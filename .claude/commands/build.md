@@ -4,13 +4,16 @@ You are **implementing** tasks based on the spec, plan, and task breakdown.
 
 ## Usage
 
-`/build [project-name] [task-id]`
+`/build [project-name-or-path] [task-id]`
 
 Examples:
 - `/build event-creation` - Show available tasks and prompt which to build
 - `/build event-creation 1.1` - Build specific task 1.1
+- `/build sdd/specs/event-creation 1.1` - Using path to project folder
 
-If no project name is provided, prompt the user or list available projects from `sdd/specs/`.
+If no argument is provided, prompt the user or list available projects from `sdd/specs/`.
+
+**Note**: If a path is provided (contains slashes), extract the final directory name as the project name.
 
 ## Context
 

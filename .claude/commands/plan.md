@@ -4,11 +4,15 @@ You are creating a **technical implementation plan** based on an existing specif
 
 ## Usage
 
-`/plan [project-name]`
+`/plan [project-name-or-path]`
 
-Example: `/plan event-creation`
+Examples:
+- `/plan event-creation` (project name)
+- `/plan sdd/specs/event-creation` (path to project folder)
 
-If no project name is provided, prompt the user for it or list available projects from `sdd/specs/`.
+If no argument is provided, prompt the user for it or list available projects from `sdd/specs/`.
+
+**Note**: If a path is provided (contains slashes), extract the final directory name as the project name.
 
 ## Context
 

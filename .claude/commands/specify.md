@@ -4,11 +4,15 @@ You are helping create a **specification** for a new project or feature.
 
 ## Usage
 
-`/specify [project-name]`
+`/specify [project-name-or-path]`
 
-Example: `/specify event-creation`
+Examples:
+- `/specify event-creation` (project name)
+- `/specify sdd/specs/event-creation` (path to project folder)
 
-If no project name is provided, prompt the user for it.
+If no argument is provided, prompt the user for it.
+
+**Note**: If a path is provided (contains slashes), extract the final directory name as the project name.
 
 ## Context
 

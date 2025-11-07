@@ -4,11 +4,15 @@ You are breaking down a technical plan into **concrete, actionable tasks**.
 
 ## Usage
 
-`/tasks [project-name]`
+`/tasks [project-name-or-path]`
 
-Example: `/tasks event-creation`
+Examples:
+- `/tasks event-creation` (project name)
+- `/tasks sdd/specs/event-creation` (path to project folder)
 
-If no project name is provided, prompt the user for it or list available projects from `sdd/specs/`.
+If no argument is provided, prompt the user for it or list available projects from `sdd/specs/`.
+
+**Note**: If a path is provided (contains slashes), extract the final directory name as the project name.
 
 ## Context
 

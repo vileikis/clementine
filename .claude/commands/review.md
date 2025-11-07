@@ -4,11 +4,15 @@ You are **reviewing** implementation against the specification and plan.
 
 ## Usage
 
-`/review [project-name]`
+`/review [project-name-or-path]`
 
-Example: `/review event-creation`
+Examples:
+- `/review event-creation` (project name)
+- `/review sdd/specs/event-creation` (path to project folder)
 
-If no project name is provided, prompt the user for it or list available projects from `sdd/specs/`.
+If no argument is provided, prompt the user for it or list available projects from `sdd/specs/`.
+
+**Note**: If a path is provided (contains slashes), extract the final directory name as the project name.
 
 ## Context
 
