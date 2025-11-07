@@ -707,6 +707,39 @@ export function useGuestFlow(eventId: string) {
 
 **Alternative**: Use `XState` for formal state machine (if team prefers)
 
+**Real-time Session Updates** (using Client SDK)
+
+```typescript
+// In guest flow component
+import { doc, onSnapshot } from "firebase/firestore";
+import { db } from "@/lib/firebase/client";
+
+useEffect(() => {
+  if (!sessionId) return;
+
+  // Subscribe to session updates
+  const unsubscribe = onSnapshot(
+    doc(db, `events/${eventId}/sessions/${sessionId}`),
+    (snapshot) => {
+      const session = snapshot.data() as Session;
+
+      if (session.state === "ready") {
+        dispatch({ type: "TRANSFORM_COMPLETE", session });
+      } else if (session.state === "error") {
+        dispatch({ type: "TRANSFORM_ERROR", message: session.error });
+      }
+    }
+  );
+
+  return () => unsubscribe();
+}, [sessionId, eventId]);
+```
+
+**Benefits**:
+- Instant updates when AI transform completes (no polling)
+- Automatic cleanup on unmount
+- Better UX (no 2-second delay)
+
 ### 5.4 Theming
 
 **CSS Variables**
@@ -855,7 +888,34 @@ Call this in `createEvent` or lazily on first access to Distribution tab.
 
 ## 8. Firebase Setup
 
-### 8.1 Admin SDK Initialization
+### 8.1 Firebase SDK Initialization
+
+**Hybrid Approach**: Use both Client SDK (frontend) and Admin SDK (backend)
+
+**Client SDK** (frontend - real-time subscriptions)
+
+```typescript
+// src/lib/firebase/client.ts
+
+import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
+
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+};
+
+export const app = initializeApp(firebaseConfig);
+export const db = getFirestore(app);
+export const storage = getStorage(app);
+```
+
+**Admin SDK** (backend - privileged operations)
 
 ```typescript
 // src/lib/firebase/admin.ts
@@ -876,6 +936,10 @@ if (!admin.apps.length) {
 export const db = admin.firestore();
 export const storage = admin.storage().bucket();
 ```
+
+**Usage Pattern**:
+- Client SDK: Real-time session updates in guest flow
+- Admin SDK: All mutations via Server Actions
 
 ### 8.2 Storage Operations
 
@@ -947,33 +1011,54 @@ export async function getPublicUrl(path: string): Promise<string> {
 }
 ```
 
-### 8.3 Security Rules (POC - Wide Open)
+### 8.3 Security Rules (POC - Permissive Reads, Restricted Writes)
 
 **Firestore** (`firestore.rules`)
 
-```
+```javascript
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // POC: Allow all reads, deny all writes (force Server Actions)
     match /{document=**} {
-      allow read, write: if true; // POC ONLY
+      allow read: if true;
+      allow write: if false; // All writes via Server Actions only
     }
+
+    // Future: More granular rules
+    // match /events/{eventId} {
+    //   allow read: if true;
+    //   allow write: if request.auth != null && hasOrganizerRole();
+    //
+    //   match /sessions/{sessionId} {
+    //     allow read: if true;
+    //     allow write: if false; // Server Actions only
+    //   }
+    // }
   }
 }
 ```
 
 **Storage** (`storage.rules`)
 
-```
+```javascript
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
+    // POC: Allow all reads, deny all writes (force Server Actions)
     match /{allPaths=**} {
-      allow read, write: if true; // POC ONLY
+      allow read: if true;
+      allow write: if false; // All uploads via Server Actions only
     }
   }
 }
 ```
+
+**Why This Approach**:
+- ✅ Client SDK can read/subscribe to Firestore (real-time updates)
+- ✅ All mutations enforced through Server Actions (security + validation)
+- ✅ Business logic stays server-side
+- ✅ Ready to tighten rules in MVP phase
 
 **Optional POC_ADMIN_KEY** (in Server Actions)
 
@@ -992,18 +1077,19 @@ if (process.env.POC_ADMIN_KEY) {
 
 ### Phase 1: Foundation (Days 1-2)
 
-**Goal**: Core data layer + Firebase setup
+**Goal**: Core data layer + Firebase setup (hybrid Client + Admin SDK)
 
 - [x] Set up Firebase project (Firestore + Storage)
-- [x] Initialize Firebase Admin SDK in Next.js
+- [x] Initialize Firebase Client SDK in Next.js (frontend real-time)
+- [x] Initialize Firebase Admin SDK in Next.js (backend mutations)
 - [x] Define TypeScript types + Zod schemas
 - [x] Implement event repository (CRUD)
 - [x] Implement scene repository (CRUD)
 - [x] Implement session repository (CRUD)
 - [x] Write storage upload/download utilities
-- [x] Deploy POC security rules (wide open)
+- [x] Deploy POC security rules (allow reads, deny writes)
 
-**Deliverable**: Can create events & scenes in Firestore via Node.js script
+**Deliverable**: Can create events & scenes via Server Actions, can subscribe to session updates via Client SDK
 
 ### Phase 2: Organizer UI (Days 3-4)
 
@@ -1117,17 +1203,27 @@ if (process.env.POC_ADMIN_KEY) {
 **Environment Variables** (`.env.local` → Vercel dashboard)
 
 ```bash
+# Public (NEXT_PUBLIC_* for Client SDK)
 NEXT_PUBLIC_BASE_URL=https://clementine.app
+NEXT_PUBLIC_FIREBASE_API_KEY=...
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=...
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=...
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=...
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=...
+NEXT_PUBLIC_FIREBASE_APP_ID=...
 
+# Private (for Admin SDK - server-side only)
 FIREBASE_PROJECT_ID=...
 FIREBASE_CLIENT_EMAIL=...
 FIREBASE_PRIVATE_KEY=...
 FIREBASE_STORAGE_BUCKET=...
 
+# Nano Banana API
 NANO_BANANA_API_KEY=...
 NANO_BANANA_BG_SWAP_ENDPOINT=...
 NANO_BANANA_DEEPFAKE_ENDPOINT=...
 
+# Optional
 POC_ADMIN_KEY=... # optional, for demo gating
 ```
 

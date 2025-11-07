@@ -22,20 +22,37 @@
   - `.env.local.example` (create)
   - `README.md` (update with Firebase setup instructions)
 
-### Task 1.2: Firebase Admin SDK Integration
+### Task 1.2: Firebase Client SDK Integration
 - **Complexity**: S
 - **Dependencies**: Task 1.1
-- **Description**: Initialize Firebase Admin SDK in Next.js app
+- **Description**: Initialize Firebase Client SDK in Next.js app for frontend real-time subscriptions
+- **Acceptance Criteria**:
+  - [ ] Firebase Client SDK installed (`firebase` v10+)
+  - [ ] Client SDK initialized in `web/src/lib/firebase/client.ts`
+  - [ ] Firestore and Storage instances exported
+  - [ ] Public environment variables configured (`NEXT_PUBLIC_*`)
+  - [ ] Can connect to Firestore from browser
+- **Files**:
+  - `web/src/lib/firebase/client.ts` (create)
+  - `web/.env.local` (create, gitignored)
+  - Update: `.env.local.example` (add public vars)
+  - `web/package.json` (update dependencies)
+
+### Task 1.2b: Firebase Admin SDK Integration
+- **Complexity**: S
+- **Dependencies**: Task 1.1
+- **Description**: Initialize Firebase Admin SDK in Next.js app for backend privileged operations
 - **Acceptance Criteria**:
   - [ ] Firebase Admin SDK installed (`firebase-admin`)
   - [ ] Admin SDK initialized in `web/src/lib/firebase/admin.ts`
   - [ ] Firestore and Storage instances exported
-  - [ ] Environment variables loaded correctly
-  - [ ] Can connect to Firestore from Node.js script
+  - [ ] Service account environment variables loaded correctly
+  - [ ] Can connect to Firestore from Server Actions
 - **Files**:
   - `web/src/lib/firebase/admin.ts` (create)
-  - `web/.env.local` (create, gitignored)
-  - `web/package.json` (update dependencies)
+  - Update: `web/.env.local`
+  - Update: `.env.local.example` (add admin vars)
+  - Update: `web/package.json` (update dependencies)
 
 ### Task 1.3: TypeScript Types & Zod Schemas
 - **Complexity**: M
@@ -54,8 +71,8 @@
 
 ### Task 1.4: Event Repository Implementation
 - **Complexity**: M
-- **Dependencies**: Task 1.2, Task 1.3
-- **Description**: Implement CRUD operations for events collection
+- **Dependencies**: Task 1.2b, Task 1.3
+- **Description**: Implement CRUD operations for events collection (uses Admin SDK)
 - **Acceptance Criteria**:
   - [ ] `createEvent()` creates event + default scene in transaction
   - [ ] `getEvent()` fetches event by ID with validation
@@ -68,8 +85,8 @@
 
 ### Task 1.5: Scene Repository Implementation
 - **Complexity**: S
-- **Dependencies**: Task 1.2, Task 1.3
-- **Description**: Implement CRUD operations for scenes subcollection
+- **Dependencies**: Task 1.2b, Task 1.3
+- **Description**: Implement CRUD operations for scenes subcollection (uses Admin SDK)
 - **Acceptance Criteria**:
   - [ ] `updateScene()` updates scene fields
   - [ ] `getScene()` fetches scene by ID
@@ -80,8 +97,8 @@
 
 ### Task 1.6: Session Repository Implementation
 - **Complexity**: M
-- **Dependencies**: Task 1.2, Task 1.3
-- **Description**: Implement session lifecycle operations
+- **Dependencies**: Task 1.2b, Task 1.3
+- **Description**: Implement session lifecycle operations (uses Admin SDK)
 - **Acceptance Criteria**:
   - [ ] `startSession()` creates new session with `created` state
   - [ ] `saveCapture()` updates session with input image path
@@ -93,8 +110,8 @@
 
 ### Task 1.7: Storage Upload/Download Utilities
 - **Complexity**: M
-- **Dependencies**: Task 1.2
-- **Description**: Implement Firebase Storage operations for images and files
+- **Dependencies**: Task 1.2b
+- **Description**: Implement Firebase Storage operations for images and files (uses Admin SDK)
 - **Acceptance Criteria**:
   - [ ] `uploadInputImage()` saves guest photo to correct path
   - [ ] `uploadResultImage()` saves AI result to correct path
@@ -110,12 +127,14 @@
 ### Task 1.8: Deploy POC Security Rules
 - **Complexity**: S
 - **Dependencies**: Task 1.1
-- **Description**: Deploy wide-open Firestore and Storage rules for POC
+- **Description**: Deploy Firestore and Storage rules (allow reads, deny writes to force Server Actions)
 - **Acceptance Criteria**:
-  - [ ] `firestore.rules` created with allow all (POC only)
-  - [ ] `storage.rules` created with allow all (POC only)
+  - [ ] `firestore.rules` created: allow read: if true, allow write: if false
+  - [ ] `storage.rules` created: allow read: if true, allow write: if false
   - [ ] Rules deployed to Firebase project
-  - [ ] Rules include WARNING comments about POC-only status
+  - [ ] Rules include comments explaining hybrid approach
+  - [ ] Client SDK can read/subscribe to documents
+  - [ ] Client SDK cannot write (enforces Server Actions)
 - **Files**:
   - `firestore.rules` (create)
   - `storage.rules` (create)
@@ -405,15 +424,18 @@
 - **Files**:
   - `web/src/app/actions/sessions.ts` (create)
 
-### Task 3.10: Guest Flow State Machine
+### Task 3.10: Guest Flow State Machine with Real-time Updates
 - **Complexity**: L
-- **Dependencies**: Task 3.3, Task 3.5, Task 3.8, Task 3.9
-- **Description**: Implement useGuestFlow hook with state machine
+- **Dependencies**: Task 1.2, Task 3.3, Task 3.5, Task 3.8, Task 3.9
+- **Description**: Implement useGuestFlow hook with state machine and real-time session subscriptions
 - **Acceptance Criteria**:
   - [ ] State machine matches spec section 10
   - [ ] States: greeting, ready_to_capture, countdown, captured, transforming, review_ready, share, error
   - [ ] Transitions handled by actions
   - [ ] Side effects: camera request, upload, transform trigger
+  - [ ] **Real-time subscription** to session updates using Client SDK `onSnapshot`
+  - [ ] Instant state updates when AI transform completes (no polling)
+  - [ ] Subscription cleanup on unmount
   - [ ] Hook returns current state and dispatch function
   - [ ] Integrates all previous guest components
 - **Files**:
@@ -795,26 +817,32 @@
 
 ## Summary
 
-**Total Tasks**: 69
+**Total Tasks**: 70
 **Estimated Duration**: 10 days (8 hours/day)
 **Complexity Breakdown**:
-- Small (S): 28 tasks (~1-2 hours each)
+- Small (S): 29 tasks (~1-2 hours each)
 - Medium (M): 37 tasks (~2-3 hours each)
 - Large (L): 4 tasks (~3-4 hours each)
 
+**Firebase Architecture**:
+- Uses **hybrid approach** (Client SDK + Admin SDK)
+- Client SDK (Task 1.2): Real-time subscriptions for guest flow
+- Admin SDK (Task 1.2b): Server Actions for all mutations
+- Security Rules (Task 1.8): Allow reads, deny writes (force Server Actions)
+
 **Critical Path**:
-1. Phase 1 foundation must complete first
-2. Phase 2 (Organizer UI) can start after Task 1.4-1.7
-3. Phase 3 (Guest Capture) can start after Phase 1
+1. Phase 1 foundation must complete first (including both Client & Admin SDK)
+2. Phase 2 (Organizer UI) can start after Task 1.2b, 1.4-1.7
+3. Phase 3 (Guest Capture) can start after Task 1.2 (Client SDK) + Phase 1
 4. Phase 4 (AI Transform) depends on Phase 3
 5. Phase 5 (Share) depends on Phase 4
 6. Phase 6 (Polish) runs throughout and concludes project
 
 **Dependencies Flow**:
 ```
-Phase 1 (Foundation)
-    ├─> Phase 2 (Organizer UI) ─┐
-    └─> Phase 3 (Guest Capture) ─┴─> Phase 4 (AI Transform) ─> Phase 5 (Share) ─> Phase 6 (Polish)
+Phase 1 (Foundation - Hybrid Firebase Setup)
+    ├─> Phase 2 (Organizer UI - uses Admin SDK) ─┐
+    └─> Phase 3 (Guest Capture - uses Client SDK) ─┴─> Phase 4 (AI Transform) ─> Phase 5 (Share) ─> Phase 6 (Polish)
 ```
 
 **Next Steps**:
