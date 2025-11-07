@@ -13,7 +13,28 @@ A web-based platform where:
 - **Guests** visit a shareable link, upload a photo, and receive an AI-transformed result in under 1 minute
 - **Analytics** help creators measure engagement, shares, and campaign success
 
-See [PRODUCT.md](./PRODUCT.md) for full product strategy, user flows, MVP scope, and success metrics.
+See [PRODUCT.md](sdd/product/PRODUCT.md) for full product strategy, user flows, MVP scope, and success metrics.
+
+### Spec-Driven Development
+
+This project follows **spec-driven development** practices. Key documentation is organized in `sdd/`:
+
+- **`sdd/product/`** - Product vision, strategy, and roadmap documents
+- **`sdd/standards/`** - Technical standards, conventions, and coding guidelines
+- **`sdd/specs/`** - Project/feature specifications, each containing:
+  - `spec.md` - What and why we're building
+  - `plan.md` - Technical implementation plan
+  - `tasks.md` - Breakdown of actionable tasks
+  - Other relevant documentation
+
+**Workflow**: Use custom slash commands with project names:
+- `/specify [project-name]` - Create a new specification
+- `/plan [project-name]` - Generate technical implementation plan
+- `/tasks [project-name]` - Break down plan into actionable tasks
+- `/build [project-name] [task-id]` - Implement tasks systematically
+- `/review [project-name]` - Review implementation against spec/plan
+
+Example: `/specify event-creation` creates `sdd/specs/event-creation/spec.md`
 
 ### Technical Stack
 
