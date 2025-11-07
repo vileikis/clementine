@@ -18,8 +18,10 @@ If no argument is provided, prompt the user for it or list available projects fr
 
 Review:
 - The project specification in `sdd/specs/[project-name]/spec.md`
-- Technical standards in `sdd/standards/`
+- **Technical standards** in `sdd/standards/` - See [Standards README](../standards/README.md) for available standards
 - Current codebase architecture (from CLAUDE.md)
+
+**IMPORTANT**: Always check `sdd/standards/README.md` for relevant standards that apply to the technologies and patterns in the spec. Follow established standards for architecture, patterns, and best practices.
 
 ## Your Task
 

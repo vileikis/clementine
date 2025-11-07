@@ -21,7 +21,9 @@ Review:
 - The specification: `sdd/specs/[project-name]/spec.md`
 - The technical plan: `sdd/specs/[project-name]/plan.md`
 - The task list: `sdd/specs/[project-name]/tasks.md`
-- Technical standards: `sdd/standards/`
+- **Technical standards** in `sdd/standards/` - See [Standards README](../standards/README.md)
+
+**IMPORTANT**: Follow established standards from `sdd/standards/` for all implementation. Check README for relevant standards.
 
 ## Your Task
 

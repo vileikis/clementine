@@ -18,8 +18,10 @@ If no argument is provided, prompt the user for it.
 
 Review the following documents:
 - `sdd/product/` - Product vision, strategy, and roadmap
-- `sdd/standards/` - Technical standards and conventions
+- **Technical standards** in `sdd/standards/` - See [Standards README](../standards/README.md)
 - Existing specs in `sdd/specs/` for reference
+
+**IMPORTANT**: Check `sdd/standards/README.md` for relevant standards that inform technical requirements and constraints.
 
 ## Your Task
 

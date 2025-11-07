@@ -19,6 +19,9 @@ If no argument is provided, prompt the user for it or list available projects fr
 Review:
 - The specification: `sdd/specs/[project-name]/spec.md`
 - The technical plan: `sdd/specs/[project-name]/plan.md`
+- **Technical standards** in `sdd/standards/` - See [Standards README](../standards/README.md) for available standards
+
+**IMPORTANT**: Always check `sdd/standards/README.md` for relevant standards. Follow established patterns for task breakdown, naming, and organization.
 
 ## Your Task
 

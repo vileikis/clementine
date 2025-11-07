@@ -100,6 +100,15 @@ React component best practices
 
 Standards for API routes and backend services.
 
+### [Firebase](./backend/firebase.md)
+Firebase architecture and best practices
+- Hybrid Client SDK + Admin SDK pattern
+- Client SDK for real-time subscriptions
+- Admin SDK for mutations and business logic
+- Security rules (allow reads, deny writes)
+- Environment variables and configuration
+- Data patterns and repository layer
+
 ### [API](./backend/api.md)
 Next.js API route standards
 - RESTful design patterns
