@@ -331,57 +331,57 @@
   - `web/src/app/join/[eventId]/page.tsx` (create) ✅
   - `web/src/app/join/[eventId]/layout.tsx` (create) ✅
 
-### Task 3.2: Brand Theme Provider
+### Task 3.2: Brand Theme Provider ✅
 - **Complexity**: S
 - **Dependencies**: Task 3.1
 - **Description**: Create client component to inject brand color as CSS variable
 - **Acceptance Criteria**:
-  - [ ] Component receives brandColor prop
-  - [ ] Sets `--brand` CSS variable on mount
-  - [ ] Updates variable when brandColor changes
-  - [ ] Wraps guest flow content
+  - [x] Component receives brandColor prop
+  - [x] Sets `--brand` CSS variable on mount
+  - [x] Updates variable when brandColor changes
+  - [x] Wraps guest flow content
 - **Files**:
-  - `web/src/components/guest/BrandThemeProvider.tsx` (create)
-  - Update: `web/src/app/join/[eventId]/page.tsx`
+  - `web/src/components/guest/BrandThemeProvider.tsx` (create) ✅
+  - Update: `web/src/app/join/[eventId]/page.tsx` ✅
 
-### Task 3.3: Greeting Screen
+### Task 3.3: Greeting Screen ✅
 - **Complexity**: S
 - **Dependencies**: Task 3.2
 - **Description**: Build initial greeting screen for guests
 - **Acceptance Criteria**:
-  - [ ] Displays event title (if showTitleOverlay is true)
-  - [ ] Shows branded welcome message
-  - [ ] "Get Started" button to request camera
-  - [ ] Uses brand color for accents
-  - [ ] Mobile-responsive layout
+  - [x] Displays event title (if showTitleOverlay is true)
+  - [x] Shows branded welcome message
+  - [x] "Get Started" button to request camera
+  - [x] Uses brand color for accents
+  - [x] Mobile-responsive layout
 - **Files**:
-  - `web/src/components/guest/GreetingScreen.tsx` (create)
+  - `web/src/components/guest/GreetingScreen.tsx` (create) ✅
 
-### Task 3.4: Camera Access Hook
+### Task 3.4: Camera Access Hook ✅
 - **Complexity**: M
 - **Dependencies**: None
 - **Description**: Implement React hook for camera access via MediaDevices API
 - **Acceptance Criteria**:
-  - [ ] Hook requests user camera (front-facing)
-  - [ ] Returns stream, error, and video ref
-  - [ ] Cleans up stream on unmount
-  - [ ] Handles permission denied gracefully
-  - [ ] Mobile browser compatible (iOS Safari, Android Chrome)
+  - [x] Hook requests user camera (front-facing)
+  - [x] Returns stream, error, and video ref
+  - [x] Cleans up stream on unmount
+  - [x] Handles permission denied gracefully
+  - [x] Mobile browser compatible (iOS Safari, Android Chrome)
 - **Files**:
-  - `web/src/hooks/useCamera.ts` (create)
+  - `web/src/hooks/useCamera.ts` (create) ✅
 
-### Task 3.5: Camera View Component
+### Task 3.5: Camera View Component ✅
 - **Complexity**: M
 - **Dependencies**: Task 3.4
 - **Description**: Build live camera preview component
 - **Acceptance Criteria**:
-  - [ ] Video element shows live camera feed
-  - [ ] Maintains aspect ratio (9:16 or auto)
-  - [ ] Fills viewport on mobile
-  - [ ] Shows permission error state
-  - [ ] Mirror effect for front camera
+  - [x] Video element shows live camera feed
+  - [x] Maintains aspect ratio (9:16 or auto)
+  - [x] Fills viewport on mobile
+  - [x] Shows permission error state
+  - [x] Mirror effect for front camera
 - **Files**:
-  - `web/src/components/guest/CameraView.tsx` (create)
+  - `web/src/components/guest/CameraView.tsx` (create) ✅
 
 ### Task 3.6: Countdown Component
 - **Complexity**: S
