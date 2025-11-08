@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { EventForm } from "@/components/organizer/EventForm"
 
 export default function NewEventPage() {
   return (
@@ -12,39 +13,15 @@ export default function NewEventPage() {
         </Link>
       </div>
 
-      <div className="border rounded-lg p-8 text-center">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-yellow-100 text-yellow-600 mb-4">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-8 w-8"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-            />
-          </svg>
-        </div>
-
-        <h1 className="text-2xl font-bold mb-2">Create Event</h1>
-        <p className="text-muted-foreground mb-6">
-          Event creation form - Work in Progress
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold mb-2">Create Event</h1>
+        <p className="text-muted-foreground">
+          Set up your AI photobooth experience with custom branding
         </p>
+      </div>
 
-        <div className="bg-muted/50 rounded-lg p-6 text-left">
-          <h3 className="font-semibold mb-3">Coming Soon:</h3>
-          <ul className="space-y-2 text-sm text-muted-foreground">
-            <li>• Event title and branding configuration</li>
-            <li>• Brand color picker</li>
-            <li>• Title overlay toggle</li>
-            <li>• Automatic join URL generation</li>
-            <li>• QR code creation</li>
-          </ul>
-        </div>
+      <div className="border rounded-lg p-6 bg-card">
+        <EventForm />
       </div>
     </div>
   )

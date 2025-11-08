@@ -1,11 +1,15 @@
-import { render, screen } from '@testing-library/react'
-import Home from '../page'
+// Mock the redirect function
+jest.mock('next/navigation', () => ({
+  redirect: jest.fn(),
+}))
 
 describe('Home Page', () => {
-  it('renders the main heading', () => {
-    render(<Home />)
+  it('redirects to /events', async () => {
+    const { redirect: mockRedirect } = await import('next/navigation')
+    const Home = (await import('../page')).default
 
-    const heading = screen.getByRole('heading', { level: 1 })
-    expect(heading).toHaveTextContent('To get started, edit the page.tsx file.')
+    Home()
+
+    expect(mockRedirect).toHaveBeenCalledWith('/events')
   })
 })

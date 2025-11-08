@@ -189,21 +189,21 @@
   - `web/src/app/events/layout.tsx` (create) ✅
   - `web/src/components/organizer/EventCard.tsx` (create) ✅
 
-### Task 2.4: Event Creation Form ✅ (WIP placeholder)
+### Task 2.4: Event Creation Form ✅
 - **Complexity**: M
 - **Dependencies**: Task 2.1
 - **Description**: Build `/events/new` page with event creation form
 - **Acceptance Criteria**:
-  - [x] Page structure created with WIP message
-  - [ ] Form has title, brand color, title overlay toggle inputs
-  - [ ] Form validation (title required, color valid hex)
-  - [ ] Submit calls `createEventAction()`
-  - [ ] Redirects to event detail page on success
-  - [ ] Shows error toast on failure
-  - [ ] Uses shadcn/ui components (Input, Button, Label, Switch)
+  - [x] Page structure created
+  - [x] Form has title, brand color, title overlay toggle inputs
+  - [x] Form validation (title required, color valid hex)
+  - [x] Submit calls `createEventAction()`
+  - [x] Redirects to event detail page on success
+  - [x] Shows error message on failure
+  - [x] Custom form components (Input, Button, Label, Switch)
 - **Files**:
-  - `web/src/app/events/new/page.tsx` (create) ✅ (WIP)
-  - `web/src/components/organizer/EventForm.tsx` (pending)
+  - `web/src/app/events/new/page.tsx` (create) ✅
+  - `web/src/components/organizer/EventForm.tsx` (create) ✅
 
 ### Task 2.5: Event Detail Layout & Tabs ✅ (WIP placeholder)
 - **Complexity**: S
