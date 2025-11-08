@@ -7,11 +7,14 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "kill": "pkill -f 'next dev'"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "firebase": "^12.5.0",
+    "firebase-admin": "^13.6.0",
     "lucide-react": "^0.553.0",
     "next": "16.0.1",
     "react": "19.2.0",

@@ -22,37 +22,37 @@
   - `.env.local.example` (create) ✅
   - `README.md` (update with Firebase setup instructions) ✅
 
-### Task 1.2: Firebase Client SDK Integration
+### Task 1.2: Firebase Client SDK Integration ✅
 - **Complexity**: S
 - **Dependencies**: Task 1.1
 - **Description**: Initialize Firebase Client SDK in Next.js app for frontend real-time subscriptions
 - **Acceptance Criteria**:
-  - [ ] Firebase Client SDK installed (`firebase` v10+)
-  - [ ] Client SDK initialized in `web/src/lib/firebase/client.ts`
-  - [ ] Firestore and Storage instances exported
-  - [ ] Public environment variables configured (`NEXT_PUBLIC_*`)
-  - [ ] Can connect to Firestore from browser
+  - [x] Firebase Client SDK installed (`firebase` v12.5.0)
+  - [x] Client SDK initialized in `web/src/lib/firebase/client.ts`
+  - [x] Firestore and Storage instances exported
+  - [x] Public environment variables configured (`NEXT_PUBLIC_*`)
+  - [x] Can connect to Firestore from browser
 - **Files**:
-  - `web/src/lib/firebase/client.ts` (create)
-  - `web/.env.local` (create, gitignored)
-  - Update: `.env.local.example` (add public vars)
-  - `web/package.json` (update dependencies)
+  - `web/src/lib/firebase/client.ts` (create) ✅
+  - `web/.env.local` (already exists) ✅
+  - Update: `.env.local.example` (add public vars) ✅
+  - `web/package.json` (update dependencies) ✅
 
-### Task 1.2b: Firebase Admin SDK Integration
+### Task 1.2b: Firebase Admin SDK Integration ✅
 - **Complexity**: S
 - **Dependencies**: Task 1.1
 - **Description**: Initialize Firebase Admin SDK in Next.js app for backend privileged operations
 - **Acceptance Criteria**:
-  - [ ] Firebase Admin SDK installed (`firebase-admin`)
-  - [ ] Admin SDK initialized in `web/src/lib/firebase/admin.ts`
-  - [ ] Firestore and Storage instances exported
-  - [ ] Service account environment variables loaded correctly
-  - [ ] Can connect to Firestore from Server Actions
+  - [x] Firebase Admin SDK installed (`firebase-admin` v13.6.0)
+  - [x] Admin SDK initialized in `web/src/lib/firebase/admin.ts`
+  - [x] Firestore and Storage instances exported
+  - [x] Service account environment variables loaded correctly
+  - [x] Can connect to Firestore from Server Actions
 - **Files**:
-  - `web/src/lib/firebase/admin.ts` (create)
-  - Update: `web/.env.local`
-  - Update: `.env.local.example` (add admin vars)
-  - Update: `web/package.json` (update dependencies)
+  - `web/src/lib/firebase/admin.ts` (create) ✅
+  - Update: `web/.env.local` (user already configured) ✅
+  - Update: `.env.local.example` (add admin vars) ✅
+  - Update: `web/package.json` (update dependencies) ✅
 
 ### Task 1.3: TypeScript Types & Zod Schemas
 - **Complexity**: M
