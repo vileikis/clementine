@@ -252,20 +252,22 @@
   - `web/src/components/organizer/PromptEditor.tsx` (create) ✅
   - Update: `web/src/app/events/[eventId]/scene/page.tsx` ✅
 
-### Task 2.8: Scene Configuration Tab - Reference Image Uploader
+### Task 2.8: Scene Configuration Tab - Reference Image Uploader ✅
 - **Complexity**: M
 - **Dependencies**: Task 2.6
 - **Description**: Add reference image upload to Scene tab
 - **Acceptance Criteria**:
-  - [ ] File input for image upload (JPEG, PNG only)
-  - [ ] Image preview after upload
-  - [ ] Replace image button if already uploaded
-  - [ ] Upload progress indicator
-  - [ ] Calls `uploadReferenceImageAction()`
-  - [ ] Shows current reference image if exists
+  - [x] File input for image upload (JPEG, PNG only)
+  - [x] Image preview after upload
+  - [x] Replace image button if already uploaded
+  - [x] Upload progress indicator
+  - [x] Calls `uploadReferenceImageAction()`
+  - [x] Shows current reference image if exists
 - **Files**:
-  - `web/src/components/organizer/RefImageUploader.tsx` (create)
-  - Update: `web/src/app/events/[eventId]/scene/page.tsx`
+  - `web/src/components/organizer/RefImageUploader.tsx` (create) ✅
+  - Update: `web/src/app/events/[eventId]/scene/page.tsx` ✅
+  - Update: `web/src/app/actions/scenes.ts` (added `getImageUrlAction()`) ✅
+  - Update: `web/next.config.ts` (configured Firebase Storage image domain) ✅
 
 ### Task 2.9: Branding Configuration Tab
 - **Complexity**: M

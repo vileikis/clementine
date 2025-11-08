@@ -1,7 +1,7 @@
 "use server"
 
 import { updateScene } from "@/lib/repositories/scenes"
-import { uploadReferenceImage } from "@/lib/storage/upload"
+import { uploadReferenceImage, getPublicUrl } from "@/lib/storage/upload"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
 
@@ -72,6 +72,18 @@ export async function uploadReferenceImageAction(
       success: false,
       error:
         error instanceof Error ? error.message : "Failed to upload image",
+    }
+  }
+}
+
+export async function getImageUrlAction(path: string) {
+  try {
+    const url = await getPublicUrl(path)
+    return { success: true, url }
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to get image URL",
     }
   }
 }

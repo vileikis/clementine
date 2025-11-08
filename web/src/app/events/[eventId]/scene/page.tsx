@@ -3,6 +3,7 @@ import { notFound } from "next/navigation"
 import { ModeSelector } from "@/components/organizer/ModeSelector"
 import { EffectPicker } from "@/components/organizer/EffectPicker"
 import { PromptEditor } from "@/components/organizer/PromptEditor"
+import { RefImageUploader } from "@/components/organizer/RefImageUploader"
 
 interface ScenePageProps {
   params: Promise<{ eventId: string }>
@@ -41,6 +42,15 @@ export default async function ScenePage({ params }: ScenePageProps) {
           defaultPrompt={scene.defaultPrompt}
           eventId={eventId}
           sceneId={scene.id}
+        />
+      </section>
+
+      <section>
+        <h2 className="text-xl font-semibold mb-4">Reference Image</h2>
+        <RefImageUploader
+          eventId={eventId}
+          sceneId={scene.id}
+          currentImagePath={scene.referenceImagePath}
         />
       </section>
     </div>
