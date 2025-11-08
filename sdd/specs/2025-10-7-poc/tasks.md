@@ -54,59 +54,59 @@
   - Update: `.env.local.example` (add admin vars) ✅
   - Update: `web/package.json` (update dependencies) ✅
 
-### Task 1.3: TypeScript Types & Zod Schemas
+### Task 1.3: TypeScript Types & Zod Schemas ✅
 - **Complexity**: M
 - **Dependencies**: None
 - **Description**: Define canonical TypeScript types and Zod validation schemas for all data models
 - **Acceptance Criteria**:
-  - [ ] `Event`, `Scene`, `Session`, `Media`, `StatsOverview` types defined
-  - [ ] Enum types for `EventStatus`, `SceneStatus`, `SessionState`, `CaptureMode`, `EffectType`
-  - [ ] Zod schemas created for runtime validation
-  - [ ] All types match spec section 2
-  - [ ] Types exported from barrel file
+  - [x] `Event`, `Scene`, `Session`, `Media`, `StatsOverview` types defined
+  - [x] Enum types for `EventStatus`, `SceneStatus`, `SessionState`, `CaptureMode`, `EffectType`
+  - [x] Zod schemas created for runtime validation
+  - [x] All types match spec section 2
+  - [x] Types exported from barrel file
 - **Files**:
-  - `web/src/lib/types/firestore.ts` (create)
-  - `web/src/lib/schemas/firestore.ts` (create)
-  - `web/src/lib/types/index.ts` (create)
+  - `web/src/lib/types/firestore.ts` (create) ✅
+  - `web/src/lib/schemas/firestore.ts` (create) ✅
+  - `web/src/lib/types/index.ts` (create) ✅
 
-### Task 1.4: Event Repository Implementation
+### Task 1.4: Event Repository Implementation ✅
 - **Complexity**: M
 - **Dependencies**: Task 1.2b, Task 1.3
 - **Description**: Implement CRUD operations for events collection (uses Admin SDK)
 - **Acceptance Criteria**:
-  - [ ] `createEvent()` creates event + default scene in transaction
-  - [ ] `getEvent()` fetches event by ID with validation
-  - [ ] `listEvents()` returns all events ordered by creation
-  - [ ] `updateEventBranding()` updates brand color and title overlay
-  - [ ] `getCurrentScene()` fetches active scene for event
-  - [ ] All functions handle errors gracefully
+  - [x] `createEvent()` creates event + default scene in transaction
+  - [x] `getEvent()` fetches event by ID with validation
+  - [x] `listEvents()` returns all events ordered by creation
+  - [x] `updateEventBranding()` updates brand color and title overlay
+  - [x] `getCurrentScene()` fetches active scene for event
+  - [x] All functions handle errors gracefully
 - **Files**:
-  - `web/src/lib/repositories/events.ts` (create)
+  - `web/src/lib/repositories/events.ts` (create) ✅
 
-### Task 1.5: Scene Repository Implementation
+### Task 1.5: Scene Repository Implementation ✅
 - **Complexity**: S
 - **Dependencies**: Task 1.2b, Task 1.3
 - **Description**: Implement CRUD operations for scenes subcollection (uses Admin SDK)
 - **Acceptance Criteria**:
-  - [ ] `updateScene()` updates scene fields
-  - [ ] `getScene()` fetches scene by ID
-  - [ ] Scene updates include `updatedAt` timestamp
-  - [ ] Validation on effect type and mode
+  - [x] `updateScene()` updates scene fields
+  - [x] `getScene()` fetches scene by ID
+  - [x] Scene updates include `updatedAt` timestamp
+  - [x] Validation on effect type and mode
 - **Files**:
-  - `web/src/lib/repositories/scenes.ts` (create)
+  - `web/src/lib/repositories/scenes.ts` (create) ✅
 
-### Task 1.6: Session Repository Implementation
+### Task 1.6: Session Repository Implementation ✅
 - **Complexity**: M
 - **Dependencies**: Task 1.2b, Task 1.3
 - **Description**: Implement session lifecycle operations (uses Admin SDK)
 - **Acceptance Criteria**:
-  - [ ] `startSession()` creates new session with `created` state
-  - [ ] `saveCapture()` updates session with input image path
-  - [ ] `updateSessionState()` transitions session state
-  - [ ] `getSession()` fetches session by ID
-  - [ ] State transitions follow spec section 10 state machine
+  - [x] `startSession()` creates new session with `created` state
+  - [x] `saveCapture()` updates session with input image path
+  - [x] `updateSessionState()` transitions session state
+  - [x] `getSession()` fetches session by ID
+  - [x] State transitions follow spec section 10 state machine
 - **Files**:
-  - `web/src/lib/repositories/sessions.ts` (create)
+  - `web/src/lib/repositories/sessions.ts` (create) ✅
 
 ### Task 1.7: Storage Upload/Download Utilities
 - **Complexity**: M
