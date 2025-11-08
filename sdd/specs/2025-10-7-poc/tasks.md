@@ -147,53 +147,54 @@
 
 ## Phase 2: Organizer UI (Days 3-4)
 
-### Task 2.1: Event Server Actions
+### Task 2.1: Event Server Actions ✅
 - **Complexity**: M
 - **Dependencies**: Task 1.4, Task 1.5
 - **Description**: Create Server Actions for event management
 - **Acceptance Criteria**:
-  - [ ] `createEventAction()` validates input and calls repository
-  - [ ] `getEventAction()` fetches event with error handling
-  - [ ] `listEventsAction()` returns event list
-  - [ ] `updateEventBrandingAction()` updates branding with revalidation
-  - [ ] `getCurrentSceneAction()` fetches active scene
-  - [ ] All actions use `"use server"` directive
-  - [ ] All actions revalidate relevant paths
+  - [x] `createEventAction()` validates input and calls repository
+  - [x] `getEventAction()` fetches event with error handling
+  - [x] `listEventsAction()` returns event list
+  - [x] `updateEventBrandingAction()` updates branding with revalidation
+  - [x] `getCurrentSceneAction()` fetches active scene
+  - [x] All actions use `"use server"` directive
+  - [x] All actions revalidate relevant paths
 - **Files**:
-  - `web/src/app/actions/events.ts` (create)
+  - `web/src/app/actions/events.ts` (create) ✅
 
-### Task 2.2: Scene Server Actions
+### Task 2.2: Scene Server Actions ✅
 - **Complexity**: M
 - **Dependencies**: Task 1.5, Task 1.7
 - **Description**: Create Server Actions for scene configuration
 - **Acceptance Criteria**:
-  - [ ] `updateSceneAction()` updates effect and prompt
-  - [ ] `uploadReferenceImageAction()` handles file upload from FormData
-  - [ ] Actions revalidate event page on changes
-  - [ ] File size validation (max 10MB for reference images)
+  - [x] `updateSceneAction()` updates effect and prompt
+  - [x] `uploadReferenceImageAction()` handles file upload from FormData
+  - [x] Actions revalidate event page on changes
+  - [x] File size validation (max 10MB for reference images)
 - **Files**:
-  - `web/src/app/actions/scenes.ts` (create)
+  - `web/src/app/actions/scenes.ts` (create) ✅
 
-### Task 2.3: Events List Page
+### Task 2.3: Events List Page ✅
 - **Complexity**: M
 - **Dependencies**: Task 2.1
 - **Description**: Build `/events` page showing all events
 - **Acceptance Criteria**:
-  - [ ] Page fetches events using `listEventsAction()`
-  - [ ] EventCard component displays title, status, join URL
-  - [ ] "Create Event" button navigates to `/events/new`
-  - [ ] Empty state shown when no events
-  - [ ] Responsive layout (mobile-first)
+  - [x] Page fetches events using `listEventsAction()`
+  - [x] EventCard component displays title, status, join URL
+  - [x] "Create Event" button navigates to `/events/new`
+  - [x] Empty state shown when no events
+  - [x] Responsive layout (mobile-first)
 - **Files**:
-  - `web/src/app/events/page.tsx` (create)
-  - `web/src/app/events/layout.tsx` (create)
-  - `web/src/components/organizer/EventCard.tsx` (create)
+  - `web/src/app/events/page.tsx` (create) ✅
+  - `web/src/app/events/layout.tsx` (create) ✅
+  - `web/src/components/organizer/EventCard.tsx` (create) ✅
 
-### Task 2.4: Event Creation Form
+### Task 2.4: Event Creation Form ✅ (WIP placeholder)
 - **Complexity**: M
 - **Dependencies**: Task 2.1
 - **Description**: Build `/events/new` page with event creation form
 - **Acceptance Criteria**:
+  - [x] Page structure created with WIP message
   - [ ] Form has title, brand color, title overlay toggle inputs
   - [ ] Form validation (title required, color valid hex)
   - [ ] Submit calls `createEventAction()`
@@ -201,23 +202,24 @@
   - [ ] Shows error toast on failure
   - [ ] Uses shadcn/ui components (Input, Button, Label, Switch)
 - **Files**:
-  - `web/src/app/events/new/page.tsx` (create)
-  - `web/src/components/organizer/EventForm.tsx` (create)
+  - `web/src/app/events/new/page.tsx` (create) ✅ (WIP)
+  - `web/src/components/organizer/EventForm.tsx` (pending)
 
-### Task 2.5: Event Detail Layout & Tabs
+### Task 2.5: Event Detail Layout & Tabs ✅ (WIP placeholder)
 - **Complexity**: S
 - **Dependencies**: Task 2.1
 - **Description**: Build `/events/[eventId]` layout with tab navigation
 - **Acceptance Criteria**:
-  - [ ] Layout fetches event and passes to children
+  - [x] Page structure created with WIP message
+  - [x] Layout fetches event and passes to children
   - [ ] Tabs for Scene, Branding, Distribution
   - [ ] Tab navigation uses Next.js Link
   - [ ] Active tab highlighted
-  - [ ] Event title shown in header
+  - [x] Event title shown in header
   - [ ] Uses shadcn/ui Tabs component
 - **Files**:
-  - `web/src/app/events/[eventId]/layout.tsx` (create)
-  - `web/src/app/events/[eventId]/page.tsx` (create, redirects to /scene)
+  - `web/src/app/events/[eventId]/layout.tsx` (create) ✅
+  - `web/src/app/events/[eventId]/page.tsx` (create) ✅ (WIP)
 
 ### Task 2.6: Scene Configuration Tab - Mode & Effect
 - **Complexity**: M
