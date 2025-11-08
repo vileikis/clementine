@@ -13,15 +13,86 @@ Perfect for festivals, brand activations, corporate events, and social campaigns
 
 ## 🚀 Quick Start
 
+### Prerequisites
+
+- Node.js 18+
+- pnpm package manager
+- Firebase project (see [Firebase Setup](#firebase-setup))
+
+### Installation
+
 ```bash
 # Install dependencies
 pnpm install
+
+# Set up environment variables (see Firebase Setup below)
+cp web/.env.local.example web/.env.local
+# Edit web/.env.local with your Firebase credentials
 
 # Start development server
 pnpm dev
 
 # Visit http://localhost:3000
 ```
+
+### Firebase Setup
+
+This project requires a Firebase project for Firestore and Storage. Follow these steps:
+
+#### 1. Create Firebase Project
+
+1. Go to [Firebase Console](https://console.firebase.google.com/)
+2. Click "Add project" or select an existing project
+3. Enable Google Analytics (optional)
+
+#### 2. Enable Firestore Database
+
+1. In Firebase Console, go to **Firestore Database**
+2. Click "Create database"
+3. Select **Start in production mode** (we'll add security rules later)
+4. Choose a location (e.g., `us-central1`)
+
+#### 3. Enable Firebase Storage
+
+1. In Firebase Console, go to **Storage**
+2. Click "Get started"
+3. Accept default security rules (we'll customize later)
+4. Use the same location as Firestore
+
+#### 4. Get Client SDK Configuration
+
+1. Go to **Project Settings** > **General**
+2. Scroll to "Your apps" section
+3. Click the Web icon (`</>`) to add a web app
+4. Register app with a nickname (e.g., "Clementine Web")
+5. Copy the config object values to `web/.env.local`:
+   - `apiKey` → `NEXT_PUBLIC_FIREBASE_API_KEY`
+   - `projectId` → `NEXT_PUBLIC_FIREBASE_PROJECT_ID`
+   - `storageBucket` → `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`
+   - `authDomain` → `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
+   - `messagingSenderId` → `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`
+   - `appId` → `NEXT_PUBLIC_FIREBASE_APP_ID`
+
+#### 5. Generate Service Account (Admin SDK)
+
+1. Go to **Project Settings** > **Service Accounts**
+2. Click "Generate new private key"
+3. Download the JSON file (keep it secure!)
+4. Add these values to `web/.env.local`:
+   - `project_id` → `FIREBASE_PROJECT_ID`
+   - `client_email` → `FIREBASE_CLIENT_EMAIL`
+   - `private_key` → `FIREBASE_PRIVATE_KEY` (keep the full key with newlines)
+   - Also set `FIREBASE_STORAGE_BUCKET` (same as public storage bucket)
+
+#### 6. Set Base URL
+
+Add your base URL to `web/.env.local`:
+```bash
+NEXT_PUBLIC_BASE_URL=http://localhost:3000  # Development
+# NEXT_PUBLIC_BASE_URL=https://your-domain.com  # Production
+```
+
+**Important**: Never commit `web/.env.local` or the service account JSON file to version control! The `.env.local.example` file should be committed as a template.
 
 ## 📂 Project Structure
 
