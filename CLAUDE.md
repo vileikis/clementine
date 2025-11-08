@@ -27,6 +27,15 @@ This project follows **spec-driven development** practices. Key documentation is
   - `tasks.md` - Breakdown of actionable tasks
   - Other relevant documentation
 
+**IMPORTANT**: Before implementing any feature or making changes, you MUST:
+1. Read `sdd/standards/README.md` to understand applicable standards
+2. Review relevant standards from `sdd/standards/` based on your task:
+   - `global/` - Always applicable (coding style, conventions, validation, error handling)
+   - `frontend/` - For UI/UX work (CSS, components, accessibility, responsive design)
+   - `backend/` - For API/data work (Firebase, API routes, models)
+   - `testing/` - For test implementation
+3. Follow all standards strictly in your implementation
+
 **Workflow**: Use custom slash commands with project names:
 - `/specify [project-name]` - Create a new specification
 - `/plan [project-name]` - Generate technical implementation plan
