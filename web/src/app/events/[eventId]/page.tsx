@@ -3,13 +3,14 @@ import { getEventAction } from "@/app/actions/events"
 import { notFound } from "next/navigation"
 
 interface EventDetailPageProps {
-  params: { eventId: string }
+  params: Promise<{ eventId: string }>
 }
 
 export default async function EventDetailPage({
   params,
 }: EventDetailPageProps) {
-  const result = await getEventAction(params.eventId)
+  const { eventId } = await params
+  const result = await getEventAction(eventId)
 
   if (!result.success || !result.event) {
     notFound()
