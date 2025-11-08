@@ -57,7 +57,8 @@ export function CameraView({ onError }: CameraViewProps) {
           autoPlay
           playsInline
           muted
-          className="absolute inset-0 w-full h-full object-cover transform scale-x-[-1]"
+          webkit-playsinline="true"
+          className="absolute inset-0 w-full h-full object-cover"
           style={{
             // Mirror effect for front camera
             transform: "scaleX(-1)",

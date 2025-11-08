@@ -17,6 +17,7 @@ export function useCamera(): UseCameraReturn {
   const [isLoading, setIsLoading] = useState(true)
   const videoRef = useRef<HTMLVideoElement>(null)
 
+  // Request camera access
   useEffect(() => {
     let mounted = true
 
@@ -24,6 +25,13 @@ export function useCamera(): UseCameraReturn {
       try {
         setIsLoading(true)
         setError(null)
+
+        // Check if MediaDevices API is available
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          throw new Error(
+            "Camera access not supported. Please use HTTPS or a supported browser."
+          )
+        }
 
         // Request front-facing camera (user mode)
         const mediaStream = await navigator.mediaDevices.getUserMedia({
@@ -42,11 +50,6 @@ export function useCamera(): UseCameraReturn {
         }
 
         setStream(mediaStream)
-
-        // Attach stream to video element
-        if (videoRef.current) {
-          videoRef.current.srcObject = mediaStream
-        }
       } catch (err) {
         if (!mounted) return
 
@@ -76,10 +79,33 @@ export function useCamera(): UseCameraReturn {
     // Cleanup: stop all tracks when component unmounts
     return () => {
       mounted = false
-      stream?.getTracks().forEach((track) => track.stop())
+      if (stream) {
+        stream.getTracks().forEach((track) => track.stop())
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []) // Empty deps - only run once on mount
+  }, [])
+
+  // Attach stream to video element when stream or ref changes
+  useEffect(() => {
+    if (!stream || !videoRef.current) return
+
+    const video = videoRef.current
+    video.srcObject = stream
+
+    // Play video once metadata is loaded
+    const handleLoadedMetadata = () => {
+      video.play().catch((err) => {
+        console.error("Error playing video:", err)
+      })
+    }
+
+    video.addEventListener("loadedmetadata", handleLoadedMetadata)
+
+    return () => {
+      video.removeEventListener("loadedmetadata", handleLoadedMetadata)
+    }
+  }, [stream])
 
   return { stream, error, videoRef, isLoading }
 }
