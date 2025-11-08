@@ -108,21 +108,21 @@
 - **Files**:
   - `web/src/lib/repositories/sessions.ts` (create) ✅
 
-### Task 1.7: Storage Upload/Download Utilities
+### Task 1.7: Storage Upload/Download Utilities ✅
 - **Complexity**: M
 - **Dependencies**: Task 1.2b
 - **Description**: Implement Firebase Storage operations for images and files (uses Admin SDK)
 - **Acceptance Criteria**:
-  - [ ] `uploadInputImage()` saves guest photo to correct path
-  - [ ] `uploadResultImage()` saves AI result to correct path
-  - [ ] `uploadReferenceImage()` saves scene reference image
-  - [ ] `uploadQrCode()` saves QR code PNG
-  - [ ] `getSignedUrl()` generates temporary signed URL
-  - [ ] `getPublicUrl()` generates token-based public URL
-  - [ ] All uploads include download tokens for public access
-  - [ ] File paths match spec section 3 storage layout
+  - [x] `uploadInputImage()` saves guest photo to correct path
+  - [x] `uploadResultImage()` saves AI result to correct path
+  - [x] `uploadReferenceImage()` saves scene reference image
+  - [x] `uploadQrCode()` saves QR code PNG
+  - [x] `getSignedUrl()` generates temporary signed URL
+  - [x] `getPublicUrl()` generates token-based public URL
+  - [x] All uploads include download tokens for public access
+  - [x] File paths match spec section 3 storage layout
 - **Files**:
-  - `web/src/lib/storage/upload.ts` (create)
+  - `web/src/lib/storage/upload.ts` (create) ✅
 
 ### Task 1.8: Deploy POC Security Rules
 - **Complexity**: S
