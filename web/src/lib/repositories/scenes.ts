@@ -10,6 +10,7 @@ export async function updateScene(
   updates: {
     effect?: EffectType;
     prompt?: string;
+    defaultPrompt?: string;
     referenceImagePath?: string;
   }
 ): Promise<void> {

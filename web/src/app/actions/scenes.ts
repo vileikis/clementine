@@ -8,6 +8,7 @@ import { z } from "zod"
 const updateSceneInput = z.object({
   effect: z.enum(["background_swap", "deep_fake"]).optional(),
   prompt: z.string().min(1, "Prompt is required").optional(),
+  defaultPrompt: z.string().optional(),
 })
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB

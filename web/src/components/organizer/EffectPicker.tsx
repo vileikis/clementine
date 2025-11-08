@@ -19,6 +19,7 @@ const effects = [
     icon: Sparkles,
     description: "Replace background with AI-generated scene",
     example: "Transform to beach, studio, or custom backdrop",
+    defaultPrompt: "Apply clean studio background with brand color accents.",
   },
   {
     value: "deep_fake" as const,
@@ -26,6 +27,7 @@ const effects = [
     icon: Users,
     description: "Face swap with reference image",
     example: "Swap face with celebrity, character, or custom reference",
+    defaultPrompt: "Swap the face in the photo with the reference image face, maintaining natural lighting and expressions.",
   },
 ]
 
@@ -43,8 +45,16 @@ export function EffectPicker({
     setIsLoading(true)
     setSelectedEffect(effect)
 
+    // Always apply the default prompt for the selected effect
+    const selectedEffectConfig = effects.find((e) => e.value === effect)
+    const defaultPrompt = selectedEffectConfig?.defaultPrompt || ""
+
     try {
-      const result = await updateSceneAction(eventId, sceneId, { effect })
+      const result = await updateSceneAction(eventId, sceneId, {
+        effect,
+        prompt: defaultPrompt,
+        defaultPrompt: defaultPrompt,
+      })
       if (!result.success) {
         // Revert on error
         setSelectedEffect(currentEffect)
