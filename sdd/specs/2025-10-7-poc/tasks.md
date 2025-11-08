@@ -269,20 +269,20 @@
   - Update: `web/src/app/actions/scenes.ts` (added `getImageUrlAction()`) ✅
   - Update: `web/next.config.ts` (configured Firebase Storage image domain) ✅
 
-### Task 2.9: Branding Configuration Tab
+### Task 2.9: Branding Configuration Tab ✅
 - **Complexity**: M
 - **Dependencies**: Task 2.1, Task 2.5
 - **Description**: Build Branding tab with color picker and preview
 - **Acceptance Criteria**:
-  - [ ] Brand color picker (native or react-colorful)
-  - [ ] Title overlay toggle switch
-  - [ ] Live preview of branding
-  - [ ] Changes save via `updateEventBrandingAction()`
-  - [ ] Preview shows example guest screen with branding applied
+  - [x] Brand color picker (native or react-colorful)
+  - [x] Title overlay toggle switch
+  - [x] Live preview of branding
+  - [x] Changes save via `updateEventBrandingAction()`
+  - [x] Preview shows example guest screen with branding applied
 - **Files**:
-  - `web/src/app/events/[eventId]/branding/page.tsx` (create)
-  - `web/src/components/organizer/BrandingForm.tsx` (create)
-  - `web/src/components/organizer/BrandColorPicker.tsx` (create)
+  - `web/src/app/events/[eventId]/branding/page.tsx` (create) ✅
+  - `web/src/components/organizer/BrandingForm.tsx` (create) ✅
+  - `web/src/components/organizer/BrandColorPicker.tsx` (create) ✅
 
 ### Task 2.10: QR Code Generation
 - **Complexity**: M
