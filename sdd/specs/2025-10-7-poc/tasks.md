@@ -205,51 +205,52 @@
   - `web/src/app/events/new/page.tsx` (create) ✅
   - `web/src/components/organizer/EventForm.tsx` (create) ✅
 
-### Task 2.5: Event Detail Layout & Tabs ✅ (WIP placeholder)
+### Task 2.5: Event Detail Layout & Tabs ✅
 - **Complexity**: S
 - **Dependencies**: Task 2.1
 - **Description**: Build `/events/[eventId]` layout with tab navigation
 - **Acceptance Criteria**:
   - [x] Page structure created with WIP message
   - [x] Layout fetches event and passes to children
-  - [ ] Tabs for Scene, Branding, Distribution
-  - [ ] Tab navigation uses Next.js Link
-  - [ ] Active tab highlighted
+  - [x] Tabs for Scene, Branding, Distribution
+  - [x] Tab navigation uses Next.js Link
+  - [x] Active tab highlighted
   - [x] Event title shown in header
-  - [ ] Uses shadcn/ui Tabs component
+  - [x] Custom TabLink component with active state
 - **Files**:
   - `web/src/app/events/[eventId]/layout.tsx` (create) ✅
-  - `web/src/app/events/[eventId]/page.tsx` (create) ✅ (WIP)
+  - `web/src/app/events/[eventId]/page.tsx` (create) ✅
+  - `web/src/components/organizer/TabLink.tsx` (create) ✅
 
-### Task 2.6: Scene Configuration Tab - Mode & Effect
+### Task 2.6: Scene Configuration Tab - Mode & Effect ✅
 - **Complexity**: M
 - **Dependencies**: Task 2.2, Task 2.5
 - **Description**: Build Scene tab with mode selector and effect picker
 - **Acceptance Criteria**:
-  - [ ] Mode selector shows Photo (active), Video/GIF/Boomerang (disabled)
-  - [ ] Effect picker shows background_swap and deep_fake options
-  - [ ] Visual cards for each effect option
-  - [ ] Selected effect highlighted
-  - [ ] Changes save immediately via `updateSceneAction()`
-  - [ ] Loading state during save
+  - [x] Mode selector shows Photo (active), Video/GIF/Boomerang (disabled)
+  - [x] Effect picker shows background_swap and deep_fake options
+  - [x] Visual cards for each effect option
+  - [x] Selected effect highlighted
+  - [x] Changes save immediately via `updateSceneAction()`
+  - [x] Loading state during save
 - **Files**:
-  - `web/src/app/events/[eventId]/scene/page.tsx` (create)
-  - `web/src/components/organizer/ModeSelector.tsx` (create)
-  - `web/src/components/organizer/EffectPicker.tsx` (create)
+  - `web/src/app/events/[eventId]/scene/page.tsx` (create) ✅
+  - `web/src/components/organizer/ModeSelector.tsx` (create) ✅
+  - `web/src/components/organizer/EffectPicker.tsx` (create) ✅
 
-### Task 2.7: Scene Configuration Tab - Prompt Editor
+### Task 2.7: Scene Configuration Tab - Prompt Editor ✅
 - **Complexity**: S
 - **Dependencies**: Task 2.6
 - **Description**: Add prompt editing to Scene tab
 - **Acceptance Criteria**:
-  - [ ] Textarea for prompt input
-  - [ ] Character count display
-  - [ ] "Reset to Default" button
-  - [ ] Auto-save on blur or manual Save button
-  - [ ] Shows current prompt from scene
+  - [x] Textarea for prompt input
+  - [x] Character count display
+  - [x] "Reset to Default" button
+  - [x] Auto-save on blur or manual Save button
+  - [x] Shows current prompt from scene
 - **Files**:
-  - `web/src/components/organizer/PromptEditor.tsx` (create)
-  - Update: `web/src/app/events/[eventId]/scene/page.tsx`
+  - `web/src/components/organizer/PromptEditor.tsx` (create) ✅
+  - Update: `web/src/app/events/[eventId]/scene/page.tsx` ✅
 
 ### Task 2.8: Scene Configuration Tab - Reference Image Uploader
 - **Complexity**: M
