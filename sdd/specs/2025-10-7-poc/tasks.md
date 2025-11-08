@@ -284,34 +284,35 @@
   - `web/src/components/organizer/BrandingForm.tsx` (create) ✅
   - `web/src/components/organizer/BrandColorPicker.tsx` (create) ✅
 
-### Task 2.10: QR Code Generation
+### Task 2.10: QR Code Generation ✅
 - **Complexity**: M
 - **Dependencies**: Task 1.7
 - **Description**: Implement QR code generation for join URLs
 - **Acceptance Criteria**:
-  - [ ] `qrcode` library installed
-  - [ ] `generateJoinQr()` creates QR code PNG
-  - [ ] QR code uploaded to Storage at correct path
-  - [ ] QR includes full join URL
-  - [ ] Error correction level M
-  - [ ] 512x512px output
+  - [x] `qrcode` library installed
+  - [x] `generateJoinQr()` creates QR code PNG
+  - [x] QR code uploaded to Storage at correct path
+  - [x] QR includes full join URL
+  - [x] Error correction level M
+  - [x] 512x512px output
 - **Files**:
-  - `web/src/lib/qr/generate.ts` (create)
-  - Update: `web/package.json` (add qrcode dependency)
+  - `web/src/lib/qr/generate.ts` (create) ✅
+  - Update: `web/package.json` (add qrcode dependency) ✅
 
-### Task 2.11: Distribution Tab
+### Task 2.11: Distribution Tab ✅
 - **Complexity**: M
 - **Dependencies**: Task 2.10, Task 2.5
 - **Description**: Build Distribution tab with join URL and QR code
 - **Acceptance Criteria**:
-  - [ ] Display join URL with copy button
-  - [ ] Generate and display QR code (lazy generate on first view)
-  - [ ] Download QR code button
-  - [ ] "Open Guest View" button opens `/join/:eventId` in new tab
-  - [ ] Copy success toast
+  - [x] Display join URL with copy button
+  - [x] Generate and display QR code (lazy generate on first view)
+  - [x] Download QR code button
+  - [x] "Open Guest View" button opens `/join/:eventId` in new tab
+  - [x] Copy success toast (implemented as inline "Copied!" message)
 - **Files**:
-  - `web/src/app/events/[eventId]/distribution/page.tsx` (create)
-  - `web/src/components/organizer/QRPanel.tsx` (create)
+  - `web/src/app/events/[eventId]/distribution/page.tsx` (create) ✅
+  - `web/src/components/organizer/QRPanel.tsx` (create) ✅
+  - `web/src/app/actions/qr.ts` (create) ✅
 
 ---
 
