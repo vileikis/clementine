@@ -1,6 +1,6 @@
 ## Test Writing Standards
 
-**Testing stack:** Vitest, React Testing Library, Playwright
+**Testing stack:** Jest, React Testing Library, Playwright
 
 ### Test Coverage Philosophy
 
@@ -9,11 +9,10 @@
 - **Defer edge cases** - Unless business-critical, test happy paths first
 - **Test behavior, not implementation** - Focus on what users see and experience
 
-### Unit Tests (Vitest)
+### Unit Tests (Jest)
 
 ```typescript
 // lib/utils.test.ts
-import { describe, it, expect } from 'vitest'
 import { formatEventDate, calculateTimeRemaining } from './utils'
 
 describe('formatEventDate', () => {
@@ -28,11 +27,10 @@ describe('formatEventDate', () => {
 })
 ```
 
-### Component Tests (React Testing Library)
+### Component Tests (React Testing Library + Jest)
 
 ```typescript
 // components/EventCard.test.tsx
-import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { EventCard } from './EventCard'
@@ -50,7 +48,7 @@ describe('EventCard', () => {
   })
 
   it('calls onSelect when clicked', async () => {
-    const onSelect = vi.fn()
+    const onSelect = jest.fn()
     const user = userEvent.setup()
 
     render(<EventCard event={mockEvent} onSelect={onSelect} />)
@@ -58,6 +56,27 @@ describe('EventCard', () => {
 
     expect(onSelect).toHaveBeenCalledWith('1')
   })
+})
+```
+
+### Mocking in Tests
+
+```typescript
+// Mocking modules with Jest
+jest.mock('@/lib/firebase/admin', () => ({
+  db: {
+    collection: jest.fn(),
+  },
+}))
+
+// Mock functions
+const mockFn = jest.fn()
+mockFn.mockReturnValue('value')
+mockFn.mockResolvedValue('async value')
+
+// Clear mocks in beforeEach
+beforeEach(() => {
+  jest.clearAllMocks()
 })
 ```
 
@@ -108,22 +127,33 @@ Don't chase 100% - focus on high-value tests.
 ### Best Practices
 
 - **Arrange-Act-Assert** pattern
-- **Descriptive test names** - "should ..." format
-- **Mock external dependencies** - APIs, databases, services
+- **Descriptive test names** - "it does something" format
+- **Mock external dependencies** - APIs, databases, services (use `jest.mock()`)
+- **Global mocks** - Place shared mocks in `jest.setup.ts` (e.g., Firebase Admin SDK)
 - **Fast execution** - Unit tests in milliseconds
 - **Test user behavior** - Not implementation details
 - **Use accessible queries** - getByRole, getByLabelText, getByText
 - **Avoid snapshot tests** - Unless truly valuable
+- **Clear mocks** - Always use `jest.clearAllMocks()` in `beforeEach()`
+
+### Jest Configuration
+
+The project uses Jest with Next.js integration (`next/jest`):
+
+- **Config:** `web/jest.config.ts`
+- **Setup:** `web/jest.setup.ts` - Global test setup and mocks
+- **Environment:** jsdom (for React component testing)
+- **Module aliases:** `@/` maps to `src/`
 
 ### Running Tests
 
 ```bash
 # Unit/integration tests
-pnpm test              # Run all tests
-pnpm test:watch       # Watch mode
-pnpm test:coverage    # With coverage
+pnpm test              # Run all tests (runs Jest)
+pnpm test:watch       # Watch mode (planned)
+pnpm test:coverage    # With coverage (planned)
 
 # E2E tests
-pnpm test:e2e         # Run E2E tests
-pnpm test:e2e:ui      # With Playwright UI
+pnpm test:e2e         # Run E2E tests (planned)
+pnpm test:e2e:ui      # With Playwright UI (planned)
 ```

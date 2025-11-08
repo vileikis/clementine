@@ -409,12 +409,10 @@ onSnapshot(doc(db, "sessions", id), (snapshot) => {
 
 ```typescript
 // tests/mocks/firebase.ts
-import { vi } from "vitest";
+export const mockOnSnapshot = jest.fn();
+export const mockGetDoc = jest.fn();
 
-export const mockOnSnapshot = vi.fn();
-export const mockGetDoc = vi.fn();
-
-vi.mock("@/lib/firebase/client", () => ({
+jest.mock("@/lib/firebase/client", () => ({
   db: {},
   storage: {},
 }));
@@ -423,17 +421,40 @@ vi.mock("@/lib/firebase/client", () => ({
 ### Mock Admin SDK
 
 ```typescript
-// Use Firebase emulators or mock the Admin SDK
-vi.mock("@/lib/firebase/admin", () => ({
+// jest.setup.ts - Mock the Admin SDK globally
+jest.mock("@/lib/firebase/admin", () => ({
   db: {
-    collection: vi.fn(() => ({
-      doc: vi.fn(() => ({
-        set: vi.fn(),
-        get: vi.fn(),
-      })),
-    })),
+    collection: jest.fn(),
+    runTransaction: jest.fn(),
+  },
+  storage: {
+    file: jest.fn(),
   },
 }));
+```
+
+```typescript
+// In test files, use the mocked db
+import { db } from "@/lib/firebase/admin";
+
+describe("Repository", () => {
+  const mockDb = db as unknown as {
+    collection: ReturnType<typeof jest.fn>;
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("performs database operation", async () => {
+    mockDb.collection.mockReturnValue({
+      doc: jest.fn().mockReturnValue({
+        get: jest.fn().mockResolvedValue({ exists: true, data: () => ({}) }),
+      }),
+    });
+    // Test your repository function here
+  });
+});
 ```
 
 ## Migration Path

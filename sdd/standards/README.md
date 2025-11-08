@@ -133,7 +133,7 @@ Testing philosophy, tools, and coverage requirements.
 
 ### [Test Writing](./testing/test-writing.md)
 Unit, integration, and E2E testing
-- Vitest for unit/integration tests
+- Jest for unit/integration tests
 - React Testing Library for components
 - Playwright for E2E tests
 - Coverage goals (70%+ overall, 90%+ critical paths)

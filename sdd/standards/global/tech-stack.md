@@ -22,11 +22,11 @@ This document defines the complete technical stack for Clementine - a digital AI
 - **Storage:** Firebase Storage (planned for images)
 - **AI Services:** Nano Banana, Stable Diffusion (via n8n workflows)
 
-### Testing & Quality (Planned)
-- **Unit/Integration Tests:** Vitest
+### Testing & Quality
+- **Unit/Integration Tests:** Jest (with Next.js integration)
 - **Component Testing:** React Testing Library, Testing Library User Event
-- **E2E Testing:** Playwright
-- **API Mocking:** MSW (Mock Service Worker)
+- **E2E Testing:** Playwright (planned)
+- **API Mocking:** MSW (Mock Service Worker) (planned)
 - **Linting:** ESLint (Next.js config)
 - **Formatting:** Prettier (recommended)
 - **Type Checking:** TypeScript compiler (strict mode)
