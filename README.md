@@ -94,6 +94,63 @@ NEXT_PUBLIC_BASE_URL=http://localhost:3000  # Development
 
 **Important**: Never commit `web/.env.local` or the service account JSON file to version control! The `.env.local.example` file should be committed as a template.
 
+#### 7. Deploy Security Rules
+
+Firebase security rules are stored in the repository for version control. To deploy them:
+
+**Option 1: Firebase CLI (Recommended)**
+
+```bash
+# Install Firebase CLI globally
+npm install -g firebase-tools
+
+# Login to Firebase
+firebase login
+
+# Update .firebaserc with your project ID
+# Edit .firebaserc and replace "clementine-poc" with your project ID
+
+# Update firebase.json with your storage bucket
+# Edit firebase.json and replace the bucket name with yours
+
+# Deploy rules
+firebase deploy --only firestore:rules,storage
+
+# Or use the npm script
+pnpm firebase:deploy:rules
+
+# Or deploy everything (including indexes)
+pnpm firebase:deploy
+```
+
+**Option 2: Web Console (Manual - Not Recommended)**
+
+1. Go to [Firebase Console](https://console.firebase.google.com/)
+2. Select your project
+3. For Firestore rules:
+   - Go to **Firestore Database** > **Rules** tab
+   - Copy contents of `firestore.rules` and paste
+   - Click **Publish**
+4. For Storage rules:
+   - Go to **Storage** > **Rules** tab
+   - Copy contents of `storage.rules` and paste
+   - Click **Publish**
+
+**Important**: Always deploy rules from the repository files (Option 1) to maintain version control and consistency across environments.
+
+**Rules Files Location:**
+- `firebase/firestore.rules` - Firestore security rules
+- `firebase/storage.rules` - Storage security rules
+- `firebase/firestore.indexes.json` - Firestore indexes (auto-generated)
+- `firebase.json` - Firebase configuration (at root, points to firebase/ folder)
+- `.firebaserc` - Firebase project aliases (at root)
+
+**POC Security Strategy:**
+- ✅ Allow all reads (Client SDK can subscribe to real-time updates)
+- ❌ Deny all writes (force all mutations through Server Actions)
+- ✅ Business logic and validation enforced server-side
+- ✅ Ready to tighten in MVP phase when authentication is added
+
 ## 📂 Project Structure
 
 ```
@@ -106,10 +163,16 @@ clementine/
 │   ├── src/hooks/        # Custom React hooks
 │   └── src/types/        # TypeScript type definitions
 ├── functions/             # Firebase Cloud Functions (planned)
+├── firebase/              # Firebase configuration
+│   ├── firestore.rules    # Firestore security rules
+│   ├── storage.rules      # Storage security rules
+│   └── firestore.indexes.json # Firestore indexes
 ├── sdd/                   # Spec-driven development documentation
 │   ├── product/          # Product strategy & roadmap
 │   ├── standards/        # Technical standards & conventions
 │   └── specs/            # Project specifications
+├── firebase.json          # Firebase config (points to firebase/ folder)
+├── .firebaserc            # Firebase project aliases
 ├── CLAUDE.md             # Claude Code guidance
 └── README.md             # This file
 ```

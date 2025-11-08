@@ -124,20 +124,24 @@
 - **Files**:
   - `web/src/lib/storage/upload.ts` (create) ✅
 
-### Task 1.8: Deploy POC Security Rules
+### Task 1.8: Deploy POC Security Rules ✅
 - **Complexity**: S
 - **Dependencies**: Task 1.1
 - **Description**: Deploy Firestore and Storage rules (allow reads, deny writes to force Server Actions)
 - **Acceptance Criteria**:
-  - [ ] `firestore.rules` created: allow read: if true, allow write: if false
-  - [ ] `storage.rules` created: allow read: if true, allow write: if false
-  - [ ] Rules deployed to Firebase project
-  - [ ] Rules include comments explaining hybrid approach
-  - [ ] Client SDK can read/subscribe to documents
-  - [ ] Client SDK cannot write (enforces Server Actions)
+  - [x] `firestore.rules` created: allow read: if true, allow write: if false
+  - [x] `storage.rules` created: allow read: if true, allow write: if false
+  - [x] Rules deployed to Firebase project (via `firebase deploy`)
+  - [x] Rules include comments explaining hybrid approach
+  - [x] Client SDK can read/subscribe to documents
+  - [x] Client SDK cannot write (enforces Server Actions)
 - **Files**:
-  - `firestore.rules` (create)
-  - `storage.rules` (create)
+  - `firestore.rules` (create) ✅
+  - `storage.rules` (create) ✅
+  - `firebase.json` (create) ✅
+  - `.firebaserc` (create) ✅
+  - `firestore.indexes.json` (create) ✅
+  - `README.md` (update with deployment instructions) ✅
 
 ---
 

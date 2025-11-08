@@ -1,0 +1,72 @@
+rules_version = '2';
+
+// Firebase Storage Security Rules for Clementine POC
+// Strategy: Hybrid Client SDK + Admin SDK approach
+// - Allow all reads (anyone can view uploaded/generated images)
+// - Deny all writes (force all uploads through Server Actions with Admin SDK)
+//
+// Why this approach?
+// ✅ Guest-uploaded photos and AI results are publicly viewable (via share links)
+// ✅ All uploads go through Server Actions (server-side validation for file type/size)
+// ✅ Business logic and validation stay secure on the server
+// ✅ Ready to tighten rules in MVP phase when authentication is added
+//
+// POC Limitations:
+// - No authentication required
+// - No file size/type validation at Storage level (validated in Server Actions)
+// - No user-specific access control
+//
+// Future MVP Rules (when authentication is added):
+// - Organizers can only upload reference images for their own events
+// - System (via Admin SDK) uploads input/result images
+// - Public read access remains for share functionality
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // POC: Allow all reads, deny all writes
+    // All uploads MUST go through Server Actions using Admin SDK
+    match /{allPaths=**} {
+      allow read: if true;
+      allow write: if false; // Server Actions only
+    }
+
+    // Future: Granular rules example (commented out for POC)
+    //
+    // match /events/{eventId} {
+    //
+    //   // Reference images: Only organizers can upload (via Server Actions)
+    //   match /refs/{filename} {
+    //     allow read: if true; // Public read for AI generation
+    //     allow write: if false; // Server Actions only
+    //   }
+    //
+    //   // Session images: System uploads only (via Server Actions)
+    //   match /sessions/{sessionId}/{filename} {
+    //     allow read: if true; // Public read for guest flow + sharing
+    //     allow write: if false; // Server Actions only
+    //   }
+    //
+    //   // QR codes: System uploads only (via Server Actions)
+    //   match /qr/{filename} {
+    //     allow read: if true; // Public read for distribution
+    //     allow write: if false; // Server Actions only
+    //   }
+    // }
+    //
+    // // Helper functions for future use
+    // function isAuthenticated() {
+    //   return request.auth != null;
+    // }
+    //
+    // function isOrganizer(eventId) {
+    //   return isAuthenticated() &&
+    //          firestore.get(/databases/(default)/documents/events/$(eventId)).data.organizerId == request.auth.uid;
+    // }
+    //
+    // function isValidImage() {
+    //   return request.resource.contentType.matches('image/.*') &&
+    //          request.resource.size < 10 * 1024 * 1024; // 10MB limit
+    // }
+  }
+}

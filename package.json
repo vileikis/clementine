@@ -9,7 +9,9 @@
     "start": "pnpm --filter web start",
     "lint": "pnpm --filter web lint",
     "type-check": "pnpm --filter web type-check",
-    "test": "pnpm --filter web test"
+    "test": "pnpm --filter web test",
+    "firebase:deploy:rules": "firebase deploy --only firestore:rules,storage",
+    "firebase:deploy": "firebase deploy"
   },
   "keywords": [
     "ai",
