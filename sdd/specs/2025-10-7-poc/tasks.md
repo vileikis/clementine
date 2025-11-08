@@ -318,18 +318,18 @@
 
 ## Phase 3: Guest Flow - Capture (Days 5-6)
 
-### Task 3.1: Guest Join Page Structure
+### Task 3.1: Guest Join Page Structure ✅
 - **Complexity**: S
 - **Dependencies**: Task 2.1
 - **Description**: Create `/join/[eventId]` page with basic structure
 - **Acceptance Criteria**:
-  - [ ] Page fetches event data
-  - [ ] Page validates event exists (404 if not)
-  - [ ] Page validates event is "live" (error if draft/archived)
-  - [ ] Layout ready for guest flow components
+  - [x] Page fetches event data
+  - [x] Page validates event exists (404 if not)
+  - [x] Page validates event is "live" (error if draft/archived)
+  - [x] Layout ready for guest flow components
 - **Files**:
-  - `web/src/app/join/[eventId]/page.tsx` (create)
-  - `web/src/app/join/[eventId]/layout.tsx` (create)
+  - `web/src/app/join/[eventId]/page.tsx` (create) ✅
+  - `web/src/app/join/[eventId]/layout.tsx` (create) ✅
 
 ### Task 3.2: Brand Theme Provider
 - **Complexity**: S
