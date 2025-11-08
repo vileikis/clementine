@@ -5,6 +5,7 @@ import {
   getEvent,
   listEvents,
   updateEventBranding,
+  updateEventStatus,
   getCurrentScene,
 } from "@/lib/repositories/events"
 import { revalidatePath } from "next/cache"
@@ -89,6 +90,23 @@ export async function getCurrentSceneAction(eventId: string) {
     return {
       success: false,
       error: error instanceof Error ? error.message : "Failed to fetch scene",
+    }
+  }
+}
+
+export async function updateEventStatusAction(
+  eventId: string,
+  status: "draft" | "live" | "archived"
+) {
+  try {
+    await updateEventStatus(eventId, status)
+    revalidatePath("/events")
+    revalidatePath(`/events/${eventId}`)
+    return { success: true }
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to update status",
     }
   }
 }

@@ -2,6 +2,7 @@ import Link from "next/link"
 import { getEventAction } from "@/app/actions/events"
 import { notFound } from "next/navigation"
 import { TabLink } from "@/components/organizer/TabLink"
+import { EventStatusSwitcher } from "@/components/organizer/EventStatusSwitcher"
 
 interface EventLayoutProps {
   children: React.ReactNode
@@ -33,9 +34,12 @@ export default async function EventLayout({
       </div>
 
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">{event.title}</h1>
+        <div className="flex items-start justify-between mb-2">
+          <h1 className="text-3xl font-bold">{event.title}</h1>
+          <EventStatusSwitcher eventId={event.id} currentStatus={event.status} />
+        </div>
         <p className="text-sm text-muted-foreground">
-          Status: <span className="capitalize">{event.status}</span> • Brand:{" "}
+          Brand:{" "}
           <span
             className="inline-block w-3 h-3 rounded align-middle"
             style={{ backgroundColor: event.brandColor }}

@@ -78,6 +78,16 @@ export async function updateEventBranding(
   });
 }
 
+export async function updateEventStatus(
+  eventId: string,
+  status: "draft" | "live" | "archived"
+): Promise<void> {
+  await db.collection("events").doc(eventId).update({
+    status,
+    updatedAt: Date.now(),
+  });
+}
+
 export async function getCurrentScene(eventId: string): Promise<Scene | null> {
   const eventDoc = await db.collection("events").doc(eventId).get();
   if (!eventDoc.exists) return null;
