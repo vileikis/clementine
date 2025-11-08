@@ -55,11 +55,12 @@ Use TodoWrite to track implementation steps:
 3. **Validate code quality** (MUST pass before proceeding):
    - Run `pnpm lint` - must pass with no errors
    - Run `pnpm type-check` - must pass with no errors
+   - Run `pnpm test` - must pass with no errors
    - Fix any issues before continuing
 4. Test against acceptance criteria
 5. Update task status
 6. Commit changes
 
-**IMPORTANT**: The validation step (lint + type-check) is mandatory. Do not mark implementation as complete or move to testing until both checks pass successfully.
+**IMPORTANT**: The validation step (lint + type-check + test) is mandatory. Do not mark implementation as complete or move to testing until all checks pass successfully.
 
 Stay focused on the specific task - don't add scope or "improvements" unless explicitly in the acceptance criteria.
