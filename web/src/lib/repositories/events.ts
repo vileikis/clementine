@@ -22,7 +22,6 @@ export async function createEvent(data: {
     status: "draft",
     currentSceneId: sceneRef.id,
     joinPath,
-    joinUrl: `${process.env.NEXT_PUBLIC_BASE_URL}${joinPath}`,
     qrPngPath: `events/${eventId}/qr/join.png`,
     createdAt: now,
     updatedAt: now,

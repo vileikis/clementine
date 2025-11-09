@@ -1,6 +1,7 @@
 import { getEventAction } from "@/app/actions/events"
 import { notFound } from "next/navigation"
 import { QRPanel } from "@/components/organizer/QRPanel"
+import { getJoinUrl } from "@/lib/utils/urls"
 
 interface DistributionPageProps {
   params: Promise<{ eventId: string }>
@@ -29,7 +30,7 @@ export default async function DistributionPage({
 
       <QRPanel
         eventId={event.id}
-        joinUrl={event.joinUrl}
+        joinUrl={getJoinUrl(event.joinPath)}
         qrPngPath={event.qrPngPath}
       />
     </div>

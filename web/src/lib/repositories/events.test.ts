@@ -16,7 +16,6 @@ describe("Events Repository", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    process.env.NEXT_PUBLIC_BASE_URL = "https://example.com";
   });
 
   describe("createEvent", () => {
@@ -61,7 +60,6 @@ describe("Events Repository", () => {
         status: "draft",
         currentSceneId: "scene-456",
         joinPath: "/join/event-123",
-        joinUrl: "https://example.com/join/event-123",
         qrPngPath: "events/event-123/qr/join.png",
       });
       expect(eventData.createdAt).toBeGreaterThan(0);
@@ -96,7 +94,6 @@ describe("Events Repository", () => {
         status: "live",
         currentSceneId: "scene-123",
         joinPath: "/join/event-123",
-        joinUrl: "https://example.com/join/event-123",
         qrPngPath: "events/event-123/qr/join.png",
         createdAt: 1234567890,
         updatedAt: 1234567890,
@@ -144,7 +141,6 @@ describe("Events Repository", () => {
         status: "invalid-status",
         currentSceneId: "scene-123",
         joinPath: "/join/event-123",
-        joinUrl: "not-a-url",
         qrPngPath: "events/event-123/qr/join.png",
         createdAt: 1234567890,
         updatedAt: 1234567890,
@@ -177,7 +173,6 @@ describe("Events Repository", () => {
           status: "live",
           currentSceneId: "scene-2",
           joinPath: "/join/event-2",
-          joinUrl: "https://example.com/join/event-2",
           qrPngPath: "events/event-2/qr/join.png",
           createdAt: 2000000000,
           updatedAt: 2000000000,
@@ -190,7 +185,6 @@ describe("Events Repository", () => {
           status: "draft",
           currentSceneId: "scene-1",
           joinPath: "/join/event-1",
-          joinUrl: "https://example.com/join/event-1",
           qrPngPath: "events/event-1/qr/join.png",
           createdAt: 1000000000,
           updatedAt: 1000000000,

@@ -10,7 +10,6 @@ export const eventSchema = z.object({
   status: z.enum(["draft", "live", "archived"]),
   currentSceneId: z.string(),
   joinPath: z.string(),
-  joinUrl: z.string().url(),
   qrPngPath: z.string(),
   createdAt: z.number(),
   updatedAt: z.number(),

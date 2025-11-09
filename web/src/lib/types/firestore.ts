@@ -16,7 +16,6 @@ export interface Event {
   currentSceneId: string; // FK to scenes subcollection
 
   joinPath: string; // e.g., "/join/abc123"
-  joinUrl: string; // full URL
   qrPngPath: string; // Storage path
 
   createdAt: number; // Unix timestamp ms
