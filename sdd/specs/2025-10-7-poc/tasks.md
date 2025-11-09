@@ -383,74 +383,74 @@
 - **Files**:
   - `web/src/components/guest/CameraView.tsx` (create) ✅
 
-### Task 3.6: Countdown Component
+### Task 3.6: Countdown Component ✅
 - **Complexity**: S
 - **Dependencies**: None
 - **Description**: Build 3-2-1 countdown animation
 - **Acceptance Criteria**:
-  - [ ] Displays 3, 2, 1 with 1-second intervals
-  - [ ] Animated transitions (scale/fade)
-  - [ ] Calls callback on completion
-  - [ ] Overlays camera view
-  - [ ] Uses brand color for styling
+  - [x] Displays 3, 2, 1 with 1-second intervals
+  - [x] Animated transitions (scale/fade)
+  - [x] Calls callback on completion
+  - [x] Overlays camera view
+  - [x] Uses brand color for styling
 - **Files**:
-  - `web/src/components/guest/Countdown.tsx` (create)
+  - `web/src/components/guest/Countdown.tsx` (create) ✅
 
-### Task 3.7: Photo Capture Utility
+### Task 3.7: Photo Capture Utility ✅
 - **Complexity**: S
 - **Dependencies**: None
 - **Description**: Implement utility to capture photo from video stream
 - **Acceptance Criteria**:
-  - [ ] Creates canvas from video element
-  - [ ] Returns Blob (JPEG, quality 0.9)
-  - [ ] Maintains video dimensions
-  - [ ] Works on mobile browsers
+  - [x] Creates canvas from video element
+  - [x] Returns Blob (JPEG, quality 0.9)
+  - [x] Maintains video dimensions
+  - [x] Works on mobile browsers
 - **Files**:
-  - `web/src/lib/camera/capture.ts` (create)
+  - `web/src/lib/camera/capture.ts` (create) ✅
 
-### Task 3.8: Capture Button & Flow
+### Task 3.8: Capture Button & Flow ✅
 - **Complexity**: M
 - **Dependencies**: Task 3.5, Task 3.6, Task 3.7
 - **Description**: Build capture button and orchestrate countdown + snap
 - **Acceptance Criteria**:
-  - [ ] Large circular capture button
-  - [ ] Click starts countdown
-  - [ ] Auto-captures after countdown
-  - [ ] Button disabled during countdown
-  - [ ] Shows preview of captured photo
+  - [x] Large circular capture button
+  - [x] Click starts countdown
+  - [x] Auto-captures after countdown
+  - [x] Button disabled during countdown
+  - [x] Shows preview of captured photo
 - **Files**:
-  - `web/src/components/guest/CaptureButton.tsx` (create)
+  - `web/src/components/guest/CaptureButton.tsx` (create) ✅
 
-### Task 3.9: Session Server Actions
+### Task 3.9: Session Server Actions ✅
 - **Complexity**: M
 - **Dependencies**: Task 1.6, Task 1.7
 - **Description**: Create Server Actions for session management
 - **Acceptance Criteria**:
-  - [ ] `startSessionAction()` creates new session
-  - [ ] `saveCaptureAction()` uploads photo and updates session
-  - [ ] `getSessionAction()` fetches session data
-  - [ ] FormData handling for file upload
-  - [ ] Error handling for upload failures
+  - [x] `startSessionAction()` creates new session
+  - [x] `saveCaptureAction()` uploads photo and updates session
+  - [x] `getSessionAction()` fetches session data
+  - [x] FormData handling for file upload
+  - [x] Error handling for upload failures
 - **Files**:
-  - `web/src/app/actions/sessions.ts` (create)
+  - `web/src/app/actions/sessions.ts` (create) ✅
 
-### Task 3.10: Guest Flow State Machine with Real-time Updates
+### Task 3.10: Guest Flow State Machine with Real-time Updates ✅
 - **Complexity**: L
 - **Dependencies**: Task 1.2, Task 3.3, Task 3.5, Task 3.8, Task 3.9
 - **Description**: Implement useGuestFlow hook with state machine and real-time session subscriptions
 - **Acceptance Criteria**:
-  - [ ] State machine matches spec section 10
-  - [ ] States: greeting, ready_to_capture, countdown, captured, transforming, review_ready, share, error
-  - [ ] Transitions handled by actions
-  - [ ] Side effects: camera request, upload, transform trigger
-  - [ ] **Real-time subscription** to session updates using Client SDK `onSnapshot`
-  - [ ] Instant state updates when AI transform completes (no polling)
-  - [ ] Subscription cleanup on unmount
-  - [ ] Hook returns current state and dispatch function
-  - [ ] Integrates all previous guest components
+  - [x] State machine matches spec section 10
+  - [x] States: greeting, ready_to_capture, countdown, captured, transforming, review_ready, share, error
+  - [x] Transitions handled by actions
+  - [x] Side effects: camera request, upload, transform trigger
+  - [x] **Real-time subscription** to session updates using Client SDK `onSnapshot`
+  - [x] Instant state updates when AI transform completes (no polling)
+  - [x] Subscription cleanup on unmount
+  - [x] Hook returns current state and dispatch function
+  - [x] Integrates all previous guest components
 - **Files**:
-  - `web/src/hooks/useGuestFlow.ts` (create)
-  - Update: `web/src/app/join/[eventId]/page.tsx` (integrate hook)
+  - `web/src/hooks/useGuestFlow.ts` (create) ✅
+  - Update: `web/src/components/guest/GuestFlowContainer.tsx` (integrate hook) ✅
 
 ---
 
