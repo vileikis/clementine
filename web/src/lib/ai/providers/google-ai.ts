@@ -10,42 +10,51 @@ export class GoogleAIProvider implements AIClient {
     this.ai = new GoogleGenAI({ apiKey });
   }
 
+  /**
+   * Fetch image from URL and convert to base64
+   */
+  private async fetchImageAsBase64(url: string): Promise<string> {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch image from ${url}: ${response.statusText}`);
+    }
+    const arrayBuffer = await response.arrayBuffer();
+    return Buffer.from(arrayBuffer).toString('base64');
+  }
+
   async generateImage(params: TransformParams): Promise<Buffer> {
     console.log('[GoogleAI] Starting transform:', {
       effect: params.effect,
       hasReference: !!params.referenceImageUrl,
     });
 
-    // Fetch input image and convert to base64
     console.log('[GoogleAI] Adding input image:', params.inputImageUrl);
-    const inputResponse = await fetch(params.inputImageUrl);
-    const inputBuffer = await inputResponse.arrayBuffer();
-    const inputBase64 = Buffer.from(inputBuffer).toString('base64');
+    // Fetch and convert images to base64
+    // Note: fileData.fileUri only works with Gemini File API URIs, not arbitrary HTTPS URLs
+    const [inputImageData, referenceImageData] = await Promise.all([
+      this.fetchImageAsBase64(params.inputImageUrl),
+      params.referenceImageUrl ? this.fetchImageAsBase64(params.referenceImageUrl) : null,
+    ]);
 
     // Build prompt parts
     const promptParts: ContentListUnion = [
-      { text: buildPromptForEffect(params) }
+      { text: buildPromptForEffect(params) },
+      {
+        inlineData: {
+          mimeType: 'image/jpeg',
+          data: inputImageData,
+        }
+      }
     ];
 
-    // Add input image
-    promptParts.push({
-      inlineData: {
-        mimeType: 'image/jpeg',
-        data: inputBase64,
-      }
-    });
 
     // Add reference image if provided (for background swap)
     console.log('[GoogleAI] Adding reference image:', params.referenceImageUrl);
-    if (params.referenceImageUrl) {
-      const refResponse = await fetch(params.referenceImageUrl);
-      const refBuffer = await refResponse.arrayBuffer();
-      const refBase64 = Buffer.from(refBuffer).toString('base64');
-
+    if (referenceImageData) {
       promptParts.push({
         inlineData: {
           mimeType: 'image/jpeg',
-          data: refBase64,
+          data: referenceImageData,
         }
       });
     }
