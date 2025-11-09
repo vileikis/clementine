@@ -1,14 +1,6 @@
-/**
- * AI Transform Types and Configuration
- *
- * Defines types and configuration for AI image transformation services.
- */
+// Effect types - will be synced with firestore types when available
+export type EffectType = 'background_swap' | 'deep_fake';
 
-import type { EffectType } from "@/lib/types/firestore";
-
-/**
- * Parameters for AI image transformation
- */
 export interface TransformParams {
   effect: EffectType;
   prompt: string;
@@ -17,38 +9,21 @@ export interface TransformParams {
   brandColor?: string;
 }
 
-/**
- * AI service endpoint configuration
- */
+// AI provider configuration (read from env)
 export interface AIServiceConfig {
-  apiKey: string;
-  backgroundSwapEndpoint?: string;
-  deepFakeEndpoint?: string;
+  provider: 'google-ai' | 'n8n' | 'mock';
+  googleAIKey?: string;
+  n8nWebhookUrl?: string;
+  n8nAuthToken?: string;
 }
 
-/**
- * Get AI service configuration from environment variables
- */
 export function getAIConfig(): AIServiceConfig {
+  const provider = (process.env.AI_PROVIDER || 'mock') as AIServiceConfig['provider'];
+
   return {
-    apiKey: process.env.NANO_BANANA_API_KEY || "",
-    backgroundSwapEndpoint: process.env.NANO_BANANA_BG_SWAP_ENDPOINT,
-    deepFakeEndpoint: process.env.NANO_BANANA_DEEPFAKE_ENDPOINT,
+    provider,
+    googleAIKey: process.env.GOOGLE_AI_API_KEY,
+    n8nWebhookUrl: process.env.N8N_WEBHOOK_BASE_URL,
+    n8nAuthToken: process.env.N8N_WEBHOOK_AUTH_TOKEN,
   };
-}
-
-/**
- * Get endpoint URL for a specific effect type
- */
-export function getEndpointForEffect(effect: EffectType): string | undefined {
-  const config = getAIConfig();
-
-  switch (effect) {
-    case "background_swap":
-      return config.backgroundSwapEndpoint;
-    case "deep_fake":
-      return config.deepFakeEndpoint;
-    default:
-      return undefined;
-  }
 }
