@@ -28,7 +28,7 @@ export class GoogleAIProvider implements AIClient {
       hasReference: !!params.referenceImageUrl,
     });
 
-    console.log('[GoogleAI] Adding input image:', params.inputImageUrl);
+    // console.log('[GoogleAI] Adding input image:', params.inputImageUrl);
     // Fetch and convert images to base64
     // Note: fileData.fileUri only works with Gemini File API URIs, not arbitrary HTTPS URLs
     const [inputImageData, referenceImageData] = await Promise.all([
@@ -37,8 +37,11 @@ export class GoogleAIProvider implements AIClient {
     ]);
 
     // Build prompt parts
+    const promptText = buildPromptForEffect(params);
+    console.log('[GoogleAI] Prompt text:', promptText);
+
     const promptParts: ContentListUnion = [
-      { text: buildPromptForEffect(params) },
+      { text: promptText },
       {
         inlineData: {
           mimeType: 'image/jpeg',
@@ -49,7 +52,7 @@ export class GoogleAIProvider implements AIClient {
 
 
     // Add reference image if provided (for background swap)
-    console.log('[GoogleAI] Adding reference image:', params.referenceImageUrl);
+    // console.log('[GoogleAI] Adding reference image:', params.referenceImageUrl);
     if (referenceImageData) {
       promptParts.push({
         inlineData: {
@@ -67,9 +70,20 @@ export class GoogleAIProvider implements AIClient {
 
     // Extract image from response
     // Handle potential response structures
+    console.log('[GoogleAI] Response structure:', {
+      hasCandidates: !!response.candidates,
+      candidatesCount: response.candidates?.length || 0,
+      fullResponse: JSON.stringify(response, null, 2),
+    });
+
     const candidates = response.candidates || [];
     for (const candidate of candidates) {
       const parts = candidate.content?.parts || [];
+      console.log('[GoogleAI] Candidate parts:', {
+        partsCount: parts.length,
+        partTypes: parts.map(p => Object.keys(p)),
+      });
+
       for (const part of parts) {
         if (part.inlineData?.data) {
           const buffer = Buffer.from(part.inlineData.data, 'base64');
@@ -78,6 +92,11 @@ export class GoogleAIProvider implements AIClient {
             imageSize: buffer.length,
           });
           return buffer;
+        }
+
+        // Log what we got instead
+        if (part.text) {
+          console.log('[GoogleAI] Got text instead of image:', part.text.substring(0, 200));
         }
       }
     }

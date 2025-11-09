@@ -27,23 +27,9 @@ Output: Single merged image with subject in new background, photorealistic quali
 // ${prompt ? `Additional context: ${prompt}` : ''}
 
     case 'deep_fake':
-      return `Perform a face swap between two images:
+      return `Transform the person in the first image into a superhero. Make them look like a powerful superhero character with dramatic lighting and epic styling.
 
-First image: Contains the SOURCE FACE to extract
-Second image: Contains the TARGET PERSON whose face will be replaced
-
-Instructions:
-- Extract the face from the first image
-- If the first image is low quality, pixelated, or blurry, enhance the facial features: improve sharpness, skin texture, reduce noise
-- Replace the face on the person in the second image with the extracted face
-- Match facial expression and head pose from the second image
-- Blend skin tones, lighting, and colors naturally
-- Maintain the body, clothing, and background from the second image unchanged
-- Ensure realistic and seamless face integration with enhanced facial clarity
-- High quality photorealistic output with crisp facial details
-${brandColor ? `- Optionally add subtle brand color accent: ${brandColor}` : ''}
-
-Output: Single image with swapped face, photorealistic quality with enhanced sharpness and detail.`;
+Output: A single superhero portrait image.`;
 
 // ${prompt ? `Additional context: ${prompt}` : ''}
 
