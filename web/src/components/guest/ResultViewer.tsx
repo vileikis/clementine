@@ -47,7 +47,19 @@ export function ResultViewer({ session, resultImageUrl }: ResultViewerProps) {
   }
 
   // Show result image when ready
-  if (session.state === "ready" && resultImageUrl) {
+  if (session.state === "ready") {
+    if (!resultImageUrl) {
+      // URL is still being fetched
+      return (
+        <div className="flex flex-col items-center justify-center gap-4 p-8">
+          <Skeleton className="aspect-[3/4] w-full max-w-md rounded-lg" />
+          <div className="text-center">
+            <p className="text-lg font-medium">Loading your photo...</p>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="flex flex-col items-center gap-4">
         <div className="relative aspect-[3/4] w-full max-w-md overflow-hidden rounded-lg">
@@ -71,7 +83,9 @@ export function ResultViewer({ session, resultImageUrl }: ResultViewerProps) {
   // Fallback: session state doesn't match expected
   return (
     <div className="flex items-center justify-center p-8">
-      <p className="text-muted-foreground">No result available</p>
+      <p className="text-muted-foreground">
+        No result available (state: {session.state})
+      </p>
     </div>
   );
 }

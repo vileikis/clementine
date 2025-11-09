@@ -70,6 +70,8 @@ function reducer(state: GuestState, action: GuestAction): GuestState {
       return { step: "error", message: action.message };
 
     case "RETAKE":
+      // Go back to greeting so user can re-request camera
+      // (camera access requires user gesture)
       return { step: "greeting" };
 
     case "NEXT":

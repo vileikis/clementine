@@ -2,8 +2,7 @@
 // All file uploads use this module to ensure consistent paths and metadata
 
 import { storage } from "@/lib/firebase/admin";
-// cSpell: ignore uuidv
-import { v4 as uuidv4 } from "uuid";
+import { getDownloadURL } from "firebase-admin/storage";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -52,7 +51,6 @@ export async function uploadInputImage(
 
   await blob.save(Buffer.from(await file.arrayBuffer()), {
     contentType: "image/jpeg",
-    metadata: { firebaseStorageDownloadTokens: uuidv4() },
   });
 
   return path;
@@ -72,7 +70,6 @@ export async function uploadResultImage(
 
   await blob.save(buffer, {
     contentType: "image/jpeg",
-    metadata: { firebaseStorageDownloadTokens: uuidv4() },
   });
 
   return path;
@@ -97,7 +94,6 @@ export async function uploadReferenceImage(
 
   await blob.save(Buffer.from(await file.arrayBuffer()), {
     contentType: file.type,
-    metadata: { firebaseStorageDownloadTokens: uuidv4() },
   });
 
   return path;
@@ -115,7 +111,6 @@ export async function uploadQrCode(
 
   await blob.save(buffer, {
     contentType: "image/png",
-    metadata: { firebaseStorageDownloadTokens: uuidv4() },
   });
 
   return storagePath;
@@ -137,17 +132,26 @@ export async function getSignedUrl(
 }
 
 /**
- * Generates a token-based public URL for file access
- * Uses Firebase Storage download token pattern
+ * Generates a public download URL for file access
+ * Uses Firebase Admin SDK's getDownloadURL method
  */
 export async function getPublicUrl(path: string): Promise<string> {
   const file = storage.file(path);
-  const [metadata] = await file.getMetadata();
-  const token = metadata.metadata?.firebaseStorageDownloadTokens;
 
-  if (!token) {
-    throw new Error("No download token found for file");
+  try {
+    // Get the download URL using Firebase Admin SDK
+    const downloadUrl = await getDownloadURL(file);
+
+    console.log("[Storage] Generated download URL:", {
+      path,
+      url: downloadUrl,
+    });
+
+    return downloadUrl;
+  } catch (error) {
+    console.error("[Storage] Failed to generate download URL:", error);
+    throw new Error(
+      `Failed to get download URL for file: ${error instanceof Error ? error.message : "Unknown error"}`
+    );
   }
-
-  return `https://firebasestorage.googleapis.com/v0/b/${storage.name}/o/${encodeURIComponent(path)}?alt=media&token=${token}`;
 }

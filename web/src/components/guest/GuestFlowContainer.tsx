@@ -52,10 +52,21 @@ export function GuestFlowContainer({
       state.session.resultImagePath &&
       !resultImageUrl
     ) {
+      console.log("[GuestFlow] Fetching result image URL:", state.session.resultImagePath)
       getImageUrlAction(state.session.resultImagePath).then((result) => {
         if (result.success) {
+          console.log("[GuestFlow] Result image URL fetched:", result.url)
           setResultImageUrl(result.url)
+        } else {
+          console.error("[GuestFlow] Failed to fetch result URL:", result.error)
         }
+      })
+    } else if (state.step === "review_ready" || state.step === "share") {
+      console.log("[GuestFlow] Session state:", {
+        step: state.step,
+        hasResultImagePath: !!state.session.resultImagePath,
+        resultImagePath: state.session.resultImagePath,
+        hasResultUrl: !!resultImageUrl,
       })
     }
   }, [state, resultImageUrl])
@@ -182,7 +193,11 @@ export function GuestFlowContainer({
         />
         <div className="flex gap-4 w-full max-w-md">
           <RetakeButton
-            onRetake={() => dispatch({ type: "RETAKE" })}
+            onRetake={() => {
+              dispatch({ type: "RETAKE" })
+              // Auto-request camera after retake
+              requestCamera()
+            }}
           />
           <Button
             onClick={() => dispatch({ type: "NEXT" })}
