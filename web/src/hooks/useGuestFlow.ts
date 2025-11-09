@@ -87,23 +87,18 @@ export function useGuestFlow(eventId: string) {
   const captureRef = useRef<Blob | null>(null);
   const unsubscribeRef = useRef<(() => void) | null>(null);
 
-  // Request camera when moving from greeting
-  useEffect(() => {
-    if (state.step === "greeting") {
-      async function requestCamera() {
-        try {
-          const mediaStream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: "user" },
-            audio: false,
-          });
-          dispatch({ type: "PERMISSION_GRANTED", stream: mediaStream });
-        } catch (err) {
-          dispatch({ type: "PERMISSION_DENIED" });
-        }
-      }
-      requestCamera();
+  // Request camera - exposed as a function to be called on user action
+  const requestCamera = async () => {
+    try {
+      const mediaStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "user" },
+        audio: false,
+      });
+      dispatch({ type: "PERMISSION_GRANTED", stream: mediaStream });
+    } catch (err) {
+      dispatch({ type: "PERMISSION_DENIED" });
     }
-  }, [state.step]);
+  };
 
   // Handle photo upload after capture
   const handleCapture = async (blob: Blob) => {
@@ -194,5 +189,5 @@ export function useGuestFlow(eventId: string) {
     };
   }, [state]);
 
-  return { state, dispatch, handleCapture };
+  return { state, dispatch, handleCapture, requestCamera };
 }

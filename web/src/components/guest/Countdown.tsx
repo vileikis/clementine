@@ -25,7 +25,7 @@ export function Countdown({ onComplete }: CountdownProps) {
   }, [onComplete]);
 
   return (
-    <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
+    <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/30 backdrop-blur-sm">
       <div
         className="text-[20rem] font-bold text-white animate-in zoom-in-50 fade-in duration-300"
         style={{ color: "var(--brand, #0EA5E9)" }}

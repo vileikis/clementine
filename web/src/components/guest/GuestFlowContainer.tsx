@@ -1,9 +1,11 @@
 "use client"
 
-import { useRef, useEffect } from "react"
+import { useRef, useEffect, useState } from "react"
 import { GreetingScreen } from "./GreetingScreen"
 import { CaptureButton } from "./CaptureButton"
+import { Countdown } from "./Countdown"
 import { useGuestFlow } from "@/hooks/useGuestFlow"
+import { capturePhoto } from "@/lib/camera/capture"
 
 interface GuestFlowContainerProps {
   eventId: string
@@ -20,8 +22,9 @@ export function GuestFlowContainer({
   eventTitle,
   showTitleOverlay,
 }: GuestFlowContainerProps) {
-  const { state, dispatch, handleCapture } = useGuestFlow(eventId)
+  const { state, dispatch, handleCapture, requestCamera } = useGuestFlow(eventId)
   const videoRef = useRef<HTMLVideoElement>(null)
+  const [isCounting, setIsCounting] = useState(false)
 
   // Set video stream when ready
   useEffect(() => {
@@ -42,9 +45,7 @@ export function GuestFlowContainer({
       <GreetingScreen
         eventTitle={eventTitle}
         showTitleOverlay={showTitleOverlay}
-        onGetStarted={() => {
-          // Camera permission request happens automatically in useGuestFlow
-        }}
+        onGetStarted={requestCamera}
       />
     )
   }
@@ -74,8 +75,28 @@ export function GuestFlowContainer({
 
   // Ready to capture - show camera with capture button
   if (state.step === "ready_to_capture" || state.step === "countdown") {
+    const handleStartCountdown = () => {
+      setIsCounting(true)
+    }
+
+    const handleCountdownComplete = async () => {
+      setIsCounting(false)
+
+      if (!videoRef.current) {
+        return
+      }
+
+      try {
+        const blob = await capturePhoto(videoRef.current)
+        handleCapture(blob)
+      } catch (error) {
+        console.error("Capture failed:", error)
+      }
+    }
+
     return (
       <div className="min-h-screen bg-black flex flex-col items-center justify-center relative">
+        {isCounting && <Countdown onComplete={handleCountdownComplete} />}
         <div className="relative w-full h-screen">
           <video
             ref={videoRef}
@@ -90,7 +111,9 @@ export function GuestFlowContainer({
           <CaptureButton
             videoRef={videoRef}
             onCapture={handleCapture}
-            disabled={state.step === "countdown"}
+            onStartCountdown={handleStartCountdown}
+            disabled={isCounting}
+            isCounting={isCounting}
           />
         </div>
       </div>
