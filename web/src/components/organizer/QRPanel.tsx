@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { generateQrCodeAction } from "@/app/actions/qr"
+import { generateQrCodeAction, regenerateQrCodeAction } from "@/app/actions/qr"
 
 interface QRPanelProps {
   eventId: string
@@ -12,6 +12,7 @@ interface QRPanelProps {
 export function QRPanel({ eventId, joinUrl, qrPngPath }: QRPanelProps) {
   const [qrUrl, setQrUrl] = useState<string | null>(null)
   const [isGenerating, setIsGenerating] = useState(false)
+  const [isRegenerating, setIsRegenerating] = useState(false)
   const [isCopied, setIsCopied] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -36,6 +37,25 @@ export function QRPanel({ eventId, joinUrl, qrPngPath }: QRPanelProps) {
       setError(err instanceof Error ? err.message : "Failed to load QR code")
     } finally {
       setIsGenerating(false)
+    }
+  }
+
+  const handleRegenerateQr = async () => {
+    try {
+      setIsRegenerating(true)
+      setError(null)
+
+      const result = await regenerateQrCodeAction(eventId, joinUrl, qrPngPath)
+
+      if (result.success && result.qrUrl) {
+        setQrUrl(result.qrUrl)
+      } else {
+        setError(result.error || "Failed to regenerate QR code")
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to regenerate QR code")
+    } finally {
+      setIsRegenerating(false)
     }
   }
 
@@ -103,12 +123,12 @@ export function QRPanel({ eventId, joinUrl, qrPngPath }: QRPanelProps) {
             </div>
           )}
 
-          {isGenerating ? (
+          {isGenerating || isRegenerating ? (
             <div className="flex items-center justify-center h-64 bg-muted rounded-lg">
               <div className="text-center space-y-2">
                 <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
                 <p className="text-sm text-muted-foreground">
-                  Generating QR code...
+                  {isRegenerating ? "Regenerating QR code..." : "Generating QR code..."}
                 </p>
               </div>
             </div>
@@ -123,12 +143,21 @@ export function QRPanel({ eventId, joinUrl, qrPngPath }: QRPanelProps) {
                   style={{ maxWidth: "256px" }}
                 />
               </div>
-              <button
-                onClick={handleDownloadQr}
-                className="w-full px-4 py-2 text-sm font-medium border border-input rounded-md hover:bg-muted transition-colors"
-              >
-                Download QR Code
-              </button>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={handleDownloadQr}
+                  className="px-4 py-2 text-sm font-medium border border-input rounded-md hover:bg-muted transition-colors"
+                >
+                  Download QR Code
+                </button>
+                <button
+                  onClick={handleRegenerateQr}
+                  disabled={isRegenerating}
+                  className="px-4 py-2 text-sm font-medium border border-input rounded-md hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Regenerate QR Code
+                </button>
+              </div>
             </>
           ) : null}
         </div>
