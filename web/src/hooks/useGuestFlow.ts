@@ -4,7 +4,11 @@ import { useReducer, useEffect, useRef } from "react";
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
 import type { Session } from "@/lib/types/firestore";
-import { startSessionAction, saveCaptureAction } from "@/app/actions/sessions";
+import {
+  startSessionAction,
+  saveCaptureAction,
+  triggerTransformAction,
+} from "@/app/actions/sessions";
 
 type GuestState =
   | { step: "greeting" }
@@ -117,6 +121,13 @@ export function useGuestFlow(eventId: string) {
 
       await saveCaptureAction(formData);
       dispatch({ type: "UPLOAD_COMPLETE", sessionId });
+
+      // Trigger AI transform
+      // Note: We don't await here - the real-time subscription will notify us when done
+      triggerTransformAction(eventId, sessionId).catch((error) => {
+        console.error("Transform trigger failed:", error);
+        // Error state will be handled by the real-time subscription
+      });
     } catch (error) {
       dispatch({
         type: "TRANSFORM_ERROR",

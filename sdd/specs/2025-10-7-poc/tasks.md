@@ -456,118 +456,118 @@
 
 ## Phase 4: AI Transform Pipeline (Days 7-8)
 
-### Task 4.1: Nano Banana Types & Config
+### Task 4.1: Nano Banana Types & Config ✅
 - **Complexity**: S
 - **Dependencies**: None
 - **Description**: Define types and environment variables for Nano Banana API
 - **Acceptance Criteria**:
-  - [ ] `TransformParams` type defined
-  - [ ] Environment variables documented (API key, endpoints)
-  - [ ] API endpoint configuration by effect type
+  - [x] `TransformParams` type defined
+  - [x] Environment variables documented (API key, endpoints)
+  - [x] API endpoint configuration by effect type
 - **Files**:
-  - `web/src/lib/ai/types.ts` (create)
-  - Update: `.env.local.example`
+  - `web/src/lib/ai/types.ts` (create) ✅
+  - Update: `.env.local.example` ✅
 
-### Task 4.2: Mock Transform Implementation
+### Task 4.2: Mock Transform Implementation ✅
 - **Complexity**: M
 - **Dependencies**: Task 4.1
 - **Description**: Implement mock transform for development (no API dependency)
 - **Acceptance Criteria**:
-  - [ ] Fetches input image from signed URL
-  - [ ] Applies simple overlay (colored tint + text)
-  - [ ] Returns Buffer
-  - [ ] Simulates 3-5 second processing delay
-  - [ ] Used when API endpoint not configured
+  - [x] Fetches input image from signed URL
+  - [x] Applies simple overlay (colored tint + text)
+  - [x] Returns Buffer
+  - [x] Simulates 3-5 second processing delay
+  - [x] Used when API endpoint not configured
 - **Files**:
-  - `web/src/lib/ai/mock.ts` (create)
+  - `web/src/lib/ai/mock.ts` (create) ✅
 
-### Task 4.3: Nano Banana API Integration
+### Task 4.3: Nano Banana API Integration ✅
 - **Complexity**: M
 - **Dependencies**: Task 4.1
 - **Description**: Implement real Nano Banana API calls
 - **Acceptance Criteria**:
-  - [ ] `transformWithNanoBanana()` calls correct endpoint by effect
-  - [ ] Sends input image URL, reference URL, prompt, brand color
-  - [ ] Handles API authentication
-  - [ ] Returns result image as Buffer
-  - [ ] Throws descriptive errors on failure
-  - [ ] Falls back to mock if endpoints not configured
+  - [x] `transformWithNanoBanana()` calls correct endpoint by effect
+  - [x] Sends input image URL, reference URL, prompt, brand color
+  - [x] Handles API authentication
+  - [x] Returns result image as Buffer
+  - [x] Throws descriptive errors on failure
+  - [x] Falls back to mock if endpoints not configured
 - **Files**:
-  - `web/src/lib/ai/nano-banana.ts` (create)
-  - Update: `web/package.json` (add node-fetch if needed)
+  - `web/src/lib/ai/nano-banana.ts` (create) ✅
+  - Update: `web/package.json` (add node-fetch if needed) N/A (native fetch used)
 
-### Task 4.4: Transform Server Action
+### Task 4.4: Transform Server Action ✅
 - **Complexity**: L
 - **Dependencies**: Task 4.3, Task 3.9, Task 2.2
 - **Description**: Create Server Action to orchestrate AI transform pipeline
 - **Acceptance Criteria**:
-  - [ ] `triggerTransformAction()` updates session to "transforming"
-  - [ ] Fetches session and current scene configuration
-  - [ ] Generates signed URLs for input and reference images
-  - [ ] Calls `transformWithNanoBanana()` with correct params
-  - [ ] Uploads result image to Storage
-  - [ ] Updates session to "ready" with resultImagePath
-  - [ ] On error, updates session to "error" with message
-  - [ ] Revalidates join page path
-  - [ ] Handles timeouts (60s max)
+  - [x] `triggerTransformAction()` updates session to "transforming"
+  - [x] Fetches session and current scene configuration
+  - [x] Generates signed URLs for input and reference images
+  - [x] Calls `transformWithNanoBanana()` with correct params
+  - [x] Uploads result image to Storage
+  - [x] Updates session to "ready" with resultImagePath
+  - [x] On error, updates session to "error" with message
+  - [x] Revalidates join page path
+  - [x] Handles timeouts (60s max)
 - **Files**:
-  - Update: `web/src/app/actions/sessions.ts`
+  - Update: `web/src/app/actions/sessions.ts` ✅
 
-### Task 4.5: Result Viewer Component
+### Task 4.5: Result Viewer Component ✅
 - **Complexity**: M
 - **Dependencies**: None
 - **Description**: Build component to display AI-transformed result
 - **Acceptance Criteria**:
-  - [ ] Shows loading skeleton while transforming
-  - [ ] Displays result image when ready
-  - [ ] Shows error message if transform failed
-  - [ ] Image responsive and maintains aspect ratio
-  - [ ] Uses shadcn/ui Skeleton component
+  - [x] Shows loading skeleton while transforming
+  - [x] Displays result image when ready
+  - [x] Shows error message if transform failed
+  - [x] Image responsive and maintains aspect ratio
+  - [x] Uses shadcn/ui Skeleton component
 - **Files**:
-  - `web/src/components/guest/ResultViewer.tsx` (create)
+  - `web/src/components/guest/ResultViewer.tsx` (create) ✅
 
-### Task 4.6: Retake Button
+### Task 4.6: Retake Button ✅
 - **Complexity**: S
 - **Dependencies**: Task 3.10
 - **Description**: Build button to restart capture flow
 - **Acceptance Criteria**:
-  - [ ] Button dispatches "RETAKE" action to state machine
-  - [ ] Returns to ready_to_capture state
-  - [ ] Keeps existing session or creates new one (implementation choice)
-  - [ ] Button styled with brand color
+  - [x] Button dispatches "RETAKE" action to state machine
+  - [x] Returns to ready_to_capture state
+  - [x] Keeps existing session or creates new one (implementation choice)
+  - [x] Button styled with brand color
 - **Files**:
-  - `web/src/components/guest/RetakeButton.tsx` (create)
+  - `web/src/components/guest/RetakeButton.tsx` (create) ✅
 
-### Task 4.7: Integrate Transform into Guest Flow
+### Task 4.7: Integrate Transform into Guest Flow ✅
 - **Complexity**: M
 - **Dependencies**: Task 4.4, Task 4.5, Task 3.10
 - **Description**: Connect transform action to guest state machine
 - **Acceptance Criteria**:
-  - [ ] After capture, state transitions to "transforming"
-  - [ ] `triggerTransformAction()` called automatically
-  - [ ] Result viewer shows loading state
-  - [ ] On completion, state transitions to "review_ready"
-  - [ ] On error, state transitions to "error"
-  - [ ] Error banner shown with retry option
+  - [x] After capture, state transitions to "transforming"
+  - [x] `triggerTransformAction()` called automatically
+  - [x] Result viewer shows loading state
+  - [x] On completion, state transitions to "review_ready"
+  - [x] On error, state transitions to "error"
+  - [x] Error banner shown with retry option
 - **Files**:
-  - Update: `web/src/hooks/useGuestFlow.ts`
-  - Update: `web/src/app/join/[eventId]/page.tsx`
+  - Update: `web/src/hooks/useGuestFlow.ts` ✅
+  - Update: `web/src/components/guest/GuestFlowContainer.tsx` ✅
 
-### Task 4.8: Error Handling & Retry Logic
+### Task 4.8: Error Handling & Retry Logic ✅
 - **Complexity**: M
 - **Dependencies**: Task 4.7
 - **Description**: Implement robust error handling for transform failures
 - **Acceptance Criteria**:
-  - [ ] Transform errors caught and logged
-  - [ ] Session marked as "error" with message
-  - [ ] Guest sees friendly error message
-  - [ ] "Try Again" button re-triggers transform
-  - [ ] Transient errors retried automatically (max 3 attempts)
-  - [ ] Timeout after 60 seconds
+  - [x] Transform errors caught and logged
+  - [x] Session marked as "error" with message
+  - [x] Guest sees friendly error message
+  - [x] "Try Again" button re-triggers transform
+  - [x] Transient errors retried automatically (max 3 attempts)
+  - [x] Timeout after 60 seconds
 - **Files**:
-  - `web/src/components/guest/ErrorBanner.tsx` (create)
-  - Update: `web/src/app/actions/sessions.ts` (retry logic)
-  - Update: `web/src/hooks/useGuestFlow.ts`
+  - `web/src/components/guest/ErrorBanner.tsx` (create) ✅
+  - Update: `web/src/app/actions/sessions.ts` (retry logic) ✅
+  - Update: `web/src/hooks/useGuestFlow.ts` ✅
 
 ---
 

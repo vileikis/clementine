@@ -4,8 +4,13 @@ import { useRef, useEffect, useState } from "react"
 import { GreetingScreen } from "./GreetingScreen"
 import { CaptureButton } from "./CaptureButton"
 import { Countdown } from "./Countdown"
+import { ResultViewer } from "./ResultViewer"
+import { RetakeButton } from "./RetakeButton"
+import { ErrorBanner } from "./ErrorBanner"
+import { Button } from "@/components/ui/button"
 import { useGuestFlow } from "@/hooks/useGuestFlow"
 import { capturePhoto } from "@/lib/camera/capture"
+import { getImageUrlAction } from "@/app/actions/scenes"
 
 interface GuestFlowContainerProps {
   eventId: string
@@ -25,6 +30,7 @@ export function GuestFlowContainer({
   const { state, dispatch, handleCapture, requestCamera } = useGuestFlow(eventId)
   const videoRef = useRef<HTMLVideoElement>(null)
   const [isCounting, setIsCounting] = useState(false)
+  const [resultImageUrl, setResultImageUrl] = useState<string | undefined>()
 
   // Set video stream when ready
   useEffect(() => {
@@ -38,6 +44,21 @@ export function GuestFlowContainer({
       }
     }
   }, [state])
+
+  // Fetch result image URL when session is ready
+  useEffect(() => {
+    if (
+      (state.step === "review_ready" || state.step === "share") &&
+      state.session.resultImagePath &&
+      !resultImageUrl
+    ) {
+      getImageUrlAction(state.session.resultImagePath).then((result) => {
+        if (result.success) {
+          setResultImageUrl(result.url)
+        }
+      })
+    }
+  }, [state, resultImageUrl])
 
   // Greeting screen
   if (state.step === "greeting") {
@@ -132,41 +153,44 @@ export function GuestFlowContainer({
     )
   }
 
-  // Transforming
+  // Transforming - show loading state via ResultViewer
   if (state.step === "transforming") {
+    // Create a minimal session object for loading state
+    const transformingSession = {
+      id: state.sessionId,
+      eventId,
+      sceneId: "",
+      state: "transforming" as const,
+      createdAt: 0,
+      updatedAt: 0,
+    }
+
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black">
-        <div className="text-center space-y-4">
-          <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-r-transparent"></div>
-          <p className="text-white text-lg">Creating your AI photo...</p>
-          <p className="text-gray-400 text-sm">This may take up to a minute</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-background px-4">
+        <ResultViewer session={transformingSession} />
       </div>
     )
   }
 
-  // Review ready
+  // Review ready - show result with retake and next buttons
   if (state.step === "review_ready") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black px-4">
-        <div className="text-center space-y-6">
-          <h2 className="text-2xl font-bold text-white">Your AI Photo is Ready!</h2>
-          <p className="text-gray-400">Session ID: {state.session.id}</p>
-          <div className="space-x-4">
-            <button
-              onClick={() => dispatch({ type: "RETAKE" })}
-              className="px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600"
-            >
-              Retake
-            </button>
-            <button
-              onClick={() => dispatch({ type: "NEXT" })}
-              className="px-6 py-3 text-white rounded-lg hover:opacity-90"
-              style={{ backgroundColor: "var(--brand, #0EA5E9)" }}
-            >
-              Next
-            </button>
-          </div>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4 py-8 gap-6">
+        <ResultViewer
+          session={state.session}
+          resultImageUrl={resultImageUrl}
+        />
+        <div className="flex gap-4 w-full max-w-md">
+          <RetakeButton
+            onRetake={() => dispatch({ type: "RETAKE" })}
+          />
+          <Button
+            onClick={() => dispatch({ type: "NEXT" })}
+            className="flex-1"
+            style={{ backgroundColor: "var(--brand, #0EA5E9)" }}
+          >
+            Next
+          </Button>
         </div>
       </div>
     )
@@ -190,21 +214,14 @@ export function GuestFlowContainer({
     )
   }
 
-  // Error
+  // Error - show error banner with retry option
   if (state.step === "error") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black px-4">
-        <div className="max-w-md w-full text-center space-y-6">
-          <div className="text-6xl">⚠️</div>
-          <h2 className="text-2xl font-bold text-white">Something went wrong</h2>
-          <p className="text-gray-300">{state.message}</p>
-          <button
-            onClick={() => dispatch({ type: "CLOSE" })}
-            className="px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600"
-          >
-            Try Again
-          </button>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-background px-4">
+        <ErrorBanner
+          message={state.message}
+          onClose={() => dispatch({ type: "CLOSE" })}
+        />
       </div>
     )
   }
