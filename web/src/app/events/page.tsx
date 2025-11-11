@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { listEventsAction } from "@/app/actions/events"
+import { getCompanyAction } from "@/app/actions/companies"
 import { EventCard } from "@/components/organizer/EventCard"
 import { LogoutButton } from "@/components/organizer/LogoutButton"
 
@@ -15,6 +16,22 @@ export default async function EventsPage() {
   }
 
   const events = result.events ?? []
+
+  // Fetch company names for events that have companyId
+  const companyIds = [...new Set(events.filter(e => e.companyId).map(e => e.companyId!))]
+  const companies = await Promise.all(
+    companyIds.map(async (id) => {
+      const result = await getCompanyAction(id)
+      return result.success ? result.company : null
+    })
+  )
+  const companyMap = new Map(companies.filter(c => c).map(c => [c!.id, c!.name]))
+
+  // Create events with company names
+  const eventsWithCompanies = events.map(event => ({
+    event,
+    companyName: event.companyId ? companyMap.get(event.companyId) ?? null : null
+  }))
 
   return (
     <div className="space-y-6">
@@ -51,8 +68,8 @@ export default async function EventsPage() {
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {events.map((event) => (
-            <EventCard key={event.id} event={event} />
+          {eventsWithCompanies.map(({ event, companyName }) => (
+            <EventCard key={event.id} event={event} companyName={companyName} />
           ))}
         </div>
       )}

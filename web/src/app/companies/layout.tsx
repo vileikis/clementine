@@ -2,11 +2,11 @@ import type { Metadata } from "next"
 import Link from "next/link"
 
 export const metadata: Metadata = {
-  title: "Events | Clementine",
-  description: "Manage your AI photobooth events",
+  title: "Companies | Clementine",
+  description: "Manage your companies",
 }
 
-export default function EventsLayout({
+export default function CompaniesLayout({
   children,
 }: {
   children: React.ReactNode

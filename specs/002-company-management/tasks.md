@@ -101,26 +101,26 @@ Web application (monorepo: web/ workspace):
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T019 [P] [US1] Create repository test file web/src/lib/repositories/companies.test.ts (test createCompany with uniqueness validation)
-- [ ] T020 [P] [US1] Add test for listCompanies filtering active only in companies.test.ts
-- [ ] T021 [P] [US1] Create Server Action test file web/src/app/actions/companies.test.ts (test createCompanyAction success and duplicate name failure)
+- [X] T019 [P] [US1] Create repository test file web/src/lib/repositories/companies.test.ts (test createCompany with uniqueness validation)
+- [X] T020 [P] [US1] Add test for listCompanies filtering active only in companies.test.ts
+- [X] T021 [P] [US1] Create Server Action test file web/src/app/actions/companies.test.ts (test createCompanyAction success and duplicate name failure)
 
 ### Implementation for User Story 1
 
-- [ ] T022 [US1] Create company repository web/src/lib/repositories/companies.ts (implement createCompany with transaction-based uniqueness check per research.md)
-- [ ] T023 [US1] Add listCompanies function to companies.ts (filter status == 'active', order by name ASC)
-- [ ] T024 [US1] Add getCompany function to companies.ts (return single company by ID)
-- [ ] T025 [US1] Create companies Server Actions web/src/app/actions/companies.ts (implement createCompanyAction with Zod validation and revalidatePath)
-- [ ] T026 [US1] Add listCompaniesAction to companies.ts (call repository listCompanies)
-- [ ] T027 [US1] Add getCompanyAction to companies.ts (call repository getCompany)
-- [ ] T028 [US1] Extend createEventAction in web/src/app/actions/events.ts (add companyId field to input schema, validate company exists if provided)
-- [ ] T029 [US1] Extend createEvent repository function in web/src/lib/repositories/events.ts (accept and store companyId field)
-- [ ] T030 [P] [US1] Create CompanyForm component web/src/components/organizer/CompanyForm.tsx (modal with name input, Zod validation, calls createCompanyAction)
-- [ ] T031 [P] [US1] Create CompanyCard component web/src/components/organizer/CompanyCard.tsx (displays company name, event count, Edit and View Events buttons)
-- [ ] T032 [US1] Create Companies page web/src/app/companies/page.tsx (lists companies using listCompaniesAction, "Create New Company" button, renders CompanyCard components)
-- [ ] T033 [US1] Add Companies tab navigation to web/src/app/events/layout.tsx (add /companies link alongside Events tab per research.md URL-based routing decision)
-- [ ] T034 [US1] Add company selector to event creation form in web/src/app/events/new/page.tsx (dropdown populated from listCompaniesAction, optional "Create new company" inline action)
-- [ ] T035 [US1] Extend EventCard component web/src/components/organizer/EventCard.tsx (display company name if event.companyId present, join with company data)
+- [X] T022 [US1] Create company repository web/src/lib/repositories/companies.ts (implement createCompany with transaction-based uniqueness check per research.md)
+- [X] T023 [US1] Add listCompanies function to companies.ts (filter status == 'active', order by name ASC)
+- [X] T024 [US1] Add getCompany function to companies.ts (return single company by ID)
+- [X] T025 [US1] Create companies Server Actions web/src/app/actions/companies.ts (implement createCompanyAction with Zod validation and revalidatePath)
+- [X] T026 [US1] Add listCompaniesAction to companies.ts (call repository listCompanies)
+- [X] T027 [US1] Add getCompanyAction to companies.ts (call repository getCompany)
+- [X] T028 [US1] Extend createEventAction in web/src/app/actions/events.ts (add companyId field to input schema, validate company exists if provided)
+- [X] T029 [US1] Extend createEvent repository function in web/src/lib/repositories/events.ts (accept and store companyId field)
+- [X] T030 [P] [US1] Create CompanyForm component web/src/components/organizer/CompanyForm.tsx (modal with name input, Zod validation, calls createCompanyAction)
+- [X] T031 [P] [US1] Create CompanyCard component web/src/components/organizer/CompanyCard.tsx (displays company name, event count, Edit and View Events buttons)
+- [X] T032 [US1] Create Companies page web/src/app/companies/page.tsx (lists companies using listCompaniesAction, "Create New Company" button, renders CompanyCard components)
+- [X] T033 [US1] Add Companies tab navigation to web/src/app/events/layout.tsx (add /companies link alongside Events tab per research.md URL-based routing decision)
+- [X] T034 [US1] Add company selector to event creation form in web/src/app/events/new/page.tsx (dropdown populated from listCompaniesAction, optional "Create new company" inline action)
+- [X] T035 [US1] Extend EventCard component web/src/components/organizer/EventCard.tsx (display company name if event.companyId present, join with company data)
 
 **Checkpoint**: At this point, User Story 1 should be fully functional - admin can create companies, create events with company association, see company names in event list
 

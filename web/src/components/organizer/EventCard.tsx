@@ -3,6 +3,7 @@ import type { Event } from "@/lib/types/firestore"
 
 interface EventCardProps {
   event: Event
+  companyName?: string | null
 }
 
 const statusStyles = {
@@ -17,7 +18,7 @@ const statusLabels = {
   archived: "Archived",
 }
 
-export function EventCard({ event }: EventCardProps) {
+export function EventCard({ event, companyName }: EventCardProps) {
   const formattedDate = new Date(event.createdAt).toLocaleDateString("en-US", {
     year: "numeric",
     month: "short",
@@ -30,9 +31,16 @@ export function EventCard({ event }: EventCardProps) {
       className="block border rounded-lg p-6 hover:border-primary transition-colors"
     >
       <div className="flex items-start justify-between mb-3">
-        <h3 className="text-lg font-semibold">{event.title}</h3>
+        <div className="flex-1 min-w-0">
+          <h3 className="text-lg font-semibold">{event.title}</h3>
+          {companyName && (
+            <p className="text-sm text-muted-foreground mt-1">
+              {companyName}
+            </p>
+          )}
+        </div>
         <span
-          className={`px-2 py-1 text-xs font-medium rounded-full border ${statusStyles[event.status]}`}
+          className={`px-2 py-1 text-xs font-medium rounded-full border flex-shrink-0 ${statusStyles[event.status]}`}
         >
           {statusLabels[event.status]}
         </span>
