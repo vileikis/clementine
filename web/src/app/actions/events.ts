@@ -8,6 +8,7 @@ import {
   updateEventStatus,
   getCurrentScene,
 } from "@/lib/repositories/events"
+import { getCompany } from "@/lib/repositories/companies"
 import { verifyAdminSecret } from "@/lib/auth"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
@@ -16,6 +17,7 @@ const createEventInput = z.object({
   title: z.string().min(1, "Title is required").max(100, "Title too long"),
   brandColor: z.string().regex(/^#[0-9A-F]{6}$/i, "Invalid hex color"),
   showTitleOverlay: z.boolean(),
+  companyId: z.string().nullable().optional(),
 })
 
 export async function createEventAction(
@@ -29,6 +31,18 @@ export async function createEventAction(
 
   try {
     const validated = createEventInput.parse(input)
+
+    // Validate company exists if companyId provided
+    if (validated.companyId) {
+      const company = await getCompany(validated.companyId)
+      if (!company) {
+        return { success: false, error: "Company not found" }
+      }
+      if (company.status !== "active") {
+        return { success: false, error: "Company is not active" }
+      }
+    }
+
     const eventId = await createEvent(validated)
     revalidatePath("/events")
     return { success: true, eventId }

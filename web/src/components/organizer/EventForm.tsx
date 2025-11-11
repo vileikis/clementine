@@ -1,8 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { createEventAction } from "@/app/actions/events"
+import { listCompaniesAction } from "@/app/actions/companies"
+import type { Company } from "@/lib/types/firestore"
 
 interface EventFormProps {
   onSuccess?: (eventId: string) => void
@@ -17,9 +19,27 @@ export function EventForm({ onSuccess }: EventFormProps) {
   const [title, setTitle] = useState("")
   const [brandColor, setBrandColor] = useState("#0EA5E9")
   const [showTitleOverlay, setShowTitleOverlay] = useState(true)
+  const [companyId, setCompanyId] = useState<string | null>(null)
+
+  // Companies list
+  const [companies, setCompanies] = useState<Company[]>([])
+  const [loadingCompanies, setLoadingCompanies] = useState(true)
 
   // Validation errors
   const [titleError, setTitleError] = useState<string | null>(null)
+
+  // Load companies on mount
+  useEffect(() => {
+    async function loadCompanies() {
+      setLoadingCompanies(true)
+      const result = await listCompaniesAction()
+      if (result.success) {
+        setCompanies(result.companies ?? [])
+      }
+      setLoadingCompanies(false)
+    }
+    loadCompanies()
+  }, [])
 
   const validateTitle = (value: string): boolean => {
     if (!value.trim()) {
@@ -51,6 +71,7 @@ export function EventForm({ onSuccess }: EventFormProps) {
         title: title.trim(),
         brandColor,
         showTitleOverlay,
+        companyId: companyId || null,
       })
 
       if (result.success && result.eventId) {
@@ -102,6 +123,33 @@ export function EventForm({ onSuccess }: EventFormProps) {
         )}
         <p className="text-sm text-muted-foreground mt-1">
           {title.length}/100 characters
+        </p>
+      </div>
+
+      {/* Company Selector */}
+      <div>
+        <label
+          htmlFor="company"
+          className="block text-sm font-medium mb-2"
+        >
+          Company (Optional)
+        </label>
+        <select
+          id="company"
+          value={companyId || ""}
+          onChange={(e) => setCompanyId(e.target.value || null)}
+          className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-background"
+          disabled={isSubmitting || loadingCompanies}
+        >
+          <option value="">No company</option>
+          {companies.map((company) => (
+            <option key={company.id} value={company.id}>
+              {company.name}
+            </option>
+          ))}
+        </select>
+        <p className="text-sm text-muted-foreground mt-1">
+          Associate this event with a brand or client
         </p>
       </div>
 
