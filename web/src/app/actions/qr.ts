@@ -2,6 +2,7 @@
 
 import { storage } from "@/lib/firebase/admin"
 import { generateJoinQr } from "@/lib/qr/generate"
+import { verifyAdminSecret } from "@/lib/auth"
 import { v4 as uuidv4 } from "uuid"
 
 /**
@@ -12,6 +13,12 @@ export async function generateQrCodeAction(
   joinUrl: string,
   qrPngPath: string
 ) {
+  // Verify admin authentication
+  const auth = await verifyAdminSecret()
+  if (!auth.authorized) {
+    return { success: false, error: auth.error }
+  }
+
   try {
     const file = storage.file(qrPngPath)
 
@@ -56,6 +63,12 @@ export async function regenerateQrCodeAction(
   joinUrl: string,
   qrPngPath: string
 ) {
+  // Verify admin authentication
+  const auth = await verifyAdminSecret()
+  if (!auth.authorized) {
+    return { success: false, error: auth.error }
+  }
+
   try {
     const file = storage.file(qrPngPath)
 

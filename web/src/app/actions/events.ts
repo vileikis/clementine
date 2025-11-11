@@ -6,8 +6,11 @@ import {
   listEvents,
   updateEventBranding,
   updateEventStatus,
+  updateEventTitle,
   getCurrentScene,
 } from "@/lib/repositories/events"
+import { getCompany } from "@/lib/repositories/companies"
+import { verifyAdminSecret } from "@/lib/auth"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
 
@@ -15,13 +18,30 @@ const createEventInput = z.object({
   title: z.string().min(1, "Title is required").max(100, "Title too long"),
   brandColor: z.string().regex(/^#[0-9A-F]{6}$/i, "Invalid hex color"),
   showTitleOverlay: z.boolean(),
+  companyId: z.string().min(1, "Company is required"),
 })
 
 export async function createEventAction(
   input: z.infer<typeof createEventInput>
 ) {
+  // Verify admin authentication
+  const auth = await verifyAdminSecret()
+  if (!auth.authorized) {
+    return { success: false, error: auth.error }
+  }
+
   try {
     const validated = createEventInput.parse(input)
+
+    // Validate company exists
+    const company = await getCompany(validated.companyId)
+    if (!company) {
+      return { success: false, error: "Company not found" }
+    }
+    if (company.status !== "active") {
+      return { success: false, error: "Company is not active" }
+    }
+
     const eventId = await createEvent(validated)
     revalidatePath("/events")
     return { success: true, eventId }
@@ -51,9 +71,11 @@ export async function getEventAction(eventId: string) {
   }
 }
 
-export async function listEventsAction() {
+export async function listEventsAction(filters?: {
+  companyId?: string | null;
+}) {
   try {
-    const events = await listEvents()
+    const events = await listEvents(filters)
     return { success: true, events }
   } catch (error) {
     return {
@@ -67,6 +89,12 @@ export async function updateEventBrandingAction(
   eventId: string,
   branding: { brandColor?: string; showTitleOverlay?: boolean }
 ) {
+  // Verify admin authentication
+  const auth = await verifyAdminSecret()
+  if (!auth.authorized) {
+    return { success: false, error: auth.error }
+  }
+
   try {
     await updateEventBranding(eventId, branding)
     revalidatePath(`/events/${eventId}`)
@@ -98,6 +126,12 @@ export async function updateEventStatusAction(
   eventId: string,
   status: "draft" | "live" | "archived"
 ) {
+  // Verify admin authentication
+  const auth = await verifyAdminSecret()
+  if (!auth.authorized) {
+    return { success: false, error: auth.error }
+  }
+
   try {
     await updateEventStatus(eventId, status)
     revalidatePath("/events")
@@ -107,6 +141,37 @@ export async function updateEventStatusAction(
     return {
       success: false,
       error: error instanceof Error ? error.message : "Failed to update status",
+    }
+  }
+}
+
+const updateEventTitleInput = z.object({
+  title: z.string().min(1, "Title is required").max(100, "Title too long"),
+})
+
+export async function updateEventTitleAction(
+  eventId: string,
+  title: string
+) {
+  // Verify admin authentication
+  const auth = await verifyAdminSecret()
+  if (!auth.authorized) {
+    return { success: false, error: auth.error }
+  }
+
+  try {
+    const validated = updateEventTitleInput.parse({ title })
+    await updateEventTitle(eventId, validated.title)
+    revalidatePath("/events")
+    revalidatePath(`/events/${eventId}`)
+    return { success: true }
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return { success: false, error: error.issues[0].message }
+    }
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to update title",
     }
   }
 }

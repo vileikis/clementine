@@ -4,6 +4,7 @@ export type EventStatus = "draft" | "live" | "archived";
 export type SceneStatus = "active" | "deprecated";
 export type SessionState = "created" | "captured" | "transforming" | "ready" | "error";
 export type CaptureMode = "photo" | "video" | "gif" | "boomerang";
+export type CompanyStatus = "active" | "deleted";
 
 export interface Event {
   id: string;
@@ -14,10 +15,28 @@ export interface Event {
   status: EventStatus;
   currentSceneId: string; // FK to scenes subcollection
 
+  companyId: string | null; // FK to companies collection
+
   joinPath: string; // e.g., "/join/abc123"
   qrPngPath: string; // Storage path
 
   createdAt: number; // Unix timestamp ms
+  updatedAt: number;
+}
+
+export interface Company {
+  id: string;
+  name: string;
+  status: CompanyStatus;
+  deletedAt: number | null;
+
+  // Optional branding metadata
+  brandColor?: string;
+  contactEmail?: string;
+  termsUrl?: string;
+  privacyUrl?: string;
+
+  createdAt: number;
   updatedAt: number;
 }
 

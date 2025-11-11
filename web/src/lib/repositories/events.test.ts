@@ -43,6 +43,7 @@ describe("Events Repository", () => {
         title: "Summer Festival",
         brandColor: "#FF5733",
         showTitleOverlay: true,
+        companyId: "company-123",
       });
 
       expect(eventId).toBe("event-123");
@@ -220,6 +221,92 @@ describe("Events Repository", () => {
       const events = await listEvents();
 
       expect(events).toEqual([]);
+    });
+
+    it("filters events by companyId when provided", async () => {
+      const mockEvents = [
+        {
+          id: "event-1",
+          title: "Company A Event",
+          brandColor: "#111111",
+          showTitleOverlay: true,
+          status: "live",
+          currentSceneId: "scene-1",
+          joinPath: "/join/event-1",
+          qrPngPath: "events/event-1/qr/join.png",
+          companyId: "company-a",
+          createdAt: 2000000000,
+          updatedAt: 2000000000,
+        },
+      ];
+
+      const mockDocs = mockEvents.map((event) => ({
+        id: event.id,
+        data: jest.fn().mockReturnValue(event),
+      }));
+
+      const mockOrderBy = jest.fn().mockReturnValue({
+        get: jest.fn().mockResolvedValue({ docs: mockDocs }),
+      });
+
+      const mockWhere = jest.fn().mockReturnValue({
+        orderBy: mockOrderBy,
+      });
+
+      mockDb.collection.mockReturnValue({
+        where: mockWhere,
+      });
+
+      const events = await listEvents({ companyId: "company-a" });
+
+      expect(mockDb.collection).toHaveBeenCalledWith("events");
+      expect(mockWhere).toHaveBeenCalledWith("companyId", "==", "company-a");
+      expect(mockOrderBy).toHaveBeenCalledWith("createdAt", "desc");
+      expect(events).toHaveLength(1);
+      expect(events[0].companyId).toBe("company-a");
+    });
+
+    it("filters events with no company when companyId is null", async () => {
+      const mockEvents = [
+        {
+          id: "event-1",
+          title: "No Company Event",
+          brandColor: "#111111",
+          showTitleOverlay: true,
+          status: "live",
+          currentSceneId: "scene-1",
+          joinPath: "/join/event-1",
+          qrPngPath: "events/event-1/qr/join.png",
+          companyId: null,
+          createdAt: 2000000000,
+          updatedAt: 2000000000,
+        },
+      ];
+
+      const mockDocs = mockEvents.map((event) => ({
+        id: event.id,
+        data: jest.fn().mockReturnValue(event),
+      }));
+
+      const mockOrderBy = jest.fn().mockReturnValue({
+        get: jest.fn().mockResolvedValue({ docs: mockDocs }),
+      });
+
+      const mockWhere = jest.fn().mockReturnValue({
+        orderBy: mockOrderBy,
+      });
+
+      mockDb.collection.mockReturnValue({
+        where: mockWhere,
+      });
+
+      const events = await listEvents({ companyId: null });
+
+      expect(mockDb.collection).toHaveBeenCalledWith("events");
+      expect(mockWhere).toHaveBeenCalledWith("companyId", "==", null);
+      expect(mockOrderBy).toHaveBeenCalledWith("createdAt", "desc");
+      expect(events).toHaveLength(1);
+      expect(events[0].companyId).toBeNull();
     });
   });
 

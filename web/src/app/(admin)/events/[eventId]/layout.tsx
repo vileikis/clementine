@@ -3,6 +3,7 @@ import { getEventAction } from "@/app/actions/events"
 import { notFound } from "next/navigation"
 import { TabLink } from "@/components/organizer/TabLink"
 import { EventStatusSwitcher } from "@/components/organizer/EventStatusSwitcher"
+import { EditableEventName } from "@/components/organizer/EditableEventName"
 
 interface EventLayoutProps {
   children: React.ReactNode
@@ -35,7 +36,7 @@ export default async function EventLayout({
 
       <div className="mb-8">
         <div className="flex items-start justify-between mb-2">
-          <h1 className="text-3xl font-bold">{event.title}</h1>
+          <EditableEventName eventId={event.id} currentTitle={event.title} />
           <EventStatusSwitcher eventId={event.id} currentStatus={event.status} />
         </div>
         <p className="text-sm text-muted-foreground">
