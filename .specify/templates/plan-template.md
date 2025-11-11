@@ -31,7 +31,17 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+Verify compliance with Clementine Constitution (`.specify/memory/constitution.md`):
+
+- [ ] **Mobile-First Responsive Design**: Feature designed mobile-first (320px-768px), touch targets ≥44x44px, readable typography (≥14px)
+- [ ] **Clean Code & Simplicity**: No premature optimization, YAGNI applied, single responsibility maintained
+- [ ] **Type-Safe Development**: TypeScript strict mode, no `any` escapes, Zod validation for external inputs
+- [ ] **Minimal Testing Strategy**: Jest unit tests for critical paths (70%+ coverage goal), tests co-located with source
+- [ ] **Validation Loop Discipline**: Plan includes validation tasks (lint, type-check, test) before completion
+- [ ] **Technical Standards**: Applicable standards from `sdd/standards/` reviewed and referenced
+
+**Complexity Violations** (if any):
+If this feature violates "Clean Code & Simplicity" (e.g., new abstraction layers, architectural patterns), document in "Complexity Tracking" section below.
 
 ## Project Structure
 
