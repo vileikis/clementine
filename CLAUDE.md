@@ -137,6 +137,8 @@ The `functions/` workspace is a placeholder for Firebase Cloud Functions that wi
 - **White-label** - Fully customizable branding per event
 
 ## Active Technologies
+- TypeScript 5.x (strict mode) + Next.js 16, React 19, Firebase Admin SDK 13.x, Zod 4.x, Tailwind CSS v4, shadcn/ui (002-company-management)
+- Firestore (companies collection, events collection extended with companyId) (002-company-management)
 
 - TypeScript 5.x (strict mode), Next.js 16, React 19 + Next.js 16, React 19, Firebase (client + admin SDKs), Zod 4.x, Tailwind CSS 4, shadcn/ui (001-simplify-ai-prompts)
 - Firebase Storage (images), Firestore (scene/session metadata) (001-simplify-ai-prompts)

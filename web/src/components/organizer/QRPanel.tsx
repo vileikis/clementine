@@ -14,7 +14,8 @@ export function QRPanel({ eventId, joinUrl, qrPngPath }: QRPanelProps) {
   const [isGenerating, setIsGenerating] = useState(false)
   const [isRegenerating, setIsRegenerating] = useState(false)
   const [isCopied, setIsCopied] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [copyError, setCopyError] = useState<string | null>(null)
+  const [qrError, setQrError] = useState<string | null>(null)
 
   useEffect(() => {
     loadQrCode()
@@ -24,17 +25,17 @@ export function QRPanel({ eventId, joinUrl, qrPngPath }: QRPanelProps) {
   const loadQrCode = async () => {
     try {
       setIsGenerating(true)
-      setError(null)
+      setQrError(null)
 
       const result = await generateQrCodeAction(eventId, joinUrl, qrPngPath)
 
       if (result.success && result.qrUrl) {
         setQrUrl(result.qrUrl)
       } else {
-        setError(result.error || "Failed to load QR code")
+        setQrError(result.error || "Failed to load QR code")
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load QR code")
+      setQrError(err instanceof Error ? err.message : "Failed to load QR code")
     } finally {
       setIsGenerating(false)
     }
@@ -43,17 +44,17 @@ export function QRPanel({ eventId, joinUrl, qrPngPath }: QRPanelProps) {
   const handleRegenerateQr = async () => {
     try {
       setIsRegenerating(true)
-      setError(null)
+      setQrError(null)
 
       const result = await regenerateQrCodeAction(eventId, joinUrl, qrPngPath)
 
       if (result.success && result.qrUrl) {
         setQrUrl(result.qrUrl)
       } else {
-        setError(result.error || "Failed to regenerate QR code")
+        setQrError(result.error || "Failed to regenerate QR code")
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to regenerate QR code")
+      setQrError(err instanceof Error ? err.message : "Failed to regenerate QR code")
     } finally {
       setIsRegenerating(false)
     }
@@ -61,11 +62,42 @@ export function QRPanel({ eventId, joinUrl, qrPngPath }: QRPanelProps) {
 
   const handleCopyUrl = async () => {
     try {
-      await navigator.clipboard.writeText(joinUrl)
-      setIsCopied(true)
-      setTimeout(() => setIsCopied(false), 2000)
-    } catch {
-      setError("Failed to copy URL")
+      setCopyError(null)
+
+      // Try modern clipboard API first
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(joinUrl)
+        setIsCopied(true)
+        setTimeout(() => setIsCopied(false), 2000)
+        return
+      }
+
+      // Fallback to older method
+      const textArea = document.createElement("textarea")
+      textArea.value = joinUrl
+      textArea.style.position = "fixed"
+      textArea.style.left = "-999999px"
+      textArea.setAttribute("readonly", "")
+      document.body.appendChild(textArea)
+      textArea.select()
+
+      const successful = document.execCommand("copy")
+      document.body.removeChild(textArea)
+
+      if (successful) {
+        setIsCopied(true)
+        setTimeout(() => setIsCopied(false), 2000)
+      } else {
+        throw new Error("Copy command failed")
+      }
+    } catch (err) {
+      console.error("Copy failed:", err)
+      setCopyError(
+        err instanceof Error
+          ? `Failed to copy: ${err.message}`
+          : "Failed to copy URL. Please copy manually."
+      )
+      setTimeout(() => setCopyError(null), 3000)
     }
   }
 
@@ -104,6 +136,11 @@ export function QRPanel({ eventId, joinUrl, qrPngPath }: QRPanelProps) {
               {isCopied ? "Copied!" : "Copy"}
             </button>
           </div>
+          {copyError && (
+            <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-sm text-red-800">{copyError}</p>
+            </div>
+          )}
           <button
             onClick={handleOpenGuestView}
             className="w-full px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
@@ -117,9 +154,9 @@ export function QRPanel({ eventId, joinUrl, qrPngPath }: QRPanelProps) {
       <div>
         <h3 className="text-lg font-semibold mb-3">QR Code</h3>
         <div className="p-4 border rounded-lg space-y-4">
-          {error && (
+          {qrError && (
             <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-sm text-red-800">{error}</p>
+              <p className="text-sm text-red-800">{qrError}</p>
             </div>
           )}
 

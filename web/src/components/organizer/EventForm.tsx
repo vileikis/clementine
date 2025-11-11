@@ -1,8 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { createEventAction } from "@/app/actions/events"
+import { listCompaniesAction } from "@/app/actions/companies"
+import type { Company } from "@/lib/types/firestore"
 
 interface EventFormProps {
   onSuccess?: (eventId: string) => void
@@ -17,9 +19,28 @@ export function EventForm({ onSuccess }: EventFormProps) {
   const [title, setTitle] = useState("")
   const [brandColor, setBrandColor] = useState("#0EA5E9")
   const [showTitleOverlay, setShowTitleOverlay] = useState(true)
+  const [companyId, setCompanyId] = useState<string>("")
+
+  // Companies list
+  const [companies, setCompanies] = useState<Company[]>([])
+  const [loadingCompanies, setLoadingCompanies] = useState(true)
 
   // Validation errors
   const [titleError, setTitleError] = useState<string | null>(null)
+  const [companyError, setCompanyError] = useState<string | null>(null)
+
+  // Load companies on mount
+  useEffect(() => {
+    async function loadCompanies() {
+      setLoadingCompanies(true)
+      const result = await listCompaniesAction()
+      if (result.success) {
+        setCompanies(result.companies ?? [])
+      }
+      setLoadingCompanies(false)
+    }
+    loadCompanies()
+  }, [])
 
   const validateTitle = (value: string): boolean => {
     if (!value.trim()) {
@@ -34,13 +55,23 @@ export function EventForm({ onSuccess }: EventFormProps) {
     return true
   }
 
+  const validateCompany = (value: string): boolean => {
+    if (!value) {
+      setCompanyError("Company is required")
+      return false
+    }
+    setCompanyError(null)
+    return true
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
 
     // Validate
     const isTitleValid = validateTitle(title)
-    if (!isTitleValid) {
+    const isCompanyValid = validateCompany(companyId)
+    if (!isTitleValid || !isCompanyValid) {
       return
     }
 
@@ -51,6 +82,7 @@ export function EventForm({ onSuccess }: EventFormProps) {
         title: title.trim(),
         brandColor,
         showTitleOverlay,
+        companyId,
       })
 
       if (result.success && result.eventId) {
@@ -102,6 +134,44 @@ export function EventForm({ onSuccess }: EventFormProps) {
         )}
         <p className="text-sm text-muted-foreground mt-1">
           {title.length}/100 characters
+        </p>
+      </div>
+
+      {/* Company Selector */}
+      <div>
+        <label
+          htmlFor="company"
+          className="block text-sm font-medium mb-2"
+        >
+          Company <span className="text-red-500">*</span>
+        </label>
+        <select
+          id="company"
+          value={companyId}
+          onChange={(e) => {
+            setCompanyId(e.target.value)
+            if (companyError) validateCompany(e.target.value)
+          }}
+          onBlur={() => validateCompany(companyId)}
+          className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 bg-background ${
+            companyError
+              ? "border-red-500 focus:ring-red-500"
+              : "border-input focus:ring-primary"
+          }`}
+          disabled={isSubmitting || loadingCompanies}
+        >
+          <option value="">Select a company...</option>
+          {companies.map((company) => (
+            <option key={company.id} value={company.id}>
+              {company.name}
+            </option>
+          ))}
+        </select>
+        {companyError && (
+          <p className="text-sm text-red-500 mt-1">{companyError}</p>
+        )}
+        <p className="text-sm text-muted-foreground mt-1">
+          Associate this event with a brand or client
         </p>
       </div>
 
@@ -187,7 +257,7 @@ export function EventForm({ onSuccess }: EventFormProps) {
       <div className="flex items-center gap-3">
         <button
           type="submit"
-          disabled={isSubmitting || !title.trim()}
+          disabled={isSubmitting || !title.trim() || !companyId}
           className="flex-1 inline-flex items-center justify-center rounded-md bg-primary px-6 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isSubmitting ? "Creating..." : "Create Event"}
