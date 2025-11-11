@@ -1,10 +1,22 @@
 import Link from "next/link"
 import { listEventsAction } from "@/app/actions/events"
-import { getCompanyAction } from "@/app/actions/companies"
+import { getCompanyAction, listCompaniesAction } from "@/app/actions/companies"
 import { EventCard } from "@/components/organizer/EventCard"
+import { CompanyFilter } from "@/components/organizer/CompanyFilter"
 
-export default async function EventsPage() {
-  const result = await listEventsAction()
+export default async function EventsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ companyId?: string }>
+}) {
+  const params = await searchParams
+  const companyIdFilter = params.companyId === "no-company"
+    ? null
+    : params.companyId || undefined
+
+  const result = await listEventsAction(
+    companyIdFilter !== undefined ? { companyId: companyIdFilter } : undefined
+  )
 
   if (!result.success) {
     return (
@@ -32,9 +44,13 @@ export default async function EventsPage() {
     companyName: event.companyId ? companyMap.get(event.companyId) ?? null : null
   }))
 
+  // Fetch all companies for the filter dropdown
+  const companiesResult = await listCompaniesAction()
+  const allCompanies = companiesResult.success ? companiesResult.companies ?? [] : []
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <h2 className="text-3xl font-bold">Events</h2>
           <p className="text-muted-foreground mt-1">
@@ -43,11 +59,14 @@ export default async function EventsPage() {
         </div>
         <Link
           href="/events/new"
-          className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+          className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors min-h-[44px]"
         >
           Create Event
         </Link>
       </div>
+
+      {/* Company filter */}
+      <CompanyFilter companies={allCompanies} />
 
       {events.length === 0 ? (
         <div className="text-center py-12 border rounded-lg border-dashed">

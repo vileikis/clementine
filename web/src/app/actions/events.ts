@@ -70,9 +70,11 @@ export async function getEventAction(eventId: string) {
   }
 }
 
-export async function listEventsAction() {
+export async function listEventsAction(filters?: {
+  companyId?: string | null;
+}) {
   try {
-    const events = await listEvents()
+    const events = await listEvents(filters)
     return { success: true, events }
   } catch (error) {
     return {

@@ -22,9 +22,9 @@ export function CompanyCard({ company, eventCount = 0 }: CompanyCardProps) {
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0">
             <h3 className="text-lg font-semibold truncate">{company.name}</h3>
-            <p className="text-sm text-muted-foreground mt-1">
+            {/* <p className="text-sm text-muted-foreground mt-1">
               {eventCount} {eventCount === 1 ? "event" : "events"}
-            </p>
+            </p> */}
           </div>
 
           {/* Optional brand color indicator */}

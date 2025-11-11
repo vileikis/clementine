@@ -56,11 +56,38 @@ export async function getEvent(eventId: string): Promise<Event | null> {
   return eventSchema.parse({ id: doc.id, ...doc.data() });
 }
 
-export async function listEvents(): Promise<Event[]> {
-  const snapshot = await db
-    .collection("events")
-    .orderBy("createdAt", "desc")
-    .get();
+export async function listEvents(filters?: {
+  companyId?: string | null;
+}): Promise<Event[]> {
+  let query: FirebaseFirestore.Query<FirebaseFirestore.DocumentData> = db.collection("events");
+
+  // Special handling for "no company" filter
+  // Need to fetch all events and filter server-side because Firestore
+  // doesn't match undefined fields with null queries
+  if (filters?.companyId === null) {
+    const snapshot = await query.orderBy("createdAt", "desc").get();
+    const allEvents = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as Event[];
+
+    // Filter for events without companyId (null or undefined)
+    const eventsWithoutCompany = allEvents.filter(
+      (event) =>
+        event.companyId === null ||
+        event.companyId === undefined ||
+        event.companyId === ""
+    );
+
+    return eventsWithoutCompany.map((event) => eventSchema.parse(event));
+  }
+
+  // Apply companyId filter for specific company
+  if (filters?.companyId !== undefined) {
+    query = query.where("companyId", "==", filters.companyId);
+  }
+
+  const snapshot = await query.orderBy("createdAt", "desc").get();
   return snapshot.docs.map((doc) =>
     eventSchema.parse({ id: doc.id, ...doc.data() })
   );
