@@ -1,8 +1,4 @@
-// Effect types - will be synced with firestore types when available
-export type EffectType = 'background_swap' | 'deep_fake';
-
 export interface TransformParams {
-  effect: EffectType;
   prompt: string;
   inputImageUrl: string;
   referenceImageUrl?: string;

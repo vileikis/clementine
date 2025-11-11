@@ -4,7 +4,6 @@ import type { TransformParams } from '../types';
 export class MockProvider implements AIClient {
   async generateImage(params: TransformParams): Promise<Buffer> {
     console.log('[Mock AI] Starting mock transform:', {
-      effect: params.effect,
       prompt: params.prompt.substring(0, 50) + '...',
     });
 
@@ -23,7 +22,7 @@ export class MockProvider implements AIClient {
 
     console.log(`[Mock AI] Transform complete (${Math.round(delayMs)}ms):`, {
       imageSize: buffer.length,
-      effect: params.effect,
+      promptLength: params.prompt.length,
     });
 
     return buffer;

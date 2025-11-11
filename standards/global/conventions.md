@@ -3,6 +3,7 @@
 ### Project Structure
 
 **Monorepo organization:**
+
 ```
 clementine/
 ├── web/                    # Next.js app
@@ -11,11 +12,11 @@ clementine/
 │   ├── src/lib/          # Utilities
 │   └── src/hooks/        # Custom hooks
 ├── functions/             # Firebase Cloud Functions
-├── sdd/                   # Spec-driven development docs
 └── pnpm-workspace.yaml   # Workspace config
 ```
 
 **File organization:**
+
 - Group by feature/domain, not by type
 - Co-locate related files (component + styles + tests)
 - Use index files sparingly (explicit imports preferred)
@@ -23,6 +24,7 @@ clementine/
 ### Version Control
 
 #### Commit Messages
+
 ```
 feat: add event creation form
 fix: resolve image upload validation issue
@@ -33,12 +35,14 @@ test: add tests for event submission flow
 ```
 
 #### Branch Strategy
+
 - `main` - production-ready code
 - `feature/[feature-name]` - new features
 - `fix/[bug-description]` - bug fixes
 - Short-lived branches (merge within 1-3 days)
 
 #### Pull Requests
+
 - Clear description of changes
 - Reference related issues/specs
 - Run tests and linting before PR
@@ -47,11 +51,13 @@ test: add tests for event submission flow
 ### Environment Configuration
 
 **Public variables** (exposed to browser):
+
 ```bash
 NEXT_PUBLIC_API_URL=https://api.clementine.app
 ```
 
 **Private variables** (server-only):
+
 ```bash
 DATABASE_URL=postgresql://...
 API_SECRET_KEY=...
@@ -72,6 +78,7 @@ FIREBASE_ADMIN_KEY=...
 ### Testing Requirements
 
 Before merging:
+
 - Critical paths must have tests (event creation, photo upload)
 - All tests must pass
 - No TypeScript errors (`pnpm type-check`)
@@ -82,15 +89,3 @@ Before merging:
 - Update CHANGELOG.md for notable changes
 - Keep README files current
 - Document "why" in comments, not "what"
-- Create ADRs for significant architectural decisions in `sdd/specs/[project]/adr/`
-
-### Spec-Driven Development
-
-Follow the SDD workflow:
-1. `/specify [project]` - Create specification
-2. `/plan [project]` - Technical plan
-3. `/tasks [project]` - Task breakdown
-4. `/build [project]` - Implementation
-5. `/review [project]` - Review against spec
-
-See `sdd/` directory for all specifications and standards.

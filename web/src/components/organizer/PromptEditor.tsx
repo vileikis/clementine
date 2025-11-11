@@ -1,26 +1,23 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { RotateCcw } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { updateSceneAction } from "@/app/actions/scenes"
 
 interface PromptEditorProps {
-  currentPrompt: string
-  defaultPrompt: string
+  currentPrompt: string | null
   eventId: string
   sceneId: string
 }
 
-const MAX_CHARS = 500
+const MAX_CHARS = 600
 
 export function PromptEditor({
   currentPrompt,
-  defaultPrompt,
   eventId,
   sceneId,
 }: PromptEditorProps) {
-  const [prompt, setPrompt] = useState(currentPrompt)
+  const [prompt, setPrompt] = useState(currentPrompt || "")
   const [isLoading, setIsLoading] = useState(false)
   const [isSaved, setIsSaved] = useState(true)
   const charCount = prompt.length
@@ -50,26 +47,6 @@ export function PromptEditor({
     }
   }
 
-  const handleReset = async () => {
-    if (isLoading || prompt === defaultPrompt) return
-
-    setPrompt(defaultPrompt)
-    setIsLoading(true)
-
-    try {
-      const result = await updateSceneAction(eventId, sceneId, {
-        prompt: defaultPrompt,
-      })
-      if (result.success) {
-        setIsSaved(true)
-      }
-    } catch (error) {
-      console.error("Failed to reset prompt:", error)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
   return (
     <div className="space-y-4">
       <div className="flex items-start justify-between gap-4">
@@ -82,23 +59,9 @@ export function PromptEditor({
           </label>
           <p className="text-sm text-muted-foreground mb-3">
             Describe how the AI should transform the photo. Be specific about
-            style, lighting, and details.
+            style, lighting, and details. Leave empty to skip AI transformation (passthrough mode).
           </p>
         </div>
-        <button
-          onClick={handleReset}
-          disabled={isLoading || prompt === defaultPrompt}
-          className={cn(
-            "flex items-center gap-2 px-3 py-2 text-sm rounded-md border transition-colors",
-            prompt === defaultPrompt
-              ? "opacity-50 cursor-not-allowed"
-              : "hover:bg-accent"
-          )}
-          title="Reset to default prompt"
-        >
-          <RotateCcw className="w-4 h-4" />
-          Reset
-        </button>
       </div>
 
       <div className="relative">

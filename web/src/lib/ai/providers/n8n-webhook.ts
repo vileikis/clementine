@@ -1,6 +1,5 @@
 import type { AIClient } from '../client';
 import type { TransformParams } from '../types';
-import { buildPromptForEffect } from '../prompts';
 
 export interface N8nConfig {
   baseUrl: string;
@@ -12,7 +11,7 @@ export class N8nWebhookProvider implements AIClient {
 
   async generateImage(params: TransformParams): Promise<Buffer> {
     console.log('[n8n] Starting transform:', {
-      effect: params.effect,
+      prompt: params.prompt.substring(0, 50),
       webhook: this.config.baseUrl,
     });
 
@@ -25,8 +24,7 @@ export class N8nWebhookProvider implements AIClient {
         }),
       },
       body: JSON.stringify({
-        effect: params.effect,
-        prompt: buildPromptForEffect(params),
+        prompt: params.prompt,
         inputImageUrl: params.inputImageUrl,
         referenceImageUrl: params.referenceImageUrl,
         brandColor: params.brandColor,
@@ -41,7 +39,7 @@ export class N8nWebhookProvider implements AIClient {
     const buffer = Buffer.from(arrayBuffer);
 
     console.log('[n8n] Transform complete:', {
-      effect: params.effect,
+      promptLength: params.prompt.length,
       imageSize: buffer.length,
     });
 

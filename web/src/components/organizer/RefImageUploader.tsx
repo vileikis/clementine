@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils"
 import {
   uploadReferenceImageAction,
   getImageUrlAction,
+  removeReferenceImageAction,
 } from "@/app/actions/scenes"
 
 interface RefImageUploaderProps {
@@ -122,11 +123,26 @@ export function RefImageUploader({
     }
   }
 
-  const handleRemove = () => {
-    setPreviewUrl(null)
-    setUploadedPath(undefined)
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ""
+  const handleRemove = async () => {
+    setIsUploading(true)
+    setError(null)
+
+    try {
+      const result = await removeReferenceImageAction(eventId, sceneId)
+
+      if (result.success) {
+        setPreviewUrl(null)
+        setUploadedPath(undefined)
+        if (fileInputRef.current) {
+          fileInputRef.current.value = ""
+        }
+      } else {
+        setError(result.error || "Failed to remove image")
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to remove image")
+    } finally {
+      setIsUploading(false)
     }
   }
 
