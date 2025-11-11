@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { listEventsAction } from "@/app/actions/events"
-import { getCompanyAction, listCompaniesAction } from "@/app/actions/companies"
+import { listCompaniesAction } from "@/app/actions/companies"
 import { EventCard } from "@/components/organizer/EventCard"
 import { CompanyFilter } from "@/components/organizer/CompanyFilter"
 
@@ -28,25 +28,29 @@ export default async function EventsPage({
 
   const events = result.events ?? []
 
-  // Fetch company names for events that have companyId
-  const companyIds = [...new Set(events.filter(e => e.companyId).map(e => e.companyId!))]
-  const companies = await Promise.all(
-    companyIds.map(async (id) => {
-      const result = await getCompanyAction(id)
-      return result.success ? result.company : null
-    })
-  )
-  const companyMap = new Map(companies.filter(c => c).map(c => [c!.id, c!.name]))
-
-  // Create events with company names
-  const eventsWithCompanies = events.map(event => ({
-    event,
-    companyName: event.companyId ? companyMap.get(event.companyId) ?? null : null
-  }))
-
-  // Fetch all companies for the filter dropdown
+  // Fetch all active companies (used for both filter and event company names)
   const companiesResult = await listCompaniesAction()
   const allCompanies = companiesResult.success ? companiesResult.companies ?? [] : []
+
+  // Create a Set of active company IDs for efficient filtering
+  const activeCompanyIds = new Set(allCompanies.map(c => c.id))
+
+  // Create company map for name lookup
+  const companyMap = new Map(allCompanies.map(c => [c.id, c.name]))
+
+  // Filter out events from deleted companies and add company names
+  const eventsWithCompanies = events
+    .filter(event => {
+      // Include events with no company
+      if (!event.companyId) return true
+
+      // Include only if company is in active list (excludes deleted companies)
+      return activeCompanyIds.has(event.companyId)
+    })
+    .map(event => ({
+      event,
+      companyName: event.companyId ? companyMap.get(event.companyId) ?? null : null
+    }))
 
   return (
     <div className="space-y-6">
@@ -68,7 +72,7 @@ export default async function EventsPage({
       {/* Company filter */}
       <CompanyFilter companies={allCompanies} />
 
-      {events.length === 0 ? (
+      {eventsWithCompanies.length === 0 ? (
         <div className="text-center py-12 border rounded-lg border-dashed">
           <h3 className="text-lg font-semibold mb-2">No events yet</h3>
           <p className="text-muted-foreground mb-4">
