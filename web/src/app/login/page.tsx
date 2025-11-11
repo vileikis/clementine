@@ -1,14 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { loginAction } from "@/app/actions/auth";
+import { DEFAULT_AUTHENTICATED_ROUTE } from "@/lib/routes";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -22,7 +24,9 @@ export default function LoginPage() {
       const result = await loginAction({ password });
 
       if (result.success) {
-        router.push("/events");
+        // Redirect to the original destination or default route
+        const redirectTo = searchParams.get("from") || DEFAULT_AUTHENTICATED_ROUTE;
+        router.push(redirectTo);
         router.refresh();
       } else {
         setError(result.error || "Login failed");
