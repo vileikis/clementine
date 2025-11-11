@@ -6,6 +6,7 @@ import {
   listEvents,
   updateEventBranding,
   updateEventStatus,
+  updateEventTitle,
   getCurrentScene,
 } from "@/lib/repositories/events"
 import { getCompany } from "@/lib/repositories/companies"
@@ -140,6 +141,37 @@ export async function updateEventStatusAction(
     return {
       success: false,
       error: error instanceof Error ? error.message : "Failed to update status",
+    }
+  }
+}
+
+const updateEventTitleInput = z.object({
+  title: z.string().min(1, "Title is required").max(100, "Title too long"),
+})
+
+export async function updateEventTitleAction(
+  eventId: string,
+  title: string
+) {
+  // Verify admin authentication
+  const auth = await verifyAdminSecret()
+  if (!auth.authorized) {
+    return { success: false, error: auth.error }
+  }
+
+  try {
+    const validated = updateEventTitleInput.parse({ title })
+    await updateEventTitle(eventId, validated.title)
+    revalidatePath("/events")
+    revalidatePath(`/events/${eventId}`)
+    return { success: true }
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return { success: false, error: error.issues[0].message }
+    }
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to update title",
     }
   }
 }

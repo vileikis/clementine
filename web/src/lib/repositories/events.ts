@@ -113,6 +113,16 @@ export async function updateEventStatus(
   });
 }
 
+export async function updateEventTitle(
+  eventId: string,
+  title: string
+): Promise<void> {
+  await db.collection("events").doc(eventId).update({
+    title,
+    updatedAt: Date.now(),
+  });
+}
+
 export async function getCurrentScene(eventId: string): Promise<Scene | null> {
   const eventDoc = await db.collection("events").doc(eventId).get();
   if (!eventDoc.exists) return null;
