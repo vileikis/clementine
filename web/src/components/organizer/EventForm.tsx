@@ -19,7 +19,7 @@ export function EventForm({ onSuccess }: EventFormProps) {
   const [title, setTitle] = useState("")
   const [brandColor, setBrandColor] = useState("#0EA5E9")
   const [showTitleOverlay, setShowTitleOverlay] = useState(true)
-  const [companyId, setCompanyId] = useState<string | null>(null)
+  const [companyId, setCompanyId] = useState<string>("")
 
   // Companies list
   const [companies, setCompanies] = useState<Company[]>([])
@@ -27,6 +27,7 @@ export function EventForm({ onSuccess }: EventFormProps) {
 
   // Validation errors
   const [titleError, setTitleError] = useState<string | null>(null)
+  const [companyError, setCompanyError] = useState<string | null>(null)
 
   // Load companies on mount
   useEffect(() => {
@@ -54,13 +55,23 @@ export function EventForm({ onSuccess }: EventFormProps) {
     return true
   }
 
+  const validateCompany = (value: string): boolean => {
+    if (!value) {
+      setCompanyError("Company is required")
+      return false
+    }
+    setCompanyError(null)
+    return true
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
 
     // Validate
     const isTitleValid = validateTitle(title)
-    if (!isTitleValid) {
+    const isCompanyValid = validateCompany(companyId)
+    if (!isTitleValid || !isCompanyValid) {
       return
     }
 
@@ -71,7 +82,7 @@ export function EventForm({ onSuccess }: EventFormProps) {
         title: title.trim(),
         brandColor,
         showTitleOverlay,
-        companyId: companyId || null,
+        companyId,
       })
 
       if (result.success && result.eventId) {
@@ -132,22 +143,33 @@ export function EventForm({ onSuccess }: EventFormProps) {
           htmlFor="company"
           className="block text-sm font-medium mb-2"
         >
-          Company (Optional)
+          Company <span className="text-red-500">*</span>
         </label>
         <select
           id="company"
-          value={companyId || ""}
-          onChange={(e) => setCompanyId(e.target.value || null)}
-          className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-background"
+          value={companyId}
+          onChange={(e) => {
+            setCompanyId(e.target.value)
+            if (companyError) validateCompany(e.target.value)
+          }}
+          onBlur={() => validateCompany(companyId)}
+          className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 bg-background ${
+            companyError
+              ? "border-red-500 focus:ring-red-500"
+              : "border-input focus:ring-primary"
+          }`}
           disabled={isSubmitting || loadingCompanies}
         >
-          <option value="">No company</option>
+          <option value="">Select a company...</option>
           {companies.map((company) => (
             <option key={company.id} value={company.id}>
               {company.name}
             </option>
           ))}
         </select>
+        {companyError && (
+          <p className="text-sm text-red-500 mt-1">{companyError}</p>
+        )}
         <p className="text-sm text-muted-foreground mt-1">
           Associate this event with a brand or client
         </p>
@@ -235,7 +257,7 @@ export function EventForm({ onSuccess }: EventFormProps) {
       <div className="flex items-center gap-3">
         <button
           type="submit"
-          disabled={isSubmitting || !title.trim()}
+          disabled={isSubmitting || !title.trim() || !companyId}
           className="flex-1 inline-flex items-center justify-center rounded-md bg-primary px-6 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isSubmitting ? "Creating..." : "Create Event"}
