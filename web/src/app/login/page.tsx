@@ -1,43 +1,15 @@
-"use client";
-
-import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { loginAction } from "@/app/actions/auth";
-import { DEFAULT_AUTHENTICATED_ROUTE } from "@/lib/routes";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Suspense } from "react";
+import LoginForm from "./login-form";
 
 export default function LoginPage() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  return (
+    <Suspense fallback={<LoginPageSkeleton />}>
+      <LoginForm />
+    </Suspense>
+  );
+}
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setError("");
-    setIsLoading(true);
-
-    try {
-      const result = await loginAction({ password });
-
-      if (result.success) {
-        // Redirect to the original destination or default route
-        const redirectTo = searchParams.get("from") || DEFAULT_AUTHENTICATED_ROUTE;
-        router.push(redirectTo);
-        router.refresh();
-      } else {
-        setError(result.error || "Login failed");
-      }
-    } catch {
-      setError("An unexpected error occurred");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+function LoginPageSkeleton() {
   return (
     <div className="flex min-h-screen items-center justify-center px-4">
       <div className="w-full max-w-md space-y-6">
@@ -47,37 +19,13 @@ export default function LoginPage() {
             Enter your admin password to continue
           </p>
         </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter admin password"
-              disabled={isLoading}
-              required
-              className="min-h-[44px]"
-              autoComplete="current-password"
-            />
+            <div className="h-4 w-20 animate-pulse rounded bg-muted" />
+            <div className="h-[44px] w-full animate-pulse rounded bg-muted" />
           </div>
-
-          {error && (
-            <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
-              {error}
-            </div>
-          )}
-
-          <Button
-            type="submit"
-            disabled={isLoading}
-            className="min-h-[44px] w-full"
-          >
-            {isLoading ? "Logging in..." : "Log in"}
-          </Button>
-        </form>
+          <div className="h-[44px] w-full animate-pulse rounded bg-muted" />
+        </div>
       </div>
     </div>
   );
