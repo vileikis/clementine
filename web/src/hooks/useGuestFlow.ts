@@ -92,6 +92,7 @@ export function useGuestFlow(eventId: string) {
   const [state, dispatch] = useReducer(reducer, { step: "greeting" });
   const captureRef = useRef<Blob | null>(null);
   const unsubscribeRef = useRef<(() => void) | null>(null);
+  const isProcessingRef = useRef<boolean>(false);
 
   // Request camera - exposed as a function to be called on user action
   const requestCamera = async () => {
@@ -108,6 +109,13 @@ export function useGuestFlow(eventId: string) {
 
   // Handle photo upload after capture
   const handleCapture = async (blob: Blob) => {
+    // Guard: Prevent duplicate captures
+    if (isProcessingRef.current) {
+      console.log("[GuestFlow] Skipping duplicate capture - already processing");
+      return;
+    }
+
+    isProcessingRef.current = true;
     captureRef.current = blob;
 
     try {
@@ -130,7 +138,12 @@ export function useGuestFlow(eventId: string) {
         console.error("Transform trigger failed:", error);
         // Error state will be handled by the real-time subscription
       });
+
+      // Reset processing flag after upload completes
+      // (Transform will continue in background via real-time subscription)
+      isProcessingRef.current = false;
     } catch (error) {
+      isProcessingRef.current = false;
       dispatch({
         type: "TRANSFORM_ERROR",
         message: error instanceof Error ? error.message : "Upload failed",

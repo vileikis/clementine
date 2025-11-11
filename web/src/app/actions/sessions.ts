@@ -54,10 +54,15 @@ export async function getSessionAction(eventId: string, sessionId: string) {
 }
 
 /**
- * Sleep for a given number of milliseconds
+ * Sleep for a given number of milliseconds with cancellation support
  */
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+function sleep(ms: number): { promise: Promise<void>; cancel: () => void } {
+  let timeoutId: NodeJS.Timeout;
+  const promise = new Promise<void>((resolve) => {
+    timeoutId = setTimeout(resolve, ms);
+  });
+  const cancel = () => clearTimeout(timeoutId);
+  return { promise, cancel };
 }
 
 /**
@@ -88,24 +93,36 @@ export async function triggerTransformAction(
   const RETRY_DELAY_MS = 2000; // Start with 2 seconds
   const TIMEOUT_MS = 60000; // 60 seconds
 
-  // Wrap transform in timeout
-  const timeoutPromise = sleep(TIMEOUT_MS).then(() => {
+  // Create timeout with cancellation support
+  const timeout = sleep(TIMEOUT_MS);
+  const timeoutPromise = timeout.promise.then(() => {
     throw new Error("Transform timeout: Operation took longer than 60 seconds");
   });
 
   try {
-    // Mark session as transforming
-    await updateSessionState(eventId, sessionId, "transforming");
-
-    // Fetch session and scene configuration
+    // Fetch session first to check current state
     const session = await getSession(eventId, sessionId);
     if (!session) {
       throw new Error("Session not found");
     }
 
+    // Guard: Prevent double-triggering if already transforming, ready, or error
+    console.log("[Transform] Session state:", session.state);
+    if (session.state !== "captured") {
+      console.log("[Transform] Skipping: Session already in state:", session.state);
+      timeout.cancel();
+      return {
+        success: false,
+        error: `Session already in state: ${session.state}`,
+      };
+    }
+
     if (!session.inputImagePath) {
       throw new Error("No input image found for session");
     }
+
+    // Mark session as transforming
+    await updateSessionState(eventId, sessionId, "transforming");
 
     const scene = await getCurrentScene(eventId);
     if (!scene) {
@@ -120,6 +137,9 @@ export async function triggerTransformAction(
     // PASSTHROUGH MODE: Empty or null prompt
     if (!scene.prompt || scene.prompt.trim() === "") {
       console.log("[Transform] Passthrough mode: Copying input to result (no AI transformation)");
+
+      // Cancel timeout since we're returning early
+      timeout.cancel();
 
       const resultImagePath = await copyImageToResult(
         session.inputImagePath,
@@ -194,7 +214,7 @@ export async function triggerTransformAction(
         if (attempt < MAX_RETRIES) {
           const delayMs = RETRY_DELAY_MS * Math.pow(2, attempt - 1);
           console.log(`[Transform] Retrying in ${delayMs}ms...`);
-          await sleep(delayMs);
+          await sleep(delayMs).promise;
         }
       }
     }
@@ -202,6 +222,9 @@ export async function triggerTransformAction(
     if (!resultBuffer) {
       throw lastError || new Error("Transform failed after all retries");
     }
+
+    // Cancel timeout since AI transformation succeeded
+    timeout.cancel();
 
     // Upload result image
     const resultImagePath = await uploadResultImage(
@@ -226,6 +249,8 @@ export async function triggerTransformAction(
 
     return { success: true, resultImagePath };
   } catch (error) {
+    // Cancel timeout on error
+    timeout.cancel();
     console.error("[Transform] Transform failed:", error);
 
     // Mark session as error with message
