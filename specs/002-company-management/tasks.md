@@ -161,17 +161,17 @@ Web application (monorepo: web/ workspace):
 
 ### Tests for User Story 3
 
-- [ ] T047 [P] [US3] Add test for listEvents with companyId filter in events.test.ts (verify filtering returns correct events)
-- [ ] T048 [P] [US3] Add test for listEventsAction with filters in events.test.ts (test companyId filter and null filter)
+- [X] T047 [P] [US3] Add test for listEvents with companyId filter in events.test.ts (verify filtering returns correct events)
+- [X] T048 [P] [US3] Add test for listEventsAction with filters in events.test.ts (test companyId filter and null filter)
 
 ### Implementation for User Story 3
 
-- [ ] T049 [US3] Extend listEvents repository function in web/src/lib/repositories/events.ts (accept optional filters param with companyId field, apply .where('companyId', '==', companyId) if provided)
-- [ ] T050 [US3] Extend listEventsAction in web/src/app/actions/events.ts (accept filters param, pass to repository listEvents)
-- [ ] T051 [P] [US3] Create CompanyFilter component web/src/components/organizer/CompanyFilter.tsx (dropdown with "All", "No company", and company list, mobile-responsive per research.md)
-- [ ] T052 [US3] Update Events page web/src/app/events/page.tsx (add CompanyFilter component, read companyId from URL search params, pass to listEventsAction)
-- [ ] T053 [US3] Update CompanyCard "View Events" button to link to /events?companyId=X (URL-based filter)
-- [ ] T054 [US3] Update company detail page "View events" link to /events?companyId=X
+- [X] T049 [US3] Extend listEvents repository function in web/src/lib/repositories/events.ts (accept optional filters param with companyId field, apply .where('companyId', '==', companyId) if provided)
+- [X] T050 [US3] Extend listEventsAction in web/src/app/actions/events.ts (accept filters param, pass to repository listEvents)
+- [X] T051 [P] [US3] Create CompanyFilter component web/src/components/organizer/CompanyFilter.tsx (dropdown with "All", "No company", and company list, mobile-responsive per research.md)
+- [X] T052 [US3] Update Events page web/src/app/events/page.tsx (add CompanyFilter component, read companyId from URL search params, pass to listEventsAction)
+- [X] T053 [US3] Update CompanyCard "View Events" button to link to /events?companyId=X (URL-based filter)
+- [X] T054 [US3] Update company detail page "View events" link to /events?companyId=X
 
 **Checkpoint**: All P2 user stories (2 and 3) should now be independently functional - full company management and event filtering
 
