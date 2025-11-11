@@ -3,7 +3,7 @@
  */
 
 import { db } from "@/lib/firebase/admin";
-import type { Company } from "@/lib/types/firestore";
+import type { Company, CompanyStatus } from "@/lib/types/firestore";
 import { companySchema } from "@/lib/schemas/firestore";
 import type { CreateCompanyInput } from "@/lib/schemas/validation";
 
@@ -171,4 +171,71 @@ export async function getCompanyEventCount(companyId: string): Promise<number> {
     .get();
 
   return snapshot.data().count;
+}
+
+/**
+ * Soft delete a company by marking as deleted (does not remove document)
+ *
+ * @param companyId - Company document ID to delete
+ * @returns void
+ *
+ * Implementation notes:
+ * - Sets status='deleted' and deletedAt timestamp
+ * - Does NOT remove document from Firestore (soft delete)
+ * - Deleted companies are excluded from listCompanies() via status filter
+ * - Events associated with deleted companies remain but guest links are disabled
+ * - Invalidates company status cache for immediate guest link effect
+ */
+export async function deleteCompany(companyId: string): Promise<void> {
+  const now = Date.now();
+
+  await db.collection("companies").doc(companyId).update({
+    status: "deleted",
+    deletedAt: now,
+    updatedAt: now,
+  });
+
+  // Invalidate cache so guest links see updated status immediately
+  const { invalidateCompanyStatusCache } = await import(
+    "@/lib/cache/company-status"
+  );
+  invalidateCompanyStatusCache(companyId);
+}
+
+/**
+ * Get company status with caching for guest link validation
+ *
+ * @param companyId - Company document ID
+ * @returns Company status or null if company not found
+ *
+ * Implementation notes:
+ * - Checks in-memory cache first (60s TTL)
+ * - Falls back to Firestore if cache miss
+ * - Caches result for future requests
+ * - Target cache hit rate: >80% (reduces Firestore reads by ~90%)
+ */
+export async function getCompanyStatus(
+  companyId: string
+): Promise<CompanyStatus | null> {
+  const {
+    getCachedCompanyStatus,
+    setCachedCompanyStatus,
+  } = await import("@/lib/cache/company-status");
+
+  // Check cache first
+  const cached = getCachedCompanyStatus(companyId);
+  if (cached !== null) {
+    return cached;
+  }
+
+  // Cache miss - fetch from Firestore
+  const company = await getCompany(companyId);
+  if (!company) {
+    return null;
+  }
+
+  // Cache the result
+  setCachedCompanyStatus(companyId, company.status);
+
+  return company.status;
 }
