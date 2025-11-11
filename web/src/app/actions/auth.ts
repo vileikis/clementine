@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { PUBLIC_ROUTES } from "@/lib/routes";
 import { z } from "zod";
 
 const loginSchema = z.object({
@@ -48,5 +49,5 @@ export async function loginAction(input: unknown) {
 export async function logoutAction() {
   const cookieStore = await cookies();
   cookieStore.delete("ADMIN_SECRET");
-  redirect("/login");
+  redirect(PUBLIC_ROUTES.LOGIN);
 }
