@@ -96,3 +96,79 @@ export async function getCompany(companyId: string): Promise<Company | null> {
   const data = doc.data();
   return companySchema.parse({ id: doc.id, ...data });
 }
+
+/**
+ * Update an existing company with transaction-based uniqueness validation
+ *
+ * @param companyId - Company document ID to update
+ * @param data - Company update input (name and optional metadata)
+ * @returns void
+ * @throws Error if company not found or name already exists (case-insensitive, excluding self)
+ */
+export async function updateCompany(
+  companyId: string,
+  data: CreateCompanyInput
+): Promise<void> {
+  const companyRef = db.collection("companies").doc(companyId);
+
+  await db.runTransaction(async (txn) => {
+    // Verify company exists
+    const companyDoc = await txn.get(companyRef);
+    if (!companyDoc.exists) {
+      throw new Error("Company not found");
+    }
+
+    // Check for duplicate name among active companies (excluding self)
+    const normalizedName = data.name.toLowerCase().trim();
+
+    const existingSnapshot = await txn.get(
+      db
+        .collection("companies")
+        .where("status", "==", "active")
+        .limit(10) // Get a few to check, excluding self
+    );
+
+    // Check if any other active company has matching normalized name
+    const duplicate = existingSnapshot.docs.find(
+      (doc) =>
+        doc.id !== companyId &&
+        doc.data().name.toLowerCase().trim() === normalizedName
+    );
+
+    if (duplicate) {
+      throw new Error(`Company name "${data.name}" already exists`);
+    }
+
+    // Update company document
+    const now = Date.now();
+    const updates: Partial<Company> = {
+      name: data.name.trim(),
+      updatedAt: now,
+      // Optional metadata fields
+      ...(data.brandColor !== undefined && { brandColor: data.brandColor }),
+      ...(data.contactEmail !== undefined && {
+        contactEmail: data.contactEmail,
+      }),
+      ...(data.termsUrl !== undefined && { termsUrl: data.termsUrl }),
+      ...(data.privacyUrl !== undefined && { privacyUrl: data.privacyUrl }),
+    };
+
+    txn.update(companyRef, updates);
+  });
+}
+
+/**
+ * Get the count of events associated with a company
+ *
+ * @param companyId - Company document ID
+ * @returns Number of events linked to this company
+ */
+export async function getCompanyEventCount(companyId: string): Promise<number> {
+  const snapshot = await db
+    .collection("events")
+    .where("companyId", "==", companyId)
+    .count()
+    .get();
+
+  return snapshot.data().count;
+}

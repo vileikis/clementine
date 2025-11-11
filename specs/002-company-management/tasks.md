@@ -140,14 +140,14 @@ Web application (monorepo: web/ workspace):
 
 ### Implementation for User Story 2
 
-- [ ] T039 [US2] Add updateCompany function to web/src/lib/repositories/companies.ts (transaction-based uniqueness check excluding self, update name and metadata)
-- [ ] T040 [US2] Add getCompanyEventCount function to companies.ts (Firestore count() query on events where companyId == companyId)
-- [ ] T041 [US2] Add updateCompanyAction to web/src/app/actions/companies.ts (Zod validation, call updateCompany, revalidatePath for /companies and /companies/[id])
-- [ ] T042 [US2] Add getCompanyEventCountAction to companies.ts (call repository getCompanyEventCount)
-- [ ] T043 [US2] Update CompanyCard component to display event count (call getCompanyEventCountAction, show "X events")
-- [ ] T044 [US2] Update CompanyForm component to support edit mode (accept companyId prop, pre-fill name, call updateCompanyAction instead of create)
-- [ ] T045 [US2] Create company detail page web/src/app/companies/[companyId]/page.tsx (editable name field, event count display, "View events for this company" link to /events?companyId=X)
-- [ ] T046 [US2] Add "Edit" button to CompanyCard that opens CompanyForm in edit mode
+- [X] T039 [US2] Add updateCompany function to web/src/lib/repositories/companies.ts (transaction-based uniqueness check excluding self, update name and metadata)
+- [X] T040 [US2] Add getCompanyEventCount function to companies.ts (Firestore count() query on events where companyId == companyId)
+- [X] T041 [US2] Add updateCompanyAction to web/src/app/actions/companies.ts (Zod validation, call updateCompany, revalidatePath for /companies and /companies/[id])
+- [X] T042 [US2] Add getCompanyEventCountAction to companies.ts (call repository getCompanyEventCount)
+- [X] T043 [US2] Update CompanyCard component to display event count (call getCompanyEventCountAction, show "X events")
+- [X] T044 [US2] Update CompanyForm component to support edit mode (accept companyId prop, pre-fill name, call updateCompanyAction instead of create)
+- [X] T045 [US2] Create company detail page web/src/app/(admin)/companies/[companyId]/page.tsx (editable name field with centralized save button in top right, event count display, "View events for this company" link to /events?companyId=X)
+- [X] T046 [US2] Add "Edit" button to CompanyCard that navigates to company detail page
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently - admin can create, view, and edit companies with event counts
 
