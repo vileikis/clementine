@@ -1,16 +1,14 @@
 // Scene repository - CRUD operations for scenes subcollection
 
 import { db } from "@/lib/firebase/admin";
-import type { Scene, EffectType } from "@/lib/types/firestore";
+import type { Scene } from "@/lib/types/firestore";
 import { sceneSchema } from "@/lib/schemas/firestore";
 
 export async function updateScene(
   eventId: string,
   sceneId: string,
   updates: {
-    effect?: EffectType;
-    prompt?: string;
-    defaultPrompt?: string;
+    prompt?: string | null;
     referenceImagePath?: string;
   }
 ): Promise<void> {

@@ -10,5 +10,4 @@ export type {
   SceneStatus,
   SessionState,
   CaptureMode,
-  EffectType,
 } from "./firestore";

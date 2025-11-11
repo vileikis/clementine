@@ -4,7 +4,6 @@ export type EventStatus = "draft" | "live" | "archived";
 export type SceneStatus = "active" | "deprecated";
 export type SessionState = "created" | "captured" | "transforming" | "ready" | "error";
 export type CaptureMode = "photo" | "video" | "gif" | "boomerang";
-export type EffectType = "background_swap" | "deep_fake";
 
 export interface Event {
   id: string;
@@ -26,10 +25,8 @@ export interface Scene {
   id: string;
   label: string;
   mode: CaptureMode;
-  effect: EffectType;
 
-  prompt: string;
-  defaultPrompt: string;
+  prompt: string | null;
 
   referenceImagePath?: string; // Storage path
 

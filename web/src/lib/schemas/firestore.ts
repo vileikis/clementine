@@ -19,9 +19,7 @@ export const sceneSchema = z.object({
   id: z.string(),
   label: z.string(),
   mode: z.enum(["photo", "video", "gif", "boomerang"]),
-  effect: z.enum(["background_swap", "deep_fake"]),
-  prompt: z.string().min(1),
-  defaultPrompt: z.string(),
+  prompt: z.string().max(600, "Prompt must be 600 characters or less").nullable(),
   referenceImagePath: z.string().optional(),
   flags: z.object({
     customTextTool: z.boolean(),

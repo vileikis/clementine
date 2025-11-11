@@ -37,14 +37,14 @@ No setup tasks needed - this is a modification to existing codebase.
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T001 [P] Remove EffectType enum from web/src/lib/types/firestore.ts
-- [ ] T002 [P] Remove `effect` field from Scene interface in web/src/lib/types/firestore.ts
-- [ ] T003 [P] Remove `defaultPrompt` field from Scene interface in web/src/lib/types/firestore.ts
-- [ ] T004 [P] Update `prompt` field to `prompt: string | null` in Scene interface in web/src/lib/types/firestore.ts
-- [ ] T005 [P] Remove `effect` field from TransformParams in web/src/lib/ai/types.ts
-- [ ] T006 [P] Update SceneSchema prompt validation in web/src/lib/schemas/firestore.ts (z.string().max(600).nullable())
-- [ ] T007 [P] Remove `effect` and `defaultPrompt` fields from SceneSchema in web/src/lib/schemas/firestore.ts
-- [ ] T008 Delete web/src/lib/ai/prompts.ts file entirely (remove buildPromptForEffect function)
+- [X] T001 [P] Remove EffectType enum from web/src/lib/types/firestore.ts
+- [X] T002 [P] Remove `effect` field from Scene interface in web/src/lib/types/firestore.ts
+- [X] T003 [P] Remove `defaultPrompt` field from Scene interface in web/src/lib/types/firestore.ts
+- [X] T004 [P] Update `prompt` field to `prompt: string | null` in Scene interface in web/src/lib/types/firestore.ts
+- [X] T005 [P] Remove `effect` field from TransformParams in web/src/lib/ai/types.ts
+- [X] T006 [P] Update SceneSchema prompt validation in web/src/lib/schemas/firestore.ts (z.string().max(600).nullable())
+- [X] T007 [P] Remove `effect` and `defaultPrompt` fields from SceneSchema in web/src/lib/schemas/firestore.ts
+- [X] T008 Delete web/src/lib/ai/prompts.ts file entirely (remove buildPromptForEffect function)
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -60,28 +60,28 @@ No setup tasks needed - this is a modification to existing codebase.
 
 > **NOTE: Update these tests to FAIL before implementation, then make them pass**
 
-- [ ] T009 [P] [US1] Update scenes.test.ts to remove tests for `effect` field in web/src/lib/repositories/scenes.test.ts
-- [ ] T010 [P] [US1] Update scenes.test.ts to remove tests for `defaultPrompt` field in web/src/lib/repositories/scenes.test.ts
-- [ ] T011 [P] [US1] Add test for creating scene with custom prompt in web/src/lib/repositories/scenes.test.ts
-- [ ] T012 [P] [US1] Add test for prompt validation (max 600 chars) in web/src/lib/repositories/scenes.test.ts
-- [ ] T013 [P] [US1] Add test for prompt validation failure (> 600 chars) in web/src/lib/repositories/scenes.test.ts
+- [X] T009 [P] [US1] Update scenes.test.ts to remove tests for `effect` field in web/src/lib/repositories/scenes.test.ts
+- [X] T010 [P] [US1] Update scenes.test.ts to remove tests for `defaultPrompt` field in web/src/lib/repositories/scenes.test.ts
+- [X] T011 [P] [US1] Add test for creating scene with custom prompt in web/src/lib/repositories/scenes.test.ts
+- [X] T012 [P] [US1] Add test for prompt validation (max 600 chars) in web/src/lib/repositories/scenes.test.ts
+- [X] T013 [P] [US1] Add test for prompt validation failure (> 600 chars) in web/src/lib/repositories/scenes.test.ts
 
 ### Implementation for User Story 1
 
-- [ ] T014 [P] [US1] Remove buildPromptForEffect import from web/src/lib/ai/providers/google-ai.ts
-- [ ] T015 [P] [US1] Update Google AI provider to use params.prompt directly in web/src/lib/ai/providers/google-ai.ts
-- [ ] T016 [P] [US1] Remove buildPromptForEffect import from web/src/lib/ai/providers/n8n-webhook.ts
-- [ ] T017 [P] [US1] Update n8n provider to pass params.prompt directly in payload in web/src/lib/ai/providers/n8n-webhook.ts
-- [ ] T018 [P] [US1] Remove buildPromptForEffect import from web/src/lib/ai/providers/mock.ts
-- [ ] T019 [P] [US1] Update mock provider to log params.prompt directly in web/src/lib/ai/providers/mock.ts
-- [ ] T020 [US1] Remove defaultPrompt handling from scenes repository in web/src/lib/repositories/scenes.ts
-- [ ] T021 [US1] Update createScene action to remove effect parameter in web/src/app/actions/scenes.ts
-- [ ] T022 [US1] Update updateScene action to remove effect parameter in web/src/app/actions/scenes.ts
-- [ ] T023 [US1] Ensure prompt validation uses updated SceneSchema in web/src/app/actions/scenes.ts
-- [ ] T024 [US1] Update PromptEditor component for 600 char validation in web/src/components/organizer/PromptEditor.tsx
-- [ ] T025 [US1] Add character count display (X / 600) in PromptEditor in web/src/components/organizer/PromptEditor.tsx
-- [ ] T026 [US1] Add validation error display for > 600 chars in PromptEditor in web/src/components/organizer/PromptEditor.tsx
-- [ ] T027 [US1] Ensure mobile-friendly keyboard type in PromptEditor in web/src/components/organizer/PromptEditor.tsx
+- [X] T014 [P] [US1] Remove buildPromptForEffect import from web/src/lib/ai/providers/google-ai.ts
+- [X] T015 [P] [US1] Update Google AI provider to use params.prompt directly in web/src/lib/ai/providers/google-ai.ts
+- [X] T016 [P] [US1] Remove buildPromptForEffect import from web/src/lib/ai/providers/n8n-webhook.ts
+- [X] T017 [P] [US1] Update n8n provider to pass params.prompt directly in payload in web/src/lib/ai/providers/n8n-webhook.ts
+- [X] T018 [P] [US1] Remove buildPromptForEffect import from web/src/lib/ai/providers/mock.ts
+- [X] T019 [P] [US1] Update mock provider to log params.prompt directly in web/src/lib/ai/providers/mock.ts
+- [X] T020 [US1] Remove defaultPrompt handling from scenes repository in web/src/lib/repositories/scenes.ts
+- [X] T021 [US1] Update createScene action to remove effect parameter in web/src/app/actions/scenes.ts
+- [X] T022 [US1] Update updateScene action to remove effect parameter in web/src/app/actions/scenes.ts
+- [X] T023 [US1] Ensure prompt validation uses updated SceneSchema in web/src/app/actions/scenes.ts
+- [X] T024 [US1] Update PromptEditor component for 600 char validation in web/src/components/organizer/PromptEditor.tsx
+- [X] T025 [US1] Add character count display (X / 600) in PromptEditor in web/src/components/organizer/PromptEditor.tsx
+- [X] T026 [US1] Add validation error display for > 600 chars in PromptEditor in web/src/components/organizer/PromptEditor.tsx
+- [X] T027 [US1] Ensure mobile-friendly keyboard type in PromptEditor in web/src/components/organizer/PromptEditor.tsx
 
 **Checkpoint**: At this point, custom AI prompts should be fully functional - creators can enter prompts, AI providers use them directly
 
@@ -95,19 +95,19 @@ No setup tasks needed - this is a modification to existing codebase.
 
 ### Tests for User Story 2
 
-- [ ] T028 [P] [US2] Add test for passthrough mode (empty prompt) in web/src/lib/repositories/sessions.test.ts
-- [ ] T029 [P] [US2] Add test for passthrough copies input to result in web/src/lib/repositories/sessions.test.ts
-- [ ] T030 [P] [US2] Add test for passthrough completes quickly (< 5s) in web/src/lib/repositories/sessions.test.ts
-- [ ] T031 [P] [US2] Add test for copyImageToResult function in web/src/lib/storage/upload.test.ts
+- [X] T028 [P] [US2] Add test for passthrough mode (empty prompt) in web/src/lib/repositories/sessions.test.ts
+- [X] T029 [P] [US2] Add test for passthrough copies input to result in web/src/lib/repositories/sessions.test.ts
+- [X] T030 [P] [US2] Add test for passthrough completes quickly (< 5s) in web/src/lib/repositories/sessions.test.ts
+- [X] T031 [P] [US2] Add test for copyImageToResult function in web/src/lib/storage/upload.test.ts
 
 ### Implementation for User Story 2
 
-- [ ] T032 [US2] Add copyImageToResult function in web/src/lib/storage/upload.ts
-- [ ] T033 [US2] Implement Firebase Storage copy logic (getBytes + uploadBytes) in copyImageToResult in web/src/lib/storage/upload.ts
-- [ ] T034 [US2] Add passthrough mode detection in triggerTransformAction in web/src/app/actions/sessions.ts
-- [ ] T035 [US2] Implement early exit for empty prompt (call copyImageToResult) in triggerTransformAction in web/src/app/actions/sessions.ts
-- [ ] T036 [US2] Update session state to "ready" for passthrough in triggerTransformAction in web/src/app/actions/sessions.ts
-- [ ] T037 [US2] Ensure passthrough skips AI provider calls in triggerTransformAction in web/src/app/actions/sessions.ts
+- [X] T032 [US2] Add copyImageToResult function in web/src/lib/storage/upload.ts
+- [X] T033 [US2] Implement Firebase Storage copy logic (getBytes + uploadBytes) in copyImageToResult in web/src/lib/storage/upload.ts
+- [X] T034 [US2] Add passthrough mode detection in triggerTransformAction in web/src/app/actions/sessions.ts
+- [X] T035 [US2] Implement early exit for empty prompt (call copyImageToResult) in triggerTransformAction in web/src/app/actions/sessions.ts
+- [X] T036 [US2] Update session state to "ready" for passthrough in triggerTransformAction in web/src/app/actions/sessions.ts
+- [X] T037 [US2] Ensure passthrough skips AI provider calls in triggerTransformAction in web/src/app/actions/sessions.ts
 
 **Checkpoint**: At this point, both custom AI prompts AND passthrough mode should work independently
 
@@ -125,10 +125,10 @@ No new tests needed - existing tests already updated in Phase 3 (removed effect 
 
 ### Implementation for User Story 3
 
-- [ ] T038 [US3] Delete EffectPicker component file at web/src/components/organizer/EffectPicker.tsx
-- [ ] T039 [US3] Remove EffectPicker import from scene configuration page in web/src/app/events/[eventId]/scene/page.tsx
-- [ ] T040 [US3] Remove EffectPicker component usage from scene configuration page in web/src/app/events/[eventId]/scene/page.tsx
-- [ ] T041 [US3] Verify scene page only shows PromptEditor and RefImageUploader in web/src/app/events/[eventId]/scene/page.tsx
+- [X] T038 [US3] Delete EffectPicker component file at web/src/components/organizer/EffectPicker.tsx
+- [X] T039 [US3] Remove EffectPicker import from scene configuration page in web/src/app/events/[eventId]/scene/page.tsx
+- [X] T040 [US3] Remove EffectPicker component usage from scene configuration page in web/src/app/events/[eventId]/scene/page.tsx
+- [X] T041 [US3] Verify scene page only shows PromptEditor and RefImageUploader in web/src/app/events/[eventId]/scene/page.tsx
 
 **Checkpoint**: All user stories should now be independently functional - legacy code removed, clean prompt-based system in place
 
@@ -138,18 +138,18 @@ No new tests needed - existing tests already updated in Phase 3 (removed effect 
 
 **Purpose**: Improvements that affect multiple user stories and validation
 
-- [ ] T042 [P] Add JSDoc comments for copyImageToResult function in web/src/lib/storage/upload.ts
-- [ ] T043 [P] Add logging for passthrough mode in triggerTransformAction in web/src/app/actions/sessions.ts
-- [ ] T044 [P] Update any remaining references to effect or defaultPrompt in web/src (search and clean up)
-- [ ] T045 Verify mobile viewport (320px) for PromptEditor using dev tools
+- [X] T042 [P] Add JSDoc comments for copyImageToResult function in web/src/lib/storage/upload.ts
+- [X] T043 [P] Add logging for passthrough mode in triggerTransformAction in web/src/app/actions/sessions.ts
+- [X] T044 [P] Update any remaining references to effect or defaultPrompt in web/src (search and clean up)
+- [X] T045 Verify mobile viewport (320px) for PromptEditor using dev tools
 
 ### Validation Loop (REQUIRED - Constitution Principle V)
 
 **Purpose**: Ensure code quality and correctness before merge
 
-- [ ] T046 Run `pnpm lint` and fix all errors/warnings
-- [ ] T047 Run `pnpm type-check` and resolve all TypeScript errors
-- [ ] T048 Run `pnpm test` and ensure all tests pass
+- [X] T046 Run `pnpm lint` and fix all errors/warnings
+- [X] T047 Run `pnpm type-check` and resolve all TypeScript errors
+- [X] T048 Run `pnpm test` and ensure all tests pass
 - [ ] T049 Verify feature in local dev server (`pnpm dev`) - test both custom prompts and passthrough
 - [ ] T050 Manual test: Create scene with custom prompt, verify AI transformation
 - [ ] T051 Manual test: Create scene with empty prompt, verify passthrough (< 5s)

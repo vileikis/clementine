@@ -1,7 +1,6 @@
 import { ContentListUnion, GoogleGenAI } from '@google/genai';
 import type { AIClient } from '../client';
 import type { TransformParams } from '../types';
-import { buildPromptForEffect } from '../prompts';
 
 export class GoogleAIProvider implements AIClient {
   private ai: GoogleGenAI;
@@ -24,7 +23,7 @@ export class GoogleAIProvider implements AIClient {
 
   async generateImage(params: TransformParams): Promise<Buffer> {
     console.log('[GoogleAI] Starting transform:', {
-      effect: params.effect,
+      prompt: params.prompt.substring(0, 50),
       hasReference: !!params.referenceImageUrl,
     });
 
@@ -36,8 +35,8 @@ export class GoogleAIProvider implements AIClient {
       params.referenceImageUrl ? this.fetchImageAsBase64(params.referenceImageUrl) : null,
     ]);
 
-    // Build prompt parts
-    const promptText = buildPromptForEffect(params);
+    // Use prompt directly from scene
+    const promptText = params.prompt;
     console.log('[GoogleAI] Prompt text:', promptText);
 
     const promptParts: ContentListUnion = [
@@ -87,7 +86,7 @@ export class GoogleAIProvider implements AIClient {
         if (part.inlineData?.data) {
           const buffer = Buffer.from(part.inlineData.data, 'base64');
           console.log('[GoogleAI] Transform complete:', {
-            effect: params.effect,
+            promptLength: params.prompt.length,
             imageSize: buffer.length,
           });
           return buffer;

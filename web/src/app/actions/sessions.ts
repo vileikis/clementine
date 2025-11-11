@@ -12,6 +12,7 @@ import {
   uploadInputImage,
   uploadResultImage,
   getSignedUrl,
+  copyImageToResult,
 } from "@/lib/storage/upload";
 import { transformWithNanoBanana } from "@/lib/ai/nano-banana";
 import { revalidatePath } from "next/cache";
@@ -116,6 +117,31 @@ export async function triggerTransformAction(
       throw new Error("Event not found");
     }
 
+    // PASSTHROUGH MODE: Empty or null prompt
+    if (!scene.prompt || scene.prompt.trim() === "") {
+      console.log("[Transform] Passthrough mode: Copying input to result (no AI transformation)");
+
+      const resultImagePath = await copyImageToResult(
+        session.inputImagePath,
+        `events/${eventId}/sessions/${sessionId}/result.jpg`
+      );
+
+      // Mark session as ready (skip AI)
+      await updateSessionState(eventId, sessionId, "ready", {
+        resultImagePath,
+      });
+
+      console.log("[Transform] Passthrough complete:", {
+        eventId,
+        sessionId,
+        resultImagePath,
+      });
+
+      revalidatePath(`/join/${eventId}`);
+      return { success: true, resultImagePath };
+    }
+
+    // AI TRANSFORMATION MODE: Non-empty prompt
     // Generate signed URLs for AI service
     const inputUrl = await getSignedUrl(session.inputImagePath, 3600);
     const referenceUrl = scene.referenceImagePath
@@ -125,7 +151,7 @@ export async function triggerTransformAction(
     console.log("[Transform] Starting AI transform:", {
       eventId,
       sessionId,
-      effect: scene.effect,
+      prompt: scene.prompt.substring(0, 50),
       hasReference: !!referenceUrl,
     });
 
@@ -138,7 +164,6 @@ export async function triggerTransformAction(
         // Race between transform and timeout
         resultBuffer = await Promise.race([
           transformWithNanoBanana({
-            effect: scene.effect,
             prompt: scene.prompt,
             inputImageUrl: inputUrl,
             referenceImageUrl: referenceUrl,
