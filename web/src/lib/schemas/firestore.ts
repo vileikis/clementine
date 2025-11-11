@@ -11,7 +11,7 @@ export const eventSchema = z.object({
   showTitleOverlay: z.boolean(),
   status: eventStatusSchema,
   currentSceneId: z.string(),
-  companyId: z.string().nullable(),
+  companyId: z.string().nullable().default(null),
   joinPath: z.string(),
   qrPngPath: z.string(),
   createdAt: z.number(),
