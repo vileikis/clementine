@@ -43,6 +43,7 @@ describe("Events Repository", () => {
         title: "Summer Festival",
         brandColor: "#FF5733",
         showTitleOverlay: true,
+        companyId: "company-123",
       });
 
       expect(eventId).toBe("event-123");
