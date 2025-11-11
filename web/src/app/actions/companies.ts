@@ -6,6 +6,7 @@ import {
   getCompany,
   updateCompany,
   getCompanyEventCount,
+  deleteCompany,
 } from "@/lib/repositories/companies";
 import { verifyAdminSecret } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
@@ -133,6 +134,33 @@ export async function getCompanyEventCountAction(companyId: string) {
       success: false,
       error:
         error instanceof Error ? error.message : "Failed to fetch event count",
+    };
+  }
+}
+
+/**
+ * Soft delete a company (mark as deleted, hide from UI, disable guest links)
+ *
+ * @param companyId - Company document ID to delete
+ * @returns Success or failure with error message
+ */
+export async function deleteCompanyAction(companyId: string) {
+  // Verify admin authentication
+  const auth = await verifyAdminSecret();
+  if (!auth.authorized) {
+    return { success: false, error: auth.error };
+  }
+
+  try {
+    await deleteCompany(companyId);
+    revalidatePath("/companies");
+    revalidatePath(`/companies/${companyId}`);
+    return { success: true };
+  } catch (error) {
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Failed to delete company",
     };
   }
 }

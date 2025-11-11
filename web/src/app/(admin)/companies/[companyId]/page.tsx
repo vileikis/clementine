@@ -6,6 +6,7 @@ import type { Company } from "@/lib/types/firestore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { DeleteCompanyDialog } from "@/components/organizer/DeleteCompanyDialog";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
@@ -38,6 +39,9 @@ export default function CompanyDetailPage({ params }: CompanyDetailPageProps) {
 
   // Track if form has changes
   const [hasChanges, setHasChanges] = useState(false);
+
+  // Delete dialog state
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const loadCompany = async () => {
     setLoading(true);
@@ -449,6 +453,35 @@ export default function CompanyDetailPage({ params }: CompanyDetailPageProps) {
           </div>
         </div>
       </div>
+
+      {/* Danger Zone - Delete Company */}
+      <div className="border rounded-lg border-red-200 p-6 space-y-4">
+        <div>
+          <h3 className="text-lg font-semibold text-red-600">Danger Zone</h3>
+          <p className="text-sm text-muted-foreground mt-1">
+            Permanently delete this company. This action cannot be undone.
+          </p>
+        </div>
+        <Button
+          variant="destructive"
+          onClick={() => setDeleteDialogOpen(true)}
+          disabled={saving}
+          className="min-h-[44px]"
+        >
+          Delete Company
+        </Button>
+      </div>
+
+      {/* Delete Confirmation Dialog */}
+      {company && (
+        <DeleteCompanyDialog
+          companyId={company.id}
+          companyName={company.name}
+          eventCount={eventCount}
+          open={deleteDialogOpen}
+          onOpenChange={setDeleteDialogOpen}
+        />
+      )}
     </div>
   );
 }

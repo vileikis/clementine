@@ -1,6 +1,6 @@
 import { db } from "@/lib/firebase/admin";
 import type { Company } from "@/lib/types/firestore";
-import { createCompany, listCompanies, getCompany } from "./companies";
+import { createCompany, listCompanies, getCompany, deleteCompany } from "./companies";
 
 describe("Companies Repository", () => {
   const mockDb = db as unknown as {
@@ -307,6 +307,48 @@ describe("Companies Repository", () => {
       });
 
       await expect(getCompany("company-123")).rejects.toThrow();
+    });
+  });
+
+  describe("deleteCompany", () => {
+    it("soft deletes a company by setting status to deleted and deletedAt timestamp", async () => {
+      const mockUpdate = jest.fn();
+      mockDb.collection.mockReturnValue({
+        doc: jest.fn().mockReturnValue({
+          update: mockUpdate,
+        }),
+      });
+
+      await deleteCompany("company-123");
+
+      expect(mockDb.collection).toHaveBeenCalledWith("companies");
+      expect(mockUpdate).toHaveBeenCalledWith({
+        status: "deleted",
+        deletedAt: expect.any(Number),
+        updatedAt: expect.any(Number),
+      });
+
+      // Verify deletedAt and updatedAt are recent timestamps
+      const updateCall = mockUpdate.mock.calls[0][0];
+      expect(updateCall.deletedAt).toBeGreaterThan(Date.now() - 1000);
+      expect(updateCall.updatedAt).toBeGreaterThan(Date.now() - 1000);
+    });
+
+    it("does not actually delete the document from Firestore", async () => {
+      const mockUpdate = jest.fn();
+      const mockDelete = jest.fn();
+      mockDb.collection.mockReturnValue({
+        doc: jest.fn().mockReturnValue({
+          update: mockUpdate,
+          delete: mockDelete,
+        }),
+      });
+
+      await deleteCompany("company-123");
+
+      // Verify we called update, not delete
+      expect(mockUpdate).toHaveBeenCalled();
+      expect(mockDelete).not.toHaveBeenCalled();
     });
   });
 });

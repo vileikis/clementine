@@ -177,18 +177,20 @@ Web application (monorepo: web/ workspace):
 
 ---
 
-## Phase 6: User Story 4 - Reassign Event Company (Priority: P3)
+## Phase 6: User Story 4 - Reassign Event Company (Priority: P3) - **OBSOLETE**
+
+**Status**: SKIPPED - Feature deemed unnecessary for MVP. Event company assignment happens at creation time. Reassignment can be added in future if needed.
 
 **Goal**: Admin can change event's company association or remove it entirely (legacy event migration).
 
 **Independent Test**: Edit existing event, change company dropdown, verify association updated in events list.
 
-### Tests for User Story 4
+### Tests for User Story 4 - **SKIPPED**
 
 - [ ] T055 [P] [US4] Add test for updateEvent with companyId change in events.test.ts (verify companyId update persists)
 - [ ] T056 [P] [US4] Add test for updateEventAction with companyId in events.test.ts (test changing and removing company)
 
-### Implementation for User Story 4
+### Implementation for User Story 4 - **SKIPPED**
 
 - [ ] T057 [US4] Create updateEventAction in web/src/app/actions/events.ts (accept eventId and partial event data including companyId, validate company exists if provided, revalidatePath)
 - [ ] T058 [US4] Create updateEvent function in web/src/lib/repositories/events.ts (update event document with new companyId, updatedAt timestamp)
@@ -196,7 +198,7 @@ Web application (monorepo: web/ workspace):
 - [ ] T060 [US4] Add "Edit" link to EventCard component (link to /events/[eventId]/edit)
 - [ ] T061 [US4] Add "No company" option to company dropdown in edit form (allows removing company association)
 
-**Checkpoint**: User Story 4 complete - events can be reassigned to different companies or have company removed
+**Checkpoint**: Phase 6 skipped - proceed directly to Phase 7
 
 ---
 
@@ -208,20 +210,20 @@ Web application (monorepo: web/ workspace):
 
 ### Tests for User Story 5
 
-- [ ] T062 [P] [US5] Add test for deleteCompany (soft delete) in companies.test.ts (verify status='deleted' and deletedAt set)
-- [ ] T063 [P] [US5] Add test for listCompanies excludes deleted companies in companies.test.ts
-- [ ] T064 [P] [US5] Add test for guest link validation with deleted company in join page tests
+- [X] T062 [P] [US5] Add test for deleteCompany (soft delete) in companies.test.ts (verify status='deleted' and deletedAt set)
+- [X] T063 [P] [US5] Add test for listCompanies excludes deleted companies in companies.test.ts
+- [X] T064 [P] [US5] Add test for guest link validation with deleted company in join page tests
 
 ### Implementation for User Story 5
 
-- [ ] T065 [US5] Add deleteCompany function to web/src/lib/repositories/companies.ts (update status='deleted', set deletedAt timestamp, do not delete document)
-- [ ] T066 [US5] Add deleteCompanyAction to web/src/app/actions/companies.ts (call deleteCompany, revalidatePath /companies)
-- [ ] T067 [P] [US5] Create DeleteCompanyDialog component web/src/components/organizer/DeleteCompanyDialog.tsx (confirmation dialog with warning about events, calls deleteCompanyAction)
-- [ ] T068 [US5] Add "Delete" button to CompanyCard that opens DeleteCompanyDialog
-- [ ] T069 [US5] Add "Delete" button to company detail page that opens DeleteCompanyDialog
-- [ ] T070 [US5] Update listCompanies to filter .where('status', '==', 'active') (already implemented in T023, verify)
-- [ ] T071 [US5] Extend guest link page web/src/app/join/[eventId]/page.tsx (check if event.companyId, fetch company, if company.status == 'deleted' return error page "Event Unavailable")
-- [ ] T072 [US5] Implement company status caching for guest link validation per research.md (in-memory cache, 60s TTL, reduce Firestore reads)
+- [X] T065 [US5] Add deleteCompany function to web/src/lib/repositories/companies.ts (update status='deleted', set deletedAt timestamp, do not delete document)
+- [X] T066 [US5] Add deleteCompanyAction to web/src/app/actions/companies.ts (call deleteCompany, revalidatePath /companies)
+- [X] T067 [P] [US5] Create DeleteCompanyDialog component web/src/components/organizer/DeleteCompanyDialog.tsx (confirmation dialog with warning about events, calls deleteCompanyAction)
+- [X] T068 [US5] Add "Delete" button to CompanyCard that opens DeleteCompanyDialog (SKIPPED - handled from detail page per user request)
+- [X] T069 [US5] Add "Delete" button to company detail page that opens DeleteCompanyDialog
+- [X] T070 [US5] Update listCompanies to filter .where('status', '==', 'active') (already implemented in T023, verify)
+- [X] T071 [US5] Extend guest link page web/src/app/join/[eventId]/page.tsx (check if event.companyId, fetch company, if company.status == 'deleted' return error page "Event Unavailable")
+- [X] T072 [US5] Implement company status caching for guest link validation per research.md (in-memory cache, 60s TTL, reduce Firestore reads)
 
 **Checkpoint**: All user stories complete - full company management lifecycle including soft deletion and guest link protection
 
