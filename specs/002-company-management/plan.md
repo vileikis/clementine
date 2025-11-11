@@ -195,16 +195,32 @@ Generate Server Actions based on functional requirements:
 
 Admin authentication system (ADMIN_SECRET-based):
 
+- **Route Constants** (`lib/routes.ts`)
+  - `PUBLIC_ROUTES` constant (LOGIN, JOIN paths)
+  - `DEFAULT_AUTHENTICATED_ROUTE` constant (/events)
+  - `isPublicRoute()` helper function
+  - Centralized route configuration for consistency
+
 - **Auth Utility** (`lib/auth.ts`)
-  - `verifyAdminSecret()` - Cookie/header validation helper
+  - `isValidAdminSecret()` - Shared validation function (used by middleware and Server Actions)
+  - `verifyAdminSecret()` - Cookie/header validation for Server Actions
   - Returns `{ authorized: true }` or `{ authorized: false, error: string }`
   - Used by all Server Actions requiring admin access
+
+- **Middleware** (`middleware.ts`)
+  - Next.js Edge Middleware for page-level route protection
+  - Runs before every page load (except static assets)
+  - Redirects unauthenticated users from protected routes to `/login`
+  - Redirects authenticated users from `/login` to `/events`
+  - Preserves original destination via `?from=` query parameter
+  - Public routes: `/login`, `/join/*` (guest links)
 
 - **Login Page** (`app/login/page.tsx`)
   - Simple form: password input field
   - Client component with form submission
   - Sets `ADMIN_SECRET` cookie on successful login
-  - Redirects to `/events` after login
+  - Redirects to original destination or `/events` after login
+  - Handles `?from=` parameter for post-login redirect
 
 - **Login Server Action** (`app/actions/auth.ts`)
   - `loginAction(password: string)` - Validates against `process.env.ADMIN_SECRET`
@@ -213,18 +229,22 @@ Admin authentication system (ADMIN_SECRET-based):
 
 - **Logout Functionality**
   - `logoutAction()` - Clears ADMIN_SECRET cookie
-  - Redirects to `/login`
+  - Redirects to `/login` using route constants
 
-- **Protected Routes**
-  - Apply `verifyAdminSecret()` to all existing event/scene Server Actions
+- **Protected Routes (Two-Layer Security)**
+  - **Layer 1 (Middleware)**: Page-level protection - redirects before page loads
+  - **Layer 2 (Server Actions)**: API-level protection - `verifyAdminSecret()` in all admin actions
+  - Apply to all existing event/scene Server Actions
   - Apply to all new company Server Actions
   - Guest routes (`/join/*`) remain public
 
 **Security Notes**:
+- Two-layer authentication: Middleware (page-level) + Server Actions (API-level)
 - POC uses simple shared secret (ADMIN_SECRET env var)
 - Production should upgrade to session tokens or Firebase Auth
 - HTTP-only cookies prevent XSS attacks
 - SameSite=Lax prevents CSRF
+- Edge middleware provides fast redirects
 
 ### 4. Quickstart Guide (`quickstart.md`)
 
