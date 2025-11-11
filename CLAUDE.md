@@ -146,3 +146,10 @@ The `functions/` workspace is a placeholder for Firebase Cloud Functions that wi
 - **Speed** - AI transformation in under 1 minute
 - **Simplicity** - Minimal friction from link → upload → result → share
 - **White-label** - Fully customizable branding per event
+
+## Active Technologies
+- TypeScript 5.x (strict mode), Next.js 16, React 19 + Next.js 16, React 19, Firebase (client + admin SDKs), Zod 4.x, Tailwind CSS 4, shadcn/ui (001-simplify-ai-prompts)
+- Firebase Storage (images), Firestore (scene/session metadata) (001-simplify-ai-prompts)
+
+## Recent Changes
+- 001-simplify-ai-prompts: Added TypeScript 5.x (strict mode), Next.js 16, React 19 + Next.js 16, React 19, Firebase (client + admin SDKs), Zod 4.x, Tailwind CSS 4, shadcn/ui
