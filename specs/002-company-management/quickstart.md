@@ -31,41 +31,29 @@ pnpm install
 
 ### 2. Firestore Indexes Setup
 
-Create required indexes for company queries. Add to `firestore.indexes.json`:
+**The indexes are already configured** in `firebase/firestore.indexes.json`:
 
-```json
-{
-  "indexes": [
-    {
-      "collectionGroup": "companies",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "status", "order": "ASCENDING" },
-        { "fieldPath": "name", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "events",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "companyId", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    }
-  ]
-}
-```
+- `companies` collection: `status + name` (for uniqueness checks and sorted lists)
+- `events` collection: `companyId + createdAt` (for filtering events by company)
 
-Deploy indexes:
+**Deploy indexes to production**:
 
 ```bash
+# From repo root
 firebase deploy --only firestore:indexes
 ```
 
-**Note**: Indexes take 5-15 minutes to build. Monitor status:
+**Note**:
+- Indexes take 5-15 minutes to build after deployment
+- Local development works without indexes (Firestore SDK handles simple queries)
+- Production **requires** indexes for compound queries to work
+
+**Monitor index build status**:
 ```bash
 firebase firestore:indexes
 ```
+
+Or check Firebase Console > Firestore > Indexes tab
 
 ### 3. Start Development Server
 

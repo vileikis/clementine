@@ -8,6 +8,7 @@ export async function createEvent(data: {
   title: string;
   brandColor: string;
   showTitleOverlay: boolean;
+  companyId?: string | null;
 }): Promise<string> {
   const eventRef = db.collection("events").doc();
   const sceneRef = eventRef.collection("scenes").doc();
@@ -19,6 +20,7 @@ export async function createEvent(data: {
   const event: Event = {
     id: eventId,
     ...data,
+    companyId: data.companyId ?? null,
     status: "draft",
     currentSceneId: sceneRef.id,
     joinPath,
