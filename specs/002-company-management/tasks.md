@@ -30,9 +30,9 @@ Web application (monorepo: web/ workspace):
 
 **Purpose**: Project initialization and schema foundation
 
-- [ ] T001 Review data-model.md and identify all TypeScript interfaces needed
-- [ ] T002 Review contracts/server-actions.yaml and identify all Zod validation schemas needed
-- [ ] T003 Review plan.md project structure and confirm file paths for new components
+- [X] T001 Review data-model.md and identify all TypeScript interfaces needed
+- [X] T002 Review contracts/server-actions.yaml and identify all Zod validation schemas needed
+- [X] T003 Review plan.md project structure and confirm file paths for new components
 
 ---
 
@@ -42,11 +42,11 @@ Web application (monorepo: web/ workspace):
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T004 [P] Add Company interface to web/src/lib/types/firestore.ts (CompanyStatus enum, Company interface with all fields from data-model.md)
-- [ ] T005 [P] Extend Event interface in web/src/lib/types/firestore.ts (add companyId: string | null field)
-- [ ] T006 [P] Create companySchema in web/src/lib/schemas/firestore.ts (Zod schema matching Company interface)
-- [ ] T007 [P] Create company validation schemas in web/src/lib/schemas/validation.ts (createCompanyInput, updateCompanyInput with uniqueness rules)
-- [ ] T008 Create Firestore indexes configuration (document composite indexes: companies status+name, events companyId+createdAt)
+- [X] T004 [P] Add Company interface to web/src/lib/types/firestore.ts (CompanyStatus enum, Company interface with all fields from data-model.md)
+- [X] T005 [P] Extend Event interface in web/src/lib/types/firestore.ts (add companyId: string | null field)
+- [X] T006 [P] Create companySchema in web/src/lib/schemas/firestore.ts (Zod schema matching Company interface)
+- [X] T007 [P] Create company validation schemas in web/src/lib/schemas/validation.ts (createCompanyInput, updateCompanyInput with uniqueness rules)
+- [X] T008 Create Firestore indexes configuration (document composite indexes: companies status+name, events companyId+createdAt)
 
 **Checkpoint**: Foundation ready - types and schemas defined, user story implementation can now begin in parallel
 
