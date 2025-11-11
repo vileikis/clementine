@@ -191,16 +191,52 @@ Generate Server Actions based on functional requirements:
 
 **Output**: OpenAPI-style documentation in `contracts/server-actions.yaml`
 
-### 3. Quickstart Guide (`quickstart.md`)
+### 3. Authentication Infrastructure (`auth/`)
+
+Admin authentication system (ADMIN_SECRET-based):
+
+- **Auth Utility** (`lib/auth.ts`)
+  - `verifyAdminSecret()` - Cookie/header validation helper
+  - Returns `{ authorized: true }` or `{ authorized: false, error: string }`
+  - Used by all Server Actions requiring admin access
+
+- **Login Page** (`app/login/page.tsx`)
+  - Simple form: password input field
+  - Client component with form submission
+  - Sets `ADMIN_SECRET` cookie on successful login
+  - Redirects to `/events` after login
+
+- **Login Server Action** (`app/actions/auth.ts`)
+  - `loginAction(password: string)` - Validates against `process.env.ADMIN_SECRET`
+  - Sets HTTP-only cookie with SameSite and Secure flags
+  - Returns success/failure
+
+- **Logout Functionality**
+  - `logoutAction()` - Clears ADMIN_SECRET cookie
+  - Redirects to `/login`
+
+- **Protected Routes**
+  - Apply `verifyAdminSecret()` to all existing event/scene Server Actions
+  - Apply to all new company Server Actions
+  - Guest routes (`/join/*`) remain public
+
+**Security Notes**:
+- POC uses simple shared secret (ADMIN_SECRET env var)
+- Production should upgrade to session tokens or Firebase Auth
+- HTTP-only cookies prevent XSS attacks
+- SameSite=Lax prevents CSRF
+
+### 4. Quickstart Guide (`quickstart.md`)
 
 Developer setup for this feature:
 - Database schema setup (Firestore indexes)
-- Environment variables (no changes needed)
+- Environment variables (ADMIN_SECRET required)
 - Running local dev server
+- Admin login flow
 - Testing company CRUD flows
 - Testing event-company association
 
-### 4. Agent Context Update
+### 5. Agent Context Update
 
 Run `.specify/scripts/bash/update-agent-context.sh claude` to add:
 - Company entity to context
