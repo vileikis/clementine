@@ -18,7 +18,7 @@ import {
  * - Authenticated + /login → redirect to /events
  * - Everything else → allow
  */
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const adminSecret = request.cookies.get("ADMIN_SECRET")?.value;
 

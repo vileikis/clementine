@@ -2,8 +2,9 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { LogoutButton } from "@/components/organizer/LogoutButton"
 
-export default function EventsLayout({
+export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode
@@ -15,8 +16,9 @@ export default function EventsLayout({
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b">
-        <div className="container mx-auto px-4 py-4">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <h1 className="text-2xl font-bold">Clementine</h1>
+          <LogoutButton />
         </div>
         {/* Tab Navigation */}
         <nav className="container mx-auto px-4" role="tablist" aria-label="Admin dashboard navigation">
