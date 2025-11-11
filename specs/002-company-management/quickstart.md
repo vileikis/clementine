@@ -68,18 +68,24 @@ pnpm dev
 
 Server starts at http://localhost:3000
 
-### 4. Authentication (Admin Access)
+### 4. Set Admin Password
 
-Set `ADMIN_SECRET` cookie to access admin dashboard:
+Ensure `ADMIN_SECRET` is set in your `web/.env.local` file:
 
-**Option 1: Browser DevTools**
-```javascript
-// In browser console (F12)
-document.cookie = "ADMIN_SECRET=your-secret-here; path=/; SameSite=Lax"
+```bash
+# In web/.env.local
+ADMIN_SECRET=your-secure-password-here
 ```
 
-**Option 2: Login Page** (if implemented)
-Navigate to `/admin/login` and enter admin secret.
+**Note**: Change this to a strong password in production!
+
+### 5. Login to Admin Dashboard
+
+1. Navigate to http://localhost:3000/login
+2. Enter the password you set in `ADMIN_SECRET`
+3. Click "Log in"
+4. You'll be redirected to `/events` page
+5. Use the "Log out" button in the top right to log out
 
 ## Testing Company Management
 

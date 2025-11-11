@@ -2,6 +2,7 @@
 
 import { updateScene } from "@/lib/repositories/scenes"
 import { uploadReferenceImage, getPublicUrl } from "@/lib/storage/upload"
+import { verifyAdminSecret } from "@/lib/auth"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
 
@@ -16,6 +17,12 @@ export async function updateSceneAction(
   sceneId: string,
   updates: z.infer<typeof updateSceneInput>
 ) {
+  // Verify admin authentication
+  const auth = await verifyAdminSecret()
+  if (!auth.authorized) {
+    return { success: false, error: auth.error }
+  }
+
   try {
     const validated = updateSceneInput.parse(updates)
     await updateScene(eventId, sceneId, validated)
@@ -37,6 +44,12 @@ export async function uploadReferenceImageAction(
   sceneId: string,
   formData: FormData
 ) {
+  // Verify admin authentication
+  const auth = await verifyAdminSecret()
+  if (!auth.authorized) {
+    return { success: false, error: auth.error }
+  }
+
   try {
     const file = formData.get("file") as File
 
@@ -90,6 +103,12 @@ export async function removeReferenceImageAction(
   eventId: string,
   sceneId: string
 ) {
+  // Verify admin authentication
+  const auth = await verifyAdminSecret()
+  if (!auth.authorized) {
+    return { success: false, error: auth.error }
+  }
+
   try {
     await updateScene(eventId, sceneId, { referenceImagePath: null })
     revalidatePath(`/events/${eventId}`)

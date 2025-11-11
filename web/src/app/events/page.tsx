@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { listEventsAction } from "@/app/actions/events"
 import { EventCard } from "@/components/organizer/EventCard"
+import { LogoutButton } from "@/components/organizer/LogoutButton"
 
 export default async function EventsPage() {
   const result = await listEventsAction()
@@ -24,12 +25,15 @@ export default async function EventsPage() {
             Create and manage your AI photobooth experiences
           </p>
         </div>
-        <Link
-          href="/events/new"
-          className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
-        >
-          Create Event
-        </Link>
+        <div className="flex items-center gap-3">
+          <LogoutButton />
+          <Link
+            href="/events/new"
+            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+          >
+            Create Event
+          </Link>
+        </div>
       </div>
 
       {events.length === 0 ? (

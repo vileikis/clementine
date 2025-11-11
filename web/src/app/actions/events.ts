@@ -8,6 +8,7 @@ import {
   updateEventStatus,
   getCurrentScene,
 } from "@/lib/repositories/events"
+import { verifyAdminSecret } from "@/lib/auth"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
 
@@ -20,6 +21,12 @@ const createEventInput = z.object({
 export async function createEventAction(
   input: z.infer<typeof createEventInput>
 ) {
+  // Verify admin authentication
+  const auth = await verifyAdminSecret()
+  if (!auth.authorized) {
+    return { success: false, error: auth.error }
+  }
+
   try {
     const validated = createEventInput.parse(input)
     const eventId = await createEvent(validated)
@@ -67,6 +74,12 @@ export async function updateEventBrandingAction(
   eventId: string,
   branding: { brandColor?: string; showTitleOverlay?: boolean }
 ) {
+  // Verify admin authentication
+  const auth = await verifyAdminSecret()
+  if (!auth.authorized) {
+    return { success: false, error: auth.error }
+  }
+
   try {
     await updateEventBranding(eventId, branding)
     revalidatePath(`/events/${eventId}`)
@@ -98,6 +111,12 @@ export async function updateEventStatusAction(
   eventId: string,
   status: "draft" | "live" | "archived"
 ) {
+  // Verify admin authentication
+  const auth = await verifyAdminSecret()
+  if (!auth.authorized) {
+    return { success: false, error: auth.error }
+  }
+
   try {
     await updateEventStatus(eventId, status)
     revalidatePath("/events")
