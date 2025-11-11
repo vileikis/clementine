@@ -1,17 +1,19 @@
 "use client";
 
-import { useState } from "react";
-import { createCompanyAction } from "@/app/actions/companies";
+import { useState, useEffect } from "react";
+import { createCompanyAction, updateCompanyAction } from "@/app/actions/companies";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import type { Company } from "@/lib/types/firestore";
 
 interface CompanyFormProps {
+  company?: Company; // If provided, form is in edit mode
   onSuccess?: (companyId: string) => void;
   onCancel?: () => void;
 }
 
-export function CompanyForm({ onSuccess, onCancel }: CompanyFormProps) {
+export function CompanyForm({ company, onSuccess, onCancel }: CompanyFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -20,6 +22,13 @@ export function CompanyForm({ onSuccess, onCancel }: CompanyFormProps) {
 
   // Validation errors
   const [nameError, setNameError] = useState<string | null>(null);
+
+  // Initialize form with company data if in edit mode
+  useEffect(() => {
+    if (company) {
+      setName(company.name);
+    }
+  }, [company]);
 
   const validateName = (value: string): boolean => {
     if (!value.trim()) {
@@ -47,19 +56,30 @@ export function CompanyForm({ onSuccess, onCancel }: CompanyFormProps) {
     setIsSubmitting(true);
 
     try {
-      const result = await createCompanyAction({
-        name: name.trim(),
-      });
+      let result;
+      if (company) {
+        // Edit mode - update existing company
+        result = await updateCompanyAction(company.id, {
+          name: name.trim(),
+        });
+      } else {
+        // Create mode - create new company
+        result = await createCompanyAction({
+          name: name.trim(),
+        });
+      }
 
-      if (result.success && result.companyId) {
+      if (result.success) {
         // Success!
         if (onSuccess) {
-          onSuccess(result.companyId);
+          onSuccess(company?.id ?? (result as { companyId?: string }).companyId ?? "");
         }
-        // Reset form
-        setName("");
+        // Reset form only if creating
+        if (!company) {
+          setName("");
+        }
       } else {
-        setError(result.error || "Failed to create company");
+        setError(result.error || `Failed to ${company ? "update" : "create"} company`);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
@@ -121,7 +141,9 @@ export function CompanyForm({ onSuccess, onCancel }: CompanyFormProps) {
           </Button>
         )}
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Creating..." : "Create Company"}
+          {isSubmitting
+            ? (company ? "Updating..." : "Creating...")
+            : (company ? "Update Company" : "Create Company")}
         </Button>
       </div>
     </form>

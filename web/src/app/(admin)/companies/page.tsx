@@ -13,11 +13,6 @@ export default function CompaniesPage() {
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
 
-  // Fetch companies on mount
-  useEffect(() => {
-    loadCompanies();
-  }, []);
-
   const loadCompanies = async () => {
     setLoading(true);
     setError(null);
@@ -33,7 +28,13 @@ export default function CompaniesPage() {
     setLoading(false);
   };
 
-  const handleCreateSuccess = (companyId: string) => {
+  // Fetch companies on mount
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void loadCompanies();
+  }, []);
+
+  const handleCreateSuccess = () => {
     // Reload companies and close form
     loadCompanies();
     setShowForm(false);
@@ -97,11 +98,7 @@ export default function CompaniesPage() {
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {companies.map((company) => (
-            <CompanyCard
-              key={company.id}
-              company={company}
-              eventCount={0}
-            />
+            <CompanyCard key={company.id} company={company} />
           ))}
         </div>
       )}

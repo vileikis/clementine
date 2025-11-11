@@ -4,6 +4,8 @@ import {
   createCompany,
   listCompanies,
   getCompany,
+  updateCompany,
+  getCompanyEventCount,
 } from "@/lib/repositories/companies";
 import { verifyAdminSecret } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
@@ -77,6 +79,60 @@ export async function getCompanyAction(companyId: string) {
     return {
       success: false,
       error: error instanceof Error ? error.message : "Failed to fetch company",
+    };
+  }
+}
+
+/**
+ * Update an existing company with unique name validation
+ *
+ * @param companyId - Company document ID
+ * @param input - Company update data (name and optional metadata)
+ * @returns Success or failure with error message
+ */
+export async function updateCompanyAction(
+  companyId: string,
+  input: z.infer<typeof createCompanyInput>
+) {
+  // Verify admin authentication
+  const auth = await verifyAdminSecret();
+  if (!auth.authorized) {
+    return { success: false, error: auth.error };
+  }
+
+  try {
+    const validated = createCompanyInput.parse(input);
+    await updateCompany(companyId, validated);
+    revalidatePath("/companies");
+    revalidatePath(`/companies/${companyId}`);
+    return { success: true };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return { success: false, error: error.issues[0].message };
+    }
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Failed to update company",
+    };
+  }
+}
+
+/**
+ * Get the count of events associated with a company
+ *
+ * @param companyId - Company document ID
+ * @returns Success with event count or failure with error message
+ */
+export async function getCompanyEventCountAction(companyId: string) {
+  try {
+    const count = await getCompanyEventCount(companyId);
+    return { success: true, count };
+  } catch (error) {
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Failed to fetch event count",
     };
   }
 }
