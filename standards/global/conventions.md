@@ -12,7 +12,6 @@ clementine/
 │   ├── src/lib/          # Utilities
 │   └── src/hooks/        # Custom hooks
 ├── functions/             # Firebase Cloud Functions
-├── sdd/                   # Spec-driven development docs
 └── pnpm-workspace.yaml   # Workspace config
 ```
 
@@ -90,4 +89,3 @@ Before merging:
 - Update CHANGELOG.md for notable changes
 - Keep README files current
 - Document "why" in comments, not "what"
-- Create ADRs for significant architectural decisions in `sdd/specs/[project]/adr/`

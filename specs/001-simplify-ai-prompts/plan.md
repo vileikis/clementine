@@ -23,7 +23,7 @@ Replace hardcoded AI effect types (background_swap, deep_fake) with a flexible p
 
 ## Constitution Check
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+_GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
 Verify compliance with Clementine Constitution (`.specify/memory/constitution.md`):
 
@@ -45,7 +45,7 @@ Verify compliance with Clementine Constitution (`.specify/memory/constitution.md
   - Test prompt validation (600 char limit)
 - [x] **Validation Loop Discipline**: Plan includes validation tasks (lint, type-check, test) before completion
   - Final task includes running `pnpm lint`, `pnpm type-check`, `pnpm test`
-- [x] **Technical Standards**: Applicable standards from `sdd/standards/` reviewed and referenced
+- [x] **Technical Standards**: Applicable standards from `standards/` reviewed and referenced
   - Global: validation.md (Zod schemas), error-handling.md (type-safe errors)
   - Frontend: responsive.md (mobile-first), components.md (composition)
   - Backend: firebase.md (Firestore schema updates), api.md (Server Actions)
@@ -111,6 +111,7 @@ web/src/
 > **Fill ONLY if Constitution Check has violations that must be justified**
 
 **No complexity violations**. This feature reduces overall codebase complexity by:
+
 - Removing hardcoded effect templates (buildPromptForEffect function)
 - Removing deprecated fields (effect, defaultPrompt)
 - Simplifying AI transformation logic (direct prompt usage)
@@ -120,7 +121,7 @@ web/src/
 
 ## Re-evaluation: Constitution Check (Post-Phase 1)
 
-*Re-checked after Phase 1 design (data-model.md, contracts, quickstart.md generated)*
+_Re-checked after Phase 1 design (data-model.md, contracts, quickstart.md generated)_
 
 All constitution principles remain satisfied after detailed design:
 
@@ -168,6 +169,7 @@ The implementation plan is complete. Next steps:
 ## Artifacts Summary
 
 **Generated Documents**:
+
 - ✅ `plan.md` - This file (implementation plan)
 - ✅ `research.md` - Technical research and design decisions
 - ✅ `data-model.md` - Entity schemas, validation rules, state transitions

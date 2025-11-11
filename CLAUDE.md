@@ -9,41 +9,26 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### What We're Building
 
 A web-based platform where:
+
 - **Experience Creators** (brands/event organizers) set up AI-powered photo experiences with custom prompts and branding
 - **Guests** visit a shareable link, upload a photo, and receive an AI-transformed result in under 1 minute
 - **Analytics** help creators measure engagement, shares, and campaign success
 
-See [PRODUCT.md](sdd/product/PRODUCT.md) for full product strategy, user flows, MVP scope, and success metrics.
+See [PRODUCT.md](.specify/memory/product/PRODUCT.md) for full product strategy, user flows, MVP scope, and success metrics.
 
 ### Spec-Driven Development
 
-This project follows **spec-driven development** practices. Key documentation is organized in `sdd/`:
-
-- **`sdd/product/`** - Product vision, strategy, and roadmap documents
-- **`sdd/standards/`** - Technical standards, conventions, and coding guidelines
-- **`sdd/specs/`** - Project/feature specifications, each containing:
-  - `spec.md` - What and why we're building
-  - `plan.md` - Technical implementation plan
-  - `tasks.md` - Breakdown of actionable tasks
-  - Other relevant documentation
+This project follows **spec-driven development** practices. Key documentation like technical standards, conventions, and coding guidelines in `standards/`
 
 **IMPORTANT**: Before implementing any feature or making changes, you MUST:
-1. Read `sdd/standards/README.md` to understand applicable standards
-2. Review relevant standards from `sdd/standards/` based on your task:
+
+1. Read `standards/README.md` to understand applicable standards
+2. Review relevant standards from `standards/` based on your task:
    - `global/` - Always applicable (coding style, conventions, validation, error handling)
    - `frontend/` - For UI/UX work (CSS, components, accessibility, responsive design)
    - `backend/` - For API/data work (Firebase, API routes, models)
    - `testing/` - For test implementation
 3. Follow all standards strictly in your implementation
-
-**Workflow**: Use custom slash commands with project names:
-- `/specify [project-name]` - Create a new specification
-- `/plan [project-name]` - Generate technical implementation plan
-- `/tasks [project-name]` - Break down plan into actionable tasks
-- `/build [project-name] [task-id]` - Implement tasks systematically
-- `/review [project-name]` - Review implementation against spec/plan
-
-Example: `/specify event-creation` creates `sdd/specs/event-creation/spec.md`
 
 ### Technical Stack
 
@@ -100,6 +85,7 @@ This is a **pnpm workspace** monorepo (`pnpm-workspace.yaml`). Root `package.jso
 ### Import Aliases
 
 The web app uses path aliases (configured in `tsconfig.json`):
+
 - `@/*` maps to `src/*`
 - shadcn/ui components use `@/components/ui`
 - Utilities use `@/lib/utils`
@@ -116,6 +102,7 @@ Components are added to `src/components/ui/` and can be imported via `@/componen
 ### Backend Architecture (Planned)
 
 The `functions/` workspace is a placeholder for Firebase Cloud Functions that will handle:
+
 - **n8n workflow integration** - AI image generation pipeline (Nano Banana, Stable Diffusion, etc.)
 - **Event & asset storage** - Firebase/Firestore for event configurations and generated images
 - **Webhook processing** - Communication between web app and AI generation services
@@ -125,12 +112,14 @@ The `functions/` workspace is a placeholder for Firebase Cloud Functions that wi
 ### Core Entities
 
 1. **Event/Campaign** - A branded AI photobooth experience created by an Experience Creator
+
    - Custom AI prompt/theme
    - Branding (logo, campaign name)
    - Configuration (input type, output format)
    - Shareable link or embeddable widget
 
 2. **Submission** - A guest interaction with an event
+
    - Original uploaded photo
    - AI-generated result
    - Metadata (timestamp, share status)
@@ -148,8 +137,10 @@ The `functions/` workspace is a placeholder for Firebase Cloud Functions that wi
 - **White-label** - Fully customizable branding per event
 
 ## Active Technologies
+
 - TypeScript 5.x (strict mode), Next.js 16, React 19 + Next.js 16, React 19, Firebase (client + admin SDKs), Zod 4.x, Tailwind CSS 4, shadcn/ui (001-simplify-ai-prompts)
 - Firebase Storage (images), Firestore (scene/session metadata) (001-simplify-ai-prompts)
 
 ## Recent Changes
+
 - 001-simplify-ai-prompts: Added TypeScript 5.x (strict mode), Next.js 16, React 19 + Next.js 16, React 19, Firebase (client + admin SDKs), Zod 4.x, Tailwind CSS 4, shadcn/ui

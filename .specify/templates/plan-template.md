@@ -29,7 +29,7 @@
 
 ## Constitution Check
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+_GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
 Verify compliance with Clementine Constitution (`.specify/memory/constitution.md`):
 
@@ -38,7 +38,7 @@ Verify compliance with Clementine Constitution (`.specify/memory/constitution.md
 - [ ] **Type-Safe Development**: TypeScript strict mode, no `any` escapes, Zod validation for external inputs
 - [ ] **Minimal Testing Strategy**: Jest unit tests for critical paths (70%+ coverage goal), tests co-located with source
 - [ ] **Validation Loop Discipline**: Plan includes validation tasks (lint, type-check, test) before completion
-- [ ] **Technical Standards**: Applicable standards from `sdd/standards/` reviewed and referenced
+- [ ] **Technical Standards**: Applicable standards from `standards/` reviewed and referenced
 
 **Complexity Violations** (if any):
 If this feature violates "Clean Code & Simplicity" (e.g., new abstraction layers, architectural patterns), document in "Complexity Tracking" section below.
@@ -58,6 +58,7 @@ specs/[###-feature]/
 ```
 
 ### Source Code (repository root)
+
 <!--
   ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
   for this feature. Delete unused options and expand the chosen structure with
@@ -108,7 +109,7 @@ directories captured above]
 
 > **Fill ONLY if Constitution Check has violations that must be justified**
 
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
-| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
-| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
+| Violation                  | Why Needed         | Simpler Alternative Rejected Because |
+| -------------------------- | ------------------ | ------------------------------------ |
+| [e.g., 4th project]        | [current need]     | [why 3 projects insufficient]        |
+| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient]  |

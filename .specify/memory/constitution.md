@@ -104,7 +104,7 @@ Before marking any feature complete, MUST run validation loop to ensure code qua
 
 ## Technical Standards
 
-All development MUST adhere to standards defined in `sdd/standards/`:
+All development MUST adhere to standards defined in `standards/`:
 
 ### Global Standards (Always Applicable)
 

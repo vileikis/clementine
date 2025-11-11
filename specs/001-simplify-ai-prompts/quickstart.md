@@ -9,6 +9,7 @@
 This feature replaces hardcoded AI effect types (background_swap, deep_fake) with a flexible custom prompt system. Event creators can now define AI transformations using natural language prompts and optional reference images.
 
 **Key Changes**:
+
 - Remove `effect` field and `EffectType` enum
 - Remove `defaultPrompt` field
 - Make `prompt` field nullable (null = passthrough mode)
@@ -51,6 +52,7 @@ N8N_WEBHOOK_AUTH_TOKEN=...     # Optional
 ### Phase 1: Type Definitions
 
 - [ ] Update `web/src/lib/types/firestore.ts`:
+
   - Remove `EffectType` type definition
   - Remove `effect: EffectType` from `Scene` interface
   - Remove `defaultPrompt: string` from `Scene` interface
@@ -67,20 +69,23 @@ N8N_WEBHOOK_AUTH_TOKEN=...     # Optional
     ```typescript
     prompt: z.string()
       .max(600, "Prompt must be 600 characters or less")
-      .nullable()
+      .nullable();
     ```
   - Remove any references to `effect` or `defaultPrompt` fields
 
 ### Phase 3: AI Transformation Logic
 
 - [ ] Delete `web/src/lib/ai/prompts.ts`:
+
   - Remove entire file (contains `buildPromptForEffect`)
 
 - [ ] Update `web/src/lib/ai/providers/google-ai.ts`:
+
   - Remove `buildPromptForEffect` import
   - Use `params.prompt` directly in API call
 
 - [ ] Update `web/src/lib/ai/providers/n8n-webhook.ts`:
+
   - Remove `buildPromptForEffect` import
   - Pass `params.prompt` directly in webhook payload
 
@@ -91,6 +96,7 @@ N8N_WEBHOOK_AUTH_TOKEN=...     # Optional
 ### Phase 4: Passthrough Mode
 
 - [ ] Add `web/src/lib/storage/upload.ts`:
+
   ```typescript
   export async function copyImageToResult(
     inputPath: string,
@@ -108,7 +114,9 @@ N8N_WEBHOOK_AUTH_TOKEN=...     # Optional
   ```
 
 - [ ] Update `web/src/app/actions/sessions.ts`:
+
   - Add passthrough mode detection in `triggerTransformAction`:
+
     ```typescript
     // Check for passthrough mode
     if (!scene.prompt || scene.prompt.trim() === "") {
@@ -130,9 +138,11 @@ N8N_WEBHOOK_AUTH_TOKEN=...     # Optional
 ### Phase 5: UI Components
 
 - [ ] Delete `web/src/components/organizer/EffectPicker.tsx`:
+
   - Remove entire file (predefined effect selector)
 
 - [ ] Update `web/src/components/organizer/PromptEditor.tsx`:
+
   - Add character count display (X / 600)
   - Add validation error for > 600 chars
   - Ensure mobile-friendly (appropriate keyboard type)
@@ -158,6 +168,7 @@ N8N_WEBHOOK_AUTH_TOKEN=...     # Optional
 ### Phase 8: Tests
 
 - [ ] Update `web/src/lib/repositories/scenes.test.ts`:
+
   - Remove tests for `effect` field
   - Remove tests for `defaultPrompt` field
   - Add test: Create scene with custom prompt
@@ -165,6 +176,7 @@ N8N_WEBHOOK_AUTH_TOKEN=...     # Optional
   - Add test: Validate prompt > 600 chars fails
 
 - [ ] Update `web/src/lib/repositories/sessions.test.ts`:
+
   - Add test: Passthrough mode (empty prompt) copies input to result
   - Add test: AI mode (non-empty prompt) calls AI provider
 
@@ -180,6 +192,7 @@ N8N_WEBHOOK_AUTH_TOKEN=...     # Optional
 #### Test 1: Custom Prompt AI Transformation
 
 1. Create a new scene with custom prompt:
+
    ```
    Prompt: "Transform into a 1920s silent film star with black and white styling"
    Reference Image: (optional vintage photo)
@@ -192,6 +205,7 @@ N8N_WEBHOOK_AUTH_TOKEN=...     # Optional
 #### Test 2: Passthrough Mode
 
 1. Create a new scene with empty prompt:
+
    ```
    Prompt: (leave empty or set to null)
    ```
@@ -236,6 +250,7 @@ pnpm test --coverage
 ```
 
 **Expected Coverage**:
+
 - Overall: 70%+
 - Critical paths (scene creation, transformation, passthrough): 90%+
 
@@ -283,6 +298,7 @@ pnpm dev
 If issues are discovered after deployment:
 
 1. **Revert Git commit**:
+
    ```bash
    git revert <commit-hash>
    git push origin main
@@ -303,6 +319,7 @@ If issues are discovered after deployment:
 **Symptom**: Empty prompt scenes still attempt AI transformation
 
 **Solution**:
+
 - Check passthrough detection logic in `triggerTransformAction`:
   ```typescript
   if (!scene.prompt || scene.prompt.trim() === "") {
@@ -316,6 +333,7 @@ If issues are discovered after deployment:
 **Symptom**: Prompts > 600 chars are accepted
 
 **Solution**:
+
 - Ensure `SceneSchema` is imported and used in Server Actions:
   ```typescript
   const validated = SceneSchema.parse(input);
@@ -327,6 +345,7 @@ If issues are discovered after deployment:
 **Symptom**: All AI transformations fail with error
 
 **Solution**:
+
 - Verify `buildPromptForEffect` import is removed from all providers
 - Check that `params.prompt` is being passed correctly to AI APIs
 - Test with mock provider first to isolate issue
@@ -336,6 +355,7 @@ If issues are discovered after deployment:
 **Symptom**: Old scenes with `effect` field fail to transform
 
 **Solution**:
+
 - Verify existing scenes have `prompt` field populated
 - Check database for missing `prompt` values
 - Ensure transformation logic ignores `effect` field
@@ -347,16 +367,19 @@ If issues are discovered after deployment:
 ### Metrics to Track
 
 **Passthrough Mode**:
+
 - Average duration (target: < 5 seconds)
 - Success rate (target: 100%)
 - Usage percentage (% of sessions with empty prompt)
 
 **AI Transformation**:
+
 - Average duration (existing target: < 60 seconds)
 - Success rate (existing target: > 95%)
 - Prompt length distribution
 
 **Validation**:
+
 - Client-side validation errors (prompt > 600 chars)
 - Server-side validation errors
 
@@ -380,10 +403,12 @@ console.log("[Transform]", {
 After this feature is complete:
 
 1. **Monitor production usage**:
+
    - Track passthrough mode adoption
    - Collect user feedback on custom prompts
 
 2. **Future enhancements**:
+
    - Prompt templates library (optional)
    - Multi-reference image support
    - Prompt preview/testing tool
@@ -402,7 +427,7 @@ After this feature is complete:
 - **API Contracts**: [contracts/server-actions.md](./contracts/server-actions.md)
 - **Research**: [research.md](./research.md)
 - **Constitution**: `.specify/memory/constitution.md`
-- **Standards**: `sdd/standards/`
+- **Standards**: `standards/`
 
 ---
 
