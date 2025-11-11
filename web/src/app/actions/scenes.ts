@@ -85,3 +85,22 @@ export async function getImageUrlAction(path: string) {
     }
   }
 }
+
+export async function removeReferenceImageAction(
+  eventId: string,
+  sceneId: string
+) {
+  try {
+    await updateScene(eventId, sceneId, { referenceImagePath: null })
+    revalidatePath(`/events/${eventId}`)
+    return { success: true }
+  } catch (error) {
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to remove reference image",
+    }
+  }
+}

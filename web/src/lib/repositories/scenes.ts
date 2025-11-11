@@ -9,7 +9,7 @@ export async function updateScene(
   sceneId: string,
   updates: {
     prompt?: string | null;
-    referenceImagePath?: string;
+    referenceImagePath?: string | null;
   }
 ): Promise<void> {
   await db
