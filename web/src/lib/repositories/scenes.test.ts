@@ -12,7 +12,7 @@ describe("Scenes Repository", () => {
   });
 
   describe("updateScene", () => {
-    it("updates scene effect", async () => {
+    it("creates scene with custom prompt", async () => {
       const mockUpdate = jest.fn();
 
       const mockSceneRef = {
@@ -32,14 +32,14 @@ describe("Scenes Repository", () => {
       });
 
       await updateScene("event-123", "scene-456", {
-        effect: "deep_fake",
+        prompt: "Transform into anime style",
       });
 
       expect(mockDb.collection).toHaveBeenCalledWith("events");
       expect(mockEventRef.collection).toHaveBeenCalledWith("scenes");
       expect(mockSceneCollection.doc).toHaveBeenCalledWith("scene-456");
       expect(mockUpdate).toHaveBeenCalledWith({
-        effect: "deep_fake",
+        prompt: "Transform into anime style",
         updatedAt: expect.any(Number),
       });
     });
@@ -122,13 +122,11 @@ describe("Scenes Repository", () => {
       });
 
       await updateScene("event-123", "scene-456", {
-        effect: "background_swap",
         prompt: "New prompt",
         referenceImagePath: "scenes/scene-456/ref.jpg",
       });
 
       expect(mockUpdate).toHaveBeenCalledWith({
-        effect: "background_swap",
         prompt: "New prompt",
         referenceImagePath: "scenes/scene-456/ref.jpg",
         updatedAt: expect.any(Number),
@@ -160,6 +158,64 @@ describe("Scenes Repository", () => {
         updatedAt: expect.any(Number),
       });
     });
+
+    it("validates prompt length (max 600 chars)", async () => {
+      const mockUpdate = jest.fn();
+
+      const mockSceneRef = {
+        update: mockUpdate,
+      };
+
+      const mockSceneCollection = {
+        doc: jest.fn().mockReturnValue(mockSceneRef),
+      };
+
+      const mockEventRef = {
+        collection: jest.fn().mockReturnValue(mockSceneCollection),
+      };
+
+      mockDb.collection.mockReturnValue({
+        doc: jest.fn().mockReturnValue(mockEventRef),
+      });
+
+      const validPrompt = "A".repeat(600);
+      await updateScene("event-123", "scene-456", {
+        prompt: validPrompt,
+      });
+
+      expect(mockUpdate).toHaveBeenCalledWith({
+        prompt: validPrompt,
+        updatedAt: expect.any(Number),
+      });
+    });
+
+    it("rejects prompt longer than 600 chars", async () => {
+      const mockUpdate = jest.fn();
+
+      const mockSceneRef = {
+        update: mockUpdate,
+      };
+
+      const mockSceneCollection = {
+        doc: jest.fn().mockReturnValue(mockSceneRef),
+      };
+
+      const mockEventRef = {
+        collection: jest.fn().mockReturnValue(mockSceneCollection),
+      };
+
+      mockDb.collection.mockReturnValue({
+        doc: jest.fn().mockReturnValue(mockEventRef),
+      });
+
+      const invalidPrompt = "A".repeat(601);
+
+      await expect(
+        updateScene("event-123", "scene-456", {
+          prompt: invalidPrompt,
+        })
+      ).rejects.toThrow("Prompt must be 600 characters or less");
+    });
   });
 
   describe("getScene", () => {
@@ -167,9 +223,7 @@ describe("Scenes Repository", () => {
       const mockSceneData = {
         label: "Test Scene",
         mode: "photo",
-        effect: "background_swap",
         prompt: "Test prompt",
-        defaultPrompt: "Default prompt",
         referenceImagePath: "scenes/scene-456/reference.jpg",
         flags: {
           customTextTool: true,
@@ -239,9 +293,7 @@ describe("Scenes Repository", () => {
       const invalidSceneData = {
         label: "Test Scene",
         mode: "invalid-mode",
-        effect: "background_swap",
-        prompt: "",
-        defaultPrompt: "Default",
+        prompt: null,
         flags: {
           customTextTool: true,
           stickersTool: false,
@@ -280,9 +332,7 @@ describe("Scenes Repository", () => {
       const mockSceneData = {
         label: "Minimal Scene",
         mode: "photo",
-        effect: "deep_fake",
         prompt: "Prompt text",
-        defaultPrompt: "Default prompt",
         flags: {
           customTextTool: false,
           stickersTool: false,

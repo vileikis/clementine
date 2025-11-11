@@ -6,9 +6,7 @@ import { revalidatePath } from "next/cache"
 import { z } from "zod"
 
 const updateSceneInput = z.object({
-  effect: z.enum(["background_swap", "deep_fake"]).optional(),
-  prompt: z.string().min(1, "Prompt is required").optional(),
-  defaultPrompt: z.string().optional(),
+  prompt: z.string().max(600, "Prompt must be 600 characters or less").nullable().optional(),
 })
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
@@ -84,6 +82,25 @@ export async function getImageUrlAction(path: string) {
     return {
       success: false,
       error: error instanceof Error ? error.message : "Failed to get image URL",
+    }
+  }
+}
+
+export async function removeReferenceImageAction(
+  eventId: string,
+  sceneId: string
+) {
+  try {
+    await updateScene(eventId, sceneId, { referenceImagePath: null })
+    revalidatePath(`/events/${eventId}`)
+    return { success: true }
+  } catch (error) {
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to remove reference image",
     }
   }
 }

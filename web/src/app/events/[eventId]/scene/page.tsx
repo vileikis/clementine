@@ -1,7 +1,6 @@
 import { getCurrentSceneAction } from "@/app/actions/events"
 import { notFound } from "next/navigation"
 import { ModeSelector } from "@/components/organizer/ModeSelector"
-import { EffectPicker } from "@/components/organizer/EffectPicker"
 import { PromptEditor } from "@/components/organizer/PromptEditor"
 import { RefImageUploader } from "@/components/organizer/RefImageUploader"
 
@@ -27,26 +26,16 @@ export default async function ScenePage({ params }: ScenePageProps) {
       </section>
 
       <section>
-        <h2 className="text-xl font-semibold mb-4">AI Effect</h2>
-        <EffectPicker
-          currentEffect={scene.effect}
-          eventId={eventId}
-          sceneId={scene.id}
-        />
-      </section>
-
-      <section>
-        <h2 className="text-xl font-semibold mb-4">Prompt Configuration</h2>
+        <h2 className="text-xl font-semibold mb-4">AI Transformation Prompt</h2>
         <PromptEditor
           currentPrompt={scene.prompt}
-          defaultPrompt={scene.defaultPrompt}
           eventId={eventId}
           sceneId={scene.id}
         />
       </section>
 
       <section>
-        <h2 className="text-xl font-semibold mb-4">Reference Image</h2>
+        <h2 className="text-xl font-semibold mb-4">Reference Image (Optional)</h2>
         <RefImageUploader
           eventId={eventId}
           sceneId={scene.id}

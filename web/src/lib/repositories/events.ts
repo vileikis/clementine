@@ -31,9 +31,7 @@ export async function createEvent(data: {
     id: sceneRef.id,
     label: "Default Scene v1",
     mode: "photo",
-    effect: "background_swap",
     prompt: "Apply clean studio background with brand color accents.",
-    defaultPrompt: "Apply clean studio background with brand color accents.",
     flags: {
       customTextTool: false,
       stickersTool: false,

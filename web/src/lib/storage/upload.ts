@@ -76,6 +76,29 @@ export async function uploadResultImage(
 }
 
 /**
+ * Copies input image to result location for passthrough mode (no AI transformation)
+ * Used when scene prompt is empty/null
+ * Path: events/{eventId}/sessions/{sessionId}/input.jpg → events/{eventId}/sessions/{sessionId}/result.jpg
+ */
+export async function copyImageToResult(
+  inputPath: string,
+  resultPath: string
+): Promise<string> {
+  const inputFile = storage.file(inputPath);
+  const resultFile = storage.file(resultPath);
+
+  // Download the input image
+  const [inputBuffer] = await inputFile.download();
+
+  // Upload it to the result location
+  await resultFile.save(inputBuffer, {
+    contentType: "image/jpeg",
+  });
+
+  return resultPath;
+}
+
+/**
  * Uploads scene reference image to Storage
  * Path: events/{eventId}/refs/{timestamp}-{filename}
  */

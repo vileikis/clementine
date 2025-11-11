@@ -44,6 +44,7 @@ To empower brands, event creators, and marketers with an intuitive digital platf
 ### 3. Analytics & Upsell (Post-event Review)
 
 Event creators receive access to:
+
 - Views, submissions, shares, engagement stats
 - Top prompts/themes
 - Visual gallery of results
