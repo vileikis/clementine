@@ -60,25 +60,25 @@ Web application (monorepo: web/ workspace):
 
 ### Authentication Utility & Server Actions
 
-- [ ] T009 Create auth utility web/src/lib/auth.ts (verifyAdminSecret function that checks ADMIN_SECRET cookie against env var, returns {authorized: true} or {authorized: false, error: string})
-- [ ] T010 Create auth Server Actions web/src/app/actions/auth.ts (loginAction validates password and sets HTTP-only cookie, logoutAction clears cookie)
+- [X] T009 Create auth utility web/src/lib/auth.ts (verifyAdminSecret function that checks ADMIN_SECRET cookie against env var, returns {authorized: true} or {authorized: false, error: string})
+- [X] T010 Create auth Server Actions web/src/app/actions/auth.ts (loginAction validates password and sets HTTP-only cookie, logoutAction clears cookie)
 
 ### Login/Logout UI
 
-- [ ] T011 [P] Create login page web/src/app/login/page.tsx (form with password input, calls loginAction, redirects to /events on success, mobile-responsive)
-- [ ] T012 [P] Add logout button component web/src/components/organizer/LogoutButton.tsx (calls logoutAction, redirects to /login)
+- [X] T011 [P] Create login page web/src/app/login/page.tsx (form with password input, calls loginAction, redirects to /events on success, mobile-responsive)
+- [X] T012 [P] Add logout button component web/src/components/organizer/LogoutButton.tsx (calls logoutAction, redirects to /login)
 
 ### Apply Authentication to Existing Routes (Testing)
 
-- [ ] T013 Add verifyAdminSecret to web/src/app/actions/events.ts (apply to createEventAction, updateEventBranding, updateEventStatus - test that auth works)
-- [ ] T014 Add verifyAdminSecret to web/src/app/actions/scenes.ts (apply to all scene Server Actions)
-- [ ] T015 Add verifyAdminSecret to web/src/app/actions/qr.ts (apply to generateQRAction if exists)
-- [ ] T016 Add logout button to events page web/src/app/events/page.tsx or layout (add LogoutButton to header/nav)
+- [X] T013 Add verifyAdminSecret to web/src/app/actions/events.ts (apply to createEventAction, updateEventBranding, updateEventStatus - test that auth works)
+- [X] T014 Add verifyAdminSecret to web/src/app/actions/scenes.ts (apply to all scene Server Actions)
+- [X] T015 Add verifyAdminSecret to web/src/app/actions/qr.ts (apply to generateQRAction if exists)
+- [X] T016 Add logout button to events page web/src/app/events/page.tsx or layout (add LogoutButton to header/nav)
 
 ### Documentation & Testing
 
-- [ ] T017 Update quickstart.md with login instructions (add section on logging in via /login page, no more manual cookie setting)
-- [ ] T018 Test authentication flow (login via /login, verify events page works, verify unauthenticated request fails, logout and verify redirect)
+- [X] T017 Update quickstart.md with login instructions (add section on logging in via /login page, no more manual cookie setting)
+- [X] T018 Test authentication flow (login via /login, verify events page works, verify unauthenticated request fails, logout and verify redirect)
 
 **Checkpoint**: Authentication working - can login at /login, existing event routes are protected, ready to build company features
 
