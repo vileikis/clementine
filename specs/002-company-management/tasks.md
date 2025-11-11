@@ -60,8 +60,15 @@ Web application (monorepo: web/ workspace):
 
 ### Authentication Utility & Server Actions
 
-- [X] T009 Create auth utility web/src/lib/auth.ts (verifyAdminSecret function that checks ADMIN_SECRET cookie against env var, returns {authorized: true} or {authorized: false, error: string})
+- [X] T009 Create auth utility web/src/lib/auth.ts (verifyAdminSecret function that checks ADMIN_SECRET cookie against env var, returns {authorized: true} or {authorized: false, error: string}, plus isValidAdminSecret for shared validation)
 - [X] T010 Create auth Server Actions web/src/app/actions/auth.ts (loginAction validates password and sets HTTP-only cookie, logoutAction clears cookie)
+
+### Route Constants & Middleware
+
+- [X] T010a Create route constants web/src/lib/routes.ts (PUBLIC_ROUTES constant with LOGIN and JOIN, DEFAULT_AUTHENTICATED_ROUTE constant, isPublicRoute helper function)
+- [X] T010b Create Next.js middleware web/src/middleware.ts (Edge middleware for page-level route protection, redirect unauthenticated users to /login, redirect authenticated users from /login to /events, preserve destination via ?from= parameter)
+- [X] T010c Update login page to handle redirect parameter (use ?from= to redirect back to original destination after login)
+- [X] T010d Update logout action to use route constants (use PUBLIC_ROUTES.LOGIN for redirect)
 
 ### Login/Logout UI
 
@@ -80,7 +87,7 @@ Web application (monorepo: web/ workspace):
 - [X] T017 Update quickstart.md with login instructions (add section on logging in via /login page, no more manual cookie setting)
 - [X] T018 Test authentication flow (login via /login, verify events page works, verify unauthenticated request fails, logout and verify redirect)
 
-**Checkpoint**: Authentication working - can login at /login, existing event routes are protected, ready to build company features
+**Checkpoint**: Two-layer authentication complete - middleware protects pages, Server Actions protected, can login at /login, existing event routes fully secured, ready to build company features
 
 ---
 
@@ -352,14 +359,15 @@ Task: "Create CompanyCard component"
 
 ### MVP First (User Story 1 Only)
 
-1. Complete Phase 1: Setup (T011-T013)
-2. Complete Phase 2: Foundational (T014-T018) - CRITICAL blocking phase
-3. Complete Phase 3: User Story 1 (T019-T035)
-4. **STOP and VALIDATE**: Test User Story 1 independently per quickstart.md
+1. Complete Phase 1: Setup (T001-T003)
+2. Complete Phase 2: Foundational (T004-T008) - CRITICAL blocking phase
+3. Complete Phase 2.5: Authentication (T009-T018) - Two-layer security with middleware
+4. Complete Phase 3: User Story 1 (T019-T035)
+5. **STOP and VALIDATE**: Test User Story 1 independently per quickstart.md
    - Create company ✓
    - Create event with company ✓
    - View company name in events list ✓
-5. Deploy/demo if ready - **THIS IS A VIABLE MVP**
+6. Deploy/demo if ready - **THIS IS A VIABLE MVP**
 
 ### Incremental Delivery
 
@@ -387,10 +395,10 @@ With multiple developers:
 
 ## Task Count Summary
 
-- **Total Tasks**: 91
+- **Total Tasks**: 95
 - **Setup Phase (Phase 1)**: 3 tasks (T001-T003)
 - **Foundational Phase (Phase 2)**: 5 tasks (T004-T008) - CRITICAL, blocks all stories
-- **Authentication Phase (Phase 2.5)**: 10 tasks (T009-T018) - Implement before user stories
+- **Authentication Phase (Phase 2.5)**: 14 tasks (T009-T018, includes T010a-d for middleware) - Two-layer security
 - **User Story 1 (P1 - MVP)**: 17 tasks (T019-T035) - 3 tests + 14 implementation
 - **User Story 2 (P2)**: 11 tasks (T036-T046) - 3 tests + 8 implementation
 - **User Story 3 (P2)**: 8 tasks (T047-T054) - 2 tests + 6 implementation
@@ -400,7 +408,7 @@ With multiple developers:
 
 **Parallel Opportunities**: 37 tasks marked [P] can be parallelized within their phases
 
-**Suggested MVP Scope**: Phases 1-2.5-3 (Setup + Foundational + Auth + User Story 1) = 35 tasks
+**Suggested MVP Scope**: Phases 1-2.5-3 (Setup + Foundational + Auth + User Story 1) = 39 tasks
 
 ---
 
