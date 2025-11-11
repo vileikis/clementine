@@ -73,7 +73,6 @@ export class GoogleAIProvider implements AIClient {
     console.log('[GoogleAI] Response structure:', {
       hasCandidates: !!response.candidates,
       candidatesCount: response.candidates?.length || 0,
-      fullResponse: JSON.stringify(response, null, 2),
     });
 
     const candidates = response.candidates || [];
@@ -95,9 +94,9 @@ export class GoogleAIProvider implements AIClient {
         }
 
         // Log what we got instead
-        if (part.text) {
-          console.log('[GoogleAI] Got text instead of image:', part.text.substring(0, 200));
-        }
+        // if (part.text) {
+        //   console.log('[GoogleAI] Got text instead of image:', part.text.substring(0, 200));
+        // }
       }
     }
 
