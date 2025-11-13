@@ -131,10 +131,10 @@ This is a monorepo with web/ and functions/ workspaces. All paths below use `web
 - [x] T045 [US3] Implement full updateExperience Server Action with Zod validation in web/src/lib/actions/experiences.ts
 - [x] T046 [US3] Implement full deleteExperience Server Action in web/src/lib/actions/experiences.ts
 - [x] T047 [US3] Add experience deletion with confirmation dialog
-- [ ] T048 [US3] Add real-time experience list fetching from Firestore subcollection
-- [ ] T049 [US3] Connect ExperienceEditor to updateExperience Server Action
+- [x] T048 [US3] Add real-time experience list fetching from Firestore subcollection
+- [x] T049 [US3] Connect ExperienceEditor to updateExperience Server Action
 - [x] T050 [US3] Add all photo experience controls (label, capture options, overlays, AI configuration) to ExperienceEditor
-- [ ] T051 [US3] Verify experience creation, editing, and deletion work correctly in dev server
+- [x] T051 [US3] Verify experience creation, editing, and deletion work correctly in dev server
 
 **Checkpoint**: At this point, User Story 3 should be fully functional - Photo experiences can be added, configured, and managed
 
