@@ -31,7 +31,7 @@
 
 ## Validation Results
 
-**Status**: ✅ PASSED
+**Status**: ✅ PASSED (Updated after adding User Story 0)
 
 All checklist items have been validated and passed. The specification is complete and ready for planning phase.
 
@@ -41,6 +41,7 @@ All checklist items have been validated and passed. The specification is complet
 - ✅ All content is written from business/user perspective
 - ✅ Language is accessible to non-technical stakeholders
 - ✅ All mandatory sections (User Scenarios, Requirements, Success Criteria) are complete
+- ✅ New Assumptions section clearly documents phased implementation approach
 
 ### Requirement Completeness Review
 
@@ -48,18 +49,31 @@ All checklist items have been validated and passed. The specification is complet
 - ✅ All functional requirements (FR-001 through FR-024) are testable with clear conditions
 - ✅ Success criteria (SC-001 through SC-008) include specific metrics (time, percentages, counts)
 - ✅ Success criteria are user-focused without mentioning technologies
-- ✅ All 6 user stories include comprehensive acceptance scenarios with Given-When-Then format
+- ✅ All 7 user stories (0-6) include comprehensive acceptance scenarios with Given-When-Then format
+- ✅ User Story 0 (P0) correctly identifies the foundational navigation shell as the base infrastructure
+- ✅ User Story 1 (P1) correctly identifies the Content tab layout as the structure for all content features
 - ✅ Edge cases section identifies 7 potential boundary conditions
-- ✅ Scope is clearly bounded (photo experiences only, other types marked "coming soon")
+- ✅ Scope is clearly bounded with phased approach (layout-first strategy, photo experiences only)
 - ✅ Key entities section identifies all data models with references to events-data-model.md
+- ✅ Assumptions section clearly documents out-of-scope items and implementation phases
 
 ### Feature Readiness Review
 
 - ✅ All 24 functional requirements map to acceptance scenarios in user stories
-- ✅ User scenarios are prioritized (P1, P2, P3) and independently testable
+- ✅ User scenarios are prioritized (P0, P1, P2, P3) with clear dependency order
+- ✅ User Story 0 (P0) can be implemented independently with WIP/placeholder content
+- ✅ Each subsequent story builds on the previous infrastructure
 - ✅ Success criteria define measurable outcomes for the feature
 - ✅ No technical implementation details (React, Firestore, etc.) leak into requirements
 
 ## Notes
 
-Specification validation completed successfully on first iteration. The spec is comprehensive, well-structured, and ready to proceed to `/speckit.plan` or `/speckit.clarify`.
+**Update 2025-11-13**: Added User Story 0 (P0) for Base Events UI Navigation Shell as foundational infrastructure per user feedback. This story acts as the base that enables all other features and can be implemented with placeholder content first, supporting the layout-first implementation strategy.
+
+Specification validation completed successfully. The spec now correctly reflects the layered architecture:
+- **P0**: Navigation shell (foundation)
+- **P1**: Content layout + core features (welcome, experiences)
+- **P2**: Extended features (survey, ending)
+- **P3**: Future capabilities visibility
+
+Ready to proceed to `/speckit.plan` or `/speckit.clarify`.
