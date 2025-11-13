@@ -29,7 +29,7 @@ This quickstart guide provides step-by-step instructions for implementing the ev
 
 1. **Add new types to `lib/types/firestore.ts`**:
    ```typescript
-   // Experience types
+   // Experience types (only photo type implemented in this phase)
    export type ExperienceType = "photo" | "video" | "gif" | "wheel";
 
    export interface Experience {
@@ -41,17 +41,6 @@ This quickstart guide provides step-by-step instructions for implementing the ev
      // ... (see data-model-plan.md for full definition)
    }
 
-   // ExperienceItem types
-   export type ExperienceItemKind = "wheel_sector" | "choice" | "reward" | "generic";
-
-   export interface ExperienceItem {
-     id: string;
-     eventId: string;
-     experienceId: string;
-     kind: ExperienceItemKind;
-     // ... (see data-model-plan.md)
-   }
-
    // SurveyStep types
    export type SurveyStepType = "short_text" | "long_text" | "multiple_choice" | "opinion_scale" | "email" | "statement";
 
@@ -61,6 +50,9 @@ This quickstart guide provides step-by-step instructions for implementing the ev
      type: SurveyStepType;
      // ... (see data-model-plan.md)
    }
+
+   // Note: ExperienceItem, Session, Share, SurveyResponse, and Participant types
+   // are out of scope for this phase (see data-model-plan.md)
    ```
 
 2. **Extend Event interface** with new fields:
@@ -114,7 +106,15 @@ This quickstart guide provides step-by-step instructions for implementing the ev
      // ... (see data-model-plan.md for full schema)
    });
 
-   // Add schemas for ExperienceItem, SurveyStep, etc.
+   export const surveyStepTypeSchema = z.enum(["short_text", "long_text", "multiple_choice", "opinion_scale", "email", "statement"]);
+   export const surveyStepSchema = z.object({
+     id: z.string(),
+     eventId: z.string(),
+     type: surveyStepTypeSchema,
+     // ... (see data-model-plan.md for full schema)
+   });
+
+   // Note: ExperienceItem schemas are out of scope for this phase
    ```
 
 4. **Validation**:

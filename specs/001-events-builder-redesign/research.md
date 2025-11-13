@@ -63,9 +63,27 @@ This document consolidates research findings for the events builder redesign. Th
 - **Live iframe preview**: Rejected because it adds complexity (iframe communication, state sync) and isn't needed for this phase
 - **No previews at all**: Rejected because visual feedback is important for Welcome/Ending screens with custom colors/images
 
-### 5. Experience Type Selector (Dialog vs Inline)
+### 5. Experience Type Scope (Photo Only)
 
-**Decision**: Use a shadcn/ui Dialog component triggered by the "+" button in the Experiences section to select experience type (photo, video, gif, wheel).
+**Decision**: Only implement photo experience type in this phase. Video, GIF, and wheel types are defined in the type system but marked as "Coming soon" in the UI.
+
+**Rationale**:
+- **Focused scope**: User requirements state "We only implement photo ExperienceType, others can be present but disabled (coming soon)"
+- **Reduced complexity**: Photo experiences are simpler (single image capture + optional AI transformation). Video, GIF, and wheel experiences require additional infrastructure
+- **Future extensibility**: Type system includes all experience types for forward compatibility, but implementation is phased
+
+**Implications**:
+- ExperienceType enum includes all types: "photo" | "video" | "gif" | "wheel"
+- ExperienceItem collection (used by wheel experiences) is out of scope for this phase
+- Experience type selector dialog shows all types, but only photo is selectable (others show "Coming soon" badge)
+
+**Alternatives considered**:
+- **Hide non-photo types entirely**: Rejected because it's useful to show users what's coming and avoid confusion about why the type selector exists
+- **Implement all types at once**: Rejected because it violates YAGNI principle and extends timeline unnecessarily
+
+### 6. Experience Type Selector (Dialog vs Inline)
+
+**Decision**: Use a shadcn/ui Dialog component triggered by the "+" button in the Experiences section to select experience type (photo initially, others marked as "Coming soon").
 
 **Rationale**:
 - **Focus**: A modal dialog forces the user to make a deliberate choice before adding an experience, reducing accidental clicks
@@ -76,7 +94,7 @@ This document consolidates research findings for the events builder redesign. Th
 - **Inline dropdown**: Rejected because it's less discoverable and doesn't support showing "Coming soon" states with explanatory text
 - **Dedicated page**: Rejected because it adds unnecessary navigation overhead for a simple type selection
 
-### 6. Survey Step Reordering UI
+### 7. Survey Step Reordering UI
 
 **Decision**: Use drag-and-drop handles (using lucide-react GripVertical icon) for reordering survey steps in the sidebar list. Store order in `event.surveyStepsOrder` array.
 
@@ -89,7 +107,7 @@ This document consolidates research findings for the events builder redesign. Th
 - **Up/down arrow buttons**: Rejected because they require multiple clicks for large reorders and are less intuitive than drag-and-drop
 - **Order field on each step**: Rejected because it's prone to race conditions (concurrent updates to multiple steps) and requires updating multiple documents for reordering
 
-### 7. Data Model Migration Strategy
+### 8. Data Model Migration Strategy
 
 **Decision**: No migration required. New builder reads from new subcollections (experiences, surveySteps). Old builder (scenes) remains functional until deprecated.
 
@@ -127,7 +145,7 @@ The builder uses Tailwind CSS v4 utility classes for responsive layout:
 
 ### Zod Validation for New Types
 
-All new Firestore types (Experience, ExperienceItem, SurveyStep, etc.) must have corresponding Zod schemas in `lib/schemas/firestore.ts`:
+All new Firestore types in scope (Experience, SurveyStep) must have corresponding Zod schemas in `lib/schemas/firestore.ts`. ExperienceItem and other types are out of scope for this phase.
 
 ```typescript
 export const experienceTypeSchema = z.enum(["photo", "video", "gif", "wheel"]);

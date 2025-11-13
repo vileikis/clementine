@@ -156,48 +156,13 @@ interface Experience {
 - `enabled: false` → `enabled: true`: Experience becomes visible to guests
 - `enabled: true` → `enabled: false`: Experience hidden but not deleted
 
-### 3. ExperienceItem
+### 3. ExperienceItem (Out of Scope for This Phase)
 
 **Collection**: `/events/{eventId}/experienceItems/{itemId}`
 
-**Purpose**: Represents individual items within an experience (e.g., wheel sectors, choices, rewards). Currently only used for `type === "wheel"` experiences.
+**Purpose**: Represents individual items within an experience (e.g., wheel sectors, choices, rewards). Only used for `type === "wheel"` experiences.
 
-**TypeScript Interface**:
-```typescript
-type ExperienceItemKind = "wheel_sector" | "choice" | "reward" | "generic";
-
-interface ExperienceItem {
-  id: string;
-  eventId: string;
-  experienceId: string;
-
-  kind: ExperienceItemKind;
-  label: string;
-  value?: string;
-
-  weight?: number;
-  order?: number;
-
-  meta?: Record<string, unknown>;
-
-  createdAt: number;
-  updatedAt: number;
-}
-```
-
-**Validation Rules**:
-- `label`: Required, 1-100 characters
-- `value`: Optional, max 500 characters
-- `weight`: Optional, integer ≥ 1, default 1
-- `order`: Optional, integer ≥ 0
-- `meta`: Optional, arbitrary JSON object
-
-**Relationships**:
-- **Belongs to** event (via `eventId`)
-- **Belongs to** experience (via `experienceId`)
-
-**State Transitions**:
-- No state transitions (static configuration)
+**Note**: ExperienceItem is out of scope for this phase. Only photo experiences are being implemented; wheel experiences (which use ExperienceItems) are marked as "coming soon" in the builder UI. This collection will be implemented in a future phase when wheel experiences are added.
 
 ### 4. SurveyStep
 

@@ -7,19 +7,19 @@
 
 ## Summary
 
-Redesign the events builder to transition from the current scene-based architecture to a more scalable experience-collection model. The new builder will feature a tabbed interface (Content, Distribute, Results) with a left sidebar for navigation between Welcome screen, Experiences, Survey, and Ending sections. Each section will have its own design controls and preview. The data model introduces new Firestore subcollections: /experiences, /experienceItems, /surveySteps, /surveyResponses, /participants, /sessions, and /shares under each event. This phase focuses exclusively on the builder UI (Content tab with static previews), leaving guest experience implementation for a separate project.
+Redesign the events builder to transition from the current scene-based architecture to a more scalable experience-collection model. The new builder will feature a tabbed interface (Content, Distribute, Results) with a left sidebar for navigation between Welcome screen, Experiences, Survey, and Ending sections. Each section will have its own design controls and preview. The data model introduces new Firestore subcollections under each event: /experiences and /surveySteps (in scope for this phase), plus /experienceItems, /surveyResponses, /participants, /sessions, and /shares (documented but out of scope). This phase focuses exclusively on the builder UI (Content tab with static previews) for photo experiences only, leaving guest experience implementation and other experience types for separate projects.
 
 ## Technical Context
 
 **Language/Version**: TypeScript 5.x (strict mode), Next.js 16 (App Router), React 19
 **Primary Dependencies**: Firebase (Firestore + Storage), Zod 4.x, Tailwind CSS v4, shadcn/ui, lucide-react
-**Storage**: Firestore (events collection with 7 subcollections: experiences, experienceItems, surveySteps, surveyResponses, participants, sessions, shares), Firebase Storage (images/media)
+**Storage**: Firestore (events collection + in-scope subcollections: experiences, surveySteps; out-of-scope: experienceItems, surveyResponses, participants, sessions, shares), Firebase Storage (images/media)
 **Testing**: Jest for unit tests, React Testing Library for components (minimal strategy per constitution)
 **Target Platform**: Web (Next.js SSR + Client Components), mobile-first (320px-768px primary viewport)
 **Project Type**: Web application (monorepo structure: web/ and functions/ workspaces)
-**Performance Goals**: Event builder page load < 2s on 4G, real-time preview updates < 300ms, support up to 20 experiences per event
+**Performance Goals**: Event builder page load < 2s on 4G, real-time preview updates < 300ms, support up to 20 experiences per event (photo type only)
 **Constraints**: Mobile-first design (44x44px touch targets), TypeScript strict mode (no `any`), Zod validation for all external inputs, Firebase security rules (allow reads, deny writes from client)
-**Scale/Scope**: Support 100+ events per company, 20+ experiences per event, 50+ survey steps per event, builder UI only (guest experience out of scope)
+**Scale/Scope**: Support 100+ events per company, 20+ photo experiences per event, 50+ survey steps per event, builder UI only (guest experience out of scope)
 
 ## Constitution Check
 
