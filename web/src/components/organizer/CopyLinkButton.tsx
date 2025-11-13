@@ -2,6 +2,12 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Check, Copy } from "lucide-react";
 
 interface CopyLinkButtonProps {
@@ -9,7 +15,7 @@ interface CopyLinkButtonProps {
 }
 
 /**
- * Button to copy event join link to clipboard
+ * Icon button to copy event join link to clipboard with tooltip
  * Part of Phase 3 (User Story 0) - Base Events UI Navigation Shell
  */
 export function CopyLinkButton({ joinPath }: CopyLinkButtonProps) {
@@ -23,24 +29,27 @@ export function CopyLinkButton({ joinPath }: CopyLinkButtonProps) {
   };
 
   return (
-    <Button
-      variant="outline"
-      size="sm"
-      onClick={handleCopy}
-      className="min-h-[44px] min-w-[44px]"
-      aria-label={copied ? "Link copied" : "Copy event link"}
-    >
-      {copied ? (
-        <>
-          <Check className="h-4 w-4 mr-2" aria-hidden="true" />
-          Copied
-        </>
-      ) : (
-        <>
-          <Copy className="h-4 w-4 mr-2" aria-hidden="true" />
-          Copy Link
-        </>
-      )}
-    </Button>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={handleCopy}
+            className="h-9 w-9"
+            aria-label={copied ? "Link copied" : "Copy event link"}
+          >
+            {copied ? (
+              <Check className="h-4 w-4" aria-hidden="true" />
+            ) : (
+              <Copy className="h-4 w-4" aria-hidden="true" />
+            )}
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{copied ? "Copied!" : "Copy link"}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }
