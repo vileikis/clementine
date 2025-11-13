@@ -7,10 +7,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { PreviewPanel } from "./PreviewPanel";
+import { ImageUploadField } from "./ImageUploadField";
 import { updateEventWelcome } from "@/lib/actions/events";
-import { uploadImage } from "@/lib/actions/storage";
 import { useRouter } from "next/navigation";
-import { Upload, CheckCircle2, XCircle } from "lucide-react";
+import { CheckCircle2, XCircle } from "lucide-react";
 
 interface WelcomeEditorProps {
   event: Event;
@@ -18,7 +18,6 @@ interface WelcomeEditorProps {
 
 export function WelcomeEditor({ event }: WelcomeEditorProps) {
   const [isPending, startTransition] = useTransition();
-  const [isUploading, setIsUploading] = useState(false);
   const [saveMessage, setSaveMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const router = useRouter();
 
@@ -33,37 +32,6 @@ export function WelcomeEditor({ event }: WelcomeEditorProps) {
   const [welcomeBackgroundImagePath, setWelcomeBackgroundImagePath] = useState(
     event.welcomeBackgroundImagePath || ""
   );
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setIsUploading(true);
-    setSaveMessage(null);
-
-    try {
-      const result = await uploadImage(file, "welcome");
-
-      if (result.success) {
-        // Store the URL directly for easy display
-        setWelcomeBackgroundImagePath(result.data.url);
-        setSaveMessage({ type: "success", text: "Background image uploaded successfully" });
-        setTimeout(() => setSaveMessage(null), 3000);
-      } else {
-        setSaveMessage({ type: "error", text: result.error.message });
-        setTimeout(() => setSaveMessage(null), 5000);
-      }
-    } catch {
-      setSaveMessage({ type: "error", text: "An unexpected error occurred during upload" });
-      setTimeout(() => setSaveMessage(null), 5000);
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
-  const handleRemoveImage = () => {
-    setWelcomeBackgroundImagePath("");
-  };
 
   const handleSave = () => {
     setSaveMessage(null);
@@ -187,56 +155,21 @@ export function WelcomeEditor({ event }: WelcomeEditorProps) {
           </div>
 
           {/* Background Image */}
-          <div className="space-y-2">
-            <Label htmlFor="welcome-bg-image">Background Image</Label>
-            <div className="space-y-2">
-              {welcomeBackgroundImagePath && (
-                <div className="relative aspect-video w-full overflow-hidden rounded-lg border">
-                  <img
-                    src={welcomeBackgroundImagePath}
-                    alt="Welcome background"
-                    className="h-full w-full object-cover"
-                  />
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    className="absolute top-2 right-2"
-                    onClick={handleRemoveImage}
-                    disabled={isUploading || isPending}
-                  >
-                    Remove
-                  </Button>
-                </div>
-              )}
-              <div className="relative">
-                <input
-                  id="welcome-bg-image"
-                  type="file"
-                  accept="image/png,image/jpeg,image/webp"
-                  onChange={handleImageUpload}
-                  disabled={isUploading || isPending}
-                  className="hidden"
-                />
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  disabled={isUploading || isPending}
-                  onClick={() => document.getElementById("welcome-bg-image")?.click()}
-                >
-                  <Upload className="mr-2 h-4 w-4" />
-                  {isUploading ? "Uploading..." : "Upload Image"}
-                </Button>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Recommended: 1080x1920px (9:16 aspect ratio). Max 10MB.
-              </p>
-            </div>
-          </div>
+          <ImageUploadField
+            id="welcome-bg-image"
+            label="Background Image"
+            value={welcomeBackgroundImagePath}
+            onChange={setWelcomeBackgroundImagePath}
+            destination="welcome"
+            disabled={isPending}
+            aspectRatio="aspect-video"
+            recommendedSize="Recommended: 1080x1920px (9:16 aspect ratio). Max 10MB."
+          />
 
           {/* Save Button */}
           <Button
             onClick={handleSave}
-            disabled={isPending || isUploading}
+            disabled={isPending}
             className="w-full"
           >
             {isPending ? "Saving..." : "Save Changes"}
