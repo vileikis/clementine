@@ -73,9 +73,7 @@ describe("Events Repository", () => {
         id: "scene-456",
         label: "Default Scene v1",
         mode: "photo",
-        effect: "background_swap",
         prompt: "Apply clean studio background with brand color accents.",
-        defaultPrompt: "Apply clean studio background with brand color accents.",
         flags: {
           customTextTool: false,
           stickersTool: false,
@@ -98,6 +96,20 @@ describe("Events Repository", () => {
         qrPngPath: "events/event-123/qr/join.png",
         createdAt: 1234567890,
         updatedAt: 1234567890,
+        companyId: null,
+        shareAllowDownload: true,
+        shareAllowSystemShare: true,
+        shareAllowEmail: true,
+        shareSocials: [],
+        surveyEnabled: false,
+        surveyRequired: false,
+        surveyStepsCount: 0,
+        surveyStepsOrder: [],
+        surveyVersion: 1,
+        experiencesCount: 0,
+        sessionsCount: 0,
+        readyCount: 0,
+        sharesCount: 0,
       };
 
       const mockDoc = {
@@ -280,6 +292,45 @@ describe("Events Repository", () => {
           companyId: null,
           createdAt: 2000000000,
           updatedAt: 2000000000,
+          shareAllowDownload: true,
+          shareAllowSystemShare: true,
+          shareAllowEmail: true,
+          shareSocials: [],
+          surveyEnabled: false,
+          surveyRequired: false,
+          surveyStepsCount: 0,
+          surveyStepsOrder: [],
+          surveyVersion: 1,
+          experiencesCount: 0,
+          sessionsCount: 0,
+          readyCount: 0,
+          sharesCount: 0,
+        },
+        {
+          id: "event-2",
+          title: "Company Event",
+          brandColor: "#222222",
+          showTitleOverlay: false,
+          status: "draft",
+          currentSceneId: "scene-2",
+          joinPath: "/join/event-2",
+          qrPngPath: "events/event-2/qr/join.png",
+          companyId: "company-a",
+          createdAt: 1000000000,
+          updatedAt: 1000000000,
+          shareAllowDownload: true,
+          shareAllowSystemShare: true,
+          shareAllowEmail: true,
+          shareSocials: [],
+          surveyEnabled: false,
+          surveyRequired: false,
+          surveyStepsCount: 0,
+          surveyStepsOrder: [],
+          surveyVersion: 1,
+          experiencesCount: 0,
+          sessionsCount: 0,
+          readyCount: 0,
+          sharesCount: 0,
         },
       ];
 
@@ -292,18 +343,13 @@ describe("Events Repository", () => {
         get: jest.fn().mockResolvedValue({ docs: mockDocs }),
       });
 
-      const mockWhere = jest.fn().mockReturnValue({
-        orderBy: mockOrderBy,
-      });
-
       mockDb.collection.mockReturnValue({
-        where: mockWhere,
+        orderBy: mockOrderBy,
       });
 
       const events = await listEvents({ companyId: null });
 
       expect(mockDb.collection).toHaveBeenCalledWith("events");
-      expect(mockWhere).toHaveBeenCalledWith("companyId", "==", null);
       expect(mockOrderBy).toHaveBeenCalledWith("createdAt", "desc");
       expect(events).toHaveLength(1);
       expect(events[0].companyId).toBeNull();

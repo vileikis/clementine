@@ -12,6 +12,11 @@ export async function updateScene(
     referenceImagePath?: string | null;
   }
 ): Promise<void> {
+  // Validate prompt length
+  if (updates.prompt !== undefined && updates.prompt !== null && updates.prompt.length > 600) {
+    throw new Error("Prompt must be 600 characters or less");
+  }
+
   await db
     .collection("events")
     .doc(eventId)
