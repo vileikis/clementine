@@ -66,8 +66,8 @@ This is a monorepo with web/ and functions/ workspaces. All paths below use `web
 - [x] T019 [P] [US0] Create EditableEventName component in web/src/components/organizer/EditableEventName.tsx
 - [x] T020 [P] [US0] Create EventStatusSwitcher component in web/src/components/organizer/EventStatusSwitcher.tsx
 - [x] T021 [P] [US0] Create CopyLinkButton component in web/src/components/organizer/CopyLinkButton.tsx
-- [x] T022 [US0] Update event layout in web/src/app/(admin)/events/[eventId]/layout.tsx to include breadcrumb, tabs, and action buttons
-- [x] T023 [P] [US0] Create results page with placeholder analytics in web/src/app/(admin)/events/[eventId]/results/page.tsx
+- [x] T022 [US0] Update event layout in web/src/app/(event-builder)/events/[eventId]/layout.tsx to include breadcrumb, tabs, and action buttons
+- [x] T023 [P] [US0] Create results page with placeholder analytics in web/src/app/(event-builder)/events/[eventId]/results/page.tsx
 - [x] T024 [US0] Verify layout renders correctly in dev server and tabs navigate properly
 
 **Checkpoint**: At this point, User Story 0 should be fully functional - event pages show custom navigation with working tabs
@@ -85,7 +85,7 @@ This is a monorepo with web/ and functions/ workspaces. All paths below use `web
 - [ ] T025 [P] [US1] Create BuilderSidebar component in web/src/components/organizer/builder/BuilderSidebar.tsx
 - [ ] T026 [P] [US1] Create BuilderContent component in web/src/components/organizer/builder/BuilderContent.tsx
 - [ ] T027 [P] [US1] Create PreviewPanel reusable component in web/src/components/organizer/builder/PreviewPanel.tsx
-- [ ] T028 [US1] Create content page in web/src/app/(admin)/events/[eventId]/content/page.tsx that uses BuilderSidebar and BuilderContent
+- [ ] T028 [US1] Create content page in web/src/app/(event-builder)/events/[eventId]/content/page.tsx that uses BuilderSidebar and BuilderContent
 - [ ] T029 [US1] Add mobile-responsive behavior to BuilderSidebar (collapsible on mobile, fixed on desktop)
 - [ ] T030 [US1] Verify sidebar renders with static placeholders for Welcome, Experiences, Survey, Ending sections
 
