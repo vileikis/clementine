@@ -82,12 +82,12 @@ This is a monorepo with web/ and functions/ workspaces. All paths below use `web
 
 ### Implementation for User Story 1
 
-- [ ] T025 [P] [US1] Create BuilderSidebar component in web/src/components/organizer/builder/BuilderSidebar.tsx
-- [ ] T026 [P] [US1] Create BuilderContent component in web/src/components/organizer/builder/BuilderContent.tsx
-- [ ] T027 [P] [US1] Create PreviewPanel reusable component in web/src/components/organizer/builder/PreviewPanel.tsx
-- [ ] T028 [US1] Create content page in web/src/app/(event-builder)/events/[eventId]/content/page.tsx that uses BuilderSidebar and BuilderContent
-- [ ] T029 [US1] Add mobile-responsive behavior to BuilderSidebar (collapsible on mobile, fixed on desktop)
-- [ ] T030 [US1] Verify sidebar renders with static placeholders for Welcome, Experiences, Survey, Ending sections
+- [X] T025 [P] [US1] Create BuilderSidebar component in web/src/components/organizer/builder/BuilderSidebar.tsx
+- [X] T026 [P] [US1] Create BuilderContent component in web/src/components/organizer/builder/BuilderContent.tsx
+- [X] T027 [P] [US1] Create PreviewPanel reusable component in web/src/components/organizer/builder/PreviewPanel.tsx
+- [X] T028 [US1] Create content page in web/src/app/(event-builder)/events/[eventId]/content/page.tsx that uses BuilderSidebar and BuilderContent
+- [X] T029 [US1] Add mobile-responsive behavior to BuilderSidebar (collapsible on mobile, fixed on desktop)
+- [X] T030 [US1] Verify sidebar renders with static placeholders for Welcome, Experiences, Survey, Ending sections
 
 **Checkpoint**: At this point, User Story 1 should be fully functional - Content tab shows sidebar with all sections
 
