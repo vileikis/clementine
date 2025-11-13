@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/lib/firebase/admin";
-import { updateEventWelcomeSchema } from "@/lib/schemas/firestore";
+import { updateEventWelcomeSchema, updateEventEndingSchema } from "@/lib/schemas/firestore";
 
 /**
  * Server Actions for event-level mutations.
@@ -99,8 +99,52 @@ export async function updateEventEnding(
     >;
   }
 ): Promise<ActionResponse<void>> {
-  // TODO: Implement in Phase 8 (User Story 5)
-  throw new Error("Not implemented");
+  try {
+    // Validate input with Zod
+    const validatedData = updateEventEndingSchema.parse(data);
+
+    // Check if event exists
+    const eventRef = db.collection("events").doc(eventId);
+    const eventDoc = await eventRef.get();
+
+    if (!eventDoc.exists) {
+      return {
+        success: false,
+        error: {
+          code: "EVENT_NOT_FOUND",
+          message: "Event not found",
+        },
+      };
+    }
+
+    // Update only provided fields
+    await eventRef.update({
+      ...validatedData,
+      updatedAt: Date.now(),
+    });
+
+    return { success: true, data: undefined };
+  } catch (error) {
+    // Handle Zod validation errors
+    if (error && typeof error === "object" && "issues" in error) {
+      return {
+        success: false,
+        error: {
+          code: "VALIDATION_ERROR",
+          message: "Invalid input data",
+        },
+      };
+    }
+
+    // Handle other errors
+    return {
+      success: false,
+      error: {
+        code: "INTERNAL_ERROR",
+        message: error instanceof Error ? error.message : "Unknown error",
+      },
+    };
+  }
 }
 
 /**

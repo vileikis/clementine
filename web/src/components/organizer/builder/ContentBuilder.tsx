@@ -9,6 +9,7 @@ import { PreviewPanel } from "./PreviewPanel";
 import { WelcomeEditor } from "./WelcomeEditor";
 import { ExperienceEditor } from "./ExperienceEditor";
 import { ExperienceTypeDialog } from "./ExperienceTypeDialog";
+import { EndingEditor } from "./EndingEditor";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -164,33 +165,7 @@ export function ContentBuilder({ event }: ContentBuilderProps) {
         );
 
       case "ending":
-        return (
-          <div className="space-y-6">
-            <p className="text-sm text-muted-foreground">
-              Configure the ending screen and share options.
-            </p>
-            <PreviewPanel title="Ending Preview">
-              <div className="flex flex-col items-center justify-center h-full p-6">
-                <div className="text-center space-y-4">
-                  <h2 className="text-xl font-bold">
-                    {event.endHeadline || "Thanks for participating!"}
-                  </h2>
-                  <p className="text-sm text-muted-foreground">
-                    {event.endBody || "Share your result with friends."}
-                  </p>
-                  <button className="px-6 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium">
-                    {event.endCtaLabel || "Share Now"}
-                  </button>
-                </div>
-              </div>
-            </PreviewPanel>
-            <div className="border rounded-lg p-6 bg-muted/50">
-              <p className="text-sm text-muted-foreground text-center">
-                Ending editor controls will be implemented in Phase 8 (User Story 5)
-              </p>
-            </div>
-          </div>
-        );
+        return <EndingEditor event={event} />;
 
       default:
         return null;
