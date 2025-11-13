@@ -1,9 +1,10 @@
-import Link from "next/link"
 import { getEventAction } from "@/app/actions/events"
 import { notFound } from "next/navigation"
-import { TabLink } from "@/components/organizer/TabLink"
+import { EventBreadcrumb } from "@/components/organizer/EventBreadcrumb"
+import { EventTabs } from "@/components/organizer/EventTabs"
 import { EventStatusSwitcher } from "@/components/organizer/EventStatusSwitcher"
 import { EditableEventName } from "@/components/organizer/EditableEventName"
+import { CopyLinkButton } from "@/components/organizer/CopyLinkButton"
 
 interface EventLayoutProps {
   children: React.ReactNode
@@ -24,41 +25,25 @@ export default async function EventLayout({
   const event = result.event
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      <div className="mb-6">
-        <Link
-          href="/events"
-          className="text-sm text-muted-foreground hover:text-foreground"
-        >
-          ← Back to Events
-        </Link>
-      </div>
+    <div className="max-w-6xl mx-auto px-4 py-8">
+      {/* Breadcrumb navigation */}
+      <EventBreadcrumb eventName={event.title} />
 
+      {/* Event header with name, status, and copy link button */}
       <div className="mb-8">
-        <div className="flex items-start justify-between mb-2">
+        <div className="flex items-start justify-between gap-4 mb-4">
           <EditableEventName eventId={event.id} currentTitle={event.title} />
-          <EventStatusSwitcher eventId={event.id} currentStatus={event.status} />
+          <div className="flex items-center gap-3">
+            <CopyLinkButton joinPath={event.joinPath} />
+            <EventStatusSwitcher eventId={event.id} currentStatus={event.status} />
+          </div>
         </div>
-        <p className="text-sm text-muted-foreground">
-          Brand:{" "}
-          <span
-            className="inline-block w-3 h-3 rounded align-middle"
-            style={{ backgroundColor: event.brandColor }}
-          />{" "}
-          {event.brandColor}
-        </p>
       </div>
 
-      <nav className="border-b mb-8">
-        <ul className="flex gap-8">
-          <TabLink href={`/events/${eventId}/scene`}>Scene</TabLink>
-          <TabLink href={`/events/${eventId}/branding`}>Branding</TabLink>
-          <TabLink href={`/events/${eventId}/distribution`}>
-            Distribution
-          </TabLink>
-        </ul>
-      </nav>
+      {/* Tab navigation */}
+      <EventTabs eventId={eventId} />
 
+      {/* Page content */}
       {children}
     </div>
   )

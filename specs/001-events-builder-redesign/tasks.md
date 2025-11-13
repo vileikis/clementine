@@ -61,14 +61,14 @@ This is a monorepo with web/ and functions/ workspaces. All paths below use `web
 
 ### Implementation for User Story 0
 
-- [ ] T017 [P] [US0] Create EventBreadcrumb component in web/src/components/organizer/EventBreadcrumb.tsx
-- [ ] T018 [P] [US0] Create EventTabs component in web/src/components/organizer/EventTabs.tsx
-- [ ] T019 [P] [US0] Create EditableEventName component in web/src/components/organizer/EditableEventName.tsx
-- [ ] T020 [P] [US0] Create EventStatusSwitcher component in web/src/components/organizer/EventStatusSwitcher.tsx
-- [ ] T021 [P] [US0] Create CopyLinkButton component in web/src/components/organizer/CopyLinkButton.tsx
-- [ ] T022 [US0] Update event layout in web/src/app/(admin)/events/[eventId]/layout.tsx to include breadcrumb, tabs, and action buttons
-- [ ] T023 [P] [US0] Create results page with placeholder analytics in web/src/app/(admin)/events/[eventId]/results/page.tsx
-- [ ] T024 [US0] Verify layout renders correctly in dev server and tabs navigate properly
+- [x] T017 [P] [US0] Create EventBreadcrumb component in web/src/components/organizer/EventBreadcrumb.tsx
+- [x] T018 [P] [US0] Create EventTabs component in web/src/components/organizer/EventTabs.tsx
+- [x] T019 [P] [US0] Create EditableEventName component in web/src/components/organizer/EditableEventName.tsx
+- [x] T020 [P] [US0] Create EventStatusSwitcher component in web/src/components/organizer/EventStatusSwitcher.tsx
+- [x] T021 [P] [US0] Create CopyLinkButton component in web/src/components/organizer/CopyLinkButton.tsx
+- [x] T022 [US0] Update event layout in web/src/app/(admin)/events/[eventId]/layout.tsx to include breadcrumb, tabs, and action buttons
+- [x] T023 [P] [US0] Create results page with placeholder analytics in web/src/app/(admin)/events/[eventId]/results/page.tsx
+- [x] T024 [US0] Verify layout renders correctly in dev server and tabs navigate properly
 
 **Checkpoint**: At this point, User Story 0 should be fully functional - event pages show custom navigation with working tabs
 
