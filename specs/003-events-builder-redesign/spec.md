@@ -7,13 +7,52 @@
 
 ## User Scenarios & Testing *(mandatory)*
 
-### User Story 1 - Configure Welcome Screen (Priority: P1)
+### User Story 0 - Base Events UI Navigation Shell (Priority: P0)
+
+As an event creator, I need a custom navigation interface when viewing a specific event so that I can access all event management features from a central location.
+
+**Why this priority**: This is the foundational infrastructure that enables all other features. Without this navigation shell, no other event builder features can be accessed. It must be implemented first.
+
+**Independent Test**: Can be fully tested by navigating to an event page and verifying the custom navigation renders correctly with all required elements, even if tabs show WIP/placeholder content.
+
+**Acceptance Scenarios**:
+
+1. **Given** I navigate to a specific event URL, **When** the page loads, **Then** the default app navigation is hidden and replaced with custom event navigation
+2. **Given** I am viewing an event, **When** I look at the navigation, **Then** I see: Events breadcrumb, Event name, Content/Distribute/Results tabs, Copy link button, and Status dropdown in a single row
+3. **Given** I am viewing an event, **When** I click on "Events" in the breadcrumb, **Then** I am redirected to the main events dashboard
+4. **Given** I am viewing an event, **When** I click on the event name, **Then** an edit name dialog opens
+5. **Given** I am viewing an event, **When** I click the Copy link button, **Then** the event join link is copied to clipboard
+6. **Given** I am viewing an event, **When** the page loads, **Then** the Content tab is selected by default
+7. **Given** I click on the Distribute tab, **When** the tab loads, **Then** I see the distribution settings (same as current implementation)
+8. **Given** I click on the Results tab, **When** the tab loads, **Then** I see placeholder analytics showing: "0 sessions, 0 shares, 0 downloads, 0 reach" with "WIP coming soon" message below
+9. **Given** the Content tab is not yet implemented, **When** I click on the Content tab, **Then** I see a WIP/placeholder message (acceptable until other stories are implemented)
+
+---
+
+### User Story 1 - Content Tab Layout Infrastructure (Priority: P1)
+
+As an event creator, I need the Content tab to have a structured layout with left sidebar and main content area so that I can organize and access all event configuration sections.
+
+**Why this priority**: The Content tab layout is the foundation for all event configuration features (welcome, experiences, survey, ending). Without this structure, no content features can be built.
+
+**Independent Test**: Can be fully tested by navigating to the Content tab and verifying the layout renders with left sidebar containing four sections (Welcome, Experiences, Survey, Ending) and a main content area, even if sections show placeholder content.
+
+**Acceptance Scenarios**:
+
+1. **Given** I am viewing an event, **When** I click on the Content tab, **Then** I see a layout with left sidebar and main content area
+2. **Given** I am on the Content tab, **When** I view the left sidebar, **Then** I see four sections: Welcome (single item), Experiences (with + button), Survey (with + button), and Ending (single item)
+3. **Given** I click on any sidebar item, **When** the selection changes, **Then** the main content area updates to show relevant controls (or placeholder if not yet implemented)
+4. **Given** I am viewing the Content tab on mobile, **When** the page loads, **Then** the sidebar is collapsible/toggleable to allow full-width content view
+
+---
+
+### User Story 2 - Configure Welcome Screen (Priority: P1)
 
 As an event creator, I need to configure the welcome screen for my event so that guests see branded entry experience when they join.
 
-**Why this priority**: The welcome screen is the first touchpoint for guests and critical for brand identity. Without it, the event cannot be used.
+**Why this priority**: The welcome screen is the first guest touchpoint and critical for brand identity.
 
-**Independent Test**: Can be fully tested by creating an event, configuring welcome settings (title, description, CTA, colors/background), and verifying the preview displays correctly.
+**Independent Test**: Can be fully tested by clicking the Welcome item in the sidebar, configuring welcome settings (title, description, CTA, colors/background), and verifying the preview displays correctly.
 
 **Acceptance Scenarios**:
 
@@ -25,13 +64,13 @@ As an event creator, I need to configure the welcome screen for my event so that
 
 ---
 
-### User Story 2 - Manage Photo Experiences (Priority: P1)
+### User Story 3 - Manage Photo Experiences (Priority: P1)
 
 As an event creator, I need to add and configure photo experiences so that guests can capture and transform photos during the event.
 
 **Why this priority**: Photo experiences are the core value proposition of the platform and the minimum viable experience type.
 
-**Independent Test**: Can be fully tested by adding a photo experience, configuring its settings (label, overlays, AI settings), and verifying it appears in the experiences list and can be edited.
+**Independent Test**: Can be fully tested by clicking the + button in Experiences section, adding a photo experience, configuring its settings (label, overlays, AI settings), and verifying it appears in the experiences list and can be edited.
 
 **Acceptance Scenarios**:
 
@@ -41,25 +80,6 @@ As an event creator, I need to add and configure photo experiences so that guest
 4. **Given** I am editing a photo experience, **When** I configure settings (label, capture options, overlays, AI prompt), **Then** the settings are saved
 5. **Given** I have multiple experiences, **When** I view the experiences list, **Then** I see each experience listed with its label
 6. **Given** I select a photo experience, **When** I view the experience editor, **Then** I see controls similar to the current scene builder interface
-
----
-
-### User Story 3 - Navigate Event Builder (Priority: P1)
-
-As an event creator, I need to navigate between event sections (Content, Distribute, Results) so that I can manage all aspects of my event.
-
-**Why this priority**: Navigation is essential infrastructure for accessing all event features. Without proper navigation, creators cannot access other features.
-
-**Independent Test**: Can be fully tested by creating an event, navigating between tabs, and verifying the correct content is displayed for each tab.
-
-**Acceptance Scenarios**:
-
-1. **Given** I navigate to a specific event, **When** the page loads, **Then** I see custom navigation with: Events breadcrumb, Event name, Content/Distribute/Results tabs, Copy link button, and Status dropdown
-2. **Given** I am viewing an event, **When** I click on "Events" in the breadcrumb, **Then** I am redirected to the main events dashboard
-3. **Given** I am viewing an event, **When** I click on the event name, **Then** an edit name dialog opens
-4. **Given** I am on any tab, **When** I click the "Content" tab, **Then** I see the event builder interface
-5. **Given** I am on any tab, **When** I click the "Distribute" tab, **Then** I see the distribution settings (same as current implementation)
-6. **Given** I am on any tab, **When** I click the "Results" tab, **Then** I see placeholder analytics with 0 sessions/shares/downloads/reach and "WIP coming soon" message
 
 ---
 
@@ -123,6 +143,26 @@ As an event creator, I want to see all available experience types (photo, video,
 - What happens when a user navigates away from the builder with unsaved changes?
 - How does the system handle concurrent edits to the same event by multiple users?
 - What happens when an experience is deleted but is still referenced in guest sessions?
+
+## Assumptions
+
+### Implementation Approach
+
+- **Phased Development**: Implementation will follow a phased approach, starting with layout structure before adding business logic
+  - **Phase 0**: Base Events UI navigation shell (User Story 0) - can show WIP/placeholder content initially
+  - **Phase 1**: Content tab layout infrastructure (User Story 1) - establishes structure for all content features
+  - **Phase 2**: Individual content features (User Stories 2-6) - implement welcome, experiences, survey, ending configurations
+- **Layout-First Strategy**: The core layout (navigation shell + Content tab structure) will be implemented first to ensure correct visual structure, then features will be added incrementally
+- **Out of Scope for Initial Implementation**:
+  - Denormalized counters on events collection (can be added later without update logic)
+  - Collections: /experienceItems, /participants, /sessions, /shares (guest experience is separate project)
+  - Experience types: Only photo experiences are functional; video, gif, and wheel are visible but disabled with "coming soon" indicators
+
+### Data Model
+
+- Event data follows the structure defined in events-data-model.md
+- Experience types supported: "photo" (functional), "video" | "gif" | "wheel" (visible but disabled)
+- Survey step types supported: "short_text" | "long_text" | "multiple_choice" | "opinion_scale" | "email" | "statement"
 
 ## Requirements *(mandatory)*
 
