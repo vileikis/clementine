@@ -18,7 +18,6 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { createExperience, updateExperience, deleteExperience } from "@/lib/actions/experiences";
-import { uploadImage } from "@/lib/actions/storage";
 import { toast } from "sonner";
 import type { Event, Experience } from "@/lib/types/firestore";
 
@@ -100,12 +99,12 @@ export function ContentBuilder({ event }: ContentBuilderProps) {
     }
   };
 
-  // Handle experience update
-  const handleUpdateExperience = async (experienceId: string, data: Partial<Experience>) => {
+  // Handle experience save
+  const handleSaveExperience = async (experienceId: string, data: Partial<Experience>) => {
     const result = await updateExperience(event.id, experienceId, data);
 
     if (!result.success) {
-      toast.error(result.error.message);
+      throw new Error(result.error.message);
     }
   };
 
@@ -117,21 +116,6 @@ export function ContentBuilder({ event }: ContentBuilderProps) {
       setSelectedExperienceId(null);
       toast.success("Experience deleted successfully.");
     } else {
-      toast.error(result.error.message);
-    }
-  };
-
-  // Handle image upload
-  const handleUploadImage = async (
-    file: File,
-    destination: "experience-preview" | "experience-overlay" | "ai-reference"
-  ) => {
-    const result = await uploadImage(file, destination);
-
-    if (result.success) {
-      return result.data;
-    } else {
-      toast.error(result.error.message);
       throw new Error(result.error.message);
     }
   };
@@ -160,9 +144,8 @@ export function ContentBuilder({ event }: ContentBuilderProps) {
         return (
           <ExperienceEditor
             experience={selectedExperience}
-            onUpdate={handleUpdateExperience}
+            onSave={handleSaveExperience}
             onDelete={handleDeleteExperience}
-            onUploadImage={handleUploadImage}
           />
         );
 
