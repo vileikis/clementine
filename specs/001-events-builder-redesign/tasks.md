@@ -23,17 +23,17 @@ This is a monorepo with web/ and functions/ workspaces. All paths below use `web
 
 **Purpose**: Data model setup and basic type infrastructure
 
-- [ ] T001 [P] Add Experience type to web/src/lib/types/firestore.ts
-- [ ] T002 [P] Add SurveyStep type to web/src/lib/types/firestore.ts
-- [ ] T003 [P] Add ExperienceItem type to web/src/lib/types/firestore.ts (documented but out of scope for implementation)
-- [ ] T004 Extend Event interface with welcome fields (welcomeTitle, welcomeDescription, welcomeCtaLabel, welcomeBackgroundImagePath, welcomeBackgroundColorHex) in web/src/lib/types/firestore.ts
-- [ ] T005 Extend Event interface with ending fields (endHeadline, endBody, endCtaLabel, endCtaUrl) in web/src/lib/types/firestore.ts
-- [ ] T006 Extend Event interface with share fields (shareAllowDownload, shareAllowSystemShare, shareAllowEmail, shareSocials) in web/src/lib/types/firestore.ts
-- [ ] T007 Extend Event interface with survey fields (surveyEnabled, surveyRequired, surveyStepsCount, surveyStepsOrder, surveyVersion) in web/src/lib/types/firestore.ts
-- [ ] T008 Extend Event interface with counter fields (experiencesCount, sessionsCount, readyCount, sharesCount) in web/src/lib/types/firestore.ts
-- [ ] T009 [P] Add experienceSchema to web/src/lib/schemas/firestore.ts
-- [ ] T010 [P] Add surveyStepSchema to web/src/lib/schemas/firestore.ts
-- [ ] T011 Run pnpm type-check to validate all new types
+- [x] T001 [P] Add Experience type to web/src/lib/types/firestore.ts
+- [x] T002 [P] Add SurveyStep type to web/src/lib/types/firestore.ts
+- [x] T003 [P] Add ExperienceItem type to web/src/lib/types/firestore.ts (documented but out of scope for implementation)
+- [x] T004 Extend Event interface with welcome fields (welcomeTitle, welcomeDescription, welcomeCtaLabel, welcomeBackgroundImagePath, welcomeBackgroundColorHex) in web/src/lib/types/firestore.ts
+- [x] T005 Extend Event interface with ending fields (endHeadline, endBody, endCtaLabel, endCtaUrl) in web/src/lib/types/firestore.ts
+- [x] T006 Extend Event interface with share fields (shareAllowDownload, shareAllowSystemShare, shareAllowEmail, shareSocials) in web/src/lib/types/firestore.ts
+- [x] T007 Extend Event interface with survey fields (surveyEnabled, surveyRequired, surveyStepsCount, surveyStepsOrder, surveyVersion) in web/src/lib/types/firestore.ts
+- [x] T008 Extend Event interface with counter fields (experiencesCount, sessionsCount, readyCount, sharesCount) in web/src/lib/types/firestore.ts
+- [x] T009 [P] Add experienceSchema to web/src/lib/schemas/firestore.ts
+- [x] T010 [P] Add surveyStepSchema to web/src/lib/schemas/firestore.ts
+- [x] T011 Run pnpm type-check to validate all new types
 
 ---
 

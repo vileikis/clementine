@@ -26,6 +26,20 @@ export async function createEvent(data: {
     qrPngPath: `events/${eventId}/qr/join.png`,
     createdAt: now,
     updatedAt: now,
+    // Events Builder Redesign defaults
+    shareAllowDownload: true,
+    shareAllowSystemShare: true,
+    shareAllowEmail: true,
+    shareSocials: [],
+    surveyEnabled: false,
+    surveyRequired: false,
+    surveyStepsCount: 0,
+    surveyStepsOrder: [],
+    surveyVersion: 1,
+    experiencesCount: 0,
+    sessionsCount: 0,
+    readyCount: 0,
+    sharesCount: 0,
   };
 
   const scene: Scene = {
