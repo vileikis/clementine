@@ -178,14 +178,14 @@ This is a monorepo with web/ and functions/ workspaces. All paths below use `web
 
 ### Implementation for User Story 5
 
-- [ ] T069 [P] [US5] Create EndingEditor component in web/src/components/organizer/builder/EndingEditor.tsx
-- [ ] T070 [US5] Integrate EndingEditor into BuilderContent when Ending is selected
-- [ ] T071 [US5] Add ending screen form controls (headline, body, CTA label, CTA URL)
-- [ ] T072 [US5] Add share configuration toggles (download, email, system share, social platforms)
-- [ ] T073 [US5] Add live preview panel to EndingEditor
-- [ ] T074 [US5] Connect EndingEditor form to updateEventEnding Server Action
-- [ ] T075 [US5] Implement full updateEventEnding Server Action with Zod validation in web/src/lib/actions/events.ts
-- [ ] T076 [US5] Verify ending screen configuration and preview work correctly in dev server
+- [x] T069 [P] [US5] Create EndingEditor component in web/src/components/organizer/builder/EndingEditor.tsx
+- [x] T070 [US5] Integrate EndingEditor into BuilderContent when Ending is selected
+- [x] T071 [US5] Add ending screen form controls (headline, body, CTA label, CTA URL)
+- [x] T072 [US5] Add share configuration toggles (download, email, system share, social platforms)
+- [x] T073 [US5] Add live preview panel to EndingEditor
+- [x] T074 [US5] Connect EndingEditor form to updateEventEnding Server Action
+- [x] T075 [US5] Implement full updateEventEnding Server Action with Zod validation in web/src/lib/actions/events.ts
+- [x] T076 [US5] Verify ending screen configuration and preview work correctly in dev server
 
 **Checkpoint**: At this point, User Story 5 should be fully functional - Ending screen can be configured with share options
 
