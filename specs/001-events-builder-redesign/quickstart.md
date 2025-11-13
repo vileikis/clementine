@@ -129,7 +129,7 @@ This quickstart guide provides step-by-step instructions for implementing the ev
 **Goal**: Create the new event layout with tab navigation (Content, Distribute, Results) and breadcrumb.
 
 **Files to create/modify**:
-- `web/src/app/(admin)/events/[eventId]/layout.tsx` (modify)
+- `web/src/app/(event-builder)/events/[eventId]/layout.tsx` (modify)
 - `web/src/components/organizer/EventTabs.tsx` (create)
 - `web/src/components/organizer/EventBreadcrumb.tsx` (create)
 
@@ -218,7 +218,7 @@ This quickstart guide provides step-by-step instructions for implementing the ev
 **Goal**: Implement the Content tab with sidebar navigation and main content area (static, no business logic).
 
 **Files to create**:
-- `web/src/app/(admin)/events/[eventId]/content/page.tsx`
+- `web/src/app/(event-builder)/events/[eventId]/content/page.tsx`
 - `web/src/components/organizer/builder/BuilderSidebar.tsx`
 - `web/src/components/organizer/builder/BuilderContent.tsx`
 
@@ -378,7 +378,7 @@ This quickstart guide provides step-by-step instructions for implementing the ev
 **Goal**: Implement Results tab with placeholder data.
 
 **Files to create**:
-- `web/src/app/(admin)/events/[eventId]/results/page.tsx`
+- `web/src/app/(event-builder)/events/[eventId]/results/page.tsx`
 
 **Steps**:
 

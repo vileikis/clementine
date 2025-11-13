@@ -31,7 +31,8 @@ This document consolidates research findings for the events builder redesign. Th
 - **URL-based routing**: Each tab gets its own URL (`/events/{id}/content`, `/events/{id}/distribute`, `/events/{id}/results`), making tabs bookmarkable and shareable
 - **Server Components by default**: App Router enables Server Components for initial page load, improving performance
 - **Layout composition**: Shared layout can render the tab navigation UI and breadcrumb once, while each tab's page.tsx handles its own content
-- **Existing pattern**: The codebase already uses App Router with nested layouts (see `(admin)/events/[eventId]/layout.tsx`)
+- **Existing pattern**: The codebase already uses App Router with nested layouts
+- **Route group separation**: Event builder pages use a separate `(event-builder)` route group (instead of `(admin)`) to avoid layout conflicts and eliminate conditional rendering, following Next.js best practices
 
 **Alternatives considered**:
 - **Client-side tab state**: Rejected because it doesn't support deep linking to specific tabs and loses state on page refresh

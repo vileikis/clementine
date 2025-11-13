@@ -57,13 +57,22 @@ specs/003-events-builder-redesign/
 web/
 ├── src/
 │   ├── app/
-│   │   └── (admin)/
+│   │   ├── (admin)/
+│   │   │   ├── layout.tsx                      # Admin dashboard layout (header, tabs)
+│   │   │   ├── events/
+│   │   │   │   ├── page.tsx                    # Events list
+│   │   │   │   └── new/page.tsx                # Create new event
+│   │   │   └── companies/
+│   │   │       └── page.tsx                    # Companies list
+│   │   │
+│   │   └── (event-builder)/
 │   │       └── events/
 │   │           └── [eventId]/
 │   │               ├── layout.tsx              # Event-level navigation (tabs, breadcrumb, status)
+│   │               ├── page.tsx                # Redirect to /content
 │   │               ├── content/
 │   │               │   └── page.tsx            # NEW: Content tab (builder UI)
-│   │               ├── distribute/
+│   │               ├── distribution/
 │   │               │   └── page.tsx            # Existing: Distribute tab (no changes)
 │   │               ├── results/
 │   │               │   └── page.tsx            # NEW: Results tab (placeholder)
@@ -107,7 +116,14 @@ web/
     └── [component tests co-located with source]
 ```
 
-**Structure Decision**: Web application structure (Next.js App Router). The feature adds new pages under the existing `(admin)/events/[eventId]` route group. New builder components are organized under `components/organizer/builder/` to keep them separate from existing organizer components. New Firestore types and schemas extend the existing pattern in `lib/types/firestore.ts` and `lib/schemas/firestore.ts`. Server Actions follow the existing pattern (Firebase Admin SDK for mutations).
+**Structure Decision**: Web application structure (Next.js App Router) using **two separate route groups** for optimal layout separation:
+
+- **`(admin)` route group**: Contains event/company list pages with admin dashboard layout (header with Clementine branding and Events/Companies tabs)
+- **`(event-builder)` route group**: Contains event detail pages (`/events/[eventId]/*`) with custom event builder layout (breadcrumb, event tabs, action buttons) to avoid layout conflicts and flickering
+
+This separation eliminates the need for conditional layout rendering and follows Next.js best practices for distinct UI contexts. URLs remain unchanged (`/events`, `/events/abc123/content`, etc.) as route groups don't affect the URL structure.
+
+New builder components are organized under `components/organizer/builder/` to keep them separate from existing organizer components. New Firestore types and schemas extend the existing pattern in `lib/types/firestore.ts` and `lib/schemas/firestore.ts`. Server Actions follow the existing pattern (Firebase Admin SDK for mutations).
 
 ## Complexity Tracking
 
