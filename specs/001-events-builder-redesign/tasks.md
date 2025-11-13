@@ -101,13 +101,13 @@ This is a monorepo with web/ and functions/ workspaces. All paths below use `web
 
 ### Implementation for User Story 2
 
-- [ ] T031 [P] [US2] Create WelcomeEditor component in web/src/components/organizer/builder/WelcomeEditor.tsx with form controls
-- [ ] T032 [US2] Integrate WelcomeEditor into BuilderContent when Welcome is selected
-- [ ] T033 [US2] Add live preview panel to WelcomeEditor that updates in real-time
-- [ ] T034 [US2] Connect WelcomeEditor form to updateEventWelcome Server Action
-- [ ] T035 [US2] Implement full updateEventWelcome Server Action with Zod validation in web/src/lib/actions/events.ts
-- [ ] T036 [US2] Add image upload functionality for welcome background (integrate with uploadImage action)
-- [ ] T037 [US2] Verify welcome screen configuration and preview work correctly in dev server
+- [X] T031 [P] [US2] Create WelcomeEditor component in web/src/components/organizer/builder/WelcomeEditor.tsx with form controls
+- [X] T032 [US2] Integrate WelcomeEditor into BuilderContent when Welcome is selected
+- [X] T033 [US2] Add live preview panel to WelcomeEditor that updates in real-time
+- [X] T034 [US2] Connect WelcomeEditor form to updateEventWelcome Server Action
+- [X] T035 [US2] Implement full updateEventWelcome Server Action with Zod validation in web/src/lib/actions/events.ts
+- [X] T036 [US2] Add image upload functionality for welcome background (integrate with uploadImage action)
+- [X] T037 [US2] Verify welcome screen configuration and preview work correctly in dev server
 
 **Checkpoint**: At this point, User Story 2 should be fully functional - Welcome screen can be configured with live preview
 

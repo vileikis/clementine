@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { Menu } from "lucide-react";
 import { BuilderSidebar } from "./BuilderSidebar";
-import { BuilderContent } from "./BuilderContent";
 import { PreviewPanel } from "./PreviewPanel";
+import { WelcomeEditor } from "./WelcomeEditor";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -43,34 +43,7 @@ export function ContentBuilder({ event }: ContentBuilderProps) {
   const renderSectionContent = () => {
     switch (activeSection) {
       case "welcome":
-        return (
-          <div className="space-y-6">
-            <p className="text-sm text-muted-foreground">
-              Configure the welcome screen that guests see when they join your event.
-            </p>
-            <PreviewPanel title="Welcome Preview">
-              <div className="flex flex-col items-center justify-center h-full p-6 bg-gradient-to-b from-primary/10 to-background">
-                <div className="text-center space-y-4">
-                  <h2 className="text-xl font-bold">
-                    {event.welcomeTitle || "Welcome to the event!"}
-                  </h2>
-                  <p className="text-sm text-muted-foreground">
-                    {event.welcomeDescription ||
-                      "Take a photo and get an AI-transformed result."}
-                  </p>
-                  <button className="px-6 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium">
-                    {event.welcomeCtaLabel || "Get Started"}
-                  </button>
-                </div>
-              </div>
-            </PreviewPanel>
-            <div className="border rounded-lg p-6 bg-muted/50">
-              <p className="text-sm text-muted-foreground text-center">
-                Welcome editor controls will be implemented in Phase 5 (User Story 2)
-              </p>
-            </div>
-          </div>
-        );
+        return <WelcomeEditor event={event} />;
 
       case "experiences":
         return (
@@ -149,25 +122,10 @@ export function ContentBuilder({ event }: ContentBuilderProps) {
     }
   };
 
-  const getSectionDescription = () => {
-    switch (activeSection) {
-      case "welcome":
-        return "Configure the welcome screen that guests see first";
-      case "experiences":
-        return "Add and configure photo experiences for your event";
-      case "survey":
-        return "Collect feedback with custom survey questions";
-      case "ending":
-        return "Configure the ending screen and share options";
-      default:
-        return "";
-    }
-  };
-
   return (
     <div className="flex flex-col lg:flex-row gap-6 h-full">
       {/* Desktop sidebar - visible on lg+ screens */}
-      <div className="hidden lg:block w-64 flex-shrink-0">
+      <div className="hidden lg:block w-64 shrink-0">
         <BuilderSidebar
           eventId={event.id}
           activeSection={activeSection}
@@ -204,13 +162,8 @@ export function ContentBuilder({ event }: ContentBuilderProps) {
       </div>
 
       {/* Main content area */}
-      <div className="flex-1 min-w-0">
-        <BuilderContent
-          title={getSectionTitle()}
-          description={getSectionDescription()}
-        >
-          {renderSectionContent()}
-        </BuilderContent>
+      <div className="flex-1 min-w-0 overflow-y-auto p-6">
+        {renderSectionContent()}
       </div>
     </div>
   );
