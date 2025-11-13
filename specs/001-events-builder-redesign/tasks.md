@@ -82,12 +82,12 @@ This is a monorepo with web/ and functions/ workspaces. All paths below use `web
 
 ### Implementation for User Story 1
 
-- [X] T025 [P] [US1] Create BuilderSidebar component in web/src/components/organizer/builder/BuilderSidebar.tsx
-- [X] T026 [P] [US1] Create BuilderContent component in web/src/components/organizer/builder/BuilderContent.tsx
-- [X] T027 [P] [US1] Create PreviewPanel reusable component in web/src/components/organizer/builder/PreviewPanel.tsx
-- [X] T028 [US1] Create content page in web/src/app/(event-builder)/events/[eventId]/content/page.tsx that uses BuilderSidebar and BuilderContent
-- [X] T029 [US1] Add mobile-responsive behavior to BuilderSidebar (collapsible on mobile, fixed on desktop)
-- [X] T030 [US1] Verify sidebar renders with static placeholders for Welcome, Experiences, Survey, Ending sections
+- [x] T025 [P] [US1] Create BuilderSidebar component in web/src/components/organizer/builder/BuilderSidebar.tsx
+- [x] T026 [P] [US1] Create BuilderContent component in web/src/components/organizer/builder/BuilderContent.tsx
+- [x] T027 [P] [US1] Create PreviewPanel reusable component in web/src/components/organizer/builder/PreviewPanel.tsx
+- [x] T028 [US1] Create content page in web/src/app/(event-builder)/events/[eventId]/content/page.tsx that uses BuilderSidebar and BuilderContent
+- [x] T029 [US1] Add mobile-responsive behavior to BuilderSidebar (collapsible on mobile, fixed on desktop)
+- [x] T030 [US1] Verify sidebar renders with static placeholders for Welcome, Experiences, Survey, Ending sections
 
 **Checkpoint**: At this point, User Story 1 should be fully functional - Content tab shows sidebar with all sections
 
@@ -101,13 +101,13 @@ This is a monorepo with web/ and functions/ workspaces. All paths below use `web
 
 ### Implementation for User Story 2
 
-- [X] T031 [P] [US2] Create WelcomeEditor component in web/src/components/organizer/builder/WelcomeEditor.tsx with form controls
-- [X] T032 [US2] Integrate WelcomeEditor into BuilderContent when Welcome is selected
-- [X] T033 [US2] Add live preview panel to WelcomeEditor that updates in real-time
-- [X] T034 [US2] Connect WelcomeEditor form to updateEventWelcome Server Action
-- [X] T035 [US2] Implement full updateEventWelcome Server Action with Zod validation in web/src/lib/actions/events.ts
-- [X] T036 [US2] Add image upload functionality for welcome background (integrate with uploadImage action)
-- [X] T037 [US2] Verify welcome screen configuration and preview work correctly in dev server
+- [x] T031 [P] [US2] Create WelcomeEditor component in web/src/components/organizer/builder/WelcomeEditor.tsx with form controls
+- [x] T032 [US2] Integrate WelcomeEditor into BuilderContent when Welcome is selected
+- [x] T033 [US2] Add live preview panel to WelcomeEditor that updates in real-time
+- [x] T034 [US2] Connect WelcomeEditor form to updateEventWelcome Server Action
+- [x] T035 [US2] Implement full updateEventWelcome Server Action with Zod validation in web/src/lib/actions/events.ts
+- [x] T036 [US2] Add image upload functionality for welcome background (integrate with uploadImage action)
+- [x] T037 [US2] Verify welcome screen configuration and preview work correctly in dev server
 
 **Checkpoint**: At this point, User Story 2 should be fully functional - Welcome screen can be configured with live preview
 
@@ -121,19 +121,19 @@ This is a monorepo with web/ and functions/ workspaces. All paths below use `web
 
 ### Implementation for User Story 3
 
-- [ ] T038 [P] [US3] Create ExperienceTypeDialog component in web/src/components/organizer/builder/ExperienceTypeDialog.tsx
-- [ ] T039 [P] [US3] Create ExperiencesList component in web/src/components/organizer/builder/ExperiencesList.tsx
-- [ ] T040 [P] [US3] Create ExperienceEditor component in web/src/components/organizer/builder/ExperienceEditor.tsx
-- [ ] T041 [US3] Integrate ExperiencesList into BuilderSidebar with + button
-- [ ] T042 [US3] Implement ExperienceTypeDialog to show Photo (enabled), Video/GIF/Wheel (coming soon)
-- [ ] T043 [US3] Connect + button to ExperienceTypeDialog modal
-- [ ] T044 [US3] Implement full createExperience Server Action with Zod validation in web/src/lib/actions/experiences.ts
-- [ ] T045 [US3] Implement full updateExperience Server Action with Zod validation in web/src/lib/actions/experiences.ts
-- [ ] T046 [US3] Implement full deleteExperience Server Action in web/src/lib/actions/experiences.ts
-- [ ] T047 [US3] Add experience deletion with confirmation dialog
+- [x] T038 [P] [US3] Create ExperienceTypeDialog component in web/src/components/organizer/builder/ExperienceTypeDialog.tsx
+- [x] T039 [P] [US3] Create ExperiencesList component in web/src/components/organizer/builder/ExperiencesList.tsx
+- [x] T040 [P] [US3] Create ExperienceEditor component in web/src/components/organizer/builder/ExperienceEditor.tsx
+- [x] T041 [US3] Integrate ExperiencesList into BuilderSidebar with + button
+- [x] T042 [US3] Implement ExperienceTypeDialog to show Photo (enabled), Video/GIF/Wheel (coming soon)
+- [x] T043 [US3] Connect + button to ExperienceTypeDialog modal
+- [x] T044 [US3] Implement full createExperience Server Action with Zod validation in web/src/lib/actions/experiences.ts
+- [x] T045 [US3] Implement full updateExperience Server Action with Zod validation in web/src/lib/actions/experiences.ts
+- [x] T046 [US3] Implement full deleteExperience Server Action in web/src/lib/actions/experiences.ts
+- [x] T047 [US3] Add experience deletion with confirmation dialog
 - [ ] T048 [US3] Add real-time experience list fetching from Firestore subcollection
 - [ ] T049 [US3] Connect ExperienceEditor to updateExperience Server Action
-- [ ] T050 [US3] Add all photo experience controls (label, capture options, overlays, AI configuration) to ExperienceEditor
+- [x] T050 [US3] Add all photo experience controls (label, capture options, overlays, AI configuration) to ExperienceEditor
 - [ ] T051 [US3] Verify experience creation, editing, and deletion work correctly in dev server
 
 **Checkpoint**: At this point, User Story 3 should be fully functional - Photo experiences can be added, configured, and managed
@@ -352,6 +352,7 @@ With multiple developers:
 **Total Tasks**: 94
 
 **Task Count by User Story**:
+
 - Setup (Phase 1): 11 tasks
 - Foundational (Phase 2): 5 tasks
 - User Story 0 (P0): 8 tasks
@@ -364,6 +365,7 @@ With multiple developers:
 - Polish & Validation: 15 tasks
 
 **Parallel Opportunities Identified**:
+
 - Phase 1: 5 parallel opportunities (types, schemas)
 - Phase 2: 3 parallel opportunities (Server Actions files)
 - Phase 3 (US0): 5 parallel opportunities (navigation components)
@@ -373,6 +375,7 @@ With multiple developers:
 - Phase 10: 6 parallel opportunities (polish tasks)
 
 **Independent Test Criteria**:
+
 - US0: Custom navigation renders with all elements
 - US1: Content tab shows sidebar with four sections
 - US2: Welcome screen configurable with live preview
