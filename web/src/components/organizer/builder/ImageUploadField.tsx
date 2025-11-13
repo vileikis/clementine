@@ -13,7 +13,6 @@ interface ImageUploadFieldProps {
   onChange: (url: string) => void;
   destination: "welcome" | "experience-preview" | "experience-overlay" | "ai-reference";
   disabled?: boolean;
-  aspectRatio?: string;
   recommendedSize?: string;
 }
 
@@ -29,7 +28,6 @@ export function ImageUploadField({
   onChange,
   destination,
   disabled = false,
-  aspectRatio = "aspect-video",
   recommendedSize,
 }: ImageUploadFieldProps) {
   const [isUploading, setIsUploading] = useState(false);
@@ -69,11 +67,11 @@ export function ImageUploadField({
       <Label htmlFor={id}>{label}</Label>
       <div className="space-y-2">
         {value && (
-          <div className={`relative ${aspectRatio} w-full overflow-hidden rounded-lg border`}>
+          <div className="relative w-full h-32 overflow-hidden rounded-lg border bg-muted">
             <img
               src={value}
               alt={label}
-              className="h-full w-full object-cover"
+              className="h-full w-full object-contain"
             />
             <Button
               variant="destructive"

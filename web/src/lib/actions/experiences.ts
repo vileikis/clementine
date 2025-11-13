@@ -126,7 +126,7 @@ const updateExperienceSchema = z.object({
   overlayFramePath: z.string().optional(),
   overlayLogoPath: z.string().optional(),
   aiEnabled: z.boolean().optional(),
-  aiModel: z.string().optional(),
+  aiModel: z.enum(["nanobanana"]).optional(),
   aiPrompt: z.string().max(600).optional(),
   aiReferenceImagePaths: z.array(z.string()).optional(),
 });
@@ -191,11 +191,30 @@ export async function updateExperience(
       };
     }
 
-    // Update experience
-    await experienceRef.update({
+    // Update experience - explicitly handle clearing fields
+    const updateData: Record<string, unknown> = {
       ...parsed,
       updatedAt: Date.now(),
-    });
+    };
+
+    // Handle clearing optional fields when explicitly set to undefined
+    if (data.overlayFramePath === undefined || data.overlayFramePath === "") {
+      updateData.overlayFramePath = null;
+    }
+    if (data.overlayLogoPath === undefined || data.overlayLogoPath === "") {
+      updateData.overlayLogoPath = null;
+    }
+    if (data.aiModel === undefined || data.aiModel === "") {
+      updateData.aiModel = null;
+    }
+    if (data.aiPrompt === undefined || data.aiPrompt === "") {
+      updateData.aiPrompt = null;
+    }
+    if (data.aiReferenceImagePaths === undefined || data.aiReferenceImagePaths?.length === 0) {
+      updateData.aiReferenceImagePaths = null;
+    }
+
+    await experienceRef.update(updateData);
 
     return {
       success: true,
@@ -261,25 +280,14 @@ export async function deleteExperience(
       };
     }
 
-    // Check if this is the last experience (events must have at least one experience)
-    const experiencesSnapshot = await eventRef.collection("experiences").get();
-    if (experiencesSnapshot.size <= 1) {
-      return {
-        success: false,
-        error: {
-          code: "CANNOT_DELETE_LAST_EXPERIENCE",
-          message: "Events must have at least one experience",
-        },
-      };
-    }
-
     // Delete experience and update event counter in a batch
     const batch = db.batch();
     const timestamp = Date.now();
 
     batch.delete(experienceRef);
+    const currentCount = eventDoc.data()?.experiencesCount || 0;
     batch.update(eventRef, {
-      experiencesCount: (eventDoc.data()?.experiencesCount || 1) - 1,
+      experiencesCount: Math.max(0, currentCount - 1),
       updatedAt: timestamp,
     });
 

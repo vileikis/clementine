@@ -162,7 +162,6 @@ export function WelcomeEditor({ event }: WelcomeEditorProps) {
             onChange={setWelcomeBackgroundImagePath}
             destination="welcome"
             disabled={isPending}
-            aspectRatio="aspect-video"
             recommendedSize="Recommended: 1080x1920px (9:16 aspect ratio). Max 10MB."
           />
 

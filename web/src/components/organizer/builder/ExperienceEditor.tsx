@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Trash2, CheckCircle2, XCircle } from "lucide-react";
 import { ImageUploadField } from "./ImageUploadField";
@@ -48,7 +49,7 @@ export function ExperienceEditor({
   const [overlayFramePath, setOverlayFramePath] = useState(experience.overlayFramePath || "");
   const [overlayLogoPath, setOverlayLogoPath] = useState(experience.overlayLogoPath || "");
   const [aiEnabled, setAiEnabled] = useState(experience.aiEnabled);
-  const [aiModel, setAiModel] = useState(experience.aiModel || "");
+  const [aiModel, setAiModel] = useState(experience.aiModel || "nanobanana");
   const [aiPrompt, setAiPrompt] = useState(experience.aiPrompt || "");
   const [aiReferenceImagePaths, setAiReferenceImagePaths] = useState<string[]>(
     experience.aiReferenceImagePaths || []
@@ -226,7 +227,6 @@ export function ExperienceEditor({
           onChange={setOverlayFramePath}
           destination="experience-overlay"
           disabled={isPending}
-          aspectRatio="aspect-square"
           recommendedSize="Recommended: 1080x1080px. Max 10MB."
         />
 
@@ -237,7 +237,6 @@ export function ExperienceEditor({
           onChange={setOverlayLogoPath}
           destination="experience-overlay"
           disabled={isPending}
-          aspectRatio="aspect-square"
           recommendedSize="Recommended: 512x512px. Max 10MB."
         />
       </div>
@@ -258,13 +257,18 @@ export function ExperienceEditor({
           <>
             <div className="space-y-2">
               <Label htmlFor="aiModel">AI Model</Label>
-              <Input
-                id="aiModel"
+              <Select
                 value={aiModel}
-                onChange={(e) => setAiModel(e.target.value)}
-                placeholder="e.g., stable-diffusion-xl"
+                onValueChange={setAiModel}
                 disabled={isPending}
-              />
+              >
+                <SelectTrigger id="aiModel">
+                  <SelectValue placeholder="Select AI model" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="nanobanana">Nano Banana</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">
@@ -287,11 +291,11 @@ export function ExperienceEditor({
               <Label>Reference Images</Label>
               <div className="space-y-4">
                 {aiReferenceImagePaths.map((path, index) => (
-                  <div key={index} className="relative aspect-video w-full overflow-hidden rounded-lg border">
+                  <div key={index} className="relative w-full h-32 overflow-hidden rounded-lg border bg-muted">
                     <img
                       src={path}
                       alt={`Reference ${index + 1}`}
-                      className="h-full w-full object-cover"
+                      className="h-full w-full object-contain"
                     />
                     <Button
                       variant="destructive"
@@ -312,7 +316,6 @@ export function ExperienceEditor({
                   onChange={handleAddReferenceImage}
                   destination="ai-reference"
                   disabled={isPending}
-                  aspectRatio="aspect-video"
                   recommendedSize="Max 10MB."
                 />
               </div>
