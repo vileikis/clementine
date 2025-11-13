@@ -43,11 +43,11 @@ This is a monorepo with web/ and functions/ workspaces. All paths below use `web
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T012 Create stub Server Actions file web/src/lib/actions/events.ts with updateEventWelcome, updateEventEnding, updateEventSurveyConfig
-- [ ] T013 [P] Create stub Server Actions file web/src/lib/actions/experiences.ts with createExperience, updateExperience, deleteExperience
-- [ ] T014 [P] Create stub Server Actions file web/src/lib/actions/survey.ts with createSurveyStep, updateSurveyStep, deleteSurveyStep
-- [ ] T015 [P] Create stub Server Actions file web/src/lib/actions/storage.ts with uploadImage
-- [ ] T016 Run pnpm type-check to validate all Server Actions signatures
+- [x] T012 Create stub Server Actions file web/src/lib/actions/events.ts with updateEventWelcome, updateEventEnding, updateEventSurveyConfig
+- [x] T013 [P] Create stub Server Actions file web/src/lib/actions/experiences.ts with createExperience, updateExperience, deleteExperience
+- [x] T014 [P] Create stub Server Actions file web/src/lib/actions/survey.ts with createSurveyStep, updateSurveyStep, deleteSurveyStep
+- [x] T015 [P] Create stub Server Actions file web/src/lib/actions/storage.ts with uploadImage
+- [x] T016 Run pnpm type-check to validate all Server Actions signatures
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
