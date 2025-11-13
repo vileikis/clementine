@@ -3,7 +3,6 @@ import { notFound } from "next/navigation"
 import { EventBreadcrumb } from "@/components/organizer/EventBreadcrumb"
 import { EventTabs } from "@/components/organizer/EventTabs"
 import { EventStatusSwitcher } from "@/components/organizer/EventStatusSwitcher"
-import { EditableEventName } from "@/components/organizer/EditableEventName"
 import { CopyLinkButton } from "@/components/organizer/CopyLinkButton"
 
 interface EventLayoutProps {
@@ -25,26 +24,33 @@ export default async function EventLayout({
   const event = result.event
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      {/* Breadcrumb navigation */}
-      <EventBreadcrumb eventName={event.title} />
+    <div className="min-h-screen bg-background">
+      {/* Event navigation bar - everything on one row */}
+      <div className="border-b bg-background sticky top-0 z-10">
+        <div className="container mx-auto px-6 py-4">
+          <div className="flex items-center gap-6">
+            {/* Breadcrumb (includes editable event name) */}
+            <EventBreadcrumb eventId={event.id} eventName={event.title} />
 
-      {/* Event header with name, status, and copy link button */}
-      <div className="mb-8">
-        <div className="flex items-start justify-between gap-4 mb-4">
-          <EditableEventName eventId={event.id} currentTitle={event.title} />
-          <div className="flex items-center gap-3">
-            <CopyLinkButton joinPath={event.joinPath} />
-            <EventStatusSwitcher eventId={event.id} currentStatus={event.status} />
+            {/* Vertical divider */}
+            <div className="h-6 w-px bg-border" aria-hidden="true" />
+
+            {/* Tabs (centered, flexible space) */}
+            <div className="flex-1 flex justify-center">
+              <EventTabs eventId={eventId} />
+            </div>
+
+            {/* Actions (right side) */}
+            <div className="flex items-center gap-3 shrink-0">
+              <CopyLinkButton joinPath={event.joinPath} />
+              <EventStatusSwitcher eventId={event.id} currentStatus={event.status} />
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Tab navigation */}
-      <EventTabs eventId={eventId} />
-
       {/* Page content */}
-      {children}
+      <main className="container mx-auto px-6 py-8">{children}</main>
     </div>
   )
 }

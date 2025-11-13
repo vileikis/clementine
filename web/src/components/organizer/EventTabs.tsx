@@ -22,8 +22,8 @@ export function EventTabs({ eventId }: EventTabsProps) {
   ];
 
   return (
-    <nav className="border-b mb-8" role="navigation" aria-label="Event sections">
-      <ul className="flex gap-8">
+    <nav role="navigation" aria-label="Event sections">
+      <ul className="flex gap-6">
         {tabs.map((tab) => {
           const isActive = pathname === tab.href;
           return (
@@ -31,12 +31,12 @@ export function EventTabs({ eventId }: EventTabsProps) {
               <Link
                 href={tab.href}
                 className={cn(
-                  "inline-block px-1 py-3 text-sm font-medium border-b-2 transition-colors",
-                  "hover:text-foreground hover:border-foreground/50",
-                  "min-h-[44px] min-w-[44px] flex items-center justify-center",
+                  "inline-block px-3 py-2 text-sm font-medium rounded-md transition-colors",
+                  "hover:bg-accent hover:text-accent-foreground",
+                  "min-h-[40px] min-w-[40px] flex items-center justify-center",
                   isActive
-                    ? "text-foreground border-foreground"
-                    : "text-muted-foreground border-transparent"
+                    ? "bg-accent text-accent-foreground font-semibold"
+                    : "text-muted-foreground"
                 )}
                 aria-current={isActive ? "page" : undefined}
               >
