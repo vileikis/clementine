@@ -48,7 +48,7 @@ const EXPERIENCE_TYPES: ExperienceTypeOption[] = [
 interface ExperienceTypeDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onTypeSelect: (type: ExperienceType) => void;
+  onSelectType: (type: ExperienceType) => void;
 }
 
 /**
@@ -62,12 +62,12 @@ interface ExperienceTypeDialogProps {
 export function ExperienceTypeDialog({
   open,
   onOpenChange,
-  onTypeSelect,
+  onSelectType,
 }: ExperienceTypeDialogProps) {
   const [selectedType, setSelectedType] = useState<ExperienceType>("photo");
 
   const handleConfirm = () => {
-    onTypeSelect(selectedType);
+    onSelectType(selectedType);
     onOpenChange(false);
   };
 

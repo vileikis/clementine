@@ -97,7 +97,7 @@ export async function createExperience(
         success: false,
         error: {
           code: "VALIDATION_ERROR",
-          message: error.errors.map((e) => e.message).join(", "),
+          message: error.issues.map((e) => e.message).join(", "),
         },
       };
     }
@@ -207,7 +207,7 @@ export async function updateExperience(
         success: false,
         error: {
           code: "VALIDATION_ERROR",
-          message: error.errors.map((e) => e.message).join(", "),
+          message: error.issues.map((e) => e.message).join(", "),
         },
       };
     }

@@ -1,10 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Menu } from "lucide-react";
+import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
+import { db } from "@/lib/firebase/client";
 import { BuilderSidebar } from "./BuilderSidebar";
 import { PreviewPanel } from "./PreviewPanel";
 import { WelcomeEditor } from "./WelcomeEditor";
+import { ExperienceEditor } from "./ExperienceEditor";
+import { ExperienceTypeDialog } from "./ExperienceTypeDialog";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -13,7 +17,10 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import type { Event } from "@/lib/types/firestore";
+import { createExperience, updateExperience, deleteExperience } from "@/lib/actions/experiences";
+import { uploadImage } from "@/lib/actions/storage";
+import { toast } from "sonner";
+import type { Event, Experience } from "@/lib/types/firestore";
 
 type SidebarSection = "welcome" | "experiences" | "survey" | "ending";
 
@@ -24,19 +31,109 @@ interface ContentBuilderProps {
 /**
  * ContentBuilder component manages the Content tab builder UI
  * Part of Phase 4 (User Story 1) - Content Tab Layout Infrastructure
+ * Enhanced in Phase 6 (User Story 3) - Manage Photo Experiences
  *
  * Features:
  * - Left sidebar with four sections (Welcome, Experiences, Survey, Ending)
  * - Main content area with section-specific forms/controls
  * - Responsive layout (sidebar collapses on mobile)
+ * - Real-time experience list fetching
+ * - Experience creation, editing, and deletion
  */
 export function ContentBuilder({ event }: ContentBuilderProps) {
   const [activeSection, setActiveSection] = useState<SidebarSection>("welcome");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [experiences, setExperiences] = useState<Experience[]>([]);
+  const [selectedExperienceId, setSelectedExperienceId] = useState<string | null>(null);
+  const [showExperienceTypeDialog, setShowExperienceTypeDialog] = useState(false);
+
+  // Real-time experience list fetching from Firestore subcollection
+  useEffect(() => {
+    const experiencesQuery = query(
+      collection(db, "events", event.id, "experiences"),
+      orderBy("createdAt", "asc")
+    );
+
+    const unsubscribe = onSnapshot(
+      experiencesQuery,
+      (snapshot) => {
+        const experiencesData = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as Experience[];
+        setExperiences(experiencesData);
+
+        // Auto-select first experience if none selected
+        if (experiencesData.length > 0 && !selectedExperienceId) {
+          setSelectedExperienceId(experiencesData[0].id);
+        }
+      },
+      (error) => {
+        console.error("Error fetching experiences:", error);
+        toast.error("Failed to load experiences. Please refresh the page.");
+      }
+    );
+
+    return () => unsubscribe();
+  }, [event.id, selectedExperienceId]);
 
   const handleSectionChange = (section: SidebarSection) => {
     setActiveSection(section);
     setMobileMenuOpen(false); // Close mobile menu when section changes
+  };
+
+  // Handle experience creation
+  const handleCreateExperience = async (type: "photo" | "video" | "gif" | "wheel") => {
+    const result = await createExperience(event.id, {
+      label: `New ${type.charAt(0).toUpperCase() + type.slice(1)} Experience`,
+      type,
+      enabled: true,
+      aiEnabled: false,
+    });
+
+    if (result.success) {
+      setShowExperienceTypeDialog(false);
+      setSelectedExperienceId(result.data.id);
+      toast.success("Experience created successfully.");
+    } else {
+      toast.error(result.error.message);
+    }
+  };
+
+  // Handle experience update
+  const handleUpdateExperience = async (experienceId: string, data: Partial<Experience>) => {
+    const result = await updateExperience(event.id, experienceId, data);
+
+    if (!result.success) {
+      toast.error(result.error.message);
+    }
+  };
+
+  // Handle experience deletion
+  const handleDeleteExperience = async (experienceId: string) => {
+    const result = await deleteExperience(event.id, experienceId);
+
+    if (result.success) {
+      setSelectedExperienceId(null);
+      toast.success("Experience deleted successfully.");
+    } else {
+      toast.error(result.error.message);
+    }
+  };
+
+  // Handle image upload
+  const handleUploadImage = async (
+    file: File,
+    destination: "experience-preview" | "experience-overlay" | "ai-reference"
+  ) => {
+    const result = await uploadImage(file, destination);
+
+    if (result.success) {
+      return result.data;
+    } else {
+      toast.error(result.error.message);
+      throw new Error(result.error.message);
+    }
   };
 
   // Section content renderers with placeholders
@@ -46,17 +143,27 @@ export function ContentBuilder({ event }: ContentBuilderProps) {
         return <WelcomeEditor event={event} />;
 
       case "experiences":
-        return (
-          <div className="space-y-6">
-            <p className="text-sm text-muted-foreground">
-              Add and configure photo experiences for your guests.
-            </p>
-            <div className="border rounded-lg p-6 bg-muted/50">
-              <p className="text-sm text-muted-foreground text-center">
-                Experiences list and editor will be implemented in Phase 6 (User Story 3)
-              </p>
+        const selectedExperience = experiences.find((exp) => exp.id === selectedExperienceId);
+
+        if (!selectedExperience) {
+          return (
+            <div className="flex items-center justify-center h-full">
+              <div className="text-center space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  No experience selected. Click + in the sidebar to add your first experience.
+                </p>
+              </div>
             </div>
-          </div>
+          );
+        }
+
+        return (
+          <ExperienceEditor
+            experience={selectedExperience}
+            onUpdate={handleUpdateExperience}
+            onDelete={handleDeleteExperience}
+            onUploadImage={handleUploadImage}
+          />
         );
 
       case "survey":
@@ -130,6 +237,10 @@ export function ContentBuilder({ event }: ContentBuilderProps) {
           eventId={event.id}
           activeSection={activeSection}
           onSectionChange={handleSectionChange}
+          experiences={experiences}
+          selectedExperienceId={selectedExperienceId}
+          onExperienceSelect={setSelectedExperienceId}
+          onAddExperience={() => setShowExperienceTypeDialog(true)}
         />
       </div>
 
@@ -155,6 +266,10 @@ export function ContentBuilder({ event }: ContentBuilderProps) {
                 eventId={event.id}
                 activeSection={activeSection}
                 onSectionChange={handleSectionChange}
+                experiences={experiences}
+                selectedExperienceId={selectedExperienceId}
+                onExperienceSelect={setSelectedExperienceId}
+                onAddExperience={() => setShowExperienceTypeDialog(true)}
               />
             </div>
           </SheetContent>
@@ -165,6 +280,13 @@ export function ContentBuilder({ event }: ContentBuilderProps) {
       <div className="flex-1 min-w-0 overflow-y-auto p-6">
         {renderSectionContent()}
       </div>
+
+      {/* Experience Type Dialog */}
+      <ExperienceTypeDialog
+        open={showExperienceTypeDialog}
+        onOpenChange={setShowExperienceTypeDialog}
+        onSelectType={handleCreateExperience}
+      />
     </div>
   );
 }
