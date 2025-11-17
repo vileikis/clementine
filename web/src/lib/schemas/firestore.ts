@@ -127,6 +127,7 @@ export type CompanySchema = z.infer<typeof companySchema>;
 // Experience schemas
 export const experienceTypeSchema = z.enum(["photo", "video", "gif", "wheel"]);
 export const previewTypeSchema = z.enum(["image", "gif", "video"]);
+export const aspectRatioSchema = z.enum(["1:1", "3:4", "4:5", "9:16", "16:9"]);
 
 export const experienceSchema = z.object({
   id: z.string(),
@@ -141,22 +142,19 @@ export const experienceSchema = z.object({
   previewPath: z.string().optional(),
   previewType: previewTypeSchema.optional(),
 
-  // Capture configuration
-  allowCamera: z.boolean(),
-  allowLibrary: z.boolean(),
-  maxDurationMs: z.number().int().positive().max(60000).optional(),
-  frameCount: z.number().int().min(2).max(20).optional(),
-  captureIntervalMs: z.number().int().positive().optional(),
+  // Countdown configuration
+  countdownEnabled: z.boolean().default(false),
+  countdownSeconds: z.number().int().min(0).max(10).default(3),
 
   // Overlay configuration
   overlayFramePath: z.string().optional(),
-  overlayLogoPath: z.string().optional(),
 
   // AI transformation configuration
   aiEnabled: z.boolean(),
   aiModel: z.string().optional(),
   aiPrompt: z.string().max(600).optional(),
   aiReferenceImagePaths: z.array(z.string()).optional(),
+  aiAspectRatio: aspectRatioSchema.default("1:1"),
 
   createdAt: z.number(),
   updatedAt: z.number(),
@@ -238,17 +236,27 @@ export const updateExperienceSchema = z.object({
   enabled: z.boolean().optional(),
   previewPath: z.string().optional(),
   previewType: previewTypeSchema.optional(),
-  allowCamera: z.boolean().optional(),
-  allowLibrary: z.boolean().optional(),
-  maxDurationMs: z.number().int().positive().max(60000).optional(),
-  frameCount: z.number().int().min(2).max(20).optional(),
-  captureIntervalMs: z.number().int().positive().optional(),
+  countdownEnabled: z.boolean().optional(),
+  countdownSeconds: z.number().int().min(0).max(10).optional(),
   overlayFramePath: z.string().optional(),
-  overlayLogoPath: z.string().optional(),
   aiEnabled: z.boolean().optional(),
   aiModel: z.string().optional(),
   aiPrompt: z.string().max(600).optional(),
   aiReferenceImagePaths: z.array(z.string()).optional(),
+  aiAspectRatio: aspectRatioSchema.optional(),
+});
+
+// Preview media upload validation schemas
+export const uploadPreviewMediaSchema = z.object({
+  file: z.instanceof(File),
+  fileType: z.enum(["image", "gif", "video"]),
+  maxSizeBytes: z.number().default(10 * 1024 * 1024), // 10MB default
+});
+
+export const previewMediaResultSchema = z.object({
+  publicUrl: z.string().url(),
+  fileType: previewTypeSchema,
+  sizeBytes: z.number(),
 });
 
 // SurveyStep creation/update schemas
