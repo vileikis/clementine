@@ -30,11 +30,9 @@ export default async function ExperienceEditorPage({
   }
 
   return (
-    <div className="container max-w-4xl py-8">
-      <ExperienceEditorWrapper
-        eventId={eventId}
-        experience={experience}
-      />
-    </div>
+    <ExperienceEditorWrapper
+      eventId={eventId}
+      experience={experience}
+    />
   );
 }
