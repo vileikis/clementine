@@ -173,6 +173,11 @@ export type ExperienceType = "photo" | "video" | "gif" | "wheel";
 export type PreviewType = "image" | "gif" | "video";
 
 /**
+ * AI aspect ratio options for transformation output.
+ */
+export type AspectRatio = "1:1" | "3:4" | "4:5" | "9:16" | "16:9";
+
+/**
  * Experience represents a single interactive experience within an event.
  * Lives in /events/{eventId}/experiences/{experienceId} subcollection.
  */
@@ -189,25 +194,33 @@ export interface Experience {
   previewPath?: string; // Storage path
   previewType?: PreviewType;
 
-  // Capture configuration
-  allowCamera: boolean;
-  allowLibrary: boolean;
-  maxDurationMs?: number; // For video/gif types
-  frameCount?: number; // For gif/boomerang types
-  captureIntervalMs?: number; // For gif types
+  // Countdown configuration
+  countdownEnabled: boolean;
+  countdownSeconds: number;
 
   // Overlay configuration
+  overlayEnabled: boolean;
   overlayFramePath?: string; // Storage path
-  overlayLogoPath?: string; // Storage path
 
   // AI transformation configuration
   aiEnabled: boolean;
   aiModel?: string;
   aiPrompt?: string;
   aiReferenceImagePaths?: string[]; // Storage paths
+  aiAspectRatio: AspectRatio;
 
   createdAt: number;
   updatedAt: number;
+
+  // ====================================================================
+  // Deprecated fields (kept for backward compatibility with legacy data)
+  // ====================================================================
+  allowCamera?: boolean; // DEPRECATED - removed in 001-photo-experience-tweaks
+  allowLibrary?: boolean; // DEPRECATED - removed in 001-photo-experience-tweaks
+  overlayLogoPath?: string; // DEPRECATED - removed in 001-photo-experience-tweaks
+  maxDurationMs?: number; // DEPRECATED - for video/gif types (out of scope)
+  frameCount?: number; // DEPRECATED - for gif/boomerang types (out of scope)
+  captureIntervalMs?: number; // DEPRECATED - for gif types (out of scope)
 }
 
 /**

@@ -14,12 +14,15 @@ interface ImageUploadFieldProps {
   destination: "welcome" | "experience-preview" | "experience-overlay" | "ai-reference";
   disabled?: boolean;
   recommendedSize?: string;
+  accept?: string;
+  previewType?: "image" | "video";
 }
 
 /**
  * Reusable image upload field component
- * Shows uploaded image preview with remove button
+ * Shows uploaded image/video preview with remove button
  * Used across Welcome Editor and Experience Editor
+ * Enhanced in 001-photo-experience-tweaks (Phase 8) to support video preview and custom accept types
  */
 export function ImageUploadField({
   id,
@@ -29,6 +32,8 @@ export function ImageUploadField({
   destination,
   disabled = false,
   recommendedSize,
+  accept = "image/png,image/jpeg,image/webp",
+  previewType = "image",
 }: ImageUploadFieldProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -50,7 +55,7 @@ export function ImageUploadField({
         setUploadError(result.error.message);
         setTimeout(() => setUploadError(null), 5000);
       }
-    } catch (error) {
+    } catch {
       setUploadError("An unexpected error occurred during upload");
       setTimeout(() => setUploadError(null), 5000);
     } finally {
@@ -68,15 +73,26 @@ export function ImageUploadField({
       <div className="space-y-2">
         {value && (
           <div className="relative w-full h-32 overflow-hidden rounded-lg border bg-muted">
-            <img
-              src={value}
-              alt={label}
-              className="h-full w-full object-contain"
-            />
+            {previewType === "video" ? (
+              <video
+                src={value}
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="h-full w-full object-contain"
+              />
+            ) : (
+              <img
+                src={value}
+                alt={label}
+                className="h-full w-full object-contain"
+              />
+            )}
             <Button
               variant="destructive"
               size="sm"
-              className="absolute top-2 right-2"
+              className="absolute top-2 right-2 min-h-[44px] min-w-[44px]"
               onClick={handleRemoveImage}
               disabled={isUploading || disabled}
               type="button"
@@ -89,14 +105,14 @@ export function ImageUploadField({
           <input
             id={id}
             type="file"
-            accept="image/png,image/jpeg,image/webp"
+            accept={accept}
             onChange={handleImageUpload}
             disabled={isUploading || disabled}
             className="hidden"
           />
           <Button
             variant="outline"
-            className="w-full"
+            className="w-full min-h-[44px]"
             disabled={isUploading || disabled}
             onClick={() => document.getElementById(id)?.click()}
             type="button"

@@ -152,7 +152,7 @@ The `functions/` workspace is a placeholder for Firebase Cloud Functions that wi
 
 - Interactive experiences (photo/video/gif/wheel)
 - Currently implemented: photo experiences only
-- Fields: label, type, enabled, capture options, overlays, AI settings (model, prompt, reference images)
+- Fields: label, type, enabled, preview media (image/GIF/video), countdown settings, frame overlay, AI settings (model, prompt, reference images, aspect ratio)
 
 **SurveyStep** (`/events/{eventId}/surveySteps/{stepId}`) - NOT YET IMPLEMENTED
 
