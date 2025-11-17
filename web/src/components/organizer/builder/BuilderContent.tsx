@@ -12,7 +12,8 @@ interface BuilderContentProps {
 
 /**
  * BuilderContent component wraps the main content area
- * Part of Phase 4 (User Story 1) - Content Tab Layout Infrastructure
+ * Part of Phase 4 (User Story 1) - Design Tab Layout Infrastructure
+ * Updated in Phase 6 (User Story 4) - Rename Content to Design
  *
  * Provides consistent layout for different builder sections:
  * - Title and description header

@@ -9,14 +9,15 @@ interface EventTabsProps {
 }
 
 /**
- * Tab navigation for event pages: Content, Distribute, Results
+ * Tab navigation for event pages: Design, Distribute, Results
  * Part of Phase 3 (User Story 0) - Base Events UI Navigation Shell
+ * Updated in Phase 3 (User Story 4) - Rename Content to Design
  */
 export function EventTabs({ eventId }: EventTabsProps) {
   const pathname = usePathname();
 
   const tabs = [
-    { label: "Content", href: `/events/${eventId}/content` },
+    { label: "Design", href: `/events/${eventId}/design` },
     { label: "Distribute", href: `/events/${eventId}/distribution` },
     { label: "Results", href: `/events/${eventId}/results` },
   ];
@@ -25,7 +26,8 @@ export function EventTabs({ eventId }: EventTabsProps) {
     <nav role="navigation" aria-label="Event sections">
       <ul className="flex gap-6">
         {tabs.map((tab) => {
-          const isActive = pathname === tab.href;
+          // Check if current pathname starts with the tab href (for nested routes)
+          const isActive = pathname.startsWith(tab.href);
           return (
             <li key={tab.href}>
               <Link

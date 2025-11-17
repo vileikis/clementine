@@ -112,17 +112,20 @@ The `functions/` workspace is a placeholder for Firebase Cloud Functions that wi
 ### Admin Dashboard
 
 **Companies Management** (`/companies`)
+
 - Create and organize brands/organizations
 - Event count tracking per company
 - Soft deletion with status management
 - Filter events by company
 
 **Events Management** (`/events`)
+
 - Create and manage AI photobooth events
 - Associate events with companies (optional)
 - Event builder with three tabs: Content, Distribution, Results
 
 **Event Builder** (`/events/[eventId]`)
+
 - **Content Tab**: Configure welcome screen, photo experiences, ending screen via sidebar navigation (survey UI present but not fully implemented)
 - **Distribution Tab**: Share links, QR codes, embedding options
 - **Results Tab**: Analytics (sessions, shares, downloads, reach)
@@ -130,11 +133,13 @@ The `functions/` workspace is a placeholder for Firebase Cloud Functions that wi
 ### Core Entities
 
 **Company** (`/companies/{companyId}`)
+
 - Brand/organization that owns events
 - Fields: name, status, brandColor, contactEmail, termsUrl, privacyUrl
 - Soft deletion (status: "active" | "deleted")
 
 **Event** (`/events/{eventId}`)
+
 - Root event configuration
 - Welcome screen: title, description, CTA, background (image/color)
 - Ending screen: headline, body, CTA with URL
@@ -144,23 +149,27 @@ The `functions/` workspace is a placeholder for Firebase Cloud Functions that wi
 - Denormalized counters: experiencesCount, sessionsCount, readyCount, sharesCount
 
 **Experience** (`/events/{eventId}/experiences/{experienceId}`)
+
 - Interactive experiences (photo/video/gif/wheel)
 - Currently implemented: photo experiences only
 - Fields: label, type, enabled, capture options, overlays, AI settings (model, prompt, reference images)
 
 **SurveyStep** (`/events/{eventId}/surveySteps/{stepId}`) - NOT YET IMPLEMENTED
+
 - Survey questions/steps (data model defined, feature cancelled in 001 spec)
 - Types: short_text, long_text, multiple_choice, opinion_scale, email, statement
 - Order managed via Event.surveyStepsOrder array
 - Subject to change in future implementation
 
 **Session** (`/events/{eventId}/sessions/{sessionId}`)
+
 - Guest interaction with event
 - Tracks input (photo/video), output (transformed media), state (created/processing/ready/error)
 - Survey completion status
 - Share metrics (download/email/social counts)
 
 **Other Subcollections** (not yet implemented)
+
 - `/events/{eventId}/experienceItems` - Items for wheel-type experiences (future)
 - `/events/{eventId}/shares` - Share tracking records
 - `/events/{eventId}/surveyResponses` - Guest survey answers (pending survey feature)
