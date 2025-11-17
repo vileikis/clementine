@@ -584,3 +584,193 @@ export async function deletePreviewMedia(
     };
   }
 }
+
+/**
+ * Upload Frame Overlay
+ *
+ * Uploads frame overlay image (PNG recommended) to Firebase Storage and returns public URL.
+ * If experience already has a frame overlay, deletes old file before uploading new one.
+ * Added in 001-photo-experience-tweaks (User Story 4 - Priority P2).
+ *
+ * @param eventId - Event ID containing the experience
+ * @param experienceId - Experience ID to update
+ * @param file - File object from form input (PNG recommended)
+ * @returns Object with publicUrl and sizeBytes
+ */
+export async function uploadFrameOverlay(
+  eventId: string,
+  experienceId: string,
+  file: File
+): Promise<ActionResponse<{ publicUrl: string; sizeBytes: number }>> {
+  try {
+    // Check authentication
+    const auth = await verifyAdminSecret();
+    if (!auth.authorized) {
+      return {
+        success: false,
+        error: {
+          code: "PERMISSION_DENIED",
+          message: auth.error,
+        },
+      };
+    }
+
+    // Validate file type (PNG recommended for transparency)
+    const allowedTypes = ["image/png", "image/jpeg", "image/jpg"];
+    if (!allowedTypes.includes(file.type)) {
+      return {
+        success: false,
+        error: {
+          code: "VALIDATION_ERROR",
+          message: `Invalid file type. Allowed: ${allowedTypes.join(", ")}. PNG recommended for transparency.`,
+        },
+      };
+    }
+
+    // Validate file size (10MB max)
+    const maxSize = 10 * 1024 * 1024;
+    if (file.size > maxSize) {
+      return {
+        success: false,
+        error: {
+          code: "VALIDATION_ERROR",
+          message: "File too large. Maximum size: 10MB",
+        },
+      };
+    }
+
+    // Check if experience exists
+    const eventRef = db.collection("events").doc(eventId);
+    const experienceRef = eventRef.collection("experiences").doc(experienceId);
+    const experienceDoc = await experienceRef.get();
+
+    if (!experienceDoc.exists) {
+      return {
+        success: false,
+        error: {
+          code: "EXPERIENCE_NOT_FOUND",
+          message: `Experience with ID ${experienceId} not found`,
+        },
+      };
+    }
+
+    // Delete old frame overlay if exists
+    const experienceData = experienceDoc.data();
+    if (experienceData?.overlayFramePath) {
+      try {
+        const oldPath = extractStoragePath(experienceData.overlayFramePath);
+        await bucket.file(oldPath).delete();
+      } catch (error) {
+        console.error("Failed to delete old frame overlay:", error);
+        // Continue with upload even if deletion fails
+      }
+    }
+
+    // Upload new file
+    const timestamp = Date.now();
+    const filename = `${timestamp}-${file.name}`;
+    const storagePath = `events/${eventId}/experiences/${experienceId}/overlay/${filename}`;
+    const fileRef = bucket.file(storagePath);
+
+    const buffer = Buffer.from(await file.arrayBuffer());
+    await fileRef.save(buffer, {
+      metadata: {
+        contentType: file.type,
+      },
+      public: true,
+    });
+
+    // Get public URL
+    const publicUrl = `https://storage.googleapis.com/${bucket.name}/${storagePath}`;
+
+    return {
+      success: true,
+      data: {
+        publicUrl,
+        sizeBytes: file.size,
+      },
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: {
+        code: "UPLOAD_ERROR",
+        message: error instanceof Error ? error.message : "Failed to upload frame overlay",
+      },
+    };
+  }
+}
+
+/**
+ * Delete Frame Overlay
+ *
+ * Deletes frame overlay file from Firebase Storage AND clears field from Firestore.
+ * Added in 001-photo-experience-tweaks (User Story 4 - Priority P2).
+ *
+ * @param eventId - Event ID containing the experience
+ * @param experienceId - Experience ID
+ * @param overlayFramePath - Public URL of frame overlay to delete
+ * @returns Success/error response
+ */
+export async function deleteFrameOverlay(
+  eventId: string,
+  experienceId: string,
+  overlayFramePath: string
+): Promise<ActionResponse<void>> {
+  try {
+    // Check authentication
+    const auth = await verifyAdminSecret();
+    if (!auth.authorized) {
+      return {
+        success: false,
+        error: {
+          code: "PERMISSION_DENIED",
+          message: auth.error,
+        },
+      };
+    }
+
+    // Check if experience exists
+    const eventRef = db.collection("events").doc(eventId);
+    const experienceRef = eventRef.collection("experiences").doc(experienceId);
+    const experienceDoc = await experienceRef.get();
+
+    if (!experienceDoc.exists) {
+      return {
+        success: false,
+        error: {
+          code: "EXPERIENCE_NOT_FOUND",
+          message: `Experience with ID ${experienceId} not found`,
+        },
+      };
+    }
+
+    // Delete file from Storage
+    try {
+      const storagePath = extractStoragePath(overlayFramePath);
+      await bucket.file(storagePath).delete();
+    } catch (error) {
+      console.error("Failed to delete frame overlay from storage:", error);
+      // Continue to clear Firestore field even if storage deletion fails
+    }
+
+    // Clear overlay field from Firestore
+    await experienceRef.update({
+      overlayFramePath: null,
+      updatedAt: Date.now(),
+    });
+
+    return {
+      success: true,
+      data: undefined,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: {
+        code: "UNKNOWN_ERROR",
+        message: error instanceof Error ? error.message : "Unknown error occurred",
+      },
+    };
+  }
+}

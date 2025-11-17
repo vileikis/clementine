@@ -4,17 +4,17 @@ import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
-import { ImageUploadField } from "./ImageUploadField";
 import { PreviewMediaUpload } from "./PreviewMediaUpload";
+import { CountdownSettings } from "./CountdownSettings";
+import { OverlaySettings } from "./OverlaySettings";
+import { AITransformSettings } from "./AITransformSettings";
 import type { Experience } from "@/lib/types/firestore";
-import type { PreviewType } from "@/lib/types/firestore";
+import type { PreviewType, AspectRatio } from "@/lib/types/firestore";
 
 interface ExperienceEditorProps {
   experience: Experience;
@@ -59,6 +59,9 @@ export function ExperienceEditor({
   const [aiReferenceImagePaths, setAiReferenceImagePaths] = useState<string[]>(
     experience.aiReferenceImagePaths || []
   );
+  const [aiAspectRatio, setAiAspectRatio] = useState<AspectRatio>(experience.aiAspectRatio || "1:1");
+  const [countdownEnabled, setCountdownEnabled] = useState(experience.countdownEnabled ?? false);
+  const [countdownSeconds, setCountdownSeconds] = useState(experience.countdownSeconds ?? 3);
 
   // Handle save
   const handleSave = () => {
@@ -71,10 +74,13 @@ export function ExperienceEditor({
           previewPath: previewPath || undefined,
           previewType: previewType || undefined,
           overlayFramePath: overlayFramePath || undefined,
+          countdownEnabled,
+          countdownSeconds,
           aiEnabled,
           aiModel: aiModel || undefined,
           aiPrompt: aiPrompt || undefined,
           aiReferenceImagePaths: aiReferenceImagePaths.length > 0 ? aiReferenceImagePaths : undefined,
+          aiAspectRatio,
         });
         toast.success("Experience updated successfully");
       } catch (error) {
@@ -112,16 +118,6 @@ export function ExperienceEditor({
         toast.error(error instanceof Error ? error.message : "Failed to delete experience");
       }
     });
-  };
-
-  // Handle AI reference image addition
-  const handleAddReferenceImage = (url: string) => {
-    setAiReferenceImagePaths([...aiReferenceImagePaths, url]);
-  };
-
-  // Handle AI reference image removal
-  const handleRemoveReferenceImage = (index: number) => {
-    setAiReferenceImagePaths(aiReferenceImagePaths.filter((_, i) => i !== index));
   };
 
   return (
@@ -188,20 +184,23 @@ export function ExperienceEditor({
         disabled={isPending}
       />
 
-      {/* Overlays */}
-      <div className="space-y-4">
-        <h2 className="text-2xl font-semibold">Overlays</h2>
+      {/* Countdown Timer */}
+      <CountdownSettings
+        countdownEnabled={countdownEnabled}
+        countdownSeconds={countdownSeconds}
+        onCountdownEnabledChange={setCountdownEnabled}
+        onCountdownSecondsChange={setCountdownSeconds}
+        disabled={isPending}
+      />
 
-        <ImageUploadField
-          id="overlay-frame"
-          label="Frame Overlay"
-          value={overlayFramePath}
-          onChange={setOverlayFramePath}
-          destination="experience-overlay"
-          disabled={isPending}
-          recommendedSize="Recommended: 1080x1080px. Max 10MB."
-        />
-      </div>
+      {/* Frame Overlay */}
+      <OverlaySettings
+        eventId={experience.eventId}
+        experienceId={experience.id}
+        overlayFramePath={overlayFramePath || undefined}
+        onOverlayChange={(path) => setOverlayFramePath(path || "")}
+        disabled={isPending}
+      />
 
       {/* AI Transformation */}
       <div className="space-y-4">
@@ -216,73 +215,17 @@ export function ExperienceEditor({
         </div>
 
         {aiEnabled && (
-          <>
-            <div className="space-y-2">
-              <Label htmlFor="aiModel">AI Model</Label>
-              <Select
-                value={aiModel}
-                onValueChange={setAiModel}
-                disabled={isPending}
-              >
-                <SelectTrigger id="aiModel">
-                  <SelectValue placeholder="Select AI model" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="nanobanana">Nano Banana</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="aiPrompt">AI Prompt</Label>
-              <Textarea
-                id="aiPrompt"
-                value={aiPrompt}
-                onChange={(e) => setAiPrompt(e.target.value)}
-                placeholder="Describe the AI transformation..."
-                rows={4}
-                maxLength={600}
-                disabled={isPending}
-              />
-              <p className="text-xs text-muted-foreground">
-                {aiPrompt.length}/600 characters
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Reference Images</Label>
-              <div className="space-y-4">
-                {aiReferenceImagePaths.map((path, index) => (
-                  <div key={index} className="relative w-full h-32 overflow-hidden rounded-lg border bg-muted">
-                    <img
-                      src={path}
-                      alt={`Reference ${index + 1}`}
-                      className="h-full w-full object-contain"
-                    />
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      className="absolute top-2 right-2"
-                      onClick={() => handleRemoveReferenceImage(index)}
-                      disabled={isPending}
-                      type="button"
-                    >
-                      Remove
-                    </Button>
-                  </div>
-                ))}
-                <ImageUploadField
-                  id={`ai-reference-${aiReferenceImagePaths.length}`}
-                  label={aiReferenceImagePaths.length === 0 ? "Add Reference Image" : "Add Another Reference"}
-                  value=""
-                  onChange={handleAddReferenceImage}
-                  destination="ai-reference"
-                  disabled={isPending}
-                  recommendedSize="Max 10MB."
-                />
-              </div>
-            </div>
-          </>
+          <AITransformSettings
+            aiModel={aiModel}
+            aiPrompt={aiPrompt}
+            aiReferenceImagePaths={aiReferenceImagePaths}
+            aiAspectRatio={aiAspectRatio}
+            onAiModelChange={setAiModel}
+            onAiPromptChange={setAiPrompt}
+            onAiReferenceImagePathsChange={setAiReferenceImagePaths}
+            onAiAspectRatioChange={setAiAspectRatio}
+            disabled={isPending}
+          />
         )}
       </div>
 
