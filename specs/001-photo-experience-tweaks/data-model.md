@@ -382,6 +382,44 @@ https://firebasestorage.googleapis.com/v0/b/{bucket}/o/{encodedPath}?alt=media
 2. Use efficient formats: WebM for video, WebP for images
 3. Delete old preview media when replaced (handled in Server Action)
 
+### Media Deletion Pattern
+
+**Fault-Tolerant Cleanup Approach** (see `deletePreviewMedia` in `web/src/lib/actions/experiences.ts`):
+
+The media deletion strategy prioritizes data integrity over strict cleanup by continuing to clear Firestore references even if Storage deletion fails:
+
+```typescript
+// 1. Authenticate request
+// 2. Verify experience exists in Firestore
+// 3. Attempt to delete file from Firebase Storage
+try {
+  const storagePath = extractStoragePath(previewPath);
+  await bucket.file(storagePath).delete();
+} catch (error) {
+  console.error("Failed to delete preview media from storage:", error);
+  // Continue to clear Firestore fields even if storage deletion fails
+  // (file might already be deleted or inaccessible)
+}
+
+// 4. Always clear Firestore fields (prevents orphaned references)
+await experienceRef.update({
+  previewPath: null,
+  previewType: null,
+  updatedAt: Date.now(),
+});
+```
+
+**Rationale**:
+- **Prevents orphaned Firestore references**: Database always stays consistent even if Storage deletion fails
+- **Handles edge cases gracefully**: File might already be deleted, permissions might have changed, or network errors might occur
+- **User experience priority**: Users can retry operations without getting stuck in error states
+- **Storage cleanup remains eventual**: Orphaned Storage files can be cleaned up via separate maintenance scripts if needed
+
+**Trade-offs**:
+- ✅ Database integrity guaranteed
+- ✅ Resilient to Storage service issues
+- ⚠️ May leave orphaned files in Storage (rare, acceptable for free tier limits)
+
 ---
 
 ## Summary of Changes
