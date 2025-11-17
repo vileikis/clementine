@@ -90,18 +90,18 @@
 
 ### Server Actions for User Story 2
 
-- [ ] T020 [US2] Add `uploadPreviewMedia` Server Action in `web/src/lib/actions/experiences.ts` with file validation, Firebase Storage upload, and cleanup of old media
-- [ ] T021 [US2] Add `deletePreviewMedia` Server Action in `web/src/lib/actions/experiences.ts` with Firebase Storage deletion
-- [ ] T022 [US2] Update `updateExperience` Server Action in `web/src/lib/actions/experiences.ts` to support `previewPath` and `previewType` fields
+- [X] T020 [US2] Add `uploadPreviewMedia` Server Action in `web/src/lib/actions/experiences.ts` with file validation, Firebase Storage upload, and cleanup of old media
+- [X] T021 [US2] Add `deletePreviewMedia` Server Action in `web/src/lib/actions/experiences.ts` with Firebase Storage deletion
+- [X] T022 [US2] Update `updateExperience` Server Action in `web/src/lib/actions/experiences.ts` to support `previewPath` and `previewType` fields
 
 ### UI Component for User Story 2
 
-- [ ] T023 [US2] Create `web/src/components/organizer/builder/PreviewMediaUpload.tsx` component with file upload input accepting image/GIF/video
-- [ ] T024 [US2] Add conditional rendering logic to `PreviewMediaUpload.tsx` based on `previewType` (video element for videos, img for GIF/image)
-- [ ] T025 [US2] Add upload/replace/remove button handlers in `PreviewMediaUpload.tsx` calling Server Actions
-- [ ] T026 [US2] Add helper text "This media will appear on the guest start screen as a visual preview of the experience" in `PreviewMediaUpload.tsx`
-- [ ] T027 [US2] Add file size validation (10MB max) in `PreviewMediaUpload.tsx`
-- [ ] T028 [US2] Integrate `PreviewMediaUpload.tsx` component into `web/src/components/organizer/builder/ExperienceEditor.tsx`
+- [X] T023 [US2] Create `web/src/components/organizer/builder/PreviewMediaUpload.tsx` component with file upload input accepting image/GIF/video
+- [X] T024 [US2] Add conditional rendering logic to `PreviewMediaUpload.tsx` based on `previewType` (video element for videos, img for GIF/image)
+- [X] T025 [US2] Add upload/replace/remove button handlers in `PreviewMediaUpload.tsx` calling Server Actions
+- [X] T026 [US2] Add helper text "This media will appear on the guest start screen as a visual preview of the experience" in `PreviewMediaUpload.tsx`
+- [X] T027 [US2] Add file size validation (10MB max) in `PreviewMediaUpload.tsx`
+- [X] T028 [US2] Integrate `PreviewMediaUpload.tsx` component into `web/src/components/organizer/builder/ExperienceEditor.tsx`
 
 ### Tests for User Story 2
 
