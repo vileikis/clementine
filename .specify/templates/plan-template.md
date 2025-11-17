@@ -38,6 +38,7 @@ Verify compliance with Clementine Constitution (`.specify/memory/constitution.md
 - [ ] **Type-Safe Development**: TypeScript strict mode, no `any` escapes, Zod validation for external inputs
 - [ ] **Minimal Testing Strategy**: Jest unit tests for critical paths (70%+ coverage goal), tests co-located with source
 - [ ] **Validation Loop Discipline**: Plan includes validation tasks (lint, type-check, test) before completion
+- [ ] **Firebase Architecture Standards**: Admin SDK for writes/server-side, Client SDK for real-time reads, schemas in `web/src/lib/schemas/`, public images stored as full URLs
 - [ ] **Technical Standards**: Applicable standards from `standards/` reviewed and referenced
 
 **Complexity Violations** (if any):

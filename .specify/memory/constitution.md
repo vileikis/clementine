@@ -1,31 +1,30 @@
 <!--
   SYNC IMPACT REPORT
 
-  Version Change: Initial version → 1.0.0
+  Version Change: 1.0.0 → 1.1.0
 
   Modified Principles:
+  - Created VI. Firebase Architecture Standards
+
+  Added Sections:
+  - Core Principles section expanded (6 principles now)
+
+  Removed Sections: N/A
+
+  Templates Requiring Updates:
+  ✅ plan-template.md - Added Firebase architecture checkpoint to Constitution Check section
+  ✅ spec-template.md - Added Firebase Architecture Requirements section (FAR-001 through FAR-005)
+  ✅ tasks-template.md - No changes needed (validation loop covers Firebase standards)
+
+  Follow-up TODOs:
+  - None (all templates updated)
+
+  Previous Changes (1.0.0):
   - Created I. Mobile-First Responsive Design
   - Created II. Clean Code & Simplicity
   - Created III. Type-Safe Development
   - Created IV. Minimal Testing Strategy
   - Created V. Validation Loop Discipline
-
-  Added Sections:
-  - Core Principles (5 principles)
-  - Technical Standards
-  - Development Workflow
-  - Governance
-
-  Removed Sections: N/A (initial creation)
-
-  Templates Requiring Updates:
-  ✅ plan-template.md - Constitution Check section updated with concrete checklist items
-  ✅ spec-template.md - Added Mobile-First and Type-Safety requirement sections
-  ✅ tasks-template.md - Added Validation Loop subsection to Polish phase
-  ✅ Command files (.claude/commands/*.md) - Verified, no updates needed (already reference constitution)
-
-  Follow-up TODOs:
-  - None (all placeholders filled)
 -->
 
 # Clementine Constitution
@@ -101,6 +100,18 @@ Before marking any feature complete, MUST run validation loop to ensure code qua
 - Commit only after validation loop passes cleanly
 
 **Rationale**: Validation loop catches issues early before they reach code review or production. This discipline prevents broken main branch states and ensures every commit meets quality standards. Automated checks (CI) complement but don't replace local validation.
+
+### VI. Firebase Architecture Standards
+
+All Firebase integration MUST follow the hybrid Client SDK + Admin SDK pattern defined in `standards/backend/firebase.md`.
+
+- **Backend (Server Actions, API Routes)**: ALWAYS use Admin SDK (`web/src/lib/firebase/admin.ts`) for all write operations, business logic, and privileged reads
+- **Frontend (Client Components)**: ALWAYS use Client SDK (`web/src/lib/firebase/client.ts`) for real-time subscriptions (`onSnapshot`) and optimistic reads
+- **Security Rules**: Allow reads, deny writes - all mutations MUST go through Server Actions using Admin SDK
+- **Data Schemas**: All Zod schemas and validation logic MUST be located in `web/src/lib/schemas/` directory
+- **Public Images**: ALWAYS store full public URLs (not relative paths) in Firestore for instant rendering without additional API calls
+
+**Rationale**: The hybrid pattern provides real-time updates (Client SDK) while ensuring security and validation (Admin SDK). Centralizing schemas in one location makes validation logic discoverable and reusable. Storing full public URLs eliminates latency from signed URL generation and enables instant image rendering across client and server components.
 
 ## Technical Standards
 
@@ -199,4 +210,4 @@ If a feature requires violating the "Clean Code & Simplicity" principle (e.g., i
 - Why the complexity is needed for this specific use case
 - What simpler alternatives were considered and why they were rejected
 
-**Version**: 1.0.0 | **Ratified**: 2025-11-11 | **Last Amended**: 2025-11-11
+**Version**: 1.1.0 | **Ratified**: 2025-11-11 | **Last Amended**: 2025-11-17

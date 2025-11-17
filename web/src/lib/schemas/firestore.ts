@@ -223,7 +223,11 @@ export const updateEventSurveyConfigSchema = z.object({
 
 // Experience creation/update schemas
 export const createExperienceSchema = z.object({
-  label: z.string().min(1).max(50),
+  label: z
+    .string()
+    .trim()
+    .min(1, "Experience name is required")
+    .max(50, "Experience name must be 50 characters or less"),
   type: experienceTypeSchema,
   enabled: z.boolean().default(true),
   aiEnabled: z.boolean().default(false),

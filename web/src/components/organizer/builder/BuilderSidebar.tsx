@@ -18,9 +18,10 @@ interface BuilderSidebarProps {
 }
 
 /**
- * BuilderSidebar component for Content tab navigation
- * Part of Phase 4 (User Story 1) - Content Tab Layout Infrastructure
+ * BuilderSidebar component for Design tab navigation
+ * Part of Phase 4 (User Story 1) - Design Tab Layout Infrastructure
  * Enhanced in Phase 6 (User Story 3) - Manage Photo Experiences
+ * Updated in Phase 6 (User Story 4) - Rename Content to Design
  *
  * Displays four main sections:
  * - Welcome: Configure welcome screen
