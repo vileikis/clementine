@@ -199,9 +199,9 @@ This is a monorepo with web/ and functions/ workspaces. All paths below use `web
 
 ### Implementation for User Story 6
 
-- [ ] T077 [US6] Add "Coming Soon" badges to Video, GIF, and Wheel types in ExperienceTypeDialog
-- [ ] T078 [US6] Ensure non-photo types are disabled and show explanatory text
-- [ ] T079 [US6] Verify type selector shows all types with correct states in dev server
+- [x] T077 [US6] Add "Coming Soon" badges to Video, GIF, and Wheel types in ExperienceTypeDialog
+- [x] T078 [US6] Ensure non-photo types are disabled and show explanatory text
+- [x] T079 [US6] Verify type selector shows all types with correct states in dev server
 
 **Checkpoint**: At this point, User Story 6 should be fully functional - All experience types are visible with correct availability states
 
