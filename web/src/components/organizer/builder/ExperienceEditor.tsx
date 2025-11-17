@@ -52,6 +52,7 @@ export function ExperienceEditor({
   const [enabled, setEnabled] = useState(experience.enabled);
   const [previewPath, setPreviewPath] = useState(experience.previewPath || "");
   const [previewType, setPreviewType] = useState<PreviewType | undefined>(experience.previewType);
+  const [overlayEnabled, setOverlayEnabled] = useState(experience.overlayEnabled ?? false);
   const [overlayFramePath, setOverlayFramePath] = useState(experience.overlayFramePath || "");
   const [aiEnabled, setAiEnabled] = useState(experience.aiEnabled);
   const [aiModel, setAiModel] = useState(experience.aiModel || "nanobanana");
@@ -73,6 +74,7 @@ export function ExperienceEditor({
           enabled,
           previewPath: previewPath || undefined,
           previewType: previewType || undefined,
+          overlayEnabled,
           overlayFramePath: overlayFramePath || undefined,
           countdownEnabled,
           countdownSeconds,
@@ -197,8 +199,11 @@ export function ExperienceEditor({
       <OverlaySettings
         eventId={experience.eventId}
         experienceId={experience.id}
+        overlayEnabled={overlayEnabled}
         overlayFramePath={overlayFramePath || undefined}
-        onOverlayChange={(path) => setOverlayFramePath(path || "")}
+        onOverlayEnabledChange={setOverlayEnabled}
+        onUpload={(url) => setOverlayFramePath(url)}
+        onRemove={() => setOverlayFramePath("")}
         disabled={isPending}
       />
 

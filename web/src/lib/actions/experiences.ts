@@ -159,6 +159,7 @@ export async function updateExperience(
     previewType?: PreviewType;
     countdownEnabled?: boolean;
     countdownSeconds?: number;
+    overlayEnabled?: boolean;
     overlayFramePath?: string;
     aiEnabled?: boolean;
     aiModel?: string;
