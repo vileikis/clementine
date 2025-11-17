@@ -12,7 +12,9 @@ import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { ImageUploadField } from "./ImageUploadField";
+import { PreviewMediaUpload } from "./PreviewMediaUpload";
 import type { Experience } from "@/lib/types/firestore";
+import type { PreviewType } from "@/lib/types/firestore";
 
 interface ExperienceEditorProps {
   experience: Experience;
@@ -48,6 +50,8 @@ export function ExperienceEditor({
   // Local form state
   const [label, setLabel] = useState(experience.label);
   const [enabled, setEnabled] = useState(experience.enabled);
+  const [previewPath, setPreviewPath] = useState(experience.previewPath || "");
+  const [previewType, setPreviewType] = useState<PreviewType | undefined>(experience.previewType);
   const [overlayFramePath, setOverlayFramePath] = useState(experience.overlayFramePath || "");
   const [aiEnabled, setAiEnabled] = useState(experience.aiEnabled);
   const [aiModel, setAiModel] = useState(experience.aiModel || "nanobanana");
@@ -64,6 +68,8 @@ export function ExperienceEditor({
         await onSave(experience.id, {
           label,
           enabled,
+          previewPath: previewPath || undefined,
+          previewType: previewType || undefined,
           overlayFramePath: overlayFramePath || undefined,
           aiEnabled,
           aiModel: aiModel || undefined,
@@ -75,6 +81,18 @@ export function ExperienceEditor({
         toast.error(error instanceof Error ? error.message : "Failed to save experience");
       }
     });
+  };
+
+  // Handle preview media upload
+  const handlePreviewMediaUpload = (publicUrl: string, fileType: PreviewType) => {
+    setPreviewPath(publicUrl);
+    setPreviewType(fileType);
+  };
+
+  // Handle preview media removal
+  const handlePreviewMediaRemove = () => {
+    setPreviewPath("");
+    setPreviewType(undefined);
   };
 
   // Keyboard shortcuts: Cmd+S / Ctrl+S to save
@@ -158,6 +176,17 @@ export function ExperienceEditor({
           </p>
         </div>
       </div>
+
+      {/* Preview Media */}
+      <PreviewMediaUpload
+        eventId={experience.eventId}
+        experienceId={experience.id}
+        previewPath={previewPath}
+        previewType={previewType}
+        onUpload={handlePreviewMediaUpload}
+        onRemove={handlePreviewMediaRemove}
+        disabled={isPending}
+      />
 
       {/* Overlays */}
       <div className="space-y-4">

@@ -5,10 +5,10 @@
  * Phase 6 implementation: Full CRUD operations for photo experiences.
  */
 
-import { db } from "@/lib/firebase/admin";
+import { db, storage as bucket } from "@/lib/firebase/admin";
 import { z } from "zod";
 import { verifyAdminSecret } from "@/lib/auth";
-import type { ExperienceType, PreviewType } from "@/lib/types/firestore";
+import type { ExperienceType, PreviewType, AspectRatio } from "@/lib/types/firestore";
 
 // Action response types
 export type ActionResponse<T = void> =
@@ -125,27 +125,25 @@ export async function createExperience(
   }
 }
 
-// Update experience schema
+// Update experience schema (aligned with 001-photo-experience-tweaks)
 const updateExperienceSchema = z.object({
   label: z.string().min(1).max(50).optional(),
   enabled: z.boolean().optional(),
   previewPath: z.string().optional(),
   previewType: z.enum(["image", "gif", "video"]).optional(),
-  allowCamera: z.boolean().optional(),
-  allowLibrary: z.boolean().optional(),
-  maxDurationMs: z.number().int().positive().max(60000).optional(),
-  frameCount: z.number().int().min(2).max(20).optional(),
-  captureIntervalMs: z.number().int().positive().optional(),
+  countdownEnabled: z.boolean().optional(),
+  countdownSeconds: z.number().int().min(0).max(10).optional(),
   overlayFramePath: z.string().optional(),
-  overlayLogoPath: z.string().optional(),
   aiEnabled: z.boolean().optional(),
   aiModel: z.enum(["nanobanana"]).optional(),
   aiPrompt: z.string().max(600).optional(),
   aiReferenceImagePaths: z.array(z.string()).optional(),
+  aiAspectRatio: z.enum(["1:1", "3:4", "4:5", "9:16", "16:9"]).optional(),
 });
 
 /**
  * Updates an existing experience.
+ * Updated in 001-photo-experience-tweaks to support new fields.
  * @param eventId - Event ID
  * @param experienceId - Experience ID
  * @param data - Partial experience fields to update
@@ -159,17 +157,14 @@ export async function updateExperience(
     enabled?: boolean;
     previewPath?: string;
     previewType?: PreviewType;
-    allowCamera?: boolean;
-    allowLibrary?: boolean;
-    maxDurationMs?: number;
-    frameCount?: number;
-    captureIntervalMs?: number;
+    countdownEnabled?: boolean;
+    countdownSeconds?: number;
     overlayFramePath?: string;
-    overlayLogoPath?: string;
     aiEnabled?: boolean;
     aiModel?: string;
     aiPrompt?: string;
     aiReferenceImagePaths?: string[];
+    aiAspectRatio?: AspectRatio;
   }
 ): Promise<ActionResponse<void>> {
   try {
@@ -226,8 +221,9 @@ export async function updateExperience(
     if (data.overlayFramePath === undefined || data.overlayFramePath === "") {
       updateData.overlayFramePath = null;
     }
-    if (data.overlayLogoPath === undefined || data.overlayLogoPath === "") {
-      updateData.overlayLogoPath = null;
+    if (data.previewPath === undefined || data.previewPath === "") {
+      updateData.previewPath = null;
+      updateData.previewType = null;
     }
     if (data.aiModel === undefined || data.aiModel === "") {
       updateData.aiModel = null;
@@ -332,6 +328,247 @@ export async function deleteExperience(
     // In a future phase, you would also delete all related experienceItems
 
     await batch.commit();
+
+    return {
+      success: true,
+      data: undefined,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: {
+        code: "UNKNOWN_ERROR",
+        message: error instanceof Error ? error.message : "Unknown error occurred",
+      },
+    };
+  }
+}
+
+// ============================================================================
+// Media Upload Operations (001-photo-experience-tweaks)
+// ============================================================================
+
+/**
+ * Helper function to detect file type from MIME type
+ */
+function detectFileType(file: File): "image" | "gif" | "video" {
+  if (file.type === "image/gif") return "gif";
+  if (file.type.startsWith("video/")) return "video";
+  return "image";
+}
+
+/**
+ * Helper function to extract storage path from public URL
+ * Handles both formats:
+ * - storage.googleapis.com/{bucket}/{path}
+ * - firebasestorage.googleapis.com/v0/b/{bucket}/o/{path}
+ */
+function extractStoragePath(publicUrl: string): string {
+  try {
+    const url = new URL(publicUrl);
+
+    // Format: storage.googleapis.com/{bucket}/{path}
+    if (url.hostname === "storage.googleapis.com") {
+      // Path is everything after the bucket name (first segment)
+      const pathSegments = url.pathname.split("/").filter(Boolean);
+      if (pathSegments.length >= 2) {
+        // Skip bucket name (first segment), return rest of path
+        return pathSegments.slice(1).join("/");
+      }
+    }
+
+    // Format: firebasestorage.googleapis.com/v0/b/{bucket}/o/{path}
+    if (url.hostname === "firebasestorage.googleapis.com") {
+      const pathMatch = url.pathname.match(/\/o\/(.+?)(\?|$)/);
+      if (pathMatch) {
+        return decodeURIComponent(pathMatch[1]);
+      }
+    }
+
+    throw new Error("Could not extract storage path from URL");
+  } catch (error) {
+    throw new Error(`Invalid storage URL: ${error instanceof Error ? error.message : "Unknown error"}`);
+  }
+}
+
+/**
+ * Upload Preview Media
+ *
+ * Uploads preview media (image/GIF/video) to Firebase Storage and returns public URL.
+ * If experience already has preview media, deletes old file before uploading new one.
+ *
+ * @param eventId - Event ID containing the experience
+ * @param experienceId - Experience ID to update
+ * @param file - File object from form input
+ * @returns Object with publicUrl, fileType, and sizeBytes
+ */
+export async function uploadPreviewMedia(
+  eventId: string,
+  experienceId: string,
+  file: File
+): Promise<ActionResponse<{ publicUrl: string; fileType: PreviewType; sizeBytes: number }>> {
+  try {
+    // Check authentication
+    const auth = await verifyAdminSecret();
+    if (!auth.authorized) {
+      return {
+        success: false,
+        error: {
+          code: "PERMISSION_DENIED",
+          message: auth.error,
+        },
+      };
+    }
+
+    // Validate file type
+    const allowedTypes = ["image/jpeg", "image/png", "image/gif", "video/mp4", "video/webm"];
+    if (!allowedTypes.includes(file.type)) {
+      return {
+        success: false,
+        error: {
+          code: "VALIDATION_ERROR",
+          message: `Invalid file type. Allowed: ${allowedTypes.join(", ")}`,
+        },
+      };
+    }
+
+    // Validate file size (10MB max)
+    const maxSize = 10 * 1024 * 1024;
+    if (file.size > maxSize) {
+      return {
+        success: false,
+        error: {
+          code: "VALIDATION_ERROR",
+          message: "File too large. Maximum size: 10MB",
+        },
+      };
+    }
+
+    // Check if experience exists
+    const eventRef = db.collection("events").doc(eventId);
+    const experienceRef = eventRef.collection("experiences").doc(experienceId);
+    const experienceDoc = await experienceRef.get();
+
+    if (!experienceDoc.exists) {
+      return {
+        success: false,
+        error: {
+          code: "EXPERIENCE_NOT_FOUND",
+          message: `Experience with ID ${experienceId} not found`,
+        },
+      };
+    }
+
+    // Delete old preview media if exists
+    const experienceData = experienceDoc.data();
+    if (experienceData?.previewPath) {
+      try {
+        const oldPath = extractStoragePath(experienceData.previewPath);
+        await bucket.file(oldPath).delete();
+      } catch (error) {
+        console.error("Failed to delete old preview media:", error);
+        // Continue with upload even if deletion fails
+      }
+    }
+
+    // Upload new file
+    const timestamp = Date.now();
+    const filename = `${timestamp}-${file.name}`;
+    const storagePath = `events/${eventId}/experiences/${experienceId}/preview/${filename}`;
+    const fileRef = bucket.file(storagePath);
+
+    const buffer = Buffer.from(await file.arrayBuffer());
+    await fileRef.save(buffer, {
+      metadata: {
+        contentType: file.type,
+      },
+      public: true,
+    });
+
+    // Get public URL
+    const publicUrl = `https://storage.googleapis.com/${bucket.name}/${storagePath}`;
+    const fileType = detectFileType(file);
+
+    return {
+      success: true,
+      data: {
+        publicUrl,
+        fileType,
+        sizeBytes: file.size,
+      },
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: {
+        code: "UPLOAD_ERROR",
+        message: error instanceof Error ? error.message : "Failed to upload preview media",
+      },
+    };
+  }
+}
+
+/**
+ * Delete Preview Media
+ *
+ * Deletes preview media file from Firebase Storage AND clears fields from Firestore.
+ * This is an immediate, complete deletion to prevent deadlock scenarios where
+ * the file is deleted but Firestore still references it.
+ *
+ * @param eventId - Event ID containing the experience
+ * @param experienceId - Experience ID
+ * @param previewPath - Public URL of preview media to delete
+ * @returns Success/error response
+ */
+export async function deletePreviewMedia(
+  eventId: string,
+  experienceId: string,
+  previewPath: string
+): Promise<ActionResponse<void>> {
+  try {
+    // Check authentication
+    const auth = await verifyAdminSecret();
+    if (!auth.authorized) {
+      return {
+        success: false,
+        error: {
+          code: "PERMISSION_DENIED",
+          message: auth.error,
+        },
+      };
+    }
+
+    // Check if experience exists
+    const eventRef = db.collection("events").doc(eventId);
+    const experienceRef = eventRef.collection("experiences").doc(experienceId);
+    const experienceDoc = await experienceRef.get();
+
+    if (!experienceDoc.exists) {
+      return {
+        success: false,
+        error: {
+          code: "EXPERIENCE_NOT_FOUND",
+          message: `Experience with ID ${experienceId} not found`,
+        },
+      };
+    }
+
+    // Delete file from Storage
+    try {
+      const storagePath = extractStoragePath(previewPath);
+      await bucket.file(storagePath).delete();
+    } catch (error) {
+      console.error("Failed to delete preview media from storage:", error);
+      // Continue to clear Firestore fields even if storage deletion fails
+      // (file might already be deleted)
+    }
+
+    // Clear preview fields from Firestore immediately
+    await experienceRef.update({
+      previewPath: null,
+      previewType: null,
+      updatedAt: Date.now(),
+    });
 
     return {
       success: true,
