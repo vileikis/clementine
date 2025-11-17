@@ -27,6 +27,7 @@ export async function createExperienceAction(
 ### Input Schema
 
 **Validation**: `createExperienceSchema` (Zod)
+**Location**: `web/src/lib/schemas/firestore.ts`
 
 ```typescript
 import { z } from "zod";
@@ -38,9 +39,9 @@ export const createExperienceSchema = z.object({
     .min(1, "Experience name is required")
     .max(50, "Experience name must be 50 characters or less"),
 
-  type: z.enum(["photo", "video", "gif", "wheel"], {
-    errorMap: () => ({ message: "Please select an experience type" }),
-  }),
+  type: experienceTypeSchema, // z.enum(["photo", "video", "gif", "wheel"])
+  enabled: z.boolean().default(true),
+  aiEnabled: z.boolean().default(false),
 });
 
 export type CreateExperienceInput = z.infer<typeof createExperienceSchema>;
@@ -140,7 +141,7 @@ await createExperienceAction("evt_abc123", {
 
 import { addDoc, collection, doc, updateDoc, increment } from "firebase/firestore";
 import { db } from "@/lib/firebase/admin";
-import { createExperienceSchema } from "@/lib/validation/experience";
+import { createExperienceSchema } from "@/lib/schemas/firestore";
 import type { ActionResult } from "@/lib/types/actions";
 
 export async function createExperienceAction(

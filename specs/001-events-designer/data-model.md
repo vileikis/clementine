@@ -81,9 +81,9 @@ All other fields are managed by the experience editor (existing functionality).
 
 ## Validation Schemas
 
-### Create Experience Input (New)
+### Create Experience Input (Existing - needs enhancement)
 
-**Location**: `web/src/lib/validation/experience.ts` (to be created)
+**Location**: `web/src/lib/schemas/firestore.ts` (already exists, needs .trim() and error messages)
 
 ```typescript
 import { z } from "zod";
