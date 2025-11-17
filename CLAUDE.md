@@ -14,7 +14,7 @@ A web-based platform where:
 - **Guests** visit a shareable link, upload a photo, and receive an AI-transformed result in under 1 minute
 - **Analytics** help creators measure engagement, shares, and campaign success
 
-See [PRODUCT.md](.specify/memory/product/PRODUCT.md) for full product strategy, user flows, MVP scope, and success metrics.
+See [product.md](.specify/memory/product.md) for full product strategy, user flows, MVP scope, and success metrics.
 
 ### Spec-Driven Development
 
