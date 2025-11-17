@@ -72,13 +72,13 @@
 
 ### Implementation for User Story 2
 
-- [ ] T014 [US2] Create experience creation route in web/src/app/(event-builder)/events/[eventId]/design/experiences/create/page.tsx
-- [ ] T015 [US2] Create CreateExperienceForm component with React Hook Form + Zod in web/src/components/organizer/builder/CreateExperienceForm.tsx
-- [ ] T016 [US2] Implement form validation (enable submit only when name and type are valid) in web/src/components/organizer/builder/CreateExperienceForm.tsx
-- [ ] T017 [US2] Add "Create Experience" button to sidebar that navigates to create route in web/src/components/organizer/builder/DesignSidebar.tsx
-- [ ] T018 [US2] Implement redirect to experience editor after successful creation in web/src/components/organizer/builder/CreateExperienceForm.tsx
-- [ ] T019 [US2] Remove ExperienceTypeDialog component from web/src/components/organizer/builder/ExperienceTypeDialog.tsx (deprecated)
-- [ ] T020 [US2] Verify whitespace-only names are rejected (trim validation)
+- [X] T014 [US2] Create experience creation route in web/src/app/(event-builder)/events/[eventId]/design/experiences/create/page.tsx
+- [X] T015 [US2] Create CreateExperienceForm component with React Hook Form + Zod in web/src/components/organizer/builder/CreateExperienceForm.tsx
+- [X] T016 [US2] Implement form validation (enable submit only when name and type are valid) in web/src/components/organizer/builder/CreateExperienceForm.tsx
+- [X] T017 [US2] Add "Create Experience" button to sidebar that navigates to create route in web/src/components/organizer/builder/DesignSidebar.tsx
+- [X] T018 [US2] Implement redirect to experience editor after successful creation in web/src/components/organizer/builder/CreateExperienceForm.tsx
+- [X] T019 [US2] Remove ExperienceTypeDialog component from web/src/components/organizer/builder/ExperienceTypeDialog.tsx (deprecated)
+- [X] T020 [US2] Verify whitespace-only names are rejected (trim validation)
 
 **Checkpoint**: At this point, User Story 2 should be fully functional - can create experiences via inline form
 
@@ -92,12 +92,12 @@
 
 ### Implementation for User Story 3
 
-- [ ] T021 [US3] Create experience editor route in web/src/app/(event-builder)/events/[eventId]/design/experiences/[experienceId]/page.tsx
-- [ ] T022 [US3] Extract ExperienceEditor component from ContentBuilder to web/src/components/organizer/builder/ExperienceEditor.tsx
-- [ ] T023 [US3] Implement 404 handler for invalid experience IDs in web/src/app/(event-builder)/events/[eventId]/design/experiences/[experienceId]/not-found.tsx
-- [ ] T024 [US3] Add notFound() call for invalid experience IDs in web/src/app/(event-builder)/events/[eventId]/design/experiences/[experienceId]/page.tsx
-- [ ] T025 [US3] Update DesignSidebar to render experiences list always visible (remove menu toggle) in web/src/components/organizer/builder/DesignSidebar.tsx
-- [ ] T026 [US3] Update DesignSidebar to highlight active experience based on pathname in web/src/components/organizer/builder/DesignSidebar.tsx
+- [X] T021 [US3] Create experience editor route in web/src/app/(event-builder)/events/[eventId]/design/experiences/[experienceId]/page.tsx
+- [X] T022 [US3] Extract ExperienceEditor component from ContentBuilder to web/src/components/organizer/builder/ExperienceEditor.tsx
+- [X] T023 [US3] Implement 404 handler for invalid experience IDs in web/src/app/(event-builder)/events/[eventId]/design/experiences/[experienceId]/not-found.tsx
+- [X] T024 [US3] Add notFound() call for invalid experience IDs in web/src/app/(event-builder)/events/[eventId]/design/experiences/[experienceId]/page.tsx
+- [X] T025 [US3] Update DesignSidebar to render experiences list always visible (remove menu toggle) in web/src/components/organizer/builder/DesignSidebar.tsx
+- [X] T026 [US3] Update DesignSidebar to highlight active experience based on pathname in web/src/components/organizer/builder/DesignSidebar.tsx
 - [ ] T027 [US3] Verify experiences list updates in real-time when new experience is created
 - [ ] T028 [US3] Verify sidebar remains visible across all design route transitions
 
@@ -113,10 +113,10 @@
 
 ### Implementation for User Story 4
 
-- [ ] T029 [P] [US4] Update route paths from /content to /design (already done in previous phases, verify consistency)
-- [ ] T030 [P] [US4] Update component names from ContentBuilder to DesignBuilder in web/src/components/organizer/builder/DesignBuilder.tsx
-- [ ] T031 [P] [US4] Update all UI strings and labels from "Content" to "Design" throughout sidebar and navigation
-- [ ] T032 [US4] Search codebase for any remaining "content" references and update to "design" where applicable
+- [X] T029 [P] [US4] Update route paths from /content to /design (already done in previous phases, verify consistency)
+- [X] T030 [P] [US4] Update component names from ContentBuilder to DesignBuilder in web/src/components/organizer/builder/DesignBuilder.tsx
+- [X] T031 [P] [US4] Update all UI strings and labels from "Content" to "Design" throughout sidebar and navigation
+- [X] T032 [US4] Search codebase for any remaining "content" references and update to "design" where applicable
 
 **Checkpoint**: All terminology consistently uses "Design"
 

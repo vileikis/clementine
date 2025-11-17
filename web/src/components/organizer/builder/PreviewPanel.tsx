@@ -15,7 +15,8 @@ interface PreviewPanelProps {
 
 /**
  * PreviewPanel component provides a reusable preview container
- * Part of Phase 4 (User Story 1) - Content Tab Layout Infrastructure
+ * Part of Phase 4 (User Story 1) - Design Tab Layout Infrastructure
+ * Updated in Phase 6 (User Story 4) - Rename Content to Design
  *
  * Features:
  * - Mobile device frame styling
