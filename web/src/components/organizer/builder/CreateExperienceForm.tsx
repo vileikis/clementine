@@ -122,6 +122,40 @@ export function CreateExperienceForm({ eventId }: CreateExperienceFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+
+      {/* Experience Name Input */}
+      <div className="space-y-3">
+        <Label htmlFor="experience-name" className="text-base font-semibold">
+          Experience Name
+        </Label>
+        <p className="text-sm text-muted-foreground">
+          Give your experience a descriptive name (e.g., &quot;Avatar
+          Creator&quot;, &quot;Festival Selfie&quot;).
+        </p>
+
+        <Input
+          id="experience-name"
+          placeholder="Enter experience name..."
+          className={cn(
+            "min-h-[44px]", // Touch target minimum (MFR-002)
+            errors.label && "border-destructive focus-visible:ring-destructive"
+          )}
+          {...register("label")}
+          aria-invalid={!!errors.label}
+          aria-describedby={errors.label ? "name-error" : undefined}
+        />
+
+        {errors.label && (
+          <p id="name-error" className="text-sm text-destructive mt-1">
+            {errors.label.message}
+          </p>
+        )}
+
+        {/* Character count helper */}
+        <p className="text-xs text-muted-foreground">
+          {nameValue.length}/50 characters
+        </p>
+      </div>
       {/* Experience Type Selection */}
       <div className="space-y-3">
         <Label htmlFor="experience-type" className="text-base font-semibold">
@@ -182,39 +216,6 @@ export function CreateExperienceForm({ eventId }: CreateExperienceFormProps) {
         )}
       </div>
 
-      {/* Experience Name Input */}
-      <div className="space-y-3">
-        <Label htmlFor="experience-name" className="text-base font-semibold">
-          Experience Name
-        </Label>
-        <p className="text-sm text-muted-foreground">
-          Give your experience a descriptive name (e.g., &quot;Avatar
-          Creator&quot;, &quot;Festival Selfie&quot;).
-        </p>
-
-        <Input
-          id="experience-name"
-          placeholder="Enter experience name..."
-          className={cn(
-            "min-h-[44px]", // Touch target minimum (MFR-002)
-            errors.label && "border-destructive focus-visible:ring-destructive"
-          )}
-          {...register("label")}
-          aria-invalid={!!errors.label}
-          aria-describedby={errors.label ? "name-error" : undefined}
-        />
-
-        {errors.label && (
-          <p id="name-error" className="text-sm text-destructive mt-1">
-            {errors.label.message}
-          </p>
-        )}
-
-        {/* Character count helper */}
-        <p className="text-xs text-muted-foreground">
-          {nameValue.length}/50 characters
-        </p>
-      </div>
 
       {/* Form Actions */}
       <div className="flex items-center gap-3 pt-2">
