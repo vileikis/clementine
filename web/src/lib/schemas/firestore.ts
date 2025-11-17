@@ -246,7 +246,7 @@ export const updateExperienceSchema = z.object({
   aiPrompt: z.string().max(600).optional(),
   aiReferenceImagePaths: z.array(z.string()).optional(),
   aiAspectRatio: aspectRatioSchema.optional(),
-});
+}).strict();
 
 // Preview media upload validation schemas
 export const uploadPreviewMediaSchema = z.object({

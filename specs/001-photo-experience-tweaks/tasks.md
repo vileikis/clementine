@@ -75,8 +75,8 @@
 
 ### Tests for User Story 1
 
-- [ ] T018 [P] [US1] Add schema validation test ensuring `allowCamera`, `allowLibrary` are rejected in `updateExperienceSchema` in `web/tests/lib/schemas/firestore.test.ts`
-- [ ] T019 [P] [US1] Add component test verifying capture options section is not rendered in `web/src/components/organizer/builder/ExperienceEditor.test.tsx`
+- [X] T018 [P] [US1] Add schema validation test ensuring `allowCamera`, `allowLibrary` are rejected in `updateExperienceSchema` in `web/tests/lib/schemas/firestore.test.ts`
+- [X] T019 [P] [US1] Add component test verifying capture options section is not rendered in `web/src/components/organizer/builder/ExperienceEditor.test.tsx`
 
 **Checkpoint**: User Story 1 complete - capture options removed from UI and validation
 
@@ -105,11 +105,11 @@
 
 ### Tests for User Story 2
 
-- [ ] T029 [P] [US2] Add schema validation test for `previewType` accepting "gif" and "video" in `web/tests/lib/schemas/firestore.test.ts`
-- [ ] T030 [P] [US2] Add schema validation test for `uploadPreviewMediaSchema` file type and size in `web/tests/lib/schemas/firestore.test.ts`
-- [ ] T031 [P] [US2] Add component test for `PreviewMediaUpload.tsx` rendering image preview in `web/src/components/organizer/builder/PreviewMediaUpload.test.tsx`
-- [ ] T032 [P] [US2] Add component test for `PreviewMediaUpload.tsx` rendering GIF preview with autoplay in `web/src/components/organizer/builder/PreviewMediaUpload.test.tsx`
-- [ ] T033 [P] [US2] Add component test for `PreviewMediaUpload.tsx` rendering video preview with autoplay muted loop in `web/src/components/organizer/builder/PreviewMediaUpload.test.tsx`
+- [X] T029 [P] [US2] Add schema validation test for `previewType` accepting "gif" and "video" in `web/tests/lib/schemas/firestore.test.ts`
+- [X] T030 [P] [US2] Add schema validation test for `uploadPreviewMediaSchema` file type and size in `web/tests/lib/schemas/firestore.test.ts`
+- [X] T031 [P] [US2] Add component test for `PreviewMediaUpload.tsx` rendering image preview in `web/src/components/organizer/builder/PreviewMediaUpload.test.tsx`
+- [X] T032 [P] [US2] Add component test for `PreviewMediaUpload.tsx` rendering GIF preview with autoplay in `web/src/components/organizer/builder/PreviewMediaUpload.test.tsx`
+- [X] T033 [P] [US2] Add component test for `PreviewMediaUpload.tsx` rendering video preview with autoplay muted loop in `web/src/components/organizer/builder/PreviewMediaUpload.test.tsx`
 
 **Checkpoint**: User Story 2 complete - preview media upload/display fully functional
 
@@ -131,9 +131,9 @@
 
 ### Tests for User Story 3
 
-- [ ] T039 [P] [US3] Add schema validation test for `countdownSeconds` range (0-10) in `web/tests/lib/schemas/firestore.test.ts`
-- [ ] T040 [P] [US3] Add component test for `CountdownSettings.tsx` toggle shows/hides timer input in `web/src/components/organizer/builder/CountdownSettings.test.tsx`
-- [ ] T041 [P] [US3] Add component test for `CountdownSettings.tsx` default value of 3 seconds in `web/src/components/organizer/builder/CountdownSettings.test.tsx`
+- [X] T039 [P] [US3] Add schema validation test for `countdownSeconds` range (0-10) in `web/tests/lib/schemas/firestore.test.ts`
+- [X] T040 [P] [US3] Add component test for `CountdownSettings.tsx` toggle shows/hides timer input in `web/src/components/organizer/builder/CountdownSettings.test.tsx`
+- [X] T041 [P] [US3] Add component test for `CountdownSettings.tsx` default value of 3 seconds in `web/src/components/organizer/builder/CountdownSettings.test.tsx`
 
 **Checkpoint**: User Story 3 complete - countdown settings configuration functional
 
@@ -161,8 +161,8 @@
 
 ### Tests for User Story 4
 
-- [ ] T050 [P] [US4] Add component test for `OverlaySettings.tsx` toggle enables/disables overlay upload in `web/src/components/organizer/builder/OverlaySettings.test.tsx`
-- [ ] T051 [P] [US4] Add component test for `OverlaySettings.tsx` preview rendering in `web/src/components/organizer/builder/OverlaySettings.test.tsx`
+- [X] T050 [P] [US4] Add component test for `OverlaySettings.tsx` toggle enables/disables overlay upload in `web/src/components/organizer/builder/OverlaySettings.test.tsx`
+- [X] T051 [P] [US4] Add component test for `OverlaySettings.tsx` preview rendering in `web/src/components/organizer/builder/OverlaySettings.test.tsx`
 
 **Checkpoint**: User Story 4 complete - frame overlay configuration functional
 
@@ -191,10 +191,10 @@
 
 ### Tests for User Story 5
 
-- [ ] T061 [P] [US5] Add schema validation test for `aiAspectRatio` enum values in `web/tests/lib/schemas/firestore.test.ts`
-- [ ] T062 [P] [US5] Add component test for `AITransformSettings.tsx` aspect ratio picker displays all 5 options in `web/src/components/organizer/builder/AITransformSettings.test.tsx`
-- [ ] T063 [P] [US5] Add component test for `AITransformSettings.tsx` Prompt Guide link URL changes based on selected model in `web/src/components/organizer/builder/AITransformSettings.test.tsx`
-- [ ] T064 [P] [US5] Add component test for `AITransformSettings.tsx` reference images horizontal layout with flex-wrap in `web/src/components/organizer/builder/AITransformSettings.test.tsx`
+- [X] T061 [P] [US5] Add schema validation test for `aiAspectRatio` enum values in `web/tests/lib/schemas/firestore.test.ts`
+- [X] T062 [P] [US5] Add component test for `AITransformSettings.tsx` aspect ratio picker displays all 5 options in `web/src/components/organizer/builder/AITransformSettings.test.tsx`
+- [X] T063 [P] [US5] Add component test for `AITransformSettings.tsx` Prompt Guide link URL changes based on selected model in `web/src/components/organizer/builder/AITransformSettings.test.tsx`
+- [X] T064 [P] [US5] Add component test for `AITransformSettings.tsx` reference images horizontal layout with flex-wrap in `web/src/components/organizer/builder/AITransformSettings.test.tsx`
 
 **Checkpoint**: User Story 5 complete - AI transformation settings UI enhanced
 
