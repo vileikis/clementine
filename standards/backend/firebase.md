@@ -294,6 +294,154 @@ events/{eventId}/
     join.png                    # Join QR code
 ```
 
+**Convention: Store Full URLs in Firestore**
+
+When storing file references in Firestore documents, choose the appropriate format based on your access control needs:
+
+### Approach 1: Public URLs (Recommended for Public Assets)
+
+**Use for**: Images that are publicly shareable (event branding, guest photos, shared results)
+
+Store the full public URL to enable instant rendering without additional API calls:
+
+```typescript
+// ✅ Good: Public URL (instant rendering)
+{
+  welcomeBackgroundImagePath: "https://storage.googleapis.com/bucket-name/images/welcome/abc123.jpg",
+  resultPhoto: "https://storage.googleapis.com/bucket-name/events/xyz789/sessions/def456/result.jpg"
+}
+
+// ❌ Bad: Relative path (requires lookup + URL generation)
+{
+  welcomeBackgroundImagePath: "images/welcome/abc123.jpg",
+  resultPhoto: "events/xyz789/sessions/def456/result.jpg"
+}
+```
+
+**Why Public URLs?**
+
+✅ **Instant Rendering**: Use directly in `<img>` tags, no extra calls
+✅ **Never Expire**: Permanent URLs, no regeneration needed
+✅ **Performance**: Zero latency for image loads
+✅ **Simplicity**: Works in client and server components
+
+**Implementation Pattern**:
+
+```typescript
+// Server Action: Upload and return public URL
+"use server";
+
+import { storage } from "@/lib/firebase/admin";
+import { v4 as uuidv4 } from "uuid";
+
+export async function uploadImage(
+  file: File,
+  destination: string
+): Promise<ActionResponse<{ path: string; url: string }>> {
+  try {
+    const filename = `${uuidv4()}.jpg`;
+    const path = `images/${destination}/${filename}`;
+
+    // Convert File to Buffer
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    // Upload to Firebase Storage
+    const fileRef = storage.file(path);
+    await fileRef.save(buffer, {
+      metadata: { contentType: file.type },
+    });
+
+    // Make file publicly accessible
+    await fileRef.makePublic();
+
+    // Generate public URL (never expires)
+    const url = `https://storage.googleapis.com/${storage.name}/${path}`;
+
+    return {
+      success: true,
+      data: { path, url },
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: {
+        code: "UPLOAD_FAILED",
+        message: error instanceof Error ? error.message : "Upload failed",
+      },
+    };
+  }
+}
+
+// Client Component: Use URL directly
+export function ImagePreview({ imageUrl }: { imageUrl: string }) {
+  return <img src={imageUrl} alt="Preview" className="w-full h-auto" />;
+}
+```
+
+### Approach 2: Private Paths (For Access-Controlled Files)
+
+**Use for**: Sensitive files requiring access control or temporary access (private user uploads, paid content)
+
+Store internal `gs://` paths and generate signed URLs when needed:
+
+```typescript
+// ✅ Good: Private path (access control)
+{
+  privateDocument: "gs://bucket-name/private/user123/document.pdf"
+}
+```
+
+**Implementation Pattern**:
+
+```typescript
+// Server Action: Upload and return gs:// path
+"use server";
+
+export async function uploadPrivateFile(file: File, userId: string) {
+  const path = `private/${userId}/${file.name}`;
+  const fileRef = storage.file(path);
+
+  const arrayBuffer = await file.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+
+  await fileRef.save(buffer, {
+    metadata: { contentType: file.type },
+  });
+
+  // Store gs:// path (NOT public URL)
+  const gsPath = `gs://${storage.name}/${path}`;
+
+  return { success: true, data: { path: gsPath } };
+}
+
+// Server Action: Generate temporary signed URL
+"use server";
+
+export async function getSignedUrl(gsPath: string) {
+  const filePath = gsPath.replace(`gs://${storage.name}/`, "");
+  const file = storage.file(filePath);
+
+  const [url] = await file.getSignedUrl({
+    action: "read",
+    expires: Date.now() + 60 * 60 * 1000, // 1 hour
+  });
+
+  return url;
+}
+```
+
+### Decision Matrix
+
+| Use Case | Format | Why |
+|----------|--------|-----|
+| Event branding images | Public URL | Shared publicly, needs instant rendering |
+| Guest photos | Public URL | Shared on social media, no access control needed |
+| AI-generated results | Public URL | Shared publicly, high performance priority |
+| QR codes | Public URL | Public assets, embedded in multiple places |
+| User profile documents | Private path | Requires access control and audit trail |
+| Paid content | Private path | Needs temporary access with expiration |
+
 ## Best Practices
 
 ### 1. Always Clean Up Subscriptions
