@@ -7,6 +7,7 @@
 
 import { db } from "@/lib/firebase/admin";
 import { z } from "zod";
+import { verifyAdminSecret } from "@/lib/auth";
 import type { ExperienceType, PreviewType } from "@/lib/types/firestore";
 
 // Action response types
@@ -38,6 +39,18 @@ export async function createExperience(
   }
 ): Promise<ActionResponse<{ id: string }>> {
   try {
+    // Check authentication
+    const auth = await verifyAdminSecret();
+    if (!auth.authorized) {
+      return {
+        success: false,
+        error: {
+          code: "PERMISSION_DENIED",
+          message: auth.error,
+        },
+      };
+    }
+
     // Validate input
     const parsed = createExperienceSchema.parse(data);
 
@@ -160,6 +173,18 @@ export async function updateExperience(
   }
 ): Promise<ActionResponse<void>> {
   try {
+    // Check authentication
+    const auth = await verifyAdminSecret();
+    if (!auth.authorized) {
+      return {
+        success: false,
+        error: {
+          code: "PERMISSION_DENIED",
+          message: auth.error,
+        },
+      };
+    }
+
     // Validate input
     const parsed = updateExperienceSchema.parse(data);
 
@@ -252,6 +277,18 @@ export async function deleteExperience(
   experienceId: string
 ): Promise<ActionResponse<void>> {
   try {
+    // Check authentication
+    const auth = await verifyAdminSecret();
+    if (!auth.authorized) {
+      return {
+        success: false,
+        error: {
+          code: "PERMISSION_DENIED",
+          message: auth.error,
+        },
+      };
+    }
+
     // Check if event exists
     const eventRef = db.collection("events").doc(eventId);
     const eventDoc = await eventRef.get();

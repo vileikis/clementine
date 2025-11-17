@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button";
 import { PreviewPanel } from "./PreviewPanel";
 import { updateEventEnding } from "@/lib/actions/events";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, XCircle } from "lucide-react";
+import { toast } from "sonner";
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Instagram,
@@ -47,7 +48,6 @@ const SOCIAL_PLATFORMS: { value: ShareSocial; label: string; icon: typeof Instag
  */
 export function EndingEditor({ event }: EndingEditorProps) {
   const [isPending, startTransition] = useTransition();
-  const [saveMessage, setSaveMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const router = useRouter();
 
   // Form state - ending screen
@@ -63,7 +63,7 @@ export function EndingEditor({ event }: EndingEditorProps) {
   const [shareSocials, setShareSocials] = useState<ShareSocial[]>(event.shareSocials || []);
 
   const handleSave = () => {
-    setSaveMessage(null);
+    if (isPending) return; // Prevent multiple saves
     startTransition(async () => {
       const result = await updateEventEnding(event.id, {
         endHeadline,
@@ -77,16 +77,19 @@ export function EndingEditor({ event }: EndingEditorProps) {
       });
 
       if (result.success) {
-        setSaveMessage({ type: "success", text: "Ending screen updated successfully" });
-        setTimeout(() => setSaveMessage(null), 3000);
-        // Refresh the page data
+        toast.success("Ending screen updated successfully");
         router.refresh();
       } else {
-        setSaveMessage({ type: "error", text: result.error.message });
-        setTimeout(() => setSaveMessage(null), 5000);
+        toast.error(result.error.message || "Failed to update ending screen");
       }
     });
   };
+
+  // Keyboard shortcuts: Cmd+S / Ctrl+S to save
+  useKeyboardShortcuts({
+    "Cmd+S": handleSave,
+    "Ctrl+S": handleSave,
+  });
 
   const toggleSocialPlatform = (platform: ShareSocial) => {
     setShareSocials((prev) =>
@@ -106,24 +109,6 @@ export function EndingEditor({ event }: EndingEditorProps) {
             Configure the final screen guests see after completing their experience
           </p>
         </div>
-
-        {/* Save Message */}
-        {saveMessage && (
-          <div
-            className={`flex items-center gap-2 rounded-lg p-3 text-sm ${
-              saveMessage.type === "success"
-                ? "bg-green-50 text-green-800 border border-green-200"
-                : "bg-red-50 text-red-800 border border-red-200"
-            }`}
-          >
-            {saveMessage.type === "success" ? (
-              <CheckCircle2 className="h-4 w-4" />
-            ) : (
-              <XCircle className="h-4 w-4" />
-            )}
-            <span>{saveMessage.text}</span>
-          </div>
-        )}
 
         <div className="space-y-6">
           {/* Ending Screen Content */}

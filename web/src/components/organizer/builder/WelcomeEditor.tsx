@@ -10,7 +10,8 @@ import { PreviewPanel } from "./PreviewPanel";
 import { ImageUploadField } from "./ImageUploadField";
 import { updateEventWelcome } from "@/lib/actions/events";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, XCircle } from "lucide-react";
+import { toast } from "sonner";
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 
 interface WelcomeEditorProps {
   event: Event;
@@ -18,7 +19,6 @@ interface WelcomeEditorProps {
 
 export function WelcomeEditor({ event }: WelcomeEditorProps) {
   const [isPending, startTransition] = useTransition();
-  const [saveMessage, setSaveMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const router = useRouter();
 
   // Form state
@@ -34,7 +34,7 @@ export function WelcomeEditor({ event }: WelcomeEditorProps) {
   );
 
   const handleSave = () => {
-    setSaveMessage(null);
+    if (isPending) return; // Prevent multiple saves
     startTransition(async () => {
       const result = await updateEventWelcome(event.id, {
         welcomeTitle,
@@ -45,16 +45,19 @@ export function WelcomeEditor({ event }: WelcomeEditorProps) {
       });
 
       if (result.success) {
-        setSaveMessage({ type: "success", text: "Welcome screen updated successfully" });
-        setTimeout(() => setSaveMessage(null), 3000);
-        // Refresh the page data
+        toast.success("Welcome screen updated successfully");
         router.refresh();
       } else {
-        setSaveMessage({ type: "error", text: result.error.message });
-        setTimeout(() => setSaveMessage(null), 5000);
+        toast.error(result.error.message || "Failed to update welcome screen");
       }
     });
   };
+
+  // Keyboard shortcuts: Cmd+S / Ctrl+S to save
+  useKeyboardShortcuts({
+    "Cmd+S": handleSave,
+    "Ctrl+S": handleSave,
+  });
 
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
@@ -66,24 +69,6 @@ export function WelcomeEditor({ event }: WelcomeEditorProps) {
             Configure the first screen your guests will see
           </p>
         </div>
-
-        {/* Save Message */}
-        {saveMessage && (
-          <div
-            className={`flex items-center gap-2 rounded-lg p-3 text-sm ${
-              saveMessage.type === "success"
-                ? "bg-green-50 text-green-800 border border-green-200"
-                : "bg-red-50 text-red-800 border border-red-200"
-            }`}
-          >
-            {saveMessage.type === "success" ? (
-              <CheckCircle2 className="h-4 w-4" />
-            ) : (
-              <XCircle className="h-4 w-4" />
-            )}
-            <span>{saveMessage.text}</span>
-          </div>
-        )}
 
         <div className="space-y-4">
           {/* Title */}
