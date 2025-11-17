@@ -4,18 +4,16 @@
  * Server Actions for experience CRUD operations
  * Part of Phase 2 (Foundational) - Core routing structure
  * Used by Phase 4 (User Story 2) - Create New Experience Inline
+ * Updated to use Admin SDK for proper permissions
  */
 
 import {
-  addDoc,
-  collection,
-  doc,
-  updateDoc,
-  deleteDoc,
-  increment,
-} from "firebase/firestore";
-import { db } from "@/lib/firebase/client";
-import { createExperienceSchema } from "@/lib/schemas/firestore";
+  createExperience,
+  updateExperience,
+  deleteExperience,
+} from "@/lib/repositories/experiences";
+import { verifyAdminSecret } from "@/lib/auth";
+import { createExperienceSchema, updateExperienceSchema } from "@/lib/schemas/firestore";
 import type { ActionResult } from "@/lib/types/actions";
 
 /**
@@ -31,49 +29,28 @@ export async function createExperienceAction(
   data: unknown
 ): Promise<ActionResult<{ id: string }>> {
   try {
+    // Verify admin authentication
+    const auth = await verifyAdminSecret();
+    if (!auth.authorized) {
+      return { success: false, error: auth.error };
+    }
+
     // Validate input with Zod
     const validated = createExperienceSchema.safeParse(data);
 
     if (!validated.success) {
-      const errors = validated.error.flatten();
+      const errors = validated.error.format();
       const firstError =
-        errors.fieldErrors.label?.[0] ||
-        errors.fieldErrors.type?.[0] ||
+        errors.label?._errors[0] ||
+        errors.type?._errors[0] ||
         "Invalid input";
       return { success: false, error: firstError };
     }
 
-    // Create experience document in Firestore
-    const experiencesRef = collection(db, "events", eventId, "experiences");
-    const timestamp = Date.now();
+    // Create experience using repository
+    const experienceId = await createExperience(eventId, validated.data);
 
-    const experienceData = {
-      eventId,
-      label: validated.data.label, // Already trimmed by Zod
-      type: validated.data.type,
-      enabled: validated.data.enabled,
-
-      // Default capture settings
-      allowCamera: true,
-      allowLibrary: true,
-
-      // AI settings
-      aiEnabled: validated.data.aiEnabled,
-
-      createdAt: timestamp,
-      updatedAt: timestamp,
-    };
-
-    const docRef = await addDoc(experiencesRef, experienceData);
-
-    // Increment experiencesCount on parent event
-    const eventRef = doc(db, "events", eventId);
-    await updateDoc(eventRef, {
-      experiencesCount: increment(1),
-      updatedAt: timestamp,
-    });
-
-    return { success: true, data: { id: docRef.id } };
+    return { success: true, data: { id: experienceId } };
   } catch (error) {
     console.error("Error creating experience:", error);
     return {
@@ -98,32 +75,26 @@ export async function updateExperienceAction(
   data: unknown
 ): Promise<ActionResult<void>> {
   try {
-    // Import schema dynamically to avoid circular dependencies
-    const { updateExperienceSchema } = await import("@/lib/schemas/firestore");
+    // Verify admin authentication
+    const auth = await verifyAdminSecret();
+    if (!auth.authorized) {
+      return { success: false, error: auth.error };
+    }
 
     // Validate input with Zod
     const validated = updateExperienceSchema.safeParse(data);
 
     if (!validated.success) {
-      const errors = validated.error.flatten();
-      const firstError = Object.values(errors.fieldErrors)[0]?.[0] || "Invalid input";
+      const errors = validated.error.format();
+      const firstError = Object.values(errors)
+        .filter((e) => e && typeof e === "object" && "_errors" in e)
+        .map((e) => (e as { _errors: string[] })._errors[0])
+        .filter(Boolean)[0] || "Invalid input";
       return { success: false, error: firstError };
     }
 
-    // Update experience document in Firestore
-    const experienceRef = doc(db, "events", eventId, "experiences", experienceId);
-    const timestamp = Date.now();
-
-    await updateDoc(experienceRef, {
-      ...validated.data,
-      updatedAt: timestamp,
-    });
-
-    // Also update parent event's updatedAt
-    const eventRef = doc(db, "events", eventId);
-    await updateDoc(eventRef, {
-      updatedAt: timestamp,
-    });
+    // Update experience using repository
+    await updateExperience(eventId, experienceId, validated.data);
 
     return { success: true, data: undefined };
   } catch (error) {
@@ -147,18 +118,14 @@ export async function deleteExperienceAction(
   experienceId: string
 ): Promise<ActionResult<void>> {
   try {
-    // Delete experience document from Firestore
-    const experienceRef = doc(db, "events", eventId, "experiences", experienceId);
-    await deleteDoc(experienceRef);
+    // Verify admin authentication
+    const auth = await verifyAdminSecret();
+    if (!auth.authorized) {
+      return { success: false, error: auth.error };
+    }
 
-    // Decrement experiencesCount on parent event
-    const eventRef = doc(db, "events", eventId);
-    const timestamp = Date.now();
-
-    await updateDoc(eventRef, {
-      experiencesCount: increment(-1),
-      updatedAt: timestamp,
-    });
+    // Delete experience using repository
+    await deleteExperience(eventId, experienceId);
 
     return { success: true, data: undefined };
   } catch (error) {
