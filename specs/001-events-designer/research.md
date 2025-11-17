@@ -122,14 +122,14 @@ Use **Zod for server-side validation** + **React Hook Form** for client-side UX.
 
 **Schema**:
 ```typescript
-// lib/validation/experience.ts
+// lib/schemas/firestore.ts
 import { z } from "zod";
 
 export const createExperienceSchema = z.object({
-  name: z.string().trim().min(1, "Experience name is required"),
-  type: z.enum(["photo", "video", "gif", "wheel"], {
-    errorMap: () => ({ message: "Please select an experience type" })
-  })
+  label: z.string().trim().min(1, "Experience name is required").max(50),
+  type: experienceTypeSchema, // z.enum(["photo", "video", "gif", "wheel"])
+  enabled: z.boolean().default(true),
+  aiEnabled: z.boolean().default(false),
 });
 
 export type CreateExperienceInput = z.infer<typeof createExperienceSchema>;
@@ -175,7 +175,7 @@ const form = useForm<CreateExperienceInput>({
 **References**:
 - Zod Docs: [Schema Validation](https://zod.dev/)
 - React Hook Form Docs: [Zod Resolver](https://react-hook-form.com/get-started#SchemaValidation)
-- Standards: `global/validation.md`
+- Existing schema: `web/src/lib/schemas/firestore.ts`
 
 ---
 
@@ -292,8 +292,8 @@ Use **persistent sidebar on desktop** + **Sheet component on mobile**.
 
 **References**:
 - shadcn/ui: [Sheet Component](https://ui.shadcn.com/docs/components/sheet)
-- Standards: `frontend/responsive.md`
 - Constitution: Mobile-First Responsive Design (Principle I)
+- Tailwind CSS: [Responsive Design](https://tailwindcss.com/docs/responsive-design)
 
 ---
 
