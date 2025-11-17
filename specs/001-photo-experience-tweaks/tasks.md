@@ -230,7 +230,7 @@
 - [X] T075 Run `pnpm type-check` from repository root and resolve all TypeScript errors
 - [X] T076 Run `pnpm test` from repository root and ensure all tests pass
 - [X] T077 Verify feature in local dev server (`pnpm dev`) following quickstart.md manual testing guide (10 test scenarios)
-- [ ] T078 Commit changes only after validation loop passes cleanly
+- [X] T078 Commit changes only after validation loop passes cleanly
 
 ---
 
