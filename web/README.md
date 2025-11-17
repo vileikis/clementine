@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Clementine Web App
+
+Next.js 16 application for Clementine AI photobooth platform.
+
+## Tech Stack
+
+- **Next.js 16** (App Router) + **React 19**
+- **TypeScript 5** (strict mode)
+- **Tailwind CSS 4** + **shadcn/ui**
+- **Firebase** (Firestore + Storage)
+- **Zod** for validation
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm dev              # Start dev server (localhost:3000)
+pnpm build            # Production build
+pnpm type-check       # TypeScript validation
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Architecture
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Admin Dashboard
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Events Management** (`/events`) - Create and manage AI photobooth events
+- **Companies Management** (`/companies`) - Organize events by brand/organization
 
-## Learn More
+### Event Builder
 
-To learn more about Next.js, take a look at the following resources:
+- **Content Tab** - Configure welcome screen, photo experiences, ending screen
+- **Distribution Tab** - Share links and QR codes
+- **Results Tab** - View analytics (sessions, shares, downloads)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Note: Survey UI present but not fully implemented (deferred to future project)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Data Model
 
-## Deploy on Vercel
+**Companies Collection** (`/companies`)
+- Represents brands/organizations that own events
+- Soft deletion support
+- Optional branding metadata
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+**Events Collection** (`/events`)
+- Root event configuration with welcome/ending screens
+- Company association (optional)
+- Share settings and survey configuration
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Events Subcollections**
+- `/events/{eventId}/experiences` - Photo/video/gif/wheel experiences (photo only implemented)
+- `/events/{eventId}/surveySteps` - Survey questions (not yet implemented)
+- `/events/{eventId}/sessions` - Guest interactions
+- `/events/{eventId}/shares` - Share tracking
+
+## Key Features Implemented
+
+✅ Company management with event filtering
+✅ Event builder with sidebar navigation
+✅ Welcome screen configuration
+✅ Photo experiences with AI settings
+✅ Ending screen with share options
+✅ Mobile-first responsive design
+
+⏳ Surveys (UI present, functionality not fully implemented)
