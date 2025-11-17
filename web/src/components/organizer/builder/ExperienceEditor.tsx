@@ -23,15 +23,18 @@ interface ExperienceEditorProps {
 
 /**
  * ExperienceEditor component for configuring photo experience settings.
- * Part of Phase 6 (User Story 3) - Manage Photo Experiences
+ * Updated in 001-photo-experience-tweaks to simplify configuration.
  *
  * Features:
  * - Basic settings (label, enabled)
- * - Capture options (camera, library)
- * - Overlays (frame, logo)
+ * - Overlays (frame only - logo removed in 001-photo-experience-tweaks)
  * - AI transformation (prompt, reference images, model)
  * - Delete experience with confirmation
  * - Save button (not auto-save)
+ *
+ * Removed in 001-photo-experience-tweaks:
+ * - Capture options (camera, library) - always available to guests now
+ * - Logo overlay - simplified to single frame overlay only
  */
 export function ExperienceEditor({
   experience,
@@ -45,10 +48,7 @@ export function ExperienceEditor({
   // Local form state
   const [label, setLabel] = useState(experience.label);
   const [enabled, setEnabled] = useState(experience.enabled);
-  const [allowCamera, setAllowCamera] = useState(experience.allowCamera);
-  const [allowLibrary, setAllowLibrary] = useState(experience.allowLibrary);
   const [overlayFramePath, setOverlayFramePath] = useState(experience.overlayFramePath || "");
-  const [overlayLogoPath, setOverlayLogoPath] = useState(experience.overlayLogoPath || "");
   const [aiEnabled, setAiEnabled] = useState(experience.aiEnabled);
   const [aiModel, setAiModel] = useState(experience.aiModel || "nanobanana");
   const [aiPrompt, setAiPrompt] = useState(experience.aiPrompt || "");
@@ -64,10 +64,7 @@ export function ExperienceEditor({
         await onSave(experience.id, {
           label,
           enabled,
-          allowCamera,
-          allowLibrary,
           overlayFramePath: overlayFramePath || undefined,
-          overlayLogoPath: overlayLogoPath || undefined,
           aiEnabled,
           aiModel: aiModel || undefined,
           aiPrompt: aiPrompt || undefined,
@@ -162,41 +159,6 @@ export function ExperienceEditor({
         </div>
       </div>
 
-      {/* Capture Options */}
-      <div className="space-y-4">
-        <h2 className="text-2xl font-semibold">Capture Options</h2>
-
-        <div className="flex items-center justify-between">
-          <div className="space-y-0.5">
-            <Label htmlFor="allowCamera">Allow Camera</Label>
-            <p className="text-xs text-muted-foreground">
-              Let guests take photos with their camera
-            </p>
-          </div>
-          <Switch
-            id="allowCamera"
-            checked={allowCamera}
-            onCheckedChange={setAllowCamera}
-            disabled={isPending}
-          />
-        </div>
-
-        <div className="flex items-center justify-between">
-          <div className="space-y-0.5">
-            <Label htmlFor="allowLibrary">Allow Photo Library</Label>
-            <p className="text-xs text-muted-foreground">
-              Let guests upload from their photo library
-            </p>
-          </div>
-          <Switch
-            id="allowLibrary"
-            checked={allowLibrary}
-            onCheckedChange={setAllowLibrary}
-            disabled={isPending}
-          />
-        </div>
-      </div>
-
       {/* Overlays */}
       <div className="space-y-4">
         <h2 className="text-2xl font-semibold">Overlays</h2>
@@ -209,16 +171,6 @@ export function ExperienceEditor({
           destination="experience-overlay"
           disabled={isPending}
           recommendedSize="Recommended: 1080x1080px. Max 10MB."
-        />
-
-        <ImageUploadField
-          id="overlay-logo"
-          label="Logo Overlay"
-          value={overlayLogoPath}
-          onChange={setOverlayLogoPath}
-          destination="experience-overlay"
-          disabled={isPending}
-          recommendedSize="Recommended: 512x512px. Max 10MB."
         />
       </div>
 
