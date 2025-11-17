@@ -24,8 +24,8 @@
 
 **Purpose**: Project initialization and validation schema enhancements
 
-- [ ] T001 Update createExperienceSchema to add .trim() and custom error messages in web/src/lib/schemas/firestore.ts
-- [ ] T002 Verify ActionResult type exists in web/src/lib/types/actions.ts
+- [X] T001 Update createExperienceSchema to add .trim() and custom error messages in web/src/lib/schemas/firestore.ts
+- [X] T002 Verify ActionResult type exists in web/src/lib/types/actions.ts
 
 ---
 
@@ -35,10 +35,10 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T003 Create base design route with redirect in web/src/app/(event-builder)/events/[eventId]/design/page.tsx
-- [ ] T004 Create design layout with experiences context in web/src/app/(event-builder)/events/[eventId]/design/layout.tsx
-- [ ] T005 Create DesignSidebar component in web/src/components/organizer/builder/DesignSidebar.tsx
-- [ ] T006 Create createExperienceAction Server Action in web/src/app/actions/experiences.ts
+- [X] T003 Create base design route with redirect in web/src/app/(event-builder)/events/[eventId]/design/page.tsx
+- [X] T004 Create design layout with experiences context in web/src/app/(event-builder)/events/[eventId]/design/layout.tsx
+- [X] T005 Create DesignSidebar component in web/src/components/organizer/builder/DesignSidebar.tsx
+- [X] T006 Create createExperienceAction Server Action in web/src/app/actions/experiences.ts
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -52,13 +52,13 @@
 
 ### Implementation for User Story 1
 
-- [ ] T007 [P] [US1] Create Welcome editor route in web/src/app/(event-builder)/events/[eventId]/design/welcome/page.tsx
-- [ ] T008 [P] [US1] Create Ending editor route in web/src/app/(event-builder)/events/[eventId]/design/ending/page.tsx
-- [ ] T009 [US1] Extract WelcomeEditor component from ContentBuilder to web/src/components/organizer/builder/WelcomeEditor.tsx
-- [ ] T010 [US1] Extract EndingEditor component from ContentBuilder to web/src/components/organizer/builder/EndingEditor.tsx
-- [ ] T011 [US1] Update DesignSidebar to highlight active section based on pathname in web/src/components/organizer/builder/DesignSidebar.tsx
-- [ ] T012 [US1] Update main navigation tab from "Content" to "Design" in web/src/app/(event-builder)/events/[eventId]/layout.tsx
-- [ ] T013 [US1] Verify browser back/forward navigation works correctly
+- [X] T007 [P] [US1] Create Welcome editor route in web/src/app/(event-builder)/events/[eventId]/design/welcome/page.tsx
+- [X] T008 [P] [US1] Create Ending editor route in web/src/app/(event-builder)/events/[eventId]/design/ending/page.tsx
+- [X] T009 [US1] Extract WelcomeEditor component from ContentBuilder to web/src/components/organizer/builder/WelcomeEditor.tsx
+- [X] T010 [US1] Extract EndingEditor component from ContentBuilder to web/src/components/organizer/builder/EndingEditor.tsx
+- [X] T011 [US1] Update DesignSidebar to highlight active section based on pathname in web/src/components/organizer/builder/DesignSidebar.tsx
+- [X] T012 [US1] Update main navigation tab from "Content" to "Design" in web/src/app/(event-builder)/events/[eventId]/layout.tsx
+- [X] T013 [US1] Verify browser back/forward navigation works correctly
 
 **Checkpoint**: At this point, User Story 1 should be fully functional - can navigate between Welcome/Ending sections with URL updates
 
