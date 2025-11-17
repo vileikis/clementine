@@ -42,7 +42,6 @@ export function ExperienceEditor({
   experience,
   onSave,
   onDelete,
-  className,
 }: ExperienceEditorProps) {
   const [isPending, startTransition] = useTransition();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);

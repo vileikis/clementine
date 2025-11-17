@@ -54,7 +54,7 @@ export function OverlaySettings({
         setUploadError(result.error.message);
         setTimeout(() => setUploadError(null), 5000);
       }
-    } catch (error) {
+    } catch {
       setUploadError("An unexpected error occurred during upload");
       setTimeout(() => setUploadError(null), 5000);
     } finally {
@@ -80,7 +80,7 @@ export function OverlaySettings({
         setUploadError(result.error.message);
         setTimeout(() => setUploadError(null), 5000);
       }
-    } catch (error) {
+    } catch {
       setUploadError("Failed to delete frame overlay");
       setTimeout(() => setUploadError(null), 5000);
     } finally {

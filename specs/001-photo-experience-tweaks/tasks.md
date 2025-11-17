@@ -206,30 +206,30 @@
 
 ### Mobile Responsiveness
 
-- [ ] T065 [P] Verify preview media upload is usable on mobile viewport (320px-768px) in browser DevTools
-- [ ] T066 [P] Verify countdown toggle and timer input are touch-friendly (≥44x44px) on mobile
-- [ ] T067 [P] Verify aspect ratio picker is easily tappable (≥44x44px) on mobile
-- [ ] T068 [P] Verify reference images wrap responsively on mobile viewports
-- [ ] T069 [P] Verify Prompt Guide link is easily tappable (≥44x44px) on mobile
+- [X] T065 [P] Verify preview media upload is usable on mobile viewport (320px-768px) in browser DevTools
+- [X] T066 [P] Verify countdown toggle and timer input are touch-friendly (≥44x44px) on mobile
+- [X] T067 [P] Verify aspect ratio picker is easily tappable (≥44x44px) on mobile
+- [X] T068 [P] Verify reference images wrap responsively on mobile viewports
+- [X] T069 [P] Verify Prompt Guide link is easily tappable (≥44x44px) on mobile
 
 ### Image Upload Field Enhancement (Optional)
 
-- [ ] T070 Extend `web/src/components/organizer/builder/ImageUploadField.tsx` to support `accept` prop for MIME types (image/*, video/*) if not already supported
-- [ ] T071 Add video preview support to `ImageUploadField.tsx` component if not already supported
+- [X] T070 Extend `web/src/components/organizer/builder/ImageUploadField.tsx` to support `accept` prop for MIME types (image/*, video/*) if not already supported
+- [X] T071 Add video preview support to `ImageUploadField.tsx` component if not already supported
 
 ### Documentation & Code Quality
 
-- [ ] T072 [P] Update CLAUDE.md with active technologies if needed (preview media, countdown, overlays, AI settings)
-- [ ] T073 Code cleanup and refactoring in ExperienceEditor components for maintainability
+- [X] T072 [P] Update CLAUDE.md with active technologies if needed (preview media, countdown, overlays, AI settings)
+- [X] T073 Code cleanup and refactoring in ExperienceEditor components for maintainability
 
 ### Validation Loop (REQUIRED - Constitution Principle V)
 
 **Purpose**: Ensure code quality and correctness before merge
 
-- [ ] T074 Run `pnpm lint` from repository root and fix all errors/warnings
-- [ ] T075 Run `pnpm type-check` from repository root and resolve all TypeScript errors
-- [ ] T076 Run `pnpm test` from repository root and ensure all tests pass
-- [ ] T077 Verify feature in local dev server (`pnpm dev`) following quickstart.md manual testing guide (10 test scenarios)
+- [X] T074 Run `pnpm lint` from repository root and fix all errors/warnings
+- [X] T075 Run `pnpm type-check` from repository root and resolve all TypeScript errors
+- [X] T076 Run `pnpm test` from repository root and ensure all tests pass
+- [X] T077 Verify feature in local dev server (`pnpm dev`) following quickstart.md manual testing guide (10 test scenarios)
 - [ ] T078 Commit changes only after validation loop passes cleanly
 
 ---
