@@ -5,6 +5,8 @@
 **Status**: Draft
 **Input**: User description: "redesign events builder to support fully fledged flows with 4 key components: welcome, experiences, survey, ending"
 
+**⚠️ SCOPE CHANGE**: User Story 4 (Configure Event Survey) has been cancelled and will be handled in a separate future project. This specification retains survey references for historical context and future reference, but survey functionality is not implemented in this feature.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 0 - Base Events UI Navigation Shell (Priority: P0)
@@ -83,7 +85,9 @@ As an event creator, I need to add and configure photo experiences so that guest
 
 ---
 
-### User Story 4 - Configure Event Survey (Priority: P2)
+### User Story 4 - Configure Event Survey (Priority: P2) ❌ CANCELLED
+
+**Status**: This user story has been cancelled and will be handled in a separate future project.
 
 As an event creator, I need to add and configure survey steps so that I can collect feedback from guests.
 
@@ -91,14 +95,14 @@ As an event creator, I need to add and configure survey steps so that I can coll
 
 **Independent Test**: Can be fully tested by adding survey steps, configuring their order and settings, enabling/disabling the survey, and verifying the preview displays correctly.
 
-**Acceptance Scenarios**:
+**Acceptance Scenarios** (CANCELLED):
 
-1. **Given** I am on the Content tab, **When** I click the + button in the Survey section, **Then** I see a dialog to select survey step type
-2. **Given** I select a survey step type, **When** I confirm, **Then** a new step is created and appears in the survey list
-3. **Given** I have created survey steps, **When** I view the Survey section, **Then** I see toggles to enable/disable survey and make it required
-4. **Given** I have multiple survey steps, **When** I reorder them via drag-and-drop, **Then** the order is updated and persisted
-5. **Given** I click on a survey step, **When** the step opens, **Then** I see design controls for that step type with a preview on the right
-6. **Given** the survey is disabled, **When** guests complete experiences, **Then** they do not see survey steps
+1. ~~**Given** I am on the Content tab, **When** I click the + button in the Survey section, **Then** I see a dialog to select survey step type~~
+2. ~~**Given** I select a survey step type, **When** I confirm, **Then** a new step is created and appears in the survey list~~
+3. ~~**Given** I have created survey steps, **When** I view the Survey section, **Then** I see toggles to enable/disable survey and make it required~~
+4. ~~**Given** I have multiple survey steps, **When** I reorder them via drag-and-drop, **Then** the order is updated and persisted~~
+5. ~~**Given** I click on a survey step, **When** the step opens, **Then** I see design controls for that step type with a preview on the right~~
+6. ~~**Given** the survey is disabled, **When** guests complete experiences, **Then** they do not see survey steps~~
 
 ---
 

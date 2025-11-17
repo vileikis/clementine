@@ -140,33 +140,35 @@ This is a monorepo with web/ and functions/ workspaces. All paths below use `web
 
 ---
 
-## Phase 7: User Story 4 - Configure Event Survey (Priority: P2)
+## Phase 7: User Story 4 - Configure Event Survey (Priority: P2) ❌ CANCELLED
+
+**Status**: This phase has been cancelled and will be handled separately in a future project.
 
 **Goal**: Add and configure survey steps with ordering, enable/disable toggles, and step editor
 
 **Independent Test**: Add survey steps, configure their order and settings, enable/disable survey, and verify preview displays correctly
 
-### Implementation for User Story 4
+### Implementation for User Story 4 (CANCELLED)
 
-- [ ] T052 [P] [US4] Create SurveySection component in web/src/components/organizer/builder/SurveySection.tsx
-- [ ] T053 [P] [US4] Create SurveyStepTypeDialog component in web/src/components/organizer/builder/SurveyStepTypeDialog.tsx
-- [ ] T054 [P] [US4] Create SurveyStepEditor component in web/src/components/organizer/builder/SurveyStepEditor.tsx
-- [ ] T055 [US4] Integrate SurveySection into BuilderSidebar with enable/required toggles and + button
-- [ ] T056 [US4] Implement SurveyStepTypeDialog to show all step types (short_text, long_text, multiple_choice, opinion_scale, email, statement)
-- [ ] T057 [US4] Connect + button to SurveyStepTypeDialog modal
-- [ ] T058 [US4] Implement full createSurveyStep Server Action with Zod validation in web/src/lib/actions/survey.ts
-- [ ] T059 [US4] Implement full updateSurveyStep Server Action with Zod validation in web/src/lib/actions/survey.ts
-- [ ] T060 [US4] Implement full deleteSurveyStep Server Action in web/src/lib/actions/survey.ts
-- [ ] T061 [US4] Add real-time survey steps list fetching from Firestore subcollection
-- [ ] T062 [US4] Add drag-and-drop reordering for survey steps with GripVertical icon
-- [ ] T063 [US4] Connect survey reordering to updateEventSurveyConfig Server Action
-- [ ] T064 [US4] Implement full updateEventSurveyConfig Server Action with Zod validation in web/src/lib/actions/events.ts
-- [ ] T065 [US4] Connect SurveyStepEditor to updateSurveyStep Server Action
-- [ ] T066 [US4] Add type-specific controls to SurveyStepEditor (options for multiple_choice, scale for opinion_scale, etc.)
-- [ ] T067 [US4] Add survey step preview panel to SurveyStepEditor
-- [ ] T068 [US4] Verify survey steps creation, editing, ordering, and deletion work correctly in dev server
+- [ ] ~~T052 [P] [US4] Create SurveySection component in web/src/components/organizer/builder/SurveySection.tsx~~ (CANCELLED)
+- [ ] ~~T053 [P] [US4] Create SurveyStepTypeDialog component in web/src/components/organizer/builder/SurveyStepTypeDialog.tsx~~ (CANCELLED)
+- [ ] ~~T054 [P] [US4] Create SurveyStepEditor component in web/src/components/organizer/builder/SurveyStepEditor.tsx~~ (CANCELLED)
+- [ ] ~~T055 [US4] Integrate SurveySection into BuilderSidebar with enable/required toggles and + button~~ (CANCELLED)
+- [ ] ~~T056 [US4] Implement SurveyStepTypeDialog to show all step types (short_text, long_text, multiple_choice, opinion_scale, email, statement)~~ (CANCELLED)
+- [ ] ~~T057 [US4] Connect + button to SurveyStepTypeDialog modal~~ (CANCELLED)
+- [ ] ~~T058 [US4] Implement full createSurveyStep Server Action with Zod validation in web/src/lib/actions/survey.ts~~ (CANCELLED)
+- [ ] ~~T059 [US4] Implement full updateSurveyStep Server Action with Zod validation in web/src/lib/actions/survey.ts~~ (CANCELLED)
+- [ ] ~~T060 [US4] Implement full deleteSurveyStep Server Action in web/src/lib/actions/survey.ts~~ (CANCELLED)
+- [ ] ~~T061 [US4] Add real-time survey steps list fetching from Firestore subcollection~~ (CANCELLED)
+- [ ] ~~T062 [US4] Add drag-and-drop reordering for survey steps with GripVertical icon~~ (CANCELLED)
+- [ ] ~~T063 [US4] Connect survey reordering to updateEventSurveyConfig Server Action~~ (CANCELLED)
+- [ ] ~~T064 [US4] Implement full updateEventSurveyConfig Server Action with Zod validation in web/src/lib/actions/events.ts~~ (CANCELLED)
+- [ ] ~~T065 [US4] Connect SurveyStepEditor to updateSurveyStep Server Action~~ (CANCELLED)
+- [ ] ~~T066 [US4] Add type-specific controls to SurveyStepEditor (options for multiple_choice, scale for opinion_scale, etc.)~~ (CANCELLED)
+- [ ] ~~T067 [US4] Add survey step preview panel to SurveyStepEditor~~ (CANCELLED)
+- [ ] ~~T068 [US4] Verify survey steps creation, editing, ordering, and deletion work correctly in dev server~~ (CANCELLED)
 
-**Checkpoint**: At this point, User Story 4 should be fully functional - Survey can be configured with multiple steps
+**Checkpoint**: ~~At this point, User Story 4 should be fully functional - Survey can be configured with multiple steps~~ (CANCELLED - Will be handled in separate project)
 
 ---
 
@@ -250,12 +252,12 @@ This is a monorepo with web/ and functions/ workspaces. All paths below use `web
 ### User Story Dependencies
 
 - **User Story 0 (P0)**: FOUNDATIONAL - Must complete before US1
-- **User Story 1 (P1)**: Depends on US0 - Must complete before US2, US3, US4, US5, US6
+- **User Story 1 (P1)**: Depends on US0 - Must complete before US2, US3, US5, US6
 - **User Story 2 (P1)**: Depends on US0, US1 - Can run in parallel with US3
 - **User Story 3 (P1)**: Depends on US0, US1 - Can run in parallel with US2
-- **User Story 4 (P2)**: Depends on US0, US1 - Can run in parallel with US2, US3, US5, US6
-- **User Story 5 (P2)**: Depends on US0, US1 - Can run in parallel with US2, US3, US4, US6
-- **User Story 6 (P3)**: Depends on US3 (ExperienceTypeDialog) - Can run in parallel with US2, US4, US5
+- **User Story 4 (P2)**: ❌ CANCELLED - Will be handled in separate project
+- **User Story 5 (P2)**: Depends on US0, US1 - Can run in parallel with US2, US3, US6
+- **User Story 6 (P3)**: Depends on US3 (ExperienceTypeDialog) - Can run in parallel with US2, US5
 
 ### Within Each User Story
 
@@ -276,7 +278,7 @@ This is a monorepo with web/ and functions/ workspaces. All paths below use `web
 - **Phase 8 (US5)**: T069 can run while other stories are being implemented
 - **Phase 10**: T080, T081, T082, T083, T084, T085 can run in parallel
 - **After US1 completes**: US2, US3 can be worked on in parallel
-- **After US2, US3 complete**: US4, US5, US6 can be worked on in parallel
+- **After US2, US3 complete**: US5, US6 can be worked on in parallel (US4 cancelled)
 
 ---
 
@@ -349,20 +351,20 @@ With multiple developers:
 
 ## Summary
 
-**Total Tasks**: 94
+**Total Tasks**: 94 (77 active, 17 cancelled)
 
 **Task Count by User Story**:
 
-- Setup (Phase 1): 11 tasks
-- Foundational (Phase 2): 5 tasks
-- User Story 0 (P0): 8 tasks
-- User Story 1 (P1): 6 tasks
-- User Story 2 (P1): 7 tasks
-- User Story 3 (P1): 14 tasks
-- User Story 4 (P2): 17 tasks
-- User Story 5 (P2): 8 tasks
-- User Story 6 (P3): 3 tasks
-- Polish & Validation: 15 tasks
+- Setup (Phase 1): 11 tasks ✅
+- Foundational (Phase 2): 5 tasks ✅
+- User Story 0 (P0): 8 tasks ✅
+- User Story 1 (P1): 6 tasks ✅
+- User Story 2 (P1): 7 tasks ✅
+- User Story 3 (P1): 14 tasks ✅
+- User Story 4 (P2): 17 tasks ❌ CANCELLED
+- User Story 5 (P2): 8 tasks ✅
+- User Story 6 (P3): 3 tasks ✅
+- Polish & Validation: 15 tasks ⏳ Pending
 
 **Parallel Opportunities Identified**:
 
@@ -376,15 +378,16 @@ With multiple developers:
 
 **Independent Test Criteria**:
 
-- US0: Custom navigation renders with all elements
-- US1: Content tab shows sidebar with four sections
-- US2: Welcome screen configurable with live preview
-- US3: Photo experiences can be added and configured
-- US4: Survey steps can be added and reordered
-- US5: Ending screen configurable with share options
-- US6: All experience types visible with correct availability
+- US0: Custom navigation renders with all elements ✅
+- US1: Content tab shows sidebar with four sections ✅
+- US2: Welcome screen configurable with live preview ✅
+- US3: Photo experiences can be added and configured ✅
+- US4: Survey steps can be added and reordered ❌ CANCELLED
+- US5: Ending screen configurable with share options ✅
+- US6: All experience types visible with correct availability ✅
 
-**Suggested MVP Scope**: User Stories 0, 1, 2, 3 (Navigation + Content Tab + Welcome + Photo Experiences)
+**Implemented Scope**: User Stories 0, 1, 2, 3, 5, 6 (Navigation + Content Tab + Welcome + Photo Experiences + Ending + Experience Types)
+**Cancelled Scope**: User Story 4 (Survey Configuration - deferred to separate project)
 
 **Format Validation**: ✅ All tasks follow the checklist format with checkbox, ID, optional [P] marker, [Story] label (for user story phases), and file paths
 

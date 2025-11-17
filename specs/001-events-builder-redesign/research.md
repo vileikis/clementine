@@ -3,6 +3,8 @@
 **Date**: 2025-11-13
 **Branch**: `001-events-builder-redesign`
 
+**⚠️ SCOPE CHANGE**: User Story 4 (Configure Event Survey) has been cancelled and will be handled in a separate future project. Survey-related research is retained for historical context.
+
 ## Overview
 
 This document consolidates research findings for the events builder redesign. The goal is to transition from the current scene-based architecture to a more scalable experience-collection model with a tabbed builder interface (Welcome, Experiences, Survey, Ending).

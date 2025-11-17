@@ -3,6 +3,8 @@
 **Date**: 2025-11-13
 **Branch**: `001-events-builder-redesign`
 
+**⚠️ SCOPE CHANGE**: User Story 4 (Configure Event Survey) has been cancelled and will be handled in a separate future project. All survey-related references in this document are retained for historical context but are not implemented. Survey-related types, schemas, components, and server actions should be skipped.
+
 ## Overview
 
 This quickstart guide provides step-by-step instructions for implementing the events builder redesign. The implementation is split into logical phases, focusing first on UI structure (without business logic) to validate the layout, then adding functionality in subsequent iterations.

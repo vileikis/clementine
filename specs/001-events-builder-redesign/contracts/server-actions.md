@@ -3,6 +3,8 @@
 **Date**: 2025-11-13
 **Branch**: `001-events-builder-redesign`
 
+**⚠️ SCOPE CHANGE**: User Story 4 (Configure Event Survey) has been cancelled and will be handled in a separate future project. Survey-related server actions (createSurveyStep, updateSurveyStep, deleteSurveyStep, updateEventSurveyConfig) are not implemented.
+
 ## Overview
 
 This document defines the Server Actions API contracts for the events builder redesign. All mutations (create, update, delete) use Next.js Server Actions with Firebase Admin SDK. All actions validate input with Zod and return typed responses.
