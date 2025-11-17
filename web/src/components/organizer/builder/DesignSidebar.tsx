@@ -81,85 +81,73 @@ export function DesignSidebar({
 
           {/* Experiences section - always expanded */}
           <li className="space-y-1">
-            {/* Experiences header */}
+            {/* Experiences header with add button */}
             <div className="px-4 py-3 min-h-[44px] flex items-center justify-between">
-              <div className="flex flex-col gap-0.5">
-                <span className="text-sm font-medium">Experiences</span>
-                <span className="text-xs text-muted-foreground">
-                  Photo experiences
-                </span>
-              </div>
+              <span className="text-sm font-medium">Experiences</span>
+              <Link href={`/events/${eventId}/design/experiences/create`}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0"
+                  aria-label="Add experience"
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </Link>
             </div>
 
             {/* Experiences list - always visible */}
-            <div className="pl-2">
-              <div className="flex flex-col gap-2">
-                {/* Add Experience Button */}
-                <div className="px-4">
-                  <Link href={`/events/${eventId}/design/experiences/create`}>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="w-full justify-start gap-2 min-h-[44px]"
-                    >
-                      <Plus className="h-4 w-4" />
-                      <span>Create Experience</span>
-                    </Button>
-                  </Link>
+            <div className="flex flex-col gap-2">
+              {/* Experiences List */}
+              {experiences.length === 0 ? (
+                <div className="px-4 py-6 text-center">
+                  <p className="text-xs text-muted-foreground">
+                    No experiences yet. Click + to add your first one.
+                  </p>
                 </div>
+              ) : (
+                <ul className="space-y-1">
+                  {experiences.map((experience) => (
+                    <li key={experience.id}>
+                      <Link
+                        href={`/events/${eventId}/design/experiences/${experience.id}`}
+                        className={cn(
+                          "block w-full text-left px-4 py-2.5 rounded-md transition-colors",
+                          "min-h-[44px] flex items-center gap-2",
+                          "hover:bg-accent hover:text-accent-foreground",
+                          isExperienceActive(experience.id)
+                            ? "bg-accent text-accent-foreground font-medium"
+                            : "text-muted-foreground"
+                        )}
+                        aria-current={
+                          isExperienceActive(experience.id) ? "page" : undefined
+                        }
+                      >
+                        {/* Experience Icon based on type */}
+                        <span className="text-base" aria-hidden="true">
+                          {experience.type === "photo" && "📷"}
+                          {experience.type === "video" && "🎥"}
+                          {experience.type === "gif" && "🎞️"}
+                          {experience.type === "wheel" && "🎡"}
+                        </span>
 
-                {/* Experiences List */}
-                {experiences.length === 0 ? (
-                  <div className="px-4 py-6 text-center">
-                    <p className="text-xs text-muted-foreground">
-                      No experiences yet. Click Create Experience to add your
-                      first one.
-                    </p>
-                  </div>
-                ) : (
-                  <ul className="space-y-1">
-                    {experiences.map((experience) => (
-                      <li key={experience.id}>
-                        <Link
-                          href={`/events/${eventId}/design/experiences/${experience.id}`}
-                          className={cn(
-                            "block w-full text-left px-4 py-2.5 rounded-md transition-colors",
-                            "min-h-[44px] flex items-center gap-2",
-                            "hover:bg-accent hover:text-accent-foreground",
-                            isExperienceActive(experience.id)
-                              ? "bg-accent text-accent-foreground font-medium"
-                              : "text-muted-foreground"
-                          )}
-                          aria-current={
-                            isExperienceActive(experience.id) ? "page" : undefined
-                          }
-                        >
-                          {/* Experience Icon based on type */}
-                          <span className="text-base" aria-hidden="true">
-                            {experience.type === "photo" && "📷"}
-                            {experience.type === "video" && "🎥"}
-                            {experience.type === "gif" && "🎞️"}
-                            {experience.type === "wheel" && "🎡"}
+                        {/* Experience Label */}
+                        <span className="text-sm flex-1 truncate">
+                          {experience.label}
+                        </span>
+
+                        {/* Enabled/Disabled Indicator */}
+                        {!experience.enabled && (
+                          <span className="text-xs text-muted-foreground">
+                            (Disabled)
                           </span>
-
-                          {/* Experience Label */}
-                          <span className="text-sm flex-1 truncate">
-                            {experience.label}
-                          </span>
-
-                          {/* Enabled/Disabled Indicator */}
-                          {!experience.enabled && (
-                            <span className="text-xs text-muted-foreground">
-                              (Disabled)
-                            </span>
-                          )}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
+                        )}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           </li>
 
