@@ -91,7 +91,7 @@ export function AITransformSettings({
               href={promptGuideUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm text-primary hover:underline flex items-center gap-1"
+              className="text-sm text-primary hover:underline flex items-center gap-1 min-h-[44px] py-2"
             >
               Prompt Guide
               <ExternalLink className="h-3 w-3" />
@@ -170,7 +170,7 @@ export function AITransformSettings({
                 <Button
                   variant="destructive"
                   size="sm"
-                  className="absolute top-1 right-1"
+                  className="absolute top-1 right-1 min-h-[44px] min-w-[44px]"
                   onClick={() => handleRemoveReferenceImage(index)}
                   disabled={disabled}
                   type="button"

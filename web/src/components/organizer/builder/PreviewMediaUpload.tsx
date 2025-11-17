@@ -51,7 +51,7 @@ export function PreviewMediaUpload({
         setUploadError(result.error.message);
         setTimeout(() => setUploadError(null), 5000);
       }
-    } catch (error) {
+    } catch {
       setUploadError("An unexpected error occurred during upload");
       setTimeout(() => setUploadError(null), 5000);
     } finally {
@@ -76,7 +76,7 @@ export function PreviewMediaUpload({
         setUploadError(result.error.message);
         setTimeout(() => setUploadError(null), 5000);
       }
-    } catch (error) {
+    } catch {
       setUploadError("Failed to delete preview media");
       setTimeout(() => setUploadError(null), 5000);
     } finally {
@@ -109,7 +109,7 @@ export function PreviewMediaUpload({
             <Button
               variant="destructive"
               size="sm"
-              className="absolute top-2 right-2"
+              className="absolute top-2 right-2 min-h-[44px] min-w-[44px]"
               onClick={handleRemoveMedia}
               disabled={isUploading || isDeleting || disabled}
               type="button"
@@ -129,7 +129,7 @@ export function PreviewMediaUpload({
           />
           <Button
             variant="outline"
-            className="w-full"
+            className="w-full min-h-[44px]"
             disabled={isUploading || isDeleting || disabled}
             onClick={() => document.getElementById("preview-media")?.click()}
             type="button"
