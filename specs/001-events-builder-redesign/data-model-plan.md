@@ -4,6 +4,8 @@
 **Branch**: `001-events-builder-redesign`
 **Source**: Derived from `/specs/003-events-builder-redesign/events-data-model.md` with builder-specific requirements
 
+**⚠️ SCOPE CHANGE**: User Story 4 (Configure Event Survey) has been cancelled and will be handled in a separate future project. SurveyStep-related data model definitions are retained for historical context but are not implemented.
+
 ## Overview
 
 This document defines the data model for the events builder redesign. The model extends the existing `Event` type and introduces new Firestore subcollections for experiences, survey steps, and related entities. This phase focuses on the builder UI, so only entities needed for the Content, Distribute, and Results tabs are included.

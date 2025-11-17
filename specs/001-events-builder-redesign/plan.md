@@ -5,6 +5,8 @@
 
 **Note**: This plan covers the redesign of the events builder to support fully-fledged flows with 4 key components: welcome, experiences, survey, and ending. The implementation will focus on the event builder UI first (without logic), ensuring the core layout is correct before adding functionality in subsequent phases.
 
+**⚠️ SCOPE CHANGE**: User Story 4 (Configure Event Survey) has been cancelled and will be handled in a separate future project. Survey-related components (SurveySection, SurveyStepEditor, SurveyStepTypeDialog) and server actions (survey.ts) are not implemented in this feature.
+
 ## Summary
 
 Redesign the events builder to transition from the current scene-based architecture to a more scalable experience-collection model. The new builder will feature a tabbed interface (Content, Distribute, Results) with a left sidebar for navigation between Welcome screen, Experiences, Survey, and Ending sections. Each section will have its own design controls and preview. The data model introduces new Firestore subcollections under each event: /experiences and /surveySteps (in scope for this phase), plus /experienceItems, /surveyResponses, /participants, /sessions, and /shares (documented but out of scope). This phase focuses exclusively on the builder UI (Content tab with static previews) for photo experiences only, leaving guest experience implementation and other experience types for separate projects.
