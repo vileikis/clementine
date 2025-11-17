@@ -2,7 +2,7 @@
 
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Input } from "@/components/ui/input";
+import { Slider } from "@/components/ui/slider";
 
 interface CountdownSettingsProps {
   countdownEnabled: boolean;
@@ -18,8 +18,8 @@ interface CountdownSettingsProps {
  *
  * Features:
  * - Toggle to enable/disable countdown timer
- * - Number input for countdown duration (0-10 seconds)
- * - Conditional rendering: input hidden when toggle is disabled
+ * - Slider for countdown duration (0-10 seconds)
+ * - Conditional rendering: slider hidden when toggle is disabled
  * - Default value: 3 seconds
  * - Mobile-friendly: touch targets ≥44x44px
  *
@@ -54,19 +54,17 @@ export function CountdownSettings({
 
       {countdownEnabled && (
         <div className="space-y-2">
-          <Label htmlFor="countdownSeconds">Countdown Duration (seconds)</Label>
-          <Input
+          <div className="flex items-center justify-between">
+            <Label htmlFor="countdownSeconds">Countdown Duration</Label>
+            <span className="text-sm font-medium">{countdownSeconds}s</span>
+          </div>
+          <Slider
             id="countdownSeconds"
-            type="number"
             min={0}
             max={10}
-            value={countdownSeconds}
-            onChange={(e) => {
-              const value = parseInt(e.target.value, 10);
-              if (!isNaN(value) && value >= 0 && value <= 10) {
-                onCountdownSecondsChange(value);
-              }
-            }}
+            step={1}
+            value={[countdownSeconds]}
+            onValueChange={(value) => onCountdownSecondsChange(value[0])}
             disabled={disabled}
             className="w-full"
           />

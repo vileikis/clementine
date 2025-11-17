@@ -147,6 +147,7 @@ export const experienceSchema = z.object({
   countdownSeconds: z.number().int().min(0).max(10).default(3),
 
   // Overlay configuration
+  overlayEnabled: z.boolean().default(false),
   overlayFramePath: z.string().optional(),
 
   // AI transformation configuration
@@ -238,6 +239,7 @@ export const updateExperienceSchema = z.object({
   previewType: previewTypeSchema.optional(),
   countdownEnabled: z.boolean().optional(),
   countdownSeconds: z.number().int().min(0).max(10).optional(),
+  overlayEnabled: z.boolean().optional(),
   overlayFramePath: z.string().optional(),
   aiEnabled: z.boolean().optional(),
   aiModel: z.string().optional(),

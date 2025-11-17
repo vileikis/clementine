@@ -199,6 +199,7 @@ export interface Experience {
   countdownSeconds: number;
 
   // Overlay configuration
+  overlayEnabled: boolean;
   overlayFramePath?: string; // Storage path
 
   // AI transformation configuration
