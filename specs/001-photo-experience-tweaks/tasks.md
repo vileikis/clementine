@@ -123,11 +123,11 @@
 
 ### UI Component for User Story 3
 
-- [ ] T034 [US3] Create `web/src/components/organizer/builder/CountdownSettings.tsx` component with toggle switch for `countdownEnabled`
-- [ ] T035 [US3] Add number input (0-10 seconds) for `countdownSeconds` in `CountdownSettings.tsx` with min/max attributes
-- [ ] T036 [US3] Add conditional rendering to hide countdown timer input when toggle is disabled in `CountdownSettings.tsx`
-- [ ] T037 [US3] Set default value of 3 seconds for countdown timer in `CountdownSettings.tsx`
-- [ ] T038 [US3] Integrate `CountdownSettings.tsx` component into `web/src/components/organizer/builder/ExperienceEditor.tsx`
+- [X] T034 [US3] Create `web/src/components/organizer/builder/CountdownSettings.tsx` component with toggle switch for `countdownEnabled`
+- [X] T035 [US3] Add number input (0-10 seconds) for `countdownSeconds` in `CountdownSettings.tsx` with min/max attributes
+- [X] T036 [US3] Add conditional rendering to hide countdown timer input when toggle is disabled in `CountdownSettings.tsx`
+- [X] T037 [US3] Set default value of 3 seconds for countdown timer in `CountdownSettings.tsx`
+- [X] T038 [US3] Integrate `CountdownSettings.tsx` component into `web/src/components/organizer/builder/ExperienceEditor.tsx`
 
 ### Tests for User Story 3
 
@@ -147,17 +147,17 @@
 
 ### Server Actions for User Story 4
 
-- [ ] T042 [US4] Add `uploadFrameOverlay` Server Action in `web/src/lib/actions/experiences.ts` with PNG validation, Firebase Storage upload, and cleanup of old overlay
-- [ ] T043 [US4] Add `deleteFrameOverlay` Server Action in `web/src/lib/actions/experiences.ts` with Firebase Storage deletion
-- [ ] T044 [US4] Update `updateExperience` Server Action in `web/src/lib/actions/experiences.ts` to support `overlayFramePath` field
+- [X] T042 [US4] Add `uploadFrameOverlay` Server Action in `web/src/lib/actions/experiences.ts` with PNG validation, Firebase Storage upload, and cleanup of old overlay
+- [X] T043 [US4] Add `deleteFrameOverlay` Server Action in `web/src/lib/actions/experiences.ts` with Firebase Storage deletion
+- [X] T044 [US4] Update `updateExperience` Server Action in `web/src/lib/actions/experiences.ts` to support `overlayFramePath` field
 
 ### UI Component for User Story 4
 
-- [ ] T045 [US4] Create `web/src/components/organizer/builder/OverlaySettings.tsx` component with toggle switch for overlay enable/disable
-- [ ] T046 [US4] Add frame overlay upload field (PNG recommended) in `OverlaySettings.tsx`
-- [ ] T047 [US4] Add preview display of overlay composited over sample photo in `OverlaySettings.tsx`
-- [ ] T048 [US4] Add upload/replace/remove button handlers in `OverlaySettings.tsx` calling Server Actions
-- [ ] T049 [US4] Integrate `OverlaySettings.tsx` component into `web/src/components/organizer/builder/ExperienceEditor.tsx`
+- [X] T045 [US4] Create `web/src/components/organizer/builder/OverlaySettings.tsx` component with toggle switch for overlay enable/disable
+- [X] T046 [US4] Add frame overlay upload field (PNG recommended) in `OverlaySettings.tsx`
+- [X] T047 [US4] Add preview display of overlay composited over sample photo in `OverlaySettings.tsx`
+- [X] T048 [US4] Add upload/replace/remove button handlers in `OverlaySettings.tsx` calling Server Actions
+- [X] T049 [US4] Integrate `OverlaySettings.tsx` component into `web/src/components/organizer/builder/ExperienceEditor.tsx`
 
 ### Tests for User Story 4
 
@@ -176,18 +176,18 @@
 
 ### Server Actions for User Story 5 (Reference Images)
 
-- [ ] T052 [US5] Verify `uploadReferenceImage` Server Action exists in `web/src/lib/actions/experiences.ts` (should already exist)
-- [ ] T053 [US5] Verify `deleteReferenceImage` Server Action exists in `web/src/lib/actions/experiences.ts` (should already exist)
+- [X] T052 [US5] Verify `uploadReferenceImage` Server Action exists in `web/src/lib/actions/experiences.ts` (should already exist)
+- [X] T053 [US5] Verify `deleteReferenceImage` Server Action exists in `web/src/lib/actions/experiences.ts` (should already exist)
 
 ### UI Component for User Story 5
 
-- [ ] T054 [US5] Create `web/src/components/organizer/builder/AITransformSettings.tsx` component with horizontal Flexbox row layout for reference images
-- [ ] T055 [US5] Add `flex-wrap` CSS for responsive wrapping of reference images in `AITransformSettings.tsx`
-- [ ] T056 [US5] Add aspect ratio picker using shadcn/ui Select component with 5 options (1:1, 3:4, 4:5, 9:16, 16:9) in `AITransformSettings.tsx`
-- [ ] T057 [US5] Add human-readable labels with use case hints for aspect ratio options in `AITransformSettings.tsx`
-- [ ] T058 [US5] Add "Prompt Guide" link next to Model Picker with dynamic URL based on selected AI model in `AITransformSettings.tsx`
-- [ ] T059 [US5] Configure Prompt Guide link to open in new tab with `target="_blank"` and `rel="noopener noreferrer"` in `AITransformSettings.tsx`
-- [ ] T060 [US5] Integrate `AITransformSettings.tsx` component into `web/src/components/organizer/builder/ExperienceEditor.tsx`
+- [X] T054 [US5] Create `web/src/components/organizer/builder/AITransformSettings.tsx` component with horizontal Flexbox row layout for reference images
+- [X] T055 [US5] Add `flex-wrap` CSS for responsive wrapping of reference images in `AITransformSettings.tsx`
+- [X] T056 [US5] Add aspect ratio picker using shadcn/ui Select component with 5 options (1:1, 3:4, 4:5, 9:16, 16:9) in `AITransformSettings.tsx`
+- [X] T057 [US5] Add human-readable labels with use case hints for aspect ratio options in `AITransformSettings.tsx`
+- [X] T058 [US5] Add "Prompt Guide" link next to Model Picker with dynamic URL based on selected AI model in `AITransformSettings.tsx`
+- [X] T059 [US5] Configure Prompt Guide link to open in new tab with `target="_blank"` and `rel="noopener noreferrer"` in `AITransformSettings.tsx`
+- [X] T060 [US5] Integrate `AITransformSettings.tsx` component into `web/src/components/organizer/builder/ExperienceEditor.tsx`
 
 ### Tests for User Story 5
 
