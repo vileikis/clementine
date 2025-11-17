@@ -8,7 +8,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Trash2, CheckCircle2, XCircle } from "lucide-react";
+import { Trash2 } from "lucide-react";
+import { toast } from "sonner";
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { ImageUploadField } from "./ImageUploadField";
 import type { Experience } from "@/lib/types/firestore";
 
@@ -39,7 +41,6 @@ export function ExperienceEditor({
 }: ExperienceEditorProps) {
   const [isPending, startTransition] = useTransition();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [saveMessage, setSaveMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   // Local form state
   const [label, setLabel] = useState(experience.label);
@@ -57,7 +58,7 @@ export function ExperienceEditor({
 
   // Handle save
   const handleSave = () => {
-    setSaveMessage(null);
+    if (isPending) return; // Prevent multiple saves
     startTransition(async () => {
       try {
         await onSave(experience.id, {
@@ -72,17 +73,18 @@ export function ExperienceEditor({
           aiPrompt: aiPrompt || undefined,
           aiReferenceImagePaths: aiReferenceImagePaths.length > 0 ? aiReferenceImagePaths : undefined,
         });
-        setSaveMessage({ type: "success", text: "Experience updated successfully" });
-        setTimeout(() => setSaveMessage(null), 3000);
+        toast.success("Experience updated successfully");
       } catch (error) {
-        setSaveMessage({
-          type: "error",
-          text: error instanceof Error ? error.message : "Failed to save experience"
-        });
-        setTimeout(() => setSaveMessage(null), 5000);
+        toast.error(error instanceof Error ? error.message : "Failed to save experience");
       }
     });
   };
+
+  // Keyboard shortcuts: Cmd+S / Ctrl+S to save
+  useKeyboardShortcuts({
+    "Cmd+S": handleSave,
+    "Ctrl+S": handleSave,
+  });
 
   // Handle experience deletion
   const handleDelete = async () => {
@@ -90,12 +92,9 @@ export function ExperienceEditor({
       try {
         await onDelete(experience.id);
         setShowDeleteDialog(false);
+        toast.success("Experience deleted successfully");
       } catch (error) {
-        setSaveMessage({
-          type: "error",
-          text: error instanceof Error ? error.message : "Failed to delete experience"
-        });
-        setTimeout(() => setSaveMessage(null), 5000);
+        toast.error(error instanceof Error ? error.message : "Failed to delete experience");
       }
     });
   };
@@ -144,24 +143,6 @@ export function ExperienceEditor({
           </Button>
         </div>
       </div>
-
-      {/* Save Message */}
-      {saveMessage && (
-        <div
-          className={`flex items-center gap-2 rounded-lg p-3 text-sm ${
-            saveMessage.type === "success"
-              ? "bg-green-50 text-green-800 border border-green-200"
-              : "bg-red-50 text-red-800 border border-red-200"
-          }`}
-        >
-          {saveMessage.type === "success" ? (
-            <CheckCircle2 className="h-4 w-4" />
-          ) : (
-            <XCircle className="h-4 w-4" />
-          )}
-          <span>{saveMessage.text}</span>
-        </div>
-      )}
 
       {/* Basic Settings */}
       <div className="space-y-4">

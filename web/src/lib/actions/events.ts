@@ -2,6 +2,7 @@
 
 import { db } from "@/lib/firebase/admin";
 import { updateEventWelcomeSchema, updateEventEndingSchema } from "@/lib/schemas/firestore";
+import { verifyAdminSecret } from "@/lib/auth";
 
 /**
  * Server Actions for event-level mutations.
@@ -31,6 +32,18 @@ export async function updateEventWelcome(
   }
 ): Promise<ActionResponse<void>> {
   try {
+    // Check authentication
+    const auth = await verifyAdminSecret();
+    if (!auth.authorized) {
+      return {
+        success: false,
+        error: {
+          code: "PERMISSION_DENIED",
+          message: auth.error,
+        },
+      };
+    }
+
     // Validate input with Zod
     const validatedData = updateEventWelcomeSchema.parse(data);
 
@@ -100,6 +113,18 @@ export async function updateEventEnding(
   }
 ): Promise<ActionResponse<void>> {
   try {
+    // Check authentication
+    const auth = await verifyAdminSecret();
+    if (!auth.authorized) {
+      return {
+        success: false,
+        error: {
+          code: "PERMISSION_DENIED",
+          message: auth.error,
+        },
+      };
+    }
+
     // Validate input with Zod
     const validatedData = updateEventEndingSchema.parse(data);
 
