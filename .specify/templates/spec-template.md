@@ -113,6 +113,14 @@
 - **TSR-002**: TypeScript strict mode MUST be maintained (no `any` escapes)
 - **TSR-003**: [Add feature-specific validation requirements]
 
+### Firebase Architecture Requirements *(Constitution Principle VI)*
+
+- **FAR-001**: All write operations (create/update/delete) MUST use Admin SDK via Server Actions (`web/src/lib/firebase/admin.ts`)
+- **FAR-002**: Real-time subscriptions and optimistic reads MUST use Client SDK (`web/src/lib/firebase/client.ts`)
+- **FAR-003**: All data schemas and validation logic MUST be located in `web/src/lib/schemas/`
+- **FAR-004**: Public images MUST be stored as full public URLs (not relative paths) for instant rendering
+- **FAR-005**: [Add feature-specific Firebase requirements]
+
 ### Key Entities *(include if feature involves data)*
 
 - **[Entity 1]**: [What it represents, key attributes without implementation]
