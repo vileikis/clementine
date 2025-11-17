@@ -98,8 +98,8 @@
 - [X] T024 [US3] Add notFound() call for invalid experience IDs in web/src/app/(event-builder)/events/[eventId]/design/experiences/[experienceId]/page.tsx
 - [X] T025 [US3] Update DesignSidebar to render experiences list always visible (remove menu toggle) in web/src/components/organizer/builder/DesignSidebar.tsx
 - [X] T026 [US3] Update DesignSidebar to highlight active experience based on pathname in web/src/components/organizer/builder/DesignSidebar.tsx
-- [ ] T027 [US3] Verify experiences list updates in real-time when new experience is created
-- [ ] T028 [US3] Verify sidebar remains visible across all design route transitions
+- [X] T027 [US3] Verify experiences list updates in real-time when new experience is created
+- [X] T028 [US3] Verify sidebar remains visible across all design route transitions
 
 **Checkpoint**: All experiences are visible in sidebar and navigable
 
@@ -126,23 +126,23 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T033 [P] Implement mobile-responsive sidebar with Sheet component for mobile viewports in web/src/app/(event-builder)/events/[eventId]/design/layout.tsx
-- [ ] T034 [P] Verify all touch targets meet 44x44px minimum on mobile (MFR-002)
-- [ ] T035 [P] Add loading states to create experience form submission
-- [ ] T036 [P] Add error toast notifications for failed experience creation
-- [ ] T037 Optimize context value memoization to prevent unnecessary re-renders in web/src/app/(event-builder)/events/[eventId]/design/layout.tsx
-- [ ] T038 Verify Firestore subscription cleanup on component unmount
-- [ ] T039 Test all routes on mobile viewport (320px-768px)
+- [X] T033 [P] Implement mobile-responsive sidebar with Sheet component for mobile viewports in web/src/app/(event-builder)/events/[eventId]/design/layout.tsx
+- [X] T034 [P] Verify all touch targets meet 44x44px minimum on mobile (MFR-002)
+- [X] T035 [P] Add loading states to create experience form submission
+- [X] T036 [P] Add error toast notifications for failed experience creation
+- [X] T037 Optimize context value memoization to prevent unnecessary re-renders in web/src/app/(event-builder)/events/[eventId]/design/layout.tsx
+- [X] T038 Verify Firestore subscription cleanup on component unmount
+- [X] T039 Test all routes on mobile viewport (320px-768px)
 
 ### Validation Loop (REQUIRED - Constitution Principle V)
 
 **Purpose**: Ensure code quality and correctness before merge
 
-- [ ] T040 Run `pnpm lint` from repository root and fix all errors/warnings
-- [ ] T041 Run `pnpm type-check` from repository root and resolve all TypeScript errors
-- [ ] T042 Verify all routes render correctly in dev server (`pnpm dev`)
-- [ ] T043 Test complete user flow: navigate to design → create experience → navigate between sections → verify browser navigation
-- [ ] T044 Commit only after validation loop passes cleanly
+- [X] T040 Run `pnpm lint` from repository root and fix all errors/warnings
+- [X] T041 Run `pnpm type-check` from repository root and resolve all TypeScript errors
+- [X] T042 Verify all routes render correctly in dev server (`pnpm dev`)
+- [X] T043 Test complete user flow: navigate to design → create experience → navigate between sections → verify browser navigation
+- [X] T044 Commit only after validation loop passes cleanly
 
 ---
 

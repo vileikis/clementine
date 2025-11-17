@@ -62,6 +62,14 @@ export default function DesignLayout({ children, params }: DesignLayoutProps) {
     params.then(({ eventId }) => setEventId(eventId));
   }, [params]);
 
+  // Close mobile menu on navigation (wrap in timeout to avoid sync setState)
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      const timer = setTimeout(() => setMobileMenuOpen(false), 0);
+      return () => clearTimeout(timer);
+    }
+  }, [pathname, mobileMenuOpen]);
+
   // Real-time experience list fetching from Firestore subcollection
   useEffect(() => {
     if (!eventId) return;
