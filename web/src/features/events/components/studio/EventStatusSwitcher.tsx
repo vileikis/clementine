@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { updateEventStatusAction } from "../../lib/actions"
+import { updateEventStatusAction } from "../../actions/events"
 import type { EventStatus } from "../../types/event.types"
 
 interface EventStatusSwitcherProps {

@@ -1,6 +1,6 @@
 "use server"
 
-import { updateScene } from "@/lib/repositories/scenes"
+import { updateScene } from "../repositories/scenes"
 import { uploadReferenceImage, getPublicUrl } from "@/lib/storage/upload"
 import { verifyAdminSecret } from "@/lib/auth"
 import { revalidatePath } from "next/cache"
