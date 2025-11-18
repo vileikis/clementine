@@ -1,5 +1,5 @@
 import { getEventAction } from "@/lib/actions/events"
-import { getCompanyStatus } from "@/lib/repositories/companies"
+import { getCompanyStatus } from "@/features/companies/lib/repository"
 import { notFound } from "next/navigation"
 import { BrandThemeProvider } from "@/components/guest/BrandThemeProvider"
 import { GuestFlowContainer } from "@/components/guest/GuestFlowContainer"

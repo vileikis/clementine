@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createCompanyAction, updateCompanyAction } from "@/lib/actions/companies";
+import { createCompanyAction, updateCompanyAction } from "@/features/companies";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { Company } from "@/lib/types/firestore";
+import type { Company } from "@/features/companies";
 
 interface CompanyFormProps {
   company?: Company; // If provided, form is in edit mode

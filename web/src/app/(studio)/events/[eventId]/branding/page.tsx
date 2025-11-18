@@ -1,6 +1,6 @@
 import { getEventAction } from "@/lib/actions/events"
 import { notFound } from "next/navigation"
-import { BrandingForm } from "@/components/organizer/BrandingForm"
+import { BrandingForm } from "@/features/companies"
 
 interface BrandingPageProps {
   params: Promise<{ eventId: string }>
