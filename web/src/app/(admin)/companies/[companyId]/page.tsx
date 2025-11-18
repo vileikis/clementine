@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, use } from "react";
-import { getCompanyAction, updateCompanyAction, getCompanyEventCountAction } from "@/app/actions/companies";
+import { getCompanyAction, updateCompanyAction, getCompanyEventCountAction } from "@/lib/actions/companies";
 import type { Company } from "@/lib/types/firestore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
