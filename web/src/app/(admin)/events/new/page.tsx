@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { EventForm } from "@/components/organizer/EventForm"
+import { EventForm } from "@/features/events"
 
 export default function NewEventPage() {
   return (

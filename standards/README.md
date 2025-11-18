@@ -41,6 +41,13 @@ Development workflow and project conventions
 - Dependency management
 - Spec-driven development workflow
 
+### [Feature Modules](./global/feature-modules.md)
+Feature-based architecture and organization
+- Feature module structure and conventions
+- Public API patterns (index.ts)
+- Server/client code separation
+- Import patterns and dependencies
+
 ### [Validation](./global/validation.md)
 Input validation patterns
 - Zod for type-safe validation

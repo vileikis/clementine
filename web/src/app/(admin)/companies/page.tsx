@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { listCompaniesAction } from "@/app/actions/companies";
-import { CompanyCard } from "@/components/organizer/CompanyCard";
-import { CompanyForm } from "@/components/organizer/CompanyForm";
-import type { Company } from "@/lib/types/firestore";
+import { listCompaniesAction } from "@/features/companies";
+import { CompanyCard } from "@/features/companies";
+import { CompanyForm } from "@/features/companies";
+import type { Company } from "@/features/companies";
 import { Button } from "@/components/ui/button";
 
 export default function CompaniesPage() {
