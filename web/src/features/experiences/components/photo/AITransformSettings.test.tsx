@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AITransformSettings } from "./AITransformSettings";
-import { AI_MODEL_PROMPT_GUIDES } from "@/lib/constants/ai-models";
+import { AI_MODEL_PROMPT_GUIDES } from "../../lib/constants";
 
 // Mock the ImageUploadField component to simplify testing
 jest.mock("./ImageUploadField", () => ({

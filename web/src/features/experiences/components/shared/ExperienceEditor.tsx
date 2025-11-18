@@ -10,11 +10,10 @@ import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { PreviewMediaUpload } from "./PreviewMediaUpload";
-import { CountdownSettings } from "./CountdownSettings";
-import { OverlaySettings } from "./OverlaySettings";
-import { AITransformSettings } from "./AITransformSettings";
-import type { Experience } from "@/lib/types/firestore";
-import type { PreviewType, AspectRatio } from "@/lib/types/firestore";
+import { CountdownSettings } from "../photo/CountdownSettings";
+import { OverlaySettings } from "../photo/OverlaySettings";
+import { AITransformSettings } from "../photo/AITransformSettings";
+import type { Experience, PreviewType, AspectRatio } from "../../types/experience.types";
 
 interface ExperienceEditorProps {
   experience: Experience;

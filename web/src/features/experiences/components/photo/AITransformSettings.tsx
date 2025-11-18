@@ -5,9 +5,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { ExternalLink } from "lucide-react";
-import { ImageUploadField } from "./ImageUploadField";
-import { AI_MODEL_PROMPT_GUIDES } from "@/lib/constants/ai-models";
-import type { AspectRatio } from "@/lib/types/firestore";
+import { ImageUploadField } from "@/components/shared/ImageUploadField";
+import { AI_MODEL_PROMPT_GUIDES } from "../../lib/constants";
+import type { AspectRatio } from "../../types/experience.types";
 
 interface AITransformSettingsProps {
   aiModel: string;

@@ -1,7 +1,7 @@
 // Experience repository - CRUD operations for experiences subcollection
 
 import { db } from "@/lib/firebase/admin";
-import type { Experience } from "@/lib/types/firestore";
+import type { Experience } from "../types/experience.types";
 import { FieldValue } from "firebase-admin/firestore";
 
 /**

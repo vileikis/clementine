@@ -1,8 +1,6 @@
 import { getCurrentSceneAction } from "@/lib/actions/events"
 import { notFound } from "next/navigation"
-import { ModeSelector } from "@/components/organizer/ModeSelector"
-import { PromptEditor } from "@/components/organizer/PromptEditor"
-import { RefImageUploader } from "@/components/organizer/RefImageUploader"
+import { ModeSelector, PromptEditor, RefImageUploader } from "@/features/experiences"
 
 interface ScenePageProps {
   params: Promise<{ eventId: string }>

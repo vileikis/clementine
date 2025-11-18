@@ -8,7 +8,7 @@
  * Route: /events/:eventId/design/experiences/create
  */
 
-import { CreateExperienceForm } from "@/components/organizer/builder/CreateExperienceForm";
+import { CreateExperienceForm } from "@/features/experiences";
 
 interface CreateExperiencePageProps {
   params: Promise<{ eventId: string }>;

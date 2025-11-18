@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { PreviewPanel } from "./PreviewPanel";
-import { ImageUploadField } from "./ImageUploadField";
+import { ImageUploadField } from "@/components/shared/ImageUploadField";
 import { updateEventWelcome } from "@/lib/actions/events";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";

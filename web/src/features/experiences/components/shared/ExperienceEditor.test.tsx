@@ -1,21 +1,21 @@
 import { render, screen } from "@testing-library/react";
 import { ExperienceEditor } from "./ExperienceEditor";
-import type { Experience } from "@/lib/types/firestore";
+import type { Experience } from "../../types/experience.types";
 
 // Mock the sub-components to focus on ExperienceEditor structure
 jest.mock("./PreviewMediaUpload", () => ({
   PreviewMediaUpload: () => <div data-testid="preview-media-upload">PreviewMediaUpload</div>,
 }));
 
-jest.mock("./CountdownSettings", () => ({
+jest.mock("../photo/CountdownSettings", () => ({
   CountdownSettings: () => <div data-testid="countdown-settings">CountdownSettings</div>,
 }));
 
-jest.mock("./OverlaySettings", () => ({
+jest.mock("../photo/OverlaySettings", () => ({
   OverlaySettings: () => <div data-testid="overlay-settings">OverlaySettings</div>,
 }));
 
-jest.mock("./AITransformSettings", () => ({
+jest.mock("../photo/AITransformSettings", () => ({
   AITransformSettings: () => <div data-testid="ai-transform-settings">AITransformSettings</div>,
 }));
 

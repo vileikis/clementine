@@ -13,8 +13,8 @@ import { ExperienceEditor } from "./ExperienceEditor";
 import {
   updateExperienceAction,
   deleteExperienceAction,
-} from "@/lib/actions/experiences";
-import type { Experience } from "@/lib/types/firestore";
+} from "../../lib/actions";
+import type { Experience } from "../../types/experience.types";
 
 interface ExperienceEditorWrapperProps {
   eventId: string;

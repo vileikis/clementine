@@ -9,8 +9,8 @@
  */
 
 import { notFound } from "next/navigation";
-import { getExperience } from "@/lib/repositories/experiences";
-import { ExperienceEditorWrapper } from "@/components/organizer/builder/ExperienceEditorWrapper";
+import { getExperience } from "@/features/experiences/lib/repository";
+import { ExperienceEditorWrapper } from "@/features/experiences";
 
 interface ExperienceEditorPageProps {
   params: Promise<{ eventId: string; experienceId: string }>;

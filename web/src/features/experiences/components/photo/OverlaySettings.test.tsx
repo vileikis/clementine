@@ -1,10 +1,10 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { OverlaySettings } from "./OverlaySettings";
-import * as experiencesActions from "@/lib/actions/experiences";
+import * as experiencesActions from "../../lib/actions";
 
 // Mock the server actions
-jest.mock("@/lib/actions/experiences", () => ({
+jest.mock("../../lib/actions", () => ({
   uploadFrameOverlay: jest.fn(),
   deleteFrameOverlay: jest.fn(),
 }));

@@ -1,4 +1,17 @@
 /**
+ * AI Model Configurations
+ *
+ * Defines available AI models for photo experiences.
+ */
+
+export const AI_MODELS = [
+  { value: "nanobanana", label: "Nano Banana" },
+  // Future models can be added here
+] as const;
+
+export const DEFAULT_AI_MODEL = "nanobanana";
+
+/**
  * AI Model Prompt Guide URLs
  *
  * Maps AI model identifiers to their respective prompt guide documentation URLs.
