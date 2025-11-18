@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { createEventAction } from "@/app/actions/events"
+import { createEventAction } from "@/lib/actions/events"
 import { listCompaniesAction } from "@/lib/actions/companies"
 import type { Company } from "@/lib/types/firestore"
 

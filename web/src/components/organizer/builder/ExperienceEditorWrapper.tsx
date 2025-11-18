@@ -13,7 +13,7 @@ import { ExperienceEditor } from "./ExperienceEditor";
 import {
   updateExperienceAction,
   deleteExperienceAction,
-} from "@/app/actions/experiences";
+} from "@/lib/actions/experiences";
 import type { Experience } from "@/lib/types/firestore";
 
 interface ExperienceEditorWrapperProps {
@@ -34,7 +34,7 @@ export function ExperienceEditorWrapper({
     const result = await updateExperienceAction(eventId, experienceId, data);
 
     if (!result.success) {
-      throw new Error(result.error);
+      throw new Error(result.error.message);
     }
   };
 
@@ -42,7 +42,7 @@ export function ExperienceEditorWrapper({
     const result = await deleteExperienceAction(eventId, experienceId);
 
     if (!result.success) {
-      throw new Error(result.error);
+      throw new Error(result.error.message);
     }
 
     // Redirect to welcome screen after deletion

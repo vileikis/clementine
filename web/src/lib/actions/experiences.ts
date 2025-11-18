@@ -775,3 +775,25 @@ export async function deleteFrameOverlay(
     };
   }
 }
+
+// ============================================================================
+// Backward Compatibility Aliases
+// ============================================================================
+
+/**
+ * Alias for createExperience to maintain backward compatibility.
+ * @deprecated Use createExperience instead
+ */
+export const createExperienceAction = createExperience;
+
+/**
+ * Alias for updateExperience to maintain backward compatibility.
+ * @deprecated Use updateExperience instead
+ */
+export const updateExperienceAction = updateExperience;
+
+/**
+ * Alias for deleteExperience to maintain backward compatibility.
+ * @deprecated Use deleteExperience instead
+ */
+export const deleteExperienceAction = deleteExperience;

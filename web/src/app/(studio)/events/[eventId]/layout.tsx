@@ -1,4 +1,4 @@
-import { getEventAction } from "@/app/actions/events"
+import { getEventAction } from "@/lib/actions/events"
 import { notFound } from "next/navigation"
 import { EventBreadcrumb } from "@/components/organizer/EventBreadcrumb"
 import { EventTabs } from "@/components/organizer/EventTabs"

@@ -1,4 +1,4 @@
-import { getCurrentSceneAction } from "@/app/actions/events"
+import { getCurrentSceneAction } from "@/lib/actions/events"
 import { notFound } from "next/navigation"
 import { ModeSelector } from "@/components/organizer/ModeSelector"
 import { PromptEditor } from "@/components/organizer/PromptEditor"
