@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LogoutButton } from "@/components/organizer/LogoutButton"
+import { LogoutButton } from "@/components/shared/LogoutButton"
 
 export default function AdminLayout({
   children,
