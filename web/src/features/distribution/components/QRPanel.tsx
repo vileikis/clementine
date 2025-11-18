@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { generateQrCodeAction, regenerateQrCodeAction } from "@/lib/actions/qr"
+import { generateQrCodeAction, regenerateQrCodeAction } from "@/features/distribution"
 
 interface QRPanelProps {
   eventId: string

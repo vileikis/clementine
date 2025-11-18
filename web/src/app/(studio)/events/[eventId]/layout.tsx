@@ -3,7 +3,7 @@ import { notFound } from "next/navigation"
 import { EventBreadcrumb } from "@/components/organizer/EventBreadcrumb"
 import { EventTabs } from "@/components/organizer/EventTabs"
 import { EventStatusSwitcher } from "@/components/organizer/EventStatusSwitcher"
-import { CopyLinkButton } from "@/components/organizer/CopyLinkButton"
+import { CopyLinkButton } from "@/features/distribution"
 
 interface EventLayoutProps {
   children: React.ReactNode

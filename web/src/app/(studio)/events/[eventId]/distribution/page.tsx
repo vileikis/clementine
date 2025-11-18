@@ -1,6 +1,6 @@
 import { getEventAction } from "@/lib/actions/events"
 import { notFound } from "next/navigation"
-import { QRPanel } from "@/components/organizer/QRPanel"
+import { QRPanel } from "@/features/distribution"
 import { getJoinUrl } from "@/lib/utils/urls"
 
 interface DistributionPageProps {
