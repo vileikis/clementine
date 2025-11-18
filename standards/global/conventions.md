@@ -17,6 +17,7 @@ clementine/
 
 **File organization:**
 
+- **Feature-based architecture** - See [feature-modules.md](./feature-modules.md) for complete feature module conventions
 - Group by feature/domain, not by type
 - Co-locate related files (component + styles + tests)
 - Use index files sparingly (explicit imports preferred)
