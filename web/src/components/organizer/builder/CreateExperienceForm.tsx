@@ -25,7 +25,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { createExperienceSchema } from "@/lib/schemas/firestore";
-import { createExperienceAction } from "@/app/actions/experiences";
+import { createExperienceAction } from "@/lib/actions/experiences";
 import type { ExperienceType } from "@/lib/types/firestore";
 import type { z } from "zod";
 
@@ -110,7 +110,7 @@ export function CreateExperienceForm({ eventId }: CreateExperienceFormProps) {
           `/events/${eventId}/design/experiences/${result.data.id}`
         );
       } else {
-        toast.error(result.error || "Failed to create experience");
+        toast.error(result.error.message || "Failed to create experience");
         setIsSubmitting(false);
       }
     } catch (error) {

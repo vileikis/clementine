@@ -1,4 +1,4 @@
-import { getEventAction } from "@/app/actions/events";
+import { getEventAction } from "@/lib/actions/events";
 import { notFound } from "next/navigation";
 import { WelcomeEditor } from "@/components/organizer/builder/WelcomeEditor";
 
