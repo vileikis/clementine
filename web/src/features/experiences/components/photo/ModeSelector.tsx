@@ -2,7 +2,7 @@
 
 import { Camera, Video, Image as ImageIcon, Repeat } from "lucide-react"
 import { cn } from "@/lib/utils"
-import type { CaptureMode } from "@/lib/types/firestore"
+import type { CaptureMode } from "@/features/events"
 
 interface ModeSelectorProps {
   currentMode: CaptureMode

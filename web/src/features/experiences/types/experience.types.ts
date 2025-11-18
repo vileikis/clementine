@@ -84,3 +84,41 @@ export interface ExperienceItem {
   createdAt: number;
   updatedAt: number;
 }
+
+/**
+ * Survey step types supported by the platform.
+ */
+export type SurveyStepType =
+  | "short_text"
+  | "long_text"
+  | "multiple_choice"
+  | "opinion_scale"
+  | "email"
+  | "statement";
+
+/**
+ * SurveyStep represents a single survey question/step.
+ * Lives in /events/{eventId}/surveySteps/{stepId} subcollection.
+ */
+export interface SurveyStep {
+  id: string;
+  eventId: string;
+  type: SurveyStepType;
+
+  // Content
+  title?: string;
+  description?: string;
+  placeholder?: string;
+
+  // Type-specific configuration
+  options?: string[]; // For multiple_choice
+  allowMultiple?: boolean; // For multiple_choice
+  scaleMin?: number; // For opinion_scale
+  scaleMax?: number; // For opinion_scale
+
+  // Validation
+  required: boolean;
+
+  createdAt: number;
+  updatedAt: number;
+}

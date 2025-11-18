@@ -11,6 +11,9 @@ export type ShareSocial =
   | "whatsapp"
   | "custom";
 
+export type SceneStatus = "active" | "deprecated";
+export type CaptureMode = "photo" | "video" | "gif" | "boomerang";
+
 export interface Event {
   id: string;
   title: string;
@@ -63,4 +66,23 @@ export interface Event {
   sessionsCount: number;
   readyCount: number; // Sessions in "ready" state
   sharesCount: number;
+}
+
+export interface Scene {
+  id: string;
+  label: string;
+  mode: CaptureMode;
+
+  prompt: string | null;
+
+  referenceImagePath?: string; // Storage path
+
+  flags: {
+    customTextTool: boolean;
+    stickersTool: boolean;
+  };
+
+  status: SceneStatus;
+  createdAt: number;
+  updatedAt: number;
 }

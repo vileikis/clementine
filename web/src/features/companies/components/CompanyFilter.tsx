@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { Company } from "@/lib/types/firestore";
+import type { Company } from "../types/company.types";
 
 interface CompanyFilterProps {
   companies: Company[];

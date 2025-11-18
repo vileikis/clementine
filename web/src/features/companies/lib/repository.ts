@@ -4,7 +4,7 @@
 
 import { db } from "@/lib/firebase/admin";
 import type { Company, CompanyStatus } from "../types/company.types";
-import { companySchema } from "@/lib/schemas/firestore";
+import { companySchema } from "./schemas";
 import type { CreateCompanyInput } from "@/lib/schemas/validation";
 
 /**

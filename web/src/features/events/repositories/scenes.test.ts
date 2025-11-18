@@ -1,5 +1,5 @@
 import { db } from "@/lib/firebase/admin";
-import type { Scene } from "@/lib/types/firestore";
+import type { Scene } from "../types/event.types";
 import { updateScene, getScene } from "./scenes";
 
 describe("Scenes Repository", () => {

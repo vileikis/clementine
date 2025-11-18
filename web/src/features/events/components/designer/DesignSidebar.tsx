@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import type { Experience } from "@/lib/types/firestore";
+import type { Experience } from "@/features/experiences";
 
 interface DesignSidebarProps {
   eventId: string;

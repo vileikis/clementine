@@ -1,5 +1,5 @@
 import { db } from "@/lib/firebase/admin";
-import type { Event, Scene } from "@/lib/types/firestore";
+import type { Event, Scene } from "../types/event.types";
 import {
   createEvent,
   getEvent,

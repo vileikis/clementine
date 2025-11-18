@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import type { Company } from "@/lib/types/firestore";
+import type { Company } from "../types/company.types";
 
 interface CompanyCardProps {
   company: Company;
