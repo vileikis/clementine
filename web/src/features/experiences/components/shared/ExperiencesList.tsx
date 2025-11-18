@@ -3,7 +3,7 @@
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import type { Experience } from "@/lib/types/firestore";
+import type { Experience } from "../../types/experience.types";
 
 interface ExperiencesListProps {
   experiences: Experience[];

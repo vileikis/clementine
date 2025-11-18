@@ -1,8 +1,8 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { ExperiencesList } from "./ExperiencesList";
-import type { Experience } from "@/lib/types/firestore";
+import { ExperiencesList } from "@/features/experiences";
+import type { Experience } from "@/features/experiences";
 
 type SidebarSection = "welcome" | "experiences" | "survey" | "ending";
 

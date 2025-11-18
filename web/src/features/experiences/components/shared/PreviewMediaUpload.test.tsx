@@ -1,10 +1,10 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { PreviewMediaUpload } from "./PreviewMediaUpload";
-import * as experiencesActions from "@/lib/actions/experiences";
+import * as experiencesActions from "../../lib/actions";
 
 // Mock the server actions
-jest.mock("@/lib/actions/experiences", () => ({
+jest.mock("../../lib/actions", () => ({
   uploadPreviewMedia: jest.fn(),
   deletePreviewMedia: jest.fn(),
 }));
