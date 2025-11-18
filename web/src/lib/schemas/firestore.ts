@@ -75,27 +75,6 @@ export const sceneSchema = z.object({
   updatedAt: z.number(),
 });
 
-// Session schema matching Session interface from types/firestore.ts
-export const sessionStateSchema = z.enum([
-  "created",
-  "captured",
-  "transforming",
-  "ready",
-  "error",
-]);
-
-export const sessionSchema = z.object({
-  id: z.string(),
-  eventId: z.string(),
-  sceneId: z.string(),
-  state: sessionStateSchema,
-  inputImagePath: z.string().optional(),
-  resultImagePath: z.string().optional(),
-  error: z.string().optional(),
-  createdAt: z.number(),
-  updatedAt: z.number(),
-});
-
 // Company schema matching Company interface from types/firestore.ts
 export const companyStatusSchema = z.enum(["active", "deleted"]);
 
@@ -117,7 +96,6 @@ export const companySchema = z.object({
 
 export type EventSchema = z.infer<typeof eventSchema>;
 export type SceneSchema = z.infer<typeof sceneSchema>;
-export type SessionSchema = z.infer<typeof sessionSchema>;
 export type CompanySchema = z.infer<typeof companySchema>;
 
 // ============================================================================

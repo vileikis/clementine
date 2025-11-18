@@ -1,11 +1,11 @@
 import { db } from "@/lib/firebase/admin";
-import type { Session } from "@/lib/types/firestore";
+import type { Session } from "../types/session.types";
 import {
   startSession,
   saveCapture,
   updateSessionState,
   getSession,
-} from "./sessions";
+} from "./repository";
 
 describe("Sessions Repository", () => {
   const mockDb = db as unknown as {

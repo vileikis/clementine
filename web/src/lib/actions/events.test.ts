@@ -9,7 +9,7 @@ import type { Event, Company } from "@/lib/types/firestore";
 
 // Mock dependencies
 jest.mock("@/lib/repositories/events");
-jest.mock("@/lib/repositories/companies");
+jest.mock("@/features/companies/lib/repository");
 jest.mock("@/lib/auth");
 jest.mock("next/cache", () => ({
   revalidatePath: jest.fn(),

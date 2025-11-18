@@ -3,12 +3,12 @@
 import { useReducer, useEffect, useRef } from "react";
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
-import type { Session } from "@/lib/types/firestore";
+import type { Session } from "@/features/sessions";
 import {
   startSessionAction,
   saveCaptureAction,
   triggerTransformAction,
-} from "@/lib/actions/sessions";
+} from "@/features/sessions";
 
 type GuestState =
   | { step: "greeting" }
