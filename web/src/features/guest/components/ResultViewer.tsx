@@ -9,7 +9,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { Session } from "@/lib/types/firestore";
+import type { Session } from "@/features/sessions";
 
 interface ResultViewerProps {
   session: Session;

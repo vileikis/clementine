@@ -1,8 +1,8 @@
 // Session repository - Session lifecycle operations
 
 import { db } from "@/lib/firebase/admin";
-import type { Session, SessionState } from "@/lib/types/firestore";
-import { sessionSchema } from "@/lib/schemas/firestore";
+import type { Session, SessionState } from "../types/session.types";
+import { sessionSchema } from "./validation";
 
 export async function startSession(eventId: string): Promise<string> {
   const eventDoc = await db.collection("events").doc(eventId).get();

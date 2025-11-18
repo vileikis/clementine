@@ -6,7 +6,7 @@ import {
   saveCapture,
   getSession,
   updateSessionState,
-} from "@/lib/repositories/sessions";
+} from "./repository";
 import { getEvent, getCurrentScene } from "@/lib/repositories/events";
 import {
   uploadInputImage,
