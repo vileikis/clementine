@@ -155,6 +155,168 @@ web/src/
 
 ---
 
+## ⚠️ CRITICAL: Server/Client Code Separation
+
+**This is the most important rule to follow during migration to avoid runtime errors.**
+
+### The Problem
+
+Next.js separates code into **server bundles** (Node.js) and **client bundles** (browser). When you export server-only code from a feature's public API (`index.ts`), client components that import from that file will try to bundle server-only dependencies (like Firebase Admin SDK), causing errors:
+
+```
+Module not found: Can't resolve 'tls'
+```
+
+### The Rule: What to Export from `index.ts`
+
+**✅ SAFE to export from public API:**
+- **Components** - Both client and server components are safe
+- **Server Actions** - Functions marked with `"use server"` (Next.js handles them automatically)
+- **TypeScript types** - Compile-time only, no runtime code
+
+**❌ NEVER export from public API:**
+- **Repository functions** - Use Firebase Admin SDK (server-only)
+- **Direct database/Firebase imports** - Server-only packages
+- **Cache functions** - Often use server-only APIs
+- **Any function that imports `firebase-admin`, `fs`, `path`, or other Node.js modules**
+
+### Correct Pattern
+
+**Bad (causes errors):**
+```typescript
+// features/companies/index.ts - ❌ DON'T DO THIS
+export { CompanyForm } from "./components/CompanyForm";
+export { createCompanyAction } from "./lib/actions";
+export { getCompany } from "./lib/repository"; // ❌ Server-only!
+export type { Company } from "./types/company.types";
+```
+
+**Good:**
+```typescript
+// features/companies/index.ts - ✅ CORRECT
+export { CompanyForm } from "./components/CompanyForm";
+export { createCompanyAction } from "./lib/actions";
+export type { Company } from "./types/company.types";
+
+// Note: Repository functions are NOT exported.
+// They should only be used internally within server code.
+```
+
+### When to Use Direct Imports
+
+**Use the public API** (`@/features/companies`):
+```typescript
+// ✅ Client components
+import { CompanyForm, createCompanyAction } from "@/features/companies";
+
+// ✅ Server components
+import { CompanyForm, createCompanyAction } from "@/features/companies";
+```
+
+**Use direct imports** (`@/features/companies/lib/repository`):
+```typescript
+// ✅ Server actions (lib/actions/*.ts)
+import { getCompany } from "@/features/companies/lib/repository";
+
+// ✅ Server components (app routes)
+import { getCompany } from "@/features/companies/lib/repository";
+
+// ✅ Other server-only code
+import { getCompany } from "@/features/companies/lib/repository";
+```
+
+### Detection During Migration
+
+**Before creating `index.ts`, check each export:**
+
+1. **Open the file** you're about to export
+2. **Look for these imports** at the top:
+   - `firebase-admin` → ❌ Don't export
+   - `@/lib/firebase/admin` → ❌ Don't export
+   - `fs`, `path`, Node.js modules → ❌ Don't export
+3. **Check if file is used by client components**:
+   - If YES → ❌ Don't export if it has server-only imports
+   - If NO (only used in server code) → Still ❌ don't export to keep API clean
+
+### Example: Companies Feature
+
+**Public API (`features/companies/index.ts`):**
+```typescript
+// ============================================================================
+// Components - Safe for client & server
+// ============================================================================
+export { CompanyCard } from "./components/CompanyCard";
+export { CompanyForm } from "./components/CompanyForm";
+
+// ============================================================================
+// Server Actions - Safe (marked "use server")
+// ============================================================================
+export {
+  createCompanyAction,
+  listCompaniesAction,
+  getCompanyAction,
+} from "./lib/actions";
+
+// ============================================================================
+// Types - Safe (compile-time only)
+// ============================================================================
+export type { Company, CompanyStatus } from "./types/company.types";
+
+// ============================================================================
+// Repository & Cache - NOT EXPORTED
+// These contain server-only code and should be imported directly when needed
+// ============================================================================
+```
+
+**Server Actions (`features/companies/lib/actions.ts`):**
+```typescript
+"use server";
+
+// Direct import - this file is server-only
+import { createCompany, getCompany } from "./repository";
+
+export async function createCompanyAction(input) {
+  // Use repository functions here
+  const id = await createCompany(input);
+  return { success: true, id };
+}
+```
+
+**Server Component (`app/(admin)/companies/page.tsx`):**
+```typescript
+// Use public API for actions
+import { listCompaniesAction, type Company } from "@/features/companies";
+
+// Or direct import if you need repository (rare)
+import { listCompanies } from "@/features/companies/lib/repository";
+```
+
+**Client Component (`features/companies/components/CompanyForm.tsx`):**
+```typescript
+"use client";
+
+// Only use public API - never import repository directly!
+import { createCompanyAction, type Company } from "@/features/companies";
+```
+
+### Testing Your Public API
+
+After creating `index.ts`, verify it's safe:
+
+1. **Run type check**: `pnpm type-check`
+2. **Start dev server**: `pnpm dev`
+3. **Check for errors** like "Module not found: Can't resolve 'tls'"
+4. **If you see server-only module errors**:
+   - Find which export is causing it
+   - Remove it from `index.ts`
+   - Update imports to use direct paths
+
+### Summary
+
+**Golden Rule**: If a file imports `firebase-admin` or any Node.js module, **DO NOT export it from `index.ts`**. Import it directly where needed in server-only code.
+
+---
+
 ## Migration Steps
 
 > **Note:** See [organization-strategy.md](./organization-strategy.md) for detailed rationale on feature structure decisions.
@@ -220,6 +382,8 @@ mv lib/cache/company-status.ts features/companies/lib/cache.ts
 
 #### 2.6 Create Public API
 
+> ⚠️ **IMPORTANT**: Review the [Server/Client Code Separation](#️-critical-serverclient-code-separation) section before creating this file. **DO NOT export repository or cache functions** - they contain server-only code.
+
 Create `features/companies/index.ts`:
 
 ```typescript
@@ -231,39 +395,46 @@ export { DeleteCompanyDialog } from './components/DeleteCompanyDialog';
 export { BrandColorPicker } from './components/BrandColorPicker';
 export { BrandingForm } from './components/BrandingForm';
 
-// Actions
+// Server Actions (safe for client components)
 export {
-  getCompany,
-  getCompanies,
-  createCompany,
-  updateCompany,
-  deleteCompany,
-  restoreCompany,
+  createCompanyAction,
+  listCompaniesAction,
+  getCompanyAction,
+  updateCompanyAction,
+  getCompanyEventCountAction,
+  deleteCompanyAction,
 } from './lib/actions';
-
-// Repository
-export {
-  companyRepository,
-} from './lib/repository';
-
-// Cache
-export {
-  getCompanyStatus,
-  invalidateCompanyStatus,
-} from './lib/cache';
 
 // Types
 export type {
   Company,
   CompanyStatus,
 } from './types/company.types';
+
+// NOTE: Repository and cache functions are NOT exported
+// They contain server-only code (Firebase Admin SDK)
+// Import directly when needed: @/features/companies/lib/repository
 ```
 
 #### 2.7 Update Imports
 
+**For components and server actions:**
+```typescript
+// ✅ Use public API
+import { CompanyCard, createCompanyAction } from "@/features/companies";
+```
+
+**For repository functions in server code:**
+```typescript
+// ✅ Import directly (server-only files)
+import { getCompany } from "@/features/companies/lib/repository";
+```
+
 Update imports in:
-- `app/(admin)/companies/` routes
-- Event components that reference companies
+- `app/(admin)/companies/` routes - Use public API
+- `components/` that use companies - Use public API
+- `lib/actions/` that use company repository - Use direct import (`/lib/repository`)
+- Test files - Use appropriate import based on what they're testing
 
 ---
 
@@ -286,6 +457,8 @@ mv lib/actions/qr.ts features/distribution/lib/actions.ts
 ```
 
 #### 3.3 Create Public API
+
+> ⚠️ **IMPORTANT**: Only export components, server actions, and types. Do NOT export repository functions.
 
 Create `features/distribution/index.ts`:
 
@@ -343,6 +516,8 @@ mv lib/camera/capture.ts features/guest/lib/capture.ts
 
 #### 4.4 Create Public API
 
+> ⚠️ **IMPORTANT**: Only export components, hooks, and types. Guest feature doesn't have server actions or repository.
+
 Create `features/guest/index.ts`:
 
 ```typescript
@@ -399,6 +574,8 @@ mv lib/repositories/sessions.test.ts features/sessions/lib/repository.test.ts
 ```
 
 #### 5.4 Create Public API
+
+> ⚠️ **IMPORTANT**: Only export server actions and types. Do NOT export repository functions (they use Firebase Admin).
 
 Create `features/sessions/index.ts`:
 
@@ -488,6 +665,8 @@ mv lib/constants/ai-models.ts features/experiences/lib/constants.ts
 ```
 
 #### 6.7 Create Public API
+
+> ⚠️ **IMPORTANT**: Only export components, server actions, constants, and types. Do NOT export repository functions.
 
 Create `features/experiences/index.ts`:
 
@@ -607,6 +786,8 @@ mv lib/repositories/events.test.ts features/events/lib/repository.test.ts
 ```
 
 #### 7.8 Create Public API
+
+> ⚠️ **IMPORTANT**: Review [Server/Client Code Separation](#️-critical-serverclient-code-separation). Do NOT export repository functions.
 
 Create `features/events/index.ts`:
 
@@ -899,6 +1080,34 @@ Don't forget to update import paths in test files (`.test.ts`, `.test.tsx`).
 
 ## Anti-Patterns to Avoid
 
+### ❌ DON'T Export Server-Only Code from Public API (CRITICAL)
+
+**Bad (causes "Module not found: Can't resolve 'tls'" error):**
+```typescript
+// features/companies/index.ts
+export { CompanyForm } from './components/CompanyForm';
+export { getCompany } from './lib/repository'; // ❌ Uses Firebase Admin!
+```
+
+**Error you'll see:**
+```
+Module not found: Can't resolve 'tls'
+```
+
+**Good:**
+```typescript
+// features/companies/index.ts
+export { CompanyForm } from './components/CompanyForm';
+export { createCompanyAction } from './lib/actions'; // ✅ Server action is safe
+export type { Company } from './types/company.types'; // ✅ Types are safe
+
+// Repository functions NOT exported - import directly when needed
+```
+
+**Why:** Repository functions use `firebase-admin` (server-only). When exported from `index.ts`, client components that import from the feature will try to bundle server-only dependencies, causing errors.
+
+**See:** [Server/Client Code Separation](#️-critical-serverclient-code-separation) for full details.
+
 ### ❌ Don't Create Circular Dependencies
 
 **Bad:**
@@ -995,7 +1204,10 @@ When adding a new product capability:
 2. Add subdirectories: `components/`, `hooks/`, `lib/`, `types/`
 3. Build the feature
 4. Create `index.ts` public API
+   - ✅ Export: components, server actions, types
+   - ❌ Don't export: repository functions, cache functions, server-only utilities
 5. Document what the feature exports
+6. Test with `pnpm dev` to ensure no server/client bundling errors
 
 ### Refactoring Existing Features
 
@@ -1113,3 +1325,8 @@ When refactoring:
   - Events feature: studio/, designer/, shared/ subfolders
   - Experiences feature: shared/, photo/ subfolders (with video/, gif/, wheel/ for future)
   - Companies first in migration order (easiest to start)
+- **2024-11-18** - Added critical Server/Client Code Separation section
+  - Documented what to export vs not export from index.ts
+  - Added warnings throughout all phase instructions
+  - Addresses "Module not found: Can't resolve 'tls'" error
+  - Repository functions must NOT be exported from public API
