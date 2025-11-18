@@ -1,9 +1,4 @@
 // Shared TypeScript types for Firestore data models
-// Feature-specific types have been moved to their respective features:
-// - @/features/events/types/event.types.ts
-// - @/features/companies/types/company.types.ts
-// - @/features/experiences/types/experience.types.ts
-// - @/features/sessions/types/session.types.ts
 
 export interface Media {
   id: string;
