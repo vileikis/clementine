@@ -1,8 +1,7 @@
 import { getEventAction } from "@/lib/actions/events"
 import { getCompanyStatus } from "@/features/companies/lib/repository"
 import { notFound } from "next/navigation"
-import { BrandThemeProvider } from "@/components/guest/BrandThemeProvider"
-import { GuestFlowContainer } from "@/components/guest/GuestFlowContainer"
+import { BrandThemeProvider, GuestFlowContainer } from "@/features/guest"
 
 interface JoinPageProps {
   params: Promise<{ eventId: string }>

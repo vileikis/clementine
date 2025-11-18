@@ -1,6 +1,6 @@
 "use client";
 
-import { capturePhoto } from "@/lib/camera/capture";
+import { capturePhoto } from "../lib/capture";
 
 interface CaptureButtonProps {
   videoRef: React.RefObject<HTMLVideoElement | null>;
