@@ -48,7 +48,15 @@ export {
   updateEventWelcome,
   updateEventEnding,
   updateEventSurveyConfig,
-} from "./lib/actions";
+} from "./actions/events";
+
+// Scene-related actions (legacy - still in use)
+export {
+  updateSceneAction,
+  uploadReferenceImageAction,
+  getImageUrlAction,
+  removeReferenceImageAction,
+} from "./actions/scenes";
 
 // ============================================================================
 // Types (Compile-time only, safe to export)
@@ -73,7 +81,8 @@ export {
 // These contain server-only code (Firebase Admin SDK) and should be imported
 // directly when needed in server-only files:
 //
-// import { createEvent, getEvent, listEvents } from "@/features/events/lib/repository"
+// import { createEvent, getEvent, listEvents } from "@/features/events/repositories/events"
+// import { updateScene, getScene } from "@/features/events/repositories/scenes"
 //
 // DO NOT add repository exports here - they will cause build errors when
 // client components try to import them!

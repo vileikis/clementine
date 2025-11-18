@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { createEventAction } from "../../lib/actions"
+import { createEventAction } from "../../actions/events"
 import { listCompaniesAction, type Company } from "@/features/companies"
 
 interface EventFormProps {

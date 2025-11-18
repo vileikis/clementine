@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
-import { updateSceneAction } from "@/lib/actions/scenes"
+import { updateSceneAction } from "@/features/events/actions/scenes"
 
 interface PromptEditorProps {
   currentPrompt: string | null

@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { PreviewPanel } from "./PreviewPanel";
 import { ImageUploadField } from "@/components/shared/ImageUploadField";
-import { updateEventWelcome } from "../../lib/actions";
+import { updateEventWelcome } from "../../actions/events";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";

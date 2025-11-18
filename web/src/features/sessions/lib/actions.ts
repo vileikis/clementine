@@ -7,7 +7,7 @@ import {
   getSession,
   updateSessionState,
 } from "./repository";
-import { getEvent, getCurrentScene } from "@/features/events/lib/repository";
+import { getEvent, getCurrentScene } from "@/features/events/repositories/events";
 import {
   uploadInputImage,
   uploadResultImage,

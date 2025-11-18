@@ -10,7 +10,7 @@ import { ErrorBanner } from "./ErrorBanner"
 import { Button } from "@/components/ui/button"
 import { useGuestFlow } from "../hooks/useGuestFlow"
 import { capturePhoto } from "../lib/capture"
-import { getImageUrlAction } from "@/lib/actions/scenes"
+import { getImageUrlAction } from "@/features/events/actions/scenes"
 
 interface GuestFlowContainerProps {
   eventId: string

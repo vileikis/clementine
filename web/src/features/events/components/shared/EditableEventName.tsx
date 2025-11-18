@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { updateEventTitleAction } from "../../lib/actions"
+import { updateEventTitleAction } from "../../actions/events"
 import { useRouter } from "next/navigation"
 
 interface EditableEventNameProps {
