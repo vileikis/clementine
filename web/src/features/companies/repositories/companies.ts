@@ -4,7 +4,7 @@
 
 import { db } from "@/lib/firebase/admin";
 import type { Company, CompanyStatus } from "../types/company.types";
-import { companySchema } from "./schemas";
+import { companySchema } from "../lib/schemas";
 import type { CreateCompanyInput } from "@/lib/schemas/validation";
 
 /**
@@ -197,7 +197,7 @@ export async function deleteCompany(companyId: string): Promise<void> {
 
   // Invalidate cache so guest links see updated status immediately
   const { invalidateCompanyStatusCache } = await import(
-    "./cache"
+    "../lib/cache"
   );
   invalidateCompanyStatusCache(companyId);
 }
@@ -220,7 +220,7 @@ export async function getCompanyStatus(
   const {
     getCachedCompanyStatus,
     setCachedCompanyStatus,
-  } = await import("./cache");
+  } = await import("../lib/cache");
 
   // Check cache first
   const cached = getCachedCompanyStatus(companyId);

@@ -21,7 +21,7 @@ export {
   updateCompanyAction,
   getCompanyEventCountAction,
   deleteCompanyAction,
-} from "./lib/actions";
+} from "./actions/companies";
 
 // ============================================================================
 // Types

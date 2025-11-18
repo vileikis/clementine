@@ -3,14 +3,14 @@ import {
   listEventsAction,
 } from "./events";
 import * as eventsRepository from "../repositories/events";
-import * as companiesRepository from "@/features/companies/lib/repository";
+import * as companiesRepository from "@/features/companies/repositories/companies";
 import * as auth from "@/lib/auth";
 import type { Event } from "../types/event.types";
 import type { Company } from "@/features/companies";
 
 // Mock dependencies
 jest.mock("@/lib/repositories/events");
-jest.mock("@/features/companies/lib/repository");
+jest.mock("@/features/companies/repositories/companies");
 jest.mock("@/lib/auth");
 jest.mock("next/cache", () => ({
   revalidatePath: jest.fn(),
