@@ -15,7 +15,7 @@ import {
   updateEventTitle,
   getCurrentScene,
 } from "../repositories/events";
-import { getCompany } from "@/features/companies/lib/repository";
+import { getCompany } from "@/features/companies/repositories/companies";
 import { updateEventWelcomeSchema, updateEventEndingSchema } from "../lib/validation";
 import { verifyAdminSecret } from "@/lib/auth";
 import { revalidatePath } from "next/cache";

@@ -1,9 +1,9 @@
-import { createCompanyAction, listCompaniesAction, getCompanyAction } from "./actions";
-import * as companiesRepo from "./repository";
+import { createCompanyAction, listCompaniesAction, getCompanyAction } from "./companies";
+import * as companiesRepo from "../repositories/companies";
 import * as auth from "@/lib/auth";
 
 // Mock the repositories and auth module
-jest.mock("./repository");
+jest.mock("../repositories/companies");
 jest.mock("@/lib/auth");
 jest.mock("next/cache", () => ({
   revalidatePath: jest.fn(),
