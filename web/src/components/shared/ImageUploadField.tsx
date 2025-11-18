@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Upload } from "lucide-react";
-import { uploadImage } from "@/lib/actions/storage";
+import { uploadImage } from "@/lib/storage/upload";
 
 interface ImageUploadFieldProps {
   id: string;
