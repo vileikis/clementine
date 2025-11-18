@@ -1,6 +1,6 @@
 "use client"
 
-import { useCamera } from "@/hooks/useCamera"
+import { useCamera } from "../hooks/useCamera"
 
 interface CameraViewProps {
   onError?: (error: string) => void
