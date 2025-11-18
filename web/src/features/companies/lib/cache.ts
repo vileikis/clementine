@@ -8,7 +8,7 @@
  * - Automatic cleanup of expired entries every 60 seconds
  */
 
-import type { CompanyStatus } from "@/lib/types/firestore";
+import type { CompanyStatus } from "../types/company.types";
 
 interface CacheEntry {
   status: CompanyStatus;

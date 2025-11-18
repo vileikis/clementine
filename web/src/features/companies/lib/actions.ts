@@ -7,7 +7,7 @@ import {
   updateCompany,
   getCompanyEventCount,
   deleteCompany,
-} from "@/lib/repositories/companies";
+} from "./repository";
 import { verifyAdminSecret } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { createCompanyInput } from "@/lib/schemas/validation";

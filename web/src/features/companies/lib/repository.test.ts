@@ -1,6 +1,6 @@
 import { db } from "@/lib/firebase/admin";
-import type { Company } from "@/lib/types/firestore";
-import { createCompany, listCompanies, getCompany, deleteCompany } from "./companies";
+import type { Company } from "../types/company.types";
+import { createCompany, listCompanies, getCompany, deleteCompany } from "./repository";
 
 describe("Companies Repository", () => {
   const mockDb = db as unknown as {

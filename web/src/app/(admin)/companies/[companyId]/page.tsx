@@ -1,12 +1,10 @@
 "use client";
 
 import { useState, useEffect, use } from "react";
-import { getCompanyAction, updateCompanyAction, getCompanyEventCountAction } from "@/lib/actions/companies";
-import type { Company } from "@/lib/types/firestore";
+import { getCompanyAction, updateCompanyAction, getCompanyEventCountAction, type Company, DeleteCompanyDialog } from "@/features/companies";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { DeleteCompanyDialog } from "@/components/organizer/DeleteCompanyDialog";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
