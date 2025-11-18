@@ -1,4 +1,4 @@
-import { getEventAction } from "@/lib/actions/events"
+import { getEventAction } from "@/features/events"
 import { getCompanyStatus } from "@/features/companies/lib/repository"
 import { notFound } from "next/navigation"
 import { BrandThemeProvider, GuestFlowContainer } from "@/features/guest"

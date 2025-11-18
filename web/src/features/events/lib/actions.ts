@@ -14,9 +14,9 @@ import {
   updateEventStatus,
   updateEventTitle,
   getCurrentScene,
-} from "@/lib/repositories/events";
+} from "./repository";
 import { getCompany } from "@/features/companies/lib/repository";
-import { updateEventWelcomeSchema, updateEventEndingSchema } from "@/lib/schemas/firestore";
+import { updateEventWelcomeSchema, updateEventEndingSchema } from "./validation";
 import { verifyAdminSecret } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";

@@ -6,7 +6,7 @@ import {
   listEvents,
   updateEventBranding,
   getCurrentScene,
-} from "./events";
+} from "./repository";
 
 describe("Events Repository", () => {
   const mockDb = db as unknown as {

@@ -1,4 +1,4 @@
-import { getEventAction } from "@/lib/actions/events"
+import { getEventAction } from "@/features/events"
 import { notFound } from "next/navigation"
 
 interface JoinLayoutProps {

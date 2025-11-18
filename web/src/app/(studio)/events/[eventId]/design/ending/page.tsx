@@ -1,6 +1,5 @@
-import { getEventAction } from "@/lib/actions/events";
+import { getEventAction, EndingEditor } from "@/features/events";
 import { notFound } from "next/navigation";
-import { EndingEditor } from "@/components/organizer/builder/EndingEditor";
 
 interface EndingPageProps {
   params: Promise<{ eventId: string }>;
