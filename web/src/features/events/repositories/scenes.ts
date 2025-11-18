@@ -1,8 +1,8 @@
 // Scene repository - CRUD operations for scenes subcollection
 
 import { db } from "@/lib/firebase/admin";
-import type { Scene } from "@/lib/types/firestore";
-import { sceneSchema } from "@/lib/schemas/firestore";
+import type { Scene } from "../types/event.types";
+import { sceneSchema } from "../lib/schemas";
 
 export async function updateScene(
   eventId: string,

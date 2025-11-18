@@ -61,7 +61,14 @@ export {
 // ============================================================================
 // Types (Compile-time only, safe to export)
 // ============================================================================
-export type { Event, EventStatus, ShareSocial } from "./types/event.types";
+export type {
+  Event,
+  EventStatus,
+  ShareSocial,
+  Scene,
+  SceneStatus,
+  CaptureMode,
+} from "./types/event.types";
 
 // ============================================================================
 // Validation Schemas (Safe to export)
@@ -70,10 +77,13 @@ export {
   eventStatusSchema,
   shareSocialSchema,
   eventSchema,
+  sceneSchema,
+  captureModeSchema,
+  sceneStatusSchema,
   updateEventWelcomeSchema,
   updateEventEndingSchema,
   updateEventSurveyConfigSchema,
-} from "./lib/validation";
+} from "./lib/schemas";
 
 // ============================================================================
 // Repository & Cache - NOT EXPORTED

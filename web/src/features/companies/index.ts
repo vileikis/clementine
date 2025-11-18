@@ -29,6 +29,11 @@ export {
 export type { Company, CompanyStatus } from "./types/company.types";
 
 // ============================================================================
+// Validation Schemas
+// ============================================================================
+export { companyStatusSchema, companySchema } from "./lib/schemas";
+
+// ============================================================================
 // Server-only exports
 // Note: Repository and cache functions are NOT exported from the public API
 // They should only be used internally within this feature's server code.

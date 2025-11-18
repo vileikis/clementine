@@ -53,4 +53,24 @@ export type {
   PreviewType,
   AspectRatio,
   ExperienceItem,
+  SurveyStep,
+  SurveyStepType,
 } from "./types/experience.types";
+
+// ============================================================================
+// Validation Schemas (Safe to export)
+// ============================================================================
+export {
+  experienceTypeSchema,
+  previewTypeSchema,
+  aspectRatioSchema,
+  experienceSchema,
+  surveyStepTypeSchema,
+  surveyStepSchema,
+  createExperienceSchema,
+  updateExperienceSchema,
+  uploadPreviewMediaSchema,
+  previewMediaResultSchema,
+  createSurveyStepSchema,
+  updateSurveyStepSchema,
+} from "./lib/schemas";

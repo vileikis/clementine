@@ -1,5 +1,5 @@
 import Link from "next/link"
-import type { Event } from "@/lib/types/firestore"
+import type { Event } from "../../types/event.types"
 
 interface EventCardProps {
   event: Event

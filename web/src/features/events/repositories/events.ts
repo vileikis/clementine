@@ -1,8 +1,8 @@
 // Event repository - CRUD operations for events collection
 
 import { db } from "@/lib/firebase/admin";
-import type { Event, Scene } from "@/lib/types/firestore";
-import { eventSchema } from "@/lib/schemas/firestore";
+import type { Event, Scene } from "../types/event.types";
+import { eventSchema } from "../lib/schemas";
 
 export async function createEvent(data: {
   title: string;

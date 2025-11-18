@@ -5,7 +5,8 @@ import {
 import * as eventsRepository from "../repositories/events";
 import * as companiesRepository from "@/features/companies/lib/repository";
 import * as auth from "@/lib/auth";
-import type { Event, Company } from "@/lib/types/firestore";
+import type { Event } from "../types/event.types";
+import type { Company } from "@/features/companies";
 
 // Mock dependencies
 jest.mock("@/lib/repositories/events");

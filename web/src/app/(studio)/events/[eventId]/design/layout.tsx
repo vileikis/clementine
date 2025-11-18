@@ -15,7 +15,7 @@ import {
 import { toast } from "sonner";
 import { usePathname } from "next/navigation";
 import { DesignSidebar } from "@/features/events";
-import type { Experience } from "@/lib/types/firestore";
+import type { Experience } from "@/features/experiences";
 
 /**
  * Experiences Context for sharing experiences data across design routes

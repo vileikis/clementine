@@ -4,7 +4,7 @@ import {
   uploadPreviewMediaSchema,
   aspectRatioSchema,
   experienceSchema,
-} from "@/lib/schemas/firestore";
+} from "@/features/experiences";
 
 describe("Photo Experience Tweaks Schema Validation", () => {
   describe("User Story 1 - Simplified Capture Settings", () => {

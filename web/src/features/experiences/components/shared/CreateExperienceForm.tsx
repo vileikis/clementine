@@ -24,7 +24,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { createExperienceSchema } from "@/lib/schemas/firestore";
+import { createExperienceSchema } from "../../lib/schemas";
 import { createExperienceAction } from "../../lib/actions";
 import type { ExperienceType } from "../../types/experience.types";
 import type { z } from "zod";
