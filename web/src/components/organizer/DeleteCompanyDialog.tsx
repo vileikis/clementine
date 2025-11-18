@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { deleteCompanyAction } from "@/app/actions/companies";
+import { deleteCompanyAction } from "@/lib/actions/companies";
 import {
   AlertDialog,
   AlertDialogAction,

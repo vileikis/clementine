@@ -8,7 +8,7 @@ import {
   uploadReferenceImageAction,
   getImageUrlAction,
   removeReferenceImageAction,
-} from "@/app/actions/scenes"
+} from "@/lib/actions/scenes"
 
 interface RefImageUploaderProps {
   eventId: string

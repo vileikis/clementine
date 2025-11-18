@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { createEventAction } from "@/app/actions/events"
-import { listCompaniesAction } from "@/app/actions/companies"
+import { listCompaniesAction } from "@/lib/actions/companies"
 import type { Company } from "@/lib/types/firestore"
 
 interface EventFormProps {
