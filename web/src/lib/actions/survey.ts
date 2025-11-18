@@ -6,7 +6,7 @@
  * Full implementation will be added in later phases.
  */
 
-import type { SurveyStepType } from "@/lib/types/firestore";
+import type { SurveyStepType } from "@/features/experiences";
 
 // Action response types
 export type ActionResponse<T = void> =

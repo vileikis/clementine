@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { loginAction } from "@/app/actions/auth";
+import { loginAction } from "@/lib/actions/auth";
 import { DEFAULT_AUTHENTICATED_ROUTE } from "@/lib/routes";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

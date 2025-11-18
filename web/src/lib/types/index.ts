@@ -1,13 +1,5 @@
-// Barrel file for type exports
-
+// Shared type exports only
 export type {
-  Event,
-  Scene,
-  Session,
   Media,
   StatsOverview,
-  EventStatus,
-  SceneStatus,
-  SessionState,
-  CaptureMode,
 } from "./firestore";
