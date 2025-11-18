@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/sheet";
 import { toast } from "sonner";
 import { usePathname } from "next/navigation";
-import { DesignSidebar } from "@/components/organizer/builder/DesignSidebar";
+import { DesignSidebar } from "@/features/events";
 import type { Experience } from "@/lib/types/firestore";
 
 /**

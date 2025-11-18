@@ -1,8 +1,5 @@
-import { getEventAction } from "@/lib/actions/events"
+import { getEventAction, EventBreadcrumb, EventTabs, EventStatusSwitcher } from "@/features/events"
 import { notFound } from "next/navigation"
-import { EventBreadcrumb } from "@/components/organizer/EventBreadcrumb"
-import { EventTabs } from "@/components/organizer/EventTabs"
-import { EventStatusSwitcher } from "@/components/organizer/EventStatusSwitcher"
 import { CopyLinkButton } from "@/features/distribution"
 
 interface EventLayoutProps {

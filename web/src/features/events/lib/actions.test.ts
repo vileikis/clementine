@@ -1,8 +1,8 @@
 import {
   createEventAction,
   listEventsAction,
-} from "./events";
-import * as eventsRepository from "@/lib/repositories/events";
+} from "./actions";
+import * as eventsRepository from "./repository";
 import * as companiesRepository from "@/features/companies/lib/repository";
 import * as auth from "@/lib/auth";
 import type { Event, Company } from "@/lib/types/firestore";

@@ -1,6 +1,5 @@
-import { getEventAction } from "@/lib/actions/events";
+import { getEventAction, WelcomeEditor } from "@/features/events";
 import { notFound } from "next/navigation";
-import { WelcomeEditor } from "@/components/organizer/builder/WelcomeEditor";
 
 interface WelcomePageProps {
   params: Promise<{ eventId: string }>;

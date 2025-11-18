@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { updateEventTitleAction } from "@/lib/actions/events";
+import { updateEventTitleAction } from "../../lib/actions";
 import { useRouter } from "next/navigation";
 
 interface EventBreadcrumbProps {

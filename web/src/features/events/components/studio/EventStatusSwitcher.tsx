@@ -1,8 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { updateEventStatusAction } from "@/lib/actions/events"
-import type { EventStatus } from "@/lib/types/firestore"
+import { updateEventStatusAction } from "../../lib/actions"
+import type { EventStatus } from "../../types/event.types"
 
 interface EventStatusSwitcherProps {
   eventId: string

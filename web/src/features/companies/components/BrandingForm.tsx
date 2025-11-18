@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
 import { BrandColorPicker } from "./BrandColorPicker"
-import { updateEventBrandingAction } from "@/lib/actions/events"
+import { updateEventBrandingAction } from "@/features/events"
 
 interface BrandingFormProps {
   eventId: string
