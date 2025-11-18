@@ -1,7 +1,7 @@
 "use server"
 
 import { storage } from "@/lib/firebase/admin"
-import { generateJoinQr } from "@/lib/qr/generate"
+import { generateJoinQr } from "./qr"
 import { verifyAdminSecret } from "@/lib/auth"
 import { v4 as uuidv4 } from "uuid"
 
