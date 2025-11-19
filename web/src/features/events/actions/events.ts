@@ -13,7 +13,6 @@ import {
   updateEventBranding,
   updateEventStatus,
   updateEventTitle,
-  getCurrentScene,
 } from "../repositories/events";
 import { getCompany } from "@/features/companies/repositories/companies";
 import { updateEventWelcomeSchema, updateEventEndingSchema } from "../lib/validation";
@@ -122,21 +121,6 @@ export async function updateEventBrandingAction(
     return {
       success: false,
       error: error instanceof Error ? error.message : "Failed to update branding",
-    };
-  }
-}
-
-export async function getCurrentSceneAction(eventId: string) {
-  try {
-    const scene = await getCurrentScene(eventId);
-    if (!scene) {
-      throw new Error("Scene not found");
-    }
-    return { success: true, scene };
-  } catch (error) {
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Failed to fetch scene",
     };
   }
 }

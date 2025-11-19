@@ -3,6 +3,7 @@
 // ============================================================================
 export { ExperiencesList } from "./components/shared/ExperiencesList";
 export { CreateExperienceForm } from "./components/shared/CreateExperienceForm";
+export { ExperienceTypeSelector } from "./components/shared/ExperienceTypeSelector";
 export { ExperienceEditor } from "./components/shared/ExperienceEditor";
 export { ExperienceEditorWrapper } from "./components/shared/ExperienceEditorWrapper";
 export { PreviewMediaUpload } from "./components/shared/PreviewMediaUpload";
@@ -13,9 +14,7 @@ export { PreviewMediaUpload } from "./components/shared/PreviewMediaUpload";
 export { AITransformSettings } from "./components/photo/AITransformSettings";
 export { CountdownSettings } from "./components/photo/CountdownSettings";
 export { OverlaySettings } from "./components/photo/OverlaySettings";
-export { PromptEditor } from "./components/photo/PromptEditor";
-export { RefImageUploader } from "./components/photo/RefImageUploader";
-export { ModeSelector } from "./components/photo/ModeSelector";
+
 
 // ============================================================================
 // Server Actions (safe for client components - marked "use server")

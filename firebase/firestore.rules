@@ -40,11 +40,6 @@ service cloud.firestore {
     //   // Only organizers can write events (via Admin SDK Server Actions)
     //   allow write: if false; // Server Actions only
     //
-    //   match /scenes/{sceneId} {
-    //     allow read: if true;
-    //     allow write: if false; // Server Actions only
-    //   }
-    //
     //   match /sessions/{sessionId} {
     //     // Anyone can read sessions (for real-time updates in guest flow)
     //     allow read: if true;

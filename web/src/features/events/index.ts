@@ -20,12 +20,10 @@ export { EventBreadcrumb } from "./components/studio/EventBreadcrumb";
 // ============================================================================
 // Designer Components (Event builder UI)
 // ============================================================================
-export { BuilderSidebar } from "./components/designer/BuilderSidebar";
 export { DesignSidebar } from "./components/designer/DesignSidebar";
 export { WelcomeEditor } from "./components/designer/WelcomeEditor";
 export { EndingEditor } from "./components/designer/EndingEditor";
 export { PreviewPanel } from "./components/designer/PreviewPanel";
-export { BuilderContent } from "./components/designer/BuilderContent";
 
 // ============================================================================
 // Shared Components (Used across studio & designer)
@@ -42,21 +40,12 @@ export {
   getEventAction,
   listEventsAction,
   updateEventBrandingAction,
-  getCurrentSceneAction,
   updateEventStatusAction,
   updateEventTitleAction,
   updateEventWelcome,
   updateEventEnding,
   updateEventSurveyConfig,
 } from "./actions/events";
-
-// Scene-related actions (legacy - still in use)
-export {
-  updateSceneAction,
-  uploadReferenceImageAction,
-  getImageUrlAction,
-  removeReferenceImageAction,
-} from "./actions/scenes";
 
 // ============================================================================
 // Types (Compile-time only, safe to export)
@@ -65,9 +54,6 @@ export type {
   Event,
   EventStatus,
   ShareSocial,
-  Scene,
-  SceneStatus,
-  CaptureMode,
 } from "./types/event.types";
 
 // ============================================================================
@@ -77,9 +63,6 @@ export {
   eventStatusSchema,
   shareSocialSchema,
   eventSchema,
-  sceneSchema,
-  captureModeSchema,
-  sceneStatusSchema,
   updateEventWelcomeSchema,
   updateEventEndingSchema,
   updateEventSurveyConfigSchema,
@@ -92,7 +75,6 @@ export {
 // directly when needed in server-only files:
 //
 // import { createEvent, getEvent, listEvents } from "@/features/events/repositories/events"
-// import { updateScene, getScene } from "@/features/events/repositories/scenes"
 //
 // DO NOT add repository exports here - they will cause build errors when
 // client components try to import them!

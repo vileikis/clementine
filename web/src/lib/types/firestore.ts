@@ -3,7 +3,6 @@
 export interface Media {
   id: string;
   sessionId: string;
-  sceneId: string;
   resultImagePath: string;
 
   createdAt: number;
