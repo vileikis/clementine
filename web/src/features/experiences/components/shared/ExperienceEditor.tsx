@@ -112,7 +112,7 @@ export function ExperienceEditor({
             referenceImagePaths: aiReferenceImagePaths.length > 0 ? aiReferenceImagePaths : null,
             aspectRatio: aiAspectRatio,
           },
-        } as any); // Type assertion needed since onSave expects Partial<Experience> but we're sending new schema
+        } as PhotoExperience); // Type assertion needed since onSave expects Partial<Experience> but we're sending new schema
         toast.success("Experience updated successfully");
       } catch (error) {
         toast.error(error instanceof Error ? error.message : "Failed to save experience");

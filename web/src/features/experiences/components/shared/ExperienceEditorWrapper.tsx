@@ -30,7 +30,7 @@ export function ExperienceEditorWrapper({
     data: Partial<Experience>
   ) => {
     // Use new updatePhotoExperience action which handles migration
-    const result = await updatePhotoExperience(eventId, experienceId, data as any);
+    const result = await updatePhotoExperience(eventId, experienceId, data);
 
     if (!result.success) {
       throw new Error(result.error.message);
