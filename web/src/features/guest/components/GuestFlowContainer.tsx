@@ -170,7 +170,6 @@ export function GuestFlowContainer({
     const transformingSession = {
       id: state.sessionId,
       eventId,
-      sceneId: "",
       state: "transforming" as const,
       createdAt: 0,
       updatedAt: 0,

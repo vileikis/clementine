@@ -13,9 +13,8 @@ export { PreviewMediaUpload } from "./components/shared/PreviewMediaUpload";
 export { AITransformSettings } from "./components/photo/AITransformSettings";
 export { CountdownSettings } from "./components/photo/CountdownSettings";
 export { OverlaySettings } from "./components/photo/OverlaySettings";
-export { PromptEditor } from "./components/photo/PromptEditor";
-export { RefImageUploader } from "./components/photo/RefImageUploader";
-export { ModeSelector } from "./components/photo/ModeSelector";
+// PromptEditor and RefImageUploader removed (legacy scene-based components)
+export { ExperienceTypeSelector } from "./components/photo/ModeSelector";
 
 // ============================================================================
 // Server Actions (safe for client components - marked "use server")

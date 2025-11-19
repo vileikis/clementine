@@ -35,7 +35,7 @@ export class GoogleAIProvider implements AIClient {
       params.referenceImageUrl ? this.fetchImageAsBase64(params.referenceImageUrl) : null,
     ]);
 
-    // Use prompt directly from scene
+    // Use AI prompt from experience configuration
     const promptText = params.prompt;
     console.log('[GoogleAI] Prompt text:', promptText);
 

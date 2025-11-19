@@ -18,13 +18,8 @@ describe("Sessions Repository", () => {
 
   describe("startSession", () => {
     it("creates a new session for an event", async () => {
-      const mockEventData = {
-        currentSceneId: "scene-123",
-      };
-
       const mockEventDoc = {
         exists: true,
-        data: jest.fn().mockReturnValue(mockEventData),
       };
 
       const mockSessionRef = {
@@ -56,7 +51,6 @@ describe("Sessions Repository", () => {
       expect(sessionData).toMatchObject({
         id: "session-456",
         eventId: "event-123",
-        sceneId: "scene-123",
         state: "created",
       });
       expect(sessionData.createdAt).toBeGreaterThan(0);
@@ -76,27 +70,6 @@ describe("Sessions Repository", () => {
 
       await expect(startSession("nonexistent")).rejects.toThrow(
         "Event not found"
-      );
-    });
-
-    it("throws error when event has no current scene", async () => {
-      const mockEventData = {
-        currentSceneId: undefined,
-      };
-
-      const mockEventDoc = {
-        exists: true,
-        data: jest.fn().mockReturnValue(mockEventData),
-      };
-
-      mockDb.collection.mockReturnValue({
-        doc: jest.fn().mockReturnValue({
-          get: jest.fn().mockResolvedValue(mockEventDoc),
-        }),
-      });
-
-      await expect(startSession("event-123")).rejects.toThrow(
-        "Event has no current scene"
       );
     });
   });
@@ -263,7 +236,6 @@ describe("Sessions Repository", () => {
     it("returns session when it exists", async () => {
       const mockSessionData = {
         eventId: "event-123",
-        sceneId: "scene-123",
         state: "ready",
         inputImagePath: "sessions/session-456/input.jpg",
         resultImagePath: "sessions/session-456/result.jpg",
@@ -328,7 +300,6 @@ describe("Sessions Repository", () => {
     it("validates session data with schema", async () => {
       const invalidSessionData = {
         eventId: "event-123",
-        sceneId: "scene-123",
         state: "invalid-state",
         createdAt: 1234567890,
         updatedAt: 1234567900,

@@ -10,13 +10,6 @@ export async function startSession(eventId: string): Promise<string> {
     throw new Error("Event not found");
   }
 
-  const eventData = eventDoc.data();
-  const sceneId = eventData?.currentSceneId;
-
-  if (!sceneId) {
-    throw new Error("Event has no current scene");
-  }
-
   const sessionRef = db
     .collection("events")
     .doc(eventId)
@@ -27,7 +20,6 @@ export async function startSession(eventId: string): Promise<string> {
   const session: Session = {
     id: sessionRef.id,
     eventId,
-    sceneId,
     state: "created",
     createdAt: now,
     updatedAt: now,

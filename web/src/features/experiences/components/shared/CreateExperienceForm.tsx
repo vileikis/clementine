@@ -26,48 +26,8 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { createExperienceSchema } from "../../lib/schemas";
 import { createExperienceAction } from "../../lib/actions";
-import type { ExperienceType } from "../../types/experience.types";
+import { ExperienceTypeSelector } from "../photo/ModeSelector";
 import type { z } from "zod";
-
-// Experience type options with descriptions and availability
-interface ExperienceTypeOption {
-  type: ExperienceType;
-  label: string;
-  description: string;
-  icon: string;
-  available: boolean;
-}
-
-const EXPERIENCE_TYPES: ExperienceTypeOption[] = [
-  {
-    type: "photo",
-    label: "Photo",
-    description: "Capture a single photo with optional AI transformation",
-    icon: "📷",
-    available: true,
-  },
-  {
-    type: "video",
-    label: "Video",
-    description: "Record a short video clip",
-    icon: "🎥",
-    available: false,
-  },
-  {
-    type: "gif",
-    label: "GIF",
-    description: "Create an animated GIF from multiple frames",
-    icon: "🎞️",
-    available: false,
-  },
-  {
-    type: "wheel",
-    label: "Wheel",
-    description: "Spin a wheel to select from multiple experiences",
-    icon: "🎡",
-    available: false,
-  },
-];
 
 type CreateExperienceInput = z.input<typeof createExperienceSchema>;
 
@@ -166,47 +126,10 @@ export function CreateExperienceForm({ eventId }: CreateExperienceFormProps) {
           experiences are available at this time.
         </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-          {EXPERIENCE_TYPES.map((option) => (
-            <button
-              key={option.type}
-              type="button"
-              disabled={!option.available}
-              onClick={() => option.available && setValue("type", option.type, { shouldValidate: true })}
-              className={cn(
-                "relative flex flex-col items-start gap-2 rounded-lg border-2 p-4 transition-all",
-                "min-h-[120px] min-w-0", // min-h for touch target, min-w-0 for text truncation
-                "hover:border-primary/50",
-                "disabled:cursor-not-allowed disabled:opacity-60",
-                selectedType === option.type && option.available
-                  ? "border-primary bg-primary/5"
-                  : "border-border"
-              )}
-              aria-pressed={selectedType === option.type}
-              aria-label={`${option.label} experience type${!option.available ? " (coming soon)" : ""}`}
-            >
-              {/* Coming Soon Badge */}
-              {!option.available && (
-                <div className="absolute top-2 right-2 rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
-                  Coming Soon
-                </div>
-              )}
-
-              {/* Icon */}
-              <div className="text-3xl" aria-hidden="true">
-                {option.icon}
-              </div>
-
-              {/* Label */}
-              <div className="flex-1 text-left">
-                <h3 className="font-semibold text-sm">{option.label}</h3>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {option.description}
-                </p>
-              </div>
-            </button>
-          ))}
-        </div>
+        <ExperienceTypeSelector
+          selectedType={selectedType}
+          onSelect={(type) => setValue("type", type, { shouldValidate: true })}
+        />
 
         {/* Hidden input for react-hook-form registration */}
         <input type="hidden" {...register("type")} />
