@@ -38,7 +38,9 @@ describe("Photo Experience Tweaks Schema Validation", () => {
         const validData = {
           label: "Test Experience",
           enabled: true,
-          countdownEnabled: true,
+          config: {
+            countdown: 3,
+          },
         };
 
         const result = updateExperienceSchema.safeParse(validData);
@@ -141,10 +143,12 @@ describe("Photo Experience Tweaks Schema Validation", () => {
   });
 
   describe("User Story 3 - Countdown Timer Control", () => {
-    describe("T039 - countdownSeconds validates range (0-10)", () => {
+    describe("T039 - config.countdown validates range (0-10)", () => {
       it("accepts 0 seconds", () => {
         const validData = {
-          countdownSeconds: 0,
+          config: {
+            countdown: 0,
+          },
         };
 
         const result = updateExperienceSchema.safeParse(validData);
@@ -153,7 +157,9 @@ describe("Photo Experience Tweaks Schema Validation", () => {
 
       it("accepts 3 seconds (default)", () => {
         const validData = {
-          countdownSeconds: 3,
+          config: {
+            countdown: 3,
+          },
         };
 
         const result = updateExperienceSchema.safeParse(validData);
@@ -162,7 +168,9 @@ describe("Photo Experience Tweaks Schema Validation", () => {
 
       it("accepts 10 seconds (max)", () => {
         const validData = {
-          countdownSeconds: 10,
+          config: {
+            countdown: 10,
+          },
         };
 
         const result = updateExperienceSchema.safeParse(validData);
@@ -171,7 +179,9 @@ describe("Photo Experience Tweaks Schema Validation", () => {
 
       it("rejects negative values", () => {
         const invalidData = {
-          countdownSeconds: -1,
+          config: {
+            countdown: -1,
+          },
         };
 
         const result = updateExperienceSchema.safeParse(invalidData);
@@ -180,7 +190,9 @@ describe("Photo Experience Tweaks Schema Validation", () => {
 
       it("rejects values above 10", () => {
         const invalidData = {
-          countdownSeconds: 11,
+          config: {
+            countdown: 11,
+          },
         };
 
         const result = updateExperienceSchema.safeParse(invalidData);
@@ -189,7 +201,9 @@ describe("Photo Experience Tweaks Schema Validation", () => {
 
       it("rejects decimal values", () => {
         const invalidData = {
-          countdownSeconds: 3.5,
+          config: {
+            countdown: 3.5,
+          },
         };
 
         const result = updateExperienceSchema.safeParse(invalidData);
@@ -241,65 +255,92 @@ describe("Photo Experience Tweaks Schema Validation", () => {
       });
     });
 
-    it("experienceSchema validates aiAspectRatio field", () => {
+    it("experienceSchema validates aiConfig.aspectRatio field", () => {
       const validData = {
         id: "exp-1",
         eventId: "event-1",
         label: "Test Experience",
         type: "photo" as const,
         enabled: true,
-        aiEnabled: true,
-        aiAspectRatio: "16:9" as const,
+        hidden: false,
+        config: {
+          countdown: 0,
+          overlayFramePath: null,
+        },
+        aiConfig: {
+          enabled: true,
+          model: null,
+          prompt: null,
+          referenceImagePaths: null,
+          aspectRatio: "16:9" as const,
+        },
         createdAt: Date.now(),
         updatedAt: Date.now(),
       };
 
       const result = experienceSchema.safeParse(validData);
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.aiAspectRatio).toBe("16:9");
+      if (result.success && result.data.type === "photo") {
+        expect(result.data.aiConfig.aspectRatio).toBe("16:9");
       }
     });
 
-    it("experienceSchema defaults aiAspectRatio to 1:1 when not provided", () => {
+    it("experienceSchema requires aspectRatio in aiConfig", () => {
       const validData = {
         id: "exp-1",
         eventId: "event-1",
         label: "Test Experience",
         type: "photo" as const,
         enabled: true,
-        aiEnabled: true,
+        hidden: false,
+        config: {
+          countdown: 0,
+          overlayFramePath: null,
+        },
+        aiConfig: {
+          enabled: true,
+          model: null,
+          prompt: null,
+          referenceImagePaths: null,
+          aspectRatio: "1:1" as const,
+        },
         createdAt: Date.now(),
         updatedAt: Date.now(),
       };
 
       const result = experienceSchema.safeParse(validData);
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.aiAspectRatio).toBe("1:1");
+      if (result.success && result.data.type === "photo") {
+        expect(result.data.aiConfig.aspectRatio).toBe("1:1");
       }
     });
   });
 
   describe("Integration Tests - Full Experience Validation", () => {
-    it("validates complete experience with all new fields", () => {
+    it("validates complete photo experience with all new schema fields", () => {
       const completeExperience = {
         id: "exp-1",
         eventId: "event-1",
         label: "Photo Booth Experience",
         type: "photo" as const,
         enabled: true,
-        previewPath: "previews/preview.gif",
+        hidden: false,
+        previewPath: "https://example.com/previews/preview.gif",
         previewType: "gif" as const,
-        countdownEnabled: true,
-        countdownSeconds: 5,
-        overlayEnabled: true,
-        overlayFramePath: "overlays/frame.png",
-        aiEnabled: true,
-        aiModel: "flux-1.1-pro",
-        aiPrompt: "Transform into a futuristic cyberpunk style",
-        aiReferenceImagePaths: ["refs/ref1.png", "refs/ref2.png"],
-        aiAspectRatio: "9:16" as const,
+        config: {
+          countdown: 5,
+          overlayFramePath: "https://example.com/overlays/frame.png",
+        },
+        aiConfig: {
+          enabled: true,
+          model: "flux-1.1-pro",
+          prompt: "Transform into a futuristic cyberpunk style",
+          referenceImagePaths: [
+            "https://example.com/refs/ref1.png",
+            "https://example.com/refs/ref2.png",
+          ],
+          aspectRatio: "9:16" as const,
+        },
         createdAt: Date.now(),
         updatedAt: Date.now(),
       };
@@ -308,25 +349,36 @@ describe("Photo Experience Tweaks Schema Validation", () => {
       expect(result.success).toBe(true);
     });
 
-    it("validates minimal experience with defaults", () => {
+    it("validates minimal photo experience with required fields only", () => {
       const minimalExperience = {
         id: "exp-2",
         eventId: "event-2",
         label: "Simple Experience",
         type: "photo" as const,
         enabled: false,
-        aiEnabled: false,
+        hidden: false,
+        config: {
+          countdown: 0,
+          overlayFramePath: null,
+        },
+        aiConfig: {
+          enabled: false,
+          model: null,
+          prompt: null,
+          referenceImagePaths: null,
+          aspectRatio: "1:1" as const,
+        },
         createdAt: Date.now(),
         updatedAt: Date.now(),
       };
 
       const result = experienceSchema.safeParse(minimalExperience);
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.countdownEnabled).toBe(false);
-        expect(result.data.countdownSeconds).toBe(3);
-        expect(result.data.overlayEnabled).toBe(false);
-        expect(result.data.aiAspectRatio).toBe("1:1");
+      if (result.success && result.data.type === "photo") {
+        expect(result.data.config.countdown).toBe(0);
+        expect(result.data.config.overlayFramePath).toBeNull();
+        expect(result.data.aiConfig.enabled).toBe(false);
+        expect(result.data.aiConfig.aspectRatio).toBe("1:1");
       }
     });
   });

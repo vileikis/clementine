@@ -24,7 +24,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { createExperienceSchema } from "../../lib/schemas";
+import { createPhotoExperienceSchema as createExperienceSchema } from "../../lib/schemas";
 import { createExperience } from "../../lib/actions";
 import { ExperienceTypeSelector } from "./ExperienceTypeSelector";
 import type { z } from "zod";
@@ -128,7 +128,12 @@ export function CreateExperienceForm({ eventId }: CreateExperienceFormProps) {
 
         <ExperienceTypeSelector
           selectedType={selectedType}
-          onSelect={(type) => setValue("type", type, { shouldValidate: true })}
+          onSelect={(type) => {
+            // Only photo type is currently supported
+            if (type === "photo") {
+              setValue("type", type, { shouldValidate: true });
+            }
+          }}
         />
 
         {/* Hidden input for react-hook-form registration */}
