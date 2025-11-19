@@ -295,10 +295,10 @@ export async function updateEventWelcome(
 export async function updateEventEnding(
   eventId: string,
   data: {
-    title?: string;
-    body?: string;
-    ctaLabel?: string;
-    ctaUrl?: string;
+    title?: string | null;
+    body?: string | null;
+    ctaLabel?: string | null;
+    ctaUrl?: string | null;
   }
 ): Promise<ActionResponse<void>> {
   try {

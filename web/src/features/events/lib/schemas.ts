@@ -39,10 +39,10 @@ export const eventWelcomeSchema = z.object({
  * Ending screen configuration
  */
 export const eventEndingSchema = z.object({
-  title: z.string().max(500).optional(),
-  body: z.string().max(500).optional(),
-  ctaLabel: z.string().max(50).optional(),
-  ctaUrl: z.string().url().optional(),
+  title: z.string().max(500).nullable(),
+  body: z.string().max(500).nullable(),
+  ctaLabel: z.string().max(50).nullable(),
+  ctaUrl: z.string().url().nullable(),
 });
 
 /**
@@ -113,11 +113,22 @@ export const updateEventWelcomeSchema = z.object({
 });
 
 export const updateEventEndingSchema = z.object({
-  title: z.string().max(500).default(""),
-  body: z.string().max(500).default(""),
-  ctaLabel: z.string().max(50).default(""),
-  // URL field: convert empty string to undefined (omit from update)
-  ctaUrl: z.url().default(""),
+  title: z.preprocess(
+    val => val === "" ? null : val,
+    z.string().max(500).nullable().optional()
+  ),
+  body: z.preprocess(
+    val => val === "" ? null : val,
+    z.string().max(500).nullable().optional()
+  ),
+  ctaLabel: z.preprocess(
+    val => val === "" ? null : val,
+    z.string().max(50).nullable().optional()
+  ),
+  ctaUrl: z.preprocess(
+    val => val === "" ? null : val,
+    z.string().url().nullable().optional()
+  ),
 });
 
 export const updateEventShareSchema = z.object({
