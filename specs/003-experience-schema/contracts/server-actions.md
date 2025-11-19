@@ -71,10 +71,14 @@ type ErrorCode =
     "enabled": true,
     "hidden": false,
     "config": {
-      "countdown": 0
+      "countdown": 0,
+      "overlayFramePath": null
     },
     "aiConfig": {
       "enabled": false,
+      "model": null,
+      "prompt": null,
+      "referenceImagePaths": null,
       "aspectRatio": "1:1"
     },
     "createdAt": 1700000000000,
@@ -103,7 +107,11 @@ type ErrorCode =
    - `enabled`: `true`
    - `hidden`: `false`
    - `config.countdown`: `0`
+   - `config.overlayFramePath`: `null`
    - `aiConfig.enabled`: `false`
+   - `aiConfig.model`: `null`
+   - `aiConfig.prompt`: `null`
+   - `aiConfig.referenceImagePaths`: `null`
    - `aiConfig.aspectRatio`: `"1:1"`
    - `createdAt`: `Date.now()`
    - `updatedAt`: `Date.now()`
@@ -154,16 +162,16 @@ type UpdatePhotoExperienceInput = {
 };
 
 type PhotoConfig = {
-  countdown?: number;            // 0-10 seconds
-  overlayFramePath?: string;     // Full public URL
+  countdown: number;             // 0-10 seconds, 0 = disabled
+  overlayFramePath: string | null;  // Full public URL, null = no overlay
 };
 
 type AiConfig = {
-  enabled?: boolean;
-  model?: string;
-  prompt?: string;               // Max 600 characters
-  referenceImagePaths?: string[];  // Max 5 URLs
-  aspectRatio?: "1:1" | "3:4" | "4:5" | "9:16" | "16:9";
+  enabled: boolean;
+  model: string | null;          // AI model identifier, null = no model
+  prompt: string | null;         // Max 600 characters, null = no prompt
+  referenceImagePaths: string[] | null;  // Max 5 URLs, null = no references
+  aspectRatio: "1:1" | "3:4" | "4:5" | "9:16" | "16:9";
 };
 ```
 
@@ -176,15 +184,15 @@ const updatePhotoExperienceSchema = z.object({
   previewPath: z.string().url().optional(),
   previewType: z.enum(["image", "gif", "video"]).optional(),
   config: z.object({
-    countdown: z.number().int().min(0).max(10).optional(),
-    overlayFramePath: z.string().url().optional(),
+    countdown: z.number().int().min(0).max(10),
+    overlayFramePath: z.string().url().nullable(),
   }).partial().optional(),
   aiConfig: z.object({
-    enabled: z.boolean().optional(),
-    model: z.string().optional(),
-    prompt: z.string().max(600).optional(),
-    referenceImagePaths: z.array(z.string().url()).max(5).optional(),
-    aspectRatio: z.enum(["1:1", "3:4", "4:5", "9:16", "16:9"]).optional(),
+    enabled: z.boolean(),
+    model: z.string().nullable(),
+    prompt: z.string().max(600).nullable(),
+    referenceImagePaths: z.array(z.string().url()).max(5).nullable(),
+    aspectRatio: z.enum(["1:1", "3:4", "4:5", "9:16", "16:9"]),
   }).partial().optional(),
 }).strict();
 ```

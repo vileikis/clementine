@@ -54,6 +54,7 @@ This quickstart guide helps developers understand and implement the new experien
     enabled: true,
     model: "flux-schnell",
     prompt: "Transform to vintage",
+    referenceImagePaths: null,
     aspectRatio: "1:1"
   }
 }
@@ -95,11 +96,15 @@ When creating new photo experiences:
 ```typescript
 const defaults = {
   config: {
-    countdown: 0,  // No countdown by default
+    countdown: 0,              // No countdown by default
+    overlayFramePath: null,    // No overlay by default
   },
   aiConfig: {
-    enabled: false,    // AI disabled by default
-    aspectRatio: "1:1" // Square format (most common)
+    enabled: false,            // AI disabled by default
+    model: null,               // No model by default
+    prompt: null,              // No prompt by default
+    referenceImagePaths: null, // No references by default
+    aspectRatio: "1:1"         // Square format (most common)
   }
 };
 ```
@@ -284,15 +289,15 @@ interface PhotoExperience extends BaseExperience {
 }
 
 interface PhotoConfig {
-  countdown?: number;            // 0-10 seconds (optional, default 0)
-  overlayFramePath?: string;     // Public URL to overlay frame (optional)
+  countdown: number;             // 0-10 seconds, 0 = disabled
+  overlayFramePath: string | null;  // Public URL to overlay frame, null = no overlay
 }
 
 interface AiConfig {
   enabled: boolean;              // AI transformation on/off
-  model?: string;                // AI model ID (e.g., "flux-schnell")
-  prompt?: string;               // Transformation prompt (max 600 chars)
-  referenceImagePaths?: string[];  // Reference image URLs (max 5)
+  model: string | null;          // AI model ID (e.g., "flux-schnell"), null = no model
+  prompt: string | null;         // Transformation prompt (max 600 chars), null = no prompt
+  referenceImagePaths: string[] | null;  // Reference image URLs (max 5), null = no references
   aspectRatio: AspectRatio;      // Output aspect ratio (required)
 }
 
