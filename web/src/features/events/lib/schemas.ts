@@ -28,11 +28,11 @@ export const eventThemeSchema = z.object({
  * Welcome screen configuration
  */
 export const eventWelcomeSchema = z.object({
-  title: z.string().max(500).optional(),
-  body: z.string().max(500).optional(),
-  ctaLabel: z.string().max(50).optional(),
-  backgroundImage: z.string().url().optional(),
-  backgroundColor: z.string().regex(/^#[0-9A-F]{6}$/i).optional(),
+  title: z.string().max(500).nullable(),
+  body: z.string().max(500).nullable(),
+  ctaLabel: z.string().max(50).nullable(),
+  backgroundImage: z.string().url().nullable(),
+  backgroundColor: z.string().regex(/^#[0-9A-F]{6}$/i).nullable(),
 });
 
 /**
@@ -90,25 +90,41 @@ export const updateEventThemeSchema = z.object({
 });
 
 export const updateEventWelcomeSchema = z.object({
-  title: z.string().max(500).optional(),
-  body: z.string().max(500).optional(),
-  ctaLabel: z.string().max(50).optional(),
-  backgroundImage: z.string().url().optional(),
-  backgroundColor: z.string().regex(/^#[0-9A-F]{6}$/i).optional(),
+  title: z.preprocess(
+    val => val === "" ? null : val,
+    z.string().max(500).nullable().optional()
+  ),
+  body: z.preprocess(
+    val => val === "" ? null : val,
+    z.string().max(500).nullable().optional()
+  ),
+  ctaLabel: z.preprocess(
+    val => val === "" ? null : val,
+    z.string().max(50).nullable().optional()
+  ),
+  backgroundImage: z.preprocess(
+    val => val === "" ? null : val,
+    z.string().url().nullable().optional()
+  ),
+  backgroundColor: z.preprocess(
+    val => val === "" ? null : val,
+    z.string().regex(/^#[0-9A-F]{6}$/i).nullable().optional()
+  ),
 });
 
 export const updateEventEndingSchema = z.object({
-  title: z.string().max(500).optional(),
-  body: z.string().max(500).optional(),
-  ctaLabel: z.string().max(50).optional(),
-  ctaUrl: z.string().url().optional(),
+  title: z.string().max(500).default(""),
+  body: z.string().max(500).default(""),
+  ctaLabel: z.string().max(50).default(""),
+  // URL field: convert empty string to undefined (omit from update)
+  ctaUrl: z.url().default(""),
 });
 
 export const updateEventShareSchema = z.object({
-  allowDownload: z.boolean().optional(),
-  allowSystemShare: z.boolean().optional(),
-  allowEmail: z.boolean().optional(),
-  socials: z.array(shareSocialSchema).optional(),
+  allowDownload: z.boolean().default(false),
+  allowSystemShare: z.boolean().default(false),
+  allowEmail: z.boolean().default(false),
+  socials: z.array(shareSocialSchema).default([]),
 });
 
 export type EventSchema = z.infer<typeof eventSchema>;

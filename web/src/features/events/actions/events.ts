@@ -198,11 +198,11 @@ export async function updateEventTitleAction(
 export async function updateEventWelcome(
   eventId: string,
   data: {
-    title?: string;
-    body?: string;
-    ctaLabel?: string;
-    backgroundImage?: string;
-    backgroundColor?: string;
+    title?: string | null;
+    body?: string | null;
+    ctaLabel?: string | null;
+    backgroundImage?: string | null;
+    backgroundColor?: string | null;
   }
 ): Promise<ActionResponse<void>> {
   try {
@@ -241,6 +241,7 @@ export async function updateEventWelcome(
     };
 
     // Map validated data to nested welcome object fields using dot notation
+    // Note: null values are explicitly set to clear fields in Firestore
     if (validatedData.title !== undefined) {
       updateData["welcome.title"] = validatedData.title;
     }
