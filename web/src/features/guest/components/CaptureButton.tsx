@@ -1,18 +1,12 @@
 "use client";
 
-import { capturePhoto } from "../lib/capture";
-
 interface CaptureButtonProps {
-  videoRef: React.RefObject<HTMLVideoElement | null>;
-  onCapture: (blob: Blob) => void;
   onStartCountdown: () => void;
   disabled?: boolean;
   isCounting?: boolean;
 }
 
 export function CaptureButton({
-  videoRef,
-  onCapture,
   onStartCountdown,
   disabled,
   isCounting = false,

@@ -102,7 +102,7 @@ export function useGuestFlow(eventId: string) {
         audio: false,
       });
       dispatch({ type: "PERMISSION_GRANTED", stream: mediaStream });
-    } catch (err) {
+    } catch {
       dispatch({ type: "PERMISSION_DENIED" });
     }
   };

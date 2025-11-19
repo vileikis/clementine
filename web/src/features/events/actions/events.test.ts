@@ -11,6 +11,7 @@ import * as companiesRepository from "@/features/companies/repositories/companie
 import * as auth from "@/lib/auth";
 import type { Event } from "../types/event.types";
 import type { Company } from "@/features/companies";
+import * as firebaseAdmin from "@/lib/firebase/admin";
 
 // Mock dependencies
 jest.mock("../repositories/events");
@@ -19,11 +20,7 @@ jest.mock("@/lib/auth");
 jest.mock("next/cache", () => ({
   revalidatePath: jest.fn(),
 }));
-jest.mock("@/lib/firebase/admin", () => ({
-  db: {
-    collection: jest.fn(),
-  },
-}));
+jest.mock("@/lib/firebase/admin");
 
 describe("Events Server Actions", () => {
   beforeEach(() => {
@@ -36,23 +33,18 @@ describe("Events Server Actions", () => {
         {
           id: "event-1",
           title: "Event 1",
-          brandColor: "#111111",
-          showTitleOverlay: true,
           status: "live",
           joinPath: "/join/event-1",
           qrPngPath: "events/event-1/qr/join.png",
           companyId: "company-a",
           createdAt: 2000000000,
           updatedAt: 2000000000,
-          shareAllowDownload: true,
-          shareAllowSystemShare: true,
-          shareAllowEmail: true,
-          shareSocials: [],
-          surveyEnabled: false,
-          surveyRequired: false,
-          surveyStepsCount: 0,
-          surveyStepsOrder: [],
-          surveyVersion: 1,
+          share: {
+            allowDownload: true,
+            allowSystemShare: true,
+            allowEmail: true,
+            socials: [],
+          },
           experiencesCount: 0,
           sessionsCount: 0,
           readyCount: 0,
@@ -61,23 +53,18 @@ describe("Events Server Actions", () => {
         {
           id: "event-2",
           title: "Event 2",
-          brandColor: "#222222",
-          showTitleOverlay: false,
           status: "draft",
           joinPath: "/join/event-2",
           qrPngPath: "events/event-2/qr/join.png",
           companyId: null,
           createdAt: 1000000000,
           updatedAt: 1000000000,
-          shareAllowDownload: true,
-          shareAllowSystemShare: true,
-          shareAllowEmail: true,
-          shareSocials: [],
-          surveyEnabled: false,
-          surveyRequired: false,
-          surveyStepsCount: 0,
-          surveyStepsOrder: [],
-          surveyVersion: 1,
+          share: {
+            allowDownload: true,
+            allowSystemShare: true,
+            allowEmail: true,
+            socials: [],
+          },
           experiencesCount: 0,
           sessionsCount: 0,
           readyCount: 0,
@@ -101,23 +88,18 @@ describe("Events Server Actions", () => {
         {
           id: "event-1",
           title: "Event 1",
-          brandColor: "#111111",
-          showTitleOverlay: true,
           status: "live",
           joinPath: "/join/event-1",
           qrPngPath: "events/event-1/qr/join.png",
           companyId: "company-a",
           createdAt: 2000000000,
           updatedAt: 2000000000,
-          shareAllowDownload: true,
-          shareAllowSystemShare: true,
-          shareAllowEmail: true,
-          shareSocials: [],
-          surveyEnabled: false,
-          surveyRequired: false,
-          surveyStepsCount: 0,
-          surveyStepsOrder: [],
-          surveyVersion: 1,
+          share: {
+            allowDownload: true,
+            allowSystemShare: true,
+            allowEmail: true,
+            socials: [],
+          },
           experiencesCount: 0,
           sessionsCount: 0,
           readyCount: 0,
@@ -144,23 +126,18 @@ describe("Events Server Actions", () => {
         {
           id: "event-2",
           title: "Event 2",
-          brandColor: "#222222",
-          showTitleOverlay: false,
           status: "draft",
           joinPath: "/join/event-2",
           qrPngPath: "events/event-2/qr/join.png",
           companyId: null,
           createdAt: 1000000000,
           updatedAt: 1000000000,
-          shareAllowDownload: true,
-          shareAllowSystemShare: true,
-          shareAllowEmail: true,
-          shareSocials: [],
-          surveyEnabled: false,
-          surveyRequired: false,
-          surveyStepsCount: 0,
-          surveyStepsOrder: [],
-          surveyVersion: 1,
+          share: {
+            allowDownload: true,
+            allowSystemShare: true,
+            allowEmail: true,
+            socials: [],
+          },
           experiencesCount: 0,
           sessionsCount: 0,
           readyCount: 0,
@@ -272,8 +249,13 @@ describe("Events Server Actions", () => {
 
   describe("updateEventWelcome", () => {
     const mockEventId = "event-123";
-    let mockEventRef: any;
-    let mockDb: any;
+    let mockEventRef: {
+      get: jest.Mock;
+      update: jest.Mock;
+    };
+    let mockDb: {
+      collection: jest.Mock;
+    };
 
     beforeEach(() => {
       // Mock Firebase admin db
@@ -286,8 +268,10 @@ describe("Events Server Actions", () => {
           doc: jest.fn().mockReturnValue(mockEventRef),
         }),
       };
-      const firebaseAdmin = require("@/lib/firebase/admin");
-      firebaseAdmin.db = mockDb;
+      Object.defineProperty(firebaseAdmin, 'db', {
+        get: jest.fn(() => mockDb),
+        configurable: true,
+      });
 
       // Mock auth
       jest.spyOn(auth, "verifyAdminSecret").mockResolvedValue({
@@ -380,8 +364,13 @@ describe("Events Server Actions", () => {
 
   describe("updateEventEnding", () => {
     const mockEventId = "event-123";
-    let mockEventRef: any;
-    let mockDb: any;
+    let mockEventRef: {
+      get: jest.Mock;
+      update: jest.Mock;
+    };
+    let mockDb: {
+      collection: jest.Mock;
+    };
 
     beforeEach(() => {
       mockEventRef = {
@@ -393,8 +382,10 @@ describe("Events Server Actions", () => {
           doc: jest.fn().mockReturnValue(mockEventRef),
         }),
       };
-      const firebaseAdmin = require("@/lib/firebase/admin");
-      firebaseAdmin.db = mockDb;
+      Object.defineProperty(firebaseAdmin, 'db', {
+        get: jest.fn(() => mockDb),
+        configurable: true,
+      });
 
       jest.spyOn(auth, "verifyAdminSecret").mockResolvedValue({
         authorized: true,
@@ -474,8 +465,13 @@ describe("Events Server Actions", () => {
 
   describe("updateEventShare", () => {
     const mockEventId = "event-123";
-    let mockEventRef: any;
-    let mockDb: any;
+    let mockEventRef: {
+      get: jest.Mock;
+      update: jest.Mock;
+    };
+    let mockDb: {
+      collection: jest.Mock;
+    };
 
     beforeEach(() => {
       mockEventRef = {
@@ -487,8 +483,10 @@ describe("Events Server Actions", () => {
           doc: jest.fn().mockReturnValue(mockEventRef),
         }),
       };
-      const firebaseAdmin = require("@/lib/firebase/admin");
-      firebaseAdmin.db = mockDb;
+      Object.defineProperty(firebaseAdmin, 'db', {
+        get: jest.fn(() => mockDb),
+        configurable: true,
+      });
 
       jest.spyOn(auth, "verifyAdminSecret").mockResolvedValue({
         authorized: true,
@@ -505,7 +503,7 @@ describe("Events Server Actions", () => {
         allowDownload: true,
         allowSystemShare: true,
         allowEmail: false,
-        socials: ["instagram", "tiktok", "facebook"] as const,
+        socials: ["instagram", "tiktok", "facebook"] as Array<"instagram" | "tiktok" | "facebook" | "x" | "snapchat" | "whatsapp" | "custom">,
       };
 
       const result = await updateEventShare(mockEventId, shareData);
@@ -570,8 +568,13 @@ describe("Events Server Actions", () => {
 
   describe("updateEventTheme", () => {
     const mockEventId = "event-123";
-    let mockEventRef: any;
-    let mockDb: any;
+    let mockEventRef: {
+      get: jest.Mock;
+      update: jest.Mock;
+    };
+    let mockDb: {
+      collection: jest.Mock;
+    };
 
     beforeEach(() => {
       mockEventRef = {
@@ -583,8 +586,10 @@ describe("Events Server Actions", () => {
           doc: jest.fn().mockReturnValue(mockEventRef),
         }),
       };
-      const firebaseAdmin = require("@/lib/firebase/admin");
-      firebaseAdmin.db = mockDb;
+      Object.defineProperty(firebaseAdmin, 'db', {
+        get: jest.fn(() => mockDb),
+        configurable: true,
+      });
 
       jest.spyOn(auth, "verifyAdminSecret").mockResolvedValue({
         authorized: true,

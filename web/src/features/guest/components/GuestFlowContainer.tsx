@@ -138,8 +138,6 @@ export function GuestFlowContainer({
         </div>
         <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-40">
           <CaptureButton
-            videoRef={videoRef}
-            onCapture={handleCapture}
             onStartCountdown={handleStartCountdown}
             disabled={isCounting}
             isCounting={isCounting}
