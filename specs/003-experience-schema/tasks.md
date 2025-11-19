@@ -60,16 +60,16 @@ This is a Next.js 16 monorepo web app. All paths are relative to `web/`:
 
 ### Implementation for User Story 1
 
-- [ ] T012 [US1] Implement createPhotoExperienceAction Server Action in web/src/features/experiences/actions/create-experience.ts
-- [ ] T013 [US1] Add validation for createPhotoExperienceSchema input in createPhotoExperienceAction
-- [ ] T014 [US1] Initialize default values (config.countdown: 0, aiConfig.enabled: false, aiConfig.aspectRatio: "1:1") in createPhotoExperienceAction
-- [ ] T015 [US1] Write new experience document to Firestore using Admin SDK in createPhotoExperienceAction
-- [ ] T016 [US1] Add revalidatePath call for /events/${eventId} in createPhotoExperienceAction
-- [ ] T017 [US1] Return ActionResponse<PhotoExperience> with proper error handling in createPhotoExperienceAction
-- [ ] T018 [US1] Verify ExperienceTypeSelector component shows "Coming Soon" badges for non-photo types in web/src/features/experiences/components/shared/ExperienceTypeSelector.tsx (should already be compliant, just verify)
-- [ ] T019 [US1] Verify CreateExperienceForm calls createPhotoExperienceAction with correct schema in web/src/features/experiences/components/shared/CreateExperienceForm.tsx (should already be compliant, just verify)
+- [X] T012 [US1] Implement createPhotoExperienceAction Server Action in web/src/features/experiences/actions/create-experience.ts
+- [X] T013 [US1] Add validation for createPhotoExperienceSchema input in createPhotoExperienceAction
+- [X] T014 [US1] Initialize default values (config.countdown: 0, aiConfig.enabled: false, aiConfig.aspectRatio: "1:1") in createPhotoExperienceAction
+- [X] T015 [US1] Write new experience document to Firestore using Admin SDK in createPhotoExperienceAction
+- [X] T016 [US1] Add revalidatePath call for /events/${eventId} in createPhotoExperienceAction
+- [X] T017 [US1] Return ActionResponse<PhotoExperience> with proper error handling in createPhotoExperienceAction
+- [X] T018 [US1] Verify ExperienceTypeSelector component shows "Coming Soon" badges for non-photo types in web/src/features/experiences/components/shared/ExperienceTypeSelector.tsx (verified - already compliant)
+- [X] T019 [US1] Verify CreateExperienceForm calls createPhotoExperienceAction with correct schema in web/src/features/experiences/components/shared/CreateExperienceForm.tsx (updated to use new action)
 
-**Checkpoint**: At this point, User Story 1 should be fully functional - new photo experiences create with correct schema
+**Checkpoint**: At this point, User Story 1 should be fully functional - new photo experiences create with correct schema ✅
 
 ---
 
