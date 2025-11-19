@@ -26,18 +26,18 @@ Web monorepo structure (per plan.md):
 
 **Purpose**: Update TypeScript types and Zod schemas to support nested object structure
 
-- [ ] T001 [P] Add EventTheme interface to web/src/features/events/types/event.types.ts
-- [ ] T002 [P] Add EventWelcome interface to web/src/features/events/types/event.types.ts
-- [ ] T003 [P] Add EventEnding interface to web/src/features/events/types/event.types.ts
-- [ ] T004 [P] Add EventShareConfig interface to web/src/features/events/types/event.types.ts
-- [ ] T005 Update Event interface to use nested objects (theme, welcome, ending, share) in web/src/features/events/types/event.types.ts
-- [ ] T006 Remove deprecated fields from Event interface in web/src/features/events/types/event.types.ts
-- [ ] T007 [P] Add eventThemeSchema Zod schema to web/src/features/events/lib/schemas.ts
-- [ ] T008 [P] Add eventWelcomeSchema Zod schema to web/src/features/events/lib/schemas.ts
-- [ ] T009 [P] Add eventEndingSchema Zod schema to web/src/features/events/lib/schemas.ts
-- [ ] T010 [P] Add eventShareConfigSchema Zod schema to web/src/features/events/lib/schemas.ts
-- [ ] T011 Update eventSchema to use nested object schemas in web/src/features/events/lib/schemas.ts
-- [ ] T012 Remove deprecated field schemas from web/src/features/events/lib/schemas.ts
+- [X] T001 [P] Add EventTheme interface to web/src/features/events/types/event.types.ts
+- [X] T002 [P] Add EventWelcome interface to web/src/features/events/types/event.types.ts
+- [X] T003 [P] Add EventEnding interface to web/src/features/events/types/event.types.ts
+- [X] T004 [P] Add EventShareConfig interface to web/src/features/events/types/event.types.ts
+- [X] T005 Update Event interface to use nested objects (theme, welcome, ending, share) in web/src/features/events/types/event.types.ts
+- [X] T006 Remove deprecated fields from Event interface in web/src/features/events/types/event.types.ts
+- [X] T007 [P] Add eventThemeSchema Zod schema to web/src/features/events/lib/schemas.ts
+- [X] T008 [P] Add eventWelcomeSchema Zod schema to web/src/features/events/lib/schemas.ts
+- [X] T009 [P] Add eventEndingSchema Zod schema to web/src/features/events/lib/schemas.ts
+- [X] T010 [P] Add eventShareConfigSchema Zod schema to web/src/features/events/lib/schemas.ts
+- [X] T011 Update eventSchema to use nested object schemas in web/src/features/events/lib/schemas.ts
+- [X] T012 Remove deprecated field schemas from web/src/features/events/lib/schemas.ts
 
 **Checkpoint**: TypeScript types and Zod schemas updated - type system enforces new nested structure
 
@@ -49,14 +49,14 @@ Web monorepo structure (per plan.md):
 
 **⚠️ CRITICAL**: No UI editor work can begin until Server Actions support nested objects
 
-- [ ] T013 [P] Add updateEventThemeSchema to web/src/features/events/lib/schemas.ts
-- [ ] T014 [P] Add updateEventShareSchema to web/src/features/events/lib/schemas.ts
-- [ ] T015 [P] Update updateEventWelcomeSchema to match new nested structure in web/src/features/events/lib/schemas.ts
-- [ ] T016 [P] Update updateEventEndingSchema to match new nested structure in web/src/features/events/lib/schemas.ts
-- [ ] T017 Refactor updateEventWelcome Server Action to use dot notation for nested fields in web/src/features/events/actions/events.ts
-- [ ] T018 Refactor updateEventEnding Server Action to use dot notation for ending fields in web/src/features/events/actions/events.ts
-- [ ] T019 [P] Create updateEventShare Server Action using dot notation for share fields in web/src/features/events/actions/events.ts
-- [ ] T020 [P] Create updateEventTheme Server Action using dot notation for theme fields in web/src/features/events/actions/events.ts
+- [X] T013 [P] Add updateEventThemeSchema to web/src/features/events/lib/schemas.ts
+- [X] T014 [P] Add updateEventShareSchema to web/src/features/events/lib/schemas.ts
+- [X] T015 [P] Update updateEventWelcomeSchema to match new nested structure in web/src/features/events/lib/schemas.ts
+- [X] T016 [P] Update updateEventEndingSchema to match new nested structure in web/src/features/events/lib/schemas.ts
+- [X] T017 Refactor updateEventWelcome Server Action to use dot notation for nested fields in web/src/features/events/actions/events.ts
+- [X] T018 Refactor updateEventEnding Server Action to use dot notation for ending fields in web/src/features/events/actions/events.ts
+- [X] T019 [P] Create updateEventShare Server Action using dot notation for share fields in web/src/features/events/actions/events.ts
+- [X] T020 [P] Create updateEventTheme Server Action using dot notation for theme fields in web/src/features/events/actions/events.ts
 - [ ] T021 [P] Update Server Action tests for updateEventWelcome in web/src/features/events/actions/events.test.ts
 - [ ] T022 [P] Update Server Action tests for updateEventEnding in web/src/features/events/actions/events.test.ts
 - [ ] T023 [P] Add Server Action tests for updateEventShare in web/src/features/events/actions/events.test.ts
@@ -74,10 +74,10 @@ Web monorepo structure (per plan.md):
 
 ### Implementation for User Story 1
 
-- [ ] T025 [US1] Refactor WelcomeEditor state initialization to use event.welcome?.* with optional chaining in web/src/features/events/components/designer/WelcomeEditor.tsx
-- [ ] T026 [US1] Update WelcomeEditor form bindings to read from event.welcome?.title, event.welcome?.body, etc. in web/src/features/events/components/designer/WelcomeEditor.tsx
-- [ ] T027 [US1] Update WelcomeEditor save handler to call updateEventWelcome with nested structure in web/src/features/events/components/designer/WelcomeEditor.tsx
-- [ ] T028 [US1] Remove all references to flat welcome* fields in WelcomeEditor in web/src/features/events/components/designer/WelcomeEditor.tsx
+- [X] T025 [US1] Refactor WelcomeEditor state initialization to use event.welcome?.* with optional chaining in web/src/features/events/components/designer/WelcomeEditor.tsx
+- [X] T026 [US1] Update WelcomeEditor form bindings to read from event.welcome?.title, event.welcome?.body, etc. in web/src/features/events/components/designer/WelcomeEditor.tsx
+- [X] T027 [US1] Update WelcomeEditor save handler to call updateEventWelcome with nested structure in web/src/features/events/components/designer/WelcomeEditor.tsx
+- [X] T028 [US1] Remove all references to flat welcome* fields in WelcomeEditor in web/src/features/events/components/designer/WelcomeEditor.tsx
 - [ ] T029 [US1] Add React Testing Library test for WelcomeEditor rendering with nested welcome object in web/src/features/events/components/designer/WelcomeEditor.test.tsx
 - [ ] T030 [US1] Add React Testing Library test for WelcomeEditor saving with nested welcome object in web/src/features/events/components/designer/WelcomeEditor.test.tsx
 - [ ] T031 [US1] Add React Testing Library test for WelcomeEditor handling undefined welcome object in web/src/features/events/components/designer/WelcomeEditor.test.tsx

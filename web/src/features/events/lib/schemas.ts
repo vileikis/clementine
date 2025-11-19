@@ -14,71 +14,101 @@ export const shareSocialSchema = z.enum([
   "custom",
 ]);
 
+/**
+ * Event-wide theme settings for visual customization
+ */
+export const eventThemeSchema = z.object({
+  buttonColor: z.string().regex(/^#[0-9A-F]{6}$/i).optional(),
+  buttonTextColor: z.string().regex(/^#[0-9A-F]{6}$/i).optional(),
+  backgroundColor: z.string().regex(/^#[0-9A-F]{6}$/i).optional(),
+  backgroundImage: z.string().url().optional(),
+});
+
+/**
+ * Welcome screen configuration
+ */
+export const eventWelcomeSchema = z.object({
+  title: z.string().max(500).optional(),
+  body: z.string().max(500).optional(),
+  ctaLabel: z.string().max(50).optional(),
+  backgroundImage: z.string().url().optional(),
+  backgroundColor: z.string().regex(/^#[0-9A-F]{6}$/i).optional(),
+});
+
+/**
+ * Ending screen configuration
+ */
+export const eventEndingSchema = z.object({
+  title: z.string().max(500).optional(),
+  body: z.string().max(500).optional(),
+  ctaLabel: z.string().max(50).optional(),
+  ctaUrl: z.string().url().optional(),
+});
+
+/**
+ * Share settings configuration
+ */
+export const eventShareConfigSchema = z.object({
+  allowDownload: z.boolean().default(true),
+  allowSystemShare: z.boolean().default(true),
+  allowEmail: z.boolean().default(false),
+  socials: z.array(shareSocialSchema).default([]),
+});
+
 export const eventSchema = z.object({
   id: z.string(),
-  title: z.string(),
-  brandColor: z.string().regex(/^#[0-9A-F]{6}$/i),
-  showTitleOverlay: z.boolean(),
+  title: z.string().min(1).max(200),
   status: eventStatusSchema,
   companyId: z.string().nullable().default(null),
   joinPath: z.string(),
-  qrPngPath: z.string(),
-  createdAt: z.number(),
-  updatedAt: z.number(),
+  qrPngPath: z.string().url(),
+  publishStartAt: z.number().optional(),
+  publishEndAt: z.number().optional(),
 
-  // Events Builder Redesign fields with defaults
-  welcomeTitle: z.string().optional(),
-  welcomeDescription: z.string().optional(),
-  welcomeCtaLabel: z.string().optional(),
-  welcomeBackgroundImagePath: z.string().optional(),
-  welcomeBackgroundColorHex: z.string().optional(),
+  // Nested object configurations
+  theme: eventThemeSchema.optional(),
+  welcome: eventWelcomeSchema.optional(),
+  ending: eventEndingSchema.optional(),
+  share: eventShareConfigSchema,
 
-  endHeadline: z.string().optional(),
-  endBody: z.string().optional(),
-  endCtaLabel: z.string().optional(),
-  endCtaUrl: z.string().optional(),
-
-  shareAllowDownload: z.boolean().default(true),
-  shareAllowSystemShare: z.boolean().default(true),
-  shareAllowEmail: z.boolean().default(true),
-  shareSocials: z.array(shareSocialSchema).default([]),
-
-  surveyEnabled: z.boolean().default(false),
-  surveyRequired: z.boolean().default(false),
-  surveyStepsCount: z.number().default(0),
-  surveyStepsOrder: z.array(z.string()).default([]),
-  surveyVersion: z.number().default(1),
-
+  // Denormalized counters
   experiencesCount: z.number().default(0),
   sessionsCount: z.number().default(0),
   readyCount: z.number().default(0),
   sharesCount: z.number().default(0),
+
+  createdAt: z.number(),
+  updatedAt: z.number(),
 });
 
 // Event update schemas (for Server Actions)
+export const updateEventThemeSchema = z.object({
+  buttonColor: z.string().regex(/^#[0-9A-F]{6}$/i).optional(),
+  buttonTextColor: z.string().regex(/^#[0-9A-F]{6}$/i).optional(),
+  backgroundColor: z.string().regex(/^#[0-9A-F]{6}$/i).optional(),
+  backgroundImage: z.string().url().optional(),
+});
+
 export const updateEventWelcomeSchema = z.object({
-  welcomeTitle: z.string().max(500).optional(),
-  welcomeDescription: z.string().max(500).optional(),
-  welcomeCtaLabel: z.string().max(50).optional(),
-  welcomeBackgroundImagePath: z.string().optional(),
-  welcomeBackgroundColorHex: z.string().regex(/^#[0-9A-F]{6}$/i).optional(),
+  title: z.string().max(500).optional(),
+  body: z.string().max(500).optional(),
+  ctaLabel: z.string().max(50).optional(),
+  backgroundImage: z.string().url().optional(),
+  backgroundColor: z.string().regex(/^#[0-9A-F]{6}$/i).optional(),
 });
 
 export const updateEventEndingSchema = z.object({
-  endHeadline: z.string().max(500).optional(),
-  endBody: z.string().max(500).optional(),
-  endCtaLabel: z.string().max(50).optional(),
-  endCtaUrl: z.string().url().optional(),
-  shareAllowDownload: z.boolean().optional(),
-  shareAllowSystemShare: z.boolean().optional(),
-  shareAllowEmail: z.boolean().optional(),
-  shareSocials: z.array(shareSocialSchema).optional(),
+  title: z.string().max(500).optional(),
+  body: z.string().max(500).optional(),
+  ctaLabel: z.string().max(50).optional(),
+  ctaUrl: z.string().url().optional(),
 });
 
-export const updateEventSurveyConfigSchema = z.object({
-  surveyEnabled: z.boolean().optional(),
-  surveyRequired: z.boolean().optional(),
-  surveyStepsOrder: z.array(z.string()).optional(),
+export const updateEventShareSchema = z.object({
+  allowDownload: z.boolean().optional(),
+  allowSystemShare: z.boolean().optional(),
+  allowEmail: z.boolean().optional(),
+  socials: z.array(shareSocialSchema).optional(),
 });
 
 export type EventSchema = z.infer<typeof eventSchema>;
