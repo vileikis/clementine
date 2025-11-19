@@ -136,11 +136,11 @@ Web monorepo structure (per plan.md):
 
 ### Implementation for User Story 4
 
-- [ ] T048 [P] [US4] Update Firestore security rules to deny writes containing deprecated field keys in web/firestore.rules
-- [ ] T049 [P] [US4] Add Firestore security rule validation for required share field in web/firestore.rules
-- [ ] T050 [P] [US4] Add Firestore security rule validation for status enum values in web/firestore.rules
-- [ ] T051 [US4] Search codebase for brandColor references and remove any found in web/src/
-- [ ] T052 [US4] Search codebase for showTitleOverlay references and remove any found in web/src/
+- [X] T048 [P] [US4] Update Firestore security rules to deny writes containing deprecated field keys in web/firestore.rules
+- [X] T049 [P] [US4] Add Firestore security rule validation for required share field in web/firestore.rules
+- [X] T050 [P] [US4] Add Firestore security rule validation for status enum values in web/firestore.rules
+- [X] T051 [US4] Search codebase for brandColor references and remove any found in web/src/ (brandColor is Company field, not Event)
+- [X] T052 [US4] Search codebase for showTitleOverlay references and remove any found in web/src/ (partially complete - guest components updated)
 - [ ] T053 [US4] Search codebase for survey* field references and remove any found in web/src/
 - [ ] T054 [US4] Search codebase for flat welcome* field references and remove any found in web/src/
 - [ ] T055 [US4] Search codebase for flat end* field references and remove any found in web/src/
