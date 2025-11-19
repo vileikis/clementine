@@ -1,600 +1,335 @@
-# UI Components Contract: Experience Builder
+# UI Components Contract: Experience Schema Migration
 
 **Feature**: 003-experience-schema
 **Date**: 2025-11-19
-**Version**: 1.0
+**Version**: 2.0 (Revised based on existing components)
 
 ## Overview
 
-This document defines the component interface contracts for the experience builder UI. All components read from and write to the new discriminated union schema (`config`, `aiConfig`).
+This document defines the modifications needed to existing experience builder UI components to support the new discriminated union schema (`config`, `aiConfig`).
+
+**Key Change**: Instead of creating new components, we will modify existing components to read from and write to the new schema structure while maintaining backward compatibility during migration.
+
+## Existing Components (No Changes Needed)
+
+The following components already meet the requirements and need NO modifications:
+
+### ExperienceTypeSelector
+**Location**: `web/src/features/experiences/components/shared/ExperienceTypeSelector.tsx`
+
+**Already Implements**:
+- Visual card-based type selection (FR-004)
+- "Coming Soon" badges for non-photo types (US1-AC2)
+- Touch-friendly 44px+ hit areas (MFR-002)
+- Mobile-responsive grid layout
+- Disabled state for unavailable types
+
+**Status**: ✅ No changes required - already compliant with spec
 
 ---
 
-## Create Experience Dialog
+## Components Requiring Schema Updates
 
-### Component Signature
+### 1. CreateExperienceForm
+
+**Location**: `web/src/features/experiences/components/shared/CreateExperienceForm.tsx`
+
+**Current State**:
+- Uses React Hook Form + Zod validation
+- Calls `createExperience(eventId, data)` Server Action
+- Uses ExperienceTypeSelector for type selection
+- Mobile-first responsive (MFR-001, MFR-002, MFR-003 compliant)
+
+**Required Changes**:
+None to the component UI - the Server Action (`createExperience`) needs to be updated to write the new schema structure.
+
+**Verification Needed**:
+- Ensure `createExperience` action writes new schema: `type: "photo"`, `config: {countdown: 0}`, `aiConfig: {enabled: false, aspectRatio: "1:1"}`
+- Validate against updated Zod schema
+
+**Acceptance Criteria**: US1-AC1, US1-AC2, FR-001, FR-002, FR-003
+
+---
+
+### 2. ExperienceEditor
+
+**Location**: `web/src/features/experiences/components/shared/ExperienceEditor.tsx`
+
+**Current State**:
+- Reads from flat fields: `experience.countdownEnabled`, `experience.countdownSeconds`, `experience.overlayEnabled`, `experience.aiEnabled`, etc.
+- Uses local state for all form fields
+- Calls `onSave(experienceId, data)` prop with flat field structure
+- Includes AI settings, countdown, overlay frame configuration
+- Mobile-responsive with proper touch targets
+
+**Required Changes**:
+
+1. **Update State Initialization** (lines 49-63):
+   ```typescript
+   // BEFORE (current flat structure)
+   const [countdownEnabled, setCountdownEnabled] = useState(experience.countdownEnabled ?? false);
+   const [countdownSeconds, setCountdownSeconds] = useState(experience.countdownSeconds ?? 3);
+   const [overlayEnabled, setOverlayEnabled] = useState(experience.overlayEnabled ?? false);
+   const [overlayFramePath, setOverlayFramePath] = useState(experience.overlayFramePath || "");
+   const [aiEnabled, setAiEnabled] = useState(experience.aiEnabled);
+   const [aiModel, setAiModel] = useState(experience.aiModel || "nanobanana");
+   const [aiPrompt, setAiPrompt] = useState(experience.aiPrompt || "");
+
+   // AFTER (new nested structure with fallback to legacy)
+   const [countdownEnabled, setCountdownEnabled] = useState(
+     experience.config?.countdown !== undefined ? experience.config.countdown > 0 : experience.countdownEnabled ?? false
+   );
+   const [countdownSeconds, setCountdownSeconds] = useState(
+     experience.config?.countdown ?? experience.countdownSeconds ?? 3
+   );
+   const [overlayFramePath, setOverlayFramePath] = useState(
+     experience.config?.overlayFramePath || experience.overlayFramePath || ""
+   );
+   const [aiEnabled, setAiEnabled] = useState(
+     experience.aiConfig?.enabled ?? experience.aiEnabled ?? false
+   );
+   const [aiModel, setAiModel] = useState(
+     experience.aiConfig?.model || experience.aiModel || "nanobanana"
+   );
+   const [aiPrompt, setAiPrompt] = useState(
+     experience.aiConfig?.prompt || experience.aiPrompt || ""
+   );
+   const [aiReferenceImagePaths, setAiReferenceImagePaths] = useState<string[]>(
+     experience.aiConfig?.referenceImagePaths || experience.aiReferenceImagePaths || []
+   );
+   const [aiAspectRatio, setAiAspectRatio] = useState<AspectRatio>(
+     experience.aiConfig?.aspectRatio || experience.aiAspectRatio || "1:1"
+   );
+   ```
+
+2. **Update handleSave** (lines 66-90):
+   ```typescript
+   // BEFORE (writes flat fields)
+   await onSave(experience.id, {
+     label,
+     enabled,
+     countdownEnabled,
+     countdownSeconds,
+     overlayEnabled,
+     overlayFramePath: overlayFramePath || undefined,
+     aiEnabled,
+     aiModel: aiModel || undefined,
+     aiPrompt: aiPrompt || undefined,
+   });
+
+   // AFTER (writes nested structure)
+   await onSave(experience.id, {
+     label,
+     enabled,
+     config: {
+       countdown: countdownEnabled ? countdownSeconds : 0,
+       overlayFramePath: overlayFramePath || undefined,
+     },
+     aiConfig: {
+       enabled: aiEnabled,
+       model: aiModel || undefined,
+       prompt: aiPrompt || undefined,
+       referenceImagePaths: aiReferenceImagePaths.length > 0 ? aiReferenceImagePaths : undefined,
+       aspectRatio: aiAspectRatio,
+     },
+   });
+   ```
+
+**Acceptance Criteria**: FR-006, FR-007, FR-008, US2-AC1, US2-AC2, US2-AC3, US3-AC1, US3-AC2, US3-AC3
+
+---
+
+### 3. ExperienceEditorWrapper
+
+**Location**: `web/src/features/experiences/components/shared/ExperienceEditorWrapper.tsx`
+
+**Current State**:
+- Wraps ExperienceEditor with Server Actions
+- Calls `updateExperienceAction(eventId, experienceId, data)`
+- Handles navigation after deletion
+
+**Required Changes**:
+None to the component - the Server Action (`updateExperienceAction`) will handle schema migration.
+
+**Verification Needed**:
+- Ensure `updateExperienceAction` performs migration logic (FR-008, FR-010)
+- Verify it removes deprecated flat fields after migration
+
+**Acceptance Criteria**: FR-008, FR-010
+
+---
+
+## Component Testing Requirements
+
+Each modified component must have tests covering:
+
+### 1. ExperienceEditor Tests
+
+**Location**: `web/src/features/experiences/components/shared/ExperienceEditor.test.tsx`
+
+**Required Test Cases**:
 
 ```typescript
-type CreateExperienceDialogProps = {
-  eventId: string;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onSuccess?: (experienceId: string) => void;
-};
-
-function CreateExperienceDialog(props: CreateExperienceDialogProps): JSX.Element;
-```
-
-### Props
-
-| Prop | Type | Required | Description |
-|------|------|----------|-------------|
-| `eventId` | `string` | Yes | Parent event ID for the new experience |
-| `open` | `boolean` | Yes | Dialog open/closed state |
-| `onOpenChange` | `(open: boolean) => void` | Yes | Callback when dialog state changes |
-| `onSuccess` | `(experienceId: string) => void` | No | Callback with newly created experience ID |
-
-### UI Structure
-
-```tsx
-<Dialog open={open} onOpenChange={onOpenChange}>
-  <DialogContent>
-    <DialogHeader>
-      <DialogTitle>Create New Experience</DialogTitle>
-      <DialogDescription>
-        Choose an experience type and give it a name.
-      </DialogDescription>
-    </DialogHeader>
-
-    <form onSubmit={handleSubmit}>
-      {/* Experience Type Selection */}
-      <Label htmlFor="type">Experience Type</Label>
-      <Select name="type" defaultValue="photo">
-        <SelectItem value="photo">Photo Experience</SelectItem>
-
-        {/* Disabled types with "coming soon" badges */}
-        <SelectItem value="video" disabled>
-          <div className="flex items-center justify-between w-full">
-            <span>Video Experience</span>
-            <Badge variant="outline">Coming Soon</Badge>
-          </div>
-        </SelectItem>
-
-        <SelectItem value="gif" disabled>
-          <div className="flex items-center justify-between w-full">
-            <span>GIF Experience</span>
-            <Badge variant="outline">Coming Soon</Badge>
-          </div>
-        </SelectItem>
-
-        <SelectItem value="wheel" disabled>
-          <div className="flex items-center justify-between w-full">
-            <span>Prize Wheel</span>
-            <Badge variant="outline">Coming Soon</Badge>
-          </div>
-        </SelectItem>
-
-        <SelectItem value="survey" disabled>
-          <div className="flex items-center justify-between w-full">
-            <span>Survey</span>
-            <Badge variant="outline">Coming Soon</Badge>
-          </div>
-        </SelectItem>
-      </Select>
-
-      {/* Experience Name Input */}
-      <Label htmlFor="label">Experience Name</Label>
-      <Input
-        id="label"
-        name="label"
-        placeholder="e.g., Summer Photo Booth"
-        maxLength={50}
-        required
-      />
-
-      {/* Actions */}
-      <DialogFooter>
-        <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-          Cancel
-        </Button>
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Creating..." : "Create Experience"}
-        </Button>
-      </DialogFooter>
-    </form>
-  </DialogContent>
-</Dialog>
-```
-
-### Behavior
-
-1. **Type Selection**:
-   - Only "photo" is selectable (FR-004)
-   - Video, GIF, Wheel, Survey show "Coming Soon" badge and are disabled
-   - Attempting to submit with disabled type shows validation error
-
-2. **Form Submission**:
-   - Client-side validation: label required, 1-50 characters
-   - Call `createPhotoExperienceAction(eventId, { label, type: "photo" })`
-   - On success: call `onSuccess(experienceId)` and close dialog
-   - On error: display error toast
-
-3. **Mobile Responsiveness** (MFR-002):
-   - Touch-friendly Select with ≥44px hit area
-   - Input field ≥44px height
-   - Full-width buttons on mobile (<768px)
-
-### Acceptance Criteria
-
-- **FR-004**: Non-photo types disabled and marked "coming soon"
-- **FR-005**: Cannot submit without label
-- **MFR-002**: Touch targets ≥44x44px
-- **US1-AC1**: Creates document with `type: "photo"`, `config: {countdown: 0}`, `aiConfig: {enabled: false, aspectRatio: "1:1"}`
-- **US1-AC2**: Only photo type is enabled
-
----
-
-## Experience Builder Form
-
-### Component Signature
-
-```typescript
-type ExperienceBuilderFormProps = {
-  eventId: string;
-  experienceId: string;
-  initialData: PhotoExperience;  // From Firestore subscription
-  onSave?: () => void;
-};
-
-function ExperienceBuilderForm(props: ExperienceBuilderFormProps): JSX.Element;
-```
-
-### Props
-
-| Prop | Type | Required | Description |
-|------|------|----------|-------------|
-| `eventId` | `string` | Yes | Parent event ID |
-| `experienceId` | `string` | Yes | Experience document ID |
-| `initialData` | `PhotoExperience` | Yes | Current experience data (from real-time subscription) |
-| `onSave` | `() => void` | No | Callback after successful save |
-
-### UI Structure
-
-```tsx
-<form onSubmit={handleSubmit}>
-  {/* Basic Configuration Section */}
-  <section>
-    <h3>Basic Settings</h3>
-
-    <Label htmlFor="label">Experience Name</Label>
-    <Input
-      id="label"
-      name="label"
-      defaultValue={initialData.label}
-      maxLength={50}
-      required
-    />
-
-    <div className="flex items-center gap-2">
-      <Switch
-        id="enabled"
-        name="enabled"
-        defaultChecked={initialData.enabled}
-      />
-      <Label htmlFor="enabled">Active</Label>
-    </div>
-
-    <div className="flex items-center gap-2">
-      <Switch
-        id="hidden"
-        name="hidden"
-        defaultChecked={initialData.hidden}
-      />
-      <Label htmlFor="hidden">Hidden (draft mode)</Label>
-    </div>
-  </section>
-
-  {/* Photo Configuration Section */}
-  <section>
-    <h3>Photo Settings</h3>
-
-    <Label htmlFor="countdown">Countdown Duration (seconds)</Label>
-    <Slider
-      id="countdown"
-      name="config.countdown"
-      min={0}
-      max={10}
-      step={1}
-      defaultValue={[initialData.config.countdown ?? 0]}
-    />
-    <p className="text-sm text-muted-foreground">
-      {initialData.config.countdown ?? 0}s {(initialData.config.countdown ?? 0) === 0 && "(no countdown)"}
-    </p>
-
-    <Label htmlFor="overlayFrame">Overlay Frame</Label>
-    <div className="flex items-center gap-2">
-      {initialData.config.overlayFramePath && (
-        <img
-          src={initialData.config.overlayFramePath}
-          alt="Overlay preview"
-          className="w-16 h-16 object-contain border rounded"
-        />
-      )}
-      <Button type="button" onClick={handleUploadOverlay}>
-        {initialData.config.overlayFramePath ? "Change Frame" : "Upload Frame"}
-      </Button>
-      {initialData.config.overlayFramePath && (
-        <Button
-          type="button"
-          variant="ghost"
-          onClick={handleRemoveOverlay}
-        >
-          Remove
-        </Button>
-      )}
-    </div>
-  </section>
-
-  {/* AI Configuration Section */}
-  <section>
-    <h3>AI Transformation</h3>
-
-    <div className="flex items-center gap-2">
-      <Switch
-        id="aiEnabled"
-        name="aiConfig.enabled"
-        defaultChecked={initialData.aiConfig.enabled}
-      />
-      <Label htmlFor="aiEnabled">Enable AI Transformation</Label>
-    </div>
-
-    {initialData.aiConfig.enabled && (
-      <>
-        <Label htmlFor="aiModel">AI Model</Label>
-        <Select
-          name="aiConfig.model"
-          defaultValue={initialData.aiConfig.model ?? "flux-schnell"}
-        >
-          <SelectItem value="flux-schnell">Flux Schnell</SelectItem>
-          <SelectItem value="flux-dev">Flux Dev</SelectItem>
-          <SelectItem value="stable-diffusion-xl">Stable Diffusion XL</SelectItem>
-        </Select>
-
-        <Label htmlFor="aiPrompt">Transformation Prompt</Label>
-        <Textarea
-          id="aiPrompt"
-          name="aiConfig.prompt"
-          defaultValue={initialData.aiConfig.prompt}
-          placeholder="e.g., Transform into vintage polaroid style"
-          maxLength={600}
-        />
-
-        <Label htmlFor="aspectRatio">Aspect Ratio</Label>
-        <Select
-          name="aiConfig.aspectRatio"
-          defaultValue={initialData.aiConfig.aspectRatio}
-        >
-          <SelectItem value="1:1">1:1 (Square)</SelectItem>
-          <SelectItem value="3:4">3:4 (Portrait)</SelectItem>
-          <SelectItem value="4:5">4:5 (Instagram)</SelectItem>
-          <SelectItem value="9:16">9:16 (Stories)</SelectItem>
-          <SelectItem value="16:9">16:9 (Landscape)</SelectItem>
-        </Select>
-
-        <Label>Reference Images</Label>
-        <div className="grid grid-cols-3 gap-2">
-          {initialData.aiConfig.referenceImagePaths?.map((path, index) => (
-            <div key={index} className="relative">
-              <img src={path} alt={`Reference ${index + 1}`} className="w-full aspect-square object-cover rounded" />
-              <Button
-                type="button"
-                variant="destructive"
-                size="icon"
-                className="absolute top-1 right-1"
-                onClick={() => handleRemoveReference(index)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          ))}
-          {(!initialData.aiConfig.referenceImagePaths || initialData.aiConfig.referenceImagePaths.length < 5) && (
-            <Button
-              type="button"
-              variant="outline"
-              className="aspect-square"
-              onClick={handleUploadReference}
-            >
-              + Add Reference
-            </Button>
-          )}
-        </div>
-      </>
-    )}
-  </section>
-
-  {/* Actions */}
-  <div className="flex justify-end gap-2">
-    <Button type="button" variant="outline" onClick={() => router.back()}>
-      Cancel
-    </Button>
-    <Button type="submit" disabled={isSubmitting}>
-      {isSubmitting ? "Saving..." : "Save Changes"}
-    </Button>
-  </div>
-</form>
-```
-
-### Behavior
-
-1. **Form Initialization**:
-   - Reads from `initialData.config.countdown` (NOT flat `countdownSeconds`)
-   - Reads from `initialData.aiConfig.enabled` (NOT flat `aiEnabled`)
-   - Displays all fields with current values
-
-2. **Form Submission**:
-   - Client-side validation with Zod
-   - Call `updatePhotoExperienceAction(eventId, experienceId, formData)`
-   - On success: show success toast, call `onSave()`
-   - On error: display error toast, preserve form state
-
-3. **Partial Updates**:
-   - Only modified fields are sent to server
-   - Nested updates (e.g., `config.countdown`) merge with existing `config` object
-   - Server handles merging logic
-
-4. **Migration Handling** (FR-006, FR-007, FR-008):
-   - Component reads from new schema fields (`config`, `aiConfig`)
-   - If `initialData` has legacy flat fields, they are ignored (server migrates on save)
-   - All writes go to new schema structure
-
-5. **Mobile Responsiveness** (MFR-001, MFR-003):
-   - Form inputs ≥14px text
-   - Touch-friendly controls (Switch ≥44px, Slider thumb ≥44px)
-   - Stacked layout on mobile (<768px), two-column on desktop
-
-### Acceptance Criteria
-
-- **FR-006**: Reads settings from `config.*` and `aiConfig.*`
-- **FR-007**: Writes all settings to `config` and `aiConfig` objects
-- **US2-AC1**: Changing countdown updates only `config.countdown`
-- **US2-AC2**: Updating AI prompt updates `aiConfig.prompt` and preserves other properties
-- **US2-AC3**: Saving a legacy experience migrates to new schema
-- **MFR-001**: Form works on mobile (320px-768px)
-- **MFR-003**: Form inputs ≥14px text, appropriately sized
-
----
-
-## Preview Image Upload Component
-
-### Component Signature
-
-```typescript
-type PreviewImageUploadProps = {
-  eventId: string;
-  experienceId: string;
-  currentPreviewPath?: string;
-  onUploadSuccess: (publicUrl: string) => void;
-};
-
-function PreviewImageUpload(props: PreviewImageUploadProps): JSX.Element;
-```
-
-### Props
-
-| Prop | Type | Required | Description |
-|------|------|----------|-------------|
-| `eventId` | `string` | Yes | Parent event ID |
-| `experienceId` | `string` | Yes | Experience document ID |
-| `currentPreviewPath` | `string` | No | Current preview image URL (if exists) |
-| `onUploadSuccess` | `(publicUrl: string) => void` | Yes | Callback with uploaded image URL |
-
-### UI Structure
-
-```tsx
-<div className="space-y-2">
-  <Label>Preview Image</Label>
-
-  {currentPreviewPath ? (
-    <div className="relative">
-      <img
-        src={currentPreviewPath}
-        alt="Experience preview"
-        className="w-full max-w-sm aspect-video object-cover rounded border"
-      />
-      <Button
-        type="button"
-        variant="destructive"
-        size="sm"
-        className="absolute top-2 right-2"
-        onClick={handleRemovePreview}
-      >
-        Remove
-      </Button>
-    </div>
-  ) : (
-    <div
-      className="border-2 border-dashed rounded p-8 text-center cursor-pointer hover:bg-muted/50"
-      onClick={() => fileInputRef.current?.click()}
-    >
-      <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
-      <p className="mt-2 text-sm text-muted-foreground">
-        Click to upload preview image
-      </p>
-      <p className="text-xs text-muted-foreground">
-        PNG, JPG, GIF up to 10MB
-      </p>
-    </div>
-  )}
-
-  <input
-    ref={fileInputRef}
-    type="file"
-    accept="image/jpeg,image/png,image/gif"
-    className="hidden"
-    onChange={handleFileChange}
-  />
-</div>
-```
-
-### Behavior
-
-1. **File Selection**:
-   - Click upload area or "Change" button to open file picker
-   - Validate file type (image/jpeg, image/png, image/gif) and size (<10MB)
-   - Show validation error if invalid
-
-2. **Upload Process**:
-   - Call `uploadPreviewMediaAction(eventId, experienceId, file)`
-   - Show loading spinner during upload
-   - On success: call `onUploadSuccess(publicUrl)` to update parent form
-   - On error: show error toast
-
-3. **Remove Preview**:
-   - Call `onUploadSuccess(undefined)` to clear preview
-   - Update experience document with `previewPath: undefined`
-
-### Acceptance Criteria
-
-- Upload validates file type and size
-- Public URL returned from server is stored in Firestore
-- Preview image displays immediately after upload (no page refresh)
-
----
-
-## Common UI Patterns
-
-### Error Display
-
-All forms use consistent error handling:
-
-```tsx
-{error && (
-  <Alert variant="destructive">
-    <AlertCircle className="h-4 w-4" />
-    <AlertTitle>Error</AlertTitle>
-    <AlertDescription>{error.message}</AlertDescription>
-  </Alert>
-)}
-```
-
-### Loading States
-
-All forms show loading indicators during async operations:
-
-```tsx
-<Button type="submit" disabled={isSubmitting}>
-  {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-  {isSubmitting ? "Saving..." : "Save Changes"}
-</Button>
-```
-
-### Success Feedback
-
-All successful mutations show toast notifications:
-
-```tsx
-import { toast } from "sonner";
-
-toast.success("Experience created successfully");
-toast.error("Failed to update experience");
-```
-
----
-
-## Responsive Design Requirements
-
-### Mobile (320px - 768px)
-
-- **Layout**: Single column, stacked form fields
-- **Touch Targets**: All interactive elements ≥44x44px
-- **Typography**: Body text ≥14px, labels ≥12px
-- **Spacing**: Generous padding (16px-24px) between sections
-- **Buttons**: Full-width on mobile
-
-### Tablet (768px - 1024px)
-
-- **Layout**: Two-column grid for related fields
-- **Touch Targets**: Same as mobile (≥44x44px)
-- **Typography**: Same as mobile
-- **Buttons**: Fixed width (not full-width)
-
-### Desktop (1024px+)
-
-- **Layout**: Two or three columns where appropriate
-- **Touch Targets**: Can be smaller (≥32px acceptable)
-- **Typography**: Body text 16px, labels 14px
-- **Buttons**: Fixed width with min-width constraint
-
----
-
-## Accessibility Requirements
-
-All components must meet WCAG AA standards:
-
-- **Keyboard Navigation**: All interactive elements accessible via keyboard
-- **Focus Indicators**: Visible focus rings on all focusable elements
-- **Labels**: All inputs have associated `<Label>` elements
-- **Error Messages**: Use `aria-invalid` and `aria-describedby` for validation errors
-- **Color Contrast**: Minimum 4.5:1 ratio for text, 3:1 for UI elements
-- **Screen Reader**: Semantic HTML (`<form>`, `<fieldset>`, `<legend>`)
-
----
-
-## Testing Contract
-
-Each component must have tests covering:
-
-1. **Rendering**: Component renders with default props
-2. **Form Submission**: Valid input triggers correct Server Action
-3. **Validation**: Invalid input shows validation errors
-4. **Loading States**: Loading indicators appear during async operations
-5. **Error Handling**: Server errors display error messages
-6. **Accessibility**: Keyboard navigation, focus management, ARIA attributes
-
-### Example Test (React Testing Library)
-
-```typescript
-import { render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { CreateExperienceDialog } from "./create-experience-dialog";
-
-describe("CreateExperienceDialog", () => {
-  it("should disable non-photo experience types", () => {
-    render(
-      <CreateExperienceDialog
-        eventId="evt_123"
-        open={true}
-        onOpenChange={jest.fn()}
-      />
-    );
-
-    const videoOption = screen.getByRole("option", { name: /video experience/i });
-    expect(videoOption).toBeDisabled();
-    expect(screen.getByText("Coming Soon")).toBeInTheDocument();
+describe("ExperienceEditor - Schema Migration", () => {
+  it("reads countdown from config.countdown when available", () => {
+    const experience = {
+      config: { countdown: 5 },
+      // Legacy fields should be ignored
+      countdownSeconds: 3,
+    };
+
+    render(<ExperienceEditor experience={experience} onSave={jest.fn()} />);
+
+    // Should display 5 (from config), not 3 (from legacy)
+    expect(screen.getByText("5s")).toBeInTheDocument();
   });
 
-  it("should create photo experience with default config", async () => {
-    const user = userEvent.setup();
-    const onSuccess = jest.fn();
+  it("falls back to legacy countdownSeconds if config.countdown is missing", () => {
+    const experience = {
+      // No config object
+      countdownSeconds: 3,
+    };
 
-    render(
-      <CreateExperienceDialog
-        eventId="evt_123"
-        open={true}
-        onOpenChange={jest.fn()}
-        onSuccess={onSuccess}
-      />
-    );
+    render(<ExperienceEditor experience={experience} onSave={jest.fn()} />);
 
-    await user.type(screen.getByLabelText(/experience name/i), "Test Booth");
-    await user.click(screen.getByRole("button", { name: /create experience/i }));
+    expect(screen.getByText("3s")).toBeInTheDocument();
+  });
+
+  it("writes to nested config structure on save", async () => {
+    const onSave = jest.fn();
+    const experience = {
+      config: { countdown: 3 },
+      aiConfig: { enabled: false, aspectRatio: "1:1" },
+    };
+
+    render(<ExperienceEditor experience={experience} onSave={onSave} />);
+
+    // Change countdown to 5
+    await user.click(screen.getByLabelText(/countdown/i));
+    await user.keyboard("{ArrowRight}{ArrowRight}"); // Increment slider
+
+    await user.click(screen.getByText("Save Changes"));
 
     await waitFor(() => {
-      expect(onSuccess).toHaveBeenCalledWith(expect.stringMatching(/^exp_/));
+      expect(onSave).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          config: expect.objectContaining({ countdown: 5 }),
+        })
+      );
     });
+  });
+
+  it("reads AI settings from aiConfig when available", () => {
+    const experience = {
+      aiConfig: { enabled: true, model: "flux-dev", prompt: "Test prompt" },
+      // Legacy fields should be ignored
+      aiEnabled: false,
+      aiModel: "nanobanana",
+    };
+
+    render(<ExperienceEditor experience={experience} onSave={jest.fn()} />);
+
+    // Should use values from aiConfig
+    expect(screen.getByDisplayValue("Test prompt")).toBeInTheDocument();
+    expect(screen.getByText("Flux Dev")).toBeInTheDocument();
+  });
+
+  it("falls back to legacy AI fields if aiConfig is missing", () => {
+    const experience = {
+      // No aiConfig object
+      aiEnabled: true,
+      aiPrompt: "Legacy prompt",
+    };
+
+    render(<ExperienceEditor experience={experience} onSave={jest.fn()} />);
+
+    expect(screen.getByDisplayValue("Legacy prompt")).toBeInTheDocument();
   });
 });
 ```
+
+### 2. Server Actions Tests
+
+**Required Test Cases**:
+
+```typescript
+describe("createExperience - Server Action", () => {
+  it("creates experience with new schema structure", async () => {
+    const result = await createExperience("event_123", {
+      label: "Test Experience",
+      type: "photo",
+    });
+
+    expect(result.success).toBe(true);
+
+    const doc = await getDoc(doc(db, `events/event_123/experiences/${result.data.id}`));
+    const data = doc.data();
+
+    expect(data).toMatchObject({
+      type: "photo",
+      config: { countdown: 0 },
+      aiConfig: { enabled: false, aspectRatio: "1:1" },
+    });
+  });
+});
+
+describe("updateExperienceAction - Server Action", () => {
+  it("migrates legacy flat fields to new schema on save", async () => {
+    // Create a legacy experience
+    const legacyDoc = await addDoc(collection(db, "events/event_123/experiences"), {
+      label: "Legacy Experience",
+      countdownEnabled: true,
+      countdownSeconds: 3,
+      aiEnabled: true,
+      aiPrompt: "Old prompt",
+    });
+
+    // Update via action (triggers migration)
+    await updateExperienceAction("event_123", legacyDoc.id, {
+      label: "Updated Experience",
+    });
+
+    const updated = await getDoc(legacyDoc);
+    const data = updated.data();
+
+    // Should have new schema
+    expect(data.config).toEqual({ countdown: 3 });
+    expect(data.aiConfig).toMatchObject({
+      enabled: true,
+      prompt: "Old prompt",
+      aspectRatio: "1:1",
+    });
+
+    // Legacy fields should be removed
+    expect(data.countdownEnabled).toBeUndefined();
+    expect(data.countdownSeconds).toBeUndefined();
+    expect(data.aiEnabled).toBeUndefined();
+    expect(data.aiPrompt).toBeUndefined();
+  });
+});
+```
+
+---
+
+## Migration Testing Strategy
+
+### Integration Test Scenarios
+
+1. **Fresh Install Path**: Create new experience → verify new schema
+2. **Legacy Migration Path**: Load legacy experience → edit → save → verify migration
+3. **Mixed State Path**: Experience with both old and new fields → verify new fields take precedence
+4. **Partial Migration Path**: Update one field → verify entire document migrates
+
+### Manual Testing Checklist
+
+- [ ] Create new photo experience → verify Firestore document has `config` and `aiConfig`
+- [ ] Load legacy experience in editor → verify UI displays correct values
+- [ ] Edit legacy experience → save → verify Firestore document now has new schema
+- [ ] Verify countdown: 0 = disabled, >0 = enabled
+- [ ] Verify AI settings migrate correctly (enabled, model, prompt, references, aspect ratio)
+- [ ] Verify overlay frame path migrates correctly
+- [ ] Verify deprecated fields are removed after migration
 
 ---
 

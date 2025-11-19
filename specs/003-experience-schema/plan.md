@@ -4,6 +4,40 @@
 **Input**: Feature specification from `/specs/003-experience-schema/spec.md`
 
 **Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/commands/plan.md` for the execution workflow.
+**Status**: UI Components Contract Reassessed (2025-11-19)
+
+## Reassessment Summary
+
+**Key Finding**: The initial UI components contract proposed creating entirely new components (CreateExperienceDialog, ExperienceBuilderForm, etc.), but analysis of the existing codebase revealed we already have well-implemented components that handle all required functionality:
+
+### Existing Components (Already Production-Ready)
+
+- **ExperienceTypeSelector** - Already implements type selection with "Coming Soon" badges, touch-friendly design, mobile-responsive ✅
+- **CreateExperienceForm** - Full-featured inline form with React Hook Form + Zod validation ✅
+- **ExperienceEditor** - Comprehensive editor for photo experience settings ✅
+- **ExperienceEditorWrapper** - Server Action integration wrapper ✅
+
+### Revised Approach
+
+Instead of building new components from scratch, we will:
+
+1. **Modify ExperienceEditor** (lines 49-90):
+
+   - Update state initialization to read from `config.*` and `aiConfig.*` with fallback to legacy flat fields
+   - Update handleSave to write to new nested structure (`config`, `aiConfig`)
+   - Maintain backward compatibility during migration
+
+2. **Verify Server Actions**:
+
+   - `createExperience` - Ensure it writes new schema (`config: {countdown: 0}`, `aiConfig: {enabled: false, aspectRatio: "1:1"}`)
+   - `updateExperienceAction` - Implement migration logic to move flat fields into nested structure
+
+3. **No Changes Needed**:
+   - ExperienceTypeSelector - Already compliant
+   - CreateExperienceForm - Already compliant (Server Action needs update, not component)
+   - ExperienceEditorWrapper - Already compliant (Server Action needs update, not component)
+
+**Impact**: This reduces implementation scope by ~60%. Instead of building 3 new components + tests, we're modifying 1 component's state management and updating 2 Server Actions. See [contracts/ui-components.md](./contracts/ui-components.md) for detailed changes.
 
 ## Summary
 
@@ -38,6 +72,7 @@ Verify compliance with Clementine Constitution (`.specify/memory/constitution.md
 **Complexity Violations**: None. This is a data model refactoring using standard TypeScript discriminated unions. Migration logic is a one-time function, not a permanent abstraction layer.
 
 **Post-Design Re-evaluation** (2025-11-19): After completing Phase 0 (Research) and Phase 1 (Design), all constitution principles remain satisfied:
+
 - Data model uses standard TypeScript patterns (discriminated unions)
 - Server Actions follow established Firebase hybrid architecture
 - UI components maintain mobile-first responsive design
