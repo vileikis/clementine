@@ -14,7 +14,6 @@ const sessionStateSchema = z.enum([
 export const sessionSchema = z.object({
   id: z.string(),
   eventId: z.string(),
-  sceneId: z.string(),
   state: sessionStateSchema,
   inputImagePath: z.string().optional(),
   resultImagePath: z.string().optional(),

@@ -1,87 +1,104 @@
-"use client"
+"use client";
 
-import { Camera, Video, Image as ImageIcon, Repeat } from "lucide-react"
-import { cn } from "@/lib/utils"
-import type { CaptureMode } from "@/features/events"
+/**
+ * ExperienceTypeSelector - Reusable component for selecting experience type
+ * Repurposed from legacy ModeSelector component
+ *
+ * Used in CreateExperienceForm for inline experience creation
+ */
 
-interface ModeSelectorProps {
-  currentMode: CaptureMode
-  eventId: string
-  sceneId: string
+import { cn } from "@/lib/utils";
+import type { ExperienceType } from "@/features/experiences/types/experience.types";
+
+interface ExperienceTypeOption {
+  type: ExperienceType;
+  label: string;
+  description: string;
+  icon: string;
+  available: boolean;
 }
 
-const modes = [
+const EXPERIENCE_TYPES: ExperienceTypeOption[] = [
   {
-    value: "photo" as const,
+    type: "photo",
     label: "Photo",
-    icon: Camera,
-    enabled: true,
-    description: "Single photo capture",
+    description: "Capture a single photo with optional AI transformation",
+    icon: "📷",
+    available: true,
   },
   {
-    value: "video" as const,
+    type: "video",
     label: "Video",
-    icon: Video,
-    enabled: false,
-    description: "Short video recording",
+    description: "Record a short video clip",
+    icon: "🎥",
+    available: false,
   },
   {
-    value: "gif" as const,
+    type: "gif",
     label: "GIF",
-    icon: ImageIcon,
-    enabled: false,
-    description: "Animated GIF",
+    description: "Create an animated GIF from multiple frames",
+    icon: "🎞️",
+    available: false,
   },
   {
-    value: "boomerang" as const,
-    label: "Boomerang",
-    icon: Repeat,
-    enabled: false,
-    description: "Loop video effect",
+    type: "wheel",
+    label: "Wheel",
+    description: "Spin a wheel to select from multiple experiences",
+    icon: "🎡",
+    available: false,
   },
-]
+];
 
-export function ModeSelector({
-  currentMode,
-}: ModeSelectorProps) {
+interface ExperienceTypeSelectorProps {
+  selectedType: ExperienceType;
+  onSelect: (type: ExperienceType) => void;
+}
+
+export function ExperienceTypeSelector({
+  selectedType,
+  onSelect,
+}: ExperienceTypeSelectorProps) {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      {modes.map((mode) => {
-        const Icon = mode.icon
-        const isActive = currentMode === mode.value
-        const isDisabled = !mode.enabled
-
-        return (
-          <button
-            key={mode.value}
-            disabled={isDisabled}
-            className={cn(
-              "relative flex flex-col items-center gap-3 p-6 rounded-lg border-2 transition-all",
-              isActive && mode.enabled
-                ? "border-foreground bg-accent"
-                : "border-border bg-background",
-              !isDisabled && !isActive && "hover:border-muted-foreground",
-              isDisabled && "opacity-50 cursor-not-allowed"
-            )}
-          >
-            <Icon className="w-8 h-8" />
-            <div className="text-center">
-              <div className="font-medium">{mode.label}</div>
-              <div className="text-xs text-muted-foreground mt-1">
-                {mode.description}
-              </div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+      {EXPERIENCE_TYPES.map((option) => (
+        <button
+          key={option.type}
+          type="button"
+          disabled={!option.available}
+          onClick={() => option.available && onSelect(option.type)}
+          className={cn(
+            "relative flex flex-col items-start gap-2 rounded-lg border-2 p-4 transition-all",
+            "min-h-[120px] min-w-0",
+            "hover:border-primary/50",
+            "disabled:cursor-not-allowed disabled:opacity-60",
+            selectedType === option.type && option.available
+              ? "border-primary bg-primary/5"
+              : "border-border"
+          )}
+          aria-pressed={selectedType === option.type}
+          aria-label={`${option.label} experience type${!option.available ? " (coming soon)" : ""}`}
+        >
+          {/* Coming Soon Badge */}
+          {!option.available && (
+            <div className="absolute top-2 right-2 rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+              Coming Soon
             </div>
-            {isDisabled && (
-              <span className="absolute top-2 right-2 text-xs px-2 py-1 bg-muted rounded">
-                Coming Soon
-              </span>
-            )}
-            {isActive && (
-              <div className="absolute top-2 left-2 w-2 h-2 bg-foreground rounded-full" />
-            )}
-          </button>
-        )
-      })}
+          )}
+
+          {/* Icon */}
+          <div className="text-3xl" aria-hidden="true">
+            {option.icon}
+          </div>
+
+          {/* Label */}
+          <div className="flex-1 text-left">
+            <h3 className="font-semibold text-sm">{option.label}</h3>
+            <p className="text-xs text-muted-foreground mt-1">
+              {option.description}
+            </p>
+          </div>
+        </button>
+      ))}
     </div>
-  )
+  );
 }

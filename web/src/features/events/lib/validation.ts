@@ -21,7 +21,6 @@ export const eventSchema = z.object({
   brandColor: z.string().regex(/^#[0-9A-F]{6}$/i),
   showTitleOverlay: z.boolean(),
   status: eventStatusSchema,
-  currentSceneId: z.string(),
   companyId: z.string().nullable().default(null),
   joinPath: z.string(),
   qrPngPath: z.string(),

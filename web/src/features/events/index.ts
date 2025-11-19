@@ -75,7 +75,6 @@ export {
 // directly when needed in server-only files:
 //
 // import { createEvent, getEvent, listEvents } from "@/features/events/repositories/events"
-// import { updateScene, getScene } from "@/features/events/repositories/scenes"
 //
 // DO NOT add repository exports here - they will cause build errors when
 // client components try to import them!

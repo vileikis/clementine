@@ -6,7 +6,6 @@ export type SessionState = "created" | "captured" | "transforming" | "ready" | "
 export interface Session {
   id: string;
   eventId: string; // denormalized for convenience
-  sceneId: string; // snapshot pointer
 
   state: SessionState;
 
