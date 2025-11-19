@@ -20,12 +20,10 @@ export { EventBreadcrumb } from "./components/studio/EventBreadcrumb";
 // ============================================================================
 // Designer Components (Event builder UI)
 // ============================================================================
-export { BuilderSidebar } from "./components/designer/BuilderSidebar";
 export { DesignSidebar } from "./components/designer/DesignSidebar";
 export { WelcomeEditor } from "./components/designer/WelcomeEditor";
 export { EndingEditor } from "./components/designer/EndingEditor";
 export { PreviewPanel } from "./components/designer/PreviewPanel";
-export { BuilderContent } from "./components/designer/BuilderContent";
 
 // ============================================================================
 // Shared Components (Used across studio & designer)
