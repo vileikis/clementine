@@ -2,7 +2,6 @@
 
 interface GreetingScreenProps {
   eventTitle: string
-  showTitleOverlay: boolean
   onGetStarted: () => void
 }
 
@@ -12,16 +11,13 @@ interface GreetingScreenProps {
  */
 export function GreetingScreen({
   eventTitle,
-  showTitleOverlay,
   onGetStarted,
 }: GreetingScreenProps) {
   return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-background">
       <div className="max-w-md w-full text-center space-y-8">
         {/* Event Title */}
-        {showTitleOverlay && (
-          <h1 className="text-4xl font-bold text-foreground">{eventTitle}</h1>
-        )}
+        <h1 className="text-4xl font-bold text-foreground">{eventTitle}</h1>
 
         {/* Brand Circle */}
         <div className="flex justify-center">
