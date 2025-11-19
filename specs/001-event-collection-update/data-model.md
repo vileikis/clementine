@@ -103,11 +103,17 @@ Welcome screen configuration shown to guests when they first join an event.
 
 | Field | Type | Required | Description | Validation |
 |-------|------|----------|-------------|------------|
-| `title` | `string` | No | Welcome screen headline | Max 500 characters |
-| `body` | `string` | No | Welcome screen description/body text | Max 500 characters |
-| `ctaLabel` | `string` | No | Welcome screen CTA button label | Max 50 characters |
-| `backgroundImage` | `string` | No | Welcome screen background image (full public URL) | Valid URL |
-| `backgroundColor` | `string` | No | Welcome screen background color | Hex color (e.g., "#FFFFFF") |
+| `title` | `string \| null` | Yes | Welcome screen headline, null = no title | Max 500 characters, nullable |
+| `body` | `string \| null` | Yes | Welcome screen description/body text, null = no body | Max 500 characters, nullable |
+| `ctaLabel` | `string \| null` | Yes | Welcome screen CTA button label, null = no CTA | Max 50 characters, nullable |
+| `backgroundImage` | `string \| null` | Yes | Welcome screen background image (full public URL), null = no image | Valid URL, nullable |
+| `backgroundColor` | `string \| null` | Yes | Welcome screen background color, null = no color | Hex color (e.g., "#FFFFFF"), nullable |
+
+**Data Model Notes**:
+- All fields are **explicitly nullable** - `null` indicates "no value set" (different from empty string or undefined)
+- Empty strings from forms are **converted to `null`** via Zod preprocessing before validation
+- TypeScript types use `string | null` (not `string | undefined` or optional `?`)
+- Server actions accept `null` values and write them to Firestore to clear fields
 
 **Example**:
 ```json
@@ -122,6 +128,19 @@ Welcome screen configuration shown to guests when they first join an event.
 }
 ```
 
+**Example (cleared fields)**:
+```json
+{
+  "welcome": {
+    "title": null,
+    "body": null,
+    "ctaLabel": null,
+    "backgroundColor": null,
+    "backgroundImage": null
+  }
+}
+```
+
 ---
 
 ### EventEnding (Nested Object)
@@ -132,10 +151,17 @@ Ending screen configuration shown to guests after completing an experience.
 
 | Field | Type | Required | Description | Validation |
 |-------|------|----------|-------------|------------|
-| `title` | `string` | No | Ending screen headline | Max 500 characters |
-| `body` | `string` | No | Ending screen body text | Max 500 characters |
-| `ctaLabel` | `string` | No | Ending screen CTA button label | Max 50 characters |
-| `ctaUrl` | `string` | No | Ending screen CTA button destination URL | Valid URL |
+| `title` | `string \| null` | Yes | Ending screen headline, null = no title | Max 500 characters, nullable |
+| `body` | `string \| null` | Yes | Ending screen body text, null = no body | Max 500 characters, nullable |
+| `ctaLabel` | `string \| null` | Yes | Ending screen CTA button label, null = no CTA | Max 50 characters, nullable |
+| `ctaUrl` | `string \| null` | Yes | Ending screen CTA button destination URL, null = no URL | Valid URL (http/https), nullable |
+
+**Data Model Notes**:
+- All fields are **explicitly nullable** - `null` indicates "no value set" (different from empty string or undefined)
+- Empty strings from forms are **converted to `null`** via Zod preprocessing before validation
+- TypeScript types use `string | null` (not `string | undefined` or optional `?`)
+- Server actions accept `null` values and write them to Firestore to clear fields
+- **Client-side URL validation**: `ctaUrl` field has real-time validation to prevent invalid URLs
 
 **Example**:
 ```json
@@ -145,6 +171,18 @@ Ending screen configuration shown to guests after completing an experience.
     "body": "Visit our website to learn more about our products.",
     "ctaLabel": "Visit Website",
     "ctaUrl": "https://example.com"
+  }
+}
+```
+
+**Example (cleared fields)**:
+```json
+{
+  "ending": {
+    "title": null,
+    "body": null,
+    "ctaLabel": null,
+    "ctaUrl": null
   }
 }
 ```
@@ -263,24 +301,72 @@ export const eventThemeSchema = z.object({
 });
 ```
 
-**EventWelcome Schema**:
+**EventWelcome Schema** (Read from Database):
 ```typescript
 export const eventWelcomeSchema = z.object({
-  title: z.string().max(500).optional(),
-  body: z.string().max(500).optional(),
-  ctaLabel: z.string().max(50).optional(),
-  backgroundImage: z.string().url().optional(),
-  backgroundColor: z.string().regex(/^#[0-9A-F]{6}$/i).optional(),
+  title: z.string().max(500).nullable(),
+  body: z.string().max(500).nullable(),
+  ctaLabel: z.string().max(50).nullable(),
+  backgroundImage: z.string().url().nullable(),
+  backgroundColor: z.string().regex(/^#[0-9A-F]{6}$/i).nullable(),
 });
 ```
 
-**EventEnding Schema**:
+**EventWelcome Update Schema** (Server Actions):
+```typescript
+export const updateEventWelcomeSchema = z.object({
+  title: z.preprocess(
+    val => val === "" ? null : val,
+    z.string().max(500).nullable().optional()
+  ),
+  body: z.preprocess(
+    val => val === "" ? null : val,
+    z.string().max(500).nullable().optional()
+  ),
+  ctaLabel: z.preprocess(
+    val => val === "" ? null : val,
+    z.string().max(50).nullable().optional()
+  ),
+  backgroundImage: z.preprocess(
+    val => val === "" ? null : val,
+    z.string().url().nullable().optional()
+  ),
+  backgroundColor: z.preprocess(
+    val => val === "" ? null : val,
+    z.string().regex(/^#[0-9A-F]{6}$/i).nullable().optional()
+  ),
+});
+```
+
+**EventEnding Schema** (Read from Database):
 ```typescript
 export const eventEndingSchema = z.object({
-  title: z.string().max(500).optional(),
-  body: z.string().max(500).optional(),
-  ctaLabel: z.string().max(50).optional(),
-  ctaUrl: z.string().url().optional(),
+  title: z.string().max(500).nullable(),
+  body: z.string().max(500).nullable(),
+  ctaLabel: z.string().max(50).nullable(),
+  ctaUrl: z.string().url().nullable(),
+});
+```
+
+**EventEnding Update Schema** (Server Actions):
+```typescript
+export const updateEventEndingSchema = z.object({
+  title: z.preprocess(
+    val => val === "" ? null : val,
+    z.string().max(500).nullable().optional()
+  ),
+  body: z.preprocess(
+    val => val === "" ? null : val,
+    z.string().max(500).nullable().optional()
+  ),
+  ctaLabel: z.preprocess(
+    val => val === "" ? null : val,
+    z.string().max(50).nullable().optional()
+  ),
+  ctaUrl: z.preprocess(
+    val => val === "" ? null : val,
+    z.string().url().nullable().optional()
+  ),
 });
 ```
 
@@ -421,12 +507,93 @@ function WelcomeEditor({ event }: { event: Event }) {
 
 ---
 
+---
+
+## Nullable Approach Implementation
+
+### Why Nullable Instead of Optional?
+
+All fields in `EventWelcome` and `EventEnding` use **explicit nullable types** (`string | null`) instead of optional fields (`string | undefined`):
+
+**Benefits**:
+1. **Semantic clarity**: `null` explicitly means "no value set", not "uninitialized"
+2. **Can clear fields**: Users can intentionally remove values by setting to `null`
+3. **Firestore-friendly**: Firestore handles `null` naturally
+4. **Type safety**: TypeScript enforces null checks with `??` operator
+5. **No ambiguity**: Distinguishes between "field not set" vs "field cleared"
+
+### Empty String Handling
+
+Forms submit empty strings (`""`) when fields are cleared. These are converted to `null` using Zod preprocessing:
+
+```typescript
+z.preprocess(
+  val => val === "" ? null : val,  // Transform empty string to null
+  z.string().url().nullable().optional()  // Then validate
+)
+```
+
+**Flow**:
+1. User clears field → empty string `""`
+2. Form submits → `{ title: "" }`
+3. Zod preprocesses → `{ title: null }`
+4. Server writes → `welcome.title: null` in Firestore
+5. On read → `null ?? ""` displays as empty in form
+
+### Client-Side Validation
+
+URL fields (`backgroundImage`, `ctaUrl`) have real-time client-side validation:
+
+```typescript
+const isValidUrl = (urlString: string): boolean => {
+  if (!urlString) return true; // Empty is valid (will be set to null)
+  try {
+    const url = new URL(urlString);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+};
+```
+
+**Features**:
+- Validates as user types
+- Shows error message in red text
+- Disables save button when invalid
+- Prevents submitting bad URLs to server
+
+### TypeScript Pattern
+
+```typescript
+// Type definition
+export interface EventWelcome {
+  title: string | null;          // Explicitly nullable
+  body: string | null;
+  ctaLabel: string | null;
+  backgroundImage: string | null;
+  backgroundColor: string | null;
+}
+
+// Reading from DB
+const [title, setTitle] = useState(event.welcome?.title ?? "");
+
+// Writing to DB
+await updateEventWelcome(event.id, {
+  title: title || null,  // Convert empty string to null
+  body: body || null,
+});
+```
+
+---
+
 ## Summary
 
 This refactored schema provides:
 
 ✅ **Semantic grouping**: Related fields organized into logical objects
 ✅ **Type safety**: Strict Zod schemas + TypeScript types
-✅ **Validation layers**: Zod (Server Actions) + Firestore rules (database)
+✅ **Validation layers**: Zod (Server Actions) + Firestore rules (database) + Client-side validation
 ✅ **No migration risk**: Existing data untouched, natural migration via Event Designer
 ✅ **Developer experience**: Cleaner code, better autocomplete, fewer naming collisions
+✅ **Explicit nullability**: Clear semantics for "no value" vs "uninitialized"
+✅ **Defensive validation**: Empty strings converted to null automatically via preprocessing
