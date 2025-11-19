@@ -22,13 +22,13 @@ export function WelcomeEditor({ event }: WelcomeEditorProps) {
   const router = useRouter();
 
   // Form state - using nested welcome object with optional chaining
+  // Note: null from DB should display as empty string in form
   const [title, setTitle] = useState(event.welcome?.title ?? "");
   const [body, setBody] = useState(event.welcome?.body ?? "");
-  const [ctaLabel, setCtaLabel] = useState(event.welcome?.ctaLabel ?? "Get Started");
+  const [ctaLabel, setCtaLabel] = useState(event.welcome?.ctaLabel ?? "");
   const [backgroundColor, setBackgroundColor] = useState(
-    event.welcome?.backgroundColor ?? "#FFFFFF"
+    event.welcome?.backgroundColor ?? ""
   );
-  // Store the URL directly in the database for easier display
   const [backgroundImage, setBackgroundImage] = useState(
     event.welcome?.backgroundImage ?? ""
   );
@@ -37,11 +37,11 @@ export function WelcomeEditor({ event }: WelcomeEditorProps) {
     if (isPending) return; // Prevent multiple saves
     startTransition(async () => {
       const result = await updateEventWelcome(event.id, {
-        title,
-        body,
-        ctaLabel,
-        backgroundColor,
-        backgroundImage,
+        title: title || null,
+        body: body || null,
+        ctaLabel: ctaLabel || null,
+        backgroundColor: backgroundColor || null,
+        backgroundImage: backgroundImage || null,
       });
 
       if (result.success) {

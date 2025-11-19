@@ -25,11 +25,11 @@ export interface EventTheme {
  * Welcome screen configuration shown to guests when they first join an event
  */
 export interface EventWelcome {
-  title?: string; // Max 500 characters
-  body?: string; // Max 500 characters
-  ctaLabel?: string; // Max 50 characters
-  backgroundImage?: string; // Full public URL
-  backgroundColor?: string; // Hex color (e.g., "#FFFFFF")
+  title: string | null; // Max 500 characters, null = no title
+  body: string | null; // Max 500 characters, null = no body text
+  ctaLabel: string | null; // Max 50 characters, null = no CTA
+  backgroundImage: string | null; // Full public URL, null = no background image
+  backgroundColor: string | null; // Hex color (e.g., "#FFFFFF"), null = no background color
 }
 
 /**
