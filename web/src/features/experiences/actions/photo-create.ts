@@ -17,13 +17,14 @@
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/firebase/admin";
 import { FieldValue } from "firebase-admin/firestore";
-import { verifyAdminSecret } from "@/lib/auth";
 import { z } from "zod";
 import {
   createPhotoExperienceSchema,
   type PhotoExperience
 } from "../lib/schemas";
-import type { ActionResponse } from "../lib/actions";
+import type { ActionResponse } from "./types";
+import { ErrorCodes } from "./types";
+import { checkAuth, validateEventExists, createSuccessResponse, createErrorResponse } from "./utils";
 
 /**
  * Creates a new photo experience for an event.
@@ -38,33 +39,17 @@ export async function createPhotoExperience(
 ): Promise<ActionResponse<PhotoExperience>> {
   try {
     // Check authentication
-    const auth = await verifyAdminSecret();
-    if (!auth.authorized) {
-      return {
-        success: false,
-        error: {
-          code: "PERMISSION_DENIED",
-          message: auth.error,
-        },
-      };
-    }
+    const authError = await checkAuth();
+    if (authError) return authError;
 
     // Validate input with Zod schema
     const validated = createPhotoExperienceSchema.parse(input);
 
     // Check if event exists
-    const eventRef = db.collection("events").doc(eventId);
-    const eventDoc = await eventRef.get();
+    const eventError = await validateEventExists(eventId);
+    if (eventError) return eventError;
 
-    if (!eventDoc.exists) {
-      return {
-        success: false,
-        error: {
-          code: "EVENT_NOT_FOUND",
-          message: `Event with ID ${eventId} not found`,
-        },
-      };
-    }
+    const eventRef = db.collection("events").doc(eventId);
 
     // Create experience document reference
     const experienceRef = eventRef.collection("experiences").doc();
@@ -115,29 +100,20 @@ export async function createPhotoExperience(
     // Revalidate the event page to show new experience
     revalidatePath(`/events/${eventId}`);
 
-    return {
-      success: true,
-      data: photoExperience,
-    };
+    return createSuccessResponse(photoExperience);
   } catch (error) {
     // Handle Zod validation errors
     if (error instanceof z.ZodError) {
-      return {
-        success: false,
-        error: {
-          code: "VALIDATION_ERROR",
-          message: error.issues.map((e) => e.message).join(", "),
-        },
-      };
+      return createErrorResponse(
+        ErrorCodes.VALIDATION_ERROR,
+        error.issues.map((e) => e.message).join(", ")
+      );
     }
 
     // Handle unknown errors
-    return {
-      success: false,
-      error: {
-        code: "UNKNOWN_ERROR",
-        message: error instanceof Error ? error.message : "Unknown error occurred",
-      },
-    };
+    return createErrorResponse(
+      ErrorCodes.UNKNOWN_ERROR,
+      error instanceof Error ? error.message : "Unknown error occurred"
+    );
   }
 }

@@ -9,8 +9,9 @@ import { photoExperienceSchema, type PhotoExperience } from "./schemas";
 
 /**
  * Legacy photo experience fields (pre-migration)
+ * Exported for test purposes
  */
-interface LegacyPhotoExperience {
+export interface LegacyPhotoExperience {
   id: string;
   eventId: string;
   label: string;

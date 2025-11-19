@@ -25,7 +25,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { createPhotoExperienceSchema as createExperienceSchema } from "../../lib/schemas";
-import { createPhotoExperience } from "../../actions";
+import { createPhotoExperience } from "../../actions/photo-create";
 import { ExperienceTypeSelector } from "./ExperienceTypeSelector";
 import type { z } from "zod";
 
