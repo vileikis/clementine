@@ -36,10 +36,10 @@ export interface EventWelcome {
  * Ending screen configuration shown to guests after completing an experience
  */
 export interface EventEnding {
-  title?: string; // Max 500 characters
-  body?: string; // Max 500 characters
-  ctaLabel?: string; // Max 50 characters
-  ctaUrl?: string; // Valid URL
+  title: string | null; // Max 500 characters, null = no title
+  body: string | null; // Max 500 characters, null = no body text
+  ctaLabel: string | null; // Max 50 characters, null = no CTA
+  ctaUrl: string | null; // Valid URL, null = no CTA URL
 }
 
 /**

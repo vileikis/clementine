@@ -51,10 +51,11 @@ export function EndingEditor({ event }: EndingEditorProps) {
   const router = useRouter();
 
   // Form state - ending screen (using nested event.ending object)
-  const [endTitle, setEndTitle] = useState(event.ending?.title || "");
-  const [endBody, setEndBody] = useState(event.ending?.body || "");
-  const [endCtaLabel, setEndCtaLabel] = useState(event.ending?.ctaLabel || "");
-  const [endCtaUrl, setEndCtaUrl] = useState(event.ending?.ctaUrl || "");
+  // Note: null from DB should display as empty string in form
+  const [endTitle, setEndTitle] = useState(event.ending?.title ?? "");
+  const [endBody, setEndBody] = useState(event.ending?.body ?? "");
+  const [endCtaLabel, setEndCtaLabel] = useState(event.ending?.ctaLabel ?? "");
+  const [endCtaUrl, setEndCtaUrl] = useState(event.ending?.ctaUrl ?? "");
 
   // Form state - share configuration (using nested event.share object)
   const [shareAllowDownload, setShareAllowDownload] = useState(event.share?.allowDownload ?? true);
@@ -62,16 +63,47 @@ export function EndingEditor({ event }: EndingEditorProps) {
   const [shareAllowEmail, setShareAllowEmail] = useState(event.share?.allowEmail ?? false);
   const [shareSocials, setShareSocials] = useState<ShareSocial[]>(event.share?.socials || []);
 
+  // URL validation state
+  const [ctaUrlError, setCtaUrlError] = useState<string | null>(null);
+
+  // Helper function to validate URL
+  const isValidUrl = (urlString: string): boolean => {
+    if (!urlString) return true; // Empty is valid (will be set to null)
+    try {
+      const url = new URL(urlString);
+      return url.protocol === "http:" || url.protocol === "https:";
+    } catch {
+      return false;
+    }
+  };
+
+  // Validate ctaUrl
+  const handleCtaUrlChange = (value: string) => {
+    setEndCtaUrl(value);
+    if (value && !isValidUrl(value)) {
+      setCtaUrlError("Please enter a valid URL (starting with http:// or https://)");
+    } else {
+      setCtaUrlError(null);
+    }
+  };
+
   const handleSave = () => {
     if (isPending) return; // Prevent multiple saves
+
+    // Check for validation errors before saving
+    if (ctaUrlError) {
+      toast.error("Please fix validation errors before saving");
+      return;
+    }
+
     startTransition(async () => {
       // Call both Server Actions in parallel
       const [endingResult, shareResult] = await Promise.all([
         updateEventEnding(event.id, {
-          title: endTitle,
-          body: endBody,
-          ctaLabel: endCtaLabel,
-          ctaUrl: endCtaUrl,
+          title: endTitle || null,
+          body: endBody || null,
+          ctaLabel: endCtaLabel || null,
+          ctaUrl: endCtaUrl || null,
         }),
         updateEventShare(event.id, {
           allowDownload: shareAllowDownload,
@@ -180,11 +212,15 @@ export function EndingEditor({ event }: EndingEditorProps) {
                 type="url"
                 placeholder="https://example.com"
                 value={endCtaUrl}
-                onChange={(e) => setEndCtaUrl(e.target.value)}
+                onChange={(e) => handleCtaUrlChange(e.target.value)}
               />
-              <p className="text-xs text-muted-foreground">
-                External link for the button (leave empty for share action)
-              </p>
+              {ctaUrlError ? (
+                <p className="text-sm text-destructive">{ctaUrlError}</p>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  External link for the button (leave empty for share action)
+                </p>
+              )}
             </div>
           </div>
 
@@ -270,7 +306,7 @@ export function EndingEditor({ event }: EndingEditorProps) {
           {/* Save Button */}
           <Button
             onClick={handleSave}
-            disabled={isPending}
+            disabled={isPending || !!ctaUrlError}
             className="w-full"
           >
             {isPending ? "Saving..." : "Save Changes"}
