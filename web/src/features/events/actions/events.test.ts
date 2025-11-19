@@ -9,7 +9,7 @@ import type { Event } from "../types/event.types";
 import type { Company } from "@/features/companies";
 
 // Mock dependencies
-jest.mock("@/lib/repositories/events");
+jest.mock("../repositories/events");
 jest.mock("@/features/companies/repositories/companies");
 jest.mock("@/lib/auth");
 jest.mock("next/cache", () => ({

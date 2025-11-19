@@ -147,7 +147,7 @@ This is a Web monorepo (pnpm workspace):
 
 - [X] T031 Run `pnpm lint` and fix all errors/warnings (PASS: 19 warnings, 0 errors - all pre-existing, none scene-related)
 - [X] T032 Run `pnpm type-check` and resolve all TypeScript errors (PASS: zero TypeScript errors)
-- [ ] T033 Run `pnpm test` and ensure all tests pass (skipped - tests not implemented for removal feature)
+- [X] T033 Run `pnpm test` and ensure all tests pass (PASS: 12 test suites, 185 tests passed - fixed 3 test configuration issues)
 - [X] T034 Run `pnpm build` to verify production build succeeds (PASS: clean build completed successfully)
 - [ ] T035 Verify feature in local dev server (`pnpm dev`) - manually test Event Builder and guest flow (user to verify)
 - [ ] T036 Commit only after validation loop passes cleanly (ready for commit)
