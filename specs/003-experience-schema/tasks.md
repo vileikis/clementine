@@ -143,11 +143,11 @@ import type { ActionResponse } from '@/features/experiences/actions/types';
 
 ### Implementation for User Story 3
 
-- [ ] T030 [US3] Add legacy schema detection logic in updatePhotoExperience (web/src/features/experiences/actions/photo-update.ts)
-- [ ] T031 [US3] Call migratePhotoExperience from lib/migration.ts when legacy fields detected
-- [ ] T032 [US3] Remove deprecated flat fields after migration (countdownEnabled, countdownSeconds, overlayEnabled, aiEnabled, aiModel, aiPrompt, aiReferenceImagePaths, aiAspectRatio)
-- [ ] T033 [US3] Validate migrated document against photoExperienceSchema from lib/schemas.ts before write
-- [ ] T034 [US3] Add error handling for migration failures with MIGRATION_ERROR code
+- [X] T030 [US3] Add legacy schema detection logic in updatePhotoExperience (web/src/features/experiences/actions/photo-update.ts)
+- [X] T031 [US3] Call migratePhotoExperience from lib/migration.ts when legacy fields detected
+- [X] T032 [US3] Remove deprecated flat fields after migration (countdownEnabled, countdownSeconds, overlayEnabled, aiEnabled, aiModel, aiPrompt, aiReferenceImagePaths, aiAspectRatio)
+- [X] T033 [US3] Validate migrated document against photoExperienceSchema from lib/schemas.ts before write
+- [X] T034 [US3] Add error handling for migration failures with MIGRATION_ERROR code
 - [ ] T035 [US3] Test migration with legacy countdown fields (countdownEnabled: true, countdownSeconds: 5) in web/src/features/experiences/lib/migration.test.ts
 - [ ] T036 [P] [US3] Test migration with legacy AI fields (aiEnabled: true, aiPrompt: "test") in web/src/features/experiences/lib/migration.test.ts
 - [ ] T037 [P] [US3] Test migration with mixed old and new fields (new fields take precedence) in web/src/features/experiences/lib/migration.test.ts
@@ -161,9 +161,9 @@ import type { ActionResponse } from '@/features/experiences/actions/types';
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T039 [P] Add error boundary for schema validation failures in experience builder page in web/src/app/events/[eventId]/experiences/[experienceId]/page.tsx
-- [ ] T040 [P] Add loading states for Server Action calls in CreateExperienceForm and ExperienceEditor
-- [ ] T041 [P] Add toast notifications for success/error states in CreateExperienceForm and ExperienceEditor
+- [X] T039 [P] Add error boundary for schema validation failures in experience builder page in web/src/app/events/[eventId]/experiences/[experienceId]/page.tsx
+- [X] T040 [P] Add loading states for Server Action calls in CreateExperienceForm and ExperienceEditor
+- [X] T041 [P] Add toast notifications for success/error states in CreateExperienceForm and ExperienceEditor
 - [ ] T042 Add unit tests for ExperienceEditor state initialization (new vs legacy schema) in web/src/features/experiences/components/shared/ExperienceEditor.test.tsx
 - [ ] T043 [P] Add unit tests for ExperienceEditor handleSave output structure in web/src/features/experiences/components/shared/ExperienceEditor.test.tsx
 - [ ] T044 [P] Add integration test for create experience flow (US1) in web/src/features/experiences/__tests__/create-experience.integration.test.ts
@@ -192,7 +192,7 @@ import type { ActionResponse } from '@/features/experiences/actions/types';
 
 - [X] T058 Run `pnpm lint` from root and fix all errors/warnings
 - [X] T059 Run `pnpm type-check` from root and resolve all TypeScript errors
-- [ ] T060 Run `pnpm test` from root and ensure all tests pass
+- [X] T060 Run `pnpm test` from root and ensure all tests pass
 - [ ] T061 Test create new photo experience in local dev server (`pnpm dev`)
 - [ ] T062 Test edit existing photo experience in local dev server
 - [ ] T063 Test migration of legacy experience (create legacy doc in Firestore, edit, verify migration)
