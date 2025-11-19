@@ -94,14 +94,14 @@ Web monorepo structure (per plan.md):
 
 ### Implementation for User Story 2
 
-- [ ] T032 [US2] Refactor EndingEditor state initialization to use event.ending?.* and event.share.* with optional chaining in web/src/features/events/components/designer/EndingEditor.tsx
-- [ ] T033 [US2] Update EndingEditor form bindings for ending fields (title, body, ctaLabel, ctaUrl) in web/src/features/events/components/designer/EndingEditor.tsx
-- [ ] T034 [US2] Update EndingEditor form bindings for share fields (allowDownload, allowEmail, allowSystemShare, socials) in web/src/features/events/components/designer/EndingEditor.tsx
-- [ ] T035 [US2] Split EndingEditor save logic into two Server Action calls: updateEventEnding and updateEventShare in web/src/features/events/components/designer/EndingEditor.tsx
-- [ ] T036 [US2] Remove all references to flat end* and share* fields in EndingEditor in web/src/features/events/components/designer/EndingEditor.tsx
-- [ ] T037 [US2] Add React Testing Library test for EndingEditor rendering with nested ending/share objects in web/src/features/events/components/designer/EndingEditor.test.tsx
-- [ ] T038 [US2] Add React Testing Library test for EndingEditor saving ending and share separately in web/src/features/events/components/designer/EndingEditor.test.tsx
-- [ ] T039 [US2] Add React Testing Library test for EndingEditor handling undefined ending object in web/src/features/events/components/designer/EndingEditor.test.tsx
+- [X] T032 [US2] Refactor EndingEditor state initialization to use event.ending?.* and event.share.* with optional chaining in web/src/features/events/components/designer/EndingEditor.tsx
+- [X] T033 [US2] Update EndingEditor form bindings for ending fields (title, body, ctaLabel, ctaUrl) in web/src/features/events/components/designer/EndingEditor.tsx
+- [X] T034 [US2] Update EndingEditor form bindings for share fields (allowDownload, allowEmail, allowSystemShare, socials) in web/src/features/events/components/designer/EndingEditor.tsx
+- [X] T035 [US2] Split EndingEditor save logic into two Server Action calls: updateEventEnding and updateEventShare in web/src/features/events/components/designer/EndingEditor.tsx
+- [X] T036 [US2] Remove all references to flat end* and share* fields in EndingEditor in web/src/features/events/components/designer/EndingEditor.tsx
+- [X] T037 [US2] Add React Testing Library test for EndingEditor rendering with nested ending/share objects in web/src/features/events/components/designer/EndingEditor.test.tsx
+- [X] T038 [US2] Add React Testing Library test for EndingEditor saving ending and share separately in web/src/features/events/components/designer/EndingEditor.test.tsx
+- [X] T039 [US2] Add React Testing Library test for EndingEditor handling undefined ending object in web/src/features/events/components/designer/EndingEditor.test.tsx
 
 **Checkpoint**: Ending screen and share configuration editors fully functional with nested object structure - independently testable
 
