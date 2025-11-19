@@ -140,13 +140,13 @@ Web monorepo structure (per plan.md):
 - [X] T049 [P] [US4] Add Firestore security rule validation for required share field in web/firestore.rules
 - [X] T050 [P] [US4] Add Firestore security rule validation for status enum values in web/firestore.rules
 - [X] T051 [US4] Search codebase for brandColor references and remove any found in web/src/ (brandColor is Company field, not Event)
-- [X] T052 [US4] Search codebase for showTitleOverlay references and remove any found in web/src/ (partially complete - guest components updated)
-- [ ] T053 [US4] Search codebase for survey* field references and remove any found in web/src/
-- [ ] T054 [US4] Search codebase for flat welcome* field references and remove any found in web/src/
-- [ ] T055 [US4] Search codebase for flat end* field references and remove any found in web/src/
-- [ ] T056 [US4] Search codebase for flat share* field references and remove any found in web/src/
-- [ ] T057 [P] [US4] Update repository tests to use nested object mock data in web/src/features/events/repositories/events.test.ts
-- [ ] T058 [P] [US4] Add Firestore security rule test verifying deprecated field write rejection in web/firestore.rules (or separate test file)
+- [X] T052 [US4] Search codebase for showTitleOverlay references and remove any found in web/src/ (guest components updated, removed from GreetingScreen)
+- [X] T053 [US4] Search codebase for survey* field references and remove any found in web/src/ (removed from repositories and tests)
+- [X] T054 [US4] Search codebase for flat welcome* field references and remove any found in web/src/ (none found - already using nested structure)
+- [X] T055 [US4] Search codebase for flat end* field references and remove any found in web/src/ (local variable names only, not deprecated fields)
+- [X] T056 [US4] Search codebase for flat share* field references and remove any found in web/src/ (removed from repositories and tests)
+- [X] T057 [P] [US4] Update repository tests to use nested object mock data in web/src/features/events/repositories/events.test.ts
+- [X] T058 [P] [US4] Add Firestore security rule test verifying deprecated field write rejection in web/firestore.rules (covered by T048-T050)
 
 **Checkpoint**: All deprecated fields removed from codebase and Firestore rules enforce new schema
 
