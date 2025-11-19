@@ -120,16 +120,16 @@ import type { ActionResponse } from '@/features/experiences/actions/types';
 
 ### Implementation for User Story 2
 
-- [ ] T020 [US2] Implement updatePhotoExperience in web/src/features/experiences/actions/photo-update.ts
-- [ ] T021 [US2] Add validation using updatePhotoExperienceSchema from lib/schemas.ts
-- [ ] T022 [US2] Fetch existing experience document from Firestore
-- [ ] T023 [US2] Merge partial updates with existing config and aiConfig objects (deep merge)
-- [ ] T024 [US2] Update updatedAt timestamp
-- [ ] T025 [US2] Write merged document to Firestore using Admin SDK
-- [ ] T026 [US2] Add revalidatePath call for /events/${eventId}/experiences/${experienceId}
-- [ ] T027 [US2] Update ExperienceEditor state initialization to read from config.* and aiConfig.* with fallback to legacy fields (web/src/features/experiences/components/shared/ExperienceEditor.tsx lines 49-90)
-- [ ] T028 [US2] Update ExperienceEditor handleSave to write to config and aiConfig nested structure (web/src/features/experiences/components/shared/ExperienceEditor.tsx lines 66-90)
-- [ ] T029 [US2] Update ExperienceEditorWrapper to import from actions/photo-update.ts (web/src/features/experiences/components/shared/ExperienceEditorWrapper.tsx)
+- [X] T020 [US2] Implement updatePhotoExperience in web/src/features/experiences/actions/photo-update.ts
+- [X] T021 [US2] Add validation using updatePhotoExperienceSchema from lib/schemas.ts
+- [X] T022 [US2] Fetch existing experience document from Firestore
+- [X] T023 [US2] Merge partial updates with existing config and aiConfig objects (deep merge)
+- [X] T024 [US2] Update updatedAt timestamp
+- [X] T025 [US2] Write merged document to Firestore using Admin SDK
+- [X] T026 [US2] Add revalidatePath call for /events/${eventId}/experiences/${experienceId}
+- [X] T027 [US2] Update ExperienceEditor state initialization to read from config.* and aiConfig.* with fallback to legacy fields (web/src/features/experiences/components/shared/ExperienceEditor.tsx lines 49-90)
+- [X] T028 [US2] Update ExperienceEditor handleSave to write to config and aiConfig nested structure (web/src/features/experiences/components/shared/ExperienceEditor.tsx lines 66-90)
+- [X] T029 [US2] Update ExperienceEditorWrapper to import from actions/photo-update.ts (web/src/features/experiences/components/shared/ExperienceEditorWrapper.tsx)
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work - create and edit experiences with new schema
 
