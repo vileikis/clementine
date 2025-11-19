@@ -2,6 +2,7 @@
 
 import { v4 as uuidv4 } from "uuid";
 import { storage } from "@/lib/firebase/admin";
+import { getPublicUrl } from "./upload";
 
 /**
  * Server action for uploading images from client components.
@@ -86,6 +87,23 @@ export async function uploadImage(
         code: "UPLOAD_FAILED",
         message: error instanceof Error ? error.message : "Upload failed",
       },
+    };
+  }
+}
+
+/**
+ * Get public URL for a storage path
+ * @param path - Storage path
+ * @returns Success response with public URL, or error
+ */
+export async function getImageUrlAction(path: string) {
+  try {
+    const url = await getPublicUrl(path);
+    return { success: true, url };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to get image URL",
     };
   }
 }

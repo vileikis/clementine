@@ -6,9 +6,9 @@ import { Upload, X, Image as ImageIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import {
   uploadReferenceImageAction,
-  getImageUrlAction,
   removeReferenceImageAction,
 } from "@/features/events/actions/scenes"
+import { getImageUrlAction } from "@/lib/storage/actions"
 
 interface RefImageUploaderProps {
   eventId: string

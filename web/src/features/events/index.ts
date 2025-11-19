@@ -40,21 +40,12 @@ export {
   getEventAction,
   listEventsAction,
   updateEventBrandingAction,
-  getCurrentSceneAction,
   updateEventStatusAction,
   updateEventTitleAction,
   updateEventWelcome,
   updateEventEnding,
   updateEventSurveyConfig,
 } from "./actions/events";
-
-// Scene-related actions (legacy - still in use)
-export {
-  updateSceneAction,
-  uploadReferenceImageAction,
-  getImageUrlAction,
-  removeReferenceImageAction,
-} from "./actions/scenes";
 
 // ============================================================================
 // Types (Compile-time only, safe to export)
@@ -63,9 +54,6 @@ export type {
   Event,
   EventStatus,
   ShareSocial,
-  Scene,
-  SceneStatus,
-  CaptureMode,
 } from "./types/event.types";
 
 // ============================================================================
@@ -75,9 +63,6 @@ export {
   eventStatusSchema,
   shareSocialSchema,
   eventSchema,
-  sceneSchema,
-  captureModeSchema,
-  sceneStatusSchema,
   updateEventWelcomeSchema,
   updateEventEndingSchema,
   updateEventSurveyConfigSchema,

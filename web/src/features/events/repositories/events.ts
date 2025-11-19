@@ -1,7 +1,7 @@
 // Event repository - CRUD operations for events collection
 
 import { db } from "@/lib/firebase/admin";
-import type { Event, Scene } from "../types/event.types";
+import type { Event } from "../types/event.types";
 import { eventSchema } from "../lib/schemas";
 
 export async function createEvent(data: {
@@ -11,7 +11,6 @@ export async function createEvent(data: {
   companyId: string;
 }): Promise<string> {
   const eventRef = db.collection("events").doc();
-  const sceneRef = eventRef.collection("scenes").doc();
 
   const now = Date.now();
   const eventId = eventRef.id;
@@ -21,7 +20,6 @@ export async function createEvent(data: {
     id: eventId,
     ...data,
     status: "draft",
-    currentSceneId: sceneRef.id,
     joinPath,
     qrPngPath: `events/${eventId}/qr/join.png`,
     createdAt: now,
@@ -42,24 +40,7 @@ export async function createEvent(data: {
     sharesCount: 0,
   };
 
-  const scene: Scene = {
-    id: sceneRef.id,
-    label: "Default Scene v1",
-    mode: "photo",
-    prompt: "Apply clean studio background with brand color accents.",
-    flags: {
-      customTextTool: false,
-      stickersTool: false,
-    },
-    status: "active",
-    createdAt: now,
-    updatedAt: now,
-  };
-
-  await db.runTransaction(async (txn) => {
-    txn.set(eventRef, event);
-    txn.set(sceneRef, scene);
-  });
+  await eventRef.set(event);
 
   return eventId;
 }
@@ -137,19 +118,3 @@ export async function updateEventTitle(
   });
 }
 
-export async function getCurrentScene(eventId: string): Promise<Scene | null> {
-  const eventDoc = await db.collection("events").doc(eventId).get();
-  if (!eventDoc.exists) return null;
-
-  const eventData = eventDoc.data() as Event;
-  const sceneDoc = await db
-    .collection("events")
-    .doc(eventId)
-    .collection("scenes")
-    .doc(eventData.currentSceneId)
-    .get();
-
-  if (!sceneDoc.exists) return null;
-
-  return { id: sceneDoc.id, ...sceneDoc.data() } as Scene;
-}
