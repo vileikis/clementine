@@ -64,12 +64,16 @@ export {
   previewTypeSchema,
   aspectRatioSchema,
   experienceSchema,
+  photoExperienceSchema,
   surveyStepTypeSchema,
   surveyStepSchema,
-  createExperienceSchema,
-  updateExperienceSchema,
+  createPhotoExperienceSchema,
+  updatePhotoExperienceSchema,
   uploadPreviewMediaSchema,
   previewMediaResultSchema,
   createSurveyStepSchema,
   updateSurveyStepSchema,
+  // Legacy aliases for backward compatibility during migration
+  createPhotoExperienceSchema as createExperienceSchema,
+  updatePhotoExperienceSchema as updateExperienceSchema,
 } from "./lib/schemas";

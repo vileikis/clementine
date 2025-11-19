@@ -27,9 +27,9 @@ This is a Next.js 16 monorepo web app. All paths are relative to `web/`:
 
 **Purpose**: Project initialization and schema foundation
 
-- [ ] T001 Create discriminated union schema types in web/src/features/experiences/lib/schemas.ts
-- [ ] T002 [P] Create migration utility function in web/src/features/experiences/lib/migration.ts
-- [ ] T003 [P] Add schema validation tests in web/src/features/experiences/lib/schemas.test.ts
+- [X] T001 Create discriminated union schema types in web/src/features/experiences/lib/schemas.ts
+- [X] T002 [P] Create migration utility function in web/src/features/experiences/lib/migration.ts
+- [X] T003 [P] Add schema validation tests in web/src/features/experiences/lib/schemas.test.ts
 
 ---
 
@@ -39,16 +39,16 @@ This is a Next.js 16 monorepo web app. All paths are relative to `web/`:
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T004 Define PhotoExperience schema with Zod in web/src/features/experiences/lib/schemas.ts (including PhotoConfig and AiConfig)
-- [ ] T005 [P] Define future experience type schemas (VideoExperience, GifExperience, WheelExperience, SurveyExperience) with placeholder implementations in web/src/features/experiences/lib/schemas.ts
-- [ ] T006 [P] Create experienceSchema discriminated union combining all experience types in web/src/features/experiences/lib/schemas.ts
-- [ ] T007 [P] Define createPhotoExperienceSchema for input validation in web/src/features/experiences/lib/schemas.ts
-- [ ] T008 [P] Define updatePhotoExperienceSchema for input validation in web/src/features/experiences/lib/schemas.ts
-- [ ] T009 Implement migratePhotoExperience function in web/src/features/experiences/lib/migration.ts
-- [ ] T010 [P] Add unit tests for migration function in web/src/features/experiences/lib/migration.test.ts
-- [ ] T011 [P] Export all TypeScript types (PhotoExperience, Experience, PhotoConfig, AiConfig, AspectRatio) from web/src/features/experiences/lib/schemas.ts
+- [X] T004 Define PhotoExperience schema with Zod in web/src/features/experiences/lib/schemas.ts (including PhotoConfig and AiConfig)
+- [X] T005 [P] Define future experience type schemas (VideoExperience, GifExperience, WheelExperience, SurveyExperience) with placeholder implementations in web/src/features/experiences/lib/schemas.ts
+- [X] T006 [P] Create experienceSchema discriminated union combining all experience types in web/src/features/experiences/lib/schemas.ts
+- [X] T007 [P] Define createPhotoExperienceSchema for input validation in web/src/features/experiences/lib/schemas.ts
+- [X] T008 [P] Define updatePhotoExperienceSchema for input validation in web/src/features/experiences/lib/schemas.ts
+- [X] T009 Implement migratePhotoExperience function in web/src/features/experiences/lib/migration.ts
+- [X] T010 [P] Add unit tests for migration function in web/src/features/experiences/lib/migration.test.ts
+- [X] T011 [P] Export all TypeScript types (PhotoExperience, Experience, PhotoConfig, AiConfig, AspectRatio) from web/src/features/experiences/lib/schemas.ts
 
-**Checkpoint**: Foundation ready - user story implementation can now begin in parallel
+**Checkpoint**: Foundation ready - user story implementation can now begin in parallel ✅
 
 ---
 
