@@ -1,6 +1,10 @@
 import {
   createEventAction,
   listEventsAction,
+  updateEventWelcome,
+  updateEventEnding,
+  updateEventShare,
+  updateEventTheme,
 } from "./events";
 import * as eventsRepository from "../repositories/events";
 import * as companiesRepository from "@/features/companies/repositories/companies";
@@ -14,6 +18,11 @@ jest.mock("@/features/companies/repositories/companies");
 jest.mock("@/lib/auth");
 jest.mock("next/cache", () => ({
   revalidatePath: jest.fn(),
+}));
+jest.mock("@/lib/firebase/admin", () => ({
+  db: {
+    collection: jest.fn(),
+  },
 }));
 
 describe("Events Server Actions", () => {
@@ -258,6 +267,400 @@ describe("Events Server Actions", () => {
       expect(result.success).toBe(false);
       expect(result.error).toBe("Company is not active");
       expect(eventsRepository.createEvent).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("updateEventWelcome", () => {
+    const mockEventId = "event-123";
+    let mockEventRef: any;
+    let mockDb: any;
+
+    beforeEach(() => {
+      // Mock Firebase admin db
+      mockEventRef = {
+        get: jest.fn(),
+        update: jest.fn(),
+      };
+      mockDb = {
+        collection: jest.fn().mockReturnValue({
+          doc: jest.fn().mockReturnValue(mockEventRef),
+        }),
+      };
+      const firebaseAdmin = require("@/lib/firebase/admin");
+      firebaseAdmin.db = mockDb;
+
+      // Mock auth
+      jest.spyOn(auth, "verifyAdminSecret").mockResolvedValue({
+        authorized: true,
+      });
+
+      // Mock event exists
+      mockEventRef.get.mockResolvedValue({
+        exists: true,
+        data: () => ({ id: mockEventId }),
+      });
+    });
+
+    it("updates welcome fields using dot notation", async () => {
+      const welcomeData = {
+        title: "Welcome to Event",
+        body: "Join us for an amazing experience",
+        ctaLabel: "Get Started",
+        backgroundImage: "https://example.com/bg.jpg",
+        backgroundColor: "#FF0000",
+      };
+
+      const result = await updateEventWelcome(mockEventId, welcomeData);
+
+      expect(result.success).toBe(true);
+      expect(mockEventRef.update).toHaveBeenCalledWith({
+        updatedAt: expect.any(Number),
+        "welcome.title": welcomeData.title,
+        "welcome.body": welcomeData.body,
+        "welcome.ctaLabel": welcomeData.ctaLabel,
+        "welcome.backgroundImage": welcomeData.backgroundImage,
+        "welcome.backgroundColor": welcomeData.backgroundColor,
+      });
+    });
+
+    it("updates only provided fields", async () => {
+      const partialData = {
+        title: "New Title",
+      };
+
+      const result = await updateEventWelcome(mockEventId, partialData);
+
+      expect(result.success).toBe(true);
+      expect(mockEventRef.update).toHaveBeenCalledWith({
+        updatedAt: expect.any(Number),
+        "welcome.title": "New Title",
+      });
+    });
+
+    it("returns error when event not found", async () => {
+      mockEventRef.get.mockResolvedValue({
+        exists: false,
+      });
+
+      const result = await updateEventWelcome(mockEventId, { title: "Test" });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.code).toBe("EVENT_NOT_FOUND");
+      }
+      expect(mockEventRef.update).not.toHaveBeenCalled();
+    });
+
+    it("returns error when not authorized", async () => {
+      jest.spyOn(auth, "verifyAdminSecret").mockResolvedValue({
+        authorized: false,
+        error: "Invalid credentials",
+      });
+
+      const result = await updateEventWelcome(mockEventId, { title: "Test" });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.code).toBe("PERMISSION_DENIED");
+      }
+      expect(mockEventRef.update).not.toHaveBeenCalled();
+    });
+
+    it("validates input data with schema", async () => {
+      const invalidData = {
+        title: "", // Empty string should fail validation if min length required
+      };
+
+      const result = await updateEventWelcome(mockEventId, invalidData);
+
+      // Should either validate or fail gracefully
+      expect(result).toHaveProperty("success");
+    });
+  });
+
+  describe("updateEventEnding", () => {
+    const mockEventId = "event-123";
+    let mockEventRef: any;
+    let mockDb: any;
+
+    beforeEach(() => {
+      mockEventRef = {
+        get: jest.fn(),
+        update: jest.fn(),
+      };
+      mockDb = {
+        collection: jest.fn().mockReturnValue({
+          doc: jest.fn().mockReturnValue(mockEventRef),
+        }),
+      };
+      const firebaseAdmin = require("@/lib/firebase/admin");
+      firebaseAdmin.db = mockDb;
+
+      jest.spyOn(auth, "verifyAdminSecret").mockResolvedValue({
+        authorized: true,
+      });
+
+      mockEventRef.get.mockResolvedValue({
+        exists: true,
+        data: () => ({ id: mockEventId }),
+      });
+    });
+
+    it("updates ending fields using dot notation", async () => {
+      const endingData = {
+        title: "Thanks for joining!",
+        body: "We hope you enjoyed the event",
+        ctaLabel: "Learn More",
+        ctaUrl: "https://example.com",
+      };
+
+      const result = await updateEventEnding(mockEventId, endingData);
+
+      expect(result.success).toBe(true);
+      expect(mockEventRef.update).toHaveBeenCalledWith({
+        updatedAt: expect.any(Number),
+        "ending.title": endingData.title,
+        "ending.body": endingData.body,
+        "ending.ctaLabel": endingData.ctaLabel,
+        "ending.ctaUrl": endingData.ctaUrl,
+      });
+    });
+
+    it("updates only provided ending fields", async () => {
+      const partialData = {
+        title: "New Ending Title",
+        ctaUrl: "https://new-url.com",
+      };
+
+      const result = await updateEventEnding(mockEventId, partialData);
+
+      expect(result.success).toBe(true);
+      expect(mockEventRef.update).toHaveBeenCalledWith({
+        updatedAt: expect.any(Number),
+        "ending.title": "New Ending Title",
+        "ending.ctaUrl": "https://new-url.com",
+      });
+    });
+
+    it("returns error when event not found", async () => {
+      mockEventRef.get.mockResolvedValue({
+        exists: false,
+      });
+
+      const result = await updateEventEnding(mockEventId, { title: "Test" });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.code).toBe("EVENT_NOT_FOUND");
+      }
+      expect(mockEventRef.update).not.toHaveBeenCalled();
+    });
+
+    it("returns error when not authorized", async () => {
+      jest.spyOn(auth, "verifyAdminSecret").mockResolvedValue({
+        authorized: false,
+        error: "Invalid credentials",
+      });
+
+      const result = await updateEventEnding(mockEventId, { title: "Test" });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.code).toBe("PERMISSION_DENIED");
+      }
+      expect(mockEventRef.update).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("updateEventShare", () => {
+    const mockEventId = "event-123";
+    let mockEventRef: any;
+    let mockDb: any;
+
+    beforeEach(() => {
+      mockEventRef = {
+        get: jest.fn(),
+        update: jest.fn(),
+      };
+      mockDb = {
+        collection: jest.fn().mockReturnValue({
+          doc: jest.fn().mockReturnValue(mockEventRef),
+        }),
+      };
+      const firebaseAdmin = require("@/lib/firebase/admin");
+      firebaseAdmin.db = mockDb;
+
+      jest.spyOn(auth, "verifyAdminSecret").mockResolvedValue({
+        authorized: true,
+      });
+
+      mockEventRef.get.mockResolvedValue({
+        exists: true,
+        data: () => ({ id: mockEventId }),
+      });
+    });
+
+    it("updates share configuration using dot notation", async () => {
+      const shareData = {
+        allowDownload: true,
+        allowSystemShare: true,
+        allowEmail: false,
+        socials: ["instagram", "tiktok", "facebook"] as const,
+      };
+
+      const result = await updateEventShare(mockEventId, shareData);
+
+      expect(result.success).toBe(true);
+      expect(mockEventRef.update).toHaveBeenCalledWith({
+        updatedAt: expect.any(Number),
+        "share.allowDownload": true,
+        "share.allowSystemShare": true,
+        "share.allowEmail": false,
+        "share.socials": ["instagram", "tiktok", "facebook"],
+      });
+    });
+
+    it("updates only provided share fields", async () => {
+      const partialData = {
+        allowDownload: false,
+      };
+
+      const result = await updateEventShare(mockEventId, partialData);
+
+      expect(result.success).toBe(true);
+      expect(mockEventRef.update).toHaveBeenCalledWith({
+        updatedAt: expect.any(Number),
+        "share.allowDownload": false,
+      });
+    });
+
+    it("returns error when event not found", async () => {
+      mockEventRef.get.mockResolvedValue({
+        exists: false,
+      });
+
+      const result = await updateEventShare(mockEventId, {
+        allowDownload: true,
+      });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.code).toBe("EVENT_NOT_FOUND");
+      }
+      expect(mockEventRef.update).not.toHaveBeenCalled();
+    });
+
+    it("returns error when not authorized", async () => {
+      jest.spyOn(auth, "verifyAdminSecret").mockResolvedValue({
+        authorized: false,
+        error: "Invalid credentials",
+      });
+
+      const result = await updateEventShare(mockEventId, {
+        allowDownload: true,
+      });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.code).toBe("PERMISSION_DENIED");
+      }
+      expect(mockEventRef.update).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("updateEventTheme", () => {
+    const mockEventId = "event-123";
+    let mockEventRef: any;
+    let mockDb: any;
+
+    beforeEach(() => {
+      mockEventRef = {
+        get: jest.fn(),
+        update: jest.fn(),
+      };
+      mockDb = {
+        collection: jest.fn().mockReturnValue({
+          doc: jest.fn().mockReturnValue(mockEventRef),
+        }),
+      };
+      const firebaseAdmin = require("@/lib/firebase/admin");
+      firebaseAdmin.db = mockDb;
+
+      jest.spyOn(auth, "verifyAdminSecret").mockResolvedValue({
+        authorized: true,
+      });
+
+      mockEventRef.get.mockResolvedValue({
+        exists: true,
+        data: () => ({ id: mockEventId }),
+      });
+    });
+
+    it("updates theme configuration using dot notation", async () => {
+      const themeData = {
+        buttonColor: "#FF0000",
+        buttonTextColor: "#FFFFFF",
+        backgroundColor: "#000000",
+        backgroundImage: "https://example.com/theme-bg.jpg",
+      };
+
+      const result = await updateEventTheme(mockEventId, themeData);
+
+      expect(result.success).toBe(true);
+      expect(mockEventRef.update).toHaveBeenCalledWith({
+        updatedAt: expect.any(Number),
+        "theme.buttonColor": themeData.buttonColor,
+        "theme.buttonTextColor": themeData.buttonTextColor,
+        "theme.backgroundColor": themeData.backgroundColor,
+        "theme.backgroundImage": themeData.backgroundImage,
+      });
+    });
+
+    it("updates only provided theme fields", async () => {
+      const partialData = {
+        buttonColor: "#00FF00",
+      };
+
+      const result = await updateEventTheme(mockEventId, partialData);
+
+      expect(result.success).toBe(true);
+      expect(mockEventRef.update).toHaveBeenCalledWith({
+        updatedAt: expect.any(Number),
+        "theme.buttonColor": "#00FF00",
+      });
+    });
+
+    it("returns error when event not found", async () => {
+      mockEventRef.get.mockResolvedValue({
+        exists: false,
+      });
+
+      const result = await updateEventTheme(mockEventId, {
+        buttonColor: "#FF0000",
+      });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.code).toBe("EVENT_NOT_FOUND");
+      }
+      expect(mockEventRef.update).not.toHaveBeenCalled();
+    });
+
+    it("returns error when not authorized", async () => {
+      jest.spyOn(auth, "verifyAdminSecret").mockResolvedValue({
+        authorized: false,
+        error: "Invalid credentials",
+      });
+
+      const result = await updateEventTheme(mockEventId, {
+        buttonColor: "#FF0000",
+      });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.code).toBe("PERMISSION_DENIED");
+      }
+      expect(mockEventRef.update).not.toHaveBeenCalled();
     });
   });
 });

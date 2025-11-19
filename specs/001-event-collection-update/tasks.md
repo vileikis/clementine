@@ -57,10 +57,10 @@ Web monorepo structure (per plan.md):
 - [X] T018 Refactor updateEventEnding Server Action to use dot notation for ending fields in web/src/features/events/actions/events.ts
 - [X] T019 [P] Create updateEventShare Server Action using dot notation for share fields in web/src/features/events/actions/events.ts
 - [X] T020 [P] Create updateEventTheme Server Action using dot notation for theme fields in web/src/features/events/actions/events.ts
-- [ ] T021 [P] Update Server Action tests for updateEventWelcome in web/src/features/events/actions/events.test.ts
-- [ ] T022 [P] Update Server Action tests for updateEventEnding in web/src/features/events/actions/events.test.ts
-- [ ] T023 [P] Add Server Action tests for updateEventShare in web/src/features/events/actions/events.test.ts
-- [ ] T024 [P] Add Server Action tests for updateEventTheme in web/src/features/events/actions/events.test.ts
+- [X] T021 [P] Update Server Action tests for updateEventWelcome in web/src/features/events/actions/events.test.ts
+- [X] T022 [P] Update Server Action tests for updateEventEnding in web/src/features/events/actions/events.test.ts
+- [X] T023 [P] Add Server Action tests for updateEventShare in web/src/features/events/actions/events.test.ts
+- [X] T024 [P] Add Server Action tests for updateEventTheme in web/src/features/events/actions/events.test.ts
 
 **Checkpoint**: Server Actions ready - all CRUD operations support nested objects
 
@@ -78,9 +78,9 @@ Web monorepo structure (per plan.md):
 - [X] T026 [US1] Update WelcomeEditor form bindings to read from event.welcome?.title, event.welcome?.body, etc. in web/src/features/events/components/designer/WelcomeEditor.tsx
 - [X] T027 [US1] Update WelcomeEditor save handler to call updateEventWelcome with nested structure in web/src/features/events/components/designer/WelcomeEditor.tsx
 - [X] T028 [US1] Remove all references to flat welcome* fields in WelcomeEditor in web/src/features/events/components/designer/WelcomeEditor.tsx
-- [ ] T029 [US1] Add React Testing Library test for WelcomeEditor rendering with nested welcome object in web/src/features/events/components/designer/WelcomeEditor.test.tsx
-- [ ] T030 [US1] Add React Testing Library test for WelcomeEditor saving with nested welcome object in web/src/features/events/components/designer/WelcomeEditor.test.tsx
-- [ ] T031 [US1] Add React Testing Library test for WelcomeEditor handling undefined welcome object in web/src/features/events/components/designer/WelcomeEditor.test.tsx
+- [X] T029 [US1] Add React Testing Library test for WelcomeEditor rendering with nested welcome object in web/src/features/events/components/designer/WelcomeEditor.test.tsx
+- [X] T030 [US1] Add React Testing Library test for WelcomeEditor saving with nested welcome object in web/src/features/events/components/designer/WelcomeEditor.test.tsx
+- [X] T031 [US1] Add React Testing Library test for WelcomeEditor handling undefined welcome object in web/src/features/events/components/designer/WelcomeEditor.test.tsx
 
 **Checkpoint**: Welcome screen editor fully functional with nested object structure - independently testable
 
