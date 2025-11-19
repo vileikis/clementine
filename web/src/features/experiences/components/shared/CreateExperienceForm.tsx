@@ -25,7 +25,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { createPhotoExperienceSchema as createExperienceSchema } from "../../lib/schemas";
-import { createExperience } from "../../lib/actions";
+import { createPhotoExperienceAction } from "../../actions/create-experience";
 import { ExperienceTypeSelector } from "./ExperienceTypeSelector";
 import type { z } from "zod";
 
@@ -61,11 +61,11 @@ export function CreateExperienceForm({ eventId }: CreateExperienceFormProps) {
     setIsSubmitting(true);
 
     try {
-      const result = await createExperience(eventId, data);
+      const result = await createPhotoExperienceAction(eventId, data);
 
       if (result.success) {
         toast.success("Experience created successfully");
-        // Redirect to experience editor (T018)
+        // Redirect to experience editor
         router.push(
           `/events/${eventId}/design/experiences/${result.data.id}`
         );
