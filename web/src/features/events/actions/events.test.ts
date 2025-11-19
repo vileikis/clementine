@@ -13,6 +13,9 @@ import type { Event } from "../types/event.types";
 import type { Company } from "@/features/companies";
 import * as firebaseAdmin from "@/lib/firebase/admin";
 
+// Get the mock collection function
+const mockCollection = (firebaseAdmin as typeof firebaseAdmin & { __mockCollection: jest.Mock }).__mockCollection;
+
 // Mock dependencies
 jest.mock("../repositories/events");
 jest.mock("@/features/companies/repositories/companies");
@@ -20,7 +23,17 @@ jest.mock("@/lib/auth");
 jest.mock("next/cache", () => ({
   revalidatePath: jest.fn(),
 }));
-jest.mock("@/lib/firebase/admin");
+
+// Mock firebase admin with a factory that returns a fresh mock
+jest.mock("@/lib/firebase/admin", () => {
+  const mockCollection = jest.fn();
+  return {
+    db: {
+      collection: mockCollection,
+    },
+    __mockCollection: mockCollection, // Expose for test access
+  };
+});
 
 describe("Events Server Actions", () => {
   beforeEach(() => {
@@ -253,9 +266,6 @@ describe("Events Server Actions", () => {
       get: jest.Mock;
       update: jest.Mock;
     };
-    let mockDb: {
-      collection: jest.Mock;
-    };
 
     beforeEach(() => {
       // Mock Firebase admin db
@@ -263,14 +273,9 @@ describe("Events Server Actions", () => {
         get: jest.fn(),
         update: jest.fn(),
       };
-      mockDb = {
-        collection: jest.fn().mockReturnValue({
-          doc: jest.fn().mockReturnValue(mockEventRef),
-        }),
-      };
-      Object.defineProperty(firebaseAdmin, 'db', {
-        get: jest.fn(() => mockDb),
-        configurable: true,
+
+      mockCollection.mockReturnValue({
+        doc: jest.fn().mockReturnValue(mockEventRef),
       });
 
       // Mock auth
@@ -368,23 +373,15 @@ describe("Events Server Actions", () => {
       get: jest.Mock;
       update: jest.Mock;
     };
-    let mockDb: {
-      collection: jest.Mock;
-    };
 
     beforeEach(() => {
       mockEventRef = {
         get: jest.fn(),
         update: jest.fn(),
       };
-      mockDb = {
-        collection: jest.fn().mockReturnValue({
-          doc: jest.fn().mockReturnValue(mockEventRef),
-        }),
-      };
-      Object.defineProperty(firebaseAdmin, 'db', {
-        get: jest.fn(() => mockDb),
-        configurable: true,
+
+      mockCollection.mockReturnValue({
+        doc: jest.fn().mockReturnValue(mockEventRef),
       });
 
       jest.spyOn(auth, "verifyAdminSecret").mockResolvedValue({
@@ -469,23 +466,15 @@ describe("Events Server Actions", () => {
       get: jest.Mock;
       update: jest.Mock;
     };
-    let mockDb: {
-      collection: jest.Mock;
-    };
 
     beforeEach(() => {
       mockEventRef = {
         get: jest.fn(),
         update: jest.fn(),
       };
-      mockDb = {
-        collection: jest.fn().mockReturnValue({
-          doc: jest.fn().mockReturnValue(mockEventRef),
-        }),
-      };
-      Object.defineProperty(firebaseAdmin, 'db', {
-        get: jest.fn(() => mockDb),
-        configurable: true,
+
+      mockCollection.mockReturnValue({
+        doc: jest.fn().mockReturnValue(mockEventRef),
       });
 
       jest.spyOn(auth, "verifyAdminSecret").mockResolvedValue({
@@ -572,23 +561,15 @@ describe("Events Server Actions", () => {
       get: jest.Mock;
       update: jest.Mock;
     };
-    let mockDb: {
-      collection: jest.Mock;
-    };
 
     beforeEach(() => {
       mockEventRef = {
         get: jest.fn(),
         update: jest.fn(),
       };
-      mockDb = {
-        collection: jest.fn().mockReturnValue({
-          doc: jest.fn().mockReturnValue(mockEventRef),
-        }),
-      };
-      Object.defineProperty(firebaseAdmin, 'db', {
-        get: jest.fn(() => mockDb),
-        configurable: true,
+
+      mockCollection.mockReturnValue({
+        doc: jest.fn().mockReturnValue(mockEventRef),
       });
 
       jest.spyOn(auth, "verifyAdminSecret").mockResolvedValue({

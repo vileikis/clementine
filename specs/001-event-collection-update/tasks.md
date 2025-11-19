@@ -170,7 +170,7 @@ Web monorepo structure (per plan.md):
 
 - [X] T066 Run `pnpm lint` from repo root and fix all errors/warnings (completed: 0 errors, 12 warnings - all acceptable)
 - [X] T067 Run `pnpm type-check` from repo root and resolve all TypeScript errors (completed: 0 errors)
-- [ ] T068 Run `pnpm test` from repo root and ensure all tests pass
+- [X] T068 Run `pnpm test` from repo root and ensure all tests pass (completed: 257 tests passed)
 - [ ] T069 Start dev server (`pnpm dev`) and manually test all Event Designer editors (Welcome, Ending, Theme)
 - [ ] T070 Verify in Firestore console that new events use only nested object fields
 - [ ] T071 Deploy Firestore security rules (`firebase deploy --only firestore:rules`) and test deprecated field rejection

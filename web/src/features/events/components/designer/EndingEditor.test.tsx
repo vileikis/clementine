@@ -252,7 +252,7 @@ describe("EndingEditor", () => {
           title: "New Title",
           body: "New Body",
           ctaLabel: "Share Now",
-          ctaUrl: "",
+          ctaUrl: null,
         });
 
         expect(updateEventShare).toHaveBeenCalledWith("event-123", {

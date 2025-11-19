@@ -137,10 +137,10 @@ export const updateEventEndingSchema = z.object({
 });
 
 export const updateEventShareSchema = z.object({
-  allowDownload: z.boolean().default(false),
-  allowSystemShare: z.boolean().default(false),
-  allowEmail: z.boolean().default(false),
-  socials: z.array(shareSocialSchema).default([]),
+  allowDownload: z.boolean().optional(),
+  allowSystemShare: z.boolean().optional(),
+  allowEmail: z.boolean().optional(),
+  socials: z.array(shareSocialSchema).optional(),
 });
 
 export type EventSchema = z.infer<typeof eventSchema>;

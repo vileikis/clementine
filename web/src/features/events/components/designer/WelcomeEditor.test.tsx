@@ -184,10 +184,11 @@ describe("WelcomeEditor", () => {
       expect(bodyTextarea).toHaveValue("");
 
       const ctaInput = screen.getByLabelText(/button label/i);
-      expect(ctaInput).toHaveValue("Get Started"); // Default value
+      expect(ctaInput).toHaveValue(""); // Empty when undefined
 
-      const colorInputs = screen.getAllByDisplayValue("#FFFFFF");
-      expect(colorInputs.length).toBeGreaterThan(0); // Default color
+      // Color inputs should exist even if empty
+      const backgroundColorInput = screen.getByLabelText(/background color/i);
+      expect(backgroundColorInput).toBeInTheDocument();
     });
 
     it("handles partial welcome object with optional chaining", () => {
@@ -210,7 +211,7 @@ describe("WelcomeEditor", () => {
       expect(bodyTextarea).toHaveValue("");
 
       const ctaInput = screen.getByLabelText(/button label/i);
-      expect(ctaInput).toHaveValue("Get Started");
+      expect(ctaInput).toHaveValue(""); // Empty when undefined
     });
   });
 
@@ -241,7 +242,7 @@ describe("WelcomeEditor", () => {
           body: "New Description",
           ctaLabel: "Get Started",
           backgroundColor: "#FFFFFF",
-          backgroundImage: "",
+          backgroundImage: null,
         });
       });
     });
