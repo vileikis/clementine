@@ -100,7 +100,7 @@ describe("PhotoExperience Schema", () => {
       ...validPhotoExperience,
       aiConfig: {
         ...validPhotoExperience.aiConfig,
-        aspectRatio: "invalid" as any,
+        aspectRatio: "invalid",
       },
     };
     const result = photoExperienceSchema.safeParse(experience);
@@ -355,7 +355,7 @@ describe("Create Photo Experience Schema", () => {
   it("should reject non-photo type", () => {
     const input = {
       label: "Video Booth",
-      type: "video" as any,
+      type: "video",
     };
 
     const result = createPhotoExperienceSchema.safeParse(input);

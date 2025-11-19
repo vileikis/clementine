@@ -2,7 +2,7 @@
  * Migration function tests for evolving experience schema
  */
 
-import { migratePhotoExperience, stripLegacyFields } from "./migration";
+import { LegacyPhotoExperience, migratePhotoExperience, stripLegacyFields } from "./migration";
 import type { PhotoExperience } from "./schemas";
 
 describe("migratePhotoExperience", () => {
@@ -381,7 +381,7 @@ describe("migratePhotoExperience", () => {
 
 describe("stripLegacyFields", () => {
   it("should remove all legacy countdown fields", () => {
-    const migratedWithLegacy: any = {
+    const migratedWithLegacy: PhotoExperience & Partial<LegacyPhotoExperience> = {
       id: "exp_123",
       eventId: "evt_456",
       label: "Clean Me",
@@ -414,7 +414,7 @@ describe("stripLegacyFields", () => {
   });
 
   it("should remove all legacy AI fields", () => {
-    const migratedWithLegacy: any = {
+    const migratedWithLegacy: PhotoExperience & Partial<LegacyPhotoExperience> = {
       id: "exp_123",
       eventId: "evt_456",
       label: "Clean Me",
@@ -438,7 +438,7 @@ describe("stripLegacyFields", () => {
       aiEnabled: true,
       aiModel: "flux-schnell",
       aiPrompt: "Transform",
-      aiReferenceImagePaths: null,
+      aiReferenceImagePaths: undefined,
       aiAspectRatio: "1:1",
     };
 
@@ -451,7 +451,7 @@ describe("stripLegacyFields", () => {
   });
 
   it("should preserve all new schema fields", () => {
-    const migratedWithLegacy: any = {
+    const migratedWithLegacy: PhotoExperience & Partial<LegacyPhotoExperience> = {
       id: "exp_123",
       eventId: "evt_456",
       label: "Clean Me",
