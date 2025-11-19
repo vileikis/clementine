@@ -10,10 +10,8 @@
 
 import { useRouter } from "next/navigation";
 import { ExperienceEditor } from "./ExperienceEditor";
-import {
-  updateExperienceAction,
-  deleteExperienceAction,
-} from "../../lib/actions";
+import { updatePhotoExperience } from "../../actions/photo-update";
+import { deleteExperienceAction } from "../../lib/actions";
 import type { Experience } from "../../types/experience.types";
 
 interface ExperienceEditorWrapperProps {
@@ -31,7 +29,8 @@ export function ExperienceEditorWrapper({
     experienceId: string,
     data: Partial<Experience>
   ) => {
-    const result = await updateExperienceAction(eventId, experienceId, data);
+    // Use new updatePhotoExperience action which handles migration
+    const result = await updatePhotoExperience(eventId, experienceId, data as any);
 
     if (!result.success) {
       throw new Error(result.error.message);
