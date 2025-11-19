@@ -4,7 +4,7 @@ import { AITransformSettings } from "./AITransformSettings";
 import { AI_MODEL_PROMPT_GUIDES } from "../../lib/constants";
 
 // Mock the ImageUploadField component to simplify testing
-jest.mock("./ImageUploadField", () => ({
+jest.mock("@/components/shared/ImageUploadField", () => ({
   ImageUploadField: ({ label, onChange }: { label: string; onChange: (url: string) => void }) => (
     <button onClick={() => onChange("https://example.com/ref.png")}>{label}</button>
   ),

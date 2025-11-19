@@ -77,7 +77,7 @@ export async function uploadResultImage(
 
 /**
  * Copies input image to result location for passthrough mode (no AI transformation)
- * Used when scene prompt is empty/null
+ * Used when AI transformation is disabled or prompt is empty/null
  * Path: events/{eventId}/sessions/{sessionId}/input.jpg → events/{eventId}/sessions/{sessionId}/result.jpg
  */
 export async function copyImageToResult(
@@ -99,7 +99,7 @@ export async function copyImageToResult(
 }
 
 /**
- * Uploads scene reference image to Storage
+ * Uploads reference image to Storage for AI transformation
  * Path: events/{eventId}/refs/{timestamp}-{filename}
  */
 export async function uploadReferenceImage(

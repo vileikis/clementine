@@ -1,4 +1,4 @@
-// Zod schemas for Event and Scene data models
+// Zod schemas for Event data models
 import { z } from "zod";
 
 // Event schemas
@@ -20,7 +20,6 @@ export const eventSchema = z.object({
   brandColor: z.string().regex(/^#[0-9A-F]{6}$/i),
   showTitleOverlay: z.boolean(),
   status: eventStatusSchema,
-  currentSceneId: z.string(),
   companyId: z.string().nullable().default(null),
   joinPath: z.string(),
   qrPngPath: z.string(),
@@ -56,25 +55,6 @@ export const eventSchema = z.object({
   sharesCount: z.number().default(0),
 });
 
-// Scene schemas
-export const captureModeSchema = z.enum(["photo", "video", "gif", "boomerang"]);
-export const sceneStatusSchema = z.enum(["active", "deprecated"]);
-
-export const sceneSchema = z.object({
-  id: z.string(),
-  label: z.string(),
-  mode: captureModeSchema,
-  prompt: z.string().nullable(),
-  referenceImagePath: z.string().optional(),
-  flags: z.object({
-    customTextTool: z.boolean(),
-    stickersTool: z.boolean(),
-  }),
-  status: sceneStatusSchema,
-  createdAt: z.number(),
-  updatedAt: z.number(),
-});
-
 // Event update schemas (for Server Actions)
 export const updateEventWelcomeSchema = z.object({
   welcomeTitle: z.string().max(500).optional(),
@@ -102,4 +82,3 @@ export const updateEventSurveyConfigSchema = z.object({
 });
 
 export type EventSchema = z.infer<typeof eventSchema>;
-export type SceneSchema = z.infer<typeof sceneSchema>;

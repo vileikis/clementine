@@ -9,7 +9,7 @@ import type { Event } from "../types/event.types";
 import type { Company } from "@/features/companies";
 
 // Mock dependencies
-jest.mock("@/lib/repositories/events");
+jest.mock("../repositories/events");
 jest.mock("@/features/companies/repositories/companies");
 jest.mock("@/lib/auth");
 jest.mock("next/cache", () => ({
@@ -30,7 +30,6 @@ describe("Events Server Actions", () => {
           brandColor: "#111111",
           showTitleOverlay: true,
           status: "live",
-          currentSceneId: "scene-1",
           joinPath: "/join/event-1",
           qrPngPath: "events/event-1/qr/join.png",
           companyId: "company-a",
@@ -56,7 +55,6 @@ describe("Events Server Actions", () => {
           brandColor: "#222222",
           showTitleOverlay: false,
           status: "draft",
-          currentSceneId: "scene-2",
           joinPath: "/join/event-2",
           qrPngPath: "events/event-2/qr/join.png",
           companyId: null,
@@ -97,7 +95,6 @@ describe("Events Server Actions", () => {
           brandColor: "#111111",
           showTitleOverlay: true,
           status: "live",
-          currentSceneId: "scene-1",
           joinPath: "/join/event-1",
           qrPngPath: "events/event-1/qr/join.png",
           companyId: "company-a",
@@ -141,7 +138,6 @@ describe("Events Server Actions", () => {
           brandColor: "#222222",
           showTitleOverlay: false,
           status: "draft",
-          currentSceneId: "scene-2",
           joinPath: "/join/event-2",
           qrPngPath: "events/event-2/qr/join.png",
           companyId: null,
