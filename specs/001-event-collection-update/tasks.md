@@ -115,14 +115,14 @@ Web monorepo structure (per plan.md):
 
 ### Implementation for User Story 3
 
-- [ ] T040 [P] [US3] Create ThemeEditor component structure with form state for theme fields in web/src/features/events/components/designer/ThemeEditor.tsx
-- [ ] T041 [US3] Add color picker inputs for buttonColor, buttonTextColor, backgroundColor in ThemeEditor in web/src/features/events/components/designer/ThemeEditor.tsx
-- [ ] T042 [US3] Add ImageUploadField for theme backgroundImage in ThemeEditor in web/src/features/events/components/designer/ThemeEditor.tsx
-- [ ] T043 [US3] Implement ThemeEditor save handler calling updateEventTheme Server Action in web/src/features/events/components/designer/ThemeEditor.tsx
-- [ ] T044 [US3] Add keyboard shortcuts (Cmd+S/Ctrl+S) for ThemeEditor save in web/src/features/events/components/designer/ThemeEditor.tsx
-- [ ] T045 [P] [US3] Add React Testing Library test for ThemeEditor rendering with theme object in web/src/features/events/components/designer/ThemeEditor.test.tsx
-- [ ] T046 [P] [US3] Add React Testing Library test for ThemeEditor saving theme successfully in web/src/features/events/components/designer/ThemeEditor.test.tsx
-- [ ] T047 [P] [US3] Add React Testing Library test for ThemeEditor handling undefined theme object in web/src/features/events/components/designer/ThemeEditor.test.tsx
+- [X] T040 [P] [US3] Create ThemeEditor component structure with form state for theme fields in web/src/features/events/components/designer/ThemeEditor.tsx
+- [X] T041 [US3] Add color picker inputs for buttonColor, buttonTextColor, backgroundColor in ThemeEditor in web/src/features/events/components/designer/ThemeEditor.tsx
+- [X] T042 [US3] Add ImageUploadField for theme backgroundImage in ThemeEditor in web/src/features/events/components/designer/ThemeEditor.tsx
+- [X] T043 [US3] Implement ThemeEditor save handler calling updateEventTheme Server Action in web/src/features/events/components/designer/ThemeEditor.tsx
+- [X] T044 [US3] Add keyboard shortcuts (Cmd+S/Ctrl+S) for ThemeEditor save in web/src/features/events/components/designer/ThemeEditor.tsx
+- [X] T045 [P] [US3] Add React Testing Library test for ThemeEditor rendering with theme object in web/src/features/events/components/designer/ThemeEditor.test.tsx
+- [X] T046 [P] [US3] Add React Testing Library test for ThemeEditor saving theme successfully in web/src/features/events/components/designer/ThemeEditor.test.tsx
+- [X] T047 [P] [US3] Add React Testing Library test for ThemeEditor handling undefined theme object in web/src/features/events/components/designer/ThemeEditor.test.tsx
 
 **Checkpoint**: Theme editor fully functional with nested object structure - independently testable
 
