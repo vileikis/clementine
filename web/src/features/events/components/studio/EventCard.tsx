@@ -50,9 +50,9 @@ export function EventCard({ event, companyName }: EventCardProps) {
         <div className="flex items-center gap-2">
           <div
             className="w-4 h-4 rounded border"
-            style={{ backgroundColor: event.brandColor }}
+            style={{ backgroundColor: event.theme?.buttonColor ?? "#FFFFFF" }}
           />
-          <span>{event.brandColor}</span>
+          <span>{event.theme?.buttonColor ?? "#FFFFFF"}</span>
         </div>
 
         <div>

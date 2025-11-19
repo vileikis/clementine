@@ -28,8 +28,8 @@ export default async function BrandingPage({ params }: BrandingPageProps) {
       <BrandingForm
         eventId={eventId}
         eventTitle={event.title}
-        initialBrandColor={event.brandColor}
-        initialShowTitleOverlay={event.showTitleOverlay}
+        initialBrandColor={event.theme?.buttonColor ?? "#3B82F6"}
+        initialShowTitleOverlay={false}
       />
     </div>
   )

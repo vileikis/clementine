@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { PreviewPanel } from "./PreviewPanel";
-import { updateEventEnding } from "../../actions/events";
+import { updateEventEnding, updateEventShare } from "../../actions/events";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
@@ -50,37 +50,80 @@ export function EndingEditor({ event }: EndingEditorProps) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
-  // Form state - ending screen
-  const [endHeadline, setEndHeadline] = useState(event.endHeadline || "");
-  const [endBody, setEndBody] = useState(event.endBody || "");
-  const [endCtaLabel, setEndCtaLabel] = useState(event.endCtaLabel || "");
-  const [endCtaUrl, setEndCtaUrl] = useState(event.endCtaUrl || "");
+  // Form state - ending screen (using nested event.ending object)
+  // Note: null from DB should display as empty string in form
+  const [endTitle, setEndTitle] = useState(event.ending?.title ?? "");
+  const [endBody, setEndBody] = useState(event.ending?.body ?? "");
+  const [endCtaLabel, setEndCtaLabel] = useState(event.ending?.ctaLabel ?? "");
+  const [endCtaUrl, setEndCtaUrl] = useState(event.ending?.ctaUrl ?? "");
 
-  // Form state - share configuration
-  const [shareAllowDownload, setShareAllowDownload] = useState(event.shareAllowDownload ?? true);
-  const [shareAllowSystemShare, setShareAllowSystemShare] = useState(event.shareAllowSystemShare ?? true);
-  const [shareAllowEmail, setShareAllowEmail] = useState(event.shareAllowEmail ?? false);
-  const [shareSocials, setShareSocials] = useState<ShareSocial[]>(event.shareSocials || []);
+  // Form state - share configuration (using nested event.share object)
+  const [shareAllowDownload, setShareAllowDownload] = useState(event.share?.allowDownload ?? true);
+  const [shareAllowSystemShare, setShareAllowSystemShare] = useState(event.share?.allowSystemShare ?? true);
+  const [shareAllowEmail, setShareAllowEmail] = useState(event.share?.allowEmail ?? false);
+  const [shareSocials, setShareSocials] = useState<ShareSocial[]>(event.share?.socials || []);
+
+  // URL validation state
+  const [ctaUrlError, setCtaUrlError] = useState<string | null>(null);
+
+  // Helper function to validate URL
+  const isValidUrl = (urlString: string): boolean => {
+    if (!urlString) return true; // Empty is valid (will be set to null)
+    try {
+      const url = new URL(urlString);
+      return url.protocol === "http:" || url.protocol === "https:";
+    } catch {
+      return false;
+    }
+  };
+
+  // Validate ctaUrl
+  const handleCtaUrlChange = (value: string) => {
+    setEndCtaUrl(value);
+    if (value && !isValidUrl(value)) {
+      setCtaUrlError("Please enter a valid URL (starting with http:// or https://)");
+    } else {
+      setCtaUrlError(null);
+    }
+  };
 
   const handleSave = () => {
     if (isPending) return; // Prevent multiple saves
-    startTransition(async () => {
-      const result = await updateEventEnding(event.id, {
-        endHeadline,
-        endBody,
-        endCtaLabel,
-        endCtaUrl,
-        shareAllowDownload,
-        shareAllowSystemShare,
-        shareAllowEmail,
-        shareSocials,
-      });
 
-      if (result.success) {
-        toast.success("Ending screen updated successfully");
+    // Check for validation errors before saving
+    if (ctaUrlError) {
+      toast.error("Please fix validation errors before saving");
+      return;
+    }
+
+    startTransition(async () => {
+      // Call both Server Actions in parallel
+      const [endingResult, shareResult] = await Promise.all([
+        updateEventEnding(event.id, {
+          title: endTitle || null,
+          body: endBody || null,
+          ctaLabel: endCtaLabel || null,
+          ctaUrl: endCtaUrl || null,
+        }),
+        updateEventShare(event.id, {
+          allowDownload: shareAllowDownload,
+          allowSystemShare: shareAllowSystemShare,
+          allowEmail: shareAllowEmail,
+          socials: shareSocials,
+        }),
+      ]);
+
+      // Check both results
+      if (endingResult.success && shareResult.success) {
+        toast.success("Ending screen and share settings updated successfully");
         router.refresh();
       } else {
-        toast.error(result.error.message || "Failed to update ending screen");
+        // Show error from whichever failed
+        if (!endingResult.success) {
+          toast.error(endingResult.error.message || "Failed to update ending screen");
+        } else if (!shareResult.success) {
+          toast.error(shareResult.error.message || "Failed to update share settings");
+        }
       }
     });
   };
@@ -115,18 +158,18 @@ export function EndingEditor({ event }: EndingEditorProps) {
           <div className="space-y-4">
             <h3 className="text-lg font-medium">Content</h3>
 
-            {/* Headline */}
+            {/* Title */}
             <div className="space-y-2">
-              <Label htmlFor="end-headline">Headline</Label>
+              <Label htmlFor="end-title">Title</Label>
               <Input
-                id="end-headline"
+                id="end-title"
                 placeholder="Thanks for participating!"
-                value={endHeadline}
-                onChange={(e) => setEndHeadline(e.target.value)}
+                value={endTitle}
+                onChange={(e) => setEndTitle(e.target.value)}
                 maxLength={500}
               />
               <p className="text-xs text-muted-foreground">
-                {endHeadline.length}/500 characters
+                {endTitle.length}/500 characters
               </p>
             </div>
 
@@ -169,11 +212,15 @@ export function EndingEditor({ event }: EndingEditorProps) {
                 type="url"
                 placeholder="https://example.com"
                 value={endCtaUrl}
-                onChange={(e) => setEndCtaUrl(e.target.value)}
+                onChange={(e) => handleCtaUrlChange(e.target.value)}
               />
-              <p className="text-xs text-muted-foreground">
-                External link for the button (leave empty for share action)
-              </p>
+              {ctaUrlError ? (
+                <p className="text-sm text-destructive">{ctaUrlError}</p>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  External link for the button (leave empty for share action)
+                </p>
+              )}
             </div>
           </div>
 
@@ -259,7 +306,7 @@ export function EndingEditor({ event }: EndingEditorProps) {
           {/* Save Button */}
           <Button
             onClick={handleSave}
-            disabled={isPending}
+            disabled={isPending || !!ctaUrlError}
             className="w-full"
           >
             {isPending ? "Saving..." : "Save Changes"}
@@ -277,9 +324,9 @@ export function EndingEditor({ event }: EndingEditorProps) {
               <p className="text-sm text-muted-foreground">Generated Result</p>
             </div>
 
-            {endHeadline && (
+            {endTitle && (
               <h1 className="text-3xl font-bold text-foreground">
-                {endHeadline}
+                {endTitle}
               </h1>
             )}
 

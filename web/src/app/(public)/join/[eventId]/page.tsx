@@ -36,11 +36,10 @@ export default async function JoinPage({ params }: JoinPageProps) {
   }
 
   return (
-    <BrandThemeProvider brandColor={event.brandColor}>
+    <BrandThemeProvider brandColor={event.theme?.buttonColor ?? "#3B82F6"}>
       <GuestFlowContainer
         eventId={event.id}
         eventTitle={event.title}
-        showTitleOverlay={event.showTitleOverlay}
       />
     </BrandThemeProvider>
   )

@@ -4,7 +4,6 @@ import {
   createEvent,
   getEvent,
   listEvents,
-  updateEventBranding,
 } from "./events";
 
 describe("Events Repository", () => {
@@ -30,8 +29,6 @@ describe("Events Repository", () => {
 
       const eventId = await createEvent({
         title: "Summer Festival",
-        brandColor: "#FF5733",
-        showTitleOverlay: true,
         companyId: "company-123",
       });
 
@@ -44,11 +41,16 @@ describe("Events Repository", () => {
       expect(eventData).toMatchObject({
         id: "event-123",
         title: "Summer Festival",
-        brandColor: "#FF5733",
-        showTitleOverlay: true,
+        companyId: "company-123",
         status: "draft",
         joinPath: "/join/event-123",
         qrPngPath: "events/event-123/qr/join.png",
+        share: {
+          allowDownload: true,
+          allowSystemShare: true,
+          allowEmail: false,
+          socials: [],
+        },
       });
       expect(eventData.createdAt).toBeGreaterThan(0);
       expect(eventData.updatedAt).toBe(eventData.createdAt);
@@ -59,23 +61,18 @@ describe("Events Repository", () => {
     it("returns event when it exists", async () => {
       const mockEventData = {
         title: "Test Event",
-        brandColor: "#000000",
-        showTitleOverlay: false,
         status: "live",
         joinPath: "/join/event-123",
         qrPngPath: "events/event-123/qr/join.png",
         createdAt: 1234567890,
         updatedAt: 1234567890,
         companyId: null,
-        shareAllowDownload: true,
-        shareAllowSystemShare: true,
-        shareAllowEmail: true,
-        shareSocials: [],
-        surveyEnabled: false,
-        surveyRequired: false,
-        surveyStepsCount: 0,
-        surveyStepsOrder: [],
-        surveyVersion: 1,
+        share: {
+          allowDownload: true,
+          allowSystemShare: true,
+          allowEmail: false,
+          socials: [],
+        },
         experiencesCount: 0,
         sessionsCount: 0,
         readyCount: 0,
@@ -119,13 +116,22 @@ describe("Events Repository", () => {
     it("validates event data with schema", async () => {
       const invalidEventData = {
         title: "",
-        brandColor: "invalid-color",
-        showTitleOverlay: false,
         status: "invalid-status",
         joinPath: "/join/event-123",
         qrPngPath: "events/event-123/qr/join.png",
         createdAt: 1234567890,
         updatedAt: 1234567890,
+        companyId: null,
+        share: {
+          allowDownload: true,
+          allowSystemShare: true,
+          allowEmail: false,
+          socials: [],
+        },
+        experiencesCount: 0,
+        sessionsCount: 0,
+        readyCount: 0,
+        sharesCount: 0,
       };
 
       const mockDoc = {
@@ -150,22 +156,30 @@ describe("Events Repository", () => {
         {
           id: "event-2",
           title: "Newer Event",
-          brandColor: "#111111",
-          showTitleOverlay: true,
           status: "live",
           joinPath: "/join/event-2",
           qrPngPath: "events/event-2/qr/join.png",
+          companyId: null,
+          share: { allowDownload: true, allowSystemShare: true, allowEmail: false, socials: [] },
+          experiencesCount: 0,
+          sessionsCount: 0,
+          readyCount: 0,
+          sharesCount: 0,
           createdAt: 2000000000,
           updatedAt: 2000000000,
         },
         {
           id: "event-1",
           title: "Older Event",
-          brandColor: "#222222",
-          showTitleOverlay: false,
           status: "draft",
           joinPath: "/join/event-1",
           qrPngPath: "events/event-1/qr/join.png",
+          companyId: null,
+          share: { allowDownload: true, allowSystemShare: true, allowEmail: false, socials: [] },
+          experiencesCount: 0,
+          sessionsCount: 0,
+          readyCount: 0,
+          sharesCount: 0,
           createdAt: 1000000000,
           updatedAt: 1000000000,
         },
@@ -207,12 +221,15 @@ describe("Events Repository", () => {
         {
           id: "event-1",
           title: "Company A Event",
-          brandColor: "#111111",
-          showTitleOverlay: true,
           status: "live",
           joinPath: "/join/event-1",
           qrPngPath: "events/event-1/qr/join.png",
           companyId: "company-a",
+          share: { allowDownload: true, allowSystemShare: true, allowEmail: false, socials: [] },
+          experiencesCount: 0,
+          sessionsCount: 0,
+          readyCount: 0,
+          sharesCount: 0,
           createdAt: 2000000000,
           updatedAt: 2000000000,
         },
@@ -249,52 +266,32 @@ describe("Events Repository", () => {
         {
           id: "event-1",
           title: "No Company Event",
-          brandColor: "#111111",
-          showTitleOverlay: true,
           status: "live",
           joinPath: "/join/event-1",
           qrPngPath: "events/event-1/qr/join.png",
           companyId: null,
-          createdAt: 2000000000,
-          updatedAt: 2000000000,
-          shareAllowDownload: true,
-          shareAllowSystemShare: true,
-          shareAllowEmail: true,
-          shareSocials: [],
-          surveyEnabled: false,
-          surveyRequired: false,
-          surveyStepsCount: 0,
-          surveyStepsOrder: [],
-          surveyVersion: 1,
+          share: { allowDownload: true, allowSystemShare: true, allowEmail: false, socials: [] },
           experiencesCount: 0,
           sessionsCount: 0,
           readyCount: 0,
           sharesCount: 0,
+          createdAt: 2000000000,
+          updatedAt: 2000000000,
         },
         {
           id: "event-2",
           title: "Company Event",
-          brandColor: "#222222",
-          showTitleOverlay: false,
           status: "draft",
           joinPath: "/join/event-2",
           qrPngPath: "events/event-2/qr/join.png",
           companyId: "company-a",
-          createdAt: 1000000000,
-          updatedAt: 1000000000,
-          shareAllowDownload: true,
-          shareAllowSystemShare: true,
-          shareAllowEmail: true,
-          shareSocials: [],
-          surveyEnabled: false,
-          surveyRequired: false,
-          surveyStepsCount: 0,
-          surveyStepsOrder: [],
-          surveyVersion: 1,
+          share: { allowDownload: true, allowSystemShare: true, allowEmail: false, socials: [] },
           experiencesCount: 0,
           sessionsCount: 0,
           readyCount: 0,
           sharesCount: 0,
+          createdAt: 1000000000,
+          updatedAt: 1000000000,
         },
       ];
 
@@ -320,63 +317,7 @@ describe("Events Repository", () => {
     });
   });
 
-  describe("updateEventBranding", () => {
-    it("updates brand color", async () => {
-      const mockUpdate = jest.fn();
-      mockDb.collection.mockReturnValue({
-        doc: jest.fn().mockReturnValue({
-          update: mockUpdate,
-        }),
-      });
-
-      await updateEventBranding("event-123", {
-        brandColor: "#FF00FF",
-      });
-
-      expect(mockDb.collection).toHaveBeenCalledWith("events");
-      expect(mockUpdate).toHaveBeenCalledWith({
-        brandColor: "#FF00FF",
-        updatedAt: expect.any(Number),
-      });
-    });
-
-    it("updates showTitleOverlay", async () => {
-      const mockUpdate = jest.fn();
-      mockDb.collection.mockReturnValue({
-        doc: jest.fn().mockReturnValue({
-          update: mockUpdate,
-        }),
-      });
-
-      await updateEventBranding("event-123", {
-        showTitleOverlay: true,
-      });
-
-      expect(mockUpdate).toHaveBeenCalledWith({
-        showTitleOverlay: true,
-        updatedAt: expect.any(Number),
-      });
-    });
-
-    it("updates both branding properties", async () => {
-      const mockUpdate = jest.fn();
-      mockDb.collection.mockReturnValue({
-        doc: jest.fn().mockReturnValue({
-          update: mockUpdate,
-        }),
-      });
-
-      await updateEventBranding("event-123", {
-        brandColor: "#00FF00",
-        showTitleOverlay: false,
-      });
-
-      expect(mockUpdate).toHaveBeenCalledWith({
-        brandColor: "#00FF00",
-        showTitleOverlay: false,
-        updatedAt: expect.any(Number),
-      });
-    });
-  });
+  // updateEventBranding tests removed - brandColor and showTitleOverlay deprecated
+  // Theme updates now handled by updateEventTheme Server Action
 
 });
