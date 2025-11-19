@@ -61,7 +61,7 @@ export const eventSchema = z.object({
   status: eventStatusSchema,
   companyId: z.string().nullable().default(null),
   joinPath: z.string(),
-  qrPngPath: z.string().url(),
+  qrPngPath: z.string(),
   publishStartAt: z.number().optional(),
   publishEndAt: z.number().optional(),
 
@@ -69,7 +69,7 @@ export const eventSchema = z.object({
   theme: eventThemeSchema.optional(),
   welcome: eventWelcomeSchema.optional(),
   ending: eventEndingSchema.optional(),
-  share: eventShareConfigSchema,
+  share: eventShareConfigSchema.optional(),
 
   // Denormalized counters
   experiencesCount: z.number().default(0),
