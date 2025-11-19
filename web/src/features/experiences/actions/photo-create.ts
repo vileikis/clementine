@@ -32,7 +32,7 @@ import type { ActionResponse } from "../lib/actions";
  * @param input - Creation data (label, type)
  * @returns ActionResponse with created PhotoExperience or error
  */
-export async function createPhotoExperienceAction(
+export async function createPhotoExperience(
   eventId: string,
   input: { label: string; type: "photo" }
 ): Promise<ActionResponse<PhotoExperience>> {

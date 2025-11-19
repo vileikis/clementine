@@ -25,7 +25,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { createPhotoExperienceSchema as createExperienceSchema } from "../../lib/schemas";
-import { createPhotoExperienceAction } from "../../actions/create-experience";
+import { createPhotoExperience } from "../../actions";
 import { ExperienceTypeSelector } from "./ExperienceTypeSelector";
 import type { z } from "zod";
 
@@ -61,7 +61,7 @@ export function CreateExperienceForm({ eventId }: CreateExperienceFormProps) {
     setIsSubmitting(true);
 
     try {
-      const result = await createPhotoExperienceAction(eventId, data);
+      const result = await createPhotoExperience(eventId, data);
 
       if (result.success) {
         toast.success("Experience created successfully");

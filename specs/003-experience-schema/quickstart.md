@@ -133,10 +133,14 @@ await db.collection("experiences").doc("exp_123").set(migrated);
 ### Task 1: Create a New Photo Experience
 
 ```typescript
-import { createPhotoExperienceAction } from "@/features/experiences/actions/create-experience";
+// Import from barrel export (recommended)
+import { createPhotoExperience, type ActionResponse } from "@/features/experiences/actions";
+
+// Or import directly from specific file
+// import { createPhotoExperience } from "@/features/experiences/actions/photo-create";
 
 async function createExperience(eventId: string) {
-  const result = await createPhotoExperienceAction(eventId, {
+  const result = await createPhotoExperience(eventId, {
     label: "Summer Photo Booth",
     type: "photo",
   });
@@ -153,10 +157,11 @@ async function createExperience(eventId: string) {
 ### Task 2: Update Photo Configuration
 
 ```typescript
-import { updatePhotoExperienceAction } from "@/features/experiences/actions/update-experience";
+// Import from barrel export (recommended)
+import { updatePhotoExperience } from "@/features/experiences/actions";
 
 async function updateCountdown(eventId: string, experienceId: string) {
-  const result = await updatePhotoExperienceAction(eventId, experienceId, {
+  const result = await updatePhotoExperience(eventId, experienceId, {
     config: {
       countdown: 5,  // Update just countdown, preserve other config fields
     },
@@ -171,8 +176,10 @@ async function updateCountdown(eventId: string, experienceId: string) {
 ### Task 3: Enable AI Transformation
 
 ```typescript
+import { updatePhotoExperience } from "@/features/experiences/actions";
+
 async function enableAI(eventId: string, experienceId: string) {
-  const result = await updatePhotoExperienceAction(eventId, experienceId, {
+  const result = await updatePhotoExperience(eventId, experienceId, {
     aiConfig: {
       enabled: true,
       model: "flux-schnell",
@@ -265,14 +272,23 @@ web/src/features/experiences/
 ├── lib/
 │   ├── schemas.ts              # Zod schemas, TypeScript types
 │   ├── schemas.test.ts         # Schema validation tests
-│   └── migration.ts            # Legacy → new schema migration
-├── components/
-│   ├── create-experience-dialog.tsx   # Create new experience UI
-│   └── experience-builder-form.tsx    # Edit experience UI
-└── actions/
-    ├── create-experience.ts    # Server Action: create
-    ├── update-experience.ts    # Server Action: update
-    └── delete-experience.ts    # Server Action: delete
+│   ├── migration.ts            # Legacy → new schema migration
+│   └── migration.test.ts       # Migration tests
+├── actions/
+│   ├── index.ts                # Barrel export (clean imports)
+│   ├── types.ts                # ActionResponse, shared types
+│   ├── photo-create.ts         # Server Action: create photo experience
+│   ├── photo-update.ts         # Server Action: update photo experience
+│   ├── photo-media.ts          # Server Action: media upload/delete
+│   ├── shared.ts               # Server Action: delete experience (all types)
+│   ├── utils.ts                # Helper functions (auth, validation)
+│   └── legacy.ts               # Old actions (@deprecated)
+└── components/
+    └── shared/
+        ├── CreateExperienceForm.tsx       # Create new experience UI
+        ├── ExperienceTypeSelector.tsx     # Type selection with "coming soon"
+        ├── ExperienceEditor.tsx           # Edit experience configuration
+        └── ExperienceEditorWrapper.tsx    # Server Action wrapper
 ```
 
 ---

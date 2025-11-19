@@ -21,6 +21,45 @@ This is a Next.js 16 monorepo web app. All paths are relative to `web/`:
 - Server Actions: `web/src/features/experiences/actions/`
 - Tests: Co-located with source files (e.g., `schemas.test.ts`)
 
+## Action File Organization Strategy
+
+**Flat structure with explicit naming** to prevent duplication and scale cleanly:
+
+```
+web/src/features/experiences/actions/
+├── index.ts                 # Barrel export (all actions + types)
+├── types.ts                 # ActionResponse, shared types, error codes
+├── photo-create.ts          # createPhotoExperience (new schema)
+├── photo-update.ts          # updatePhotoExperience (new schema + migration)
+├── photo-media.ts           # uploadPreview, uploadOverlay, deletePreview, deleteOverlay
+├── shared.ts                # deleteExperience (works for all types)
+├── legacy.ts                # Old flat-schema actions (deprecated, for backward compat)
+└── utils.ts                 # checkAuth, validateEventExists, etc.
+```
+
+**Migration Path**:
+- **Phase 3** (Current): New `photo-create.ts` coexists with `lib/actions.ts`
+- **Phase 4-5**: Create full actions/ structure, migrate components to use new imports
+- **Phase 6**: Move `lib/actions.ts` → `actions/legacy.ts`, mark deprecated
+- **Future**: Add `video-create.ts`, `video-update.ts`, etc. as needed
+
+**Key Principles**:
+- **Explicit naming**: `photo-create.ts` not `create.ts` (clear which type)
+- **Flat structure**: All files at same level (easy to find, no deep nesting)
+- **Barrel exports**: `actions/index.ts` exports everything (clean imports)
+- **Schema reuse**: Import Zod schemas from `lib/schemas.ts` (no duplication)
+- **Shared utilities**: `utils.ts` for auth checks, event validation (DRY)
+
+**Example Imports After Migration**:
+```typescript
+// Components import from barrel
+import { createPhotoExperience, ActionResponse } from '@/features/experiences/actions';
+
+// Or specific imports
+import { createPhotoExperience } from '@/features/experiences/actions/photo-create';
+import type { ActionResponse } from '@/features/experiences/actions/types';
+```
+
 ---
 
 ## Phase 1: Setup (Shared Infrastructure)
@@ -60,14 +99,14 @@ This is a Next.js 16 monorepo web app. All paths are relative to `web/`:
 
 ### Implementation for User Story 1
 
-- [X] T012 [US1] Implement createPhotoExperienceAction Server Action in web/src/features/experiences/actions/create-experience.ts
-- [X] T013 [US1] Add validation for createPhotoExperienceSchema input in createPhotoExperienceAction
-- [X] T014 [US1] Initialize default values (config.countdown: 0, aiConfig.enabled: false, aiConfig.aspectRatio: "1:1") in createPhotoExperienceAction
-- [X] T015 [US1] Write new experience document to Firestore using Admin SDK in createPhotoExperienceAction
-- [X] T016 [US1] Add revalidatePath call for /events/${eventId} in createPhotoExperienceAction
-- [X] T017 [US1] Return ActionResponse<PhotoExperience> with proper error handling in createPhotoExperienceAction
-- [X] T018 [US1] Verify ExperienceTypeSelector component shows "Coming Soon" badges for non-photo types in web/src/features/experiences/components/shared/ExperienceTypeSelector.tsx (verified - already compliant)
-- [X] T019 [US1] Verify CreateExperienceForm calls createPhotoExperienceAction with correct schema in web/src/features/experiences/components/shared/CreateExperienceForm.tsx (updated to use new action)
+- [X] T012 [US1] Implement createPhotoExperience in web/src/features/experiences/actions/photo-create.ts (temporarily named create-experience.ts in Phase 3)
+- [X] T013 [US1] Add validation using createPhotoExperienceSchema from lib/schemas.ts
+- [X] T014 [US1] Initialize default values (config.countdown: 0, aiConfig.enabled: false, aiConfig.aspectRatio: "1:1")
+- [X] T015 [US1] Write new experience document to Firestore using Admin SDK
+- [X] T016 [US1] Add revalidatePath call for /events/${eventId}
+- [X] T017 [US1] Return ActionResponse<PhotoExperience> with proper error handling
+- [X] T018 [US1] Verify ExperienceTypeSelector shows "Coming Soon" badges for non-photo types (verified - already compliant)
+- [X] T019 [US1] Update CreateExperienceForm to import from new action file (completed - uses createPhotoExperienceAction)
 
 **Checkpoint**: At this point, User Story 1 should be fully functional - new photo experiences create with correct schema ✅
 
@@ -81,16 +120,16 @@ This is a Next.js 16 monorepo web app. All paths are relative to `web/`:
 
 ### Implementation for User Story 2
 
-- [ ] T020 [US2] Implement updatePhotoExperienceAction Server Action in web/src/features/experiences/actions/update-experience.ts
-- [ ] T021 [US2] Add validation for updatePhotoExperienceSchema input in updatePhotoExperienceAction
-- [ ] T022 [US2] Fetch existing experience document from Firestore in updatePhotoExperienceAction
-- [ ] T023 [US2] Merge partial updates with existing config and aiConfig objects in updatePhotoExperienceAction
-- [ ] T024 [US2] Update updatedAt timestamp in updatePhotoExperienceAction
-- [ ] T025 [US2] Write merged document to Firestore using Admin SDK in updatePhotoExperienceAction
-- [ ] T026 [US2] Add revalidatePath call for /events/${eventId}/experiences/${experienceId} in updatePhotoExperienceAction
-- [ ] T027 [US2] Update ExperienceEditor state initialization to read from config.* and aiConfig.* with fallback to legacy fields in web/src/features/experiences/components/shared/ExperienceEditor.tsx (lines 49-90)
-- [ ] T028 [US2] Update ExperienceEditor handleSave to write to config and aiConfig nested structure in web/src/features/experiences/components/shared/ExperienceEditor.tsx (lines 66-90)
-- [ ] T029 [US2] Verify ExperienceEditorWrapper calls updatePhotoExperienceAction correctly in web/src/features/experiences/components/shared/ExperienceEditorWrapper.tsx (should already work, just verify)
+- [ ] T020 [US2] Implement updatePhotoExperience in web/src/features/experiences/actions/photo-update.ts
+- [ ] T021 [US2] Add validation using updatePhotoExperienceSchema from lib/schemas.ts
+- [ ] T022 [US2] Fetch existing experience document from Firestore
+- [ ] T023 [US2] Merge partial updates with existing config and aiConfig objects (deep merge)
+- [ ] T024 [US2] Update updatedAt timestamp
+- [ ] T025 [US2] Write merged document to Firestore using Admin SDK
+- [ ] T026 [US2] Add revalidatePath call for /events/${eventId}/experiences/${experienceId}
+- [ ] T027 [US2] Update ExperienceEditor state initialization to read from config.* and aiConfig.* with fallback to legacy fields (web/src/features/experiences/components/shared/ExperienceEditor.tsx lines 49-90)
+- [ ] T028 [US2] Update ExperienceEditor handleSave to write to config and aiConfig nested structure (web/src/features/experiences/components/shared/ExperienceEditor.tsx lines 66-90)
+- [ ] T029 [US2] Update ExperienceEditorWrapper to import from actions/photo-update.ts (web/src/features/experiences/components/shared/ExperienceEditorWrapper.tsx)
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work - create and edit experiences with new schema
 
@@ -104,11 +143,11 @@ This is a Next.js 16 monorepo web app. All paths are relative to `web/`:
 
 ### Implementation for User Story 3
 
-- [ ] T030 [US3] Add legacy schema detection logic in updatePhotoExperienceAction in web/src/features/experiences/actions/update-experience.ts
-- [ ] T031 [US3] Call migratePhotoExperience function when legacy fields detected in updatePhotoExperienceAction
-- [ ] T032 [US3] Remove deprecated flat fields (countdownEnabled, countdownSeconds, overlayEnabled, aiEnabled, aiModel, aiPrompt, aiReferenceImagePaths, aiAspectRatio) after migration in updatePhotoExperienceAction
-- [ ] T033 [US3] Validate migrated document against photoExperienceSchema before write in updatePhotoExperienceAction
-- [ ] T034 [US3] Add error handling for migration failures with MIGRATION_ERROR code in updatePhotoExperienceAction
+- [ ] T030 [US3] Add legacy schema detection logic in updatePhotoExperience (web/src/features/experiences/actions/photo-update.ts)
+- [ ] T031 [US3] Call migratePhotoExperience from lib/migration.ts when legacy fields detected
+- [ ] T032 [US3] Remove deprecated flat fields after migration (countdownEnabled, countdownSeconds, overlayEnabled, aiEnabled, aiModel, aiPrompt, aiReferenceImagePaths, aiAspectRatio)
+- [ ] T033 [US3] Validate migrated document against photoExperienceSchema from lib/schemas.ts before write
+- [ ] T034 [US3] Add error handling for migration failures with MIGRATION_ERROR code
 - [ ] T035 [US3] Test migration with legacy countdown fields (countdownEnabled: true, countdownSeconds: 5) in web/src/features/experiences/lib/migration.test.ts
 - [ ] T036 [P] [US3] Test migration with legacy AI fields (aiEnabled: true, aiPrompt: "test") in web/src/features/experiences/lib/migration.test.ts
 - [ ] T037 [P] [US3] Test migration with mixed old and new fields (new fields take precedence) in web/src/features/experiences/lib/migration.test.ts
@@ -131,17 +170,33 @@ This is a Next.js 16 monorepo web app. All paths are relative to `web/`:
 - [ ] T045 [P] Add integration test for edit experience flow (US2) in web/src/features/experiences/__tests__/edit-experience.integration.test.ts
 - [ ] T046 [P] Add integration test for migration flow (US3) in web/src/features/experiences/__tests__/migration.integration.test.ts
 
+### Action File Reorganization (Post-Implementation Cleanup)
+
+**Purpose**: Migrate to flat action file structure and eliminate duplication
+
+- [ ] T047 Create web/src/features/experiences/actions/types.ts (export ActionResponse and error codes)
+- [ ] T048 Create web/src/features/experiences/actions/utils.ts (checkAuth, validateEventExists helpers)
+- [ ] T049 Rename web/src/features/experiences/actions/create-experience.ts → photo-create.ts
+- [ ] T050 Create web/src/features/experiences/actions/photo-update.ts (move updatePhotoExperience logic)
+- [ ] T051 Create web/src/features/experiences/actions/photo-media.ts (move uploadPreview, uploadOverlay, deletePreview, deleteOverlay from lib/actions.ts)
+- [ ] T052 Create web/src/features/experiences/actions/shared.ts (move deleteExperience from lib/actions.ts)
+- [ ] T053 Move web/src/features/experiences/lib/actions.ts → actions/legacy.ts and add @deprecated JSDoc comments
+- [ ] T054 Create web/src/features/experiences/actions/index.ts barrel export (export all actions + types)
+- [ ] T055 Update all component imports to use new action paths (CreateExperienceForm, ExperienceEditor, ExperienceEditorWrapper, etc.)
+- [ ] T056 Verify all schemas are imported from lib/schemas.ts (no inline Zod schema definitions in actions)
+- [ ] T057 Add deprecation warnings in legacy.ts for all exported functions
+
 ### Validation Loop (REQUIRED - Constitution Principle V)
 
 **Purpose**: Ensure code quality and correctness before merge
 
-- [ ] T047 Run `pnpm lint` from root and fix all errors/warnings
-- [ ] T048 Run `pnpm type-check` from root and resolve all TypeScript errors
-- [ ] T049 Run `pnpm test` from root and ensure all tests pass
-- [ ] T050 Test create new photo experience in local dev server (`pnpm dev`)
-- [ ] T051 Test edit existing photo experience in local dev server
-- [ ] T052 Test migration of legacy experience (create legacy doc in Firestore, edit, verify migration)
-- [ ] T053 Commit only after validation loop passes cleanly
+- [ ] T058 Run `pnpm lint` from root and fix all errors/warnings
+- [ ] T059 Run `pnpm type-check` from root and resolve all TypeScript errors
+- [ ] T060 Run `pnpm test` from root and ensure all tests pass
+- [ ] T061 Test create new photo experience in local dev server (`pnpm dev`)
+- [ ] T062 Test edit existing photo experience in local dev server
+- [ ] T063 Test migration of legacy experience (create legacy doc in Firestore, edit, verify migration)
+- [ ] T064 Commit only after validation loop passes cleanly
 
 ---
 
