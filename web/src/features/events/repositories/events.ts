@@ -7,6 +7,7 @@ import { eventSchema } from "../lib/schemas";
 export async function createEvent(data: {
   title: string;
   companyId: string;
+  buttonColor?: string;
 }): Promise<string> {
   const eventRef = db.collection("events").doc();
 
@@ -23,6 +24,12 @@ export async function createEvent(data: {
     qrPngPath: `events/${eventId}/qr/join.png`,
     createdAt: now,
     updatedAt: now,
+    // Initialize theme with button color if provided
+    ...(data.buttonColor && {
+      theme: {
+        buttonColor: data.buttonColor,
+      },
+    }),
     // Initialize share config with defaults
     share: {
       allowDownload: true,
