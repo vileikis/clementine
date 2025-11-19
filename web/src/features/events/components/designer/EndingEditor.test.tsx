@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { EndingEditor } from "./EndingEditor";
 import { useRouter } from "next/navigation";
@@ -244,7 +244,7 @@ describe("EndingEditor", () => {
 
       // Click save button
       const saveButton = screen.getByRole("button", { name: /save changes/i });
-      fireEvent.click(saveButton);
+      await userEvent.click(saveButton);
 
       // Wait for async operations
       await waitFor(() => {
@@ -272,7 +272,7 @@ describe("EndingEditor", () => {
       render(<EndingEditor event={event} />);
 
       const saveButton = screen.getByRole("button", { name: /save changes/i });
-      fireEvent.click(saveButton);
+      await userEvent.click(saveButton);
 
       await waitFor(() => {
         expect(toast.success).toHaveBeenCalledWith(
@@ -296,7 +296,7 @@ describe("EndingEditor", () => {
       render(<EndingEditor event={event} />);
 
       const saveButton = screen.getByRole("button", { name: /save changes/i });
-      fireEvent.click(saveButton);
+      await userEvent.click(saveButton);
 
       await waitFor(() => {
         expect(toast.error).toHaveBeenCalledWith("Invalid ending data");
@@ -317,7 +317,7 @@ describe("EndingEditor", () => {
       render(<EndingEditor event={event} />);
 
       const saveButton = screen.getByRole("button", { name: /save changes/i });
-      fireEvent.click(saveButton);
+      await userEvent.click(saveButton);
 
       await waitFor(() => {
         expect(toast.error).toHaveBeenCalledWith("Invalid share data");
@@ -342,7 +342,7 @@ describe("EndingEditor", () => {
       render(<EndingEditor event={event} />);
 
       const saveButton = screen.getByRole("button", { name: /save changes/i });
-      fireEvent.click(saveButton);
+      await userEvent.click(saveButton);
 
       // Button should be disabled and show "Saving..."
       await waitFor(() => {
@@ -350,9 +350,13 @@ describe("EndingEditor", () => {
         expect(saveButton).toHaveTextContent("Saving...");
       });
 
-      // Resolve both promises
-      resolveEndingUpdate!({ success: true });
-      resolveShareUpdate!({ success: true });
+      // Resolve both promises and wait for transition to complete
+      await act(async () => {
+        resolveEndingUpdate!({ success: true });
+        resolveShareUpdate!({ success: true });
+        // Allow React to process the transition
+        await new Promise(resolve => setTimeout(resolve, 0));
+      });
 
       // Button should be enabled again
       await waitFor(() => {
@@ -381,9 +385,9 @@ describe("EndingEditor", () => {
       const saveButton = screen.getByRole("button", { name: /save changes/i });
 
       // Click save multiple times
-      fireEvent.click(saveButton);
-      fireEvent.click(saveButton);
-      fireEvent.click(saveButton);
+      await userEvent.click(saveButton);
+      await userEvent.click(saveButton);
+      await userEvent.click(saveButton);
 
       // Should only call each Server Action once
       await waitFor(() => {
@@ -392,8 +396,12 @@ describe("EndingEditor", () => {
       });
 
       // Resolve both promises
-      resolveEndingUpdate!({ success: true });
-      resolveShareUpdate!({ success: true });
+      await act(async () => {
+        resolveEndingUpdate!({ success: true });
+        resolveShareUpdate!({ success: true });
+        // Allow React to process the transition
+        await new Promise(resolve => setTimeout(resolve, 0));
+      });
     });
   });
 
@@ -447,7 +455,7 @@ describe("EndingEditor", () => {
 
       // Save
       const saveButton = screen.getByRole("button", { name: /save changes/i });
-      fireEvent.click(saveButton);
+      await userEvent.click(saveButton);
 
       await waitFor(() => {
         expect(updateEventShare).toHaveBeenCalledWith("event-123", {
