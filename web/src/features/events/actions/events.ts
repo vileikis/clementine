@@ -15,7 +15,12 @@ import {
   updateEventTitle,
 } from "../repositories/events";
 import { getCompany } from "@/features/companies/repositories/companies";
-import { updateEventWelcomeSchema, updateEventEndingSchema } from "../lib/validation";
+import {
+  updateEventWelcomeSchema,
+  updateEventEndingSchema,
+  updateEventShareSchema,
+  updateEventThemeSchema,
+} from "../lib/schemas";
 import { verifyAdminSecret } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
@@ -185,6 +190,7 @@ export async function updateEventTitleAction(
 
 /**
  * Updates welcome screen configuration for an event.
+ * Uses nested object structure (event.welcome.*)
  * @param eventId - Event ID
  * @param data - Partial welcome screen fields to update
  * @returns Success/error response
@@ -192,11 +198,11 @@ export async function updateEventTitleAction(
 export async function updateEventWelcome(
   eventId: string,
   data: {
-    welcomeTitle?: string;
-    welcomeDescription?: string;
-    welcomeCtaLabel?: string;
-    welcomeBackgroundImagePath?: string;
-    welcomeBackgroundColorHex?: string;
+    title?: string;
+    body?: string;
+    ctaLabel?: string;
+    backgroundImage?: string;
+    backgroundColor?: string;
   }
 ): Promise<ActionResponse<void>> {
   try {
@@ -229,11 +235,30 @@ export async function updateEventWelcome(
       };
     }
 
-    // Update only provided fields
-    await eventRef.update({
-      ...validatedData,
+    // Build update object with dot notation for nested fields
+    const updateData: Record<string, unknown> = {
       updatedAt: Date.now(),
-    });
+    };
+
+    // Map validated data to nested welcome object fields using dot notation
+    if (validatedData.title !== undefined) {
+      updateData["welcome.title"] = validatedData.title;
+    }
+    if (validatedData.body !== undefined) {
+      updateData["welcome.body"] = validatedData.body;
+    }
+    if (validatedData.ctaLabel !== undefined) {
+      updateData["welcome.ctaLabel"] = validatedData.ctaLabel;
+    }
+    if (validatedData.backgroundImage !== undefined) {
+      updateData["welcome.backgroundImage"] = validatedData.backgroundImage;
+    }
+    if (validatedData.backgroundColor !== undefined) {
+      updateData["welcome.backgroundColor"] = validatedData.backgroundColor;
+    }
+
+    // Update only provided fields
+    await eventRef.update(updateData);
 
     return { success: true, data: undefined };
   } catch (error) {
@@ -260,24 +285,19 @@ export async function updateEventWelcome(
 }
 
 /**
- * Updates ending screen and share configuration for an event.
+ * Updates ending screen configuration for an event.
+ * Uses nested object structure (event.ending.*)
  * @param eventId - Event ID
- * @param data - Partial ending screen and share fields to update
+ * @param data - Partial ending screen fields to update
  * @returns Success/error response
  */
 export async function updateEventEnding(
   eventId: string,
   data: {
-    endHeadline?: string;
-    endBody?: string;
-    endCtaLabel?: string;
-    endCtaUrl?: string;
-    shareAllowDownload?: boolean;
-    shareAllowSystemShare?: boolean;
-    shareAllowEmail?: boolean;
-    shareSocials?: Array<
-      "instagram" | "tiktok" | "facebook" | "x" | "snapchat" | "whatsapp" | "custom"
-    >;
+    title?: string;
+    body?: string;
+    ctaLabel?: string;
+    ctaUrl?: string;
   }
 ): Promise<ActionResponse<void>> {
   try {
@@ -310,11 +330,27 @@ export async function updateEventEnding(
       };
     }
 
-    // Update only provided fields
-    await eventRef.update({
-      ...validatedData,
+    // Build update object with dot notation for nested fields
+    const updateData: Record<string, unknown> = {
       updatedAt: Date.now(),
-    });
+    };
+
+    // Map validated data to nested ending object fields using dot notation
+    if (validatedData.title !== undefined) {
+      updateData["ending.title"] = validatedData.title;
+    }
+    if (validatedData.body !== undefined) {
+      updateData["ending.body"] = validatedData.body;
+    }
+    if (validatedData.ctaLabel !== undefined) {
+      updateData["ending.ctaLabel"] = validatedData.ctaLabel;
+    }
+    if (validatedData.ctaUrl !== undefined) {
+      updateData["ending.ctaUrl"] = validatedData.ctaUrl;
+    }
+
+    // Update only provided fields
+    await eventRef.update(updateData);
 
     return { success: true, data: undefined };
   } catch (error) {
@@ -341,19 +377,187 @@ export async function updateEventEnding(
 }
 
 /**
- * Updates survey configuration for an event.
+ * Updates share configuration for an event.
+ * Uses nested object structure (event.share.*)
  * @param eventId - Event ID
- * @param data - Partial survey configuration fields to update
+ * @param data - Partial share configuration fields to update
  * @returns Success/error response
  */
-export async function updateEventSurveyConfig(
-  _eventId: string,
-  _data: {
-    surveyEnabled?: boolean;
-    surveyRequired?: boolean;
-    surveyStepsOrder?: string[];
+export async function updateEventShare(
+  eventId: string,
+  data: {
+    allowDownload?: boolean;
+    allowSystemShare?: boolean;
+    allowEmail?: boolean;
+    socials?: Array<
+      "instagram" | "tiktok" | "facebook" | "x" | "snapchat" | "whatsapp" | "custom"
+    >;
   }
 ): Promise<ActionResponse<void>> {
-  // TODO: Implement in Phase 7 (User Story 4)
-  throw new Error("Not implemented");
+  try {
+    // Check authentication
+    const auth = await verifyAdminSecret();
+    if (!auth.authorized) {
+      return {
+        success: false,
+        error: {
+          code: "PERMISSION_DENIED",
+          message: auth.error,
+        },
+      };
+    }
+
+    // Validate input with Zod
+    const validatedData = updateEventShareSchema.parse(data);
+
+    // Check if event exists
+    const eventRef = db.collection("events").doc(eventId);
+    const eventDoc = await eventRef.get();
+
+    if (!eventDoc.exists) {
+      return {
+        success: false,
+        error: {
+          code: "EVENT_NOT_FOUND",
+          message: "Event not found",
+        },
+      };
+    }
+
+    // Build update object with dot notation for nested fields
+    const updateData: Record<string, unknown> = {
+      updatedAt: Date.now(),
+    };
+
+    // Map validated data to nested share object fields using dot notation
+    if (validatedData.allowDownload !== undefined) {
+      updateData["share.allowDownload"] = validatedData.allowDownload;
+    }
+    if (validatedData.allowSystemShare !== undefined) {
+      updateData["share.allowSystemShare"] = validatedData.allowSystemShare;
+    }
+    if (validatedData.allowEmail !== undefined) {
+      updateData["share.allowEmail"] = validatedData.allowEmail;
+    }
+    if (validatedData.socials !== undefined) {
+      updateData["share.socials"] = validatedData.socials;
+    }
+
+    // Update only provided fields
+    await eventRef.update(updateData);
+
+    return { success: true, data: undefined };
+  } catch (error) {
+    // Handle Zod validation errors
+    if (error && typeof error === "object" && "issues" in error) {
+      return {
+        success: false,
+        error: {
+          code: "VALIDATION_ERROR",
+          message: "Invalid input data",
+        },
+      };
+    }
+
+    // Handle other errors
+    return {
+      success: false,
+      error: {
+        code: "INTERNAL_ERROR",
+        message: error instanceof Error ? error.message : "Unknown error",
+      },
+    };
+  }
+}
+
+/**
+ * Updates theme configuration for an event.
+ * Uses nested object structure (event.theme.*)
+ * @param eventId - Event ID
+ * @param data - Partial theme configuration fields to update
+ * @returns Success/error response
+ */
+export async function updateEventTheme(
+  eventId: string,
+  data: {
+    buttonColor?: string;
+    buttonTextColor?: string;
+    backgroundColor?: string;
+    backgroundImage?: string;
+  }
+): Promise<ActionResponse<void>> {
+  try {
+    // Check authentication
+    const auth = await verifyAdminSecret();
+    if (!auth.authorized) {
+      return {
+        success: false,
+        error: {
+          code: "PERMISSION_DENIED",
+          message: auth.error,
+        },
+      };
+    }
+
+    // Validate input with Zod
+    const validatedData = updateEventThemeSchema.parse(data);
+
+    // Check if event exists
+    const eventRef = db.collection("events").doc(eventId);
+    const eventDoc = await eventRef.get();
+
+    if (!eventDoc.exists) {
+      return {
+        success: false,
+        error: {
+          code: "EVENT_NOT_FOUND",
+          message: "Event not found",
+        },
+      };
+    }
+
+    // Build update object with dot notation for nested fields
+    const updateData: Record<string, unknown> = {
+      updatedAt: Date.now(),
+    };
+
+    // Map validated data to nested theme object fields using dot notation
+    if (validatedData.buttonColor !== undefined) {
+      updateData["theme.buttonColor"] = validatedData.buttonColor;
+    }
+    if (validatedData.buttonTextColor !== undefined) {
+      updateData["theme.buttonTextColor"] = validatedData.buttonTextColor;
+    }
+    if (validatedData.backgroundColor !== undefined) {
+      updateData["theme.backgroundColor"] = validatedData.backgroundColor;
+    }
+    if (validatedData.backgroundImage !== undefined) {
+      updateData["theme.backgroundImage"] = validatedData.backgroundImage;
+    }
+
+    // Update only provided fields
+    await eventRef.update(updateData);
+
+    return { success: true, data: undefined };
+  } catch (error) {
+    // Handle Zod validation errors
+    if (error && typeof error === "object" && "issues" in error) {
+      return {
+        success: false,
+        error: {
+          code: "VALIDATION_ERROR",
+          message: "Invalid input data",
+        },
+      };
+    }
+
+    // Handle other errors
+    return {
+      success: false,
+      error: {
+        code: "INTERNAL_ERROR",
+        message: error instanceof Error ? error.message : "Unknown error",
+      },
+    };
+  }
 }
