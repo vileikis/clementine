@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ThemeEditor } from "./ThemeEditor";
 import { useRouter } from "next/navigation";
@@ -224,7 +224,7 @@ describe("ThemeEditor", () => {
 
       // Click save button
       const saveButton = screen.getByRole("button", { name: /save changes/i });
-      fireEvent.click(saveButton);
+      await userEvent.click(saveButton);
 
       // Wait for async operation
       await waitFor(() => {
@@ -245,7 +245,7 @@ describe("ThemeEditor", () => {
       render(<ThemeEditor event={event} />);
 
       const saveButton = screen.getByRole("button", { name: /save changes/i });
-      fireEvent.click(saveButton);
+      await userEvent.click(saveButton);
 
       await waitFor(() => {
         expect(toast.success).toHaveBeenCalledWith(
@@ -269,7 +269,7 @@ describe("ThemeEditor", () => {
       render(<ThemeEditor event={event} />);
 
       const saveButton = screen.getByRole("button", { name: /save changes/i });
-      fireEvent.click(saveButton);
+      await userEvent.click(saveButton);
 
       await waitFor(() => {
         expect(toast.error).toHaveBeenCalledWith("Invalid theme data");
@@ -288,7 +288,7 @@ describe("ThemeEditor", () => {
       render(<ThemeEditor event={event} />);
 
       const saveButton = screen.getByRole("button", { name: /save changes/i });
-      fireEvent.click(saveButton);
+      await userEvent.click(saveButton);
 
       // Button should be disabled and show "Saving..."
       await waitFor(() => {
@@ -296,8 +296,12 @@ describe("ThemeEditor", () => {
         expect(saveButton).toHaveTextContent("Saving...");
       });
 
-      // Resolve the promise
-      resolveUpdate!({ success: true, data: undefined });
+      // Resolve the promise and wait for transition to complete
+      await act(async () => {
+        resolveUpdate!({ success: true, data: undefined });
+        // Allow React to process the transition
+        await new Promise(resolve => setTimeout(resolve, 0));
+      });
 
       // Button should be enabled again
       await waitFor(() => {
@@ -320,9 +324,9 @@ describe("ThemeEditor", () => {
       const saveButton = screen.getByRole("button", { name: /save changes/i });
 
       // Click save multiple times
-      fireEvent.click(saveButton);
-      fireEvent.click(saveButton);
-      fireEvent.click(saveButton);
+      await userEvent.click(saveButton);
+      await userEvent.click(saveButton);
+      await userEvent.click(saveButton);
 
       // Should only call updateEventTheme once
       await waitFor(() => {
@@ -330,7 +334,11 @@ describe("ThemeEditor", () => {
       });
 
       // Resolve the promise
-      resolveUpdate!({ success: true, data: undefined });
+      await act(async () => {
+        resolveUpdate!({ success: true, data: undefined });
+        // Allow React to process the transition
+        await new Promise(resolve => setTimeout(resolve, 0));
+      });
     });
   });
 
