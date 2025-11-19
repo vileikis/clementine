@@ -174,24 +174,24 @@ import type { ActionResponse } from '@/features/experiences/actions/types';
 
 **Purpose**: Migrate to flat action file structure and eliminate duplication
 
-- [ ] T047 Create web/src/features/experiences/actions/types.ts (export ActionResponse and error codes)
-- [ ] T048 Create web/src/features/experiences/actions/utils.ts (checkAuth, validateEventExists helpers)
-- [ ] T049 Rename web/src/features/experiences/actions/create-experience.ts → photo-create.ts
-- [ ] T050 Create web/src/features/experiences/actions/photo-update.ts (move updatePhotoExperience logic)
-- [ ] T051 Create web/src/features/experiences/actions/photo-media.ts (move uploadPreview, uploadOverlay, deletePreview, deleteOverlay from lib/actions.ts)
-- [ ] T052 Create web/src/features/experiences/actions/shared.ts (move deleteExperience from lib/actions.ts)
-- [ ] T053 Move web/src/features/experiences/lib/actions.ts → actions/legacy.ts and add @deprecated JSDoc comments
-- [ ] T054 Create web/src/features/experiences/actions/index.ts barrel export (export all actions + types)
-- [ ] T055 Update all component imports to use new action paths (CreateExperienceForm, ExperienceEditor, ExperienceEditorWrapper, etc.)
-- [ ] T056 Verify all schemas are imported from lib/schemas.ts (no inline Zod schema definitions in actions)
-- [ ] T057 Add deprecation warnings in legacy.ts for all exported functions
+- [X] T047 Create web/src/features/experiences/actions/types.ts (export ActionResponse and error codes)
+- [X] T048 Create web/src/features/experiences/actions/utils.ts (checkAuth, validateEventExists helpers)
+- [X] T049 Rename web/src/features/experiences/actions/create-experience.ts → photo-create.ts
+- [X] T050 Create web/src/features/experiences/actions/photo-update.ts (move updatePhotoExperience logic)
+- [X] T051 Create web/src/features/experiences/actions/photo-media.ts (move uploadPreview, uploadOverlay, deletePreview, deleteOverlay from lib/actions.ts)
+- [X] T052 Create web/src/features/experiences/actions/shared.ts (move deleteExperience from lib/actions.ts)
+- [X] T053 Move web/src/features/experiences/lib/actions.ts → actions/legacy.ts and add @deprecated JSDoc comments
+- [X] T054 Create web/src/features/experiences/actions/index.ts barrel export (export all actions + types)
+- [X] T055 Update all component imports to use new action paths (CreateExperienceForm, ExperienceEditor, ExperienceEditorWrapper, etc.)
+- [X] T056 Verify all schemas are imported from lib/schemas.ts (no inline Zod schema definitions in actions)
+- [X] T057 Add deprecation warnings in legacy.ts for all exported functions
 
 ### Validation Loop (REQUIRED - Constitution Principle V)
 
 **Purpose**: Ensure code quality and correctness before merge
 
-- [ ] T058 Run `pnpm lint` from root and fix all errors/warnings
-- [ ] T059 Run `pnpm type-check` from root and resolve all TypeScript errors
+- [X] T058 Run `pnpm lint` from root and fix all errors/warnings
+- [X] T059 Run `pnpm type-check` from root and resolve all TypeScript errors
 - [ ] T060 Run `pnpm test` from root and ensure all tests pass
 - [ ] T061 Test create new photo experience in local dev server (`pnpm dev`)
 - [ ] T062 Test edit existing photo experience in local dev server

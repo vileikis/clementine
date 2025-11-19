@@ -17,7 +17,6 @@
 
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/firebase/admin";
-import { verifyAdminSecret } from "@/lib/auth";
 import { z } from "zod";
 import {
   updatePhotoExperienceSchema,
@@ -27,7 +26,9 @@ import {
   type AiConfig
 } from "../lib/schemas";
 import { migratePhotoExperience, stripLegacyFields } from "../lib/migration";
-import type { ActionResponse } from "../lib/actions";
+import type { ActionResponse } from "./types";
+import { ErrorCodes } from "./types";
+import { checkAuth, validateExperienceExists, createSuccessResponse, createErrorResponse } from "./utils";
 
 /**
  * Type for partial update input
@@ -57,19 +58,15 @@ export async function updatePhotoExperience(
 ): Promise<ActionResponse<PhotoExperience>> {
   try {
     // Check authentication
-    const auth = await verifyAdminSecret();
-    if (!auth.authorized) {
-      return {
-        success: false,
-        error: {
-          code: "PERMISSION_DENIED",
-          message: auth.error,
-        },
-      };
-    }
+    const authError = await checkAuth();
+    if (authError) return authError;
 
     // Validate input with Zod schema
     const validated = updatePhotoExperienceSchema.parse(input);
+
+    // Check if experience exists
+    const experienceError = await validateExperienceExists(eventId, experienceId);
+    if (experienceError) return experienceError;
 
     // Fetch existing experience document
     const experienceRef = db
@@ -80,16 +77,6 @@ export async function updatePhotoExperience(
 
     const experienceDoc = await experienceRef.get();
 
-    if (!experienceDoc.exists) {
-      return {
-        success: false,
-        error: {
-          code: "EXPERIENCE_NOT_FOUND",
-          message: `Experience with ID ${experienceId} not found`,
-        },
-      };
-    }
-
     const existingData = experienceDoc.data();
 
     // Migrate legacy data if needed (User Story 3)
@@ -97,16 +84,12 @@ export async function updatePhotoExperience(
     try {
       currentExperience = migratePhotoExperience(existingData);
     } catch (migrationError) {
-      return {
-        success: false,
-        error: {
-          code: "MIGRATION_ERROR",
-          message:
-            migrationError instanceof Error
-              ? migrationError.message
-              : "Failed to migrate legacy experience",
-        },
-      };
+      return createErrorResponse(
+        ErrorCodes.MIGRATION_ERROR,
+        migrationError instanceof Error
+          ? migrationError.message
+          : "Failed to migrate legacy experience"
+      );
     }
 
     // Merge partial updates with existing data
@@ -152,30 +135,20 @@ export async function updatePhotoExperience(
     // Also revalidate the event page (list view)
     revalidatePath(`/events/${eventId}`);
 
-    return {
-      success: true,
-      data: cleanExperience,
-    };
+    return createSuccessResponse(cleanExperience);
   } catch (error) {
     // Handle Zod validation errors
     if (error instanceof z.ZodError) {
-      return {
-        success: false,
-        error: {
-          code: "VALIDATION_ERROR",
-          message: error.issues.map((e) => e.message).join(", "),
-        },
-      };
+      return createErrorResponse(
+        ErrorCodes.VALIDATION_ERROR,
+        error.issues.map((e) => e.message).join(", ")
+      );
     }
 
     // Handle unknown errors
-    return {
-      success: false,
-      error: {
-        code: "UNKNOWN_ERROR",
-        message:
-          error instanceof Error ? error.message : "Unknown error occurred",
-      },
-    };
+    return createErrorResponse(
+      ErrorCodes.UNKNOWN_ERROR,
+      error instanceof Error ? error.message : "Unknown error occurred"
+    );
   }
 }

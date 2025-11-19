@@ -1,8 +1,16 @@
 "use server";
 
 /**
- * Server Actions for experience CRUD operations.
- * Phase 6 implementation: Full CRUD operations for photo experiences.
+ * @deprecated This file contains legacy Server Actions.
+ *
+ * **DO NOT USE** - Use the new action files instead:
+ * - `photo-create.ts` for creating photo experiences
+ * - `photo-update.ts` for updating photo experiences
+ * - `photo-media.ts` for media upload/delete operations
+ * - `shared.ts` for type-agnostic operations (delete, etc.)
+ *
+ * This file is kept for backward compatibility only and will be removed in a future version.
+ * Part of 003-experience-schema Phase 6 - Action File Reorganization.
  */
 
 import { db, storage as bucket } from "@/lib/firebase/admin";

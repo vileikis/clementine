@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Upload } from "lucide-react";
-import { uploadPreviewMedia, deletePreviewMedia } from "../../lib/actions";
+import { uploadPreviewMedia, deletePreviewMedia } from "../../actions/photo-media";
 import type { PreviewType } from "../../types/experience.types";
 
 interface PreviewMediaUploadProps {
