@@ -4,6 +4,7 @@ import { WelcomeEditor } from "./WelcomeEditor";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import type { Event } from "../../types/event.types";
+import * as eventsActions from "../../actions/events";
 
 // Mock dependencies
 jest.mock("../../actions/events", () => ({
@@ -50,8 +51,8 @@ jest.mock("./PreviewPanel", () => ({
   ),
 }));
 
-// Import the mocked function
-const { updateEventWelcome } = require("../../actions/events");
+// Get mocked function
+const { updateEventWelcome } = eventsActions as jest.Mocked<typeof eventsActions>;
 
 describe("WelcomeEditor", () => {
   const mockRouter = {

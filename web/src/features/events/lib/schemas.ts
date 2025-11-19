@@ -69,7 +69,12 @@ export const eventSchema = z.object({
   theme: eventThemeSchema.optional(),
   welcome: eventWelcomeSchema.optional(),
   ending: eventEndingSchema.optional(),
-  share: eventShareConfigSchema.optional(),
+  share: eventShareConfigSchema.default({
+    allowDownload: true,
+    allowSystemShare: true,
+    allowEmail: false,
+    socials: [],
+  }),
 
   // Denormalized counters
   experiencesCount: z.number().default(0),
