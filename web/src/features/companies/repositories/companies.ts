@@ -4,8 +4,7 @@
 
 import { db } from "@/lib/firebase/admin";
 import type { Company, CompanyStatus } from "../types/company.types";
-import { companySchema } from "../lib/schemas";
-import type { CreateCompanyInput } from "@/lib/schemas/validation";
+import { companySchema, type CreateCompanyInput } from "../lib/schemas";
 
 /**
  * Create a new company with transaction-based uniqueness validation

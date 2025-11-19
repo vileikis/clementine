@@ -17,17 +17,19 @@ export { OverlaySettings } from "./components/photo/OverlaySettings";
 
 
 // ============================================================================
-// Server Actions (safe for client components - marked "use server")
+// Server Actions - NOT EXPORTED from public API
 // ============================================================================
-export {
-  createExperience,
-  updateExperience,
-  deleteExperience,
-  uploadPreviewMedia,
-  deletePreviewMedia,
-  uploadFrameOverlay,
-  deleteFrameOverlay,
-} from "./lib/actions";
+// Server Actions should be imported directly from their source files to avoid
+// bundling server-only code (Firebase Admin SDK, next/headers) in client bundles.
+//
+// Import Server Actions directly:
+// import { createPhotoExperience } from "@/features/experiences/actions/photo-create";
+// import { updatePhotoExperience } from "@/features/experiences/actions/photo-update";
+// import { deleteExperience } from "@/features/experiences/actions/shared";
+// import { uploadPreviewMedia, deletePreviewMedia } from "@/features/experiences/actions/photo-media";
+//
+// Type exports (safe for client):
+export type { ActionResponse } from "./actions/types";
 
 // ============================================================================
 // Repository - NOT EXPORTED from public API
@@ -64,12 +66,16 @@ export {
   previewTypeSchema,
   aspectRatioSchema,
   experienceSchema,
+  photoExperienceSchema,
   surveyStepTypeSchema,
   surveyStepSchema,
-  createExperienceSchema,
-  updateExperienceSchema,
+  createPhotoExperienceSchema,
+  updatePhotoExperienceSchema,
   uploadPreviewMediaSchema,
   previewMediaResultSchema,
   createSurveyStepSchema,
   updateSurveyStepSchema,
+  // Legacy aliases for backward compatibility during migration
+  createPhotoExperienceSchema as createExperienceSchema,
+  updatePhotoExperienceSchema as updateExperienceSchema,
 } from "./lib/schemas";

@@ -10,7 +10,7 @@ import {
 } from "../repositories/companies";
 import { verifyAdminSecret } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
-import { createCompanyInput } from "@/lib/schemas/validation";
+import { createCompanyInput } from "../lib/schemas";
 import { z } from "zod";
 
 /**
