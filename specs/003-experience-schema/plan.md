@@ -103,22 +103,51 @@ web/
 │   │       ├── lib/
 │   │       │   ├── schemas.ts              # MODIFIED: New discriminated union schemas
 │   │       │   ├── schemas.test.ts         # NEW: Schema validation tests
-│   │       │   └── migration.ts            # NEW: Legacy → new schema migration logic
-│   │       ├── components/
-│   │       │   ├── create-experience-dialog.tsx   # MODIFIED: Type selection with "coming soon" UI
-│   │       │   └── experience-builder-form.tsx    # MODIFIED: Read/write from config/aiConfig
-│   │       └── actions/
-│   │           ├── create-experience.ts    # MODIFIED: Use new schema for creation
-│   │           └── update-experience.ts    # MODIFIED: Use migration + new schema
+│   │       │   ├── migration.ts            # NEW: Legacy → new schema migration logic
+│   │       │   └── migration.test.ts       # NEW: Migration tests
+│   │       ├── actions/
+│   │       │   ├── index.ts                # NEW: Barrel export (all actions + types)
+│   │       │   ├── types.ts                # NEW: ActionResponse, shared types
+│   │       │   ├── photo-create.ts         # NEW: createPhotoExperience (new schema)
+│   │       │   ├── photo-update.ts         # NEW: updatePhotoExperience (new schema + migration)
+│   │       │   ├── photo-media.ts          # MIGRATED: Media upload/delete functions
+│   │       │   ├── shared.ts               # MIGRATED: deleteExperience (type-agnostic)
+│   │       │   ├── utils.ts                # NEW: checkAuth, validateEventExists helpers
+│   │       │   └── legacy.ts               # MIGRATED: Old lib/actions.ts (@deprecated)
+│   │       └── components/
+│   │           └── shared/
+│   │               ├── CreateExperienceForm.tsx    # MODIFIED: Import from actions/photo-create
+│   │               ├── ExperienceTypeSelector.tsx  # VERIFIED: Shows "coming soon" badges
+│   │               ├── ExperienceEditor.tsx        # MODIFIED: Read/write config/aiConfig
+│   │               └── ExperienceEditorWrapper.tsx # MODIFIED: Import from actions/photo-update
 │   └── app/
 │       └── events/[eventId]/
 │           └── experiences/
 │               └── [experienceId]/
-│                   └── page.tsx            # Experience builder page (uses updated components)
+│                   └── page.tsx            # Experience builder page
 └── package.json
 ```
 
-**Structure Decision**: This is a web monorepo project. We're following the feature module pattern (`web/src/features/experiences/`) where schemas, migration logic, components, and Server Actions are co-located. Schemas are defined in `lib/schemas.ts` per Firebase Architecture Standards (FAR-003). Migration logic is isolated in `lib/migration.ts` to keep concerns separated and testable.
+**Structure Decision**:
+
+**Flat action file structure** with explicit naming for scalability:
+- `actions/photo-create.ts`, `actions/video-create.ts` (future) - Clear which type
+- `actions/shared.ts` - Type-agnostic functions (delete, disable, etc.)
+- `actions/types.ts` - Shared ActionResponse and error code types
+- `actions/utils.ts` - Reusable helpers (auth, validation)
+- `actions/legacy.ts` - Old flat-schema actions marked @deprecated
+- `actions/index.ts` - Barrel export for clean imports
+
+**Migration Path**:
+- Phase 3: New `photo-create.ts` coexists with `lib/actions.ts`
+- Phase 4-5: Create full actions/ structure
+- Phase 6: Move `lib/actions.ts` → `actions/legacy.ts`, mark deprecated
+- Future: Add `video-create.ts`, `gif-create.ts` as needed
+
+**Key Principles**:
+- Schemas imported from `lib/schemas.ts` (no duplication)
+- Action files use Server Actions pattern with `"use server"` directive
+- Components import from `@/features/experiences/actions` barrel export
 
 ## Complexity Tracking
 
