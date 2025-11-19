@@ -1,11 +1,10 @@
 import { db } from "@/lib/firebase/admin";
-import type { Event, Scene } from "../types/event.types";
+import type { Event } from "../types/event.types";
 import {
   createEvent,
   getEvent,
   listEvents,
   updateEventBranding,
-  getCurrentScene,
 } from "./events";
 
 describe("Events Repository", () => {
@@ -19,24 +18,14 @@ describe("Events Repository", () => {
   });
 
   describe("createEvent", () => {
-    it("creates an event with default scene in a transaction", async () => {
+    it("creates an event", async () => {
       const mockEventRef = {
         id: "event-123",
-        collection: jest.fn().mockReturnValue({
-          doc: jest.fn().mockReturnValue({ id: "scene-456" }),
-        }),
+        set: jest.fn(),
       };
 
       mockDb.collection.mockReturnValue({
         doc: jest.fn().mockReturnValue(mockEventRef),
-      });
-
-      const mockTxn = {
-        set: jest.fn(),
-      };
-
-      mockDb.runTransaction.mockImplementation(async (callback) => {
-        await callback(mockTxn);
       });
 
       const eventId = await createEvent({
@@ -48,39 +37,21 @@ describe("Events Repository", () => {
 
       expect(eventId).toBe("event-123");
       expect(mockDb.collection).toHaveBeenCalledWith("events");
-      expect(mockDb.runTransaction).toHaveBeenCalled();
+      expect(mockEventRef.set).toHaveBeenCalled();
 
       // Verify event data structure
-      const eventCall = mockTxn.set.mock.calls[0];
-      const eventData = eventCall[1] as Event;
+      const eventData = mockEventRef.set.mock.calls[0][0] as Event;
       expect(eventData).toMatchObject({
         id: "event-123",
         title: "Summer Festival",
         brandColor: "#FF5733",
         showTitleOverlay: true,
         status: "draft",
-        currentSceneId: "scene-456",
         joinPath: "/join/event-123",
         qrPngPath: "events/event-123/qr/join.png",
       });
       expect(eventData.createdAt).toBeGreaterThan(0);
       expect(eventData.updatedAt).toBe(eventData.createdAt);
-
-      // Verify scene data structure
-      const sceneCall = mockTxn.set.mock.calls[1];
-      const sceneData = sceneCall[1] as Scene;
-      expect(sceneData).toMatchObject({
-        id: "scene-456",
-        label: "Default Scene v1",
-        mode: "photo",
-        prompt: "Apply clean studio background with brand color accents.",
-        flags: {
-          customTextTool: false,
-          stickersTool: false,
-        },
-        status: "active",
-      });
-      expect(sceneData.createdAt).toBeGreaterThan(0);
     });
   });
 
@@ -91,7 +62,6 @@ describe("Events Repository", () => {
         brandColor: "#000000",
         showTitleOverlay: false,
         status: "live",
-        currentSceneId: "scene-123",
         joinPath: "/join/event-123",
         qrPngPath: "events/event-123/qr/join.png",
         createdAt: 1234567890,
@@ -152,7 +122,6 @@ describe("Events Repository", () => {
         brandColor: "invalid-color",
         showTitleOverlay: false,
         status: "invalid-status",
-        currentSceneId: "scene-123",
         joinPath: "/join/event-123",
         qrPngPath: "events/event-123/qr/join.png",
         createdAt: 1234567890,
@@ -184,7 +153,6 @@ describe("Events Repository", () => {
           brandColor: "#111111",
           showTitleOverlay: true,
           status: "live",
-          currentSceneId: "scene-2",
           joinPath: "/join/event-2",
           qrPngPath: "events/event-2/qr/join.png",
           createdAt: 2000000000,
@@ -196,7 +164,6 @@ describe("Events Repository", () => {
           brandColor: "#222222",
           showTitleOverlay: false,
           status: "draft",
-          currentSceneId: "scene-1",
           joinPath: "/join/event-1",
           qrPngPath: "events/event-1/qr/join.png",
           createdAt: 1000000000,
@@ -243,7 +210,6 @@ describe("Events Repository", () => {
           brandColor: "#111111",
           showTitleOverlay: true,
           status: "live",
-          currentSceneId: "scene-1",
           joinPath: "/join/event-1",
           qrPngPath: "events/event-1/qr/join.png",
           companyId: "company-a",
@@ -286,7 +252,6 @@ describe("Events Repository", () => {
           brandColor: "#111111",
           showTitleOverlay: true,
           status: "live",
-          currentSceneId: "scene-1",
           joinPath: "/join/event-1",
           qrPngPath: "events/event-1/qr/join.png",
           companyId: null,
@@ -312,7 +277,6 @@ describe("Events Repository", () => {
           brandColor: "#222222",
           showTitleOverlay: false,
           status: "draft",
-          currentSceneId: "scene-2",
           joinPath: "/join/event-2",
           qrPngPath: "events/event-2/qr/join.png",
           companyId: "company-a",
@@ -415,110 +379,4 @@ describe("Events Repository", () => {
     });
   });
 
-  describe("getCurrentScene", () => {
-    it("returns current scene for an event", async () => {
-      const mockEventData = {
-        currentSceneId: "scene-123",
-      };
-
-      const mockSceneData = {
-        label: "Test Scene",
-        mode: "photo",
-        effect: "background_swap",
-        prompt: "Test prompt",
-        defaultPrompt: "Default prompt",
-        flags: {
-          customTextTool: false,
-          stickersTool: true,
-        },
-        status: "active",
-        createdAt: 1234567890,
-        updatedAt: 1234567890,
-      };
-
-      const mockEventDoc = {
-        exists: true,
-        data: jest.fn().mockReturnValue(mockEventData),
-      };
-
-      const mockSceneDoc = {
-        exists: true,
-        id: "scene-123",
-        data: jest.fn().mockReturnValue(mockSceneData),
-      };
-
-      const mockSceneRef = {
-        get: jest.fn().mockResolvedValue(mockSceneDoc),
-      };
-
-      const mockSceneCollection = {
-        doc: jest.fn().mockReturnValue(mockSceneRef),
-      };
-
-      const mockEventRef = {
-        get: jest.fn().mockResolvedValue(mockEventDoc),
-        collection: jest.fn().mockReturnValue(mockSceneCollection),
-      };
-
-      mockDb.collection.mockReturnValue({
-        doc: jest.fn().mockReturnValue(mockEventRef),
-      });
-
-      const scene = await getCurrentScene("event-123");
-
-      expect(scene).toEqual({ id: "scene-123", ...mockSceneData });
-      expect(mockDb.collection).toHaveBeenCalledWith("events");
-      expect(mockEventRef.collection).toHaveBeenCalledWith("scenes");
-    });
-
-    it("returns null when event does not exist", async () => {
-      const mockEventDoc = {
-        exists: false,
-      };
-
-      mockDb.collection.mockReturnValue({
-        doc: jest.fn().mockReturnValue({
-          get: jest.fn().mockResolvedValue(mockEventDoc),
-        }),
-      });
-
-      const scene = await getCurrentScene("nonexistent");
-
-      expect(scene).toBeNull();
-    });
-
-    it("returns null when scene does not exist", async () => {
-      const mockEventData = {
-        currentSceneId: "scene-123",
-      };
-
-      const mockEventDoc = {
-        exists: true,
-        data: jest.fn().mockReturnValue(mockEventData),
-      };
-
-      const mockSceneDoc = {
-        exists: false,
-      };
-
-      const mockSceneRef = {
-        get: jest.fn().mockResolvedValue(mockSceneDoc),
-      };
-
-      const mockEventRef = {
-        get: jest.fn().mockResolvedValue(mockEventDoc),
-        collection: jest.fn().mockReturnValue({
-          doc: jest.fn().mockReturnValue(mockSceneRef),
-        }),
-      };
-
-      mockDb.collection.mockReturnValue({
-        doc: jest.fn().mockReturnValue(mockEventRef),
-      });
-
-      const scene = await getCurrentScene("event-123");
-
-      expect(scene).toBeNull();
-    });
-  });
 });

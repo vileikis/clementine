@@ -49,30 +49,30 @@ This is a Web monorepo (pnpm workspace):
 
 #### Remove Admin UI (Phase 1 from quickstart.md)
 
-- [ ] T003 [US1] Delete scene admin page at `web/src/app/(studio)/events/[eventId]/scene/page.tsx` (entire directory)
+- [X] T003 [US1] Delete scene admin page at `web/src/app/(studio)/events/[eventId]/scene/page.tsx` (entire directory)
 
 #### Remove Scene Actions (Phase 2 from quickstart.md)
 
-- [ ] T004 [US1] Delete scene server actions file `web/src/features/events/actions/scenes.ts` (updateSceneAction, uploadReferenceImageAction, removeReferenceImageAction)
-- [ ] T005 [US1] Verify getImageUrlAction is not needed (or move to shared storage utilities if used by experiences)
+- [X] T004 [US1] Delete scene server actions file `web/src/features/events/actions/scenes.ts` (updateSceneAction, uploadReferenceImageAction, removeReferenceImageAction)
+- [X] T005 [US1] Verify getImageUrlAction is not needed (or move to shared storage utilities if used by experiences)
 
 #### Remove Scene Repositories (Phase 3 from quickstart.md)
 
-- [ ] T006 [P] [US1] Delete scene repository file `web/src/features/events/repositories/scenes.ts`
-- [ ] T007 [P] [US1] Delete scene repository test file `web/src/features/events/repositories/scenes.test.ts`
-- [ ] T008 [US1] Update events repository `web/src/features/events/repositories/events.ts` - remove scene imports
-- [ ] T009 [US1] Update events repository tests `web/src/features/events/repositories/events.test.ts` - remove scene test cases
+- [X] T006 [P] [US1] Delete scene repository file `web/src/features/events/repositories/scenes.ts`
+- [X] T007 [P] [US1] Delete scene repository test file `web/src/features/events/repositories/scenes.test.ts`
+- [X] T008 [US1] Update events repository `web/src/features/events/repositories/events.ts` - remove scene imports
+- [X] T009 [US1] Update events repository tests `web/src/features/events/repositories/events.test.ts` - remove scene test cases
 
 #### Remove Scene Types and Schemas (Phase 4 from quickstart.md)
 
-- [ ] T010 [US1] Update event schemas `web/src/features/events/lib/schemas.ts` - remove sceneSchema export and currentSceneId from eventSchema
-- [ ] T011 [US1] Update event types `web/src/features/events/types/event.types.ts` - remove Scene type and currentSceneId from Event type
-- [ ] T012 [US1] Update events feature exports `web/src/features/events/index.ts` - remove scene type/schema exports
-- [ ] T013 [US1] Update firestore types `web/src/lib/types/firestore.ts` - remove scene type references if present
+- [X] T010 [US1] Update event schemas `web/src/features/events/lib/schemas.ts` - remove sceneSchema export and currentSceneId from eventSchema
+- [X] T011 [US1] Update event types `web/src/features/events/types/event.types.ts` - remove Scene type and currentSceneId from Event type
+- [X] T012 [US1] Update events feature exports `web/src/features/events/index.ts` - remove scene type/schema exports
+- [X] T013 [US1] Update firestore types `web/src/lib/types/firestore.ts` - remove scene type references if present
 
 #### Update Event Actions (Phase 5 from quickstart.md)
 
-- [ ] T014 [US1] Update event actions `web/src/features/events/actions/events.ts` - remove currentSceneId from event creation/update logic
+- [X] T014 [US1] Update event actions `web/src/features/events/actions/events.ts` - remove currentSceneId from event creation/update logic
 - [ ] T015 [US1] Update event action tests `web/src/features/events/actions/events.test.ts` - remove scene-related test cases and fixtures
 
 **Checkpoint**: Event Builder should load without scene references, TypeScript compilation should have significantly fewer errors
