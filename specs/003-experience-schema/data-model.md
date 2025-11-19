@@ -73,15 +73,15 @@ interface PhotoExperience extends BaseExperience {
 }
 
 interface PhotoConfig {
-  countdown?: number;            // Countdown duration in seconds (0-10)
-  overlayFramePath?: string;     // Public URL to overlay frame image
+  countdown: number;             // Countdown duration in seconds (0-10), 0 = disabled
+  overlayFramePath: string | null;  // Public URL to overlay frame image, null = no overlay
 }
 
 interface AiConfig {
   enabled: boolean;              // AI transformation enabled/disabled
-  model?: string;                // AI model identifier (e.g., "flux-schnell")
-  prompt?: string;               // AI transformation prompt (max 600 chars)
-  referenceImagePaths?: string[];  // Public URLs to reference images
+  model: string | null;          // AI model identifier (e.g., "flux-schnell"), null = no model
+  prompt: string | null;         // AI transformation prompt (max 600 chars), null = no prompt
+  referenceImagePaths: string[] | null;  // Public URLs to reference images (max 5), null = no references
   aspectRatio: AspectRatio;      // Output aspect ratio
 }
 
@@ -90,16 +90,20 @@ type AspectRatio = "1:1" | "3:4" | "4:5" | "9:16" | "16:9";
 
 **Default Values** (when creating new photo experience):
 - `config.countdown`: `0` (no countdown)
+- `config.overlayFramePath`: `null` (no overlay)
 - `aiConfig.enabled`: `false` (AI disabled)
+- `aiConfig.model`: `null` (no model)
+- `aiConfig.prompt`: `null` (no prompt)
+- `aiConfig.referenceImagePaths`: `null` (no references)
 - `aiConfig.aspectRatio`: `"1:1"` (square format)
 
 **Validation Rules**:
-- `config.countdown`: Optional, integer, 0-10 seconds
-- `config.overlayFramePath`: Optional, full public URL
+- `config.countdown`: Required, integer, 0-10 seconds (0 = disabled)
+- `config.overlayFramePath`: Required, full public URL or null
 - `aiConfig.enabled`: Required, boolean
-- `aiConfig.model`: Optional, non-empty string
-- `aiConfig.prompt`: Optional, max 600 characters
-- `aiConfig.referenceImagePaths`: Optional, array of public URLs (max 5 images)
+- `aiConfig.model`: Required, non-empty string or null
+- `aiConfig.prompt`: Required, max 600 characters or null
+- `aiConfig.referenceImagePaths`: Required, array of public URLs (max 5 images) or null
 - `aiConfig.aspectRatio`: Required, one of the enum values
 
 **State Transitions**: None (photo experiences don't have workflow states)
@@ -315,14 +319,14 @@ interface LegacyPhotoExperience {
   // Migrated to config object
   countdownEnabled: boolean → config.countdown: number (0 if false, countdownSeconds if true)
   countdownSeconds: number → config.countdown: number
-  overlayFramePath: string → config.overlayFramePath: string
+  overlayFramePath: string → config.overlayFramePath: string | null (null if missing)
 
   // Migrated to aiConfig object
   aiEnabled: boolean → aiConfig.enabled: boolean
-  aiModel: string → aiConfig.model: string
-  aiPrompt: string → aiConfig.prompt: string
-  aiReferenceImagePaths: string[] → aiConfig.referenceImagePaths: string[]
-  aiAspectRatio: AspectRatio → aiConfig.aspectRatio: AspectRatio
+  aiModel: string → aiConfig.model: string | null (null if missing)
+  aiPrompt: string → aiConfig.prompt: string | null (null if missing)
+  aiReferenceImagePaths: string[] → aiConfig.referenceImagePaths: string[] | null (null if missing)
+  aiAspectRatio: AspectRatio → aiConfig.aspectRatio: AspectRatio (default "1:1")
 
   // Removed (deprecated)
   countdownEnabled, overlayEnabled
@@ -353,6 +357,9 @@ interface LegacyPhotoExperience {
   },
   "aiConfig": {
     "enabled": false,
+    "model": null,
+    "prompt": null,
+    "referenceImagePaths": null,
     "aspectRatio": "1:1"
   },
   "createdAt": 1700000000000,
@@ -463,15 +470,15 @@ const baseExperienceSchema = z.object({
 
 // Type-specific config schemas
 const photoConfigSchema = z.object({
-  countdown: z.number().int().min(0).max(10).optional(),
-  overlayFramePath: z.string().url().optional(),
+  countdown: z.number().int().min(0).max(10),
+  overlayFramePath: z.string().url().nullable(),
 });
 
 const aiConfigSchema = z.object({
   enabled: z.boolean(),
-  model: z.string().optional(),
-  prompt: z.string().max(600).optional(),
-  referenceImagePaths: z.array(z.string().url()).max(5).optional(),
+  model: z.string().nullable(),
+  prompt: z.string().max(600).nullable(),
+  referenceImagePaths: z.array(z.string().url()).max(5).nullable(),
   aspectRatio: aspectRatioSchema,
 });
 
@@ -578,13 +585,13 @@ function migratePhotoExperience(legacyData: unknown): PhotoExperience {
     hidden: baseFields.hidden ?? false,
     config: {
       countdown: countdownEnabled ? (countdownSeconds ?? 3) : 0,
-      overlayFramePath: overlayFramePath,
+      overlayFramePath: overlayFramePath ?? null,
     },
     aiConfig: {
       enabled: aiEnabled ?? false,
-      model: aiModel,
-      prompt: aiPrompt,
-      referenceImagePaths: aiReferenceImagePaths,
+      model: aiModel ?? null,
+      prompt: aiPrompt ?? null,
+      referenceImagePaths: aiReferenceImagePaths ?? null,
       aspectRatio: aiAspectRatio ?? "1:1",
     },
   };
