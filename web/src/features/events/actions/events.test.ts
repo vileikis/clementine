@@ -208,8 +208,7 @@ describe("Events Server Actions", () => {
 
       const result = await createEventAction({
         title: "Test Event",
-        brandColor: "#FF0000",
-        showTitleOverlay: true,
+        buttonColor: "#FF0000",
         companyId: "company-a",
       });
 
@@ -223,8 +222,7 @@ describe("Events Server Actions", () => {
 
       const result = await createEventAction({
         title: "Test Event",
-        brandColor: "#FF0000",
-        showTitleOverlay: true,
+        buttonColor: "#FF0000",
         companyId: "nonexistent",
       });
 
@@ -249,8 +247,7 @@ describe("Events Server Actions", () => {
 
       const result = await createEventAction({
         title: "Test Event",
-        brandColor: "#FF0000",
-        showTitleOverlay: true,
+        buttonColor: "#FF0000",
         companyId: "company-a",
       });
 

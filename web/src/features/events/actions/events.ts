@@ -39,8 +39,7 @@ export type ActionResponse<T = void> =
 
 const createEventInput = z.object({
   title: z.string().min(1, "Title is required").max(100, "Title too long"),
-  brandColor: z.string().regex(/^#[0-9A-F]{6}$/i, "Invalid hex color"),
-  showTitleOverlay: z.boolean(),
+  buttonColor: z.string().regex(/^#[0-9A-F]{6}$/i, "Invalid hex color"),
   companyId: z.string().min(1, "Company is required"),
 });
 
@@ -65,7 +64,11 @@ export async function createEventAction(
       return { success: false, error: "Company is not active" };
     }
 
-    const eventId = await createEvent(validated);
+    const eventId = await createEvent({
+      title: validated.title,
+      companyId: validated.companyId,
+      buttonColor: validated.buttonColor,
+    });
     revalidatePath("/events");
     return { success: true, eventId };
   } catch (error) {

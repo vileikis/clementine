@@ -16,8 +16,7 @@ export function EventForm({ onSuccess }: EventFormProps) {
 
   // Form state
   const [title, setTitle] = useState("")
-  const [brandColor, setBrandColor] = useState("#0EA5E9")
-  const [showTitleOverlay, setShowTitleOverlay] = useState(true)
+  const [buttonColor, setButtonColor] = useState("#0EA5E9")
   const [companyId, setCompanyId] = useState<string>("")
 
   // Companies list
@@ -79,8 +78,7 @@ export function EventForm({ onSuccess }: EventFormProps) {
     try {
       const result = await createEventAction({
         title: title.trim(),
-        brandColor,
-        showTitleOverlay,
+        buttonColor,
         companyId,
       })
 
@@ -174,31 +172,31 @@ export function EventForm({ onSuccess }: EventFormProps) {
         </p>
       </div>
 
-      {/* Brand Color Picker */}
+      {/* Button Color Picker */}
       <div>
         <label
-          htmlFor="brandColor"
+          htmlFor="buttonColor"
           className="block text-sm font-medium mb-2"
         >
-          Brand Color
+          Button Color
         </label>
         <div className="flex items-center gap-3">
           <input
             type="color"
-            id="brandColor"
-            value={brandColor}
-            onChange={(e) => setBrandColor(e.target.value)}
+            id="buttonColor"
+            value={buttonColor}
+            onChange={(e) => setButtonColor(e.target.value)}
             className="h-12 w-20 border border-input rounded-md cursor-pointer"
             disabled={isSubmitting}
           />
           <input
             type="text"
-            value={brandColor}
+            value={buttonColor}
             onChange={(e) => {
               const value = e.target.value
               // Allow typing hex colors
               if (/^#[0-9A-Fa-f]{0,6}$/.test(value)) {
-                setBrandColor(value)
+                setButtonColor(value)
               }
             }}
             className="flex-1 px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary font-mono"
@@ -208,41 +206,8 @@ export function EventForm({ onSuccess }: EventFormProps) {
           />
         </div>
         <p className="text-sm text-muted-foreground mt-1">
-          This color will be used throughout the guest experience
+          This color will be used for buttons throughout the event
         </p>
-      </div>
-
-      {/* Title Overlay Toggle */}
-      <div className="flex items-center justify-between p-4 border rounded-lg">
-        <div className="flex-1">
-          <label
-            htmlFor="showTitleOverlay"
-            className="text-sm font-medium cursor-pointer"
-          >
-            Show Title Overlay
-          </label>
-          <p className="text-sm text-muted-foreground mt-1">
-            Display the event title on the guest capture screen
-          </p>
-        </div>
-        <div className="ml-4">
-          <button
-            type="button"
-            role="switch"
-            aria-checked={showTitleOverlay}
-            onClick={() => setShowTitleOverlay(!showTitleOverlay)}
-            disabled={isSubmitting}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
-              showTitleOverlay ? "bg-primary" : "bg-gray-200"
-            }`}
-          >
-            <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                showTitleOverlay ? "translate-x-6" : "translate-x-1"
-              }`}
-            />
-          </button>
-        </div>
       </div>
 
       {/* Error Message */}
