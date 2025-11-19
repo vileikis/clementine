@@ -15,7 +15,6 @@ import { getImageUrlAction } from "@/lib/storage/actions"
 interface GuestFlowContainerProps {
   eventId: string
   eventTitle: string
-  showTitleOverlay: boolean
 }
 
 /**
@@ -25,7 +24,6 @@ interface GuestFlowContainerProps {
 export function GuestFlowContainer({
   eventId,
   eventTitle,
-  showTitleOverlay,
 }: GuestFlowContainerProps) {
   const { state, dispatch, handleCapture, requestCamera } = useGuestFlow(eventId)
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -76,7 +74,6 @@ export function GuestFlowContainer({
     return (
       <GreetingScreen
         eventTitle={eventTitle}
-        showTitleOverlay={showTitleOverlay}
         onGetStarted={requestCamera}
       />
     )
@@ -141,8 +138,6 @@ export function GuestFlowContainer({
         </div>
         <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-40">
           <CaptureButton
-            videoRef={videoRef}
-            onCapture={handleCapture}
             onStartCountdown={handleStartCountdown}
             disabled={isCounting}
             isCounting={isCounting}

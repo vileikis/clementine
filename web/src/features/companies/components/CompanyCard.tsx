@@ -8,7 +8,7 @@ interface CompanyCardProps {
   eventCount?: number;
 }
 
-export function CompanyCard({ company, eventCount = 0 }: CompanyCardProps) {
+export function CompanyCard({ company }: CompanyCardProps) {
   const formattedDate = new Date(company.createdAt).toLocaleDateString("en-US", {
     year: "numeric",
     month: "short",

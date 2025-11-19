@@ -21,27 +21,27 @@ export function WelcomeEditor({ event }: WelcomeEditorProps) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
-  // Form state
-  const [welcomeTitle, setWelcomeTitle] = useState(event.welcomeTitle || "");
-  const [welcomeDescription, setWelcomeDescription] = useState(event.welcomeDescription || "");
-  const [welcomeCtaLabel, setWelcomeCtaLabel] = useState(event.welcomeCtaLabel || "Get Started");
-  const [welcomeBackgroundColorHex, setWelcomeBackgroundColorHex] = useState(
-    event.welcomeBackgroundColorHex || "#FFFFFF"
+  // Form state - using nested welcome object with optional chaining
+  // Note: null from DB should display as empty string in form
+  const [title, setTitle] = useState(event.welcome?.title ?? "");
+  const [body, setBody] = useState(event.welcome?.body ?? "");
+  const [ctaLabel, setCtaLabel] = useState(event.welcome?.ctaLabel ?? "");
+  const [backgroundColor, setBackgroundColor] = useState(
+    event.welcome?.backgroundColor ?? ""
   );
-  // Store the URL directly in the database for easier display
-  const [welcomeBackgroundImagePath, setWelcomeBackgroundImagePath] = useState(
-    event.welcomeBackgroundImagePath || ""
+  const [backgroundImage, setBackgroundImage] = useState(
+    event.welcome?.backgroundImage ?? ""
   );
 
   const handleSave = () => {
     if (isPending) return; // Prevent multiple saves
     startTransition(async () => {
       const result = await updateEventWelcome(event.id, {
-        welcomeTitle,
-        welcomeDescription,
-        welcomeCtaLabel,
-        welcomeBackgroundColorHex,
-        welcomeBackgroundImagePath,
+        title: title || null,
+        body: body || null,
+        ctaLabel: ctaLabel || null,
+        backgroundColor: backgroundColor || null,
+        backgroundImage: backgroundImage || null,
       });
 
       if (result.success) {
@@ -77,12 +77,12 @@ export function WelcomeEditor({ event }: WelcomeEditorProps) {
             <Input
               id="welcome-title"
               placeholder="Welcome to the event!"
-              value={welcomeTitle}
-              onChange={(e) => setWelcomeTitle(e.target.value)}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
               maxLength={500}
             />
             <p className="text-xs text-muted-foreground">
-              {welcomeTitle.length}/500 characters
+              {title.length}/500 characters
             </p>
           </div>
 
@@ -92,13 +92,13 @@ export function WelcomeEditor({ event }: WelcomeEditorProps) {
             <Textarea
               id="welcome-description"
               placeholder="Take a photo and share it with your friends!"
-              value={welcomeDescription}
-              onChange={(e) => setWelcomeDescription(e.target.value)}
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
               maxLength={500}
               rows={4}
             />
             <p className="text-xs text-muted-foreground">
-              {welcomeDescription.length}/500 characters
+              {body.length}/500 characters
             </p>
           </div>
 
@@ -108,12 +108,12 @@ export function WelcomeEditor({ event }: WelcomeEditorProps) {
             <Input
               id="welcome-cta"
               placeholder="Get Started"
-              value={welcomeCtaLabel}
-              onChange={(e) => setWelcomeCtaLabel(e.target.value)}
+              value={ctaLabel}
+              onChange={(e) => setCtaLabel(e.target.value)}
               maxLength={50}
             />
             <p className="text-xs text-muted-foreground">
-              {welcomeCtaLabel.length}/50 characters
+              {ctaLabel.length}/50 characters
             </p>
           </div>
 
@@ -124,14 +124,14 @@ export function WelcomeEditor({ event }: WelcomeEditorProps) {
               <Input
                 id="welcome-bg-color"
                 type="color"
-                value={welcomeBackgroundColorHex}
-                onChange={(e) => setWelcomeBackgroundColorHex(e.target.value)}
+                value={backgroundColor}
+                onChange={(e) => setBackgroundColor(e.target.value)}
                 className="h-10 w-20"
               />
               <Input
                 type="text"
-                value={welcomeBackgroundColorHex}
-                onChange={(e) => setWelcomeBackgroundColorHex(e.target.value)}
+                value={backgroundColor}
+                onChange={(e) => setBackgroundColor(e.target.value)}
                 placeholder="#FFFFFF"
                 pattern="^#[0-9A-Fa-f]{6}$"
                 className="flex-1"
@@ -143,8 +143,8 @@ export function WelcomeEditor({ event }: WelcomeEditorProps) {
           <ImageUploadField
             id="welcome-bg-image"
             label="Background Image"
-            value={welcomeBackgroundImagePath}
-            onChange={setWelcomeBackgroundImagePath}
+            value={backgroundImage}
+            onChange={setBackgroundImage}
             destination="welcome"
             disabled={isPending}
             recommendedSize="Recommended: 1080x1920px (9:16 aspect ratio). Max 10MB."
@@ -166,46 +166,46 @@ export function WelcomeEditor({ event }: WelcomeEditorProps) {
         <div
           className="relative flex h-full w-full flex-col items-center justify-center p-8 text-center"
           style={{
-            backgroundColor: welcomeBackgroundColorHex,
-            backgroundImage: welcomeBackgroundImagePath
-              ? `url(${welcomeBackgroundImagePath})`
+            backgroundColor: backgroundColor,
+            backgroundImage: backgroundImage
+              ? `url(${backgroundImage})`
               : undefined,
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
         >
           {/* Overlay for readability when image is present */}
-          {welcomeBackgroundImagePath && (
+          {backgroundImage && (
             <div className="absolute inset-0 bg-black/40" />
           )}
 
           {/* Content */}
           <div className="relative z-10 space-y-6">
-            {welcomeTitle && (
+            {title && (
               <h1
                 className="text-3xl font-bold"
                 style={{
-                  color: welcomeBackgroundImagePath ? "#FFFFFF" : "#000000",
+                  color: backgroundImage ? "#FFFFFF" : "#000000",
                 }}
               >
-                {welcomeTitle}
+                {title}
               </h1>
             )}
 
-            {welcomeDescription && (
+            {body && (
               <p
                 className="text-lg"
                 style={{
-                  color: welcomeBackgroundImagePath ? "#FFFFFF" : "#666666",
+                  color: backgroundImage ? "#FFFFFF" : "#666666",
                 }}
               >
-                {welcomeDescription}
+                {body}
               </p>
             )}
 
-            {welcomeCtaLabel && (
+            {ctaLabel && (
               <Button size="lg" className="mt-4">
-                {welcomeCtaLabel}
+                {ctaLabel}
               </Button>
             )}
           </div>

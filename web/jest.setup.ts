@@ -1,4 +1,9 @@
 import '@testing-library/jest-dom'
+import { TextEncoder, TextDecoder } from 'util'
+
+// Polyfill TextEncoder/TextDecoder for Node environment
+global.TextEncoder = TextEncoder
+global.TextDecoder = TextDecoder as typeof global.TextDecoder
 
 // Mock Firebase Admin SDK globally to prevent initialization errors in tests
 jest.mock('@/lib/firebase/admin', () => ({

@@ -44,7 +44,6 @@ export {
   updateEventTitleAction,
   updateEventWelcome,
   updateEventEnding,
-  updateEventSurveyConfig,
 } from "./actions/events";
 
 // ============================================================================
@@ -65,7 +64,6 @@ export {
   eventSchema,
   updateEventWelcomeSchema,
   updateEventEndingSchema,
-  updateEventSurveyConfigSchema,
 } from "./lib/schemas";
 
 // ============================================================================

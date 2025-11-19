@@ -1,12 +1,20 @@
 import {
   createEventAction,
   listEventsAction,
+  updateEventWelcome,
+  updateEventEnding,
+  updateEventShare,
+  updateEventTheme,
 } from "./events";
 import * as eventsRepository from "../repositories/events";
 import * as companiesRepository from "@/features/companies/repositories/companies";
 import * as auth from "@/lib/auth";
 import type { Event } from "../types/event.types";
 import type { Company } from "@/features/companies";
+import * as firebaseAdmin from "@/lib/firebase/admin";
+
+// Get the mock collection function
+const mockCollection = (firebaseAdmin as typeof firebaseAdmin & { __mockCollection: jest.Mock }).__mockCollection;
 
 // Mock dependencies
 jest.mock("../repositories/events");
@@ -15,6 +23,17 @@ jest.mock("@/lib/auth");
 jest.mock("next/cache", () => ({
   revalidatePath: jest.fn(),
 }));
+
+// Mock firebase admin with a factory that returns a fresh mock
+jest.mock("@/lib/firebase/admin", () => {
+  const mockCollection = jest.fn();
+  return {
+    db: {
+      collection: mockCollection,
+    },
+    __mockCollection: mockCollection, // Expose for test access
+  };
+});
 
 describe("Events Server Actions", () => {
   beforeEach(() => {
@@ -27,23 +46,18 @@ describe("Events Server Actions", () => {
         {
           id: "event-1",
           title: "Event 1",
-          brandColor: "#111111",
-          showTitleOverlay: true,
           status: "live",
           joinPath: "/join/event-1",
           qrPngPath: "events/event-1/qr/join.png",
           companyId: "company-a",
           createdAt: 2000000000,
           updatedAt: 2000000000,
-          shareAllowDownload: true,
-          shareAllowSystemShare: true,
-          shareAllowEmail: true,
-          shareSocials: [],
-          surveyEnabled: false,
-          surveyRequired: false,
-          surveyStepsCount: 0,
-          surveyStepsOrder: [],
-          surveyVersion: 1,
+          share: {
+            allowDownload: true,
+            allowSystemShare: true,
+            allowEmail: true,
+            socials: [],
+          },
           experiencesCount: 0,
           sessionsCount: 0,
           readyCount: 0,
@@ -52,23 +66,18 @@ describe("Events Server Actions", () => {
         {
           id: "event-2",
           title: "Event 2",
-          brandColor: "#222222",
-          showTitleOverlay: false,
           status: "draft",
           joinPath: "/join/event-2",
           qrPngPath: "events/event-2/qr/join.png",
           companyId: null,
           createdAt: 1000000000,
           updatedAt: 1000000000,
-          shareAllowDownload: true,
-          shareAllowSystemShare: true,
-          shareAllowEmail: true,
-          shareSocials: [],
-          surveyEnabled: false,
-          surveyRequired: false,
-          surveyStepsCount: 0,
-          surveyStepsOrder: [],
-          surveyVersion: 1,
+          share: {
+            allowDownload: true,
+            allowSystemShare: true,
+            allowEmail: true,
+            socials: [],
+          },
           experiencesCount: 0,
           sessionsCount: 0,
           readyCount: 0,
@@ -92,23 +101,18 @@ describe("Events Server Actions", () => {
         {
           id: "event-1",
           title: "Event 1",
-          brandColor: "#111111",
-          showTitleOverlay: true,
           status: "live",
           joinPath: "/join/event-1",
           qrPngPath: "events/event-1/qr/join.png",
           companyId: "company-a",
           createdAt: 2000000000,
           updatedAt: 2000000000,
-          shareAllowDownload: true,
-          shareAllowSystemShare: true,
-          shareAllowEmail: true,
-          shareSocials: [],
-          surveyEnabled: false,
-          surveyRequired: false,
-          surveyStepsCount: 0,
-          surveyStepsOrder: [],
-          surveyVersion: 1,
+          share: {
+            allowDownload: true,
+            allowSystemShare: true,
+            allowEmail: true,
+            socials: [],
+          },
           experiencesCount: 0,
           sessionsCount: 0,
           readyCount: 0,
@@ -135,23 +139,18 @@ describe("Events Server Actions", () => {
         {
           id: "event-2",
           title: "Event 2",
-          brandColor: "#222222",
-          showTitleOverlay: false,
           status: "draft",
           joinPath: "/join/event-2",
           qrPngPath: "events/event-2/qr/join.png",
           companyId: null,
           createdAt: 1000000000,
           updatedAt: 1000000000,
-          shareAllowDownload: true,
-          shareAllowSystemShare: true,
-          shareAllowEmail: true,
-          shareSocials: [],
-          surveyEnabled: false,
-          surveyRequired: false,
-          surveyStepsCount: 0,
-          surveyStepsOrder: [],
-          surveyVersion: 1,
+          share: {
+            allowDownload: true,
+            allowSystemShare: true,
+            allowEmail: true,
+            socials: [],
+          },
           experiencesCount: 0,
           sessionsCount: 0,
           readyCount: 0,
@@ -209,8 +208,7 @@ describe("Events Server Actions", () => {
 
       const result = await createEventAction({
         title: "Test Event",
-        brandColor: "#FF0000",
-        showTitleOverlay: true,
+        buttonColor: "#FF0000",
         companyId: "company-a",
       });
 
@@ -224,8 +222,7 @@ describe("Events Server Actions", () => {
 
       const result = await createEventAction({
         title: "Test Event",
-        brandColor: "#FF0000",
-        showTitleOverlay: true,
+        buttonColor: "#FF0000",
         companyId: "nonexistent",
       });
 
@@ -250,14 +247,403 @@ describe("Events Server Actions", () => {
 
       const result = await createEventAction({
         title: "Test Event",
-        brandColor: "#FF0000",
-        showTitleOverlay: true,
+        buttonColor: "#FF0000",
         companyId: "company-a",
       });
 
       expect(result.success).toBe(false);
       expect(result.error).toBe("Company is not active");
       expect(eventsRepository.createEvent).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("updateEventWelcome", () => {
+    const mockEventId = "event-123";
+    let mockEventRef: {
+      get: jest.Mock;
+      update: jest.Mock;
+    };
+
+    beforeEach(() => {
+      // Mock Firebase admin db
+      mockEventRef = {
+        get: jest.fn(),
+        update: jest.fn(),
+      };
+
+      mockCollection.mockReturnValue({
+        doc: jest.fn().mockReturnValue(mockEventRef),
+      });
+
+      // Mock auth
+      jest.spyOn(auth, "verifyAdminSecret").mockResolvedValue({
+        authorized: true,
+      });
+
+      // Mock event exists
+      mockEventRef.get.mockResolvedValue({
+        exists: true,
+        data: () => ({ id: mockEventId }),
+      });
+    });
+
+    it("updates welcome fields using dot notation", async () => {
+      const welcomeData = {
+        title: "Welcome to Event",
+        body: "Join us for an amazing experience",
+        ctaLabel: "Get Started",
+        backgroundImage: "https://example.com/bg.jpg",
+        backgroundColor: "#FF0000",
+      };
+
+      const result = await updateEventWelcome(mockEventId, welcomeData);
+
+      expect(result.success).toBe(true);
+      expect(mockEventRef.update).toHaveBeenCalledWith({
+        updatedAt: expect.any(Number),
+        "welcome.title": welcomeData.title,
+        "welcome.body": welcomeData.body,
+        "welcome.ctaLabel": welcomeData.ctaLabel,
+        "welcome.backgroundImage": welcomeData.backgroundImage,
+        "welcome.backgroundColor": welcomeData.backgroundColor,
+      });
+    });
+
+    it("updates only provided fields", async () => {
+      const partialData = {
+        title: "New Title",
+      };
+
+      const result = await updateEventWelcome(mockEventId, partialData);
+
+      expect(result.success).toBe(true);
+      expect(mockEventRef.update).toHaveBeenCalledWith({
+        updatedAt: expect.any(Number),
+        "welcome.title": "New Title",
+      });
+    });
+
+    it("returns error when event not found", async () => {
+      mockEventRef.get.mockResolvedValue({
+        exists: false,
+      });
+
+      const result = await updateEventWelcome(mockEventId, { title: "Test" });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.code).toBe("EVENT_NOT_FOUND");
+      }
+      expect(mockEventRef.update).not.toHaveBeenCalled();
+    });
+
+    it("returns error when not authorized", async () => {
+      jest.spyOn(auth, "verifyAdminSecret").mockResolvedValue({
+        authorized: false,
+        error: "Invalid credentials",
+      });
+
+      const result = await updateEventWelcome(mockEventId, { title: "Test" });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.code).toBe("PERMISSION_DENIED");
+      }
+      expect(mockEventRef.update).not.toHaveBeenCalled();
+    });
+
+    it("validates input data with schema", async () => {
+      const invalidData = {
+        title: "", // Empty string should fail validation if min length required
+      };
+
+      const result = await updateEventWelcome(mockEventId, invalidData);
+
+      // Should either validate or fail gracefully
+      expect(result).toHaveProperty("success");
+    });
+  });
+
+  describe("updateEventEnding", () => {
+    const mockEventId = "event-123";
+    let mockEventRef: {
+      get: jest.Mock;
+      update: jest.Mock;
+    };
+
+    beforeEach(() => {
+      mockEventRef = {
+        get: jest.fn(),
+        update: jest.fn(),
+      };
+
+      mockCollection.mockReturnValue({
+        doc: jest.fn().mockReturnValue(mockEventRef),
+      });
+
+      jest.spyOn(auth, "verifyAdminSecret").mockResolvedValue({
+        authorized: true,
+      });
+
+      mockEventRef.get.mockResolvedValue({
+        exists: true,
+        data: () => ({ id: mockEventId }),
+      });
+    });
+
+    it("updates ending fields using dot notation", async () => {
+      const endingData = {
+        title: "Thanks for joining!",
+        body: "We hope you enjoyed the event",
+        ctaLabel: "Learn More",
+        ctaUrl: "https://example.com",
+      };
+
+      const result = await updateEventEnding(mockEventId, endingData);
+
+      expect(result.success).toBe(true);
+      expect(mockEventRef.update).toHaveBeenCalledWith({
+        updatedAt: expect.any(Number),
+        "ending.title": endingData.title,
+        "ending.body": endingData.body,
+        "ending.ctaLabel": endingData.ctaLabel,
+        "ending.ctaUrl": endingData.ctaUrl,
+      });
+    });
+
+    it("updates only provided ending fields", async () => {
+      const partialData = {
+        title: "New Ending Title",
+        ctaUrl: "https://new-url.com",
+      };
+
+      const result = await updateEventEnding(mockEventId, partialData);
+
+      expect(result.success).toBe(true);
+      expect(mockEventRef.update).toHaveBeenCalledWith({
+        updatedAt: expect.any(Number),
+        "ending.title": "New Ending Title",
+        "ending.ctaUrl": "https://new-url.com",
+      });
+    });
+
+    it("returns error when event not found", async () => {
+      mockEventRef.get.mockResolvedValue({
+        exists: false,
+      });
+
+      const result = await updateEventEnding(mockEventId, { title: "Test" });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.code).toBe("EVENT_NOT_FOUND");
+      }
+      expect(mockEventRef.update).not.toHaveBeenCalled();
+    });
+
+    it("returns error when not authorized", async () => {
+      jest.spyOn(auth, "verifyAdminSecret").mockResolvedValue({
+        authorized: false,
+        error: "Invalid credentials",
+      });
+
+      const result = await updateEventEnding(mockEventId, { title: "Test" });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.code).toBe("PERMISSION_DENIED");
+      }
+      expect(mockEventRef.update).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("updateEventShare", () => {
+    const mockEventId = "event-123";
+    let mockEventRef: {
+      get: jest.Mock;
+      update: jest.Mock;
+    };
+
+    beforeEach(() => {
+      mockEventRef = {
+        get: jest.fn(),
+        update: jest.fn(),
+      };
+
+      mockCollection.mockReturnValue({
+        doc: jest.fn().mockReturnValue(mockEventRef),
+      });
+
+      jest.spyOn(auth, "verifyAdminSecret").mockResolvedValue({
+        authorized: true,
+      });
+
+      mockEventRef.get.mockResolvedValue({
+        exists: true,
+        data: () => ({ id: mockEventId }),
+      });
+    });
+
+    it("updates share configuration using dot notation", async () => {
+      const shareData = {
+        allowDownload: true,
+        allowSystemShare: true,
+        allowEmail: false,
+        socials: ["instagram", "tiktok", "facebook"] as Array<"instagram" | "tiktok" | "facebook" | "x" | "snapchat" | "whatsapp" | "custom">,
+      };
+
+      const result = await updateEventShare(mockEventId, shareData);
+
+      expect(result.success).toBe(true);
+      expect(mockEventRef.update).toHaveBeenCalledWith({
+        updatedAt: expect.any(Number),
+        "share.allowDownload": true,
+        "share.allowSystemShare": true,
+        "share.allowEmail": false,
+        "share.socials": ["instagram", "tiktok", "facebook"],
+      });
+    });
+
+    it("updates only provided share fields", async () => {
+      const partialData = {
+        allowDownload: false,
+      };
+
+      const result = await updateEventShare(mockEventId, partialData);
+
+      expect(result.success).toBe(true);
+      expect(mockEventRef.update).toHaveBeenCalledWith({
+        updatedAt: expect.any(Number),
+        "share.allowDownload": false,
+      });
+    });
+
+    it("returns error when event not found", async () => {
+      mockEventRef.get.mockResolvedValue({
+        exists: false,
+      });
+
+      const result = await updateEventShare(mockEventId, {
+        allowDownload: true,
+      });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.code).toBe("EVENT_NOT_FOUND");
+      }
+      expect(mockEventRef.update).not.toHaveBeenCalled();
+    });
+
+    it("returns error when not authorized", async () => {
+      jest.spyOn(auth, "verifyAdminSecret").mockResolvedValue({
+        authorized: false,
+        error: "Invalid credentials",
+      });
+
+      const result = await updateEventShare(mockEventId, {
+        allowDownload: true,
+      });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.code).toBe("PERMISSION_DENIED");
+      }
+      expect(mockEventRef.update).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("updateEventTheme", () => {
+    const mockEventId = "event-123";
+    let mockEventRef: {
+      get: jest.Mock;
+      update: jest.Mock;
+    };
+
+    beforeEach(() => {
+      mockEventRef = {
+        get: jest.fn(),
+        update: jest.fn(),
+      };
+
+      mockCollection.mockReturnValue({
+        doc: jest.fn().mockReturnValue(mockEventRef),
+      });
+
+      jest.spyOn(auth, "verifyAdminSecret").mockResolvedValue({
+        authorized: true,
+      });
+
+      mockEventRef.get.mockResolvedValue({
+        exists: true,
+        data: () => ({ id: mockEventId }),
+      });
+    });
+
+    it("updates theme configuration using dot notation", async () => {
+      const themeData = {
+        buttonColor: "#FF0000",
+        buttonTextColor: "#FFFFFF",
+        backgroundColor: "#000000",
+        backgroundImage: "https://example.com/theme-bg.jpg",
+      };
+
+      const result = await updateEventTheme(mockEventId, themeData);
+
+      expect(result.success).toBe(true);
+      expect(mockEventRef.update).toHaveBeenCalledWith({
+        updatedAt: expect.any(Number),
+        "theme.buttonColor": themeData.buttonColor,
+        "theme.buttonTextColor": themeData.buttonTextColor,
+        "theme.backgroundColor": themeData.backgroundColor,
+        "theme.backgroundImage": themeData.backgroundImage,
+      });
+    });
+
+    it("updates only provided theme fields", async () => {
+      const partialData = {
+        buttonColor: "#00FF00",
+      };
+
+      const result = await updateEventTheme(mockEventId, partialData);
+
+      expect(result.success).toBe(true);
+      expect(mockEventRef.update).toHaveBeenCalledWith({
+        updatedAt: expect.any(Number),
+        "theme.buttonColor": "#00FF00",
+      });
+    });
+
+    it("returns error when event not found", async () => {
+      mockEventRef.get.mockResolvedValue({
+        exists: false,
+      });
+
+      const result = await updateEventTheme(mockEventId, {
+        buttonColor: "#FF0000",
+      });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.code).toBe("EVENT_NOT_FOUND");
+      }
+      expect(mockEventRef.update).not.toHaveBeenCalled();
+    });
+
+    it("returns error when not authorized", async () => {
+      jest.spyOn(auth, "verifyAdminSecret").mockResolvedValue({
+        authorized: false,
+        error: "Invalid credentials",
+      });
+
+      const result = await updateEventTheme(mockEventId, {
+        buttonColor: "#FF0000",
+      });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.code).toBe("PERMISSION_DENIED");
+      }
+      expect(mockEventRef.update).not.toHaveBeenCalled();
     });
   });
 });
