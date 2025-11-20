@@ -29,7 +29,7 @@ interface YesNoEditorProps {
 }
 
 // Unused params suppressed for React Hook Form integration
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 export function YesNoEditor({
   config,
   register,

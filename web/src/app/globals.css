@@ -119,4 +119,15 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Touch-manipulation for better mobile UX */
+  button,
+  a,
+  input,
+  textarea,
+  select,
+  [role="button"],
+  [tabindex] {
+    touch-action: manipulation;
+  }
 }

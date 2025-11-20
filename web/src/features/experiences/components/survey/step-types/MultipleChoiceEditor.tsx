@@ -9,21 +9,17 @@
  * Part of 001-survey-experience implementation (Phase 3 - User Story 1).
  */
 
-import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { X, Plus } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 interface MultipleChoiceEditorProps {
   config: {
     options: string[];
     allowMultiple: boolean;
   };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  register: any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   watch: any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -35,7 +31,6 @@ interface MultipleChoiceEditorProps {
 
 export function MultipleChoiceEditor({
   config,
-  register,
   watch,
   setValue,
   errors,
@@ -116,6 +111,11 @@ export function MultipleChoiceEditor({
         {errors.config?.options && (
           <p className="text-xs text-destructive">
             {errors.config.options.message}
+          </p>
+        )}
+        {options.some((opt: string) => !opt.trim()) && (
+          <p className="text-xs text-amber-600 dark:text-amber-400">
+            Some options are empty. Fill them in or remove them before saving.
           </p>
         )}
       </div>

@@ -29,9 +29,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Plus, HelpCircle } from "lucide-react";
+import { Plus, HelpCircle, AlertTriangle } from "lucide-react";
 import { updateSurveyExperience } from "../../actions/survey-update";
 import type { SurveyExperience } from "../../lib/schemas";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { SURVEY_STEP_SOFT_LIMIT, SURVEY_STEP_HARD_LIMIT } from "../../lib/constants";
 
 interface SurveyExperienceEditorProps {
   eventId: string;
@@ -120,6 +122,12 @@ export function SurveyExperienceEditor({
 
   // Handle step creation from type selector
   const handleStepTypeSelected = async (type: string) => {
+    // Check step count limit (hard limit)
+    if (orderedSteps.length >= SURVEY_STEP_HARD_LIMIT) {
+      // Error will be shown in UI - cannot add more steps
+      return;
+    }
+
     // Create step data based on type with proper defaults
     // These defaults match the Zod schema defaults
     let stepData;
@@ -309,10 +317,42 @@ export function SurveyExperienceEditor({
     );
   }
 
+  // Step count warnings/errors
+  const renderStepLimitAlert = () => {
+    const stepCount = orderedSteps.length;
+
+    if (stepCount >= SURVEY_STEP_HARD_LIMIT) {
+      return (
+        <Alert variant="destructive" className="mb-6">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>
+            <strong>Maximum steps reached.</strong> You have reached the maximum limit of {SURVEY_STEP_HARD_LIMIT} survey steps.
+            Please delete a step before adding more.
+          </AlertDescription>
+        </Alert>
+      );
+    }
+
+    if (stepCount >= SURVEY_STEP_SOFT_LIMIT) {
+      return (
+        <Alert className="mb-6 border-amber-500 bg-amber-50 text-amber-900 dark:bg-amber-950 dark:text-amber-200">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>
+            <strong>Survey length notice.</strong> You have {stepCount} steps.
+            Consider keeping surveys under {SURVEY_STEP_SOFT_LIMIT} steps for better completion rates.
+          </AlertDescription>
+        </Alert>
+      );
+    }
+
+    return null;
+  };
+
   // Main 3-column layout
   return (
     <div className="flex flex-col">
       {renderSurveyControls()}
+      {renderStepLimitAlert()}
       <div className={`flex flex-col gap-6 lg:flex-row ${!experience.enabled ? "opacity-50" : ""}`}>
         {/* Left: Step List */}
         <aside className="w-full lg:w-64 shrink-0">
@@ -326,6 +366,7 @@ export function SurveyExperienceEditor({
               onClick={() => setTypeSelectorOpen(true)}
               className="h-8 w-8 p-0"
               aria-label="Add survey step"
+              disabled={orderedSteps.length >= SURVEY_STEP_HARD_LIMIT}
             >
               <Plus className="h-4 w-4" />
             </Button>
