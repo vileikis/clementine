@@ -2,9 +2,10 @@
 
 /**
  * ExperienceEditorWrapper component
- * Part of Phase 5 (User Story 3) - View and Manage Experiences in Sidebar
+ * Updated in Phase 2 (User Story 1) to support all experience types
  *
  * Wraps ExperienceEditor with Server Actions for update and delete
+ * Routes to correct Server Action based on experience type
  * Handles navigation after deletion
  */
 
@@ -12,11 +13,11 @@ import { useRouter } from "next/navigation";
 import { ExperienceEditor } from "./ExperienceEditor";
 import { updatePhotoExperience } from "../../actions/photo-update";
 import { deleteExperience } from "../../actions/shared";
-import type { PhotoExperience } from "../../lib/schemas";
+import type { Experience, PhotoExperience } from "../../lib/schemas";
 
 interface ExperienceEditorWrapperProps {
   eventId: string;
-  experience: PhotoExperience;
+  experience: Experience;
 }
 
 export function ExperienceEditorWrapper({
@@ -27,12 +28,34 @@ export function ExperienceEditorWrapper({
 
   const handleSave = async (
     experienceId: string,
-    data: Partial<PhotoExperience>
+    data: Partial<Experience>
   ) => {
-    const result = await updatePhotoExperience(eventId, experienceId, data);
+    // Route to correct Server Action based on experience type
+    switch (experience.type) {
+      case "photo":
+        const photoResult = await updatePhotoExperience(
+          eventId,
+          experienceId,
+          data as Partial<PhotoExperience>
+        );
+        if (!photoResult.success) {
+          throw new Error(photoResult.error.message);
+        }
+        break;
 
-    if (!result.success) {
-      throw new Error(result.error.message);
+      case "gif":
+        // TODO: Implement in Phase 3
+        // const gifResult = await updateGifExperience(eventId, experienceId, data as Partial<GifExperience>);
+        throw new Error("GIF experience updates not yet implemented");
+
+      case "video":
+      case "wheel":
+      case "survey":
+        throw new Error(`${experience.type} experience updates not yet implemented`);
+
+      default:
+        const _exhaustive: never = experience;
+        throw new Error("Unknown experience type");
     }
   };
 
