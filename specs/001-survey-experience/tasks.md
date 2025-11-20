@@ -219,13 +219,13 @@ This provides a complete, independently testable feature that allows creators to
 
 **Tasks**: 7
 
-- [ ] T049 [US2] Integrate @dnd-kit DndContext in SurveyStepList component
-- [ ] T050 [US2] Wrap step items with SortableContext using verticalListSortingStrategy
-- [ ] T051 [US2] Create SortableStepItem component with useSortable hook in web/src/features/experiences/components/survey/SurveyStepList.tsx
-- [ ] T052 [US2] Add drag handle with touch-friendly size (≥44x44px minimum)
-- [ ] T053 [US2] Implement handleDragEnd to call reorderSurveyStepsAction
-- [ ] T054 [US2] Add visual feedback during drag (insertion line, transform animations)
-- [ ] T055 [US2] Update step numbering dynamically based on position
+- [X] T049 [US2] Integrate @dnd-kit DndContext in SurveyStepList component
+- [X] T050 [US2] Wrap step items with SortableContext using verticalListSortingStrategy
+- [X] T051 [US2] Create SortableStepItem component with useSortable hook in web/src/features/experiences/components/survey/SurveyStepList.tsx
+- [X] T052 [US2] Add drag handle with touch-friendly size (≥44x44px minimum)
+- [X] T053 [US2] Implement handleDragEnd to call reorderSurveyStepsAction
+- [X] T054 [US2] Add visual feedback during drag (insertion line, transform animations)
+- [X] T055 [US2] Update step numbering dynamically based on position
 
 **Validation** (User Story 2):
 - [ ] Create survey with 3-5 steps
