@@ -2,13 +2,14 @@
 
 /**
  * Component: SurveyExperienceEditor
+ * Updated to use unified ExperienceEditorHeader component
  *
- * Main container for editing survey experiences with a 3-column layout:
- * - Left: Step list with drag-and-drop reordering
- * - Center: Step editor with type-specific configuration
- * - Right: Real-time preview of the selected step
- *
- * Part of 001-survey-experience implementation (Phase 3 - User Story 1).
+ * Main container for editing survey experiences with:
+ * - Unified header: Title, enabled toggle, required toggle (additionalControls), delete button
+ * - 3-column layout:
+ *   - Left: Step list with drag-and-drop reordering
+ *   - Center: Step editor with type-specific configuration
+ *   - Right: Real-time preview of the selected step
  *
  * Mobile-first: Stacks vertically on mobile, side-by-side on desktop (lg+).
  */
@@ -20,6 +21,7 @@ import { SurveyStepList } from "./SurveyStepList";
 import { SurveyStepEditor } from "./SurveyStepEditor";
 import { SurveyStepPreview } from "./SurveyStepPreview";
 import { SurveyStepTypeSelector } from "./SurveyStepTypeSelector";
+import { ExperienceEditorHeader } from "../shared/ExperienceEditorHeader";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -31,9 +33,12 @@ import {
 } from "@/components/ui/tooltip";
 import { Plus, HelpCircle, AlertTriangle } from "lucide-react";
 import { updateSurveyExperience } from "../../actions/survey-update";
-import type { SurveyExperience } from "../../lib/schemas";
+import { deleteExperience } from "../../actions/shared";
+import type { SurveyExperience, PreviewType } from "../../lib/schemas";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { SURVEY_STEP_SOFT_LIMIT, SURVEY_STEP_HARD_LIMIT } from "../../lib/constants";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface SurveyExperienceEditorProps {
   eventId: string;
@@ -44,6 +49,8 @@ export function SurveyExperienceEditor({
   eventId,
   experience,
 }: SurveyExperienceEditorProps) {
+  const router = useRouter();
+
   // Real-time subscription to survey steps
   const { steps, loading, error } = useSurveySteps(eventId);
 
@@ -57,8 +64,11 @@ export function SurveyExperienceEditor({
   const [typeSelectorOpen, setTypeSelectorOpen] = useState(false);
 
   // State: Loading states for toggles
-  const [enabledLoading, setEnabledLoading] = useState(false);
   const [requiredLoading, setRequiredLoading] = useState(false);
+
+  // State: Preview media
+  const [previewPath, setPreviewPath] = useState(experience.previewPath || "");
+  const [previewType, setPreviewType] = useState<PreviewType | undefined>(experience.previewType);
 
   // Get ordered steps based on experience.config.stepsOrder
   const orderedSteps = experience.config.stepsOrder
@@ -79,23 +89,51 @@ export function SurveyExperienceEditor({
   // Find selected step
   const selectedStep = orderedSteps.find((s) => s.id === selectedStepId);
 
+  // Handle title save
+  const handleTitleSave = async (newTitle: string) => {
+    const result = await updateSurveyExperience(eventId, experience.id, {
+      label: newTitle,
+    });
+    if (!result.success) {
+      throw new Error(result.error.message);
+    }
+    toast.success("Experience name updated");
+  };
+
   // Handle enabled toggle
   const handleEnabledToggle = async (checked: boolean) => {
-    setEnabledLoading(true);
-    try {
-      const result = await updateSurveyExperience(eventId, experience.id, {
-        enabled: checked,
-      });
+    const result = await updateSurveyExperience(eventId, experience.id, {
+      enabled: checked,
+    });
 
-      if (!result.success) {
-        console.error("Failed to update enabled status:", result.error);
-        // Optionally show a toast notification here
-      }
-    } catch (error) {
-      console.error("Error updating enabled status:", error);
-    } finally {
-      setEnabledLoading(false);
+    if (!result.success) {
+      toast.error(result.error.message);
+    } else {
+      toast.success(`Survey ${checked ? "enabled" : "disabled"}`);
     }
+  };
+
+  // Handle delete
+  const handleDelete = async () => {
+    const result = await deleteExperience(eventId, experience.id);
+    if (result.success) {
+      toast.success("Survey experience deleted");
+      router.push(`/events/${eventId}`);
+    } else {
+      throw new Error(result.error.message);
+    }
+  };
+
+  // Handle preview media upload
+  const handlePreviewMediaUpload = (publicUrl: string, fileType: PreviewType) => {
+    setPreviewPath(publicUrl);
+    setPreviewType(fileType);
+  };
+
+  // Handle preview media removal
+  const handlePreviewMediaRemove = () => {
+    setPreviewPath("");
+    setPreviewType(undefined);
   };
 
   // Handle required toggle
@@ -110,11 +148,12 @@ export function SurveyExperienceEditor({
       });
 
       if (!result.success) {
-        console.error("Failed to update required status:", result.error);
-        // Optionally show a toast notification here
+        toast.error(result.error.message);
+      } else {
+        toast.success(`Survey ${checked ? "required" : "optional"}`);
       }
     } catch (error) {
-      console.error("Error updating required status:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to update required status");
     } finally {
       setRequiredLoading(false);
     }
@@ -223,74 +262,58 @@ export function SurveyExperienceEditor({
     );
   }
 
-  // Survey Controls Header (shown for all states except loading/error)
-  const renderSurveyControls = () => (
-    <div className="mb-6 rounded-lg border border-border bg-card p-4">
-      <TooltipProvider>
-        <div className="flex flex-col gap-4 sm:flex-row sm:gap-6">
-          {/* Enabled Toggle */}
-          <div className="flex items-center gap-3">
-            <Switch
-              id="survey-enabled"
-              checked={experience.enabled}
-              onCheckedChange={handleEnabledToggle}
-              disabled={enabledLoading}
-              className="data-[state=checked]:bg-primary"
-            />
-            <div className="flex items-center gap-1.5">
-              <Label
-                htmlFor="survey-enabled"
-                className="text-sm font-medium cursor-pointer"
-              >
-                Enabled
-              </Label>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
-                </TooltipTrigger>
-                <TooltipContent side="top" className="max-w-xs">
-                  <p>Controls whether the survey is visible to guests. When disabled, the survey is completely hidden.</p>
-                </TooltipContent>
-              </Tooltip>
-            </div>
-          </div>
+  // Required toggle as additional control for the header
+  const renderRequiredToggle = () => (
+    <TooltipProvider>
+      <div className="flex items-center gap-3">
+        <Switch
+          id="survey-required"
+          checked={experience.config.required}
+          onCheckedChange={handleRequiredToggle}
+          disabled={requiredLoading || !experience.enabled}
+          className="data-[state=checked]:bg-primary"
+        />
+        <Label
+          htmlFor="survey-required"
+          className="cursor-pointer text-sm font-medium"
+        >
+          {requiredLoading ? "Updating..." : "Required"}
+        </Label>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+          </TooltipTrigger>
+          <TooltipContent side="top" className="max-w-xs">
+            <p>When enabled, guests must complete the survey before proceeding. Only available when survey is enabled.</p>
+          </TooltipContent>
+        </Tooltip>
+      </div>
+    </TooltipProvider>
+  );
 
-          {/* Required Toggle */}
-          <div className="flex items-center gap-3">
-            <Switch
-              id="survey-required"
-              checked={experience.config.required}
-              onCheckedChange={handleRequiredToggle}
-              disabled={requiredLoading || !experience.enabled}
-              className="data-[state=checked]:bg-primary"
-            />
-            <div className="flex items-center gap-1.5">
-              <Label
-                htmlFor="survey-required"
-                className="text-sm font-medium cursor-pointer"
-              >
-                Required
-              </Label>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
-                </TooltipTrigger>
-                <TooltipContent side="top" className="max-w-xs">
-                  <p>When enabled, guests must complete the survey before proceeding. Only available when survey is enabled.</p>
-                </TooltipContent>
-              </Tooltip>
-            </div>
-          </div>
-        </div>
-      </TooltipProvider>
-    </div>
+  // Survey header with unified component
+  const renderSurveyHeader = () => (
+    <ExperienceEditorHeader
+      eventId={eventId}
+      experience={experience}
+      showPreview={true}
+      previewPath={previewPath}
+      previewType={previewType}
+      onPreviewUpload={handlePreviewMediaUpload}
+      onPreviewRemove={handlePreviewMediaRemove}
+      onTitleSave={handleTitleSave}
+      enabled={experience.enabled}
+      onEnabledChange={handleEnabledToggle}
+      onDelete={handleDelete}
+      additionalControls={renderRequiredToggle()}
+    />
   );
 
   // Empty state: No steps yet
   if (orderedSteps.length === 0) {
     return (
       <div className="flex flex-col">
-        {renderSurveyControls()}
+        {renderSurveyHeader()}
         <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
           <div className="text-center">
             <h3 className="text-lg font-semibold mb-2">No survey steps yet</h3>
@@ -351,7 +374,7 @@ export function SurveyExperienceEditor({
   // Main 3-column layout
   return (
     <div className="flex flex-col">
-      {renderSurveyControls()}
+      {renderSurveyHeader()}
       {renderStepLimitAlert()}
       <div className={`flex flex-col gap-6 lg:flex-row ${!experience.enabled ? "opacity-50" : ""}`}>
         {/* Left: Step List */}
