@@ -72,14 +72,14 @@
 
 ### Server Actions Updates
 
-- [ ] T015 [P] [US2] Remove migration logic from `web/src/features/experiences/actions/photo-update.ts` (delete migration check block and `stripLegacyFields` call)
-- [ ] T016 [P] [US2] Verify `photo-create.ts` in `web/src/features/experiences/actions/` already uses correct schema (no changes needed, just confirm)
-- [ ] T017 [US2] Add deprecation notice to `web/src/features/experiences/actions/legacy.ts` file header
+- [X] T015 [P] [US2] Remove migration logic from `web/src/features/experiences/actions/photo-update.ts` (delete migration check block and `stripLegacyFields` call)
+- [X] T016 [P] [US2] Verify `photo-create.ts` in `web/src/features/experiences/actions/` already uses correct schema (no changes needed, just confirm)
+- [X] T017 [US2] Add deprecation notice to `web/src/features/experiences/actions/legacy.ts` file header
 
 ### Data Migration
 
-- [ ] T018 [US2] Wipe all Experience documents from Firestore (manual - Firebase Console: `/events/{eventId}/experiences` subcollections)
-- [ ] T019 [US2] Verify Firestore is empty of Experience documents (manual - Firebase Console check)
+- [X] T018 [US2] Wipe all Experience documents from Firestore (manual - Firebase Console: `/events/{eventId}/experiences` subcollections)
+- [X] T019 [US2] Verify Firestore is empty of Experience documents (manual - Firebase Console check)
 
 ### Manual Testing (CRUD Operations)
 
