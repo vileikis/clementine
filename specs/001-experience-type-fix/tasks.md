@@ -129,8 +129,8 @@
 
 ### Code Quality Checks
 
-- [ ] T036 [P] Run `pnpm lint` from repository root and fix all ESLint errors/warnings
-- [ ] T037 [P] Run `pnpm type-check` from repository root and verify zero TypeScript errors
+- [X] T036 [P] Run `pnpm lint` from repository root and fix all ESLint errors/warnings
+- [X] T037 [P] Run `pnpm type-check` from repository root and verify zero TypeScript errors
 - [ ] T038 Run `pnpm dev` and manually test Experience CRUD in browser (create, edit, delete)
 
 ### Final Verification
@@ -142,8 +142,8 @@
 
 ### Documentation & Cleanup
 
-- [ ] T043 Update `CLAUDE.md` if it references old Experience types (search for "experience.types")
-- [ ] T044 Remove unused imports flagged by ESLint in any updated files
+- [X] T043 Update `CLAUDE.md` if it references old Experience types (search for "experience.types")
+- [X] T044 Remove unused imports flagged by ESLint in any updated files
 
 **Checkpoint**: Validation loop complete, feature ready for commit
 
