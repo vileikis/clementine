@@ -22,22 +22,19 @@ interface SurveyStepPreviewProps {
 }
 
 export function SurveyStepPreview({ step }: SurveyStepPreviewProps) {
-  return (
-    <div className="border rounded-lg p-6 bg-muted/10">
-      <div className="mb-4">
-        <div className="inline-block px-2 py-1 text-xs font-medium bg-primary/10 text-primary rounded mb-2">
-          Preview Mode
-        </div>
-        <h3 className="font-semibold mb-1">Guest View</h3>
-        <p className="text-xs text-muted-foreground">
-          This is how guests will see this step
-        </p>
-      </div>
+  // Show button for text input steps and statement
+  const showButton =
+    step.type === "short_text" ||
+    step.type === "long_text" ||
+    step.type === "email" ||
+    step.type === "statement";
 
-      <div className="bg-background border rounded-lg p-6 space-y-4">
+  return (
+    <div className="flex h-full min-h-[600px] w-full flex-col items-center justify-center border rounded-lg bg-background p-8">
+      <div className="w-full max-w-2xl space-y-6">
         {/* Step Title */}
         <div className="space-y-2">
-          <h4 className="text-lg font-semibold">
+          <h4 className="text-lg font-semibold text-foreground">
             {step.title || "Question title"}
             {step.required && <span className="text-destructive ml-1">*</span>}
           </h4>
@@ -49,13 +46,14 @@ export function SurveyStepPreview({ step }: SurveyStepPreviewProps) {
         {/* Type-Specific Preview */}
         {renderStepPreview(step)}
 
-        {/* CTA Button */}
-        <Button
-          className="w-full min-h-[44px]"
-          disabled
-        >
-          {step.ctaLabel || "Continue"}
-        </Button>
+        {/* CTA Button - for text input steps and statement */}
+        {showButton && (
+          <div className="flex justify-start">
+            <Button className="min-h-[44px] px-8">
+              {step.ctaLabel || "Continue"}
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
