@@ -66,16 +66,80 @@ export function SurveyExperienceEditor({
 
   // Handle step creation from type selector
   const handleStepTypeSelected = async (type: string) => {
-    const result = await mutations.createStep(eventId, experience.id, {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      type: type as any, // Type-cast since we validate in schema
-      title: "",
-      required: false,
-    });
+    // Create step data based on type with proper defaults
+    // These defaults match the Zod schema defaults
+    let stepData;
+
+    switch (type) {
+      case "multiple_choice":
+        stepData = {
+          type: "multiple_choice" as const,
+          title: "Multiple Choice Question",
+          required: null,
+          config: {
+            options: ["Option 1"],
+            allowMultiple: false,
+          },
+        };
+        break;
+      case "yes_no":
+        stepData = {
+          type: "yes_no" as const,
+          title: "Yes/No Question",
+          required: null,
+        };
+        break;
+      case "opinion_scale":
+        stepData = {
+          type: "opinion_scale" as const,
+          title: "Opinion Scale",
+          required: null,
+          config: {
+            scaleMin: 1,
+            scaleMax: 5,
+          },
+        };
+        break;
+      case "short_text":
+        stepData = {
+          type: "short_text" as const,
+          title: "Short Text Question",
+          required: null,
+        };
+        break;
+      case "long_text":
+        stepData = {
+          type: "long_text" as const,
+          title: "Long Text Question",
+          required: null,
+        };
+        break;
+      case "email":
+        stepData = {
+          type: "email" as const,
+          title: "Email Address",
+          required: null,
+        };
+        break;
+      case "statement":
+        stepData = {
+          type: "statement" as const,
+          title: "Statement",
+          required: null,
+        };
+        break;
+      default:
+        console.error(`Unknown step type: ${type}`);
+        return;
+    }
+
+    const result = await mutations.createStep(eventId, experience.id, stepData);
 
     if (result.success && result.stepId) {
       setSelectedStepId(result.stepId);
       setTypeSelectorOpen(false);
+    } else if (result.error) {
+      console.error("Failed to create step:", result.error);
     }
   };
 
