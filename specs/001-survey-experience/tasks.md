@@ -97,36 +97,36 @@ This provides a complete, independently testable feature that allows creators to
 
 ### Data Layer (Schemas & Repository)
 
-- [ ] T005 [P] Update surveyConfigSchema: rename surveyStepIds to stepsOrder in web/src/features/experiences/lib/schemas.ts
-- [ ] T006 [P] Add yes_no to surveyStepTypeSchema enum in web/src/features/experiences/lib/schemas.ts
-- [ ] T007 Create stepBaseSchema with common fields (id, eventId, title, description, required, createdAt, updatedAt) in web/src/features/experiences/lib/schemas.ts
-- [ ] T008 Create discriminated union schemas for all 7 step types (multiple_choice, yes_no, opinion_scale, short_text, long_text, email, statement) in web/src/features/experiences/lib/schemas.ts
-- [ ] T009 Export TypeScript types from discriminated union (SurveyStep, StepType) in web/src/features/experiences/lib/schemas.ts
-- [ ] T010 Implement createSurveyStep repository function with transaction in web/src/features/experiences/lib/repository.ts
-- [ ] T011 Implement updateSurveyStep repository function in web/src/features/experiences/lib/repository.ts
-- [ ] T012 Implement deleteSurveyStep repository function with transaction in web/src/features/experiences/lib/repository.ts
-- [ ] T013 Implement reorderSurveySteps repository function in web/src/features/experiences/lib/repository.ts
+- [X] T005 [P] Update surveyConfigSchema: rename surveyStepIds to stepsOrder in web/src/features/experiences/lib/schemas.ts
+- [X] T006 [P] Add yes_no to surveyStepTypeSchema enum in web/src/features/experiences/lib/schemas.ts
+- [X] T007 Create stepBaseSchema with common fields (id, eventId, title, description, required, createdAt, updatedAt) in web/src/features/experiences/lib/schemas.ts
+- [X] T008 Create discriminated union schemas for all 7 step types (multiple_choice, yes_no, opinion_scale, short_text, long_text, email, statement) in web/src/features/experiences/lib/schemas.ts
+- [X] T009 Export TypeScript types from discriminated union (SurveyStep, StepType) in web/src/features/experiences/lib/schemas.ts
+- [X] T010 Implement createSurveyStep repository function with transaction in web/src/features/experiences/lib/repository.ts
+- [X] T011 Implement updateSurveyStep repository function in web/src/features/experiences/lib/repository.ts
+- [X] T012 Implement deleteSurveyStep repository function with transaction in web/src/features/experiences/lib/repository.ts
+- [X] T013 Implement reorderSurveySteps repository function in web/src/features/experiences/lib/repository.ts
 
 ### Server Actions
 
-- [ ] T014 Create survey-steps.ts file with ActionResponse type definition in web/src/features/experiences/actions/
-- [ ] T015 Implement createSurveyStepAction with validation and error handling in web/src/features/experiences/actions/survey-steps.ts
-- [ ] T016 Implement updateSurveyStepAction with validation and error handling in web/src/features/experiences/actions/survey-steps.ts
-- [ ] T017 Implement deleteSurveyStepAction with validation and error handling in web/src/features/experiences/actions/survey-steps.ts
-- [ ] T018 Implement reorderSurveyStepsAction with validation and error handling in web/src/features/experiences/actions/survey-steps.ts
+- [X] T014 Create survey-steps.ts file with ActionResponse type definition in web/src/features/experiences/actions/
+- [X] T015 Implement createSurveyStepAction with validation and error handling in web/src/features/experiences/actions/survey-steps.ts
+- [X] T016 Implement updateSurveyStepAction with validation and error handling in web/src/features/experiences/actions/survey-steps.ts
+- [X] T017 Implement deleteSurveyStepAction with validation and error handling in web/src/features/experiences/actions/survey-steps.ts
+- [X] T018 Implement reorderSurveyStepsAction with validation and error handling in web/src/features/experiences/actions/survey-steps.ts
 
 ### Hooks Layer
 
-- [ ] T019 Create useSurveySteps hook with Firebase Client SDK onSnapshot for real-time subscriptions in web/src/features/experiences/hooks/useSurveySteps.ts
-- [ ] T020 Create useSurveyStepMutations hook wrapping all Server Actions (create, update, delete, reorder) in web/src/features/experiences/hooks/useSurveyStepMutations.ts
+- [X] T019 Create useSurveySteps hook with Firebase Client SDK onSnapshot for real-time subscriptions in web/src/features/experiences/hooks/useSurveySteps.ts
+- [X] T020 Create useSurveyStepMutations hook wrapping all Server Actions (create, update, delete, reorder) in web/src/features/experiences/hooks/useSurveyStepMutations.ts
 
 **Validation**:
-- [ ] All schemas validate correctly with test data
-- [ ] Repository functions pass unit tests (mocked Firestore)
-- [ ] Server Actions return proper ActionResponse format
-- [ ] Hooks connect to Firestore without errors
-- [ ] TypeScript compiles with no errors
-- [ ] Run `pnpm type-check` successfully
+- [X] All schemas validate correctly with test data
+- [X] Repository functions pass unit tests (mocked Firestore)
+- [X] Server Actions return proper ActionResponse format
+- [X] Hooks connect to Firestore without errors
+- [X] TypeScript compiles with no errors
+- [X] Run `pnpm type-check` successfully
 
 ---
 

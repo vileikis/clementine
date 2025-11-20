@@ -67,7 +67,15 @@ export type {
   ExperienceType,
   PreviewType,
   AspectRatio,
-  SurveyStepType,
+  StepType,
+  SurveyStep,
+  MultipleChoiceStep,
+  YesNoStep,
+  OpinionScaleStep,
+  ShortTextStep,
+  LongTextStep,
+  EmailStep,
+  StatementStep,
 } from "./lib/schemas";
 
 // ============================================================================
