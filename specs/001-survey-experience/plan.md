@@ -81,15 +81,16 @@ web/src/
 │   │   │   │       └── StatementEditor.tsx
 │   │   │   ├── photo/                             # Existing photo experience
 │   │   │   └── ...
+│   │   ├── lib/
+│   │   │   ├── schemas.ts                         # MODIFIED: Update existing survey schemas (lines 99-103, 215-289)
+│   │   │   ├── repository.ts                      # MODIFIED: Add survey step operations (extend existing)
+│   │   │   └── constants.ts                       # Existing constants
 │   │   ├── hooks/
 │   │   │   ├── useSurveySteps.ts                  # NEW: Firestore subscription hook
 │   │   │   ├── useSurveyStepMutations.ts          # NEW: Mutation hooks (create/update/delete)
 │   │   │   └── ...
 │   │   ├── actions/
 │   │   │   ├── survey-steps.ts                    # NEW: Server Actions for step CRUD
-│   │   │   └── ...
-│   │   ├── repositories/
-│   │   │   ├── survey-steps.repository.ts         # NEW: Firestore operations (Admin SDK)
 │   │   │   └── ...
 │   │   └── index.ts                               # Public API exports
 │   ├── events/
@@ -98,9 +99,6 @@ web/src/
 │   │   │       └── DesignSidebar.tsx              # MODIFIED: Add survey type to selector
 │   │   └── ...
 ├── lib/
-│   ├── schemas/
-│   │   ├── survey.ts                              # NEW: Zod schemas for survey/steps
-│   │   └── ...
 │   ├── firebase/
 │   │   ├── admin.ts                               # Existing Admin SDK setup
 │   │   ├── client.ts                              # Existing Client SDK setup
