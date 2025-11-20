@@ -21,7 +21,16 @@ import { SurveyStepEditor } from "./SurveyStepEditor";
 import { SurveyStepPreview } from "./SurveyStepPreview";
 import { SurveyStepTypeSelector } from "./SurveyStepTypeSelector";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Plus, HelpCircle } from "lucide-react";
+import { updateSurveyExperience } from "../../actions/survey-update";
 import type { SurveyExperience } from "../../lib/schemas";
 
 interface SurveyExperienceEditorProps {
@@ -45,6 +54,10 @@ export function SurveyExperienceEditor({
   // State: Type selector dialog open/closed
   const [typeSelectorOpen, setTypeSelectorOpen] = useState(false);
 
+  // State: Loading states for toggles
+  const [enabledLoading, setEnabledLoading] = useState(false);
+  const [requiredLoading, setRequiredLoading] = useState(false);
+
   // Get ordered steps based on experience.config.stepsOrder
   const orderedSteps = experience.config.stepsOrder
     .map((stepId) => steps.find((s) => s.id === stepId))
@@ -63,6 +76,47 @@ export function SurveyExperienceEditor({
 
   // Find selected step
   const selectedStep = orderedSteps.find((s) => s.id === selectedStepId);
+
+  // Handle enabled toggle
+  const handleEnabledToggle = async (checked: boolean) => {
+    setEnabledLoading(true);
+    try {
+      const result = await updateSurveyExperience(eventId, experience.id, {
+        enabled: checked,
+      });
+
+      if (!result.success) {
+        console.error("Failed to update enabled status:", result.error);
+        // Optionally show a toast notification here
+      }
+    } catch (error) {
+      console.error("Error updating enabled status:", error);
+    } finally {
+      setEnabledLoading(false);
+    }
+  };
+
+  // Handle required toggle
+  const handleRequiredToggle = async (checked: boolean) => {
+    setRequiredLoading(true);
+    try {
+      const result = await updateSurveyExperience(eventId, experience.id, {
+        config: {
+          ...experience.config,
+          required: checked,
+        },
+      });
+
+      if (!result.success) {
+        console.error("Failed to update required status:", result.error);
+        // Optionally show a toast notification here
+      }
+    } catch (error) {
+      console.error("Error updating required status:", error);
+    } finally {
+      setRequiredLoading(false);
+    }
+  };
 
   // Handle step creation from type selector
   const handleStepTypeSelected = async (type: string) => {
@@ -161,39 +215,107 @@ export function SurveyExperienceEditor({
     );
   }
 
+  // Survey Controls Header (shown for all states except loading/error)
+  const renderSurveyControls = () => (
+    <div className="mb-6 rounded-lg border border-border bg-card p-4">
+      <TooltipProvider>
+        <div className="flex flex-col gap-4 sm:flex-row sm:gap-6">
+          {/* Enabled Toggle */}
+          <div className="flex items-center gap-3">
+            <Switch
+              id="survey-enabled"
+              checked={experience.enabled}
+              onCheckedChange={handleEnabledToggle}
+              disabled={enabledLoading}
+              className="data-[state=checked]:bg-primary"
+            />
+            <div className="flex items-center gap-1.5">
+              <Label
+                htmlFor="survey-enabled"
+                className="text-sm font-medium cursor-pointer"
+              >
+                Enabled
+              </Label>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent side="top" className="max-w-xs">
+                  <p>Controls whether the survey is visible to guests. When disabled, the survey is completely hidden.</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+          </div>
+
+          {/* Required Toggle */}
+          <div className="flex items-center gap-3">
+            <Switch
+              id="survey-required"
+              checked={experience.config.required}
+              onCheckedChange={handleRequiredToggle}
+              disabled={requiredLoading || !experience.enabled}
+              className="data-[state=checked]:bg-primary"
+            />
+            <div className="flex items-center gap-1.5">
+              <Label
+                htmlFor="survey-required"
+                className="text-sm font-medium cursor-pointer"
+              >
+                Required
+              </Label>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent side="top" className="max-w-xs">
+                  <p>When enabled, guests must complete the survey before proceeding. Only available when survey is enabled.</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+          </div>
+        </div>
+      </TooltipProvider>
+    </div>
+  );
+
   // Empty state: No steps yet
   if (orderedSteps.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <div className="text-center">
-          <h3 className="text-lg font-semibold mb-2">No survey steps yet</h3>
-          <p className="text-muted-foreground mb-4">
-            Add your first question to get started
-          </p>
+      <div className="flex flex-col">
+        {renderSurveyControls()}
+        <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+          <div className="text-center">
+            <h3 className="text-lg font-semibold mb-2">No survey steps yet</h3>
+            <p className="text-muted-foreground mb-4">
+              Add your first question to get started
+            </p>
+          </div>
+          <Button
+            onClick={() => setTypeSelectorOpen(true)}
+            size="lg"
+            className="min-h-[44px] min-w-[44px]"
+          >
+            <Plus className="mr-2 h-5 w-5" />
+            Add First Step
+          </Button>
+          <SurveyStepTypeSelector
+            open={typeSelectorOpen}
+            onOpenChange={setTypeSelectorOpen}
+            onTypeSelected={handleStepTypeSelected}
+            loading={mutations.createLoading}
+          />
         </div>
-        <Button
-          onClick={() => setTypeSelectorOpen(true)}
-          size="lg"
-          className="min-h-[44px] min-w-[44px]"
-        >
-          <Plus className="mr-2 h-5 w-5" />
-          Add First Step
-        </Button>
-        <SurveyStepTypeSelector
-          open={typeSelectorOpen}
-          onOpenChange={setTypeSelectorOpen}
-          onTypeSelected={handleStepTypeSelected}
-          loading={mutations.createLoading}
-        />
       </div>
     );
   }
 
   // Main 3-column layout
   return (
-    <div className="flex flex-col gap-6 lg:flex-row">
-      {/* Left: Step List */}
-      <aside className="w-full lg:w-64 shrink-0">
+    <div className="flex flex-col">
+      {renderSurveyControls()}
+      <div className={`flex flex-col gap-6 lg:flex-row ${!experience.enabled ? "opacity-50" : ""}`}>
+        {/* Left: Step List */}
+        <aside className="w-full lg:w-64 shrink-0">
         <div className="space-y-4">
           <div className="flex items-center justify-between px-4">
             <h3 className="text-sm font-semibold text-foreground">Survey Steps</h3>
@@ -260,6 +382,7 @@ export function SurveyExperienceEditor({
         onTypeSelected={handleStepTypeSelected}
         loading={mutations.createLoading}
       />
+      </div>
     </div>
   );
 }
