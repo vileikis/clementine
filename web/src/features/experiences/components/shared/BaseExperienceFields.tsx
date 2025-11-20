@@ -48,14 +48,16 @@ export function BaseExperienceFields({
       </div>
 
       {/* Enabled Toggle */}
-      <div className="flex items-center gap-2">
-        <Label htmlFor="enabled">Enable Experience</Label>
-        <Switch
-          id="enabled"
-          checked={enabled}
-          onCheckedChange={onEnabledChange}
-          disabled={disabled}
-        />
+      <div className="flex items-center gap-3">
+        <Label htmlFor="enabled" className="flex-shrink-0">Enable Experience</Label>
+        <div className="inline-flex items-center justify-center min-h-[44px] min-w-[44px]">
+          <Switch
+            id="enabled"
+            checked={enabled}
+            onCheckedChange={onEnabledChange}
+            disabled={disabled}
+          />
+        </div>
         <p className="text-xs text-muted-foreground">
           {enabled ? "Guests can access this experience" : "Hidden from guests"}
         </p>

@@ -63,6 +63,7 @@ export function DeleteExperienceButton({
         size="sm"
         onClick={() => setShowDialog(true)}
         disabled={disabled || isPending}
+        className="min-h-[44px] min-w-[44px]"
       >
         <Trash2 className="h-4 w-4 mr-2" />
         Delete
