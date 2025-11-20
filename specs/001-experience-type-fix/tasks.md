@@ -23,9 +23,9 @@
 
 **Purpose**: Prepare for type consolidation and document current state
 
-- [ ] T001 Document current Firestore Experience documents structure (optional - for test data recreation)
-- [ ] T002 Verify clean slate approach is safe (check Firebase Console for production data)
-- [ ] T003 Create backup of test data structure if needed (manual - screenshot or notes)
+- [X] T001 Document current Firestore Experience documents structure (optional - for test data recreation)
+- [X] T002 Verify clean slate approach is safe (check Firebase Console for production data)
+- [X] T003 Create backup of test data structure if needed (manual - screenshot or notes)
 
 **Checkpoint**: Pre-migration preparation complete, ready to delete legacy files
 
@@ -39,26 +39,26 @@
 
 ### Core Cleanup
 
-- [ ] T004 [P] [US1] Delete migration utility file `web/src/features/experiences/lib/migration.ts`
-- [ ] T005 [P] [US1] Delete migration test file `web/src/features/experiences/lib/migration.test.ts`
-- [ ] T006 [US1] Delete legacy types file `web/src/features/experiences/types/experience.types.ts`
+- [X] T004 [P] [US1] Delete migration utility file `web/src/features/experiences/lib/migration.ts`
+- [X] T005 [P] [US1] Delete migration test file `web/src/features/experiences/lib/migration.test.ts`
+- [X] T006 [US1] Delete legacy types file `web/src/features/experiences/types/experience.types.ts`
 
 ### Repository Layer Updates
 
-- [ ] T007 [US1] Update repository imports in `web/src/features/experiences/lib/repository.ts` (change line 4 from `experience.types.ts` to `schemas.ts`)
-- [ ] T008 [US1] Update `createExperience` function in `web/src/features/experiences/lib/repository.ts` to use nested `config` and `aiConfig` structure
-- [ ] T009 [US1] Update `updateExperience` parameter type from `Partial<Experience>` to `Partial<PhotoExperience>` in `web/src/features/experiences/lib/repository.ts`
-- [ ] T010 [US1] Add Zod validation to `getExperience` function in `web/src/features/experiences/lib/repository.ts` using `photoExperienceSchema.parse()`
-- [ ] T011 [US1] Add Zod validation to `listExperiences` function in `web/src/features/experiences/lib/repository.ts` using `photoExperienceSchema.parse()`
+- [X] T007 [US1] Update repository imports in `web/src/features/experiences/lib/repository.ts` (change line 4 from `experience.types.ts` to `schemas.ts`)
+- [X] T008 [US1] Update `createExperience` function in `web/src/features/experiences/lib/repository.ts` to use nested `config` and `aiConfig` structure
+- [X] T009 [US1] Update `updateExperience` parameter type from `Partial<Experience>` to `Partial<PhotoExperience>` in `web/src/features/experiences/lib/repository.ts`
+- [X] T010 [US1] Add Zod validation to `getExperience` function in `web/src/features/experiences/lib/repository.ts` using `photoExperienceSchema.parse()`
+- [X] T011 [US1] Add Zod validation to `listExperiences` function in `web/src/features/experiences/lib/repository.ts` using `photoExperienceSchema.parse()`
 
 ### Barrel Export Updates
 
-- [ ] T012 [US1] Update barrel export types in `web/src/features/experiences/index.ts` (lines 51-59) to export from `schemas.ts` instead of `experience.types.ts`
+- [X] T012 [US1] Update barrel export types in `web/src/features/experiences/index.ts` (lines 51-59) to export from `schemas.ts` instead of `experience.types.ts`
 
 ### TypeScript Validation
 
-- [ ] T013 [US1] Run `pnpm type-check` from repository root to identify all TypeScript errors from type changes
-- [ ] T014 [US1] Review TypeScript errors and create list of remaining files needing import updates
+- [X] T013 [US1] Run `pnpm type-check` from repository root to identify all TypeScript errors from type changes
+- [X] T014 [US1] Review TypeScript errors and create list of remaining files needing import updates
 
 **Checkpoint**: Repository layer and exports updated - TypeScript errors will guide remaining component updates
 
