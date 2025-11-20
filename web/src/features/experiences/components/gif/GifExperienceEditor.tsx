@@ -186,8 +186,10 @@ export function GifExperienceEditor({
         disabled={isPending}
       />
 
-      {/* GIF Capture Settings */}
-      <GifCaptureSettings
+      {/* Body Content - Centered with max width */}
+      <div className="max-w-2xl mx-auto space-y-6">
+        {/* GIF Capture Settings */}
+        <GifCaptureSettings
         frameCount={frameCount}
         intervalMs={intervalMs}
         loopCount={loopCount}
@@ -228,14 +230,15 @@ export function GifExperienceEditor({
         )}
       </div>
 
-      {/* Save Button */}
-      <Button
-        onClick={handleSave}
-        disabled={isPending}
-        className="w-full"
-      >
-        {isPending ? "Saving..." : "Save Changes"}
-      </Button>
+        {/* Save Button */}
+        <Button
+          onClick={handleSave}
+          disabled={isPending}
+          className="w-full"
+        >
+          {isPending ? "Saving..." : "Save Changes"}
+        </Button>
+      </div>
     </div>
   );
 }

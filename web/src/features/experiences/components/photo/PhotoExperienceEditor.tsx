@@ -187,8 +187,10 @@ export function PhotoExperienceEditor({
         disabled={isPending}
       />
 
-      {/* Countdown Timer */}
-      <CountdownSettings
+      {/* Body Content - Centered with max width */}
+      <div className="max-w-2xl mx-auto space-y-6">
+        {/* Countdown Timer */}
+        <CountdownSettings
         countdownSeconds={countdownSeconds}
         onCountdownSecondsChange={setCountdownSeconds}
         disabled={isPending}
@@ -235,14 +237,15 @@ export function PhotoExperienceEditor({
         )}
       </div>
 
-      {/* Save Button */}
-      <Button
-        onClick={handleSave}
-        disabled={isPending}
-        className="w-full"
-      >
-        {isPending ? "Saving..." : "Save Changes"}
-      </Button>
+        {/* Save Button */}
+        <Button
+          onClick={handleSave}
+          disabled={isPending}
+          className="w-full"
+        >
+          {isPending ? "Saving..." : "Save Changes"}
+        </Button>
+      </div>
     </div>
   );
 }
