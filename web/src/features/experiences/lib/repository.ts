@@ -1,7 +1,12 @@
 // Experience repository - CRUD operations for experiences subcollection
 
 import { db } from "@/lib/firebase/admin";
-import { photoExperienceSchema, type PhotoExperience } from "./schemas";
+import {
+  photoExperienceSchema,
+  experienceSchema,
+  type PhotoExperience,
+  type Experience,
+} from "./schemas";
 import { FieldValue } from "firebase-admin/firestore";
 
 /**
@@ -122,7 +127,7 @@ export async function deleteExperience(
 export async function getExperience(
   eventId: string,
   experienceId: string
-): Promise<PhotoExperience | null> {
+): Promise<Experience | null> {
   const doc = await db
     .collection("events")
     .doc(eventId)
@@ -134,7 +139,7 @@ export async function getExperience(
     return null;
   }
 
-  return photoExperienceSchema.parse({
+  return experienceSchema.parse({
     id: doc.id,
     ...doc.data(),
   });
@@ -143,7 +148,7 @@ export async function getExperience(
 /**
  * Lists all experiences for an event
  */
-export async function listExperiences(eventId: string): Promise<PhotoExperience[]> {
+export async function listExperiences(eventId: string): Promise<Experience[]> {
   const snapshot = await db
     .collection("events")
     .doc(eventId)
@@ -152,7 +157,7 @@ export async function listExperiences(eventId: string): Promise<PhotoExperience[
     .get();
 
   return snapshot.docs.map((doc) =>
-    photoExperienceSchema.parse({
+    experienceSchema.parse({
       id: doc.id,
       ...doc.data(),
     })

@@ -23,10 +23,10 @@
 
 ### Fix TypeScript Errors (Blocking Foundation)
 
-- [ ] T001 Update `getExperiencesByEventId` return type from `PhotoExperience[]` to `Experience[]` in web/src/features/experiences/lib/repository.ts
-- [ ] T002 Update `ExperiencesList` component to accept `Experience[]` instead of `PhotoExperience[]` in web/src/features/experiences/components/shared/ExperiencesList.tsx
-- [ ] T003 Fix icon rendering logic in DesignSidebar to handle all experience types (photo, gif, video, wheel, survey) in web/src/features/events/components/designer/DesignSidebar.tsx
-- [ ] T004 Run `pnpm type-check` from web/ directory to verify zero TypeScript errors
+- [X] T001 Update `getExperiencesByEventId` return type from `PhotoExperience[]` to `Experience[]` in web/src/features/experiences/lib/repository.ts
+- [X] T002 Update `ExperiencesList` component to accept `Experience[]` instead of `PhotoExperience[]` in web/src/features/experiences/components/shared/ExperiencesList.tsx
+- [X] T003 Fix icon rendering logic in DesignSidebar to handle all experience types (photo, gif, video, wheel, survey) in web/src/features/events/components/designer/DesignSidebar.tsx
+- [X] T004 Run `pnpm type-check` from web/ directory to verify zero TypeScript errors
 
 **Checkpoint**: Foundation ready - TypeScript compilation passes with zero errors
 
@@ -40,9 +40,9 @@
 
 ### Implementation for User Story 1
 
-- [ ] T005 [P] [US1] Create `BaseExperienceFields` shared component (label input, enabled toggle) in web/src/features/experiences/components/shared/BaseExperienceFields.tsx
-- [ ] T006 [P] [US1] Create `DeleteExperienceButton` shared component with confirmation dialog in web/src/features/experiences/components/shared/DeleteExperienceButton.tsx
-- [ ] T007 [US1] Extract `AITransformSettings` from photo/ to shared/ directory (move from web/src/features/experiences/components/photo/AITransformSettings.tsx to web/src/features/experiences/components/shared/AITransformSettings.tsx)
+- [X] T005 [P] [US1] Create `BaseExperienceFields` shared component (label input, enabled toggle) in web/src/features/experiences/components/shared/BaseExperienceFields.tsx
+- [X] T006 [P] [US1] Create `DeleteExperienceButton` shared component with confirmation dialog in web/src/features/experiences/components/shared/DeleteExperienceButton.tsx
+- [X] T007 [US1] Extract `AITransformSettings` from photo/ to shared/ directory (move from web/src/features/experiences/components/photo/AITransformSettings.tsx to web/src/features/experiences/components/shared/AITransformSettings.tsx)
 - [ ] T008 [US1] Create wrapper `ExperienceEditor` component with switch-case routing based on experience.type in web/src/features/experiences/components/shared/ExperienceEditor.tsx
 - [ ] T009 [US1] Update `ExperienceEditorWrapper` to accept `Experience` type and bind correct Server Actions in web/src/features/experiences/components/shared/ExperienceEditorWrapper.tsx
 - [ ] T010 [US1] Test that shared components (BaseExperienceFields, DeleteExperienceButton, PreviewMediaUpload) work with existing photo experience editing
