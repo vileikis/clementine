@@ -24,10 +24,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { createPhotoExperienceSchema as createExperienceSchema } from "../../lib/schemas";
+import { z } from "zod";
+import {
+  createPhotoExperienceSchema,
+  createGifExperienceSchema
+} from "../../lib/schemas";
 import { createPhotoExperience } from "../../actions/photo-create";
+import { createGifExperience } from "../../actions/gif-create";
 import { ExperienceTypeSelector } from "./ExperienceTypeSelector";
-import type { z } from "zod";
+
+// Union schema for photo or GIF creation
+const createExperienceSchema = z.union([
+  createPhotoExperienceSchema,
+  createGifExperienceSchema,
+]);
 
 type CreateExperienceInput = z.input<typeof createExperienceSchema>;
 
@@ -61,7 +71,10 @@ export function CreateExperienceForm({ eventId }: CreateExperienceFormProps) {
     setIsSubmitting(true);
 
     try {
-      const result = await createPhotoExperience(eventId, data);
+      // Route to correct Server Action based on type
+      const result = data.type === "photo"
+        ? await createPhotoExperience(eventId, data)
+        : await createGifExperience(eventId, data);
 
       if (result.success) {
         toast.success("Experience created successfully");
@@ -122,15 +135,15 @@ export function CreateExperienceForm({ eventId }: CreateExperienceFormProps) {
           Experience Type
         </Label>
         <p className="text-sm text-muted-foreground">
-          Select the type of experience you want to create. Only photo
-          experiences are available at this time.
+          Select the type of experience you want to create. Photo and GIF
+          experiences are currently available.
         </p>
 
         <ExperienceTypeSelector
           selectedType={selectedType}
           onSelect={(type) => {
-            // Only photo type is currently supported
-            if (type === "photo") {
+            // Photo and GIF types are currently supported
+            if (type === "photo" || type === "gif") {
               setValue("type", type, { shouldValidate: true });
             }
           }}
