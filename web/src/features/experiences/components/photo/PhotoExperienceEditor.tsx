@@ -44,7 +44,7 @@ export function PhotoExperienceEditor({
   // Local form state - read from new schema
   const [enabled, setEnabled] = useState(experience.enabled);
   const [previewPath, setPreviewPath] = useState(experience.previewPath || "");
-  const [previewType, setPreviewType] = useState<PreviewType | undefined>(experience.previewType);
+  const [previewType, setPreviewType] = useState<PreviewType | undefined>(experience.previewType || undefined);
 
   // Countdown settings - countdown: 0 means disabled, countdown: N means N seconds
   const [countdownSeconds, setCountdownSeconds] = useState(experience.config.countdown);
@@ -88,14 +88,13 @@ export function PhotoExperienceEditor({
   };
 
   // Handle save - write to new schema structure (config/aiConfig)
+  // Note: Preview media is saved automatically via PreviewMediaCompact component
   const handleSave = () => {
     if (isPending) return; // Prevent multiple saves
     startTransition(async () => {
       try {
         await onSave(experience.id, {
           enabled,
-          previewPath: previewPath || undefined,
-          previewType: previewType || undefined,
           // Write to config object structure
           config: {
             countdown: countdownSeconds, // 0 = disabled, N = N seconds
@@ -117,16 +116,46 @@ export function PhotoExperienceEditor({
     });
   };
 
-  // Handle preview media upload
-  const handlePreviewMediaUpload = (publicUrl: string, fileType: PreviewType) => {
+  // Handle preview media upload - save immediately
+  const handlePreviewMediaUpload = async (publicUrl: string, fileType: PreviewType) => {
     setPreviewPath(publicUrl);
     setPreviewType(fileType);
+
+    // Save to database immediately
+    const result = await updatePhotoExperience(experience.eventId, experience.id, {
+      previewPath: publicUrl,
+      previewType: fileType,
+    });
+
+    if (!result.success) {
+      // Revert local state on error
+      setPreviewPath(experience.previewPath || "");
+      setPreviewType(experience.previewType || undefined);
+      toast.error("Failed to save preview media");
+    } else {
+      toast.success("Preview media updated");
+    }
   };
 
-  // Handle preview media removal
-  const handlePreviewMediaRemove = () => {
+  // Handle preview media removal - save immediately
+  const handlePreviewMediaRemove = async () => {
     setPreviewPath("");
     setPreviewType(undefined);
+
+    // Save to database immediately (use null to clear the fields)
+    const result = await updatePhotoExperience(experience.eventId, experience.id, {
+      previewPath: null,
+      previewType: null,
+    });
+
+    if (!result.success) {
+      // Revert local state on error
+      setPreviewPath(experience.previewPath || "");
+      setPreviewType(experience.previewType || undefined);
+      toast.error("Failed to remove preview media");
+    } else {
+      toast.success("Preview media removed");
+    }
   };
 
   // Keyboard shortcuts: Cmd+S / Ctrl+S to save

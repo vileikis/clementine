@@ -68,7 +68,7 @@ export function SurveyExperienceEditor({
 
   // State: Preview media
   const [previewPath, setPreviewPath] = useState(experience.previewPath || "");
-  const [previewType, setPreviewType] = useState<PreviewType | undefined>(experience.previewType);
+  const [previewType, setPreviewType] = useState<PreviewType | undefined>(experience.previewType || undefined);
 
   // Get ordered steps based on experience.config.stepsOrder
   const orderedSteps = experience.config.stepsOrder
@@ -124,16 +124,46 @@ export function SurveyExperienceEditor({
     }
   };
 
-  // Handle preview media upload
-  const handlePreviewMediaUpload = (publicUrl: string, fileType: PreviewType) => {
+  // Handle preview media upload - save immediately for survey
+  const handlePreviewMediaUpload = async (publicUrl: string, fileType: PreviewType) => {
     setPreviewPath(publicUrl);
     setPreviewType(fileType);
+
+    // Save to database immediately (surveys don't have a Save button)
+    const result = await updateSurveyExperience(eventId, experience.id, {
+      previewPath: publicUrl,
+      previewType: fileType,
+    });
+
+    if (!result.success) {
+      // Revert local state on error
+      setPreviewPath(experience.previewPath || "");
+      setPreviewType(experience.previewType || undefined);
+      toast.error("Failed to save preview media");
+    } else {
+      toast.success("Preview media updated");
+    }
   };
 
-  // Handle preview media removal
-  const handlePreviewMediaRemove = () => {
+  // Handle preview media removal - save immediately for survey
+  const handlePreviewMediaRemove = async () => {
     setPreviewPath("");
     setPreviewType(undefined);
+
+    // Save to database immediately (surveys don't have a Save button, use null to clear fields)
+    const result = await updateSurveyExperience(eventId, experience.id, {
+      previewPath: null,
+      previewType: null,
+    });
+
+    if (!result.success) {
+      // Revert local state on error
+      setPreviewPath(experience.previewPath || "");
+      setPreviewType(experience.previewType || undefined);
+      toast.error("Failed to remove preview media");
+    } else {
+      toast.success("Preview media removed");
+    }
   };
 
   // Handle required toggle
