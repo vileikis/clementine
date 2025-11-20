@@ -1,16 +1,24 @@
 "use server";
 
 /**
- * @deprecated This file contains legacy Server Actions.
+ * @deprecated This file contains legacy Server Actions with outdated type system.
  *
- * **DO NOT USE** - Use the new action files instead:
- * - `photo-create.ts` for creating photo experiences
- * - `photo-update.ts` for updating photo experiences
- * - `photo-media.ts` for media upload/delete operations
- * - `shared.ts` for type-agnostic operations (delete, etc.)
+ * **⚠️ WARNING: DO NOT USE IN NEW CODE**
  *
- * This file is kept for backward compatibility only and will be removed in a future version.
- * Part of 003-experience-schema Phase 6 - Action File Reorganization.
+ * This file uses the legacy Experience type system that has been replaced by the
+ * new PhotoExperience discriminated union schema. All references to the old type
+ * system have been removed as part of 001-experience-type-fix.
+ *
+ * **Use these files instead:**
+ * - `photo-create.ts` - Create photo experiences with new schema
+ * - `photo-update.ts` - Update photo experiences with new schema
+ * - `photo-media.ts` - Media upload/delete operations
+ * - `shared.ts` - Type-agnostic operations (delete, etc.)
+ *
+ * **Scheduled for removal:** This file will be deleted in a future cleanup.
+ * Maintained only for temporary backward compatibility during migration.
+ *
+ * Part of 001-experience-type-fix - Experience Type System Consolidation
  */
 
 import { db, storage as bucket } from "@/lib/firebase/admin";
