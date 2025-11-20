@@ -27,6 +27,7 @@ export const ErrorCodes = {
   // Resource not found errors
   EVENT_NOT_FOUND: "EVENT_NOT_FOUND",
   EXPERIENCE_NOT_FOUND: "EXPERIENCE_NOT_FOUND",
+  STEP_NOT_FOUND: "STEP_NOT_FOUND",
 
   // Validation errors
   VALIDATION_ERROR: "VALIDATION_ERROR",

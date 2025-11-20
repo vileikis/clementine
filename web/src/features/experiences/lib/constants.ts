@@ -25,3 +25,15 @@ export const AI_MODEL_PROMPT_GUIDES: Record<string, string> = {
   // Future models can be added here as they become available
   // example: "https://docs.example.com/ai-model/prompting",
 };
+
+/**
+ * Survey Step Limits
+ *
+ * Defines the soft and hard limits for the number of steps in a survey.
+ * Used to maintain good UX and prevent overly long surveys.
+ *
+ * @see specs/001-survey-experience/spec.md - Requirements section
+ */
+
+export const SURVEY_STEP_SOFT_LIMIT = 5; // Shows warning for better completion rates
+export const SURVEY_STEP_HARD_LIMIT = 10; // Maximum allowed steps

@@ -6,7 +6,7 @@
  * Full implementation will be added in later phases.
  */
 
-import type { SurveyStepType } from "@/features/experiences";
+import type { StepType } from "@/features/experiences";
 
 // Action response types
 export type ActionResponse<T = void> =
@@ -22,7 +22,7 @@ export type ActionResponse<T = void> =
 export async function createSurveyStep(
   eventId: string,
   data: {
-    type: SurveyStepType;
+    type: StepType;
     title?: string;
     description?: string;
     placeholder?: string;

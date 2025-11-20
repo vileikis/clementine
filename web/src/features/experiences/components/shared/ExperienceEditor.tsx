@@ -2,7 +2,8 @@
 
 import { PhotoExperienceEditor } from "../photo/PhotoExperienceEditor";
 import { GifExperienceEditor } from "../gif/GifExperienceEditor";
-import type { Experience, PhotoExperience, GifExperience } from "../../lib/schemas";
+import { SurveyExperienceEditor } from "../survey/SurveyExperienceEditor";
+import type { Experience, PhotoExperience, GifExperience, SurveyExperience } from "../../lib/schemas";
 
 interface ExperienceEditorProps {
   experience: Experience;
@@ -78,14 +79,11 @@ export function ExperienceEditor({
       );
 
     case "survey":
-      // Placeholder for SurveyExperienceEditor (future)
       return (
-        <div className="space-y-6">
-          <h2 className="text-2xl font-semibold">Survey Experience Editor</h2>
-          <p className="text-sm text-muted-foreground">
-            Survey experience editing is not yet implemented.
-          </p>
-        </div>
+        <SurveyExperienceEditor
+          eventId={experience.eventId}
+          experience={experience} // Type narrowed to SurveyExperience
+        />
       );
 
     default:

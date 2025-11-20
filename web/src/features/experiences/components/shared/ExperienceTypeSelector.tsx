@@ -41,6 +41,13 @@ const EXPERIENCE_TYPES: ExperienceTypeOption[] = [
     available: true,
   },
   {
+    type: "survey",
+    label: "Survey",
+    description: "Collect feedback with customizable survey questions",
+    icon: "📋",
+    available: true,
+  },
+  {
     type: "wheel",
     label: "Wheel",
     description: "Spin a wheel to select from multiple experiences",
