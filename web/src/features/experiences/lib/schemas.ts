@@ -95,11 +95,11 @@ const wheelConfigSchema = z.object({
   autoSpin: z.boolean(),
 });
 
-// Survey Experience Configuration (Future)
+// Survey Experience Configuration
 const surveyConfigSchema = z.object({
-  surveyStepIds: z.array(z.string()),
-  required: z.boolean(),
-  showProgressBar: z.boolean(),
+  stepsOrder: z.array(z.string()).max(10, "Maximum 10 steps allowed"),
+  required: z.boolean().default(false),
+  showProgressBar: z.boolean().default(true),
 });
 
 // ============================================================================
@@ -212,80 +212,236 @@ export const previewMediaResultSchema = z.object({
 });
 
 // ============================================================================
-// SurveyStep Schemas (unchanged from legacy)
+// SurveyStep Schemas (Discriminated Union)
 // ============================================================================
 
 export const surveyStepTypeSchema = z.enum([
   "short_text",
   "long_text",
   "multiple_choice",
+  "yes_no",
   "opinion_scale",
   "email",
   "statement",
 ]);
 
-export const surveyStepSchema = z.object({
+// Base schema with common fields for all step types
+const stepBaseSchema = z.object({
   id: z.string(),
   eventId: z.string(),
-  type: surveyStepTypeSchema,
-
-  // Content
-  title: z.string().max(200).optional(),
-  description: z.string().max(500).optional(),
-  placeholder: z.string().max(100).optional(),
-
-  // Type-specific configuration
-  options: z.array(z.string().max(100)).min(1).optional(),
-  allowMultiple: z.boolean().optional(),
-  scaleMin: z.number().int().optional(),
-  scaleMax: z.number().int().optional(),
-
-  // Validation
-  required: z.boolean(),
-
+  title: z.string().min(1, "Title required").max(200, "Max 200 characters"),
+  description: z.string().max(500, "Max 500 characters").optional(),
+  required: z.boolean().nullable().default(null), // null = inherit from experience
+  helperText: z.string().max(200, "Max 200 characters").optional(),
+  ctaLabel: z.string().min(1).max(50, "Max 50 characters").optional(),
+  mediaUrl: z.string().url().optional(),
   createdAt: z.number(),
   updatedAt: z.number(),
 });
 
-export const createSurveyStepSchema = z
-  .object({
-    type: surveyStepTypeSchema,
-    title: z.string().max(200).optional(),
-    description: z.string().max(500).optional(),
-    placeholder: z.string().max(100).optional(),
-    options: z.array(z.string().max(100)).min(1).optional(),
-    allowMultiple: z.boolean().optional(),
-    scaleMin: z.number().int().optional(),
-    scaleMax: z.number().int().optional(),
-    required: z.boolean().default(false),
-  })
-  .refine(
-    (data) =>
-      data.type !== "multiple_choice" ||
-      (data.options && data.options.length > 0),
-    { message: "options required for multiple_choice type" }
-  )
-  .refine(
-    (data) =>
-      data.type !== "opinion_scale" ||
-      (data.scaleMin !== undefined &&
-        data.scaleMax !== undefined &&
-        data.scaleMin < data.scaleMax),
-    {
-      message:
-        "scaleMin and scaleMax required and scaleMin < scaleMax for opinion_scale type",
-    }
-  );
+// Type-specific step schemas
 
-export const updateSurveyStepSchema = z.object({
-  title: z.string().max(200).optional(),
+export const multipleChoiceStepSchema = stepBaseSchema.extend({
+  type: z.literal("multiple_choice"),
+  config: z.object({
+    options: z
+      .array(
+        z.string().min(1, "Option cannot be empty").max(100, "Max 100 characters")
+      )
+      .min(1, "At least 1 option required")
+      .max(10, "Max 10 options"),
+    allowMultiple: z.boolean().default(false),
+  }),
+});
+
+export const yesNoStepSchema = stepBaseSchema.extend({
+  type: z.literal("yes_no"),
+  config: z
+    .object({
+      yesLabel: z.string().min(1).max(50, "Max 50 characters").optional(),
+      noLabel: z.string().min(1).max(50, "Max 50 characters").optional(),
+    })
+    .optional(),
+});
+
+export const opinionScaleStepSchema = stepBaseSchema.extend({
+  type: z.literal("opinion_scale"),
+  config: z
+    .object({
+      scaleMin: z.number().int("Must be an integer"),
+      scaleMax: z.number().int("Must be an integer"),
+      minLabel: z.string().max(50, "Max 50 characters").optional(),
+      maxLabel: z.string().max(50, "Max 50 characters").optional(),
+    })
+    .refine((data) => data.scaleMin < data.scaleMax, {
+      message: "Min value must be less than max value",
+      path: ["scaleMin"],
+    }),
+});
+
+export const shortTextStepSchema = stepBaseSchema.extend({
+  type: z.literal("short_text"),
+  config: z
+    .object({
+      placeholder: z.string().max(100, "Max 100 characters").optional(),
+      maxLength: z
+        .number()
+        .int()
+        .positive()
+        .max(500, "Max 500 characters")
+        .optional(),
+    })
+    .optional(),
+});
+
+export const longTextStepSchema = stepBaseSchema.extend({
+  type: z.literal("long_text"),
+  config: z
+    .object({
+      placeholder: z.string().max(100, "Max 100 characters").optional(),
+      maxLength: z
+        .number()
+        .int()
+        .positive()
+        .max(2000, "Max 2000 characters")
+        .optional(),
+    })
+    .optional(),
+});
+
+export const emailStepSchema = stepBaseSchema.extend({
+  type: z.literal("email"),
+  config: z
+    .object({
+      placeholder: z.string().max(100, "Max 100 characters").optional(),
+    })
+    .optional(),
+});
+
+export const statementStepSchema = stepBaseSchema.extend({
+  type: z.literal("statement"),
+  config: z.null().optional(),
+});
+
+// Discriminated union of all step types
+export const surveyStepSchema = z.discriminatedUnion("type", [
+  multipleChoiceStepSchema,
+  yesNoStepSchema,
+  opinionScaleStepSchema,
+  shortTextStepSchema,
+  longTextStepSchema,
+  emailStepSchema,
+  statementStepSchema,
+]);
+
+// Creation schemas for each step type
+export const createMultipleChoiceStepSchema = z.object({
+  type: z.literal("multiple_choice"),
+  title: z.string().min(1).max(200).default("Multiple Choice Question"),
   description: z.string().max(500).optional(),
-  placeholder: z.string().max(100).optional(),
-  options: z.array(z.string().max(100)).min(1).optional(),
-  allowMultiple: z.boolean().optional(),
-  scaleMin: z.number().int().optional(),
-  scaleMax: z.number().int().optional(),
-  required: z.boolean().optional(),
+  required: z.boolean().nullable().default(null),
+  config: z.object({
+    options: z
+      .array(z.string().min(1).max(100))
+      .min(1)
+      .max(10)
+      .default(["Option 1"]),
+    allowMultiple: z.boolean().default(false),
+  }),
+});
+
+export const createYesNoStepSchema = z.object({
+  type: z.literal("yes_no"),
+  title: z.string().min(1).max(200).default("Yes/No Question"),
+  description: z.string().max(500).optional(),
+  required: z.boolean().nullable().default(null),
+  config: z
+    .object({
+      yesLabel: z.string().min(1).max(50).optional(),
+      noLabel: z.string().min(1).max(50).optional(),
+    })
+    .optional(),
+});
+
+export const createOpinionScaleStepSchema = z.object({
+  type: z.literal("opinion_scale"),
+  title: z.string().min(1).max(200).default("Opinion Scale"),
+  description: z.string().max(500).optional(),
+  required: z.boolean().nullable().default(null),
+  config: z.object({
+    scaleMin: z.number().int().default(1),
+    scaleMax: z.number().int().default(5),
+    minLabel: z.string().max(50).optional(),
+    maxLabel: z.string().max(50).optional(),
+  }),
+});
+
+export const createShortTextStepSchema = z.object({
+  type: z.literal("short_text"),
+  title: z.string().min(1).max(200).default("Short Text Question"),
+  description: z.string().max(500).optional(),
+  required: z.boolean().nullable().default(null),
+  config: z
+    .object({
+      placeholder: z.string().max(100).optional(),
+      maxLength: z.number().int().positive().max(500).optional(),
+    })
+    .optional(),
+});
+
+export const createLongTextStepSchema = z.object({
+  type: z.literal("long_text"),
+  title: z.string().min(1).max(200).default("Long Text Question"),
+  description: z.string().max(500).optional(),
+  required: z.boolean().nullable().default(null),
+  config: z
+    .object({
+      placeholder: z.string().max(100).optional(),
+      maxLength: z.number().int().positive().max(2000).optional(),
+    })
+    .optional(),
+});
+
+export const createEmailStepSchema = z.object({
+  type: z.literal("email"),
+  title: z.string().min(1).max(200).default("Email Address"),
+  description: z.string().max(500).optional(),
+  required: z.boolean().nullable().default(null),
+  config: z
+    .object({
+      placeholder: z.string().max(100).optional(),
+    })
+    .optional(),
+});
+
+export const createStatementStepSchema = z.object({
+  type: z.literal("statement"),
+  title: z.string().min(1).max(200).default("Statement"),
+  description: z.string().max(500).optional(),
+  required: z.boolean().nullable().default(null),
+  config: z.null().optional(),
+});
+
+// Union of all create step schemas
+export const createSurveyStepSchema = z.discriminatedUnion("type", [
+  createMultipleChoiceStepSchema,
+  createYesNoStepSchema,
+  createOpinionScaleStepSchema,
+  createShortTextStepSchema,
+  createLongTextStepSchema,
+  createEmailStepSchema,
+  createStatementStepSchema,
+]);
+
+// Update schema (partial updates for any step type)
+export const updateSurveyStepSchema = z.object({
+  title: z.string().min(1).max(200).optional(),
+  description: z.string().max(500).optional(),
+  required: z.boolean().nullable().optional(),
+  helperText: z.string().max(200).optional(),
+  ctaLabel: z.string().min(1).max(50).optional(),
+  mediaUrl: z.string().url().optional(),
+  config: z.record(z.string(), z.any()).optional(), // Allow any config updates
 });
 
 // ============================================================================
@@ -314,9 +470,20 @@ export type ExperienceType = z.infer<typeof experienceTypeSchema>;
 export type PreviewType = z.infer<typeof previewTypeSchema>;
 export type AspectRatio = z.infer<typeof aspectRatioSchema>;
 
-// Survey Types
-export type SurveyStepSchema = z.infer<typeof surveyStepSchema>;
-export type SurveyStepType = z.infer<typeof surveyStepTypeSchema>;
+// Survey Step Types
+export type SurveyStep = z.infer<typeof surveyStepSchema>;
+export type StepType = z.infer<typeof surveyStepTypeSchema>;
+export type MultipleChoiceStep = z.infer<typeof multipleChoiceStepSchema>;
+export type YesNoStep = z.infer<typeof yesNoStepSchema>;
+export type OpinionScaleStep = z.infer<typeof opinionScaleStepSchema>;
+export type ShortTextStep = z.infer<typeof shortTextStepSchema>;
+export type LongTextStep = z.infer<typeof longTextStepSchema>;
+export type EmailStep = z.infer<typeof emailStepSchema>;
+export type StatementStep = z.infer<typeof statementStepSchema>;
+
+// Survey Step Creation Types
+export type CreateSurveyStepData = z.infer<typeof createSurveyStepSchema>;
+export type UpdateSurveyStepData = z.infer<typeof updateSurveyStepSchema>;
 
 // Creation/Update Types
 export type CreatePhotoExperienceData = z.infer<typeof createPhotoExperienceSchema>;
