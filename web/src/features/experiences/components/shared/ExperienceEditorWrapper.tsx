@@ -13,8 +13,9 @@ import { useRouter } from "next/navigation";
 import { ExperienceEditor } from "./ExperienceEditor";
 import { updatePhotoExperience } from "../../actions/photo-update";
 import { updateGifExperience } from "../../actions/gif-update";
+import { updateSurveyExperience } from "../../actions/survey-update";
 import { deleteExperience } from "../../actions/shared";
-import type { Experience, PhotoExperience, GifExperience } from "../../lib/schemas";
+import type { Experience, PhotoExperience, GifExperience, SurveyExperience } from "../../lib/schemas";
 
 interface ExperienceEditorWrapperProps {
   eventId: string;
@@ -55,9 +56,19 @@ export function ExperienceEditorWrapper({
         }
         break;
 
+      case "survey":
+        const surveyResult = await updateSurveyExperience(
+          eventId,
+          experienceId,
+          data as Partial<SurveyExperience>
+        );
+        if (!surveyResult.success) {
+          throw new Error(surveyResult.error.message);
+        }
+        break;
+
       case "video":
       case "wheel":
-      case "survey":
         throw new Error(`${experience.type} experience updates not yet implemented`);
 
       default:
