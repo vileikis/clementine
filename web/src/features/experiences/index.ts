@@ -105,6 +105,8 @@ export {
   previewMediaResultSchema,
   createSurveyStepSchema,
   updateSurveyStepSchema,
+  createSurveyExperienceSchema,
+  updateSurveyExperienceSchema,
   // Legacy aliases for backward compatibility during migration
   createPhotoExperienceSchema as createExperienceSchema,
   updatePhotoExperienceSchema as updateExperienceSchema,

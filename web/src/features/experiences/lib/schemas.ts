@@ -195,6 +195,28 @@ export const updateGifExperienceSchema = z
   })
   .strict();
 
+// Create Survey Experience
+export const createSurveyExperienceSchema = z.object({
+  label: z
+    .string()
+    .trim()
+    .min(1, "Experience name is required")
+    .max(50, "Experience name must be 50 characters or less"),
+  type: z.literal("survey"),
+});
+
+// Update Survey Experience (partial updates allowed)
+export const updateSurveyExperienceSchema = z
+  .object({
+    label: z.string().min(1).max(50).optional(),
+    enabled: z.boolean().optional(),
+    hidden: z.boolean().optional(),
+    previewPath: z.string().url().optional(),
+    previewType: previewTypeSchema.optional(),
+    config: surveyConfigSchema.partial().optional(),
+  })
+  .strict();
+
 // ============================================================================
 // Preview Media Upload Schemas
 // ============================================================================

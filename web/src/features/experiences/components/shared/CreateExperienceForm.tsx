@@ -27,16 +27,19 @@ import { cn } from "@/lib/utils";
 import { z } from "zod";
 import {
   createPhotoExperienceSchema,
-  createGifExperienceSchema
+  createGifExperienceSchema,
+  createSurveyExperienceSchema,
 } from "../../lib/schemas";
 import { createPhotoExperience } from "../../actions/photo-create";
 import { createGifExperience } from "../../actions/gif-create";
+import { createSurveyExperience } from "../../actions/survey-create";
 import { ExperienceTypeSelector } from "./ExperienceTypeSelector";
 
-// Union schema for photo or GIF creation
+// Union schema for photo, GIF, or survey creation
 const createExperienceSchema = z.union([
   createPhotoExperienceSchema,
   createGifExperienceSchema,
+  createSurveyExperienceSchema,
 ]);
 
 type CreateExperienceInput = z.input<typeof createExperienceSchema>;
@@ -72,9 +75,12 @@ export function CreateExperienceForm({ eventId }: CreateExperienceFormProps) {
 
     try {
       // Route to correct Server Action based on type
-      const result = data.type === "photo"
-        ? await createPhotoExperience(eventId, data)
-        : await createGifExperience(eventId, data);
+      const result =
+        data.type === "photo"
+          ? await createPhotoExperience(eventId, data)
+          : data.type === "gif"
+          ? await createGifExperience(eventId, data)
+          : await createSurveyExperience(eventId, data);
 
       if (result.success) {
         toast.success("Experience created successfully");
@@ -135,15 +141,15 @@ export function CreateExperienceForm({ eventId }: CreateExperienceFormProps) {
           Experience Type
         </Label>
         <p className="text-sm text-muted-foreground">
-          Select the type of experience you want to create. Photo and GIF
-          experiences are currently available.
+          Select the type of experience you want to create. Photo, GIF, and
+          Survey experiences are currently available.
         </p>
 
         <ExperienceTypeSelector
           selectedType={selectedType}
           onSelect={(type) => {
-            // Photo and GIF types are currently supported
-            if (type === "photo" || type === "gif") {
+            // Photo, GIF, and Survey types are currently supported
+            if (type === "photo" || type === "gif" || type === "survey") {
               setValue("type", type, { shouldValidate: true });
             }
           }}
