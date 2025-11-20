@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { ExperienceEditor } from "./ExperienceEditor";
-import type { Experience } from "../../types/experience.types";
+import type { PhotoExperience } from "../../lib/schemas";
 
 // Mock the sub-components to focus on ExperienceEditor structure
 jest.mock("./PreviewMediaUpload", () => ({
@@ -27,23 +27,26 @@ describe("ExperienceEditor Component - User Story 1", () => {
   const mockOnSave = jest.fn();
   const mockOnDelete = jest.fn();
 
-  const mockExperience: Experience = {
+  const mockExperience: PhotoExperience = {
     id: "exp-1",
     eventId: "event-1",
     label: "Test Experience",
     type: "photo",
     enabled: true,
+    hidden: false,
     previewPath: undefined,
     previewType: undefined,
-    countdownEnabled: false,
-    countdownSeconds: 3,
-    overlayEnabled: false,
-    overlayFramePath: undefined,
-    aiEnabled: true,
-    aiModel: "nanobanana",
-    aiPrompt: "Test prompt",
-    aiReferenceImagePaths: [],
-    aiAspectRatio: "1:1",
+    config: {
+      countdown: 3,
+      overlayFramePath: null,
+    },
+    aiConfig: {
+      enabled: true,
+      model: "nanobanana",
+      prompt: "Test prompt",
+      referenceImagePaths: null,
+      aspectRatio: "1:1",
+    },
     createdAt: Date.now(),
     updatedAt: Date.now(),
   };

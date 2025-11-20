@@ -4,19 +4,17 @@
  * Server Action: Update Photo Experience
  *
  * Updates an existing photo experience with the new discriminated union schema.
- * Part of 003-experience-schema implementation (User Story 2).
+ * Part of 001-experience-type-fix implementation.
  *
  * This action:
  * - Validates input using updatePhotoExperienceSchema
- * - Fetches existing experience document
- * - Migrates legacy schema if needed (User Story 3)
+ * - Fetches existing experience document with schema validation
  * - Merges partial updates with existing config and aiConfig
  * - Writes to Firestore using Admin SDK
  * - Revalidates the experience page
  */
 
 import { revalidatePath } from "next/cache";
-import { db } from "@/lib/firebase/admin";
 import { z } from "zod";
 import {
   updatePhotoExperienceSchema,
@@ -25,10 +23,9 @@ import {
   type PhotoConfig,
   type AiConfig
 } from "../lib/schemas";
-import { migratePhotoExperience, stripLegacyFields } from "../lib/migration";
 import type { ActionResponse } from "./types";
 import { ErrorCodes } from "./types";
-import { checkAuth, validateExperienceExists, createSuccessResponse, createErrorResponse } from "./utils";
+import { checkAuth, getExperienceDocument, createSuccessResponse, createErrorResponse } from "./utils";
 
 /**
  * Type for partial update input
@@ -64,33 +61,21 @@ export async function updatePhotoExperience(
     // Validate input with Zod schema
     const validated = updatePhotoExperienceSchema.parse(input);
 
-    // Check if experience exists
-    const experienceError = await validateExperienceExists(eventId, experienceId);
-    if (experienceError) return experienceError;
+    // Get experience document (validates existence and returns doc in one read)
+    const result = await getExperienceDocument(eventId, experienceId);
+    if ("error" in result) return result.error;
 
-    // Fetch existing experience document
-    const experienceRef = db
-      .collection("events")
-      .doc(eventId)
-      .collection("experiences")
-      .doc(experienceId);
-
-    const experienceDoc = await experienceRef.get();
-
+    const experienceDoc = result.doc;
     const existingData = experienceDoc.data();
 
-    // Migrate legacy data if needed (User Story 3)
-    let currentExperience: PhotoExperience;
-    try {
-      currentExperience = migratePhotoExperience(existingData);
-    } catch (migrationError) {
-      return createErrorResponse(
-        ErrorCodes.MIGRATION_ERROR,
-        migrationError instanceof Error
-          ? migrationError.message
-          : "Failed to migrate legacy experience"
-      );
-    }
+    // Get reference for later update
+    const experienceRef = experienceDoc.ref;
+
+    // Parse existing data with schema validation
+    const currentExperience = photoExperienceSchema.parse({
+      id: experienceDoc.id,
+      ...existingData,
+    });
 
     // Merge partial updates with existing data
     const updatedExperience: PhotoExperience = {
@@ -122,20 +107,15 @@ export async function updatePhotoExperience(
     // Validate merged result against schema
     const validatedExperience = photoExperienceSchema.parse(updatedExperience);
 
-    // Strip legacy fields before writing to Firestore
-    const cleanExperience = stripLegacyFields(
-      validatedExperience as PhotoExperience & Record<string, unknown>
-    );
-
     // Write to Firestore
-    await experienceRef.set(cleanExperience);
+    await experienceRef.set(validatedExperience);
 
     // Revalidate the experience page
     revalidatePath(`/events/${eventId}/experiences/${experienceId}`);
     // Also revalidate the event page (list view)
     revalidatePath(`/events/${eventId}`);
 
-    return createSuccessResponse(cleanExperience);
+    return createSuccessResponse(validatedExperience);
   } catch (error) {
     // Handle Zod validation errors
     if (error instanceof z.ZodError) {

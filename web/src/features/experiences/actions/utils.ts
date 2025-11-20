@@ -58,6 +58,8 @@ export async function validateEventExists<T = never>(
 /**
  * Validate that an experience exists.
  * Returns an error response if the experience doesn't exist, otherwise null.
+ *
+ * @deprecated Use getExperienceDocument instead to avoid duplicate reads
  */
 export async function validateExperienceExists<T = never>(
   eventId: string,
@@ -82,6 +84,43 @@ export async function validateExperienceExists<T = never>(
   }
 
   return null; // null means success, no error
+}
+
+/**
+ * Get experience document and validate it exists.
+ * Returns either an error response or the document snapshot.
+ * This avoids duplicate reads when you need both validation and the document data.
+ *
+ * @returns Error response if not found, or object with the document snapshot
+ */
+export async function getExperienceDocument(
+  eventId: string,
+  experienceId: string
+): Promise<
+  | { error: ActionResponse<never> }
+  | { doc: FirebaseFirestore.DocumentSnapshot }
+> {
+  const experienceRef = db
+    .collection("events")
+    .doc(eventId)
+    .collection("experiences")
+    .doc(experienceId);
+
+  const experienceDoc = await experienceRef.get();
+
+  if (!experienceDoc.exists) {
+    return {
+      error: {
+        success: false,
+        error: {
+          code: ErrorCodes.EXPERIENCE_NOT_FOUND,
+          message: `Experience with ID ${experienceId} not found`,
+        },
+      },
+    };
+  }
+
+  return { doc: experienceDoc };
 }
 
 /**
