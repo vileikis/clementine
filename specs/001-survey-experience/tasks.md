@@ -75,15 +75,15 @@ This provides a complete, independently testable feature that allows creators to
 
 **Tasks**: 4
 
-- [ ] T001 Install @dnd-kit packages for drag-and-drop in web/ workspace
-- [ ] T002 Install react-hook-form and @hookform/resolvers for form management in web/ workspace
-- [ ] T003 Verify TypeScript strict mode is enabled in web/tsconfig.json
-- [ ] T004 Review existing survey schemas in web/src/features/experiences/lib/schemas.ts (lines 99-103, 215-289)
+- [X] T001 Install @dnd-kit packages for drag-and-drop in web/ workspace
+- [X] T002 Install react-hook-form and @hookform/resolvers for form management in web/ workspace
+- [X] T003 Verify TypeScript strict mode is enabled in web/tsconfig.json
+- [X] T004 Review existing survey schemas in web/src/features/experiences/lib/schemas.ts (lines 99-103, 215-289)
 
 **Validation**:
-- [ ] All dependencies installed successfully with `pnpm install`
-- [ ] No TypeScript errors in existing codebase
-- [ ] Existing survey schemas reviewed and understood
+- [X] All dependencies installed successfully with `pnpm install`
+- [X] No TypeScript errors in existing codebase
+- [X] Existing survey schemas reviewed and understood
 
 ---
 
