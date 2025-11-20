@@ -49,14 +49,11 @@ export { AI_MODELS, DEFAULT_AI_MODEL } from "./lib/constants";
 // Types (compile-time only)
 // ============================================================================
 export type {
-  Experience,
+  PhotoExperience,
   ExperienceType,
   PreviewType,
   AspectRatio,
-  ExperienceItem,
-  SurveyStep,
-  SurveyStepType,
-} from "./types/experience.types";
+} from "./lib/schemas";
 
 // ============================================================================
 // Validation Schemas (Safe to export)
