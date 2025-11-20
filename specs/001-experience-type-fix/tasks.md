@@ -101,23 +101,23 @@
 
 ### Component Updates (7 files)
 
-- [ ] T025 [P] [US3] Update `web/src/features/experiences/components/shared/ExperiencesList.tsx` to import `PhotoExperience` from `../../lib/schemas` (line 6)
-- [ ] T026 [P] [US3] Update `web/src/features/experiences/components/shared/ExperienceEditorWrapper.tsx` to import `PhotoExperience` from `../../lib/schemas` (line 15)
-- [ ] T027 [P] [US3] Update `web/src/features/experiences/components/shared/ExperienceTypeSelector.tsx` to import `ExperienceType` from `../../lib/schemas` (line 11)
-- [ ] T028 [P] [US3] Update `web/src/features/experiences/components/shared/PreviewMediaUpload.tsx` to import `PreviewType` from `../../lib/schemas` (line 8)
-- [ ] T029 [P] [US3] Update `web/src/features/experiences/components/photo/AITransformSettings.tsx` to import `AspectRatio` from `../../lib/schemas` (line 10)
-- [ ] T030 [US3] Update `web/src/features/experiences/components/shared/ExperienceEditor.tsx` to consolidate imports (lines 16-17), remove dual-type handling, and remove type guard (lines 49-51)
-- [ ] T031 [US3] Simplify state initialization in `web/src/features/experiences/components/shared/ExperienceEditor.tsx` (lines 54-90) to remove legacy field fallbacks
+- [X] T025 [P] [US3] Update `web/src/features/experiences/components/shared/ExperiencesList.tsx` to import `PhotoExperience` from `../../lib/schemas` (line 6)
+- [X] T026 [P] [US3] Update `web/src/features/experiences/components/shared/ExperienceEditorWrapper.tsx` to import `PhotoExperience` from `../../lib/schemas` (line 15)
+- [X] T027 [P] [US3] Update `web/src/features/experiences/components/shared/ExperienceTypeSelector.tsx` to import `ExperienceType` from `../../lib/schemas` (line 11)
+- [X] T028 [P] [US3] Update `web/src/features/experiences/components/shared/PreviewMediaUpload.tsx` to import `PreviewType` from `../../lib/schemas` (line 8)
+- [X] T029 [P] [US3] Update `web/src/features/experiences/components/photo/AITransformSettings.tsx` to import `AspectRatio` from `../../lib/schemas` (line 10)
+- [X] T030 [US3] Update `web/src/features/experiences/components/shared/ExperienceEditor.tsx` to consolidate imports (lines 16-17), remove dual-type handling, and remove type guard (lines 49-51)
+- [X] T031 [US3] Simplify state initialization in `web/src/features/experiences/components/shared/ExperienceEditor.tsx` (lines 54-90) to remove legacy field fallbacks
 
 ### Test File Updates
 
-- [ ] T032 [US3] Update `web/src/features/experiences/components/shared/ExperienceEditor.test.tsx` to import `PhotoExperience` from `../../lib/schemas` and update test data structure (line 3)
+- [X] T032 [US3] Update `web/src/features/experiences/components/shared/ExperienceEditor.test.tsx` to import `PhotoExperience` from `../../lib/schemas` and update test data structure (line 3)
 
 ### Cleanup & Verification
 
-- [ ] T033 [US3] Remove empty `web/src/features/experiences/types/` directory if no other files remain
-- [ ] T034 [US3] Search codebase for `experience.types.ts` imports with `grep -r "experience.types" web/src/` (expect zero results)
-- [ ] T035 [US3] Search codebase for `migration` references with `grep -r "migration" web/src/features/experiences/` (expect zero results)
+- [X] T033 [US3] Remove empty `web/src/features/experiences/types/` directory if no other files remain
+- [X] T034 [US3] Search codebase for `experience.types.ts` imports with `grep -r "experience.types" web/src/` (expect zero results)
+- [X] T035 [US3] Search codebase for `migration` references with `grep -r "migration" web/src/features/experiences/` (expect zero results)
 
 **Checkpoint**: All component imports updated, no legacy references remain in codebase
 

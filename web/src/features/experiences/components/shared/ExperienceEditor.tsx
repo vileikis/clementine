@@ -13,12 +13,11 @@ import { PreviewMediaUpload } from "./PreviewMediaUpload";
 import { CountdownSettings } from "../photo/CountdownSettings";
 import { OverlaySettings } from "../photo/OverlaySettings";
 import { AITransformSettings } from "../photo/AITransformSettings";
-import type { Experience, PreviewType, AspectRatio } from "../../types/experience.types";
-import type { PhotoExperience } from "../../lib/schemas";
+import type { PhotoExperience, PreviewType, AspectRatio } from "../../lib/schemas";
 
 interface ExperienceEditorProps {
-  experience: Experience;
-  onSave: (experienceId: string, data: Partial<Experience>) => Promise<void>;
+  experience: PhotoExperience;
+  onSave: (experienceId: string, data: Partial<PhotoExperience>) => Promise<void>;
   onDelete: (experienceId: string) => Promise<void>;
   className?: string;
 }
@@ -46,48 +45,27 @@ export function ExperienceEditor({
   const [isPending, startTransition] = useTransition();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-  // Type guard to check if experience uses new schema
-  const hasNewSchema = "config" in experience && "aiConfig" in experience;
-  const photoExp = hasNewSchema ? (experience as unknown as PhotoExperience) : null;
-
-  // Local form state - read from new schema first, then fallback to legacy fields
+  // Local form state - read from new schema
   const [label, setLabel] = useState(experience.label);
   const [enabled, setEnabled] = useState(experience.enabled);
   const [previewPath, setPreviewPath] = useState(experience.previewPath || "");
   const [previewType, setPreviewType] = useState<PreviewType | undefined>(experience.previewType);
 
-  // Countdown settings - read from config.countdown (new) or legacy fields
-  // Note: In new schema, countdown: 0 means disabled, countdown: N means N seconds
-  const [countdownSeconds, setCountdownSeconds] = useState(
-    photoExp
-      ? photoExp.config.countdown
-      : (experience.countdownEnabled ? (experience.countdownSeconds ?? 3) : 0)
-  );
+  // Countdown settings - countdown: 0 means disabled, countdown: N means N seconds
+  const [countdownSeconds, setCountdownSeconds] = useState(experience.config.countdown);
 
-  // Overlay settings - read from config.overlayFramePath (new) or legacy fields
-  const [overlayEnabled, setOverlayEnabled] = useState(
-    photoExp ? !!photoExp.config.overlayFramePath : (experience.overlayEnabled ?? false)
-  );
-  const [overlayFramePath, setOverlayFramePath] = useState(
-    photoExp ? (photoExp.config.overlayFramePath || "") : (experience.overlayFramePath || "")
-  );
+  // Overlay settings - read from config.overlayFramePath
+  const [overlayEnabled, setOverlayEnabled] = useState(!!experience.config.overlayFramePath);
+  const [overlayFramePath, setOverlayFramePath] = useState(experience.config.overlayFramePath || "");
 
-  // AI settings - read from aiConfig (new) or legacy fields
-  const [aiEnabled, setAiEnabled] = useState(
-    photoExp ? photoExp.aiConfig.enabled : experience.aiEnabled
-  );
-  const [aiModel, setAiModel] = useState(
-    photoExp ? (photoExp.aiConfig.model || "nanobanana") : (experience.aiModel || "nanobanana")
-  );
-  const [aiPrompt, setAiPrompt] = useState(
-    photoExp ? (photoExp.aiConfig.prompt || "") : (experience.aiPrompt || "")
-  );
+  // AI settings - read from aiConfig
+  const [aiEnabled, setAiEnabled] = useState(experience.aiConfig.enabled);
+  const [aiModel, setAiModel] = useState(experience.aiConfig.model || "nanobanana");
+  const [aiPrompt, setAiPrompt] = useState(experience.aiConfig.prompt || "");
   const [aiReferenceImagePaths, setAiReferenceImagePaths] = useState<string[]>(
-    photoExp ? (photoExp.aiConfig.referenceImagePaths || []) : (experience.aiReferenceImagePaths || [])
+    experience.aiConfig.referenceImagePaths || []
   );
-  const [aiAspectRatio, setAiAspectRatio] = useState<AspectRatio>(
-    photoExp ? photoExp.aiConfig.aspectRatio : (experience.aiAspectRatio || "1:1")
-  );
+  const [aiAspectRatio, setAiAspectRatio] = useState<AspectRatio>(experience.aiConfig.aspectRatio);
 
   // Handle save - write to new schema structure (config/aiConfig)
   const handleSave = () => {
@@ -99,12 +77,12 @@ export function ExperienceEditor({
           enabled,
           previewPath: previewPath || undefined,
           previewType: previewType || undefined,
-          // Write to new config object structure
+          // Write to config object structure
           config: {
             countdown: countdownSeconds, // 0 = disabled, N = N seconds
             overlayFramePath: overlayEnabled && overlayFramePath ? overlayFramePath : null,
           },
-          // Write to new aiConfig object structure
+          // Write to aiConfig object structure
           aiConfig: {
             enabled: aiEnabled,
             model: aiModel || null,
@@ -112,7 +90,7 @@ export function ExperienceEditor({
             referenceImagePaths: aiReferenceImagePaths.length > 0 ? aiReferenceImagePaths : null,
             aspectRatio: aiAspectRatio,
           },
-        } as PhotoExperience); // Type assertion needed since onSave expects Partial<Experience> but we're sending new schema
+        });
         toast.success("Experience updated successfully");
       } catch (error) {
         toast.error(error instanceof Error ? error.message : "Failed to save experience");

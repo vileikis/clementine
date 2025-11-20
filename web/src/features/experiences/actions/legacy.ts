@@ -24,7 +24,7 @@
 import { db, storage as bucket } from "@/lib/firebase/admin";
 import { z } from "zod";
 import { verifyAdminSecret } from "@/lib/auth";
-import type { ExperienceType, PreviewType, AspectRatio } from "../types/experience.types";
+import type { ExperienceType, PreviewType, AspectRatio } from "../lib/schemas";
 
 // Action response types
 export type ActionResponse<T = void> =
