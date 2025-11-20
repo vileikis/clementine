@@ -34,8 +34,8 @@ type UpdatePhotoExperienceInput = {
   label?: string;
   enabled?: boolean;
   hidden?: boolean;
-  previewPath?: string;
-  previewType?: "image" | "gif" | "video";
+  previewPath?: string | null;
+  previewType?: "image" | "gif" | "video" | null;
   config?: Partial<PhotoConfig>;
   aiConfig?: Partial<AiConfig>;
 };

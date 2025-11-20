@@ -128,65 +128,73 @@ export function ExperienceEditorHeader({
   };
 
   return (
-    <div className="space-y-6 mb-6">
-      {/* Row 1: Preview Media (Optional) */}
-      {showPreview && onPreviewUpload && onPreviewRemove && (
-        <PreviewMediaCompact
-          eventId={eventId}
-          experienceId={experience.id}
-          previewPath={previewPath}
-          previewType={previewType}
-          onUpload={onPreviewUpload}
-          onRemove={onPreviewRemove}
-          disabled={disabled}
-        />
-      )}
+    <div className="mb-8">
+      {/* 2-Column Layout: Preview Media | Title + Controls */}
+      <div className="flex gap-6 items-center">
+        {/* Column 1: Preview Media (always shown as square) */}
+        {showPreview && onPreviewUpload && onPreviewRemove && (
+          <div className="shrink-0">
+            <PreviewMediaCompact
+              eventId={eventId}
+              experienceId={experience.id}
+              previewPath={previewPath}
+              previewType={previewType}
+              onUpload={onPreviewUpload}
+              onRemove={onPreviewRemove}
+              disabled={disabled}
+            />
+          </div>
+        )}
 
-      {/* Row 2: Title & Delete */}
-      <div className="flex items-start justify-between gap-4">
-        <h2
-          className="text-2xl font-semibold cursor-pointer hover:underline break-words inline-block"
-          onClick={handleTitleClick}
-        >
-          {experience.label}
-        </h2>
-        <DeleteExperienceButton
-          experienceLabel={experience.label}
-          onDelete={onDelete}
-          disabled={disabled || isTitlePending || isEnabledPending}
-        />
-      </div>
-
-      {/* Row 3: Toggle Controls */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
-        {/* Enabled Toggle */}
-        <TooltipProvider>
-          <div className="flex items-center gap-3">
-            <Switch
-              id={`enabled-${experience.id}`}
-              checked={enabled}
-              onCheckedChange={handleEnabledChange}
+        {/* Column 2: Title + Delete + Controls */}
+        <div className="flex-1 min-w-0 space-y-3">
+          {/* Row 1: Title & Delete */}
+          <div className="flex items-start justify-between gap-4">
+            <h2
+              className="text-2xl font-semibold cursor-pointer hover:underline break-words inline-block"
+              onClick={handleTitleClick}
+            >
+              {experience.label}
+            </h2>
+            <DeleteExperienceButton
+              experienceLabel={experience.label}
+              onDelete={onDelete}
               disabled={disabled || isTitlePending || isEnabledPending}
             />
-            <Label
-              htmlFor={`enabled-${experience.id}`}
-              className="cursor-pointer text-sm font-medium"
-            >
-              {isEnabledPending ? "Updating..." : "Enabled"}
-            </Label>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
-              </TooltipTrigger>
-              <TooltipContent side="top" className="max-w-xs">
-                <p>{enabled ? "Guests can access this experience" : "Hidden from guests"}</p>
-              </TooltipContent>
-            </Tooltip>
           </div>
-        </TooltipProvider>
 
-        {/* Additional Controls (e.g., Survey Required toggle) */}
-        {additionalControls}
+          {/* Row 2: Toggle Controls */}
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
+            {/* Enabled Toggle */}
+            <TooltipProvider>
+              <div className="flex items-center gap-3">
+                <Switch
+                  id={`enabled-${experience.id}`}
+                  checked={enabled}
+                  onCheckedChange={handleEnabledChange}
+                  disabled={disabled || isTitlePending || isEnabledPending}
+                />
+                <Label
+                  htmlFor={`enabled-${experience.id}`}
+                  className="cursor-pointer text-sm font-medium"
+                >
+                  {isEnabledPending ? "Updating..." : "Enabled"}
+                </Label>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="max-w-xs">
+                    <p>{enabled ? "Guests can access this experience" : "Hidden from guests"}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+            </TooltipProvider>
+
+            {/* Additional Controls (e.g., Survey Required toggle) */}
+            {additionalControls}
+          </div>
+        </div>
       </div>
 
       {/* Title Edit Dialog */}

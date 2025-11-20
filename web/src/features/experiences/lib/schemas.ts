@@ -37,9 +37,9 @@ const baseExperienceSchema = z.object({
   enabled: z.boolean(),
   hidden: z.boolean().default(false),
 
-  // Preview Media (optional)
-  previewPath: z.string().url().optional(),
-  previewType: previewTypeSchema.optional(),
+  // Preview Media (optional, nullable for graceful handling)
+  previewPath: z.string().url().nullable().optional(),
+  previewType: previewTypeSchema.nullable().optional(),
 
   // Audit
   createdAt: z.number().int().positive(),
@@ -165,8 +165,8 @@ export const updatePhotoExperienceSchema = z
     label: z.string().min(1).max(50).optional(),
     enabled: z.boolean().optional(),
     hidden: z.boolean().optional(),
-    previewPath: z.string().url().optional(),
-    previewType: previewTypeSchema.optional(),
+    previewPath: z.string().url().nullable().optional(),
+    previewType: previewTypeSchema.nullable().optional(),
     config: photoConfigSchema.partial().optional(),
     aiConfig: aiConfigSchema.partial().optional(),
   })
@@ -188,8 +188,8 @@ export const updateGifExperienceSchema = z
     label: z.string().min(1).max(50).optional(),
     enabled: z.boolean().optional(),
     hidden: z.boolean().optional(),
-    previewPath: z.string().url().optional(),
-    previewType: previewTypeSchema.optional(),
+    previewPath: z.string().url().nullable().optional(),
+    previewType: previewTypeSchema.nullable().optional(),
     config: gifConfigSchema.partial().optional(),
     aiConfig: aiConfigSchema.partial().optional(),
   })
@@ -211,8 +211,8 @@ export const updateSurveyExperienceSchema = z
     label: z.string().min(1).max(50).optional(),
     enabled: z.boolean().optional(),
     hidden: z.boolean().optional(),
-    previewPath: z.string().url().optional(),
-    previewType: previewTypeSchema.optional(),
+    previewPath: z.string().url().nullable().optional(),
+    previewType: previewTypeSchema.nullable().optional(),
     config: surveyConfigSchema.partial().optional(),
   })
   .strict();

@@ -88,84 +88,86 @@ export function PreviewMediaCompact({
     }
   };
 
-  // No media state - show add button
-  if (!previewPath) {
-    return (
-      <div className={cn("space-y-2", className)}>
-        <div className="relative">
-          <input
-            id={`preview-media-${experienceId}`}
-            type="file"
-            accept="image/png,image/jpeg,image/gif,video/mp4,video/webm"
-            onChange={handleMediaUpload}
-            disabled={isUploading || disabled}
-            className="hidden"
-          />
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-auto py-2 min-h-[44px]"
-            disabled={isUploading || disabled}
-            onClick={() => document.getElementById(`preview-media-${experienceId}`)?.click()}
-            type="button"
-          >
-            <ImagePlus className="mr-2 h-4 w-4" />
-            {isUploading ? "Uploading..." : "Add Preview"}
-          </Button>
-        </div>
-        {uploadError && (
-          <p className="text-xs text-destructive">{uploadError}</p>
-        )}
-      </div>
-    );
-  }
-
-  // Media exists - show square preview with hover trash icon
+  // Always show square container
   return (
     <div className={cn("space-y-2", className)}>
       <div
-        className="relative w-[120px] h-[120px] sm:w-[160px] sm:h-[160px] overflow-hidden rounded-lg border border-border bg-muted"
+        className="relative w-[120px] h-[120px] sm:w-[160px] sm:h-[160px] overflow-hidden rounded-lg border border-border bg-muted cursor-pointer"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
+        onClick={() => {
+          if (!previewPath && !isUploading && !disabled) {
+            document.getElementById(`preview-media-${experienceId}`)?.click();
+          }
+        }}
       >
-        {previewType === "video" ? (
-          <video
-            src={previewPath}
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="h-full w-full object-cover"
-          />
+        {/* Hidden file input */}
+        <input
+          id={`preview-media-${experienceId}`}
+          type="file"
+          accept="image/png,image/jpeg,image/gif,video/mp4,video/webm"
+          onChange={handleMediaUpload}
+          disabled={isUploading || disabled}
+          className="hidden"
+        />
+
+        {previewPath ? (
+          <>
+            {/* Media exists - show preview */}
+            {previewType === "video" ? (
+              <video
+                src={previewPath}
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <img
+                src={previewPath}
+                alt="Experience preview"
+                className="h-full w-full object-cover"
+              />
+            )}
+
+            {/* Hover overlay with trash icon */}
+            {isHovered && !isDeleting && !disabled && (
+              <div className="absolute inset-0 bg-black/50 flex items-start justify-end p-2">
+                <Button
+                  variant="destructive"
+                  size="icon"
+                  className="h-8 w-8 min-h-[44px] min-w-[44px] sm:h-9 sm:w-9"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRemoveMedia();
+                  }}
+                  type="button"
+                >
+                  <X className="h-4 w-4" />
+                  <span className="sr-only">Remove preview</span>
+                </Button>
+              </div>
+            )}
+
+            {/* Deleting state */}
+            {isDeleting && (
+              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                <span className="text-white text-sm">Removing...</span>
+              </div>
+            )}
+          </>
         ) : (
-          <img
-            src={previewPath}
-            alt="Experience preview"
-            className="h-full w-full object-cover"
-          />
-        )}
-
-        {/* Hover overlay with trash icon */}
-        {isHovered && !isDeleting && !disabled && (
-          <div className="absolute inset-0 bg-black/50 flex items-start justify-end p-2">
-            <Button
-              variant="destructive"
-              size="icon"
-              className="h-8 w-8 min-h-[44px] min-w-[44px] sm:h-9 sm:w-9"
-              onClick={handleRemoveMedia}
-              type="button"
-            >
-              <X className="h-4 w-4" />
-              <span className="sr-only">Remove preview</span>
-            </Button>
-          </div>
-        )}
-
-        {/* Deleting state */}
-        {isDeleting && (
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-            <span className="text-white text-sm">Removing...</span>
-          </div>
+          <>
+            {/* No media - show empty state with icon */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              {isUploading ? (
+                <span className="text-sm text-muted-foreground">Uploading...</span>
+              ) : (
+                <ImagePlus className="h-8 w-8 text-muted-foreground" />
+              )}
+            </div>
+          </>
         )}
       </div>
 
