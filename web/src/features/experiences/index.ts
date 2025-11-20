@@ -50,9 +50,11 @@ export { AI_MODELS, DEFAULT_AI_MODEL } from "./lib/constants";
 // ============================================================================
 export type {
   PhotoExperience,
+  PhotoExperience as Experience, // Alias for backward compatibility
   ExperienceType,
   PreviewType,
   AspectRatio,
+  SurveyStepType,
 } from "./lib/schemas";
 
 // ============================================================================

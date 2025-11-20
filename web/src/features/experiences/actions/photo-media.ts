@@ -107,7 +107,6 @@ export async function uploadPreviewMedia(
 
     const experienceDoc = result.doc;
     const experienceData = experienceDoc.data();
-    const experienceRef = experienceDoc.ref;
 
     // Delete old preview media if exists
     if (experienceData?.previewPath) {
@@ -250,7 +249,6 @@ export async function uploadFrameOverlay(
 
     const experienceDoc = result.doc;
     const experienceData = experienceDoc.data();
-    const experienceRef = experienceDoc.ref;
 
     // Delete old frame overlay if exists
     if (experienceData?.overlayFramePath || experienceData?.config?.overlayFramePath) {
