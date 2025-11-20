@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ExternalLink } from "lucide-react";
 import { ImageUploadField } from "@/components/shared/ImageUploadField";
 import { AI_MODEL_PROMPT_GUIDES } from "../../lib/constants";
-import type { AspectRatio } from "../../types/experience.types";
+import type { AspectRatio } from "../../lib/schemas";
 
 interface AITransformSettingsProps {
   aiModel: string;

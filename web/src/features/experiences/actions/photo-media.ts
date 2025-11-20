@@ -11,10 +11,10 @@
  * - Firebase Storage operations
  */
 
-import { db, storage as bucket } from "@/lib/firebase/admin";
+import { storage as bucket } from "@/lib/firebase/admin";
 import type { ActionResponse } from "./types";
 import { ErrorCodes } from "./types";
-import { checkAuth, validateExperienceExists, createErrorResponse, createSuccessResponse } from "./utils";
+import { checkAuth, getExperienceDocument, createErrorResponse, createSuccessResponse } from "./utils";
 import type { PreviewType } from "../lib/schemas";
 
 /**
@@ -101,17 +101,11 @@ export async function uploadPreviewMedia(
       );
     }
 
-    // Check if experience exists
-    const experienceError = await validateExperienceExists(eventId, experienceId);
-    if (experienceError) return experienceError;
+    // Get experience document (validates existence and returns doc in one read)
+    const result = await getExperienceDocument(eventId, experienceId);
+    if ("error" in result) return result.error;
 
-    // Get experience reference and data
-    const experienceRef = db
-      .collection("events")
-      .doc(eventId)
-      .collection("experiences")
-      .doc(experienceId);
-    const experienceDoc = await experienceRef.get();
+    const experienceDoc = result.doc;
     const experienceData = experienceDoc.data();
 
     // Delete old preview media if exists
@@ -178,16 +172,11 @@ export async function deletePreviewMedia(
     const authError = await checkAuth();
     if (authError) return authError;
 
-    // Check if experience exists
-    const experienceError = await validateExperienceExists(eventId, experienceId);
-    if (experienceError) return experienceError;
+    // Get experience document (validates existence and returns doc in one read)
+    const result = await getExperienceDocument(eventId, experienceId);
+    if ("error" in result) return result.error;
 
-    // Get experience reference
-    const experienceRef = db
-      .collection("events")
-      .doc(eventId)
-      .collection("experiences")
-      .doc(experienceId);
+    const experienceRef = result.doc.ref;
 
     // Delete file from Storage
     try {
@@ -254,17 +243,11 @@ export async function uploadFrameOverlay(
       );
     }
 
-    // Check if experience exists
-    const experienceError = await validateExperienceExists(eventId, experienceId);
-    if (experienceError) return experienceError;
+    // Get experience document (validates existence and returns doc in one read)
+    const result = await getExperienceDocument(eventId, experienceId);
+    if ("error" in result) return result.error;
 
-    // Get experience reference and data
-    const experienceRef = db
-      .collection("events")
-      .doc(eventId)
-      .collection("experiences")
-      .doc(experienceId);
-    const experienceDoc = await experienceRef.get();
+    const experienceDoc = result.doc;
     const experienceData = experienceDoc.data();
 
     // Delete old frame overlay if exists
@@ -329,16 +312,13 @@ export async function deleteFrameOverlay(
     const authError = await checkAuth();
     if (authError) return authError;
 
-    // Check if experience exists
-    const experienceError = await validateExperienceExists(eventId, experienceId);
-    if (experienceError) return experienceError;
+    // Get experience document (validates existence and returns doc in one read)
+    const result = await getExperienceDocument(eventId, experienceId);
+    if ("error" in result) return result.error;
 
-    // Get experience reference
-    const experienceRef = db
-      .collection("events")
-      .doc(eventId)
-      .collection("experiences")
-      .doc(experienceId);
+    const experienceDoc = result.doc;
+    const experienceData = experienceDoc.data();
+    const experienceRef = experienceDoc.ref;
 
     // Delete file from Storage
     try {
@@ -350,8 +330,6 @@ export async function deleteFrameOverlay(
     }
 
     // Clear overlay field from Firestore (handle both new and legacy schemas)
-    const experienceDoc = await experienceRef.get();
-    const experienceData = experienceDoc.data();
 
     if (experienceData?.config) {
       // New schema: clear config.overlayFramePath

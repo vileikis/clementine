@@ -295,5 +295,5 @@ export type AspectRatio = z.infer<typeof aspectRatioSchema>;
 export type SurveyStepSchema = z.infer<typeof surveyStepSchema>;
 export type SurveyStepType = z.infer<typeof surveyStepTypeSchema>;
 
-// Legacy type alias for backward compatibility (can be removed after migration)
+// Type alias for Experience union
 export type ExperienceSchema = Experience;

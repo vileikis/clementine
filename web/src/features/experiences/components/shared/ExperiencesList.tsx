@@ -3,10 +3,10 @@
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import type { Experience } from "../../types/experience.types";
+import type { PhotoExperience } from "../../lib/schemas";
 
 interface ExperiencesListProps {
-  experiences: Experience[];
+  experiences: PhotoExperience[];
   selectedExperienceId: string | null;
   onExperienceSelect: (experienceId: string) => void;
   onAddClick: () => void;

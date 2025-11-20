@@ -1,7 +1,7 @@
 // Experience repository - CRUD operations for experiences subcollection
 
 import { db } from "@/lib/firebase/admin";
-import type { Experience } from "../types/experience.types";
+import { photoExperienceSchema, type PhotoExperience } from "./schemas";
 import { FieldValue } from "firebase-admin/firestore";
 
 /**
@@ -11,9 +11,8 @@ export async function createExperience(
   eventId: string,
   data: {
     label: string;
-    type: "photo" | "video" | "gif" | "wheel";
+    type: "photo";
     enabled: boolean;
-    aiEnabled: boolean;
   }
 ): Promise<string> {
   const experienceRef = db
@@ -28,15 +27,24 @@ export async function createExperience(
     id: experienceRef.id,
     eventId,
     label: data.label,
-    type: data.type,
+    type: "photo" as const,
     enabled: data.enabled,
+    hidden: false,
 
-    // Default capture settings
-    allowCamera: true,
-    allowLibrary: true,
+    // Nested config object
+    config: {
+      countdown: 3,
+      overlayFramePath: null,
+    },
 
-    // AI settings
-    aiEnabled: data.aiEnabled,
+    // Nested aiConfig object
+    aiConfig: {
+      enabled: false,
+      model: null,
+      prompt: null,
+      referenceImagePaths: null,
+      aspectRatio: "1:1" as const,
+    },
 
     createdAt: now,
     updatedAt: now,
@@ -62,7 +70,7 @@ export async function createExperience(
 export async function updateExperience(
   eventId: string,
   experienceId: string,
-  data: Partial<Experience>
+  data: Partial<PhotoExperience>
 ): Promise<void> {
   const now = Date.now();
 
@@ -114,7 +122,7 @@ export async function deleteExperience(
 export async function getExperience(
   eventId: string,
   experienceId: string
-): Promise<Experience | null> {
+): Promise<PhotoExperience | null> {
   const doc = await db
     .collection("events")
     .doc(eventId)
@@ -126,16 +134,16 @@ export async function getExperience(
     return null;
   }
 
-  return {
+  return photoExperienceSchema.parse({
     id: doc.id,
     ...doc.data(),
-  } as Experience;
+  });
 }
 
 /**
  * Lists all experiences for an event
  */
-export async function listExperiences(eventId: string): Promise<Experience[]> {
+export async function listExperiences(eventId: string): Promise<PhotoExperience[]> {
   const snapshot = await db
     .collection("events")
     .doc(eventId)
@@ -143,8 +151,10 @@ export async function listExperiences(eventId: string): Promise<Experience[]> {
     .orderBy("createdAt", "asc")
     .get();
 
-  return snapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  })) as Experience[];
+  return snapshot.docs.map((doc) =>
+    photoExperienceSchema.parse({
+      id: doc.id,
+      ...doc.data(),
+    })
+  );
 }
