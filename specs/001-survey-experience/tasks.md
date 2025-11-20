@@ -282,11 +282,11 @@ This provides a complete, independently testable feature that allows creators to
 
 **Tasks**: 5
 
-- [ ] T061 [US4] Add delete button to step editor with confirmation dialog
-- [ ] T062 [US4] Implement handleDelete function calling deleteSurveyStepAction
-- [ ] T063 [US4] Handle step selection after deletion (select next available or show empty state)
-- [ ] T064 [US4] Add optimistic UI update before Server Action completes
-- [ ] T065 [US4] Show error message if deletion fails
+- [X] T061 [US4] Add delete button to step editor with confirmation dialog
+- [X] T062 [US4] Implement handleDelete function calling deleteSurveyStepAction
+- [X] T063 [US4] Handle step selection after deletion (select next available or show empty state)
+- [X] T064 [US4] Add optimistic UI update before Server Action completes
+- [X] T065 [US4] Show error message if deletion fails
 
 **Validation** (User Story 4):
 - [ ] Click delete on step 2 of 3 → confirmation dialog appears

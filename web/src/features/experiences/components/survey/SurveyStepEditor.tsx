@@ -97,6 +97,9 @@ export function SurveyStepEditor({
     const result = await mutations.deleteStep(eventId, experienceId, step.id);
     if (result.success) {
       onStepDeleted?.();
+    } else if (result.error) {
+      // Error is already tracked in mutations.deleteError
+      console.error("Failed to delete step:", result.error);
     }
   };
 
@@ -127,6 +130,7 @@ export function SurveyStepEditor({
               variant="outline"
               size="sm"
               className="min-h-[44px] min-w-[44px]"
+              disabled={mutations.deleteLoading}
             >
               <Trash2 className="h-4 w-4 text-destructive" />
             </Button>
@@ -139,10 +143,21 @@ export function SurveyStepEditor({
                 removed from your survey.
               </AlertDialogDescription>
             </AlertDialogHeader>
+            {mutations.deleteError && (
+              <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+                {mutations.deleteError}
+              </div>
+            )}
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={handleDelete} className="bg-destructive">
-                Delete Step
+              <AlertDialogCancel disabled={mutations.deleteLoading}>
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDelete}
+                disabled={mutations.deleteLoading}
+                className="bg-destructive hover:bg-destructive/90"
+              >
+                {mutations.deleteLoading ? "Deleting..." : "Delete Step"}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
