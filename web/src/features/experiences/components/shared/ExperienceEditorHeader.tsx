@@ -197,6 +197,9 @@ export function ExperienceEditorHeader({
         </div>
       </div>
 
+      {/* Divider */}
+      <div className="border-t border-border mt-6 mb-2" />
+
       {/* Title Edit Dialog */}
       <Dialog open={isTitleDialogOpen} onOpenChange={setIsTitleDialogOpen}>
         <DialogContent>

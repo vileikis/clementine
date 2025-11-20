@@ -92,7 +92,7 @@ export function PreviewMediaCompact({
   return (
     <div className={cn("space-y-2", className)}>
       <div
-        className="relative w-[120px] h-[120px] sm:w-[160px] sm:h-[160px] overflow-hidden rounded-lg border border-border bg-muted cursor-pointer"
+        className="relative w-[120px] h-[120px] sm:w-[120px] sm:h-[120px] overflow-hidden rounded-lg border border-border bg-muted cursor-pointer"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         onClick={() => {
