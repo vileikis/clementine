@@ -195,13 +195,15 @@ export function SurveyExperienceEditor({
       {/* Left: Step List */}
       <aside className="w-full lg:w-64 shrink-0">
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="font-semibold">Survey Steps</h3>
+          <div className="flex items-center justify-between px-4">
+            <h3 className="text-sm font-semibold text-foreground">Survey Steps</h3>
             <Button
-              onClick={() => setTypeSelectorOpen(true)}
+              type="button"
+              variant="ghost"
               size="sm"
-              variant="outline"
-              className="min-h-[44px] min-w-[44px]"
+              onClick={() => setTypeSelectorOpen(true)}
+              className="h-8 w-8 p-0"
+              aria-label="Add survey step"
             >
               <Plus className="h-4 w-4" />
             </Button>
@@ -216,8 +218,19 @@ export function SurveyExperienceEditor({
         </div>
       </aside>
 
-      {/* Center: Step Editor */}
+      {/* Center: Preview */}
       <main className="flex-1 min-w-0">
+        {selectedStep ? (
+          <SurveyStepPreview step={selectedStep} />
+        ) : (
+          <div className="flex items-center justify-center min-h-[400px]">
+            <p className="text-muted-foreground">Select a step to preview</p>
+          </div>
+        )}
+      </main>
+
+      {/* Right: Step Editor */}
+      <aside className="w-full lg:w-80 shrink-0">
         {selectedStep ? (
           <SurveyStepEditor
             eventId={eventId}
@@ -238,11 +251,6 @@ export function SurveyExperienceEditor({
             <p className="text-muted-foreground">Select a step to edit</p>
           </div>
         )}
-      </main>
-
-      {/* Right: Preview */}
-      <aside className="w-full lg:w-80 shrink-0">
-        {selectedStep && <SurveyStepPreview step={selectedStep} />}
       </aside>
 
       {/* Step Type Selector Dialog */}
