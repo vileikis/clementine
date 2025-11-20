@@ -80,15 +80,22 @@ export function SurveyStepEditor({
   // Auto-save on form changes (debounced in real implementation)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = async (data: any) => {
-    await mutations.updateStep(eventId, step.id, {
+    const updateData: Record<string, any> = {
       title: data.title,
       description: data.description,
       required: data.required ?? null,
       helperText: data.helperText,
       ctaLabel: data.ctaLabel,
       mediaUrl: data.mediaUrl,
-      config: data.config ?? null,
-    });
+    };
+
+    // Only include config if it exists (not null/undefined)
+    // Statement steps don't have config, so we skip it
+    if (data.config !== null && data.config !== undefined) {
+      updateData.config = data.config;
+    }
+
+    await mutations.updateStep(eventId, step.id, updateData);
   };
 
   // Handle step deletion

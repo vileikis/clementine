@@ -463,7 +463,7 @@ export const updateSurveyStepSchema = z.object({
   helperText: z.string().max(200).optional(),
   ctaLabel: z.string().min(1).max(50).optional(),
   mediaUrl: z.string().url().optional(),
-  config: z.record(z.string(), z.any()).optional(), // Allow any config updates
+  config: z.record(z.string(), z.any()).nullable().optional(), // Allow any config updates (including null for statement steps)
 });
 
 // ============================================================================
