@@ -87,11 +87,11 @@
 
 ### Refactor Photo Editor for User Story 3
 
-- [ ] T020 [US3] Create `PhotoExperienceEditor` component by migrating existing photo editing logic in web/src/features/experiences/components/photo/PhotoExperienceEditor.tsx
-- [ ] T021 [US3] Update PhotoExperienceEditor to use shared components (BaseExperienceFields from T005, DeleteExperienceButton from T006, AITransformSettings from T007)
-- [ ] T022 [US3] Keep photo-specific components (CountdownSettings, OverlaySettings) in PhotoExperienceEditor
-- [ ] T023 [US3] Add `case 'photo'` to ExperienceEditor wrapper switch statement to route to PhotoExperienceEditor in web/src/features/experiences/components/shared/ExperienceEditor.tsx
-- [ ] T024 [US3] Test that photo editing still works after refactoring (countdown, overlay frame, AI settings all save correctly)
+- [X] T020 [US3] Create `PhotoExperienceEditor` component by migrating existing photo editing logic in web/src/features/experiences/components/photo/PhotoExperienceEditor.tsx
+- [X] T021 [US3] Update PhotoExperienceEditor to use shared components (BaseExperienceFields from T005, DeleteExperienceButton from T006, AITransformSettings from T007)
+- [X] T022 [US3] Keep photo-specific components (CountdownSettings, OverlaySettings) in PhotoExperienceEditor
+- [X] T023 [US3] Add `case 'photo'` to ExperienceEditor wrapper switch statement to route to PhotoExperienceEditor in web/src/features/experiences/components/shared/ExperienceEditor.tsx
+- [X] T024 [US3] Test that photo editing still works after refactoring (countdown, overlay frame, AI settings all save correctly)
 
 **Checkpoint**: Photo experience editing works through new architecture with zero regressions. All three user stories (shared fields, GIF, Photo) are independently functional.
 
