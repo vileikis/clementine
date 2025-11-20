@@ -1,7 +1,8 @@
 "use client";
 
 import { PhotoExperienceEditor } from "../photo/PhotoExperienceEditor";
-import type { Experience, PhotoExperience } from "../../lib/schemas";
+import { GifExperienceEditor } from "../gif/GifExperienceEditor";
+import type { Experience, PhotoExperience, GifExperience } from "../../lib/schemas";
 
 interface ExperienceEditorProps {
   experience: Experience;
@@ -45,14 +46,13 @@ export function ExperienceEditor({
       );
 
     case "gif":
-      // Placeholder for GifExperienceEditor (Phase 3)
       return (
-        <div className="space-y-6">
-          <h2 className="text-2xl font-semibold">GIF Experience Editor</h2>
-          <p className="text-sm text-muted-foreground">
-            GIF experience editing will be implemented in Phase 3.
-          </p>
-        </div>
+        <GifExperienceEditor
+          experience={experience} // Type narrowed to GifExperience
+          onSave={onSave as (id: string, data: Partial<GifExperience>) => Promise<void>}
+          onDelete={onDelete}
+          className={className}
+        />
       );
 
     case "video":
@@ -90,6 +90,7 @@ export function ExperienceEditor({
 
     default:
       // Exhaustiveness check - TypeScript will error if a case is missing
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const _exhaustive: never = experience;
       return (
         <div className="space-y-6">

@@ -9,53 +9,50 @@ import { BaseExperienceFields } from "../shared/BaseExperienceFields";
 import { DeleteExperienceButton } from "../shared/DeleteExperienceButton";
 import { PreviewMediaUpload } from "../shared/PreviewMediaUpload";
 import { AITransformSettings } from "../shared/AITransformSettings";
-import { CountdownSettings } from "./CountdownSettings";
-import { OverlaySettings } from "./OverlaySettings";
-import type { PhotoExperience, PreviewType, AspectRatio } from "../../lib/schemas";
+import { GifCaptureSettings } from "./GifCaptureSettings";
+import type { GifExperience, PreviewType, AspectRatio } from "../../lib/schemas";
 
-interface PhotoExperienceEditorProps {
-  experience: PhotoExperience;
-  onSave: (experienceId: string, data: Partial<PhotoExperience>) => Promise<void>;
+interface GifExperienceEditorProps {
+  experience: GifExperience;
+  onSave: (experienceId: string, data: Partial<GifExperience>) => Promise<void>;
   onDelete: (experienceId: string) => Promise<void>;
   className?: string;
 }
 
 /**
- * PhotoExperienceEditor - Photo-specific experience configuration
- * Refactored in Phase 2 (User Story 1) to use shared components
+ * GifExperienceEditor - GIF-specific experience configuration
+ * Part of 004-multi-experience-editor implementation (User Story 2)
  *
  * Features:
  * - Shared: Label, enabled status, preview media, delete (via shared components)
- * - Photo-specific: Countdown timer, overlay frame
- * - AI transformation (shared with GIF/Video types)
+ * - GIF-specific: Frame count, interval, loop count, countdown
+ * - AI transformation (shared with Photo/Video types)
  *
  * Uses:
  * - BaseExperienceFields (label, enabled)
  * - DeleteExperienceButton (delete with confirmation)
  * - PreviewMediaUpload (shared)
  * - AITransformSettings (shared)
- * - CountdownSettings (photo-specific, but reusable)
- * - OverlaySettings (photo-specific)
+ * - GifCaptureSettings (GIF-specific)
  */
-export function PhotoExperienceEditor({
+export function GifExperienceEditor({
   experience,
   onSave,
   onDelete,
-}: PhotoExperienceEditorProps) {
+}: GifExperienceEditorProps) {
   const [isPending, startTransition] = useTransition();
 
-  // Local form state - read from new schema
+  // Local form state - read from schema
   const [label, setLabel] = useState(experience.label);
   const [enabled, setEnabled] = useState(experience.enabled);
   const [previewPath, setPreviewPath] = useState(experience.previewPath || "");
   const [previewType, setPreviewType] = useState<PreviewType | undefined>(experience.previewType);
 
-  // Countdown settings - countdown: 0 means disabled, countdown: N means N seconds
-  const [countdownSeconds, setCountdownSeconds] = useState(experience.config.countdown);
-
-  // Overlay settings - read from config.overlayFramePath
-  const [overlayEnabled, setOverlayEnabled] = useState(!!experience.config.overlayFramePath);
-  const [overlayFramePath, setOverlayFramePath] = useState(experience.config.overlayFramePath || "");
+  // GIF capture settings - read from config
+  const [frameCount, setFrameCount] = useState(experience.config.frameCount);
+  const [intervalMs, setIntervalMs] = useState(experience.config.intervalMs);
+  const [loopCount, setLoopCount] = useState(experience.config.loopCount);
+  const [countdown, setCountdown] = useState(experience.config.countdown || 0);
 
   // AI settings - read from aiConfig
   const [aiEnabled, setAiEnabled] = useState(experience.aiConfig.enabled);
@@ -66,7 +63,7 @@ export function PhotoExperienceEditor({
   );
   const [aiAspectRatio, setAiAspectRatio] = useState<AspectRatio>(experience.aiConfig.aspectRatio);
 
-  // Handle save - write to new schema structure (config/aiConfig)
+  // Handle save - write to schema structure (config/aiConfig)
   const handleSave = () => {
     if (isPending) return; // Prevent multiple saves
     startTransition(async () => {
@@ -78,8 +75,10 @@ export function PhotoExperienceEditor({
           previewType: previewType || undefined,
           // Write to config object structure
           config: {
-            countdown: countdownSeconds, // 0 = disabled, N = N seconds
-            overlayFramePath: overlayEnabled && overlayFramePath ? overlayFramePath : null,
+            frameCount,
+            intervalMs,
+            loopCount,
+            countdown: countdown || undefined,
           },
           // Write to aiConfig object structure
           aiConfig: {
@@ -90,7 +89,7 @@ export function PhotoExperienceEditor({
             aspectRatio: aiAspectRatio,
           },
         });
-        toast.success("Experience updated successfully");
+        toast.success("GIF experience updated successfully");
       } catch (error) {
         toast.error(error instanceof Error ? error.message : "Failed to save experience");
       }
@@ -125,9 +124,9 @@ export function PhotoExperienceEditor({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-semibold">Edit Photo Experience</h2>
+          <h2 className="text-2xl font-semibold">Edit GIF Experience</h2>
           <p className="text-sm text-muted-foreground mt-1">
-            Configure photo capture and AI transformation settings
+            Configure GIF capture settings and AI transformation
           </p>
         </div>
         <DeleteExperienceButton
@@ -157,22 +156,16 @@ export function PhotoExperienceEditor({
         disabled={isPending}
       />
 
-      {/* Countdown Timer */}
-      <CountdownSettings
-        countdownSeconds={countdownSeconds}
-        onCountdownSecondsChange={setCountdownSeconds}
-        disabled={isPending}
-      />
-
-      {/* Frame Overlay */}
-      <OverlaySettings
-        eventId={experience.eventId}
-        experienceId={experience.id}
-        overlayEnabled={overlayEnabled}
-        overlayFramePath={overlayFramePath || undefined}
-        onOverlayEnabledChange={setOverlayEnabled}
-        onUpload={(url) => setOverlayFramePath(url)}
-        onRemove={() => setOverlayFramePath("")}
+      {/* GIF Capture Settings */}
+      <GifCaptureSettings
+        frameCount={frameCount}
+        intervalMs={intervalMs}
+        loopCount={loopCount}
+        countdown={countdown}
+        onFrameCountChange={setFrameCount}
+        onIntervalMsChange={setIntervalMs}
+        onLoopCountChange={setLoopCount}
+        onCountdownChange={setCountdown}
         disabled={isPending}
       />
 

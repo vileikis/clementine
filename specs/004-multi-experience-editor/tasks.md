@@ -59,21 +59,21 @@
 
 ### Schema & Validation for User Story 2
 
-- [ ] T011 [P] [US2] Add `createGifExperienceSchema` to web/src/features/experiences/lib/schemas.ts
-- [ ] T012 [P] [US2] Add `updateGifExperienceSchema` to web/src/features/experiences/lib/schemas.ts
-- [ ] T013 [P] [US2] Export `CreateGifExperienceData` and `UpdateGifExperienceData` types from schemas
+- [X] T011 [P] [US2] Add `createGifExperienceSchema` to web/src/features/experiences/lib/schemas.ts
+- [X] T012 [P] [US2] Add `updateGifExperienceSchema` to web/src/features/experiences/lib/schemas.ts
+- [X] T013 [P] [US2] Export `CreateGifExperienceData` and `UpdateGifExperienceData` types from schemas
 
 ### Server Actions for User Story 2
 
-- [ ] T014 [P] [US2] Implement `createGifExperience` Server Action in web/src/features/experiences/actions/gif-create.ts
-- [ ] T015 [P] [US2] Implement `updateGifExperience` Server Action in web/src/features/experiences/actions/gif-update.ts
+- [X] T014 [P] [US2] Implement `createGifExperience` Server Action in web/src/features/experiences/actions/gif-create.ts
+- [X] T015 [P] [US2] Implement `updateGifExperience` Server Action in web/src/features/experiences/actions/gif-update.ts
 
 ### UI Components for User Story 2
 
-- [ ] T016 [P] [US2] Create `GifCaptureSettings` component (frame count, interval, loop count inputs) in web/src/features/experiences/components/gif/GifCaptureSettings.tsx
-- [ ] T017 [US2] Create `GifExperienceEditor` component using shared components (BaseExperienceFields, AITransformSettings, DeleteExperienceButton) and GifCaptureSettings in web/src/features/experiences/components/gif/GifExperienceEditor.tsx
-- [ ] T018 [US2] Add `case 'gif'` to ExperienceEditor wrapper switch statement to route to GifExperienceEditor in web/src/features/experiences/components/shared/ExperienceEditor.tsx
-- [ ] T019 [US2] Update experience creation flow to support GIF type selection (if creation UI exists, otherwise document that GIF creation needs to be added to creation flow)
+- [X] T016 [P] [US2] Create `GifCaptureSettings` component (frame count, interval, loop count inputs) in web/src/features/experiences/components/gif/GifCaptureSettings.tsx
+- [X] T017 [US2] Create `GifExperienceEditor` component using shared components (BaseExperienceFields, AITransformSettings, DeleteExperienceButton) and GifCaptureSettings in web/src/features/experiences/components/gif/GifExperienceEditor.tsx
+- [X] T018 [US2] Add `case 'gif'` to ExperienceEditor wrapper switch statement to route to GifExperienceEditor in web/src/features/experiences/components/shared/ExperienceEditor.tsx
+- [X] T019 [US2] Update experience creation flow to support GIF type selection (if creation UI exists, otherwise document that GIF creation needs to be added to creation flow)
 
 **Checkpoint**: GIF experiences can be created and edited with type-specific configuration. Both Photo and GIF experiences work independently.
 
