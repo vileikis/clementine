@@ -126,10 +126,11 @@ export function DesignSidebar({
                       >
                         {/* Experience Icon based on type */}
                         <span className="text-base" aria-hidden="true">
-                          {experience.type === "photo" && "📷"}
-                          {experience.type === "video" && "🎥"}
-                          {experience.type === "gif" && "🎞️"}
-                          {experience.type === "wheel" && "🎡"}
+                          {experience.type === "photo" ? "📷" :
+                           experience.type === "video" ? "🎥" :
+                           experience.type === "gif" ? "🎞️" :
+                           experience.type === "wheel" ? "🎡" :
+                           experience.type === "survey" ? "📋" : null}
                         </span>
 
                         {/* Experience Label */}
