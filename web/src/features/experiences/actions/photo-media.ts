@@ -188,10 +188,11 @@ export async function deletePreviewMedia(
       // (file might already be deleted)
     }
 
-    // Clear preview fields from Firestore immediately
+    // Clear preview fields from Firestore immediately using FieldValue.delete()
+    const { FieldValue } = await import("firebase-admin/firestore");
     await experienceRef.update({
-      previewPath: null,
-      previewType: null,
+      previewPath: FieldValue.delete(),
+      previewType: FieldValue.delete(),
       updatedAt: Date.now(),
     });
 

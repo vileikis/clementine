@@ -24,6 +24,10 @@ export { OverlaySettings } from "./components/photo/OverlaySettings";
 export { GifExperienceEditor } from "./components/gif/GifExperienceEditor";
 export { GifCaptureSettings } from "./components/gif/GifCaptureSettings";
 
+// ============================================================================
+// Survey-specific components
+// ============================================================================
+export { SurveyExperienceEditor } from "./components/survey/SurveyExperienceEditor";
 
 // ============================================================================
 // Server Actions - NOT EXPORTED from public API
@@ -52,7 +56,12 @@ export type { ActionResponse } from "./actions/types";
 // ============================================================================
 // Constants
 // ============================================================================
-export { AI_MODELS, DEFAULT_AI_MODEL } from "./lib/constants";
+export {
+  AI_MODELS,
+  DEFAULT_AI_MODEL,
+  SURVEY_STEP_SOFT_LIMIT,
+  SURVEY_STEP_HARD_LIMIT
+} from "./lib/constants";
 
 // ============================================================================
 // Types (compile-time only)
@@ -67,7 +76,15 @@ export type {
   ExperienceType,
   PreviewType,
   AspectRatio,
-  SurveyStepType,
+  StepType,
+  SurveyStep,
+  MultipleChoiceStep,
+  YesNoStep,
+  OpinionScaleStep,
+  ShortTextStep,
+  LongTextStep,
+  EmailStep,
+  StatementStep,
 } from "./lib/schemas";
 
 // ============================================================================
@@ -93,6 +110,8 @@ export {
   previewMediaResultSchema,
   createSurveyStepSchema,
   updateSurveyStepSchema,
+  createSurveyExperienceSchema,
+  updateSurveyExperienceSchema,
   // Legacy aliases for backward compatibility during migration
   createPhotoExperienceSchema as createExperienceSchema,
   updatePhotoExperienceSchema as updateExperienceSchema,

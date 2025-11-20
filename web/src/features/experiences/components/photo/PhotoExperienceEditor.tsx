@@ -5,12 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
-import { BaseExperienceFields } from "../shared/BaseExperienceFields";
-import { DeleteExperienceButton } from "../shared/DeleteExperienceButton";
-import { PreviewMediaUpload } from "../shared/PreviewMediaUpload";
+import { ExperienceEditorHeader } from "../shared/ExperienceEditorHeader";
 import { AITransformSettings } from "../shared/AITransformSettings";
 import { CountdownSettings } from "./CountdownSettings";
 import { OverlaySettings } from "./OverlaySettings";
+import { updatePhotoExperience } from "../../actions/photo-update";
 import type { PhotoExperience, PreviewType, AspectRatio } from "../../lib/schemas";
 
 interface PhotoExperienceEditorProps {
@@ -22,17 +21,15 @@ interface PhotoExperienceEditorProps {
 
 /**
  * PhotoExperienceEditor - Photo-specific experience configuration
- * Refactored in Phase 2 (User Story 1) to use shared components
+ * Updated to use unified ExperienceEditorHeader component
  *
  * Features:
- * - Shared: Label, enabled status, preview media, delete (via shared components)
+ * - Unified header: Preview media, title, enabled toggle, delete button
  * - Photo-specific: Countdown timer, overlay frame
  * - AI transformation (shared with GIF/Video types)
  *
  * Uses:
- * - BaseExperienceFields (label, enabled)
- * - DeleteExperienceButton (delete with confirmation)
- * - PreviewMediaUpload (shared)
+ * - ExperienceEditorHeader (unified header for all experience types)
  * - AITransformSettings (shared)
  * - CountdownSettings (photo-specific, but reusable)
  * - OverlaySettings (photo-specific)
@@ -45,10 +42,9 @@ export function PhotoExperienceEditor({
   const [isPending, startTransition] = useTransition();
 
   // Local form state - read from new schema
-  const [label, setLabel] = useState(experience.label);
   const [enabled, setEnabled] = useState(experience.enabled);
   const [previewPath, setPreviewPath] = useState(experience.previewPath || "");
-  const [previewType, setPreviewType] = useState<PreviewType | undefined>(experience.previewType);
+  const [previewType, setPreviewType] = useState<PreviewType | undefined>(experience.previewType || undefined);
 
   // Countdown settings - countdown: 0 means disabled, countdown: N means N seconds
   const [countdownSeconds, setCountdownSeconds] = useState(experience.config.countdown);
@@ -66,16 +62,39 @@ export function PhotoExperienceEditor({
   );
   const [aiAspectRatio, setAiAspectRatio] = useState<AspectRatio>(experience.aiConfig.aspectRatio);
 
+  // Handle title save
+  const handleTitleSave = async (newTitle: string) => {
+    const result = await updatePhotoExperience(experience.eventId, experience.id, {
+      label: newTitle,
+    });
+    if (!result.success) {
+      throw new Error(result.error.message);
+    }
+    toast.success("Experience name updated");
+  };
+
+  // Handle enabled toggle
+  const handleEnabledChange = async (newEnabled: boolean) => {
+    setEnabled(newEnabled);
+    const result = await updatePhotoExperience(experience.eventId, experience.id, {
+      enabled: newEnabled,
+    });
+    if (!result.success) {
+      setEnabled(!newEnabled); // Revert on error
+      toast.error(result.error.message);
+    } else {
+      toast.success(`Experience ${newEnabled ? "enabled" : "disabled"}`);
+    }
+  };
+
   // Handle save - write to new schema structure (config/aiConfig)
+  // Note: Preview media is saved automatically via PreviewMediaCompact component
   const handleSave = () => {
     if (isPending) return; // Prevent multiple saves
     startTransition(async () => {
       try {
         await onSave(experience.id, {
-          label,
           enabled,
-          previewPath: previewPath || undefined,
-          previewType: previewType || undefined,
           // Write to config object structure
           config: {
             countdown: countdownSeconds, // 0 = disabled, N = N seconds
@@ -97,16 +116,46 @@ export function PhotoExperienceEditor({
     });
   };
 
-  // Handle preview media upload
-  const handlePreviewMediaUpload = (publicUrl: string, fileType: PreviewType) => {
+  // Handle preview media upload - save immediately
+  const handlePreviewMediaUpload = async (publicUrl: string, fileType: PreviewType) => {
     setPreviewPath(publicUrl);
     setPreviewType(fileType);
+
+    // Save to database immediately
+    const result = await updatePhotoExperience(experience.eventId, experience.id, {
+      previewPath: publicUrl,
+      previewType: fileType,
+    });
+
+    if (!result.success) {
+      // Revert local state on error
+      setPreviewPath(experience.previewPath || "");
+      setPreviewType(experience.previewType || undefined);
+      toast.error("Failed to save preview media");
+    } else {
+      toast.success("Preview media updated");
+    }
   };
 
-  // Handle preview media removal
-  const handlePreviewMediaRemove = () => {
+  // Handle preview media removal - save immediately
+  const handlePreviewMediaRemove = async () => {
     setPreviewPath("");
     setPreviewType(undefined);
+
+    // Save to database immediately (use null to clear the fields)
+    const result = await updatePhotoExperience(experience.eventId, experience.id, {
+      previewPath: null,
+      previewType: null,
+    });
+
+    if (!result.success) {
+      // Revert local state on error
+      setPreviewPath(experience.previewPath || "");
+      setPreviewType(experience.previewType || undefined);
+      toast.error("Failed to remove preview media");
+    } else {
+      toast.success("Preview media removed");
+    }
   };
 
   // Keyboard shortcuts: Cmd+S / Ctrl+S to save
@@ -122,38 +171,19 @@ export function PhotoExperienceEditor({
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-semibold">Edit Photo Experience</h2>
-          <p className="text-sm text-muted-foreground mt-1">
-            Configure photo capture and AI transformation settings
-          </p>
-        </div>
-        <DeleteExperienceButton
-          experienceLabel={experience.label}
-          onDelete={handleDelete}
-          disabled={isPending}
-        />
-      </div>
-
-      {/* Shared Base Fields (Label, Enabled) */}
-      <BaseExperienceFields
-        label={label}
-        enabled={enabled}
-        onLabelChange={setLabel}
-        onEnabledChange={setEnabled}
-        disabled={isPending}
-      />
-
-      {/* Preview Media */}
-      <PreviewMediaUpload
+      {/* Unified Experience Editor Header */}
+      <ExperienceEditorHeader
         eventId={experience.eventId}
-        experienceId={experience.id}
+        experience={experience}
+        showPreview={true}
         previewPath={previewPath}
         previewType={previewType}
-        onUpload={handlePreviewMediaUpload}
-        onRemove={handlePreviewMediaRemove}
+        onPreviewUpload={handlePreviewMediaUpload}
+        onPreviewRemove={handlePreviewMediaRemove}
+        onTitleSave={handleTitleSave}
+        enabled={enabled}
+        onEnabledChange={handleEnabledChange}
+        onDelete={handleDelete}
         disabled={isPending}
       />
 
