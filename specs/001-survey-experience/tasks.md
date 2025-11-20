@@ -252,11 +252,11 @@ This provides a complete, independently testable feature that allows creators to
 
 **Tasks**: 5
 
-- [ ] T056 [US3] Add "Enabled" toggle switch to SurveyExperienceEditor header with label
-- [ ] T057 [US3] Add "Required" toggle switch to SurveyExperienceEditor header with label
-- [ ] T058 [US3] Connect toggles to existing updateExperience Server Action (reuse from photo experience)
-- [ ] T059 [US3] Show visual indicator when survey is disabled (grayed out steps)
-- [ ] T060 [US3] Add helper text explaining enabled vs required behavior
+- [X] T056 [US3] Add "Enabled" toggle switch to SurveyExperienceEditor header with label
+- [X] T057 [US3] Add "Required" toggle switch to SurveyExperienceEditor header with label
+- [X] T058 [US3] Connect toggles to existing updateExperience Server Action (reuse from photo experience)
+- [X] T059 [US3] Show visual indicator when survey is disabled (grayed out steps)
+- [X] T060 [US3] Add helper text explaining enabled vs required behavior
 
 **Validation** (User Story 3):
 - [ ] Toggle "Enabled" to off → survey disabled
