@@ -336,30 +336,30 @@ This provides a complete, independently testable feature that allows creators to
 
 ### Validation & Error Handling
 
-- [ ] T073 Show warning when survey exceeds 5 steps (recommended limit) in SurveyExperienceEditor
-- [ ] T074 Prevent adding more than 10 steps (hard limit) with clear error message
-- [ ] T075 Add validation errors display for invalid configurations (e.g., multiple choice with no options)
-- [ ] T076 Implement form-level error handling with user-friendly messages
+- [X] T073 Show warning when survey exceeds 5 steps (recommended limit) in SurveyExperienceEditor
+- [X] T074 Prevent adding more than 10 steps (hard limit) with clear error message
+- [X] T075 Add validation errors display for invalid configurations (e.g., multiple choice with no options)
+- [X] T076 Implement form-level error handling with user-friendly messages
 
 ### Mobile Optimization
 
-- [ ] T077 Verify all touch targets meet 44x44px minimum across all components
-- [ ] T078 Test vertical stacking on mobile viewports (320px-768px)
-- [ ] T079 Add touch-manipulation CSS to all interactive elements
+- [X] T077 Verify all touch targets meet 44x44px minimum across all components
+- [X] T078 Test vertical stacking on mobile viewports (320px-768px)
+- [X] T079 Add touch-manipulation CSS to all interactive elements
 - [ ] T080 Test drag-and-drop on real mobile devices (iOS & Android)
 
 ### Final Validation
 
-- [ ] T081 Run full type-check: `cd web && pnpm type-check`
-- [ ] T082 Run linter: `cd web && pnpm lint`
-- [ ] T083 Fix any remaining linter errors or TypeScript errors
+- [X] T081 Run full type-check: `cd web && pnpm type-check`
+- [X] T082 Run linter: `cd web && pnpm lint`
+- [X] T083 Fix any remaining linter errors or TypeScript errors
 - [ ] T084 Test all 5 user stories end-to-end
 - [ ] T085 Verify all success criteria met (spec.md requirements)
-- [ ] T086 Update feature exports in web/src/features/experiences/index.ts
+- [X] T086 Update feature exports in web/src/features/experiences/index.ts
 
 ### Documentation
 
-- [ ] T087 Document any deviations from plan in specs/001-survey-experience/implementation-notes.md
+- [X] T087 Document any deviations from plan in specs/001-survey-experience/implementation-notes.md
 
 **Final Validation Checklist**:
 - [ ] All 5 user stories pass acceptance criteria

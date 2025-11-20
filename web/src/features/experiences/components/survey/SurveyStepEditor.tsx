@@ -56,15 +56,14 @@ export function SurveyStepEditor({
   const mutations = useSurveyStepMutations();
 
   // React Hook Form setup with Zod validation
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const {
     register,
     handleSubmit,
     watch,
     setValue,
-    formState: { errors, isDirty },
+    formState: { errors },
     reset,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } = useForm({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(surveyStepSchema) as any,
@@ -277,7 +276,6 @@ function renderTypeSpecificEditor(
       return (
         <MultipleChoiceEditor
           config={step.config}
-          register={register}
           watch={watch}
           setValue={setValue}
           errors={errors}

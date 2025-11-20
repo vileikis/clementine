@@ -56,7 +56,12 @@ export type { ActionResponse } from "./actions/types";
 // ============================================================================
 // Constants
 // ============================================================================
-export { AI_MODELS, DEFAULT_AI_MODEL } from "./lib/constants";
+export {
+  AI_MODELS,
+  DEFAULT_AI_MODEL,
+  SURVEY_STEP_SOFT_LIMIT,
+  SURVEY_STEP_HARD_LIMIT
+} from "./lib/constants";
 
 // ============================================================================
 // Types (compile-time only)
