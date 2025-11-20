@@ -101,22 +101,22 @@
 
 **Purpose**: Quality improvements, validation, and documentation
 
-- [ ] T025 [P] Verify exhaustiveness checking in ExperienceEditor switch statement (add `default: const _exhaustive: never = experience;` case)
-- [ ] T026 [P] Update experience creation UI to include type selection (Photo vs GIF) if not already implemented
-- [ ] T027 [P] Verify mobile responsiveness for all editors (Photo, GIF, shared components) on 320px-768px viewports
-- [ ] T028 [P] Verify touch target sizes meet 44x44px requirement for delete button, toggle switches, and other interactive elements
-- [ ] T029 Search codebase for duplicate label/enabled/preview/delete UI - should find only 1 instance of each in shared components
-- [ ] T030 Code review: Verify shared components have no conditional logic based on experience type (type-agnostic design)
-- [ ] T031 Update public exports in web/src/features/experiences/index.ts to include new components and actions
+- [X] T025 [P] Verify exhaustiveness checking in ExperienceEditor switch statement (add `default: const _exhaustive: never = experience;` case)
+- [X] T026 [P] Update experience creation UI to include type selection (Photo vs GIF) if not already implemented
+- [X] T027 [P] Verify mobile responsiveness for all editors (Photo, GIF, shared components) on 320px-768px viewports
+- [X] T028 [P] Verify touch target sizes meet 44x44px requirement for delete button, toggle switches, and other interactive elements
+- [X] T029 Search codebase for duplicate label/enabled/preview/delete UI - should find only 1 instance of each in shared components
+- [X] T030 Code review: Verify shared components have no conditional logic based on experience type (type-agnostic design)
+- [X] T031 Update public exports in web/src/features/experiences/index.ts to include new components and actions
 
 ### Validation Loop (REQUIRED - Constitution Principle V)
 
 **Purpose**: Ensure code quality and correctness before merge
 
-- [ ] T032 Run `pnpm lint` from web/ directory and fix all errors/warnings
-- [ ] T033 Run `pnpm type-check` from web/ directory and resolve all TypeScript errors (should be zero)
+- [X] T032 Run `pnpm lint` from web/ directory and fix all errors/warnings
+- [X] T033 Run `pnpm type-check` from web/ directory and resolve all TypeScript errors (should be zero)
 - [ ] T034 Verify feature in local dev server (`pnpm dev` from root) - test photo and GIF editing workflows end-to-end
-- [ ] T035 Measure extensibility: Calculate lines of code needed to add Video type (goal: <50 LOC for new type-specific component + schema + actions)
+- [X] T035 Measure extensibility: Calculate lines of code needed to add Video type (goal: <50 LOC for new type-specific component + schema + actions)
 - [ ] T036 Commit changes only after validation loop passes cleanly
 
 ---

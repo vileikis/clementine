@@ -180,12 +180,14 @@ export function PhotoExperienceEditor({
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-semibold">AI Transformation</h2>
-          <Switch
-            id="aiEnabled"
-            checked={aiEnabled}
-            onCheckedChange={setAiEnabled}
-            disabled={isPending}
-          />
+          <div className="inline-flex items-center justify-center min-h-[44px] min-w-[44px]">
+            <Switch
+              id="aiEnabled"
+              checked={aiEnabled}
+              onCheckedChange={setAiEnabled}
+              disabled={isPending}
+            />
+          </div>
         </div>
 
         {aiEnabled && (
