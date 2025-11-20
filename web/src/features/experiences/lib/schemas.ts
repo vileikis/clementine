@@ -149,7 +149,7 @@ export const experienceSchema = z.discriminatedUnion("type", [
 // Creation/Update Schemas
 // ============================================================================
 
-// Create Photo Experience (only photo type is currently implemented)
+// Create Photo Experience
 export const createPhotoExperienceSchema = z.object({
   label: z
     .string()
@@ -168,6 +168,29 @@ export const updatePhotoExperienceSchema = z
     previewPath: z.string().url().optional(),
     previewType: previewTypeSchema.optional(),
     config: photoConfigSchema.partial().optional(),
+    aiConfig: aiConfigSchema.partial().optional(),
+  })
+  .strict();
+
+// Create GIF Experience
+export const createGifExperienceSchema = z.object({
+  label: z
+    .string()
+    .trim()
+    .min(1, "Experience name is required")
+    .max(50, "Experience name must be 50 characters or less"),
+  type: z.literal("gif"),
+});
+
+// Update GIF Experience (partial updates allowed)
+export const updateGifExperienceSchema = z
+  .object({
+    label: z.string().min(1).max(50).optional(),
+    enabled: z.boolean().optional(),
+    hidden: z.boolean().optional(),
+    previewPath: z.string().url().optional(),
+    previewType: previewTypeSchema.optional(),
+    config: gifConfigSchema.partial().optional(),
     aiConfig: aiConfigSchema.partial().optional(),
   })
   .strict();
@@ -294,6 +317,12 @@ export type AspectRatio = z.infer<typeof aspectRatioSchema>;
 // Survey Types
 export type SurveyStepSchema = z.infer<typeof surveyStepSchema>;
 export type SurveyStepType = z.infer<typeof surveyStepTypeSchema>;
+
+// Creation/Update Types
+export type CreatePhotoExperienceData = z.infer<typeof createPhotoExperienceSchema>;
+export type UpdatePhotoExperienceData = z.infer<typeof updatePhotoExperienceSchema>;
+export type CreateGifExperienceData = z.infer<typeof createGifExperienceSchema>;
+export type UpdateGifExperienceData = z.infer<typeof updateGifExperienceSchema>;
 
 // Type alias for Experience union
 export type ExperienceSchema = Experience;

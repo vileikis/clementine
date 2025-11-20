@@ -7,13 +7,22 @@ export { ExperienceTypeSelector } from "./components/shared/ExperienceTypeSelect
 export { ExperienceEditor } from "./components/shared/ExperienceEditor";
 export { ExperienceEditorWrapper } from "./components/shared/ExperienceEditorWrapper";
 export { PreviewMediaUpload } from "./components/shared/PreviewMediaUpload";
+export { BaseExperienceFields } from "./components/shared/BaseExperienceFields";
+export { DeleteExperienceButton } from "./components/shared/DeleteExperienceButton";
+export { AITransformSettings } from "./components/shared/AITransformSettings";
 
 // ============================================================================
 // Photo-specific components
 // ============================================================================
-export { AITransformSettings } from "./components/photo/AITransformSettings";
+export { PhotoExperienceEditor } from "./components/photo/PhotoExperienceEditor";
 export { CountdownSettings } from "./components/photo/CountdownSettings";
 export { OverlaySettings } from "./components/photo/OverlaySettings";
+
+// ============================================================================
+// GIF-specific components
+// ============================================================================
+export { GifExperienceEditor } from "./components/gif/GifExperienceEditor";
+export { GifCaptureSettings } from "./components/gif/GifCaptureSettings";
 
 
 // ============================================================================
@@ -49,8 +58,12 @@ export { AI_MODELS, DEFAULT_AI_MODEL } from "./lib/constants";
 // Types (compile-time only)
 // ============================================================================
 export type {
+  Experience,
   PhotoExperience,
-  PhotoExperience as Experience, // Alias for backward compatibility
+  GifExperience,
+  VideoExperience,
+  WheelExperience,
+  SurveyExperience,
   ExperienceType,
   PreviewType,
   AspectRatio,
@@ -66,10 +79,16 @@ export {
   aspectRatioSchema,
   experienceSchema,
   photoExperienceSchema,
+  gifExperienceSchema,
+  videoExperienceSchema,
+  wheelExperienceSchema,
+  surveyExperienceSchema,
   surveyStepTypeSchema,
   surveyStepSchema,
   createPhotoExperienceSchema,
   updatePhotoExperienceSchema,
+  createGifExperienceSchema,
+  updateGifExperienceSchema,
   uploadPreviewMediaSchema,
   previewMediaResultSchema,
   createSurveyStepSchema,

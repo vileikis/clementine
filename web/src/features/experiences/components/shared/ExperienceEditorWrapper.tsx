@@ -2,21 +2,23 @@
 
 /**
  * ExperienceEditorWrapper component
- * Part of Phase 5 (User Story 3) - View and Manage Experiences in Sidebar
+ * Updated in Phase 2 (User Story 1) to support all experience types
  *
  * Wraps ExperienceEditor with Server Actions for update and delete
+ * Routes to correct Server Action based on experience type
  * Handles navigation after deletion
  */
 
 import { useRouter } from "next/navigation";
 import { ExperienceEditor } from "./ExperienceEditor";
 import { updatePhotoExperience } from "../../actions/photo-update";
+import { updateGifExperience } from "../../actions/gif-update";
 import { deleteExperience } from "../../actions/shared";
-import type { PhotoExperience } from "../../lib/schemas";
+import type { Experience, PhotoExperience, GifExperience } from "../../lib/schemas";
 
 interface ExperienceEditorWrapperProps {
   eventId: string;
-  experience: PhotoExperience;
+  experience: Experience;
 }
 
 export function ExperienceEditorWrapper({
@@ -27,12 +29,42 @@ export function ExperienceEditorWrapper({
 
   const handleSave = async (
     experienceId: string,
-    data: Partial<PhotoExperience>
+    data: Partial<Experience>
   ) => {
-    const result = await updatePhotoExperience(eventId, experienceId, data);
+    // Route to correct Server Action based on experience type
+    switch (experience.type) {
+      case "photo":
+        const photoResult = await updatePhotoExperience(
+          eventId,
+          experienceId,
+          data as Partial<PhotoExperience>
+        );
+        if (!photoResult.success) {
+          throw new Error(photoResult.error.message);
+        }
+        break;
 
-    if (!result.success) {
-      throw new Error(result.error.message);
+      case "gif":
+        const gifResult = await updateGifExperience(
+          eventId,
+          experienceId,
+          data as Partial<GifExperience>
+        );
+        if (!gifResult.success) {
+          throw new Error(gifResult.error.message);
+        }
+        break;
+
+      case "video":
+      case "wheel":
+      case "survey":
+        throw new Error(`${experience.type} experience updates not yet implemented`);
+
+      default:
+        // Exhaustiveness check - TypeScript will error if a case is missing
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const _exhaustive: never = experience;
+        throw new Error("Unknown experience type");
     }
   };
 
