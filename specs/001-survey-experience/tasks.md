@@ -312,13 +312,13 @@ This provides a complete, independently testable feature that allows creators to
 
 **Tasks**: 7
 
-- [ ] T066 [P] [US5] Implement SurveyStepPreview container component in web/src/features/experiences/components/survey/SurveyStepPreview.tsx
-- [ ] T067 [P] [US5] Create preview components for each step type (match guest-facing design) in web/src/features/experiences/components/survey/preview/
-- [ ] T068 [US5] Add mobile-first styling to preview pane (vertical stack on mobile, sidebar on desktop)
-- [ ] T069 [US5] Connect preview to selectedStep prop for real-time updates
-- [ ] T070 [US5] Add preview toggle button for mobile (collapsible preview)
-- [ ] T071 [US5] Style preview to match guest experience (accurate representation)
-- [ ] T072 [US5] Add "Preview Mode" indicator to distinguish from actual survey
+- [X] T066 [P] [US5] Implement SurveyStepPreview container component in web/src/features/experiences/components/survey/SurveyStepPreview.tsx
+- [X] T067 [P] [US5] Create preview components for each step type (match guest-facing design) in web/src/features/experiences/components/survey/preview/
+- [X] T068 [US5] Add mobile-first styling to preview pane (vertical stack on mobile, sidebar on desktop)
+- [X] T069 [US5] Connect preview to selectedStep prop for real-time updates
+- [X] T070 [US5] Add preview toggle button for mobile (collapsible preview)
+- [X] T071 [US5] Style preview to match guest experience (accurate representation)
+- [X] T072 [US5] Add "Preview Mode" indicator to distinguish from actual survey
 
 **Validation** (User Story 5):
 - [ ] Type in title field → preview updates immediately (<1s)
