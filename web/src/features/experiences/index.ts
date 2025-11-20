@@ -24,6 +24,10 @@ export { OverlaySettings } from "./components/photo/OverlaySettings";
 export { GifExperienceEditor } from "./components/gif/GifExperienceEditor";
 export { GifCaptureSettings } from "./components/gif/GifCaptureSettings";
 
+// ============================================================================
+// Survey-specific components
+// ============================================================================
+export { SurveyExperienceEditor } from "./components/survey/SurveyExperienceEditor";
 
 // ============================================================================
 // Server Actions - NOT EXPORTED from public API

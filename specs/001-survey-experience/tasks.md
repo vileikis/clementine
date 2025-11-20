@@ -148,49 +148,49 @@ This provides a complete, independently testable feature that allows creators to
 
 ### Main Editor Container
 
-- [ ] T021 [US1] Create survey/ directory structure in web/src/features/experiences/components/
-- [ ] T022 [US1] Implement SurveyExperienceEditor main container component with 3-column layout (list, editor, preview) in web/src/features/experiences/components/survey/SurveyExperienceEditor.tsx
-- [ ] T023 [US1] Add state management for selectedStepId in SurveyExperienceEditor
-- [ ] T024 [US1] Connect useSurveySteps hook to SurveyExperienceEditor for real-time step data
+- [X] T021 [US1] Create survey/ directory structure in web/src/features/experiences/components/
+- [X] T022 [US1] Implement SurveyExperienceEditor main container component with 3-column layout (list, editor, preview) in web/src/features/experiences/components/survey/SurveyExperienceEditor.tsx
+- [X] T023 [US1] Add state management for selectedStepId in SurveyExperienceEditor
+- [X] T024 [US1] Connect useSurveySteps hook to SurveyExperienceEditor for real-time step data
 
 ### Step List Component
 
-- [ ] T025 [US1] Implement SurveyStepList component with step items display in web/src/features/experiences/components/survey/SurveyStepList.tsx
-- [ ] T026 [US1] Add step selection interaction (click to select) in SurveyStepList
-- [ ] T027 [US1] Style selected vs unselected step items in SurveyStepList
+- [X] T025 [US1] Implement SurveyStepList component with step items display in web/src/features/experiences/components/survey/SurveyStepList.tsx
+- [X] T026 [US1] Add step selection interaction (click to select) in SurveyStepList
+- [X] T027 [US1] Style selected vs unselected step items in SurveyStepList
 
 ### Step Type Selector
 
-- [ ] T028 [US1] Implement SurveyStepTypeSelector dialog component with all 7 step types in web/src/features/experiences/components/survey/SurveyStepTypeSelector.tsx
-- [ ] T029 [US1] Add mobile-optimized layout for step type selector (large tappable options, ≥44x44px)
-- [ ] T030 [US1] Connect step type selector to createSurveyStepAction via useSurveyStepMutations
+- [X] T028 [US1] Implement SurveyStepTypeSelector dialog component with all 7 step types in web/src/features/experiences/components/survey/SurveyStepTypeSelector.tsx
+- [X] T029 [US1] Add mobile-optimized layout for step type selector (large tappable options, ≥44x44px)
+- [X] T030 [US1] Connect step type selector to createSurveyStepAction via useSurveyStepMutations
 
 ### Main Step Editor
 
-- [ ] T031 [US1] Implement SurveyStepEditor container with React Hook Form setup in web/src/features/experiences/components/survey/SurveyStepEditor.tsx
-- [ ] T032 [US1] Add common step fields form (title, description, required toggle) in SurveyStepEditor
-- [ ] T033 [US1] Add character count indicators for title (max 200) and description (max 500)
-- [ ] T034 [US1] Integrate type-specific editors based on step.type discriminator
-- [ ] T035 [US1] Connect form submission to updateSurveyStepAction
+- [X] T031 [US1] Implement SurveyStepEditor container with React Hook Form setup in web/src/features/experiences/components/survey/SurveyStepEditor.tsx
+- [X] T032 [US1] Add common step fields form (title, description, required toggle) in SurveyStepEditor
+- [X] T033 [US1] Add character count indicators for title (max 200) and description (max 500)
+- [X] T034 [US1] Integrate type-specific editors based on step.type discriminator
+- [X] T035 [US1] Connect form submission to updateSurveyStepAction
 
 ### Type-Specific Editors (Can be done in parallel)
 
-- [ ] T036 [P] [US1] Implement MultipleChoiceEditor with options list management (add/remove, max 10) in web/src/features/experiences/components/survey/step-types/MultipleChoiceEditor.tsx
-- [ ] T037 [P] [US1] Add allowMultiple toggle to MultipleChoiceEditor
-- [ ] T038 [P] [US1] Implement YesNoEditor with custom label inputs (yesLabel, noLabel) in web/src/features/experiences/components/survey/step-types/YesNoEditor.tsx
-- [ ] T039 [P] [US1] Implement OpinionScaleEditor with scaleMin/scaleMax inputs and labels in web/src/features/experiences/components/survey/step-types/OpinionScaleEditor.tsx
-- [ ] T040 [P] [US1] Add validation for scaleMin < scaleMax in OpinionScaleEditor
-- [ ] T041 [P] [US1] Implement TextEditor component handling both short_text and long_text types in web/src/features/experiences/components/survey/step-types/TextEditor.tsx
-- [ ] T042 [P] [US1] Add placeholder and maxLength inputs to TextEditor
-- [ ] T043 [P] [US1] Implement EmailEditor with placeholder input in web/src/features/experiences/components/survey/step-types/EmailEditor.tsx
-- [ ] T044 [P] [US1] Implement StatementEditor (minimal, no config fields) in web/src/features/experiences/components/survey/step-types/StatementEditor.tsx
+- [X] T036 [P] [US1] Implement MultipleChoiceEditor with options list management (add/remove, max 10) in web/src/features/experiences/components/survey/step-types/MultipleChoiceEditor.tsx
+- [X] T037 [P] [US1] Add allowMultiple toggle to MultipleChoiceEditor
+- [X] T038 [P] [US1] Implement YesNoEditor with custom label inputs (yesLabel, noLabel) in web/src/features/experiences/components/survey/step-types/YesNoEditor.tsx
+- [X] T039 [P] [US1] Implement OpinionScaleEditor with scaleMin/scaleMax inputs and labels in web/src/features/experiences/components/survey/step-types/OpinionScaleEditor.tsx
+- [X] T040 [P] [US1] Add validation for scaleMin < scaleMax in OpinionScaleEditor
+- [X] T041 [P] [US1] Implement TextEditor component handling both short_text and long_text types in web/src/features/experiences/components/survey/step-types/TextEditor.tsx
+- [X] T042 [P] [US1] Add placeholder and maxLength inputs to TextEditor
+- [X] T043 [P] [US1] Implement EmailEditor with placeholder input in web/src/features/experiences/components/survey/step-types/EmailEditor.tsx
+- [X] T044 [P] [US1] Implement StatementEditor (minimal, no config fields) in web/src/features/experiences/components/survey/step-types/StatementEditor.tsx
 
 ### Integration
 
-- [ ] T045 [US1] Add "Add Step" button with step type selector trigger to SurveyExperienceEditor
-- [ ] T046 [US1] Show empty state when no steps exist
-- [ ] T047 [US1] Add error handling and loading states throughout editor
-- [ ] T048 [US1] Export SurveyExperienceEditor from features/experiences public API in web/src/features/experiences/index.ts
+- [X] T045 [US1] Add "Add Step" button with step type selector trigger to SurveyExperienceEditor
+- [X] T046 [US1] Show empty state when no steps exist
+- [X] T047 [US1] Add error handling and loading states throughout editor
+- [X] T048 [US1] Export SurveyExperienceEditor from features/experiences public API in web/src/features/experiences/index.ts
 
 **Validation** (User Story 1):
 - [ ] Create event and add survey experience successfully
@@ -198,7 +198,7 @@ This provides a complete, independently testable feature that allows creators to
 - [ ] Configure title, description, and options → all saved
 - [ ] Reload page → configurations persist
 - [ ] Repeat for at least 2 other step types
-- [ ] Run `pnpm lint` and `pnpm type-check` with zero errors
+- [X] Run `pnpm lint` and `pnpm type-check` with zero errors
 
 **Test Coverage Target**: 70%+ for schemas, repository, Server Actions
 
