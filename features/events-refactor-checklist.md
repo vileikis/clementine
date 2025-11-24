@@ -75,7 +75,7 @@
 
 - [x] **Task 3.3**: Rename `updateEventTitle()` → `updateEventName()`
 
-- [ ] **Task 3.4**: Update repository tests with new schema
+- [x] **Task 3.4**: Update repository tests with new schema
 
 ---
 
@@ -122,17 +122,19 @@
 
 ## Phase 6: Tests (3-4 hours)
 
-- [ ] **Task 6.1**: Update `actions/events.test.ts`:
+**Status**: ✅ Complete
+
+- [x] **Task 6.1**: Update `actions/events.test.ts`:
   - Update all mock Event objects with new schema
   - Update test cases for renamed actions
   - Add test suite for `updateEventSwitchboardAction()`
   - Delete welcome/ending/share test suites
 
-- [ ] **Task 6.2**: Update `repositories/events.test.ts` with new schema
+- [x] **Task 6.2**: Update `repositories/events.test.ts` with new schema
 
-- [ ] **Task 6.3**: Update `ThemeEditor.test.tsx` for new structure with useReducer
+- [x] **Task 6.3**: Update `ThemeEditor.test.tsx` for new structure with useReducer
 
-- [ ] **Task 6.4**: Run full test suite: `pnpm test src/features/events`
+- [x] **Task 6.4**: Run full test suite: `pnpm test src/features/events`
 
 ---
 
@@ -164,7 +166,7 @@
 ## Progress Tracking
 
 **Phase 0**: ✅ | **Phase 1**: ✅ | **Phase 2**: ✅ | **Phase 3**: ✅
-**Phase 4**: ✅ | **Phase 5**: ✅ | **Phase 6**: ⬜ | **Phase 7**: ⬜
+**Phase 4**: ✅ | **Phase 5**: ✅ | **Phase 6**: ✅ | **Phase 7**: ⬜
 
 **Legend**: ⬜ Not Started | 🟡 In Progress | ✅ Complete
 
@@ -186,4 +188,11 @@
   - Removed counter references from results page
   - Fixed public join page to use new schema fields
   - Updated repository tests with V4 schema
-- **Next**: Phase 6 - Tests (action tests, ThemeEditor tests)
+- **Phase 6 completed**: All tests updated for V4 schema
+  - ✅ `actions/events.test.ts`: 37 tests covering all server actions
+  - ✅ `repositories/events.test.ts`: 11 tests with V4 schema mock data
+  - ✅ `ThemeEditor.test.tsx`: 31 tests for useReducer state management
+  - ✅ All 79 tests passing
+  - ✅ TypeScript compilation passing
+  - ✅ ESLint passing
+- **Next**: Phase 7 - Public API & Documentation

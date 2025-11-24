@@ -1,3 +1,12 @@
+/**
+ * Tests for Events Repository (V4 schema)
+ *
+ * Tests cover:
+ * - createEvent (name, ownerId, primaryColor)
+ * - getEvent
+ * - listEvents (with ownerId filter)
+ */
+
 import { db } from "@/lib/firebase/admin";
 import type { Event } from "../types/event.types";
 import {
@@ -5,6 +14,42 @@ import {
   getEvent,
   listEvents,
 } from "./events";
+
+// V4 schema mock event helper
+function createMockEventData(overrides: Partial<Event> = {}): Omit<Event, "id"> {
+  return {
+    name: "Test Event",
+    status: "draft",
+    ownerId: "company-123",
+    joinPath: "/join/event-123",
+    qrPngPath: "events/event-123/qr/join.png",
+    publishStartAt: null,
+    publishEndAt: null,
+    activeJourneyId: null,
+    theme: {
+      logoUrl: null,
+      fontFamily: null,
+      primaryColor: "#3B82F6",
+      text: {
+        color: "#000000",
+        alignment: "center",
+      },
+      button: {
+        backgroundColor: null,
+        textColor: "#FFFFFF",
+        radius: "md",
+      },
+      background: {
+        color: "#F9FAFB",
+        image: null,
+        overlayOpacity: 0.5,
+      },
+    },
+    createdAt: 1234567890,
+    updatedAt: 1234567890,
+    ...overrides,
+  };
+}
 
 describe("Events Repository", () => {
   const mockDb = db as unknown as {
@@ -17,7 +62,7 @@ describe("Events Repository", () => {
   });
 
   describe("createEvent", () => {
-    it("creates an event", async () => {
+    it("creates an event with V4 schema structure", async () => {
       const mockEventRef = {
         id: "event-123",
         set: jest.fn(),
@@ -37,7 +82,7 @@ describe("Events Repository", () => {
       expect(mockDb.collection).toHaveBeenCalledWith("events");
       expect(mockEventRef.set).toHaveBeenCalled();
 
-      // Verify event data structure
+      // Verify event data structure matches V4 schema
       const eventData = mockEventRef.set.mock.calls[0][0] as Event;
       expect(eventData).toMatchObject({
         id: "event-123",
@@ -46,35 +91,57 @@ describe("Events Repository", () => {
         status: "draft",
         joinPath: "/join/event-123",
         qrPngPath: "events/event-123/qr/join.png",
+        activeJourneyId: null,
       });
+
+      // Verify theme structure (V4)
       expect(eventData.theme).toBeDefined();
       expect(eventData.theme.primaryColor).toBe("#3B82F6");
+      expect(eventData.theme.text).toBeDefined();
+      expect(eventData.theme.button).toBeDefined();
+      expect(eventData.theme.background).toBeDefined();
+
+      // Verify timestamps
       expect(eventData.createdAt).toBeGreaterThan(0);
       expect(eventData.updatedAt).toBe(eventData.createdAt);
+    });
+
+    it("initializes theme with defaults and provided primaryColor", async () => {
+      const mockEventRef = {
+        id: "event-456",
+        set: jest.fn(),
+      };
+
+      mockDb.collection.mockReturnValue({
+        doc: jest.fn().mockReturnValue(mockEventRef),
+      });
+
+      await createEvent({
+        name: "Custom Event",
+        ownerId: "company-456",
+        primaryColor: "#FF5733",
+      });
+
+      const eventData = mockEventRef.set.mock.calls[0][0] as Event;
+
+      // Check theme defaults are applied correctly
+      expect(eventData.theme.primaryColor).toBe("#FF5733");
+      expect(eventData.theme.logoUrl).toBeNull();
+      expect(eventData.theme.fontFamily).toBeNull();
+      expect(eventData.theme.text.color).toBe("#000000");
+      expect(eventData.theme.text.alignment).toBe("center");
+      expect(eventData.theme.button.backgroundColor).toBeNull(); // Inherits primaryColor
+      expect(eventData.theme.button.textColor).toBe("#FFFFFF");
+      expect(eventData.theme.button.radius).toBe("md");
+      expect(eventData.theme.background.color).toBe("#F9FAFB");
+      expect(eventData.theme.background.image).toBeNull();
+      expect(eventData.theme.background.overlayOpacity).toBe(0.5);
     });
   });
 
   describe("getEvent", () => {
-    it("returns event when it exists", async () => {
-      const mockEventData = {
-        title: "Test Event",
-        status: "live",
-        joinPath: "/join/event-123",
-        qrPngPath: "events/event-123/qr/join.png",
-        createdAt: 1234567890,
-        updatedAt: 1234567890,
-        companyId: null,
-        share: {
-          allowDownload: true,
-          allowSystemShare: true,
-          allowEmail: false,
-          socials: [],
-        },
-        experiencesCount: 0,
-        sessionsCount: 0,
-        readyCount: 0,
-        sharesCount: 0,
-      };
+    it("returns event when it exists with V4 schema", async () => {
+      const mockEventData = createMockEventData();
 
       const mockDoc = {
         exists: true,
@@ -110,25 +177,22 @@ describe("Events Repository", () => {
       expect(event).toBeNull();
     });
 
-    it("validates event data with schema", async () => {
+    it("validates event data with V4 schema", async () => {
       const invalidEventData = {
-        title: "",
-        status: "invalid-status",
+        name: "", // Invalid: empty name
+        status: "invalid-status", // Invalid: not in enum
         joinPath: "/join/event-123",
         qrPngPath: "events/event-123/qr/join.png",
+        ownerId: null,
+        activeJourneyId: null,
+        theme: {
+          primaryColor: "#3B82F6",
+          text: { color: "#000000", alignment: "center" },
+          button: { backgroundColor: null, textColor: "#FFFFFF", radius: "md" },
+          background: { color: "#F9FAFB", image: null, overlayOpacity: 0.5 },
+        },
         createdAt: 1234567890,
         updatedAt: 1234567890,
-        companyId: null,
-        share: {
-          allowDownload: true,
-          allowSystemShare: true,
-          allowEmail: false,
-          socials: [],
-        },
-        experiencesCount: 0,
-        sessionsCount: 0,
-        readyCount: 0,
-        sharesCount: 0,
       };
 
       const mockDoc = {
@@ -145,38 +209,54 @@ describe("Events Repository", () => {
 
       await expect(getEvent("event-123")).rejects.toThrow();
     });
+
+    it("validates nested theme structure", async () => {
+      const invalidThemeData = {
+        name: "Test Event",
+        status: "draft",
+        joinPath: "/join/event-123",
+        qrPngPath: "events/event-123/qr/join.png",
+        ownerId: null,
+        activeJourneyId: null,
+        theme: {
+          primaryColor: "invalid-color", // Invalid: not hex format
+          text: { color: "#000000", alignment: "center" },
+          button: { backgroundColor: null, textColor: "#FFFFFF", radius: "md" },
+          background: { color: "#F9FAFB", image: null, overlayOpacity: 0.5 },
+        },
+        createdAt: 1234567890,
+        updatedAt: 1234567890,
+      };
+
+      const mockDoc = {
+        exists: true,
+        id: "event-456",
+        data: jest.fn().mockReturnValue(invalidThemeData),
+      };
+
+      mockDb.collection.mockReturnValue({
+        doc: jest.fn().mockReturnValue({
+          get: jest.fn().mockResolvedValue(mockDoc),
+        }),
+      });
+
+      await expect(getEvent("event-456")).rejects.toThrow();
+    });
   });
 
   describe("listEvents", () => {
     it("returns events ordered by createdAt descending", async () => {
       const mockEvents = [
         {
+          ...createMockEventData({ name: "Newer Event" }),
           id: "event-2",
-          title: "Newer Event",
-          status: "live",
-          joinPath: "/join/event-2",
-          qrPngPath: "events/event-2/qr/join.png",
-          companyId: null,
-          share: { allowDownload: true, allowSystemShare: true, allowEmail: false, socials: [] },
-          experiencesCount: 0,
-          sessionsCount: 0,
-          readyCount: 0,
-          sharesCount: 0,
           createdAt: 2000000000,
           updatedAt: 2000000000,
         },
         {
+          ...createMockEventData({ name: "Older Event" }),
           id: "event-1",
-          title: "Older Event",
-          status: "draft",
-          joinPath: "/join/event-1",
-          qrPngPath: "events/event-1/qr/join.png",
-          companyId: null,
-          share: { allowDownload: true, allowSystemShare: true, allowEmail: false, socials: [] },
-          experiencesCount: 0,
-          sessionsCount: 0,
-          readyCount: 0,
-          sharesCount: 0,
+          status: "draft" as const,
           createdAt: 1000000000,
           updatedAt: 1000000000,
         },
@@ -213,22 +293,11 @@ describe("Events Repository", () => {
       expect(events).toEqual([]);
     });
 
-    it("filters events by companyId when provided", async () => {
+    it("filters events by ownerId when provided", async () => {
       const mockEvents = [
         {
+          ...createMockEventData({ name: "Company A Event", ownerId: "company-a" }),
           id: "event-1",
-          title: "Company A Event",
-          status: "live",
-          joinPath: "/join/event-1",
-          qrPngPath: "events/event-1/qr/join.png",
-          companyId: "company-a",
-          share: { allowDownload: true, allowSystemShare: true, allowEmail: false, socials: [] },
-          experiencesCount: 0,
-          sessionsCount: 0,
-          readyCount: 0,
-          sharesCount: 0,
-          createdAt: 2000000000,
-          updatedAt: 2000000000,
         },
       ];
 
@@ -258,37 +327,11 @@ describe("Events Repository", () => {
       expect(events[0].ownerId).toBe("company-a");
     });
 
-    it("filters events with no company when companyId is null", async () => {
+    it("filters events with no owner when ownerId is null", async () => {
       const mockEvents = [
         {
+          ...createMockEventData({ name: "No Company Event", ownerId: null }),
           id: "event-1",
-          title: "No Company Event",
-          status: "live",
-          joinPath: "/join/event-1",
-          qrPngPath: "events/event-1/qr/join.png",
-          companyId: null,
-          share: { allowDownload: true, allowSystemShare: true, allowEmail: false, socials: [] },
-          experiencesCount: 0,
-          sessionsCount: 0,
-          readyCount: 0,
-          sharesCount: 0,
-          createdAt: 2000000000,
-          updatedAt: 2000000000,
-        },
-        {
-          id: "event-2",
-          title: "Company Event",
-          status: "draft",
-          joinPath: "/join/event-2",
-          qrPngPath: "events/event-2/qr/join.png",
-          companyId: "company-a",
-          share: { allowDownload: true, allowSystemShare: true, allowEmail: false, socials: [] },
-          experiencesCount: 0,
-          sessionsCount: 0,
-          readyCount: 0,
-          sharesCount: 0,
-          createdAt: 1000000000,
-          updatedAt: 1000000000,
         },
       ];
 
@@ -313,8 +356,4 @@ describe("Events Repository", () => {
       expect(events[0].ownerId).toBeNull();
     });
   });
-
-  // updateEventBranding tests removed - brandColor and showTitleOverlay deprecated
-  // Theme updates now handled by updateEventTheme Server Action
-
 });
