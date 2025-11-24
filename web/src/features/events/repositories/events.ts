@@ -2,7 +2,7 @@
 
 import { db } from "@/lib/firebase/admin";
 import type { Event } from "../types/event.types";
-import { eventSchema } from "../lib/schemas";
+import { eventSchema } from "../schemas";
 
 export async function createEvent(data: {
   title: string;
