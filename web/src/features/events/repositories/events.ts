@@ -30,13 +30,6 @@ export async function createEvent(data: {
         buttonColor: data.buttonColor,
       },
     }),
-    // Initialize share config with defaults
-    share: {
-      allowDownload: true,
-      allowSystemShare: true,
-      allowEmail: false,
-      socials: [],
-    },
     // Denormalized counters
     experiencesCount: 0,
     sessionsCount: 0,
