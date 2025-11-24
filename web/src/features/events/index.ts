@@ -29,6 +29,7 @@ export { PreviewPanel } from "./components/designer/PreviewPanel";
 // Shared Components (Used across studio & designer)
 // ============================================================================
 export { EventTabs } from "./components/shared/EventTabs";
+export { DesignSubTabs } from "./components/shared/DesignSubTabs";
 export { TabLink } from "./components/shared/TabLink";
 export { EditableEventName } from "./components/shared/EditableEventName";
 
