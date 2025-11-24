@@ -7,7 +7,18 @@ interface EventLayoutProps {
   params: Promise<{ eventId: string }>
 }
 
-export default async function EventLayout({
+/**
+ * Studio Layout - Event management UI
+ *
+ * Shows event header with:
+ * - Editable event name breadcrumb
+ * - Main tabs (Design, Distribution, Results)
+ * - Status switcher and actions
+ *
+ * Note: getEventAction is called again here, but Next.js automatically
+ * deduplicates it with the parent layout's fetch (same render cycle)
+ */
+export default async function StudioLayout({
   children,
   params,
 }: EventLayoutProps) {
