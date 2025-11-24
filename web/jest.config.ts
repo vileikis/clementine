@@ -17,7 +17,7 @@ const config: Config = {
   },
   // Transform ESM modules from node_modules
   transformIgnorePatterns: [
-    'node_modules/(?!(uuid)/)',
+    '/node_modules/(?!uuid)',
   ],
   modulePathIgnorePatterns: ['<rootDir>/src/legacy-features'],
 }
