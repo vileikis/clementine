@@ -7,7 +7,7 @@ import {
   updateEventTheme,
 } from "./events";
 import * as eventsRepository from "../repositories/events";
-import * as companiesRepository from "@/features/companies/repositories/companies";
+import * as companiesRepository from "@/features/companies/repositories/companies.repository";
 import * as auth from "@/lib/auth";
 import type { Event } from "../types/event.types";
 import type { Company } from "@/features/companies";
@@ -18,7 +18,7 @@ const mockCollection = (firebaseAdmin as typeof firebaseAdmin & { __mockCollecti
 
 // Mock dependencies
 jest.mock("../repositories/events");
-jest.mock("@/features/companies/repositories/companies");
+jest.mock("@/features/companies/repositories/companies.repository");
 jest.mock("@/lib/auth");
 jest.mock("next/cache", () => ({
   revalidatePath: jest.fn(),
@@ -197,6 +197,9 @@ describe("Events Server Actions", () => {
         name: "Company A",
         status: "active",
         deletedAt: null,
+        contactEmail: null,
+        termsUrl: null,
+        privacyUrl: null,
         createdAt: 1000000000,
         updatedAt: 1000000000,
       };
@@ -237,6 +240,9 @@ describe("Events Server Actions", () => {
         name: "Company A",
         status: "deleted",
         deletedAt: Date.now(),
+        contactEmail: null,
+        termsUrl: null,
+        privacyUrl: null,
         createdAt: 1000000000,
         updatedAt: 1000000000,
       };

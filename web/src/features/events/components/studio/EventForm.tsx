@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { createEventAction } from "../../actions/events"
-import { listCompaniesAction, type Company } from "@/features/companies"
+import { listCompaniesAction } from "@/features/companies/actions"
+import type { Company } from "@/features/companies"
 
 interface EventFormProps {
   onSuccess?: (eventId: string) => void

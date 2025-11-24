@@ -7,10 +7,10 @@ import {
   updateCompany,
   getCompanyEventCount,
   deleteCompany,
-} from "../repositories/companies";
+} from "../repositories";
 import { verifyAdminSecret } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
-import { createCompanyInput } from "../lib/schemas";
+import { createCompanyInput } from "../schemas";
 import { z } from "zod";
 
 /**
@@ -35,7 +35,12 @@ export async function createCompanyAction(
     return { success: true, companyId };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { success: false, error: error.issues[0].message };
+      // Return all validation issues with field paths
+      return {
+        success: false,
+        error: error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join(', '),
+        issues: error.issues,
+      };
     }
     return {
       success: false,
@@ -109,7 +114,12 @@ export async function updateCompanyAction(
     return { success: true };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { success: false, error: error.issues[0].message };
+      // Return all validation issues with field paths
+      return {
+        success: false,
+        error: error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join(', '),
+        issues: error.issues,
+      };
     }
     return {
       success: false,

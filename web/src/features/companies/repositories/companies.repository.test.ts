@@ -1,6 +1,6 @@
 import { db } from "@/lib/firebase/admin";
-import type { Company } from "../types/company.types";
-import { createCompany, listCompanies, getCompany, deleteCompany } from "./companies";
+import type { Company } from "../types/companies.types";
+import { createCompany, listCompanies, getCompany, deleteCompany } from "./companies.repository";
 
 describe("Companies Repository", () => {
   const mockDb = db as unknown as {
@@ -124,7 +124,6 @@ describe("Companies Repository", () => {
 
       const companyId = await createCompany({
         name: "Nike Inc",
-        brandColor: "#FF5733",
         contactEmail: "contact@nike.com",
         termsUrl: "https://nike.com/terms",
         privacyUrl: "https://nike.com/privacy",
@@ -139,7 +138,6 @@ describe("Companies Repository", () => {
         name: "Nike Inc",
         status: "active",
         deletedAt: null,
-        brandColor: "#FF5733",
         contactEmail: "contact@nike.com",
         termsUrl: "https://nike.com/terms",
         privacyUrl: "https://nike.com/privacy",
@@ -245,8 +243,9 @@ describe("Companies Repository", () => {
         name: "Test Company",
         status: "active",
         deletedAt: null,
-        brandColor: "#000000",
         contactEmail: "test@example.com",
+        termsUrl: null,
+        privacyUrl: null,
         createdAt: 1234567890,
         updatedAt: 1234567890,
       };

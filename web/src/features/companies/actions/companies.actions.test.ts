@@ -1,9 +1,9 @@
-import { createCompanyAction, listCompaniesAction, getCompanyAction } from "./companies";
-import * as companiesRepo from "../repositories/companies";
+import { createCompanyAction, listCompaniesAction, getCompanyAction } from "./companies.actions";
+import * as companiesRepo from "../repositories/companies.repository";
 import * as auth from "@/lib/auth";
 
 // Mock the repositories and auth module
-jest.mock("../repositories/companies");
+jest.mock("../repositories/companies.repository");
 jest.mock("@/lib/auth");
 jest.mock("next/cache", () => ({
   revalidatePath: jest.fn(),
@@ -102,11 +102,11 @@ describe("Companies Server Actions", () => {
 
       const result = await createCompanyAction({
         name: "Nike Inc",
-        brandColor: "invalid-color", // Should fail validation
+        contactEmail: "invalid-email", // Should fail validation
       });
 
       expect(result.success).toBe(false);
-      expect(result.error).toContain("hex color");
+      expect(result.error).toContain("email");
       expect(companiesRepo.createCompany).not.toHaveBeenCalled();
     });
   });

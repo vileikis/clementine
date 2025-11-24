@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createCompanyAction, updateCompanyAction } from "@/features/companies";
+import { createCompanyAction, updateCompanyAction } from "../actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { Company } from "@/features/companies";
+import type { Company } from "../types";
 
 interface CompanyFormProps {
   company?: Company; // If provided, form is in edit mode
@@ -13,6 +13,12 @@ interface CompanyFormProps {
   onCancel?: () => void;
 }
 
+/**
+ * Form for creating and editing companies
+ * @param company - Existing company data (for edit mode)
+ * @param onSuccess - Callback fired after successful save
+ * @param onCancel - Callback fired when user cancels
+ */
 export function CompanyForm({ company, onSuccess, onCancel }: CompanyFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);

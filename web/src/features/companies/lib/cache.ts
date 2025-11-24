@@ -8,7 +8,8 @@
  * - Automatic cleanup of expired entries every 60 seconds
  */
 
-import type { CompanyStatus } from "../types/company.types";
+import type { CompanyStatus } from "../types";
+import { COMPANY_CACHE } from '../constants';
 
 interface CacheEntry {
   status: CompanyStatus;
@@ -16,7 +17,6 @@ interface CacheEntry {
 }
 
 const cache = new Map<string, CacheEntry>();
-const CACHE_TTL_MS = 60_000; // 60 seconds
 
 /**
  * Get company status from cache or return null if not cached/expired
@@ -48,7 +48,7 @@ export function setCachedCompanyStatus(
   const now = Date.now();
   cache.set(companyId, {
     status,
-    expires: now + CACHE_TTL_MS,
+    expires: now + COMPANY_CACHE.TTL_MS,
   });
 }
 
@@ -77,4 +77,4 @@ setInterval(() => {
       cache.delete(companyId);
     }
   }
-}, CACHE_TTL_MS);
+}, COMPANY_CACHE.CLEANUP_INTERVAL_MS);

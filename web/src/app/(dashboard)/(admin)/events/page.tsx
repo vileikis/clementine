@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { listEventsAction, EventCard } from "@/features/events"
-import { listCompaniesAction, CompanyFilter } from "@/features/companies"
+import { listCompaniesAction } from "@/features/companies/actions"
+import { CompanyFilter } from "@/features/companies"
 
 export default async function EventsPage({
   searchParams,

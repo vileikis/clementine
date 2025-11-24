@@ -1,5 +1,6 @@
 // Zod schemas for Company data model
 import { z } from "zod";
+import { COMPANY_CONSTRAINTS } from '../constants';
 
 // ============================================================================
 // Enums
@@ -13,15 +14,16 @@ export const companyStatusSchema = z.enum(["active", "deleted"]);
 
 export const companySchema = z.object({
   id: z.string(),
-  name: z.string().min(1).max(100),
+  name: z.string()
+    .min(COMPANY_CONSTRAINTS.NAME_LENGTH.min)
+    .max(COMPANY_CONSTRAINTS.NAME_LENGTH.max),
   status: companyStatusSchema,
   deletedAt: z.number().nullable(),
 
-  // Optional branding metadata
-  brandColor: z.string().regex(/^#[0-9A-F]{6}$/i).optional(),
-  contactEmail: z.string().email().optional(),
-  termsUrl: z.string().url().optional(),
-  privacyUrl: z.string().url().optional(),
+  // Optional metadata (Firestore-safe with Zod v4 validators)
+  contactEmail: z.email().nullable().optional().default(null),
+  termsUrl: z.url().nullable().optional().default(null),
+  privacyUrl: z.url().nullable().optional().default(null),
 
   createdAt: z.number(),
   updatedAt: z.number(),
@@ -34,32 +36,24 @@ export const companySchema = z.object({
 export const createCompanyInput = z.object({
   name: z
     .string()
-    .min(1, "Company name is required")
-    .max(100, "Company name too long")
+    .min(COMPANY_CONSTRAINTS.NAME_LENGTH.min, "Company name is required")
+    .max(COMPANY_CONSTRAINTS.NAME_LENGTH.max, "Company name too long")
     .transform((val) => val.trim()),
-  brandColor: z
-    .string()
-    .regex(/^#[0-9A-F]{6}$/i, "Invalid hex color")
-    .optional(),
-  contactEmail: z.string().email("Invalid email format").optional(),
-  termsUrl: z.string().url("Invalid URL").optional(),
-  privacyUrl: z.string().url("Invalid URL").optional(),
+  contactEmail: z.email({ message: "Invalid email format" }).optional(),
+  termsUrl: z.url({ message: "Invalid URL" }).optional(),
+  privacyUrl: z.url({ message: "Invalid URL" }).optional(),
 });
 
 export const updateCompanyInput = z.object({
   companyId: z.string(),
   name: z
     .string()
-    .min(1, "Company name is required")
-    .max(100, "Company name too long")
+    .min(COMPANY_CONSTRAINTS.NAME_LENGTH.min, "Company name is required")
+    .max(COMPANY_CONSTRAINTS.NAME_LENGTH.max, "Company name too long")
     .transform((val) => val.trim()),
-  brandColor: z
-    .string()
-    .regex(/^#[0-9A-F]{6}$/i, "Invalid hex color")
-    .optional(),
-  contactEmail: z.string().email("Invalid email format").optional(),
-  termsUrl: z.string().url("Invalid URL").optional(),
-  privacyUrl: z.string().url("Invalid URL").optional(),
+  contactEmail: z.email({ message: "Invalid email format" }).optional(),
+  termsUrl: z.url({ message: "Invalid URL" }).optional(),
+  privacyUrl: z.url({ message: "Invalid URL" }).optional(),
 });
 
 // ============================================================================
