@@ -109,71 +109,79 @@ The `functions/` workspace is a placeholder for Firebase Cloud Functions that wi
 
 ## Product Architecture
 
-### Admin Dashboard
+### Feature Modules & Data Model
 
-**Companies Management** (`/companies`)
+The application is organized into feature modules in `web/src/features/`. The data model has been redesigned to use a **normalized Firestore architecture** with flat root collections (see `features/data-model-v4.md` for full specification).
 
-- Create and organize brands/organizations
-- Event count tracking per company
-- Soft deletion with status management
-- Filter events by company
+**IMPORTANT: Legacy Code**
+- Legacy implementations have been moved to `web/src/legacy-features/`
+- **Do NOT reference or use legacy code unless explicitly asked**
+- Only consult legacy features when specifically mentioned by the user (e.g., "check legacy-features for reference")
+- When creating new feature modules from scratch, legacy code may be referenced if explicitly requested
 
-**Events Management** (`/events`)
+#### Feature Module Status
 
-- Create and manage AI photobooth events
-- Associate events with companies (optional)
-- Event builder with three tabs: Content, Distribution, Results
+**✅ Ready - Companies** (`web/src/features/companies/`)
+- **Firestore Collection**: `/companies/{companyId}`
+- **Purpose**: Brand/organization management that owns events
+- **Status**: Fully implemented and stable
+- **Schema**: name, status, brandColor, contactEmail, termsUrl, privacyUrl
+- **Features**: Soft deletion (status: "active" | "deleted"), event count tracking
 
-**Event Builder** (`/events/[eventId]`)
+**🚧 In Progress - Events** (`web/src/features/events/`)
+- **Firestore Collection**: `/events/{eventId}`
+- **Purpose**: Root container for event configuration and the real-time "Switchboard" state
+- **Status**: Complete redesign in progress - schema and actions being rewritten
+- **New Model**: Event will control which Journey is active via `activeJourneyId`, manage branding/theming, and serve as entry point for guests
+- **Note**: Current implementation is transitional - refer to data-model-v4.md for target architecture
 
-- **Content Tab**: Configure welcome screen, photo experiences, ending screen via sidebar navigation (survey UI present but not fully implemented)
-- **Distribution Tab**: Share links, QR codes, embedding options
-- **Results Tab**: Analytics (sessions, shares, downloads, reach)
+**📋 Planned - Experiences** (`web/src/features/experiences/`)
+- **Firestore Collection**: `/experiences/{experienceId}`
+- **Purpose**: Reusable library of atomic AI experience configurations
+- **Status**: Not yet started - will be completely rewritten from scratch
+- **New Model**: Self-contained configs for AI rules (photo/video/gif), hardware settings, required user inputs, and prompt templates
+- **Note**: Purpose and functionality have completely changed from legacy version
 
-### Core Entities
+**📋 Planned - Journeys** (new module)
+- **Firestore Collection**: `/journeys/{journeyId}`
+- **Purpose**: Define linear sequences of steps (playlists) for guest experiences
+- **Status**: Not yet started - new module to be written from scratch
+- **New Model**: Lightweight wrapper that orders step IDs, referenced by Events via `activeJourneyId`
 
-**Company** (`/companies/{companyId}`)
+**📋 Planned - Steps** (new module)
+- **Firestore Collection**: `/steps/{stepId}`
+- **Purpose**: Individual UI screen configurations (welcome, selection, capture, form, processing, result)
+- **Status**: Not yet started - new module to be written from scratch
+- **New Model**: Content and layout for each screen in a Journey
 
-- Brand/organization that owns events
-- Fields: name, status, brandColor, contactEmail, termsUrl, privacyUrl
-- Soft deletion (status: "active" | "deleted")
+**📋 Planned - Sessions** (`web/src/features/sessions/`)
+- **Firestore Collection**: `/sessions/{sessionId}`
+- **Purpose**: Transactional records of guest runs through Journeys
+- **Status**: Not yet started - will be completely rewritten
+- **New Model**: Stores guest progress, collected data (form inputs, media captures), and AI generation results
 
-**Event** (`/events/{eventId}`)
+**📋 Planned - Guest** (`web/src/features/guest/`)
+- **Purpose**: Guest-facing experience and UI components
+- **Status**: Will be completely rewritten to work with new data model
 
-- Root event configuration
-- Welcome screen: title, description, CTA, background (image/color)
-- Ending screen: headline, body, CTA with URL
-- Share settings: download, email, system share, social platforms
-- Survey configuration: enabled, required, steps count/order (data model defined but feature not fully implemented)
-- Company association (optional via companyId)
-- Denormalized counters: experiencesCount, sessionsCount, readyCount, sharesCount
+### Architecture Principles (New Model)
 
-**Experience** (`/events/{eventId}/experiences/{experienceId}`)
+**Normalized Firestore Design**
+- No nested subcollections beyond one level
+- All entities at root collection level
+- Linked by `eventId` references
+- Enables future SQL migration
 
-- Interactive experiences (photo/video/gif/wheel)
-- Currently implemented: photo experiences only
-- Fields: label, type, enabled, preview media (image/GIF/video), countdown settings, frame overlay, AI settings (model, prompt, reference images, aspect ratio)
+**Dynamic Injection Pattern**
+- Capture steps load Experience configs at runtime
+- Selection steps set session variables
+- Experiences define their own required inputs
+- Promotes reusability and atomic design
 
-**SurveyStep** (`/events/{eventId}/surveySteps/{stepId}`) - NOT YET IMPLEMENTED
-
-- Survey questions/steps (data model defined, feature cancelled in 001 spec)
-- Types: short_text, long_text, multiple_choice, opinion_scale, email, statement
-- Order managed via Event.surveyStepsOrder array
-- Subject to change in future implementation
-
-**Session** (`/events/{eventId}/sessions/{sessionId}`)
-
-- Guest interaction with event
-- Tracks input (photo/video), output (transformed media), state (created/processing/ready/error)
-- Survey completion status
-- Share metrics (download/email/social counts)
-
-**Other Subcollections** (not yet implemented)
-
-- `/events/{eventId}/experienceItems` - Items for wheel-type experiences (future)
-- `/events/{eventId}/shares` - Share tracking records
-- `/events/{eventId}/surveyResponses` - Guest survey answers (pending survey feature)
-- `/events/{eventId}/participants` - Authenticated user tracking
+**Real-time Switchboard**
+- Event's `activeJourneyId` controls live experience
+- All connected guests react to changes
+- Host can switch Journeys dynamically
 
 ### User Experience Priorities
 
@@ -187,9 +195,34 @@ The `functions/` workspace is a placeholder for Firebase Cloud Functions that wi
 - TypeScript 5.x (strict mode), Next.js 16 (App Router), React 19
 - Firebase (Firestore + Storage), Zod 4.x
 - Tailwind CSS v4, shadcn/ui, lucide-react
-- Firestore: companies collection, events collection with 7 subcollections (experiences, experienceItems, surveySteps, surveyResponses, participants, sessions, shares)
+- **Firestore Collections** (normalized, flat architecture):
+  - `/companies` - Brand/organization management (ready)
+  - `/events` - Root event configs and switchboard (in redesign)
+  - `/experiences` - AI experience library (planned)
+  - `/journeys` - Step sequence playlists (planned)
+  - `/steps` - Individual screen configs (planned)
+  - `/sessions` - Guest interaction records (planned)
 - Firebase Storage for images/media assets
 
 ## Recent Changes
+
+### Data Model v4 Redesign (November 2024)
+
+**Major architectural overhaul** to implement normalized Firestore design:
+
+- **Moved legacy code** to `web/src/legacy-features/` (companies, events, experiences, guest, sessions, distribution)
+- **Changed data model** from nested subcollections to flat root collections
+- **New terminology**: "Journey" (playlist), "Experience" (AI asset), "Step" (UI screen)
+- **Dynamic injection pattern**: Capture steps load Experience configs at runtime
+- **Switchboard pattern**: Events control active Journey via `activeJourneyId`
+
+**Migration status**:
+- ✅ Companies feature - ready and stable
+- 🚧 Events feature - schema redesign in progress
+- 📋 Experiences, Journeys, Steps, Sessions, Guest - to be rewritten from scratch
+
+See `features/data-model-v4.md` for full specification.
+
+### Previous Changes
 
 - 001-remove-scenes: Added TypeScript 5.x (strict mode), Next.js 16 (App Router), React 19 + Firebase (Firestore + Storage), Zod 4.x for validation, Tailwind CSS v4, shadcn/ui
