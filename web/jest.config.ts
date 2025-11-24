@@ -19,6 +19,7 @@ const config: Config = {
   transformIgnorePatterns: [
     'node_modules/(?!(uuid)/)',
   ],
+  modulePathIgnorePatterns: ['<rootDir>/src/legacy-features'],
 }
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async

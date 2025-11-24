@@ -7,7 +7,7 @@ import {
   updateEventTheme,
 } from "./events";
 import * as eventsRepository from "../repositories/events";
-import * as companiesRepository from "@/features/companies/repositories/companies";
+import * as companiesRepository from "@/features/companies/repositories/companies.repository";
 import * as auth from "@/lib/auth";
 import type { Event } from "../types/event.types";
 import type { Company } from "@/features/companies";
