@@ -1,4 +1,4 @@
-import { getEventAction } from "@/features/events";
+import { getEventAction } from "@/features/events/actions";
 import { notFound } from "next/navigation";
 
 interface ResultsPageProps {
@@ -18,8 +18,6 @@ export default async function ResultsPage({ params }: ResultsPageProps) {
     notFound();
   }
 
-  const event = result.event;
-
   return (
     <main className="container mx-auto px-6 py-8">
       <div className="space-y-8">
@@ -30,31 +28,27 @@ export default async function ResultsPage({ params }: ResultsPageProps) {
           </p>
         </div>
 
-        {/* Placeholder metrics cards */}
+        {/* Placeholder metrics cards - counters removed in V4 schema */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <MetricCard
           label="Total Sessions"
-          value={event.sessionsCount?.toString() ?? "0"}
-          description="Total number of guest sessions"
+          value="0"
+          description="Total number of guest sessions (coming soon)"
         />
         <MetricCard
           label="Ready Sessions"
-          value={event.readyCount?.toString() ?? "0"}
-          description="Sessions with completed results"
+          value="0"
+          description="Sessions with completed results (coming soon)"
         />
         <MetricCard
           label="Shares"
-          value={event.sharesCount?.toString() ?? "0"}
-          description="Times content was shared"
+          value="0"
+          description="Times content was shared (coming soon)"
         />
         <MetricCard
           label="Conversion Rate"
-          value={
-            event.sessionsCount > 0
-              ? `${Math.round((event.readyCount / event.sessionsCount) * 100)}%`
-              : "0%"
-          }
-          description="Session completion rate"
+          value="0%"
+          description="Session completion rate (coming soon)"
         />
       </div>
 

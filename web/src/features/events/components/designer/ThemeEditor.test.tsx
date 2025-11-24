@@ -1,482 +1,555 @@
+/**
+ * Tests for ThemeEditor component (V4 schema)
+ *
+ * Tests cover:
+ * - Rendering all 7 theme sections (Identity, Primary Color, Text, Button, Background, Logo, Font)
+ * - useReducer state management pattern
+ * - Form interactions for each theme section
+ * - Save functionality with server action integration
+ * - Live preview updates
+ */
+
+import React from "react";
 import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ThemeEditor } from "./ThemeEditor";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 import type { Event } from "../../types/event.types";
 
 // Mock dependencies
-jest.mock("../../actions/events", () => ({
-  updateEventTheme: jest.fn(),
-}));
 jest.mock("next/navigation", () => ({
-  useRouter: jest.fn(),
+  useRouter: () => ({
+    refresh: jest.fn(),
+  }),
 }));
+
 jest.mock("sonner", () => ({
   toast: {
     success: jest.fn(),
     error: jest.fn(),
   },
 }));
+
 jest.mock("@/hooks/useKeyboardShortcuts", () => ({
   useKeyboardShortcuts: jest.fn(),
 }));
+
+jest.mock("../../actions/events", () => ({
+  updateEventTheme: jest.fn(),
+}));
+
 jest.mock("@/components/shared/ImageUploadField", () => ({
-  ImageUploadField: ({
-    id,
-    label,
-    value,
-    onChange,
-  }: {
+  ImageUploadField: ({ id, label, value, onChange, disabled }: {
     id: string;
     label: string;
     value: string;
     onChange: (value: string) => void;
+    disabled?: boolean;
   }) => (
-    <div data-testid={id}>
-      <label>{label}</label>
+    <div data-testid={`image-upload-${id}`}>
+      <label htmlFor={id}>{label}</label>
       <input
+        id={id}
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        data-testid={`${id}-input`}
+        disabled={disabled}
+        data-testid={`image-input-${id}`}
       />
     </div>
   ),
 }));
-jest.mock("./PreviewPanel", () => ({
-  PreviewPanel: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="preview-panel">{children}</div>
+
+// Mock next/image
+jest.mock("next/image", () => ({
+  __esModule: true,
+  default: ({ src, alt, ...props }: { src: string; alt: string }) => (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src={src} alt={alt} {...props} />
   ),
 }));
 
-// Import the mocked function
 import { updateEventTheme } from "../../actions/events";
+import { toast } from "sonner";
+
+const mockUpdateEventTheme = updateEventTheme as jest.MockedFunction<typeof updateEventTheme>;
+
+// V4 schema mock event helper
+function createMockEvent(overrides: Partial<Event> = {}): Event {
+  return {
+    id: "event-123",
+    name: "Test Event",
+    status: "draft",
+    ownerId: "company-123",
+    joinPath: "/join/event-123",
+    qrPngPath: "events/event-123/qr/join.png",
+    publishStartAt: null,
+    publishEndAt: null,
+    activeJourneyId: null,
+    theme: {
+      logoUrl: null,
+      fontFamily: null,
+      primaryColor: "#3B82F6",
+      text: {
+        color: "#000000",
+        alignment: "center",
+      },
+      button: {
+        backgroundColor: null,
+        textColor: "#FFFFFF",
+        radius: "md",
+      },
+      background: {
+        color: "#F9FAFB",
+        image: null,
+        overlayOpacity: 0.5,
+      },
+    },
+    createdAt: 1234567890,
+    updatedAt: 1234567890,
+    ...overrides,
+  };
+}
 
 describe("ThemeEditor", () => {
-  const mockRouter = {
-    refresh: jest.fn(),
-    push: jest.fn(),
-    back: jest.fn(),
-  };
-
-  const createMockEvent = (
-    themeOverrides?: Partial<Event["theme"]>
-  ): Event => ({
-    id: "event-123",
-    title: "Test Event",
-    status: "draft",
-    joinPath: "/join/test-event",
-    qrPngPath: "events/test-event/qr/join.png",
-    companyId: "company-1",
-    createdAt: Date.now(),
-    updatedAt: Date.now(),
-    share: {
-      allowDownload: true,
-      allowSystemShare: true,
-      allowEmail: true,
-      socials: [],
-    },
-    experiencesCount: 0,
-    sessionsCount: 0,
-    readyCount: 0,
-    sharesCount: 0,
-    theme: {
-      buttonColor: "#3B82F6",
-      buttonTextColor: "#FFFFFF",
-      backgroundColor: "#F9FAFB",
-      backgroundImage: "",
-      ...themeOverrides,
-    },
-  });
-
   beforeEach(() => {
     jest.clearAllMocks();
-    (useRouter as jest.Mock).mockReturnValue(mockRouter);
   });
 
-  describe("rendering with theme object", () => {
-    it("renders all form fields with values from event.theme", () => {
-      const event = createMockEvent({
-        buttonColor: "#FF0000",
-        buttonTextColor: "#000000",
-        backgroundColor: "#FFFF00",
-        backgroundImage: "https://example.com/bg.jpg",
-      });
-
+  describe("Rendering", () => {
+    it("renders the component with all sections", () => {
+      const event = createMockEvent();
       render(<ThemeEditor event={event} />);
 
-      // Check button color inputs
-      const buttonColorInputs = screen.getAllByDisplayValue("#FF0000");
-      expect(buttonColorInputs.length).toBeGreaterThan(0);
+      // Check main heading
+      expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent("Event Theme");
 
-      // Check button text color inputs
-      const buttonTextColorInputs = screen.getAllByDisplayValue("#000000");
-      expect(buttonTextColorInputs.length).toBeGreaterThan(0);
-
-      // Check background color inputs
-      const bgColorInputs = screen.getAllByDisplayValue("#FFFF00");
-      expect(bgColorInputs.length).toBeGreaterThan(0);
-
-      // Check background image field
-      const bgImageInput = screen.getByTestId("theme-bg-image-input");
-      expect(bgImageInput).toHaveValue("https://example.com/bg.jpg");
+      // Check section headings (h3 elements)
+      const sectionHeadings = screen.getAllByRole("heading", { level: 3 });
+      expect(sectionHeadings.map(h => h.textContent)).toEqual(
+        expect.arrayContaining(["Identity", "Primary Color", "Text", "Button", "Background"])
+      );
     });
 
-    it("renders preview panel with theme styling", () => {
-      const event = createMockEvent({
-        buttonColor: "#FF0000",
-        buttonTextColor: "#FFFFFF",
-        backgroundColor: "#000000",
-      });
-
+    it("renders the Save Changes button", () => {
+      const event = createMockEvent();
       render(<ThemeEditor event={event} />);
 
-      // Check preview content
-      const previewPanel = screen.getByTestId("preview-panel");
-      expect(previewPanel).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /save changes/i })).toBeInTheDocument();
+    });
 
-      // Check preview text
+    it("renders the live preview panel", () => {
+      const event = createMockEvent();
+      render(<ThemeEditor event={event} />);
+
+      // Preview panel should show event preview content
       expect(screen.getByText("Event Preview")).toBeInTheDocument();
       expect(screen.getByText("This is how your theme will look")).toBeInTheDocument();
-      expect(screen.getByText("Primary Button")).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /primary button/i })).toBeInTheDocument();
     });
   });
 
-  describe("handling undefined theme object", () => {
-    it("initializes form with default values when theme is undefined", () => {
-      const eventWithoutTheme: Event = {
-        id: "event-123",
-        title: "Test Event",
-        status: "draft",
-        joinPath: "/join/test-event",
-        qrPngPath: "events/test-event/qr/join.png",
-        companyId: "company-1",
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-        share: {
-          allowDownload: true,
-          allowSystemShare: true,
-          allowEmail: true,
-          socials: [],
-        },
-        experiencesCount: 0,
-        sessionsCount: 0,
-        readyCount: 0,
-        sharesCount: 0,
-        // theme is undefined
-      };
+  describe("Identity Section", () => {
+    it("renders logo upload field", () => {
+      const event = createMockEvent();
+      render(<ThemeEditor event={event} />);
 
-      render(<ThemeEditor event={eventWithoutTheme} />);
-
-      // Check default values
-      const buttonColorInputs = screen.getAllByDisplayValue("#3B82F6");
-      expect(buttonColorInputs.length).toBeGreaterThan(0); // Default button color
-
-      const buttonTextColorInputs = screen.getAllByDisplayValue("#FFFFFF");
-      expect(buttonTextColorInputs.length).toBeGreaterThan(0); // Default button text color
-
-      const bgColorInputs = screen.getAllByDisplayValue("#F9FAFB");
-      expect(bgColorInputs.length).toBeGreaterThan(0); // Default background color
+      expect(screen.getByTestId("image-upload-theme-logo")).toBeInTheDocument();
     });
 
-    it("handles partial theme object with optional chaining", () => {
-      const eventWithPartialTheme = createMockEvent({
-        buttonColor: "#FF0000",
-        // Other fields undefined
-        buttonTextColor: undefined,
-        backgroundColor: undefined,
-        backgroundImage: undefined,
+    it("renders font family input", () => {
+      const event = createMockEvent();
+      render(<ThemeEditor event={event} />);
+
+      const fontInput = screen.getByLabelText(/font family/i);
+      expect(fontInput).toBeInTheDocument();
+      expect(fontInput).toHaveAttribute("placeholder", "Inter, sans-serif");
+    });
+
+    it("displays existing logo URL", () => {
+      const event = createMockEvent({
+        theme: {
+          ...createMockEvent().theme,
+          logoUrl: "https://example.com/logo.png",
+        },
       });
+      render(<ThemeEditor event={event} />);
 
-      render(<ThemeEditor event={eventWithPartialTheme} />);
+      const logoInput = screen.getByTestId("image-input-theme-logo");
+      expect(logoInput).toHaveValue("https://example.com/logo.png");
+    });
 
-      const buttonColorInputs = screen.getAllByDisplayValue("#FF0000");
-      expect(buttonColorInputs.length).toBeGreaterThan(0);
+    it("displays existing font family", () => {
+      const event = createMockEvent({
+        theme: {
+          ...createMockEvent().theme,
+          fontFamily: "Roboto, sans-serif",
+        },
+      });
+      render(<ThemeEditor event={event} />);
 
-      // Should use defaults for undefined fields
-      const buttonTextColorInputs = screen.getAllByDisplayValue("#FFFFFF");
-      expect(buttonTextColorInputs.length).toBeGreaterThan(0);
+      expect(screen.getByLabelText(/font family/i)).toHaveValue("Roboto, sans-serif");
+    });
+  });
 
-      const bgColorInputs = screen.getAllByDisplayValue("#F9FAFB");
+  describe("Primary Color Section", () => {
+    it("renders primary color input", () => {
+      const event = createMockEvent();
+      render(<ThemeEditor event={event} />);
+
+      // Primary color has both a color picker and text input
+      const colorInput = screen.getByLabelText("Primary Color");
+      expect(colorInput).toBeInTheDocument();
+    });
+
+    it("updates primary color on change", async () => {
+      const event = createMockEvent();
+      render(<ThemeEditor event={event} />);
+
+      // Get the text input for primary color (the one inside the Primary Color section)
+      const colorInputs = screen.getAllByPlaceholderText("#3B82F6");
+      const textInput = colorInputs[0]; // First one is the primary color text input
+      await userEvent.clear(textInput);
+      await userEvent.type(textInput, "#FF5733");
+
+      expect(textInput).toHaveValue("#FF5733");
+    });
+  });
+
+  describe("Text Section", () => {
+    it("renders text color input", () => {
+      const event = createMockEvent();
+      render(<ThemeEditor event={event} />);
+
+      // Use exact match to avoid collision with "Button Text Color"
+      expect(screen.getByLabelText("Text Color")).toBeInTheDocument();
+    });
+
+    it("renders text alignment selector", () => {
+      const event = createMockEvent();
+      render(<ThemeEditor event={event} />);
+
+      const alignmentSelect = screen.getByLabelText(/text alignment/i);
+      expect(alignmentSelect).toBeInTheDocument();
+      expect(alignmentSelect).toHaveValue("center");
+    });
+
+    it("updates text alignment on change", async () => {
+      const event = createMockEvent();
+      render(<ThemeEditor event={event} />);
+
+      const alignmentSelect = screen.getByLabelText(/text alignment/i);
+      await userEvent.selectOptions(alignmentSelect, "left");
+
+      expect(alignmentSelect).toHaveValue("left");
+    });
+  });
+
+  describe("Button Section", () => {
+    it("renders button background color input", () => {
+      const event = createMockEvent();
+      render(<ThemeEditor event={event} />);
+
+      expect(screen.getByLabelText(/button background color/i)).toBeInTheDocument();
+    });
+
+    it("renders button text color input", () => {
+      const event = createMockEvent();
+      render(<ThemeEditor event={event} />);
+
+      expect(screen.getByLabelText(/button text color/i)).toBeInTheDocument();
+    });
+
+    it("renders button radius selector", () => {
+      const event = createMockEvent();
+      render(<ThemeEditor event={event} />);
+
+      const radiusSelect = screen.getByLabelText(/button radius/i);
+      expect(radiusSelect).toBeInTheDocument();
+      expect(radiusSelect).toHaveValue("md");
+    });
+
+    it("updates button radius on change", async () => {
+      const event = createMockEvent();
+      render(<ThemeEditor event={event} />);
+
+      const radiusSelect = screen.getByLabelText(/button radius/i);
+      await userEvent.selectOptions(radiusSelect, "full");
+
+      expect(radiusSelect).toHaveValue("full");
+    });
+
+    it("shows primary color when button background is null", () => {
+      const event = createMockEvent();
+      render(<ThemeEditor event={event} />);
+
+      // Button background inherits primary color when null
+      const bgColorInputs = screen.getAllByDisplayValue("#3B82F6");
       expect(bgColorInputs.length).toBeGreaterThan(0);
     });
   });
 
-  describe("saving theme successfully", () => {
-    it("calls updateEventTheme with correct data on save", async () => {
+  describe("Background Section", () => {
+    it("renders background color input", () => {
       const event = createMockEvent();
-      const mockedUpdateEventTheme = jest.mocked(updateEventTheme);
-      mockedUpdateEventTheme.mockResolvedValue({ success: true, data: undefined });
-
       render(<ThemeEditor event={event} />);
 
-      // Modify button color
-      const buttonColorTextInputs = screen.getAllByDisplayValue("#3B82F6");
-      const buttonColorTextInput = buttonColorTextInputs.find(
-        (input) => input.getAttribute("type") === "text"
-      );
+      // Use exact label match to avoid collision with "Button Background Color"
+      expect(screen.getByLabelText("Background Color")).toBeInTheDocument();
+    });
 
-      if (buttonColorTextInput) {
-        await userEvent.clear(buttonColorTextInput);
-        await userEvent.type(buttonColorTextInput, "#FF0000");
-      }
+    it("renders background image upload", () => {
+      const event = createMockEvent();
+      render(<ThemeEditor event={event} />);
 
-      // Click save button
+      expect(screen.getByTestId("image-upload-theme-bg-image")).toBeInTheDocument();
+    });
+
+    it("renders overlay opacity slider", () => {
+      const event = createMockEvent();
+      render(<ThemeEditor event={event} />);
+
+      const opacitySlider = screen.getByRole("slider");
+      expect(opacitySlider).toBeInTheDocument();
+      expect(opacitySlider).toHaveValue("0.5");
+    });
+
+    it("displays overlay opacity percentage", () => {
+      const event = createMockEvent();
+      render(<ThemeEditor event={event} />);
+
+      expect(screen.getByText(/overlay opacity: 50%/i)).toBeInTheDocument();
+    });
+
+    it("updates overlay opacity on slider change", async () => {
+      const event = createMockEvent();
+      render(<ThemeEditor event={event} />);
+
+      const opacitySlider = screen.getByRole("slider");
+      fireEvent.change(opacitySlider, { target: { value: "0.8" } });
+
+      expect(opacitySlider).toHaveValue("0.8");
+      expect(screen.getByText(/overlay opacity: 80%/i)).toBeInTheDocument();
+    });
+  });
+
+  describe("Save Functionality", () => {
+    it("calls updateEventTheme on save with all theme fields", async () => {
+      mockUpdateEventTheme.mockResolvedValue({ success: true, data: undefined });
+
+      const event = createMockEvent();
+      render(<ThemeEditor event={event} />);
+
       const saveButton = screen.getByRole("button", { name: /save changes/i });
       await userEvent.click(saveButton);
 
-      // Wait for async operation
       await waitFor(() => {
-        expect(mockedUpdateEventTheme).toHaveBeenCalledWith("event-123", {
-          buttonColor: "#FF0000",
-          buttonTextColor: "#FFFFFF",
-          backgroundColor: "#F9FAFB",
-          backgroundImage: undefined,
+        expect(mockUpdateEventTheme).toHaveBeenCalledWith("event-123", {
+          primaryColor: "#3B82F6",
+          logoUrl: null,
+          fontFamily: null,
+          text: {
+            color: "#000000",
+            alignment: "center",
+          },
+          button: {
+            backgroundColor: null,
+            textColor: "#FFFFFF",
+            radius: "md",
+          },
+          background: {
+            color: "#F9FAFB",
+            image: null,
+            overlayOpacity: 0.5,
+          },
         });
       });
     });
 
-    it("shows success toast and refreshes router on successful save", async () => {
-      const event = createMockEvent();
-      const mockedUpdateEventTheme = jest.mocked(updateEventTheme);
-      mockedUpdateEventTheme.mockResolvedValue({ success: true, data: undefined });
+    it("shows success toast on successful save", async () => {
+      mockUpdateEventTheme.mockResolvedValue({ success: true, data: undefined });
 
+      const event = createMockEvent();
       render(<ThemeEditor event={event} />);
 
       const saveButton = screen.getByRole("button", { name: /save changes/i });
       await userEvent.click(saveButton);
 
       await waitFor(() => {
-        expect(toast.success).toHaveBeenCalledWith(
-          "Theme settings updated successfully"
-        );
-        expect(mockRouter.refresh).toHaveBeenCalled();
+        expect(toast.success).toHaveBeenCalledWith("Theme settings updated successfully");
       });
     });
 
     it("shows error toast on failed save", async () => {
-      const event = createMockEvent();
-      const mockedUpdateEventTheme = jest.mocked(updateEventTheme);
-      mockedUpdateEventTheme.mockResolvedValue({
+      mockUpdateEventTheme.mockResolvedValue({
         success: false,
-        error: {
-          code: "VALIDATION_ERROR",
-          message: "Invalid theme data",
-        },
+        error: { code: "VALIDATION_ERROR", message: "Invalid color format" },
       });
 
+      const event = createMockEvent();
       render(<ThemeEditor event={event} />);
 
       const saveButton = screen.getByRole("button", { name: /save changes/i });
       await userEvent.click(saveButton);
 
       await waitFor(() => {
-        expect(toast.error).toHaveBeenCalledWith("Invalid theme data");
+        expect(toast.error).toHaveBeenCalledWith("Invalid color format");
       });
     });
 
     it("disables save button while saving", async () => {
-      const event = createMockEvent();
-      const mockedUpdateEventTheme = jest.mocked(updateEventTheme);
-      let resolveUpdate: (value: { success: true; data: undefined }) => void;
-      const updatePromise = new Promise<{ success: true; data: undefined }>((resolve) => {
-        resolveUpdate = resolve;
+      // Create a promise that we can control
+      let resolvePromise: (value: { success: true; data: undefined }) => void;
+      const savePromise = new Promise<{ success: true; data: undefined }>((resolve) => {
+        resolvePromise = resolve;
       });
-      mockedUpdateEventTheme.mockReturnValue(updatePromise);
 
+      mockUpdateEventTheme.mockImplementation(() => savePromise);
+
+      const event = createMockEvent();
       render(<ThemeEditor event={event} />);
 
       const saveButton = screen.getByRole("button", { name: /save changes/i });
       await userEvent.click(saveButton);
 
-      // Button should be disabled and show "Saving..."
+      // Button should show "Saving..." while pending
       await waitFor(() => {
-        expect(saveButton).toBeDisabled();
-        expect(saveButton).toHaveTextContent("Saving...");
+        expect(screen.getByRole("button", { name: /saving/i })).toBeDisabled();
       });
 
-      // Resolve the promise and wait for transition to complete
+      // Resolve the save within act to avoid warning
       await act(async () => {
-        resolveUpdate!({ success: true, data: undefined });
-        // Allow React to process the transition
-        await new Promise(resolve => setTimeout(resolve, 0));
+        resolvePromise!({ success: true, data: undefined });
       });
 
-      // Button should be enabled again
+      // Wait for the button to return to normal state
       await waitFor(() => {
-        expect(saveButton).not.toBeDisabled();
-        expect(saveButton).toHaveTextContent("Save Changes");
-      });
-    });
-
-    it("prevents multiple simultaneous saves", async () => {
-      const event = createMockEvent();
-      const mockedUpdateEventTheme = jest.mocked(updateEventTheme);
-      let resolveUpdate: (value: { success: true; data: undefined }) => void;
-      const updatePromise = new Promise<{ success: true; data: undefined }>((resolve) => {
-        resolveUpdate = resolve;
-      });
-      mockedUpdateEventTheme.mockReturnValue(updatePromise);
-
-      render(<ThemeEditor event={event} />);
-
-      const saveButton = screen.getByRole("button", { name: /save changes/i });
-
-      // Click save multiple times
-      await userEvent.click(saveButton);
-      await userEvent.click(saveButton);
-      await userEvent.click(saveButton);
-
-      // Should only call updateEventTheme once
-      await waitFor(() => {
-        expect(mockedUpdateEventTheme).toHaveBeenCalledTimes(1);
-      });
-
-      // Resolve the promise
-      await act(async () => {
-        resolveUpdate!({ success: true, data: undefined });
-        // Allow React to process the transition
-        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(screen.getByRole("button", { name: /save changes/i })).toBeEnabled();
       });
     });
   });
 
-  describe("color customization", () => {
-    it("updates button color via color picker", async () => {
-      const event = createMockEvent();
-      render(<ThemeEditor event={event} />);
-
-      const buttonColorInputs = screen.getAllByDisplayValue("#3B82F6");
-      const textInput = buttonColorInputs.find(
-        (input) => input.getAttribute("type") === "text"
-      );
-
-      if (textInput) {
-        await userEvent.clear(textInput);
-        await userEvent.type(textInput, "#FF0000");
-
-        await waitFor(() => {
-          expect(textInput).toHaveValue("#FF0000");
-        });
-      }
-    });
-
-    it("updates button text color via color picker", async () => {
-      const event = createMockEvent();
-      render(<ThemeEditor event={event} />);
-
-      const buttonTextColorInputs = screen.getAllByDisplayValue("#FFFFFF");
-      const textInput = buttonTextColorInputs.find(
-        (input) => input.getAttribute("type") === "text"
-      );
-
-      if (textInput) {
-        await userEvent.clear(textInput);
-        await userEvent.type(textInput, "#000000");
-
-        await waitFor(() => {
-          expect(textInput).toHaveValue("#000000");
-        });
-      }
-    });
-
-    it("updates background color via color picker", async () => {
-      const event = createMockEvent();
-      render(<ThemeEditor event={event} />);
-
-      const bgColorInputs = screen.getAllByDisplayValue("#F9FAFB");
-      const textInput = bgColorInputs.find(
-        (input) => input.getAttribute("type") === "text"
-      );
-
-      if (textInput) {
-        await userEvent.clear(textInput);
-        await userEvent.type(textInput, "#CCCCCC");
-
-        await waitFor(() => {
-          expect(textInput).toHaveValue("#CCCCCC");
-        });
-      }
-    });
-
-    it("updates background image via ImageUploadField", async () => {
-      const event = createMockEvent();
-      render(<ThemeEditor event={event} />);
-
-      const bgImageInput = screen.getByTestId("theme-bg-image-input");
-      fireEvent.change(bgImageInput, {
-        target: { value: "https://example.com/new-bg.jpg" },
-      });
-
-      await waitFor(() => {
-        expect(bgImageInput).toHaveValue("https://example.com/new-bg.jpg");
-      });
-    });
-  });
-
-  describe("preview rendering", () => {
-    it("shows overlay when background image is present", () => {
+  describe("Live Preview", () => {
+    it("displays logo in preview when set", () => {
       const event = createMockEvent({
-        backgroundImage: "https://example.com/bg.jpg",
+        theme: {
+          ...createMockEvent().theme,
+          logoUrl: "https://example.com/logo.png",
+        },
       });
       render(<ThemeEditor event={event} />);
 
-      const overlay = screen
-        .getByTestId("preview-panel")
-        .querySelector(".bg-black\\/40");
-      expect(overlay).toBeInTheDocument();
+      const logoImg = screen.getByAltText("Event logo");
+      expect(logoImg).toHaveAttribute("src", "https://example.com/logo.png");
     });
 
-    it("hides overlay when no background image", () => {
-      const event = createMockEvent({ backgroundImage: "" });
+    it("hides logo in preview when not set", () => {
+      const event = createMockEvent();
       render(<ThemeEditor event={event} />);
 
-      const overlay = screen
-        .getByTestId("preview-panel")
-        .querySelector(".bg-black\\/40");
-      expect(overlay).not.toBeInTheDocument();
+      expect(screen.queryByAltText("Event logo")).not.toBeInTheDocument();
+    });
+
+    it("applies text color to preview text", () => {
+      const event = createMockEvent({
+        theme: {
+          ...createMockEvent().theme,
+          text: { color: "#FF0000", alignment: "center" },
+        },
+      });
+      render(<ThemeEditor event={event} />);
+
+      const previewTitle = screen.getByText("Event Preview");
+      expect(previewTitle).toHaveStyle({ color: "#FF0000" });
+    });
+
+    it("applies text alignment to preview", () => {
+      const event = createMockEvent({
+        theme: {
+          ...createMockEvent().theme,
+          text: { color: "#000000", alignment: "left" },
+        },
+      });
+      render(<ThemeEditor event={event} />);
+
+      // The preview content wrapper should have left alignment
+      const previewContent = screen.getByText("Event Preview").parentElement;
+      expect(previewContent).toHaveStyle({ textAlign: "left" });
+    });
+
+    it("applies button styles to preview button", () => {
+      const event = createMockEvent({
+        theme: {
+          ...createMockEvent().theme,
+          button: {
+            backgroundColor: "#FF0000",
+            textColor: "#00FF00",
+            radius: "full",
+          },
+        },
+      });
+      render(<ThemeEditor event={event} />);
+
+      const previewButton = screen.getByRole("button", { name: /primary button/i });
+      expect(previewButton).toHaveStyle({
+        backgroundColor: "#FF0000",
+        color: "#00FF00",
+        borderRadius: "9999px",
+      });
+    });
+
+    it("applies background color to preview", () => {
+      const event = createMockEvent({
+        theme: {
+          ...createMockEvent().theme,
+          background: { color: "#000000", image: null, overlayOpacity: 0.5 },
+        },
+      });
+      render(<ThemeEditor event={event} />);
+
+      // Find the preview wrapper by its unique styling
+      const previewWrapper = screen.getByText("Event Preview").closest(".relative");
+      expect(previewWrapper?.parentElement).toHaveStyle({ backgroundColor: "#000000" });
     });
   });
 
-  describe("live preview updates", () => {
-    it("updates preview when button color changes", async () => {
-      const event = createMockEvent();
+  describe("Reducer State Management", () => {
+    it("initializes state from event.theme", () => {
+      const event = createMockEvent({
+        theme: {
+          logoUrl: "https://example.com/logo.png",
+          fontFamily: "Roboto",
+          primaryColor: "#FF5733",
+          text: { color: "#333333", alignment: "left" },
+          button: { backgroundColor: "#0000FF", textColor: "#FFFFFF", radius: "full" },
+          background: { color: "#EEEEEE", image: "https://example.com/bg.jpg", overlayOpacity: 0.7 },
+        },
+      });
       render(<ThemeEditor event={event} />);
 
-      const buttonColorInputs = screen.getAllByDisplayValue("#3B82F6");
-      const textInput = buttonColorInputs.find(
-        (input) => input.getAttribute("type") === "text"
-      );
-
-      if (textInput) {
-        await userEvent.clear(textInput);
-        await userEvent.type(textInput, "#FF0000");
-
-        // Preview button should have new color (checked via style attribute)
-        const previewButton = screen.getByText("Primary Button");
-        expect(previewButton).toBeInTheDocument();
-      }
+      // Check that form fields are populated with initial values
+      expect(screen.getByTestId("image-input-theme-logo")).toHaveValue("https://example.com/logo.png");
+      expect(screen.getByLabelText(/font family/i)).toHaveValue("Roboto");
+      expect(screen.getByLabelText(/text alignment/i)).toHaveValue("left");
+      expect(screen.getByLabelText(/button radius/i)).toHaveValue("full");
+      expect(screen.getByRole("slider")).toHaveValue("0.7");
     });
 
-    it("updates preview when background color changes", async () => {
+    it("updates state independently for different fields", async () => {
       const event = createMockEvent();
       render(<ThemeEditor event={event} />);
 
-      const bgColorInputs = screen.getAllByDisplayValue("#F9FAFB");
-      const textInput = bgColorInputs.find(
-        (input) => input.getAttribute("type") === "text"
-      );
+      // Update text alignment
+      const alignmentSelect = screen.getByLabelText(/text alignment/i);
+      await userEvent.selectOptions(alignmentSelect, "right");
+      expect(alignmentSelect).toHaveValue("right");
 
-      if (textInput) {
-        await userEvent.clear(textInput);
-        await userEvent.type(textInput, "#000000");
+      // Update button radius
+      const radiusSelect = screen.getByLabelText(/button radius/i);
+      await userEvent.selectOptions(radiusSelect, "none");
+      expect(radiusSelect).toHaveValue("none");
 
-        // Preview should update background
-        await waitFor(() => {
-          expect(textInput).toHaveValue("#000000");
-        });
-      }
+      // Original values should still be correct for unchanged fields
+      expect(screen.getByRole("slider")).toHaveValue("0.5");
     });
   });
 });

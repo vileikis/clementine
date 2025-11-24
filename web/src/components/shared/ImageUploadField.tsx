@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Upload } from "lucide-react";
@@ -11,7 +12,7 @@ interface ImageUploadFieldProps {
   label: string;
   value: string;
   onChange: (url: string) => void;
-  destination: "welcome" | "experience-preview" | "experience-overlay" | "ai-reference";
+  destination: "welcome" | "experience-preview" | "experience-overlay" | "ai-reference" | "logos" | "backgrounds";
   disabled?: boolean;
   recommendedSize?: string;
   accept?: string;
@@ -83,10 +84,11 @@ export function ImageUploadField({
                 className="h-full w-full object-contain"
               />
             ) : (
-              <img
+              <Image
                 src={value}
                 alt={label}
-                className="h-full w-full object-contain"
+                fill
+                className="object-contain"
               />
             )}
             <Button
