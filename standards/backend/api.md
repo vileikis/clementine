@@ -66,7 +66,7 @@ return NextResponse.json(data, {
 ### Error Responses
 
 ```typescript
-// ✅ Consistent error format
+// ✅ Consistent error format with descriptive messages
 try {
   // ...
 } catch (error) {
@@ -74,7 +74,8 @@ try {
     return NextResponse.json(
       {
         error: 'Validation failed',
-        details: error.errors,
+        message: error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join(', '),
+        issues: error.issues, // Full details for client-side field-specific errors
       },
       { status: 400 }
     )
@@ -88,6 +89,11 @@ try {
   )
 }
 ```
+
+**Key points:**
+- **Descriptive validation errors**: Include field paths and messages, not just generic "Validation failed"
+- **Field-specific errors**: Return full `issues` array so frontend can highlight specific form fields
+- **Never expose internals**: Generic error messages for unexpected errors
 
 ### Query Parameters
 

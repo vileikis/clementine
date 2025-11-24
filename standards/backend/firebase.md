@@ -533,11 +533,34 @@ export const createEventInputSchema = eventSchema.omit({ id: true, createdAt: tr
 
 import { createEventInputSchema } from "../schemas";
 import { createEvent } from "../repositories";
+import { z } from "zod";
 
 export async function createEventAction(input: unknown) {
-  const validated = createEventInputSchema.parse(input); // Runtime validation
-  const event = await createEvent(validated);
-  return { success: true, data: event };
+  try {
+    const validated = createEventInputSchema.parse(input);
+    const event = await createEvent(validated);
+    return { success: true, data: event };
+  } catch (error) {
+    // Provide descriptive validation errors
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        error: {
+          code: "VALIDATION_ERROR",
+          message: error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join(', '),
+          issues: error.issues, // Include full details for client-side field errors
+        },
+      };
+    }
+    // Handle other errors
+    return {
+      success: false,
+      error: {
+        code: "INTERNAL_ERROR",
+        message: error instanceof Error ? error.message : "Unknown error",
+      },
+    };
+  }
 }
 ```
 
@@ -545,6 +568,99 @@ export async function createEventAction(input: unknown) {
 - Use `.nullable().optional().default(null)` for optional fields (prevents `undefined` in Firestore)
 - Separate schemas for create/update operations (use `.omit()`, `.pick()`, `.partial()`)
 - Import schemas from feature's `schemas/` folder using relative imports
+- **Always provide descriptive validation errors** - include field paths and messages, not generic "Invalid input"
+
+### 6. Efficient Document Updates
+
+**Don't check existence before updates** - Firebase Admin SDK's `.update()` already throws `NOT_FOUND` if the document doesn't exist:
+
+```typescript
+// ❌ Bad: Wasteful extra read
+const eventDoc = await db.collection("events").doc(eventId).get();
+if (!eventDoc.exists) {
+  return { success: false, error: { code: "NOT_FOUND", message: "Event not found" } };
+}
+await db.collection("events").doc(eventId).update(data); // Extra request!
+
+// ✅ Good: Let Firebase handle it
+try {
+  await db.collection("events").doc(eventId).update(data);
+  return { success: true, data: undefined };
+} catch (error: any) {
+  if (error.code === 5) { // Firestore NOT_FOUND error code
+    return {
+      success: false,
+      error: { code: "NOT_FOUND", message: "Event not found" },
+    };
+  }
+  throw error; // Re-throw unexpected errors
+}
+```
+
+**Why?**
+- ✅ **Performance**: 1 request instead of 2 (50% fewer reads)
+- ✅ **Cost**: Firestore charges per operation - unnecessary reads cost money
+- ✅ **Race conditions**: Document could be deleted between check and update
+- ✅ **Simpler code**: Fewer lines, clearer intent
+
+**When to check existence:**
+- ✅ When you need to **read existing data** to compute the update (e.g., incrementing a counter)
+- ✅ When you need to **validate business logic** based on current state (e.g., can't archive already-archived event)
+- ❌ **Never** check just to verify existence before a blind update
+
+### 7. Dynamic Field Mapping for Nested Updates
+
+**Don't manually map fields** - use dynamic mapping for scalable, maintainable updates:
+
+```typescript
+// ❌ Bad: Manual field mapping (not scalable)
+const updateData: Record<string, unknown> = { updatedAt: Date.now() };
+
+if (validatedData.buttonColor !== undefined) {
+  updateData["theme.buttonColor"] = validatedData.buttonColor;
+}
+if (validatedData.buttonTextColor !== undefined) {
+  updateData["theme.buttonTextColor"] = validatedData.buttonTextColor;
+}
+if (validatedData.backgroundColor !== undefined) {
+  updateData["theme.backgroundColor"] = validatedData.backgroundColor;
+}
+// 10 more fields... 😱
+
+// ✅ Good: Dynamic field mapping
+const updateData: Record<string, unknown> = { updatedAt: Date.now() };
+
+const fieldMappings: Record<string, string> = {
+  buttonColor: "theme.buttonColor",
+  buttonTextColor: "theme.buttonTextColor",
+  backgroundColor: "theme.backgroundColor",
+  backgroundImage: "theme.backgroundImage",
+};
+
+Object.entries(validatedData).forEach(([key, value]) => {
+  if (value !== undefined && fieldMappings[key]) {
+    updateData[fieldMappings[key]] = value;
+  }
+});
+```
+
+**Benefits:**
+- ✅ **Scalable**: Add new fields by updating mapping object only
+- ✅ **DRY**: No repetitive if-statements
+- ✅ **Type-safe**: TypeScript ensures field names match schema
+- ✅ **Readable**: Mapping declaration is self-documenting
+
+**For flat updates** (no nesting), it's even simpler:
+
+```typescript
+// When updating flat fields directly
+const updateData = {
+  ...validatedData,
+  updatedAt: Date.now(),
+};
+
+await db.collection("events").doc(eventId).update(updateData);
+```
 
 ## Common Mistakes
 
@@ -585,6 +701,73 @@ const interval = setInterval(async () => {
 onSnapshot(doc(db, "sessions", id), (snapshot) => {
   // ...
 });
+```
+
+### ❌ Don't: Check Existence Before Blind Updates
+
+```typescript
+// ❌ Wasteful: Extra read just to check existence
+const eventDoc = await db.collection("events").doc(eventId).get();
+if (!eventDoc.exists) {
+  return { error: "Not found" };
+}
+await db.collection("events").doc(eventId).update(data);
+
+// ✅ Efficient: Let Firebase handle the error
+try {
+  await db.collection("events").doc(eventId).update(data);
+} catch (error: any) {
+  if (error.code === 5) {
+    return { error: "Not found" };
+  }
+  throw error;
+}
+```
+
+### ❌ Don't: Use Manual Field Mapping
+
+```typescript
+// ❌ Not scalable: Manual if-statements for every field
+if (data.buttonColor) updateData["theme.buttonColor"] = data.buttonColor;
+if (data.buttonTextColor) updateData["theme.buttonTextColor"] = data.buttonTextColor;
+if (data.backgroundColor) updateData["theme.backgroundColor"] = data.backgroundColor;
+// ... 10 more fields
+
+// ✅ Scalable: Dynamic mapping
+const fieldMappings = {
+  buttonColor: "theme.buttonColor",
+  buttonTextColor: "theme.buttonTextColor",
+  backgroundColor: "theme.backgroundColor",
+};
+Object.entries(data).forEach(([key, value]) => {
+  if (value !== undefined && fieldMappings[key]) {
+    updateData[fieldMappings[key]] = value;
+  }
+});
+```
+
+### ❌ Don't: Return Vague Validation Errors
+
+```typescript
+// ❌ Not helpful: Generic error message
+if (error instanceof z.ZodError) {
+  return {
+    success: false,
+    error: { code: "VALIDATION_ERROR", message: "Invalid input data" }, // What failed?
+  };
+}
+
+// ✅ Descriptive: Include field paths and messages
+if (error instanceof z.ZodError) {
+  return {
+    success: false,
+    error: {
+      code: "VALIDATION_ERROR",
+      message: error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join(', '),
+      issues: error.issues, // Full details for client
+    },
+  };
+}
 ```
 
 ## Testing
