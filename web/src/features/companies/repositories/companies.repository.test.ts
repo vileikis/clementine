@@ -244,6 +244,8 @@ describe("Companies Repository", () => {
         status: "active",
         deletedAt: null,
         contactEmail: "test@example.com",
+        termsUrl: null,
+        privacyUrl: null,
         createdAt: 1234567890,
         updatedAt: 1234567890,
       };

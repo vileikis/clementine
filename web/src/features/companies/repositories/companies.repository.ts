@@ -48,10 +48,10 @@ export async function createCompany(
       deletedAt: null,
       createdAt: now,
       updatedAt: now,
-      // Optional metadata fields
-      ...(data.contactEmail && { contactEmail: data.contactEmail }),
-      ...(data.termsUrl && { termsUrl: data.termsUrl }),
-      ...(data.privacyUrl && { privacyUrl: data.privacyUrl }),
+      // Optional metadata fields (null when not provided)
+      contactEmail: data.contactEmail ?? null,
+      termsUrl: data.termsUrl ?? null,
+      privacyUrl: data.privacyUrl ?? null,
     };
 
     txn.set(companyRef, company);
