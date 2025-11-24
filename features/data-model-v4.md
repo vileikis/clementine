@@ -92,7 +92,6 @@ interface Experience {
   id: string;
   eventId: string; // The event this experience belongs to
   name: string; // Internal name
-  thumbnailUrl?: string; // Icon used in Selection menus
 
   // 1. THE ENGINE (Output Type)
   // Determines which camera UI to load.

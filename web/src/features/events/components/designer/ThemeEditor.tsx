@@ -1,6 +1,7 @@
 "use client";
 
 import { useReducer, useTransition } from "react";
+import Image from "next/image";
 import { Event, EventTheme } from "../../types/event.types";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,7 +12,6 @@ import { updateEventTheme } from "../../actions/events";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
-import { THEME_DEFAULTS } from "../../constants";
 
 interface ThemeEditorProps {
   event: Event;
@@ -192,7 +192,7 @@ export function ThemeEditor({ event }: ThemeEditorProps) {
                 placeholder="Inter, sans-serif"
               />
               <p className="text-xs text-muted-foreground">
-                Custom font family (e.g., "Roboto, sans-serif"). Leave empty for default.
+                Custom font family (e.g., &quot;Roboto, sans-serif&quot;). Leave empty for default.
               </p>
             </div>
           </div>
@@ -493,9 +493,11 @@ export function ThemeEditor({ event }: ThemeEditorProps) {
           >
             {/* Logo */}
             {theme.logoUrl && (
-              <img
+              <Image
                 src={theme.logoUrl}
                 alt="Event logo"
+                width={96}
+                height={96}
                 className="mx-auto h-24 w-24 object-contain mb-4"
               />
             )}
