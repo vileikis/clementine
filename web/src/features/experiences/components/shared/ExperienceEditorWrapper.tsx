@@ -86,8 +86,8 @@ export function ExperienceEditorWrapper({
       throw new Error(result.error.message);
     }
 
-    // Redirect to welcome screen after deletion
-    router.push(`/events/${eventId}/design/welcome`);
+    // Redirect to design after deletion
+    router.push(`/events/${eventId}/design`);
   };
 
   return (
