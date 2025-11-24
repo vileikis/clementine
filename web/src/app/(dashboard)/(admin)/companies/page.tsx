@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { listCompaniesAction } from "@/features/companies";
+import { listCompaniesAction } from "@/features/companies/actions";
 import { CompanyCard } from "@/features/companies";
 import { CompanyForm } from "@/features/companies";
 import type { Company } from "@/features/companies";

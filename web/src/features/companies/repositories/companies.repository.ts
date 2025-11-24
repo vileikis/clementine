@@ -3,8 +3,8 @@
  */
 
 import { db } from "@/lib/firebase/admin";
-import type { Company, CompanyStatus } from "../types/company.types";
-import { companySchema, type CreateCompanyInput } from "../lib/schemas";
+import type { Company, CompanyStatus } from "../types";
+import { companySchema, type CreateCompanyInput } from "../schemas";
 
 /**
  * Create a new company with transaction-based uniqueness validation
@@ -48,11 +48,10 @@ export async function createCompany(
       deletedAt: null,
       createdAt: now,
       updatedAt: now,
-      // Optional metadata fields
-      ...(data.brandColor && { brandColor: data.brandColor }),
-      ...(data.contactEmail && { contactEmail: data.contactEmail }),
-      ...(data.termsUrl && { termsUrl: data.termsUrl }),
-      ...(data.privacyUrl && { privacyUrl: data.privacyUrl }),
+      // Optional metadata fields (null when not provided)
+      contactEmail: data.contactEmail ?? null,
+      termsUrl: data.termsUrl ?? null,
+      privacyUrl: data.privacyUrl ?? null,
     };
 
     txn.set(companyRef, company);
@@ -144,7 +143,6 @@ export async function updateCompany(
       name: data.name.trim(),
       updatedAt: now,
       // Optional metadata fields
-      ...(data.brandColor !== undefined && { brandColor: data.brandColor }),
       ...(data.contactEmail !== undefined && {
         contactEmail: data.contactEmail,
       }),

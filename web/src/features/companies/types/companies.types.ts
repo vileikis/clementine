@@ -8,11 +8,10 @@ export interface Company {
   status: CompanyStatus;
   deletedAt: number | null;
 
-  // Optional branding metadata
-  brandColor?: string;
-  contactEmail?: string;
-  termsUrl?: string;
-  privacyUrl?: string;
+  // Optional metadata (Firestore-safe: null instead of undefined)
+  contactEmail: string | null;
+  termsUrl: string | null;
+  privacyUrl: string | null;
 
   createdAt: number;
   updatedAt: number;

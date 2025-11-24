@@ -1,13 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import type { Company } from "../types/company.types";
+import type { Company } from "../types";
 
 interface CompanyCardProps {
   company: Company;
-  eventCount?: number;
 }
 
+/**
+ * Company card component for displaying company information in lists
+ * @param company - Company data to display
+ */
 export function CompanyCard({ company }: CompanyCardProps) {
   const formattedDate = new Date(company.createdAt).toLocaleDateString("en-US", {
     year: "numeric",
@@ -26,15 +29,6 @@ export function CompanyCard({ company }: CompanyCardProps) {
               {eventCount} {eventCount === 1 ? "event" : "events"}
             </p> */}
           </div>
-
-          {/* Optional brand color indicator */}
-          {company.brandColor && (
-            <div
-              className="w-8 h-8 rounded border flex-shrink-0"
-              style={{ backgroundColor: company.brandColor }}
-              title={`Brand color: ${company.brandColor}`}
-            />
-          )}
         </div>
 
         {/* Metadata */}
