@@ -18,7 +18,7 @@ const mockCollection = (firebaseAdmin as typeof firebaseAdmin & { __mockCollecti
 
 // Mock dependencies
 jest.mock("../repositories/events");
-jest.mock("@/features/companies/repositories/companies");
+jest.mock("@/features/companies/repositories/companies.repository");
 jest.mock("@/lib/auth");
 jest.mock("next/cache", () => ({
   revalidatePath: jest.fn(),

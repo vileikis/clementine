@@ -280,6 +280,7 @@ describe("Discriminated Union Schema", () => {
       hidden: false,
       config: {
         surveyStepIds: ["step_1", "step_2", "step_3"],
+        stepsOrder: ["step_1", "step_2", "step_3"],
         required: true,
         showProgressBar: true,
       },
