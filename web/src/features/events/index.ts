@@ -39,7 +39,9 @@ export {
   listEventsAction,
   updateEventBrandingAction,
   updateEventStatusAction,
-  updateEventTitleAction,
+  updateEventNameAction,
+  updateEventTheme,
+  updateEventSwitchboardAction,
 } from "./actions/events";
 
 // ============================================================================
@@ -48,6 +50,10 @@ export {
 export type {
   Event,
   EventStatus,
+  EventTheme,
+  EventThemeText,
+  EventThemeButton,
+  EventThemeBackground,
 } from "./types/event.types";
 
 // ============================================================================
@@ -57,6 +63,15 @@ export {
   eventStatusSchema,
   eventSchema,
 } from "./schemas";
+
+// ============================================================================
+// Constants (Safe to export)
+// ============================================================================
+export {
+  NAME_LENGTH,
+  COLOR_REGEX,
+  THEME_DEFAULTS,
+} from "./constants";
 
 // ============================================================================
 // Repository & Cache - NOT EXPORTED

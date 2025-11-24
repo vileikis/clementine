@@ -3,11 +3,12 @@
 import { db } from "@/lib/firebase/admin";
 import type { Event } from "../types/event.types";
 import { eventSchema } from "../schemas";
+import { THEME_DEFAULTS } from "../constants";
 
 export async function createEvent(data: {
-  title: string;
-  companyId: string;
-  buttonColor?: string;
+  name: string;
+  ownerId: string;
+  primaryColor: string;
 }): Promise<string> {
   const eventRef = db.collection("events").doc();
 
@@ -17,24 +18,19 @@ export async function createEvent(data: {
 
   const event: Event = {
     id: eventId,
-    title: data.title,
-    companyId: data.companyId,
+    name: data.name,
+    ownerId: data.ownerId,
     status: "draft",
     joinPath,
     qrPngPath: `events/${eventId}/qr/join.png`,
+    activeJourneyId: null,
     createdAt: now,
     updatedAt: now,
-    // Initialize theme with button color if provided
-    ...(data.buttonColor && {
-      theme: {
-        buttonColor: data.buttonColor,
-      },
-    }),
-    // Denormalized counters
-    experiencesCount: 0,
-    sessionsCount: 0,
-    readyCount: 0,
-    sharesCount: 0,
+    // Initialize full theme structure with defaults
+    theme: {
+      ...THEME_DEFAULTS,
+      primaryColor: data.primaryColor,
+    },
   };
 
   await eventRef.set(event);
@@ -49,34 +45,34 @@ export async function getEvent(eventId: string): Promise<Event | null> {
 }
 
 export async function listEvents(filters?: {
-  companyId?: string | null;
+  ownerId?: string | null;
 }): Promise<Event[]> {
   let query: FirebaseFirestore.Query<FirebaseFirestore.DocumentData> = db.collection("events");
 
-  // Special handling for "no company" filter
+  // Special handling for "no owner" filter
   // Need to fetch all events and filter server-side because Firestore
   // doesn't match undefined fields with null queries
-  if (filters?.companyId === null) {
+  if (filters?.ownerId === null) {
     const snapshot = await query.orderBy("createdAt", "desc").get();
     const allEvents = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     })) as Event[];
 
-    // Filter for events without companyId (null or undefined)
-    const eventsWithoutCompany = allEvents.filter(
+    // Filter for events without ownerId (null or undefined)
+    const eventsWithoutOwner = allEvents.filter(
       (event) =>
-        event.companyId === null ||
-        event.companyId === undefined ||
-        event.companyId === ""
+        event.ownerId === null ||
+        event.ownerId === undefined ||
+        event.ownerId === ""
     );
 
-    return eventsWithoutCompany.map((event) => eventSchema.parse(event));
+    return eventsWithoutOwner.map((event) => eventSchema.parse(event));
   }
 
-  // Apply companyId filter for specific company
-  if (filters?.companyId !== undefined) {
-    query = query.where("companyId", "==", filters.companyId);
+  // Apply ownerId filter for specific owner
+  if (filters?.ownerId !== undefined) {
+    query = query.where("ownerId", "==", filters.ownerId);
   }
 
   const snapshot = await query.orderBy("createdAt", "desc").get();
@@ -97,7 +93,7 @@ export async function updateEventBranding(
 
 export async function updateEventStatus(
   eventId: string,
-  status: "draft" | "live" | "archived"
+  status: "draft" | "published" | "archived"
 ): Promise<void> {
   await db.collection("events").doc(eventId).update({
     status,
@@ -105,12 +101,12 @@ export async function updateEventStatus(
   });
 }
 
-export async function updateEventTitle(
+export async function updateEventName(
   eventId: string,
-  title: string
+  name: string
 ): Promise<void> {
   await db.collection("events").doc(eventId).update({
-    title,
+    name,
     updatedAt: Date.now(),
   });
 }
