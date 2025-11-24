@@ -125,7 +125,8 @@ export const storage = admin.storage().bucket();
 "use server";
 
 import { db } from "@/lib/firebase/admin";
-import { createEventSchema } from "@/lib/schemas/events";
+import { createEventSchema } from "../schemas";
+import { revalidatePath } from "next/cache";
 
 export async function createEventAction(input: unknown) {
   // Server-side validation
@@ -139,7 +140,7 @@ export async function createEventAction(input: unknown) {
   });
 
   revalidatePath("/events");
-  return { eventId: eventRef.id };
+  return { success: true, data: { eventId: eventRef.id } };
 }
 ```
 
@@ -264,19 +265,33 @@ events/{eventId}/
 Group related operations in repositories (use Admin SDK):
 
 ```typescript
-// web/src/lib/repositories/events.ts
+// features/events/repositories/events.repository.ts
 import { db } from "@/lib/firebase/admin";
+import type { CreateEventInput, Event } from "../types";
 
-export async function createEvent(data: CreateEventInput) {
+export async function createEvent(data: CreateEventInput): Promise<Event> {
   const eventRef = db.collection("events").doc();
-  const sceneRef = eventRef.collection("scenes").doc();
 
-  await db.runTransaction(async (txn) => {
-    txn.set(eventRef, { ...eventData });
-    txn.set(sceneRef, { ...defaultSceneData });
-  });
+  const eventData: Event = {
+    ...data,
+    id: eventRef.id,
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  };
 
-  return eventRef.id;
+  await eventRef.set(eventData);
+
+  return eventData;
+}
+
+export async function getEvent(eventId: string): Promise<Event | null> {
+  const snapshot = await db.collection("events").doc(eventId).get();
+
+  if (!snapshot.exists) {
+    return null;
+  }
+
+  return snapshot.data() as Event;
 }
 ```
 
@@ -497,18 +512,39 @@ await updateDoc(doc(db, "events", id), data); // Will fail due to rules
 
 ### 5. Type Safety with Zod
 
+Define schemas with Firestore-safe optional fields:
+
 ```typescript
-// ✅ Good: Validate data
-const eventSchema = z.object({
+// features/events/schemas/events.schemas.ts
+import { z } from "zod";
+
+export const eventSchema = z.object({
   title: z.string().min(1).max(100),
-  brandColor: z.string().regex(/^#[0-9A-F]{6}$/i),
+  description: z.string().nullable().optional().default(null), // Firestore-safe
+  brandColor: z.string().regex(/^#[0-9A-F]{6}$/i).nullable().optional().default(null),
 });
 
+export const createEventInputSchema = eventSchema.omit({ id: true, createdAt: true });
+```
+
+```typescript
+// features/events/actions/events.actions.ts
+"use server";
+
+import { createEventInputSchema } from "../schemas";
+import { createEvent } from "../repositories";
+
 export async function createEventAction(input: unknown) {
-  const validated = eventSchema.parse(input); // Runtime validation
-  // ...
+  const validated = createEventInputSchema.parse(input); // Runtime validation
+  const event = await createEvent(validated);
+  return { success: true, data: event };
 }
 ```
+
+**Key points:**
+- Use `.nullable().optional().default(null)` for optional fields (prevents `undefined` in Firestore)
+- Separate schemas for create/update operations (use `.omit()`, `.pick()`, `.partial()`)
+- Import schemas from feature's `schemas/` folder using relative imports
 
 ## Common Mistakes
 
