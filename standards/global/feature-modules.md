@@ -40,6 +40,7 @@ features/[feature-name]/
 ├── utils/              # Pure helper functions
 │   ├── [purpose].utils.ts
 │   └── index.ts        # Barrel export for all utils
+├── constants.ts        # Feature-specific constants (validation constraints, enums, etc.)
 └── index.ts            # Public API (exports components, hooks, types ONLY)
 ```
 
@@ -221,6 +222,66 @@ export type CreateEventInput = Omit<Event, 'id' | 'createdAt'>;
 Pure helper functions and utilities specific to this feature. Use for domain-specific logic that doesn't fit elsewhere.
 
 **File naming:** `[purpose].utils.ts` (e.g., `url.utils.ts`, `date.utils.ts`)
+
+### `/constants.ts`
+Feature-specific constants for **validation constraints** and **configuration values**. Use this to eliminate magic numbers in schemas and make constraints reusable across validation, UI hints, and error messages.
+
+**What to include:**
+- ✅ Validation constraints (min/max lengths, numeric ranges)
+- ✅ Configuration values (timeouts, limits, thresholds)
+- ✅ Magic numbers used in business logic
+
+**What NOT to include:**
+- ❌ Enums/union types (define inline in schemas - they're part of the inferred type)
+- ❌ TypeScript types (use `types/` folder)
+
+**Example:**
+```typescript
+// features/experiences/constants.ts
+
+export const EXPERIENCE_CONSTRAINTS = {
+  SPIN_DURATION_MS: { min: 2000, max: 5000 },
+  LABEL_LENGTH: { min: 1, max: 100 },
+  COUNTDOWN_DURATION_MS: { min: 3000, max: 10000 },
+} as const;
+
+export const UPLOAD_LIMITS = {
+  MAX_FILE_SIZE_MB: 10,
+  ALLOWED_IMAGE_TYPES: ['image/jpeg', 'image/png', 'image/webp'] as const,
+} as const;
+```
+
+**Usage in schemas:**
+```typescript
+// features/experiences/schemas/experiences.schemas.ts
+import { EXPERIENCE_CONSTRAINTS } from '../constants';
+
+export const experienceSchema = z.object({
+  type: z.enum(['photo', 'video', 'gif', 'wheel']), // ✅ Enum inline (part of type)
+  label: z.string()
+    .min(EXPERIENCE_CONSTRAINTS.LABEL_LENGTH.min)
+    .max(EXPERIENCE_CONSTRAINTS.LABEL_LENGTH.max),
+  spinDurationMs: z.number()
+    .int()
+    .min(EXPERIENCE_CONSTRAINTS.SPIN_DURATION_MS.min)
+    .max(EXPERIENCE_CONSTRAINTS.SPIN_DURATION_MS.max),
+});
+
+// ✅ Inferred type includes the enum inline
+type Experience = z.infer<typeof experienceSchema>;
+// { type: 'photo' | 'video' | 'gif' | 'wheel', label: string, ... }
+```
+
+**Reusing constraints in UI:**
+```typescript
+// features/experiences/components/ExperienceForm.tsx
+import { EXPERIENCE_CONSTRAINTS } from '../constants';
+
+<Input
+  maxLength={EXPERIENCE_CONSTRAINTS.LABEL_LENGTH.max}
+  helperText={`Max ${EXPERIENCE_CONSTRAINTS.LABEL_LENGTH.max} characters`}
+/>
+```
 
 ### `/index.ts`
 The feature's **public API**. Exports ONLY components, hooks, and types. Does NOT export actions, schemas, or repositories.
