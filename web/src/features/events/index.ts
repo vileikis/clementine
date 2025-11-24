@@ -48,7 +48,6 @@ export {
 export type {
   Event,
   EventStatus,
-  ShareSocial,
 } from "./types/event.types";
 
 // ============================================================================

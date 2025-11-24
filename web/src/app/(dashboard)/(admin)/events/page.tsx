@@ -20,7 +20,7 @@ export default async function EventsPage({
   if (!result.success) {
     return (
       <div className="text-center py-12">
-        <p className="text-red-500">Failed to load events: {result.error}</p>
+        <p className="text-red-500">Failed to load events: {result.error?.message || "Unknown error"}</p>
       </div>
     )
   }

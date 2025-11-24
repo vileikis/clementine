@@ -36,7 +36,7 @@ export function EditableEventName({
         setIsOpen(false)
         router.refresh()
       } else {
-        setError(result.error || "Failed to update event name")
+        setError(result.error?.message || "Failed to update event name")
       }
     })
   }

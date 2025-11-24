@@ -90,7 +90,7 @@ export function EventForm({ onSuccess }: EventFormProps) {
         }
         router.push(`/events/${result.eventId}`)
       } else {
-        setError(result.error || "Failed to create event")
+        setError(result.error?.message || "Failed to create event")
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred")
