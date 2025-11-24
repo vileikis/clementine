@@ -29,7 +29,7 @@ export default async function JourneyEditorLayout({
       <EditorHeader
         breadcrumbs={[
           { label: "Events", href: "/events" },
-          { label: event.title, href: `/events/${eventId}/design` },
+          { label: event.name, href: `/events/${eventId}/design` },
           { label: `Journey ${journeyId}` },
         ]}
         exitUrl={`/events/${eventId}/design/journeys`}

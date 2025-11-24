@@ -28,8 +28,9 @@ describe("Events Repository", () => {
       });
 
       const eventId = await createEvent({
-        title: "Summer Festival",
-        companyId: "company-123",
+        name: "Summer Festival",
+        ownerId: "company-123",
+        primaryColor: "#3B82F6",
       });
 
       expect(eventId).toBe("event-123");
@@ -40,18 +41,14 @@ describe("Events Repository", () => {
       const eventData = mockEventRef.set.mock.calls[0][0] as Event;
       expect(eventData).toMatchObject({
         id: "event-123",
-        title: "Summer Festival",
-        companyId: "company-123",
+        name: "Summer Festival",
+        ownerId: "company-123",
         status: "draft",
         joinPath: "/join/event-123",
         qrPngPath: "events/event-123/qr/join.png",
-        share: {
-          allowDownload: true,
-          allowSystemShare: true,
-          allowEmail: false,
-          socials: [],
-        },
       });
+      expect(eventData.theme).toBeDefined();
+      expect(eventData.theme.primaryColor).toBe("#3B82F6");
       expect(eventData.createdAt).toBeGreaterThan(0);
       expect(eventData.updatedAt).toBe(eventData.createdAt);
     });
@@ -252,13 +249,13 @@ describe("Events Repository", () => {
         where: mockWhere,
       });
 
-      const events = await listEvents({ companyId: "company-a" });
+      const events = await listEvents({ ownerId: "company-a" });
 
       expect(mockDb.collection).toHaveBeenCalledWith("events");
-      expect(mockWhere).toHaveBeenCalledWith("companyId", "==", "company-a");
+      expect(mockWhere).toHaveBeenCalledWith("ownerId", "==", "company-a");
       expect(mockOrderBy).toHaveBeenCalledWith("createdAt", "desc");
       expect(events).toHaveLength(1);
-      expect(events[0].companyId).toBe("company-a");
+      expect(events[0].ownerId).toBe("company-a");
     });
 
     it("filters events with no company when companyId is null", async () => {
@@ -308,12 +305,12 @@ describe("Events Repository", () => {
         orderBy: mockOrderBy,
       });
 
-      const events = await listEvents({ companyId: null });
+      const events = await listEvents({ ownerId: null });
 
       expect(mockDb.collection).toHaveBeenCalledWith("events");
       expect(mockOrderBy).toHaveBeenCalledWith("createdAt", "desc");
       expect(events).toHaveLength(1);
-      expect(events[0].companyId).toBeNull();
+      expect(events[0].ownerId).toBeNull();
     });
   });
 

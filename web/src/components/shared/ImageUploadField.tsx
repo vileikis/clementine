@@ -11,7 +11,7 @@ interface ImageUploadFieldProps {
   label: string;
   value: string;
   onChange: (url: string) => void;
-  destination: "welcome" | "experience-preview" | "experience-overlay" | "ai-reference";
+  destination: "welcome" | "experience-preview" | "experience-overlay" | "ai-reference" | "logos" | "backgrounds";
   disabled?: boolean;
   recommendedSize?: string;
   accept?: string;

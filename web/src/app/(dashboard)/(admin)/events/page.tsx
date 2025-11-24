@@ -9,12 +9,12 @@ export default async function EventsPage({
   searchParams: Promise<{ companyId?: string }>
 }) {
   const params = await searchParams
-  const companyIdFilter = params.companyId === "no-company"
+  const ownerIdFilter = params.companyId === "no-company"
     ? null
     : params.companyId || undefined
 
   const result = await listEventsAction(
-    companyIdFilter !== undefined ? { companyId: companyIdFilter } : undefined
+    ownerIdFilter !== undefined ? { ownerId: ownerIdFilter } : undefined
   )
 
   if (!result.success) {
@@ -41,14 +41,14 @@ export default async function EventsPage({
   const eventsWithCompanies = events
     .filter(event => {
       // Include events with no company
-      if (!event.companyId) return true
+      if (!event.ownerId) return true
 
       // Include only if company is in active list (excludes deleted companies)
-      return activeCompanyIds.has(event.companyId)
+      return activeCompanyIds.has(event.ownerId)
     })
     .map(event => ({
       event,
-      companyName: event.companyId ? companyMap.get(event.companyId) ?? null : null
+      companyName: event.ownerId ? companyMap.get(event.ownerId) ?? null : null
     }))
 
   return (
