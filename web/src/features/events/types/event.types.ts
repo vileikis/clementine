@@ -1,6 +1,6 @@
 // Event-related TypeScript types
 
-export type EventStatus = "draft" | "published" | "archived";
+export type EventStatus = "draft" | "live" | "archived";
 
 /**
  * Theme text configuration

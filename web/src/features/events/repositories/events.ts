@@ -93,7 +93,7 @@ export async function updateEventBranding(
 
 export async function updateEventStatus(
   eventId: string,
-  status: "draft" | "published" | "archived"
+  status: "draft" | "live" | "archived"
 ): Promise<void> {
   await db.collection("events").doc(eventId).update({
     status,

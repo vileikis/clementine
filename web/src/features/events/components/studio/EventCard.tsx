@@ -32,7 +32,7 @@ export function EventCard({ event, companyName }: EventCardProps) {
     >
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1 min-w-0">
-          <h3 className="text-lg font-semibold">{event.title}</h3>
+          <h3 className="text-lg font-semibold">{event.name}</h3>
           {companyName && (
             <p className="text-sm text-muted-foreground mt-1">
               {companyName}
@@ -50,9 +50,9 @@ export function EventCard({ event, companyName }: EventCardProps) {
         <div className="flex items-center gap-2">
           <div
             className="w-4 h-4 rounded border"
-            style={{ backgroundColor: event.theme?.buttonColor ?? "#FFFFFF" }}
+            style={{ backgroundColor: event.theme.primaryColor }}
           />
-          <span>{event.theme?.buttonColor ?? "#FFFFFF"}</span>
+          <span>{event.theme.primaryColor}</span>
         </div>
 
         <div>

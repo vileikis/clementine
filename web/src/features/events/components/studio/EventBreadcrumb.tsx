@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { updateEventTitleAction } from "../../actions/events";
+import { updateEventNameAction } from "../../actions/events";
 import { useRouter } from "next/navigation";
 
 interface EventBreadcrumbProps {
@@ -26,7 +26,7 @@ interface EventBreadcrumbProps {
  */
 export function EventBreadcrumb({ eventId, eventName }: EventBreadcrumbProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [title, setTitle] = useState(eventName);
+  const [name, setName] = useState(eventName);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
@@ -34,7 +34,7 @@ export function EventBreadcrumb({ eventId, eventName }: EventBreadcrumbProps) {
   const handleSave = () => {
     setError(null);
     startTransition(async () => {
-      const result = await updateEventTitleAction(eventId, title);
+      const result = await updateEventNameAction(eventId, name);
       if (result.success) {
         setIsOpen(false);
         router.refresh();
@@ -45,7 +45,7 @@ export function EventBreadcrumb({ eventId, eventName }: EventBreadcrumbProps) {
   };
 
   const handleCancel = () => {
-    setTitle(eventName);
+    setName(eventName);
     setError(null);
     setIsOpen(false);
   };
@@ -84,10 +84,10 @@ export function EventBreadcrumb({ eventId, eventName }: EventBreadcrumbProps) {
 
           <div className="py-4">
             <Input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               placeholder="Event name"
-              maxLength={100}
+              maxLength={200}
               disabled={isPending}
             />
             {error && <p className="text-sm text-destructive mt-2">{error}</p>}
