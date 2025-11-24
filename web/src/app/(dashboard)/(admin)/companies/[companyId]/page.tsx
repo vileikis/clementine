@@ -292,7 +292,7 @@ export default function CompanyDetailPage({ params }: CompanyDetailPageProps) {
               </span>
             </div>
           </div>
-          <Link href={`/events?companyId=${company.id}`}>
+          <Link href={`/events?ownerId=${company.id}`}>
             <Button variant="outline" size="sm">
               View Events ({eventCount})
             </Button>

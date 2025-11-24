@@ -18,17 +18,17 @@ export function CompanyFilter({ companies }: CompanyFilterProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const currentCompanyId = searchParams.get("companyId");
+  const currentCompanyId = searchParams.get("ownerId");
 
   const handleFilterChange = (value: string) => {
     const params = new URLSearchParams(searchParams.toString());
 
     if (value === "all") {
       // Remove companyId filter
-      params.delete("companyId");
+      params.delete("ownerId");
     } else {
       // Set companyId filter
-      params.set("companyId", value);
+      params.set("ownerId", value);
     }
 
     // Navigate to updated URL
