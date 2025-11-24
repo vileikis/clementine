@@ -18,8 +18,6 @@ export default async function ResultsPage({ params }: ResultsPageProps) {
     notFound();
   }
 
-  const event = result.event;
-
   return (
     <main className="container mx-auto px-6 py-8">
       <div className="space-y-8">

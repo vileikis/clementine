@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Upload } from "lucide-react";
@@ -83,10 +84,11 @@ export function ImageUploadField({
                 className="h-full w-full object-contain"
               />
             ) : (
-              <img
+              <Image
                 src={value}
                 alt={label}
-                className="h-full w-full object-contain"
+                fill
+                className="object-contain"
               />
             )}
             <Button
