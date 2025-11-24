@@ -180,7 +180,7 @@ export async function updateEventBrandingAction(
 
 export async function updateEventStatusAction(
   eventId: string,
-  status: "draft" | "published" | "archived"
+  status: "draft" | "live" | "archived"
 ) {
   // Verify admin authentication
   const auth = await verifyAdminSecret();

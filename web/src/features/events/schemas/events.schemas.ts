@@ -6,7 +6,7 @@ import {
 } from "../constants";
 
 // Event schemas
-export const eventStatusSchema = z.enum(["draft", "published", "archived"]);
+export const eventStatusSchema = z.enum(["draft", "live", "archived"]);
 
 /**
  * Theme text configuration

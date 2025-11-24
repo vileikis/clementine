@@ -16,17 +16,17 @@ export function EventForm({ onSuccess }: EventFormProps) {
   const [error, setError] = useState<string | null>(null)
 
   // Form state
-  const [title, setTitle] = useState("")
-  const [buttonColor, setButtonColor] = useState("#0EA5E9")
-  const [companyId, setCompanyId] = useState<string>("")
+  const [name, setName] = useState("")
+  const [primaryColor, setPrimaryColor] = useState("#0EA5E9")
+  const [ownerId, setOwnerId] = useState<string>("")
 
   // Companies list
   const [companies, setCompanies] = useState<Company[]>([])
   const [loadingCompanies, setLoadingCompanies] = useState(true)
 
   // Validation errors
-  const [titleError, setTitleError] = useState<string | null>(null)
-  const [companyError, setCompanyError] = useState<string | null>(null)
+  const [nameError, setNameError] = useState<string | null>(null)
+  const [ownerError, setOwnerError] = useState<string | null>(null)
 
   // Load companies on mount
   useEffect(() => {
@@ -41,25 +41,25 @@ export function EventForm({ onSuccess }: EventFormProps) {
     loadCompanies()
   }, [])
 
-  const validateTitle = (value: string): boolean => {
+  const validateName = (value: string): boolean => {
     if (!value.trim()) {
-      setTitleError("Title is required")
+      setNameError("Name is required")
       return false
     }
-    if (value.length > 100) {
-      setTitleError("Title must be 100 characters or less")
+    if (value.length > 200) {
+      setNameError("Name must be 200 characters or less")
       return false
     }
-    setTitleError(null)
+    setNameError(null)
     return true
   }
 
-  const validateCompany = (value: string): boolean => {
+  const validateOwner = (value: string): boolean => {
     if (!value) {
-      setCompanyError("Company is required")
+      setOwnerError("Owner is required")
       return false
     }
-    setCompanyError(null)
+    setOwnerError(null)
     return true
   }
 
@@ -68,9 +68,9 @@ export function EventForm({ onSuccess }: EventFormProps) {
     setError(null)
 
     // Validate
-    const isTitleValid = validateTitle(title)
-    const isCompanyValid = validateCompany(companyId)
-    if (!isTitleValid || !isCompanyValid) {
+    const isNameValid = validateName(name)
+    const isOwnerValid = validateOwner(ownerId)
+    if (!isNameValid || !isOwnerValid) {
       return
     }
 
@@ -78,9 +78,9 @@ export function EventForm({ onSuccess }: EventFormProps) {
 
     try {
       const result = await createEventAction({
-        title: title.trim(),
-        buttonColor,
-        companyId,
+        name: name.trim(),
+        primaryColor,
+        ownerId,
       })
 
       if (result.success && result.eventId) {
@@ -101,58 +101,58 @@ export function EventForm({ onSuccess }: EventFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Title Input */}
+      {/* Name Input */}
       <div>
         <label
-          htmlFor="title"
+          htmlFor="name"
           className="block text-sm font-medium mb-2"
         >
-          Event Title <span className="text-red-500">*</span>
+          Event Name <span className="text-red-500">*</span>
         </label>
         <input
           type="text"
-          id="title"
-          value={title}
+          id="name"
+          value={name}
           onChange={(e) => {
-            setTitle(e.target.value)
-            if (titleError) validateTitle(e.target.value)
+            setName(e.target.value)
+            if (nameError) validateName(e.target.value)
           }}
-          onBlur={() => validateTitle(title)}
+          onBlur={() => validateName(name)}
           className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 ${
-            titleError
+            nameError
               ? "border-red-500 focus:ring-red-500"
               : "border-input focus:ring-primary"
           }`}
           placeholder="My Awesome Event"
           disabled={isSubmitting}
-          maxLength={100}
+          maxLength={200}
         />
-        {titleError && (
-          <p className="text-sm text-red-500 mt-1">{titleError}</p>
+        {nameError && (
+          <p className="text-sm text-red-500 mt-1">{nameError}</p>
         )}
         <p className="text-sm text-muted-foreground mt-1">
-          {title.length}/100 characters
+          {name.length}/200 characters
         </p>
       </div>
 
-      {/* Company Selector */}
+      {/* Owner/Company Selector */}
       <div>
         <label
-          htmlFor="company"
+          htmlFor="owner"
           className="block text-sm font-medium mb-2"
         >
-          Company <span className="text-red-500">*</span>
+          Owner (Company) <span className="text-red-500">*</span>
         </label>
         <select
-          id="company"
-          value={companyId}
+          id="owner"
+          value={ownerId}
           onChange={(e) => {
-            setCompanyId(e.target.value)
-            if (companyError) validateCompany(e.target.value)
+            setOwnerId(e.target.value)
+            if (ownerError) validateOwner(e.target.value)
           }}
-          onBlur={() => validateCompany(companyId)}
+          onBlur={() => validateOwner(ownerId)}
           className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 bg-background ${
-            companyError
+            ownerError
               ? "border-red-500 focus:ring-red-500"
               : "border-input focus:ring-primary"
           }`}
@@ -165,39 +165,39 @@ export function EventForm({ onSuccess }: EventFormProps) {
             </option>
           ))}
         </select>
-        {companyError && (
-          <p className="text-sm text-red-500 mt-1">{companyError}</p>
+        {ownerError && (
+          <p className="text-sm text-red-500 mt-1">{ownerError}</p>
         )}
         <p className="text-sm text-muted-foreground mt-1">
           Associate this event with a brand or client
         </p>
       </div>
 
-      {/* Button Color Picker */}
+      {/* Primary Color Picker */}
       <div>
         <label
-          htmlFor="buttonColor"
+          htmlFor="primaryColor"
           className="block text-sm font-medium mb-2"
         >
-          Button Color
+          Primary Color
         </label>
         <div className="flex items-center gap-3">
           <input
             type="color"
-            id="buttonColor"
-            value={buttonColor}
-            onChange={(e) => setButtonColor(e.target.value)}
+            id="primaryColor"
+            value={primaryColor}
+            onChange={(e) => setPrimaryColor(e.target.value)}
             className="h-12 w-20 border border-input rounded-md cursor-pointer"
             disabled={isSubmitting}
           />
           <input
             type="text"
-            value={buttonColor}
+            value={primaryColor}
             onChange={(e) => {
               const value = e.target.value
               // Allow typing hex colors
               if (/^#[0-9A-Fa-f]{0,6}$/.test(value)) {
-                setButtonColor(value)
+                setPrimaryColor(value)
               }
             }}
             className="flex-1 px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary font-mono"
@@ -207,7 +207,7 @@ export function EventForm({ onSuccess }: EventFormProps) {
           />
         </div>
         <p className="text-sm text-muted-foreground mt-1">
-          This color will be used for buttons throughout the event
+          This color will be used as the primary color throughout the event
         </p>
       </div>
 
@@ -222,7 +222,7 @@ export function EventForm({ onSuccess }: EventFormProps) {
       <div className="flex items-center gap-3">
         <button
           type="submit"
-          disabled={isSubmitting || !title.trim() || !companyId}
+          disabled={isSubmitting || !name.trim() || !ownerId}
           className="flex-1 inline-flex items-center justify-center rounded-md bg-primary px-6 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isSubmitting ? "Creating..." : "Create Event"}
