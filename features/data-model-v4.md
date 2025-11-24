@@ -71,7 +71,7 @@ interface Event {
 
 ### 2.2. EXPERIENCE: Experiences Collection
 
-**Path:** `/Experiences/{experienceId}`
+**Path:** `/experiences/{experienceId}`
 
 A Experience is an atomic, self-contained configuration for a specific AI experience (e.g., "80s Movie Star", "Cyberpunk Hero"). It defines the output type, required inputs, hardware rules, and the AI prompt template.
 
@@ -92,6 +92,18 @@ interface Experience {
   id: string;
   eventId: string; // The event this experience belongs to
   name: string; // Internal name
+  // 1. The source of truth for how to render the player
+  previewType: z.enum(["image", "gif", "video"]),
+
+  // 2. The heavy asset (The actual GIF or Video file)
+  previewMediaUrl: z.url().optional(),
+
+  // 3. The lightweight asset (Static JPG/PNG)
+  // CRITICAL for grid views so you don't kill bandwidth loading 50 videos
+  posterUrl: z..url().optional(),
+
+  enabled: boolean;
+
 
   // 1. THE ENGINE (Output Type)
   // Determines which camera UI to load.
@@ -117,7 +129,7 @@ interface Experience {
 
   // 4. AI CONFIGURATION
   aiConfig: {
-    engine: "stable-diffusion-xl" | "flux" | "kling-video";
+    model: "nanobanano", "stable-diffusion-xl" | "flux" | "kling-video";
     // Handlebars syntax used to inject values from inputFields
     // e.g., "A portrait of {{guest_name}} in the style of {{selected_vibe}}"
     prompt: string;

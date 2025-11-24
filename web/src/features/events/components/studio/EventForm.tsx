@@ -17,7 +17,6 @@ export function EventForm({ onSuccess }: EventFormProps) {
 
   // Form state
   const [name, setName] = useState("")
-  const [primaryColor, setPrimaryColor] = useState("#0EA5E9")
   const [ownerId, setOwnerId] = useState<string>("")
 
   // Companies list
@@ -79,7 +78,7 @@ export function EventForm({ onSuccess }: EventFormProps) {
     try {
       const result = await createEventAction({
         name: name.trim(),
-        primaryColor,
+        primaryColor: "#3B82F6", // Default theme color
         ownerId,
       })
 
@@ -170,44 +169,6 @@ export function EventForm({ onSuccess }: EventFormProps) {
         )}
         <p className="text-sm text-muted-foreground mt-1">
           Associate this event with a brand or client
-        </p>
-      </div>
-
-      {/* Primary Color Picker */}
-      <div>
-        <label
-          htmlFor="primaryColor"
-          className="block text-sm font-medium mb-2"
-        >
-          Primary Color
-        </label>
-        <div className="flex items-center gap-3">
-          <input
-            type="color"
-            id="primaryColor"
-            value={primaryColor}
-            onChange={(e) => setPrimaryColor(e.target.value)}
-            className="h-12 w-20 border border-input rounded-md cursor-pointer"
-            disabled={isSubmitting}
-          />
-          <input
-            type="text"
-            value={primaryColor}
-            onChange={(e) => {
-              const value = e.target.value
-              // Allow typing hex colors
-              if (/^#[0-9A-Fa-f]{0,6}$/.test(value)) {
-                setPrimaryColor(value)
-              }
-            }}
-            className="flex-1 px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary font-mono"
-            placeholder="#0EA5E9"
-            disabled={isSubmitting}
-            maxLength={7}
-          />
-        </div>
-        <p className="text-sm text-muted-foreground mt-1">
-          This color will be used as the primary color throughout the event
         </p>
       </div>
 

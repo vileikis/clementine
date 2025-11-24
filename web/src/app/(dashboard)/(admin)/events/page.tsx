@@ -6,12 +6,12 @@ import { CompanyFilter } from "@/features/companies"
 export default async function EventsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ companyId?: string }>
+  searchParams: Promise<{ ownerId?: string }>
 }) {
   const params = await searchParams
-  const ownerIdFilter = params.companyId === "no-company"
+  const ownerIdFilter = params.ownerId === "no-company"
     ? null
-    : params.companyId || undefined
+    : params.ownerId || undefined
 
   const result = await listEventsAction(
     ownerIdFilter !== undefined ? { ownerId: ownerIdFilter } : undefined
