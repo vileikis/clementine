@@ -12,7 +12,7 @@ import {
   listEvents,
   updateEventBranding,
   updateEventStatus,
-  updateEventTitle,
+  updateEventName,
 } from "../repositories/events";
 import { getCompany } from "@/features/companies/repositories/companies.repository";
 import {
@@ -35,9 +35,9 @@ export type ActionResponse<T = void> =
 // ============================================================================
 
 const createEventInput = z.object({
-  title: z.string().min(1, "Title is required").max(100, "Title too long"),
-  buttonColor: z.string().regex(/^#[0-9A-F]{6}$/i, "Invalid hex color"),
-  companyId: z.string().min(1, "Company is required"),
+  name: z.string().min(1, "Name is required").max(200, "Name too long"),
+  primaryColor: z.string().regex(/^#[0-9A-F]{6}$/i, "Invalid hex color"),
+  ownerId: z.string().min(1, "Owner is required"),
 });
 
 export async function createEventAction(
@@ -58,14 +58,14 @@ export async function createEventAction(
   try {
     const validated = createEventInput.parse(input);
 
-    // Validate company exists
-    const company = await getCompany(validated.companyId);
+    // Validate owner (company) exists and is active
+    const company = await getCompany(validated.ownerId);
     if (!company) {
       return {
         success: false,
         error: {
-          code: "COMPANY_NOT_FOUND",
-          message: "Company not found"
+          code: "OWNER_NOT_FOUND",
+          message: "Owner (company) not found"
         }
       };
     }
@@ -73,16 +73,16 @@ export async function createEventAction(
       return {
         success: false,
         error: {
-          code: "COMPANY_INACTIVE",
-          message: "Company is not active"
+          code: "OWNER_INACTIVE",
+          message: "Owner (company) is not active"
         }
       };
     }
 
     const eventId = await createEvent({
-      title: validated.title,
-      companyId: validated.companyId,
-      buttonColor: validated.buttonColor,
+      name: validated.name,
+      ownerId: validated.ownerId,
+      primaryColor: validated.primaryColor,
     });
     revalidatePath("/events");
     return { success: true, eventId };
@@ -131,7 +131,7 @@ export async function getEventAction(eventId: string) {
 }
 
 export async function listEventsAction(filters?: {
-  companyId?: string | null;
+  ownerId?: string | null;
 }) {
   try {
     const events = await listEvents(filters);
@@ -180,7 +180,7 @@ export async function updateEventBrandingAction(
 
 export async function updateEventStatusAction(
   eventId: string,
-  status: "draft" | "live" | "archived"
+  status: "draft" | "published" | "archived"
 ) {
   // Verify admin authentication
   const auth = await verifyAdminSecret();
@@ -210,13 +210,13 @@ export async function updateEventStatusAction(
   }
 }
 
-const updateEventTitleInput = z.object({
-  title: z.string().min(1, "Title is required").max(100, "Title too long"),
+const updateEventNameInput = z.object({
+  name: z.string().min(1, "Name is required").max(200, "Name too long"),
 });
 
-export async function updateEventTitleAction(
+export async function updateEventNameAction(
   eventId: string,
-  title: string
+  name: string
 ) {
   // Verify admin authentication
   const auth = await verifyAdminSecret();
@@ -231,8 +231,8 @@ export async function updateEventTitleAction(
   }
 
   try {
-    const validated = updateEventTitleInput.parse({ title });
-    await updateEventTitle(eventId, validated.title);
+    const validated = updateEventNameInput.parse({ name });
+    await updateEventName(eventId, validated.name);
     revalidatePath("/events");
     revalidatePath(`/events/${eventId}`);
     return { success: true };
@@ -250,7 +250,7 @@ export async function updateEventTitleAction(
       success: false,
       error: {
         code: "INTERNAL_ERROR",
-        message: error instanceof Error ? error.message : "Failed to update title"
+        message: error instanceof Error ? error.message : "Failed to update name"
       }
     };
   }
@@ -270,10 +270,23 @@ export async function updateEventTitleAction(
 export async function updateEventTheme(
   eventId: string,
   data: {
-    buttonColor?: string;
-    buttonTextColor?: string;
-    backgroundColor?: string;
-    backgroundImage?: string;
+    logoUrl?: string | null;
+    fontFamily?: string | null;
+    primaryColor?: string;
+    text?: {
+      color?: string;
+      alignment?: "left" | "center" | "right";
+    };
+    button?: {
+      backgroundColor?: string | null;
+      textColor?: string;
+      radius?: "none" | "sm" | "md" | "full";
+    };
+    background?: {
+      color?: string;
+      image?: string | null;
+      overlayOpacity?: number;
+    };
   }
 ): Promise<ActionResponse<void>> {
   try {
@@ -298,18 +311,43 @@ export async function updateEventTheme(
     };
 
     // Dynamic field mapping using Object.entries
-    const fieldMappings: Record<string, string> = {
-      buttonColor: "theme.buttonColor",
-      buttonTextColor: "theme.buttonTextColor",
-      backgroundColor: "theme.backgroundColor",
-      backgroundImage: "theme.backgroundImage",
-    };
+    // Top-level theme fields
+    if (validatedData.logoUrl !== undefined) {
+      updateData["theme.logoUrl"] = validatedData.logoUrl;
+    }
+    if (validatedData.fontFamily !== undefined) {
+      updateData["theme.fontFamily"] = validatedData.fontFamily;
+    }
+    if (validatedData.primaryColor !== undefined) {
+      updateData["theme.primaryColor"] = validatedData.primaryColor;
+    }
 
-    Object.entries(validatedData).forEach(([key, value]) => {
-      if (value !== undefined && fieldMappings[key]) {
-        updateData[fieldMappings[key]] = value;
-      }
-    });
+    // Nested text fields
+    if (validatedData.text) {
+      Object.entries(validatedData.text).forEach(([key, value]) => {
+        if (value !== undefined) {
+          updateData[`theme.text.${key}`] = value;
+        }
+      });
+    }
+
+    // Nested button fields
+    if (validatedData.button) {
+      Object.entries(validatedData.button).forEach(([key, value]) => {
+        if (value !== undefined) {
+          updateData[`theme.button.${key}`] = value;
+        }
+      });
+    }
+
+    // Nested background fields
+    if (validatedData.background) {
+      Object.entries(validatedData.background).forEach(([key, value]) => {
+        if (value !== undefined) {
+          updateData[`theme.background.${key}`] = value;
+        }
+      });
+    }
 
     // Update only provided fields - trust Firebase, catch NOT_FOUND error
     const eventRef = db.collection("events").doc(eventId);
@@ -329,9 +367,91 @@ export async function updateEventTheme(
       throw updateError;
     }
 
+    revalidatePath("/events");
+    revalidatePath(`/events/${eventId}`);
+
     return { success: true, data: undefined };
   } catch (error) {
     // Handle Zod validation errors with detailed field paths
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        error: {
+          code: "VALIDATION_ERROR",
+          message: error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join(', '),
+        },
+      };
+    }
+
+    // Handle other errors
+    return {
+      success: false,
+      error: {
+        code: "INTERNAL_ERROR",
+        message: error instanceof Error ? error.message : "Unknown error",
+      },
+    };
+  }
+}
+
+/**
+ * Updates the active journey for an event (Switchboard pattern).
+ * Controls which journey is currently live for all connected guests.
+ * @param eventId - Event ID
+ * @param activeJourneyId - Journey ID to activate, or null to deactivate
+ * @returns Success/error response
+ */
+export async function updateEventSwitchboardAction(
+  eventId: string,
+  activeJourneyId: string | null
+): Promise<ActionResponse<void>> {
+  try {
+    // Check authentication
+    const auth = await verifyAdminSecret();
+    if (!auth.authorized) {
+      return {
+        success: false,
+        error: {
+          code: "PERMISSION_DENIED",
+          message: auth.error,
+        },
+      };
+    }
+
+    // Validate input with Zod
+    const validatedData = z
+      .object({
+        activeJourneyId: z.string().nullable(),
+      })
+      .parse({ activeJourneyId });
+
+    // Update event - trust Firebase, catch NOT_FOUND error
+    const eventRef = db.collection("events").doc(eventId);
+    try {
+      await eventRef.update({
+        activeJourneyId: validatedData.activeJourneyId,
+        updatedAt: Date.now(),
+      });
+    } catch (updateError: unknown) {
+      // Firestore throws code 5 for NOT_FOUND
+      if (updateError && typeof updateError === "object" && "code" in updateError && updateError.code === 5) {
+        return {
+          success: false,
+          error: {
+            code: "EVENT_NOT_FOUND",
+            message: "Event not found",
+          },
+        };
+      }
+      throw updateError;
+    }
+
+    revalidatePath("/events");
+    revalidatePath(`/events/${eventId}`);
+
+    return { success: true, data: undefined };
+  } catch (error) {
+    // Handle Zod validation errors
     if (error instanceof z.ZodError) {
       return {
         success: false,

@@ -65,15 +65,15 @@
 
 ## Phase 3: Repository Layer (1 hour)
 
-- [ ] **Task 3.1**: Update `createEvent()`:
+- [x] **Task 3.1**: Update `createEvent()`:
   - Parameters: `name`, `ownerId`, `primaryColor`
   - Initialize full theme structure with defaults
   - Add `activeJourneyId: null`
   - Remove counters and share config
 
-- [ ] **Task 3.2**: Update `listEvents()` filter: `companyId` → `ownerId`
+- [x] **Task 3.2**: Update `listEvents()` filter: `companyId` → `ownerId`
 
-- [ ] **Task 3.3**: Rename `updateEventTitle()` → `updateEventName()`
+- [x] **Task 3.3**: Rename `updateEventTitle()` → `updateEventName()`
 
 - [ ] **Task 3.4**: Update repository tests with new schema
 
@@ -81,23 +81,23 @@
 
 ## Phase 4: Actions Layer (2-3 hours)
 
-- [ ] **Task 4.1**: Update `createEventAction()`:
+- [x] **Task 4.1**: Update `createEventAction()`:
   - Input schema: `name`, `ownerId`, `primaryColor`
   - Validate owner (company) exists and is active
   - Use structured error responses
 
-- [ ] **Task 4.2**: Update `listEventsAction()` filter: `companyId` → `ownerId`
+- [x] **Task 4.2**: Update `listEventsAction()` filter: `companyId` → `ownerId`
 
-- [ ] **Task 4.3**: Rename `updateEventTitleAction()` → `updateEventNameAction()`
+- [x] **Task 4.3**: Rename `updateEventTitleAction()` → `updateEventNameAction()`
 
-- [ ] **Task 4.4**: Update `updateEventStatusAction()` enum: `"live"` → `"published"`
+- [x] **Task 4.4**: Update `updateEventStatusAction()` enum: `"live"` → `"published"`
 
-- [ ] **Task 4.5**: Refactor `updateEventTheme()`:
+- [x] **Task 4.5**: Refactor `updateEventTheme()`:
   - Support new nested structure (text, button, background)
   - Use dynamic field mapping (not manual if-statements)
   - Use Firestore dot notation for nested updates
 
-- [ ] **Task 4.6**: Create `updateEventSwitchboardAction()` for `activeJourneyId`
+- [x] **Task 4.6**: Create `updateEventSwitchboardAction()` for `activeJourneyId`
 
 ---
 
@@ -160,8 +160,8 @@
 
 ## Progress Tracking
 
-**Phase 0**: ✅ | **Phase 1**: ✅ | **Phase 2**: ✅ | **Phase 3**: ⬜
-**Phase 4**: ⬜ | **Phase 5**: ⬜ | **Phase 6**: ⬜ | **Phase 7**: ⬜
+**Phase 0**: ✅ | **Phase 1**: ✅ | **Phase 2**: ✅ | **Phase 3**: ✅
+**Phase 4**: ✅ | **Phase 5**: ⬜ | **Phase 6**: ⬜ | **Phase 7**: ⬜
 
 **Legend**: ⬜ Not Started | 🟡 In Progress | ✅ Complete
 
@@ -169,6 +169,6 @@
 
 ## Notes
 
-- **Phase 0, 1 & 2 completed**: Standards compliance fixes applied, V4 schema migration complete, unused content code deleted
-- **Server status**: Schema updated to V4 - expect type errors in actions/repositories/components until Phase 3-5 complete
-- **Next**: Phase 3 - Repository Layer
+- **Phase 0-4 completed**: Standards compliance, V4 schema migration, repository and actions layers fully updated
+- **Server status**: Repository and actions layers migrated to V4 - UI components and tests still need updates
+- **Next**: Phase 5 - UI Components (ThemeEditor, EventCard, EventForm, etc.)
