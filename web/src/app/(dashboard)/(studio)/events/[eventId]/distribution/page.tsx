@@ -20,19 +20,21 @@ export default async function DistributionPage({
   const event = result.event
 
   return (
-    <div className="max-w-2xl">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold mb-2">Distribution</h2>
-        <p className="text-muted-foreground">
-          Share your event with guests using the join URL or QR code.
-        </p>
-      </div>
+    <main className="container mx-auto px-6 py-8">
+      <div className="max-w-2xl">
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold mb-2">Distribution</h2>
+          <p className="text-muted-foreground">
+            Share your event with guests using the join URL or QR code.
+          </p>
+        </div>
 
-      <QRPanel
-        eventId={event.id}
-        joinUrl={getJoinUrl(event.joinPath)}
-        qrPngPath={event.qrPngPath}
-      />
-    </div>
+        <QRPanel
+          eventId={event.id}
+          joinUrl={getJoinUrl(event.joinPath)}
+          qrPngPath={event.qrPngPath}
+        />
+      </div>
+    </main>
   )
 }
