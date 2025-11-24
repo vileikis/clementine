@@ -20,8 +20,6 @@ export { EventBreadcrumb } from "./components/studio/EventBreadcrumb";
 // ============================================================================
 // Designer Components (Event builder UI)
 // ============================================================================
-export { WelcomeEditor } from "./components/designer/WelcomeEditor";
-export { EndingEditor } from "./components/designer/EndingEditor";
 export { PreviewPanel } from "./components/designer/PreviewPanel";
 
 // ============================================================================
@@ -42,8 +40,6 @@ export {
   updateEventBrandingAction,
   updateEventStatusAction,
   updateEventTitleAction,
-  updateEventWelcome,
-  updateEventEnding,
 } from "./actions/events";
 
 // ============================================================================
@@ -60,11 +56,8 @@ export type {
 // ============================================================================
 export {
   eventStatusSchema,
-  shareSocialSchema,
   eventSchema,
-  updateEventWelcomeSchema,
-  updateEventEndingSchema,
-} from "./lib/schemas";
+} from "./schemas";
 
 // ============================================================================
 // Repository & Cache - NOT EXPORTED
