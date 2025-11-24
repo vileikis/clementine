@@ -8,8 +8,7 @@ export interface Company {
   status: CompanyStatus;
   deletedAt: number | null;
 
-  // Optional branding metadata
-  brandColor?: string;
+  // Optional metadata
   contactEmail?: string;
   termsUrl?: string;
   privacyUrl?: string;

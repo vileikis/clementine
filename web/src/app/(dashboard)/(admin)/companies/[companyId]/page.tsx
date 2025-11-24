@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect, use } from "react";
-import { getCompanyAction, updateCompanyAction, getCompanyEventCountAction, type Company, DeleteCompanyDialog } from "@/features/companies";
+import { getCompanyAction, updateCompanyAction, getCompanyEventCountAction } from "@/features/companies/actions";
+import type { Company } from "@/features/companies";
+import { DeleteCompanyDialog } from "@/features/companies";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,7 +26,6 @@ export default function CompanyDetailPage({ params }: CompanyDetailPageProps) {
 
   // Form state
   const [name, setName] = useState("");
-  const [brandColor, setBrandColor] = useState("");
   const [contactEmail, setContactEmail] = useState("");
   const [termsUrl, setTermsUrl] = useState("");
   const [privacyUrl, setPrivacyUrl] = useState("");
@@ -54,7 +55,6 @@ export default function CompanyDetailPage({ params }: CompanyDetailPageProps) {
       if (companyResult.success && companyResult.company) {
         setCompany(companyResult.company);
         setName(companyResult.company.name);
-        setBrandColor(companyResult.company.brandColor || "");
         setContactEmail(companyResult.company.contactEmail || "");
         setTermsUrl(companyResult.company.termsUrl || "");
         setPrivacyUrl(companyResult.company.privacyUrl || "");
@@ -82,20 +82,18 @@ export default function CompanyDetailPage({ params }: CompanyDetailPageProps) {
   useEffect(() => {
     if (company) {
       const hasNameChange = name !== company.name;
-      const hasBrandColorChange = brandColor !== (company.brandColor || "");
       const hasContactEmailChange = contactEmail !== (company.contactEmail || "");
       const hasTermsUrlChange = termsUrl !== (company.termsUrl || "");
       const hasPrivacyUrlChange = privacyUrl !== (company.privacyUrl || "");
 
       setHasChanges(
         hasNameChange ||
-        hasBrandColorChange ||
         hasContactEmailChange ||
         hasTermsUrlChange ||
         hasPrivacyUrlChange
       );
     }
-  }, [name, brandColor, contactEmail, termsUrl, privacyUrl, company]);
+  }, [name, contactEmail, termsUrl, privacyUrl, company]);
 
   const validateName = (value: string): boolean => {
     if (!value.trim()) {
@@ -156,7 +154,6 @@ export default function CompanyDetailPage({ params }: CompanyDetailPageProps) {
     try {
       const result = await updateCompanyAction(companyId, {
         name: name.trim(),
-        brandColor: brandColor || undefined,
         contactEmail: contactEmail || undefined,
         termsUrl: termsUrl || undefined,
         privacyUrl: privacyUrl || undefined,
@@ -332,38 +329,6 @@ export default function CompanyDetailPage({ params }: CompanyDetailPageProps) {
                 {nameError}
               </p>
             )}
-          </div>
-
-          {/* Brand Color */}
-          <div className="space-y-2">
-            <Label htmlFor="brand-color">Brand Color</Label>
-            <div className="flex items-center gap-3">
-              <input
-                type="color"
-                id="brand-color"
-                value={brandColor || "#0EA5E9"}
-                onChange={(e) => setBrandColor(e.target.value)}
-                className="h-12 w-20 border border-input rounded-md cursor-pointer"
-                disabled={saving}
-              />
-              <Input
-                type="text"
-                value={brandColor || ""}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (!value || /^#[0-9A-Fa-f]{0,6}$/.test(value)) {
-                    setBrandColor(value);
-                  }
-                }}
-                className="flex-1 font-mono"
-                placeholder="#0EA5E9"
-                disabled={saving}
-                maxLength={7}
-              />
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Brand color for customization (optional)
-            </p>
           </div>
 
           {/* Contact Email */}

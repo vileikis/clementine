@@ -14,7 +14,7 @@ import {
   updateEventStatus,
   updateEventTitle,
 } from "../repositories/events";
-import { getCompany } from "@/features/companies/repositories/companies";
+import { getCompany } from "@/features/companies/repositories/companies.repository";
 import {
   updateEventWelcomeSchema,
   updateEventEndingSchema,
