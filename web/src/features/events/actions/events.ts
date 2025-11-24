@@ -12,15 +12,12 @@ import {
   listEvents,
   updateEventBranding,
   updateEventStatus,
-  updateEventTitle,
+  updateEventName,
 } from "../repositories/events";
 import { getCompany } from "@/features/companies/repositories/companies.repository";
 import {
-  updateEventWelcomeSchema,
-  updateEventEndingSchema,
-  updateEventShareSchema,
   updateEventThemeSchema,
-} from "../lib/schemas";
+} from "../schemas";
 import { verifyAdminSecret } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
@@ -38,9 +35,9 @@ export type ActionResponse<T = void> =
 // ============================================================================
 
 const createEventInput = z.object({
-  title: z.string().min(1, "Title is required").max(100, "Title too long"),
-  buttonColor: z.string().regex(/^#[0-9A-F]{6}$/i, "Invalid hex color"),
-  companyId: z.string().min(1, "Company is required"),
+  name: z.string().min(1, "Name is required").max(200, "Name too long"),
+  primaryColor: z.string().regex(/^#[0-9A-F]{6}$/i, "Invalid hex color"),
+  ownerId: z.string().min(1, "Owner is required"),
 });
 
 export async function createEventAction(
@@ -49,35 +46,62 @@ export async function createEventAction(
   // Verify admin authentication
   const auth = await verifyAdminSecret();
   if (!auth.authorized) {
-    return { success: false, error: auth.error };
+    return {
+      success: false,
+      error: {
+        code: "PERMISSION_DENIED",
+        message: auth.error
+      }
+    };
   }
 
   try {
     const validated = createEventInput.parse(input);
 
-    // Validate company exists
-    const company = await getCompany(validated.companyId);
+    // Validate owner (company) exists and is active
+    const company = await getCompany(validated.ownerId);
     if (!company) {
-      return { success: false, error: "Company not found" };
+      return {
+        success: false,
+        error: {
+          code: "OWNER_NOT_FOUND",
+          message: "Owner (company) not found"
+        }
+      };
     }
     if (company.status !== "active") {
-      return { success: false, error: "Company is not active" };
+      return {
+        success: false,
+        error: {
+          code: "OWNER_INACTIVE",
+          message: "Owner (company) is not active"
+        }
+      };
     }
 
     const eventId = await createEvent({
-      title: validated.title,
-      companyId: validated.companyId,
-      buttonColor: validated.buttonColor,
+      name: validated.name,
+      ownerId: validated.ownerId,
+      primaryColor: validated.primaryColor,
     });
     revalidatePath("/events");
     return { success: true, eventId };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { success: false, error: error.issues[0].message };
+      return {
+        success: false,
+        error: {
+          code: "VALIDATION_ERROR",
+          message: error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join(', ')
+        }
+      };
     }
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to create event",
+      error: {
+        code: "INTERNAL_ERROR",
+        message: error instanceof Error ? error.message : "Failed to create event"
+      },
     };
   }
 }
@@ -86,19 +110,28 @@ export async function getEventAction(eventId: string) {
   try {
     const event = await getEvent(eventId);
     if (!event) {
-      throw new Error("Event not found");
+      return {
+        success: false,
+        error: {
+          code: "EVENT_NOT_FOUND",
+          message: "Event not found"
+        }
+      };
     }
     return { success: true, event };
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to fetch event",
+      error: {
+        code: "INTERNAL_ERROR",
+        message: error instanceof Error ? error.message : "Failed to fetch event"
+      }
     };
   }
 }
 
 export async function listEventsAction(filters?: {
-  companyId?: string | null;
+  ownerId?: string | null;
 }) {
   try {
     const events = await listEvents(filters);
@@ -106,7 +139,10 @@ export async function listEventsAction(filters?: {
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to fetch events",
+      error: {
+        code: "INTERNAL_ERROR",
+        message: error instanceof Error ? error.message : "Failed to fetch events"
+      }
     };
   }
 }
@@ -118,7 +154,13 @@ export async function updateEventBrandingAction(
   // Verify admin authentication
   const auth = await verifyAdminSecret();
   if (!auth.authorized) {
-    return { success: false, error: auth.error };
+    return {
+      success: false,
+      error: {
+        code: "PERMISSION_DENIED",
+        message: auth.error
+      }
+    };
   }
 
   try {
@@ -128,7 +170,10 @@ export async function updateEventBrandingAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to update branding",
+      error: {
+        code: "INTERNAL_ERROR",
+        message: error instanceof Error ? error.message : "Failed to update branding"
+      }
     };
   }
 }
@@ -140,7 +185,13 @@ export async function updateEventStatusAction(
   // Verify admin authentication
   const auth = await verifyAdminSecret();
   if (!auth.authorized) {
-    return { success: false, error: auth.error };
+    return {
+      success: false,
+      error: {
+        code: "PERMISSION_DENIED",
+        message: auth.error
+      }
+    };
   }
 
   try {
@@ -151,38 +202,56 @@ export async function updateEventStatusAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to update status",
+      error: {
+        code: "INTERNAL_ERROR",
+        message: error instanceof Error ? error.message : "Failed to update status"
+      }
     };
   }
 }
 
-const updateEventTitleInput = z.object({
-  title: z.string().min(1, "Title is required").max(100, "Title too long"),
+const updateEventNameInput = z.object({
+  name: z.string().min(1, "Name is required").max(200, "Name too long"),
 });
 
-export async function updateEventTitleAction(
+export async function updateEventNameAction(
   eventId: string,
-  title: string
+  name: string
 ) {
   // Verify admin authentication
   const auth = await verifyAdminSecret();
   if (!auth.authorized) {
-    return { success: false, error: auth.error };
+    return {
+      success: false,
+      error: {
+        code: "PERMISSION_DENIED",
+        message: auth.error
+      }
+    };
   }
 
   try {
-    const validated = updateEventTitleInput.parse({ title });
-    await updateEventTitle(eventId, validated.title);
+    const validated = updateEventNameInput.parse({ name });
+    await updateEventName(eventId, validated.name);
     revalidatePath("/events");
     revalidatePath(`/events/${eventId}`);
     return { success: true };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { success: false, error: error.issues[0].message };
+      return {
+        success: false,
+        error: {
+          code: "VALIDATION_ERROR",
+          message: error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join(', ')
+        }
+      };
     }
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to update title",
+      error: {
+        code: "INTERNAL_ERROR",
+        message: error instanceof Error ? error.message : "Failed to update name"
+      }
     };
   }
 }
@@ -190,289 +259,6 @@ export async function updateEventTitleAction(
 // ============================================================================
 // Event Configuration Updates (Direct Firebase)
 // ============================================================================
-
-/**
- * Updates welcome screen configuration for an event.
- * Uses nested object structure (event.welcome.*)
- * @param eventId - Event ID
- * @param data - Partial welcome screen fields to update
- * @returns Success/error response
- */
-export async function updateEventWelcome(
-  eventId: string,
-  data: {
-    title?: string | null;
-    body?: string | null;
-    ctaLabel?: string | null;
-    backgroundImage?: string | null;
-    backgroundColor?: string | null;
-  }
-): Promise<ActionResponse<void>> {
-  try {
-    // Check authentication
-    const auth = await verifyAdminSecret();
-    if (!auth.authorized) {
-      return {
-        success: false,
-        error: {
-          code: "PERMISSION_DENIED",
-          message: auth.error,
-        },
-      };
-    }
-
-    // Validate input with Zod
-    const validatedData = updateEventWelcomeSchema.parse(data);
-
-    // Check if event exists
-    const eventRef = db.collection("events").doc(eventId);
-    const eventDoc = await eventRef.get();
-
-    if (!eventDoc.exists) {
-      return {
-        success: false,
-        error: {
-          code: "EVENT_NOT_FOUND",
-          message: "Event not found",
-        },
-      };
-    }
-
-    // Build update object with dot notation for nested fields
-    const updateData: Record<string, unknown> = {
-      updatedAt: Date.now(),
-    };
-
-    // Map validated data to nested welcome object fields using dot notation
-    // Note: null values are explicitly set to clear fields in Firestore
-    if (validatedData.title !== undefined) {
-      updateData["welcome.title"] = validatedData.title;
-    }
-    if (validatedData.body !== undefined) {
-      updateData["welcome.body"] = validatedData.body;
-    }
-    if (validatedData.ctaLabel !== undefined) {
-      updateData["welcome.ctaLabel"] = validatedData.ctaLabel;
-    }
-    if (validatedData.backgroundImage !== undefined) {
-      updateData["welcome.backgroundImage"] = validatedData.backgroundImage;
-    }
-    if (validatedData.backgroundColor !== undefined) {
-      updateData["welcome.backgroundColor"] = validatedData.backgroundColor;
-    }
-
-    // Update only provided fields
-    await eventRef.update(updateData);
-
-    return { success: true, data: undefined };
-  } catch (error) {
-    // Handle Zod validation errors
-    if (error && typeof error === "object" && "issues" in error) {
-      return {
-        success: false,
-        error: {
-          code: "VALIDATION_ERROR",
-          message: "Invalid input data",
-        },
-      };
-    }
-
-    // Handle other errors
-    return {
-      success: false,
-      error: {
-        code: "INTERNAL_ERROR",
-        message: error instanceof Error ? error.message : "Unknown error",
-      },
-    };
-  }
-}
-
-/**
- * Updates ending screen configuration for an event.
- * Uses nested object structure (event.ending.*)
- * @param eventId - Event ID
- * @param data - Partial ending screen fields to update
- * @returns Success/error response
- */
-export async function updateEventEnding(
-  eventId: string,
-  data: {
-    title?: string | null;
-    body?: string | null;
-    ctaLabel?: string | null;
-    ctaUrl?: string | null;
-  }
-): Promise<ActionResponse<void>> {
-  try {
-    // Check authentication
-    const auth = await verifyAdminSecret();
-    if (!auth.authorized) {
-      return {
-        success: false,
-        error: {
-          code: "PERMISSION_DENIED",
-          message: auth.error,
-        },
-      };
-    }
-
-    // Validate input with Zod
-    const validatedData = updateEventEndingSchema.parse(data);
-
-    // Check if event exists
-    const eventRef = db.collection("events").doc(eventId);
-    const eventDoc = await eventRef.get();
-
-    if (!eventDoc.exists) {
-      return {
-        success: false,
-        error: {
-          code: "EVENT_NOT_FOUND",
-          message: "Event not found",
-        },
-      };
-    }
-
-    // Build update object with dot notation for nested fields
-    const updateData: Record<string, unknown> = {
-      updatedAt: Date.now(),
-    };
-
-    // Map validated data to nested ending object fields using dot notation
-    if (validatedData.title !== undefined) {
-      updateData["ending.title"] = validatedData.title;
-    }
-    if (validatedData.body !== undefined) {
-      updateData["ending.body"] = validatedData.body;
-    }
-    if (validatedData.ctaLabel !== undefined) {
-      updateData["ending.ctaLabel"] = validatedData.ctaLabel;
-    }
-    if (validatedData.ctaUrl !== undefined) {
-      updateData["ending.ctaUrl"] = validatedData.ctaUrl;
-    }
-
-    // Update only provided fields
-    await eventRef.update(updateData);
-
-    return { success: true, data: undefined };
-  } catch (error) {
-    // Handle Zod validation errors
-    if (error && typeof error === "object" && "issues" in error) {
-      return {
-        success: false,
-        error: {
-          code: "VALIDATION_ERROR",
-          message: "Invalid input data",
-        },
-      };
-    }
-
-    // Handle other errors
-    return {
-      success: false,
-      error: {
-        code: "INTERNAL_ERROR",
-        message: error instanceof Error ? error.message : "Unknown error",
-      },
-    };
-  }
-}
-
-/**
- * Updates share configuration for an event.
- * Uses nested object structure (event.share.*)
- * @param eventId - Event ID
- * @param data - Partial share configuration fields to update
- * @returns Success/error response
- */
-export async function updateEventShare(
-  eventId: string,
-  data: {
-    allowDownload?: boolean;
-    allowSystemShare?: boolean;
-    allowEmail?: boolean;
-    socials?: Array<
-      "instagram" | "tiktok" | "facebook" | "x" | "snapchat" | "whatsapp" | "custom"
-    >;
-  }
-): Promise<ActionResponse<void>> {
-  try {
-    // Check authentication
-    const auth = await verifyAdminSecret();
-    if (!auth.authorized) {
-      return {
-        success: false,
-        error: {
-          code: "PERMISSION_DENIED",
-          message: auth.error,
-        },
-      };
-    }
-
-    // Validate input with Zod
-    const validatedData = updateEventShareSchema.parse(data);
-
-    // Check if event exists
-    const eventRef = db.collection("events").doc(eventId);
-    const eventDoc = await eventRef.get();
-
-    if (!eventDoc.exists) {
-      return {
-        success: false,
-        error: {
-          code: "EVENT_NOT_FOUND",
-          message: "Event not found",
-        },
-      };
-    }
-
-    // Build update object with dot notation for nested fields
-    const updateData: Record<string, unknown> = {
-      updatedAt: Date.now(),
-    };
-
-    // Map validated data to nested share object fields using dot notation
-    if (validatedData.allowDownload !== undefined) {
-      updateData["share.allowDownload"] = validatedData.allowDownload;
-    }
-    if (validatedData.allowSystemShare !== undefined) {
-      updateData["share.allowSystemShare"] = validatedData.allowSystemShare;
-    }
-    if (validatedData.allowEmail !== undefined) {
-      updateData["share.allowEmail"] = validatedData.allowEmail;
-    }
-    if (validatedData.socials !== undefined) {
-      updateData["share.socials"] = validatedData.socials;
-    }
-
-    // Update only provided fields
-    await eventRef.update(updateData);
-
-    return { success: true, data: undefined };
-  } catch (error) {
-    // Handle Zod validation errors
-    if (error && typeof error === "object" && "issues" in error) {
-      return {
-        success: false,
-        error: {
-          code: "VALIDATION_ERROR",
-          message: "Invalid input data",
-        },
-      };
-    }
-
-    // Handle other errors
-    return {
-      success: false,
-      error: {
-        code: "INTERNAL_ERROR",
-        message: error instanceof Error ? error.message : "Unknown error",
-      },
-    };
-  }
-}
 
 /**
  * Updates theme configuration for an event.
@@ -484,10 +270,23 @@ export async function updateEventShare(
 export async function updateEventTheme(
   eventId: string,
   data: {
-    buttonColor?: string;
-    buttonTextColor?: string;
-    backgroundColor?: string;
-    backgroundImage?: string;
+    logoUrl?: string | null;
+    fontFamily?: string | null;
+    primaryColor?: string;
+    text?: {
+      color?: string;
+      alignment?: "left" | "center" | "right";
+    };
+    button?: {
+      backgroundColor?: string | null;
+      textColor?: string;
+      radius?: "none" | "sm" | "md" | "full";
+    };
+    background?: {
+      color?: string;
+      image?: string | null;
+      overlayOpacity?: number;
+    };
   }
 ): Promise<ActionResponse<void>> {
   try {
@@ -506,51 +305,159 @@ export async function updateEventTheme(
     // Validate input with Zod
     const validatedData = updateEventThemeSchema.parse(data);
 
-    // Check if event exists
-    const eventRef = db.collection("events").doc(eventId);
-    const eventDoc = await eventRef.get();
-
-    if (!eventDoc.exists) {
-      return {
-        success: false,
-        error: {
-          code: "EVENT_NOT_FOUND",
-          message: "Event not found",
-        },
-      };
-    }
-
     // Build update object with dot notation for nested fields
     const updateData: Record<string, unknown> = {
       updatedAt: Date.now(),
     };
 
-    // Map validated data to nested theme object fields using dot notation
-    if (validatedData.buttonColor !== undefined) {
-      updateData["theme.buttonColor"] = validatedData.buttonColor;
+    // Dynamic field mapping using Object.entries
+    // Top-level theme fields
+    if (validatedData.logoUrl !== undefined) {
+      updateData["theme.logoUrl"] = validatedData.logoUrl;
     }
-    if (validatedData.buttonTextColor !== undefined) {
-      updateData["theme.buttonTextColor"] = validatedData.buttonTextColor;
+    if (validatedData.fontFamily !== undefined) {
+      updateData["theme.fontFamily"] = validatedData.fontFamily;
     }
-    if (validatedData.backgroundColor !== undefined) {
-      updateData["theme.backgroundColor"] = validatedData.backgroundColor;
-    }
-    if (validatedData.backgroundImage !== undefined) {
-      updateData["theme.backgroundImage"] = validatedData.backgroundImage;
+    if (validatedData.primaryColor !== undefined) {
+      updateData["theme.primaryColor"] = validatedData.primaryColor;
     }
 
-    // Update only provided fields
-    await eventRef.update(updateData);
+    // Nested text fields
+    if (validatedData.text) {
+      Object.entries(validatedData.text).forEach(([key, value]) => {
+        if (value !== undefined) {
+          updateData[`theme.text.${key}`] = value;
+        }
+      });
+    }
+
+    // Nested button fields
+    if (validatedData.button) {
+      Object.entries(validatedData.button).forEach(([key, value]) => {
+        if (value !== undefined) {
+          updateData[`theme.button.${key}`] = value;
+        }
+      });
+    }
+
+    // Nested background fields
+    if (validatedData.background) {
+      Object.entries(validatedData.background).forEach(([key, value]) => {
+        if (value !== undefined) {
+          updateData[`theme.background.${key}`] = value;
+        }
+      });
+    }
+
+    // Update only provided fields - trust Firebase, catch NOT_FOUND error
+    const eventRef = db.collection("events").doc(eventId);
+    try {
+      await eventRef.update(updateData);
+    } catch (updateError: unknown) {
+      // Firestore throws code 5 for NOT_FOUND
+      if (updateError && typeof updateError === "object" && "code" in updateError && updateError.code === 5) {
+        return {
+          success: false,
+          error: {
+            code: "EVENT_NOT_FOUND",
+            message: "Event not found",
+          },
+        };
+      }
+      throw updateError;
+    }
+
+    revalidatePath("/events");
+    revalidatePath(`/events/${eventId}`);
 
     return { success: true, data: undefined };
   } catch (error) {
-    // Handle Zod validation errors
-    if (error && typeof error === "object" && "issues" in error) {
+    // Handle Zod validation errors with detailed field paths
+    if (error instanceof z.ZodError) {
       return {
         success: false,
         error: {
           code: "VALIDATION_ERROR",
-          message: "Invalid input data",
+          message: error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join(', '),
+        },
+      };
+    }
+
+    // Handle other errors
+    return {
+      success: false,
+      error: {
+        code: "INTERNAL_ERROR",
+        message: error instanceof Error ? error.message : "Unknown error",
+      },
+    };
+  }
+}
+
+/**
+ * Updates the active journey for an event (Switchboard pattern).
+ * Controls which journey is currently live for all connected guests.
+ * @param eventId - Event ID
+ * @param activeJourneyId - Journey ID to activate, or null to deactivate
+ * @returns Success/error response
+ */
+export async function updateEventSwitchboardAction(
+  eventId: string,
+  activeJourneyId: string | null
+): Promise<ActionResponse<void>> {
+  try {
+    // Check authentication
+    const auth = await verifyAdminSecret();
+    if (!auth.authorized) {
+      return {
+        success: false,
+        error: {
+          code: "PERMISSION_DENIED",
+          message: auth.error,
+        },
+      };
+    }
+
+    // Validate input with Zod
+    const validatedData = z
+      .object({
+        activeJourneyId: z.string().nullable(),
+      })
+      .parse({ activeJourneyId });
+
+    // Update event - trust Firebase, catch NOT_FOUND error
+    const eventRef = db.collection("events").doc(eventId);
+    try {
+      await eventRef.update({
+        activeJourneyId: validatedData.activeJourneyId,
+        updatedAt: Date.now(),
+      });
+    } catch (updateError: unknown) {
+      // Firestore throws code 5 for NOT_FOUND
+      if (updateError && typeof updateError === "object" && "code" in updateError && updateError.code === 5) {
+        return {
+          success: false,
+          error: {
+            code: "EVENT_NOT_FOUND",
+            message: "Event not found",
+          },
+        };
+      }
+      throw updateError;
+    }
+
+    revalidatePath("/events");
+    revalidatePath(`/events/${eventId}`);
+
+    return { success: true, data: undefined };
+  } catch (error) {
+    // Handle Zod validation errors
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        error: {
+          code: "VALIDATION_ERROR",
+          message: error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join(', '),
         },
       };
     }

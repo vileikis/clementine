@@ -1,4 +1,4 @@
-import { getEventAction } from "@/features/events"
+import { getEventAction } from "@/features/events/actions"
 import { getCompanyStatus } from "@/features/companies/repositories/companies.repository"
 import { notFound } from "next/navigation"
 import { BrandThemeProvider, GuestFlowContainer } from "@/features/guest"
@@ -17,9 +17,9 @@ export default async function JoinPage({ params }: JoinPageProps) {
 
   const event = result.event
 
-  // Check if event has a company and if that company is deleted
-  if (event.companyId) {
-    const companyStatus = await getCompanyStatus(event.companyId)
+  // Check if event has an owner company and if that company is deleted
+  if (event.ownerId) {
+    const companyStatus = await getCompanyStatus(event.ownerId)
 
     if (!companyStatus || companyStatus === "deleted") {
       return (
@@ -36,10 +36,10 @@ export default async function JoinPage({ params }: JoinPageProps) {
   }
 
   return (
-    <BrandThemeProvider brandColor={event.theme?.buttonColor ?? "#3B82F6"}>
+    <BrandThemeProvider brandColor={event.theme.primaryColor}>
       <GuestFlowContainer
         eventId={event.id}
-        eventTitle={event.title}
+        eventTitle={event.name}
       />
     </BrandThemeProvider>
   )

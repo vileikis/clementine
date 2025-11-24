@@ -2,81 +2,63 @@
 
 export type EventStatus = "draft" | "live" | "archived";
 
-export type ShareSocial =
-  | "instagram"
-  | "tiktok"
-  | "facebook"
-  | "x"
-  | "snapchat"
-  | "whatsapp"
-  | "custom";
+/**
+ * Theme text configuration
+ */
+export interface EventThemeText {
+  color: string; // Hex color (e.g., "#000000")
+  alignment: "left" | "center" | "right";
+}
+
+/**
+ * Theme button configuration
+ */
+export interface EventThemeButton {
+  backgroundColor?: string | null; // Hex color (inherits primaryColor if undefined)
+  textColor: string; // Hex color (e.g., "#FFFFFF")
+  radius: "none" | "sm" | "md" | "full";
+}
+
+/**
+ * Theme background configuration
+ */
+export interface EventThemeBackground {
+  color: string; // Hex color (e.g., "#F9FAFB")
+  image?: string | null; // Full public URL
+  overlayOpacity: number; // 0-1
+}
 
 /**
  * Event-wide theme settings for visual customization
  */
 export interface EventTheme {
-  buttonColor?: string; // Hex color (e.g., "#3B82F6")
-  buttonTextColor?: string; // Hex color (e.g., "#FFFFFF")
-  backgroundColor?: string; // Hex color (e.g., "#F9FAFB")
-  backgroundImage?: string; // Full public URL
-}
-
-/**
- * Welcome screen configuration shown to guests when they first join an event
- */
-export interface EventWelcome {
-  title: string | null; // Max 500 characters, null = no title
-  body: string | null; // Max 500 characters, null = no body text
-  ctaLabel: string | null; // Max 50 characters, null = no CTA
-  backgroundImage: string | null; // Full public URL, null = no background image
-  backgroundColor: string | null; // Hex color (e.g., "#FFFFFF"), null = no background color
-}
-
-/**
- * Ending screen configuration shown to guests after completing an experience
- */
-export interface EventEnding {
-  title: string | null; // Max 500 characters, null = no title
-  body: string | null; // Max 500 characters, null = no body text
-  ctaLabel: string | null; // Max 50 characters, null = no CTA
-  ctaUrl: string | null; // Valid URL, null = no CTA URL
-}
-
-/**
- * Share settings controlling how guests can share their generated media
- */
-export interface EventShareConfig {
-  allowDownload: boolean; // Default: true
-  allowSystemShare: boolean; // Default: true
-  allowEmail: boolean; // Default: false
-  socials: ShareSocial[]; // Default: []
+  logoUrl?: string | null;
+  fontFamily?: string | null;
+  primaryColor: string; // Hex color - anchor color for the event
+  text: EventThemeText;
+  button: EventThemeButton;
+  background: EventThemeBackground;
 }
 
 export interface Event {
   id: string;
-  title: string;
+  name: string;
 
   status: EventStatus;
 
-  companyId: string | null; // FK to companies collection
+  ownerId: string | null; // FK to companies collection
 
   joinPath: string; // e.g., "/join/abc123"
   qrPngPath: string; // Storage path
 
-  publishStartAt?: number; // Optional Unix timestamp ms
-  publishEndAt?: number; // Optional Unix timestamp ms
+  publishStartAt?: number | null; // Optional Unix timestamp ms
+  publishEndAt?: number | null; // Optional Unix timestamp ms
+
+  // Switchboard pattern - controls which journey is active
+  activeJourneyId?: string | null;
 
   // Nested object configurations
-  theme?: EventTheme;
-  welcome?: EventWelcome;
-  ending?: EventEnding;
-  share: EventShareConfig;
-
-  // Denormalized counters (for performance)
-  experiencesCount: number;
-  sessionsCount: number;
-  readyCount: number; // Sessions in "ready" state
-  sharesCount: number;
+  theme: EventTheme;
 
   createdAt: number; // Unix timestamp ms
   updatedAt: number;

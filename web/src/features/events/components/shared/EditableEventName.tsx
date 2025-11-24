@@ -10,20 +10,20 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { updateEventTitleAction } from "../../actions/events"
+import { updateEventNameAction } from "../../actions/events"
 import { useRouter } from "next/navigation"
 
 interface EditableEventNameProps {
   eventId: string
-  currentTitle: string
+  currentName: string
 }
 
 export function EditableEventName({
   eventId,
-  currentTitle,
+  currentName,
 }: EditableEventNameProps) {
   const [isOpen, setIsOpen] = useState(false)
-  const [title, setTitle] = useState(currentTitle)
+  const [name, setName] = useState(currentName)
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
@@ -31,18 +31,18 @@ export function EditableEventName({
   const handleSave = () => {
     setError(null)
     startTransition(async () => {
-      const result = await updateEventTitleAction(eventId, title)
+      const result = await updateEventNameAction(eventId, name)
       if (result.success) {
         setIsOpen(false)
         router.refresh()
       } else {
-        setError(result.error || "Failed to update event name")
+        setError(result.error?.message || "Failed to update event name")
       }
     })
   }
 
   const handleCancel = () => {
-    setTitle(currentTitle)
+    setName(currentName)
     setError(null)
     setIsOpen(false)
   }
@@ -53,7 +53,7 @@ export function EditableEventName({
         className="text-3xl font-bold cursor-pointer hover:underline"
         onClick={() => setIsOpen(true)}
       >
-        {currentTitle}
+        {currentName}
       </h1>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -64,10 +64,10 @@ export function EditableEventName({
 
           <div className="py-4">
             <Input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               placeholder="Event name"
-              maxLength={100}
+              maxLength={200}
               disabled={isPending}
             />
             {error && (

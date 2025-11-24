@@ -1,4 +1,4 @@
-import { getEventAction } from "@/features/events"
+import { getEventAction } from "@/features/events/actions"
 import { notFound } from "next/navigation"
 import { EditorHeader } from "@/components/shared"
 
@@ -29,7 +29,7 @@ export default async function ExperienceEditorLayout({
       <EditorHeader
         breadcrumbs={[
           { label: "Events", href: "/events" },
-          { label: event.title, href: `/events/${eventId}/design` },
+          { label: event.name, href: `/events/${eventId}/design` },
           { label: `Experience ${experienceId}` },
         ]}
         exitUrl={`/events/${eventId}/design/experiences`}

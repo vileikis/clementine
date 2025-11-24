@@ -1,26 +1,27 @@
 import Link from "next/link"
-import { listEventsAction, EventCard } from "@/features/events"
+import { EventCard } from "@/features/events"
+import { listEventsAction } from "@/features/events/actions"
 import { listCompaniesAction } from "@/features/companies/actions"
 import { CompanyFilter } from "@/features/companies"
 
 export default async function EventsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ companyId?: string }>
+  searchParams: Promise<{ ownerId?: string }>
 }) {
   const params = await searchParams
-  const companyIdFilter = params.companyId === "no-company"
+  const ownerIdFilter = params.ownerId === "no-company"
     ? null
-    : params.companyId || undefined
+    : params.ownerId || undefined
 
   const result = await listEventsAction(
-    companyIdFilter !== undefined ? { companyId: companyIdFilter } : undefined
+    ownerIdFilter !== undefined ? { ownerId: ownerIdFilter } : undefined
   )
 
   if (!result.success) {
     return (
       <div className="text-center py-12">
-        <p className="text-red-500">Failed to load events: {result.error}</p>
+        <p className="text-red-500">Failed to load events: {result.error?.message || "Unknown error"}</p>
       </div>
     )
   }
@@ -41,14 +42,14 @@ export default async function EventsPage({
   const eventsWithCompanies = events
     .filter(event => {
       // Include events with no company
-      if (!event.companyId) return true
+      if (!event.ownerId) return true
 
       // Include only if company is in active list (excludes deleted companies)
-      return activeCompanyIds.has(event.companyId)
+      return activeCompanyIds.has(event.ownerId)
     })
     .map(event => ({
       event,
-      companyName: event.companyId ? companyMap.get(event.companyId) ?? null : null
+      companyName: event.ownerId ? companyMap.get(event.ownerId) ?? null : null
     }))
 
   return (

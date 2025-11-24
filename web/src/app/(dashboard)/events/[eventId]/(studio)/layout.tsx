@@ -1,4 +1,5 @@
-import { getEventAction, EventBreadcrumb, EventTabs, EventStatusSwitcher } from "@/features/events"
+import { EventBreadcrumb, EventTabs, EventStatusSwitcher } from "@/features/events"
+import { getEventAction } from "@/features/events/actions"
 import { notFound } from "next/navigation"
 import { CopyLinkButton } from "@/features/distribution"
 
@@ -38,7 +39,7 @@ export default async function StudioLayout({
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center gap-6">
             {/* Breadcrumb (includes editable event name) */}
-            <EventBreadcrumb eventId={event.id} eventName={event.title} />
+            <EventBreadcrumb eventId={event.id} eventName={event.name} />
 
             {/* Vertical divider */}
             <div className="h-6 w-px bg-border" aria-hidden="true" />
