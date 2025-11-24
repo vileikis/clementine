@@ -21,7 +21,7 @@
 
 ## Phase 1: Schema Update to V4 (2-3 hours)
 
-- [ ] **Task 1.1**: Update `schemas/events.schemas.ts`:
+- [x] **Task 1.1**: Update `schemas/events.schemas.ts`:
   - Change status enum: `"live"` → `"published"`
   - Create nested theme sub-schemas: `text`, `button`, `background`
   - Remove: `welcome`, `ending`, `share`, counters
@@ -29,12 +29,12 @@
   - Rename: `title` → `name`, `companyId` → `ownerId`
   - Use Zod v4 validators: `z.url()` not `z.string().url()`
 
-- [ ] **Task 1.2**: Update `types/event.types.ts`:
+- [x] **Task 1.2**: Update `types/event.types.ts`:
   - Match new schema structure
   - Remove old interfaces (EventWelcome, EventEnding, EventShareConfig)
   - Add new theme sub-interfaces
 
-- [ ] **Task 1.3**: Update `constants.ts`:
+- [x] **Task 1.3**: Update `constants.ts`:
   - Rename `TITLE_LENGTH` → `NAME_LENGTH`
   - Add `THEME_DEFAULTS` for UI default values
 
@@ -160,7 +160,7 @@
 
 ## Progress Tracking
 
-**Phase 0**: ✅ | **Phase 1**: ⬜ | **Phase 2**: ✅ | **Phase 3**: ⬜
+**Phase 0**: ✅ | **Phase 1**: ✅ | **Phase 2**: ✅ | **Phase 3**: ⬜
 **Phase 4**: ⬜ | **Phase 5**: ⬜ | **Phase 6**: ⬜ | **Phase 7**: ⬜
 
 **Legend**: ⬜ Not Started | 🟡 In Progress | ✅ Complete
@@ -169,6 +169,6 @@
 
 ## Notes
 
-- **Phase 0 & 2 completed**: Standards compliance fixes applied to all remaining actions, unused content code deleted
-- **Server status**: Compiling successfully with no errors
-- **Next**: Phase 1 - Schema Update to V4
+- **Phase 0, 1 & 2 completed**: Standards compliance fixes applied, V4 schema migration complete, unused content code deleted
+- **Server status**: Schema updated to V4 - expect type errors in actions/repositories/components until Phase 3-5 complete
+- **Next**: Phase 3 - Repository Layer

@@ -1,7 +1,7 @@
 // Event validation constants - extracted from schemas to avoid magic numbers
 
 // Field length constraints
-export const TITLE_LENGTH = {
+export const NAME_LENGTH = {
   MIN: 1,
   MAX: 200,
 } as const;
@@ -9,18 +9,23 @@ export const TITLE_LENGTH = {
 // Color validation
 export const COLOR_REGEX = /^#[0-9A-F]{6}$/i;
 
-// Theme defaults (for backward compatibility and initialization)
+// Theme defaults (for UI default values and initialization)
 export const THEME_DEFAULTS = {
-  buttonColor: undefined,
-  buttonTextColor: undefined,
-  backgroundColor: undefined,
-  backgroundImage: undefined,
-} as const;
-
-// Share config defaults (kept for backward compatibility, will be removed in V4)
-export const SHARE_CONFIG_DEFAULTS = {
-  allowDownload: true,
-  allowSystemShare: true,
-  allowEmail: false,
-  socials: [],
+  logoUrl: null,
+  fontFamily: null,
+  primaryColor: "#3B82F6", // Default blue
+  text: {
+    color: "#000000",
+    alignment: "center" as const,
+  },
+  button: {
+    backgroundColor: null, // Inherits primaryColor
+    textColor: "#FFFFFF",
+    radius: "md" as const,
+  },
+  background: {
+    color: "#F9FAFB",
+    image: null,
+    overlayOpacity: 0.5,
+  },
 } as const;
