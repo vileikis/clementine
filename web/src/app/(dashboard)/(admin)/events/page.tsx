@@ -1,5 +1,6 @@
 import Link from "next/link"
-import { listEventsAction, EventCard } from "@/features/events"
+import { EventCard } from "@/features/events"
+import { listEventsAction } from "@/features/events/actions"
 import { listCompaniesAction } from "@/features/companies/actions"
 import { CompanyFilter } from "@/features/companies"
 

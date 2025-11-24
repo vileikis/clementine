@@ -1,4 +1,5 @@
-import { getEventAction, EventBreadcrumb, EventTabs, EventStatusSwitcher } from "@/features/events"
+import { EventBreadcrumb, EventTabs, EventStatusSwitcher } from "@/features/events"
+import { getEventAction } from "@/features/events/actions"
 import { notFound } from "next/navigation"
 import { CopyLinkButton } from "@/features/distribution"
 
