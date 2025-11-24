@@ -103,17 +103,20 @@
 
 ## Phase 5: UI Components (3-4 hours)
 
-- [ ] **Task 5.1**: Refactor `ThemeEditor.tsx`:
+**Status**: ✅ Complete
+
+- [x] **Task 5.1**: Refactor `ThemeEditor.tsx`:
   - Use `useReducer` for managing theme config state
   - Implement 7 sections: Identity, Primary Color, Text, Button, Background, Logo, Font
   - Support full nested theme structure
   - Update preview to reflect all new settings
 
-- [ ] **Task 5.2**: Update `EventForm.tsx`:
+- [x] **Task 5.2**: Update `EventForm.tsx`:
   - Rename fields: `title` → `name`, `companyId` → `ownerId`, `buttonColor` → `primaryColor`
-  - Remove counter displays
+  - Remove counter displays (already completed in Phase 4)
 
-- [ ] **Task 5.3**: Simplify/remove `DesignSubTabs.tsx` (only one tab remains)
+- [x] **Task 5.3**: Simplify/remove `DesignSubTabs.tsx` (only one tab remains)
+  - Already using V4 structure with Journeys, Experiences, Branding tabs
 
 ---
 
@@ -161,7 +164,7 @@
 ## Progress Tracking
 
 **Phase 0**: ✅ | **Phase 1**: ✅ | **Phase 2**: ✅ | **Phase 3**: ✅
-**Phase 4**: ✅ | **Phase 5**: ⬜ | **Phase 6**: ⬜ | **Phase 7**: ⬜
+**Phase 4**: ✅ | **Phase 5**: ✅ | **Phase 6**: ⬜ | **Phase 7**: ⬜
 
 **Legend**: ⬜ Not Started | 🟡 In Progress | ✅ Complete
 
@@ -169,6 +172,18 @@
 
 ## Notes
 
-- **Phase 0-4 completed**: Standards compliance, V4 schema migration, repository and actions layers fully updated
-- **Server status**: Repository and actions layers migrated to V4 - UI components and tests still need updates
-- **Next**: Phase 5 - UI Components (ThemeEditor, EventCard, EventForm, etc.)
+- **Phase 0-5 completed**: Standards compliance, V4 schema migration, repository, actions, and UI components fully updated
+- **Status**:
+  - ✅ ThemeEditor refactored with useReducer, 7 sections, nested theme structure
+  - ✅ EventForm already using correct field names (name, ownerId, primaryColor)
+  - ✅ DesignSubTabs already using V4 structure (Journeys, Experiences, Branding)
+  - ✅ All type errors fixed (companyId→ownerId, title→name, removed counters)
+  - ✅ TypeScript compilation passing
+- **Additional fixes made**:
+  - Updated ImageUploadField and uploadImage to support "logos" and "backgrounds" destinations
+  - Fixed admin events page to use ownerId filter
+  - Updated all layout files to use event.name instead of event.title
+  - Removed counter references from results page
+  - Fixed public join page to use new schema fields
+  - Updated repository tests with V4 schema
+- **Next**: Phase 6 - Tests (action tests, ThemeEditor tests)
