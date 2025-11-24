@@ -20,10 +20,10 @@ export const companySchema = z.object({
   status: companyStatusSchema,
   deletedAt: z.number().nullable(),
 
-  // Optional metadata
-  contactEmail: z.string().email().optional(),
-  termsUrl: z.string().url().optional(),
-  privacyUrl: z.string().url().optional(),
+  // Optional metadata (Firestore-safe with Zod v4 validators)
+  contactEmail: z.email().nullable().optional().default(null),
+  termsUrl: z.url().nullable().optional().default(null),
+  privacyUrl: z.url().nullable().optional().default(null),
 
   createdAt: z.number(),
   updatedAt: z.number(),
@@ -39,9 +39,9 @@ export const createCompanyInput = z.object({
     .min(COMPANY_CONSTRAINTS.NAME_LENGTH.min, "Company name is required")
     .max(COMPANY_CONSTRAINTS.NAME_LENGTH.max, "Company name too long")
     .transform((val) => val.trim()),
-  contactEmail: z.string().email("Invalid email format").optional(),
-  termsUrl: z.string().url("Invalid URL").optional(),
-  privacyUrl: z.string().url("Invalid URL").optional(),
+  contactEmail: z.email({ message: "Invalid email format" }).optional(),
+  termsUrl: z.url({ message: "Invalid URL" }).optional(),
+  privacyUrl: z.url({ message: "Invalid URL" }).optional(),
 });
 
 export const updateCompanyInput = z.object({
@@ -51,9 +51,9 @@ export const updateCompanyInput = z.object({
     .min(COMPANY_CONSTRAINTS.NAME_LENGTH.min, "Company name is required")
     .max(COMPANY_CONSTRAINTS.NAME_LENGTH.max, "Company name too long")
     .transform((val) => val.trim()),
-  contactEmail: z.string().email("Invalid email format").optional(),
-  termsUrl: z.string().url("Invalid URL").optional(),
-  privacyUrl: z.string().url("Invalid URL").optional(),
+  contactEmail: z.email({ message: "Invalid email format" }).optional(),
+  termsUrl: z.url({ message: "Invalid URL" }).optional(),
+  privacyUrl: z.url({ message: "Invalid URL" }).optional(),
 });
 
 // ============================================================================

@@ -197,6 +197,9 @@ describe("Events Server Actions", () => {
         name: "Company A",
         status: "active",
         deletedAt: null,
+        contactEmail: null,
+        termsUrl: null,
+        privacyUrl: null,
         createdAt: 1000000000,
         updatedAt: 1000000000,
       };
@@ -237,6 +240,9 @@ describe("Events Server Actions", () => {
         name: "Company A",
         status: "deleted",
         deletedAt: Date.now(),
+        contactEmail: null,
+        termsUrl: null,
+        privacyUrl: null,
         createdAt: 1000000000,
         updatedAt: 1000000000,
       };
