@@ -21,16 +21,17 @@ export default async function ResultsPage({ params }: ResultsPageProps) {
   const event = result.event;
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold mb-2">Event Analytics</h1>
-        <p className="text-muted-foreground">
-          Track performance and engagement metrics for your event
-        </p>
-      </div>
+    <main className="container mx-auto px-6 py-8">
+      <div className="space-y-8">
+        <div>
+          <h1 className="text-2xl font-bold mb-2">Event Analytics</h1>
+          <p className="text-muted-foreground">
+            Track performance and engagement metrics for your event
+          </p>
+        </div>
 
-      {/* Placeholder metrics cards */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        {/* Placeholder metrics cards */}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <MetricCard
           label="Total Sessions"
           value={event.sessionsCount?.toString() ?? "0"}
@@ -67,7 +68,8 @@ export default async function ResultsPage({ params }: ResultsPageProps) {
           </p>
         </div>
       </div>
-    </div>
+      </div>
+    </main>
   );
 }
 

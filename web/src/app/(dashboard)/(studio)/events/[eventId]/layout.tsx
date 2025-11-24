@@ -46,8 +46,8 @@ export default async function EventLayout({
         </div>
       </div>
 
-      {/* Page content */}
-      <main className="container mx-auto px-6 py-8">{children}</main>
+      {/* Page content - child routes handle their own main wrapper */}
+      {children}
     </div>
   )
 }
