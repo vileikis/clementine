@@ -1,4 +1,4 @@
-import { getEventAction } from "@/features/events";
+import { getEventAction } from "@/features/events/actions";
 import { notFound } from "next/navigation";
 
 interface ResultsPageProps {
