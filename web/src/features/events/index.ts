@@ -20,7 +20,6 @@ export { EventBreadcrumb } from "./components/studio/EventBreadcrumb";
 // ============================================================================
 // Designer Components (Event builder UI)
 // ============================================================================
-export { DesignSidebar } from "./components/designer/DesignSidebar";
 export { WelcomeEditor } from "./components/designer/WelcomeEditor";
 export { EndingEditor } from "./components/designer/EndingEditor";
 export { PreviewPanel } from "./components/designer/PreviewPanel";
