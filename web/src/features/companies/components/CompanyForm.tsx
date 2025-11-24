@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createCompanyAction, updateCompanyAction } from "@/features/companies/actions";
+import { createCompanyAction, updateCompanyAction } from "../actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { Company } from "@/features/companies";
+import type { Company } from "../types";
 
 interface CompanyFormProps {
   company?: Company; // If provided, form is in edit mode
