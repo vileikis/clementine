@@ -46,7 +46,13 @@ export async function createEventAction(
   // Verify admin authentication
   const auth = await verifyAdminSecret();
   if (!auth.authorized) {
-    return { success: false, error: auth.error };
+    return {
+      success: false,
+      error: {
+        code: "PERMISSION_DENIED",
+        message: auth.error
+      }
+    };
   }
 
   try {
@@ -55,10 +61,22 @@ export async function createEventAction(
     // Validate company exists
     const company = await getCompany(validated.companyId);
     if (!company) {
-      return { success: false, error: "Company not found" };
+      return {
+        success: false,
+        error: {
+          code: "COMPANY_NOT_FOUND",
+          message: "Company not found"
+        }
+      };
     }
     if (company.status !== "active") {
-      return { success: false, error: "Company is not active" };
+      return {
+        success: false,
+        error: {
+          code: "COMPANY_INACTIVE",
+          message: "Company is not active"
+        }
+      };
     }
 
     const eventId = await createEvent({
@@ -70,11 +88,20 @@ export async function createEventAction(
     return { success: true, eventId };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { success: false, error: error.issues[0].message };
+      return {
+        success: false,
+        error: {
+          code: "VALIDATION_ERROR",
+          message: error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join(', ')
+        }
+      };
     }
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to create event",
+      error: {
+        code: "INTERNAL_ERROR",
+        message: error instanceof Error ? error.message : "Failed to create event"
+      },
     };
   }
 }
@@ -83,13 +110,22 @@ export async function getEventAction(eventId: string) {
   try {
     const event = await getEvent(eventId);
     if (!event) {
-      throw new Error("Event not found");
+      return {
+        success: false,
+        error: {
+          code: "EVENT_NOT_FOUND",
+          message: "Event not found"
+        }
+      };
     }
     return { success: true, event };
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to fetch event",
+      error: {
+        code: "INTERNAL_ERROR",
+        message: error instanceof Error ? error.message : "Failed to fetch event"
+      }
     };
   }
 }
@@ -103,7 +139,10 @@ export async function listEventsAction(filters?: {
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to fetch events",
+      error: {
+        code: "INTERNAL_ERROR",
+        message: error instanceof Error ? error.message : "Failed to fetch events"
+      }
     };
   }
 }
@@ -115,7 +154,13 @@ export async function updateEventBrandingAction(
   // Verify admin authentication
   const auth = await verifyAdminSecret();
   if (!auth.authorized) {
-    return { success: false, error: auth.error };
+    return {
+      success: false,
+      error: {
+        code: "PERMISSION_DENIED",
+        message: auth.error
+      }
+    };
   }
 
   try {
@@ -125,7 +170,10 @@ export async function updateEventBrandingAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to update branding",
+      error: {
+        code: "INTERNAL_ERROR",
+        message: error instanceof Error ? error.message : "Failed to update branding"
+      }
     };
   }
 }
@@ -137,7 +185,13 @@ export async function updateEventStatusAction(
   // Verify admin authentication
   const auth = await verifyAdminSecret();
   if (!auth.authorized) {
-    return { success: false, error: auth.error };
+    return {
+      success: false,
+      error: {
+        code: "PERMISSION_DENIED",
+        message: auth.error
+      }
+    };
   }
 
   try {
@@ -148,7 +202,10 @@ export async function updateEventStatusAction(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to update status",
+      error: {
+        code: "INTERNAL_ERROR",
+        message: error instanceof Error ? error.message : "Failed to update status"
+      }
     };
   }
 }
@@ -164,7 +221,13 @@ export async function updateEventTitleAction(
   // Verify admin authentication
   const auth = await verifyAdminSecret();
   if (!auth.authorized) {
-    return { success: false, error: auth.error };
+    return {
+      success: false,
+      error: {
+        code: "PERMISSION_DENIED",
+        message: auth.error
+      }
+    };
   }
 
   try {
@@ -175,11 +238,20 @@ export async function updateEventTitleAction(
     return { success: true };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { success: false, error: error.issues[0].message };
+      return {
+        success: false,
+        error: {
+          code: "VALIDATION_ERROR",
+          message: error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join(', ')
+        }
+      };
     }
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to update title",
+      error: {
+        code: "INTERNAL_ERROR",
+        message: error instanceof Error ? error.message : "Failed to update title"
+      }
     };
   }
 }
@@ -220,51 +292,52 @@ export async function updateEventTheme(
     // Validate input with Zod
     const validatedData = updateEventThemeSchema.parse(data);
 
-    // Check if event exists
-    const eventRef = db.collection("events").doc(eventId);
-    const eventDoc = await eventRef.get();
-
-    if (!eventDoc.exists) {
-      return {
-        success: false,
-        error: {
-          code: "EVENT_NOT_FOUND",
-          message: "Event not found",
-        },
-      };
-    }
-
     // Build update object with dot notation for nested fields
     const updateData: Record<string, unknown> = {
       updatedAt: Date.now(),
     };
 
-    // Map validated data to nested theme object fields using dot notation
-    if (validatedData.buttonColor !== undefined) {
-      updateData["theme.buttonColor"] = validatedData.buttonColor;
-    }
-    if (validatedData.buttonTextColor !== undefined) {
-      updateData["theme.buttonTextColor"] = validatedData.buttonTextColor;
-    }
-    if (validatedData.backgroundColor !== undefined) {
-      updateData["theme.backgroundColor"] = validatedData.backgroundColor;
-    }
-    if (validatedData.backgroundImage !== undefined) {
-      updateData["theme.backgroundImage"] = validatedData.backgroundImage;
-    }
+    // Dynamic field mapping using Object.entries
+    const fieldMappings: Record<string, string> = {
+      buttonColor: "theme.buttonColor",
+      buttonTextColor: "theme.buttonTextColor",
+      backgroundColor: "theme.backgroundColor",
+      backgroundImage: "theme.backgroundImage",
+    };
 
-    // Update only provided fields
-    await eventRef.update(updateData);
+    Object.entries(validatedData).forEach(([key, value]) => {
+      if (value !== undefined && fieldMappings[key]) {
+        updateData[fieldMappings[key]] = value;
+      }
+    });
+
+    // Update only provided fields - trust Firebase, catch NOT_FOUND error
+    const eventRef = db.collection("events").doc(eventId);
+    try {
+      await eventRef.update(updateData);
+    } catch (updateError: unknown) {
+      // Firestore throws code 5 for NOT_FOUND
+      if (updateError && typeof updateError === "object" && "code" in updateError && updateError.code === 5) {
+        return {
+          success: false,
+          error: {
+            code: "EVENT_NOT_FOUND",
+            message: "Event not found",
+          },
+        };
+      }
+      throw updateError;
+    }
 
     return { success: true, data: undefined };
   } catch (error) {
-    // Handle Zod validation errors
-    if (error && typeof error === "object" && "issues" in error) {
+    // Handle Zod validation errors with detailed field paths
+    if (error instanceof z.ZodError) {
       return {
         success: false,
         error: {
           code: "VALIDATION_ERROR",
-          message: "Invalid input data",
+          message: error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join(', '),
         },
       };
     }
