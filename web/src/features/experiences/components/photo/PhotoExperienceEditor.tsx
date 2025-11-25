@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
+import { useUnsavedChanges } from "@/hooks/useUnsavedChanges";
 import { ExperienceEditorHeader } from "../shared/ExperienceEditorHeader";
 import { AITransformSettings } from "../shared/AITransformSettings";
 import { AIPlayground } from "../shared/AIPlayground";
@@ -61,6 +62,40 @@ export function PhotoExperienceEditor({
     experience.aiPhotoConfig.referenceImageUrls || []
   );
   const [aiAspectRatio, setAiAspectRatio] = useState<AspectRatio>(experience.aiPhotoConfig.aspectRatio || "1:1");
+
+  // Track unsaved changes by comparing current state to original experience values
+  const hasUnsavedChanges = useMemo(() => {
+    // Compare countdown
+    if (countdownSeconds !== experience.captureConfig.countdown) return true;
+    // Compare overlay
+    if ((overlayUrl || null) !== (experience.captureConfig.overlayUrl || null)) return true;
+    // Compare AI enabled
+    if (aiEnabled !== experience.aiPhotoConfig.enabled) return true;
+    // Compare AI model
+    if ((aiModel || null) !== (experience.aiPhotoConfig.model || null)) return true;
+    // Compare AI prompt
+    if ((aiPrompt || null) !== (experience.aiPhotoConfig.prompt || null)) return true;
+    // Compare AI aspect ratio
+    if (aiAspectRatio !== (experience.aiPhotoConfig.aspectRatio || "1:1")) return true;
+    // Compare reference images (array comparison)
+    const originalRefs = experience.aiPhotoConfig.referenceImageUrls || [];
+    if (aiReferenceImageUrls.length !== originalRefs.length) return true;
+    if (aiReferenceImageUrls.some((url, i) => url !== originalRefs[i])) return true;
+
+    return false;
+  }, [
+    countdownSeconds,
+    overlayUrl,
+    aiEnabled,
+    aiModel,
+    aiPrompt,
+    aiAspectRatio,
+    aiReferenceImageUrls,
+    experience,
+  ]);
+
+  // Show browser confirmation dialog when leaving with unsaved changes
+  useUnsavedChanges(hasUnsavedChanges);
 
   // Handle title save
   const handleTitleSave = async (newTitle: string) => {

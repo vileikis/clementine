@@ -123,19 +123,19 @@ All paths relative to repository root:
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T027 [P] Add unsaved changes detection with browser confirmation dialog in `web/src/features/experiences/components/PhotoExperienceEditor.tsx`
-- [ ] T028 [P] Add keyboard shortcut (Cmd+S / Ctrl+S) for save in `web/src/features/experiences/components/PhotoExperienceEditor.tsx`
-- [ ] T029 Verify touch targets ≥44x44px on all interactive elements
-- [ ] T030 Verify typography ≥14px for body text on mobile
+- [x] T027 [P] Add unsaved changes detection with browser confirmation dialog in `web/src/features/experiences/components/PhotoExperienceEditor.tsx`
+- [x] T028 [P] Add keyboard shortcut (Cmd+S / Ctrl+S) for save in `web/src/features/experiences/components/PhotoExperienceEditor.tsx`
+- [x] T029 Verify touch targets ≥44x44px on all interactive elements
+- [x] T030 Verify typography ≥14px for body text on mobile
 
 ### Validation Loop (REQUIRED - Constitution Principle V)
 
 **Purpose**: Ensure code quality and correctness before merge
 
-- [ ] T031 Run `pnpm lint` and fix all errors/warnings
-- [ ] T032 Run `pnpm type-check` and resolve all TypeScript errors
-- [ ] T033 Verify feature in local dev server (`pnpm dev`) using quickstart.md test scenarios
-- [ ] T034 Commit only after validation loop passes cleanly
+- [x] T031 Run `pnpm lint` and fix all errors/warnings
+- [x] T032 Run `pnpm type-check` and resolve all TypeScript errors
+- [x] T033 Verify feature in local dev server (`pnpm dev`) using quickstart.md test scenarios
+- [x] T034 Commit only after validation loop passes cleanly
 
 ---
 

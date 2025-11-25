@@ -281,7 +281,7 @@ export function AIPlayground({
               size="sm"
               onClick={handleClear}
               disabled={disabled}
-              className="h-8 w-8 p-0"
+              className="min-h-[44px] min-w-[44px] p-0"
               title="Clear and start over"
             >
               <X className="h-4 w-4" />
