@@ -69,35 +69,35 @@
 
 ### Implementation for User Story 1
 
-- [ ] T011 [US1] Update repository query pattern in `web/src/features/experiences/repositories/experiences.repository.ts`:
+- [x] T011 [US1] Update repository query pattern in `web/src/features/experiences/repositories/experiences.repository.ts`:
   - Change collection path from subcollection to root `/experiences`
   - Add `createExperience` function that writes to root collection
-- [ ] T012 [US1] Update `photo-create.ts` in `web/src/features/experiences/actions/photo-create.ts`:
+- [x] T012 [US1] Update `photo-create.ts` in `web/src/features/experiences/actions/photo-create.ts`:
   - Accept `companyId` parameter instead of `eventId`
   - Accept `eventIds[]` array (can be empty for company-only experiences)
   - Use `name` instead of `label`
   - Use `aiPhotoConfig` instead of `aiConfig`
   - Use `previewMediaUrl` instead of `previewPath`
   - Use `captureConfig` instead of `config`
-- [ ] T013 [US1] Update `gif-create.ts` in `web/src/features/experiences/actions/gif-create.ts`:
+- [x] T013 [US1] Update `gif-create.ts` in `web/src/features/experiences/actions/gif-create.ts`:
   - Apply same changes as photo-create (companyId, eventIds[], name, aiPhotoConfig, captureConfig)
-- [ ] T014 [US1] Update `BaseExperienceFields.tsx` in `web/src/features/experiences/components/shared/BaseExperienceFields.tsx`:
+- [x] T014 [US1] Update `BaseExperienceFields.tsx` in `web/src/features/experiences/components/shared/BaseExperienceFields.tsx`:
   - Change `label` field to `name` field
   - Update form field labels and validation
-- [ ] T015 [US1] Update `AITransformSettings.tsx` in `web/src/features/experiences/components/shared/AITransformSettings.tsx`:
+- [x] T015 [US1] Update `AITransformSettings.tsx` in `web/src/features/experiences/components/shared/AITransformSettings.tsx`:
   - Access `aiPhotoConfig` instead of `aiConfig` for photo/gif types
   - Rename `referenceImagePaths` to `referenceImageUrls`
-- [ ] T016 [US1] Update `CreateExperienceForm.tsx` in `web/src/features/experiences/components/shared/CreateExperienceForm.tsx`:
+- [x] T016 [US1] Update `CreateExperienceForm.tsx` in `web/src/features/experiences/components/shared/CreateExperienceForm.tsx`:
   - Pass `companyId` from context
   - Handle `eventIds[]` array (empty or with current event ID)
   - Use new field names throughout
-- [ ] T017 [US1] Update `PhotoExperienceEditor.tsx` in `web/src/features/experiences/components/photo/PhotoExperienceEditor.tsx`:
+- [x] T017 [US1] Update `PhotoExperienceEditor.tsx` in `web/src/features/experiences/components/photo/PhotoExperienceEditor.tsx`:
   - Use `aiPhotoConfig` instead of `aiConfig`
   - Use `captureConfig` instead of `config`
-- [ ] T018 [US1] Update `GifExperienceEditor.tsx` in `web/src/features/experiences/components/gif/GifExperienceEditor.tsx`:
+- [x] T018 [US1] Update `GifExperienceEditor.tsx` in `web/src/features/experiences/components/gif/GifExperienceEditor.tsx`:
   - Use `aiPhotoConfig` instead of `aiConfig` (GIFs use photo models)
   - Use `captureConfig` instead of `config`
-- [ ] T019 [US1] Validate company access in create actions:
+- [x] T019 [US1] Validate company access in create actions:
   - Add `companyId` validation against user's authorized companies
   - Return appropriate error if unauthorized
 
