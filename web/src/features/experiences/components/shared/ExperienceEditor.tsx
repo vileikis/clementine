@@ -2,7 +2,7 @@
 
 import { PhotoExperienceEditor } from "../photo/PhotoExperienceEditor";
 import { GifExperienceEditor } from "../gif/GifExperienceEditor";
-import type { Experience, PhotoExperience, GifExperience } from "../../lib/schemas";
+import type { Experience, PhotoExperience, GifExperience } from "../../schemas";
 
 interface ExperienceEditorProps {
   experience: Experience;

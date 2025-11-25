@@ -21,7 +21,7 @@ import { z } from "zod";
 import {
   createPhotoExperienceSchema,
   type PhotoExperience
-} from "../lib/schemas";
+} from "../schemas";
 import type { ActionResponse } from "./types";
 import { ErrorCodes } from "./types";
 import { checkAuth, validateEventExists, createSuccessResponse, createErrorResponse } from "./utils";

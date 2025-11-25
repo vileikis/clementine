@@ -9,7 +9,7 @@
  */
 
 import { notFound } from "next/navigation";
-import { getExperience } from "@/features/experiences/lib/repository";
+import { getExperience } from "@/features/experiences/repositories";
 import { ExperienceEditorWrapper } from "@/features/experiences";
 
 interface ExperienceEditorPageProps {

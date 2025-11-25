@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Upload } from "lucide-react";
 import { uploadPreviewMedia, deletePreviewMedia } from "../../actions/photo-media";
-import type { PreviewType } from "../../lib/schemas";
+import type { PreviewType } from "../../schemas";
 
 interface PreviewMediaUploadProps {
   eventId: string;

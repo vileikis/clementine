@@ -15,7 +15,7 @@ import { storage as bucket } from "@/lib/firebase/admin";
 import type { ActionResponse } from "./types";
 import { ErrorCodes } from "./types";
 import { checkAuth, getExperienceDocument, createErrorResponse, createSuccessResponse } from "./utils";
-import type { PreviewType } from "../lib/schemas";
+import type { PreviewType } from "../schemas";
 
 /**
  * Helper function to detect file type from MIME type

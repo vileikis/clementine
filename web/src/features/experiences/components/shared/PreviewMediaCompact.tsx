@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ImagePlus, X } from "lucide-react";
 import { uploadPreviewMedia, deletePreviewMedia } from "../../actions/photo-media";
-import type { PreviewType } from "../../lib/schemas";
+import type { PreviewType } from "../../schemas";
 import { cn } from "@/lib/utils";
 
 interface PreviewMediaCompactProps {

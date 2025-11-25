@@ -10,7 +10,7 @@ import { AITransformSettings } from "../shared/AITransformSettings";
 import { CountdownSettings } from "./CountdownSettings";
 import { OverlaySettings } from "./OverlaySettings";
 import { updatePhotoExperience } from "../../actions/photo-update";
-import type { PhotoExperience, PreviewType, AspectRatio } from "../../lib/schemas";
+import type { PhotoExperience, PreviewType, AspectRatio } from "../../schemas";
 
 interface PhotoExperienceEditorProps {
   experience: PhotoExperience;

@@ -21,7 +21,7 @@ import {
 import { HelpCircle } from "lucide-react";
 import { PreviewMediaCompact } from "./PreviewMediaCompact";
 import { DeleteExperienceButton } from "./DeleteExperienceButton";
-import type { Experience, PreviewType } from "../../lib/schemas";
+import type { Experience, PreviewType } from "../../schemas";
 
 interface ExperienceEditorHeaderProps {
   // Experience data

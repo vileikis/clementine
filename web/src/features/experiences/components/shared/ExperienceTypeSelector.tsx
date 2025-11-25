@@ -8,7 +8,7 @@
  */
 
 import { cn } from "@/lib/utils";
-import type { ExperienceType } from "../../lib/schemas";
+import type { ExperienceType } from "../../schemas";
 
 interface ExperienceTypeOption {
   type: ExperienceType;

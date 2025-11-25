@@ -9,7 +9,7 @@ import { ExperienceEditorHeader } from "../shared/ExperienceEditorHeader";
 import { AITransformSettings } from "../shared/AITransformSettings";
 import { GifCaptureSettings } from "./GifCaptureSettings";
 import { updateGifExperience } from "../../actions/gif-update";
-import type { GifExperience, PreviewType, AspectRatio } from "../../lib/schemas";
+import type { GifExperience, PreviewType, AspectRatio } from "../../schemas";
 
 interface GifExperienceEditorProps {
   experience: GifExperience;

@@ -6,8 +6,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { ExternalLink } from "lucide-react";
 import { ImageUploadField } from "@/components/shared/ImageUploadField";
-import { AI_MODEL_PROMPT_GUIDES } from "../../lib/constants";
-import type { AspectRatio } from "../../lib/schemas";
+import { AI_MODEL_PROMPT_GUIDES } from "../../constants";
+import type { AspectRatio } from "../../schemas";
 
 interface AITransformSettingsProps {
   aiModel: string;
