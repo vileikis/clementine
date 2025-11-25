@@ -24,9 +24,9 @@
 
 **Purpose**: Create the new folder structure per feature-modules.md standard
 
-- [ ] T001 Create `repositories/` folder in `web/src/features/experiences/`
-- [ ] T002 [P] Create `schemas/` folder in `web/src/features/experiences/`
-- [ ] T003 [P] Create `types/` folder in `web/src/features/experiences/`
+- [x] T001 Create `repositories/` folder in `web/src/features/experiences/`
+- [x] T002 [P] Create `schemas/` folder in `web/src/features/experiences/`
+- [x] T003 [P] Create `types/` folder in `web/src/features/experiences/`
 
 ---
 
@@ -38,23 +38,23 @@
 
 ### Schema Migration
 
-- [ ] T004 Move `lib/schemas.ts` → `schemas/experiences.schemas.ts` using git mv
-- [ ] T005 Move `lib/schemas.test.ts` → `schemas/experiences.schemas.test.ts` using git mv
-- [ ] T006 Create barrel export `schemas/index.ts` with `export * from './experiences.schemas'`
+- [x] T004 Move `lib/schemas.ts` → `schemas/experiences.schemas.ts` using git mv
+- [x] T005 Move `lib/schemas.test.ts` → `schemas/experiences.schemas.test.ts` using git mv
+- [x] T006 Create barrel export `schemas/index.ts` with `export * from './experiences.schemas'`
 
 ### Repository Migration
 
-- [ ] T007 Move `lib/repository.ts` → `repositories/experiences.repository.ts` using git mv
-- [ ] T008 Create barrel export `repositories/index.ts` with `export * from './experiences.repository'`
+- [x] T007 Move `lib/repository.ts` → `repositories/experiences.repository.ts` using git mv
+- [x] T008 Create barrel export `repositories/index.ts` with `export * from './experiences.repository'`
 
 ### Constants Migration
 
-- [ ] T009 Move `lib/constants.ts` → `constants.ts` (feature root) using git mv
+- [x] T009 Move `lib/constants.ts` → `constants.ts` (feature root) using git mv
 
 ### Types Extraction
 
-- [ ] T010 Create `types/experiences.types.ts` extracting type exports from schemas (Zod-inferred types)
-- [ ] T011 Create barrel export `types/index.ts` with `export * from './experiences.types'`
+- [x] T010 Create `types/experiences.types.ts` extracting type exports from schemas (Zod-inferred types)
+- [x] T011 Create barrel export `types/index.ts` with `export * from './experiences.types'`
 
 **Checkpoint**: File structure is now compliant. Import updates can begin.
 
