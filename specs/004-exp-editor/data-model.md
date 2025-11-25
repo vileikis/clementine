@@ -25,18 +25,6 @@ The experience entity already exists in `web/src/features/experiences/schemas/ex
 | `aiPhotoConfig.aspectRatio` | enum | Output aspect ratio |
 | `aiPhotoConfig.referenceImageUrls` | string[] \| null | Reference images (max 5) |
 
-### Event Theme (Existing - Read Only)
-
-The event theme is read from the parent event for branding context display. No modifications needed.
-
-**Relevant Fields for Branding Context**:
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `theme.primaryColor` | string (hex) | Primary brand color |
-| `theme.logoUrl` | string \| null | Brand logo URL |
-| `theme.fontFamily` | string \| null | Brand font family |
-
 ### Playground Session (Client-Side Only - Not Persisted)
 
 Playground state is ephemeral and lives only in React component state.
@@ -53,14 +41,12 @@ Playground state is ephemeral and lives only in React component state.
 
 ```
 Event (1) ─────< (N) Experience
-  │                    │
-  └── theme ◄──────── aiPhotoConfig
-      (branding)       (AI settings)
+                       │
+                   aiPhotoConfig
+                   (AI settings)
 ```
 
-- Event has theme (branding context)
 - Experience belongs to Event via `eventIds[]`
-- AI generation injects event theme into prompt
 
 ## State Transitions
 
@@ -127,7 +113,6 @@ Uses existing `updatePhotoExperienceSchema` from `experiences.schemas.ts`:
   prompt: string,            // From experience config
   inputImageUrl: string,     // Uploaded test image (temp URL)
   referenceImageUrl?: string,// Optional reference
-  brandColor?: string,       // From event theme.primaryColor
 }
 ```
 
@@ -173,7 +158,7 @@ Uses existing `updatePhotoExperienceSchema` from `experiences.schemas.ts`:
        │
        ├── Upload to temp storage (get URL)
        │
-       ├── Fetch experience + event theme
+       ├── Fetch experience config
        │
        ├── Call AI client
        │

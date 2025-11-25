@@ -5,7 +5,7 @@
 
 ## Summary
 
-Implement a dedicated Experience Editor route (`/events/{eventId}/design/experiences/{experienceId}`) with a split-screen workspace. The left panel provides AI configuration (model selector, prompt editor, branding context indicator), while the right panel provides a playground for testing AI transformations in real-time. Builds on existing experiences module architecture using discriminated unions and Server Actions pattern.
+Implement a dedicated Experience Editor route (`/events/{eventId}/design/experiences/{experienceId}`) with a split-screen workspace. The left panel provides AI configuration (model selector, prompt editor), while the right panel provides a playground for testing AI transformations in real-time. Builds on existing experiences module architecture using discriminated unions and Server Actions pattern.
 
 ## Technical Context
 
@@ -69,8 +69,7 @@ web/
 │   │       │   ├── ExperienceEditor.tsx           # Wrapper (existing)
 │   │       │   ├── PhotoExperienceEditor.tsx      # Photo editor (enhance)
 │   │       │   ├── AIPlayground.tsx               # NEW: Playground panel
-│   │       │   ├── AITransformSettings.tsx        # Existing AI config
-│   │       │   └── BrandingContextIndicator.tsx   # NEW: Theme display
+│   │       │   └── AITransformSettings.tsx        # Existing AI config
 │   │       ├── actions/
 │   │       │   └── photo-update.ts                # Existing update action
 │   │       └── schemas/
@@ -88,7 +87,7 @@ web/
             └── AIPlayground.test.tsx              # NEW: Playground tests
 ```
 
-**Structure Decision**: Extends existing experiences module structure. No new directories needed except `AIPlayground.tsx` and `BrandingContextIndicator.tsx` components.
+**Structure Decision**: Extends existing experiences module structure. Only new component needed is `AIPlayground.tsx`.
 
 ## Complexity Tracking
 

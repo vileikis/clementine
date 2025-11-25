@@ -60,7 +60,6 @@ type ActionResponse<T = void> =
 ```typescript
 {
   experienceId: string;
-  eventId: string;
   testImageBase64: string;  // Base64-encoded image
   testImageMimeType: "image/jpeg" | "image/png" | "image/webp";
 }
@@ -78,7 +77,6 @@ ActionResponse<{
 **Error Codes**:
 - `PERMISSION_DENIED`: Not authenticated
 - `EXPERIENCE_NOT_FOUND`: Invalid experienceId
-- `EVENT_NOT_FOUND`: Invalid eventId
 - `AI_CONFIG_MISSING`: Experience has no AI config or prompt
 - `GENERATION_FAILED`: AI provider error
 - `GENERATION_TIMEOUT`: Took longer than 60s
@@ -86,13 +84,12 @@ ActionResponse<{
 
 **Implementation Notes**:
 1. Validate authentication
-2. Fetch experience and event
+2. Fetch experience
 3. Validate experience has aiPhotoConfig with prompt
 4. Upload test image to temp Firebase Storage
 5. Call `getAIClient().generateImage()` with:
    - `prompt`: experience.aiPhotoConfig.prompt
    - `inputImageUrl`: temp storage URL
-   - `brandColor`: event.theme.primaryColor
 6. Return result as Base64
 7. Clean up temp storage
 
