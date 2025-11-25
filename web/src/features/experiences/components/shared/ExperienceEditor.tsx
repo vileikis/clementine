@@ -5,6 +5,7 @@ import { GifExperienceEditor } from "../gif/GifExperienceEditor";
 import type { Experience, PhotoExperience, GifExperience } from "../../schemas";
 
 interface ExperienceEditorProps {
+  eventId: string;
   experience: Experience;
   onSave: (experienceId: string, data: Partial<Experience>) => Promise<void>;
   onDelete: (experienceId: string) => Promise<void>;
@@ -26,6 +27,7 @@ interface ExperienceEditorProps {
  * Pattern: Switch-case with exhaustiveness checking (research.md)
  */
 export function ExperienceEditor({
+  eventId,
   experience,
   onSave,
   onDelete,
@@ -36,6 +38,7 @@ export function ExperienceEditor({
     case "photo":
       return (
         <PhotoExperienceEditor
+          eventId={eventId}
           experience={experience} // Type narrowed to PhotoExperience
           onSave={onSave as (id: string, data: Partial<PhotoExperience>) => Promise<void>}
           onDelete={onDelete}
@@ -46,6 +49,7 @@ export function ExperienceEditor({
     case "gif":
       return (
         <GifExperienceEditor
+          eventId={eventId}
           experience={experience} // Type narrowed to GifExperience
           onSave={onSave as (id: string, data: Partial<GifExperience>) => Promise<void>}
           onDelete={onDelete}

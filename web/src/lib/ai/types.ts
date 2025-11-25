@@ -3,6 +3,8 @@ export interface TransformParams {
   inputImageUrl: string;
   referenceImageUrl?: string;
   brandColor?: string;
+  /** AI model to use for generation (e.g., 'gemini-2.5-flash-image', 'gemini-3-pro-image-preview') */
+  model?: string;
 }
 
 // AI provider configuration (read from env)

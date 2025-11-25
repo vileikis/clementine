@@ -151,16 +151,18 @@ export function ThemeEditor({ event }: ThemeEditorProps) {
   };
 
   return (
-    <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-      {/* Form Controls */}
-      <div className="space-y-6">
-        <div>
-          <h2 className="text-2xl font-semibold">Event Theme</h2>
-          <p className="text-sm text-muted-foreground mt-1">
-            Configure event-wide theme settings for visual customization
-          </p>
-        </div>
+    <div className="space-y-6">
+      {/* Header - Full Width */}
+      <div>
+        <h2 className="text-2xl font-semibold">Event Theme</h2>
+        <p className="text-sm text-muted-foreground mt-1">
+          Configure event-wide theme settings for visual customization
+        </p>
+      </div>
 
+      {/* Two Column Layout */}
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_1fr] items-start">
+        {/* Form Controls */}
         <div className="space-y-8">
           {/* 1. Identity Section */}
           <div className="space-y-4">
@@ -408,7 +410,7 @@ export function ThemeEditor({ event }: ThemeEditorProps) {
                   onChange={(e) =>
                     dispatch({ type: "UPDATE_BG_COLOR", payload: e.target.value })
                   }
-                  placeholder="#F9FAFB"
+                  placeholder="#FFFFFF"
                   pattern="^#[0-9A-Fa-f]{6}$"
                   className="flex-1"
                 />
@@ -462,68 +464,70 @@ export function ThemeEditor({ event }: ThemeEditorProps) {
             {isPending ? "Saving..." : "Save Changes"}
           </Button>
         </div>
-      </div>
 
-      {/* Live Preview */}
-      <PreviewPanel>
-        <div
-          className="relative flex h-full w-full flex-col items-center justify-center p-8"
-          style={{
-            backgroundColor: theme.background.color,
-            backgroundImage: theme.background.image
-              ? `url(${theme.background.image})`
-              : undefined,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            fontFamily: theme.fontFamily || undefined,
-          }}
-        >
-          {/* Overlay for readability when image is present */}
-          {theme.background.image && (
+        {/* Live Preview - Sticky */}
+        <div className="lg:sticky lg:top-4">
+          <PreviewPanel>
             <div
-              className="absolute inset-0 bg-black"
-              style={{ opacity: theme.background.overlayOpacity }}
-            />
-          )}
-
-          {/* Content */}
-          <div
-            className="relative z-10 space-y-6"
-            style={{ textAlign: theme.text.alignment }}
-          >
-            {/* Logo */}
-            {theme.logoUrl && (
-              <Image
-                src={theme.logoUrl}
-                alt="Event logo"
-                width={96}
-                height={96}
-                className="mx-auto h-24 w-24 object-contain mb-4"
-              />
-            )}
-
-            <h1 className="text-3xl font-bold" style={{ color: theme.text.color }}>
-              Event Preview
-            </h1>
-
-            <p className="text-lg" style={{ color: theme.text.color }}>
-              This is how your theme will look
-            </p>
-
-            <Button
-              size="lg"
-              className="mt-4"
+              className="relative flex h-full w-full flex-col items-center justify-center p-8"
               style={{
-                backgroundColor: buttonBgColor,
-                color: theme.button.textColor,
-                borderRadius: buttonRadiusMap[theme.button.radius],
+                backgroundColor: theme.background.color,
+                backgroundImage: theme.background.image
+                  ? `url(${theme.background.image})`
+                  : undefined,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                fontFamily: theme.fontFamily || undefined,
               }}
             >
-              Primary Button
-            </Button>
-          </div>
+              {/* Overlay for readability when image is present */}
+              {theme.background.image && (
+                <div
+                  className="absolute inset-0 bg-black"
+                  style={{ opacity: theme.background.overlayOpacity }}
+                />
+              )}
+
+              {/* Content */}
+              <div
+                className="relative z-10 space-y-6"
+                style={{ textAlign: theme.text.alignment }}
+              >
+                {/* Logo */}
+                {theme.logoUrl && (
+                  <Image
+                    src={theme.logoUrl}
+                    alt="Event logo"
+                    width={96}
+                    height={96}
+                    className="mx-auto h-24 w-24 object-contain mb-4"
+                  />
+                )}
+
+                <h1 className="text-3xl font-bold" style={{ color: theme.text.color }}>
+                  Event Preview
+                </h1>
+
+                <p className="text-lg" style={{ color: theme.text.color }}>
+                  This is how your theme will look
+                </p>
+
+                <Button
+                  size="lg"
+                  className="mt-4"
+                  style={{
+                    backgroundColor: buttonBgColor,
+                    color: theme.button.textColor,
+                    borderRadius: buttonRadiusMap[theme.button.radius],
+                  }}
+                >
+                  Primary Button
+                </Button>
+              </div>
+            </div>
+          </PreviewPanel>
         </div>
-      </PreviewPanel>
+      </div>
     </div>
   );
 }
