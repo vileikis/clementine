@@ -4,15 +4,12 @@ import { useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { Upload } from "lucide-react";
 import { uploadFrameOverlay, deleteFrameOverlay } from "../../actions/photo-media";
 
 interface OverlaySettingsProps {
   experienceId: string;
-  overlayEnabled: boolean;
   overlayUrl?: string;
-  onOverlayEnabledChange: (enabled: boolean) => void;
   onUpload: (publicUrl: string) => void;
   onRemove: () => void;
   disabled?: boolean;
@@ -22,12 +19,13 @@ interface OverlaySettingsProps {
  * Overlay Settings component for frame overlay configuration
  * Refactored for normalized Firestore design (data-model-v4).
  * Matches the style of PreviewMediaUpload for consistency.
+ *
+ * Frame overlay is optional - upload to enable, remove to disable.
+ * No separate toggle needed.
  */
 export function OverlaySettings({
   experienceId,
-  overlayEnabled,
   overlayUrl,
-  onOverlayEnabledChange,
   onUpload,
   onRemove,
   disabled = false,
@@ -48,7 +46,6 @@ export function OverlaySettings({
 
       if (result.success) {
         onUpload(result.data.publicUrl);
-        onOverlayEnabledChange(true);
       } else {
         setUploadError(result.error.message);
         setTimeout(() => setUploadError(null), 5000);
@@ -89,72 +86,62 @@ export function OverlaySettings({
 
   return (
     <div className="space-y-4">
-      {/* Header with Toggle */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-semibold">Frame Overlay</h2>
-        <Switch
-          id="overlayEnabled"
-          checked={overlayEnabled}
-          onCheckedChange={onOverlayEnabledChange}
-          disabled={disabled}
-        />
-      </div>
+      {/* Header */}
+      <h2 className="text-2xl font-semibold">Frame Overlay</h2>
 
-      {/* Upload Area - only visible when enabled */}
-      {overlayEnabled && (
+      {/* Upload Area - always visible */}
+      <div className="space-y-2">
+        <Label htmlFor="frame-overlay">Upload Frame</Label>
         <div className="space-y-2">
-          <Label htmlFor="frame-overlay">Upload Frame</Label>
-          <div className="space-y-2">
-            {overlayUrl && (
-              <div className="relative w-full h-48 overflow-hidden rounded-lg border bg-muted">
-                <Image
-                  src={overlayUrl}
-                  alt="Frame overlay"
-                  fill
-                  className="object-contain"
-                  unoptimized
-                />
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  className="absolute top-2 right-2"
-                  onClick={handleRemoveOverlay}
-                  disabled={isUploading || isDeleting || disabled}
-                  type="button"
-                >
-                  {isDeleting ? "Removing..." : "Remove"}
-                </Button>
-              </div>
-            )}
-            <div className="relative">
-              <input
-                id="frame-overlay"
-                type="file"
-                accept="image/png,image/jpeg,image/jpg"
-                onChange={handleOverlayUpload}
-                disabled={isUploading || isDeleting || disabled}
-                className="hidden"
+          {overlayUrl && (
+            <div className="relative w-full h-48 overflow-hidden rounded-lg border bg-muted">
+              <Image
+                src={overlayUrl}
+                alt="Frame overlay"
+                fill
+                className="object-contain"
+                unoptimized
               />
               <Button
-                variant="outline"
-                className="w-full"
+                variant="destructive"
+                size="sm"
+                className="absolute top-2 right-2 min-h-[44px] min-w-[44px]"
+                onClick={handleRemoveOverlay}
                 disabled={isUploading || isDeleting || disabled}
-                onClick={() => document.getElementById("frame-overlay")?.click()}
                 type="button"
               >
-                <Upload className="mr-2 h-4 w-4" />
-                {isUploading ? "Uploading..." : overlayUrl ? "Replace Overlay" : "Upload Overlay"}
+                {isDeleting ? "Removing..." : "Remove"}
               </Button>
             </div>
-            {uploadError && (
-              <p className="text-xs text-destructive">{uploadError}</p>
-            )}
-            <p className="text-xs text-muted-foreground">
-              The frame will be overlaid on top of guest photos. PNG recommended for transparency. Max 10MB.
-            </p>
+          )}
+          <div className="relative">
+            <input
+              id="frame-overlay"
+              type="file"
+              accept="image/png,image/jpeg,image/jpg"
+              onChange={handleOverlayUpload}
+              disabled={isUploading || isDeleting || disabled}
+              className="hidden"
+            />
+            <Button
+              variant="outline"
+              className="w-full min-h-[44px]"
+              disabled={isUploading || isDeleting || disabled}
+              onClick={() => document.getElementById("frame-overlay")?.click()}
+              type="button"
+            >
+              <Upload className="mr-2 h-4 w-4" />
+              {isUploading ? "Uploading..." : overlayUrl ? "Replace Overlay" : "Upload Overlay"}
+            </Button>
           </div>
+          {uploadError && (
+            <p className="text-xs text-destructive">{uploadError}</p>
+          )}
+          <p className="text-xs text-muted-foreground">
+            The frame will be overlaid on top of guest photos. PNG recommended for transparency. Max 10MB.
+          </p>
         </div>
-      )}
+      </div>
     </div>
   );
 }

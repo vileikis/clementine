@@ -22,7 +22,10 @@ export class GoogleAIProvider implements AIClient {
   }
 
   async generateImage(params: TransformParams): Promise<Buffer> {
+    const model = params.model || 'gemini-2.5-flash-image';
+
     console.log('[GoogleAI] Starting transform:', {
+      model,
       prompt: params.prompt.substring(0, 50),
       hasReference: !!params.referenceImageUrl,
     });
@@ -63,7 +66,7 @@ export class GoogleAIProvider implements AIClient {
 
     // Call Google AI
     const response = await this.ai.models.generateContent({
-      model: 'gemini-2.5-flash-image',
+      model,
       contents: promptParts,
     });
 
