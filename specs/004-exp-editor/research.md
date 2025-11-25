@@ -21,28 +21,7 @@
 - Direct Google AI SDK calls: Rejected - would bypass the existing abstraction layer
 - New playground-specific AI service: Rejected - unnecessary duplication
 
-### 2. Event Theme Branding Context
-
-**Decision**: Extract branding context from event's `theme` object via existing event fetch
-
-**Rationale**: Events already store comprehensive theme data including `primaryColor`, `logoUrl`, `fontFamily`, and nested `text`, `button`, `background` configurations. The playground can inject `primaryColor` as `brandColor` into AI prompts.
-
-**Branding Context Fields (from EventTheme)**:
-- `primaryColor`: Hex color (required) - maps to `TransformParams.brandColor`
-- `logoUrl`: Optional brand logo URL
-- `text.color`: Text color for reference
-- `background.color`: Background color for reference
-
-**Display in Editor**: Read-only indicator showing:
-- Primary color swatch
-- Logo thumbnail (if set)
-- "Theme not configured" message if event has default theme
-
-**Alternatives Considered**:
-- Separate branding endpoint: Rejected - event already includes theme data
-- Manual branding input in playground: Rejected - defeats purpose of automatic injection
-
-### 3. Photo Upload and Temporary Storage
+### 2. Photo Upload and Temporary Storage
 
 **Decision**: Use client-side File API with Base64 encoding for playground (no Firebase Storage persistence)
 
@@ -60,7 +39,7 @@
 - Persist all playground images: Rejected - creates storage bloat
 - Base64-only flow: May work if AI provider supports inline data (needs testing)
 
-### 4. Split-Screen Layout Pattern
+### 3. Split-Screen Layout Pattern
 
 **Decision**: Use CSS Grid with responsive breakpoints following existing patterns
 
@@ -86,7 +65,7 @@ flex-direction: column;
 - Resizable panels: Rejected - adds complexity, not requested in spec
 - Tabs for mobile: Valid option, simpler than vertical scroll for large forms
 
-### 5. AI Model Selection
+### 4. AI Model Selection
 
 **Decision**: Use existing model options from `experiences.constants.ts` with simple dropdown
 
@@ -102,7 +81,7 @@ flex-direction: column;
 - Hardcoded options: Rejected - should use shared constants
 - Dynamic model fetch from API: Over-engineering for current needs
 
-### 6. Form State Management
+### 5. Form State Management
 
 **Decision**: Use `useState` for local state (following PhotoExperienceEditor pattern)
 
@@ -119,7 +98,7 @@ const [model, setModel] = useState(experience.aiPhotoConfig?.model ?? "gemini-2.
 - React Hook Form: Overhead for this use case since most fields are simple
 - useReducer: Better for complex nested state, but form is relatively flat
 
-### 7. Playground Generation Flow
+### 6. Playground Generation Flow
 
 **Decision**: Server Action for AI generation to protect API keys and handle large payloads
 
@@ -130,8 +109,8 @@ const [model, setModel] = useState(experience.aiPhotoConfig?.model ?? "gemini-2.
 2. Image uploaded to temp Firebase Storage location (with expiry)
 3. User clicks Generate
 4. Server Action receives: experienceId, testImageUrl
-5. Server fetches experience config + event theme
-6. Server calls AI client with merged params
+5. Server fetches experience config
+6. Server calls AI client with params from experience
 7. Server returns transformed image as Base64 or uploads to temp storage
 8. Client displays result
 
@@ -144,9 +123,12 @@ const [model, setModel] = useState(experience.aiPhotoConfig?.model ?? "gemini-2.
 | Topic | Decision | Key Rationale |
 |-------|----------|---------------|
 | AI Client | Use existing `getAIClient()` | Infrastructure exists, provider-agnostic |
-| Branding Context | Extract from event theme | Data already available, no new fetch needed |
 | Photo Storage | Client-side File API, temp upload for AI | Playground results not persisted per spec |
 | Layout | CSS Grid, responsive stacking | Follows ThemeEditor pattern |
 | Model Selection | Dropdown with constants | Consistent with existing UI patterns |
 | Form State | useState | Matches PhotoExperienceEditor pattern |
 | Generation Flow | Server Action | Protects API keys, handles payloads |
+
+## Deferred
+
+- **Branding Context**: Automatic injection of event theme colors into AI prompts. See `deferred/branding-context.md` for details.

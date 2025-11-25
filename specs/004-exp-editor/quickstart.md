@@ -32,8 +32,7 @@ GOOGLE_AI_API_KEY=your-api-key-here
 
 ```
 web/src/features/experiences/components/
-├── AIPlayground.tsx           # Playground panel with upload + generate
-└── BrandingContextIndicator.tsx  # Read-only theme display
+└── AIPlayground.tsx           # Playground panel with upload + generate
 ```
 
 ### Modified Components
@@ -69,8 +68,7 @@ ExperienceEditorPage
         │   │   └── Description Input
         │   ├── AI Engine Section
         │   │   ├── Model Selector
-        │   │   ├── Prompt Editor
-        │   │   └── BrandingContextIndicator
+        │   │   └── Prompt Editor
         │   └── Save Button
         │
         └── AIPlayground (Right)
@@ -90,7 +88,6 @@ ExperienceEditorPage
 ### Phase 2: Configuration Panel
 1. Add model selector dropdown
 2. Verify prompt editor (existing `AITransformSettings`)
-3. Create `BrandingContextIndicator.tsx`
 
 ### Phase 3: Playground Functionality
 1. Implement drag-drop upload in `AIPlayground`
@@ -109,7 +106,6 @@ ExperienceEditorPage
 - [ ] Editor loads with existing experience data
 - [ ] Model selector populates and saves
 - [ ] Prompt editor saves changes
-- [ ] Branding context displays event theme
 - [ ] File upload accepts JPEG/PNG/WebP
 - [ ] File upload rejects invalid types
 - [ ] Generate button triggers AI transformation
