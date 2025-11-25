@@ -40,7 +40,7 @@ function createMockEventData(overrides: Partial<Event> = {}): Omit<Event, "id"> 
         radius: "md",
       },
       background: {
-        color: "#F9FAFB",
+        color: "#FFFFFF",
         image: null,
         overlayOpacity: 0.5,
       },
@@ -133,7 +133,7 @@ describe("Events Repository", () => {
       expect(eventData.theme.button.backgroundColor).toBeNull(); // Inherits primaryColor
       expect(eventData.theme.button.textColor).toBe("#FFFFFF");
       expect(eventData.theme.button.radius).toBe("md");
-      expect(eventData.theme.background.color).toBe("#F9FAFB");
+      expect(eventData.theme.background.color).toBe("#FFFFFF");
       expect(eventData.theme.background.image).toBeNull();
       expect(eventData.theme.background.overlayOpacity).toBe(0.5);
     });
