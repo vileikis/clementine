@@ -11,12 +11,11 @@ This feature implements the **Dedicated Editor Route**. It allows users to defin
 
 ### 2.1 The Route
 
-- **URL:** `/studio/events/{eventId}/experiences/{experienceId}`
-- **Breadcrumbs:** Fixed top-left navigation: `Events` > `[Event Name]` > `[Experience Name]`.
-  - Clicking `[Event Name]` navigates back to the List View (PRD 1).
+- **URL:** `/events/{eventId}/design/experiences/{experienceId}`.
 
 ### 2.2 Split-Screen Workspace
 
+- **Header (Info)** Shows experience editor header with preview media, name, enabled switch and delete button.
 - **Left Panel (Configuration):** Scrollable form area.
 - **Right Panel (Playground):** Sticky/Fixed preview area.
 
@@ -27,12 +26,7 @@ This feature implements the **Dedicated Editor Route**. It allows users to defin
 - **Name:** Edit the Experience display name.
 - **Description:** Internal notes.
 
-### 3.2 Input Configuration
-
-- **Selector:** Dropdown to define what the guest provides.
-  - Values: `Photo`, `Burst/GIF`, `Video`.
-
-### 3.3 AI Engine
+### 3.2 AI Engine
 
 - **Model Selector:** Dropdown (e.g., "gemini-2.5-flash-image", "gemini-3-pro-image-preview").
 - **Prompt Editor:** Text area for the system prompt.
@@ -44,7 +38,7 @@ This feature implements the **Dedicated Editor Route**. It allows users to defin
 
 - **Upload:** Area to drag-and-drop a test file (matching the Input Configuration).
 - **Generate Button:** Triggers the AI transformation.
-- AI module /Users/iggyvileikis/Projects/@attempt-n2/clementine/web/src/lib/ai
+- Logic from AI transfomrations /Users/iggyvileikis/Projects/@attempt-n2/clementine/web/src/lib/ai
 - See Google Gemeni models docs https://ai.google.dev/gemini-api/docs/image-generation?batch=file#javascript_9
 
 ### 4.2 Output & Iteration
@@ -52,3 +46,14 @@ This feature implements the **Dedicated Editor Route**. It allows users to defin
 - **Loading State:** Visual feedback while the AI processes.
 - **Result Display:** Renders the final image/video.
 - **Save:** Persists the configuration changes (Prompt, Model, etc.) to the database.
+
+## 5. Scope
+
+### 5.1 In Scope
+
+- **AI Photo Experience** - Full editor and playground support for photo-based AI transformations
+
+### 5.2 Out of Scope
+
+- **Video Experience** - Video capture and AI transformation not included in this PRD
+- **GIF Editor** - GIF experience creation and editing not included in this PRD

@@ -139,14 +139,14 @@ export function CreateExperienceForm({ eventId }: CreateExperienceFormProps) {
           Experience Type
         </Label>
         <p className="text-sm text-muted-foreground">
-          Select the type of experience you want to create. Photo and GIF experiences are currently available.
+          Select the type of experience you want to create. Photo experiences are currently available.
         </p>
 
         <ExperienceTypeSelector
           selectedType={selectedType}
           onSelect={(type) => {
-            // Photo, GIF types are currently supported
-            if (type === "photo" || type === "gif") {
+            // Only Photo type is currently supported
+            if (type === "photo") {
               setValue("type", type, { shouldValidate: true });
             }
           }}
