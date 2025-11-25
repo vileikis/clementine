@@ -9,7 +9,7 @@
 
 ### User Story 1 - Configure AI Photo Experience (Priority: P1)
 
-An experience creator navigates to an existing experience's editor route to configure its AI transformation settings. They select an AI model, write a custom prompt, and view branding context that will be automatically injected from the event's theme.
+An experience creator navigates to an existing experience's editor route to configure its AI transformation settings. They select an AI model and write a custom prompt.
 
 **Why this priority**: Core functionality - without AI configuration, the experience cannot transform guest photos. This is the primary purpose of the editor.
 
@@ -19,7 +19,6 @@ An experience creator navigates to an existing experience's editor route to conf
 
 1. **Given** a user is on an experience editor page, **When** they select a model from the dropdown, **Then** the selection is visually reflected and persisted when saved
 2. **Given** a user is on an experience editor page, **When** they edit the system prompt, **Then** the prompt text updates in real-time and persists when saved
-3. **Given** an event has theme settings configured, **When** a user views the experience editor, **Then** they see a read-only indicator showing branding context will be injected
 
 ---
 
@@ -76,7 +75,6 @@ An experience creator uses the header to view preview media, toggle the enabled 
 - What happens when the user uploads an unsupported file type? System displays a validation error and rejects the file.
 - How does the system handle AI generation timeouts or rate limits? System displays a user-friendly error with option to retry.
 - What happens when the user navigates away with unsaved changes? Browser confirmation dialog prompts user to save or discard.
-- How does the system behave when the event theme has no colors or branding configured? Branding context indicator shows "No theme configured" and generation proceeds without theme injection.
 - What happens if the experience ID in the URL doesn't exist or the user doesn't have access? System displays a 404 or access denied page with navigation back to event.
 
 ## Requirements *(mandatory)*
@@ -87,8 +85,7 @@ An experience creator uses the header to view preview media, toggle the enabled 
 - **FR-002**: System MUST display a split-screen layout with a header (info), left panel (configuration), and right panel (playground)
 - **FR-003**: System MUST provide a model selector dropdown with available AI models (e.g., "gemini-2.5-flash-image", "gemini-3-pro-image-preview")
 - **FR-004**: System MUST provide a text area for editing the system prompt
-- **FR-005**: System MUST display a read-only branding context indicator showing theme detection from the event
-- **FR-006**: System MUST provide editable fields for experience Name and Description
+- **FR-005**: System MUST provide editable fields for experience Name and Description
 - **FR-007**: System MUST display experience preview media in the header
 - **FR-008**: System MUST provide an enabled/disabled toggle switch in the header
 - **FR-009**: System MUST provide a delete button in the header with confirmation
@@ -127,7 +124,6 @@ An experience creator uses the header to view preview media, toggle the enabled 
 ### Key Entities
 
 - **Experience**: Represents an AI photo experience configuration with model selection, prompt, and preview media
-- **Event Theme**: Contains branding context (colors, logo, keywords) that is injected into AI prompts
 - **Test Image**: Temporary uploaded image for playground testing (not persisted)
 - **Generated Result**: AI-transformed image displayed in playground (not persisted)
 
@@ -147,7 +143,6 @@ An experience creator uses the header to view preview media, toggle the enabled 
 - PRD 1 has been implemented, providing valid experience IDs and the routing foundation
 - The AI transformation logic exists in `web/src/lib/ai` and can be invoked from the playground
 - Google Gemini API is configured and accessible for AI image generation
-- Event themes are already stored and accessible for branding context injection
 - The experiences feature module is implemented per data-model-v4 architecture
 - File upload size limits follow standard web practices (10MB max for images)
 - Only AI Photo Experience type is in scope; Video and GIF are explicitly out of scope

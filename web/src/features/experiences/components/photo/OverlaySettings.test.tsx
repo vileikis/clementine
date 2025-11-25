@@ -9,15 +9,12 @@ jest.mock("../../actions/photo-media", () => ({
   deleteFrameOverlay: jest.fn(),
 }));
 
-describe("OverlaySettings Component - User Story 4", () => {
-  const mockOnOverlayEnabledChange = jest.fn();
+describe("OverlaySettings Component", () => {
   const mockOnUpload = jest.fn();
   const mockOnRemove = jest.fn();
 
   const defaultProps = {
     experienceId: "exp-1",
-    overlayEnabled: false,
-    onOverlayEnabledChange: mockOnOverlayEnabledChange,
     onUpload: mockOnUpload,
     onRemove: mockOnRemove,
   };
@@ -26,77 +23,40 @@ describe("OverlaySettings Component - User Story 4", () => {
     jest.clearAllMocks();
   });
 
-  describe("T050 - Toggle enables/disables overlay upload", () => {
-    it("hides upload area when toggle is disabled", () => {
-      render(<OverlaySettings {...defaultProps} overlayEnabled={false} />);
+  describe("Rendering", () => {
+    it("renders frame overlay heading", () => {
+      render(<OverlaySettings {...defaultProps} />);
 
-      expect(screen.queryByLabelText(/upload frame/i)).not.toBeInTheDocument();
-      expect(screen.queryByRole("button", { name: /upload overlay/i })).not.toBeInTheDocument();
+      expect(screen.getByText("Frame Overlay")).toBeInTheDocument();
     });
 
-    it("shows upload area when toggle is enabled", () => {
-      render(<OverlaySettings {...defaultProps} overlayEnabled={true} />);
+    it("shows upload area always (no toggle)", () => {
+      render(<OverlaySettings {...defaultProps} />);
 
       expect(screen.getByLabelText(/upload frame/i)).toBeInTheDocument();
       expect(screen.getByRole("button", { name: /upload overlay/i })).toBeInTheDocument();
     });
 
-    it("calls onOverlayEnabledChange when toggle is clicked", async () => {
-      render(<OverlaySettings {...defaultProps} overlayEnabled={false} />);
-      const user = userEvent.setup();
+    it("displays helper text about overlay usage", () => {
+      render(<OverlaySettings {...defaultProps} />);
 
-      // Switch doesn't have an accessible name - find by id or role
-      const toggle = screen.getByRole("switch");
-      await user.click(toggle);
-
-      expect(mockOnOverlayEnabledChange).toHaveBeenCalledWith(true);
+      expect(
+        screen.getByText(/the frame will be overlaid on top of guest photos/i)
+      ).toBeInTheDocument();
     });
 
-    it("toggle starts unchecked when overlayEnabled is false", () => {
-      render(<OverlaySettings {...defaultProps} overlayEnabled={false} />);
+    it("helper text recommends PNG for transparency", () => {
+      render(<OverlaySettings {...defaultProps} />);
 
-      const toggle = screen.getByRole("switch");
-      expect(toggle).not.toBeChecked();
-    });
-
-    it("toggle starts checked when overlayEnabled is true", () => {
-      render(<OverlaySettings {...defaultProps} overlayEnabled={true} />);
-
-      const toggle = screen.getByRole("switch");
-      expect(toggle).toBeChecked();
-    });
-
-    it("enables toggle automatically when overlay is uploaded", async () => {
-      const mockUploadResult = {
-        success: true as const,
-        data: {
-          publicUrl: "https://example.com/overlay.png",
-          sizeBytes: 1024,
-        },
-      };
-
-      jest.spyOn(experiencesActions, "uploadFrameOverlay").mockResolvedValue(mockUploadResult);
-
-      render(<OverlaySettings {...defaultProps} overlayEnabled={true} />);
-      const user = userEvent.setup();
-
-      const file = new File(["test"], "overlay.png", { type: "image/png" });
-      const fileInput = screen.getByLabelText(/upload frame/i) as HTMLInputElement;
-
-      await user.upload(fileInput, file);
-
-      await waitFor(() => {
-        expect(mockOnOverlayEnabledChange).toHaveBeenCalledWith(true);
-      });
+      expect(screen.getByText(/png recommended for transparency/i)).toBeInTheDocument();
     });
   });
 
-  describe("T051 - Preview rendering", () => {
-    it("renders overlay preview when overlayUrl is provided and enabled", () => {
+  describe("Preview rendering", () => {
+    it("renders overlay preview when overlayUrl is provided", () => {
       render(
         <OverlaySettings
           {...defaultProps}
-          overlayEnabled={true}
           overlayUrl="https://example.com/overlay.png"
         />
       );
@@ -106,23 +66,10 @@ describe("OverlaySettings Component - User Story 4", () => {
       expect(img).toHaveAttribute("src", "https://example.com/overlay.png");
     });
 
-    it("does not render preview when overlayEnabled is false", () => {
-      render(
-        <OverlaySettings
-          {...defaultProps}
-          overlayEnabled={false}
-          overlayUrl="https://example.com/overlay.png"
-        />
-      );
-
-      expect(screen.queryByRole("img", { name: /frame overlay/i })).not.toBeInTheDocument();
-    });
-
     it("displays remove button when overlay preview is shown", () => {
       render(
         <OverlaySettings
           {...defaultProps}
-          overlayEnabled={true}
           overlayUrl="https://example.com/overlay.png"
         />
       );
@@ -134,7 +81,6 @@ describe("OverlaySettings Component - User Story 4", () => {
       render(
         <OverlaySettings
           {...defaultProps}
-          overlayEnabled={true}
           overlayUrl="https://example.com/overlay.png"
         />
       );
@@ -144,7 +90,7 @@ describe("OverlaySettings Component - User Story 4", () => {
     });
 
     it("does not render preview when overlayUrl is not provided", () => {
-      render(<OverlaySettings {...defaultProps} overlayEnabled={true} />);
+      render(<OverlaySettings {...defaultProps} />);
 
       expect(screen.queryByRole("img", { name: /frame overlay/i })).not.toBeInTheDocument();
       expect(screen.queryByRole("button", { name: /remove/i })).not.toBeInTheDocument();
@@ -153,7 +99,7 @@ describe("OverlaySettings Component - User Story 4", () => {
 
   describe("Upload functionality", () => {
     it("displays upload button text when no overlay exists", () => {
-      render(<OverlaySettings {...defaultProps} overlayEnabled={true} />);
+      render(<OverlaySettings {...defaultProps} />);
 
       expect(screen.getByRole("button", { name: /upload overlay/i })).toBeInTheDocument();
     });
@@ -162,7 +108,6 @@ describe("OverlaySettings Component - User Story 4", () => {
       render(
         <OverlaySettings
           {...defaultProps}
-          overlayEnabled={true}
           overlayUrl="https://example.com/overlay.png"
         />
       );
@@ -171,7 +116,7 @@ describe("OverlaySettings Component - User Story 4", () => {
     });
 
     it("accepts PNG, JPG, and JPEG file types", () => {
-      const { container } = render(<OverlaySettings {...defaultProps} overlayEnabled={true} />);
+      const { container } = render(<OverlaySettings {...defaultProps} />);
 
       const fileInput = container.querySelector('input[type="file"]');
       expect(fileInput).toHaveAttribute("accept", "image/png,image/jpeg,image/jpg");
@@ -188,7 +133,7 @@ describe("OverlaySettings Component - User Story 4", () => {
 
       jest.spyOn(experiencesActions, "uploadFrameOverlay").mockResolvedValue(mockUploadResult);
 
-      render(<OverlaySettings {...defaultProps} overlayEnabled={true} />);
+      render(<OverlaySettings {...defaultProps} />);
       const user = userEvent.setup();
 
       const file = new File(["test"], "overlay.png", { type: "image/png" });
@@ -211,7 +156,7 @@ describe("OverlaySettings Component - User Story 4", () => {
         () => new Promise((resolve) => setTimeout(resolve, 100))
       );
 
-      render(<OverlaySettings {...defaultProps} overlayEnabled={true} />);
+      render(<OverlaySettings {...defaultProps} />);
       const user = userEvent.setup();
 
       const file = new File(["test"], "overlay.png", { type: "image/png" });
@@ -237,7 +182,6 @@ describe("OverlaySettings Component - User Story 4", () => {
       render(
         <OverlaySettings
           {...defaultProps}
-          overlayEnabled={true}
           overlayUrl="https://example.com/overlay.png"
         />
       );
@@ -258,32 +202,25 @@ describe("OverlaySettings Component - User Story 4", () => {
     });
   });
 
-  describe("Additional features", () => {
-    it("renders frame overlay heading", () => {
-      render(<OverlaySettings {...defaultProps} />);
-
-      expect(screen.getByText("Frame Overlay")).toBeInTheDocument();
-    });
-
-    it("displays helper text about overlay usage", () => {
-      render(<OverlaySettings {...defaultProps} overlayEnabled={true} />);
-
-      expect(
-        screen.getByText(/the frame will be overlaid on top of guest photos/i)
-      ).toBeInTheDocument();
-    });
-
-    it("helper text recommends PNG for transparency", () => {
-      render(<OverlaySettings {...defaultProps} overlayEnabled={true} />);
-
-      expect(screen.getByText(/png recommended for transparency/i)).toBeInTheDocument();
-    });
-
-    it("disables toggle when disabled prop is true", () => {
+  describe("Disabled state", () => {
+    it("disables upload button when disabled prop is true", () => {
       render(<OverlaySettings {...defaultProps} disabled={true} />);
 
-      const toggle = screen.getByRole("switch");
-      expect(toggle).toBeDisabled();
+      const uploadButton = screen.getByRole("button", { name: /upload overlay/i });
+      expect(uploadButton).toBeDisabled();
+    });
+
+    it("disables remove button when disabled prop is true", () => {
+      render(
+        <OverlaySettings
+          {...defaultProps}
+          overlayUrl="https://example.com/overlay.png"
+          disabled={true}
+        />
+      );
+
+      const removeButton = screen.getByRole("button", { name: /remove/i });
+      expect(removeButton).toBeDisabled();
     });
   });
 });

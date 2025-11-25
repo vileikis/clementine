@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -18,14 +20,18 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { HelpCircle } from "lucide-react";
+import { HelpCircle, Copy } from "lucide-react";
 import { PreviewMediaCompact } from "./PreviewMediaCompact";
 import { DeleteExperienceButton } from "./DeleteExperienceButton";
 import type { Experience, PreviewType } from "../../schemas";
+import { duplicateExperience } from "../../actions/duplicate";
 
 interface ExperienceEditorHeaderProps {
   // Experience data
   experience: Experience;
+
+  // Event ID for navigation after duplicate
+  eventId: string;
 
   // Preview media (optional - can be omitted for types that don't need it)
   showPreview?: boolean;
@@ -44,7 +50,7 @@ interface ExperienceEditorHeaderProps {
   // Delete
   onDelete: () => Promise<void>;
 
-  // Optional: Additional controls for Row 3 
+  // Optional: Additional controls for Row 3
   additionalControls?: React.ReactNode;
 
   // Loading/disabled states
@@ -63,6 +69,7 @@ interface ExperienceEditorHeaderProps {
  */
 export function ExperienceEditorHeader({
   experience,
+  eventId,
   showPreview = true,
   previewMediaUrl,
   previewMediaType,
@@ -83,6 +90,23 @@ export function ExperienceEditorHeader({
 
   // Enabled toggle state
   const [isEnabledPending, startEnabledTransition] = useTransition();
+
+  // Duplicate state
+  const [isDuplicatePending, startDuplicateTransition] = useTransition();
+  const router = useRouter();
+
+  const handleDuplicate = () => {
+    startDuplicateTransition(async () => {
+      const result = await duplicateExperience(experience.id, eventId);
+      if (result.success) {
+        toast.success("Experience duplicated");
+        // Navigate to the new experience
+        router.push(`/events/${eventId}/design/experiences/${result.data.id}`);
+      } else {
+        toast.error(result.error.message);
+      }
+    });
+  };
 
   const handleTitleClick = () => {
     setTitleInput(experience.name);
@@ -145,7 +169,7 @@ export function ExperienceEditorHeader({
 
         {/* Column 2: Title + Delete + Controls */}
         <div className="flex-1 min-w-0 space-y-3">
-          {/* Row 1: Title & Delete */}
+          {/* Row 1: Title & Actions */}
           <div className="flex items-start justify-between gap-4">
             <h2
               className="text-2xl font-semibold cursor-pointer hover:underline break-words inline-block"
@@ -153,11 +177,31 @@ export function ExperienceEditorHeader({
             >
               {experience.name}
             </h2>
-            <DeleteExperienceButton
-              experienceName={experience.name}
-              onDelete={onDelete}
-              disabled={disabled || isTitlePending || isEnabledPending}
-            />
+            <div className="flex items-center gap-2">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={handleDuplicate}
+                      disabled={disabled || isTitlePending || isEnabledPending || isDuplicatePending}
+                      className="min-h-[44px] min-w-[44px]"
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{isDuplicatePending ? "Duplicating..." : "Duplicate experience"}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <DeleteExperienceButton
+                experienceName={experience.name}
+                onDelete={onDelete}
+                disabled={disabled || isTitlePending || isEnabledPending || isDuplicatePending}
+              />
+            </div>
           </div>
 
           {/* Row 2: Toggle Controls */}
@@ -165,12 +209,14 @@ export function ExperienceEditorHeader({
             {/* Enabled Toggle */}
             <TooltipProvider>
               <div className="flex items-center gap-3">
-                <Switch
-                  id={`enabled-${experience.id}`}
-                  checked={enabled}
-                  onCheckedChange={handleEnabledChange}
-                  disabled={disabled || isTitlePending || isEnabledPending}
-                />
+                <div className="inline-flex items-center justify-center min-h-[44px] min-w-[44px]">
+                  <Switch
+                    id={`enabled-${experience.id}`}
+                    checked={enabled}
+                    onCheckedChange={handleEnabledChange}
+                    disabled={disabled || isTitlePending || isEnabledPending}
+                  />
+                </div>
                 <Label
                   htmlFor={`enabled-${experience.id}`}
                   className="cursor-pointer text-sm font-medium"
