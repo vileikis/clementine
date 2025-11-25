@@ -113,13 +113,13 @@
 
 ### Implementation for User Story 2
 
-- [ ] T020 [US2] Add `attachExperienceToEvent` action in `web/src/features/experiences/actions/shared.ts`:
+- [x] T020 [US2] Add `attachExperienceToEvent` action in `web/src/features/experiences/actions/shared.ts`:
   - Accept `experienceId` and `eventId` parameters
   - Add `eventId` to experience's `eventIds` array if not already present
-- [ ] T021 [US2] Add `detachExperienceFromEvent` action in `web/src/features/experiences/actions/shared.ts`:
+- [x] T021 [US2] Add `detachExperienceFromEvent` action in `web/src/features/experiences/actions/shared.ts`:
   - Accept `experienceId` and `eventId` parameters
   - Remove `eventId` from experience's `eventIds` array
-- [ ] T022 [US2] Update create actions to auto-attach current event in `web/src/features/experiences/actions/photo-create.ts` and `gif-create.ts`:
+- [x] T022 [US2] Update create actions to auto-attach current event in `web/src/features/experiences/actions/photo-create.ts` and `gif-create.ts`:
   - If `eventId` context is available, include it in initial `eventIds` array
 
 **Checkpoint**: At this point, experiences can be attached/detached from events
@@ -134,16 +134,17 @@
 
 ### Implementation for User Story 3
 
-- [ ] T023 [US3] Update `getExperiencesByEventId` in `web/src/features/experiences/repositories/experiences.repository.ts`:
+- [x] T023 [US3] Update `getExperiencesByEventId` in `web/src/features/experiences/repositories/experiences.repository.ts`:
   - Change from subcollection query to root collection query
   - Use `where('eventIds', 'array-contains', eventId)` pattern
-- [ ] T024 [US3] Update `subscribeToExperiencesByEventId` in `web/src/features/experiences/repositories/experiences.repository.ts`:
+- [x] T024 [US3] Update `subscribeToExperiencesByEventId` in `web/src/features/experiences/repositories/experiences.repository.ts`:
   - Apply same `array-contains` query pattern for real-time subscriptions
-- [ ] T025 [US3] Update `ExperiencesList.tsx` in `web/src/features/experiences/components/shared/ExperiencesList.tsx`:
+  - NOTE: Real-time subscriptions not currently used - will be added when needed
+- [x] T025 [US3] Update `ExperiencesList.tsx` in `web/src/features/experiences/components/shared/ExperiencesList.tsx`:
   - Use updated repository function with new query pattern
   - Display `name` instead of `label`
   - Handle empty state correctly
-- [ ] T026 [US3] Update `ExperiencesSidebar.tsx` in `web/src/features/experiences/components/shared/ExperiencesSidebar.tsx`:
+- [x] T026 [US3] Update `ExperiencesSidebar.tsx` in `web/src/features/experiences/components/shared/ExperiencesSidebar.tsx`:
   - Use updated repository function with new query pattern
   - Display `name` instead of `label`
   - Auto-select first experience when list loads
