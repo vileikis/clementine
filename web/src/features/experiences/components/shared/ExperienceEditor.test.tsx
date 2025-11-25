@@ -22,6 +22,7 @@ jest.mock("../gif/GifExperienceEditor", () => ({
 describe("ExperienceEditor Component - Discriminated Union Routing", () => {
   const mockOnSave = jest.fn();
   const mockOnDelete = jest.fn();
+  const mockEventId = "event-1";
 
   const baseExperience = {
     id: "exp-1",
@@ -77,6 +78,7 @@ describe("ExperienceEditor Component - Discriminated Union Routing", () => {
     it("routes photo experience to PhotoExperienceEditor", () => {
       render(
         <ExperienceEditor
+          eventId={mockEventId}
           experience={mockPhotoExperience}
           onSave={mockOnSave}
           onDelete={mockOnDelete}
@@ -91,6 +93,7 @@ describe("ExperienceEditor Component - Discriminated Union Routing", () => {
     it("routes gif experience to GifExperienceEditor", () => {
       render(
         <ExperienceEditor
+          eventId={mockEventId}
           experience={mockGifExperience}
           onSave={mockOnSave}
           onDelete={mockOnDelete}
@@ -122,6 +125,7 @@ describe("ExperienceEditor Component - Discriminated Union Routing", () => {
 
       render(
         <ExperienceEditor
+          eventId={mockEventId}
           experience={videoExperience}
           onSave={mockOnSave}
           onDelete={mockOnDelete}
@@ -137,6 +141,7 @@ describe("ExperienceEditor Component - Discriminated Union Routing", () => {
     it("passes experience prop to PhotoExperienceEditor", () => {
       render(
         <ExperienceEditor
+          eventId={mockEventId}
           experience={mockPhotoExperience}
           onSave={mockOnSave}
           onDelete={mockOnDelete}
@@ -150,6 +155,7 @@ describe("ExperienceEditor Component - Discriminated Union Routing", () => {
     it("passes experience prop to GifExperienceEditor", () => {
       render(
         <ExperienceEditor
+          eventId={mockEventId}
           experience={mockGifExperience}
           onSave={mockOnSave}
           onDelete={mockOnDelete}

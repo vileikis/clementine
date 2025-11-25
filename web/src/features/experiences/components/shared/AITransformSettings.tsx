@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { ExternalLink } from "lucide-react";
 import { ImageUploadField } from "@/components/shared/ImageUploadField";
-import { AI_MODEL_PROMPT_GUIDES } from "../../constants";
+import { AI_MODELS, AI_MODEL_PROMPT_GUIDES } from "../../constants";
 import type { AspectRatio } from "../../schemas";
 
 interface AITransformSettingsProps {
@@ -107,7 +107,11 @@ export function AITransformSettings({
             <SelectValue placeholder="Select AI model" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="nanobanana">Nano Banana</SelectItem>
+            {AI_MODELS.map((model) => (
+              <SelectItem key={model.value} value={model.value}>
+                {model.label}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>

@@ -12,6 +12,7 @@ import { updateGifExperience } from "../../actions/gif-update";
 import type { GifExperience, PreviewType, AspectRatio } from "../../schemas";
 
 interface GifExperienceEditorProps {
+  eventId: string;
   experience: GifExperience;
   onSave: (experienceId: string, data: Partial<GifExperience>) => Promise<void>;
   onDelete: (experienceId: string) => Promise<void>;
@@ -33,6 +34,7 @@ interface GifExperienceEditorProps {
  * - GifCaptureSettings (GIF-specific)
  */
 export function GifExperienceEditor({
+  eventId,
   experience,
   onSave,
   onDelete,
@@ -170,6 +172,7 @@ export function GifExperienceEditor({
       {/* Unified Experience Editor Header */}
       <ExperienceEditorHeader
         experience={experience}
+        eventId={eventId}
         showPreview={true}
         previewMediaUrl={previewMediaUrl}
         previewMediaType={previewType}
