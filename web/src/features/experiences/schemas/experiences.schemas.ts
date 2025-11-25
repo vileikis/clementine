@@ -1,17 +1,12 @@
 // Zod schemas for Experience data models using discriminated unions
+// Refactored for normalized Firestore design (data-model-v4)
 import { z } from "zod";
 
 // ============================================================================
 // Enums and Primitive Schemas
 // ============================================================================
 
-export const experienceTypeSchema = z.enum([
-  "photo",
-  "video",
-  "gif",
-  "wheel",
-  
-]);
+export const experienceTypeSchema = z.enum(["photo", "video", "gif"]);
 
 export const previewTypeSchema = z.enum(["image", "gif", "video"]);
 
@@ -23,23 +18,29 @@ export const aspectRatioSchema = z.enum([
   "16:9",
 ]);
 
+export const cameraFacingSchema = z.enum(["front", "back", "both"]);
+
 // ============================================================================
 // Base Experience Schema (Shared Fields)
 // ============================================================================
 
 const baseExperienceSchema = z.object({
   id: z.string(),
-  eventId: z.string(),
+  companyId: z.string(), // Company that owns this experience
+  eventIds: z.array(z.string()), // Events using this experience (many-to-many)
 
   // Core Configuration
-  label: z.string().min(1).max(50),
+  name: z.string().min(1).max(50), // Renamed from 'label'
   type: experienceTypeSchema,
   enabled: z.boolean(),
-  hidden: z.boolean().default(false),
+  // 'hidden' field removed
 
   // Preview Media (optional, nullable for graceful handling)
-  previewPath: z.string().url().nullable().optional(),
+  previewMediaUrl: z.string().url().nullable().optional(), // Renamed from 'previewPath'
   previewType: previewTypeSchema.nullable().optional(),
+
+  // Input Fields (deferred implementation)
+  inputFields: z.array(z.unknown()).nullable().optional(),
 
   // Audit
   createdAt: z.number().int().positive(),
@@ -50,49 +51,50 @@ const baseExperienceSchema = z.object({
 // Type-Specific Configuration Schemas
 // ============================================================================
 
-// Photo Experience Configuration
-const photoConfigSchema = z.object({
+// Photo Capture Configuration (renamed from photoConfigSchema)
+const photoCaptureConfigSchema = z.object({
   countdown: z.number().int().min(0).max(10), // 0 = disabled, 1-10 = seconds
-  overlayFramePath: z.string().url().nullable(), // null = no overlay
+  cameraFacing: cameraFacingSchema,
+  overlayUrl: z.string().url().nullable().optional(), // Renamed from overlayFramePath
 });
 
-// AI Configuration (shared by photo, video, gif experiences)
-const aiConfigSchema = z.object({
-  enabled: z.boolean(),
-  model: z.string().nullable(), // null = no model
-  prompt: z.string().max(600).nullable(), // null = no prompt
-  referenceImagePaths: z.array(z.string().url()).max(5).nullable(), // null = no references
-  aspectRatio: aspectRatioSchema,
+// Video Capture Configuration
+const videoCaptureConfigSchema = z.object({
+  countdown: z.number().int().min(0).max(10),
+  cameraFacing: cameraFacingSchema,
+  minDuration: z.number().int().min(1).optional(),
+  maxDuration: z.number().int().min(1).max(60),
 });
 
-// Video Experience Configuration (Future)
-const videoConfigSchema = z.object({
-  maxDurationSeconds: z.number().int().min(1).max(60),
-  allowRetake: z.boolean(),
-  countdown: z.number().int().min(0).max(10).optional(),
-});
-
-// GIF Experience Configuration (Future)
-const gifConfigSchema = z.object({
+// GIF Capture Configuration
+const gifCaptureConfigSchema = z.object({
+  countdown: z.number().int().min(0).max(10),
+  cameraFacing: cameraFacingSchema,
   frameCount: z.number().int().min(3).max(10),
-  intervalMs: z.number().int().min(100).max(1000),
-  loopCount: z.number().int().min(0), // 0 = infinite
-  countdown: z.number().int().min(0).max(10).optional(),
 });
 
-// Wheel Experience Configuration (Future)
-const wheelItemSchema = z.object({
-  id: z.string(),
-  label: z.string(),
-  weight: z.number().positive(),
-  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/), // Hex color
-  imagePath: z.string().url().optional(),
+// ============================================================================
+// AI Configuration Schemas (Type-Specific)
+// ============================================================================
+
+// AI Photo Configuration (for photo and gif types - they use image models)
+const aiPhotoConfigSchema = z.object({
+  enabled: z.boolean(),
+  model: z.string().nullable().optional(), // e.g., "flux", "stable-diffusion-xl"
+  prompt: z.string().max(600).nullable().optional(),
+  referenceImageUrls: z.array(z.string().url()).max(5).nullable().optional(), // Renamed from referenceImagePaths
+  aspectRatio: aspectRatioSchema.optional(),
 });
 
-const wheelConfigSchema = z.object({
-  items: z.array(wheelItemSchema).min(2).max(12),
-  spinDurationMs: z.number().int().min(2000).max(5000),
-  autoSpin: z.boolean(),
+// AI Video Configuration (for video type only - has additional fields)
+const aiVideoConfigSchema = z.object({
+  enabled: z.boolean(),
+  model: z.string().nullable().optional(), // e.g., "kling-video", "runway"
+  prompt: z.string().max(600).nullable().optional(),
+  referenceImageUrls: z.array(z.string().url()).max(5).nullable().optional(),
+  aspectRatio: aspectRatioSchema.optional(),
+  duration: z.number().int().min(1).max(60).nullable().optional(), // Output duration in seconds
+  fps: z.number().int().min(12).max(60).nullable().optional(), // Frames per second
 });
 
 
@@ -102,37 +104,29 @@ const wheelConfigSchema = z.object({
 
 export const photoExperienceSchema = baseExperienceSchema.extend({
   type: z.literal("photo"),
-  config: photoConfigSchema,
-  aiConfig: aiConfigSchema,
+  captureConfig: photoCaptureConfigSchema, // Renamed from 'config'
+  aiPhotoConfig: aiPhotoConfigSchema, // Renamed from 'aiConfig'
 });
 
 export const videoExperienceSchema = baseExperienceSchema.extend({
   type: z.literal("video"),
-  config: videoConfigSchema,
-  aiConfig: aiConfigSchema,
+  captureConfig: videoCaptureConfigSchema,
+  aiVideoConfig: aiVideoConfigSchema, // Video uses video-specific AI config
 });
 
 export const gifExperienceSchema = baseExperienceSchema.extend({
   type: z.literal("gif"),
-  config: gifConfigSchema,
-  aiConfig: aiConfigSchema,
+  captureConfig: gifCaptureConfigSchema,
+  aiPhotoConfig: aiPhotoConfigSchema, // GIF uses photo AI config (image models)
 });
 
-export const wheelExperienceSchema = baseExperienceSchema.extend({
-  type: z.literal("wheel"),
-  config: wheelConfigSchema,
-  // Note: wheel experiences do NOT have aiConfig
-});
-
-
+// Wheel experience type removed - not in scope for data-model-v4
 
 // Discriminated Union - all experience types
 export const experienceSchema = z.discriminatedUnion("type", [
   photoExperienceSchema,
   videoExperienceSchema,
   gifExperienceSchema,
-  wheelExperienceSchema,
-  
 ]);
 
 // ============================================================================
@@ -141,7 +135,9 @@ export const experienceSchema = z.discriminatedUnion("type", [
 
 // Create Photo Experience
 export const createPhotoExperienceSchema = z.object({
-  label: z
+  companyId: z.string().min(1, "Company ID is required"),
+  eventIds: z.array(z.string()).default([]), // Can be empty initially
+  name: z
     .string()
     .trim()
     .min(1, "Experience name is required")
@@ -152,19 +148,21 @@ export const createPhotoExperienceSchema = z.object({
 // Update Photo Experience (partial updates allowed)
 export const updatePhotoExperienceSchema = z
   .object({
-    label: z.string().min(1).max(50).optional(),
+    name: z.string().min(1).max(50).optional(),
     enabled: z.boolean().optional(),
-    hidden: z.boolean().optional(),
-    previewPath: z.string().url().nullable().optional(),
+    eventIds: z.array(z.string()).optional(), // Can modify event associations
+    previewMediaUrl: z.string().url().nullable().optional(),
     previewType: previewTypeSchema.nullable().optional(),
-    config: photoConfigSchema.partial().optional(),
-    aiConfig: aiConfigSchema.partial().optional(),
+    captureConfig: photoCaptureConfigSchema.partial().optional(),
+    aiPhotoConfig: aiPhotoConfigSchema.partial().optional(),
   })
   .strict();
 
 // Create GIF Experience
 export const createGifExperienceSchema = z.object({
-  label: z
+  companyId: z.string().min(1, "Company ID is required"),
+  eventIds: z.array(z.string()).default([]),
+  name: z
     .string()
     .trim()
     .min(1, "Experience name is required")
@@ -175,13 +173,38 @@ export const createGifExperienceSchema = z.object({
 // Update GIF Experience (partial updates allowed)
 export const updateGifExperienceSchema = z
   .object({
-    label: z.string().min(1).max(50).optional(),
+    name: z.string().min(1).max(50).optional(),
     enabled: z.boolean().optional(),
-    hidden: z.boolean().optional(),
-    previewPath: z.string().url().nullable().optional(),
+    eventIds: z.array(z.string()).optional(),
+    previewMediaUrl: z.string().url().nullable().optional(),
     previewType: previewTypeSchema.nullable().optional(),
-    config: gifConfigSchema.partial().optional(),
-    aiConfig: aiConfigSchema.partial().optional(),
+    captureConfig: gifCaptureConfigSchema.partial().optional(),
+    aiPhotoConfig: aiPhotoConfigSchema.partial().optional(),
+  })
+  .strict();
+
+// Create Video Experience
+export const createVideoExperienceSchema = z.object({
+  companyId: z.string().min(1, "Company ID is required"),
+  eventIds: z.array(z.string()).default([]),
+  name: z
+    .string()
+    .trim()
+    .min(1, "Experience name is required")
+    .max(50, "Experience name must be 50 characters or less"),
+  type: z.literal("video"),
+});
+
+// Update Video Experience (partial updates allowed)
+export const updateVideoExperienceSchema = z
+  .object({
+    name: z.string().min(1).max(50).optional(),
+    enabled: z.boolean().optional(),
+    eventIds: z.array(z.string()).optional(),
+    previewMediaUrl: z.string().url().nullable().optional(),
+    previewType: previewTypeSchema.nullable().optional(),
+    captureConfig: videoCaptureConfigSchema.partial().optional(),
+    aiVideoConfig: aiVideoConfigSchema.partial().optional(),
   })
   .strict();
 
@@ -205,34 +228,47 @@ export const previewMediaResultSchema = z.object({
 // TypeScript Type Exports
 // ============================================================================
 
-// Experience Types
+// Experience Types (discriminated union members)
 export type PhotoExperience = z.infer<typeof photoExperienceSchema>;
 export type VideoExperience = z.infer<typeof videoExperienceSchema>;
 export type GifExperience = z.infer<typeof gifExperienceSchema>;
-export type WheelExperience = z.infer<typeof wheelExperienceSchema>;
 
 export type Experience = z.infer<typeof experienceSchema>;
 
-// Config Types
-export type PhotoConfig = z.infer<typeof photoConfigSchema>;
-export type VideoConfig = z.infer<typeof videoConfigSchema>;
-export type GifConfig = z.infer<typeof gifConfigSchema>;
-export type WheelConfig = z.infer<typeof wheelConfigSchema>;
+// Capture Config Types (renamed from PhotoConfig, etc.)
+export type PhotoCaptureConfig = z.infer<typeof photoCaptureConfigSchema>;
+export type VideoCaptureConfig = z.infer<typeof videoCaptureConfigSchema>;
+export type GifCaptureConfig = z.infer<typeof gifCaptureConfigSchema>;
 
-export type AiConfig = z.infer<typeof aiConfigSchema>;
-export type WheelItem = z.infer<typeof wheelItemSchema>;
+// AI Config Types (type-specific)
+export type AiPhotoConfig = z.infer<typeof aiPhotoConfigSchema>;
+export type AiVideoConfig = z.infer<typeof aiVideoConfigSchema>;
 
 // Primitive Types
 export type ExperienceType = z.infer<typeof experienceTypeSchema>;
 export type PreviewType = z.infer<typeof previewTypeSchema>;
 export type AspectRatio = z.infer<typeof aspectRatioSchema>;
-
+export type CameraFacing = z.infer<typeof cameraFacingSchema>;
 
 // Creation/Update Types
 export type CreatePhotoExperienceData = z.infer<typeof createPhotoExperienceSchema>;
 export type UpdatePhotoExperienceData = z.infer<typeof updatePhotoExperienceSchema>;
 export type CreateGifExperienceData = z.infer<typeof createGifExperienceSchema>;
 export type UpdateGifExperienceData = z.infer<typeof updateGifExperienceSchema>;
+export type CreateVideoExperienceData = z.infer<typeof createVideoExperienceSchema>;
+export type UpdateVideoExperienceData = z.infer<typeof updateVideoExperienceSchema>;
 
 // Type alias for Experience union
 export type ExperienceSchema = Experience;
+
+// ============================================================================
+// Schema Exports (for validation)
+// ============================================================================
+
+export {
+  photoCaptureConfigSchema,
+  videoCaptureConfigSchema,
+  gifCaptureConfigSchema,
+  aiPhotoConfigSchema,
+  aiVideoConfigSchema,
+};

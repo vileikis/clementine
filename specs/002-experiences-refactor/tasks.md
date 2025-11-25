@@ -27,10 +27,10 @@
 
 **Purpose**: Ensure development environment is ready and understand existing code
 
-- [ ] T001 Verify feature branch `002-experiences-refactor` is checked out and up to date
-- [ ] T002 Run `pnpm install` to ensure dependencies are current
-- [ ] T003 Run `pnpm type-check` to baseline current type errors (if any)
-- [ ] T004 Review existing schema structure in `web/src/features/experiences/schemas/experiences.schemas.ts`
+- [x] T001 Verify feature branch `002-experiences-refactor` is checked out and up to date
+- [x] T002 Run `pnpm install` to ensure dependencies are current
+- [x] T003 Run `pnpm type-check` to baseline current type errors (if any)
+- [x] T004 Review existing schema structure in `web/src/features/experiences/schemas/experiences.schemas.ts`
 
 ---
 
@@ -40,7 +40,7 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T005 Update Experience schema in `web/src/features/experiences/schemas/experiences.schemas.ts`:
+- [x] T005 Update Experience schema in `web/src/features/experiences/schemas/experiences.schemas.ts`:
   - Replace `eventId: string` with `companyId: string`
   - Add `eventIds: string[]` array field
   - Rename `label` to `name`
@@ -48,14 +48,14 @@
   - Rename `previewPath` to `previewMediaUrl`
   - Rename `config` to `captureConfig`
   - Rename `config.overlayFramePath` to `captureConfig.overlayUrl`
-- [ ] T006 Split AI config into type-specific schemas in `web/src/features/experiences/schemas/experiences.schemas.ts`:
+- [x] T006 Split AI config into type-specific schemas in `web/src/features/experiences/schemas/experiences.schemas.ts`:
   - Create `aiPhotoConfigSchema` for photo/gif types (enabled, model, prompt, referenceImageUrls, aspectRatio)
   - Create `aiVideoConfigSchema` for video type (add duration, fps fields)
   - Update main experience schema to use discriminated config based on type
-- [ ] T007 Update TypeScript types in `web/src/features/experiences/types/experiences.types.ts` to match new schema
-- [ ] T008 Update action types in `web/src/features/experiences/actions/types.ts` to use new field names
-- [ ] T009 Update schema tests in `web/src/features/experiences/schemas/experiences.schemas.test.ts` for new schema structure
-- [ ] T010 Run `pnpm type-check` and note all type errors introduced by schema changes
+- [x] T007 Update TypeScript types in `web/src/features/experiences/types/experiences.types.ts` to match new schema
+- [x] T008 Update action types in `web/src/features/experiences/actions/types.ts` to use new field names
+- [x] T009 Update schema tests in `web/src/features/experiences/schemas/experiences.schemas.test.ts` for new schema structure
+- [x] T010 Run `pnpm type-check` and note all type errors introduced by schema changes
 
 **Checkpoint**: Schema foundation ready - user story implementation can now begin
 

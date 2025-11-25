@@ -19,19 +19,24 @@ export type ActionResponse<T = void> =
 
 /**
  * Error codes for experience operations
+ *
+ * Refactored for normalized Firestore design (data-model-v4)
  */
 export const ErrorCodes = {
-  // Authentication errors
+  // Authentication/Authorization errors
   PERMISSION_DENIED: "PERMISSION_DENIED",
+  COMPANY_ACCESS_DENIED: "COMPANY_ACCESS_DENIED", // User doesn't have access to the company
 
   // Resource not found errors
   EVENT_NOT_FOUND: "EVENT_NOT_FOUND",
   EXPERIENCE_NOT_FOUND: "EXPERIENCE_NOT_FOUND",
+  COMPANY_NOT_FOUND: "COMPANY_NOT_FOUND",
   STEP_NOT_FOUND: "STEP_NOT_FOUND",
 
   // Validation errors
   VALIDATION_ERROR: "VALIDATION_ERROR",
   MIGRATION_ERROR: "MIGRATION_ERROR",
+  IMMUTABLE_FIELD_ERROR: "IMMUTABLE_FIELD_ERROR", // Attempt to modify companyId or type
 
   // Storage/upload errors
   UPLOAD_ERROR: "UPLOAD_ERROR",
