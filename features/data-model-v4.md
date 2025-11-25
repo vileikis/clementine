@@ -130,7 +130,6 @@ interface Experience {
     // Handlebars syntax used to inject values from inputFields
     // e.g., "A portrait of {{guest_name}} in the style of {{selected_vibe}}"
     prompt: string;
-    negativePrompt?: string;
     referenceImageUrls: string[],
     aspectRatio?: "9:16" | "1:1" | "4:3";
   };

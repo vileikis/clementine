@@ -34,12 +34,36 @@ Migrate the Experiences feature from a subcollection architecture (`/events/{eve
 - `name` (string) - Internal name for the experience
 - `previewMediaUrl` (string, optional) - Preview asset URL
 - `captureConfig` - Hardware/capture settings object
-- `aiConfig` - AI generation settings object (aligned with v4 spec)
+- `aiConfig` - Type-specific AI configuration (see section 1.1)
 
 **Defer `inputFields`**
 
 - `inputFields` field should be nullable/optional
 - Full implementation deferred to future iteration
+
+### 1.1 Type-Specific AI Configurations
+
+AI config schemas are separated by experience type due to different model capabilities and parameters.
+
+**Photo/GIF AI Config (`aiPhotoConfig`):**
+
+- `enabled` (boolean)
+- `model` (string, nullable) - e.g., "stable-diffusion-xl", "flux"
+- `prompt` (string, nullable) - What to generate
+- `referenceImageUrls` (string[], nullable) - Style/subject reference images
+- `aspectRatio` (enum) - Output dimensions
+
+**Video AI Config (`aiVideoConfig`):**
+
+- `enabled` (boolean)
+- `model` (string, nullable) - e.g., "kling-video", "runway"
+- `prompt` (string, nullable) - Motion/scene description
+- `referenceImageUrls` (string[], nullable) - Starting frame or style reference
+- `aspectRatio` (enum) - Output dimensions
+- `duration` (number, nullable) - Output length in seconds
+- `fps` (number, nullable) - Frames per second
+
+**Note:** GIF experiences use `aiPhotoConfig` (generates frames via image models).
 
 **Remove legacy fields:**
 
