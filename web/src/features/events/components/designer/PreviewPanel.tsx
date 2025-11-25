@@ -7,10 +7,6 @@ interface PreviewPanelProps {
   title?: string;
   children: ReactNode;
   className?: string;
-  /**
-   * Mobile device frame aspect ratio (default: 9/19.5 for iPhone-like aspect)
-   */
-  aspectRatio?: number;
 }
 
 /**
@@ -28,7 +24,6 @@ export function PreviewPanel({
   title = "Preview",
   children,
   className,
-  aspectRatio = 9 / 19.5,
 }: PreviewPanelProps) {
   return (
     <div className={cn("flex flex-col gap-4", className)}>
@@ -38,13 +33,8 @@ export function PreviewPanel({
       <div
         className={cn(
           "relative bg-muted rounded-lg border-2 border-border overflow-hidden",
-          "shadow-sm"
+          "shadow-sm w-full h-[70vh] max-h-[700px]"
         )}
-        style={{
-          aspectRatio: aspectRatio.toString(),
-          maxWidth: "375px",
-          width: "100%",
-        }}
       >
         <div className="absolute inset-0 overflow-y-auto bg-background">
           {children}
