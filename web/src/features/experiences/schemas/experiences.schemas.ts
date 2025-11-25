@@ -225,6 +225,34 @@ export const previewMediaResultSchema = z.object({
 });
 
 // ============================================================================
+// AI Playground Schemas
+// ============================================================================
+
+/**
+ * Input schema for playground preview generation.
+ * Used by the generatePlaygroundPreview Server Action.
+ */
+export const playgroundGenerateInputSchema = z.object({
+  experienceId: z.string().min(1, "Experience ID is required"),
+  testImageBase64: z
+    .string()
+    .min(1, "Test image is required")
+    .refine(
+      (val) => val.startsWith("data:image/"),
+      "Test image must be a valid data URL"
+    ),
+});
+
+/**
+ * Output schema for playground preview generation.
+ * Returns the transformed image as a base64 data URL.
+ */
+export const playgroundGenerateOutputSchema = z.object({
+  resultImageBase64: z.string(),
+  generationTimeMs: z.number().optional(),
+});
+
+// ============================================================================
 // TypeScript Type Exports
 // ============================================================================
 
@@ -260,6 +288,10 @@ export type UpdateVideoExperienceData = z.infer<typeof updateVideoExperienceSche
 
 // Type alias for Experience union
 export type ExperienceSchema = Experience;
+
+// Playground Types
+export type PlaygroundGenerateInput = z.infer<typeof playgroundGenerateInputSchema>;
+export type PlaygroundGenerateOutput = z.infer<typeof playgroundGenerateOutputSchema>;
 
 // ============================================================================
 // Schema Exports (for validation)
