@@ -159,7 +159,7 @@
 
 - [x] T040 [US5] Run `pnpm type-check` and fix all TypeScript errors in experiences feature
 - [x] T041 [US5] Run `pnpm lint` and fix all ESLint errors/warnings in experiences feature
-- [ ] T042 [US5] Run `pnpm test` and ensure all existing tests pass
+- [x] T042 [US5] Run `pnpm test` and ensure all existing tests pass
 - [ ] T043 [US5] Verify feature in local dev server (`pnpm dev`) - test experience creation/editing flow
 
 ### Final Verification

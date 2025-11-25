@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -108,10 +109,12 @@ export function OverlaySettings({
           <div className="space-y-2">
             {overlayFramePath && (
               <div className="relative w-full h-48 overflow-hidden rounded-lg border bg-muted">
-                <img
+                <Image
                   src={overlayFramePath}
                   alt="Frame overlay"
-                  className="h-full w-full object-contain"
+                  fill
+                  className="object-contain"
+                  unoptimized
                 />
                 <Button
                   variant="destructive"
