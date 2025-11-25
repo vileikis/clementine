@@ -3,7 +3,7 @@
 
 import { useState, useEffect, createContext, useContext, useMemo } from "react";
 import { Menu } from "lucide-react";
-import { collection, onSnapshot, query, orderBy, where } from "firebase/firestore";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
 import { Button } from "@/components/ui/button";
 import {
