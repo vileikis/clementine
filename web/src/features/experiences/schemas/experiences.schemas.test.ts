@@ -173,12 +173,14 @@ describe("PhotoExperience Schema", () => {
   });
 
   it("should reject photo experience with missing companyId", () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { companyId: _, ...experienceWithoutCompanyId } = validPhotoExperience;
     const result = photoExperienceSchema.safeParse(experienceWithoutCompanyId);
     expect(result.success).toBe(false);
   });
 
   it("should reject photo experience with missing eventIds", () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { eventIds: _, ...experienceWithoutEventIds } = validPhotoExperience;
     const result = photoExperienceSchema.safeParse(experienceWithoutEventIds);
     expect(result.success).toBe(false);

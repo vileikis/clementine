@@ -216,28 +216,28 @@
 
 **Purpose**: Cleanup, remaining component updates, and validation
 
-- [ ] T039 [P] Update `utils.ts` in `web/src/features/experiences/actions/utils.ts`:
+- [x] T039 [P] Update `utils.ts` in `web/src/features/experiences/actions/utils.ts`:
   - Review utility functions for field name updates
-- [ ] T040 [P] Update `ExperienceEditorWrapper.tsx` in `web/src/features/experiences/components/shared/ExperienceEditorWrapper.tsx`:
+- [x] T040 [P] Update `ExperienceEditorWrapper.tsx` in `web/src/features/experiences/components/shared/ExperienceEditorWrapper.tsx`:
   - Ensure wrapper passes correct props with new field names
-- [ ] T041 [P] Update `ExperienceTypeSelector.tsx` in `web/src/features/experiences/components/shared/ExperienceTypeSelector.tsx`:
+- [x] T041 [P] Update `ExperienceTypeSelector.tsx` in `web/src/features/experiences/components/shared/ExperienceTypeSelector.tsx`:
   - Review and update if any schema fields are referenced
-- [ ] T042 [P] Update `constants.ts` in `web/src/features/experiences/constants.ts`:
+- [x] T042 [P] Update `constants.ts` in `web/src/features/experiences/constants.ts`:
   - Review and update any constants related to field names
-- [ ] T043 [P] Update barrel exports in `web/src/features/experiences/index.ts`:
+- [x] T043 [P] Update barrel exports in `web/src/features/experiences/index.ts`:
   - Ensure all updated types are exported
-- [ ] T044 [P] Update action barrel exports in `web/src/features/experiences/actions/index.ts`
-- [ ] T045 [P] Update component barrel exports in `web/src/features/experiences/components/index.ts`
-- [ ] T046 [P] Update repository barrel exports in `web/src/features/experiences/repositories/index.ts`
-- [ ] T047 Deploy Firestore index for `eventIds` array-contains + `createdAt` ordering (see data-model.md)
+- [x] T044 [P] Update action barrel exports in `web/src/features/experiences/actions/index.ts`
+- [x] T045 [P] Update component barrel exports in `web/src/features/experiences/components/index.ts`
+- [x] T046 [P] Update repository barrel exports in `web/src/features/experiences/repositories/index.ts`
+- [x] T047 Deploy Firestore index for `eventIds` array-contains + `createdAt` ordering (see data-model.md)
 
 ### Validation Loop (REQUIRED - Constitution Principle V)
 
 **Purpose**: Ensure code quality and correctness before merge
 
-- [ ] T048 Run `pnpm lint` and fix all errors/warnings
-- [ ] T049 Run `pnpm type-check` and resolve all TypeScript errors
-- [ ] T050 Run `pnpm test` and ensure all tests pass
+- [x] T048 Run `pnpm lint` and fix all errors/warnings
+- [x] T049 Run `pnpm type-check` and resolve all TypeScript errors
+- [x] T050 Run `pnpm test` and ensure all tests pass
 - [ ] T051 Verify feature in local dev server (`pnpm dev`):
   - Test create experience flow
   - Test view experiences for event

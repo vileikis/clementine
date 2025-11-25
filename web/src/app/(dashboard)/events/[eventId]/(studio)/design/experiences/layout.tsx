@@ -3,7 +3,7 @@
 
 import { useState, useEffect, createContext, useContext, useMemo } from "react";
 import { Menu } from "lucide-react";
-import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
+import { collection, onSnapshot, query, orderBy, where } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
 import { Button } from "@/components/ui/button";
 import {
@@ -63,13 +63,15 @@ export default function DesignLayout({ children, params }: DesignLayoutProps) {
     params.then(({ eventId }) => setEventId(eventId));
   }, [params]);
 
-  // Real-time experience list fetching from Firestore subcollection
+  // Real-time experience list fetching from root /experiences collection
+  // Uses array-contains query on eventIds field (data-model-v4 normalized design)
   useEffect(() => {
     if (!eventId) return;
 
     const experiencesQuery = query(
-      collection(db, "events", eventId, "experiences"),
-      orderBy("createdAt", "asc")
+      collection(db, "experiences"),
+      where("eventIds", "array-contains", eventId),
+      // orderBy("createdAt", "asc")
     );
 
     const unsubscribe = onSnapshot(
