@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition, useState } from "react";
+import { useTransition, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,11 @@ export function JourneyCard({ journey, eventId, isActive }: JourneyCardProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [optimisticActive, setOptimisticActive] = useState(isActive);
 
+  // Sync local state when prop changes (after router.refresh())
+  useEffect(() => {
+    setOptimisticActive(isActive);
+  }, [isActive]);
+
   // Format date for display
   const createdDate = new Date(journey.createdAt).toLocaleDateString("en-US", {
     month: "short",
@@ -48,6 +53,8 @@ export function JourneyCard({ journey, eventId, isActive }: JourneyCardProps) {
 
       if (result.success) {
         toast.success(checked ? "Journey activated" : "Journey deactivated");
+        // Refresh to sync all cards with updated event.activeJourneyId
+        router.refresh();
       } else {
         // Revert optimistic update
         setOptimisticActive(!checked);
