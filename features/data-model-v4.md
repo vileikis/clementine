@@ -90,17 +90,13 @@ export interface FieldConfig {
 
 interface Experience {
   id: string;
-  eventId: string; // The event this experience belongs to
+  companyId: string; // The event this experience belongs to
   name: string; // Internal name
   // 1. The source of truth for how to render the player
-  previewType: z.enum(["image", "gif", "video"]),
+  previewType?: "image" | "gif" | "video",
 
-  // 2. The heavy asset (The actual GIF or Video file)
-  previewMediaUrl: z.url().optional(),
-
-  // 3. The lightweight asset (Static JPG/PNG)
-  // CRITICAL for grid views so you don't kill bandwidth loading 50 videos
-  posterUrl: z..url().optional(),
+  // 2. The heavy asset (The actual Image, GIF or Video file)
+  previewMediaUrl?: string,
 
   enabled: boolean;
 
@@ -117,25 +113,26 @@ interface Experience {
   // 3. HARDWARE CONFIGURATION
   captureConfig: {
     countdown: number; // seconds
-    cameraFacing: "front" | "back";
-    aspectRatio?: "9:16" | "1:1" | "4:3";
+    cameraFacing: "front" | "back" | "both";
+
     overlayUrl?: string; // PNG frame applied over camera
 
     // Video/GIF specific
     minDuration?: number;
     maxDuration?: number;
-    frameDelay?: number; // for GIFs
+    frameCount?: number; // number of gifs
   };
 
   // 4. AI CONFIGURATION
   aiConfig: {
+    enabled: boolean,
     model: "nanobanano", "stable-diffusion-xl" | "flux" | "kling-video";
     // Handlebars syntax used to inject values from inputFields
     // e.g., "A portrait of {{guest_name}} in the style of {{selected_vibe}}"
     prompt: string;
     negativePrompt?: string;
-    strength?: number; // 0.0 - 1.0 (img2img strength)
-    seed?: number; // -1 for random
+    referenceImageUrls: string[],
+    aspectRatio?: "9:16" | "1:1" | "4:3";
   };
 
   createdAt: number;
