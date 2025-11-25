@@ -73,14 +73,14 @@ All paths relative to repository root:
 
 ### Implementation for User Story 2
 
-- [ ] T012 [US2] Implement drag-and-drop upload area in `web/src/features/experiences/components/AIPlayground.tsx`
-- [ ] T013 [US2] Add file validation (JPEG/PNG/WebP, max 10MB) in `web/src/features/experiences/components/AIPlayground.tsx`
-- [ ] T014 [US2] Display uploaded image preview (Data URL) in `web/src/features/experiences/components/AIPlayground.tsx`
-- [ ] T015 [US2] Add Generate button with loading state in `web/src/features/experiences/components/AIPlayground.tsx`
-- [ ] T016 [US2] Wire Generate button to generatePlaygroundPreview Server Action in `web/src/features/experiences/components/AIPlayground.tsx`
-- [ ] T017 [US2] Display transformed result image in `web/src/features/experiences/components/AIPlayground.tsx`
-- [ ] T018 [US2] Add error state display with retry option in `web/src/features/experiences/components/AIPlayground.tsx`
-- [ ] T019 [US2] Integrate AIPlayground into PhotoExperienceEditor right panel in `web/src/features/experiences/components/PhotoExperienceEditor.tsx`
+- [x] T012 [US2] Implement drag-and-drop upload area in `web/src/features/experiences/components/shared/AIPlayground.tsx`
+- [x] T013 [US2] Add file validation (JPEG/PNG/WebP, max 10MB) in `web/src/features/experiences/components/shared/AIPlayground.tsx`
+- [x] T014 [US2] Display uploaded image preview (Data URL) in `web/src/features/experiences/components/shared/AIPlayground.tsx`
+- [x] T015 [US2] Add Generate button with loading state in `web/src/features/experiences/components/shared/AIPlayground.tsx`
+- [x] T016 [US2] Wire Generate button to generatePlaygroundPreview Server Action in `web/src/features/experiences/components/shared/AIPlayground.tsx`
+- [x] T017 [US2] Display transformed result image in `web/src/features/experiences/components/shared/AIPlayground.tsx`
+- [x] T018 [US2] Add error state display with retry option in `web/src/features/experiences/components/shared/AIPlayground.tsx`
+- [x] T019 [US2] Integrate AIPlayground into PhotoExperienceEditor right panel in `web/src/features/experiences/components/photo/PhotoExperienceEditor.tsx`
 
 **Checkpoint**: User Story 2 complete - Playground upload/generate/result works independently
 
@@ -94,9 +94,9 @@ All paths relative to repository root:
 
 ### Implementation for User Story 3
 
-- [ ] T020 [US3] Add Name input field to configuration panel in `web/src/features/experiences/components/PhotoExperienceEditor.tsx`
-- [ ] T021 [US3] Add Description textarea to configuration panel in `web/src/features/experiences/components/PhotoExperienceEditor.tsx`
-- [ ] T022 [US3] Wire name/description to updatePhotoExperience action in `web/src/features/experiences/components/PhotoExperienceEditor.tsx`
+- [x] T020 [US3] Add Name input field to configuration panel in `web/src/features/experiences/components/photo/PhotoExperienceEditor.tsx`
+- [x] T021 [US3] Add Description textarea to configuration panel in `web/src/features/experiences/components/photo/PhotoExperienceEditor.tsx`
+- [x] T022 [US3] Wire name/description to updatePhotoExperience action in `web/src/features/experiences/components/photo/PhotoExperienceEditor.tsx`
 
 **Checkpoint**: User Story 3 complete - General info editing works
 
@@ -110,10 +110,10 @@ All paths relative to repository root:
 
 ### Implementation for User Story 4
 
-- [ ] T023 [US4] Verify ExperienceEditorHeader displays preview media in `web/src/features/experiences/components/ExperienceEditorHeader.tsx`
-- [ ] T024 [US4] Verify enabled toggle switch works and persists in `web/src/features/experiences/components/ExperienceEditorHeader.tsx`
-- [ ] T025 [US4] Verify delete button shows confirmation dialog in `web/src/features/experiences/components/ExperienceEditorHeader.tsx`
-- [ ] T026 [US4] Verify delete action removes experience and navigates away in `web/src/features/experiences/components/ExperienceEditorHeader.tsx`
+- [x] T023 [US4] Verify ExperienceEditorHeader displays preview media in `web/src/features/experiences/components/shared/ExperienceEditorHeader.tsx`
+- [x] T024 [US4] Verify enabled toggle switch works and persists in `web/src/features/experiences/components/shared/ExperienceEditorHeader.tsx`
+- [x] T025 [US4] Verify delete button shows confirmation dialog in `web/src/features/experiences/components/shared/DeleteExperienceButton.tsx`
+- [x] T026 [US4] Verify delete action removes experience and navigates away in `web/src/features/experiences/components/shared/DeleteExperienceButton.tsx`
 
 **Checkpoint**: User Story 4 complete - Header actions work
 
