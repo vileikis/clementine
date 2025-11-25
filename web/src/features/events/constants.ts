@@ -24,7 +24,7 @@ export const THEME_DEFAULTS = {
     radius: "md" as const,
   },
   background: {
-    color: "#F9FAFB",
+    color: "#FFFFFF",
     image: null,
     overlayOpacity: 0.5,
   },
