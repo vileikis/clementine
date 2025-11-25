@@ -2,7 +2,7 @@
 
 /**
  * ExperienceEditorWrapper component
- * Updated in Phase 2 (User Story 1) to support all experience types
+ * Refactored for normalized Firestore design (data-model-v4).
  *
  * Wraps ExperienceEditor with Server Actions for update and delete
  * Routes to correct Server Action based on experience type
@@ -35,7 +35,6 @@ export function ExperienceEditorWrapper({
     switch (experience.type) {
       case "photo":
         const photoResult = await updatePhotoExperience(
-          eventId,
           experienceId,
           data as Partial<PhotoExperience>
         );
@@ -46,7 +45,6 @@ export function ExperienceEditorWrapper({
 
       case "gif":
         const gifResult = await updateGifExperience(
-          eventId,
           experienceId,
           data as Partial<GifExperience>
         );
@@ -55,10 +53,8 @@ export function ExperienceEditorWrapper({
         }
         break;
 
-
       case "video":
-      case "wheel":
-        throw new Error(`${experience.type} experience updates not yet implemented`);
+        throw new Error("Video experience updates not yet implemented");
 
       default:
         // Exhaustiveness check - TypeScript will error if a case is missing
@@ -69,7 +65,7 @@ export function ExperienceEditorWrapper({
   };
 
   const handleDelete = async (experienceId: string) => {
-    const result = await deleteExperience(eventId, experienceId);
+    const result = await deleteExperience(experienceId);
 
     if (!result.success) {
       throw new Error(result.error.message);

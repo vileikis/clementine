@@ -9,10 +9,9 @@ import type { PreviewType } from "../../schemas";
 import { cn } from "@/lib/utils";
 
 interface PreviewMediaCompactProps {
-  eventId: string;
   experienceId: string;
-  previewPath?: string;
-  previewType?: PreviewType;
+  previewMediaUrl?: string;
+  previewMediaType?: PreviewType;
   onUpload: (publicUrl: string, fileType: PreviewType) => void;
   onRemove: () => void;
   disabled?: boolean;
@@ -27,10 +26,9 @@ interface PreviewMediaCompactProps {
  * Created for unified experience editor header
  */
 export function PreviewMediaCompact({
-  eventId,
   experienceId,
-  previewPath,
-  previewType,
+  previewMediaUrl,
+  previewMediaType,
   onUpload,
   onRemove,
   disabled = false,
@@ -49,7 +47,7 @@ export function PreviewMediaCompact({
     setUploadError(null);
 
     try {
-      const result = await uploadPreviewMedia(eventId, experienceId, file);
+      const result = await uploadPreviewMedia(experienceId, file);
 
       if (result.success) {
         onUpload(result.data.publicUrl, result.data.fileType);
@@ -67,13 +65,13 @@ export function PreviewMediaCompact({
   };
 
   const handleRemoveMedia = async () => {
-    if (!previewPath) return;
+    if (!previewMediaUrl) return;
 
     setIsDeleting(true);
     setUploadError(null);
 
     try {
-      const result = await deletePreviewMedia(eventId, experienceId, previewPath);
+      const result = await deletePreviewMedia(experienceId, previewMediaUrl);
 
       if (result.success) {
         onRemove();
@@ -97,7 +95,7 @@ export function PreviewMediaCompact({
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         onClick={() => {
-          if (!previewPath && !isUploading && !disabled) {
+          if (!previewMediaUrl && !isUploading && !disabled) {
             document.getElementById(`preview-media-${experienceId}`)?.click();
           }
         }}
@@ -112,12 +110,12 @@ export function PreviewMediaCompact({
           className="hidden"
         />
 
-        {previewPath ? (
+        {previewMediaUrl ? (
           <>
             {/* Media exists - show preview */}
-            {previewType === "video" ? (
+            {previewMediaType === "video" ? (
               <video
-                src={previewPath}
+                src={previewMediaUrl}
                 autoPlay
                 muted
                 loop
@@ -126,7 +124,7 @@ export function PreviewMediaCompact({
               />
             ) : (
               <Image
-                src={previewPath}
+                src={previewMediaUrl}
                 alt="Experience preview"
                 fill
                 className="object-cover"

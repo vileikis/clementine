@@ -2,17 +2,18 @@
 
 /**
  * CreateExperienceForm component for inline experience creation
- * Part of Phase 4 (User Story 2) - Create New Experience Inline
+ * Refactored for normalized Firestore design (data-model-v4).
  *
  * Replaces modal-based creation with inline form at dedicated route
  * Uses React Hook Form + Zod for validation (Constitution Principle III)
  *
  * Features:
- * - Name input with trim validation
+ * - Name input with trim validation (renamed from 'label')
  * - Type selection with visual cards
  * - Real-time validation feedback
  * - Submit button enabled only when valid
  * - Redirect to experience editor after creation
+ * - Accepts companyId from context (via event's ownerId)
  */
 
 import { useState } from "react";
@@ -34,20 +35,20 @@ import { createGifExperience } from "../../actions/gif-create";
 
 import { ExperienceTypeSelector } from "./ExperienceTypeSelector";
 
-// Union schema for photo, GIF, 
+// Union schema for photo, GIF
 const createExperienceSchema = z.union([
   createPhotoExperienceSchema,
   createGifExperienceSchema,
-
 ]);
 
 type CreateExperienceInput = z.input<typeof createExperienceSchema>;
 
 interface CreateExperienceFormProps {
   eventId: string;
+  companyId: string;
 }
 
-export function CreateExperienceForm({ eventId }: CreateExperienceFormProps) {
+export function CreateExperienceForm({ eventId, companyId }: CreateExperienceFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -61,14 +62,16 @@ export function CreateExperienceForm({ eventId }: CreateExperienceFormProps) {
     resolver: zodResolver(createExperienceSchema),
     mode: "onChange", // Enable real-time validation
     defaultValues: {
-      label: "",
+      companyId, // Set from props
+      name: "",
       type: "photo", // Default to photo (only available type)
+      eventIds: [], // Will be auto-populated by server action
     },
   });
 
   // eslint-disable-next-line react-hooks/incompatible-library -- React Hook Form watch() is used safely here
   const selectedType = watch("type");
-  const nameValue = watch("label");
+  const nameValue = watch("name");
 
   const onSubmit = async (data: CreateExperienceInput) => {
     setIsSubmitting(true);
@@ -115,16 +118,16 @@ export function CreateExperienceForm({ eventId }: CreateExperienceFormProps) {
           placeholder="Enter experience name..."
           className={cn(
             "min-h-[44px]", // Touch target minimum (MFR-002)
-            errors.label && "border-destructive focus-visible:ring-destructive"
+            errors.name && "border-destructive focus-visible:ring-destructive"
           )}
-          {...register("label")}
-          aria-invalid={!!errors.label}
-          aria-describedby={errors.label ? "name-error" : undefined}
+          {...register("name")}
+          aria-invalid={!!errors.name}
+          aria-describedby={errors.name ? "name-error" : undefined}
         />
 
-        {errors.label && (
+        {errors.name && (
           <p id="name-error" className="text-sm text-destructive mt-1">
-            {errors.label.message}
+            {errors.name.message}
           </p>
         )}
 
@@ -139,14 +142,14 @@ export function CreateExperienceForm({ eventId }: CreateExperienceFormProps) {
           Experience Type
         </Label>
         <p className="text-sm text-muted-foreground">
-          Select the type of experience you want to create. Photo experiences are currently available.
+          Select the type of experience you want to create.
         </p>
 
         <ExperienceTypeSelector
           selectedType={selectedType}
           onSelect={(type) => {
-            // Only Photo type is currently supported
-            if (type === "photo") {
+            // Photo and GIF types are currently supported
+            if (type === "photo" || type === "gif") {
               setValue("type", type, { shouldValidate: true });
             }
           }}

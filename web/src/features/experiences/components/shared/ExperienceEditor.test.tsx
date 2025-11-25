@@ -6,7 +6,7 @@ import type { PhotoExperience, GifExperience } from "../../schemas";
 jest.mock("../photo/PhotoExperienceEditor", () => ({
   PhotoExperienceEditor: ({ experience }: { experience: PhotoExperience }) => (
     <div data-testid="photo-experience-editor">
-      PhotoExperienceEditor: {experience.label}
+      PhotoExperienceEditor: {experience.name}
     </div>
   ),
 }));
@@ -14,7 +14,7 @@ jest.mock("../photo/PhotoExperienceEditor", () => ({
 jest.mock("../gif/GifExperienceEditor", () => ({
   GifExperienceEditor: ({ experience }: { experience: GifExperience }) => (
     <div data-testid="gif-experience-editor">
-      GifExperienceEditor: {experience.label}
+      GifExperienceEditor: {experience.name}
     </div>
   ),
 }));
@@ -25,12 +25,12 @@ describe("ExperienceEditor Component - Discriminated Union Routing", () => {
 
   const baseExperience = {
     id: "exp-1",
-    eventId: "event-1",
-    label: "Test Experience",
+    companyId: "company-1",
+    eventIds: ["event-1"],
+    name: "Test Experience",
     enabled: true,
-    hidden: false,
-    previewPath: undefined,
-    previewType: undefined,
+    previewMediaUrl: undefined,
+    previewMediaType: undefined,
     createdAt: Date.now(),
     updatedAt: Date.now(),
   };
@@ -38,15 +38,16 @@ describe("ExperienceEditor Component - Discriminated Union Routing", () => {
   const mockPhotoExperience: PhotoExperience = {
     ...baseExperience,
     type: "photo",
-    config: {
+    captureConfig: {
       countdown: 3,
-      overlayFramePath: null,
+      cameraFacing: "front",
+      overlayUrl: null,
     },
-    aiConfig: {
+    aiPhotoConfig: {
       enabled: true,
       model: "nanobanana", // cspell:disable-line
       prompt: "Test prompt",
-      referenceImagePaths: null,
+      referenceImageUrls: null,
       aspectRatio: "1:1",
     },
   };
@@ -54,17 +55,16 @@ describe("ExperienceEditor Component - Discriminated Union Routing", () => {
   const mockGifExperience: GifExperience = {
     ...baseExperience,
     type: "gif",
-    config: {
-      frameCount: 5,
-      intervalMs: 300,
-      loopCount: 0,
+    captureConfig: {
       countdown: 3,
+      cameraFacing: "front",
+      frameCount: 5,
     },
-    aiConfig: {
+    aiPhotoConfig: {
       enabled: false,
       model: null,
       prompt: null,
-      referenceImagePaths: null,
+      referenceImageUrls: null,
       aspectRatio: "1:1",
     },
   };
@@ -106,15 +106,16 @@ describe("ExperienceEditor Component - Discriminated Union Routing", () => {
       const videoExperience = {
         ...baseExperience,
         type: "video" as const,
-        config: {
-          maxDurationSeconds: 15,
-          allowRetake: true,
+        captureConfig: {
+          countdown: 3,
+          cameraFacing: "front" as const,
+          maxDuration: 15,
         },
-        aiConfig: {
+        aiVideoConfig: {
           enabled: false,
           model: null,
           prompt: null,
-          referenceImagePaths: null,
+          referenceImageUrls: null,
           aspectRatio: "9:16" as const,
         },
       };
@@ -130,32 +131,6 @@ describe("ExperienceEditor Component - Discriminated Union Routing", () => {
       expect(screen.getByText("Video Experience Editor")).toBeInTheDocument();
       expect(screen.getByText(/not yet implemented/)).toBeInTheDocument();
     });
-
-    it("renders placeholder for wheel experience", () => {
-      const wheelExperience = {
-        ...baseExperience,
-        type: "wheel" as const,
-        config: {
-          items: [
-            { id: "1", label: "Prize 1", weight: 1, color: "#FF0000" },
-            { id: "2", label: "Prize 2", weight: 1, color: "#00FF00" },
-          ],
-          spinDurationMs: 3000,
-          autoSpin: false,
-        },
-      };
-
-      render(
-        <ExperienceEditor
-          experience={wheelExperience}
-          onSave={mockOnSave}
-          onDelete={mockOnDelete}
-        />
-      );
-
-      expect(screen.getByText("Wheel Experience Editor")).toBeInTheDocument();
-      expect(screen.getByText(/not yet implemented/)).toBeInTheDocument();
-    });
   });
 
   describe("Props forwarding", () => {
@@ -168,7 +143,7 @@ describe("ExperienceEditor Component - Discriminated Union Routing", () => {
         />
       );
 
-      // The mock displays the experience label to verify it was passed
+      // The mock displays the experience name to verify it was passed
       expect(screen.getByText(/Test Experience/)).toBeInTheDocument();
     });
 
@@ -181,7 +156,7 @@ describe("ExperienceEditor Component - Discriminated Union Routing", () => {
         />
       );
 
-      // The mock displays the experience label to verify it was passed
+      // The mock displays the experience name to verify it was passed
       expect(screen.getByText(/Test Experience/)).toBeInTheDocument();
     });
   });

@@ -1,53 +1,47 @@
-// Experience repository - CRUD operations for experiences subcollection
+// Experience repository - CRUD operations for root /experiences collection
+// Refactored for normalized Firestore design (data-model-v4)
 
 import { db } from "@/lib/firebase/admin";
 import {
   experienceSchema,
   type PhotoExperience,
+  type GifExperience,
   type Experience,
 } from "../schemas";
-import { FieldValue } from "firebase-admin/firestore";
 
 /**
- * Creates a new experience for an event
+ * Creates a new photo experience in the root /experiences collection
  */
-export async function createExperience(
-  eventId: string,
-  data: {
-    label: string;
-    type: "photo";
-    enabled: boolean;
-  }
-): Promise<string> {
-  const experienceRef = db
-    .collection("events")
-    .doc(eventId)
-    .collection("experiences")
-    .doc();
-
+export async function createPhotoExperience(data: {
+  companyId: string;
+  eventIds: string[];
+  name: string;
+}): Promise<PhotoExperience> {
+  const experienceRef = db.collection("experiences").doc();
   const now = Date.now();
 
-  const experience = {
+  const experience: PhotoExperience = {
     id: experienceRef.id,
-    eventId,
-    label: data.label,
-    type: "photo" as const,
-    enabled: data.enabled,
-    hidden: false,
+    companyId: data.companyId,
+    eventIds: data.eventIds,
+    name: data.name,
+    type: "photo",
+    enabled: true,
 
-    // Nested config object
-    config: {
-      countdown: 3,
-      overlayFramePath: null,
+    // Default capture config
+    captureConfig: {
+      countdown: 0,
+      cameraFacing: "front",
+      overlayUrl: null,
     },
 
-    // Nested aiConfig object
-    aiConfig: {
+    // Default AI config
+    aiPhotoConfig: {
       enabled: false,
       model: null,
       prompt: null,
-      referenceImagePaths: null,
-      aspectRatio: "1:1" as const,
+      referenceImageUrls: null,
+      aspectRatio: "1:1",
     },
 
     createdAt: now,
@@ -55,84 +49,84 @@ export async function createExperience(
   };
 
   await experienceRef.set(experience);
-
-  // Increment experiencesCount on parent event
-  await db
-    .collection("events")
-    .doc(eventId)
-    .update({
-      experiencesCount: FieldValue.increment(1),
-      updatedAt: now,
-    });
-
-  return experienceRef.id;
+  return experience;
 }
 
 /**
- * Updates an existing experience
+ * Creates a new GIF experience in the root /experiences collection
+ */
+export async function createGifExperience(data: {
+  companyId: string;
+  eventIds: string[];
+  name: string;
+}): Promise<GifExperience> {
+  const experienceRef = db.collection("experiences").doc();
+  const now = Date.now();
+
+  const experience: GifExperience = {
+    id: experienceRef.id,
+    companyId: data.companyId,
+    eventIds: data.eventIds,
+    name: data.name,
+    type: "gif",
+    enabled: true,
+
+    // Default capture config
+    captureConfig: {
+      countdown: 3,
+      cameraFacing: "front",
+      frameCount: 5,
+    },
+
+    // Default AI config (GIF uses photo config - image models)
+    aiPhotoConfig: {
+      enabled: false,
+      model: null,
+      prompt: null,
+      referenceImageUrls: null,
+      aspectRatio: "1:1",
+    },
+
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  await experienceRef.set(experience);
+  return experience;
+}
+
+/**
+ * Updates an existing experience in the root /experiences collection
  */
 export async function updateExperience(
-  eventId: string,
   experienceId: string,
-  data: Partial<PhotoExperience>
+  data: Partial<Experience>
 ): Promise<void> {
   const now = Date.now();
 
   await db
-    .collection("events")
-    .doc(eventId)
     .collection("experiences")
     .doc(experienceId)
     .update({
       ...data,
       updatedAt: now,
     });
-
-  // Also update parent event's updatedAt
-  await db.collection("events").doc(eventId).update({
-    updatedAt: now,
-  });
 }
 
 /**
- * Deletes an experience
+ * Deletes an experience from the root /experiences collection
  */
-export async function deleteExperience(
-  eventId: string,
-  experienceId: string
-): Promise<void> {
-  const now = Date.now();
-
-  await db
-    .collection("events")
-    .doc(eventId)
-    .collection("experiences")
-    .doc(experienceId)
-    .delete();
-
-  // Decrement experiencesCount on parent event
-  await db
-    .collection("events")
-    .doc(eventId)
-    .update({
-      experiencesCount: FieldValue.increment(-1),
-      updatedAt: now,
-    });
+export async function deleteExperience(experienceId: string): Promise<void> {
+  await db.collection("experiences").doc(experienceId).delete();
 }
 
 /**
- * Gets a single experience by ID
+ * Gets a single experience by ID from the root /experiences collection
  */
 export async function getExperience(
-  eventId: string,
   experienceId: string
 ): Promise<Experience | null> {
-  const doc = await db
-    .collection("events")
-    .doc(eventId)
-    .collection("experiences")
-    .doc(experienceId)
-    .get();
+  const doc = await db.collection("experiences").doc(experienceId).get();
 
   if (!doc.exists) {
     return null;
@@ -145,14 +139,36 @@ export async function getExperience(
 }
 
 /**
- * Lists all experiences for an event
+ * Gets all experiences for an event using array-contains query
+ * Query: where('eventIds', 'array-contains', eventId)
  */
-export async function listExperiences(eventId: string): Promise<Experience[]> {
+export async function getExperiencesByEventId(
+  eventId: string
+): Promise<Experience[]> {
   const snapshot = await db
-    .collection("events")
-    .doc(eventId)
     .collection("experiences")
-    .orderBy("createdAt", "asc")
+    .where("eventIds", "array-contains", eventId)
+    .orderBy("createdAt", "desc")
+    .get();
+
+  return snapshot.docs.map((doc) =>
+    experienceSchema.parse({
+      id: doc.id,
+      ...doc.data(),
+    })
+  );
+}
+
+/**
+ * Gets all experiences for a company
+ */
+export async function getExperiencesByCompanyId(
+  companyId: string
+): Promise<Experience[]> {
+  const snapshot = await db
+    .collection("experiences")
+    .where("companyId", "==", companyId)
+    .orderBy("createdAt", "desc")
     .get();
 
   return snapshot.docs.map((doc) =>

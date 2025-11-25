@@ -25,13 +25,12 @@ import type { Experience, PreviewType } from "../../schemas";
 
 interface ExperienceEditorHeaderProps {
   // Experience data
-  eventId: string;
   experience: Experience;
 
   // Preview media (optional - can be omitted for types that don't need it)
   showPreview?: boolean;
-  previewPath?: string;
-  previewType?: PreviewType;
+  previewMediaUrl?: string;
+  previewMediaType?: PreviewType;
   onPreviewUpload?: (publicUrl: string, fileType: PreviewType) => void;
   onPreviewRemove?: () => void;
 
@@ -63,11 +62,10 @@ interface ExperienceEditorHeaderProps {
  * Created for unified experience editor header (see unified-experience-header-requirements.md)
  */
 export function ExperienceEditorHeader({
-  eventId,
   experience,
   showPreview = true,
-  previewPath,
-  previewType,
+  previewMediaUrl,
+  previewMediaType,
   onPreviewUpload,
   onPreviewRemove,
   onTitleSave,
@@ -79,7 +77,7 @@ export function ExperienceEditorHeader({
 }: ExperienceEditorHeaderProps) {
   // Title editing dialog state
   const [isTitleDialogOpen, setIsTitleDialogOpen] = useState(false);
-  const [titleInput, setTitleInput] = useState(experience.label);
+  const [titleInput, setTitleInput] = useState(experience.name);
   const [titleError, setTitleError] = useState<string | null>(null);
   const [isTitlePending, startTitleTransition] = useTransition();
 
@@ -87,7 +85,7 @@ export function ExperienceEditorHeader({
   const [isEnabledPending, startEnabledTransition] = useTransition();
 
   const handleTitleClick = () => {
-    setTitleInput(experience.label);
+    setTitleInput(experience.name);
     setTitleError(null);
     setIsTitleDialogOpen(true);
   };
@@ -116,7 +114,7 @@ export function ExperienceEditorHeader({
   };
 
   const handleTitleCancel = () => {
-    setTitleInput(experience.label);
+    setTitleInput(experience.name);
     setTitleError(null);
     setIsTitleDialogOpen(false);
   };
@@ -135,10 +133,9 @@ export function ExperienceEditorHeader({
         {showPreview && onPreviewUpload && onPreviewRemove && (
           <div className="shrink-0">
             <PreviewMediaCompact
-              eventId={eventId}
               experienceId={experience.id}
-              previewPath={previewPath}
-              previewType={previewType}
+              previewMediaUrl={previewMediaUrl}
+              previewMediaType={previewMediaType}
               onUpload={onPreviewUpload}
               onRemove={onPreviewRemove}
               disabled={disabled}
@@ -154,10 +151,10 @@ export function ExperienceEditorHeader({
               className="text-2xl font-semibold cursor-pointer hover:underline break-words inline-block"
               onClick={handleTitleClick}
             >
-              {experience.label}
+              {experience.name}
             </h2>
             <DeleteExperienceButton
-              experienceLabel={experience.label}
+              experienceName={experience.name}
               onDelete={onDelete}
               disabled={disabled || isTitlePending || isEnabledPending}
             />

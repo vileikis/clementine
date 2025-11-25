@@ -68,13 +68,11 @@ function extractStoragePath(publicUrl: string): string {
  * Uploads preview media (image/GIF/video) to Firebase Storage and returns public URL.
  * If experience already has preview media, deletes old file before uploading new one.
  *
- * @param eventId - Event ID containing the experience
  * @param experienceId - Experience ID to update
  * @param file - File object from form input
  * @returns Object with publicUrl, fileType, and sizeBytes
  */
 export async function uploadPreviewMedia(
-  eventId: string,
   experienceId: string,
   file: File
 ): Promise<ActionResponse<{ publicUrl: string; fileType: PreviewType; sizeBytes: number }>> {
@@ -102,16 +100,16 @@ export async function uploadPreviewMedia(
     }
 
     // Get experience document (validates existence and returns doc in one read)
-    const result = await getExperienceDocument(eventId, experienceId);
+    const result = await getExperienceDocument(experienceId);
     if ("error" in result) return result.error;
 
     const experienceDoc = result.doc;
     const experienceData = experienceDoc.data();
 
     // Delete old preview media if exists
-    if (experienceData?.previewPath) {
+    if (experienceData?.previewMediaUrl) {
       try {
-        const oldPath = extractStoragePath(experienceData.previewPath);
+        const oldPath = extractStoragePath(experienceData.previewMediaUrl);
         await bucket.file(oldPath).delete();
       } catch (error) {
         console.error("Failed to delete old preview media:", error);
@@ -122,7 +120,7 @@ export async function uploadPreviewMedia(
     // Upload new file
     const timestamp = Date.now();
     const filename = `${timestamp}-${file.name}`;
-    const storagePath = `events/${eventId}/experiences/${experienceId}/preview/${filename}`;
+    const storagePath = `experiences/${experienceId}/preview/${filename}`;
     const fileRef = bucket.file(storagePath);
 
     const buffer = Buffer.from(await file.arrayBuffer());
@@ -157,15 +155,13 @@ export async function uploadPreviewMedia(
  * This is an immediate, complete deletion to prevent deadlock scenarios where
  * the file is deleted but Firestore still references it.
  *
- * @param eventId - Event ID containing the experience
  * @param experienceId - Experience ID
- * @param previewPath - Public URL of preview media to delete
+ * @param previewMediaUrl - Public URL of preview media to delete
  * @returns Success/error response
  */
 export async function deletePreviewMedia(
-  eventId: string,
   experienceId: string,
-  previewPath: string
+  previewMediaUrl: string
 ): Promise<ActionResponse<void>> {
   try {
     // Check authentication
@@ -173,14 +169,14 @@ export async function deletePreviewMedia(
     if (authError) return authError;
 
     // Get experience document (validates existence and returns doc in one read)
-    const result = await getExperienceDocument(eventId, experienceId);
+    const result = await getExperienceDocument(experienceId);
     if ("error" in result) return result.error;
 
     const experienceRef = result.doc.ref;
 
     // Delete file from Storage
     try {
-      const storagePath = extractStoragePath(previewPath);
+      const storagePath = extractStoragePath(previewMediaUrl);
       await bucket.file(storagePath).delete();
     } catch (error) {
       console.error("Failed to delete preview media from storage:", error);
@@ -191,8 +187,8 @@ export async function deletePreviewMedia(
     // Clear preview fields from Firestore immediately using FieldValue.delete()
     const { FieldValue } = await import("firebase-admin/firestore");
     await experienceRef.update({
-      previewPath: FieldValue.delete(),
-      previewType: FieldValue.delete(),
+      previewMediaUrl: FieldValue.delete(),
+      previewMediaType: FieldValue.delete(),
       updatedAt: Date.now(),
     });
 
@@ -211,13 +207,11 @@ export async function deletePreviewMedia(
  * Uploads frame overlay image (PNG recommended) to Firebase Storage and returns public URL.
  * If experience already has a frame overlay, deletes old file before uploading new one.
  *
- * @param eventId - Event ID containing the experience
  * @param experienceId - Experience ID to update
  * @param file - File object from form input (PNG recommended)
  * @returns Object with publicUrl and sizeBytes
  */
 export async function uploadFrameOverlay(
-  eventId: string,
   experienceId: string,
   file: File
 ): Promise<ActionResponse<{ publicUrl: string; sizeBytes: number }>> {
@@ -245,18 +239,16 @@ export async function uploadFrameOverlay(
     }
 
     // Get experience document (validates existence and returns doc in one read)
-    const result = await getExperienceDocument(eventId, experienceId);
+    const result = await getExperienceDocument(experienceId);
     if ("error" in result) return result.error;
 
     const experienceDoc = result.doc;
     const experienceData = experienceDoc.data();
 
     // Delete old frame overlay if exists
-    if (experienceData?.overlayFramePath || experienceData?.config?.overlayFramePath) {
+    if (experienceData?.captureConfig?.overlayUrl) {
       try {
-        const oldPath = extractStoragePath(
-          experienceData.config?.overlayFramePath || experienceData.overlayFramePath
-        );
+        const oldPath = extractStoragePath(experienceData.captureConfig.overlayUrl);
         await bucket.file(oldPath).delete();
       } catch (error) {
         console.error("Failed to delete old frame overlay:", error);
@@ -267,7 +259,7 @@ export async function uploadFrameOverlay(
     // Upload new file
     const timestamp = Date.now();
     const filename = `${timestamp}-${file.name}`;
-    const storagePath = `events/${eventId}/experiences/${experienceId}/overlay/${filename}`;
+    const storagePath = `experiences/${experienceId}/overlay/${filename}`;
     const fileRef = bucket.file(storagePath);
 
     const buffer = Buffer.from(await file.arrayBuffer());
@@ -298,15 +290,13 @@ export async function uploadFrameOverlay(
  *
  * Deletes frame overlay file from Firebase Storage AND clears field from Firestore.
  *
- * @param eventId - Event ID containing the experience
  * @param experienceId - Experience ID
- * @param overlayFramePath - Public URL of frame overlay to delete
+ * @param overlayUrl - Public URL of frame overlay to delete
  * @returns Success/error response
  */
 export async function deleteFrameOverlay(
-  eventId: string,
   experienceId: string,
-  overlayFramePath: string
+  overlayUrl: string
 ): Promise<ActionResponse<void>> {
   try {
     // Check authentication
@@ -314,37 +304,26 @@ export async function deleteFrameOverlay(
     if (authError) return authError;
 
     // Get experience document (validates existence and returns doc in one read)
-    const result = await getExperienceDocument(eventId, experienceId);
+    const result = await getExperienceDocument(experienceId);
     if ("error" in result) return result.error;
 
-    const experienceDoc = result.doc;
-    const experienceData = experienceDoc.data();
-    const experienceRef = experienceDoc.ref;
+    const experienceRef = result.doc.ref;
 
     // Delete file from Storage
     try {
-      const storagePath = extractStoragePath(overlayFramePath);
+      const storagePath = extractStoragePath(overlayUrl);
       await bucket.file(storagePath).delete();
     } catch (error) {
       console.error("Failed to delete frame overlay from storage:", error);
       // Continue to clear Firestore field even if storage deletion fails
     }
 
-    // Clear overlay field from Firestore (handle both new and legacy schemas)
-
-    if (experienceData?.config) {
-      // New schema: clear config.overlayFramePath
-      await experienceRef.update({
-        "config.overlayFramePath": null,
-        updatedAt: Date.now(),
-      });
-    } else {
-      // Legacy schema: clear overlayFramePath
-      await experienceRef.update({
-        overlayFramePath: null,
-        updatedAt: Date.now(),
-      });
-    }
+    // Clear overlay field from Firestore using FieldValue.delete()
+    const { FieldValue } = await import("firebase-admin/firestore");
+    await experienceRef.update({
+      "captureConfig.overlayUrl": FieldValue.delete(),
+      updatedAt: Date.now(),
+    });
 
     return createSuccessResponse(undefined);
   } catch (error) {

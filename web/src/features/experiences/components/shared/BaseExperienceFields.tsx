@@ -5,45 +5,45 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 
 interface BaseExperienceFieldsProps {
-  label: string;
+  name: string;
   enabled: boolean;
-  onLabelChange: (value: string) => void;
+  onNameChange: (value: string) => void;
   onEnabledChange: (value: boolean) => void;
   disabled?: boolean;
 }
 
 /**
  * BaseExperienceFields - Shared component for common experience configuration
- * Part of Phase 2 (User Story 1) - Edit Shared Experience Fields
+ * Refactored for normalized Firestore design (data-model-v4).
  *
  * Provides editing UI for fields shared across all experience types:
- * - Label (1-50 characters)
+ * - Name (1-50 characters) - renamed from 'label'
  * - Enabled status toggle
  *
  * Used by: PhotoExperienceEditor, GifExperienceEditor, VideoExperienceEditor, etc.
  */
 export function BaseExperienceFields({
-  label,
+  name,
   enabled,
-  onLabelChange,
+  onNameChange,
   onEnabledChange,
   disabled,
 }: BaseExperienceFieldsProps) {
   return (
     <div className="space-y-4">
-      {/* Label Input */}
+      {/* Name Input */}
       <div className="space-y-2">
-        <Label htmlFor="label">Experience Label</Label>
+        <Label htmlFor="name">Experience Name</Label>
         <Input
-          id="label"
-          value={label}
-          onChange={(e) => onLabelChange(e.target.value)}
+          id="name"
+          value={name}
+          onChange={(e) => onNameChange(e.target.value)}
           placeholder="e.g., Neon Portrait"
           disabled={disabled}
           maxLength={50}
         />
         <p className="text-xs text-muted-foreground">
-          {label.length}/50 characters
+          {name.length}/50 characters
         </p>
       </div>
 
