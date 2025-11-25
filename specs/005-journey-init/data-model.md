@@ -7,7 +7,7 @@
 
 ### Journey
 
-**Collection Path**: `/journeys/{journeyId}`
+**Collection Path**: `/events/{eventId}/journeys/{journeyId}` (subcollection of Event)
 
 | Field | Type | Required | Default | Description |
 |-------|------|----------|---------|-------------|
@@ -22,7 +22,7 @@
 | `updatedAt` | number | Yes | - | Unix timestamp ms |
 
 **Indexes Required**:
-- Composite: `eventId` + `status` + `createdAt` (for filtered list queries)
+- Composite: `status` + `createdAt` (for filtered list queries within subcollection)
 
 ### Event (Existing - Relevant Fields)
 
@@ -202,8 +202,7 @@ export const JOURNEY_CONSTRAINTS = {
 ### List Journeys for Event
 
 ```typescript
-db.collection("journeys")
-  .where("eventId", "==", eventId)
+db.collection("events").doc(eventId).collection("journeys")
   .where("status", "==", "active")
   .orderBy("createdAt", "desc")
   .get()
@@ -212,7 +211,7 @@ db.collection("journeys")
 ### Get Single Journey
 
 ```typescript
-const doc = await db.collection("journeys").doc(journeyId).get();
+const doc = await db.collection("events").doc(eventId).collection("journeys").doc(journeyId).get();
 if (!doc.exists || doc.data()?.status === "deleted") {
   return null;
 }

@@ -148,7 +148,7 @@ The application is organized into feature modules in `web/src/features/`. The da
 
 **✅ Ready - Journeys** (`web/src/features/journeys/`)
 
-- **Firestore Collection**: `/journeys/{journeyId}`
+- **Firestore Collection**: `/events/{eventId}/journeys/{journeyId}` (subcollection of Event)
 - **Purpose**: Define linear sequences of steps (playlists) for guest experiences
 - **Status**: Fully implemented - CRUD operations, list view, active toggle, detail page
 - **Schema**: id, eventId, name, stepOrder[], tags[], status (active/deleted), deletedAt, createdAt, updatedAt

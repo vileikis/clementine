@@ -21,7 +21,7 @@ export default async function JourneyEditorLayout({
   // Fetch event and journey in parallel
   const [eventResult, journeyResult] = await Promise.all([
     getEventAction(eventId),
-    getJourneyAction(journeyId),
+    getJourneyAction(eventId, journeyId),
   ]);
 
   if (!eventResult.success || !eventResult.event) {
