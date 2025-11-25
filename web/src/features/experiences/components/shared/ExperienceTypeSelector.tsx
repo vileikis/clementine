@@ -38,7 +38,7 @@ const EXPERIENCE_TYPES: ExperienceTypeOption[] = [
     label: "GIF",
     description: "Create an animated GIF from multiple frames",
     icon: "🎞️",
-    available: true,
+    available: false,
   },
   
   {
