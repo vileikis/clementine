@@ -1,9 +1,9 @@
 /**
  * Experience Editor Page
- * Part of Phase 5 (User Story 3) - View and Manage Experiences in Sidebar
+ * Refactored for normalized Firestore design (data-model-v4).
  *
  * Provides dedicated route for editing individual experiences
- * Loads experience data from Firestore and displays editor
+ * Loads experience data from root /experiences collection
  *
  * Route: /events/:eventId/design/experiences/:experienceId
  */
@@ -21,10 +21,10 @@ export default async function ExperienceEditorPage({
 }: ExperienceEditorPageProps) {
   const { eventId, experienceId } = await params;
 
-  // Fetch experience using Admin SDK repository
-  const experience = await getExperience(eventId, experienceId);
+  // Fetch experience from root /experiences collection
+  const experience = await getExperience(experienceId);
 
-  // Show 404 if experience doesn't exist (T024)
+  // Show 404 if experience doesn't exist
   if (!experience) {
     notFound();
   }

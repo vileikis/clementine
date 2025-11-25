@@ -41,31 +41,31 @@ export function PhotoExperienceEditor({
 }: PhotoExperienceEditorProps) {
   const [isPending, startTransition] = useTransition();
 
-  // Local form state - read from new schema
+  // Local form state - read from new schema (data-model-v4)
   const [enabled, setEnabled] = useState(experience.enabled);
-  const [previewPath, setPreviewPath] = useState(experience.previewPath || "");
+  const [previewMediaUrl, setPreviewMediaUrl] = useState(experience.previewMediaUrl || "");
   const [previewType, setPreviewType] = useState<PreviewType | undefined>(experience.previewType || undefined);
 
   // Countdown settings - countdown: 0 means disabled, countdown: N means N seconds
-  const [countdownSeconds, setCountdownSeconds] = useState(experience.config.countdown);
+  const [countdownSeconds, setCountdownSeconds] = useState(experience.captureConfig.countdown);
 
-  // Overlay settings - read from config.overlayFramePath
-  const [overlayEnabled, setOverlayEnabled] = useState(!!experience.config.overlayFramePath);
-  const [overlayFramePath, setOverlayFramePath] = useState(experience.config.overlayFramePath || "");
+  // Overlay settings - read from captureConfig.overlayUrl
+  const [overlayEnabled, setOverlayEnabled] = useState(!!experience.captureConfig.overlayUrl);
+  const [overlayUrl, setOverlayUrl] = useState(experience.captureConfig.overlayUrl || "");
 
-  // AI settings - read from aiConfig
-  const [aiEnabled, setAiEnabled] = useState(experience.aiConfig.enabled);
-  const [aiModel, setAiModel] = useState(experience.aiConfig.model || "nanobanana");
-  const [aiPrompt, setAiPrompt] = useState(experience.aiConfig.prompt || "");
-  const [aiReferenceImagePaths, setAiReferenceImagePaths] = useState<string[]>(
-    experience.aiConfig.referenceImagePaths || []
+  // AI settings - read from aiPhotoConfig
+  const [aiEnabled, setAiEnabled] = useState(experience.aiPhotoConfig.enabled);
+  const [aiModel, setAiModel] = useState(experience.aiPhotoConfig.model || "nanobanana");
+  const [aiPrompt, setAiPrompt] = useState(experience.aiPhotoConfig.prompt || "");
+  const [aiReferenceImageUrls, setAiReferenceImageUrls] = useState<string[]>(
+    experience.aiPhotoConfig.referenceImageUrls || []
   );
-  const [aiAspectRatio, setAiAspectRatio] = useState<AspectRatio>(experience.aiConfig.aspectRatio);
+  const [aiAspectRatio, setAiAspectRatio] = useState<AspectRatio>(experience.aiPhotoConfig.aspectRatio || "1:1");
 
   // Handle title save
   const handleTitleSave = async (newTitle: string) => {
-    const result = await updatePhotoExperience(experience.eventId, experience.id, {
-      label: newTitle,
+    const result = await updatePhotoExperience(experience.id, {
+      name: newTitle,
     });
     if (!result.success) {
       throw new Error(result.error.message);
@@ -76,7 +76,7 @@ export function PhotoExperienceEditor({
   // Handle enabled toggle
   const handleEnabledChange = async (newEnabled: boolean) => {
     setEnabled(newEnabled);
-    const result = await updatePhotoExperience(experience.eventId, experience.id, {
+    const result = await updatePhotoExperience(experience.id, {
       enabled: newEnabled,
     });
     if (!result.success) {
@@ -87,7 +87,7 @@ export function PhotoExperienceEditor({
     }
   };
 
-  // Handle save - write to new schema structure (config/aiConfig)
+  // Handle save - write to new schema structure (captureConfig/aiPhotoConfig)
   // Note: Preview media is saved automatically via PreviewMediaCompact component
   const handleSave = () => {
     if (isPending) return; // Prevent multiple saves
@@ -95,17 +95,18 @@ export function PhotoExperienceEditor({
       try {
         await onSave(experience.id, {
           enabled,
-          // Write to config object structure
-          config: {
+          // Write to captureConfig object structure
+          captureConfig: {
             countdown: countdownSeconds, // 0 = disabled, N = N seconds
-            overlayFramePath: overlayEnabled && overlayFramePath ? overlayFramePath : null,
+            cameraFacing: experience.captureConfig.cameraFacing,
+            overlayUrl: overlayEnabled && overlayUrl ? overlayUrl : null,
           },
-          // Write to aiConfig object structure
-          aiConfig: {
+          // Write to aiPhotoConfig object structure
+          aiPhotoConfig: {
             enabled: aiEnabled,
             model: aiModel || null,
             prompt: aiPrompt || null,
-            referenceImagePaths: aiReferenceImagePaths.length > 0 ? aiReferenceImagePaths : null,
+            referenceImageUrls: aiReferenceImageUrls.length > 0 ? aiReferenceImageUrls : null,
             aspectRatio: aiAspectRatio,
           },
         });
@@ -118,18 +119,18 @@ export function PhotoExperienceEditor({
 
   // Handle preview media upload - save immediately
   const handlePreviewMediaUpload = async (publicUrl: string, fileType: PreviewType) => {
-    setPreviewPath(publicUrl);
+    setPreviewMediaUrl(publicUrl);
     setPreviewType(fileType);
 
     // Save to database immediately
-    const result = await updatePhotoExperience(experience.eventId, experience.id, {
-      previewPath: publicUrl,
+    const result = await updatePhotoExperience(experience.id, {
+      previewMediaUrl: publicUrl,
       previewType: fileType,
     });
 
     if (!result.success) {
       // Revert local state on error
-      setPreviewPath(experience.previewPath || "");
+      setPreviewMediaUrl(experience.previewMediaUrl || "");
       setPreviewType(experience.previewType || undefined);
       toast.error("Failed to save preview media");
     } else {
@@ -139,18 +140,18 @@ export function PhotoExperienceEditor({
 
   // Handle preview media removal - save immediately
   const handlePreviewMediaRemove = async () => {
-    setPreviewPath("");
+    setPreviewMediaUrl("");
     setPreviewType(undefined);
 
     // Save to database immediately (use null to clear the fields)
-    const result = await updatePhotoExperience(experience.eventId, experience.id, {
-      previewPath: null,
+    const result = await updatePhotoExperience(experience.id, {
+      previewMediaUrl: null,
       previewType: null,
     });
 
     if (!result.success) {
       // Revert local state on error
-      setPreviewPath(experience.previewPath || "");
+      setPreviewMediaUrl(experience.previewMediaUrl || "");
       setPreviewType(experience.previewType || undefined);
       toast.error("Failed to remove preview media");
     } else {
@@ -173,11 +174,10 @@ export function PhotoExperienceEditor({
     <div className="space-y-6">
       {/* Unified Experience Editor Header */}
       <ExperienceEditorHeader
-        eventId={experience.eventId}
         experience={experience}
         showPreview={true}
-        previewPath={previewPath}
-        previewType={previewType}
+        previewMediaUrl={previewMediaUrl}
+        previewMediaType={previewType}
         onPreviewUpload={handlePreviewMediaUpload}
         onPreviewRemove={handlePreviewMediaRemove}
         onTitleSave={handleTitleSave}
@@ -198,13 +198,12 @@ export function PhotoExperienceEditor({
 
       {/* Frame Overlay */}
       <OverlaySettings
-        eventId={experience.eventId}
         experienceId={experience.id}
         overlayEnabled={overlayEnabled}
-        overlayFramePath={overlayFramePath || undefined}
+        overlayUrl={overlayUrl || undefined}
         onOverlayEnabledChange={setOverlayEnabled}
-        onUpload={(url) => setOverlayFramePath(url)}
-        onRemove={() => setOverlayFramePath("")}
+        onUpload={(url) => setOverlayUrl(url)}
+        onRemove={() => setOverlayUrl("")}
         disabled={isPending}
       />
 
@@ -226,11 +225,11 @@ export function PhotoExperienceEditor({
           <AITransformSettings
             aiModel={aiModel}
             aiPrompt={aiPrompt}
-            aiReferenceImagePaths={aiReferenceImagePaths}
+            aiReferenceImageUrls={aiReferenceImageUrls}
             aiAspectRatio={aiAspectRatio}
             onAiModelChange={setAiModel}
             onAiPromptChange={setAiPrompt}
-            onAiReferenceImagePathsChange={setAiReferenceImagePaths}
+            onAiReferenceImageUrlsChange={setAiReferenceImageUrls}
             onAiAspectRatioChange={setAiAspectRatio}
             disabled={isPending}
           />

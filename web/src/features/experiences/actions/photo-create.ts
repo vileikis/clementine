@@ -3,39 +3,40 @@
 /**
  * Server Action: Create Photo Experience
  *
- * Creates a new photo experience with the new discriminated union schema.
- * Part of 003-experience-schema implementation (User Story 1).
+ * Creates a new photo experience in the root /experiences collection.
+ * Refactored for normalized Firestore design (data-model-v4).
  *
  * This action:
  * - Validates input using createPhotoExperienceSchema
- * - Initializes default values for config and aiConfig
- * - Writes to Firestore using Admin SDK
- * - Updates parent event's experiencesCount
+ * - Validates companyId access (user must have access to the company)
+ * - Writes to root /experiences collection using Admin SDK
+ * - Auto-attaches current event ID to eventIds array
  * - Revalidates the event page
  */
 
 import { revalidatePath } from "next/cache";
-import { db } from "@/lib/firebase/admin";
-import { FieldValue } from "firebase-admin/firestore";
 import { z } from "zod";
 import {
   createPhotoExperienceSchema,
   type PhotoExperience
 } from "../schemas";
+import {
+  createPhotoExperience as createPhotoExperienceInDb
+} from "../repositories/experiences.repository";
 import type { ActionResponse } from "./types";
 import { ErrorCodes } from "./types";
-import { checkAuth, validateEventExists, createSuccessResponse, createErrorResponse } from "./utils";
+import { checkAuth, validateCompanyAccess, createSuccessResponse, createErrorResponse } from "./utils";
 
 /**
- * Creates a new photo experience for an event.
+ * Creates a new photo experience for a company, optionally attached to an event.
  *
- * @param eventId - Event ID
- * @param input - Creation data (label, type)
+ * @param input - Creation data (companyId, name, type, eventIds)
+ * @param eventId - Optional event ID to auto-attach the experience to
  * @returns ActionResponse with created PhotoExperience or error
  */
 export async function createPhotoExperience(
-  eventId: string,
-  input: { label: string; type: "photo" }
+  eventId: string | null,
+  input: { companyId: string; name: string; type: "photo"; eventIds?: string[] }
 ): Promise<ActionResponse<PhotoExperience>> {
   try {
     // Check authentication
@@ -45,60 +46,28 @@ export async function createPhotoExperience(
     // Validate input with Zod schema
     const validated = createPhotoExperienceSchema.parse(input);
 
-    // Check if event exists
-    const eventError = await validateEventExists(eventId);
-    if (eventError) return eventError;
+    // Validate company access
+    const companyError = await validateCompanyAccess(validated.companyId);
+    if (companyError) return companyError;
 
-    const eventRef = db.collection("events").doc(eventId);
+    // Determine eventIds - use provided array or auto-attach to current event
+    const eventIds = validated.eventIds?.length
+      ? validated.eventIds
+      : eventId
+        ? [eventId]
+        : [];
 
-    // Create experience document reference
-    const experienceRef = eventRef.collection("experiences").doc();
-    const timestamp = Date.now();
-
-    // Initialize PhotoExperience with new schema structure
-    const photoExperience: PhotoExperience = {
-      // Identity
-      id: experienceRef.id,
-      eventId,
-
-      // Core configuration
-      label: validated.label,
-      type: "photo",
-      enabled: true, // Enabled by default
-      hidden: false, // Visible by default
-
-      // Type-specific config (photo)
-      config: {
-        countdown: 0, // No countdown by default
-        overlayFramePath: null, // No overlay by default
-      },
-
-      // Shared AI config
-      aiConfig: {
-        enabled: false, // AI disabled by default
-        model: null, // No model by default
-        prompt: null, // No prompt by default
-        referenceImagePaths: null, // No references by default
-        aspectRatio: "1:1", // Square format (most common)
-      },
-
-      // Audit
-      createdAt: timestamp,
-      updatedAt: timestamp,
-    };
-
-    // Write experience and update event counter in a batch
-    const batch = db.batch();
-    batch.set(experienceRef, photoExperience);
-    batch.update(eventRef, {
-      experiencesCount: FieldValue.increment(1),
-      updatedAt: timestamp,
+    // Create experience in root /experiences collection
+    const photoExperience = await createPhotoExperienceInDb({
+      companyId: validated.companyId,
+      eventIds,
+      name: validated.name,
     });
 
-    await batch.commit();
-
     // Revalidate the event page to show new experience
-    revalidatePath(`/events/${eventId}`);
+    if (eventId) {
+      revalidatePath(`/events/${eventId}`);
+    }
 
     return createSuccessResponse(photoExperience);
   } catch (error) {

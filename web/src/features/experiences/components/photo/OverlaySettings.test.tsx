@@ -15,7 +15,6 @@ describe("OverlaySettings Component - User Story 4", () => {
   const mockOnRemove = jest.fn();
 
   const defaultProps = {
-    eventId: "event-1",
     experienceId: "exp-1",
     overlayEnabled: false,
     onOverlayEnabledChange: mockOnOverlayEnabledChange,
@@ -93,12 +92,12 @@ describe("OverlaySettings Component - User Story 4", () => {
   });
 
   describe("T051 - Preview rendering", () => {
-    it("renders overlay preview when overlayFramePath is provided and enabled", () => {
+    it("renders overlay preview when overlayUrl is provided and enabled", () => {
       render(
         <OverlaySettings
           {...defaultProps}
           overlayEnabled={true}
-          overlayFramePath="https://example.com/overlay.png"
+          overlayUrl="https://example.com/overlay.png"
         />
       );
 
@@ -112,7 +111,7 @@ describe("OverlaySettings Component - User Story 4", () => {
         <OverlaySettings
           {...defaultProps}
           overlayEnabled={false}
-          overlayFramePath="https://example.com/overlay.png"
+          overlayUrl="https://example.com/overlay.png"
         />
       );
 
@@ -124,7 +123,7 @@ describe("OverlaySettings Component - User Story 4", () => {
         <OverlaySettings
           {...defaultProps}
           overlayEnabled={true}
-          overlayFramePath="https://example.com/overlay.png"
+          overlayUrl="https://example.com/overlay.png"
         />
       );
 
@@ -136,7 +135,7 @@ describe("OverlaySettings Component - User Story 4", () => {
         <OverlaySettings
           {...defaultProps}
           overlayEnabled={true}
-          overlayFramePath="https://example.com/overlay.png"
+          overlayUrl="https://example.com/overlay.png"
         />
       );
 
@@ -144,7 +143,7 @@ describe("OverlaySettings Component - User Story 4", () => {
       expect(img).toHaveClass("object-contain");
     });
 
-    it("does not render preview when overlayFramePath is not provided", () => {
+    it("does not render preview when overlayUrl is not provided", () => {
       render(<OverlaySettings {...defaultProps} overlayEnabled={true} />);
 
       expect(screen.queryByRole("img", { name: /frame overlay/i })).not.toBeInTheDocument();
@@ -164,7 +163,7 @@ describe("OverlaySettings Component - User Story 4", () => {
         <OverlaySettings
           {...defaultProps}
           overlayEnabled={true}
-          overlayFramePath="https://example.com/overlay.png"
+          overlayUrl="https://example.com/overlay.png"
         />
       );
 
@@ -199,7 +198,6 @@ describe("OverlaySettings Component - User Story 4", () => {
 
       await waitFor(() => {
         expect(experiencesActions.uploadFrameOverlay).toHaveBeenCalledWith(
-          "event-1",
           "exp-1",
           file
         );
@@ -240,7 +238,7 @@ describe("OverlaySettings Component - User Story 4", () => {
         <OverlaySettings
           {...defaultProps}
           overlayEnabled={true}
-          overlayFramePath="https://example.com/overlay.png"
+          overlayUrl="https://example.com/overlay.png"
         />
       );
 
@@ -251,7 +249,6 @@ describe("OverlaySettings Component - User Story 4", () => {
 
       await waitFor(() => {
         expect(experiencesActions.deleteFrameOverlay).toHaveBeenCalledWith(
-          "event-1",
           "exp-1",
           "https://example.com/overlay.png"
         );

@@ -60,16 +60,21 @@ export {
 
 // ============================================================================
 // Types (compile-time only)
+// Refactored for normalized Firestore design (data-model-v4)
 // ============================================================================
 export type {
   Experience,
   PhotoExperience,
   GifExperience,
   VideoExperience,
-  WheelExperience,
   ExperienceType,
   PreviewType,
   AspectRatio,
+  PhotoCaptureConfig,
+  GifCaptureConfig,
+  VideoCaptureConfig,
+  AiPhotoConfig,
+  AiVideoConfig,
 } from "./schemas";
 
 // ============================================================================
@@ -83,7 +88,6 @@ export {
   photoExperienceSchema,
   gifExperienceSchema,
   videoExperienceSchema,
-  wheelExperienceSchema,
   createPhotoExperienceSchema,
   updatePhotoExperienceSchema,
   createGifExperienceSchema,

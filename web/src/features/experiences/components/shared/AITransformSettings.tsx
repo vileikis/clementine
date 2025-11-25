@@ -13,11 +13,11 @@ import type { AspectRatio } from "../../schemas";
 interface AITransformSettingsProps {
   aiModel: string;
   aiPrompt: string;
-  aiReferenceImagePaths: string[];
+  aiReferenceImageUrls: string[];
   aiAspectRatio: AspectRatio;
   onAiModelChange: (model: string) => void;
   onAiPromptChange: (prompt: string) => void;
-  onAiReferenceImagePathsChange: (paths: string[]) => void;
+  onAiReferenceImageUrlsChange: (urls: string[]) => void;
   onAiAspectRatioChange: (aspectRatio: AspectRatio) => void;
   disabled?: boolean;
 }
@@ -51,11 +51,11 @@ const ASPECT_RATIO_OPTIONS: Array<{ value: AspectRatio; label: string; hint: str
  * <AITransformSettings
  *   aiModel={aiModel}
  *   aiPrompt={aiPrompt}
- *   aiReferenceImagePaths={aiReferenceImagePaths}
+ *   aiReferenceImageUrls={aiReferenceImageUrls}
  *   aiAspectRatio={aiAspectRatio}
  *   onAiModelChange={setAiModel}
  *   onAiPromptChange={setAiPrompt}
- *   onAiReferenceImagePathsChange={setAiReferenceImagePaths}
+ *   onAiReferenceImageUrlsChange={setAiReferenceImageUrls}
  *   onAiAspectRatioChange={setAiAspectRatio}
  * />
  * ```
@@ -63,11 +63,11 @@ const ASPECT_RATIO_OPTIONS: Array<{ value: AspectRatio; label: string; hint: str
 export function AITransformSettings({
   aiModel,
   aiPrompt,
-  aiReferenceImagePaths,
+  aiReferenceImageUrls,
   aiAspectRatio,
   onAiModelChange,
   onAiPromptChange,
-  onAiReferenceImagePathsChange,
+  onAiReferenceImageUrlsChange,
   onAiAspectRatioChange,
   disabled = false,
 }: AITransformSettingsProps) {
@@ -76,12 +76,12 @@ export function AITransformSettings({
 
   // Handle reference image addition
   const handleAddReferenceImage = (url: string) => {
-    onAiReferenceImagePathsChange([...aiReferenceImagePaths, url]);
+    onAiReferenceImageUrlsChange([...aiReferenceImageUrls, url]);
   };
 
   // Handle reference image removal
   const handleRemoveReferenceImage = (index: number) => {
-    onAiReferenceImagePathsChange(aiReferenceImagePaths.filter((_, i) => i !== index));
+    onAiReferenceImageUrlsChange(aiReferenceImageUrls.filter((_, i) => i !== index));
   };
 
   return (
@@ -159,15 +159,15 @@ export function AITransformSettings({
       {/* Reference Images - Horizontal Layout with Flex-Wrap */}
       <div className="space-y-2">
         <Label>Reference Images</Label>
-        {aiReferenceImagePaths.length > 0 && (
+        {aiReferenceImageUrls.length > 0 && (
           <div className="flex flex-wrap gap-4">
-            {aiReferenceImagePaths.map((path, index) => (
+            {aiReferenceImageUrls.map((url, index) => (
               <div
                 key={index}
                 className="relative w-32 h-32 overflow-hidden rounded-lg border bg-muted shrink-0"
               >
                 <Image
-                  src={path}
+                  src={url}
                   alt={`Reference ${index + 1}`}
                   fill
                   className="object-contain"
@@ -188,8 +188,8 @@ export function AITransformSettings({
           </div>
         )}
         <ImageUploadField
-          id={`ai-reference-${aiReferenceImagePaths.length}`}
-          label={aiReferenceImagePaths.length === 0 ? "Add Reference Image" : "Add Another Reference"}
+          id={`ai-reference-${aiReferenceImageUrls.length}`}
+          label={aiReferenceImageUrls.length === 0 ? "Add Reference Image" : "Add Another Reference"}
           value=""
           onChange={handleAddReferenceImage}
           destination="ai-reference"
