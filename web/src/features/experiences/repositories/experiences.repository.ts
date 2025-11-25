@@ -2,13 +2,10 @@
 
 import { db } from "@/lib/firebase/admin";
 import {
-  
   experienceSchema,
-  
   type PhotoExperience,
   type Experience,
-  
-} from "./schemas";
+} from "../schemas";
 import { FieldValue } from "firebase-admin/firestore";
 
 /**

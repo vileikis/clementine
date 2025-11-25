@@ -8,7 +8,7 @@ import {
   createPhotoExperienceSchema,
   updatePhotoExperienceSchema,
   type PhotoExperience,
-} from "./schemas";
+} from "./experiences.schemas";
 
 describe("PhotoExperience Schema", () => {
   const validPhotoExperience: PhotoExperience = {
