@@ -44,7 +44,6 @@ export async function createJourney(data: {
  */
 export async function listJourneys(eventId: string): Promise<Journey[]> {
   const snapshot = await getJourneysCollection(eventId)
-    .where("status", "==", "active")
     .orderBy("createdAt", "desc")
     .get();
 
