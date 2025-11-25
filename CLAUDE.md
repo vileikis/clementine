@@ -128,19 +128,19 @@ The application is organized into feature modules in `web/src/features/`. The da
 - **Schema**: name, status, brandColor, contactEmail, termsUrl, privacyUrl
 - **Features**: Soft deletion (status: "active" | "deleted"), event count tracking
 
-**🚧 In Progress - Events** (`web/src/features/events/`)
+**✅ Ready - Events** (`web/src/features/events/`)
 - **Firestore Collection**: `/events/{eventId}`
 - **Purpose**: Root container for event configuration and the real-time "Switchboard" state
-- **Status**: Complete redesign in progress - schema and actions being rewritten
-- **New Model**: Event will control which Journey is active via `activeJourneyId`, manage branding/theming, and serve as entry point for guests
-- **Note**: Current implementation is transitional - refer to data-model-v4.md for target architecture
+- **Status**: Fully implemented with new data-model-v4 architecture
+- **Schema**: name, status (draft/live/archived), ownerId, joinPath, qrPngPath, publishStartAt/EndAt, activeJourneyId, theme (nested object with logo, colors, text, button, background settings)
+- **Features**: Switchboard pattern via `activeJourneyId`, comprehensive theming system
 
-**📋 Planned - Experiences** (`web/src/features/experiences/`)
+**✅ Ready - Experiences** (`web/src/features/experiences/`)
 - **Firestore Collection**: `/experiences/{experienceId}`
 - **Purpose**: Reusable library of atomic AI experience configurations
-- **Status**: Not yet started - will be completely rewritten from scratch
-- **New Model**: Self-contained configs for AI rules (photo/video/gif), hardware settings, required user inputs, and prompt templates
-- **Note**: Purpose and functionality have completely changed from legacy version
+- **Status**: Fully implemented with new data-model-v4 architecture
+- **Schema**: Discriminated union by type (photo/video/gif), companyId, eventIds (many-to-many), name, enabled, previewMediaUrl/previewType, captureConfig (type-specific), aiPhotoConfig/aiVideoConfig
+- **Features**: Photo/Video/GIF experience types, capture settings (countdown, cameraFacing, overlays), AI transform settings (model, prompt, referenceImages, aspectRatio)
 
 **📋 Planned - Journeys** (new module)
 - **Firestore Collection**: `/journeys/{journeyId}`
@@ -218,8 +218,9 @@ The application is organized into feature modules in `web/src/features/`. The da
 
 **Migration status**:
 - ✅ Companies feature - ready and stable
-- 🚧 Events feature - schema redesign in progress
-- 📋 Experiences, Journeys, Steps, Sessions, Guest - to be rewritten from scratch
+- ✅ Events feature - ready and stable
+- ✅ Experiences feature - ready and stable
+- 📋 Journeys, Steps, Sessions, Guest - to be written from scratch
 
 See `features/data-model-v4.md` for full specification.
 
