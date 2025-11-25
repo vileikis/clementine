@@ -27,9 +27,9 @@ All paths relative to repository root:
 
 **Purpose**: Verify prerequisites and create new component files
 
-- [ ] T001 Verify AI provider is configured in `.env.local` (AI_PROVIDER and GOOGLE_AI_API_KEY)
-- [ ] T002 Verify existing experience editor route loads at `web/src/app/(dashboard)/events/[eventId]/(studio)/design/experiences/[experienceId]/page.tsx`
-- [ ] T003 [P] Create AIPlayground component shell in `web/src/features/experiences/components/AIPlayground.tsx`
+- [x] T001 Verify AI provider is configured in `.env.local` (AI_PROVIDER and GOOGLE_AI_API_KEY)
+- [x] T002 Verify existing experience editor route loads at `web/src/app/(dashboard)/events/[eventId]/(studio)/design/experiences/[experienceId]/page.tsx`
+- [x] T003 [P] Create AIPlayground component shell in `web/src/features/experiences/components/shared/AIPlayground.tsx`
 
 ---
 
@@ -39,8 +39,8 @@ All paths relative to repository root:
 
 **⚠️ CRITICAL**: Playground Server Action must exist before US2 can be implemented
 
-- [ ] T004 Create generatePlaygroundPreview Server Action in `web/src/features/experiences/actions/playground-generate.ts`
-- [ ] T005 Add playground generation input/output schemas to `web/src/features/experiences/schemas/experiences.schemas.ts`
+- [x] T004 Create generatePlaygroundPreview Server Action in `web/src/features/experiences/actions/playground-generate.ts`
+- [x] T005 Add playground generation input/output schemas to `web/src/features/experiences/schemas/experiences.schemas.ts`
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
