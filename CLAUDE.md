@@ -114,6 +114,7 @@ The `functions/` workspace is a placeholder for Firebase Cloud Functions that wi
 The application is organized into feature modules in `web/src/features/`. The data model has been redesigned to use a **normalized Firestore architecture** with flat root collections (see `features/data-model-v4.md` for full specification).
 
 **IMPORTANT: Legacy Code**
+
 - Legacy implementations have been moved to `web/src/legacy-features/`
 - **Do NOT reference or use legacy code unless explicitly asked**
 - Only consult legacy features when specifically mentioned by the user (e.g., "check legacy-features for reference")
@@ -122,6 +123,7 @@ The application is organized into feature modules in `web/src/features/`. The da
 #### Feature Module Status
 
 **✅ Ready - Companies** (`web/src/features/companies/`)
+
 - **Firestore Collection**: `/companies/{companyId}`
 - **Purpose**: Brand/organization management that owns events
 - **Status**: Fully implemented and stable
@@ -129,6 +131,7 @@ The application is organized into feature modules in `web/src/features/`. The da
 - **Features**: Soft deletion (status: "active" | "deleted"), event count tracking
 
 **✅ Ready - Events** (`web/src/features/events/`)
+
 - **Firestore Collection**: `/events/{eventId}`
 - **Purpose**: Root container for event configuration and the real-time "Switchboard" state
 - **Status**: Fully implemented with new data-model-v4 architecture
@@ -136,49 +139,58 @@ The application is organized into feature modules in `web/src/features/`. The da
 - **Features**: Switchboard pattern via `activeJourneyId`, comprehensive theming system
 
 **✅ Ready - Experiences** (`web/src/features/experiences/`)
+
 - **Firestore Collection**: `/experiences/{experienceId}`
 - **Purpose**: Reusable library of atomic AI experience configurations
 - **Status**: Fully implemented with new data-model-v4 architecture
 - **Schema**: Discriminated union by type (photo/video/gif), companyId, eventIds (many-to-many), name, enabled, previewMediaUrl/previewType, captureConfig (type-specific), aiPhotoConfig/aiVideoConfig
 - **Features**: Photo/Video/GIF experience types, capture settings (countdown, cameraFacing, overlays), AI transform settings (model, prompt, referenceImages, aspectRatio)
 
-**📋 Planned - Journeys** (new module)
-- **Firestore Collection**: `/journeys/{journeyId}`
+**✅ Ready - Journeys** (`web/src/features/journeys/`)
+
+- **Firestore Collection**: `/events/{eventId}/journeys/{journeyId}` (subcollection of Event)
 - **Purpose**: Define linear sequences of steps (playlists) for guest experiences
-- **Status**: Not yet started - new module to be written from scratch
-- **New Model**: Lightweight wrapper that orders step IDs, referenced by Events via `activeJourneyId`
+- **Status**: Fully implemented - CRUD operations, list view, active toggle, detail page
+- **Schema**: id, eventId, name, stepOrder[], tags[], status (active/deleted), deletedAt, createdAt, updatedAt
+- **Features**: Soft deletion, switchboard integration via Event.activeJourneyId, empty state handling, mobile-first responsive design
 
 **📋 Planned - Steps** (new module)
+
 - **Firestore Collection**: `/steps/{stepId}`
 - **Purpose**: Individual UI screen configurations (welcome, selection, capture, form, processing, result)
 - **Status**: Not yet started - new module to be written from scratch
 - **New Model**: Content and layout for each screen in a Journey
 
 **📋 Planned - Sessions** (`web/src/features/sessions/`)
+
 - **Firestore Collection**: `/sessions/{sessionId}`
 - **Purpose**: Transactional records of guest runs through Journeys
 - **Status**: Not yet started - will be completely rewritten
 - **New Model**: Stores guest progress, collected data (form inputs, media captures), and AI generation results
 
 **📋 Planned - Guest** (`web/src/features/guest/`)
+
 - **Purpose**: Guest-facing experience and UI components
 - **Status**: Will be completely rewritten to work with new data model
 
 ### Architecture Principles (New Model)
 
 **Normalized Firestore Design**
+
 - No nested subcollections beyond one level
 - All entities at root collection level
 - Linked by `eventId` references
 - Enables future SQL migration
 
 **Dynamic Injection Pattern**
+
 - Capture steps load Experience configs at runtime
 - Selection steps set session variables
 - Experiences define their own required inputs
 - Promotes reusability and atomic design
 
 **Real-time Switchboard**
+
 - Event's `activeJourneyId` controls live experience
 - All connected guests react to changes
 - Host can switch Journeys dynamically
@@ -217,6 +229,7 @@ The application is organized into feature modules in `web/src/features/`. The da
 - **Switchboard pattern**: Events control active Journey via `activeJourneyId`
 
 **Migration status**:
+
 - ✅ Companies feature - ready and stable
 - ✅ Events feature - ready and stable
 - ✅ Experiences feature - ready and stable

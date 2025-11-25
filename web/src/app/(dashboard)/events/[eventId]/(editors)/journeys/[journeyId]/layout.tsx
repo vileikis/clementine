@@ -1,4 +1,5 @@
 import { getEventAction } from "@/features/events/actions"
+import { getJourneyAction } from "@/features/journeys/actions/journeys"
 import { notFound } from "next/navigation"
 import { EditorHeader } from "@/components/shared"
 
@@ -16,13 +17,21 @@ export default async function JourneyEditorLayout({
   params,
 }: JourneyEditorLayoutProps) {
   const { eventId, journeyId } = await params
-  const result = await getEventAction(eventId)
 
-  if (!result.success || !result.event) {
+  // Fetch event and journey in parallel
+  const [eventResult, journeyResult] = await Promise.all([
+    getEventAction(eventId),
+    getJourneyAction(eventId, journeyId),
+  ]);
+
+  if (!eventResult.success || !eventResult.event) {
     notFound()
   }
 
-  const event = result.event
+  const event = eventResult.event
+  const journeyName = journeyResult.success
+    ? journeyResult.data.name
+    : `Journey ${journeyId}`
 
   return (
     <div className="h-screen overflow-hidden flex flex-col">
@@ -30,7 +39,7 @@ export default async function JourneyEditorLayout({
         breadcrumbs={[
           { label: "Events", href: "/events" },
           { label: event.name, href: `/events/${eventId}/design` },
-          { label: `Journey ${journeyId}` },
+          { label: journeyName },
         ]}
         exitUrl={`/events/${eventId}/design/journeys`}
       />
