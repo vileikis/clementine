@@ -27,7 +27,7 @@
 
 **Purpose**: Rename the route directory from "branding" to "theme" per PRD specification
 
-- [ ] T001 Rename route directory from `web/src/app/(dashboard)/events/[eventId]/(studio)/design/branding/` to `theme/`
+- [X] T001 Rename route directory from `web/src/app/(dashboard)/events/[eventId]/(studio)/design/branding/` to `theme/`
 
 ---
 
@@ -39,8 +39,8 @@
 
 ### Implementation for User Story 1
 
-- [ ] T002 [US1] Update page component in `web/src/app/(dashboard)/events/[eventId]/(studio)/design/theme/page.tsx` - Replace placeholder with server component that fetches event and renders ThemeEditor
-- [ ] T003 [US1] Update navigation label in `web/src/features/events/components/shared/DesignSubTabs.tsx` - Change "Branding" to "Theme" and update href from `/design/branding` to `/design/theme`
+- [X] T002 [US1] Update page component in `web/src/app/(dashboard)/events/[eventId]/(studio)/design/theme/page.tsx` - Replace placeholder with server component that fetches event and renders ThemeEditor
+- [X] T003 [US1] Update navigation label in `web/src/features/events/components/shared/DesignSubTabs.tsx` - Change "Branding" to "Theme" and update href from `/design/branding` to `/design/theme`
 
 **Checkpoint**: At this point, User Story 1 should be fully functional - creators can navigate to Design → Theme, see the editor, modify all settings, and save
 
@@ -80,9 +80,9 @@
 
 ### Validation Loop (REQUIRED - Constitution Principle V)
 
-- [ ] T004 Run `pnpm lint` and fix all errors/warnings
-- [ ] T005 Run `pnpm type-check` and resolve all TypeScript errors
-- [ ] T006 Run `pnpm test` and ensure all tests pass
+- [X] T004 Run `pnpm lint` and fix all errors/warnings
+- [X] T005 Run `pnpm type-check` and resolve all TypeScript errors
+- [X] T006 Run `pnpm test` and ensure all tests pass
 - [ ] T007 Verify feature in local dev server (`pnpm dev`) - Navigate to Design → Theme, test all sections, save changes
 
 ---

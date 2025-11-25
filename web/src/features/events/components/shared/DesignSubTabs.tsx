@@ -9,7 +9,7 @@ interface DesignSubTabsProps {
 }
 
 /**
- * Sub-navigation tabs for Design section: Journeys, Experiences, Branding
+ * Sub-navigation tabs for Design section: Journeys, Experiences, Theme
  * Follows EventTabs component pattern
  */
 export function DesignSubTabs({ eventId }: DesignSubTabsProps) {
@@ -18,7 +18,7 @@ export function DesignSubTabs({ eventId }: DesignSubTabsProps) {
   const tabs = [
     { label: "Journeys", href: `/events/${eventId}/design/journeys` },
     { label: "Experiences", href: `/events/${eventId}/design/experiences` },
-    { label: "Branding", href: `/events/${eventId}/design/branding` },
+    { label: "Theme", href: `/events/${eventId}/design/theme` },
   ];
 
   return (
