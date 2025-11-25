@@ -57,7 +57,7 @@ export function JourneyCard({ journey, eventId, isActive }: JourneyCardProps) {
   };
 
   const handleDelete = async () => {
-    const result = await deleteJourneyAction(journey.id);
+    const result = await deleteJourneyAction(eventId, journey.id);
     if (!result.success) {
       throw new Error(result.error.message);
     }

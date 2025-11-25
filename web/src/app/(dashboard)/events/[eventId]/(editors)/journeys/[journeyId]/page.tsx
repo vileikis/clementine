@@ -12,9 +12,9 @@ interface JourneyEditorPageProps {
 export default async function JourneyEditorPage({
   params,
 }: JourneyEditorPageProps) {
-  const { journeyId } = await params;
+  const { eventId, journeyId } = await params;
 
-  const result = await getJourneyAction(journeyId);
+  const result = await getJourneyAction(eventId, journeyId);
 
   if (!result.success) {
     notFound();

@@ -54,10 +54,11 @@ export async function listJourneysAction(
  * Returns error if journey does not exist or is deleted.
  */
 export async function getJourneyAction(
+  eventId: string,
   journeyId: string
 ): Promise<ActionResponse<Journey>> {
   try {
-    const journey = await getJourney(journeyId);
+    const journey = await getJourney(eventId, journeyId);
     if (!journey) {
       return {
         success: false,
@@ -168,6 +169,7 @@ export async function createJourneyAction(
  * If journey is the event's activeJourneyId, clears it.
  */
 export async function deleteJourneyAction(
+  eventId: string,
   journeyId: string
 ): Promise<ActionResponse<void>> {
   // Verify admin authentication
@@ -183,8 +185,8 @@ export async function deleteJourneyAction(
   }
 
   try {
-    // Get journey to verify it exists and get eventId
-    const journey = await getJourney(journeyId);
+    // Get journey to verify it exists
+    const journey = await getJourney(eventId, journeyId);
     if (!journey) {
       return {
         success: false,
@@ -196,21 +198,21 @@ export async function deleteJourneyAction(
     }
 
     // Get event to check if this is the active journey
-    const event = await getEvent(journey.eventId);
+    const event = await getEvent(eventId);
 
     // Soft delete the journey
-    await deleteJourney(journeyId);
+    await deleteJourney(eventId, journeyId);
 
     // If this was the active journey, clear it from the event
     if (event && event.activeJourneyId === journeyId) {
-      await db.collection("events").doc(journey.eventId).update({
+      await db.collection("events").doc(eventId).update({
         activeJourneyId: null,
         updatedAt: Date.now(),
       });
     }
 
     // Revalidate cache
-    revalidatePath(`/events/${journey.eventId}/journeys`);
+    revalidatePath(`/events/${eventId}/journeys`);
 
     return { success: true, data: undefined };
   } catch (error) {
