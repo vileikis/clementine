@@ -1,6 +1,6 @@
 # Feature Specification: Theme Editor
 
-**Feature Branch**: `001-theme-editor`
+**Feature Branch**: `003-theme-editor`
 **Created**: 2025-11-25
 **Status**: Draft
 **Input**: User description: "Theme Editor - Enable users to configure visual theme settings for events via the Event → Design → Theme page"
