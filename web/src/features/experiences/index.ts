@@ -10,7 +10,7 @@ export { PreviewMediaUpload } from "./components/shared/PreviewMediaUpload";
 export { BaseExperienceFields } from "./components/shared/BaseExperienceFields";
 export { DeleteExperienceButton } from "./components/shared/DeleteExperienceButton";
 export { AITransformSettings } from "./components/shared/AITransformSettings";
-export { DesignSidebar } from "./components/shared/DesignSidebar";
+export { ExperiencesSidebar as DesignSidebar } from "./components/shared/ExperiencesSidebar";
 
 // ============================================================================
 // Photo-specific components
