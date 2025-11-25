@@ -90,16 +90,17 @@ export interface FieldConfig {
 
 interface Experience {
   id: string;
-  companyId: string; // The event this experience belongs to
+  companyId: string; // The company that owns this experience
+  eventIds: string[]; // Array of event IDs that use this experience
   name: string; // Internal name
+
   // 1. The source of truth for how to render the player
-  previewType?: "image" | "gif" | "video",
+  previewType?: "image" | "gif" | "video";
 
   // 2. The heavy asset (The actual Image, GIF or Video file)
-  previewMediaUrl?: string,
+  previewMediaUrl?: string;
 
   enabled: boolean;
-
 
   // 1. THE ENGINE (Output Type)
   // Determines which camera UI to load.
@@ -107,8 +108,8 @@ interface Experience {
 
   // 2. REQUIRED INPUTS (Just-in-Time Form)
   // These fields are rendered on the capture screen to collect data
-  // needed for the prompt.
-  inputFields: FieldConfig[];
+  // needed for the prompt. Nullable - full implementation deferred.
+  inputFields?: FieldConfig[] | null;
 
   // 3. HARDWARE CONFIGURATION
   captureConfig: {
@@ -123,18 +124,29 @@ interface Experience {
     frameCount?: number; // number of gifs
   };
 
-  // 4. AI CONFIGURATION
-  aiConfig: {
-    enabled: boolean,
-    model: "nanobanano", "stable-diffusion-xl" | "flux" | "kling-video";
-    // Handlebars syntax used to inject values from inputFields
-    // e.g., "A portrait of {{guest_name}} in the style of {{selected_vibe}}"
-    prompt: string;
-    referenceImageUrls: string[],
+  // 4. AI CONFIGURATION (Type-specific)
+  // Photo/GIF experiences use aiPhotoConfig
+  // Video experiences use aiVideoConfig
+  aiPhotoConfig?: {
+    enabled: boolean;
+    model?: string | null; // e.g., "stable-diffusion-xl", "flux"
+    prompt?: string | null;
+    referenceImageUrls?: string[] | null;
     aspectRatio?: "9:16" | "1:1" | "4:3";
   };
 
+  aiVideoConfig?: {
+    enabled: boolean;
+    model?: string | null; // e.g., "kling-video", "runway"
+    prompt?: string | null;
+    referenceImageUrls?: string[] | null;
+    aspectRatio?: "9:16" | "1:1" | "4:3";
+    duration?: number | null; // Output length in seconds
+    fps?: number | null; // Frames per second
+  };
+
   createdAt: number;
+  updatedAt: number;
 }
 ```
 
