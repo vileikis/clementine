@@ -44,11 +44,11 @@ export type { ActionResponse } from "./actions/types";
 // ============================================================================
 // Repository - NOT EXPORTED from public API
 // Repository functions contain server-only code (Firebase Admin SDK)
-// Import directly when needed: @/features/experiences/lib/repository
+// Import directly when needed: @/features/experiences/repositories
 // ============================================================================
 // NOTE: Repository functions are NOT exported from public API to avoid
 // bundling server-only code in client bundles. Import directly from
-// @/features/experiences/lib/repository in server-only code.
+// @/features/experiences/repositories in server-only code.
 
 // ============================================================================
 // Constants
@@ -56,8 +56,7 @@ export type { ActionResponse } from "./actions/types";
 export {
   AI_MODELS,
   DEFAULT_AI_MODEL,
-  
-} from "./lib/constants";
+} from "./constants";
 
 // ============================================================================
 // Types (compile-time only)
@@ -68,12 +67,10 @@ export type {
   GifExperience,
   VideoExperience,
   WheelExperience,
-  
   ExperienceType,
   PreviewType,
   AspectRatio,
-  
-} from "./lib/schemas";
+} from "./schemas";
 
 // ============================================================================
 // Validation Schemas (Safe to export)
@@ -87,15 +84,13 @@ export {
   gifExperienceSchema,
   videoExperienceSchema,
   wheelExperienceSchema,
-  
   createPhotoExperienceSchema,
   updatePhotoExperienceSchema,
   createGifExperienceSchema,
   updateGifExperienceSchema,
   uploadPreviewMediaSchema,
   previewMediaResultSchema,
-  
   // Legacy aliases for backward compatibility during migration
   createPhotoExperienceSchema as createExperienceSchema,
   updatePhotoExperienceSchema as updateExperienceSchema,
-} from "./lib/schemas";
+} from "./schemas";

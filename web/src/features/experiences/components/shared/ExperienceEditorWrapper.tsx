@@ -14,7 +14,7 @@ import { ExperienceEditor } from "./ExperienceEditor";
 import { updatePhotoExperience } from "../../actions/photo-update";
 import { updateGifExperience } from "../../actions/gif-update";
 import { deleteExperience } from "../../actions/shared";
-import type { Experience, PhotoExperience, GifExperience } from "../../lib/schemas";
+import type { Experience, PhotoExperience, GifExperience } from "../../schemas";
 
 interface ExperienceEditorWrapperProps {
   eventId: string;

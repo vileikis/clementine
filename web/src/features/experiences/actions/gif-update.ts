@@ -22,7 +22,7 @@ import {
   type GifExperience,
   type GifConfig,
   type AiConfig
-} from "../lib/schemas";
+} from "../schemas";
 import type { ActionResponse } from "./types";
 import { ErrorCodes } from "./types";
 import { checkAuth, getExperienceDocument, createSuccessResponse, createErrorResponse } from "./utils";

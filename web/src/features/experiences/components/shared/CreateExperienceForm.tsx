@@ -28,8 +28,7 @@ import { z } from "zod";
 import {
   createPhotoExperienceSchema,
   createGifExperienceSchema,
-  
-} from "../../lib/schemas";
+} from "../../schemas";
 import { createPhotoExperience } from "../../actions/photo-create";
 import { createGifExperience } from "../../actions/gif-create";
 

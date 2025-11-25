@@ -3,7 +3,7 @@
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import type { Experience } from "../../lib/schemas";
+import type { Experience } from "../../schemas";
 
 interface ExperiencesListProps {
   experiences: Experience[];

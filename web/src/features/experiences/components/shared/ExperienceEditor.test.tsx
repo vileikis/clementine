@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { ExperienceEditor } from "./ExperienceEditor";
-import type { PhotoExperience } from "../../lib/schemas";
+import type { PhotoExperience } from "../../schemas";
 
 // Mock the sub-components to focus on ExperienceEditor structure
 jest.mock("./PreviewMediaUpload", () => ({

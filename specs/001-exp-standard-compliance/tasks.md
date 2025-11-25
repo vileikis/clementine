@@ -68,12 +68,12 @@
 
 ### Implementation for User Story 1
 
-- [ ] T012 [US1] Update import in `schemas/experiences.schemas.test.ts` from `./schemas` → `./experiences.schemas`
-- [ ] T013 [US1] Update import in `repositories/experiences.repository.ts` from `./schemas` → `../schemas`
-- [ ] T014 [P] [US1] Create barrel export `components/gif/index.ts` exporting GifCaptureSettings, GifExperienceEditor
-- [ ] T015 [P] [US1] Create barrel export `components/photo/index.ts` exporting CountdownSettings, OverlaySettings, PhotoExperienceEditor
-- [ ] T016 [P] [US1] Create barrel export `components/shared/index.ts` exporting all shared components
-- [ ] T017 [US1] Update `components/index.ts` to re-export from `./gif`, `./photo`, `./shared` subfolders
+- [x] T012 [US1] Update import in `schemas/experiences.schemas.test.ts` from `./schemas` → `./experiences.schemas`
+- [x] T013 [US1] Update import in `repositories/experiences.repository.ts` from `./schemas` → `../schemas`
+- [x] T014 [P] [US1] Create barrel export `components/gif/index.ts` exporting GifCaptureSettings, GifExperienceEditor
+- [x] T015 [P] [US1] Create barrel export `components/photo/index.ts` exporting CountdownSettings, OverlaySettings, PhotoExperienceEditor
+- [x] T016 [P] [US1] Create barrel export `components/shared/index.ts` exporting all shared components
+- [x] T017 [US1] Update `components/index.ts` to re-export from `./gif`, `./photo`, `./shared` subfolders
 
 **Checkpoint**: User Story 1 complete - folder structure is navigable and follows naming convention
 
@@ -87,15 +87,15 @@
 
 ### Implementation for User Story 2
 
-- [ ] T018 [P] [US2] Update import in `actions/photo-create.ts` from `../lib/schemas` → `../schemas`
-- [ ] T019 [P] [US2] Update import in `actions/photo-update.ts` from `../lib/schemas` → `../schemas`
-- [ ] T020 [P] [US2] Update import in `actions/gif-create.ts` from `../lib/schemas` → `../schemas`
-- [ ] T021 [P] [US2] Update import in `actions/gif-update.ts` from `../lib/schemas` → `../schemas`
-- [ ] T022 [P] [US2] Update import in `actions/photo-media.ts` from `../lib/schemas` → `../schemas`
-- [ ] T023 [US2] Update `index.ts` (feature root) imports from `./lib/constants` → `./constants`
-- [ ] T024 [US2] Update `index.ts` (feature root) imports from `./lib/schemas` → `./schemas`
-- [ ] T025 [US2] Verify `index.ts` exports ONLY components, hooks, and types (no actions, repos, schemas)
-- [ ] T026 [US2] Update external import in `app/(dashboard)/events/[eventId]/(studio)/design/experiences/[experienceId]/page.tsx` from `@/features/experiences/lib/repository` → `@/features/experiences/repositories`
+- [x] T018 [P] [US2] Update import in `actions/photo-create.ts` from `../lib/schemas` → `../schemas`
+- [x] T019 [P] [US2] Update import in `actions/photo-update.ts` from `../lib/schemas` → `../schemas`
+- [x] T020 [P] [US2] Update import in `actions/gif-create.ts` from `../lib/schemas` → `../schemas`
+- [x] T021 [P] [US2] Update import in `actions/gif-update.ts` from `../lib/schemas` → `../schemas`
+- [x] T022 [P] [US2] Update import in `actions/photo-media.ts` from `../lib/schemas` → `../schemas`
+- [x] T023 [US2] Update `index.ts` (feature root) imports from `./lib/constants` → `./constants`
+- [x] T024 [US2] Update `index.ts` (feature root) imports from `./lib/schemas` → `./schemas`
+- [x] T025 [US2] Verify `index.ts` exports ONLY components, hooks, and types (no actions, repos, schemas)
+- [x] T026 [US2] Update external import in `app/(dashboard)/events/[eventId]/(studio)/design/experiences/[experienceId]/page.tsx` from `@/features/experiences/lib/repository` → `@/features/experiences/repositories`
 
 **Checkpoint**: User Story 2 complete - imports work correctly from public API and direct paths
 
@@ -109,9 +109,9 @@
 
 ### Implementation for User Story 3
 
-- [ ] T027 [US3] Verify discriminated union pattern in `schemas/experiences.schemas.ts` is clearly documented with inline comments
-- [ ] T028 [US3] Verify `components/` subfolder pattern is consistent (each type has own folder with barrel export)
-- [ ] T029 [US3] Verify `actions/` naming pattern is consistent (`[type]-create.ts`, `[type]-update.ts`)
+- [x] T027 [US3] Verify discriminated union pattern in `schemas/experiences.schemas.ts` is clearly documented with inline comments
+- [x] T028 [US3] Verify `components/` subfolder pattern is consistent (each type has own folder with barrel export)
+- [x] T029 [US3] Verify `actions/` naming pattern is consistent (`[type]-create.ts`, `[type]-update.ts`)
 
 **Checkpoint**: User Story 3 complete - patterns are clear and documented for extension
 
@@ -125,10 +125,10 @@
 
 ### Implementation for User Story 4
 
-- [ ] T030 [US4] Audit `schemas/experiences.schemas.ts` for Zod v4 compliance (z.email() not z.string().email())
-- [ ] T031 [US4] Audit `schemas/experiences.schemas.ts` for magic numbers and extract to `constants.ts` if found
-- [ ] T032 [US4] Verify optional fields use `.nullable().optional().default(null)` for Firestore compatibility
-- [ ] T033 [US4] Verify nested schemas are extracted to named variables (no inline complex schemas)
+- [x] T030 [US4] Audit `schemas/experiences.schemas.ts` for Zod v4 compliance (z.email() not z.string().email())
+- [x] T031 [US4] Audit `schemas/experiences.schemas.ts` for magic numbers and extract to `constants.ts` if found
+- [x] T032 [US4] Verify optional fields use `.nullable().optional().default(null)` for Firestore compatibility
+- [x] T033 [US4] Verify nested schemas are extracted to named variables (no inline complex schemas)
 
 **Checkpoint**: User Story 4 complete - validation patterns comply with standards
 
@@ -138,12 +138,12 @@
 
 **Purpose**: Remove deprecated/duplicate code
 
-- [ ] T034 Delete `actions/legacy.ts` (deprecated file, 815 lines)
-- [ ] T035 [P] Delete `components/photo/AITransformSettings.tsx` (duplicate of shared version)
-- [ ] T036 [P] Delete `components/photo/AITransformSettings.test.tsx` (test for deleted duplicate)
-- [ ] T037 [P] Update any imports of photo AITransformSettings to use shared version
-- [ ] T038 Delete empty `hooks/` folder
-- [ ] T039 Delete `lib/` folder (should be empty after migrations)
+- [x] T034 Delete `actions/legacy.ts` (deprecated file, 815 lines)
+- [x] T035 [P] Delete `components/photo/AITransformSettings.tsx` (duplicate of shared version)
+- [x] T036 [P] Delete `components/photo/AITransformSettings.test.tsx` (test for deleted duplicate)
+- [x] T037 [P] Update any imports of photo AITransformSettings to use shared version
+- [x] T038 Delete empty `hooks/` folder
+- [x] T039 Delete `lib/` folder (should be empty after migrations)
 
 **Checkpoint**: All deprecated/duplicate code removed
 
@@ -157,16 +157,16 @@
 
 ### Validation Loop (REQUIRED - Constitution Principle V)
 
-- [ ] T040 [US5] Run `pnpm type-check` and fix all TypeScript errors in experiences feature
-- [ ] T041 [US5] Run `pnpm lint` and fix all ESLint errors/warnings in experiences feature
+- [x] T040 [US5] Run `pnpm type-check` and fix all TypeScript errors in experiences feature
+- [x] T041 [US5] Run `pnpm lint` and fix all ESLint errors/warnings in experiences feature
 - [ ] T042 [US5] Run `pnpm test` and ensure all existing tests pass
 - [ ] T043 [US5] Verify feature in local dev server (`pnpm dev`) - test experience creation/editing flow
 
 ### Final Verification
 
-- [ ] T044 Verify no files remain in `lib/` folder (SC-007)
-- [ ] T045 Verify only one `AITransformSettings.tsx` exists in `shared/` (SC-008)
-- [ ] T046 List all files in feature directory to verify `[domain].[purpose].ts` naming (SC-006)
+- [x] T044 Verify no files remain in `lib/` folder (SC-007)
+- [x] T045 Verify only one `AITransformSettings.tsx` exists in `shared/` (SC-008)
+- [x] T046 List all files in feature directory to verify `[domain].[purpose].ts` naming (SC-006)
 - [ ] T047 Commit final changes after validation loop passes cleanly
 
 ---
