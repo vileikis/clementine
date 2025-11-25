@@ -161,29 +161,29 @@
 
 ### Implementation for User Story 4
 
-- [ ] T027 [US4] Update `photo-update.ts` in `web/src/features/experiences/actions/photo-update.ts`:
+- [x] T027 [US4] Update `photo-update.ts` in `web/src/features/experiences/actions/photo-update.ts`:
   - Use new field names (`name`, `aiPhotoConfig`, `captureConfig`, `previewMediaUrl`)
   - Validate `companyId` ownership before allowing update
   - Prevent modification of `companyId` and `type` (immutable fields)
-- [ ] T028 [US4] Update `gif-update.ts` in `web/src/features/experiences/actions/gif-update.ts`:
+- [x] T028 [US4] Update `gif-update.ts` in `web/src/features/experiences/actions/gif-update.ts`:
   - Apply same changes as photo-update
-- [ ] T029 [US4] Update `ExperienceEditor.tsx` in `web/src/features/experiences/components/shared/ExperienceEditor.tsx`:
+- [x] T029 [US4] Update `ExperienceEditor.tsx` in `web/src/features/experiences/components/shared/ExperienceEditor.tsx`:
   - Use new field names throughout
   - Handle `eventIds` array display/management
-- [ ] T030 [US4] Update `ExperienceEditorHeader.tsx` in `web/src/features/experiences/components/shared/ExperienceEditorHeader.tsx`:
+- [x] T030 [US4] Update `ExperienceEditorHeader.tsx` in `web/src/features/experiences/components/shared/ExperienceEditorHeader.tsx`:
   - Display `name` instead of `label`
-- [ ] T031 [US4] Update `OverlaySettings.tsx` in `web/src/features/experiences/components/photo/OverlaySettings.tsx`:
+- [x] T031 [US4] Update `OverlaySettings.tsx` in `web/src/features/experiences/components/photo/OverlaySettings.tsx`:
   - Use `captureConfig.overlayUrl` instead of `config.overlayFramePath`
-- [ ] T032 [US4] Update `CountdownSettings.tsx` in `web/src/features/experiences/components/photo/CountdownSettings.tsx`:
+- [x] T032 [US4] Update `CountdownSettings.tsx` in `web/src/features/experiences/components/photo/CountdownSettings.tsx`:
   - Use `captureConfig.countdown` instead of `config.countdown`
-- [ ] T033 [US4] Update `GifCaptureSettings.tsx` in `web/src/features/experiences/components/gif/GifCaptureSettings.tsx`:
+- [x] T033 [US4] Update `GifCaptureSettings.tsx` in `web/src/features/experiences/components/gif/GifCaptureSettings.tsx`:
   - Use `captureConfig` instead of `config`
-- [ ] T034 [US4] Update `photo-media.ts` in `web/src/features/experiences/actions/photo-media.ts`:
+- [x] T034 [US4] Update `photo-media.ts` in `web/src/features/experiences/actions/photo-media.ts`:
   - Review and update storage paths if needed
   - Use `previewMediaUrl` instead of `previewPath`
-- [ ] T035 [US4] Update `PreviewMediaUpload.tsx` in `web/src/features/experiences/components/shared/PreviewMediaUpload.tsx`:
+- [x] T035 [US4] Update `PreviewMediaUpload.tsx` in `web/src/features/experiences/components/shared/PreviewMediaUpload.tsx`:
   - Use `previewMediaUrl` instead of `previewPath`
-- [ ] T036 [US4] Update `PreviewMediaCompact.tsx` in `web/src/features/experiences/components/shared/PreviewMediaCompact.tsx`:
+- [x] T036 [US4] Update `PreviewMediaCompact.tsx` in `web/src/features/experiences/components/shared/PreviewMediaCompact.tsx`:
   - Use `previewMediaUrl` instead of `previewPath`
 
 **Checkpoint**: At this point, updating experiences should work with new schema
@@ -198,13 +198,13 @@
 
 ### Implementation for User Story 5
 
-- [ ] T037 [US5] Update delete action in `web/src/features/experiences/actions/shared.ts`:
+- [x] T037 [US5] Update delete action in `web/src/features/experiences/actions/shared.ts`:
   - Validate user has access to experience's `companyId`
   - Delete `previewMediaUrl` from storage if present
   - Delete `aiPhotoConfig.referenceImageUrls` from storage if present
   - Delete `aiVideoConfig.referenceImageUrls` from storage if present
   - Delete Firestore document from root `/experiences` collection
-- [ ] T038 [US5] Update `DeleteExperienceButton.tsx` in `web/src/features/experiences/components/shared/DeleteExperienceButton.tsx`:
+- [x] T038 [US5] Update `DeleteExperienceButton.tsx` in `web/src/features/experiences/components/shared/DeleteExperienceButton.tsx`:
   - Ensure proper confirmation dialog
   - Call updated delete action
 
