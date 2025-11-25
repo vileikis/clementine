@@ -39,30 +39,28 @@ export function GifExperienceEditor({
 }: GifExperienceEditorProps) {
   const [isPending, startTransition] = useTransition();
 
-  // Local form state - read from schema
+  // Local form state - read from new schema (data-model-v4)
   const [enabled, setEnabled] = useState(experience.enabled);
-  const [previewPath, setPreviewPath] = useState(experience.previewPath || "");
+  const [previewMediaUrl, setPreviewMediaUrl] = useState(experience.previewMediaUrl || "");
   const [previewType, setPreviewType] = useState<PreviewType | undefined>(experience.previewType || undefined);
 
-  // GIF capture settings - read from config
-  const [frameCount, setFrameCount] = useState(experience.config.frameCount);
-  const [intervalMs, setIntervalMs] = useState(experience.config.intervalMs);
-  const [loopCount, setLoopCount] = useState(experience.config.loopCount);
-  const [countdown, setCountdown] = useState(experience.config.countdown || 0);
+  // GIF capture settings - read from captureConfig
+  const [frameCount, setFrameCount] = useState(experience.captureConfig.frameCount);
+  const [countdown, setCountdown] = useState(experience.captureConfig.countdown || 0);
 
-  // AI settings - read from aiConfig
-  const [aiEnabled, setAiEnabled] = useState(experience.aiConfig.enabled);
-  const [aiModel, setAiModel] = useState(experience.aiConfig.model || "nanobanana");
-  const [aiPrompt, setAiPrompt] = useState(experience.aiConfig.prompt || "");
-  const [aiReferenceImagePaths, setAiReferenceImagePaths] = useState<string[]>(
-    experience.aiConfig.referenceImagePaths || []
+  // AI settings - read from aiPhotoConfig
+  const [aiEnabled, setAiEnabled] = useState(experience.aiPhotoConfig.enabled);
+  const [aiModel, setAiModel] = useState(experience.aiPhotoConfig.model || "nanobanana");
+  const [aiPrompt, setAiPrompt] = useState(experience.aiPhotoConfig.prompt || "");
+  const [aiReferenceImageUrls, setAiReferenceImageUrls] = useState<string[]>(
+    experience.aiPhotoConfig.referenceImageUrls || []
   );
-  const [aiAspectRatio, setAiAspectRatio] = useState<AspectRatio>(experience.aiConfig.aspectRatio);
+  const [aiAspectRatio, setAiAspectRatio] = useState<AspectRatio>(experience.aiPhotoConfig.aspectRatio || "1:1");
 
   // Handle title save
   const handleTitleSave = async (newTitle: string) => {
-    const result = await updateGifExperience(experience.eventId, experience.id, {
-      label: newTitle,
+    const result = await updateGifExperience(experience.id, {
+      name: newTitle,
     });
     if (!result.success) {
       throw new Error(result.error.message);
@@ -73,7 +71,7 @@ export function GifExperienceEditor({
   // Handle enabled toggle
   const handleEnabledChange = async (newEnabled: boolean) => {
     setEnabled(newEnabled);
-    const result = await updateGifExperience(experience.eventId, experience.id, {
+    const result = await updateGifExperience(experience.id, {
       enabled: newEnabled,
     });
     if (!result.success) {
@@ -84,7 +82,7 @@ export function GifExperienceEditor({
     }
   };
 
-  // Handle save - write to schema structure (config/aiConfig)
+  // Handle save - write to schema structure (captureConfig/aiPhotoConfig)
   // Note: Preview media is saved automatically via PreviewMediaCompact component
   const handleSave = () => {
     if (isPending) return; // Prevent multiple saves
@@ -92,19 +90,18 @@ export function GifExperienceEditor({
       try {
         await onSave(experience.id, {
           enabled,
-          // Write to config object structure
-          config: {
+          // Write to captureConfig object structure
+          captureConfig: {
             frameCount,
-            intervalMs,
-            loopCount,
-            countdown: countdown || undefined,
+            cameraFacing: experience.captureConfig.cameraFacing,
+            countdown: countdown || 0,
           },
-          // Write to aiConfig object structure
-          aiConfig: {
+          // Write to aiPhotoConfig object structure
+          aiPhotoConfig: {
             enabled: aiEnabled,
             model: aiModel || null,
             prompt: aiPrompt || null,
-            referenceImagePaths: aiReferenceImagePaths.length > 0 ? aiReferenceImagePaths : null,
+            referenceImageUrls: aiReferenceImageUrls.length > 0 ? aiReferenceImageUrls : null,
             aspectRatio: aiAspectRatio,
           },
         });
@@ -117,18 +114,18 @@ export function GifExperienceEditor({
 
   // Handle preview media upload - save immediately
   const handlePreviewMediaUpload = async (publicUrl: string, fileType: PreviewType) => {
-    setPreviewPath(publicUrl);
+    setPreviewMediaUrl(publicUrl);
     setPreviewType(fileType);
 
     // Save to database immediately
-    const result = await updateGifExperience(experience.eventId, experience.id, {
-      previewPath: publicUrl,
+    const result = await updateGifExperience(experience.id, {
+      previewMediaUrl: publicUrl,
       previewType: fileType,
     });
 
     if (!result.success) {
       // Revert local state on error
-      setPreviewPath(experience.previewPath || "");
+      setPreviewMediaUrl(experience.previewMediaUrl || "");
       setPreviewType(experience.previewType || undefined);
       toast.error("Failed to save preview media");
     } else {
@@ -138,18 +135,18 @@ export function GifExperienceEditor({
 
   // Handle preview media removal - save immediately
   const handlePreviewMediaRemove = async () => {
-    setPreviewPath("");
+    setPreviewMediaUrl("");
     setPreviewType(undefined);
 
     // Save to database immediately (use null to clear the fields)
-    const result = await updateGifExperience(experience.eventId, experience.id, {
-      previewPath: null,
+    const result = await updateGifExperience(experience.id, {
+      previewMediaUrl: null,
       previewType: null,
     });
 
     if (!result.success) {
       // Revert local state on error
-      setPreviewPath(experience.previewPath || "");
+      setPreviewMediaUrl(experience.previewMediaUrl || "");
       setPreviewType(experience.previewType || undefined);
       toast.error("Failed to remove preview media");
     } else {
@@ -172,11 +169,10 @@ export function GifExperienceEditor({
     <div className="space-y-6">
       {/* Unified Experience Editor Header */}
       <ExperienceEditorHeader
-        eventId={experience.eventId}
         experience={experience}
         showPreview={true}
-        previewPath={previewPath}
-        previewType={previewType}
+        previewMediaUrl={previewMediaUrl}
+        previewMediaType={previewType}
         onPreviewUpload={handlePreviewMediaUpload}
         onPreviewRemove={handlePreviewMediaRemove}
         onTitleSave={handleTitleSave}
@@ -191,12 +187,8 @@ export function GifExperienceEditor({
         {/* GIF Capture Settings */}
         <GifCaptureSettings
         frameCount={frameCount}
-        intervalMs={intervalMs}
-        loopCount={loopCount}
         countdown={countdown}
         onFrameCountChange={setFrameCount}
-        onIntervalMsChange={setIntervalMs}
-        onLoopCountChange={setLoopCount}
         onCountdownChange={setCountdown}
         disabled={isPending}
       />
@@ -219,11 +211,11 @@ export function GifExperienceEditor({
           <AITransformSettings
             aiModel={aiModel}
             aiPrompt={aiPrompt}
-            aiReferenceImagePaths={aiReferenceImagePaths}
+            aiReferenceImageUrls={aiReferenceImageUrls}
             aiAspectRatio={aiAspectRatio}
             onAiModelChange={setAiModel}
             onAiPromptChange={setAiPrompt}
-            onAiReferenceImagePathsChange={setAiReferenceImagePaths}
+            onAiReferenceImageUrlsChange={setAiReferenceImageUrls}
             onAiAspectRatioChange={setAiAspectRatio}
             disabled={isPending}
           />

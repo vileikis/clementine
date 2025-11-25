@@ -27,25 +27,17 @@ const EXPERIENCE_TYPES: ExperienceTypeOption[] = [
     available: true,
   },
   {
-    type: "video",
-    label: "Video",
-    description: "Record a short video clip",
-    icon: "🎥",
-    available: false,
-  },
-  {
     type: "gif",
     label: "GIF",
     description: "Create an animated GIF from multiple frames",
     icon: "🎞️",
-    available: false,
+    available: true,
   },
-  
   {
-    type: "wheel",
-    label: "Wheel",
-    description: "Spin a wheel to select from multiple experiences",
-    icon: "🎡",
+    type: "video",
+    label: "Video",
+    description: "Record a short video clip",
+    icon: "🎥",
     available: false,
   },
 ];

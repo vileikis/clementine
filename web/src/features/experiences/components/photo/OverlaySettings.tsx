@@ -9,10 +9,9 @@ import { Upload } from "lucide-react";
 import { uploadFrameOverlay, deleteFrameOverlay } from "../../actions/photo-media";
 
 interface OverlaySettingsProps {
-  eventId: string;
   experienceId: string;
   overlayEnabled: boolean;
-  overlayFramePath?: string;
+  overlayUrl?: string;
   onOverlayEnabledChange: (enabled: boolean) => void;
   onUpload: (publicUrl: string) => void;
   onRemove: () => void;
@@ -21,14 +20,13 @@ interface OverlaySettingsProps {
 
 /**
  * Overlay Settings component for frame overlay configuration
- * Matches the style of PreviewMediaUpload for consistency
- * Created in 001-photo-experience-tweaks (User Story 4)
+ * Refactored for normalized Firestore design (data-model-v4).
+ * Matches the style of PreviewMediaUpload for consistency.
  */
 export function OverlaySettings({
-  eventId,
   experienceId,
   overlayEnabled,
-  overlayFramePath,
+  overlayUrl,
   onOverlayEnabledChange,
   onUpload,
   onRemove,
@@ -46,7 +44,7 @@ export function OverlaySettings({
     setUploadError(null);
 
     try {
-      const result = await uploadFrameOverlay(eventId, experienceId, file);
+      const result = await uploadFrameOverlay(experienceId, file);
 
       if (result.success) {
         onUpload(result.data.publicUrl);
@@ -66,13 +64,13 @@ export function OverlaySettings({
   };
 
   const handleRemoveOverlay = async () => {
-    if (!overlayFramePath) return;
+    if (!overlayUrl) return;
 
     setIsDeleting(true);
     setUploadError(null);
 
     try {
-      const result = await deleteFrameOverlay(eventId, experienceId, overlayFramePath);
+      const result = await deleteFrameOverlay(experienceId, overlayUrl);
 
       if (result.success) {
         onRemove();
@@ -107,10 +105,10 @@ export function OverlaySettings({
         <div className="space-y-2">
           <Label htmlFor="frame-overlay">Upload Frame</Label>
           <div className="space-y-2">
-            {overlayFramePath && (
+            {overlayUrl && (
               <div className="relative w-full h-48 overflow-hidden rounded-lg border bg-muted">
                 <Image
-                  src={overlayFramePath}
+                  src={overlayUrl}
                   alt="Frame overlay"
                   fill
                   className="object-contain"
@@ -145,7 +143,7 @@ export function OverlaySettings({
                 type="button"
               >
                 <Upload className="mr-2 h-4 w-4" />
-                {isUploading ? "Uploading..." : overlayFramePath ? "Replace Overlay" : "Upload Overlay"}
+                {isUploading ? "Uploading..." : overlayUrl ? "Replace Overlay" : "Upload Overlay"}
               </Button>
             </div>
             {uploadError && (

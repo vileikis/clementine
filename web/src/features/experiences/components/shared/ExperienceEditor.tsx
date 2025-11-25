@@ -13,14 +13,12 @@ interface ExperienceEditorProps {
 
 /**
  * ExperienceEditor - Wrapper component with discriminated union routing
- * Created in Phase 2 (User Story 1) - Edit Shared Experience Fields
+ * Refactored for normalized Firestore design (data-model-v4).
  *
  * Routes to type-specific editor components based on experience.type:
  * - photo → PhotoExperienceEditor
- * - gif → GifExperienceEditor (Phase 3)
+ * - gif → GifExperienceEditor
  * - video → VideoExperienceEditor (future)
- * - wheel → WheelExperienceEditor (future)
-
  *
  * TypeScript automatically narrows the experience type within each case,
  * allowing type-specific components to receive fully-typed props.
@@ -62,17 +60,6 @@ export function ExperienceEditor({
           <h2 className="text-2xl font-semibold">Video Experience Editor</h2>
           <p className="text-sm text-muted-foreground">
             Video experience editing is not yet implemented.
-          </p>
-        </div>
-      );
-
-    case "wheel":
-      // Placeholder for WheelExperienceEditor (future)
-      return (
-        <div className="space-y-6">
-          <h2 className="text-2xl font-semibold">Wheel Experience Editor</h2>
-          <p className="text-sm text-muted-foreground">
-            Wheel experience editing is not yet implemented.
           </p>
         </div>
       );

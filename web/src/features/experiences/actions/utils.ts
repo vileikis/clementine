@@ -1,11 +1,11 @@
 /**
  * Shared utility functions for experience Server Actions
  *
- * Part of 003-experience-schema implementation (Phase 6 - Action File Reorganization).
+ * Refactored for normalized Firestore design (data-model-v4).
  *
  * This module provides reusable helpers for:
  * - Authentication checks
- * - Event and experience validation
+ * - Company and experience validation
  * - Common error responses
  */
 
@@ -33,6 +33,35 @@ export async function checkAuth<T = never>(): Promise<ActionResponse<T> | null> 
 }
 
 /**
+ * Validate that a company exists and user has access to it.
+ * Returns an error response if the company doesn't exist or user lacks access.
+ *
+ * Note: For MVP, we just verify the company exists. Full access control
+ * should be implemented when user-company relationships are established.
+ */
+export async function validateCompanyAccess<T = never>(
+  companyId: string
+): Promise<ActionResponse<T> | null> {
+  const companyRef = db.collection("companies").doc(companyId);
+  const companyDoc = await companyRef.get();
+
+  if (!companyDoc.exists) {
+    return {
+      success: false,
+      error: {
+        code: ErrorCodes.COMPANY_NOT_FOUND,
+        message: `Company with ID ${companyId} not found`,
+      },
+    } as ActionResponse<T>;
+  }
+
+  // TODO: Add user-company access check when user management is implemented
+  // For now, if the company exists and user is authenticated, allow access
+
+  return null; // null means success, no error
+}
+
+/**
  * Validate that an event exists.
  * Returns an error response if the event doesn't exist, otherwise null.
  */
@@ -56,21 +85,15 @@ export async function validateEventExists<T = never>(
 }
 
 /**
- * Validate that an experience exists.
+ * Validate that an experience exists in root /experiences collection.
  * Returns an error response if the experience doesn't exist, otherwise null.
  *
  * @deprecated Use getExperienceDocument instead to avoid duplicate reads
  */
 export async function validateExperienceExists<T = never>(
-  eventId: string,
   experienceId: string
 ): Promise<ActionResponse<T> | null> {
-  const experienceRef = db
-    .collection("events")
-    .doc(eventId)
-    .collection("experiences")
-    .doc(experienceId);
-
+  const experienceRef = db.collection("experiences").doc(experienceId);
   const experienceDoc = await experienceRef.get();
 
   if (!experienceDoc.exists) {
@@ -94,18 +117,12 @@ export async function validateExperienceExists<T = never>(
  * @returns Error response if not found, or object with the document snapshot
  */
 export async function getExperienceDocument(
-  eventId: string,
   experienceId: string
 ): Promise<
   | { error: ActionResponse<never> }
   | { doc: FirebaseFirestore.DocumentSnapshot }
 > {
-  const experienceRef = db
-    .collection("events")
-    .doc(eventId)
-    .collection("experiences")
-    .doc(experienceId);
-
+  const experienceRef = db.collection("experiences").doc(experienceId);
   const experienceDoc = await experienceRef.get();
 
   if (!experienceDoc.exists) {

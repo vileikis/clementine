@@ -14,7 +14,6 @@ describe("PreviewMediaUpload Component - User Story 2", () => {
   const mockOnRemove = jest.fn();
 
   const defaultProps = {
-    eventId: "event-1",
     experienceId: "exp-1",
     onUpload: mockOnUpload,
     onRemove: mockOnRemove,
@@ -25,12 +24,12 @@ describe("PreviewMediaUpload Component - User Story 2", () => {
   });
 
   describe("T031 - Image preview rendering", () => {
-    it("renders image preview when previewPath and previewType='image' are provided", () => {
+    it("renders image preview when previewMediaUrl and previewMediaType='image' are provided", () => {
       render(
         <PreviewMediaUpload
           {...defaultProps}
-          previewPath="https://example.com/image.jpg"
-          previewType="image"
+          previewMediaUrl="https://example.com/image.jpg"
+          previewMediaType="image"
         />
       );
 
@@ -43,8 +42,8 @@ describe("PreviewMediaUpload Component - User Story 2", () => {
       render(
         <PreviewMediaUpload
           {...defaultProps}
-          previewPath="https://example.com/image.jpg"
-          previewType="image"
+          previewMediaUrl="https://example.com/image.jpg"
+          previewMediaType="image"
         />
       );
 
@@ -56,15 +55,15 @@ describe("PreviewMediaUpload Component - User Story 2", () => {
       render(
         <PreviewMediaUpload
           {...defaultProps}
-          previewPath="https://example.com/image.jpg"
-          previewType="image"
+          previewMediaUrl="https://example.com/image.jpg"
+          previewMediaType="image"
         />
       );
 
       expect(screen.getByRole("button", { name: /remove/i })).toBeInTheDocument();
     });
 
-    it("does not render preview when previewPath is not provided", () => {
+    it("does not render preview when previewMediaUrl is not provided", () => {
       render(<PreviewMediaUpload {...defaultProps} />);
 
       expect(screen.queryByRole("img")).not.toBeInTheDocument();
@@ -77,8 +76,8 @@ describe("PreviewMediaUpload Component - User Story 2", () => {
       render(
         <PreviewMediaUpload
           {...defaultProps}
-          previewPath="https://example.com/animated.gif"
-          previewType="gif"
+          previewMediaUrl="https://example.com/animated.gif"
+          previewMediaType="gif"
         />
       );
 
@@ -91,8 +90,8 @@ describe("PreviewMediaUpload Component - User Story 2", () => {
       render(
         <PreviewMediaUpload
           {...defaultProps}
-          previewPath="https://example.com/animated.gif"
-          previewType="gif"
+          previewMediaUrl="https://example.com/animated.gif"
+          previewMediaType="gif"
         />
       );
 
@@ -106,8 +105,8 @@ describe("PreviewMediaUpload Component - User Story 2", () => {
       render(
         <PreviewMediaUpload
           {...defaultProps}
-          previewPath="https://example.com/animated.gif"
-          previewType="gif"
+          previewMediaUrl="https://example.com/animated.gif"
+          previewMediaType="gif"
         />
       );
 
@@ -116,12 +115,12 @@ describe("PreviewMediaUpload Component - User Story 2", () => {
   });
 
   describe("T033 - Video preview rendering", () => {
-    it("renders video preview when previewType='video'", () => {
+    it("renders video preview when previewMediaType='video'", () => {
       const { container } = render(
         <PreviewMediaUpload
           {...defaultProps}
-          previewPath="https://example.com/video.mp4"
-          previewType="video"
+          previewMediaUrl="https://example.com/video.mp4"
+          previewMediaType="video"
         />
       );
 
@@ -134,8 +133,8 @@ describe("PreviewMediaUpload Component - User Story 2", () => {
       const { container } = render(
         <PreviewMediaUpload
           {...defaultProps}
-          previewPath="https://example.com/video.mp4"
-          previewType="video"
+          previewMediaUrl="https://example.com/video.mp4"
+          previewMediaType="video"
         />
       );
 
@@ -150,8 +149,8 @@ describe("PreviewMediaUpload Component - User Story 2", () => {
       const { container } = render(
         <PreviewMediaUpload
           {...defaultProps}
-          previewPath="https://example.com/video.mp4"
-          previewType="video"
+          previewMediaUrl="https://example.com/video.mp4"
+          previewMediaType="video"
         />
       );
 
@@ -163,8 +162,8 @@ describe("PreviewMediaUpload Component - User Story 2", () => {
       render(
         <PreviewMediaUpload
           {...defaultProps}
-          previewPath="https://example.com/video.mp4"
-          previewType="video"
+          previewMediaUrl="https://example.com/video.mp4"
+          previewMediaType="video"
         />
       );
 
@@ -184,8 +183,8 @@ describe("PreviewMediaUpload Component - User Story 2", () => {
       render(
         <PreviewMediaUpload
           {...defaultProps}
-          previewPath="https://example.com/image.jpg"
-          previewType="image"
+          previewMediaUrl="https://example.com/image.jpg"
+          previewMediaType="image"
         />
       );
 
@@ -225,7 +224,6 @@ describe("PreviewMediaUpload Component - User Story 2", () => {
 
       await waitFor(() => {
         expect(experiencesActions.uploadPreviewMedia).toHaveBeenCalledWith(
-          "event-1",
           "exp-1",
           file
         );
@@ -268,8 +266,8 @@ describe("PreviewMediaUpload Component - User Story 2", () => {
       render(
         <PreviewMediaUpload
           {...defaultProps}
-          previewPath="https://example.com/image.jpg"
-          previewType="image"
+          previewMediaUrl="https://example.com/image.jpg"
+          previewMediaType="image"
         />
       );
 
@@ -280,7 +278,6 @@ describe("PreviewMediaUpload Component - User Story 2", () => {
 
       await waitFor(() => {
         expect(experiencesActions.deletePreviewMedia).toHaveBeenCalledWith(
-          "event-1",
           "exp-1",
           "https://example.com/image.jpg"
         );

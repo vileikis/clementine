@@ -3,39 +3,40 @@
 /**
  * Server Action: Create GIF Experience
  *
- * Creates a new GIF experience with the discriminated union schema.
- * Part of 004-multi-experience-editor implementation (User Story 2).
+ * Creates a new GIF experience in the root /experiences collection.
+ * Refactored for normalized Firestore design (data-model-v4).
  *
  * This action:
  * - Validates input using createGifExperienceSchema
- * - Initializes default values for config and aiConfig
- * - Writes to Firestore using Admin SDK
- * - Updates parent event's experiencesCount
+ * - Validates companyId access (user must have access to the company)
+ * - Writes to root /experiences collection using Admin SDK
+ * - Auto-attaches current event ID to eventIds array
  * - Revalidates the event page
  */
 
 import { revalidatePath } from "next/cache";
-import { db } from "@/lib/firebase/admin";
-import { FieldValue } from "firebase-admin/firestore";
 import { z } from "zod";
 import {
   createGifExperienceSchema,
   type GifExperience
 } from "../schemas";
+import {
+  createGifExperience as createGifExperienceInDb
+} from "../repositories/experiences.repository";
 import type { ActionResponse } from "./types";
 import { ErrorCodes } from "./types";
-import { checkAuth, validateEventExists, createSuccessResponse, createErrorResponse } from "./utils";
+import { checkAuth, validateCompanyAccess, createSuccessResponse, createErrorResponse } from "./utils";
 
 /**
- * Creates a new GIF experience for an event.
+ * Creates a new GIF experience for a company, optionally attached to an event.
  *
- * @param eventId - Event ID
- * @param input - Creation data (label, type)
+ * @param input - Creation data (companyId, name, type, eventIds)
+ * @param eventId - Optional event ID to auto-attach the experience to
  * @returns ActionResponse with created GifExperience or error
  */
 export async function createGifExperience(
-  eventId: string,
-  input: { label: string; type: "gif" }
+  eventId: string | null,
+  input: { companyId: string; name: string; type: "gif"; eventIds?: string[] }
 ): Promise<ActionResponse<GifExperience>> {
   try {
     // Check authentication
@@ -45,62 +46,28 @@ export async function createGifExperience(
     // Validate input with Zod schema
     const validated = createGifExperienceSchema.parse(input);
 
-    // Check if event exists
-    const eventError = await validateEventExists(eventId);
-    if (eventError) return eventError;
+    // Validate company access
+    const companyError = await validateCompanyAccess(validated.companyId);
+    if (companyError) return companyError;
 
-    const eventRef = db.collection("events").doc(eventId);
+    // Determine eventIds - use provided array or auto-attach to current event
+    const eventIds = validated.eventIds?.length
+      ? validated.eventIds
+      : eventId
+        ? [eventId]
+        : [];
 
-    // Create experience document reference
-    const experienceRef = eventRef.collection("experiences").doc();
-    const timestamp = Date.now();
-
-    // Initialize GifExperience with default configuration
-    const gifExperience: GifExperience = {
-      // Identity
-      id: experienceRef.id,
-      eventId,
-
-      // Core configuration
-      label: validated.label,
-      type: "gif",
-      enabled: true, // Enabled by default
-      hidden: false, // Visible by default
-
-      // Type-specific config (GIF)
-      config: {
-        frameCount: 5, // Default 5 frames
-        intervalMs: 500, // Default 500ms between frames
-        loopCount: 0, // Infinite loop by default
-        countdown: 3, // Default 3 second countdown
-      },
-
-      // Shared AI config
-      aiConfig: {
-        enabled: false, // AI disabled by default
-        model: null, // No model by default
-        prompt: null, // No prompt by default
-        referenceImagePaths: null, // No references by default
-        aspectRatio: "1:1", // Square format (most common)
-      },
-
-      // Audit
-      createdAt: timestamp,
-      updatedAt: timestamp,
-    };
-
-    // Write experience and update event counter in a batch
-    const batch = db.batch();
-    batch.set(experienceRef, gifExperience);
-    batch.update(eventRef, {
-      experiencesCount: FieldValue.increment(1),
-      updatedAt: timestamp,
+    // Create experience in root /experiences collection
+    const gifExperience = await createGifExperienceInDb({
+      companyId: validated.companyId,
+      eventIds,
+      name: validated.name,
     });
 
-    await batch.commit();
-
     // Revalidate the event page to show new experience
-    revalidatePath(`/events/${eventId}`);
+    if (eventId) {
+      revalidatePath(`/events/${eventId}`);
+    }
 
     return createSuccessResponse(gifExperience);
   } catch (error) {

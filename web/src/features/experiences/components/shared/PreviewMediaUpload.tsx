@@ -9,10 +9,9 @@ import { uploadPreviewMedia, deletePreviewMedia } from "../../actions/photo-medi
 import type { PreviewType } from "../../schemas";
 
 interface PreviewMediaUploadProps {
-  eventId: string;
   experienceId: string;
-  previewPath?: string;
-  previewType?: PreviewType;
+  previewMediaUrl?: string;
+  previewMediaType?: PreviewType;
   onUpload: (publicUrl: string, fileType: PreviewType) => void;
   onRemove: () => void;
   disabled?: boolean;
@@ -24,10 +23,9 @@ interface PreviewMediaUploadProps {
  * Created in 001-photo-experience-tweaks (User Story 2)
  */
 export function PreviewMediaUpload({
-  eventId,
   experienceId,
-  previewPath,
-  previewType,
+  previewMediaUrl,
+  previewMediaType,
   onUpload,
   onRemove,
   disabled = false,
@@ -44,7 +42,7 @@ export function PreviewMediaUpload({
     setUploadError(null);
 
     try {
-      const result = await uploadPreviewMedia(eventId, experienceId, file);
+      const result = await uploadPreviewMedia(experienceId, file);
 
       if (result.success) {
         onUpload(result.data.publicUrl, result.data.fileType);
@@ -63,13 +61,13 @@ export function PreviewMediaUpload({
   };
 
   const handleRemoveMedia = async () => {
-    if (!previewPath) return;
+    if (!previewMediaUrl) return;
 
     setIsDeleting(true);
     setUploadError(null);
 
     try {
-      const result = await deletePreviewMedia(eventId, experienceId, previewPath);
+      const result = await deletePreviewMedia(experienceId, previewMediaUrl);
 
       if (result.success) {
         onRemove();
@@ -89,11 +87,11 @@ export function PreviewMediaUpload({
     <div className="space-y-2">
       <Label htmlFor="preview-media">Preview Media</Label>
       <div className="space-y-2">
-        {previewPath && (
+        {previewMediaUrl && (
           <div className="relative w-full h-48 overflow-hidden rounded-lg border bg-muted">
-            {previewType === "video" ? (
+            {previewMediaType === "video" ? (
               <video
-                src={previewPath}
+                src={previewMediaUrl}
                 autoPlay
                 muted
                 loop
@@ -102,7 +100,7 @@ export function PreviewMediaUpload({
               />
             ) : (
               <Image
-                src={previewPath}
+                src={previewMediaUrl}
                 alt="Preview media"
                 fill
                 className="object-contain"
@@ -138,7 +136,7 @@ export function PreviewMediaUpload({
             type="button"
           >
             <Upload className="mr-2 h-4 w-4" />
-            {isUploading ? "Uploading..." : previewPath ? "Replace Media" : "Upload Media"}
+            {isUploading ? "Uploading..." : previewMediaUrl ? "Replace Media" : "Upload Media"}
           </Button>
         </div>
         {uploadError && (
