@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ImagePlus, X } from "lucide-react";
 import { uploadPreviewMedia, deletePreviewMedia } from "../../actions/photo-media";
@@ -124,10 +125,12 @@ export function PreviewMediaCompact({
                 className="h-full w-full object-cover"
               />
             ) : (
-              <img
+              <Image
                 src={previewPath}
                 alt="Experience preview"
-                className="h-full w-full object-cover"
+                fill
+                className="object-cover"
+                unoptimized
               />
             )}
 

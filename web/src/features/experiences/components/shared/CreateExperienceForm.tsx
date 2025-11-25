@@ -66,6 +66,7 @@ export function CreateExperienceForm({ eventId }: CreateExperienceFormProps) {
     },
   });
 
+  // eslint-disable-next-line react-hooks/incompatible-library -- React Hook Form watch() is used safely here
   const selectedType = watch("type");
   const nameValue = watch("label");
 

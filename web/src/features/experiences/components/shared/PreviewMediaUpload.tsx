@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Upload } from "lucide-react";
@@ -100,10 +101,12 @@ export function PreviewMediaUpload({
                 className="h-full w-full object-contain"
               />
             ) : (
-              <img
+              <Image
                 src={previewPath}
                 alt="Preview media"
-                className="h-full w-full object-contain"
+                fill
+                className="object-contain"
+                unoptimized
               />
             )}
             <Button

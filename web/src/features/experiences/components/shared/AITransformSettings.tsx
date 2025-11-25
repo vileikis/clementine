@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -163,12 +164,14 @@ export function AITransformSettings({
             {aiReferenceImagePaths.map((path, index) => (
               <div
                 key={index}
-                className="relative w-32 h-32 overflow-hidden rounded-lg border bg-muted flex-shrink-0"
+                className="relative w-32 h-32 overflow-hidden rounded-lg border bg-muted shrink-0"
               >
-                <img
+                <Image
                   src={path}
                   alt={`Reference ${index + 1}`}
-                  className="h-full w-full object-contain"
+                  fill
+                  className="object-contain"
+                  unoptimized
                 />
                 <Button
                   variant="destructive"
