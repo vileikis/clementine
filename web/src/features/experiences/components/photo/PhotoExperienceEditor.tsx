@@ -15,6 +15,7 @@ import { updatePhotoExperience } from "../../actions/photo-update";
 import type { PhotoExperience, PreviewType, AspectRatio } from "../../schemas";
 
 interface PhotoExperienceEditorProps {
+  eventId: string;
   experience: PhotoExperience;
   onSave: (experienceId: string, data: Partial<PhotoExperience>) => Promise<void>;
   onDelete: (experienceId: string) => Promise<void>;
@@ -37,6 +38,7 @@ interface PhotoExperienceEditorProps {
  * - OverlaySettings (photo-specific)
  */
 export function PhotoExperienceEditor({
+  eventId,
   experience,
   onSave,
   onDelete,
@@ -210,6 +212,7 @@ export function PhotoExperienceEditor({
       {/* Unified Experience Editor Header */}
       <ExperienceEditorHeader
         experience={experience}
+        eventId={eventId}
         showPreview={true}
         previewMediaUrl={previewMediaUrl}
         previewMediaType={previewType}

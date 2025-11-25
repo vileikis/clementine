@@ -77,6 +77,7 @@ export function ExperienceEditorWrapper({
 
   return (
     <ExperienceEditor
+      eventId={eventId}
       experience={experience}
       onSave={handleSave}
       onDelete={handleDelete}
