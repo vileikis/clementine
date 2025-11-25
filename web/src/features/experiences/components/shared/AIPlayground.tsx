@@ -11,16 +11,17 @@
  * - Generate button to trigger AI transformation
  * - Display transformed result image
  * - Error state with retry option
+ * - Live timer during generation + total time display
  *
  * Note: Playground images are ephemeral and not persisted to storage.
  * This is for testing AI prompts before going live.
  */
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Upload, Loader2, AlertCircle, RefreshCw, X, ImageIcon } from "lucide-react";
+import { Upload, Loader2, AlertCircle, RefreshCw, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Constants for file validation
@@ -71,6 +72,18 @@ function fileToDataUrl(file: File): Promise<string> {
   });
 }
 
+/**
+ * Format seconds to display string (e.g., "5s" or "1m 23s")
+ */
+function formatTime(seconds: number): string {
+  if (seconds < 60) {
+    return `${seconds}s`;
+  }
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins}m ${secs}s`;
+}
+
 export function AIPlayground({
   experienceId,
   prompt,
@@ -85,11 +98,37 @@ export function AIPlayground({
   const [resultImageUrl, setResultImageUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // Timer state
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [totalGenerationTime, setTotalGenerationTime] = useState<number | null>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
   // Drag state for visual feedback
   const [isDragging, setIsDragging] = useState(false);
 
   // File input ref for programmatic click
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Timer effect - runs during generation
+  useEffect(() => {
+    if (state === "generating") {
+      setElapsedSeconds(0);
+      timerRef.current = setInterval(() => {
+        setElapsedSeconds((prev) => prev + 1);
+      }, 1000);
+    } else {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    }
+
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, [state]);
 
   // Handle file selection (from input or drop)
   const handleFileSelect = useCallback(async (file: File) => {
@@ -106,6 +145,7 @@ export function AIPlayground({
       setTestImagePreview(dataUrl);
       setResultImageUrl(null);
       setError(null);
+      setTotalGenerationTime(null);
       setState("ready");
     } catch {
       setError("Failed to read the image file");
@@ -161,8 +201,10 @@ export function AIPlayground({
   const handleGenerate = useCallback(async () => {
     if (!testImageFile || !testImagePreview) return;
 
+    const startTime = Date.now();
     setState("generating");
     setError(null);
+    setTotalGenerationTime(null);
 
     try {
       // Import the server action dynamically to avoid bundling issues
@@ -175,6 +217,10 @@ export function AIPlayground({
         testImageBase64: testImagePreview,
       });
 
+      const endTime = Date.now();
+      const totalSeconds = Math.round((endTime - startTime) / 1000);
+      setTotalGenerationTime(totalSeconds);
+
       if (result.success) {
         setResultImageUrl(result.data.resultImageBase64);
         setState("result");
@@ -185,6 +231,9 @@ export function AIPlayground({
         onGenerationComplete?.(false);
       }
     } catch (err) {
+      const endTime = Date.now();
+      const totalSeconds = Math.round((endTime - startTime) / 1000);
+      setTotalGenerationTime(totalSeconds);
       setError(err instanceof Error ? err.message : "Generation failed");
       setState("error");
       onGenerationComplete?.(false);
@@ -196,9 +245,11 @@ export function AIPlayground({
     if (testImageFile) {
       setState("ready");
       setError(null);
+      setTotalGenerationTime(null);
     } else {
       setState("idle");
       setError(null);
+      setTotalGenerationTime(null);
     }
   }, [testImageFile]);
 
@@ -208,6 +259,7 @@ export function AIPlayground({
     setTestImagePreview(null);
     setResultImageUrl(null);
     setError(null);
+    setTotalGenerationTime(null);
     setState("idle");
   }, []);
 
@@ -279,59 +331,22 @@ export function AIPlayground({
           </div>
         )}
 
-        {/* Image Preview - shown when ready, generating, result, or error with image */}
+        {/* Single column layout: Input → Generate → Result */}
         {testImagePreview && state !== "idle" && (
           <div className="space-y-4">
-            {/* Before/After comparison */}
-            <div className="grid grid-cols-2 gap-3">
-              {/* Input image */}
-              <div className="space-y-2">
-                <p className="text-xs font-medium text-muted-foreground">Input</p>
-                <div className="relative aspect-square rounded-lg overflow-hidden bg-muted border">
-                  <Image
-                    src={testImagePreview}
-                    alt="Test image"
-                    fill
-                    className="object-contain"
-                    unoptimized
-                  />
-                </div>
-              </div>
-
-              {/* Result image */}
-              <div className="space-y-2">
-                <p className="text-xs font-medium text-muted-foreground">Result</p>
-                <div className="relative aspect-square rounded-lg overflow-hidden bg-muted border">
-                  {state === "generating" && (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                    </div>
-                  )}
-                  {state === "result" && resultImageUrl && (
-                    <Image
-                      src={resultImageUrl}
-                      alt="AI transformed result"
-                      fill
-                      className="object-contain"
-                      unoptimized
-                    />
-                  )}
-                  {(state === "ready" || state === "error") && !resultImageUrl && (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <ImageIcon className="h-8 w-8 text-muted-foreground/50" />
-                    </div>
-                  )}
-                </div>
+            {/* Input image */}
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-muted-foreground">Input</p>
+              <div className="h-80 w-full relative aspect-square rounded-lg overflow-hidden bg-muted border">
+                <Image
+                  src={testImagePreview}
+                  alt="Test image"
+                  fill
+                  className="object-contain"
+                  unoptimized
+                />
               </div>
             </div>
-
-            {/* Error message */}
-            {state === "error" && error && (
-              <div className="flex items-start gap-2 p-3 rounded-lg bg-destructive/10 text-destructive">
-                <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
-                <p className="text-sm">{error}</p>
-              </div>
-            )}
 
             {/* Action buttons */}
             <div className="flex gap-2">
@@ -347,7 +362,7 @@ export function AIPlayground({
               {state === "generating" && (
                 <Button disabled className="flex-1 min-h-[44px]">
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Generating...
+                  Generating... {formatTime(elapsedSeconds)}
                 </Button>
               )}
               {state === "result" && (
@@ -372,11 +387,42 @@ export function AIPlayground({
               )}
             </div>
 
-            {/* Prompt preview */}
+            {/* Prompt validation message */}
             {!prompt && (
               <p className="text-xs text-muted-foreground text-center">
                 Add a prompt in the configuration panel to enable generation
               </p>
+            )}
+
+            {/* Error message */}
+            {state === "error" && error && (
+              <div className="flex items-start gap-2 p-3 rounded-lg bg-destructive/10 text-destructive">
+                <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+                <p className="text-sm">{error}</p>
+              </div>
+            )}
+
+            {/* Result image - shown after generation completes */}
+            {state === "result" && resultImageUrl && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs font-medium text-muted-foreground">Result</p>
+                  {totalGenerationTime !== null && (
+                    <p className="text-xs text-muted-foreground">
+                      Generated in {formatTime(totalGenerationTime)}
+                    </p>
+                  )}
+                </div>
+                <div className="h-80 w-full relative aspect-square rounded-lg overflow-hidden bg-muted border">
+                  <Image
+                    src={resultImageUrl}
+                    alt="AI transformed result"
+                    fill
+                    className="object-contain"
+                    unoptimized
+                  />
+                </div>
+              </div>
             )}
           </div>
         )}
