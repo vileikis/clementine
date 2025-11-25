@@ -54,12 +54,12 @@ All paths relative to repository root:
 
 ### Implementation for User Story 1
 
-- [ ] T006 [US1] Update PhotoExperienceEditor with split-screen grid layout in `web/src/features/experiences/components/PhotoExperienceEditor.tsx`
-- [ ] T007 [US1] Add mobile responsive stacking (vertical on <1024px) in `web/src/features/experiences/components/PhotoExperienceEditor.tsx`
-- [ ] T008 [US1] Verify model selector dropdown exists and works in `web/src/features/experiences/components/AITransformSettings.tsx`
-- [ ] T009 [US1] Verify prompt editor textarea exists and works in `web/src/features/experiences/components/AITransformSettings.tsx`
-- [ ] T010 [US1] Wire save button to updatePhotoExperience action for aiPhotoConfig (model, prompt) in `web/src/features/experiences/components/PhotoExperienceEditor.tsx`
-- [ ] T011 [US1] Add toast notifications for save success/error in `web/src/features/experiences/components/PhotoExperienceEditor.tsx`
+- [x] T006 [US1] Update PhotoExperienceEditor with split-screen grid layout in `web/src/features/experiences/components/photo/PhotoExperienceEditor.tsx`
+- [x] T007 [US1] Add mobile responsive stacking (vertical on <1024px) in `web/src/features/experiences/components/photo/PhotoExperienceEditor.tsx`
+- [x] T008 [US1] Verify model selector dropdown exists and works in `web/src/features/experiences/components/shared/AITransformSettings.tsx`
+- [x] T009 [US1] Verify prompt editor textarea exists and works in `web/src/features/experiences/components/shared/AITransformSettings.tsx`
+- [x] T010 [US1] Wire save button to updatePhotoExperience action for aiPhotoConfig (model, prompt) in `web/src/features/experiences/components/photo/PhotoExperienceEditor.tsx`
+- [x] T011 [US1] Add toast notifications for save success/error in `web/src/features/experiences/components/photo/PhotoExperienceEditor.tsx`
 
 **Checkpoint**: User Story 1 complete - AI configuration (model + prompt + save) works independently
 

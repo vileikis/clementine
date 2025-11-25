@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { ExperienceEditorHeader } from "../shared/ExperienceEditorHeader";
 import { AITransformSettings } from "../shared/AITransformSettings";
+import { AIPlayground } from "../shared/AIPlayground";
 import { CountdownSettings } from "./CountdownSettings";
 import { OverlaySettings } from "./OverlaySettings";
 import { updatePhotoExperience } from "../../actions/photo-update";
@@ -50,12 +51,11 @@ export function PhotoExperienceEditor({
   const [countdownSeconds, setCountdownSeconds] = useState(experience.captureConfig.countdown);
 
   // Overlay settings - read from captureConfig.overlayUrl
-  const [overlayEnabled, setOverlayEnabled] = useState(!!experience.captureConfig.overlayUrl);
   const [overlayUrl, setOverlayUrl] = useState(experience.captureConfig.overlayUrl || "");
 
   // AI settings - read from aiPhotoConfig
   const [aiEnabled, setAiEnabled] = useState(experience.aiPhotoConfig.enabled);
-  const [aiModel, setAiModel] = useState(experience.aiPhotoConfig.model || "nanobanana");
+  const [aiModel, setAiModel] = useState(experience.aiPhotoConfig.model || "gemini-2.5-flash-image");
   const [aiPrompt, setAiPrompt] = useState(experience.aiPhotoConfig.prompt || "");
   const [aiReferenceImageUrls, setAiReferenceImageUrls] = useState<string[]>(
     experience.aiPhotoConfig.referenceImageUrls || []
@@ -99,7 +99,7 @@ export function PhotoExperienceEditor({
           captureConfig: {
             countdown: countdownSeconds, // 0 = disabled, N = N seconds
             cameraFacing: experience.captureConfig.cameraFacing,
-            overlayUrl: overlayEnabled && overlayUrl ? overlayUrl : null,
+            overlayUrl: overlayUrl || null,
           },
           // Write to aiPhotoConfig object structure
           aiPhotoConfig: {
@@ -187,63 +187,74 @@ export function PhotoExperienceEditor({
         disabled={isPending}
       />
 
-      {/* Body Content - Centered with max width */}
-      <div className="max-w-2xl mx-auto space-y-6">
-        {/* Countdown Timer */}
-        <CountdownSettings
-        countdownSeconds={countdownSeconds}
-        onCountdownSecondsChange={setCountdownSeconds}
-        disabled={isPending}
-      />
-
-      {/* Frame Overlay */}
-      <OverlaySettings
-        experienceId={experience.id}
-        overlayEnabled={overlayEnabled}
-        overlayUrl={overlayUrl || undefined}
-        onOverlayEnabledChange={setOverlayEnabled}
-        onUpload={(url) => setOverlayUrl(url)}
-        onRemove={() => setOverlayUrl("")}
-        disabled={isPending}
-      />
-
-      {/* AI Transformation */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-semibold">AI Transformation</h2>
-          <div className="inline-flex items-center justify-center min-h-[44px] min-w-[44px]">
-            <Switch
-              id="aiEnabled"
-              checked={aiEnabled}
-              onCheckedChange={setAiEnabled}
-              disabled={isPending}
-            />
-          </div>
-        </div>
-
-        {aiEnabled && (
-          <AITransformSettings
-            aiModel={aiModel}
-            aiPrompt={aiPrompt}
-            aiReferenceImageUrls={aiReferenceImageUrls}
-            aiAspectRatio={aiAspectRatio}
-            onAiModelChange={setAiModel}
-            onAiPromptChange={setAiPrompt}
-            onAiReferenceImageUrlsChange={setAiReferenceImageUrls}
-            onAiAspectRatioChange={setAiAspectRatio}
+      {/* Split-Screen Layout: Config Panel (left) | Playground (right) */}
+      {/* Stacks vertically on mobile (<1024px), side-by-side on desktop */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Left Panel: Configuration */}
+        <div className="space-y-6">
+          {/* Countdown Timer */}
+          <CountdownSettings
+            countdownSeconds={countdownSeconds}
+            onCountdownSecondsChange={setCountdownSeconds}
             disabled={isPending}
           />
-        )}
-      </div>
 
-        {/* Save Button */}
-        <Button
-          onClick={handleSave}
-          disabled={isPending}
-          className="w-full"
-        >
-          {isPending ? "Saving..." : "Save Changes"}
-        </Button>
+          {/* Frame Overlay */}
+          <OverlaySettings
+            experienceId={experience.id}
+            overlayUrl={overlayUrl || undefined}
+            onUpload={(url) => setOverlayUrl(url)}
+            onRemove={() => setOverlayUrl("")}
+            disabled={isPending}
+          />
+
+          {/* AI Transformation */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-semibold">AI Transformation</h2>
+              <div className="inline-flex items-center justify-center min-h-[44px] min-w-[44px]">
+                <Switch
+                  id="aiEnabled"
+                  checked={aiEnabled}
+                  onCheckedChange={setAiEnabled}
+                  disabled={isPending}
+                />
+              </div>
+            </div>
+
+            {aiEnabled && (
+              <AITransformSettings
+                aiModel={aiModel}
+                aiPrompt={aiPrompt}
+                aiReferenceImageUrls={aiReferenceImageUrls}
+                aiAspectRatio={aiAspectRatio}
+                onAiModelChange={setAiModel}
+                onAiPromptChange={setAiPrompt}
+                onAiReferenceImageUrlsChange={setAiReferenceImageUrls}
+                onAiAspectRatioChange={setAiAspectRatio}
+                disabled={isPending}
+              />
+            )}
+          </div>
+
+          {/* Save Button */}
+          <Button
+            onClick={handleSave}
+            disabled={isPending}
+            className="w-full min-h-[44px]"
+          >
+            {isPending ? "Saving..." : "Save Changes"}
+          </Button>
+        </div>
+
+        {/* Right Panel: AI Playground - Always visible for testing */}
+        <div className="lg:sticky lg:top-4 lg:self-start">
+          <AIPlayground
+            experienceId={experience.id}
+            prompt={aiPrompt}
+            disabled={isPending || !aiEnabled}
+          />
+        </div>
       </div>
     </div>
   );

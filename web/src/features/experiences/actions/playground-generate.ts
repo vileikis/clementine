@@ -151,12 +151,16 @@ export async function generatePlaygroundPreview(
     // Get first reference image URL if available
     const referenceImageUrl = experience.aiPhotoConfig.referenceImageUrls?.[0];
 
+    // Get model from experience config
+    const model = experience.aiPhotoConfig.model || "gemini-2.5-flash-image";
+
     // Call AI client
     const aiClient = getAIClient();
     const resultBuffer = await aiClient.generateImage({
       prompt,
       inputImageUrl: testImageUrl,
       referenceImageUrl,
+      model,
     });
 
     // Convert result buffer to base64 data URL
