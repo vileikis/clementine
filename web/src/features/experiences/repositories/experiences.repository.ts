@@ -178,3 +178,27 @@ export async function getExperiencesByCompanyId(
     })
   );
 }
+
+/**
+ * Duplicates an existing experience with a new ID and name
+ * All settings are copied except for the ID and timestamps
+ */
+export async function duplicateExperience(
+  sourceExperience: Experience,
+  newName: string
+): Promise<Experience> {
+  const experienceRef = db.collection("experiences").doc();
+  const now = Date.now();
+
+  // Create a copy with new ID, name, and timestamps
+  const duplicated: Experience = {
+    ...sourceExperience,
+    id: experienceRef.id,
+    name: newName,
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  await experienceRef.set(duplicated);
+  return duplicated;
+}
