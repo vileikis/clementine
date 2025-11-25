@@ -82,14 +82,12 @@ export function ExperiencesSidebar({
                         ? "🎥"
                         : experience.type === "gif"
                           ? "🎞️"
-                          : experience.type === "wheel"
-                            ? "🎡"
-                            : null}
+                          : null}
                   </span>
 
-                  {/* Experience Label */}
+                  {/* Experience Name */}
                   <span className="text-sm flex-1 truncate">
-                    {experience.label}
+                    {experience.name}
                   </span>
 
                   {/* Enabled/Disabled Indicator */}

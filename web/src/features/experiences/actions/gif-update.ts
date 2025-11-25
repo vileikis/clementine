@@ -3,13 +3,13 @@
 /**
  * Server Action: Update GIF Experience
  *
- * Updates an existing GIF experience with the discriminated union schema.
- * Part of 004-multi-experience-editor implementation (User Story 2).
+ * Updates an existing GIF experience in the root /experiences collection.
+ * Refactored for normalized Firestore design (data-model-v4).
  *
  * This action:
  * - Validates input using updateGifExperienceSchema
  * - Fetches existing experience document with schema validation
- * - Merges partial updates with existing config and aiConfig
+ * - Merges partial updates with existing captureConfig and aiPhotoConfig
  * - Writes to Firestore using Admin SDK
  * - Revalidates the experience page
  */
@@ -20,8 +20,8 @@ import {
   updateGifExperienceSchema,
   gifExperienceSchema,
   type GifExperience,
-  type GifConfig,
-  type AiConfig
+  type GifCaptureConfig,
+  type AiPhotoConfig
 } from "../schemas";
 import type { ActionResponse } from "./types";
 import { ErrorCodes } from "./types";
@@ -31,25 +31,22 @@ import { checkAuth, getExperienceDocument, createSuccessResponse, createErrorRes
  * Type for partial update input
  */
 type UpdateGifExperienceInput = {
-  label?: string;
+  name?: string;
   enabled?: boolean;
-  hidden?: boolean;
-  previewPath?: string | null;
+  previewMediaUrl?: string | null;
   previewType?: "image" | "gif" | "video" | null;
-  config?: Partial<GifConfig>;
-  aiConfig?: Partial<AiConfig>;
+  captureConfig?: Partial<GifCaptureConfig>;
+  aiPhotoConfig?: Partial<AiPhotoConfig>;
 };
 
 /**
- * Updates an existing GIF experience for an event.
+ * Updates an existing GIF experience.
  *
- * @param eventId - Event ID
  * @param experienceId - Experience ID
  * @param input - Partial update data
  * @returns ActionResponse with updated GifExperience or error
  */
 export async function updateGifExperience(
-  eventId: string,
   experienceId: string,
   input: UpdateGifExperienceInput
 ): Promise<ActionResponse<GifExperience>> {
@@ -62,7 +59,7 @@ export async function updateGifExperience(
     const validated = updateGifExperienceSchema.parse(input);
 
     // Get experience document (validates existence and returns doc in one read)
-    const result = await getExperienceDocument(eventId, experienceId);
+    const result = await getExperienceDocument(experienceId);
     if ("error" in result) return result.error;
 
     const experienceDoc = result.doc;
@@ -81,24 +78,23 @@ export async function updateGifExperience(
     const updatedExperience: GifExperience = {
       ...currentExperience,
       // Update basic fields if provided
-      ...(validated.label !== undefined && { label: validated.label }),
+      ...(validated.name !== undefined && { name: validated.name }),
       ...(validated.enabled !== undefined && { enabled: validated.enabled }),
-      ...(validated.hidden !== undefined && { hidden: validated.hidden }),
-      ...(validated.previewPath !== undefined && {
-        previewPath: validated.previewPath,
+      ...(validated.previewMediaUrl !== undefined && {
+        previewMediaUrl: validated.previewMediaUrl,
       }),
       ...(validated.previewType !== undefined && {
         previewType: validated.previewType,
       }),
-      // Deep merge config object
-      config: {
-        ...currentExperience.config,
-        ...(validated.config !== undefined && validated.config),
+      // Deep merge captureConfig object
+      captureConfig: {
+        ...currentExperience.captureConfig,
+        ...(validated.captureConfig !== undefined && validated.captureConfig),
       },
-      // Deep merge aiConfig object
-      aiConfig: {
-        ...currentExperience.aiConfig,
-        ...(validated.aiConfig !== undefined && validated.aiConfig),
+      // Deep merge aiPhotoConfig object
+      aiPhotoConfig: {
+        ...currentExperience.aiPhotoConfig,
+        ...(validated.aiPhotoConfig !== undefined && validated.aiPhotoConfig),
       },
       // Update timestamp
       updatedAt: Date.now(),
@@ -110,10 +106,11 @@ export async function updateGifExperience(
     // Write to Firestore
     await experienceRef.set(validatedExperience);
 
-    // Revalidate the experience page
-    revalidatePath(`/events/${eventId}/experiences/${experienceId}`);
-    // Also revalidate the event page (list view)
-    revalidatePath(`/events/${eventId}`);
+    // Revalidate pages for all attached events
+    for (const eventId of currentExperience.eventIds) {
+      revalidatePath(`/events/${eventId}/experiences/${experienceId}`);
+      revalidatePath(`/events/${eventId}`);
+    }
 
     return createSuccessResponse(validatedExperience);
   } catch (error) {

@@ -76,13 +76,12 @@ export function ExperiencesList({
                   <span className="text-base" aria-hidden="true">
                     {experience.type === "photo" ? "📷" :
                      experience.type === "video" ? "🎥" :
-                     experience.type === "gif" ? "🎞️" :
-                     experience.type === "wheel" ? "🎡" : null}
+                     experience.type === "gif" ? "🎞️" : null}
                   </span>
 
-                  {/* Experience Label */}
+                  {/* Experience Name */}
                   <span className="text-sm flex-1 truncate">
-                    {experience.label}
+                    {experience.name}
                   </span>
 
                   {/* Enabled/Disabled Indicator */}

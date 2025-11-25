@@ -16,25 +16,25 @@ import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface DeleteExperienceButtonProps {
-  experienceLabel: string;
+  experienceName: string;
   onDelete: () => Promise<void>;
   disabled?: boolean;
 }
 
 /**
  * DeleteExperienceButton - Shared component for deleting experiences
- * Part of Phase 2 (User Story 1) - Edit Shared Experience Fields
+ * Refactored for normalized Firestore design (data-model-v4).
  *
  * Provides a consistent delete flow for all experience types:
  * - Delete button with trash icon
- * - Confirmation dialog with experience label
+ * - Confirmation dialog with experience name
  * - Loading state during deletion
  * - Success/error toast notifications
  *
  * Used by: PhotoExperienceEditor, GifExperienceEditor, VideoExperienceEditor, etc.
  */
 export function DeleteExperienceButton({
-  experienceLabel,
+  experienceName,
   onDelete,
   disabled,
 }: DeleteExperienceButtonProps) {
@@ -74,7 +74,7 @@ export function DeleteExperienceButton({
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Experience?</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete &quot;{experienceLabel}&quot;? This
+              Are you sure you want to delete &quot;{experienceName}&quot;? This
               action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
