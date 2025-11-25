@@ -38,7 +38,7 @@ This feature implements the **Dedicated Editor Route**. It allows users to defin
 
 - **Upload:** Area to drag-and-drop a test file (matching the Input Configuration).
 - **Generate Button:** Triggers the AI transformation.
-- Logic from AI transfomrations /Users/iggyvileikis/Projects/@attempt-n2/clementine/web/src/lib/ai
+- Logic from AI transformations /Users/iggyvileikis/Projects/@attempt-n2/clementine/web/src/lib/ai
 - See Google Gemeni models docs https://ai.google.dev/gemini-api/docs/image-generation?batch=file#javascript_9
 
 ### 4.2 Output & Iteration
