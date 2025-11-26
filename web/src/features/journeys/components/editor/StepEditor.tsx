@@ -25,10 +25,11 @@ import {
 import {
   InfoStepEditor,
   ExperiencePickerEditor,
+  CaptureStepEditor,
 } from "@/features/steps/components/editors";
 import { useStepMutations } from "../../hooks";
 import { getStepTypeMeta } from "@/features/steps/constants";
-import type { Step, StepInfo, StepExperiencePicker } from "@/features/steps/types";
+import type { Step, StepInfo, StepExperiencePicker, StepCapture } from "@/features/steps/types";
 import type { Experience } from "@/features/experiences/types";
 
 interface StepEditorProps {
@@ -160,8 +161,17 @@ function renderEditor(
         />
       );
 
-    // TODO: Add editors for other step types in Phase 7-9
     case "capture":
+      return (
+        <CaptureStepEditor
+          step={step as StepCapture}
+          experiences={experiences}
+          onUpdate={onUpdate}
+          onPreviewChange={onPreviewChange}
+        />
+      );
+
+    // TODO: Add editors for other step types in Phase 8-9
     case "short_text":
     case "long_text":
     case "multiple_choice":
