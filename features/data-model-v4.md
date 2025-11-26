@@ -19,13 +19,13 @@ All data related to an event is organized under root collections, linked by an `
 
 ### Collection Map
 
-| Collection Path | Purpose                                                                                                            | Key Role                                                 |
-| :-------------- | :----------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------- |
-| `/events`       | **Root Container.** Stores high-level settings and the real-time "Switchboard" state.                              | The single source of truth for what is currently active. |
-| `/experiences`  | **Experience Library.** Stores reusable configurations for AI rules, hardware settings, and required user inputs.  | The "Recipe book" for AI experiences.                    |
-| `/journeys`     | **Playlist Sequence.** Defines a linear ordering of steps. It does not contain step content.                       | The skeleton of an experience.                           |
-| `/steps`        | **Screen Content.** Stores the configuration for individual UI screens (Welcome, Selection, Capture, Form).        | The building blocks of the user interface.               |
-| `/sessions`     | **Guest Runs.** Transactional records of a single user's progress, answers, and generated media through a Journey. | The "save state" for a guest.                            |
+| Collection Path | Purpose                                                                                                                 | Key Role                                                 |
+| :-------------- | :---------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------- |
+| `/events`       | **Root Container.** Stores high-level settings and the real-time "Switchboard" state.                                   | The single source of truth for what is currently active. |
+| `/experiences`  | **Experience Library.** Stores reusable configurations for AI rules, hardware settings, and required user inputs.       | The "Recipe book" for AI experiences.                    |
+| `/journeys`     | **Playlist Sequence.** Defines a linear ordering of steps. It does not contain step content.                            | The skeleton of an experience.                           |
+| `/steps`        | **Screen Content.** Stores the configuration for individual UI screens (Info, Experience Picker, Capture, Input, etc.). | The building blocks of the user interface.               |
+| `/sessions`     | **Guest Runs.** Transactional records of a single user's progress, answers, and generated media through a Journey.      | The "save state" for a guest.                            |
 
 ### Relationship Diagram
 
@@ -183,18 +183,36 @@ interface Journey {
 
 Steps are the actual screens a user interacts with. We use a **Discriminated Union** to define the specific configuration for each step type while sharing a common base.
 
+#### Step Type Categories
+
+| Category             | Types                                                                            | Purpose                                              |
+| :------------------- | :------------------------------------------------------------------------------- | :--------------------------------------------------- |
+| **Navigation**       | `info`, `experience-picker`                                                      | Guide users through the journey                      |
+| **Media Capture**    | `capture`                                                                        | Camera/photo/video capture (loads Experience config) |
+| **Input Collection** | `short_text`, `long_text`, `multiple_choice`, `yes_no`, `opinion_scale`, `email` | Collect user data                                    |
+| **Completion**       | `processing`, `reward`                                                           | Show results and final content                       |
+
 #### The Base Interface (Universal UI)
 
 All steps share these common layout properties.
 
 ```typescript
 export type StepType =
-  | "welcome"
-  | "selection"
-  | "capture"
-  | "form"
-  | "processing"
-  | "result";
+  // Navigation
+  | "info" // Universal message/welcome screen
+  | "experience-picker" // Choose an Experience
+  // Media Capture
+  | "capture" // Camera capture (loads Experience config at runtime)
+  // Input Collection (one question per screen)
+  | "short_text"
+  | "long_text"
+  | "multiple_choice"
+  | "yes_no"
+  | "opinion_scale"
+  | "email"
+  // Completion
+  | "processing" // Optional custom loading/generation screen
+  | "reward"; // Final result display
 
 interface StepBase {
   id: string;
@@ -212,60 +230,197 @@ interface StepBase {
 
 #### Specific Step Implementations
 
-**1. The Selection Step (The Router)**
-Allows the user to choose a path, which sets a variable in their session.
+---
+
+**1. Info Step (Universal Message)**
+A flexible screen for welcome messages, instructions, transitions, or any informational content. Replaces the old `welcome` and `statement` step types.
 
 ```typescript
-interface StepSelection extends StepBase {
-  type: "selection";
+interface StepInfo extends StepBase {
+  type: "info";
+  // Uses base properties only: title, description, mediaUrl, ctaLabel
+  // No additional config needed
+}
+```
+
+---
+
+**2. Experience Picker Step (The Router)**
+Allows the user to choose an Experience, which sets a variable in their session.
+
+```typescript
+interface StepExperiencePicker extends StepBase {
+  type: "experience-picker";
   config: {
     layout: "grid" | "list" | "carousel";
-    variableName: string; // The session key to save the choice to (e.g. "selected_experience_id")
-
+    variable: string; // The session key to save the choice to (e.g., "selected_experience_id")
     options: Array<{
       id: string; // Unique ID for this option
       label: string; // Display text
-      value: string; // The value saved to the variable (e.g. a Experience ID: "experience_hero_123")
-      imageUrl?: string; // Custom icon for the button
+      value: string; // The value saved to the variable (e.g., an Experience ID: "experience_hero_123")
+      imageUrl?: string; // Custom thumbnail for the option
     }>;
   };
 }
 ```
 
-**2. The Capture Step (The Consumer)**
-This step is a chameleon. It looks at a session variable (set by a previous Selection step) to find a Experience ID, loads that Experience, and then configures the camera and AI accordingly.
+---
+
+**3. Capture Step (The Consumer)**
+This step is a chameleon. It looks at a session variable (set by a previous Experience Picker step) to find an Experience ID, loads that Experience, and then configures the camera and AI accordingly.
 
 ```typescript
 interface StepCapture extends StepBase {
   type: "capture";
   config: {
-    // The name of the session variable that holds the Experience ID.
-    // e.g., "selected_experience_id" from the Selection Step above.
+    // The session variable key that holds the Experience ID.
+    // e.g., "selected_experience_id" from the Experience Picker Step above.
     sourceVariable: string;
 
-    // Optional default in case the variable isn't set.
+    // Optional default Experience ID if the variable isn't set.
     fallbackExperienceId?: string;
   };
   // Note: No hardcoded hardware/AI config here. It's all injected at runtime from the Experience.
 }
 ```
 
-**3. The Form Step (Blocking Input)**
-A dedicated screen for collecting data, separate from the capture process.
+---
+
+**4. Input Steps (One Question Per Screen)**
+Each input type is its own step, allowing granular control over the user journey. All input steps save their value to session data using a `variable` key.
+
+**Short Text Input**
 
 ```typescript
-import { FieldConfig } from "../experiences"; // Reusing the field definition
-
-interface StepForm extends StepBase {
-  type: "form";
+interface StepShortText extends StepBase {
+  type: "short_text";
   config: {
-    // A list of fields to present on this screen.
-    fields: FieldConfig[];
+    variable: string; // Session key to save the response (e.g., "guest_name")
+    placeholder?: string;
+    maxLength?: number; // Default: 500
+    required?: boolean; // Default: true
   };
 }
 ```
 
-_(Other types like `welcome`, `processing`, and `result` would follow a similar pattern with minimal configs)._
+**Long Text Input**
+
+```typescript
+interface StepLongText extends StepBase {
+  type: "long_text";
+  config: {
+    variable: string;
+    placeholder?: string;
+    maxLength?: number; // Default: 2000
+    required?: boolean;
+  };
+}
+```
+
+**Multiple Choice**
+
+```typescript
+interface StepMultipleChoice extends StepBase {
+  type: "multiple_choice";
+  config: {
+    variable: string;
+    options: Array<{
+      label: string;
+      value: string;
+    }>;
+    allowMultiple?: boolean; // Default: false
+    required?: boolean;
+  };
+}
+```
+
+**Yes/No**
+
+```typescript
+interface StepYesNo extends StepBase {
+  type: "yes_no";
+  config: {
+    variable: string;
+    yesLabel?: string; // Default: "Yes"
+    noLabel?: string; // Default: "No"
+    required?: boolean;
+  };
+}
+```
+
+**Opinion Scale**
+
+```typescript
+interface StepOpinionScale extends StepBase {
+  type: "opinion_scale";
+  config: {
+    variable: string;
+    scaleMin: number; // e.g., 1
+    scaleMax: number; // e.g., 10
+    minLabel?: string; // e.g., "Not likely"
+    maxLabel?: string; // e.g., "Very likely"
+    required?: boolean;
+  };
+}
+```
+
+**Email**
+
+```typescript
+interface StepEmail extends StepBase {
+  type: "email";
+  config: {
+    variable: string;
+    placeholder?: string; // Default: "your@email.com"
+    required?: boolean;
+  };
+}
+```
+
+---
+
+**5. Processing Step (Optional Loading Screen)**
+An optional step to show a custom loading/generation screen with branded visuals and messaging while AI processing occurs. If omitted, the Reward step handles its own loading state.
+
+```typescript
+interface StepProcessing extends StepBase {
+  type: "processing";
+  config: {
+    // Optional: Rotating messages during generation
+    messages?: string[]; // e.g., ["Generating your image...", "Almost there..."]
+    estimatedDuration?: number; // Seconds - for progress indication
+  };
+  // Note: Use base `mediaUrl` for custom loading animation (Lottie, GIF, video)
+}
+```
+
+---
+
+**6. Reward Step (Final Result)**
+The final screen showing the generated result with sharing options.
+
+```typescript
+type ShareSocial =
+  | "instagram"
+  | "tiktok"
+  | "facebook"
+  | "x"
+  | "snapchat"
+  | "whatsapp"
+  | "custom";
+
+interface StepReward extends StepBase {
+  type: "reward";
+  config: {
+    // Share settings
+    allowDownload?: boolean; // Default: true
+    allowSystemShare?: boolean; // Default: true - native OS share sheet
+    allowEmail?: boolean; // Default: false
+    socials?: ShareSocial[]; // Default: [] - specific social platforms to show
+  };
+  // Note: If AI result is not ready, shows loading state automatically
+}
+```
 
 ---
 
@@ -286,13 +441,14 @@ interface Session {
 
   // THE DATA STORE
   // A key-value map of all data collected during the session.
-  // Keys correspond to 'variableName' in steps or 'id' in fields.
+  // Keys correspond to 'variableName' in steps.
   data: {
-    // From Selection Steps:
+    // From Experience Picker Steps:
     selected_experience_id?: string; // e.g., "experience_hero_123"
 
-    // From Form Steps or Experience Inputs:
+    // From Input Steps (short_text, long_text, email, etc.):
     guest_name?: string; // e.g., "Alex"
+    guest_email?: string; // e.g., "alex@example.com"
 
     // From Capture Steps (The raw media info):
     capture_result_raw?: {
@@ -301,7 +457,7 @@ interface Session {
       mimeType: string;
     };
 
-    // From AI Processing (The final output):
+    // From AI Processing (The final output for Reward step):
     ai_result_final?: {
       url: string;
       generationId: string;
