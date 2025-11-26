@@ -117,7 +117,7 @@
 
 - **FAR-001**: All write operations (create/update/delete) MUST use Admin SDK via Server Actions (`web/src/lib/firebase/admin.ts`)
 - **FAR-002**: Real-time subscriptions and optimistic reads MUST use Client SDK (`web/src/lib/firebase/client.ts`)
-- **FAR-003**: All data schemas and validation logic MUST be located in `web/src/lib/schemas/`
+- **FAR-003**: Zod schemas MUST be feature-local in `features/[name]/schemas/` (see Constitution Principle VII); cross-cutting schemas may use `web/src/lib/schemas/`
 - **FAR-004**: Public images MUST be stored as full public URLs (not relative paths) for instant rendering
 - **FAR-005**: [Add feature-specific Firebase requirements]
 
