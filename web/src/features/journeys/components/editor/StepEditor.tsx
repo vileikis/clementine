@@ -22,10 +22,13 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { InfoStepEditor } from "@/features/steps/components/editors";
+import {
+  InfoStepEditor,
+  ExperiencePickerEditor,
+} from "@/features/steps/components/editors";
 import { useStepMutations } from "../../hooks";
 import { getStepTypeMeta } from "@/features/steps/constants";
-import type { Step, StepInfo } from "@/features/steps/types";
+import type { Step, StepInfo, StepExperiencePicker } from "@/features/steps/types";
 
 interface StepEditorProps {
   eventId: string;
@@ -141,8 +144,16 @@ function renderEditor(
         />
       );
 
-    // TODO: Add editors for other step types in Phase 6-9
     case "experience-picker":
+      return (
+        <ExperiencePickerEditor
+          step={step as StepExperiencePicker}
+          onUpdate={onUpdate}
+          onPreviewChange={onPreviewChange}
+        />
+      );
+
+    // TODO: Add editors for other step types in Phase 7-9
     case "capture":
     case "short_text":
     case "long_text":

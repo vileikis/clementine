@@ -19,6 +19,7 @@ import {
   YesNoStep,
   OpinionScaleStep,
   EmailStep,
+  ExperiencePickerStep,
 } from "@/features/steps/components/preview";
 import type { Step } from "@/features/steps/types";
 import type { EventTheme } from "@/features/events/types";
@@ -65,9 +66,8 @@ function StepContent({ step }: { step: Step }) {
       return <OpinionScaleStep step={step} />;
     case "email":
       return <EmailStep step={step} />;
-    // Placeholder for step types that will be implemented in later phases
     case "experience-picker":
-      return <PlaceholderStep title="Experience Picker" type={step.type} />;
+      return <ExperiencePickerStep step={step} />;
     case "capture":
       return <PlaceholderStep title="Capture" type={step.type} />;
     case "processing":
