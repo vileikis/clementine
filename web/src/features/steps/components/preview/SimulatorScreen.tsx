@@ -67,7 +67,7 @@ export function SimulatorScreen({ children }: SimulatorScreenProps) {
       )}
 
       {/* Content */}
-      <div className="relative z-10 h-full pt-16">{children}</div>
+      <div className="relative z-5 h-full pt-16">{children}</div>
     </div>
   );
 }
