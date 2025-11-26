@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEventTheme } from "@/components/providers/EventThemeProvider";
 import type { ReactNode } from "react";
 
@@ -24,11 +25,13 @@ export function StepLayout({ children, mediaUrl }: StepLayoutProps) {
       }}
     >
       {mediaUrl && (
-        <div className="w-full aspect-video overflow-hidden">
-          <img
+        <div className="relative w-full aspect-video overflow-hidden">
+          <Image
             src={mediaUrl}
             alt=""
-            className="h-full w-full object-cover"
+            fill
+            className="object-cover"
+            unoptimized
           />
         </div>
       )}
