@@ -26,10 +26,27 @@ import {
   InfoStepEditor,
   ExperiencePickerEditor,
   CaptureStepEditor,
+  ShortTextEditor,
+  LongTextEditor,
+  MultipleChoiceEditor,
+  YesNoEditor,
+  OpinionScaleEditor,
+  EmailEditor,
 } from "@/features/steps/components/editors";
 import { useStepMutations } from "../../hooks";
 import { getStepTypeMeta } from "@/features/steps/constants";
-import type { Step, StepInfo, StepExperiencePicker, StepCapture } from "@/features/steps/types";
+import type {
+  Step,
+  StepInfo,
+  StepExperiencePicker,
+  StepCapture,
+  StepShortText,
+  StepLongText,
+  StepMultipleChoice,
+  StepYesNo,
+  StepOpinionScale,
+  StepEmail,
+} from "@/features/steps/types";
 import type { Experience } from "@/features/experiences/types";
 
 interface StepEditorProps {
@@ -171,13 +188,61 @@ function renderEditor(
         />
       );
 
-    // TODO: Add editors for other step types in Phase 8-9
     case "short_text":
+      return (
+        <ShortTextEditor
+          step={step as StepShortText}
+          onUpdate={onUpdate}
+          onPreviewChange={onPreviewChange}
+        />
+      );
+
     case "long_text":
+      return (
+        <LongTextEditor
+          step={step as StepLongText}
+          onUpdate={onUpdate}
+          onPreviewChange={onPreviewChange}
+        />
+      );
+
     case "multiple_choice":
+      return (
+        <MultipleChoiceEditor
+          step={step as StepMultipleChoice}
+          onUpdate={onUpdate}
+          onPreviewChange={onPreviewChange}
+        />
+      );
+
     case "yes_no":
+      return (
+        <YesNoEditor
+          step={step as StepYesNo}
+          onUpdate={onUpdate}
+          onPreviewChange={onPreviewChange}
+        />
+      );
+
     case "opinion_scale":
+      return (
+        <OpinionScaleEditor
+          step={step as StepOpinionScale}
+          onUpdate={onUpdate}
+          onPreviewChange={onPreviewChange}
+        />
+      );
+
     case "email":
+      return (
+        <EmailEditor
+          step={step as StepEmail}
+          onUpdate={onUpdate}
+          onPreviewChange={onPreviewChange}
+        />
+      );
+
+    // TODO: Add editors for completion step types in Phase 9
     case "processing":
     case "reward":
       return (

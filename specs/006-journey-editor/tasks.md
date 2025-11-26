@@ -170,14 +170,14 @@
 
 ### Implementation for User Story 6
 
-- [ ] T059 [P] [US6] Create ShortTextEditor in `web/src/features/steps/components/editors/ShortTextEditor.tsx`
-- [ ] T060 [P] [US6] Create LongTextEditor in `web/src/features/steps/components/editors/LongTextEditor.tsx`
-- [ ] T061 [P] [US6] Create MultipleChoiceEditor in `web/src/features/steps/components/editors/MultipleChoiceEditor.tsx`
-- [ ] T062 [P] [US6] Create YesNoEditor in `web/src/features/steps/components/editors/YesNoEditor.tsx`
-- [ ] T063 [P] [US6] Create OpinionScaleEditor in `web/src/features/steps/components/editors/OpinionScaleEditor.tsx`
-- [ ] T064 [P] [US6] Create EmailEditor in `web/src/features/steps/components/editors/EmailEditor.tsx`
-- [ ] T065 [US6] Add all input editors to step editors barrel export
-- [ ] T066 [US6] Update StepEditor to route to all input editors
+- [X] T059 [P] [US6] Create ShortTextEditor in `web/src/features/steps/components/editors/ShortTextEditor.tsx`
+- [X] T060 [P] [US6] Create LongTextEditor in `web/src/features/steps/components/editors/LongTextEditor.tsx`
+- [X] T061 [P] [US6] Create MultipleChoiceEditor in `web/src/features/steps/components/editors/MultipleChoiceEditor.tsx`
+- [X] T062 [P] [US6] Create YesNoEditor in `web/src/features/steps/components/editors/YesNoEditor.tsx`
+- [X] T063 [P] [US6] Create OpinionScaleEditor in `web/src/features/steps/components/editors/OpinionScaleEditor.tsx`
+- [X] T064 [P] [US6] Create EmailEditor in `web/src/features/steps/components/editors/EmailEditor.tsx`
+- [X] T065 [US6] Add all input editors to step editors barrel export
+- [X] T066 [US6] Update StepEditor to route to all input editors
 
 **Checkpoint**: User Story 6 complete - all input steps fully configurable
 
