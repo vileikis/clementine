@@ -23,10 +23,12 @@ import {
 } from "@/features/steps/components/preview";
 import type { Step } from "@/features/steps/types";
 import type { EventTheme } from "@/features/events/types";
+import type { Experience } from "@/features/experiences/types";
 
 interface StepPreviewProps {
   step: Step;
   theme: EventTheme;
+  experiences: Experience[];
 }
 
 /**
@@ -36,11 +38,12 @@ interface StepPreviewProps {
 export const StepPreview = memo(function StepPreview({
   step,
   theme,
+  experiences,
 }: StepPreviewProps) {
   return (
     <EventThemeProvider theme={theme}>
       <SimulatorScreen>
-        <StepContent step={step} />
+        <StepContent step={step} experiences={experiences} />
       </SimulatorScreen>
     </EventThemeProvider>
   );
@@ -50,7 +53,13 @@ export const StepPreview = memo(function StepPreview({
  * Internal component that renders the step content based on type.
  * Uses discriminated union pattern for type-safe rendering.
  */
-function StepContent({ step }: { step: Step }) {
+function StepContent({
+  step,
+  experiences,
+}: {
+  step: Step;
+  experiences: Experience[];
+}) {
   switch (step.type) {
     case "info":
       return <InfoStep step={step} />;
@@ -67,7 +76,7 @@ function StepContent({ step }: { step: Step }) {
     case "email":
       return <EmailStep step={step} />;
     case "experience-picker":
-      return <ExperiencePickerStep step={step} />;
+      return <ExperiencePickerStep step={step} experiences={experiences} />;
     case "capture":
       return <PlaceholderStep title="Capture" type={step.type} />;
     case "processing":

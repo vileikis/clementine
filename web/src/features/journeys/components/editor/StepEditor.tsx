@@ -29,10 +29,12 @@ import {
 import { useStepMutations } from "../../hooks";
 import { getStepTypeMeta } from "@/features/steps/constants";
 import type { Step, StepInfo, StepExperiencePicker } from "@/features/steps/types";
+import type { Experience } from "@/features/experiences/types";
 
 interface StepEditorProps {
   eventId: string;
   step: Step;
+  experiences: Experience[];
   onStepDeleted?: () => void;
   onPreviewChange?: (step: Partial<Step>) => void;
 }
@@ -40,6 +42,7 @@ interface StepEditorProps {
 export function StepEditor({
   eventId,
   step,
+  experiences,
   onStepDeleted,
   onPreviewChange,
 }: StepEditorProps) {
@@ -118,7 +121,7 @@ export function StepEditor({
         {isUpdating && (
           <div className="text-xs text-muted-foreground mb-2">Saving...</div>
         )}
-        {renderEditor(step, handleUpdate, handlePreviewChange)}
+        {renderEditor(step, experiences, handleUpdate, handlePreviewChange)}
       </div>
     </div>
   );
@@ -131,6 +134,7 @@ export function StepEditor({
  */
 function renderEditor(
   step: Step,
+  experiences: Experience[],
   onUpdate: (updates: Record<string, unknown>) => Promise<void>,
   onPreviewChange: (values: Record<string, unknown>) => void
 ) {
@@ -148,6 +152,7 @@ function renderEditor(
       return (
         <ExperiencePickerEditor
           step={step as StepExperiencePicker}
+          experiences={experiences}
           onUpdate={onUpdate}
           onPreviewChange={onPreviewChange}
         />

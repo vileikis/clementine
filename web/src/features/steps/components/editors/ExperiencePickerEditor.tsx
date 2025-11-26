@@ -7,16 +7,16 @@
  * Allows configuring:
  * - Layout (grid, list, carousel)
  * - Variable name for storing selection
- * - Experience options (id, label, imageUrl)
+ * - Experience selection from available event experiences
  *
- * Base fields (title, description, mediaUrl, ctaLabel) are handled by BaseStepEditor.
+ * Experience display data (name, previewMediaUrl) is resolved at runtime.
  */
 
-import { useEffect, useCallback, useRef } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useEffect, useCallback, useRef, useMemo } from "react";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Plus, Trash2, GripVertical } from "lucide-react";
+import { AlertCircle, Check, ImageIcon } from "lucide-react";
 import { Form } from "@/components/ui/form";
 import {
   FormField,
@@ -27,7 +27,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -35,9 +34,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { BaseStepEditor } from "./BaseStepEditor";
 import { STEP_CONSTANTS } from "../../constants";
 import type { StepExperiencePicker } from "../../types";
+import type { Experience } from "@/features/experiences/types";
 
 const experiencePickerFormSchema = z.object({
   // Base fields
@@ -53,16 +54,7 @@ const experiencePickerFormSchema = z.object({
       .min(1)
       .max(STEP_CONSTANTS.MAX_VARIABLE_NAME_LENGTH)
       .regex(/^[a-zA-Z_][a-zA-Z0-9_]*$/, "Must be a valid variable name"),
-    options: z
-      .array(
-        z.object({
-          id: z.string(),
-          experienceId: z.string(),
-          label: z.string().min(1).max(100),
-          imageUrl: z.string().url().optional().nullable().or(z.literal("")),
-        })
-      )
-      .max(STEP_CONSTANTS.MAX_EXPERIENCE_OPTIONS),
+    experienceIds: z.array(z.string()).max(STEP_CONSTANTS.MAX_EXPERIENCE_OPTIONS),
   }),
 });
 
@@ -70,16 +62,21 @@ type ExperiencePickerFormValues = z.infer<typeof experiencePickerFormSchema>;
 
 interface ExperiencePickerEditorProps {
   step: StepExperiencePicker;
+  experiences: Experience[];
   onUpdate: (updates: Partial<ExperiencePickerFormValues>) => Promise<void>;
   onPreviewChange?: (values: ExperiencePickerFormValues) => void;
 }
 
 export function ExperiencePickerEditor({
   step,
+  experiences,
   onUpdate,
   onPreviewChange,
 }: ExperiencePickerEditorProps) {
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Provide defaults for config in case it's undefined
+  const config = step.config ?? { layout: "grid" as const, variable: "selected_experience_id", experienceIds: [] };
 
   const form = useForm<ExperiencePickerFormValues>({
     resolver: zodResolver(experiencePickerFormSchema),
@@ -89,22 +86,25 @@ export function ExperiencePickerEditor({
       mediaUrl: step.mediaUrl ?? "",
       ctaLabel: step.ctaLabel ?? "",
       config: {
-        layout: step.config.layout,
-        variable: step.config.variable,
-        options: step.config.options.map((opt) => ({
-          id: opt.id,
-          experienceId: opt.experienceId,
-          label: opt.label,
-          imageUrl: opt.imageUrl ?? "",
-        })),
+        layout: config.layout,
+        variable: config.variable,
+        experienceIds: config.experienceIds || [],
       },
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
-    control: form.control,
-    name: "config.options",
-  });
+
+  const selectedIds = form.watch("config.experienceIds");
+
+
+  // Track which experienceIds reference missing experiences
+  const missingExperienceIds = useMemo(() => {
+    const availableIds = new Set((experiences ?? []).map((e) => e.id));
+    console.log("----availableIds", availableIds);
+    console.log("----config.experienceIds", JSON.stringify(config.experienceIds, null, 2));
+
+    return config.experienceIds?.filter((id) => !availableIds.has(id)) ?? [];
+  }, [config.experienceIds, experiences]);
 
   // Reset form when step ID changes
   useEffect(() => {
@@ -114,14 +114,9 @@ export function ExperiencePickerEditor({
       mediaUrl: step.mediaUrl ?? "",
       ctaLabel: step.ctaLabel ?? "",
       config: {
-        layout: step.config.layout,
-        variable: step.config.variable,
-        options: step.config.options.map((opt) => ({
-          id: opt.id,
-          experienceId: opt.experienceId,
-          label: opt.label,
-          imageUrl: opt.imageUrl ?? "",
-        })),
+        layout: config.layout,
+        variable: config.variable,
+        experienceIds: config.experienceIds,
       },
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -148,7 +143,6 @@ export function ExperiencePickerEditor({
       const isValid = await form.trigger();
       if (isValid) {
         const values = form.getValues();
-        // Build updates object
         const updates: Partial<ExperiencePickerFormValues> = {};
 
         if (values.title !== step.title) updates.title = values.title || null;
@@ -160,23 +154,15 @@ export function ExperiencePickerEditor({
           updates.ctaLabel = values.ctaLabel || null;
 
         // Check config changes
+        const stepConfig = step.config ?? { layout: "grid", variable: "selected_experience_id", experienceIds: [] };
         const configChanged =
-          values.config.layout !== step.config.layout ||
-          values.config.variable !== step.config.variable ||
-          JSON.stringify(values.config.options) !==
-            JSON.stringify(step.config.options);
+          values.config.layout !== stepConfig.layout ||
+          values.config.variable !== stepConfig.variable ||
+          JSON.stringify(values.config.experienceIds) !==
+            JSON.stringify(stepConfig.experienceIds);
 
         if (configChanged) {
-          updates.config = {
-            layout: values.config.layout,
-            variable: values.config.variable,
-            options: values.config.options.map((opt) => ({
-              id: opt.id,
-              experienceId: opt.experienceId,
-              label: opt.label,
-              imageUrl: opt.imageUrl || null,
-            })),
-          };
+          updates.config = values.config;
         }
 
         if (Object.keys(updates).length > 0) {
@@ -186,6 +172,27 @@ export function ExperiencePickerEditor({
     }, 300);
   }, [form, step, onUpdate]);
 
+  // Save immediately when experience selection changes
+  const handleExperienceToggle = useCallback(
+    async (experienceId: string, checked: boolean) => {
+      const currentIds = form.getValues("config.experienceIds");
+      const newIds = checked
+        ? [...currentIds, experienceId]
+        : currentIds.filter((id) => id !== experienceId);
+
+      form.setValue("config.experienceIds", newIds);
+
+      // Save immediately
+      await onUpdate({
+        config: {
+          ...form.getValues("config"),
+          experienceIds: newIds,
+        },
+      });
+    },
+    [form, onUpdate]
+  );
+
   // Cleanup debounce on unmount
   useEffect(() => {
     return () => {
@@ -194,16 +201,6 @@ export function ExperiencePickerEditor({
       }
     };
   }, []);
-
-  const handleAddOption = () => {
-    const newId = `opt_${Date.now()}`;
-    append({
-      id: newId,
-      experienceId: "",
-      label: `Option ${fields.length + 1}`,
-      imageUrl: "",
-    });
-  };
 
   return (
     <Form {...form}>
@@ -269,94 +266,76 @@ export function ExperiencePickerEditor({
           )}
         />
 
-        {/* Options */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <FormLabel>Options</FormLabel>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleAddOption}
-              disabled={fields.length >= STEP_CONSTANTS.MAX_EXPERIENCE_OPTIONS}
-            >
-              <Plus className="h-4 w-4 mr-1" />
-              Add Option
-            </Button>
+        {/* Missing Experiences Warning */}
+        {missingExperienceIds.length > 0 && (
+          <div className="flex items-start gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg text-sm">
+            <AlertCircle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
+            <div>
+              <p className="font-medium text-destructive">Missing experiences</p>
+              <p className="text-muted-foreground">
+                {missingExperienceIds.length} selected experience(s) no longer exist
+                in this event.
+              </p>
+            </div>
           </div>
+        )}
 
-          {fields.length === 0 && (
+        {/* Experience Selection */}
+        <div className="space-y-3">
+          <FormLabel>Select Experiences</FormLabel>
+          {!experiences || experiences.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-4">
-              No options added yet. Add options for guests to choose from.
+              No experiences available for this event.
             </p>
+          ) : (
+            <div className="space-y-2">
+              {experiences.map((experience) => {
+                const isSelected = selectedIds.includes(experience.id);
+                return (
+                  <label
+                    key={experience.id}
+                    className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${
+                      isSelected
+                        ? "border-primary bg-primary/5"
+                        : "border-border hover:bg-muted/50"
+                    }`}
+                  >
+                    <Checkbox
+                      checked={isSelected}
+                      onCheckedChange={(checked) =>
+                        handleExperienceToggle(experience.id, checked === true)
+                      }
+                    />
+                    {experience.previewMediaUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={experience.previewMediaUrl}
+                        alt=""
+                        className="h-10 w-10 rounded object-cover shrink-0"
+                      />
+                    ) : (
+                      <div className="h-10 w-10 rounded bg-muted flex items-center justify-center shrink-0">
+                        <ImageIcon className="h-5 w-5 text-muted-foreground" />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">{experience.name}</p>
+                      <p className="text-xs text-muted-foreground capitalize">
+                        {experience.type}
+                      </p>
+                    </div>
+                    {isSelected && (
+                      <Check className="h-4 w-4 text-primary shrink-0" />
+                    )}
+                  </label>
+                );
+              })}
+            </div>
           )}
-
-          <div className="space-y-3">
-            {fields.map((field, index) => (
-              <div
-                key={field.id}
-                className="flex items-start gap-2 p-3 border rounded-lg bg-muted/30"
-              >
-                <GripVertical className="h-5 w-5 text-muted-foreground mt-2 shrink-0" />
-                <div className="flex-1 space-y-2">
-                  <FormField
-                    control={form.control}
-                    name={`config.options.${index}.label`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <Input placeholder="Option label" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name={`config.options.${index}.experienceId`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <Input
-                            placeholder="Experience ID"
-                            {...field}
-                            className="font-mono text-xs"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name={`config.options.${index}.imageUrl`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <Input
-                            placeholder="Image URL (optional)"
-                            type="url"
-                            {...field}
-                            value={field.value ?? ""}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => remove(index)}
-                  className="h-8 w-8 text-muted-foreground hover:text-destructive shrink-0"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
-          </div>
+          <FormDescription>
+            {selectedIds.length} of {STEP_CONSTANTS.MAX_EXPERIENCE_OPTIONS} max
+            selected
+          </FormDescription>
         </div>
       </form>
     </Form>
