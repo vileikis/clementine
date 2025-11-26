@@ -25,14 +25,14 @@
 
 **Purpose**: Project initialization and shared building blocks
 
-- [ ] T001 [P] Create EventThemeProvider context in `web/src/components/providers/EventThemeProvider.tsx`
-- [ ] T002 [P] Create step-primitives barrel export in `web/src/components/step-primitives/index.ts`
-- [ ] T003 [P] Create StepLayout primitive in `web/src/components/step-primitives/StepLayout.tsx`
-- [ ] T004 [P] Create ActionButton primitive in `web/src/components/step-primitives/ActionButton.tsx`
-- [ ] T005 [P] Create OptionButton primitive in `web/src/components/step-primitives/OptionButton.tsx`
-- [ ] T006 [P] Create ScaleButton primitive in `web/src/components/step-primitives/ScaleButton.tsx`
-- [ ] T007 [P] Create TextInput primitive in `web/src/components/step-primitives/TextInput.tsx`
-- [ ] T008 [P] Create TextArea primitive in `web/src/components/step-primitives/TextArea.tsx`
+- [X] T001 [P] Create EventThemeProvider context in `web/src/components/providers/EventThemeProvider.tsx`
+- [X] T002 [P] Create step-primitives barrel export in `web/src/components/step-primitives/index.ts`
+- [X] T003 [P] Create StepLayout primitive in `web/src/components/step-primitives/StepLayout.tsx`
+- [X] T004 [P] Create ActionButton primitive in `web/src/components/step-primitives/ActionButton.tsx`
+- [X] T005 [P] Create OptionButton primitive in `web/src/components/step-primitives/OptionButton.tsx`
+- [X] T006 [P] Create ScaleButton primitive in `web/src/components/step-primitives/ScaleButton.tsx`
+- [X] T007 [P] Create TextInput primitive in `web/src/components/step-primitives/TextInput.tsx`
+- [X] T008 [P] Create TextArea primitive in `web/src/components/step-primitives/TextArea.tsx`
 
 ---
 
@@ -42,17 +42,17 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T009 Create step type definitions in `web/src/features/steps/types/step.types.ts`
-- [ ] T010 Create step constants in `web/src/features/steps/constants.ts`
-- [ ] T011 Create Zod schemas for all 11 step types in `web/src/features/steps/schemas/step.schemas.ts`
-- [ ] T012 Create steps repository in `web/src/features/steps/repositories/steps.repository.ts`
-- [ ] T013 Implement listStepsAction server action in `web/src/features/steps/actions/steps.ts`
-- [ ] T014 Implement getStepAction server action in `web/src/features/steps/actions/steps.ts`
-- [ ] T015 Implement createStepAction server action in `web/src/features/steps/actions/steps.ts`
-- [ ] T016 Implement updateStepAction server action in `web/src/features/steps/actions/steps.ts`
-- [ ] T017 Implement deleteStepAction server action in `web/src/features/steps/actions/steps.ts`
-- [ ] T018 Implement reorderStepsAction server action in `web/src/features/steps/actions/steps.ts`
-- [ ] T019 Create steps feature barrel export in `web/src/features/steps/index.ts`
+- [X] T009 Create step type definitions in `web/src/features/steps/types/step.types.ts`
+- [X] T010 Create step constants in `web/src/features/steps/constants.ts`
+- [X] T011 Create Zod schemas for all 11 step types in `web/src/features/steps/schemas/step.schemas.ts`
+- [X] T012 Create steps repository in `web/src/features/steps/repositories/steps.repository.ts`
+- [X] T013 Implement listStepsAction server action in `web/src/features/steps/actions/steps.ts`
+- [X] T014 Implement getStepAction server action in `web/src/features/steps/actions/steps.ts`
+- [X] T015 Implement createStepAction server action in `web/src/features/steps/actions/steps.ts`
+- [X] T016 Implement updateStepAction server action in `web/src/features/steps/actions/steps.ts`
+- [X] T017 Implement deleteStepAction server action in `web/src/features/steps/actions/steps.ts`
+- [X] T018 Implement reorderStepsAction server action in `web/src/features/steps/actions/steps.ts`
+- [X] T019 Create steps feature barrel export in `web/src/features/steps/index.ts`
 
 **Checkpoint**: Steps data layer ready - user story implementation can now begin
 
