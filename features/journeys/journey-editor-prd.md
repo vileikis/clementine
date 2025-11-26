@@ -10,7 +10,7 @@ The Journey Editor is a visual canvas for creating and editing guest journeys (s
 
 ### Shared Components Strategy
 
-The Journey Editor uses a **composition-based architecture** that separates visual presentation from interactive behavior. This enables code reuse across the simulator (editor previews) and guest-facing experience while keeping concerns cleanly separated.
+The Journey Editor uses a **composition-based architecture** that separates visual presentation from interactive behavior. The `steps` feature module owns all step-related code (data, previews, editors), while the `journeys` feature provides the editor layout/orchestration.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -19,24 +19,27 @@ The Journey Editor uses a **composition-based architecture** that separates visu
 │                    (Shared theme context)                            │
 └─────────────────────────────────────────────────────────────────────┘
                                  │
-                    ┌────────────┴────────────┐
-                    ▼                         ▼
-┌─────────────────────────────┐   ┌─────────────────────────────────┐
-│   features/simulator/       │   │   features/guest/               │
-│   (Display-only previews)   │   │   (Interactive experience)      │
-│                             │   │                                 │
-│   - SimulatorScreen         │   │   - Uses step-primitives        │
-│   - steps/ (read-only)      │   │   - Adds form state, validation │
-└─────────────────────────────┘   │   - Handles navigation, submit  │
-              │                   └─────────────────────────────────┘
-              │                                  │
-              └──────────────┬───────────────────┘
-                             ▼
-              ┌─────────────────────────────────┐
-              │   components/step-primitives/   │
-              │   (Shared visual building       │
-              │    blocks - no behavior)        │
-              └─────────────────────────────────┘
+        ┌────────────────────────┼────────────────────────┐
+        ▼                        ▼                        ▼
+┌─────────────────────┐  ┌─────────────────────┐  ┌─────────────────────┐
+│  features/steps/    │  │  features/journeys/ │  │  features/guest/    │
+│  (Step module)      │  │  (Editor layout)    │  │  (Interactive)      │
+│                     │  │                     │  │                     │
+│  - types/schemas    │  │  - JourneyEditor    │  │  - Uses primitives  │
+│  - CRUD actions     │  │  - StepList         │  │  - Form state       │
+│  - components/      │  │  - StepPreview      │  │  - Navigation       │
+│    - preview/       │  │  - StepEditor       │  │  - API calls        │
+│    - editors/       │  │    (routes to       │  │                     │
+│                     │  │     steps/editors)  │  │                     │
+└─────────────────────┘  └─────────────────────┘  └─────────────────────┘
+        │                                                 │
+        └─────────────────────┬───────────────────────────┘
+                              ▼
+               ┌─────────────────────────────────┐
+               │   components/step-primitives/   │
+               │   (Shared visual building       │
+               │    blocks - no behavior)        │
+               └─────────────────────────────────┘
 ```
 
 ### Key Architectural Decisions
@@ -44,8 +47,9 @@ The Journey Editor uses a **composition-based architecture** that separates visu
 | Decision | Rationale |
 |----------|-----------|
 | **EventThemeProvider in `components/providers/`** | Used by 3+ features (events, journeys, guest) - belongs in shared space |
-| **Simulator feature for display-only steps** | Editor previews are read-only; separate from interactive guest logic |
-| **Step primitives for shared visuals** | Visual consistency without mixing behavior; both simulator and guest import these |
+| **Steps feature owns all step code** | Data layer (types, schemas, CRUD) + presentation (preview, editors) in one cohesive module |
+| **Journeys feature is thin orchestrator** | Only layout/composition - imports step components from `features/steps/` |
+| **Step primitives for shared visuals** | Visual consistency without mixing behavior; both steps and guest import these |
 | **Guest feature owns interactive behavior** | Form state, validation, navigation, API calls belong to guest domain |
 
 ---
@@ -190,9 +194,9 @@ See `features/data-model-v4.md` for complete step type definitions.
 #### Component Composition
 
 ```tsx
-// Journey Editor uses simulator components
-import { SimulatorScreen } from "@/features/simulator";
-import { InfoStep, CaptureStep } from "@/features/simulator/steps";
+// Journey Editor uses step preview components from steps feature
+import { SimulatorScreen } from "@/features/steps/components/preview";
+import { InfoStep, CaptureStep } from "@/features/steps/components/preview/steps";
 import { EventThemeProvider } from "@/components/providers";
 
 <EventThemeProvider theme={event.theme}>
@@ -420,28 +424,33 @@ interface StepCapture {
 
 | Legacy Component | New Location | Changes |
 |-----------------|--------------|---------|
-| `SurveyStepList.tsx` | `features/journeys/.../StepList.tsx` | Update types, add new step types |
-| `SurveyStepEditor.tsx` | `features/journeys/.../StepEditor.tsx` | Expand for all step types |
-| `SurveyStepTypeSelector.tsx` | `features/journeys/.../StepTypeSelector.tsx` | Update step type options |
-| `SurveyStepPreview.tsx` | `features/simulator/steps/*` | Split into individual step components |
-| Step type editors (`step-types/`) | `features/journeys/.../step-editors/` | Adapt for new schema |
+| `SurveyStepList.tsx` | `features/journeys/components/editor/StepList.tsx` | Update types, add new step types |
+| `SurveyStepEditor.tsx` | `features/journeys/components/editor/StepEditor.tsx` | Routes to step editors in steps feature |
+| `SurveyStepTypeSelector.tsx` | `features/journeys/components/editor/StepTypeSelector.tsx` | Update step type options |
+| `SurveyStepPreview.tsx` | `features/steps/components/preview/steps/*` | Split into individual step components |
+| Step type editors (`step-types/`) | `features/steps/components/editors/*` | Adapt for new schema |
 
 ### New Components Needed
 
-**Journey Editor (features/journeys/):**
-- `ExperiencePickerEditor.tsx` - Configure experience-picker options
-- `CaptureStepEditor.tsx` - Configure capture step
-- `ProcessingStepEditor.tsx` - Configure processing step
-- `RewardStepEditor.tsx` - Configure reward step
-- `InfoStepEditor.tsx` - Configure info step
+**Steps Feature (features/steps/):**
+- `components/preview/SimulatorScreen.tsx` - Theme-aware content wrapper
+- `components/preview/steps/InfoStep.tsx` - Info step preview
+- `components/preview/steps/ExperiencePickerStep.tsx` - Experience picker preview
+- `components/preview/steps/CaptureStep.tsx` - Capture step preview
+- `components/preview/steps/MultipleChoiceStep.tsx` - Multiple choice preview
+- ... (one preview per step type)
+- `components/editors/InfoStepEditor.tsx` - Configure info step
+- `components/editors/ExperiencePickerEditor.tsx` - Configure experience-picker options
+- `components/editors/CaptureStepEditor.tsx` - Configure capture step
+- `components/editors/ProcessingStepEditor.tsx` - Configure processing step
+- `components/editors/RewardStepEditor.tsx` - Configure reward step
+- ... (one editor per step type)
 
-**Simulator (features/simulator/):**
-- `SimulatorScreen.tsx` - Theme-aware content wrapper
-- `steps/InfoStep.tsx` - Info step preview
-- `steps/ExperiencePickerStep.tsx` - Experience picker preview
-- `steps/CaptureStep.tsx` - Capture step preview
-- `steps/MultipleChoiceStep.tsx` - Multiple choice preview
-- ... (one per step type)
+**Journey Editor (features/journeys/):**
+- `components/editor/JourneyEditor.tsx` - Main 3-panel layout
+- `components/editor/StepList.tsx` - Left panel with drag-and-drop
+- `components/editor/StepPreview.tsx` - Middle panel (uses steps/preview)
+- `components/editor/StepEditor.tsx` - Right panel (routes to steps/editors)
 
 **Shared (components/):**
 - `providers/EventThemeProvider.tsx` - Theme context provider
@@ -461,6 +470,7 @@ web/src/
 │   ├── providers/
 │   │   └── EventThemeProvider.tsx      # Shared theme context
 │   └── step-primitives/                # Shared visual building blocks
+│       ├── index.ts
 │       ├── StepLayout.tsx              # Title, description, media wrapper
 │       ├── OptionButton.tsx            # For multiple choice, yes/no
 │       ├── ScaleButton.tsx             # For opinion scale
@@ -469,58 +479,67 @@ web/src/
 │       └── ActionButton.tsx            # Themed CTA button
 │
 ├── features/
-│   ├── simulator/                      # Display-only step previews
-│   │   ├── components/
-│   │   │   ├── SimulatorScreen.tsx     # Theme-aware content wrapper
-│   │   │   └── steps/                  # Read-only step renderers
-│   │   │       ├── InfoStep.tsx
-│   │   │       ├── ExperiencePickerStep.tsx
-│   │   │       ├── CaptureStep.tsx
-│   │   │       ├── ShortTextStep.tsx
-│   │   │       ├── LongTextStep.tsx
-│   │   │       ├── MultipleChoiceStep.tsx
-│   │   │       ├── YesNoStep.tsx
-│   │   │       ├── OpinionScaleStep.tsx
-│   │   │       ├── EmailStep.tsx
-│   │   │       ├── ProcessingStep.tsx
-│   │   │       └── RewardStep.tsx
-│   │   └── index.ts                    # Clean exports
+│   ├── steps/                          # Step data + components (cohesive module)
+│   │   ├── index.ts                    # Clean exports
+│   │   ├── types/
+│   │   │   └── step.types.ts           # TypeScript types for all 11 step types
+│   │   ├── schemas/
+│   │   │   └── step.schemas.ts         # Zod validation schemas
+│   │   ├── repositories/
+│   │   │   └── steps.repository.ts     # Firestore CRUD operations
+│   │   ├── actions/
+│   │   │   └── steps.ts                # Server actions for steps
+│   │   ├── constants.ts                # Step limits, defaults
+│   │   └── components/
+│   │       ├── preview/                # Display-only step renderers
+│   │       │   ├── index.ts
+│   │       │   ├── SimulatorScreen.tsx # Theme-aware content wrapper
+│   │       │   └── steps/              # Read-only step previews
+│   │       │       ├── index.ts
+│   │       │       ├── InfoStep.tsx
+│   │       │       ├── ExperiencePickerStep.tsx
+│   │       │       ├── CaptureStep.tsx
+│   │       │       ├── ShortTextStep.tsx
+│   │       │       ├── LongTextStep.tsx
+│   │       │       ├── MultipleChoiceStep.tsx
+│   │       │       ├── YesNoStep.tsx
+│   │       │       ├── OpinionScaleStep.tsx
+│   │       │       ├── EmailStep.tsx
+│   │       │       ├── ProcessingStep.tsx
+│   │       │       └── RewardStep.tsx
+│   │       └── editors/                # Config forms per step type
+│   │           ├── index.ts
+│   │           ├── BaseStepEditor.tsx  # Shared base fields form
+│   │           ├── InfoStepEditor.tsx
+│   │           ├── ExperiencePickerEditor.tsx
+│   │           ├── CaptureStepEditor.tsx
+│   │           ├── ShortTextEditor.tsx
+│   │           ├── LongTextEditor.tsx
+│   │           ├── MultipleChoiceEditor.tsx
+│   │           ├── YesNoEditor.tsx
+│   │           ├── OpinionScaleEditor.tsx
+│   │           ├── EmailEditor.tsx
+│   │           ├── ProcessingStepEditor.tsx
+│   │           └── RewardStepEditor.tsx
 │   │
-│   ├── journeys/                       # Journey editor feature
+│   ├── journeys/                       # Journey editor (thin orchestrator)
 │   │   ├── components/
 │   │   │   └── editor/
 │   │   │       ├── JourneyEditor.tsx   # Main 3-panel layout
 │   │   │       ├── JourneyEditorHeader.tsx
 │   │   │       ├── StepList.tsx        # Left panel (drag-and-drop)
-│   │   │       ├── StepPreview.tsx     # Middle panel (uses simulator)
-│   │   │       ├── StepEditor.tsx      # Right panel (form router)
-│   │   │       ├── StepTypeSelector.tsx
-│   │   │       └── step-editors/       # Config forms per step type
-│   │   │           ├── InfoStepEditor.tsx
-│   │   │           ├── ExperiencePickerEditor.tsx
-│   │   │           ├── CaptureStepEditor.tsx
-│   │   │           ├── ShortTextEditor.tsx
-│   │   │           ├── LongTextEditor.tsx
-│   │   │           ├── MultipleChoiceEditor.tsx
-│   │   │           ├── YesNoEditor.tsx
-│   │   │           ├── OpinionScaleEditor.tsx
-│   │   │           ├── EmailEditor.tsx
-│   │   │           ├── ProcessingStepEditor.tsx
-│   │   │           └── RewardStepEditor.tsx
+│   │   │       ├── StepListItem.tsx
+│   │   │       ├── StepPreview.tsx     # Middle panel (uses steps/preview)
+│   │   │       ├── StepEditor.tsx      # Right panel (routes to steps/editors)
+│   │   │       └── StepTypeSelector.tsx
 │   │   ├── hooks/
 │   │   │   ├── useSteps.ts             # Real-time steps subscription
-│   │   │   ├── useStepMutations.ts     # CRUD operations
-│   │   │   └── useJourney.ts           # Journey data
-│   │   ├── actions/
-│   │   │   ├── steps.ts                # Server actions for steps
-│   │   │   └── journeys.ts             # Server actions for journeys
-│   │   ├── lib/
-│   │   │   ├── schemas.ts              # Zod schemas for steps
-│   │   │   └── constants.ts            # Step limits, defaults
-│   │   └── types/
-│   │       └── step.types.ts           # TypeScript types
+│   │   │   ├── useStepMutations.ts     # CRUD operations (calls steps/actions)
+│   │   │   └── useSelectedStep.ts      # URL query param sync
+│   │   └── actions/
+│   │       └── journeys.ts             # Server actions for journeys (existing)
 │   │
-│   ├── guest/                          # Guest-facing experience
+│   ├── guest/                          # Guest-facing experience (future)
 │   │   └── components/
 │   │       └── steps/                  # Interactive step components
 │   │           ├── InfoStep.tsx        # Uses primitives + navigation
@@ -595,7 +614,7 @@ export function EventThemeProvider({
 ### SimulatorScreen Component
 
 ```tsx
-// features/simulator/components/SimulatorScreen.tsx
+// features/steps/components/preview/SimulatorScreen.tsx
 import { useEventTheme } from "@/components/providers/EventThemeProvider";
 
 interface SimulatorScreenProps {
@@ -693,12 +712,12 @@ export function StepLayout({ title, description, required, children }: StepLayou
 }
 ```
 
-### Simulator vs Guest Step Example
+### Preview vs Guest Step Example
 
 ```tsx
-// features/simulator/components/steps/MultipleChoiceStep.tsx (read-only)
+// features/steps/components/preview/steps/MultipleChoiceStep.tsx (read-only)
 import { StepLayout, OptionButton } from "@/components/step-primitives";
-import type { StepMultipleChoice } from "@/features/journeys/types/step.types";
+import type { StepMultipleChoice } from "@/features/steps/types/step.types";
 
 export function MultipleChoiceStep({ step }: { step: StepMultipleChoice }) {
   return (
@@ -714,7 +733,7 @@ export function MultipleChoiceStep({ step }: { step: StepMultipleChoice }) {
 
 // features/guest/components/steps/MultipleChoiceStep.tsx (interactive)
 import { StepLayout, OptionButton, ActionButton } from "@/components/step-primitives";
-import type { StepMultipleChoice } from "@/features/journeys/types/step.types";
+import type { StepMultipleChoice } from "@/features/steps/types/step.types";
 
 interface Props {
   step: StepMultipleChoice;
@@ -784,7 +803,8 @@ export function MultipleChoiceStep({ step, value, onChange, onSubmit }: Props) {
 
 ### Architecture
 11. ✅ `EventThemeProvider` in `components/providers/` - shared across features
-12. ✅ `SimulatorScreen` in `features/simulator/` - theme-aware preview wrapper
-13. ✅ Step primitives in `components/step-primitives/` - shared visual building blocks
-14. ✅ Simulator steps (read-only) separated from guest steps (interactive)
-15. ✅ Theme editor uses `SimulatorScreen` with custom `ThemePreviewContent`
+12. ✅ `features/steps/` owns all step code - data layer (types, schemas, CRUD) + presentation (preview, editors)
+13. ✅ `features/journeys/` is thin orchestrator - only layout/composition, imports step components
+14. ✅ Step primitives in `components/step-primitives/` - shared visual building blocks
+15. ✅ Preview steps (read-only in steps/) separated from guest steps (interactive in guest/)
+16. ✅ Theme editor uses `SimulatorScreen` with custom `ThemePreviewContent`
