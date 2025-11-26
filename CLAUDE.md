@@ -203,6 +203,8 @@ The application is organized into feature modules in `web/src/features/`. The da
 - **White-label** - Fully customizable branding per event
 
 ## Active Technologies
+- TypeScript 5.x (strict mode), React 19, Next.js 16 + @dnd-kit/core (drag-drop), react-hook-form + zod (forms), shadcn/ui (components), lucide-react (icons), sonner (toasts) (006-journey-editor)
+- Firebase Firestore - Steps as subcollection `/events/{eventId}/steps/{stepId}`, Journeys at `/events/{eventId}/journeys/{journeyId}` (006-journey-editor)
 
 - TypeScript 5.x (strict mode), Next.js 16 (App Router), React 19
 - Firebase (Firestore + Storage), Zod 4.x
