@@ -152,11 +152,11 @@
 
 ### Implementation for User Story 5
 
-- [ ] T054 [P] [US5] Create CaptureStepEditor in `web/src/features/steps/components/editors/CaptureStepEditor.tsx`
-- [ ] T055 [P] [US5] Create CaptureStep preview in `web/src/features/steps/components/preview/steps/CaptureStep.tsx`
-- [ ] T056 [US5] Add CaptureStepEditor to step editors barrel export
-- [ ] T057 [US5] Add CaptureStep to step previews barrel export
-- [ ] T058 [US5] Update StepEditor to route to CaptureStepEditor
+- [X] T054 [P] [US5] Create CaptureStepEditor in `web/src/features/steps/components/editors/CaptureStepEditor.tsx`
+- [X] T055 [P] [US5] Create CaptureStep preview in `web/src/features/steps/components/preview/steps/CaptureStep.tsx`
+- [X] T056 [US5] Add CaptureStepEditor to step editors barrel export
+- [X] T057 [US5] Add CaptureStep to step previews barrel export
+- [X] T058 [US5] Update StepEditor to route to CaptureStepEditor
 
 **Checkpoint**: User Story 5 complete - capture step fully configurable
 

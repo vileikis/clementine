@@ -9,3 +9,4 @@ export { YesNoStep } from "./YesNoStep";
 export { OpinionScaleStep } from "./OpinionScaleStep";
 export { EmailStep } from "./EmailStep";
 export { ExperiencePickerStep } from "./ExperiencePickerStep";
+export { CaptureStep } from "./CaptureStep";

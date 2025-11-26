@@ -12,4 +12,5 @@ export {
   OpinionScaleStep,
   EmailStep,
   ExperiencePickerStep,
+  CaptureStep,
 } from "./steps";
