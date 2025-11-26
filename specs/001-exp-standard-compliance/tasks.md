@@ -160,14 +160,14 @@
 - [x] T040 [US5] Run `pnpm type-check` and fix all TypeScript errors in experiences feature
 - [x] T041 [US5] Run `pnpm lint` and fix all ESLint errors/warnings in experiences feature
 - [x] T042 [US5] Run `pnpm test` and ensure all existing tests pass
-- [ ] T043 [US5] Verify feature in local dev server (`pnpm dev`) - test experience creation/editing flow
+- [x] T043 [US5] Verify feature in local dev server (`pnpm dev`) - test experience creation/editing flow
 
 ### Final Verification
 
 - [x] T044 Verify no files remain in `lib/` folder (SC-007)
 - [x] T045 Verify only one `AITransformSettings.tsx` exists in `shared/` (SC-008)
 - [x] T046 List all files in feature directory to verify `[domain].[purpose].ts` naming (SC-006)
-- [ ] T047 Commit final changes after validation loop passes cleanly
+- [x] T047 Commit final changes after validation loop passes cleanly
 
 ---
 
