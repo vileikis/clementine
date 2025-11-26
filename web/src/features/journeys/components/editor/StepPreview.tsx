@@ -21,6 +21,8 @@ import {
   EmailStep,
   ExperiencePickerStep,
   CaptureStep,
+  ProcessingStep,
+  RewardStep,
 } from "@/features/steps/components/preview";
 import type { Step } from "@/features/steps/types";
 import type { EventTheme } from "@/features/events/types";
@@ -81,9 +83,9 @@ function StepContent({
     case "capture":
       return <CaptureStep step={step} experiences={experiences} />;
     case "processing":
-      return <PlaceholderStep title="Processing" type={step.type} />;
+      return <ProcessingStep step={step} />;
     case "reward":
-      return <PlaceholderStep title="Reward" type={step.type} />;
+      return <RewardStep step={step} />;
     default: {
       // TypeScript exhaustive check
       const _exhaustive: never = step;

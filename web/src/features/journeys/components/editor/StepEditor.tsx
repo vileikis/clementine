@@ -32,6 +32,8 @@ import {
   YesNoEditor,
   OpinionScaleEditor,
   EmailEditor,
+  ProcessingStepEditor,
+  RewardStepEditor,
 } from "@/features/steps/components/editors";
 import { useStepMutations } from "../../hooks";
 import { getStepTypeMeta } from "@/features/steps/constants";
@@ -46,6 +48,8 @@ import type {
   StepYesNo,
   StepOpinionScale,
   StepEmail,
+  StepProcessing,
+  StepReward,
 } from "@/features/steps/types";
 import type { Experience } from "@/features/experiences/types";
 
@@ -242,18 +246,22 @@ function renderEditor(
         />
       );
 
-    // TODO: Add editors for completion step types in Phase 9
     case "processing":
+      return (
+        <ProcessingStepEditor
+          step={step as StepProcessing}
+          onUpdate={onUpdate}
+          onPreviewChange={onPreviewChange}
+        />
+      );
+
     case "reward":
       return (
-        <div className="text-center py-8 text-muted-foreground">
-          <p className="text-sm">
-            Editor for &quot;{step.type}&quot; step coming soon.
-          </p>
-          <p className="text-xs mt-2">
-            Use the base fields above to configure this step.
-          </p>
-        </div>
+        <RewardStepEditor
+          step={step as StepReward}
+          onUpdate={onUpdate}
+          onPreviewChange={onPreviewChange}
+        />
       );
 
     default:
