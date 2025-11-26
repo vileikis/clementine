@@ -80,7 +80,7 @@ export function JourneyCard({ journey, eventId, isActive }: JourneyCardProps) {
     ) {
       return;
     }
-    router.push(`/events/${eventId}/journeys/${journey.id}`);
+    router.push(`/events/${eventId}/design/journeys/${journey.id}`);
   };
 
   return (
