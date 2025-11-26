@@ -13,4 +13,6 @@ export {
   EmailStep,
   ExperiencePickerStep,
   CaptureStep,
+  ProcessingStep,
+  RewardStep,
 } from "./steps";

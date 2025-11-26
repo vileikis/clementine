@@ -191,13 +191,13 @@
 
 ### Implementation for User Story 7
 
-- [ ] T067 [P] [US7] Create ProcessingStepEditor in `web/src/features/steps/components/editors/ProcessingStepEditor.tsx`
-- [ ] T068 [P] [US7] Create RewardStepEditor in `web/src/features/steps/components/editors/RewardStepEditor.tsx`
-- [ ] T069 [P] [US7] Create ProcessingStep preview in `web/src/features/steps/components/preview/steps/ProcessingStep.tsx`
-- [ ] T070 [P] [US7] Create RewardStep preview in `web/src/features/steps/components/preview/steps/RewardStep.tsx`
-- [ ] T071 [US7] Add completion editors to step editors barrel export
-- [ ] T072 [US7] Add completion previews to step previews barrel export
-- [ ] T073 [US7] Update StepEditor to route to completion editors
+- [X] T067 [P] [US7] Create ProcessingStepEditor in `web/src/features/steps/components/editors/ProcessingStepEditor.tsx`
+- [X] T068 [P] [US7] Create RewardStepEditor in `web/src/features/steps/components/editors/RewardStepEditor.tsx`
+- [X] T069 [P] [US7] Create ProcessingStep preview in `web/src/features/steps/components/preview/steps/ProcessingStep.tsx`
+- [X] T070 [P] [US7] Create RewardStep preview in `web/src/features/steps/components/preview/steps/RewardStep.tsx`
+- [X] T071 [US7] Add completion editors to step editors barrel export
+- [X] T072 [US7] Add completion previews to step previews barrel export
+- [X] T073 [US7] Update StepEditor to route to completion editors
 
 **Checkpoint**: User Story 7 complete - all completion steps fully configurable
 

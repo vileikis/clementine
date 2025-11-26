@@ -8,3 +8,5 @@ export { MultipleChoiceEditor } from "./MultipleChoiceEditor";
 export { YesNoEditor } from "./YesNoEditor";
 export { OpinionScaleEditor } from "./OpinionScaleEditor";
 export { EmailEditor } from "./EmailEditor";
+export { ProcessingStepEditor } from "./ProcessingStepEditor";
+export { RewardStepEditor } from "./RewardStepEditor";
