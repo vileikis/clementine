@@ -140,13 +140,21 @@ export function ExperiencePickerEditor({
         const values = form.getValues();
         const updates: Partial<ExperiencePickerFormValues> = {};
 
-        if (values.title !== step.title) updates.title = values.title || null;
-        if (values.description !== step.description)
+        // Normalize empty strings to null for comparison
+        const normalize = (v: string | null | undefined) => v || null;
+
+        if (normalize(values.title) !== normalize(step.title)) {
+          updates.title = values.title || null;
+        }
+        if (normalize(values.description) !== normalize(step.description)) {
           updates.description = values.description || null;
-        if (values.mediaUrl !== step.mediaUrl)
+        }
+        if (normalize(values.mediaUrl) !== normalize(step.mediaUrl)) {
           updates.mediaUrl = values.mediaUrl || null;
-        if (values.ctaLabel !== step.ctaLabel)
+        }
+        if (normalize(values.ctaLabel) !== normalize(step.ctaLabel)) {
           updates.ctaLabel = values.ctaLabel || null;
+        }
 
         // Check config changes
         const stepConfig = step.config ?? { layout: "grid", variable: "selected_experience_id", experienceIds: [] };
