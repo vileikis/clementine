@@ -5,18 +5,56 @@
  *
  * Read-only preview for Experience Picker step type.
  * Displays title, description, and experience options in the configured layout.
+ * Resolves display data (name, previewMediaUrl) from experiences at runtime.
  */
 
+import { useMemo } from "react";
 import { StepLayout, ActionButton, OptionButton } from "@/components/step-primitives";
 import { useEventTheme } from "@/components/providers/EventThemeProvider";
+import { AlertCircle, ImageIcon } from "lucide-react";
 import type { StepExperiencePicker } from "@/features/steps/types";
+import type { Experience } from "@/features/experiences/types";
 
 interface ExperiencePickerStepProps {
   step: StepExperiencePicker;
+  experiences: Experience[];
 }
 
-export function ExperiencePickerStep({ step }: ExperiencePickerStepProps) {
-  const { layout, options } = step.config;
+interface ResolvedOption {
+  id: string;
+  name: string;
+  imageUrl: string | null;
+  missing: boolean;
+}
+
+export function ExperiencePickerStep({ step, experiences }: ExperiencePickerStepProps) {
+  const layout = step.config?.layout ?? "grid";
+
+  // Resolve experience data from IDs
+  const resolvedOptions = useMemo(() => {
+    const experienceMap = new Map((experiences ?? []).map((e) => [e.id, e]));
+    const ids = step.config?.experienceIds ?? [];
+
+    return ids.map((id): ResolvedOption => {
+      const experience = experienceMap.get(id);
+      if (experience) {
+        return {
+          id,
+          name: experience.name,
+          imageUrl: experience.previewMediaUrl ?? null,
+          missing: false,
+        };
+      }
+      return {
+        id,
+        name: "Missing Experience",
+        imageUrl: null,
+        missing: true,
+      };
+    });
+  }, [step.config?.experienceIds, experiences]);
+
+  const hasMissingExperiences = resolvedOptions.some((o) => o.missing);
 
   return (
     <StepLayout mediaUrl={step.mediaUrl}>
@@ -28,12 +66,19 @@ export function ExperiencePickerStep({ step }: ExperiencePickerStepProps) {
           <p className="text-sm opacity-80 mb-4">{step.description}</p>
         )}
 
-        {options.length === 0 ? (
+        {hasMissingExperiences && (
+          <div className="flex items-center gap-2 text-xs text-destructive mb-3">
+            <AlertCircle className="h-3 w-3" />
+            <span>Some experiences are missing</span>
+          </div>
+        )}
+
+        {resolvedOptions.length === 0 ? (
           <div className="text-center py-4 opacity-60">
-            <p className="text-sm">No options configured</p>
+            <p className="text-sm">No experiences selected</p>
           </div>
         ) : (
-          <OptionsLayout layout={layout} options={options} />
+          <OptionsLayout layout={layout} options={resolvedOptions} />
         )}
       </div>
 
@@ -48,7 +93,7 @@ export function ExperiencePickerStep({ step }: ExperiencePickerStepProps) {
 
 interface OptionsLayoutProps {
   layout: "grid" | "list" | "carousel";
-  options: StepExperiencePicker["config"]["options"];
+  options: ResolvedOption[];
 }
 
 function OptionsLayout({ layout, options }: OptionsLayoutProps) {
@@ -68,7 +113,11 @@ function OptionsLayout({ layout, options }: OptionsLayoutProps) {
       return (
         <div className="space-y-2">
           {options.map((option) => (
-            <OptionButton key={option.id}>{option.label}</OptionButton>
+            <OptionButton key={option.id}>
+              <span className={option.missing ? "text-destructive" : ""}>
+                {option.name}
+              </span>
+            </OptionButton>
           ))}
         </div>
       );
@@ -88,7 +137,7 @@ function OptionsLayout({ layout, options }: OptionsLayoutProps) {
 }
 
 interface OptionProps {
-  option: StepExperiencePicker["config"]["options"][number];
+  option: ResolvedOption;
   theme: ReturnType<typeof useEventTheme>["theme"];
 }
 
@@ -96,9 +145,11 @@ function GridOption({ option, theme }: OptionProps) {
   return (
     <button
       type="button"
-      className="flex flex-col items-center p-2 border-2 rounded-lg transition-colors aspect-square"
+      className={`flex flex-col items-center p-2 border-2 rounded-lg transition-colors aspect-square ${
+        option.missing ? "border-destructive/40" : ""
+      }`}
       style={{
-        borderColor: theme.text.color + "40",
+        borderColor: option.missing ? undefined : theme.text.color + "40",
         color: theme.text.color,
       }}
     >
@@ -107,20 +158,32 @@ function GridOption({ option, theme }: OptionProps) {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={option.imageUrl}
-            alt={option.label}
+            alt={option.name}
             className="w-full h-full object-cover"
           />
         </div>
       ) : (
         <div
-          className="flex-1 w-full rounded flex items-center justify-center mb-1"
-          style={{ backgroundColor: theme.text.color + "10" }}
+          className={`flex-1 w-full rounded flex items-center justify-center mb-1 ${
+            option.missing ? "bg-destructive/10" : ""
+          }`}
+          style={{
+            backgroundColor: option.missing ? undefined : theme.text.color + "10",
+          }}
         >
-          <span className="text-2xl opacity-40">?</span>
+          {option.missing ? (
+            <AlertCircle className="h-5 w-5 text-destructive" />
+          ) : (
+            <ImageIcon className="h-5 w-5 opacity-40" />
+          )}
         </div>
       )}
-      <span className="text-xs font-medium truncate w-full text-center">
-        {option.label}
+      <span
+        className={`text-xs font-medium truncate w-full text-center ${
+          option.missing ? "text-destructive" : ""
+        }`}
+      >
+        {option.name}
       </span>
     </button>
   );
@@ -130,9 +193,11 @@ function CarouselOption({ option, theme }: OptionProps) {
   return (
     <button
       type="button"
-      className="flex flex-col items-center p-2 border-2 rounded-lg transition-colors shrink-0 w-24"
+      className={`flex flex-col items-center p-2 border-2 rounded-lg transition-colors shrink-0 w-24 ${
+        option.missing ? "border-destructive/40" : ""
+      }`}
       style={{
-        borderColor: theme.text.color + "40",
+        borderColor: option.missing ? undefined : theme.text.color + "40",
         color: theme.text.color,
       }}
     >
@@ -141,20 +206,32 @@ function CarouselOption({ option, theme }: OptionProps) {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={option.imageUrl}
-            alt={option.label}
+            alt={option.name}
             className="w-full h-full object-cover"
           />
         </div>
       ) : (
         <div
-          className="w-full h-16 rounded flex items-center justify-center mb-1"
-          style={{ backgroundColor: theme.text.color + "10" }}
+          className={`w-full h-16 rounded flex items-center justify-center mb-1 ${
+            option.missing ? "bg-destructive/10" : ""
+          }`}
+          style={{
+            backgroundColor: option.missing ? undefined : theme.text.color + "10",
+          }}
         >
-          <span className="text-2xl opacity-40">?</span>
+          {option.missing ? (
+            <AlertCircle className="h-5 w-5 text-destructive" />
+          ) : (
+            <ImageIcon className="h-5 w-5 opacity-40" />
+          )}
         </div>
       )}
-      <span className="text-xs font-medium truncate w-full text-center">
-        {option.label}
+      <span
+        className={`text-xs font-medium truncate w-full text-center ${
+          option.missing ? "text-destructive" : ""
+        }`}
+      >
+        {option.name}
       </span>
     </button>
   );

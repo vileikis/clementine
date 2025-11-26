@@ -66,33 +66,32 @@ interface StepInfo extends StepBase {
 
 Allows guests to choose from available AI experiences.
 
+Display data (name, previewMediaUrl) is resolved at runtime from the `/experiences` collection.
+
 ```typescript
 interface StepExperiencePicker extends StepBase {
   type: "experience-picker";
   config: {
     layout: "grid" | "list" | "carousel";
-    variable: string;  // Session variable to store selection
-    options: ExperiencePickerOption[];
+    variable: string;       // Session variable to store selection
+    experienceIds: string[]; // References to /experiences/{id}
   };
 }
-
-interface ExperiencePickerOption {
-  id: string;           // Option ID (unique within step)
-  experienceId: string; // Reference to /experiences/{id}
-  label: string;        // Display text
-  imageUrl?: string;    // Preview thumbnail (from experience.previewMediaUrl)
-}
 ```
+
+**Runtime Resolution**:
+- Editor and preview components fetch experiences via `useEventExperiences(eventId)`
+- Display data (name, previewMediaUrl) is joined from experiences at render time
+- Missing experiences are shown with a warning indicator
 
 **Default Values**:
 - `layout`: "grid"
 - `variable`: "selected_experience_id"
-- `options`: []
+- `experienceIds`: []
 
 **Validation**:
 - `variable`: 1-50 chars, alphanumeric + underscore
-- `options`: 0-20 items
-- `label`: 1-100 chars
+- `experienceIds`: 0-20 items
 
 ---
 

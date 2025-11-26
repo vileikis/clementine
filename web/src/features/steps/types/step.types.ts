@@ -55,24 +55,15 @@ export interface StepInfo extends StepBase {
 }
 
 /**
- * Experience picker option
- */
-export interface ExperiencePickerOption {
-  id: string;
-  experienceId: string;
-  label: string;
-  imageUrl?: string | null;
-}
-
-/**
  * Experience Picker step - Allows guests to choose from available AI experiences
+ * Stores only experienceIds - display data (name, previewMediaUrl) is resolved at runtime
  */
 export interface StepExperiencePicker extends StepBase {
   type: "experience-picker";
   config: {
     layout: "grid" | "list" | "carousel";
     variable: string;
-    options: ExperiencePickerOption[];
+    experienceIds: string[]; // References to /experiences/{id}
   };
 }
 

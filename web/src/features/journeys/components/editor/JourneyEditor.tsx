@@ -16,7 +16,7 @@ import { JourneyEditorHeader } from "./JourneyEditorHeader";
 import { StepList } from "./StepList";
 import { StepEditor } from "./StepEditor";
 import { StepPreview } from "./StepPreview";
-import { useSteps, useSelectedStep } from "../../hooks";
+import { useSteps, useSelectedStep, useEventExperiences } from "../../hooks";
 import type { Journey } from "../../types";
 import type { Step } from "@/features/steps/types";
 import type { Event } from "@/features/events/types";
@@ -29,6 +29,7 @@ interface JourneyEditorProps {
 export function JourneyEditor({ event, journey }: JourneyEditorProps) {
   const { steps, loading: stepsLoading } = useSteps(event.id, journey.id, journey);
   const { selectedStepId, selectedStep, setSelectedStepId } = useSelectedStep(steps);
+  const { experiences } = useEventExperiences(event.id);
 
   // Preview state - holds the in-progress form values for live preview
   const [previewStep, setPreviewStep] = useState<Partial<Step> | null>(null);
@@ -98,7 +99,11 @@ export function JourneyEditor({ event, journey }: JourneyEditorProps) {
           <div className="flex-1 p-6 overflow-y-auto bg-muted/10">
             <div className="flex justify-center">
               {displayStep ? (
-                <StepPreview step={displayStep as Step} theme={event.theme} />
+                <StepPreview
+                  step={displayStep as Step}
+                  theme={event.theme}
+                  experiences={experiences}
+                />
               ) : (
                 <div className="text-center text-muted-foreground">
                   <p className="text-sm">Select a step to preview</p>
@@ -113,6 +118,7 @@ export function JourneyEditor({ event, journey }: JourneyEditorProps) {
               <StepEditor
                 eventId={event.id}
                 step={selectedStep}
+                experiences={experiences}
                 onStepDeleted={handleStepDeleted}
                 onPreviewChange={handlePreviewChange}
               />
