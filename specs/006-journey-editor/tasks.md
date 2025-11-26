@@ -207,24 +207,24 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T074 [P] Add empty state for journey with no steps in StepList
-- [ ] T075 [P] Add keyboard shortcuts (Cmd+S save, arrows navigate, Delete remove)
-- [ ] T076 [P] Add duplicateStepAction to `web/src/features/steps/actions/steps.ts`
-- [ ] T077 [P] Add duplicate step functionality to StepList context menu
-- [ ] T078 [P] Handle edge case: step references deleted experience (warning indicator)
-- [ ] T079 [P] Handle edge case: event has no experiences (warning in picker/capture)
-- [ ] T080 Ensure responsive layout works on mobile (panels stack vertically)
-- [ ] T081 Ensure touch targets are ≥44x44px on mobile
+- [X] T074 [P] Add empty state for journey with no steps in StepList
+- [X] T075 [P] Add keyboard shortcuts (Cmd+S save, arrows navigate, Delete remove)
+- [X] T076 [P] Add duplicateStepAction to `web/src/features/steps/actions/steps.ts`
+- [X] T077 [P] Add duplicate step functionality to StepList context menu
+- [X] T078 [P] Handle edge case: step references deleted experience (warning indicator)
+- [X] T079 [P] Handle edge case: event has no experiences (warning in picker/capture)
+- [X] T080 Ensure responsive layout works on mobile (panels stack vertically)
+- [X] T081 Ensure touch targets are ≥44x44px on mobile
 
 ### Validation Loop (REQUIRED - Constitution Principle V)
 
 **Purpose**: Ensure code quality and correctness before merge
 
-- [ ] T082 Run `pnpm lint` and fix all errors/warnings
-- [ ] T083 Run `pnpm type-check` and resolve all TypeScript errors
-- [ ] T084 Run `pnpm test` and ensure all tests pass
-- [ ] T085 Verify feature in local dev server (`pnpm dev`)
-- [ ] T086 Commit only after validation loop passes cleanly
+- [X] T082 Run `pnpm lint` and fix all errors/warnings
+- [X] T083 Run `pnpm type-check` and resolve all TypeScript errors
+- [X] T084 Run `pnpm test` and ensure all tests pass
+- [X] T085 Verify feature in local dev server (`pnpm dev`)
+- [X] T086 Commit only after validation loop passes cleanly
 
 ---
 

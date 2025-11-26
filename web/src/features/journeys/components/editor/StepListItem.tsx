@@ -6,6 +6,7 @@
  * A single step item in the step list with selection state.
  * Uses @dnd-kit/sortable for drag-and-drop reordering.
  * Mobile-first with ≥44px touch targets.
+ * Includes context menu with duplicate and delete actions.
  */
 
 import { useSortable } from "@dnd-kit/sortable";
@@ -22,8 +23,19 @@ import {
   Mail,
   Loader2,
   Gift,
+  MoreVertical,
+  Copy,
+  Trash2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import type { Step, StepType } from "@/features/steps/types";
 
 interface StepListItemProps {
@@ -31,6 +43,8 @@ interface StepListItemProps {
   index: number;
   isSelected: boolean;
   onSelect: () => void;
+  onDuplicate?: () => void;
+  onDelete?: () => void;
   isDragging?: boolean;
 }
 
@@ -53,6 +67,8 @@ export function StepListItem({
   index,
   isSelected,
   onSelect,
+  onDuplicate,
+  onDelete,
   isDragging: globalDragging,
 }: StepListItemProps) {
   const {
@@ -99,9 +115,52 @@ export function StepListItem({
         </div>
 
         {/* Step Title - allows 2 lines */}
-        <p className="text-sm font-medium line-clamp-2 pt-0.5">
+        <p className="text-sm font-medium line-clamp-2 pt-0.5 flex-1">
           {step.title || "Untitled"}
         </p>
+
+        {/* Context Menu */}
+        {(onDuplicate || onDelete) && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 shrink-0 opacity-0 group-hover:opacity-100 hover:opacity-100 focus:opacity-100 data-[state=open]:opacity-100"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <MoreVertical className="h-4 w-4" />
+                <span className="sr-only">Step actions</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {onDuplicate && (
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDuplicate();
+                  }}
+                >
+                  <Copy className="h-4 w-4" />
+                  Duplicate
+                </DropdownMenuItem>
+              )}
+              {onDuplicate && onDelete && <DropdownMenuSeparator />}
+              {onDelete && (
+                <DropdownMenuItem
+                  variant="destructive"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete();
+                  }}
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Delete
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
     </div>
   );

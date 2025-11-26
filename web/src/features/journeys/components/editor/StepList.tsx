@@ -26,6 +26,16 @@ import {
 } from "@dnd-kit/sortable";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { StepListItem } from "./StepListItem";
 import { StepTypeSelector } from "./StepTypeSelector";
 import { useStepMutations } from "../../hooks";
@@ -46,9 +56,10 @@ export function StepList({
   selectedStepId,
   onSelectStep,
 }: StepListProps) {
-  const { createStep, reorderSteps, isCreating, isReordering } = useStepMutations();
+  const { createStep, reorderSteps, duplicateStep, deleteStep, isCreating, isReordering } = useStepMutations();
   const [optimisticSteps, setOptimisticSteps] = useState<Step[] | null>(null);
   const [showTypeSelector, setShowTypeSelector] = useState(false);
+  const [stepToDelete, setStepToDelete] = useState<Step | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Configure sensors for drag-and-drop
@@ -112,6 +123,32 @@ export function StepList({
     }
   };
 
+  // Handle duplicate step
+  const handleDuplicate = async (step: Step) => {
+    const result = await duplicateStep(eventId, step.id);
+    if (result.success && result.stepId) {
+      onSelectStep(result.stepId);
+    }
+  };
+
+  // Handle delete step confirmation
+  const handleConfirmDelete = async () => {
+    if (!stepToDelete) return;
+
+    const result = await deleteStep(eventId, stepToDelete.id);
+    if (result.success) {
+      // Select next/previous step after deletion
+      const currentIndex = steps.findIndex((s) => s.id === stepToDelete.id);
+      const remainingSteps = steps.filter((s) => s.id !== stepToDelete.id);
+
+      if (remainingSteps.length > 0) {
+        const nextIndex = Math.min(currentIndex, remainingSteps.length - 1);
+        onSelectStep(remainingSteps[nextIndex].id);
+      }
+    }
+    setStepToDelete(null);
+  };
+
   // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
@@ -168,14 +205,17 @@ export function StepList({
             >
               <div className="space-y-2">
                 {displaySteps.map((step, index) => (
-                  <StepListItem
-                    key={step.id}
-                    step={step}
-                    index={index}
-                    isSelected={step.id === selectedStepId}
-                    onSelect={() => onSelectStep(step.id)}
-                    isDragging={isReordering}
-                  />
+                  <div key={step.id} className="group">
+                    <StepListItem
+                      step={step}
+                      index={index}
+                      isSelected={step.id === selectedStepId}
+                      onSelect={() => onSelectStep(step.id)}
+                      onDuplicate={() => handleDuplicate(step)}
+                      onDelete={() => setStepToDelete(step)}
+                      isDragging={isReordering}
+                    />
+                  </div>
                 ))}
               </div>
             </SortableContext>
@@ -190,6 +230,28 @@ export function StepList({
         onTypeSelected={handleTypeSelected}
         loading={isCreating}
       />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!stepToDelete} onOpenChange={() => setStepToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete step?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete &ldquo;{stepToDelete?.title || "Untitled"}&rdquo; from the journey.
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              className="bg-destructive text-white hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
