@@ -63,7 +63,7 @@ export function JourneyEditor({ event, journey }: JourneyEditorProps) {
     : null;
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-full">
       {/* Header */}
       <JourneyEditorHeader eventId={event.id} journey={journey} />
 
@@ -89,8 +89,8 @@ export function JourneyEditor({ event, journey }: JourneyEditorProps) {
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
           {/* Middle Panel - Preview */}
-          <div className="flex-1 p-4 overflow-y-auto bg-muted/10">
-            <div className="h-full flex items-center justify-center">
+          <div className="flex-1 p-6 overflow-y-auto bg-muted/10">
+            <div className="flex justify-center">
               {displayStep ? (
                 <StepPreviewPlaceholder step={displayStep as Step} theme={event.theme} />
               ) : (
@@ -140,7 +140,7 @@ interface StepPreviewPlaceholderProps {
 function StepPreviewPlaceholder({ step, theme }: StepPreviewPlaceholderProps) {
   return (
     <div
-      className="w-full max-w-[320px] aspect-[9/16] rounded-2xl border-4 border-foreground/10 shadow-lg overflow-hidden relative"
+      className=" w-full  max-w-[320px] aspect-[9/16] rounded-2xl border-4 border-foreground/10 shadow-lg overflow-hidden relative"
       style={{
         backgroundColor: theme.background.color,
         color: theme.text.color,
@@ -162,7 +162,7 @@ function StepPreviewPlaceholder({ step, theme }: StepPreviewPlaceholderProps) {
 
       {/* Content */}
       <div
-        className="relative z-10 flex flex-col h-full p-6"
+        className="relative z-10 flex flex-col h-full p-6 pt-16"
         style={{ textAlign: theme.text.alignment }}
       >
         {/* Logo */}
@@ -196,7 +196,7 @@ function StepPreviewPlaceholder({ step, theme }: StepPreviewPlaceholderProps) {
         {/* Title & Description */}
         <div className="flex-1">
           {step.title && (
-            <h2 className="text-xl font-bold mb-2">{step.title}</h2>
+            <h2 className="text-2xl font-bold mb-2">{step.title}</h2>
           )}
           {step.description && (
             <p className="text-sm opacity-80">{step.description}</p>
