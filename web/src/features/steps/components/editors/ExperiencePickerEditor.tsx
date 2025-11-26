@@ -38,7 +38,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { BaseStepEditor } from "./BaseStepEditor";
 import { STEP_CONSTANTS } from "../../constants";
 import type { StepExperiencePicker } from "../../types";
-import type { Experience } from "@/features/experiences/types";
+import type { Experience } from "@/features/experiences";
 
 const experiencePickerFormSchema = z.object({
   // Base fields
@@ -93,17 +93,12 @@ export function ExperiencePickerEditor({
     },
   });
 
-
   const selectedIds = form.watch("config.experienceIds");
-
 
   // Track which experienceIds reference missing experiences
   const missingExperienceIds = useMemo(() => {
     const availableIds = new Set((experiences ?? []).map((e) => e.id));
-    console.log("----availableIds", availableIds);
-    console.log("----config.experienceIds", JSON.stringify(config.experienceIds, null, 2));
-
-    return config.experienceIds?.filter((id) => !availableIds.has(id)) ?? [];
+    return (config.experienceIds || []).filter((id) => !availableIds.has(id));
   }, [config.experienceIds, experiences]);
 
   // Reset form when step ID changes
@@ -116,7 +111,7 @@ export function ExperiencePickerEditor({
       config: {
         layout: config.layout,
         variable: config.variable,
-        experienceIds: config.experienceIds,
+        experienceIds: config.experienceIds || [],
       },
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -158,8 +153,8 @@ export function ExperiencePickerEditor({
         const configChanged =
           values.config.layout !== stepConfig.layout ||
           values.config.variable !== stepConfig.variable ||
-          JSON.stringify(values.config.experienceIds) !==
-            JSON.stringify(stepConfig.experienceIds);
+          JSON.stringify(values.config.experienceIds || []) !==
+            JSON.stringify(stepConfig.experienceIds || []);
 
         if (configChanged) {
           updates.config = values.config;
