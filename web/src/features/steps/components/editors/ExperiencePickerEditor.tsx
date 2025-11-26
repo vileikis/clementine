@@ -16,7 +16,7 @@ import { useEffect, useCallback, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { AlertCircle, Check, ImageIcon } from "lucide-react";
+import { AlertCircle, ImageIcon, Plus, Trash2 } from "lucide-react";
 import { Form } from "@/components/ui/form";
 import {
   FormField,
@@ -34,7 +34,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
 import { BaseStepEditor } from "./BaseStepEditor";
 import { useAutoSave } from "../../hooks";
 import { STEP_CONSTANTS } from "../../constants";
@@ -148,14 +148,45 @@ export function ExperiencePickerEditor({
     return () => subscription.unsubscribe();
   }, [form, onPreviewChange]);
 
-  // Save immediately when experience selection changes (bypasses debounce)
-  const handleExperienceToggle = useCallback(
-    async (experienceId: string, checked: boolean) => {
-      const currentIds = form.getValues("config.experienceIds");
-      const newIds = checked
-        ? [...currentIds, experienceId]
-        : currentIds.filter((id) => id !== experienceId);
+  // Get available (unselected) experiences for the dropdown
+  const availableExperiences = useMemo(() => {
+    const selectedSet = new Set(selectedIds);
+    return (experiences ?? []).filter((e) => !selectedSet.has(e.id));
+  }, [experiences, selectedIds]);
 
+  // Get selected experiences with their data
+  const selectedExperiences = useMemo(() => {
+    const experienceMap = new Map((experiences ?? []).map((e) => [e.id, e]));
+    return selectedIds
+      .map((id) => experienceMap.get(id))
+      .filter((e): e is Experience => e !== undefined);
+  }, [experiences, selectedIds]);
+
+  // Add experience to selection
+  const handleAddExperience = useCallback(
+    async (experienceId: string) => {
+      const currentIds = form.getValues("config.experienceIds");
+      if (currentIds.includes(experienceId)) return;
+
+      const newIds = [...currentIds, experienceId];
+      form.setValue("config.experienceIds", newIds);
+
+      // Save immediately
+      await onUpdate({
+        config: {
+          ...form.getValues("config"),
+          experienceIds: newIds,
+        },
+      });
+    },
+    [form, onUpdate]
+  );
+
+  // Remove experience from selection
+  const handleRemoveExperience = useCallback(
+    async (experienceId: string) => {
+      const currentIds = form.getValues("config.experienceIds");
+      const newIds = currentIds.filter((id) => id !== experienceId);
       form.setValue("config.experienceIds", newIds);
 
       // Save immediately
@@ -249,56 +280,93 @@ export function ExperiencePickerEditor({
 
         {/* Experience Selection */}
         <div className="space-y-3">
-          <FormLabel>Select Experiences</FormLabel>
+          <FormLabel>Experiences</FormLabel>
+
+          {/* Add Experience Dropdown */}
           {!experiences || experiences.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-4">
               No experiences available for this event.
             </p>
+          ) : availableExperiences.length === 0 ? (
+            <p className="text-sm text-muted-foreground py-2">
+              All experiences have been added.
+            </p>
           ) : (
-            <div className="space-y-2">
-              {experiences.map((experience) => {
-                const isSelected = selectedIds.includes(experience.id);
-                return (
-                  <label
-                    key={experience.id}
-                    className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${
-                      isSelected
-                        ? "border-primary bg-primary/5"
-                        : "border-border hover:bg-muted/50"
-                    }`}
-                  >
-                    <Checkbox
-                      checked={isSelected}
-                      onCheckedChange={(checked) =>
-                        handleExperienceToggle(experience.id, checked === true)
-                      }
-                    />
-                    {experience.previewMediaUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={experience.previewMediaUrl}
-                        alt=""
-                        className="h-10 w-10 rounded object-cover shrink-0"
-                      />
-                    ) : (
-                      <div className="h-10 w-10 rounded bg-muted flex items-center justify-center shrink-0">
-                        <ImageIcon className="h-5 w-5 text-muted-foreground" />
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{experience.name}</p>
-                      <p className="text-xs text-muted-foreground capitalize">
-                        {experience.type}
-                      </p>
+            <Select onValueChange={handleAddExperience} value="">
+              <SelectTrigger className="w-full">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Plus className="h-4 w-4" />
+                  <span>Add experience...</span>
+                </div>
+              </SelectTrigger>
+              <SelectContent>
+                {availableExperiences.map((experience) => (
+                  <SelectItem key={experience.id} value={experience.id}>
+                    <div className="flex items-center gap-2">
+                      {experience.previewMediaUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={experience.previewMediaUrl}
+                          alt=""
+                          className="h-6 w-6 rounded object-cover shrink-0"
+                        />
+                      ) : (
+                        <div className="h-6 w-6 rounded bg-muted flex items-center justify-center shrink-0">
+                          <ImageIcon className="h-3 w-3 text-muted-foreground" />
+                        </div>
+                      )}
+                      <span>{experience.name}</span>
+                      <span className="text-xs text-muted-foreground capitalize">
+                        ({experience.type})
+                      </span>
                     </div>
-                    {isSelected && (
-                      <Check className="h-4 w-4 text-primary shrink-0" />
-                    )}
-                  </label>
-                );
-              })}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+
+          {/* Selected Experiences List */}
+          {selectedExperiences.length > 0 && (
+            <div className="space-y-2">
+              {selectedExperiences.map((experience) => (
+                <div
+                  key={experience.id}
+                  className="flex items-center gap-3 p-3 border border-border rounded-lg bg-muted/30"
+                >
+                  {experience.previewMediaUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={experience.previewMediaUrl}
+                      alt=""
+                      className="h-10 w-10 rounded object-cover shrink-0"
+                    />
+                  ) : (
+                    <div className="h-10 w-10 rounded bg-muted flex items-center justify-center shrink-0">
+                      <ImageIcon className="h-5 w-5 text-muted-foreground" />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{experience.name}</p>
+                    <p className="text-xs text-muted-foreground capitalize">
+                      {experience.type}
+                    </p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
+                    onClick={() => handleRemoveExperience(experience.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    <span className="sr-only">Remove {experience.name}</span>
+                  </Button>
+                </div>
+              ))}
             </div>
           )}
+
           <FormDescription>
             {selectedIds.length} of {STEP_CONSTANTS.MAX_EXPERIENCE_OPTIONS} max
             selected

@@ -145,7 +145,7 @@ function GridOption({ option, theme }: OptionProps) {
   return (
     <button
       type="button"
-      className={`flex flex-col items-center p-2 border-2 rounded-lg transition-colors aspect-square ${
+      className={`flex flex-col items-center p-2 border-2 rounded-lg transition-colors aspect-square isolate ${
         option.missing ? "border-destructive/40" : ""
       }`}
       style={{
@@ -193,7 +193,7 @@ function CarouselOption({ option, theme }: OptionProps) {
   return (
     <button
       type="button"
-      className={`flex flex-col items-center p-2 border-2 rounded-lg transition-colors shrink-0 w-24 ${
+      className={`flex flex-col items-center p-2 border-2 rounded-lg transition-colors shrink-0 w-24 isolate ${
         option.missing ? "border-destructive/40" : ""
       }`}
       style={{
