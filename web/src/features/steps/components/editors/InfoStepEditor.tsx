@@ -7,12 +7,13 @@
  * Uses only base fields (title, description, mediaUrl, ctaLabel).
  */
 
-import { useEffect, useCallback, useRef } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Form } from "@/components/ui/form";
 import { BaseStepEditor } from "./BaseStepEditor";
+import { useAutoSave } from "../../hooks";
 import type { StepInfo } from "../../types";
 
 const infoStepFormSchema = z.object({
@@ -23,6 +24,14 @@ const infoStepFormSchema = z.object({
 });
 
 type InfoStepFormValues = z.infer<typeof infoStepFormSchema>;
+
+/** Fields to compare for changes */
+const FIELDS_TO_COMPARE: (keyof InfoStepFormValues)[] = [
+  "title",
+  "description",
+  "mediaUrl",
+  "ctaLabel",
+];
 
 interface InfoStepEditorProps {
   step: StepInfo;
@@ -35,8 +44,6 @@ export function InfoStepEditor({
   onUpdate,
   onPreviewChange,
 }: InfoStepEditorProps) {
-  const debounceRef = useRef<NodeJS.Timeout | null>(null);
-
   const form = useForm<InfoStepFormValues>({
     resolver: zodResolver(infoStepFormSchema),
     defaultValues: {
@@ -45,6 +52,14 @@ export function InfoStepEditor({
       mediaUrl: step.mediaUrl ?? "",
       ctaLabel: step.ctaLabel ?? "",
     },
+  });
+
+  // Auto-save on blur with debouncing
+  const { handleBlur } = useAutoSave({
+    form,
+    originalValues: step,
+    onUpdate,
+    fieldsToCompare: FIELDS_TO_COMPARE,
   });
 
   // Reset form when step ID changes
@@ -69,52 +84,6 @@ export function InfoStepEditor({
 
     return () => subscription.unsubscribe();
   }, [form, onPreviewChange]);
-
-  // Debounced auto-save on blur
-  const handleBlur = useCallback(async () => {
-    // Clear any pending debounce
-    if (debounceRef.current) {
-      clearTimeout(debounceRef.current);
-    }
-
-    // Debounce the save
-    debounceRef.current = setTimeout(async () => {
-      const isValid = await form.trigger();
-      if (isValid) {
-        const values = form.getValues();
-        // Normalize empty strings to null for comparison
-        const normalize = (v: string | null | undefined) => v || null;
-
-        // Only send changed fields
-        const updates: Partial<InfoStepFormValues> = {};
-        if (normalize(values.title) !== normalize(step.title)) {
-          updates.title = values.title || null;
-        }
-        if (normalize(values.description) !== normalize(step.description)) {
-          updates.description = values.description || null;
-        }
-        if (normalize(values.mediaUrl) !== normalize(step.mediaUrl)) {
-          updates.mediaUrl = values.mediaUrl || null;
-        }
-        if (normalize(values.ctaLabel) !== normalize(step.ctaLabel)) {
-          updates.ctaLabel = values.ctaLabel || null;
-        }
-
-        if (Object.keys(updates).length > 0) {
-          await onUpdate(updates);
-        }
-      }
-    }, 300);
-  }, [form, step.title, step.description, step.mediaUrl, step.ctaLabel, onUpdate]);
-
-  // Cleanup debounce on unmount
-  useEffect(() => {
-    return () => {
-      if (debounceRef.current) {
-        clearTimeout(debounceRef.current);
-      }
-    };
-  }, []);
 
   return (
     <Form {...form}>
