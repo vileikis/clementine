@@ -9,7 +9,7 @@
  */
 
 import { useMemo } from "react";
-import { Camera, FlipHorizontal, Zap, ImageIcon, AlertCircle } from "lucide-react";
+import { Camera, ImageIcon, AlertCircle } from "lucide-react";
 import { StepLayout, ActionButton } from "@/components/step-primitives";
 import { useEventTheme } from "@/components/providers/EventThemeProvider";
 import type { StepCapture } from "@/features/steps/types";
@@ -80,34 +80,6 @@ export function CaptureStep({ step, experiences }: CaptureStepProps) {
             <div className="absolute bottom-3 left-3 w-6 h-6 border-b-2 border-l-2 rounded-bl" style={{ borderColor: theme.text.color + "60" }} />
             <div className="absolute bottom-3 right-3 w-6 h-6 border-b-2 border-r-2 rounded-br" style={{ borderColor: theme.text.color + "60" }} />
           </div>
-
-          {/* Camera controls */}
-          {/* <div className="flex items-center gap-6 mt-4">
-            <button
-              type="button"
-              className="p-2 rounded-full opacity-60"
-              style={{ backgroundColor: theme.text.color + "20" }}
-            >
-              <FlipHorizontal className="h-5 w-5" style={{ color: theme.text.color }} />
-            </button>
-            <button
-              type="button"
-              className="p-4 rounded-full"
-              style={{
-                backgroundColor: theme.button.backgroundColor ?? theme.primaryColor,
-                border: `3px solid ${theme.text.color}40`,
-              }}
-            >
-              <Camera className="h-6 w-6" style={{ color: theme.button.textColor }} />
-            </button>
-            <button
-              type="button"
-              className="p-2 rounded-full opacity-60"
-              style={{ backgroundColor: theme.text.color + "20" }}
-            >
-              <Zap className="h-5 w-5" style={{ color: theme.text.color }} />
-            </button>
-          </div> */}
         </div>
 
         {/* Fallback Experience Info */}
@@ -152,13 +124,7 @@ export function CaptureStep({ step, experiences }: CaptureStepProps) {
           </div>
         )}
 
-        {/* Source Variable Info (subtle) */}
-        {/* <div
-          className="text-xs opacity-40 text-center mt-2"
-          style={{ color: theme.text.color }}
-        >
-          Source: {config.source}
-        </div> */}
+  
       </div>
 
       {/* CTA Button */}
