@@ -92,18 +92,18 @@
 
 ### Implementation for User Story 2
 
-- [ ] T033 [P] [US2] Create SimulatorScreen in `web/src/features/steps/components/preview/SimulatorScreen.tsx`
-- [ ] T034 [P] [US2] Create InfoStep preview in `web/src/features/steps/components/preview/steps/InfoStep.tsx`
-- [ ] T035 [P] [US2] Create ShortTextStep preview in `web/src/features/steps/components/preview/steps/ShortTextStep.tsx`
-- [ ] T036 [P] [US2] Create LongTextStep preview in `web/src/features/steps/components/preview/steps/LongTextStep.tsx`
-- [ ] T037 [P] [US2] Create MultipleChoiceStep preview in `web/src/features/steps/components/preview/steps/MultipleChoiceStep.tsx`
-- [ ] T038 [P] [US2] Create YesNoStep preview in `web/src/features/steps/components/preview/steps/YesNoStep.tsx`
-- [ ] T039 [P] [US2] Create OpinionScaleStep preview in `web/src/features/steps/components/preview/steps/OpinionScaleStep.tsx`
-- [ ] T040 [P] [US2] Create EmailStep preview in `web/src/features/steps/components/preview/steps/EmailStep.tsx`
-- [ ] T041 [US2] Create step previews barrel export in `web/src/features/steps/components/preview/steps/index.ts`
-- [ ] T042 [US2] Create preview barrel export in `web/src/features/steps/components/preview/index.ts`
-- [ ] T043 [US2] Create StepPreview component in `web/src/features/journeys/components/editor/StepPreview.tsx`
-- [ ] T044 [US2] Integrate StepPreview into JourneyEditor middle panel
+- [X] T033 [P] [US2] Create SimulatorScreen in `web/src/features/steps/components/preview/SimulatorScreen.tsx`
+- [X] T034 [P] [US2] Create InfoStep preview in `web/src/features/steps/components/preview/steps/InfoStep.tsx`
+- [X] T035 [P] [US2] Create ShortTextStep preview in `web/src/features/steps/components/preview/steps/ShortTextStep.tsx`
+- [X] T036 [P] [US2] Create LongTextStep preview in `web/src/features/steps/components/preview/steps/LongTextStep.tsx`
+- [X] T037 [P] [US2] Create MultipleChoiceStep preview in `web/src/features/steps/components/preview/steps/MultipleChoiceStep.tsx`
+- [X] T038 [P] [US2] Create YesNoStep preview in `web/src/features/steps/components/preview/steps/YesNoStep.tsx`
+- [X] T039 [P] [US2] Create OpinionScaleStep preview in `web/src/features/steps/components/preview/steps/OpinionScaleStep.tsx`
+- [X] T040 [P] [US2] Create EmailStep preview in `web/src/features/steps/components/preview/steps/EmailStep.tsx`
+- [X] T041 [US2] Create step previews barrel export in `web/src/features/steps/components/preview/steps/index.ts`
+- [X] T042 [US2] Create preview barrel export in `web/src/features/steps/components/preview/index.ts`
+- [X] T043 [US2] Create StepPreview component in `web/src/features/journeys/components/editor/StepPreview.tsx`
+- [X] T044 [US2] Integrate StepPreview into JourneyEditor middle panel
 
 **Checkpoint**: User Story 2 complete - steps preview with theme applied
 
@@ -117,10 +117,10 @@
 
 ### Implementation for User Story 3
 
-- [ ] T045 [US3] Update useSelectedStep hook for bidirectional URL sync in `web/src/features/journeys/hooks/useSelectedStep.ts`
-- [ ] T046 [US3] Add auto-select first step logic when no stepId in URL
-- [ ] T047 [US3] Add URL update on step selection in StepList
-- [ ] T048 [US3] Handle deleted step - auto-select next/previous
+- [X] T045 [US3] Update useSelectedStep hook for bidirectional URL sync in `web/src/features/journeys/hooks/useSelectedStep.ts`
+- [X] T046 [US3] Add auto-select first step logic when no stepId in URL
+- [X] T047 [US3] Add URL update on step selection in StepList
+- [X] T048 [US3] Handle deleted step - auto-select next/previous
 
 **Checkpoint**: User Story 3 complete - deep linking works correctly
 

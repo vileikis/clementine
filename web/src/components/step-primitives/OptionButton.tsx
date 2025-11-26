@@ -12,21 +12,21 @@ interface OptionButtonProps {
 /**
  * Selection option button for multiple choice, yes/no, etc.
  * Shows selected state with theme primary color.
+ * Uses fixed border radius (not theme button radius).
  */
 export function OptionButton({
   children,
   selected = false,
   onClick,
 }: OptionButtonProps) {
-  const { theme, buttonRadius } = useEventTheme();
+  const { theme } = useEventTheme();
 
   return (
     <button
       type="button"
       onClick={onClick}
-      className="w-full px-4 py-3 text-base font-medium border-2 transition-colors min-h-[44px]"
+      className="w-full px-4 py-3 text-base font-medium border-2 rounded-lg transition-colors min-h-[44px]"
       style={{
-        borderRadius: buttonRadius,
         borderColor: selected ? theme.primaryColor : theme.text.color + "40",
         backgroundColor: selected ? theme.primaryColor + "15" : "transparent",
         color: theme.text.color,

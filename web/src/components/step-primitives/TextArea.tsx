@@ -15,6 +15,7 @@ interface TextAreaProps {
 /**
  * Multi-line text area styled with event theme.
  * Used for long text input steps.
+ * Uses fixed border radius (not theme button radius).
  */
 export function TextArea({
   value = "",
@@ -24,7 +25,7 @@ export function TextArea({
   rows = 4,
   required = false,
 }: TextAreaProps) {
-  const { theme, buttonRadius } = useEventTheme();
+  const { theme } = useEventTheme();
 
   const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     onChange?.(e.target.value);
@@ -38,9 +39,8 @@ export function TextArea({
       maxLength={maxLength}
       rows={rows}
       required={required}
-      className="w-full resize-none px-4 py-3 text-base border-2 bg-transparent outline-none transition-colors focus:border-current"
+      className="w-full resize-none px-4 py-3 text-base border-2 rounded-lg bg-transparent outline-none transition-colors focus:border-current"
       style={{
-        borderRadius: buttonRadius,
         borderColor: theme.text.color + "40",
         color: theme.text.color,
       }}

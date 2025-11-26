@@ -5,7 +5,7 @@
  *
  * Main 3-panel layout for the journey editor.
  * - Left: Step list with drag-and-drop reordering
- * - Middle: Preview panel (placeholder for Phase 4)
+ * - Middle: Live preview panel with event theme
  * - Right: Step configuration editor
  *
  * Responsive: Stacks vertically on mobile, side-by-side on desktop.
@@ -15,6 +15,7 @@ import { useState, useCallback } from "react";
 import { JourneyEditorHeader } from "./JourneyEditorHeader";
 import { StepList } from "./StepList";
 import { StepEditor } from "./StepEditor";
+import { StepPreview } from "./StepPreview";
 import { useSteps, useSelectedStep } from "../../hooks";
 import type { Journey } from "../../types";
 import type { Step } from "@/features/steps/types";
@@ -41,10 +42,15 @@ export function JourneyEditor({ event, journey }: JourneyEditorProps) {
   );
 
   const handleStepDeleted = useCallback(() => {
-    // After deletion, select the first remaining step or clear selection
+    // After deletion, select the next step (or previous if at end), or clear selection
+    const currentIndex = steps.findIndex((s) => s.id === selectedStepId);
     const remainingSteps = steps.filter((s) => s.id !== selectedStepId);
+
     if (remainingSteps.length > 0) {
-      setSelectedStepId(remainingSteps[0].id);
+      // Try to select the step at the same position (next step)
+      // If at end, select the previous step (last in remaining)
+      const nextIndex = Math.min(currentIndex, remainingSteps.length - 1);
+      setSelectedStepId(remainingSteps[nextIndex].id);
     } else {
       setSelectedStepId(null);
     }
@@ -92,7 +98,7 @@ export function JourneyEditor({ event, journey }: JourneyEditorProps) {
           <div className="flex-1 p-6 overflow-y-auto bg-muted/10">
             <div className="flex justify-center">
               {displayStep ? (
-                <StepPreviewPlaceholder step={displayStep as Step} theme={event.theme} />
+                <StepPreview step={displayStep as Step} theme={event.theme} />
               ) : (
                 <div className="text-center text-muted-foreground">
                   <p className="text-sm">Select a step to preview</p>
@@ -121,110 +127,6 @@ export function JourneyEditor({ event, journey }: JourneyEditorProps) {
             )}
           </aside>
         </div>
-      </div>
-    </div>
-  );
-}
-
-/**
- * Placeholder preview component.
- * Will be replaced with SimulatorScreen in Phase 4 (User Story 2).
- */
-import type { EventTheme } from "@/features/events/types";
-
-interface StepPreviewPlaceholderProps {
-  step: Step;
-  theme: EventTheme;
-}
-
-function StepPreviewPlaceholder({ step, theme }: StepPreviewPlaceholderProps) {
-  return (
-    <div
-      className="w-full max-w-[320px] aspect-9/16 rounded-2xl border-4 border-foreground/10 shadow-lg overflow-hidden relative"
-      style={{
-        backgroundColor: theme.background.color,
-        color: theme.text.color,
-      }}
-    >
-      {/* Background Image */}
-      {theme.background.image && (
-        <>
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: `url(${theme.background.image})` }}
-          />
-          <div
-            className="absolute inset-0"
-            style={{ backgroundColor: `rgba(0,0,0,${theme.background.overlayOpacity})` }}
-          />
-        </>
-      )}
-
-      {/* Content */}
-      <div
-        className="relative z-10 flex flex-col h-full p-6 pt-16"
-        style={{ textAlign: theme.text.alignment }}
-      >
-        {/* Logo */}
-        {theme.logoUrl && (
-          <div className="mb-4">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={theme.logoUrl}
-              alt="Event logo"
-              className="h-8 w-auto object-contain"
-              style={{
-                marginLeft: theme.text.alignment === "center" ? "auto" : undefined,
-                marginRight: theme.text.alignment === "center" ? "auto" : undefined,
-              }}
-            />
-          </div>
-        )}
-
-        {/* Media */}
-        {step.mediaUrl && (
-          <div className="mb-4 flex-shrink-0">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={step.mediaUrl}
-              alt="Step media"
-              className="w-full h-32 object-cover rounded-lg"
-            />
-          </div>
-        )}
-
-        {/* Title & Description */}
-        <div className="flex-1">
-          {step.title && (
-            <h2 className="text-2xl font-bold mb-2">{step.title}</h2>
-          )}
-          {step.description && (
-            <p className="text-sm opacity-80">{step.description}</p>
-          )}
-        </div>
-
-        {/* CTA Button */}
-        {step.ctaLabel && (
-          <div className="mt-auto pt-4">
-            <div
-              className="w-full py-3 px-6 text-center font-medium"
-              style={{
-                backgroundColor: theme.button.backgroundColor ?? theme.primaryColor,
-                color: theme.button.textColor,
-                borderRadius:
-                  theme.button.radius === "none"
-                    ? "0"
-                    : theme.button.radius === "sm"
-                    ? "0.25rem"
-                    : theme.button.radius === "md"
-                    ? "0.5rem"
-                    : "9999px",
-              }}
-            >
-              {step.ctaLabel}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
