@@ -140,7 +140,7 @@ interface StepPreviewPlaceholderProps {
 function StepPreviewPlaceholder({ step, theme }: StepPreviewPlaceholderProps) {
   return (
     <div
-      className=" w-full  max-w-[320px] aspect-[9/16] rounded-2xl border-4 border-foreground/10 shadow-lg overflow-hidden relative"
+      className="w-full max-w-[320px] aspect-9/16 rounded-2xl border-4 border-foreground/10 shadow-lg overflow-hidden relative"
       style={{
         backgroundColor: theme.background.color,
         color: theme.text.color,
