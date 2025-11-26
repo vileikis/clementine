@@ -66,19 +66,19 @@
 
 ### Implementation for User Story 1
 
-- [ ] T020 [P] [US1] Create useSteps hook for real-time subscription in `web/src/features/journeys/hooks/useSteps.ts`
-- [ ] T021 [P] [US1] Create useStepMutations hook in `web/src/features/journeys/hooks/useStepMutations.ts`
-- [ ] T022 [P] [US1] Create useSelectedStep hook for URL sync in `web/src/features/journeys/hooks/useSelectedStep.ts`
-- [ ] T023 [US1] Create StepTypeSelector dialog in `web/src/features/journeys/components/editor/StepTypeSelector.tsx`
-- [ ] T024 [US1] Create StepListItem component in `web/src/features/journeys/components/editor/StepListItem.tsx`
-- [ ] T025 [US1] Create StepList component with dnd-kit in `web/src/features/journeys/components/editor/StepList.tsx`
-- [ ] T026 [P] [US1] Create BaseStepEditor for common fields in `web/src/features/steps/components/editors/BaseStepEditor.tsx`
-- [ ] T027 [P] [US1] Create InfoStepEditor in `web/src/features/steps/components/editors/InfoStepEditor.tsx`
-- [ ] T028 [US1] Create step editors barrel export in `web/src/features/steps/components/editors/index.ts`
-- [ ] T029 [US1] Create StepEditor component (form router) in `web/src/features/journeys/components/editor/StepEditor.tsx`
-- [ ] T030 [US1] Create JourneyEditorHeader in `web/src/features/journeys/components/editor/JourneyEditorHeader.tsx`
-- [ ] T031 [US1] Create JourneyEditor 3-panel layout in `web/src/features/journeys/components/editor/JourneyEditor.tsx`
-- [ ] T032 [US1] Create journey editor page in `web/src/app/events/[eventId]/design/journeys/[journeyId]/page.tsx`
+- [X] T020 [P] [US1] Create useSteps hook for real-time subscription in `web/src/features/journeys/hooks/useSteps.ts`
+- [X] T021 [P] [US1] Create useStepMutations hook in `web/src/features/journeys/hooks/useStepMutations.ts`
+- [X] T022 [P] [US1] Create useSelectedStep hook for URL sync in `web/src/features/journeys/hooks/useSelectedStep.ts`
+- [X] T023 [US1] Create StepTypeSelector dialog in `web/src/features/journeys/components/editor/StepTypeSelector.tsx`
+- [X] T024 [US1] Create StepListItem component in `web/src/features/journeys/components/editor/StepListItem.tsx`
+- [X] T025 [US1] Create StepList component with dnd-kit in `web/src/features/journeys/components/editor/StepList.tsx`
+- [X] T026 [P] [US1] Create BaseStepEditor for common fields in `web/src/features/steps/components/editors/BaseStepEditor.tsx`
+- [X] T027 [P] [US1] Create InfoStepEditor in `web/src/features/steps/components/editors/InfoStepEditor.tsx`
+- [X] T028 [US1] Create step editors barrel export in `web/src/features/steps/components/editors/index.ts`
+- [X] T029 [US1] Create StepEditor component (form router) in `web/src/features/journeys/components/editor/StepEditor.tsx`
+- [X] T030 [US1] Create JourneyEditorHeader in `web/src/features/journeys/components/editor/JourneyEditorHeader.tsx`
+- [X] T031 [US1] Create JourneyEditor 3-panel layout in `web/src/features/journeys/components/editor/JourneyEditor.tsx`
+- [X] T032 [US1] Create journey editor page in `web/src/app/events/[eventId]/design/journeys/[journeyId]/page.tsx`
 
 **Checkpoint**: User Story 1 complete - can add, configure, and reorder steps
 

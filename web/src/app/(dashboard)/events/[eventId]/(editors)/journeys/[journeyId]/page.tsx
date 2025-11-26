@@ -1,47 +1,45 @@
-import { getJourneyAction } from "@/features/journeys/actions/journeys";
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
+import { getEventAction } from "@/features/events/actions";
+import { getJourneyAction } from "@/features/journeys/actions/journeys";
+import { JourneyEditor } from "@/features/journeys/components";
 
 interface JourneyEditorPageProps {
   params: Promise<{ eventId: string; journeyId: string }>;
 }
 
 /**
- * Journey Detail/Editor Page - Server Component
- * Shows journey name and WIP message (editor functionality coming later)
+ * Journey Editor Page - Server Component
+ * Loads event and journey data, then renders the JourneyEditor client component.
  */
 export default async function JourneyEditorPage({
   params,
 }: JourneyEditorPageProps) {
   const { eventId, journeyId } = await params;
 
-  const result = await getJourneyAction(eventId, journeyId);
+  // Fetch event and journey in parallel
+  const [eventResult, journeyResult] = await Promise.all([
+    getEventAction(eventId),
+    getJourneyAction(eventId, journeyId),
+  ]);
 
-  if (!result.success) {
+  if (!eventResult.success || !journeyResult.success) {
     notFound();
   }
 
-  const journey = result.data;
+  // TypeScript narrowing after success check
+  const event = eventResult.event!;
+  const journey = journeyResult.data;
 
   return (
-    <div className="container mx-auto px-6 py-8 max-w-4xl">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">{journey.name}</h1>
-        <p className="text-sm text-gray-500 mt-1">
-          {journey.stepOrder.length}{" "}
-          {journey.stepOrder.length === 1 ? "step" : "steps"}
-        </p>
-      </div>
-
-      <div className="flex items-center justify-center min-h-[300px] border-2 border-dashed border-gray-200 rounded-lg bg-gray-50">
-        <div className="text-center">
-          <h2 className="text-lg font-semibold text-gray-900">
-            Work in Progress
-          </h2>
-          <p className="text-sm text-gray-500 mt-1">
-            Journey editor is under development. Steps management coming soon.
-          </p>
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center h-screen">
+          <p className="text-sm text-muted-foreground">Loading editor...</p>
         </div>
-      </div>
-    </div>
+      }
+    >
+      <JourneyEditor event={event} journey={journey} />
+    </Suspense>
   );
 }
