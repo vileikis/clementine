@@ -11,4 +11,5 @@ export {
   YesNoStep,
   OpinionScaleStep,
   EmailStep,
+  ExperiencePickerStep,
 } from "./steps";

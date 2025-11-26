@@ -134,11 +134,11 @@
 
 ### Implementation for User Story 4
 
-- [ ] T049 [P] [US4] Create ExperiencePickerEditor in `web/src/features/steps/components/editors/ExperiencePickerEditor.tsx`
-- [ ] T050 [P] [US4] Create ExperiencePickerStep preview in `web/src/features/steps/components/preview/steps/ExperiencePickerStep.tsx`
-- [ ] T051 [US4] Add ExperiencePickerEditor to step editors barrel export
-- [ ] T052 [US4] Add ExperiencePickerStep to step previews barrel export
-- [ ] T053 [US4] Update StepEditor to route to ExperiencePickerEditor
+- [X] T049 [P] [US4] Create ExperiencePickerEditor in `web/src/features/steps/components/editors/ExperiencePickerEditor.tsx`
+- [X] T050 [P] [US4] Create ExperiencePickerStep preview in `web/src/features/steps/components/preview/steps/ExperiencePickerStep.tsx`
+- [X] T051 [US4] Add ExperiencePickerEditor to step editors barrel export
+- [X] T052 [US4] Add ExperiencePickerStep to step previews barrel export
+- [X] T053 [US4] Update StepEditor to route to ExperiencePickerEditor
 
 **Checkpoint**: User Story 4 complete - experience picker fully configurable
 
