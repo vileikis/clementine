@@ -126,26 +126,26 @@ Per plan.md, this feature uses Next.js monorepo structure:
 
 ### Input Step Rendering
 
-- [ ] T045 [US2] Wire ShortTextStep to real onInputChange callback in JourneyStepRenderer in `web/src/features/guest/components/JourneyStepRenderer.tsx`
-- [ ] T046 [US2] Wire LongTextStep to real onInputChange callback in JourneyStepRenderer in `web/src/features/guest/components/JourneyStepRenderer.tsx`
-- [ ] T047 [US2] Wire EmailStep to real onInputChange callback with validation in JourneyStepRenderer in `web/src/features/guest/components/JourneyStepRenderer.tsx`
-- [ ] T048 [US2] Wire MultipleChoiceStep to real onInputChange callback in JourneyStepRenderer in `web/src/features/guest/components/JourneyStepRenderer.tsx`
-- [ ] T049 [US2] Wire YesNoStep to real onInputChange callback in JourneyStepRenderer in `web/src/features/guest/components/JourneyStepRenderer.tsx`
-- [ ] T050 [US2] Wire OpinionScaleStep to real onInputChange callback in JourneyStepRenderer in `web/src/features/guest/components/JourneyStepRenderer.tsx`
+- [X] T045 [US2] Wire ShortTextStep to real onInputChange callback in JourneyStepRenderer in `web/src/features/guest/components/JourneyStepRenderer.tsx`
+- [X] T046 [US2] Wire LongTextStep to real onInputChange callback in JourneyStepRenderer in `web/src/features/guest/components/JourneyStepRenderer.tsx`
+- [X] T047 [US2] Wire EmailStep to real onInputChange callback with validation in JourneyStepRenderer in `web/src/features/guest/components/JourneyStepRenderer.tsx`
+- [X] T048 [US2] Wire MultipleChoiceStep to real onInputChange callback in JourneyStepRenderer in `web/src/features/guest/components/JourneyStepRenderer.tsx`
+- [X] T049 [US2] Wire YesNoStep to real onInputChange callback in JourneyStepRenderer in `web/src/features/guest/components/JourneyStepRenderer.tsx`
+- [X] T050 [US2] Wire OpinionScaleStep to real onInputChange callback in JourneyStepRenderer in `web/src/features/guest/components/JourneyStepRenderer.tsx`
 
 ### Input Validation
 
-- [ ] T051 [US2] Add email format validation with Zod in JourneyStepRenderer for email steps in `web/src/features/guest/components/JourneyStepRenderer.tsx`
-- [ ] T052 [US2] Add required field validation for text steps in JourneyStepRenderer in `web/src/features/guest/components/JourneyStepRenderer.tsx`
-- [ ] T053 [US2] Display validation errors inline in step components in `web/src/features/guest/components/JourneyStepRenderer.tsx`
+- [X] T051 [US2] Add email format validation with Zod in JourneyStepRenderer for email steps in `web/src/features/guest/components/JourneyStepRenderer.tsx`
+- [X] T052 [US2] Add required field validation for text steps in JourneyStepRenderer in `web/src/features/guest/components/JourneyStepRenderer.tsx`
+- [X] T053 [US2] Display validation errors inline in step components in `web/src/features/guest/components/JourneyStepRenderer.tsx`
 
 ### Navigation Controls
 
-- [ ] T054 [P] [US2] Create JourneyNavigation component with back/next buttons in `web/src/features/guest/components/JourneyNavigation.tsx`
-- [ ] T055 [US2] Wire JourneyNavigation to useJourneyRuntime previous/next in JourneyGuestContainer in `web/src/features/guest/components/JourneyGuestContainer.tsx`
-- [ ] T056 [US2] Conditionally show/hide back button based on canGoBack in `web/src/features/guest/components/JourneyNavigation.tsx`
+- [X] T054 [P] [US2] ~~Create JourneyNavigation component with back/next buttons~~ **NOT NEEDED** - Navigation driven by step CTA buttons
+- [X] T055 [US2] Move validation logic to handleStepComplete (triggered by step CTA) in `web/src/features/guest/components/JourneyGuestContainer.tsx`
+- [X] T056 [US2] Add auto-advance for yes_no steps after selection in `web/src/features/guest/components/JourneyGuestContainer.tsx`
 
-**Checkpoint**: User Story 2 complete - all input steps collect and persist data
+**Checkpoint**: User Story 2 complete - all input steps collect and persist data, validation prevents invalid advancement ✅
 
 ---
 
