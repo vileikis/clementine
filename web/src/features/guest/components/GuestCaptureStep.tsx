@@ -3,7 +3,7 @@
 import { useState, useCallback, useRef } from "react";
 import type { StepCapture } from "@/features/steps";
 import { useCamera } from "../hooks/useCamera";
-import { saveCaptureAction, triggerTransformAction } from "@/features/sessions/actions";
+import { saveCaptureAction } from "@/features/sessions/actions";
 import { Button } from "@/components/ui/button";
 import { Camera } from "lucide-react";
 
@@ -80,17 +80,18 @@ export function GuestCaptureStep({
       formData.append("sessionId", sessionId);
       formData.append("photo", blob, "photo.jpg");
 
+      // Upload and trigger transform (all server-side, non-blocking)
       await saveCaptureAction(formData);
 
       // Stop camera stream after successful capture
       stream.getTracks().forEach((track) => track.stop());
 
-      // Trigger AI transform in background (don't await - let it run async)
-      triggerTransformAction(eventId, sessionId).catch((err) => {
-        console.error("[GuestCaptureStep] Transform failed:", err);
-      });
+      // Clear uploading state BEFORE advancing
+      setIsUploading(false);
+      setIsCapturing(false);
 
-      // Notify parent (advances to next step while transform runs in background)
+      // Advance to next step IMMEDIATELY
+      // Transform is triggered automatically server-side after upload
       onCaptureComplete();
     } catch (err) {
       const message = err instanceof Error ? err.message : "Capture failed";

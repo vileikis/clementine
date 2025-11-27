@@ -35,6 +35,7 @@ function validateImageFile(
 /**
  * Uploads guest input photo to Storage
  * Path: events/{eventId}/sessions/{sessionId}/input.jpg
+ * Returns: Public download URL for instant rendering (per Firebase standards)
  */
 export async function uploadInputImage(
   eventId: string,
@@ -53,7 +54,11 @@ export async function uploadInputImage(
     contentType: "image/jpeg",
   });
 
-  return path;
+  // Make file publicly accessible and return the public URL
+  await blob.makePublic();
+  const publicUrl = `https://storage.googleapis.com/${storage.name}/${path}`;
+
+  return publicUrl;
 }
 
 /**
