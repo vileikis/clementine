@@ -114,6 +114,7 @@ export default function DesignLayout({ children, params }: DesignLayoutProps) {
 
   return (
     <ExperiencesContext.Provider value={contextValue}>
+      
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Desktop sidebar - visible on lg+ screens */}
         <div className="hidden lg:block w-64 shrink-0">
@@ -145,8 +146,9 @@ export default function DesignLayout({ children, params }: DesignLayoutProps) {
         </div>
 
         {/* Main content area */}
-        <div className="flex-1 min-w-0">{children}</div>
+        <div className="flex-1 min-w-0 py-6">{children}</div>
       </div>
+      
     </ExperiencesContext.Provider>
   );
 }
