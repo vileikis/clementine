@@ -9,7 +9,7 @@
  */
 
 import { useCallback } from "react";
-import { Trash2 } from "lucide-react";
+import { Loader2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -22,14 +22,41 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { InfoStepEditor } from "@/features/steps/components/editors";
+import {
+  InfoStepEditor,
+  ExperiencePickerEditor,
+  CaptureStepEditor,
+  ShortTextEditor,
+  LongTextEditor,
+  MultipleChoiceEditor,
+  YesNoEditor,
+  OpinionScaleEditor,
+  EmailEditor,
+  ProcessingStepEditor,
+  RewardStepEditor,
+} from "@/features/steps/components/editors";
 import { useStepMutations } from "../../hooks";
 import { getStepTypeMeta } from "@/features/steps/constants";
-import type { Step, StepInfo } from "@/features/steps/types";
+import type {
+  Step,
+  StepInfo,
+  StepExperiencePicker,
+  StepCapture,
+  StepShortText,
+  StepLongText,
+  StepMultipleChoice,
+  StepYesNo,
+  StepOpinionScale,
+  StepEmail,
+  StepProcessing,
+  StepReward,
+} from "@/features/steps/types";
+import type { Experience } from "@/features/experiences/types";
 
 interface StepEditorProps {
   eventId: string;
   step: Step;
+  experiences: Experience[];
   onStepDeleted?: () => void;
   onPreviewChange?: (step: Partial<Step>) => void;
 }
@@ -37,6 +64,7 @@ interface StepEditorProps {
 export function StepEditor({
   eventId,
   step,
+  experiences,
   onStepDeleted,
   onPreviewChange,
 }: StepEditorProps) {
@@ -77,45 +105,47 @@ export function StepEditor({
             {stepMeta?.description || "Configure this step"}
           </p>
         </div>
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button
-              size="icon"
-              variant="ghost"
-              className="h-8 w-8 text-muted-foreground hover:text-destructive"
-              disabled={isDeleting}
-            >
-              <Trash2 className="h-4 w-4" />
-              <span className="sr-only">Delete step</span>
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Delete step?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This will permanently delete this step from the journey.
-                This action cannot be undone.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={handleDelete}
-                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+        <div className="flex items-center gap-2">
+          {isUpdating && (
+            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+          )}
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                size="icon"
+                variant="ghost"
+                className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                disabled={isDeleting}
               >
-                Delete
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+                <Trash2 className="h-4 w-4" />
+                <span className="sr-only">Delete step</span>
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete step?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will permanently delete this step from the journey.
+                  This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleDelete}
+                  className="bg-destructive text-white hover:bg-destructive/90"
+                >
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
       </div>
 
       {/* Editor Content */}
       <div className="flex-1 overflow-y-auto p-4">
-        {isUpdating && (
-          <div className="text-xs text-muted-foreground mb-2">Saving...</div>
-        )}
-        {renderEditor(step, handleUpdate, handlePreviewChange)}
+        {renderEditor(step, experiences, handleUpdate, handlePreviewChange)}
       </div>
     </div>
   );
@@ -128,6 +158,7 @@ export function StepEditor({
  */
 function renderEditor(
   step: Step,
+  experiences: Experience[],
   onUpdate: (updates: Record<string, unknown>) => Promise<void>,
   onPreviewChange: (values: Record<string, unknown>) => void
 ) {
@@ -141,26 +172,96 @@ function renderEditor(
         />
       );
 
-    // TODO: Add editors for other step types in Phase 6-9
     case "experience-picker":
+      return (
+        <ExperiencePickerEditor
+          step={step as StepExperiencePicker}
+          experiences={experiences}
+          onUpdate={onUpdate}
+          onPreviewChange={onPreviewChange}
+        />
+      );
+
     case "capture":
+      return (
+        <CaptureStepEditor
+          step={step as StepCapture}
+          experiences={experiences}
+          onUpdate={onUpdate}
+          onPreviewChange={onPreviewChange}
+        />
+      );
+
     case "short_text":
+      return (
+        <ShortTextEditor
+          step={step as StepShortText}
+          onUpdate={onUpdate}
+          onPreviewChange={onPreviewChange}
+        />
+      );
+
     case "long_text":
+      return (
+        <LongTextEditor
+          step={step as StepLongText}
+          onUpdate={onUpdate}
+          onPreviewChange={onPreviewChange}
+        />
+      );
+
     case "multiple_choice":
+      return (
+        <MultipleChoiceEditor
+          step={step as StepMultipleChoice}
+          onUpdate={onUpdate}
+          onPreviewChange={onPreviewChange}
+        />
+      );
+
     case "yes_no":
+      return (
+        <YesNoEditor
+          step={step as StepYesNo}
+          onUpdate={onUpdate}
+          onPreviewChange={onPreviewChange}
+        />
+      );
+
     case "opinion_scale":
+      return (
+        <OpinionScaleEditor
+          step={step as StepOpinionScale}
+          onUpdate={onUpdate}
+          onPreviewChange={onPreviewChange}
+        />
+      );
+
     case "email":
+      return (
+        <EmailEditor
+          step={step as StepEmail}
+          onUpdate={onUpdate}
+          onPreviewChange={onPreviewChange}
+        />
+      );
+
     case "processing":
+      return (
+        <ProcessingStepEditor
+          step={step as StepProcessing}
+          onUpdate={onUpdate}
+          onPreviewChange={onPreviewChange}
+        />
+      );
+
     case "reward":
       return (
-        <div className="text-center py-8 text-muted-foreground">
-          <p className="text-sm">
-            Editor for &quot;{step.type}&quot; step coming soon.
-          </p>
-          <p className="text-xs mt-2">
-            Use the base fields above to configure this step.
-          </p>
-        </div>
+        <RewardStepEditor
+          step={step as StepReward}
+          onUpdate={onUpdate}
+          onPreviewChange={onPreviewChange}
+        />
       );
 
     default:

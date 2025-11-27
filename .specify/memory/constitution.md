@@ -1,23 +1,27 @@
 <!--
   SYNC IMPACT REPORT
 
-  Version Change: 1.0.0 → 1.1.0
+  Version Change: 1.1.0 → 1.2.0
 
   Modified Principles:
-  - Created VI. Firebase Architecture Standards
+  - Created VII. Feature Module Architecture (new principle)
+  - Updated VI. Firebase Architecture Standards - Fixed FAR-003 schema location to align with feature-modules.md
 
   Added Sections:
-  - Core Principles section expanded (6 principles now)
+  - Core Principles section expanded (7 principles now)
+  - Added Feature Modules to Global Standards section
 
   Removed Sections: N/A
 
   Templates Requiring Updates:
-  ✅ plan-template.md - Added Firebase architecture checkpoint to Constitution Check section
-  ✅ spec-template.md - Added Firebase Architecture Requirements section (FAR-001 through FAR-005)
-  ✅ tasks-template.md - No changes needed (validation loop covers Firebase standards)
+  ✅ spec-template.md - Updated FAR-003 to reference feature-local schemas
+  ⏳ plan-template.md - May need feature module checkpoint (optional)
 
   Follow-up TODOs:
-  - None (all templates updated)
+  - None (all critical templates updated)
+
+  Previous Changes (1.1.0):
+  - Created VI. Firebase Architecture Standards
 
   Previous Changes (1.0.0):
   - Created I. Mobile-First Responsive Design
@@ -108,10 +112,23 @@ All Firebase integration MUST follow the hybrid Client SDK + Admin SDK pattern d
 - **Backend (Server Actions, API Routes)**: ALWAYS use Admin SDK (`web/src/lib/firebase/admin.ts`) for all write operations, business logic, and privileged reads
 - **Frontend (Client Components)**: ALWAYS use Client SDK (`web/src/lib/firebase/client.ts`) for real-time subscriptions (`onSnapshot`) and optimistic reads
 - **Security Rules**: Allow reads, deny writes - all mutations MUST go through Server Actions using Admin SDK
-- **Data Schemas**: All Zod schemas and validation logic MUST be located in `web/src/lib/schemas/` directory
+- **Data Schemas**: Zod schemas MUST be feature-local in `features/[name]/schemas/` (see Principle VII); cross-cutting schemas may use `web/src/lib/schemas/`
 - **Public Images**: ALWAYS store full public URLs (not relative paths) in Firestore for instant rendering without additional API calls
 
-**Rationale**: The hybrid pattern provides real-time updates (Client SDK) while ensuring security and validation (Admin SDK). Centralizing schemas in one location makes validation logic discoverable and reusable. Storing full public URLs eliminates latency from signed URL generation and enables instant image rendering across client and server components.
+**Rationale**: The hybrid pattern provides real-time updates (Client SDK) while ensuring security and validation (Admin SDK). Storing full public URLs eliminates latency from signed URL generation and enables instant image rendering across client and server components.
+
+### VII. Feature Module Architecture
+
+All product features MUST follow the vertical slice architecture defined in `standards/global/feature-modules.md`.
+
+- **One feature = one domain**: Each feature module (`features/[name]/`) encapsulates components, hooks, actions, repositories, schemas, and types for a single product capability
+- **Organized by technical concern**: Group files by purpose (`actions/`, `repositories/`, `schemas/`, `components/`) with domain-specific naming (`events.actions.ts`, `events.repository.ts`)
+- **Explicit file naming**: Use `[domain].[purpose].[ext]` pattern for instant recognition in search and tabs
+- **Barrel exports everywhere**: Every folder MUST have an `index.ts` that re-exports its contents
+- **Restricted public API**: Feature-level `index.ts` exports ONLY components, hooks, and types - NOT actions, schemas, or repositories (to avoid Next.js client bundling errors)
+- **Feature-local schemas**: Zod schemas live in `features/[name]/schemas/` alongside the code that uses them, NOT in a central `lib/schemas/` directory
+
+**Rationale**: Vertical slice architecture keeps related code together, improving discoverability and maintainability. Each feature is self-contained and can be developed, tested, and modified independently. The restricted public API prevents server-only code from leaking into client bundles.
 
 ## Technical Standards
 
@@ -120,6 +137,7 @@ All development MUST adhere to standards defined in `standards/`:
 ### Global Standards (Always Applicable)
 
 - **Tech Stack** (`global/tech-stack.md`): Next.js 16, React 19, TypeScript strict mode, Tailwind CSS v4, shadcn/ui
+- **Feature Modules** (`global/feature-modules.md`): Vertical slice architecture, feature structure, barrel exports, public API restrictions
 - **Coding Style** (`global/coding-style.md`): Naming conventions (PascalCase components, camelCase functions, UPPER_SNAKE_CASE constants)
 - **Conventions** (`global/conventions.md`): Git workflow, branch strategy, environment config, dependency management
 - **Validation** (`global/validation.md`): Zod for type-safe validation, server-side validation required, client-side optional
@@ -210,4 +228,4 @@ If a feature requires violating the "Clean Code & Simplicity" principle (e.g., i
 - Why the complexity is needed for this specific use case
 - What simpler alternatives were considered and why they were rejected
 
-**Version**: 1.1.0 | **Ratified**: 2025-11-11 | **Last Amended**: 2025-11-17
+**Version**: 1.2.0 | **Ratified**: 2025-11-11 | **Last Amended**: 2025-11-26

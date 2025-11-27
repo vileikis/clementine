@@ -71,7 +71,7 @@ export const STEP_DEFAULTS: Record<
     config: {
       layout: "grid",
       variable: "selected_experience_id",
-      options: [],
+      experienceIds: [],
     },
   },
   capture: {
