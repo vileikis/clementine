@@ -60,8 +60,8 @@ export default async function StudioLayout({
       </div>
 
       {/* Page content - fills remaining space */}
-      <main className="flex-1 overflow-hidden">
-        <div className="container mx-auto h-full overflow-hidden">{children}</div>
+      <main className="flex-1 overflow-auto">
+        {children}
       </main>
     </div>
   )
