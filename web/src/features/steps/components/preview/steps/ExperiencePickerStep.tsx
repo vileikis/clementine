@@ -6,6 +6,7 @@
  * Read-only preview for Experience Picker step type.
  * Displays title, description, and experience options in the configured layout.
  * Resolves display data (name, previewMediaUrl) from experiences at runtime.
+ * Supports interactive mode for playback with selection persistence.
  *
  * Responsive grid layout:
  * - Mobile: 2 columns
@@ -22,6 +23,14 @@ import type { Experience } from "@/features/experiences/types";
 interface ExperiencePickerStepProps {
   step: StepExperiencePicker;
   experiences: Experience[];
+  /** Enable interactive selection (playback mode) */
+  isInteractive?: boolean;
+  /** Currently selected experience ID */
+  selectedExperienceId?: string;
+  /** Callback when selection changes */
+  onValueChange?: (experienceId: string) => void;
+  /** Callback when CTA button is clicked */
+  onCtaClick?: () => void;
 }
 
 interface ResolvedOption {
@@ -31,8 +40,21 @@ interface ResolvedOption {
   missing: boolean;
 }
 
-export function ExperiencePickerStep({ step, experiences }: ExperiencePickerStepProps) {
+export function ExperiencePickerStep({
+  step,
+  experiences,
+  isInteractive = false,
+  selectedExperienceId,
+  onValueChange,
+  onCtaClick,
+}: ExperiencePickerStepProps) {
   const layout = step.config?.layout ?? "grid";
+
+  const handleSelect = (experienceId: string) => {
+    if (isInteractive) {
+      onValueChange?.(experienceId);
+    }
+  };
 
   // Resolve experience data from IDs
   const resolvedOptions = useMemo(() => {
@@ -64,7 +86,7 @@ export function ExperiencePickerStep({ step, experiences }: ExperiencePickerStep
     <StepLayout
       mediaUrl={step.mediaUrl}
       mediaType={step.mediaType}
-      action={step.ctaLabel && <ActionButton>{step.ctaLabel}</ActionButton>}
+      action={step.ctaLabel && <ActionButton onClick={onCtaClick}>{step.ctaLabel}</ActionButton>}
     >
       {step.title && (
         <h2 className="text-2xl font-bold mb-2">{step.title}</h2>
@@ -85,7 +107,12 @@ export function ExperiencePickerStep({ step, experiences }: ExperiencePickerStep
           <p className="text-sm">No experiences selected</p>
         </div>
       ) : (
-        <OptionsLayout layout={layout} options={resolvedOptions} />
+        <OptionsLayout
+          layout={layout}
+          options={resolvedOptions}
+          selectedId={selectedExperienceId}
+          onSelect={handleSelect}
+        />
       )}
     </StepLayout>
   );
@@ -94,9 +121,11 @@ export function ExperiencePickerStep({ step, experiences }: ExperiencePickerStep
 interface OptionsLayoutProps {
   layout: "grid" | "list" | "carousel";
   options: ResolvedOption[];
+  selectedId?: string;
+  onSelect?: (id: string) => void;
 }
 
-function OptionsLayout({ layout, options }: OptionsLayoutProps) {
+function OptionsLayout({ layout, options, selectedId, onSelect }: OptionsLayoutProps) {
   const { theme } = useEventTheme();
 
   switch (layout) {
@@ -104,7 +133,13 @@ function OptionsLayout({ layout, options }: OptionsLayoutProps) {
       return (
         <div className="grid grid-cols-2 gap-2 lg:grid-cols-3 lg:gap-3">
           {options.map((option) => (
-            <GridOption key={option.id} option={option} theme={theme} />
+            <GridOption
+              key={option.id}
+              option={option}
+              theme={theme}
+              selected={selectedId === option.id}
+              onClick={() => onSelect?.(option.id)}
+            />
           ))}
         </div>
       );
@@ -113,7 +148,11 @@ function OptionsLayout({ layout, options }: OptionsLayoutProps) {
       return (
         <div className="space-y-2">
           {options.map((option) => (
-            <OptionButton key={option.id}>
+            <OptionButton
+              key={option.id}
+              selected={selectedId === option.id}
+              onClick={() => onSelect?.(option.id)}
+            >
               <span className={option.missing ? "text-destructive" : ""}>
                 {option.name}
               </span>
@@ -126,7 +165,13 @@ function OptionsLayout({ layout, options }: OptionsLayoutProps) {
       return (
         <div className="flex gap-2 overflow-x-auto pb-2 -mx-2 px-2">
           {options.map((option) => (
-            <CarouselOption key={option.id} option={option} theme={theme} />
+            <CarouselOption
+              key={option.id}
+              option={option}
+              theme={theme}
+              selected={selectedId === option.id}
+              onClick={() => onSelect?.(option.id)}
+            />
           ))}
         </div>
       );
@@ -139,18 +184,22 @@ function OptionsLayout({ layout, options }: OptionsLayoutProps) {
 interface OptionProps {
   option: ResolvedOption;
   theme: ReturnType<typeof useEventTheme>["theme"];
+  selected?: boolean;
+  onClick?: () => void;
 }
 
-function GridOption({ option, theme }: OptionProps) {
+function GridOption({ option, theme, selected, onClick }: OptionProps) {
   return (
     <button
       type="button"
+      onClick={onClick}
       className={`flex flex-col items-center p-2 border-2 rounded-lg transition-colors aspect-square isolate ${
         option.missing ? "border-destructive/40" : ""
-      }`}
+      } ${selected ? "ring-2 ring-offset-2" : ""}`}
       style={{
         borderColor: option.missing ? undefined : theme.text.color + "40",
         color: theme.text.color,
+        ...(selected ? { borderColor: theme.button.backgroundColor ?? theme.text.color } : {}),
       }}
     >
       {option.imageUrl ? (
@@ -189,16 +238,18 @@ function GridOption({ option, theme }: OptionProps) {
   );
 }
 
-function CarouselOption({ option, theme }: OptionProps) {
+function CarouselOption({ option, theme, selected, onClick }: OptionProps) {
   return (
     <button
       type="button"
+      onClick={onClick}
       className={`flex flex-col items-center p-2 border-2 rounded-lg transition-colors shrink-0 w-24 isolate ${
         option.missing ? "border-destructive/40" : ""
-      }`}
+      } ${selected ? "ring-2 ring-offset-2" : ""}`}
       style={{
         borderColor: option.missing ? undefined : theme.text.color + "40",
         color: theme.text.color,
+        ...(selected ? { borderColor: theme.button.backgroundColor ?? theme.text.color } : {}),
       }}
     >
       {option.imageUrl ? (

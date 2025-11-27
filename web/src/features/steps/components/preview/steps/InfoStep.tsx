@@ -12,14 +12,16 @@ import type { StepInfo } from "@/features/steps/types";
 
 interface InfoStepProps {
   step: StepInfo;
+  /** Callback when CTA button is clicked */
+  onCtaClick?: () => void;
 }
 
-export function InfoStep({ step }: InfoStepProps) {
+export function InfoStep({ step, onCtaClick }: InfoStepProps) {
   return (
     <StepLayout
       mediaUrl={step.mediaUrl}
       mediaType={step.mediaType}
-      action={step.ctaLabel && <ActionButton>{step.ctaLabel}</ActionButton>}
+      action={step.ctaLabel && <ActionButton onClick={onCtaClick}>{step.ctaLabel}</ActionButton>}
     >
       {step.title && (
         <h2 className="text-2xl font-bold mb-2">{step.title}</h2>

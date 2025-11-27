@@ -3,8 +3,9 @@
 /**
  * Preview: ShortTextStep
  *
- * Read-only preview for Short Text input step type.
+ * Preview for Short Text input step type.
  * Displays title, description, a text input field, and CTA button.
+ * Supports interactive mode for playback with value persistence.
  */
 
 import { StepLayout, ActionButton, TextInput } from "@/components/step-primitives";
@@ -12,14 +13,28 @@ import type { StepShortText } from "@/features/steps/types";
 
 interface ShortTextStepProps {
   step: StepShortText;
+  /** Enable interactive input (playback mode) */
+  isInteractive?: boolean;
+  /** Current input value (controlled) */
+  value?: string;
+  /** Callback when value changes */
+  onValueChange?: (value: string) => void;
+  /** Callback when CTA button is clicked */
+  onCtaClick?: () => void;
 }
 
-export function ShortTextStep({ step }: ShortTextStepProps) {
+export function ShortTextStep({
+  step,
+  isInteractive = false,
+  value = "",
+  onValueChange,
+  onCtaClick,
+}: ShortTextStepProps) {
   return (
     <StepLayout
       mediaUrl={step.mediaUrl}
       mediaType={step.mediaType}
-      action={step.ctaLabel && <ActionButton>{step.ctaLabel}</ActionButton>}
+      action={step.ctaLabel && <ActionButton onClick={onCtaClick}>{step.ctaLabel}</ActionButton>}
     >
       {step.title && (
         <h2 className="text-2xl font-bold mb-2">{step.title}</h2>
@@ -32,6 +47,8 @@ export function ShortTextStep({ step }: ShortTextStepProps) {
         placeholder={step.config.placeholder || "Enter your answer..."}
         maxLength={step.config.maxLength}
         required={step.config.required}
+        value={isInteractive ? value : undefined}
+        onChange={isInteractive ? onValueChange : undefined}
       />
     </StepLayout>
   );

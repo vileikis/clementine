@@ -3,8 +3,9 @@
 /**
  * Preview: MultipleChoiceStep
  *
- * Read-only preview for Multiple Choice step type.
+ * Preview for Multiple Choice step type.
  * Displays title, description, option buttons, and CTA button.
+ * Supports interactive mode for playback with selection persistence.
  *
  * Responsive layout:
  * - Mobile: Single column stack
@@ -16,17 +17,37 @@ import type { StepMultipleChoice } from "@/features/steps/types";
 
 interface MultipleChoiceStepProps {
   step: StepMultipleChoice;
+  /** Enable interactive selection (playback mode) */
+  isInteractive?: boolean;
+  /** Currently selected option value */
+  selectedValue?: string;
+  /** Callback when selection changes */
+  onValueChange?: (value: string) => void;
+  /** Callback when CTA button is clicked */
+  onCtaClick?: () => void;
 }
 
-export function MultipleChoiceStep({ step }: MultipleChoiceStepProps) {
+export function MultipleChoiceStep({
+  step,
+  isInteractive = false,
+  selectedValue,
+  onValueChange,
+  onCtaClick,
+}: MultipleChoiceStepProps) {
   const options = step.config.options;
   const useGrid = options.length > 4;
+
+  const handleOptionClick = (value: string) => {
+    if (isInteractive) {
+      onValueChange?.(value);
+    }
+  };
 
   return (
     <StepLayout
       mediaUrl={step.mediaUrl}
       mediaType={step.mediaType}
-      action={step.ctaLabel && <ActionButton>{step.ctaLabel}</ActionButton>}
+      action={step.ctaLabel && <ActionButton onClick={onCtaClick}>{step.ctaLabel}</ActionButton>}
     >
       {step.title && (
         <h2 className="text-2xl font-bold mb-2">{step.title}</h2>
@@ -43,7 +64,11 @@ export function MultipleChoiceStep({ step }: MultipleChoiceStepProps) {
         }
       >
         {options.map((option, index) => (
-          <OptionButton key={option.value || index}>
+          <OptionButton
+            key={option.value || index}
+            selected={selectedValue === option.value}
+            onClick={() => handleOptionClick(option.value)}
+          >
             {option.label}
           </OptionButton>
         ))}

@@ -11,7 +11,7 @@
 
 import { useMemo } from "react";
 import Image from "next/image";
-import { ImageIcon, AlertCircle } from "lucide-react";
+import { ImageIcon, AlertCircle, Camera } from "lucide-react";
 import { StepLayout, ActionButton } from "@/components/step-primitives";
 import { useEventTheme } from "@/components/providers/EventThemeProvider";
 import type { StepCapture } from "@/features/steps/types";
@@ -22,9 +22,22 @@ interface CaptureStepProps {
   step: StepCapture;
   experiences: Experience[];
   mockSession?: MockSessionData;
+  /** Callback when CTA button is clicked */
+  onCtaClick?: () => void;
+  /** Enable interactive mode (playback) */
+  isInteractive?: boolean;
+  /** Callback when step is complete (triggers auto-advance in playback) */
+  onComplete?: () => void;
 }
 
-export function CaptureStep({ step, experiences, mockSession }: CaptureStepProps) {
+export function CaptureStep({
+  step,
+  experiences,
+  mockSession,
+  onCtaClick,
+  isInteractive = false,
+  onComplete,
+}: CaptureStepProps) {
   const { theme } = useEventTheme();
   const config = step.config ?? { source: "selected_experience_id", fallbackExperienceId: null };
   const capturedPhoto = mockSession?.capturedPhoto ?? "/placeholders/selfie-placeholder.svg";
@@ -45,7 +58,7 @@ export function CaptureStep({ step, experiences, mockSession }: CaptureStepProps
     <StepLayout
       mediaUrl={step.mediaUrl}
       mediaType={step.mediaType}
-      action={step.ctaLabel && <ActionButton>{step.ctaLabel}</ActionButton>}
+      action={step.ctaLabel && <ActionButton onClick={onCtaClick}>{step.ctaLabel}</ActionButton>}
     >
       <div className="flex-1 flex flex-col">
         {/* Header with title/description */}
@@ -92,6 +105,18 @@ export function CaptureStep({ step, experiences, mockSession }: CaptureStepProps
             <div className="absolute bottom-3 left-3 w-6 h-6 border-b-2 border-l-2 rounded-bl border-white/60" />
             <div className="absolute bottom-3 right-3 w-6 h-6 border-b-2 border-r-2 rounded-br border-white/60" />
           </div>
+
+          {/* Capture Button - visible in interactive mode */}
+          {isInteractive && (
+            <button
+              type="button"
+              onClick={onComplete}
+              className="mt-4 w-16 h-16 rounded-full bg-white flex items-center justify-center shadow-lg active:scale-95 transition-transform"
+              aria-label="Capture photo"
+            >
+              <Camera className="w-8 h-8 text-gray-800" />
+            </button>
+          )}
         </div>
 
         {/* Fallback Experience Info */}
@@ -135,10 +160,7 @@ export function CaptureStep({ step, experiences, mockSession }: CaptureStepProps
             ) : null}
           </div>
         )}
-
-  
       </div>
-
     </StepLayout>
   );
 }
