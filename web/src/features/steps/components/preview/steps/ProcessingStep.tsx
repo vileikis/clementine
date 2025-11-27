@@ -76,7 +76,7 @@ export function ProcessingStep({ step }: ProcessingStepProps) {
         </p>
 
         {/* Progress Bar */}
-        <div className="w-full max-w-xs">
+        <div className="w-[80%]">
           <div className="h-2 rounded-full bg-white/20 overflow-hidden">
             <div
               className="h-full rounded-full transition-all duration-100"

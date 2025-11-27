@@ -1,6 +1,8 @@
 // Preview components barrel export
 
-export { SimulatorScreen } from "./SimulatorScreen";
+export { DeviceFrame } from "./DeviceFrame";
+export { ViewSwitcher } from "./ViewSwitcher";
+export { PreviewRuntime } from "./PreviewRuntime";
 
 // Step preview components
 export {

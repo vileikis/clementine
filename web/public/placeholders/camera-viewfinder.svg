@@ -1,0 +1,16 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Outer circle guide -->
+  <circle cx="100" cy="100" r="80" stroke="white" stroke-width="2" stroke-opacity="0.5" fill="none"/>
+  <!-- Corner brackets -->
+  <!-- Top-left -->
+  <path d="M30 60 L30 30 L60 30" stroke="white" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <!-- Top-right -->
+  <path d="M140 30 L170 30 L170 60" stroke="white" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <!-- Bottom-left -->
+  <path d="M30 140 L30 170 L60 170" stroke="white" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <!-- Bottom-right -->
+  <path d="M140 170 L170 170 L170 140" stroke="white" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <!-- Center crosshair -->
+  <line x1="90" y1="100" x2="110" y2="100" stroke="white" stroke-width="1" stroke-opacity="0.5"/>
+  <line x1="100" y1="90" x2="100" y2="110" stroke="white" stroke-width="1" stroke-opacity="0.5"/>
+</svg>
