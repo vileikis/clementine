@@ -17,7 +17,9 @@ export function EventTabs({ eventId }: EventTabsProps) {
   const pathname = usePathname();
 
   const tabs = [
-    { label: "Design", href: `/events/${eventId}/design` },
+    { label: "Journeys", href: `/events/${eventId}/design/journeys` },
+    { label: "Experiences", href: `/events/${eventId}/design/experiences` },
+    { label: "Theme", href: `/events/${eventId}/design/theme` },
     { label: "Distribute", href: `/events/${eventId}/distribution` },
     { label: "Results", href: `/events/${eventId}/results` },
   ];

@@ -59,7 +59,7 @@ export function EventBreadcrumb({ eventId, eventName }: EventBreadcrumbProps) {
               href="/events"
               className="hover:text-foreground hover:underline transition-colors"
             >
-              Events
+              🍊 Events
             </Link>
           </li>
           <li aria-hidden="true">&gt;</li>
