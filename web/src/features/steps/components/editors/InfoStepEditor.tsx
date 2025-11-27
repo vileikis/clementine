@@ -16,10 +16,13 @@ import { BaseStepEditor } from "./BaseStepEditor";
 import { useAutoSave } from "../../hooks";
 import type { StepInfo } from "../../types";
 
+import { stepMediaTypeSchema } from "../../schemas";
+
 const infoStepFormSchema = z.object({
   title: z.string().max(200).optional().nullable(),
   description: z.string().max(1000).optional().nullable(),
   mediaUrl: z.string().url().optional().nullable().or(z.literal("")),
+  mediaType: stepMediaTypeSchema.optional().nullable(),
   ctaLabel: z.string().max(50).optional().nullable(),
 });
 
@@ -30,6 +33,7 @@ const FIELDS_TO_COMPARE: (keyof InfoStepFormValues)[] = [
   "title",
   "description",
   "mediaUrl",
+  "mediaType",
   "ctaLabel",
 ];
 
@@ -52,6 +56,7 @@ export function InfoStepEditor({
       title: step.title ?? "",
       description: step.description ?? "",
       mediaUrl: step.mediaUrl ?? "",
+      mediaType: step.mediaType ?? null,
       ctaLabel: step.ctaLabel ?? "",
     },
   });
@@ -70,6 +75,7 @@ export function InfoStepEditor({
       title: step.title ?? "",
       description: step.description ?? "",
       mediaUrl: step.mediaUrl ?? "",
+      mediaType: step.mediaType ?? null,
       ctaLabel: step.ctaLabel ?? "",
     });
     // Only reset when step.id changes, not on every step field change
@@ -93,6 +99,9 @@ export function InfoStepEditor({
         <BaseStepEditor
           form={form}
           companyId={companyId}
+          onMediaChange={async (mediaUrl, mediaType) => {
+            await onUpdate({ mediaUrl, mediaType });
+          }}
           showDescription={true}
           showMediaUrl={true}
           showCtaLabel={true}

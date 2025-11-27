@@ -27,6 +27,7 @@ import { Switch } from "@/components/ui/switch";
 import { BaseStepEditor } from "./BaseStepEditor";
 import { useAutoSave } from "../../hooks";
 import { STEP_CONSTANTS } from "../../constants";
+import { stepMediaTypeSchema } from "../../schemas";
 import type { StepMultipleChoice } from "../../types";
 
 const multipleChoiceFormSchema = z.object({
@@ -34,6 +35,7 @@ const multipleChoiceFormSchema = z.object({
   title: z.string().max(200).optional().nullable(),
   description: z.string().max(1000).optional().nullable(),
   mediaUrl: z.string().url().optional().nullable().or(z.literal("")),
+  mediaType: stepMediaTypeSchema.optional().nullable(),
   ctaLabel: z.string().max(50).optional().nullable(),
   // Config fields
   config: z.object({
@@ -67,6 +69,7 @@ const FIELDS_TO_COMPARE: (keyof MultipleChoiceFormValues)[] = [
   "title",
   "description",
   "mediaUrl",
+  "mediaType",
   "ctaLabel",
   "config",
 ];
@@ -101,6 +104,7 @@ export function MultipleChoiceEditor({
       title: step.title ?? "",
       description: step.description ?? "",
       mediaUrl: step.mediaUrl ?? "",
+      mediaType: step.mediaType ?? null,
       ctaLabel: step.ctaLabel ?? "",
       config: {
         variable: config.variable,
@@ -130,6 +134,7 @@ export function MultipleChoiceEditor({
       title: step.title ?? "",
       description: step.description ?? "",
       mediaUrl: step.mediaUrl ?? "",
+      mediaType: step.mediaType ?? null,
       ctaLabel: step.ctaLabel ?? "",
       config: {
         variable: config.variable,
@@ -197,6 +202,9 @@ export function MultipleChoiceEditor({
         <BaseStepEditor
           form={form}
           companyId={companyId}
+          onMediaChange={async (mediaUrl, mediaType) => {
+            await onUpdate({ mediaUrl, mediaType });
+          }}
           showDescription={true}
           showMediaUrl={true}
           showCtaLabel={true}
