@@ -6,4 +6,5 @@ export {
   updateEventBranding,
   updateEventStatus,
   updateEventName,
+  deleteEvent,
 } from "./events";
