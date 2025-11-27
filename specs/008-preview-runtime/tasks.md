@@ -26,14 +26,14 @@
 
 **Purpose**: Create foundational types and assets required by all user stories
 
-- [ ] T001 Create preview types file with ViewportMode, ViewportDimensions, MockSessionData in `web/src/features/steps/types/preview.types.ts`
-- [ ] T002 [P] Update types barrel export to include preview types in `web/src/features/steps/types/index.ts`
-- [ ] T003 [P] Create placeholder images directory at `web/public/placeholders/`
-- [ ] T004 [P] Add selfie-placeholder.jpg (375x500px) to `web/public/placeholders/`
-- [ ] T005 [P] Add transformed-placeholder.jpg (375x500px) to `web/public/placeholders/`
-- [ ] T006 [P] Add camera-viewfinder.svg to `web/public/placeholders/`
+- [x] T001 Create preview types file with ViewportMode, ViewportDimensions, MockSessionData in `web/src/features/steps/types/preview.types.ts`
+- [x] T002 [P] Update types barrel export to include preview types in `web/src/features/steps/types/index.ts`
+- [x] T003 [P] Create placeholder images directory at `web/public/placeholders/`
+- [x] T004 [P] Add selfie-placeholder.svg (375x500px) to `web/public/placeholders/`
+- [x] T005 [P] Add transformed-placeholder.svg (375x500px) to `web/public/placeholders/`
+- [x] T006 [P] Add camera-viewfinder.svg to `web/public/placeholders/`
 
-**Checkpoint**: Types and assets ready for component development
+**Checkpoint**: Types and assets ready for component development ✅
 
 ---
 
@@ -43,14 +43,14 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T007 Rename SimulatorScreen.tsx to DeviceFrame.tsx in `web/src/features/steps/components/preview/`
-- [ ] T008 Update DeviceFrame component to accept viewportMode prop and use VIEWPORT_DIMENSIONS in `web/src/features/steps/components/preview/DeviceFrame.tsx`
-- [ ] T009 Create ViewSwitcher component with mobile/desktop toggle in `web/src/features/steps/components/preview/ViewSwitcher.tsx`
-- [ ] T010 Create PreviewRuntime wrapper component in `web/src/features/steps/components/preview/PreviewRuntime.tsx`
-- [ ] T011 Update preview barrel export with DeviceFrame, ViewSwitcher, PreviewRuntime in `web/src/features/steps/components/preview/index.ts`
-- [ ] T012 Update all existing imports from SimulatorScreen to DeviceFrame across codebase
+- [x] T007 Rename SimulatorScreen.tsx to DeviceFrame.tsx in `web/src/features/steps/components/preview/`
+- [x] T008 Update DeviceFrame component to accept viewportMode prop and use VIEWPORT_DIMENSIONS in `web/src/features/steps/components/preview/DeviceFrame.tsx`
+- [x] T009 Create ViewSwitcher component with mobile/desktop toggle in `web/src/features/steps/components/preview/ViewSwitcher.tsx`
+- [x] T010 Create PreviewRuntime wrapper component in `web/src/features/steps/components/preview/PreviewRuntime.tsx`
+- [x] T011 Update preview barrel export with DeviceFrame, ViewSwitcher, PreviewRuntime in `web/src/features/steps/components/preview/index.ts`
+- [x] T012 Update all existing imports from SimulatorScreen to DeviceFrame across codebase
 
-**Checkpoint**: Foundation ready - user story integration can now begin
+**Checkpoint**: Foundation ready - user story integration can now begin ✅
 
 ---
 
