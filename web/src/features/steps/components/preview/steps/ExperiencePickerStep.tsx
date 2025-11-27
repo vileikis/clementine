@@ -24,6 +24,8 @@ interface ExperiencePickerStepProps {
   selectedExperienceId?: string;
   /** Callback when selection changes */
   onValueChange?: (experienceId: string) => void;
+  /** Callback when CTA button is clicked */
+  onCtaClick?: () => void;
 }
 
 interface ResolvedOption {
@@ -39,6 +41,7 @@ export function ExperiencePickerStep({
   isInteractive = false,
   selectedExperienceId,
   onValueChange,
+  onCtaClick,
 }: ExperiencePickerStepProps) {
   const layout = step.config?.layout ?? "grid";
 
@@ -107,7 +110,7 @@ export function ExperiencePickerStep({
 
       {step.ctaLabel && (
         <div className="mt-auto pt-4">
-          <ActionButton>{step.ctaLabel}</ActionButton>
+          <ActionButton onClick={onCtaClick}>{step.ctaLabel}</ActionButton>
         </div>
       )}
     </StepLayout>

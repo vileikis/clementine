@@ -66,6 +66,7 @@ export function PlaybackMode({
               mode="playback"
               playbackSession={mockSession.session}
               onInputChange={mockSession.updateInput}
+              onCtaClick={actions.next}
             />
           ) : (
             <JourneyCompleteState />

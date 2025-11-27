@@ -22,9 +22,11 @@ interface CaptureStepProps {
   step: StepCapture;
   experiences: Experience[];
   mockSession?: MockSessionData;
+  /** Callback when CTA button is clicked */
+  onCtaClick?: () => void;
 }
 
-export function CaptureStep({ step, experiences, mockSession }: CaptureStepProps) {
+export function CaptureStep({ step, experiences, mockSession, onCtaClick }: CaptureStepProps) {
   const { theme } = useEventTheme();
   const config = step.config ?? { source: "selected_experience_id", fallbackExperienceId: null };
   const capturedPhoto = mockSession?.capturedPhoto ?? "/placeholders/selfie-placeholder.svg";
@@ -138,7 +140,7 @@ export function CaptureStep({ step, experiences, mockSession }: CaptureStepProps
       {/* CTA Button */}
       {step.ctaLabel && (
         <div className="mt-auto pt-4">
-          <ActionButton>{step.ctaLabel}</ActionButton>
+          <ActionButton onClick={onCtaClick}>{step.ctaLabel}</ActionButton>
         </div>
       )}
     </StepLayout>

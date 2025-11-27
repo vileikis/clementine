@@ -53,6 +53,8 @@ interface PreviewRuntimeProps {
   playbackSession?: PlaybackMockSession;
   /** Callback when step input value changes (only used in playback mode) */
   onInputChange?: (stepId: string, value: StepInputValue) => void;
+  /** Callback when CTA button is clicked (only used in playback mode) */
+  onCtaClick?: () => void;
 }
 
 export function PreviewRuntime({
@@ -64,6 +66,7 @@ export function PreviewRuntime({
   mode = "single-step",
   playbackSession,
   onInputChange,
+  onCtaClick,
 }: PreviewRuntimeProps) {
   // Merge provided mock data with defaults
   const session: MockSessionData = {
@@ -84,6 +87,7 @@ export function PreviewRuntime({
             isInteractive={isInteractive}
             playbackSession={playbackSession}
             onInputChange={onInputChange}
+            onCtaClick={isInteractive ? onCtaClick : undefined}
           />
         </DeviceFrame>
       </div>
@@ -104,6 +108,7 @@ function StepContent({
   isInteractive,
   playbackSession,
   onInputChange,
+  onCtaClick,
 }: {
   step: Step;
   experiences: Experience[];
@@ -111,6 +116,7 @@ function StepContent({
   isInteractive: boolean;
   playbackSession?: PlaybackMockSession;
   onInputChange?: (stepId: string, value: StepInputValue) => void;
+  onCtaClick?: () => void;
 }) {
   // Helper to get current input value for a step
   const getInputValue = (stepId: string) => playbackSession?.inputs[stepId];
@@ -141,7 +147,7 @@ function StepContent({
 
   switch (step.type) {
     case "info":
-      return <InfoStep step={step} />;
+      return <InfoStep step={step} onCtaClick={onCtaClick} />;
 
     case "short_text":
       return (
@@ -152,6 +158,7 @@ function StepContent({
           onValueChange={(value) =>
             onInputChange?.(step.id, { type: "text", value })
           }
+          onCtaClick={onCtaClick}
         />
       );
 
@@ -164,6 +171,7 @@ function StepContent({
           onValueChange={(value) =>
             onInputChange?.(step.id, { type: "text", value })
           }
+          onCtaClick={onCtaClick}
         />
       );
 
@@ -176,6 +184,7 @@ function StepContent({
           onValueChange={(value) =>
             onInputChange?.(step.id, { type: "selection", selectedId: value })
           }
+          onCtaClick={onCtaClick}
         />
       );
 
@@ -200,6 +209,7 @@ function StepContent({
           onValueChange={(value) =>
             onInputChange?.(step.id, { type: "number", value })
           }
+          onCtaClick={onCtaClick}
         />
       );
 
@@ -212,6 +222,7 @@ function StepContent({
           onValueChange={(value) =>
             onInputChange?.(step.id, { type: "text", value })
           }
+          onCtaClick={onCtaClick}
         />
       );
 
@@ -227,6 +238,7 @@ function StepContent({
           onValueChange={(experienceId) =>
             onInputChange?.(step.id, { type: "selection", selectedId: experienceId })
           }
+          onCtaClick={onCtaClick}
         />
       );
 
@@ -236,6 +248,7 @@ function StepContent({
           step={step}
           experiences={experiences}
           mockSession={mockSession}
+          onCtaClick={onCtaClick}
         />
       );
 
@@ -243,7 +256,7 @@ function StepContent({
       return <ProcessingStep step={step} />;
 
     case "reward":
-      return <RewardStep step={step} mockSession={mockSession} />;
+      return <RewardStep step={step} mockSession={mockSession} onCtaClick={onCtaClick} />;
 
     default: {
       // TypeScript exhaustive check

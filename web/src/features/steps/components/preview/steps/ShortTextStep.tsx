@@ -19,6 +19,8 @@ interface ShortTextStepProps {
   value?: string;
   /** Callback when value changes */
   onValueChange?: (value: string) => void;
+  /** Callback when CTA button is clicked */
+  onCtaClick?: () => void;
 }
 
 export function ShortTextStep({
@@ -26,6 +28,7 @@ export function ShortTextStep({
   isInteractive = false,
   value = "",
   onValueChange,
+  onCtaClick,
 }: ShortTextStepProps) {
   return (
     <StepLayout mediaUrl={step.mediaUrl}>
@@ -48,7 +51,7 @@ export function ShortTextStep({
 
       {step.ctaLabel && (
         <div className="mt-auto pt-4">
-          <ActionButton>{step.ctaLabel}</ActionButton>
+          <ActionButton onClick={onCtaClick}>{step.ctaLabel}</ActionButton>
         </div>
       )}
     </StepLayout>
