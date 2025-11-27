@@ -239,6 +239,16 @@ export function JourneyGuestContainer({
    */
   const handleInputChange = useCallback(
     (variableName: string, value: StepInputValue) => {
+      // Special handling for selected_experience_id - save as plain string
+      if (variableName === "selected_experience_id" && value.type === "selection") {
+        // Update local state with the wrapped value for consistency
+        setInputValues((prev) => ({ ...prev, [variableName]: value }));
+
+        // But persist to Firestore as plain string (schema expects string, not object)
+        runtime.saveInput(variableName, value.selectedId as any);
+        return;
+      }
+
       // Update local state immediately for responsive UI (keyed by variable name)
       setInputValues((prev) => ({ ...prev, [variableName]: value }));
 

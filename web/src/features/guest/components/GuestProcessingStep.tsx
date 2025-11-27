@@ -5,7 +5,6 @@ import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
 import type { StepProcessing } from "@/features/steps";
 import type { Session } from "@/features/sessions";
-import { triggerTransformAction } from "@/features/sessions/actions";
 
 interface GuestProcessingStepProps {
   step: StepProcessing;
@@ -16,7 +15,8 @@ interface GuestProcessingStepProps {
 
 /**
  * Guest-facing processing step component
- * Triggers AI transform and monitors session state via real-time subscription
+ * Monitors session state via real-time subscription and advances when transform completes
+ * Note: Transform is triggered after capture, not here
  */
 export function GuestProcessingStep({
   step,
@@ -26,7 +26,6 @@ export function GuestProcessingStep({
 }: GuestProcessingStepProps) {
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const hasTriggeredRef = useRef(false);
   const unsubscribeRef = useRef<(() => void) | null>(null);
 
   // Rotate messages based on estimated duration
@@ -43,25 +42,6 @@ export function GuestProcessingStep({
 
     return () => clearInterval(interval);
   }, [step.config.messages, step.config.estimatedDuration]);
-
-  // Trigger AI transform on mount
-  useEffect(() => {
-    if (hasTriggeredRef.current) return;
-    hasTriggeredRef.current = true;
-
-    const triggerTransform = async () => {
-      try {
-        await triggerTransformAction(eventId, sessionId);
-      } catch (err) {
-        const message =
-          err instanceof Error ? err.message : "Transform failed";
-        setError(message);
-        console.error("[GuestProcessingStep] Transform trigger failed:", err);
-      }
-    };
-
-    triggerTransform();
-  }, [eventId, sessionId]);
 
   // Subscribe to session updates for real-time transform status
   useEffect(() => {

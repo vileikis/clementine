@@ -91,14 +91,14 @@ function sleep(ms: number): { promise: Promise<void>; cancel: () => void } {
  * 3. Generate signed URLs for input and reference images
  * 4. Call AI provider (Google AI, n8n, or mock based on config)
  * 5. Upload result image to Storage
- * 6. Update session to "ready" with result path
+ * 6. Update session to "ready" with public result URL (per Firebase standards)
  * 7. On error, update session to "error" with message
  *
  * Timeout after 60 seconds.
  *
  * @param eventId - Event ID
  * @param sessionId - Session ID
- * @returns Success response with result path
+ * @returns Success response with public result URL
  * @throws Error on validation or transform failure (session marked as error)
  */
 export async function triggerTransformAction(
