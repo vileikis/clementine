@@ -6,6 +6,10 @@
  * Read-only preview for Processing step type.
  * Displays a loading/generation screen with rotating messages
  * and a progress indicator.
+ *
+ * Responsive sizing:
+ * - Mobile: 48px spinner, 80% progress bar
+ * - Desktop: 64px spinner, 60% progress bar (max 400px)
  */
 
 import { useState, useEffect } from "react";
@@ -81,10 +85,10 @@ export function ProcessingStep({
           <h2 className="text-2xl font-bold mb-4">{step.title}</h2>
         )}
 
-        {/* Spinner */}
+        {/* Spinner - responsive sizing */}
         <div className="mb-6">
           <Loader2
-            className="h-12 w-12 animate-spin"
+            className="h-12 w-12 lg:h-16 lg:w-16 animate-spin"
             style={{ color: buttonBgColor }}
           />
         </div>
@@ -94,8 +98,8 @@ export function ProcessingStep({
           {messages[currentMessageIndex]}
         </p>
 
-        {/* Progress Bar */}
-        <div className="w-[80%]">
+        {/* Progress Bar - responsive width */}
+        <div className="w-[80%] lg:w-[60%] lg:max-w-[400px]">
           <div className="h-2 rounded-full bg-white/20 overflow-hidden">
             <div
               className="h-full rounded-full transition-all duration-100"

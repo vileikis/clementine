@@ -6,6 +6,10 @@
  * Read-only preview for Reward step type.
  * Displays final result with sharing options (download, share, social).
  * Uses transformed placeholder from mockSession for realistic preview.
+ *
+ * Responsive sizing:
+ * - Mobile: 70% width image, 3-column share grid
+ * - Desktop: 50% width image (max 300px), inline share buttons
  */
 
 import Image from "next/image";
@@ -64,7 +68,11 @@ export function RewardStep({ step, mockSession, onCtaClick }: RewardStepProps) {
     config.socials.length > 0;
 
   return (
-    <StepLayout>
+    <StepLayout
+      mediaUrl={step.mediaUrl}
+      mediaType={step.mediaType}
+      action={step.ctaLabel && <ActionButton onClick={onCtaClick}>{step.ctaLabel}</ActionButton>}
+    >
       <div className="flex-1 flex flex-col">
         {/* Title */}
         {step.title && (
@@ -76,10 +84,10 @@ export function RewardStep({ step, mockSession, onCtaClick }: RewardStepProps) {
           <p className="text-sm opacity-80 mb-4">{step.description}</p>
         )}
 
-        {/* Result Image */}
+        {/* Result Image - responsive sizing */}
         <div className="flex-1 flex items-center justify-center py-4">
           <div
-            className="w-[55%] aspect-[3/4] rounded-lg overflow-hidden relative shadow-lg"
+            className="w-[70%] lg:w-[50%] lg:max-w-[300px] aspect-[3/4] rounded-lg overflow-hidden relative shadow-lg"
           >
             <Image
               src={transformedPhoto}
@@ -94,32 +102,32 @@ export function RewardStep({ step, mockSession, onCtaClick }: RewardStepProps) {
         {/* Share Options */}
         {hasShareOptions && (
           <div className="mt-auto space-y-3">
-            {/* Primary Share Buttons */}
-            <div className="grid grid-cols-3 gap-2">
+            {/* Primary Share Buttons - grid on mobile, inline on desktop */}
+            <div className="grid grid-cols-3 gap-2 lg:flex lg:justify-center lg:gap-3">
               {config.allowDownload && (
                 <button
-                  className="flex flex-col items-center justify-center p-3 rounded-lg bg-white/10 min-h-[60px]"
+                  className="flex flex-col items-center justify-center p-3 rounded-lg bg-white/10 min-h-[60px] lg:min-h-0 lg:flex-row lg:gap-2 lg:px-4 lg:py-2"
                   style={{ borderRadius: buttonRadius }}
                 >
-                  <Download className="h-5 w-5 mb-1" />
+                  <Download className="h-5 w-5 mb-1 lg:mb-0" />
                   <span className="text-xs">Download</span>
                 </button>
               )}
               {config.allowSystemShare && (
                 <button
-                  className="flex flex-col items-center justify-center p-3 rounded-lg bg-white/10 min-h-[60px]"
+                  className="flex flex-col items-center justify-center p-3 rounded-lg bg-white/10 min-h-[60px] lg:min-h-0 lg:flex-row lg:gap-2 lg:px-4 lg:py-2"
                   style={{ borderRadius: buttonRadius }}
                 >
-                  <Share2 className="h-5 w-5 mb-1" />
+                  <Share2 className="h-5 w-5 mb-1 lg:mb-0" />
                   <span className="text-xs">Share</span>
                 </button>
               )}
               {config.allowEmail && (
                 <button
-                  className="flex flex-col items-center justify-center p-3 rounded-lg bg-white/10 min-h-[60px]"
+                  className="flex flex-col items-center justify-center p-3 rounded-lg bg-white/10 min-h-[60px] lg:min-h-0 lg:flex-row lg:gap-2 lg:px-4 lg:py-2"
                   style={{ borderRadius: buttonRadius }}
                 >
-                  <Mail className="h-5 w-5 mb-1" />
+                  <Mail className="h-5 w-5 mb-1 lg:mb-0" />
                   <span className="text-xs">Email</span>
                 </button>
               )}
@@ -144,13 +152,6 @@ export function RewardStep({ step, mockSession, onCtaClick }: RewardStepProps) {
                 ))}
               </div>
             )}
-          </div>
-        )}
-
-        {/* CTA Button */}
-        {step.ctaLabel && (
-          <div className="mt-4">
-            <ActionButton onClick={onCtaClick}>{step.ctaLabel}</ActionButton>
           </div>
         )}
       </div>

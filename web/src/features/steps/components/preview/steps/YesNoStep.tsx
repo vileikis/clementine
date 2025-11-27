@@ -6,6 +6,7 @@
  * Preview for Yes/No step type.
  * Displays title, description, and two option buttons.
  * Supports interactive mode for playback with selection persistence.
+ * No CTA button - selection auto-advances.
  */
 
 import { StepLayout, OptionButton } from "@/components/step-primitives";
@@ -35,28 +36,26 @@ export function YesNoStep({
 
   return (
     <StepLayout mediaUrl={step.mediaUrl} mediaType={step.mediaType}>
-      <div className="flex-1">
-        {step.title && (
-          <h2 className="text-2xl font-bold mb-2">{step.title}</h2>
-        )}
-        {step.description && (
-          <p className="text-sm opacity-80 mb-4">{step.description}</p>
-        )}
+      {step.title && (
+        <h2 className="text-2xl font-bold mb-2">{step.title}</h2>
+      )}
+      {step.description && (
+        <p className="text-sm opacity-80 mb-4">{step.description}</p>
+      )}
 
-        <div className="space-y-2">
-          <OptionButton
-            selected={selectedValue === true}
-            onClick={() => handleClick(true)}
-          >
-            {step.config.yesLabel}
-          </OptionButton>
-          <OptionButton
-            selected={selectedValue === false}
-            onClick={() => handleClick(false)}
-          >
-            {step.config.noLabel}
-          </OptionButton>
-        </div>
+      <div className="space-y-2">
+        <OptionButton
+          selected={selectedValue === true}
+          onClick={() => handleClick(true)}
+        >
+          {step.config.yesLabel}
+        </OptionButton>
+        <OptionButton
+          selected={selectedValue === false}
+          onClick={() => handleClick(false)}
+        >
+          {step.config.noLabel}
+        </OptionButton>
       </div>
     </StepLayout>
   );
