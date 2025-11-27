@@ -24,8 +24,8 @@
 
 **Purpose**: Update data model to support soft delete
 
-- [ ] T001 [P] Add "deleted" to eventStatusSchema enum in `web/src/features/events/schemas/events.schemas.ts`
-- [ ] T002 [P] Add deletedAt field to eventSchema in `web/src/features/events/schemas/events.schemas.ts`
+- [X] T001 [P] Add "deleted" to eventStatusSchema enum in `web/src/features/events/schemas/events.schemas.ts`
+- [X] T002 [P] Add deletedAt field to eventSchema in `web/src/features/events/schemas/events.schemas.ts`
 
 ---
 
@@ -35,11 +35,11 @@
 
 **⚠️ CRITICAL**: User story implementation cannot begin until this phase is complete
 
-- [ ] T003 Implement deleteEvent repository function in `web/src/features/events/repositories/events.ts`
-- [ ] T004 Update listEvents query to filter out deleted events using status "in" clause in `web/src/features/events/repositories/events.ts`
-- [ ] T005 Export deleteEvent from repository index in `web/src/features/events/repositories/index.ts`
-- [ ] T006 Implement deleteEventAction Server Action in `web/src/features/events/actions/events.ts`
-- [ ] T007 Export deleteEventAction from actions index in `web/src/features/events/actions/index.ts`
+- [X] T003 Implement deleteEvent repository function in `web/src/features/events/repositories/events.ts`
+- [X] T004 Update listEvents query to filter out deleted events using status "in" clause in `web/src/features/events/repositories/events.ts`
+- [X] T005 Export deleteEvent from repository index in `web/src/features/events/repositories/index.ts`
+- [X] T006 Implement deleteEventAction Server Action in `web/src/features/events/actions/events.ts`
+- [X] T007 Export deleteEventAction from actions index in `web/src/features/events/actions/index.ts`
 
 **Checkpoint**: Foundation ready - soft delete backend is fully functional via Server Action
 
@@ -53,10 +53,10 @@
 
 ### Implementation for User Story 1
 
-- [ ] T008 [P] [US1] Create DeleteEventButton client component in `web/src/features/events/components/studio/DeleteEventButton.tsx`
-- [ ] T009 [P] [US1] Export DeleteEventButton from studio components index in `web/src/features/events/components/studio/index.ts`
-- [ ] T010 [US1] Update EventCard to include DeleteEventButton in `web/src/features/events/components/studio/EventCard.tsx`
-- [ ] T011 [US1] Add "deleted" status styling to EventCard statusStyles (for edge case display) in `web/src/features/events/components/studio/EventCard.tsx`
+- [X] T008 [P] [US1] Create DeleteEventButton client component in `web/src/features/events/components/studio/DeleteEventButton.tsx`
+- [X] T009 [P] [US1] Export DeleteEventButton from studio components index in `web/src/features/events/components/studio/index.ts`
+- [X] T010 [US1] Update EventCard to include DeleteEventButton in `web/src/features/events/components/studio/EventCard.tsx`
+- [X] T011 [US1] Add "deleted" status styling to EventCard statusStyles (for edge case display) in `web/src/features/events/components/studio/EventCard.tsx`
 
 **Checkpoint**: User Story 1 complete - admins can delete events from list with confirmation
 
@@ -70,9 +70,9 @@
 
 ### Implementation for User Story 2
 
-- [ ] T012 [US2] Add toast.success call on successful deletion in `web/src/features/events/components/studio/DeleteEventButton.tsx`
-- [ ] T013 [US2] Add toast.error call on failed deletion in `web/src/features/events/components/studio/DeleteEventButton.tsx`
-- [ ] T014 [US2] Add loading state feedback (disable button, show "Deleting...") in `web/src/features/events/components/studio/DeleteEventButton.tsx`
+- [X] T012 [US2] Add toast.success call on successful deletion in `web/src/features/events/components/studio/DeleteEventButton.tsx`
+- [X] T013 [US2] Add toast.error call on failed deletion in `web/src/features/events/components/studio/DeleteEventButton.tsx`
+- [X] T014 [US2] Add loading state feedback (disable button, show "Deleting...") in `web/src/features/events/components/studio/DeleteEventButton.tsx`
 
 **Checkpoint**: User Story 2 complete - users get clear feedback on delete actions
 
@@ -86,8 +86,8 @@
 
 ### Implementation for User Story 3
 
-- [ ] T015 [US3] Verify EventCard (with delete) is NOT used in Event Studio pages - manual audit of `web/src/app/(dashboard)/events/[eventId]/(studio)/`
-- [ ] T016 [US3] Document in code comment that DeleteEventButton must NOT be added to Event Studio pages in `web/src/features/events/components/studio/DeleteEventButton.tsx`
+- [X] T015 [US3] Verify EventCard (with delete) is NOT used in Event Studio pages - manual audit of `web/src/app/(dashboard)/events/[eventId]/(studio)/`
+- [X] T016 [US3] Document in code comment that DeleteEventButton must NOT be added to Event Studio pages in `web/src/features/events/components/studio/DeleteEventButton.tsx`
 
 **Checkpoint**: User Story 3 complete - Event Studio is safe from accidental deletion
 
@@ -101,9 +101,9 @@
 
 **Purpose**: Ensure code quality and correctness before merge
 
-- [ ] T017 Run `pnpm lint` and fix all errors/warnings
-- [ ] T018 Run `pnpm type-check` and resolve all TypeScript errors
-- [ ] T019 Run `pnpm test` and ensure all tests pass
+- [X] T017 Run `pnpm lint` and fix all errors/warnings
+- [X] T018 Run `pnpm type-check` and resolve all TypeScript errors
+- [X] T019 Run `pnpm test` and ensure all tests pass
 - [ ] T020 Verify feature in local dev server (`pnpm dev`) - test full delete flow
 - [ ] T021 Manual test: Verify deleted events don't appear in list
 - [ ] T022 Manual test: Verify Event Studio has no delete option

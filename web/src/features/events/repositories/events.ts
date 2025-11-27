@@ -49,6 +49,9 @@ export async function listEvents(filters?: {
 }): Promise<Event[]> {
   let query: FirebaseFirestore.Query<FirebaseFirestore.DocumentData> = db.collection("events");
 
+  // Filter out deleted events - use "in" clause for Firestore compatibility
+  query = query.where("status", "in", ["draft", "live", "archived"]);
+
   // Special handling for "no owner" filter
   // Need to fetch all events and filter server-side because Firestore
   // doesn't match undefined fields with null queries
@@ -108,6 +111,25 @@ export async function updateEventName(
   await db.collection("events").doc(eventId).update({
     name,
     updatedAt: Date.now(),
+  });
+}
+
+/**
+ * Soft delete an event (mark as deleted)
+ */
+export async function deleteEvent(eventId: string): Promise<void> {
+  const eventRef = db.collection("events").doc(eventId);
+  const eventSnap = await eventRef.get();
+
+  if (!eventSnap.exists) {
+    throw new Error("Event not found");
+  }
+
+  const now = Date.now();
+  await eventRef.update({
+    status: "deleted",
+    deletedAt: now,
+    updatedAt: now,
   });
 }
 
