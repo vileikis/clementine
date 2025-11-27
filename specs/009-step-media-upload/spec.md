@@ -1,6 +1,6 @@
 # Feature Specification: Step Media Upload
 
-**Feature Branch**: `001-step-media-upload`
+**Feature Branch**: `009-step-media-upload`
 **Created**: 2025-11-27
 **Status**: Draft
 **Input**: Replace manual URL text input for mediaUrl in step editors with a proper media upload component supporting images, videos, GIFs, and Lottie JSON animations
