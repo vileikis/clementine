@@ -3,6 +3,9 @@
 export { DeviceFrame } from "./DeviceFrame";
 export { ViewSwitcher } from "./ViewSwitcher";
 export { PreviewRuntime } from "./PreviewRuntime";
+export { PlaybackMode } from "./PlaybackMode";
+export { PreviewNavigationBar } from "./PreviewNavigationBar";
+export { StepErrorBoundary } from "./StepErrorBoundary";
 
 // Step preview components
 export {

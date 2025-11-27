@@ -7,6 +7,9 @@
  * Wraps DeviceFrame with theme and mock data injection.
  *
  * Used in the Journey Editor to render step previews with viewport mode support.
+ * Supports two modes:
+ * - "single-step": Read-only preview (default, for editor panel)
+ * - "playback": Interactive mode with value persistence (for journey playback)
  */
 
 import { EventThemeProvider } from "@/components/providers/EventThemeProvider";
@@ -19,6 +22,7 @@ import {
   MockSessionData,
   DEFAULT_MOCK_SESSION,
 } from "../../types/preview.types";
+import type { StepInputValue, PlaybackMockSession } from "../../types/playback.types";
 
 import {
   InfoStep,
@@ -34,12 +38,25 @@ import {
   RewardStep,
 } from "./steps";
 
+/** Preview mode */
+export type PreviewMode = "single-step" | "playback";
+
 interface PreviewRuntimeProps {
   step: Step;
   theme: EventTheme;
   viewportMode: ViewportMode;
   experiences?: Experience[];
   mockSession?: Partial<MockSessionData>;
+  /** Preview mode: "single-step" (read-only) or "playback" (interactive) */
+  mode?: PreviewMode;
+  /** Playback session with collected inputs (only used in playback mode) */
+  playbackSession?: PlaybackMockSession;
+  /** Callback when step input value changes (only used in playback mode) */
+  onInputChange?: (stepId: string, value: StepInputValue) => void;
+  /** Callback when CTA button is clicked (only used in playback mode) */
+  onCtaClick?: () => void;
+  /** Callback when step is complete for auto-advance (Capture, Processing steps) */
+  onStepComplete?: (stepId: string) => void;
 }
 
 export function PreviewRuntime({
@@ -48,12 +65,19 @@ export function PreviewRuntime({
   viewportMode,
   experiences = [],
   mockSession,
+  mode = "single-step",
+  playbackSession,
+  onInputChange,
+  onCtaClick,
+  onStepComplete,
 }: PreviewRuntimeProps) {
   // Merge provided mock data with defaults
   const session: MockSessionData = {
     ...DEFAULT_MOCK_SESSION,
     ...mockSession,
   };
+
+  const isInteractive = mode === "playback";
 
   return (
     <EventThemeProvider theme={theme}>
@@ -63,6 +87,11 @@ export function PreviewRuntime({
             step={step}
             experiences={experiences}
             mockSession={session}
+            isInteractive={isInteractive}
+            playbackSession={playbackSession}
+            onInputChange={onInputChange}
+            onCtaClick={isInteractive ? onCtaClick : undefined}
+            onStepComplete={isInteractive ? onStepComplete : undefined}
           />
         </DeviceFrame>
       </div>
@@ -74,39 +103,175 @@ export function PreviewRuntime({
  * Internal component that renders the step content based on type.
  * Uses discriminated union pattern for type-safe rendering.
  * Passes mockSession to components that need it for realistic preview.
+ * In playback mode, passes interactive props for value persistence.
  */
 function StepContent({
   step,
   experiences,
   mockSession,
+  isInteractive,
+  playbackSession,
+  onInputChange,
+  onCtaClick,
+  onStepComplete,
 }: {
   step: Step;
   experiences: Experience[];
   mockSession: MockSessionData;
+  isInteractive: boolean;
+  playbackSession?: PlaybackMockSession;
+  onInputChange?: (stepId: string, value: StepInputValue) => void;
+  onCtaClick?: () => void;
+  onStepComplete?: (stepId: string) => void;
 }) {
+  // Helper to get current input value for a step
+  const getInputValue = (stepId: string) => playbackSession?.inputs[stepId];
+
+  // Helper to extract text value from input
+  const getTextValue = (stepId: string): string => {
+    const input = getInputValue(stepId);
+    return input?.type === "text" ? input.value : "";
+  };
+
+  // Helper to extract selection value
+  const getSelectionValue = (stepId: string): string | undefined => {
+    const input = getInputValue(stepId);
+    return input?.type === "selection" ? input.selectedId : undefined;
+  };
+
+  // Helper to extract boolean value
+  const getBooleanValue = (stepId: string): boolean | undefined => {
+    const input = getInputValue(stepId);
+    return input?.type === "boolean" ? input.value : undefined;
+  };
+
+  // Helper to extract number value
+  const getNumberValue = (stepId: string): number | undefined => {
+    const input = getInputValue(stepId);
+    return input?.type === "number" ? input.value : undefined;
+  };
+
   switch (step.type) {
     case "info":
-      return <InfoStep step={step} />;
+      return <InfoStep step={step} onCtaClick={onCtaClick} />;
+
     case "short_text":
-      return <ShortTextStep step={step} />;
+      return (
+        <ShortTextStep
+          step={step}
+          isInteractive={isInteractive}
+          value={getTextValue(step.id)}
+          onValueChange={(value) =>
+            onInputChange?.(step.id, { type: "text", value })
+          }
+          onCtaClick={onCtaClick}
+        />
+      );
+
     case "long_text":
-      return <LongTextStep step={step} />;
+      return (
+        <LongTextStep
+          step={step}
+          isInteractive={isInteractive}
+          value={getTextValue(step.id)}
+          onValueChange={(value) =>
+            onInputChange?.(step.id, { type: "text", value })
+          }
+          onCtaClick={onCtaClick}
+        />
+      );
+
     case "multiple_choice":
-      return <MultipleChoiceStep step={step} />;
+      return (
+        <MultipleChoiceStep
+          step={step}
+          isInteractive={isInteractive}
+          selectedValue={getSelectionValue(step.id)}
+          onValueChange={(value) =>
+            onInputChange?.(step.id, { type: "selection", selectedId: value })
+          }
+          onCtaClick={onCtaClick}
+        />
+      );
+
     case "yes_no":
-      return <YesNoStep step={step} />;
+      return (
+        <YesNoStep
+          step={step}
+          isInteractive={isInteractive}
+          selectedValue={getBooleanValue(step.id)}
+          onValueChange={(value) =>
+            onInputChange?.(step.id, { type: "boolean", value })
+          }
+        />
+      );
+
     case "opinion_scale":
-      return <OpinionScaleStep step={step} />;
+      return (
+        <OpinionScaleStep
+          step={step}
+          isInteractive={isInteractive}
+          selectedValue={getNumberValue(step.id)}
+          onValueChange={(value) =>
+            onInputChange?.(step.id, { type: "number", value })
+          }
+          onCtaClick={onCtaClick}
+        />
+      );
+
     case "email":
-      return <EmailStep step={step} />;
+      return (
+        <EmailStep
+          step={step}
+          isInteractive={isInteractive}
+          value={getTextValue(step.id)}
+          onValueChange={(value) =>
+            onInputChange?.(step.id, { type: "text", value })
+          }
+          onCtaClick={onCtaClick}
+        />
+      );
+
     case "experience-picker":
-      return <ExperiencePickerStep step={step} experiences={experiences} />;
+      return (
+        <ExperiencePickerStep
+          step={step}
+          experiences={experiences}
+          isInteractive={isInteractive}
+          selectedExperienceId={
+            playbackSession?.selectedExperienceId ?? getSelectionValue(step.id)
+          }
+          onValueChange={(experienceId) =>
+            onInputChange?.(step.id, { type: "selection", selectedId: experienceId })
+          }
+          onCtaClick={onCtaClick}
+        />
+      );
+
     case "capture":
-      return <CaptureStep step={step} experiences={experiences} mockSession={mockSession} />;
+      return (
+        <CaptureStep
+          step={step}
+          experiences={experiences}
+          mockSession={mockSession}
+          onCtaClick={onCtaClick}
+          isInteractive={isInteractive}
+          onComplete={() => onStepComplete?.(step.id)}
+        />
+      );
+
     case "processing":
-      return <ProcessingStep step={step} />;
+      return (
+        <ProcessingStep
+          step={step}
+          isInteractive={isInteractive}
+          onComplete={() => onStepComplete?.(step.id)}
+        />
+      );
+
     case "reward":
-      return <RewardStep step={step} mockSession={mockSession} />;
+      return <RewardStep step={step} mockSession={mockSession} onCtaClick={onCtaClick} />;
+
     default: {
       // TypeScript exhaustive check
       const _exhaustive: never = step;

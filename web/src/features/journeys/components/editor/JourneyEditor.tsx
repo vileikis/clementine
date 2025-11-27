@@ -21,7 +21,11 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { JourneyEditorHeader } from "./JourneyEditorHeader";
 import { StepList } from "./StepList";
 import { StepEditor } from "./StepEditor";
-import { PreviewRuntime, ViewSwitcher } from "@/features/steps/components/preview";
+import {
+  PreviewRuntime,
+  ViewSwitcher,
+  PlaybackMode,
+} from "@/features/steps/components/preview";
 import type { ViewportMode } from "@/features/steps/types";
 import {
   useSteps,
@@ -72,6 +76,17 @@ export function JourneyEditor({ event, journey }: JourneyEditorProps) {
 
   // Preview state - holds the in-progress form values for live preview
   const [previewStep, setPreviewStep] = useState<Partial<Step> | null>(null);
+
+  // Playback state - controls whether fullscreen playback mode is open
+  const [isPlaybackOpen, setIsPlaybackOpen] = useState(false);
+
+  const handlePlayClick = useCallback(() => {
+    setIsPlaybackOpen(true);
+  }, []);
+
+  const handlePlaybackExit = useCallback(() => {
+    setIsPlaybackOpen(false);
+  }, []);
 
 
   const handleSelectStep = useCallback(
@@ -133,7 +148,22 @@ export function JourneyEditor({ event, journey }: JourneyEditorProps) {
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <JourneyEditorHeader eventId={event.id} journey={journey} />
+      <JourneyEditorHeader
+        eventId={event.id}
+        journey={journey}
+        onPlayClick={handlePlayClick}
+      />
+
+      {/* Playback Mode Overlay */}
+      {isPlaybackOpen && (
+        <PlaybackMode
+          steps={steps}
+          theme={event.theme}
+          experiences={experiences}
+          initialViewport={viewportMode}
+          onExit={handlePlaybackExit}
+        />
+      )}
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
