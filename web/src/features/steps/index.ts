@@ -1,16 +1,12 @@
 // Steps feature module - CRUD operations for journey steps
+//
+// Public API (safe for client components):
+// - Types, constants only
+// - Actions, schemas, repositories are NOT exported to avoid Next.js client bundling issues
+// - Import those directly from their paths when needed in server components
 
 // Types
 export * from "./types";
 
-// Schemas
-export * from "./schemas";
-
 // Constants
 export * from "./constants";
-
-// Actions (server actions for mutations)
-export * from "./actions";
-
-// Repository (for direct access if needed)
-export * from "./repositories";

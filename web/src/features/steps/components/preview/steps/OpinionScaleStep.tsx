@@ -36,7 +36,7 @@ export function OpinionScaleStep({ step }: OpinionScaleStepProps) {
         )}
 
         {/* Scale buttons */}
-        <div className="flex flex-wrap justify-center gap-2">
+        <div className="flex flex-wrap justify-between gap-2">
           {scaleValues.map((value) => (
             <ScaleButton key={value} value={value} />
           ))}

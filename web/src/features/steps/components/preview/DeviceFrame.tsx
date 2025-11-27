@@ -1,9 +1,10 @@
 "use client";
 
 /**
- * Component: SimulatorScreen
+ * Component: DeviceFrame
  *
- * A theme-aware wrapper that simulates a mobile device screen.
+ * A theme-aware wrapper that simulates a device screen.
+ * Supports both mobile (375px) and desktop (900px) viewport modes.
  * Applies event theme (background, overlay, text color) to provide
  * an accurate preview of how steps will appear to guests.
  *
@@ -12,22 +13,37 @@
 
 import { useEventTheme } from "@/components/providers/EventThemeProvider";
 import type { ReactNode } from "react";
+import { ViewportMode, VIEWPORT_DIMENSIONS } from "../../types/preview.types";
 
-interface SimulatorScreenProps {
+interface DeviceFrameProps {
   children: ReactNode;
+  viewportMode?: ViewportMode;
 }
 
 /**
- * Renders a mobile device frame with event theme applied.
+ * Renders a device frame with event theme applied.
  * All step preview components should be rendered inside this wrapper.
  */
-export function SimulatorScreen({ children }: SimulatorScreenProps) {
+export function DeviceFrame({
+  children,
+  viewportMode = "mobile",
+}: DeviceFrameProps) {
   const { theme } = useEventTheme();
+  const dimensions = VIEWPORT_DIMENSIONS[viewportMode];
+
+  // Desktop uses different aspect ratio styling
+  const isMobile = viewportMode === "mobile";
 
   return (
     <div
-      className="w-full max-w-[320px] aspect-[9/16] rounded-2xl border-4 border-foreground/10 shadow-lg overflow-hidden relative"
+      className="rounded-2xl border-4 border-foreground/10 shadow-lg overflow-hidden relative"
       style={{
+        // Width: use dimension but don't exceed available space
+        width: isMobile ? dimensions.width : "100%",
+        maxWidth: dimensions.width,
+        // Height: mobile fixed, desktop fills available
+        height: isMobile ? dimensions.height : "100%",
+        minHeight: isMobile ? undefined : dimensions.height,
         backgroundColor: theme.background.color,
         fontFamily: theme.fontFamily || undefined,
       }}
@@ -60,14 +76,14 @@ export function SimulatorScreen({ children }: SimulatorScreenProps) {
             <img
               src={theme.logoUrl}
               alt="Event logo"
-              className="h-8 w-auto object-contain inline-block"
+              className={`${isMobile ? "h-8" : "h-10"} w-auto object-contain inline-block`}
             />
           </div>
         </div>
       )}
 
       {/* Content */}
-      <div className="relative z-5 h-full pt-16">{children}</div>
+      <div className="relative z-5 h-full pt-16 overflow-auto">{children}</div>
     </div>
   );
 }

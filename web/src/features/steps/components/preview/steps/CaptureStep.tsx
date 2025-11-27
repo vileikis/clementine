@@ -6,23 +6,28 @@
  * Read-only preview for Capture step type.
  * Displays a camera UI mockup with the step configuration.
  * Shows the fallback experience if configured.
+ * Uses placeholder images from mockSession for realistic preview.
  */
 
 import { useMemo } from "react";
-import { Camera, ImageIcon, AlertCircle } from "lucide-react";
+import Image from "next/image";
+import { ImageIcon, AlertCircle } from "lucide-react";
 import { StepLayout, ActionButton } from "@/components/step-primitives";
 import { useEventTheme } from "@/components/providers/EventThemeProvider";
 import type { StepCapture } from "@/features/steps/types";
 import type { Experience } from "@/features/experiences/types";
+import type { MockSessionData } from "@/features/steps/types/preview.types";
 
 interface CaptureStepProps {
   step: StepCapture;
   experiences: Experience[];
+  mockSession?: MockSessionData;
 }
 
-export function CaptureStep({ step, experiences }: CaptureStepProps) {
+export function CaptureStep({ step, experiences, mockSession }: CaptureStepProps) {
   const { theme } = useEventTheme();
   const config = step.config ?? { source: "selected_experience_id", fallbackExperienceId: null };
+  const capturedPhoto = mockSession?.capturedPhoto ?? "/placeholders/selfie-placeholder.svg";
 
   // Get fallback experience data
   const fallbackExperience = useMemo(() => {
@@ -54,31 +59,34 @@ export function CaptureStep({ step, experiences }: CaptureStepProps) {
         {/* Camera Preview Area */}
         <div className="flex-1 flex flex-col items-center justify-center">
           <div
-            className="w-full max-w-[200px] aspect-[3/4] rounded-xl overflow-hidden relative"
-            style={{
-              backgroundColor: theme.text.color + "10",
-              border: `2px dashed ${theme.text.color}30`,
-            }}
+            className="w-[55%] aspect-[3/4] rounded-xl overflow-hidden relative bg-gray-900"
           >
-            {/* Camera viewfinder simulation */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <Camera
-                className="h-12 w-12 mb-2 opacity-40"
-                style={{ color: theme.text.color }}
+            {/* Placeholder photo simulating camera feed */}
+            <Image
+              src={capturedPhoto}
+              alt="Camera preview"
+              fill
+              className="object-cover opacity-75"
+              unoptimized
+            />
+
+            {/* Camera viewfinder overlay */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <Image
+                src="/placeholders/camera-viewfinder.svg"
+                alt=""
+                width={160}
+                height={160}
+                className="opacity-80"
+                unoptimized
               />
-              <span
-                className="text-xs opacity-60"
-                style={{ color: theme.text.color }}
-              >
-                Camera Preview
-              </span>
             </div>
 
             {/* Corner guides */}
-            <div className="absolute top-3 left-3 w-6 h-6 border-t-2 border-l-2 rounded-tl" style={{ borderColor: theme.text.color + "60" }} />
-            <div className="absolute top-3 right-3 w-6 h-6 border-t-2 border-r-2 rounded-tr" style={{ borderColor: theme.text.color + "60" }} />
-            <div className="absolute bottom-3 left-3 w-6 h-6 border-b-2 border-l-2 rounded-bl" style={{ borderColor: theme.text.color + "60" }} />
-            <div className="absolute bottom-3 right-3 w-6 h-6 border-b-2 border-r-2 rounded-br" style={{ borderColor: theme.text.color + "60" }} />
+            <div className="absolute top-3 left-3 w-6 h-6 border-t-2 border-l-2 rounded-tl border-white/60" />
+            <div className="absolute top-3 right-3 w-6 h-6 border-t-2 border-r-2 rounded-tr border-white/60" />
+            <div className="absolute bottom-3 left-3 w-6 h-6 border-b-2 border-l-2 rounded-bl border-white/60" />
+            <div className="absolute bottom-3 right-3 w-6 h-6 border-b-2 border-r-2 rounded-br border-white/60" />
           </div>
         </div>
 
