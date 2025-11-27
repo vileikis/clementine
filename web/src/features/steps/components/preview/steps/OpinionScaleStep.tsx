@@ -20,6 +20,8 @@ interface OpinionScaleStepProps {
   selectedValue?: number;
   /** Callback when selection changes */
   onValueChange?: (value: number) => void;
+  /** Callback when CTA button is clicked */
+  onCtaClick?: () => void;
 }
 
 export function OpinionScaleStep({
@@ -27,6 +29,7 @@ export function OpinionScaleStep({
   isInteractive = false,
   selectedValue,
   onValueChange,
+  onCtaClick,
 }: OpinionScaleStepProps) {
   const { theme } = useEventTheme();
   const { scaleMin, scaleMax, minLabel, maxLabel } = step.config;
@@ -79,7 +82,7 @@ export function OpinionScaleStep({
 
       {step.ctaLabel && (
         <div className="mt-auto pt-4">
-          <ActionButton>{step.ctaLabel}</ActionButton>
+          <ActionButton onClick={onCtaClick}>{step.ctaLabel}</ActionButton>
         </div>
       )}
     </StepLayout>

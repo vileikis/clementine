@@ -22,6 +22,8 @@ import type { MockSessionData } from "@/features/steps/types/preview.types";
 interface RewardStepProps {
   step: StepReward;
   mockSession?: MockSessionData;
+  /** Callback when CTA button is clicked */
+  onCtaClick?: () => void;
 }
 
 /** Social media icon mapping */
@@ -44,7 +46,7 @@ const SOCIAL_LABELS: Record<ShareSocial, string> = {
   whatsapp: "WhatsApp",
 };
 
-export function RewardStep({ step, mockSession }: RewardStepProps) {
+export function RewardStep({ step, mockSession, onCtaClick }: RewardStepProps) {
   const { buttonBgColor, buttonTextColor, buttonRadius } = useEventTheme();
   const transformedPhoto = mockSession?.transformedPhoto ?? "/placeholders/transformed-placeholder.svg";
 
@@ -148,7 +150,7 @@ export function RewardStep({ step, mockSession }: RewardStepProps) {
         {/* CTA Button */}
         {step.ctaLabel && (
           <div className="mt-4">
-            <ActionButton>{step.ctaLabel}</ActionButton>
+            <ActionButton onClick={onCtaClick}>{step.ctaLabel}</ActionButton>
           </div>
         )}
       </div>

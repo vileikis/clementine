@@ -19,6 +19,8 @@ interface MultipleChoiceStepProps {
   selectedValue?: string;
   /** Callback when selection changes */
   onValueChange?: (value: string) => void;
+  /** Callback when CTA button is clicked */
+  onCtaClick?: () => void;
 }
 
 export function MultipleChoiceStep({
@@ -26,6 +28,7 @@ export function MultipleChoiceStep({
   isInteractive = false,
   selectedValue,
   onValueChange,
+  onCtaClick,
 }: MultipleChoiceStepProps) {
   const handleOptionClick = (value: string) => {
     if (isInteractive) {
@@ -58,7 +61,7 @@ export function MultipleChoiceStep({
 
       {step.ctaLabel && (
         <div className="mt-auto pt-4">
-          <ActionButton>{step.ctaLabel}</ActionButton>
+          <ActionButton onClick={onCtaClick}>{step.ctaLabel}</ActionButton>
         </div>
       )}
     </StepLayout>

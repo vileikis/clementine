@@ -12,9 +12,11 @@ import type { StepInfo } from "@/features/steps/types";
 
 interface InfoStepProps {
   step: StepInfo;
+  /** Callback when CTA button is clicked */
+  onCtaClick?: () => void;
 }
 
-export function InfoStep({ step }: InfoStepProps) {
+export function InfoStep({ step, onCtaClick }: InfoStepProps) {
   return (
     <StepLayout mediaUrl={step.mediaUrl}>
       <div className="flex-1">
@@ -28,7 +30,7 @@ export function InfoStep({ step }: InfoStepProps) {
 
       {step.ctaLabel && (
         <div className="mt-auto pt-4">
-          <ActionButton>{step.ctaLabel}</ActionButton>
+          <ActionButton onClick={onCtaClick}>{step.ctaLabel}</ActionButton>
         </div>
       )}
     </StepLayout>

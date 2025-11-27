@@ -19,6 +19,8 @@ interface LongTextStepProps {
   value?: string;
   /** Callback when value changes */
   onValueChange?: (value: string) => void;
+  /** Callback when CTA button is clicked */
+  onCtaClick?: () => void;
 }
 
 export function LongTextStep({
@@ -26,6 +28,7 @@ export function LongTextStep({
   isInteractive = false,
   value = "",
   onValueChange,
+  onCtaClick,
 }: LongTextStepProps) {
   return (
     <StepLayout mediaUrl={step.mediaUrl}>
@@ -49,7 +52,7 @@ export function LongTextStep({
 
       {step.ctaLabel && (
         <div className="mt-auto pt-4">
-          <ActionButton>{step.ctaLabel}</ActionButton>
+          <ActionButton onClick={onCtaClick}>{step.ctaLabel}</ActionButton>
         </div>
       )}
     </StepLayout>
