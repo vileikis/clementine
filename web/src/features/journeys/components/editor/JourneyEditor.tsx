@@ -133,94 +133,70 @@ export function JourneyEditor({ event, journey }: JourneyEditorProps) {
     : null;
 
   return (
-    <>
-      <div className="flex flex-col h-full">
-        {/* Header */}
-        <JourneyEditorHeader eventId={event.id} journey={journey} />
+    <div className="flex flex-col h-full">
+      {/* Header */}
+      <JourneyEditorHeader eventId={event.id} journey={journey} />
 
-        {/* Main Content */}
-        <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
-          {/* Left Panel - Step List */}
-          <aside className="w-full lg:w-64 xl:w-72 border-b lg:border-b-0 lg:border-r bg-muted/30 shrink-0">
-            {stepsLoading ? (
-              <div className="flex items-center justify-center h-full p-4">
-                <p className="text-sm text-muted-foreground">Loading steps...</p>
-              </div>
-            ) : (
-              <StepList
-                eventId={event.id}
-                journeyId={journey.id}
-                steps={steps}
-                selectedStepId={selectedStepId}
-                onSelectStep={handleSelectStep}
-              />
-            )}
-          </aside>
-
-          {/* Main Content Area */}
-          <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
-            {/* Middle Panel - Preview */}
-            <div className="flex-1 p-6 overflow-y-auto bg-muted/10">
-              <div className="flex justify-center">
-                {displayStep ? (
-                  <StepPreview
-                    step={displayStep as Step}
-                    theme={event.theme}
-                    experiences={experiences}
-                  />
-                ) : (
-                  <div className="text-center text-muted-foreground">
-                    <p className="text-sm">Select a step to preview</p>
-                  </div>
-                )}
-              </div>
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+        {/* Left Panel - Step List */}
+        <aside className="w-full lg:w-64 xl:w-72 border-b lg:border-b-0 lg:border-r bg-muted/30 shrink-0 overflow-y-auto">
+          {stepsLoading ? (
+            <div className="flex items-center justify-center h-full p-4">
+              <p className="text-sm text-muted-foreground">Loading steps...</p>
             </div>
+          ) : (
+            <StepList
+              eventId={event.id}
+              journeyId={journey.id}
+              steps={steps}
+              selectedStepId={selectedStepId}
+              onSelectStep={handleSelectStep}
+            />
+          )}
+        </aside>
 
-            {/* Right Panel - Step Editor */}
-            <aside className="w-full md:w-80 xl:w-96 border-t md:border-t-0 md:border-l bg-background shrink-0 overflow-hidden">
-              {selectedStep ? (
-                <StepEditor
-                  eventId={event.id}
-                  step={selectedStep}
+        {/* Main Content Area */}
+        <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
+          {/* Middle Panel - Preview */}
+          <div className="flex-1 p-6 overflow-y-auto bg-muted/10">
+            <div className="flex justify-center">
+              {displayStep ? (
+                <StepPreview
+                  step={displayStep as Step}
+                  theme={event.theme}
                   experiences={experiences}
-                  onStepDeleted={handleStepDeleted}
-                  onPreviewChange={handlePreviewChange}
                 />
               ) : (
-                <div className="flex items-center justify-center h-full p-4">
-                  <p className="text-sm text-muted-foreground">
-                    {steps.length === 0
-                      ? "Add a step to get started"
-                      : "Select a step to edit"}
-                  </p>
+                <div className="text-center text-muted-foreground">
+                  <p className="text-sm">Select a step to preview</p>
                 </div>
               )}
-            </aside>
+            </div>
           </div>
+
+          {/* Right Panel - Step Editor */}
+          <aside className="w-full md:w-80 xl:w-96 border-t md:border-t-0 md:border-l bg-background shrink-0 overflow-y-auto">
+            {selectedStep ? (
+              <StepEditor
+                eventId={event.id}
+                step={selectedStep}
+                experiences={experiences}
+                onStepDeleted={handleStepDeleted}
+                onPreviewChange={handlePreviewChange}
+              />
+            ) : (
+              <div className="flex items-center justify-center h-full p-4">
+                <p className="text-sm text-muted-foreground">
+                  {steps.length === 0
+                    ? "Add a step to get started"
+                    : "Select a step to edit"}
+                </p>
+              </div>
+            )}
+          </aside>
         </div>
       </div>
-
-      {/* Keyboard Shortcut Delete Confirmation Dialog */}
-      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete step?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently delete this step from the journey.
-              This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleConfirmDelete}
-              className="bg-destructive text-white hover:bg-destructive/90"
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </>
+    </div>
   );
 }
