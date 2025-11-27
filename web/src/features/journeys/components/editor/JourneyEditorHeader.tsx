@@ -4,22 +4,25 @@
  * Component: JourneyEditorHeader
  *
  * Top header bar for the journey editor.
- * Shows journey name and navigation back to journeys list.
+ * Shows journey name, navigation back to journeys list, and Play Journey button.
  */
 
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Journey } from "../../types";
 
 interface JourneyEditorHeaderProps {
   eventId: string;
   journey: Journey;
+  /** Callback when Play Journey button is clicked */
+  onPlayClick?: () => void;
 }
 
 export function JourneyEditorHeader({
   eventId,
   journey,
+  onPlayClick,
 }: JourneyEditorHeaderProps) {
   return (
     <header className="flex items-center gap-4 px-4 py-3 border-b bg-background">
@@ -38,6 +41,20 @@ export function JourneyEditorHeader({
           {journey.stepOrder.length} step{journey.stepOrder.length !== 1 ? "s" : ""}
         </p>
       </div>
+
+      {/* Play Journey Button */}
+      {onPlayClick && (
+        <Button
+          variant="default"
+          size="sm"
+          onClick={onPlayClick}
+          className="gap-1.5 shrink-0"
+        >
+          <Play className="h-4 w-4" />
+          <span className="hidden sm:inline">Play Journey</span>
+          <span className="sm:hidden">Play</span>
+        </Button>
+      )}
     </header>
   );
 }
