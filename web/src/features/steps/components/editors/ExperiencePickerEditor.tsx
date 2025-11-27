@@ -38,6 +38,7 @@ import { Button } from "@/components/ui/button";
 import { BaseStepEditor } from "./BaseStepEditor";
 import { useAutoSave } from "../../hooks";
 import { STEP_CONSTANTS } from "../../constants";
+import { stepMediaTypeSchema } from "../../schemas";
 import type { StepExperiencePicker } from "../../types";
 import type { Experience } from "@/features/experiences";
 
@@ -46,6 +47,7 @@ const experiencePickerFormSchema = z.object({
   title: z.string().max(200).optional().nullable(),
   description: z.string().max(1000).optional().nullable(),
   mediaUrl: z.string().url().optional().nullable().or(z.literal("")),
+  mediaType: stepMediaTypeSchema.optional().nullable(),
   ctaLabel: z.string().max(50).optional().nullable(),
   // Config fields
   config: z.object({
@@ -66,12 +68,14 @@ const FIELDS_TO_COMPARE: (keyof ExperiencePickerFormValues)[] = [
   "title",
   "description",
   "mediaUrl",
+  "mediaType",
   "ctaLabel",
   "config",
 ];
 
 interface ExperiencePickerEditorProps {
   step: StepExperiencePicker;
+  companyId: string;
   experiences: Experience[];
   onUpdate: (updates: Partial<ExperiencePickerFormValues>) => Promise<void>;
   onPreviewChange?: (values: ExperiencePickerFormValues) => void;
@@ -79,6 +83,7 @@ interface ExperiencePickerEditorProps {
 
 export function ExperiencePickerEditor({
   step,
+  companyId,
   experiences,
   onUpdate,
   onPreviewChange,
@@ -96,6 +101,7 @@ export function ExperiencePickerEditor({
       title: step.title ?? "",
       description: step.description ?? "",
       mediaUrl: step.mediaUrl ?? "",
+      mediaType: step.mediaType ?? null,
       ctaLabel: step.ctaLabel ?? "",
       config: {
         layout: config.layout,
@@ -127,6 +133,7 @@ export function ExperiencePickerEditor({
       title: step.title ?? "",
       description: step.description ?? "",
       mediaUrl: step.mediaUrl ?? "",
+      mediaType: step.mediaType ?? null,
       ctaLabel: step.ctaLabel ?? "",
       config: {
         layout: config.layout,
@@ -206,6 +213,10 @@ export function ExperiencePickerEditor({
         {/* Base Fields */}
         <BaseStepEditor
           form={form}
+          companyId={companyId}
+          onMediaChange={async (mediaUrl, mediaType) => {
+            await onUpdate({ mediaUrl, mediaType });
+          }}
           showDescription={true}
           showMediaUrl={true}
           showCtaLabel={true}
