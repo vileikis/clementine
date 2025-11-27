@@ -154,12 +154,14 @@ The application is organized into feature modules in `web/src/features/`. The da
 - **Schema**: id, eventId, name, stepOrder[], tags[], status (active/deleted), deletedAt, createdAt, updatedAt
 - **Features**: Soft deletion, switchboard integration via Event.activeJourneyId, empty state handling, mobile-first responsive design
 
-**📋 Planned - Steps** (new module)
+**✅ Ready - Steps** (`web/src/features/steps/`)
 
-- **Firestore Collection**: `/steps/{stepId}`
-- **Purpose**: Individual UI screen configurations (welcome, selection, capture, form, processing, result)
-- **Status**: Not yet started - new module to be written from scratch
-- **New Model**: Content and layout for each screen in a Journey
+- **Firestore Collection**: `/events/{eventId}/steps/{stepId}` (subcollection of Event)
+- **Purpose**: Individual UI screen configurations for guest journeys
+- **Status**: Fully implemented with Journey Editor (006-journey-editor)
+- **Schema**: Discriminated union by type (11 types), base fields (id, eventId, journeyId, type, title, description, mediaUrl, ctaLabel, createdAt, updatedAt), plus type-specific config
+- **Step Types**: info, experience-picker, capture, short_text, long_text, multiple_choice, yes_no, opinion_scale, email, processing, reward
+- **Features**: 3-panel editor (step list, preview, config), drag-and-drop reordering, real-time preview with event theme, type-specific configuration forms, URL deep linking
 
 **📋 Planned - Sessions** (`web/src/features/sessions/`)
 
@@ -209,12 +211,12 @@ The application is organized into feature modules in `web/src/features/`. The da
 - TypeScript 5.x (strict mode), Next.js 16 (App Router), React 19
 - Firebase (Firestore + Storage), Zod 4.x
 - Tailwind CSS v4, shadcn/ui, lucide-react
-- **Firestore Collections** (normalized, flat architecture):
+- **Firestore Collections**:
   - `/companies` - Brand/organization management (ready)
-  - `/events` - Root event configs and switchboard (in redesign)
-  - `/experiences` - AI experience library (planned)
-  - `/journeys` - Step sequence playlists (planned)
-  - `/steps` - Individual screen configs (planned)
+  - `/events` - Root event configs and switchboard (ready)
+  - `/experiences` - AI experience library (ready)
+  - `/events/{eventId}/journeys` - Step sequence playlists (ready)
+  - `/events/{eventId}/steps` - Individual screen configs (ready)
   - `/sessions` - Guest interaction records (planned)
 - Firebase Storage for images/media assets
 
@@ -235,10 +237,13 @@ The application is organized into feature modules in `web/src/features/`. The da
 - ✅ Companies feature - ready and stable
 - ✅ Events feature - ready and stable
 - ✅ Experiences feature - ready and stable
-- 📋 Journeys, Steps, Sessions, Guest - to be written from scratch
+- ✅ Journeys feature - ready and stable
+- ✅ Steps feature - ready and stable (Journey Editor)
+- 📋 Sessions, Guest - to be written from scratch
 
 See `features/data-model-v4.md` for full specification.
 
 ### Previous Changes
 
 - 001-remove-scenes: Added TypeScript 5.x (strict mode), Next.js 16 (App Router), React 19 + Firebase (Firestore + Storage), Zod 4.x for validation, Tailwind CSS v4, shadcn/ui
+- 006-journey-editor: Implemented Steps module with Journey Editor (3-panel interface, 11 step types, drag-and-drop reordering, real-time preview with event theming)
