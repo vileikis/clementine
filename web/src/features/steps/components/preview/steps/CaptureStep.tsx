@@ -37,7 +37,7 @@ export function CaptureStep({ step, experiences }: CaptureStepProps) {
   }, [config.fallbackExperienceId, experiences]);
 
   return (
-    <StepLayout mediaUrl={step.mediaUrl}>
+    <StepLayout mediaUrl={step.mediaUrl} mediaType={step.mediaType}>
       <div className="flex-1 flex flex-col">
         {/* Header with title/description */}
         {(step.title || step.description) && (

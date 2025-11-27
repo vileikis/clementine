@@ -72,12 +72,14 @@ const FIELDS_TO_COMPARE: (keyof OpinionScaleFormValues)[] = [
 
 interface OpinionScaleEditorProps {
   step: StepOpinionScale;
+  companyId: string;
   onUpdate: (updates: Partial<OpinionScaleFormValues>) => Promise<void>;
   onPreviewChange?: (values: OpinionScaleFormValues) => void;
 }
 
 export function OpinionScaleEditor({
   step,
+  companyId,
   onUpdate,
   onPreviewChange,
 }: OpinionScaleEditorProps) {
@@ -158,6 +160,7 @@ export function OpinionScaleEditor({
         {/* Base Fields */}
         <BaseStepEditor
           form={form}
+          companyId={companyId}
           showDescription={true}
           showMediaUrl={true}
           showCtaLabel={false}

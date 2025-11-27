@@ -69,6 +69,7 @@ const FIELDS_TO_COMPARE: (keyof CaptureFormValues)[] = [
 
 interface CaptureStepEditorProps {
   step: StepCapture;
+  companyId: string;
   experiences: Experience[];
   onUpdate: (updates: Partial<CaptureFormValues>) => Promise<void>;
   onPreviewChange?: (values: CaptureFormValues) => void;
@@ -76,6 +77,7 @@ interface CaptureStepEditorProps {
 
 export function CaptureStepEditor({
   step,
+  companyId,
   experiences,
   onUpdate,
   onPreviewChange,
@@ -170,6 +172,7 @@ export function CaptureStepEditor({
         {/* Base Fields */}
         <BaseStepEditor
           form={form}
+          companyId={companyId}
           showDescription={true}
           showMediaUrl={true}
           showCtaLabel={true}

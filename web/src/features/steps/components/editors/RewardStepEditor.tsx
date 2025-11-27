@@ -64,12 +64,14 @@ const SOCIAL_OPTIONS: { value: ShareSocial; label: string }[] = [
 
 interface RewardStepEditorProps {
   step: StepReward;
+  companyId: string;
   onUpdate: (updates: Partial<RewardStepFormValues>) => Promise<void>;
   onPreviewChange?: (values: RewardStepFormValues) => void;
 }
 
 export function RewardStepEditor({
   step,
+  companyId,
   onUpdate,
   onPreviewChange,
 }: RewardStepEditorProps) {
@@ -139,6 +141,7 @@ export function RewardStepEditor({
         {/* Base Fields */}
         <BaseStepEditor
           form={form}
+          companyId={companyId}
           showDescription={true}
           showMediaUrl={false}
           showCtaLabel={true}

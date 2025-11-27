@@ -55,7 +55,7 @@ export function ProcessingStep({ step }: ProcessingStepProps) {
   }, [estimatedDuration]);
 
   return (
-    <StepLayout mediaUrl={step.mediaUrl}>
+    <StepLayout mediaUrl={step.mediaUrl} mediaType={step.mediaType}>
       <div className="flex-1 flex flex-col items-center justify-center text-center">
         {/* Title */}
         {step.title && (

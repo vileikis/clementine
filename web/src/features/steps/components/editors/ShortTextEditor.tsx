@@ -59,12 +59,14 @@ const FIELDS_TO_COMPARE: (keyof ShortTextFormValues)[] = [
 
 interface ShortTextEditorProps {
   step: StepShortText;
+  companyId: string;
   onUpdate: (updates: Partial<ShortTextFormValues>) => Promise<void>;
   onPreviewChange?: (values: ShortTextFormValues) => void;
 }
 
 export function ShortTextEditor({
   step,
+  companyId,
   onUpdate,
   onPreviewChange,
 }: ShortTextEditorProps) {
@@ -134,6 +136,7 @@ export function ShortTextEditor({
         {/* Base Fields */}
         <BaseStepEditor
           form={form}
+          companyId={companyId}
           showDescription={true}
           showMediaUrl={true}
           showCtaLabel={true}

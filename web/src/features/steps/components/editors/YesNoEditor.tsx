@@ -59,12 +59,14 @@ const FIELDS_TO_COMPARE: (keyof YesNoFormValues)[] = [
 
 interface YesNoEditorProps {
   step: StepYesNo;
+  companyId: string;
   onUpdate: (updates: Partial<YesNoFormValues>) => Promise<void>;
   onPreviewChange?: (values: YesNoFormValues) => void;
 }
 
 export function YesNoEditor({
   step,
+  companyId,
   onUpdate,
   onPreviewChange,
 }: YesNoEditorProps) {
@@ -134,6 +136,7 @@ export function YesNoEditor({
         {/* Base Fields */}
         <BaseStepEditor
           form={form}
+          companyId={companyId}
           showDescription={true}
           showMediaUrl={true}
           showCtaLabel={false}
