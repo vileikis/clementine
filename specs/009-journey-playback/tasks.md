@@ -138,17 +138,17 @@
 
 **Purpose**: Edge cases, refinements, and validation
 
-- [ ] T032 [P] Handle empty journey edge case in PlaybackMode - show empty state message with only Exit button
-- [ ] T033 [P] Handle single step journey edge case - disable Back, show completion on Next
-- [ ] T034 [P] Add navigation debouncing in useJourneyPlayback to prevent rapid clicking issues
-- [ ] T035 Ensure InfoStep and RewardStep work correctly in playback mode (read-only, no interactive changes needed)
+- [X] T032 [P] Handle empty journey edge case in PlaybackMode - show empty state message with only Exit button
+- [X] T033 [P] Handle single step journey edge case - disable Back, show completion on Next
+- [X] T034 [P] Add navigation debouncing in useJourneyPlayback to prevent rapid clicking issues
+- [X] T035 Ensure InfoStep and RewardStep work correctly in playback mode (read-only, no interactive changes needed)
 
 ### Validation Loop (REQUIRED - Constitution Principle V)
 
 **Purpose**: Ensure code quality and correctness before merge
 
-- [ ] T036 Run `pnpm lint` and fix all errors/warnings
-- [ ] T037 Run `pnpm type-check` and resolve all TypeScript errors
+- [X] T036 Run `pnpm lint` and fix all errors/warnings
+- [X] T037 Run `pnpm type-check` and resolve all TypeScript errors
 - [ ] T038 Verify feature in local dev server (`pnpm dev`) - test all acceptance scenarios
 - [ ] T039 Commit only after validation loop passes cleanly
 
