@@ -11,6 +11,7 @@
 
 import { EventThemeProvider } from "@/components/providers/EventThemeProvider";
 import { DeviceFrame } from "./DeviceFrame";
+import { ViewportModeProvider } from "./ViewportModeContext";
 import type { Step } from "@/features/steps/types";
 import type { EventTheme } from "@/features/events/types";
 import type { Experience } from "@/features/experiences/types";
@@ -57,15 +58,17 @@ export function PreviewRuntime({
 
   return (
     <EventThemeProvider theme={theme}>
-      <div className="h-full w-full flex justify-center">
-        <DeviceFrame viewportMode={viewportMode}>
-          <StepContent
-            step={step}
-            experiences={experiences}
-            mockSession={session}
-          />
-        </DeviceFrame>
-      </div>
+      <ViewportModeProvider mode={viewportMode}>
+        <div className="h-full w-full flex justify-center">
+          <DeviceFrame viewportMode={viewportMode}>
+            <StepContent
+              step={step}
+              experiences={experiences}
+              mockSession={session}
+            />
+          </DeviceFrame>
+        </div>
+      </ViewportModeProvider>
     </EventThemeProvider>
   );
 }

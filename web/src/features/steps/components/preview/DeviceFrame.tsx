@@ -83,7 +83,7 @@ export function DeviceFrame({
       )}
 
       {/* Content */}
-      <div className="relative z-5 h-full pt-16 overflow-auto">{children}</div>
+      <div className="relative z-5 h-full overflow-auto">{children}</div>
     </div>
   );
 }
