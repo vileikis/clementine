@@ -31,30 +31,26 @@ export function LongTextStep({
   onCtaClick,
 }: LongTextStepProps) {
   return (
-    <StepLayout mediaUrl={step.mediaUrl} mediaType={step.mediaType}>
-      <div className="flex-1">
-        {step.title && (
-          <h2 className="text-2xl font-bold mb-2">{step.title}</h2>
-        )}
-        {step.description && (
-          <p className="text-sm opacity-80 mb-4">{step.description}</p>
-        )}
-
-        <TextArea
-          placeholder={step.config.placeholder || "Share your thoughts..."}
-          maxLength={step.config.maxLength}
-          required={step.config.required}
-          rows={4}
-          value={isInteractive ? value : undefined}
-          onChange={isInteractive ? onValueChange : undefined}
-        />
-      </div>
-
-      {step.ctaLabel && (
-        <div className="mt-auto pt-4">
-          <ActionButton onClick={onCtaClick}>{step.ctaLabel}</ActionButton>
-        </div>
+    <StepLayout
+      mediaUrl={step.mediaUrl}
+      mediaType={step.mediaType}
+      action={step.ctaLabel && <ActionButton onClick={onCtaClick}>{step.ctaLabel}</ActionButton>}
+    >
+      {step.title && (
+        <h2 className="text-2xl font-bold mb-2">{step.title}</h2>
       )}
+      {step.description && (
+        <p className="text-sm opacity-80 mb-4">{step.description}</p>
+      )}
+
+      <TextArea
+        placeholder={step.config.placeholder || "Share your thoughts..."}
+        maxLength={step.config.maxLength}
+        required={step.config.required}
+        rows={4}
+        value={isInteractive ? value : undefined}
+        onChange={isInteractive ? onValueChange : undefined}
+      />
     </StepLayout>
   );
 }

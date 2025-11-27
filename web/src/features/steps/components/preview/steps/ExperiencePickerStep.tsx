@@ -6,6 +6,11 @@
  * Read-only preview for Experience Picker step type.
  * Displays title, description, and experience options in the configured layout.
  * Resolves display data (name, previewMediaUrl) from experiences at runtime.
+ * Supports interactive mode for playback with selection persistence.
+ *
+ * Responsive grid layout:
+ * - Mobile: 2 columns
+ * - Desktop: 3 columns
  */
 
 import { useMemo } from "react";
@@ -78,40 +83,36 @@ export function ExperiencePickerStep({
   const hasMissingExperiences = resolvedOptions.some((o) => o.missing);
 
   return (
-    <StepLayout mediaUrl={step.mediaUrl} mediaType={step.mediaType}>
-      <div className="flex-1">
-        {step.title && (
-          <h2 className="text-2xl font-bold mb-2">{step.title}</h2>
-        )}
-        {step.description && (
-          <p className="text-sm opacity-80 mb-4">{step.description}</p>
-        )}
+    <StepLayout
+      mediaUrl={step.mediaUrl}
+      mediaType={step.mediaType}
+      action={step.ctaLabel && <ActionButton onClick={onCtaClick}>{step.ctaLabel}</ActionButton>}
+    >
+      {step.title && (
+        <h2 className="text-2xl font-bold mb-2">{step.title}</h2>
+      )}
+      {step.description && (
+        <p className="text-sm opacity-80 mb-4">{step.description}</p>
+      )}
 
-        {hasMissingExperiences && (
-          <div className="flex items-center gap-2 text-xs text-destructive mb-3">
-            <AlertCircle className="h-3 w-3" />
-            <span>Some experiences are missing</span>
-          </div>
-        )}
-
-        {resolvedOptions.length === 0 ? (
-          <div className="text-center py-4 opacity-60">
-            <p className="text-sm">No experiences selected</p>
-          </div>
-        ) : (
-          <OptionsLayout
-            layout={layout}
-            options={resolvedOptions}
-            selectedId={selectedExperienceId}
-            onSelect={handleSelect}
-          />
-        )}
-      </div>
-
-      {step.ctaLabel && (
-        <div className="mt-auto pt-4">
-          <ActionButton onClick={onCtaClick}>{step.ctaLabel}</ActionButton>
+      {hasMissingExperiences && (
+        <div className="flex items-center gap-2 text-xs text-destructive mb-3">
+          <AlertCircle className="h-3 w-3" />
+          <span>Some experiences are missing</span>
         </div>
+      )}
+
+      {resolvedOptions.length === 0 ? (
+        <div className="text-center py-4 opacity-60">
+          <p className="text-sm">No experiences selected</p>
+        </div>
+      ) : (
+        <OptionsLayout
+          layout={layout}
+          options={resolvedOptions}
+          selectedId={selectedExperienceId}
+          onSelect={handleSelect}
+        />
       )}
     </StepLayout>
   );
@@ -130,7 +131,7 @@ function OptionsLayout({ layout, options, selectedId, onSelect }: OptionsLayoutP
   switch (layout) {
     case "grid":
       return (
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-2 lg:grid-cols-3 lg:gap-3">
           {options.map((option) => (
             <GridOption
               key={option.id}

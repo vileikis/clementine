@@ -55,7 +55,11 @@ export function CaptureStep({
   }, [config.fallbackExperienceId, experiences]);
 
   return (
-    <StepLayout mediaUrl={step.mediaUrl} mediaType={step.mediaType}>
+    <StepLayout
+      mediaUrl={step.mediaUrl}
+      mediaType={step.mediaType}
+      action={step.ctaLabel && <ActionButton onClick={onCtaClick}>{step.ctaLabel}</ActionButton>}
+    >
       <div className="flex-1 flex flex-col">
         {/* Header with title/description */}
         {(step.title || step.description) && (
@@ -69,10 +73,10 @@ export function CaptureStep({
           </div>
         )}
 
-        {/* Camera Preview Area */}
+        {/* Camera Preview Area - responsive sizing */}
         <div className="flex-1 flex flex-col items-center justify-center">
           <div
-            className="w-[55%] aspect-[3/4] rounded-xl overflow-hidden relative bg-gray-900"
+            className="w-[70%] lg:w-[50%] lg:max-w-[300px] aspect-[3/4] rounded-xl overflow-hidden relative bg-gray-900"
           >
             {/* Placeholder photo simulating camera feed */}
             <Image
@@ -156,16 +160,7 @@ export function CaptureStep({
             ) : null}
           </div>
         )}
-
-  
       </div>
-
-      {/* CTA Button */}
-      {step.ctaLabel && (
-        <div className="mt-auto pt-4">
-          <ActionButton onClick={onCtaClick}>{step.ctaLabel}</ActionButton>
-        </div>
-      )}
     </StepLayout>
   );
 }
