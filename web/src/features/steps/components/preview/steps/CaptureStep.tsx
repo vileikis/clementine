@@ -59,7 +59,7 @@ export function CaptureStep({ step, experiences, mockSession }: CaptureStepProps
         {/* Camera Preview Area */}
         <div className="flex-1 flex flex-col items-center justify-center">
           <div
-            className="w-full max-w-[200px] aspect-[3/4] rounded-xl overflow-hidden relative bg-gray-900"
+            className="w-[55%] aspect-[3/4] rounded-xl overflow-hidden relative bg-gray-900"
           >
             {/* Placeholder photo simulating camera feed */}
             <Image

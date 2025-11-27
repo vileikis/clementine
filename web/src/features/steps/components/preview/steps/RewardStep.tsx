@@ -77,7 +77,7 @@ export function RewardStep({ step, mockSession }: RewardStepProps) {
         {/* Result Image */}
         <div className="flex-1 flex items-center justify-center py-4">
           <div
-            className="w-full max-w-[200px] aspect-[3/4] rounded-lg overflow-hidden relative shadow-lg"
+            className="w-[55%] aspect-[3/4] rounded-lg overflow-hidden relative shadow-lg"
           >
             <Image
               src={transformedPhoto}
