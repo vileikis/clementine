@@ -5,20 +5,23 @@
  *
  * Read-only preview for Reward step type.
  * Displays final result with sharing options (download, share, social).
+ * Uses transformed placeholder from mockSession for realistic preview.
  */
 
+import Image from "next/image";
 import {
   Download,
   Share2,
   Mail,
-  Image as ImageIcon,
 } from "lucide-react";
 import { StepLayout, ActionButton } from "@/components/step-primitives";
 import { useEventTheme } from "@/components/providers/EventThemeProvider";
 import type { StepReward, ShareSocial } from "@/features/steps/types";
+import type { MockSessionData } from "@/features/steps/types/preview.types";
 
 interface RewardStepProps {
   step: StepReward;
+  mockSession?: MockSessionData;
 }
 
 /** Social media icon mapping */
@@ -41,8 +44,9 @@ const SOCIAL_LABELS: Record<ShareSocial, string> = {
   whatsapp: "WhatsApp",
 };
 
-export function RewardStep({ step }: RewardStepProps) {
+export function RewardStep({ step, mockSession }: RewardStepProps) {
   const { buttonBgColor, buttonTextColor, buttonRadius } = useEventTheme();
+  const transformedPhoto = mockSession?.transformedPhoto ?? "/placeholders/transformed-placeholder.svg";
 
   const config = step.config ?? {
     allowDownload: true,
@@ -70,17 +74,18 @@ export function RewardStep({ step }: RewardStepProps) {
           <p className="text-sm opacity-80 mb-4">{step.description}</p>
         )}
 
-        {/* Result Image Placeholder */}
+        {/* Result Image */}
         <div className="flex-1 flex items-center justify-center py-4">
           <div
-            className="w-full max-w-[200px] aspect-square rounded-lg border-2 border-dashed flex items-center justify-center"
-            style={{ borderColor: `${buttonBgColor}40` }}
+            className="w-full max-w-[200px] aspect-[3/4] rounded-lg overflow-hidden relative shadow-lg"
           >
-            <div className="text-center opacity-60">
-              <ImageIcon className="h-12 w-12 mx-auto mb-2" />
-              <p className="text-xs">Generated result</p>
-              <p className="text-xs">will appear here</p>
-            </div>
+            <Image
+              src={transformedPhoto}
+              alt="AI transformed result"
+              fill
+              className="object-cover"
+              unoptimized
+            />
           </div>
         </div>
 

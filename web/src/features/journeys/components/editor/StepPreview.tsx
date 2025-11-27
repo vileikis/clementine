@@ -6,6 +6,7 @@
  * Renders a live preview of the selected step within a DeviceFrame.
  * Wraps step content with EventThemeProvider to apply the event's theme.
  * Routes to the appropriate step preview component based on step type.
+ * Passes mockSession data to step components for realistic preview rendering.
  */
 
 import { memo } from "react";
@@ -27,11 +28,13 @@ import {
 import type { Step } from "@/features/steps/types";
 import type { EventTheme } from "@/features/events/types";
 import type { Experience } from "@/features/experiences/types";
+import { DEFAULT_MOCK_SESSION, type MockSessionData } from "@/features/steps/types/preview.types";
 
 interface StepPreviewProps {
   step: Step;
   theme: EventTheme;
   experiences: Experience[];
+  mockSession?: MockSessionData;
 }
 
 /**
@@ -42,11 +45,12 @@ export const StepPreview = memo(function StepPreview({
   step,
   theme,
   experiences,
+  mockSession = DEFAULT_MOCK_SESSION,
 }: StepPreviewProps) {
   return (
     <EventThemeProvider theme={theme}>
       <DeviceFrame>
-        <StepContent step={step} experiences={experiences} />
+        <StepContent step={step} experiences={experiences} mockSession={mockSession} />
       </DeviceFrame>
     </EventThemeProvider>
   );
@@ -55,13 +59,16 @@ export const StepPreview = memo(function StepPreview({
 /**
  * Internal component that renders the step content based on type.
  * Uses discriminated union pattern for type-safe rendering.
+ * Passes mockSession to components that need it for realistic preview.
  */
 function StepContent({
   step,
   experiences,
+  mockSession,
 }: {
   step: Step;
   experiences: Experience[];
+  mockSession: MockSessionData;
 }) {
   switch (step.type) {
     case "info":
@@ -81,11 +88,11 @@ function StepContent({
     case "experience-picker":
       return <ExperiencePickerStep step={step} experiences={experiences} />;
     case "capture":
-      return <CaptureStep step={step} experiences={experiences} />;
+      return <CaptureStep step={step} experiences={experiences} mockSession={mockSession} />;
     case "processing":
       return <ProcessingStep step={step} />;
     case "reward":
-      return <RewardStep step={step} />;
+      return <RewardStep step={step} mockSession={mockSession} />;
     default: {
       // TypeScript exhaustive check
       const _exhaustive: never = step;
