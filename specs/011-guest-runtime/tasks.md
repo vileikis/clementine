@@ -63,56 +63,56 @@ Per plan.md, this feature uses Next.js monorepo structure:
 
 ### Core Runtime Hook
 
-- [ ] T016 [US1] Create JourneyRuntimeState interface in `web/src/features/guest/hooks/useJourneyRuntime.ts`
-- [ ] T017 [US1] Implement useJourneyRuntime reducer with actions (SESSION_CREATED, ADVANCE, GO_BACK, ERROR) in `web/src/features/guest/hooks/useJourneyRuntime.ts`
-- [ ] T018 [US1] Implement session initialization in useJourneyRuntime (calls startJourneySessionAction on mount) in `web/src/features/guest/hooks/useJourneyRuntime.ts`
-- [ ] T019 [US1] Implement next() function in useJourneyRuntime (calls advanceStepAction) in `web/src/features/guest/hooks/useJourneyRuntime.ts`
-- [ ] T020 [US1] Implement previous() function in useJourneyRuntime (calls goBackStepAction) in `web/src/features/guest/hooks/useJourneyRuntime.ts`
-- [ ] T021 [US1] Implement saveInput() function in useJourneyRuntime (calls saveStepDataAction) in `web/src/features/guest/hooks/useJourneyRuntime.ts`
-- [ ] T022 [US1] Export useJourneyRuntime hook from `web/src/features/guest/hooks/useJourneyRuntime.ts`
+- [x] T016 [US1] Create JourneyRuntimeState interface in `web/src/features/guest/hooks/useJourneyRuntime.ts`
+- [x] T017 [US1] Implement useJourneyRuntime reducer with actions (SESSION_CREATED, ADVANCE, GO_BACK, ERROR) in `web/src/features/guest/hooks/useJourneyRuntime.ts`
+- [x] T018 [US1] Implement session initialization in useJourneyRuntime (calls startJourneySessionAction on mount) in `web/src/features/guest/hooks/useJourneyRuntime.ts`
+- [x] T019 [US1] Implement next() function in useJourneyRuntime (calls advanceStepAction) in `web/src/features/guest/hooks/useJourneyRuntime.ts`
+- [x] T020 [US1] Implement previous() function in useJourneyRuntime (calls goBackStepAction) in `web/src/features/guest/hooks/useJourneyRuntime.ts`
+- [x] T021 [US1] Implement saveInput() function in useJourneyRuntime (calls saveStepDataAction) in `web/src/features/guest/hooks/useJourneyRuntime.ts`
+- [x] T022 [US1] Export useJourneyRuntime hook from `web/src/features/guest/hooks/useJourneyRuntime.ts`
 
 ### Guest Capture Step Component
 
-- [ ] T023 [P] [US1] Create GuestCaptureStep component with real camera integration in `web/src/features/guest/components/GuestCaptureStep.tsx`
-- [ ] T024 [US1] Wire GuestCaptureStep to useCamera hook and saveCaptureAction in `web/src/features/guest/components/GuestCaptureStep.tsx`
-- [ ] T025 [US1] Add onCaptureComplete callback to GuestCaptureStep in `web/src/features/guest/components/GuestCaptureStep.tsx`
+- [x] T023 [P] [US1] Create GuestCaptureStep component with real camera integration in `web/src/features/guest/components/GuestCaptureStep.tsx`
+- [x] T024 [US1] Wire GuestCaptureStep to useCamera hook and saveCaptureAction in `web/src/features/guest/components/GuestCaptureStep.tsx`
+- [x] T025 [US1] Add onCaptureComplete callback to GuestCaptureStep in `web/src/features/guest/components/GuestCaptureStep.tsx`
 
 ### Guest Processing Step Component
 
-- [ ] T026 [P] [US1] Create GuestProcessingStep component with transform trigger in `web/src/features/guest/components/GuestProcessingStep.tsx`
-- [ ] T027 [US1] Wire GuestProcessingStep to triggerTransformAction in `web/src/features/guest/components/GuestProcessingStep.tsx`
-- [ ] T028 [US1] Add Firestore real-time subscription for session state in GuestProcessingStep in `web/src/features/guest/components/GuestProcessingStep.tsx`
-- [ ] T029 [US1] Add onProcessingComplete callback to GuestProcessingStep in `web/src/features/guest/components/GuestProcessingStep.tsx`
+- [x] T026 [P] [US1] Create GuestProcessingStep component with transform trigger in `web/src/features/guest/components/GuestProcessingStep.tsx`
+- [x] T027 [US1] Wire GuestProcessingStep to triggerTransformAction in `web/src/features/guest/components/GuestProcessingStep.tsx`
+- [x] T028 [US1] Add Firestore real-time subscription for session state in GuestProcessingStep in `web/src/features/guest/components/GuestProcessingStep.tsx`
+- [x] T029 [US1] Add onProcessingComplete callback to GuestProcessingStep in `web/src/features/guest/components/GuestProcessingStep.tsx`
 
 ### Guest Reward Step Component
 
-- [ ] T030 [P] [US1] Create GuestRewardStep component with result display in `web/src/features/guest/components/GuestRewardStep.tsx`
-- [ ] T031 [US1] Add download button functionality to GuestRewardStep in `web/src/features/guest/components/GuestRewardStep.tsx`
-- [ ] T032 [US1] Add share button with native share API fallback in GuestRewardStep in `web/src/features/guest/components/GuestRewardStep.tsx`
+- [x] T030 [P] [US1] Create GuestRewardStep component with result display in `web/src/features/guest/components/GuestRewardStep.tsx`
+- [x] T031 [US1] Add download button functionality to GuestRewardStep in `web/src/features/guest/components/GuestRewardStep.tsx`
+- [x] T032 [US1] Add share button with native share API fallback in GuestRewardStep in `web/src/features/guest/components/GuestRewardStep.tsx`
 
 ### Step Renderer Integration
 
-- [ ] T033 [US1] Create JourneyStepRenderer component in `web/src/features/guest/components/JourneyStepRenderer.tsx`
-- [ ] T034 [US1] Add step type routing in JourneyStepRenderer (capture → GuestCaptureStep, processing → GuestProcessingStep, reward → GuestRewardStep) in `web/src/features/guest/components/JourneyStepRenderer.tsx`
-- [ ] T035 [US1] Wire other step types to existing preview renderers with real callbacks in JourneyStepRenderer in `web/src/features/guest/components/JourneyStepRenderer.tsx`
+- [x] T033 [US1] Create JourneyStepRenderer component in `web/src/features/guest/components/JourneyStepRenderer.tsx`
+- [x] T034 [US1] Add step type routing in JourneyStepRenderer (capture → GuestCaptureStep, processing → GuestProcessingStep, reward → GuestRewardStep) in `web/src/features/guest/components/JourneyStepRenderer.tsx`
+- [x] T035 [US1] Wire other step types to existing preview renderers with real callbacks in JourneyStepRenderer in `web/src/features/guest/components/JourneyStepRenderer.tsx`
 
 ### Main Container
 
-- [ ] T036 [US1] Create JourneyGuestContainer component in `web/src/features/guest/components/JourneyGuestContainer.tsx`
-- [ ] T037 [US1] Wire JourneyGuestContainer to useJourneyRuntime hook in `web/src/features/guest/components/JourneyGuestContainer.tsx`
-- [ ] T038 [US1] Add EventThemeProvider wrapper in JourneyGuestContainer in `web/src/features/guest/components/JourneyGuestContainer.tsx`
-- [ ] T039 [US1] Add loading and error states to JourneyGuestContainer in `web/src/features/guest/components/JourneyGuestContainer.tsx`
+- [x] T036 [US1] Create JourneyGuestContainer component in `web/src/features/guest/components/JourneyGuestContainer.tsx`
+- [x] T037 [US1] Wire JourneyGuestContainer to useJourneyRuntime hook in `web/src/features/guest/components/JourneyGuestContainer.tsx`
+- [x] T038 [US1] Add EventThemeProvider wrapper in JourneyGuestContainer in `web/src/features/guest/components/JourneyGuestContainer.tsx`
+- [x] T039 [US1] Add loading and error states to JourneyGuestContainer in `web/src/features/guest/components/JourneyGuestContainer.tsx`
 
 ### Route Integration
 
-- [ ] T040 [US1] Update join page routing logic to check activeJourneyId in `web/src/app/(public)/join/[eventId]/page.tsx`
-- [ ] T041 [US1] Add journey and steps loading to join page in `web/src/app/(public)/join/[eventId]/page.tsx`
-- [ ] T042 [US1] Render JourneyGuestContainer when activeJourneyId exists in `web/src/app/(public)/join/[eventId]/page.tsx`
-- [ ] T043 [US1] Add fallback to legacy GuestFlowContainer when no activeJourneyId in `web/src/app/(public)/join/[eventId]/page.tsx`
+- [x] T040 [US1] Update join page routing logic to check activeJourneyId in `web/src/app/(public)/join/[eventId]/page.tsx`
+- [x] T041 [US1] Add journey and steps loading to join page in `web/src/app/(public)/join/[eventId]/page.tsx`
+- [x] T042 [US1] Render JourneyGuestContainer when activeJourneyId exists in `web/src/app/(public)/join/[eventId]/page.tsx`
+- [x] T043 [US1] Add fallback to legacy GuestFlowContainer when no activeJourneyId in `web/src/app/(public)/join/[eventId]/page.tsx`
 
 ### Exports
 
-- [ ] T044 [US1] Update guest feature barrel exports with new components and hooks in `web/src/features/guest/index.ts`
+- [x] T044 [US1] Update guest feature barrel exports with new components and hooks in `web/src/features/guest/index.ts`
 
 **Checkpoint**: At this point, User Story 1 is functional - guest can complete full journey with capture and AI result
 
