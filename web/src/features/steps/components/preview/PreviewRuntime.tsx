@@ -57,7 +57,7 @@ export function PreviewRuntime({
 
   return (
     <EventThemeProvider theme={theme}>
-      <div className="h-full">
+      <div className="h-full w-full flex justify-center">
         <DeviceFrame viewportMode={viewportMode}>
           <StepContent
             step={step}
@@ -73,10 +73,12 @@ export function PreviewRuntime({
 /**
  * Internal component that renders the step content based on type.
  * Uses discriminated union pattern for type-safe rendering.
+ * Passes mockSession to components that need it for realistic preview.
  */
 function StepContent({
   step,
   experiences,
+  mockSession,
 }: {
   step: Step;
   experiences: Experience[];
@@ -100,11 +102,11 @@ function StepContent({
     case "experience-picker":
       return <ExperiencePickerStep step={step} experiences={experiences} />;
     case "capture":
-      return <CaptureStep step={step} experiences={experiences} />;
+      return <CaptureStep step={step} experiences={experiences} mockSession={mockSession} />;
     case "processing":
       return <ProcessingStep step={step} />;
     case "reward":
-      return <RewardStep step={step} />;
+      return <RewardStep step={step} mockSession={mockSession} />;
     default: {
       // TypeScript exhaustive check
       const _exhaustive: never = step;

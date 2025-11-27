@@ -38,10 +38,10 @@ export function DeviceFrame({
     <div
       className="rounded-2xl border-4 border-foreground/10 shadow-lg overflow-hidden relative"
       style={{
-        // Mobile: fixed width, Desktop: fill available space (up to max)
+        // Width: use dimension but don't exceed available space
         width: isMobile ? dimensions.width : "100%",
         maxWidth: dimensions.width,
-        // Mobile: fixed height for phone simulation, Desktop: fill available space
+        // Height: mobile fixed, desktop fills available
         height: isMobile ? dimensions.height : "100%",
         minHeight: isMobile ? undefined : dimensions.height,
         backgroundColor: theme.background.color,
