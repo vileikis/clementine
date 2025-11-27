@@ -1,12 +1,14 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useState, useEffect } from "react";
 import type { Event } from "@/features/events/types";
 import type { Journey } from "@/features/journeys/types";
 import type { Step } from "@/features/steps/types";
 import type { Experience } from "@/features/experiences/types";
 import type { StepInputValue } from "@/features/sessions";
 import { EventThemeProvider } from "@/components/providers/EventThemeProvider";
+import { ViewportModeProvider } from "@/features/steps/components/preview/ViewportModeContext";
+import type { ViewportMode } from "@/features/steps/types/preview.types";
 import { useJourneyRuntime } from "../hooks/useJourneyRuntime";
 import { JourneyStepRenderer } from "./JourneyStepRenderer";
 
@@ -33,6 +35,28 @@ export function JourneyGuestContainer({
   experiences,
 }: JourneyGuestContainerProps) {
   const runtime = useJourneyRuntime(event.id, journey, steps);
+
+  // Responsive viewport mode detection
+  const [viewportMode, setViewportMode] = useState<ViewportMode>("mobile");
+
+  useEffect(() => {
+    // Desktop breakpoint at 1024px (lg breakpoint)
+    const mediaQuery = window.matchMedia("(min-width: 1024px)");
+
+    const updateViewportMode = () => {
+      setViewportMode(mediaQuery.matches ? "desktop" : "mobile");
+    };
+
+    // Set initial value
+    updateViewportMode();
+
+    // Listen for changes
+    mediaQuery.addEventListener("change", updateViewportMode);
+
+    return () => {
+      mediaQuery.removeEventListener("change", updateViewportMode);
+    };
+  }, []);
 
   /**
    * Handle step completion and advance to next step
@@ -106,14 +130,28 @@ export function JourneyGuestContainer({
   // Ready state - render current step with theme
   return (
     <EventThemeProvider theme={event.theme}>
-      <JourneyStepRenderer
-        step={runtime.currentStep}
-        experiences={experiences}
-        sessionId={runtime.sessionId}
-        eventId={event.id}
-        onStepComplete={handleStepComplete}
-        onInputChange={handleInputChange}
-      />
+      <ViewportModeProvider mode={viewportMode}>
+        <div
+          className="h-screen w-full overflow-hidden"
+          style={{
+            backgroundColor: event.theme.background.color,
+            backgroundImage: event.theme.background.image
+              ? `url(${event.theme.background.image})`
+              : undefined,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        >
+          <JourneyStepRenderer
+            step={runtime.currentStep}
+            experiences={experiences}
+            sessionId={runtime.sessionId}
+            eventId={event.id}
+            onStepComplete={handleStepComplete}
+            onInputChange={handleInputChange}
+          />
+        </div>
+      </ViewportModeProvider>
     </EventThemeProvider>
   );
 }
