@@ -99,9 +99,9 @@ export function StepLayout({
       }}
     >
       {/* Content container: full width on mobile, constrained on desktop */}
-      <div className="flex flex-1 flex-col w-full lg:flex-none lg:max-w-xl lg:w-full">
-        {/* Scrollable content area on mobile */}
-        <div className="flex-1 overflow-y-auto lg:overflow-visible px-4 lg:px-6 pb-24 lg:pb-0">
+      <div className="flex flex-1 flex-col w-full lg:flex-none lg:max-w-xl lg:w-full overflow-y-auto lg:overflow-visible">
+        {/* Content area */}
+        <div className="flex-1 px-4 lg:px-6">
           {mediaUrl && (
             <div className="relative w-full max-w-sm mx-auto aspect-video overflow-hidden rounded-lg mb-4">
               {renderMedia()}
@@ -110,7 +110,7 @@ export function StepLayout({
           {children}
         </div>
 
-        {/* Action bar: fixed on mobile, inline on desktop */}
+        {/* Action bar: sticky at bottom on mobile, inline on desktop */}
         {action && <ActionBar>{action}</ActionBar>}
       </div>
     </div>
