@@ -12,8 +12,8 @@ export default async function DesignLayout({
 }: DesignLayoutProps) {
   
   return (
-    <main className="container mx-auto">
+    <div className="h-full overflow-auto">
       {children}
-    </main>
+    </div>
   );
 }

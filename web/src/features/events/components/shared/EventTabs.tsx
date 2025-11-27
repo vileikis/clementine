@@ -26,7 +26,7 @@ export function EventTabs({ eventId }: EventTabsProps) {
 
   return (
     <nav role="navigation" aria-label="Event sections">
-      <ul className="flex gap-6">
+      <ul className="flex gap-4">
         {tabs.map((tab) => {
           // Check if current pathname starts with the tab href (for nested routes)
           const isActive = pathname.startsWith(tab.href);
