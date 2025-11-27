@@ -11,7 +11,7 @@
  *
  * Provides user-friendly error UI with recovery options
  *
- * Route: /events/:eventId/design/experiences/:experienceId/error
+ * Route: /events/:eventId/experiences/:experienceId/error
  */
 
 import { useEffect } from "react";

@@ -5,7 +5,7 @@
  * Provides inline form for creating new experiences at dedicated route
  * Replaces modal-based creation with URL-based navigation pattern
  *
- * Route: /events/:eventId/design/experiences/create
+ * Route: /events/:eventId/experiences/create
  */
 
 import { notFound } from "next/navigation";

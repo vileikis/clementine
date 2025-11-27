@@ -5,7 +5,7 @@
  * Provides dedicated route for editing individual experiences
  * Loads experience data from root /experiences collection
  *
- * Route: /events/:eventId/design/experiences/:experienceId
+ * Route: /events/:eventId/experiences/:experienceId
  */
 
 import { notFound } from "next/navigation";

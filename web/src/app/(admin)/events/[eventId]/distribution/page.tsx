@@ -20,7 +20,7 @@ export default async function DistributionPage({
   const event = result.event
 
   return (
-    <main className="container mx-auto px-6 py-8">
+    <div className="container mx-auto px-6 py-8">
       <div className="max-w-2xl">
         <div className="mb-6">
           <h2 className="text-2xl font-bold mb-2">Distribution</h2>
@@ -35,6 +35,6 @@ export default async function DistributionPage({
           qrPngPath={event.qrPngPath}
         />
       </div>
-    </main>
+    </div>
   )
 }

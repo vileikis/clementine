@@ -16,9 +16,9 @@ export function DesignSubTabs({ eventId }: DesignSubTabsProps) {
   const pathname = usePathname();
 
   const tabs = [
-    { label: "Journeys", href: `/events/${eventId}/design/journeys` },
-    { label: "Experiences", href: `/events/${eventId}/design/experiences` },
-    { label: "Theme", href: `/events/${eventId}/design/theme` },
+    { label: "Journeys", href: `/events/${eventId}/journeys` },
+    { label: "Experiences", href: `/events/${eventId}/experiences` },
+    { label: "Theme", href: `/events/${eventId}/theme` },
   ];
 
   return (

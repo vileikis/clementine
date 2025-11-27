@@ -55,7 +55,7 @@ export async function duplicateExperience(
     // Revalidate paths
     if (eventId) {
       revalidatePath(`/events/${eventId}`);
-      revalidatePath(`/events/${eventId}/design/experiences`);
+      revalidatePath(`/events/${eventId}/experiences`);
     }
 
     return createSuccessResponse(duplicated);
