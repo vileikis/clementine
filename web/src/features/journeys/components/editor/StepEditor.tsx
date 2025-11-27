@@ -55,6 +55,7 @@ import type { Experience } from "@/features/experiences/types";
 
 interface StepEditorProps {
   eventId: string;
+  companyId: string;
   step: Step;
   experiences: Experience[];
   onStepDeleted?: () => void;
@@ -63,6 +64,7 @@ interface StepEditorProps {
 
 export function StepEditor({
   eventId,
+  companyId,
   step,
   experiences,
   onStepDeleted,
@@ -145,7 +147,7 @@ export function StepEditor({
 
       {/* Editor Content */}
       <div className="flex-1 overflow-y-auto p-4">
-        {renderEditor(step, experiences, handleUpdate, handlePreviewChange)}
+        {renderEditor(step, companyId, experiences, handleUpdate, handlePreviewChange)}
       </div>
     </div>
   );
@@ -158,6 +160,7 @@ export function StepEditor({
  */
 function renderEditor(
   step: Step,
+  companyId: string,
   experiences: Experience[],
   onUpdate: (updates: Record<string, unknown>) => Promise<void>,
   onPreviewChange: (values: Record<string, unknown>) => void
@@ -167,6 +170,7 @@ function renderEditor(
       return (
         <InfoStepEditor
           step={step as StepInfo}
+          companyId={companyId}
           onUpdate={onUpdate}
           onPreviewChange={onPreviewChange}
         />
@@ -176,6 +180,7 @@ function renderEditor(
       return (
         <ExperiencePickerEditor
           step={step as StepExperiencePicker}
+          companyId={companyId}
           experiences={experiences}
           onUpdate={onUpdate}
           onPreviewChange={onPreviewChange}
@@ -186,6 +191,7 @@ function renderEditor(
       return (
         <CaptureStepEditor
           step={step as StepCapture}
+          companyId={companyId}
           experiences={experiences}
           onUpdate={onUpdate}
           onPreviewChange={onPreviewChange}
@@ -196,6 +202,7 @@ function renderEditor(
       return (
         <ShortTextEditor
           step={step as StepShortText}
+          companyId={companyId}
           onUpdate={onUpdate}
           onPreviewChange={onPreviewChange}
         />
@@ -205,6 +212,7 @@ function renderEditor(
       return (
         <LongTextEditor
           step={step as StepLongText}
+          companyId={companyId}
           onUpdate={onUpdate}
           onPreviewChange={onPreviewChange}
         />
@@ -214,6 +222,7 @@ function renderEditor(
       return (
         <MultipleChoiceEditor
           step={step as StepMultipleChoice}
+          companyId={companyId}
           onUpdate={onUpdate}
           onPreviewChange={onPreviewChange}
         />
@@ -223,6 +232,7 @@ function renderEditor(
       return (
         <YesNoEditor
           step={step as StepYesNo}
+          companyId={companyId}
           onUpdate={onUpdate}
           onPreviewChange={onPreviewChange}
         />
@@ -232,6 +242,7 @@ function renderEditor(
       return (
         <OpinionScaleEditor
           step={step as StepOpinionScale}
+          companyId={companyId}
           onUpdate={onUpdate}
           onPreviewChange={onPreviewChange}
         />
@@ -241,6 +252,7 @@ function renderEditor(
       return (
         <EmailEditor
           step={step as StepEmail}
+          companyId={companyId}
           onUpdate={onUpdate}
           onPreviewChange={onPreviewChange}
         />
@@ -250,6 +262,7 @@ function renderEditor(
       return (
         <ProcessingStepEditor
           step={step as StepProcessing}
+          companyId={companyId}
           onUpdate={onUpdate}
           onPreviewChange={onPreviewChange}
         />
@@ -259,6 +272,7 @@ function renderEditor(
       return (
         <RewardStepEditor
           step={step as StepReward}
+          companyId={companyId}
           onUpdate={onUpdate}
           onPreviewChange={onPreviewChange}
         />

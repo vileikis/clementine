@@ -16,7 +16,7 @@ interface EmailStepProps {
 
 export function EmailStep({ step }: EmailStepProps) {
   return (
-    <StepLayout mediaUrl={step.mediaUrl}>
+    <StepLayout mediaUrl={step.mediaUrl} mediaType={step.mediaType}>
       <div className="flex-1">
         {step.title && (
           <h2 className="text-2xl font-bold mb-2">{step.title}</h2>

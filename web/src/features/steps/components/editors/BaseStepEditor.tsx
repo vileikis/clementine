@@ -19,10 +19,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { STEP_CONSTANTS } from "../../constants";
+import { StepMediaUpload } from "../shared/StepMediaUpload";
+import type { StepMediaType } from "../../types";
 
 interface BaseStepEditorProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   form: UseFormReturn<any>;
+  /** Company ID for media uploads */
+  companyId: string;
+  /** Callback to immediately save media changes (upload/remove don't trigger blur) */
+  onMediaChange?: (mediaUrl: string | null, mediaType: StepMediaType | null) => Promise<void>;
   showDescription?: boolean;
   showMediaUrl?: boolean;
   showCtaLabel?: boolean;
@@ -31,6 +37,8 @@ interface BaseStepEditorProps {
 
 export function BaseStepEditor({
   form,
+  companyId,
+  onMediaChange,
   showDescription = true,
   showMediaUrl = true,
   showCtaLabel = true,
@@ -84,29 +92,35 @@ export function BaseStepEditor({
         />
       )}
 
-      {/* Media URL */}
+      {/* Media Upload */}
       {showMediaUrl && (
-        <FormField
-          control={form.control}
-          name="mediaUrl"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Media URL</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="https://example.com/image.jpg"
-                  type="url"
-                  {...field}
-                  value={field.value ?? ""}
-                />
-              </FormControl>
-              <FormDescription>
-                Hero image or video URL (optional)
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <FormItem>
+          <FormLabel>Media</FormLabel>
+          <StepMediaUpload
+            companyId={companyId}
+            mediaUrl={form.watch("mediaUrl")}
+            mediaType={form.watch("mediaType") as StepMediaType | null | undefined}
+            onUpload={async (url, type) => {
+              form.setValue("mediaUrl", url, { shouldDirty: true });
+              form.setValue("mediaType", type, { shouldDirty: true });
+              // Immediately save since upload doesn't trigger blur
+              if (onMediaChange) {
+                await onMediaChange(url, type);
+              }
+            }}
+            onRemove={async () => {
+              form.setValue("mediaUrl", null, { shouldDirty: true });
+              form.setValue("mediaType", null, { shouldDirty: true });
+              // Immediately save since remove doesn't trigger blur
+              if (onMediaChange) {
+                await onMediaChange(null, null);
+              }
+            }}
+          />
+          <FormDescription>
+            Hero image, video, GIF, or Lottie animation (optional)
+          </FormDescription>
+        </FormItem>
       )}
 
       {/* CTA Label */}
