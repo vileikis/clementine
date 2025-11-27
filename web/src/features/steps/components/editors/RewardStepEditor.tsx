@@ -24,6 +24,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { BaseStepEditor } from "./BaseStepEditor";
 import { useAutoSave } from "../../hooks";
 import { STEP_CONSTANTS } from "../../constants";
+import { stepMediaTypeSchema } from "../../schemas";
 import type { StepReward, ShareSocial } from "../../types";
 
 const rewardStepFormSchema = z.object({
@@ -31,6 +32,7 @@ const rewardStepFormSchema = z.object({
   title: z.string().max(200).optional().nullable(),
   description: z.string().max(1000).optional().nullable(),
   mediaUrl: z.string().url().optional().nullable().or(z.literal("")),
+  mediaType: stepMediaTypeSchema.optional().nullable(),
   ctaLabel: z.string().max(50).optional().nullable(),
   // Config fields
   config: z.object({
@@ -48,6 +50,7 @@ const FIELDS_TO_COMPARE: (keyof RewardStepFormValues)[] = [
   "title",
   "description",
   "mediaUrl",
+  "mediaType",
   "ctaLabel",
   "config",
 ];
@@ -64,12 +67,14 @@ const SOCIAL_OPTIONS: { value: ShareSocial; label: string }[] = [
 
 interface RewardStepEditorProps {
   step: StepReward;
+  companyId: string;
   onUpdate: (updates: Partial<RewardStepFormValues>) => Promise<void>;
   onPreviewChange?: (values: RewardStepFormValues) => void;
 }
 
 export function RewardStepEditor({
   step,
+  companyId,
   onUpdate,
   onPreviewChange,
 }: RewardStepEditorProps) {
@@ -87,6 +92,7 @@ export function RewardStepEditor({
       title: step.title ?? "",
       description: step.description ?? "",
       mediaUrl: step.mediaUrl ?? "",
+      mediaType: step.mediaType ?? null,
       ctaLabel: step.ctaLabel ?? "",
       config: {
         allowDownload: config.allowDownload,
@@ -111,6 +117,7 @@ export function RewardStepEditor({
       title: step.title ?? "",
       description: step.description ?? "",
       mediaUrl: step.mediaUrl ?? "",
+      mediaType: step.mediaType ?? null,
       ctaLabel: step.ctaLabel ?? "",
       config: {
         allowDownload: config.allowDownload,
@@ -139,6 +146,7 @@ export function RewardStepEditor({
         {/* Base Fields */}
         <BaseStepEditor
           form={form}
+          companyId={companyId}
           showDescription={true}
           showMediaUrl={false}
           showCtaLabel={true}
