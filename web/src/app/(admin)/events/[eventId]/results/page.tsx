@@ -19,7 +19,7 @@ export default async function ResultsPage({ params }: ResultsPageProps) {
   }
 
   return (
-    <main className="container mx-auto px-6 py-8">
+    <div className="container mx-auto px-6 py-8">
       <div className="space-y-8">
         <div>
           <h1 className="text-2xl font-bold mb-2">Event Analytics</h1>
@@ -30,40 +30,40 @@ export default async function ResultsPage({ params }: ResultsPageProps) {
 
         {/* Placeholder metrics cards - counters removed in V4 schema */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <MetricCard
-          label="Total Sessions"
-          value="0"
-          description="Total number of guest sessions (coming soon)"
-        />
-        <MetricCard
-          label="Ready Sessions"
-          value="0"
-          description="Sessions with completed results (coming soon)"
-        />
-        <MetricCard
-          label="Shares"
-          value="0"
-          description="Times content was shared (coming soon)"
-        />
-        <MetricCard
-          label="Conversion Rate"
-          value="0%"
-          description="Session completion rate (coming soon)"
-        />
-      </div>
+          <MetricCard
+            label="Total Sessions"
+            value="0"
+            description="Total number of guest sessions (coming soon)"
+          />
+          <MetricCard
+            label="Ready Sessions"
+            value="0"
+            description="Sessions with completed results (coming soon)"
+          />
+          <MetricCard
+            label="Shares"
+            value="0"
+            description="Times content was shared (coming soon)"
+          />
+          <MetricCard
+            label="Conversion Rate"
+            value="0%"
+            description="Session completion rate (coming soon)"
+          />
+        </div>
 
-      {/* Placeholder for future charts and detailed analytics */}
-      <div className="border rounded-lg p-8 bg-muted/50">
-        <div className="text-center space-y-2">
-          <h3 className="text-lg font-medium">Detailed Analytics Coming Soon</h3>
-          <p className="text-sm text-muted-foreground max-w-md mx-auto">
-            Advanced analytics including engagement trends, top-performing experiences,
-            and demographic insights will be available in a future update.
-          </p>
+        {/* Placeholder for future charts and detailed analytics */}
+        <div className="border rounded-lg p-8 bg-muted/50">
+          <div className="text-center space-y-2">
+            <h3 className="text-lg font-medium">Detailed Analytics Coming Soon</h3>
+            <p className="text-sm text-muted-foreground max-w-md mx-auto">
+              Advanced analytics including engagement trends, top-performing experiences,
+              and demographic insights will be available in a future update.
+            </p>
+          </div>
         </div>
       </div>
-      </div>
-    </main>
+    </div>
   );
 }
 

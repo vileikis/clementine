@@ -16,8 +16,8 @@ export default async function ThemePage({ params }: ThemePageProps) {
   }
 
   return (
-    <main className="container mx-auto px-6 py-8">
+    <div className="container mx-auto px-6 py-8">
       <ThemeEditor event={result.event} />
-    </main>
+    </div>
   );
 }

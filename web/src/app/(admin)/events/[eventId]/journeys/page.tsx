@@ -27,8 +27,8 @@ export default async function JourneysPage({ params }: JourneysPageProps) {
   const journeys = journeysResult.success ? journeysResult.data : [];
 
   return (
-    <main className="container mx-auto px-6 py-8 max-w-4xl">
+    <div className="container mx-auto px-6 py-8 max-w-4xl">
       <JourneyList journeys={journeys} event={eventResult.event} />
-    </main>
+    </div>
   );
 }
