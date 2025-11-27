@@ -13,6 +13,7 @@ import {
   updateEventBranding,
   updateEventStatus,
   updateEventName,
+  deleteEvent,
 } from "../repositories/events";
 import { getCompany } from "@/features/companies/repositories/companies.repository";
 import {
@@ -468,6 +469,49 @@ export async function updateEventSwitchboardAction(
       error: {
         code: "INTERNAL_ERROR",
         message: error instanceof Error ? error.message : "Unknown error",
+      },
+    };
+  }
+}
+
+// ============================================================================
+// Event Delete Operation
+// ============================================================================
+
+/**
+ * Soft delete an event (mark as deleted, hide from UI)
+ */
+export async function deleteEventAction(eventId: string) {
+  const auth = await verifyAdminSecret();
+  if (!auth.authorized) {
+    return {
+      success: false,
+      error: {
+        code: "PERMISSION_DENIED",
+        message: auth.error,
+      },
+    };
+  }
+
+  try {
+    await deleteEvent(eventId);
+    revalidatePath("/events");
+    return { success: true };
+  } catch (error) {
+    if (error instanceof Error && error.message === "Event not found") {
+      return {
+        success: false,
+        error: {
+          code: "EVENT_NOT_FOUND",
+          message: "Event not found",
+        },
+      };
+    }
+    return {
+      success: false,
+      error: {
+        code: "INTERNAL_ERROR",
+        message: error instanceof Error ? error.message : "Failed to delete event",
       },
     };
   }

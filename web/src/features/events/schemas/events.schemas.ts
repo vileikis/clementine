@@ -6,7 +6,7 @@ import {
 } from "../constants";
 
 // Event schemas
-export const eventStatusSchema = z.enum(["draft", "live", "archived"]);
+export const eventStatusSchema = z.enum(["draft", "live", "archived", "deleted"]);
 
 /**
  * Theme text configuration
@@ -61,6 +61,9 @@ export const eventSchema = z.object({
 
   // Nested object configurations
   theme: eventThemeSchema,
+
+  // Soft delete timestamp
+  deletedAt: z.number().nullable().optional().default(null),
 
   createdAt: z.number(),
   updatedAt: z.number(),

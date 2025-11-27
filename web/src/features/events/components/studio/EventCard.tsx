@@ -1,21 +1,24 @@
 import Link from "next/link"
 import type { Event } from "../../types/event.types"
+import { DeleteEventButton } from "./DeleteEventButton"
 
 interface EventCardProps {
   event: Event
   companyName?: string | null
 }
 
-const statusStyles = {
+const statusStyles: Record<Event["status"], string> = {
   draft: "bg-yellow-100 text-yellow-800 border-yellow-200",
   live: "bg-green-100 text-green-800 border-green-200",
   archived: "bg-gray-100 text-gray-800 border-gray-200",
+  deleted: "bg-red-100 text-red-800 border-red-200",
 }
 
-const statusLabels = {
+const statusLabels: Record<Event["status"], string> = {
   draft: "Draft",
   live: "Live",
   archived: "Archived",
+  deleted: "Deleted",
 }
 
 export function EventCard({ event, companyName }: EventCardProps) {
@@ -39,11 +42,14 @@ export function EventCard({ event, companyName }: EventCardProps) {
             </p>
           )}
         </div>
-        <span
-          className={`px-2 py-1 text-xs font-medium rounded-full border flex-shrink-0 ${statusStyles[event.status]}`}
-        >
-          {statusLabels[event.status]}
-        </span>
+        <div className="flex items-center gap-2">
+          <span
+            className={`px-2 py-1 text-xs font-medium rounded-full border flex-shrink-0 ${statusStyles[event.status]}`}
+          >
+            {statusLabels[event.status]}
+          </span>
+          <DeleteEventButton eventId={event.id} eventName={event.name} />
+        </div>
       </div>
 
       <div className="space-y-2 text-sm text-muted-foreground">

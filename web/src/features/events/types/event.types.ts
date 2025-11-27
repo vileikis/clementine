@@ -1,6 +1,6 @@
 // Event-related TypeScript types
 
-export type EventStatus = "draft" | "live" | "archived";
+export type EventStatus = "draft" | "live" | "archived" | "deleted";
 
 /**
  * Theme text configuration
@@ -59,6 +59,9 @@ export interface Event {
 
   // Nested object configurations
   theme: EventTheme;
+
+  // Soft delete timestamp
+  deletedAt?: number | null;
 
   createdAt: number; // Unix timestamp ms
   updatedAt: number;

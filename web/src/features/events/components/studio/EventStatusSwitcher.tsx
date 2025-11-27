@@ -4,12 +4,15 @@ import { useState } from "react"
 import { updateEventStatusAction } from "../../actions/events"
 import type { EventStatus } from "../../types/event.types"
 
+// Only allow setting these statuses (not "deleted" - that requires delete action)
+type SettableStatus = Exclude<EventStatus, "deleted">
+
 interface EventStatusSwitcherProps {
   eventId: string
-  currentStatus: EventStatus
+  currentStatus: SettableStatus
 }
 
-const statusOptions: { value: EventStatus; label: string; color: string }[] = [
+const statusOptions: { value: SettableStatus; label: string; color: string }[] = [
   { value: "draft", label: "Draft", color: "bg-yellow-100 text-yellow-800" },
   { value: "live", label: "Live", color: "bg-green-100 text-green-800" },
   { value: "archived", label: "Archived", color: "bg-gray-100 text-gray-800" },
@@ -19,10 +22,10 @@ export function EventStatusSwitcher({
   eventId,
   currentStatus,
 }: EventStatusSwitcherProps) {
-  const [status, setStatus] = useState<EventStatus>(currentStatus)
+  const [status, setStatus] = useState<SettableStatus>(currentStatus)
   const [isUpdating, setIsUpdating] = useState(false)
 
-  const handleStatusChange = async (newStatus: EventStatus) => {
+  const handleStatusChange = async (newStatus: SettableStatus) => {
     if (newStatus === status || isUpdating) return
 
     setIsUpdating(true)
@@ -45,7 +48,7 @@ export function EventStatusSwitcher({
     >
       <select
         value={status}
-        onChange={(e) => handleStatusChange(e.target.value as EventStatus)}
+        onChange={(e) => handleStatusChange(e.target.value as SettableStatus)}
         disabled={isUpdating}
         className={`px-2 py-1 text-xs font-medium rounded-full border cursor-pointer transition-opacity ${
           statusOptions.find((opt) => opt.value === status)?.color

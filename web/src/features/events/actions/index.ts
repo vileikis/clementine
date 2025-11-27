@@ -8,5 +8,6 @@ export {
   updateEventNameAction,
   updateEventTheme,
   updateEventSwitchboardAction,
+  deleteEventAction,
   type ActionResponse,
 } from "./events";
