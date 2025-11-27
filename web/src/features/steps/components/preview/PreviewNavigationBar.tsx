@@ -17,13 +17,14 @@ export function PreviewNavigationBar({
   currentIndex,
   totalSteps,
   canGoBack,
-  canGoNext,
+  canGoNext: _canGoNext, // Reserved for future disabled state
   isCompleted,
   onBack,
   onNext,
   onRestart,
   onExit,
 }: PreviewNavigationBarProps) {
+  void _canGoNext; // Used to satisfy interface, Next is always enabled until completed
   return (
     <nav
       className="fixed bottom-0 left-0 right-0 h-16 bg-background/95 backdrop-blur-sm border-t flex items-center justify-between px-4 gap-2 z-50"
@@ -60,13 +61,12 @@ export function PreviewNavigationBar({
           <Button
             variant="default"
             onClick={onNext}
-            disabled={!canGoNext && !isCompleted}
             className="h-11 px-6 gap-1"
             aria-label={
               currentIndex >= totalSteps - 1 ? "Complete journey" : "Next step"
             }
           >
-            <span>Next</span>
+            <span>{currentIndex >= totalSteps - 1 ? "Complete" : "Next"}</span>
             <ChevronRight className="h-4 w-4" />
           </Button>
         )}

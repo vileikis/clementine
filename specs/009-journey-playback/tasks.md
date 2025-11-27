@@ -70,15 +70,15 @@
 
 ### Implementation for User Story 2
 
-- [ ] T012 [P] [US2] Enhance ShortTextStep in `web/src/features/steps/components/preview/steps/ShortTextStep.tsx` to add isInteractive and onValueChange props, implement controlled input when interactive
-- [ ] T013 [P] [US2] Enhance LongTextStep in `web/src/features/steps/components/preview/steps/LongTextStep.tsx` to add isInteractive and onValueChange props, implement controlled textarea when interactive
-- [ ] T014 [P] [US2] Enhance EmailStep in `web/src/features/steps/components/preview/steps/EmailStep.tsx` to add isInteractive and onValueChange props, implement controlled input when interactive
-- [ ] T015 [P] [US2] Enhance MultipleChoiceStep in `web/src/features/steps/components/preview/steps/MultipleChoiceStep.tsx` to add isInteractive and onValueChange props, implement selection handler when interactive
-- [ ] T016 [P] [US2] Enhance YesNoStep in `web/src/features/steps/components/preview/steps/YesNoStep.tsx` to add isInteractive and onValueChange props, implement click handlers when interactive
-- [ ] T017 [P] [US2] Enhance OpinionScaleStep in `web/src/features/steps/components/preview/steps/OpinionScaleStep.tsx` to add isInteractive and onValueChange props, implement click handlers when interactive
-- [ ] T018 [P] [US2] Enhance ExperiencePickerStep in `web/src/features/steps/components/preview/steps/ExperiencePickerStep.tsx` to add isInteractive and onValueChange props, implement selection handler when interactive
-- [ ] T019 [US2] Update PreviewRuntime in `web/src/features/steps/components/preview/PreviewRuntime.tsx` to add mode prop ("single-step" | "playback"), pass isInteractive and onValueChange to step renderers when in playback mode
-- [ ] T020 [US2] Update PlaybackMode in `web/src/features/steps/components/preview/PlaybackMode.tsx` to pass session values and updateInput callbacks to PreviewRuntime for each step
+- [X] T012 [P] [US2] Enhance ShortTextStep in `web/src/features/steps/components/preview/steps/ShortTextStep.tsx` to add isInteractive and onValueChange props, implement controlled input when interactive
+- [X] T013 [P] [US2] Enhance LongTextStep in `web/src/features/steps/components/preview/steps/LongTextStep.tsx` to add isInteractive and onValueChange props, implement controlled textarea when interactive
+- [X] T014 [P] [US2] Enhance EmailStep in `web/src/features/steps/components/preview/steps/EmailStep.tsx` to add isInteractive and onValueChange props, implement controlled input when interactive
+- [X] T015 [P] [US2] Enhance MultipleChoiceStep in `web/src/features/steps/components/preview/steps/MultipleChoiceStep.tsx` to add isInteractive and onValueChange props, implement selection handler when interactive
+- [X] T016 [P] [US2] Enhance YesNoStep in `web/src/features/steps/components/preview/steps/YesNoStep.tsx` to add isInteractive and onValueChange props, implement click handlers when interactive
+- [X] T017 [P] [US2] Enhance OpinionScaleStep in `web/src/features/steps/components/preview/steps/OpinionScaleStep.tsx` to add isInteractive and onValueChange props, implement click handlers when interactive
+- [X] T018 [P] [US2] Enhance ExperiencePickerStep in `web/src/features/steps/components/preview/steps/ExperiencePickerStep.tsx` to add isInteractive and onValueChange props, implement selection handler when interactive
+- [X] T019 [US2] Update PreviewRuntime in `web/src/features/steps/components/preview/PreviewRuntime.tsx` to add mode prop ("single-step" | "playback"), pass isInteractive and onValueChange to step renderers when in playback mode
+- [X] T020 [US2] Update PlaybackMode in `web/src/features/steps/components/preview/PlaybackMode.tsx` to pass session values and updateInput callbacks to PreviewRuntime for each step
 
 **Checkpoint**: User Story 2 complete - inputs persist across step navigation
 
@@ -92,9 +92,9 @@
 
 ### Implementation for User Story 3
 
-- [ ] T021 [US3] Enhance PreviewNavigationBar in `web/src/features/steps/components/preview/PreviewNavigationBar.tsx` to add proper disabled states for Back (first step) and Next (last step), add completion indicator when journey complete
-- [ ] T022 [US3] Enhance useJourneyPlayback in `web/src/features/steps/hooks/useJourneyPlayback.ts` to ensure restart() clears mock session state via useMockSession.reset(), ensure proper canGoBack/canGoNext computation
-- [ ] T023 [US3] Enhance PlaybackMode in `web/src/features/steps/components/preview/PlaybackMode.tsx` to integrate ViewSwitcher for mobile/desktop toggle, preserve playback state across viewport changes
+- [X] T021 [US3] Enhance PreviewNavigationBar in `web/src/features/steps/components/preview/PreviewNavigationBar.tsx` to add proper disabled states for Back (first step) and Next (last step), add completion indicator when journey complete
+- [X] T022 [US3] Enhance useJourneyPlayback in `web/src/features/steps/hooks/useJourneyPlayback.ts` to ensure restart() clears mock session state via useMockSession.reset(), ensure proper canGoBack/canGoNext computation
+- [X] T023 [US3] Enhance PlaybackMode in `web/src/features/steps/components/preview/PlaybackMode.tsx` to integrate ViewSwitcher for mobile/desktop toggle, preserve playback state across viewport changes
 
 **Checkpoint**: User Story 3 complete - full navigation controls working with proper state management
 
