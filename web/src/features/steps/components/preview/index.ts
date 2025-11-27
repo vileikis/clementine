@@ -3,6 +3,7 @@
 export { DeviceFrame } from "./DeviceFrame";
 export { ViewSwitcher } from "./ViewSwitcher";
 export { PreviewRuntime } from "./PreviewRuntime";
+export { ViewportModeProvider, useViewportMode } from "./ViewportModeContext";
 
 // Step preview components
 export {

@@ -8,18 +8,16 @@ interface ActionBarProps {
 }
 
 /**
- * Responsive action bar for CTA buttons.
+ * Action bar for CTA buttons.
  *
- * Mobile (< 1024px): Sticky at bottom of scroll container with safe area padding.
- *
- * Desktop (>= 1024px): Static inline container, flows with content.
+ * On mobile: Absolutely positioned at bottom of parent container.
+ * Parent must have `position: relative` and defined height.
  */
 export function ActionBar({ children, className = "" }: ActionBarProps) {
   return (
     <div
       className={`
-        sticky bottom-0 p-4 mt-auto
-        lg:static lg:p-0 lg:mt-4
+        absolute bottom-0 left-0 right-0 p-4
         ${className}
       `}
       style={{
