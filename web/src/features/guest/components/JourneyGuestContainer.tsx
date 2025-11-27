@@ -12,6 +12,7 @@ import { ViewportModeProvider } from "@/features/steps/components/preview/Viewpo
 import type { ViewportMode } from "@/features/steps/types/preview.types";
 import { useJourneyRuntime } from "../hooks/useJourneyRuntime";
 import { JourneyStepRenderer } from "./JourneyStepRenderer";
+import { JourneyErrorBoundary } from "./JourneyErrorBoundary";
 
 interface JourneyGuestContainerProps {
   event: Event;
@@ -245,7 +246,7 @@ export function JourneyGuestContainer({
         setInputValues((prev) => ({ ...prev, [variableName]: value }));
 
         // But persist to Firestore as plain string (schema expects string, not object)
-        runtime.saveInput(variableName, value.selectedId as any);
+        runtime.saveInput(variableName, { type: "text", value: value.selectedId } as StepInputValue);
         return;
       }
 
@@ -325,7 +326,7 @@ export function JourneyGuestContainer({
     );
   }
 
-  // Ready state - render current step with theme
+  // Ready state - render current step with theme and error boundary
   return (
     <EventThemeProvider theme={event.theme}>
       <ViewportModeProvider mode={viewportMode}>
@@ -340,18 +341,23 @@ export function JourneyGuestContainer({
             backgroundPosition: "center",
           }}
         >
-          <JourneyStepRenderer
-            step={runtime.currentStep}
-            experiences={experiences}
-            sessionId={runtime.sessionId}
-            eventId={event.id}
-            inputValues={inputValues}
-            textDrafts={textDrafts}
-            validationErrors={validationErrors}
-            onStepComplete={handleStepComplete}
-            onInputChange={handleInputChange}
-            onTextDraftChange={handleTextDraftChange}
-          />
+          <JourneyErrorBoundary
+            onRetry={() => window.location.reload()}
+            onRestart={() => window.location.reload()}
+          >
+            <JourneyStepRenderer
+              step={runtime.currentStep}
+              experiences={experiences}
+              sessionId={runtime.sessionId}
+              eventId={event.id}
+              inputValues={inputValues}
+              textDrafts={textDrafts}
+              validationErrors={validationErrors}
+              onStepComplete={handleStepComplete}
+              onInputChange={handleInputChange}
+              onTextDraftChange={handleTextDraftChange}
+            />
+          </JourneyErrorBoundary>
         </div>
       </ViewportModeProvider>
     </EventThemeProvider>
