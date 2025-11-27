@@ -20,7 +20,8 @@ import { useState, useCallback } from "react";
 import { JourneyEditorHeader } from "./JourneyEditorHeader";
 import { StepList } from "./StepList";
 import { StepEditor } from "./StepEditor";
-import { StepPreview } from "./StepPreview";
+import { PreviewRuntime, ViewSwitcher } from "@/features/steps/components/preview";
+import type { ViewportMode } from "@/features/steps/types";
 import {
   useSteps,
   useSelectedStep,
@@ -45,6 +46,9 @@ export function JourneyEditor({ event, journey }: JourneyEditorProps) {
 
   // Preview state - holds the in-progress form values for live preview
   const [previewStep, setPreviewStep] = useState<Partial<Step> | null>(null);
+
+  // Viewport mode state for preview panel (mobile: 375px, desktop: 900px)
+  const [viewportMode, setViewportMode] = useState<ViewportMode>("mobile");
 
 
   const handleSelectStep = useCallback(
@@ -130,19 +134,29 @@ export function JourneyEditor({ event, journey }: JourneyEditorProps) {
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
           {/* Middle Panel - Preview */}
-          <div className="flex-1 p-6 overflow-y-auto bg-muted/10">
-            <div className="flex justify-center">
-              {displayStep ? (
-                <StepPreview
-                  step={displayStep as Step}
-                  theme={event.theme}
-                  experiences={experiences}
-                />
-              ) : (
-                <div className="text-center text-muted-foreground">
-                  <p className="text-sm">Select a step to preview</p>
-                </div>
-              )}
+          <div className="flex-1 flex flex-col overflow-hidden">
+            {/* Preview panel header with viewport switcher */}
+            <div className="flex items-center justify-between px-4 py-3 border-b">
+              <h2 className="text-sm font-semibold">Preview</h2>
+              <ViewSwitcher mode={viewportMode} onChange={setViewportMode} />
+            </div>
+
+            {/* Preview content */}
+            <div className="flex-1 p-6 overflow-auto bg-muted/10">
+              <div className="flex justify-center h-full">
+                {displayStep ? (
+                  <PreviewRuntime
+                    step={displayStep as Step}
+                    theme={event.theme}
+                    viewportMode={viewportMode}
+                    experiences={experiences}
+                  />
+                ) : (
+                  <div className="text-center text-muted-foreground">
+                    <p className="text-sm">Select a step to preview</p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 

@@ -57,13 +57,15 @@ export function PreviewRuntime({
 
   return (
     <EventThemeProvider theme={theme}>
-      <DeviceFrame viewportMode={viewportMode}>
-        <StepContent
-          step={step}
-          experiences={experiences}
-          mockSession={session}
-        />
-      </DeviceFrame>
+      <div className="h-full">
+        <DeviceFrame viewportMode={viewportMode}>
+          <StepContent
+            step={step}
+            experiences={experiences}
+            mockSession={session}
+          />
+        </DeviceFrame>
+      </div>
     </EventThemeProvider>
   );
 }

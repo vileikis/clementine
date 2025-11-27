@@ -62,14 +62,14 @@
 
 ### Implementation for User Story 1
 
-- [ ] T013 [US1] Update JourneyEditor to import PreviewRuntime and ViewportMode in `web/src/features/journeys/components/editor/JourneyEditor.tsx`
-- [ ] T014 [US1] Add viewportMode state (default: "mobile") to JourneyEditor in `web/src/features/journeys/components/editor/JourneyEditor.tsx`
-- [ ] T015 [US1] Replace existing preview rendering with PreviewRuntime component in `web/src/features/journeys/components/editor/JourneyEditor.tsx`
-- [ ] T016 [US1] Ensure DeviceFrame renders at 375px width when viewportMode is "mobile" in `web/src/features/steps/components/preview/DeviceFrame.tsx`
-- [ ] T017 [US1] Verify theme background color and image apply correctly in DeviceFrame in `web/src/features/steps/components/preview/DeviceFrame.tsx`
-- [ ] T018 [US1] Ensure preview container is scrollable when content exceeds frame height in `web/src/features/steps/components/preview/DeviceFrame.tsx`
+- [x] T013 [US1] Update JourneyEditor to import PreviewRuntime and ViewportMode in `web/src/features/journeys/components/editor/JourneyEditor.tsx`
+- [x] T014 [US1] Add viewportMode state (default: "mobile") to JourneyEditor in `web/src/features/journeys/components/editor/JourneyEditor.tsx`
+- [x] T015 [US1] Replace existing preview rendering with PreviewRuntime component in `web/src/features/journeys/components/editor/JourneyEditor.tsx`
+- [x] T016 [US1] Ensure DeviceFrame renders at 375px width when viewportMode is "mobile" in `web/src/features/steps/components/preview/DeviceFrame.tsx`
+- [x] T017 [US1] Verify theme background color and image apply correctly in DeviceFrame in `web/src/features/steps/components/preview/DeviceFrame.tsx`
+- [x] T018 [US1] Ensure preview container is scrollable when content exceeds frame height in `web/src/features/steps/components/preview/DeviceFrame.tsx`
 
-**Checkpoint**: Mobile preview renders at 375px with full theme application
+**Checkpoint**: Mobile preview renders at 375px with full theme application ✅
 
 ---
 
@@ -81,14 +81,14 @@
 
 ### Implementation for User Story 2
 
-- [ ] T019 [US2] Add preview panel header section to JourneyEditor layout in `web/src/features/journeys/components/editor/JourneyEditor.tsx`
-- [ ] T020 [US2] Integrate ViewSwitcher component into preview panel header in `web/src/features/journeys/components/editor/JourneyEditor.tsx`
-- [ ] T021 [US2] Wire ViewSwitcher onChange to setViewportMode state updater in `web/src/features/journeys/components/editor/JourneyEditor.tsx`
-- [ ] T022 [US2] Pass viewportMode prop to PreviewRuntime component in `web/src/features/journeys/components/editor/JourneyEditor.tsx`
-- [ ] T023 [US2] Ensure DeviceFrame renders at 900px width when viewportMode is "desktop" in `web/src/features/steps/components/preview/DeviceFrame.tsx`
-- [ ] T024 [US2] Verify instant re-render (<500ms) when toggling viewport modes
+- [x] T019 [US2] Add preview panel header section to JourneyEditor layout in `web/src/features/journeys/components/editor/JourneyEditor.tsx`
+- [x] T020 [US2] Integrate ViewSwitcher component into preview panel header in `web/src/features/journeys/components/editor/JourneyEditor.tsx`
+- [x] T021 [US2] Wire ViewSwitcher onChange to setViewportMode state updater in `web/src/features/journeys/components/editor/JourneyEditor.tsx`
+- [x] T022 [US2] Pass viewportMode prop to PreviewRuntime component in `web/src/features/journeys/components/editor/JourneyEditor.tsx`
+- [x] T023 [US2] Ensure DeviceFrame renders at 900px width when viewportMode is "desktop" in `web/src/features/steps/components/preview/DeviceFrame.tsx`
+- [x] T024 [US2] Verify instant re-render (<500ms) when toggling viewport modes
 
-**Checkpoint**: Mobile/Desktop toggle works with instant re-render
+**Checkpoint**: Mobile/Desktop toggle works with instant re-render ✅
 
 ---
 
