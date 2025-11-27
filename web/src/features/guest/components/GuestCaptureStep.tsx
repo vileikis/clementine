@@ -6,6 +6,7 @@ import { useCamera } from "../hooks/useCamera";
 import { saveCaptureAction } from "@/features/sessions/actions";
 import { Button } from "@/components/ui/button";
 import { Camera } from "lucide-react";
+import { CameraPermissionDenied } from "./CameraPermissionDenied";
 
 interface GuestCaptureStepProps {
   step: StepCapture;
@@ -24,11 +25,44 @@ export function GuestCaptureStep({
   sessionId,
   onCaptureComplete,
 }: GuestCaptureStepProps) {
-  const { stream, error, videoRef, isLoading } = useCamera();
+  const { stream, error, videoRef, isLoading, requestPermission } = useCamera();
   const [isCapturing, setIsCapturing] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [captureError, setCaptureError] = useState<string | null>(null);
+  const [showUploadFallback, setShowUploadFallback] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  /**
+   * Handle file upload fallback when camera is unavailable
+   */
+  const handleFileUpload = useCallback(
+    async (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      setIsUploading(true);
+      setCaptureError(null);
+
+      try {
+        const formData = new FormData();
+        formData.append("eventId", eventId);
+        formData.append("sessionId", sessionId);
+        formData.append("photo", file);
+
+        await saveCaptureAction(formData);
+
+        setIsUploading(false);
+        onCaptureComplete();
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Upload failed";
+        setCaptureError(message);
+        console.error("[GuestCaptureStep] Upload failed:", err);
+        setIsUploading(false);
+      }
+    },
+    [eventId, sessionId, onCaptureComplete]
+  );
 
   /**
    * Capture photo from video stream and upload to storage
@@ -115,25 +149,26 @@ export function GuestCaptureStep({
     );
   }
 
-  // Camera error state
-  if (error) {
+  // Camera error state - show permission denied screen with upload fallback
+  if (error || showUploadFallback) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black px-4">
-        <div className="max-w-md w-full text-center space-y-6">
-          <div className="text-6xl">📷</div>
-          <h2 className="text-2xl font-bold text-white">
-            Camera Access Required
-          </h2>
-          <p className="text-gray-300">{error}</p>
-          <div className="text-sm text-gray-400 space-y-2">
-            <p>To continue, please:</p>
-            <ol className="list-decimal list-inside space-y-1">
-              <li>Check your browser settings</li>
-              <li>Allow camera permission for this site</li>
-              <li>Reload the page</li>
-            </ol>
-          </div>
-          {/* TODO: Add file upload fallback option */}
+      <div className="min-h-screen flex items-center justify-center bg-background px-4">
+        <div className="max-w-md w-full">
+          <CameraPermissionDenied
+            onRequestAgain={() => {
+              setShowUploadFallback(false);
+              requestPermission?.();
+            }}
+            onUploadFallback={() => fileInputRef.current?.click()}
+          />
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            onChange={handleFileUpload}
+            className="hidden"
+          />
         </div>
       </div>
     );

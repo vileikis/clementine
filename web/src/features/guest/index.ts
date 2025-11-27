@@ -18,6 +18,11 @@ export { GuestCaptureStep } from "./components/GuestCaptureStep";
 export { GuestProcessingStep } from "./components/GuestProcessingStep";
 export { GuestRewardStep } from "./components/GuestRewardStep";
 
+// Error Handling Components (Phase 5)
+export { JourneyErrorBoundary } from "./components/JourneyErrorBoundary";
+export { CameraPermissionDenied } from "./components/CameraPermissionDenied";
+export { EventUnavailableScreen } from "./components/EventUnavailableScreen";
+
 // ============================================================================
 // Hooks - Client-side only
 // ============================================================================

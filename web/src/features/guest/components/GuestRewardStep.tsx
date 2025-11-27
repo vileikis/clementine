@@ -228,7 +228,7 @@ export function GuestRewardStep({
             Result Not Available
           </h2>
           <p className="text-gray-300">
-            Your result couldn't be generated. Please try again or contact support.
+            Your result couldn&apos;t be generated. Please try again or contact support.
           </p>
         </div>
       </div>

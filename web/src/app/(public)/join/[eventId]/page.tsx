@@ -9,6 +9,7 @@ import {
   BrandThemeProvider,
   GuestFlowContainer,
   JourneyGuestContainer,
+  EventUnavailableScreen,
 } from "@/features/guest"
 
 interface JoinPageProps {
@@ -31,16 +32,20 @@ export default async function JoinPage({ params }: JoinPageProps) {
 
     if (!companyStatus || companyStatus === "deleted") {
       return (
-        <div className="min-h-screen flex items-center justify-center px-4 bg-background">
-          <div className="max-w-md text-center space-y-4">
-            <h1 className="text-2xl md:text-3xl font-bold">Event Unavailable</h1>
-            <p className="text-base md:text-lg text-muted-foreground">
-              This event is no longer available. Please contact the event organizer for more information.
-            </p>
-          </div>
-        </div>
+        <EventUnavailableScreen
+          message="This event is no longer available. Please contact the event organizer for more information."
+        />
       )
     }
+  }
+
+  // Check if event is archived
+  if (event.status === "archived") {
+    return (
+      <EventUnavailableScreen
+        message="This event has ended and is no longer accepting participants."
+      />
+    )
   }
 
   // Route based on activeJourneyId - new journey flow vs legacy flow
@@ -73,14 +78,9 @@ export default async function JoinPage({ params }: JoinPageProps) {
 
     // Journey not found or has no steps - show error
     return (
-      <div className="min-h-screen flex items-center justify-center px-4 bg-background">
-        <div className="max-w-md text-center space-y-4">
-          <h1 className="text-2xl md:text-3xl font-bold">Journey Unavailable</h1>
-          <p className="text-base md:text-lg text-muted-foreground">
-            This journey is not configured. Please contact the event organizer.
-          </p>
-        </div>
-      </div>
+      <EventUnavailableScreen
+        message="This journey is not configured. Please contact the event organizer."
+      />
     )
   }
 

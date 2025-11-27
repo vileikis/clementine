@@ -5,6 +5,9 @@ import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
 import type { StepProcessing } from "@/features/steps";
 import type { Session } from "@/features/sessions";
+import { retryTransformAction } from "@/features/sessions/actions";
+import { Button } from "@/components/ui/button";
+import { RotateCw } from "lucide-react";
 
 interface GuestProcessingStepProps {
   step: StepProcessing;
@@ -27,7 +30,40 @@ export function GuestProcessingStep({
 }: GuestProcessingStepProps) {
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [isRetrying, setIsRetrying] = useState(false);
+  const [isTimeout, setIsTimeout] = useState(false);
   const unsubscribeRef = useRef<(() => void) | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Add retry handler
+  const handleRetry = async () => {
+    setIsRetrying(true);
+    setError(null);
+    setIsTimeout(false);
+
+    try {
+      await retryTransformAction(eventId, sessionId);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Retry failed";
+      setError(message);
+    } finally {
+      setIsRetrying(false);
+    }
+  };
+
+  // Timeout detection (45 seconds)
+  useEffect(() => {
+    timeoutRef.current = setTimeout(() => {
+      setIsTimeout(true);
+      setError("Processing is taking longer than expected. This might be due to high demand.");
+    }, 45000);
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   // Rotate messages based on estimated duration
   useEffect(() => {
@@ -84,19 +120,36 @@ export function GuestProcessingStep({
     };
   }, [eventId, sessionId, onProcessingComplete]);
 
-  // Error state
+  // Error state with retry button
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black px-4">
+      <div className="min-h-screen flex items-center justify-center bg-background px-4">
         <div className="max-w-md w-full text-center space-y-6">
-          <div className="text-6xl">⚠️</div>
-          <h2 className="text-2xl font-bold text-white">
-            Processing Failed
-          </h2>
-          <p className="text-gray-300">{error}</p>
-          <div className="text-sm text-gray-400">
-            Please try again or contact support if the problem persists.
+          <div className="flex justify-center">
+            <div className="rounded-full bg-destructive/10 p-4">
+              <div className="text-6xl">⚠️</div>
+            </div>
           </div>
+          <h2 className="text-2xl font-bold">
+            {isTimeout ? "Taking Longer Than Expected" : "Processing Failed"}
+          </h2>
+          <p className="text-muted-foreground">{error}</p>
+
+          <Button
+            onClick={handleRetry}
+            disabled={isRetrying}
+            size="lg"
+            className="w-full gap-2"
+          >
+            <RotateCw className={`h-5 w-5 ${isRetrying ? 'animate-spin' : ''}`} />
+            {isRetrying ? "Retrying..." : "Try Again"}
+          </Button>
+
+          <p className="text-xs text-muted-foreground">
+            {isTimeout
+              ? "Don't worry, we're still trying! You can wait or retry manually."
+              : "If this problem persists, please contact support."}
+          </p>
         </div>
       </div>
     );
