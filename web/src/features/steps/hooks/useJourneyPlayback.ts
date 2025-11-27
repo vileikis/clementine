@@ -37,6 +37,9 @@ interface UseJourneyPlaybackReturn {
 /** Step types that support auto-advance */
 const AUTO_ADVANCE_STEP_TYPES = ["capture", "processing"] as const;
 
+/** Debounce delay for navigation actions (ms) */
+const NAV_DEBOUNCE_DELAY = 150;
+
 export function useJourneyPlayback(
   onExit: () => void
 ): UseJourneyPlaybackReturn {
@@ -45,6 +48,21 @@ export function useJourneyPlayback(
 
   // Ref to prevent double auto-advance
   const isAutoAdvancingRef = useRef(false);
+
+  // Ref for navigation debouncing
+  const lastNavTimeRef = useRef(0);
+
+  /**
+   * Check if navigation should be allowed (debounce check)
+   */
+  const canNavigate = useCallback(() => {
+    const now = Date.now();
+    if (now - lastNavTimeRef.current < NAV_DEBOUNCE_DELAY) {
+      return false;
+    }
+    lastNavTimeRef.current = now;
+    return true;
+  }, []);
 
   /**
    * Compute navigation availability based on current index and steps
@@ -89,6 +107,8 @@ export function useJourneyPlayback(
    * Navigate to next step or complete if at end
    */
   const next = useCallback(() => {
+    if (!canNavigate()) return;
+
     setState((prev) => {
       if (prev.status !== "playing" || prev.isAutoAdvancing) return prev;
 
@@ -111,12 +131,14 @@ export function useJourneyPlayback(
         ...navState,
       };
     });
-  }, [computeNavState]);
+  }, [canNavigate, computeNavState]);
 
   /**
    * Navigate to previous step
    */
   const previous = useCallback(() => {
+    if (!canNavigate()) return;
+
     setState((prev) => {
       if (prev.currentIndex <= 0 || prev.isAutoAdvancing) return prev;
 
@@ -131,7 +153,7 @@ export function useJourneyPlayback(
         ...navState,
       };
     });
-  }, [computeNavState]);
+  }, [canNavigate, computeNavState]);
 
   /**
    * Restart playback from the beginning and clear session
