@@ -125,14 +125,14 @@
 
 ### Implementation for User Story 4
 
-- [ ] T037 [US4] Verify primaryColor applies to buttons in step previews via theme context
-- [ ] T038 [US4] Verify text.color applies to all text elements in step previews
-- [ ] T039 [US4] Verify background.color applies to DeviceFrame background in `web/src/features/steps/components/preview/DeviceFrame.tsx`
-- [ ] T040 [US4] Verify logoUrl renders in correct position when configured
-- [ ] T041 [US4] Verify fontFamily applies to all text when configured in `web/src/features/steps/components/preview/DeviceFrame.tsx`
-- [ ] T042 [US4] Handle graceful fallback when theme settings are partially configured
+- [x] T037 [US4] Verify primaryColor applies to buttons in step previews via theme context
+- [x] T038 [US4] Verify text.color applies to all text elements in step previews
+- [x] T039 [US4] Verify background.color applies to DeviceFrame background in `web/src/features/steps/components/preview/DeviceFrame.tsx`
+- [x] T040 [US4] Verify logoUrl renders in correct position when configured
+- [x] T041 [US4] Verify fontFamily applies to all text when configured in `web/src/features/steps/components/preview/DeviceFrame.tsx`
+- [x] T042 [US4] Handle graceful fallback when theme settings are partially configured
 
-**Checkpoint**: Theme changes reflect accurately in preview within 1 second
+**Checkpoint**: Theme changes reflect accurately in preview within 1 second ✅
 
 ---
 
@@ -140,21 +140,23 @@
 
 **Purpose**: Final cleanup and validation
 
-- [ ] T043 [P] Update feature steps barrel export in `web/src/features/steps/index.ts`
-- [ ] T044 [P] Remove any remaining references to SimulatorScreen across codebase
-- [ ] T045 Code cleanup: Remove unused imports and dead code from modified files
-- [ ] T046 Verify all edge cases: long text scrolling, incomplete step config, rapid type switching
+- [x] T043 [P] Update feature steps barrel export in `web/src/features/steps/index.ts`
+- [x] T044 [P] Remove any remaining references to SimulatorScreen across codebase
+- [x] T045 Code cleanup: Remove unused imports and dead code from modified files
+- [x] T046 Verify all edge cases: long text scrolling, incomplete step config, rapid type switching
 
 ### Validation Loop (REQUIRED - Constitution Principle V)
 
 **Purpose**: Ensure code quality and correctness before merge
 
-- [ ] T047 Run `pnpm lint` and fix all errors/warnings
-- [ ] T048 Run `pnpm type-check` and resolve all TypeScript errors
-- [ ] T049 Run `pnpm test` and ensure all tests pass
-- [ ] T050 Verify feature in local dev server (`pnpm dev`)
-- [ ] T051 Manual testing: Verify all 11 step types in both viewport modes
-- [ ] T052 Commit only after validation loop passes cleanly
+- [x] T047 Run `pnpm lint` and fix all errors/warnings
+- [x] T048 Run `pnpm type-check` and resolve all TypeScript errors
+- [x] T049 Run `pnpm test` and ensure all tests pass
+- [x] T050 Verify feature in local dev server (`pnpm dev`)
+- [x] T051 Manual testing: Verify all 11 step types in both viewport modes
+- [x] T052 Commit only after validation loop passes cleanly
+
+**Checkpoint**: All validation passes ✅
 
 ---
 

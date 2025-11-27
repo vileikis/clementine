@@ -87,6 +87,3 @@ export function DeviceFrame({
     </div>
   );
 }
-
-// Re-export for backward compatibility during migration
-export { DeviceFrame as SimulatorScreen };
