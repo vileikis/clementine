@@ -100,20 +100,20 @@
 
 ### Implementation for User Story 3
 
-- [ ] T025 [P] [US3] Update InfoStep preview to use theme styling in `web/src/features/steps/components/preview/steps/InfoStep.tsx`
-- [ ] T026 [P] [US3] Update ExperiencePickerStep preview to show experience cards in `web/src/features/steps/components/preview/steps/ExperiencePickerStep.tsx`
-- [ ] T027 [P] [US3] Update CaptureStep preview with camera placeholder and viewfinder overlay in `web/src/features/steps/components/preview/steps/CaptureStep.tsx`
-- [ ] T028 [P] [US3] Update ShortTextStep preview with input field and placeholder in `web/src/features/steps/components/preview/steps/ShortTextStep.tsx`
-- [ ] T029 [P] [US3] Update LongTextStep preview with textarea and character limit in `web/src/features/steps/components/preview/steps/LongTextStep.tsx`
-- [ ] T030 [P] [US3] Update MultipleChoiceStep preview with selectable options in `web/src/features/steps/components/preview/steps/MultipleChoiceStep.tsx`
-- [ ] T031 [P] [US3] Update YesNoStep preview with two buttons in `web/src/features/steps/components/preview/steps/YesNoStep.tsx`
-- [ ] T032 [P] [US3] Update OpinionScaleStep preview with numeric scale in `web/src/features/steps/components/preview/steps/OpinionScaleStep.tsx`
-- [ ] T033 [P] [US3] Update EmailStep preview with email input field in `web/src/features/steps/components/preview/steps/EmailStep.tsx`
-- [ ] T034 [P] [US3] Update ProcessingStep preview with rotating messages animation in `web/src/features/steps/components/preview/steps/ProcessingStep.tsx`
-- [ ] T035 [P] [US3] Update RewardStep preview with placeholder result image and share buttons in `web/src/features/steps/components/preview/steps/RewardStep.tsx`
-- [ ] T036 [US3] Update StepPreview router to pass mockSession to step components in `web/src/features/journeys/components/editor/StepPreview.tsx`
+- [x] T025 [P] [US3] Update InfoStep preview to use theme styling in `web/src/features/steps/components/preview/steps/InfoStep.tsx`
+- [x] T026 [P] [US3] Update ExperiencePickerStep preview to show experience cards in `web/src/features/steps/components/preview/steps/ExperiencePickerStep.tsx`
+- [x] T027 [P] [US3] Update CaptureStep preview with camera placeholder and viewfinder overlay in `web/src/features/steps/components/preview/steps/CaptureStep.tsx`
+- [x] T028 [P] [US3] Update ShortTextStep preview with input field and placeholder in `web/src/features/steps/components/preview/steps/ShortTextStep.tsx`
+- [x] T029 [P] [US3] Update LongTextStep preview with textarea and character limit in `web/src/features/steps/components/preview/steps/LongTextStep.tsx`
+- [x] T030 [P] [US3] Update MultipleChoiceStep preview with selectable options in `web/src/features/steps/components/preview/steps/MultipleChoiceStep.tsx`
+- [x] T031 [P] [US3] Update YesNoStep preview with two buttons in `web/src/features/steps/components/preview/steps/YesNoStep.tsx`
+- [x] T032 [P] [US3] Update OpinionScaleStep preview with numeric scale in `web/src/features/steps/components/preview/steps/OpinionScaleStep.tsx`
+- [x] T033 [P] [US3] Update EmailStep preview with email input field in `web/src/features/steps/components/preview/steps/EmailStep.tsx`
+- [x] T034 [P] [US3] Update ProcessingStep preview with rotating messages animation in `web/src/features/steps/components/preview/steps/ProcessingStep.tsx`
+- [x] T035 [P] [US3] Update RewardStep preview with placeholder result image and share buttons in `web/src/features/steps/components/preview/steps/RewardStep.tsx`
+- [x] T036 [US3] Update StepPreview router to pass mockSession to step components in `web/src/features/journeys/components/editor/StepPreview.tsx`
 
-**Checkpoint**: All 11 step types render correctly in both mobile and desktop modes
+**Checkpoint**: All 11 step types render correctly in both mobile and desktop modes ✅
 
 ---
 
