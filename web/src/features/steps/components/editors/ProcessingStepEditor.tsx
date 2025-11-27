@@ -27,6 +27,7 @@ import { Slider } from "@/components/ui/slider";
 import { BaseStepEditor } from "./BaseStepEditor";
 import { useAutoSave } from "../../hooks";
 import { STEP_CONSTANTS } from "../../constants";
+import { stepMediaTypeSchema } from "../../schemas";
 import type { StepProcessing } from "../../types";
 
 const processingStepFormSchema = z.object({
@@ -34,6 +35,7 @@ const processingStepFormSchema = z.object({
   title: z.string().max(200).optional().nullable(),
   description: z.string().max(1000).optional().nullable(),
   mediaUrl: z.string().url().optional().nullable().or(z.literal("")),
+  mediaType: stepMediaTypeSchema.optional().nullable(),
   ctaLabel: z.string().max(50).optional().nullable(),
   // Config fields
   config: z.object({
@@ -55,18 +57,21 @@ const FIELDS_TO_COMPARE: (keyof ProcessingStepFormValues)[] = [
   "title",
   "description",
   "mediaUrl",
+  "mediaType",
   "ctaLabel",
   "config",
 ];
 
 interface ProcessingStepEditorProps {
   step: StepProcessing;
+  companyId: string;
   onUpdate: (updates: Partial<ProcessingStepFormValues>) => Promise<void>;
   onPreviewChange?: (values: ProcessingStepFormValues) => void;
 }
 
 export function ProcessingStepEditor({
   step,
+  companyId,
   onUpdate,
   onPreviewChange,
 }: ProcessingStepEditorProps) {
@@ -86,6 +91,7 @@ export function ProcessingStepEditor({
       title: step.title ?? "",
       description: step.description ?? "",
       mediaUrl: step.mediaUrl ?? "",
+      mediaType: step.mediaType ?? null,
       ctaLabel: step.ctaLabel ?? "",
       config: {
         messages: config.messages,
@@ -113,6 +119,7 @@ export function ProcessingStepEditor({
       title: step.title ?? "",
       description: step.description ?? "",
       mediaUrl: step.mediaUrl ?? "",
+      mediaType: step.mediaType ?? null,
       ctaLabel: step.ctaLabel ?? "",
       config: {
         messages: config.messages,
@@ -163,6 +170,10 @@ export function ProcessingStepEditor({
         {/* Base Fields */}
         <BaseStepEditor
           form={form}
+          companyId={companyId}
+          onMediaChange={async (mediaUrl, mediaType) => {
+            await onUpdate({ mediaUrl, mediaType });
+          }}
           showDescription={true}
           showMediaUrl={true}
           showCtaLabel={false}

@@ -8,6 +8,11 @@ import { STEP_CONSTANTS } from "../constants";
 // ============================================================================
 
 /**
+ * Media type enum schema
+ */
+export const stepMediaTypeSchema = z.enum(["image", "gif", "video", "lottie"]);
+
+/**
  * Variable name schema - valid identifier for session variables
  */
 const variableNameSchema = z
@@ -29,6 +34,7 @@ const stepBaseSchema = z.object({
   title: z.string().max(STEP_CONSTANTS.MAX_TITLE_LENGTH).nullish(),
   description: z.string().max(STEP_CONSTANTS.MAX_DESCRIPTION_LENGTH).nullish(),
   mediaUrl: z.string().url().nullish(),
+  mediaType: stepMediaTypeSchema.nullish(),
   ctaLabel: z.string().max(STEP_CONSTANTS.MAX_CTA_LABEL_LENGTH).nullish(),
   createdAt: z.number(),
   updatedAt: z.number(),
@@ -269,6 +275,7 @@ export const createStepInputSchema = z.object({
   title: z.string().max(STEP_CONSTANTS.MAX_TITLE_LENGTH).nullish(),
   description: z.string().max(STEP_CONSTANTS.MAX_DESCRIPTION_LENGTH).nullish(),
   mediaUrl: z.string().url().nullish(),
+  mediaType: stepMediaTypeSchema.nullish(),
   ctaLabel: z.string().max(STEP_CONSTANTS.MAX_CTA_LABEL_LENGTH).nullish(),
   config: z.record(z.string(), z.unknown()).optional(),
 });
@@ -280,6 +287,7 @@ export const updateStepInputSchema = z.object({
   title: z.string().max(STEP_CONSTANTS.MAX_TITLE_LENGTH).nullish(),
   description: z.string().max(STEP_CONSTANTS.MAX_DESCRIPTION_LENGTH).nullish(),
   mediaUrl: z.string().url().nullish(),
+  mediaType: stepMediaTypeSchema.nullish(),
   ctaLabel: z.string().max(STEP_CONSTANTS.MAX_CTA_LABEL_LENGTH).nullish(),
   config: z.record(z.string(), z.unknown()).optional(),
 });

@@ -25,6 +25,7 @@ import { Switch } from "@/components/ui/switch";
 import { BaseStepEditor } from "./BaseStepEditor";
 import { useAutoSave } from "../../hooks";
 import { STEP_CONSTANTS } from "../../constants";
+import { stepMediaTypeSchema } from "../../schemas";
 import type { StepEmail } from "../../types";
 
 const emailFormSchema = z.object({
@@ -32,6 +33,7 @@ const emailFormSchema = z.object({
   title: z.string().max(200).optional().nullable(),
   description: z.string().max(1000).optional().nullable(),
   mediaUrl: z.string().url().optional().nullable().or(z.literal("")),
+  mediaType: stepMediaTypeSchema.optional().nullable(),
   ctaLabel: z.string().max(50).optional().nullable(),
   // Config fields
   config: z.object({
@@ -52,18 +54,21 @@ const FIELDS_TO_COMPARE: (keyof EmailFormValues)[] = [
   "title",
   "description",
   "mediaUrl",
+  "mediaType",
   "ctaLabel",
   "config",
 ];
 
 interface EmailEditorProps {
   step: StepEmail;
+  companyId: string;
   onUpdate: (updates: Partial<EmailFormValues>) => Promise<void>;
   onPreviewChange?: (values: EmailFormValues) => void;
 }
 
 export function EmailEditor({
   step,
+  companyId,
   onUpdate,
   onPreviewChange,
 }: EmailEditorProps) {
@@ -80,6 +85,7 @@ export function EmailEditor({
       title: step.title ?? "",
       description: step.description ?? "",
       mediaUrl: step.mediaUrl ?? "",
+      mediaType: step.mediaType ?? null,
       ctaLabel: step.ctaLabel ?? "",
       config: {
         variable: config.variable,
@@ -103,6 +109,7 @@ export function EmailEditor({
       title: step.title ?? "",
       description: step.description ?? "",
       mediaUrl: step.mediaUrl ?? "",
+      mediaType: step.mediaType ?? null,
       ctaLabel: step.ctaLabel ?? "",
       config: {
         variable: config.variable,
@@ -130,6 +137,10 @@ export function EmailEditor({
         {/* Base Fields */}
         <BaseStepEditor
           form={form}
+          companyId={companyId}
+          onMediaChange={async (mediaUrl, mediaType) => {
+            await onUpdate({ mediaUrl, mediaType });
+          }}
           showDescription={true}
           showMediaUrl={true}
           showCtaLabel={true}
