@@ -1,6 +1,6 @@
 // Preview components barrel export
 
-export { DeviceFrame, SimulatorScreen } from "./DeviceFrame";
+export { DeviceFrame } from "./DeviceFrame";
 export { ViewSwitcher } from "./ViewSwitcher";
 export { PreviewRuntime } from "./PreviewRuntime";
 
