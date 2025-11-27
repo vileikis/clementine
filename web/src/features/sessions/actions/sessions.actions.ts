@@ -21,7 +21,6 @@ import {
   uploadInputImage,
   uploadResultImage,
   copyImageToResult,
-  getSignedUrl,
 } from "@/lib/storage/upload";
 import { getAIClient } from "@/lib/ai/client";
 import type { TransformParams } from "@/lib/ai/types";
@@ -61,6 +60,13 @@ export async function saveCaptureAction(formData: FormData) {
     photo
   );
   await saveCapture(validated.eventId, validated.sessionId, inputImagePath);
+
+  // Trigger AI transform in background (don't await - fire and forget)
+  // This runs server-side and doesn't block the client response
+  triggerTransformAction(validated.eventId, validated.sessionId).catch((err) => {
+    console.error("[saveCaptureAction] Background transform trigger failed:", err);
+    // Error will be captured in session state
+  });
 
   revalidatePath(`/join/${validated.eventId}`);
   return { success: true, inputImagePath };
@@ -172,7 +178,7 @@ export async function triggerTransformAction(
         resultImagePath,
       });
 
-      revalidatePath(`/join/${eventId}`);
+      // No revalidatePath needed - UI updates via Firestore subscriptions
       return { success: true, resultImagePath };
     }
 
@@ -183,8 +189,8 @@ export async function triggerTransformAction(
       prompt: aiConfig.prompt?.substring(0, 50) + "...",
     });
 
-    // Generate signed URL for input image
-    const inputImageUrl = await getSignedUrl(session.inputImagePath, 3600);
+    // Use public URL directly (no need for signed URL since files are public)
+    const inputImageUrl = session.inputImagePath;
 
     // Build transform params from experience config
     // aiConfig.prompt is guaranteed to be truthy since aiEnabled checked it
@@ -221,7 +227,7 @@ export async function triggerTransformAction(
       resultImagePath,
     });
 
-    revalidatePath(`/join/${eventId}`);
+    // No revalidatePath needed - UI updates via Firestore subscriptions
     return { success: true, resultImagePath };
   } catch (error) {
     // Cancel timeout on error
@@ -236,9 +242,7 @@ export async function triggerTransformAction(
       error: errorMessage,
     });
 
-    // Revalidate to show error state
-    revalidatePath(`/join/${eventId}`);
-
+    // No revalidatePath needed - UI updates via Firestore subscriptions
     throw error;
   }
 }

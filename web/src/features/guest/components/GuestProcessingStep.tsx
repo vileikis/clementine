@@ -15,8 +15,9 @@ interface GuestProcessingStepProps {
 
 /**
  * Guest-facing processing step component
- * Monitors session state via real-time subscription and advances when transform completes
- * Note: Transform is triggered after capture, not here
+ * Monitors session state via real-time subscription.
+ * If transform is complete, advances immediately.
+ * If still processing, shows loading animation until complete.
  */
 export function GuestProcessingStep({
   step,
