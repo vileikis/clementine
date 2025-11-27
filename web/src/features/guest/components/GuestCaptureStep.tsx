@@ -3,7 +3,7 @@
 import { useState, useCallback, useRef } from "react";
 import type { StepCapture } from "@/features/steps";
 import { useCamera } from "../hooks/useCamera";
-import { saveCaptureAction } from "@/features/sessions/actions";
+import { saveCaptureAction, triggerTransformAction } from "@/features/sessions/actions";
 import { Button } from "@/components/ui/button";
 import { Camera } from "lucide-react";
 
@@ -85,7 +85,12 @@ export function GuestCaptureStep({
       // Stop camera stream after successful capture
       stream.getTracks().forEach((track) => track.stop());
 
-      // Notify parent
+      // Trigger AI transform in background (don't await - let it run async)
+      triggerTransformAction(eventId, sessionId).catch((err) => {
+        console.error("[GuestCaptureStep] Transform failed:", err);
+      });
+
+      // Notify parent (advances to next step while transform runs in background)
       onCaptureComplete();
     } catch (err) {
       const message = err instanceof Error ? err.message : "Capture failed";

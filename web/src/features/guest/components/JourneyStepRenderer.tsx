@@ -279,9 +279,9 @@ export function JourneyStepRenderer({
             step={step}
             experiences={experiences}
             isInteractive={true}
-            selectedExperienceId={getSelectionValue(variableName)}
+            selectedExperienceId={getSelectionValue("selected_experience_id")}
             onValueChange={(experienceId) =>
-              onInputChange(variableName, {
+              onInputChange("selected_experience_id", {
                 type: "selection",
                 selectedId: experienceId,
               })
