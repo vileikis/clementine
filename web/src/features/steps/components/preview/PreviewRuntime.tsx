@@ -55,6 +55,8 @@ interface PreviewRuntimeProps {
   onInputChange?: (stepId: string, value: StepInputValue) => void;
   /** Callback when CTA button is clicked (only used in playback mode) */
   onCtaClick?: () => void;
+  /** Callback when step is complete for auto-advance (Capture, Processing steps) */
+  onStepComplete?: (stepId: string) => void;
 }
 
 export function PreviewRuntime({
@@ -67,6 +69,7 @@ export function PreviewRuntime({
   playbackSession,
   onInputChange,
   onCtaClick,
+  onStepComplete,
 }: PreviewRuntimeProps) {
   // Merge provided mock data with defaults
   const session: MockSessionData = {
@@ -88,6 +91,7 @@ export function PreviewRuntime({
             playbackSession={playbackSession}
             onInputChange={onInputChange}
             onCtaClick={isInteractive ? onCtaClick : undefined}
+            onStepComplete={isInteractive ? onStepComplete : undefined}
           />
         </DeviceFrame>
       </div>
@@ -109,6 +113,7 @@ function StepContent({
   playbackSession,
   onInputChange,
   onCtaClick,
+  onStepComplete,
 }: {
   step: Step;
   experiences: Experience[];
@@ -117,6 +122,7 @@ function StepContent({
   playbackSession?: PlaybackMockSession;
   onInputChange?: (stepId: string, value: StepInputValue) => void;
   onCtaClick?: () => void;
+  onStepComplete?: (stepId: string) => void;
 }) {
   // Helper to get current input value for a step
   const getInputValue = (stepId: string) => playbackSession?.inputs[stepId];
@@ -249,11 +255,19 @@ function StepContent({
           experiences={experiences}
           mockSession={mockSession}
           onCtaClick={onCtaClick}
+          isInteractive={isInteractive}
+          onComplete={() => onStepComplete?.(step.id)}
         />
       );
 
     case "processing":
-      return <ProcessingStep step={step} />;
+      return (
+        <ProcessingStep
+          step={step}
+          isInteractive={isInteractive}
+          onComplete={() => onStepComplete?.(step.id)}
+        />
+      );
 
     case "reward":
       return <RewardStep step={step} mockSession={mockSession} onCtaClick={onCtaClick} />;

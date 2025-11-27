@@ -108,11 +108,11 @@
 
 ### Implementation for User Story 4
 
-- [ ] T024 [P] [US4] Enhance CaptureStep in `web/src/features/steps/components/preview/steps/CaptureStep.tsx` to add isInteractive and onComplete props, trigger onComplete when mock capture button clicked
-- [ ] T025 [P] [US4] Enhance ProcessingStep in `web/src/features/steps/components/preview/steps/ProcessingStep.tsx` to add isInteractive and onComplete props, trigger onComplete after animation completes (1-2 seconds)
-- [ ] T026 [US4] Update useJourneyPlayback in `web/src/features/steps/hooks/useJourneyPlayback.ts` to add handleStepComplete function that auto-advances for Capture and Processing steps, add isAutoAdvancing state to prevent double-advances
-- [ ] T027 [US4] Update PreviewRuntime in `web/src/features/steps/components/preview/PreviewRuntime.tsx` to pass onComplete callback to CaptureStep and ProcessingStep when in playback mode
-- [ ] T028 [US4] Update PlaybackMode in `web/src/features/steps/components/preview/PlaybackMode.tsx` to wire handleStepComplete from useJourneyPlayback to PreviewRuntime
+- [X] T024 [P] [US4] Enhance CaptureStep in `web/src/features/steps/components/preview/steps/CaptureStep.tsx` to add isInteractive and onComplete props, trigger onComplete when mock capture button clicked
+- [X] T025 [P] [US4] Enhance ProcessingStep in `web/src/features/steps/components/preview/steps/ProcessingStep.tsx` to add isInteractive and onComplete props, trigger onComplete after animation completes (1-2 seconds)
+- [X] T026 [US4] Update useJourneyPlayback in `web/src/features/steps/hooks/useJourneyPlayback.ts` to add handleStepComplete function that auto-advances for Capture and Processing steps, add isAutoAdvancing state to prevent double-advances
+- [X] T027 [US4] Update PreviewRuntime in `web/src/features/steps/components/preview/PreviewRuntime.tsx` to pass onComplete callback to CaptureStep and ProcessingStep when in playback mode
+- [X] T028 [US4] Update PlaybackMode in `web/src/features/steps/components/preview/PlaybackMode.tsx` to wire handleStepComplete from useJourneyPlayback to PreviewRuntime
 
 **Checkpoint**: User Story 4 complete - Capture and Processing steps auto-advance
 
@@ -126,9 +126,9 @@
 
 ### Implementation for User Story 5
 
-- [ ] T029 [US5] Create StepErrorBoundary component in `web/src/features/steps/components/preview/StepErrorBoundary.tsx` with error state, fallback UI showing step type and error message, key prop support for reset on step change
-- [ ] T030 [US5] Update PlaybackMode in `web/src/features/steps/components/preview/PlaybackMode.tsx` to wrap step rendering in StepErrorBoundary, pass stepId as key to reset boundary on navigation
-- [ ] T031 [US5] Export StepErrorBoundary from `web/src/features/steps/components/preview/index.ts`
+- [X] T029 [US5] Create StepErrorBoundary component in `web/src/features/steps/components/preview/StepErrorBoundary.tsx` with error state, fallback UI showing step type and error message, key prop support for reset on step change
+- [X] T030 [US5] Update PlaybackMode in `web/src/features/steps/components/preview/PlaybackMode.tsx` to wrap step rendering in StepErrorBoundary, pass stepId as key to reset boundary on navigation
+- [X] T031 [US5] Export StepErrorBoundary from `web/src/features/steps/components/preview/index.ts`
 
 **Checkpoint**: User Story 5 complete - errors handled gracefully without breaking navigation
 
