@@ -17,6 +17,7 @@
  */
 
 import { useState, useCallback } from "react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { JourneyEditorHeader } from "./JourneyEditorHeader";
 import { StepList } from "./StepList";
 import { StepEditor } from "./StepEditor";
@@ -44,11 +45,33 @@ export function JourneyEditor({ event, journey }: JourneyEditorProps) {
   const { experiences } = useEventExperiences(event.id);
   const { duplicateStep } = useStepMutations();
 
+  // URL state for viewport mode (synced with ?preview=mobile|desktop)
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  // Read viewport mode from URL, default to mobile
+  const previewParam = searchParams.get("preview");
+  const viewportMode: ViewportMode =
+    previewParam === "desktop" ? "desktop" : "mobile";
+
+  // Update URL when viewport mode changes
+  const setViewportMode = useCallback(
+    (mode: ViewportMode) => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (mode === "mobile") {
+        params.delete("preview"); // mobile is default, keep URL clean
+      } else {
+        params.set("preview", mode);
+      }
+      const query = params.toString();
+      router.replace(`${pathname}${query ? `?${query}` : ""}`, { scroll: false });
+    },
+    [searchParams, router, pathname]
+  );
+
   // Preview state - holds the in-progress form values for live preview
   const [previewStep, setPreviewStep] = useState<Partial<Step> | null>(null);
-
-  // Viewport mode state for preview panel (mobile: 375px, desktop: 900px)
-  const [viewportMode, setViewportMode] = useState<ViewportMode>("mobile");
 
 
   const handleSelectStep = useCallback(
