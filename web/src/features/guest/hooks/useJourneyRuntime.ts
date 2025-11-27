@@ -201,9 +201,10 @@ export function useJourneyRuntime(
 
   /**
    * Save input data for a step
+   * Accepts StepInputValue for regular inputs, or string for special cases like selected_experience_id
    */
   const saveInput = useCallback(
-    async (stepId: string, value: StepInputValue) => {
+    async (stepId: string, value: StepInputValue | string) => {
       if (!state.sessionId) {
         console.error("[JourneyRuntime] Cannot save input: no session ID");
         return;

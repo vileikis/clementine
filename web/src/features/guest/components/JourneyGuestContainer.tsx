@@ -245,8 +245,8 @@ export function JourneyGuestContainer({
         // Update local state with the wrapped value for consistency
         setInputValues((prev) => ({ ...prev, [variableName]: value }));
 
-        // But persist to Firestore as plain string (schema expects string, not object)
-        runtime.saveInput(variableName, { type: "text", value: value.selectedId } as StepInputValue);
+        // But persist to Firestore as plain string (schema expects string, not StepInputValue object)
+        runtime.saveInput(variableName, value.selectedId);
         return;
       }
 
