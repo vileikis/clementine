@@ -45,6 +45,7 @@ function createMockEventData(overrides: Partial<Event> = {}): Omit<Event, "id"> 
         overlayOpacity: 0.5,
       },
     },
+    deletedAt: null,
     createdAt: 1234567890,
     updatedAt: 1234567890,
     ...overrides,
@@ -267,25 +268,38 @@ describe("Events Repository", () => {
         data: jest.fn().mockReturnValue(event),
       }));
 
+      const mockOrderBy = jest.fn().mockReturnValue({
+        get: jest.fn().mockResolvedValue({ docs: mockDocs }),
+      });
+
+      const mockStatusWhere = jest.fn().mockReturnValue({
+        orderBy: mockOrderBy,
+      });
+
       mockDb.collection.mockReturnValue({
-        orderBy: jest.fn().mockReturnValue({
-          get: jest.fn().mockResolvedValue({ docs: mockDocs }),
-        }),
+        where: mockStatusWhere,
       });
 
       const events = await listEvents();
 
       expect(mockDb.collection).toHaveBeenCalledWith("events");
+      expect(mockStatusWhere).toHaveBeenCalledWith("status", "in", ["draft", "live", "archived"]);
       expect(events).toHaveLength(2);
       expect(events[0].id).toBe("event-2");
       expect(events[1].id).toBe("event-1");
     });
 
     it("returns empty array when no events exist", async () => {
+      const mockOrderBy = jest.fn().mockReturnValue({
+        get: jest.fn().mockResolvedValue({ docs: [] }),
+      });
+
+      const mockStatusWhere = jest.fn().mockReturnValue({
+        orderBy: mockOrderBy,
+      });
+
       mockDb.collection.mockReturnValue({
-        orderBy: jest.fn().mockReturnValue({
-          get: jest.fn().mockResolvedValue({ docs: [] }),
-        }),
+        where: mockStatusWhere,
       });
 
       const events = await listEvents();
@@ -310,18 +324,23 @@ describe("Events Repository", () => {
         get: jest.fn().mockResolvedValue({ docs: mockDocs }),
       });
 
-      const mockWhere = jest.fn().mockReturnValue({
+      const mockOwnerWhere = jest.fn().mockReturnValue({
         orderBy: mockOrderBy,
       });
 
+      const mockStatusWhere = jest.fn().mockReturnValue({
+        where: mockOwnerWhere,
+      });
+
       mockDb.collection.mockReturnValue({
-        where: mockWhere,
+        where: mockStatusWhere,
       });
 
       const events = await listEvents({ ownerId: "company-a" });
 
       expect(mockDb.collection).toHaveBeenCalledWith("events");
-      expect(mockWhere).toHaveBeenCalledWith("ownerId", "==", "company-a");
+      expect(mockStatusWhere).toHaveBeenCalledWith("status", "in", ["draft", "live", "archived"]);
+      expect(mockOwnerWhere).toHaveBeenCalledWith("ownerId", "==", "company-a");
       expect(mockOrderBy).toHaveBeenCalledWith("createdAt", "desc");
       expect(events).toHaveLength(1);
       expect(events[0].ownerId).toBe("company-a");
@@ -344,13 +363,18 @@ describe("Events Repository", () => {
         get: jest.fn().mockResolvedValue({ docs: mockDocs }),
       });
 
-      mockDb.collection.mockReturnValue({
+      const mockStatusWhere = jest.fn().mockReturnValue({
         orderBy: mockOrderBy,
+      });
+
+      mockDb.collection.mockReturnValue({
+        where: mockStatusWhere,
       });
 
       const events = await listEvents({ ownerId: null });
 
       expect(mockDb.collection).toHaveBeenCalledWith("events");
+      expect(mockStatusWhere).toHaveBeenCalledWith("status", "in", ["draft", "live", "archived"]);
       expect(mockOrderBy).toHaveBeenCalledWith("createdAt", "desc");
       expect(events).toHaveLength(1);
       expect(events[0].ownerId).toBeNull();

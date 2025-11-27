@@ -2,6 +2,7 @@ import { EventBreadcrumb, EventTabs, EventStatusSwitcher } from "@/features/even
 import { getEventAction } from "@/features/events/actions"
 import { notFound } from "next/navigation"
 import { CopyLinkButton } from "@/features/distribution"
+import type { EventStatus } from "@/features/events/types/event.types"
 
 interface EventLayoutProps {
   children: React.ReactNode
@@ -52,7 +53,7 @@ export default async function StudioLayout({
             {/* Actions (right side) */}
             <div className="flex items-center gap-3 shrink-0">
               <CopyLinkButton joinPath={event.joinPath} />
-              <EventStatusSwitcher eventId={event.id} currentStatus={event.status} />
+              <EventStatusSwitcher eventId={event.id} currentStatus={event.status as Exclude<EventStatus, "deleted">} />
             </div>
           </div>
         </div>
