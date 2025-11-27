@@ -81,7 +81,7 @@ export function StepLayout({ children, mediaUrl, mediaType }: StepLayoutProps) {
       }}
     >
       {mediaUrl && (
-        <div className="relative w-full aspect-video overflow-hidden">
+        <div className="relative w-full max-w-sm mx-auto aspect-video overflow-hidden rounded-lg">
           {renderMedia()}
         </div>
       )}
