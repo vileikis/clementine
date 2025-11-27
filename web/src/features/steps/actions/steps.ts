@@ -167,7 +167,7 @@ export async function createStepAction(
 
     // Revalidate cache
     revalidatePath(
-      `/events/${validated.eventId}/design/journeys/${validated.journeyId}`
+      `/events/${validated.eventId}/journeys/${validated.journeyId}`
     );
 
     return { success: true, data: { stepId } };
@@ -244,7 +244,7 @@ export async function updateStepAction(
 
     // Revalidate cache
     revalidatePath(
-      `/events/${eventId}/design/journeys/${existingStep.journeyId}`
+      `/events/${eventId}/journeys/${existingStep.journeyId}`
     );
 
     return { success: true, data: undefined };
@@ -311,7 +311,7 @@ export async function deleteStepAction(
 
     // Revalidate cache
     revalidatePath(
-      `/events/${eventId}/design/journeys/${existingStep.journeyId}`
+      `/events/${eventId}/journeys/${existingStep.journeyId}`
     );
 
     return { success: true, data: undefined };
@@ -393,7 +393,7 @@ export async function reorderStepsAction(
     await reorderSteps(eventId, journeyId, newOrder);
 
     // Revalidate cache
-    revalidatePath(`/events/${eventId}/design/journeys/${journeyId}`);
+    revalidatePath(`/events/${eventId}/journeys/${journeyId}`);
 
     return { success: true, data: undefined };
   } catch (error) {
@@ -464,7 +464,7 @@ export async function duplicateStepAction(
 
     // Revalidate cache
     revalidatePath(
-      `/events/${eventId}/design/journeys/${existingStep.journeyId}`
+      `/events/${eventId}/journeys/${existingStep.journeyId}`
     );
 
     return { success: true, data: { stepId: newStepId } };

@@ -72,7 +72,7 @@ export function ExperienceEditorWrapper({
     }
 
     // Redirect to design after deletion
-    router.push(`/events/${eventId}/design`);
+    router.push(`/events/${eventId}`);
   };
 
   return (

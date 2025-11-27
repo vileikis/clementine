@@ -25,7 +25,7 @@ export function ExperiencesSidebar({
   const pathname = usePathname();
 
   const isExperienceActive = (experienceId: string) =>
-    pathname === `/events/${eventId}/design/experiences/${experienceId}`;
+    pathname === `/events/${eventId}/experiences/${experienceId}`;
 
   return (
     <aside
@@ -35,7 +35,7 @@ export function ExperiencesSidebar({
       {/* Header with add button */}
       <div className="px-4 py-3 min-h-[44px] flex items-center justify-between">
         <span className="text-sm font-medium">Experiences</span>
-        <Link href={`/events/${eventId}/design/experiences/create`}>
+        <Link href={`/events/${eventId}/experiences/create`}>
           <Button
             type="button"
             variant="ghost"
@@ -61,7 +61,7 @@ export function ExperiencesSidebar({
             {experiences.map((experience) => (
               <li key={experience.id}>
                 <Link
-                  href={`/events/${eventId}/design/experiences/${experience.id}`}
+                  href={`/events/${eventId}/experiences/${experience.id}`}
                   className={cn(
                     "block w-full text-left px-4 py-2.5 rounded-md transition-colors",
                     "min-h-[44px] flex items-center gap-2",
