@@ -3,8 +3,9 @@
 /**
  * Preview: OpinionScaleStep
  *
- * Read-only preview for Opinion Scale step type.
+ * Preview for Opinion Scale step type.
  * Displays title, description, scale buttons, min/max labels, and CTA button.
+ * Supports interactive mode for playback with selection persistence.
  *
  * Responsive layout:
  * - 44px buttons with centered flex-wrap
@@ -17,9 +18,23 @@ import type { StepOpinionScale } from "@/features/steps/types";
 
 interface OpinionScaleStepProps {
   step: StepOpinionScale;
+  /** Enable interactive selection (playback mode) */
+  isInteractive?: boolean;
+  /** Currently selected scale value */
+  selectedValue?: number;
+  /** Callback when selection changes */
+  onValueChange?: (value: number) => void;
+  /** Callback when CTA button is clicked */
+  onCtaClick?: () => void;
 }
 
-export function OpinionScaleStep({ step }: OpinionScaleStepProps) {
+export function OpinionScaleStep({
+  step,
+  isInteractive = false,
+  selectedValue,
+  onValueChange,
+  onCtaClick,
+}: OpinionScaleStepProps) {
   const { theme } = useEventTheme();
   const { scaleMin, scaleMax, minLabel, maxLabel } = step.config;
 
@@ -29,11 +44,17 @@ export function OpinionScaleStep({ step }: OpinionScaleStepProps) {
     scaleValues.push(i);
   }
 
+  const handleClick = (value: number) => {
+    if (isInteractive) {
+      onValueChange?.(value);
+    }
+  };
+
   return (
     <StepLayout
       mediaUrl={step.mediaUrl}
       mediaType={step.mediaType}
-      action={step.ctaLabel && <ActionButton>{step.ctaLabel}</ActionButton>}
+      action={step.ctaLabel && <ActionButton onClick={onCtaClick}>{step.ctaLabel}</ActionButton>}
     >
       {step.title && (
         <h2 className="text-2xl font-bold mb-2">{step.title}</h2>
@@ -45,7 +66,12 @@ export function OpinionScaleStep({ step }: OpinionScaleStepProps) {
       {/* Scale buttons - wrap with center alignment, reasonable gaps */}
       <div className="flex flex-wrap justify-center gap-2 lg:gap-3">
         {scaleValues.map((value) => (
-          <ScaleButton key={value} value={value} />
+          <ScaleButton
+            key={value}
+            value={value}
+            selected={selectedValue === value}
+            onClick={() => handleClick(value)}
+          />
         ))}
       </div>
 

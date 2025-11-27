@@ -209,6 +209,8 @@ The application is organized into feature modules in `web/src/features/`. The da
 - Firebase Firestore - Steps as subcollection `/events/{eventId}/steps/{stepId}`, Journeys at `/events/{eventId}/journeys/{journeyId}` (006-journey-editor)
 - TypeScript 5.x (strict mode) + Next.js 16, React 19, Tailwind CSS v4, shadcn/ui, @dnd-kit/core, react-hook-form, zod (008-preview-runtime)
 - Firebase Firestore (read-only for preview) (008-preview-runtime)
+- TypeScript 5.x (strict mode) + Next.js 16, React 19, Tailwind CSS v4, shadcn/ui, lucide-react (009-journey-playback)
+- N/A (ephemeral in-memory state only - no Firestore writes) (009-journey-playback)
 - TypeScript 5.x (strict mode) + Next.js 16, React 19, Firebase Storage (Admin SDK), lottie-react, Zod 4.x (009-step-media-upload)
 - Firebase Storage with company-level paths: `media/{companyId}/{mediaType}/{timestamp}-{filename}` (009-step-media-upload)
 
