@@ -3,8 +3,9 @@
 /**
  * Preview: MultipleChoiceStep
  *
- * Read-only preview for Multiple Choice step type.
+ * Preview for Multiple Choice step type.
  * Displays title, description, option buttons, and CTA button.
+ * Supports interactive mode for playback with selection persistence.
  */
 
 import { StepLayout, ActionButton, OptionButton } from "@/components/step-primitives";
@@ -12,9 +13,29 @@ import type { StepMultipleChoice } from "@/features/steps/types";
 
 interface MultipleChoiceStepProps {
   step: StepMultipleChoice;
+  /** Enable interactive selection (playback mode) */
+  isInteractive?: boolean;
+  /** Currently selected option value */
+  selectedValue?: string;
+  /** Callback when selection changes */
+  onValueChange?: (value: string) => void;
+  /** Callback when CTA button is clicked */
+  onCtaClick?: () => void;
 }
 
-export function MultipleChoiceStep({ step }: MultipleChoiceStepProps) {
+export function MultipleChoiceStep({
+  step,
+  isInteractive = false,
+  selectedValue,
+  onValueChange,
+  onCtaClick,
+}: MultipleChoiceStepProps) {
+  const handleOptionClick = (value: string) => {
+    if (isInteractive) {
+      onValueChange?.(value);
+    }
+  };
+
   return (
     <StepLayout mediaUrl={step.mediaUrl} mediaType={step.mediaType}>
       <div className="flex-1">
@@ -27,7 +48,11 @@ export function MultipleChoiceStep({ step }: MultipleChoiceStepProps) {
 
         <div className="space-y-2">
           {step.config.options.map((option, index) => (
-            <OptionButton key={option.value || index}>
+            <OptionButton
+              key={option.value || index}
+              selected={selectedValue === option.value}
+              onClick={() => handleOptionClick(option.value)}
+            >
               {option.label}
             </OptionButton>
           ))}
@@ -36,7 +61,7 @@ export function MultipleChoiceStep({ step }: MultipleChoiceStepProps) {
 
       {step.ctaLabel && (
         <div className="mt-auto pt-4">
-          <ActionButton>{step.ctaLabel}</ActionButton>
+          <ActionButton onClick={onCtaClick}>{step.ctaLabel}</ActionButton>
         </div>
       )}
     </StepLayout>
