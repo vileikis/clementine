@@ -101,7 +101,7 @@ export function ExperienceEditorHeader({
       if (result.success) {
         toast.success("Experience duplicated");
         // Navigate to the new experience
-        router.push(`/events/${eventId}/design/experiences/${result.data.id}`);
+        router.push(`/events/${eventId}/experiences/${result.data.id}`);
       } else {
         toast.error(result.error.message);
       }

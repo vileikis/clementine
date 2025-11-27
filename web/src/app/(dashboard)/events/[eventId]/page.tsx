@@ -13,5 +13,5 @@ export default async function EventDetailPage({
   params,
 }: EventDetailPageProps) {
   const { eventId } = await params
-  redirect(`/events/${eventId}/design`)
+  redirect(`/events/${eventId}/journeys`)
 }

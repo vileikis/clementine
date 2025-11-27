@@ -137,7 +137,7 @@ export async function createJourneyAction(
     });
 
     // Revalidate cache
-    revalidatePath(`/events/${validated.eventId}/design/journeys`);
+    revalidatePath(`/events/${validated.eventId}/journeys`);
 
     return { success: true, data: { journeyId } };
   } catch (error) {
@@ -212,7 +212,7 @@ export async function deleteJourneyAction(
     }
 
     // Revalidate cache
-    revalidatePath(`/events/${eventId}/design/journeys`);
+    revalidatePath(`/events/${eventId}/journeys`);
 
     return { success: true, data: undefined };
   } catch (error) {
