@@ -17,16 +17,6 @@
  */
 
 import { useState, useCallback } from "react";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { JourneyEditorHeader } from "./JourneyEditorHeader";
 import { StepList } from "./StepList";
 import { StepEditor } from "./StepEditor";
@@ -51,13 +41,11 @@ export function JourneyEditor({ event, journey }: JourneyEditorProps) {
   const { steps, loading: stepsLoading } = useSteps(event.id, journey.id, journey);
   const { selectedStepId, selectedStep, setSelectedStepId } = useSelectedStep(steps);
   const { experiences } = useEventExperiences(event.id);
-  const { deleteStep, duplicateStep } = useStepMutations();
+  const { duplicateStep } = useStepMutations();
 
   // Preview state - holds the in-progress form values for live preview
   const [previewStep, setPreviewStep] = useState<Partial<Step> | null>(null);
 
-  // Delete confirmation dialog state
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const handleSelectStep = useCallback(
     (stepId: string) => {
@@ -87,23 +75,6 @@ export function JourneyEditor({ event, journey }: JourneyEditorProps) {
     setPreviewStep(updates);
   }, []);
 
-  // Keyboard shortcut: Delete with confirmation
-  const handleKeyboardDelete = useCallback(() => {
-    if (selectedStepId) {
-      setShowDeleteDialog(true);
-    }
-  }, [selectedStepId]);
-
-  // Keyboard shortcut: Confirm delete
-  const handleConfirmDelete = useCallback(async () => {
-    if (selectedStepId) {
-      const result = await deleteStep(event.id, selectedStepId);
-      if (result.success) {
-        handleStepDeleted();
-      }
-    }
-    setShowDeleteDialog(false);
-  }, [event.id, selectedStepId, deleteStep, handleStepDeleted]);
 
   // Keyboard shortcut: Duplicate step
   const handleDuplicateStep = useCallback(async () => {
@@ -120,7 +91,7 @@ export function JourneyEditor({ event, journey }: JourneyEditorProps) {
     stepIds: steps.map((s) => s.id),
     selectedStepId,
     onSelectStep: handleSelectStep,
-    onDeleteStep: handleKeyboardDelete,
+    onDeleteStep: () => {},
     onDuplicateStep: handleDuplicateStep,
     enabled: !stepsLoading,
   });
