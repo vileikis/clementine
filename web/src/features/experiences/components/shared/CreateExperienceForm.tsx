@@ -87,7 +87,7 @@ export function CreateExperienceForm({ eventId, companyId }: CreateExperienceFor
         toast.success("Experience created successfully");
         // Redirect to experience editor
         router.push(
-          `/events/${eventId}/design/experiences/${result.data.id}`
+          `/events/${eventId}/experiences/${result.data.id}`
         );
       } else {
         toast.error(result.error.message || "Failed to create experience");

@@ -34,9 +34,9 @@ export default async function StudioLayout({
   const event = result.event
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="h-screen flex flex-col overflow-hidden bg-background">
       {/* Event navigation bar - everything on one row */}
-      <div className="border-b bg-background sticky top-0 z-10">
+      <div className="border-b bg-background shrink-0">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center gap-6">
             {/* Breadcrumb (includes editable event name) */}
@@ -59,8 +59,10 @@ export default async function StudioLayout({
         </div>
       </div>
 
-      {/* Page content - child routes handle their own main wrapper */}
-      {children}
+      {/* Page content - fills remaining space */}
+      <main className="flex-1 overflow-auto">
+        {children}
+      </main>
     </div>
   )
 }

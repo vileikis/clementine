@@ -25,7 +25,7 @@ export function JourneyEditorHeader({
     <header className="flex items-center gap-4 px-4 py-3 border-b bg-background">
       {/* Back Button */}
       <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0" asChild>
-        <Link href={`/events/${eventId}/design/journeys`}>
+        <Link href={`/events/${eventId}/journeys`}>
           <ArrowLeft className="h-5 w-5" />
           <span className="sr-only">Back to journeys</span>
         </Link>

@@ -114,41 +114,41 @@ export default function DesignLayout({ children, params }: DesignLayoutProps) {
 
   return (
     <ExperiencesContext.Provider value={contextValue}>
-      
-      <div className="flex flex-col lg:flex-row gap-6">
-        {/* Desktop sidebar - visible on lg+ screens */}
-        <div className="hidden lg:block w-64 shrink-0">
-          <DesignSidebar eventId={eventId} experiences={experiences} />
-        </div>
+      <div className="container mx-auto px-6 py-8">
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Desktop sidebar - visible on lg+ screens */}
+          <div className="hidden lg:block w-64 shrink-0">
+            <DesignSidebar eventId={eventId} experiences={experiences} />
+          </div>
 
-        {/* Mobile menu button - visible on mobile only */}
-        <div className="lg:hidden">
-          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-            <SheetTrigger asChild>
-              <Button
-                variant="outline"
-                size="default"
-                className="w-full justify-start gap-2 min-h-[44px]"
-              >
-                <Menu className="h-4 w-4" />
-                <span>{getSectionTitle()}</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-80">
-              <SheetHeader>
-                <SheetTitle>Design Sections</SheetTitle>
-              </SheetHeader>
-              <div className="mt-6">
-                <DesignSidebar eventId={eventId} experiences={experiences} />
-              </div>
-            </SheetContent>
-          </Sheet>
-        </div>
+          {/* Mobile menu button - visible on mobile only */}
+          <div className="lg:hidden">
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="default"
+                  className="w-full justify-start gap-2 min-h-[44px]"
+                >
+                  <Menu className="h-4 w-4" />
+                  <span>{getSectionTitle()}</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-80">
+                <SheetHeader>
+                  <SheetTitle>Design Sections</SheetTitle>
+                </SheetHeader>
+                <div className="mt-6">
+                  <DesignSidebar eventId={eventId} experiences={experiences} />
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
 
-        {/* Main content area */}
-        <div className="flex-1 min-w-0 py-6">{children}</div>
+          {/* Main content area */}
+          <div className="flex-1 min-w-0">{children}</div>
+        </div>
       </div>
-      
     </ExperiencesContext.Provider>
   );
 }
