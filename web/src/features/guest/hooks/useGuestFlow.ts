@@ -8,7 +8,7 @@ import {
   startSessionAction,
   saveCaptureAction,
   triggerTransformAction,
-} from "@/features/sessions";
+} from "@/features/sessions/actions";
 
 type GuestState =
   | { step: "greeting" }

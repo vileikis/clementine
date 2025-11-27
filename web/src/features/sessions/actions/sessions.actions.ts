@@ -6,13 +6,20 @@ import {
   saveCapture,
   getSession,
   updateSessionState,
-} from "./repository";
+  startJourneySession,
+  updateStepIndex,
+  saveStepData,
+} from "../repositories";
 import { getEvent } from "@/features/events/repositories/events";
 import {
   uploadInputImage,
   copyImageToResult,
 } from "@/lib/storage/upload";
 import { revalidatePath } from "next/cache";
+
+// ============================================================================
+// Existing actions (preserved)
+// ============================================================================
 
 export async function startSessionAction(eventId: string) {
   const sessionId = await startSession(eventId);
@@ -165,4 +172,36 @@ export async function triggerTransformAction(
 
     throw error;
   }
+}
+
+// ============================================================================
+// New actions for journey support
+// ============================================================================
+
+export async function startJourneySessionAction(
+  eventId: string,
+  journeyId: string
+) {
+  const sessionId = await startJourneySession(eventId, journeyId);
+  return { sessionId };
+}
+
+export async function advanceStepAction(
+  eventId: string,
+  sessionId: string,
+  nextIndex: number
+) {
+  await updateStepIndex(eventId, sessionId, nextIndex);
+  revalidatePath(`/join/${eventId}`);
+  return { success: true };
+}
+
+export async function saveStepDataAction(
+  eventId: string,
+  sessionId: string,
+  key: string,
+  value: unknown
+) {
+  await saveStepData(eventId, sessionId, key, value);
+  return { success: true };
 }
