@@ -336,20 +336,20 @@ Search codebase for imports from old paths and update:
 
 | Task | Status |
 |------|--------|
-| Create new folders | ⬜ |
-| Move/rename files | ⬜ |
-| Create barrel exports | ⬜ |
-| Update internal imports | ⬜ |
-| Fix index.ts public API | ⬜ |
-| Delete lib/ folder | ⬜ |
-| Update types with new fields | ⬜ |
-| Update schema with new fields | ⬜ |
-| Add new repository functions | ⬜ |
-| Add new actions | ⬜ |
-| Update tests | ⬜ |
-| Run type-check | ⬜ |
-| Run lint | ⬜ |
-| Update external imports | ⬜ |
+| Create new folders | ✅ |
+| Move/rename files | ✅ |
+| Create barrel exports | ✅ |
+| Update internal imports | ✅ |
+| Fix index.ts public API | ✅ |
+| Delete lib/ folder | ✅ |
+| Update types with new fields | ✅ |
+| Update schema with new fields | ✅ |
+| Add new repository functions | ✅ |
+| Add new actions | ✅ |
+| Update tests | ✅ |
+| Run type-check | ✅ |
+| Run lint | ✅ |
+| Update external imports | ✅ |
 
 ---
 
@@ -365,9 +365,9 @@ Search codebase for imports from old paths and update:
 
 ## Success Criteria
 
-- [ ] All files follow `[domain].[purpose].[ext]` naming
-- [ ] No `lib/` folder exists
-- [ ] index.ts only exports types
-- [ ] New journey fields added to Session type
-- [ ] `pnpm type-check` passes
-- [ ] `pnpm lint` passes
+- [x] All files follow `[domain].[purpose].[ext]` naming
+- [x] No `lib/` folder exists
+- [x] index.ts only exports types
+- [x] New journey fields added to Session type
+- [x] `pnpm type-check` passes
+- [x] `pnpm lint` passes
