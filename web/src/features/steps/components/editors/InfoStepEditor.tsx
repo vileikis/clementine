@@ -35,12 +35,14 @@ const FIELDS_TO_COMPARE: (keyof InfoStepFormValues)[] = [
 
 interface InfoStepEditorProps {
   step: StepInfo;
+  companyId: string;
   onUpdate: (updates: Partial<InfoStepFormValues>) => Promise<void>;
   onPreviewChange?: (values: InfoStepFormValues) => void;
 }
 
 export function InfoStepEditor({
   step,
+  companyId,
   onUpdate,
   onPreviewChange,
 }: InfoStepEditorProps) {
@@ -90,6 +92,7 @@ export function InfoStepEditor({
       <form onBlur={handleBlur} className="space-y-4">
         <BaseStepEditor
           form={form}
+          companyId={companyId}
           showDescription={true}
           showMediaUrl={true}
           showCtaLabel={true}

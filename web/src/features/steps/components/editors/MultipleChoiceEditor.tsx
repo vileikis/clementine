@@ -73,12 +73,14 @@ const FIELDS_TO_COMPARE: (keyof MultipleChoiceFormValues)[] = [
 
 interface MultipleChoiceEditorProps {
   step: StepMultipleChoice;
+  companyId: string;
   onUpdate: (updates: Partial<MultipleChoiceFormValues>) => Promise<void>;
   onPreviewChange?: (values: MultipleChoiceFormValues) => void;
 }
 
 export function MultipleChoiceEditor({
   step,
+  companyId,
   onUpdate,
   onPreviewChange,
 }: MultipleChoiceEditorProps) {
@@ -194,6 +196,7 @@ export function MultipleChoiceEditor({
         {/* Base Fields */}
         <BaseStepEditor
           form={form}
+          companyId={companyId}
           showDescription={true}
           showMediaUrl={true}
           showCtaLabel={true}

@@ -58,12 +58,14 @@ const FIELDS_TO_COMPARE: (keyof EmailFormValues)[] = [
 
 interface EmailEditorProps {
   step: StepEmail;
+  companyId: string;
   onUpdate: (updates: Partial<EmailFormValues>) => Promise<void>;
   onPreviewChange?: (values: EmailFormValues) => void;
 }
 
 export function EmailEditor({
   step,
+  companyId,
   onUpdate,
   onPreviewChange,
 }: EmailEditorProps) {
@@ -130,6 +132,7 @@ export function EmailEditor({
         {/* Base Fields */}
         <BaseStepEditor
           form={form}
+          companyId={companyId}
           showDescription={true}
           showMediaUrl={true}
           showCtaLabel={true}

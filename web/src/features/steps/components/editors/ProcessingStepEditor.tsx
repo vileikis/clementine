@@ -61,12 +61,14 @@ const FIELDS_TO_COMPARE: (keyof ProcessingStepFormValues)[] = [
 
 interface ProcessingStepEditorProps {
   step: StepProcessing;
+  companyId: string;
   onUpdate: (updates: Partial<ProcessingStepFormValues>) => Promise<void>;
   onPreviewChange?: (values: ProcessingStepFormValues) => void;
 }
 
 export function ProcessingStepEditor({
   step,
+  companyId,
   onUpdate,
   onPreviewChange,
 }: ProcessingStepEditorProps) {
@@ -163,6 +165,7 @@ export function ProcessingStepEditor({
         {/* Base Fields */}
         <BaseStepEditor
           form={form}
+          companyId={companyId}
           showDescription={true}
           showMediaUrl={true}
           showCtaLabel={false}

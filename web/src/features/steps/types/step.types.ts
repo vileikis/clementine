@@ -1,6 +1,11 @@
 // Step type definitions for the journey editor
 
 /**
+ * Media types supported in step editors
+ */
+export type StepMediaType = "image" | "gif" | "video" | "lottie";
+
+/**
  * All available step types
  */
 export type StepType =
@@ -38,6 +43,7 @@ export interface StepBase {
   title?: string | null;
   description?: string | null;
   mediaUrl?: string | null;
+  mediaType?: StepMediaType | null;
   ctaLabel?: string | null;
   createdAt: number;
   updatedAt: number;

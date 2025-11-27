@@ -72,6 +72,7 @@ const FIELDS_TO_COMPARE: (keyof ExperiencePickerFormValues)[] = [
 
 interface ExperiencePickerEditorProps {
   step: StepExperiencePicker;
+  companyId: string;
   experiences: Experience[];
   onUpdate: (updates: Partial<ExperiencePickerFormValues>) => Promise<void>;
   onPreviewChange?: (values: ExperiencePickerFormValues) => void;
@@ -79,6 +80,7 @@ interface ExperiencePickerEditorProps {
 
 export function ExperiencePickerEditor({
   step,
+  companyId,
   experiences,
   onUpdate,
   onPreviewChange,
@@ -206,6 +208,7 @@ export function ExperiencePickerEditor({
         {/* Base Fields */}
         <BaseStepEditor
           form={form}
+          companyId={companyId}
           showDescription={true}
           showMediaUrl={true}
           showCtaLabel={true}

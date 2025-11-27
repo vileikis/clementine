@@ -151,6 +151,7 @@ export function JourneyEditor({ event, journey }: JourneyEditorProps) {
             {selectedStep ? (
               <StepEditor
                 eventId={event.id}
+                companyId={event.ownerId ?? ""}
                 step={selectedStep}
                 experiences={experiences}
                 onStepDeleted={handleStepDeleted}

@@ -59,12 +59,14 @@ const FIELDS_TO_COMPARE: (keyof LongTextFormValues)[] = [
 
 interface LongTextEditorProps {
   step: StepLongText;
+  companyId: string;
   onUpdate: (updates: Partial<LongTextFormValues>) => Promise<void>;
   onPreviewChange?: (values: LongTextFormValues) => void;
 }
 
 export function LongTextEditor({
   step,
+  companyId,
   onUpdate,
   onPreviewChange,
 }: LongTextEditorProps) {
@@ -134,6 +136,7 @@ export function LongTextEditor({
         {/* Base Fields */}
         <BaseStepEditor
           form={form}
+          companyId={companyId}
           showDescription={true}
           showMediaUrl={true}
           showCtaLabel={true}

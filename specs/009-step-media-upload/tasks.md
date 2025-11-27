@@ -25,8 +25,8 @@
 
 **Purpose**: Install dependencies and configure project for new feature
 
-- [ ] T001 Install lottie-react dependency: `cd web && pnpm add lottie-react`
-- [ ] T002 [P] Verify Firebase Storage configuration in web/.env.local
+- [X] T001 Install lottie-react dependency: `cd web && pnpm add lottie-react`
+- [X] T002 [P] Verify Firebase Storage configuration in web/.env.local
 
 ---
 
@@ -38,26 +38,26 @@
 
 ### Types & Schemas
 
-- [ ] T003 [P] Add StepMediaType type to web/src/features/steps/types/step.types.ts
-- [ ] T004 [P] Add mediaType field to StepBase interface in web/src/features/steps/types/step.types.ts
-- [ ] T005 [P] Add stepMediaTypeSchema and update stepBaseSchema in web/src/features/steps/schemas/step.schemas.ts
-- [ ] T006 Update updateStepInputSchema to include mediaType in web/src/features/steps/schemas/step.schemas.ts
+- [X] T003 [P] Add StepMediaType type to web/src/features/steps/types/step.types.ts
+- [X] T004 [P] Add mediaType field to StepBase interface in web/src/features/steps/types/step.types.ts
+- [X] T005 [P] Add stepMediaTypeSchema and update stepBaseSchema in web/src/features/steps/schemas/step.schemas.ts
+- [X] T006 Update updateStepInputSchema to include mediaType in web/src/features/steps/schemas/step.schemas.ts
 
 ### Utility Functions
 
-- [ ] T007 [P] Create media type detection utilities in web/src/features/steps/utils/media-type.ts (detectMediaType, inferMediaTypeFromUrl, getMediaType)
-- [ ] T008 [P] Create Lottie validation utilities in web/src/features/steps/utils/lottie-validation.ts (isValidLottie, validateLottieFile, LottieJSON interface)
-- [ ] T009 [P] Create media validation constants in web/src/features/steps/utils/media-validation.ts (MEDIA_VALIDATION config object)
-- [ ] T010 Update utils barrel export in web/src/features/steps/utils/index.ts
+- [X] T007 [P] Create media type detection utilities in web/src/features/steps/utils/media-type.ts (detectMediaType, inferMediaTypeFromUrl, getMediaType)
+- [X] T008 [P] Create Lottie validation utilities in web/src/features/steps/utils/lottie-validation.ts (isValidLottie, validateLottieFile, LottieJSON interface)
+- [X] T009 [P] Create media validation constants in web/src/features/steps/utils/media-validation.ts (MEDIA_VALIDATION config object)
+- [X] T010 Update utils barrel export in web/src/features/steps/utils/index.ts
 
 ### Server Action
 
-- [ ] T011 Create uploadStepMedia server action in web/src/features/steps/actions/step-media.ts
-- [ ] T012 Update actions barrel export in web/src/features/steps/actions/index.ts
+- [X] T011 Create uploadStepMedia server action in web/src/features/steps/actions/step-media.ts
+- [X] T012 Update actions barrel export in web/src/features/steps/actions/index.ts
 
 ### Shared Components
 
-- [ ] T013 Create LottiePlayer component in web/src/components/shared/LottiePlayer.tsx (fetches JSON from URL, renders with lottie-react)
+- [X] T013 Create LottiePlayer component in web/src/components/shared/LottiePlayer.tsx (fetches JSON from URL, renders with lottie-react)
 
 **Checkpoint**: Foundation ready - Types, schemas, utilities, server action, and Lottie player all available
 
@@ -71,12 +71,12 @@
 
 ### Implementation for User Story 1
 
-- [ ] T014 [US1] Create StepMediaUpload component in web/src/features/steps/components/shared/StepMediaUpload.tsx (file input, upload state, error handling, image preview)
-- [ ] T015 [US1] Create shared directory and barrel export in web/src/features/steps/components/shared/index.ts
-- [ ] T016 [US1] Update BaseStepEditorProps interface to add companyId prop in web/src/features/steps/components/editors/BaseStepEditor.tsx
-- [ ] T017 [US1] Replace URL input with StepMediaUpload component in BaseStepEditor in web/src/features/steps/components/editors/BaseStepEditor.tsx
-- [ ] T018 [US1] Update InfoStepEditor to pass companyId to BaseStepEditor in web/src/features/steps/components/editors/InfoStepEditor.tsx
-- [ ] T019 [P] [US1] Update all remaining step editors to pass companyId (CaptureStepEditor, ShortTextEditor, LongTextEditor, MultipleChoiceEditor, YesNoEditor, OpinionScaleEditor, EmailEditor, ProcessingStepEditor, RewardStepEditor, ExperiencePickerEditor)
+- [X] T014 [US1] Create StepMediaUpload component in web/src/features/steps/components/shared/StepMediaUpload.tsx (file input, upload state, error handling, image preview)
+- [X] T015 [US1] Create shared directory and barrel export in web/src/features/steps/components/shared/index.ts
+- [X] T016 [US1] Update BaseStepEditorProps interface to add companyId prop in web/src/features/steps/components/editors/BaseStepEditor.tsx
+- [X] T017 [US1] Replace URL input with StepMediaUpload component in BaseStepEditor in web/src/features/steps/components/editors/BaseStepEditor.tsx
+- [X] T018 [US1] Update InfoStepEditor to pass companyId to BaseStepEditor in web/src/features/steps/components/editors/InfoStepEditor.tsx
+- [X] T019 [P] [US1] Update all remaining step editors to pass companyId (CaptureStepEditor, ShortTextEditor, LongTextEditor, MultipleChoiceEditor, YesNoEditor, OpinionScaleEditor, EmailEditor, ProcessingStepEditor, RewardStepEditor, ExperiencePickerEditor)
 
 **Checkpoint**: Image upload works end-to-end - can upload JPG/PNG/WebP and see preview in editor
 
@@ -90,9 +90,9 @@
 
 ### Implementation for User Story 5
 
-- [ ] T020 [US5] Add image preview rendering to StepMediaUpload in web/src/features/steps/components/shared/StepMediaUpload.tsx (static Image component for image type)
-- [ ] T021 [US5] Add remove button functionality to StepMediaUpload (clears form values, does not delete from storage)
-- [ ] T022 [US5] Add upload progress indicator to StepMediaUpload
+- [X] T020 [US5] Add image preview rendering to StepMediaUpload in web/src/features/steps/components/shared/StepMediaUpload.tsx (static Image component for image type)
+- [X] T021 [US5] Add remove button functionality to StepMediaUpload (clears form values, does not delete from storage)
+- [X] T022 [US5] Add upload progress indicator to StepMediaUpload
 
 **Checkpoint**: Editor shows accurate preview with upload progress and remove functionality
 
@@ -106,8 +106,8 @@
 
 ### Implementation for User Story 6
 
-- [ ] T023 [US6] Update StepMediaUpload to infer mediaType from URL when mediaType is null in web/src/features/steps/components/shared/StepMediaUpload.tsx
-- [ ] T024 [US6] Update preview-runtime step renderers to use getMediaType utility for backward compatibility in web/src/features/preview-runtime/components/step-renderers/
+- [X] T023 [US6] Update StepMediaUpload to infer mediaType from URL when mediaType is null in web/src/features/steps/components/shared/StepMediaUpload.tsx
+- [X] T024 [US6] Update preview-runtime step renderers to use getMediaType utility for backward compatibility in web/src/features/preview-runtime/components/step-renderers/
 
 **Checkpoint**: All existing steps render correctly, new uploads set mediaType explicitly
 
@@ -121,9 +121,9 @@
 
 ### Implementation for User Story 2
 
-- [ ] T025 [US2] Extend StepMediaUpload to handle video file types in web/src/features/steps/components/shared/StepMediaUpload.tsx
-- [ ] T026 [US2] Add video preview rendering to StepMediaUpload (autoPlay, muted, loop, playsInline)
-- [ ] T027 [US2] Add 25MB size validation for video files in server action
+- [X] T025 [US2] Extend StepMediaUpload to handle video file types in web/src/features/steps/components/shared/StepMediaUpload.tsx
+- [X] T026 [US2] Add video preview rendering to StepMediaUpload (autoPlay, muted, loop, playsInline)
+- [X] T027 [US2] Add 25MB size validation for video files in server action
 
 **Checkpoint**: Video upload works with autoplay preview
 
@@ -137,8 +137,8 @@
 
 ### Implementation for User Story 3
 
-- [ ] T028 [US3] Extend StepMediaUpload to handle GIF file type in web/src/features/steps/components/shared/StepMediaUpload.tsx
-- [ ] T029 [US3] Add GIF preview rendering with unoptimized Image component
+- [X] T028 [US3] Extend StepMediaUpload to handle GIF file type in web/src/features/steps/components/shared/StepMediaUpload.tsx
+- [X] T029 [US3] Add GIF preview rendering with unoptimized Image component
 
 **Checkpoint**: GIF upload works with animated preview
 
@@ -152,9 +152,9 @@
 
 ### Implementation for User Story 4
 
-- [ ] T030 [US4] Extend StepMediaUpload to handle JSON files with Lottie validation in web/src/features/steps/components/shared/StepMediaUpload.tsx
-- [ ] T031 [US4] Add Lottie preview rendering using LottiePlayer component
-- [ ] T032 [US4] Add specific error message for invalid Lottie JSON structure
+- [X] T030 [US4] Extend StepMediaUpload to handle JSON files with Lottie validation in web/src/features/steps/components/shared/StepMediaUpload.tsx
+- [X] T031 [US4] Add Lottie preview rendering using LottiePlayer component
+- [X] T032 [US4] Add specific error message for invalid Lottie JSON structure
 
 **Checkpoint**: Lottie upload works with animated preview and validation
 
@@ -164,16 +164,16 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T033 [P] Update preview-runtime step renderers to handle all media types (image, gif, video, lottie) in web/src/features/preview-runtime/components/step-renderers/
-- [ ] T034 [P] Add comprehensive error messages for all validation failures (file type, file size, Lottie structure)
-- [ ] T035 Verify mobile-first styling (44px touch targets, responsive preview)
+- [X] T033 [P] Update preview-runtime step renderers to handle all media types (image, gif, video, lottie) in web/src/features/preview-runtime/components/step-renderers/
+- [X] T034 [P] Add comprehensive error messages for all validation failures (file type, file size, Lottie structure)
+- [X] T035 Verify mobile-first styling (44px touch targets, responsive preview)
 
 ### Validation Loop (REQUIRED - Constitution Principle V)
 
 **Purpose**: Ensure code quality and correctness before merge
 
-- [ ] T036 Run `pnpm lint` and fix all errors/warnings
-- [ ] T037 Run `pnpm type-check` and resolve all TypeScript errors
+- [X] T036 Run `pnpm lint` and fix all errors/warnings
+- [X] T037 Run `pnpm type-check` and resolve all TypeScript errors
 - [ ] T038 Verify feature in local dev server (`pnpm dev`)
 - [ ] T039 Manual testing: run through quickstart.md testing checklist
 
