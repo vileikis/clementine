@@ -3,10 +3,22 @@
 
 export type SessionState = "created" | "captured" | "transforming" | "ready" | "error";
 
+/**
+ * Discriminated union for type-safe step input storage.
+ * Each step type maps to a specific value format.
+ */
+export type StepInputValue =
+  | { type: "text"; value: string }
+  | { type: "boolean"; value: boolean }
+  | { type: "number"; value: number }
+  | { type: "selection"; selectedId: string }
+  | { type: "selections"; selectedIds: string[] }
+  | { type: "photo"; url: string };
+
 // Dynamic data store for step inputs
 export interface SessionData {
   selected_experience_id?: string;
-  [key: string]: unknown;
+  [key: string]: StepInputValue | string | undefined;
 }
 
 export interface Session {

@@ -5,6 +5,7 @@ export type {
   Session,
   SessionState,
   SessionData,
+  StepInputValue,
 } from './types';
 
 // ============================================================================
