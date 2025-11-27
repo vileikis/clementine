@@ -1,6 +1,6 @@
 # Tasks: Responsive Steps
 
-**Input**: Design documents from `/specs/009-responsive-steps/`
+**Input**: Design documents from `/specs/010-responsive-steps/`
 **Prerequisites**: plan.md (required), spec.md (required for user stories), research.md, data-model.md, quickstart.md
 
 **Tests**: Jest unit tests included for ActionBar and StepLayout per plan.md testing strategy.
@@ -25,8 +25,8 @@
 
 **Purpose**: CSS foundation and base responsive utilities
 
-- [ ] T001 Add safe area CSS custom properties to `web/src/app/globals.css`
-- [ ] T002 [P] Export ActionBar from `web/src/components/step-primitives/index.ts`
+- [x] T001 Add safe area CSS custom properties to `web/src/app/globals.css`
+- [x] T002 [P] Export ActionBar from `web/src/components/step-primitives/index.ts`
 
 ---
 
@@ -36,13 +36,13 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T003 Create ActionBar component in `web/src/components/step-primitives/ActionBar.tsx` (mobile fixed, desktop inline)
-- [ ] T004 Refactor StepLayout for responsive container in `web/src/components/step-primitives/StepLayout.tsx` (add action slot, responsive centering)
-- [ ] T005 Update ActionButton with responsive sizing in `web/src/components/step-primitives/ActionButton.tsx`
-- [ ] T006 [P] Verify TextInput has 16px font in `web/src/components/step-primitives/TextInput.tsx`
-- [ ] T007 [P] Verify TextArea has 16px font in `web/src/components/step-primitives/TextArea.tsx`
-- [ ] T008 [P] Verify OptionButton meets 44px touch target in `web/src/components/step-primitives/OptionButton.tsx`
-- [ ] T009 [P] Verify ScaleButton meets 44px touch target in `web/src/components/step-primitives/ScaleButton.tsx`
+- [x] T003 Create ActionBar component in `web/src/components/step-primitives/ActionBar.tsx` (mobile fixed, desktop inline)
+- [x] T004 Refactor StepLayout for responsive container in `web/src/components/step-primitives/StepLayout.tsx` (add action slot, responsive centering)
+- [x] T005 Update ActionButton with responsive sizing in `web/src/components/step-primitives/ActionButton.tsx`
+- [x] T006 [P] Verify TextInput has 16px font in `web/src/components/step-primitives/TextInput.tsx`
+- [x] T007 [P] Verify TextArea has 16px font in `web/src/components/step-primitives/TextArea.tsx`
+- [x] T008 [P] Verify OptionButton meets 44px touch target in `web/src/components/step-primitives/OptionButton.tsx`
+- [x] T009 [P] Verify ScaleButton meets 44px touch target in `web/src/components/step-primitives/ScaleButton.tsx`
 
 **Checkpoint**: All primitives ready - step component updates can now begin
 
@@ -56,17 +56,17 @@
 
 ### Implementation for User Story 1
 
-- [ ] T010 [P] [US1] Update InfoStep with ActionBar pattern in `web/src/features/steps/components/preview/steps/InfoStep.tsx`
-- [ ] T011 [P] [US1] Update ShortTextStep with ActionBar pattern in `web/src/features/steps/components/preview/steps/ShortTextStep.tsx`
-- [ ] T012 [P] [US1] Update LongTextStep with ActionBar pattern in `web/src/features/steps/components/preview/steps/LongTextStep.tsx`
-- [ ] T013 [P] [US1] Update EmailStep with ActionBar pattern in `web/src/features/steps/components/preview/steps/EmailStep.tsx`
-- [ ] T014 [P] [US1] Update YesNoStep with ActionBar pattern in `web/src/features/steps/components/preview/steps/YesNoStep.tsx`
-- [ ] T015 [P] [US1] Update MultipleChoiceStep with ActionBar pattern in `web/src/features/steps/components/preview/steps/MultipleChoiceStep.tsx`
-- [ ] T016 [P] [US1] Update OpinionScaleStep with ActionBar pattern in `web/src/features/steps/components/preview/steps/OpinionScaleStep.tsx`
-- [ ] T017 [P] [US1] Update ExperiencePickerStep with ActionBar pattern in `web/src/features/steps/components/preview/steps/ExperiencePickerStep.tsx`
-- [ ] T018 [P] [US1] Update CaptureStep with ActionBar pattern in `web/src/features/steps/components/preview/steps/CaptureStep.tsx`
-- [ ] T019 [P] [US1] Update ProcessingStep layout for mobile in `web/src/features/steps/components/preview/steps/ProcessingStep.tsx`
-- [ ] T020 [P] [US1] Update RewardStep with ActionBar pattern in `web/src/features/steps/components/preview/steps/RewardStep.tsx`
+- [x] T010 [P] [US1] Update InfoStep with ActionBar pattern in `web/src/features/steps/components/preview/steps/InfoStep.tsx`
+- [x] T011 [P] [US1] Update ShortTextStep with ActionBar pattern in `web/src/features/steps/components/preview/steps/ShortTextStep.tsx`
+- [x] T012 [P] [US1] Update LongTextStep with ActionBar pattern in `web/src/features/steps/components/preview/steps/LongTextStep.tsx`
+- [x] T013 [P] [US1] Update EmailStep with ActionBar pattern in `web/src/features/steps/components/preview/steps/EmailStep.tsx`
+- [x] T014 [P] [US1] Update YesNoStep with ActionBar pattern in `web/src/features/steps/components/preview/steps/YesNoStep.tsx`
+- [x] T015 [P] [US1] Update MultipleChoiceStep with ActionBar pattern in `web/src/features/steps/components/preview/steps/MultipleChoiceStep.tsx`
+- [x] T016 [P] [US1] Update OpinionScaleStep with ActionBar pattern in `web/src/features/steps/components/preview/steps/OpinionScaleStep.tsx`
+- [x] T017 [P] [US1] Update ExperiencePickerStep with ActionBar pattern in `web/src/features/steps/components/preview/steps/ExperiencePickerStep.tsx`
+- [x] T018 [P] [US1] Update CaptureStep with ActionBar pattern in `web/src/features/steps/components/preview/steps/CaptureStep.tsx`
+- [x] T019 [P] [US1] Update ProcessingStep layout for mobile in `web/src/features/steps/components/preview/steps/ProcessingStep.tsx`
+- [x] T020 [P] [US1] Update RewardStep with ActionBar pattern in `web/src/features/steps/components/preview/steps/RewardStep.tsx`
 
 **Checkpoint**: All 11 steps render with fixed bottom CTA on mobile (< 768px)
 
@@ -82,11 +82,11 @@
 
 Desktop layout is handled by the responsive classes added in Phase 3. This phase focuses on verification and refinement:
 
-- [ ] T021 [US2] Verify InfoStep desktop centering in `web/src/features/steps/components/preview/steps/InfoStep.tsx`
-- [ ] T022 [US2] Verify ShortTextStep desktop centering in `web/src/features/steps/components/preview/steps/ShortTextStep.tsx`
-- [ ] T023 [US2] Verify LongTextStep desktop centering in `web/src/features/steps/components/preview/steps/LongTextStep.tsx`
-- [ ] T024 [US2] Verify EmailStep desktop centering in `web/src/features/steps/components/preview/steps/EmailStep.tsx`
-- [ ] T025 [US2] Verify YesNoStep desktop centering in `web/src/features/steps/components/preview/steps/YesNoStep.tsx`
+- [x] T021 [US2] Verify InfoStep desktop centering in `web/src/features/steps/components/preview/steps/InfoStep.tsx`
+- [x] T022 [US2] Verify ShortTextStep desktop centering in `web/src/features/steps/components/preview/steps/ShortTextStep.tsx`
+- [x] T023 [US2] Verify LongTextStep desktop centering in `web/src/features/steps/components/preview/steps/LongTextStep.tsx`
+- [x] T024 [US2] Verify EmailStep desktop centering in `web/src/features/steps/components/preview/steps/EmailStep.tsx`
+- [x] T025 [US2] Verify YesNoStep desktop centering in `web/src/features/steps/components/preview/steps/YesNoStep.tsx`
 
 **Checkpoint**: Simple steps render centered with inline CTA on desktop (>= 1024px)
 
@@ -100,9 +100,9 @@ Desktop layout is handled by the responsive classes added in Phase 3. This phase
 
 ### Implementation for User Story 3
 
-- [ ] T026 [US3] Add responsive columns to MultipleChoiceStep in `web/src/features/steps/components/preview/steps/MultipleChoiceStep.tsx` (mobile: single column, desktop: 2 columns if >4)
-- [ ] T027 [US3] Add responsive button sizing to OpinionScaleStep in `web/src/features/steps/components/preview/steps/OpinionScaleStep.tsx` (mobile: 44px wrap, desktop: 48px no-wrap)
-- [ ] T028 [US3] Add responsive grid to ExperiencePickerStep in `web/src/features/steps/components/preview/steps/ExperiencePickerStep.tsx` (mobile: 2 cols, desktop: 3 cols)
+- [x] T026 [US3] Add responsive columns to MultipleChoiceStep in `web/src/features/steps/components/preview/steps/MultipleChoiceStep.tsx` (mobile: single column, desktop: 2 columns if >4)
+- [x] T027 [US3] Add responsive button sizing to OpinionScaleStep in `web/src/features/steps/components/preview/steps/OpinionScaleStep.tsx` (mobile: 44px wrap, desktop: 48px no-wrap)
+- [x] T028 [US3] Add responsive grid to ExperiencePickerStep in `web/src/features/steps/components/preview/steps/ExperiencePickerStep.tsx` (mobile: 2 cols, desktop: 3 cols)
 
 **Checkpoint**: Component-specific responsive behavior working on mobile and desktop
 
@@ -116,11 +116,11 @@ Desktop layout is handled by the responsive classes added in Phase 3. This phase
 
 ### Implementation for User Story 4
 
-- [ ] T029 [US4] Add responsive spinner sizing to ProcessingStep in `web/src/features/steps/components/preview/steps/ProcessingStep.tsx` (mobile: 48px, desktop: 64px)
-- [ ] T030 [US4] Add responsive progress bar to ProcessingStep in `web/src/features/steps/components/preview/steps/ProcessingStep.tsx` (mobile: 80%, desktop: 60% max 400px)
-- [ ] T031 [US4] Add responsive image sizing to CaptureStep in `web/src/features/steps/components/preview/steps/CaptureStep.tsx` (mobile: 70%, desktop: 50%)
-- [ ] T032 [US4] Add responsive image sizing to RewardStep in `web/src/features/steps/components/preview/steps/RewardStep.tsx` (mobile: 70%, desktop: 50% max 300px)
-- [ ] T033 [US4] Add responsive share buttons to RewardStep in `web/src/features/steps/components/preview/steps/RewardStep.tsx` (mobile: grid, desktop: inline row)
+- [x] T029 [US4] Add responsive spinner sizing to ProcessingStep in `web/src/features/steps/components/preview/steps/ProcessingStep.tsx` (mobile: 48px, desktop: 64px)
+- [x] T030 [US4] Add responsive progress bar to ProcessingStep in `web/src/features/steps/components/preview/steps/ProcessingStep.tsx` (mobile: 80%, desktop: 60% max 400px)
+- [x] T031 [US4] Add responsive image sizing to CaptureStep in `web/src/features/steps/components/preview/steps/CaptureStep.tsx` (mobile: 70%, desktop: 50%)
+- [x] T032 [US4] Add responsive image sizing to RewardStep in `web/src/features/steps/components/preview/steps/RewardStep.tsx` (mobile: 70%, desktop: 50% max 300px)
+- [x] T033 [US4] Add responsive share buttons to RewardStep in `web/src/features/steps/components/preview/steps/RewardStep.tsx` (mobile: grid, desktop: inline row)
 
 **Checkpoint**: Processing and reward steps display correctly sized elements on all viewports
 
@@ -139,8 +139,8 @@ Desktop layout is handled by the responsive classes added in Phase 3. This phase
 
 **Purpose**: Ensure code quality and correctness before merge
 
-- [ ] T036 Run `pnpm lint` and fix all errors/warnings
-- [ ] T037 Run `pnpm type-check` and resolve all TypeScript errors
+- [x] T036 Run `pnpm lint` and fix all errors/warnings
+- [x] T037 Run `pnpm type-check` and resolve all TypeScript errors
 - [ ] T038 Run `pnpm test` and ensure all tests pass
 - [ ] T039 Manual test all 11 step types on mobile (375px) viewport
 - [ ] T040 Manual test all 11 step types on desktop (1920px) viewport

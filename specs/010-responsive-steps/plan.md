@@ -1,7 +1,7 @@
 # Implementation Plan: Responsive Steps
 
-**Branch**: `009-responsive-steps` | **Date**: 2025-11-27 | **Spec**: [spec.md](./spec.md)
-**Input**: Feature specification from `/specs/009-responsive-steps/spec.md`
+**Branch**: `010-responsive-steps` | **Date**: 2025-11-27 | **Spec**: [spec.md](./spec.md)
+**Input**: Feature specification from `/specs/010-responsive-steps/spec.md`
 
 ## Summary
 
@@ -41,7 +41,7 @@ Verify compliance with Clementine Constitution (`.specify/memory/constitution.md
 ### Documentation (this feature)
 
 ```text
-specs/009-responsive-steps/
+specs/010-responsive-steps/
 ├── spec.md              # Feature specification
 ├── plan.md              # This file
 ├── research.md          # Phase 0 output
