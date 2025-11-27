@@ -1,0 +1,6 @@
+<svg width="375" height="500" viewBox="0 0 375 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="375" height="500" fill="#1a1a2e"/>
+  <circle cx="187.5" cy="180" r="70" fill="#374151"/>
+  <ellipse cx="187.5" cy="350" rx="90" ry="100" fill="#374151"/>
+  <text x="187.5" y="470" text-anchor="middle" fill="#6b7280" font-family="system-ui" font-size="14">Preview Photo</text>
+</svg>

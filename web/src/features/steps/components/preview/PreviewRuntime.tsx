@@ -1,18 +1,26 @@
 "use client";
 
 /**
- * Component: StepPreview
+ * Component: PreviewRuntime
  *
- * Renders a live preview of the selected step within a DeviceFrame.
- * Wraps step content with EventThemeProvider to apply the event's theme.
- * Routes to the appropriate step preview component based on step type.
- * Passes mockSession data to step components for realistic preview rendering.
+ * A runtime wrapper that provides mock session context for step previews.
+ * Wraps DeviceFrame with theme and mock data injection.
+ *
+ * Used in the Journey Editor to render step previews with viewport mode support.
  */
 
-import { memo } from "react";
 import { EventThemeProvider } from "@/components/providers/EventThemeProvider";
+import { DeviceFrame } from "./DeviceFrame";
+import type { Step } from "@/features/steps/types";
+import type { EventTheme } from "@/features/events/types";
+import type { Experience } from "@/features/experiences/types";
 import {
-  DeviceFrame,
+  ViewportMode,
+  MockSessionData,
+  DEFAULT_MOCK_SESSION,
+} from "../../types/preview.types";
+
+import {
   InfoStep,
   ShortTextStep,
   LongTextStep,
@@ -24,37 +32,43 @@ import {
   CaptureStep,
   ProcessingStep,
   RewardStep,
-} from "@/features/steps/components/preview";
-import type { Step } from "@/features/steps/types";
-import type { EventTheme } from "@/features/events/types";
-import type { Experience } from "@/features/experiences/types";
-import { DEFAULT_MOCK_SESSION, type MockSessionData } from "@/features/steps/types/preview.types";
+} from "./steps";
 
-interface StepPreviewProps {
+interface PreviewRuntimeProps {
   step: Step;
   theme: EventTheme;
-  experiences: Experience[];
-  mockSession?: MockSessionData;
+  viewportMode: ViewportMode;
+  experiences?: Experience[];
+  mockSession?: Partial<MockSessionData>;
 }
 
-/**
- * Routes to the appropriate step preview component based on step type.
- * Memoized to prevent unnecessary re-renders.
- */
-export const StepPreview = memo(function StepPreview({
+export function PreviewRuntime({
   step,
   theme,
-  experiences,
-  mockSession = DEFAULT_MOCK_SESSION,
-}: StepPreviewProps) {
+  viewportMode,
+  experiences = [],
+  mockSession,
+}: PreviewRuntimeProps) {
+  // Merge provided mock data with defaults
+  const session: MockSessionData = {
+    ...DEFAULT_MOCK_SESSION,
+    ...mockSession,
+  };
+
   return (
     <EventThemeProvider theme={theme}>
-      <DeviceFrame>
-        <StepContent step={step} experiences={experiences} mockSession={mockSession} />
-      </DeviceFrame>
+      <div className="h-full w-full flex justify-center">
+        <DeviceFrame viewportMode={viewportMode}>
+          <StepContent
+            step={step}
+            experiences={experiences}
+            mockSession={session}
+          />
+        </DeviceFrame>
+      </div>
     </EventThemeProvider>
   );
-});
+}
 
 /**
  * Internal component that renders the step content based on type.
@@ -96,7 +110,9 @@ function StepContent({
     default: {
       // TypeScript exhaustive check
       const _exhaustive: never = step;
-      return <PlaceholderStep title="Unknown" type={(_exhaustive as Step).type} />;
+      return (
+        <PlaceholderStep title="Unknown" type={(_exhaustive as Step).type} />
+      );
     }
   }
 }
@@ -109,7 +125,8 @@ function PlaceholderStep({ title, type }: { title: string; type: string }) {
     <div className="flex flex-col items-center justify-center h-full p-4 text-center">
       <div className="text-lg font-medium mb-2">{title}</div>
       <div className="text-sm opacity-60">
-        Preview for &quot;{type}&quot; steps will be available in a future phase.
+        Preview for &quot;{type}&quot; steps will be available in a future
+        phase.
       </div>
     </div>
   );
