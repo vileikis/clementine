@@ -1,2 +1,12 @@
 export { BaseStepEditor } from "./BaseStepEditor";
 export { InfoStepEditor } from "./InfoStepEditor";
+export { ExperiencePickerEditor } from "./ExperiencePickerEditor";
+export { CaptureStepEditor } from "./CaptureStepEditor";
+export { ShortTextEditor } from "./ShortTextEditor";
+export { LongTextEditor } from "./LongTextEditor";
+export { MultipleChoiceEditor } from "./MultipleChoiceEditor";
+export { YesNoEditor } from "./YesNoEditor";
+export { OpinionScaleEditor } from "./OpinionScaleEditor";
+export { EmailEditor } from "./EmailEditor";
+export { ProcessingStepEditor } from "./ProcessingStepEditor";
+export { RewardStepEditor } from "./RewardStepEditor";

@@ -92,18 +92,18 @@
 
 ### Implementation for User Story 2
 
-- [ ] T033 [P] [US2] Create SimulatorScreen in `web/src/features/steps/components/preview/SimulatorScreen.tsx`
-- [ ] T034 [P] [US2] Create InfoStep preview in `web/src/features/steps/components/preview/steps/InfoStep.tsx`
-- [ ] T035 [P] [US2] Create ShortTextStep preview in `web/src/features/steps/components/preview/steps/ShortTextStep.tsx`
-- [ ] T036 [P] [US2] Create LongTextStep preview in `web/src/features/steps/components/preview/steps/LongTextStep.tsx`
-- [ ] T037 [P] [US2] Create MultipleChoiceStep preview in `web/src/features/steps/components/preview/steps/MultipleChoiceStep.tsx`
-- [ ] T038 [P] [US2] Create YesNoStep preview in `web/src/features/steps/components/preview/steps/YesNoStep.tsx`
-- [ ] T039 [P] [US2] Create OpinionScaleStep preview in `web/src/features/steps/components/preview/steps/OpinionScaleStep.tsx`
-- [ ] T040 [P] [US2] Create EmailStep preview in `web/src/features/steps/components/preview/steps/EmailStep.tsx`
-- [ ] T041 [US2] Create step previews barrel export in `web/src/features/steps/components/preview/steps/index.ts`
-- [ ] T042 [US2] Create preview barrel export in `web/src/features/steps/components/preview/index.ts`
-- [ ] T043 [US2] Create StepPreview component in `web/src/features/journeys/components/editor/StepPreview.tsx`
-- [ ] T044 [US2] Integrate StepPreview into JourneyEditor middle panel
+- [X] T033 [P] [US2] Create SimulatorScreen in `web/src/features/steps/components/preview/SimulatorScreen.tsx`
+- [X] T034 [P] [US2] Create InfoStep preview in `web/src/features/steps/components/preview/steps/InfoStep.tsx`
+- [X] T035 [P] [US2] Create ShortTextStep preview in `web/src/features/steps/components/preview/steps/ShortTextStep.tsx`
+- [X] T036 [P] [US2] Create LongTextStep preview in `web/src/features/steps/components/preview/steps/LongTextStep.tsx`
+- [X] T037 [P] [US2] Create MultipleChoiceStep preview in `web/src/features/steps/components/preview/steps/MultipleChoiceStep.tsx`
+- [X] T038 [P] [US2] Create YesNoStep preview in `web/src/features/steps/components/preview/steps/YesNoStep.tsx`
+- [X] T039 [P] [US2] Create OpinionScaleStep preview in `web/src/features/steps/components/preview/steps/OpinionScaleStep.tsx`
+- [X] T040 [P] [US2] Create EmailStep preview in `web/src/features/steps/components/preview/steps/EmailStep.tsx`
+- [X] T041 [US2] Create step previews barrel export in `web/src/features/steps/components/preview/steps/index.ts`
+- [X] T042 [US2] Create preview barrel export in `web/src/features/steps/components/preview/index.ts`
+- [X] T043 [US2] Create StepPreview component in `web/src/features/journeys/components/editor/StepPreview.tsx`
+- [X] T044 [US2] Integrate StepPreview into JourneyEditor middle panel
 
 **Checkpoint**: User Story 2 complete - steps preview with theme applied
 
@@ -117,10 +117,10 @@
 
 ### Implementation for User Story 3
 
-- [ ] T045 [US3] Update useSelectedStep hook for bidirectional URL sync in `web/src/features/journeys/hooks/useSelectedStep.ts`
-- [ ] T046 [US3] Add auto-select first step logic when no stepId in URL
-- [ ] T047 [US3] Add URL update on step selection in StepList
-- [ ] T048 [US3] Handle deleted step - auto-select next/previous
+- [X] T045 [US3] Update useSelectedStep hook for bidirectional URL sync in `web/src/features/journeys/hooks/useSelectedStep.ts`
+- [X] T046 [US3] Add auto-select first step logic when no stepId in URL
+- [X] T047 [US3] Add URL update on step selection in StepList
+- [X] T048 [US3] Handle deleted step - auto-select next/previous
 
 **Checkpoint**: User Story 3 complete - deep linking works correctly
 
@@ -134,11 +134,11 @@
 
 ### Implementation for User Story 4
 
-- [ ] T049 [P] [US4] Create ExperiencePickerEditor in `web/src/features/steps/components/editors/ExperiencePickerEditor.tsx`
-- [ ] T050 [P] [US4] Create ExperiencePickerStep preview in `web/src/features/steps/components/preview/steps/ExperiencePickerStep.tsx`
-- [ ] T051 [US4] Add ExperiencePickerEditor to step editors barrel export
-- [ ] T052 [US4] Add ExperiencePickerStep to step previews barrel export
-- [ ] T053 [US4] Update StepEditor to route to ExperiencePickerEditor
+- [X] T049 [P] [US4] Create ExperiencePickerEditor in `web/src/features/steps/components/editors/ExperiencePickerEditor.tsx`
+- [X] T050 [P] [US4] Create ExperiencePickerStep preview in `web/src/features/steps/components/preview/steps/ExperiencePickerStep.tsx`
+- [X] T051 [US4] Add ExperiencePickerEditor to step editors barrel export
+- [X] T052 [US4] Add ExperiencePickerStep to step previews barrel export
+- [X] T053 [US4] Update StepEditor to route to ExperiencePickerEditor
 
 **Checkpoint**: User Story 4 complete - experience picker fully configurable
 
@@ -152,11 +152,11 @@
 
 ### Implementation for User Story 5
 
-- [ ] T054 [P] [US5] Create CaptureStepEditor in `web/src/features/steps/components/editors/CaptureStepEditor.tsx`
-- [ ] T055 [P] [US5] Create CaptureStep preview in `web/src/features/steps/components/preview/steps/CaptureStep.tsx`
-- [ ] T056 [US5] Add CaptureStepEditor to step editors barrel export
-- [ ] T057 [US5] Add CaptureStep to step previews barrel export
-- [ ] T058 [US5] Update StepEditor to route to CaptureStepEditor
+- [X] T054 [P] [US5] Create CaptureStepEditor in `web/src/features/steps/components/editors/CaptureStepEditor.tsx`
+- [X] T055 [P] [US5] Create CaptureStep preview in `web/src/features/steps/components/preview/steps/CaptureStep.tsx`
+- [X] T056 [US5] Add CaptureStepEditor to step editors barrel export
+- [X] T057 [US5] Add CaptureStep to step previews barrel export
+- [X] T058 [US5] Update StepEditor to route to CaptureStepEditor
 
 **Checkpoint**: User Story 5 complete - capture step fully configurable
 
@@ -170,14 +170,14 @@
 
 ### Implementation for User Story 6
 
-- [ ] T059 [P] [US6] Create ShortTextEditor in `web/src/features/steps/components/editors/ShortTextEditor.tsx`
-- [ ] T060 [P] [US6] Create LongTextEditor in `web/src/features/steps/components/editors/LongTextEditor.tsx`
-- [ ] T061 [P] [US6] Create MultipleChoiceEditor in `web/src/features/steps/components/editors/MultipleChoiceEditor.tsx`
-- [ ] T062 [P] [US6] Create YesNoEditor in `web/src/features/steps/components/editors/YesNoEditor.tsx`
-- [ ] T063 [P] [US6] Create OpinionScaleEditor in `web/src/features/steps/components/editors/OpinionScaleEditor.tsx`
-- [ ] T064 [P] [US6] Create EmailEditor in `web/src/features/steps/components/editors/EmailEditor.tsx`
-- [ ] T065 [US6] Add all input editors to step editors barrel export
-- [ ] T066 [US6] Update StepEditor to route to all input editors
+- [X] T059 [P] [US6] Create ShortTextEditor in `web/src/features/steps/components/editors/ShortTextEditor.tsx`
+- [X] T060 [P] [US6] Create LongTextEditor in `web/src/features/steps/components/editors/LongTextEditor.tsx`
+- [X] T061 [P] [US6] Create MultipleChoiceEditor in `web/src/features/steps/components/editors/MultipleChoiceEditor.tsx`
+- [X] T062 [P] [US6] Create YesNoEditor in `web/src/features/steps/components/editors/YesNoEditor.tsx`
+- [X] T063 [P] [US6] Create OpinionScaleEditor in `web/src/features/steps/components/editors/OpinionScaleEditor.tsx`
+- [X] T064 [P] [US6] Create EmailEditor in `web/src/features/steps/components/editors/EmailEditor.tsx`
+- [X] T065 [US6] Add all input editors to step editors barrel export
+- [X] T066 [US6] Update StepEditor to route to all input editors
 
 **Checkpoint**: User Story 6 complete - all input steps fully configurable
 
@@ -191,13 +191,13 @@
 
 ### Implementation for User Story 7
 
-- [ ] T067 [P] [US7] Create ProcessingStepEditor in `web/src/features/steps/components/editors/ProcessingStepEditor.tsx`
-- [ ] T068 [P] [US7] Create RewardStepEditor in `web/src/features/steps/components/editors/RewardStepEditor.tsx`
-- [ ] T069 [P] [US7] Create ProcessingStep preview in `web/src/features/steps/components/preview/steps/ProcessingStep.tsx`
-- [ ] T070 [P] [US7] Create RewardStep preview in `web/src/features/steps/components/preview/steps/RewardStep.tsx`
-- [ ] T071 [US7] Add completion editors to step editors barrel export
-- [ ] T072 [US7] Add completion previews to step previews barrel export
-- [ ] T073 [US7] Update StepEditor to route to completion editors
+- [X] T067 [P] [US7] Create ProcessingStepEditor in `web/src/features/steps/components/editors/ProcessingStepEditor.tsx`
+- [X] T068 [P] [US7] Create RewardStepEditor in `web/src/features/steps/components/editors/RewardStepEditor.tsx`
+- [X] T069 [P] [US7] Create ProcessingStep preview in `web/src/features/steps/components/preview/steps/ProcessingStep.tsx`
+- [X] T070 [P] [US7] Create RewardStep preview in `web/src/features/steps/components/preview/steps/RewardStep.tsx`
+- [X] T071 [US7] Add completion editors to step editors barrel export
+- [X] T072 [US7] Add completion previews to step previews barrel export
+- [X] T073 [US7] Update StepEditor to route to completion editors
 
 **Checkpoint**: User Story 7 complete - all completion steps fully configurable
 
@@ -207,24 +207,24 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T074 [P] Add empty state for journey with no steps in StepList
-- [ ] T075 [P] Add keyboard shortcuts (Cmd+S save, arrows navigate, Delete remove)
-- [ ] T076 [P] Add duplicateStepAction to `web/src/features/steps/actions/steps.ts`
-- [ ] T077 [P] Add duplicate step functionality to StepList context menu
-- [ ] T078 [P] Handle edge case: step references deleted experience (warning indicator)
-- [ ] T079 [P] Handle edge case: event has no experiences (warning in picker/capture)
-- [ ] T080 Ensure responsive layout works on mobile (panels stack vertically)
-- [ ] T081 Ensure touch targets are ≥44x44px on mobile
+- [X] T074 [P] Add empty state for journey with no steps in StepList
+- [X] T075 [P] Add keyboard shortcuts (Cmd+S save, arrows navigate, Delete remove)
+- [X] T076 [P] Add duplicateStepAction to `web/src/features/steps/actions/steps.ts`
+- [X] T077 [P] Add duplicate step functionality to StepList context menu
+- [X] T078 [P] Handle edge case: step references deleted experience (warning indicator)
+- [X] T079 [P] Handle edge case: event has no experiences (warning in picker/capture)
+- [X] T080 Ensure responsive layout works on mobile (panels stack vertically)
+- [X] T081 Ensure touch targets are ≥44x44px on mobile
 
 ### Validation Loop (REQUIRED - Constitution Principle V)
 
 **Purpose**: Ensure code quality and correctness before merge
 
-- [ ] T082 Run `pnpm lint` and fix all errors/warnings
-- [ ] T083 Run `pnpm type-check` and resolve all TypeScript errors
-- [ ] T084 Run `pnpm test` and ensure all tests pass
-- [ ] T085 Verify feature in local dev server (`pnpm dev`)
-- [ ] T086 Commit only after validation loop passes cleanly
+- [X] T082 Run `pnpm lint` and fix all errors/warnings
+- [X] T083 Run `pnpm type-check` and resolve all TypeScript errors
+- [X] T084 Run `pnpm test` and ensure all tests pass
+- [X] T085 Verify feature in local dev server (`pnpm dev`)
+- [X] T086 Commit only after validation loop passes cleanly
 
 ---
 

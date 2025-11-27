@@ -46,27 +46,17 @@ export const infoStepSchema = stepBaseSchema.extend({
 });
 
 /**
- * Experience picker option schema
- */
-const experiencePickerOptionSchema = z.object({
-  id: z.string(),
-  experienceId: z.string(),
-  label: z.string().min(1).max(STEP_CONSTANTS.MAX_OPTION_LABEL_LENGTH),
-  imageUrl: z.string().url().nullish(),
-});
-
-/**
  * Experience picker step schema
+ * Stores only experienceIds - display data is resolved at runtime from experiences
+ * Uses passthrough() to allow old data with 'options' field to still parse
  */
 export const experiencePickerStepSchema = stepBaseSchema.extend({
   type: z.literal("experience-picker"),
   config: z.object({
-    layout: z.enum(["grid", "list", "carousel"]),
-    variable: variableNameSchema,
-    options: z
-      .array(experiencePickerOptionSchema)
-      .max(STEP_CONSTANTS.MAX_EXPERIENCE_OPTIONS),
-  }),
+    layout: z.enum(["grid", "list", "carousel"]).default("grid"),
+    variable: variableNameSchema.default("selected_experience_id"),
+    experienceIds: z.array(z.string()).max(STEP_CONSTANTS.MAX_EXPERIENCE_OPTIONS).default([]),
+  }).passthrough(),
 });
 
 /**
