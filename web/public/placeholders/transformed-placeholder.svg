@@ -1,0 +1,12 @@
+<svg width="375" height="500" viewBox="0 0 375 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4f46e5"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+  </defs>
+  <rect width="375" height="500" fill="url(#bg)"/>
+  <circle cx="187.5" cy="180" r="70" fill="rgba(255,255,255,0.2)"/>
+  <ellipse cx="187.5" cy="350" rx="90" ry="100" fill="rgba(255,255,255,0.2)"/>
+  <text x="187.5" y="470" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-family="system-ui" font-size="14">AI Transformed</text>
+</svg>
