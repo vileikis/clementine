@@ -28,7 +28,7 @@ export function PlaybackMode({
   initialViewport = "mobile",
   onExit,
 }: PlaybackModeProps) {
-  const { state, actions } = useJourneyPlayback(onExit);
+  const { state, actions, mockSession } = useJourneyPlayback(onExit);
   const [viewportMode, setViewportMode] = useState<ViewportMode>(initialViewport);
 
   // Initialize playback when component mounts
@@ -63,6 +63,9 @@ export function PlaybackMode({
               theme={theme}
               viewportMode={viewportMode}
               experiences={experiences}
+              mode="playback"
+              playbackSession={mockSession.session}
+              onInputChange={mockSession.updateInput}
             />
           ) : (
             <JourneyCompleteState />

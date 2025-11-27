@@ -3,8 +3,9 @@
 /**
  * Preview: OpinionScaleStep
  *
- * Read-only preview for Opinion Scale step type.
+ * Preview for Opinion Scale step type.
  * Displays title, description, scale buttons, min/max labels, and CTA button.
+ * Supports interactive mode for playback with selection persistence.
  */
 
 import { StepLayout, ActionButton, ScaleButton } from "@/components/step-primitives";
@@ -13,9 +14,20 @@ import type { StepOpinionScale } from "@/features/steps/types";
 
 interface OpinionScaleStepProps {
   step: StepOpinionScale;
+  /** Enable interactive selection (playback mode) */
+  isInteractive?: boolean;
+  /** Currently selected scale value */
+  selectedValue?: number;
+  /** Callback when selection changes */
+  onValueChange?: (value: number) => void;
 }
 
-export function OpinionScaleStep({ step }: OpinionScaleStepProps) {
+export function OpinionScaleStep({
+  step,
+  isInteractive = false,
+  selectedValue,
+  onValueChange,
+}: OpinionScaleStepProps) {
   const { theme } = useEventTheme();
   const { scaleMin, scaleMax, minLabel, maxLabel } = step.config;
 
@@ -24,6 +36,12 @@ export function OpinionScaleStep({ step }: OpinionScaleStepProps) {
   for (let i = scaleMin; i <= scaleMax; i++) {
     scaleValues.push(i);
   }
+
+  const handleClick = (value: number) => {
+    if (isInteractive) {
+      onValueChange?.(value);
+    }
+  };
 
   return (
     <StepLayout mediaUrl={step.mediaUrl}>
@@ -38,7 +56,12 @@ export function OpinionScaleStep({ step }: OpinionScaleStepProps) {
         {/* Scale buttons */}
         <div className="flex flex-wrap justify-between gap-2">
           {scaleValues.map((value) => (
-            <ScaleButton key={value} value={value} />
+            <ScaleButton
+              key={value}
+              value={value}
+              selected={selectedValue === value}
+              onClick={() => handleClick(value)}
+            />
           ))}
         </div>
 

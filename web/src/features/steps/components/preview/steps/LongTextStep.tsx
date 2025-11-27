@@ -3,8 +3,9 @@
 /**
  * Preview: LongTextStep
  *
- * Read-only preview for Long Text input step type.
+ * Preview for Long Text input step type.
  * Displays title, description, a textarea field, and CTA button.
+ * Supports interactive mode for playback with value persistence.
  */
 
 import { StepLayout, ActionButton, TextArea } from "@/components/step-primitives";
@@ -12,9 +13,20 @@ import type { StepLongText } from "@/features/steps/types";
 
 interface LongTextStepProps {
   step: StepLongText;
+  /** Enable interactive input (playback mode) */
+  isInteractive?: boolean;
+  /** Current input value (controlled) */
+  value?: string;
+  /** Callback when value changes */
+  onValueChange?: (value: string) => void;
 }
 
-export function LongTextStep({ step }: LongTextStepProps) {
+export function LongTextStep({
+  step,
+  isInteractive = false,
+  value = "",
+  onValueChange,
+}: LongTextStepProps) {
   return (
     <StepLayout mediaUrl={step.mediaUrl}>
       <div className="flex-1">
@@ -30,6 +42,8 @@ export function LongTextStep({ step }: LongTextStepProps) {
           maxLength={step.config.maxLength}
           required={step.config.required}
           rows={4}
+          value={isInteractive ? value : undefined}
+          onChange={isInteractive ? onValueChange : undefined}
         />
       </div>
 
