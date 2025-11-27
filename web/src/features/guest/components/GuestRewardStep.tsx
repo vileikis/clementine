@@ -204,13 +204,13 @@ export function GuestRewardStep({
   // Transform still in progress - show loading with real-time updates
   if (!session.resultImagePath && session.state === "transforming") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black px-4">
+      <div className="min-h-screen bg-transparent flex items-center justify-center px-6">
         <div className="max-w-md w-full text-center space-y-6">
-          <div className="inline-block h-16 w-16 animate-spin rounded-full border-4 border-solid border-white border-r-transparent"></div>
-          <h2 className="text-2xl font-bold text-white">
+          <div className="inline-block h-16 w-16 animate-spin rounded-full border-4 border-solid border-current border-r-transparent opacity-80"></div>
+          <h2 className="text-2xl font-bold">
             Creating Your Result
           </h2>
-          <p className="text-gray-300">
+          <p className="text-sm opacity-80">
             Your AI transformation is in progress. This will be ready in just a moment...
           </p>
         </div>
@@ -249,10 +249,10 @@ export function GuestRewardStep({
           <p className="text-sm opacity-80 mb-4">{step.description}</p>
         )}
 
-        {/* Result Image - responsive sizing to match preview */}
+        {/* Result Image - larger on desktop for better viewing */}
         <div className="flex-1 flex items-center justify-center py-4">
           <div
-            className="w-[70%] lg:w-[50%] lg:max-w-[300px] aspect-[3/4] rounded-lg overflow-hidden relative shadow-lg"
+            className="w-[85%] sm:w-[75%] lg:w-[60%] lg:max-w-[500px] aspect-[3/4] rounded-lg overflow-hidden relative shadow-lg"
           >
             <Image
               src={session.resultImagePath}
