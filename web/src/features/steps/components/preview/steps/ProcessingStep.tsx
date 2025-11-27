@@ -16,9 +16,17 @@ import type { StepProcessing } from "@/features/steps/types";
 
 interface ProcessingStepProps {
   step: StepProcessing;
+  /** Enable interactive mode (playback) */
+  isInteractive?: boolean;
+  /** Callback when step is complete (triggers auto-advance in playback) */
+  onComplete?: () => void;
 }
 
-export function ProcessingStep({ step }: ProcessingStepProps) {
+export function ProcessingStep({
+  step,
+  isInteractive = false,
+  onComplete,
+}: ProcessingStepProps) {
   const { buttonBgColor } = useEventTheme();
   const messages = step.config?.messages ?? [
     "Creating your image...",
@@ -53,6 +61,17 @@ export function ProcessingStep({ step }: ProcessingStepProps) {
 
     return () => clearInterval(interval);
   }, [estimatedDuration]);
+
+  // Auto-advance in interactive/playback mode after 2 seconds
+  useEffect(() => {
+    if (!isInteractive || !onComplete) return;
+
+    const timer = setTimeout(() => {
+      onComplete();
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [isInteractive, onComplete]);
 
   return (
     <StepLayout mediaUrl={step.mediaUrl}>

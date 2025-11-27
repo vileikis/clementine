@@ -18,6 +18,7 @@ import { useJourneyPlayback } from "../../hooks/useJourneyPlayback";
 import { PreviewNavigationBar } from "./PreviewNavigationBar";
 import { PreviewRuntime } from "./PreviewRuntime";
 import { ViewSwitcher } from "./ViewSwitcher";
+import { StepErrorBoundary } from "./StepErrorBoundary";
 import type { PlaybackModeProps } from "../../types/playback.types";
 import type { ViewportMode } from "../../types/preview.types";
 
@@ -58,16 +59,23 @@ export function PlaybackMode({
           {steps.length === 0 ? (
             <EmptyJourneyState />
           ) : currentStep ? (
-            <PreviewRuntime
-              step={currentStep}
-              theme={theme}
-              viewportMode={viewportMode}
-              experiences={experiences}
-              mode="playback"
-              playbackSession={mockSession.session}
-              onInputChange={mockSession.updateInput}
-              onCtaClick={actions.next}
-            />
+            <StepErrorBoundary
+              key={currentStep.id}
+              stepId={currentStep.id}
+              stepType={currentStep.type}
+            >
+              <PreviewRuntime
+                step={currentStep}
+                theme={theme}
+                viewportMode={viewportMode}
+                experiences={experiences}
+                mode="playback"
+                playbackSession={mockSession.session}
+                onInputChange={mockSession.updateInput}
+                onCtaClick={actions.next}
+                onStepComplete={actions.handleStepComplete}
+              />
+            </StepErrorBoundary>
           ) : (
             <JourneyCompleteState />
           )}
