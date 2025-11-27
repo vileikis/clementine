@@ -11,11 +11,24 @@ export { GuestFlowContainer } from "./components/GuestFlowContainer";
 export { ResultViewer } from "./components/ResultViewer";
 export { RetakeButton } from "./components/RetakeButton";
 
+// Journey Runtime Components (Phase 3)
+export { JourneyGuestContainer } from "./components/JourneyGuestContainer";
+export { JourneyStepRenderer } from "./components/JourneyStepRenderer";
+export { GuestCaptureStep } from "./components/GuestCaptureStep";
+export { GuestProcessingStep } from "./components/GuestProcessingStep";
+export { GuestRewardStep } from "./components/GuestRewardStep";
+
+// Error Handling Components (Phase 5)
+export { JourneyErrorBoundary } from "./components/JourneyErrorBoundary";
+export { CameraPermissionDenied } from "./components/CameraPermissionDenied";
+export { EventUnavailableScreen } from "./components/EventUnavailableScreen";
+
 // ============================================================================
 // Hooks - Client-side only
 // ============================================================================
 export { useCamera } from "./hooks/useCamera";
 export { useGuestFlow } from "./hooks/useGuestFlow";
+export { useJourneyRuntime } from "./hooks/useJourneyRuntime";
 
 // ============================================================================
 // Utilities - Client-side camera capture
