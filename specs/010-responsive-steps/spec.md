@@ -1,6 +1,6 @@
 # Feature Specification: Responsive Steps
 
-**Feature Branch**: `009-responsive-steps`
+**Feature Branch**: `010-responsive-steps`
 **Created**: 2025-11-27
 **Status**: Draft
 **Input**: Make the Steps feature (`web/src/features/steps/`) fully responsive to render appropriately on both mobile and desktop devices with distinct but cohesive user experiences optimized for each platform.
