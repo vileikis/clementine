@@ -7,6 +7,7 @@ interface UseCameraReturn {
   error: string | null
   videoRef: React.RefObject<HTMLVideoElement | null>
   isLoading: boolean
+  requestPermission: () => void
 }
 
 /**
@@ -17,7 +18,13 @@ export function useCamera(): UseCameraReturn {
   const [stream, setStream] = useState<MediaStream | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [retryTrigger, setRetryTrigger] = useState(0)
   const videoRef = useRef<HTMLVideoElement>(null)
+
+  // Expose requestPermission to allow manual retry
+  const requestPermission = () => {
+    setRetryTrigger((prev) => prev + 1)
+  }
 
   // Request camera access
   useEffect(() => {
@@ -86,7 +93,7 @@ export function useCamera(): UseCameraReturn {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [retryTrigger])
 
   // Attach stream to video element when stream or ref changes
   useEffect(() => {
@@ -109,5 +116,5 @@ export function useCamera(): UseCameraReturn {
     }
   }, [stream])
 
-  return { stream, error, videoRef, isLoading }
+  return { stream, error, videoRef, isLoading, requestPermission }
 }

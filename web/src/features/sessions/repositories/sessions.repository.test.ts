@@ -1,11 +1,14 @@
 import { db } from "@/lib/firebase/admin";
-import type { Session } from "../types/session.types";
+import type { Session } from "../types";
 import {
   startSession,
   saveCapture,
   updateSessionState,
   getSession,
-} from "./repository";
+  startJourneySession,
+  updateStepIndex,
+  saveStepData,
+} from "./sessions.repository";
 
 describe("Sessions Repository", () => {
   const mockDb = db as unknown as {
@@ -328,6 +331,151 @@ describe("Sessions Repository", () => {
       });
 
       await expect(getSession("event-123", "session-456")).rejects.toThrow();
+    });
+  });
+
+  // ============================================================================
+  // Tests for new journey support functions
+  // ============================================================================
+
+  describe("startJourneySession", () => {
+    it("creates a new session with journey context", async () => {
+      const mockEventDoc = {
+        exists: true,
+      };
+
+      const mockSessionRef = {
+        id: "session-789",
+        set: jest.fn(),
+      };
+
+      const mockSessionCollection = {
+        doc: jest.fn().mockReturnValue(mockSessionRef),
+      };
+
+      const mockEventRef = {
+        get: jest.fn().mockResolvedValue(mockEventDoc),
+        collection: jest.fn().mockReturnValue(mockSessionCollection),
+      };
+
+      mockDb.collection.mockReturnValue({
+        doc: jest.fn().mockReturnValue(mockEventRef),
+      });
+
+      const sessionId = await startJourneySession("event-123", "journey-456");
+
+      expect(sessionId).toBe("session-789");
+
+      const sessionData = mockSessionRef.set.mock.calls[0][0] as Session;
+      expect(sessionData).toMatchObject({
+        id: "session-789",
+        eventId: "event-123",
+        journeyId: "journey-456",
+        currentStepIndex: 0,
+        data: {},
+        state: "created",
+      });
+    });
+
+    it("throws error when event does not exist", async () => {
+      const mockEventDoc = {
+        exists: false,
+      };
+
+      mockDb.collection.mockReturnValue({
+        doc: jest.fn().mockReturnValue({
+          get: jest.fn().mockResolvedValue(mockEventDoc),
+        }),
+      });
+
+      await expect(startJourneySession("nonexistent", "journey-456")).rejects.toThrow(
+        "Event not found"
+      );
+    });
+  });
+
+  describe("updateStepIndex", () => {
+    it("updates the current step index", async () => {
+      const mockUpdate = jest.fn();
+
+      const mockSessionRef = {
+        update: mockUpdate,
+      };
+
+      const mockSessionCollection = {
+        doc: jest.fn().mockReturnValue(mockSessionRef),
+      };
+
+      const mockEventRef = {
+        collection: jest.fn().mockReturnValue(mockSessionCollection),
+      };
+
+      mockDb.collection.mockReturnValue({
+        doc: jest.fn().mockReturnValue(mockEventRef),
+      });
+
+      await updateStepIndex("event-123", "session-456", 3);
+
+      expect(mockUpdate).toHaveBeenCalledWith({
+        currentStepIndex: 3,
+        updatedAt: expect.any(Number),
+      });
+    });
+  });
+
+  describe("saveStepData", () => {
+    it("saves data for a specific key", async () => {
+      const mockUpdate = jest.fn();
+
+      const mockSessionRef = {
+        update: mockUpdate,
+      };
+
+      const mockSessionCollection = {
+        doc: jest.fn().mockReturnValue(mockSessionRef),
+      };
+
+      const mockEventRef = {
+        collection: jest.fn().mockReturnValue(mockSessionCollection),
+      };
+
+      mockDb.collection.mockReturnValue({
+        doc: jest.fn().mockReturnValue(mockEventRef),
+      });
+
+      await saveStepData("event-123", "session-456", "selected_experience_id", "exp-001");
+
+      expect(mockUpdate).toHaveBeenCalledWith({
+        "data.selected_experience_id": "exp-001",
+        updatedAt: expect.any(Number),
+      });
+    });
+
+    it("saves complex object data", async () => {
+      const mockUpdate = jest.fn();
+
+      const mockSessionRef = {
+        update: mockUpdate,
+      };
+
+      const mockSessionCollection = {
+        doc: jest.fn().mockReturnValue(mockSessionRef),
+      };
+
+      const mockEventRef = {
+        collection: jest.fn().mockReturnValue(mockSessionCollection),
+      };
+
+      mockDb.collection.mockReturnValue({
+        doc: jest.fn().mockReturnValue(mockEventRef),
+      });
+
+      await saveStepData("event-123", "session-456", "form_response", { email: "test@example.com", name: "Test User" });
+
+      expect(mockUpdate).toHaveBeenCalledWith({
+        "data.form_response": { email: "test@example.com", name: "Test User" },
+        updatedAt: expect.any(Number),
+      });
     });
   });
 });

@@ -35,6 +35,7 @@ function validateImageFile(
 /**
  * Uploads guest input photo to Storage
  * Path: events/{eventId}/sessions/{sessionId}/input.jpg
+ * Returns: Public download URL for instant rendering (per Firebase standards)
  */
 export async function uploadInputImage(
   eventId: string,
@@ -53,12 +54,17 @@ export async function uploadInputImage(
     contentType: "image/jpeg",
   });
 
-  return path;
+  // Make file publicly accessible and return the public URL
+  await blob.makePublic();
+  const publicUrl = `https://storage.googleapis.com/${storage.name}/${path}`;
+
+  return publicUrl;
 }
 
 /**
  * Uploads AI-transformed result image to Storage
  * Path: events/{eventId}/sessions/{sessionId}/result.jpg
+ * Returns: Public download URL for instant rendering (per Firebase standards)
  */
 export async function uploadResultImage(
   eventId: string,
@@ -72,13 +78,18 @@ export async function uploadResultImage(
     contentType: "image/jpeg",
   });
 
-  return path;
+  // Make file publicly accessible and return the public URL
+  await blob.makePublic();
+  const publicUrl = `https://storage.googleapis.com/${storage.name}/${path}`;
+
+  return publicUrl;
 }
 
 /**
  * Copies input image to result location for passthrough mode (no AI transformation)
  * Used when AI transformation is disabled or prompt is empty/null
  * Path: events/{eventId}/sessions/{sessionId}/input.jpg → events/{eventId}/sessions/{sessionId}/result.jpg
+ * Returns: Public download URL for instant rendering (per Firebase standards)
  */
 export async function copyImageToResult(
   inputPath: string,
@@ -95,7 +106,11 @@ export async function copyImageToResult(
     contentType: "image/jpeg",
   });
 
-  return resultPath;
+  // Make file publicly accessible and return the public URL
+  await resultFile.makePublic();
+  const publicUrl = `https://storage.googleapis.com/${storage.name}/${resultPath}`;
+
+  return publicUrl;
 }
 
 /**
