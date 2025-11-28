@@ -199,12 +199,9 @@ export async function triggerTransformAction(
       inputImageUrl,
       model: aiConfig.model ?? undefined,
       brandColor: event.theme?.primaryColor,
+      aspectRatio: aiConfig.aspectRatio || "1:1",
+      referenceImageUrls: aiConfig.referenceImageUrls || [],
     };
-
-    // Add reference image if available
-    if (aiConfig.referenceImageUrls && aiConfig.referenceImageUrls.length > 0) {
-      transformParams.referenceImageUrl = aiConfig.referenceImageUrls[0];
-    }
 
     // Call AI provider
     const aiClient = getAIClient();

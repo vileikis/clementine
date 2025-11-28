@@ -1,10 +1,12 @@
 export interface TransformParams {
   prompt: string;
   inputImageUrl: string;
-  referenceImageUrl?: string;
+  referenceImageUrls?: string[];
   brandColor?: string;
   /** AI model to use for generation (e.g., 'gemini-2.5-flash-image', 'gemini-3-pro-image-preview') */
   model?: string;
+  /** Aspect ratio for generated image (e.g., '1:1', '16:9', '3:4'). Defaults to '1:1' if not specified. */
+  aspectRatio?: string;
 }
 
 // AI provider configuration (read from env)
