@@ -81,7 +81,7 @@ const gifCaptureConfigSchema = z.object({
 const aiPhotoConfigSchema = z.object({
   enabled: z.boolean(),
   model: z.string().nullable().optional(), // e.g., "flux", "stable-diffusion-xl"
-  prompt: z.string().max(600).nullable().optional(),
+  prompt: z.string().max(1000).nullable().optional(),
   referenceImageUrls: z.array(z.string().url()).max(5).nullable().optional(), // Renamed from referenceImagePaths
   aspectRatio: aspectRatioSchema.optional(),
 });
@@ -90,7 +90,7 @@ const aiPhotoConfigSchema = z.object({
 const aiVideoConfigSchema = z.object({
   enabled: z.boolean(),
   model: z.string().nullable().optional(), // e.g., "kling-video", "runway"
-  prompt: z.string().max(600).nullable().optional(),
+  prompt: z.string().max(1000).nullable().optional(),
   referenceImageUrls: z.array(z.string().url()).max(5).nullable().optional(),
   aspectRatio: aspectRatioSchema.optional(),
   duration: z.number().int().min(1).max(60).nullable().optional(), // Output duration in seconds
