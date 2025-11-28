@@ -5,6 +5,9 @@ export class MockProvider implements AIClient {
   async generateImage(params: TransformParams): Promise<Buffer> {
     console.log('[Mock AI] Starting mock transform:', {
       prompt: params.prompt.substring(0, 50) + '...',
+      model: params.model,
+      aspectRatio: params.aspectRatio,
+      referenceImageCount: params.referenceImageUrls?.length || 0,
     });
 
     // Simulate API processing time (3-5 seconds)

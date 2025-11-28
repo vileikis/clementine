@@ -2,6 +2,33 @@ import { ContentListUnion, GoogleGenAI } from '@google/genai';
 import type { AIClient } from '../client';
 import type { TransformParams } from '../types';
 
+/**
+ * Valid aspect ratios supported by Google AI image generation models.
+ * Our schema uses a subset: "1:1", "3:4", "4:5", "9:16", "16:9"
+ * @see https://ai.google.dev/gemini-api/docs/image-generation
+ */
+const GOOGLE_AI_ASPECT_RATIOS = [
+  "1:1", "2:3", "3:2", "3:4", "4:3", "4:5", "5:4", "9:16", "16:9", "21:9"
+] as const;
+
+/**
+ * Validate and normalize aspect ratio for Google AI.
+ * Falls back to "1:1" if invalid or undefined.
+ *
+ * @param aspectRatio - Requested aspect ratio
+ * @returns Valid Google AI aspect ratio
+ */
+function validateAspectRatio(aspectRatio?: string): string {
+  if (!aspectRatio) return "1:1";
+
+  if (GOOGLE_AI_ASPECT_RATIOS.includes(aspectRatio as typeof GOOGLE_AI_ASPECT_RATIOS[number])) {
+    return aspectRatio;
+  }
+
+  console.warn(`[GoogleAI] Invalid aspect ratio: ${aspectRatio}, defaulting to 1:1`);
+  return "1:1";
+}
+
 export class GoogleAIProvider implements AIClient {
   private ai: GoogleGenAI;
 
@@ -27,16 +54,22 @@ export class GoogleAIProvider implements AIClient {
     console.log('[GoogleAI] Starting transform:', {
       model,
       prompt: params.prompt.substring(0, 50),
-      hasReference: !!params.referenceImageUrl,
+      referenceImageCount: params.referenceImageUrls?.length || 0,
     });
 
-    // console.log('[GoogleAI] Adding input image:', params.inputImageUrl);
     // Fetch and convert images to base64
     // Note: fileData.fileUri only works with Gemini File API URIs, not arbitrary HTTPS URLs
-    const [inputImageData, referenceImageData] = await Promise.all([
-      this.fetchImageAsBase64(params.inputImageUrl),
-      params.referenceImageUrl ? this.fetchImageAsBase64(params.referenceImageUrl) : null,
-    ]);
+    const inputImageData = await this.fetchImageAsBase64(params.inputImageUrl);
+
+    // Fetch all reference images (if any)
+    const referenceImageDataList: string[] = [];
+    if (params.referenceImageUrls && params.referenceImageUrls.length > 0) {
+      const referencePromises = params.referenceImageUrls.map(url =>
+        this.fetchImageAsBase64(url)
+      );
+      const results = await Promise.all(referencePromises);
+      referenceImageDataList.push(...results);
+    }
 
     // Use AI prompt from experience configuration
     const promptText = params.prompt;
@@ -52,22 +85,37 @@ export class GoogleAIProvider implements AIClient {
       }
     ];
 
-
-    // Add reference image if provided (for background swap)
-    // console.log('[GoogleAI] Adding reference image:', params.referenceImageUrl);
-    if (referenceImageData) {
-      promptParts.push({
-        inlineData: {
-          mimeType: 'image/jpeg',
-          data: referenceImageData,
-        }
-      });
+    // Add all reference images if provided
+    if (referenceImageDataList.length > 0) {
+      for (const referenceData of referenceImageDataList) {
+        promptParts.push({
+          inlineData: {
+            mimeType: 'image/jpeg',
+            data: referenceData,
+          }
+        });
+      }
     }
 
-    // Call Google AI
+    // Validate and prepare aspect ratio
+    const aspectRatio = validateAspectRatio(params.aspectRatio);
+
+    console.log('[GoogleAI] Generation config:', {
+      model,
+      aspectRatio,
+      promptLength: params.prompt.length,
+      referenceImageCount: referenceImageDataList.length,
+    });
+
+    // Call Google AI with imageConfig
     const response = await this.ai.models.generateContent({
       model,
       contents: promptParts,
+      config: {
+        imageConfig: {
+          aspectRatio: aspectRatio,
+        },
+      },
     });
 
     // Extract image from response

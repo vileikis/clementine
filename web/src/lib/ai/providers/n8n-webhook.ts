@@ -13,6 +13,8 @@ export class N8nWebhookProvider implements AIClient {
     console.log('[n8n] Starting transform:', {
       prompt: params.prompt.substring(0, 50),
       webhook: this.config.baseUrl,
+      aspectRatio: params.aspectRatio,
+      referenceImageCount: params.referenceImageUrls?.length || 0,
     });
 
     const response = await fetch(`${this.config.baseUrl}/transform`, {
@@ -26,8 +28,10 @@ export class N8nWebhookProvider implements AIClient {
       body: JSON.stringify({
         prompt: params.prompt,
         inputImageUrl: params.inputImageUrl,
-        referenceImageUrl: params.referenceImageUrl,
+        referenceImageUrls: params.referenceImageUrls || [],
         brandColor: params.brandColor,
+        model: params.model,
+        aspectRatio: params.aspectRatio || "1:1",
       }),
     });
 
