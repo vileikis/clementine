@@ -152,11 +152,11 @@ export function AITransformSettings({
           onChange={(e) => onAiPromptChange(e.target.value)}
           placeholder="Describe the AI transformation..."
           rows={4}
-          maxLength={600}
+          maxLength={1000}
           disabled={disabled}
         />
         <p className="text-xs text-muted-foreground">
-          {aiPrompt.length}/600 characters
+          {aiPrompt.length}/1000 characters
         </p>
       </div>
 
