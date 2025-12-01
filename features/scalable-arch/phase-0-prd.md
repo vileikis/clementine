@@ -16,45 +16,56 @@ Transform Clementine from a flat admin structure into a company-centric multi-te
 
 ### Next.js App Router Layout
 
+Uses **flat route groups** to avoid layout nesting issues. Each context (company, project, event, experience) has its own isolated layout - no stacking of navbars.
+
 ```
 web/src/app/
-├── (workspace)/                            # Route group for admin area
-│   ├── layout.tsx                          # Minimal shell (Toaster)
-│   ├── page.tsx                            # Companies list (root)
+├── layout.tsx                                    # Root layout (existing - fonts, Toaster)
+├── (workspace)/                                  # Route group for admin area (no layout needed)
 │   │
-│   └── [companySlug]/                      # Dynamic company segment
-│       ├── layout.tsx                      # Company layout + navbar
-│       ├── page.tsx                        # Redirect to /projects
-│       ├── projects/
-│       │   └── page.tsx                    # Projects list (placeholder)
-│       ├── exps/
-│       │   ├── page.tsx                    # Experiences list (placeholder)
-│       │   └── [expId]/
-│       │       └── page.tsx                # Experience editor (placeholder)
-│       ├── settings/
-│       │   └── page.tsx                    # Company settings (CompanyForm)
-│       │
-│       └── [projectId]/                    # Dynamic project segment
-│           ├── layout.tsx                  # Project layout
-│           ├── page.tsx                    # Redirect to /events
-│           ├── events/
-│           │   └── page.tsx                # Events list (placeholder)
-│           ├── distribute/
-│           │   └── page.tsx                # Distribute (placeholder)
-│           ├── results/
-│           │   └── page.tsx                # Results (placeholder)
-│           │
-│           └── [eventId]/                  # Dynamic event segment
-│               ├── layout.tsx              # Event layout
-│               ├── page.tsx                # Redirect to /experiences
-│               ├── experiences/
-│               │   └── page.tsx            # Experiences (placeholder)
-│               └── theme/
-│                   └── page.tsx            # Theme (placeholder)
+│   ├── page.tsx                                  # Companies list (root /)
+│   │
+│   ├── (company)/[companySlug]/                  # Company context
+│   │   ├── layout.tsx                            # Company navbar (Projects, Exps, Settings)
+│   │   ├── page.tsx                              # Redirect to /projects
+│   │   ├── projects/page.tsx                     # Projects list (placeholder)
+│   │   ├── exps/page.tsx                         # Experiences list (placeholder)
+│   │   └── settings/page.tsx                     # Company settings (CompanyForm)
+│   │
+│   ├── (project)/[companySlug]/[projectId]/      # Project context (NOT nested in company!)
+│   │   ├── layout.tsx                            # Project navbar (Events, Distribute, Results)
+│   │   ├── page.tsx                              # Redirect to /events
+│   │   ├── events/page.tsx                       # Events list (placeholder)
+│   │   ├── distribute/page.tsx                   # Distribute (placeholder)
+│   │   └── results/page.tsx                      # Results (placeholder)
+│   │
+│   ├── (event)/[companySlug]/[projectId]/[eventId]/  # Event context
+│   │   ├── layout.tsx                            # Event navbar (Experiences, Theme)
+│   │   ├── page.tsx                              # Redirect to /experiences
+│   │   ├── experiences/page.tsx                  # Experiences (placeholder)
+│   │   └── theme/page.tsx                        # Theme (placeholder)
+│   │
+│   └── (experience)/[companySlug]/exps/[expId]/  # Experience context
+│       ├── layout.tsx                            # Experience navbar (breadcrumbs only)
+│       └── page.tsx                              # Experience editor (placeholder)
 │
-└── (public)/                               # Unchanged
+└── (public)/                                     # Unchanged
     └── join/[eventId]/
 ```
+
+### Route Matching
+
+| URL | Route Group | Layout |
+|-----|-------------|--------|
+| `/` | `(workspace)/page.tsx` | Companies list (no navbar) |
+| `/acme-corp` | `(company)/[companySlug]` | Company navbar |
+| `/acme-corp/projects` | `(company)/[companySlug]/projects` | Company navbar |
+| `/acme-corp/proj123` | `(project)/[companySlug]/[projectId]` | Project navbar only |
+| `/acme-corp/proj123/events` | `(project)/[companySlug]/[projectId]/events` | Project navbar only |
+| `/acme-corp/proj123/evt456` | `(event)/[companySlug]/[projectId]/[eventId]` | Event navbar only |
+| `/acme-corp/exps/exp789` | `(experience)/[companySlug]/exps/[expId]` | Experience navbar only |
+
+**Key insight**: Route groups `(company)`, `(project)`, `(event)`, `(experience)` break layout inheritance - each context renders only its own navbar.
 
 ---
 
@@ -175,25 +186,25 @@ Last item is display-only (no link, no edit dialog).
 8. `components/shared/AppNavbar.tsx` - Combined navbar (new file)
 
 ### Phase 0c: App Structure (Layouts)
-9. `app/(workspace)/layout.tsx` - Workspace shell
-10. `app/(workspace)/[companySlug]/layout.tsx` - Company layout with navbar
-11. `app/(workspace)/[companySlug]/[projectId]/layout.tsx` - Project layout
-12. `app/(workspace)/[companySlug]/[projectId]/[eventId]/layout.tsx` - Event layout
+9. `app/(workspace)/(company)/[companySlug]/layout.tsx` - Company navbar
+10. `app/(workspace)/(project)/[companySlug]/[projectId]/layout.tsx` - Project navbar
+11. `app/(workspace)/(event)/[companySlug]/[projectId]/[eventId]/layout.tsx` - Event navbar
+12. `app/(workspace)/(experience)/[companySlug]/exps/[expId]/layout.tsx` - Experience navbar
 
 ### Phase 0d: Pages
 13. `app/(workspace)/page.tsx` - Companies list
-14. `app/(workspace)/[companySlug]/page.tsx` - Redirect to projects
-15. `app/(workspace)/[companySlug]/projects/page.tsx` - Projects placeholder
-16. `app/(workspace)/[companySlug]/exps/page.tsx` - Experiences placeholder
-17. `app/(workspace)/[companySlug]/exps/[expId]/page.tsx` - Experience placeholder
-18. `app/(workspace)/[companySlug]/settings/page.tsx` - Settings with CompanyForm
-19. `app/(workspace)/[companySlug]/[projectId]/page.tsx` - Redirect
-20. `app/(workspace)/[companySlug]/[projectId]/events/page.tsx` - Placeholder
-21. `app/(workspace)/[companySlug]/[projectId]/distribute/page.tsx` - Placeholder
-22. `app/(workspace)/[companySlug]/[projectId]/results/page.tsx` - Placeholder
-23. `app/(workspace)/[companySlug]/[projectId]/[eventId]/page.tsx` - Redirect
-24. `app/(workspace)/[companySlug]/[projectId]/[eventId]/experiences/page.tsx` - Placeholder
-25. `app/(workspace)/[companySlug]/[projectId]/[eventId]/theme/page.tsx` - Placeholder
+14. `app/(workspace)/(company)/[companySlug]/page.tsx` - Redirect to projects
+15. `app/(workspace)/(company)/[companySlug]/projects/page.tsx` - Projects placeholder
+16. `app/(workspace)/(company)/[companySlug]/exps/page.tsx` - Experiences placeholder
+17. `app/(workspace)/(company)/[companySlug]/settings/page.tsx` - Settings with CompanyForm
+18. `app/(workspace)/(project)/[companySlug]/[projectId]/page.tsx` - Redirect
+19. `app/(workspace)/(project)/[companySlug]/[projectId]/events/page.tsx` - Placeholder
+20. `app/(workspace)/(project)/[companySlug]/[projectId]/distribute/page.tsx` - Placeholder
+21. `app/(workspace)/(project)/[companySlug]/[projectId]/results/page.tsx` - Placeholder
+22. `app/(workspace)/(event)/[companySlug]/[projectId]/[eventId]/page.tsx` - Redirect
+23. `app/(workspace)/(event)/[companySlug]/[projectId]/[eventId]/experiences/page.tsx` - Placeholder
+24. `app/(workspace)/(event)/[companySlug]/[projectId]/[eventId]/theme/page.tsx` - Placeholder
+25. `app/(workspace)/(experience)/[companySlug]/exps/[expId]/page.tsx` - Placeholder
 
 ### Phase 0e: Form Updates
 26. `features/companies/components/CompanyForm.tsx` - Add slug input
@@ -208,23 +219,23 @@ Last item is display-only (no link, no edit dialog).
 - `lib/utils/slug.ts`
 - `components/shared/NavTabs.tsx`
 - `components/shared/AppNavbar.tsx`
-- `app/(workspace)/layout.tsx`
 - `app/(workspace)/page.tsx`
-- `app/(workspace)/[companySlug]/layout.tsx`
-- `app/(workspace)/[companySlug]/page.tsx`
-- `app/(workspace)/[companySlug]/projects/page.tsx`
-- `app/(workspace)/[companySlug]/exps/page.tsx`
-- `app/(workspace)/[companySlug]/exps/[expId]/page.tsx`
-- `app/(workspace)/[companySlug]/settings/page.tsx`
-- `app/(workspace)/[companySlug]/[projectId]/layout.tsx`
-- `app/(workspace)/[companySlug]/[projectId]/page.tsx`
-- `app/(workspace)/[companySlug]/[projectId]/events/page.tsx`
-- `app/(workspace)/[companySlug]/[projectId]/distribute/page.tsx`
-- `app/(workspace)/[companySlug]/[projectId]/results/page.tsx`
-- `app/(workspace)/[companySlug]/[projectId]/[eventId]/layout.tsx`
-- `app/(workspace)/[companySlug]/[projectId]/[eventId]/page.tsx`
-- `app/(workspace)/[companySlug]/[projectId]/[eventId]/experiences/page.tsx`
-- `app/(workspace)/[companySlug]/[projectId]/[eventId]/theme/page.tsx`
+- `app/(workspace)/(company)/[companySlug]/layout.tsx`
+- `app/(workspace)/(company)/[companySlug]/page.tsx`
+- `app/(workspace)/(company)/[companySlug]/projects/page.tsx`
+- `app/(workspace)/(company)/[companySlug]/exps/page.tsx`
+- `app/(workspace)/(company)/[companySlug]/settings/page.tsx`
+- `app/(workspace)/(project)/[companySlug]/[projectId]/layout.tsx`
+- `app/(workspace)/(project)/[companySlug]/[projectId]/page.tsx`
+- `app/(workspace)/(project)/[companySlug]/[projectId]/events/page.tsx`
+- `app/(workspace)/(project)/[companySlug]/[projectId]/distribute/page.tsx`
+- `app/(workspace)/(project)/[companySlug]/[projectId]/results/page.tsx`
+- `app/(workspace)/(event)/[companySlug]/[projectId]/[eventId]/layout.tsx`
+- `app/(workspace)/(event)/[companySlug]/[projectId]/[eventId]/page.tsx`
+- `app/(workspace)/(event)/[companySlug]/[projectId]/[eventId]/experiences/page.tsx`
+- `app/(workspace)/(event)/[companySlug]/[projectId]/[eventId]/theme/page.tsx`
+- `app/(workspace)/(experience)/[companySlug]/exps/[expId]/layout.tsx`
+- `app/(workspace)/(experience)/[companySlug]/exps/[expId]/page.tsx`
 
 ### Modified Files (7)
 - `features/companies/constants.ts`
@@ -244,17 +255,18 @@ Last item is display-only (no link, no edit dialog).
 
 ## 6. Key Design Decisions
 
-1. **Route group `(workspace)`** - Cleaner than nested `(admin)/(dashboard)`
-2. **Reuse `EditorBreadcrumbs`** - No need for new breadcrumb component
-3. **Generic `AppNavbar`** - Single component for all contexts, configured via props
-4. **Slug auto-generation** - If not provided, generate from name
-5. **Display-only last breadcrumb** - No edit dialogs in breadcrumbs
-6. **Settings uses existing `CompanyForm`** - Full edit capability
-7. **Keep old `(admin)` routes** - Both route groups coexist; cleanup in later phase
-8. **Use `[companySlug]`** - Specific param names for clarity (vs generic `[slug]`)
-9. **Slug utilities in `lib/utils/`** - General-purpose, not company-specific
-10. **Route precedence** - Static routes (projects, exps, settings) take precedence over dynamic `[projectId]`. This is accepted; IDs matching static routes won't be reachable.
-11. **Authentication** - Existing `proxy.ts` middleware handles auth; new routes protected by default
+1. **Flat route groups (Option D)** - Use `(company)`, `(project)`, `(event)`, `(experience)` route groups to break layout inheritance. Each context has isolated layout - no navbar stacking.
+2. **No `(workspace)` layout** - Root `app/layout.tsx` already provides shell (fonts, Toaster). No additional wrapper needed.
+3. **Reuse `EditorBreadcrumbs`** - No need for new breadcrumb component
+4. **Generic `AppNavbar`** - Single component for all contexts, configured via props
+5. **Slug auto-generation** - If not provided, generate from name
+6. **Display-only last breadcrumb** - No edit dialogs in breadcrumbs
+7. **Settings uses existing `CompanyForm`** - Full edit capability
+8. **Keep old `(admin)` routes** - Both route groups coexist; cleanup in later phase
+9. **Use `[companySlug]`** - Specific param names for clarity (vs generic `[slug]`)
+10. **Slug utilities in `lib/utils/`** - General-purpose, not company-specific
+11. **Route precedence** - Static routes (projects, exps, settings) take precedence over dynamic `[projectId]`. Accepted limitation.
+12. **Authentication** - Existing `proxy.ts` middleware handles auth; new routes protected by default
 
 ---
 
