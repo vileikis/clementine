@@ -53,7 +53,7 @@ Companies represent brands or organizations that own projects, events, and exper
 interface Company {
   id: string;
   name: string; // 1-100 characters. Ex: Turn Page Oy
-  slug: slug; // Ex: turn-page-oy
+  slug: slug; // NEW Ex: turn-page-oy
   status: "active" | "deleted";
   deletedAt: number | null; // Unix timestamp ms (soft delete)
   contactEmail: string | null;
