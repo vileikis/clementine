@@ -86,7 +86,7 @@ export interface Company {
 - Add `slug` field with validation
 - Make slug optional in `createCompanyInput` (auto-generate if not provided)
 
-**New: `features/companies/lib/slug.ts`**
+**New: `lib/utils/slug.ts`** (general-purpose utility)
 ```ts
 export function generateSlug(name: string): string {
   return name
@@ -163,10 +163,10 @@ Last item is display-only (no link, no edit dialog).
 ## 4. Implementation Order
 
 ### Phase 0a: Schema & Data Layer
-1. `features/companies/constants.ts` - Add slug constraints
-2. `features/companies/types/companies.types.ts` - Add slug field
-3. `features/companies/schemas/companies.schemas.ts` - Add slug validation
-4. `features/companies/lib/slug.ts` - Slug utilities (new file)
+1. `lib/utils/slug.ts` - Slug utilities (new file, general-purpose)
+2. `features/companies/constants.ts` - Add slug constraints
+3. `features/companies/types/companies.types.ts` - Add slug field
+4. `features/companies/schemas/companies.schemas.ts` - Add slug validation
 5. `features/companies/repositories/companies.repository.ts` - Add getBySlug
 6. `features/companies/actions/companies.actions.ts` - Add getBySlugAction
 
@@ -205,7 +205,7 @@ Last item is display-only (no link, no edit dialog).
 ## 5. Files Summary
 
 ### New Files (20)
-- `features/companies/lib/slug.ts`
+- `lib/utils/slug.ts`
 - `components/shared/NavTabs.tsx`
 - `components/shared/AppNavbar.tsx`
 - `app/(workspace)/layout.tsx`
@@ -251,6 +251,10 @@ Last item is display-only (no link, no edit dialog).
 5. **Display-only last breadcrumb** - No edit dialogs in breadcrumbs
 6. **Settings uses existing `CompanyForm`** - Full edit capability
 7. **Keep old `(admin)` routes** - Both route groups coexist; cleanup in later phase
+8. **Use `[companySlug]`** - Specific param names for clarity (vs generic `[slug]`)
+9. **Slug utilities in `lib/utils/`** - General-purpose, not company-specific
+10. **Route precedence** - Static routes (projects, exps, settings) take precedence over dynamic `[projectId]`. This is accepted; IDs matching static routes won't be reachable.
+11. **Authentication** - Existing `proxy.ts` middleware handles auth; new routes protected by default
 
 ---
 
