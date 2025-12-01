@@ -5,13 +5,14 @@
 import { db } from "@/lib/firebase/admin";
 import type { Company, CompanyStatus } from "../types";
 import { companySchema, type CreateCompanyInput } from "../schemas";
+import { generateSlug } from "@/lib/utils/slug";
 
 /**
  * Create a new company with transaction-based uniqueness validation
  *
- * @param data - Company creation input (name and optional metadata)
+ * @param data - Company creation input (name, optional slug, and optional metadata)
  * @returns Company ID
- * @throws Error if company name already exists (case-insensitive)
+ * @throws Error if company name or slug already exists
  */
 export async function createCompany(
   data: CreateCompanyInput
@@ -20,14 +21,13 @@ export async function createCompany(
 
   await db.runTransaction(async (txn) => {
     // Check for existing active company with same name (case-insensitive)
-    // Normalize to lowercase for comparison
     const normalizedName = data.name.toLowerCase().trim();
 
     const existingSnapshot = await txn.get(
       db
         .collection("companies")
         .where("status", "==", "active")
-        .limit(1)
+        .limit(100) // Get enough to check both name and slug
     );
 
     // Check if any existing active company has matching normalized name
@@ -39,11 +39,24 @@ export async function createCompany(
       throw new Error(`Company name "${data.name}" already exists`);
     }
 
+    // Generate slug from name if not provided
+    const slug = data.slug ?? generateSlug(data.name);
+
+    // Check if slug already exists
+    const slugDuplicate = existingSnapshot.docs.find(
+      (doc) => doc.data().slug === slug
+    );
+
+    if (slugDuplicate) {
+      throw new Error(`Slug "${slug}" is already in use`);
+    }
+
     // Create new company document
     const now = Date.now();
     const company: Company = {
       id: companyRef.id,
       name: data.name.trim(),
+      slug,
       status: "active",
       deletedAt: null,
       createdAt: now,
@@ -96,12 +109,65 @@ export async function getCompany(companyId: string): Promise<Company | null> {
 }
 
 /**
+ * Get a single company by slug
+ *
+ * @param slug - URL-friendly company identifier
+ * @returns Company data or null if not found
+ */
+export async function getCompanyBySlug(slug: string): Promise<Company | null> {
+  const snapshot = await db
+    .collection("companies")
+    .where("slug", "==", slug)
+    .where("status", "==", "active")
+    .limit(1)
+    .get();
+
+  if (snapshot.empty) {
+    return null;
+  }
+
+  const doc = snapshot.docs[0];
+  const data = doc.data();
+  return companySchema.parse({ id: doc.id, ...data });
+}
+
+/**
+ * Check if a slug is available for use
+ *
+ * @param slug - The slug to check
+ * @param excludeCompanyId - Optionally exclude a company ID (for updates)
+ * @returns true if the slug is available, false otherwise
+ */
+export async function isSlugAvailable(
+  slug: string,
+  excludeCompanyId?: string
+): Promise<boolean> {
+  const snapshot = await db
+    .collection("companies")
+    .where("slug", "==", slug)
+    .where("status", "==", "active")
+    .limit(1)
+    .get();
+
+  if (snapshot.empty) {
+    return true;
+  }
+
+  // If excluding a company ID, check if the match is the excluded company
+  if (excludeCompanyId && snapshot.docs[0].id === excludeCompanyId) {
+    return true;
+  }
+
+  return false;
+}
+
+/**
  * Update an existing company with transaction-based uniqueness validation
  *
  * @param companyId - Company document ID to update
- * @param data - Company update input (name and optional metadata)
+ * @param data - Company update input (name, optional slug, and optional metadata)
  * @returns void
- * @throws Error if company not found or name already exists (case-insensitive, excluding self)
+ * @throws Error if company not found or name/slug already exists (excluding self)
  */
 export async function updateCompany(
   companyId: string,
@@ -116,14 +182,14 @@ export async function updateCompany(
       throw new Error("Company not found");
     }
 
-    // Check for duplicate name among active companies (excluding self)
+    // Check for duplicate name/slug among active companies (excluding self)
     const normalizedName = data.name.toLowerCase().trim();
 
     const existingSnapshot = await txn.get(
       db
         .collection("companies")
         .where("status", "==", "active")
-        .limit(10) // Get a few to check, excluding self
+        .limit(100) // Get enough to check name and slug
     );
 
     // Check if any other active company has matching normalized name
@@ -137,11 +203,24 @@ export async function updateCompany(
       throw new Error(`Company name "${data.name}" already exists`);
     }
 
+    // Check slug uniqueness if slug is being updated
+    if (data.slug !== undefined) {
+      const slugDuplicate = existingSnapshot.docs.find(
+        (doc) => doc.id !== companyId && doc.data().slug === data.slug
+      );
+
+      if (slugDuplicate) {
+        throw new Error(`Slug "${data.slug}" is already in use`);
+      }
+    }
+
     // Update company document
     const now = Date.now();
     const updates: Partial<Company> = {
       name: data.name.trim(),
       updatedAt: now,
+      // Optional slug update
+      ...(data.slug !== undefined && { slug: data.slug }),
       // Optional metadata fields
       ...(data.contactEmail !== undefined && {
         contactEmail: data.contactEmail,

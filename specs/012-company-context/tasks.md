@@ -23,8 +23,8 @@
 
 **Purpose**: Create utility functions and constants that will be used across all user stories
 
-- [ ] T001 [P] Create slug generation utility in `web/src/lib/utils/slug.ts` with `generateSlug()` and `isValidSlug()` functions
-- [ ] T002 [P] Add SLUG_LENGTH and SLUG_PATTERN constants to `web/src/features/companies/constants.ts`
+- [X] T001 [P] Create slug generation utility in `web/src/lib/utils/slug.ts` with `generateSlug()` and `isValidSlug()` functions
+- [X] T002 [P] Add SLUG_LENGTH and SLUG_PATTERN constants to `web/src/features/companies/constants.ts`
 
 ---
 
@@ -34,13 +34,13 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T003 Add `slug` field to Company type in `web/src/features/companies/types/companies.types.ts`
-- [ ] T004 Add slug validation schema to `web/src/features/companies/schemas/companies.schemas.ts` (slugSchema, update createCompanyInput, updateCompanyInput)
-- [ ] T005 Add `getCompanyBySlug()` function to `web/src/features/companies/repositories/companies.repository.ts`
-- [ ] T006 Add `isSlugAvailable()` function to `web/src/features/companies/repositories/companies.repository.ts`
-- [ ] T007 Update `createCompany()` in repository to auto-generate slug from name if not provided and validate uniqueness
-- [ ] T008 Update `updateCompany()` in repository to validate slug uniqueness on change
-- [ ] T009 Add `getCompanyBySlugAction()` server action to `web/src/features/companies/actions/companies.actions.ts`
+- [X] T003 Add `slug` field to Company type in `web/src/features/companies/types/companies.types.ts`
+- [X] T004 Add slug validation schema to `web/src/features/companies/schemas/companies.schemas.ts` (slugSchema, update createCompanyInput, updateCompanyInput)
+- [X] T005 Add `getCompanyBySlug()` function to `web/src/features/companies/repositories/companies.repository.ts`
+- [X] T006 Add `isSlugAvailable()` function to `web/src/features/companies/repositories/companies.repository.ts`
+- [X] T007 Update `createCompany()` in repository to auto-generate slug from name if not provided and validate uniqueness
+- [X] T008 Update `updateCompany()` in repository to validate slug uniqueness on change
+- [X] T009 Add `getCompanyBySlugAction()` server action to `web/src/features/companies/actions/companies.actions.ts`
 
 **Checkpoint**: Data layer ready - user story implementation can now begin
 
@@ -54,9 +54,9 @@
 
 ### Implementation for User Story 1
 
-- [ ] T010 [P] [US1] Create workspace route group structure `web/src/app/(workspace)/` with root `page.tsx` (placeholder - will be completed in US6)
-- [ ] T011 [P] [US1] Create company route group `web/src/app/(workspace)/(company)/[companySlug]/layout.tsx` - fetches company by slug, renders children or 404
-- [ ] T012 [US1] Create company root page `web/src/app/(workspace)/(company)/[companySlug]/page.tsx` that redirects to `/projects`
+- [X] T010 [P] [US1] Create workspace route group structure `web/src/app/(workspace)/` with root `page.tsx` (placeholder - will be completed in US6)
+- [X] T011 [P] [US1] Create company route group `web/src/app/(workspace)/(company)/[companySlug]/layout.tsx` - fetches company by slug, renders children or 404
+- [X] T012 [US1] Create company root page `web/src/app/(workspace)/(company)/[companySlug]/page.tsx` that redirects to `/projects`
 
 **Checkpoint**: At this point, users can navigate to `/{companySlug}` and see a loading company workspace (redirects to projects)
 
@@ -70,12 +70,12 @@
 
 ### Implementation for User Story 2
 
-- [ ] T013 [P] [US2] Create `web/src/components/shared/Breadcrumbs.tsx` component with "/" separator (based on EditorBreadcrumbs pattern)
-- [ ] T014 [P] [US2] Create `web/src/components/shared/NavTabs.tsx` component with `usePathname()` for active detection, horizontal scroll on mobile, 44px touch targets
-- [ ] T015 [US2] Create `web/src/components/shared/AppNavbar.tsx` component combining Breadcrumbs + NavTabs
-- [ ] T016 [US2] Update company layout `web/src/app/(workspace)/(company)/[companySlug]/layout.tsx` to use AppNavbar with company breadcrumbs and tabs (Projects, Experiences, Settings)
-- [ ] T017 [P] [US2] Create projects placeholder page `web/src/app/(workspace)/(company)/[companySlug]/projects/page.tsx` (Coming Soon)
-- [ ] T018 [P] [US2] Create experiences placeholder page `web/src/app/(workspace)/(company)/[companySlug]/exps/page.tsx` (Coming Soon)
+- [X] T013 [P] [US2] Create `web/src/components/shared/Breadcrumbs.tsx` component with "/" separator (based on EditorBreadcrumbs pattern)
+- [X] T014 [P] [US2] Create `web/src/components/shared/NavTabs.tsx` component with `usePathname()` for active detection, horizontal scroll on mobile, 44px touch targets
+- [X] T015 [US2] Create `web/src/components/shared/AppNavbar.tsx` component combining Breadcrumbs + NavTabs
+- [X] T016 [US2] Update company layout `web/src/app/(workspace)/(company)/[companySlug]/layout.tsx` to use AppNavbar with company breadcrumbs and tabs (Projects, Experiences, Settings)
+- [X] T017 [P] [US2] Create projects placeholder page `web/src/app/(workspace)/(company)/[companySlug]/projects/page.tsx` (Coming Soon)
+- [X] T018 [P] [US2] Create experiences placeholder page `web/src/app/(workspace)/(company)/[companySlug]/exps/page.tsx` (Coming Soon)
 
 **Checkpoint**: At this point, company workspace has full navigation with breadcrumbs "🍊 / Company Name" and tabs for Projects/Experiences/Settings
 
@@ -89,9 +89,9 @@
 
 ### Implementation for User Story 3
 
-- [ ] T019 [US3] Update `web/src/features/companies/components/CompanyForm.tsx` to include slug input field with validation feedback
-- [ ] T020 [US3] Create settings page `web/src/app/(workspace)/(company)/[companySlug]/settings/page.tsx` using updated CompanyForm
-- [ ] T021 [US3] Update company actions to handle slug changes with uniqueness validation in `web/src/features/companies/actions/companies.actions.ts`
+- [X] T019 [US3] Update `web/src/features/companies/components/CompanyForm.tsx` to include slug input field with validation feedback
+- [X] T020 [US3] Create settings page `web/src/app/(workspace)/(company)/[companySlug]/settings/page.tsx` using updated CompanyForm
+- [X] T021 [US3] Update company actions to handle slug changes with uniqueness validation in `web/src/features/companies/actions/companies.actions.ts`
 
 **Checkpoint**: At this point, users can view and edit company settings including slug management
 
@@ -105,11 +105,11 @@
 
 ### Implementation for User Story 4
 
-- [ ] T022 [US4] Create project route group `web/src/app/(workspace)/(project)/[companySlug]/[projectId]/layout.tsx` with project-specific AppNavbar (breadcrumbs: 🍊 / Company / Project, tabs: Events, Distribute, Results)
-- [ ] T023 [US4] Create project root page `web/src/app/(workspace)/(project)/[companySlug]/[projectId]/page.tsx` that redirects to `/events`
-- [ ] T024 [P] [US4] Create events placeholder page `web/src/app/(workspace)/(project)/[companySlug]/[projectId]/events/page.tsx` (Coming Soon)
-- [ ] T025 [P] [US4] Create distribute placeholder page `web/src/app/(workspace)/(project)/[companySlug]/[projectId]/distribute/page.tsx` (Coming Soon)
-- [ ] T026 [P] [US4] Create results placeholder page `web/src/app/(workspace)/(project)/[companySlug]/[projectId]/results/page.tsx` (Coming Soon)
+- [X] T022 [US4] Create project route group `web/src/app/(workspace)/(project)/[companySlug]/[projectId]/layout.tsx` with project-specific AppNavbar (breadcrumbs: 🍊 / Company / Project, tabs: Events, Distribute, Results)
+- [X] T023 [US4] Create project root page `web/src/app/(workspace)/(project)/[companySlug]/[projectId]/page.tsx` that redirects to `/events`
+- [X] T024 [P] [US4] Create events placeholder page `web/src/app/(workspace)/(project)/[companySlug]/[projectId]/events/page.tsx` (Coming Soon)
+- [X] T025 [P] [US4] Create distribute placeholder page `web/src/app/(workspace)/(project)/[companySlug]/[projectId]/distribute/page.tsx` (Coming Soon)
+- [X] T026 [P] [US4] Create results placeholder page `web/src/app/(workspace)/(project)/[companySlug]/[projectId]/results/page.tsx` (Coming Soon)
 
 **Checkpoint**: At this point, project navigation works independently with no layout stacking from company context
 
@@ -123,12 +123,12 @@
 
 ### Implementation for User Story 5
 
-- [ ] T027 [US5] Create event route group `web/src/app/(workspace)/(event)/[companySlug]/[projectId]/[eventId]/layout.tsx` with event-specific AppNavbar (breadcrumbs: 🍊 / Company / Project / Event, tabs: Experiences, Theme)
-- [ ] T028 [US5] Create event root page `web/src/app/(workspace)/(event)/[companySlug]/[projectId]/[eventId]/page.tsx` that redirects to `/experiences`
-- [ ] T029 [P] [US5] Create event experiences placeholder page `web/src/app/(workspace)/(event)/[companySlug]/[projectId]/[eventId]/experiences/page.tsx` (Coming Soon)
-- [ ] T030 [P] [US5] Create theme placeholder page `web/src/app/(workspace)/(event)/[companySlug]/[projectId]/[eventId]/theme/page.tsx` (Coming Soon)
-- [ ] T031 [US5] Create experience route group `web/src/app/(workspace)/(experience)/[companySlug]/exps/[expId]/layout.tsx` with breadcrumbs only (🍊 / Company / experiences / Experience Name), no tabs
-- [ ] T032 [US5] Create experience placeholder page `web/src/app/(workspace)/(experience)/[companySlug]/exps/[expId]/page.tsx` (Coming Soon)
+- [X] T027 [US5] Create event route group `web/src/app/(workspace)/(event)/[companySlug]/[projectId]/[eventId]/layout.tsx` with event-specific AppNavbar (breadcrumbs: 🍊 / Company / Project / Event, tabs: Experiences, Theme)
+- [X] T028 [US5] Create event root page `web/src/app/(workspace)/(event)/[companySlug]/[projectId]/[eventId]/page.tsx` that redirects to `/experiences`
+- [X] T029 [P] [US5] Create event experiences placeholder page `web/src/app/(workspace)/(event)/[companySlug]/[projectId]/[eventId]/experiences/page.tsx` (Coming Soon)
+- [X] T030 [P] [US5] Create theme placeholder page `web/src/app/(workspace)/(event)/[companySlug]/[projectId]/[eventId]/theme/page.tsx` (Coming Soon)
+- [X] T031 [US5] Create experience route group `web/src/app/(workspace)/(experience)/[companySlug]/exps/[expId]/layout.tsx` with breadcrumbs only (🍊 / Company / experiences / Experience Name), no tabs
+- [X] T032 [US5] Create experience placeholder page `web/src/app/(workspace)/(experience)/[companySlug]/exps/[expId]/page.tsx` (Coming Soon)
 
 **Checkpoint**: At this point, all context levels (company, project, event, experience) have isolated navigation
 
@@ -142,8 +142,8 @@
 
 ### Implementation for User Story 6
 
-- [ ] T033 [US6] Update root page `web/src/app/(workspace)/page.tsx` to display companies list (reuse existing companies list logic)
-- [ ] T034 [US6] Update `web/src/features/companies/components/CompanyCard.tsx` to link to `/{slug}` instead of by ID
+- [X] T033 [US6] Update root page `web/src/app/(workspace)/page.tsx` to display companies list (reuse existing companies list logic)
+- [X] T034 [US6] Update `web/src/features/companies/components/CompanyCard.tsx` to link to `/{slug}` instead of by ID
 
 **Checkpoint**: At this point, users can see all companies at `/` and navigate to any via slug
 
@@ -153,15 +153,15 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T035 Mobile responsiveness verification across all navigation components (breadcrumbs collapse, tabs scroll, 44px touch targets)
-- [ ] T036 Verify old `(admin)` routes still work (parallel operation during transition)
+- [X] T035 Mobile responsiveness verification across all navigation components (breadcrumbs collapse, tabs scroll, 44px touch targets)
+- [X] T036 Verify old `(admin)` routes still work (parallel operation during transition)
 
 ### Validation Loop (REQUIRED - Constitution Principle V)
 
 **Purpose**: Ensure code quality and correctness before merge
 
-- [ ] T037 Run `pnpm lint` and fix all errors/warnings
-- [ ] T038 Run `pnpm type-check` and resolve all TypeScript errors
+- [X] T037 Run `pnpm lint` and fix all errors/warnings
+- [X] T038 Run `pnpm type-check` and resolve all TypeScript errors
 - [ ] T039 Verify feature in local dev server (`pnpm dev`)
 - [ ] T040 Run quickstart.md validation checklist
 
