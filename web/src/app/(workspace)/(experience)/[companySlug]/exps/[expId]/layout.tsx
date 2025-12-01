@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getCompanyBySlugAction } from "@/features/companies/actions";
 import { AppNavbar } from "@/components/shared/AppNavbar";
+import { LogoutButton } from "@/components/shared/LogoutButton";
 
 interface ExperienceLayoutProps {
   children: React.ReactNode;
@@ -33,11 +34,12 @@ export default async function ExperienceLayout({
     <div className="flex flex-col h-full">
       <AppNavbar
         breadcrumbs={[
-          { label: "\u{1F34A}", href: "/" },
+          { label: "\u{1F34A}", href: "/", isLogo: true },
           { label: company.name, href: `/${companySlug}/exps` },
           { label: "experiences", href: `/${companySlug}/exps` },
           { label: experienceName },
         ]}
+        actions={<LogoutButton />}
       />
       <div className="flex-1 overflow-auto">{children}</div>
     </div>
