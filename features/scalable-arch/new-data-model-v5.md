@@ -52,7 +52,8 @@ Companies represent brands or organizations that own projects, events, and exper
 ```ts
 interface Company {
   id: string;
-  name: string; // 1-100 characters
+  name: string; // 1-100 characters. Ex: Turn Page Oy
+  slug: slug; // Ex: turn-page-oy
   status: "active" | "deleted";
   deletedAt: number | null; // Unix timestamp ms (soft delete)
   contactEmail: string | null;
@@ -335,9 +336,9 @@ New step type that encapsulates the AI "preset" behavior inline.
 interface StepAiTransform extends StepBase {
   type: "ai-transform";
   config: {
-    mode: "photo" | "video";         // Determines output type AND available models
-    model: string;                   // Model selection depends on mode (photo vs video models)
-    prompt: string;                  // Max ~1000 chars
+    mode: "photo" | "video"; // Determines output type AND available models
+    model: string; // Model selection depends on mode (photo vs video models)
+    prompt: string; // Max ~1000 chars
     negativePrompt?: string | null;
     aspectRatio?: "1:1" | "3:4" | "4:5" | "9:16" | "16:9" | null;
   };
@@ -345,6 +346,7 @@ interface StepAiTransform extends StepBase {
 ```
 
 > **Simplified from original design:**
+>
 > - `mode` determines both input handling and output format (no separate `outputFormat`)
 > - Photo mode → image output, Video mode → video output (no GIF at this stage)
 > - Model selection is filtered by mode (photo models vs video models are different)
