@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getCompanyBySlugAction } from "@/features/companies/actions";
 import { AppNavbar } from "@/components/shared/AppNavbar";
+import { LogoutButton } from "@/components/shared/LogoutButton";
 
 interface EventLayoutProps {
   children: React.ReactNode;
@@ -34,7 +35,7 @@ export default async function EventLayout({
     <div className="flex flex-col h-full">
       <AppNavbar
         breadcrumbs={[
-          { label: "\u{1F34A}", href: "/" },
+          { label: "\u{1F34A}", href: "/", isLogo: true },
           { label: company.name, href: `/${companySlug}/projects` },
           { label: projectName, href: `/${companySlug}/${projectId}/events` },
           { label: eventName },
@@ -44,6 +45,7 @@ export default async function EventLayout({
           { label: "Theme", href: "/theme" },
         ]}
         basePath={`/${companySlug}/${projectId}/${eventId}`}
+        actions={<LogoutButton />}
       />
       <div className="flex-1 overflow-auto">{children}</div>
     </div>

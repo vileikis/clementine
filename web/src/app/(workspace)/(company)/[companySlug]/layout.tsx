@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getCompanyBySlugAction } from "@/features/companies/actions";
 import { AppNavbar } from "@/components/shared/AppNavbar";
+import { LogoutButton } from "@/components/shared/LogoutButton";
 
 interface CompanyLayoutProps {
   children: React.ReactNode;
@@ -28,7 +29,7 @@ export default async function CompanyLayout({
     <div className="flex flex-col h-full">
       <AppNavbar
         breadcrumbs={[
-          { label: "\u{1F34A}", href: "/" },
+          { label: "\u{1F34A}", href: "/", isLogo: true },
           { label: company.name },
         ]}
         tabs={[
@@ -37,6 +38,7 @@ export default async function CompanyLayout({
           { label: "Settings", href: "/settings" },
         ]}
         basePath={`/${companySlug}`}
+        actions={<LogoutButton />}
       />
       <div className="flex-1 overflow-auto">{children}</div>
     </div>
