@@ -121,9 +121,34 @@ export function generateSlug(name: string): string {
 
 ## 3. Navigation Components
 
-### Reuse Existing `EditorBreadcrumbs`
+### Rename `EditorBreadcrumbs` → `Breadcrumbs`
 
-The existing `components/shared/EditorBreadcrumbs.tsx` is a generic breadcrumb component that accepts `BreadcrumbItem[]`. We'll reuse it directly.
+Modify existing `components/shared/EditorBreadcrumbs.tsx`:
+1. Rename to `Breadcrumbs.tsx`
+2. Change separator from `<ChevronRight>` to gray `/` character
+
+```tsx
+// Before: 🍊 Events > Event Name
+// After:  🍊 / Acme Corp / Project Name
+
+interface BreadcrumbItem {
+  label: string;
+  href?: string; // Optional - last item has no link
+}
+
+interface BreadcrumbsProps {
+  items: BreadcrumbItem[];
+}
+```
+
+Separator change:
+```tsx
+// Old
+<ChevronRight className="h-4 w-4 text-muted-foreground" />
+
+// New
+<span className="text-muted-foreground">/</span>
+```
 
 ### New: `AppNavbar` Component
 
@@ -139,14 +164,41 @@ interface AppNavbarProps {
 ```
 
 Two-row layout:
-- Row 1: Breadcrumbs (using EditorBreadcrumbs)
+- Row 1: Breadcrumbs (using renamed Breadcrumbs component)
 - Row 2: Tabs (context-dependent, optional)
 
 ### New: `NavTabs` Component
 
 Create in `components/shared/NavTabs.tsx`:
 
-Client component using `usePathname()` for active state. Follows pattern from existing `EventTabs.tsx`.
+Client component that receives tabs as props. Uses `usePathname()` for active state detection.
+
+```tsx
+interface TabItem {
+  label: string;
+  href: string; // Relative path from basePath
+}
+
+interface NavTabsProps {
+  tabs: TabItem[];
+  basePath: string; // e.g., "/acme-corp" for company context
+}
+
+// Usage in company layout:
+<NavTabs
+  tabs={[
+    { label: "Projects", href: "/projects" },
+    { label: "Experiences", href: "/exps" },
+    { label: "Settings", href: "/settings" },
+  ]}
+  basePath={`/${companySlug}`}
+/>
+```
+
+NavTabs handles:
+- Rendering tab links
+- Active state detection via `usePathname().startsWith(basePath + tab.href)`
+- Styling (follows EventTabs pattern)
 
 ### Tab Configurations by Context
 
@@ -237,7 +289,7 @@ Last item is display-only (no link, no edit dialog).
 - `app/(workspace)/(experience)/[companySlug]/exps/[expId]/layout.tsx`
 - `app/(workspace)/(experience)/[companySlug]/exps/[expId]/page.tsx`
 
-### Modified Files (7)
+### Modified Files (8)
 - `features/companies/constants.ts`
 - `features/companies/types/companies.types.ts`
 - `features/companies/schemas/companies.schemas.ts`
@@ -245,11 +297,11 @@ Last item is display-only (no link, no edit dialog).
 - `features/companies/actions/companies.actions.ts`
 - `features/companies/components/CompanyForm.tsx`
 - `features/companies/components/CompanyCard.tsx`
+- `components/shared/EditorBreadcrumbs.tsx` → Rename to `Breadcrumbs.tsx`, change separator to `/`
 
 ### Reference Files (patterns to follow)
 - `app/(admin)/events/[eventId]/layout.tsx` - Layout with navbar pattern
 - `features/events/components/shared/EventTabs.tsx` - Tab component pattern
-- `components/shared/EditorBreadcrumbs.tsx` - Reuse directly
 
 ---
 
@@ -257,16 +309,17 @@ Last item is display-only (no link, no edit dialog).
 
 1. **Flat route groups (Option D)** - Use `(company)`, `(project)`, `(event)`, `(experience)` route groups to break layout inheritance. Each context has isolated layout - no navbar stacking.
 2. **No `(workspace)` layout** - Root `app/layout.tsx` already provides shell (fonts, Toaster). No additional wrapper needed.
-3. **Reuse `EditorBreadcrumbs`** - No need for new breadcrumb component
-4. **Generic `AppNavbar`** - Single component for all contexts, configured via props
-5. **Slug auto-generation** - If not provided, generate from name
-6. **Display-only last breadcrumb** - No edit dialogs in breadcrumbs
-7. **Settings uses existing `CompanyForm`** - Full edit capability
-8. **Keep old `(admin)` routes** - Both route groups coexist; cleanup in later phase
-9. **Use `[companySlug]`** - Specific param names for clarity (vs generic `[slug]`)
-10. **Slug utilities in `lib/utils/`** - General-purpose, not company-specific
-11. **Route precedence** - Static routes (projects, exps, settings) take precedence over dynamic `[projectId]`. Accepted limitation.
-12. **Authentication** - Existing `proxy.ts` middleware handles auth; new routes protected by default
+3. **Rename `EditorBreadcrumbs` → `Breadcrumbs`** - Change separator from chevron to `/` for cleaner look
+4. **`NavTabs` receives tabs as props** - Generic component, each layout passes its own tab config
+5. **Generic `AppNavbar`** - Single component for all contexts, configured via props
+6. **Slug auto-generation** - If not provided, generate from name
+7. **Display-only last breadcrumb** - No edit dialogs in breadcrumbs
+8. **Settings uses existing `CompanyForm`** - Full edit capability
+9. **Keep old `(admin)` routes** - Both route groups coexist; cleanup in later phase
+10. **Use `[companySlug]`** - Specific param names for clarity (vs generic `[slug]`)
+11. **Slug utilities in `lib/utils/`** - General-purpose, not company-specific
+12. **Route precedence** - Static routes (projects, exps, settings) take precedence over dynamic `[projectId]`. Accepted limitation.
+13. **Authentication** - Existing `proxy.ts` middleware handles auth; new routes protected by default
 
 ---
 
