@@ -1,6 +1,6 @@
 # Feature Specification: Company Context Architecture
 
-**Feature Branch**: `001-company-context`
+**Feature Branch**: `012-company-context`
 **Created**: 2025-12-01
 **Status**: Draft
 **Input**: Phase 0 PRD - Transform Clementine from flat admin structure into company-centric multi-tenant architecture
