@@ -1,4 +1,4 @@
-// Event validation constants - extracted from schemas to avoid magic numbers
+// Project validation constants - extracted from schemas to avoid magic numbers
 
 // Field length constraints
 export const NAME_LENGTH = {
@@ -8,6 +8,20 @@ export const NAME_LENGTH = {
 
 // Color validation
 export const COLOR_REGEX = /^#[0-9A-F]{6}$/i;
+
+// Project status constants
+export const PROJECT_STATUS = {
+  DRAFT: "draft",
+  LIVE: "live",
+  ARCHIVED: "archived",
+  DELETED: "deleted",
+} as const;
+
+// Share path configuration
+export const SHARE_PATH_PREFIX = "/p/";
+
+// QR code storage path template
+export const QR_STORAGE_PATH = "media/{companyId}/qr/{projectId}.png";
 
 // Theme defaults (for UI default values and initialization)
 export const THEME_DEFAULTS = {

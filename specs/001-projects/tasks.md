@@ -26,8 +26,8 @@ This is a Next.js monorepo:
 
 **Purpose**: Firestore migration and project initialization
 
-- [ ] T001 Create migration script at `scripts/migrate-events-to-projects.ts` to copy `/events` → `/projects` with field renaming (ownerId→companyId, joinPath→sharePath, activeJourneyId→activeEventId)
-- [ ] T002 Add Firestore indexes to `firebase.json` for projects collection (companyId, sharePath, status+updatedAt composite)
+- [X] T001 Create migration script at `scripts/migrate-events-to-projects.ts` to copy `/events` → `/projects` with field renaming (ownerId→companyId, joinPath→sharePath, activeJourneyId→activeEventId)
+- [X] T002 Add Firestore indexes to `firebase.json` for projects collection (companyId, sharePath, status+updatedAt composite)
 - [ ] T003 Run migration script in dry-run mode and verify output logs
 - [ ] T004 Run migration script with writes enabled and verify document count matches
 - [ ] T005 Spot-check 10 random migrated documents for field correctness

@@ -1,20 +1,20 @@
 "use server";
 
 /**
- * Server Actions for event-level operations.
+ * Server Actions for project-level operations.
  * Consolidated from app/actions and lib/actions for single source of truth.
  */
 
 import { db } from "@/lib/firebase/admin";
 import {
-  createEvent,
-  getEvent,
-  listEvents,
-  updateEventBranding,
-  updateEventStatus,
-  updateEventName,
-  deleteEvent,
-} from "../repositories/events";
+  createProject,
+  getProject,
+  listProjects,
+  updateProjectBranding,
+  updateProjectStatus,
+  updateProjectName,
+  deleteProject,
+} from "../repositories/projects.repository";
 import { getCompany } from "@/features/companies/repositories/companies.repository";
 import {
   updateEventThemeSchema,
