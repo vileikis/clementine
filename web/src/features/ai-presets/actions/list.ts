@@ -6,7 +6,7 @@
  * Fetches experiences for an event using the repository.
  */
 
-import { getExperiencesByEventId } from "../repositories/experiences.repository";
+import { getAiPresetsByEventId } from "../repositories/ai-presets.repository";
 import type { Experience } from "../types";
 import type { ActionResponse } from "./types";
 import { ErrorCodes } from "./types";
@@ -28,7 +28,7 @@ export async function listExperiencesByEventAction(
       return createErrorResponse(ErrorCodes.VALIDATION_ERROR, "Event ID is required");
     }
 
-    const experiences = await getExperiencesByEventId(eventId);
+    const experiences = await getAiPresetsByEventId(eventId);
     return createSuccessResponse(experiences);
   } catch (error) {
     return createErrorResponse(

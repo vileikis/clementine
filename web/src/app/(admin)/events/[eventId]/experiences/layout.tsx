@@ -15,8 +15,8 @@ import {
 } from "@/components/ui/sheet";
 import { toast } from "sonner";
 import { usePathname } from "next/navigation";
-import { DesignSidebar } from "@/features/experiences";
-import type { Experience } from "@/features/experiences";
+import { DesignSidebar } from "@/features/ai-presets";
+import type { Experience } from "@/features/ai-presets";
 
 /**
  * Experiences Context for sharing experiences data across design routes
@@ -69,7 +69,7 @@ export default function DesignLayout({ children, params }: DesignLayoutProps) {
     if (!eventId) return;
 
     const experiencesQuery = query(
-      collection(db, "experiences"),
+      collection(db, "aiPresets"),
       where("eventIds", "array-contains", eventId),
       // orderBy("createdAt", "asc")
     );

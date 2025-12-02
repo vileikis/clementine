@@ -1,7 +1,7 @@
 "use client";
 
 import type { Step } from "@/features/steps/types";
-import type { Experience } from "@/features/experiences/types";
+import type { Experience } from "@/features/ai-presets/types";
 import type { StepInputValue } from "@/features/sessions";
 import { GuestCaptureStep } from "./GuestCaptureStep";
 import { GuestProcessingStep } from "./GuestProcessingStep";

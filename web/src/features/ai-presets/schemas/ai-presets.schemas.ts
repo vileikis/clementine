@@ -1,4 +1,4 @@
-// Zod schemas for Experience data models using discriminated unions
+// Zod schemas for AI Preset data models using discriminated unions
 // Refactored for normalized Firestore design (data-model-v4)
 import { z } from "zod";
 
@@ -6,7 +6,9 @@ import { z } from "zod";
 // Enums and Primitive Schemas
 // ============================================================================
 
-export const experienceTypeSchema = z.enum(["photo", "video", "gif"]);
+export const aiPresetTypeSchema = z.enum(["photo", "video", "gif"]);
+/** @deprecated Use aiPresetTypeSchema instead */
+export const experienceTypeSchema = aiPresetTypeSchema;
 
 export const previewTypeSchema = z.enum(["image", "gif", "video"]);
 
@@ -21,17 +23,17 @@ export const aspectRatioSchema = z.enum([
 export const cameraFacingSchema = z.enum(["front", "back", "both"]);
 
 // ============================================================================
-// Base Experience Schema (Shared Fields)
+// Base AI Preset Schema (Shared Fields)
 // ============================================================================
 
-const baseExperienceSchema = z.object({
+const baseAiPresetSchema = z.object({
   id: z.string(),
-  companyId: z.string(), // Company that owns this experience
-  eventIds: z.array(z.string()), // Events using this experience (many-to-many)
+  companyId: z.string(), // Company that owns this AI preset
+  eventIds: z.array(z.string()), // Events using this AI preset (many-to-many)
 
   // Core Configuration
   name: z.string().min(1).max(50), // Renamed from 'label'
-  type: experienceTypeSchema,
+  type: aiPresetTypeSchema,
   enabled: z.boolean(),
   // 'hidden' field removed
 
@@ -99,22 +101,22 @@ const aiVideoConfigSchema = z.object({
 
 
 // ============================================================================
-// Discriminated Union Experience Schemas
+// Discriminated Union AI Preset Schemas
 // ============================================================================
 
-export const photoExperienceSchema = baseExperienceSchema.extend({
+export const photoAiPresetSchema = baseAiPresetSchema.extend({
   type: z.literal("photo"),
   captureConfig: photoCaptureConfigSchema, // Renamed from 'config'
   aiPhotoConfig: aiPhotoConfigSchema, // Renamed from 'aiConfig'
 });
 
-export const videoExperienceSchema = baseExperienceSchema.extend({
+export const videoAiPresetSchema = baseAiPresetSchema.extend({
   type: z.literal("video"),
   captureConfig: videoCaptureConfigSchema,
   aiVideoConfig: aiVideoConfigSchema, // Video uses video-specific AI config
 });
 
-export const gifExperienceSchema = baseExperienceSchema.extend({
+export const gifAiPresetSchema = baseAiPresetSchema.extend({
   type: z.literal("gif"),
   captureConfig: gifCaptureConfigSchema,
   aiPhotoConfig: aiPhotoConfigSchema, // GIF uses photo AI config (image models)
@@ -122,31 +124,41 @@ export const gifExperienceSchema = baseExperienceSchema.extend({
 
 // Wheel experience type removed - not in scope for data-model-v4
 
-// Discriminated Union - all experience types
-export const experienceSchema = z.discriminatedUnion("type", [
-  photoExperienceSchema,
-  videoExperienceSchema,
-  gifExperienceSchema,
+// Discriminated Union - all AI preset types
+export const aiPresetSchema = z.discriminatedUnion("type", [
+  photoAiPresetSchema,
+  videoAiPresetSchema,
+  gifAiPresetSchema,
 ]);
+
+// Legacy aliases for backward compatibility
+/** @deprecated Use photoAiPresetSchema instead */
+export const photoExperienceSchema = photoAiPresetSchema;
+/** @deprecated Use videoAiPresetSchema instead */
+export const videoExperienceSchema = videoAiPresetSchema;
+/** @deprecated Use gifAiPresetSchema instead */
+export const gifExperienceSchema = gifAiPresetSchema;
+/** @deprecated Use aiPresetSchema instead */
+export const experienceSchema = aiPresetSchema;
 
 // ============================================================================
 // Creation/Update Schemas
 // ============================================================================
 
-// Create Photo Experience
-export const createPhotoExperienceSchema = z.object({
+// Create Photo AI Preset
+export const createPhotoAiPresetSchema = z.object({
   companyId: z.string().min(1, "Company ID is required"),
   eventIds: z.array(z.string()).default([]), // Can be empty initially
   name: z
     .string()
     .trim()
-    .min(1, "Experience name is required")
-    .max(50, "Experience name must be 50 characters or less"),
+    .min(1, "AI preset name is required")
+    .max(50, "AI preset name must be 50 characters or less"),
   type: z.literal("photo"),
 });
 
-// Update Photo Experience (partial updates allowed)
-export const updatePhotoExperienceSchema = z
+// Update Photo AI Preset (partial updates allowed)
+export const updatePhotoAiPresetSchema = z
   .object({
     name: z.string().min(1).max(50).optional(),
     enabled: z.boolean().optional(),
@@ -158,20 +170,20 @@ export const updatePhotoExperienceSchema = z
   })
   .strict();
 
-// Create GIF Experience
-export const createGifExperienceSchema = z.object({
+// Create GIF AI Preset
+export const createGifAiPresetSchema = z.object({
   companyId: z.string().min(1, "Company ID is required"),
   eventIds: z.array(z.string()).default([]),
   name: z
     .string()
     .trim()
-    .min(1, "Experience name is required")
-    .max(50, "Experience name must be 50 characters or less"),
+    .min(1, "AI preset name is required")
+    .max(50, "AI preset name must be 50 characters or less"),
   type: z.literal("gif"),
 });
 
-// Update GIF Experience (partial updates allowed)
-export const updateGifExperienceSchema = z
+// Update GIF AI Preset (partial updates allowed)
+export const updateGifAiPresetSchema = z
   .object({
     name: z.string().min(1).max(50).optional(),
     enabled: z.boolean().optional(),
@@ -183,20 +195,20 @@ export const updateGifExperienceSchema = z
   })
   .strict();
 
-// Create Video Experience
-export const createVideoExperienceSchema = z.object({
+// Create Video AI Preset
+export const createVideoAiPresetSchema = z.object({
   companyId: z.string().min(1, "Company ID is required"),
   eventIds: z.array(z.string()).default([]),
   name: z
     .string()
     .trim()
-    .min(1, "Experience name is required")
-    .max(50, "Experience name must be 50 characters or less"),
+    .min(1, "AI preset name is required")
+    .max(50, "AI preset name must be 50 characters or less"),
   type: z.literal("video"),
 });
 
-// Update Video Experience (partial updates allowed)
-export const updateVideoExperienceSchema = z
+// Update Video AI Preset (partial updates allowed)
+export const updateVideoAiPresetSchema = z
   .object({
     name: z.string().min(1).max(50).optional(),
     enabled: z.boolean().optional(),
@@ -207,6 +219,20 @@ export const updateVideoExperienceSchema = z
     aiVideoConfig: aiVideoConfigSchema.partial().optional(),
   })
   .strict();
+
+// Legacy aliases for backward compatibility
+/** @deprecated Use createPhotoAiPresetSchema instead */
+export const createPhotoExperienceSchema = createPhotoAiPresetSchema;
+/** @deprecated Use updatePhotoAiPresetSchema instead */
+export const updatePhotoExperienceSchema = updatePhotoAiPresetSchema;
+/** @deprecated Use createGifAiPresetSchema instead */
+export const createGifExperienceSchema = createGifAiPresetSchema;
+/** @deprecated Use updateGifAiPresetSchema instead */
+export const updateGifExperienceSchema = updateGifAiPresetSchema;
+/** @deprecated Use createVideoAiPresetSchema instead */
+export const createVideoExperienceSchema = createVideoAiPresetSchema;
+/** @deprecated Use updateVideoAiPresetSchema instead */
+export const updateVideoExperienceSchema = updateVideoAiPresetSchema;
 
 // ============================================================================
 // Preview Media Upload Schemas
@@ -256,12 +282,22 @@ export const playgroundGenerateOutputSchema = z.object({
 // TypeScript Type Exports
 // ============================================================================
 
-// Experience Types (discriminated union members)
-export type PhotoExperience = z.infer<typeof photoExperienceSchema>;
-export type VideoExperience = z.infer<typeof videoExperienceSchema>;
-export type GifExperience = z.infer<typeof gifExperienceSchema>;
+// AI Preset Types (discriminated union members)
+export type PhotoAiPreset = z.infer<typeof photoAiPresetSchema>;
+export type VideoAiPreset = z.infer<typeof videoAiPresetSchema>;
+export type GifAiPreset = z.infer<typeof gifAiPresetSchema>;
 
-export type Experience = z.infer<typeof experienceSchema>;
+export type AiPreset = z.infer<typeof aiPresetSchema>;
+
+// Legacy aliases for backward compatibility
+/** @deprecated Use PhotoAiPreset instead */
+export type PhotoExperience = PhotoAiPreset;
+/** @deprecated Use VideoAiPreset instead */
+export type VideoExperience = VideoAiPreset;
+/** @deprecated Use GifAiPreset instead */
+export type GifExperience = GifAiPreset;
+/** @deprecated Use AiPreset instead */
+export type Experience = AiPreset;
 
 // Capture Config Types (renamed from PhotoConfig, etc.)
 export type PhotoCaptureConfig = z.infer<typeof photoCaptureConfigSchema>;
@@ -273,21 +309,39 @@ export type AiPhotoConfig = z.infer<typeof aiPhotoConfigSchema>;
 export type AiVideoConfig = z.infer<typeof aiVideoConfigSchema>;
 
 // Primitive Types
-export type ExperienceType = z.infer<typeof experienceTypeSchema>;
+export type AiPresetType = z.infer<typeof aiPresetTypeSchema>;
+/** @deprecated Use AiPresetType instead */
+export type ExperienceType = AiPresetType;
 export type PreviewType = z.infer<typeof previewTypeSchema>;
 export type AspectRatio = z.infer<typeof aspectRatioSchema>;
 export type CameraFacing = z.infer<typeof cameraFacingSchema>;
 
 // Creation/Update Types
-export type CreatePhotoExperienceData = z.infer<typeof createPhotoExperienceSchema>;
-export type UpdatePhotoExperienceData = z.infer<typeof updatePhotoExperienceSchema>;
-export type CreateGifExperienceData = z.infer<typeof createGifExperienceSchema>;
-export type UpdateGifExperienceData = z.infer<typeof updateGifExperienceSchema>;
-export type CreateVideoExperienceData = z.infer<typeof createVideoExperienceSchema>;
-export type UpdateVideoExperienceData = z.infer<typeof updateVideoExperienceSchema>;
+export type CreatePhotoAiPresetData = z.infer<typeof createPhotoAiPresetSchema>;
+export type UpdatePhotoAiPresetData = z.infer<typeof updatePhotoAiPresetSchema>;
+export type CreateGifAiPresetData = z.infer<typeof createGifAiPresetSchema>;
+export type UpdateGifAiPresetData = z.infer<typeof updateGifAiPresetSchema>;
+export type CreateVideoAiPresetData = z.infer<typeof createVideoAiPresetSchema>;
+export type UpdateVideoAiPresetData = z.infer<typeof updateVideoAiPresetSchema>;
 
-// Type alias for Experience union
-export type ExperienceSchema = Experience;
+// Legacy aliases for creation/update types
+/** @deprecated Use CreatePhotoAiPresetData instead */
+export type CreatePhotoExperienceData = CreatePhotoAiPresetData;
+/** @deprecated Use UpdatePhotoAiPresetData instead */
+export type UpdatePhotoExperienceData = UpdatePhotoAiPresetData;
+/** @deprecated Use CreateGifAiPresetData instead */
+export type CreateGifExperienceData = CreateGifAiPresetData;
+/** @deprecated Use UpdateGifAiPresetData instead */
+export type UpdateGifExperienceData = UpdateGifAiPresetData;
+/** @deprecated Use CreateVideoAiPresetData instead */
+export type CreateVideoExperienceData = CreateVideoAiPresetData;
+/** @deprecated Use UpdateVideoAiPresetData instead */
+export type UpdateVideoExperienceData = UpdateVideoAiPresetData;
+
+// Type alias for AI Preset union
+export type AiPresetSchema = AiPreset;
+/** @deprecated Use AiPresetSchema instead */
+export type ExperienceSchema = AiPreset;
 
 // Playground Types
 export type PlaygroundGenerateInput = z.infer<typeof playgroundGenerateInputSchema>;

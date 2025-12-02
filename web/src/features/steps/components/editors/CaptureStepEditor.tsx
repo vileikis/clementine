@@ -38,7 +38,7 @@ import { useAutoSave } from "../../hooks";
 import { STEP_CONSTANTS } from "../../constants";
 import { stepMediaTypeSchema } from "../../schemas";
 import type { StepCapture } from "../../types";
-import type { Experience } from "@/features/experiences";
+import type { Experience } from "@/features/ai-presets";
 
 const captureFormSchema = z.object({
   // Base fields

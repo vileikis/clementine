@@ -33,10 +33,10 @@ export { GifCaptureSettings } from "./components/gif/GifCaptureSettings";
 // bundling server-only code (Firebase Admin SDK, next/headers) in client bundles.
 //
 // Import Server Actions directly:
-// import { createPhotoExperience } from "@/features/experiences/actions/photo-create";
-// import { updatePhotoExperience } from "@/features/experiences/actions/photo-update";
-// import { deleteExperience } from "@/features/experiences/actions/shared";
-// import { uploadPreviewMedia, deletePreviewMedia } from "@/features/experiences/actions/photo-media";
+// import { createPhotoAiPreset } from "@/features/ai-presets/actions/photo-create";
+// import { updatePhotoAiPreset } from "@/features/ai-presets/actions/photo-update";
+// import { deleteAiPreset } from "@/features/ai-presets/actions/shared";
+// import { uploadPreviewMedia, deletePreviewMedia } from "@/features/ai-presets/actions/photo-media";
 //
 // Type exports (safe for client):
 export type { ActionResponse } from "./actions/types";
@@ -44,11 +44,11 @@ export type { ActionResponse } from "./actions/types";
 // ============================================================================
 // Repository - NOT EXPORTED from public API
 // Repository functions contain server-only code (Firebase Admin SDK)
-// Import directly when needed: @/features/experiences/repositories
+// Import directly when needed: @/features/ai-presets/repositories
 // ============================================================================
 // NOTE: Repository functions are NOT exported from public API to avoid
 // bundling server-only code in client bundles. Import directly from
-// @/features/experiences/repositories in server-only code.
+// @/features/ai-presets/repositories in server-only code.
 
 // ============================================================================
 // Constants
@@ -63,11 +63,19 @@ export {
 // Refactored for normalized Firestore design (data-model-v4)
 // ============================================================================
 export type {
+  // New naming convention
+  AiPreset,
+  PhotoAiPreset,
+  GifAiPreset,
+  VideoAiPreset,
+  AiPresetType,
+  // Legacy aliases for backward compatibility
   Experience,
   PhotoExperience,
   GifExperience,
   VideoExperience,
   ExperienceType,
+  // Common types
   PreviewType,
   AspectRatio,
   PhotoCaptureConfig,
@@ -81,9 +89,18 @@ export type {
 // Validation Schemas (Safe to export)
 // ============================================================================
 export {
+  // New naming convention
+  aiPresetTypeSchema,
+  aiPresetSchema,
+  photoAiPresetSchema,
+  gifAiPresetSchema,
+  videoAiPresetSchema,
+  createPhotoAiPresetSchema,
+  updatePhotoAiPresetSchema,
+  createGifAiPresetSchema,
+  updateGifAiPresetSchema,
+  // Legacy aliases for backward compatibility
   experienceTypeSchema,
-  previewTypeSchema,
-  aspectRatioSchema,
   experienceSchema,
   photoExperienceSchema,
   gifExperienceSchema,
@@ -92,6 +109,9 @@ export {
   updatePhotoExperienceSchema,
   createGifExperienceSchema,
   updateGifExperienceSchema,
+  // Common schemas
+  previewTypeSchema,
+  aspectRatioSchema,
   uploadPreviewMediaSchema,
   previewMediaResultSchema,
   // Legacy aliases for backward compatibility during migration

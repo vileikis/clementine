@@ -33,11 +33,12 @@ Key changes:
 
 ### Nested collections
 
-| Collection           | Path                                                           | Description                        |
-| -------------------- | -------------------------------------------------------------- | ---------------------------------- |
-| **Events**           | `/projects/{projectId}/events/{eventId}`                       | Time-bound, themed event instances |
-| **EventExperiences** | `/projects/{projectId}/events/{eventId}/eventExperiences/{id}` | Links events → experiences         |
-| **Steps**            | `/experiences/{experienceId}/steps/{stepId}`                   | UI / logic nodes in an Experience  |
+| Collection | Path                                         | Description                        |
+| ---------- | -------------------------------------------- | ---------------------------------- |
+| **Events** | `/projects/{projectId}/events/{eventId}`     | Time-bound, themed event instances |
+| **Steps**  | `/experiences/{experienceId}/steps/{stepId}` | UI / logic nodes in an Experience  |
+
+> **Note:** Event → Experience linking is handled via `experiences[]` array embedded in the Event document (no separate subcollection).
 
 ---
 
@@ -116,12 +117,25 @@ interface Event {
   publishStartAt?: number | null; // Unix timestamp ms
   publishEndAt?: number | null; // Unix timestamp ms
 
+  // Linked experiences (embedded array, no subcollection)
+  experiences: EventExperienceLink[]; // Links to /experiences/{experienceId}
+
   // Theming is defined only at event level (MVP)
   theme: EventTheme;
 
   deletedAt?: number | null;
   createdAt: number;
   updatedAt: number;
+}
+```
+
+### EventExperienceLink (embedded object)
+
+```ts
+interface EventExperienceLink {
+  experienceId: string; // FK to /experiences/{experienceId}
+  label?: string | null; // Optional override for display name in this event
+  // Future fields: sortOrder, isEnabled, customConfig, etc.
 }
 ```
 
@@ -194,39 +208,7 @@ interface Experience {
 
 ---
 
-## 6. EventExperiences (linking Events → Experiences)
-
-**Collection**:
-`/projects/{projectId}/events/{eventId}/eventExperiences/{eventExperienceId}`
-
-These documents link an Event to one or more Experiences from the company’s Experience library.
-
-### Schema
-
-```ts
-interface EventExperience {
-  id: string;
-  eventId: string;
-  projectId: string;
-  companyId: string;
-  experienceId: string; // FK to /experiences/{experienceId}
-  isEnabled: boolean; // Simple on/off toggle (MVP)
-  createdAt: number;
-  updatedAt: number;
-}
-```
-
-### Notes
-
-- No overrides or ordering in MVP.
-- Guest runtime can:
-
-  - Show a single chosen Experience, or
-  - Offer a simple “experience choice” screen built from these docs (not via a step).
-
----
-
-## 7. Steps (per Experience)
+## 6. Steps (per Experience)
 
 **Collection**:
 `/experiences/{experienceId}/steps/{stepId}`
@@ -268,7 +250,7 @@ interface StepBase {
 
 Most of the old step types can be **reused exactly as before**, with `eventId`/`journeyId` removed and replaced by `experienceId`. For brevity, I’ll list just the changed / key parts.
 
-#### 7.1 Info Step
+#### 6.1 Info Step
 
 ```ts
 interface StepInfo extends StepBase {
@@ -276,7 +258,7 @@ interface StepInfo extends StepBase {
 }
 ```
 
-#### 7.2 Capture Step
+#### 6.2 Capture Step
 
 Still a camera capture screen, but now **bound to the Experience** rather than dynamic experience picking.
 
@@ -294,11 +276,11 @@ interface StepCapture extends StepBase {
 
 > Note: old `config.source` referencing `$experienceId` is no longer needed, since the Experience is fixed.
 
-#### 7.3 Input Steps
+#### 6.3 Input Steps
 
 Same shapes as before (short_text, long_text, multiple_choice, yes_no, opinion_scale, email), but with `experienceId` instead of `eventId`/`journeyId`.
 
-#### 7.4 Processing Step
+#### 6.4 Processing Step
 
 Same as old:
 
@@ -312,7 +294,7 @@ interface StepProcessing extends StepBase {
 }
 ```
 
-#### 7.5 Reward Step
+#### 6.5 Reward Step
 
 Same as old, used for final sharing screen.
 
@@ -328,7 +310,7 @@ interface StepReward extends StepBase {
 }
 ```
 
-#### 7.6 NEW: AiTransform Step
+#### 6.6 NEW: AiTransform Step
 
 New step type that encapsulates the AI "preset" behavior inline.
 
@@ -353,7 +335,7 @@ interface StepAiTransform extends StepBase {
 > - Variable bindings deferred to future iteration
 > - Advanced settings (steps, guidanceScale, seed) removed for MVP simplicity
 
-#### 7.7 Removed: Experience Picker Step
+#### 6.7 Removed: Experience Picker Step
 
 The old:
 
@@ -361,11 +343,11 @@ The old:
 type: "experience-picker";
 ```
 
-step is **removed** from the schema and renderer registry. Experience selection happens at the **Event level** via `eventExperiences`, not as a step.
+step is **removed** from the schema and renderer registry. Experience selection happens at the **Event level** via `experiences[]` array, not as a step.
 
 ---
 
-## 8. AiPresets (Dormant, Future Use)
+## 7. AiPresets (Dormant, Future Use)
 
 **Collection**: `/aiPresets/{aiPresetId}`
 
@@ -398,15 +380,14 @@ interface AiPreset {
 
 ---
 
-## 9. Relationships (New World)
+## 8. Relationships (New World)
 
 ```text
 Companies (1)
   ├── (*) Projects
   │       └── (*) Events
-  │             └── (*) EventExperiences
-  │                    └── (1) Experiences
-  │                          └── (*) Steps
+  │             └── experiences[] → (*) Experiences
+  │                                      └── (*) Steps
   └── (*) Experiences
          └── (*) Steps
 
@@ -416,7 +397,7 @@ Companies (1)
 
 - **Company → Projects**: one company has many projects.
 - **Project → Events**: one project has many events.
-- **Event → EventExperiences**: one event can expose multiple experiences.
+- **Event → Experiences**: events link to experiences via `experiences[]` array (embedded objects with `experienceId`, `label`, etc.).
 - **Company → Experiences**: experiences are shared across a company.
 - **Experience → Steps**: one experience has many steps.
 - **AiPresets**: standalone, company-scoped; future AI library.

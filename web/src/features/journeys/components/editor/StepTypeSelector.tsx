@@ -17,8 +17,6 @@ import {
 } from "@/components/ui/dialog";
 import {
   Layout,
-  Grid3X3,
-  Camera,
   Type,
   AlignLeft,
   ListChecks,
@@ -60,25 +58,11 @@ const STEP_TYPE_CATEGORIES: StepTypeCategory[] = [
         description: "Welcome or message screen",
         icon: Layout,
       },
-      {
-        type: "experience-picker",
-        label: "Experience Picker",
-        description: "Choose an AI experience",
-        icon: Grid3X3,
-      },
+      // Deprecated: "experience-picker" - removed from creation UI
+      // Deprecated: "capture" - removed from creation UI
     ],
   },
-  {
-    name: "Capture",
-    types: [
-      {
-        type: "capture",
-        label: "Capture",
-        description: "Take a photo or video",
-        icon: Camera,
-      },
-    ],
-  },
+  // Note: "Capture" category is now empty since capture step is deprecated
   {
     name: "Input",
     types: [

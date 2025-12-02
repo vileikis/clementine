@@ -5,7 +5,7 @@ import { z } from "zod";
 import type { Event } from "@/features/events/types";
 import type { Journey } from "@/features/journeys/types";
 import type { Step } from "@/features/steps/types";
-import type { Experience } from "@/features/experiences/types";
+import type { Experience } from "@/features/ai-presets/types";
 import type { StepInputValue } from "@/features/sessions";
 import { EventThemeProvider } from "@/components/providers/EventThemeProvider";
 import { ViewportModeProvider } from "@/features/steps/components/preview/ViewportModeContext";
