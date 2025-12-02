@@ -1,5 +1,5 @@
 import { listCompaniesAction } from "@/features/companies/actions";
-import { CompanyCard } from "@/features/companies/components";
+import { CompanyCard, CompaniesHeader } from "@/features/companies/components";
 
 /**
  * Companies page - displays list of all companies
@@ -10,12 +10,15 @@ export default async function CompaniesPage() {
 
   if (!result.success) {
     return (
-      <div className="flex items-center justify-center h-full min-h-[50vh]">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold text-destructive">Error</h2>
-          <p className="text-sm text-muted-foreground mt-2">
-            {result.error ?? "Failed to load companies"}
-          </p>
+      <div className="p-4">
+        <CompaniesHeader />
+        <div className="flex items-center justify-center h-full min-h-[50vh]">
+          <div className="text-center">
+            <h2 className="text-xl font-semibold text-destructive">Error</h2>
+            <p className="text-sm text-muted-foreground mt-2">
+              {result.error ?? "Failed to load companies"}
+            </p>
+          </div>
         </div>
       </div>
     );
@@ -25,14 +28,17 @@ export default async function CompaniesPage() {
 
   if (companies.length === 0) {
     return (
-      <div className="flex items-center justify-center h-full min-h-[50vh]">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold text-muted-foreground">
-            No Companies
-          </h2>
-          <p className="text-sm text-muted-foreground mt-2">
-            Create your first company to get started.
-          </p>
+      <div className="p-4">
+        <CompaniesHeader />
+        <div className="flex items-center justify-center h-full min-h-[50vh]">
+          <div className="text-center">
+            <h2 className="text-xl font-semibold text-muted-foreground">
+              No Companies
+            </h2>
+            <p className="text-sm text-muted-foreground mt-2">
+              Create your first company to get started.
+            </p>
+          </div>
         </div>
       </div>
     );
@@ -40,7 +46,7 @@ export default async function CompaniesPage() {
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-6">Companies</h1>
+      <CompaniesHeader />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {companies.map((company) => (
           <CompanyCard key={company.id} company={company} />
