@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { getCompanyBySlugAction } from "@/features/companies/actions";
-import { AppNavbar } from "@/components/shared/AppNavbar";
-import { LogoutButton } from "@/components/shared/LogoutButton";
+import { Sidebar, ContentHeader, LastCompanyUpdater } from "@/features/sidebar";
 
 interface ExperienceLayoutProps {
   children: React.ReactNode;
@@ -9,9 +8,8 @@ interface ExperienceLayoutProps {
 }
 
 /**
- * Experience layout - isolated navigation context
- * Breadcrumbs: 🍊 / Company / experiences / Experience Name
- * No tabs - breadcrumbs only
+ * Experience layout - sidebar navigation with breadcrumbs in content area
+ * Breadcrumbs: Experiences / [Experience Name] (company context in sidebar)
  */
 export default async function ExperienceLayout({
   children,
@@ -19,7 +17,7 @@ export default async function ExperienceLayout({
 }: ExperienceLayoutProps) {
   const { companySlug, expId } = await params;
 
-  // Fetch company for breadcrumbs
+  // Fetch company for sidebar
   const companyResult = await getCompanyBySlugAction(companySlug);
   if (!companyResult.success || !companyResult.company) {
     notFound();
@@ -31,17 +29,18 @@ export default async function ExperienceLayout({
   const experienceName = `Experience ${expId}`;
 
   return (
-    <div className="flex flex-col h-full">
-      <AppNavbar
-        breadcrumbs={[
-          { label: "\u{1F34A}", href: "/", isLogo: true },
-          { label: company.name, href: `/${companySlug}/exps` },
-          { label: "experiences", href: `/${companySlug}/exps` },
-          { label: experienceName },
-        ]}
-        actions={<LogoutButton />}
-      />
-      <div className="flex-1 overflow-auto">{children}</div>
+    <div className="flex h-screen">
+      <Sidebar company={company} />
+      <main className="flex-1 overflow-auto flex flex-col">
+        <ContentHeader
+          breadcrumbs={[
+            { label: "Experiences", href: `/${companySlug}/exps` },
+            { label: experienceName },
+          ]}
+        />
+        <div className="flex-1 overflow-auto">{children}</div>
+      </main>
+      <LastCompanyUpdater companySlug={companySlug} />
     </div>
   );
 }
