@@ -205,26 +205,31 @@ The application is organized into feature modules in `web/src/features/`. The da
 - **White-label** - Fully customizable branding per event
 
 ## Active Technologies
-- TypeScript 5.x (strict mode), React 19, Next.js 16 + @dnd-kit/core (drag-drop), react-hook-form + zod (forms), shadcn/ui (components), lucide-react (icons), sonner (toasts) (006-journey-editor)
-- Firebase Firestore - Steps as subcollection `/events/{eventId}/steps/{stepId}`, Journeys at `/events/{eventId}/journeys/{journeyId}` (006-journey-editor)
-- TypeScript 5.x (strict mode) + Next.js 16, React 19, Tailwind CSS v4, shadcn/ui, @dnd-kit/core, react-hook-form, zod (008-preview-runtime)
-- Firebase Firestore (read-only for preview) (008-preview-runtime)
-- TypeScript 5.x (strict mode) + Next.js 16, React 19, Tailwind CSS v4, shadcn/ui, lucide-react (009-journey-playback)
-- N/A (ephemeral in-memory state only - no Firestore writes) (009-journey-playback)
-- TypeScript 5.x (strict mode) + Next.js 16, React 19, Firebase Storage (Admin SDK), lottie-react, Zod 4.x (009-step-media-upload)
-- Firebase Storage with company-level paths: `media/{companyId}/{mediaType}/{timestamp}-{filename}` (009-step-media-upload)
 
-- TypeScript 5.x (strict mode), Next.js 16 (App Router), React 19
-- Firebase (Firestore + Storage), Zod 4.x
-- Tailwind CSS v4, shadcn/ui, lucide-react
-- **Firestore Collections**:
-  - `/companies` - Brand/organization management (ready)
-  - `/events` - Root event configs and switchboard (ready)
-  - `/experiences` - AI experience library (ready)
-  - `/events/{eventId}/journeys` - Step sequence playlists (ready)
-  - `/events/{eventId}/steps` - Individual screen configs (ready)
-  - `/sessions` - Guest interaction records (planned)
-- Firebase Storage for images/media assets
+### Core Stack
+- **Language**: TypeScript 5.x (strict mode)
+- **Framework**: Next.js 16 (App Router), React 19
+- **Styling**: Tailwind CSS v4, shadcn/ui, lucide-react
+- **Validation**: Zod 4.x
+
+### Data Layer
+- **Database**: Firebase Firestore
+- **Storage**: Firebase Storage (`media/{companyId}/{mediaType}/{timestamp}-{filename}`)
+- **Client State**: Zustand (with persist middleware for localStorage)
+
+### Additional Libraries
+- @dnd-kit/core (drag-drop)
+- react-hook-form (forms)
+- lottie-react (animations)
+- sonner (toasts)
+
+### Firestore Collections
+- `/companies` - Brand/organization management (ready)
+- `/events` - Root event configs and switchboard (ready)
+- `/experiences` - AI experience library (ready)
+- `/events/{eventId}/journeys` - Step sequence playlists (ready)
+- `/events/{eventId}/steps` - Individual screen configs (ready)
+- `/sessions` - Guest interaction records (planned)
 
 ## Recent Changes
 
