@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
-import { getProject } from "../repositories/projects.repository";
+import { doc, onSnapshot } from "firebase/firestore";
+import { db } from "@/lib/firebase/client";
+import { projectSchema } from "../schemas";
 import type { Project } from "../types/project.types";
 
 interface UseProjectOptions {
@@ -7,7 +9,7 @@ interface UseProjectOptions {
 }
 
 /**
- * Hook to fetch a single project by ID with optional real-time subscription.
+ * Hook to fetch a single project by ID with real-time subscription.
  *
  * @param projectId - The ID of the project to fetch
  * @param options - Options for the hook (subscribe for real-time updates)
@@ -31,37 +33,37 @@ export function useProject(
     setLoading(true);
     setError(null);
 
-    if (options.subscribe) {
-      // Real-time subscription
-      const unsubscribe = getProject(
-        projectId,
-        { subscribe: true },
-        (updatedProject) => {
-          setProject(updatedProject);
-          setLoading(false);
-        },
-        (err) => {
-          setError(err);
-          setLoading(false);
+    // Real-time subscription using Client SDK
+    const projectRef = doc(db, "projects", projectId);
+    const unsubscribe = onSnapshot(
+      projectRef,
+      (snapshot) => {
+        if (snapshot.exists()) {
+          try {
+            const projectData = projectSchema.parse({
+              id: snapshot.id,
+              ...snapshot.data(),
+            });
+            setProject(projectData);
+            setError(null);
+          } catch (err) {
+            setError(err instanceof Error ? err : new Error("Validation error"));
+            setProject(null);
+          }
+        } else {
+          setProject(null);
+          setError(new Error("Project not found"));
         }
-      );
+        setLoading(false);
+      },
+      (err) => {
+        setError(err instanceof Error ? err : new Error("Failed to fetch project"));
+        setLoading(false);
+      }
+    );
 
-      return () => {
-        if (unsubscribe) unsubscribe();
-      };
-    } else {
-      // One-time fetch
-      getProject(projectId, { subscribe: false })
-        .then((fetchedProject) => {
-          setProject(fetchedProject);
-          setLoading(false);
-        })
-        .catch((err) => {
-          setError(err);
-          setLoading(false);
-        });
-    }
-  }, [projectId, options.subscribe]);
+    return () => unsubscribe();
+  }, [projectId]);
 
   return { project, loading, error };
 }

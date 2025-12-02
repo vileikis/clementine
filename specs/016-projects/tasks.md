@@ -68,14 +68,14 @@ This is a Next.js monorepo:
 - [X] T018 [P] [US1] Rename component `web/src/features/projects/components/studio/DeleteEventButton.tsx` → `DeleteProjectButton.tsx`, update to use deleteProject action
 - [X] T019 [P] [US1] Rename component `web/src/features/projects/components/shared/EditableEventName.tsx` → `EditableProjectName.tsx`, update Event→Project references
 - [X] T020 [P] [US1] Create hook `web/src/features/projects/hooks/useProject.ts` for single project real-time subscription (wraps getProject with subscribe: true)
-- [ ] T021 [US1] Create new component `web/src/features/projects/components/ProjectDetailsHeader.tsx` with project name, ProjectStatusSwitcher, and edit controls
-- [ ] T022 [US1] Create page `web/src/app/(authenticated)/projects/[projectId]/page.tsx` with ProjectDetailsHeader, tab navigation (Events, Distribute), and useProject hook
-- [ ] T023 [US1] Update ProjectForm to call createProject action on submit and handle success/error states with toast notifications
-- [ ] T024 [US1] Update ProjectStatusSwitcher to call updateProjectStatus action and handle transition validation errors
-- [ ] T025 [US1] Update DeleteProjectButton to call deleteProject action and redirect to projects list on success
+- [X] T021 [US1] Create new component `web/src/features/projects/components/ProjectDetailsHeader.tsx` with project name, ProjectStatusSwitcher, and edit controls
+- [X] T022 [US1] Create page `web/src/app/(authenticated)/projects/[projectId]/page.tsx` with ProjectDetailsHeader, tab navigation (Events, Distribute), and useProject hook
+- [X] T023 [US1] Update ProjectForm to call createProject action on submit and handle success/error states with toast notifications
+- [X] T024 [US1] Update ProjectStatusSwitcher to call updateProjectStatus action and handle transition validation errors
+- [X] T025 [US1] Update DeleteProjectButton to call deleteProject action and redirect to projects list on success
 - [X] T026 [US1] Update barrel export `web/src/features/projects/components/index.ts` to export new components (ProjectForm, ProjectStatusSwitcher, DeleteProjectButton, EditableProjectName, ProjectDetailsHeader)
 - [X] T027 [US1] Update barrel export `web/src/features/projects/hooks/index.ts` to export useProject hook
-- [ ] T028 [US1] Update feature module public API `web/src/features/projects/index.ts` to export components, hooks, and types (no actions/schemas/repositories)
+- [X] T028 [US1] Update feature module public API `web/src/features/projects/index.ts` to export components, hooks, and types (no actions/schemas/repositories)
 
 **Checkpoint**: At this point, administrators can create projects, view project details, and change project status. This is independently testable.
 
