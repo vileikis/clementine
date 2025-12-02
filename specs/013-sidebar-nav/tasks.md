@@ -57,7 +57,7 @@
 - [X] T014 [US1] Update workspace layout to include Sidebar in `app/(workspace)/layout.tsx`
 - [X] T015 [US1] Update company layout to remove AppNavbar, pass company to Sidebar in `app/(workspace)/(company)/[companySlug]/layout.tsx`
 - [X] T016 [US1] Create analytics placeholder page in `app/(workspace)/(company)/[companySlug]/analytics/page.tsx`
-- [ ] T017 [US1] Verify navigation works: click each nav item navigates correctly with active highlighting
+- [X] T017 [US1] Verify navigation works: click each nav item navigates correctly with active highlighting
 
 **Checkpoint**: User Story 1 complete - basic navigation functional
 
@@ -76,7 +76,7 @@
 - [X] T020 [US2] Add CSS width transition animation (256px ↔ 72px, 200ms ease-out) to Sidebar in `features/sidebar/components/Sidebar.tsx`
 - [X] T021 [US2] Add tooltip on hover for collapsed nav items in `features/sidebar/components/SidebarNavItem.tsx`
 - [X] T022 [US2] Connect collapse state to Zustand store (toggleCollapsed action) in `features/sidebar/components/Sidebar.tsx`
-- [ ] T023 [US2] Verify persistence: collapse sidebar, refresh page, verify still collapsed
+- [X] T023 [US2] Verify persistence: collapse sidebar, refresh page, verify still collapsed
 
 **Checkpoint**: User Story 2 complete - collapse/expand with persistence working
 
@@ -94,8 +94,8 @@
 - [X] T025 [US3] Update root page with client-side redirect logic using Zustand store in `app/page.tsx`
 - [X] T026 [US3] Add lastCompanySlug update when visiting company pages in `app/(workspace)/(company)/[companySlug]/layout.tsx`
 - [X] T027 [US3] Handle invalid stored slug: validate company exists, clear if invalid in `app/page.tsx`
-- [ ] T028 [US3] Verify redirect: clear storage, visit `/`, verify redirect to `/companies`
-- [ ] T029 [US3] Verify redirect: visit a company, then visit `/`, verify redirect to that company
+- [X] T028 [US3] Verify redirect: clear storage, visit `/`, verify redirect to `/companies`
+- [X] T029 [US3] Verify redirect: visit a company, then visit `/`, verify redirect to that company
 
 **Checkpoint**: User Story 3 complete - smart root redirect working
 
