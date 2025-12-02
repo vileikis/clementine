@@ -49,7 +49,7 @@ import {
   listEvents,
   updateEventStatus,
   updateEventName,
-} from "../repositories/events";
+} from "../repositories/projects.repository";
 import {
   createEventAction,
   getEventAction,
@@ -58,8 +58,8 @@ import {
   updateEventStatusAction,
   updateEventTheme,
   updateEventSwitchboardAction,
-} from "./events";
-import type { Event } from "../types/event.types";
+} from "./projects.actions";
+import type { Project } from "../types/project.types";
 
 // Mock types
 const mockVerifyAdminSecret = verifyAdminSecret as jest.MockedFunction<typeof verifyAdminSecret>;

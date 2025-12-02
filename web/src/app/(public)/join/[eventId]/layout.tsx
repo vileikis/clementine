@@ -1,4 +1,4 @@
-import { getEventAction } from "@/features/events/actions"
+import { getProjectAction } from "@/features/projects/actions"
 import { notFound } from "next/navigation"
 
 interface JoinLayoutProps {
@@ -11,7 +11,7 @@ export default async function JoinLayout({
   params,
 }: JoinLayoutProps) {
   const { eventId } = await params
-  const result = await getEventAction(eventId)
+  const result = await getProjectAction(eventId)
 
   if (!result.success || !result.event) {
     notFound()

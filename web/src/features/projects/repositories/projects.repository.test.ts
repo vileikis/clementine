@@ -8,12 +8,12 @@
  */
 
 import { db } from "@/lib/firebase/admin";
-import type { Event } from "../types/event.types";
+import type { Project } from "../types/project.types";
 import {
   createEvent,
   getEvent,
   listEvents,
-} from "./events";
+} from "./projects.repository";
 
 // V4 schema mock event helper
 function createMockEventData(overrides: Partial<Event> = {}): Omit<Event, "id"> {

@@ -1,8 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { updateEventStatusAction } from "../../actions/events"
-import type { EventStatus } from "../../types/event.types"
+import { updateProjectStatusAction } from "../../actions/projects.actions"
+import type { ProjectStatus } from "../../types/project.types"
 
 // Only allow setting these statuses (not "deleted" - that requires delete action)
 type SettableStatus = Exclude<EventStatus, "deleted">

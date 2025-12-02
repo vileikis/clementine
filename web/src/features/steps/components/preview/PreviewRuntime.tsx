@@ -16,7 +16,7 @@ import { EventThemeProvider } from "@/components/providers/EventThemeProvider";
 import { DeviceFrame } from "./DeviceFrame";
 import { ViewportModeProvider } from "./ViewportModeContext";
 import type { Step } from "@/features/steps/types";
-import type { EventTheme } from "@/features/events/types";
+import type { ProjectTheme as EventTheme } from "@/features/projects/types";
 import type { Experience } from "@/features/ai-presets/types";
 import {
   ViewportMode,

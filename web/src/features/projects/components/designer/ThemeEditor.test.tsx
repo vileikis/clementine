@@ -13,7 +13,7 @@ import React from "react";
 import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ThemeEditor } from "./ThemeEditor";
-import type { Event } from "../../types/event.types";
+import type { Project } from "../../types/project.types";
 
 // Mock dependencies
 jest.mock("next/navigation", () => ({
@@ -68,7 +68,7 @@ jest.mock("next/image", () => ({
   ),
 }));
 
-import { updateEventTheme } from "../../actions/events";
+import { updateProjectTheme } from "../../actions/projects.actions";
 import { toast } from "sonner";
 
 const mockUpdateEventTheme = updateEventTheme as jest.MockedFunction<typeof updateEventTheme>;

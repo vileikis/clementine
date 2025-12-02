@@ -19,7 +19,7 @@ import {
 import { createStepInputSchema, updateStepInputSchema } from "../schemas";
 import { STEP_CONSTANTS } from "../constants";
 import { getJourney } from "@/features/journeys/repositories";
-import { getEvent } from "@/features/events/repositories/events";
+import { getProject } from "@/features/projects/repositories/projects.repository";
 import type { Step } from "../types";
 import type { ActionResponse } from "./types";
 
