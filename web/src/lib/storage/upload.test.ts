@@ -15,6 +15,10 @@ jest.mock("@/lib/firebase/admin", () => ({
   },
 }));
 
+jest.mock("firebase-admin/storage", () => ({
+  getDownloadURL: jest.fn(),
+}));
+
 jest.mock("uuid", () => ({
   v4: jest.fn(() => "mock-uuid-token"),
 }));
@@ -42,19 +46,21 @@ describe("Storage Upload Utilities", () => {
 
       const mockBlob = {
         save: jest.fn().mockResolvedValue(undefined),
+        makePublic: jest.fn().mockResolvedValue(undefined),
       };
 
       mockStorage.file.mockReturnValue(mockBlob);
 
-      const path = await uploadInputImage("event-123", "session-456", mockFile);
+      const url = await uploadInputImage("event-123", "session-456", mockFile);
 
-      expect(path).toBe("events/event-123/sessions/session-456/input.jpg");
+      expect(url).toBe("https://storage.googleapis.com/test-bucket/events/event-123/sessions/session-456/input.jpg");
       expect(mockStorage.file).toHaveBeenCalledWith(
         "events/event-123/sessions/session-456/input.jpg"
       );
       expect(mockBlob.save).toHaveBeenCalledWith(expect.any(Buffer), {
         contentType: "image/jpeg",
       });
+      expect(mockBlob.makePublic).toHaveBeenCalled();
     });
 
     it("rejects file exceeding size limit", async () => {
@@ -95,19 +101,21 @@ describe("Storage Upload Utilities", () => {
 
       const mockBlob = {
         save: jest.fn().mockResolvedValue(undefined),
+        makePublic: jest.fn().mockResolvedValue(undefined),
       };
 
       mockStorage.file.mockReturnValue(mockBlob);
 
-      const path = await uploadResultImage("event-123", "session-456", buffer);
+      const url = await uploadResultImage("event-123", "session-456", buffer);
 
-      expect(path).toBe("events/event-123/sessions/session-456/result.jpg");
+      expect(url).toBe("https://storage.googleapis.com/test-bucket/events/event-123/sessions/session-456/result.jpg");
       expect(mockStorage.file).toHaveBeenCalledWith(
         "events/event-123/sessions/session-456/result.jpg"
       );
       expect(mockBlob.save).toHaveBeenCalledWith(buffer, {
         contentType: "image/jpeg",
       });
+      expect(mockBlob.makePublic).toHaveBeenCalled();
     });
   });
 
@@ -220,36 +228,24 @@ describe("Storage Upload Utilities", () => {
 
   describe("getPublicUrl", () => {
     it("calls getDownloadURL with file reference", async () => {
-      const mockFile = {
-        metadata: {
-          bucket: "test-bucket",
-          name: "events/event-123/qr/join.png",
-        },
-      };
+      const { getDownloadURL } = require("firebase-admin/storage");
+      const mockFile = {};
 
       mockStorage.file.mockReturnValue(mockFile);
+      getDownloadURL.mockResolvedValue("https://storage.example.com/download/file.png");
 
-      // Note: getDownloadURL from firebase-admin/storage requires proper file metadata
-      // In tests, this will fail without full Firebase emulator setup
-      // This test verifies the function handles the call correctly
-      try {
-        await getPublicUrl("events/event-123/qr/join.png");
-        // If it succeeds in test environment, verify file was called
-        expect(mockStorage.file).toHaveBeenCalledWith(
-          "events/event-123/qr/join.png"
-        );
-      } catch (error) {
-        // Expected to fail in test environment without proper mocking
-        // Verify it throws with our error message
-        expect((error as Error).message).toContain(
-          "Failed to get download URL for file"
-        );
-      }
+      const url = await getPublicUrl("events/event-123/qr/join.png");
+
+      expect(mockStorage.file).toHaveBeenCalledWith("events/event-123/qr/join.png");
+      expect(getDownloadURL).toHaveBeenCalledWith(mockFile);
+      expect(url).toBe("https://storage.example.com/download/file.png");
     });
 
     it("handles errors from getDownloadURL gracefully", async () => {
+      const { getDownloadURL } = require("firebase-admin/storage");
       const mockFile = {};
       mockStorage.file.mockReturnValue(mockFile);
+      getDownloadURL.mockRejectedValue(new Error("File not found"));
 
       await expect(getPublicUrl("path/to/file.jpg")).rejects.toThrow(
         "Failed to get download URL for file"

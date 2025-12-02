@@ -9,6 +9,7 @@ interface CompanyCardProps {
 
 /**
  * Company card component for displaying company information in lists
+ * Links to company workspace via slug
  * @param company - Company data to display
  */
 export function CompanyCard({ company }: CompanyCardProps) {
@@ -19,15 +20,13 @@ export function CompanyCard({ company }: CompanyCardProps) {
   });
 
   return (
-    <Link href={`/companies/${company.id}`}>
+    <Link href={`/${company.slug}`}>
       <div className="border rounded-lg p-6 space-y-4 hover:bg-muted/50 transition-colors cursor-pointer">
         {/* Header */}
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0">
             <h3 className="text-lg font-semibold truncate">{company.name}</h3>
-            {/* <p className="text-sm text-muted-foreground mt-1">
-              {eventCount} {eventCount === 1 ? "event" : "events"}
-            </p> */}
+            <p className="text-sm text-muted-foreground mt-1">/{company.slug}</p>
           </div>
         </div>
 

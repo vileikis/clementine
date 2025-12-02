@@ -37,11 +37,11 @@ describe("Companies Repository", () => {
         return await callback(mockTxn);
       });
 
-      const companyId = await createCompany({
+      const result = await createCompany({
         name: "Acme Corp",
       });
 
-      expect(companyId).toBe("company-123");
+      expect(result).toEqual({ id: "company-123", slug: "acme-corp" });
       expect(mockDb.collection).toHaveBeenCalledWith("companies");
       expect(mockDb.runTransaction).toHaveBeenCalled();
 
@@ -122,14 +122,14 @@ describe("Companies Repository", () => {
         return await callback(mockTxn);
       });
 
-      const companyId = await createCompany({
+      const result = await createCompany({
         name: "Nike Inc",
         contactEmail: "contact@nike.com",
         termsUrl: "https://nike.com/terms",
         privacyUrl: "https://nike.com/privacy",
       });
 
-      expect(companyId).toBe("company-456");
+      expect(result).toEqual({ id: "company-456", slug: "nike-inc" });
 
       const companyCall = mockTxn.set.mock.calls[0];
       const companyData = companyCall[1] as Company;
@@ -151,6 +151,7 @@ describe("Companies Repository", () => {
         {
           id: "company-1",
           name: "Acme Corp",
+          slug: "acme-corp",
           status: "active",
           deletedAt: null,
           createdAt: 1000000000,
@@ -159,6 +160,7 @@ describe("Companies Repository", () => {
         {
           id: "company-2",
           name: "Beta Inc",
+          slug: "beta-inc",
           status: "active",
           deletedAt: null,
           createdAt: 2000000000,
@@ -192,6 +194,7 @@ describe("Companies Repository", () => {
         {
           id: "company-1",
           name: "Active Corp",
+          slug: "active-corp",
           status: "active",
           deletedAt: null,
           createdAt: 1000000000,
@@ -241,6 +244,7 @@ describe("Companies Repository", () => {
     it("returns company when it exists", async () => {
       const mockCompanyData = {
         name: "Test Company",
+        slug: "test-company",
         status: "active",
         deletedAt: null,
         contactEmail: "test@example.com",
@@ -287,6 +291,7 @@ describe("Companies Repository", () => {
     it("validates company data with schema", async () => {
       const invalidCompanyData = {
         name: "",
+        slug: "test",
         status: "invalid-status",
         deletedAt: null,
         createdAt: 1234567890,

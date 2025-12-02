@@ -21,8 +21,11 @@ describe("Companies Server Actions", () => {
         authorized: true,
       });
 
-      // Mock repository success
-      (companiesRepo.createCompany as jest.Mock).mockResolvedValue("company-123");
+      // Mock repository success - returns { id, slug } object
+      (companiesRepo.createCompany as jest.Mock).mockResolvedValue({
+        id: "company-123",
+        slug: "acme-corp",
+      });
 
       const result = await createCompanyAction({
         name: "Acme Corp",
@@ -31,6 +34,7 @@ describe("Companies Server Actions", () => {
       expect(result).toEqual({
         success: true,
         companyId: "company-123",
+        slug: "acme-corp",
       });
       expect(companiesRepo.createCompany).toHaveBeenCalledWith({
         name: "Acme Corp",
@@ -97,8 +101,11 @@ describe("Companies Server Actions", () => {
         authorized: true,
       });
 
-      // Mock repository success
-      (companiesRepo.createCompany as jest.Mock).mockResolvedValue("company-456");
+      // Mock repository success - returns { id, slug } object
+      (companiesRepo.createCompany as jest.Mock).mockResolvedValue({
+        id: "company-456",
+        slug: "nike-inc",
+      });
 
       const result = await createCompanyAction({
         name: "Nike Inc",

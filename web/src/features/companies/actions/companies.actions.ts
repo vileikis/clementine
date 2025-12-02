@@ -4,6 +4,7 @@ import {
   createCompany,
   listCompanies,
   getCompany,
+  getCompanyBySlug,
   updateCompany,
   getCompanyEventCount,
   deleteCompany,
@@ -30,9 +31,9 @@ export async function createCompanyAction(
 
   try {
     const validated = createCompanyInput.parse(input);
-    const companyId = await createCompany(validated);
+    const { id: companyId, slug } = await createCompany(validated);
     revalidatePath("/companies");
-    return { success: true, companyId };
+    return { success: true, companyId, slug };
   } catch (error) {
     if (error instanceof z.ZodError) {
       // Return all validation issues with field paths
@@ -79,6 +80,27 @@ export async function getCompanyAction(companyId: string) {
     const company = await getCompany(companyId);
     if (!company) {
       throw new Error("Company not found");
+    }
+    return { success: true, company };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to fetch company",
+    };
+  }
+}
+
+/**
+ * Get a single company by slug (URL-friendly identifier)
+ *
+ * @param slug - URL-friendly company identifier
+ * @returns Success with company data or failure with error message
+ */
+export async function getCompanyBySlugAction(slug: string) {
+  try {
+    const company = await getCompanyBySlug(slug);
+    if (!company) {
+      return { success: false, error: "Company not found" };
     }
     return { success: true, company };
   } catch (error) {

@@ -128,6 +128,7 @@ describe("Event Server Actions", () => {
       mockGetCompany.mockResolvedValue({
         id: "company-123",
         name: "Test Company",
+        slug: "test-company",
         status: "active",
         deletedAt: null,
         contactEmail: null,
@@ -188,6 +189,7 @@ describe("Event Server Actions", () => {
       mockGetCompany.mockResolvedValue({
         id: "company-123",
         name: "Deleted Company",
+        slug: "deleted-company",
         status: "deleted",
         deletedAt: 1234567890,
         contactEmail: null,

@@ -1,6 +1,6 @@
 // Zod schemas for Company data model
 import { z } from "zod";
-import { COMPANY_CONSTRAINTS } from '../constants';
+import { COMPANY_CONSTRAINTS } from "../constants";
 
 // ============================================================================
 // Enums
@@ -9,14 +9,32 @@ import { COMPANY_CONSTRAINTS } from '../constants';
 export const companyStatusSchema = z.enum(["active", "deleted"]);
 
 // ============================================================================
+// Slug Validation
+// ============================================================================
+
+export const slugSchema = z
+  .string()
+  .min(COMPANY_CONSTRAINTS.SLUG_LENGTH.min, "Slug is required")
+  .max(
+    COMPANY_CONSTRAINTS.SLUG_LENGTH.max,
+    `Slug must be ${COMPANY_CONSTRAINTS.SLUG_LENGTH.max} characters or less`
+  )
+  .regex(
+    COMPANY_CONSTRAINTS.SLUG_PATTERN,
+    "Slug must contain only lowercase letters, numbers, and hyphens (no leading/trailing hyphens)"
+  );
+
+// ============================================================================
 // Document Schema (Firestore)
 // ============================================================================
 
 export const companySchema = z.object({
   id: z.string(),
-  name: z.string()
+  name: z
+    .string()
     .min(COMPANY_CONSTRAINTS.NAME_LENGTH.min)
     .max(COMPANY_CONSTRAINTS.NAME_LENGTH.max),
+  slug: slugSchema,
   status: companyStatusSchema,
   deletedAt: z.number().nullable(),
 
@@ -39,6 +57,7 @@ export const createCompanyInput = z.object({
     .min(COMPANY_CONSTRAINTS.NAME_LENGTH.min, "Company name is required")
     .max(COMPANY_CONSTRAINTS.NAME_LENGTH.max, "Company name too long")
     .transform((val) => val.trim()),
+  slug: slugSchema.optional(), // Auto-generated from name if not provided
   contactEmail: z.email({ message: "Invalid email format" }).optional(),
   termsUrl: z.url({ message: "Invalid URL" }).optional(),
   privacyUrl: z.url({ message: "Invalid URL" }).optional(),
@@ -51,6 +70,7 @@ export const updateCompanyInput = z.object({
     .min(COMPANY_CONSTRAINTS.NAME_LENGTH.min, "Company name is required")
     .max(COMPANY_CONSTRAINTS.NAME_LENGTH.max, "Company name too long")
     .transform((val) => val.trim()),
+  slug: slugSchema.optional(), // Can be changed on update
   contactEmail: z.email({ message: "Invalid email format" }).optional(),
   termsUrl: z.url({ message: "Invalid URL" }).optional(),
   privacyUrl: z.url({ message: "Invalid URL" }).optional(),
