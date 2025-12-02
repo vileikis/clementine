@@ -117,16 +117,16 @@
 
 ### Editor Components
 
-- [ ] T028 [P] [US3] Create StepListItem component at `web/src/features/experiences/components/editor/StepListItem.tsx`
-- [ ] T029 [P] [US3] Create StepList component at `web/src/features/experiences/components/editor/StepList.tsx` (drag-and-drop ordering)
-- [ ] T030 [P] [US3] Create StepTypeSelector component at `web/src/features/experiences/components/editor/StepTypeSelector.tsx` (filter deprecated types)
-- [ ] T031 [P] [US3] Create StepEditor component at `web/src/features/experiences/components/editor/StepEditor.tsx` (routes to type-specific editors)
-- [ ] T032 [P] [US3] Create StepPreview component at `web/src/features/experiences/components/editor/StepPreview.tsx`
-- [ ] T033 [P] [US3] Create ExperienceEditorHeader component at `web/src/features/experiences/components/editor/ExperienceEditorHeader.tsx`
-- [ ] T034 [P] [US3] Create useKeyboardShortcuts hook at `web/src/features/experiences/hooks/useKeyboardShortcuts.ts`
-- [ ] T035 [US3] Create ExperienceEditor component at `web/src/features/experiences/components/editor/ExperienceEditor.tsx` (3-panel layout)
-- [ ] T036 [US3] Create editor components barrel export at `web/src/features/experiences/components/editor/index.ts`
-- [ ] T037 [US3] Implement experience editor page at `web/src/app/(workspace)/[companySlug]/exps/[expId]/page.tsx` (replace placeholder)
+- [X] T028 [P] [US3] Create StepListItem component at `web/src/features/experiences/components/editor/StepListItem.tsx`
+- [X] T029 [P] [US3] Create StepList component at `web/src/features/experiences/components/editor/StepList.tsx` (drag-and-drop ordering)
+- [X] T030 [P] [US3] Create StepTypeSelector component at `web/src/features/experiences/components/editor/StepTypeSelector.tsx` (filter deprecated types)
+- [X] T031 [P] [US3] Create StepEditor component at `web/src/features/experiences/components/editor/StepEditor.tsx` (routes to type-specific editors)
+- [X] T032 [P] [US3] Create StepPreview component at `web/src/features/experiences/components/editor/StepPreview.tsx`
+- [X] T033 [P] [US3] Create ExperienceEditorHeader component at `web/src/features/experiences/components/editor/ExperienceEditorHeader.tsx`
+- [X] T034 [P] [US3] Create useKeyboardShortcuts hook at `web/src/features/experiences/hooks/useKeyboardShortcuts.ts`
+- [X] T035 [US3] Create ExperienceEditor component at `web/src/features/experiences/components/editor/ExperienceEditor.tsx` (3-panel layout)
+- [X] T036 [US3] Create editor components barrel export at `web/src/features/experiences/components/editor/index.ts`
+- [X] T037 [US3] Implement experience editor page at `web/src/app/(workspace)/[companySlug]/exps/[expId]/page.tsx` (replace placeholder)
 
 **Checkpoint**: User Story 3 complete - users can edit experiences with full step management
 
@@ -140,8 +140,8 @@
 
 ### Implementation for User Story 4
 
-- [ ] T038 [US4] Create RenameExperienceDialog component at `web/src/features/experiences/components/RenameExperienceDialog.tsx`
-- [ ] T039 [US4] Integrate RenameExperienceDialog into ExperienceEditorHeader at `web/src/features/experiences/components/editor/ExperienceEditorHeader.tsx`
+- [X] T038 [US4] Create RenameExperienceDialog component at `web/src/features/experiences/components/RenameExperienceDialog.tsx`
+- [X] T039 [US4] Integrate RenameExperienceDialog into ExperienceEditorHeader at `web/src/features/experiences/components/editor/ExperienceEditorHeader.tsx`
 
 **Checkpoint**: User Story 4 complete - users can rename experiences
 
@@ -153,23 +153,23 @@
 
 ### Delete Experience
 
-- [ ] T040 [P] Create DeleteExperienceDialog component at `web/src/features/experiences/components/DeleteExperienceDialog.tsx`
-- [ ] T041 Integrate DeleteExperienceDialog into ExperienceCard at `web/src/features/experiences/components/ExperienceCard.tsx`
+- [X] T040 [P] Create DeleteExperienceDialog component at `web/src/features/experiences/components/DeleteExperienceDialog.tsx`
+- [X] T041 Integrate DeleteExperienceDialog into ExperienceCard at `web/src/features/experiences/components/ExperienceCard.tsx`
 
 ### Terminology Cleanup
 
-- [ ] T042 Audit and replace all "Journey" terminology with "Experience" in UI strings across `web/src/features/experiences/`
+- [X] T042 Audit and replace all "Journey" terminology with "Experience" in UI strings across `web/src/features/experiences/`
 
 ### Update Feature Module Public API
 
-- [ ] T043 Update feature module public exports at `web/src/features/experiences/index.ts` (export only components and types, not actions/schemas/repositories)
+- [X] T043 Update feature module public exports at `web/src/features/experiences/index.ts` (export only components and types, not actions/schemas/repositories)
 
 ### Validation Loop (REQUIRED - Constitution Principle V)
 
 **Purpose**: Ensure code quality and correctness before merge
 
-- [ ] T044 Run `pnpm lint` and fix all errors/warnings
-- [ ] T045 Run `pnpm type-check` and resolve all TypeScript errors
+- [X] T044 Run `pnpm lint` and fix all errors/warnings
+- [X] T045 Run `pnpm type-check` and resolve all TypeScript errors
 - [ ] T046 Verify feature in local dev server (`pnpm dev`) - test all user stories
 - [ ] T047 Commit only after validation loop passes cleanly
 

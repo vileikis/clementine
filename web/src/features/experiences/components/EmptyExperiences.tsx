@@ -26,7 +26,7 @@ export function EmptyExperiences({
       </div>
       <h3 className="text-lg font-semibold mb-2">No experiences yet</h3>
       <p className="text-sm text-muted-foreground max-w-md mb-6">
-        Create your first experience to start building interactive journeys for
+        Create your first experience to start building interactive flows for
         your guests.
       </p>
       <CreateExperienceButton

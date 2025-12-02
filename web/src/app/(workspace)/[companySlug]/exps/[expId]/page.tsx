@@ -1,7 +1,7 @@
 import { getCompanyBySlugAction } from "@/features/companies/actions";
-import { ContentHeader } from "@/features/sidebar/components/ContentHeader";
-import { buildBreadcrumbs } from "@/lib/breadcrumbs";
+import { getExperienceAction } from "@/features/experiences/actions";
 import { notFound } from "next/navigation";
+import { ExperienceEditorClient } from "./ExperienceEditorClient";
 
 interface ExperiencePageProps {
   params: Promise<{ companySlug: string; expId: string }>;
@@ -9,7 +9,8 @@ interface ExperiencePageProps {
 
 /**
  * Experience editor page
- * Breadcrumbs: Experiences > [Experience Name]
+ * Server component that fetches company and experience data,
+ * then renders the client-side editor.
  */
 export default async function ExperiencePage({ params }: ExperiencePageProps) {
   const { companySlug, expId } = await params;
@@ -21,28 +22,23 @@ export default async function ExperiencePage({ params }: ExperiencePageProps) {
 
   const company = companyResult.company;
 
-  // TODO: Fetch experience when entity exists
-  const experienceName = `Experience ${expId}`;
+  const experienceResult = await getExperienceAction(expId);
+  if (!experienceResult.success || !experienceResult.data) {
+    notFound();
+  }
 
-  const breadcrumbs = buildBreadcrumbs(company, {
-    experience: { name: experienceName, id: expId },
-  });
+  const experience = experienceResult.data;
+
+  // Verify the experience belongs to this company
+  if (experience.companyId !== company.id) {
+    notFound();
+  }
 
   return (
-    <div className="flex flex-col h-full">
-      <ContentHeader breadcrumbs={breadcrumbs} />
-      <div className="flex-1 overflow-auto">
-        <div className="flex items-center justify-center h-full min-h-[50vh]">
-          <div className="text-center">
-            <h2 className="text-xl font-semibold text-muted-foreground">
-              Coming Soon
-            </h2>
-            <p className="text-sm text-muted-foreground mt-2">
-              Experience editor is under development.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
+    <ExperienceEditorClient
+      companySlug={companySlug}
+      companyId={company.id}
+      initialExperience={experience}
+    />
   );
 }
