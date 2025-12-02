@@ -9,7 +9,7 @@
  */
 
 import { notFound } from "next/navigation";
-import { CreateExperienceForm } from "@/features/experiences";
+import { CreateExperienceForm } from "@/features/ai-presets";
 import { getEventAction } from "@/features/events/actions";
 
 interface CreateExperiencePageProps {

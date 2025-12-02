@@ -21,8 +21,8 @@ import {
   type PhotoExperience
 } from "../schemas";
 import {
-  createPhotoExperience as createPhotoExperienceInDb
-} from "../repositories/experiences.repository";
+  createPhotoAiPreset as createPhotoAiPresetInDb
+} from "../repositories/ai-presets.repository";
 import type { ActionResponse } from "./types";
 import { ErrorCodes } from "./types";
 import { checkAuth, validateCompanyAccess, createSuccessResponse, createErrorResponse } from "./utils";
@@ -57,8 +57,8 @@ export async function createPhotoExperience(
         ? [eventId]
         : [];
 
-    // Create experience in root /experiences collection
-    const photoExperience = await createPhotoExperienceInDb({
+    // Create experience in root /aiPresets collection
+    const photoExperience = await createPhotoAiPresetInDb({
       companyId: validated.companyId,
       eventIds,
       name: validated.name,
