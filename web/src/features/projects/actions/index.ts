@@ -1,13 +1,13 @@
-// Barrel export for event actions
+// Barrel export for project actions
 export {
-  createEventAction,
-  getEventAction,
-  listEventsAction,
-  updateEventBrandingAction,
-  updateEventStatusAction,
-  updateEventNameAction,
-  updateEventTheme,
-  updateEventSwitchboardAction,
-  deleteEventAction,
+  createProjectAction,
+  getProjectAction,
+  listProjectsAction,
+  updateProjectBrandingAction,
+  updateProjectStatusAction,
+  updateProjectNameAction,
+  updateProjectTheme,
+  updateProjectSwitchboardAction,
+  deleteProjectAction,
   type ActionResponse,
-} from "./events";
+} from "./projects.actions";

@@ -40,16 +40,16 @@ This is a Next.js monorepo:
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T006 Rename directory `web/src/features/events/` → `web/src/features/projects/`
-- [ ] T007 [P] Rename types file `web/src/features/projects/types/event.types.ts` → `project.types.ts` and update all type names (Event→Project, EventStatus→ProjectStatus, EventTheme→ProjectTheme, EventThemeText→ProjectThemeText, EventThemeButton→ProjectThemeButton, EventThemeBackground→ProjectThemeBackground)
-- [ ] T008 [P] Rename schemas file `web/src/features/projects/schemas/events.schemas.ts` → `projects.schemas.ts` and update all schema names (eventSchema→projectSchema, eventThemeSchema→projectThemeSchema, etc.) and field references
-- [ ] T009 Update constants file `web/src/features/projects/constants.ts` with PROJECT_STATUS constants and add SHARE_PATH_PREFIX="/p/", QR_STORAGE_PATH template
-- [ ] T010 [P] Rename repository file `web/src/features/projects/repositories/events.ts` → `projects.repository.ts` and update: collection reference 'events'→'projects', function names (getEvent→getProject, listEvents→listProjects), add getProjectBySharePath function, update all type references Event→Project
-- [ ] T011 [P] Create Server Actions file `web/src/features/projects/actions/projects.actions.ts` implementing createProject (with QR generation), updateProject, updateProjectStatus (with transition validation), deleteProject (soft delete), updateProjectTheme per contracts/projects.actions.md
-- [ ] T012 [P] Update barrel export `web/src/features/projects/types/index.ts` to export Project types
-- [ ] T013 [P] Update barrel export `web/src/features/projects/schemas/index.ts` to export Project schemas
-- [ ] T014 [P] Update barrel export `web/src/features/projects/repositories/index.ts` to export repository functions
-- [ ] T015 Run `pnpm type-check` to identify remaining Event references and update them globally (search codebase for @/features/events imports and Event type references)
+- [X] T006 Rename directory `web/src/features/events/` → `web/src/features/projects/`
+- [X] T007 [P] Rename types file `web/src/features/projects/types/event.types.ts` → `project.types.ts` and update all type names (Event→Project, EventStatus→ProjectStatus, EventTheme→ProjectTheme, EventThemeText→ProjectThemeText, EventThemeButton→ProjectThemeButton, EventThemeBackground→ProjectThemeBackground)
+- [X] T008 [P] Rename schemas file `web/src/features/projects/schemas/events.schemas.ts` → `projects.schemas.ts` and update all schema names (eventSchema→projectSchema, eventThemeSchema→projectThemeSchema, etc.) and field references
+- [X] T009 Update constants file `web/src/features/projects/constants.ts` with PROJECT_STATUS constants and add SHARE_PATH_PREFIX="/p/", QR_STORAGE_PATH template
+- [X] T010 [P] Rename repository file `web/src/features/projects/repositories/events.ts` → `projects.repository.ts` and update: collection reference 'events'→'projects', function names (getEvent→getProject, listEvents→listProjects), add getProjectBySharePath function, update all type references Event→Project
+- [X] T011 [P] Create Server Actions file `web/src/features/projects/actions/projects.actions.ts` implementing createProject (with QR generation), updateProject, updateProjectStatus (with transition validation), deleteProject (soft delete), updateProjectTheme per contracts/projects.actions.md
+- [X] T012 [P] Update barrel export `web/src/features/projects/types/index.ts` to export Project types
+- [X] T013 [P] Update barrel export `web/src/features/projects/schemas/index.ts` to export Project schemas
+- [X] T014 [P] Update barrel export `web/src/features/projects/repositories/index.ts` to export repository functions
+- [X] T015 Run `pnpm type-check` to identify remaining Event references and update them globally (search codebase for @/features/events imports and Event type references)
 
 **Checkpoint**: Foundation ready - feature module fully renamed, all core types/schemas/actions/repositories in place. User story UI implementation can now begin.
 

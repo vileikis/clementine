@@ -17,7 +17,7 @@ import {
 } from "../repositories/projects.repository";
 import { getCompany } from "@/features/companies/repositories/companies.repository";
 import {
-  updateEventThemeSchema,
+  updateProjectThemeSchema,
 } from "../schemas";
 import { verifyAdminSecret } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
@@ -32,17 +32,17 @@ export type ActionResponse<T = void> =
   | { success: false; error: { code: string; message: string } };
 
 // ============================================================================
-// Event CRUD Operations (Repository-based)
+// Project CRUD Operations (Repository-based)
 // ============================================================================
 
-const createEventInput = z.object({
+const createProjectInput = z.object({
   name: z.string().min(1, "Name is required").max(200, "Name too long"),
   primaryColor: z.string().regex(/^#[0-9A-F]{6}$/i, "Invalid hex color"),
-  ownerId: z.string().min(1, "Owner is required"),
+  companyId: z.string().min(1, "Company is required"),
 });
 
-export async function createEventAction(
-  input: z.infer<typeof createEventInput>
+export async function createProjectAction(
+  input: z.infer<typeof createProjectInput>
 ) {
   // Verify admin authentication
   const auth = await verifyAdminSecret();
@@ -57,16 +57,16 @@ export async function createEventAction(
   }
 
   try {
-    const validated = createEventInput.parse(input);
+    const validated = createProjectInput.parse(input);
 
-    // Validate owner (company) exists and is active
-    const company = await getCompany(validated.ownerId);
+    // Validate company exists and is active
+    const company = await getCompany(validated.companyId);
     if (!company) {
       return {
         success: false,
         error: {
-          code: "OWNER_NOT_FOUND",
-          message: "Owner (company) not found"
+          code: "COMPANY_NOT_FOUND",
+          message: "Company not found"
         }
       };
     }
@@ -74,19 +74,19 @@ export async function createEventAction(
       return {
         success: false,
         error: {
-          code: "OWNER_INACTIVE",
-          message: "Owner (company) is not active"
+          code: "COMPANY_INACTIVE",
+          message: "Company is not active"
         }
       };
     }
 
-    const eventId = await createEvent({
+    const projectId = await createProject({
       name: validated.name,
-      ownerId: validated.ownerId,
+      companyId: validated.companyId,
       primaryColor: validated.primaryColor,
     });
-    revalidatePath("/events");
-    return { success: true, eventId };
+    revalidatePath("/projects");
+    return { success: true, projectId };
   } catch (error) {
     if (error instanceof z.ZodError) {
       return {
@@ -101,55 +101,55 @@ export async function createEventAction(
       success: false,
       error: {
         code: "INTERNAL_ERROR",
-        message: error instanceof Error ? error.message : "Failed to create event"
+        message: error instanceof Error ? error.message : "Failed to create project"
       },
     };
   }
 }
 
-export async function getEventAction(eventId: string) {
+export async function getProjectAction(projectId: string) {
   try {
-    const event = await getEvent(eventId);
-    if (!event) {
+    const project = await getProject(projectId);
+    if (!project) {
       return {
         success: false,
         error: {
-          code: "EVENT_NOT_FOUND",
-          message: "Event not found"
+          code: "PROJECT_NOT_FOUND",
+          message: "Project not found"
         }
       };
     }
-    return { success: true, event };
+    return { success: true, project };
   } catch (error) {
     return {
       success: false,
       error: {
         code: "INTERNAL_ERROR",
-        message: error instanceof Error ? error.message : "Failed to fetch event"
+        message: error instanceof Error ? error.message : "Failed to fetch project"
       }
     };
   }
 }
 
-export async function listEventsAction(filters?: {
-  ownerId?: string | null;
+export async function listProjectsAction(filters?: {
+  companyId?: string | null;
 }) {
   try {
-    const events = await listEvents(filters);
-    return { success: true, events };
+    const projects = await listProjects(filters);
+    return { success: true, projects };
   } catch (error) {
     return {
       success: false,
       error: {
         code: "INTERNAL_ERROR",
-        message: error instanceof Error ? error.message : "Failed to fetch events"
+        message: error instanceof Error ? error.message : "Failed to fetch projects"
       }
     };
   }
 }
 
-export async function updateEventBrandingAction(
-  eventId: string,
+export async function updateProjectBrandingAction(
+  projectId: string,
   branding: { brandColor?: string; showTitleOverlay?: boolean }
 ) {
   // Verify admin authentication
@@ -165,8 +165,8 @@ export async function updateEventBrandingAction(
   }
 
   try {
-    await updateEventBranding(eventId, branding);
-    revalidatePath(`/events/${eventId}`);
+    await updateProjectBranding(projectId, branding);
+    revalidatePath(`/projects/${projectId}`);
     return { success: true };
   } catch (error) {
     return {
@@ -179,8 +179,8 @@ export async function updateEventBrandingAction(
   }
 }
 
-export async function updateEventStatusAction(
-  eventId: string,
+export async function updateProjectStatusAction(
+  projectId: string,
   status: "draft" | "live" | "archived"
 ) {
   // Verify admin authentication
@@ -196,9 +196,9 @@ export async function updateEventStatusAction(
   }
 
   try {
-    await updateEventStatus(eventId, status);
-    revalidatePath("/events");
-    revalidatePath(`/events/${eventId}`);
+    await updateProjectStatus(projectId, status);
+    revalidatePath("/projects");
+    revalidatePath(`/projects/${projectId}`);
     return { success: true };
   } catch (error) {
     return {
@@ -211,12 +211,12 @@ export async function updateEventStatusAction(
   }
 }
 
-const updateEventNameInput = z.object({
+const updateProjectNameInput = z.object({
   name: z.string().min(1, "Name is required").max(200, "Name too long"),
 });
 
-export async function updateEventNameAction(
-  eventId: string,
+export async function updateProjectNameAction(
+  projectId: string,
   name: string
 ) {
   // Verify admin authentication
@@ -232,10 +232,10 @@ export async function updateEventNameAction(
   }
 
   try {
-    const validated = updateEventNameInput.parse({ name });
-    await updateEventName(eventId, validated.name);
-    revalidatePath("/events");
-    revalidatePath(`/events/${eventId}`);
+    const validated = updateProjectNameInput.parse({ name });
+    await updateProjectName(projectId, validated.name);
+    revalidatePath("/projects");
+    revalidatePath(`/projects/${projectId}`);
     return { success: true };
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -258,18 +258,18 @@ export async function updateEventNameAction(
 }
 
 // ============================================================================
-// Event Configuration Updates (Direct Firebase)
+// Project Configuration Updates (Direct Firebase)
 // ============================================================================
 
 /**
- * Updates theme configuration for an event.
- * Uses nested object structure (event.theme.*)
- * @param eventId - Event ID
+ * Updates theme configuration for a project.
+ * Uses nested object structure (project.theme.*)
+ * @param projectId - Project ID
  * @param data - Partial theme configuration fields to update
  * @returns Success/error response
  */
-export async function updateEventTheme(
-  eventId: string,
+export async function updateProjectTheme(
+  projectId: string,
   data: {
     logoUrl?: string | null;
     fontFamily?: string | null;
@@ -304,7 +304,7 @@ export async function updateEventTheme(
     }
 
     // Validate input with Zod
-    const validatedData = updateEventThemeSchema.parse(data);
+    const validatedData = updateProjectThemeSchema.parse(data);
 
     // Build update object with dot notation for nested fields
     const updateData: Record<string, unknown> = {
@@ -351,25 +351,25 @@ export async function updateEventTheme(
     }
 
     // Update only provided fields - trust Firebase, catch NOT_FOUND error
-    const eventRef = db.collection("events").doc(eventId);
+    const projectRef = db.collection("projects").doc(projectId);
     try {
-      await eventRef.update(updateData);
+      await projectRef.update(updateData);
     } catch (updateError: unknown) {
       // Firestore throws code 5 for NOT_FOUND
       if (updateError && typeof updateError === "object" && "code" in updateError && updateError.code === 5) {
         return {
           success: false,
           error: {
-            code: "EVENT_NOT_FOUND",
-            message: "Event not found",
+            code: "PROJECT_NOT_FOUND",
+            message: "Project not found",
           },
         };
       }
       throw updateError;
     }
 
-    revalidatePath("/events");
-    revalidatePath(`/events/${eventId}`);
+    revalidatePath("/projects");
+    revalidatePath(`/projects/${projectId}`);
 
     return { success: true, data: undefined };
   } catch (error) {
@@ -396,15 +396,15 @@ export async function updateEventTheme(
 }
 
 /**
- * Updates the active journey for an event (Switchboard pattern).
- * Controls which journey is currently live for all connected guests.
- * @param eventId - Event ID
- * @param activeJourneyId - Journey ID to activate, or null to deactivate
+ * Updates the active event for a project (Switchboard pattern).
+ * Controls which event/experience is currently live for all connected guests.
+ * @param projectId - Project ID
+ * @param activeEventId - Event/Experience ID to activate, or null to deactivate
  * @returns Success/error response
  */
-export async function updateEventSwitchboardAction(
-  eventId: string,
-  activeJourneyId: string | null
+export async function updateProjectSwitchboardAction(
+  projectId: string,
+  activeEventId: string | null
 ): Promise<ActionResponse<void>> {
   try {
     // Check authentication
@@ -422,15 +422,15 @@ export async function updateEventSwitchboardAction(
     // Validate input with Zod
     const validatedData = z
       .object({
-        activeJourneyId: z.string().nullable(),
+        activeEventId: z.string().nullable(),
       })
-      .parse({ activeJourneyId });
+      .parse({ activeEventId });
 
-    // Update event - trust Firebase, catch NOT_FOUND error
-    const eventRef = db.collection("events").doc(eventId);
+    // Update project - trust Firebase, catch NOT_FOUND error
+    const projectRef = db.collection("projects").doc(projectId);
     try {
-      await eventRef.update({
-        activeJourneyId: validatedData.activeJourneyId,
+      await projectRef.update({
+        activeEventId: validatedData.activeEventId,
         updatedAt: Date.now(),
       });
     } catch (updateError: unknown) {
@@ -439,16 +439,16 @@ export async function updateEventSwitchboardAction(
         return {
           success: false,
           error: {
-            code: "EVENT_NOT_FOUND",
-            message: "Event not found",
+            code: "PROJECT_NOT_FOUND",
+            message: "Project not found",
           },
         };
       }
       throw updateError;
     }
 
-    revalidatePath("/events");
-    revalidatePath(`/events/${eventId}`);
+    revalidatePath("/projects");
+    revalidatePath(`/projects/${projectId}`);
 
     return { success: true, data: undefined };
   } catch (error) {
@@ -475,13 +475,13 @@ export async function updateEventSwitchboardAction(
 }
 
 // ============================================================================
-// Event Delete Operation
+// Project Delete Operation
 // ============================================================================
 
 /**
- * Soft delete an event (mark as deleted, hide from UI)
+ * Soft delete a project (mark as deleted, hide from UI)
  */
-export async function deleteEventAction(eventId: string) {
+export async function deleteProjectAction(projectId: string) {
   const auth = await verifyAdminSecret();
   if (!auth.authorized) {
     return {
@@ -494,16 +494,16 @@ export async function deleteEventAction(eventId: string) {
   }
 
   try {
-    await deleteEvent(eventId);
-    revalidatePath("/events");
+    await deleteProject(projectId);
+    revalidatePath("/projects");
     return { success: true };
   } catch (error) {
-    if (error instanceof Error && error.message === "Event not found") {
+    if (error instanceof Error && error.message === "Project not found") {
       return {
         success: false,
         error: {
-          code: "EVENT_NOT_FOUND",
-          message: "Event not found",
+          code: "PROJECT_NOT_FOUND",
+          message: "Project not found",
         },
       };
     }
@@ -511,7 +511,7 @@ export async function deleteEventAction(eventId: string) {
       success: false,
       error: {
         code: "INTERNAL_ERROR",
-        message: error instanceof Error ? error.message : "Failed to delete event",
+        message: error instanceof Error ? error.message : "Failed to delete project",
       },
     };
   }
