@@ -31,9 +31,9 @@ export async function createCompanyAction(
 
   try {
     const validated = createCompanyInput.parse(input);
-    const companyId = await createCompany(validated);
+    const { id: companyId, slug } = await createCompany(validated);
     revalidatePath("/companies");
-    return { success: true, companyId };
+    return { success: true, companyId, slug };
   } catch (error) {
     if (error instanceof z.ZodError) {
       // Return all validation issues with field paths

@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { getCompanyBySlugAction } from "@/features/companies/actions";
-import { AppNavbar } from "@/components/shared/AppNavbar";
-import { LogoutButton } from "@/components/shared/LogoutButton";
+import { Sidebar, LastCompanyUpdater } from "@/features/sidebar";
 
 interface CompanyLayoutProps {
   children: React.ReactNode;
@@ -9,7 +8,7 @@ interface CompanyLayoutProps {
 }
 
 /**
- * Company layout - fetches company by slug and provides navigation context
+ * Company layout - fetches company by slug and provides sidebar navigation
  * Renders 404 if company not found
  */
 export default async function CompanyLayout({
@@ -26,21 +25,12 @@ export default async function CompanyLayout({
   const company = result.company;
 
   return (
-    <div className="flex flex-col h-full">
-      <AppNavbar
-        breadcrumbs={[
-          { label: "\u{1F34A}", href: "/", isLogo: true },
-          { label: company.name },
-        ]}
-        tabs={[
-          { label: "Projects", href: "/projects" },
-          { label: "Experiences", href: "/exps" },
-          { label: "Settings", href: "/settings" },
-        ]}
-        basePath={`/${companySlug}`}
-        actions={<LogoutButton />}
-      />
-      <div className="flex-1 overflow-auto">{children}</div>
+    <div className="flex h-screen">
+      <Sidebar company={company} />
+      <main className="flex-1 overflow-auto">
+        {children}
+      </main>
+      <LastCompanyUpdater companySlug={companySlug} />
     </div>
   );
 }

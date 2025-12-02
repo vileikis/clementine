@@ -2,7 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { getCompanyBySlugAction } from "@/features/companies/actions";
+import {
+  getCompanyBySlugAction,
+  getCompanyAction,
+} from "@/features/companies/actions";
 import { CompanyForm } from "@/features/companies/components/CompanyForm";
 import type { Company } from "@/features/companies/types";
 
@@ -32,11 +35,18 @@ export default function SettingsPage() {
     loadCompany();
   }, [companySlug]);
 
-  const handleSuccess = () => {
-    // If slug changed, redirect to new slug URL
-    if (company) {
-      // Refresh to get updated company data
-      router.refresh();
+  const handleSuccess = async (companyId: string) => {
+    // Fetch the updated company to check if slug changed
+    const result = await getCompanyAction(companyId);
+    if (result.success && result.company) {
+      const newSlug = result.company.slug;
+      if (newSlug !== companySlug) {
+        // Slug changed - redirect to new URL
+        router.replace(`/${newSlug}/settings`);
+      } else {
+        // No slug change - just refresh
+        router.refresh();
+      }
     }
   };
 
