@@ -1,7 +1,5 @@
 import { notFound } from "next/navigation";
 import { getCompanyBySlugAction } from "@/features/companies/actions";
-import { ContentHeader } from "@/features/sidebar/components/ContentHeader";
-import { buildBreadcrumbs } from "@/lib/breadcrumbs";
 import { ExperienceList } from "@/features/experiences/components";
 
 interface ExperiencesPageProps {
@@ -10,7 +8,6 @@ interface ExperiencesPageProps {
 
 /**
  * Company experiences list page
- * Breadcrumbs: Experiences
  */
 export default async function ExperiencesPage({ params }: ExperiencesPageProps) {
   const { companySlug } = await params;
@@ -22,13 +19,9 @@ export default async function ExperiencesPage({ params }: ExperiencesPageProps) 
 
   const company = companyResult.company;
 
-  // For the list page, we just show "Experiences" as the current page
-  const breadcrumbs = buildBreadcrumbs(company, { current: "Experiences" });
-
   return (
     <div className="flex flex-col h-full">
-      <ContentHeader breadcrumbs={breadcrumbs} />
-      <div className="flex-1 overflow-auto p-6">
+      <div className="flex-1 overflow-auto p-6 pt-8">
         <ExperienceList companyId={company.id} companySlug={company.slug} />
       </div>
     </div>
