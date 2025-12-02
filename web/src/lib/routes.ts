@@ -11,7 +11,7 @@ export const PUBLIC_ROUTES = {
 /**
  * Default redirect route after successful login
  */
-export const DEFAULT_AUTHENTICATED_ROUTE = "/events";
+export const DEFAULT_AUTHENTICATED_ROUTE = "/companies";
 
 /**
  * Check if a pathname is a public route (doesn't require auth)

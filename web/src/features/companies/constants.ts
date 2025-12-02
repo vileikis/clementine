@@ -5,6 +5,8 @@
 
 export const COMPANY_CONSTRAINTS = {
   NAME_LENGTH: { min: 1, max: 100 },
+  SLUG_LENGTH: { min: 1, max: 50 },
+  SLUG_PATTERN: /^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$/,
 } as const;
 
 export const COMPANY_CACHE = {
