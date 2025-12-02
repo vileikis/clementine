@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useSidebarStore } from '@/features/sidebar';
+import { useSidebarStore } from '../stores';
 
 interface LastCompanyUpdaterProps {
   companySlug: string;
