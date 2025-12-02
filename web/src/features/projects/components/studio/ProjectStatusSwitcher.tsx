@@ -5,10 +5,10 @@ import { updateProjectStatusAction } from "../../actions/projects.actions"
 import type { ProjectStatus } from "../../types/project.types"
 
 // Only allow setting these statuses (not "deleted" - that requires delete action)
-type SettableStatus = Exclude<EventStatus, "deleted">
+type SettableStatus = Exclude<ProjectStatus, "deleted">
 
-interface EventStatusSwitcherProps {
-  eventId: string
+interface ProjectStatusSwitcherProps {
+  projectId: string
   currentStatus: SettableStatus
 }
 
@@ -18,10 +18,10 @@ const statusOptions: { value: SettableStatus; label: string; color: string }[] =
   { value: "archived", label: "Archived", color: "bg-gray-100 text-gray-800" },
 ]
 
-export function EventStatusSwitcher({
-  eventId,
+export function ProjectStatusSwitcher({
+  projectId,
   currentStatus,
-}: EventStatusSwitcherProps) {
+}: ProjectStatusSwitcherProps) {
   const [status, setStatus] = useState<SettableStatus>(currentStatus)
   const [isUpdating, setIsUpdating] = useState(false)
 
@@ -29,7 +29,7 @@ export function EventStatusSwitcher({
     if (newStatus === status || isUpdating) return
 
     setIsUpdating(true)
-    const result = await updateEventStatusAction(eventId, newStatus)
+    const result = await updateProjectStatusAction(projectId, newStatus)
 
     if (result.success) {
       setStatus(newStatus)

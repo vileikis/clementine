@@ -13,15 +13,15 @@ import { Input } from "@/components/ui/input"
 import { updateProjectNameAction } from "../../actions/projects.actions"
 import { useRouter } from "next/navigation"
 
-interface EditableEventNameProps {
-  eventId: string
+interface EditableProjectNameProps {
+  projectId: string
   currentName: string
 }
 
-export function EditableEventName({
-  eventId,
+export function EditableProjectName({
+  projectId,
   currentName,
-}: EditableEventNameProps) {
+}: EditableProjectNameProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [name, setName] = useState(currentName)
   const [error, setError] = useState<string | null>(null)
@@ -31,12 +31,12 @@ export function EditableEventName({
   const handleSave = () => {
     setError(null)
     startTransition(async () => {
-      const result = await updateEventNameAction(eventId, name)
+      const result = await updateProjectNameAction(projectId, name)
       if (result.success) {
         setIsOpen(false)
         router.refresh()
       } else {
-        setError(result.error?.message || "Failed to update event name")
+        setError(result.error?.message || "Failed to update project name")
       }
     })
   }
@@ -59,14 +59,14 @@ export function EditableEventName({
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Rename this event</DialogTitle>
+            <DialogTitle>Rename this project</DialogTitle>
           </DialogHeader>
 
           <div className="py-4">
             <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Event name"
+              placeholder="Project name"
               maxLength={200}
               disabled={isPending}
             />
