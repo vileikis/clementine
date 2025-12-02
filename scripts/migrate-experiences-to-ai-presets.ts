@@ -1,4 +1,4 @@
-#!/usr/bin/env npx ts-node
+#!/usr/bin/env node
 /**
  * Migration Script: /experiences → /aiPresets
  *
@@ -6,29 +6,47 @@
  * to the /aiPresets collection, preserving document IDs.
  *
  * Usage:
- *   # From project root, with environment variables loaded:
- *   cd web && npx ts-node ../scripts/migrate-experiences-to-ai-presets.ts
+ *   cd scripts && pnpm migrate:ai-presets <service-account.json>
  *
- *   # Or source your .env.local first:
- *   export $(cat web/.env.local | xargs) && npx ts-node scripts/migrate-experiences-to-ai-presets.ts
+ *   Or directly:
+ *   cd scripts && node --import=tsx migrate-experiences-to-ai-presets.ts <service-account.json>
  *
  * Prerequisites:
- *   - FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY env vars set
- *   - firebase-admin installed (available from web workspace)
+ *   - Firebase service account JSON file (download from Firebase Console > Project Settings > Service Accounts)
  */
 
 import admin from "firebase-admin";
+import fs from "fs";
+import path from "path";
+
+// Get service account path from command line
+const serviceAccountPath = process.argv[2];
+
+if (!serviceAccountPath) {
+  console.error(
+    "Usage: pnpm migrate:ai-presets <service-account.json>"
+  );
+  console.error("");
+  console.error("Download your service account JSON from:");
+  console.error(
+    "  Firebase Console > Project Settings > Service Accounts > Generate new private key"
+  );
+  process.exit(1);
+}
+
+const absolutePath = path.resolve(process.cwd(), serviceAccountPath);
+
+if (!fs.existsSync(absolutePath)) {
+  console.error(`Error: Service account file not found: ${absolutePath}`);
+  process.exit(1);
+}
+
+const serviceAccount = JSON.parse(fs.readFileSync(absolutePath, "utf-8"));
 
 // Initialize Firebase Admin SDK
-if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.cert({
-      projectId: process.env.FIREBASE_PROJECT_ID,
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
-    }),
-  });
-}
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
 
 const db = admin.firestore();
 
@@ -43,7 +61,9 @@ async function migrateExperiencesToAiPresets(): Promise<void> {
   const totalDocs = snapshot.size;
 
   if (totalDocs === 0) {
-    console.log("No documents found in /experiences collection. Nothing to migrate.");
+    console.log(
+      "No documents found in /experiences collection. Nothing to migrate."
+    );
     return;
   }
 
@@ -75,7 +95,9 @@ async function migrateExperiencesToAiPresets(): Promise<void> {
   const aiPresetsCount = aiPresetsSnapshot.size;
 
   if (aiPresetsCount === totalDocs) {
-    console.log(`\n✓ Verification passed: ${aiPresetsCount} documents in /aiPresets`);
+    console.log(
+      `\n✓ Verification passed: ${aiPresetsCount} documents in /aiPresets`
+    );
     console.log("Migration complete!\n");
     console.log("Note: The /experiences collection has been preserved as backup.");
     console.log("You can delete it later after confirming stability.");
