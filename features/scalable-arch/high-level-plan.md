@@ -66,47 +66,156 @@
 - Steps now live at: `/experiences/{experienceId}/steps/{stepId}`.
 - Add **Test Panel** in editor for `ai-transform` to preview AI results.
 
----
-
-## **🎯 Phase 4 — Projects (Company-Level Containers)**
-
-**Purpose:** Organize events under long-running projects.
-
-- `/projects` collection (company-scoped).
-- Fields: `name`, `sharePath`, `activeEventId`.
-- UI: Projects list inside company workspace; open a project to see its events.
-- Guest join links point to project → resolve the active event.
+  **Note:** This phase focuses on data model changes. The steps module will still
+  contain editors and renderers. The architectural split (moving renderers to
+  experience-engine, potentially moving editors to experiences) will happen in
+  Phase 7 when building the unified runtime.
 
 ---
 
-## **🎯 Phase 5 — Events (Scheduled & Themed Instances)**
+## **🎯 Phase 4 — Projects (Rename Events → Projects)**
 
-**Purpose:** Events are the actual time-bound guest-facing experiences.
+**Purpose:** Rename the Events feature module to Projects as a foundation for future nested Events.
 
-- Path: `/projects/{projectId}/events/{eventId}`.
-- Fields: `name`, `status`, `startTime`, `endTime`, `theme`.
-- **Theme only at event level** (no inheritance for MVP).
-- **Scheduling rules:**
+**Strategy:** This is a **rename/refactor** with temporary field preservation. Some old Event fields (`theme`, `publishStartAt/EndAt`) are kept temporarily and will be moved to nested Events in Phase 5.
 
-  - 1 active event per project at a time.
+### Data Model Changes
 
-- UI: Event Editor with theme customization.
+- **Firestore path:** `/events/{eventId}` → `/projects/{projectId}`
+- **Schema changes:**
+  - `Event` → `Project`
+  - `EventTheme` → `ProjectTheme` (temporary - will move to Event in Phase 5)
+  - `ownerId` → `companyId`
+  - `joinPath` → `sharePath`
+  - `activeJourneyId` → `activeEventId` (renamed for Phase 5 prep, but still points to Experiences in Phase 4)
+- **Fields temporarily preserved (will move to Events in Phase 5):**
+  - `theme: ProjectTheme` (will become Event.theme)
+  - `publishStartAt`, `publishEndAt` (will become Event scheduling)
+- **Fields kept:** `name`, `status`, `qrPngPath`, `deletedAt`, timestamps
+
+### Code Refactoring
+
+- **Feature module:** Rename `web/src/features/events/` → `web/src/features/projects/`
+- **All files:**
+  - Types: `Event` → `Project`, `EventTheme` → `ProjectTheme`
+  - Components: `EventCard` → `ProjectCard`, `EventForm` → `ProjectForm`, etc.
+  - Actions: `createEvent` → `createProject`, `updateEvent` → `updateProject`, etc.
+  - Repositories: `getEvent` → `getProject`, `listEvents` → `listProjects`, etc.
+  - Schemas: `eventSchema` → `projectSchema`
+  - Field: `activeJourneyId` → `activeEventId` (but type stays `string | null`, points to Experience ID)
+- **Preserve all business logic:** Status transitions, soft delete, theme management, QR generation
+
+### UI Implementation
+
+**Projects List Page** (`/projects` or similar):
+
+- Reuse/rename `components/studio/EventCard` → `ProjectCard`
+- Show list of projects for active company
+- Create new project button
+- On create success → navigate to project details page
+
+**Project Details Page** (`/projects/{projectId}`):
+
+- **Header:**
+  - Left: Project name/title
+  - Right: Project status switcher (draft/live/archived)
+- **Tabs:**
+  - **Events** tab: Empty state with "Coming in Phase 5" message (WIP)
+  - **Distribute** tab:
+    - Share link display (project `sharePath`)
+    - QR code display (project `qrPngPath`)
+    - Copy link button
+    - Download QR button
+
+### Migration Notes
+
+- **Backwards compatibility:** Not required - this is a breaking rename
+- **Guest flow:** Continues to work via `sharePath` → resolves `activeEventId` (which points to an Experience in Phase 4)
+- **Temporary inconsistency:** `activeEventId` is named for Events but points to Experiences until Phase 5
+- **Phase 5 cleanup:** Theme, scheduling, and `activeEventId` semantics will be corrected when nested Events are introduced
 
 ---
 
-## **🎯 Phase 6 — Attach Experiences to Events (Simple Linking)**
+## **🎯 Phase 5 — Events (New Nested Time-Bound Instances)**
 
-**Purpose:** Events define which Experiences guests can access.
+**Purpose:** Create NEW Events as nested, time-bound instances under Projects. Clean up temporary Phase 4 fields.
 
-- Path: `/projects/{projectId}/events/{eventId}/eventExperiences`.
-- Each document links: `experienceId` + `isEnabled`.
-- No ordering, no overrides in MVP.
-- UI: Event Editor → Add Experience (picker from Experience Library).
+**Note:** This is a new Event type, different from the old Events (which became Projects in Phase 4).
+
+### Data Model Changes
+
+- **Firestore path:** `/projects/{projectId}/events/{eventId}` (nested subcollection)
+- **New Event schema:**
+  - `id`, `projectId`, `companyId`, `name`
+  - `status`: `draft | scheduled | active | ended | deleted`
+  - `publishStartAt`, `publishEndAt` (moved from Project)
+  - `experiences: EventExperienceLink[]` (embedded array - replaces Project's `activeEventId` pointing to single Experience)
+  - `theme: EventTheme` (moved from Project)
+  - timestamps, soft delete
+- **EventExperienceLink:** `{ experienceId: string, label?: string | null }`
+
+### Changes to Projects (Cleanup Phase 4 temporary fields)
+
+- **Remove:** `theme` (moved to Event)
+- **Remove:** `publishStartAt`, `publishEndAt` (moved to Event)
+- **Update:** `activeEventId` now points to actual nested Events (was pointing to Experiences in Phase 4)
+- **Keep:** `sharePath`, `qrPngPath`, `status`, etc.
+
+### Final Project Schema
+
+```ts
+interface Project {
+  id: string;
+  name: string;
+  status: "draft" | "live" | "archived" | "deleted";
+  companyId: string | null;
+  sharePath: string;
+  qrPngPath: string;
+  activeEventId?: string | null; // NOW points to /projects/{projectId}/events/{eventId}
+  deletedAt?: number | null;
+  createdAt: number;
+  updatedAt: number;
+}
+```
+
+### Scheduling Rules
+
+- **1 active event per project** at a time (enforced at application level)
+- Project's `activeEventId` determines which event guests see
+
+### UI Implementation
+
+- **Project Details Page - Events Tab:** List of events under the project, create event button
+- **Event Editor:** Configure event name, schedule, theme, linked experiences
+- **Guest Flow Update:** `sharePath` → loads `activeEventId` → loads Event (with theme) → loads `experiences[]`
+
+---
+
+## **🎯 Phase 6 — Attach Experiences to Events (Merged into Phase 5)**
+
+**Status:** Merged into Phase 5 - the `experiences[]` array is part of the Event schema.
+
+~~**Purpose:** Events define which Experiences guests can access.~~
+
+~~- Path: `/projects/{projectId}/events/{eventId}/eventExperiences`.~~
+
+**New approach:**
+
+- Experiences are linked via embedded `experiences: EventExperienceLink[]` array in Event document
+- No separate subcollection needed
+- UI: Event Editor → Add Experience button → Picker from Experience Library → Updates `experiences[]` array
 
 ---
 
 ## **🎯 Phase 7 — Experience Engine (Preview + Guest Runtime)**
 
+**Architectural Refactor:**
+
+- Extract step renderers from `features/steps/components/preview` →
+  `features/experience-engine/components/renderers/`
+- Steps module becomes pure definitions (schemas, types, constants only)
+
+**Runtime Implementation:**
 **Purpose:** A unified engine that powers both admin preview & guest flow.
 
 - Shared runtime that:
@@ -128,18 +237,34 @@
 
 ```
 Company
-  → Projects
-      → Events (theme + schedule)
-          → EventExperiences (links)
-  → Experiences (flows)
+  → Projects (containers with sharePath, QR, activeEventId)
+      → Events (nested, theme + schedule + experiences[])
+  → Experiences (company-scoped flows)
       → Steps (including ai-transform)
   → AiPresets (legacy AI library, unused)
 ```
 
+### **Guest Flow:**
+
+```
+Guest clicks sharePath
+  → Loads Project
+    → Resolves activeEventId
+      → Loads Event (with theme)
+        → Loads experiences[] array
+          → Loads Experience (flow)
+            → Loads Steps
+              → Experience Engine executes
+```
+
 ### **What we gain:**
 
-- Multi-tenant, scalable organization.
-- Clear separation between brand-level content (Experiences) and scheduled activations (Events).
-- AI fully integrated as a step with local “Test” capability.
-- Unified runtime powering admin preview + guest experience.
-- Clean naming, no legacy confusion.
+- **Multi-tenant, scalable organization:** Company → Projects → Events hierarchy
+- **Clear separation of concerns:**
+  - Projects = Long-running containers (campaigns, tours)
+  - Events = Time-bound activations (specific dates/times)
+  - Experiences = Reusable flow templates (company-wide library)
+- **AI fully integrated** as a step with local "Test" capability
+- **Unified runtime** (Experience Engine) powering admin preview + guest experience
+- **Clean naming:** No legacy confusion between old "Events" (now Projects) and new Events
+- **Flexible architecture:** Switchboard at Project level (activeEventId), array linking at Event level (experiences[])
