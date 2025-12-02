@@ -5,6 +5,7 @@
 Transform Clementine from a flat admin structure into a company-centric multi-tenant architecture where all work happens "inside a selected company".
 
 ### Key Outcomes
+
 - Company as top-level context for all entities
 - URL-friendly company slugs (e.g., `/acme-corp` instead of `/abc123`)
 - Reusable navigation bar with breadcrumbs + tabs
@@ -55,15 +56,15 @@ web/src/app/
 
 ### Route Matching
 
-| URL | Route Group | Layout |
-|-----|-------------|--------|
-| `/` | `(workspace)/page.tsx` | Companies list (no navbar) |
-| `/acme-corp` | `(company)/[companySlug]` | Company navbar |
-| `/acme-corp/projects` | `(company)/[companySlug]/projects` | Company navbar |
-| `/acme-corp/proj123` | `(project)/[companySlug]/[projectId]` | Project navbar only |
-| `/acme-corp/proj123/events` | `(project)/[companySlug]/[projectId]/events` | Project navbar only |
-| `/acme-corp/proj123/evt456` | `(event)/[companySlug]/[projectId]/[eventId]` | Event navbar only |
-| `/acme-corp/exps/exp789` | `(experience)/[companySlug]/exps/[expId]` | Experience navbar only |
+| URL                         | Route Group                                   | Layout                     |
+| --------------------------- | --------------------------------------------- | -------------------------- |
+| `/`                         | `(workspace)/page.tsx`                        | Companies list (no navbar) |
+| `/acme-corp`                | `(company)/[companySlug]`                     | Company navbar             |
+| `/acme-corp/projects`       | `(company)/[companySlug]/projects`            | Company navbar             |
+| `/acme-corp/proj123`        | `(project)/[companySlug]/[projectId]`         | Project navbar only        |
+| `/acme-corp/proj123/events` | `(project)/[companySlug]/[projectId]/events`  | Project navbar only        |
+| `/acme-corp/proj123/evt456` | `(event)/[companySlug]/[projectId]/[eventId]` | Event navbar only          |
+| `/acme-corp/exps/exp789`    | `(experience)/[companySlug]/exps/[expId]`     | Experience navbar only     |
 
 **Key insight**: Route groups `(company)`, `(project)`, `(event)`, `(experience)` break layout inheritance - each context renders only its own navbar.
 
@@ -74,6 +75,7 @@ web/src/app/
 ### Files to Modify
 
 **`features/companies/constants.ts`**
+
 ```ts
 export const COMPANY_CONSTRAINTS = {
   NAME_LENGTH: { min: 1, max: 100 },
@@ -83,38 +85,43 @@ export const COMPANY_CONSTRAINTS = {
 ```
 
 **`features/companies/types/companies.types.ts`**
+
 ```ts
 export interface Company {
   id: string;
   name: string;
-  slug: string;  // NEW
+  slug: string; // NEW
   status: CompanyStatus;
   // ... rest unchanged
 }
 ```
 
 **`features/companies/schemas/companies.schemas.ts`**
+
 - Add `slug` field with validation
 - Make slug optional in `createCompanyInput` (auto-generate if not provided)
 
 **New: `lib/utils/slug.ts`** (general-purpose utility)
+
 ```ts
 export function generateSlug(name: string): string {
   return name
     .toLowerCase()
     .trim()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
     .substring(0, 50);
 }
 ```
 
 **`features/companies/repositories/companies.repository.ts`**
+
 - Add `getCompanyBySlug(slug: string)` query
 - Update `createCompany` to generate slug if not provided
 - Add slug uniqueness validation
 
 **`features/companies/actions/companies.actions.ts`**
+
 - Add `getCompanyBySlugAction(slug: string)`
 
 ---
@@ -124,6 +131,7 @@ export function generateSlug(name: string): string {
 ### Rename `EditorBreadcrumbs` → `Breadcrumbs`
 
 Modify existing `components/shared/EditorBreadcrumbs.tsx`:
+
 1. Rename to `Breadcrumbs.tsx`
 2. Change separator from `<ChevronRight>` to gray `/` character
 
@@ -142,6 +150,7 @@ interface BreadcrumbsProps {
 ```
 
 Separator change:
+
 ```tsx
 // Old
 <ChevronRight className="h-4 w-4 text-muted-foreground" />
@@ -164,6 +173,7 @@ interface AppNavbarProps {
 ```
 
 Two-row layout:
+
 - Row 1: Breadcrumbs (using renamed Breadcrumbs component)
 - Row 2: Tabs (context-dependent, optional)
 
@@ -192,32 +202,33 @@ interface NavTabsProps {
     { label: "Settings", href: "/settings" },
   ]}
   basePath={`/${companySlug}`}
-/>
+/>;
 ```
 
 NavTabs handles:
+
 - Rendering tab links
 - Active state detection via `usePathname().startsWith(basePath + tab.href)`
 - Styling (follows EventTabs pattern)
 
 ### Tab Configurations by Context
 
-| Context | Tabs |
-|---------|------|
+| Context           | Tabs                            |
+| ----------------- | ------------------------------- |
 | Company workspace | Projects, Experiences, Settings |
-| Project editor | Events, Distribute, Results |
-| Event editor | Experiences, Theme |
-| Experience editor | (no tabs) |
+| Project editor    | Events, Distribute, Results     |
+| Event editor      | Experiences, Theme              |
+| Experience editor | (no tabs)                       |
 
 ### Breadcrumb Patterns
 
-| Route | Breadcrumbs |
-|-------|-------------|
-| `/` | `[🍊]` |
-| `/acme-corp` | `[🍊] / Acme Corp` |
-| `/acme-corp/proj123` | `[🍊] / Acme Corp / Project Name` |
-| `/acme-corp/proj123/evt456` | `[🍊] / Acme Corp / Project Name / Event Name` |
-| `/acme-corp/exps/exp789` | `[🍊] / Acme Corp / experiences / Experience Name` |
+| Route                       | Breadcrumbs                                        |
+| --------------------------- | -------------------------------------------------- |
+| `/`                         | `[🍊]`                                             |
+| `/acme-corp`                | `[🍊] / Acme Corp`                                 |
+| `/acme-corp/proj123`        | `[🍊] / Acme Corp / Project Name`                  |
+| `/acme-corp/proj123/evt456` | `[🍊] / Acme Corp / Project Name / Event Name`     |
+| `/acme-corp/exps/exp789`    | `[🍊] / Acme Corp / experiences / Experience Name` |
 
 Last item is display-only (no link, no edit dialog).
 
@@ -226,6 +237,7 @@ Last item is display-only (no link, no edit dialog).
 ## 4. Implementation Order
 
 ### Phase 0a: Schema & Data Layer
+
 1. `lib/utils/slug.ts` - Slug utilities (new file, general-purpose)
 2. `features/companies/constants.ts` - Add slug constraints
 3. `features/companies/types/companies.types.ts` - Add slug field
@@ -234,16 +246,19 @@ Last item is display-only (no link, no edit dialog).
 6. `features/companies/actions/companies.actions.ts` - Add getBySlugAction
 
 ### Phase 0b: Navigation Components
+
 7. `components/shared/NavTabs.tsx` - Tab component (new file)
 8. `components/shared/AppNavbar.tsx` - Combined navbar (new file)
 
 ### Phase 0c: App Structure (Layouts)
+
 9. `app/(workspace)/(company)/[companySlug]/layout.tsx` - Company navbar
 10. `app/(workspace)/(project)/[companySlug]/[projectId]/layout.tsx` - Project navbar
 11. `app/(workspace)/(event)/[companySlug]/[projectId]/[eventId]/layout.tsx` - Event navbar
 12. `app/(workspace)/(experience)/[companySlug]/exps/[expId]/layout.tsx` - Experience navbar
 
 ### Phase 0d: Pages
+
 13. `app/(workspace)/page.tsx` - Companies list
 14. `app/(workspace)/(company)/[companySlug]/page.tsx` - Redirect to projects
 15. `app/(workspace)/(company)/[companySlug]/projects/page.tsx` - Projects placeholder
@@ -259,6 +274,7 @@ Last item is display-only (no link, no edit dialog).
 25. `app/(workspace)/(experience)/[companySlug]/exps/[expId]/page.tsx` - Placeholder
 
 ### Phase 0e: Form Updates
+
 26. `features/companies/components/CompanyForm.tsx` - Add slug input
 27. `features/companies/components/CompanyCard.tsx` - Link uses slug
 28. `app/page.tsx` - Update redirect
@@ -268,6 +284,7 @@ Last item is display-only (no link, no edit dialog).
 ## 5. Files Summary
 
 ### New Files (20)
+
 - `lib/utils/slug.ts`
 - `components/shared/NavTabs.tsx`
 - `components/shared/AppNavbar.tsx`
@@ -290,6 +307,7 @@ Last item is display-only (no link, no edit dialog).
 - `app/(workspace)/(experience)/[companySlug]/exps/[expId]/page.tsx`
 
 ### Modified Files (8)
+
 - `features/companies/constants.ts`
 - `features/companies/types/companies.types.ts`
 - `features/companies/schemas/companies.schemas.ts`
@@ -300,6 +318,7 @@ Last item is display-only (no link, no edit dialog).
 - `components/shared/EditorBreadcrumbs.tsx` → Rename to `Breadcrumbs.tsx`, change separator to `/`
 
 ### Reference Files (patterns to follow)
+
 - `app/(admin)/events/[eventId]/layout.tsx` - Layout with navbar pattern
 - `features/events/components/shared/EventTabs.tsx` - Tab component pattern
 
