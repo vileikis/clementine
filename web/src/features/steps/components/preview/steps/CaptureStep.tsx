@@ -15,7 +15,7 @@ import { ImageIcon, AlertCircle, Camera } from "lucide-react";
 import { StepLayout, ActionButton } from "@/components/step-primitives";
 import { useEventTheme } from "@/components/providers/EventThemeProvider";
 import type { StepCapture } from "@/features/steps/types";
-import type { Experience } from "@/features/experiences/types";
+import type { Experience } from "@/features/ai-presets/types";
 import type { MockSessionData } from "@/features/steps/types/preview.types";
 
 interface CaptureStepProps {

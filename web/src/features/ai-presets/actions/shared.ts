@@ -164,7 +164,7 @@ export async function attachExperienceToEvent(
     if (experienceError) return experienceError;
 
     // Add eventId to experience's eventIds array (arrayUnion is idempotent)
-    await db.collection("experiences").doc(experienceId).update({
+    await db.collection("aiPresets").doc(experienceId).update({
       eventIds: FieldValue.arrayUnion(eventId),
       updatedAt: Date.now(),
     });
@@ -204,7 +204,7 @@ export async function detachExperienceFromEvent(
     if (experienceError) return experienceError;
 
     // Remove eventId from experience's eventIds array (arrayRemove is idempotent)
-    await db.collection("experiences").doc(experienceId).update({
+    await db.collection("aiPresets").doc(experienceId).update({
       eventIds: FieldValue.arrayRemove(eventId),
       updatedAt: Date.now(),
     });

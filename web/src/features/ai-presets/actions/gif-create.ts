@@ -21,8 +21,8 @@ import {
   type GifExperience
 } from "../schemas";
 import {
-  createGifExperience as createGifExperienceInDb
-} from "../repositories/experiences.repository";
+  createGifAiPreset as createGifAiPresetInDb
+} from "../repositories/ai-presets.repository";
 import type { ActionResponse } from "./types";
 import { ErrorCodes } from "./types";
 import { checkAuth, validateCompanyAccess, createSuccessResponse, createErrorResponse } from "./utils";
@@ -57,8 +57,8 @@ export async function createGifExperience(
         ? [eventId]
         : [];
 
-    // Create experience in root /experiences collection
-    const gifExperience = await createGifExperienceInDb({
+    // Create experience in root /aiPresets collection
+    const gifExperience = await createGifAiPresetInDb({
       companyId: validated.companyId,
       eventIds,
       name: validated.name,

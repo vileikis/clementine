@@ -1,4 +1,5 @@
 import { storage } from "@/lib/firebase/admin";
+import { getDownloadURL } from "firebase-admin/storage";
 import {
   uploadInputImage,
   uploadResultImage,
@@ -228,24 +229,24 @@ describe("Storage Upload Utilities", () => {
 
   describe("getPublicUrl", () => {
     it("calls getDownloadURL with file reference", async () => {
-      const { getDownloadURL } = require("firebase-admin/storage");
+      const mockGetDownloadURL = getDownloadURL as jest.Mock;
       const mockFile = {};
 
       mockStorage.file.mockReturnValue(mockFile);
-      getDownloadURL.mockResolvedValue("https://storage.example.com/download/file.png");
+      mockGetDownloadURL.mockResolvedValue("https://storage.example.com/download/file.png");
 
       const url = await getPublicUrl("events/event-123/qr/join.png");
 
       expect(mockStorage.file).toHaveBeenCalledWith("events/event-123/qr/join.png");
-      expect(getDownloadURL).toHaveBeenCalledWith(mockFile);
+      expect(mockGetDownloadURL).toHaveBeenCalledWith(mockFile);
       expect(url).toBe("https://storage.example.com/download/file.png");
     });
 
     it("handles errors from getDownloadURL gracefully", async () => {
-      const { getDownloadURL } = require("firebase-admin/storage");
+      const mockGetDownloadURL = getDownloadURL as jest.Mock;
       const mockFile = {};
       mockStorage.file.mockReturnValue(mockFile);
-      getDownloadURL.mockRejectedValue(new Error("File not found"));
+      mockGetDownloadURL.mockRejectedValue(new Error("File not found"));
 
       await expect(getPublicUrl("path/to/file.jpg")).rejects.toThrow(
         "Failed to get download URL for file"
