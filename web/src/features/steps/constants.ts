@@ -178,6 +178,8 @@ export interface StepTypeMeta {
   label: string;
   description: string;
   category: "navigation" | "capture" | "input" | "completion";
+  /** If true, this step type is deprecated and should be hidden from the creation UI */
+  deprecated?: boolean;
 }
 
 export const STEP_TYPE_META: StepTypeMeta[] = [
@@ -193,6 +195,7 @@ export const STEP_TYPE_META: StepTypeMeta[] = [
     label: "Experience Picker",
     description: "Choose an AI experience",
     category: "navigation",
+    deprecated: true, // Hidden from creation UI - replaced by AI Presets workflow
   },
   // Capture
   {
@@ -200,6 +203,7 @@ export const STEP_TYPE_META: StepTypeMeta[] = [
     label: "Capture",
     description: "Take a photo or video",
     category: "capture",
+    deprecated: true, // Hidden from creation UI - replaced by AI Presets workflow
   },
   // Input
   {

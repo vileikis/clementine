@@ -40,7 +40,7 @@ import { useAutoSave } from "../../hooks";
 import { STEP_CONSTANTS } from "../../constants";
 import { stepMediaTypeSchema } from "../../schemas";
 import type { StepExperiencePicker } from "../../types";
-import type { Experience } from "@/features/experiences";
+import type { Experience } from "@/features/ai-presets";
 
 const experiencePickerFormSchema = z.object({
   // Base fields

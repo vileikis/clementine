@@ -1,12 +1,18 @@
 /**
- * TypeScript types for Experience domain
+ * TypeScript types for AI Preset domain
  * Re-exported from Zod schemas for convenience
  *
  * Refactored for normalized Firestore design (data-model-v4)
  */
 
 export type {
-  // Experience Types (discriminated union members)
+  // AI Preset Types (discriminated union members)
+  PhotoAiPreset,
+  VideoAiPreset,
+  GifAiPreset,
+  AiPreset,
+
+  // Legacy aliases for backward compatibility
   PhotoExperience,
   VideoExperience,
   GifExperience,
@@ -22,12 +28,21 @@ export type {
   AiVideoConfig,
 
   // Primitive Types
+  AiPresetType,
   ExperienceType,
   PreviewType,
   AspectRatio,
   CameraFacing,
 
-  // Creation/Update Types
+  // Creation/Update Types (new names)
+  CreatePhotoAiPresetData,
+  UpdatePhotoAiPresetData,
+  CreateGifAiPresetData,
+  UpdateGifAiPresetData,
+  CreateVideoAiPresetData,
+  UpdateVideoAiPresetData,
+
+  // Creation/Update Types (legacy aliases)
   CreatePhotoExperienceData,
   UpdatePhotoExperienceData,
   CreateGifExperienceData,
@@ -35,6 +50,7 @@ export type {
   CreateVideoExperienceData,
   UpdateVideoExperienceData,
 
-  // Type alias
+  // Type aliases
+  AiPresetSchema,
   ExperienceSchema,
 } from "../schemas";
