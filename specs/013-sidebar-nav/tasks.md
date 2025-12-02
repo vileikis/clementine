@@ -109,10 +109,10 @@
 
 ### Implementation for User Story 4
 
-- [ ] T030 [US4] Create CompanySwitcher component (avatar + name in expanded, avatar only in collapsed) in `features/sidebar/components/CompanySwitcher.tsx`
-- [ ] T031 [US4] Add CompanySwitcher to Sidebar below hamburger toggle in `features/sidebar/components/Sidebar.tsx`
-- [ ] T032 [US4] Implement click handler to open `/companies` in new tab (target="_blank") in `features/sidebar/components/CompanySwitcher.tsx`
-- [ ] T033 [US4] Pass company prop from layout to Sidebar in `app/(workspace)/(company)/[companySlug]/layout.tsx`
+- [X] T030 [US4] Create CompanySwitcher component (avatar + name in expanded, avatar only in collapsed) in `features/sidebar/components/CompanySwitcher.tsx`
+- [X] T031 [US4] Add CompanySwitcher to Sidebar below hamburger toggle in `features/sidebar/components/Sidebar.tsx`
+- [X] T032 [US4] Implement click handler to open `/companies` in new tab (target="_blank") in `features/sidebar/components/CompanySwitcher.tsx`
+- [X] T033 [US4] Pass company prop from layout to Sidebar in `app/(workspace)/(company)/[companySlug]/layout.tsx`
 - [ ] T034 [US4] Verify: click company switcher opens `/companies` in new tab
 
 **Checkpoint**: User Story 4 complete - company switcher functional
