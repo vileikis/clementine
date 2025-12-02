@@ -19,12 +19,12 @@
 
 **Purpose**: Install dependencies and create feature module structure
 
-- [ ] T001 Install Zustand dependency: `cd web && pnpm add zustand`
-- [ ] T002 [P] Create feature module directory structure at `features/sidebar/`
-- [ ] T003 [P] Create types barrel export in `features/sidebar/types/index.ts`
-- [ ] T004 [P] Create stores barrel export in `features/sidebar/stores/index.ts`
-- [ ] T005 [P] Create hooks barrel export in `features/sidebar/hooks/index.ts`
-- [ ] T006 [P] Create components barrel export in `features/sidebar/components/index.ts`
+- [X] T001 Install Zustand dependency: `cd web && pnpm add zustand`
+- [X] T002 [P] Create feature module directory structure at `features/sidebar/`
+- [X] T003 [P] Create types barrel export in `features/sidebar/types/index.ts`
+- [X] T004 [P] Create stores barrel export in `features/sidebar/stores/index.ts`
+- [X] T005 [P] Create hooks barrel export in `features/sidebar/hooks/index.ts`
+- [X] T006 [P] Create components barrel export in `features/sidebar/components/index.ts`
 
 ---
 
@@ -34,10 +34,10 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T007 Create sidebar types (SidebarState, SidebarActions, NavigationItem) in `features/sidebar/types/sidebar.types.ts`
-- [ ] T008 Create Zustand store with persist middleware in `features/sidebar/stores/sidebar.store.ts`
-- [ ] T009 Create navigation items constants (Projects, Experiences, Analytics, Settings) in `features/sidebar/constants.ts`
-- [ ] T010 Create feature public API barrel export in `features/sidebar/index.ts`
+- [X] T007 Create sidebar types (SidebarState, SidebarActions, NavigationItem) in `features/sidebar/types/sidebar.types.ts`
+- [X] T008 Create Zustand store with persist middleware in `features/sidebar/stores/sidebar.store.ts`
+- [X] T009 Create navigation items constants (Projects, Experiences, Analytics, Settings) in `features/sidebar/constants.ts`
+- [X] T010 Create feature public API barrel export in `features/sidebar/index.ts`
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
@@ -51,12 +51,12 @@
 
 ### Implementation for User Story 1
 
-- [ ] T011 [P] [US1] Create SidebarNavItem component with icon, label, active state, disabled state in `features/sidebar/components/SidebarNavItem.tsx`
-- [ ] T012 [P] [US1] Create SidebarNav component that renders navigation items list in `features/sidebar/components/SidebarNav.tsx`
-- [ ] T013 [US1] Create main Sidebar container component (layout structure only, expanded mode) in `features/sidebar/components/Sidebar.tsx`
-- [ ] T014 [US1] Update workspace layout to include Sidebar in `app/(workspace)/layout.tsx`
-- [ ] T015 [US1] Update company layout to remove AppNavbar, pass company to Sidebar in `app/(workspace)/(company)/[companySlug]/layout.tsx`
-- [ ] T016 [US1] Create analytics placeholder page in `app/(workspace)/(company)/[companySlug]/analytics/page.tsx`
+- [X] T011 [P] [US1] Create SidebarNavItem component with icon, label, active state, disabled state in `features/sidebar/components/SidebarNavItem.tsx`
+- [X] T012 [P] [US1] Create SidebarNav component that renders navigation items list in `features/sidebar/components/SidebarNav.tsx`
+- [X] T013 [US1] Create main Sidebar container component (layout structure only, expanded mode) in `features/sidebar/components/Sidebar.tsx`
+- [X] T014 [US1] Update workspace layout to include Sidebar in `app/(workspace)/layout.tsx`
+- [X] T015 [US1] Update company layout to remove AppNavbar, pass company to Sidebar in `app/(workspace)/(company)/[companySlug]/layout.tsx`
+- [X] T016 [US1] Create analytics placeholder page in `app/(workspace)/(company)/[companySlug]/analytics/page.tsx`
 - [ ] T017 [US1] Verify navigation works: click each nav item navigates correctly with active highlighting
 
 **Checkpoint**: User Story 1 complete - basic navigation functional
@@ -71,11 +71,11 @@
 
 ### Implementation for User Story 2
 
-- [ ] T018 [US2] Add collapse toggle (hamburger menu) to Sidebar component in `features/sidebar/components/Sidebar.tsx`
-- [ ] T019 [US2] Update SidebarNavItem to support collapsed mode (icon + small label underneath, YouTube-style) in `features/sidebar/components/SidebarNavItem.tsx`
-- [ ] T020 [US2] Add CSS width transition animation (256px ↔ 72px, 200ms ease-out) to Sidebar in `features/sidebar/components/Sidebar.tsx`
-- [ ] T021 [US2] Add tooltip on hover for collapsed nav items in `features/sidebar/components/SidebarNavItem.tsx`
-- [ ] T022 [US2] Connect collapse state to Zustand store (toggleCollapsed action) in `features/sidebar/components/Sidebar.tsx`
+- [X] T018 [US2] Add collapse toggle (hamburger menu) to Sidebar component in `features/sidebar/components/Sidebar.tsx`
+- [X] T019 [US2] Update SidebarNavItem to support collapsed mode (icon + small label underneath, YouTube-style) in `features/sidebar/components/SidebarNavItem.tsx`
+- [X] T020 [US2] Add CSS width transition animation (256px ↔ 72px, 200ms ease-out) to Sidebar in `features/sidebar/components/Sidebar.tsx`
+- [X] T021 [US2] Add tooltip on hover for collapsed nav items in `features/sidebar/components/SidebarNavItem.tsx`
+- [X] T022 [US2] Connect collapse state to Zustand store (toggleCollapsed action) in `features/sidebar/components/Sidebar.tsx`
 - [ ] T023 [US2] Verify persistence: collapse sidebar, refresh page, verify still collapsed
 
 **Checkpoint**: User Story 2 complete - collapse/expand with persistence working
@@ -90,10 +90,10 @@
 
 ### Implementation for User Story 3
 
-- [ ] T024 [US3] Create `/companies` page (move company list from workspace root) in `app/(workspace)/companies/page.tsx`
-- [ ] T025 [US3] Update root page with client-side redirect logic using Zustand store in `app/page.tsx`
-- [ ] T026 [US3] Add lastCompanySlug update when visiting company pages in `app/(workspace)/(company)/[companySlug]/layout.tsx`
-- [ ] T027 [US3] Handle invalid stored slug: validate company exists, clear if invalid in `app/page.tsx`
+- [X] T024 [US3] Create `/companies` page (move company list from workspace root) in `app/(workspace)/companies/page.tsx`
+- [X] T025 [US3] Update root page with client-side redirect logic using Zustand store in `app/page.tsx`
+- [X] T026 [US3] Add lastCompanySlug update when visiting company pages in `app/(workspace)/(company)/[companySlug]/layout.tsx`
+- [X] T027 [US3] Handle invalid stored slug: validate company exists, clear if invalid in `app/page.tsx`
 - [ ] T028 [US3] Verify redirect: clear storage, visit `/`, verify redirect to `/companies`
 - [ ] T029 [US3] Verify redirect: visit a company, then visit `/`, verify redirect to that company
 
