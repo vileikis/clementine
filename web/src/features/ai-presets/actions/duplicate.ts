@@ -14,9 +14,9 @@
 import { revalidatePath } from "next/cache";
 import type { Experience } from "../schemas";
 import {
-  getExperience,
-  duplicateExperience as duplicateExperienceInDb,
-} from "../repositories/experiences.repository";
+  getAiPreset,
+  duplicateAiPreset as duplicateAiPresetInDb,
+} from "../repositories/ai-presets.repository";
 import type { ActionResponse } from "./types";
 import { ErrorCodes } from "./types";
 import { checkAuth, createSuccessResponse, createErrorResponse } from "./utils";
@@ -38,7 +38,7 @@ export async function duplicateExperience(
     if (authError) return authError;
 
     // Get the source experience
-    const sourceExperience = await getExperience(experienceId);
+    const sourceExperience = await getAiPreset(experienceId);
     if (!sourceExperience) {
       return createErrorResponse(
         ErrorCodes.EXPERIENCE_NOT_FOUND,
@@ -50,7 +50,7 @@ export async function duplicateExperience(
     const newName = `${sourceExperience.name} (Copy)`;
 
     // Duplicate the experience
-    const duplicated = await duplicateExperienceInDb(sourceExperience, newName);
+    const duplicated = await duplicateAiPresetInDb(sourceExperience, newName);
 
     // Revalidate paths
     if (eventId) {

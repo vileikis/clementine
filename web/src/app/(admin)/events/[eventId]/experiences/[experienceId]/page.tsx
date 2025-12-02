@@ -9,8 +9,8 @@
  */
 
 import { notFound } from "next/navigation";
-import { getExperience } from "@/features/experiences/repositories";
-import { ExperienceEditorWrapper } from "@/features/experiences";
+import { getAiPreset } from "@/features/ai-presets/repositories";
+import { ExperienceEditorWrapper } from "@/features/ai-presets";
 
 interface ExperienceEditorPageProps {
   params: Promise<{ eventId: string; experienceId: string }>;
@@ -22,7 +22,7 @@ export default async function ExperienceEditorPage({
   const { eventId, experienceId } = await params;
 
   // Fetch experience from root /experiences collection
-  const experience = await getExperience(experienceId);
+  const experience = await getAiPreset(experienceId);
 
   // Show 404 if experience doesn't exist
   if (!experience) {

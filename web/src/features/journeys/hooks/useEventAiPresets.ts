@@ -1,32 +1,32 @@
 "use client";
 
 /**
- * Hook: useEventExperiences
+ * Hook: useEventAiPresets
  *
- * Fetches experiences for an event using a server action.
- * Returns experiences that have this eventId in their eventIds array.
+ * Fetches AI presets for an event using a server action.
+ * Returns AI presets that have this eventId in their eventIds array.
  */
 
 import { useState, useEffect, useCallback, useRef, useReducer } from "react";
-import { listExperiencesByEventAction } from "@/features/experiences/actions/list";
-import type { Experience } from "@/features/experiences/types";
+import { listExperiencesByEventAction } from "@/features/ai-presets/actions/list";
+import type { AiPreset } from "@/features/ai-presets/types";
 
-interface UseEventExperiencesResult {
-  experiences: Experience[];
+interface UseEventAiPresetsResult {
+  aiPresets: AiPreset[];
   loading: boolean;
   error: string | null;
   refresh: () => void;
 }
 
 type State = {
-  experiences: Experience[];
+  aiPresets: AiPreset[];
   loading: boolean;
   error: string | null;
 };
 
 type Action =
   | { type: "FETCH_START" }
-  | { type: "FETCH_SUCCESS"; data: Experience[] }
+  | { type: "FETCH_SUCCESS"; data: AiPreset[] }
   | { type: "FETCH_ERROR"; error: string };
 
 function reducer(state: State, action: Action): State {
@@ -34,21 +34,21 @@ function reducer(state: State, action: Action): State {
     case "FETCH_START":
       return { ...state, loading: true, error: null };
     case "FETCH_SUCCESS":
-      return { experiences: action.data, loading: false, error: null };
+      return { aiPresets: action.data, loading: false, error: null };
     case "FETCH_ERROR":
-      return { experiences: [], loading: false, error: action.error };
+      return { aiPresets: [], loading: false, error: action.error };
     default:
       return state;
   }
 }
 
 /**
- * Fetches experiences for an event.
+ * Fetches AI presets for an event.
  * Caches result until eventId changes or refresh is called.
  */
-export function useEventExperiences(eventId: string): UseEventExperiencesResult {
+export function useEventAiPresets(eventId: string): UseEventAiPresetsResult {
   const [state, dispatch] = useReducer(reducer, {
-    experiences: [],
+    aiPresets: [],
     loading: !!eventId,
     error: null,
   });
@@ -76,7 +76,7 @@ export function useEventExperiences(eventId: string): UseEventExperiencesResult 
       } else {
         dispatch({
           type: "FETCH_ERROR",
-          error: result.error?.message ?? "Failed to load experiences",
+          error: result.error?.message ?? "Failed to load AI presets",
         });
       }
     })();
@@ -92,8 +92,25 @@ export function useEventExperiences(eventId: string): UseEventExperiencesResult 
   }, []);
 
   if (!eventId) {
-    return { experiences: [], loading: false, error: null, refresh };
+    return { aiPresets: [], loading: false, error: null, refresh };
   }
 
   return { ...state, refresh };
+}
+
+// Legacy alias for backward compatibility
+/** @deprecated Use useEventAiPresets instead */
+export function useEventExperiences(eventId: string): {
+  experiences: AiPreset[];
+  loading: boolean;
+  error: string | null;
+  refresh: () => void;
+} {
+  const result = useEventAiPresets(eventId);
+  return {
+    experiences: result.aiPresets,
+    loading: result.loading,
+    error: result.error,
+    refresh: result.refresh,
+  };
 }

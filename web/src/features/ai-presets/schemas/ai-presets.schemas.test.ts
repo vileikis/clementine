@@ -17,7 +17,7 @@ import {
   type PhotoExperience,
   type VideoExperience,
   type GifExperience,
-} from "./experiences.schemas";
+} from "./ai-presets.schemas";
 
 describe("PhotoExperience Schema", () => {
   const validPhotoExperience: PhotoExperience = {

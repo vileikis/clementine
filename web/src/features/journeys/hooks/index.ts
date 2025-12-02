@@ -1,5 +1,5 @@
 export { useSteps } from "./useSteps";
 export { useStepMutations } from "./useStepMutations";
 export { useSelectedStep } from "./useSelectedStep";
-export { useEventExperiences } from "./useEventExperiences";
+export { useEventAiPresets, useEventExperiences } from "./useEventAiPresets";
 export { useKeyboardShortcuts } from "./useKeyboardShortcuts";
