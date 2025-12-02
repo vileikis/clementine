@@ -7,23 +7,39 @@
 
 ## User Scenarios & Testing *(mandatory)*
 
-### User Story 1 - View Company Experiences (Priority: P1)
+### User Story 1 - Create New Experience (Priority: P1)
+
+As an experience creator, I want to create a new experience so I can build custom guest flows from scratch.
+
+**Why this priority**: Creating experiences is the first action users take - without the ability to create, there's nothing to view or edit. This enables the entire feature.
+
+**Independent Test**: Click "New Experience" from the library, verify a new experience is created with default name "Untitled" and the editor opens automatically.
+
+**Acceptance Scenarios**:
+
+1. **Given** I am in the Experiences section, **When** I click the create/add button, **Then** a new experience is created with default name "Untitled"
+2. **Given** I have created a new experience, **When** creation completes, **Then** I am automatically redirected to the experience editor page
+3. **Given** I create a new experience, **When** it is created, **Then** it has the correct company association
+
+---
+
+### User Story 2 - View Company Experiences (Priority: P1)
 
 As an experience creator, I want to see all experiences belonging to my company so I can manage and organize my reusable flow templates.
 
-**Why this priority**: This is the foundation of the Experience Library - without being able to view experiences, no other functionality is useful. It establishes the core navigation pattern and data architecture.
+**Why this priority**: After creating experiences, users need to view and navigate their library. This establishes the core navigation pattern.
 
 **Independent Test**: Navigate to the Experiences section from the company workspace and verify a list/grid of company experiences appears. Delivers the core organizational value of having a central library.
 
 **Acceptance Scenarios**:
 
 1. **Given** I am logged into a company workspace, **When** I navigate to the Experiences section, **Then** I see a list/grid of all experiences belonging to that company
-2. **Given** a company has no experiences yet, **When** I navigate to the Experiences section, **Then** I see an empty state indicating no experiences exist
+2. **Given** a company has no experiences yet, **When** I navigate to the Experiences section, **Then** I see an empty state with a prompt to create the first experience
 3. **Given** experiences exist with preview media, **When** I view the experience list, **Then** preview media is displayed if available
 
 ---
 
-### User Story 2 - Edit Experience in Editor (Priority: P1)
+### User Story 3 - Edit Experience in Editor (Priority: P1)
 
 As an experience creator, I want to open an experience and edit its steps so I can customize the guest flow for my needs.
 
@@ -40,11 +56,11 @@ As an experience creator, I want to open an experience and edit its steps so I c
 
 ---
 
-### User Story 3 - Rename Experience (Priority: P2)
+### User Story 4 - Rename Experience (Priority: P2)
 
 As an experience creator, I want to rename an experience so I can keep my library organized with meaningful names.
 
-**Why this priority**: Naming is important for organization but is secondary to viewing and editing. Users can work with default names initially.
+**Why this priority**: Naming is important for organization but is secondary to core CRUD operations. Users can work with default names initially.
 
 **Independent Test**: Open an experience, click on the title to trigger rename dialog, enter a new name, and verify the name updates in the library.
 
@@ -53,22 +69,6 @@ As an experience creator, I want to rename an experience so I can keep my librar
 1. **Given** I am on the experience detail page, **When** I click on the experience title, **Then** a rename dialog opens
 2. **Given** the rename dialog is open, **When** I enter a new name and confirm, **Then** the experience name is updated
 3. **Given** I have renamed an experience, **When** I return to the experience list, **Then** the new name is displayed
-
----
-
-### User Story 4 - Create New Experience (Priority: P2)
-
-As an experience creator, I want to create a new experience so I can build custom guest flows from scratch.
-
-**Why this priority**: Creating new experiences is essential for growth but initial MVP can function with migrated existing journeys.
-
-**Independent Test**: Click "New Experience" from the library, provide a name, and verify a new empty experience is created and opens in the editor.
-
-**Acceptance Scenarios**:
-
-1. **Given** I am in the Experiences section, **When** I click the create/add button, **Then** I can create a new experience with a name
-2. **Given** I have created a new experience, **When** it is created, **Then** it appears in the experience list with the correct company association
-3. **Given** I create a new experience, **When** the creation completes, **Then** I am navigated to the experience editor for that new experience
 
 ---
 
