@@ -51,7 +51,7 @@ import type {
   StepProcessing,
   StepReward,
 } from "@/features/steps/types";
-import type { Experience } from "@/features/experiences/types";
+import type { Experience } from "@/features/ai-presets/types";
 
 interface StepEditorProps {
   eventId: string;

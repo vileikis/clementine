@@ -85,7 +85,7 @@ export async function validateEventExists<T = never>(
 }
 
 /**
- * Validate that an experience exists in root /experiences collection.
+ * Validate that an experience exists in root /aiPresets collection.
  * Returns an error response if the experience doesn't exist, otherwise null.
  *
  * @deprecated Use getExperienceDocument instead to avoid duplicate reads
@@ -93,7 +93,7 @@ export async function validateEventExists<T = never>(
 export async function validateExperienceExists<T = never>(
   experienceId: string
 ): Promise<ActionResponse<T> | null> {
-  const experienceRef = db.collection("experiences").doc(experienceId);
+  const experienceRef = db.collection("aiPresets").doc(experienceId);
   const experienceDoc = await experienceRef.get();
 
   if (!experienceDoc.exists) {
@@ -122,7 +122,7 @@ export async function getExperienceDocument(
   | { error: ActionResponse<never> }
   | { doc: FirebaseFirestore.DocumentSnapshot }
 > {
-  const experienceRef = db.collection("experiences").doc(experienceId);
+  const experienceRef = db.collection("aiPresets").doc(experienceId);
   const experienceDoc = await experienceRef.get();
 
   if (!experienceDoc.exists) {

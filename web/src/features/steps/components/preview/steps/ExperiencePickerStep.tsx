@@ -18,7 +18,7 @@ import { StepLayout, ActionButton, OptionButton } from "@/components/step-primit
 import { useEventTheme } from "@/components/providers/EventThemeProvider";
 import { AlertCircle, ImageIcon } from "lucide-react";
 import type { StepExperiencePicker } from "@/features/steps/types";
-import type { Experience } from "@/features/experiences/types";
+import type { Experience } from "@/features/ai-presets/types";
 
 interface ExperiencePickerStepProps {
   step: StepExperiencePicker;
