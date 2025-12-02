@@ -1,11 +1,11 @@
 "use client";
 
 /**
- * Delete Event Button with confirmation dialog.
+ * Delete Project Button with confirmation dialog.
  *
- * SAFETY: This component must NOT be added to Event Studio pages.
- * Delete functionality is intentionally restricted to the event list page only
- * to prevent accidental deletion while editing event details.
+ * SAFETY: This component must NOT be added to Project Studio pages.
+ * Delete functionality is intentionally restricted to the project list page only
+ * to prevent accidental deletion while editing project details.
  */
 
 import { useState } from "react";
@@ -22,27 +22,27 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { deleteEventAction } from "../../actions";
+import { deleteProjectAction } from "../../actions";
 import { toast } from "sonner";
 
-interface DeleteEventButtonProps {
-  eventId: string;
-  eventName: string;
+interface DeleteProjectButtonProps {
+  projectId: string;
+  projectName: string;
 }
 
-export function DeleteEventButton({ eventId, eventName }: DeleteEventButtonProps) {
+export function DeleteProjectButton({ projectId, projectName }: DeleteProjectButtonProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
   async function handleDelete() {
     setIsDeleting(true);
     try {
-      const result = await deleteEventAction(eventId);
+      const result = await deleteProjectAction(projectId);
       if (result.success) {
-        toast.success("Event deleted");
+        toast.success("Project deleted");
         setIsOpen(false);
       } else {
-        toast.error(result.error?.message || "Failed to delete event");
+        toast.error(result.error?.message || "Failed to delete project");
       }
     } finally {
       setIsDeleting(false);
@@ -59,14 +59,14 @@ export function DeleteEventButton({ eventId, eventName }: DeleteEventButtonProps
             className="h-11 w-11"
           >
             <Trash2 className="h-4 w-4" />
-            <span className="sr-only">Delete event</span>
+            <span className="sr-only">Delete project</span>
           </Button>
         </AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Event</AlertDialogTitle>
+            <AlertDialogTitle>Delete Project</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete &quot;{eventName}&quot;?
+              Are you sure you want to delete &quot;{projectName}&quot;?
               This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>

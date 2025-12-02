@@ -6,18 +6,18 @@ import { createProjectAction } from "../../actions/projects.actions"
 import { listCompaniesAction } from "@/features/companies/actions"
 import type { Company } from "@/features/companies"
 
-interface EventFormProps {
-  onSuccess?: (eventId: string) => void
+interface ProjectFormProps {
+  onSuccess?: (projectId: string) => void
 }
 
-export function EventForm({ onSuccess }: EventFormProps) {
+export function ProjectForm({ onSuccess }: ProjectFormProps) {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   // Form state
   const [name, setName] = useState("")
-  const [ownerId, setOwnerId] = useState<string>("")
+  const [companyId, setCompanyId] = useState<string>("")
 
   // Companies list
   const [companies, setCompanies] = useState<Company[]>([])
@@ -25,7 +25,7 @@ export function EventForm({ onSuccess }: EventFormProps) {
 
   // Validation errors
   const [nameError, setNameError] = useState<string | null>(null)
-  const [ownerError, setOwnerError] = useState<string | null>(null)
+  const [companyError, setCompanyError] = useState<string | null>(null)
 
   // Load companies on mount
   useEffect(() => {
@@ -53,12 +53,12 @@ export function EventForm({ onSuccess }: EventFormProps) {
     return true
   }
 
-  const validateOwner = (value: string): boolean => {
+  const validateCompany = (value: string): boolean => {
     if (!value) {
-      setOwnerError("Owner is required")
+      setCompanyError("Company is required")
       return false
     }
-    setOwnerError(null)
+    setCompanyError(null)
     return true
   }
 
@@ -68,28 +68,28 @@ export function EventForm({ onSuccess }: EventFormProps) {
 
     // Validate
     const isNameValid = validateName(name)
-    const isOwnerValid = validateOwner(ownerId)
-    if (!isNameValid || !isOwnerValid) {
+    const isCompanyValid = validateCompany(companyId)
+    if (!isNameValid || !isCompanyValid) {
       return
     }
 
     setIsSubmitting(true)
 
     try {
-      const result = await createEventAction({
+      const result = await createProjectAction({
         name: name.trim(),
         primaryColor: "#3B82F6", // Default theme color
-        ownerId,
+        companyId,
       })
 
-      if (result.success && result.eventId) {
-        // Success! Redirect to event detail page
+      if (result.success && result.projectId) {
+        // Success! Redirect to project detail page
         if (onSuccess) {
-          onSuccess(result.eventId)
+          onSuccess(result.projectId)
         }
-        router.push(`/events/${result.eventId}`)
+        router.push(`/projects/${result.projectId}`)
       } else {
-        setError(result.error?.message || "Failed to create event")
+        setError(result.error?.message || "Failed to create project")
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred")
@@ -106,7 +106,7 @@ export function EventForm({ onSuccess }: EventFormProps) {
           htmlFor="name"
           className="block text-sm font-medium mb-2"
         >
-          Event Name <span className="text-red-500">*</span>
+          Project Name <span className="text-red-500">*</span>
         </label>
         <input
           type="text"
@@ -122,7 +122,7 @@ export function EventForm({ onSuccess }: EventFormProps) {
               ? "border-red-500 focus:ring-red-500"
               : "border-input focus:ring-primary"
           }`}
-          placeholder="My Awesome Event"
+          placeholder="My Awesome Project"
           disabled={isSubmitting}
           maxLength={200}
         />
@@ -134,24 +134,24 @@ export function EventForm({ onSuccess }: EventFormProps) {
         </p>
       </div>
 
-      {/* Owner/Company Selector */}
+      {/* Company Selector */}
       <div>
         <label
-          htmlFor="owner"
+          htmlFor="company"
           className="block text-sm font-medium mb-2"
         >
-          Owner (Company) <span className="text-red-500">*</span>
+          Company <span className="text-red-500">*</span>
         </label>
         <select
-          id="owner"
-          value={ownerId}
+          id="company"
+          value={companyId}
           onChange={(e) => {
-            setOwnerId(e.target.value)
-            if (ownerError) validateOwner(e.target.value)
+            setCompanyId(e.target.value)
+            if (companyError) validateCompany(e.target.value)
           }}
-          onBlur={() => validateOwner(ownerId)}
+          onBlur={() => validateCompany(companyId)}
           className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 bg-background ${
-            ownerError
+            companyError
               ? "border-red-500 focus:ring-red-500"
               : "border-input focus:ring-primary"
           }`}
@@ -164,11 +164,11 @@ export function EventForm({ onSuccess }: EventFormProps) {
             </option>
           ))}
         </select>
-        {ownerError && (
-          <p className="text-sm text-red-500 mt-1">{ownerError}</p>
+        {companyError && (
+          <p className="text-sm text-red-500 mt-1">{companyError}</p>
         )}
         <p className="text-sm text-muted-foreground mt-1">
-          Associate this event with a brand or client
+          Associate this project with a brand or client
         </p>
       </div>
 
@@ -183,14 +183,14 @@ export function EventForm({ onSuccess }: EventFormProps) {
       <div className="flex items-center gap-3">
         <button
           type="submit"
-          disabled={isSubmitting || !name.trim() || !ownerId}
+          disabled={isSubmitting || !name.trim() || !companyId}
           className="flex-1 inline-flex items-center justify-center rounded-md bg-primary px-6 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isSubmitting ? "Creating..." : "Create Event"}
+          {isSubmitting ? "Creating..." : "Create Project"}
         </button>
         <button
           type="button"
-          onClick={() => router.push("/events")}
+          onClick={() => router.push("/projects")}
           disabled={isSubmitting}
           className="px-6 py-3 text-sm font-medium border border-input rounded-md hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >

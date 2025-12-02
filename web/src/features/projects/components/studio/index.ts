@@ -1,6 +1,6 @@
-// Barrel export for studio event components
-export { EventCard } from "./EventCard";
-export { EventForm } from "./EventForm";
-export { EventStatusSwitcher } from "./EventStatusSwitcher";
-export { EventBreadcrumb } from "./EventBreadcrumb";
-export { DeleteEventButton } from "./DeleteEventButton";
+// Barrel export for studio project components
+export { ProjectCard } from "./ProjectCard";
+export { ProjectForm } from "./ProjectForm";
+export { ProjectStatusSwitcher } from "./ProjectStatusSwitcher";
+export { ProjectBreadcrumb } from "./ProjectBreadcrumb";
+export { DeleteProjectButton } from "./DeleteProjectButton";
