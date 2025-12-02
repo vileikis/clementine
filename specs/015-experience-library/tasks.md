@@ -25,9 +25,9 @@
 
 **Purpose**: Create the experiences feature module structure by copying from journeys
 
-- [ ] T001 Create feature module directory structure at `web/src/features/experiences/`
-- [ ] T002 [P] Create barrel export file at `web/src/features/experiences/index.ts`
-- [ ] T003 [P] Create constants file with DEFAULT_EXPERIENCE_NAME="Untitled" at `web/src/features/experiences/constants.ts`
+- [X] T001 Create feature module directory structure at `web/src/features/experiences/`
+- [X] T002 [P] Create barrel export file at `web/src/features/experiences/index.ts`
+- [X] T003 [P] Create constants file with DEFAULT_EXPERIENCE_NAME="Untitled" at `web/src/features/experiences/constants.ts`
 
 ---
 
@@ -39,38 +39,38 @@
 
 ### Types & Schemas
 
-- [ ] T004 [P] Create Experience types at `web/src/features/experiences/types/experiences.types.ts`
-- [ ] T005 [P] Create types barrel export at `web/src/features/experiences/types/index.ts`
-- [ ] T006 [P] Create Experience Zod schemas at `web/src/features/experiences/schemas/experiences.schemas.ts`
-- [ ] T007 [P] Create schemas barrel export at `web/src/features/experiences/schemas/index.ts`
+- [X] T004 [P] Create Experience types at `web/src/features/experiences/types/experiences.types.ts`
+- [X] T005 [P] Create types barrel export at `web/src/features/experiences/types/index.ts`
+- [X] T006 [P] Create Experience Zod schemas at `web/src/features/experiences/schemas/experiences.schemas.ts`
+- [X] T007 [P] Create schemas barrel export at `web/src/features/experiences/schemas/index.ts`
 
 ### Repository
 
-- [ ] T008 Create experiences repository at `web/src/features/experiences/repositories/experiences.repository.ts` (listExperiences, getExperience, createExperience, updateExperience, deleteExperience)
-- [ ] T009 [P] Create repository barrel export at `web/src/features/experiences/repositories/index.ts`
+- [X] T008 Create experiences repository at `web/src/features/experiences/repositories/experiences.repository.ts` (listExperiences, getExperience, createExperience, updateExperience, deleteExperience)
+- [X] T009 [P] Create repository barrel export at `web/src/features/experiences/repositories/index.ts`
 
 ### Server Actions
 
-- [ ] T010 Create action response types at `web/src/features/experiences/actions/types.ts`
-- [ ] T011 Create experience server actions at `web/src/features/experiences/actions/experiences.ts` (listExperiencesAction, getExperienceAction, createExperienceAction, updateExperienceAction, deleteExperienceAction)
-- [ ] T012 [P] Create actions barrel export at `web/src/features/experiences/actions/index.ts`
+- [X] T010 Create action response types at `web/src/features/experiences/actions/types.ts`
+- [X] T011 Create experience server actions at `web/src/features/experiences/actions/experiences.ts` (listExperiencesAction, getExperienceAction, createExperienceAction, updateExperienceAction, deleteExperienceAction)
+- [X] T012 [P] Create actions barrel export at `web/src/features/experiences/actions/index.ts`
 
 ### Step Actions (Refactored)
 
-- [ ] T013 Create step server actions at `web/src/features/experiences/actions/steps.ts` (listStepsAction, createStepAction, updateStepAction, deleteStepAction, reorderStepsAction, duplicateStepAction)
+- [X] T013 Create step server actions at `web/src/features/experiences/actions/steps.ts` (listStepsAction, createStepAction, updateStepAction, deleteStepAction, reorderStepsAction, duplicateStepAction)
 
 ### Hooks
 
-- [ ] T014 [P] Create useExperiences hook at `web/src/features/experiences/hooks/useExperiences.ts`
-- [ ] T015 [P] Create useExperience hook at `web/src/features/experiences/hooks/useExperience.ts`
-- [ ] T016 [P] Create useSteps hook at `web/src/features/experiences/hooks/useSteps.ts`
-- [ ] T017 [P] Create useStepMutations hook at `web/src/features/experiences/hooks/useStepMutations.ts`
-- [ ] T018 [P] Create useSelectedStep hook at `web/src/features/experiences/hooks/useSelectedStep.ts`
-- [ ] T019 [P] Create hooks barrel export at `web/src/features/experiences/hooks/index.ts`
+- [X] T014 [P] Create useExperiences hook at `web/src/features/experiences/hooks/useExperiences.ts`
+- [X] T015 [P] Create useExperience hook at `web/src/features/experiences/hooks/useExperience.ts`
+- [X] T016 [P] Create useSteps hook at `web/src/features/experiences/hooks/useSteps.ts`
+- [X] T017 [P] Create useStepMutations hook at `web/src/features/experiences/hooks/useStepMutations.ts`
+- [X] T018 [P] Create useSelectedStep hook at `web/src/features/experiences/hooks/useSelectedStep.ts`
+- [X] T019 [P] Create hooks barrel export at `web/src/features/experiences/hooks/index.ts`
 
 ### Step Type Filtering
 
-- [ ] T020 Update step constants to mark experience-picker as deprecated at `web/src/features/steps/constants.ts`
+- [X] T020 Update step constants to mark experience-picker as deprecated at `web/src/features/steps/constants.ts`
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
@@ -84,8 +84,8 @@
 
 ### Implementation for User Story 1
 
-- [ ] T021 [US1] Create CreateExperienceButton component at `web/src/features/experiences/components/CreateExperienceButton.tsx` (creates with default name "Untitled", redirects to editor on success)
-- [ ] T022 [US1] Create components barrel export at `web/src/features/experiences/components/index.ts`
+- [X] T021 [US1] Create CreateExperienceButton component at `web/src/features/experiences/components/CreateExperienceButton.tsx` (creates with default name "Untitled", redirects to editor on success)
+- [X] T022 [US1] Create components barrel export at `web/src/features/experiences/components/index.ts`
 
 **Checkpoint**: User Story 1 complete - users can create new experiences
 
@@ -99,11 +99,11 @@
 
 ### Implementation for User Story 2
 
-- [ ] T023 [P] [US2] Create ExperienceCard component at `web/src/features/experiences/components/ExperienceCard.tsx`
-- [ ] T024 [P] [US2] Create EmptyExperiences component at `web/src/features/experiences/components/EmptyExperiences.tsx` (includes create prompt)
-- [ ] T025 [US2] Create ExperienceList component at `web/src/features/experiences/components/ExperienceList.tsx` (uses ExperienceCard, EmptyExperiences, CreateExperienceButton)
-- [ ] T026 [US2] Update components barrel export at `web/src/features/experiences/components/index.ts`
-- [ ] T027 [US2] Implement experiences list page at `web/src/app/(workspace)/[companySlug]/exps/page.tsx` (replace placeholder)
+- [X] T023 [P] [US2] Create ExperienceCard component at `web/src/features/experiences/components/ExperienceCard.tsx`
+- [X] T024 [P] [US2] Create EmptyExperiences component at `web/src/features/experiences/components/EmptyExperiences.tsx` (includes create prompt)
+- [X] T025 [US2] Create ExperienceList component at `web/src/features/experiences/components/ExperienceList.tsx` (uses ExperienceCard, EmptyExperiences, CreateExperienceButton)
+- [X] T026 [US2] Update components barrel export at `web/src/features/experiences/components/index.ts`
+- [X] T027 [US2] Implement experiences list page at `web/src/app/(workspace)/[companySlug]/exps/page.tsx` (replace placeholder)
 
 **Checkpoint**: User Story 2 complete - users can view their company's experience library
 
