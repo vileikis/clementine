@@ -89,14 +89,14 @@ This is a Next.js monorepo:
 
 ### Implementation for User Story 2
 
-- [ ] T029 [P] [US2] Rename component `web/src/features/projects/components/studio/EventCard.tsx` → `ProjectCard.tsx`, update Event→Project references, update click handler to navigate to `/projects/{projectId}`
-- [ ] T030 [P] [US2] Rename component `web/src/features/projects/components/studio/EventBreadcrumb.tsx` → `ProjectBreadcrumb.tsx`, update Event→Project references and route paths
-- [ ] T031 [US2] Create hook `web/src/features/projects/hooks/useProjects.ts` for projects list real-time subscription (wraps listProjects with subscribe: true, filters by companyId and deletedAt==null)
-- [ ] T032 [US2] Create page `web/src/app/(authenticated)/projects/page.tsx` with ProjectCard grid, "Create Project" button (opens ProjectForm dialog), empty state, and useProjects hook
-- [ ] T033 [US2] Update ProjectCard to display project name, status badge, and last updated timestamp
-- [ ] T034 [US2] Add empty state UI to projects list page with "Create Project" call-to-action and illustration
-- [ ] T035 [US2] Update barrel export `web/src/features/projects/components/index.ts` to export ProjectCard and ProjectBreadcrumb
-- [ ] T036 [US2] Update barrel export `web/src/features/projects/hooks/index.ts` to export useProjects hook
+- [X] T029 [P] [US2] Rename component `web/src/features/projects/components/studio/EventCard.tsx` → `ProjectCard.tsx`, update Event→Project references, update click handler to navigate to `/projects/{projectId}`
+- [X] T030 [P] [US2] Rename component `web/src/features/projects/components/studio/EventBreadcrumb.tsx` → `ProjectBreadcrumb.tsx`, update Event→Project references and route paths
+- [X] T031 [US2] Create hook `web/src/features/projects/hooks/useProjects.ts` for projects list real-time subscription (wraps listProjects with subscribe: true, filters by companyId and deletedAt==null)
+- [X] T032 [US2] Create page `web/src/app/(authenticated)/projects/page.tsx` with ProjectCard grid, "Create Project" button (opens ProjectForm dialog), empty state, and useProjects hook
+- [X] T033 [US2] Update ProjectCard to display project name, status badge, and last updated timestamp
+- [X] T034 [US2] Add empty state UI to projects list page with "Create Project" call-to-action and illustration
+- [X] T035 [US2] Update barrel export `web/src/features/projects/components/index.ts` to export ProjectCard and ProjectBreadcrumb
+- [X] T036 [US2] Update barrel export `web/src/features/projects/hooks/index.ts` to export useProjects hook
 
 **Checkpoint**: At this point, User Stories 1 AND 2 are both functional - administrators can view projects list, create projects, and navigate to details. Both stories are independently testable.
 

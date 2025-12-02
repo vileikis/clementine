@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { useState, useTransition } from "react";
 import {
   Dialog,
@@ -14,19 +15,20 @@ import { Input } from "@/components/ui/input";
 import { updateProjectNameAction } from "../../actions/projects.actions";
 import { useRouter } from "next/navigation";
 
-interface EventBreadcrumbProps {
-  eventId: string;
-  eventName: string;
+interface ProjectBreadcrumbProps {
+  projectId: string;
+  projectName: string;
 }
 
 /**
- * Breadcrumb navigation showing "Events > [Event name]"
- * Event name is clickable to edit
- * Part of Phase 3 (User Story 0) - Base Events UI Navigation Shell
+ * Breadcrumb navigation showing "Projects > [Project name]"
+ * Project name is clickable to edit
  */
-export function EventBreadcrumb({ eventId, eventName }: EventBreadcrumbProps) {
+export function ProjectBreadcrumb({ projectId, projectName }: ProjectBreadcrumbProps) {
+  const params = useParams();
+  const companySlug = params.companySlug as string;
   const [isOpen, setIsOpen] = useState(false);
-  const [name, setName] = useState(eventName);
+  const [name, setName] = useState(projectName);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
@@ -34,18 +36,18 @@ export function EventBreadcrumb({ eventId, eventName }: EventBreadcrumbProps) {
   const handleSave = () => {
     setError(null);
     startTransition(async () => {
-      const result = await updateEventNameAction(eventId, name);
+      const result = await updateProjectNameAction(projectId, name);
       if (result.success) {
         setIsOpen(false);
         router.refresh();
       } else {
-        setError(result.error?.message || "Failed to update event name");
+        setError(result.error?.message || "Failed to update project name");
       }
     });
   };
 
   const handleCancel = () => {
-    setName(eventName);
+    setName(projectName);
     setError(null);
     setIsOpen(false);
   };
@@ -56,10 +58,10 @@ export function EventBreadcrumb({ eventId, eventName }: EventBreadcrumbProps) {
         <ol className="flex items-center gap-2 text-sm text-muted-foreground whitespace-nowrap">
           <li>
             <Link
-              href="/events"
+              href={`/${companySlug}/projects`}
               className="hover:text-foreground hover:underline transition-colors"
             >
-              🍊 Events
+              Projects
             </Link>
           </li>
           <li aria-hidden="true">&gt;</li>
@@ -67,26 +69,26 @@ export function EventBreadcrumb({ eventId, eventName }: EventBreadcrumbProps) {
             <button
               onClick={() => setIsOpen(true)}
               className="text-foreground font-medium truncate max-w-[150px] hover:underline cursor-pointer"
-              title={`${eventName} (click to edit)`}
+              title={`${projectName} (click to edit)`}
             >
-              {eventName}
+              {projectName}
             </button>
           </li>
         </ol>
       </nav>
 
-      {/* Edit event name dialog */}
+      {/* Edit project name dialog */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Rename this event</DialogTitle>
+            <DialogTitle>Rename this project</DialogTitle>
           </DialogHeader>
 
           <div className="py-4">
             <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Event name"
+              placeholder="Project name"
               maxLength={200}
               disabled={isPending}
             />
