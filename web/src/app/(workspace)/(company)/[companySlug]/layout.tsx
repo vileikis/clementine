@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { getCompanyBySlugAction } from "@/features/companies/actions";
-import { Sidebar } from "@/features/sidebar";
-import { LastCompanyUpdater } from "./LastCompanyUpdater";
+import { Sidebar, LastCompanyUpdater } from "@/features/sidebar";
 
 interface CompanyLayoutProps {
   children: React.ReactNode;

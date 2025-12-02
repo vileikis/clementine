@@ -127,11 +127,11 @@
 
 ### Implementation for User Story 5
 
-- [ ] T035 [US5] Create content header component with breadcrumbs slot in `features/sidebar/components/ContentHeader.tsx`
-- [ ] T036 [US5] Update company layout to render breadcrumbs in content area (not sidebar) in `app/(workspace)/(company)/[companySlug]/layout.tsx`
-- [ ] T037 [US5] Update project layout breadcrumbs (Projects / [Project Name]) in `app/(workspace)/(project)/[companySlug]/[projectId]/layout.tsx`
-- [ ] T038 [US5] Update event layout breadcrumbs (Projects / [Project] / [Event]) in `app/(workspace)/(event)/[companySlug]/[projectId]/[eventId]/layout.tsx`
-- [ ] T039 [US5] Ensure breadcrumbs exclude company name (company context in sidebar) in all layouts
+- [X] T035 [US5] Create content header component with breadcrumbs slot in `features/sidebar/components/ContentHeader.tsx`
+- [X] T036 [US5] Update company layout to render breadcrumbs in content area (not sidebar) in `app/(workspace)/(company)/[companySlug]/layout.tsx`
+- [X] T037 [US5] Update project layout breadcrumbs (Projects / [Project Name]) in `app/(workspace)/(project)/[companySlug]/[projectId]/layout.tsx`
+- [X] T038 [US5] Update event layout breadcrumbs (Projects / [Project] / [Event]) in `app/(workspace)/(event)/[companySlug]/[projectId]/[eventId]/layout.tsx`
+- [X] T039 [US5] Ensure breadcrumbs exclude company name (company context in sidebar) in all layouts
 - [ ] T040 [US5] Verify: breadcrumbs are clickable and navigate to correct sections
 
 **Checkpoint**: User Story 5 complete - breadcrumbs in content area working
@@ -146,9 +146,9 @@
 
 ### Implementation for User Story 6
 
-- [ ] T041 [US6] Create SidebarLogout component (icon + label expanded, icon only collapsed) in `features/sidebar/components/SidebarLogout.tsx`
-- [ ] T042 [US6] Add SidebarLogout to Sidebar anchored at bottom in `features/sidebar/components/Sidebar.tsx`
-- [ ] T043 [US6] Connect logout to existing auth signout functionality in `features/sidebar/components/SidebarLogout.tsx`
+- [X] T041 [US6] Create SidebarLogout component (icon + label expanded, icon only collapsed) in `features/sidebar/components/SidebarLogout.tsx`
+- [X] T042 [US6] Add SidebarLogout to Sidebar anchored at bottom in `features/sidebar/components/Sidebar.tsx`
+- [X] T043 [US6] Connect logout to existing auth signout functionality in `features/sidebar/components/SidebarLogout.tsx`
 - [ ] T044 [US6] Verify: click logout signs out and redirects to login page
 
 **Checkpoint**: User Story 6 complete - logout from sidebar working
