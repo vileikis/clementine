@@ -13,11 +13,13 @@ interface BreadcrumbsProps {
 /**
  * Dynamic breadcrumb navigation with "/" separator
  * Used across workspace layouts
+ *
+ * Mobile: Horizontal scroll with hidden scrollbar for long breadcrumb trails
  */
 export function Breadcrumbs({ items }: BreadcrumbsProps) {
   return (
-    <nav aria-label="Breadcrumb">
-      <ol className="flex items-center gap-2 text-sm">
+    <nav aria-label="Breadcrumb" className="overflow-x-auto scrollbar-hide">
+      <ol className="flex items-center gap-2 text-sm whitespace-nowrap min-w-max">
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
 
