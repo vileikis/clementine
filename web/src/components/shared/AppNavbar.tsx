@@ -9,8 +9,9 @@ interface AppNavbarProps {
 }
 
 /**
- * Combined navigation bar with breadcrumbs and optional tabs
- * Used in workspace layouts for consistent navigation
+ * @deprecated Use Sidebar + ContentHeader from @/features/sidebar instead.
+ * This component is kept for legacy admin layouts only.
+ * Combined navigation bar with breadcrumbs and optional tabs.
  */
 export function AppNavbar({
   breadcrumbs,

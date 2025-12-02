@@ -113,7 +113,7 @@
 - [X] T031 [US4] Add CompanySwitcher to Sidebar below hamburger toggle in `features/sidebar/components/Sidebar.tsx`
 - [X] T032 [US4] Implement click handler to open `/companies` in new tab (target="_blank") in `features/sidebar/components/CompanySwitcher.tsx`
 - [X] T033 [US4] Pass company prop from layout to Sidebar in `app/(workspace)/(company)/[companySlug]/layout.tsx`
-- [ ] T034 [US4] Verify: click company switcher opens `/companies` in new tab
+- [X] T034 [US4] Verify: click company switcher opens `/companies` in new tab
 
 **Checkpoint**: User Story 4 complete - company switcher functional
 
@@ -132,7 +132,7 @@
 - [X] T037 [US5] Update project layout breadcrumbs (Projects / [Project Name]) in `app/(workspace)/(project)/[companySlug]/[projectId]/layout.tsx`
 - [X] T038 [US5] Update event layout breadcrumbs (Projects / [Project] / [Event]) in `app/(workspace)/(event)/[companySlug]/[projectId]/[eventId]/layout.tsx`
 - [X] T039 [US5] Ensure breadcrumbs exclude company name (company context in sidebar) in all layouts
-- [ ] T040 [US5] Verify: breadcrumbs are clickable and navigate to correct sections
+- [X] T040 [US5] Verify: breadcrumbs are clickable and navigate to correct sections
 
 **Checkpoint**: User Story 5 complete - breadcrumbs in content area working
 
@@ -149,7 +149,7 @@
 - [X] T041 [US6] Create SidebarLogout component (icon + label expanded, icon only collapsed) in `features/sidebar/components/SidebarLogout.tsx`
 - [X] T042 [US6] Add SidebarLogout to Sidebar anchored at bottom in `features/sidebar/components/Sidebar.tsx`
 - [X] T043 [US6] Connect logout to existing auth signout functionality in `features/sidebar/components/SidebarLogout.tsx`
-- [ ] T044 [US6] Verify: click logout signs out and redirects to login page
+- [X] T044 [US6] Verify: click logout signs out and redirects to login page
 
 **Checkpoint**: User Story 6 complete - logout from sidebar working
 
@@ -159,18 +159,18 @@
 
 **Purpose**: Final cleanup and validation
 
-- [ ] T045 [P] Update components barrel export with all new components in `features/sidebar/components/index.ts`
-- [ ] T046 [P] Ensure all touch targets meet 44x44px minimum requirement across sidebar components
-- [ ] T047 [P] Remove or deprecate AppNavbar component in `components/shared/AppNavbar.tsx`
-- [ ] T048 [P] Remove NavTabs usage from company layout (replaced by sidebar) in `app/(workspace)/(company)/[companySlug]/layout.tsx`
-- [ ] T049 Clean up any unused imports and dead code in modified layout files
+- [X] T045 [P] Update components barrel export with all new components in `features/sidebar/components/index.ts`
+- [X] T046 [P] Ensure all touch targets meet 44x44px minimum requirement across sidebar components
+- [X] T047 [P] Remove or deprecate AppNavbar component in `components/shared/AppNavbar.tsx`
+- [X] T048 [P] Remove NavTabs usage from company layout (replaced by sidebar) in `app/(workspace)/(company)/[companySlug]/layout.tsx`
+- [X] T049 Clean up any unused imports and dead code in modified layout files
 
 ### Validation Loop (REQUIRED - Constitution Principle V)
 
 **Purpose**: Ensure code quality and correctness before merge
 
-- [ ] T050 Run `pnpm lint` and fix all errors/warnings
-- [ ] T051 Run `pnpm type-check` and resolve all TypeScript errors
+- [X] T050 Run `pnpm lint` and fix all errors/warnings
+- [X] T051 Run `pnpm type-check` and resolve all TypeScript errors
 - [ ] T052 Verify feature in local dev server (`pnpm dev`)
 - [ ] T053 Test all user stories manually per acceptance scenarios in spec.md
 - [ ] T054 Commit only after validation loop passes cleanly
