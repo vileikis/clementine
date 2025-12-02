@@ -4,6 +4,12 @@
 **Owner:** Igor
 **Scope:** Admin App Navigation
 
+# **0. Purpose**
+
+This is a follow up PRD for the company context based navigation project /Users/iggyvileikis/Projects/@attempt-n2/clementine/specs/012-company-context
+
+Key impacted areas are to navigation layout and router structure.
+
 ---
 
 # **1. Purpose**
