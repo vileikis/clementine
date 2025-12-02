@@ -7,6 +7,13 @@ const SLUG_LENGTH = { min: 1, max: 50 };
 const SLUG_PATTERN = /^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$/;
 
 /**
+ * Generate a short alphanumeric suffix for fallback slugs
+ */
+function generateSuffix(): string {
+  return Math.random().toString(36).substring(2, 6);
+}
+
+/**
  * Generate a URL-friendly slug from a name
  *
  * @param name - The name to convert to a slug
@@ -15,14 +22,22 @@ const SLUG_PATTERN = /^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$/;
  * @example
  * generateSlug("Acme Corp") // "acme-corp"
  * generateSlug("My  Company!") // "my-company"
+ * generateSlug("!!!") // "item-x7k2" (fallback for non-alphanumeric input)
  */
 export function generateSlug(name: string): string {
-  return name
+  const slug = name
     .toLowerCase()
     .trim()
     .replace(/[^a-z0-9]+/g, "-") // Replace non-alphanumeric with hyphens
     .replace(/^-+|-+$/g, "") // Remove leading/trailing hyphens
     .substring(0, SLUG_LENGTH.max); // Enforce max length
+
+  // Fallback for empty or too-short slugs
+  if (slug.length < SLUG_LENGTH.min) {
+    return `item-${generateSuffix()}`;
+  }
+
+  return slug;
 }
 
 /**
