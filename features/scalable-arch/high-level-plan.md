@@ -7,6 +7,10 @@
 - Old features/scalable-arch/old-data-model-v4.md
 - New features/scalable-arch/new-data-model-v5.md
 
+## PLanned feature modules
+
+- features/scalable-arch/feature-modules.md
+
 ---
 
 ## **🎯 Phase 0 — Establish Company Context (Foundation)**

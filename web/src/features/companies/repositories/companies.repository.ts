@@ -11,13 +11,14 @@ import { generateSlug } from "@/lib/utils/slug";
  * Create a new company with transaction-based uniqueness validation
  *
  * @param data - Company creation input (name, optional slug, and optional metadata)
- * @returns Company ID
+ * @returns Object with company ID and slug
  * @throws Error if company name or slug already exists
  */
 export async function createCompany(
   data: CreateCompanyInput
-): Promise<string> {
+): Promise<{ id: string; slug: string }> {
   const companyRef = db.collection("companies").doc();
+  let createdSlug: string = "";
 
   await db.runTransaction(async (txn) => {
     // Check for existing active company with same name (case-insensitive)
@@ -41,6 +42,7 @@ export async function createCompany(
 
     // Generate slug from name if not provided
     const slug = data.slug ?? generateSlug(data.name);
+    createdSlug = slug;
 
     // Check if slug already exists
     const slugDuplicate = existingSnapshot.docs.find(
@@ -70,7 +72,7 @@ export async function createCompany(
     txn.set(companyRef, company);
   });
 
-  return companyRef.id;
+  return { id: companyRef.id, slug: createdSlug };
 }
 
 /**

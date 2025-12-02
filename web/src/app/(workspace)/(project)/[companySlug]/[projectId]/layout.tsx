@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { getCompanyBySlugAction } from "@/features/companies/actions";
-import { AppNavbar } from "@/components/shared/AppNavbar";
-import { LogoutButton } from "@/components/shared/LogoutButton";
+import { Sidebar, ContentHeader, LastCompanyUpdater } from "@/features/sidebar";
 
 interface ProjectLayoutProps {
   children: React.ReactNode;
@@ -9,9 +8,8 @@ interface ProjectLayoutProps {
 }
 
 /**
- * Project layout - isolated navigation context (no layout stacking)
- * Breadcrumbs: 🍊 / Company / Project
- * Tabs: Events, Distribute, Results
+ * Project layout - sidebar navigation with breadcrumbs in content area
+ * Breadcrumbs: Projects / [Project Name] (company context in sidebar)
  */
 export default async function ProjectLayout({
   children,
@@ -19,7 +17,7 @@ export default async function ProjectLayout({
 }: ProjectLayoutProps) {
   const { companySlug, projectId } = await params;
 
-  // Fetch company for breadcrumbs
+  // Fetch company for sidebar
   const companyResult = await getCompanyBySlugAction(companySlug);
   if (!companyResult.success || !companyResult.company) {
     notFound();
@@ -32,22 +30,18 @@ export default async function ProjectLayout({
   const projectName = `Project ${projectId}`;
 
   return (
-    <div className="flex flex-col h-full">
-      <AppNavbar
-        breadcrumbs={[
-          { label: "\u{1F34A}", href: "/", isLogo: true },
-          { label: company.name, href: `/${companySlug}/projects` },
-          { label: projectName },
-        ]}
-        tabs={[
-          { label: "Events", href: "/events" },
-          { label: "Distribute", href: "/distribute" },
-          { label: "Results", href: "/results" },
-        ]}
-        basePath={`/${companySlug}/${projectId}`}
-        actions={<LogoutButton />}
-      />
-      <div className="flex-1 overflow-auto">{children}</div>
+    <div className="flex h-screen">
+      <Sidebar company={company} />
+      <main className="flex-1 overflow-auto flex flex-col">
+        <ContentHeader
+          breadcrumbs={[
+            { label: "Projects", href: `/${companySlug}/projects` },
+            { label: projectName },
+          ]}
+        />
+        <div className="flex-1 overflow-auto">{children}</div>
+      </main>
+      <LastCompanyUpdater companySlug={companySlug} />
     </div>
   );
 }
