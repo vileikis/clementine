@@ -48,10 +48,10 @@ export function ExperienceList({ companyId, companySlug }: ExperienceListProps) 
   return (
     <div className="space-y-6">
       {/* Header with create button */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-lg font-semibold">Experiences</h2>
-          <p className="text-sm text-muted-foreground">
+          <h2 className="text-4xl font-semibold">Experiences</h2>
+          <p className="text-sm text-muted-foreground mt-2">
             {experiences.length}{" "}
             {experiences.length === 1 ? "experience" : "experiences"}
           </p>
