@@ -10,7 +10,7 @@ import {
   updateStepIndex,
   saveStepData,
 } from "../repositories";
-import { getEvent } from "@/features/events/repositories/events";
+import { getProject } from "@/features/projects/repositories/projects.repository";
 import { getJourney } from "@/features/journeys/repositories/journeys.repository";
 import { listSteps } from "@/features/steps/repositories/steps.repository";
 import {

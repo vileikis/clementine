@@ -1,5 +1,5 @@
 import Link from "next/link"
-import type { Event } from "../../types/event.types"
+import type { Project } from "../../types/project.types"
 import { DeleteEventButton } from "./DeleteEventButton"
 
 interface EventCardProps {

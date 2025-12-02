@@ -2,7 +2,7 @@
 
 import { useCallback, useState, useEffect } from "react";
 import { z } from "zod";
-import type { Event } from "@/features/events/types";
+import type { Project as Event } from "@/features/projects/types";
 import type { Journey } from "@/features/journeys/types";
 import type { Step } from "@/features/steps/types";
 import type { Experience } from "@/features/ai-presets/types";

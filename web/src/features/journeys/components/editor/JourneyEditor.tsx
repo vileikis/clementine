@@ -36,7 +36,7 @@ import {
 } from "../../hooks";
 import type { Journey } from "../../types";
 import type { Step } from "@/features/steps/types";
-import type { Event } from "@/features/events/types";
+import type { Project as Event } from "@/features/projects/types";
 
 interface JourneyEditorProps {
   event: Event;
@@ -218,7 +218,7 @@ export function JourneyEditor({ event, journey }: JourneyEditorProps) {
             {selectedStep ? (
               <StepEditor
                 eventId={event.id}
-                companyId={event.ownerId ?? ""}
+                companyId={event.companyId ?? ""}
                 step={selectedStep}
                 experiences={experiences}
                 onStepDeleted={handleStepDeleted}

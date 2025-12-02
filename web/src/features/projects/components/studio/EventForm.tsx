@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { createEventAction } from "../../actions/events"
+import { createProjectAction } from "../../actions/projects.actions"
 import { listCompaniesAction } from "@/features/companies/actions"
 import type { Company } from "@/features/companies"
 

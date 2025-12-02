@@ -6,7 +6,7 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { updateEventSwitchboardAction } from "@/features/events/actions/events";
+import { updateProjectSwitchboardAction } from "@/features/projects/actions/projects.actions";
 import type { Journey } from "../types";
 import { DeleteJourneyDialog } from "./DeleteJourneyDialog";
 import { deleteJourneyAction } from "../actions/journeys";
@@ -46,7 +46,7 @@ export function JourneyCard({ journey, eventId, isActive }: JourneyCardProps) {
     setOptimisticActive(checked);
 
     startTransition(async () => {
-      const result = await updateEventSwitchboardAction(
+      const result = await updateProjectSwitchboardAction(
         eventId,
         checked ? journey.id : null
       );

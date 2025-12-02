@@ -33,10 +33,10 @@ import {
   useStepMutations,
   useKeyboardShortcuts,
 } from "../../hooks";
-import { THEME_DEFAULTS } from "@/features/events/constants";
+import { THEME_DEFAULTS } from "@/features/projects/constants";
 import type { Experience } from "../../types";
 import type { Step } from "@/features/steps/types";
-import type { EventTheme } from "@/features/events/types";
+import type { ProjectTheme as EventTheme } from "@/features/projects/types";
 
 interface ExperienceEditorProps {
   companySlug: string;

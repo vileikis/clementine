@@ -2,13 +2,13 @@
 
 import { useReducer, useTransition } from "react";
 import Image from "next/image";
-import { Event, EventTheme } from "../../types/event.types";
+import { Project, ProjectTheme } from "../../types/project.types";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { PreviewPanel } from "./PreviewPanel";
 import { ImageUploadField } from "@/components/shared/ImageUploadField";
-import { updateEventTheme } from "../../actions/events";
+import { updateProjectTheme } from "../../actions/projects.actions";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";

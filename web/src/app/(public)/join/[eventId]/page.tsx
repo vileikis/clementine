@@ -1,4 +1,4 @@
-import { getEventAction } from "@/features/events/actions"
+import { getProjectAction } from "@/features/projects/actions"
 import { getCompanyStatus } from "@/features/companies/repositories/companies.repository"
 import {
   getJourneyForGuestAction,
@@ -18,7 +18,7 @@ interface JoinPageProps {
 
 export default async function JoinPage({ params }: JoinPageProps) {
   const { eventId } = await params
-  const result = await getEventAction(eventId)
+  const result = await getProjectAction(eventId)
 
   if (!result.success || !result.event) {
     notFound()
@@ -27,8 +27,8 @@ export default async function JoinPage({ params }: JoinPageProps) {
   const event = result.event
 
   // Check if event has an owner company and if that company is deleted
-  if (event.ownerId) {
-    const companyStatus = await getCompanyStatus(event.ownerId)
+  if (event.companyId) {
+    const companyStatus = await getCompanyStatus(event.companyId)
 
     if (!companyStatus || companyStatus === "deleted") {
       return (
@@ -48,12 +48,12 @@ export default async function JoinPage({ params }: JoinPageProps) {
     )
   }
 
-  // Route based on activeJourneyId - new journey flow vs legacy flow
-  if (event.activeJourneyId) {
+  // Route based on activeEventId - new journey flow vs legacy flow
+  if (event.activeEventId) {
     // Load journey and steps
     const journeyResult = await getJourneyForGuestAction(
       event.id,
-      event.activeJourneyId
+      event.activeEventId
     )
 
     // Load experiences for experience-picker steps
