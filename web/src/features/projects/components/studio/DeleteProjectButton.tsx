@@ -9,6 +9,7 @@
  */
 
 import { useState } from "react";
+import { useRouter, useParams } from "next/navigation";
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,6 +34,9 @@ interface DeleteProjectButtonProps {
 export function DeleteProjectButton({ projectId, projectName }: DeleteProjectButtonProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
+  const params = useParams();
+  const companySlug = params.companySlug as string;
 
   async function handleDelete() {
     setIsDeleting(true);
@@ -41,6 +45,8 @@ export function DeleteProjectButton({ projectId, projectName }: DeleteProjectBut
       if (result.success) {
         toast.success("Project deleted");
         setIsOpen(false);
+        // Redirect to projects list
+        router.push(`/${companySlug}/projects`);
       } else {
         toast.error(result.error?.message || "Failed to delete project");
       }

@@ -5,7 +5,7 @@ interface ProjectPageProps {
 }
 
 /**
- * Project root page - redirects to events
+ * Project root page - redirects to events tab
  */
 export default async function ProjectPage({ params }: ProjectPageProps) {
   const { companySlug, projectId } = await params;

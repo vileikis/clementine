@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { toast } from "sonner"
 import { updateProjectStatusAction } from "../../actions/projects.actions"
 import type { ProjectStatus } from "../../types/project.types"
 
@@ -33,6 +34,9 @@ export function ProjectStatusSwitcher({
 
     if (result.success) {
       setStatus(newStatus)
+      toast.success(`Status updated to ${newStatus}`)
+    } else {
+      toast.error(result.error?.message || "Failed to update status")
     }
 
     setIsUpdating(false)
