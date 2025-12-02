@@ -141,12 +141,12 @@ describe("PhotoExperience Schema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("should reject photo experience with prompt > 600 chars", () => {
+  it("should reject photo experience with prompt > 1000 chars", () => {
     const experience = {
       ...validPhotoExperience,
       aiPhotoConfig: {
         ...validPhotoExperience.aiPhotoConfig,
-        prompt: "a".repeat(601),
+        prompt: "a".repeat(1001),
       },
     };
     const result = photoExperienceSchema.safeParse(experience);
