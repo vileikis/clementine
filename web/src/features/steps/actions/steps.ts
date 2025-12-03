@@ -108,24 +108,24 @@ export async function createStepAction(
     // Validate input
     const validated = createStepInputSchema.parse(input);
 
-    // Validate event exists and is not archived
-    const event = await getEvent(validated.eventId);
-    if (!event) {
+    // Validate project exists and is not archived
+    const project = await getProject(validated.eventId);
+    if (!project) {
       return {
         success: false,
         error: {
-          code: "EVENT_NOT_FOUND",
-          message: "Event not found",
+          code: "PROJECT_NOT_FOUND",
+          message: "Project not found",
         },
       };
     }
 
-    if (event.status === "archived") {
+    if (project.status === "archived") {
       return {
         success: false,
         error: {
-          code: "EVENT_ARCHIVED",
-          message: "Cannot create step for archived event",
+          code: "PROJECT_ARCHIVED",
+          message: "Cannot create step for archived project",
         },
       };
     }

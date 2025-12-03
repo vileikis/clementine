@@ -3,6 +3,10 @@
 // Project Details Header (top-level component)
 export { ProjectDetailsHeader } from "./ProjectDetailsHeader";
 
+// Project Tab Content Components
+export { ProjectDistributeTab } from "./ProjectDistributeTab";
+export { ProjectEventsTab } from "./ProjectEventsTab";
+
 // Rename Project Dialog
 export { RenameProjectDialog } from "./RenameProjectDialog";
 

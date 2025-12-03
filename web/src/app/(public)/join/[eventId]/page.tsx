@@ -20,44 +20,44 @@ export default async function JoinPage({ params }: JoinPageProps) {
   const { eventId } = await params
   const result = await getProjectAction(eventId)
 
-  if (!result.success || !result.event) {
+  if (!result.success || !result.project) {
     notFound()
   }
 
-  const event = result.event
+  const project = result.project
 
-  // Check if event has an owner company and if that company is deleted
-  if (event.companyId) {
-    const companyStatus = await getCompanyStatus(event.companyId)
+  // Check if project has an owner company and if that company is deleted
+  if (project.companyId) {
+    const companyStatus = await getCompanyStatus(project.companyId)
 
     if (!companyStatus || companyStatus === "deleted") {
       return (
         <EventUnavailableScreen
-          message="This event is no longer available. Please contact the event organizer for more information."
+          message="This experience is no longer available. Please contact the organizer for more information."
         />
       )
     }
   }
 
-  // Check if event is archived
-  if (event.status === "archived") {
+  // Check if project is archived
+  if (project.status === "archived") {
     return (
       <EventUnavailableScreen
-        message="This event has ended and is no longer accepting participants."
+        message="This experience has ended and is no longer accepting participants."
       />
     )
   }
 
   // Route based on activeEventId - new journey flow vs legacy flow
-  if (event.activeEventId) {
+  if (project.activeEventId) {
     // Load journey and steps
     const journeyResult = await getJourneyForGuestAction(
-      event.id,
-      event.activeEventId
+      project.id,
+      project.activeEventId
     )
 
     // Load experiences for experience-picker steps
-    const experiencesResult = await getExperiencesForGuestAction(event.id)
+    const experiencesResult = await getExperiencesForGuestAction(project.id)
 
     // Validate journey exists and has steps
     if (
@@ -68,7 +68,7 @@ export default async function JoinPage({ params }: JoinPageProps) {
     ) {
       return (
         <JourneyGuestContainer
-          event={event}
+          event={project}
           journey={journeyResult.journey}
           steps={journeyResult.steps}
           experiences={experiencesResult.experiences}
@@ -79,17 +79,17 @@ export default async function JoinPage({ params }: JoinPageProps) {
     // Journey not found or has no steps - show error
     return (
       <EventUnavailableScreen
-        message="This journey is not configured. Please contact the event organizer."
+        message="This experience is not configured. Please contact the organizer."
       />
     )
   }
 
   // Fallback to legacy flow when no activeJourneyId
   return (
-    <BrandThemeProvider brandColor={event.theme.primaryColor}>
+    <BrandThemeProvider brandColor={project.theme.primaryColor}>
       <GuestFlowContainer
-        eventId={event.id}
-        eventTitle={event.name}
+        eventId={project.id}
+        eventTitle={project.name}
       />
     </BrandThemeProvider>
   )
