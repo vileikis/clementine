@@ -1,6 +1,7 @@
 export { BaseStepEditor } from "./BaseStepEditor";
 export { InfoStepEditor } from "./InfoStepEditor";
 export { CaptureStepEditor } from "./CaptureStepEditor";
+export { AiTransformEditor } from "./AiTransformEditor";
 export { ShortTextEditor } from "./ShortTextEditor";
 export { LongTextEditor } from "./LongTextEditor";
 export { MultipleChoiceEditor } from "./MultipleChoiceEditor";

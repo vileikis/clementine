@@ -36,7 +36,7 @@ export interface MockSessionData {
   /** Simulated form input values keyed by variable name */
   variables: Record<string, string>;
 
-  /** Current step index in journey (for multi-step preview) */
+  /** Current step index in experience (for multi-step preview) */
   currentStepIndex: number;
 }
 
