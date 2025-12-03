@@ -15,12 +15,12 @@ import { ImageIcon, AlertCircle, Camera } from "lucide-react";
 import { StepLayout, ActionButton } from "@/components/step-primitives";
 import { useEventTheme } from "@/components/providers/EventThemeProvider";
 import type { StepCapture } from "@/features/steps/types";
-import type { Experience } from "@/features/ai-presets/types";
+import type { AiPreset } from "@/features/ai-presets/types";
 import type { MockSessionData } from "@/features/steps/types/preview.types";
 
 interface CaptureStepProps {
   step: StepCapture;
-  experiences: Experience[];
+  aiPresets: AiPreset[];
   mockSession?: MockSessionData;
   /** Callback when CTA button is clicked */
   onCtaClick?: () => void;
@@ -32,7 +32,7 @@ interface CaptureStepProps {
 
 export function CaptureStep({
   step,
-  experiences,
+  aiPresets,
   mockSession,
   onCtaClick,
   isInteractive = false,
@@ -45,14 +45,14 @@ export function CaptureStep({
   // Get fallback experience data
   const fallbackExperience = useMemo(() => {
     if (!config.fallbackExperienceId) return null;
-    return experiences.find((e) => e.id === config.fallbackExperienceId) ?? null;
-  }, [config.fallbackExperienceId, experiences]);
+    return aiPresets.find((aiPreset) => aiPreset.id === config.fallbackExperienceId) ?? null;
+  }, [config.fallbackExperienceId, aiPresets]);
 
   // Check if fallback is missing
   const isFallbackMissing = useMemo(() => {
     if (!config.fallbackExperienceId) return false;
-    return !experiences.some((e) => e.id === config.fallbackExperienceId);
-  }, [config.fallbackExperienceId, experiences]);
+    return !aiPresets.some((aiPreset) => aiPreset.id === config.fallbackExperienceId);
+  }, [config.fallbackExperienceId, aiPresets]);
 
   return (
     <StepLayout

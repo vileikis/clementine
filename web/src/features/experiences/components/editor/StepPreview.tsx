@@ -20,14 +20,13 @@ import {
   YesNoStep,
   OpinionScaleStep,
   EmailStep,
-  ExperiencePickerStep,
   CaptureStep,
   ProcessingStep,
   RewardStep,
 } from "@/features/steps/components/preview";
 import type { Step } from "@/features/steps/types";
-import type { ProjectTheme as EventTheme } from "@/features/projects/types";
-import type { Experience as AiPreset } from "@/features/ai-presets/types";
+import type { ProjectTheme as EventTheme } from "@/features/projects/types"
+import type { AiPreset } from "@/features/ai-presets/types";
 import { DEFAULT_MOCK_SESSION, type MockSessionData } from "@/features/steps/types/preview.types";
 
 interface StepPreviewProps {
@@ -85,10 +84,9 @@ function StepContent({
       return <OpinionScaleStep step={step} />;
     case "email":
       return <EmailStep step={step} />;
-    case "experience-picker":
-      return <ExperiencePickerStep step={step} experiences={aiPresets} />;
+    
     case "capture":
-      return <CaptureStep step={step} experiences={aiPresets} mockSession={mockSession} />;
+      return <CaptureStep step={step} aiPresets={aiPresets} mockSession={mockSession} />;
     case "processing":
       return <ProcessingStep step={step} />;
     case "reward":

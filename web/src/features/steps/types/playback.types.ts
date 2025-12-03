@@ -7,7 +7,7 @@
 
 import type { Step } from "./step.types";
 import type { ProjectTheme as EventTheme } from "@/features/projects/types";
-import type { Experience } from "@/features/ai-presets/types";
+import type { AiPreset } from "@/features/ai-presets/types";
 import type { MockSessionData } from "./preview.types";
 
 // ============================================================================
@@ -179,7 +179,7 @@ export interface PlaybackModeProps {
   theme: EventTheme;
 
   /** Available experiences (for ExperiencePicker and Capture steps) */
-  experiences: Experience[];
+  aiPresets: AiPreset[];
 
   /** Initial viewport mode */
   initialViewport?: "mobile" | "desktop";

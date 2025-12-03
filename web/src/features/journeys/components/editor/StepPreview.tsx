@@ -20,20 +20,19 @@ import {
   YesNoStep,
   OpinionScaleStep,
   EmailStep,
-  ExperiencePickerStep,
   CaptureStep,
   ProcessingStep,
   RewardStep,
 } from "@/features/steps/components/preview";
 import type { Step } from "@/features/steps/types";
 import type { ProjectTheme as EventTheme } from "@/features/projects/types";
-import type { Experience } from "@/features/ai-presets/types";
+import type { AiPreset } from "@/features/ai-presets/types";
 import { DEFAULT_MOCK_SESSION, type MockSessionData } from "@/features/steps/types/preview.types";
 
 interface StepPreviewProps {
   step: Step;
   theme: EventTheme;
-  experiences: Experience[];
+  aiPresets: AiPreset[];
   mockSession?: MockSessionData;
 }
 
@@ -44,13 +43,13 @@ interface StepPreviewProps {
 export const StepPreview = memo(function StepPreview({
   step,
   theme,
-  experiences,
+  aiPresets,
   mockSession = DEFAULT_MOCK_SESSION,
 }: StepPreviewProps) {
   return (
     <EventThemeProvider theme={theme}>
       <DeviceFrame>
-        <StepContent step={step} experiences={experiences} mockSession={mockSession} />
+        <StepContent step={step} aiPresets={aiPresets} mockSession={mockSession} />
       </DeviceFrame>
     </EventThemeProvider>
   );
@@ -63,11 +62,11 @@ export const StepPreview = memo(function StepPreview({
  */
 function StepContent({
   step,
-  experiences,
+  aiPresets,
   mockSession,
 }: {
   step: Step;
-  experiences: Experience[];
+  aiPresets: AiPreset[];
   mockSession: MockSessionData;
 }) {
   switch (step.type) {
@@ -85,10 +84,8 @@ function StepContent({
       return <OpinionScaleStep step={step} />;
     case "email":
       return <EmailStep step={step} />;
-    case "experience-picker":
-      return <ExperiencePickerStep step={step} experiences={experiences} />;
     case "capture":
-      return <CaptureStep step={step} experiences={experiences} mockSession={mockSession} />;
+      return <CaptureStep step={step} aiPresets={aiPresets} mockSession={mockSession} />;
     case "processing":
       return <ProcessingStep step={step} />;
     case "reward":

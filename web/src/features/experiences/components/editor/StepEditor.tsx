@@ -24,7 +24,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import {
   InfoStepEditor,
-  ExperiencePickerEditor,
   CaptureStepEditor,
   ShortTextEditor,
   LongTextEditor,
@@ -40,7 +39,6 @@ import { getStepTypeMeta } from "@/features/steps/constants";
 import type {
   Step,
   StepInfo,
-  StepExperiencePicker,
   StepCapture,
   StepShortText,
   StepLongText,
@@ -50,8 +48,9 @@ import type {
   StepEmail,
   StepProcessing,
   StepReward,
+  StepUpdateInput,
 } from "@/features/steps/types";
-import type { Experience as AiPreset } from "@/features/ai-presets/types";
+import type { AiPreset } from "@/features/ai-presets/types";
 
 interface StepEditorProps {
   experienceId: string;
@@ -73,7 +72,7 @@ export function StepEditor({
   const { updateStep, deleteStep, isUpdating, isDeleting } = useStepMutations();
 
   const handleUpdate = useCallback(
-    async (updates: Record<string, unknown>) => {
+    async (updates: StepUpdateInput) => {
       await updateStep(experienceId, step.id, updates);
     },
     [experienceId, step.id, updateStep]
@@ -87,9 +86,9 @@ export function StepEditor({
   }, [experienceId, step.id, deleteStep, onStepDeleted]);
 
   const handlePreviewChange = useCallback(
-    (values: Record<string, unknown>) => {
+    (values: StepUpdateInput) => {
       if (onPreviewChange) {
-        onPreviewChange({ ...step, ...values });
+        onPreviewChange({ ...step, ...values } as Partial<Step>);
       }
     },
     [step, onPreviewChange]
@@ -160,8 +159,8 @@ function renderEditor(
   step: Step,
   companyId: string,
   aiPresets: AiPreset[],
-  onUpdate: (updates: Record<string, unknown>) => Promise<void>,
-  onPreviewChange: (values: Record<string, unknown>) => void
+  onUpdate: (updates: StepUpdateInput) => Promise<void>,
+  onPreviewChange: (values: StepUpdateInput) => void
 ) {
   switch (step.type) {
     case "info":
@@ -173,18 +172,7 @@ function renderEditor(
           onPreviewChange={onPreviewChange}
         />
       );
-
-    case "experience-picker":
-      return (
-        <ExperiencePickerEditor
-          step={step as StepExperiencePicker}
-          companyId={companyId}
-          experiences={aiPresets}
-          onUpdate={onUpdate}
-          onPreviewChange={onPreviewChange}
-        />
-      );
-
+      
     case "capture":
       return (
         <CaptureStepEditor
