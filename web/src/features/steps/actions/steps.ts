@@ -19,7 +19,6 @@ import {
 import { createStepInputSchema, updateStepInputSchema } from "../schemas";
 import { STEP_CONSTANTS } from "../constants";
 import { getJourney } from "@/features/journeys/repositories";
-import { getProject } from "@/features/projects/repositories/projects.repository";
 import type { Step } from "../types";
 import type { ActionResponse } from "./types";
 
@@ -107,28 +106,6 @@ export async function createStepAction(
   try {
     // Validate input
     const validated = createStepInputSchema.parse(input);
-
-    // Validate project exists and is not archived
-    const project = await getProject(validated.eventId);
-    if (!project) {
-      return {
-        success: false,
-        error: {
-          code: "PROJECT_NOT_FOUND",
-          message: "Project not found",
-        },
-      };
-    }
-
-    if (project.status === "archived") {
-      return {
-        success: false,
-        error: {
-          code: "PROJECT_ARCHIVED",
-          message: "Cannot create step for archived project",
-        },
-      };
-    }
 
     // Validate journey exists
     const journey = await getJourney(validated.eventId, validated.journeyId);
