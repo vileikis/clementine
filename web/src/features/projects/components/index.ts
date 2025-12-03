@@ -3,6 +3,12 @@
 // Project Details Header (top-level component)
 export { ProjectDetailsHeader } from "./ProjectDetailsHeader";
 
+// Rename Project Dialog
+export { RenameProjectDialog } from "./RenameProjectDialog";
+
+// Project Page Layout (shared layout for project sub-pages)
+export { ProjectPageLayout } from "./ProjectPageLayout";
+
 // Create Project Button (quick-create with default name)
 export { CreateProjectButton } from "./CreateProjectButton";
 
