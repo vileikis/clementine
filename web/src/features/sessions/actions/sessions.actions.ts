@@ -6,12 +6,14 @@ import {
   saveCapture,
   getSession,
   updateSessionState,
+  startExperienceSession,
   startJourneySession,
   updateStepIndex,
   saveStepData,
 } from "../repositories";
 import { getProject } from "@/features/projects/repositories/projects.repository";
-import { getJourney } from "@/features/journeys/repositories/journeys.repository";
+import { getJourney, listStepsLegacy } from "@/features/journeys/repositories";
+import { getExperience } from "@/features/experiences/repositories/experiences.repository";
 import { listSteps } from "@/features/steps/repositories/steps.repository";
 import {
   getAiPreset,
@@ -27,7 +29,8 @@ import type { TransformParams } from "@/lib/ai/types";
 import { revalidatePath } from "next/cache";
 import type { Journey } from "@/features/journeys";
 import type { Step } from "@/features/steps";
-import type { Experience } from "@/features/ai-presets";
+import type { Experience as AiPreset } from "@/features/ai-presets";
+import type { Experience } from "@/features/experiences/types";
 
 // ============================================================================
 // Existing actions (preserved)
@@ -245,9 +248,42 @@ export async function triggerTransformAction(
 }
 
 // ============================================================================
-// New actions for journey support
+// Experience session actions
 // ============================================================================
 
+export async function startExperienceSessionAction(
+  eventId: string,
+  experienceId: string
+) {
+  const sessionId = await startExperienceSession(eventId, experienceId);
+  return { sessionId };
+}
+
+/**
+ * Loads experience definition and steps for guest display.
+ */
+export async function getExperienceForGuestAction(
+  experienceId: string
+): Promise<
+  | { success: true; experience: Experience; steps: Step[] }
+  | { success: false; error: string }
+> {
+  const experience = await getExperience(experienceId);
+  if (!experience) {
+    return { success: false, error: "Experience not found" };
+  }
+
+  const steps = await listSteps(experienceId);
+  return { success: true, experience, steps };
+}
+
+// ============================================================================
+// Legacy journey session actions (deprecated)
+// ============================================================================
+
+/**
+ * @deprecated Use startExperienceSessionAction instead
+ */
 export async function startJourneySessionAction(
   eventId: string,
   journeyId: string
@@ -331,6 +367,7 @@ export async function selectExperienceAction(
 }
 
 /**
+ * @deprecated Use getExperienceForGuestAction instead
  * Loads journey definition and steps for guest display.
  */
 export async function getJourneyForGuestAction(
@@ -345,18 +382,44 @@ export async function getJourneyForGuestAction(
     return { success: false, error: "Journey not found" };
   }
 
-  const steps = await listSteps(eventId, journeyId);
+  const steps = await listStepsLegacy(eventId, journeyId);
   return { success: true, journey, steps };
 }
 
 /**
+ * Loads AI presets (experiences) available for selection.
+ * Only returns enabled presets linked to the event.
+ */
+export async function getAiPresetsForGuestAction(
+  eventId: string
+): Promise<
+  | { success: true; aiPresets: AiPreset[] }
+  | { success: false; error: string }
+> {
+  // Verify project exists
+  const project = await getProject(eventId);
+  if (!project) {
+    return { success: false, error: "Project not found" };
+  }
+
+  // Get all AI presets for this event
+  const allPresets = await getAiPresetsByEventId(eventId);
+
+  // Filter to only enabled presets
+  const enabledPresets = allPresets.filter((preset) => preset.enabled);
+
+  return { success: true, aiPresets: enabledPresets };
+}
+
+/**
+ * @deprecated Use getAiPresetsForGuestAction instead
  * Loads experiences available for selection (for experience-picker steps).
  * Only returns enabled experiences linked to the event.
  */
 export async function getExperiencesForGuestAction(
   eventId: string
 ): Promise<
-  | { success: true; experiences: Experience[] }
+  | { success: true; experiences: AiPreset[] }
   | { success: false; error: string }
 > {
   // Verify project exists

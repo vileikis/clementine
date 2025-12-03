@@ -3,7 +3,7 @@
 /**
  * Component: PreviewNavigationBar
  *
- * Fixed bottom navigation bar for journey playback mode.
+ * Fixed bottom navigation bar for experience playback mode.
  * Provides Back, Next, Restart, and Exit controls with step counter.
  *
  * Mobile-first design with 44x44px minimum touch targets per Constitution.
@@ -55,7 +55,7 @@ export function PreviewNavigationBar({
         {isCompleted ? (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Check className="h-4 w-4 text-green-500" />
-            <span>Journey Complete</span>
+            <span>Experience Complete</span>
           </div>
         ) : (
           <Button
@@ -63,7 +63,7 @@ export function PreviewNavigationBar({
             onClick={onNext}
             className="h-11 px-6 gap-1"
             aria-label={
-              currentIndex >= totalSteps - 1 ? "Complete journey" : "Next step"
+              currentIndex >= totalSteps - 1 ? "Complete experience" : "Next step"
             }
           >
             <span>{currentIndex >= totalSteps - 1 ? "Complete" : "Next"}</span>
@@ -79,7 +79,7 @@ export function PreviewNavigationBar({
           size="icon"
           onClick={onRestart}
           className="h-11 w-11 shrink-0"
-          aria-label="Restart journey"
+          aria-label="Restart experience"
           title="Restart"
         >
           <RotateCcw className="h-5 w-5" />

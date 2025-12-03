@@ -82,6 +82,18 @@ export const STEP_DEFAULTS: Record<
       fallbackExperienceId: null,
     },
   },
+  "ai-transform": {
+    title: "AI Transform",
+    ctaLabel: "Generate",
+    config: {
+      model: null,
+      prompt: null,
+      variables: [],
+      outputType: "image",
+      aspectRatio: "1:1",
+      referenceImageUrls: [],
+    },
+  },
   short_text: {
     title: "Share Your Answer",
     ctaLabel: "Continue",
@@ -204,6 +216,12 @@ export const STEP_TYPE_META: StepTypeMeta[] = [
     description: "Take a photo or video",
     category: "capture",
     deprecated: true, // Hidden from creation UI - replaced by AI Presets workflow
+  },
+  {
+    type: "ai-transform",
+    label: "AI Transform",
+    description: "Transform photos with AI models",
+    category: "capture",
   },
   // Input
   {

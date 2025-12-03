@@ -1,5 +1,5 @@
 // Steps repository - CRUD operations for steps subcollection
-// Collection path: /events/{eventId}/steps/{stepId}
+// Collection path: /experiences/{experienceId}/steps/{stepId}
 
 import { db } from "@/lib/firebase/admin";
 import type { Step, StepType } from "../types";
@@ -7,17 +7,17 @@ import { stepSchema } from "../schemas";
 import { STEP_DEFAULTS } from "../constants";
 
 /**
- * Helper to get the steps subcollection reference for an event
+ * Helper to get the steps subcollection reference for an experience
  */
-function getStepsCollection(eventId: string) {
-  return db.collection("events").doc(eventId).collection("steps");
+function getStepsCollection(experienceId: string) {
+  return db.collection("experiences").doc(experienceId).collection("steps");
 }
 
 /**
- * Helper to get the journeys subcollection reference for an event
+ * Helper to get the experiences collection reference
  */
-function getJourneysCollection(eventId: string) {
-  return db.collection("events").doc(eventId).collection("journeys");
+function getExperiencesCollection() {
+  return db.collection("experiences");
 }
 
 // ============================================================================
@@ -25,11 +25,11 @@ function getJourneysCollection(eventId: string) {
 // ============================================================================
 
 /**
- * Creates a new step and adds it to the journey's stepOrder
+ * Creates a new step and adds it to the experience's stepsOrder
+ * Uses batch writes for atomicity
  */
 export async function createStep(data: {
-  eventId: string;
-  journeyId: string;
+  experienceId: string;
   type: StepType;
   title?: string | null;
   description?: string | null;
@@ -37,14 +37,13 @@ export async function createStep(data: {
   ctaLabel?: string | null;
   config?: Record<string, unknown>;
 }): Promise<string> {
-  const stepRef = getStepsCollection(data.eventId).doc();
+  const stepRef = getStepsCollection(data.experienceId).doc();
   const defaults = STEP_DEFAULTS[data.type];
 
   const now = Date.now();
   const step: Record<string, unknown> = {
     id: stepRef.id,
-    eventId: data.eventId,
-    journeyId: data.journeyId,
+    experienceId: data.experienceId,
     type: data.type,
     title: data.title ?? defaults.title,
     description: data.description ?? null,
@@ -59,20 +58,21 @@ export async function createStep(data: {
     step.config = data.config ?? defaults.config;
   }
 
-  // Create step document
-  await stepRef.set(step);
+  // Get current stepsOrder from experience
+  const experienceRef = getExperiencesCollection().doc(data.experienceId);
+  const experienceDoc = await experienceRef.get();
+  const currentOrder = (experienceDoc.data()?.stepsOrder as string[]) || [];
+  const newOrder = [...currentOrder, stepRef.id];
 
-  // Add step ID to journey's stepOrder array
-  const journeyRef = getJourneysCollection(data.eventId).doc(data.journeyId);
-  const journeyDoc = await journeyRef.get();
+  // Use batch write for atomicity
+  const batch = db.batch();
+  batch.set(stepRef, step);
+  batch.update(experienceRef, {
+    stepsOrder: newOrder,
+    updatedAt: now,
+  });
 
-  if (journeyDoc.exists) {
-    const currentOrder = (journeyDoc.data()?.stepOrder as string[]) || [];
-    await journeyRef.update({
-      stepOrder: [...currentOrder, stepRef.id],
-      updatedAt: now,
-    });
-  }
+  await batch.commit();
 
   return stepRef.id;
 }
@@ -82,27 +82,22 @@ export async function createStep(data: {
 // ============================================================================
 
 /**
- * Lists all steps for a journey, ordered by journey's stepOrder array
+ * Lists all steps for an experience, ordered by experience's stepsOrder array
  */
-export async function listSteps(
-  eventId: string,
-  journeyId: string
-): Promise<Step[]> {
-  // Get journey to get stepOrder
-  const journeyDoc = await getJourneysCollection(eventId).doc(journeyId).get();
-  if (!journeyDoc.exists) {
+export async function listSteps(experienceId: string): Promise<Step[]> {
+  // Get experience to get stepsOrder
+  const experienceDoc = await getExperiencesCollection().doc(experienceId).get();
+  if (!experienceDoc.exists) {
     return [];
   }
 
-  const stepOrder = (journeyDoc.data()?.stepOrder as string[]) || [];
-  if (stepOrder.length === 0) {
+  const stepsOrder = (experienceDoc.data()?.stepsOrder as string[]) || [];
+  if (stepsOrder.length === 0) {
     return [];
   }
 
-  // Get all steps for this journey
-  const stepsSnapshot = await getStepsCollection(eventId)
-    .where("journeyId", "==", journeyId)
-    .get();
+  // Get all steps for this experience
+  const stepsSnapshot = await getStepsCollection(experienceId).get();
 
   const stepsMap = new Map<string, Step>();
   stepsSnapshot.docs.forEach((doc) => {
@@ -112,8 +107,8 @@ export async function listSteps(
     }
   });
 
-  // Return steps in stepOrder order
-  return stepOrder
+  // Return steps in stepsOrder order
+  return stepsOrder
     .map((id) => stepsMap.get(id))
     .filter((step): step is Step => step !== undefined);
 }
@@ -122,10 +117,10 @@ export async function listSteps(
  * Gets a single step by ID
  */
 export async function getStep(
-  eventId: string,
+  experienceId: string,
   stepId: string
 ): Promise<Step | null> {
-  const doc = await getStepsCollection(eventId).doc(stepId).get();
+  const doc = await getStepsCollection(experienceId).doc(stepId).get();
   if (!doc.exists) {
     return null;
   }
@@ -146,12 +141,13 @@ export async function getStep(
  * Updates an existing step
  */
 export async function updateStep(
-  eventId: string,
+  experienceId: string,
   stepId: string,
   data: {
     title?: string | null;
     description?: string | null;
     mediaUrl?: string | null;
+    mediaType?: string | null;
     ctaLabel?: string | null;
     config?: Record<string, unknown>;
   }
@@ -164,10 +160,11 @@ export async function updateStep(
   if (data.title !== undefined) updateData.title = data.title;
   if (data.description !== undefined) updateData.description = data.description;
   if (data.mediaUrl !== undefined) updateData.mediaUrl = data.mediaUrl;
+  if (data.mediaType !== undefined) updateData.mediaType = data.mediaType;
   if (data.ctaLabel !== undefined) updateData.ctaLabel = data.ctaLabel;
   if (data.config !== undefined) updateData.config = data.config;
 
-  await getStepsCollection(eventId).doc(stepId).update(updateData);
+  await getStepsCollection(experienceId).doc(stepId).update(updateData);
 }
 
 // ============================================================================
@@ -175,30 +172,38 @@ export async function updateStep(
 // ============================================================================
 
 /**
- * Deletes a step and removes it from the journey's stepOrder
+ * Deletes a step and removes it from the experience's stepsOrder
+ * Uses batch writes for atomicity
  */
 export async function deleteStep(
-  eventId: string,
-  stepId: string,
-  journeyId: string
+  experienceId: string,
+  stepId: string
 ): Promise<void> {
   const now = Date.now();
 
-  // Delete the step document
-  await getStepsCollection(eventId).doc(stepId).delete();
+  // Get current stepsOrder from experience
+  const experienceRef = getExperiencesCollection().doc(experienceId);
+  const experienceDoc = await experienceRef.get();
 
-  // Remove from journey's stepOrder
-  const journeyRef = getJourneysCollection(eventId).doc(journeyId);
-  const journeyDoc = await journeyRef.get();
-
-  if (journeyDoc.exists) {
-    const currentOrder = (journeyDoc.data()?.stepOrder as string[]) || [];
-    const newOrder = currentOrder.filter((id) => id !== stepId);
-    await journeyRef.update({
-      stepOrder: newOrder,
-      updatedAt: now,
-    });
+  // Defensive check: ensure experience exists before attempting batch update
+  if (!experienceDoc.exists) {
+    throw new Error("Experience not found");
   }
+
+  const currentOrder = (experienceDoc.data()?.stepsOrder as string[]) || [];
+  const newOrder = currentOrder.filter((id) => id !== stepId);
+
+  // Use batch write for atomicity
+  const batch = db.batch();
+  const stepRef = getStepsCollection(experienceId).doc(stepId);
+
+  batch.delete(stepRef);
+  batch.update(experienceRef, {
+    stepsOrder: newOrder,
+    updatedAt: now,
+  });
+
+  await batch.commit();
 }
 
 // ============================================================================
@@ -206,15 +211,14 @@ export async function deleteStep(
 // ============================================================================
 
 /**
- * Updates the stepOrder array in the journey document
+ * Updates the stepsOrder array in the experience document
  */
 export async function reorderSteps(
-  eventId: string,
-  journeyId: string,
+  experienceId: string,
   newOrder: string[]
 ): Promise<void> {
-  await getJourneysCollection(eventId).doc(journeyId).update({
-    stepOrder: newOrder,
+  await getExperiencesCollection().doc(experienceId).update({
+    stepsOrder: newOrder,
     updatedAt: Date.now(),
   });
 }
@@ -224,14 +228,15 @@ export async function reorderSteps(
 // ============================================================================
 
 /**
- * Duplicates a step and adds it after the original in stepOrder
+ * Duplicates a step and adds it after the original in stepsOrder
+ * Uses batch writes for atomicity
  */
 export async function duplicateStep(
-  eventId: string,
+  experienceId: string,
   stepId: string
 ): Promise<string> {
   // Get the original step
-  const originalDoc = await getStepsCollection(eventId).doc(stepId).get();
+  const originalDoc = await getStepsCollection(experienceId).doc(stepId).get();
   if (!originalDoc.exists) {
     throw new Error("Step not found");
   }
@@ -241,10 +246,8 @@ export async function duplicateStep(
     throw new Error("Step data not found");
   }
 
-  const journeyId = originalData.journeyId as string;
-
   // Create new step with copied data
-  const newStepRef = getStepsCollection(eventId).doc();
+  const newStepRef = getStepsCollection(experienceId).doc();
   const now = Date.now();
 
   const newStep = {
@@ -255,23 +258,24 @@ export async function duplicateStep(
     updatedAt: now,
   };
 
-  await newStepRef.set(newStep);
+  // Get current stepsOrder and insert after original
+  const experienceRef = getExperiencesCollection().doc(experienceId);
+  const experienceDoc = await experienceRef.get();
+  const currentOrder = (experienceDoc.data()?.stepsOrder as string[]) || [];
+  const originalIndex = currentOrder.indexOf(stepId);
+  const newOrder = [...currentOrder];
+  newOrder.splice(originalIndex + 1, 0, newStepRef.id);
 
-  // Insert after original in stepOrder
-  const journeyRef = getJourneysCollection(eventId).doc(journeyId);
-  const journeyDoc = await journeyRef.get();
+  // Use batch write for atomicity
+  const batch = db.batch();
+  batch.set(newStepRef, newStep);
+  batch.update(experienceRef, {
+    stepsOrder: newOrder,
+    updatedAt: now,
+  });
 
-  if (journeyDoc.exists) {
-    const currentOrder = (journeyDoc.data()?.stepOrder as string[]) || [];
-    const originalIndex = currentOrder.indexOf(stepId);
-    const newOrder = [...currentOrder];
-    newOrder.splice(originalIndex + 1, 0, newStepRef.id);
-
-    await journeyRef.update({
-      stepOrder: newOrder,
-      updatedAt: now,
-    });
-  }
+  await batch.commit();
 
   return newStepRef.id;
 }
+
