@@ -6,10 +6,10 @@
  * A runtime wrapper that provides mock session context for step previews.
  * Wraps DeviceFrame with theme and mock data injection.
  *
- * Used in the Journey Editor to render step previews with viewport mode support.
+ * Used in the Experience Editor to render step previews with viewport mode support.
  * Supports two modes:
  * - "single-step": Read-only preview (default, for editor panel)
- * - "playback": Interactive mode with value persistence (for journey playback)
+ * - "playback": Interactive mode with value persistence (for experience playback)
  */
 
 import { EventThemeProvider } from "@/components/providers/EventThemeProvider";
@@ -257,6 +257,9 @@ function StepContent({
 
     case "reward":
       return <RewardStep step={step} mockSession={mockSession} onCtaClick={onCtaClick} />;
+
+    case "ai-transform":
+      return <PlaceholderStep title="AI Transform" type={step.type} />;
 
     default: {
       // TypeScript exhaustive check

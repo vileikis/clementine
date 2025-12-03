@@ -1,7 +1,7 @@
 /**
- * Playback types for Journey Playback Mode (009-journey-playback)
+ * Playback types for Experience Playback Mode
  *
- * These types define the ephemeral client-side state for journey playback.
+ * These types define the ephemeral client-side state for experience playback.
  * No Firestore documents are created - all state exists in memory only.
  */
 
@@ -29,7 +29,7 @@ export interface PlaybackState {
   /** Index of currently displayed step (0-based) */
   currentIndex: number;
 
-  /** Ordered array of steps in the journey */
+  /** Ordered array of steps in the experience */
   steps: Step[];
 
   /** Whether back navigation is available */
@@ -113,7 +113,7 @@ export const DEFAULT_PLAYBACK_SESSION: PlaybackMockSession = {
  * Actions available for playback control
  */
 export interface PlaybackActions {
-  /** Initialize playback with journey steps */
+  /** Initialize playback with experience steps */
   start: (steps: Step[]) => void;
 
   /** Navigate to next step (or complete if at end) */

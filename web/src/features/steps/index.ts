@@ -1,4 +1,4 @@
-// Steps feature module - CRUD operations for journey steps
+// Steps feature module - CRUD operations for experience steps
 //
 // Public API (safe for client components):
 // - Types, constants only

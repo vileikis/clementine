@@ -25,6 +25,7 @@ import {
   Mail,
   Loader2,
   Gift,
+  Wand2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { StepType } from "@/features/steps/types";
@@ -62,7 +63,17 @@ const STEP_TYPE_CATEGORIES: StepTypeCategory[] = [
       // Deprecated: "capture" - removed from creation UI
     ],
   },
-  // Note: "Capture" category is now empty since capture step is deprecated
+  {
+    name: "Capture",
+    types: [
+      {
+        type: "ai-transform",
+        label: "AI Transform",
+        description: "Transform photos with AI models",
+        icon: Wand2,
+      },
+    ],
+  },
   {
     name: "Input",
     types: [
