@@ -159,7 +159,7 @@ export function JourneyEditor({ event, journey }: JourneyEditorProps) {
         <PlaybackMode
           steps={steps}
           theme={event.theme}
-          experiences={experiences}
+          aiPresets={experiences}
           initialViewport={viewportMode}
           onExit={handlePlaybackExit}
         />
@@ -202,7 +202,7 @@ export function JourneyEditor({ event, journey }: JourneyEditorProps) {
                     step={displayStep as Step}
                     theme={event.theme}
                     viewportMode={viewportMode}
-                    experiences={experiences}
+                    aiPresets={experiences}
                   />
                 ) : (
                   <div className="text-center text-muted-foreground">

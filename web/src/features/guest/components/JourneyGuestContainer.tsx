@@ -41,8 +41,7 @@ function getStepVariableName(step: Step): string {
     step.type === "email" ||
     step.type === "multiple_choice" ||
     step.type === "yes_no" ||
-    step.type === "opinion_scale" ||
-    step.type === "experience-picker"
+    step.type === "opinion_scale"
   ) {
     return step.config.variable;
   }

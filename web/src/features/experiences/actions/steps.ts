@@ -191,15 +191,18 @@ export async function createStepAction(
       step.config = validated.config ?? defaults.config;
     }
 
-    await stepRef.set(step);
-
-    // Add step ID to experience's stepsOrder array
+    // Use batch write for atomic operation
+    const batch = db.batch();
     const experienceRef = getExperiencesCollection().doc(validated.experienceId);
     const newOrder = [...experience.stepsOrder, stepRef.id];
-    await experienceRef.update({
+
+    batch.set(stepRef, step);
+    batch.update(experienceRef, {
       stepsOrder: newOrder,
       updatedAt: now,
     });
+
+    await batch.commit();
 
     // Revalidate cache
     const company = await getCompany(experience.companyId);
@@ -375,15 +378,19 @@ export async function deleteStepAction(
 
     const now = Date.now();
 
-    // Delete the step document
-    await getStepsCollection(experienceId).doc(stepId).delete();
-
-    // Remove from experience's stepsOrder
+    // Use batch write for atomic operation
+    const batch = db.batch();
+    const stepRef = getStepsCollection(experienceId).doc(stepId);
+    const experienceRef = getExperiencesCollection().doc(experienceId);
     const newOrder = experience.stepsOrder.filter((id) => id !== stepId);
-    await getExperiencesCollection().doc(experienceId).update({
+
+    batch.delete(stepRef);
+    batch.update(experienceRef, {
       stepsOrder: newOrder,
       updatedAt: now,
     });
+
+    await batch.commit();
 
     // Revalidate cache
     const company = await getCompany(experience.companyId);
@@ -572,17 +579,22 @@ export async function duplicateStepAction(
       updatedAt: now,
     };
 
-    await newStepRef.set(newStep);
-
     // Insert after original in stepsOrder
     const originalIndex = experience.stepsOrder.indexOf(stepId);
     const newOrder = [...experience.stepsOrder];
     newOrder.splice(originalIndex + 1, 0, newStepRef.id);
 
-    await getExperiencesCollection().doc(experienceId).update({
+    // Use batch write for atomic operation
+    const batch = db.batch();
+    const experienceRef = getExperiencesCollection().doc(experienceId);
+
+    batch.set(newStepRef, newStep);
+    batch.update(experienceRef, {
       stepsOrder: newOrder,
       updatedAt: now,
     });
+
+    await batch.commit();
 
     // Revalidate cache
     const company = await getCompany(experience.companyId);

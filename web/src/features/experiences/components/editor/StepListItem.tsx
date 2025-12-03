@@ -96,7 +96,7 @@ export function StepListItem({
       {...listeners}
       onClick={onSelect}
       className={cn(
-        "w-full p-3 rounded-lg border transition-colors cursor-grab active:cursor-grabbing",
+        "group w-full p-3 rounded-lg border transition-colors cursor-grab active:cursor-grabbing",
         "min-h-[44px] touch-manipulation",
         isSelected
           ? "border-primary bg-primary/5 shadow-sm"

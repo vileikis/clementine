@@ -2,6 +2,9 @@
 
 /**
  * Server Actions for experience operations.
+ *
+ * Note: These actions rely on workspace route resolution for company validation
+ * and real-time hooks (useExperiences, useExperience) for UI updates.
  */
 
 import {
@@ -11,13 +14,11 @@ import {
   updateExperience,
   deleteExperience,
 } from "../repositories/experiences.repository";
-import { getCompany } from "@/features/companies/repositories";
 import {
   createExperienceInputSchema,
   updateExperienceInputSchema,
 } from "../schemas";
 import { verifyAdminSecret } from "@/lib/auth";
-import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import type { ActionResponse } from "./types";
 import type { Experience } from "../types";
@@ -35,18 +36,6 @@ export async function listExperiencesAction(
   companyId: string
 ): Promise<ActionResponse<Experience[]>> {
   try {
-    // Validate company exists
-    const company = await getCompany(companyId);
-    if (!company) {
-      return {
-        success: false,
-        error: {
-          code: "COMPANY_NOT_FOUND",
-          message: "Company not found",
-        },
-      };
-    }
-
     const experiences = await listExperiences(companyId);
     return { success: true, data: experiences };
   } catch (error) {
@@ -102,12 +91,10 @@ export async function getExperienceAction(
 
 /**
  * Creates a new experience for a company.
- * Validates company exists.
  */
 export async function createExperienceAction(
   input: z.infer<typeof createExperienceInputSchema>
 ): Promise<ActionResponse<{ experienceId: string }>> {
-  // Verify admin authentication
   const auth = await verifyAdminSecret();
   if (!auth.authorized) {
     return {
@@ -120,29 +107,12 @@ export async function createExperienceAction(
   }
 
   try {
-    // Validate input
     const validated = createExperienceInputSchema.parse(input);
 
-    // Validate company exists
-    const company = await getCompany(validated.companyId);
-    if (!company) {
-      return {
-        success: false,
-        error: {
-          code: "COMPANY_NOT_FOUND",
-          message: "Company not found",
-        },
-      };
-    }
-
-    // Create experience
     const experienceId = await createExperience({
       companyId: validated.companyId,
       name: validated.name,
     });
-
-    // Revalidate cache
-    revalidatePath(`/${company.slug}/exps`);
 
     return { success: true, data: { experienceId } };
   } catch (error) {
@@ -179,7 +149,6 @@ export async function updateExperienceAction(
   experienceId: string,
   input: z.infer<typeof updateExperienceInputSchema>
 ): Promise<ActionResponse<void>> {
-  // Verify admin authentication
   const auth = await verifyAdminSecret();
   if (!auth.authorized) {
     return {
@@ -192,10 +161,8 @@ export async function updateExperienceAction(
   }
 
   try {
-    // Validate input
     const validated = updateExperienceInputSchema.parse(input);
 
-    // Get experience to verify it exists
     const experience = await getExperience(experienceId);
     if (!experience) {
       return {
@@ -207,17 +174,10 @@ export async function updateExperienceAction(
       };
     }
 
-    // Update experience
     await updateExperience(experienceId, {
       name: validated.name,
       description: validated.description,
     });
-
-    // Get company for path revalidation
-    const company = await getCompany(experience.companyId);
-    if (company) {
-      revalidatePath(`/${company.slug}/exps/${experienceId}`);
-    }
 
     return { success: true, data: undefined };
   } catch (error) {
@@ -253,7 +213,6 @@ export async function updateExperienceAction(
 export async function deleteExperienceAction(
   experienceId: string
 ): Promise<ActionResponse<void>> {
-  // Verify admin authentication
   const auth = await verifyAdminSecret();
   if (!auth.authorized) {
     return {
@@ -266,7 +225,6 @@ export async function deleteExperienceAction(
   }
 
   try {
-    // Get experience to verify it exists
     const experience = await getExperience(experienceId);
     if (!experience) {
       return {
@@ -278,14 +236,7 @@ export async function deleteExperienceAction(
       };
     }
 
-    // Soft delete the experience
     await deleteExperience(experienceId);
-
-    // Get company for path revalidation
-    const company = await getCompany(experience.companyId);
-    if (company) {
-      revalidatePath(`/${company.slug}/exps`);
-    }
 
     return { success: true, data: undefined };
   } catch (error) {

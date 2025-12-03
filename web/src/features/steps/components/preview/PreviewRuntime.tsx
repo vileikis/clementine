@@ -17,7 +17,7 @@ import { DeviceFrame } from "./DeviceFrame";
 import { ViewportModeProvider } from "./ViewportModeContext";
 import type { Step } from "@/features/steps/types";
 import type { ProjectTheme as EventTheme } from "@/features/projects/types";
-import type { Experience } from "@/features/ai-presets/types";
+import type { AiPreset } from "@/features/ai-presets/types";
 import {
   ViewportMode,
   MockSessionData,
@@ -33,7 +33,6 @@ import {
   YesNoStep,
   OpinionScaleStep,
   EmailStep,
-  ExperiencePickerStep,
   CaptureStep,
   ProcessingStep,
   RewardStep,
@@ -46,7 +45,7 @@ interface PreviewRuntimeProps {
   step: Step;
   theme: EventTheme;
   viewportMode: ViewportMode;
-  experiences?: Experience[];
+  aiPresets?: AiPreset[];
   mockSession?: Partial<MockSessionData>;
   /** Preview mode: "single-step" (read-only) or "playback" (interactive) */
   mode?: PreviewMode;
@@ -64,7 +63,7 @@ export function PreviewRuntime({
   step,
   theme,
   viewportMode,
-  experiences = [],
+  aiPresets = [],
   mockSession,
   mode = "single-step",
   playbackSession,
@@ -87,7 +86,7 @@ export function PreviewRuntime({
           <DeviceFrame viewportMode={viewportMode}>
             <StepContent
               step={step}
-              experiences={experiences}
+              aiPresets={aiPresets}
               mockSession={session}
               isInteractive={isInteractive}
               playbackSession={playbackSession}
@@ -110,7 +109,7 @@ export function PreviewRuntime({
  */
 function StepContent({
   step,
-  experiences,
+  aiPresets,
   mockSession,
   isInteractive,
   playbackSession,
@@ -119,7 +118,7 @@ function StepContent({
   onStepComplete,
 }: {
   step: Step;
-  experiences: Experience[];
+  aiPresets: AiPreset[];
   mockSession: MockSessionData;
   isInteractive: boolean;
   playbackSession?: PlaybackMockSession;
@@ -235,27 +234,11 @@ function StepContent({
         />
       );
 
-    case "experience-picker":
-      return (
-        <ExperiencePickerStep
-          step={step}
-          experiences={experiences}
-          isInteractive={isInteractive}
-          selectedExperienceId={
-            playbackSession?.selectedExperienceId ?? getSelectionValue(step.id)
-          }
-          onValueChange={(experienceId) =>
-            onInputChange?.(step.id, { type: "selection", selectedId: experienceId })
-          }
-          onCtaClick={onCtaClick}
-        />
-      );
-
     case "capture":
       return (
         <CaptureStep
           step={step}
-          experiences={experiences}
+          aiPresets={aiPresets}
           mockSession={mockSession}
           onCtaClick={onCtaClick}
           isInteractive={isInteractive}

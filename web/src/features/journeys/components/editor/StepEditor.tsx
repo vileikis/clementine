@@ -24,7 +24,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import {
   InfoStepEditor,
-  ExperiencePickerEditor,
   CaptureStepEditor,
   ShortTextEditor,
   LongTextEditor,
@@ -40,7 +39,6 @@ import { getStepTypeMeta } from "@/features/steps/constants";
 import type {
   Step,
   StepInfo,
-  StepExperiencePicker,
   StepCapture,
   StepShortText,
   StepLongText,
@@ -171,17 +169,6 @@ function renderEditor(
         <InfoStepEditor
           step={step as StepInfo}
           companyId={companyId}
-          onUpdate={onUpdate}
-          onPreviewChange={onPreviewChange}
-        />
-      );
-
-    case "experience-picker":
-      return (
-        <ExperiencePickerEditor
-          step={step as StepExperiencePicker}
-          companyId={companyId}
-          experiences={experiences}
           onUpdate={onUpdate}
           onPreviewChange={onPreviewChange}
         />
