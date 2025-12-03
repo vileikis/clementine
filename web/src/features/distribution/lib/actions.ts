@@ -1,16 +1,21 @@
 "use server"
 
 import { storage } from "@/lib/firebase/admin"
-import { generateJoinQr } from "./qr"
+import { generateQrToPath } from "./qr"
 import { verifyAdminSecret } from "@/lib/auth"
 import { v4 as uuidv4 } from "uuid"
 
 /**
- * Generates QR code for event join URL if it doesn't exist
+ * Generates QR code for project share URL if it doesn't exist.
+ * Returns the download URL for the QR code image.
+ *
+ * @param projectId - The project ID (used for logging/context)
+ * @param shareUrl - The URL to encode in the QR code
+ * @param qrPngPath - The storage path for the QR code (e.g., projects/{id}/qr/share.png)
  */
 export async function generateQrCodeAction(
-  eventId: string,
-  joinUrl: string,
+  projectId: string,
+  shareUrl: string,
   qrPngPath: string
 ) {
   // Verify admin authentication
@@ -26,8 +31,8 @@ export async function generateQrCodeAction(
     const [exists] = await file.exists()
 
     if (!exists) {
-      // QR code doesn't exist, generate it
-      await generateJoinQr(eventId, joinUrl)
+      // QR code doesn't exist, generate it at the correct path
+      await generateQrToPath(shareUrl, qrPngPath)
     }
 
     // Get or set download token
@@ -56,11 +61,16 @@ export async function generateQrCodeAction(
 }
 
 /**
- * Forces regeneration of QR code for event join URL
+ * Forces regeneration of QR code for project share URL.
+ * Deletes existing QR code and creates a new one.
+ *
+ * @param projectId - The project ID (used for logging/context)
+ * @param shareUrl - The URL to encode in the QR code
+ * @param qrPngPath - The storage path for the QR code (e.g., projects/{id}/qr/share.png)
  */
 export async function regenerateQrCodeAction(
-  eventId: string,
-  joinUrl: string,
+  projectId: string,
+  shareUrl: string,
   qrPngPath: string
 ) {
   // Verify admin authentication
@@ -78,8 +88,8 @@ export async function regenerateQrCodeAction(
       await file.delete()
     }
 
-    // Generate new QR code
-    await generateJoinQr(eventId, joinUrl)
+    // Generate new QR code at the correct path
+    await generateQrToPath(shareUrl, qrPngPath)
 
     // Create new download token
     const token = uuidv4()
