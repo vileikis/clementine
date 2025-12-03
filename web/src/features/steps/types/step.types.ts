@@ -239,3 +239,13 @@ export type VariableStepType =
   | "experience-picker"
   | "capture";
 
+/**
+ * Input type for step update mutations.
+ * Allows updating base fields and type-specific config.
+ */
+export type StepUpdateInput = Partial<
+  Pick<StepBase, "title" | "description" | "mediaUrl" | "mediaType" | "ctaLabel">
+> & {
+  config?: Record<string, unknown>;
+};
+
