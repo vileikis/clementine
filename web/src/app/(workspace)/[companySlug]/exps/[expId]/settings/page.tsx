@@ -35,6 +35,7 @@ export default async function SettingsPage({ params }: SettingsPageProps) {
 
   return (
     <ExperienceSettingsClient
+      companySlug={companySlug}
       companyId={company.id}
       initialExperience={experience}
     />
