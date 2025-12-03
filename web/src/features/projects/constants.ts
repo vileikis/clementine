@@ -23,6 +23,9 @@ export const SHARE_PATH_PREFIX = "/p/";
 // QR code storage path template
 export const QR_STORAGE_PATH = "media/{companyId}/qr/{projectId}.png";
 
+// Default project name (used when creating via quick-create button)
+export const DEFAULT_PROJECT_NAME = "Untitled";
+
 // Theme defaults (for UI default values and initialization)
 export const THEME_DEFAULTS = {
   logoUrl: null,

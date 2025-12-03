@@ -34,7 +34,7 @@ export function SidebarNavItem({
     <div
       className={cn(
         'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors min-h-[44px]',
-        isCollapsed && 'flex-col gap-1 px-2 py-2 text-center',
+        isCollapsed && 'flex-col gap-1 px-0 py-2 text-center',
         isActive
           ? 'bg-accent text-accent-foreground'
           : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
@@ -45,7 +45,7 @@ export function SidebarNavItem({
       <span
         className={cn(
           'transition-all',
-          isCollapsed && 'text-[10px] truncate max-w-[56px]'
+          isCollapsed && 'text-[10px] w-full wrap-break-word'
         )}
       >
         {item.label}

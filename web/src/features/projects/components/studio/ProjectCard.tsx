@@ -37,7 +37,7 @@ export function ProjectCard({ project, companyName }: ProjectCardProps) {
   return (
     <div className="relative block border rounded-lg p-6 hover:border-primary transition-colors">
       <Link
-        href={`/${companySlug}/${project.id}`}
+        href={`/${companySlug}/projects/${project.id}`}
         className="absolute inset-0 rounded-lg"
       >
         <span className="sr-only">View {project.name}</span>
