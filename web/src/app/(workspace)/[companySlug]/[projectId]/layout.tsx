@@ -16,17 +16,27 @@ interface ProjectLayoutProps {
 /**
  * Layout for project details pages with header and tab navigation.
  * Wraps Events, Distribute, and Results pages.
+ *
+ * When viewing an event (path has eventId segment), this layout
+ * renders children only - the event layout handles its own header.
  */
 export default function ProjectLayout({ children }: ProjectLayoutProps) {
   const params = useParams();
   const pathname = usePathname();
   const projectId = params.projectId as string;
   const companySlug = params.companySlug as string;
+  const eventId = params.eventId as string | undefined;
 
   const { project, loading, error } = useProject(projectId);
 
   // Rename dialog state
   const [isRenameOpen, setIsRenameOpen] = useState(false);
+
+  // If we're viewing an event, skip the project header/tabs
+  // The event layout will handle its own header
+  if (eventId) {
+    return <>{children}</>;
+  }
 
   if (loading) {
     return (
