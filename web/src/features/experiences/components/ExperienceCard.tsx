@@ -48,15 +48,15 @@ export function ExperienceCard({ experience, companySlug }: ExperienceCardProps)
           href={`/${companySlug}/exps/${experience.id}/design`}
           className="block"
         >
-          <Card className="h-full transition-colors hover:border-primary/50 hover:bg-muted/50 overflow-hidden">
+          <Card className="h-full transition-colors hover:border-primary/50 hover:bg-muted/50 overflow-hidden pt-0">
             {/* Preview thumbnail */}
-            <div className="relative aspect-video w-full bg-muted">
+            <div className="relative aspect-video w-full bg-muted rounded-t-lg overflow-hidden">
               {experience.previewMediaUrl ? (
                 <Image
                   src={experience.previewMediaUrl}
                   alt=""
                   fill
-                  className="object-cover"
+                  className="object-contain bg-black"
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   unoptimized={experience.previewType === "gif"}
                 />
