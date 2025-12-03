@@ -47,7 +47,7 @@ export function CreateProjectButton({
       if (result.success && result.projectId) {
         toast.success("Project created");
         // Redirect to the project details page
-        router.push(`/${companySlug}/projects/${result.projectId}`);
+        router.push(`/${companySlug}/${result.projectId}`);
       } else {
         toast.error(result.error?.message || "Failed to create project");
       }
