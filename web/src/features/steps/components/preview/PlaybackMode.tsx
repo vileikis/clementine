@@ -25,7 +25,7 @@ import type { ViewportMode } from "../../types/preview.types";
 export function PlaybackMode({
   steps,
   theme,
-  experiences,
+  aiPresets,
   initialViewport = "mobile",
   onExit,
 }: PlaybackModeProps) {
@@ -68,7 +68,7 @@ export function PlaybackMode({
                 step={currentStep}
                 theme={theme}
                 viewportMode={viewportMode}
-                experiences={experiences}
+                aiPresets={aiPresets}
                 mode="playback"
                 playbackSession={mockSession.session}
                 onInputChange={mockSession.updateInput}
