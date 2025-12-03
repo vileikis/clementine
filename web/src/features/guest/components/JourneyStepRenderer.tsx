@@ -62,8 +62,7 @@ export function JourneyStepRenderer({
       currentStep.type === "email" ||
       currentStep.type === "multiple_choice" ||
       currentStep.type === "yes_no" ||
-      currentStep.type === "opinion_scale" ||
-      currentStep.type === "experience-picker"
+      currentStep.type === "opinion_scale"
     ) {
       return currentStep.config.variable;
     }

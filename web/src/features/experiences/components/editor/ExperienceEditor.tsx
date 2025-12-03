@@ -177,7 +177,7 @@ export function ExperienceEditor({
         <PlaybackMode
           steps={steps}
           theme={DEFAULT_PREVIEW_THEME}
-          experiences={aiPresets}
+          aiPresets={aiPresets}
           initialViewport={viewportMode}
           onExit={handlePlaybackExit}
         />
@@ -219,7 +219,7 @@ export function ExperienceEditor({
                     step={displayStep as Step}
                     theme={DEFAULT_PREVIEW_THEME}
                     viewportMode={viewportMode}
-                    experiences={aiPresets}
+                    aiPresets={aiPresets}
                   />
                 ) : (
                   <div className="text-center text-muted-foreground">
