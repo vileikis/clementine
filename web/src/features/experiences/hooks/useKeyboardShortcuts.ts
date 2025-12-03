@@ -11,7 +11,7 @@
  * Note: Cmd+S is NOT implemented because forms auto-save on blur.
  */
 
-import { useEffect, useCallback, useRef } from "react";
+import { useEffect, useCallback } from "react";
 
 interface UseKeyboardShortcutsOptions {
   /** Array of step IDs in order */
@@ -36,9 +36,6 @@ export function useKeyboardShortcuts({
   onDuplicateStep,
   enabled = true,
 }: UseKeyboardShortcutsOptions) {
-  // Track if an input element is focused to avoid conflicts
-  const isInputFocused = useRef(false);
-
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
       // Skip if disabled or no steps
@@ -106,26 +103,4 @@ export function useKeyboardShortcuts({
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [enabled, handleKeyDown]);
-
-  // Track focus state for input elements
-  useEffect(() => {
-    const handleFocusIn = (e: FocusEvent) => {
-      const target = e.target as HTMLElement;
-      isInputFocused.current =
-        target instanceof HTMLInputElement ||
-        target instanceof HTMLTextAreaElement;
-    };
-
-    const handleFocusOut = () => {
-      isInputFocused.current = false;
-    };
-
-    document.addEventListener("focusin", handleFocusIn);
-    document.addEventListener("focusout", handleFocusOut);
-
-    return () => {
-      document.removeEventListener("focusin", handleFocusIn);
-      document.removeEventListener("focusout", handleFocusOut);
-    };
-  }, []);
 }
