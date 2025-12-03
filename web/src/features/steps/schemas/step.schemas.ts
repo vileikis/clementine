@@ -37,9 +37,6 @@ const stepBaseSchema = z.object({
   ctaLabel: z.string().max(STEP_CONSTANTS.MAX_CTA_LABEL_LENGTH).nullish(),
   createdAt: z.number(),
   updatedAt: z.number(),
-  // Legacy fields for backwards compatibility
-  eventId: z.string().optional(),
-  journeyId: z.string().optional(),
 });
 
 // ============================================================================
@@ -318,8 +315,7 @@ export const stepTypeSchema = z.enum([
  * Create step input schema
  */
 export const createStepInputSchema = z.object({
-  eventId: z.string().min(1),
-  journeyId: z.string().min(1),
+  experienceId: z.string().min(1),
   type: stepTypeSchema,
   title: z.string().max(STEP_CONSTANTS.MAX_TITLE_LENGTH).nullish(),
   description: z.string().max(STEP_CONSTANTS.MAX_DESCRIPTION_LENGTH).nullish(),

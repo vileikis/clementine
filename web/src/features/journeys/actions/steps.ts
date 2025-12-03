@@ -9,17 +9,17 @@
 import { verifyAdminSecret } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { stepTypeSchema, updateStepInputSchema } from "@/features/steps/schemas";
+import { STEP_CONSTANTS } from "@/features/steps/constants";
 import {
+  getJourney,
   createStepLegacy,
   deleteStepLegacy,
   duplicateStepLegacy,
   getStepLegacy,
   reorderStepsLegacy,
   updateStepLegacy,
-} from "@/features/steps/repositories/steps.repository";
-import { stepTypeSchema, updateStepInputSchema } from "@/features/steps/schemas";
-import { STEP_CONSTANTS } from "@/features/steps/constants";
-import { getJourney } from "../repositories";
+} from "../repositories";
 import type { ActionResponse } from "./types";
 
 // ============================================================================
