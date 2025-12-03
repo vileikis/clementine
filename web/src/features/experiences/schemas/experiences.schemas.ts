@@ -29,6 +29,7 @@ export const createExperienceInputSchema = z.object({
   companyId: z.string().min(1, "Company ID is required"),
   name: z
     .string()
+    .trim()
     .min(
       EXPERIENCE_CONSTRAINTS.NAME_LENGTH.min,
       "Experience name is required"
@@ -36,8 +37,7 @@ export const createExperienceInputSchema = z.object({
     .max(
       EXPERIENCE_CONSTRAINTS.NAME_LENGTH.max,
       "Experience name too long"
-    )
-    .transform((val) => val.trim()),
+    ),
 });
 
 export type CreateExperienceInput = z.infer<typeof createExperienceInputSchema>;
@@ -46,6 +46,7 @@ export type CreateExperienceInput = z.infer<typeof createExperienceInputSchema>;
 export const updateExperienceInputSchema = z.object({
   name: z
     .string()
+    .trim()
     .min(
       EXPERIENCE_CONSTRAINTS.NAME_LENGTH.min,
       "Experience name is required"
@@ -54,7 +55,6 @@ export const updateExperienceInputSchema = z.object({
       EXPERIENCE_CONSTRAINTS.NAME_LENGTH.max,
       "Experience name too long"
     )
-    .transform((val) => val.trim())
     .optional(),
   description: z
     .string()

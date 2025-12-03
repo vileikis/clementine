@@ -7,7 +7,7 @@
  * Uses Firebase Client SDK for live updates.
  */
 
-import { useState, useEffect } from "react";
+import { useReducer, useEffect } from "react";
 import {
   collection,
   query,
@@ -18,10 +18,29 @@ import {
 import { db } from "@/lib/firebase/client";
 import type { Experience } from "../types";
 
-interface UseExperiencesResult {
+interface State {
   experiences: Experience[];
   loading: boolean;
   error: Error | null;
+}
+
+type Action =
+  | { type: "RESET" }
+  | { type: "LOADING" }
+  | { type: "SUCCESS"; experiences: Experience[] }
+  | { type: "ERROR"; error: Error };
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case "RESET":
+      return { experiences: [], loading: false, error: null };
+    case "LOADING":
+      return { ...state, loading: true, error: null };
+    case "SUCCESS":
+      return { experiences: action.experiences, loading: false, error: null };
+    case "ERROR":
+      return { ...state, loading: false, error: action.error };
+  }
 }
 
 /**
@@ -29,18 +48,21 @@ interface UseExperiencesResult {
  * Only returns active (non-deleted) experiences.
  * Sorted by createdAt descending (newest first).
  */
-export function useExperiences(companyId: string | null): UseExperiencesResult {
-  const [experiences, setExperiences] = useState<Experience[]>([]);
-  const [loading, setLoading] = useState(!!companyId);
-  const [error, setError] = useState<Error | null>(null);
+export function useExperiences(companyId: string | null): State {
+  const [state, dispatch] = useReducer(reducer, {
+    experiences: [],
+    loading: !!companyId,
+    error: null,
+  });
 
   useEffect(() => {
-    // Early return for missing params
     if (!companyId) {
+      dispatch({ type: "RESET" });
       return;
     }
 
-    // Subscribe to experiences collection filtered by companyId
+    dispatch({ type: "LOADING" });
+
     const experiencesRef = collection(db, "experiences");
     const experiencesQuery = query(
       experiencesRef,
@@ -57,19 +79,16 @@ export function useExperiences(companyId: string | null): UseExperiencesResult {
           ...doc.data(),
         })) as Experience[];
 
-        setExperiences(experiencesData);
-        setLoading(false);
-        setError(null);
+        dispatch({ type: "SUCCESS", experiences: experiencesData });
       },
       (err) => {
         console.error("Error subscribing to experiences:", err);
-        setLoading(false);
-        setError(err);
+        dispatch({ type: "ERROR", error: err });
       }
     );
 
     return () => unsubscribe();
   }, [companyId]);
 
-  return { experiences, loading, error };
+  return state;
 }
