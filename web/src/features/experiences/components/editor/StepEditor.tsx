@@ -48,6 +48,7 @@ import type {
   StepEmail,
   StepProcessing,
   StepReward,
+  StepUpdateInput,
 } from "@/features/steps/types";
 import type { AiPreset } from "@/features/ai-presets/types";
 
@@ -71,7 +72,7 @@ export function StepEditor({
   const { updateStep, deleteStep, isUpdating, isDeleting } = useStepMutations();
 
   const handleUpdate = useCallback(
-    async (updates: Record<string, unknown>) => {
+    async (updates: StepUpdateInput) => {
       await updateStep(experienceId, step.id, updates);
     },
     [experienceId, step.id, updateStep]
@@ -85,9 +86,9 @@ export function StepEditor({
   }, [experienceId, step.id, deleteStep, onStepDeleted]);
 
   const handlePreviewChange = useCallback(
-    (values: Record<string, unknown>) => {
+    (values: StepUpdateInput) => {
       if (onPreviewChange) {
-        onPreviewChange({ ...step, ...values });
+        onPreviewChange({ ...step, ...values } as Partial<Step>);
       }
     },
     [step, onPreviewChange]
@@ -158,8 +159,8 @@ function renderEditor(
   step: Step,
   companyId: string,
   aiPresets: AiPreset[],
-  onUpdate: (updates: Record<string, unknown>) => Promise<void>,
-  onPreviewChange: (values: Record<string, unknown>) => void
+  onUpdate: (updates: StepUpdateInput) => Promise<void>,
+  onPreviewChange: (values: StepUpdateInput) => void
 ) {
   switch (step.type) {
     case "info":

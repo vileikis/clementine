@@ -16,7 +16,7 @@ import {
   reorderStepsAction,
   duplicateStepAction,
 } from "../actions/steps";
-import type { StepType, Step } from "@/features/steps/types";
+import type { StepType, StepUpdateInput } from "@/features/steps/types";
 
 interface UseStepMutationsResult {
   createStep: (
@@ -26,9 +26,7 @@ interface UseStepMutationsResult {
   updateStep: (
     experienceId: string,
     stepId: string,
-    updates: Partial<Pick<Step, "title" | "description" | "mediaUrl" | "ctaLabel">> & {
-      config?: Record<string, unknown>;
-    }
+    updates: StepUpdateInput
   ) => Promise<{ success: boolean }>;
   deleteStep: (
     experienceId: string,
@@ -90,9 +88,7 @@ export function useStepMutations(): UseStepMutationsResult {
     async (
       experienceId: string,
       stepId: string,
-      updates: Partial<Pick<Step, "title" | "description" | "mediaUrl" | "ctaLabel">> & {
-        config?: Record<string, unknown>;
-      }
+      updates: StepUpdateInput
     ): Promise<{ success: boolean }> => {
       setIsUpdating(true);
       try {
