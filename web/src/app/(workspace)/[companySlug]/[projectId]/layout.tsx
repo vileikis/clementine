@@ -1,9 +1,13 @@
-"use client"
+"use client";
 
+import { useState } from "react";
 import { useParams, usePathname } from "next/navigation";
-import { useProject } from "@/features/projects/hooks/useProject";
-import { ProjectDetailsHeader } from "@/features/projects/components/ProjectDetailsHeader";
 import Link from "next/link";
+import { useProject } from "@/features/projects/hooks/useProject";
+import {
+  ProjectDetailsHeader,
+  RenameProjectDialog,
+} from "@/features/projects/components";
 
 interface ProjectLayoutProps {
   children: React.ReactNode;
@@ -11,7 +15,7 @@ interface ProjectLayoutProps {
 
 /**
  * Layout for project details pages with header and tab navigation.
- * Wraps Events and Distribute pages.
+ * Wraps Events, Distribute, and Results pages.
  */
 export default function ProjectLayout({ children }: ProjectLayoutProps) {
   const params = useParams();
@@ -20,6 +24,9 @@ export default function ProjectLayout({ children }: ProjectLayoutProps) {
   const companySlug = params.companySlug as string;
 
   const { project, loading, error } = useProject(projectId);
+
+  // Rename dialog state
+  const [isRenameOpen, setIsRenameOpen] = useState(false);
 
   if (loading) {
     return (
@@ -52,19 +59,21 @@ export default function ProjectLayout({ children }: ProjectLayoutProps) {
   // Determine active tab from pathname
   const activeTab = pathname?.includes("/distribute")
     ? "Distribute"
-    : pathname?.includes("/events")
-    ? "Events"
-    : "Events";
+    : pathname?.includes("/results")
+      ? "Results"
+      : "Events";
 
   return (
     <div className="flex flex-col h-full">
-      {/* Header with project name and status */}
-      <div className="px-6 pt-6">
-        <ProjectDetailsHeader project={project} />
-      </div>
+      {/* Header with back arrow, project name, and status */}
+      <ProjectDetailsHeader
+        companySlug={companySlug}
+        project={project}
+        onRenameClick={() => setIsRenameOpen(true)}
+      />
 
       {/* Tab Navigation */}
-      <div className="border-b px-6 mt-6">
+      <div className="border-b px-4">
         <nav className="flex gap-6" aria-label="Project tabs">
           {tabs.map((tab) => {
             const isActive = activeTab === tab.name;
@@ -87,9 +96,14 @@ export default function ProjectLayout({ children }: ProjectLayoutProps) {
       </div>
 
       {/* Tab content */}
-      <div className="flex-1 overflow-auto">
-        {children}
-      </div>
+      <div className="flex-1 overflow-auto">{children}</div>
+
+      {/* Rename Dialog */}
+      <RenameProjectDialog
+        open={isRenameOpen}
+        onOpenChange={setIsRenameOpen}
+        project={project}
+      />
     </div>
   );
 }
