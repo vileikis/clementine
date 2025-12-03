@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useParams } from "next/navigation"
-import type { Project } from "../../types/project.types"
+import type { Project } from "../types/project.types"
 import { DeleteProjectButton } from "./DeleteProjectButton"
 
 interface ProjectCardProps {

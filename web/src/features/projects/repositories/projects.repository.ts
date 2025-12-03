@@ -96,16 +96,6 @@ export async function listProjects(filters?: {
   );
 }
 
-export async function updateProjectBranding(
-  projectId: string,
-  branding: { brandColor?: string; showTitleOverlay?: boolean }
-): Promise<void> {
-  await db.collection("projects").doc(projectId).update({
-    ...branding,
-    updatedAt: Date.now(),
-  });
-}
-
 export async function updateProjectStatus(
   projectId: string,
   status: "draft" | "live" | "archived"

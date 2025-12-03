@@ -9,7 +9,7 @@
  */
 
 import { Loader2 } from "lucide-react";
-import { ProjectCard } from "./studio/ProjectCard";
+import { ProjectCard } from "./ProjectCard";
 import { EmptyProjects } from "./EmptyProjects";
 import { CreateProjectButton } from "./CreateProjectButton";
 import { useProjects } from "../hooks/useProjects";

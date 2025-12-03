@@ -3,7 +3,6 @@ export {
   createProjectAction,
   getProjectAction,
   listProjectsAction,
-  updateProjectBrandingAction,
   updateProjectStatusAction,
   updateProjectNameAction,
   updateProjectTheme,

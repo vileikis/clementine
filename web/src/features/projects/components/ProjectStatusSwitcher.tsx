@@ -2,8 +2,8 @@
 
 import { useState } from "react"
 import { toast } from "sonner"
-import { updateProjectStatusAction } from "../../actions/projects.actions"
-import type { ProjectStatus } from "../../types/project.types"
+import { updateProjectStatusAction } from "../actions/projects.actions"
+import type { ProjectStatus } from "../types/project.types"
 
 // Only allow setting these statuses (not "deleted" - that requires delete action)
 type SettableStatus = Exclude<ProjectStatus, "deleted">

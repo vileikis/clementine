@@ -4,7 +4,6 @@ export {
   getProject,
   getProjectBySharePath,
   listProjects,
-  updateProjectBranding,
   updateProjectStatus,
   updateProjectName,
   deleteProject,
