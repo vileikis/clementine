@@ -73,18 +73,22 @@ _(Same spirit as v1; no theme here yet — theme is event-level only.)_
 
 **Collection**: `/projects/{projectId}`
 
-Projects are **company-scoped containers** for events (e.g. “Brand X Summer Tour”, “Pop-up Campaign 2025”).
+Projects are **company-scoped containers** for events (e.g. "Brand X Summer Tour", "Pop-up Campaign 2025").
 
-### Schema
+> **Migration Note (Phase 4):** The Project schema evolves from the old Event schema. During Phase 4, some old Event fields are temporarily preserved (like `theme`) for backwards compatibility. Phase 5 will complete the migration by moving theme to nested Events.
+
+### Schema (Final State - Post Phase 5)
 
 ```ts
 interface Project {
   id: string;
-  companyId: string; // FK to companies
   name: string; // 1-200 characters
-  status: "active" | "archived";
-  sharePath: string; // e.g., "/join/abc123" (project-level join link)
-  activeEventId?: string | null; // Currently live event for this project
+  status: "draft" | "live" | "archived" | "deleted";
+  companyId: string | null; // FK to companies (renamed from ownerId)
+  sharePath: string; // e.g., "abc123" or "/join/abc123" (renamed from joinPath)
+  qrPngPath: string; // Firebase Storage path for QR code
+  activeEventId?: string | null; // Switchboard: currently active event (points to nested event)
+  deletedAt?: number | null; // Unix timestamp ms (soft delete)
   createdAt: number;
   updatedAt: number;
 }
@@ -92,8 +96,10 @@ interface Project {
 
 ### Notes
 
-- All **events** live under a project.
-- Guests typically join via the project `sharePath`, which resolves to its `activeEventId`.
+- **No theme at project level** - theme is event-specific (on nested Event documents)
+- **No scheduling at project level** - scheduling is event-specific (`publishStartAt/EndAt` moved to Events)
+- **Switchboard pattern:** `activeEventId` points to the currently live event under this project
+- **Guest flow:** `sharePath` → loads `activeEventId` → loads Event (with theme) → loads `experiences[]`
 
 ---
 
@@ -101,7 +107,9 @@ interface Project {
 
 **Collection**: `/projects/{projectId}/events/{eventId}`
 
-Events are **time-bound, themed containers** that use Experiences as their flow building blocks.
+> **Phase 5:** Events are **time-bound, themed instances** nested under Projects. This is the **future** schema - not implemented in Phase 4.
+
+Events are **simplified containers** that link to Experiences and apply event-specific theming.
 
 ### Schema
 
@@ -120,7 +128,7 @@ interface Event {
   // Linked experiences (embedded array, no subcollection)
   experiences: EventExperienceLink[]; // Links to /experiences/{experienceId}
 
-  // Theming is defined only at event level (MVP)
+  // Theming is defined only at event level (Phase 5+)
   theme: EventTheme;
 
   deletedAt?: number | null;
@@ -139,7 +147,7 @@ interface EventExperienceLink {
 }
 ```
 
-### EventTheme (unchanged in spirit)
+### EventTheme
 
 ```ts
 interface EventTheme {
@@ -167,8 +175,7 @@ interface EventTheme {
 
 - Exactly **one active event per project** at a time (enforced at application level).
 - Join logic:
-
-  - Guest opens `Project.sharePath` → server/app resolves `project.activeEventId` → loads that Event.
+  - Guest opens `Project.sharePath` → server/app resolves `project.activeEventId` → loads that Event → loads linked experiences.
 
 ---
 
@@ -380,12 +387,33 @@ interface AiPreset {
 
 ---
 
-## 8. Relationships (New World)
+## 8. Relationships
+
+### Phase 4 (Transition - Projects with temporary fields)
+
+During Phase 4, Projects temporarily retain some old Event fields:
+
+```text
+Companies (1)
+  ├── (*) Projects (with theme, activeJourneyId→activeEventId, publishDates - temporary)
+  └── (*) Experiences (renamed from Journeys in Phase 2)
+         └── (*) Steps
+
+Companies (1)
+  └── (*) AiPresets (legacy AI config, unused)
+```
+
+**Temporary schema during Phase 4:**
+- Projects keep `theme` temporarily (will move to Events in Phase 5)
+- Projects keep `publishStartAt/EndAt` temporarily (will move to Events in Phase 5)
+- `activeJourneyId` renamed to `activeEventId` (preparing for Phase 5, points to Experiences temporarily)
+
+### Phase 5+ (Target - Projects with Nested Events)
 
 ```text
 Companies (1)
   ├── (*) Projects
-  │       └── (*) Events
+  │       └── (*) Events (nested)
   │             └── experiences[] → (*) Experiences
   │                                      └── (*) Steps
   └── (*) Experiences
@@ -395,12 +423,12 @@ Companies (1)
   └── (*) AiPresets (legacy AI config, unused for now)
 ```
 
-- **Company → Projects**: one company has many projects.
-- **Project → Events**: one project has many events.
-- **Event → Experiences**: events link to experiences via `experiences[]` array (embedded objects with `experienceId`, `label`, etc.).
-- **Company → Experiences**: experiences are shared across a company.
-- **Experience → Steps**: one experience has many steps.
-- **AiPresets**: standalone, company-scoped; future AI library.
+- **Company → Projects**: one company has many projects
+- **Project → Events**: one project has many events (nested subcollection)
+- **Event → Experiences**: events link to experiences via `experiences[]` array (embedded objects with `experienceId`, `label`, etc.)
+- **Company → Experiences**: experiences are shared across a company
+- **Experience → Steps**: one experience has many steps
+- **AiPresets**: standalone, company-scoped; future AI library
 
 ---
 
