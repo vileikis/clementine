@@ -4,13 +4,14 @@
  * Component: ExperienceCard
  *
  * Card displaying an experience in the list view.
- * Shows name, step count, and last updated date.
+ * Shows preview thumbnail (if available), name, step count, and last updated date.
  * Includes link to experience editor and context menu for delete.
  */
 
 import { useState } from "react";
 import Link from "next/link";
-import { Layers, Clock, MoreVertical, Trash2 } from "lucide-react";
+import Image from "next/image";
+import { Layers, Clock, MoreVertical, Trash2, ImageIcon } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -44,10 +45,28 @@ export function ExperienceCard({ experience, companySlug }: ExperienceCardProps)
     <>
       <div className="relative group">
         <Link
-          href={`/${companySlug}/exps/${experience.id}`}
+          href={`/${companySlug}/exps/${experience.id}/design`}
           className="block"
         >
-          <Card className="h-full transition-colors hover:border-primary/50 hover:bg-muted/50">
+          <Card className="h-full transition-colors hover:border-primary/50 hover:bg-muted/50 overflow-hidden pt-0">
+            {/* Preview thumbnail */}
+            <div className="relative aspect-video w-full bg-muted rounded-t-lg overflow-hidden">
+              {experience.previewMediaUrl ? (
+                <Image
+                  src={experience.previewMediaUrl}
+                  alt=""
+                  fill
+                  className="object-contain bg-black"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  unoptimized={experience.previewType === "gif"}
+                />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <ImageIcon className="h-8 w-8 text-muted-foreground/40" />
+                </div>
+              )}
+            </div>
+
             <CardHeader className="pb-2">
               <div className="flex items-start justify-between gap-2">
                 <CardTitle className="text-base font-medium line-clamp-1 group-hover:text-primary transition-colors">
