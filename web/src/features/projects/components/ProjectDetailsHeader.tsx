@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ProjectStatusSwitcher } from "./studio/ProjectStatusSwitcher";
+import { ProjectStatusSwitcher } from "./ProjectStatusSwitcher";
 import type { Project } from "../types/project.types";
 
 interface ProjectDetailsHeaderProps {

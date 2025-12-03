@@ -10,7 +10,6 @@ import {
   createProject,
   getProject,
   listProjects,
-  updateProjectBranding,
   updateProjectStatus,
   updateProjectName,
   deleteProject,
@@ -143,37 +142,6 @@ export async function listProjectsAction(filters?: {
       error: {
         code: "INTERNAL_ERROR",
         message: error instanceof Error ? error.message : "Failed to fetch projects"
-      }
-    };
-  }
-}
-
-export async function updateProjectBrandingAction(
-  projectId: string,
-  branding: { brandColor?: string; showTitleOverlay?: boolean }
-) {
-  // Verify admin authentication
-  const auth = await verifyAdminSecret();
-  if (!auth.authorized) {
-    return {
-      success: false,
-      error: {
-        code: "PERMISSION_DENIED",
-        message: auth.error
-      }
-    };
-  }
-
-  try {
-    await updateProjectBranding(projectId, branding);
-    revalidatePath(`/projects/${projectId}`);
-    return { success: true };
-  } catch (error) {
-    return {
-      success: false,
-      error: {
-        code: "INTERNAL_ERROR",
-        message: error instanceof Error ? error.message : "Failed to update branding"
       }
     };
   }

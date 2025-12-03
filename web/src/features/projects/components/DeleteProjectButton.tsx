@@ -23,7 +23,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { deleteProjectAction } from "../../actions";
+import { deleteProjectAction } from "../actions";
 import { toast } from "sonner";
 
 interface DeleteProjectButtonProps {
