@@ -1,4 +1,4 @@
-// Step type definitions for the journey editor
+// Step type definitions for the experience editor
 
 /**
  * Media types supported in step editors
@@ -47,10 +47,6 @@ export interface StepBase {
   ctaLabel?: string | null;
   createdAt: number;
   updatedAt: number;
-  /** @deprecated Used for backwards compatibility with legacy journeys */
-  eventId?: string;
-  /** @deprecated Used for backwards compatibility with legacy journeys */
-  journeyId?: string;
 }
 
 // ============================================================================

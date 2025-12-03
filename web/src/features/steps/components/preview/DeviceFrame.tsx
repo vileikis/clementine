@@ -8,7 +8,7 @@
  * Applies event theme (background, overlay, text color) to provide
  * an accurate preview of how steps will appear to guests.
  *
- * Used in the journey editor's middle panel.
+ * Used in the experience editor's middle panel.
  */
 
 import { useEventTheme } from "@/components/providers/EventThemeProvider";

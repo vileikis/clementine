@@ -85,9 +85,47 @@ export async function getSession(
 }
 
 // ============================================================================
-// New functions for journey support
+// Experience session functions
 // ============================================================================
 
+export async function startExperienceSession(
+  eventId: string,
+  experienceId: string
+): Promise<string> {
+  const eventDoc = await db.collection("events").doc(eventId).get();
+  if (!eventDoc.exists) {
+    throw new Error("Event not found");
+  }
+
+  const sessionRef = db
+    .collection("events")
+    .doc(eventId)
+    .collection("sessions")
+    .doc();
+
+  const now = Date.now();
+  const session: Session = {
+    id: sessionRef.id,
+    eventId,
+    experienceId,
+    currentStepIndex: 0,
+    data: {},
+    state: "created",
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  await sessionRef.set(session);
+  return sessionRef.id;
+}
+
+// ============================================================================
+// Legacy functions for journey support (deprecated)
+// ============================================================================
+
+/**
+ * @deprecated Use startExperienceSession instead
+ */
 export async function startJourneySession(
   eventId: string,
   journeyId: string

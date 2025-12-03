@@ -116,12 +116,12 @@
 
 - [x] T043 [P] [US3] Remove journeyId field from Step interface in `web/src/features/steps/types/step.types.ts`
 - [x] T044 [P] [US3] Update stepSchema to remove journeyId, ensure experienceId is required in `web/src/features/steps/schemas/step.schemas.ts`
-- [ ] T045 [US3] Remove any journey imports from steps repository in `web/src/features/steps/repositories/steps.repository.ts`
-- [ ] T046 [US3] Remove any journey imports from steps actions in `web/src/features/steps/actions/steps.ts`
-- [ ] T047 [US3] Search and remove journey references from steps hooks in `web/src/features/steps/hooks/`
-- [ ] T048 [US3] Search and remove journey references from steps components in `web/src/features/steps/components/`
-- [ ] T049 [US3] Verify zero imports from `features/journeys/` in steps module (FR-012)
-- [ ] T050 [US3] Update useSteps hook to fetch from experience subcollection path in `web/src/features/experiences/hooks/useSteps.ts`
+- [x] T045 [US3] Remove any journey imports from steps repository in `web/src/features/steps/repositories/steps.repository.ts`
+- [x] T046 [US3] Remove any journey imports from steps actions in `web/src/features/steps/actions/steps.ts`
+- [x] T047 [US3] Search and remove journey references from steps hooks in `web/src/features/steps/hooks/`
+- [x] T048 [US3] Search and remove journey references from steps components in `web/src/features/steps/components/`
+- [x] T049 [US3] Verify zero imports from `features/journeys/` in steps module (FR-012)
+- [x] T050 [US3] Update useSteps hook to fetch from experience subcollection path in `web/src/features/experiences/hooks/useSteps.ts`
 
 **Checkpoint**: At this point, User Story 3 should be fully functional - steps module has zero journey dependencies
 
@@ -135,13 +135,13 @@
 
 ### Implementation for User Story 4
 
-- [ ] T051 [P] [US4] Add experienceId field to Session type in `web/src/features/sessions/types/sessions.types.ts`
-- [ ] T052 [P] [US4] Update sessionSchema to include experienceId field in `web/src/features/sessions/schemas/sessions.schemas.ts`
-- [ ] T053 [US4] Add startExperienceSessionAction function in `web/src/features/sessions/actions/sessions.actions.ts`
-- [ ] T054 [US4] Update getExperiencesForGuestAction to use experience repository in `web/src/features/sessions/actions/sessions.actions.ts`
-- [ ] T055 [US4] Add getExperienceForGuestAction function to load experience + steps for guest in `web/src/features/sessions/actions/sessions.actions.ts`
-- [ ] T056 [US4] Update advanceStepAction to read stepsOrder from experience (not journey) in `web/src/features/sessions/actions/sessions.actions.ts`
-- [ ] T057 [US4] Import experience repository functions in sessions actions
+- [x] T051 [P] [US4] Add experienceId field to Session type in `web/src/features/sessions/types/sessions.types.ts`
+- [x] T052 [P] [US4] Update sessionSchema to include experienceId field in `web/src/features/sessions/schemas/sessions.schemas.ts`
+- [x] T053 [US4] Add startExperienceSessionAction function in `web/src/features/sessions/actions/sessions.actions.ts`
+- [x] T054 [US4] Update getExperiencesForGuestAction to use experience repository in `web/src/features/sessions/actions/sessions.actions.ts`
+- [x] T055 [US4] Add getExperienceForGuestAction function to load experience + steps for guest in `web/src/features/sessions/actions/sessions.actions.ts`
+- [x] T056 [US4] Update advanceStepAction to read stepsOrder from experience (not journey) in `web/src/features/sessions/actions/sessions.actions.ts`
+- [x] T057 [US4] Import experience repository functions in sessions actions
 
 **Checkpoint**: At this point, User Story 4 should be fully functional - sessions work with experiences
 
@@ -151,10 +151,10 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T058 [P] Remove unused journey-related imports across all modified files
-- [ ] T059 [P] Clean up any TODO comments added during implementation
-- [ ] T060 Verify step picker modal is mobile-friendly (scrollable, touch targets >=44px)
-- [ ] T061 Verify AiTransformEditor is mobile-first (works on 320px-768px viewport)
+- [x] T058 [P] Remove unused journey-related imports across all modified files
+- [x] T059 [P] Clean up any TODO comments added during implementation
+- [x] T060 Verify step picker modal is mobile-friendly (scrollable, touch targets >=44px)
+- [x] T061 Verify AiTransformEditor is mobile-first (works on 320px-768px viewport)
 
 ### Validation Loop (REQUIRED - Constitution Principle V)
 
@@ -163,7 +163,7 @@
 - [x] T062 Run `pnpm lint` and fix all errors/warnings (SC-005)
 - [x] T063 Run `pnpm type-check` and resolve all TypeScript errors (SC-004)
 - [x] T064 Run `pnpm build` and ensure build completes successfully (SC-006)
-- [ ] T065 Verify in local dev server (`pnpm dev`) that experience editor loads steps correctly (SC-007)
+- [x] T065 Verify in local dev server (`pnpm dev`) that experience editor loads steps correctly (SC-007)
 - [x] T066 Verify `grep -r "journeyId" web/src/features/steps/` returns zero results (SC-003)
 - [x] T067 Verify `grep -r "journey" web/src/features/steps/` returns zero results excluding comments (SC-003)
 - [x] T068 Verify step picker shows ai-transform, hides experience-picker (SC-008)
