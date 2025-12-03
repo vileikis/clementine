@@ -24,13 +24,13 @@
 
 **Purpose**: Type and schema foundation required by all user stories
 
-- [ ] T001 [P] Add `ai-transform` to StepType union in `web/src/features/steps/types/step.types.ts`
-- [ ] T002 [P] Add AiTransformConfig and AiTransformVariable types to `web/src/features/steps/types/step.types.ts`
-- [ ] T003 [P] Add aiTransformVariableSchema Zod schema with refinements in `web/src/features/steps/schemas/step.schemas.ts`
-- [ ] T004 [P] Add aiTransformConfigSchema Zod schema in `web/src/features/steps/schemas/step.schemas.ts`
-- [ ] T005 [P] Update stepTypeSchema to include `ai-transform` in `web/src/features/steps/schemas/step.schemas.ts`
-- [ ] T006 [P] Export new types and schemas from `web/src/features/steps/schemas/index.ts`
-- [ ] T007 [P] Export new types from `web/src/features/steps/types/index.ts`
+- [x] T001 [P] Add `ai-transform` to StepType union in `web/src/features/steps/types/step.types.ts`
+- [x] T002 [P] Add AiTransformConfig and AiTransformVariable types to `web/src/features/steps/types/step.types.ts`
+- [x] T003 [P] Add aiTransformVariableSchema Zod schema with refinements in `web/src/features/steps/schemas/step.schemas.ts`
+- [x] T004 [P] Add aiTransformConfigSchema Zod schema in `web/src/features/steps/schemas/step.schemas.ts`
+- [x] T005 [P] Update stepTypeSchema to include `ai-transform` in `web/src/features/steps/schemas/step.schemas.ts`
+- [x] T006 [P] Export new types and schemas from `web/src/features/steps/schemas/index.ts`
+- [x] T007 [P] Export new types from `web/src/features/steps/types/index.ts`
 
 ---
 
@@ -40,9 +40,9 @@
 
 **CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T008 Add STEP_TYPE_META entry for `ai-transform` in `web/src/features/steps/constants.ts`
-- [ ] T009 Add STEP_DEFAULTS entry for `ai-transform` with default config in `web/src/features/steps/constants.ts`
-- [ ] T010 Update StepConfig union type to include AiTransformConfig in `web/src/features/steps/types/step.types.ts`
+- [x] T008 Add STEP_TYPE_META entry for `ai-transform` in `web/src/features/steps/constants.ts`
+- [x] T009 Add STEP_DEFAULTS entry for `ai-transform` with default config in `web/src/features/steps/constants.ts`
+- [x] T010 Update StepConfig union type to include AiTransformConfig in `web/src/features/steps/types/step.types.ts`
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -56,19 +56,19 @@
 
 ### Implementation for User Story 1
 
-- [ ] T011 [P] [US1] Create AiTransformEditor component scaffold in `web/src/features/steps/components/editors/AiTransformEditor.tsx`
-- [ ] T012 [P] [US1] Implement model selection input (text input or dropdown) in AiTransformEditor
-- [ ] T013 [P] [US1] Implement prompt textarea with max 1000 chars validation in AiTransformEditor
-- [ ] T014 [US1] Implement variables list management (add/remove/edit) in AiTransformEditor
-- [ ] T015 [US1] Implement output type selector (image/video/gif) in AiTransformEditor
-- [ ] T016 [US1] Implement aspect ratio selector in AiTransformEditor
+- [x] T011 [P] [US1] Create AiTransformEditor component scaffold in `web/src/features/steps/components/editors/AiTransformEditor.tsx`
+- [x] T012 [P] [US1] Implement model selection input (text input or dropdown) in AiTransformEditor
+- [x] T013 [P] [US1] Implement prompt textarea with max 1000 chars validation in AiTransformEditor
+- [x] T014 [US1] Implement variables list management (add/remove/edit) in AiTransformEditor
+- [x] T015 [US1] Implement output type selector (image/video/gif) in AiTransformEditor
+- [x] T016 [US1] Implement aspect ratio selector in AiTransformEditor
 - [ ] T017 [US1] Implement reference images upload (max 5) using StepMediaUpload in AiTransformEditor
-- [ ] T018 [US1] Wire AiTransformEditor to react-hook-form with zodResolver for aiTransformConfigSchema
-- [ ] T019 [US1] Add auto-save on form changes using form.watch pattern in AiTransformEditor
-- [ ] T020 [US1] Export AiTransformEditor from `web/src/features/steps/components/editors/index.ts`
-- [ ] T021 [US1] Register AiTransformEditor in step editor switch/mapping (where step type resolves to editor component)
-- [ ] T022 [US1] Verify experience-picker is hidden from step picker (deprecated: true in STEP_TYPE_META)
-- [ ] T023 [US1] Verify ai-transform appears in step picker with correct icon and label
+- [x] T018 [US1] Wire AiTransformEditor to react-hook-form with zodResolver for aiTransformConfigSchema
+- [x] T019 [US1] Add auto-save on form changes using form.watch pattern in AiTransformEditor
+- [x] T020 [US1] Export AiTransformEditor from `web/src/features/steps/components/editors/index.ts`
+- [x] T021 [US1] Register AiTransformEditor in step editor switch/mapping (where step type resolves to editor component)
+- [x] T022 [US1] Verify experience-picker is hidden from step picker (deprecated: true in STEP_TYPE_META)
+- [x] T023 [US1] Verify ai-transform appears in step picker with correct icon and label
 
 **Checkpoint**: At this point, User Story 1 should be fully functional - admins can add and configure AI Transform steps
 
@@ -82,25 +82,25 @@
 
 ### Implementation for User Story 2
 
-- [ ] T024 [US2] Update getStepsCollection helper to use `/experiences/{experienceId}/steps` path in `web/src/features/steps/repositories/steps.repository.ts`
-- [ ] T025 [US2] Update listSteps function signature to accept `experienceId` only (remove eventId/journeyId) in `web/src/features/steps/repositories/steps.repository.ts`
-- [ ] T026 [US2] Update getStep function to use experienceId in `web/src/features/steps/repositories/steps.repository.ts`
-- [ ] T027 [US2] Update createStep function to use experienceId and batch writes in `web/src/features/steps/repositories/steps.repository.ts`
-- [ ] T028 [US2] Update updateStep function to use experienceId in `web/src/features/steps/repositories/steps.repository.ts`
-- [ ] T029 [US2] Update deleteStep function to use batch writes (delete doc + update stepsOrder) in `web/src/features/steps/repositories/steps.repository.ts`
-- [ ] T030 [US2] Update reorderSteps function to update experience.stepsOrder in `web/src/features/steps/repositories/steps.repository.ts`
-- [ ] T031 [US2] Update duplicateStep function to use batch writes in `web/src/features/steps/repositories/steps.repository.ts`
-- [ ] T032 [US2] Update listStepsAction to accept experienceId only in `web/src/features/steps/actions/steps.ts`
-- [ ] T033 [US2] Update getStepAction to accept experienceId in `web/src/features/steps/actions/steps.ts`
-- [ ] T034 [US2] Update createStepAction to accept experienceId in input, use batch writes in `web/src/features/steps/actions/steps.ts`
-- [ ] T035 [US2] Update updateStepAction signature to (experienceId, stepId, input) in `web/src/features/steps/actions/steps.ts`
-- [ ] T036 [US2] Update deleteStepAction to use experienceId and batch writes in `web/src/features/steps/actions/steps.ts`
-- [ ] T037 [US2] Update reorderStepsAction to use experienceId in `web/src/features/steps/actions/steps.ts`
-- [ ] T038 [US2] Update duplicateStepAction to use experienceId and batch writes in `web/src/features/steps/actions/steps.ts`
-- [ ] T039 [US2] Export all updated actions from `web/src/features/steps/actions/index.ts`
-- [ ] T040 [US2] Update useStepMutations to import actions from `@/features/steps/actions` instead of local `../actions/steps` in `web/src/features/experiences/hooks/useStepMutations.ts`
-- [ ] T041 [US2] Remove step action exports from `web/src/features/experiences/actions/index.ts`
-- [ ] T042 [US2] Delete duplicate file `web/src/features/experiences/actions/steps.ts` (FR-013)
+- [x] T024 [US2] Update getStepsCollection helper to use `/experiences/{experienceId}/steps` path in `web/src/features/steps/repositories/steps.repository.ts`
+- [x] T025 [US2] Update listSteps function signature to accept `experienceId` only (remove eventId/journeyId) in `web/src/features/steps/repositories/steps.repository.ts`
+- [x] T026 [US2] Update getStep function to use experienceId in `web/src/features/steps/repositories/steps.repository.ts`
+- [x] T027 [US2] Update createStep function to use experienceId and batch writes in `web/src/features/steps/repositories/steps.repository.ts`
+- [x] T028 [US2] Update updateStep function to use experienceId in `web/src/features/steps/repositories/steps.repository.ts`
+- [x] T029 [US2] Update deleteStep function to use batch writes (delete doc + update stepsOrder) in `web/src/features/steps/repositories/steps.repository.ts`
+- [x] T030 [US2] Update reorderSteps function to update experience.stepsOrder in `web/src/features/steps/repositories/steps.repository.ts`
+- [x] T031 [US2] Update duplicateStep function to use batch writes in `web/src/features/steps/repositories/steps.repository.ts`
+- [x] T032 [US2] Update listStepsAction to accept experienceId only in `web/src/features/steps/actions/steps.ts`
+- [x] T033 [US2] Update getStepAction to accept experienceId in `web/src/features/steps/actions/steps.ts`
+- [x] T034 [US2] Update createStepAction to accept experienceId in input, use batch writes in `web/src/features/steps/actions/steps.ts`
+- [x] T035 [US2] Update updateStepAction signature to (experienceId, stepId, input) in `web/src/features/steps/actions/steps.ts`
+- [x] T036 [US2] Update deleteStepAction to use experienceId and batch writes in `web/src/features/steps/actions/steps.ts`
+- [x] T037 [US2] Update reorderStepsAction to use experienceId in `web/src/features/steps/actions/steps.ts`
+- [x] T038 [US2] Update duplicateStepAction to use experienceId and batch writes in `web/src/features/steps/actions/steps.ts`
+- [x] T039 [US2] Export all updated actions from `web/src/features/steps/actions/index.ts`
+- [x] T040 [US2] Update useStepMutations to import actions from `@/features/steps/actions` instead of local `../actions/steps` in `web/src/features/experiences/hooks/useStepMutations.ts`
+- [x] T041 [US2] Remove step action exports from `web/src/features/experiences/actions/index.ts`
+- [x] T042 [US2] Delete duplicate file `web/src/features/experiences/actions/steps.ts` (FR-013)
 
 **Checkpoint**: At this point, User Story 2 should be fully functional - all step operations use consolidated code path
 
@@ -114,8 +114,8 @@
 
 ### Implementation for User Story 3
 
-- [ ] T043 [P] [US3] Remove journeyId field from Step interface in `web/src/features/steps/types/step.types.ts`
-- [ ] T044 [P] [US3] Update stepSchema to remove journeyId, ensure experienceId is required in `web/src/features/steps/schemas/step.schemas.ts`
+- [x] T043 [P] [US3] Remove journeyId field from Step interface in `web/src/features/steps/types/step.types.ts`
+- [x] T044 [P] [US3] Update stepSchema to remove journeyId, ensure experienceId is required in `web/src/features/steps/schemas/step.schemas.ts`
 - [ ] T045 [US3] Remove any journey imports from steps repository in `web/src/features/steps/repositories/steps.repository.ts`
 - [ ] T046 [US3] Remove any journey imports from steps actions in `web/src/features/steps/actions/steps.ts`
 - [ ] T047 [US3] Search and remove journey references from steps hooks in `web/src/features/steps/hooks/`
@@ -160,13 +160,13 @@
 
 **Purpose**: Ensure code quality and correctness before merge
 
-- [ ] T062 Run `pnpm lint` and fix all errors/warnings (SC-005)
-- [ ] T063 Run `pnpm type-check` and resolve all TypeScript errors (SC-004)
-- [ ] T064 Run `pnpm build` and ensure build completes successfully (SC-006)
+- [x] T062 Run `pnpm lint` and fix all errors/warnings (SC-005)
+- [x] T063 Run `pnpm type-check` and resolve all TypeScript errors (SC-004)
+- [x] T064 Run `pnpm build` and ensure build completes successfully (SC-006)
 - [ ] T065 Verify in local dev server (`pnpm dev`) that experience editor loads steps correctly (SC-007)
-- [ ] T066 Verify `grep -r "journeyId" web/src/features/steps/` returns zero results (SC-003)
-- [ ] T067 Verify `grep -r "journey" web/src/features/steps/` returns zero results excluding comments (SC-003)
-- [ ] T068 Verify step picker shows ai-transform, hides experience-picker (SC-008)
+- [x] T066 Verify `grep -r "journeyId" web/src/features/steps/` returns zero results (SC-003)
+- [x] T067 Verify `grep -r "journey" web/src/features/steps/` returns zero results excluding comments (SC-003)
+- [x] T068 Verify step picker shows ai-transform, hides experience-picker (SC-008)
 
 ---
 

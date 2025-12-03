@@ -29,8 +29,7 @@ const variableNameSchema = z
  */
 const stepBaseSchema = z.object({
   id: z.string(),
-  eventId: z.string(),
-  journeyId: z.string(),
+  experienceId: z.string(),
   title: z.string().max(STEP_CONSTANTS.MAX_TITLE_LENGTH).nullish(),
   description: z.string().max(STEP_CONSTANTS.MAX_DESCRIPTION_LENGTH).nullish(),
   mediaUrl: z.string().url().nullish(),
@@ -38,6 +37,9 @@ const stepBaseSchema = z.object({
   ctaLabel: z.string().max(STEP_CONSTANTS.MAX_CTA_LABEL_LENGTH).nullish(),
   createdAt: z.number(),
   updatedAt: z.number(),
+  // Legacy fields for backwards compatibility
+  eventId: z.string().optional(),
+  journeyId: z.string().optional(),
 });
 
 // ============================================================================
@@ -60,6 +62,66 @@ export const captureStepSchema = stepBaseSchema.extend({
     source: variableNameSchema,
     fallbackExperienceId: z.string().nullish(),
   }),
+});
+
+// ============================================================================
+// AI Transform Schemas
+// ============================================================================
+
+/**
+ * AI Transform variable schema - maps prompt variables to input sources
+ */
+export const aiTransformVariableSchema = z
+  .object({
+    key: z
+      .string()
+      .min(1, "Variable key is required")
+      .max(50, "Variable key must be 50 characters or less")
+      .regex(
+        /^[a-zA-Z_][a-zA-Z0-9_]*$/,
+        "Variable key must start with letter or underscore"
+      ),
+    sourceType: z.enum(["capture", "input", "static"]),
+    sourceStepId: z.string().optional(),
+    staticValue: z.string().optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.sourceType === "static") {
+        return data.staticValue !== undefined && data.staticValue !== "";
+      }
+      if (data.sourceType === "capture" || data.sourceType === "input") {
+        return data.sourceStepId !== undefined && data.sourceStepId !== "";
+      }
+      return true;
+    },
+    { message: "Source configuration is incomplete" }
+  );
+
+/**
+ * AI Transform config schema
+ */
+export const aiTransformConfigSchema = z.object({
+  model: z.string().nullable(),
+  prompt: z
+    .string()
+    .max(1000, "Prompt must be 1000 characters or less")
+    .nullable(),
+  variables: z.array(aiTransformVariableSchema).default([]),
+  outputType: z.enum(["image", "video", "gif"]).default("image"),
+  aspectRatio: z.string().default("1:1"),
+  referenceImageUrls: z
+    .array(z.string().url())
+    .max(5, "Maximum 5 reference images allowed")
+    .default([]),
+});
+
+/**
+ * AI Transform step schema
+ */
+export const aiTransformStepSchema = stepBaseSchema.extend({
+  type: z.literal("ai-transform"),
+  config: aiTransformConfigSchema,
 });
 
 /**
@@ -219,6 +281,7 @@ export const rewardStepSchema = stepBaseSchema.extend({
 export const stepSchema = z.discriminatedUnion("type", [
   infoStepSchema,
   captureStepSchema,
+  aiTransformStepSchema,
   shortTextStepSchema,
   longTextStepSchema,
   multipleChoiceStepSchema,
@@ -240,6 +303,7 @@ export const stepTypeSchema = z.enum([
   "info",
   "experience-picker",
   "capture",
+  "ai-transform",
   "short_text",
   "long_text",
   "multiple_choice",
@@ -284,3 +348,5 @@ export const updateStepInputSchema = z.object({
 export type StepSchema = z.infer<typeof stepSchema>;
 export type CreateStepInput = z.infer<typeof createStepInputSchema>;
 export type UpdateStepInput = z.infer<typeof updateStepInputSchema>;
+export type AiTransformConfigSchema = z.infer<typeof aiTransformConfigSchema>;
+export type AiTransformVariableSchema = z.infer<typeof aiTransformVariableSchema>;

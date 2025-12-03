@@ -12,7 +12,7 @@ import {
 } from "../repositories";
 import { getProject } from "@/features/projects/repositories/projects.repository";
 import { getJourney } from "@/features/journeys/repositories/journeys.repository";
-import { listSteps } from "@/features/steps/repositories/steps.repository";
+import { listStepsLegacy } from "@/features/steps/repositories/steps.repository";
 import {
   getAiPreset,
   getAiPresetsByEventId,
@@ -345,7 +345,7 @@ export async function getJourneyForGuestAction(
     return { success: false, error: "Journey not found" };
   }
 
-  const steps = await listSteps(eventId, journeyId);
+  const steps = await listStepsLegacy(eventId, journeyId);
   return { success: true, journey, steps };
 }
 
