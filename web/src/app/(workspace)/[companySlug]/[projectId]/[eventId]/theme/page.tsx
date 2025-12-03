@@ -1,4 +1,7 @@
 import { getCompanyBySlugAction } from "@/features/companies/actions";
+import { getProjectAction } from "@/features/projects/actions";
+import { getEventAction } from "@/features/events/actions";
+import { EventThemeEditor } from "@/features/events/components/designer/EventThemeEditor";
 import { ContentHeader } from "@/features/sidebar/components/ContentHeader";
 import { buildBreadcrumbs } from "@/lib/breadcrumbs";
 import { notFound } from "next/navigation";
@@ -21,30 +24,33 @@ export default async function ThemePage({ params }: ThemePageProps) {
 
   const company = companyResult.company;
 
-  // TODO: Fetch project and event when entities exist
-  const projectName = `Project ${projectId}`;
-  const eventName = `Event ${eventId}`;
+  // Fetch project
+  const projectResult = await getProjectAction(projectId);
+  if (!projectResult.success || !projectResult.project) {
+    notFound();
+  }
+
+  const project = projectResult.project;
+
+  // Fetch event
+  const eventResult = await getEventAction(projectId, eventId);
+  if (!eventResult.success || !eventResult.data?.event) {
+    notFound();
+  }
+
+  const event = eventResult.data.event;
 
   const breadcrumbs = buildBreadcrumbs(company, {
-    project: { name: projectName, id: projectId },
-    event: { name: eventName, id: eventId },
+    project: { name: project.name, id: projectId },
+    event: { name: event.name, id: eventId },
     current: "Theme",
   });
 
   return (
     <div className="flex flex-col h-full">
       <ContentHeader breadcrumbs={breadcrumbs} />
-      <div className="flex-1 overflow-auto">
-        <div className="flex items-center justify-center h-full min-h-[50vh]">
-          <div className="text-center">
-            <h2 className="text-xl font-semibold text-muted-foreground">
-              Coming Soon
-            </h2>
-            <p className="text-sm text-muted-foreground mt-2">
-              Theme customization feature is under development.
-            </p>
-          </div>
-        </div>
+      <div className="flex-1 overflow-auto p-6">
+        <EventThemeEditor event={event} projectId={projectId} />
       </div>
     </div>
   );

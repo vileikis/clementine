@@ -19,15 +19,15 @@
 
 **Purpose**: Create the events feature module scaffolding
 
-- [ ] T001 Create feature module directory structure at `web/src/features/events/`
-- [ ] T002 [P] Create types barrel export at `web/src/features/events/types/index.ts`
-- [ ] T003 [P] Create schemas barrel export at `web/src/features/events/schemas/index.ts`
-- [ ] T004 [P] Create repositories barrel export at `web/src/features/events/repositories/index.ts`
-- [ ] T005 [P] Create actions barrel export at `web/src/features/events/actions/index.ts`
-- [ ] T006 [P] Create hooks barrel export at `web/src/features/events/hooks/index.ts`
-- [ ] T007 [P] Create components barrel export at `web/src/features/events/components/index.ts`
-- [ ] T008 [P] Create designer components barrel export at `web/src/features/events/components/designer/index.ts`
-- [ ] T009 Create feature-level barrel export at `web/src/features/events/index.ts`
+- [x] T001 Create feature module directory structure at `web/src/features/events/`
+- [x] T002 [P] Create types barrel export at `web/src/features/events/types/index.ts`
+- [x] T003 [P] Create schemas barrel export at `web/src/features/events/schemas/index.ts`
+- [x] T004 [P] Create repositories barrel export at `web/src/features/events/repositories/index.ts`
+- [x] T005 [P] Create actions barrel export at `web/src/features/events/actions/index.ts`
+- [x] T006 [P] Create hooks barrel export at `web/src/features/events/hooks/index.ts`
+- [x] T007 [P] Create components barrel export at `web/src/features/events/components/index.ts`
+- [x] T008 [P] Create designer components barrel export at `web/src/features/events/components/designer/index.ts`
+- [x] T009 Create feature-level barrel export at `web/src/features/events/index.ts`
 
 ---
 
@@ -37,10 +37,10 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T010 [P] Create Event, EventTheme, EventExperienceLink types at `web/src/features/events/types/event.types.ts`
-- [ ] T011 [P] Create constants (DEFAULT_EVENT_THEME, NAME_LENGTH, COLOR_REGEX) at `web/src/features/events/constants.ts`
-- [ ] T012 Create Zod schemas (eventSchema, eventThemeSchema, createEventInput, updateEventInput, updateEventThemeInput) at `web/src/features/events/schemas/events.schemas.ts`
-- [ ] T013 Create events repository with CRUD operations at `web/src/features/events/repositories/events.repository.ts`
+- [x] T010 [P] Create Event, EventTheme, EventExperienceLink types at `web/src/features/events/types/event.types.ts`
+- [x] T011 [P] Create constants (DEFAULT_EVENT_THEME, NAME_LENGTH, COLOR_REGEX) at `web/src/features/events/constants.ts`
+- [x] T012 Create Zod schemas (eventSchema, eventThemeSchema, createEventInput, updateEventInput, updateEventThemeInput) at `web/src/features/events/schemas/events.schemas.ts`
+- [x] T013 Create events repository with CRUD operations at `web/src/features/events/repositories/events.repository.ts`
 
 **Checkpoint**: Foundation ready - types, schemas, constants, and repository complete
 
@@ -54,13 +54,13 @@
 
 ### Implementation for User Story 1
 
-- [ ] T014 [US1] Implement createEventAction server action at `web/src/features/events/actions/events.actions.ts`
-- [ ] T015 [US1] Implement listEventsAction server action at `web/src/features/events/actions/events.actions.ts`
-- [ ] T016 [US1] Create useEvents real-time hook at `web/src/features/events/hooks/useEvents.ts`
-- [ ] T017 [P] [US1] Create EventCard component at `web/src/features/events/components/EventCard.tsx`
-- [ ] T018 [US1] Create EventList component with empty state at `web/src/features/events/components/EventList.tsx`
-- [ ] T019 [US1] Create CreateEventDialog component at `web/src/features/events/components/CreateEventDialog.tsx`
-- [ ] T020 [US1] Update ProjectEventsTab to render EventList at `web/src/features/projects/components/ProjectEventsTab.tsx`
+- [x] T014 [US1] Implement createEventAction server action at `web/src/features/events/actions/events.actions.ts`
+- [x] T015 [US1] Implement listEventsAction server action at `web/src/features/events/actions/events.actions.ts`
+- [x] T016 [US1] Create useEvents real-time hook at `web/src/features/events/hooks/useEvents.ts`
+- [x] T017 [P] [US1] Create EventCard component at `web/src/features/events/components/EventCard.tsx`
+- [x] T018 [US1] Create EventList component with empty state at `web/src/features/events/components/EventList.tsx`
+- [x] T019 [US1] Create CreateEventDialog component at `web/src/features/events/components/CreateEventDialog.tsx`
+- [x] T020 [US1] Update ProjectEventsTab to render EventList at `web/src/features/projects/components/ProjectEventsTab.tsx`
 
 **Checkpoint**: User Story 1 complete - can create events and see them in the list
 
@@ -74,11 +74,11 @@
 
 ### Implementation for User Story 2
 
-- [ ] T021 [US2] Implement getEventAction server action at `web/src/features/events/actions/events.actions.ts`
-- [ ] T022 [US2] Implement updateEventThemeAction server action at `web/src/features/events/actions/events.actions.ts`
-- [ ] T023 [US2] Create useEvent real-time hook at `web/src/features/events/hooks/useEvent.ts`
-- [ ] T024 [US2] Create EventThemeEditor component (adapt from ThemeEditor) at `web/src/features/events/components/designer/EventThemeEditor.tsx`
-- [ ] T025 [US2] Update theme page to use EventThemeEditor at `web/src/app/(workspace)/[companySlug]/[projectId]/[eventId]/theme/page.tsx`
+- [x] T021 [US2] Implement getEventAction server action at `web/src/features/events/actions/events.actions.ts`
+- [x] T022 [US2] Implement updateEventThemeAction server action at `web/src/features/events/actions/events.actions.ts`
+- [x] T023 [US2] Create useEvent real-time hook at `web/src/features/events/hooks/useEvent.ts`
+- [x] T024 [US2] Create EventThemeEditor component (adapt from ThemeEditor) at `web/src/features/events/components/designer/EventThemeEditor.tsx`
+- [x] T025 [US2] Update theme page to use EventThemeEditor at `web/src/app/(workspace)/[companySlug]/[projectId]/[eventId]/theme/page.tsx`
 
 **Checkpoint**: User Story 2 complete - can customize and save event themes
 
@@ -92,10 +92,10 @@
 
 ### Implementation for User Story 3
 
-- [ ] T026 [US3] Add active event indicator styling to EventCard at `web/src/features/events/components/EventCard.tsx`
-- [ ] T027 [US3] Add navigation link from EventCard to event detail at `web/src/features/events/components/EventCard.tsx`
-- [ ] T028 [P] [US3] Create EventExperiencesTab placeholder component at `web/src/features/events/components/EventExperiencesTab.tsx`
-- [ ] T029 [US3] Update experiences page to use EventExperiencesTab at `web/src/app/(workspace)/[companySlug]/[projectId]/[eventId]/experiences/page.tsx`
+- [x] T026 [US3] Add active event indicator styling to EventCard at `web/src/features/events/components/EventCard.tsx`
+- [x] T027 [US3] Add navigation link from EventCard to event detail at `web/src/features/events/components/EventCard.tsx`
+- [x] T028 [P] [US3] Create EventExperiencesTab placeholder component at `web/src/features/events/components/EventExperiencesTab.tsx`
+- [x] T029 [US3] Update experiences page to use EventExperiencesTab at `web/src/app/(workspace)/[companySlug]/[projectId]/[eventId]/experiences/page.tsx`
 
 **Checkpoint**: User Story 3 complete - can navigate events list and see active indicators
 
@@ -109,9 +109,9 @@
 
 ### Implementation for User Story 4
 
-- [ ] T030 [US4] Implement setActiveEventAction server action at `web/src/features/events/actions/events.actions.ts`
-- [ ] T031 [US4] Add "Set as Active" button to EventCard at `web/src/features/events/components/EventCard.tsx`
-- [ ] T032 [US4] Add active state handling to EventCard (disable button if already active) at `web/src/features/events/components/EventCard.tsx`
+- [x] T030 [US4] Implement setActiveEventAction server action at `web/src/features/events/actions/events.actions.ts`
+- [x] T031 [US4] Add "Set as Active" button to EventCard at `web/src/features/events/components/EventCard.tsx`
+- [x] T032 [US4] Add active state handling to EventCard (disable button if already active) at `web/src/features/events/components/EventCard.tsx`
 
 **Checkpoint**: User Story 4 complete - can set events as active via switchboard pattern
 
@@ -125,9 +125,9 @@
 
 ### Implementation for User Story 5
 
-- [ ] T033 [US5] Implement updateEventAction server action at `web/src/features/events/actions/events.actions.ts`
-- [ ] T034 [US5] Create RenameEventDialog component at `web/src/features/events/components/RenameEventDialog.tsx`
-- [ ] T035 [US5] Add rename action to EventCard menu at `web/src/features/events/components/EventCard.tsx`
+- [x] T033 [US5] Implement updateEventAction server action at `web/src/features/events/actions/events.actions.ts`
+- [x] T034 [US5] Create RenameEventDialog component at `web/src/features/events/components/RenameEventDialog.tsx`
+- [x] T035 [US5] Add rename action to EventCard menu at `web/src/features/events/components/EventCard.tsx`
 
 **Checkpoint**: User Story 5 complete - can rename events
 
@@ -141,9 +141,9 @@
 
 ### Implementation for User Story 6
 
-- [ ] T036 [US6] Implement deleteEventAction server action at `web/src/features/events/actions/events.actions.ts`
-- [ ] T037 [US6] Create DeleteEventDialog component with confirmation at `web/src/features/events/components/DeleteEventDialog.tsx`
-- [ ] T038 [US6] Add delete action to EventCard menu at `web/src/features/events/components/EventCard.tsx`
+- [x] T036 [US6] Implement deleteEventAction server action at `web/src/features/events/actions/events.actions.ts`
+- [x] T037 [US6] Create DeleteEventDialog component with confirmation at `web/src/features/events/components/DeleteEventDialog.tsx`
+- [x] T038 [US6] Add delete action to EventCard menu at `web/src/features/events/components/EventCard.tsx`
 
 **Checkpoint**: User Story 6 complete - can delete events with proper cleanup
 
@@ -153,16 +153,16 @@
 
 **Purpose**: Final cleanup and validation
 
-- [ ] T039 [P] Update feature-level exports in `web/src/features/events/index.ts`
-- [ ] T040 [P] Add error handling and loading states to all components
+- [x] T039 [P] Update feature-level exports in `web/src/features/events/index.ts`
+- [x] T040 [P] Add error handling and loading states to all components
 - [ ] T041 Mobile responsiveness review for all event components
 
 ### Validation Loop (REQUIRED - Constitution Principle V)
 
 **Purpose**: Ensure code quality and correctness before merge
 
-- [ ] T042 Run `pnpm lint` and fix all errors/warnings
-- [ ] T043 Run `pnpm type-check` and resolve all TypeScript errors
+- [x] T042 Run `pnpm lint` and fix all errors/warnings
+- [x] T043 Run `pnpm type-check` and resolve all TypeScript errors
 - [ ] T044 Run `pnpm test` and ensure all tests pass
 - [ ] T045 Verify feature in local dev server (`pnpm dev`)
 - [ ] T046 Manual test: Create event → customize theme → set active flow
