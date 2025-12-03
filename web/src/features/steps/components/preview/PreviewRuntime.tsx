@@ -258,6 +258,9 @@ function StepContent({
     case "reward":
       return <RewardStep step={step} mockSession={mockSession} onCtaClick={onCtaClick} />;
 
+    case "ai-transform":
+      return <PlaceholderStep title="AI Transform" type={step.type} />;
+
     default: {
       // TypeScript exhaustive check
       const _exhaustive: never = step;

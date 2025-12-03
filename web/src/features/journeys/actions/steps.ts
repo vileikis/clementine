@@ -1,27 +1,25 @@
 "use server";
 
 /**
- * Server Actions for step operations.
- * Collection path: /experiences/{experienceId}/steps/{stepId}
+ * @deprecated Use @/features/steps/actions instead
+ * Legacy Server Actions for step operations in journeys.
+ * These actions use the old eventId/journeyId pattern.
  */
 
 import { verifyAdminSecret } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import {
-  createStep,
-  deleteStep,
-  duplicateStep,
-  getStep,
-  listSteps,
-  reorderSteps,
-  updateStep,
-} from "../repositories";
-import { stepTypeSchema, updateStepInputSchema } from "../schemas";
-import { STEP_CONSTANTS } from "../constants";
-import { getExperience } from "@/features/experiences/repositories/experiences.repository";
-import { getCompany } from "@/features/companies/repositories";
-import type { Step } from "../types";
+  createStepLegacy,
+  deleteStepLegacy,
+  duplicateStepLegacy,
+  getStepLegacy,
+  reorderStepsLegacy,
+  updateStepLegacy,
+} from "@/features/steps/repositories/steps.repository";
+import { stepTypeSchema, updateStepInputSchema } from "@/features/steps/schemas";
+import { STEP_CONSTANTS } from "@/features/steps/constants";
+import { getJourney } from "../repositories";
 import type { ActionResponse } from "./types";
 
 // ============================================================================
@@ -29,7 +27,8 @@ import type { ActionResponse } from "./types";
 // ============================================================================
 
 const createStepInputSchema = z.object({
-  experienceId: z.string().min(1),
+  eventId: z.string().min(1),
+  journeyId: z.string().min(1),
   type: stepTypeSchema,
   title: z.string().max(STEP_CONSTANTS.MAX_TITLE_LENGTH).nullish(),
   description: z.string().max(STEP_CONSTANTS.MAX_DESCRIPTION_LENGTH).nullish(),
@@ -39,74 +38,16 @@ const createStepInputSchema = z.object({
 });
 
 // ============================================================================
-// List Steps
-// ============================================================================
-
-/**
- * Lists all steps for an experience in order.
- */
-export async function listStepsAction(
-  experienceId: string
-): Promise<ActionResponse<Step[]>> {
-  try {
-    const steps = await listSteps(experienceId);
-    return { success: true, data: steps };
-  } catch (error) {
-    return {
-      success: false,
-      error: {
-        code: "INTERNAL_ERROR",
-        message: error instanceof Error ? error.message : "Failed to fetch steps",
-      },
-    };
-  }
-}
-
-// ============================================================================
-// Get Step
-// ============================================================================
-
-/**
- * Retrieves a single step by ID.
- */
-export async function getStepAction(
-  experienceId: string,
-  stepId: string
-): Promise<ActionResponse<Step>> {
-  try {
-    const step = await getStep(experienceId, stepId);
-    if (!step) {
-      return {
-        success: false,
-        error: {
-          code: "STEP_NOT_FOUND",
-          message: "Step not found",
-        },
-      };
-    }
-    return { success: true, data: step };
-  } catch (error) {
-    return {
-      success: false,
-      error: {
-        code: "INTERNAL_ERROR",
-        message: error instanceof Error ? error.message : "Failed to fetch step",
-      },
-    };
-  }
-}
-
-// ============================================================================
 // Create Step
 // ============================================================================
 
 /**
- * Creates a new step for an experience.
+ * @deprecated Use createStepAction from @/features/steps/actions
+ * Creates a new step for a journey.
  */
 export async function createStepAction(
   input: z.infer<typeof createStepInputSchema>
 ): Promise<ActionResponse<{ stepId: string }>> {
-  // Verify admin authentication
   const auth = await verifyAdminSecret();
   if (!auth.authorized) {
     return {
@@ -119,35 +60,32 @@ export async function createStepAction(
   }
 
   try {
-    // Validate input
     const validated = createStepInputSchema.parse(input);
 
-    // Validate experience exists
-    const experience = await getExperience(validated.experienceId);
-    if (!experience) {
+    const journey = await getJourney(validated.eventId, validated.journeyId);
+    if (!journey) {
       return {
         success: false,
         error: {
-          code: "EXPERIENCE_NOT_FOUND",
-          message: "Experience not found",
+          code: "JOURNEY_NOT_FOUND",
+          message: "Journey not found",
         },
       };
     }
 
-    // Check max steps limit
-    if (experience.stepsOrder.length >= STEP_CONSTANTS.MAX_STEPS_PER_JOURNEY) {
+    if (journey.stepOrder.length >= STEP_CONSTANTS.MAX_STEPS_PER_JOURNEY) {
       return {
         success: false,
         error: {
           code: "MAX_STEPS_EXCEEDED",
-          message: `Cannot exceed ${STEP_CONSTANTS.MAX_STEPS_PER_JOURNEY} steps per experience`,
+          message: `Cannot exceed ${STEP_CONSTANTS.MAX_STEPS_PER_JOURNEY} steps per journey`,
         },
       };
     }
 
-    // Create step
-    const stepId = await createStep({
-      experienceId: validated.experienceId,
+    const stepId = await createStepLegacy({
+      eventId: validated.eventId,
+      journeyId: validated.journeyId,
       type: validated.type,
       title: validated.title,
       description: validated.description,
@@ -156,11 +94,9 @@ export async function createStepAction(
       config: validated.config,
     });
 
-    // Revalidate cache
-    const company = await getCompany(experience.companyId);
-    if (company) {
-      revalidatePath(`/${company.slug}/exps/${validated.experienceId}`);
-    }
+    revalidatePath(
+      `/events/${validated.eventId}/journeys/${validated.journeyId}`
+    );
 
     return { success: true, data: { stepId } };
   } catch (error) {
@@ -190,14 +126,14 @@ export async function createStepAction(
 // ============================================================================
 
 /**
+ * @deprecated Use updateStepAction from @/features/steps/actions
  * Updates an existing step.
  */
 export async function updateStepAction(
-  experienceId: string,
+  eventId: string,
   stepId: string,
   input: z.infer<typeof updateStepInputSchema>
 ): Promise<ActionResponse<void>> {
-  // Verify admin authentication
   const auth = await verifyAdminSecret();
   if (!auth.authorized) {
     return {
@@ -210,23 +146,9 @@ export async function updateStepAction(
   }
 
   try {
-    // Validate input
     const validated = updateStepInputSchema.parse(input);
 
-    // Verify experience exists
-    const experience = await getExperience(experienceId);
-    if (!experience) {
-      return {
-        success: false,
-        error: {
-          code: "EXPERIENCE_NOT_FOUND",
-          message: "Experience not found",
-        },
-      };
-    }
-
-    // Verify step exists
-    const existingStep = await getStep(experienceId, stepId);
+    const existingStep = await getStepLegacy(eventId, stepId);
     if (!existingStep) {
       return {
         success: false,
@@ -237,8 +159,7 @@ export async function updateStepAction(
       };
     }
 
-    // Update step
-    await updateStep(experienceId, stepId, {
+    await updateStepLegacy(eventId, stepId, {
       title: validated.title,
       description: validated.description,
       mediaUrl: validated.mediaUrl,
@@ -247,11 +168,9 @@ export async function updateStepAction(
       config: validated.config,
     });
 
-    // Revalidate cache
-    const company = await getCompany(experience.companyId);
-    if (company) {
-      revalidatePath(`/${company.slug}/exps/${experienceId}`);
-    }
+    revalidatePath(
+      `/events/${eventId}/journeys/${existingStep.journeyId!}`
+    );
 
     return { success: true, data: undefined };
   } catch (error) {
@@ -281,13 +200,13 @@ export async function updateStepAction(
 // ============================================================================
 
 /**
- * Deletes a step from an experience.
+ * @deprecated Use deleteStepAction from @/features/steps/actions
+ * Deletes a step from a journey.
  */
 export async function deleteStepAction(
-  experienceId: string,
+  eventId: string,
   stepId: string
 ): Promise<ActionResponse<void>> {
-  // Verify admin authentication
   const auth = await verifyAdminSecret();
   if (!auth.authorized) {
     return {
@@ -300,20 +219,7 @@ export async function deleteStepAction(
   }
 
   try {
-    // Verify experience exists
-    const experience = await getExperience(experienceId);
-    if (!experience) {
-      return {
-        success: false,
-        error: {
-          code: "EXPERIENCE_NOT_FOUND",
-          message: "Experience not found",
-        },
-      };
-    }
-
-    // Verify step exists
-    const existingStep = await getStep(experienceId, stepId);
+    const existingStep = await getStepLegacy(eventId, stepId);
     if (!existingStep) {
       return {
         success: false,
@@ -324,14 +230,11 @@ export async function deleteStepAction(
       };
     }
 
-    // Delete step
-    await deleteStep(experienceId, stepId);
+    await deleteStepLegacy(eventId, stepId, existingStep.journeyId!);
 
-    // Revalidate cache
-    const company = await getCompany(experience.companyId);
-    if (company) {
-      revalidatePath(`/${company.slug}/exps/${experienceId}`);
-    }
+    revalidatePath(
+      `/events/${eventId}/journeys/${existingStep.journeyId!}`
+    );
 
     return { success: true, data: undefined };
   } catch (error) {
@@ -350,13 +253,14 @@ export async function deleteStepAction(
 // ============================================================================
 
 /**
- * Reorders steps within an experience.
+ * @deprecated Use reorderStepsAction from @/features/steps/actions
+ * Reorders steps within a journey.
  */
 export async function reorderStepsAction(
-  experienceId: string,
+  eventId: string,
+  journeyId: string,
   newOrder: string[]
 ): Promise<ActionResponse<void>> {
-  // Verify admin authentication
   const auth = await verifyAdminSecret();
   if (!auth.authorized) {
     return {
@@ -369,20 +273,18 @@ export async function reorderStepsAction(
   }
 
   try {
-    // Validate experience exists
-    const experience = await getExperience(experienceId);
-    if (!experience) {
+    const journey = await getJourney(eventId, journeyId);
+    if (!journey) {
       return {
         success: false,
         error: {
-          code: "EXPERIENCE_NOT_FOUND",
-          message: "Experience not found",
+          code: "JOURNEY_NOT_FOUND",
+          message: "Journey not found",
         },
       };
     }
 
-    // Validate newOrder contains same step IDs as current order
-    const currentSet = new Set(experience.stepsOrder);
+    const currentSet = new Set(journey.stepOrder);
     const newSet = new Set(newOrder);
 
     if (currentSet.size !== newSet.size) {
@@ -401,20 +303,15 @@ export async function reorderStepsAction(
           success: false,
           error: {
             code: "VALIDATION_ERROR",
-            message: `Step ${id} not found in experience`,
+            message: `Step ${id} not found in journey`,
           },
         };
       }
     }
 
-    // Update order
-    await reorderSteps(experienceId, newOrder);
+    await reorderStepsLegacy(eventId, journeyId, newOrder);
 
-    // Revalidate cache
-    const company = await getCompany(experience.companyId);
-    if (company) {
-      revalidatePath(`/${company.slug}/exps/${experienceId}`);
-    }
+    revalidatePath(`/events/${eventId}/journeys/${journeyId}`);
 
     return { success: true, data: undefined };
   } catch (error) {
@@ -434,13 +331,13 @@ export async function reorderStepsAction(
 // ============================================================================
 
 /**
- * Duplicates a step within the same experience.
+ * @deprecated Use duplicateStepAction from @/features/steps/actions
+ * Duplicates a step within the same journey.
  */
 export async function duplicateStepAction(
-  experienceId: string,
+  eventId: string,
   stepId: string
 ): Promise<ActionResponse<{ stepId: string }>> {
-  // Verify admin authentication
   const auth = await verifyAdminSecret();
   if (!auth.authorized) {
     return {
@@ -453,20 +350,7 @@ export async function duplicateStepAction(
   }
 
   try {
-    // Verify experience exists
-    const experience = await getExperience(experienceId);
-    if (!experience) {
-      return {
-        success: false,
-        error: {
-          code: "EXPERIENCE_NOT_FOUND",
-          message: "Experience not found",
-        },
-      };
-    }
-
-    // Verify step exists
-    const existingStep = await getStep(experienceId, stepId);
+    const existingStep = await getStepLegacy(eventId, stepId);
     if (!existingStep) {
       return {
         success: false,
@@ -477,25 +361,25 @@ export async function duplicateStepAction(
       };
     }
 
-    // Check max steps limit
-    if (experience.stepsOrder.length >= STEP_CONSTANTS.MAX_STEPS_PER_JOURNEY) {
+    const journey = await getJourney(eventId, existingStep.journeyId!);
+    if (
+      journey &&
+      journey.stepOrder.length >= STEP_CONSTANTS.MAX_STEPS_PER_JOURNEY
+    ) {
       return {
         success: false,
         error: {
           code: "MAX_STEPS_EXCEEDED",
-          message: `Cannot exceed ${STEP_CONSTANTS.MAX_STEPS_PER_JOURNEY} steps per experience`,
+          message: `Cannot exceed ${STEP_CONSTANTS.MAX_STEPS_PER_JOURNEY} steps per journey`,
         },
       };
     }
 
-    // Duplicate step
-    const newStepId = await duplicateStep(experienceId, stepId);
+    const newStepId = await duplicateStepLegacy(eventId, stepId);
 
-    // Revalidate cache
-    const company = await getCompany(experience.companyId);
-    if (company) {
-      revalidatePath(`/${company.slug}/exps/${experienceId}`);
-    }
+    revalidatePath(
+      `/events/${eventId}/journeys/${existingStep.journeyId!}`
+    );
 
     return { success: true, data: { stepId: newStepId } };
   } catch (error) {

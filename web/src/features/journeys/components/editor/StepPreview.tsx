@@ -86,6 +86,8 @@ function StepContent({
       return <EmailStep step={step} />;
     case "capture":
       return <CaptureStep step={step} aiPresets={aiPresets} mockSession={mockSession} />;
+    case "ai-transform":
+      return <PlaceholderStep title="AI Transform" type={step.type} />;
     case "processing":
       return <ProcessingStep step={step} />;
     case "reward":

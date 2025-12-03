@@ -12,6 +12,7 @@ export type StepType =
   | "info"
   | "experience-picker"
   | "capture"
+  | "ai-transform"
   | "short_text"
   | "long_text"
   | "multiple_choice"
@@ -37,8 +38,7 @@ export type ShareSocial =
  */
 export interface StepBase {
   id: string;
-  eventId: string;
-  journeyId: string;
+  experienceId: string;
   type: StepType;
   title?: string | null;
   description?: string | null;
@@ -47,6 +47,10 @@ export interface StepBase {
   ctaLabel?: string | null;
   createdAt: number;
   updatedAt: number;
+  /** @deprecated Used for backwards compatibility with legacy journeys */
+  eventId?: string;
+  /** @deprecated Used for backwards compatibility with legacy journeys */
+  journeyId?: string;
 }
 
 // ============================================================================
@@ -69,6 +73,46 @@ export interface StepCapture extends StepBase {
     source: string;
     fallbackExperienceId?: string | null;
   };
+}
+
+/**
+ * AI Transform variable - maps prompt variables to input sources
+ */
+export interface AiTransformVariable {
+  /** Variable name in prompt (without {{}} syntax) */
+  key: string;
+  /** Where the value comes from */
+  sourceType: "capture" | "input" | "static";
+  /** Step ID if sourceType is "capture" or "input" */
+  sourceStepId?: string;
+  /** Value if sourceType is "static" */
+  staticValue?: string;
+}
+
+/**
+ * AI Transform step configuration
+ */
+export interface AiTransformConfig {
+  /** AI model identifier (e.g., "gemini-2.5-flash-image", "flux") */
+  model: string | null;
+  /** Prompt template with {{variable}} placeholders, max 1000 chars */
+  prompt: string | null;
+  /** How prompt variables are populated */
+  variables: AiTransformVariable[];
+  /** Result format */
+  outputType: "image" | "video" | "gif";
+  /** Aspect ratio (e.g., "1:1", "3:4", "4:3", "9:16", "16:9") */
+  aspectRatio: string;
+  /** Up to 5 reference image URLs */
+  referenceImageUrls: string[];
+}
+
+/**
+ * AI Transform step - AI-powered photo transformation
+ */
+export interface StepAiTransform extends StepBase {
+  type: "ai-transform";
+  config: AiTransformConfig;
 }
 
 /**
@@ -192,6 +236,7 @@ export interface StepReward extends StepBase {
 export type Step =
   | StepInfo
   | StepCapture
+  | StepAiTransform
   | StepShortText
   | StepLongText
   | StepMultipleChoice

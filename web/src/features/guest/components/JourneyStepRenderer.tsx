@@ -43,7 +43,6 @@ interface JourneyStepRendererProps {
  */
 export function JourneyStepRenderer({
   step,
-  experiences = [],
   sessionId,
   eventId,
   inputValues = {},
@@ -268,6 +267,16 @@ export function JourneyStepRenderer({
           />
           {ErrorDisplay}
         </>
+      );
+
+    case "ai-transform":
+      return (
+        <div className="flex flex-col items-center justify-center h-screen p-4 text-center">
+          <div className="text-lg font-medium mb-2">AI Transform</div>
+          <div className="text-sm opacity-60">
+            AI Transform step runtime will be available in a future phase.
+          </div>
+        </div>
       );
 
     default: {
