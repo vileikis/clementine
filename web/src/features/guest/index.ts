@@ -11,8 +11,9 @@ export { GuestFlowContainer } from "./components/GuestFlowContainer";
 export { ResultViewer } from "./components/ResultViewer";
 export { RetakeButton } from "./components/RetakeButton";
 
-// Journey Runtime Components (Phase 3)
-export { JourneyGuestContainer } from "./components/JourneyGuestContainer";
+// Step Components
+// NOTE: JourneyGuestContainer and useJourneyRuntime deleted in Phase 3 cleanup.
+// Phase 7 Experience Engine will provide the new guest runtime.
 export { JourneyStepRenderer } from "./components/JourneyStepRenderer";
 export { GuestCaptureStep } from "./components/GuestCaptureStep";
 export { GuestProcessingStep } from "./components/GuestProcessingStep";
@@ -28,7 +29,6 @@ export { EventUnavailableScreen } from "./components/EventUnavailableScreen";
 // ============================================================================
 export { useCamera } from "./hooks/useCamera";
 export { useGuestFlow } from "./hooks/useGuestFlow";
-export { useJourneyRuntime } from "./hooks/useJourneyRuntime";
 
 // ============================================================================
 // Utilities - Client-side camera capture

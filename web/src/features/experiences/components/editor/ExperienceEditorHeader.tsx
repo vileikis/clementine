@@ -11,6 +11,7 @@ import Link from "next/link";
 import { ArrowLeft, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Experience } from "../../types";
+import { ExperienceTabs } from "./ExperienceTabs";
 
 interface ExperienceEditorHeaderProps {
   companySlug: string;
@@ -36,7 +37,7 @@ export function ExperienceEditorHeader({
       </Button>
 
       {/* Experience Name - Clickable to rename */}
-      <div className="flex-1 min-w-0">
+      <div className="min-w-20">
         <button
           onClick={onRenameClick}
           className="text-left hover:bg-accent px-2 py-1 -ml-2 rounded-md transition-colors"
@@ -47,6 +48,11 @@ export function ExperienceEditorHeader({
           </p>
         </button>
       </div>
+
+      <div className="flex-1">
+        <ExperienceTabs companySlug={companySlug} experienceId={experience.id} />
+      </div>
+
 
       {/* Play Experience Button */}
       {onPlayClick && (

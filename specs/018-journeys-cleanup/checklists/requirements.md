@@ -1,7 +1,7 @@
-# Specification Quality Checklist: Journey Init
+# Specification Quality Checklist: Journeys Module Cleanup
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
-**Created**: 2024-11-25
+**Created**: 2025-12-03
 **Feature**: [spec.md](../spec.md)
 
 ## Content Quality
@@ -31,7 +31,7 @@
 
 ## Notes
 
-- All checklist items pass validation
-- Spec is ready for `/speckit.clarify` or `/speckit.plan`
-- Key assumptions documented: auth already handled, journey names don't need uniqueness, reuses existing switchboard action
-- Out of scope items clearly defined: journey editor, steps collection, tags management
+- This is a cleanup/deletion task, so requirements are straightforward
+- Guest module is explicitly out of scope (will be rewritten in Phase 7)
+- Success criteria focus on verification commands (grep, build, type-check) which are appropriate for a cleanup task
+- All items pass - ready for `/speckit.plan`
