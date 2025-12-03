@@ -131,7 +131,10 @@ export function EventThemeEditor({ event, projectId }: EventThemeEditorProps) {
         toast.success("Theme settings updated successfully");
         router.refresh();
       } else {
-        toast.error(result.error.message || "Failed to update theme settings");
+        if (!result.error) {
+          console.warn("updateEventThemeAction returned failure without error details");
+        }
+        toast.error(result.error?.message || "Failed to update theme settings");
       }
     });
   };

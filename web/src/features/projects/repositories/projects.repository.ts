@@ -134,3 +134,16 @@ export async function deleteProject(projectId: string): Promise<void> {
     updatedAt: now,
   });
 }
+
+/**
+ * Generic project update - merges provided data with updatedAt timestamp
+ */
+export async function updateProject(
+  projectId: string,
+  data: Partial<Omit<Project, "id" | "createdAt" | "updatedAt">>
+): Promise<void> {
+  await db.collection("projects").doc(projectId).update({
+    ...data,
+    updatedAt: Date.now(),
+  });
+}

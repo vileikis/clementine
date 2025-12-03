@@ -6,5 +6,6 @@ export {
   listProjects,
   updateProjectStatus,
   updateProjectName,
+  updateProject,
   deleteProject,
 } from "./projects.repository";
