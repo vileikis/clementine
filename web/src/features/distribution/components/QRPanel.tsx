@@ -4,12 +4,17 @@ import { useState, useEffect } from "react"
 import { generateQrCodeAction, regenerateQrCodeAction } from "@/features/distribution"
 
 interface QRPanelProps {
-  eventId: string
-  joinUrl: string
+  projectId: string
+  shareUrl: string
   qrPngPath: string
 }
 
-export function QRPanel({ eventId, joinUrl, qrPngPath }: QRPanelProps) {
+export function QRPanel({
+  projectId,
+  shareUrl,
+  qrPngPath,
+}: QRPanelProps) {
+
   const [qrUrl, setQrUrl] = useState<string | null>(null)
   const [isGenerating, setIsGenerating] = useState(false)
   const [isRegenerating, setIsRegenerating] = useState(false)
@@ -27,7 +32,7 @@ export function QRPanel({ eventId, joinUrl, qrPngPath }: QRPanelProps) {
       setIsGenerating(true)
       setQrError(null)
 
-      const result = await generateQrCodeAction(eventId, joinUrl, qrPngPath)
+      const result = await generateQrCodeAction(projectId, shareUrl, qrPngPath)
 
       if (result.success && result.qrUrl) {
         setQrUrl(result.qrUrl)
@@ -46,7 +51,7 @@ export function QRPanel({ eventId, joinUrl, qrPngPath }: QRPanelProps) {
       setIsRegenerating(true)
       setQrError(null)
 
-      const result = await regenerateQrCodeAction(eventId, joinUrl, qrPngPath)
+      const result = await regenerateQrCodeAction(projectId, shareUrl, qrPngPath)
 
       if (result.success && result.qrUrl) {
         setQrUrl(result.qrUrl)
@@ -66,7 +71,7 @@ export function QRPanel({ eventId, joinUrl, qrPngPath }: QRPanelProps) {
 
       // Try modern clipboard API first
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        await navigator.clipboard.writeText(joinUrl)
+        await navigator.clipboard.writeText(shareUrl)
         setIsCopied(true)
         setTimeout(() => setIsCopied(false), 2000)
         return
@@ -74,7 +79,7 @@ export function QRPanel({ eventId, joinUrl, qrPngPath }: QRPanelProps) {
 
       // Fallback to older method
       const textArea = document.createElement("textarea")
-      textArea.value = joinUrl
+      textArea.value = shareUrl
       textArea.style.position = "fixed"
       textArea.style.left = "-999999px"
       textArea.setAttribute("readonly", "")
@@ -106,32 +111,32 @@ export function QRPanel({ eventId, joinUrl, qrPngPath }: QRPanelProps) {
 
     const link = document.createElement("a")
     link.href = qrUrl
-    link.download = `event-${eventId}-qr.png`
+    link.download = `project-${projectId}-qr.png`
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
   }
 
   const handleOpenGuestView = () => {
-    window.open(joinUrl, "_blank")
+    window.open(shareUrl, "_blank")
   }
 
   return (
     <div className="space-y-6">
-      {/* Join URL Section */}
+      {/* Share URL Section */}
       <div>
-        <h3 className="text-lg font-semibold mb-3">Join URL</h3>
+        <h3 className="text-lg font-semibold mb-3">Share URL</h3>
         <div className="p-4 border rounded-lg space-y-3">
           <div className="flex items-center gap-2">
             <input
               type="text"
-              value={joinUrl}
+              value={shareUrl}
               readOnly
               className="flex-1 px-3 py-2 border border-input rounded-md bg-muted font-mono text-sm"
             />
             <button
               onClick={handleCopyUrl}
-              className="px-4 py-2 text-sm font-medium border border-input rounded-md hover:bg-muted transition-colors"
+              className="px-4 py-2 min-h-[44px] text-sm font-medium border border-input rounded-md hover:bg-muted transition-colors"
             >
               {isCopied ? "Copied!" : "Copy"}
             </button>
@@ -143,7 +148,7 @@ export function QRPanel({ eventId, joinUrl, qrPngPath }: QRPanelProps) {
           )}
           <button
             onClick={handleOpenGuestView}
-            className="w-full px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+            className="w-full px-4 py-2 min-h-[44px] text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
           >
             Open Guest View
           </button>
@@ -175,7 +180,7 @@ export function QRPanel({ eventId, joinUrl, qrPngPath }: QRPanelProps) {
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={qrUrl}
-                  alt="Event Join QR Code"
+                  alt="Project Share QR Code"
                   className="max-w-full h-auto"
                   style={{ maxWidth: "256px" }}
                 />
@@ -183,14 +188,14 @@ export function QRPanel({ eventId, joinUrl, qrPngPath }: QRPanelProps) {
               <div className="grid grid-cols-2 gap-2">
                 <button
                   onClick={handleDownloadQr}
-                  className="px-4 py-2 text-sm font-medium border border-input rounded-md hover:bg-muted transition-colors"
+                  className="px-4 py-2 min-h-[44px] text-sm font-medium border border-input rounded-md hover:bg-muted transition-colors"
                 >
                   Download QR Code
                 </button>
                 <button
                   onClick={handleRegenerateQr}
                   disabled={isRegenerating}
-                  className="px-4 py-2 text-sm font-medium border border-input rounded-md hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 min-h-[44px] text-sm font-medium border border-input rounded-md hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Regenerate QR Code
                 </button>
@@ -204,7 +209,7 @@ export function QRPanel({ eventId, joinUrl, qrPngPath }: QRPanelProps) {
       <div className="p-4 bg-muted rounded-lg">
         <h4 className="text-sm font-medium mb-2">How to use</h4>
         <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
-          <li>Share the join URL via email, SMS, or social media</li>
+          <li>Share the URL via email, SMS, or social media</li>
           <li>Display the QR code at your event for guests to scan</li>
           <li>Download the QR code to print or add to promotional materials</li>
         </ul>

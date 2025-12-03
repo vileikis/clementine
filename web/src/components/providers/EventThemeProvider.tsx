@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useMemo, type ReactNode } from "react";
-import type { EventTheme } from "@/features/events/types";
+import type { ProjectTheme as EventTheme } from "@/features/projects/types";
 
 interface EventThemeContextValue {
   theme: EventTheme;

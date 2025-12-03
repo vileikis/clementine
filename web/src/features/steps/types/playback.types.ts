@@ -6,7 +6,7 @@
  */
 
 import type { Step } from "./step.types";
-import type { EventTheme } from "@/features/events/types";
+import type { ProjectTheme as EventTheme } from "@/features/projects/types";
 import type { AiPreset } from "@/features/ai-presets/types";
 import type { MockSessionData } from "./preview.types";
 

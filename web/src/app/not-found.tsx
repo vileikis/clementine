@@ -10,10 +10,10 @@ export default function NotFound() {
           The page you&rsquo;re looking for doesn&rsquo;t exist.
         </p>
         <Link
-          href="/events"
+          href="/"
           className="inline-flex items-center justify-center rounded-md bg-primary px-6 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
         >
-          Go to Events
+          Go Home
         </Link>
       </div>
     </div>

@@ -11,7 +11,7 @@ import {
   getJourney,
   deleteJourney,
 } from "../repositories/journeys.repository";
-import { getEvent } from "@/features/events/repositories/events";
+import { getProject } from "@/features/projects/repositories/projects.repository";
 import { createJourneyInput } from "../schemas";
 import { verifyAdminSecret } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
@@ -108,7 +108,7 @@ export async function createJourneyAction(
     const validated = createJourneyInput.parse(input);
 
     // Validate event exists
-    const event = await getEvent(validated.eventId);
+    const event = await getProject(validated.eventId);
     if (!event) {
       return {
         success: false,
@@ -198,21 +198,21 @@ export async function deleteJourneyAction(
     }
 
     // Get event to check if this is the active journey
-    const event = await getEvent(eventId);
+    const event = await getProject(eventId);
 
     // Soft delete the journey
     await deleteJourney(eventId, journeyId);
 
     // If this was the active journey, clear it from the event
-    if (event && event.activeJourneyId === journeyId) {
-      await db.collection("events").doc(eventId).update({
-        activeJourneyId: null,
+    if (event && event.activeEventId === journeyId) {
+      await db.collection("projects").doc(eventId).update({
+        activeEventId: null,
         updatedAt: Date.now(),
       });
     }
 
     // Revalidate cache
-    revalidatePath(`/events/${eventId}/journeys`);
+    revalidatePath(`/projects/${eventId}/journeys`);
 
     return { success: true, data: undefined };
   } catch (error) {

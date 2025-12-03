@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Plus, Route } from "lucide-react";
 import type { Journey } from "../types";
-import type { Event } from "@/features/events/types/event.types";
+import type { Project as Event } from "@/features/projects/types/project.types";
 import { JourneyCard } from "./JourneyCard";
 import { CreateJourneyDialog } from "./CreateJourneyDialog";
 import { useState } from "react";
@@ -67,7 +67,7 @@ export function JourneyList({ journeys, event }: JourneyListProps) {
               key={journey.id}
               journey={journey}
               eventId={event.id}
-              isActive={event.activeJourneyId === journey.id}
+              isActive={event.activeEventId === journey.id}
             />
           ))}
         </div>
