@@ -1,5 +1,6 @@
 'use client';
 
+import { cn } from '@/lib/utils';
 import { NAVIGATION_ITEMS } from '../constants';
 import { SidebarNavItem } from './SidebarNavItem';
 
@@ -14,7 +15,7 @@ interface SidebarNavProps {
  */
 export function SidebarNav({ basePath, isCollapsed }: SidebarNavProps) {
   return (
-    <nav className="flex-1 px-2 py-2 space-y-1">
+    <nav className={cn("flex-1 px-2 py-2 space-y-4", isCollapsed && "px-0")}>
       {NAVIGATION_ITEMS.map((item) => (
         <SidebarNavItem
           key={item.id}

@@ -41,7 +41,7 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
  */
 export const SIDEBAR_WIDTH = {
   expanded: 256, // px
-  collapsed: 72, // px
+  collapsed: 74, // px
 } as const;
 
 /**
