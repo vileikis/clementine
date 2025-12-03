@@ -49,7 +49,7 @@ export function ExperienceEditorHeader({
         </button>
       </div>
 
-      <div className="flex-1">
+      <div className="flex flex-1 justify-center">
         <ExperienceTabs companySlug={companySlug} experienceId={experience.id} />
       </div>
 
