@@ -191,7 +191,6 @@ function renderEditor(
       return (
         <AiTransformEditor
           step={step as StepAiTransform}
-          companyId={companyId}
           onUpdate={onUpdate}
           onPreviewChange={onPreviewChange}
         />
