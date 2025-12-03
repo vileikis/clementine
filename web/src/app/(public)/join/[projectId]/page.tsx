@@ -1,14 +1,9 @@
 import { getProjectAction } from "@/features/projects/actions"
 import { getCompanyStatus } from "@/features/companies/repositories/companies.repository"
-import {
-  getJourneyForGuestAction,
-  getExperiencesForGuestAction,
-} from "@/features/sessions/actions"
 import { notFound } from "next/navigation"
 import {
   BrandThemeProvider,
   GuestFlowContainer,
-  JourneyGuestContainer,
   EventUnavailableScreen,
 } from "@/features/guest"
 
@@ -48,43 +43,9 @@ export default async function JoinPage({ params }: JoinPageProps) {
     )
   }
 
-  // Route based on activeEventId - new journey flow vs legacy flow
-  if (project.activeEventId) {
-    // Load journey and steps
-    const journeyResult = await getJourneyForGuestAction(
-      project.id,
-      project.activeEventId
-    )
-
-    // Load experiences for experience-picker steps
-    const experiencesResult = await getExperiencesForGuestAction(project.id)
-
-    // Validate journey exists and has steps
-    if (
-      journeyResult.success &&
-      journeyResult.journey &&
-      journeyResult.steps.length > 0 &&
-      experiencesResult.success
-    ) {
-      return (
-        <JourneyGuestContainer
-          event={project}
-          journey={journeyResult.journey}
-          steps={journeyResult.steps}
-          experiences={experiencesResult.experiences}
-        />
-      )
-    }
-
-    // Journey not found or has no steps - show error
-    return (
-      <EventUnavailableScreen
-        message="This experience is not configured. Please contact the organizer."
-      />
-    )
-  }
-
-  // Fallback to legacy flow when no activeJourneyId
+  // Legacy guest flow
+  // Note: Journey-based flow (JourneyGuestContainer) removed in Phase 3 cleanup.
+  // Experience Engine (Phase 7) will provide the new guest flow.
   return (
     <BrandThemeProvider brandColor={project.theme.primaryColor}>
       <GuestFlowContainer

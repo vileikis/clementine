@@ -12,7 +12,6 @@ import {
   saveStepData,
 } from "../repositories";
 import { getProject } from "@/features/projects/repositories/projects.repository";
-import { getJourney, listStepsLegacy } from "@/features/journeys/repositories";
 import { getExperience } from "@/features/experiences/repositories/experiences.repository";
 import { listSteps } from "@/features/steps/repositories/steps.repository";
 import {
@@ -27,7 +26,6 @@ import {
 import { getAIClient } from "@/lib/ai/client";
 import type { TransformParams } from "@/lib/ai/types";
 import { revalidatePath } from "next/cache";
-import type { Journey } from "@/features/journeys";
 import type { Step } from "@/features/steps";
 import type { Experience as AiPreset } from "@/features/ai-presets";
 import type { Experience } from "@/features/experiences/types";
@@ -364,26 +362,6 @@ export async function selectExperienceAction(
   // Save to session data
   await saveStepData(eventId, sessionId, "selected_experience_id", experienceId);
   return { success: true };
-}
-
-/**
- * @deprecated Use getExperienceForGuestAction instead
- * Loads journey definition and steps for guest display.
- */
-export async function getJourneyForGuestAction(
-  eventId: string,
-  journeyId: string
-): Promise<
-  | { success: true; journey: Journey; steps: Step[] }
-  | { success: false; error: string }
-> {
-  const journey = await getJourney(eventId, journeyId);
-  if (!journey) {
-    return { success: false, error: "Journey not found" };
-  }
-
-  const steps = await listStepsLegacy(eventId, journeyId);
-  return { success: true, journey, steps };
 }
 
 /**
