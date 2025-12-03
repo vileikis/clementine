@@ -62,7 +62,7 @@
 - [x] T014 [US1] Implement variables list management (add/remove/edit) in AiTransformEditor
 - [x] T015 [US1] Implement output type selector (image/video/gif) in AiTransformEditor
 - [x] T016 [US1] Implement aspect ratio selector in AiTransformEditor
-- [ ] T017 [US1] Implement reference images upload (max 5) using StepMediaUpload in AiTransformEditor
+- [x] T017 [US1] Implement reference images upload (max 5) using ImageUploadField in AiTransformEditor
 - [x] T018 [US1] Wire AiTransformEditor to react-hook-form with zodResolver for aiTransformConfigSchema
 - [x] T019 [US1] Add auto-save on form changes using form.watch pattern in AiTransformEditor
 - [x] T020 [US1] Export AiTransformEditor from `web/src/features/steps/components/editors/index.ts`

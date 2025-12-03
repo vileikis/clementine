@@ -11,6 +11,7 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import Image from "next/image";
 import { Form } from "@/components/ui/form";
 import {
   FormField,
@@ -21,6 +22,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -28,6 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ImageUploadField } from "@/components/shared/ImageUploadField";
 import { useAutoSave } from "../../hooks";
 import type { StepAiTransform } from "../../types";
 
@@ -202,13 +206,94 @@ export function AiTransformEditor({
           )}
         />
 
-        {/* Reference Images placeholder */}
-        <div className="space-y-2">
-          <h4 className="text-sm font-medium">Reference Images</h4>
-          <p className="text-sm text-muted-foreground">
-            Reference image upload will be available in a future update.
-          </p>
-        </div>
+        {/* Reference Images - Multiple upload with horizontal layout */}
+        <FormField
+          control={form.control}
+          name="config.referenceImageUrls"
+          render={({ field }) => {
+            const imageUrls = field.value ?? [];
+            const maxImages = 5;
+            const canAddMore = imageUrls.length < maxImages;
+
+            return (
+              <FormItem>
+                <FormLabel>Reference Images</FormLabel>
+                <FormControl>
+                  <div className="space-y-3">
+                    {/* Display existing images in horizontal flex-wrap layout */}
+                    {imageUrls.length > 0 && (
+                      <div className="flex flex-wrap gap-4">
+                        {imageUrls.map((url, index) => (
+                          <div
+                            key={`${url}-${index}`}
+                            className="relative w-32 h-32 overflow-hidden rounded-lg border bg-muted shrink-0"
+                          >
+                            <Image
+                              src={url}
+                              alt={`Reference ${index + 1}`}
+                              fill
+                              className="object-contain"
+                              unoptimized
+                            />
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              className="absolute top-1 right-1 min-h-[44px] min-w-[44px]"
+                              onClick={() => {
+                                field.onChange(
+                                  imageUrls.filter((_, i) => i !== index)
+                                );
+                                // Trigger auto-save since button clicks don't fire blur
+                                handleBlur();
+                              }}
+                              type="button"
+                            >
+                              Remove
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Add new image uploader (only shown if under max) */}
+                    {canAddMore && (
+                      <ImageUploadField
+                        id={`ai-reference-${step.id}-${imageUrls.length}`}
+                        label={
+                          imageUrls.length === 0
+                            ? "Add Reference Image"
+                            : "Add Another Reference"
+                        }
+                        value=""
+                        onChange={(url: string) => {
+                          if (imageUrls.length < maxImages) {
+                            field.onChange([...imageUrls, url]);
+                            // Trigger auto-save since button clicks don't fire blur
+                            handleBlur();
+                          }
+                        }}
+                        destination="ai-reference"
+                        recommendedSize="Max 10MB. Used to guide AI transformation style."
+                      />
+                    )}
+
+                    {/* Show count and max info */}
+                    {imageUrls.length > 0 && (
+                      <Label className="text-xs text-muted-foreground">
+                        {imageUrls.length}/{maxImages} reference images
+                      </Label>
+                    )}
+                  </div>
+                </FormControl>
+                <FormDescription>
+                  Upload reference images to guide the AI transformation style.
+                  {!canAddMore && " Maximum limit reached."}
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            );
+          }}
+        />
 
         {/* Divider - Output Settings */}
         <div className="border-t pt-4">
