@@ -38,9 +38,8 @@ export default async function EventLayout({
       <EventDetailsHeader
         companySlug={companySlug}
         projectId={projectId}
-        eventId={eventId}
+        event={event}
         projectName={project.name}
-        eventName={event.name}
       />
       <div className="flex-1 overflow-auto">{children}</div>
     </div>
