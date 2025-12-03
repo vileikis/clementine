@@ -13,12 +13,12 @@ import {
 } from "@/features/guest"
 
 interface JoinPageProps {
-  params: Promise<{ eventId: string }>
+  params: Promise<{ projectId: string }>
 }
 
 export default async function JoinPage({ params }: JoinPageProps) {
-  const { eventId } = await params
-  const result = await getProjectAction(eventId)
+  const { projectId } = await params
+  const result = await getProjectAction(projectId)
 
   if (!result.success || !result.project) {
     notFound()
