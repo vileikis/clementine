@@ -10,8 +10,9 @@
     "lint": "pnpm --filter web lint",
     "type-check": "pnpm --filter web type-check",
     "test": "pnpm --filter web test",
-    "firebase:deploy:rules": "firebase deploy --only firestore:rules,storage",
-    "firebase:deploy": "firebase deploy"
+    "fb:deploy": "firebase deploy",
+    "fb:deploy:rules": "firebase deploy --only firestore:rules,storage",
+    "fb:deploy:indexes": "firebase deploy --only firestore:indexes"
   },
   "keywords": [
     "ai",

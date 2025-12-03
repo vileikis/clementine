@@ -1,16 +1,28 @@
+import { notFound } from "next/navigation";
+import { getCompanyBySlugAction } from "@/features/companies/actions";
+import { ProjectList } from "@/features/projects/components";
+
+interface ProjectsPageProps {
+  params: Promise<{ companySlug: string }>;
+}
+
 /**
- * Projects placeholder page
+ * Company projects list page (server component)
  */
-export default function ProjectsPage() {
+export default async function ProjectsPage({ params }: ProjectsPageProps) {
+  const { companySlug } = await params;
+
+  const companyResult = await getCompanyBySlugAction(companySlug);
+  if (!companyResult.success || !companyResult.company) {
+    notFound();
+  }
+
+  const company = companyResult.company;
+
   return (
-    <div className="flex items-center justify-center h-full min-h-[50vh]">
-      <div className="text-center">
-        <h2 className="text-xl font-semibold text-muted-foreground">
-          Coming Soon
-        </h2>
-        <p className="text-sm text-muted-foreground mt-2">
-          Projects feature is under development.
-        </p>
+    <div className="flex flex-col h-full">
+      <div className="flex-1 overflow-auto p-6 pt-8">
+        <ProjectList companyId={company.id} companySlug={company.slug} />
       </div>
     </div>
   );

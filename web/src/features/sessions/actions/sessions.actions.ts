@@ -10,7 +10,7 @@ import {
   updateStepIndex,
   saveStepData,
 } from "../repositories";
-import { getEvent } from "@/features/events/repositories/events";
+import { getProject } from "@/features/projects/repositories/projects.repository";
 import { getJourney } from "@/features/journeys/repositories/journeys.repository";
 import { listSteps } from "@/features/steps/repositories/steps.repository";
 import {
@@ -141,9 +141,9 @@ export async function triggerTransformAction(
     // Mark session as transforming
     await updateSessionState(eventId, sessionId, "transforming");
 
-    const event = await getEvent(eventId);
-    if (!event) {
-      throw new Error("Event not found");
+    const project = await getProject(eventId);
+    if (!project) {
+      throw new Error("Project not found");
     }
 
     // Get experience config for AI transformation
@@ -198,7 +198,7 @@ export async function triggerTransformAction(
       prompt: aiConfig.prompt!,
       inputImageUrl,
       model: aiConfig.model ?? undefined,
-      brandColor: event.theme?.primaryColor,
+      brandColor: project.theme?.primaryColor,
       aspectRatio: aiConfig.aspectRatio || "1:1",
       referenceImageUrls: aiConfig.referenceImageUrls || [],
     };
@@ -359,10 +359,10 @@ export async function getExperiencesForGuestAction(
   | { success: true; experiences: Experience[] }
   | { success: false; error: string }
 > {
-  // Verify event exists
-  const event = await getEvent(eventId);
-  if (!event) {
-    return { success: false, error: "Event not found" };
+  // Verify project exists
+  const project = await getProject(eventId);
+  if (!project) {
+    return { success: false, error: "Project not found" };
   }
 
   // Get all experiences for this event

@@ -19,7 +19,6 @@ import {
 import { createStepInputSchema, updateStepInputSchema } from "../schemas";
 import { STEP_CONSTANTS } from "../constants";
 import { getJourney } from "@/features/journeys/repositories";
-import { getEvent } from "@/features/events/repositories/events";
 import type { Step } from "../types";
 import type { ActionResponse } from "./types";
 
@@ -107,28 +106,6 @@ export async function createStepAction(
   try {
     // Validate input
     const validated = createStepInputSchema.parse(input);
-
-    // Validate event exists and is not archived
-    const event = await getEvent(validated.eventId);
-    if (!event) {
-      return {
-        success: false,
-        error: {
-          code: "EVENT_NOT_FOUND",
-          message: "Event not found",
-        },
-      };
-    }
-
-    if (event.status === "archived") {
-      return {
-        success: false,
-        error: {
-          code: "EVENT_ARCHIVED",
-          message: "Cannot create step for archived event",
-        },
-      };
-    }
 
     // Validate journey exists
     const journey = await getJourney(validated.eventId, validated.journeyId);
