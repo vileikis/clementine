@@ -63,10 +63,19 @@ const ASPECT_RATIOS = [
   { value: "16:9", label: "16:9 (Widescreen)" },
 ] as const;
 
-// Local config schema for form
+// Variable schema for form (matches AiTransformVariable type)
+const aiTransformVariableFormSchema = z.object({
+  key: z.string(),
+  sourceType: z.enum(["capture", "input", "static"]),
+  sourceStepId: z.string().optional(),
+  staticValue: z.string().optional(),
+});
+
+// Local config schema for form - includes variables to preserve them during save
 const aiTransformConfigFormSchema = z.object({
   model: z.string().nullable(),
   prompt: z.string().max(1000).nullable(),
+  variables: z.array(aiTransformVariableFormSchema),
   outputType: z.enum(["image", "video", "gif"]),
   aspectRatio: z.string(),
   referenceImageUrls: z.array(z.string()).max(5),
@@ -108,6 +117,7 @@ export function AiTransformEditor({
       config: {
         model: config.model ?? "",
         prompt: config.prompt ?? "",
+        variables: config.variables ?? [],
         outputType: config.outputType ?? "image",
         aspectRatio: config.aspectRatio ?? "1:1",
         referenceImageUrls: config.referenceImageUrls ?? [],
@@ -129,6 +139,7 @@ export function AiTransformEditor({
       config: {
         model: config.model ?? "",
         prompt: config.prompt ?? "",
+        variables: config.variables ?? [],
         outputType: config.outputType ?? "image",
         aspectRatio: config.aspectRatio ?? "1:1",
         referenceImageUrls: config.referenceImageUrls ?? [],

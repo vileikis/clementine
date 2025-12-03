@@ -184,6 +184,12 @@ export async function deleteStep(
   // Get current stepsOrder from experience
   const experienceRef = getExperiencesCollection().doc(experienceId);
   const experienceDoc = await experienceRef.get();
+
+  // Defensive check: ensure experience exists before attempting batch update
+  if (!experienceDoc.exists) {
+    throw new Error("Experience not found");
+  }
+
   const currentOrder = (experienceDoc.data()?.stepsOrder as string[]) || [];
   const newOrder = currentOrder.filter((id) => id !== stepId);
 
