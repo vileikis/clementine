@@ -49,6 +49,11 @@ export function DeleteEventDialog({
       } else {
         toast.error(result.error?.message || "Failed to delete event");
       }
+    } catch (error) {
+      console.error("Failed to delete event:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Failed to delete event"
+      );
     } finally {
       setIsDeleting(false);
     }

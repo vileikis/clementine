@@ -5,7 +5,6 @@
  * Uses Firebase Admin SDK for all write operations.
  */
 
-import { db } from "@/lib/firebase/admin";
 import {
   createEvent,
   getEvent,
@@ -14,7 +13,10 @@ import {
   updateEventTheme,
   softDeleteEvent,
 } from "../repositories/events.repository";
-import { getProject } from "@/features/projects/repositories/projects.repository";
+import {
+  getProject,
+  updateProject,
+} from "@/features/projects/repositories/projects.repository";
 import {
   createEventInputSchema,
   updateEventInputSchema,
@@ -353,10 +355,7 @@ export async function deleteEventAction(
     const project = await getProject(projectId);
     if (project && project.activeEventId === eventId) {
       // Clear the active event
-      await db.collection("projects").doc(projectId).update({
-        activeEventId: null,
-        updatedAt: Date.now(),
-      });
+      await updateProject(projectId, { activeEventId: null });
     }
 
     // Soft delete the event
@@ -422,10 +421,7 @@ export async function setActiveEventAction(
     }
 
     // Update project's active event
-    await db.collection("projects").doc(projectId).update({
-      activeEventId: eventId,
-      updatedAt: Date.now(),
-    });
+    await updateProject(projectId, { activeEventId: eventId });
 
     revalidatePath(`/[companySlug]/${projectId}/events`);
 

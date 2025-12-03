@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { updateEventAction } from "../actions/events.actions";
+import { NAME_LENGTH } from "../constants";
 import type { Event } from "../types/event.types";
 
 interface RenameEventDialogProps {
@@ -61,7 +62,7 @@ export function RenameEventDialog({
         setError("Name is required");
         return;
       }
-      if (trimmedName.length > 200) {
+      if (trimmedName.length > NAME_LENGTH.MAX) {
         setError("Name is too long");
         return;
       }
