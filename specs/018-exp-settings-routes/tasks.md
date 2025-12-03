@@ -24,10 +24,10 @@
 
 **Purpose**: Extend existing types and schemas to support new preview media fields
 
-- [ ] T001 [P] Add `ExperiencePreviewType` type and extend `Experience` interface with `previewMediaUrl` and `previewType` fields in `web/src/features/experiences/types/experiences.types.ts`
-- [ ] T002 [P] Add `PREVIEW_MEDIA` constraints to `EXPERIENCE_CONSTRAINTS` in `web/src/features/experiences/constants.ts`
-- [ ] T003 Add `experiencePreviewTypeSchema` and `updateExperienceSettingsInputSchema` to `web/src/features/experiences/schemas/experiences.schemas.ts`
-- [ ] T004 Update `experienceSchema` with optional `previewMediaUrl` and `previewType` fields in `web/src/features/experiences/schemas/experiences.schemas.ts`
+- [X] T001 [P] Add `ExperiencePreviewType` type and extend `Experience` interface with `previewMediaUrl` and `previewType` fields in `web/src/features/experiences/types/experiences.types.ts`
+- [X] T002 [P] Add `PREVIEW_MEDIA` constraints to `EXPERIENCE_CONSTRAINTS` in `web/src/features/experiences/constants.ts`
+- [X] T003 Add `experiencePreviewTypeSchema` and `updateExperienceSettingsInputSchema` to `web/src/features/experiences/schemas/experiences.schemas.ts`
+- [X] T004 Update `experienceSchema` with optional `previewMediaUrl` and `previewType` fields in `web/src/features/experiences/schemas/experiences.schemas.ts`
 
 ---
 
@@ -37,8 +37,8 @@
 
 **⚠️ CRITICAL**: Route restructuring cannot begin until this phase is complete
 
-- [ ] T005 Create `updateExperienceSettingsAction` server action in `web/src/features/experiences/actions/experiences.ts`
-- [ ] T006 Export `updateExperienceSettingsAction` from `web/src/features/experiences/actions/index.ts`
+- [X] T005 Create `updateExperienceSettingsAction` server action in `web/src/features/experiences/actions/experiences.ts`
+- [X] T006 Export `updateExperienceSettingsAction` from `web/src/features/experiences/actions/index.ts`
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
@@ -52,10 +52,10 @@
 
 ### Implementation for User Story 1
 
-- [ ] T007 [US1] Create shared layout with ExperienceTabs at `web/src/app/(workspace)/[companySlug]/exps/[expId]/layout.tsx`
-- [ ] T008 [US1] Create design route page at `web/src/app/(workspace)/[companySlug]/exps/[expId]/design/page.tsx` that renders ExperienceEditorClient
-- [ ] T009 [US1] Update base page to redirect to /design at `web/src/app/(workspace)/[companySlug]/exps/[expId]/page.tsx`
-- [ ] T010 [US1] Update ExperienceCard href to point to /design route in `web/src/features/experiences/components/ExperienceCard.tsx`
+- [X] T007 [US1] Create shared layout with ExperienceTabs at `web/src/app/(workspace)/[companySlug]/exps/[expId]/layout.tsx`
+- [X] T008 [US1] Create design route page at `web/src/app/(workspace)/[companySlug]/exps/[expId]/design/page.tsx` that renders ExperienceEditorClient
+- [X] T009 [US1] Update base page to redirect to /design at `web/src/app/(workspace)/[companySlug]/exps/[expId]/page.tsx`
+- [X] T010 [US1] Update ExperienceCard href to point to /design route in `web/src/features/experiences/components/ExperienceCard.tsx`
 
 **Checkpoint**: User Story 1 complete - Design tab works with redirect from base URL
 
@@ -69,14 +69,14 @@
 
 ### Implementation for User Story 2
 
-- [ ] T011 [P] [US2] Create settings folder and barrel export at `web/src/features/experiences/components/settings/index.ts`
-- [ ] T012 [US2] Create ExperienceSettingsForm component with useReducer pattern in `web/src/features/experiences/components/settings/ExperienceSettingsForm.tsx`
-- [ ] T013 [US2] Add name input field with validation to ExperienceSettingsForm
-- [ ] T014 [US2] Add description textarea field to ExperienceSettingsForm
-- [ ] T015 [US2] Add preview media upload using StepMediaUpload pattern to ExperienceSettingsForm
-- [ ] T016 [US2] Add save button with loading state and toast notifications to ExperienceSettingsForm
-- [ ] T017 [US2] Export settings components from `web/src/features/experiences/components/index.ts`
-- [ ] T018 [US2] Create settings route page at `web/src/app/(workspace)/[companySlug]/exps/[expId]/settings/page.tsx`
+- [X] T011 [P] [US2] Create settings folder and barrel export at `web/src/features/experiences/components/settings/index.ts`
+- [X] T012 [US2] Create ExperienceSettingsForm component with useReducer pattern in `web/src/features/experiences/components/settings/ExperienceSettingsForm.tsx`
+- [X] T013 [US2] Add name input field with validation to ExperienceSettingsForm
+- [X] T014 [US2] Add description textarea field to ExperienceSettingsForm
+- [X] T015 [US2] Add preview media upload using StepMediaUpload pattern to ExperienceSettingsForm
+- [X] T016 [US2] Add save button with loading state and toast notifications to ExperienceSettingsForm
+- [X] T017 [US2] Export settings components from `web/src/features/experiences/components/index.ts`
+- [X] T018 [US2] Create settings route page at `web/src/app/(workspace)/[companySlug]/exps/[expId]/settings/page.tsx`
 
 **Checkpoint**: User Story 2 complete - Settings tab works with form save functionality
 
@@ -90,9 +90,9 @@
 
 ### Implementation for User Story 3
 
-- [ ] T019 [US3] Add preview media thumbnail section to ExperienceCard in `web/src/features/experiences/components/ExperienceCard.tsx`
-- [ ] T020 [US3] Add fallback state (icon/placeholder) when no preview media exists in ExperienceCard
-- [ ] T021 [US3] Add loading state for preview media images using Next.js Image optimization in ExperienceCard
+- [X] T019 [US3] Add preview media thumbnail section to ExperienceCard in `web/src/features/experiences/components/ExperienceCard.tsx`
+- [X] T020 [US3] Add fallback state (icon/placeholder) when no preview media exists in ExperienceCard
+- [X] T021 [US3] Add loading state for preview media images using Next.js Image optimization in ExperienceCard
 
 **Checkpoint**: All user stories complete - Experience list shows preview thumbnails
 
@@ -111,8 +111,8 @@
 
 **Purpose**: Ensure code quality and correctness before merge
 
-- [ ] T026 Run `pnpm lint` and fix all errors/warnings
-- [ ] T027 Run `pnpm type-check` and resolve all TypeScript errors
+- [X] T026 Run `pnpm lint` and fix all errors/warnings
+- [X] T027 Run `pnpm type-check` and resolve all TypeScript errors
 - [ ] T028 Verify feature in local dev server (`pnpm dev`)
 - [ ] T029 Commit only after validation loop passes cleanly
 

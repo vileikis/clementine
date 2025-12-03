@@ -2,7 +2,7 @@
 // Collection path: /experiences/{experienceId}
 
 import { db } from "@/lib/firebase/admin";
-import type { Experience } from "../types/experiences.types";
+import type { Experience, ExperiencePreviewType } from "../types/experiences.types";
 import { experienceSchema } from "../schemas";
 
 /**
@@ -78,6 +78,8 @@ export async function updateExperience(
   updates: {
     name?: string;
     description?: string | null;
+    previewMediaUrl?: string | null;
+    previewType?: ExperiencePreviewType | null;
   }
 ): Promise<void> {
   const updateData: Record<string, unknown> = {
@@ -90,6 +92,14 @@ export async function updateExperience(
 
   if (updates.description !== undefined) {
     updateData.description = updates.description;
+  }
+
+  if (updates.previewMediaUrl !== undefined) {
+    updateData.previewMediaUrl = updates.previewMediaUrl;
+  }
+
+  if (updates.previewType !== undefined) {
+    updateData.previewType = updates.previewType;
   }
 
   await getExperiencesCollection().doc(experienceId).update(updateData);
