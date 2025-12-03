@@ -9,7 +9,7 @@
  * - Renders the ExperienceEditor component
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ExperienceEditor } from "@/features/experiences/components/editor";
 import { RenameExperienceDialog } from "@/features/experiences/components/RenameExperienceDialog";
 import { useExperience } from "@/features/experiences/hooks";
@@ -27,7 +27,14 @@ export function ExperienceEditorClient({
   initialExperience,
 }: ExperienceEditorClientProps) {
   // Subscribe to real-time experience updates
-  const { experience: liveExperience, loading } = useExperience(initialExperience.id);
+  const { experience: liveExperience, loading, error } = useExperience(initialExperience.id);
+
+  // Log sync errors for debugging (UI still works via initialExperience fallback)
+  useEffect(() => {
+    if (error) {
+      console.warn("Real-time sync unavailable, using server data:", error.message);
+    }
+  }, [error]);
 
   // Use live experience if available, otherwise fall back to initial
   const experience = liveExperience ?? initialExperience;

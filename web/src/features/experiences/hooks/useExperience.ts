@@ -55,10 +55,6 @@ export function useExperience(experienceId: string | null): State {
     }
 
     dispatch({ type: "LOADING" });
-    dispatch({ type: "ERROR", error: new Error("Experience not found") });
-  
-
-    return
 
     const experienceRef = doc(db, "experiences", experienceId);
 
