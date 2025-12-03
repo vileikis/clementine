@@ -43,10 +43,13 @@ export const sessionSchema = z.object({
   resultImagePath: z.string().optional(),
   error: z.string().optional(),
 
-  // Journey support
-  journeyId: z.string().optional(),
+  // Experience support
+  experienceId: z.string().optional(),
   currentStepIndex: z.number().int().min(0).optional(),
   data: sessionDataSchema.optional(),
+
+  // Legacy field - preserved for backwards compatibility
+  journeyId: z.string().optional(),
 
   createdAt: z.number(),
   updatedAt: z.number(),

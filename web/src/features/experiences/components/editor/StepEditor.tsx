@@ -25,6 +25,7 @@ import {
 import {
   InfoStepEditor,
   CaptureStepEditor,
+  AiTransformEditor,
   ShortTextEditor,
   LongTextEditor,
   MultipleChoiceEditor,
@@ -40,6 +41,7 @@ import type {
   Step,
   StepInfo,
   StepCapture,
+  StepAiTransform,
   StepShortText,
   StepLongText,
   StepMultipleChoice,
@@ -179,6 +181,15 @@ function renderEditor(
           step={step as StepCapture}
           companyId={companyId}
           experiences={aiPresets}
+          onUpdate={onUpdate}
+          onPreviewChange={onPreviewChange}
+        />
+      );
+
+    case "ai-transform":
+      return (
+        <AiTransformEditor
+          step={step as StepAiTransform}
           onUpdate={onUpdate}
           onPreviewChange={onPreviewChange}
         />

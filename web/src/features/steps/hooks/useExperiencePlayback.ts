@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * Hook: useJourneyPlayback
+ * Hook: useExperiencePlayback
  *
- * Main playback controller for journey step-by-step navigation.
+ * Main playback controller for experience step-by-step navigation.
  * Manages playback state, navigation, and coordinates with useMockSession.
  *
  * Features:
@@ -23,7 +23,7 @@ import {
 } from "../types/playback.types";
 import { useMockSession } from "./useMockSession";
 
-interface UseJourneyPlaybackReturn {
+interface UseExperiencePlaybackReturn {
   /** Current playback state */
   state: PlaybackState;
 
@@ -40,9 +40,9 @@ const AUTO_ADVANCE_STEP_TYPES = ["capture", "processing"] as const;
 /** Debounce delay for navigation actions (ms) */
 const NAV_DEBOUNCE_DELAY = 150;
 
-export function useJourneyPlayback(
+export function useExperiencePlayback(
   onExit: () => void
-): UseJourneyPlaybackReturn {
+): UseExperiencePlaybackReturn {
   const [state, setState] = useState<PlaybackState>(INITIAL_PLAYBACK_STATE);
   const mockSession = useMockSession();
 
@@ -114,7 +114,7 @@ export function useJourneyPlayback(
 
       const nextIndex = prev.currentIndex + 1;
 
-      // Check if we've completed the journey
+      // Check if we've completed the experience
       if (nextIndex >= prev.steps.length) {
         return {
           ...prev,
