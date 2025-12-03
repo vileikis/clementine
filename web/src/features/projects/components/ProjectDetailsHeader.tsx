@@ -30,7 +30,7 @@ export function ProjectDetailsHeader({
   const displayStatus = project.status === "deleted" ? "archived" : project.status;
 
   return (
-    <header className="flex items-center gap-4 px-4 py-3 border-b bg-background">
+    <header className="flex items-center gap-4 px-4 py-3 bg-background">
       {/* Back Button */}
       <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0" asChild>
         <Link href={`/${companySlug}/projects`}>

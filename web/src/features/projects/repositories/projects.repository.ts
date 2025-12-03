@@ -14,7 +14,7 @@ export async function createProject(data: {
 
   const now = Date.now();
   const projectId = projectRef.id;
-  const sharePath = `/p/${projectId}`;
+  const sharePath = `/join/${projectId}`;
 
   const project: Project = {
     id: projectId,

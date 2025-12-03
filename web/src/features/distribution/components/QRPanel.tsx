@@ -7,22 +7,13 @@ interface QRPanelProps {
   projectId: string
   shareUrl: string
   qrPngPath: string
-  /** @deprecated Use projectId instead */
-  eventId?: string
-  /** @deprecated Use shareUrl instead */
-  joinUrl?: string
 }
 
 export function QRPanel({
   projectId,
   shareUrl,
   qrPngPath,
-  eventId,
-  joinUrl,
 }: QRPanelProps) {
-  // Support legacy props with fallback
-  const id = projectId || eventId || ""
-  const url = shareUrl || joinUrl || ""
 
   const [qrUrl, setQrUrl] = useState<string | null>(null)
   const [isGenerating, setIsGenerating] = useState(false)
@@ -41,7 +32,7 @@ export function QRPanel({
       setIsGenerating(true)
       setQrError(null)
 
-      const result = await generateQrCodeAction(id, url, qrPngPath)
+      const result = await generateQrCodeAction(projectId, shareUrl, qrPngPath)
 
       if (result.success && result.qrUrl) {
         setQrUrl(result.qrUrl)
@@ -60,7 +51,7 @@ export function QRPanel({
       setIsRegenerating(true)
       setQrError(null)
 
-      const result = await regenerateQrCodeAction(id, url, qrPngPath)
+      const result = await regenerateQrCodeAction(projectId, shareUrl, qrPngPath)
 
       if (result.success && result.qrUrl) {
         setQrUrl(result.qrUrl)
@@ -80,7 +71,7 @@ export function QRPanel({
 
       // Try modern clipboard API first
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        await navigator.clipboard.writeText(url)
+        await navigator.clipboard.writeText(shareUrl)
         setIsCopied(true)
         setTimeout(() => setIsCopied(false), 2000)
         return
@@ -88,7 +79,7 @@ export function QRPanel({
 
       // Fallback to older method
       const textArea = document.createElement("textarea")
-      textArea.value = url
+      textArea.value = shareUrl
       textArea.style.position = "fixed"
       textArea.style.left = "-999999px"
       textArea.setAttribute("readonly", "")
@@ -120,14 +111,14 @@ export function QRPanel({
 
     const link = document.createElement("a")
     link.href = qrUrl
-    link.download = `project-${id}-qr.png`
+    link.download = `project-${projectId}-qr.png`
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
   }
 
   const handleOpenGuestView = () => {
-    window.open(url, "_blank")
+    window.open(shareUrl, "_blank")
   }
 
   return (
@@ -139,7 +130,7 @@ export function QRPanel({
           <div className="flex items-center gap-2">
             <input
               type="text"
-              value={url}
+              value={shareUrl}
               readOnly
               className="flex-1 px-3 py-2 border border-input rounded-md bg-muted font-mono text-sm"
             />
