@@ -3,7 +3,7 @@
 /**
  * Hook: useMockSession
  *
- * Manages the ephemeral mock session state during journey playback.
+ * Manages the ephemeral mock session state during experience playback.
  * Provides state management for user inputs across steps and reset functionality.
  *
  * All state is in-memory only - no Firestore writes.

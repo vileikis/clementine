@@ -27,6 +27,7 @@ import {
   Loader2,
   Gift,
   Camera,
+  Wand2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { StepType } from "@/features/steps/types";
@@ -70,6 +71,12 @@ const STEP_TYPE_CATEGORIES: StepTypeCategory[] = [
         label: "Capture",
         description: "Photo or video capture",
         icon: Camera,
+      },
+      {
+        type: "ai-transform",
+        label: "AI Transform",
+        description: "Transform photos with AI models",
+        icon: Wand2,
       },
     ],
   },

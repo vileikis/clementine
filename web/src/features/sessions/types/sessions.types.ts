@@ -32,10 +32,14 @@ export interface Session {
   resultImagePath?: string;
   error?: string;
 
-  // Journey support
-  journeyId?: string;
+  // Experience support
+  experienceId?: string;
   currentStepIndex?: number;
   data?: SessionData;
+
+  // Legacy field - preserved for backwards compatibility
+  /** @deprecated Use experienceId instead */
+  journeyId?: string;
 
   // Timestamps (existing)
   createdAt: number;
