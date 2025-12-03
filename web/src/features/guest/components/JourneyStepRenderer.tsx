@@ -14,7 +14,6 @@ import {
   YesNoStep,
   OpinionScaleStep,
   EmailStep,
-  ExperiencePickerStep,
 } from "@/features/steps/components/preview/steps";
 
 interface JourneyStepRendererProps {
@@ -266,26 +265,6 @@ export function JourneyStepRenderer({
             isInteractive={true}
             value={getTextValue(variableName)}
             onValueChange={(value) => onTextDraftChange(variableName, value)}
-            onCtaClick={onStepComplete}
-          />
-          {ErrorDisplay}
-        </>
-      );
-
-    case "experience-picker":
-      return (
-        <>
-          <ExperiencePickerStep
-            step={step}
-            experiences={experiences}
-            isInteractive={true}
-            selectedExperienceId={getSelectionValue("selected_experience_id")}
-            onValueChange={(experienceId) =>
-              onInputChange("selected_experience_id", {
-                type: "selection",
-                selectedId: experienceId,
-              })
-            }
             onCtaClick={onStepComplete}
           />
           {ErrorDisplay}

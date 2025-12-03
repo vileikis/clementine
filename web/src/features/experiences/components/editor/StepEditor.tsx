@@ -24,7 +24,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import {
   InfoStepEditor,
-  ExperiencePickerEditor,
   CaptureStepEditor,
   ShortTextEditor,
   LongTextEditor,
@@ -40,7 +39,6 @@ import { getStepTypeMeta } from "@/features/steps/constants";
 import type {
   Step,
   StepInfo,
-  StepExperiencePicker,
   StepCapture,
   StepShortText,
   StepLongText,
@@ -51,7 +49,7 @@ import type {
   StepProcessing,
   StepReward,
 } from "@/features/steps/types";
-import type { Experience as AiPreset } from "@/features/ai-presets/types";
+import type { AiPreset } from "@/features/ai-presets/types";
 
 interface StepEditorProps {
   experienceId: string;
@@ -173,18 +171,7 @@ function renderEditor(
           onPreviewChange={onPreviewChange}
         />
       );
-
-    case "experience-picker":
-      return (
-        <ExperiencePickerEditor
-          step={step as StepExperiencePicker}
-          companyId={companyId}
-          experiences={aiPresets}
-          onUpdate={onUpdate}
-          onPreviewChange={onPreviewChange}
-        />
-      );
-
+      
     case "capture":
       return (
         <CaptureStepEditor

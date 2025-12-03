@@ -17,7 +17,6 @@ export {
   YesNoStep,
   OpinionScaleStep,
   EmailStep,
-  ExperiencePickerStep,
   CaptureStep,
   ProcessingStep,
   RewardStep,
