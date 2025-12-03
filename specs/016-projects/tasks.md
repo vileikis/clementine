@@ -110,12 +110,12 @@ This is a Next.js monorepo:
 
 ### Implementation for User Story 3
 
-- [ ] T037 [P] [US3] Create component `web/src/features/projects/components/ProjectDistributeTab.tsx` displaying sharePath, QR code image (from qrPngPath), "Copy Link" button, "Download QR" button
-- [ ] T038 [US3] Implement copy-to-clipboard functionality in ProjectDistributeTab using navigator.clipboard.writeText() with toast success notification
-- [ ] T039 [US3] Implement download QR functionality in ProjectDistributeTab using anchor download or fetch + blob + URL.createObjectURL pattern
-- [ ] T040 [US3] Add ProjectDistributeTab to project details page `web/src/app/(authenticated)/projects/[projectId]/page.tsx` as second tab
-- [ ] T041 [US3] Style ProjectDistributeTab for mobile-first (320px-768px primary), ensure buttons are ≥44x44px touch targets, QR code scales properly
-- [ ] T042 [US3] Update barrel export `web/src/features/projects/components/index.ts` to export ProjectDistributeTab
+- [X] T037 [P] [US3] Create component `web/src/features/projects/components/ProjectDistributeTab.tsx` displaying sharePath, QR code image (from qrPngPath), "Copy Link" button, "Download QR" button
+- [X] T038 [US3] Implement copy-to-clipboard functionality in ProjectDistributeTab using navigator.clipboard.writeText() with toast success notification
+- [X] T039 [US3] Implement download QR functionality in ProjectDistributeTab using anchor download or fetch + blob + URL.createObjectURL pattern
+- [X] T040 [US3] Add ProjectDistributeTab to project details page `web/src/app/(authenticated)/projects/[projectId]/page.tsx` as second tab
+- [X] T041 [US3] Style ProjectDistributeTab for mobile-first (320px-768px primary), ensure buttons are ≥44x44px touch targets, QR code scales properly
+- [X] T042 [US3] Update barrel export `web/src/features/projects/components/index.ts` to export ProjectDistributeTab
 
 **Checkpoint**: All P1 and P2 user stories are functional. Administrators have full project management capabilities with distribution tools.
 
@@ -129,9 +129,9 @@ This is a Next.js monorepo:
 
 ### Implementation for User Story 4
 
-- [ ] T043 [US4] Create component `web/src/features/projects/components/ProjectEventsTab.tsx` with centered placeholder message "Coming in Phase 5" and optional illustration
-- [ ] T044 [US4] Add ProjectEventsTab to project details page `web/src/app/(authenticated)/projects/[projectId]/page.tsx` as first tab
-- [ ] T045 [US4] Update barrel export `web/src/features/projects/components/index.ts` to export ProjectEventsTab
+- [X] T043 [US4] Create component `web/src/features/projects/components/ProjectEventsTab.tsx` with centered placeholder message "Coming in Phase 5" and optional illustration
+- [X] T044 [US4] Add ProjectEventsTab to project details page `web/src/app/(authenticated)/projects/[projectId]/page.tsx` as first tab
+- [X] T045 [US4] Update barrel export `web/src/features/projects/components/index.ts` to export ProjectEventsTab
 
 **Checkpoint**: All user stories (US1-US4) are complete and independently functional.
 
@@ -141,9 +141,9 @@ This is a Next.js monorepo:
 
 **Purpose**: Update guest routing and admin navigation to use Projects instead of Events
 
-- [ ] T046 Search codebase for guest routing logic (likely in `web/src/app/(public)` or `web/src/features/guest`) and update Firestore query from `collection('events')` to `collection('projects')` and field references `joinPath`→`sharePath`
-- [ ] T047 [P] Update navigation components/breadcrumbs to reference "Projects" instead of "Events" in labels and route paths (search for /events routes globally)
-- [ ] T048 [P] Rename or update admin layout/sidebar to show "Projects" menu item pointing to `/projects`
+- [X] T046 Search codebase for guest routing logic (likely in `web/src/app/(public)` or `web/src/features/guest`) and update Firestore query from `collection('events')` to `collection('projects')` and field references `joinPath`→`sharePath`
+- [X] T047 [P] Update navigation components/breadcrumbs to reference "Projects" instead of "Events" in labels and route paths (search for /events routes globally)
+- [X] T048 [P] Rename or update admin layout/sidebar to show "Projects" menu item pointing to `/projects`
 - [ ] T049 Test guest flow end-to-end: visit existing share link → verify project loads from `/projects` collection → verify activeEventId resolves to experience → verify guest can complete flow
 
 ---
@@ -163,8 +163,8 @@ This is a Next.js monorepo:
 
 **Purpose**: Ensure code quality and correctness before merge
 
-- [ ] T056 Run `pnpm lint` and fix all errors/warnings
-- [ ] T057 Run `pnpm type-check` and resolve all TypeScript errors (strict mode, no `any` escapes)
+- [X] T056 Run `pnpm lint` and fix all errors/warnings
+- [X] T057 Run `pnpm type-check` and resolve all TypeScript errors (strict mode, no `any` escapes)
 - [ ] T058 Run `pnpm test` - update existing Event tests to use Project terminology and ensure all tests pass
 - [ ] T059 Manual testing: Create project → verify in list → view details → change status → verify persists → copy share link → download QR → verify placeholder in Events tab
 - [ ] T060 Manual testing: Test guest flow with existing share link → verify project loads → verify experience loads

@@ -14,7 +14,7 @@ import { toast } from "sonner";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 
 interface ThemeEditorProps {
-  event: Event;
+  project: Project;
 }
 
 // Theme reducer actions
@@ -32,7 +32,7 @@ type ThemeAction =
   | { type: "UPDATE_BG_OVERLAY_OPACITY"; payload: number };
 
 // Reducer function
-function themeReducer(state: EventTheme, action: ThemeAction): EventTheme {
+function themeReducer(state: ProjectTheme, action: ThemeAction): ProjectTheme {
   switch (action.type) {
     case "UPDATE_PRIMARY_COLOR":
       return { ...state, primaryColor: action.payload };
@@ -96,17 +96,17 @@ function themeReducer(state: EventTheme, action: ThemeAction): EventTheme {
  * - Keyboard shortcuts (Cmd+S/Ctrl+S)
  * - Server Action integration
  */
-export function ThemeEditor({ event }: ThemeEditorProps) {
+export function ThemeEditor({ project }: ThemeEditorProps) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
   // Initialize theme state with reducer
-  const [theme, dispatch] = useReducer(themeReducer, event.theme);
+  const [theme, dispatch] = useReducer(themeReducer, project.theme);
 
   const handleSave = () => {
     if (isPending) return; // Prevent multiple saves
     startTransition(async () => {
-      const result = await updateEventTheme(event.id, {
+      const result = await updateProjectTheme(project.id, {
         primaryColor: theme.primaryColor,
         logoUrl: theme.logoUrl,
         fontFamily: theme.fontFamily,
