@@ -2,6 +2,8 @@
 
 export type ExperienceStatus = "active" | "deleted";
 
+export type ExperiencePreviewType = "image" | "gif";
+
 export interface Experience {
   id: string;
   companyId: string;
@@ -12,4 +14,7 @@ export interface Experience {
   deletedAt: number | null;
   createdAt: number;
   updatedAt: number;
+  // Preview media (optional)
+  previewMediaUrl?: string | null;
+  previewType?: ExperiencePreviewType | null;
 }

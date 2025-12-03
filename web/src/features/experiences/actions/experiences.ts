@@ -17,6 +17,7 @@ import {
 import {
   createExperienceInputSchema,
   updateExperienceInputSchema,
+  updateExperienceSettingsInputSchema,
 } from "../schemas";
 import { verifyAdminSecret } from "@/lib/auth";
 import { z } from "zod";
@@ -246,6 +247,74 @@ export async function deleteExperienceAction(
         code: "INTERNAL_ERROR",
         message:
           error instanceof Error ? error.message : "Failed to delete experience",
+      },
+    };
+  }
+}
+
+// ============================================================================
+// Update Experience Settings
+// ============================================================================
+
+/**
+ * Updates an experience's settings (name, description, preview media).
+ * Used by the Settings form in the experience editor.
+ */
+export async function updateExperienceSettingsAction(
+  experienceId: string,
+  input: z.infer<typeof updateExperienceSettingsInputSchema>
+): Promise<ActionResponse<void>> {
+  const auth = await verifyAdminSecret();
+  if (!auth.authorized) {
+    return {
+      success: false,
+      error: {
+        code: "PERMISSION_DENIED",
+        message: auth.error,
+      },
+    };
+  }
+
+  try {
+    const validated = updateExperienceSettingsInputSchema.parse(input);
+
+    const experience = await getExperience(experienceId);
+    if (!experience) {
+      return {
+        success: false,
+        error: {
+          code: "EXPERIENCE_NOT_FOUND",
+          message: "Experience not found",
+        },
+      };
+    }
+
+    await updateExperience(experienceId, {
+      name: validated.name,
+      description: validated.description,
+      previewMediaUrl: validated.previewMediaUrl,
+      previewType: validated.previewType,
+    });
+
+    return { success: true, data: undefined };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        error: {
+          code: "VALIDATION_ERROR",
+          message: error.issues
+            .map((i) => `${i.path.join(".")}: ${i.message}`)
+            .join(", "),
+        },
+      };
+    }
+    return {
+      success: false,
+      error: {
+        code: "INTERNAL_ERROR",
+        message:
+          error instanceof Error ? error.message : "Failed to update experience settings",
       },
     };
   }

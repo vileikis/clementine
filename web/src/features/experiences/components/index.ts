@@ -5,3 +5,4 @@ export * from "./ExperienceList";
 export * from "./RenameExperienceDialog";
 export * from "./DeleteExperienceDialog";
 export * from "./editor";
+export * from "./settings";
