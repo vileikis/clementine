@@ -2,6 +2,7 @@
 export * from "./EventCard";
 export * from "./EventList";
 export * from "./EventExperiencesTab";
+export * from "./EventDetailsHeader";
 export * from "./CreateEventDialog";
 export * from "./RenameEventDialog";
 export * from "./DeleteEventDialog";
