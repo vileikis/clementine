@@ -32,6 +32,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ImageUploadField } from "@/components/shared/ImageUploadField";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { X } from "lucide-react";
 import { useAutoSave } from "../../hooks";
 import type { StepAiTransform } from "../../types";
 
@@ -235,21 +241,29 @@ export function AiTransformEditor({
                               className="object-contain"
                               unoptimized
                             />
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              className="absolute top-1 right-1 min-h-[44px] min-w-[44px]"
-                              onClick={() => {
-                                field.onChange(
-                                  imageUrls.filter((_, i) => i !== index)
-                                );
-                                // Trigger auto-save since button clicks don't fire blur
-                                handleBlur();
-                              }}
-                              type="button"
-                            >
-                              Remove
-                            </Button>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="secondary"
+                                  size="icon"
+                                  className="absolute top-1 right-1 h-6 w-6 rounded-full opacity-70 transition-all hover:opacity-100 hover:scale-110 hover:bg-primary hover:text-primary-foreground"
+                                  onClick={() => {
+                                    field.onChange(
+                                      imageUrls.filter((_, i) => i !== index)
+                                    );
+                                    // Trigger auto-save since button clicks don't fire blur
+                                    handleBlur();
+                                  }}
+                                  type="button"
+                                >
+                                  <X className="h-3 w-3" />
+                                  <span className="sr-only">Delete image</span>
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Delete image</p>
+                              </TooltipContent>
+                            </Tooltip>
                           </div>
                         ))}
                       </div>
