@@ -3,18 +3,18 @@
 /**
  * Component: PlaybackMode
  *
- * Full-screen overlay for journey playback. Allows creators to preview
- * the entire journey as guests will experience it.
+ * Full-screen overlay for experience playback. Allows creators to preview
+ * the entire experience as guests will experience it.
  *
  * Features:
  * - Step-by-step navigation via PreviewNavigationBar
  * - Viewport mode toggle (mobile/desktop) via ViewSwitcher
  * - Event theme application
- * - Empty journey handling
+ * - Empty experience handling
  */
 
 import { useEffect, useState } from "react";
-import { useJourneyPlayback } from "../../hooks/useJourneyPlayback";
+import { useExperiencePlayback } from "../../hooks/useExperiencePlayback";
 import { PreviewNavigationBar } from "./PreviewNavigationBar";
 import { PreviewRuntime } from "./PreviewRuntime";
 import { ViewSwitcher } from "./ViewSwitcher";
@@ -29,7 +29,7 @@ export function PlaybackMode({
   initialViewport = "mobile",
   onExit,
 }: PlaybackModeProps) {
-  const { state, actions, mockSession } = useJourneyPlayback(onExit);
+  const { state, actions, mockSession } = useExperiencePlayback(onExit);
   const [viewportMode, setViewportMode] = useState<ViewportMode>(initialViewport);
 
   // Initialize playback when component mounts
@@ -45,11 +45,11 @@ export function PlaybackMode({
       className="fixed inset-0 z-50 bg-background flex flex-col"
       role="dialog"
       aria-modal="true"
-      aria-label="Journey playback"
+      aria-label="Experience playback"
     >
       {/* Top Bar - ViewSwitcher */}
       <header className="flex items-center justify-between px-4 py-3 border-b bg-background shrink-0">
-        <h2 className="text-sm font-semibold">Journey Preview</h2>
+        <h2 className="text-sm font-semibold">Experience Preview</h2>
         <ViewSwitcher mode={viewportMode} onChange={setViewportMode} />
       </header>
 
@@ -57,7 +57,7 @@ export function PlaybackMode({
       <main className="flex-1 overflow-auto p-6 pb-24 bg-muted/10">
         <div className="flex justify-center h-full">
           {steps.length === 0 ? (
-            <EmptyJourneyState />
+            <EmptyExperienceState />
           ) : currentStep ? (
             <StepErrorBoundary
               key={currentStep.id}
@@ -77,7 +77,7 @@ export function PlaybackMode({
               />
             </StepErrorBoundary>
           ) : (
-            <JourneyCompleteState />
+            <ExperienceCompleteState />
           )}
         </div>
       </main>
@@ -99,29 +99,29 @@ export function PlaybackMode({
 }
 
 /**
- * Empty state when journey has no steps
+ * Empty state when experience has no steps
  */
-function EmptyJourneyState() {
+function EmptyExperienceState() {
   return (
     <div className="flex flex-col items-center justify-center h-full text-center p-8">
       <p className="text-muted-foreground mb-4">
-        This journey has no steps to preview.
+        This experience has no steps to preview.
       </p>
       <p className="text-sm text-muted-foreground">
-        Add steps to the journey, then try again.
+        Add steps to the experience, then try again.
       </p>
     </div>
   );
 }
 
 /**
- * State shown when journey is complete (after last step)
+ * State shown when experience is complete (after last step)
  */
-function JourneyCompleteState() {
+function ExperienceCompleteState() {
   return (
     <div className="flex flex-col items-center justify-center h-full text-center p-8">
       <div className="text-4xl mb-4">🎉</div>
-      <p className="text-lg font-medium mb-2">Journey Complete!</p>
+      <p className="text-lg font-medium mb-2">Experience Complete!</p>
       <p className="text-sm text-muted-foreground">
         Use the controls below to restart or exit.
       </p>

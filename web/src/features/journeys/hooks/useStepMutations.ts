@@ -15,7 +15,7 @@ import {
   deleteStepAction,
   reorderStepsAction,
   duplicateStepAction,
-} from "@/features/steps/actions";
+} from "../actions/steps";
 import type { StepType, Step } from "@/features/steps/types";
 
 interface UseStepMutationsResult {
