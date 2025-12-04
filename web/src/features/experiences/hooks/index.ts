@@ -1,5 +1,6 @@
 export * from "./useExperiences";
 export * from "./useExperience";
+export * from "./useExperienceDetails";
 export * from "./useSteps";
 export * from "./useStepMutations";
 export * from "./useSelectedStep";

@@ -49,33 +49,34 @@ interface Event {
 }
 ```
 
-## **2.2 EventExperienceLink (Enhanced)**
+## **2.2 EventExperienceLink (Unified)**
+
+A single interface used for both guest-selectable experiences AND extras slots. This unified approach:
+- Ensures consistent behavior (enable/disable without data loss)
+- Future-proofs for additional customization fields
+- Simplifies schemas and components
 
 ```ts
+type ExtraSlotFrequency = "always" | "once_per_session";
+
 interface EventExperienceLink {
-  experienceId: string;      // FK to /experiences/{experienceId}
-  label?: string | null;     // Optional display name override
-  enabled: boolean;          // NEW: Toggle to enable/disable without removing
+  experienceId: string;                     // FK to /experiences/{experienceId}
+  label?: string | null;                    // Optional display name override
+  enabled: boolean;                         // Toggle to enable/disable without removing
+  frequency?: ExtraSlotFrequency | null;    // Only used for extras (null for regular experiences)
 }
 ```
+
+**Usage:**
+- **Regular experiences**: `frequency` is `null` or omitted
+- **Extras**: `frequency` is `"always"` | `"once_per_session"`
 
 ## **2.3 EventExtras (New)**
 
 ```ts
 interface EventExtras {
-  preEntryGate?: EventExtraSlot | null;
-  preReward?: EventExtraSlot | null;
-}
-```
-
-## **2.4 EventExtraSlot (New)**
-
-```ts
-type ExtraSlotFrequency = "always" | "once_per_session";
-
-interface EventExtraSlot {
-  experienceId: string;           // FK to /experiences/{experienceId}
-  frequency: ExtraSlotFrequency;  // When to show this extra
+  preEntryGate?: EventExperienceLink | null;
+  preReward?: EventExperienceLink | null;
 }
 ```
 
@@ -92,28 +93,23 @@ Add to `web/src/features/events/schemas/events.schemas.ts`:
 export const extraSlotFrequencySchema = z.enum(["always", "once_per_session"]);
 
 /**
- * Event Extra Slot schema
- */
-export const eventExtraSlotSchema = z.object({
-  experienceId: z.string().min(1, "Experience ID is required"),
-  frequency: extraSlotFrequencySchema,
-});
-
-/**
- * Event Extras schema (slot-based flows)
- */
-export const eventExtrasSchema = z.object({
-  preEntryGate: eventExtraSlotSchema.nullable().optional().default(null),
-  preReward: eventExtraSlotSchema.nullable().optional().default(null),
-});
-
-/**
- * Enhanced Event-Experience link schema
+ * Unified Event-Experience link schema
+ * Used for both guest-selectable experiences AND extras slots
  */
 export const eventExperienceLinkSchema = z.object({
   experienceId: z.string().min(1, "Experience ID is required"),
   label: z.string().nullable().optional().default(null),
   enabled: z.boolean().default(true),
+  frequency: extraSlotFrequencySchema.nullable().optional().default(null),
+});
+
+/**
+ * Event Extras schema (slot-based flows)
+ * Uses the same EventExperienceLink structure for consistency
+ */
+export const eventExtrasSchema = z.object({
+  preEntryGate: eventExperienceLinkSchema.nullable().optional().default(null),
+  preReward: eventExperienceLinkSchema.nullable().optional().default(null),
 });
 
 /**
@@ -157,12 +153,24 @@ export const updateEventExperienceInputSchema = z.object({
 });
 
 /**
- * Set extra slot input
+ * Set extra slot input (unified - supports label, enabled, and frequency)
  */
 export const setEventExtraInputSchema = z.object({
   slot: z.enum(["preEntryGate", "preReward"]),
   experienceId: z.string().min(1, "Experience ID is required"),
+  label: z.string().nullable().optional(),
+  enabled: z.boolean().optional().default(true),
   frequency: extraSlotFrequencySchema,
+});
+
+/**
+ * Update extra slot input (for label, enabled, and frequency changes)
+ */
+export const updateEventExtraInputSchema = z.object({
+  slot: z.enum(["preEntryGate", "preReward"]),
+  label: z.string().nullable().optional(),
+  enabled: z.boolean().optional(),
+  frequency: extraSlotFrequencySchema.optional(),
 });
 
 /**
@@ -186,28 +194,26 @@ Add to `web/src/features/events/types/event.types.ts`:
 export type ExtraSlotFrequency = "always" | "once_per_session";
 
 /**
- * Extra slot configuration
- */
-export interface EventExtraSlot {
-  experienceId: string;
-  frequency: ExtraSlotFrequency;
-}
-
-/**
- * Event extras container
- */
-export interface EventExtras {
-  preEntryGate?: EventExtraSlot | null;
-  preReward?: EventExtraSlot | null;
-}
-
-/**
- * Enhanced Event-Experience link (with enabled toggle)
+ * Unified Event-Experience link
+ * Used for both guest-selectable experiences AND extras slots
+ *
+ * - Regular experiences: frequency is null/undefined
+ * - Extras: frequency is "always" | "once_per_session"
  */
 export interface EventExperienceLink {
   experienceId: string;
   label?: string | null;
   enabled: boolean;
+  frequency?: ExtraSlotFrequency | null;
+}
+
+/**
+ * Event extras container
+ * Uses the same EventExperienceLink structure for consistency
+ */
+export interface EventExtras {
+  preEntryGate?: EventExperienceLink | null;
+  preReward?: EventExperienceLink | null;
 }
 ```
 
@@ -256,6 +262,7 @@ async function removeEventExperience(
 
 /**
  * Set an extra slot (pre-entry gate or pre-reward)
+ * Creates a new extra with full EventExperienceLink data
  */
 async function setEventExtra(
   projectId: string,
@@ -263,7 +270,24 @@ async function setEventExtra(
   data: {
     slot: "preEntryGate" | "preReward";
     experienceId: string;
+    label?: string | null;
+    enabled?: boolean;
     frequency: ExtraSlotFrequency;
+  }
+): Promise<ActionResult<Event>>
+
+/**
+ * Update an extra slot (label, enabled, frequency)
+ * Allows modifying without re-selecting the experience
+ */
+async function updateEventExtra(
+  projectId: string,
+  eventId: string,
+  data: {
+    slot: "preEntryGate" | "preReward";
+    label?: string | null;
+    enabled?: boolean;
+    frequency?: ExtraSlotFrequency;
   }
 ): Promise<ActionResult<Event>>
 
@@ -475,7 +499,7 @@ Card representing a single extra slot:
 - `slot`: "preEntryGate" | "preReward"
 - `slotName`: Display name
 - `helpText`: Tooltip content
-- `value`: EventExtraSlot | null
+- `value`: EventExperienceLink | null (unified type)
 - `experienceName`: Resolved experience name (if value exists)
 
 **Empty State:**
@@ -486,15 +510,30 @@ Card representing a single extra slot:
 └─────────────────────────────────────────────────────────────┘
 ```
 
-**Filled State:**
+**Filled State (enabled):**
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  Pre-Entry Gate                                    ⓘ       │
 │  ┌─────────────────────────────────────────────────────┐   │
-│  │  Age Verification Flow          Always         [×]  │   │
+│  │  Age Verification Flow    Always    [○ On]    [×]   │   │
 │  └─────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────┘
 ```
+
+**Filled State (disabled):**
+```
+┌─────────────────────────────────────────────────────────────┐
+│  Pre-Entry Gate                                    ⓘ       │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │  Age Verification Flow    Always    [○ Off]   [×]   │   │  (muted/grayed)
+│  └─────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Key behaviors:**
+- Toggle enables/disables without removing (preserves configuration)
+- Disabled extras are visually muted but retain all settings
+- Click card body (not toggle/remove) opens edit drawer
 
 **Slot Definitions:**
 
@@ -505,7 +544,7 @@ Card representing a single extra slot:
 
 ### **ExtraSlotDrawer.tsx**
 
-Drawer for configuring an extra slot:
+Drawer for configuring an extra slot (unified fields matching EventExperienceLink):
 
 ```
 ┌─────────────────────────────────────────┐
@@ -517,6 +556,18 @@ Drawer for configuring an extra slot:
 │  │  Age Verification Flow        ▼   │  │
 │  └───────────────────────────────────┘  │
 │                                         │
+│  [Open in Editor ↗]                     │
+│                                         │
+│  ─────────────────────────────────────  │
+│                                         │
+│  Configuration                          │
+│                                         │
+│  Label (optional)                       │
+│  ┌───────────────────────────────────┐  │
+│  │                                   │  │
+│  └───────────────────────────────────┘  │
+│  Override display name for this slot    │
+│                                         │
 │  Frequency                              │
 │  ┌───────────────────────────────────┐  │
 │  │  ○ Always                         │  │
@@ -526,6 +577,11 @@ Drawer for configuring an extra slot:
 │  │    Show only once per guest       │  │
 │  └───────────────────────────────────┘  │
 │                                         │
+│  ─────────────────────────────────────  │
+│                                         │
+│  ┌─────────────────────────────────┐    │
+│  │       🗑 Remove from Slot        │    │
+│  └─────────────────────────────────┘    │
 │                                         │
 │  ┌─────────────┐  ┌─────────────────┐   │
 │  │   Cancel    │  │      Save       │   │
@@ -533,6 +589,8 @@ Drawer for configuring an extra slot:
 │                                         │
 └─────────────────────────────────────────┘
 ```
+
+**Note:** The drawer shares the same fields as EventExperienceDrawer (label, enabled behavior), plus the extras-specific frequency field. This consistency allows teams to configure extras the same way they configure regular experiences.
 
 ---
 
@@ -642,9 +700,9 @@ export const EXTRA_FREQUENCIES = {
 # **11. Acceptance Criteria**
 
 ## **Data Model**
-- [ ] `EventExperienceLink` includes `enabled` boolean field
-- [ ] `EventExtras` type with `preEntryGate` and `preReward` slots
-- [ ] `EventExtraSlot` type with `experienceId` and `frequency`
+- [ ] `EventExperienceLink` is unified with `experienceId`, `label`, `enabled`, and optional `frequency`
+- [ ] `EventExtras` type uses `EventExperienceLink` for both `preEntryGate` and `preReward` slots
+- [ ] `ExtraSlotFrequency` type with "always" | "once_per_session" values
 - [ ] Event schema updated with `extras` field
 - [ ] Zod schemas for all new types and input validation
 - [ ] Default event creation includes `extras: { preEntryGate: null, preReward: null }`
@@ -653,7 +711,8 @@ export const EXTRA_FREQUENCIES = {
 - [ ] `addEventExperience` action works correctly
 - [ ] `updateEventExperience` action updates label and enabled state
 - [ ] `removeEventExperience` action removes experience from array
-- [ ] `setEventExtra` action sets slot with experience and frequency
+- [ ] `setEventExtra` action sets slot with full EventExperienceLink data (experienceId, label, enabled, frequency)
+- [ ] `updateEventExtra` action updates label, enabled, and frequency
 - [ ] `removeEventExtra` action clears a slot
 
 ## **UI - General Tab Layout**
@@ -689,13 +748,18 @@ export const EXTRA_FREQUENCIES = {
 - [ ] Two slot cards displayed vertically
 - [ ] Each card shows slot name with info icon tooltip
 - [ ] Empty slots show "+" button
-- [ ] Filled slots show experience name, frequency, remove button
+- [ ] Filled slots show experience name, frequency badge, enabled toggle, remove button
+- [ ] Enabled toggle works inline (enable/disable without opening drawer)
+- [ ] Disabled extras are visually muted but retain configuration
 - [ ] Help text accessible via tooltip
 
 ## **UI - Extra Slot Drawer**
-- [ ] Opens on "+" click for empty slot or edit for filled slot
+- [ ] Opens on "+" click for empty slot or click card body for filled slot
 - [ ] Experience dropdown/selector populated
+- [ ] "Open in Editor" link to experience editor
+- [ ] Label field (optional override)
 - [ ] Frequency radio options (always, once per session)
+- [ ] Remove button with confirmation
 - [ ] Save updates the slot
 - [ ] Cancel closes without changes
 
@@ -710,9 +774,10 @@ The Experience Engine will consume these configurations:
 ```ts
 // Pseudo-code for Experience Engine flow
 async function runEventFlow(event: Event, session: Session) {
-  // 1. Check pre-entry gate
-  if (event.extras.preEntryGate && shouldShowExtra(event.extras.preEntryGate, session)) {
-    await runExperience(event.extras.preEntryGate.experienceId);
+  // 1. Check pre-entry gate (must be enabled AND pass frequency check)
+  const preEntry = event.extras.preEntryGate;
+  if (preEntry && preEntry.enabled && shouldShowExtra(preEntry, session)) {
+    await runExperience(preEntry.experienceId);
   }
 
   // 2. Show experience picker (enabled experiences only)
@@ -722,16 +787,19 @@ async function runEventFlow(event: Event, session: Session) {
   // 3. Run selected experience
   const result = await runExperience(selectedExperience.experienceId);
 
-  // 4. Check pre-reward
-  if (event.extras.preReward && shouldShowExtra(event.extras.preReward, session)) {
-    await runExperience(event.extras.preReward.experienceId);
+  // 4. Check pre-reward (must be enabled AND pass frequency check)
+  const preReward = event.extras.preReward;
+  if (preReward && preReward.enabled && shouldShowExtra(preReward, session)) {
+    await runExperience(preReward.experienceId);
   }
 
   // 5. Show reward/result
   await showReward(result);
 }
 
-function shouldShowExtra(slot: EventExtraSlot, session: Session): boolean {
+// Uses unified EventExperienceLink type
+function shouldShowExtra(slot: EventExperienceLink, session: Session): boolean {
+  if (!slot.frequency) return true; // No frequency = always show
   if (slot.frequency === "always") return true;
   if (slot.frequency === "once_per_session") {
     return !session.hasSeenExtra(slot.experienceId);
@@ -750,9 +818,9 @@ function shouldShowExtra(slot: EventExtraSlot, session: Session): boolean {
 
 # **13. Deliverables**
 
-1. **Updated Types:** `EventExperienceLink`, `EventExtras`, `EventExtraSlot`, `ExtraSlotFrequency`
-2. **Updated Schemas:** Enhanced event schema with extras, new input schemas
-3. **Server Actions:** Experience and extras management actions
+1. **Updated Types:** Unified `EventExperienceLink` (with optional `frequency`), `EventExtras`, `ExtraSlotFrequency`
+2. **Updated Schemas:** Enhanced event schema with extras, unified input schemas
+3. **Server Actions:** Experience and extras management actions (including `updateEventExtra`)
 4. **Components:**
    - `EventGeneralTab`
    - `ExperiencesSection`, `AddExperienceCard`, `EventExperienceCard`
