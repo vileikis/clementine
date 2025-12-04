@@ -25,9 +25,9 @@
 
 **Purpose**: Schema and action infrastructure that all user stories depend on
 
-- [ ] T001 [P] Create playground schemas file `web/src/features/steps/schemas/step-playground.schemas.ts` with input/output Zod schemas from contracts/step-playground.ts
-- [ ] T002 [P] Export new schemas from `web/src/features/steps/schemas/index.ts`
-- [ ] T003 [P] Add `AI_GENERATION_FAILED` error code to `web/src/features/steps/actions/types.ts`
+- [x] T001 [P] Create playground schemas file `web/src/features/steps/schemas/step-playground.schemas.ts` with input/output Zod schemas from contracts/step-playground.ts
+- [x] T002 [P] Export new schemas from `web/src/features/steps/schemas/index.ts`
+- [x] T003 [P] Add `AI_GENERATION_FAILED` error code to `web/src/features/steps/actions/types.ts`
 
 ---
 
@@ -37,7 +37,7 @@
 
 **⚠️ CRITICAL**: No UI components can be built until this phase is complete
 
-- [ ] T004 Create server action `web/src/features/steps/actions/step-playground.ts` implementing `generateStepPreview`:
+- [x] T004 Create server action `web/src/features/steps/actions/step-playground.ts` implementing `generateStepPreview`:
   - Validate auth with `verifyAdminSecret()`
   - Validate input with `stepPlaygroundInputSchema`
   - Fetch step from Firestore via `experienceId` (read from step doc)
@@ -48,7 +48,7 @@
   - Call AI client with `getAIClient().generateImage()`
   - Return result as base64 with generation time
   - Reference: `web/src/features/ai-presets/actions/playground-generate.ts`
-- [ ] T005 Export `generateStepPreview` from `web/src/features/steps/actions/index.ts`
+- [x] T005 Export `generateStepPreview` from `web/src/features/steps/actions/index.ts`
 
 **Checkpoint**: Server action ready - UI implementation can now begin
 
@@ -62,8 +62,8 @@
 
 ### Implementation for User Story 1
 
-- [ ] T006 [P] [US1] Create playground folder `web/src/features/steps/components/playground/`
-- [ ] T007 [US1] Create `StepAIPlayground.tsx` component in `web/src/features/steps/components/playground/StepAIPlayground.tsx`:
+- [x] T006 [P] [US1] Create playground folder `web/src/features/steps/components/playground/`
+- [x] T007 [US1] Create `StepAIPlayground.tsx` component in `web/src/features/steps/components/playground/StepAIPlayground.tsx`:
   - Horizontal layout (`flex flex-col md:flex-row`)
   - Props: `stepId` + `config`
   - State machine: idle → ready → generating → result/error
@@ -72,12 +72,12 @@
   - Side-by-side display of input/result images
   - Generation time display after completion
   - Reference: `web/src/features/ai-presets/components/shared/AIPlayground.tsx`
-- [ ] T008 [US1] Create `StepPlaygroundDialog.tsx` wrapper in `web/src/features/steps/components/playground/StepPlaygroundDialog.tsx`:
+- [x] T008 [US1] Create `StepPlaygroundDialog.tsx` wrapper in `web/src/features/steps/components/playground/StepPlaygroundDialog.tsx`:
   - shadcn/ui Dialog with `max-w-4xl`
   - Props: `stepId`, `config`, `open`, `onOpenChange`
   - Renders `StepAIPlayground` inside dialog
-- [ ] T009 [US1] Create barrel export `web/src/features/steps/components/playground/index.ts`
-- [ ] T010 [US1] Modify `web/src/features/steps/components/editors/AiTransformEditor.tsx`:
+- [x] T009 [US1] Create barrel export `web/src/features/steps/components/playground/index.ts`
+- [x] T010 [US1] Modify `web/src/features/steps/components/editors/AiTransformEditor.tsx`:
   - Add dialog state: `const [showPlayground, setShowPlayground] = useState(false)`
   - Add "Test" button with FlaskConical icon in new "Test AI Transform" section after Aspect Ratio
   - Disable button when no prompt configured: `disabled={!form.getValues('config.prompt')}`
@@ -96,7 +96,7 @@
 
 ### Implementation for User Story 2
 
-- [ ] T011 [US2] Enhance `StepAIPlayground.tsx` upload zone with drag-and-drop:
+- [x] T011 [US2] Enhance `StepAIPlayground.tsx` upload zone with drag-and-drop:
   - Add `onDragOver`, `onDragLeave`, `onDrop` handlers to upload zone
   - Visual feedback (highlight/border change) when dragging over zone
   - Accept dropped image files
@@ -116,7 +116,7 @@
 
 ### Implementation for User Story 3
 
-- [ ] T012 [US3] Enhance `StepAIPlayground.tsx` with error handling UI:
+- [x] T012 [US3] Enhance `StepAIPlayground.tsx` with error handling UI:
   - Display error state with clear message for each error type
   - Client-side validation errors: invalid file type → "Only JPEG, PNG, and WebP images are allowed"
   - Client-side validation errors: file too large → "Image must be under 10MB"
@@ -137,7 +137,7 @@
 
 ### Implementation for User Story 4
 
-- [ ] T013 [US4] Enhance `StepAIPlayground.tsx` with regeneration controls:
+- [x] T013 [US4] Enhance `StepAIPlayground.tsx` with regeneration controls:
   - Add "Regenerate" button in result state (same input image, new generation)
   - Add "Clear" / "Try New Image" button to reset to idle state
   - Preserve input image in state when regenerating
@@ -151,18 +151,18 @@
 
 **Purpose**: Final validation and quality assurance
 
-- [ ] T014 [P] Verify mobile-first responsive design:
+- [x] T014 [P] Verify mobile-first responsive design:
   - Dialog stacks vertically on mobile (`< md`)
   - Touch targets ≥44x44px
   - Upload zone large enough for touch interaction
-- [ ] T015 [P] Verify all interactive elements have appropriate disabled states and tooltips
+- [x] T015 [P] Verify all interactive elements have appropriate disabled states and tooltips
 
 ### Validation Loop (REQUIRED - Constitution Principle V)
 
 **Purpose**: Ensure code quality and correctness before merge
 
-- [ ] T016 Run `pnpm lint` and fix all errors/warnings
-- [ ] T017 Run `pnpm type-check` and resolve all TypeScript errors
+- [x] T016 Run `pnpm lint` and fix all errors/warnings
+- [x] T017 Run `pnpm type-check` and resolve all TypeScript errors
 - [ ] T018 Verify feature with manual testing checklist from quickstart.md:
   - [ ] Open Experience Editor with an AI Transform step
   - [ ] Configure prompt, model, aspect ratio
