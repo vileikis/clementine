@@ -25,17 +25,17 @@
 
 **Purpose**: Establish data model types, schemas, and constants
 
-- [ ] T001 [P] Add `ExtraSlotFrequency` type and update `EventExperienceLink` interface in `web/src/features/events/types/event.types.ts`
-- [ ] T002 [P] Add `EventExtras` interface in `web/src/features/events/types/event.types.ts`
-- [ ] T003 Update `Event` interface to include `extras` field in `web/src/features/events/types/event.types.ts`
-- [ ] T004 [P] Add `extraSlotFrequencySchema` and update `eventExperienceLinkSchema` in `web/src/features/events/schemas/events.schemas.ts`
-- [ ] T005 [P] Add `eventExtrasSchema` and update `eventSchema` in `web/src/features/events/schemas/events.schemas.ts`
-- [ ] T006 [P] Add input schemas for experience actions (add, update, remove) in `web/src/features/events/schemas/events.schemas.ts`
-- [ ] T007 [P] Add input schemas for extras actions (set, update, remove) in `web/src/features/events/schemas/events.schemas.ts`
-- [ ] T008 [P] Add `EXTRA_SLOTS` constant with slot metadata in `web/src/features/events/constants.ts`
-- [ ] T009 [P] Add `EXTRA_FREQUENCIES` constant with frequency options in `web/src/features/events/constants.ts`
-- [ ] T010 [P] Add `DEFAULT_EVENT_EXTRAS` constant in `web/src/features/events/constants.ts`
-- [ ] T011 Run `pnpm type-check` to verify type definitions are correct
+- [x] T001 [P] Add `ExtraSlotFrequency` type and update `EventExperienceLink` interface in `web/src/features/events/types/event.types.ts`
+- [x] T002 [P] Add `EventExtras` interface in `web/src/features/events/types/event.types.ts`
+- [x] T003 Update `Event` interface to include `extras` field in `web/src/features/events/types/event.types.ts`
+- [x] T004 [P] Add `extraSlotFrequencySchema` and update `eventExperienceLinkSchema` in `web/src/features/events/schemas/events.schemas.ts`
+- [x] T005 [P] Add `eventExtrasSchema` and update `eventSchema` in `web/src/features/events/schemas/events.schemas.ts`
+- [x] T006 [P] Add input schemas for experience actions (add, update, remove) in `web/src/features/events/schemas/events.schemas.ts`
+- [x] T007 [P] Add input schemas for extras actions (set, update, remove) in `web/src/features/events/schemas/events.schemas.ts`
+- [x] T008 [P] Add `EXTRA_SLOTS` constant with slot metadata in `web/src/features/events/constants.ts`
+- [x] T009 [P] Add `EXTRA_FREQUENCIES` constant with frequency options in `web/src/features/events/constants.ts`
+- [x] T010 [P] Add `DEFAULT_EVENT_EXTRAS` constant in `web/src/features/events/constants.ts`
+- [x] T011 Run `pnpm type-check` to verify type definitions are correct
 
 ---
 
@@ -45,24 +45,24 @@
 
 **CRITICAL**: No user story UI work can begin until this phase is complete
 
-- [ ] T012 Update `createEvent` function to include default extras in `web/src/features/events/repositories/events.repository.ts`
-- [ ] T013 [P] Add `addEventExperience` repository function in `web/src/features/events/repositories/events.repository.ts`
-- [ ] T014 [P] Add `updateEventExperience` repository function in `web/src/features/events/repositories/events.repository.ts`
-- [ ] T015 [P] Add `removeEventExperience` repository function in `web/src/features/events/repositories/events.repository.ts`
-- [ ] T016 [P] Add `setEventExtra` repository function in `web/src/features/events/repositories/events.repository.ts`
-- [ ] T017 [P] Add `updateEventExtra` repository function in `web/src/features/events/repositories/events.repository.ts`
-- [ ] T018 [P] Add `removeEventExtra` repository function in `web/src/features/events/repositories/events.repository.ts`
-- [ ] T019 [P] Implement `addEventExperienceAction` server action in `web/src/features/events/actions/events.actions.ts`
-- [ ] T020 [P] Implement `updateEventExperienceAction` server action in `web/src/features/events/actions/events.actions.ts`
-- [ ] T021 [P] Implement `removeEventExperienceAction` server action in `web/src/features/events/actions/events.actions.ts`
-- [ ] T022 [P] Implement `setEventExtraAction` server action in `web/src/features/events/actions/events.actions.ts`
-- [ ] T023 [P] Implement `updateEventExtraAction` server action in `web/src/features/events/actions/events.actions.ts`
-- [ ] T024 [P] Implement `removeEventExtraAction` server action in `web/src/features/events/actions/events.actions.ts`
-- [ ] T025 Update barrel export in `web/src/features/events/actions/index.ts` to export new actions
-- [ ] T026 Create `useExperienceDetails` hook in `web/src/features/experiences/hooks/useExperienceDetails.ts`
-- [ ] T027 Update barrel export in `web/src/features/experiences/hooks/index.ts` to export new hook
-- [ ] T028 Update feature export in `web/src/features/experiences/index.ts` to export `useExperienceDetails`
-- [ ] T029 Run `pnpm type-check` and `pnpm lint` to verify foundational layer
+- [x] T012 Update `createEvent` function to include default extras in `web/src/features/events/repositories/events.repository.ts`
+- [x] T013 [P] Add `addEventExperience` repository function in `web/src/features/events/repositories/events.repository.ts`
+- [x] T014 [P] Add `updateEventExperience` repository function in `web/src/features/events/repositories/events.repository.ts`
+- [x] T015 [P] Add `removeEventExperience` repository function in `web/src/features/events/repositories/events.repository.ts`
+- [x] T016 [P] Add `setEventExtra` repository function in `web/src/features/events/repositories/events.repository.ts`
+- [x] T017 [P] Add `updateEventExtra` repository function in `web/src/features/events/repositories/events.repository.ts`
+- [x] T018 [P] Add `removeEventExtra` repository function in `web/src/features/events/repositories/events.repository.ts`
+- [x] T019 [P] Implement `addEventExperienceAction` server action in `web/src/features/events/actions/events.actions.ts`
+- [x] T020 [P] Implement `updateEventExperienceAction` server action in `web/src/features/events/actions/events.actions.ts`
+- [x] T021 [P] Implement `removeEventExperienceAction` server action in `web/src/features/events/actions/events.actions.ts`
+- [x] T022 [P] Implement `setEventExtraAction` server action in `web/src/features/events/actions/events.actions.ts`
+- [x] T023 [P] Implement `updateEventExtraAction` server action in `web/src/features/events/actions/events.actions.ts`
+- [x] T024 [P] Implement `removeEventExtraAction` server action in `web/src/features/events/actions/events.actions.ts`
+- [x] T025 Update barrel export in `web/src/features/events/actions/index.ts` to export new actions
+- [x] T026 Create `useExperienceDetails` hook in `web/src/features/experiences/hooks/useExperienceDetails.ts`
+- [x] T027 Update barrel export in `web/src/features/experiences/hooks/index.ts` to export new hook
+- [x] T028 Update feature export in `web/src/features/experiences/index.ts` to export `useExperienceDetails`
+- [x] T029 Run `pnpm type-check` and `pnpm lint` to verify foundational layer
 
 **Checkpoint**: Foundation ready - UI implementation can now begin
 
@@ -76,12 +76,12 @@
 
 ### Implementation for User Stories 1 & 2
 
-- [ ] T030 [P] [US1] Create `general/` directory and barrel export in `web/src/features/events/components/general/index.ts`
-- [ ] T031 [P] [US1] Create `AddExperienceCard` component in `web/src/features/events/components/general/AddExperienceCard.tsx`
-- [ ] T032 [P] [US1] Create `EventExperienceCard` component with toggle in `web/src/features/events/components/general/EventExperienceCard.tsx`
-- [ ] T033 [US1] Create `ExperiencePickerDrawer` component in `web/src/features/events/components/general/ExperiencePickerDrawer.tsx`
-- [ ] T034 [US1] Create `ExperiencesSection` component in `web/src/features/events/components/general/ExperiencesSection.tsx`
-- [ ] T035 [US1] Update barrel export in `web/src/features/events/components/general/index.ts` for experiences components
+- [x] T030 [P] [US1] Create `general/` directory and barrel export in `web/src/features/events/components/general/index.ts`
+- [x] T031 [P] [US1] Create `AddExperienceCard` component in `web/src/features/events/components/general/AddExperienceCard.tsx`
+- [x] T032 [P] [US1] Create `EventExperienceCard` component with toggle in `web/src/features/events/components/general/EventExperienceCard.tsx`
+- [x] T033 [US1] Create `ExperiencePickerDrawer` component in `web/src/features/events/components/general/ExperiencePickerDrawer.tsx`
+- [x] T034 [US1] Create `ExperiencesSection` component in `web/src/features/events/components/general/ExperiencesSection.tsx`
+- [x] T035 [US1] Update barrel export in `web/src/features/events/components/general/index.ts` for experiences components
 
 **Checkpoint**: Can add experiences to event, toggle enabled/disabled - User Stories 1 & 2 complete
 

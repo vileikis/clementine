@@ -1,9 +1,10 @@
 // Events repository - CRUD operations for events subcollection
 
 import { db } from "@/lib/firebase/admin";
-import type { Event } from "../types/event.types";
+import type { Event, EventExperienceLink } from "../types/event.types";
 import { eventSchema } from "../schemas";
-import { DEFAULT_EVENT_THEME } from "../constants";
+import { DEFAULT_EVENT_THEME, DEFAULT_EVENT_EXTRAS } from "../constants";
+import type { ExtraSlot } from "../schemas";
 
 /**
  * Get the events collection reference for a project
@@ -34,6 +35,7 @@ export async function createEvent(data: {
     publishStartAt: null,
     publishEndAt: null,
     experiences: [],
+    extras: DEFAULT_EVENT_EXTRAS,
     theme: DEFAULT_EVENT_THEME,
     deletedAt: null,
     createdAt: now,
@@ -210,6 +212,184 @@ export async function softDeleteEvent(
 
   await eventRef.update({
     deletedAt: Date.now(),
+    updatedAt: Date.now(),
+  });
+}
+
+// ============================================================================
+// Experience Array Operations
+// ============================================================================
+
+/**
+ * Add an experience to the event's experiences array
+ */
+export async function addEventExperience(
+  projectId: string,
+  eventId: string,
+  experienceLink: EventExperienceLink
+): Promise<void> {
+  const eventRef = getEventsCollection(projectId).doc(eventId);
+
+  // Get current event to check for duplicates
+  const doc = await eventRef.get();
+  if (!doc.exists) {
+    throw new Error("Event not found");
+  }
+
+  const data = doc.data();
+  const currentExperiences = (data?.experiences || []) as EventExperienceLink[];
+
+  // Check for duplicate
+  if (currentExperiences.some((exp) => exp.experienceId === experienceLink.experienceId)) {
+    throw new Error("Experience already attached to this event");
+  }
+
+  await eventRef.update({
+    experiences: [...currentExperiences, experienceLink],
+    updatedAt: Date.now(),
+  });
+}
+
+/**
+ * Update an existing experience in the event's experiences array
+ */
+export async function updateEventExperience(
+  projectId: string,
+  eventId: string,
+  experienceId: string,
+  updates: Partial<Pick<EventExperienceLink, "label" | "enabled">>
+): Promise<void> {
+  const eventRef = getEventsCollection(projectId).doc(eventId);
+
+  // Get current event
+  const doc = await eventRef.get();
+  if (!doc.exists) {
+    throw new Error("Event not found");
+  }
+
+  const data = doc.data();
+  const currentExperiences = (data?.experiences || []) as EventExperienceLink[];
+
+  // Find and update the experience
+  const experienceIndex = currentExperiences.findIndex(
+    (exp) => exp.experienceId === experienceId
+  );
+
+  if (experienceIndex === -1) {
+    throw new Error("Experience not found in event");
+  }
+
+  const updatedExperiences = [...currentExperiences];
+  updatedExperiences[experienceIndex] = {
+    ...updatedExperiences[experienceIndex],
+    ...updates,
+  };
+
+  await eventRef.update({
+    experiences: updatedExperiences,
+    updatedAt: Date.now(),
+  });
+}
+
+/**
+ * Remove an experience from the event's experiences array
+ */
+export async function removeEventExperience(
+  projectId: string,
+  eventId: string,
+  experienceId: string
+): Promise<void> {
+  const eventRef = getEventsCollection(projectId).doc(eventId);
+
+  // Get current event
+  const doc = await eventRef.get();
+  if (!doc.exists) {
+    throw new Error("Event not found");
+  }
+
+  const data = doc.data();
+  const currentExperiences = (data?.experiences || []) as EventExperienceLink[];
+
+  // Filter out the experience
+  const updatedExperiences = currentExperiences.filter(
+    (exp) => exp.experienceId !== experienceId
+  );
+
+  await eventRef.update({
+    experiences: updatedExperiences,
+    updatedAt: Date.now(),
+  });
+}
+
+// ============================================================================
+// Extras Slot Operations
+// ============================================================================
+
+/**
+ * Set an extra slot (create or replace)
+ */
+export async function setEventExtra(
+  projectId: string,
+  eventId: string,
+  slot: ExtraSlot,
+  experienceLink: EventExperienceLink
+): Promise<void> {
+  const eventRef = getEventsCollection(projectId).doc(eventId);
+
+  await eventRef.update({
+    [`extras.${slot}`]: experienceLink,
+    updatedAt: Date.now(),
+  });
+}
+
+/**
+ * Update an existing extra slot's configuration
+ */
+export async function updateEventExtra(
+  projectId: string,
+  eventId: string,
+  slot: ExtraSlot,
+  updates: Partial<Pick<EventExperienceLink, "label" | "enabled" | "frequency">>
+): Promise<void> {
+  const eventRef = getEventsCollection(projectId).doc(eventId);
+
+  // Get current event to verify slot exists
+  const doc = await eventRef.get();
+  if (!doc.exists) {
+    throw new Error("Event not found");
+  }
+
+  const data = doc.data();
+  const currentExtra = data?.extras?.[slot] as EventExperienceLink | null;
+
+  if (!currentExtra) {
+    throw new Error(`Extra slot '${slot}' is empty`);
+  }
+
+  // Merge updates with existing slot data
+  const updatedExtra = {
+    ...currentExtra,
+    ...updates,
+  };
+
+  await eventRef.update({
+    [`extras.${slot}`]: updatedExtra,
+    updatedAt: Date.now(),
+  });
+}
+
+/**
+ * Remove an extra from a slot (set to null)
+ */
+export async function removeEventExtra(
+  projectId: string,
+  eventId: string,
+  slot: ExtraSlot
+): Promise<void> {
+  const eventRef = getEventsCollection(projectId).doc(eventId);
+
+  await eventRef.update({
+    [`extras.${slot}`]: null,
     updatedAt: Date.now(),
   });
 }
