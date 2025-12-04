@@ -5,9 +5,10 @@
  *
  * Editor for AI Transform step type.
  * Configures AI model, prompt, output type, aspect ratio, and reference images.
+ * Includes AI Playground test panel for testing transformations.
  */
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -37,9 +38,10 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { X } from "lucide-react";
+import { X, FlaskConical } from "lucide-react";
 import { useAutoSave } from "../../hooks";
 import type { StepAiTransform } from "../../types";
+import { StepPlaygroundDialog } from "../playground";
 
 // Available AI models
 const AI_MODELS = [
@@ -101,6 +103,9 @@ export function AiTransformEditor({
   onUpdate,
   onPreviewChange,
 }: AiTransformEditorProps) {
+  // Dialog state for playground
+  const [showPlayground, setShowPlayground] = useState(false);
+
   // Provide defaults for config in case it's undefined
   const config = step.config ?? {
     model: null,
@@ -382,7 +387,56 @@ export function AiTransformEditor({
             </FormItem>
           )}
         />
+
+        {/* Test AI Transform Section */}
+        <div className="border-t pt-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-sm font-medium">Test AI Transform</h3>
+              <p className="text-xs text-muted-foreground">
+                Test your configuration with a sample image
+              </p>
+            </div>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowPlayground(true)}
+                    disabled={!form.getValues("config.prompt")}
+                    type="button"
+                    className="min-h-[44px]"
+                  >
+                    <FlaskConical className="h-4 w-4 mr-2" />
+                    Test
+                  </Button>
+                </span>
+              </TooltipTrigger>
+              {!form.getValues("config.prompt") && (
+                <TooltipContent>
+                  <p>Add a prompt to enable testing</p>
+                </TooltipContent>
+              )}
+            </Tooltip>
+          </div>
+        </div>
       </form>
+
+      {/* Playground Dialog */}
+      <StepPlaygroundDialog
+        stepId={step.id}
+        config={{
+          model: form.getValues("config.model"),
+          prompt: form.getValues("config.prompt"),
+          variables: form.getValues("config.variables"),
+          outputType: form.getValues("config.outputType"),
+          aspectRatio: form.getValues("config.aspectRatio"),
+          referenceImageUrls: form.getValues("config.referenceImageUrls"),
+        }}
+        open={showPlayground}
+        onOpenChange={setShowPlayground}
+      />
     </Form>
   );
 }
