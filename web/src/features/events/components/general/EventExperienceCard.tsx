@@ -1,6 +1,7 @@
 "use client";
 
-import { AlertTriangle, Layers } from "lucide-react";
+import Image from "next/image";
+import { AlertTriangle, ImageIcon } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import type { EventExperienceLink } from "../../types/event.types";
@@ -54,17 +55,30 @@ export function EventExperienceCard({
         aria-label={`Edit ${displayName}`}
       />
 
-      {/* Icon */}
+      {/* Preview thumbnail */}
       <div
         className={cn(
-          "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg",
-          isNotFound ? "bg-destructive/10" : "bg-primary/10"
+          "relative h-12 w-12 shrink-0 overflow-hidden rounded-lg",
+          isNotFound ? "bg-destructive/10" : "bg-muted"
         )}
       >
         {isNotFound ? (
-          <AlertTriangle className="h-5 w-5 text-destructive" />
+          <div className="flex h-full w-full items-center justify-center">
+            <AlertTriangle className="h-5 w-5 text-destructive" />
+          </div>
+        ) : experience?.previewMediaUrl ? (
+          <Image
+            src={experience.previewMediaUrl}
+            alt=""
+            fill
+            className="object-cover"
+            sizes="48px"
+            unoptimized={experience.previewType === "gif"}
+          />
         ) : (
-          <Layers className="h-5 w-5 text-primary" />
+          <div className="flex h-full w-full items-center justify-center">
+            <ImageIcon className="h-5 w-5 text-muted-foreground/40" />
+          </div>
         )}
       </div>
 
