@@ -70,28 +70,39 @@ await updateDoc(eventRef, { experiences: updatedExperiences });
 
 **Question**: How to fetch and display experience details (name, description) for attached experiences?
 
-**Decision**: Create two new hooks - `useCompanyExperiences` for the picker and `useExperienceDetails` for resolving linked experiences
+**Decision**: Reuse existing `useExperiences` hook from experiences module for the picker; add new `useExperienceDetails` hook to experiences module for resolving linked experiences
 
 **Rationale**:
 - Experience picker needs all active experiences from the company library
+- **Existing `useExperiences` hook already does this** - queries `/experiences` by `companyId` and `status === "active"`
 - Event display needs to resolve experience IDs to names/descriptions
-- Real-time updates desired for consistency with existing hook patterns
-- Existing `useExperiences` hook in experiences feature can serve as reference
+- Both hooks operate only on `/experiences` collection with `Experience` type - no events dependency
+- Hooks belong in `features/experiences/` module per single-responsibility principle
 
 **Implementation Pattern**:
 ```typescript
-// For experience picker - fetch all active company experiences
-function useCompanyExperiences(companyId: string) {
-  // Real-time subscription to /experiences where companyId matches and status = "active"
-}
+// For experience picker - REUSE existing hook
+import { useExperiences } from "@/features/experiences";
+const { experiences, loading, error } = useExperiences(companyId);
 
-// For event display - resolve attached experience IDs to details
+// For event display - NEW hook in experiences module
+// web/src/features/experiences/hooks/useExperienceDetails.ts
 function useExperienceDetails(experienceIds: string[]) {
   // Batch fetch by IDs, return Map<id, Experience>
 }
 ```
 
+**Module Placement Analysis**:
+| Hook | Collection | Types Used | Module |
+|------|------------|------------|--------|
+| `useExperiences` | `/experiences` | `Experience` | `features/experiences/` (existing) |
+| `useExperienceDetails` | `/experiences` | `Experience` | `features/experiences/` (new) |
+
+Neither hook depends on events types or collections, so both belong in the experiences module.
+
 **Alternatives Considered**:
+- Create `useCompanyExperiences` in events module: Rejected - duplicates existing `useExperiences` functionality
+- Put `useExperienceDetails` in events module: Rejected - no dependency on events, violates single-responsibility
 - Server-side resolution in page component: Rejected - would lose real-time updates
 - Denormalize experience names into EventExperienceLink: Rejected - data staleness issues, harder to keep in sync
 
@@ -126,37 +137,36 @@ function useExperienceDetails(experienceIds: string[]) {
 
 **Question**: How to organize the new components within the events feature module?
 
-**Decision**: Create `components/general/` directory with `experiences/` and `extras/` subdirectories
+**Decision**: Place `EventGeneralTab.tsx` at `components/` level (same as other tab components), create flat `components/general/` directory for supporting components
 
 **Rationale**:
-- Follows existing patterns (e.g., `components/designer/` for theme editor)
-- Clear separation between the two sections of the General tab
-- Barrel exports at each level for clean imports
-- Tab-based organization matches route structure
+- `EventGeneralTab` is a top-level tab component like `EventExperiencesTab` was - should be at same level
+- Flat `general/` folder keeps related components together without over-nesting
+- Avoids 3-level deep nesting (`general/experiences/ExperiencesSection.tsx`) which adds unnecessary complexity
+- Barrel exports at `general/` level for clean imports
+- Simpler navigation and file discovery
 
 **File Structure**:
 ```
 components/
 ├── index.ts
-├── general/
-│   ├── index.ts
-│   ├── EventGeneralTab.tsx      # Main container
-│   ├── experiences/             # Guest-selectable experiences
-│   │   ├── index.ts
-│   │   ├── ExperiencesSection.tsx
-│   │   ├── AddExperienceCard.tsx
-│   │   ├── EventExperienceCard.tsx
-│   │   ├── ExperiencePickerDrawer.tsx
-│   │   └── EventExperienceDrawer.tsx
-│   └── extras/                  # Slot-based extras
-│       ├── index.ts
-│       ├── ExtrasSection.tsx
-│       ├── ExtraSlotCard.tsx
-│       └── ExtraSlotDrawer.tsx
+├── EventDetailsHeader.tsx       # (existing)
+├── EventGeneralTab.tsx          # Main tab component (same level as other tabs)
+└── general/                     # Supporting components (flat)
+    ├── index.ts
+    ├── ExperiencesSection.tsx
+    ├── AddExperienceCard.tsx
+    ├── EventExperienceCard.tsx
+    ├── ExperiencePickerDrawer.tsx
+    ├── EventExperienceDrawer.tsx
+    ├── ExtrasSection.tsx
+    ├── ExtraSlotCard.tsx
+    └── ExtraSlotDrawer.tsx
 ```
 
 **Alternatives Considered**:
-- Flat structure in `components/`: Rejected - too many files, harder to navigate
+- Nested `experiences/` and `extras/` subdirectories: Rejected - over-nesting for ~9 components
+- All components flat in `components/`: Rejected - mixes General tab components with other event components
 - Separate `events-experiences` feature module: Rejected - over-engineering, tightly coupled to events
 
 ---
@@ -259,11 +269,12 @@ if (existingIds.includes(input.experienceId)) {
    - Use Admin SDK for all Firestore operations
    - Validate existence before updates
 
-3. **Hook Pattern** (from `useEvent.ts`):
+3. **Hook Pattern** (from `useExperiences.ts` in experiences module):
    - Use `onSnapshot` for real-time subscriptions
-   - Return `{ data, loading, error }` state
+   - Return `{ experiences, loading, error }` state (or similar shape)
    - Use `useReducer` for complex state
    - Clean up subscription on unmount
+   - Place hooks in the module that owns the data being fetched
 
 4. **Dialog/Drawer Pattern** (from `CreateEventDialog.tsx`):
    - Controlled via `open`/`onOpenChange` props

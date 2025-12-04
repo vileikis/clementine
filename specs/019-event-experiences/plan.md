@@ -26,7 +26,7 @@ Implement the **General Tab** for Events, enabling attachment of guest-facing **
 **Project Type**: Web monorepo (pnpm workspace)
 **Performance Goals**: Page load < 2s on 4G, drawer interactions < 300ms
 **Constraints**: Mobile-first touch targets (44x44px min), Admin SDK for all writes
-**Scale/Scope**: Single feature module extension, ~15 new components, 6 server actions
+**Scale/Scope**: Single feature module extension, ~10 new components, 6 server actions, 1 new hook
 
 ## Constitution Check
 
@@ -94,28 +94,28 @@ web/src/features/events/
 ├── actions/
 │   └── events.actions.ts        # Update: 6 new server actions
 ├── hooks/
-│   ├── useEvent.ts             # (existing)
-│   ├── useCompanyExperiences.ts # New: Real-time company experiences list
-│   └── useExperienceDetails.ts  # New: Batch fetch experience details
+│   └── useEvent.ts              # (existing - no changes)
 ├── constants.ts                 # Update: EXTRA_SLOTS, EXTRA_FREQUENCIES
 └── components/
     ├── EventDetailsHeader.tsx   # Update: Tab rename to "General"
     ├── EventExperiencesTab.tsx  # Delete: Replaced by EventGeneralTab
-    └── general/
+    ├── EventGeneralTab.tsx      # New: Main General tab component
+    └── general/                 # New: Supporting components (flat structure)
         ├── index.ts
-        ├── EventGeneralTab.tsx
-        ├── experiences/
-        │   ├── index.ts
-        │   ├── ExperiencesSection.tsx
-        │   ├── AddExperienceCard.tsx
-        │   ├── EventExperienceCard.tsx
-        │   ├── ExperiencePickerDrawer.tsx
-        │   └── EventExperienceDrawer.tsx
-        └── extras/
-            ├── index.ts
-            ├── ExtrasSection.tsx
-            ├── ExtraSlotCard.tsx
-            └── ExtraSlotDrawer.tsx
+        ├── ExperiencesSection.tsx
+        ├── AddExperienceCard.tsx
+        ├── EventExperienceCard.tsx
+        ├── ExperiencePickerDrawer.tsx
+        ├── EventExperienceDrawer.tsx
+        ├── ExtrasSection.tsx
+        ├── ExtraSlotCard.tsx
+        └── ExtraSlotDrawer.tsx
+
+web/src/features/experiences/
+├── hooks/
+│   ├── useExperiences.ts        # (existing) - Reuse for company experiences list
+│   └── useExperienceDetails.ts  # New: Batch fetch experience details by IDs
+└── index.ts                     # Update: Export new hook
 
 web/src/app/(workspace)/[companySlug]/[projectId]/[eventId]/
 ├── layout.tsx                   # (existing - no changes needed)

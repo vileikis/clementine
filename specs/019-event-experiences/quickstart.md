@@ -95,20 +95,25 @@ Before starting implementation:
 
 ### Phase 4: Hooks
 
-**Goal**: Add data fetching hooks for UI
+**Goal**: Add data fetching hook for resolving experience details
 
 **Order**:
 
-1. **Create `useCompanyExperiences` hook** (`web/src/features/events/hooks/useCompanyExperiences.ts`)
-   - Real-time subscription to company's active experiences
-   - Returns `{ experiences, isLoading, error }`
+1. **Verify existing `useExperiences` hook** (`web/src/features/experiences/hooks/useExperiences.ts`)
+   - Already provides real-time subscription to company's active experiences
+   - Returns `{ experiences, loading, error }`
+   - **No changes needed** - reuse as-is for experience picker
 
-2. **Create `useExperienceDetails` hook** (`web/src/features/events/hooks/useExperienceDetails.ts`)
-   - Batch fetch experience details by IDs
-   - Returns `{ experiencesMap, isLoading, error }`
+2. **Create `useExperienceDetails` hook** (`web/src/features/experiences/hooks/useExperienceDetails.ts`)
+   - Batch fetch experience details by array of IDs
+   - Returns `{ experiencesMap, loading, error }`
+   - Place in **experiences module** (queries `/experiences` collection, uses `Experience` type)
 
-3. **Update Barrel Export** (`web/src/features/events/hooks/index.ts`)
-   - Export new hooks
+3. **Update Barrel Export** (`web/src/features/experiences/hooks/index.ts`)
+   - Export new `useExperienceDetails` hook
+
+4. **Update Feature Export** (`web/src/features/experiences/index.ts`)
+   - Ensure `useExperienceDetails` is exported from feature
 
 **Validation**: Run `pnpm type-check` - should pass
 
@@ -123,43 +128,39 @@ Before starting implementation:
 1. **Create Directory Structure**:
    ```
    web/src/features/events/components/general/
-   ├── index.ts
-   ├── experiences/
-   │   └── index.ts
-   └── extras/
-       └── index.ts
+   └── index.ts
    ```
 
-2. **Create `ExperiencesSection`** (`components/general/experiences/ExperiencesSection.tsx`)
+2. **Create `ExperiencesSection`** (`components/general/ExperiencesSection.tsx`)
    - Section container with header and subtitle
    - Grid layout for cards
    - Pass event data and handlers
 
-3. **Create `AddExperienceCard`** (`components/general/experiences/AddExperienceCard.tsx`)
+3. **Create `AddExperienceCard`** (`components/general/AddExperienceCard.tsx`)
    - Plus icon card
    - Opens picker drawer on click
 
-4. **Create `EventExperienceCard`** (`components/general/experiences/EventExperienceCard.tsx`)
+4. **Create `EventExperienceCard`** (`components/general/EventExperienceCard.tsx`)
    - Display experience name (resolved from Experience data)
    - Enable/disable toggle
    - Click to open edit drawer
    - Muted styling when disabled
 
-5. **Create `ExperiencePickerDrawer`** (`components/general/experiences/ExperiencePickerDrawer.tsx`)
+5. **Create `ExperiencePickerDrawer`** (`components/general/ExperiencePickerDrawer.tsx`)
    - Uses Sheet component
-   - List view of company experiences
+   - List view of company experiences (uses `useExperiences` from experiences module)
    - Detail view on selection
    - Label input field
    - Add button
 
-6. **Create `EventExperienceDrawer`** (`components/general/experiences/EventExperienceDrawer.tsx`)
+6. **Create `EventExperienceDrawer`** (`components/general/EventExperienceDrawer.tsx`)
    - Uses Sheet component
    - Display experience info
    - Edit label field
    - "Open in Editor" link
    - Remove button with confirmation
 
-7. **Update Barrel Exports**
+7. **Update Barrel Export** (`components/general/index.ts`)
 
 **Validation**: Run `pnpm type-check` and `pnpm lint` - should pass
 
@@ -171,24 +172,24 @@ Before starting implementation:
 
 **Order**:
 
-1. **Create `ExtrasSection`** (`components/general/extras/ExtrasSection.tsx`)
+1. **Create `ExtrasSection`** (`components/general/ExtrasSection.tsx`)
    - Section container with header and subtitle
    - Vertical stack of slot cards
 
-2. **Create `ExtraSlotCard`** (`components/general/extras/ExtraSlotCard.tsx`)
+2. **Create `ExtraSlotCard`** (`components/general/ExtraSlotCard.tsx`)
    - Slot header with info tooltip
    - Empty state with "+" button
    - Filled state with experience name, frequency badge, toggle, remove
 
-3. **Create `ExtraSlotDrawer`** (`components/general/extras/ExtraSlotDrawer.tsx`)
+3. **Create `ExtraSlotDrawer`** (`components/general/ExtraSlotDrawer.tsx`)
    - Uses Sheet component
-   - Experience selector (dropdown or list)
+   - Experience selector (uses `useExperiences` from experiences module)
    - Label input field
    - Frequency radio buttons
    - "Open in Editor" link
    - Remove button with confirmation
 
-4. **Update Barrel Exports**
+4. **Update Barrel Export** (`components/general/index.ts`)
 
 **Validation**: Run `pnpm type-check` and `pnpm lint` - should pass
 
@@ -200,13 +201,15 @@ Before starting implementation:
 
 **Order**:
 
-1. **Create `EventGeneralTab`** (`components/general/EventGeneralTab.tsx`)
-   - Main container component
-   - Renders ExperiencesSection and ExtrasSection
+1. **Create `EventGeneralTab`** (`components/EventGeneralTab.tsx`)
+   - Main container component (same level as other tab components)
+   - Renders ExperiencesSection and ExtrasSection from `general/`
    - Manages drawer state
+   - Uses `useExperiences` for picker, `useExperienceDetails` for display
    - Passes event data and handlers
 
-2. **Update Barrel Exports** (`components/general/index.ts`, `components/index.ts`)
+2. **Update Barrel Exports** (`components/index.ts`)
+   - Export `EventGeneralTab`
 
 **Validation**: Run `pnpm type-check` and `pnpm lint` - should pass
 
@@ -278,26 +281,23 @@ pnpm lint && pnpm type-check && pnpm test
 ### Files to Create
 
 ```
+web/src/features/experiences/
+└── hooks/
+    └── useExperienceDetails.ts    # New hook for batch fetching by IDs
+
 web/src/features/events/
-├── hooks/
-│   ├── useCompanyExperiences.ts
-│   └── useExperienceDetails.ts
 └── components/
+    ├── EventGeneralTab.tsx        # Main tab component
     └── general/
         ├── index.ts
-        ├── EventGeneralTab.tsx
-        ├── experiences/
-        │   ├── index.ts
-        │   ├── ExperiencesSection.tsx
-        │   ├── AddExperienceCard.tsx
-        │   ├── EventExperienceCard.tsx
-        │   ├── ExperiencePickerDrawer.tsx
-        │   └── EventExperienceDrawer.tsx
-        └── extras/
-            ├── index.ts
-            ├── ExtrasSection.tsx
-            ├── ExtraSlotCard.tsx
-            └── ExtraSlotDrawer.tsx
+        ├── ExperiencesSection.tsx
+        ├── AddExperienceCard.tsx
+        ├── EventExperienceCard.tsx
+        ├── ExperiencePickerDrawer.tsx
+        ├── EventExperienceDrawer.tsx
+        ├── ExtrasSection.tsx
+        ├── ExtraSlotCard.tsx
+        └── ExtraSlotDrawer.tsx
 
 web/src/app/(workspace)/[companySlug]/[projectId]/[eventId]/
 └── general/
@@ -307,13 +307,16 @@ web/src/app/(workspace)/[companySlug]/[projectId]/[eventId]/
 ### Files to Modify
 
 ```
+web/src/features/experiences/
+├── hooks/index.ts                 # Export useExperienceDetails
+└── index.ts                       # Export new hook from feature
+
 web/src/features/events/
 ├── types/event.types.ts           # Add new types
 ├── schemas/events.schemas.ts      # Add new schemas
 ├── constants.ts                   # Add new constants
 ├── repositories/events.repository.ts  # Add new functions
 ├── actions/events.actions.ts      # Add new actions
-├── hooks/index.ts                 # Export new hooks
 ├── components/index.ts            # Export new components
 └── components/EventDetailsHeader.tsx  # Rename tab
 ```
@@ -372,41 +375,65 @@ export async function addEventExperienceAction(
 }
 ```
 
-### Hook Pattern
+### Hook Pattern (useExperienceDetails - new hook)
 
 ```typescript
-export function useCompanyExperiences(companyId: string | null) {
+// web/src/features/experiences/hooks/useExperienceDetails.ts
+"use client";
+
+import { useReducer, useEffect } from "react";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase/client";
+import type { Experience } from "../types";
+
+interface State {
+  experiencesMap: Map<string, Experience>;
+  loading: boolean;
+  error: Error | null;
+}
+
+export function useExperienceDetails(experienceIds: string[]): State {
   const [state, dispatch] = useReducer(reducer, {
-    experiences: [],
-    loading: Boolean(companyId),
+    experiencesMap: new Map(),
+    loading: experienceIds.length > 0,
     error: null,
   });
 
   useEffect(() => {
-    if (!companyId) return;
+    if (experienceIds.length === 0) {
+      dispatch({ type: "RESET" });
+      return;
+    }
 
-    const q = query(
-      collection(db, "experiences"),
-      where("companyId", "==", companyId),
-      where("status", "==", "active")
-    );
+    dispatch({ type: "LOADING" });
 
-    const unsubscribe = onSnapshot(
-      q,
-      (snapshot) => {
-        const experiences = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as Experience[];
-        dispatch({ type: "SUCCESS", payload: experiences });
-      },
-      (err) => {
-        dispatch({ type: "ERROR", payload: err.message });
+    // Batch fetch experiences by IDs
+    const fetchExperiences = async () => {
+      try {
+        const results = await Promise.all(
+          experienceIds.map(async (id) => {
+            const docRef = doc(db, "experiences", id);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+              return { id, ...docSnap.data() } as Experience;
+            }
+            return null;
+          })
+        );
+
+        const map = new Map<string, Experience>();
+        results.forEach((exp) => {
+          if (exp) map.set(exp.id, exp);
+        });
+
+        dispatch({ type: "SUCCESS", experiencesMap: map });
+      } catch (err) {
+        dispatch({ type: "ERROR", error: err as Error });
       }
-    );
+    };
 
-    return () => unsubscribe();
-  }, [companyId]);
+    fetchExperiences();
+  }, [experienceIds.join(",")]); // Re-fetch when IDs change
 
   return state;
 }
@@ -434,7 +461,8 @@ export function ExperiencePickerDrawer({
   const [label, setLabel] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { experiences, isLoading } = useCompanyExperiences(companyId);
+  // Reuse existing hook from experiences module
+  const { experiences, loading } = useExperiences(companyId);
 
   // Filter out already-attached experiences
   const availableExperiences = experiences.filter(
@@ -480,7 +508,7 @@ export function ExperiencePickerDrawer({
    - Verify Sheet component is imported from `@/components/ui/sheet`
 
 4. **Experience data not showing**
-   - Check `useCompanyExperiences` hook is receiving correct companyId
+   - Check `useExperiences` hook is receiving correct companyId
    - Verify Firestore query filters are correct
    - Check console for Firestore errors
 
