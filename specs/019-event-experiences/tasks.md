@@ -139,12 +139,12 @@
 
 **Purpose**: Wire up the General tab and route
 
-- [ ] T045 Create `EventGeneralTab` component in `web/src/features/events/components/EventGeneralTab.tsx`
-- [ ] T046 Update barrel export in `web/src/features/events/components/index.ts` to export `EventGeneralTab`
-- [ ] T047 Create route page in `web/src/app/(workspace)/[companySlug]/[projectId]/[eventId]/general/page.tsx`
-- [ ] T048 Update tab navigation in `web/src/features/events/components/EventDetailsHeader.tsx` - rename "Experiences" to "General" and update href
-- [ ] T049 Delete old route at `web/src/app/(workspace)/[companySlug]/[projectId]/[eventId]/experiences/page.tsx`
-- [ ] T050 Delete old component `web/src/features/events/components/EventExperiencesTab.tsx`
+- [x] T045 Create `EventGeneralTab` component in `web/src/features/events/components/EventGeneralTab.tsx`
+- [x] T046 Update barrel export in `web/src/features/events/components/index.ts` to export `EventGeneralTab`
+- [x] T047 Create route page in `web/src/app/(workspace)/[companySlug]/[projectId]/[eventId]/general/page.tsx`
+- [x] T048 Update tab navigation in `web/src/features/events/components/EventDetailsHeader.tsx` - rename "Experiences" to "General" and update href
+- [x] T049 Delete old route at `web/src/app/(workspace)/[companySlug]/[projectId]/[eventId]/experiences/page.tsx`
+- [x] T050 Delete old component `web/src/features/events/components/EventExperiencesTab.tsx`
 
 **Checkpoint**: General tab is accessible and renders correctly
 
@@ -163,8 +163,8 @@
 
 **Purpose**: Ensure code quality and correctness before merge
 
-- [ ] T055 Run `pnpm lint` and fix all errors/warnings
-- [ ] T056 Run `pnpm type-check` and resolve all TypeScript errors
+- [x] T055 Run `pnpm lint` and fix all errors/warnings
+- [x] T056 Run `pnpm type-check` and resolve all TypeScript errors
 - [ ] T057 Verify feature in local dev server (`pnpm dev`) - navigate to General tab
 - [ ] T058 Manual testing: Add experience, toggle, edit label, remove with confirmation
 - [ ] T059 Manual testing: Configure both extra slots with different frequencies

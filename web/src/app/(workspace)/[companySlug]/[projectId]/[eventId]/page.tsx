@@ -9,5 +9,5 @@ interface EventPageProps {
  */
 export default async function EventPage({ params }: EventPageProps) {
   const { companySlug, projectId, eventId } = await params;
-  redirect(`/${companySlug}/${projectId}/${eventId}/experiences`);
+  redirect(`/${companySlug}/${projectId}/${eventId}/general`);
 }
