@@ -2,7 +2,9 @@
 
 import { useState, useTransition } from "react";
 import Image from "next/image";
-import { Loader2, ImageIcon, Trash2 } from "lucide-react";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import { Loader2, ImageIcon, Trash2, ExternalLink } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -54,6 +56,7 @@ export function EventExperienceDrawer({
   experienceLink,
   experience,
 }: EventExperienceDrawerProps) {
+  const params = useParams<{ companySlug: string }>();
   // Initialize label from experienceLink - the key on parent ensures this resets when experience changes
   const [label, setLabel] = useState(experienceLink?.label ?? "");
   const [isSaving, startSaveTransition] = useTransition();
@@ -152,6 +155,24 @@ export function EventExperienceDrawer({
                   </p>
                 </div>
               </div>
+
+              {/* Open in Editor button */}
+              {experience && (
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  asChild
+                >
+                  <Link
+                    href={`/${params.companySlug}/exps/${experienceLink.experienceId}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <ExternalLink className="mr-2 h-4 w-4" />
+                    Open in Editor
+                  </Link>
+                </Button>
+              )}
 
               {/* Label input */}
               <div className="space-y-2">
