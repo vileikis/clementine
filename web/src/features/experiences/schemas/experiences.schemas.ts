@@ -24,8 +24,7 @@ export const experienceSchema = z.object({
   updatedAt: z.number(),
   // Preview media (optional)
   previewMediaUrl: z
-    .string()
-    .url("Invalid URL format")
+    .url()
     .max(EXPERIENCE_CONSTRAINTS.PREVIEW_MEDIA.URL_MAX_LENGTH, "URL too long")
     .nullable()
     .optional(),
