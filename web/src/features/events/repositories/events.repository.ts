@@ -222,6 +222,7 @@ export async function softDeleteEvent(
 
 /**
  * Add an experience to the event's experiences array
+ * Uses a Firestore transaction to prevent race conditions
  */
 export async function addEventExperience(
   projectId: string,
@@ -230,28 +231,30 @@ export async function addEventExperience(
 ): Promise<void> {
   const eventRef = getEventsCollection(projectId).doc(eventId);
 
-  // Get current event to check for duplicates
-  const doc = await eventRef.get();
-  if (!doc.exists) {
-    throw new Error("Event not found");
-  }
+  await db.runTransaction(async (tx) => {
+    const doc = await tx.get(eventRef);
+    if (!doc.exists) {
+      throw new Error("Event not found");
+    }
 
-  const data = doc.data();
-  const currentExperiences = (data?.experiences || []) as EventExperienceLink[];
+    const data = doc.data();
+    const currentExperiences = (data?.experiences || []) as EventExperienceLink[];
 
-  // Check for duplicate
-  if (currentExperiences.some((exp) => exp.experienceId === experienceLink.experienceId)) {
-    throw new Error("Experience already attached to this event");
-  }
+    // Check for duplicate
+    if (currentExperiences.some((exp) => exp.experienceId === experienceLink.experienceId)) {
+      throw new Error("Experience already attached to this event");
+    }
 
-  await eventRef.update({
-    experiences: [...currentExperiences, experienceLink],
-    updatedAt: Date.now(),
+    tx.update(eventRef, {
+      experiences: [...currentExperiences, experienceLink],
+      updatedAt: Date.now(),
+    });
   });
 }
 
 /**
  * Update an existing experience in the event's experiences array
+ * Uses a Firestore transaction to prevent race conditions
  */
 export async function updateEventExperience(
   projectId: string,
@@ -261,38 +264,40 @@ export async function updateEventExperience(
 ): Promise<void> {
   const eventRef = getEventsCollection(projectId).doc(eventId);
 
-  // Get current event
-  const doc = await eventRef.get();
-  if (!doc.exists) {
-    throw new Error("Event not found");
-  }
+  await db.runTransaction(async (tx) => {
+    const doc = await tx.get(eventRef);
+    if (!doc.exists) {
+      throw new Error("Event not found");
+    }
 
-  const data = doc.data();
-  const currentExperiences = (data?.experiences || []) as EventExperienceLink[];
+    const data = doc.data();
+    const currentExperiences = (data?.experiences || []) as EventExperienceLink[];
 
-  // Find and update the experience
-  const experienceIndex = currentExperiences.findIndex(
-    (exp) => exp.experienceId === experienceId
-  );
+    // Find and update the experience
+    const experienceIndex = currentExperiences.findIndex(
+      (exp) => exp.experienceId === experienceId
+    );
 
-  if (experienceIndex === -1) {
-    throw new Error("Experience not found in event");
-  }
+    if (experienceIndex === -1) {
+      throw new Error("Experience not found in event");
+    }
 
-  const updatedExperiences = [...currentExperiences];
-  updatedExperiences[experienceIndex] = {
-    ...updatedExperiences[experienceIndex],
-    ...updates,
-  };
+    const updatedExperiences = [...currentExperiences];
+    updatedExperiences[experienceIndex] = {
+      ...updatedExperiences[experienceIndex],
+      ...updates,
+    };
 
-  await eventRef.update({
-    experiences: updatedExperiences,
-    updatedAt: Date.now(),
+    tx.update(eventRef, {
+      experiences: updatedExperiences,
+      updatedAt: Date.now(),
+    });
   });
 }
 
 /**
  * Remove an experience from the event's experiences array
+ * Uses a Firestore transaction to prevent race conditions
  */
 export async function removeEventExperience(
   projectId: string,
@@ -301,23 +306,24 @@ export async function removeEventExperience(
 ): Promise<void> {
   const eventRef = getEventsCollection(projectId).doc(eventId);
 
-  // Get current event
-  const doc = await eventRef.get();
-  if (!doc.exists) {
-    throw new Error("Event not found");
-  }
+  await db.runTransaction(async (tx) => {
+    const doc = await tx.get(eventRef);
+    if (!doc.exists) {
+      throw new Error("Event not found");
+    }
 
-  const data = doc.data();
-  const currentExperiences = (data?.experiences || []) as EventExperienceLink[];
+    const data = doc.data();
+    const currentExperiences = (data?.experiences || []) as EventExperienceLink[];
 
-  // Filter out the experience
-  const updatedExperiences = currentExperiences.filter(
-    (exp) => exp.experienceId !== experienceId
-  );
+    // Filter out the experience
+    const updatedExperiences = currentExperiences.filter(
+      (exp) => exp.experienceId !== experienceId
+    );
 
-  await eventRef.update({
-    experiences: updatedExperiences,
-    updatedAt: Date.now(),
+    tx.update(eventRef, {
+      experiences: updatedExperiences,
+      updatedAt: Date.now(),
+    });
   });
 }
 
@@ -344,6 +350,7 @@ export async function setEventExtra(
 
 /**
  * Update an existing extra slot's configuration
+ * Uses a Firestore transaction to prevent race conditions
  */
 export async function updateEventExtra(
   projectId: string,
@@ -353,28 +360,29 @@ export async function updateEventExtra(
 ): Promise<void> {
   const eventRef = getEventsCollection(projectId).doc(eventId);
 
-  // Get current event to verify slot exists
-  const doc = await eventRef.get();
-  if (!doc.exists) {
-    throw new Error("Event not found");
-  }
+  await db.runTransaction(async (tx) => {
+    const doc = await tx.get(eventRef);
+    if (!doc.exists) {
+      throw new Error("Event not found");
+    }
 
-  const data = doc.data();
-  const currentExtra = data?.extras?.[slot] as EventExperienceLink | null;
+    const data = doc.data();
+    const currentExtra = data?.extras?.[slot] as EventExperienceLink | null;
 
-  if (!currentExtra) {
-    throw new Error(`Extra slot '${slot}' is empty`);
-  }
+    if (!currentExtra) {
+      throw new Error(`Extra slot '${slot}' is empty`);
+    }
 
-  // Merge updates with existing slot data
-  const updatedExtra = {
-    ...currentExtra,
-    ...updates,
-  };
+    // Merge updates with existing slot data
+    const updatedExtra = {
+      ...currentExtra,
+      ...updates,
+    };
 
-  await eventRef.update({
-    [`extras.${slot}`]: updatedExtra,
-    updatedAt: Date.now(),
+    tx.update(eventRef, {
+      [`extras.${slot}`]: updatedExtra,
+      updatedAt: Date.now(),
+    });
   });
 }
 

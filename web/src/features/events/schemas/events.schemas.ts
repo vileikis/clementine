@@ -247,7 +247,6 @@ export type EventSchema = z.infer<typeof eventSchema>;
 export type CreateEventInput = z.infer<typeof createEventInputSchema>;
 export type UpdateEventInput = z.infer<typeof updateEventInputSchema>;
 export type UpdateEventThemeInput = z.infer<typeof updateEventThemeInputSchema>;
-export type ExtraSlotFrequency = z.infer<typeof extraSlotFrequencySchema>;
 export type ExtraSlot = z.infer<typeof extraSlotSchema>;
 export type AddEventExperienceInput = z.infer<typeof addEventExperienceInputSchema>;
 export type UpdateEventExperienceInput = z.infer<typeof updateEventExperienceInputSchema>;
