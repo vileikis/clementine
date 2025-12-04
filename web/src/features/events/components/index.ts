@@ -1,7 +1,6 @@
 // Event components barrel export
 export * from "./EventCard";
 export * from "./EventList";
-export * from "./EventExperiencesTab";
 export * from "./EventGeneralTab";
 export * from "./EventDetailsHeader";
 export * from "./CreateEventDialog";
