@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Layers, ChevronLeft, Loader2 } from "lucide-react";
+import Image from "next/image";
+import { Loader2, ArrowLeft, ImageIcon } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -95,7 +96,7 @@ export function ExperiencePickerDrawer({
                   onClick={handleBack}
                   className="-ml-2"
                 >
-                  <ChevronLeft className="h-4 w-4" />
+                  <ArrowLeft className="h-4 w-4" />
                 </Button>
                 <SheetTitle>Add Experience</SheetTitle>
               </div>
@@ -114,14 +115,27 @@ export function ExperiencePickerDrawer({
         </SheetHeader>
 
         {/* Content area */}
-        <div className="flex-1 overflow-y-auto py-4">
+        <div className="flex-1 overflow-y-auto px-4 py-4">
           {selectedExperience ? (
             // Configuration view
             <div className="space-y-6">
               {/* Selected experience preview */}
               <div className="flex items-start gap-3 rounded-lg border bg-muted/50 p-4">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                  <Layers className="h-5 w-5 text-primary" />
+                <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-muted">
+                  {selectedExperience.previewMediaUrl ? (
+                    <Image
+                      src={selectedExperience.previewMediaUrl}
+                      alt=""
+                      fill
+                      className="object-cover"
+                      sizes="48px"
+                      unoptimized={selectedExperience.previewType === "gif"}
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center">
+                      <ImageIcon className="h-5 w-5 text-muted-foreground/40" />
+                    </div>
+                  )}
                 </div>
                 <div className="min-w-0 flex-1">
                   <h3 className="truncate font-medium">
@@ -158,7 +172,7 @@ export function ExperiencePickerDrawer({
             // Empty state
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-                <Layers className="h-6 w-6 text-muted-foreground" />
+                <ImageIcon className="h-6 w-6 text-muted-foreground" />
               </div>
               <h3 className="mt-4 font-medium">No experiences available</h3>
               <p className="mt-1 text-sm text-muted-foreground">
@@ -182,8 +196,21 @@ export function ExperiencePickerDrawer({
                     "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   )}
                 >
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                    <Layers className="h-5 w-5 text-primary" />
+                  <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-muted">
+                    {experience.previewMediaUrl ? (
+                      <Image
+                        src={experience.previewMediaUrl}
+                        alt=""
+                        fill
+                        className="object-cover"
+                        sizes="48px"
+                        unoptimized={experience.previewType === "gif"}
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center">
+                        <ImageIcon className="h-5 w-5 text-muted-foreground/40" />
+                      </div>
+                    )}
                   </div>
                   <div className="min-w-0 flex-1">
                     <h3 className="truncate font-medium">{experience.name}</h3>
