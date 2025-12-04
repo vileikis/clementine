@@ -95,9 +95,9 @@
 
 ### Implementation for User Stories 3 & 4
 
-- [ ] T036 [US3] Create `EventExperienceDrawer` component in `web/src/features/events/components/general/EventExperienceDrawer.tsx`
-- [ ] T037 [US3] Update `EventExperienceCard` to open edit drawer on click in `web/src/features/events/components/general/EventExperienceCard.tsx`
-- [ ] T038 [US3] Update barrel export in `web/src/features/events/components/general/index.ts` for edit drawer
+- [x] T036 [US3] Create `EventExperienceDrawer` component in `web/src/features/events/components/general/EventExperienceDrawer.tsx`
+- [x] T037 [US3] Update `EventExperienceCard` to open edit drawer on click in `web/src/features/events/components/general/EventExperienceCard.tsx`
+- [x] T038 [US3] Update barrel export in `web/src/features/events/components/general/index.ts` for edit drawer
 
 **Checkpoint**: Can edit experience labels and remove experiences - User Stories 3 & 4 complete
 
@@ -111,10 +111,10 @@
 
 ### Implementation for User Stories 5 & 6
 
-- [ ] T039 [P] [US5] Create `ExtraSlotCard` component in `web/src/features/events/components/general/ExtraSlotCard.tsx`
-- [ ] T040 [US5] Create `ExtraSlotDrawer` component in `web/src/features/events/components/general/ExtraSlotDrawer.tsx`
-- [ ] T041 [US5] Create `ExtrasSection` component in `web/src/features/events/components/general/ExtrasSection.tsx`
-- [ ] T042 [US5] Update barrel export in `web/src/features/events/components/general/index.ts` for extras components
+- [x] T039 [P] [US5] Create `ExtraSlotCard` component in `web/src/features/events/components/general/ExtraSlotCard.tsx`
+- [x] T040 [US5] Create `ExtraSlotDrawer` component in `web/src/features/events/components/general/ExtraSlotDrawer.tsx`
+- [x] T041 [US5] Create `ExtrasSection` component in `web/src/features/events/components/general/ExtrasSection.tsx`
+- [x] T042 [US5] Update barrel export in `web/src/features/events/components/general/index.ts` for extras components
 
 **Checkpoint**: Can configure both extra slots - User Stories 5 & 6 complete
 
@@ -128,8 +128,8 @@
 
 ### Implementation for User Stories 7 & 8
 
-- [ ] T043 [US7] Add toggle functionality to `ExtraSlotCard` component in `web/src/features/events/components/general/ExtraSlotCard.tsx`
-- [ ] T044 [US8] Add edit mode to `ExtraSlotDrawer` component in `web/src/features/events/components/general/ExtraSlotDrawer.tsx`
+- [x] T043 [US7] Add toggle functionality to `ExtraSlotCard` component in `web/src/features/events/components/general/ExtraSlotCard.tsx`
+- [x] T044 [US8] Add edit mode to `ExtraSlotDrawer` component in `web/src/features/events/components/general/ExtraSlotDrawer.tsx`
 
 **Checkpoint**: Can toggle and edit extras - User Stories 7 & 8 complete
 
