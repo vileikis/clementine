@@ -110,7 +110,7 @@ export async function createEventAction(input: {
       name: validated.name,
     });
 
-    revalidatePath(`/[companySlug]/${validated.projectId}/events`);
+    revalidatePath(`/[companySlug]/${validated.projectId}/events`, "page");
 
     return { success: true, data: { eventId } };
   } catch (error) {
@@ -230,8 +230,8 @@ export async function updateEventAction(
     // Update the event
     await updateEvent(projectId, eventId, validated);
 
-    revalidatePath(`/[companySlug]/${projectId}/events`);
-    revalidatePath(`/[companySlug]/${projectId}/${eventId}`);
+    revalidatePath(`/[companySlug]/${projectId}/events`, "page");
+    revalidatePath(`/[companySlug]/${projectId}/${eventId}`, "page");
 
     return { success: true, data: undefined };
   } catch (error) {
@@ -313,7 +313,7 @@ export async function updateEventThemeAction(
     // Update the theme
     await updateEventTheme(projectId, eventId, validated);
 
-    revalidatePath(`/[companySlug]/${projectId}/${eventId}/theme`);
+    revalidatePath(`/[companySlug]/${projectId}/${eventId}/theme`, "page");
 
     return { success: true, data: undefined };
   } catch (error) {
@@ -381,7 +381,7 @@ export async function deleteEventAction(
     // Soft delete the event
     await softDeleteEvent(projectId, eventId);
 
-    revalidatePath(`/[companySlug]/${projectId}/events`);
+    revalidatePath(`/[companySlug]/${projectId}/events`, "page");
 
     return { success: true, data: undefined };
   } catch (error) {
@@ -443,7 +443,7 @@ export async function setActiveEventAction(
     // Update project's active event
     await updateProject(projectId, { activeEventId: eventId });
 
-    revalidatePath(`/[companySlug]/${projectId}/events`);
+    revalidatePath(`/[companySlug]/${projectId}/events`, "page");
 
     return { success: true, data: undefined };
   } catch (error) {
@@ -503,7 +503,7 @@ export async function addEventExperienceAction(
       frequency: null,
     });
 
-    revalidatePath(`/[companySlug]/${validated.projectId}/${validated.eventId}`);
+    revalidatePath(`/[companySlug]/${validated.projectId}/${validated.eventId}`, "page");
 
     return { success: true, data: { eventId: validated.eventId } };
   } catch (error) {
@@ -588,7 +588,7 @@ export async function updateEventExperienceAction(
       updates
     );
 
-    revalidatePath(`/[companySlug]/${validated.projectId}/${validated.eventId}`);
+    revalidatePath(`/[companySlug]/${validated.projectId}/${validated.eventId}`, "page");
 
     return { success: true, data: { eventId: validated.eventId } };
   } catch (error) {
@@ -663,7 +663,7 @@ export async function removeEventExperienceAction(
       validated.experienceId
     );
 
-    revalidatePath(`/[companySlug]/${validated.projectId}/${validated.eventId}`);
+    revalidatePath(`/[companySlug]/${validated.projectId}/${validated.eventId}`, "page");
 
     return { success: true, data: undefined };
   } catch (error) {
@@ -734,7 +734,7 @@ export async function setEventExtraAction(
       frequency: validated.frequency,
     });
 
-    revalidatePath(`/[companySlug]/${validated.projectId}/${validated.eventId}`);
+    revalidatePath(`/[companySlug]/${validated.projectId}/${validated.eventId}`, "page");
 
     return { success: true, data: { eventId: validated.eventId } };
   } catch (error) {
@@ -817,7 +817,7 @@ export async function updateEventExtraAction(
       updates
     );
 
-    revalidatePath(`/[companySlug]/${validated.projectId}/${validated.eventId}`);
+    revalidatePath(`/[companySlug]/${validated.projectId}/${validated.eventId}`, "page");
 
     return { success: true, data: { eventId: validated.eventId } };
   } catch (error) {
@@ -888,7 +888,7 @@ export async function removeEventExtraAction(
     // Remove the extra
     await removeEventExtra(validated.projectId, validated.eventId, validated.slot);
 
-    revalidatePath(`/[companySlug]/${validated.projectId}/${validated.eventId}`);
+    revalidatePath(`/[companySlug]/${validated.projectId}/${validated.eventId}`, "page");
 
     return { success: true, data: undefined };
   } catch (error) {
