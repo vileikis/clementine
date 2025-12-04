@@ -167,9 +167,31 @@ export function AiTransformEditor({
   return (
     <Form {...form}>
       <form onBlur={handleBlur} className="space-y-6">
-        {/* AI Configuration Header */}
-        <div>
-          <h3 className="text-sm font-medium mb-4">AI Configuration</h3>
+        {/* AI Configuration Header with Test Button */}
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-medium">AI Configuration</h3>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowPlayground(true)}
+                  disabled={!form.getValues("config.prompt")}
+                  type="button"
+                  className="min-h-[44px]"
+                >
+                  <FlaskConical className="h-4 w-4 mr-2" />
+                  Test
+                </Button>
+              </span>
+            </TooltipTrigger>
+            {!form.getValues("config.prompt") && (
+              <TooltipContent>
+                <p>Add a prompt to enable testing</p>
+              </TooltipContent>
+            )}
+          </Tooltip>
         </div>
 
         {/* Model Selection */}
@@ -388,39 +410,6 @@ export function AiTransformEditor({
           )}
         />
 
-        {/* Test AI Transform Section */}
-        <div className="border-t pt-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-sm font-medium">Test AI Transform</h3>
-              <p className="text-xs text-muted-foreground">
-                Test your configuration with a sample image
-              </p>
-            </div>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowPlayground(true)}
-                    disabled={!form.getValues("config.prompt")}
-                    type="button"
-                    className="min-h-[44px]"
-                  >
-                    <FlaskConical className="h-4 w-4 mr-2" />
-                    Test
-                  </Button>
-                </span>
-              </TooltipTrigger>
-              {!form.getValues("config.prompt") && (
-                <TooltipContent>
-                  <p>Add a prompt to enable testing</p>
-                </TooltipContent>
-              )}
-            </Tooltip>
-          </div>
-        </div>
       </form>
 
       {/* Playground Dialog */}
