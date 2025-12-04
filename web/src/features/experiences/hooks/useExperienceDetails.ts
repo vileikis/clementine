@@ -46,7 +46,8 @@ function reducer(state: State, action: Action): State {
  */
 export function useExperienceDetails(experienceIds: string[]): State {
   // Memoize the stringified IDs to avoid unnecessary re-renders
-  const idsKey = useMemo(() => experienceIds.sort().join(","), [experienceIds]);
+  // Use slice() to create a shallow copy before sorting to avoid mutating the input array
+  const idsKey = useMemo(() => [...experienceIds].sort().join(","), [experienceIds]);
 
   const [state, dispatch] = useReducer(reducer, {
     experiencesMap: new Map(),
