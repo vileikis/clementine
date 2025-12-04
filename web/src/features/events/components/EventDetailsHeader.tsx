@@ -35,8 +35,8 @@ export function EventDetailsHeader({
 
   const tabs = [
     {
-      name: "Experiences",
-      href: `/${companySlug}/${projectId}/${event.id}/experiences`,
+      name: "General",
+      href: `/${companySlug}/${projectId}/${event.id}/general`,
     },
     {
       name: "Theme",
@@ -45,7 +45,7 @@ export function EventDetailsHeader({
   ];
 
   // Determine active tab from pathname
-  const activeTab = pathname?.includes("/theme") ? "Theme" : "Experiences";
+  const activeTab = pathname?.includes("/theme") ? "Theme" : "General";
 
   return (
     <>
