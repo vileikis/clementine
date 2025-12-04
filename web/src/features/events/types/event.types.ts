@@ -1,6 +1,11 @@
 // Event-related TypeScript types
 
 /**
+ * Frequency options for extra slots
+ */
+export type ExtraSlotFrequency = "always" | "once_per_session";
+
+/**
  * Theme text configuration for events
  */
 export interface EventThemeText {
@@ -41,11 +46,21 @@ export interface EventTheme {
 
 /**
  * Link between an Event and an Experience
- * (embedded object in Event.experiences array)
+ * (embedded object in Event.experiences array and extras slots)
  */
 export interface EventExperienceLink {
   experienceId: string; // FK to /experiences/{experienceId}
   label?: string | null; // Optional display name override
+  enabled: boolean; // Toggle to enable/disable without removing
+  frequency?: ExtraSlotFrequency | null; // Only used for extras: "always" or "once_per_session"
+}
+
+/**
+ * Container for slot-based extra flows that run at specific points in the guest journey
+ */
+export interface EventExtras {
+  preEntryGate?: EventExperienceLink | null; // Flow shown before guest starts any experience
+  preReward?: EventExperienceLink | null; // Flow shown after experience but before AI result
 }
 
 /**
@@ -63,8 +78,11 @@ export interface Event {
   publishStartAt?: number | null; // Unix timestamp ms
   publishEndAt?: number | null; // Unix timestamp ms
 
-  // Linked experiences (embedded array, linking UI deferred)
+  // Linked experiences (embedded array)
   experiences: EventExperienceLink[];
+
+  // Slot-based extra flows (pre-entry gate, pre-reward)
+  extras: EventExtras;
 
   // Visual customization
   theme: EventTheme;

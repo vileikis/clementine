@@ -12,6 +12,12 @@ import {
   updateEvent,
   updateEventTheme,
   softDeleteEvent,
+  addEventExperience,
+  updateEventExperience,
+  removeEventExperience,
+  setEventExtra,
+  updateEventExtra,
+  removeEventExtra,
 } from "../repositories/events.repository";
 import {
   getProject,
@@ -21,6 +27,20 @@ import {
   createEventInputSchema,
   updateEventInputSchema,
   updateEventThemeInputSchema,
+  addEventExperienceInputSchema,
+  updateEventExperienceInputSchema,
+  removeEventExperienceInputSchema,
+  setEventExtraInputSchema,
+  updateEventExtraInputSchema,
+  removeEventExtraInputSchema,
+} from "../schemas";
+import type {
+  AddEventExperienceInput,
+  UpdateEventExperienceInput,
+  RemoveEventExperienceInput,
+  SetEventExtraInput,
+  UpdateEventExtraInput,
+  RemoveEventExtraInput,
 } from "../schemas";
 import { verifyAdminSecret } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
@@ -432,6 +452,462 @@ export async function setActiveEventAction(
       error: {
         code: "INTERNAL_ERROR",
         message: error instanceof Error ? error.message : "Failed to set active event",
+      },
+    };
+  }
+}
+
+// ============================================================================
+// Experience Management Actions
+// ============================================================================
+
+/**
+ * Add an experience to an event's experiences array
+ */
+export async function addEventExperienceAction(
+  input: AddEventExperienceInput
+): Promise<ActionResponse<{ eventId: string }>> {
+  // Verify admin authentication
+  const auth = await verifyAdminSecret();
+  if (!auth.authorized) {
+    return {
+      success: false,
+      error: {
+        code: "PERMISSION_DENIED",
+        message: auth.error,
+      },
+    };
+  }
+
+  try {
+    // Validate input
+    const validated = addEventExperienceInputSchema.parse(input);
+
+    // Verify event exists
+    const event = await getEvent(validated.projectId, validated.eventId);
+    if (!event) {
+      return {
+        success: false,
+        error: {
+          code: "EVENT_NOT_FOUND",
+          message: "Event not found",
+        },
+      };
+    }
+
+    // Add the experience
+    await addEventExperience(validated.projectId, validated.eventId, {
+      experienceId: validated.experienceId,
+      label: validated.label ?? null,
+      enabled: true,
+      frequency: null,
+    });
+
+    revalidatePath(`/[companySlug]/${validated.projectId}/${validated.eventId}`);
+
+    return { success: true, data: { eventId: validated.eventId } };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        error: {
+          code: "VALIDATION_ERROR",
+          message: error.issues
+            .map((i) => `${i.path.join(".")}: ${i.message}`)
+            .join(", "),
+        },
+      };
+    }
+    if (error instanceof Error && error.message.includes("already attached")) {
+      return {
+        success: false,
+        error: {
+          code: "DUPLICATE_EXPERIENCE",
+          message: error.message,
+        },
+      };
+    }
+    return {
+      success: false,
+      error: {
+        code: "INTERNAL_ERROR",
+        message: error instanceof Error ? error.message : "Failed to add experience",
+      },
+    };
+  }
+}
+
+/**
+ * Update an attached experience's configuration
+ */
+export async function updateEventExperienceAction(
+  input: UpdateEventExperienceInput
+): Promise<ActionResponse<{ eventId: string }>> {
+  // Verify admin authentication
+  const auth = await verifyAdminSecret();
+  if (!auth.authorized) {
+    return {
+      success: false,
+      error: {
+        code: "PERMISSION_DENIED",
+        message: auth.error,
+      },
+    };
+  }
+
+  try {
+    // Validate input
+    const validated = updateEventExperienceInputSchema.parse(input);
+
+    // Verify event exists
+    const event = await getEvent(validated.projectId, validated.eventId);
+    if (!event) {
+      return {
+        success: false,
+        error: {
+          code: "EVENT_NOT_FOUND",
+          message: "Event not found",
+        },
+      };
+    }
+
+    // Build updates object
+    const updates: { label?: string | null; enabled?: boolean } = {};
+    if (validated.label !== undefined) {
+      updates.label = validated.label;
+    }
+    if (validated.enabled !== undefined) {
+      updates.enabled = validated.enabled;
+    }
+
+    // Update the experience
+    await updateEventExperience(
+      validated.projectId,
+      validated.eventId,
+      validated.experienceId,
+      updates
+    );
+
+    revalidatePath(`/[companySlug]/${validated.projectId}/${validated.eventId}`);
+
+    return { success: true, data: { eventId: validated.eventId } };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        error: {
+          code: "VALIDATION_ERROR",
+          message: error.issues
+            .map((i) => `${i.path.join(".")}: ${i.message}`)
+            .join(", "),
+        },
+      };
+    }
+    if (error instanceof Error && error.message.includes("not found in event")) {
+      return {
+        success: false,
+        error: {
+          code: "EXPERIENCE_NOT_FOUND",
+          message: error.message,
+        },
+      };
+    }
+    return {
+      success: false,
+      error: {
+        code: "INTERNAL_ERROR",
+        message: error instanceof Error ? error.message : "Failed to update experience",
+      },
+    };
+  }
+}
+
+/**
+ * Remove an experience from an event's experiences array
+ */
+export async function removeEventExperienceAction(
+  input: RemoveEventExperienceInput
+): Promise<ActionResponse<void>> {
+  // Verify admin authentication
+  const auth = await verifyAdminSecret();
+  if (!auth.authorized) {
+    return {
+      success: false,
+      error: {
+        code: "PERMISSION_DENIED",
+        message: auth.error,
+      },
+    };
+  }
+
+  try {
+    // Validate input
+    const validated = removeEventExperienceInputSchema.parse(input);
+
+    // Verify event exists
+    const event = await getEvent(validated.projectId, validated.eventId);
+    if (!event) {
+      return {
+        success: false,
+        error: {
+          code: "EVENT_NOT_FOUND",
+          message: "Event not found",
+        },
+      };
+    }
+
+    // Remove the experience
+    await removeEventExperience(
+      validated.projectId,
+      validated.eventId,
+      validated.experienceId
+    );
+
+    revalidatePath(`/[companySlug]/${validated.projectId}/${validated.eventId}`);
+
+    return { success: true, data: undefined };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        error: {
+          code: "VALIDATION_ERROR",
+          message: error.issues
+            .map((i) => `${i.path.join(".")}: ${i.message}`)
+            .join(", "),
+        },
+      };
+    }
+    return {
+      success: false,
+      error: {
+        code: "INTERNAL_ERROR",
+        message: error instanceof Error ? error.message : "Failed to remove experience",
+      },
+    };
+  }
+}
+
+// ============================================================================
+// Extras Management Actions
+// ============================================================================
+
+/**
+ * Set an extra slot (create or replace)
+ */
+export async function setEventExtraAction(
+  input: SetEventExtraInput
+): Promise<ActionResponse<{ eventId: string }>> {
+  // Verify admin authentication
+  const auth = await verifyAdminSecret();
+  if (!auth.authorized) {
+    return {
+      success: false,
+      error: {
+        code: "PERMISSION_DENIED",
+        message: auth.error,
+      },
+    };
+  }
+
+  try {
+    // Validate input
+    const validated = setEventExtraInputSchema.parse(input);
+
+    // Verify event exists
+    const event = await getEvent(validated.projectId, validated.eventId);
+    if (!event) {
+      return {
+        success: false,
+        error: {
+          code: "EVENT_NOT_FOUND",
+          message: "Event not found",
+        },
+      };
+    }
+
+    // Set the extra slot
+    await setEventExtra(validated.projectId, validated.eventId, validated.slot, {
+      experienceId: validated.experienceId,
+      label: validated.label ?? null,
+      enabled: validated.enabled,
+      frequency: validated.frequency,
+    });
+
+    revalidatePath(`/[companySlug]/${validated.projectId}/${validated.eventId}`);
+
+    return { success: true, data: { eventId: validated.eventId } };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        error: {
+          code: "VALIDATION_ERROR",
+          message: error.issues
+            .map((i) => `${i.path.join(".")}: ${i.message}`)
+            .join(", "),
+        },
+      };
+    }
+    return {
+      success: false,
+      error: {
+        code: "INTERNAL_ERROR",
+        message: error instanceof Error ? error.message : "Failed to set extra",
+      },
+    };
+  }
+}
+
+/**
+ * Update an extra slot's configuration
+ */
+export async function updateEventExtraAction(
+  input: UpdateEventExtraInput
+): Promise<ActionResponse<{ eventId: string }>> {
+  // Verify admin authentication
+  const auth = await verifyAdminSecret();
+  if (!auth.authorized) {
+    return {
+      success: false,
+      error: {
+        code: "PERMISSION_DENIED",
+        message: auth.error,
+      },
+    };
+  }
+
+  try {
+    // Validate input
+    const validated = updateEventExtraInputSchema.parse(input);
+
+    // Verify event exists
+    const event = await getEvent(validated.projectId, validated.eventId);
+    if (!event) {
+      return {
+        success: false,
+        error: {
+          code: "EVENT_NOT_FOUND",
+          message: "Event not found",
+        },
+      };
+    }
+
+    // Build updates object
+    const updates: {
+      label?: string | null;
+      enabled?: boolean;
+      frequency?: "always" | "once_per_session";
+    } = {};
+    if (validated.label !== undefined) {
+      updates.label = validated.label;
+    }
+    if (validated.enabled !== undefined) {
+      updates.enabled = validated.enabled;
+    }
+    if (validated.frequency !== undefined) {
+      updates.frequency = validated.frequency;
+    }
+
+    // Update the extra slot
+    await updateEventExtra(
+      validated.projectId,
+      validated.eventId,
+      validated.slot,
+      updates
+    );
+
+    revalidatePath(`/[companySlug]/${validated.projectId}/${validated.eventId}`);
+
+    return { success: true, data: { eventId: validated.eventId } };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        error: {
+          code: "VALIDATION_ERROR",
+          message: error.issues
+            .map((i) => `${i.path.join(".")}: ${i.message}`)
+            .join(", "),
+        },
+      };
+    }
+    if (error instanceof Error && error.message.includes("is empty")) {
+      return {
+        success: false,
+        error: {
+          code: "EXTRA_SLOT_EMPTY",
+          message: error.message,
+        },
+      };
+    }
+    return {
+      success: false,
+      error: {
+        code: "INTERNAL_ERROR",
+        message: error instanceof Error ? error.message : "Failed to update extra",
+      },
+    };
+  }
+}
+
+/**
+ * Remove an extra from a slot (set to null)
+ */
+export async function removeEventExtraAction(
+  input: RemoveEventExtraInput
+): Promise<ActionResponse<void>> {
+  // Verify admin authentication
+  const auth = await verifyAdminSecret();
+  if (!auth.authorized) {
+    return {
+      success: false,
+      error: {
+        code: "PERMISSION_DENIED",
+        message: auth.error,
+      },
+    };
+  }
+
+  try {
+    // Validate input
+    const validated = removeEventExtraInputSchema.parse(input);
+
+    // Verify event exists
+    const event = await getEvent(validated.projectId, validated.eventId);
+    if (!event) {
+      return {
+        success: false,
+        error: {
+          code: "EVENT_NOT_FOUND",
+          message: "Event not found",
+        },
+      };
+    }
+
+    // Remove the extra
+    await removeEventExtra(validated.projectId, validated.eventId, validated.slot);
+
+    revalidatePath(`/[companySlug]/${validated.projectId}/${validated.eventId}`);
+
+    return { success: true, data: undefined };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        error: {
+          code: "VALIDATION_ERROR",
+          message: error.issues
+            .map((i) => `${i.path.join(".")}: ${i.message}`)
+            .join(", "),
+        },
+      };
+    }
+    return {
+      success: false,
+      error: {
+        code: "INTERNAL_ERROR",
+        message: error instanceof Error ? error.message : "Failed to remove extra",
       },
     };
   }

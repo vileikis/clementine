@@ -46,11 +46,31 @@ export const eventThemeSchema = z.object({
 });
 
 /**
- * Event-Experience link schema
+ * Frequency options for extra slots
+ */
+export const extraSlotFrequencySchema = z.enum(["always", "once_per_session"]);
+
+/**
+ * Extra slot identifier
+ */
+export const extraSlotSchema = z.enum(["preEntryGate", "preReward"]);
+
+/**
+ * Event-Experience link schema (used for experiences array and extras slots)
  */
 export const eventExperienceLinkSchema = z.object({
   experienceId: z.string().min(1, "Experience ID is required"),
-  label: z.string().nullable().optional().default(null),
+  label: z.string().max(200).nullable().optional().default(null),
+  enabled: z.boolean().default(true),
+  frequency: extraSlotFrequencySchema.nullable().optional().default(null),
+});
+
+/**
+ * Event Extras schema (slot-based flows)
+ */
+export const eventExtrasSchema = z.object({
+  preEntryGate: eventExperienceLinkSchema.nullable().optional().default(null),
+  preReward: eventExperienceLinkSchema.nullable().optional().default(null),
 });
 
 /**
@@ -67,6 +87,7 @@ export const eventSchema = z.object({
   publishStartAt: z.number().nullable().optional().default(null),
   publishEndAt: z.number().nullable().optional().default(null),
   experiences: z.array(eventExperienceLinkSchema).default([]),
+  extras: eventExtrasSchema.default({ preEntryGate: null, preReward: null }),
   theme: eventThemeSchema,
   deletedAt: z.number().nullable().optional().default(null),
   createdAt: z.number(),
@@ -147,6 +168,78 @@ export const updateEventThemeInputSchema = z.object({
 });
 
 // ============================================================================
+// Experience Actions Input Schemas
+// ============================================================================
+
+/**
+ * Add experience to event input
+ */
+export const addEventExperienceInputSchema = z.object({
+  projectId: z.string().min(1, "Project ID is required"),
+  eventId: z.string().min(1, "Event ID is required"),
+  experienceId: z.string().min(1, "Experience ID is required"),
+  label: z.string().max(200).nullable().optional(),
+});
+
+/**
+ * Update event experience input
+ */
+export const updateEventExperienceInputSchema = z.object({
+  projectId: z.string().min(1, "Project ID is required"),
+  eventId: z.string().min(1, "Event ID is required"),
+  experienceId: z.string().min(1, "Experience ID is required"),
+  label: z.string().max(200).nullable().optional(),
+  enabled: z.boolean().optional(),
+});
+
+/**
+ * Remove event experience input
+ */
+export const removeEventExperienceInputSchema = z.object({
+  projectId: z.string().min(1, "Project ID is required"),
+  eventId: z.string().min(1, "Event ID is required"),
+  experienceId: z.string().min(1, "Experience ID is required"),
+});
+
+// ============================================================================
+// Extras Actions Input Schemas
+// ============================================================================
+
+/**
+ * Set extra slot input
+ */
+export const setEventExtraInputSchema = z.object({
+  projectId: z.string().min(1, "Project ID is required"),
+  eventId: z.string().min(1, "Event ID is required"),
+  slot: extraSlotSchema,
+  experienceId: z.string().min(1, "Experience ID is required"),
+  label: z.string().max(200).nullable().optional(),
+  enabled: z.boolean().optional().default(true),
+  frequency: extraSlotFrequencySchema,
+});
+
+/**
+ * Update extra slot input
+ */
+export const updateEventExtraInputSchema = z.object({
+  projectId: z.string().min(1, "Project ID is required"),
+  eventId: z.string().min(1, "Event ID is required"),
+  slot: extraSlotSchema,
+  label: z.string().max(200).nullable().optional(),
+  enabled: z.boolean().optional(),
+  frequency: extraSlotFrequencySchema.optional(),
+});
+
+/**
+ * Remove extra slot input
+ */
+export const removeEventExtraInputSchema = z.object({
+  projectId: z.string().min(1, "Project ID is required"),
+  eventId: z.string().min(1, "Event ID is required"),
+  slot: extraSlotSchema,
+});
+
+// ============================================================================
 // Type Exports
 // ============================================================================
 
@@ -154,3 +247,11 @@ export type EventSchema = z.infer<typeof eventSchema>;
 export type CreateEventInput = z.infer<typeof createEventInputSchema>;
 export type UpdateEventInput = z.infer<typeof updateEventInputSchema>;
 export type UpdateEventThemeInput = z.infer<typeof updateEventThemeInputSchema>;
+export type ExtraSlotFrequency = z.infer<typeof extraSlotFrequencySchema>;
+export type ExtraSlot = z.infer<typeof extraSlotSchema>;
+export type AddEventExperienceInput = z.infer<typeof addEventExperienceInputSchema>;
+export type UpdateEventExperienceInput = z.infer<typeof updateEventExperienceInputSchema>;
+export type RemoveEventExperienceInput = z.infer<typeof removeEventExperienceInputSchema>;
+export type SetEventExtraInput = z.infer<typeof setEventExtraInputSchema>;
+export type UpdateEventExtraInput = z.infer<typeof updateEventExtraInputSchema>;
+export type RemoveEventExtraInput = z.infer<typeof removeEventExtraInputSchema>;
