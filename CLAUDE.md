@@ -150,41 +150,39 @@ The application is organized into feature modules in `web/src/features/`.
 
 - **Firestore Collection**: `/aiPresets/{presetId}`
 - **Purpose**: Legacy AI configuration library (renamed from old "experiences")
-- **Status**: Phase 1 complete - **DO NOT USE in new development**
+- **Status**: Implemented but **DEPRECATED - DO NOT USE in new development**
 - **Schema**: Discriminated union by type (photo/video/gif), AI transform settings
 - **Note**: Preserved for future preset marketplace, but not used in current flows
 
-**🔄 Needs Rework - Events** (`web/src/features/events/`)
-
-- **Firestore Collection**: `/events/{eventId}` → will move to `/projects/{projectId}/events/{eventId}`
-- **Purpose**: Time-bound, themed guest-facing instances
-- **Current Status**: Working but needs rework for Phase 5
-- **Target**: Events under Projects, theme-only at event level, scheduling rules
-
-**🔄 Needs Rework - Journeys** (`web/src/features/journeys/`)
-
-- **Firestore Collection**: `/events/{eventId}/journeys/{journeyId}`
-- **Purpose**: Will be **renamed to Experiences** (Phase 2)
-- **Current Status**: Working, but will become the new `/experiences` collection
-- **Target**: Company-scoped, reusable flow templates
-
-**🔄 Needs Rework - Steps** (`web/src/features/steps/`)
-
-- **Firestore Collection**: `/events/{eventId}/steps/{stepId}` → will move to `/experiences/{experienceId}/steps/{stepId}`
-- **Purpose**: Individual UI screen configurations
-- **Current Status**: Working, needs Phase 3 changes
-- **Target Changes**:
-  - Add new `ai-transform` step type (model, prompt, variables, test panel)
-  - Remove legacy `experience-picker` step type
-  - Move under Experiences collection
-
-**📋 Planned - Projects** (`web/src/features/projects/`)
+**✅ Ready - Projects** (`web/src/features/projects/`)
 
 - **Firestore Collection**: `/projects/{projectId}`
-- **Purpose**: Company-level containers organizing events (Phase 4)
-- **Status**: Not started
-- **Schema**: name, companyId, sharePath, activeEventId
-- **Features**: Guest join links point to project → resolve active event
+- **Purpose**: Company-level containers organizing events (refactored from old Events)
+- **Status**: Fully implemented (Phase 4 complete)
+- **Schema**: name, companyId, sharePath, qrPngPath, activeEventId, status
+- **Features**: Guest join links point to project → resolve active event, QR code generation
+
+**✅ Ready - Events** (`web/src/features/events/`)
+
+- **Firestore Collection**: `/projects/{projectId}/events/{eventId}`
+- **Purpose**: Time-bound, themed guest-facing instances nested under Projects
+- **Status**: Implemented (Phase 5 complete) - **Pending Phase 6 for Event Experiences**
+- **Schema**: name, projectId, companyId, theme, experiences[], extras, scheduling
+- **Pending**: Event Experiences linking UI (General tab) - see `features/scalable-arch/phase-6-event-experiences.md`
+
+**✅ Ready - Experiences** (`web/src/features/experiences/`)
+
+- **Firestore Collection**: `/experiences/{experienceId}`
+- **Purpose**: Company-scoped reusable flow templates (renamed from Journeys)
+- **Status**: Fully implemented (Phase 2 complete)
+- **Schema**: name, description, companyId, stepsOrder[], status, previewMedia
+
+**✅ Ready - Steps** (`web/src/features/steps/`)
+
+- **Firestore Collection**: `/experiences/{experienceId}/steps/{stepId}`
+- **Purpose**: Individual UI screen configurations within Experiences
+- **Status**: Fully implemented (Phase 3 complete)
+- **Schema**: Discriminated union by step type (info, capture, inputs, ai-transform, etc.)
 
 **📋 Planned - Experience Engine** (`web/src/features/experience-engine/`)
 
@@ -257,20 +255,14 @@ The application is organized into feature modules in `web/src/features/`.
 - lottie-react (animations)
 - sonner (toasts)
 
-### Firestore Collections (Current)
-- `/companies` - Brand/organization management (ready)
-- `/aiPresets` - Legacy AI presets (deprecated - do not use)
-- `/events` - Event configs (needs rework → will move under projects)
-- `/events/{eventId}/journeys` - Step sequences (needs rework → will become /experiences)
-- `/events/{eventId}/steps` - Screen configs (needs rework → will move under experiences)
-
-### Firestore Collections (Target - v5)
+### Firestore Collections (Current - v5)
 - `/companies` - Brand/organization management
-- `/projects` - Company-level containers
-- `/projects/{projectId}/events` - Themed instances with `experiences[]` array (objects with experienceId, label)
+- `/aiPresets` - Legacy AI presets (deprecated - do not use)
+- `/projects` - Company-level containers (sharePath, activeEventId)
+- `/projects/{projectId}/events` - Themed instances with `experiences[]` array and `extras` slots
 - `/experiences` - Reusable flow templates (company-scoped)
-- `/experiences/{experienceId}/steps` - Step configs including ai-transform
-- `/sessions` - Guest interaction records
+- `/experiences/{experienceId}/steps` - Step configs (info, capture, inputs, ai-transform, etc.)
+- `/sessions` - Guest interaction records (planned)
 
 ## Recent Changes
 
@@ -281,19 +273,20 @@ The application is organized into feature modules in `web/src/features/`.
 **Phase Status:**
 - ✅ Phase 0: Company Context - complete
 - ✅ Phase 1: Rename experiences → aiPresets - complete (deprecated, do not use)
-- 📋 Phase 2: Journeys → Experiences - not started
-- 📋 Phase 3: Steps Consolidation (ai-transform step) - not started
-- 📋 Phase 4: Projects - not started
-- 📋 Phase 5: Events under Projects - not started
-- 📋 Phase 6: Event → Experience linking (experiences[]) - not started
+- ✅ Phase 2: Journeys → Experiences - complete
+- ✅ Phase 3: Steps Consolidation - complete
+- ✅ Phase 4: Projects - complete (refactored from old Events)
+- ✅ Phase 5: Events under Projects - complete
+- 📋 Phase 6: Event Experiences & Extras (General tab) - not started (see `features/scalable-arch/phase-6-event-experiences.md`)
 - 📋 Phase 7: Experience Engine - not started
 
-### Data Model v4 (Current - November 2024)
+### Data Model v5 (Current - December 2024)
 
 **Current production architecture** in `web/src/features/`:
 
 - Normalized Firestore design with flat collections
-- Journey Editor with 11 step types
-- Events, Journeys, Steps structure
+- Company → Projects → Events hierarchy
+- Experiences (company-scoped) with Steps
+- Experience Editor with multiple step types
 
-Being evolved to v5 - see `features/scalable-arch/new-data-model-v5.md` for target model.
+See `features/scalable-arch/new-data-model-v5.md` for full data model documentation.
