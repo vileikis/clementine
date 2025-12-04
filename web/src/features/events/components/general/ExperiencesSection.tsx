@@ -5,12 +5,13 @@ import { toast } from "sonner";
 import { AddExperienceCard } from "./AddExperienceCard";
 import { EventExperienceCard } from "./EventExperienceCard";
 import { ExperiencePickerDrawer } from "./ExperiencePickerDrawer";
+import { EventExperienceDrawer } from "./EventExperienceDrawer";
 import { useExperienceDetails } from "@/features/experiences";
 import {
   addEventExperienceAction,
   updateEventExperienceAction,
 } from "../../actions";
-import type { Event } from "../../types/event.types";
+import type { Event, EventExperienceLink } from "../../types/event.types";
 
 interface ExperiencesSectionProps {
   event: Event;
@@ -22,6 +23,7 @@ interface ExperiencesSectionProps {
  */
 export function ExperiencesSection({ event }: ExperiencesSectionProps) {
   const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const [editingExperience, setEditingExperience] = useState<EventExperienceLink | null>(null);
   const [isPending, startTransition] = useTransition();
 
   // Get experience IDs from the event
@@ -70,10 +72,8 @@ export function ExperiencesSection({ event }: ExperiencesSectionProps) {
     });
   };
 
-  const handleClickExperience = (experienceId: string) => {
-    // Phase 4 will add edit drawer functionality
-    // For now, just log for debugging
-    console.log("Edit experience:", experienceId);
+  const handleClickExperience = (experienceLink: EventExperienceLink) => {
+    setEditingExperience(experienceLink);
   };
 
   return (
@@ -97,7 +97,7 @@ export function ExperiencesSection({ event }: ExperiencesSectionProps) {
             onToggle={(enabled) =>
               handleToggleExperience(experienceLink.experienceId, enabled)
             }
-            onClick={() => handleClickExperience(experienceLink.experienceId)}
+            onClick={() => handleClickExperience(experienceLink)}
             isUpdating={isPending}
           />
         ))}
@@ -116,6 +116,23 @@ export function ExperiencesSection({ event }: ExperiencesSectionProps) {
         companyId={event.companyId}
         existingExperienceIds={experienceIds}
         onAdd={handleAddExperience}
+      />
+
+      {/* Experience edit drawer - key forces remount when different experience selected */}
+      <EventExperienceDrawer
+        key={editingExperience?.experienceId ?? "none"}
+        open={editingExperience !== null}
+        onOpenChange={(open) => {
+          if (!open) setEditingExperience(null);
+        }}
+        projectId={event.projectId}
+        eventId={event.id}
+        experienceLink={editingExperience}
+        experience={
+          editingExperience
+            ? experiencesMap.get(editingExperience.experienceId) ?? null
+            : null
+        }
       />
     </section>
   );
