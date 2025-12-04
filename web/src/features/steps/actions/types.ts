@@ -22,6 +22,7 @@ export const ErrorCodes = {
   EVENT_ARCHIVED: "EVENT_ARCHIVED",
   MAX_STEPS_EXCEEDED: "MAX_STEPS_EXCEEDED",
   INTERNAL_ERROR: "INTERNAL_ERROR",
+  AI_GENERATION_FAILED: "AI_GENERATION_FAILED",
 } as const;
 
 export type ErrorCode = (typeof ErrorCodes)[keyof typeof ErrorCodes];
