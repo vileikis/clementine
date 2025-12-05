@@ -15,7 +15,26 @@ export class N8nWebhookProvider implements AIClient {
       webhook: this.config.baseUrl,
       aspectRatio: params.aspectRatio,
       referenceImageCount: params.referenceImageUrls?.length || 0,
+      hasBase64Input: !!params.inputImageBase64,
+      hasUrlInput: !!params.inputImageUrl,
     });
+
+    // Build request body - pass either URL or base64 to n8n
+    const requestBody: Record<string, unknown> = {
+      prompt: params.prompt,
+      referenceImageUrls: params.referenceImageUrls || [],
+      brandColor: params.brandColor,
+      model: params.model,
+      aspectRatio: params.aspectRatio || "1:1",
+    };
+
+    if (params.inputImageBase64) {
+      requestBody.inputImageBase64 = params.inputImageBase64;
+    } else if (params.inputImageUrl) {
+      requestBody.inputImageUrl = params.inputImageUrl;
+    } else {
+      throw new Error('Either inputImageUrl or inputImageBase64 must be provided');
+    }
 
     const response = await fetch(`${this.config.baseUrl}/transform`, {
       method: 'POST',
@@ -25,14 +44,7 @@ export class N8nWebhookProvider implements AIClient {
           Authorization: `Bearer ${this.config.authToken}`,
         }),
       },
-      body: JSON.stringify({
-        prompt: params.prompt,
-        inputImageUrl: params.inputImageUrl,
-        referenceImageUrls: params.referenceImageUrls || [],
-        brandColor: params.brandColor,
-        model: params.model,
-        aspectRatio: params.aspectRatio || "1:1",
-      }),
+      body: JSON.stringify(requestBody),
     });
 
     if (!response.ok) {

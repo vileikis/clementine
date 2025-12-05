@@ -23,7 +23,7 @@
  * @feature 019-ai-transform-playground
  */
 
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useCallback, useRef, useEffect, useReducer } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Upload, Loader2, AlertCircle, RefreshCw, Trash2 } from "lucide-react";
@@ -37,7 +37,123 @@ const MAX_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
 const MAX_SIZE_LABEL = "10MB";
 
 // Playground states
-type PlaygroundState = "idle" | "ready" | "generating" | "result" | "error";
+type PlaygroundPhase = "idle" | "ready" | "generating" | "result" | "error";
+
+// ============================================================================
+// Reducer State & Actions
+// ============================================================================
+
+interface PlaygroundState {
+  phase: PlaygroundPhase;
+  testImageFile: File | null;
+  testImagePreview: string | null;
+  resultImageUrl: string | null;
+  error: string | null;
+  elapsedSeconds: number;
+  totalGenerationTime: number | null;
+  isDragging: boolean;
+}
+
+type PlaygroundAction =
+  | { type: "SET_DRAGGING"; isDragging: boolean }
+  | { type: "FILE_SELECTED"; file: File; preview: string }
+  | { type: "FILE_ERROR"; error: string }
+  | { type: "START_GENERATION" }
+  | { type: "TICK_TIMER" }
+  | { type: "GENERATION_SUCCESS"; resultUrl: string; totalTime: number }
+  | { type: "GENERATION_ERROR"; error: string; totalTime: number }
+  | { type: "RETRY" }
+  | { type: "CLEAR" };
+
+const initialState: PlaygroundState = {
+  phase: "idle",
+  testImageFile: null,
+  testImagePreview: null,
+  resultImageUrl: null,
+  error: null,
+  elapsedSeconds: 0,
+  totalGenerationTime: null,
+  isDragging: false,
+};
+
+function playgroundReducer(
+  state: PlaygroundState,
+  action: PlaygroundAction
+): PlaygroundState {
+  switch (action.type) {
+    case "SET_DRAGGING":
+      return { ...state, isDragging: action.isDragging };
+
+    case "FILE_SELECTED":
+      return {
+        ...state,
+        phase: "ready",
+        testImageFile: action.file,
+        testImagePreview: action.preview,
+        resultImageUrl: null,
+        error: null,
+        totalGenerationTime: null,
+        isDragging: false,
+      };
+
+    case "FILE_ERROR":
+      return {
+        ...state,
+        phase: "error",
+        error: action.error,
+        isDragging: false,
+      };
+
+    case "START_GENERATION":
+      return {
+        ...state,
+        phase: "generating",
+        error: null,
+        elapsedSeconds: 0,
+        totalGenerationTime: null,
+      };
+
+    case "TICK_TIMER":
+      return {
+        ...state,
+        elapsedSeconds: state.elapsedSeconds + 1,
+      };
+
+    case "GENERATION_SUCCESS":
+      return {
+        ...state,
+        phase: "result",
+        resultImageUrl: action.resultUrl,
+        totalGenerationTime: action.totalTime,
+      };
+
+    case "GENERATION_ERROR":
+      return {
+        ...state,
+        phase: "error",
+        error: action.error,
+        totalGenerationTime: action.totalTime,
+      };
+
+    case "RETRY":
+      return {
+        ...state,
+        phase: state.testImageFile ? "ready" : "idle",
+        error: null,
+        totalGenerationTime: null,
+      };
+
+    case "CLEAR":
+      return initialState;
+
+    default:
+      return state;
+  }
+}
+
+// ============================================================================
+// Props & Helpers
+// ============================================================================
 
 interface StepAIPlaygroundProps {
   /** Step ID for the current ai-transform step */
@@ -90,6 +206,10 @@ function formatTime(seconds: number): string {
   return `${mins}m ${secs}s`;
 }
 
+// ============================================================================
+// Component
+// ============================================================================
+
 export function StepAIPlayground({
   stepId,
   config,
@@ -97,24 +217,20 @@ export function StepAIPlayground({
   disabled = false,
   className,
 }: StepAIPlaygroundProps) {
-  // Playground state
-  const [state, setState] = useState<PlaygroundState>("idle");
-  const [testImageFile, setTestImageFile] = useState<File | null>(null);
-  const [testImagePreview, setTestImagePreview] = useState<string | null>(null);
-  const [resultImageUrl, setResultImageUrl] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [state, dispatch] = useReducer(playgroundReducer, initialState);
+  const {
+    phase,
+    testImageFile,
+    testImagePreview,
+    resultImageUrl,
+    error,
+    elapsedSeconds,
+    totalGenerationTime,
+    isDragging,
+  } = state;
 
-  // Timer state
-  const [elapsedSeconds, setElapsedSeconds] = useState(0);
-  const [totalGenerationTime, setTotalGenerationTime] = useState<number | null>(
-    null
-  );
+  // Refs
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Drag state for visual feedback
-  const [isDragging, setIsDragging] = useState(false);
-
-  // File input ref for programmatic click
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Check if prompt is configured
@@ -122,10 +238,9 @@ export function StepAIPlayground({
 
   // Timer effect - runs during generation
   useEffect(() => {
-    if (state === "generating") {
-      setElapsedSeconds(0);
+    if (phase === "generating") {
       timerRef.current = setInterval(() => {
-        setElapsedSeconds((prev) => prev + 1);
+        dispatch({ type: "TICK_TIMER" });
       }, 1000);
     } else {
       if (timerRef.current) {
@@ -139,28 +254,21 @@ export function StepAIPlayground({
         clearInterval(timerRef.current);
       }
     };
-  }, [state]);
+  }, [phase]);
 
   // Handle file selection (from input or drop)
   const handleFileSelect = useCallback(async (file: File) => {
     const validationError = validateFile(file);
     if (validationError) {
-      setError(validationError);
-      setState("error");
+      dispatch({ type: "FILE_ERROR", error: validationError });
       return;
     }
 
     try {
       const dataUrl = await fileToDataUrl(file);
-      setTestImageFile(file);
-      setTestImagePreview(dataUrl);
-      setResultImageUrl(null);
-      setError(null);
-      setTotalGenerationTime(null);
-      setState("ready");
+      dispatch({ type: "FILE_SELECTED", file, preview: dataUrl });
     } catch {
-      setError("Failed to read the image file");
-      setState("error");
+      dispatch({ type: "FILE_ERROR", error: "Failed to read the image file" });
     }
   }, []);
 
@@ -183,7 +291,7 @@ export function StepAIPlayground({
       e.preventDefault();
       e.stopPropagation();
       if (!disabled) {
-        setIsDragging(true);
+        dispatch({ type: "SET_DRAGGING", isDragging: true });
       }
     },
     [disabled]
@@ -192,14 +300,14 @@ export function StepAIPlayground({
   const handleDragLeave = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsDragging(false);
+    dispatch({ type: "SET_DRAGGING", isDragging: false });
   }, []);
 
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
       e.preventDefault();
       e.stopPropagation();
-      setIsDragging(false);
+      dispatch({ type: "SET_DRAGGING", isDragging: false });
 
       if (disabled) return;
 
@@ -216,9 +324,7 @@ export function StepAIPlayground({
     if (!testImageFile || !testImagePreview) return;
 
     const startTime = Date.now();
-    setState("generating");
-    setError(null);
-    setTotalGenerationTime(null);
+    dispatch({ type: "START_GENERATION" });
 
     try {
       // Import the server action dynamically to avoid bundling issues
@@ -231,13 +337,14 @@ export function StepAIPlayground({
         testImageBase64: testImagePreview,
       });
 
-      const endTime = Date.now();
-      const totalSeconds = Math.round((endTime - startTime) / 1000);
-      setTotalGenerationTime(totalSeconds);
+      const totalSeconds = Math.round((Date.now() - startTime) / 1000);
 
       if (result.success) {
-        setResultImageUrl(result.data.resultImageBase64);
-        setState("result");
+        dispatch({
+          type: "GENERATION_SUCCESS",
+          resultUrl: result.data.resultImageBase64,
+          totalTime: totalSeconds,
+        });
         onGenerationComplete?.(true);
       } else {
         // Map error codes to user-friendly messages
@@ -246,41 +353,32 @@ export function StepAIPlayground({
           errorMessage =
             "AI service temporarily unavailable. Please try again.";
         }
-        setError(errorMessage);
-        setState("error");
+        dispatch({
+          type: "GENERATION_ERROR",
+          error: errorMessage,
+          totalTime: totalSeconds,
+        });
         onGenerationComplete?.(false);
       }
     } catch (err) {
-      const endTime = Date.now();
-      const totalSeconds = Math.round((endTime - startTime) / 1000);
-      setTotalGenerationTime(totalSeconds);
-      setError(err instanceof Error ? err.message : "Generation failed");
-      setState("error");
+      const totalSeconds = Math.round((Date.now() - startTime) / 1000);
+      dispatch({
+        type: "GENERATION_ERROR",
+        error: err instanceof Error ? err.message : "Generation failed",
+        totalTime: totalSeconds,
+      });
       onGenerationComplete?.(false);
     }
   }, [testImageFile, testImagePreview, stepId, onGenerationComplete]);
 
   // Handle retry (keeps the image, resets error state)
   const handleRetry = useCallback(() => {
-    if (testImageFile) {
-      setState("ready");
-      setError(null);
-      setTotalGenerationTime(null);
-    } else {
-      setState("idle");
-      setError(null);
-      setTotalGenerationTime(null);
-    }
-  }, [testImageFile]);
+    dispatch({ type: "RETRY" });
+  }, []);
 
   // Handle clear/reset (removes everything)
   const handleClear = useCallback(() => {
-    setTestImageFile(null);
-    setTestImagePreview(null);
-    setResultImageUrl(null);
-    setError(null);
-    setTotalGenerationTime(null);
-    setState("idle");
+    dispatch({ type: "CLEAR" });
   }, []);
 
   // Click handler for upload area
@@ -303,7 +401,7 @@ export function StepAIPlayground({
       />
 
       {/* Upload Area - shown when idle or error without image */}
-      {(state === "idle" || (state === "error" && !testImagePreview)) && (
+      {(phase === "idle" || (phase === "error" && !testImagePreview)) && (
         <div
           onClick={handleUploadClick}
           onDragOver={handleDragOver}
@@ -330,7 +428,7 @@ export function StepAIPlayground({
       )}
 
       {/* Error message for upload errors (no image preview) */}
-      {state === "error" && error && !testImagePreview && (
+      {phase === "error" && error && !testImagePreview && (
         <div className="flex items-start gap-2 p-3 rounded-lg bg-destructive/10 text-destructive">
           <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
           <p className="text-sm">{error}</p>
@@ -338,13 +436,13 @@ export function StepAIPlayground({
       )}
 
       {/* Main content area - horizontal on desktop, vertical on mobile */}
-      {testImagePreview && state !== "idle" && (
+      {testImagePreview && phase !== "idle" && (
         <div className="flex flex-col md:flex-row gap-4">
           {/* Input image panel */}
           <div className="flex-1 space-y-2">
             <div className="flex items-center justify-between">
               <p className="text-xs font-medium text-muted-foreground">Input</p>
-              {state !== "generating" && (
+              {phase !== "generating" && (
                 <Button
                   variant="ghost"
                   size="sm"
@@ -370,20 +468,20 @@ export function StepAIPlayground({
           </div>
 
           {/* Result image panel - only shown when result or generating */}
-          {(state === "result" || state === "generating") && (
+          {(phase === "result" || phase === "generating") && (
             <div className="flex-1 space-y-2">
               <div className="flex items-center justify-between">
                 <p className="text-xs font-medium text-muted-foreground">
                   Result
                 </p>
-                {totalGenerationTime !== null && state === "result" && (
+                {totalGenerationTime !== null && phase === "result" && (
                   <p className="text-xs text-muted-foreground">
                     Generated in {formatTime(totalGenerationTime)}
                   </p>
                 )}
               </div>
               <div className="aspect-square w-full relative rounded-lg overflow-hidden bg-muted border">
-                {state === "generating" ? (
+                {phase === "generating" ? (
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
                     <Loader2 className="h-8 w-8 animate-spin text-muted-foreground mb-2" />
                     <p className="text-sm text-muted-foreground">
@@ -406,10 +504,10 @@ export function StepAIPlayground({
       )}
 
       {/* Action buttons and error messages */}
-      {testImagePreview && state !== "idle" && (
+      {testImagePreview && phase !== "idle" && (
         <div className="space-y-3">
           {/* Error message with retry */}
-          {state === "error" && error && (
+          {phase === "error" && error && (
             <div className="flex items-start gap-2 p-3 rounded-lg bg-destructive/10 text-destructive">
               <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
               <div className="flex-1">
@@ -420,7 +518,7 @@ export function StepAIPlayground({
 
           {/* Action buttons */}
           <div className="flex gap-2">
-            {state === "ready" && (
+            {phase === "ready" && (
               <Button
                 onClick={handleGenerate}
                 disabled={disabled || !hasPrompt}
@@ -429,13 +527,13 @@ export function StepAIPlayground({
                 Generate
               </Button>
             )}
-            {state === "generating" && (
+            {phase === "generating" && (
               <Button disabled className="flex-1 min-h-[44px]">
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                 Generating... {formatTime(elapsedSeconds)}
               </Button>
             )}
-            {state === "result" && (
+            {phase === "result" && (
               <Button
                 onClick={handleGenerate}
                 disabled={disabled || !hasPrompt}
@@ -445,7 +543,7 @@ export function StepAIPlayground({
                 Regenerate
               </Button>
             )}
-            {state === "error" && (
+            {phase === "error" && (
               <Button
                 onClick={handleRetry}
                 variant="outline"
