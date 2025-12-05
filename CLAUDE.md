@@ -112,11 +112,13 @@ The `functions/` workspace is a placeholder for Firebase Cloud Functions that wi
 ### Architecture Roadmap
 
 We are migrating to a **scalable architecture** documented in `features/scalable-arch/`:
+
 - `high-level-plan.md` - Phased roadmap (Phases 0-7)
 - `feature-modules.md` - Target module organization
 - `new-data-model-v5.md` - Target data model
 
 **Target Architecture:**
+
 ```
 Company
   → Projects (containers for events)
@@ -215,16 +217,19 @@ The application is organized into feature modules in `web/src/features/`.
 ### Architecture Principles
 
 **Domain-First Organization**
+
 - Feature modules over global folders
 - Separation of Admin vs Guest concerns
 - One shared runtime engine (Experience Engine)
 
 **Normalized Firestore Design**
+
 - Flat root collections (no deep nesting)
 - Linked by ID references
 - Enables future SQL migration
 
 **Experience Engine Pattern**
+
 - Single source of truth for step execution
 - Identical behavior in admin preview and guest flow
 - True WYSIWYG preview
@@ -239,23 +244,27 @@ The application is organized into feature modules in `web/src/features/`.
 ## Active Technologies
 
 ### Core Stack
+
 - **Language**: TypeScript 5.x (strict mode)
 - **Framework**: Next.js 16 (App Router), React 19
 - **Styling**: Tailwind CSS v4, shadcn/ui, lucide-react
 - **Validation**: Zod 4.x
 
 ### Data Layer
+
 - **Database**: Firebase Firestore
 - **Storage**: Firebase Storage (`media/{companyId}/{mediaType}/{timestamp}-{filename}`)
-- **Client State**: Zustand (with persist middleware for localStorage)
+- **Client State**: Zustand (for complex state, with persist middleware for localStorage)
 
 ### Additional Libraries
+
 - @dnd-kit/core (drag-drop)
 - react-hook-form (forms)
 - lottie-react (animations)
 - sonner (toasts)
 
 ### Firestore Collections (Current - v5)
+
 - `/companies` - Brand/organization management
 - `/aiPresets` - Legacy AI presets (deprecated - do not use)
 - `/projects` - Company-level containers (sharePath, activeEventId)
@@ -271,6 +280,7 @@ The application is organized into feature modules in `web/src/features/`.
 **New architecture roadmap** - see `features/scalable-arch/` for full documentation.
 
 **Phase Status:**
+
 - ✅ Phase 0: Company Context - complete
 - ✅ Phase 1: Rename experiences → aiPresets - complete (deprecated, do not use)
 - ✅ Phase 2: Journeys → Experiences - complete
