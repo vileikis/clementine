@@ -94,7 +94,7 @@
 - [X] T011 Run `pnpm lint` and fix all errors/warnings
 - [X] T012 Run `pnpm type-check` and resolve all TypeScript errors
 - [X] T013 Run `pnpm test` and ensure all tests pass
-- [ ] T014 Verify feature in local dev server (`pnpm dev`) - test all acceptance scenarios from spec.md
+- [X] T014 Verify feature in local dev server (`pnpm dev`) - test all acceptance scenarios from spec.md
 
 ---
 
