@@ -29,6 +29,8 @@ import { revalidatePath } from "next/cache";
 import type { Step } from "@/features/steps";
 import type { Experience as AiPreset } from "@/features/ai-presets";
 import type { Experience } from "@/features/experiences/types";
+import { randomUUID } from "crypto";
+
 // Types used in T072-T079 (persisted session mode) - currently deferred
 // import type { TransformStatus, StepInputValue } from "../types";
 
@@ -505,7 +507,7 @@ export async function triggerEngineTransformJob(
     const validated = triggerEngineTransformSchema.parse(input);
 
     // Generate job ID
-    const jobId = `job_${crypto.randomUUID()}`;
+    const jobId = `job_${randomUUID()}`;
 
     // For MVP, we return immediately with "pending" status.
     // The actual transformation will be handled by a background process
