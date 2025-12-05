@@ -35,5 +35,5 @@ export type { StepRendererProps, RendererRegistry } from "./types";
 // ============================================================================
 // Lib - Utilities (internal, but exported for testing)
 // ============================================================================
-export { interpolateVariables } from "./lib";
+export { interpolateVariables, getCapturedPhotoUrl } from "./lib";
 export { getStepComponent, STEP_REGISTRY } from "./lib";
