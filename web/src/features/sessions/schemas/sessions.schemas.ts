@@ -10,6 +10,35 @@ export const sessionStateSchema = z.enum([
   "error",
 ]);
 
+// ============================================================================
+// Transformation Status (Experience Engine)
+// ============================================================================
+
+/**
+ * Transformation status enum for AI operations.
+ */
+export const transformStatusSchema = z.enum([
+  "idle",
+  "pending",
+  "processing",
+  "complete",
+  "error",
+]);
+
+/**
+ * Transformation status object schema.
+ */
+export const transformationStatusSchema = z.object({
+  status: transformStatusSchema,
+  resultUrl: z.string().url().optional(),
+  errorMessage: z.string().optional(),
+  jobId: z.string().optional(),
+  updatedAt: z.number().optional(),
+});
+
+export type TransformStatusSchema = z.infer<typeof transformStatusSchema>;
+export type TransformationStatusSchema = z.infer<typeof transformationStatusSchema>;
+
 /**
  * Discriminated union for type-safe step input storage.
  * Each step type maps to a specific value format.
