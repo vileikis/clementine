@@ -382,24 +382,29 @@ test("navigation advances to next step", () => {
 ## Import Paths
 
 ```typescript
-// Components
+// Engine components
 import { ExperienceEngine, StepRenderer } from "@/features/experience-engine";
 
-// Hooks
-import {
-  useEngine,
-  useEngineSession,
-  useTransformationStatus,
-} from "@/features/experience-engine";
+// Engine hooks
+import { useEngine, useEngineSession } from "@/features/experience-engine";
 
-// Types
+// Engine types
 import type {
   EngineConfig,
   EngineState,
-  EngineSession,
-  TransformationStatus,
   StepRendererProps,
 } from "@/features/experience-engine";
+
+// Session types (from sessions module)
+import type {
+  EngineSession,
+  TransformationStatus,
+  SessionData,
+  StepInputValue,
+} from "@/features/sessions";
+
+// Session hooks (from sessions module)
+import { useTransformationStatus } from "@/features/sessions";
 ```
 
 ---

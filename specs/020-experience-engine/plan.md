@@ -69,37 +69,30 @@ web/src/features/experience-engine/
 │   ├── index.ts                       # Component barrel
 │   ├── ExperienceEngine.tsx           # Main engine component
 │   ├── StepRenderer.tsx               # Step type dispatcher
-│   └── renderers/
-│       ├── index.ts                   # Renderer barrel
-│       ├── InfoRenderer.tsx           # info step
-│       ├── CaptureRenderer.tsx        # capture step
-│       ├── AiTransformRenderer.tsx    # ai-transform step
-│       ├── ShortTextRenderer.tsx      # short_text step
-│       ├── LongTextRenderer.tsx       # long_text step
-│       ├── MultipleChoiceRenderer.tsx # multiple_choice step
-│       ├── YesNoRenderer.tsx          # yes_no step
-│       ├── OpinionScaleRenderer.tsx   # opinion_scale step
-│       ├── EmailRenderer.tsx          # email step
-│       ├── ProcessingRenderer.tsx     # processing step
-│       └── RewardRenderer.tsx         # reward step
+│   └── steps/                         # Step renderers (matches existing naming)
+│       ├── index.ts                   # Step barrel
+│       ├── InfoStep.tsx               # info step
+│       ├── CaptureStep.tsx            # capture step
+│       ├── AiTransformStep.tsx        # ai-transform step
+│       ├── ShortTextStep.tsx          # short_text step
+│       ├── LongTextStep.tsx           # long_text step
+│       ├── MultipleChoiceStep.tsx     # multiple_choice step
+│       ├── YesNoStep.tsx              # yes_no step
+│       ├── OpinionScaleStep.tsx       # opinion_scale step
+│       ├── EmailStep.tsx              # email step
+│       ├── ProcessingStep.tsx         # processing step
+│       └── RewardStep.tsx             # reward step
 ├── hooks/
 │   ├── index.ts                       # Hook barrel
 │   ├── useEngine.ts                   # Engine state & navigation
-│   ├── useEngineSession.ts            # Session management (persisted/ephemeral)
-│   └── useTransformationStatus.ts     # Real-time transformation subscription
-├── actions/
-│   ├── index.ts                       # Action barrel (NOT exported in public API)
-│   ├── engine.actions.ts              # Session CRUD Server Actions
-│   └── transform.actions.ts           # AI job trigger Server Action
+│   └── useEngineSession.ts            # Session mode adapter (uses features/sessions)
 ├── schemas/
 │   ├── index.ts                       # Schema barrel (NOT exported in public API)
-│   ├── engine.schemas.ts              # EngineConfig, EngineState Zod schemas
-│   └── session.schemas.ts             # Extended session schemas for engine
+│   └── engine.schemas.ts              # EngineConfig, EngineState Zod schemas
 ├── types/
 │   ├── index.ts                       # Type barrel
 │   ├── engine.types.ts                # EngineConfig, EngineState, EngineCallbacks
-│   ├── renderer.types.ts              # StepRendererProps, RendererRegistry
-│   └── session.types.ts               # EngineSession (extends existing Session)
+│   └── renderer.types.ts              # StepRendererProps, RendererRegistry
 ├── lib/
 │   ├── index.ts                       # Lib barrel
 │   ├── step-registry.ts               # Step type → renderer mapping
@@ -108,9 +101,21 @@ web/src/features/experience-engine/
     ├── useEngine.test.ts
     ├── useEngineSession.test.ts
     └── variable-interpolation.test.ts
+
+web/src/features/sessions/              # Evolved sessions module
+├── types/
+│   └── sessions.types.ts              # Add TransformationStatus, EngineSession
+├── schemas/
+│   └── sessions.schemas.ts            # Add transformation status schema
+├── actions/
+│   └── sessions.actions.ts            # Add engine session CRUD, transform trigger
+├── hooks/
+│   └── useTransformationStatus.ts     # Real-time transformation subscription
+└── repositories/
+    └── sessions.repository.ts         # Extend for engine session operations
 ```
 
-**Structure Decision**: Feature module architecture per Constitution Principle VII. The Experience Engine is a new feature module at `web/src/features/experience-engine/` following vertical slice organization. Step renderers are grouped under `components/renderers/` for discoverability. Server Actions and schemas are feature-local but NOT exported in the public API per bundle safety rules.
+**Structure Decision**: Feature module architecture per Constitution Principle VII. The Experience Engine owns the runtime logic while the Sessions module owns session domain types and persistence. Step components use `*Step.tsx` naming for consistency with existing `features/steps/components/preview/steps/`. Server Actions for session operations live in `features/sessions/` (domain owner).
 
 ## Complexity Tracking
 
