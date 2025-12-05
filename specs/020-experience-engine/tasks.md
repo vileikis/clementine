@@ -24,14 +24,14 @@
 
 **Purpose**: Create feature module structure and barrel exports
 
-- [ ] T001 Create feature module directory structure at `web/src/features/experience-engine/`
-- [ ] T002 [P] Create barrel export at `web/src/features/experience-engine/index.ts`
-- [ ] T003 [P] Create types barrel at `web/src/features/experience-engine/types/index.ts`
-- [ ] T004 [P] Create hooks barrel at `web/src/features/experience-engine/hooks/index.ts`
-- [ ] T005 [P] Create components barrel at `web/src/features/experience-engine/components/index.ts`
-- [ ] T006 [P] Create schemas barrel at `web/src/features/experience-engine/schemas/index.ts`
-- [ ] T007 [P] Create lib barrel at `web/src/features/experience-engine/lib/index.ts`
-- [ ] T008 [P] Create steps barrel at `web/src/features/experience-engine/components/steps/index.ts`
+- [X] T001 Create feature module directory structure at `web/src/features/experience-engine/`
+- [X] T002 [P] Create barrel export at `web/src/features/experience-engine/index.ts`
+- [X] T003 [P] Create types barrel at `web/src/features/experience-engine/types/index.ts`
+- [X] T004 [P] Create hooks barrel at `web/src/features/experience-engine/hooks/index.ts`
+- [X] T005 [P] Create components barrel at `web/src/features/experience-engine/components/index.ts`
+- [X] T006 [P] Create schemas barrel at `web/src/features/experience-engine/schemas/index.ts`
+- [X] T007 [P] Create lib barrel at `web/src/features/experience-engine/lib/index.ts`
+- [X] T008 [P] Create steps barrel at `web/src/features/experience-engine/components/steps/index.ts`
 
 ---
 
@@ -43,20 +43,20 @@
 
 ### Engine Types & Schemas
 
-- [ ] T009 [P] Create EngineConfig and EngineState types in `web/src/features/experience-engine/types/engine.types.ts`
-- [ ] T010 [P] Create StepRendererProps and RendererRegistry types in `web/src/features/experience-engine/types/renderer.types.ts`
-- [ ] T011 [P] Create EngineConfig Zod schema in `web/src/features/experience-engine/schemas/engine.schemas.ts`
+- [X] T009 [P] Create EngineConfig and EngineState types in `web/src/features/experience-engine/types/engine.types.ts`
+- [X] T010 [P] Create StepRendererProps and RendererRegistry types in `web/src/features/experience-engine/types/renderer.types.ts`
+- [X] T011 [P] Create EngineConfig Zod schema in `web/src/features/experience-engine/schemas/engine.schemas.ts`
 
 ### Sessions Module Extension
 
-- [ ] T012 [P] Add TransformationStatus type to `web/src/features/sessions/types/sessions.types.ts`
-- [ ] T013 [P] Add EngineSession type to `web/src/features/sessions/types/sessions.types.ts`
-- [ ] T014 [P] Add transformation status Zod schema to `web/src/features/sessions/schemas/sessions.schemas.ts`
-- [ ] T015 Update sessions barrel export at `web/src/features/sessions/index.ts` to include new types
+- [X] T012 [P] Add TransformationStatus type to `web/src/features/sessions/types/sessions.types.ts`
+- [X] T013 [P] Add EngineSession type to `web/src/features/sessions/types/sessions.types.ts`
+- [X] T014 [P] Add transformation status Zod schema to `web/src/features/sessions/schemas/sessions.schemas.ts`
+- [X] T015 Update sessions barrel export at `web/src/features/sessions/index.ts` to include new types
 
 ### Step Registry
 
-- [ ] T016 Create step registry utility in `web/src/features/experience-engine/lib/step-registry.ts`
+- [X] T016 Create step registry utility in `web/src/features/experience-engine/lib/step-registry.ts`
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
@@ -70,11 +70,11 @@
 
 ### Implementation for User Story 1
 
-- [ ] T017 [US1] Create useEngineSession hook (ephemeral mode only first) in `web/src/features/experience-engine/hooks/useEngineSession.ts`
-- [ ] T018 [US1] Create useEngine hook with initialization logic in `web/src/features/experience-engine/hooks/useEngine.ts`
-- [ ] T019 [US1] Create StepRenderer component (dispatcher) in `web/src/features/experience-engine/components/StepRenderer.tsx`
-- [ ] T020 [US1] Create ExperienceEngine component (main wrapper) in `web/src/features/experience-engine/components/ExperienceEngine.tsx`
-- [ ] T021 [US1] Handle empty steps edge case (render empty state) in ExperienceEngine
+- [X] T017 [US1] Create useEngineSession hook (ephemeral mode only first) in `web/src/features/experience-engine/hooks/useEngineSession.ts`
+- [X] T018 [US1] Create useEngine hook with initialization logic in `web/src/features/experience-engine/hooks/useEngine.ts`
+- [X] T019 [US1] Create StepRenderer component (dispatcher) in `web/src/features/experience-engine/components/StepRenderer.tsx`
+- [X] T020 [US1] Create ExperienceEngine component (main wrapper) in `web/src/features/experience-engine/components/ExperienceEngine.tsx`
+- [X] T021 [US1] Handle empty steps edge case (render empty state) in ExperienceEngine
 - [ ] T022 [US1] Add unit test for useEngine initialization in `web/src/features/experience-engine/__tests__/useEngine.test.ts`
 
 **Checkpoint**: Engine initializes and renders first step - US1 complete
@@ -89,11 +89,11 @@
 
 ### Implementation for User Story 2
 
-- [ ] T023 [US2] Add navigation methods (next, previous, skip, restart) to useEngine hook in `web/src/features/experience-engine/hooks/useEngine.ts`
-- [ ] T024 [US2] Implement navigation debouncing (150ms) in useEngine hook
-- [ ] T025 [US2] Implement canGoBack/canGoNext/canSkip computed flags based on config
-- [ ] T026 [US2] Preserve input data across navigation in useEngineSession
-- [ ] T027 [US2] Fire onComplete callback when last step completes
+- [X] T023 [US2] Add navigation methods (next, previous, skip, restart) to useEngine hook in `web/src/features/experience-engine/hooks/useEngine.ts`
+- [X] T024 [US2] Implement navigation debouncing (150ms) in useEngine hook
+- [X] T025 [US2] Implement canGoBack/canGoNext/canSkip computed flags based on config
+- [X] T026 [US2] Preserve input data across navigation in useEngineSession
+- [X] T027 [US2] Fire onComplete callback when last step completes
 - [ ] T028 [US2] Add unit test for navigation actions in `web/src/features/experience-engine/__tests__/useEngine.test.ts`
 
 **Checkpoint**: Full navigation works - US2 complete
@@ -108,25 +108,25 @@
 
 ### Basic Step Components (reuse existing preview components)
 
-- [ ] T029 [P] [US3] Create InfoStep renderer in `web/src/features/experience-engine/components/steps/InfoStep.tsx`
-- [ ] T030 [P] [US3] Create ShortTextStep renderer in `web/src/features/experience-engine/components/steps/ShortTextStep.tsx`
-- [ ] T031 [P] [US3] Create LongTextStep renderer in `web/src/features/experience-engine/components/steps/LongTextStep.tsx`
-- [ ] T032 [P] [US3] Create EmailStep renderer in `web/src/features/experience-engine/components/steps/EmailStep.tsx`
-- [ ] T033 [P] [US3] Create MultipleChoiceStep renderer in `web/src/features/experience-engine/components/steps/MultipleChoiceStep.tsx`
-- [ ] T034 [P] [US3] Create OpinionScaleStep renderer in `web/src/features/experience-engine/components/steps/OpinionScaleStep.tsx`
-- [ ] T035 [P] [US3] Create YesNoStep renderer (with auto-advance) in `web/src/features/experience-engine/components/steps/YesNoStep.tsx`
+- [X] T029 [P] [US3] Create InfoStep renderer in `web/src/features/experience-engine/components/steps/InfoStep.tsx`
+- [X] T030 [P] [US3] Create ShortTextStep renderer in `web/src/features/experience-engine/components/steps/ShortTextStep.tsx`
+- [X] T031 [P] [US3] Create LongTextStep renderer in `web/src/features/experience-engine/components/steps/LongTextStep.tsx`
+- [X] T032 [P] [US3] Create EmailStep renderer in `web/src/features/experience-engine/components/steps/EmailStep.tsx`
+- [X] T033 [P] [US3] Create MultipleChoiceStep renderer in `web/src/features/experience-engine/components/steps/MultipleChoiceStep.tsx`
+- [X] T034 [P] [US3] Create OpinionScaleStep renderer in `web/src/features/experience-engine/components/steps/OpinionScaleStep.tsx`
+- [X] T035 [P] [US3] Create YesNoStep renderer (with auto-advance) in `web/src/features/experience-engine/components/steps/YesNoStep.tsx`
 
 ### Special Step Components
 
-- [ ] T036 [US3] Create CaptureStep renderer (camera/upload + auto-advance) in `web/src/features/experience-engine/components/steps/CaptureStep.tsx`
-- [ ] T037 [US3] Create placeholder AiTransformStep renderer in `web/src/features/experience-engine/components/steps/AiTransformStep.tsx`
-- [ ] T038 [US3] Create placeholder ProcessingStep renderer in `web/src/features/experience-engine/components/steps/ProcessingStep.tsx`
-- [ ] T039 [US3] Create placeholder RewardStep renderer in `web/src/features/experience-engine/components/steps/RewardStep.tsx`
+- [X] T036 [US3] Create CaptureStep renderer (camera/upload + auto-advance) in `web/src/features/experience-engine/components/steps/CaptureStep.tsx`
+- [X] T037 [US3] Create placeholder AiTransformStep renderer in `web/src/features/experience-engine/components/steps/AiTransformStep.tsx`
+- [X] T038 [US3] Create placeholder ProcessingStep renderer in `web/src/features/experience-engine/components/steps/ProcessingStep.tsx`
+- [X] T039 [US3] Create placeholder RewardStep renderer in `web/src/features/experience-engine/components/steps/RewardStep.tsx`
 
 ### Step Registry Integration
 
-- [ ] T040 [US3] Register all step components in step-registry.ts
-- [ ] T041 [US3] Handle unknown step type with error boundary in StepRenderer
+- [X] T040 [US3] Register all step components in step-registry.ts
+- [X] T041 [US3] Handle unknown step type with error boundary in StepRenderer
 
 **Checkpoint**: All 11 step types render - US3 complete
 
@@ -145,7 +145,7 @@
 
 ### Variable Interpolation
 
-- [ ] T044 [US4] Create variable interpolation utility in `web/src/features/experience-engine/lib/variable-interpolation.ts`
+- [X] T044 [US4] Create variable interpolation utility in `web/src/features/experience-engine/lib/variable-interpolation.ts`
 - [ ] T045 [US4] Add unit test for variable interpolation in `web/src/features/experience-engine/__tests__/variable-interpolation.test.ts`
 
 ### AiTransformStep Implementation
@@ -278,8 +278,8 @@
 
 **Purpose**: Ensure code quality and correctness before merge
 
-- [ ] T084 Run `pnpm lint` and fix all errors/warnings
-- [ ] T085 Run `pnpm type-check` and resolve all TypeScript errors
+- [X] T084 Run `pnpm lint` and fix all errors/warnings
+- [X] T085 Run `pnpm type-check` and resolve all TypeScript errors
 - [ ] T086 Run `pnpm test` and ensure all tests pass
 - [ ] T087 Verify feature in local dev server (`pnpm dev`)
 - [ ] T088 Commit only after validation loop passes cleanly

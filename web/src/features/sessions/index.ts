@@ -6,6 +6,10 @@ export type {
   SessionState,
   SessionData,
   StepInputValue,
+  // Experience Engine types
+  TransformStatus,
+  TransformationStatus,
+  EngineSession,
 } from './types';
 
 // ============================================================================
