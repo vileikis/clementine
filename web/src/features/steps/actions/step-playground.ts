@@ -11,11 +11,10 @@
  * 1. Validate input and authentication
  * 2. Fetch step configuration from Firestore
  * 3. Validate step type is ai-transform and has prompt configured
- * 4. Upload test image to temporary Firebase Storage location
- * 5. Call AI client with step config
- * 6. Return transformed image as base64 data URL
+ * 4. Call AI client with base64 image directly
+ * 5. Return transformed image as base64 data URL
  *
- * Note: Both input and output images are temporary and not persisted.
+ * Note: Both input and output images are ephemeral and not persisted.
  * This is for testing AI prompts before going live.
  *
  * @feature 019-ai-transform-playground
@@ -29,54 +28,8 @@ import {
 import type { ActionResponse } from "./types";
 import { ErrorCodes } from "./types";
 import { verifyAdminSecret } from "@/lib/auth";
-import { db, storage } from "@/lib/firebase/admin";
+import { db } from "@/lib/firebase/admin";
 import { getAIClient } from "@/lib/ai/client";
-
-/**
- * Convert a base64 data URL to a Buffer
- */
-function dataUrlToBuffer(dataUrl: string): { buffer: Buffer; mimeType: string } {
-  const matches = dataUrl.match(/^data:([^;]+);base64,(.+)$/);
-  if (!matches) {
-    throw new Error("Invalid data URL format");
-  }
-  return {
-    mimeType: matches[1],
-    buffer: Buffer.from(matches[2], "base64"),
-  };
-}
-
-/**
- * Upload a buffer to Firebase Storage and return a signed URL
- * Files are stored in a temporary playground folder with auto-cleanup
- */
-async function uploadToTempStorage(
-  buffer: Buffer,
-  mimeType: string,
-  prefix: string
-): Promise<string> {
-  const extension = mimeType.split("/")[1] || "jpg";
-  const filename = `playground-temp/${prefix}-${Date.now()}.${extension}`;
-
-  const file = storage.file(filename);
-
-  await file.save(buffer, {
-    contentType: mimeType,
-    metadata: {
-      // Mark as temporary for cleanup
-      temporary: "true",
-      createdAt: new Date().toISOString(),
-    },
-  });
-
-  // Generate a signed URL valid for 15 minutes (enough for AI processing)
-  const [signedUrl] = await file.getSignedUrl({
-    action: "read",
-    expires: Date.now() + 15 * 60 * 1000, // 15 minutes
-  });
-
-  return signedUrl;
-}
 
 /**
  * Create an error response
@@ -169,27 +122,16 @@ export async function generateStepPreview(
       );
     }
 
-    // Convert base64 data URL to buffer and upload to temp storage
-    const { buffer: testImageBuffer, mimeType } = dataUrlToBuffer(
-      validated.testImageBase64
-    );
-
-    const testImageUrl = await uploadToTempStorage(
-      testImageBuffer,
-      mimeType,
-      `step-${validated.stepId}-input`
-    );
-
     // Extract config with defaults (per research.md CONFIG_MAPPING)
     const model = config.model || "gemini-2.5-flash-image";
     const aspectRatio = config.aspectRatio || "1:1";
     const referenceImageUrls = config.referenceImageUrls || [];
 
-    // Call AI client
+    // Call AI client with base64 directly (avoids upload → fetch round-trip)
     const aiClient = getAIClient();
     const resultBuffer = await aiClient.generateImage({
       prompt: config.prompt,
-      inputImageUrl: testImageUrl,
+      inputImageBase64: validated.testImageBase64,
       referenceImageUrls,
       model,
       aspectRatio,
