@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useParams, usePathname } from "next/navigation";
-import Link from "next/link";
+import { useParams } from "next/navigation";
 import { useProject } from "@/features/projects/hooks/useProject";
 import {
   ProjectDetailsHeader,
@@ -15,28 +14,19 @@ interface ProjectLayoutProps {
 
 /**
  * Layout for project details pages with header and tab navigation.
- * Wraps Events, Distribute, and Results pages.
+ * Wraps Events, Distribute, and nested event pages.
  *
- * When viewing an event (path has eventId segment), this layout
- * renders children only - the event layout handles its own header.
+ * Project header with tabs remains visible even when viewing nested event routes.
  */
 export default function ProjectLayout({ children }: ProjectLayoutProps) {
   const params = useParams();
-  const pathname = usePathname();
   const projectId = params.projectId as string;
   const companySlug = params.companySlug as string;
-  const eventId = params.eventId as string | undefined;
 
   const { project, loading, error } = useProject(projectId);
 
   // Rename dialog state
   const [isRenameOpen, setIsRenameOpen] = useState(false);
-
-  // If we're viewing an event, skip the project header/tabs
-  // The event layout will handle its own header
-  if (eventId) {
-    return <>{children}</>;
-  }
 
   if (loading) {
     return (
@@ -61,52 +51,20 @@ export default function ProjectLayout({ children }: ProjectLayoutProps) {
     );
   }
 
-  const tabs = [
-    { name: "Events", href: `/${companySlug}/${projectId}/events` },
-    { name: "Distribute", href: `/${companySlug}/${projectId}/distribute` },
-  ];
-
-  // Determine active tab from pathname
-  const activeTab = pathname?.includes("/distribute")
-    ? "Distribute"
-    : pathname?.includes("/results")
-      ? "Results"
-      : "Events";
-
   return (
     <div className="flex flex-col h-full">
-      {/* Header with back arrow, project name, and status */}
+      {/* Header with back arrow, project name, status, and tabs */}
       <ProjectDetailsHeader
         companySlug={companySlug}
         project={project}
+        projectId={projectId}
         onRenameClick={() => setIsRenameOpen(true)}
       />
 
-      {/* Tab Navigation */}
-      <div className="border-b px-4">
-        <nav className="flex gap-6" aria-label="Project tabs">
-          {tabs.map((tab) => {
-            const isActive = activeTab === tab.name;
-            return (
-              <Link
-                key={tab.name}
-                href={tab.href}
-                className={`py-3 px-1 border-b-2 font-medium text-sm transition-colors ${
-                  isActive
-                    ? "border-primary text-foreground"
-                    : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted"
-                }`}
-                aria-current={isActive ? "page" : undefined}
-              >
-                {tab.name}
-              </Link>
-            );
-          })}
-        </nav>
+      {/* Content with max-width container */}
+      <div className="flex-1 overflow-auto">
+        <div className="max-w-5xl mx-auto px-4 py-4">{children}</div>
       </div>
-
-      {/* Tab content */}
-      <div className="flex-1 overflow-auto">{children}</div>
 
       {/* Rename Dialog */}
       <RenameProjectDialog
