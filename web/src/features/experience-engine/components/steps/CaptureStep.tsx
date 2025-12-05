@@ -25,6 +25,7 @@ export function CaptureStep({
   onCtaClick,
 }: CaptureStepProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const objectUrlRef = useRef<string | null>(null);
 
   // Extract current photo URL
   const capturedPhotoUrl =
@@ -33,15 +34,31 @@ export function CaptureStep({
   // Track if we've auto-advanced
   const hasAutoAdvanced = useRef(false);
 
+  // Cleanup object URL on unmount
+  useEffect(() => {
+    return () => {
+      if (objectUrlRef.current) {
+        URL.revokeObjectURL(objectUrlRef.current);
+        objectUrlRef.current = null;
+      }
+    };
+  }, []);
+
   // Handle file selection (mock capture for now)
   const handleFileChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const file = event.target.files?.[0];
       if (!file || !isInteractive) return;
 
+      // Revoke previous object URL if it exists
+      if (objectUrlRef.current) {
+        URL.revokeObjectURL(objectUrlRef.current);
+      }
+
       // Create a local URL for the captured photo
       // In production, this would upload to storage and return a permanent URL
       const objectUrl = URL.createObjectURL(file);
+      objectUrlRef.current = objectUrl;
       onChange({ type: "photo", url: objectUrl });
     },
     [isInteractive, onChange]

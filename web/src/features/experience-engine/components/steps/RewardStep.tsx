@@ -8,6 +8,7 @@
 
 import Image from "next/image";
 import { Download, Share2, Mail, AlertCircle } from "lucide-react";
+import { toast } from "sonner";
 import { StepLayout, ActionButton } from "@/components/step-primitives";
 import { useEventTheme } from "@/components/providers/EventThemeProvider";
 import type { StepReward, ShareSocial } from "@/features/steps/types";
@@ -65,6 +66,9 @@ export function RewardStep({
     if (!resultUrl) return;
     try {
       const response = await fetch(resultUrl);
+      if (!response.ok) {
+        throw new Error(`Failed to download: ${response.status} ${response.statusText}`);
+      }
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -76,6 +80,7 @@ export function RewardStep({
       URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Download failed:", error);
+      toast.error("Download failed. Please try again.");
     }
   };
 
@@ -141,10 +146,12 @@ export function RewardStep({
             <div className="grid grid-cols-3 gap-2 lg:flex lg:justify-center lg:gap-3">
               {config.allowDownload && (
                 <button
+                  type="button"
                   onClick={handleDownload}
                   disabled={!resultUrl}
                   className="flex flex-col items-center justify-center p-3 rounded-lg bg-white/10 min-h-[60px] lg:min-h-0 lg:flex-row lg:gap-2 lg:px-4 lg:py-2 disabled:opacity-50"
                   style={{ borderRadius: buttonRadius }}
+                  aria-label="Download image"
                 >
                   <Download className="h-5 w-5 mb-1 lg:mb-0" />
                   <span className="text-xs">Download</span>
@@ -152,10 +159,12 @@ export function RewardStep({
               )}
               {config.allowSystemShare && (
                 <button
+                  type="button"
                   onClick={handleShare}
                   disabled={!resultUrl}
                   className="flex flex-col items-center justify-center p-3 rounded-lg bg-white/10 min-h-[60px] lg:min-h-0 lg:flex-row lg:gap-2 lg:px-4 lg:py-2 disabled:opacity-50"
                   style={{ borderRadius: buttonRadius }}
+                  aria-label="Share image"
                 >
                   <Share2 className="h-5 w-5 mb-1 lg:mb-0" />
                   <span className="text-xs">Share</span>
@@ -163,9 +172,11 @@ export function RewardStep({
               )}
               {config.allowEmail && (
                 <button
-                  disabled={!resultUrl}
-                  className="flex flex-col items-center justify-center p-3 rounded-lg bg-white/10 min-h-[60px] lg:min-h-0 lg:flex-row lg:gap-2 lg:px-4 lg:py-2 disabled:opacity-50"
+                  type="button"
+                  disabled
+                  className="flex flex-col items-center justify-center p-3 rounded-lg bg-white/10 min-h-[60px] lg:min-h-0 lg:flex-row lg:gap-2 lg:px-4 lg:py-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{ borderRadius: buttonRadius }}
+                  aria-label="Email image (coming soon)"
                 >
                   <Mail className="h-5 w-5 mb-1 lg:mb-0" />
                   <span className="text-xs">Email</span>
@@ -178,14 +189,16 @@ export function RewardStep({
               <div className="flex flex-wrap gap-2 justify-center">
                 {config.socials.map((social) => (
                   <button
+                    type="button"
                     key={social}
-                    disabled={!resultUrl}
-                    className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium disabled:opacity-50"
+                    disabled
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{
                       backgroundColor: buttonBgColor,
                       color: buttonTextColor,
                       borderRadius: buttonRadius,
                     }}
+                    aria-label={`Share to ${SOCIAL_LABELS[social]} (coming soon)`}
                   >
                     <span>{SOCIAL_ICONS[social]}</span>
                     <span>{SOCIAL_LABELS[social]}</span>

@@ -8,7 +8,7 @@
 
 import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import type { Step } from "@/features/steps/types";
-import type { StepInputValue, EngineSession } from "@/features/sessions";
+import type { StepInputValue, EngineSession, SessionData } from "@/features/sessions";
 import type {
   EngineConfig,
   EngineState,
@@ -78,6 +78,12 @@ export function useEngine({ config }: UseEngineOptions): UseEngineReturn {
 
   // --- Navigation Debouncing ---
   const lastNavTimeRef = useRef<number>(0);
+
+  // --- Session Data Ref (for callbacks to read latest data) ---
+  const sessionDataRef = useRef<SessionData>(session.data);
+  useEffect(() => {
+    sessionDataRef.current = session.data;
+  }, [session.data]);
 
   // --- Ordered Steps ---
   const orderedSteps = useMemo(() => {
@@ -224,9 +230,13 @@ export function useEngine({ config }: UseEngineOptions): UseEngineReturn {
   const updateInput = useCallback(
     (stepId: string, value: StepInputValue) => {
       updateData(stepId, value);
-      config.onDataUpdate?.(session.data);
+      // Use ref to read latest data after update
+      // Schedule callback on next tick to ensure state has been updated
+      queueMicrotask(() => {
+        config.onDataUpdate?.({ ...sessionDataRef.current, [stepId]: value });
+      });
     },
-    [updateData, config, session.data]
+    [updateData, config]
   );
 
   // --- Engine Initialization ---
