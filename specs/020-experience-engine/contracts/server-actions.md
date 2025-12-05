@@ -5,7 +5,7 @@
 
 ## Overview
 
-The Experience Engine uses Server Actions for all write operations (per Firebase Architecture Standards). These actions use the Admin SDK and are located in `features/experience-engine/actions/`.
+The Experience Engine uses Server Actions for all write operations (per Firebase Architecture Standards). These actions use the Admin SDK and are located in `features/sessions/actions/` (session domain owner).
 
 ---
 
@@ -16,7 +16,7 @@ The Experience Engine uses Server Actions for all write operations (per Firebase
 Creates a new session for persisted mode.
 
 ```typescript
-// Location: features/experience-engine/actions/engine.actions.ts
+// Location: features/sessions/actions/sessions.actions.ts
 
 interface CreateSessionInput {
   experienceId: string;
@@ -134,7 +134,7 @@ async function updateSessionStepIndex(
 Triggers an AI transformation background job.
 
 ```typescript
-// Location: features/experience-engine/actions/transform.actions.ts
+// Location: features/sessions/actions/sessions.actions.ts
 
 interface TriggerTransformInput {
   sessionId: string;
@@ -293,7 +293,8 @@ if (result.success) {
 
 | Purpose | Path |
 |---------|------|
-| Session actions | `features/experience-engine/actions/engine.actions.ts` |
-| Transform actions | `features/experience-engine/actions/transform.actions.ts` |
-| Action types | `features/experience-engine/types/engine.types.ts` |
-| Validation schemas | `features/experience-engine/schemas/engine.schemas.ts` |
+| Session actions | `features/sessions/actions/sessions.actions.ts` |
+| Session types | `features/sessions/types/sessions.types.ts` |
+| Session schemas | `features/sessions/schemas/sessions.schemas.ts` |
+| Engine types | `features/experience-engine/types/engine.types.ts` |
+| Engine schemas | `features/experience-engine/schemas/engine.schemas.ts` |

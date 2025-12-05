@@ -149,10 +149,10 @@ function useEngineSession(
 
 ## useTransformationStatus
 
-Subscribes to real-time transformation status updates.
+Subscribes to real-time transformation status updates. **Lives in `features/sessions/hooks/`** as it's a session domain concern.
 
 ```typescript
-// Location: features/experience-engine/hooks/useTransformationStatus.ts
+// Location: features/sessions/hooks/useTransformationStatus.ts
 
 interface UseTransformationStatusOptions {
   sessionId: string;
@@ -285,7 +285,8 @@ function ShortTextRenderer({ step, sessionData, onChange }: StepRendererProps) {
 | Purpose | Path |
 |---------|------|
 | Main engine hook | `features/experience-engine/hooks/useEngine.ts` |
-| Session hook | `features/experience-engine/hooks/useEngineSession.ts` |
-| Transform status hook | `features/experience-engine/hooks/useTransformationStatus.ts` |
+| Session mode adapter | `features/experience-engine/hooks/useEngineSession.ts` |
+| Transform status hook | `features/sessions/hooks/useTransformationStatus.ts` |
 | Step input helper | `features/experience-engine/hooks/useStepInput.ts` |
-| Hook barrel export | `features/experience-engine/hooks/index.ts` |
+| Engine hook barrel | `features/experience-engine/hooks/index.ts` |
+| Sessions hook barrel | `features/sessions/hooks/index.ts` |

@@ -152,12 +152,14 @@ type EngineStatus =
 
 ### EngineSession
 
-Extended session type for engine use, including transformation tracking.
+Extended session type for engine use, including transformation tracking. **Lives in `features/sessions/types/sessions.types.ts`**.
 
 ```typescript
 /**
  * Engine session extends base Session with transformation fields.
  * Used for both ephemeral and persisted modes.
+ *
+ * Location: features/sessions/types/sessions.types.ts
  */
 interface EngineSession {
   /** Session ID (generated or provided) */
@@ -196,12 +198,14 @@ interface EngineSession {
 
 ### TransformationStatus
 
-Tracks AI transformation progress.
+Tracks AI transformation progress. **Lives in `features/sessions/types/sessions.types.ts`**.
 
 ```typescript
 /**
  * Status of AI transformation operation.
  * Updated by ai-transform step, monitored by processing step.
+ *
+ * Location: features/sessions/types/sessions.types.ts
  */
 interface TransformationStatus {
   /** Current transformation state */
@@ -467,6 +471,8 @@ Input values validated per step type using existing Zod schemas from `features/s
 |---------|------|
 | Engine types | `features/experience-engine/types/engine.types.ts` |
 | Renderer types | `features/experience-engine/types/renderer.types.ts` |
-| Session types | `features/experience-engine/types/session.types.ts` |
 | Engine schemas | `features/experience-engine/schemas/engine.schemas.ts` |
-| Session schemas | `features/experience-engine/schemas/session.schemas.ts` |
+| Session types (extended) | `features/sessions/types/sessions.types.ts` |
+| Session schemas (extended) | `features/sessions/schemas/sessions.schemas.ts` |
+| Session actions | `features/sessions/actions/sessions.actions.ts` |
+| Transform status hook | `features/sessions/hooks/useTransformationStatus.ts` |

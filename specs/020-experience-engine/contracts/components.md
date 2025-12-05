@@ -111,41 +111,41 @@ function StepRenderer(props: StepRendererProps): React.ReactElement
 
 ---
 
-## Step Renderers
+## Step Components
 
-Each step type has a corresponding renderer in `components/renderers/`.
+Each step type has a corresponding component in `components/steps/`. Naming follows the existing pattern from `features/steps/components/preview/steps/`.
 
-### Renderer Props Interface
+### Step Props Interface
 
-All renderers receive `StepRendererProps<T>` where `T` is the specific step type:
+All step components receive `StepRendererProps<T>` where `T` is the specific step type:
 
 ```typescript
-type InfoRendererProps = StepRendererProps<StepInfo>;
-type CaptureRendererProps = StepRendererProps<StepCapture>;
-type AiTransformRendererProps = StepRendererProps<StepAiTransform>;
+type InfoStepProps = StepRendererProps<StepInfo>;
+type CaptureStepProps = StepRendererProps<StepCapture>;
+type AiTransformStepProps = StepRendererProps<StepAiTransform>;
 // ... etc
 ```
 
-### Renderer List
+### Step Component List
 
-| Step Type | Renderer | Notes |
-|-----------|----------|-------|
-| `info` | `InfoRenderer` | Reuses existing `InfoStep` |
-| `capture` | `CaptureRenderer` | Real camera for guest, mock for preview |
-| `ai-transform` | `AiTransformRenderer` | Triggers job, auto-advances |
-| `short_text` | `ShortTextRenderer` | Reuses existing `ShortTextStep` |
-| `long_text` | `LongTextRenderer` | Reuses existing `LongTextStep` |
-| `multiple_choice` | `MultipleChoiceRenderer` | Reuses existing `MultipleChoiceStep` |
-| `yes_no` | `YesNoRenderer` | Reuses existing `YesNoStep` |
-| `opinion_scale` | `OpinionScaleRenderer` | Reuses existing `OpinionScaleStep` |
-| `email` | `EmailRenderer` | Reuses existing `EmailStep` |
-| `processing` | `ProcessingRenderer` | Real-time status subscription |
-| `reward` | `RewardRenderer` | Real result display |
+| Step Type | Component | Notes |
+|-----------|-----------|-------|
+| `info` | `InfoStep` | Reuses existing preview component |
+| `capture` | `CaptureStep` | Real camera for guest, mock for preview |
+| `ai-transform` | `AiTransformStep` | Triggers job, auto-advances |
+| `short_text` | `ShortTextStep` | Reuses existing preview component |
+| `long_text` | `LongTextStep` | Reuses existing preview component |
+| `multiple_choice` | `MultipleChoiceStep` | Reuses existing preview component |
+| `yes_no` | `YesNoStep` | Reuses existing preview component |
+| `opinion_scale` | `OpinionScaleStep` | Reuses existing preview component |
+| `email` | `EmailStep` | Reuses existing preview component |
+| `processing` | `ProcessingStep` | Real-time status subscription |
+| `reward` | `RewardStep` | Real result display |
 
-### AiTransformRenderer Specifics
+### AiTransformStep Specifics
 
 ```typescript
-function AiTransformRenderer({
+function AiTransformStep({
   step,
   sessionData,
   onComplete,
@@ -200,10 +200,10 @@ function AiTransformRenderer({
 }
 ```
 
-### ProcessingRenderer Specifics
+### ProcessingStep Specifics
 
 ```typescript
-function ProcessingRenderer({
+function ProcessingStep({
   step,
   transformStatus,
   onComplete,
@@ -235,10 +235,10 @@ function ProcessingRenderer({
 }
 ```
 
-### RewardRenderer Specifics
+### RewardStep Specifics
 
 ```typescript
-function RewardRenderer({
+function RewardStep({
   step,
   transformStatus,
   sessionData,
@@ -277,27 +277,27 @@ function RewardRenderer({
 // Location: features/experience-engine/lib/step-registry.ts
 
 const STEP_REGISTRY: RendererRegistry = {
-  info: InfoRenderer,
-  capture: CaptureRenderer,
-  "ai-transform": AiTransformRenderer,
-  short_text: ShortTextRenderer,
-  long_text: LongTextRenderer,
-  multiple_choice: MultipleChoiceRenderer,
-  yes_no: YesNoRenderer,
-  opinion_scale: OpinionScaleRenderer,
-  email: EmailRenderer,
-  processing: ProcessingRenderer,
-  reward: RewardRenderer,
+  info: InfoStep,
+  capture: CaptureStep,
+  "ai-transform": AiTransformStep,
+  short_text: ShortTextStep,
+  long_text: LongTextStep,
+  multiple_choice: MultipleChoiceStep,
+  yes_no: YesNoStep,
+  opinion_scale: OpinionScaleStep,
+  email: EmailStep,
+  processing: ProcessingStep,
+  reward: RewardStep,
   // Deprecated - not used in new flows
   "experience-picker": () => null,
 };
 
-export function getRenderer(stepType: StepType): React.ComponentType<StepRendererProps> {
-  const Renderer = STEP_REGISTRY[stepType];
-  if (!Renderer) {
-    throw new Error(`No renderer registered for step type: ${stepType}`);
+export function getStepComponent(stepType: StepType): React.ComponentType<StepRendererProps> {
+  const StepComponent = STEP_REGISTRY[stepType];
+  if (!StepComponent) {
+    throw new Error(`No component registered for step type: ${stepType}`);
   }
-  return Renderer;
+  return StepComponent;
 }
 ```
 
@@ -332,6 +332,6 @@ function NavigationBar(props: NavigationBarProps): React.ReactElement
 |---------|------|
 | Main component | `features/experience-engine/components/ExperienceEngine.tsx` |
 | Step dispatcher | `features/experience-engine/components/StepRenderer.tsx` |
-| Renderers | `features/experience-engine/components/renderers/*.tsx` |
+| Step components | `features/experience-engine/components/steps/*.tsx` |
 | Step registry | `features/experience-engine/lib/step-registry.ts` |
 | Component barrel | `features/experience-engine/components/index.ts` |

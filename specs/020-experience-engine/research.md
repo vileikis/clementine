@@ -44,20 +44,20 @@ The Experience Engine should:
 How should the engine manage session state for ephemeral vs persisted modes?
 
 ### Decision
-**Dual-mode hook with strategy pattern**
+**Evolve existing `features/sessions/` module with dual-mode support**
 
 ### Rationale
 The engine needs to support two session modes:
 1. **Ephemeral** (Admin Preview): All state in-memory, no Firestore calls
 2. **Persisted** (Guest Flow): State syncs to Firestore for transformation tracking
 
+**Key architectural decision**: Session types, actions, and real-time hooks live in `features/sessions/` (the domain owner), not in `features/experience-engine/`. The engine consumes sessions but doesn't own the session domain.
+
 Implementation approach:
-- Single `useEngineSession` hook that accepts a `mode` parameter
-- Ephemeral mode uses local state (similar to existing `useMockSession`)
-- Persisted mode:
-  - Writes via Server Actions (Admin SDK)
-  - Reads via `onSnapshot` subscription (Client SDK)
-- Both modes expose identical interface: `session`, `updateData`, `setTransformStatus`
+- Extend `features/sessions/types/sessions.types.ts` with `EngineSession`, `TransformationStatus`
+- Add session CRUD and transform actions to `features/sessions/actions/sessions.actions.ts`
+- Add `useTransformationStatus` hook to `features/sessions/hooks/`
+- Engine's `useEngineSession` hook is a thin adapter that delegates to sessions module
 
 ### Existing Patterns
 - `useMockSession`: In-memory session with `inputs` map and reset capability
@@ -65,12 +65,13 @@ Implementation approach:
 - Real-time subscription: `onSnapshot` pattern in `useExperience`, `useSteps` hooks
 
 ### Alternatives Considered
+- **Keep session types in experience-engine**: Rejected - duplicates session concepts, creates ambiguity about which module owns sessions
 - **Separate hooks per mode**: Rejected - would complicate engine component logic
 - **Always persist with local cache**: Rejected - unnecessary overhead for preview mode
 
 ### Reference Files
 - `web/src/features/steps/hooks/useMockSession.ts` - Ephemeral pattern
-- `web/src/features/sessions/types/sessions.types.ts` - Session schema
+- `web/src/features/sessions/types/sessions.types.ts` - Session schema (to be extended)
 - `web/src/features/experiences/hooks/useExperience.ts` - Real-time subscription pattern
 
 ---
@@ -300,8 +301,12 @@ Three categories of errors:
 
 | Area | Decision |
 |------|----------|
-| Renderer Architecture | Registry pattern with existing step components |
-| Session Management | Dual-mode hook (ephemeral/persisted) |
+| Step Component Naming | `*Step.tsx` suffix (matches existing preview components) |
+| Step Component Location | `features/experience-engine/components/steps/` |
+| Session Domain | Evolve `features/sessions/` module (domain owner) |
+| Session Types Location | `features/sessions/types/sessions.types.ts` (extended) |
+| Session Actions Location | `features/sessions/actions/sessions.actions.ts` |
+| Transform Status Hook | `features/sessions/hooks/useTransformationStatus.ts` |
 | AI Flow | Session-based status with real-time subscription |
 | Navigation | 150ms debounce, existing pattern |
 | Variable Interpolation | Simple string replacement with graceful fallback |
