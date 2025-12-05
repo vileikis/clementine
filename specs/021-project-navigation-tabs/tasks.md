@@ -26,9 +26,9 @@
 
 **Purpose**: Create the reusable InlineTabs component that all user stories depend on
 
-- [ ] T001 [P] Create InlineTabs component with TabItem interface in `web/src/components/shared/InlineTabs.tsx`
-- [ ] T002 [P] Create InlineTabs unit test in `web/src/components/shared/InlineTabs.test.tsx`
-- [ ] T003 Export InlineTabs and TabItem type from barrel in `web/src/components/shared/index.ts`
+- [X] T001 [P] Create InlineTabs component with TabItem interface in `web/src/components/shared/InlineTabs.tsx`
+- [X] T002 [P] Create InlineTabs unit test in `web/src/components/shared/InlineTabs.test.tsx`
+- [X] T003 Export InlineTabs and TabItem type from barrel in `web/src/components/shared/index.ts`
 
 **Checkpoint**: InlineTabs component ready for integration
 
@@ -42,10 +42,10 @@
 
 ### Implementation for User Story 1
 
-- [ ] T004 [US1] Update ProjectDetailsHeader props to accept projectId in `web/src/features/projects/components/ProjectDetailsHeader.tsx`
-- [ ] T005 [US1] Add InlineTabs integration to ProjectDetailsHeader centered section in `web/src/features/projects/components/ProjectDetailsHeader.tsx`
-- [ ] T006 [US1] Remove inline tab navigation from layout body in `web/src/app/(workspace)/[companySlug]/[projectId]/layout.tsx`
-- [ ] T007 [US1] Pass projectId prop to ProjectDetailsHeader in `web/src/app/(workspace)/[companySlug]/[projectId]/layout.tsx`
+- [X] T004 [US1] Update ProjectDetailsHeader props to accept projectId in `web/src/features/projects/components/ProjectDetailsHeader.tsx`
+- [X] T005 [US1] Add InlineTabs integration to ProjectDetailsHeader centered section in `web/src/features/projects/components/ProjectDetailsHeader.tsx`
+- [X] T006 [US1] Remove inline tab navigation from layout body in `web/src/app/(workspace)/[companySlug]/[projectId]/layout.tsx`
+- [X] T007 [US1] Pass projectId prop to ProjectDetailsHeader in `web/src/app/(workspace)/[companySlug]/[projectId]/layout.tsx`
 
 **Checkpoint**: Project tabs visible in header, navigation works between Events and Distribute
 
@@ -59,7 +59,7 @@
 
 ### Implementation for User Story 2
 
-- [ ] T008 [US2] Remove eventId early-return logic that hides project header in `web/src/app/(workspace)/[companySlug]/[projectId]/layout.tsx`
+- [X] T008 [US2] Remove eventId early-return logic that hides project header in `web/src/app/(workspace)/[companySlug]/[projectId]/layout.tsx`
 
 **Checkpoint**: Project tabs visible on all routes including nested event pages
 
@@ -73,7 +73,7 @@
 
 ### Implementation for User Story 3
 
-- [ ] T009 [US3] Add max-width content container wrapper in layout in `web/src/app/(workspace)/[companySlug]/[projectId]/layout.tsx`
+- [X] T009 [US3] Add max-width content container wrapper in layout in `web/src/app/(workspace)/[companySlug]/[projectId]/layout.tsx`
 
 **Checkpoint**: Content centered and constrained on wide viewports, full-width on mobile
 
@@ -85,15 +85,15 @@
 
 ### Refactoring
 
-- [ ] T010 [P] Refactor ExperienceTabs to use InlineTabs internally in `web/src/features/experiences/components/editor/ExperienceTabs.tsx`
+- [X] T010 [P] Refactor ExperienceTabs to use InlineTabs internally in `web/src/features/experiences/components/editor/ExperienceTabs.tsx`
 
 ### Validation Loop (REQUIRED - Constitution Principle V)
 
 **Purpose**: Ensure code quality and correctness before merge
 
-- [ ] T011 Run `pnpm lint` and fix all errors/warnings
-- [ ] T012 Run `pnpm type-check` and resolve all TypeScript errors
-- [ ] T013 Run `pnpm test` and ensure all tests pass
+- [X] T011 Run `pnpm lint` and fix all errors/warnings
+- [X] T012 Run `pnpm type-check` and resolve all TypeScript errors
+- [X] T013 Run `pnpm test` and ensure all tests pass
 - [ ] T014 Verify feature in local dev server (`pnpm dev`) - test all acceptance scenarios from spec.md
 
 ---

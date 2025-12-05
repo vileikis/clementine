@@ -42,6 +42,7 @@ export function ProjectPageLayout({
       <ProjectDetailsHeader
         companySlug={companySlug}
         project={project}
+        projectId={initialProject.id}
         onRenameClick={handleRenameClick}
       />
 

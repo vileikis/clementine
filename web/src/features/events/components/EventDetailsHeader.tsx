@@ -66,8 +66,8 @@ export function EventDetailsHeader({
               onClick={() => setIsRenameOpen(true)}
               className="text-left hover:bg-accent px-2 py-1 -ml-2 rounded-md transition-colors"
             >
-              <h1 className="text-base font-semibold truncate">{event.name}</h1>
-              <p className="text-xs text-muted-foreground">{projectName}</p>
+              <h1 className="text-3xl font-semibold truncate ">{event.name}</h1>
+              {/* <p className="text-xs text-muted-foreground">{projectName}</p> */}
             </button>
           </div>
         </div>
