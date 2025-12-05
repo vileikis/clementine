@@ -5,11 +5,13 @@
 // ============================================================================
 // Dispatches to the appropriate step component based on step type.
 // Acts as the bridge between the engine and individual step renderers.
+// Wraps step in error boundary for graceful error handling.
 
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 import type { Step } from "@/features/steps/types";
 import type { StepInputValue, SessionData, TransformationStatus } from "@/features/sessions";
 import { STEP_REGISTRY } from "../lib/step-registry";
+import { StepErrorBoundary } from "./StepErrorBoundary";
 
 // ============================================================================
 // Types
@@ -49,6 +51,11 @@ export interface StepRendererProps {
 
   /** Whether step is currently loading */
   isLoading: boolean;
+
+  // --- Error handling ---
+
+  /** Called when step rendering fails */
+  onRenderError?: (error: Error, stepId: string) => void;
 }
 
 // ============================================================================
@@ -66,6 +73,7 @@ export function StepRenderer({
   onSkip,
   isInteractive,
   isLoading,
+  onRenderError,
 }: StepRendererProps) {
   // Get the current input value for this step
   const currentValue = sessionData[step.id] as StepInputValue | undefined;
@@ -79,19 +87,29 @@ export function StepRenderer({
     return component;
   }, [step.type]);
 
+  // Error handler for the error boundary
+  const handleError = useCallback(
+    (error: Error) => {
+      onRenderError?.(error, step.id);
+    },
+    [onRenderError, step.id]
+  );
+
   return (
-    <StepComponent
-      step={step}
-      sessionData={sessionData}
-      transformStatus={transformStatus}
-      currentValue={currentValue}
-      sessionId={sessionId}
-      onChange={onChange}
-      onCtaClick={onCtaClick}
-      onComplete={onComplete}
-      onSkip={onSkip}
-      isInteractive={isInteractive}
-      isLoading={isLoading}
-    />
+    <StepErrorBoundary stepId={step.id} onError={handleError}>
+      <StepComponent
+        step={step}
+        sessionData={sessionData}
+        transformStatus={transformStatus}
+        currentValue={currentValue}
+        sessionId={sessionId}
+        onChange={onChange}
+        onCtaClick={onCtaClick}
+        onComplete={onComplete}
+        onSkip={onSkip}
+        isInteractive={isInteractive}
+        isLoading={isLoading}
+      />
+    </StepErrorBoundary>
   );
 }

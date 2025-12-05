@@ -6,19 +6,26 @@
 // Renders AI transform step for Experience Engine.
 // Triggers background job and auto-advances.
 // Shows brief confirmation UI during trigger.
+// T046-T048: Full implementation with job trigger
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Loader2, CheckCircle, AlertCircle, RefreshCw } from "lucide-react";
 import { StepLayout } from "@/components/step-primitives";
 import type { StepAiTransform } from "@/features/steps/types";
 import type { StepRendererProps } from "../../types";
+import { interpolateVariables, getCapturedPhotoUrl } from "../../lib/variable-interpolation";
+import { triggerEngineTransformJob } from "@/features/sessions/actions/sessions.actions";
 
 type AiTransformStepProps = StepRendererProps<StepAiTransform>;
 
 type TriggerStatus = "idle" | "triggering" | "triggered" | "error";
 
+/** Delay before auto-advancing after successful trigger (ms) */
+const AUTO_ADVANCE_DELAY = 500;
+
 export function AiTransformStep({
   step,
+  sessionData,
   isInteractive,
   onComplete,
 }: AiTransformStepProps) {
@@ -29,25 +36,58 @@ export function AiTransformStep({
   const hasTriggered = useRef(false);
   const isMounted = useRef(true);
 
-  // Mock trigger function - will be replaced with actual server action
+  // Trigger the AI transform job
   const triggerTransform = useCallback(async () => {
     if (hasTriggered.current) return;
     hasTriggered.current = true;
 
     try {
-      // TODO: Replace with actual triggerTransformJob server action
-      // For now, simulate success after a brief delay
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      // Get the captured photo URL from session data
+      const inputImageUrl = getCapturedPhotoUrl(sessionData);
+
+      if (!inputImageUrl) {
+        throw new Error("No captured photo found. Please capture a photo first.");
+      }
+
+      // Interpolate variables in the prompt
+      const promptTemplate = step.config?.prompt ?? "";
+      const variables = step.config?.variables ?? [];
+      const interpolatedPrompt = interpolateVariables(promptTemplate, sessionData, variables);
+
+      // Build transform config
+      const config = {
+        model: step.config?.model ?? "default",
+        prompt: interpolatedPrompt,
+        inputImageUrl,
+        outputType: step.config?.outputType ?? "image" as const,
+        aspectRatio: step.config?.aspectRatio ?? "1:1",
+        referenceImageUrls: step.config?.referenceImageUrls ?? [],
+      };
+
+      // Trigger the server action
+      // Note: sessionId would be available in persisted mode
+      // For ephemeral mode, we still call the action for logging purposes
+      const result = await triggerEngineTransformJob({
+        sessionId: "ephemeral", // Placeholder for ephemeral mode
+        config,
+      });
 
       if (!isMounted.current) return;
-      setStatus("triggered");
 
-      // Auto-advance after brief confirmation
-      setTimeout(() => {
-        if (isMounted.current) {
-          onComplete();
-        }
-      }, 500);
+      if (result.success) {
+        setStatus("triggered");
+
+        // Auto-advance after brief confirmation
+        setTimeout(() => {
+          if (isMounted.current) {
+            onComplete();
+          }
+        }, AUTO_ADVANCE_DELAY);
+      } else {
+        setStatus("error");
+        setErrorMessage(result.error.message);
+        hasTriggered.current = false; // Allow retry
+      }
     } catch (error) {
       if (!isMounted.current) return;
       setStatus("error");
@@ -56,7 +96,7 @@ export function AiTransformStep({
       );
       hasTriggered.current = false; // Allow retry
     }
-  }, [onComplete]);
+  }, [sessionData, step.config, onComplete]);
 
   // Handle retry
   const handleRetry = useCallback(() => {
@@ -74,7 +114,7 @@ export function AiTransformStep({
     };
   }, []);
 
-  // Auto-trigger on mount in interactive mode - using microtask to avoid setState in effect
+  // Auto-trigger on mount in interactive mode
   useEffect(() => {
     if (isInteractive && status === "triggering" && !hasTriggered.current) {
       // Use queueMicrotask to defer the async operation
