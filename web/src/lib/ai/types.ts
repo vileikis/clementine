@@ -1,6 +1,9 @@
 export interface TransformParams {
   prompt: string;
-  inputImageUrl: string;
+  /** Input image URL (mutually exclusive with inputImageBase64) */
+  inputImageUrl?: string;
+  /** Input image as base64 data URL (mutually exclusive with inputImageUrl) */
+  inputImageBase64?: string;
   referenceImageUrls?: string[];
   brandColor?: string;
   /** AI model to use for generation (e.g., 'gemini-2.5-flash-image', 'gemini-3-pro-image-preview') */

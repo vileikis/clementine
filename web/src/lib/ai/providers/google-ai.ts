@@ -48,6 +48,17 @@ export class GoogleAIProvider implements AIClient {
     return Buffer.from(arrayBuffer).toString('base64');
   }
 
+  /**
+   * Extract base64 data from a data URL
+   */
+  private extractBase64FromDataUrl(dataUrl: string): string {
+    const matches = dataUrl.match(/^data:[^;]+;base64,(.+)$/);
+    if (!matches) {
+      throw new Error('Invalid data URL format');
+    }
+    return matches[1];
+  }
+
   async generateImage(params: TransformParams): Promise<Buffer> {
     const model = params.model || 'gemini-2.5-flash-image';
 
@@ -55,11 +66,21 @@ export class GoogleAIProvider implements AIClient {
       model,
       prompt: params.prompt.substring(0, 50),
       referenceImageCount: params.referenceImageUrls?.length || 0,
+      hasBase64Input: !!params.inputImageBase64,
+      hasUrlInput: !!params.inputImageUrl,
     });
 
-    // Fetch and convert images to base64
-    // Note: fileData.fileUri only works with Gemini File API URIs, not arbitrary HTTPS URLs
-    const inputImageData = await this.fetchImageAsBase64(params.inputImageUrl);
+    // Get input image as base64 - either from provided base64 or fetch from URL
+    let inputImageData: string;
+    if (params.inputImageBase64) {
+      // Extract base64 data from data URL
+      inputImageData = this.extractBase64FromDataUrl(params.inputImageBase64);
+    } else if (params.inputImageUrl) {
+      // Fetch and convert to base64
+      inputImageData = await this.fetchImageAsBase64(params.inputImageUrl);
+    } else {
+      throw new Error('Either inputImageUrl or inputImageBase64 must be provided');
+    }
 
     // Fetch all reference images (if any)
     const referenceImageDataList: string[] = [];
