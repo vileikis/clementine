@@ -473,7 +473,7 @@ const triggerEngineTransformSchema = z.object({
   sessionId: z.string().min(1),
   config: z.object({
     model: z.string(),
-    prompt: z.string(), // Already interpolated with variables
+    prompt: z.string().min(1, "Prompt cannot be empty"), // Already interpolated with variables
     inputImageUrl: z.string().url(),
     outputType: z.enum(["image", "video", "gif"]),
     aspectRatio: z.string(),

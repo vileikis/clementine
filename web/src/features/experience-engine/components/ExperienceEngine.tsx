@@ -70,6 +70,7 @@ export function ExperienceEngine({
           {state.error.message}
         </p>
         <button
+          type="button"
           onClick={actions.restart}
           className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
         >
@@ -97,6 +98,7 @@ export function ExperienceEngine({
         </p>
         {config.debugMode && (
           <button
+            type="button"
             onClick={actions.restart}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/90 transition-colors"
           >
@@ -146,6 +148,7 @@ export function ExperienceEngine({
       {config.debugMode && (
         <div className="flex items-center justify-between p-4 border-t bg-muted/50">
           <button
+            type="button"
             onClick={actions.previous}
             disabled={!state.canGoBack}
             className="px-3 py-1.5 text-sm rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/90 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -160,6 +163,7 @@ export function ExperienceEngine({
           <div className="flex gap-2">
             {state.canSkip && (
               <button
+                type="button"
                 onClick={actions.skip}
                 className="px-3 py-1.5 text-sm rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/90"
               >
@@ -167,6 +171,7 @@ export function ExperienceEngine({
               </button>
             )}
             <button
+              type="button"
               onClick={actions.next}
               disabled={!state.canGoNext}
               className="px-3 py-1.5 text-sm rounded-md bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"

@@ -96,7 +96,7 @@ export function StepRenderer({
   );
 
   return (
-    <StepErrorBoundary stepId={step.id} onError={handleError}>
+    <StepErrorBoundary key={step.id} stepId={step.id} onError={handleError}>
       <StepComponent
         step={step}
         sessionData={sessionData}
