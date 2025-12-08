@@ -1,0 +1,329 @@
+"use client";
+
+/**
+ * CameraCapture Component
+ *
+ * Main container component for the camera capture flow.
+ * Manages state machine for permission → camera → review flow.
+ */
+
+import { useReducer, useCallback, useRef, useEffect } from "react";
+import { cn } from "@/lib/utils";
+import type {
+  CameraCaptureProps,
+  CameraState,
+  CameraAction,
+  CameraFacing,
+} from "../types";
+import { DEFAULT_LABELS } from "../constants";
+import { useCamera } from "../hooks/useCamera";
+import { usePhotoCapture } from "../hooks/usePhotoCapture";
+import { PermissionPrompt } from "./PermissionPrompt";
+import { CameraViewfinder } from "./CameraViewfinder";
+import { CameraControls } from "./CameraControls";
+import { PhotoReview } from "./PhotoReview";
+import { ErrorState } from "./ErrorState";
+
+/**
+ * State machine reducer for camera flow
+ */
+function cameraReducer(state: CameraState, action: CameraAction): CameraState {
+  switch (action.type) {
+    case "PERMISSION_GRANTED":
+      return {
+        status: "camera-active",
+        stream: action.stream,
+        facing: action.facing,
+      };
+
+    case "PERMISSION_DENIED":
+      return {
+        status: "error",
+        error: action.error,
+      };
+
+    case "PHOTO_CAPTURED":
+      return {
+        status: "photo-review",
+        photo: action.photo,
+      };
+
+    case "RETAKE":
+      // Return to camera active if we had a stream, otherwise permission prompt
+      if (state.status === "photo-review") {
+        return { status: "permission-prompt" };
+      }
+      return state;
+
+    case "FLIP_CAMERA":
+      return {
+        status: "camera-active",
+        stream: action.stream,
+        facing: action.facing,
+      };
+
+    case "ERROR":
+      return {
+        status: "error",
+        error: action.error,
+      };
+
+    case "LIBRARY_ONLY":
+      return { status: "library-only" };
+
+    case "RESET":
+      return { status: "permission-prompt" };
+
+    default:
+      return state;
+  }
+}
+
+/**
+ * CameraCapture - Main camera capture component
+ *
+ * Provides complete photo capture flow with:
+ * - Permission request UI
+ * - Live camera preview
+ * - Photo capture
+ * - Photo review with confirm/retake
+ *
+ * @example
+ * ```tsx
+ * <CameraCapture
+ *   onSubmit={async (photo) => {
+ *     const url = await uploadToStorage(photo.file);
+ *     URL.revokeObjectURL(photo.previewUrl);
+ *     console.log('Uploaded:', url);
+ *   }}
+ *   enableLibrary={true}
+ *   aspectRatio="3:4"
+ * />
+ * ```
+ */
+export function CameraCapture({
+  onPhoto,
+  onSubmit,
+  onRetake,
+  // onCancel is reserved for future use
+  onError,
+  enableCamera = true,
+  enableLibrary = true,
+  cameraFacing = "both",
+  initialFacing = "user",
+  aspectRatio,
+  className,
+  labels = {},
+}: CameraCaptureProps) {
+  const mergedLabels = { ...DEFAULT_LABELS, ...labels };
+
+  // Determine initial state based on props
+  const getInitialState = (): CameraState => {
+    if (!enableCamera && enableLibrary) {
+      return { status: "library-only" };
+    }
+    return { status: "permission-prompt" };
+  };
+
+  const [state, dispatch] = useReducer(cameraReducer, getInitialState());
+
+  // Refs for maintaining state across renders
+  const currentStreamRef = useRef<MediaStream | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Camera hook
+  const {
+    videoRef,
+    facing,
+    startCamera,
+    stopCamera,
+    switchCamera,
+    hasMultipleCameras,
+  } = useCamera({
+    initialFacing,
+    onError: (error) => {
+      onError?.(error);
+      dispatch({ type: "PERMISSION_DENIED", error });
+    },
+  });
+
+  // Photo capture hook
+  const { capturePhoto, processLibraryFile } = usePhotoCapture({
+    onCapture: (photo) => {
+      onPhoto?.(photo);
+      dispatch({ type: "PHOTO_CAPTURED", photo });
+    },
+    onError: (error) => {
+      onError?.(error);
+    },
+  });
+
+  // Handle permission request
+  const handleRequestPermission = useCallback(async () => {
+    const targetFacing =
+      cameraFacing === "both" ? initialFacing : (cameraFacing as CameraFacing);
+    const stream = await startCamera(targetFacing);
+
+    if (stream) {
+      currentStreamRef.current = stream;
+      dispatch({
+        type: "PERMISSION_GRANTED",
+        stream,
+        facing: targetFacing,
+      });
+    }
+  }, [startCamera, cameraFacing, initialFacing]);
+
+  // Handle photo capture
+  const handleCapture = useCallback(async () => {
+    if (!videoRef.current) return;
+    await capturePhoto(videoRef.current, facing);
+  }, [capturePhoto, videoRef, facing]);
+
+  // Handle camera flip
+  const handleFlipCamera = useCallback(async () => {
+    const stream = await switchCamera();
+    if (stream) {
+      currentStreamRef.current = stream;
+      const newFacing = facing === "user" ? "environment" : "user";
+      dispatch({ type: "FLIP_CAMERA", stream, facing: newFacing });
+    }
+  }, [switchCamera, facing]);
+
+  // Handle retake
+  const handleRetake = useCallback(async () => {
+    onRetake?.();
+
+    // Try to restart camera
+    const targetFacing =
+      cameraFacing === "both" ? facing : (cameraFacing as CameraFacing);
+    const stream = await startCamera(targetFacing);
+
+    if (stream) {
+      currentStreamRef.current = stream;
+      dispatch({
+        type: "PERMISSION_GRANTED",
+        stream,
+        facing: targetFacing,
+      });
+    } else {
+      dispatch({ type: "RESET" });
+    }
+  }, [onRetake, startCamera, cameraFacing, facing]);
+
+  // Handle photo confirm
+  const handleConfirm = useCallback(() => {
+    if (state.status === "photo-review") {
+      onSubmit(state.photo);
+    }
+  }, [state, onSubmit]);
+
+  // Handle library file selection
+  const handleOpenLibrary = useCallback(() => {
+    fileInputRef.current?.click();
+  }, []);
+
+  const handleFileChange = useCallback(
+    async (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      await processLibraryFile(file);
+
+      // Reset input so same file can be selected again
+      event.target.value = "";
+    },
+    [processLibraryFile]
+  );
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      stopCamera();
+    };
+  }, [stopCamera]);
+
+  // Determine what controls to show
+  const showFlipButton =
+    cameraFacing === "both" &&
+    hasMultipleCameras &&
+    state.status === "camera-active";
+  const showLibraryButton = enableLibrary;
+
+  return (
+    <div className={cn("relative w-full h-full overflow-hidden", className)}>
+      {/* Hidden file input for library selection */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/gif,image/webp"
+        capture="environment"
+        onChange={handleFileChange}
+        className="hidden"
+        aria-hidden="true"
+      />
+
+      {/* Permission prompt state */}
+      {state.status === "permission-prompt" && (
+        <PermissionPrompt
+          labels={mergedLabels}
+          onRequestPermission={handleRequestPermission}
+          onOpenLibrary={enableLibrary ? handleOpenLibrary : undefined}
+          showLibraryOption={enableLibrary}
+        />
+      )}
+
+      {/* Camera active state */}
+      {state.status === "camera-active" && (
+        <div className="flex flex-col h-full">
+          <div className="flex-1 relative">
+            <CameraViewfinder
+              ref={videoRef}
+              facing={facing}
+              aspectRatio={aspectRatio}
+            />
+          </div>
+          <CameraControls
+            labels={mergedLabels}
+            showFlipButton={showFlipButton}
+            showLibraryButton={showLibraryButton}
+            onCapture={handleCapture}
+            onFlipCamera={handleFlipCamera}
+            onOpenLibrary={handleOpenLibrary}
+          />
+        </div>
+      )}
+
+      {/* Photo review state */}
+      {state.status === "photo-review" && (
+        <PhotoReview
+          photo={state.photo}
+          labels={mergedLabels}
+          onConfirm={handleConfirm}
+          onRetake={handleRetake}
+        />
+      )}
+
+      {/* Library only state - show library picker directly */}
+      {state.status === "library-only" && (
+        <PermissionPrompt
+          labels={mergedLabels}
+          onRequestPermission={handleOpenLibrary}
+          showLibraryOption={false}
+        />
+      )}
+
+      {/* Error state */}
+      {state.status === "error" && (
+        <ErrorState
+          error={state.error}
+          labels={mergedLabels}
+          showRetry={enableCamera}
+          showLibraryFallback={enableLibrary}
+          onRetry={handleRequestPermission}
+          onOpenLibrary={handleOpenLibrary}
+        />
+      )}
+    </div>
+  );
+}
