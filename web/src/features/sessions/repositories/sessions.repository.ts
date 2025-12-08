@@ -119,44 +119,6 @@ export async function startExperienceSession(
   return sessionRef.id;
 }
 
-// ============================================================================
-// Legacy functions for journey support (deprecated)
-// ============================================================================
-
-/**
- * @deprecated Use startExperienceSession instead
- */
-export async function startJourneySession(
-  eventId: string,
-  journeyId: string
-): Promise<string> {
-  const eventDoc = await db.collection("events").doc(eventId).get();
-  if (!eventDoc.exists) {
-    throw new Error("Event not found");
-  }
-
-  const sessionRef = db
-    .collection("events")
-    .doc(eventId)
-    .collection("sessions")
-    .doc();
-
-  const now = Date.now();
-  const session: Session = {
-    id: sessionRef.id,
-    eventId,
-    journeyId,
-    currentStepIndex: 0,
-    data: {},
-    state: "created",
-    createdAt: now,
-    updatedAt: now,
-  };
-
-  await sessionRef.set(session);
-  return sessionRef.id;
-}
-
 export async function updateStepIndex(
   eventId: string,
   sessionId: string,
