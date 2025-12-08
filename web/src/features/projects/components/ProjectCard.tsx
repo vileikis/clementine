@@ -62,16 +62,8 @@ export function ProjectCard({ project, companyName }: ProjectCardProps) {
         </div>
       </div>
 
-      <div className="space-y-2 text-sm text-muted-foreground">
-        <div className="flex items-center gap-2">
-          <div
-            className="w-4 h-4 rounded border"
-            style={{ backgroundColor: project.theme.primaryColor }}
-          />
-          <span>{project.theme.primaryColor}</span>
-        </div>
-
-        <div className="text-xs">Last updated {formattedDate}</div>
+      <div className="text-xs text-muted-foreground">
+        Last updated {formattedDate}
       </div>
     </div>
   )

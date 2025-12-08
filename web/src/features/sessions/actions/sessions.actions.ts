@@ -7,7 +7,6 @@ import {
   getSession,
   updateSessionState,
   startExperienceSession,
-  startJourneySession,
   updateStepIndex,
   saveStepData,
 } from "../repositories";
@@ -27,7 +26,7 @@ import { getAIClient } from "@/lib/ai/client";
 import type { TransformParams } from "@/lib/ai/types";
 import { revalidatePath } from "next/cache";
 import type { Step } from "@/features/steps";
-import type { Experience as AiPreset } from "@/features/ai-presets";
+import type { AiPreset } from "@/features/ai-presets";
 import type { Experience } from "@/features/experiences/types";
 import { randomUUID } from "crypto";
 
@@ -287,21 +286,6 @@ export async function getExperienceForGuestAction(
   return { success: true, experience, steps };
 }
 
-// ============================================================================
-// Legacy journey session actions (deprecated)
-// ============================================================================
-
-/**
- * @deprecated Use startExperienceSessionAction instead
- */
-export async function startJourneySessionAction(
-  eventId: string,
-  journeyId: string
-) {
-  const sessionId = await startJourneySession(eventId, journeyId);
-  return { sessionId };
-}
-
 export async function advanceStepAction(
   eventId: string,
   sessionId: string,
@@ -399,32 +383,6 @@ export async function getAiPresetsForGuestAction(
   const enabledPresets = allPresets.filter((preset) => preset.enabled);
 
   return { success: true, aiPresets: enabledPresets };
-}
-
-/**
- * @deprecated Use getAiPresetsForGuestAction instead
- * Loads experiences available for selection (for experience-picker steps).
- * Only returns enabled experiences linked to the event.
- */
-export async function getExperiencesForGuestAction(
-  eventId: string
-): Promise<
-  | { success: true; experiences: AiPreset[] }
-  | { success: false; error: string }
-> {
-  // Verify project exists
-  const project = await getProject(eventId);
-  if (!project) {
-    return { success: false, error: "Project not found" };
-  }
-
-  // Get all experiences for this event
-  const allExperiences = await getAiPresetsByEventId(eventId);
-
-  // Filter to only enabled experiences
-  const enabledExperiences = allExperiences.filter((exp) => exp.enabled);
-
-  return { success: true, experiences: enabledExperiences };
 }
 
 /**

@@ -5,7 +5,6 @@ import {
   saveCapture,
   updateSessionState,
   getSession,
-  startJourneySession,
   updateStepIndex,
   saveStepData,
 } from "./sessions.repository";
@@ -331,66 +330,6 @@ describe("Sessions Repository", () => {
       });
 
       await expect(getSession("event-123", "session-456")).rejects.toThrow();
-    });
-  });
-
-  // ============================================================================
-  // Tests for new journey support functions
-  // ============================================================================
-
-  describe("startJourneySession", () => {
-    it("creates a new session with journey context", async () => {
-      const mockEventDoc = {
-        exists: true,
-      };
-
-      const mockSessionRef = {
-        id: "session-789",
-        set: jest.fn(),
-      };
-
-      const mockSessionCollection = {
-        doc: jest.fn().mockReturnValue(mockSessionRef),
-      };
-
-      const mockEventRef = {
-        get: jest.fn().mockResolvedValue(mockEventDoc),
-        collection: jest.fn().mockReturnValue(mockSessionCollection),
-      };
-
-      mockDb.collection.mockReturnValue({
-        doc: jest.fn().mockReturnValue(mockEventRef),
-      });
-
-      const sessionId = await startJourneySession("event-123", "journey-456");
-
-      expect(sessionId).toBe("session-789");
-
-      const sessionData = mockSessionRef.set.mock.calls[0][0] as Session;
-      expect(sessionData).toMatchObject({
-        id: "session-789",
-        eventId: "event-123",
-        journeyId: "journey-456",
-        currentStepIndex: 0,
-        data: {},
-        state: "created",
-      });
-    });
-
-    it("throws error when event does not exist", async () => {
-      const mockEventDoc = {
-        exists: false,
-      };
-
-      mockDb.collection.mockReturnValue({
-        doc: jest.fn().mockReturnValue({
-          get: jest.fn().mockResolvedValue(mockEventDoc),
-        }),
-      });
-
-      await expect(startJourneySession("nonexistent", "journey-456")).rejects.toThrow(
-        "Event not found"
-      );
     });
   });
 
