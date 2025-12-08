@@ -231,7 +231,56 @@ interface Project {
 
 ---
 
-# **🏁 End State After Phase 7**
+## **🎯 Phase 8 — Camera Module (Reusable Capture Flow)**
+
+**Purpose:** Extract camera functionality into a self-contained, reusable module.
+
+**Problem:** Camera logic is currently coupled to guest flow step renderers, making it hard to reuse and test.
+
+**Solution:** Create `features/camera/` module with:
+
+- **CameraCapture container** - Self-contained component handling full flow:
+  - Permission request → Camera viewfinder → Photo review → Submit
+- **Lifecycle callbacks** - `onPhoto`, `onSubmit`, `onRetake`, `onCancel`, `onError`
+- **Configuration props** - `enableCamera`, `enableLibrary`, `cameraFacing`, `aspectRatio`
+- **Analytics support** - `CapturedPhoto.method` indicates "camera" or "library"
+
+**Integration:**
+
+- `CaptureStep` in Experience Engine becomes thin consumer
+- Just renders `<CameraCapture onSubmit={...} />` and reacts to callbacks
+- All state machine logic (permissions, capture, review) encapsulated in camera module
+
+**See:** `features/scalable-arch/camera-module.md` for full PRD.
+
+---
+
+## **🎯 Phase 9 — Guest Flow (Persisted Sessions)**
+
+**Purpose:** Wire up the full guest experience using Experience Engine with Firestore persistence.
+
+**Implementation:**
+
+- Refactor `features/guest/` to mount Experience Engine with `persistSession: true`
+- Session storage: `/projects/{projectId}/sessions/{sessionId}`
+- Real-time sync via `onDataUpdate` callback → Firestore
+- Transform integration with `waitUntil` for background processing
+- Firestore subscription for `transformStatus` updates
+
+**Guest Entry Flow:**
+
+```
+/join/{projectId}
+  → Load Project
+    → Resolve activeEventId
+      → Load Event (theme, experiences[])
+        → Initialize session in Firestore
+          → Mount ExperienceEngine(persistSession: true)
+```
+
+---
+
+# **🏁 End State After Phase 9**
 
 ### **Clean, modern architecture:**
 
@@ -239,9 +288,26 @@ interface Project {
 Company
   → Projects (containers with sharePath, QR, activeEventId)
       → Events (nested, theme + schedule + experiences[])
+      → Sessions (guest interaction records)
   → Experiences (company-scoped flows)
       → Steps (including ai-transform)
   → AiPresets (legacy AI library, unused)
+```
+
+### **Feature Modules:**
+
+```
+features/
+  ├── companies/           # Company management
+  ├── projects/            # Project containers
+  ├── events/              # Time-bound instances
+  ├── experiences/         # Flow templates
+  ├── steps/               # Step definitions (schemas, types, constants)
+  ├── sessions/            # Session persistence & actions
+  ├── experience-engine/   # Unified runtime + step renderers
+  ├── camera/              # Reusable camera capture flow
+  ├── guest/               # Guest entry point (mounts Engine)
+  └── admin-preview/       # Admin testing (mounts Engine)
 ```
 
 ### **Guest Flow:**
@@ -252,9 +318,11 @@ Guest clicks sharePath
     → Resolves activeEventId
       → Loads Event (with theme)
         → Loads experiences[] array
-          → Loads Experience (flow)
-            → Loads Steps
-              → Experience Engine executes
+          → Creates Session in Firestore
+            → Mounts Experience Engine (persistSession: true)
+              → CameraCapture handles photo capture
+                → AI Transform via waitUntil
+                  → Session updated via Firestore subscription
 ```
 
 ### **What we gain:**
@@ -264,7 +332,9 @@ Guest clicks sharePath
   - Projects = Long-running containers (campaigns, tours)
   - Events = Time-bound activations (specific dates/times)
   - Experiences = Reusable flow templates (company-wide library)
+  - Sessions = Guest interaction records (under projects)
 - **AI fully integrated** as a step with local "Test" capability
 - **Unified runtime** (Experience Engine) powering admin preview + guest experience
+- **Reusable camera module** with self-contained state management
 - **Clean naming:** No legacy confusion between old "Events" (now Projects) and new Events
 - **Flexible architecture:** Switchboard at Project level (activeEventId), array linking at Event level (experiences[])
