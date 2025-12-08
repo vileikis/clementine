@@ -30,13 +30,13 @@ Based on plan.md project structure:
 
 **Purpose**: Create feature module structure and foundational types
 
-- [ ] T001 Create feature module directory structure at `web/src/features/camera/` with subdirectories: components/, hooks/, lib/, schemas/, types/
-- [ ] T002 [P] Create TypeScript types for CapturedPhoto, CaptureMethod, CameraCaptureError, CameraCaptureErrorCode in `web/src/features/camera/types/camera.types.ts`
-- [ ] T003 [P] Create TypeScript types for CameraCaptureProps and CameraCaptureLabels in `web/src/features/camera/types/camera.types.ts`
-- [ ] T004 [P] Create error codes and default labels constants in `web/src/features/camera/constants.ts`
-- [ ] T005 [P] Create Zod schema for file validation (image MIME types, max size) in `web/src/features/camera/schemas/camera.schemas.ts`
-- [ ] T006 Create barrel exports for types in `web/src/features/camera/types/index.ts`
-- [ ] T007 Create barrel exports for schemas in `web/src/features/camera/schemas/index.ts`
+- [X] T001 Create feature module directory structure at `web/src/features/camera/` with subdirectories: components/, hooks/, lib/, schemas/, types/
+- [X] T002 [P] Create TypeScript types for CapturedPhoto, CaptureMethod, CameraCaptureError, CameraCaptureErrorCode in `web/src/features/camera/types/camera.types.ts`
+- [X] T003 [P] Create TypeScript types for CameraCaptureProps and CameraCaptureLabels in `web/src/features/camera/types/camera.types.ts`
+- [X] T004 [P] Create error codes and default labels constants in `web/src/features/camera/constants.ts`
+- [X] T005 [P] Create Zod schema for file validation (image MIME types, max size) in `web/src/features/camera/schemas/camera.schemas.ts`
+- [X] T006 Create barrel exports for types in `web/src/features/camera/types/index.ts`
+- [X] T007 Create barrel exports for schemas in `web/src/features/camera/schemas/index.ts`
 
 ---
 
@@ -46,13 +46,13 @@ Based on plan.md project structure:
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T008 Implement canvas capture utility function in `web/src/features/camera/lib/capture.ts` (extracts from existing `web/src/features/guest/lib/capture.ts`)
-- [ ] T009 [P] Implement image dimension extraction utility in `web/src/features/camera/lib/image-utils.ts`
-- [ ] T010 Create barrel exports for lib utilities in `web/src/features/camera/lib/index.ts`
-- [ ] T011 Implement useCameraPermission hook with permission state machine in `web/src/features/camera/hooks/useCameraPermission.ts`
-- [ ] T012 Implement useCamera hook for MediaStream management in `web/src/features/camera/hooks/useCamera.ts` (extracts/enhances from existing `web/src/features/guest/hooks/useCamera.ts`)
-- [ ] T013 Implement usePhotoCapture hook that combines camera/library capture in `web/src/features/camera/hooks/usePhotoCapture.ts`
-- [ ] T014 Create barrel exports for hooks in `web/src/features/camera/hooks/index.ts`
+- [X] T008 Implement canvas capture utility function in `web/src/features/camera/lib/capture.ts` (extracts from existing `web/src/features/guest/lib/capture.ts`)
+- [X] T009 [P] Implement image dimension extraction utility in `web/src/features/camera/lib/image-utils.ts`
+- [X] T010 Create barrel exports for lib utilities in `web/src/features/camera/lib/index.ts`
+- [X] T011 Implement useCameraPermission hook with permission state machine in `web/src/features/camera/hooks/useCameraPermission.ts`
+- [X] T012 Implement useCamera hook for MediaStream management in `web/src/features/camera/hooks/useCamera.ts` (extracts/enhances from existing `web/src/features/guest/hooks/useCamera.ts`)
+- [X] T013 Implement usePhotoCapture hook that combines camera/library capture in `web/src/features/camera/hooks/usePhotoCapture.ts`
+- [X] T014 Create barrel exports for hooks in `web/src/features/camera/hooks/index.ts`
 
 **Checkpoint**: Foundation ready - hooks and utilities available for component implementation
 
@@ -66,15 +66,15 @@ Based on plan.md project structure:
 
 ### Implementation for User Story 1
 
-- [ ] T015 [US1] Create PermissionPrompt component with explanation text and "Allow Camera" button in `web/src/features/camera/components/PermissionPrompt.tsx`
-- [ ] T016 [US1] Create CameraViewfinder component with live video preview in `web/src/features/camera/components/CameraViewfinder.tsx`
-- [ ] T017 [US1] Create CameraControls component with capture button (64x64px touch target) in `web/src/features/camera/components/CameraControls.tsx`
-- [ ] T018 [US1] Create PhotoReview component with image preview and Confirm button in `web/src/features/camera/components/PhotoReview.tsx`
-- [ ] T019 [US1] Create CameraCapture container component with state machine (permission-prompt → camera-active → photo-review) in `web/src/features/camera/components/CameraCapture.tsx`
-- [ ] T020 [US1] Wire onSubmit callback to fire when user confirms photo in CameraCapture
-- [ ] T021 [US1] Add mobile-first responsive styles: viewfinder fills screen, controls at bottom, touch targets ≥44px
-- [ ] T022 Create barrel exports for components in `web/src/features/camera/components/index.ts`
-- [ ] T023 Create public API barrel export (CameraCapture + types only) in `web/src/features/camera/index.ts`
+- [X] T015 [US1] Create PermissionPrompt component with explanation text and "Allow Camera" button in `web/src/features/camera/components/PermissionPrompt.tsx`
+- [X] T016 [US1] Create CameraViewfinder component with live video preview in `web/src/features/camera/components/CameraViewfinder.tsx`
+- [X] T017 [US1] Create CameraControls component with capture button (64x64px touch target) in `web/src/features/camera/components/CameraControls.tsx`
+- [X] T018 [US1] Create PhotoReview component with image preview and Confirm button in `web/src/features/camera/components/PhotoReview.tsx`
+- [X] T019 [US1] Create CameraCapture container component with state machine (permission-prompt → camera-active → photo-review) in `web/src/features/camera/components/CameraCapture.tsx`
+- [X] T020 [US1] Wire onSubmit callback to fire when user confirms photo in CameraCapture
+- [X] T021 [US1] Add mobile-first responsive styles: viewfinder fills screen, controls at bottom, touch targets ≥44px
+- [X] T022 Create barrel exports for components in `web/src/features/camera/components/index.ts`
+- [X] T023 Create public API barrel export (CameraCapture + types only) in `web/src/features/camera/index.ts`
 
 **Checkpoint**: User Story 1 complete - basic camera capture flow works end-to-end
 
@@ -88,11 +88,11 @@ Based on plan.md project structure:
 
 ### Implementation for User Story 2
 
-- [ ] T024 [US2] Create LibraryPicker component with hidden file input (accept="image/*") in `web/src/features/camera/components/LibraryPicker.tsx`
-- [ ] T025 [US2] Add library button to CameraControls component in `web/src/features/camera/components/CameraControls.tsx`
-- [ ] T026 [US2] Add file validation using Zod schema (reject non-images) in LibraryPicker
-- [ ] T027 [US2] Wire library selection to photo-review state in CameraCapture
-- [ ] T028 [US2] Add file input with capture="environment" attribute for mobile fallback in `web/src/features/camera/components/LibraryPicker.tsx`
+- [X] T024 [US2] Create LibraryPicker component with hidden file input (accept="image/*") in `web/src/features/camera/components/LibraryPicker.tsx`
+- [X] T025 [US2] Add library button to CameraControls component in `web/src/features/camera/components/CameraControls.tsx`
+- [X] T026 [US2] Add file validation using Zod schema (reject non-images) in LibraryPicker
+- [X] T027 [US2] Wire library selection to photo-review state in CameraCapture
+- [X] T028 [US2] Add file input with capture="environment" attribute for mobile fallback in `web/src/features/camera/components/LibraryPicker.tsx`
 
 **Checkpoint**: User Stories 1 AND 2 complete - both camera and library flows work
 
@@ -106,10 +106,10 @@ Based on plan.md project structure:
 
 ### Implementation for User Story 3
 
-- [ ] T029 [US3] Add Retake button to PhotoReview component in `web/src/features/camera/components/PhotoReview.tsx`
-- [ ] T030 [US3] Implement RETAKE action in CameraCapture state machine (photo-review → camera-active)
-- [ ] T031 [US3] Wire onRetake callback to fire when user taps Retake in CameraCapture
-- [ ] T032 [US3] Ensure camera stream resumes without re-requesting permission on retake
+- [X] T029 [US3] Add Retake button to PhotoReview component in `web/src/features/camera/components/PhotoReview.tsx`
+- [X] T030 [US3] Implement RETAKE action in CameraCapture state machine (photo-review → camera-active)
+- [X] T031 [US3] Wire onRetake callback to fire when user taps Retake in CameraCapture
+- [X] T032 [US3] Ensure camera stream resumes without re-requesting permission on retake
 
 **Checkpoint**: Retake flow works - user can try again without losing camera permission
 
@@ -123,10 +123,10 @@ Based on plan.md project structure:
 
 ### Implementation for User Story 4
 
-- [ ] T033 [US4] Add flip camera button to CameraControls (only when cameraFacing="both" and device has multiple cameras) in `web/src/features/camera/components/CameraControls.tsx`
-- [ ] T034 [US4] Implement camera switching in useCamera hook (stop stream, restart with new facingMode) in `web/src/features/camera/hooks/useCamera.ts`
-- [ ] T035 [US4] Add FLIP_CAMERA action to CameraCapture state machine
-- [ ] T036 [US4] Detect available cameras on mount and conditionally show flip button
+- [X] T033 [US4] Add flip camera button to CameraControls (only when cameraFacing="both" and device has multiple cameras) in `web/src/features/camera/components/CameraControls.tsx`
+- [X] T034 [US4] Implement camera switching in useCamera hook (stop stream, restart with new facingMode) in `web/src/features/camera/hooks/useCamera.ts`
+- [X] T035 [US4] Add FLIP_CAMERA action to CameraCapture state machine
+- [X] T036 [US4] Detect available cameras on mount and conditionally show flip button
 
 **Checkpoint**: Camera flip works - users can toggle between front/back cameras
 
@@ -140,11 +140,11 @@ Based on plan.md project structure:
 
 ### Implementation for User Story 5
 
-- [ ] T037 [US5] Create ErrorState component with error message, settings hint, and library fallback button in `web/src/features/camera/components/ErrorState.tsx`
-- [ ] T038 [US5] Handle NotAllowedError in useCameraPermission and transition to error state
-- [ ] T039 [US5] Wire onError callback with PERMISSION_DENIED code when permission denied
-- [ ] T040 [US5] Add "Use Library" button in ErrorState that transitions to library picker
-- [ ] T041 [US5] Update component barrel exports to include ErrorState in `web/src/features/camera/components/index.ts`
+- [X] T037 [US5] Create ErrorState component with error message, settings hint, and library fallback button in `web/src/features/camera/components/ErrorState.tsx`
+- [X] T038 [US5] Handle NotAllowedError in useCameraPermission and transition to error state
+- [X] T039 [US5] Wire onError callback with PERMISSION_DENIED code when permission denied
+- [X] T040 [US5] Add "Use Library" button in ErrorState that transitions to library picker
+- [X] T041 [US5] Update component barrel exports to include ErrorState in `web/src/features/camera/components/index.ts`
 
 **Checkpoint**: Permission denied gracefully handled - library fallback always available
 
@@ -158,11 +158,11 @@ Based on plan.md project structure:
 
 ### Implementation for User Story 6
 
-- [ ] T042 [US6] Detect camera hardware availability in useCamera hook (catch NotFoundError)
-- [ ] T043 [US6] Auto-transition to library-only mode when camera unavailable
-- [ ] T044 [US6] Wire onError callback with CAMERA_UNAVAILABLE code
-- [ ] T045 [US6] Support enableCamera=false prop for explicit library-only mode
-- [ ] T046 [US6] Handle CAMERA_IN_USE error (NotReadableError) with retry option
+- [X] T042 [US6] Detect camera hardware availability in useCamera hook (catch NotFoundError)
+- [X] T043 [US6] Auto-transition to library-only mode when camera unavailable
+- [X] T044 [US6] Wire onError callback with CAMERA_UNAVAILABLE code
+- [X] T045 [US6] Support enableCamera=false prop for explicit library-only mode
+- [X] T046 [US6] Handle CAMERA_IN_USE error (NotReadableError) with retry option
 
 **Checkpoint**: Graceful degradation complete - all error scenarios handled
 
@@ -176,13 +176,13 @@ Based on plan.md project structure:
 
 ### Implementation for User Story 7
 
-- [ ] T047 [US7] Create dev-tools route layout in `web/src/app/(admin)/dev-tools/layout.tsx`
-- [ ] T048 [US7] Create dev-tools landing page with redirect to /dev-tools/camera in `web/src/app/(admin)/dev-tools/page.tsx`
-- [ ] T049 [US7] Create PropControls component with form controls for all CameraCapture props in `web/src/app/(admin)/dev-tools/camera/PropControls.tsx`
-- [ ] T050 [US7] Create CallbackLog component with timestamped callback payloads in `web/src/app/(admin)/dev-tools/camera/CallbackLog.tsx`
-- [ ] T051 [US7] Create camera dev tools page with PropControls, CameraCapture preview, and CallbackLog in `web/src/app/(admin)/dev-tools/camera/page.tsx`
-- [ ] T052 [US7] Add mobile-sized container for CameraCapture preview (simulate phone viewport)
-- [ ] T053 [US7] Add "Reset" button to remount CameraCapture component
+- [X] T047 [US7] Create dev-tools route layout in `web/src/app/(admin)/dev-tools/layout.tsx`
+- [X] T048 [US7] Create dev-tools landing page with redirect to /dev-tools/camera in `web/src/app/(admin)/dev-tools/page.tsx`
+- [X] T049 [US7] Create PropControls component with form controls for all CameraCapture props in `web/src/app/(admin)/dev-tools/camera/PropControls.tsx`
+- [X] T050 [US7] Create CallbackLog component with timestamped callback payloads in `web/src/app/(admin)/dev-tools/camera/CallbackLog.tsx`
+- [X] T051 [US7] Create camera dev tools page with PropControls, CameraCapture preview, and CallbackLog in `web/src/app/(admin)/dev-tools/camera/page.tsx`
+- [X] T052 [US7] Add mobile-sized container for CameraCapture preview (simulate phone viewport)
+- [X] T053 [US7] Add "Reset" button to remount CameraCapture component
 
 **Checkpoint**: Dev tools complete - all configurations testable
 
@@ -192,21 +192,21 @@ Based on plan.md project structure:
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T054 [P] Add aspect ratio guide overlay (3:4, 1:1, 9:16) to CameraViewfinder in `web/src/features/camera/components/CameraViewfinder.tsx`
-- [ ] T055 [P] Add i18n support via labels prop throughout all components
-- [ ] T056 [P] Add aria-label attributes to all interactive elements for accessibility
-- [ ] T057 [P] Add aria-live region for error announcements in ErrorState
-- [ ] T058 [P] Add keyboard navigation support (Tab, Enter, Space) to all buttons
-- [ ] T059 Handle tab visibility change (pause/resume camera stream when tab loses/gains focus) in useCamera hook
-- [ ] T060 Add object URL cleanup documentation in component JSDoc comments
-- [ ] T061 Mirror front camera preview (scaleX(-1)) in CameraViewfinder for natural selfie experience
+- [X] T054 [P] Add aspect ratio guide overlay (3:4, 1:1, 9:16) to CameraViewfinder in `web/src/features/camera/components/CameraViewfinder.tsx`
+- [X] T055 [P] Add i18n support via labels prop throughout all components
+- [X] T056 [P] Add aria-label attributes to all interactive elements for accessibility
+- [X] T057 [P] Add aria-live region for error announcements in ErrorState
+- [X] T058 [P] Add keyboard navigation support (Tab, Enter, Space) to all buttons
+- [X] T059 Handle tab visibility change (pause/resume camera stream when tab loses/gains focus) in useCamera hook
+- [X] T060 Add object URL cleanup documentation in component JSDoc comments
+- [X] T061 Mirror front camera preview (scaleX(-1)) in CameraViewfinder for natural selfie experience
 
 ### Validation Loop (REQUIRED - Constitution Principle V)
 
 **Purpose**: Ensure code quality and correctness before merge
 
-- [ ] T062 Run `pnpm lint` and fix all errors/warnings
-- [ ] T063 Run `pnpm type-check` and resolve all TypeScript errors
+- [X] T062 Run `pnpm lint` and fix all errors/warnings
+- [X] T063 Run `pnpm type-check` and resolve all TypeScript errors
 - [ ] T064 Verify feature in local dev server (`pnpm dev`) - test all 7 user story flows
 - [ ] T065 Test on mobile device (iOS Safari and/or Android Chrome) via HTTPS
 - [ ] T066 Commit only after validation loop passes cleanly
