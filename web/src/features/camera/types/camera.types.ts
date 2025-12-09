@@ -125,11 +125,16 @@ export type CameraAction =
 
 /**
  * Permission state for useCameraPermission hook
+ *
+ * - unknown: Initial state, permission check in progress
+ * - undetermined: Permission not yet requested by user
+ * - granted: Permission granted
+ * - denied: Permission denied by user
+ * - unavailable: No camera hardware available
  */
 export type PermissionState =
-  | "checking"
+  | "unknown"
   | "undetermined"
-  | "requesting"
   | "granted"
   | "denied"
   | "unavailable";

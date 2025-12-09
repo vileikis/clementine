@@ -66,17 +66,12 @@ async function checkPermissionStatus(): Promise<PermissionState> {
  * ```tsx
  * const { status, requestPermission, error } = useCameraPermission();
  *
- * if (status === "checking") {
+ * if (status === "unknown") {
  *   return <Loading />;
  * }
  *
  * if (status !== "granted") {
- *   return (
- *     <PermissionPrompt
- *       onRequest={requestPermission}
- *       error={error}
- *     />
- *   );
+ *   return <PermissionPrompt onRequest={requestPermission} error={error} />;
  * }
  *
  * // Permission granted - CameraView will auto-start
@@ -84,7 +79,7 @@ async function checkPermissionStatus(): Promise<PermissionState> {
  * ```
  */
 export function useCameraPermission(): UseCameraPermissionReturn {
-  const [status, setStatus] = useState<PermissionState>("checking");
+  const [status, setStatus] = useState<PermissionState>("unknown");
   const [error, setError] = useState<CameraCaptureError | null>(null);
 
   // Check permission on mount
@@ -122,7 +117,6 @@ export function useCameraPermission(): UseCameraPermissionReturn {
       return false;
     }
 
-    setStatus("requesting");
     setError(null);
 
     try {

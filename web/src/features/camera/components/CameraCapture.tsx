@@ -192,24 +192,21 @@ export function CameraCapture({
         aria-hidden="true"
       />
 
-      {/* Permission: checking */}
-      {permissionStatus === "checking" && (
+      {/* Permission: unknown (checking) */}
+      {permissionStatus === "unknown" && (
         <div className="flex flex-col items-center justify-center gap-4 h-full bg-black">
           <div className="size-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
           <p className="text-white/70 text-sm">Preparing camera...</p>
         </div>
       )}
 
-      {/* Permission: undetermined, requesting, or denied - show prompt */}
-      {(permissionStatus === "undetermined" ||
-        permissionStatus === "requesting" ||
-        permissionStatus === "denied") && (
+      {/* Permission: undetermined or denied - show prompt */}
+      {(permissionStatus === "undetermined" || permissionStatus === "denied") && (
         <PermissionPrompt
           labels={mergedLabels}
           onRequestPermission={requestPermission}
           onOpenLibrary={enableLibrary ? openPicker : undefined}
           showLibraryOption={enableLibrary}
-          isRequesting={permissionStatus === "requesting"}
           error={permissionError}
         />
       )}
