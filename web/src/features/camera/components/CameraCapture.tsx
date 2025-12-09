@@ -16,6 +16,7 @@ import type {
   CameraFacing,
 } from "../types";
 import { DEFAULT_LABELS } from "../constants";
+import { checkCameraPermission } from "../lib";
 import { useCamera } from "../hooks/useCamera";
 import { usePhotoCapture } from "../hooks/usePhotoCapture";
 import { PermissionPrompt } from "./PermissionPrompt";
@@ -195,49 +196,36 @@ export function CameraCapture({
 
   // Check permission on mount and auto-start camera if already granted
   useEffect(() => {
-    // Skip if camera is disabled or we're not in checking state
-    if (!enableCamera || state.status !== "checking-permission") return;
+    if (!enableCamera) return;
+    if (state.status !== "checking-permission") return;
 
     async function checkAndStartCamera() {
-      // Check if Permissions API is available
-      if (!navigator.permissions?.query) {
-        // Permissions API not available, show permission prompt
+      const permissionStatus = await checkCameraPermission();
+
+      // Permissions API not available or permission not granted
+      if (permissionStatus !== "granted") {
         dispatch({ type: "SHOW_PERMISSION_PROMPT" });
         return;
       }
 
-      try {
-        const permissionStatus = await navigator.permissions.query({
-          name: "camera" as PermissionName,
-        });
+      // Permission granted, try to auto-start camera
+      const targetFacing =
+        cameraFacing === "both"
+          ? initialFacing
+          : (cameraFacing as CameraFacing);
+      const stream = await startCamera(targetFacing);
 
-        if (permissionStatus.state === "granted") {
-          // Permission already granted, start camera automatically
-          const targetFacing =
-            cameraFacing === "both"
-              ? initialFacing
-              : (cameraFacing as CameraFacing);
-          const stream = await startCamera(targetFacing);
-
-          if (stream) {
-            currentStreamRef.current = stream;
-            dispatch({
-              type: "PERMISSION_GRANTED",
-              stream,
-              facing: targetFacing,
-            });
-          } else {
-            // Failed to start camera despite permission, show prompt
-            dispatch({ type: "SHOW_PERMISSION_PROMPT" });
-          }
-        } else {
-          // Permission not granted yet, show permission prompt
-          dispatch({ type: "SHOW_PERMISSION_PROMPT" });
-        }
-      } catch {
-        // Permissions API query failed, show permission prompt
+      if (!stream) {
         dispatch({ type: "SHOW_PERMISSION_PROMPT" });
+        return;
       }
+
+      currentStreamRef.current = stream;
+      dispatch({
+        type: "PERMISSION_GRANTED",
+        stream,
+        facing: targetFacing,
+      });
     }
 
     checkAndStartCamera();

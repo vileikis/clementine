@@ -10,6 +10,11 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import type { CameraFacing, CameraCaptureError } from "../types";
 import { CAMERA_CONSTRAINTS } from "../constants";
+import {
+  parseMediaError,
+  createUnavailableError,
+  isMediaDevicesAvailable,
+} from "../lib";
 
 interface UseCameraOptions {
   /** Initial camera facing direction */
@@ -90,14 +95,8 @@ export function useCamera(options: UseCameraOptions = {}): UseCameraReturn {
   // Start camera with specified facing
   const startCamera = useCallback(
     async (newFacing: CameraFacing): Promise<MediaStream | null> => {
-      // Check if MediaDevices API is available
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        const error: CameraCaptureError = {
-          code: "CAMERA_UNAVAILABLE",
-          message:
-            "Camera access not supported. Please use HTTPS or a supported browser.",
-        };
-        onError?.(error);
+      if (!isMediaDevicesAvailable()) {
+        onError?.(createUnavailableError());
         return null;
       }
 
@@ -118,39 +117,7 @@ export function useCamera(options: UseCameraOptions = {}): UseCameraReturn {
         setFacing(newFacing);
         return mediaStream;
       } catch (err) {
-        let error: CameraCaptureError;
-
-        if (err instanceof Error) {
-          if (err.name === "NotAllowedError") {
-            error = {
-              code: "PERMISSION_DENIED",
-              message:
-                "Camera permission denied. Please allow camera access to continue.",
-            };
-          } else if (err.name === "NotFoundError") {
-            error = {
-              code: "CAMERA_UNAVAILABLE",
-              message: "No camera found on this device.",
-            };
-          } else if (err.name === "NotReadableError") {
-            error = {
-              code: "CAMERA_IN_USE",
-              message: "Camera is already in use by another application.",
-            };
-          } else {
-            error = {
-              code: "UNKNOWN",
-              message: err.message,
-            };
-          }
-        } else {
-          error = {
-            code: "UNKNOWN",
-            message: "Failed to access camera. Please check your permissions.",
-          };
-        }
-
-        onError?.(error);
+        onError?.(parseMediaError(err));
         return null;
       } finally {
         setIsLoading(false);
