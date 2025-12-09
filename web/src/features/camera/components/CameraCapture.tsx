@@ -204,10 +204,8 @@ export function CameraCapture({
       {(permissionStatus === "undetermined" || permissionStatus === "denied") && (
         <PermissionPrompt
           labels={mergedLabels}
+          permissionStatus={permissionStatus}
           onRequestPermission={requestPermission}
-          onOpenLibrary={enableLibrary ? openPicker : undefined}
-          showLibraryOption={enableLibrary}
-          error={permissionError}
         />
       )}
 
