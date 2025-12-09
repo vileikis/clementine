@@ -61,7 +61,7 @@ export function CameraControls({
           size="icon"
           onClick={onOpenLibrary}
           disabled={isCapturing}
-          className="size-12 rounded-full text-white hover:bg-white/20 min-h-[44px] min-w-[44px]"
+          className="size-12 rounded-full text-white hover:bg-white/20 hover:text-white min-h-[44px] min-w-[44px]"
           aria-label={mergedLabels.openLibrary}
         >
           <ImageIcon className="size-6" />
@@ -95,7 +95,7 @@ export function CameraControls({
           size="icon"
           onClick={onFlipCamera}
           disabled={isCapturing}
-          className="size-12 rounded-full text-white hover:bg-white/20 min-h-[44px] min-w-[44px]"
+          className="size-12 rounded-full text-white hover:bg-white/20 hover:text-white min-h-[44px] min-w-[44px]"
           aria-label={mergedLabels.flipCamera}
         >
           <SwitchCamera className="size-6" />
