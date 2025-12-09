@@ -226,7 +226,8 @@ export function CameraCapture({
           {/* Camera active state */}
           {state.status === "camera-active" && (
             <div className="flex flex-col h-full">
-              <div className="flex-1 min-h-0">
+              {/* Camera view container - centers the aspect-ratio-constrained view */}
+              <div className="flex-1 min-h-0 flex items-center justify-center bg-black">
                 <CameraView
                   ref={cameraViewRef}
                   facing={targetFacing}

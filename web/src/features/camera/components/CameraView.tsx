@@ -68,9 +68,9 @@ interface CameraViewProps {
 }
 
 /**
- * Aspect ratio to CSS value mapping
+ * Aspect ratio to CSS aspect-ratio value mapping
  */
-const ASPECT_RATIOS: Record<AspectRatio, string> = {
+const ASPECT_RATIO_CSS: Record<AspectRatio, string> = {
   "3:4": "3 / 4",
   "1:1": "1 / 1",
   "9:16": "9 / 16",
@@ -198,6 +198,10 @@ export const CameraView = forwardRef<CameraViewRef, CameraViewProps>(
       const video = videoRef.current;
       if (!video) return null;
 
+      // Debug: log what aspectRatio is being used
+      console.log("[CameraView] takePhoto called with aspectRatio:", aspectRatio);
+      console.log("[CameraView] video dimensions:", video.videoWidth, "x", video.videoHeight);
+
       try {
         // Use mirrored capture for front camera (natural selfie appearance)
         // Pass aspectRatio to crop the capture to the desired ratio
@@ -283,8 +287,19 @@ export const CameraView = forwardRef<CameraViewRef, CameraViewProps>(
     const shouldMirror = facing === "user";
 
     return (
-      <div className={cn("relative w-full h-full bg-black", className)}>
-        {/* Video element */}
+      <div
+        className={cn(
+          "relative bg-black overflow-hidden",
+          aspectRatio ? "w-full" : "w-full h-full",
+          className
+        )}
+        style={
+          aspectRatio
+            ? { aspectRatio: ASPECT_RATIO_CSS[aspectRatio], maxHeight: "100%" }
+            : undefined
+        }
+      >
+        {/* Video element - fills the constrained container */}
         <video
           ref={videoRef}
           autoPlay
@@ -296,22 +311,6 @@ export const CameraView = forwardRef<CameraViewRef, CameraViewProps>(
             shouldMirror && "scale-x-[-1]"
           )}
         />
-
-        {/* Aspect ratio guide overlay */}
-        {aspectRatio && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div
-              className="border-2 border-dashed border-white/50 max-w-full max-h-full"
-              style={{
-                aspectRatio: ASPECT_RATIOS[aspectRatio],
-                width: "100%",
-                height: "100%",
-                maxWidth: aspectRatio === "9:16" ? "56.25%" : "100%",
-                maxHeight: aspectRatio === "3:4" ? "100%" : "75%",
-              }}
-            />
-          </div>
-        )}
       </div>
     );
   }
