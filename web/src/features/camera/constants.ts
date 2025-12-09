@@ -57,10 +57,19 @@ export const MAX_FILE_SIZE = 50 * 1024 * 1024;
 
 /**
  * Camera constraints for getUserMedia
+ *
+ * We request high resolution without forcing orientation.
+ * The browser will adapt based on device orientation:
+ * - Desktop: typically landscape
+ * - Mobile portrait: browser swaps to portrait automatically
+ * - Mobile landscape: stays landscape
+ *
+ * The actual dimensions are in video.videoWidth/videoHeight.
+ * We crop to the desired aspectRatio on capture.
  */
 export const CAMERA_CONSTRAINTS = {
-  width: { ideal: 1280 },
-  height: { ideal: 720 },
+  width: { ideal: 1920 },
+  height: { ideal: 1920 },
 } as const;
 
 /**
