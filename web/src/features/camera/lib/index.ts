@@ -14,4 +14,6 @@ export { parseMediaError, createUnavailableError } from "./errors";
 
 export { isMediaDevicesAvailable, checkCameraPermission } from "./utils";
 
+export { cameraReducer, INITIAL_CAMERA_STATE } from "./cameraReducer";
+
 export type { ImageDimensions } from "./image-utils";

@@ -10,8 +10,6 @@
 import { useReducer, useCallback, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import type {
-  CameraState,
-  CameraAction,
   CameraFacing,
   CameraFacingConfig,
   CapturedPhoto,
@@ -31,9 +29,7 @@ export interface CameraCaptureProps {
   onCancel?: () => void;
   /** Called on any error */
   onError?: (error: CameraCaptureError) => void;
-  /** Show camera capture option */
-  enableCamera?: boolean;
-  /** Show library selection option */
+  /** Show library selection option as secondary input method */
   enableLibrary?: boolean;
   /** Available camera(s) - "user", "environment", or "both" */
   cameraFacing?: CameraFacingConfig;
@@ -47,7 +43,7 @@ export interface CameraCaptureProps {
   labels?: CameraCaptureLabels;
 }
 import { DEFAULT_LABELS } from "../constants";
-import { checkCameraPermission } from "../lib";
+import { checkCameraPermission, cameraReducer, INITIAL_CAMERA_STATE } from "../lib";
 import { useCamera } from "../hooks/useCamera";
 import { usePhotoCapture } from "../hooks/usePhotoCapture";
 import { PermissionPrompt } from "./PermissionPrompt";
@@ -55,69 +51,6 @@ import { CameraView } from "./CameraView";
 import { CameraControls } from "./CameraControls";
 import { PhotoReview } from "./PhotoReview";
 import { ErrorState } from "./ErrorState";
-
-/**
- * State machine reducer for camera flow
- */
-function cameraReducer(state: CameraState, action: CameraAction): CameraState {
-  switch (action.type) {
-    case "SHOW_PERMISSION_PROMPT":
-      return { status: "permission-prompt" };
-
-    case "PERMISSION_GRANTED":
-      return {
-        status: "camera-active",
-        stream: action.stream,
-        facing: action.facing,
-      };
-
-    case "PERMISSION_DENIED":
-      return {
-        status: "error",
-        error: action.error,
-      };
-
-    case "PHOTO_CAPTURED":
-      return {
-        status: "photo-review",
-        photo: action.photo,
-      };
-
-    case "RETAKE":
-      // Return to camera active - the handler will restart the camera
-      // Since permission was already granted, we go directly to camera-active
-      if (state.status === "photo-review") {
-        return {
-          status: "camera-active",
-          stream: null, // Will be set by handleRetake
-          facing: action.facing ?? "user",
-        };
-      }
-      return state;
-
-    case "FLIP_CAMERA":
-      return {
-        status: "camera-active",
-        stream: action.stream,
-        facing: action.facing,
-      };
-
-    case "ERROR":
-      return {
-        status: "error",
-        error: action.error,
-      };
-
-    case "LIBRARY_ONLY":
-      return { status: "library-only" };
-
-    case "RESET":
-      return { status: "permission-prompt" };
-
-    default:
-      return state;
-  }
-}
 
 /**
  * CameraCapture - Main camera capture component
@@ -147,7 +80,6 @@ export function CameraCapture({
   onRetake,
   // onCancel is reserved for future use
   onError,
-  enableCamera = true,
   enableLibrary = true,
   cameraFacing = "both",
   initialFacing = "user",
@@ -157,16 +89,7 @@ export function CameraCapture({
 }: CameraCaptureProps) {
   const mergedLabels = { ...DEFAULT_LABELS, ...labels };
 
-  // Determine initial state based on props
-  const getInitialState = (): CameraState => {
-    if (!enableCamera && enableLibrary) {
-      return { status: "library-only" };
-    }
-    // Start in checking state - will transition after permission check
-    return { status: "checking-permission" };
-  };
-
-  const [state, dispatch] = useReducer(cameraReducer, getInitialState());
+  const [state, dispatch] = useReducer(cameraReducer, INITIAL_CAMERA_STATE);
 
   // Refs for maintaining state across renders
   const currentStreamRef = useRef<MediaStream | null>(null);
@@ -227,7 +150,6 @@ export function CameraCapture({
 
   // Check permission on mount and auto-start camera if already granted
   useEffect(() => {
-    if (!enableCamera) return;
     if (state.status !== "checking-permission") return;
 
     async function checkAndStartCamera() {
@@ -261,7 +183,7 @@ export function CameraCapture({
 
     checkAndStartCamera();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enableCamera, state.status]);
+  }, [state.status]);
 
   // Handle photo capture
   const handleCapture = useCallback(async () => {
@@ -403,21 +325,12 @@ export function CameraCapture({
         />
       )}
 
-      {/* Library only state - show library picker directly */}
-      {state.status === "library-only" && (
-        <PermissionPrompt
-          labels={mergedLabels}
-          onRequestPermission={handleOpenLibrary}
-          showLibraryOption={false}
-        />
-      )}
-
       {/* Error state */}
       {state.status === "error" && (
         <ErrorState
           error={state.error}
           labels={mergedLabels}
-          showRetry={enableCamera}
+          showRetry
           showLibraryFallback={enableLibrary}
           onRetry={handleRequestPermission}
           onOpenLibrary={handleOpenLibrary}
