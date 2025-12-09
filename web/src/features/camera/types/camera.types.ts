@@ -96,36 +96,6 @@ export interface CameraCaptureLabels {
 }
 
 /**
- * Props for the CameraCapture container component
- */
-export interface CameraCaptureProps {
-  /** Called when photo taken/selected (enters review) */
-  onPhoto?: (photo: CapturedPhoto) => void;
-  /** Called when user confirms photo (required) */
-  onSubmit: (photo: CapturedPhoto) => void;
-  /** Called when user taps retake */
-  onRetake?: () => void;
-  /** Called when user wants to exit */
-  onCancel?: () => void;
-  /** Called on any error */
-  onError?: (error: CameraCaptureError) => void;
-  /** Show camera capture option */
-  enableCamera?: boolean;
-  /** Show library selection option */
-  enableLibrary?: boolean;
-  /** Available camera(s) - "user", "environment", or "both" */
-  cameraFacing?: CameraFacingConfig;
-  /** Starting camera when cameraFacing="both" */
-  initialFacing?: CameraFacing;
-  /** Aspect ratio guide overlay */
-  aspectRatio?: AspectRatio;
-  /** Container CSS class */
-  className?: string;
-  /** Custom labels for i18n */
-  labels?: CameraCaptureLabels;
-}
-
-/**
  * Internal state machine states
  */
 export type CameraStateStatus =

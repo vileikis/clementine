@@ -5,8 +5,9 @@
  * Internal components and utilities are not exposed.
  */
 
-// Main component
+// Main component and its props
 export { CameraCapture } from "./components/CameraCapture";
+export type { CameraCaptureProps } from "./components/CameraCapture";
 
 // Public types
 export type {
@@ -14,7 +15,6 @@ export type {
   CameraCaptureError,
   CameraCaptureErrorCode,
   CaptureMethod,
-  CameraCaptureProps,
   CameraCaptureLabels,
   AspectRatio,
   CameraFacing,
