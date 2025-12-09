@@ -29,6 +29,9 @@ import { ErrorState } from "./ErrorState";
  */
 function cameraReducer(state: CameraState, action: CameraAction): CameraState {
   switch (action.type) {
+    case "SHOW_PERMISSION_PROMPT":
+      return { status: "permission-prompt" };
+
     case "PERMISSION_GRANTED":
       return {
         status: "camera-active",
@@ -127,7 +130,8 @@ export function CameraCapture({
     if (!enableCamera && enableLibrary) {
       return { status: "library-only" };
     }
-    return { status: "permission-prompt" };
+    // Start in checking state - will transition after permission check
+    return { status: "checking-permission" };
   };
 
   const [state, dispatch] = useReducer(cameraReducer, getInitialState());
@@ -188,6 +192,57 @@ export function CameraCapture({
       });
     }
   }, [startCamera, cameraFacing, initialFacing]);
+
+  // Check permission on mount and auto-start camera if already granted
+  useEffect(() => {
+    // Skip if camera is disabled or we're not in checking state
+    if (!enableCamera || state.status !== "checking-permission") return;
+
+    async function checkAndStartCamera() {
+      // Check if Permissions API is available
+      if (!navigator.permissions?.query) {
+        // Permissions API not available, show permission prompt
+        dispatch({ type: "SHOW_PERMISSION_PROMPT" });
+        return;
+      }
+
+      try {
+        const permissionStatus = await navigator.permissions.query({
+          name: "camera" as PermissionName,
+        });
+
+        if (permissionStatus.state === "granted") {
+          // Permission already granted, start camera automatically
+          const targetFacing =
+            cameraFacing === "both"
+              ? initialFacing
+              : (cameraFacing as CameraFacing);
+          const stream = await startCamera(targetFacing);
+
+          if (stream) {
+            currentStreamRef.current = stream;
+            dispatch({
+              type: "PERMISSION_GRANTED",
+              stream,
+              facing: targetFacing,
+            });
+          } else {
+            // Failed to start camera despite permission, show prompt
+            dispatch({ type: "SHOW_PERMISSION_PROMPT" });
+          }
+        } else {
+          // Permission not granted yet, show permission prompt
+          dispatch({ type: "SHOW_PERMISSION_PROMPT" });
+        }
+      } catch {
+        // Permissions API query failed, show permission prompt
+        dispatch({ type: "SHOW_PERMISSION_PROMPT" });
+      }
+    }
+
+    checkAndStartCamera();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enableCamera, state.status]);
 
   // Handle photo capture
   const handleCapture = useCallback(async () => {
@@ -279,6 +334,14 @@ export function CameraCapture({
         className="hidden"
         aria-hidden="true"
       />
+
+      {/* Checking permission state - show loading */}
+      {state.status === "checking-permission" && (
+        <div className="flex flex-col items-center justify-center gap-4 h-full bg-black">
+          <div className="size-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+          <p className="text-white/70 text-sm">Preparing camera...</p>
+        </div>
+      )}
 
       {/* Permission prompt state */}
       {state.status === "permission-prompt" && (
