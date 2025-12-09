@@ -23,7 +23,6 @@ export default function CameraDevToolsPage() {
   const [componentKey, setComponentKey] = useState(0);
 
   // Prop state
-  const [enableCamera, setEnableCamera] = useState(true);
   const [enableLibrary, setEnableLibrary] = useState(true);
   const [cameraFacing, setCameraFacing] = useState<CameraFacingConfig>("both");
   const [initialFacing, setInitialFacing] = useState<CameraFacing>("user");
@@ -86,8 +85,6 @@ export default function CameraDevToolsPage() {
     setLogEntries([]);
   }, []);
 
-  // Validate props
-  const isValidConfig = enableCamera || enableLibrary;
 
   return (
     <div className="space-y-6">
@@ -102,12 +99,10 @@ export default function CameraDevToolsPage() {
         {/* Prop Controls */}
         <div className="lg:col-span-1">
           <PropControls
-            enableCamera={enableCamera}
             enableLibrary={enableLibrary}
             cameraFacing={cameraFacing}
             initialFacing={initialFacing}
             aspectRatio={aspectRatio}
-            onEnableCameraChange={setEnableCamera}
             onEnableLibraryChange={setEnableLibrary}
             onCameraFacingChange={setCameraFacing}
             onInitialFacingChange={setInitialFacing}
@@ -134,25 +129,18 @@ export default function CameraDevToolsPage() {
                 maxWidth: "100%",
               }}
             >
-              {isValidConfig ? (
-                <CameraCapture
-                  key={componentKey}
-                  enableCamera={enableCamera}
-                  enableLibrary={enableLibrary}
-                  cameraFacing={cameraFacing}
-                  initialFacing={initialFacing}
-                  aspectRatio={aspectRatio === "none" ? undefined : aspectRatio}
-                  onPhoto={handlePhoto}
-                  onSubmit={handleSubmit}
-                  onRetake={handleRetake}
-                  onCancel={handleCancel}
-                  onError={handleError}
-                />
-              ) : (
-                <div className="flex items-center justify-center h-full text-white text-sm">
-                  Invalid configuration
-                </div>
-              )}
+              <CameraCapture
+                key={componentKey}
+                enableLibrary={enableLibrary}
+                cameraFacing={cameraFacing}
+                initialFacing={initialFacing}
+                aspectRatio={aspectRatio === "none" ? undefined : aspectRatio}
+                onPhoto={handlePhoto}
+                onSubmit={handleSubmit}
+                onRetake={handleRetake}
+                onCancel={handleCancel}
+                onError={handleError}
+              />
             </div>
           </div>
         </div>

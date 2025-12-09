@@ -19,12 +19,10 @@ import { Button } from "@/components/ui/button";
 import type { CameraFacingConfig, AspectRatio, CameraFacing } from "@/features/camera";
 
 interface PropControlsProps {
-  enableCamera: boolean;
   enableLibrary: boolean;
   cameraFacing: CameraFacingConfig;
   initialFacing: CameraFacing;
   aspectRatio: AspectRatio | "none";
-  onEnableCameraChange: (value: boolean) => void;
   onEnableLibraryChange: (value: boolean) => void;
   onCameraFacingChange: (value: CameraFacingConfig) => void;
   onInitialFacingChange: (value: CameraFacing) => void;
@@ -33,12 +31,10 @@ interface PropControlsProps {
 }
 
 export function PropControls({
-  enableCamera,
   enableLibrary,
   cameraFacing,
   initialFacing,
   aspectRatio,
-  onEnableCameraChange,
   onEnableLibraryChange,
   onCameraFacingChange,
   onInitialFacingChange,
@@ -56,15 +52,6 @@ export function PropControls({
 
       {/* Boolean Props */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <Label htmlFor="enableCamera">enableCamera</Label>
-          <Switch
-            id="enableCamera"
-            checked={enableCamera}
-            onCheckedChange={onEnableCameraChange}
-          />
-        </div>
-
         <div className="flex items-center justify-between">
           <Label htmlFor="enableLibrary">enableLibrary</Label>
           <Switch
@@ -120,12 +107,6 @@ export function PropControls({
         </div>
       </div>
 
-      {/* Validation Warning */}
-      {!enableCamera && !enableLibrary && (
-        <p className="text-sm text-destructive">
-          Warning: Both camera and library are disabled. Enable at least one.
-        </p>
-      )}
     </div>
   );
 }

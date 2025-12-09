@@ -103,8 +103,7 @@ export type CameraStateStatus =
   | "permission-prompt"
   | "camera-active"
   | "photo-review"
-  | "error"
-  | "library-only";
+  | "error";
 
 /**
  * Internal state machine state (used by CameraCapture)
@@ -118,8 +117,7 @@ export type CameraState =
       facing: CameraFacing;
     }
   | { status: "photo-review"; photo: CapturedPhoto }
-  | { status: "error"; error: CameraCaptureError }
-  | { status: "library-only" };
+  | { status: "error"; error: CameraCaptureError };
 
 /**
  * Internal state machine actions
@@ -132,7 +130,6 @@ export type CameraAction =
   | { type: "RETAKE"; facing?: CameraFacing }
   | { type: "FLIP_CAMERA"; stream: MediaStream; facing: CameraFacing }
   | { type: "ERROR"; error: CameraCaptureError }
-  | { type: "LIBRARY_ONLY" }
   | { type: "RESET" };
 
 /**
