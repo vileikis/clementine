@@ -1,4 +1,4 @@
-import { FolderOpen, Sparkles, BarChart3, Settings } from 'lucide-react';
+import { FolderOpen, Sparkles, BarChart3, Settings, Wrench } from 'lucide-react';
 import type { NavigationItem } from './types';
 
 /**
@@ -34,6 +34,13 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
     href: '/settings',
     enabled: true,
   },
+  {
+    id: 'dev-tools',
+    label: 'Dev Tools',
+    icon: Wrench,
+    href: '/dev-tools',
+    enabled: true,
+  }
 ];
 
 /**
