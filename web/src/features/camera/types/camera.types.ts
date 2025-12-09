@@ -129,6 +129,7 @@ export interface CameraCaptureProps {
  * Internal state machine states
  */
 export type CameraStateStatus =
+  | "checking-permission"
   | "permission-prompt"
   | "camera-active"
   | "photo-review"
@@ -139,6 +140,7 @@ export type CameraStateStatus =
  * Internal state machine state (used by CameraCapture)
  */
 export type CameraState =
+  | { status: "checking-permission" }
   | { status: "permission-prompt" }
   | {
       status: "camera-active";
@@ -153,6 +155,7 @@ export type CameraState =
  * Internal state machine actions
  */
 export type CameraAction =
+  | { type: "SHOW_PERMISSION_PROMPT" }
   | { type: "PERMISSION_GRANTED"; stream: MediaStream; facing: CameraFacing }
   | { type: "PERMISSION_DENIED"; error: CameraCaptureError }
   | { type: "PHOTO_CAPTURED"; photo: CapturedPhoto }
