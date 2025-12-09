@@ -96,49 +96,39 @@ export interface CameraCaptureLabels {
 }
 
 /**
- * Internal state machine states
+ * Internal state machine states for CameraCapture UI
+ *
+ * Note: Permission states are handled by useCameraPermission hook.
+ * This reducer only tracks UI state after permission is granted.
  */
 export type CameraStateStatus =
-  | "checking-permission"
-  | "permission-prompt"
   | "camera-active"
   | "photo-review"
   | "error";
 
 /**
  * Internal state machine state (used by CameraCapture)
- *
- * Note: Camera hardware state (stream, facing) is managed by useCamera hook.
- * The reducer only tracks UI state to avoid duplication and sync issues.
  */
 export type CameraState =
-  | { status: "checking-permission" }
-  | { status: "permission-prompt" }
   | { status: "camera-active" }
   | { status: "photo-review"; photo: CapturedPhoto }
   | { status: "error"; error: CameraCaptureError };
 
 /**
  * Internal state machine actions
- *
- * Note: FLIP_CAMERA removed - handled internally by useCamera hook,
- * no UI state change needed.
  */
 export type CameraAction =
-  | { type: "SHOW_PERMISSION_PROMPT" }
-  | { type: "PERMISSION_GRANTED" }
-  | { type: "PERMISSION_DENIED"; error: CameraCaptureError }
+  | { type: "CAMERA_READY" }
   | { type: "PHOTO_CAPTURED"; photo: CapturedPhoto }
   | { type: "RETAKE" }
-  | { type: "ERROR"; error: CameraCaptureError }
-  | { type: "RESET" };
+  | { type: "ERROR"; error: CameraCaptureError };
 
 /**
  * Permission state for useCameraPermission hook
  */
 export type PermissionState =
   | "checking"
-  | "prompt"
+  | "undetermined"
   | "requesting"
   | "granted"
   | "denied"

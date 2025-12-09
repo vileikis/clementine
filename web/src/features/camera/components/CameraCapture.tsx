@@ -4,12 +4,13 @@
  * CameraCapture Component
  *
  * Main container component for the camera capture flow.
- * Manages state machine for permission → camera → review flow.
+ * Uses Expo-style pattern: permission hook + auto-starting CameraView.
  *
  * Architecture:
- * - CameraView: Self-contained camera (auto-starts on mount, stops on unmount)
+ * - useCameraPermission: Handles permission state
+ * - CameraView: Self-contained camera (auto-starts on mount)
  * - useLibraryPicker: Handles file input for library selection
- * - cameraReducer: Tracks UI state only
+ * - cameraReducer: Tracks UI state (camera-active, photo-review, error)
  */
 
 import { useReducer, useCallback, useRef, useState, useMemo } from "react";
@@ -24,6 +25,7 @@ import type {
 } from "../types";
 import { DEFAULT_LABELS } from "../constants";
 import { cameraReducer, INITIAL_CAMERA_STATE } from "../lib";
+import { useCameraPermission } from "../hooks/useCameraPermission";
 import { useLibraryPicker } from "../hooks/useLibraryPicker";
 import { PermissionPrompt } from "./PermissionPrompt";
 import { CameraView, type CameraViewRef } from "./CameraView";
@@ -93,6 +95,14 @@ export function CameraCapture({
 }: CameraCaptureProps) {
   const mergedLabels = { ...DEFAULT_LABELS, ...labels };
 
+  // Permission hook - handles permission state
+  const {
+    status: permissionStatus,
+    requestPermission,
+    error: permissionError,
+  } = useCameraPermission();
+
+  // UI state reducer - only used after permission granted
   const [state, dispatch] = useReducer(cameraReducer, INITIAL_CAMERA_STATE);
 
   // Ref for CameraView - used for takePhoto and switchCamera
@@ -110,46 +120,25 @@ export function CameraCapture({
     onError,
   });
 
-  /**
-   * Target camera facing based on configuration
-   */
+  // Target camera facing based on configuration
   const targetFacing = useMemo<CameraFacing>(
     () => (cameraFacing === "both" ? initialFacing : cameraFacing),
     [cameraFacing, initialFacing]
   );
 
-  /**
-   * Handle camera ready - transition to camera-active state
-   * Called when CameraView successfully starts streaming
-   */
+  // Handle camera ready
   const handleCameraReady = useCallback(() => {
-    // Update hasMultipleCameras from ref (safe in callback)
     setHasMultipleCameras(cameraViewRef.current?.hasMultipleCameras ?? false);
+  }, []);
 
-    // Only transition if we're in checking-permission (initial auto-start)
-    // or permission-prompt (user clicked allow)
-    if (state.status === "checking-permission" || state.status === "permission-prompt") {
-      dispatch({ type: "PERMISSION_GRANTED" });
-    }
-  }, [state.status]);
-
-  /**
-   * Handle camera errors
-   */
+  // Handle camera errors (hardware errors, not permission)
   const handleCameraError = useCallback(
     (error: CameraCaptureError) => {
       onError?.(error);
-      dispatch({ type: "PERMISSION_DENIED", error });
+      dispatch({ type: "ERROR", error });
     },
     [onError]
   );
-
-  // Handle permission request - just transition state, CameraView auto-starts
-  const handleRequestPermission = useCallback(() => {
-    // Transition to a state where CameraView will be mounted
-    // CameraView auto-starts on mount and calls onReady when successful
-    dispatch({ type: "PERMISSION_GRANTED" });
-  }, []);
 
   // Handle photo capture via CameraView ref
   const handleCapture = useCallback(async () => {
@@ -170,7 +159,7 @@ export function CameraCapture({
     await cameraViewRef.current?.switchCamera();
   }, []);
 
-  // Handle retake - go back to camera-active (CameraView will remount and auto-start)
+  // Handle retake
   const handleRetake = useCallback(() => {
     onRetake?.();
     dispatch({ type: "RETAKE" });
@@ -190,12 +179,6 @@ export function CameraCapture({
     state.status === "camera-active";
   const showLibraryButton = enableLibrary;
 
-  // Should CameraView be mounted?
-  // Mount during: checking-permission (to auto-start), camera-active (to show)
-  // Unmount during: permission-prompt (waiting for user), photo-review, error
-  const shouldMountCamera =
-    state.status === "checking-permission" || state.status === "camera-active";
-
   return (
     <div className={cn("relative w-full h-full overflow-hidden", className)}>
       {/* Hidden file input for library selection */}
@@ -209,77 +192,87 @@ export function CameraCapture({
         aria-hidden="true"
       />
 
-      {/* CameraView - mounted during checking-permission and camera-active */}
-      {shouldMountCamera && (
-        <div
-          className={cn(
-            "absolute inset-0",
-            state.status === "checking-permission" && "invisible"
-          )}
-        >
-          <CameraView
-            ref={cameraViewRef}
-            facing={targetFacing}
-            aspectRatio={aspectRatio}
-            onReady={handleCameraReady}
-            onError={handleCameraError}
-          />
-        </div>
-      )}
-
-      {/* Checking permission state - show loading overlay */}
-      {state.status === "checking-permission" && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-black z-10">
+      {/* Permission: checking */}
+      {permissionStatus === "checking" && (
+        <div className="flex flex-col items-center justify-center gap-4 h-full bg-black">
           <div className="size-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
           <p className="text-white/70 text-sm">Preparing camera...</p>
         </div>
       )}
 
-      {/* Permission prompt state */}
-      {state.status === "permission-prompt" && (
+      {/* Permission: undetermined, requesting, or denied - show prompt */}
+      {(permissionStatus === "undetermined" ||
+        permissionStatus === "requesting" ||
+        permissionStatus === "denied") && (
         <PermissionPrompt
           labels={mergedLabels}
-          onRequestPermission={handleRequestPermission}
+          onRequestPermission={requestPermission}
           onOpenLibrary={enableLibrary ? openPicker : undefined}
           showLibraryOption={enableLibrary}
+          isRequesting={permissionStatus === "requesting"}
+          error={permissionError}
         />
       )}
 
-      {/* Camera active state - show controls */}
-      {state.status === "camera-active" && (
-        <div className="absolute inset-0 flex flex-col">
-          <div className="flex-1" />
-          <CameraControls
-            labels={mergedLabels}
-            showFlipButton={showFlipButton}
-            showLibraryButton={showLibraryButton}
-            onCapture={handleCapture}
-            onFlipCamera={handleFlipCamera}
-            onOpenLibrary={openPicker}
-          />
-        </div>
-      )}
-
-      {/* Photo review state */}
-      {state.status === "photo-review" && (
-        <PhotoReview
-          photo={state.photo}
-          labels={mergedLabels}
-          onConfirm={handleConfirm}
-          onRetake={handleRetake}
-        />
-      )}
-
-      {/* Error state */}
-      {state.status === "error" && (
+      {/* Permission: unavailable - show error */}
+      {permissionStatus === "unavailable" && (
         <ErrorState
-          error={state.error}
+          error={permissionError ?? { code: "CAMERA_UNAVAILABLE", message: "Camera not available" }}
           labels={mergedLabels}
-          showRetry
+          showRetry={false}
           showLibraryFallback={enableLibrary}
-          onRetry={handleRequestPermission}
           onOpenLibrary={openPicker}
         />
+      )}
+
+      {/* Permission: granted - show camera UI */}
+      {permissionStatus === "granted" && (
+        <>
+          {/* Camera active state */}
+          {state.status === "camera-active" && (
+            <div className="flex flex-col h-full">
+              <div className="flex-1 min-h-0">
+                <CameraView
+                  ref={cameraViewRef}
+                  facing={targetFacing}
+                  aspectRatio={aspectRatio}
+                  onReady={handleCameraReady}
+                  onError={handleCameraError}
+                />
+              </div>
+              <CameraControls
+                labels={mergedLabels}
+                showFlipButton={showFlipButton}
+                showLibraryButton={showLibraryButton}
+                onCapture={handleCapture}
+                onFlipCamera={handleFlipCamera}
+                onOpenLibrary={openPicker}
+              />
+            </div>
+          )}
+
+          {/* Photo review state */}
+          {state.status === "photo-review" && (
+            <PhotoReview
+              photo={state.photo}
+              labels={mergedLabels}
+              onConfirm={handleConfirm}
+              onRetake={handleRetake}
+            />
+          )}
+
+          {/* Error state (hardware error) */}
+          {state.status === "error" && (
+            <ErrorState
+              error={state.error}
+              labels={mergedLabels}
+              showRetry
+              showLibraryFallback={enableLibrary}
+              onRetry={() => dispatch({ type: "CAMERA_READY" })}
+              onOpenLibrary={openPicker}
+            />
+          )}
+        </>
       )}
     </div>
   );

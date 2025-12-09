@@ -3,12 +3,12 @@
 /**
  * useCameraPermission Hook
  *
- * Manages camera permission state with automatic permission checking on mount.
- * Auto-starts camera if permission was previously granted.
+ * Manages camera permission state following Expo pattern.
+ * Only handles permission - CameraView handles actual streaming.
  */
 
 import { useState, useCallback, useEffect } from "react";
-import type { PermissionState, CameraCaptureError, CameraFacing } from "../types";
+import type { PermissionState, CameraCaptureError } from "../types";
 import { CAMERA_CONSTRAINTS } from "../constants";
 import {
   parseMediaError,
@@ -16,169 +16,144 @@ import {
   isMediaDevicesAvailable,
 } from "../lib";
 
-interface UseCameraPermissionOptions {
-  /** Initial camera facing direction */
-  facing?: CameraFacing;
-  /** Whether to auto-check permission on mount */
-  autoCheck?: boolean;
-  /** Called when permission is granted with stream */
-  onGranted?: (stream: MediaStream) => void;
-  /** Called when permission is denied or error occurs */
-  onDenied?: (error: CameraCaptureError) => void;
-}
-
 interface UseCameraPermissionReturn {
   /** Current permission state */
-  permissionState: PermissionState;
-  /** Request camera permission - call on user action */
-  requestPermission: () => Promise<MediaStream | null>;
-  /** Reset to initial prompt state */
-  reset: () => void;
-}
-
-/**
- * Request camera stream with specified facing
- */
-async function requestCameraStream(
-  facing: CameraFacing
-): Promise<MediaStream> {
-  return navigator.mediaDevices.getUserMedia({
-    video: {
-      facingMode: facing,
-      ...CAMERA_CONSTRAINTS,
-    },
-    audio: false,
-  });
+  status: PermissionState;
+  /** Request camera permission - triggers browser prompt */
+  requestPermission: () => Promise<boolean>;
+  /** Last error if permission denied */
+  error: CameraCaptureError | null;
 }
 
 /**
  * Check current camera permission status via Permissions API
  */
-async function checkPermissionStatus(): Promise<PermissionStatus | null> {
+async function checkPermissionStatus(): Promise<PermissionState> {
   if (!navigator.permissions?.query) {
-    return null;
+    // Permissions API not available, need to request to find out
+    return "undetermined";
   }
 
   try {
-    return await navigator.permissions.query({
+    const result = await navigator.permissions.query({
       name: "camera" as PermissionName,
     });
+
+    switch (result.state) {
+      case "granted":
+        return "granted";
+      case "denied":
+        return "denied";
+      case "prompt":
+      default:
+        return "undetermined";
+    }
   } catch {
-    return null;
+    // Query failed, need to request to find out
+    return "undetermined";
   }
 }
 
 /**
  * Hook for managing camera permission state
  *
- * @param options - Configuration options
- * @returns Permission state and request function
+ * Follows Expo useCameraPermissions pattern - only handles permission,
+ * not the actual camera stream.
+ *
+ * @returns Permission state, request function, and error
  *
  * @example
  * ```tsx
- * const { permissionState, requestPermission } = useCameraPermission({
- *   autoCheck: true,
- *   onGranted: (stream) => setStream(stream),
- *   onDenied: (error) => setError(error),
- * });
+ * const { status, requestPermission, error } = useCameraPermission();
  *
- * if (permissionState === 'checking') {
- *   return <LoadingSpinner />;
+ * if (status === "checking") {
+ *   return <Loading />;
  * }
  *
- * return (
- *   <button onClick={requestPermission} disabled={permissionState === 'requesting'}>
- *     Allow Camera
- *   </button>
- * );
+ * if (status !== "granted") {
+ *   return (
+ *     <PermissionPrompt
+ *       onRequest={requestPermission}
+ *       error={error}
+ *     />
+ *   );
+ * }
+ *
+ * // Permission granted - CameraView will auto-start
+ * return <CameraView />;
  * ```
  */
-export function useCameraPermission(
-  options: UseCameraPermissionOptions = {}
-): UseCameraPermissionReturn {
-  const { facing = "user", autoCheck = false, onGranted, onDenied } = options;
+export function useCameraPermission(): UseCameraPermissionReturn {
+  const [status, setStatus] = useState<PermissionState>("checking");
+  const [error, setError] = useState<CameraCaptureError | null>(null);
 
-  const [permissionState, setPermissionState] = useState<PermissionState>(
-    autoCheck ? "checking" : "prompt"
-  );
+  // Check permission on mount
+  useEffect(() => {
+    let mounted = true;
 
-  const handleError = useCallback(
-    (err: unknown) => {
-      const error = parseMediaError(err);
-      const newState = error.code === "CAMERA_UNAVAILABLE" ? "unavailable" : "denied";
-      setPermissionState(newState);
-      onDenied?.(error);
-    },
-    [onDenied]
-  );
+    async function check() {
+      if (!isMediaDevicesAvailable()) {
+        if (mounted) {
+          setStatus("unavailable");
+          setError(createUnavailableError());
+        }
+        return;
+      }
 
-  const requestPermission = useCallback(async (): Promise<MediaStream | null> => {
-    if (!isMediaDevicesAvailable()) {
-      const error = createUnavailableError();
-      setPermissionState("unavailable");
-      onDenied?.(error);
-      return null;
+      const permissionStatus = await checkPermissionStatus();
+      if (mounted) {
+        setStatus(permissionStatus);
+      }
     }
 
-    setPermissionState("requesting");
+    check();
 
-    try {
-      const stream = await requestCameraStream(facing);
-      setPermissionState("granted");
-      onGranted?.(stream);
-      return stream;
-    } catch (err) {
-      handleError(err);
-      return null;
-    }
-  }, [facing, onGranted, onDenied, handleError]);
-
-  const reset = useCallback(() => {
-    setPermissionState("prompt");
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  // Auto-check permission on mount if enabled
-  useEffect(() => {
-    if (!autoCheck) return;
-    if (permissionState !== "checking") return;
-
-    async function checkAndRequestPermission() {
-      if (!isMediaDevicesAvailable()) {
-        setPermissionState("prompt");
-        return;
-      }
-
-      const status = await checkPermissionStatus();
-
-      // Permissions API not available, show prompt
-      if (!status) {
-        setPermissionState("prompt");
-        return;
-      }
-
-      // Permission not granted, show prompt
-      if (status.state !== "granted") {
-        setPermissionState("prompt");
-        return;
-      }
-
-      // Permission granted, auto-start camera
-      try {
-        const stream = await requestCameraStream(facing);
-        setPermissionState("granted");
-        onGranted?.(stream);
-      } catch {
-        // Failed despite permission, show prompt
-        setPermissionState("prompt");
-      }
+  // Request permission - triggers browser prompt
+  const requestPermission = useCallback(async (): Promise<boolean> => {
+    if (!isMediaDevicesAvailable()) {
+      const err = createUnavailableError();
+      setStatus("unavailable");
+      setError(err);
+      return false;
     }
 
-    checkAndRequestPermission();
-  }, [autoCheck, permissionState, facing, onGranted]);
+    setStatus("requesting");
+    setError(null);
+
+    try {
+      // Request stream to trigger permission prompt
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: CAMERA_CONSTRAINTS,
+        audio: false,
+      });
+
+      // Permission granted - stop stream immediately (CameraView will start its own)
+      stream.getTracks().forEach((track) => track.stop());
+
+      setStatus("granted");
+      return true;
+    } catch (err) {
+      const parsedError = parseMediaError(err);
+      setError(parsedError);
+
+      if (parsedError.code === "CAMERA_UNAVAILABLE") {
+        setStatus("unavailable");
+      } else {
+        setStatus("denied");
+      }
+
+      return false;
+    }
+  }, []);
 
   return {
-    permissionState,
+    status,
     requestPermission,
-    reset,
+    error,
   };
 }
