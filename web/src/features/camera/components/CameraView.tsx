@@ -33,7 +33,6 @@ import type {
 import { CAMERA_CONSTRAINTS } from "../constants";
 import {
   captureFromVideo,
-  captureFromVideoMirrored,
   createCaptureFile,
   parseMediaError,
   createUnavailableError,
@@ -198,17 +197,12 @@ export const CameraView = forwardRef<CameraViewRef, CameraViewProps>(
       const video = videoRef.current;
       if (!video) return null;
 
-      // Debug: log what aspectRatio is being used
-      console.log("[CameraView] takePhoto called with aspectRatio:", aspectRatio);
-      console.log("[CameraView] video dimensions:", video.videoWidth, "x", video.videoHeight);
-
       try {
-        // Use mirrored capture for front camera (natural selfie appearance)
-        // Pass aspectRatio to crop the capture to the desired ratio
-        const blob =
-          facing === "user"
-            ? await captureFromVideoMirrored(video, aspectRatio)
-            : await captureFromVideo(video, aspectRatio);
+        // Capture with options: mirror for front camera, crop to aspect ratio
+        const blob = await captureFromVideo(video, {
+          aspectRatio,
+          mirror: facing === "user",
+        });
 
         const file = createCaptureFile(blob);
         const previewUrl = URL.createObjectURL(file);

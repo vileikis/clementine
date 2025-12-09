@@ -2,11 +2,8 @@
  * Camera Module Lib - Barrel Export
  */
 
-export {
-  captureFromVideo,
-  captureFromVideoMirrored,
-  createCaptureFile,
-} from "./capture";
+export { captureFromVideo, createCaptureFile } from "./capture";
+export type { CaptureOptions } from "./capture";
 
 export { getImageDimensions, getVideoDimensions } from "./image-utils";
 

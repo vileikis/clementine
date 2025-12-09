@@ -68,11 +68,12 @@ export const MAX_FILE_SIZE = 50 * 1024 * 1024;
  * We crop to the desired aspectRatio on capture.
  */
 export const CAMERA_CONSTRAINTS = {
-  width: { ideal: 1920 },
-  height: { ideal: 1920 },
+  width: { ideal: 3840 },
+  height: { ideal: 3840 },
 } as const;
 
 /**
  * JPEG quality for canvas capture (0-1)
+ * 0.92 is a good balance between quality and file size
  */
-export const CAPTURE_QUALITY = 0.9;
+export const CAPTURE_QUALITY = 0.92;
