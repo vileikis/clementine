@@ -15,8 +15,6 @@ import { DEFAULT_LABELS } from "../constants";
 interface PermissionPromptProps {
   /** Custom labels for i18n */
   labels?: CameraCaptureLabels;
-  /** Whether permission is being requested */
-  isRequesting?: boolean;
   /** Called when user taps Allow Camera button */
   onRequestPermission: () => void;
   /** Called when user taps Choose from Library button */
@@ -32,7 +30,6 @@ interface PermissionPromptProps {
  */
 export function PermissionPrompt({
   labels = {},
-  isRequesting = false,
   onRequestPermission,
   onOpenLibrary,
   showLibraryOption = true,
@@ -73,18 +70,16 @@ export function PermissionPrompt({
       <div className="flex flex-col gap-3 w-full max-w-xs mt-4">
         <Button
           onClick={onRequestPermission}
-          disabled={isRequesting}
           className="w-full min-h-[44px]"
           aria-label={mergedLabels.allowCamera}
         >
-          {isRequesting ? "Requesting..." : hasError ? "Try Again" : mergedLabels.allowCamera}
+          {hasError ? "Try Again" : mergedLabels.allowCamera}
         </Button>
 
         {showLibraryOption && onOpenLibrary && (
           <Button
             variant="outline"
             onClick={onOpenLibrary}
-            disabled={isRequesting}
             className="w-full min-h-[44px]"
             aria-label={mergedLabels.openLibrary}
           >
