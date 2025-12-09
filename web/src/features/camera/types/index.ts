@@ -11,7 +11,6 @@ export type {
   CameraFacingConfig,
   AspectRatio,
   CameraCaptureLabels,
-  CameraCaptureProps,
   CameraStateStatus,
   CameraState,
   CameraAction,
