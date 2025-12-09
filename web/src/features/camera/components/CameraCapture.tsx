@@ -7,13 +7,12 @@
  * Manages state machine for permission → camera → review flow.
  *
  * Architecture:
- * - CameraView: Owns video element, exposes takePhoto() via ref
- * - useCamera: Manages MediaStream lifecycle
+ * - CameraView: Self-contained camera (auto-starts on mount, stops on unmount)
  * - useLibraryPicker: Handles file input for library selection
- * - cameraReducer: Tracks UI state only (no camera hardware state)
+ * - cameraReducer: Tracks UI state only
  */
 
-import { useReducer, useCallback, useRef, useEffect } from "react";
+import { useReducer, useCallback, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import type {
   CameraFacing,
@@ -24,8 +23,7 @@ import type {
   AspectRatio,
 } from "../types";
 import { DEFAULT_LABELS } from "../constants";
-import { checkCameraPermission, cameraReducer, INITIAL_CAMERA_STATE } from "../lib";
-import { useCamera } from "../hooks/useCamera";
+import { cameraReducer, INITIAL_CAMERA_STATE } from "../lib";
 import { useLibraryPicker } from "../hooks/useLibraryPicker";
 import { PermissionPrompt } from "./PermissionPrompt";
 import { CameraView, type CameraViewRef } from "./CameraView";
@@ -97,24 +95,11 @@ export function CameraCapture({
 
   const [state, dispatch] = useReducer(cameraReducer, INITIAL_CAMERA_STATE);
 
-  // Ref for CameraView to call takePhoto()
+  // Ref for CameraView - used for takePhoto and switchCamera
   const cameraViewRef = useRef<CameraViewRef>(null);
 
-  // Camera hook - manages stream lifecycle
-  const {
-    videoRef,
-    facing,
-    startCamera,
-    stopCamera,
-    switchCamera,
-    hasMultipleCameras,
-  } = useCamera({
-    initialFacing,
-    onError: (error) => {
-      onError?.(error);
-      dispatch({ type: "PERMISSION_DENIED", error });
-    },
-  });
+  // Track hasMultipleCameras in state (updated via onReady callback)
+  const [hasMultipleCameras, setHasMultipleCameras] = useState(false);
 
   // Library picker hook - manages file input
   const { fileInputRef, openPicker, handleFileChange } = useLibraryPicker({
@@ -127,7 +112,6 @@ export function CameraCapture({
 
   /**
    * Get target camera facing based on configuration
-   * Consolidates the repeated logic from before
    */
   const getTargetFacing = useCallback(
     (override?: CameraFacing): CameraFacing =>
@@ -138,49 +122,37 @@ export function CameraCapture({
   );
 
   /**
-   * Unified camera initialization
-   * Used by permission request, auto-start, and retake
+   * Handle camera ready - transition to camera-active state
+   * Called when CameraView successfully starts streaming
    */
-  const initializeCamera = useCallback(
-    async (targetFacing: CameraFacing): Promise<boolean> => {
-      const stream = await startCamera(targetFacing);
-      if (stream) {
-        dispatch({ type: "PERMISSION_GRANTED" });
-        return true;
-      }
-      return false;
+  const handleCameraReady = useCallback(() => {
+    // Update hasMultipleCameras from ref (safe in callback)
+    setHasMultipleCameras(cameraViewRef.current?.hasMultipleCameras ?? false);
+
+    // Only transition if we're in checking-permission (initial auto-start)
+    // or permission-prompt (user clicked allow)
+    if (state.status === "checking-permission" || state.status === "permission-prompt") {
+      dispatch({ type: "PERMISSION_GRANTED" });
+    }
+  }, [state.status]);
+
+  /**
+   * Handle camera errors
+   */
+  const handleCameraError = useCallback(
+    (error: CameraCaptureError) => {
+      onError?.(error);
+      dispatch({ type: "PERMISSION_DENIED", error });
     },
-    [startCamera]
+    [onError]
   );
 
-  // Handle permission request
-  const handleRequestPermission = useCallback(async () => {
-    await initializeCamera(getTargetFacing());
-  }, [initializeCamera, getTargetFacing]);
-
-  // Check permission on mount and auto-start camera if already granted
-  useEffect(() => {
-    if (state.status !== "checking-permission") return;
-
-    async function checkAndStartCamera() {
-      const permissionStatus = await checkCameraPermission();
-
-      // Permissions API not available or permission not granted
-      if (permissionStatus !== "granted") {
-        dispatch({ type: "SHOW_PERMISSION_PROMPT" });
-        return;
-      }
-
-      // Permission granted, try to auto-start camera
-      const success = await initializeCamera(getTargetFacing());
-      if (!success) {
-        dispatch({ type: "SHOW_PERMISSION_PROMPT" });
-      }
-    }
-
-    checkAndStartCamera();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.status]);
+  // Handle permission request - just transition state, CameraView auto-starts
+  const handleRequestPermission = useCallback(() => {
+    // Transition to a state where CameraView will be mounted
+    // CameraView auto-starts on mount and calls onReady when successful
+    dispatch({ type: "PERMISSION_GRANTED" });
+  }, []);
 
   // Handle photo capture via CameraView ref
   const handleCapture = useCallback(async () => {
@@ -196,25 +168,16 @@ export function CameraCapture({
     }
   }, [onPhoto, onError]);
 
-  // Handle camera flip
+  // Handle camera flip via CameraView ref
   const handleFlipCamera = useCallback(async () => {
-    await switchCamera();
-    // No dispatch needed - useCamera hook manages facing state internally
-    // UI re-renders via the `facing` value from useCamera
-  }, [switchCamera]);
+    await cameraViewRef.current?.switchCamera();
+  }, []);
 
-  // Handle retake
-  const handleRetake = useCallback(async () => {
+  // Handle retake - go back to camera-active (CameraView will remount and auto-start)
+  const handleRetake = useCallback(() => {
     onRetake?.();
-
-    // Try to restart camera with current facing (or config-determined facing)
-    const targetFacing = getTargetFacing(facing);
-    const success = await initializeCamera(targetFacing);
-
-    if (!success) {
-      dispatch({ type: "RESET" });
-    }
-  }, [onRetake, initializeCamera, getTargetFacing, facing]);
+    dispatch({ type: "RETAKE" });
+  }, [onRetake]);
 
   // Handle photo confirm
   const handleConfirm = useCallback(() => {
@@ -223,20 +186,21 @@ export function CameraCapture({
     }
   }, [state, onSubmit]);
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      stopCamera();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   // Determine what controls to show
   const showFlipButton =
     cameraFacing === "both" &&
     hasMultipleCameras &&
     state.status === "camera-active";
   const showLibraryButton = enableLibrary;
+
+  // Determine target facing for CameraView
+  const targetFacing = getTargetFacing();
+
+  // Should CameraView be mounted?
+  // Mount during: checking-permission (to auto-start), camera-active (to show)
+  // Unmount during: permission-prompt (waiting for user), photo-review, error
+  const shouldMountCamera =
+    state.status === "checking-permission" || state.status === "camera-active";
 
   return (
     <div className={cn("relative w-full h-full overflow-hidden", className)}>
@@ -251,9 +215,27 @@ export function CameraCapture({
         aria-hidden="true"
       />
 
-      {/* Checking permission state - show loading */}
+      {/* CameraView - mounted during checking-permission and camera-active */}
+      {shouldMountCamera && (
+        <div
+          className={cn(
+            "absolute inset-0",
+            state.status === "checking-permission" && "invisible"
+          )}
+        >
+          <CameraView
+            ref={cameraViewRef}
+            facing={targetFacing}
+            aspectRatio={aspectRatio}
+            onReady={handleCameraReady}
+            onError={handleCameraError}
+          />
+        </div>
+      )}
+
+      {/* Checking permission state - show loading overlay */}
       {state.status === "checking-permission" && (
-        <div className="flex flex-col items-center justify-center gap-4 h-full bg-black">
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-black z-10">
           <div className="size-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
           <p className="text-white/70 text-sm">Preparing camera...</p>
         </div>
@@ -269,17 +251,10 @@ export function CameraCapture({
         />
       )}
 
-      {/* Camera active state */}
+      {/* Camera active state - show controls */}
       {state.status === "camera-active" && (
-        <div className="flex flex-col h-full">
-          <div className="flex-1 relative">
-            <CameraView
-              ref={cameraViewRef}
-              videoRef={videoRef}
-              facing={facing}
-              aspectRatio={aspectRatio}
-            />
-          </div>
+        <div className="absolute inset-0 flex flex-col">
+          <div className="flex-1" />
           <CameraControls
             labels={mergedLabels}
             showFlipButton={showFlipButton}
