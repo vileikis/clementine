@@ -152,11 +152,11 @@ config: {
 
 ---
 
-### 7. Survey Experience ❌ Not Supported
+### 7. Survey Experience ✅ Supported (Basic)
 
 **Use Case**: Interactive questionnaire with MCQ, text, sliders, conditional branching.
 
-**Current Support**: Partial
+**Current Support**: Good for basic surveys
 
 **Available Steps**:
 - `short_text` ✅
@@ -166,16 +166,15 @@ config: {
 - `opinion_scale` ✅ (slider-like)
 - `email` ✅
 
+**Session Data Aggregation**: The `experience-engine` manages session state via `useEngineSession` hook, storing all step responses in `session.data: Record<stepId, StepInputValue>`. This effectively aggregates survey responses without needing a special output step.
+
 **Gaps**:
 | Gap | Severity | Impact |
 |-----|----------|--------|
-| No conditional branching logic | **Critical** | Cannot skip/show steps based on answers |
-| No "survey" experience type abstraction | Medium | Must manually sequence input steps |
-| No aggregated survey response output | High | Results stored per-step, not unified |
+| No conditional branching logic | Low (not required now) | Future enhancement for advanced surveys |
+| No "survey" experience type abstraction | Low | Must manually sequence input steps |
 
-**Required Changes**:
-- Add conditional logic to steps: `showIf: { stepId, operator, value }`
-- Add survey-specific output aggregation in session data
+**Note**: Conditional branching is explicitly not required at this stage. Basic survey functionality is achievable with current step types.
 
 ---
 
@@ -341,7 +340,7 @@ variables: config.variables ?? [],
 | AI Photo | ⚠️ Variables exist | ❌ No variables UI | ⚠️ No frame | ⚠️ Partial |
 | AI GIF | ❌ | ❌ | ❌ | ❌ None |
 | AI Video | ⚠️ Schema ready | ❌ No variables UI | ❌ No backend | ❌ None |
-| Survey | ⚠️ Input steps exist | ✅ | ❌ No branching | ⚠️ Partial |
+| Survey | ✅ Input steps exist | ✅ | ✅ Session aggregates | ✅ Supported |
 | Wheel | ❌ | ❌ | ❌ | ❌ None |
 
 ---
@@ -362,14 +361,14 @@ variables: config.variables ?? [],
 
 ### P2 - Medium (Expands Platform)
 
-7. **Add conditional branching** — Enables Survey experiences
-8. **Add wheel step type** — Enables gamification
-9. **Add step validation layer** — Prevents broken experiences
+7. **Add wheel step type** — Enables gamification
+8. **Add step validation layer** — Prevents broken experiences
 
 ### P3 - Low (Polish)
 
-10. **Add experience type wizard** — Guided creation flow
-11. **Add variable preview in prompt** — Better AI config UX
+9. **Add experience type wizard** — Guided creation flow
+10. **Add variable preview in prompt** — Better AI config UX
+11. **Add conditional branching** — Advanced survey flows (future)
 
 ---
 
