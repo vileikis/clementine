@@ -7,22 +7,24 @@
  * Follows best practice of user-initiated permission requests.
  */
 
-import { Camera } from "lucide-react";
+import { Camera, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { CameraCaptureLabels } from "../types";
+import type { CameraCaptureLabels, CameraCaptureError } from "../types";
 import { DEFAULT_LABELS } from "../constants";
 
 interface PermissionPromptProps {
   /** Custom labels for i18n */
   labels?: CameraCaptureLabels;
   /** Whether permission is being requested */
-  isLoading?: boolean;
+  isRequesting?: boolean;
   /** Called when user taps Allow Camera button */
   onRequestPermission: () => void;
   /** Called when user taps Choose from Library button */
   onOpenLibrary?: () => void;
   /** Whether to show library option */
   showLibraryOption?: boolean;
+  /** Error from previous permission attempt */
+  error?: CameraCaptureError | null;
 }
 
 /**
@@ -30,12 +32,15 @@ interface PermissionPromptProps {
  */
 export function PermissionPrompt({
   labels = {},
-  isLoading = false,
+  isRequesting = false,
   onRequestPermission,
   onOpenLibrary,
   showLibraryOption = true,
+  error,
 }: PermissionPromptProps) {
   const mergedLabels = { ...DEFAULT_LABELS, ...labels };
+
+  const hasError = error && error.code === "PERMISSION_DENIED";
 
   return (
     <div className="flex flex-col items-center justify-center h-full p-6 text-center">
@@ -46,30 +51,40 @@ export function PermissionPrompt({
 
       {/* Title */}
       <h2 className="text-xl font-semibold mb-2">
-        {mergedLabels.permissionTitle}
+        {hasError ? mergedLabels.permissionDenied : mergedLabels.permissionTitle}
       </h2>
 
       {/* Description */}
-      <p className="text-muted-foreground mb-8 max-w-xs">
-        {mergedLabels.permissionDescription}
+      <p className="text-muted-foreground mb-4 max-w-xs">
+        {hasError
+          ? mergedLabels.permissionDeniedHint
+          : mergedLabels.permissionDescription}
       </p>
 
+      {/* Error message */}
+      {hasError && (
+        <div className="flex items-center gap-2 text-destructive text-sm mb-4">
+          <AlertCircle className="size-4" />
+          <span>{error.message}</span>
+        </div>
+      )}
+
       {/* Action buttons */}
-      <div className="flex flex-col gap-3 w-full max-w-xs">
+      <div className="flex flex-col gap-3 w-full max-w-xs mt-4">
         <Button
           onClick={onRequestPermission}
-          disabled={isLoading}
+          disabled={isRequesting}
           className="w-full min-h-[44px]"
           aria-label={mergedLabels.allowCamera}
         >
-          {isLoading ? "Requesting..." : mergedLabels.allowCamera}
+          {isRequesting ? "Requesting..." : hasError ? "Try Again" : mergedLabels.allowCamera}
         </Button>
 
         {showLibraryOption && onOpenLibrary && (
           <Button
             variant="outline"
             onClick={onOpenLibrary}
-            disabled={isLoading}
+            disabled={isRequesting}
             className="w-full min-h-[44px]"
             aria-label={mergedLabels.openLibrary}
           >

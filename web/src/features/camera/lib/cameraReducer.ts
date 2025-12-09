@@ -1,42 +1,31 @@
 /**
  * Camera State Reducer
  *
- * State machine for camera capture flow:
- * checking-permission → permission-prompt → camera-active ↔ photo-review
- *                                              ↓
- *                                            error
+ * Simple state machine for camera UI flow (after permission is granted):
+ * camera-active ↔ photo-review
+ *       ↓
+ *     error
  *
- * Note: Camera hardware state (stream, facing) is managed by useCamera hook.
- * This reducer only tracks UI state to avoid duplication and sync issues.
+ * Note: Permission states are handled by useCameraPermission hook.
  */
 
 import type { CameraState, CameraAction } from "../types";
 
 /**
- * Initial state - always starts in checking-permission,
- * then transitions based on permission status
+ * Initial state - camera active (only used when permission granted)
  */
-export const INITIAL_CAMERA_STATE: CameraState = { status: "checking-permission" };
+export const INITIAL_CAMERA_STATE: CameraState = { status: "camera-active" };
 
 /**
- * State machine reducer for camera flow
+ * State machine reducer for camera UI flow
  */
 export function cameraReducer(
   state: CameraState,
   action: CameraAction
 ): CameraState {
   switch (action.type) {
-    case "SHOW_PERMISSION_PROMPT":
-      return { status: "permission-prompt" };
-
-    case "PERMISSION_GRANTED":
+    case "CAMERA_READY":
       return { status: "camera-active" };
-
-    case "PERMISSION_DENIED":
-      return {
-        status: "error",
-        error: action.error,
-      };
 
     case "PHOTO_CAPTURED":
       return {
@@ -45,21 +34,13 @@ export function cameraReducer(
       };
 
     case "RETAKE":
-      // Return to camera active - the handler will restart the camera
-      // Since permission was already granted, we go directly to camera-active
-      if (state.status === "photo-review") {
-        return { status: "camera-active" };
-      }
-      return state;
+      return { status: "camera-active" };
 
     case "ERROR":
       return {
         status: "error",
         error: action.error,
       };
-
-    case "RESET":
-      return { status: "permission-prompt" };
 
     default:
       return state;
