@@ -60,7 +60,7 @@ export function PhotoReview({
             variant="outline"
             onClick={onRetake}
             disabled={isSubmitting}
-            className="flex-1 min-h-[44px] text-white border-white/50 hover:bg-white/20"
+            className="flex-1 min-h-[44px] bg-transparent text-white border-white hover:bg-white/10 hover:text-white"
           >
             {mergedLabels.retake}
           </Button>
@@ -69,7 +69,7 @@ export function PhotoReview({
         <Button
           onClick={onConfirm}
           disabled={isSubmitting}
-          className="flex-1 min-h-[44px]"
+          className="flex-1 min-h-[44px] bg-white text-black hover:bg-white/90"
         >
           {isSubmitting ? "Processing..." : mergedLabels.confirm}
         </Button>
