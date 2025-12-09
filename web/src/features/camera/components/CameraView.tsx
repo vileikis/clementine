@@ -1,23 +1,24 @@
 "use client";
 
 /**
- * CameraViewfinder Component
+ * CameraView Component
  *
  * Displays live video preview from camera stream.
  * Supports aspect ratio guides and front camera mirroring.
  */
 
-import { forwardRef } from "react";
 import { cn } from "@/lib/utils";
 import type { AspectRatio, CameraFacing } from "../types";
 
-interface CameraViewfinderProps {
+interface CameraViewProps {
   /** Current camera facing direction (for mirroring) */
   facing?: CameraFacing;
   /** Aspect ratio guide overlay */
   aspectRatio?: AspectRatio;
   /** Additional CSS classes */
   className?: string;
+  /** Callback ref for video element */
+  videoRef?: (element: HTMLVideoElement | null) => void;
 }
 
 /**
@@ -30,12 +31,14 @@ const ASPECT_RATIOS: Record<AspectRatio, string> = {
 };
 
 /**
- * Live camera viewfinder with aspect ratio guide
+ * Live camera view with aspect ratio guide
  */
-export const CameraViewfinder = forwardRef<
-  HTMLVideoElement,
-  CameraViewfinderProps
->(function CameraViewfinder({ facing = "user", aspectRatio, className }, ref) {
+export function CameraView({
+  facing = "user",
+  aspectRatio,
+  className,
+  videoRef,
+}: CameraViewProps) {
   // Mirror front camera for natural selfie appearance
   const shouldMirror = facing === "user";
 
@@ -43,10 +46,11 @@ export const CameraViewfinder = forwardRef<
     <div className={cn("relative w-full h-full bg-black", className)}>
       {/* Video element */}
       <video
-        ref={ref}
+        ref={videoRef}
         autoPlay
         playsInline
         muted
+        webkit-playsinline="true"
         className={cn(
           "absolute inset-0 w-full h-full object-cover",
           shouldMirror && "scale-x-[-1]"
@@ -70,4 +74,4 @@ export const CameraViewfinder = forwardRef<
       )}
     </div>
   );
-});
+}

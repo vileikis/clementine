@@ -25,8 +25,8 @@ interface UseCameraReturn {
   facing: CameraFacing;
   /** Whether camera is loading/switching */
   isLoading: boolean;
-  /** Video element ref to attach stream */
-  videoRef: React.RefObject<HTMLVideoElement | null>;
+  /** Video element ref callback - attach this to video element */
+  videoRef: (element: HTMLVideoElement | null) => void;
   /** Start camera with specified facing */
   startCamera: (facing: CameraFacing) => Promise<MediaStream | null>;
   /** Stop camera and release resources */
@@ -64,7 +64,11 @@ export function useCamera(options: UseCameraOptions = {}): UseCameraReturn {
   const [facing, setFacing] = useState<CameraFacing>(initialFacing);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMultipleCameras, setHasMultipleCameras] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Use refs to store both the video element and current stream
+  // This allows the callback ref to access the latest stream value
+  const videoElementRef = useRef<HTMLVideoElement | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
 
   // Check for multiple cameras on mount
   useEffect(() => {
@@ -81,13 +85,6 @@ export function useCamera(options: UseCameraOptions = {}): UseCameraReturn {
       }
     }
     checkCameras();
-  }, []);
-
-  // Stop all tracks in a stream
-  const stopTracks = useCallback((mediaStream: MediaStream | null) => {
-    if (mediaStream) {
-      mediaStream.getTracks().forEach((track) => track.stop());
-    }
   }, []);
 
   // Start camera with specified facing
@@ -115,6 +112,12 @@ export function useCamera(options: UseCameraOptions = {}): UseCameraReturn {
           audio: false,
         });
 
+        console.log("[useCamera] Got stream:", mediaStream);
+        console.log("[useCamera] Stream tracks:", mediaStream.getTracks());
+        console.log("[useCamera] videoElementRef.current:", videoElementRef.current);
+
+        // Update ref immediately (before state update) so callback ref can access it
+        streamRef.current = mediaStream;
         setStream(mediaStream);
         setFacing(newFacing);
         return mediaStream;
@@ -161,56 +164,111 @@ export function useCamera(options: UseCameraOptions = {}): UseCameraReturn {
   );
 
   // Stop camera and release resources
+  // Uses streamRef so it can be safely called from stale closures
   const stopCamera = useCallback(() => {
-    stopTracks(stream);
+    console.log("[useCamera] stopCamera called");
+    console.log("[useCamera] streamRef.current:", streamRef.current);
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    }
     setStream(null);
-  }, [stream, stopTracks]);
+  }, []);
 
   // Switch to opposite camera
   const switchCamera = useCallback(async (): Promise<MediaStream | null> => {
     const newFacing = facing === "user" ? "environment" : "user";
 
-    // Stop current stream first
-    stopTracks(stream);
+    // Stop current stream first using ref
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    }
     setStream(null);
 
     // Start with new facing
     return startCamera(newFacing);
-  }, [facing, stream, stopTracks, startCamera]);
+  }, [facing, startCamera]);
 
-  // Attach stream to video element
+  // Helper to attach stream to a video element
+  const attachStream = useCallback(
+    (video: HTMLVideoElement, mediaStream: MediaStream) => {
+      console.log("[useCamera] attachStream called");
+      console.log("[useCamera] video.srcObject:", video.srcObject);
+      console.log("[useCamera] mediaStream:", mediaStream);
+      console.log("[useCamera] mediaStream tracks active:", mediaStream.getTracks().map(t => ({ kind: t.kind, enabled: t.enabled, readyState: t.readyState })));
+
+      // Only attach if not already attached
+      if (video.srcObject === mediaStream) {
+        console.log("[useCamera] Stream already attached, skipping");
+        return;
+      }
+
+      video.srcObject = mediaStream;
+      console.log("[useCamera] Set video.srcObject, readyState:", video.readyState);
+
+      // Play when metadata is loaded
+      const handleLoadedMetadata = () => {
+        console.log("[useCamera] loadedmetadata event fired, playing...");
+        video.play().catch((err) => {
+          console.error("Error playing video:", err);
+        });
+      };
+
+      // If metadata is already loaded, play immediately
+      if (video.readyState >= 1) {
+        console.log("[useCamera] Metadata already loaded, playing immediately");
+        video.play().catch((err) => {
+          console.error("Error playing video:", err);
+        });
+      } else {
+        console.log("[useCamera] Waiting for loadedmetadata event");
+        video.addEventListener("loadedmetadata", handleLoadedMetadata, {
+          once: true,
+        });
+      }
+    },
+    []
+  );
+
+  // Callback ref for video element - called when element mounts/unmounts
+  const videoRef = useCallback(
+    (element: HTMLVideoElement | null) => {
+      console.log("[useCamera] videoRef callback called with:", element);
+      console.log("[useCamera] streamRef.current:", streamRef.current);
+      videoElementRef.current = element;
+
+      // When video element mounts and we have a stream, attach it immediately
+      if (element && streamRef.current) {
+        console.log("[useCamera] Attaching stream in callback ref");
+        attachStream(element, streamRef.current);
+      }
+    },
+    [attachStream]
+  );
+
+  // Also attach stream when it changes (for when video is already mounted)
   useEffect(() => {
-    if (!stream || !videoRef.current) return;
-
-    const video = videoRef.current;
-    video.srcObject = stream;
-
-    const handleLoadedMetadata = () => {
-      video.play().catch((err) => {
-        console.error("Error playing video:", err);
-      });
-    };
-
-    video.addEventListener("loadedmetadata", handleLoadedMetadata);
-
-    return () => {
-      video.removeEventListener("loadedmetadata", handleLoadedMetadata);
-    };
-  }, [stream]);
+    console.log("[useCamera] useEffect for stream change - stream:", stream, "videoElementRef:", videoElementRef.current);
+    if (stream && videoElementRef.current) {
+      console.log("[useCamera] Attaching stream in useEffect");
+      attachStream(videoElementRef.current, stream);
+    }
+  }, [stream, attachStream]);
 
   // Handle tab visibility change - pause/resume camera when tab loses/gains focus
   useEffect(() => {
     if (!stream) return;
 
     const handleVisibilityChange = () => {
-      if (!videoRef.current) return;
+      if (!videoElementRef.current) return;
 
       if (document.hidden) {
         // Pause video when tab is hidden (saves resources)
-        videoRef.current.pause();
+        videoElementRef.current.pause();
       } else {
         // Resume video when tab is visible
-        videoRef.current.play().catch((err) => {
+        videoElementRef.current.play().catch((err) => {
           console.error("Error resuming video:", err);
         });
       }
@@ -226,9 +284,13 @@ export function useCamera(options: UseCameraOptions = {}): UseCameraReturn {
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      stopTracks(stream);
+      console.log("[useCamera] Cleanup effect running, stopping tracks");
+      console.log("[useCamera] streamRef.current at cleanup:", streamRef.current);
+      // Use ref instead of stale closure
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+      }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {
