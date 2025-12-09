@@ -1,30 +1,103 @@
 /**
  * Camera Capture Utility
  *
- * Canvas-based photo capture from video element.
+ * Canvas-based photo capture from video element with aspect ratio cropping.
  * Extracted and enhanced from web/src/features/guest/lib/capture.ts
  */
 
 import { CAPTURE_QUALITY } from "../constants";
+import type { AspectRatio } from "../types";
+
+/**
+ * Numeric aspect ratio values (width / height)
+ */
+const ASPECT_RATIO_VALUES: Record<AspectRatio, number> = {
+  "3:4": 3 / 4,   // 0.75 - portrait
+  "1:1": 1,       // 1.0  - square
+  "9:16": 9 / 16, // 0.5625 - tall portrait (stories/reels)
+};
+
+/**
+ * Crop region for extracting a portion of the video frame
+ */
+interface CropRegion {
+  sx: number; // source x
+  sy: number; // source y
+  sw: number; // source width
+  sh: number; // source height
+}
+
+/**
+ * Calculates the largest centered crop region that matches the target aspect ratio
+ *
+ * @param videoWidth - Width of the video frame
+ * @param videoHeight - Height of the video frame
+ * @param aspectRatio - Target aspect ratio
+ * @returns Crop region centered on the video frame
+ */
+export function calculateCropRegion(
+  videoWidth: number,
+  videoHeight: number,
+  aspectRatio: AspectRatio
+): CropRegion {
+  const targetRatio = ASPECT_RATIO_VALUES[aspectRatio];
+  const videoRatio = videoWidth / videoHeight;
+
+  let sw: number;
+  let sh: number;
+
+  if (videoRatio > targetRatio) {
+    // Video is wider than target - crop sides
+    sh = videoHeight;
+    sw = videoHeight * targetRatio;
+  } else {
+    // Video is taller than target - crop top/bottom
+    sw = videoWidth;
+    sh = videoWidth / targetRatio;
+  }
+
+  // Center the crop region
+  const sx = (videoWidth - sw) / 2;
+  const sy = (videoHeight - sh) / 2;
+
+  return { sx, sy, sw, sh };
+}
 
 /**
  * Captures a photo from a video element using canvas
  *
  * @param video - The HTMLVideoElement with active stream
+ * @param aspectRatio - Optional aspect ratio to crop to
  * @returns Promise resolving to a Blob containing the captured image
  * @throws Error if canvas context unavailable or blob creation fails
  */
-export async function captureFromVideo(video: HTMLVideoElement): Promise<Blob> {
+export async function captureFromVideo(
+  video: HTMLVideoElement,
+  aspectRatio?: AspectRatio
+): Promise<Blob> {
+  const videoWidth = video.videoWidth;
+  const videoHeight = video.videoHeight;
+
+  // Calculate crop region if aspect ratio specified
+  const crop = aspectRatio
+    ? calculateCropRegion(videoWidth, videoHeight, aspectRatio)
+    : { sx: 0, sy: 0, sw: videoWidth, sh: videoHeight };
+
   const canvas = document.createElement("canvas");
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
+  canvas.width = crop.sw;
+  canvas.height = crop.sh;
 
   const ctx = canvas.getContext("2d");
   if (!ctx) {
     throw new Error("Could not get canvas context");
   }
 
-  ctx.drawImage(video, 0, 0);
+  // Draw cropped region to canvas
+  ctx.drawImage(
+    video,
+    crop.sx, crop.sy, crop.sw, crop.sh, // source rect
+    0, 0, crop.sw, crop.sh              // dest rect
+  );
 
   return new Promise((resolve, reject) => {
     canvas.toBlob(
@@ -45,15 +118,25 @@ export async function captureFromVideo(video: HTMLVideoElement): Promise<Blob> {
  * Captures a mirrored photo from a video element (for front camera selfies)
  *
  * @param video - The HTMLVideoElement with active stream
+ * @param aspectRatio - Optional aspect ratio to crop to
  * @returns Promise resolving to a Blob containing the mirrored captured image
  * @throws Error if canvas context unavailable or blob creation fails
  */
 export async function captureFromVideoMirrored(
-  video: HTMLVideoElement
+  video: HTMLVideoElement,
+  aspectRatio?: AspectRatio
 ): Promise<Blob> {
+  const videoWidth = video.videoWidth;
+  const videoHeight = video.videoHeight;
+
+  // Calculate crop region if aspect ratio specified
+  const crop = aspectRatio
+    ? calculateCropRegion(videoWidth, videoHeight, aspectRatio)
+    : { sx: 0, sy: 0, sw: videoWidth, sh: videoHeight };
+
   const canvas = document.createElement("canvas");
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
+  canvas.width = crop.sw;
+  canvas.height = crop.sh;
 
   const ctx = canvas.getContext("2d");
   if (!ctx) {
@@ -63,7 +146,13 @@ export async function captureFromVideoMirrored(
   // Mirror the image horizontally for natural selfie appearance
   ctx.translate(canvas.width, 0);
   ctx.scale(-1, 1);
-  ctx.drawImage(video, 0, 0);
+
+  // Draw cropped region to canvas (mirrored)
+  ctx.drawImage(
+    video,
+    crop.sx, crop.sy, crop.sw, crop.sh, // source rect
+    0, 0, crop.sw, crop.sh              // dest rect
+  );
 
   return new Promise((resolve, reject) => {
     canvas.toBlob(

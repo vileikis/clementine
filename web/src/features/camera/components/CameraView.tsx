@@ -35,7 +35,6 @@ import {
   captureFromVideo,
   captureFromVideoMirrored,
   createCaptureFile,
-  getVideoDimensions,
   parseMediaError,
   createUnavailableError,
   isMediaDevicesAvailable,
@@ -201,14 +200,26 @@ export const CameraView = forwardRef<CameraViewRef, CameraViewProps>(
 
       try {
         // Use mirrored capture for front camera (natural selfie appearance)
+        // Pass aspectRatio to crop the capture to the desired ratio
         const blob =
           facing === "user"
-            ? await captureFromVideoMirrored(video)
-            : await captureFromVideo(video);
+            ? await captureFromVideoMirrored(video, aspectRatio)
+            : await captureFromVideo(video, aspectRatio);
 
         const file = createCaptureFile(blob);
-        const dimensions = getVideoDimensions(video);
         const previewUrl = URL.createObjectURL(file);
+
+        // Get dimensions from the captured blob (reflects cropping)
+        const img = new Image();
+        const dimensions = await new Promise<{ width: number; height: number }>(
+          (resolve) => {
+            img.onload = () => {
+              resolve({ width: img.naturalWidth, height: img.naturalHeight });
+              URL.revokeObjectURL(img.src);
+            };
+            img.src = URL.createObjectURL(file);
+          }
+        );
 
         return {
           previewUrl,
@@ -221,7 +232,7 @@ export const CameraView = forwardRef<CameraViewRef, CameraViewProps>(
         console.error("Failed to capture photo:", err);
         return null;
       }
-    }, [facing]);
+    }, [facing, aspectRatio]);
 
     // Expose imperative methods via ref
     useImperativeHandle(
