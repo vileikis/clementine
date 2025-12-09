@@ -156,7 +156,6 @@ export function CameraCapture({
   // Combined video ref - stores element locally and passes to camera hook
   const videoRef = useCallback(
     (element: HTMLVideoElement | null) => {
-      console.log("[CameraCapture] videoRef callback, element:", element);
       videoElementRef.current = element;
       cameraVideoRef(element);
     },
