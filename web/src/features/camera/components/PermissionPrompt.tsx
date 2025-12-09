@@ -4,89 +4,130 @@
  * PermissionPrompt Component
  *
  * Displays explanation and button to request camera permission.
- * Follows best practice of user-initiated permission requests.
+ * Shows different UI for undetermined vs denied permission states.
  */
 
-import { Camera, AlertCircle } from "lucide-react";
+import { Camera, CameraOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { CameraCaptureLabels, CameraCaptureError } from "../types";
+import type { CameraCaptureLabels, PermissionState } from "../types";
 import { DEFAULT_LABELS } from "../constants";
 
 interface PermissionPromptProps {
   /** Custom labels for i18n */
   labels?: CameraCaptureLabels;
+  /** Current permission status */
+  permissionStatus: PermissionState;
   /** Called when user taps Allow Camera button */
   onRequestPermission: () => void;
-  /** Called when user taps Choose from Library button */
-  onOpenLibrary?: () => void;
-  /** Whether to show library option */
-  showLibraryOption?: boolean;
-  /** Error from previous permission attempt */
-  error?: CameraCaptureError | null;
 }
 
 /**
- * Permission prompt UI with explanation and action button
+ * Detect if running in a mobile browser
  */
-export function PermissionPrompt({
-  labels = {},
+function isMobileBrowser(): boolean {
+  if (typeof navigator === "undefined") return false;
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
+/**
+ * Get instructions for enabling camera based on platform
+ */
+function getDeniedInstructions(): string {
+  if (isMobileBrowser()) {
+    return "To use the camera, please go to your device settings, find your browser app, and enable camera access. Then return here and refresh the page.";
+  }
+  return "To use the camera, click the camera icon in your browser's address bar or go to site settings and allow camera access. Then refresh this page.";
+}
+
+/**
+ * Permission prompt for undetermined state - user hasn't been asked yet
+ */
+function UndeterminedPrompt({
+  labels,
   onRequestPermission,
-  onOpenLibrary,
-  showLibraryOption = true,
-  error,
-}: PermissionPromptProps) {
-  const mergedLabels = { ...DEFAULT_LABELS, ...labels };
-
-  const hasError = error && error.code === "PERMISSION_DENIED";
-
+}: {
+  labels: Required<CameraCaptureLabels>;
+  onRequestPermission: () => void;
+}) {
   return (
-    <div className="flex flex-col items-center justify-center h-full p-6 text-center">
+    <div className="flex flex-col items-center justify-center h-full p-6 text-center bg-black">
       {/* Camera icon */}
-      <div className="mb-6 p-4 rounded-full bg-muted">
-        <Camera className="size-12 text-muted-foreground" aria-hidden="true" />
+      <div className="mb-6 p-4 rounded-full bg-white/10">
+        <Camera className="size-12 text-white" aria-hidden="true" />
       </div>
 
-      {/* Title */}
-      <h2 className="text-xl font-semibold mb-2">
-        {hasError ? mergedLabels.permissionDenied : mergedLabels.permissionTitle}
+      {/* Header */}
+      <h2 className="text-xl font-semibold mb-2 text-white">
+        Allow camera access
       </h2>
 
       {/* Description */}
-      <p className="text-muted-foreground mb-4 max-w-xs">
-        {hasError
-          ? mergedLabels.permissionDeniedHint
-          : mergedLabels.permissionDescription}
+      <p className="text-white/70 mb-6 max-w-xs">
+        {labels.permissionDescription}
       </p>
 
-      {/* Error message */}
-      {hasError && (
-        <div className="flex items-center gap-2 text-destructive text-sm mb-4">
-          <AlertCircle className="size-4" />
-          <span>{error.message}</span>
-        </div>
-      )}
-
-      {/* Action buttons */}
-      <div className="flex flex-col gap-3 w-full max-w-xs mt-4">
+      {/* Action button - white bg, black text like PhotoReview */}
+      <div className="w-full max-w-xs">
         <Button
           onClick={onRequestPermission}
-          className="w-full min-h-[44px]"
-          aria-label={mergedLabels.allowCamera}
+          className="w-full min-h-[44px] bg-white text-black hover:bg-white/90"
+          aria-label={labels.allowCamera}
         >
-          {hasError ? "Try Again" : mergedLabels.allowCamera}
+          {labels.allowCamera}
         </Button>
-
-        {showLibraryOption && onOpenLibrary && (
-          <Button
-            variant="outline"
-            onClick={onOpenLibrary}
-            className="w-full min-h-[44px]"
-            aria-label={mergedLabels.openLibrary}
-          >
-            {mergedLabels.openLibrary}
-          </Button>
-        )}
       </div>
     </div>
+  );
+}
+
+/**
+ * Permission prompt for denied state - user has blocked camera access
+ */
+function DeniedPrompt({
+  labels,
+}: {
+  labels: Required<CameraCaptureLabels>;
+}) {
+  const instructions = getDeniedInstructions();
+
+  return (
+    <div className="flex flex-col items-center justify-center h-full p-6 text-center bg-black">
+      {/* Camera off icon */}
+      <div className="mb-6 p-4 rounded-full bg-white/10">
+        <CameraOff className="size-12 text-white" aria-hidden="true" />
+      </div>
+
+      {/* Header */}
+      <h2 className="text-xl font-semibold mb-2 text-white">
+        Could not access camera
+      </h2>
+
+      {/* Description */}
+      <p className="text-white/70 max-w-xs">
+        {instructions}
+      </p>
+    </div>
+  );
+}
+
+/**
+ * Permission prompt UI - shows different content based on permission state
+ */
+export function PermissionPrompt({
+  labels = {},
+  permissionStatus,
+  onRequestPermission,
+}: PermissionPromptProps) {
+  const mergedLabels = { ...DEFAULT_LABELS, ...labels };
+
+  if (permissionStatus === "denied") {
+    return <DeniedPrompt labels={mergedLabels} />;
+  }
+
+  return (
+    <UndeterminedPrompt
+      labels={mergedLabels}
+      onRequestPermission={onRequestPermission}
+    />
   );
 }
