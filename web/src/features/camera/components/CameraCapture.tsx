@@ -5,6 +5,12 @@
  *
  * Main container component for the camera capture flow.
  * Manages state machine for permission → camera → review flow.
+ *
+ * Architecture:
+ * - CameraView: Owns video element, exposes takePhoto() via ref
+ * - useCamera: Manages MediaStream lifecycle
+ * - useLibraryPicker: Handles file input for library selection
+ * - cameraReducer: Tracks UI state only (no camera hardware state)
  */
 
 import { useReducer, useCallback, useRef, useEffect } from "react";
@@ -17,6 +23,15 @@ import type {
   CameraCaptureLabels,
   AspectRatio,
 } from "../types";
+import { DEFAULT_LABELS } from "../constants";
+import { checkCameraPermission, cameraReducer, INITIAL_CAMERA_STATE } from "../lib";
+import { useCamera } from "../hooks/useCamera";
+import { useLibraryPicker } from "../hooks/useLibraryPicker";
+import { PermissionPrompt } from "./PermissionPrompt";
+import { CameraView, type CameraViewRef } from "./CameraView";
+import { CameraControls } from "./CameraControls";
+import { PhotoReview } from "./PhotoReview";
+import { ErrorState } from "./ErrorState";
 
 export interface CameraCaptureProps {
   /** Called when photo taken/selected (enters review) */
@@ -42,15 +57,6 @@ export interface CameraCaptureProps {
   /** Custom labels for i18n */
   labels?: CameraCaptureLabels;
 }
-import { DEFAULT_LABELS } from "../constants";
-import { checkCameraPermission, cameraReducer, INITIAL_CAMERA_STATE } from "../lib";
-import { useCamera } from "../hooks/useCamera";
-import { usePhotoCapture } from "../hooks/usePhotoCapture";
-import { PermissionPrompt } from "./PermissionPrompt";
-import { CameraView } from "./CameraView";
-import { CameraControls } from "./CameraControls";
-import { PhotoReview } from "./PhotoReview";
-import { ErrorState } from "./ErrorState";
 
 /**
  * CameraCapture - Main camera capture component
@@ -91,14 +97,12 @@ export function CameraCapture({
 
   const [state, dispatch] = useReducer(cameraReducer, INITIAL_CAMERA_STATE);
 
-  // Refs for maintaining state across renders
-  const currentStreamRef = useRef<MediaStream | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const videoElementRef = useRef<HTMLVideoElement | null>(null);
+  // Ref for CameraView to call takePhoto()
+  const cameraViewRef = useRef<CameraViewRef>(null);
 
-  // Camera hook
+  // Camera hook - manages stream lifecycle
   const {
-    videoRef: cameraVideoRef,
+    videoRef,
     facing,
     startCamera,
     stopCamera,
@@ -112,41 +116,47 @@ export function CameraCapture({
     },
   });
 
-  // Combined video ref - stores element locally and passes to camera hook
-  const videoRef = useCallback(
-    (element: HTMLVideoElement | null) => {
-      videoElementRef.current = element;
-      cameraVideoRef(element);
-    },
-    [cameraVideoRef]
-  );
-
-  // Photo capture hook
-  const { capturePhoto, processLibraryFile } = usePhotoCapture({
-    onCapture: (photo) => {
+  // Library picker hook - manages file input
+  const { fileInputRef, openPicker, handleFileChange } = useLibraryPicker({
+    onSelect: (photo) => {
       onPhoto?.(photo);
       dispatch({ type: "PHOTO_CAPTURED", photo });
     },
-    onError: (error) => {
-      onError?.(error);
-    },
+    onError,
   });
+
+  /**
+   * Get target camera facing based on configuration
+   * Consolidates the repeated logic from before
+   */
+  const getTargetFacing = useCallback(
+    (override?: CameraFacing): CameraFacing =>
+      cameraFacing === "both"
+        ? (override ?? initialFacing)
+        : (cameraFacing as CameraFacing),
+    [cameraFacing, initialFacing]
+  );
+
+  /**
+   * Unified camera initialization
+   * Used by permission request, auto-start, and retake
+   */
+  const initializeCamera = useCallback(
+    async (targetFacing: CameraFacing): Promise<boolean> => {
+      const stream = await startCamera(targetFacing);
+      if (stream) {
+        dispatch({ type: "PERMISSION_GRANTED" });
+        return true;
+      }
+      return false;
+    },
+    [startCamera]
+  );
 
   // Handle permission request
   const handleRequestPermission = useCallback(async () => {
-    const targetFacing =
-      cameraFacing === "both" ? initialFacing : (cameraFacing as CameraFacing);
-    const stream = await startCamera(targetFacing);
-
-    if (stream) {
-      currentStreamRef.current = stream;
-      dispatch({
-        type: "PERMISSION_GRANTED",
-        stream,
-        facing: targetFacing,
-      });
-    }
-  }, [startCamera, cameraFacing, initialFacing]);
+    await initializeCamera(getTargetFacing());
+  }, [initializeCamera, getTargetFacing]);
 
   // Check permission on mount and auto-start camera if already granted
   useEffect(() => {
@@ -162,65 +172,49 @@ export function CameraCapture({
       }
 
       // Permission granted, try to auto-start camera
-      const targetFacing =
-        cameraFacing === "both"
-          ? initialFacing
-          : (cameraFacing as CameraFacing);
-      const stream = await startCamera(targetFacing);
-
-      if (!stream) {
+      const success = await initializeCamera(getTargetFacing());
+      if (!success) {
         dispatch({ type: "SHOW_PERMISSION_PROMPT" });
-        return;
       }
-
-      currentStreamRef.current = stream;
-      dispatch({
-        type: "PERMISSION_GRANTED",
-        stream,
-        facing: targetFacing,
-      });
     }
 
     checkAndStartCamera();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.status]);
 
-  // Handle photo capture
+  // Handle photo capture via CameraView ref
   const handleCapture = useCallback(async () => {
-    if (!videoElementRef.current) return;
-    await capturePhoto(videoElementRef.current, facing);
-  }, [capturePhoto, facing]);
+    const photo = await cameraViewRef.current?.takePhoto();
+    if (photo) {
+      onPhoto?.(photo);
+      dispatch({ type: "PHOTO_CAPTURED", photo });
+    } else {
+      onError?.({
+        code: "CAPTURE_FAILED",
+        message: "Failed to capture photo",
+      });
+    }
+  }, [onPhoto, onError]);
 
   // Handle camera flip
   const handleFlipCamera = useCallback(async () => {
-    const stream = await switchCamera();
-    if (stream) {
-      currentStreamRef.current = stream;
-      const newFacing = facing === "user" ? "environment" : "user";
-      dispatch({ type: "FLIP_CAMERA", stream, facing: newFacing });
-    }
-  }, [switchCamera, facing]);
+    await switchCamera();
+    // No dispatch needed - useCamera hook manages facing state internally
+    // UI re-renders via the `facing` value from useCamera
+  }, [switchCamera]);
 
   // Handle retake
   const handleRetake = useCallback(async () => {
     onRetake?.();
 
-    // Try to restart camera
-    const targetFacing =
-      cameraFacing === "both" ? facing : (cameraFacing as CameraFacing);
-    const stream = await startCamera(targetFacing);
+    // Try to restart camera with current facing (or config-determined facing)
+    const targetFacing = getTargetFacing(facing);
+    const success = await initializeCamera(targetFacing);
 
-    if (stream) {
-      currentStreamRef.current = stream;
-      dispatch({
-        type: "PERMISSION_GRANTED",
-        stream,
-        facing: targetFacing,
-      });
-    } else {
+    if (!success) {
       dispatch({ type: "RESET" });
     }
-  }, [onRetake, startCamera, cameraFacing, facing]);
+  }, [onRetake, initializeCamera, getTargetFacing, facing]);
 
   // Handle photo confirm
   const handleConfirm = useCallback(() => {
@@ -229,26 +223,7 @@ export function CameraCapture({
     }
   }, [state, onSubmit]);
 
-  // Handle library file selection
-  const handleOpenLibrary = useCallback(() => {
-    fileInputRef.current?.click();
-  }, []);
-
-  const handleFileChange = useCallback(
-    async (event: React.ChangeEvent<HTMLInputElement>) => {
-      const file = event.target.files?.[0];
-      if (!file) return;
-
-      await processLibraryFile(file);
-
-      // Reset input so same file can be selected again
-      event.target.value = "";
-    },
-    [processLibraryFile]
-  );
-
-  // Cleanup on unmount - use empty deps to only run on actual unmount
-  // stopCamera uses streamRef internally so it will clean up the correct stream
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
       stopCamera();
@@ -289,7 +264,7 @@ export function CameraCapture({
         <PermissionPrompt
           labels={mergedLabels}
           onRequestPermission={handleRequestPermission}
-          onOpenLibrary={enableLibrary ? handleOpenLibrary : undefined}
+          onOpenLibrary={enableLibrary ? openPicker : undefined}
           showLibraryOption={enableLibrary}
         />
       )}
@@ -299,6 +274,7 @@ export function CameraCapture({
         <div className="flex flex-col h-full">
           <div className="flex-1 relative">
             <CameraView
+              ref={cameraViewRef}
               videoRef={videoRef}
               facing={facing}
               aspectRatio={aspectRatio}
@@ -310,7 +286,7 @@ export function CameraCapture({
             showLibraryButton={showLibraryButton}
             onCapture={handleCapture}
             onFlipCamera={handleFlipCamera}
-            onOpenLibrary={handleOpenLibrary}
+            onOpenLibrary={openPicker}
           />
         </div>
       )}
@@ -333,7 +309,7 @@ export function CameraCapture({
           showRetry
           showLibraryFallback={enableLibrary}
           onRetry={handleRequestPermission}
-          onOpenLibrary={handleOpenLibrary}
+          onOpenLibrary={openPicker}
         />
       )}
     </div>

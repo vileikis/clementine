@@ -107,28 +107,29 @@ export type CameraStateStatus =
 
 /**
  * Internal state machine state (used by CameraCapture)
+ *
+ * Note: Camera hardware state (stream, facing) is managed by useCamera hook.
+ * The reducer only tracks UI state to avoid duplication and sync issues.
  */
 export type CameraState =
   | { status: "checking-permission" }
   | { status: "permission-prompt" }
-  | {
-      status: "camera-active";
-      stream: MediaStream | null;
-      facing: CameraFacing;
-    }
+  | { status: "camera-active" }
   | { status: "photo-review"; photo: CapturedPhoto }
   | { status: "error"; error: CameraCaptureError };
 
 /**
  * Internal state machine actions
+ *
+ * Note: FLIP_CAMERA removed - handled internally by useCamera hook,
+ * no UI state change needed.
  */
 export type CameraAction =
   | { type: "SHOW_PERMISSION_PROMPT" }
-  | { type: "PERMISSION_GRANTED"; stream: MediaStream; facing: CameraFacing }
+  | { type: "PERMISSION_GRANTED" }
   | { type: "PERMISSION_DENIED"; error: CameraCaptureError }
   | { type: "PHOTO_CAPTURED"; photo: CapturedPhoto }
-  | { type: "RETAKE"; facing?: CameraFacing }
-  | { type: "FLIP_CAMERA"; stream: MediaStream; facing: CameraFacing }
+  | { type: "RETAKE" }
   | { type: "ERROR"; error: CameraCaptureError }
   | { type: "RESET" };
 

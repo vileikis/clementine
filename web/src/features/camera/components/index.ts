@@ -4,7 +4,7 @@
 
 export { CameraCapture } from "./CameraCapture";
 export { PermissionPrompt } from "./PermissionPrompt";
-export { CameraView } from "./CameraView";
+export { CameraView, type CameraViewRef } from "./CameraView";
 export { CameraControls } from "./CameraControls";
 export { PhotoReview } from "./PhotoReview";
 export { LibraryPicker } from "./LibraryPicker";
