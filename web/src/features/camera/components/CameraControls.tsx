@@ -54,9 +54,10 @@ export function CameraControls({
         className
       )}
     >
-      {/* Library button (left) */}
-      {showLibraryButton ? (
+      {/* Library button (left) - only render when handler is provided */}
+      {showLibraryButton && onOpenLibrary ? (
         <Button
+          type="button"
           variant="ghost"
           size="icon"
           onClick={onOpenLibrary}
@@ -73,6 +74,7 @@ export function CameraControls({
 
       {/* Capture button (center) - 64x64px for easy touch */}
       <button
+        type="button"
         onClick={onCapture}
         disabled={isCapturing}
         className={cn(
