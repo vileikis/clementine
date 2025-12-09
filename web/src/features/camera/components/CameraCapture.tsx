@@ -12,7 +12,7 @@
  * - cameraReducer: Tracks UI state only
  */
 
-import { useReducer, useCallback, useRef, useState } from "react";
+import { useReducer, useCallback, useRef, useState, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import type {
   CameraFacing,
@@ -111,13 +111,10 @@ export function CameraCapture({
   });
 
   /**
-   * Get target camera facing based on configuration
+   * Target camera facing based on configuration
    */
-  const getTargetFacing = useCallback(
-    (override?: CameraFacing): CameraFacing =>
-      cameraFacing === "both"
-        ? (override ?? initialFacing)
-        : (cameraFacing as CameraFacing),
+  const targetFacing = useMemo<CameraFacing>(
+    () => (cameraFacing === "both" ? initialFacing : cameraFacing),
     [cameraFacing, initialFacing]
   );
 
@@ -192,9 +189,6 @@ export function CameraCapture({
     hasMultipleCameras &&
     state.status === "camera-active";
   const showLibraryButton = enableLibrary;
-
-  // Determine target facing for CameraView
-  const targetFacing = getTargetFacing();
 
   // Should CameraView be mounted?
   // Mount during: checking-permission (to auto-start), camera-active (to show)
