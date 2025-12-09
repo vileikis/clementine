@@ -4,4 +4,4 @@
 
 export { useCameraPermission } from "./useCameraPermission";
 export { useCamera } from "./useCamera";
-export { usePhotoCapture } from "./usePhotoCapture";
+export { useLibraryPicker } from "./useLibraryPicker";

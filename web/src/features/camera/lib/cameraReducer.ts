@@ -5,6 +5,9 @@
  * checking-permission → permission-prompt → camera-active ↔ photo-review
  *                                              ↓
  *                                            error
+ *
+ * Note: Camera hardware state (stream, facing) is managed by useCamera hook.
+ * This reducer only tracks UI state to avoid duplication and sync issues.
  */
 
 import type { CameraState, CameraAction } from "../types";
@@ -27,11 +30,7 @@ export function cameraReducer(
       return { status: "permission-prompt" };
 
     case "PERMISSION_GRANTED":
-      return {
-        status: "camera-active",
-        stream: action.stream,
-        facing: action.facing,
-      };
+      return { status: "camera-active" };
 
     case "PERMISSION_DENIED":
       return {
@@ -49,20 +48,9 @@ export function cameraReducer(
       // Return to camera active - the handler will restart the camera
       // Since permission was already granted, we go directly to camera-active
       if (state.status === "photo-review") {
-        return {
-          status: "camera-active",
-          stream: null, // Will be set by handleRetake
-          facing: action.facing ?? "user",
-        };
+        return { status: "camera-active" };
       }
       return state;
-
-    case "FLIP_CAMERA":
-      return {
-        status: "camera-active",
-        stream: action.stream,
-        facing: action.facing,
-      };
 
     case "ERROR":
       return {
