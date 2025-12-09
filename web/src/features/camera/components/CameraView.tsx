@@ -209,13 +209,27 @@ export const CameraView = forwardRef<CameraViewRef, CameraViewProps>(
 
         // Get dimensions from the captured blob (reflects cropping)
         const img = new Image();
+        const imgUrl = URL.createObjectURL(file);
         const dimensions = await new Promise<{ width: number; height: number }>(
-          (resolve) => {
-            img.onload = () => {
-              resolve({ width: img.naturalWidth, height: img.naturalHeight });
-              URL.revokeObjectURL(img.src);
+          (resolve, reject) => {
+            const cleanup = () => {
+              URL.revokeObjectURL(imgUrl);
+              img.onload = null;
+              img.onerror = null;
             };
-            img.src = URL.createObjectURL(file);
+
+            img.onload = () => {
+              const dims = { width: img.naturalWidth, height: img.naturalHeight };
+              cleanup();
+              resolve(dims);
+            };
+
+            img.onerror = () => {
+              cleanup();
+              reject(new Error("Failed to load captured image for dimension extraction"));
+            };
+
+            img.src = imgUrl;
           }
         );
 
@@ -257,10 +271,9 @@ export const CameraView = forwardRef<CameraViewRef, CameraViewProps>(
 
     // Handle tab visibility change - pause/resume when tab loses/gains focus
     useEffect(() => {
-      if (!streamRef.current) return;
-
       const handleVisibilityChange = () => {
-        if (!videoRef.current) return;
+        // Guard: only act if stream and video are available
+        if (!streamRef.current || !videoRef.current) return;
 
         if (document.hidden) {
           videoRef.current.pause();

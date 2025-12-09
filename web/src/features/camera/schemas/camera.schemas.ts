@@ -4,28 +4,7 @@
  * Zod schemas for file validation.
  */
 
-import { z } from "zod";
 import { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE } from "../constants";
-
-/**
- * Schema for validating image file type
- */
-export const imageTypeSchema = z.enum(ACCEPTED_IMAGE_TYPES).catch("image/jpeg");
-
-/**
- * Schema for validating file size
- */
-export const fileSizeSchema = z.number().max(MAX_FILE_SIZE, {
-  message: `File size must be less than ${MAX_FILE_SIZE / 1024 / 1024}MB`,
-});
-
-/**
- * Schema for validating a File object selected from library
- */
-export const imageFileSchema = z.object({
-  type: imageTypeSchema,
-  size: fileSizeSchema,
-});
 
 /**
  * Validates a File object for image type and size

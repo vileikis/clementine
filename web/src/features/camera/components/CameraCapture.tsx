@@ -186,7 +186,6 @@ export function CameraCapture({
         ref={fileInputRef}
         type="file"
         accept="image/jpeg,image/png,image/gif,image/webp"
-        capture="environment"
         onChange={handleFileChange}
         className="hidden"
         aria-hidden="true"
