@@ -142,7 +142,7 @@ export type CameraState =
   | { status: "permission-prompt" }
   | {
       status: "camera-active";
-      stream: MediaStream;
+      stream: MediaStream | null;
       facing: CameraFacing;
     }
   | { status: "photo-review"; photo: CapturedPhoto }
@@ -156,7 +156,7 @@ export type CameraAction =
   | { type: "PERMISSION_GRANTED"; stream: MediaStream; facing: CameraFacing }
   | { type: "PERMISSION_DENIED"; error: CameraCaptureError }
   | { type: "PHOTO_CAPTURED"; photo: CapturedPhoto }
-  | { type: "RETAKE" }
+  | { type: "RETAKE"; facing?: CameraFacing }
   | { type: "FLIP_CAMERA"; stream: MediaStream; facing: CameraFacing }
   | { type: "ERROR"; error: CameraCaptureError }
   | { type: "LIBRARY_ONLY" }

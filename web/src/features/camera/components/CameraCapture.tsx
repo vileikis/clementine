@@ -19,7 +19,7 @@ import { DEFAULT_LABELS } from "../constants";
 import { useCamera } from "../hooks/useCamera";
 import { usePhotoCapture } from "../hooks/usePhotoCapture";
 import { PermissionPrompt } from "./PermissionPrompt";
-import { CameraViewfinder } from "./CameraViewfinder";
+import { CameraView } from "./CameraView";
 import { CameraControls } from "./CameraControls";
 import { PhotoReview } from "./PhotoReview";
 import { ErrorState } from "./ErrorState";
@@ -49,9 +49,14 @@ function cameraReducer(state: CameraState, action: CameraAction): CameraState {
       };
 
     case "RETAKE":
-      // Return to camera active if we had a stream, otherwise permission prompt
+      // Return to camera active - the handler will restart the camera
+      // Since permission was already granted, we go directly to camera-active
       if (state.status === "photo-review") {
-        return { status: "permission-prompt" };
+        return {
+          status: "camera-active",
+          stream: null, // Will be set by handleRetake
+          facing: action.facing ?? "user",
+        };
       }
       return state;
 
@@ -130,10 +135,11 @@ export function CameraCapture({
   // Refs for maintaining state across renders
   const currentStreamRef = useRef<MediaStream | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoElementRef = useRef<HTMLVideoElement | null>(null);
 
   // Camera hook
   const {
-    videoRef,
+    videoRef: cameraVideoRef,
     facing,
     startCamera,
     stopCamera,
@@ -146,6 +152,16 @@ export function CameraCapture({
       dispatch({ type: "PERMISSION_DENIED", error });
     },
   });
+
+  // Combined video ref - stores element locally and passes to camera hook
+  const videoRef = useCallback(
+    (element: HTMLVideoElement | null) => {
+      console.log("[CameraCapture] videoRef callback, element:", element);
+      videoElementRef.current = element;
+      cameraVideoRef(element);
+    },
+    [cameraVideoRef]
+  );
 
   // Photo capture hook
   const { capturePhoto, processLibraryFile } = usePhotoCapture({
@@ -176,9 +192,9 @@ export function CameraCapture({
 
   // Handle photo capture
   const handleCapture = useCallback(async () => {
-    if (!videoRef.current) return;
-    await capturePhoto(videoRef.current, facing);
-  }, [capturePhoto, videoRef, facing]);
+    if (!videoElementRef.current) return;
+    await capturePhoto(videoElementRef.current, facing);
+  }, [capturePhoto, facing]);
 
   // Handle camera flip
   const handleFlipCamera = useCallback(async () => {
@@ -236,12 +252,14 @@ export function CameraCapture({
     [processLibraryFile]
   );
 
-  // Cleanup on unmount
+  // Cleanup on unmount - use empty deps to only run on actual unmount
+  // stopCamera uses streamRef internally so it will clean up the correct stream
   useEffect(() => {
     return () => {
       stopCamera();
     };
-  }, [stopCamera]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Determine what controls to show
   const showFlipButton =
@@ -277,8 +295,8 @@ export function CameraCapture({
       {state.status === "camera-active" && (
         <div className="flex flex-col h-full">
           <div className="flex-1 relative">
-            <CameraViewfinder
-              ref={videoRef}
+            <CameraView
+              videoRef={videoRef}
               facing={facing}
               aspectRatio={aspectRatio}
             />
