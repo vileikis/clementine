@@ -169,6 +169,7 @@ export type CameraAction =
  * Permission state for useCameraPermission hook
  */
 export type PermissionState =
+  | "checking"
   | "prompt"
   | "requesting"
   | "granted"

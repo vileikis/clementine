@@ -10,4 +10,11 @@ export {
 
 export { getImageDimensions, getVideoDimensions } from "./image-utils";
 
+export {
+  parseMediaError,
+  createUnavailableError,
+  isMediaDevicesAvailable,
+  checkCameraPermission,
+} from "./errors";
+
 export type { ImageDimensions } from "./image-utils";
