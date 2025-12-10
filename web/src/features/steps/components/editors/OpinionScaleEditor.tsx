@@ -23,7 +23,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { BaseStepEditor } from "./BaseStepEditor";
-import { useAutoSave } from "../../hooks";
+import { useAutoSave } from "@/hooks";
 import { STEP_CONSTANTS } from "../../constants";
 import { stepMediaTypeSchema } from "../../schemas";
 import type { StepOpinionScale } from "../../types";

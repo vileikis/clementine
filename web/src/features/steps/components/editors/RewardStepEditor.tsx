@@ -22,7 +22,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { BaseStepEditor } from "./BaseStepEditor";
-import { useAutoSave } from "../../hooks";
+import { useAutoSave } from "@/hooks";
 import { STEP_CONSTANTS } from "../../constants";
 import { stepMediaTypeSchema } from "../../schemas";
 import type { StepReward, ShareSocial } from "../../types";

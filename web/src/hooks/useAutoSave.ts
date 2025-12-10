@@ -3,18 +3,18 @@
 /**
  * Hook: useAutoSave
  *
- * Provides debounced auto-save functionality for step editor forms.
+ * Provides debounced auto-save functionality for forms.
  * Automatically detects changed fields and triggers updates only when necessary.
  */
 
 import { useRef, useCallback, useEffect } from "react";
 import type { UseFormReturn, FieldValues } from "react-hook-form";
-import { getChangedFields } from "../utils";
+import { getChangedFields } from "@/lib/utils/form-diff";
 
 interface UseAutoSaveOptions<TFormValues extends FieldValues, TOriginal> {
   /** React Hook Form instance */
   form: UseFormReturn<TFormValues>;
-  /** Original step data to compare against */
+  /** Original data to compare against */
   originalValues: TOriginal;
   /** Callback to persist changes */
   onUpdate: (updates: Partial<TFormValues>) => Promise<void>;
@@ -36,7 +36,7 @@ interface UseAutoSaveResult {
  * ```tsx
  * const { handleBlur } = useAutoSave({
  *   form,
- *   originalValues: step,
+ *   originalValues: data,
  *   onUpdate,
  *   fieldsToCompare: ['title', 'description', 'mediaUrl', 'ctaLabel', 'config'],
  * });
