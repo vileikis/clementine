@@ -4,7 +4,7 @@ import { useReducer, useTransition } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { PreviewPanel } from "@/features/projects/components/designer/PreviewPanel";
+import { PreviewShell } from "@/features/preview-shell";
 import { ImageUploadField } from "@/components/shared/ImageUploadField";
 import { updateEventThemeAction } from "../../actions/events.actions";
 import { useRouter } from "next/navigation";
@@ -448,7 +448,7 @@ export function EventThemeEditor({ event, projectId }: EventThemeEditorProps) {
 
         {/* Live Preview - Sticky */}
         <div className="lg:sticky lg:top-4">
-          <PreviewPanel>
+          <PreviewShell enableViewportSwitcher enableFullscreen>
             <ThemedBackground
               background={theme.background}
               fontFamily={theme.fontFamily}
@@ -476,7 +476,7 @@ export function EventThemeEditor({ event, projectId }: EventThemeEditorProps) {
                 Primary Button
               </Button>
             </ThemedBackground>
-          </PreviewPanel>
+          </PreviewShell>
         </div>
       </div>
     </div>

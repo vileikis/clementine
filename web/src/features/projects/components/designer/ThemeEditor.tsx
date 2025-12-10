@@ -5,7 +5,7 @@ import type { Project } from "../../types/project.types";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { PreviewPanel } from "./PreviewPanel";
+import { PreviewShell } from "@/features/preview-shell";
 import { ImageUploadField } from "@/components/shared/ImageUploadField";
 import { updateProjectTheme } from "../../actions/projects.actions";
 import { useRouter } from "next/navigation";
@@ -444,7 +444,7 @@ export function ThemeEditor({ project }: ThemeEditorProps) {
 
         {/* Live Preview - Sticky */}
         <div className="lg:sticky lg:top-4">
-          <PreviewPanel>
+          <PreviewShell enableViewportSwitcher enableFullscreen>
             <ThemedBackground
               background={theme.background}
               fontFamily={theme.fontFamily}
@@ -472,7 +472,7 @@ export function ThemeEditor({ project }: ThemeEditorProps) {
                 Primary Button
               </Button>
             </ThemedBackground>
-          </PreviewPanel>
+          </PreviewShell>
         </div>
       </div>
     </div>
