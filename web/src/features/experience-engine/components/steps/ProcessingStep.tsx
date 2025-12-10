@@ -10,7 +10,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Loader2, AlertCircle } from "lucide-react";
 import { StepLayout } from "@/components/step-primitives";
-import { useEventTheme } from "@/components/providers/EventThemeProvider";
+import { useEventTheme } from "@/features/theming";
 import type { StepProcessing } from "@/features/steps/types";
 import type { StepRendererProps } from "../../types";
 

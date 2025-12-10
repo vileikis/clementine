@@ -12,7 +12,7 @@
  * - "playback": Interactive mode with value persistence (for experience playback)
  */
 
-import { EventThemeProvider } from "@/components/providers/EventThemeProvider";
+import { ThemeProvider } from "@/features/theming";
 import { DeviceFrame } from "./DeviceFrame";
 import { ViewportModeProvider } from "./ViewportModeContext";
 import type { Step } from "@/features/steps/types";
@@ -80,7 +80,7 @@ export function PreviewRuntime({
   const isInteractive = mode === "playback";
 
   return (
-    <EventThemeProvider theme={theme}>
+    <ThemeProvider theme={theme}>
       <ViewportModeProvider mode={viewportMode}>
         <div className="h-full w-full flex justify-center">
           <DeviceFrame viewportMode={viewportMode}>
@@ -97,7 +97,7 @@ export function PreviewRuntime({
           </DeviceFrame>
         </div>
       </ViewportModeProvider>
-    </EventThemeProvider>
+    </ThemeProvider>
   );
 }
 
