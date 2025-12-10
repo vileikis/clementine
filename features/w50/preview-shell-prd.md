@@ -2,7 +2,15 @@
 
 ## Overview
 
-Create a reusable **preview shell** feature module that provides themed device preview capabilities across the application. This module extracts and generalizes the preview infrastructure currently embedded in the `steps` feature.
+Create a reusable **preview-shell** feature module that provides device preview capabilities across the application. This module extracts and generalizes the preview infrastructure (viewport switching, device framing, fullscreen mode) currently embedded in the `steps` feature.
+
+## Dependencies
+
+**Requires**: `theming` module (see `theming-prd.md`)
+- Uses `ThemedBackground` component for background styling
+- Uses `Theme` types for type definitions
+
+**Implementation Order**: theming → preview-shell
 
 ## Problem Statement
 
@@ -14,6 +22,12 @@ The current preview infrastructure (DeviceFrame, ViewSwitcher, viewport modes) i
 2. **Configurability**: Developer control over features (viewport switcher, fullscreen mode)
 3. **Flexibility**: Render any children inside the preview container
 4. **Consistency**: Unified look and behavior across all preview contexts
+
+## Non-Goals
+
+- **Theming/styling**: Handled by `theming` module (`ThemedBackground`, `ThemeProvider`)
+- **Playback logic**: Step navigation, session state - stays in `steps` or `experience-engine`
+- **Step rendering**: `PreviewRuntime` and step components stay in `steps`
 
 ## Naming Discussion
 
@@ -31,6 +45,8 @@ The term "shell" accurately describes a container/wrapper that provides structur
 | `showcase` | Marketing-friendly | Less technical precision |
 
 **Verdict**: Use `preview-shell` - it's descriptive, distinguishes from step preview logic, and clearly communicates that it's a container/wrapper.
+
+---
 
 ## Requirements
 
@@ -62,17 +78,20 @@ interface PreviewShellProps {
 }
 ```
 
-**Note:** Background/theme styling is handled by wrapping content with `ThemedBackground` inside `PreviewShell`. This keeps `PreviewShell` focused on viewport/fullscreen concerns while allowing flexible theming.
+**Note:** Background/theme styling is handled by wrapping content with `ThemedBackground` from the `theming` module. This keeps `PreviewShell` focused on viewport/fullscreen concerns.
 
 **Usage Example:**
 
 ```tsx
+import { PreviewShell } from "@/features/preview-shell";
+import { ThemedBackground } from "@/features/theming";
+
 // Simple usage - just device frame
 <PreviewShell>
   <MyComponent />
 </PreviewShell>
 
-// With themed background
+// With themed background (from theming module)
 <PreviewShell enableViewportSwitcher>
   <ThemedBackground background={theme.background}>
     <MyComponent />
@@ -96,9 +115,9 @@ interface PreviewShellProps {
 </PreviewShell>
 ```
 
-#### 2. DeviceFrame (Extracted from steps)
+#### 2. DeviceFrame
 
-Reusable device frame without logo (logo is theme-specific, handled by consumer).
+Reusable device frame - pure viewport/size container.
 
 ```tsx
 interface DeviceFrameProps {
@@ -110,64 +129,11 @@ interface DeviceFrameProps {
 
 **Key changes from existing DeviceFrame:**
 - Remove logo rendering (not needed for generic use)
-- Remove background handling (moved to `ThemedBackground`)
+- Remove background handling (use `ThemedBackground` from theming module)
 - Pure viewport/frame container only
 - Maintain viewport dimensions logic
 
-#### 3. ThemedBackground (New - Extracted Pattern)
-
-Handles background color, image, and overlay - extracted from duplicate code in `ThemeEditor` and `EventThemeEditor`.
-
-```tsx
-interface ThemedBackgroundProps {
-  children: ReactNode;
-  background?: {
-    color?: string;
-    image?: string;
-    overlayOpacity?: number;
-  };
-  fontFamily?: string;
-  className?: string;
-}
-```
-
-**Usage:**
-```tsx
-// Inside DeviceFrame or standalone
-<ThemedBackground
-  background={{
-    color: theme.background.color,
-    image: theme.background.image,
-    overlayOpacity: theme.background.overlayOpacity,
-  }}
-  fontFamily={theme.fontFamily}
->
-  <YourContent />
-</ThemedBackground>
-```
-
-**Eliminates duplicate code from:**
-- `web/src/features/projects/components/designer/ThemeEditor.tsx` (lines 471-489)
-- `web/src/features/events/components/designer/EventThemeEditor.tsx` (lines 476-493)
-- `web/src/features/steps/components/preview/DeviceFrame.tsx` (lines 51-65)
-
-All three have identical:
-```tsx
-// Background image
-<div
-  className="absolute inset-0 bg-cover bg-center"
-  style={{ backgroundImage: `url(${image})` }}
-/>
-// Overlay
-{overlayOpacity > 0 && (
-  <div
-    className="absolute inset-0 bg-black"
-    style={{ opacity: overlayOpacity }}
-  />
-)}
-```
-
-#### 4. ViewportSwitcher (Extracted from steps)
+#### 3. ViewportSwitcher (Extracted from steps)
 
 Already well-designed, minimal changes needed.
 
@@ -180,7 +146,7 @@ interface ViewportSwitcherProps {
 }
 ```
 
-#### 5. FullscreenOverlay (New Component)
+#### 4. FullscreenOverlay (New Component)
 
 Full-screen preview mode with easy exit options.
 
@@ -213,7 +179,7 @@ interface FullscreenOverlayProps {
 - Optional title in header
 - ViewSwitcher in header when enabled
 
-#### 6. FullscreenTrigger (New Component)
+#### 5. FullscreenTrigger (New Component)
 
 Button to enter fullscreen mode.
 
@@ -242,15 +208,6 @@ export const VIEWPORT_DIMENSIONS: Record<ViewportMode, ViewportDimensions> = {
   mobile: { width: 375, height: 667 },
   desktop: { width: 900, height: 600 },
 };
-
-export interface PreviewTheme {
-  background?: {
-    color?: string;
-    image?: string;
-    overlayOpacity?: number;
-  };
-  fontFamily?: string;
-}
 ```
 
 ### Context (Optional)
@@ -263,6 +220,8 @@ interface ViewportContextValue {
   isFullscreen: boolean;
 }
 ```
+
+---
 
 ## UI/UX Specifications
 
@@ -308,18 +267,19 @@ Two methods:
 1. **Close Button (X)** - Top-right corner, always visible
 2. **Escape Key** - Keyboard shortcut for power users
 
+---
+
 ## File Structure
 
 ```
 web/src/features/preview-shell/
 ├── index.ts                    # Public exports
-├── types.ts                    # Type definitions
-├── constants.ts                # Viewport dimensions, etc.
+├── types.ts                    # ViewportMode, ViewportDimensions
+├── constants.ts                # VIEWPORT_DIMENSIONS
 ├── components/
 │   ├── index.ts
 │   ├── PreviewShell.tsx        # Main container component
-│   ├── DeviceFrame.tsx         # Device frame (extracted, pure container)
-│   ├── ThemedBackground.tsx    # Background color/image/overlay (new)
+│   ├── DeviceFrame.tsx         # Device frame (pure container)
 │   ├── ViewportSwitcher.tsx    # Mobile/Desktop toggle (extracted)
 │   ├── FullscreenOverlay.tsx   # Fullscreen mode overlay
 │   └── FullscreenTrigger.tsx   # Button to enter fullscreen
@@ -331,14 +291,17 @@ web/src/features/preview-shell/
     └── useFullscreen.ts        # Fullscreen state + keyboard handling
 ```
 
-## Scope: Apply to Event Theme Editor
+---
 
-**Target file**: `web/src/app/(workspace)/[companySlug]/[projectId]/[eventId]/theme/page.tsx`
-**Component**: `EventThemeEditor` in `web/src/features/events/components/designer/EventThemeEditor.tsx`
+## Scope: Apply to Theme Editors
+
+### Target Files
+- `web/src/features/events/components/designer/EventThemeEditor.tsx`
+- `web/src/features/projects/components/designer/ThemeEditor.tsx`
 
 ### Current State
 
-The Event Theme Editor currently uses a simple `PreviewPanel` component that:
+Both theme editors use a simple `PreviewPanel` component that:
 - Has no viewport switching (mobile/desktop)
 - Has no fullscreen mode
 - Uses fixed 70vh height
@@ -346,7 +309,7 @@ The Event Theme Editor currently uses a simple `PreviewPanel` component that:
 
 ### Target State
 
-Replace `PreviewPanel` with `PreviewShell` to provide:
+Replace `PreviewPanel` with `PreviewShell` + `ThemedBackground` to provide:
 - **Viewport switching**: See how theme looks on mobile vs desktop
 - **Fullscreen mode**: Full immersive preview of the theme
 - **Device frame**: Proper mobile device styling with rounded corners
@@ -366,17 +329,16 @@ Replace `PreviewPanel` with `PreviewShell` to provide:
 </PreviewPanel>
 ```
 
-### After (With PreviewShell)
+### After (With PreviewShell + ThemedBackground)
 
 ```tsx
+import { PreviewShell } from "@/features/preview-shell";
+import { ThemedBackground } from "@/features/theming";
+
 // EventThemeEditor.tsx - refactored
 <PreviewShell enableViewportSwitcher enableFullscreen>
   <ThemedBackground
-    background={{
-      color: theme.background.color,
-      image: theme.background.image,
-      overlayOpacity: theme.background.overlayOpacity,
-    }}
+    background={theme.background}
     fontFamily={theme.fontFamily}
   >
     <ThemePreviewContent theme={theme} />
@@ -401,8 +363,9 @@ Replace `PreviewPanel` with `PreviewShell` to provide:
 ### 1. Experience Editor (Current Use Case)
 
 ```tsx
-// Refactored ExperienceEditor preview section
-// Note: PreviewRuntime has its own ThemedBackground internally via EventThemeProvider
+import { PreviewShell } from "@/features/preview-shell";
+
+// Note: PreviewRuntime handles its own theming internally via ThemeProvider
 <PreviewShell
   enableViewportSwitcher
   viewportMode={viewportMode}
@@ -415,7 +378,9 @@ Replace `PreviewPanel` with `PreviewShell` to provide:
 ### 2. Event Theme Editor (In Scope)
 
 ```tsx
-// Refactored EventThemeEditor preview section
+import { PreviewShell } from "@/features/preview-shell";
+import { ThemedBackground } from "@/features/theming";
+
 <PreviewShell enableViewportSwitcher enableFullscreen>
   <ThemedBackground
     background={theme.background}
@@ -429,7 +394,9 @@ Replace `PreviewPanel` with `PreviewShell` to provide:
 ### 3. Project Theme Editor (In Scope - Same Pattern)
 
 ```tsx
-// Refactored ThemeEditor (projects) - same as EventThemeEditor
+import { PreviewShell } from "@/features/preview-shell";
+import { ThemedBackground } from "@/features/theming";
+
 <PreviewShell enableViewportSwitcher enableFullscreen>
   <ThemedBackground
     background={theme.background}
@@ -443,6 +410,9 @@ Replace `PreviewPanel` with `PreviewShell` to provide:
 ### 4. Welcome Screen Editor (Future Use Case)
 
 ```tsx
+import { PreviewShell } from "@/features/preview-shell";
+import { ThemedBackground } from "@/features/theming";
+
 <PreviewShell enableViewportSwitcher enableFullscreen>
   <ThemedBackground background={welcomeConfig.background}>
     <WelcomeScreenPreview config={welcomeConfig} />
@@ -453,7 +423,8 @@ Replace `PreviewPanel` with `PreviewShell` to provide:
 ### 5. Standalone Fullscreen Button
 
 ```tsx
-// When you just need a fullscreen trigger elsewhere
+import { FullscreenTrigger, FullscreenOverlay } from "@/features/preview-shell";
+
 <FullscreenTrigger onClick={() => setIsFullscreen(true)} />
 
 {isFullscreen && (
@@ -468,13 +439,15 @@ Replace `PreviewPanel` with `PreviewShell` to provide:
 )}
 ```
 
+---
+
 ## Migration Plan
 
-### Phase 1: Create Module
+### Phase 1: Create Module (After theming module is complete)
 1. Create `preview-shell` feature module structure
-2. Extract `DeviceFrame` (without logo)
-3. Extract `ViewportSwitcher`
-4. Extract viewport types and constants
+2. Define viewport types and constants
+3. Extract `DeviceFrame` (pure container, no background)
+4. Extract `ViewportSwitcher`
 5. Create `PreviewShell` wrapper component
 
 ### Phase 2: Add Fullscreen
@@ -484,11 +457,11 @@ Replace `PreviewPanel` with `PreviewShell` to provide:
 4. Integrate fullscreen into `PreviewShell`
 
 ### Phase 3: Migrate Experience Editor
-1. Update `steps` feature to use `preview-shell` components
-2. Update `ExperienceEditor` to use new `PreviewShell`
+1. Update `ExperienceEditor` to use new `PreviewShell`
+2. Update imports from steps to preview-shell
 3. Deprecate old `DeviceFrame` and `ViewSwitcher` in steps module
 
-### Phase 4: Migrate Theme Editors (In Scope)
+### Phase 4: Migrate Theme Editors
 1. Refactor `EventThemeEditor` to use `PreviewShell` + `ThemedBackground`
 2. Refactor `ThemeEditor` (projects) to use `PreviewShell` + `ThemedBackground`
 3. Extract shared `ThemePreviewContent` component (logo, title, button preview)
@@ -496,11 +469,7 @@ Replace `PreviewPanel` with `PreviewShell` to provide:
 5. Add viewport switching and fullscreen capabilities to both editors
 6. Deprecate/remove `PreviewPanel` from projects feature
 
-## Non-Goals
-
-- **Playback logic**: Step navigation, session state - stays in `steps` or `experience-engine`
-- **Theme provider**: `EventThemeProvider` stays in `components/providers`
-- **Step rendering**: `PreviewRuntime` and step components stay in `steps`
+---
 
 ## Success Criteria
 
@@ -508,6 +477,9 @@ Replace `PreviewPanel` with `PreviewShell` to provide:
 2. Fullscreen mode works with keyboard (Escape) and button exit
 3. Viewport switching works in both inline and fullscreen modes
 4. Zero breaking changes to existing experience editor
+5. Theme editors have viewport switching and fullscreen mode
+
+---
 
 ## Open Questions
 
@@ -519,3 +491,16 @@ Replace `PreviewPanel` with `PreviewShell` to provide:
 
 3. Should fullscreen use native Fullscreen API or just CSS overlay?
    - **Recommendation**: CSS overlay - more reliable cross-browser, easier to control UI
+
+---
+
+## Relationship to Other PRDs
+
+| PRD | Relationship |
+|-----|--------------|
+| `theming-prd.md` | **Dependency**. preview-shell uses `ThemedBackground` from theming. |
+| `welcome-screen-prd.md` | Will use preview-shell for preview capabilities. |
+
+**Implementation Order:**
+1. **theming** - Create types, provider, ThemedBackground
+2. **preview-shell** (this PRD) - Uses theming components
