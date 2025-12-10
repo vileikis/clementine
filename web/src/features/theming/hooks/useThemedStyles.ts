@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, type CSSProperties } from "react";
-import { useTheme } from "./useTheme";
+import { useEventTheme } from "./useEventTheme";
 
 /**
  * Style objects returned by useThemedStyles hook
@@ -37,7 +37,7 @@ export interface ThemedStyles {
  * ```
  */
 export function useThemedStyles(): ThemedStyles {
-  const { theme, buttonBgColor, buttonTextColor, buttonRadius } = useTheme();
+  const { theme, buttonBgColor, buttonTextColor, buttonRadius } = useEventTheme();
 
   return useMemo<ThemedStyles>(() => {
     const textStyles: CSSProperties = {

@@ -558,7 +558,10 @@ describe("useEngine - Input Updates", () => {
       });
     });
 
-    expect(onDataUpdate).toHaveBeenCalled();
+    // Wait for queueMicrotask callback to fire
+    await waitFor(() => {
+      expect(onDataUpdate).toHaveBeenCalled();
+    });
   });
 });
 
