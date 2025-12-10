@@ -4,7 +4,7 @@
 // Core types for Experience Engine configuration and state management.
 
 import type { Step } from "@/features/steps/types";
-import type { ProjectTheme } from "@/features/projects/types";
+import type { Theme } from "@/features/theming";
 import type { SessionData } from "@/features/sessions";
 import type { EngineSession, TransformationStatus } from "@/features/sessions/types";
 
@@ -57,7 +57,7 @@ export interface EngineConfig {
   debugMode: boolean;
 
   /** Theme for step rendering */
-  theme?: ProjectTheme;
+  theme?: Theme;
 
   // === Context (persisted mode) ===
 

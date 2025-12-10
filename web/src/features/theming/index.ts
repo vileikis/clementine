@@ -8,7 +8,7 @@ export type {
   ThemeBackground,
   ButtonRadius,
 } from "./types";
-export type { ThemeContextValue, ThemeWithLogo } from "./context";
+export type { ThemeContextValue } from "./context";
 
 // Constants
 export { BUTTON_RADIUS_MAP } from "./constants";

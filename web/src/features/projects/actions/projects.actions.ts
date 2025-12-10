@@ -239,7 +239,6 @@ export async function updateProjectNameAction(
 export async function updateProjectTheme(
   projectId: string,
   data: {
-    logoUrl?: string | null;
     fontFamily?: string | null;
     primaryColor?: string;
     text?: {
@@ -281,9 +280,6 @@ export async function updateProjectTheme(
 
     // Dynamic field mapping using Object.entries
     // Top-level theme fields
-    if (validatedData.logoUrl !== undefined) {
-      updateData["theme.logoUrl"] = validatedData.logoUrl;
-    }
     if (validatedData.fontFamily !== undefined) {
       updateData["theme.fontFamily"] = validatedData.fontFamily;
     }

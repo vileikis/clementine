@@ -6,7 +6,7 @@
  */
 
 import type { Step } from "./step.types";
-import type { ProjectTheme as EventTheme } from "@/features/projects/types";
+import type { Theme } from "@/features/theming";
 import type { AiPreset } from "@/features/ai-presets/types";
 import type { MockSessionData } from "./preview.types";
 
@@ -176,7 +176,7 @@ export interface PlaybackModeProps {
   steps: Step[];
 
   /** Event theme for styling */
-  theme: EventTheme;
+  theme: Theme;
 
   /** Available experiences (for ExperiencePicker and Capture steps) */
   aiPresets: AiPreset[];

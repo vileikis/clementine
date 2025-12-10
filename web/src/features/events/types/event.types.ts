@@ -8,27 +8,6 @@ import type { Theme } from "@/features/theming";
 export type ExtraSlotFrequency = "always" | "once_per_session";
 
 /**
- * Re-export sub-types from theming module for backward compatibility.
- * New code should import directly from @/features/theming.
- */
-export type { ThemeText as EventThemeText } from "@/features/theming";
-export type { ThemeButton as EventThemeButton } from "@/features/theming";
-export type { ThemeBackground as EventThemeBackground } from "@/features/theming";
-
-/**
- * Event-wide theme settings for visual customization.
- *
- * Extends Theme with logoUrl for backward compatibility.
- * logoUrl is an identity concern (not styling), but kept here during migration.
- *
- * @deprecated Prefer importing Theme from @/features/theming and using Event.logoUrl directly.
- */
-export interface EventTheme extends Theme {
-  /** Logo URL - identity concern, kept for backward compatibility */
-  logoUrl?: string | null;
-}
-
-/**
  * Link between an Event and an Experience
  * (embedded object in Event.experiences array and extras slots)
  */
@@ -72,7 +51,7 @@ export interface Event {
   logoUrl?: string | null;
 
   // Visual customization
-  theme: EventTheme;
+  theme: Theme;
 
   // Soft delete timestamp
   deletedAt?: number | null; // Unix timestamp ms when deleted

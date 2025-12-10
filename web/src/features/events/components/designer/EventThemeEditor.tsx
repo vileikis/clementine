@@ -1,7 +1,6 @@
 "use client";
 
 import { useReducer, useTransition } from "react";
-import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -11,8 +10,8 @@ import { updateEventThemeAction } from "../../actions/events.actions";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
-import { ThemedBackground, BUTTON_RADIUS_MAP } from "@/features/theming";
-import type { Event, EventTheme } from "../../types/event.types";
+import { ThemedBackground, BUTTON_RADIUS_MAP, type Theme } from "@/features/theming";
+import type { Event } from "../../types/event.types";
 
 interface EventThemeEditorProps {
   event: Event;
@@ -22,7 +21,6 @@ interface EventThemeEditorProps {
 // Theme reducer actions
 type ThemeAction =
   | { type: "UPDATE_PRIMARY_COLOR"; payload: string }
-  | { type: "UPDATE_LOGO_URL"; payload: string }
   | { type: "UPDATE_FONT_FAMILY"; payload: string }
   | { type: "UPDATE_TEXT_COLOR"; payload: string }
   | { type: "UPDATE_TEXT_ALIGNMENT"; payload: "left" | "center" | "right" }
@@ -34,12 +32,10 @@ type ThemeAction =
   | { type: "UPDATE_BG_OVERLAY_OPACITY"; payload: number };
 
 // Reducer function
-function themeReducer(state: EventTheme, action: ThemeAction): EventTheme {
+function themeReducer(state: Theme, action: ThemeAction): Theme {
   switch (action.type) {
     case "UPDATE_PRIMARY_COLOR":
       return { ...state, primaryColor: action.payload };
-    case "UPDATE_LOGO_URL":
-      return { ...state, logoUrl: action.payload || null };
     case "UPDATE_FONT_FAMILY":
       return { ...state, fontFamily: action.payload || null };
     case "UPDATE_TEXT_COLOR":
@@ -110,7 +106,6 @@ export function EventThemeEditor({ event, projectId }: EventThemeEditorProps) {
     startTransition(async () => {
       const result = await updateEventThemeAction(projectId, event.id, {
         primaryColor: theme.primaryColor,
-        logoUrl: theme.logoUrl,
         fontFamily: theme.fontFamily,
         text: {
           color: theme.text.color,
@@ -163,22 +158,9 @@ export function EventThemeEditor({ event, projectId }: EventThemeEditorProps) {
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_1fr] items-start">
         {/* Form Controls */}
         <div className="space-y-8">
-          {/* 1. Identity Section */}
+          {/* 1. Font Section */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Identity</h3>
-
-            {/* Logo URL */}
-            <ImageUploadField
-              id="theme-logo"
-              label="Logo Image"
-              value={theme.logoUrl || ""}
-              onChange={(value) =>
-                dispatch({ type: "UPDATE_LOGO_URL", payload: value })
-              }
-              destination="logos"
-              disabled={isPending}
-              recommendedSize="Recommended: 512x512px (1:1 aspect ratio). Max 5MB. PNG with transparency recommended."
-            />
+            <h3 className="text-lg font-semibold">Typography</h3>
 
             {/* Font Family */}
             <div className="space-y-2">
@@ -474,17 +456,6 @@ export function EventThemeEditor({ event, projectId }: EventThemeEditorProps) {
               contentClassName="space-y-6"
               style={{ textAlign: theme.text.alignment }}
             >
-              {/* Logo */}
-              {theme.logoUrl && (
-                <Image
-                  src={theme.logoUrl}
-                  alt="Event logo"
-                  width={96}
-                  height={96}
-                  className="mx-auto h-24 w-24 object-contain mb-4"
-                />
-              )}
-
               <h1 className="text-3xl font-bold" style={{ color: theme.text.color }}>
                 Event Preview
               </h1>

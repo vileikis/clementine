@@ -1,16 +1,13 @@
 "use client";
 
 import { useMemo, type ReactNode } from "react";
-import {
-  ThemeContext,
-  type ThemeContextValue,
-  type ThemeWithLogo,
-} from "../context/ThemeContext";
+import { ThemeContext, type ThemeContextValue } from "../context/ThemeContext";
+import type { Theme } from "../types";
 import { BUTTON_RADIUS_MAP } from "../constants";
 
 interface ThemeProviderProps {
-  /** The theme configuration to provide (may include logoUrl) */
-  theme: ThemeWithLogo;
+  /** The theme configuration to provide */
+  theme: Theme;
   /** Child components that will have access to the theme */
   children: ReactNode;
 }

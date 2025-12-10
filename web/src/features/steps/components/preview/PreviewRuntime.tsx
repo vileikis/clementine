@@ -16,7 +16,7 @@ import { ThemeProvider } from "@/features/theming";
 import { DeviceFrame } from "./DeviceFrame";
 import { ViewportModeProvider } from "./ViewportModeContext";
 import type { Step } from "@/features/steps/types";
-import type { ProjectTheme as EventTheme } from "@/features/projects/types";
+import type { Theme } from "@/features/theming";
 import type { AiPreset } from "@/features/ai-presets/types";
 import {
   ViewportMode,
@@ -43,7 +43,7 @@ export type PreviewMode = "single-step" | "playback";
 
 interface PreviewRuntimeProps {
   step: Step;
-  theme: EventTheme;
+  theme: Theme;
   viewportMode: ViewportMode;
   aiPresets?: AiPreset[];
   mockSession?: Partial<MockSessionData>;

@@ -4,27 +4,6 @@ import type { Theme } from "@/features/theming";
 
 export type ProjectStatus = "draft" | "live" | "archived" | "deleted";
 
-/**
- * Re-export sub-types from theming module for backward compatibility.
- * New code should import directly from @/features/theming.
- */
-export type { ThemeText as ProjectThemeText } from "@/features/theming";
-export type { ThemeButton as ProjectThemeButton } from "@/features/theming";
-export type { ThemeBackground as ProjectThemeBackground } from "@/features/theming";
-
-/**
- * Project-wide theme settings for visual customization.
- *
- * Extends Theme with logoUrl for backward compatibility.
- * logoUrl is an identity concern (not styling), but kept here during migration.
- *
- * @deprecated Prefer importing Theme from @/features/theming and using Project.logoUrl directly.
- */
-export interface ProjectTheme extends Theme {
-  /** Logo URL - identity concern, kept for backward compatibility */
-  logoUrl?: string | null;
-}
-
 export interface Project {
   id: string;
   name: string;
@@ -46,7 +25,7 @@ export interface Project {
   logoUrl?: string | null;
 
   // Nested object configurations (TEMPORARY - will move to Event in Phase 5)
-  theme: ProjectTheme;
+  theme: Theme;
 
   // Soft delete timestamp
   deletedAt?: number | null;

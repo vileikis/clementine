@@ -49,24 +49,6 @@ export function DeviceFrame({
       }}
       contentClassName=""
     >
-      {/* Logo */}
-      {theme.logoUrl && (
-        <div className="absolute top-4 left-0 right-0 z-20 px-4">
-          <div
-            style={{
-              textAlign: theme.text.alignment,
-            }}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={theme.logoUrl}
-              alt="Event logo"
-              className={`${isMobile ? "h-8" : "h-10"} w-auto object-contain inline-block`}
-            />
-          </div>
-        </div>
-      )}
-
       {/* Content */}
       <div className="relative z-5 h-full overflow-auto">{children}</div>
     </ThemedBackground>
