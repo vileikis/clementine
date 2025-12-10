@@ -1,6 +1,6 @@
 "use client";
 
-import { useEventTheme } from "@/components/providers/EventThemeProvider";
+import { useTheme } from "@/features/theming";
 import { useViewportMode } from "@/features/steps/components/preview";
 import type { ReactNode } from "react";
 
@@ -25,7 +25,7 @@ export function ActionButton({
   disabled = false,
   type = "button",
 }: ActionButtonProps) {
-  const { buttonBgColor, buttonTextColor, buttonRadius } = useEventTheme();
+  const { buttonBgColor, buttonTextColor, buttonRadius } = useTheme();
   const viewportMode = useViewportMode();
   const isMobile = viewportMode === "mobile";
 

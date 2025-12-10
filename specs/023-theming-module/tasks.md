@@ -23,13 +23,13 @@
 
 **Purpose**: Create the theming module directory structure and barrel exports
 
-- [ ] T001 Create theming module directory structure at web/src/features/theming/
-- [ ] T002 [P] Create types barrel export at web/src/features/theming/types/index.ts
-- [ ] T003 [P] Create constants barrel export at web/src/features/theming/constants/index.ts
-- [ ] T004 [P] Create components barrel export at web/src/features/theming/components/index.ts
-- [ ] T005 [P] Create hooks barrel export at web/src/features/theming/hooks/index.ts
-- [ ] T006 [P] Create context barrel export at web/src/features/theming/context/index.ts
-- [ ] T007 Create module root barrel export at web/src/features/theming/index.ts
+- [x] T001 Create theming module directory structure at web/src/features/theming/
+- [x] T002 [P] Create types barrel export at web/src/features/theming/types/index.ts
+- [x] T003 [P] Create constants barrel export at web/src/features/theming/constants/index.ts
+- [x] T004 [P] Create components barrel export at web/src/features/theming/components/index.ts
+- [x] T005 [P] Create hooks barrel export at web/src/features/theming/hooks/index.ts
+- [x] T006 [P] Create context barrel export at web/src/features/theming/context/index.ts
+- [x] T007 Create module root barrel export at web/src/features/theming/index.ts
 
 ---
 
@@ -39,9 +39,9 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T008 Define Theme, ThemeText, ThemeButton, ThemeBackground, ButtonRadius types in web/src/features/theming/types/theme.types.ts
-- [ ] T009 Define BUTTON_RADIUS_MAP constant in web/src/features/theming/constants/theme-defaults.ts
-- [ ] T010 Export all types and constants from barrel files (update T002, T003)
+- [x] T008 Define Theme, ThemeText, ThemeButton, ThemeBackground, ButtonRadius types in web/src/features/theming/types/theme.types.ts
+- [x] T009 Define BUTTON_RADIUS_MAP constant in web/src/features/theming/constants/theme-defaults.ts
+- [x] T010 Export all types and constants from barrel files (update T002, T003)
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
@@ -55,12 +55,12 @@
 
 ### Implementation for User Story 1
 
-- [ ] T011 [US1] Add backward-compatible type alias export (ProjectTheme) in web/src/features/projects/types/project.types.ts importing Theme from @/features/theming
-- [ ] T012 [US1] Add backward-compatible type alias export (EventTheme) in web/src/features/events/types/event.types.ts importing Theme from @/features/theming
-- [ ] T013 [US1] Move logoUrl from nested theme to Project interface directly in web/src/features/projects/types/project.types.ts
-- [ ] T014 [US1] Move logoUrl from nested theme to Event interface directly in web/src/features/events/types/event.types.ts
-- [ ] T015 [US1] Update any Project type usages that reference theme.logoUrl to use Project.logoUrl directly
-- [ ] T016 [US1] Update any Event type usages that reference theme.logoUrl to use Event.logoUrl directly
+- [x] T011 [US1] Add backward-compatible type alias export (ProjectTheme) in web/src/features/projects/types/project.types.ts importing Theme from @/features/theming
+- [x] T012 [US1] Add backward-compatible type alias export (EventTheme) in web/src/features/events/types/event.types.ts importing Theme from @/features/theming
+- [x] T013 [US1] Move logoUrl from nested theme to Project interface directly in web/src/features/projects/types/project.types.ts
+- [x] T014 [US1] Move logoUrl from nested theme to Event interface directly in web/src/features/events/types/event.types.ts
+- [x] T015 [US1] Update any Project type usages that reference theme.logoUrl to use Project.logoUrl directly
+- [x] T016 [US1] Update any Event type usages that reference theme.logoUrl to use Event.logoUrl directly
 
 **Checkpoint**: User Story 1 complete - unified Theme type is available and backward compatible
 
@@ -74,14 +74,14 @@
 
 ### Implementation for User Story 2
 
-- [ ] T017 [US2] Define ThemeContextValue interface in web/src/features/theming/context/ThemeContext.tsx
-- [ ] T018 [US2] Create ThemeContext with createContext in web/src/features/theming/context/ThemeContext.tsx
-- [ ] T019 [US2] Implement ThemeProvider component with computed conveniences (buttonBgColor, buttonRadius) in web/src/features/theming/components/ThemeProvider.tsx
-- [ ] T020 [US2] Implement useTheme hook with provider-missing error in web/src/features/theming/hooks/useTheme.ts
-- [ ] T021 [US2] Export ThemeProvider and useTheme from barrel files
-- [ ] T022 [US2] Update ActionButton in web/src/components/step-primitives/ActionButton.tsx to import from @/features/theming
-- [ ] T023 [US2] Update OptionButton in web/src/components/step-primitives/OptionButton.tsx to import from @/features/theming
-- [ ] T024 [US2] Update StepLayout in web/src/components/step-primitives/StepLayout.tsx to import from @/features/theming
+- [x] T017 [US2] Define ThemeContextValue interface in web/src/features/theming/context/ThemeContext.tsx
+- [x] T018 [US2] Create ThemeContext with createContext in web/src/features/theming/context/ThemeContext.tsx
+- [x] T019 [US2] Implement ThemeProvider component with computed conveniences (buttonBgColor, buttonRadius) in web/src/features/theming/components/ThemeProvider.tsx
+- [x] T020 [US2] Implement useTheme hook with provider-missing error in web/src/features/theming/hooks/useTheme.ts
+- [x] T021 [US2] Export ThemeProvider and useTheme from barrel files
+- [x] T022 [US2] Update ActionButton in web/src/components/step-primitives/ActionButton.tsx to import from @/features/theming
+- [x] T023 [US2] Update OptionButton in web/src/components/step-primitives/OptionButton.tsx to import from @/features/theming
+- [x] T024 [US2] Update StepLayout in web/src/components/step-primitives/StepLayout.tsx to import from @/features/theming
 
 **Checkpoint**: User Story 2 complete - theme context is available to all consuming components
 
@@ -95,11 +95,11 @@
 
 ### Implementation for User Story 3
 
-- [ ] T025 [US3] Implement ThemedBackground component in web/src/features/theming/components/ThemedBackground.tsx
-- [ ] T026 [US3] Export ThemedBackground from barrel files
-- [ ] T027 [US3] Replace duplicate background code in ThemeEditor with ThemedBackground at web/src/features/projects/components/designer/ThemeEditor.tsx (lines 471-526)
-- [ ] T028 [US3] Replace duplicate background code in EventThemeEditor with ThemedBackground at web/src/features/events/components/designer/EventThemeEditor.tsx (lines 474-531)
-- [ ] T029 [US3] Replace duplicate background code in DeviceFrame with ThemedBackground at web/src/features/steps/components/preview/DeviceFrame.tsx (lines 37-89)
+- [x] T025 [US3] Implement ThemedBackground component in web/src/features/theming/components/ThemedBackground.tsx
+- [x] T026 [US3] Export ThemedBackground from barrel files
+- [x] T027 [US3] Replace duplicate background code in ThemeEditor with ThemedBackground at web/src/features/projects/components/designer/ThemeEditor.tsx (lines 471-526)
+- [x] T028 [US3] Replace duplicate background code in EventThemeEditor with ThemedBackground at web/src/features/events/components/designer/EventThemeEditor.tsx (lines 474-531)
+- [x] T029 [US3] Replace duplicate background code in DeviceFrame with ThemedBackground at web/src/features/steps/components/preview/DeviceFrame.tsx (lines 37-89)
 
 **Checkpoint**: User Story 3 complete - background rendering is consolidated to one reusable component
 
@@ -113,8 +113,8 @@
 
 ### Implementation for User Story 4
 
-- [ ] T030 [US4] Implement useThemedStyles hook returning text, button, background style objects in web/src/features/theming/hooks/useThemedStyles.ts
-- [ ] T031 [US4] Export useThemedStyles from barrel files
+- [x] T030 [US4] Implement useThemedStyles hook returning text, button, background style objects in web/src/features/theming/hooks/useThemedStyles.ts
+- [x] T031 [US4] Export useThemedStyles from barrel files
 
 **Checkpoint**: User Story 4 complete - styled inline CSS is available via hook
 
@@ -124,18 +124,18 @@
 
 **Purpose**: Cleanup, fix inconsistencies, remove deprecated code
 
-- [ ] T032 Fix button radius inconsistency - update ThemeEditor to use BUTTON_RADIUS_MAP from @/features/theming at web/src/features/projects/components/designer/ThemeEditor.tsx
-- [ ] T033 Fix button radius inconsistency - update EventThemeEditor to use BUTTON_RADIUS_MAP from @/features/theming at web/src/features/events/components/designer/EventThemeEditor.tsx
-- [ ] T034 Deprecate/remove EventThemeProvider from web/src/components/providers/EventThemeProvider.tsx (add deprecation comment or remove if no consumers)
-- [ ] T035 Remove duplicate ProjectTheme type definition from web/src/features/projects/types/project.types.ts (keep only the alias)
-- [ ] T036 Remove duplicate EventTheme type definition from web/src/features/events/types/event.types.ts (keep only the alias)
+- [x] T032 Fix button radius inconsistency - update ThemeEditor to use BUTTON_RADIUS_MAP from @/features/theming at web/src/features/projects/components/designer/ThemeEditor.tsx
+- [x] T033 Fix button radius inconsistency - update EventThemeEditor to use BUTTON_RADIUS_MAP from @/features/theming at web/src/features/events/components/designer/EventThemeEditor.tsx
+- [x] T034 Deprecate/remove EventThemeProvider from web/src/components/providers/EventThemeProvider.tsx (add deprecation comment or remove if no consumers)
+- [x] T035 Remove duplicate ProjectTheme type definition from web/src/features/projects/types/project.types.ts (keep only the alias)
+- [x] T036 Remove duplicate EventTheme type definition from web/src/features/events/types/event.types.ts (keep only the alias)
 
 ### Validation Loop (REQUIRED - Constitution Principle V)
 
 **Purpose**: Ensure code quality and correctness before merge
 
-- [ ] T037 Run `pnpm lint` and fix all errors/warnings
-- [ ] T038 Run `pnpm type-check` and resolve all TypeScript errors
+- [x] T037 Run `pnpm lint` and fix all errors/warnings
+- [x] T038 Run `pnpm type-check` and resolve all TypeScript errors
 - [ ] T039 Verify feature in local dev server (`pnpm dev`) - check themed previews render identically
 - [ ] T040 Commit only after validation loop passes cleanly
 

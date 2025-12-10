@@ -12,6 +12,7 @@ import { updateProjectTheme } from "../../actions/projects.actions";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
+import { ThemedBackground, BUTTON_RADIUS_MAP } from "@/features/theming";
 
 interface ThemeEditorProps {
   project: Project;
@@ -143,12 +144,6 @@ export function ThemeEditor({ project }: ThemeEditorProps) {
 
   // Helper for button styles
   const buttonBgColor = theme.button.backgroundColor || theme.primaryColor;
-  const buttonRadiusMap = {
-    none: "0px",
-    sm: "0.25rem",
-    md: "0.375rem",
-    full: "9999px",
-  };
 
   return (
     <div className="space-y-6">
@@ -468,63 +463,44 @@ export function ThemeEditor({ project }: ThemeEditorProps) {
         {/* Live Preview - Sticky */}
         <div className="lg:sticky lg:top-4">
           <PreviewPanel>
-            <div
-              className="relative flex h-full w-full flex-col items-center justify-center p-8"
-              style={{
-                backgroundColor: theme.background.color,
-                backgroundImage: theme.background.image
-                  ? `url(${theme.background.image})`
-                  : undefined,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                fontFamily: theme.fontFamily || undefined,
-              }}
+            <ThemedBackground
+              background={theme.background}
+              fontFamily={theme.fontFamily}
+              className="flex h-full w-full flex-col items-center justify-center p-8"
+              contentClassName="space-y-6"
+              style={{ textAlign: theme.text.alignment }}
             >
-              {/* Overlay for readability when image is present */}
-              {theme.background.image && (
-                <div
-                  className="absolute inset-0 bg-black"
-                  style={{ opacity: theme.background.overlayOpacity }}
+              {/* Logo */}
+              {theme.logoUrl && (
+                <Image
+                  src={theme.logoUrl}
+                  alt="Event logo"
+                  width={96}
+                  height={96}
+                  className="mx-auto h-24 w-24 object-contain mb-4"
                 />
               )}
 
-              {/* Content */}
-              <div
-                className="relative z-10 space-y-6"
-                style={{ textAlign: theme.text.alignment }}
+              <h1 className="text-3xl font-bold" style={{ color: theme.text.color }}>
+                Event Preview
+              </h1>
+
+              <p className="text-lg" style={{ color: theme.text.color }}>
+                This is how your theme will look
+              </p>
+
+              <Button
+                size="lg"
+                className="mt-4"
+                style={{
+                  backgroundColor: buttonBgColor,
+                  color: theme.button.textColor,
+                  borderRadius: BUTTON_RADIUS_MAP[theme.button.radius],
+                }}
               >
-                {/* Logo */}
-                {theme.logoUrl && (
-                  <Image
-                    src={theme.logoUrl}
-                    alt="Event logo"
-                    width={96}
-                    height={96}
-                    className="mx-auto h-24 w-24 object-contain mb-4"
-                  />
-                )}
-
-                <h1 className="text-3xl font-bold" style={{ color: theme.text.color }}>
-                  Event Preview
-                </h1>
-
-                <p className="text-lg" style={{ color: theme.text.color }}>
-                  This is how your theme will look
-                </p>
-
-                <Button
-                  size="lg"
-                  className="mt-4"
-                  style={{
-                    backgroundColor: buttonBgColor,
-                    color: theme.button.textColor,
-                    borderRadius: buttonRadiusMap[theme.button.radius],
-                  }}
-                >
-                  Primary Button
-                </Button>
-              </div>
-            </div>
+                Primary Button
+              </Button>
+            </ThemedBackground>
           </PreviewPanel>
         </div>
       </div>

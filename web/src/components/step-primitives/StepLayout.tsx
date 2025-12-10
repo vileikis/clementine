@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEventTheme } from "@/components/providers/EventThemeProvider";
+import { useTheme } from "@/features/theming";
 import { LottiePlayer } from "@/components/shared/LottiePlayer";
 import { useViewportMode } from "@/features/steps/components/preview";
 import { getMediaType } from "@/features/steps/utils";
@@ -38,7 +38,7 @@ export function StepLayout({
   mediaType,
   action,
 }: StepLayoutProps) {
-  const { theme } = useEventTheme();
+  const { theme } = useTheme();
   const viewportMode = useViewportMode();
   const isMobile = viewportMode === "mobile";
 

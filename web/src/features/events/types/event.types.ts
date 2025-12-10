@@ -1,47 +1,31 @@
 // Event-related TypeScript types
 
+import type { Theme } from "@/features/theming";
+
 /**
  * Frequency options for extra slots
  */
 export type ExtraSlotFrequency = "always" | "once_per_session";
 
 /**
- * Theme text configuration for events
+ * Re-export sub-types from theming module for backward compatibility.
+ * New code should import directly from @/features/theming.
  */
-export interface EventThemeText {
-  color: string; // Hex color (#RRGGBB)
-  alignment: "left" | "center" | "right";
-}
+export type { ThemeText as EventThemeText } from "@/features/theming";
+export type { ThemeButton as EventThemeButton } from "@/features/theming";
+export type { ThemeBackground as EventThemeBackground } from "@/features/theming";
 
 /**
- * Theme button configuration for events
+ * Event-wide theme settings for visual customization.
+ *
+ * Extends Theme with logoUrl for backward compatibility.
+ * logoUrl is an identity concern (not styling), but kept here during migration.
+ *
+ * @deprecated Prefer importing Theme from @/features/theming and using Event.logoUrl directly.
  */
-export interface EventThemeButton {
-  backgroundColor?: string | null; // Hex color, inherits primaryColor if null
-  textColor: string; // Hex color (#RRGGBB)
-  radius: "none" | "sm" | "md" | "full";
-}
-
-/**
- * Theme background configuration for events
- */
-export interface EventThemeBackground {
-  color: string; // Hex color (#RRGGBB)
-  image?: string | null; // Full public URL
-  overlayOpacity: number; // 0-1
-}
-
-/**
- * Event-wide theme settings for visual customization
- * (identical structure to ProjectTheme for consistency)
- */
-export interface EventTheme {
-  logoUrl?: string | null; // Full public URL
-  fontFamily?: string | null; // CSS font family string
-  primaryColor: string; // Hex color (#RRGGBB)
-  text: EventThemeText;
-  button: EventThemeButton;
-  background: EventThemeBackground;
+export interface EventTheme extends Theme {
+  /** Logo URL - identity concern, kept for backward compatibility */
+  logoUrl?: string | null;
 }
 
 /**
@@ -83,6 +67,9 @@ export interface Event {
 
   // Slot-based extra flows (pre-entry gate, pre-reward)
   extras: EventExtras;
+
+  // Logo URL - identity concern, separated from theme styling
+  logoUrl?: string | null;
 
   // Visual customization
   theme: EventTheme;

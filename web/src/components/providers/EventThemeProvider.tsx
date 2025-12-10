@@ -21,6 +21,13 @@ interface EventThemeProviderProps {
 /**
  * Provides event theme to all step renderers and primitives.
  * Computes derived values for convenience.
+ *
+ * @deprecated Use ThemeProvider and useTheme from @/features/theming instead.
+ * This provider will be removed in a future release. Migration steps:
+ * 1. Replace `import { EventThemeProvider, useEventTheme } from "@/components/providers/EventThemeProvider"`
+ *    with `import { ThemeProvider, useTheme } from "@/features/theming"`
+ * 2. Replace `<EventThemeProvider theme={...}>` with `<ThemeProvider theme={...}>`
+ * 3. Replace `useEventTheme()` with `useTheme()`
  */
 export function EventThemeProvider({
   theme,
@@ -52,6 +59,8 @@ export function EventThemeProvider({
 /**
  * Hook to access the event theme context.
  * Must be used within an EventThemeProvider.
+ *
+ * @deprecated Use useTheme from @/features/theming instead.
  */
 export function useEventTheme(): EventThemeContextValue {
   const context = useContext(EventThemeContext);
