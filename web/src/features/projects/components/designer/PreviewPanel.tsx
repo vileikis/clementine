@@ -11,6 +11,23 @@ interface PreviewPanelProps {
 
 /**
  * PreviewPanel component provides a reusable preview container
+ *
+ * @deprecated Use PreviewShell from @/features/preview-shell instead.
+ * PreviewShell provides viewport switching, fullscreen mode, and proper device frame simulation.
+ *
+ * Example migration:
+ * ```tsx
+ * // Before
+ * <PreviewPanel>
+ *   <ThemedBackground>...</ThemedBackground>
+ * </PreviewPanel>
+ *
+ * // After
+ * <PreviewShell enableViewportSwitcher enableFullscreen>
+ *   <ThemedBackground>...</ThemedBackground>
+ * </PreviewShell>
+ * ```
+ *
  * Part of Phase 4 (User Story 1) - Design Tab Layout Infrastructure
  * Updated in Phase 6 (User Story 4) - Rename Content to Design
  *
