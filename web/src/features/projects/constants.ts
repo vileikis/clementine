@@ -28,7 +28,6 @@ export const DEFAULT_PROJECT_NAME = "Untitled";
 
 // Theme defaults (for UI default values and initialization)
 export const THEME_DEFAULTS = {
-  logoUrl: null,
   fontFamily: null,
   primaryColor: "#3B82F6", // Default blue
   text: {

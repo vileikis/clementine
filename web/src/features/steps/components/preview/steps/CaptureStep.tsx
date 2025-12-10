@@ -13,7 +13,7 @@ import { useMemo } from "react";
 import Image from "next/image";
 import { ImageIcon, AlertCircle, Camera } from "lucide-react";
 import { StepLayout, ActionButton } from "@/components/step-primitives";
-import { useEventTheme } from "@/components/providers/EventThemeProvider";
+import { useEventTheme } from "@/features/theming";
 import type { StepCapture } from "@/features/steps/types";
 import type { AiPreset } from "@/features/ai-presets/types";
 import type { MockSessionData } from "@/features/steps/types/preview.types";

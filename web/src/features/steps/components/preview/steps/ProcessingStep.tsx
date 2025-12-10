@@ -15,7 +15,7 @@
 import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { StepLayout } from "@/components/step-primitives";
-import { useEventTheme } from "@/components/providers/EventThemeProvider";
+import { useEventTheme } from "@/features/theming";
 import type { StepProcessing } from "@/features/steps/types";
 
 interface ProcessingStepProps {

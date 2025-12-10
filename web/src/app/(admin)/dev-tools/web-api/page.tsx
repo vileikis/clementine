@@ -7,7 +7,7 @@
  * Primary focus: ImageCapture API for camera functionality.
  */
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { CheckCircle2, XCircle, AlertCircle, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -69,98 +69,101 @@ function ApiCheckCard({ check }: { check: ApiCheck }) {
   );
 }
 
-export default function WebApiTestPage() {
-  const [apiChecks, setApiChecks] = useState<ApiCheck[]>([]);
-  const [browserInfo, setBrowserInfo] = useState<string>("");
-  const [isLoading, setIsLoading] = useState(true);
+// Compute API checks (runs on client only)
+function getApiChecks(): ApiCheck[] {
+  if (typeof window === "undefined") return [];
 
-  useEffect(() => {
-    // Get browser info
-    const ua = navigator.userAgent;
-    setBrowserInfo(ua);
-
-    // Run API checks
-    const checks: ApiCheck[] = [
-      {
-        name: "ImageCapture API",
-        description:
-          "Enables capturing still images from a camera. Required for high-quality photo capture without canvas workarounds.",
-        supported: "ImageCapture" in window,
-        details: "ImageCapture" in window
+  return [
+    {
+      name: "ImageCapture API",
+      description:
+        "Enables capturing still images from a camera. Required for high-quality photo capture without canvas workarounds.",
+      supported: "ImageCapture" in window,
+      details:
+        "ImageCapture" in window
           ? "window.ImageCapture is available"
           : "window.ImageCapture is undefined",
-        docsUrl: "https://developer.mozilla.org/en-US/docs/Web/API/ImageCapture",
-      },
-      {
-        name: "MediaDevices API",
-        description:
-          "Provides access to connected media input devices like cameras and microphones.",
-        supported:
-          "mediaDevices" in navigator && "getUserMedia" in navigator.mediaDevices,
-        details:
-          "mediaDevices" in navigator
-            ? "navigator.mediaDevices is available"
-            : "navigator.mediaDevices is undefined",
-        docsUrl:
-          "https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices",
-      },
-      {
-        name: "MediaStream API",
-        description:
-          "Represents a stream of media content, used for camera/video capture.",
-        supported: "MediaStream" in window,
-        details: "MediaStream" in window
+      docsUrl: "https://developer.mozilla.org/en-US/docs/Web/API/ImageCapture",
+    },
+    {
+      name: "MediaDevices API",
+      description:
+        "Provides access to connected media input devices like cameras and microphones.",
+      supported:
+        "mediaDevices" in navigator && "getUserMedia" in navigator.mediaDevices,
+      details:
+        "mediaDevices" in navigator
+          ? "navigator.mediaDevices is available"
+          : "navigator.mediaDevices is undefined",
+      docsUrl: "https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices",
+    },
+    {
+      name: "MediaStream API",
+      description:
+        "Represents a stream of media content, used for camera/video capture.",
+      supported: "MediaStream" in window,
+      details:
+        "MediaStream" in window
           ? "window.MediaStream is available"
           : "window.MediaStream is undefined",
-        docsUrl: "https://developer.mozilla.org/en-US/docs/Web/API/MediaStream",
-      },
-      {
-        name: "Canvas API (2D)",
-        description:
-          "Fallback for image capture when ImageCapture is not available.",
-        supported:
-          typeof document !== "undefined" &&
-          !!document.createElement("canvas").getContext("2d"),
-        details: "Canvas 2D context is available",
-        docsUrl:
-          "https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D",
-      },
-      {
-        name: "OffscreenCanvas",
-        description:
-          "Canvas that can be rendered off the main thread for better performance.",
-        supported: "OffscreenCanvas" in window,
-        details: "OffscreenCanvas" in window
+      docsUrl: "https://developer.mozilla.org/en-US/docs/Web/API/MediaStream",
+    },
+    {
+      name: "Canvas API (2D)",
+      description:
+        "Fallback for image capture when ImageCapture is not available.",
+      supported:
+        typeof document !== "undefined" &&
+        !!document.createElement("canvas").getContext("2d"),
+      details: "Canvas 2D context is available",
+      docsUrl:
+        "https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D",
+    },
+    {
+      name: "OffscreenCanvas",
+      description:
+        "Canvas that can be rendered off the main thread for better performance.",
+      supported: "OffscreenCanvas" in window,
+      details:
+        "OffscreenCanvas" in window
           ? "window.OffscreenCanvas is available"
           : "window.OffscreenCanvas is undefined",
-        docsUrl:
-          "https://developer.mozilla.org/en-US/docs/Web/API/OffscreenCanvas",
-      },
-      {
-        name: "Blob API",
-        description: "Represents immutable raw binary data, used for image data.",
-        supported: "Blob" in window,
-        details: "Blob" in window
+      docsUrl:
+        "https://developer.mozilla.org/en-US/docs/Web/API/OffscreenCanvas",
+    },
+    {
+      name: "Blob API",
+      description: "Represents immutable raw binary data, used for image data.",
+      supported: "Blob" in window,
+      details:
+        "Blob" in window
           ? "window.Blob is available"
           : "window.Blob is undefined",
-        docsUrl: "https://developer.mozilla.org/en-US/docs/Web/API/Blob",
-      },
-      {
-        name: "createImageBitmap",
-        description:
-          "Creates an ImageBitmap from various sources for efficient image processing.",
-        supported: "createImageBitmap" in window,
-        details: "createImageBitmap" in window
+      docsUrl: "https://developer.mozilla.org/en-US/docs/Web/API/Blob",
+    },
+    {
+      name: "createImageBitmap",
+      description:
+        "Creates an ImageBitmap from various sources for efficient image processing.",
+      supported: "createImageBitmap" in window,
+      details:
+        "createImageBitmap" in window
           ? "window.createImageBitmap is available"
           : "window.createImageBitmap is undefined",
-        docsUrl:
-          "https://developer.mozilla.org/en-US/docs/Web/API/createImageBitmap",
-      },
-    ];
+      docsUrl:
+        "https://developer.mozilla.org/en-US/docs/Web/API/createImageBitmap",
+    },
+  ];
+}
 
-    setApiChecks(checks);
-    setIsLoading(false);
-  }, []);
+export default function WebApiTestPage() {
+  // Use lazy initialization to avoid setState in effect
+  const [apiChecks] = useState<ApiCheck[]>(getApiChecks);
+  const [browserInfo] = useState<string>(() =>
+    typeof navigator !== "undefined" ? navigator.userAgent : ""
+  );
+
+  const isLoading = apiChecks.length === 0;
 
   const supportedCount = apiChecks.filter((c) => c.supported === true).length;
   const totalCount = apiChecks.length;

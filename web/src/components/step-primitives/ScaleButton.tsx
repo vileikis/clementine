@@ -1,6 +1,6 @@
 "use client";
 
-import { useEventTheme } from "@/components/providers/EventThemeProvider";
+import { useEventTheme } from "@/features/theming";
 
 interface ScaleButtonProps {
   value: number;

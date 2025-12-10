@@ -10,7 +10,7 @@
  */
 
 import { memo } from "react";
-import { EventThemeProvider } from "@/components/providers/EventThemeProvider";
+import { ThemeProvider } from "@/features/theming";
 import {
   DeviceFrame,
   InfoStep,
@@ -25,13 +25,13 @@ import {
   RewardStep,
 } from "@/features/steps/components/preview";
 import type { Step } from "@/features/steps/types";
-import type { ProjectTheme as EventTheme } from "@/features/projects/types"
+import type { Theme } from "@/features/theming";
 import type { AiPreset } from "@/features/ai-presets/types";
 import { DEFAULT_MOCK_SESSION, type MockSessionData } from "@/features/steps/types/preview.types";
 
 interface StepPreviewProps {
   step: Step;
-  theme: EventTheme;
+  theme: Theme;
   aiPresets: AiPreset[];
   mockSession?: MockSessionData;
 }
@@ -47,11 +47,11 @@ export const StepPreview = memo(function StepPreview({
   mockSession = DEFAULT_MOCK_SESSION,
 }: StepPreviewProps) {
   return (
-    <EventThemeProvider theme={theme}>
+    <ThemeProvider theme={theme}>
       <DeviceFrame>
         <StepContent step={step} aiPresets={aiPresets} mockSession={mockSession} />
       </DeviceFrame>
-    </EventThemeProvider>
+    </ThemeProvider>
   );
 });
 

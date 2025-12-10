@@ -263,7 +263,6 @@ export async function updateEventThemeAction(
   projectId: string,
   eventId: string,
   data: {
-    logoUrl?: string | null;
     fontFamily?: string | null;
     primaryColor?: string;
     text?: {

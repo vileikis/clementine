@@ -36,7 +36,7 @@ import {
 import { THEME_DEFAULTS } from "@/features/projects/constants";
 import type { Experience } from "../../types";
 import type { Step } from "@/features/steps/types";
-import type { ProjectTheme as EventTheme } from "@/features/projects/types";
+import type { Theme } from "@/features/theming";
 
 interface ExperienceEditorProps {
   companySlug: string;
@@ -46,8 +46,7 @@ interface ExperienceEditorProps {
 }
 
 // Default theme for experience preview (experiences are company-scoped, not event-specific)
-const DEFAULT_PREVIEW_THEME: EventTheme = {
-  logoUrl: THEME_DEFAULTS.logoUrl,
+const DEFAULT_PREVIEW_THEME: Theme = {
   fontFamily: THEME_DEFAULTS.fontFamily,
   primaryColor: THEME_DEFAULTS.primaryColor,
   text: THEME_DEFAULTS.text,

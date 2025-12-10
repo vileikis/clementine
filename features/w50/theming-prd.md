@@ -121,24 +121,25 @@ interface ThemeProviderProps {
 }
 
 export function ThemeProvider({ theme, children }: ThemeProviderProps) {
-  const value = useMemo<ThemeContextValue>(() => ({
-    theme,
-    buttonBgColor: theme.button.backgroundColor ?? theme.primaryColor,
-    buttonTextColor: theme.button.textColor,
-    buttonRadius: BUTTON_RADIUS_MAP[theme.button.radius],
-  }), [theme]);
+  const value = useMemo<ThemeContextValue>(
+    () => ({
+      theme,
+      buttonBgColor: theme.button.backgroundColor ?? theme.primaryColor,
+      buttonTextColor: theme.button.textColor,
+      buttonRadius: BUTTON_RADIUS_MAP[theme.button.radius],
+    }),
+    [theme]
+  );
 
   return (
-    <ThemeContext.Provider value={value}>
-      {children}
-    </ThemeContext.Provider>
+    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
   );
 }
 
-export function useTheme(): ThemeContextValue {
+export function useEventTheme(): ThemeContextValue {
   const context = useContext(ThemeContext);
   if (!context) {
-    throw new Error("useTheme must be used within a ThemeProvider");
+    throw new Error("useEventTheme must be used within a ThemeProvider");
   }
   return context;
 }
@@ -213,26 +214,29 @@ interface ThemedStyles {
 }
 
 export function useThemedStyles(): ThemedStyles {
-  const { theme, buttonBgColor, buttonRadius } = useTheme();
+  const { theme, buttonBgColor, buttonRadius } = useEventTheme();
 
-  return useMemo(() => ({
-    text: {
-      color: theme.text.color,
-      textAlign: theme.text.alignment,
-    },
-    button: {
-      backgroundColor: buttonBgColor,
-      color: theme.button.textColor,
-      borderRadius: buttonRadius,
-    },
-    background: {
-      backgroundColor: theme.background.color,
-      backgroundImage: theme.background.image
-        ? `url(${theme.background.image})`
-        : undefined,
-      fontFamily: theme.fontFamily ?? undefined,
-    },
-  }), [theme, buttonBgColor, buttonRadius]);
+  return useMemo(
+    () => ({
+      text: {
+        color: theme.text.color,
+        textAlign: theme.text.alignment,
+      },
+      button: {
+        backgroundColor: buttonBgColor,
+        color: theme.button.textColor,
+        borderRadius: buttonRadius,
+      },
+      background: {
+        backgroundColor: theme.background.color,
+        backgroundImage: theme.background.image
+          ? `url(${theme.background.image})`
+          : undefined,
+        fontFamily: theme.fontFamily ?? undefined,
+      },
+    }),
+    [theme, buttonBgColor, buttonRadius]
+  );
 }
 ```
 
@@ -255,7 +259,7 @@ web/src/features/theming/
 │   └── ThemedBackground.tsx        # Background with image/overlay
 ├── hooks/
 │   ├── index.ts
-│   ├── useTheme.ts                 # Context hook
+│   ├── useEventTheme.ts                 # Context hook
 │   └── useThemedStyles.ts          # Computed styles hook
 └── context/
     └── ThemeContext.tsx            # React context definition
@@ -266,18 +270,22 @@ web/src/features/theming/
 ## Migration Plan
 
 ### Phase 1: Create Module Structure
+
 1. Create `features/theming/` directory structure
 2. Define `Theme` and related types
 3. Export from `index.ts`
 
 ### Phase 2: Create Components
+
 1. Implement `ThemeProvider` (based on EventThemeProvider)
 2. Implement `ThemedBackground` (extract from editors)
-3. Implement `useTheme` hook
+3. Implement `useEventTheme` hook
 4. Add `useThemedStyles` utility hook
 
 ### Phase 3: Migrate Types in Features
+
 1. Update `features/projects/types/project.types.ts`:
+
    - Import `Theme` from theming
    - Remove `ProjectTheme*` types
    - Use `Theme` in `Project` interface
@@ -290,16 +298,19 @@ web/src/features/theming/
    - Keep `logoUrl` as separate field
 
 ### Phase 4: Migrate Provider Usage
+
 1. Update imports from `@/components/providers/EventThemeProvider` to `@/features/theming`
-2. Rename `useEventTheme` → `useTheme` in consuming components
+2. Rename `useEventTheme` → `useEventTheme` in consuming components
 3. Deprecate/remove `EventThemeProvider` from `components/providers/`
 
 ### Phase 5: Migrate ThemedBackground Usage
+
 1. Update `ThemeEditor` (projects) to use `ThemedBackground`
 2. Update `EventThemeEditor` (events) to use `ThemedBackground`
 3. Update `DeviceFrame` (steps) to use `ThemedBackground` or remove background logic
 
 ### Phase 6: Cleanup
+
 1. Remove deprecated `EventThemeProvider`
 2. Remove duplicate theme types from projects/events
 3. Update any remaining type imports
@@ -332,14 +343,19 @@ import { EventThemeProvider, useEventTheme } from "@/components/providers/EventT
 
 ```tsx
 // Single import source
-import { Theme, ThemeProvider, useTheme, ThemedBackground } from "@/features/theming";
+import {
+  Theme,
+  ThemeProvider,
+  useEventTheme,
+  ThemedBackground,
+} from "@/features/theming";
 
 // Clean, reusable components
 <ThemeProvider theme={theme}>
   <ThemedBackground background={theme.background} fontFamily={theme.fontFamily}>
     {children}
   </ThemedBackground>
-</ThemeProvider>
+</ThemeProvider>;
 ```
 
 ---
@@ -356,7 +372,7 @@ export interface Project {
   id: string;
   name: string;
   // ...
-  theme: Theme;           // Uses unified type
+  theme: Theme; // Uses unified type
   logoUrl?: string | null; // Identity, not in Theme
   // ...
 }
@@ -372,7 +388,7 @@ export interface Event {
   id: string;
   name: string;
   // ...
-  theme: Theme;           // Uses unified type
+  theme: Theme; // Uses unified type
   logoUrl?: string | null; // Identity, not in Theme
   // ...
 }
@@ -386,7 +402,7 @@ export interface Event {
 import { useEventTheme } from "@/components/providers/EventThemeProvider";
 
 // After
-import { useTheme } from "@/features/theming";
+import { useEventTheme } from "@/features/theming";
 ```
 
 ---
@@ -441,11 +457,12 @@ export function loadGoogleFont(fontFamily: string): Promise<void> { ... }
 
 ## Relationship to Other PRDs
 
-| PRD | Relationship |
-|-----|--------------|
-| `preview-shell-prd.md` | Depends on theming. Uses `ThemedBackground` component. |
-| `welcome-screen-prd.md` | Will use theming for welcome screen preview. |
+| PRD                     | Relationship                                           |
+| ----------------------- | ------------------------------------------------------ |
+| `preview-shell-prd.md`  | Depends on theming. Uses `ThemedBackground` component. |
+| `welcome-screen-prd.md` | Will use theming for welcome screen preview.           |
 
 **Implementation Order:**
+
 1. **theming** (this PRD) - Create types, provider, components
 2. **preview-shell** - Uses theming components for themed previews

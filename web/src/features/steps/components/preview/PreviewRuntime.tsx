@@ -12,11 +12,11 @@
  * - "playback": Interactive mode with value persistence (for experience playback)
  */
 
-import { EventThemeProvider } from "@/components/providers/EventThemeProvider";
+import { ThemeProvider } from "@/features/theming";
 import { DeviceFrame } from "./DeviceFrame";
 import { ViewportModeProvider } from "./ViewportModeContext";
 import type { Step } from "@/features/steps/types";
-import type { ProjectTheme as EventTheme } from "@/features/projects/types";
+import type { Theme } from "@/features/theming";
 import type { AiPreset } from "@/features/ai-presets/types";
 import {
   ViewportMode,
@@ -43,7 +43,7 @@ export type PreviewMode = "single-step" | "playback";
 
 interface PreviewRuntimeProps {
   step: Step;
-  theme: EventTheme;
+  theme: Theme;
   viewportMode: ViewportMode;
   aiPresets?: AiPreset[];
   mockSession?: Partial<MockSessionData>;
@@ -80,7 +80,7 @@ export function PreviewRuntime({
   const isInteractive = mode === "playback";
 
   return (
-    <EventThemeProvider theme={theme}>
+    <ThemeProvider theme={theme}>
       <ViewportModeProvider mode={viewportMode}>
         <div className="h-full w-full flex justify-center">
           <DeviceFrame viewportMode={viewportMode}>
@@ -97,7 +97,7 @@ export function PreviewRuntime({
           </DeviceFrame>
         </div>
       </ViewportModeProvider>
-    </EventThemeProvider>
+    </ThemeProvider>
   );
 }
 
