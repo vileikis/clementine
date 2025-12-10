@@ -1,6 +1,6 @@
 /**
- * Utility functions for comparing form values with original step data.
- * Used by step editors to determine which fields have actually changed.
+ * Utility functions for comparing form values with original data.
+ * Used by auto-save hooks to determine which fields have actually changed.
  */
 
 /**
@@ -38,7 +38,7 @@ function deepNormalize(value: unknown): unknown {
  * Uses deep comparison with normalization for objects/arrays like config.
  *
  * @param formValues - Current form values
- * @param originalValues - Original step values to compare against
+ * @param originalValues - Original values to compare against
  * @param fieldsToCompare - Array of field keys to check for changes
  * @returns Object containing only the fields that have changed
  */

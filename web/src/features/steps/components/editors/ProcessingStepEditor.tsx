@@ -25,7 +25,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { BaseStepEditor } from "./BaseStepEditor";
-import { useAutoSave } from "../../hooks";
+import { useAutoSave } from "@/hooks";
 import { STEP_CONSTANTS } from "../../constants";
 import { stepMediaTypeSchema } from "../../schemas";
 import type { StepProcessing } from "../../types";
