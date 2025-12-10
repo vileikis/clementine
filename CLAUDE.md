@@ -186,6 +186,27 @@ The application is organized into feature modules in `web/src/features/`.
 - **Status**: Fully implemented (Phase 3 complete)
 - **Schema**: Discriminated union by step type (info, capture, inputs, ai-transform, etc.)
 
+**✅ Ready - Theming** (`web/src/features/theming/`)
+
+- **Purpose**: Centralized theming system for guest-facing experiences
+- **Status**: Fully implemented - canonical source of truth for theme types and utilities
+- **Exports**:
+  - Types: `Theme`, `ThemeText`, `ThemeButton`, `ThemeBackground`, `ButtonRadius`
+  - Components: `ThemeProvider`, `ThemedBackground`
+  - Hooks: `useEventTheme`, `useThemedStyles`
+  - Constants: `BUTTON_RADIUS_MAP`
+- **Usage**: Wrap guest-facing components with `<ThemeProvider theme={...}>` and use `useEventTheme()` hook
+
+**✅ Ready - Camera** (`web/src/features/camera/`)
+
+- **Purpose**: Camera capture and photo library picker for guest photo submission
+- **Status**: Fully implemented
+- **Exports**:
+  - Components: `CameraCapture` (main component)
+  - Types: `CapturedPhoto`, `CameraCaptureError`, `CaptureMethod`, `AspectRatio`, `CameraFacing`
+  - Constants: `DEFAULT_LABELS` (for i18n customization)
+- **Features**: Live camera preview, photo library fallback, aspect ratio constraints, camera facing toggle, permission handling
+
 **📋 Planned - Experience Engine** (`web/src/features/experience-engine/`)
 
 - **Purpose**: Unified runtime powering admin preview AND guest flow (Phase 7)
