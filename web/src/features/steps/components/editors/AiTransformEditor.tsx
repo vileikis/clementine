@@ -39,7 +39,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { X, FlaskConical } from "lucide-react";
-import { useAutoSave } from "../../hooks";
+import { useAutoSave } from "@/hooks";
 import type { StepAiTransform } from "../../types";
 import { StepPlaygroundDialog } from "../playground";
 
