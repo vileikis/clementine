@@ -37,7 +37,6 @@ export const eventThemeBackgroundSchema = z.object({
  * Event-wide theme settings schema
  */
 export const eventThemeSchema = z.object({
-  logoUrl: z.string().url().nullable().optional().default(null),
   fontFamily: z.string().nullable().optional().default(null),
   primaryColor: z.string().regex(COLOR_REGEX, "Invalid hex color format"),
   text: eventThemeTextSchema,
@@ -126,7 +125,6 @@ export const updateEventInputSchema = z.object({
  * Update event theme input schema (partial updates supported)
  */
 export const updateEventThemeInputSchema = z.object({
-  logoUrl: z.string().url().nullable().optional(),
   fontFamily: z.string().nullable().optional(),
   primaryColor: z
     .string()

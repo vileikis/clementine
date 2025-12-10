@@ -135,7 +135,6 @@ export async function updateEventTheme(
   projectId: string,
   eventId: string,
   themeData: {
-    logoUrl?: string | null;
     fontFamily?: string | null;
     primaryColor?: string;
     text?: {
@@ -161,9 +160,6 @@ export async function updateEventTheme(
   };
 
   // Top-level theme fields
-  if (themeData.logoUrl !== undefined) {
-    updateData["theme.logoUrl"] = themeData.logoUrl;
-  }
   if (themeData.fontFamily !== undefined) {
     updateData["theme.fontFamily"] = themeData.fontFamily;
   }

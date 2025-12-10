@@ -38,7 +38,6 @@ export const projectThemeBackgroundSchema = z.object({
  * Project-wide theme settings for visual customization
  */
 export const projectThemeSchema = z.object({
-  logoUrl: z.string().url().nullable().optional().default(null),
   fontFamily: z.string().nullable().optional().default(null),
   primaryColor: z.string().regex(COLOR_REGEX),
   text: projectThemeTextSchema,
@@ -71,7 +70,6 @@ export const projectSchema = z.object({
 
 // Project update schemas (for Server Actions)
 export const updateProjectThemeSchema = z.object({
-  logoUrl: z.string().url().nullable().optional().default(null),
   fontFamily: z.string().nullable().optional().default(null),
   primaryColor: z.string().regex(COLOR_REGEX).optional(),
   text: projectThemeTextSchema.partial().optional(),
