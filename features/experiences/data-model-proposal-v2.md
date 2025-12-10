@@ -2,7 +2,7 @@
 
 **Date**: December 2024
 **Status**: Draft Proposal
-**Scope**: Simplified experience model with system experiences for captures
+**Scope**: Simplified experience model with flat discriminated union types
 
 ---
 
@@ -10,11 +10,13 @@
 
 This proposal introduces a cleaner experience model that:
 
-1. **Treats everything as an experience** - Uniform handling for captures, AI, surveys, wheels
-2. **System experiences for simple captures** - Photo, GIF, Video exist once globally
-3. **Company experiences for custom flows** - AI transformations, surveys, wheels
-4. **Event-level frame overlay** - Single overlay applied to all media outputs
-5. **Event-level sharing config** - Default sharing for all outputs
+1. **Flat discriminated union** - Each experience type has its own shape, no nested configs
+2. **Simple `type` discriminator** - `type: "photo" | "gif" | "ai_photo" | "survey" | ...`
+3. **System experiences for simple captures** - Photo, GIF, Video exist once globally
+4. **Company experiences for custom flows** - AI transformations, surveys, wheels
+5. **Event-level frame overlay** - Single overlay applied to all media outputs
+6. **Event-level sharing config** - Default sharing for all outputs
+7. **Unified InfoScreen** - Reusable for intros, endings, and in-between survey content
 
 ---
 
@@ -22,9 +24,13 @@ This proposal introduces a cleaner experience model that:
 
 | Type | Scope | Purpose | Produces Media |
 |------|-------|---------|----------------|
-| `capture` | System | Simple photo/gif/video | Yes |
-| `ai_capture` | Company | AI-powered transformation | Yes |
-| `survey` | Company (or System) | Data collection | No |
+| `photo` | System | Simple photo capture | Yes |
+| `gif` | System | Burst capture → GIF | Yes |
+| `video` | System | Video recording | Yes |
+| `ai_photo` | Company | Photo → AI image | Yes |
+| `ai_gif` | Company | Burst → AI GIF | Yes |
+| `ai_video` | Company | Photo → AI video | Yes |
+| `survey` | Company | Data collection | No |
 | `wheel` | Company | Gamification | No |
 
 Future types: `quiz`, `ar`, `photo_collage`, etc.
@@ -65,156 +71,243 @@ interface ExperienceBase {
 
 ```typescript
 type Experience =
-  | CaptureExperience
-  | AiCaptureExperience
+  // Simple captures (system)
+  | PhotoExperience
+  | GifExperience
+  | VideoExperience
+  // AI captures (company)
+  | AiPhotoExperience
+  | AiGifExperience
+  | AiVideoExperience
+  // Data/Gamification (company)
   | SurveyExperience
   | WheelExperience;
+
+// Discriminator field
+type ExperienceType = Experience["type"];
+// = "photo" | "gif" | "video" | "ai_photo" | "ai_gif" | "ai_video" | "survey" | "wheel"
 ```
 
 ---
 
 ## 3. Experience Type Definitions
 
-### 3.1 Capture Experience (System)
+### 3.1 Photo Experience (System)
 
-Simple photo, GIF, or video capture without AI transformation.
+Simple single photo capture.
 
 ```typescript
-interface CaptureExperience extends ExperienceBase {
-  experienceType: "capture";
+interface PhotoExperience extends ExperienceBase {
+  type: "photo";
 
   // Always system-level
   isSystem: true;
   companyId: null;
-
-  config: {
-    mode: "photo" | "gif" | "video";
-
-    // Mode-specific defaults (can be extended in future)
-    gifConfig?: {
-      frameCount: number;         // Default: 4
-      intervalMs: number;         // Default: 500
-    } | null;
-
-    videoConfig?: {
-      maxDurationSec: number;     // Default: 15
-    } | null;
-  };
 
   // Output aspect ratio for frame overlay matching
   outputAspectRatio: AspectRatio;
 }
 ```
 
-**System Capture Experiences (seeded in database):**
+### 3.2 GIF Experience (System)
 
-| ID | Mode | Name | Aspect Ratio |
-|----|------|------|--------------|
-| `system:photo` | photo | Photo | 3:4 |
-| `system:gif` | gif | GIF | 3:4 |
-| `system:video` | video | Video | 9:16 |
-
-### 3.2 AI Capture Experience (Company)
-
-Capture photo/burst, transform with AI, output image/gif/video.
+Burst capture compiled into animated GIF.
 
 ```typescript
-interface AiCaptureExperience extends ExperienceBase {
-  experienceType: "ai_capture";
+interface GifExperience extends ExperienceBase {
+  type: "gif";
+
+  // Always system-level
+  isSystem: true;
+  companyId: null;
+
+  // Burst settings (flat, not nested)
+  frameCount: number;             // 2-10, default: 4
+  intervalMs: number;             // 200-2000, default: 500
+
+  // Output aspect ratio
+  outputAspectRatio: AspectRatio;
+}
+```
+
+### 3.3 Video Experience (System)
+
+Short video recording.
+
+```typescript
+interface VideoExperience extends ExperienceBase {
+  type: "video";
+
+  // Always system-level
+  isSystem: true;
+  companyId: null;
+
+  // Video settings (flat)
+  maxDurationSec: number;         // 3-60, default: 15
+
+  // Output aspect ratio
+  outputAspectRatio: AspectRatio;
+}
+```
+
+**System Experiences (seeded in database or hardcoded):**
+
+| ID | Type | Config | Aspect Ratio |
+|----|------|--------|--------------|
+| `system:photo` | `photo` | - | 3:4 |
+| `system:gif` | `gif` | `frameCount: 4, intervalMs: 500` | 3:4 |
+| `system:video` | `video` | `maxDurationSec: 15` | 9:16 |
+
+### 3.4 AI Photo Experience (Company)
+
+Capture single photo, transform with AI to image.
+
+```typescript
+interface AiPhotoExperience extends ExperienceBase {
+  type: "ai_photo";
 
   // Always company-level
   isSystem: false;
   companyId: string;
 
-  // What to capture as AI input
-  captureConfig: {
-    mode: "photo" | "burst";
-
-    burstConfig?: {
-      frameCount: number;         // 2-10
-      intervalMs: number;         // 200-2000
-    } | null;
-
-    cameraFacing: "user" | "environment" | "both";
-    countdown: number;            // 0-10 seconds
-  };
+  // Camera settings (capture is always single photo - no config needed)
+  cameraFacing: "user" | "environment" | "both";
+  countdown: number;              // 0-10 seconds
 
   // AI transformation settings
-  aiConfig: {
-    model: string | null;
-    prompt: string;               // max 2000 chars, supports {{variable}}
-    negativePrompt?: string | null;
-    outputType: "image" | "gif" | "video";
-    outputAspectRatio: AspectRatio;
-    referenceImageUrls: string[]; // max 5
-
-    // Advanced (optional)
-    seed?: number | null;
-    guidanceScale?: number | null;
-  };
+  aiConfig: AiConfig;
 
   // Input questions for AI context (shown before capture)
   inputQuestions: Question[];
 
-  // Processing screen config
-  processingConfig: {
-    messages: string[];           // 1-10 rotating messages
-    estimatedDurationSec: number; // 5-300
-  };
+  // Processing UX (flat, not nested)
+  processingMessages: string[];   // 1-10 rotating messages
+  estimatedDurationSec: number;   // 5-300
 
   // Optional intro screen
-  intro?: IntroScreen | null;
+  intro?: InfoScreen | null;
 }
 ```
 
-### 3.3 Survey Experience (Company or System)
+### 3.5 AI GIF Experience (Company)
 
-Data collection with multiple question types.
+Capture burst photos, transform each with AI, compile to GIF.
+
+```typescript
+interface AiGifExperience extends ExperienceBase {
+  type: "ai_gif";
+
+  // Always company-level
+  isSystem: false;
+  companyId: string;
+
+  // Camera settings (capture is burst)
+  cameraFacing: "user" | "environment" | "both";
+  countdown: number;              // 0-10 seconds
+  frameCount: number;             // 2-10
+  intervalMs: number;             // 200-2000
+
+  // AI transformation settings
+  aiConfig: AiConfig;
+
+  // Input questions for AI context (shown before capture)
+  inputQuestions: Question[];
+
+  // Processing UX
+  processingMessages: string[];   // 1-10 rotating messages
+  estimatedDurationSec: number;   // 5-300
+
+  // Optional intro screen
+  intro?: InfoScreen | null;
+}
+```
+
+### 3.6 AI Video Experience (Company)
+
+Capture single photo, transform with AI to video.
+
+```typescript
+interface AiVideoExperience extends ExperienceBase {
+  type: "ai_video";
+
+  // Always company-level
+  isSystem: false;
+  companyId: string;
+
+  // Camera settings (capture is single photo - AI generates video from it)
+  cameraFacing: "user" | "environment" | "both";
+  countdown: number;              // 0-10 seconds
+
+  // AI transformation settings
+  aiConfig: AiConfig;
+
+  // Input questions for AI context (shown before capture)
+  inputQuestions: Question[];
+
+  // Processing UX
+  processingMessages: string[];   // 1-10 rotating messages
+  estimatedDurationSec: number;   // 5-300
+
+  // Optional intro screen
+  intro?: InfoScreen | null;
+}
+```
+
+### 3.7 Survey Experience (Company)
+
+Data collection with questions and info screens interleaved.
 
 ```typescript
 interface SurveyExperience extends ExperienceBase {
-  experienceType: "survey";
+  type: "survey";
 
   // Can be system (generic templates) or company (custom)
   isSystem: boolean;
   companyId: string | null;
 
-  // Questions (same type as AI input questions)
-  questions: Question[];
+  // Flow items: questions AND info screens interleaved
+  items: SurveyItem[];
 
   // Screens
-  intro?: IntroScreen | null;
-  thankYou: ThankYouScreen;
+  intro?: InfoScreen | null;
+  ending: InfoScreen;             // Thank you / completion screen
+}
+
+// Survey can contain questions OR info screens
+type SurveyItem = Question | SurveyInfoItem;
+
+interface SurveyInfoItem {
+  type: "info";
+  id: string;
+  title: string;
+  description?: string | null;
+  mediaUrl?: string | null;
+  mediaType?: "image" | "gif" | "video" | "lottie" | null;
+  ctaLabel?: string | null;       // default: "Continue"
 }
 ```
 
-### 3.4 Wheel Experience (Company)
+### 3.8 Wheel Experience (Company)
 
 Gamified spinning wheel with prizes.
 
 ```typescript
 interface WheelExperience extends ExperienceBase {
-  experienceType: "wheel";
+  type: "wheel";
 
   // Always company-level (custom wheel config)
   isSystem: false;
   companyId: string;
 
-  // Wheel configuration
-  wheelConfig: {
-    sectors: WheelSector[];       // 2-12 sectors
-    spinDurationMs: number;       // 2000-8000
-    pointerPosition: "top" | "right";
-    showConfetti: boolean;
-  };
+  // Wheel configuration (flat, not nested in wheelConfig)
+  sectors: WheelSector[];         // 2-12 sectors
+  spinDurationMs: number;         // 2000-8000
+  pointerPosition: "top" | "right";
+  showConfetti: boolean;
 
   // Screens
-  intro?: IntroScreen | null;
-  resultScreen: {
-    titleTemplate: string;        // "You won {{prize}}!"
-    descriptionTemplate?: string;
-    showPrizeCode: boolean;
-  };
+  intro?: InfoScreen | null;
+  resultScreen: WheelResultScreen;
 }
 
 interface WheelSector {
@@ -235,13 +328,35 @@ interface WheelSector {
     description?: string | null;
   } | null;
 }
+
+interface WheelResultScreen {
+  titleTemplate: string;          // "You won {{prize}}!"
+  descriptionTemplate?: string | null;
+  showPrizeCode: boolean;
+}
 ```
 
 ---
 
 ## 4. Shared Types
 
-### 4.1 Question Type (Shared by AI inputs & Surveys)
+### 4.1 AI Config
+
+```typescript
+interface AiConfig {
+  model: string | null;
+  prompt: string;                 // max 2000 chars, supports {{variable}}
+  negativePrompt?: string | null;
+  outputAspectRatio: AspectRatio;
+  referenceImageUrls: string[];   // max 5
+
+  // Advanced (optional)
+  seed?: number | null;
+  guidanceScale?: number | null;
+}
+```
+
+### 4.2 Question Type (Shared by AI inputs & Surveys)
 
 ```typescript
 type Question =
@@ -298,26 +413,21 @@ interface EmailQuestion extends QuestionBase {
 }
 ```
 
-### 4.2 Screen Types
+### 4.3 InfoScreen (Unified)
+
+Reusable for intros, endings, and in-between content. Same structure as existing `InfoStep`.
 
 ```typescript
-interface IntroScreen {
+interface InfoScreen {
   title: string;                  // max 200 chars
   description?: string | null;    // max 1000 chars
   mediaUrl?: string | null;
   mediaType?: "image" | "gif" | "video" | "lottie" | null;
-  ctaLabel?: string | null;       // default: "Get Started"
-}
-
-interface ThankYouScreen {
-  title: string;                  // max 200 chars
-  description?: string | null;    // max 1000 chars
-  mediaUrl?: string | null;
-  mediaType?: "image" | "gif" | "video" | "lottie" | null;
+  ctaLabel?: string | null;       // default: "Continue" or "Get Started"
 }
 ```
 
-### 4.3 Aspect Ratio
+### 4.4 Aspect Ratio
 
 ```typescript
 type AspectRatio = "1:1" | "3:4" | "4:3" | "4:5" | "5:4" | "9:16" | "16:9";
@@ -426,7 +536,7 @@ const event = {
 - Easy to reorder all experiences together
 
 **Cons:**
-- Need to filter/validate system experiences (only one per mode)
+- Need to filter/validate system experiences (only one per type)
 - Slightly more complex queries
 
 **Constraints:**
@@ -443,7 +553,7 @@ System captures in dedicated map, company experiences in array.
 interface Event {
   // ...
 
-  // System captures (max one per mode)
+  // System captures (max one per type)
   systemCaptures: {
     photo?: SystemCaptureConfig | null;
     gif?: SystemCaptureConfig | null;
@@ -458,10 +568,9 @@ interface SystemCaptureConfig {
   enabled: boolean;
   label?: string | null;          // Override display name
 
-  // Future: mode-specific overrides
-  // photoConfig?: { ... };
-  // gifConfig?: { frameCount: number; ... };
-  // videoConfig?: { maxDuration: number; ... };
+  // Future: type-specific overrides
+  // gifOverrides?: { frameCount?: number; intervalMs?: number };
+  // videoOverrides?: { maxDurationSec?: number };
 }
 ```
 
@@ -470,7 +579,7 @@ interface SystemCaptureConfig {
 const event = {
   systemCaptures: {
     photo: { enabled: true, label: "Take a Photo" },
-    gif: { enabled: false, label: "Make a GIF" },
+    gif: { enabled: true, label: "Fun GIF" },
     video: null,
   },
   experiences: [
@@ -483,7 +592,7 @@ const event = {
 - Clear separation of system vs company
 - Type-safe: impossible to add duplicate system captures
 - No need to seed system experiences in database
-- Easier to add mode-specific config in future
+- Easier to add type-specific config in future
 
 **Cons:**
 - Two places to manage experiences
@@ -519,21 +628,21 @@ function getAvailableExperiences(event: Event): ExperienceOption[] {
   if (event.systemCaptures.photo?.enabled) {
     options.push({
       type: "system",
-      mode: "photo",
+      captureType: "photo",
       label: event.systemCaptures.photo.label ?? "Photo",
     });
   }
   if (event.systemCaptures.gif?.enabled) {
     options.push({
       type: "system",
-      mode: "gif",
+      captureType: "gif",
       label: event.systemCaptures.gif.label ?? "GIF",
     });
   }
   if (event.systemCaptures.video?.enabled) {
     options.push({
       type: "system",
-      mode: "video",
+      captureType: "video",
       label: event.systemCaptures.video.label ?? "Video",
     });
   }
@@ -568,12 +677,18 @@ How many experiences available?
     └── 2+ → Show experience picker
 
     ▼
-Run selected experience
+Run selected experience by type:
     │
-    ├── System capture → Camera → Output
-    ├── AI capture → Inputs? → Camera → Processing* → Output
-    ├── Survey → Questions → Thank you
-    └── Wheel → Spin → Result
+    ├── photo      → Camera (single) → Apply overlay → Output
+    ├── gif        → Camera (burst) → Compile GIF → Apply overlay → Output
+    ├── video      → Camera (video) → Apply overlay → Output
+    │
+    ├── ai_photo   → Intro? → Inputs? → Camera (single) → Processing* → Apply overlay → Output
+    ├── ai_gif     → Intro? → Inputs? → Camera (burst) → Processing* → Apply overlay → Output
+    ├── ai_video   → Intro? → Inputs? → Camera (single) → Processing* → Apply overlay → Output
+    │
+    ├── survey     → Intro? → Items (questions + info) → Ending
+    └── wheel      → Intro? → Spin → Result
 
     * During AI processing, if preReward extra exists, run it
 
@@ -593,9 +708,9 @@ For media outputs:
 
 ```
 /experiences/{experienceId}
-├── Company AI experiences (experienceType: "ai_capture")
-├── Company surveys (experienceType: "survey")
-├── Company wheels (experienceType: "wheel")
+├── Company AI experiences (type: "ai_photo" | "ai_gif" | "ai_video")
+├── Company surveys (type: "survey")
+├── Company wheels (type: "wheel")
 └── Optional: System survey templates (isSystem: true)
 
 /projects/{projectId}/events/{eventId}
@@ -607,29 +722,28 @@ For media outputs:
 └── extras
 ```
 
+Note: System captures (photo, gif, video) are NOT stored in `/experiences` collection.
+They are hardcoded in the application with `system:photo`, `system:gif`, `system:video` IDs.
+
 ### 8.2 Example Documents
 
-**AI Capture Experience:**
+**AI Photo Experience:**
 ```json
 {
   "id": "exp_abc123",
+  "type": "ai_photo",
   "companyId": "comp_xyz",
   "isSystem": false,
-  "experienceType": "ai_capture",
   "name": "Hobbitify Me",
   "description": "Transform into a hobbit character",
   "status": "active",
 
-  "captureConfig": {
-    "mode": "photo",
-    "cameraFacing": "user",
-    "countdown": 3
-  },
+  "cameraFacing": "user",
+  "countdown": 3,
 
   "aiConfig": {
     "model": "flux-schnell",
     "prompt": "Transform this person into a hobbit from Lord of the Rings. They are holding a {{pet}}. Background: {{background}}. Style: cinematic, detailed.",
-    "outputType": "image",
     "outputAspectRatio": "3:4",
     "referenceImageUrls": []
   },
@@ -663,19 +777,82 @@ For media outputs:
     }
   ],
 
-  "processingConfig": {
-    "messages": [
-      "Entering Middle-earth...",
-      "Finding your hobbit self...",
-      "Adding the finishing touches..."
-    ],
-    "estimatedDurationSec": 30
-  },
+  "processingMessages": [
+    "Entering Middle-earth...",
+    "Finding your hobbit self...",
+    "Adding the finishing touches..."
+  ],
+  "estimatedDurationSec": 30,
 
   "intro": {
     "title": "Become a Hobbit!",
     "description": "We'll transform your photo into a character from the Shire",
     "ctaLabel": "Let's Go!"
+  },
+
+  "createdAt": 1702000000000,
+  "updatedAt": 1702000000000
+}
+```
+
+**Survey Experience (with interleaved info):**
+```json
+{
+  "id": "exp_survey_feedback",
+  "type": "survey",
+  "companyId": "comp_xyz",
+  "isSystem": false,
+  "name": "Event Feedback",
+  "description": "Quick feedback survey",
+  "status": "active",
+
+  "intro": {
+    "title": "Quick Feedback",
+    "description": "Help us improve! This takes 30 seconds.",
+    "ctaLabel": "Start"
+  },
+
+  "items": [
+    {
+      "id": "q1",
+      "type": "opinion_scale",
+      "variableKey": "rating",
+      "title": "How was your experience today?",
+      "scaleMin": 1,
+      "scaleMax": 5,
+      "minLabel": "Poor",
+      "maxLabel": "Excellent",
+      "required": true
+    },
+    {
+      "id": "info1",
+      "type": "info",
+      "title": "Thanks! Just two more questions...",
+      "ctaLabel": "Continue"
+    },
+    {
+      "id": "q2",
+      "type": "yes_no",
+      "variableKey": "recommend",
+      "title": "Would you recommend this to a friend?",
+      "yesLabel": "Yes!",
+      "noLabel": "Not really",
+      "required": true
+    },
+    {
+      "id": "q3",
+      "type": "long_text",
+      "variableKey": "feedback",
+      "title": "Any other feedback?",
+      "placeholder": "Tell us what you think...",
+      "maxLength": 500,
+      "required": false
+    }
+  ],
+
+  "ending": {
+    "title": "Thank You!",
+    "description": "Your feedback helps us improve."
   },
 
   "createdAt": 1702000000000,
@@ -718,7 +895,7 @@ For media outputs:
     "preReward": { "experienceId": "exp_survey_feedback", "enabled": true }
   },
 
-  "theme": { /* ... */ },
+  "theme": { },
   "createdAt": 1702000000000,
   "updatedAt": 1702000000000
 }
@@ -732,22 +909,23 @@ For media outputs:
 
 | Current | New |
 |---------|-----|
-| `Experience.stepsOrder[]` | Removed - flow determined by `experienceType` |
+| `Experience.experienceType` | `Experience.type` (simpler) |
+| `Experience.stepsOrder[]` | Removed - flow determined by `type` |
 | `Steps` subcollection | Removed - config embedded in experience |
-| `Experience.status` | Unchanged |
+| Nested `captureConfig`, `aiConfig` | Flattened into experience |
 | `Event.experiences[]` | Split into `systemCaptures` + `experiences[]` |
 
 ### 9.2 Migration Steps
 
 1. **Add new fields** to Event schema (`systemCaptures`, `frameOverlay`, `sharingConfig`)
-2. **Create new experience types** (`ai_capture`, `survey`, `wheel`)
+2. **Create new experience types** with flat structure
 3. **Migrate existing experiences** - Convert step-based to typed experiences
 4. **Deprecate steps** - Keep for backwards compat, stop creating new
 5. **Update Experience Engine** - Execute by type, not by steps
 
 ### 9.3 Backwards Compatibility
 
-- Existing step-based experiences work as `experienceType: "legacy"`
+- Existing step-based experiences work as `type: "legacy"`
 - Legacy experiences use old step-by-step execution
 - New experiences use type-based execution
 - Gradual migration path
@@ -774,19 +952,25 @@ For media outputs:
 
 | Decision | Choice |
 |----------|--------|
+| Discriminator field | `type` (not `experienceType`) |
+| Experience structure | Flat discriminated union - no nested configs |
 | Simple captures | System-level, not per-company |
-| Experience structure | Discriminated union by `experienceType` |
 | Steps | Removed - config embedded in experience type |
 | Frame overlay | Event-level, single overlay (future: by aspect ratio) |
 | Sharing config | Event-level default |
 | System experience storage | Approach B: separate `systemCaptures` map |
+| Info screens | Unified `InfoScreen` type for intros, endings, survey interstitials |
 
 ### Experience Types
 
 | Type | Scope | Media Output | Reusable |
 |------|-------|--------------|----------|
-| `capture` | System | Yes | N/A (built-in) |
-| `ai_capture` | Company | Yes | Yes |
+| `photo` | System | Yes | N/A (built-in) |
+| `gif` | System | Yes | N/A (built-in) |
+| `video` | System | Yes | N/A (built-in) |
+| `ai_photo` | Company | Yes | Yes |
+| `ai_gif` | Company | Yes | Yes |
+| `ai_video` | Company | Yes | Yes |
 | `survey` | Company | No | Yes |
 | `wheel` | Company | No | Yes |
 
