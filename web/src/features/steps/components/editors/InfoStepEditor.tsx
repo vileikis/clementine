@@ -13,7 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Form } from "@/components/ui/form";
 import { BaseStepEditor } from "./BaseStepEditor";
-import { useAutoSave } from "../../hooks";
+import { useAutoSave } from "@/hooks";
 import type { StepInfo } from "../../types";
 
 import { stepMediaTypeSchema } from "../../schemas";

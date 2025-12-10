@@ -34,7 +34,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { BaseStepEditor } from "./BaseStepEditor";
-import { useAutoSave } from "../../hooks";
+import { useAutoSave } from "@/hooks";
 import { STEP_CONSTANTS } from "../../constants";
 import { stepMediaTypeSchema } from "../../schemas";
 import type { StepCapture } from "../../types";
