@@ -1,6 +1,7 @@
 // Event validation constants - extracted from schemas to avoid magic numbers
 
-import type { EventTheme, EventExtras } from "./types/event.types";
+import type { Theme } from "@/features/theming";
+import type { EventExtras } from "./types/event.types";
 
 // Field length constraints
 export const NAME_LENGTH = {
@@ -15,8 +16,7 @@ export const COLOR_REGEX = /^#[0-9A-F]{6}$/i;
 export const DEFAULT_EVENT_NAME = "Untitled Event";
 
 // Default theme configuration (for UI default values and initialization)
-export const DEFAULT_EVENT_THEME: EventTheme = {
-  logoUrl: null,
+export const DEFAULT_EVENT_THEME: Theme = {
   fontFamily: null,
   primaryColor: "#6366F1", // Indigo
   text: {

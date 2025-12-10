@@ -7,7 +7,7 @@
 // Numeric scale selection with min/max labels.
 
 import { StepLayout, ActionButton, ScaleButton } from "@/components/step-primitives";
-import { useEventTheme } from "@/components/providers/EventThemeProvider";
+import { useEventTheme } from "@/features/theming";
 import type { StepOpinionScale } from "@/features/steps/types";
 import type { StepRendererProps } from "../../types";
 

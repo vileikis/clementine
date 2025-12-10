@@ -11,7 +11,7 @@
  * Used in the experience editor's middle panel.
  */
 
-import { useEventTheme } from "@/components/providers/EventThemeProvider";
+import { useEventTheme, ThemedBackground } from "@/features/theming";
 import type { ReactNode } from "react";
 import { ViewportMode, VIEWPORT_DIMENSIONS } from "../../types/preview.types";
 
@@ -35,8 +35,10 @@ export function DeviceFrame({
   const isMobile = viewportMode === "mobile";
 
   return (
-    <div
-      className="rounded-2xl border-4 border-foreground/10 shadow-lg overflow-hidden relative"
+    <ThemedBackground
+      background={theme.background}
+      fontFamily={theme.fontFamily}
+      className="rounded-2xl border-4 border-foreground/10 shadow-lg overflow-hidden"
       style={{
         // Width: use dimension but don't exceed available space
         width: isMobile ? dimensions.width : "100%",
@@ -44,46 +46,11 @@ export function DeviceFrame({
         // Height: mobile fixed, desktop fills available
         height: isMobile ? dimensions.height : "100%",
         minHeight: isMobile ? undefined : dimensions.height,
-        backgroundColor: theme.background.color,
-        fontFamily: theme.fontFamily || undefined,
       }}
+      contentClassName=""
     >
-      {/* Background Image with Overlay */}
-      {theme.background.image && (
-        <>
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: `url(${theme.background.image})` }}
-          />
-          {theme.background.overlayOpacity > 0 && (
-            <div
-              className="absolute inset-0 bg-black pointer-events-none"
-              style={{ opacity: theme.background.overlayOpacity }}
-            />
-          )}
-        </>
-      )}
-
-      {/* Logo */}
-      {theme.logoUrl && (
-        <div className="absolute top-4 left-0 right-0 z-20 px-4">
-          <div
-            style={{
-              textAlign: theme.text.alignment,
-            }}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={theme.logoUrl}
-              alt="Event logo"
-              className={`${isMobile ? "h-8" : "h-10"} w-auto object-contain inline-block`}
-            />
-          </div>
-        </div>
-      )}
-
       {/* Content */}
       <div className="relative z-5 h-full overflow-auto">{children}</div>
-    </div>
+    </ThemedBackground>
   );
 }

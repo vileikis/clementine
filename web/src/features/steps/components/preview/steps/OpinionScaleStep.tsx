@@ -13,7 +13,7 @@
  */
 
 import { StepLayout, ActionButton, ScaleButton } from "@/components/step-primitives";
-import { useEventTheme } from "@/components/providers/EventThemeProvider";
+import { useEventTheme } from "@/features/theming";
 import type { StepOpinionScale } from "@/features/steps/types";
 
 interface OpinionScaleStepProps {

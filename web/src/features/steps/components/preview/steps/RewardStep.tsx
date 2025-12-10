@@ -19,7 +19,7 @@ import {
   Mail,
 } from "lucide-react";
 import { StepLayout, ActionButton } from "@/components/step-primitives";
-import { useEventTheme } from "@/components/providers/EventThemeProvider";
+import { useEventTheme } from "@/features/theming";
 import type { StepReward, ShareSocial } from "@/features/steps/types";
 import type { MockSessionData } from "@/features/steps/types/preview.types";
 

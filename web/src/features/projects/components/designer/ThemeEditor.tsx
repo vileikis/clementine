@@ -1,8 +1,7 @@
 "use client";
 
 import { useReducer, useTransition } from "react";
-import Image from "next/image";
-import { Project, ProjectTheme } from "../../types/project.types";
+import type { Project } from "../../types/project.types";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -12,6 +11,7 @@ import { updateProjectTheme } from "../../actions/projects.actions";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
+import { ThemedBackground, BUTTON_RADIUS_MAP, type Theme } from "@/features/theming";
 
 interface ThemeEditorProps {
   project: Project;
@@ -20,7 +20,6 @@ interface ThemeEditorProps {
 // Theme reducer actions
 type ThemeAction =
   | { type: "UPDATE_PRIMARY_COLOR"; payload: string }
-  | { type: "UPDATE_LOGO_URL"; payload: string }
   | { type: "UPDATE_FONT_FAMILY"; payload: string }
   | { type: "UPDATE_TEXT_COLOR"; payload: string }
   | { type: "UPDATE_TEXT_ALIGNMENT"; payload: "left" | "center" | "right" }
@@ -32,12 +31,10 @@ type ThemeAction =
   | { type: "UPDATE_BG_OVERLAY_OPACITY"; payload: number };
 
 // Reducer function
-function themeReducer(state: ProjectTheme, action: ThemeAction): ProjectTheme {
+function themeReducer(state: Theme, action: ThemeAction): Theme {
   switch (action.type) {
     case "UPDATE_PRIMARY_COLOR":
       return { ...state, primaryColor: action.payload };
-    case "UPDATE_LOGO_URL":
-      return { ...state, logoUrl: action.payload || null };
     case "UPDATE_FONT_FAMILY":
       return { ...state, fontFamily: action.payload || null };
     case "UPDATE_TEXT_COLOR":
@@ -108,7 +105,6 @@ export function ThemeEditor({ project }: ThemeEditorProps) {
     startTransition(async () => {
       const result = await updateProjectTheme(project.id, {
         primaryColor: theme.primaryColor,
-        logoUrl: theme.logoUrl,
         fontFamily: theme.fontFamily,
         text: {
           color: theme.text.color,
@@ -143,12 +139,6 @@ export function ThemeEditor({ project }: ThemeEditorProps) {
 
   // Helper for button styles
   const buttonBgColor = theme.button.backgroundColor || theme.primaryColor;
-  const buttonRadiusMap = {
-    none: "0px",
-    sm: "0.25rem",
-    md: "0.375rem",
-    full: "9999px",
-  };
 
   return (
     <div className="space-y-6">
@@ -164,22 +154,9 @@ export function ThemeEditor({ project }: ThemeEditorProps) {
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_1fr] items-start">
         {/* Form Controls */}
         <div className="space-y-8">
-          {/* 1. Identity Section */}
+          {/* 1. Font Section */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Identity</h3>
-
-            {/* Logo URL */}
-            <ImageUploadField
-              id="theme-logo"
-              label="Logo Image"
-              value={theme.logoUrl || ""}
-              onChange={(value) =>
-                dispatch({ type: "UPDATE_LOGO_URL", payload: value })
-              }
-              destination="logos"
-              disabled={isPending}
-              recommendedSize="Recommended: 512x512px (1:1 aspect ratio). Max 5MB. PNG with transparency recommended."
-            />
+            <h3 className="text-lg font-semibold">Typography</h3>
 
             {/* Font Family */}
             <div className="space-y-2">
@@ -468,63 +445,33 @@ export function ThemeEditor({ project }: ThemeEditorProps) {
         {/* Live Preview - Sticky */}
         <div className="lg:sticky lg:top-4">
           <PreviewPanel>
-            <div
-              className="relative flex h-full w-full flex-col items-center justify-center p-8"
-              style={{
-                backgroundColor: theme.background.color,
-                backgroundImage: theme.background.image
-                  ? `url(${theme.background.image})`
-                  : undefined,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                fontFamily: theme.fontFamily || undefined,
-              }}
+            <ThemedBackground
+              background={theme.background}
+              fontFamily={theme.fontFamily}
+              className="flex h-full w-full flex-col items-center justify-center p-8"
+              contentClassName="space-y-6"
+              style={{ textAlign: theme.text.alignment }}
             >
-              {/* Overlay for readability when image is present */}
-              {theme.background.image && (
-                <div
-                  className="absolute inset-0 bg-black"
-                  style={{ opacity: theme.background.overlayOpacity }}
-                />
-              )}
+              <h1 className="text-3xl font-bold" style={{ color: theme.text.color }}>
+                Theme Preview
+              </h1>
 
-              {/* Content */}
-              <div
-                className="relative z-10 space-y-6"
-                style={{ textAlign: theme.text.alignment }}
+              <p className="text-lg" style={{ color: theme.text.color }}>
+                This is how your theme will look
+              </p>
+
+              <Button
+                size="lg"
+                className="mt-4"
+                style={{
+                  backgroundColor: buttonBgColor,
+                  color: theme.button.textColor,
+                  borderRadius: BUTTON_RADIUS_MAP[theme.button.radius],
+                }}
               >
-                {/* Logo */}
-                {theme.logoUrl && (
-                  <Image
-                    src={theme.logoUrl}
-                    alt="Event logo"
-                    width={96}
-                    height={96}
-                    className="mx-auto h-24 w-24 object-contain mb-4"
-                  />
-                )}
-
-                <h1 className="text-3xl font-bold" style={{ color: theme.text.color }}>
-                  Event Preview
-                </h1>
-
-                <p className="text-lg" style={{ color: theme.text.color }}>
-                  This is how your theme will look
-                </p>
-
-                <Button
-                  size="lg"
-                  className="mt-4"
-                  style={{
-                    backgroundColor: buttonBgColor,
-                    color: theme.button.textColor,
-                    borderRadius: buttonRadiusMap[theme.button.radius],
-                  }}
-                >
-                  Primary Button
-                </Button>
-              </div>
-            </div>
+                Primary Button
+              </Button>
+            </ThemedBackground>
           </PreviewPanel>
         </div>
       </div>

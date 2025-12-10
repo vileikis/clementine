@@ -1,6 +1,6 @@
 "use client";
 
-import { useEventTheme } from "@/components/providers/EventThemeProvider";
+import { useEventTheme } from "@/features/theming";
 import { useViewportMode } from "@/features/steps/components/preview";
 import type { ReactNode } from "react";
 

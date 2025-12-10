@@ -1,44 +1,8 @@
 // Project-related TypeScript types
 
+import type { Theme } from "@/features/theming";
+
 export type ProjectStatus = "draft" | "live" | "archived" | "deleted";
-
-/**
- * Theme text configuration
- */
-export interface ProjectThemeText {
-  color: string; // Hex color (e.g., "#000000")
-  alignment: "left" | "center" | "right";
-}
-
-/**
- * Theme button configuration
- */
-export interface ProjectThemeButton {
-  backgroundColor?: string | null; // Hex color (inherits primaryColor if undefined)
-  textColor: string; // Hex color (e.g., "#FFFFFF")
-  radius: "none" | "sm" | "md" | "full";
-}
-
-/**
- * Theme background configuration
- */
-export interface ProjectThemeBackground {
-  color: string; // Hex color (e.g., "#F9FAFB")
-  image?: string | null; // Full public URL
-  overlayOpacity: number; // 0-1
-}
-
-/**
- * Project-wide theme settings for visual customization
- */
-export interface ProjectTheme {
-  logoUrl?: string | null;
-  fontFamily?: string | null;
-  primaryColor: string; // Hex color - anchor color for the project
-  text: ProjectThemeText;
-  button: ProjectThemeButton;
-  background: ProjectThemeBackground;
-}
 
 export interface Project {
   id: string;
@@ -57,8 +21,11 @@ export interface Project {
   // Switchboard pattern - controls which event/experience is active (TEMPORARY SEMANTICS - points to Experience IDs in Phase 4, will point to nested Event IDs in Phase 5)
   activeEventId?: string | null; // renamed from activeJourneyId
 
+  // Logo URL - identity concern, separated from theme styling
+  logoUrl?: string | null;
+
   // Nested object configurations (TEMPORARY - will move to Event in Phase 5)
-  theme: ProjectTheme;
+  theme: Theme;
 
   // Soft delete timestamp
   deletedAt?: number | null;
