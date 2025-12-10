@@ -10,7 +10,7 @@ import Image from "next/image";
 import { Download, Share2, Mail, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { StepLayout, ActionButton } from "@/components/step-primitives";
-import { useEventTheme } from "@/components/providers/EventThemeProvider";
+import { useEventTheme } from "@/features/theming";
 import type { StepReward, ShareSocial } from "@/features/steps/types";
 import type { StepRendererProps } from "../../types";
 import { Skeleton } from "@/components/ui/skeleton";

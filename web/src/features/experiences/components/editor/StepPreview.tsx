@@ -10,7 +10,7 @@
  */
 
 import { memo } from "react";
-import { EventThemeProvider } from "@/components/providers/EventThemeProvider";
+import { ThemeProvider } from "@/features/theming";
 import {
   DeviceFrame,
   InfoStep,
@@ -47,11 +47,11 @@ export const StepPreview = memo(function StepPreview({
   mockSession = DEFAULT_MOCK_SESSION,
 }: StepPreviewProps) {
   return (
-    <EventThemeProvider theme={theme}>
+    <ThemeProvider theme={theme}>
       <DeviceFrame>
         <StepContent step={step} aiPresets={aiPresets} mockSession={mockSession} />
       </DeviceFrame>
-    </EventThemeProvider>
+    </ThemeProvider>
   );
 });
 
