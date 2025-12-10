@@ -283,16 +283,22 @@ const DEFAULT_WELCOME: EventWelcome = {
 
 ---
 
-## 9. Dependencies
+## 9. Prerequisites
 
-- Event theme system (existing)
-- Event experiences array (existing)
-- Media upload infrastructure (existing)
-- Preview panel component (existing, used in theme editor)
+- **Preview Shell** — This feature should be implemented after [Preview Shell](./preview-shell-prd.md) is complete, to leverage the shared preview infrastructure for displaying the welcome screen preview.
 
 ---
 
-## 10. Related Documentation
+## 10. Dependencies
+
+- Preview Shell component (from prerequisite above)
+- Event theme system (existing)
+- Event experiences array (existing)
+- Media upload infrastructure (existing)
+
+---
+
+## 11. Related Documentation
 
 - [Phase 6: Event Experiences & Extras](../scalable-arch/phase-6-event-experiences.md) — Current General tab implementation
 - [Theme Editor PRD](../theme-editor/theme-editor-prd.md) — Preview panel pattern reference
