@@ -11,7 +11,7 @@
  * Used in the experience editor's middle panel.
  */
 
-import { useTheme, ThemedBackground } from "@/features/theming";
+import { useEventTheme, ThemedBackground } from "@/features/theming";
 import type { ReactNode } from "react";
 import { ViewportMode, VIEWPORT_DIMENSIONS } from "../../types/preview.types";
 
@@ -28,7 +28,7 @@ export function DeviceFrame({
   children,
   viewportMode = "mobile",
 }: DeviceFrameProps) {
-  const { theme } = useTheme();
+  const { theme } = useEventTheme();
   const dimensions = VIEWPORT_DIMENSIONS[viewportMode];
 
   // Desktop uses different aspect ratio styling

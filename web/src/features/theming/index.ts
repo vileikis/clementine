@@ -17,4 +17,4 @@ export { BUTTON_RADIUS_MAP } from "./constants";
 export { ThemeProvider, ThemedBackground } from "./components";
 
 // Hooks
-export { useTheme, useThemedStyles } from "./hooks";
+export { useEventTheme, useThemedStyles } from "./hooks";

@@ -1,3 +1,3 @@
 // Hooks barrel export
-export { useTheme } from "./useTheme";
+export { useEventTheme } from "./useEventTheme";
 export { useThemedStyles } from "./useThemedStyles";

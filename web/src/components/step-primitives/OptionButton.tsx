@@ -1,6 +1,6 @@
 "use client";
 
-import { useTheme } from "@/features/theming";
+import { useEventTheme } from "@/features/theming";
 import type { ReactNode } from "react";
 
 interface OptionButtonProps {
@@ -19,7 +19,7 @@ export function OptionButton({
   selected = false,
   onClick,
 }: OptionButtonProps) {
-  const { theme } = useTheme();
+  const { theme } = useEventTheme();
 
   return (
     <button

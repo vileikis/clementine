@@ -14,7 +14,7 @@ import { ThemeContext, type ThemeContextValue } from "../context/ThemeContext";
  * @example
  * ```tsx
  * function ActionButton({ children }) {
- *   const { buttonBgColor, buttonTextColor, buttonRadius } = useTheme();
+ *   const { buttonBgColor, buttonTextColor, buttonRadius } = useEventTheme();
  *
  *   return (
  *     <button style={{
@@ -28,10 +28,10 @@ import { ThemeContext, type ThemeContextValue } from "../context/ThemeContext";
  * }
  * ```
  */
-export function useTheme(): ThemeContextValue {
+export function useEventTheme(): ThemeContextValue {
   const context = useContext(ThemeContext);
   if (!context) {
-    throw new Error("useTheme must be used within a ThemeProvider");
+    throw new Error("useEventTheme must be used within a ThemeProvider");
   }
   return context;
 }
