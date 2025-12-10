@@ -10,9 +10,9 @@
  */
 
 import { memo } from "react";
-import { ThemeProvider } from "@/features/theming";
+import { ThemeProvider, ThemedBackground } from "@/features/theming";
+import { DeviceFrame, ViewportProvider } from "@/features/preview-shell";
 import {
-  DeviceFrame,
   InfoStep,
   ShortTextStep,
   LongTextStep,
@@ -48,9 +48,17 @@ export const StepPreview = memo(function StepPreview({
 }: StepPreviewProps) {
   return (
     <ThemeProvider theme={theme}>
-      <DeviceFrame>
-        <StepContent step={step} aiPresets={aiPresets} mockSession={mockSession} />
-      </DeviceFrame>
+      <ViewportProvider mode="mobile">
+        <DeviceFrame viewportMode="mobile">
+          <ThemedBackground
+            background={theme.background}
+            fontFamily={theme.fontFamily}
+            className="h-full w-full"
+          >
+            <StepContent step={step} aiPresets={aiPresets} mockSession={mockSession} />
+          </ThemedBackground>
+        </DeviceFrame>
+      </ViewportProvider>
     </ThemeProvider>
   );
 });

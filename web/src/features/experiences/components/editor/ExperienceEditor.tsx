@@ -23,10 +23,9 @@ import { StepList } from "./StepList";
 import { StepEditor } from "./StepEditor";
 import {
   PreviewRuntime,
-  ViewSwitcher,
   PlaybackMode,
 } from "@/features/steps/components/preview";
-import type { ViewportMode } from "@/features/steps/types";
+import { PreviewShell, type ViewportMode } from "@/features/preview-shell";
 import {
   useSteps,
   useSelectedStep,
@@ -203,30 +202,27 @@ export function ExperienceEditor({
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
           {/* Middle Panel - Preview */}
-          <div className="flex-1 flex flex-col overflow-hidden">
-            {/* Preview panel header with viewport switcher */}
-            <div className="flex items-center justify-between px-4 py-3 border-b">
-              <h2 className="text-sm font-semibold">Preview</h2>
-              <ViewSwitcher mode={viewportMode} onChange={setViewportMode} />
-            </div>
-
-            {/* Preview content */}
-            <div className="flex-1 p-6 overflow-auto bg-muted/10">
-              <div className="flex justify-center h-full">
-                {displayStep ? (
-                  <PreviewRuntime
-                    step={displayStep as Step}
-                    theme={DEFAULT_PREVIEW_THEME}
-                    viewportMode={viewportMode}
-                    aiPresets={aiPresets}
-                  />
-                ) : (
-                  <div className="text-center text-muted-foreground">
-                    <p className="text-sm">Select a step to preview</p>
-                  </div>
-                )}
+          <div className="flex-1 flex flex-col overflow-hidden p-6 bg-muted/10">
+            {displayStep ? (
+              <PreviewShell
+                viewportMode={viewportMode}
+                onViewportChange={setViewportMode}
+                enableViewportSwitcher
+                enableFullscreen
+              >
+                <PreviewRuntime
+                  step={displayStep as Step}
+                  theme={DEFAULT_PREVIEW_THEME}
+                  viewportMode={viewportMode}
+                  aiPresets={aiPresets}
+                  renderFrame={false}
+                />
+              </PreviewShell>
+            ) : (
+              <div className="flex items-center justify-center h-full text-center text-muted-foreground">
+                <p className="text-sm">Select a step to preview</p>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Right Panel - Step Editor */}

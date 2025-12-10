@@ -1,7 +1,7 @@
 "use client";
 
 import { useEventTheme } from "@/features/theming";
-import { useViewportMode } from "@/features/steps/components/preview";
+import { useViewportContext } from "@/features/preview-shell";
 import type { ReactNode } from "react";
 
 interface ActionButtonProps {
@@ -26,7 +26,7 @@ export function ActionButton({
   type = "button",
 }: ActionButtonProps) {
   const { buttonBgColor, buttonTextColor, buttonRadius } = useEventTheme();
-  const viewportMode = useViewportMode();
+  const { mode: viewportMode } = useViewportContext();
   const isMobile = viewportMode === "mobile";
 
   return (

@@ -17,10 +17,9 @@ import { useEffect, useState } from "react";
 import { useExperiencePlayback } from "../../hooks/useExperiencePlayback";
 import { PreviewNavigationBar } from "./PreviewNavigationBar";
 import { PreviewRuntime } from "./PreviewRuntime";
-import { ViewSwitcher } from "./ViewSwitcher";
 import { StepErrorBoundary } from "./StepErrorBoundary";
+import { ViewportSwitcher, type ViewportMode } from "@/features/preview-shell";
 import type { PlaybackModeProps } from "../../types/playback.types";
-import type { ViewportMode } from "../../types/preview.types";
 
 export function PlaybackMode({
   steps,
@@ -50,7 +49,7 @@ export function PlaybackMode({
       {/* Top Bar - ViewSwitcher */}
       <header className="flex items-center justify-between px-4 py-3 border-b bg-background shrink-0">
         <h2 className="text-sm font-semibold">Experience Preview</h2>
-        <ViewSwitcher mode={viewportMode} onChange={setViewportMode} />
+        <ViewportSwitcher mode={viewportMode} onChange={setViewportMode} />
       </header>
 
       {/* Main Content Area - Step Preview */}

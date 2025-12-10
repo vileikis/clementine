@@ -12,17 +12,16 @@
  * - "playback": Interactive mode with value persistence (for experience playback)
  */
 
-import { ThemeProvider } from "@/features/theming";
-import { DeviceFrame } from "./DeviceFrame";
-import { ViewportModeProvider } from "./ViewportModeContext";
+import { ThemeProvider, ThemedBackground } from "@/features/theming";
+import {
+  DeviceFrame,
+  ViewportProvider,
+  type ViewportMode,
+} from "@/features/preview-shell";
 import type { Step } from "@/features/steps/types";
 import type { Theme } from "@/features/theming";
 import type { AiPreset } from "@/features/ai-presets/types";
-import {
-  ViewportMode,
-  MockSessionData,
-  DEFAULT_MOCK_SESSION,
-} from "../../types/preview.types";
+import { MockSessionData, DEFAULT_MOCK_SESSION } from "../../types/preview.types";
 import type { StepInputValue, PlaybackMockSession } from "../../types/playback.types";
 
 import {
@@ -57,6 +56,8 @@ interface PreviewRuntimeProps {
   onCtaClick?: () => void;
   /** Callback when step is complete for auto-advance (Capture, Processing steps) */
   onStepComplete?: (stepId: string) => void;
+  /** Whether to render the DeviceFrame wrapper. Default: true. Set to false when used inside PreviewShell. */
+  renderFrame?: boolean;
 }
 
 export function PreviewRuntime({
@@ -70,6 +71,7 @@ export function PreviewRuntime({
   onInputChange,
   onCtaClick,
   onStepComplete,
+  renderFrame = true,
 }: PreviewRuntimeProps) {
   // Merge provided mock data with defaults
   const session: MockSessionData = {
@@ -79,24 +81,37 @@ export function PreviewRuntime({
 
   const isInteractive = mode === "playback";
 
+  // Step content with themed background
+  const content = (
+    <ThemedBackground
+      background={theme.background}
+      fontFamily={theme.fontFamily}
+      className="h-full w-full"
+    >
+      <StepContent
+        step={step}
+        aiPresets={aiPresets}
+        mockSession={session}
+        isInteractive={isInteractive}
+        playbackSession={playbackSession}
+        onInputChange={onInputChange}
+        onCtaClick={isInteractive ? onCtaClick : undefined}
+        onStepComplete={isInteractive ? onStepComplete : undefined}
+      />
+    </ThemedBackground>
+  );
+
   return (
     <ThemeProvider theme={theme}>
-      <ViewportModeProvider mode={viewportMode}>
+      <ViewportProvider mode={viewportMode}>
         <div className="h-full w-full flex justify-center">
-          <DeviceFrame viewportMode={viewportMode}>
-            <StepContent
-              step={step}
-              aiPresets={aiPresets}
-              mockSession={session}
-              isInteractive={isInteractive}
-              playbackSession={playbackSession}
-              onInputChange={onInputChange}
-              onCtaClick={isInteractive ? onCtaClick : undefined}
-              onStepComplete={isInteractive ? onStepComplete : undefined}
-            />
-          </DeviceFrame>
+          {renderFrame ? (
+            <DeviceFrame viewportMode={viewportMode}>{content}</DeviceFrame>
+          ) : (
+            content
+          )}
         </div>
-      </ViewportModeProvider>
+      </ViewportProvider>
     </ThemeProvider>
   );
 }

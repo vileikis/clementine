@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useEventTheme } from "@/features/theming";
 import { LottiePlayer } from "@/components/shared/LottiePlayer";
-import { useViewportMode } from "@/features/steps/components/preview";
+import { useViewportContext } from "@/features/preview-shell";
 import { getMediaType } from "@/features/steps/utils";
 import { ActionBar } from "./ActionBar";
 import type { ReactNode } from "react";
@@ -39,7 +39,7 @@ export function StepLayout({
   action,
 }: StepLayoutProps) {
   const { theme } = useEventTheme();
-  const viewportMode = useViewportMode();
+  const { mode: viewportMode } = useViewportContext();
   const isMobile = viewportMode === "mobile";
 
   // Get effective media type (stored or inferred from URL)
