@@ -10,6 +10,16 @@ export type {
 } from "./types";
 export type { ThemeContextValue } from "./context";
 
+// Schemas
+export {
+  COLOR_REGEX,
+  themeTextSchema,
+  themeButtonSchema,
+  themeBackgroundSchema,
+  themeSchema,
+  updateThemeSchema,
+} from "./schemas";
+
 // Constants
 export { BUTTON_RADIUS_MAP } from "./constants";
 

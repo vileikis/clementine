@@ -1,49 +1,21 @@
 // Zod schemas for Project data models
 import { z } from "zod";
+import { NAME_LENGTH } from "../constants";
 import {
-  NAME_LENGTH,
-  COLOR_REGEX,
-} from "../constants";
+  themeSchema,
+  themeTextSchema,
+  themeButtonSchema,
+  themeBackgroundSchema,
+} from "@/features/theming";
 
 // Project schemas
 export const projectStatusSchema = z.enum(["draft", "live", "archived", "deleted"]);
 
-/**
- * Theme text configuration
- */
-export const projectThemeTextSchema = z.object({
-  color: z.string().regex(COLOR_REGEX),
-  alignment: z.enum(["left", "center", "right"]),
-});
-
-/**
- * Theme button configuration
- */
-export const projectThemeButtonSchema = z.object({
-  backgroundColor: z.string().regex(COLOR_REGEX).nullable().optional().default(null),
-  textColor: z.string().regex(COLOR_REGEX),
-  radius: z.enum(["none", "sm", "md", "full"]),
-});
-
-/**
- * Theme background configuration
- */
-export const projectThemeBackgroundSchema = z.object({
-  color: z.string().regex(COLOR_REGEX),
-  image: z.string().url().nullable().optional().default(null),
-  overlayOpacity: z.number().min(0).max(1),
-});
-
-/**
- * Project-wide theme settings for visual customization
- */
-export const projectThemeSchema = z.object({
-  fontFamily: z.string().nullable().optional().default(null),
-  primaryColor: z.string().regex(COLOR_REGEX),
-  text: projectThemeTextSchema,
-  button: projectThemeButtonSchema,
-  background: projectThemeBackgroundSchema,
-});
+// Re-export theme schemas for backward compatibility
+export const projectThemeTextSchema = themeTextSchema;
+export const projectThemeButtonSchema = themeButtonSchema;
+export const projectThemeBackgroundSchema = themeBackgroundSchema;
+export const projectThemeSchema = themeSchema;
 
 export const projectSchema = z.object({
   id: z.string(),
@@ -69,12 +41,6 @@ export const projectSchema = z.object({
 });
 
 // Project update schemas (for Server Actions)
-export const updateProjectThemeSchema = z.object({
-  fontFamily: z.string().nullable().optional().default(null),
-  primaryColor: z.string().regex(COLOR_REGEX).optional(),
-  text: projectThemeTextSchema.partial().optional(),
-  button: projectThemeButtonSchema.partial().optional(),
-  background: projectThemeBackgroundSchema.partial().optional(),
-});
+export { updateThemeSchema as updateProjectThemeSchema } from "@/features/theming";
 
 export type ProjectSchema = z.infer<typeof projectSchema>;
