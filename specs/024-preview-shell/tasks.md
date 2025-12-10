@@ -24,12 +24,12 @@
 
 **Purpose**: Create feature module directory structure and foundational files
 
-- [ ] T001 Create feature module directory structure at `web/src/features/preview-shell/`
-- [ ] T002 [P] Create types barrel file at `web/src/features/preview-shell/types/index.ts`
-- [ ] T003 [P] Create constants barrel file at `web/src/features/preview-shell/constants/index.ts`
-- [ ] T004 [P] Create components barrel file at `web/src/features/preview-shell/components/index.ts`
-- [ ] T005 [P] Create context barrel file at `web/src/features/preview-shell/context/index.ts`
-- [ ] T006 [P] Create hooks barrel file at `web/src/features/preview-shell/hooks/index.ts`
+- [X] T001 Create feature module directory structure at `web/src/features/preview-shell/`
+- [X] T002 [P] Create types barrel file at `web/src/features/preview-shell/types/index.ts`
+- [X] T003 [P] Create constants barrel file at `web/src/features/preview-shell/constants/index.ts`
+- [X] T004 [P] Create components barrel file at `web/src/features/preview-shell/components/index.ts`
+- [X] T005 [P] Create context barrel file at `web/src/features/preview-shell/context/index.ts`
+- [X] T006 [P] Create hooks barrel file at `web/src/features/preview-shell/hooks/index.ts`
 
 ---
 
@@ -39,13 +39,13 @@
 
 **⚠️ CRITICAL**: No component work can begin until this phase is complete
 
-- [ ] T007 Define ViewportMode and ViewportDimensions types in `web/src/features/preview-shell/types/preview-shell.types.ts`
-- [ ] T008 Define ViewportContextValue interface in `web/src/features/preview-shell/types/preview-shell.types.ts`
-- [ ] T009 Define all component props interfaces (PreviewShellProps, DeviceFrameProps, ViewportSwitcherProps, FullscreenOverlayProps, FullscreenTriggerProps) in `web/src/features/preview-shell/types/preview-shell.types.ts`
-- [ ] T010 Define hook return types (UseViewportReturn, UseFullscreenReturn) in `web/src/features/preview-shell/types/preview-shell.types.ts`
-- [ ] T011 Create VIEWPORT_DIMENSIONS constant in `web/src/features/preview-shell/constants/viewport.constants.ts`
-- [ ] T012 Export all types from `web/src/features/preview-shell/types/index.ts`
-- [ ] T013 Export constants from `web/src/features/preview-shell/constants/index.ts`
+- [X] T007 Define ViewportMode and ViewportDimensions types in `web/src/features/preview-shell/types/preview-shell.types.ts`
+- [X] T008 Define ViewportContextValue interface in `web/src/features/preview-shell/types/preview-shell.types.ts`
+- [X] T009 Define all component props interfaces (PreviewShellProps, DeviceFrameProps, ViewportSwitcherProps, FullscreenOverlayProps, FullscreenTriggerProps) in `web/src/features/preview-shell/types/preview-shell.types.ts`
+- [X] T010 Define hook return types (UseViewportReturn, UseFullscreenReturn) in `web/src/features/preview-shell/types/preview-shell.types.ts`
+- [X] T011 Create VIEWPORT_DIMENSIONS constant in `web/src/features/preview-shell/constants/viewport.constants.ts`
+- [X] T012 Export all types from `web/src/features/preview-shell/types/index.ts`
+- [X] T013 Export constants from `web/src/features/preview-shell/constants/index.ts`
 
 **Checkpoint**: Foundation ready - types and constants available for component implementation
 
@@ -59,14 +59,14 @@
 
 ### Implementation for User Story 1
 
-- [ ] T014 [US1] Create ViewportContext with provider and hook in `web/src/features/preview-shell/context/ViewportContext.tsx`
-- [ ] T015 [US1] Export ViewportProvider and useViewportContext from `web/src/features/preview-shell/context/index.ts`
-- [ ] T016 [US1] Create useViewport hook (uncontrolled mode only) in `web/src/features/preview-shell/hooks/useViewport.ts`
-- [ ] T017 [US1] Export useViewport from `web/src/features/preview-shell/hooks/index.ts`
-- [ ] T018 [US1] Extract and create DeviceFrame component (pure container, no theming) in `web/src/features/preview-shell/components/DeviceFrame.tsx`
-- [ ] T019 [US1] Create basic PreviewShell component (device frame only, no switcher/fullscreen) in `web/src/features/preview-shell/components/PreviewShell.tsx`
-- [ ] T020 [US1] Export DeviceFrame and PreviewShell from `web/src/features/preview-shell/components/index.ts`
-- [ ] T021 [US1] Create public API exports in `web/src/features/preview-shell/index.ts`
+- [X] T014 [US1] Create ViewportContext with provider and hook in `web/src/features/preview-shell/context/ViewportContext.tsx`
+- [X] T015 [US1] Export ViewportProvider and useViewportContext from `web/src/features/preview-shell/context/index.ts`
+- [X] T016 [US1] Create useViewport hook (uncontrolled mode only) in `web/src/features/preview-shell/hooks/useViewport.ts`
+- [X] T017 [US1] Export useViewport from `web/src/features/preview-shell/hooks/index.ts`
+- [X] T018 [US1] Extract and create DeviceFrame component (pure container, no theming) in `web/src/features/preview-shell/components/DeviceFrame.tsx`
+- [X] T019 [US1] Create basic PreviewShell component (device frame only, no switcher/fullscreen) in `web/src/features/preview-shell/components/PreviewShell.tsx`
+- [X] T020 [US1] Export DeviceFrame and PreviewShell from `web/src/features/preview-shell/components/index.ts`
+- [X] T021 [US1] Create public API exports in `web/src/features/preview-shell/index.ts`
 
 **Checkpoint**: PreviewShell renders content in mobile device frame - MVP complete
 
@@ -80,11 +80,11 @@
 
 ### Implementation for User Story 2
 
-- [ ] T022 [US2] Extract and create ViewportSwitcher component with size variants in `web/src/features/preview-shell/components/ViewportSwitcher.tsx`
-- [ ] T023 [US2] Extend useViewport hook to support controlled mode (viewportMode + onViewportChange props) in `web/src/features/preview-shell/hooks/useViewport.ts`
-- [ ] T024 [US2] Update PreviewShell to integrate ViewportSwitcher with enableViewportSwitcher prop in `web/src/features/preview-shell/components/PreviewShell.tsx`
-- [ ] T025 [US2] Export ViewportSwitcher from `web/src/features/preview-shell/components/index.ts`
-- [ ] T026 [US2] Update public API exports with ViewportSwitcher in `web/src/features/preview-shell/index.ts`
+- [X] T022 [US2] Extract and create ViewportSwitcher component with size variants in `web/src/features/preview-shell/components/ViewportSwitcher.tsx`
+- [X] T023 [US2] Extend useViewport hook to support controlled mode (viewportMode + onViewportChange props) in `web/src/features/preview-shell/hooks/useViewport.ts`
+- [X] T024 [US2] Update PreviewShell to integrate ViewportSwitcher with enableViewportSwitcher prop in `web/src/features/preview-shell/components/PreviewShell.tsx`
+- [X] T025 [US2] Export ViewportSwitcher from `web/src/features/preview-shell/components/index.ts`
+- [X] T026 [US2] Update public API exports with ViewportSwitcher in `web/src/features/preview-shell/index.ts`
 
 **Checkpoint**: Viewport switching works - users can toggle mobile/desktop views
 
@@ -98,13 +98,13 @@
 
 ### Implementation for User Story 3
 
-- [ ] T027 [US3] Create useFullscreen hook with Escape key handling in `web/src/features/preview-shell/hooks/useFullscreen.ts`
-- [ ] T028 [US3] Export useFullscreen from `web/src/features/preview-shell/hooks/index.ts`
-- [ ] T029 [US3] Create FullscreenOverlay component (CSS overlay, header with close button, viewport switcher support) in `web/src/features/preview-shell/components/FullscreenOverlay.tsx`
-- [ ] T030 [US3] Create FullscreenTrigger button component in `web/src/features/preview-shell/components/FullscreenTrigger.tsx`
-- [ ] T031 [US3] Update PreviewShell to integrate fullscreen mode with enableFullscreen prop in `web/src/features/preview-shell/components/PreviewShell.tsx`
-- [ ] T032 [US3] Export FullscreenOverlay and FullscreenTrigger from `web/src/features/preview-shell/components/index.ts`
-- [ ] T033 [US3] Update public API exports with fullscreen components and hook in `web/src/features/preview-shell/index.ts`
+- [X] T027 [US3] Create useFullscreen hook with Escape key handling in `web/src/features/preview-shell/hooks/useFullscreen.ts`
+- [X] T028 [US3] Export useFullscreen from `web/src/features/preview-shell/hooks/index.ts`
+- [X] T029 [US3] Create FullscreenOverlay component (CSS overlay, header with close button, viewport switcher support) in `web/src/features/preview-shell/components/FullscreenOverlay.tsx`
+- [X] T030 [US3] Create FullscreenTrigger button component in `web/src/features/preview-shell/components/FullscreenTrigger.tsx`
+- [X] T031 [US3] Update PreviewShell to integrate fullscreen mode with enableFullscreen prop in `web/src/features/preview-shell/components/PreviewShell.tsx`
+- [X] T032 [US3] Export FullscreenOverlay and FullscreenTrigger from `web/src/features/preview-shell/components/index.ts`
+- [X] T033 [US3] Update public API exports with fullscreen components and hook in `web/src/features/preview-shell/index.ts`
 
 **Checkpoint**: Fullscreen mode works with keyboard accessibility
 
@@ -118,10 +118,10 @@
 
 ### Implementation for User Story 4
 
-- [ ] T034 [US4] Update steps feature to re-export DeviceFrame and ViewSwitcher from preview-shell with deprecation comments in `web/src/features/steps/components/preview/index.ts`
-- [ ] T035 [US4] Update EventThemeEditor to use PreviewShell + ThemedBackground replacing PreviewPanel in `web/src/features/events/components/designer/EventThemeEditor.tsx`
-- [ ] T036 [US4] Update ThemeEditor (projects) to use PreviewShell + ThemedBackground replacing PreviewPanel in `web/src/features/projects/components/designer/ThemeEditor.tsx`
-- [ ] T037 [US4] Deprecate PreviewPanel component with comment (do not delete yet) in `web/src/features/projects/components/designer/PreviewPanel.tsx`
+- [X] T034 [US4] Update steps feature to re-export DeviceFrame and ViewSwitcher from preview-shell with deprecation comments in `web/src/features/steps/components/preview/index.ts`
+- [X] T035 [US4] Update EventThemeEditor to use PreviewShell + ThemedBackground replacing PreviewPanel in `web/src/features/events/components/designer/EventThemeEditor.tsx`
+- [X] T036 [US4] Update ThemeEditor (projects) to use PreviewShell + ThemedBackground replacing PreviewPanel in `web/src/features/projects/components/designer/ThemeEditor.tsx`
+- [X] T037 [US4] Deprecate PreviewPanel component with comment (do not delete yet) in `web/src/features/projects/components/designer/PreviewPanel.tsx`
 
 **Checkpoint**: Theme editors have viewport switching and fullscreen - full feature complete
 
@@ -131,16 +131,16 @@
 
 **Purpose**: Cleanup, documentation, and validation loop
 
-- [ ] T038 [P] Remove any remaining unused imports in preview-shell components
-- [ ] T039 [P] Verify touch target sizes (44x44px) on ViewportSwitcher and FullscreenTrigger buttons
-- [ ] T040 [P] Test keyboard navigation (Tab) and Escape key in fullscreen mode
+- [X] T038 [P] Remove any remaining unused imports in preview-shell components
+- [X] T039 [P] Verify touch target sizes (44x44px) on ViewportSwitcher and FullscreenTrigger buttons
+- [X] T040 [P] Test keyboard navigation (Tab) and Escape key in fullscreen mode
 
 ### Validation Loop (REQUIRED - Constitution Principle V)
 
 **Purpose**: Ensure code quality and correctness before merge
 
-- [ ] T041 Run `pnpm lint` and fix all errors/warnings
-- [ ] T042 Run `pnpm type-check` and resolve all TypeScript errors
+- [X] T041 Run `pnpm lint` and fix all errors/warnings
+- [X] T042 Run `pnpm type-check` and resolve all TypeScript errors
 - [ ] T043 Verify feature in local dev server (`pnpm dev`) - test all 4 user stories
 - [ ] T044 Commit only after validation loop passes cleanly
 
