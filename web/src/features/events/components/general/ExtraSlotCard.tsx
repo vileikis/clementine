@@ -151,14 +151,13 @@ export function ExtraSlotCard({
 
         {/* Toggle switch - positioned above the click area */}
         {onToggle && (
-          <div className="relative z-10">
-            <Switch
-              checked={experienceLink.enabled}
-              onCheckedChange={onToggle}
-              disabled={isUpdating || isNotFound}
-              aria-label={`${experienceLink.enabled ? "Disable" : "Enable"} ${displayName}`}
-            />
-          </div>
+          <Switch
+            checked={experienceLink.enabled}
+            onCheckedChange={onToggle}
+            disabled={isUpdating || isNotFound}
+            aria-label={`${experienceLink.enabled ? "Disable" : "Enable"} ${displayName}`}
+            className="relative"
+          />
         )}
       </div>
     </div>
