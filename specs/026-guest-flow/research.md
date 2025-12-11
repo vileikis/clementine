@@ -77,41 +77,55 @@ export function useGuestAuth() {
 
 ---
 
-## Decision 3: Welcome Screen Component Reuse
+## Decision 3: Welcome Screen Component Location
 
-**Decision**: Reuse existing `WelcomePreview`, `ExperienceCards`, and `ExperienceCard` components from `features/events/`.
+**Decision**: Migrate welcome components (`WelcomeContent`, `ExperienceCards`, `ExperienceCard`) from `features/events/` to `features/guest/components/welcome/`. Admin preview imports from guest module.
 
 **Rationale**:
-- Components already render welcome content with theme support
-- Ensures visual consistency between admin preview and guest flow (WYSIWYG)
-- Reduces code duplication
-- Components use `useEventTheme()` hook which works with `ThemeProvider`
+- Guest module owns all guest-facing UI (single source of truth)
+- Components are fundamentally guest-facing, not admin-facing
+- Admin preview becomes a true WYSIWYG - imports production components
+- Interactive behavior (`onClick`) is native to the component, disabled via prop for preview
+- Cleaner separation of concerns: events module is admin-focused, guest module is guest-focused
 
 **Alternatives Considered**:
-- **Duplicate components in guest module**: Rejected - violates DRY, maintenance burden
-- **Create abstraction layer**: Rejected - unnecessary complexity, components already work as-is
+- **Keep in events, import to guest**: Rejected - backwards architecture (admin shouldn't own guest UI)
+- **Duplicate components**: Rejected - violates DRY, components would drift over time
+- **Shared module**: Rejected - unnecessary abstraction, guest is the natural owner
 
-**Integration Pattern**:
+**Migration Pattern**:
 ```typescript
-// features/guest/components/welcome-screen.tsx
-import { WelcomePreview } from "@/features/events/components/welcome"
-import { ThemeProvider } from "@/features/theming"
-
-export function WelcomeScreen({ event, experiencesMap, onExperienceSelect }) {
+// features/guest/components/welcome/WelcomeContent.tsx
+// Migrated from events - adds onClick prop for interactivity
+export function WelcomeContent({ welcome, event, experiencesMap, onExperienceClick }) {
   return (
-    <ThemeProvider theme={event.theme}>
-      <WelcomePreview
-        welcome={event.welcome ?? DEFAULT_EVENT_WELCOME}
-        event={event}
+    <div className="...">
+      {/* Hero, title, description */}
+      <ExperienceCards
+        experiences={event.experiences}
+        layout={welcome.layout}
         experiencesMap={experiencesMap}
-        onExperienceClick={onExperienceSelect}
+        onExperienceClick={onExperienceClick}  // Interactive when provided
       />
-    </ThemeProvider>
+    </div>
+  )
+}
+
+// features/events/components/welcome/WelcomePreview.tsx
+// Thin wrapper for admin preview - imports from guest
+import { WelcomeContent } from "@/features/guest/components/welcome"
+
+export function WelcomePreview({ welcome, event, experiencesMap }) {
+  return (
+    <WelcomeContent
+      welcome={welcome}
+      event={event}
+      experiencesMap={experiencesMap}
+      onExperienceClick={undefined}  // Disabled in preview
+    />
   )
 }
 ```
-
-**Note**: May need to add `onExperienceClick` prop to `ExperienceCard` if not already present (for navigation).
 
 ---
 
@@ -244,23 +258,37 @@ if (enabledExperiences.length === 0) {
 
 ## Decision 8: Experience Card Click Handling
 
-**Decision**: Add `onExperienceClick` prop to `ExperienceCard` component (modification needed).
+**Decision**: During migration to guest module, add optional `onClick` prop to `ExperienceCard` component.
 
 **Rationale**:
-- Admin preview currently shows cards as static (no click handling)
+- Component migrates from events to guest module (see Decision 3)
 - Guest flow needs click to navigate and create session
-- Prop makes component reusable for both contexts
+- Admin preview passes `undefined` to disable interaction
+- Single component serves both contexts with prop-based behavior
 
-**Current vs Modified**:
+**Implementation**:
 ```typescript
-// Current (admin preview) - no click handler
-<ExperienceCard experience={exp} />
+// features/guest/components/welcome/ExperienceCard.tsx
+interface ExperienceCardProps {
+  experience: EventExperienceLink
+  experienceData?: Experience
+  onClick?: () => void  // Optional - undefined for preview, function for guest
+}
 
-// Modified - with optional click handler
-<ExperienceCard
-  experience={exp}
-  onClick={() => onExperienceSelect(exp.experienceId)}
-/>
+export function ExperienceCard({ experience, experienceData, onClick }: ExperienceCardProps) {
+  const isClickable = onClick !== undefined
+
+  return (
+    <div
+      className={cn("...", isClickable && "cursor-pointer hover:...")}
+      onClick={onClick}
+      role={isClickable ? "button" : undefined}
+      tabIndex={isClickable ? 0 : undefined}
+    >
+      {/* Card content */}
+    </div>
+  )
+}
 ```
 
 **Alternatives Considered**:
@@ -272,20 +300,27 @@ if (enabledExperiences.length === 0) {
 
 ## Existing Code References
 
-### Key Files to Reuse
+### Key Files to Reuse (No Changes)
 
 | File | Purpose | Location |
 |------|---------|----------|
 | ThemeProvider | Theme context | `features/theming/context/ThemeContext.tsx` |
 | ThemedBackground | Background styling | `features/theming/components/ThemedBackground.tsx` |
-| useEventTheme | Theme values hook | `features/theming/hooks/use-event-theme.ts` |
-| WelcomePreview | Welcome layout | `features/events/components/welcome/WelcomePreview.tsx` |
-| ExperienceCards | Card container | `features/events/components/welcome/ExperienceCards.tsx` |
-| ExperienceCard | Individual card | `features/events/components/welcome/ExperienceCard.tsx` |
+| useEventTheme | Theme values hook | `features/theming/hooks/useEventTheme.ts` |
 | getProject | Project fetch | `features/projects/repositories/projects.repository.ts` |
 | getEvent | Event fetch | `features/events/repositories/events.repository.ts` |
 | Firebase Client | Auth init | `lib/firebase/client.ts` |
 | Firebase Admin | DB writes | `lib/firebase/admin.ts` |
+
+### Key Files to Migrate (events → guest)
+
+| File | From | To |
+|------|------|-----|
+| WelcomeContent | `features/events/components/welcome/WelcomePreview.tsx` | `features/guest/components/welcome/WelcomeContent.tsx` |
+| ExperienceCards | `features/events/components/welcome/ExperienceCards.tsx` | `features/guest/components/welcome/ExperienceCards.tsx` |
+| ExperienceCard | `features/events/components/welcome/ExperienceCard.tsx` | `features/guest/components/welcome/ExperienceCard.tsx` |
+
+**Note**: After migration, `features/events/components/welcome/WelcomePreview.tsx` becomes a thin wrapper that imports from guest module.
 
 ### Key Types to Reference
 

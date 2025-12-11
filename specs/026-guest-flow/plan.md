@@ -12,7 +12,7 @@ Implement guest-facing flow enabling visitors to access branded event experience
 - URL-based state management with query parameters (`?exp={id}&s={sessionId}`)
 - Theme integration from existing theming module
 
-Technical approach: Extend the existing `features/guest/` module, reuse welcome screen components from `features/events/`, implement anonymous auth via Firebase Client SDK, and store guest/session records in project subcollections using Admin SDK via Server Actions.
+Technical approach: Extend the existing `features/guest/` module, migrate welcome screen components from `features/events/` to `features/guest/` (guest owns production UI, admin imports for preview), implement anonymous auth via Firebase Client SDK, and store guest/session records in project subcollections using Admin SDK via Server Actions.
 
 ## Technical Context
 
@@ -33,7 +33,7 @@ _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 Verify compliance with Clementine Constitution (`.specify/memory/constitution.md`):
 
 - [x] **Mobile-First Responsive Design**: Guest flow designed mobile-first (320px-768px), reuses existing mobile-optimized components from welcome preview, touch targets ≥44x44px
-- [x] **Clean Code & Simplicity**: Reuses existing components (WelcomePreview, ExperienceCards), minimal new abstractions, follows existing patterns
+- [x] **Clean Code & Simplicity**: Migrates welcome components to guest module (single source of truth), admin preview imports from guest, minimal new abstractions
 - [x] **Type-Safe Development**: TypeScript strict mode, Zod schemas for Guest/Session records, validated URL params
 - [x] **Minimal Testing Strategy**: Jest unit tests for auth hook and session management, tests co-located with source
 - [x] **Validation Loop Discipline**: Plan includes lint, type-check, test validation before completion
@@ -78,29 +78,35 @@ web/src/
 │   ├── actions/
 │   │   ├── index.ts
 │   │   └── guests.actions.ts       # NEW - Server Actions
+│   ├── contexts/
+│   │   ├── index.ts
+│   │   └── GuestContext.tsx        # NEW - Auth + guest state context
 │   ├── hooks/
 │   │   ├── index.ts
-│   │   ├── use-guest-auth.ts       # NEW - Anonymous auth hook
-│   │   └── use-session.ts          # NEW - Session state hook
+│   │   ├── useGuestAuth.ts         # NEW - Anonymous auth hook
+│   │   └── useSession.ts           # NEW - Session state hook
 │   └── components/
 │       ├── index.ts
-│       ├── guest-provider.tsx      # NEW - Auth + context provider
-│       ├── welcome-screen.tsx      # NEW - Wraps WelcomePreview for guest flow
-│       ├── experience-screen.tsx   # NEW - Placeholder experience view
-│       └── loading-screen.tsx      # NEW - Auth/data loading state
+│       ├── ExperienceScreen.tsx    # NEW - Placeholder experience view
+│       ├── LoadingScreen.tsx       # NEW - Auth/data loading state
+│       ├── EmptyStates.tsx         # NEW - No event / empty event states
+│       └── welcome/
+│           ├── index.ts
+│           ├── WelcomeContent.tsx  # MIGRATE - Main welcome layout (from events)
+│           ├── ExperienceCards.tsx # MIGRATE - Experience list/grid (from events)
+│           └── ExperienceCard.tsx  # MIGRATE - Individual card with onClick (from events)
 │
 ├── features/events/components/welcome/
-│   ├── WelcomePreview.tsx   # REUSE - Main welcome layout
-│   ├── ExperienceCards.tsx  # REUSE - Experience list/grid
-│   └── ExperienceCard.tsx   # REUSE - Individual experience card
+│   ├── index.ts
+│   └── WelcomePreview.tsx   # UPDATE - Thin wrapper, imports from guest module
 │
 └── features/theming/
     ├── ThemeProvider.tsx    # REUSE - Theme context
     ├── ThemedBackground.tsx # REUSE - Background styling
-    └── hooks/use-event-theme.ts # REUSE - Theme values hook
+    └── hooks/useEventTheme.ts # REUSE - Theme values hook
 ```
 
-**Structure Decision**: Extends existing `features/guest/` module following the established vertical slice architecture. Reuses welcome screen components from `features/events/` and theming from `features/theming/`. New Server Actions follow existing patterns from projects/events modules.
+**Structure Decision**: Guest module owns all guest-facing UI components including welcome screen. Welcome components migrate from `features/events/` to `features/guest/components/welcome/`. Admin preview (`WelcomePreview`) becomes a thin wrapper that imports from guest module - ensuring true WYSIWYG preview. Context lives in dedicated `contexts/` folder. Hooks use camelCase, components use PascalCase.
 
 ## Complexity Tracking
 
