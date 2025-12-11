@@ -144,8 +144,10 @@ export function EventThemeEditor({ event, projectId }: EventThemeEditorProps) {
   // Helper for button styles
   const buttonBgColor = theme.button.backgroundColor || theme.primaryColor;
 
-  return (
-    <div className="space-y-6">
+  return (    
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_1fr] items-start">
+      {/* Form Controls */}
+      <div className="space-y-8">
       {/* Header - Full Width */}
       <div>
         <h2 className="text-2xl font-semibold">Event Theme</h2>
@@ -154,308 +156,304 @@ export function EventThemeEditor({ event, projectId }: EventThemeEditorProps) {
         </p>
       </div>
 
-      {/* Two Column Layout */}
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_1fr] items-start">
-        {/* Form Controls */}
-        <div className="space-y-8">
-          {/* 1. Font Section */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Typography</h3>
+        {/* 1. Font Section */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Typography</h3>
 
-            {/* Font Family */}
-            <div className="space-y-2">
-              <Label htmlFor="font-family">Font Family</Label>
-              <Input
-                id="font-family"
-                type="text"
-                value={theme.fontFamily || ""}
-                onChange={(e) =>
-                  dispatch({ type: "UPDATE_FONT_FAMILY", payload: e.target.value })
-                }
-                placeholder="Inter, sans-serif"
-              />
-              <p className="text-xs text-muted-foreground">
-                Custom font family (e.g., &quot;Roboto, sans-serif&quot;). Leave empty for default.
-              </p>
-            </div>
-          </div>
-
-          {/* 2. Primary Color Section */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Primary Color</h3>
-            <div className="space-y-2">
-              <Label htmlFor="primary-color">Primary Color</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="primary-color"
-                  type="color"
-                  value={theme.primaryColor}
-                  onChange={(e) =>
-                    dispatch({ type: "UPDATE_PRIMARY_COLOR", payload: e.target.value })
-                  }
-                  className="h-10 w-20"
-                />
-                <Input
-                  type="text"
-                  value={theme.primaryColor}
-                  onChange={(e) =>
-                    dispatch({ type: "UPDATE_PRIMARY_COLOR", payload: e.target.value })
-                  }
-                  placeholder="#6366F1"
-                  pattern="^#[0-9A-Fa-f]{6}$"
-                  className="flex-1"
-                />
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Anchor color for the event. Buttons inherit this if no custom color is set.
-              </p>
-            </div>
-          </div>
-
-          {/* 3. Text Section */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Text</h3>
-
-            {/* Text Color */}
-            <div className="space-y-2">
-              <Label htmlFor="text-color">Text Color</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="text-color"
-                  type="color"
-                  value={theme.text.color}
-                  onChange={(e) =>
-                    dispatch({ type: "UPDATE_TEXT_COLOR", payload: e.target.value })
-                  }
-                  className="h-10 w-20"
-                />
-                <Input
-                  type="text"
-                  value={theme.text.color}
-                  onChange={(e) =>
-                    dispatch({ type: "UPDATE_TEXT_COLOR", payload: e.target.value })
-                  }
-                  placeholder="#1F2937"
-                  pattern="^#[0-9A-Fa-f]{6}$"
-                  className="flex-1"
-                />
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Default text color for content
-              </p>
-            </div>
-
-            {/* Text Alignment */}
-            <div className="space-y-2">
-              <Label htmlFor="text-alignment">Text Alignment</Label>
-              <select
-                id="text-alignment"
-                value={theme.text.alignment}
-                onChange={(e) =>
-                  dispatch({
-                    type: "UPDATE_TEXT_ALIGNMENT",
-                    payload: e.target.value as "left" | "center" | "right",
-                  })
-                }
-                className="w-full px-3 py-2 border border-input rounded-md bg-background"
-              >
-                <option value="left">Left</option>
-                <option value="center">Center</option>
-                <option value="right">Right</option>
-              </select>
-              <p className="text-xs text-muted-foreground">
-                Default text alignment for content
-              </p>
-            </div>
-          </div>
-
-          {/* 4. Button Section */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Button</h3>
-
-            {/* Button Background Color */}
-            <div className="space-y-2">
-              <Label htmlFor="button-bg-color">Button Background Color</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="button-bg-color"
-                  type="color"
-                  value={buttonBgColor}
-                  onChange={(e) =>
-                    dispatch({
-                      type: "UPDATE_BUTTON_BG_COLOR",
-                      payload: e.target.value,
-                    })
-                  }
-                  className="h-10 w-20"
-                />
-                <Input
-                  type="text"
-                  value={buttonBgColor}
-                  onChange={(e) =>
-                    dispatch({
-                      type: "UPDATE_BUTTON_BG_COLOR",
-                      payload: e.target.value || null,
-                    })
-                  }
-                  placeholder={theme.primaryColor}
-                  pattern="^#[0-9A-Fa-f]{6}$"
-                  className="flex-1"
-                />
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Leave empty to inherit primary color
-              </p>
-            </div>
-
-            {/* Button Text Color */}
-            <div className="space-y-2">
-              <Label htmlFor="button-text-color">Button Text Color</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="button-text-color"
-                  type="color"
-                  value={theme.button.textColor}
-                  onChange={(e) =>
-                    dispatch({
-                      type: "UPDATE_BUTTON_TEXT_COLOR",
-                      payload: e.target.value,
-                    })
-                  }
-                  className="h-10 w-20"
-                />
-                <Input
-                  type="text"
-                  value={theme.button.textColor}
-                  onChange={(e) =>
-                    dispatch({
-                      type: "UPDATE_BUTTON_TEXT_COLOR",
-                      payload: e.target.value,
-                    })
-                  }
-                  placeholder="#FFFFFF"
-                  pattern="^#[0-9A-Fa-f]{6}$"
-                  className="flex-1"
-                />
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Text color for buttons
-              </p>
-            </div>
-
-            {/* Button Radius */}
-            <div className="space-y-2">
-              <Label htmlFor="button-radius">Button Radius</Label>
-              <select
-                id="button-radius"
-                value={theme.button.radius}
-                onChange={(e) =>
-                  dispatch({
-                    type: "UPDATE_BUTTON_RADIUS",
-                    payload: e.target.value as "none" | "sm" | "md" | "full",
-                  })
-                }
-                className="w-full px-3 py-2 border border-input rounded-md bg-background"
-              >
-                <option value="none">None (Square)</option>
-                <option value="sm">Small</option>
-                <option value="md">Medium</option>
-                <option value="full">Full (Pill)</option>
-              </select>
-              <p className="text-xs text-muted-foreground">
-                Border radius for buttons
-              </p>
-            </div>
-          </div>
-
-          {/* 5. Background Section */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Background</h3>
-
-            {/* Background Color */}
-            <div className="space-y-2">
-              <Label htmlFor="bg-color">Background Color</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="bg-color"
-                  type="color"
-                  value={theme.background.color}
-                  onChange={(e) =>
-                    dispatch({ type: "UPDATE_BG_COLOR", payload: e.target.value })
-                  }
-                  className="h-10 w-20"
-                />
-                <Input
-                  type="text"
-                  value={theme.background.color}
-                  onChange={(e) =>
-                    dispatch({ type: "UPDATE_BG_COLOR", payload: e.target.value })
-                  }
-                  placeholder="#FFFFFF"
-                  pattern="^#[0-9A-Fa-f]{6}$"
-                  className="flex-1"
-                />
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Default background color for screens
-              </p>
-            </div>
-
-            {/* Background Image */}
-            <ImageUploadField
-              id="theme-bg-image"
-              label="Background Image"
-              value={theme.background.image || ""}
-              onChange={(value) =>
-                dispatch({ type: "UPDATE_BG_IMAGE", payload: value || null })
+          {/* Font Family */}
+          <div className="space-y-2">
+            <Label htmlFor="font-family">Font Family</Label>
+            <Input
+              id="font-family"
+              type="text"
+              value={theme.fontFamily || ""}
+              onChange={(e) =>
+                dispatch({ type: "UPDATE_FONT_FAMILY", payload: e.target.value })
               }
-              destination="backgrounds"
-              disabled={isPending}
-              recommendedSize="Recommended: 1080x1920px (9:16 aspect ratio). Max 10MB."
+              placeholder="Inter, sans-serif"
             />
-
-            {/* Overlay Opacity */}
-            <div className="space-y-2">
-              <Label htmlFor="overlay-opacity">
-                Overlay Opacity: {Math.round(theme.background.overlayOpacity * 100)}%
-              </Label>
-              <Input
-                id="overlay-opacity"
-                type="range"
-                min="0"
-                max="1"
-                step="0.05"
-                value={theme.background.overlayOpacity}
-                onChange={(e) =>
-                  dispatch({
-                    type: "UPDATE_BG_OVERLAY_OPACITY",
-                    payload: parseFloat(e.target.value),
-                  })
-                }
-                className="w-full"
-              />
-              <p className="text-xs text-muted-foreground">
-                Dark overlay opacity when background image is present (improves text readability)
-              </p>
-            </div>
+            <p className="text-xs text-muted-foreground">
+              Custom font family (e.g., &quot;Roboto, sans-serif&quot;). Leave empty for default.
+            </p>
           </div>
-
-          {/* Save Button */}
-          <Button onClick={handleSave} disabled={isPending} className="w-full">
-            {isPending ? "Saving..." : "Save Changes"}
-          </Button>
         </div>
 
-        {/* Live Preview - Sticky */}
-        <div className="lg:sticky lg:top-4">
-          <PreviewShell enableViewportSwitcher enableFullscreen>
-            <ThemedBackground
-              background={theme.background}
-              fontFamily={theme.fontFamily}
-              className="flex h-full w-full flex-col items-center justify-center p-8"
-              contentClassName="space-y-6"
-              style={{ textAlign: theme.text.alignment }}
+        {/* 2. Primary Color Section */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Primary Color</h3>
+          <div className="space-y-2">
+            <Label htmlFor="primary-color">Primary Color</Label>
+            <div className="flex gap-2">
+              <Input
+                id="primary-color"
+                type="color"
+                value={theme.primaryColor}
+                onChange={(e) =>
+                  dispatch({ type: "UPDATE_PRIMARY_COLOR", payload: e.target.value })
+                }
+                className="h-10 w-20"
+              />
+              <Input
+                type="text"
+                value={theme.primaryColor}
+                onChange={(e) =>
+                  dispatch({ type: "UPDATE_PRIMARY_COLOR", payload: e.target.value })
+                }
+                placeholder="#6366F1"
+                pattern="^#[0-9A-Fa-f]{6}$"
+                className="flex-1"
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Anchor color for the event. Buttons inherit this if no custom color is set.
+            </p>
+          </div>
+        </div>
+
+        {/* 3. Text Section */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Text</h3>
+
+          {/* Text Color */}
+          <div className="space-y-2">
+            <Label htmlFor="text-color">Text Color</Label>
+            <div className="flex gap-2">
+              <Input
+                id="text-color"
+                type="color"
+                value={theme.text.color}
+                onChange={(e) =>
+                  dispatch({ type: "UPDATE_TEXT_COLOR", payload: e.target.value })
+                }
+                className="h-10 w-20"
+              />
+              <Input
+                type="text"
+                value={theme.text.color}
+                onChange={(e) =>
+                  dispatch({ type: "UPDATE_TEXT_COLOR", payload: e.target.value })
+                }
+                placeholder="#1F2937"
+                pattern="^#[0-9A-Fa-f]{6}$"
+                className="flex-1"
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Default text color for content
+            </p>
+          </div>
+
+          {/* Text Alignment */}
+          <div className="space-y-2">
+            <Label htmlFor="text-alignment">Text Alignment</Label>
+            <select
+              id="text-alignment"
+              value={theme.text.alignment}
+              onChange={(e) =>
+                dispatch({
+                  type: "UPDATE_TEXT_ALIGNMENT",
+                  payload: e.target.value as "left" | "center" | "right",
+                })
+              }
+              className="w-full px-3 py-2 border border-input rounded-md bg-background"
             >
+              <option value="left">Left</option>
+              <option value="center">Center</option>
+              <option value="right">Right</option>
+            </select>
+            <p className="text-xs text-muted-foreground">
+              Default text alignment for content
+            </p>
+          </div>
+        </div>
+
+        {/* 4. Button Section */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Button</h3>
+
+          {/* Button Background Color */}
+          <div className="space-y-2">
+            <Label htmlFor="button-bg-color">Button Background Color</Label>
+            <div className="flex gap-2">
+              <Input
+                id="button-bg-color"
+                type="color"
+                value={buttonBgColor}
+                onChange={(e) =>
+                  dispatch({
+                    type: "UPDATE_BUTTON_BG_COLOR",
+                    payload: e.target.value,
+                  })
+                }
+                className="h-10 w-20"
+              />
+              <Input
+                type="text"
+                value={buttonBgColor}
+                onChange={(e) =>
+                  dispatch({
+                    type: "UPDATE_BUTTON_BG_COLOR",
+                    payload: e.target.value || null,
+                  })
+                }
+                placeholder={theme.primaryColor}
+                pattern="^#[0-9A-Fa-f]{6}$"
+                className="flex-1"
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Leave empty to inherit primary color
+            </p>
+          </div>
+
+          {/* Button Text Color */}
+          <div className="space-y-2">
+            <Label htmlFor="button-text-color">Button Text Color</Label>
+            <div className="flex gap-2">
+              <Input
+                id="button-text-color"
+                type="color"
+                value={theme.button.textColor}
+                onChange={(e) =>
+                  dispatch({
+                    type: "UPDATE_BUTTON_TEXT_COLOR",
+                    payload: e.target.value,
+                  })
+                }
+                className="h-10 w-20"
+              />
+              <Input
+                type="text"
+                value={theme.button.textColor}
+                onChange={(e) =>
+                  dispatch({
+                    type: "UPDATE_BUTTON_TEXT_COLOR",
+                    payload: e.target.value,
+                  })
+                }
+                placeholder="#FFFFFF"
+                pattern="^#[0-9A-Fa-f]{6}$"
+                className="flex-1"
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Text color for buttons
+            </p>
+          </div>
+
+          {/* Button Radius */}
+          <div className="space-y-2">
+            <Label htmlFor="button-radius">Button Radius</Label>
+            <select
+              id="button-radius"
+              value={theme.button.radius}
+              onChange={(e) =>
+                dispatch({
+                  type: "UPDATE_BUTTON_RADIUS",
+                  payload: e.target.value as "none" | "sm" | "md" | "full",
+                })
+              }
+              className="w-full px-3 py-2 border border-input rounded-md bg-background"
+            >
+              <option value="none">None (Square)</option>
+              <option value="sm">Small</option>
+              <option value="md">Medium</option>
+              <option value="full">Full (Pill)</option>
+            </select>
+            <p className="text-xs text-muted-foreground">
+              Border radius for buttons
+            </p>
+          </div>
+        </div>
+
+        {/* 5. Background Section */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Background</h3>
+
+          {/* Background Color */}
+          <div className="space-y-2">
+            <Label htmlFor="bg-color">Background Color</Label>
+            <div className="flex gap-2">
+              <Input
+                id="bg-color"
+                type="color"
+                value={theme.background.color}
+                onChange={(e) =>
+                  dispatch({ type: "UPDATE_BG_COLOR", payload: e.target.value })
+                }
+                className="h-10 w-20"
+              />
+              <Input
+                type="text"
+                value={theme.background.color}
+                onChange={(e) =>
+                  dispatch({ type: "UPDATE_BG_COLOR", payload: e.target.value })
+                }
+                placeholder="#FFFFFF"
+                pattern="^#[0-9A-Fa-f]{6}$"
+                className="flex-1"
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Default background color for screens
+            </p>
+          </div>
+
+          {/* Background Image */}
+          <ImageUploadField
+            id="theme-bg-image"
+            label="Background Image"
+            value={theme.background.image || ""}
+            onChange={(value) =>
+              dispatch({ type: "UPDATE_BG_IMAGE", payload: value || null })
+            }
+            destination="backgrounds"
+            disabled={isPending}
+            recommendedSize="Recommended: 1080x1920px (9:16 aspect ratio). Max 10MB."
+          />
+
+          {/* Overlay Opacity */}
+          <div className="space-y-2">
+            <Label htmlFor="overlay-opacity">
+              Overlay Opacity: {Math.round(theme.background.overlayOpacity * 100)}%
+            </Label>
+            <Input
+              id="overlay-opacity"
+              type="range"
+              min="0"
+              max="1"
+              step="0.05"
+              value={theme.background.overlayOpacity}
+              onChange={(e) =>
+                dispatch({
+                  type: "UPDATE_BG_OVERLAY_OPACITY",
+                  payload: parseFloat(e.target.value),
+                })
+              }
+              className="w-full"
+            />
+            <p className="text-xs text-muted-foreground">
+              Dark overlay opacity when background image is present (improves text readability)
+            </p>
+          </div>
+        </div>
+
+        {/* Save Button */}
+        <Button onClick={handleSave} disabled={isPending} className="w-full">
+          {isPending ? "Saving..." : "Save Changes"}
+        </Button>
+      </div>
+
+      {/* Live Preview - Sticky */}
+      <div className="lg:sticky lg:top-4">
+        <PreviewShell enableViewportSwitcher enableFullscreen>
+          <ThemedBackground
+            background={theme.background}
+            fontFamily={theme.fontFamily}
+            className="flex h-full w-full flex-col p-8"
+            style={{ textAlign: theme.text.alignment }}
+          >
+            <div className="space-y-6">
               <h1 className="text-3xl font-bold" style={{ color: theme.text.color }}>
                 Event Preview
               </h1>
@@ -475,9 +473,9 @@ export function EventThemeEditor({ event, projectId }: EventThemeEditorProps) {
               >
                 Primary Button
               </Button>
-            </ThemedBackground>
-          </PreviewShell>
-        </div>
+            </div>
+          </ThemedBackground>
+        </PreviewShell>
       </div>
     </div>
   );

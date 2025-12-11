@@ -63,7 +63,7 @@ export default function ProjectLayout({ children }: ProjectLayoutProps) {
 
       {/* Content with max-width container */}
       <div className="flex-1 overflow-auto">
-        <div className="max-w-5xl mx-auto px-4 py-4">{children}</div>
+        <div className="mx-auto px-4 py-4">{children}</div>
       </div>
 
       {/* Rename Dialog */}

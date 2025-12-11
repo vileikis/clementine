@@ -18,6 +18,7 @@ import {
   setEventExtra,
   updateEventExtra,
   removeEventExtra,
+  updateEventWelcome,
 } from "../repositories/events.repository";
 import {
   getProject,
@@ -33,6 +34,7 @@ import {
   setEventExtraInputSchema,
   updateEventExtraInputSchema,
   removeEventExtraInputSchema,
+  updateEventWelcomeSchema,
 } from "../schemas";
 import type {
   AddEventExperienceInput,
@@ -907,6 +909,73 @@ export async function removeEventExtraAction(
       error: {
         code: "INTERNAL_ERROR",
         message: error instanceof Error ? error.message : "Failed to remove extra",
+      },
+    };
+  }
+}
+
+// ============================================================================
+// Welcome Screen Actions
+// ============================================================================
+
+/**
+ * Update event welcome screen configuration (partial updates supported)
+ */
+export async function updateEventWelcomeAction(
+  projectId: string,
+  eventId: string,
+  data: unknown
+): Promise<ActionResponse<void>> {
+  // Verify admin authentication
+  const auth = await verifyAdminSecret();
+  if (!auth.authorized) {
+    return {
+      success: false,
+      error: {
+        code: "PERMISSION_DENIED",
+        message: auth.error,
+      },
+    };
+  }
+
+  try {
+    // Validate input
+    const validated = updateEventWelcomeSchema.safeParse(data);
+    if (!validated.success) {
+      return {
+        success: false,
+        error: {
+          code: "VALIDATION_ERROR",
+          message: validated.error.issues[0]?.message ?? "Invalid input",
+        },
+      };
+    }
+
+    // Verify event exists
+    const event = await getEvent(projectId, eventId);
+    if (!event) {
+      return {
+        success: false,
+        error: {
+          code: "EVENT_NOT_FOUND",
+          message: "Event not found",
+        },
+      };
+    }
+
+    // Update the welcome screen configuration
+    await updateEventWelcome(projectId, eventId, validated.data);
+
+    revalidatePath(`/[companySlug]/${projectId}/${eventId}`, "page");
+
+    return { success: true, data: undefined };
+  } catch (error) {
+    console.error("updateEventWelcomeAction error:", error);
+    return {
+      success: false,
+      error: {
+        code: "INTERNAL_ERROR",
+        message: error instanceof Error ? error.message : "Failed to update welcome screen",
       },
     };
   }

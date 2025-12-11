@@ -3,6 +3,7 @@ import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
 import { eventSchema } from "../schemas";
 import type { Event } from "../types/event.types";
+import { DEFAULT_EVENT_WELCOME } from "../types/event.types";
 
 interface State {
   event: Event | null;
@@ -74,10 +75,15 @@ export function useEvent(projectId: string | null, eventId: string | null) {
               return;
             }
 
-            const eventData = eventSchema.parse({
+            const parsedData = eventSchema.parse({
               id: snapshot.id,
               ...data,
             });
+            // Apply DEFAULT_EVENT_WELCOME fallback for existing events without welcome field
+            const eventData: Event = {
+              ...parsedData,
+              welcome: parsedData.welcome ?? DEFAULT_EVENT_WELCOME,
+            };
             dispatch({ type: "SET_EVENT", event: eventData });
           } catch (err) {
             dispatch({
