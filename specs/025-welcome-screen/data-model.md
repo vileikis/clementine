@@ -22,10 +22,10 @@ Enum type defining how experiences are displayed on the welcome screen.
 export type ExperienceLayout = "list" | "grid";
 ```
 
-| Value | Description | Use Case |
-|-------|-------------|----------|
-| `list` | Single column, full-width cards stacked vertically | 1-3 experiences, longer names |
-| `grid` | Two-column grid of cards | 4+ experiences, visual variety |
+| Value  | Description                                        | Use Case                       |
+| ------ | -------------------------------------------------- | ------------------------------ |
+| `list` | Single column, full-width cards stacked vertically | 1-3 experiences, longer names  |
+| `grid` | Two-column grid of cards                           | 4+ experiences, visual variety |
 
 ### EventWelcome
 
@@ -53,13 +53,13 @@ export interface EventWelcome {
 }
 ```
 
-| Field | Type | Required | Constraints | Default |
-|-------|------|----------|-------------|---------|
-| `title` | `string \| null` | No | Max 100 characters | `null` (falls back to event name) |
-| `description` | `string \| null` | No | Max 500 characters | `null` |
-| `mediaUrl` | `string \| null` | No | Valid URL | `null` |
-| `mediaType` | `"image" \| "video" \| null` | No | Auto-detected from upload | `null` |
-| `layout` | `ExperienceLayout` | Yes | `"list"` or `"grid"` | `"list"` |
+| Field         | Type                         | Required | Constraints               | Default                           |
+| ------------- | ---------------------------- | -------- | ------------------------- | --------------------------------- |
+| `title`       | `string \| null`             | No       | Max 100 characters        | `null` (falls back to event name) |
+| `description` | `string \| null`             | No       | Max 500 characters        | `null`                            |
+| `mediaUrl`    | `string \| null`             | No       | Valid URL                 | `null`                            |
+| `mediaType`   | `"image" \| "video" \| null` | No       | Auto-detected from upload | `null`                            |
+| `layout`      | `ExperienceLayout`           | Yes      | `"list"` or `"grid"`      | `"list"`                          |
 
 ---
 
@@ -84,7 +84,7 @@ export interface Event {
   theme: Theme;
 
   /** Welcome screen configuration */
-  welcome: EventWelcome;  // NEW
+  welcome: EventWelcome; // NEW
 
   deletedAt?: number | null;
   createdAt: number;
@@ -101,7 +101,7 @@ export interface Event {
  * Default welcome configuration for new events
  */
 export const DEFAULT_EVENT_WELCOME: EventWelcome = {
-  title: null,
+  title: "Choose your experience",
   description: null,
   mediaUrl: null,
   mediaType: null,
@@ -236,7 +236,7 @@ async function backfillWelcomeField() {
     .get();
 
   const batch = db.batch();
-  eventsWithoutWelcome.docs.forEach(doc => {
+  eventsWithoutWelcome.docs.forEach((doc) => {
     batch.update(doc.ref, {
       welcome: DEFAULT_EVENT_WELCOME,
       updatedAt: Date.now(),
