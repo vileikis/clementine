@@ -15,6 +15,38 @@ export const eventThemeButtonSchema = themeButtonSchema;
 export const eventThemeBackgroundSchema = themeBackgroundSchema;
 export const eventThemeSchema = themeSchema;
 
+// ============================================================================
+// Welcome Screen Schemas
+// ============================================================================
+
+/**
+ * Experience layout schema (list or grid)
+ */
+export const experienceLayoutSchema = z.enum(["list", "grid"]);
+
+/**
+ * Event welcome screen configuration schema
+ * Note: layout is required; use DEFAULT_EVENT_WELCOME for default values
+ */
+export const eventWelcomeSchema = z.object({
+  title: z.string().max(100).nullable().optional(),
+  description: z.string().max(500).nullable().optional(),
+  mediaUrl: z.string().url().nullable().optional(),
+  mediaType: z.enum(["image", "video"]).nullable().optional(),
+  layout: experienceLayoutSchema,
+});
+
+/**
+ * Update event welcome screen input schema (for server action)
+ */
+export const updateEventWelcomeSchema = z.object({
+  title: z.string().max(100).nullable().optional(),
+  description: z.string().max(500).nullable().optional(),
+  mediaUrl: z.string().url().nullable().optional(),
+  mediaType: z.enum(["image", "video"]).nullable().optional(),
+  layout: experienceLayoutSchema.optional(),
+});
+
 /**
  * Frequency options for extra slots
  */
@@ -59,6 +91,7 @@ export const eventSchema = z.object({
   experiences: z.array(eventExperienceLinkSchema).default([]),
   extras: eventExtrasSchema.default({ preEntryGate: null, preReward: null }),
   theme: eventThemeSchema,
+  welcome: eventWelcomeSchema.optional(),
   deletedAt: z.number().nullable().optional().default(null),
   createdAt: z.number(),
   updatedAt: z.number(),
@@ -184,3 +217,6 @@ export type RemoveEventExperienceInput = z.infer<typeof removeEventExperienceInp
 export type SetEventExtraInput = z.infer<typeof setEventExtraInputSchema>;
 export type UpdateEventExtraInput = z.infer<typeof updateEventExtraInputSchema>;
 export type RemoveEventExtraInput = z.infer<typeof removeEventExtraInputSchema>;
+export type ExperienceLayout = z.infer<typeof experienceLayoutSchema>;
+export type EventWelcomeSchema = z.infer<typeof eventWelcomeSchema>;
+export type UpdateEventWelcomeInput = z.infer<typeof updateEventWelcomeSchema>;

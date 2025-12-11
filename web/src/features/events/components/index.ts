@@ -8,3 +8,4 @@ export * from "./RenameEventDialog";
 export * from "./DeleteEventDialog";
 export * from "./designer";
 export * from "./general";
+export * from "./welcome";
