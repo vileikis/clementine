@@ -49,8 +49,8 @@ export function DeviceFrame({
         height: dimensions.height,
       }}
     >
-      {/* Content container */}
-      <div className="relative h-full w-full overflow-auto">{children}</div>
+      {/* Content container - overflow handled by children (ThemedBackground) */}
+      <div className="relative h-full w-full">{children}</div>
     </div>
   );
 }
