@@ -105,14 +105,13 @@ export function EventExperienceCard({
       </div>
 
       {/* Toggle switch - positioned above the click area */}
-      <div className="relative z-10">
-        <Switch
-          checked={experienceLink.enabled}
-          onCheckedChange={onToggle}
-          disabled={isUpdating || isNotFound}
-          aria-label={`${experienceLink.enabled ? "Disable" : "Enable"} ${displayName}`}
-        />
-      </div>
+      <Switch
+        checked={experienceLink.enabled}
+        onCheckedChange={onToggle}
+        disabled={isUpdating || isNotFound}
+        aria-label={`${experienceLink.enabled ? "Disable" : "Enable"} ${displayName}`}
+        className="relative"
+      />
     </div>
   );
 }
