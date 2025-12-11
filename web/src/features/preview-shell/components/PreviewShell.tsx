@@ -11,8 +11,8 @@
 import { cn } from "@/lib/utils";
 import type { PreviewShellProps, ViewportMode } from "../types";
 import { ViewportProvider } from "../context";
-import { useViewport } from "../hooks/useViewport";
 import { useFullscreen } from "../hooks/useFullscreen";
+import { useViewportStore } from "../store";
 import { DeviceFrame } from "./DeviceFrame";
 import { ViewportSwitcher } from "./ViewportSwitcher";
 import { FullscreenOverlay } from "./FullscreenOverlay";
@@ -50,19 +50,22 @@ export function PreviewShell({
   children,
   enableViewportSwitcher = false,
   enableFullscreen = false,
-  defaultViewport = "mobile",
+  defaultViewport: _defaultViewport = "mobile",
   viewportMode: controlledViewport,
   onViewportChange,
   onFullscreenEnter,
   onFullscreenExit,
   className,
 }: PreviewShellProps) {
-  // Viewport state management
-  const { mode, setMode } = useViewport({
-    defaultMode: defaultViewport,
-    mode: controlledViewport,
-    onModeChange: onViewportChange,
-  });
+  // Global viewport store (used when not controlled)
+  const globalMode = useViewportStore((state) => state.mode);
+  const setGlobalMode = useViewportStore((state) => state.setMode);
+
+  // Determine if controlled mode
+  const isControlled = controlledViewport !== undefined;
+
+  // Use controlled or global mode
+  const mode = isControlled ? controlledViewport : globalMode;
 
   // Fullscreen state management
   const { isFullscreen, enter: enterFullscreen, exit: exitFullscreen } = useFullscreen({
@@ -70,9 +73,13 @@ export function PreviewShell({
     onExit: onFullscreenExit,
   });
 
-  // Handler for viewport change
+  // Handler for viewport change - updates both controlled callback and global store
   const handleViewportChange = (newMode: ViewportMode) => {
-    setMode(newMode);
+    if (isControlled) {
+      onViewportChange?.(newMode);
+    }
+    // Always update global store so all PreviewShells stay in sync
+    setGlobalMode(newMode);
   };
 
   // Handler for fullscreen exit

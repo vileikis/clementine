@@ -38,6 +38,9 @@ export { useFullscreen } from "./hooks";
 // Context
 export { ViewportProvider, useViewportContext } from "./context";
 
+// Store
+export { useViewportStore } from "./store";
+
 // Types
 export type {
   ViewportMode,
