@@ -3,6 +3,42 @@
 import type { Theme } from "@/features/theming";
 
 /**
+ * Layout options for experience cards on the welcome screen
+ */
+export type ExperienceLayout = "list" | "grid";
+
+/**
+ * Welcome screen configuration for an event
+ */
+export interface EventWelcome {
+  /** Custom welcome title. Falls back to event.name in UI if null/empty */
+  title?: string | null;
+
+  /** Welcome description displayed below title */
+  description?: string | null;
+
+  /** Hero media URL (Firebase Storage public URL) */
+  mediaUrl?: string | null;
+
+  /** Type of hero media for proper rendering */
+  mediaType?: "image" | "video" | null;
+
+  /** Layout for experience cards */
+  layout: ExperienceLayout;
+}
+
+/**
+ * Default welcome configuration for new events
+ */
+export const DEFAULT_EVENT_WELCOME: EventWelcome = {
+  title: "Choose your experience",
+  description: null,
+  mediaUrl: null,
+  mediaType: null,
+  layout: "list",
+};
+
+/**
  * Frequency options for extra slots
  */
 export type ExtraSlotFrequency = "always" | "once_per_session";
@@ -52,6 +88,9 @@ export interface Event {
 
   // Visual customization
   theme: Theme;
+
+  // Welcome screen configuration
+  welcome: EventWelcome;
 
   // Soft delete timestamp
   deletedAt?: number | null; // Unix timestamp ms when deleted

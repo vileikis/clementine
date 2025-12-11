@@ -2,7 +2,8 @@
 
 import { db } from "@/lib/firebase/admin";
 import type { Event, EventExperienceLink } from "../types/event.types";
-import { eventSchema } from "../schemas";
+import { DEFAULT_EVENT_WELCOME } from "../types/event.types";
+import { eventSchema, type UpdateEventWelcomeInput } from "../schemas";
 import { DEFAULT_EVENT_THEME, DEFAULT_EVENT_EXTRAS } from "../constants";
 import type { ExtraSlot } from "../schemas";
 
@@ -37,6 +38,7 @@ export async function createEvent(data: {
     experiences: [],
     extras: DEFAULT_EVENT_EXTRAS,
     theme: DEFAULT_EVENT_THEME,
+    welcome: DEFAULT_EVENT_WELCOME,
     deletedAt: null,
     createdAt: now,
     updatedAt: now,
@@ -45,6 +47,20 @@ export async function createEvent(data: {
   await eventRef.set(event);
 
   return eventId;
+}
+
+/**
+ * Normalize event data by applying defaults for missing fields (migration support)
+ */
+function normalizeEvent(data: FirebaseFirestore.DocumentData, docId: string): Event {
+  // Apply DEFAULT_EVENT_WELCOME fallback for events without welcome field
+  const normalizedData = {
+    id: docId,
+    ...data,
+    welcome: data.welcome ?? DEFAULT_EVENT_WELCOME,
+  };
+
+  return eventSchema.parse(normalizedData) as Event;
 }
 
 /**
@@ -64,7 +80,7 @@ export async function getEvent(
   // Check for soft delete
   if (data.deletedAt) return null;
 
-  return eventSchema.parse({ id: doc.id, ...data });
+  return normalizeEvent(data, doc.id);
 }
 
 /**
@@ -86,8 +102,8 @@ export async function listEvents(
 
   for (const doc of snapshot.docs) {
     try {
-      const parsed = eventSchema.parse({ id: doc.id, ...doc.data() });
-      events.push(parsed as Event);
+      const parsed = normalizeEvent(doc.data(), doc.id);
+      events.push(parsed);
     } catch {
       // Skip invalid documents
     }
@@ -396,4 +412,43 @@ export async function removeEventExtra(
     [`extras.${slot}`]: null,
     updatedAt: Date.now(),
   });
+}
+
+// ============================================================================
+// Welcome Screen Operations
+// ============================================================================
+
+/**
+ * Update welcome screen configuration (partial update with dot notation)
+ */
+export async function updateEventWelcome(
+  projectId: string,
+  eventId: string,
+  welcome: UpdateEventWelcomeInput
+): Promise<void> {
+  const eventRef = getEventsCollection(projectId).doc(eventId);
+
+  // Build dot-notation update object
+  const updateData: Record<string, unknown> = {
+    updatedAt: Date.now(),
+  };
+
+  // Only include fields that are explicitly provided
+  if (welcome.title !== undefined) {
+    updateData["welcome.title"] = welcome.title;
+  }
+  if (welcome.description !== undefined) {
+    updateData["welcome.description"] = welcome.description;
+  }
+  if (welcome.mediaUrl !== undefined) {
+    updateData["welcome.mediaUrl"] = welcome.mediaUrl;
+  }
+  if (welcome.mediaType !== undefined) {
+    updateData["welcome.mediaType"] = welcome.mediaType;
+  }
+  if (welcome.layout !== undefined) {
+    updateData["welcome.layout"] = welcome.layout;
+  }
+
+  await eventRef.update(updateData);
 }
