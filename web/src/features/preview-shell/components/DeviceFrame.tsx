@@ -45,9 +45,8 @@ export function DeviceFrame({
         // Width: use dimension but don't exceed available space
         width: isMobile ? dimensions.width : "100%",
         maxWidth: dimensions.width,
-        // Height: mobile fixed, desktop fills available
-        height: isMobile ? dimensions.height : "100%",
-        minHeight: isMobile ? undefined : dimensions.height,
+        // Height: fixed for both modes to ensure background fills space
+        height: dimensions.height,
       }}
     >
       {/* Content container */}
