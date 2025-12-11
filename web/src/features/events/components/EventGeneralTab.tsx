@@ -37,7 +37,11 @@ export function EventGeneralTab({ event }: EventGeneralTabProps) {
   });
 
   // Watch form values for real-time preview updates
-  const welcomeValues = useWatch({ control: form.control });
+  const watchedValues = useWatch({ control: form.control });
+  const welcomeValues: EventWelcome = {
+    ...DEFAULT_EVENT_WELCOME,
+    ...watchedValues,
+  };
 
   // Fetch experience details once for all child components
   const experienceIds = useMemo(
