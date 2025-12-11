@@ -207,6 +207,18 @@ The application is organized into feature modules in `web/src/features/`.
   - Constants: `DEFAULT_LABELS` (for i18n customization)
 - **Features**: Live camera preview, photo library fallback, aspect ratio constraints, camera facing toggle, permission handling
 
+**✅ Ready - Preview Shell** (`web/src/features/preview-shell/`)
+
+- **Purpose**: Reusable device preview infrastructure for admin interfaces
+- **Status**: Fully implemented
+- **Exports**:
+  - Components: `PreviewShell`, `DeviceFrame`, `ViewportSwitcher`, `FullscreenOverlay`, `FullscreenTrigger`
+  - Hooks: `useViewport`, `useFullscreen`
+  - Context: `ViewportProvider`, `useViewportContext`
+  - Types: `ViewportMode`, `ViewportDimensions`, `PreviewShellProps`, etc.
+- **Features**: Mobile device frame, viewport switching (mobile/tablet), fullscreen mode
+- **Usage**: Wrap preview content with `<PreviewShell>` component, combine with `theming` module for themed previews
+
 **📋 Planned - Experience Engine** (`web/src/features/experience-engine/`)
 
 - **Purpose**: Unified runtime powering admin preview AND guest flow (Phase 7)

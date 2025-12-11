@@ -118,8 +118,15 @@ export function FullscreenOverlay({
         )}
       </header>
 
-      {/* Content area - centered */}
-      <div className="flex-1 flex items-center justify-center p-6 overflow-auto">
+      {/* Content area - mobile centered, desktop fills space */}
+      <div
+        className={cn(
+          "flex-1 flex p-6 overflow-auto",
+          viewportMode === "mobile"
+            ? "items-center justify-center"
+            : "flex-col"
+        )}
+      >
         {children}
       </div>
     </div>

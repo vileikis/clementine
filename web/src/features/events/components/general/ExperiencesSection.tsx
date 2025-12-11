@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useMemo, useTransition } from "react";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { AddExperienceCard } from "./AddExperienceCard";
 import { EventExperienceCard } from "./EventExperienceCard";
 import { ExperiencePickerDrawer } from "./ExperiencePickerDrawer";
 import { EventExperienceDrawer } from "./EventExperienceDrawer";
-import { useExperienceDetails } from "@/features/experiences";
+import type { Experience } from "@/features/experiences";
 import {
   addEventExperienceAction,
   updateEventExperienceAction,
@@ -15,26 +15,28 @@ import type { Event, EventExperienceLink } from "../../types/event.types";
 
 interface ExperiencesSectionProps {
   event: Event;
+  /** Pre-fetched experience details map */
+  experiencesMap: Map<string, Experience>;
+  /** Whether experience details are loading */
+  loadingExperiences: boolean;
 }
 
 /**
  * Section component displaying the experiences grid.
  * Contains add card + attached experience cards with toggles.
  */
-export function ExperiencesSection({ event }: ExperiencesSectionProps) {
+export function ExperiencesSection({
+  event,
+  experiencesMap,
+  loadingExperiences,
+}: ExperiencesSectionProps) {
   const [isPickerOpen, setIsPickerOpen] = useState(false);
-  const [editingExperience, setEditingExperience] = useState<EventExperienceLink | null>(null);
+  const [editingExperience, setEditingExperience] =
+    useState<EventExperienceLink | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  // Get experience IDs from the event
-  const experienceIds = useMemo(
-    () => event.experiences.map((exp) => exp.experienceId),
-    [event.experiences]
-  );
-
-  // Fetch experience details for display
-  const { experiencesMap, loading: loadingDetails } =
-    useExperienceDetails(experienceIds);
+  // Get experience IDs from the event (for picker exclusion)
+  const experienceIds = event.experiences.map((exp) => exp.experienceId);
 
   const handleAddExperience = async (
     experienceId: string,
@@ -105,7 +107,7 @@ export function ExperiencesSection({ event }: ExperiencesSectionProps) {
         {/* Add experience card */}
         <AddExperienceCard
           onClick={() => setIsPickerOpen(true)}
-          disabled={isPending || loadingDetails}
+          disabled={isPending || loadingExperiences}
         />
       </div>
 

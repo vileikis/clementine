@@ -11,8 +11,8 @@
 import { cn } from "@/lib/utils";
 import type { PreviewShellProps, ViewportMode } from "../types";
 import { ViewportProvider } from "../context";
-import { useViewport } from "../hooks/useViewport";
 import { useFullscreen } from "../hooks/useFullscreen";
+import { useViewportStore } from "../store";
 import { DeviceFrame } from "./DeviceFrame";
 import { ViewportSwitcher } from "./ViewportSwitcher";
 import { FullscreenOverlay } from "./FullscreenOverlay";
@@ -50,19 +50,21 @@ export function PreviewShell({
   children,
   enableViewportSwitcher = false,
   enableFullscreen = false,
-  defaultViewport = "mobile",
   viewportMode: controlledViewport,
   onViewportChange,
   onFullscreenEnter,
   onFullscreenExit,
   className,
 }: PreviewShellProps) {
-  // Viewport state management
-  const { mode, setMode } = useViewport({
-    defaultMode: defaultViewport,
-    mode: controlledViewport,
-    onModeChange: onViewportChange,
-  });
+  // Global viewport store (used when not controlled)
+  const globalMode = useViewportStore((state) => state.mode);
+  const setGlobalMode = useViewportStore((state) => state.setMode);
+
+  // Determine if controlled mode
+  const isControlled = controlledViewport !== undefined;
+
+  // Use controlled or global mode
+  const mode = isControlled ? controlledViewport : globalMode;
 
   // Fullscreen state management
   const { isFullscreen, enter: enterFullscreen, exit: exitFullscreen } = useFullscreen({
@@ -70,9 +72,13 @@ export function PreviewShell({
     onExit: onFullscreenExit,
   });
 
-  // Handler for viewport change
+  // Handler for viewport change - updates both controlled callback and global store
   const handleViewportChange = (newMode: ViewportMode) => {
-    setMode(newMode);
+    if (isControlled) {
+      onViewportChange?.(newMode);
+    }
+    // Always update global store so all PreviewShells stay in sync
+    setGlobalMode(newMode);
   };
 
   // Handler for fullscreen exit
@@ -80,12 +86,14 @@ export function PreviewShell({
     exitFullscreen();
   };
 
+  const isMobile = mode === "mobile";
+
   return (
     <ViewportProvider mode={mode} isFullscreen={isFullscreen}>
-      <div className={cn("flex flex-col gap-4", className)}>
+      <div className={cn("flex flex-col gap-4 h-full", className)}>
         {/* Controls row - only show if features are enabled */}
         {(enableViewportSwitcher || enableFullscreen) && (
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center justify-between gap-4 shrink-0">
             {/* Viewport switcher */}
             {enableViewportSwitcher ? (
               <ViewportSwitcher
@@ -105,7 +113,15 @@ export function PreviewShell({
         )}
 
         {/* Device frame with content */}
-        <div className="flex justify-center">
+        <div
+          className={cn(
+            "flex min-h-0",
+            // Mobile: center the fixed-size frame
+            isMobile && "justify-center",
+            // Desktop: fill available space with flex column for proper height
+            !isMobile && "flex-1 flex-col"
+          )}
+        >
           <DeviceFrame viewportMode={mode}>{children}</DeviceFrame>
         </div>
 

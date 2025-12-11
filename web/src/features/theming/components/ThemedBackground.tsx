@@ -15,8 +15,9 @@ interface ThemedBackgroundProps {
   /** Additional inline styles for the container */
   style?: CSSProperties;
   /**
-   * Content wrapper className. Set to empty string to disable the default "relative z-10" wrapper.
-   * @default "relative z-10"
+   * Content wrapper className. Set to empty string to disable the default wrapper.
+   * Must include z-10 to stay above background image and overflow-auto for scrolling.
+   * @default "relative z-10 h-full w-full overflow-auto"
    */
   contentClassName?: string;
 }
@@ -46,7 +47,7 @@ export function ThemedBackground({
   fontFamily,
   className = "",
   style,
-  contentClassName = "relative z-10",
+  contentClassName = "relative z-10 h-full w-full overflow-auto py-8",
 }: ThemedBackgroundProps) {
   const bgColor = background?.color ?? "#FFFFFF";
   const bgImage = background?.image;
@@ -54,7 +55,7 @@ export function ThemedBackground({
 
   return (
     <div
-      className={`relative ${className}`}
+      className={`relative overflow-hidden flex-1 ${className}`}
       style={{
         backgroundColor: bgColor,
         fontFamily: fontFamily ?? undefined,
@@ -79,7 +80,13 @@ export function ThemedBackground({
 
       {/* Content - wrap only if contentClassName is provided */}
       {contentClassName ? (
-        <div className={contentClassName}>{children}</div>
+        <div className={contentClassName}>
+          {/* Inner centering wrapper: min-h-full ensures it fills container,
+              flex centering works when content fits, scrolls properly when it overflows */}
+          <div className="min-h-full w-full max-w-[800px] mx-auto flex flex-col items-center justify-center">
+            {children}
+          </div>
+        </div>
       ) : (
         children
       )}

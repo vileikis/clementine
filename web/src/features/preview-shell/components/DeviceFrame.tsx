@@ -6,7 +6,7 @@
  * A pure container that simulates a device screen with proper dimensions.
  * Does NOT handle theming - consumers wrap content with ThemedBackground as needed.
  *
- * Supports mobile (375x667px) and desktop (900x600px) viewport modes.
+ * Supports mobile (375x667px fixed) and desktop (fills available space) viewport modes.
  */
 
 import { cn } from "@/lib/utils";
@@ -39,19 +39,32 @@ export function DeviceFrame({
         "rounded-2xl border-4 border-foreground/10 shadow-lg overflow-hidden",
         // Background for frame area
         "bg-background",
+        // Desktop fills available space using flex-grow (not h-full which needs explicit parent height)
+        !isMobile && "w-full flex-1 flex flex-col",
         className
       )}
-      style={{
-        // Width: use dimension but don't exceed available space
-        width: isMobile ? dimensions.width : "100%",
-        maxWidth: dimensions.width,
-        // Height: mobile fixed, desktop fills available
-        height: isMobile ? dimensions.height : "100%",
-        minHeight: isMobile ? undefined : dimensions.height,
-      }}
+      style={
+        isMobile
+          ? {
+              // Mobile: fixed dimensions
+              width: dimensions.width,
+              height: dimensions.height,
+            }
+          : {
+              // Desktop: minimum height for visual presence
+              minHeight: dimensions.height,
+            }
+      }
     >
-      {/* Content container */}
-      <div className="relative h-full w-full overflow-auto">{children}</div>
+      {/* Content container - fills frame, overflow handled by children (ThemedBackground) */}
+      <div
+        className={cn(
+          "relative w-full",
+          isMobile ? "h-full" : "flex-1 flex flex-col"
+        )}
+      >
+        {children}
+      </div>
     </div>
   );
 }
