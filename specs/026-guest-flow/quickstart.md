@@ -14,9 +14,9 @@ This guide provides a step-by-step implementation path for the guest flow featur
 Before implementing, ensure:
 
 1. **Theming module** is complete (`features/theming/`)
-2. **Welcome screen components** exist (`features/events/components/welcome/`)
-3. **Project/Event modules** have working repositories and actions
-4. **Firebase Client SDK** is configured (`lib/firebase/client.ts`)
+2. **Project/Event modules** have working repositories and actions
+3. **Firebase Client SDK** is configured (`lib/firebase/client.ts`)
+4. **Welcome screen components** exist in events module (will be migrated to guest)
 
 ---
 
@@ -69,7 +69,7 @@ Before implementing, ensure:
 
 ### Phase 4: Client Hooks
 
-9. **Create auth hook** (`features/guest/hooks/use-guest-auth.ts`)
+9. **Create auth hook** (`features/guest/hooks/useGuestAuth.ts`)
    ```typescript
    export function useGuestAuth() {
      // State: user, loading, error
@@ -79,7 +79,7 @@ Before implementing, ensure:
    }
    ```
 
-10. **Create session hook** (`features/guest/hooks/use-session.ts`)
+10. **Create session hook** (`features/guest/hooks/useSession.ts`)
     ```typescript
     export function useSession(projectId, experienceId, sessionId) {
       // State: session, loading
@@ -89,55 +89,57 @@ Before implementing, ensure:
     }
     ```
 
-### Phase 5: Components
+### Phase 5: Context & Components
 
-11. **Create loading screen** (`features/guest/components/loading-screen.tsx`)
+11. **Create guest context** (`features/guest/contexts/GuestContext.tsx`)
+    - Define `GuestContextValue` type
+    - Create context with `createContext`
+    - Export `GuestProvider` component (wraps children with auth)
+    - Export `useGuestContext` hook
+    - Manages guest record creation on auth
+
+12. **Migrate welcome components** (`features/guest/components/welcome/`)
+    - Move `WelcomeContent.tsx` from events (rename from WelcomePreview if needed)
+    - Move `ExperienceCards.tsx` from events
+    - Move `ExperienceCard.tsx` from events
+    - Add `onClick` prop to `ExperienceCard` for navigation
+    - Update barrel exports in `welcome/index.ts`
+
+13. **Update admin preview** (`features/events/components/welcome/WelcomePreview.tsx`)
+    - Make thin wrapper that imports from guest module
+    - Wrap in PreviewShell infrastructure
+    - Pass `onClick={undefined}` to disable interaction in preview
+
+14. **Create loading screen** (`features/guest/components/LoadingScreen.tsx`)
     - Full-screen loading indicator
     - Optionally accepts theme for branded loading
 
-12. **Create empty states** (`features/guest/components/empty-states.tsx`)
+15. **Create empty states** (`features/guest/components/EmptyStates.tsx`)
     - `NoActiveEvent` - "Event has not been launched yet"
     - `EmptyEvent` - "Event is empty"
     - Apply theme if available
 
-13. **Create guest provider** (`features/guest/components/guest-provider.tsx`)
-    - Wraps children with auth context
-    - Manages guest record creation
-    - Provides guest data via context
-
-14. **Create welcome screen wrapper** (`features/guest/components/welcome-screen.tsx`)
-    - Imports `WelcomePreview` from events
-    - Wraps with `ThemeProvider`
-    - Handles experience click → navigate with `?exp={id}`
-
-15. **Create experience screen** (`features/guest/components/experience-screen.tsx`)
+16. **Create experience screen** (`features/guest/components/ExperienceScreen.tsx`)
     - Placeholder for MVP
     - Shows experience name, guest ID, session ID
     - Home button to return to welcome
 
 ### Phase 6: Page Integration
 
-16. **Update join page** (`app/(public)/join/[projectId]/page.tsx`)
+17. **Update join page** (`app/(public)/join/[projectId]/page.tsx`)
     - Fetch event using `activeEventId` from project (layout provides project)
     - Render `GuestProvider` wrapper
     - Conditionally render:
       - `LoadingScreen` while auth/data loading
       - `NoActiveEvent` if no event
       - `EmptyEvent` if no enabled experiences
-      - `WelcomeScreen` if no `exp` param
+      - `WelcomeContent` if no `exp` param
       - `ExperienceScreen` if `exp` param present
 
-17. **Handle URL state**
+18. **Handle URL state**
     - Read `exp` and `s` from `useSearchParams()`
     - Update URL after session creation
     - Clear params on home navigation
-
-### Phase 7: Component Modifications
-
-18. **Modify ExperienceCard** (`features/events/components/welcome/ExperienceCard.tsx`)
-    - Add optional `onClick` prop
-    - Make card clickable when onClick provided
-    - Preserve existing behavior for admin preview (no onClick)
 
 ---
 
@@ -223,19 +225,20 @@ function goHome() {
 
 ```typescript
 import { ThemeProvider, ThemedBackground } from "@/features/theming"
+import { WelcomeContent } from "@/features/guest/components/welcome"
 
-function WelcomeScreen({ event, ... }) {
+function JoinPage({ event, experiencesMap, ... }) {
   return (
     <ThemeProvider theme={event.theme}>
       <ThemedBackground
         background={event.theme.background}
         fontFamily={event.theme.fontFamily}
       >
-        <WelcomePreview
+        <WelcomeContent
           welcome={event.welcome}
           event={event}
           experiencesMap={experiencesMap}
-          onExperienceClick={handleSelect}
+          onExperienceClick={handleSelect}  // Interactive in guest flow
         />
       </ThemedBackground>
     </ThemeProvider>
@@ -310,17 +313,23 @@ features/guest/
 ├── actions/
 │   ├── index.ts
 │   └── guests.actions.ts       # Server Actions
+├── contexts/
+│   ├── index.ts
+│   └── GuestContext.tsx        # Auth + guest state context
 ├── hooks/
 │   ├── index.ts
-│   ├── use-guest-auth.ts       # Anonymous auth
-│   └── use-session.ts          # Session management
+│   ├── useGuestAuth.ts         # Anonymous auth
+│   └── useSession.ts           # Session management
 └── components/
     ├── index.ts
-    ├── guest-provider.tsx      # Auth + context
-    ├── welcome-screen.tsx      # Welcome wrapper
-    ├── experience-screen.tsx   # Placeholder
-    ├── loading-screen.tsx      # Loading state
-    └── empty-states.tsx        # Error states
+    ├── ExperienceScreen.tsx    # Placeholder experience view
+    ├── LoadingScreen.tsx       # Loading state
+    ├── EmptyStates.tsx         # Error states
+    └── welcome/
+        ├── index.ts
+        ├── WelcomeContent.tsx  # Main welcome layout (migrated)
+        ├── ExperienceCards.tsx # Card container (migrated)
+        └── ExperienceCard.tsx  # Individual card (migrated)
 ```
 
 ---
