@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { ExperiencesSection, ExtrasSection } from "./general";
@@ -37,7 +37,7 @@ export function EventGeneralTab({ event }: EventGeneralTabProps) {
   });
 
   // Watch form values for real-time preview updates
-  const welcomeValues = form.watch();
+  const welcomeValues = useWatch({ control: form.control });
 
   // Fetch experience details once for all child components
   const experienceIds = useMemo(
