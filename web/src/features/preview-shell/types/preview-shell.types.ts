@@ -54,10 +54,6 @@ export interface PreviewShellProps {
   /** Enable fullscreen mode. Default: false */
   enableFullscreen?: boolean;
 
-  // Viewport control (uncontrolled)
-  /** Initial viewport mode when uncontrolled. Default: "mobile" */
-  defaultViewport?: ViewportMode;
-
   // Viewport control (controlled)
   /** Current viewport mode (controlled) */
   viewportMode?: ViewportMode;

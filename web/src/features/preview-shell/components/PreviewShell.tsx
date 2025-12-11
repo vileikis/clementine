@@ -50,7 +50,6 @@ export function PreviewShell({
   children,
   enableViewportSwitcher = false,
   enableFullscreen = false,
-  defaultViewport: _defaultViewport = "mobile",
   viewportMode: controlledViewport,
   onViewportChange,
   onFullscreenEnter,
