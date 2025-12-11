@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { PreviewShell } from "@/features/preview-shell";
 import { ThemeProvider, ThemedBackground, useEventTheme } from "@/features/theming";
-import { useExperienceDetails, type Experience } from "@/features/experiences";
+import type { Experience } from "@/features/experiences";
 import { ExperienceCards } from "./ExperienceCards";
 import type { EventWelcome, Event } from "../../types/event.types";
 
@@ -12,6 +12,8 @@ interface WelcomePreviewProps {
   welcome: EventWelcome;
   /** Event data for theme and experiences */
   event: Event;
+  /** Pre-fetched experience details map */
+  experiencesMap: Map<string, Experience>;
 }
 
 /**
@@ -21,21 +23,16 @@ interface WelcomePreviewProps {
  * Receives welcome values from parent (EventGeneralTab) via form.watch()
  * to enable real-time preview updates as user types.
  */
-export function WelcomePreview({ welcome, event }: WelcomePreviewProps) {
+export function WelcomePreview({
+  welcome,
+  event,
+  experiencesMap,
+}: WelcomePreviewProps) {
   // Filter to show only enabled experiences
   const enabledExperiences = useMemo(
     () => event.experiences.filter((exp) => exp.enabled),
     [event.experiences]
   );
-
-  // Get experience IDs for fetching details
-  const experienceIds = useMemo(
-    () => enabledExperiences.map((exp) => exp.experienceId),
-    [enabledExperiences]
-  );
-
-  // Fetch experience details for name and media
-  const { experiencesMap } = useExperienceDetails(experienceIds);
 
   // Get the display title (fall back to event name)
   const displayTitle = welcome.title?.trim() || event.name;

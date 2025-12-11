@@ -1,11 +1,13 @@
 "use client";
 
+import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { ExperiencesSection, ExtrasSection } from "./general";
 import { WelcomeSection, WelcomePreview } from "./welcome";
 import { useAutoSave } from "@/hooks/useAutoSave";
+import { useExperienceDetails } from "@/features/experiences";
 import { updateEventWelcomeAction } from "../actions";
 import { eventWelcomeSchema } from "../schemas";
 import type { Event, EventWelcome } from "../types/event.types";
@@ -37,6 +39,14 @@ export function EventGeneralTab({ event }: EventGeneralTabProps) {
   // Watch form values for real-time preview updates
   const welcomeValues = form.watch();
 
+  // Fetch experience details once for all child components
+  const experienceIds = useMemo(
+    () => event.experiences.map((exp) => exp.experienceId),
+    [event.experiences]
+  );
+  const { experiencesMap, loading: loadingExperiences } =
+    useExperienceDetails(experienceIds);
+
   // Handle save - called by useAutoSave
   const handleSave = async (updates: Partial<EventWelcome>) => {
     const result = await updateEventWelcomeAction(
@@ -66,13 +76,21 @@ export function EventGeneralTab({ event }: EventGeneralTabProps) {
       {/* Left column: Form sections */}
       <div className="space-y-8">
         <WelcomeSection form={form} event={event} onBlur={handleBlur} />
-        <ExperiencesSection event={event} />
+        <ExperiencesSection
+          event={event}
+          experiencesMap={experiencesMap}
+          loadingExperiences={loadingExperiences}
+        />
         <ExtrasSection event={event} />
       </div>
 
       {/* Right column: Sticky preview */}
       <div className="hidden lg:block lg:sticky lg:top-4">
-        <WelcomePreview welcome={welcomeValues} event={event} />
+        <WelcomePreview
+          welcome={welcomeValues}
+          event={event}
+          experiencesMap={experiencesMap}
+        />
       </div>
     </div>
   );

@@ -89,8 +89,8 @@ export interface Event {
   // Visual customization
   theme: Theme;
 
-  // Welcome screen configuration
-  welcome: EventWelcome;
+  // Welcome screen configuration (optional - use DEFAULT_EVENT_WELCOME when absent)
+  welcome?: EventWelcome;
 
   // Soft delete timestamp
   deletedAt?: number | null; // Unix timestamp ms when deleted
