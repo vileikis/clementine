@@ -451,7 +451,7 @@ export function EventThemeEditor({ event, projectId }: EventThemeEditorProps) {
             background={theme.background}
             fontFamily={theme.fontFamily}
             className="flex h-full w-full flex-col items-center justify-center p-8"
-            contentClassName="relative z-10 h-full overflow-auto space-y-6"
+            contentClassName="relative z-10 h-full overflow-auto max-w-[800px] mx-auto w-full space-y-6"
             style={{ textAlign: theme.text.alignment }}
           >
             <h1 className="text-3xl font-bold" style={{ color: theme.text.color }}>
