@@ -49,10 +49,11 @@ Enable guests to access branded event experiences through shareable project link
 **So that** I can participate in the AI photobooth flow
 
 **Acceptance Criteria:**
-- Tapping an experience navigates to the experience screen
+- Tapping an experience updates URL with `?exp={experienceId}` and shows experience screen
 - A new session is created and associated with the guest
+- URL updates to include `&s={sessionId}` after session creation
 - Experience screen shows the active experience content
-- Home button allows returning to welcome screen
+- Home button clears query params and returns to welcome screen
 
 ### US-4: Resume Session on Refresh
 
@@ -61,9 +62,9 @@ Enable guests to access branded event experiences through shareable project link
 **So that** I don't lose my progress
 
 **Acceptance Criteria:**
-- Refreshing the experience page does not create a new session
+- Refreshing with `?exp={id}&s={sessionId}` in URL resumes existing session
 - Session persists as long as the same guest is authenticated
-- If guest identity changes, a new session is created
+- If guest identity changes, a new session is created (URL updated accordingly)
 
 ---
 
@@ -71,10 +72,15 @@ Enable guests to access branded event experiences through shareable project link
 
 ### FR-1: Route Structure
 
-| Route | Purpose |
-|-------|---------|
-| `/join/[projectId]` | Welcome screen for the project's active event |
-| `/join/[projectId]/[experienceId]` | Active experience screen with session |
+Single route with query parameters for state management:
+
+| URL | Purpose |
+|-----|---------|
+| `/join/[projectId]` | Welcome screen (no query params) |
+| `/join/[projectId]?exp={experienceId}` | Experience screen (new session created) |
+| `/join/[projectId]?exp={experienceId}&s={sessionId}` | Experience screen (existing session) |
+
+**Rationale:** Query params simplify data flow by keeping all logic in a single page component. The active event is resolved from the project on each request, and experience/session state is managed via URL parameters.
 
 ### FR-2: Empty States
 
@@ -114,11 +120,12 @@ The experience screen displays:
 
 1. Session is created when guest activates (taps) an experience
 2. Session is stored in project's sessions collection
-3. Session references the guest ID
-4. Session ID should be reflected in the URL (query param or similar)
+3. Session references the guest ID and experience ID
+4. After session creation, URL updates to include `&s={sessionId}`
 5. On page refresh:
-   - If session exists and guest ID matches → reuse session
-   - If guest ID doesn't match → create new session
+   - If `s` param exists and guest ID matches → reuse session
+   - If `s` param missing or guest ID doesn't match → create new session
+6. Returning to welcome screen (clearing `exp` param) does not end the session
 
 ### FR-7: Loading States
 
@@ -152,10 +159,11 @@ Stored in `/projects/{projectId}/sessions/{sessionId}`:
 
 | Scenario | Behavior |
 |----------|----------|
-| Guest refreshes welcome screen | Re-authenticate if needed, show welcome screen |
-| Guest refreshes experience screen | Reuse existing session if guest matches |
+| Guest refreshes welcome screen (no query params) | Re-authenticate if needed, show welcome screen |
+| Guest refreshes experience screen (with `exp` + `s` params) | Validate session, reuse if guest matches |
 | Guest clears cookies, returns | New anonymous auth, new guest record, new session |
 | Multiple experiences available | Guest can return home and start different experience |
+| Guest navigates to invalid `exp` param | Show error or redirect to welcome |
 | Experience disabled after guest starts | Handle gracefully (TBD - show error or redirect) |
 
 ---
@@ -178,13 +186,13 @@ Stored in `/projects/{projectId}/sessions/{sessionId}`:
 - [ ] Empty states display correctly for all error scenarios
 - [ ] Anonymous authentication happens seamlessly on first visit
 - [ ] Guest record created in Firestore on first visit
-- [ ] Tapping experience navigates to experience screen
+- [ ] Tapping experience adds `?exp={id}` and navigates to experience screen
 - [ ] Session created and stored when experience activated
-- [ ] Session ID reflected in URL for persistence
-- [ ] Page refresh reuses session (same guest)
-- [ ] Page refresh creates new session (different guest)
+- [ ] Session ID added to URL (`&s={id}`) after creation
+- [ ] Page refresh with valid `s` param reuses session (same guest)
+- [ ] Page refresh creates new session if guest changed
 - [ ] Loading states shown during auth/data resolution
-- [ ] Home navigation works from experience screen
+- [ ] Home navigation (clearing query params) returns to welcome screen
 - [ ] Event theme applied throughout guest flow
 
 ---
@@ -196,6 +204,20 @@ Stored in `/projects/{projectId}/sessions/{sessionId}`:
 - **Experiences** — List of enabled experiences from event
 - **Firebase Auth** — Anonymous authentication
 - **Firestore** — Guest and session storage
+
+### Component Reuse
+
+The guest welcome screen reuses UI components from the admin welcome preview:
+
+- **WelcomeContent** — Main welcome screen layout (hero, title, description, experiences)
+- **ExperienceCard** — Individual experience card
+- **ExperienceCards** — Experience cards container with layout (list/grid)
+
+These components live in the `guest` feature module and are imported by both:
+- Guest flow (actual guest experience)
+- Admin preview (welcome screen preview in event settings)
+
+This ensures visual consistency between what admins preview and what guests see.
 
 ---
 
