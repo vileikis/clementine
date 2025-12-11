@@ -17,7 +17,7 @@ interface ThemedBackgroundProps {
   /**
    * Content wrapper className. Set to empty string to disable the default wrapper.
    * Must include z-10 to stay above background image and overflow-auto for scrolling.
-   * @default "relative h-full z-10 overflow-auto"
+   * @default "relative h-full z-10 overflow-auto max-w-[800px] mx-auto w-full"
    */
   contentClassName?: string;
 }
@@ -47,7 +47,7 @@ export function ThemedBackground({
   fontFamily,
   className = "",
   style,
-  contentClassName = "relative h-full z-10 overflow-auto",
+  contentClassName = "relative h-full z-10 overflow-auto max-w-[800px] mx-auto w-full",
 }: ThemedBackgroundProps) {
   const bgColor = background?.color ?? "#FFFFFF";
   const bgImage = background?.image;
@@ -55,7 +55,7 @@ export function ThemedBackground({
 
   return (
     <div
-      className={`relative overflow-hidden ${className}`}
+      className={`relative overflow-hidden flex-1 ${className}`}
       style={{
         backgroundColor: bgColor,
         fontFamily: fontFamily ?? undefined,

@@ -87,12 +87,14 @@ export function PreviewShell({
     exitFullscreen();
   };
 
+  const isMobile = mode === "mobile";
+
   return (
     <ViewportProvider mode={mode} isFullscreen={isFullscreen}>
-      <div className={cn("flex flex-col gap-4", className)}>
+      <div className={cn("flex flex-col gap-4 h-full", className)}>
         {/* Controls row - only show if features are enabled */}
         {(enableViewportSwitcher || enableFullscreen) && (
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center justify-between gap-4 shrink-0">
             {/* Viewport switcher */}
             {enableViewportSwitcher ? (
               <ViewportSwitcher
@@ -112,7 +114,15 @@ export function PreviewShell({
         )}
 
         {/* Device frame with content */}
-        <div className="flex justify-center">
+        <div
+          className={cn(
+            "flex min-h-0",
+            // Mobile: center the fixed-size frame
+            isMobile && "justify-center",
+            // Desktop: fill available space with flex column for proper height
+            !isMobile && "flex-1 flex-col"
+          )}
+        >
           <DeviceFrame viewportMode={mode}>{children}</DeviceFrame>
         </div>
 
