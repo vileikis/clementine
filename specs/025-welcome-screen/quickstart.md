@@ -45,27 +45,32 @@ This guide provides quick reference for implementing the Welcome Screen Customiz
 
 ### Phase 2: UI Components
 
-5. **Create WelcomeSection** (`components/designer/WelcomeSection.tsx`)
+5. **Create WelcomeSection** (`components/welcome/WelcomeSection.tsx`)
    - Form fields for title, description, media, layout
-   - Uses React Hook Form with `useAutoSave` hook
-   - Implements 500ms debounce autosave on blur
+   - Receives `form` prop from EventGeneralTab (lifted state)
+   - Receives `onBlur` handler for autosave
 
-6. **Create WelcomePreview** (`components/designer/WelcomePreview.tsx`)
+6. **Create WelcomePreview** (`components/welcome/WelcomePreview.tsx`)
    - Uses `PreviewShell` with `ThemedBackground`
    - Shows welcome content + experience cards
-   - Handles empty states
+   - Receives `welcome` values + `event` props
 
-7. **Modify EventGeneralTab** (`components/EventGeneralTab.tsx`)
-   - Add `<WelcomeSection />` as first section
-   - Pass event and projectId props
+7. **Create ExperienceCards** (`components/welcome/ExperienceCards.tsx`)
+   - Renders experience cards in list or grid layout
+   - Filters to show only enabled experiences
+
+8. **Modify EventGeneralTab** (`components/EventGeneralTab.tsx`)
+   - Owns form state (lifted from WelcomeSection)
+   - Two-column layout: left sections, right preview (sticky)
+   - Integrates `useAutoSave` hook
 
 ### Phase 3: Integration
 
-8. **Update Event creation** (`events.repository.ts`)
+9. **Update Event creation** (`events.repository.ts`)
    - Add `welcome: DEFAULT_EVENT_WELCOME` to new events
 
-9. **Handle migration** (`normalizeEvent` helper)
-   - Fallback for existing events without welcome field
+10. **Handle migration** (`normalizeEvent` helper)
+    - Fallback for existing events without welcome field
 
 ---
 
@@ -77,9 +82,10 @@ This guide provides quick reference for implementing the Welcome Screen Customiz
 | `features/events/schemas/events.schemas.ts` | Zod validation schemas |
 | `features/events/repositories/events.repository.ts` | updateEventWelcome function |
 | `features/events/actions/events.actions.ts` | updateEventWelcomeAction server action |
-| `features/events/components/designer/WelcomeSection.tsx` | Main component (NEW) |
-| `features/events/components/designer/WelcomePreview.tsx` | Preview component (NEW) |
-| `features/events/components/EventGeneralTab.tsx` | Parent tab (MODIFY) |
+| `features/events/components/welcome/WelcomeSection.tsx` | Form fields (NEW) |
+| `features/events/components/welcome/WelcomePreview.tsx` | Preview component (NEW) |
+| `features/events/components/welcome/ExperienceCards.tsx` | Card list/grid (NEW) |
+| `features/events/components/EventGeneralTab.tsx` | Parent tab, owns form state (MODIFY) |
 | `hooks/useAutoSave.ts` | Existing autosave hook (REUSE) |
 
 ---
@@ -87,101 +93,134 @@ This guide provides quick reference for implementing the Welcome Screen Customiz
 ## Component Architecture
 
 ```
-EventGeneralTab
-├── WelcomeSection
-│   ├── WelcomeForm (title, description, media, layout)
-│   └── WelcomePreview
-│       ├── PreviewShell
-│       │   └── ThemedBackground
-│       │       ├── Hero Media
-│       │       ├── Title
-│       │       ├── Description
-│       │       └── ExperienceCards (list or grid)
-│       └── ViewportSwitcher
-├── ExperiencesSection (existing)
-└── ExtrasSection (existing)
+EventGeneralTab (owns form state, two-column layout)
+├── Left Column (sections)
+│   ├── WelcomeSection (receives form prop)
+│   │   ├── Title input (form.register)
+│   │   ├── Description textarea (form.register)
+│   │   ├── ImageUploadField (media)
+│   │   └── Layout toggle (list/grid)
+│   ├── ExperiencesSection (existing)
+│   └── ExtrasSection (existing)
+│
+└── Right Column (sticky preview)
+    └── WelcomePreview (receives welcome + event)
+        └── PreviewShell
+            └── ThemedBackground
+                ├── Hero Media
+                ├── Title (or event.name fallback)
+                ├── Description
+                └── ExperienceCards (list or grid)
 ```
 
 ---
 
 ## State Management & Autosave
 
-Uses React Hook Form with the existing `useAutoSave` hook (`web/src/hooks/useAutoSave.ts`):
+Form state is **lifted to EventGeneralTab** so both WelcomeSection (form) and WelcomePreview (display) can access it.
 
 ```typescript
+// EventGeneralTab.tsx - owns form state
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAutoSave } from "@/hooks/useAutoSave";
 import { eventWelcomeSchema, type EventWelcome } from "../schemas/events.schemas";
+import { WelcomeSection, WelcomePreview } from "./welcome";
 
-// Form setup with Zod validation
-const form = useForm<EventWelcome>({
-  resolver: zodResolver(eventWelcomeSchema),
-  defaultValues: event.welcome ?? DEFAULT_EVENT_WELCOME,
-});
+export function EventGeneralTab({ event, projectId }: Props) {
+  // Form setup with Zod validation
+  const form = useForm<EventWelcome>({
+    resolver: zodResolver(eventWelcomeSchema),
+    defaultValues: event.welcome ?? DEFAULT_EVENT_WELCOME,
+  });
 
-// Watch form values for real-time preview updates
-const welcomeValues = form.watch();
+  // Watch form values for real-time preview updates
+  const welcomeValues = form.watch();
 
-// Autosave on blur with 500ms debounce
-const { handleBlur } = useAutoSave({
-  form,
-  originalValues: event.welcome ?? DEFAULT_EVENT_WELCOME,
-  onUpdate: async (updates) => {
-    const result = await updateEventWelcomeAction(projectId, eventId, updates);
-    if (result.success) {
-      toast.success("Saved");
-    } else {
-      toast.error(result.error.message);
-    }
-  },
-  fieldsToCompare: ['title', 'description', 'mediaUrl', 'mediaType', 'layout'],
-  debounceMs: 500,
-});
+  // Autosave on blur with 500ms debounce
+  const { handleBlur } = useAutoSave({
+    form,
+    originalValues: event.welcome ?? DEFAULT_EVENT_WELCOME,
+    onUpdate: async (updates) => {
+      const result = await updateEventWelcomeAction(projectId, event.id, updates);
+      if (result.success) {
+        toast.success("Saved");
+      } else {
+        toast.error(result.error.message);
+      }
+    },
+    fieldsToCompare: ['title', 'description', 'mediaUrl', 'mediaType', 'layout'],
+    debounceMs: 500,
+  });
 
-// Attach handleBlur to form
-return (
-  <form onBlur={handleBlur}>
-    {/* Form fields using form.register() */}
-  </form>
-);
+  return (
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_1fr] items-start">
+      {/* Left: Form sections */}
+      <div className="space-y-8">
+        <WelcomeSection form={form} event={event} onBlur={handleBlur} />
+        <ExperiencesSection event={event} />
+        <ExtrasSection event={event} />
+      </div>
+
+      {/* Right: Preview (sticky) */}
+      <div className="lg:sticky lg:top-4">
+        <WelcomePreview welcome={welcomeValues} event={event} />
+      </div>
+    </div>
+  );
+}
 ```
 
 ---
 
 ## Preview Integration
 
+WelcomePreview receives both `welcome` (form values) and `event` (for experiences + theme):
+
 ```tsx
-<PreviewShell enableViewportSwitcher enableFullscreen>
-  <ThemeProvider theme={event.theme}>
-    <ThemedBackground
-      background={event.theme.background}
-      fontFamily={event.theme.fontFamily}
-      className="flex h-full flex-col"
-    >
-      {/* Hero Media */}
-      {welcome.mediaUrl && (
-        welcome.mediaType === "video" ? (
-          <video src={welcome.mediaUrl} autoPlay loop muted />
-        ) : (
-          <img src={welcome.mediaUrl} alt="Welcome" />
-        )
-      )}
+// WelcomePreview.tsx
+interface WelcomePreviewProps {
+  welcome: EventWelcome;
+  event: Event;
+}
 
-      {/* Title */}
-      <h1>{welcome.title || event.name}</h1>
+export function WelcomePreview({ welcome, event }: WelcomePreviewProps) {
+  // Filter to enabled experiences only
+  const enabledExperiences = event.experiences.filter(exp => exp.enabled);
 
-      {/* Description */}
-      {welcome.description && <p>{welcome.description}</p>}
+  return (
+    <PreviewShell enableViewportSwitcher enableFullscreen>
+      <ThemeProvider theme={event.theme}>
+        <ThemedBackground
+          background={event.theme.background}
+          fontFamily={event.theme.fontFamily}
+          className="flex h-full flex-col"
+        >
+          {/* Hero Media */}
+          {welcome.mediaUrl && (
+            welcome.mediaType === "video" ? (
+              <video src={welcome.mediaUrl} autoPlay loop muted />
+            ) : (
+              <img src={welcome.mediaUrl} alt="Welcome" />
+            )
+          )}
 
-      {/* Experience Cards */}
-      <ExperienceCards
-        experiences={enabledExperiences}
-        layout={welcome.layout}
-      />
-    </ThemedBackground>
-  </ThemeProvider>
-</PreviewShell>
+          {/* Title (fallback to event.name) */}
+          <h1>{welcome.title || event.name}</h1>
+
+          {/* Description */}
+          {welcome.description && <p>{welcome.description}</p>}
+
+          {/* Experience Cards */}
+          <ExperienceCards
+            experiences={enabledExperiences}
+            layout={welcome.layout}
+          />
+        </ThemedBackground>
+      </ThemeProvider>
+    </PreviewShell>
+  );
+}
 ```
 
 ---

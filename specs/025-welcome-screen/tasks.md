@@ -17,6 +17,7 @@
 
 - **Project type**: Next.js monorepo with `web/` workspace
 - **Feature path**: `web/src/features/events/`
+- **Welcome components**: `web/src/features/events/components/welcome/`
 - **Shared components**: `web/src/components/shared/`
 - **Hooks**: `web/src/hooks/`
 
@@ -60,14 +61,13 @@
 
 ### Implementation for User Story 1
 
-- [ ] T013 [US1] Create WelcomeSection component skeleton with React Hook Form setup in `web/src/features/events/components/designer/WelcomeSection.tsx`
-- [ ] T014 [US1] Add title input field with 100 character max and character counter in `web/src/features/events/components/designer/WelcomeSection.tsx`
-- [ ] T015 [US1] Add description textarea with 500 character max and character counter in `web/src/features/events/components/designer/WelcomeSection.tsx`
-- [ ] T016 [US1] Add fallback logic to display event.name when title is empty
-- [ ] T017 [US1] Create WelcomePreview component skeleton in `web/src/features/events/components/designer/WelcomePreview.tsx`
-- [ ] T018 [US1] Add title and description display in WelcomePreview with theme text styling in `web/src/features/events/components/designer/WelcomePreview.tsx`
-- [ ] T019 [US1] Wire form.watch() to WelcomePreview for real-time updates
-- [ ] T020 [US1] Re-export WelcomeSection from `web/src/features/events/components/index.ts`
+- [ ] T013 [US1] Create `components/welcome/` folder and barrel export in `web/src/features/events/components/welcome/index.ts`
+- [ ] T014 [US1] Create WelcomeSection component that receives form prop in `web/src/features/events/components/welcome/WelcomeSection.tsx`
+- [ ] T015 [US1] Add title input field with 100 character max and character counter in `web/src/features/events/components/welcome/WelcomeSection.tsx`
+- [ ] T016 [US1] Add description textarea with 500 character max and character counter in `web/src/features/events/components/welcome/WelcomeSection.tsx`
+- [ ] T017 [US1] Create WelcomePreview component that receives welcome + event props in `web/src/features/events/components/welcome/WelcomePreview.tsx`
+- [ ] T018 [US1] Add title display with event.name fallback and description in WelcomePreview in `web/src/features/events/components/welcome/WelcomePreview.tsx`
+- [ ] T019 [US1] Re-export welcome components from `web/src/features/events/components/welcome/index.ts`
 
 **Checkpoint**: Title and description customization works independently
 
@@ -81,11 +81,11 @@
 
 ### Implementation for User Story 2
 
-- [ ] T021 [US2] Add ImageUploadField for welcome media with destination="welcome" in `web/src/features/events/components/designer/WelcomeSection.tsx`
-- [ ] T022 [US2] Implement media upload handler that sets mediaUrl and auto-detects mediaType
-- [ ] T023 [US2] Add hero media display (image or video) in WelcomePreview in `web/src/features/events/components/designer/WelcomePreview.tsx`
-- [ ] T024 [US2] Handle media removal and fallback to themed background when no media set
-- [ ] T025 [US2] Add video autoplay/loop/muted attributes for video hero media
+- [ ] T020 [US2] Add ImageUploadField for welcome media with destination="welcome" in `web/src/features/events/components/welcome/WelcomeSection.tsx`
+- [ ] T021 [US2] Implement media upload handler that sets mediaUrl and auto-detects mediaType via form.setValue
+- [ ] T022 [US2] Add hero media display (image or video) in WelcomePreview in `web/src/features/events/components/welcome/WelcomePreview.tsx`
+- [ ] T023 [US2] Handle media removal and fallback to themed background when no media set
+- [ ] T024 [US2] Add video autoplay/loop/muted attributes for video hero media
 
 **Checkpoint**: Media upload and display works independently
 
@@ -99,12 +99,13 @@
 
 ### Implementation for User Story 3
 
-- [ ] T026 [US3] Add layout toggle (segmented control or radio group) for list/grid selection in `web/src/features/events/components/designer/WelcomeSection.tsx`
-- [ ] T027 [US3] Create ExperienceCard component for welcome preview in `web/src/features/events/components/designer/WelcomePreview.tsx`
-- [ ] T028 [US3] Create ExperienceCardList component (vertical stack) in `web/src/features/events/components/designer/WelcomePreview.tsx`
-- [ ] T029 [US3] Create ExperienceCardGrid component (two-column grid) in `web/src/features/events/components/designer/WelcomePreview.tsx`
-- [ ] T030 [US3] Filter experiences to show only enabled ones (EventExperienceLink.enabled === true)
-- [ ] T031 [US3] Add empty state message when no experiences are linked or all disabled
+- [ ] T025 [US3] Add layout toggle (segmented control or radio group) for list/grid selection in `web/src/features/events/components/welcome/WelcomeSection.tsx`
+- [ ] T026 [US3] Create ExperienceCards component in `web/src/features/events/components/welcome/ExperienceCards.tsx`
+- [ ] T027 [US3] Implement list layout (vertical stack) in ExperienceCards
+- [ ] T028 [US3] Implement grid layout (two-column grid) in ExperienceCards
+- [ ] T029 [US3] Filter experiences to show only enabled ones (EventExperienceLink.enabled === true)
+- [ ] T030 [US3] Add empty state message when no experiences are linked or all disabled
+- [ ] T031 [US3] Re-export ExperienceCards from `web/src/features/events/components/welcome/index.ts`
 
 **Checkpoint**: Layout selection works independently
 
@@ -118,11 +119,11 @@
 
 ### Implementation for User Story 4
 
-- [ ] T032 [US4] Wrap WelcomePreview with PreviewShell component (enableViewportSwitcher, enableFullscreen) in `web/src/features/events/components/designer/WelcomeSection.tsx`
-- [ ] T033 [US4] Wrap preview content with ThemeProvider and ThemedBackground using event.theme
-- [ ] T034 [US4] Apply theme text colors to title and description in preview
-- [ ] T035 [US4] Apply theme button styles to experience cards in preview
-- [ ] T036 [US4] Ensure preview updates in real-time when any welcome setting changes via form.watch()
+- [ ] T032 [US4] Wrap WelcomePreview content with PreviewShell component (enableViewportSwitcher, enableFullscreen) in `web/src/features/events/components/welcome/WelcomePreview.tsx`
+- [ ] T033 [US4] Wrap preview content with ThemeProvider and ThemedBackground using event.theme in `web/src/features/events/components/welcome/WelcomePreview.tsx`
+- [ ] T034 [US4] Apply theme text colors to title and description in preview in `web/src/features/events/components/welcome/WelcomePreview.tsx`
+- [ ] T035 [US4] Apply theme button styles to experience cards in preview in `web/src/features/events/components/welcome/ExperienceCards.tsx`
+- [ ] T036 [US4] Preview updates automatically via welcomeValues prop from EventGeneralTab's form.watch()
 
 **Checkpoint**: Themed preview works independently
 
@@ -136,11 +137,11 @@
 
 ### Implementation for User Story 5
 
-- [ ] T037 [US5] Integrate useAutoSave hook with React Hook Form in WelcomeSection in `web/src/features/events/components/designer/WelcomeSection.tsx`
-- [ ] T038 [US5] Configure useAutoSave with 500ms debounce, fieldsToCompare for all welcome fields
-- [ ] T039 [US5] Add toast notifications for save success (sonner)
-- [ ] T040 [US5] Add toast notifications for save errors with retry context
-- [ ] T041 [US5] Attach handleBlur from useAutoSave to form element
+- [ ] T037 [US5] Integrate useAutoSave hook with React Hook Form in EventGeneralTab in `web/src/features/events/components/EventGeneralTab.tsx`
+- [ ] T038 [US5] Configure useAutoSave with 500ms debounce, fieldsToCompare for all welcome fields in `web/src/features/events/components/EventGeneralTab.tsx`
+- [ ] T039 [US5] Add toast notifications for save success (sonner) in `web/src/features/events/components/EventGeneralTab.tsx`
+- [ ] T040 [US5] Add toast notifications for save errors with retry context in `web/src/features/events/components/EventGeneralTab.tsx`
+- [ ] T041 [US5] Pass handleBlur from useAutoSave to WelcomeSection via onBlur prop
 
 **Checkpoint**: Autosave works independently
 
@@ -148,14 +149,14 @@
 
 ## Phase 8: Integration & Polish
 
-**Purpose**: Integrate WelcomeSection into EventGeneralTab and final polish
+**Purpose**: Set up EventGeneralTab with two-column layout, form state lifting, and final polish
 
-- [ ] T042 Import and add WelcomeSection as first section in EventGeneralTab in `web/src/features/events/components/EventGeneralTab.tsx`
-- [ ] T043 Pass event and projectId props to WelcomeSection
-- [ ] T044 Verify section order: Welcome → Experiences → Extras
-- [ ] T045 Add mobile-responsive layout for WelcomeSection (form/preview stacking on mobile)
-- [ ] T046 Ensure touch targets meet 44x44px minimum for all interactive elements
-- [ ] T047 Add proper spacing and typography per mobile-first requirements
+- [ ] T042 Set up useForm with eventWelcomeSchema and DEFAULT_EVENT_WELCOME in EventGeneralTab in `web/src/features/events/components/EventGeneralTab.tsx`
+- [ ] T043 Add two-column grid layout (left: sections, right: sticky preview) in EventGeneralTab in `web/src/features/events/components/EventGeneralTab.tsx`
+- [ ] T044 Import WelcomeSection and pass form, event, onBlur props in `web/src/features/events/components/EventGeneralTab.tsx`
+- [ ] T045 Import WelcomePreview and pass welcomeValues (form.watch()) and event props in `web/src/features/events/components/EventGeneralTab.tsx`
+- [ ] T046 Verify section order in left column: Welcome → Experiences → Extras
+- [ ] T047 Add mobile-responsive layout (single column on mobile, two-column on lg:) with proper spacing
 
 ### Validation Loop (REQUIRED - Constitution Principle V)
 
@@ -175,18 +176,20 @@
 
 - **Setup (Phase 1)**: No dependencies - can start immediately
 - **Foundational (Phase 2)**: Depends on Setup completion - BLOCKS all user stories
-- **User Stories (Phase 3-7)**: All depend on Foundational phase completion
-  - US1 and US2 (both P1) can proceed in parallel
-  - US3, US4, US5 (all P2) can proceed in parallel after foundational
-- **Integration & Polish (Phase 8)**: Depends on all user stories being complete
+- **User Stories (Phase 3-6)**: All depend on Foundational phase completion
+  - US1 and US2 (both P1) can proceed in parallel - create WelcomeSection and WelcomePreview
+  - US3 and US4 (both P2) can proceed in parallel - layout toggle and theme integration
+- **Integration (Phase 7-8)**: Depends on US1-US4 completion
+  - Phase 7 (US5) and Phase 8 should be done together - both modify EventGeneralTab
+  - Sets up form state, two-column layout, useAutoSave integration
 
 ### User Story Dependencies
 
 - **User Story 1 (P1)**: Can start after Foundational (Phase 2) - No dependencies on other stories
 - **User Story 2 (P1)**: Can start after Foundational (Phase 2) - No dependencies on other stories
 - **User Story 3 (P2)**: Can start after Foundational (Phase 2) - Uses components from US1/US2 but independently testable
-- **User Story 4 (P2)**: Can start after Foundational (Phase 2) - Requires WelcomePreview from US1
-- **User Story 5 (P2)**: Can start after Foundational (Phase 2) - Requires WelcomeSection form from US1
+- **User Story 4 (P2)**: Requires WelcomePreview from US1 - Theme integration happens in WelcomePreview.tsx
+- **User Story 5 (P2)**: Requires Phase 8 setup - useAutoSave is integrated at EventGeneralTab level
 
 ### Within Each User Story
 
@@ -265,5 +268,7 @@ This is a functional MVP that can be shipped and iterated on.
 - Each user story should be independently completable and testable
 - Commit after each task or logical group
 - Stop at any checkpoint to validate story independently
-- Uses existing useAutoSave hook - no custom autosave implementation needed
+- Uses existing useAutoSave hook at EventGeneralTab level - no custom autosave implementation needed
 - Uses existing preview-shell and theming modules - no new infrastructure needed
+- Form state lifted to EventGeneralTab - WelcomeSection receives form prop, WelcomePreview receives welcomeValues + event
+- Two-column layout at EventGeneralTab level (left: sections, right: sticky preview)

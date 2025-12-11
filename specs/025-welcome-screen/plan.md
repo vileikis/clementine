@@ -62,9 +62,15 @@ web/src/features/events/
 │   └── events.actions.ts               # ADD: updateEventWelcomeAction
 ├── components/
 │   ├── index.ts                        # Re-exports all components
-│   ├── EventGeneralTab.tsx             # MODIFY: Add WelcomeSection
-│   └── designer/
-│       └── WelcomeSection.tsx          # NEW: Welcome content form + preview
+│   ├── EventGeneralTab.tsx             # MODIFY: Two-column layout, owns form state
+│   ├── welcome/                        # NEW: Welcome-related components
+│   │   ├── index.ts                    # Re-exports welcome components
+│   │   ├── WelcomeSection.tsx          # NEW: Form fields (receives form prop)
+│   │   ├── WelcomePreview.tsx          # NEW: Preview (receives welcome + event)
+│   │   └── ExperienceCards.tsx         # NEW: Card list/grid for preview
+│   └── general/                        # Existing sections
+│       ├── ExperiencesSection.tsx
+│       └── ExtrasSection.tsx
 ├── hooks/
 │   └── index.ts                        # Existing hooks (useEvent, etc.)
 ├── repositories/
@@ -81,9 +87,11 @@ web/src/features/preview-shell/        # REUSE: PreviewShell, DeviceFrame
 web/src/features/theming/               # REUSE: ThemeProvider, ThemedBackground
 web/src/components/shared/
 └── ImageUploadField.tsx               # REUSE: Media upload component
+web/src/hooks/
+└── useAutoSave.ts                     # REUSE: Autosave hook
 ```
 
-**Structure Decision**: Extend existing `features/events/` vertical slice following Feature Module Architecture (Constitution Principle VII). All new code is co-located with events feature. Reuse preview-shell and theming modules via imports.
+**Structure Decision**: Extend existing `features/events/` vertical slice following Feature Module Architecture (Constitution Principle VII). Welcome components grouped in `components/welcome/` subfolder. EventGeneralTab owns form state and renders two-column layout (left: sections, right: preview). Reuse preview-shell, theming modules, and useAutoSave hook via imports.
 
 ## Complexity Tracking
 
