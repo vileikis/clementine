@@ -122,23 +122,24 @@ export async function uploadImage(
 
 ## 4. State Management Pattern
 
-### Decision: Use React Hook Form with `useAutoSave` hook
+### Decision: Lift form state to EventGeneralTab, use React Hook Form with `useAutoSave` hook
 
-**Rationale**: The existing `useAutoSave` hook requires React Hook Form integration. Using RHF provides built-in validation, form state tracking, and seamless integration with the autosave pattern already established in the codebase.
+**Rationale**: The WelcomePreview needs both welcome form values AND event.experiences to render the full preview. By lifting form state to EventGeneralTab, both WelcomeSection (form) and WelcomePreview (display) can access the data they need. The existing `useAutoSave` hook requires React Hook Form integration.
 
 **Alternatives Considered**:
+- Form state in WelcomeSection only — Rejected: WelcomePreview (sibling component) wouldn't have access to form values
 - useReducer + custom autosave — Rejected: useAutoSave hook requires React Hook Form
-- Zustand store — Rejected: component-local state sufficient, no cross-component sharing needed
-- useState per field — Rejected: doesn't integrate with useAutoSave
+- Zustand store — Rejected: lifted state sufficient, no global store needed
+- React Context for welcome state — Rejected: prop drilling is simpler for this case
 
 **Key Pattern**:
 
 ```typescript
+// EventGeneralTab.tsx - owns form state
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAutoSave } from "@/hooks/useAutoSave";
 
-// Form setup with Zod validation
 const form = useForm<EventWelcome>({
   resolver: zodResolver(eventWelcomeSchema),
   defaultValues: event.welcome ?? DEFAULT_EVENT_WELCOME,
@@ -155,13 +156,23 @@ const { handleBlur } = useAutoSave({
   fieldsToCompare: ['title', 'description', 'mediaUrl', 'mediaType', 'layout'],
   debounceMs: 500,
 });
+
+// Two-column layout
+<div className="grid lg:grid-cols-[1fr_1fr]">
+  <div className="space-y-8">
+    <WelcomeSection form={form} event={event} onBlur={handleBlur} />
+    <ExperiencesSection event={event} />
+    <ExtrasSection event={event} />
+  </div>
+  <WelcomePreview welcome={welcomeValues} event={event} />
+</div>
 ```
 
 **Benefits**:
-- Built-in validation with Zod resolver
-- `watch()` for real-time preview updates
-- `handleBlur` integrates with useAutoSave
-- Change detection handled by form-diff utility
+- Form state and preview in sync via `watch()`
+- WelcomePreview has access to both welcome values AND event.experiences
+- Clean separation: WelcomeSection handles form UI, WelcomePreview handles display
+- `handleBlur` can be passed down to form components
 
 ---
 
@@ -358,29 +369,81 @@ interface ExperienceLayoutProps {
 
 ## 9. General Tab Layout
 
-### Decision: Add WelcomeSection as first section in EventGeneralTab
+### Decision: Two-column layout with preview at EventGeneralTab level
 
-**Rationale**: Welcome content is the first thing guests see, so it should be prominent in the admin interface.
+**Rationale**: The WelcomePreview needs to display both welcome content AND experience cards from the event. By placing the preview at the tab level (not inside WelcomeSection), it can access all the data it needs. This also allows the preview to remain visible while scrolling through all sections.
 
-**Section Order**:
-1. **Welcome Section** (NEW) — Title, description, media, layout
-2. **Experiences Section** (existing) — Linked experiences
-3. **Extras Section** (existing) — Pre-entry gate, pre-reward
+**Layout Structure**:
+
+```
+┌─────────────────────────────────────────────────┐
+│ EventGeneralTab (two-column on lg:)             │
+├────────────────────────┬────────────────────────┤
+│ Left Panel (sections)  │ Right Panel (preview)  │
+│ ┌────────────────────┐ │ ┌────────────────────┐ │
+│ │ WelcomeSection     │ │ │ WelcomePreview     │ │
+│ │ (form fields)      │ │ │ (sticky)           │ │
+│ └────────────────────┘ │ │ - Hero media       │ │
+│ ┌────────────────────┐ │ │ - Title            │ │
+│ │ ExperiencesSection │ │ │ - Description      │ │
+│ └────────────────────┘ │ │ - Experience cards │ │
+│ ┌────────────────────┐ │ │                    │ │
+│ │ ExtrasSection      │ │ └────────────────────┘ │
+│ └────────────────────┘ │                        │
+└────────────────────────┴────────────────────────┘
+```
+
+**Section Order** (left panel):
+1. **WelcomeSection** (NEW) — Title, description, media, layout fields
+2. **ExperiencesSection** (existing) — Linked experiences
+3. **ExtrasSection** (existing) — Pre-entry gate, pre-reward
 
 **Layout Pattern**:
 
 ```typescript
 // EventGeneralTab.tsx
 export function EventGeneralTab({ event, projectId }: Props) {
+  // Form state lifted to tab level
+  const form = useForm<EventWelcome>({
+    resolver: zodResolver(eventWelcomeSchema),
+    defaultValues: event.welcome ?? DEFAULT_EVENT_WELCOME,
+  });
+  const welcomeValues = form.watch();
+
+  const { handleBlur } = useAutoSave({
+    form,
+    originalValues: event.welcome ?? DEFAULT_EVENT_WELCOME,
+    onUpdate: async (updates) => {
+      await updateEventWelcomeAction(projectId, event.id, updates);
+    },
+    fieldsToCompare: ['title', 'description', 'mediaUrl', 'mediaType', 'layout'],
+    debounceMs: 500,
+  });
+
   return (
-    <div className="space-y-8">
-      <WelcomeSection event={event} projectId={projectId} />
-      <ExperiencesSection event={event} projectId={projectId} />
-      <ExtrasSection event={event} projectId={projectId} />
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_1fr] items-start">
+      {/* Left: Form sections */}
+      <div className="space-y-8">
+        <WelcomeSection form={form} event={event} onBlur={handleBlur} />
+        <ExperiencesSection event={event} />
+        <ExtrasSection event={event} />
+      </div>
+
+      {/* Right: Preview (sticky) */}
+      <div className="lg:sticky lg:top-4">
+        <WelcomePreview welcome={welcomeValues} event={event} />
+      </div>
     </div>
   );
 }
 ```
+
+**Component Locations**:
+- `components/welcome/WelcomeSection.tsx` — Form fields only (receives form prop)
+- `components/welcome/WelcomePreview.tsx` — Preview rendering (receives welcome + event)
+- `components/welcome/ExperienceCards.tsx` — Card list/grid helper for preview
+- `components/general/ExperiencesSection.tsx` — Existing
+- `components/general/ExtrasSection.tsx` — Existing
 
 ---
 
@@ -411,10 +474,11 @@ All technical decisions align with existing codebase patterns:
 | Preview | preview-shell module | EventThemeEditor |
 | Theming | theming module | EventThemeEditor |
 | Upload | ImageUploadField (extended) | Theme background upload |
-| State | React Hook Form | Required by useAutoSave hook |
+| State | React Hook Form + lifted state | EventGeneralTab owns form state |
 | Autosave | useAutoSave hook (500ms) | `web/src/hooks/useAutoSave.ts` |
 | Data Model | Nested EventWelcome | Event.theme pattern |
 | Updates | Dot notation | updateEventTheme |
-| Layout | Two-column form+preview | EventThemeEditor |
+| Tab Layout | Two-column (sections + preview) | EventThemeEditor |
+| Components | `components/welcome/` subfolder | Domain-specific grouping |
 
-No new architectural patterns or dependencies required. Reuses existing `useAutoSave` hook for autosave functionality.
+No new architectural patterns or dependencies required. Reuses existing `useAutoSave` hook for autosave functionality. Form state lifted to EventGeneralTab to enable preview access to both welcome values and event.experiences.
