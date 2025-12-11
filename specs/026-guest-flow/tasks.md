@@ -25,12 +25,12 @@
 
 **Purpose**: Create guest module structure and foundational types/schemas
 
-- [ ] T001 Create guest module directory structure in web/src/features/guest/
-- [ ] T002 [P] Create guest types in web/src/features/guest/types/guest.types.ts (Guest, Session, SessionState, GuestAuthState interfaces)
-- [ ] T003 [P] Create Zod schemas in web/src/features/guest/schemas/guest.schemas.ts (guestSchema, sessionSchema, createGuestSchema, createSessionSchema)
-- [ ] T004 [P] Create types barrel export in web/src/features/guest/types/index.ts
-- [ ] T005 [P] Create schemas barrel export in web/src/features/guest/schemas/index.ts
-- [ ] T006 Create main feature barrel export in web/src/features/guest/index.ts
+- [x] T001 Create guest module directory structure in web/src/features/guest/
+- [x] T002 [P] Create guest types in web/src/features/guest/types/guest.types.ts (Guest, Session, SessionState, GuestAuthState interfaces)
+- [x] T003 [P] Create Zod schemas in web/src/features/guest/schemas/guest.schemas.ts (guestSchema, sessionSchema, createGuestSchema, createSessionSchema)
+- [x] T004 [P] Create types barrel export in web/src/features/guest/types/index.ts
+- [x] T005 [P] Create schemas barrel export in web/src/features/guest/schemas/index.ts
+- [x] T006 Create main feature barrel export in web/src/features/guest/index.ts
 
 ---
 
@@ -40,14 +40,14 @@
 
 **CRITICAL**: Repository and Server Actions are required for all user story work
 
-- [ ] T007 Create guests repository in web/src/features/guest/repositories/guests.repository.ts (getGuest, createGuest, updateGuestLastSeen)
-- [ ] T008 Create sessions repository functions in web/src/features/guest/repositories/guests.repository.ts (getSession, createSession, getSessionsByGuest)
-- [ ] T009 Create repositories barrel export in web/src/features/guest/repositories/index.ts
-- [ ] T010 Create createGuestAction Server Action in web/src/features/guest/actions/guests.actions.ts
-- [ ] T011 Add createSessionAction Server Action in web/src/features/guest/actions/guests.actions.ts
-- [ ] T012 Add getSessionAction Server Action in web/src/features/guest/actions/guests.actions.ts
-- [ ] T013 Add validateSessionOwnershipAction Server Action in web/src/features/guest/actions/guests.actions.ts
-- [ ] T014 Create actions barrel export in web/src/features/guest/actions/index.ts
+- [x] T007 Create guests repository in web/src/features/guest/repositories/guests.repository.ts (getGuest, createGuest, updateGuestLastSeen)
+- [x] T008 Create sessions repository functions in web/src/features/guest/repositories/guests.repository.ts (getSession, createSession, getSessionsByGuest)
+- [x] T009 Create repositories barrel export in web/src/features/guest/repositories/index.ts
+- [x] T010 Create createGuestAction Server Action in web/src/features/guest/actions/guests.actions.ts
+- [x] T011 Add createSessionAction Server Action in web/src/features/guest/actions/guests.actions.ts
+- [x] T012 Add getSessionAction Server Action in web/src/features/guest/actions/guests.actions.ts
+- [x] T013 Add validateSessionOwnershipAction Server Action in web/src/features/guest/actions/guests.actions.ts
+- [x] T014 Create actions barrel export in web/src/features/guest/actions/index.ts
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
@@ -61,10 +61,10 @@
 
 ### Implementation for User Story 1
 
-- [ ] T015 [US1] Create LoadingScreen component in web/src/features/guest/components/LoadingScreen.tsx (full-screen loading indicator with optional theme support)
-- [ ] T016 [P] [US1] Create EmptyStates component in web/src/features/guest/components/EmptyStates.tsx (NoActiveEvent, EmptyEvent components)
-- [ ] T017 [US1] Create components barrel export in web/src/features/guest/components/index.ts
-- [ ] T018 [US1] Update join page in web/src/app/(public)/join/[projectId]/page.tsx to fetch active event, render LoadingScreen during data fetch, and render appropriate empty state components
+- [x] T015 [US1] Create LoadingScreen component in web/src/features/guest/components/LoadingScreen.tsx (full-screen loading indicator with optional theme support)
+- [x] T016 [P] [US1] Create EmptyStates component in web/src/features/guest/components/EmptyStates.tsx (NoActiveEvent, EmptyEvent components)
+- [x] T017 [US1] Create components barrel export in web/src/features/guest/components/index.ts
+- [x] T018 [US1] Update join page in web/src/app/(public)/join/[projectId]/page.tsx to fetch active event, render LoadingScreen during data fetch, and render appropriate empty state components
 
 **Checkpoint**: User Story 1 complete - guests can access share links and see appropriate content or empty states
 
@@ -80,13 +80,13 @@
 
 ### Implementation for User Story 2
 
-- [ ] T019 [US2] Migrate WelcomeContent component from events module to web/src/features/guest/components/welcome/WelcomeContent.tsx (add optional onExperienceClick prop)
-- [ ] T020 [P] [US2] Migrate ExperienceCards component to web/src/features/guest/components/welcome/ExperienceCards.tsx (add onExperienceClick prop passthrough)
-- [ ] T021 [P] [US2] Migrate ExperienceCard component to web/src/features/guest/components/welcome/ExperienceCard.tsx (add onClick prop for interactive behavior)
-- [ ] T022 [US2] Create welcome components barrel export in web/src/features/guest/components/welcome/index.ts
-- [ ] T023 [US2] Update WelcomePreview in web/src/features/events/components/welcome/WelcomePreview.tsx to be thin wrapper importing from guest module
-- [ ] T024 [US2] Update components barrel export in web/src/features/guest/components/index.ts to include welcome components
-- [ ] T025 [US2] Update join page in web/src/app/(public)/join/[projectId]/page.tsx to render WelcomeContent with ThemeProvider when event exists and has experiences
+- [x] T019 [US2] Migrate WelcomeContent component from events module to web/src/features/guest/components/welcome/WelcomeContent.tsx (add optional onExperienceClick prop)
+- [x] T020 [P] [US2] Migrate ExperienceCards component to web/src/features/guest/components/welcome/ExperienceCards.tsx (add onExperienceClick prop passthrough)
+- [x] T021 [P] [US2] Migrate ExperienceCard component to web/src/features/guest/components/welcome/ExperienceCard.tsx (add onClick prop for interactive behavior)
+- [x] T022 [US2] Create welcome components barrel export in web/src/features/guest/components/welcome/index.ts
+- [x] T023 [US2] Update WelcomePreview in web/src/features/events/components/welcome/WelcomePreview.tsx to be thin wrapper importing from guest module
+- [x] T024 [US2] Update components barrel export in web/src/features/guest/components/index.ts to include welcome components
+- [x] T025 [US2] Update join page in web/src/app/(public)/join/[projectId]/page.tsx to render WelcomeContent with ThemeProvider when event exists and has experiences
 
 **Checkpoint**: User Story 2 complete - welcome screen displays all branded content with theme
 
@@ -102,11 +102,11 @@
 
 ### Implementation for User Story 3
 
-- [ ] T026 [US3] Create ExperienceScreen placeholder component in web/src/features/guest/components/ExperienceScreen.tsx (shows experience name, guest ID, session ID, home button)
-- [ ] T027 [US3] Update components barrel export in web/src/features/guest/components/index.ts to include ExperienceScreen
-- [ ] T028 [US3] Update join page in web/src/app/(public)/join/[projectId]/page.tsx to read exp and s query params, conditionally render WelcomeContent or ExperienceScreen based on exp param
-- [ ] T029 [US3] Implement experience selection handler in join page: create session via createSessionAction, update URL with exp and s params using router.push
-- [ ] T030 [US3] Implement home navigation in ExperienceScreen: clear query params and return to welcome screen using router.push
+- [x] T026 [US3] Create ExperienceScreen placeholder component in web/src/features/guest/components/ExperienceScreen.tsx (shows experience name, guest ID, session ID, home button)
+- [x] T027 [US3] Update components barrel export in web/src/features/guest/components/index.ts to include ExperienceScreen
+- [x] T028 [US3] Update join page in web/src/app/(public)/join/[projectId]/page.tsx to read exp and s query params, conditionally render WelcomeContent or ExperienceScreen based on exp param
+- [x] T029 [US3] Implement experience selection handler in join page: create session via createSessionAction, update URL with exp and s params using router.push
+- [x] T030 [US3] Implement home navigation in ExperienceScreen: clear query params and return to welcome screen using router.push
 
 **Checkpoint**: User Story 3 complete - guests can start experiences and navigate between welcome/experience screens
 
@@ -122,12 +122,12 @@
 
 ### Implementation for User Story 4
 
-- [ ] T031 [US4] Create useGuestAuth hook in web/src/features/guest/hooks/useGuestAuth.ts (anonymous auth with Firebase Client SDK, returns user/loading/error state)
-- [ ] T032 [P] [US4] Create hooks barrel export in web/src/features/guest/hooks/index.ts
-- [ ] T033 [US4] Create GuestContext and GuestProvider in web/src/features/guest/contexts/GuestContext.tsx (wraps useGuestAuth, manages guest record creation via createGuestAction)
-- [ ] T034 [P] [US4] Create contexts barrel export in web/src/features/guest/contexts/index.ts
-- [ ] T035 [US4] Update main feature barrel export in web/src/features/guest/index.ts to include hooks and contexts
-- [ ] T036 [US4] Update join page in web/src/app/(public)/join/[projectId]/page.tsx to wrap content with GuestProvider, show LoadingScreen during auth
+- [x] T031 [US4] Create useGuestAuth hook in web/src/features/guest/hooks/useGuestAuth.ts (anonymous auth with Firebase Client SDK, returns user/loading/error state)
+- [x] T032 [P] [US4] Create hooks barrel export in web/src/features/guest/hooks/index.ts
+- [x] T033 [US4] Create GuestContext and GuestProvider in web/src/features/guest/contexts/GuestContext.tsx (wraps useGuestAuth, manages guest record creation via createGuestAction)
+- [x] T034 [P] [US4] Create contexts barrel export in web/src/features/guest/contexts/index.ts
+- [x] T035 [US4] Update main feature barrel export in web/src/features/guest/index.ts to include hooks and contexts
+- [x] T036 [US4] Update join page in web/src/app/(public)/join/[projectId]/page.tsx to wrap content with GuestProvider, show LoadingScreen during auth
 
 **Checkpoint**: User Story 4 complete - guests are automatically authenticated and tracked
 
@@ -143,9 +143,9 @@
 
 ### Implementation for User Story 5
 
-- [ ] T037 [US5] Create useSession hook in web/src/features/guest/hooks/useSession.ts (validates session ownership, handles resume vs create new session logic)
-- [ ] T038 [US5] Update hooks barrel export in web/src/features/guest/hooks/index.ts to include useSession
-- [ ] T039 [US5] Update join page in web/src/app/(public)/join/[projectId]/page.tsx to integrate useSession hook, validate session on mount when s param present, update URL if new session created
+- [x] T037 [US5] Create useSession hook in web/src/features/guest/hooks/useSession.ts (validates session ownership, handles resume vs create new session logic)
+- [x] T038 [US5] Update hooks barrel export in web/src/features/guest/hooks/index.ts to include useSession
+- [x] T039 [US5] Update join page in web/src/app/(public)/join/[projectId]/page.tsx to integrate useSession hook, validate session on mount when s param present, update URL if new session created
 
 **Checkpoint**: User Story 5 complete - session persistence works correctly on refresh
 
@@ -155,17 +155,17 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T040 Update feature barrel export in web/src/features/guest/index.ts to ensure all public exports are documented
-- [ ] T041 Verify all components apply theme consistently across loading, empty states, welcome, and experience screens
-- [ ] T042 Verify touch targets meet 44x44px minimum on all interactive elements
-- [ ] T043 Test mobile viewport rendering at 320px width
+- [x] T040 Update feature barrel export in web/src/features/guest/index.ts to ensure all public exports are documented
+- [x] T041 Verify all components apply theme consistently across loading, empty states, welcome, and experience screens
+- [x] T042 Verify touch targets meet 44x44px minimum on all interactive elements
+- [x] T043 Test mobile viewport rendering at 320px width
 
 ### Validation Loop (REQUIRED - Constitution Principle V)
 
 **Purpose**: Ensure code quality and correctness before merge
 
-- [ ] T044 Run `pnpm lint` and fix all errors/warnings
-- [ ] T045 Run `pnpm type-check` and resolve all TypeScript errors
+- [x] T044 Run `pnpm lint` and fix all errors/warnings
+- [x] T045 Run `pnpm type-check` and resolve all TypeScript errors
 - [ ] T046 Verify feature in local dev server (`pnpm dev`) - test all user stories manually
 - [ ] T047 Commit only after validation loop passes cleanly
 
