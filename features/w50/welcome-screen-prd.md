@@ -53,10 +53,10 @@ Extend the Event General tab to support welcome screen customization, giving eve
 
 **Acceptance Criteria:**
 - Preview panel displays on the same screen as the configuration controls
-- Preview renders in a mobile device frame (consistent with theme editor)
-- Preview applies the event's theme settings (colors, fonts, buttons, background)
+- Preview renders using the `preview-shell` module (device frame, viewport switching)
+- Preview applies the event's theme via the `theming` module
 - Preview updates in real-time as welcome content or layout changes
-- Preview shows the experience cards in the selected layout format
+- Preview shows experience cards in the selected layout format
 
 ### US-4: Autosave Changes
 
@@ -101,27 +101,32 @@ The General tab must support configuring the experience display layout:
 
 **Notes:**
 - Layout selection is a simple toggle or segmented control
-- Only enabled experiences (from the experiences array) are shown
+- Only enabled experiences (from the experiences array) are shown in preview
 - Experience cards display the experience name (or custom label if set)
 
 ### FR-3: Preview Panel
 
-The preview panel must:
+The preview panel must leverage existing modules:
 
-- Display adjacent to the configuration controls (split-screen layout)
-- Render at mobile device aspect ratio (9:19.5) in a device frame
-- Apply the event's theme settings:
-  - Background color/image with overlay
-  - Logo (if configured)
-  - Text colors and alignment
-  - Button styles for experience cards
-  - Font family
-- Show welcome content:
-  - Hero media (if configured)
-  - Welcome title
-  - Welcome description
-- Show experience cards in the selected layout
-- Update instantly when any setting changes
+**Using `preview-shell` module:**
+- `PreviewShell` component with device frame
+- Optional viewport switching (mobile/tablet)
+- Optional fullscreen mode
+
+**Using `theming` module:**
+- `ThemeProvider` wrapping preview content
+- `ThemedBackground` for background rendering
+- `useEventTheme` hook for accessing theme values
+
+**Preview content must show:**
+- Hero media (if configured)
+- Welcome title
+- Welcome description
+- Experience cards in the selected layout
+
+**Behavior:**
+- Updates instantly when any setting changes
+- Reflects current theme settings from event
 
 ### FR-4: Autosave Behavior
 
@@ -153,38 +158,26 @@ The General tab layout must be reorganized to:
    - Pre-reward slot
 
 4. **Preview Panel** (new)
-   - Mobile device frame with live welcome screen preview
+   - Uses `PreviewShell` with live welcome screen preview
 
 ---
 
-## 4. Guest-Facing Behavior
+## 4. Edge Cases (Admin Preview)
 
-When a guest visits the event welcome screen:
-
-1. Display welcome media (if configured) as hero element
-2. Display welcome title (falls back to event name)
-3. Display welcome description (if configured)
-4. Display enabled experiences in the configured layout (list or grid)
-5. Apply event theme throughout
-6. Guest taps an experience card to begin that flow
-
----
-
-## 5. Edge Cases
-
-| Scenario | Behavior |
-|----------|----------|
-| No title set | Display event name as title |
+| Scenario | Preview Behavior |
+|----------|------------------|
+| No title set | Show event name as title |
 | No description set | Hide description area |
-| No media set | Display plain background (theme background applies) |
-| No experiences linked | Show empty state with message "No experiences available" |
-| Single experience | Show single card regardless of layout setting |
+| No media set | Show plain background (theme background applies) |
+| No experiences linked | Show empty state with message |
+| Single experience | Show single card regardless of layout |
 | All experiences disabled | Show empty state |
 
 ---
 
-## 6. Out of Scope
+## 5. Out of Scope
 
+- Guest-facing welcome screen implementation (separate feature)
 - Custom CSS or advanced styling beyond theme settings
 - Animation or transition customization
 - Multiple welcome screen variants (A/B testing)
@@ -196,24 +189,22 @@ When a guest visits the event welcome screen:
 
 ---
 
-## 7. Success Criteria
+## 6. Success Criteria
 
 - [ ] Welcome title field available and persists correctly
 - [ ] Welcome description field available and persists correctly
 - [ ] Welcome media upload works for images and videos
 - [ ] Layout toggle switches between list and grid views
-- [ ] Preview panel renders with event theme applied
+- [ ] Preview panel renders using `PreviewShell` component
+- [ ] Preview applies theme using `theming` module
 - [ ] Preview updates in real-time on content/layout changes
 - [ ] Autosave triggers after editing stops (debounced)
 - [ ] Saving indicator visible during persistence
 - [ ] Success/error feedback shown after save attempt
-- [ ] Guest-facing welcome screen renders with configured content
-- [ ] Guest-facing welcome screen uses configured layout
-- [ ] Fallback to event name when title is empty
 
 ---
 
-## 8. Data Schema
+## 7. Data Schema
 
 ### New Types
 
@@ -249,7 +240,7 @@ export interface Event {
 
   experiences: EventExperienceLink[];
   extras: EventExtras;
-  theme: EventTheme;
+  theme: Theme;  // From theming module
 
   welcome: EventWelcome;  // NEW
 
@@ -283,23 +274,17 @@ const DEFAULT_WELCOME: EventWelcome = {
 
 ---
 
-## 9. Prerequisites
+## 8. Dependencies
 
-- **Preview Shell** — This feature should be implemented after [Preview Shell](./preview-shell-prd.md) is complete, to leverage the shared preview infrastructure for displaying the welcome screen preview.
-
----
-
-## 10. Dependencies
-
-- Preview Shell component (from prerequisite above)
-- Event theme system (existing)
+- `preview-shell` module — Device frame and preview infrastructure
+- `theming` module — Theme types, provider, and styled components
 - Event experiences array (existing)
 - Media upload infrastructure (existing)
 
 ---
 
-## 11. Related Documentation
+## 9. Related Documentation
 
 - [Phase 6: Event Experiences & Extras](../scalable-arch/phase-6-event-experiences.md) — Current General tab implementation
-- [Theme Editor PRD](../theme-editor/theme-editor-prd.md) — Preview panel pattern reference
+- [Preview Shell PRD](./preview-shell-prd.md) — Preview infrastructure
 - [Data Model v5](../scalable-arch/new-data-model-v5.md) — Event schema reference
