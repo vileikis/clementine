@@ -125,7 +125,7 @@ export function WelcomeSection({ form, event, onBlur }: WelcomeSectionProps) {
             type="single"
             value={layout}
             onValueChange={handleLayoutChange}
-            className="justify-start"
+            className="justify-start border border-input rounded-md"
           >
             <ToggleGroupItem
               value="list"

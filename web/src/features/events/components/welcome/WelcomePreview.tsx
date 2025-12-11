@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import { PreviewShell } from "@/features/preview-shell";
 import { ThemeProvider, ThemedBackground, useEventTheme } from "@/features/theming";
+import { useExperienceDetails, type Experience } from "@/features/experiences";
 import { ExperienceCards } from "./ExperienceCards";
 import type { EventWelcome, Event } from "../../types/event.types";
 
@@ -27,6 +28,15 @@ export function WelcomePreview({ welcome, event }: WelcomePreviewProps) {
     [event.experiences]
   );
 
+  // Get experience IDs for fetching details
+  const experienceIds = useMemo(
+    () => enabledExperiences.map((exp) => exp.experienceId),
+    [enabledExperiences]
+  );
+
+  // Fetch experience details for name and media
+  const { experiencesMap } = useExperienceDetails(experienceIds);
+
   // Get the display title (fall back to event name)
   const displayTitle = welcome.title?.trim() || event.name;
 
@@ -37,6 +47,7 @@ export function WelcomePreview({ welcome, event }: WelcomePreviewProps) {
           welcome={welcome}
           displayTitle={displayTitle}
           enabledExperiences={enabledExperiences}
+          experiencesMap={experiencesMap}
         />
       </ThemeProvider>
     </PreviewShell>
@@ -50,10 +61,12 @@ function PreviewContent({
   welcome,
   displayTitle,
   enabledExperiences,
+  experiencesMap,
 }: {
   welcome: EventWelcome;
   displayTitle: string;
   enabledExperiences: Event["experiences"];
+  experiencesMap: Map<string, Experience>;
 }) {
   const { theme } = useEventTheme();
 
@@ -86,8 +99,8 @@ function PreviewContent({
         </div>
       )}
 
-      {/* Content area */}
-      <div className="flex flex-1 flex-col p-4 gap-4 overflow-auto ">
+      {/* Content area - centered vertically */}
+      <div className="flex flex-1 flex-col justify-center p-4 gap-4 overflow-auto">
         {/* Title */}
         <h1
           className="text-2xl font-bold"
@@ -114,10 +127,11 @@ function PreviewContent({
         )}
 
         {/* Experience cards */}
-        <div className="flex-1 mt-2">
+        <div className="mt-2">
           <ExperienceCards
             experiences={enabledExperiences}
             layout={welcome.layout}
+            experiencesMap={experiencesMap}
           />
         </div>
       </div>
