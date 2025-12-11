@@ -17,7 +17,7 @@ interface ThemedBackgroundProps {
   /**
    * Content wrapper className. Set to empty string to disable the default wrapper.
    * Must include z-10 to stay above background image and overflow-auto for scrolling.
-   * @default "relative h-full z-10 overflow-auto max-w-[800px] mx-auto w-full"
+   * @default "relative z-10 h-full w-full overflow-auto"
    */
   contentClassName?: string;
 }
@@ -47,7 +47,7 @@ export function ThemedBackground({
   fontFamily,
   className = "",
   style,
-  contentClassName = "relative h-full z-10 overflow-auto max-w-[800px] mx-auto w-full",
+  contentClassName = "relative z-10 h-full w-full overflow-auto py-8",
 }: ThemedBackgroundProps) {
   const bgColor = background?.color ?? "#FFFFFF";
   const bgImage = background?.image;
@@ -80,7 +80,13 @@ export function ThemedBackground({
 
       {/* Content - wrap only if contentClassName is provided */}
       {contentClassName ? (
-        <div className={contentClassName}>{children}</div>
+        <div className={contentClassName}>
+          {/* Inner centering wrapper: min-h-full ensures it fills container,
+              flex centering works when content fits, scrolls properly when it overflows */}
+          <div className="min-h-full w-full max-w-[800px] mx-auto flex flex-col items-center justify-center">
+            {children}
+          </div>
+        </div>
       ) : (
         children
       )}

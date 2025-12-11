@@ -450,29 +450,30 @@ export function EventThemeEditor({ event, projectId }: EventThemeEditorProps) {
           <ThemedBackground
             background={theme.background}
             fontFamily={theme.fontFamily}
-            className="flex h-full w-full flex-col items-center justify-center p-8"
-            contentClassName="relative z-10 h-full overflow-auto max-w-[800px] mx-auto w-full space-y-6"
+            className="flex h-full w-full flex-col p-8"
             style={{ textAlign: theme.text.alignment }}
           >
-            <h1 className="text-3xl font-bold" style={{ color: theme.text.color }}>
-              Event Preview
-            </h1>
+            <div className="space-y-6">
+              <h1 className="text-3xl font-bold" style={{ color: theme.text.color }}>
+                Event Preview
+              </h1>
 
-            <p className="text-lg" style={{ color: theme.text.color }}>
-              This is how your theme will look
-            </p>
+              <p className="text-lg" style={{ color: theme.text.color }}>
+                This is how your theme will look
+              </p>
 
-            <Button
-              size="lg"
-              className="mt-4"
-              style={{
-                backgroundColor: buttonBgColor,
-                color: theme.button.textColor,
-                borderRadius: BUTTON_RADIUS_MAP[theme.button.radius],
-              }}
-            >
-              Primary Button
-            </Button>
+              <Button
+                size="lg"
+                className="mt-4"
+                style={{
+                  backgroundColor: buttonBgColor,
+                  color: theme.button.textColor,
+                  borderRadius: BUTTON_RADIUS_MAP[theme.button.radius],
+                }}
+              >
+                Primary Button
+              </Button>
+            </div>
           </ThemedBackground>
         </PreviewShell>
       </div>
