@@ -11,12 +11,15 @@ interface EmptyStateProps {
 /**
  * Empty state shown when project has no active event.
  * Displayed when project.activeEventId is null or event doesn't exist.
+ *
+ * Note: Parent ThemedBackground handles full-screen height and centering.
+ * This component just provides the content.
  */
 export function NoActiveEvent({ className }: EmptyStateProps) {
   return (
     <div
       className={cn(
-        "flex min-h-screen flex-col items-center justify-center gap-4 p-8 text-center",
+        "flex flex-col items-center gap-4 p-8 text-center",
         className
       )}
     >
@@ -39,12 +42,15 @@ export function NoActiveEvent({ className }: EmptyStateProps) {
 /**
  * Empty state shown when event exists but has no enabled experiences.
  * Displayed when event.experiences is empty or all experiences are disabled.
+ *
+ * Note: Parent ThemedBackground handles full-screen height and centering.
+ * This component just provides the content.
  */
 export function EmptyEvent({ className }: EmptyStateProps) {
   return (
     <div
       className={cn(
-        "flex min-h-screen flex-col items-center justify-center gap-4 p-8 text-center",
+        "flex flex-col items-center gap-4 p-8 text-center",
         className
       )}
     >

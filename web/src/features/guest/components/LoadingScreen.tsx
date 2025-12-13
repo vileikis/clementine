@@ -11,24 +11,27 @@ interface LoadingScreenProps {
 }
 
 /**
- * Full-screen loading indicator for guest flow.
+ * Loading indicator for guest flow.
  * Displays a centered spinner with optional message.
  * Uses neutral styling that works with any theme background.
+ *
+ * Note: Parent ThemedBackground handles full-screen height and centering.
+ * This component just provides the content.
  */
 export function LoadingScreen({ message, className }: LoadingScreenProps) {
   return (
     <div
       className={cn(
-        "flex min-h-screen flex-col items-center justify-center gap-4 p-4",
+        "flex flex-col items-center justify-center gap-4 p-4",
         className
       )}
     >
       <Loader2
-        className="h-8 w-8 animate-spin text-white/60"
+        className="h-12 w-12 animate-spin text-white/80"
         aria-hidden="true"
       />
       {message && (
-        <p className="text-sm text-white/60 text-center">{message}</p>
+        <p className="text-base text-white/80 text-center">{message}</p>
       )}
       <span className="sr-only">Loading...</span>
     </div>
