@@ -47,7 +47,7 @@ export function ThemedBackground({
   fontFamily,
   className = "",
   style,
-  contentClassName = "relative z-10 min-h-full w-full overflow-auto py-8",
+  contentClassName = "relative z-10 h-full w-full overflow-auto py-8",
 }: ThemedBackgroundProps) {
   const bgColor = background?.color ?? "#FFFFFF";
   const bgImage = background?.image;
