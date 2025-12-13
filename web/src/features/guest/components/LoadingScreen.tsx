@@ -2,6 +2,7 @@
 
 import { Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useEventTheme } from "@/features/theming"
 
 interface LoadingScreenProps {
   /** Optional message to display below spinner */
@@ -13,25 +14,31 @@ interface LoadingScreenProps {
 /**
  * Loading indicator for guest flow.
  * Displays a centered spinner with optional message.
- * Uses neutral styling that works with any theme background.
- *
- * Note: Parent ThemedBackground handles full-screen height and centering.
- * This component just provides the content.
+ * Uses theme-aware styling to ensure visibility on any background.
  */
 export function LoadingScreen({ message, className }: LoadingScreenProps) {
+  const { theme } = useEventTheme()
+  const textColor = theme.text.color
+
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center gap-4 p-4",
+        "flex min-h-screen flex-col items-center justify-center gap-4 p-4",
         className
       )}
     >
       <Loader2
-        className="h-12 w-12 animate-spin text-white/80"
+        className="h-12 w-12 animate-spin"
+        style={{ color: `${textColor}CC` }}
         aria-hidden="true"
       />
       {message && (
-        <p className="text-base text-white/80 text-center">{message}</p>
+        <p
+          className="text-base text-center"
+          style={{ color: `${textColor}CC` }}
+        >
+          {message}
+        </p>
       )}
       <span className="sr-only">Loading...</span>
     </div>

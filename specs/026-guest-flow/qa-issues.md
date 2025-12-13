@@ -8,16 +8,16 @@
 
 ## Fixes Applied
 
-### BUG-001/002 Fix: Empty states not rendering
-**Root Cause**: `ThemedBackground` used `h-full` on content wrapper which requires parent to have explicit height. Parent only had `min-h-screen` (minimum, not actual height), causing content area to collapse.
+### BUG-001/002 Fix: Empty states not rendering (invisible text)
+**Root Cause**: Empty state components used hardcoded `text-white` CSS classes, but the default project theme has a white background (`#FFFFFF`). White text on white background = invisible content.
 
-**Fix**:
-1. Changed `ThemedBackground` contentClassName from `h-full` to `min-h-full` (line 50)
-2. Removed redundant `min-h-screen` from empty state components (they're centered by parent)
+The components WERE rendering, but the text was invisible due to lack of color contrast.
+
+**Fix**: Made empty states theme-aware by using `useEventTheme()` hook to get the theme's text color instead of hardcoded white.
 
 **Files changed**:
-- `web/src/features/theming/components/ThemedBackground.tsx`
 - `web/src/features/guest/components/EmptyStates.tsx`
+- `web/src/features/guest/components/LoadingScreen.tsx`
 
 ### BUG-003 Fix: Missing session creation
 **Root Cause**: `useSession` hook only created sessions when `sessionId` was invalid. Missing `sessionId` (no `s` param) was treated as "no session needed" rather than "create new session".
