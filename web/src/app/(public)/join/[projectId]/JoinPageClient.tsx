@@ -147,6 +147,7 @@ function JoinPageContent({
     return (
       <ExperienceScreen
         experienceName={getExperienceName(experienceId)}
+        experienceId={experienceId}
         guestId={guest?.id}
         sessionId={session?.id || sessionIdFromUrl || "no-session"}
         onHomeClick={handleHomeClick}

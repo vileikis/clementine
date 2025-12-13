@@ -6,6 +6,8 @@ import { useEventTheme, BUTTON_RADIUS_MAP } from "@/features/theming"
 interface ExperienceScreenProps {
   /** Experience name to display */
   experienceName: string
+  /** Experience ID for debugging */
+  experienceId: string
   /** Guest ID for debugging */
   guestId?: string
   /** Session ID for debugging */
@@ -23,6 +25,7 @@ interface ExperienceScreenProps {
  */
 export function ExperienceScreen({
   experienceName,
+  experienceId,
   guestId,
   sessionId,
   onHomeClick,
@@ -30,7 +33,7 @@ export function ExperienceScreen({
   const { theme } = useEventTheme()
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center p-4 gap-6">
+    <div className="flex flex-col items-center justify-center p-4 gap-6">
       {/* Experience name */}
       <h1
         className="text-2xl font-bold text-center"
@@ -41,11 +44,20 @@ export function ExperienceScreen({
 
       {/* Session info (for debugging) */}
       <div
-        className="text-center space-y-1 text-sm opacity-60"
+        className="text-center space-y-2 text-xs opacity-60 font-mono"
         style={{ color: theme.text.color }}
       >
-        {guestId && <p>Guest: {guestId.slice(0, 8)}...</p>}
-        <p>Session: {sessionId.slice(0, 8)}...</p>
+        <p className="break-all">
+          <span className="opacity-70">Experience:</span> {experienceId}
+        </p>
+        {guestId && (
+          <p className="break-all">
+            <span className="opacity-70">Guest:</span> {guestId}
+          </p>
+        )}
+        <p className="break-all">
+          <span className="opacity-70">Session:</span> {sessionId}
+        </p>
       </div>
 
       {/* Placeholder message */}

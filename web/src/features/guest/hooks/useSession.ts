@@ -36,14 +36,13 @@ interface UseSessionResult {
 /**
  * Hook for session management with ownership validation.
  *
- * When sessionId is provided:
- * 1. Validates that the session belongs to the current guest
- * 2. If valid, returns the session
- * 3. If invalid (different guest or not found), creates a new session
+ * When experienceId is provided (on experience screen):
+ * - If sessionId is also provided: validates ownership, creates new if invalid
+ * - If sessionId is missing: creates a new session automatically
  *
- * When sessionId is not provided:
- * - Does not create a session automatically
- * - Use createNewSession to create one on experience selection
+ * When experienceId is not provided (on welcome screen):
+ * - Does not create a session
+ * - Use createNewSession when user selects an experience
  */
 export function useSession({
   projectId,
@@ -95,11 +94,11 @@ export function useSession({
     [projectId, guestId, eventId, onSessionChange]
   )
 
-  // Validate and resume session on mount
+  // Validate and resume session on mount, or create new session if needed
   useEffect(() => {
-    async function validateAndResumeSession() {
-      // No session to validate
-      if (!sessionId || !experienceId) {
+    async function handleSession() {
+      // No experience selected - on welcome screen, no session needed
+      if (!experienceId) {
         setSession(null)
         return
       }
@@ -113,22 +112,28 @@ export function useSession({
       setError(null)
 
       try {
-        const result = await validateSessionOwnershipAction(
-          projectId,
-          sessionId,
-          guestId
-        )
+        // If sessionId is provided, validate it first
+        if (sessionId) {
+          const result = await validateSessionOwnershipAction(
+            projectId,
+            sessionId,
+            guestId
+          )
 
-        if (result.success && result.data.valid && result.data.session) {
-          // Session is valid - resume it
-          setSession(result.data.session)
-        } else {
-          // Session invalid or not found - create new one
+          if (result.success && result.data.valid && result.data.session) {
+            // Session is valid - resume it
+            setSession(result.data.session)
+            setLoading(false)
+            return
+          }
+          // Session invalid or not found - fall through to create new
           console.log("Session invalid, creating new session")
-          await createNewSession(experienceId)
         }
+
+        // No sessionId or invalid session - create new one
+        await createNewSession(experienceId)
       } catch (e) {
-        console.error("Error validating session:", e)
+        console.error("Error handling session:", e)
         // Try to create new session on error
         await createNewSession(experienceId)
       } finally {
@@ -136,7 +141,7 @@ export function useSession({
       }
     }
 
-    validateAndResumeSession()
+    handleSession()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId, sessionId, experienceId, guestId])
 
