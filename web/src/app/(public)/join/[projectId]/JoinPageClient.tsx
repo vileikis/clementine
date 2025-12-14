@@ -39,7 +39,7 @@ export function JoinPageClient({
         <ThemedBackground
           background={event.theme.background}
           fontFamily={event.theme.fontFamily}
-          className="flex h-screen flex-col"
+          className="h-screen"
         >
           <JoinPageContent
             projectId={projectId}

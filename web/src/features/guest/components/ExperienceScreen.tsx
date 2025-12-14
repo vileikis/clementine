@@ -33,7 +33,7 @@ export function ExperienceScreen({
   const { theme } = useEventTheme()
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center p-4 gap-6">
+    <div className="flex flex-col items-center gap-6">
       {/* Experience name */}
       <h1
         className="text-2xl font-bold text-center"

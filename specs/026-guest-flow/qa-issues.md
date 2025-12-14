@@ -52,20 +52,27 @@ The components WERE rendering, but the text was invisible due to lack of color c
 ---
 
 ### UX-003 Fix: Content not vertically centered (P2)
-**Root Cause**: Preview shell used `className="flex h-full flex-col"` on `ThemedBackground`, but guest flow used `className="min-h-screen"`. The `flex-1` in child components needs a flex parent to work.
+**Root Cause**: ThemedBackground had mixed concerns (theming + layout) and required boilerplate `className="flex h-full flex-col"` everywhere. Child components used `flex-1` hacks that conflicted with parent layouts.
+
+**Solution**: Refactored `ThemedBackground` with sensible defaults:
+- Outer container: `flex flex-1 flex-col` built-in (no need to pass className)
+- Content wrapper: centered, max-width 768px, vertically centered, scrollable by default
+- Single content wrapper (not two nested divs)
+- `contentClassName` prop to override or disable (`contentClassName=""`)
 
 **Fix**:
-1. Changed all `ThemedBackground` wrappers in guest flow to use `className="flex min-h-screen flex-col"`
-2. Changed guest components to use `flex-1` instead of `min-h-screen` to fill parent
-3. Created `ContentLayout` component in `web/src/components/shared/` for future use
+1. Refactored `ThemedBackground` to have built-in centering and max-width
+2. Simplified all guest components to remove redundant `flex-1 justify-center` classes
+3. Parent components just need `className="h-screen"` to set full height
 
 **Files changed**:
-- `web/src/app/(public)/join/[projectId]/page.tsx` - all ThemedBackground usages
-- `web/src/app/(public)/join/[projectId]/JoinPageClient.tsx`
-- `web/src/features/guest/components/EmptyStates.tsx`
-- `web/src/features/guest/components/LoadingScreen.tsx`
-- `web/src/features/guest/components/ExperienceScreen.tsx`
-- `web/src/components/shared/ContentLayout.tsx` (new)
+- `web/src/features/theming/components/ThemedBackground.tsx` - major refactor
+- `web/src/app/(public)/join/[projectId]/page.tsx` - simplified to `className="h-screen"`
+- `web/src/app/(public)/join/[projectId]/JoinPageClient.tsx` - simplified to `className="h-screen"`
+- `web/src/features/guest/components/EmptyStates.tsx` - removed flex-1 hacks
+- `web/src/features/guest/components/LoadingScreen.tsx` - removed flex-1 hacks
+- `web/src/features/guest/components/ExperienceScreen.tsx` - removed flex-1 hacks
+- `web/src/features/guest/components/welcome/WelcomeContent.tsx` - simplified layout
 
 ---
 
@@ -149,30 +156,24 @@ The components WERE rendering, but the text was invisible due to lack of color c
 
 ## UX Issues (P2)
 
-### UX-003: Welcome screen content not vertically centered
+### UX-003: Welcome screen content not vertically centered ✅ FIXED
 
 **Observed**: Welcome screen content is not centered vertically (unlike in preview shell)
 **Expected**: Consistent vertical centering between preview and guest flow
 
-**Solution**: Create shared `ContentLayout` component
-
-**Proposed API**:
-```tsx
-interface ContentLayoutProps {
-  children: React.ReactNode
-  vAlign?: "top" | "center" | "bottom" | "stretch"  // default: "center"
-  hAlign?: "left" | "center" | "right" | "stretch"  // default: "center"
-  className?: string
-}
-```
+**Solution**: Refactored `ThemedBackground` with sensible defaults instead of creating a separate `ContentLayout` component. This approach:
+- Eliminates boilerplate `className="flex h-full flex-col"` everywhere
+- Provides centered, max-width (768px) content by default
+- Uses single content wrapper instead of nested divs
+- Allows override via `contentClassName` prop
 
 **Tasks**:
-- [ ] Create `web/src/components/shared/ContentLayout.tsx`
-- [ ] Apply to `WelcomeContent`
-- [ ] Apply to `ExperienceScreen`
-- [ ] Apply to empty state components (`NoActiveEvent`, `EmptyEvent`)
-- [ ] Apply to `LoadingScreen`
-- [ ] Verify consistency with preview shell
+- [x] Refactor `ThemedBackground` with built-in centering
+- [x] Simplify `WelcomeContent` - remove redundant flex/justify classes
+- [x] Simplify `ExperienceScreen` - remove redundant flex/justify classes
+- [x] Simplify empty state components (`NoActiveEvent`) - remove flex-1 hacks
+- [x] Simplify `LoadingScreen` - remove flex-1 hacks
+- [ ] Verify consistency with preview shell (manual QA)
 
 ---
 
