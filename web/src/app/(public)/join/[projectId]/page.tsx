@@ -38,7 +38,7 @@ export default async function JoinPage({ params }: JoinPageProps) {
         <ThemedBackground
           background={project.theme.background}
           fontFamily={project.theme.fontFamily}
-          className="flex h-screen flex-col"
+          className="h-screen"
         >
           <NoActiveEvent />
         </ThemedBackground>
@@ -54,7 +54,7 @@ export default async function JoinPage({ params }: JoinPageProps) {
         <ThemedBackground
           background={project.theme.background}
           fontFamily={project.theme.fontFamily}
-          className="flex h-screen flex-col"
+          className="h-screen"
         >
           <NoActiveEvent />
         </ThemedBackground>
@@ -90,7 +90,7 @@ export default async function JoinPage({ params }: JoinPageProps) {
           <ThemedBackground
             background={event.theme.background}
             fontFamily={event.theme.fontFamily}
-            className="flex h-screen flex-col"
+            className="h-screen"
           >
             <LoadingScreen />
           </ThemedBackground>

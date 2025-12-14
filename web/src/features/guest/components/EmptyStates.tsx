@@ -19,10 +19,7 @@ export function NoActiveEvent({ className }: EmptyStateProps) {
 
   return (
     <div
-      className={cn(
-        "flex flex-1 flex-col items-center justify-center gap-4 p-8 text-center",
-        className
-      )}
+      className={cn("flex flex-col items-center gap-4 text-center", className)}
     >
       <div
         className="rounded-full p-4"
@@ -35,16 +32,10 @@ export function NoActiveEvent({ className }: EmptyStateProps) {
         />
       </div>
       <div className="max-w-xs space-y-2">
-        <h1
-          className="text-xl font-semibold"
-          style={{ color: textColor }}
-        >
+        <h1 className="text-xl font-semibold" style={{ color: textColor }}>
           Event Not Available
         </h1>
-        <p
-          className="text-sm"
-          style={{ color: `${textColor}99` }}
-        >
+        <p className="text-sm" style={{ color: `${textColor}99` }}>
           This event has not been launched yet. Please check back later or
           contact the event organizer.
         </p>
@@ -63,10 +54,7 @@ export function EmptyEvent({ className }: EmptyStateProps) {
 
   return (
     <div
-      className={cn(
-        "flex flex-1 flex-col items-center justify-center gap-4 p-8 text-center",
-        className
-      )}
+      className={cn("flex flex-col items-center gap-4 text-center", className)}
     >
       <div
         className="rounded-full p-4"
@@ -79,16 +67,10 @@ export function EmptyEvent({ className }: EmptyStateProps) {
         />
       </div>
       <div className="max-w-xs space-y-2">
-        <h1
-          className="text-xl font-semibold"
-          style={{ color: textColor }}
-        >
+        <h1 className="text-xl font-semibold" style={{ color: textColor }}>
           Coming Soon
         </h1>
-        <p
-          className="text-sm"
-          style={{ color: `${textColor}99` }}
-        >
+        <p className="text-sm" style={{ color: `${textColor}99` }}>
           This event is being set up. Experiences will be available soon.
         </p>
       </div>

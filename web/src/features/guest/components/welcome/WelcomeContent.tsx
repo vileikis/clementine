@@ -42,7 +42,7 @@ export function WelcomeContent({
   const displayTitle = welcome.title?.trim() || event.name
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center h-full">
+    <div className="flex flex-col">
       {/* Hero media (image or video) */}
       {welcome.mediaUrl && (
         <div className="relative w-full aspect-video shrink-0 overflow-hidden">
@@ -66,8 +66,8 @@ export function WelcomeContent({
         </div>
       )}
 
-      {/* Content area - centered vertically */}
-      <div className="flex flex-1 flex-col justify-center p-4 gap-4 overflow-auto">
+      {/* Content area */}
+      <div className="flex flex-col gap-4 p-4">
         {/* Title */}
         <h1
           className="text-2xl font-bold"
