@@ -6,7 +6,6 @@ import { getExperience } from "@/features/experiences/repositories/experiences.r
 import { ThemeProvider, ThemedBackground } from "@/features/theming"
 import {
   NoActiveEvent,
-  EmptyEvent,
   LoadingScreen,
 } from "@/features/guest/components"
 import { JoinPageClient } from "./JoinPageClient"
@@ -39,7 +38,7 @@ export default async function JoinPage({ params }: JoinPageProps) {
         <ThemedBackground
           background={project.theme.background}
           fontFamily={project.theme.fontFamily}
-          className="min-h-screen"
+          className="flex h-screen flex-col"
         >
           <NoActiveEvent />
         </ThemedBackground>
@@ -55,7 +54,7 @@ export default async function JoinPage({ params }: JoinPageProps) {
         <ThemedBackground
           background={project.theme.background}
           fontFamily={project.theme.fontFamily}
-          className="min-h-screen"
+          className="flex h-screen flex-col"
         >
           <NoActiveEvent />
         </ThemedBackground>
@@ -65,26 +64,11 @@ export default async function JoinPage({ params }: JoinPageProps) {
 
   const event = eventResult.data.event
 
-  // Filter enabled experiences
+  // Filter enabled experiences and build experiences map
   const enabledExperiences = event.experiences.filter((exp) => exp.enabled)
-
-  // Check if there are any enabled experiences
-  if (enabledExperiences.length === 0) {
-    return (
-      <ThemeProvider theme={event.theme}>
-        <ThemedBackground
-          background={event.theme.background}
-          fontFamily={event.theme.fontFamily}
-          className="min-h-screen"
-        >
-          <EmptyEvent />
-        </ThemedBackground>
-      </ThemeProvider>
-    )
-  }
-
-  // Build experiences map for display
   const experiencesMap = new Map<string, Experience>()
+
+  // Fetch experience details for enabled experiences
   await Promise.all(
     enabledExperiences.map(async (expLink) => {
       const experience = await getExperience(expLink.experienceId)
@@ -93,6 +77,9 @@ export default async function JoinPage({ params }: JoinPageProps) {
       }
     })
   )
+
+  // Note: If no enabled experiences, WelcomeContent will show "No experiences available yet"
+  // instead of a separate empty state screen
 
   // Render client component for interactive experience
   // Suspense boundary handles loading state for searchParams
@@ -103,7 +90,7 @@ export default async function JoinPage({ params }: JoinPageProps) {
           <ThemedBackground
             background={event.theme.background}
             fontFamily={event.theme.fontFamily}
-            className="min-h-screen"
+            className="flex h-screen flex-col"
           >
             <LoadingScreen />
           </ThemedBackground>

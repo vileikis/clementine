@@ -23,7 +23,7 @@ export function LoadingScreen({ message, className }: LoadingScreenProps) {
   return (
     <div
       className={cn(
-        "flex min-h-screen flex-col items-center justify-center gap-4 p-4",
+        "flex flex-1 flex-col items-center justify-center gap-4 p-4",
         className
       )}
     >

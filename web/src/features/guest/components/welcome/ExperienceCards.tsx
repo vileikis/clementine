@@ -1,6 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
+import { useEventTheme } from "@/features/theming"
 import type { Experience } from "@/features/experiences"
 import type { EventExperienceLink, ExperienceLayout } from "@/features/events/types/event.types"
 import { ExperienceCard } from "./ExperienceCard"
@@ -29,10 +30,15 @@ export function ExperienceCards({
   experiencesMap,
   onExperienceClick,
 }: ExperienceCardsProps) {
+  const { theme } = useEventTheme()
+
   if (experiences.length === 0) {
     return (
-      <div className="flex items-center justify-center p-4 text-center text-sm opacity-60">
-        <p>No experiences added yet</p>
+      <div
+        className="flex items-center justify-center p-4 text-center text-sm"
+        style={{ color: `${theme.text.color}99` }}
+      >
+        <p>No experiences available yet</p>
       </div>
     )
   }
