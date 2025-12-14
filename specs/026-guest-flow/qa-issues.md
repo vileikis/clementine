@@ -2,7 +2,7 @@
 
 **QA Date**: 2024-12-13
 **Branch**: `026-guest-flow`
-**Status**: P0/P1 Fixed - Awaiting Re-test
+**Status**: All Issues Fixed (P0/P1/P2) - Awaiting Re-test
 
 ---
 
@@ -39,6 +39,33 @@ The components WERE rendering, but the text was invisible due to lack of color c
 **Files changed**:
 - `web/src/features/guest/components/ExperienceScreen.tsx`
 - `web/src/app/(public)/join/[projectId]/JoinPageClient.tsx`
+
+### BUG-002 Update: Empty experiences now shows welcome screen
+**Change**: Instead of showing a generic "Coming Soon" screen when event has no experiences, now shows the full welcome screen with "No experiences available yet" message in the experience cards area.
+
+**Rationale**: Better UX - guests see the event branding and can understand they're at the right place, just no experiences available yet.
+
+**Files changed**:
+- `web/src/app/(public)/join/[projectId]/page.tsx` - removed EmptyEvent check
+- `web/src/features/guest/components/welcome/ExperienceCards.tsx` - theme-aware empty message
+
+---
+
+### UX-003 Fix: Content not vertically centered (P2)
+**Root Cause**: Preview shell used `className="flex h-full flex-col"` on `ThemedBackground`, but guest flow used `className="min-h-screen"`. The `flex-1` in child components needs a flex parent to work.
+
+**Fix**:
+1. Changed all `ThemedBackground` wrappers in guest flow to use `className="flex min-h-screen flex-col"`
+2. Changed guest components to use `flex-1` instead of `min-h-screen` to fill parent
+3. Created `ContentLayout` component in `web/src/components/shared/` for future use
+
+**Files changed**:
+- `web/src/app/(public)/join/[projectId]/page.tsx` - all ThemedBackground usages
+- `web/src/app/(public)/join/[projectId]/JoinPageClient.tsx`
+- `web/src/features/guest/components/EmptyStates.tsx`
+- `web/src/features/guest/components/LoadingScreen.tsx`
+- `web/src/features/guest/components/ExperienceScreen.tsx`
+- `web/src/components/shared/ContentLayout.tsx` (new)
 
 ---
 

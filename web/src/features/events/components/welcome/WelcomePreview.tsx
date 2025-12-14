@@ -67,8 +67,7 @@ function PreviewContent({
         welcome={welcome}
         event={event}
         experiencesMap={experiencesMap}
-        onExperienceClick={undefined} // Disabled in preview mode
-      />
+      />   
     </ThemedBackground>
   )
 }

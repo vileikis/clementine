@@ -20,7 +20,7 @@ export function NoActiveEvent({ className }: EmptyStateProps) {
   return (
     <div
       className={cn(
-        "flex min-h-screen flex-col items-center justify-center gap-4 p-8 text-center",
+        "flex flex-1 flex-col items-center justify-center gap-4 p-8 text-center",
         className
       )}
     >
@@ -64,7 +64,7 @@ export function EmptyEvent({ className }: EmptyStateProps) {
   return (
     <div
       className={cn(
-        "flex min-h-screen flex-col items-center justify-center gap-4 p-8 text-center",
+        "flex flex-1 flex-col items-center justify-center gap-4 p-8 text-center",
         className
       )}
     >
