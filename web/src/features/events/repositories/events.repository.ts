@@ -3,8 +3,8 @@
 import { db } from "@/lib/firebase/admin";
 import type { Event, EventExperienceLink, EventOutro, EventShareOptions } from "../types/event.types";
 import { DEFAULT_EVENT_WELCOME } from "../types/event.types";
-import { eventSchema, type UpdateEventWelcomeInput } from "../schemas";
-import { DEFAULT_EVENT_THEME, DEFAULT_EVENT_EXTRAS } from "../constants";
+import { eventSchema, type UpdateEventWelcomeInput, type UpdateEventOverlayInput } from "../schemas";
+import { DEFAULT_EVENT_THEME, DEFAULT_EVENT_EXTRAS, DEFAULT_EVENT_OVERLAY } from "../constants";
 import type { ExtraSlot } from "../schemas";
 
 /**
@@ -53,11 +53,15 @@ export async function createEvent(data: {
  * Normalize event data by applying defaults for missing fields (migration support)
  */
 function normalizeEvent(data: FirebaseFirestore.DocumentData, docId: string): Event {
-  // Apply DEFAULT_EVENT_WELCOME fallback for events without welcome field
+  // Apply defaults for optional fields to support migration
   const normalizedData = {
     id: docId,
     ...data,
     welcome: data.welcome ?? DEFAULT_EVENT_WELCOME,
+    overlay: data.overlay ? {
+      square: data.overlay.square ?? { enabled: false, frameUrl: null },
+      story: data.overlay.story ?? { enabled: false, frameUrl: null },
+    } : DEFAULT_EVENT_OVERLAY,
   };
 
   return eventSchema.parse(normalizedData) as Event;
@@ -516,6 +520,48 @@ export async function updateEventShareOptions(
   }
   if (shareOptions.socials !== undefined) {
     updateData["shareOptions.socials"] = shareOptions.socials;
+  }
+
+  await eventRef.update(updateData);
+}
+
+// ============================================================================
+// Overlay Configuration Operations
+// ============================================================================
+
+/**
+ * Update overlay configuration (partial update with dot notation)
+ * Supports updating individual aspect ratios without affecting others
+ */
+export async function updateEventOverlay(
+  projectId: string,
+  eventId: string,
+  data: UpdateEventOverlayInput
+): Promise<void> {
+  const eventRef = getEventsCollection(projectId).doc(eventId);
+
+  const updateData: Record<string, unknown> = {
+    updatedAt: Date.now(),
+  };
+
+  // Square frame updates
+  if (data.square !== undefined) {
+    if (data.square.enabled !== undefined) {
+      updateData["overlay.square.enabled"] = data.square.enabled;
+    }
+    if (data.square.frameUrl !== undefined) {
+      updateData["overlay.square.frameUrl"] = data.square.frameUrl;
+    }
+  }
+
+  // Story frame updates
+  if (data.story !== undefined) {
+    if (data.story.enabled !== undefined) {
+      updateData["overlay.story.enabled"] = data.story.enabled;
+    }
+    if (data.story.frameUrl !== undefined) {
+      updateData["overlay.story.frameUrl"] = data.story.frameUrl;
+    }
   }
 
   await eventRef.update(updateData);

@@ -22,7 +22,7 @@ interface EventDetailsHeaderProps {
  * - Back arrow to project events list
  * - Clickable event name (opens rename dialog)
  * - Breadcrumb showing project name
- * - Tabs: Experiences | Theme
+ * - Tabs: General | Theme | Overlays
  */
 export function EventDetailsHeader({
   companySlug,
@@ -37,15 +37,22 @@ export function EventDetailsHeader({
     {
       name: "General",
       href: `/${companySlug}/${projectId}/${event.id}/general`,
+      segment: "general",
+    },
+    {
+      name: "Overlays",
+      href: `/${companySlug}/${projectId}/${event.id}/overlays`,
+      segment: "overlays",
     },
     {
       name: "Theme",
       href: `/${companySlug}/${projectId}/${event.id}/theme`,
+      segment: "theme",
     },
   ];
 
-  // Determine active tab from pathname
-  const activeTab = pathname?.includes("/theme") ? "Theme" : "General";
+  // Determine which tab is active based on URL segment
+  const activeTab = tabs.find((tab) => pathname?.includes(`/${tab.segment}`))?.name || "General";
 
   return (
     <>

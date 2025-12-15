@@ -1,7 +1,7 @@
 // Event validation constants - extracted from schemas to avoid magic numbers
 
 import type { Theme } from "@/features/theming";
-import type { EventExtras, EventOutro, EventShareOptions } from "./types/event.types";
+import type { EventExtras, EventOutro, EventShareOptions, EventOverlayConfig, OverlayAspectRatio } from "./types/event.types";
 
 // Field length constraints
 export const NAME_LENGTH = {
@@ -85,4 +85,19 @@ export const DEFAULT_EVENT_SHARE_OPTIONS: EventShareOptions = {
   allowSystemShare: true,
   allowEmail: false,
   socials: [],
+};
+
+// Overlay aspect ratio metadata for UI rendering
+export const OVERLAY_ASPECT_RATIOS: Record<
+  OverlayAspectRatio,
+  { label: string; ratio: string; cssAspect: string }
+> = {
+  square: { label: "Square", ratio: "1:1", cssAspect: "1/1" },
+  story: { label: "Story", ratio: "9:16", cssAspect: "9/16" },
+} as const;
+
+// Default overlay configuration (no frames configured)
+export const DEFAULT_EVENT_OVERLAY: EventOverlayConfig = {
+  square: { enabled: false, frameUrl: null },
+  story: { enabled: false, frameUrl: null },
 };
