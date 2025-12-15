@@ -4,20 +4,32 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useAutoSave } from "@/hooks/useAutoSave";
-import { OutroSection, OutroPreview, ShareOptionsSection } from "@/features/events/components/outro";
-import { updateEventOutroAction, updateEventShareOptionsAction } from "@/features/events/actions/events.actions";
-import { DEFAULT_EVENT_OUTRO, DEFAULT_EVENT_SHARE_OPTIONS } from "@/features/events/constants";
-import type { Event, EventOutro, EventShareOptions } from "@/features/events/types/event.types";
+import { OutroSection } from "./OutroSection";
+import { OutroPreview } from "./OutroPreview";
+import { ShareOptionsSection } from "./ShareOptionsSection";
+import { updateEventOutroAction, updateEventShareOptionsAction } from "../../actions/events.actions";
+import { DEFAULT_EVENT_OUTRO, DEFAULT_EVENT_SHARE_OPTIONS } from "../../constants";
+import type { Event, EventOutro, EventShareOptions } from "../../types/event.types";
 
-interface OutroPageClientProps {
+interface EventOutroEditorProps {
+  /** Event data with current outro and share options */
   event: Event;
+  /** Project ID for server actions */
   projectId: string;
 }
 
 /**
- * Client component for outro page with form management and auto-save
+ * EventOutroEditor component - Main outro configuration editor
+ *
+ * Features:
+ * - Dual form management (outro + share options)
+ * - Auto-save on blur with debouncing
+ * - Two-column layout: forms on left, preview on right
+ * - Mobile-first responsive (stacked on mobile)
+ * - Real-time preview updates
+ * - Error handling with toast notifications
  */
-export function OutroPageClient({ event, projectId }: OutroPageClientProps) {
+export function EventOutroEditor({ event, projectId }: EventOutroEditorProps) {
   const router = useRouter();
 
   // Initialize outro form with event outro or defaults

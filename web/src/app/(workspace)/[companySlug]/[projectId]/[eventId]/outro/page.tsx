@@ -1,6 +1,6 @@
 import { getEventAction } from "@/features/events/actions";
+import { EventOutroEditor } from "@/features/events/components/outro";
 import { notFound } from "next/navigation";
-import { OutroPageClient } from "./OutroPageClient";
 
 interface OutroPageProps {
   params: Promise<{ companySlug: string; projectId: string; eventId: string }>;
@@ -23,7 +23,7 @@ export default async function OutroPage({ params }: OutroPageProps) {
 
   return (
     <div className="p-6">
-      <OutroPageClient event={event} projectId={projectId} />
+      <EventOutroEditor event={event} projectId={projectId} />
     </div>
   );
 }
