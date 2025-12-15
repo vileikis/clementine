@@ -15,8 +15,8 @@ import type { Event, EventExperienceLink } from "../../types/event.types";
 
 interface ExperiencesSectionProps {
   event: Event;
-  /** Pre-fetched experience details map */
-  experiencesMap: Map<string, Experience>;
+  /** Experience details by ID */
+  experiencesMap: Record<string, Experience>;
   /** Whether experience details are loading */
   loadingExperiences: boolean;
 }
@@ -95,7 +95,7 @@ export function ExperiencesSection({
           <EventExperienceCard
             key={experienceLink.experienceId}
             experienceLink={experienceLink}
-            experience={experiencesMap.get(experienceLink.experienceId) ?? null}
+            experience={experiencesMap[experienceLink.experienceId] ?? null}
             onToggle={(enabled) =>
               handleToggleExperience(experienceLink.experienceId, enabled)
             }
@@ -132,7 +132,7 @@ export function ExperiencesSection({
         experienceLink={editingExperience}
         experience={
           editingExperience
-            ? experiencesMap.get(editingExperience.experienceId) ?? null
+            ? experiencesMap[editingExperience.experienceId] ?? null
             : null
         }
       />

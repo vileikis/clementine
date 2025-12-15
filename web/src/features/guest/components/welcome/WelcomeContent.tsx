@@ -11,7 +11,7 @@ interface WelcomeContentProps {
   welcome: EventWelcome
   /** Event data for experiences list */
   event: Event
-  /** Pre-fetched experience details (plain object for serialization) */
+  /** Experience details by ID */
   experiencesMap: Record<string, Experience>
   /** Optional click handler for experience selection - undefined for preview mode */
   onExperienceClick?: (experienceId: string) => void

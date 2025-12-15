@@ -4,7 +4,7 @@
  * Hook: useExperienceDetails
  *
  * Batch fetches experience details by array of IDs.
- * Returns a Map for O(1) lookups by experience ID.
+ * Returns a Record for O(1) lookups by experience ID.
  */
 
 import { useReducer, useEffect, useMemo } from "react";
@@ -13,7 +13,7 @@ import { db } from "@/lib/firebase/client";
 import type { Experience } from "../types";
 
 interface State {
-  experiencesMap: Map<string, Experience>;
+  experiencesMap: Record<string, Experience>;
   loading: boolean;
   error: Error | null;
 }
@@ -21,13 +21,13 @@ interface State {
 type Action =
   | { type: "RESET" }
   | { type: "LOADING" }
-  | { type: "SUCCESS"; experiencesMap: Map<string, Experience> }
+  | { type: "SUCCESS"; experiencesMap: Record<string, Experience> }
   | { type: "ERROR"; error: Error };
 
 function reducer(state: State, action: Action): State {
   switch (action.type) {
     case "RESET":
-      return { experiencesMap: new Map(), loading: false, error: null };
+      return { experiencesMap: {}, loading: false, error: null };
     case "LOADING":
       return { ...state, loading: true, error: null };
     case "SUCCESS":
@@ -39,7 +39,7 @@ function reducer(state: State, action: Action): State {
 
 /**
  * Fetch experience details for a list of experience IDs.
- * Returns a Map for efficient lookups.
+ * Returns a Record for efficient lookups.
  *
  * @param experienceIds - Array of experience IDs to fetch
  * @returns State object with experiencesMap, loading, and error
@@ -50,7 +50,7 @@ export function useExperienceDetails(experienceIds: string[]): State {
   const idsKey = useMemo(() => [...experienceIds].sort().join(","), [experienceIds]);
 
   const [state, dispatch] = useReducer(reducer, {
-    experiencesMap: new Map(),
+    experiencesMap: {},
     loading: experienceIds.length > 0,
     error: null,
   });
@@ -82,12 +82,12 @@ export function useExperienceDetails(experienceIds: string[]): State {
           })
         );
 
-        const map = new Map<string, Experience>();
+        const record: Record<string, Experience> = {};
         results.forEach((exp) => {
-          if (exp) map.set(exp.id, exp);
+          if (exp) record[exp.id] = exp;
         });
 
-        dispatch({ type: "SUCCESS", experiencesMap: map });
+        dispatch({ type: "SUCCESS", experiencesMap: record });
       } catch (err) {
         console.error("Error fetching experience details:", err);
         dispatch({ type: "ERROR", error: err as Error });
