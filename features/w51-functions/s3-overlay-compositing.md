@@ -1,3 +1,7 @@
+# Original PLan
+
+- see ./plan.md
+
 ### Stage 3: Overlay Compositing (Days 6-7)
 
 **Goal**: Apply overlay images from Event configuration.

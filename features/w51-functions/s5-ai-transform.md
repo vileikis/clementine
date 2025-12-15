@@ -1,3 +1,7 @@
+# Original PLan
+
+- see ./plan.md
+
 ### Stage 5: AI Transformation (Days 10-11)
 
 **Goal**: Integrate AI image transformation with provider abstraction.

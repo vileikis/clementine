@@ -1,3 +1,7 @@
+# Original PLan
+
+- see ./plan.md
+
 ### Stage 2: Deduplication & Error Handling (Days 4-5)
 
 **Goal**: Prevent duplicate processing and handle failures gracefully with Cloud Tasks.

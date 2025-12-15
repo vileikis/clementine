@@ -1,3 +1,7 @@
+# Original PLan
+
+- see ./plan.md
+
 ### Stage 4: Background Removal (Days 8-9)
 
 **Goal**: Remove or replace backgrounds using external API.

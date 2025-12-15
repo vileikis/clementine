@@ -1,0 +1,14 @@
+# Compiled output
+dist/
+lib/
+.deploy/
+isolate/
+
+# Dependencies
+node_modules/
+
+# Logs
+*.log
+
+# Environment
+.env*

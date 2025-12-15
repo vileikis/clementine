@@ -1,3 +1,7 @@
+# Original PLan
+
+- see ./plan.md
+
 ### Stage 1: Basic Pipeline - No Manipulation (Days 2-3)
 
 **Goal**: End-to-end flow for passthrough processing. When no manipulations are configured, output the original media (single image) or composed media (GIF/video from burst).
