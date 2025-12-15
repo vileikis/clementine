@@ -3,7 +3,6 @@ set -e
 
 echo "🚀 Deploying Clementine Functions..."
 
-# Navigate to repository root
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 cd "$ROOT_DIR"
@@ -11,10 +10,7 @@ cd "$ROOT_DIR"
 echo "📦 Building shared package..."
 pnpm --filter @clementine/shared build
 
-echo "📦 Building functions with esbuild..."
-pnpm --filter @clementine/functions build
-
-echo "🔥 Deploying to Firebase..."
+echo "🔥 Deploying to Firebase (predeploy will build & isolate)..."
 firebase deploy --only functions
 
 echo "✅ Deployment complete!"
