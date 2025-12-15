@@ -23,7 +23,7 @@ import { getPublicUrl } from "./upload";
  */
 export async function uploadImage(
   file: File,
-  destination: "welcome" | "experience-preview" | "experience-overlay" | "ai-reference" | "logos" | "backgrounds"
+  destination: "welcome" | "experience-preview" | "experience-overlay" | "ai-reference" | "logos" | "backgrounds" | "frames"
 ): Promise<
   | { success: true; data: { path: string; url: string } }
   | { success: false; error: { code: string; message: string } }
