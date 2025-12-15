@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { X, Upload } from "lucide-react";
+import { toast } from "sonner";
 import { uploadImage } from "@/lib/storage/actions";
 import type { FrameEntry, OverlayAspectRatio } from "../../types/event.types";
 import { OVERLAY_ASPECT_RATIOS } from "../../constants";
@@ -59,7 +60,17 @@ export function FrameCard({
       const result = await uploadImage(file, "frames");
       if (result.success) {
         onFrameUpload(result.data.url);
+      } else {
+        // Handle upload failure
+        const errorMessage = result.error?.message || "Failed to upload frame";
+        console.error("Frame upload failed:", errorMessage);
+        toast.error(errorMessage);
       }
+    } catch (error) {
+      // Handle exception during upload
+      const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred";
+      console.error("Frame upload exception:", error);
+      toast.error(errorMessage);
     } finally {
       setIsUploading(false);
       // Reset input so same file can be uploaded again
@@ -78,7 +89,7 @@ export function FrameCard({
 
   return (
     <Card
-      className={`w-2xs border-0 shadow-none pt-0 relative overflow-hidden transition-all cursor-pointer hover:shadow-md ${
+      className={`max-w-xs border-0 shadow-none pt-0 relative overflow-hidden transition-all cursor-pointer hover:shadow-md ${
         disabled ? "opacity-60 cursor-not-allowed" : ""
       } ${isUploading ? "opacity-50" : ""}`}
       onClick={handleCardClick}
@@ -118,7 +129,7 @@ export function FrameCard({
         ) : (
           <>
             {/* Placeholder */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-linear-to-br from-gray-100 to-gray-200">
               <Upload className="h-8 w-8 text-muted-foreground mb-2" />
               <p className="text-sm text-muted-foreground">
                 {isUploading ? "Uploading..." : "Click to upload"}

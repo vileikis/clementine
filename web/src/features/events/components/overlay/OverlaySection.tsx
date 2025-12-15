@@ -17,7 +17,8 @@ interface OverlaySectionProps {
 // Overlay reducer actions
 type OverlayAction =
   | { type: "SET_FRAME"; ratio: OverlayAspectRatio; url: string }
-  | { type: "REMOVE_FRAME"; ratio: OverlayAspectRatio };
+  | { type: "REMOVE_FRAME"; ratio: OverlayAspectRatio }
+  | { type: "ROLLBACK"; ratio: OverlayAspectRatio; previousState: { enabled: boolean; frameUrl: string | null } };
 
 // Reducer function
 function overlayReducer(state: EventOverlayConfig, action: OverlayAction): EventOverlayConfig {
@@ -38,6 +39,12 @@ function overlayReducer(state: EventOverlayConfig, action: OverlayAction): Event
           enabled: false,
           frameUrl: null,
         },
+      };
+    case "ROLLBACK":
+      // Rollback to previous state on error
+      return {
+        ...state,
+        [action.ratio]: action.previousState,
       };
     default:
       return state;
@@ -69,11 +76,15 @@ export function OverlaySection({ event, projectId }: OverlaySectionProps) {
    * Handle frame upload - automatically enable and save to server
    */
   const handleFrameUpload = (ratio: OverlayAspectRatio, url: string) => {
-    // Update local state (automatically enables frame)
+    if (isPending) return;
+
+    // Capture previous state for rollback
+    const previousState = overlay[ratio] ?? { enabled: false, frameUrl: null };
+
+    // Optimistic update
     dispatch({ type: "SET_FRAME", ratio, url });
 
     // Save to server
-    if (isPending) return;
     startTransition(async () => {
       const result = await updateEventOverlayAction(projectId, event.id, {
         [ratio]: { frameUrl: url, enabled: true },
@@ -83,6 +94,8 @@ export function OverlaySection({ event, projectId }: OverlaySectionProps) {
         toast.success(`${ratio === "square" ? "Square" : "Story"} frame uploaded`);
         router.refresh();
       } else {
+        // Rollback on failure
+        dispatch({ type: "ROLLBACK", ratio, previousState });
         toast.error(result.error?.message || "Failed to upload frame");
       }
     });
@@ -92,11 +105,15 @@ export function OverlaySection({ event, projectId }: OverlaySectionProps) {
    * Handle frame removal - save immediately to server
    */
   const handleRemove = (ratio: OverlayAspectRatio) => {
-    // Update local state
+    if (isPending) return;
+
+    // Capture previous state for rollback
+    const previousState = overlay[ratio] ?? { enabled: false, frameUrl: null };
+
+    // Optimistic update
     dispatch({ type: "REMOVE_FRAME", ratio });
 
     // Save to server
-    if (isPending) return;
     startTransition(async () => {
       const result = await updateEventOverlayAction(projectId, event.id, {
         [ratio]: { frameUrl: null, enabled: false },
@@ -106,6 +123,8 @@ export function OverlaySection({ event, projectId }: OverlaySectionProps) {
         toast.success("Frame removed");
         router.refresh();
       } else {
+        // Rollback on failure
+        dispatch({ type: "ROLLBACK", ratio, previousState });
         toast.error(result.error?.message || "Failed to remove frame");
       }
     });
