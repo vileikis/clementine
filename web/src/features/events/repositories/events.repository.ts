@@ -59,10 +59,8 @@ function normalizeEvent(data: FirebaseFirestore.DocumentData, docId: string): Ev
     ...data,
     welcome: data.welcome ?? DEFAULT_EVENT_WELCOME,
     overlay: data.overlay ? {
-      frames: {
-        square: data.overlay.frames?.square ?? { enabled: false, frameUrl: null },
-        story: data.overlay.frames?.story ?? { enabled: false, frameUrl: null },
-      }
+      square: data.overlay.square ?? { enabled: false, frameUrl: null },
+      story: data.overlay.story ?? { enabled: false, frameUrl: null },
     } : DEFAULT_EVENT_OVERLAY,
   };
 
@@ -481,20 +479,20 @@ export async function updateEventOverlay(
   // Square frame updates
   if (data.square !== undefined) {
     if (data.square.enabled !== undefined) {
-      updateData["overlay.frames.square.enabled"] = data.square.enabled;
+      updateData["overlay.square.enabled"] = data.square.enabled;
     }
     if (data.square.frameUrl !== undefined) {
-      updateData["overlay.frames.square.frameUrl"] = data.square.frameUrl;
+      updateData["overlay.square.frameUrl"] = data.square.frameUrl;
     }
   }
 
   // Story frame updates
   if (data.story !== undefined) {
     if (data.story.enabled !== undefined) {
-      updateData["overlay.frames.story.enabled"] = data.story.enabled;
+      updateData["overlay.story.enabled"] = data.story.enabled;
     }
     if (data.story.frameUrl !== undefined) {
-      updateData["overlay.frames.story.frameUrl"] = data.story.frameUrl;
+      updateData["overlay.story.frameUrl"] = data.story.frameUrl;
     }
   }
 

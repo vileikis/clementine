@@ -34,13 +34,11 @@ export const frameEntrySchema = z.object({
 
 /**
  * Event overlay configuration schema
- * Uses explicit optional fields instead of z.record() to allow partial configurations
+ * Flattened structure with optional frame entries
  */
 export const eventOverlayConfigSchema = z.object({
-  frames: z.object({
-    square: frameEntrySchema.optional(),
-    story: frameEntrySchema.optional(),
-  }),
+  square: frameEntrySchema.optional(),
+  story: frameEntrySchema.optional(),
 });
 
 /**

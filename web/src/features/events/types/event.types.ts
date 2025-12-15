@@ -26,11 +26,10 @@ export interface FrameEntry {
  * Frame overlay configuration for an event
  */
 export interface EventOverlayConfig {
-  /** Frame configurations by aspect ratio (optional to allow partial configurations) */
-  frames: {
-    square?: FrameEntry;
-    story?: FrameEntry;
-  };
+  /** Square (1:1) frame configuration */
+  square?: FrameEntry;
+  /** Story (9:16) frame configuration */
+  story?: FrameEntry;
 }
 
 /**

@@ -27,23 +27,17 @@ function overlayReducer(state: EventOverlayConfig, action: OverlayAction): Event
       // When setting a frame, automatically enable it
       return {
         ...state,
-        frames: {
-          ...state.frames,
-          [action.ratio]: {
-            enabled: true,
-            frameUrl: action.url,
-          },
+        [action.ratio]: {
+          enabled: true,
+          frameUrl: action.url,
         },
       };
     case "REMOVE_FRAME":
       return {
         ...state,
-        frames: {
-          ...state.frames,
-          [action.ratio]: {
-            enabled: false,
-            frameUrl: null,
-          },
+        [action.ratio]: {
+          enabled: false,
+          frameUrl: null,
         },
       };
     default:
@@ -70,7 +64,7 @@ export function OverlaySection({ event, projectId }: OverlaySectionProps) {
   // Initialize overlay state with reducer
   const [overlay, dispatch] = useReducer(
     overlayReducer,
-    event.overlay || { frames: { square: { enabled: false, frameUrl: null }, story: { enabled: false, frameUrl: null } } }
+    event.overlay || { square: { enabled: false, frameUrl: null }, story: { enabled: false, frameUrl: null } }
   );
 
   /**
@@ -135,14 +129,14 @@ export function OverlaySection({ event, projectId }: OverlaySectionProps) {
         <div className="space-y-6">
           <FrameCard
             ratio="square"
-            frame={overlay.frames.square ?? { enabled: false, frameUrl: null }}
+            frame={overlay.square ?? { enabled: false, frameUrl: null }}
             onFrameUpload={(url) => handleFrameUpload("square", url)}
             onRemove={() => handleRemove("square")}
             disabled={isPending}
           />
           <FrameCard
             ratio="story"
-            frame={overlay.frames.story ?? { enabled: false, frameUrl: null }}
+            frame={overlay.story ?? { enabled: false, frameUrl: null }}
             onFrameUpload={(url) => handleFrameUpload("story", url)}
             onRemove={() => handleRemove("story")}
             disabled={isPending}

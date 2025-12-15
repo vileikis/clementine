@@ -82,8 +82,6 @@ export const OVERLAY_ASPECT_RATIOS: Record<
 
 // Default overlay configuration (no frames configured)
 export const DEFAULT_EVENT_OVERLAY: EventOverlayConfig = {
-  frames: {
-    square: { enabled: false, frameUrl: null },
-    story: { enabled: false, frameUrl: null },
-  },
+  square: { enabled: false, frameUrl: null },
+  story: { enabled: false, frameUrl: null },
 };
