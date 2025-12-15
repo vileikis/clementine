@@ -8,6 +8,29 @@ import type { Theme } from "@/features/theming";
 export type ExperienceLayout = "list" | "grid";
 
 /**
+ * Supported aspect ratios for frame overlays
+ */
+export type OverlayAspectRatio = "square" | "story";
+
+/**
+ * Frame configuration for one aspect ratio
+ */
+export interface FrameEntry {
+  /** Whether the frame overlay is applied to outputs */
+  enabled: boolean;
+  /** Full public URL to the frame image in Firebase Storage */
+  frameUrl: string | null;
+}
+
+/**
+ * Frame overlay configuration for an event
+ */
+export interface EventOverlayConfig {
+  /** Map of aspect ratio to frame configuration */
+  frames: Record<OverlayAspectRatio, FrameEntry>;
+}
+
+/**
  * Welcome screen configuration for an event
  */
 export interface EventWelcome {
@@ -91,6 +114,9 @@ export interface Event {
 
   // Welcome screen configuration (optional - use DEFAULT_EVENT_WELCOME when absent)
   welcome?: EventWelcome;
+
+  // Frame overlay configuration (optional - use DEFAULT_EVENT_OVERLAY when absent)
+  overlay?: EventOverlayConfig;
 
   // Soft delete timestamp
   deletedAt?: number | null; // Unix timestamp ms when deleted
