@@ -11,7 +11,7 @@ interface ExperienceCardsProps {
   experiences: EventExperienceLink[]
   /** Layout mode: list (single column) or grid (two columns) */
   layout: ExperienceLayout
-  /** Experience details (plain object for serialization) */
+  /** Experience details by ID */
   experiencesMap?: Record<string, Experience>
   /** Optional click handler for experience selection */
   onExperienceClick?: (experienceId: string) => void

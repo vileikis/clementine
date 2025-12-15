@@ -11,7 +11,7 @@ interface WelcomePreviewProps {
   welcome: EventWelcome
   /** Event data for theme and experiences */
   event: Event
-  /** Pre-fetched experience details (plain object for serialization) */
+  /** Experience details by ID */
   experiencesMap: Record<string, Experience>
 }
 
