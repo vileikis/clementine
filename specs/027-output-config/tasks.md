@@ -60,6 +60,7 @@
 - [X] T011 [US1] Create barrel export for overlay components in `web/src/features/events/components/overlay/index.ts`
 - [X] T012 [US1] Create overlays page route in `web/src/app/(workspace)/[companySlug]/[projectId]/[eventId]/overlays/page.tsx`
 - [X] T013 [US1] Wire up upload flow: `ImageUploadField` → `uploadImage` action → `updateEventOverlayAction` with frameUrl
+- [X] T013.1 [US1] Add "Overlays" tab to `EventDetailsHeader` for navigation to overlays page
 
 **Checkpoint**: User Story 1 complete - organizers can upload frames and see them in preview
 
