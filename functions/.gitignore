@@ -1,5 +1,7 @@
 # Compiled output
+dist/
 lib/
+.deploy/
 
 # Dependencies
 node_modules/

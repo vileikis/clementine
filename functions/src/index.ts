@@ -5,7 +5,11 @@ import type { SessionProcessing } from "@clementine/shared"
  * Hello World function to verify Firebase Functions deployment
  * and shared package integration.
  */
-export const helloWorld = onRequest((request, response) => {
+export const helloWorld = onRequest(
+  {
+    region: "europe-west1",
+  },
+  (request, response) => {
   // Create a mock SessionProcessing object to verify shared types work
   const mockSession: Partial<SessionProcessing> = {
     inputAssets: [
