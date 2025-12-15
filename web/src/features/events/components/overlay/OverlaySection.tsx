@@ -1,10 +1,9 @@
 "use client";
 
-import { useReducer, useTransition, useState } from "react";
+import { useReducer, useTransition } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { FrameCard } from "./FrameCard";
-import { OverlayPreview } from "./OverlayPreview";
 import type { EventOverlayConfig, OverlayAspectRatio, Event } from "../../types/event.types";
 import { updateEventOverlayAction } from "../../actions/events.actions";
 
@@ -58,7 +57,6 @@ function overlayReducer(state: EventOverlayConfig, action: OverlayAction): Event
  */
 export function OverlaySection({ event, projectId }: OverlaySectionProps) {
   const [isPending, startTransition] = useTransition();
-  const [selectedRatio, setSelectedRatio] = useState<OverlayAspectRatio>("square");
   const router = useRouter();
 
   // Initialize overlay state with reducer
@@ -123,34 +121,22 @@ export function OverlaySection({ event, projectId }: OverlaySectionProps) {
         </p>
       </div>
 
-      {/* Two-column layout: cards on left, preview on right */}
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_1fr] items-start">
-        {/* Left: Frame configuration cards */}
-        <div className="space-y-6">
-          <FrameCard
-            ratio="square"
-            frame={overlay.square ?? { enabled: false, frameUrl: null }}
-            onFrameUpload={(url) => handleFrameUpload("square", url)}
-            onRemove={() => handleRemove("square")}
-            disabled={isPending}
-          />
-          <FrameCard
-            ratio="story"
-            frame={overlay.story ?? { enabled: false, frameUrl: null }}
-            onFrameUpload={(url) => handleFrameUpload("story", url)}
-            onRemove={() => handleRemove("story")}
-            disabled={isPending}
-          />
-        </div>
-
-        {/* Right: Preview (hidden on mobile, sticky on desktop) */}
-        <div className="hidden lg:block lg:sticky lg:top-4">
-          <OverlayPreview
-            overlay={overlay}
-            selectedRatio={selectedRatio}
-            onRatioChange={setSelectedRatio}
-          />
-        </div>
+      {/* Frame cards in a row with wrapping */}
+      <div className="flex flex-wrap gap-6">
+        <FrameCard
+          ratio="square"
+          frame={overlay.square ?? { enabled: false, frameUrl: null }}
+          onFrameUpload={(url) => handleFrameUpload("square", url)}
+          onRemove={() => handleRemove("square")}
+          disabled={isPending}
+        />
+        <FrameCard
+          ratio="story"
+          frame={overlay.story ?? { enabled: false, frameUrl: null }}
+          onFrameUpload={(url) => handleFrameUpload("story", url)}
+          onRemove={() => handleRemove("story")}
+          disabled={isPending}
+        />
       </div>
     </div>
   );
