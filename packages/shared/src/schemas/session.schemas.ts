@@ -4,7 +4,7 @@ import { z } from "zod"
  * Represents a single input file (image or video) submitted by a guest for processing.
  */
 export const inputAssetSchema = z.object({
-  url: z.string().url(),
+  url: z.url(),
   type: z.enum(["image", "video"]),
 })
 
@@ -42,8 +42,8 @@ export type ProcessingState = z.infer<typeof processingStateSchema>
  * Represents the final processed media output from a completed session.
  */
 export const sessionOutputsSchema = z.object({
-  primaryUrl: z.string().url(),
-  thumbnailUrl: z.string().url(),
+  primaryUrl: z.url(),
+  thumbnailUrl: z.url(),
   format: z.enum(["gif", "mp4", "webm", "image"]),
   dimensions: z.object({
     width: z.number().int().positive(),
