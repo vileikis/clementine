@@ -102,12 +102,14 @@
 - [x] Verify shared package contents: `ls -la node_modules/@clementine/shared/dist/`
 
 ### Test Local Emulators
-- [ ] Run `pnpm functions:serve` (from root)
-- [ ] Verify emulators start without errors
-- [ ] Check Functions emulator is running (port 5003)
-- [ ] Make a code change in `functions/src/`
-- [ ] Verify hot reload still works
-- [ ] Stop emulators
+- [x] Run `pnpm functions:serve` (from root)
+- [x] Verify emulators start without errors
+- [x] Check Functions emulator is running (port 5003)
+- [x] Make a code change in `functions/src/`
+- [x] ~~Verify hot reload still works~~ **Hot reload does NOT work** (expected limitation - see note below)
+- [x] Stop emulators
+
+**Note on Hot Reload:** The standard `isolate-package` approach does not support hot reload in emulators because firebase.json points to `functions/isolate/` (a static snapshot). To get hot reload working, you would need to use the [`firebase-tools-with-isolate` fork](https://github.com/0x80/firebase-tools-with-isolate) mentioned in ISOLATE_PLAN.md. For now, this limitation is acceptable - just rebuild and restart emulators when testing locally.
 
 ## Phase 6: Deployment Testing
 
@@ -181,12 +183,12 @@ Implementation is complete when:
 
 - [x] ✅ All configuration files updated
 - [x] ✅ Isolation runs successfully locally
-- [x] ✅ `firebase deploy` completes without "EUNSUPPORTEDPROTOCOL" error
-- [x] ✅ Functions are active in Firebase Console
-- [x] ✅ Functions can be invoked successfully
-- [x] ✅ Shared package code works at runtime
-- [x] ✅ Local emulator hot reload still works
-- [x] ✅ Team is informed and documentation updated
+- [ ] ⏳ `firebase deploy` completes without "EUNSUPPORTEDPROTOCOL" error (ready to test)
+- [ ] ⏳ Functions are active in Firebase Console (ready to test)
+- [ ] ⏳ Functions can be invoked successfully (ready to test)
+- [ ] ⏳ Shared package code works at runtime (ready to test)
+- [x] ✅ Local emulators work (⚠️ hot reload does NOT work - expected limitation)
+- [ ] 📝 Team is informed and documentation updated (pending deployment test)
 
 ## Troubleshooting Reference
 
