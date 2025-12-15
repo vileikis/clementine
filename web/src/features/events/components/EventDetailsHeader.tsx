@@ -40,6 +40,11 @@ export function EventDetailsHeader({
       segment: "general",
     },
     {
+      name: "Outro",
+      href: `/${companySlug}/${projectId}/${event.id}/outro`,
+      segment: "outro",
+    },
+    {
       name: "Overlays",
       href: `/${companySlug}/${projectId}/${event.id}/overlays`,
       segment: "overlays",
