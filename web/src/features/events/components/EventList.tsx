@@ -39,6 +39,7 @@ export function EventList({ projectId }: EventListProps) {
     );
   }
 
+  console.log("----events", events.length);
   if (events.length === 0) {
     return <EmptyEvents projectId={projectId} />;
   }

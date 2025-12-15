@@ -31,7 +31,7 @@ export function OverlayPreview({
   selectedRatio,
   onRatioChange,
 }: OverlayPreviewProps) {
-  const frame = overlay.frames[selectedRatio];
+  const frame = overlay.frames[selectedRatio] ?? { enabled: false, frameUrl: null };
   const aspectInfo = OVERLAY_ASPECT_RATIOS[selectedRatio];
   const showFrame = frame.enabled && Boolean(frame.frameUrl);
 

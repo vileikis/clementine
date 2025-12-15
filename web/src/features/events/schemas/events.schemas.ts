@@ -29,14 +29,18 @@ export const overlayAspectRatioSchema = z.enum(["square", "story"]);
  */
 export const frameEntrySchema = z.object({
   enabled: z.boolean(),
-  frameUrl: z.string().url().nullable(),
+  frameUrl: z.url().nullable(),
 });
 
 /**
  * Event overlay configuration schema
+ * Uses explicit optional fields instead of z.record() to allow partial configurations
  */
 export const eventOverlayConfigSchema = z.object({
-  frames: z.record(overlayAspectRatioSchema, frameEntrySchema),
+  frames: z.object({
+    square: frameEntrySchema.optional(),
+    story: frameEntrySchema.optional(),
+  }),
 });
 
 /**
@@ -46,11 +50,11 @@ export const eventOverlayConfigSchema = z.object({
 export const updateEventOverlayInputSchema = z.object({
   square: z.object({
     enabled: z.boolean().optional(),
-    frameUrl: z.string().url().nullable().optional(),
+    frameUrl: z.url().nullable().optional(),
   }).optional(),
   story: z.object({
     enabled: z.boolean().optional(),
-    frameUrl: z.string().url().nullable().optional(),
+    frameUrl: z.url().nullable().optional(),
   }).optional(),
 });
 
@@ -70,7 +74,7 @@ export const experienceLayoutSchema = z.enum(["list", "grid"]);
 export const eventWelcomeSchema = z.object({
   title: z.string().max(100).nullable().optional(),
   description: z.string().max(500).nullable().optional(),
-  mediaUrl: z.string().url().nullable().optional(),
+  mediaUrl: z.url().nullable().optional(),
   mediaType: z.enum(["image", "video"]).nullable().optional(),
   layout: experienceLayoutSchema,
 });
@@ -81,7 +85,7 @@ export const eventWelcomeSchema = z.object({
 export const updateEventWelcomeSchema = z.object({
   title: z.string().max(100).nullable().optional(),
   description: z.string().max(500).nullable().optional(),
-  mediaUrl: z.string().url().nullable().optional(),
+  mediaUrl: z.url().nullable().optional(),
   mediaType: z.enum(["image", "video"]).nullable().optional(),
   layout: experienceLayoutSchema.optional(),
 });

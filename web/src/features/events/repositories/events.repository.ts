@@ -58,7 +58,12 @@ function normalizeEvent(data: FirebaseFirestore.DocumentData, docId: string): Ev
     id: docId,
     ...data,
     welcome: data.welcome ?? DEFAULT_EVENT_WELCOME,
-    overlay: data.overlay ?? DEFAULT_EVENT_OVERLAY,
+    overlay: data.overlay ? {
+      frames: {
+        square: data.overlay.frames?.square ?? { enabled: false, frameUrl: null },
+        story: data.overlay.frames?.story ?? { enabled: false, frameUrl: null },
+      }
+    } : DEFAULT_EVENT_OVERLAY,
   };
 
   return eventSchema.parse(normalizedData) as Event;
