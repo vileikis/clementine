@@ -47,6 +47,56 @@ export const updateEventWelcomeSchema = z.object({
   layout: experienceLayoutSchema.optional(),
 });
 
+// ============================================================================
+// Outro Screen Schemas
+// ============================================================================
+
+/**
+ * Share social platform schema (reused from steps)
+ */
+export const shareSocialSchema = z.enum([
+  "instagram",
+  "facebook",
+  "twitter",
+  "linkedin",
+  "tiktok",
+  "whatsapp",
+]);
+
+/**
+ * Event outro screen configuration schema
+ */
+export const eventOutroSchema = z.object({
+  title: z.string().max(100).nullable().optional(),
+  description: z.string().max(500).nullable().optional(),
+  ctaLabel: z.string().max(50).nullable().optional(),
+  ctaUrl: z.string().url().nullable().optional(),
+});
+
+/**
+ * Partial event outro schema for updates
+ */
+export const partialEventOutroSchema = eventOutroSchema.partial();
+
+/**
+ * Event share options configuration schema
+ */
+export const eventShareOptionsSchema = z.object({
+  allowDownload: z.boolean(),
+  allowSystemShare: z.boolean(),
+  allowEmail: z.boolean(),
+  socials: z.array(shareSocialSchema),
+});
+
+/**
+ * Partial event share options schema for updates
+ */
+export const partialEventShareOptionsSchema = eventShareOptionsSchema.partial();
+
+// ============================================================================
+// Extras Schemas
+// ============================================================================
+
 /**
  * Frequency options for extra slots
  */
@@ -92,6 +142,8 @@ export const eventSchema = z.object({
   extras: eventExtrasSchema.default({ preEntryGate: null, preReward: null }),
   theme: eventThemeSchema,
   welcome: eventWelcomeSchema.optional(),
+  outro: eventOutroSchema.optional(),
+  shareOptions: eventShareOptionsSchema.optional(),
   deletedAt: z.number().nullable().optional().default(null),
   createdAt: z.number(),
   updatedAt: z.number(),
@@ -220,3 +272,8 @@ export type RemoveEventExtraInput = z.infer<typeof removeEventExtraInputSchema>;
 export type ExperienceLayout = z.infer<typeof experienceLayoutSchema>;
 export type EventWelcomeSchema = z.infer<typeof eventWelcomeSchema>;
 export type UpdateEventWelcomeInput = z.infer<typeof updateEventWelcomeSchema>;
+export type EventOutroSchema = z.infer<typeof eventOutroSchema>;
+export type PartialEventOutroInput = z.infer<typeof partialEventOutroSchema>;
+export type EventShareOptionsSchema = z.infer<typeof eventShareOptionsSchema>;
+export type PartialEventShareOptionsInput = z.infer<typeof partialEventShareOptionsSchema>;
+export type ShareSocial = z.infer<typeof shareSocialSchema>;

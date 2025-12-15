@@ -1,7 +1,7 @@
 // Events repository - CRUD operations for events subcollection
 
 import { db } from "@/lib/firebase/admin";
-import type { Event, EventExperienceLink } from "../types/event.types";
+import type { Event, EventExperienceLink, EventOutro, EventShareOptions } from "../types/event.types";
 import { DEFAULT_EVENT_WELCOME } from "../types/event.types";
 import { eventSchema, type UpdateEventWelcomeInput } from "../schemas";
 import { DEFAULT_EVENT_THEME, DEFAULT_EVENT_EXTRAS } from "../constants";
@@ -448,6 +448,74 @@ export async function updateEventWelcome(
   }
   if (welcome.layout !== undefined) {
     updateData["welcome.layout"] = welcome.layout;
+  }
+
+  await eventRef.update(updateData);
+}
+
+// ============================================================================
+// Outro Screen Operations
+// ============================================================================
+
+/**
+ * Update outro configuration (partial update with dot notation)
+ */
+export async function updateEventOutro(
+  projectId: string,
+  eventId: string,
+  outro: Partial<EventOutro>
+): Promise<void> {
+  const eventRef = getEventsCollection(projectId).doc(eventId);
+
+  // Build dot-notation update object
+  const updateData: Record<string, unknown> = {
+    updatedAt: Date.now(),
+  };
+
+  // Only include fields that are explicitly provided
+  if (outro.title !== undefined) {
+    updateData["outro.title"] = outro.title;
+  }
+  if (outro.description !== undefined) {
+    updateData["outro.description"] = outro.description;
+  }
+  if (outro.ctaLabel !== undefined) {
+    updateData["outro.ctaLabel"] = outro.ctaLabel;
+  }
+  if (outro.ctaUrl !== undefined) {
+    updateData["outro.ctaUrl"] = outro.ctaUrl;
+  }
+
+  await eventRef.update(updateData);
+}
+
+/**
+ * Update share options configuration (partial update with dot notation)
+ */
+export async function updateEventShareOptions(
+  projectId: string,
+  eventId: string,
+  shareOptions: Partial<EventShareOptions>
+): Promise<void> {
+  const eventRef = getEventsCollection(projectId).doc(eventId);
+
+  // Build dot-notation update object
+  const updateData: Record<string, unknown> = {
+    updatedAt: Date.now(),
+  };
+
+  // Only include fields that are explicitly provided
+  if (shareOptions.allowDownload !== undefined) {
+    updateData["shareOptions.allowDownload"] = shareOptions.allowDownload;
+  }
+  if (shareOptions.allowSystemShare !== undefined) {
+    updateData["shareOptions.allowSystemShare"] = shareOptions.allowSystemShare;
+  }
+  if (shareOptions.allowEmail !== undefined) {
+    updateData["shareOptions.allowEmail"] = shareOptions.allowEmail;
+  }
+  if (shareOptions.socials !== undefined) {
+    updateData["shareOptions.socials"] = shareOptions.socials;
   }
 
   await eventRef.update(updateData);

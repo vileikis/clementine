@@ -1,7 +1,7 @@
 // Event validation constants - extracted from schemas to avoid magic numbers
 
 import type { Theme } from "@/features/theming";
-import type { EventExtras } from "./types/event.types";
+import type { EventExtras, EventOutro, EventShareOptions } from "./types/event.types";
 
 // Field length constraints
 export const NAME_LENGTH = {
@@ -69,4 +69,20 @@ export const EXTRA_FREQUENCIES = {
 export const DEFAULT_EVENT_EXTRAS: EventExtras = {
   preEntryGate: null,
   preReward: null,
+};
+
+// Default outro configuration (all fields null)
+export const DEFAULT_EVENT_OUTRO: EventOutro = {
+  title: null,
+  description: null,
+  ctaLabel: null,
+  ctaUrl: null,
+};
+
+// Default share options (download and system share enabled, no social platforms)
+export const DEFAULT_EVENT_SHARE_OPTIONS: EventShareOptions = {
+  allowDownload: true,
+  allowSystemShare: true,
+  allowEmail: false,
+  socials: [],
 };
