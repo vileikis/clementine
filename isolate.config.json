@@ -1,0 +1,8 @@
+{
+  "targetPackagePath": "./functions",
+  "buildDirName": "dist",
+  "isolateDirName": "isolate",
+  "forceNpm": true,
+  "includeDevDependencies": false,
+  "logLevel": "info"
+}

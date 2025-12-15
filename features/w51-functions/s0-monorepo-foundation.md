@@ -1,3 +1,7 @@
+# Original PLan
+
+- see ./plan.md
+
 ### Stage 0: Monorepo Foundation (Day 1)
 
 **Goal**: Establish shared packages and deployment infrastructure before any business logic.

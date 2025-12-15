@@ -1,0 +1,8 @@
+{
+  "buildDirName": "dist",
+  "workspaceRoot": "..",
+  "isolateDirName": "isolate",
+  "forceNpm": true,
+  "includeDevDependencies": false,
+  "logLevel": "info"
+}
