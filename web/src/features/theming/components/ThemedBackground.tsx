@@ -1,6 +1,7 @@
 "use client";
 
 import type { CSSProperties, ReactNode } from "react";
+import { cn } from "@/lib/utils";
 import type { ThemeBackground } from "../types";
 
 interface ThemedBackgroundProps {
@@ -10,34 +11,43 @@ interface ThemedBackgroundProps {
   background?: Partial<ThemeBackground>;
   /** CSS font-family to apply to the container */
   fontFamily?: string | null;
-  /** Additional CSS classes */
+  /** Additional CSS classes for the outer container */
   className?: string;
-  /** Additional inline styles for the container */
+  /** Additional inline styles for the outer container */
   style?: CSSProperties;
   /**
-   * Content wrapper className. Set to empty string to disable the default wrapper.
-   * Must include z-10 to stay above background image and overflow-auto for scrolling.
-   * @default "relative z-10 h-full w-full overflow-auto"
+   * Override classes for the content wrapper.
+   * Default provides centered, max-width content with vertical centering.
+   * Pass empty string to disable content wrapper entirely.
    */
   contentClassName?: string;
 }
 
 /**
- * Renders a container with themed background color, optional image, and optional overlay.
+ * Renders a full-height container with themed background and centered content.
  *
- * Consolidates duplicate background rendering code from:
- * - ThemeEditor preview
- * - EventThemeEditor preview
- * - DeviceFrame
+ * Default behavior:
+ * - Outer container: fills available space (flex-1), flex column
+ * - Content: max-width 768px, horizontally centered, vertically centered, scrollable
+ *
+ * Use `contentClassName` to override content wrapper behavior, or pass empty string
+ * to render children directly without a wrapper.
  *
  * @example
  * ```tsx
- * <ThemedBackground
- *   background={theme.background}
- *   fontFamily={theme.fontFamily}
- *   className="min-h-screen"
- * >
+ * // Standard usage - centered content with max-width
+ * <ThemedBackground background={theme.background} fontFamily={theme.fontFamily}>
  *   <PageContent />
+ * </ThemedBackground>
+ *
+ * // Custom content layout
+ * <ThemedBackground contentClassName="p-4">
+ *   <FullWidthContent />
+ * </ThemedBackground>
+ *
+ * // No content wrapper
+ * <ThemedBackground contentClassName="">
+ *   <CustomLayout />
  * </ThemedBackground>
  * ```
  */
@@ -45,17 +55,20 @@ export function ThemedBackground({
   children,
   background,
   fontFamily,
-  className = "",
+  className,
   style,
-  contentClassName = "relative z-10 h-full w-full overflow-auto py-8",
+  contentClassName,
 }: ThemedBackgroundProps) {
   const bgColor = background?.color ?? "#FFFFFF";
   const bgImage = background?.image;
   const overlayOpacity = background?.overlayOpacity ?? 0;
 
+  // Check if content wrapper should be rendered
+  const hasContentWrapper = contentClassName !== "";
+
   return (
     <div
-      className={`relative overflow-hidden flex-1 ${className}`}
+      className={cn("relative flex flex-1 flex-col overflow-hidden", className)}
       style={{
         backgroundColor: bgColor,
         fontFamily: fontFamily ?? undefined,
@@ -78,17 +91,18 @@ export function ThemedBackground({
         />
       )}
 
-      {/* Content - wrap only if contentClassName is provided */}
-      {contentClassName ? (
-        <div className={contentClassName}>
-          {/* Inner centering wrapper: min-h-full ensures it fills container,
-              flex centering works when content fits, scrolls properly when it overflows */}
-          <div className="min-h-full w-full max-w-[800px] mx-auto flex flex-col items-center justify-center">
-            {children}
-          </div>
+      {/* Content wrapper with sensible defaults */}
+      {hasContentWrapper ? (
+        <div
+          className={cn(
+            "relative z-10 flex flex-1 flex-col items-center justify-center overflow-auto px-4 py-8",
+            contentClassName
+          )}
+        >
+          <div className="w-full max-w-3xl">{children}</div>
         </div>
       ) : (
-        children
+        <div className="relative z-10 flex flex-1 flex-col">{children}</div>
       )}
     </div>
   );
