@@ -76,8 +76,9 @@ export function useEvents(projectId: string | null) {
                 ...doc.data(),
               });
               eventsList.push(parsed as Event);
-            } catch {
-              // Skip invalid documents
+            } catch (error) {
+              // Skip invalid documents - validation errors are expected during schema migrations
+              console.error(`Failed to parse event ${doc.id}:`, error);
             }
           }
 

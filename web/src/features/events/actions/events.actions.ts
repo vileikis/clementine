@@ -19,6 +19,7 @@ import {
   updateEventExtra,
   removeEventExtra,
   updateEventWelcome,
+  updateEventOverlay,
 } from "../repositories/events.repository";
 import {
   getProject,
@@ -35,6 +36,7 @@ import {
   updateEventExtraInputSchema,
   removeEventExtraInputSchema,
   updateEventWelcomeSchema,
+  updateEventOverlayInputSchema,
 } from "../schemas";
 import type {
   AddEventExperienceInput,
@@ -976,6 +978,73 @@ export async function updateEventWelcomeAction(
       error: {
         code: "INTERNAL_ERROR",
         message: error instanceof Error ? error.message : "Failed to update welcome screen",
+      },
+    };
+  }
+}
+
+// ============================================================================
+// Overlay Configuration Actions
+// ============================================================================
+
+/**
+ * Update event overlay configuration (partial updates supported)
+ */
+export async function updateEventOverlayAction(
+  projectId: string,
+  eventId: string,
+  data: unknown
+): Promise<ActionResponse<void>> {
+  // Verify admin authentication
+  const auth = await verifyAdminSecret();
+  if (!auth.authorized) {
+    return {
+      success: false,
+      error: {
+        code: "PERMISSION_DENIED",
+        message: auth.error,
+      },
+    };
+  }
+
+  try {
+    // Validate input
+    const validated = updateEventOverlayInputSchema.safeParse(data);
+    if (!validated.success) {
+      return {
+        success: false,
+        error: {
+          code: "VALIDATION_ERROR",
+          message: validated.error.issues[0]?.message ?? "Invalid input",
+        },
+      };
+    }
+
+    // Verify event exists
+    const event = await getEvent(projectId, eventId);
+    if (!event) {
+      return {
+        success: false,
+        error: {
+          code: "EVENT_NOT_FOUND",
+          message: "Event not found",
+        },
+      };
+    }
+
+    // Update the overlay configuration
+    await updateEventOverlay(projectId, eventId, validated.data);
+
+    revalidatePath(`/[companySlug]/${projectId}/${eventId}/overlays`, "page");
+
+    return { success: true, data: undefined };
+  } catch (error) {
+    console.error("updateEventOverlayAction error:", error);
+    return {
+      success: false,
+      error: {
+        code: "INTERNAL_ERROR",
+        message: error instanceof Error ? error.message : "Failed to update overlay configuration",
       },
     };
   }

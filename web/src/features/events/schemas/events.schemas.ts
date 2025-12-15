@@ -16,6 +16,47 @@ export const eventThemeBackgroundSchema = themeBackgroundSchema;
 export const eventThemeSchema = themeSchema;
 
 // ============================================================================
+// Overlay Configuration Schemas
+// ============================================================================
+
+/**
+ * Overlay aspect ratio schema
+ */
+export const overlayAspectRatioSchema = z.enum(["square", "story"]);
+
+/**
+ * Frame entry schema for one aspect ratio
+ */
+export const frameEntrySchema = z.object({
+  enabled: z.boolean(),
+  frameUrl: z.url().nullable(),
+});
+
+/**
+ * Event overlay configuration schema
+ * Flattened structure with optional frame entries
+ */
+export const eventOverlayConfigSchema = z.object({
+  square: frameEntrySchema.optional(),
+  story: frameEntrySchema.optional(),
+});
+
+/**
+ * Update event overlay input schema (for server action)
+ * Supports partial updates for individual aspect ratios
+ */
+export const updateEventOverlayInputSchema = z.object({
+  square: z.object({
+    enabled: z.boolean().optional(),
+    frameUrl: z.url().nullable().optional(),
+  }).optional(),
+  story: z.object({
+    enabled: z.boolean().optional(),
+    frameUrl: z.url().nullable().optional(),
+  }).optional(),
+});
+
+// ============================================================================
 // Welcome Screen Schemas
 // ============================================================================
 
@@ -31,7 +72,7 @@ export const experienceLayoutSchema = z.enum(["list", "grid"]);
 export const eventWelcomeSchema = z.object({
   title: z.string().max(100).nullable().optional(),
   description: z.string().max(500).nullable().optional(),
-  mediaUrl: z.string().url().nullable().optional(),
+  mediaUrl: z.url().nullable().optional(),
   mediaType: z.enum(["image", "video"]).nullable().optional(),
   layout: experienceLayoutSchema,
 });
@@ -42,7 +83,7 @@ export const eventWelcomeSchema = z.object({
 export const updateEventWelcomeSchema = z.object({
   title: z.string().max(100).nullable().optional(),
   description: z.string().max(500).nullable().optional(),
-  mediaUrl: z.string().url().nullable().optional(),
+  mediaUrl: z.url().nullable().optional(),
   mediaType: z.enum(["image", "video"]).nullable().optional(),
   layout: experienceLayoutSchema.optional(),
 });
@@ -92,6 +133,7 @@ export const eventSchema = z.object({
   extras: eventExtrasSchema.default({ preEntryGate: null, preReward: null }),
   theme: eventThemeSchema,
   welcome: eventWelcomeSchema.optional(),
+  overlay: eventOverlayConfigSchema.optional(),
   deletedAt: z.number().nullable().optional().default(null),
   createdAt: z.number(),
   updatedAt: z.number(),
@@ -220,3 +262,4 @@ export type RemoveEventExtraInput = z.infer<typeof removeEventExtraInputSchema>;
 export type ExperienceLayout = z.infer<typeof experienceLayoutSchema>;
 export type EventWelcomeSchema = z.infer<typeof eventWelcomeSchema>;
 export type UpdateEventWelcomeInput = z.infer<typeof updateEventWelcomeSchema>;
+export type UpdateEventOverlayInput = z.infer<typeof updateEventOverlayInputSchema>;
