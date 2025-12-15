@@ -134,8 +134,8 @@ export function useSession({
         await createNewSession(experienceId)
       } catch (e) {
         console.error("Error handling session:", e)
-        // Try to create new session on error
-        await createNewSession(experienceId)
+        const err = e instanceof Error ? e : new Error("Failed to initialize session")
+        setError(err)
       } finally {
         setLoading(false)
       }

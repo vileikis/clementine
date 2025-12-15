@@ -11,8 +11,8 @@ interface WelcomePreviewProps {
   welcome: EventWelcome
   /** Event data for theme and experiences */
   event: Event
-  /** Pre-fetched experience details map */
-  experiencesMap: Map<string, Experience>
+  /** Pre-fetched experience details (plain object for serialization) */
+  experiencesMap: Record<string, Experience>
 }
 
 /**
@@ -53,7 +53,7 @@ function PreviewContent({
 }: {
   welcome: EventWelcome
   event: Event
-  experiencesMap: Map<string, Experience>
+  experiencesMap: Record<string, Experience>
 }) {
   const { theme } = useEventTheme()
 

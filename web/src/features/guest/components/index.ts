@@ -2,7 +2,7 @@
 
 export { BrandThemeProvider } from "./BrandThemeProvider"
 export { LoadingScreen } from "./LoadingScreen"
-export { NoActiveEvent, EmptyEvent } from "./EmptyStates"
+export { NoActiveEvent, EmptyEvent, ErrorScreen } from "./EmptyStates"
 export { ExperienceScreen } from "./ExperienceScreen"
 
 // Welcome screen components

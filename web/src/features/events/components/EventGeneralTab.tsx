@@ -48,8 +48,17 @@ export function EventGeneralTab({ event }: EventGeneralTabProps) {
     () => event.experiences.map((exp) => exp.experienceId),
     [event.experiences]
   );
-  const { experiencesMap, loading: loadingExperiences } =
+  const { experiencesMap: experiencesMapRaw, loading: loadingExperiences } =
     useExperienceDetails(experienceIds);
+
+  // Convert Map to Record for components that expect plain object
+  const experiencesRecord = useMemo(() => {
+    const record: Record<string, (typeof experiencesMapRaw extends Map<string, infer T> ? T : never)> = {};
+    experiencesMapRaw.forEach((exp, id) => {
+      record[id] = exp;
+    });
+    return record;
+  }, [experiencesMapRaw]);
 
   // Handle save - called by useAutoSave
   const handleSave = async (updates: Partial<EventWelcome>) => {
@@ -82,7 +91,7 @@ export function EventGeneralTab({ event }: EventGeneralTabProps) {
         <WelcomeSection form={form} event={event} onBlur={handleBlur} />
         <ExperiencesSection
           event={event}
-          experiencesMap={experiencesMap}
+          experiencesMap={experiencesMapRaw}
           loadingExperiences={loadingExperiences}
         />
         <ExtrasSection event={event} />
@@ -93,7 +102,7 @@ export function EventGeneralTab({ event }: EventGeneralTabProps) {
         <WelcomePreview
           welcome={welcomeValues}
           event={event}
-          experiencesMap={experiencesMap}
+          experiencesMap={experiencesRecord}
         />
       </div>
     </div>
