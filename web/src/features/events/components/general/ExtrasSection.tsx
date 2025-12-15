@@ -64,7 +64,7 @@ export function ExtrasSection({ event }: ExtrasSectionProps) {
   const getSlotData = (slotKey: ExtraSlotKey) => {
     const link = event.extras?.[slotKey];
     const experience = link?.experienceId
-      ? experiencesMap.get(link.experienceId) ?? null
+      ? experiencesMap[link.experienceId] ?? null
       : null;
     return { link, experience };
   };
