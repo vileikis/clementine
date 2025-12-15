@@ -26,10 +26,10 @@ This feature uses pnpm monorepo structure:
 
 **Purpose**: Project initialization and workspace configuration
 
-- [ ] T001 Update pnpm-workspace.yaml to add `packages/*` pattern
-- [ ] T002 [P] Create packages/shared/ directory structure with src/schemas/ folders
-- [ ] T003 [P] Create functions/src/ directory structure
-- [ ] T004 [P] Create functions/scripts/ directory for deploy script
+- [X] T001 Update pnpm-workspace.yaml to add `packages/*` pattern
+- [X] T002 [P] Create packages/shared/ directory structure with src/schemas/ folders
+- [X] T003 [P] Create functions/src/ directory structure
+- [X] T004 [P] Create functions/scripts/ directory for deploy script
 
 ---
 
@@ -39,11 +39,11 @@ This feature uses pnpm monorepo structure:
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T005 Create packages/shared/package.json with @clementine/shared name, zod dependency, and dual ESM/CJS exports
-- [ ] T006 [P] Create packages/shared/tsconfig.json with strict mode and dual output configuration
-- [ ] T007 [P] Create functions/package.json with @clementine/functions name, firebase dependencies, and workspace:* for @clementine/shared
-- [ ] T008 [P] Create functions/tsconfig.json for Node.js target with CommonJS output
-- [ ] T009 Run `pnpm install` to verify workspace resolution and install all dependencies
+- [X] T005 Create packages/shared/package.json with @clementine/shared name, zod dependency, and dual ESM/CJS exports
+- [X] T006 [P] Create packages/shared/tsconfig.json with strict mode and dual output configuration
+- [X] T007 [P] Create functions/package.json with @clementine/functions name, firebase dependencies, and workspace:* for @clementine/shared
+- [X] T008 [P] Create functions/tsconfig.json for Node.js target with CommonJS output
+- [X] T009 Run `pnpm install` to verify workspace resolution and install all dependencies
 
 **Checkpoint**: Foundation ready - workspace configured, dependencies installed
 
@@ -57,15 +57,15 @@ This feature uses pnpm monorepo structure:
 
 ### Implementation for User Story 1
 
-- [ ] T010 [US1] Define inputAssetSchema in packages/shared/src/schemas/session.schemas.ts
-- [ ] T011 [US1] Define processingErrorSchema in packages/shared/src/schemas/session.schemas.ts
-- [ ] T012 [US1] Define processingStateSchema in packages/shared/src/schemas/session.schemas.ts
-- [ ] T013 [US1] Define sessionOutputsSchema in packages/shared/src/schemas/session.schemas.ts
-- [ ] T014 [US1] Define sessionProcessingSchema in packages/shared/src/schemas/session.schemas.ts
-- [ ] T015 [P] [US1] Create barrel export in packages/shared/src/schemas/index.ts
-- [ ] T016 [P] [US1] Create package entry point in packages/shared/src/index.ts
-- [ ] T017 [US1] Build shared package with `pnpm --filter @clementine/shared build`
-- [ ] T018 [US1] Verify type import works in functions by creating functions/src/index.ts with SessionProcessing import
+- [X] T010 [US1] Define inputAssetSchema in packages/shared/src/schemas/session.schemas.ts
+- [X] T011 [US1] Define processingErrorSchema in packages/shared/src/schemas/session.schemas.ts
+- [X] T012 [US1] Define processingStateSchema in packages/shared/src/schemas/session.schemas.ts
+- [X] T013 [US1] Define sessionOutputsSchema in packages/shared/src/schemas/session.schemas.ts
+- [X] T014 [US1] Define sessionProcessingSchema in packages/shared/src/schemas/session.schemas.ts
+- [X] T015 [P] [US1] Create barrel export in packages/shared/src/schemas/index.ts
+- [X] T016 [P] [US1] Create package entry point in packages/shared/src/index.ts
+- [X] T017 [US1] Build shared package with `pnpm --filter @clementine/shared build`
+- [X] T018 [US1] Verify type import works in functions by creating functions/src/index.ts with SessionProcessing import
 
 **Checkpoint**: Shared types package complete and importable from functions workspace
 
@@ -79,13 +79,13 @@ This feature uses pnpm monorepo structure:
 
 ### Implementation for User Story 2
 
-- [ ] T019 [US2] Implement helloWorld HTTP function in functions/src/index.ts using Firebase Functions v2 SDK
-- [ ] T020 [US2] Add shared type usage in helloWorld to verify integration (return mock SessionProcessing data)
-- [ ] T021 [US2] Update firebase.json to add functions configuration (source, codebase, predeploy, ignore)
-- [ ] T022 [US2] Create functions/scripts/deploy.sh with fail-fast behavior (set -e)
-- [ ] T023 [US2] Add build steps to deploy.sh: build shared package, then firebase deploy
-- [ ] T024 [US2] Make deploy.sh executable with chmod +x
-- [ ] T025 [US2] Build functions package with `pnpm --filter @clementine/functions build`
+- [X] T019 [US2] Implement helloWorld HTTP function in functions/src/index.ts using Firebase Functions v2 SDK
+- [X] T020 [US2] Add shared type usage in helloWorld to verify integration (return mock SessionProcessing data)
+- [X] T021 [US2] Update firebase.json to add functions configuration (source, codebase, predeploy, ignore)
+- [X] T022 [US2] Create functions/scripts/deploy.sh with fail-fast behavior (set -e)
+- [X] T023 [US2] Add build steps to deploy.sh: build shared package, then firebase deploy
+- [X] T024 [US2] Make deploy.sh executable with chmod +x
+- [X] T025 [US2] Build functions package with `pnpm --filter @clementine/functions build`
 - [ ] T026 [US2] Deploy functions using ./functions/scripts/deploy.sh
 - [ ] T027 [US2] Verify deployment by curling the helloWorld endpoint URL
 
@@ -101,8 +101,8 @@ This feature uses pnpm monorepo structure:
 
 ### Implementation for User Story 3
 
-- [ ] T028 [US3] Update firebase.json to add functions emulator configuration (port 5001)
-- [ ] T029 [US3] Add serve script to functions/package.json for local development
+- [X] T028 [US3] Update firebase.json to add functions emulator configuration (port 5001)
+- [X] T029 [US3] Add serve script to functions/package.json for local development
 - [ ] T030 [US3] Test local emulator by running `pnpm --filter @clementine/functions serve`
 - [ ] T031 [US3] Verify local endpoint responds correctly via curl to localhost:5001
 
@@ -114,16 +114,16 @@ This feature uses pnpm monorepo structure:
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T032 [P] Add lib/ to functions/.gitignore for compiled output
-- [ ] T033 [P] Update root package.json with functions-related scripts (optional convenience commands)
-- [ ] T034 Review and verify all TypeScript strict mode settings across workspaces
+- [X] T032 [P] Add lib/ to functions/.gitignore for compiled output
+- [X] T033 [P] Update root package.json with functions-related scripts (optional convenience commands)
+- [X] T034 Review and verify all TypeScript strict mode settings across workspaces
 
 ### Validation Loop (REQUIRED - Constitution Principle V)
 
 **Purpose**: Ensure code quality and correctness before merge
 
-- [ ] T035 Run `pnpm --filter @clementine/shared build` and verify no errors
-- [ ] T036 Run `pnpm --filter @clementine/functions build` and verify no errors
+- [X] T035 Run `pnpm --filter @clementine/shared build` and verify no errors
+- [X] T036 Run `pnpm --filter @clementine/functions build` and verify no errors
 - [ ] T037 Verify production endpoint with curl returns expected JSON
 - [ ] T038 Commit changes after validation loop passes cleanly
 
