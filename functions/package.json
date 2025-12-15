@@ -9,7 +9,7 @@
     "clean": "rm -rf lib"
   },
   "engines": {
-    "node": ">=18"
+    "node": "22"
   },
   "dependencies": {
     "@clementine/shared": "workspace:*",

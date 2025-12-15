@@ -23,7 +23,7 @@
       "port": 9199
     },
     "functions": {
-      "port": 5001
+      "port": 5003
     },
     "ui": {
       "enabled": true,
