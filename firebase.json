@@ -11,14 +11,14 @@
   ],
   "functions": [
     {
-      "source": "functions",
+      "source": "functions/isolate",
       "codebase": "default",
       "ignore": [
         "node_modules",
-        ".git",
-        "src",
-        "tsconfig.json",
-        ".deploy"
+        ".git"
+      ],
+      "predeploy": [
+        "cd functions && pnpm build && npx isolate"
       ]
     }
   ],
