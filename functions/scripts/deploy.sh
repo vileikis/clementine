@@ -11,6 +11,9 @@ cd "$ROOT_DIR"
 echo "📦 Building shared package..."
 pnpm --filter @clementine/shared build
 
+echo "📦 Building functions with esbuild..."
+pnpm --filter @clementine/functions build
+
 echo "🔥 Deploying to Firebase..."
 firebase deploy --only functions
 
