@@ -71,12 +71,14 @@ export function useEvents(projectId: string | null) {
 
           for (const doc of snapshot.docs) {
             try {
+              console.log("----doc.data()", doc.id);
               const parsed = eventSchema.parse({
                 id: doc.id,
                 ...doc.data(),
               });
               eventsList.push(parsed as Event);
-            } catch {
+            } catch (error) {
+              console.log("----error", error);
               // Skip invalid documents
             }
           }

@@ -26,8 +26,11 @@ export interface FrameEntry {
  * Frame overlay configuration for an event
  */
 export interface EventOverlayConfig {
-  /** Map of aspect ratio to frame configuration */
-  frames: Record<OverlayAspectRatio, FrameEntry>;
+  /** Frame configurations by aspect ratio (optional to allow partial configurations) */
+  frames: {
+    square?: FrameEntry;
+    story?: FrameEntry;
+  };
 }
 
 /**

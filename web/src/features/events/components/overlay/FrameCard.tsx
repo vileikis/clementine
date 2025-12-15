@@ -1,11 +1,9 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Button } from "@/components/ui/button";
-import { ImageUploadField } from "@/components/shared";
-import { Trash2, CheckCircle2, XCircle } from "lucide-react";
+import { useRef, useState } from "react";
+import { Card } from "@/components/ui/card";
+import { X, Upload } from "lucide-react";
+import { uploadImage } from "@/lib/storage/actions";
 import type { FrameEntry, OverlayAspectRatio } from "../../types/event.types";
 import { OVERLAY_ASPECT_RATIOS } from "../../constants";
 
@@ -16,8 +14,6 @@ interface FrameCardProps {
   frame: FrameEntry;
   /** Callback when frame image is uploaded */
   onFrameUpload: (url: string) => void;
-  /** Callback when enabled state changes */
-  onEnabledChange: (enabled: boolean) => void;
   /** Callback when frame is removed */
   onRemove: () => void;
   /** Disable all interactions (during save) */
@@ -25,108 +21,124 @@ interface FrameCardProps {
 }
 
 /**
- * FrameCard component - Manages frame overlay configuration for one aspect ratio
+ * FrameCard component - Visual frame overlay card with click-to-upload
  *
  * Features:
- * - Upload frame image with ImageUploadField
- * - Enable/disable toggle (preserves URL when disabled)
- * - Remove button (clears URL and disables)
- * - Status indicators (configured/unconfigured)
- *
- * Mobile-first design with touch-friendly controls
+ * - Click anywhere on card to upload
+ * - Shows placeholder in correct aspect ratio (1:1 or 9:16)
+ * - Displays uploaded frame when available
+ * - Hover shows subtle close icon to remove
+ * - Minimal text, visual-first design
  */
 export function FrameCard({
   ratio,
   frame,
   onFrameUpload,
-  onEnabledChange,
   onRemove,
   disabled = false,
 }: FrameCardProps) {
   const aspectInfo = OVERLAY_ASPECT_RATIOS[ratio];
   const hasFrame = Boolean(frame.frameUrl);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleCardClick = () => {
+    if (!disabled && !isUploading) {
+      fileInputRef.current?.click();
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const result = await uploadImage(file, "frames");
+      if (result.success) {
+        onFrameUpload(result.data.url);
+      }
+    } finally {
+      setIsUploading(false);
+      // Reset input so same file can be uploaded again
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
+
+  const handleRemove = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!disabled) {
+      onRemove();
+    }
+  };
 
   return (
-    <Card className={disabled ? "opacity-60" : ""}>
-      <CardHeader>
-        <div className="flex items-start justify-between">
-          <div>
-            <CardTitle className="text-base">
-              {aspectInfo.label} ({aspectInfo.ratio})
-            </CardTitle>
-            <CardDescription className="mt-1">
-              Frame overlay for {aspectInfo.label.toLowerCase()} aspect ratio outputs
-            </CardDescription>
-          </div>
-          {/* Status indicator */}
-          <div className="flex items-center gap-2 text-sm">
-            {hasFrame ? (
-              frame.enabled ? (
-                <div className="flex items-center gap-1 text-green-600">
-                  <CheckCircle2 className="h-4 w-4" />
-                  <span className="hidden sm:inline">Active</span>
-                </div>
-              ) : (
-                <div className="flex items-center gap-1 text-muted-foreground">
-                  <XCircle className="h-4 w-4" />
-                  <span className="hidden sm:inline">Disabled</span>
-                </div>
-              )
-            ) : (
-              <span className="text-muted-foreground text-xs">Not configured</span>
-            )}
-          </div>
+    <div className="space-y-2 w-2xs">
+      <Card
+        className={`relative overflow-hidden transition-all cursor-pointer hover:shadow-md ${
+          disabled ? "opacity-60 cursor-not-allowed" : ""
+        } ${isUploading ? "opacity-50" : ""}`}
+        onClick={handleCardClick}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        {/* Preview container with correct aspect ratio */}
+        <div
+          className="relative w-full bg-muted"
+          style={{ aspectRatio: aspectInfo.cssAspect }}
+        >
+          {/* Frame preview or placeholder */}
+          {hasFrame && frame.frameUrl ? (
+            <>
+              {/* Uploaded frame */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={frame.frameUrl}
+                alt={`${aspectInfo.label} frame`}
+                className="w-full h-full object-contain"
+              />
+              {/* Remove button on hover */}
+              {isHovered && !disabled && !isUploading && (
+                <button
+                  onClick={handleRemove}
+                  className="absolute top-2 right-2 p-1.5 bg-background/80 hover:bg-background rounded-full shadow-md transition-all"
+                  aria-label="Remove frame"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </>
+          ) : (
+            <>
+              {/* Placeholder */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+                <Upload className="h-8 w-8 text-muted-foreground mb-2" />
+                <p className="text-sm text-muted-foreground">
+                  {isUploading ? "Uploading..." : "Click to upload"}
+                </p>
+              </div>
+            </>
+          )}
         </div>
-      </CardHeader>
 
-      <CardContent className="space-y-4">
-        {/* Frame upload */}
-        <ImageUploadField
-          id={`frame-${ratio}`}
-          label="Frame Image"
-          value={frame.frameUrl ?? ""}
-          onChange={onFrameUpload}
-          destination="frames"
-          disabled={disabled}
-          recommendedSize={`Transparent PNG, ${aspectInfo.ratio} aspect ratio recommended`}
+        {/* Hidden file input */}
+        <input
+          ref={fileInputRef}
+          type="file"
           accept="image/png,image/jpeg,image/webp"
+          onChange={handleFileChange}
+          className="hidden"
+          disabled={disabled || isUploading}
         />
+      </Card>
 
-        {/* Enable toggle - only show if frame exists */}
-        {hasFrame && (
-          <div className="flex items-center justify-between pt-2 border-t">
-            <div className="space-y-0.5">
-              <Label htmlFor={`enable-${ratio}`} className="text-sm font-medium">
-                Enable Frame
-              </Label>
-              <p className="text-xs text-muted-foreground">
-                Apply this frame to generated outputs
-              </p>
-            </div>
-            <Switch
-              id={`enable-${ratio}`}
-              checked={frame.enabled}
-              onCheckedChange={onEnabledChange}
-              disabled={disabled}
-            />
-          </div>
-        )}
-
-        {/* Remove button - only show if frame exists */}
-        {hasFrame && (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={onRemove}
-            disabled={disabled}
-            className="w-full text-destructive hover:text-destructive"
-          >
-            <Trash2 className="h-4 w-4 mr-2" />
-            Remove Frame
-          </Button>
-        )}
-      </CardContent>
-    </Card>
+      {/* Label below */}
+      <p className="text-sm text-center text-muted-foreground">
+        {aspectInfo.label} ({aspectInfo.ratio})
+      </p>
+    </div>
   );
 }
