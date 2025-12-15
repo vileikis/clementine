@@ -5,6 +5,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Square, Smartphone } from "lucide-react";
 import type { EventOverlayConfig, OverlayAspectRatio } from "../../types/event.types";
 import { OVERLAY_ASPECT_RATIOS } from "../../constants";
+import Image from "next/image";
 
 interface OverlayPreviewProps {
   /** Current overlay configuration */
@@ -84,11 +85,12 @@ export function OverlayPreview({
         >
           {/* Placeholder/base image */}
           <div className="absolute inset-0 w-full h-full">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <Image
               src={placeholderImage}
               alt="Preview placeholder"
-              className="w-full h-full object-cover"
+              className="absolute z-1 inset-0 w-full h-full object-cover"
+              width={300}
+              height={300}
               onError={(e) => {
                 // Fallback to gray background if placeholder image fails
                 e.currentTarget.style.display = "none";
