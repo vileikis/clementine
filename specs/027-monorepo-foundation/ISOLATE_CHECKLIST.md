@@ -2,66 +2,58 @@
 
 ## Phase 1: Pre-Implementation Setup
 
-- [ ] Review `ISOLATE_PLAN.md` completely
-- [ ] Ensure current code is committed to git (clean working tree)
-- [ ] Verify current build works: `pnpm --filter @clementine/shared build && pnpm --filter @clementine/functions build`
+- [x] Review `ISOLATE_PLAN.md` completely
+- [x] Ensure current code is committed to git (clean working tree)
+- [x] Verify current build works: `pnpm --filter @clementine/shared build && pnpm --filter @clementine/functions build`
 - [ ] Verify local emulators work: `pnpm functions:serve`
 
 ## Phase 2: Package Configuration
 
 ### Update Shared Package
-- [ ] Open `packages/shared/package.json`
-- [ ] Add `"files": ["dist/**/*", "package.json", "README.md"]`
-- [ ] Verify shared package builds: `cd packages/shared && pnpm build`
-- [ ] Commit changes: `git add packages/shared/package.json && git commit -m "Add files field to shared package for isolation"`
+- [x] Open `packages/shared/package.json`
+- [x] Add `"files": ["dist/**/*", "package.json", "README.md"]`
+- [x] Verify shared package builds: `cd packages/shared && pnpm build`
+- [x] Commit changes: `git add packages/shared/package.json && git commit -m "Add files field to shared package for isolation"`
 
 ### Update Functions Package
-- [ ] Open `functions/package.json`
-- [ ] Add `"files": ["dist/**/*", "package.json"]`
-- [ ] Move `"@clementine/shared": "workspace:*"` from `devDependencies` to `dependencies`
-- [ ] Save and verify JSON is valid
-- [ ] Commit changes: `git add functions/package.json && git commit -m "Configure functions package for isolation"`
+- [x] Open `functions/package.json`
+- [x] Add `"files": ["dist/**/*", "package.json"]`
+- [x] Move `"@clementine/shared": "workspace:*"` from `devDependencies` to `dependencies`
+- [x] Save and verify JSON is valid
+- [x] Commit changes: `git add functions/package.json && git commit -m "Configure functions package for isolation"`
 
 ### Install isolate-package
-- [ ] Run `cd functions && pnpm add -D isolate-package`
-- [ ] Verify installation: `cd functions && pnpm list isolate-package`
-- [ ] Commit lockfile: `git add pnpm-lock.yaml && git commit -m "Add isolate-package dependency"`
+- [x] Run `cd functions && pnpm add -D isolate-package`
+- [x] Verify installation: `cd functions && pnpm list isolate-package`
+- [x] Commit lockfile: `git add pnpm-lock.yaml && git commit -m "Add isolate-package dependency"`
 
 ## Phase 3: Isolation Configuration
 
 ### Create Isolation Config
-- [ ] Create new file: `functions/isolate.config.json`
-- [ ] Add configuration:
-  ```json
-  {
-    "outDir": "./isolate",
-    "packageManager": "npm",
-    "includeDevDependencies": false,
-    "logLevel": "info"
-  }
-  ```
-- [ ] Save file
-- [ ] Commit: `git add functions/isolate.config.json && git commit -m "Add isolation configuration"`
+- [x] ~~Create new file: `functions/isolate.config.json`~~ Created `functions/tsconfig.json` instead (required for isolate-package to detect build dir)
+- [x] Add configuration with `outDir: "./dist"` in tsconfig.json
+- [x] Save file
+- [x] Commit: `git add functions/tsconfig.json && git commit -m "Restore proper tsconfig.json with correct outDir"`
 
 ### Update .gitignore
-- [ ] Open `functions/.gitignore`
-- [ ] Add `/isolate` to the file
-- [ ] Save file
-- [ ] Commit: `git add functions/.gitignore && git commit -m "Ignore isolation output directory"`
+- [x] Open `functions/.gitignore`
+- [x] Add `/isolate` to the file
+- [x] Save file
+- [x] Commit: `git add functions/.gitignore && git commit -m "Ignore isolation output directory"`
 
 ## Phase 4: Firebase Configuration
 
 ### Update firebase.json
-- [ ] Open root `firebase.json`
-- [ ] Change `"source": "functions"` to `"source": "functions/isolate"`
-- [ ] Add predeploy hook: `"predeploy": ["cd functions && pnpm build && npx isolate"]`
-- [ ] Remove `.deploy` from ignore list (if present)
-- [ ] Verify JSON is valid
-- [ ] Commit: `git add firebase.json && git commit -m "Configure Firebase to use isolated functions output"`
+- [x] Open root `firebase.json`
+- [x] Change `"source": "functions"` to `"source": "functions/isolate"`
+- [x] Add predeploy hook: `"predeploy": ["cd functions && pnpm build && npx isolate"]`
+- [x] Remove `.deploy` from ignore list (if present)
+- [x] Verify JSON is valid
+- [x] Commit: `git add firebase.json && git commit -m "Configure Firebase to use isolated functions output"`
 
 ### Update Deployment Script
-- [ ] Open `functions/scripts/deploy.sh`
-- [ ] Simplify to:
+- [x] Open `functions/scripts/deploy.sh`
+- [x] Simplify to:
   ```bash
   #!/bin/bash
   set -e
@@ -80,34 +72,34 @@
 
   echo "✅ Deployment complete!"
   ```
-- [ ] Save file
-- [ ] Commit: `git add functions/scripts/deploy.sh && git commit -m "Simplify deployment script - predeploy handles isolation"`
+- [x] Save file
+- [x] Commit: `git add functions/scripts/deploy.sh && git commit -m "Simplify deployment script - predeploy handles isolation"`
 
 ## Phase 5: Local Testing
 
 ### Test Build
-- [ ] Build shared: `pnpm --filter @clementine/shared build`
-- [ ] Verify `packages/shared/dist/` contains files
-- [ ] Build functions: `pnpm --filter @clementine/functions build`
-- [ ] Verify `functions/dist/index.js` exists
+- [x] Build shared: `pnpm --filter @clementine/shared build`
+- [x] Verify `packages/shared/dist/` contains files
+- [x] Build functions: `pnpm --filter @clementine/functions build`
+- [x] Verify `functions/dist/index.js` exists
 
 ### Test Isolation
-- [ ] Run isolation: `cd functions && npx isolate`
-- [ ] Check output: `ls -la functions/isolate/`
-- [ ] Verify `isolate/` contains:
-  - [ ] `dist/index.js`
-  - [ ] `package.json`
-  - [ ] `package-lock.json` (npm format)
-- [ ] Inspect `isolate/package.json`:
-  - [ ] Verify no `workspace:*` protocol
-  - [ ] Verify `@clementine/shared` is listed properly
-- [ ] Check isolation log for errors
+- [x] Run isolation: `pnpm --filter @clementine/functions exec isolate` (note: requires tsconfig.json with outDir)
+- [x] Check output: `ls -la functions/isolate/`
+- [x] Verify `isolate/` contains:
+  - [x] `dist/index.js`
+  - [x] `package.json`
+  - [x] `package-lock.json` (npm format)
+- [x] Inspect `isolate/package.json`:
+  - [x] Verify no `workspace:*` protocol (converted to `file:./packages/shared`)
+  - [x] Verify `@clementine/shared` is listed properly
+- [x] Check isolation log for errors
 
 ### Validate Isolated Package
-- [ ] `cd functions/isolate`
-- [ ] Run `npm install` (should work without errors)
-- [ ] Check `node_modules/@clementine/shared/` exists
-- [ ] Verify shared package contents: `ls -la node_modules/@clementine/shared/dist/`
+- [x] `cd functions/isolate`
+- [x] Run `npm install` (should work without errors)
+- [x] Check `node_modules/@clementine/shared/` exists
+- [x] Verify shared package contents: `ls -la node_modules/@clementine/shared/dist/`
 
 ### Test Local Emulators
 - [ ] Run `pnpm functions:serve` (from root)
