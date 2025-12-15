@@ -129,7 +129,7 @@ export function FrameCard({
         ) : (
           <>
             {/* Placeholder */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-linear-to-br from-gray-100 to-gray-200">
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
               <Upload className="h-8 w-8 text-muted-foreground mb-2" />
               <p className="text-sm text-muted-foreground">
                 {isUploading ? "Uploading..." : "Click to upload"}
