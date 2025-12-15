@@ -1,0 +1,6 @@
+{
+  "outDir": "./isolate",
+  "packageManager": "npm",
+  "includeDevDependencies": false,
+  "logLevel": "info"
+}
