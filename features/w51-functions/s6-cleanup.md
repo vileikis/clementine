@@ -1,3 +1,7 @@
+# Original PLan
+
+- see ./plan.md
+
 ### Stage 6: Production Readiness (Days 12-13)
 
 **Goal**: Monitoring, optimization, and operational tooling.
