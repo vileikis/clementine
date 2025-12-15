@@ -6,6 +6,7 @@ export {
   LoadingScreen,
   NoActiveEvent,
   EmptyEvent,
+  ErrorScreen,
   ExperienceScreen,
   WelcomeContent,
   ExperienceCards,

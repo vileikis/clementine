@@ -7,6 +7,7 @@ import {
   WelcomeContent,
   ExperienceScreen,
   LoadingScreen,
+  ErrorScreen,
   GuestProvider,
   useGuestContext,
 } from "@/features/guest"
@@ -20,8 +21,8 @@ interface JoinPageClientProps {
   projectId: string
   /** Active event data */
   event: Event
-  /** Pre-fetched experience details map */
-  experiencesMap: Map<string, Experience>
+  /** Pre-fetched experience details (plain object for serialization) */
+  experiencesMap: Record<string, Experience>
 }
 
 /**
@@ -91,6 +92,7 @@ function JoinPageContent({
   const {
     session,
     loading: isSessionLoading,
+    error: sessionError,
     createNewSession,
   } = useSession({
     projectId,
@@ -128,7 +130,7 @@ function JoinPageContent({
 
   // Get experience name for display
   const getExperienceName = (expId: string): string => {
-    const experience = experiencesMap.get(expId)
+    const experience = experiencesMap[expId]
     const expLink = event.experiences.find((e) => e.experienceId === expId)
     return expLink?.label || experience?.name || "Experience"
   }
@@ -138,6 +140,15 @@ function JoinPageContent({
     return (
       <LoadingScreen
         message={isSessionLoading ? "Resuming session..." : "Loading..."}
+      />
+    )
+  }
+
+  // Show error screen if session failed
+  if (experienceId && sessionError) {
+    return (
+      <ErrorScreen
+        message={sessionError.message || "Failed to start session. Please try again."}
       />
     )
   }

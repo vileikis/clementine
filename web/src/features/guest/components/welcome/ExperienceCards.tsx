@@ -11,8 +11,8 @@ interface ExperienceCardsProps {
   experiences: EventExperienceLink[]
   /** Layout mode: list (single column) or grid (two columns) */
   layout: ExperienceLayout
-  /** Map of experience details for name and media */
-  experiencesMap?: Map<string, Experience>
+  /** Experience details (plain object for serialization) */
+  experiencesMap?: Record<string, Experience>
   /** Optional click handler for experience selection */
   onExperienceClick?: (experienceId: string) => void
 }
@@ -51,7 +51,7 @@ export function ExperienceCards({
       )}
     >
       {experiences.map((experienceLink) => {
-        const experience = experiencesMap?.get(experienceLink.experienceId)
+        const experience = experiencesMap?.[experienceLink.experienceId]
         return (
           <ExperienceCard
             key={experienceLink.experienceId}

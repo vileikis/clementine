@@ -64,16 +64,16 @@ export default async function JoinPage({ params }: JoinPageProps) {
 
   const event = eventResult.data.event
 
-  // Filter enabled experiences and build experiences map
+  // Filter enabled experiences and build experiences record
   const enabledExperiences = event.experiences.filter((exp) => exp.enabled)
-  const experiencesMap = new Map<string, Experience>()
+  const experiencesMap: Record<string, Experience> = {}
 
   // Fetch experience details for enabled experiences
   await Promise.all(
     enabledExperiences.map(async (expLink) => {
       const experience = await getExperience(expLink.experienceId)
       if (experience) {
-        experiencesMap.set(expLink.experienceId, experience)
+        experiencesMap[expLink.experienceId] = experience
       }
     })
   )
