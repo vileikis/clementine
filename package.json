@@ -12,7 +12,10 @@
     "test": "pnpm --filter web test",
     "fb:deploy": "firebase deploy",
     "fb:deploy:rules": "firebase deploy --only firestore:rules,storage",
-    "fb:deploy:indexes": "firebase deploy --only firestore:indexes"
+    "fb:deploy:indexes": "firebase deploy --only firestore:indexes",
+    "functions:build": "pnpm --filter @clementine/shared build && pnpm --filter @clementine/functions build",
+    "functions:serve": "pnpm --filter @clementine/functions serve",
+    "functions:deploy": "./functions/scripts/deploy.sh"
   },
   "keywords": [
     "ai",
