@@ -61,6 +61,7 @@ function PreviewContent({
     <ThemedBackground
       background={theme.background}
       fontFamily={theme.fontFamily}
+      className="flex h-full w-full"
     >
       <WelcomeContent
         welcome={welcome}
