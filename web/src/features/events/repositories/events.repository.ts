@@ -437,22 +437,20 @@ export async function updateEventWelcome(
     updatedAt: Date.now(),
   };
 
-  // Only include fields that are explicitly provided
-  if (welcome.title !== undefined) {
-    updateData["welcome.title"] = welcome.title;
-  }
-  if (welcome.description !== undefined) {
-    updateData["welcome.description"] = welcome.description;
-  }
-  if (welcome.mediaUrl !== undefined) {
-    updateData["welcome.mediaUrl"] = welcome.mediaUrl;
-  }
-  if (welcome.mediaType !== undefined) {
-    updateData["welcome.mediaType"] = welcome.mediaType;
-  }
-  if (welcome.layout !== undefined) {
-    updateData["welcome.layout"] = welcome.layout;
-  }
+  // Dynamic field mapping (scalable, DRY)
+  const fieldMappings: Record<keyof UpdateEventWelcomeInput, string> = {
+    title: "welcome.title",
+    description: "welcome.description",
+    mediaUrl: "welcome.mediaUrl",
+    mediaType: "welcome.mediaType",
+    layout: "welcome.layout",
+  };
+
+  Object.entries(welcome).forEach(([key, value]) => {
+    if (value !== undefined && fieldMappings[key as keyof UpdateEventWelcomeInput]) {
+      updateData[fieldMappings[key as keyof UpdateEventWelcomeInput]] = value;
+    }
+  });
 
   await eventRef.update(updateData);
 }
@@ -467,7 +465,7 @@ export async function updateEventWelcome(
 export async function updateEventOutro(
   projectId: string,
   eventId: string,
-  outro: Partial<EventOutro> | UpdateEventOutroInput
+  outro: UpdateEventOutroInput
 ): Promise<void> {
   const eventRef = getEventsCollection(projectId).doc(eventId);
 
@@ -476,19 +474,19 @@ export async function updateEventOutro(
     updatedAt: Date.now(),
   };
 
-  // Only include fields that are explicitly provided
-  if (outro.title !== undefined) {
-    updateData["outro.title"] = outro.title;
-  }
-  if (outro.description !== undefined) {
-    updateData["outro.description"] = outro.description;
-  }
-  if (outro.ctaLabel !== undefined) {
-    updateData["outro.ctaLabel"] = outro.ctaLabel;
-  }
-  if (outro.ctaUrl !== undefined) {
-    updateData["outro.ctaUrl"] = outro.ctaUrl;
-  }
+  // Dynamic field mapping (scalable, DRY)
+  const fieldMappings: Record<keyof UpdateEventOutroInput, string> = {
+    title: "outro.title",
+    description: "outro.description",
+    ctaLabel: "outro.ctaLabel",
+    ctaUrl: "outro.ctaUrl",
+  };
+
+  Object.entries(outro).forEach(([key, value]) => {
+    if (value !== undefined && fieldMappings[key as keyof UpdateEventOutroInput]) {
+      updateData[fieldMappings[key as keyof UpdateEventOutroInput]] = value;
+    }
+  });
 
   await eventRef.update(updateData);
 }
@@ -508,19 +506,19 @@ export async function updateEventShareOptions(
     updatedAt: Date.now(),
   };
 
-  // Only include fields that are explicitly provided
-  if (shareOptions.allowDownload !== undefined) {
-    updateData["shareOptions.allowDownload"] = shareOptions.allowDownload;
-  }
-  if (shareOptions.allowSystemShare !== undefined) {
-    updateData["shareOptions.allowSystemShare"] = shareOptions.allowSystemShare;
-  }
-  if (shareOptions.allowEmail !== undefined) {
-    updateData["shareOptions.allowEmail"] = shareOptions.allowEmail;
-  }
-  if (shareOptions.socials !== undefined) {
-    updateData["shareOptions.socials"] = shareOptions.socials;
-  }
+  // Dynamic field mapping (scalable, DRY)
+  const fieldMappings: Record<keyof EventShareOptions, string> = {
+    allowDownload: "shareOptions.allowDownload",
+    allowSystemShare: "shareOptions.allowSystemShare",
+    allowEmail: "shareOptions.allowEmail",
+    socials: "shareOptions.socials",
+  };
+
+  Object.entries(shareOptions).forEach(([key, value]) => {
+    if (value !== undefined && fieldMappings[key as keyof EventShareOptions]) {
+      updateData[fieldMappings[key as keyof EventShareOptions]] = value;
+    }
+  });
 
   await eventRef.update(updateData);
 }
@@ -544,25 +542,25 @@ export async function updateEventOverlay(
     updatedAt: Date.now(),
   };
 
-  // Square frame updates
-  if (data.square !== undefined) {
-    if (data.square.enabled !== undefined) {
-      updateData["overlay.square.enabled"] = data.square.enabled;
-    }
-    if (data.square.frameUrl !== undefined) {
-      updateData["overlay.square.frameUrl"] = data.square.frameUrl;
-    }
-  }
+  // Flattened field mapping for nested structures (clearer than nested loops)
+  const fieldMappings: Record<string, string> = {
+    "square.enabled": "overlay.square.enabled",
+    "square.frameUrl": "overlay.square.frameUrl",
+    "story.enabled": "overlay.story.enabled",
+    "story.frameUrl": "overlay.story.frameUrl",
+  };
 
-  // Story frame updates
-  if (data.story !== undefined) {
-    if (data.story.enabled !== undefined) {
-      updateData["overlay.story.enabled"] = data.story.enabled;
+  // Map nested fields to Firestore dot notation
+  Object.entries(data).forEach(([aspectRatio, aspectData]) => {
+    if (aspectData !== undefined) {
+      Object.entries(aspectData).forEach(([field, value]) => {
+        const mappingKey = `${aspectRatio}.${field}`;
+        if (value !== undefined && fieldMappings[mappingKey]) {
+          updateData[fieldMappings[mappingKey]] = value;
+        }
+      });
     }
-    if (data.story.frameUrl !== undefined) {
-      updateData["overlay.story.frameUrl"] = data.story.frameUrl;
-    }
-  }
+  });
 
   await eventRef.update(updateData);
 }
