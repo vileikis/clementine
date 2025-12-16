@@ -1,28 +1,9 @@
-import { db, FieldValue } from '../../lib/firebase-admin';
+import { db, FieldValue } from './firebase-admin';
 import type {
+  SessionWithProcessing,
   ProcessingState,
   SessionOutputs,
-} from '../../lib/schemas/media-pipeline.schema';
-
-/**
- * Session document structure (partial - only fields we need)
- */
-export interface Session {
-  id: string;
-  projectId: string;
-  eventId: string;
-  companyId: string;
-  inputAssets: Array<{
-    url: string;
-    filename: string;
-    mimeType: string;
-    sizeBytes: number;
-    uploadedAt: Date;
-  }>;
-  processing?: ProcessingState;
-  outputs?: SessionOutputs;
-  createdAt: Date;
-}
+} from '@clementine/shared';
 
 /**
  * Fetch session document from Firestore
@@ -32,7 +13,7 @@ export interface Session {
  */
 export async function fetchSession(
   sessionId: string
-): Promise<Session | null> {
+): Promise<SessionWithProcessing | null> {
   const doc = await db.collection('sessions').doc(sessionId).get();
 
   if (!doc.exists) {
@@ -47,7 +28,7 @@ export async function fetchSession(
   return {
     id: doc.id,
     ...data,
-  } as Session;
+  } as SessionWithProcessing;
 }
 
 /**
@@ -62,13 +43,17 @@ export async function markSessionPending(
   attemptNumber: number,
   taskId?: string
 ): Promise<void> {
-  const processingState: ProcessingState = {
+  const processingState: Partial<ProcessingState> = {
     state: 'pending',
-    startedAt: new Date(),
-    updatedAt: new Date(),
+    currentStep: 'pending',
+    startedAt: Date.now(),
+    updatedAt: Date.now(),
     attemptNumber,
-    taskId,
   };
+
+  if (taskId) {
+    processingState.taskId = taskId;
+  }
 
   await db.collection('sessions').doc(sessionId).update({
     processing: processingState,
@@ -165,6 +150,6 @@ export async function updateProcessingStep(
  * @param session - Session document
  * @returns True if session is being processed
  */
-export function isSessionProcessing(session: Session): boolean {
+export function isSessionProcessing(session: SessionWithProcessing): boolean {
   return session.processing?.state === 'running';
 }

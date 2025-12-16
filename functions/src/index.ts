@@ -15,7 +15,10 @@ export const helloWorld = onRequest(
     inputAssets: [
       {
         url: "https://storage.googleapis.com/test/image.jpg",
-        type: "image",
+        filename: "image.jpg",
+        mimeType: "image/jpeg",
+        sizeBytes: 1024,
+        uploadedAt: Date.now(),
       },
     ],
   }

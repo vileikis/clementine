@@ -1,11 +1,10 @@
 import { onRequest } from 'firebase-functions/v2/https';
-import { onTaskDispatched } from 'firebase-functions/v2/tasks';
 import { processMediaRequestSchema } from '../lib/schemas/media-pipeline.schema';
 import {
   fetchSession,
   isSessionProcessing,
   markSessionPending,
-} from '../services/media-pipeline/session';
+} from '../lib/session';
 
 /**
  * HTTP Cloud Function endpoint to queue media processing jobs

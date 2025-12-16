@@ -5,13 +5,13 @@ import {
   markSessionRunning,
   markSessionFailed,
   updateSessionOutputs,
-} from '../services/media-pipeline/session';
+} from '../lib/session';
 import {
   processSingleImage,
   processGIF,
   processVideo,
-} from '../services/media-pipeline/pipeline';
-import { detectOutputFormat } from '../services/media-pipeline/config';
+  detectOutputFormat,
+} from '../services/media-pipeline';
 
 /**
  * Cloud Task handler for async media processing

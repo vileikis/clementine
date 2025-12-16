@@ -1,6 +1,5 @@
-import { storage } from '../../lib/firebase-admin';
+import { storage } from './firebase-admin';
 import * as fs from 'fs/promises';
-import * as path from 'path';
 
 /**
  * Download a file from Firebase Storage to local filesystem
