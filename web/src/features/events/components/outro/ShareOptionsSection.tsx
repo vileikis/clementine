@@ -62,8 +62,8 @@ export function ShareOptionsSection({ form, onBlur }: ShareOptionsSectionProps) 
         </p>
       </div>
 
-      {/* Form fields */}
-      <div className="space-y-6" onBlur={onBlur}>
+      {/* Form fields - saves on interaction only, not on blur */}
+      <div className="space-y-6">
         {/* Download toggle */}
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
