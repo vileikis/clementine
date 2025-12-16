@@ -83,7 +83,9 @@ function UndeterminedPrompt({
 /**
  * Permission prompt for denied state - user has blocked camera access
  */
+
 function DeniedPrompt({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   labels,
 }: {
   labels: Required<CameraCaptureLabels>;

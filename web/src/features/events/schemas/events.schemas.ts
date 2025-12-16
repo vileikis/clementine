@@ -70,11 +70,11 @@ export const experienceLayoutSchema = z.enum(["list", "grid"]);
  * Note: layout is required; use DEFAULT_EVENT_WELCOME for default values
  */
 export const eventWelcomeSchema = z.object({
-  title: z.string().max(100).nullable().optional(),
-  description: z.string().max(500).nullable().optional(),
-  mediaUrl: z.url().nullable().optional(),
-  mediaType: z.enum(["image", "video"]).nullable().optional(),
-  layout: experienceLayoutSchema,
+  title: z.string().max(100).nullable().default("Choose your experience"),
+  description: z.string().max(500).nullable().default(null),
+  mediaUrl: z.url().nullable().default(null),
+  mediaType: z.enum(["image", "video"]).nullable().default(null),
+  layout: experienceLayoutSchema.default("list"),
 });
 
 /**
@@ -87,6 +87,63 @@ export const updateEventWelcomeSchema = z.object({
   mediaType: z.enum(["image", "video"]).nullable().optional(),
   layout: experienceLayoutSchema.optional(),
 });
+
+// ============================================================================
+// Outro Screen Schemas
+// ============================================================================
+
+/**
+ * Share social platform schema (reused from steps)
+ */
+export const shareSocialSchema = z.enum([
+  "instagram",
+  "facebook",
+  "twitter",
+  "linkedin",
+  "tiktok",
+  "whatsapp",
+]);
+
+/**
+ * Event outro screen configuration schema
+ * Uses .default(null) to handle partial Firestore documents gracefully
+ */
+export const eventOutroSchema = z.object({
+  title: z.string().max(100).nullable().default(null),
+  description: z.string().max(500).nullable().default(null),
+  ctaLabel: z.string().max(50).nullable().default(null),
+  ctaUrl: z.url().nullable().default(null),
+});
+
+/**
+ * Update event outro schema for server action (partial updates)
+ */
+export const updateEventOutroSchema = z.object({
+  title: z.string().max(100).nullable().optional(),
+  description: z.string().max(500).nullable().optional(),
+  ctaLabel: z.string().max(50).nullable().optional(),
+  ctaUrl: z.url().nullable().optional(),
+});
+
+/**
+ * Event share options configuration schema
+ * Uses .default() to handle partial Firestore documents gracefully
+ */
+export const eventShareOptionsSchema = z.object({
+  allowDownload: z.boolean().default(true),
+  allowSystemShare: z.boolean().default(true),
+  allowEmail: z.boolean().default(false),
+  socials: z.array(shareSocialSchema).default([]),
+});
+
+/**
+ * Partial event share options schema for updates
+ */
+export const partialEventShareOptionsSchema = eventShareOptionsSchema.partial();
+
+// ============================================================================
+// Extras Schemas
+// ============================================================================
 
 /**
  * Frequency options for extra slots
@@ -133,6 +190,8 @@ export const eventSchema = z.object({
   extras: eventExtrasSchema.default({ preEntryGate: null, preReward: null }),
   theme: eventThemeSchema,
   welcome: eventWelcomeSchema.optional(),
+  outro: eventOutroSchema.optional(),
+  shareOptions: eventShareOptionsSchema.optional(),
   overlay: eventOverlayConfigSchema.optional(),
   deletedAt: z.number().nullable().optional().default(null),
   createdAt: z.number(),
@@ -262,4 +321,9 @@ export type RemoveEventExtraInput = z.infer<typeof removeEventExtraInputSchema>;
 export type ExperienceLayout = z.infer<typeof experienceLayoutSchema>;
 export type EventWelcomeSchema = z.infer<typeof eventWelcomeSchema>;
 export type UpdateEventWelcomeInput = z.infer<typeof updateEventWelcomeSchema>;
+export type EventOutroSchema = z.infer<typeof eventOutroSchema>;
+export type UpdateEventOutroInput = z.infer<typeof updateEventOutroSchema>;
+export type EventShareOptionsSchema = z.infer<typeof eventShareOptionsSchema>;
+export type PartialEventShareOptionsInput = z.infer<typeof partialEventShareOptionsSchema>;
+export type ShareSocial = z.infer<typeof shareSocialSchema>;
 export type UpdateEventOverlayInput = z.infer<typeof updateEventOverlayInputSchema>;

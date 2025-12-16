@@ -97,7 +97,7 @@ export function WelcomeContent({
         <div className="mt-2">
           <ExperienceCards
             experiences={enabledExperiences}
-            layout={welcome.layout}
+            layout={welcome.layout ?? "list"}
             experiencesMap={experiencesMap}
             onExperienceClick={onExperienceClick}
           />

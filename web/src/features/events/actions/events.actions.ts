@@ -19,6 +19,8 @@ import {
   updateEventExtra,
   removeEventExtra,
   updateEventWelcome,
+  updateEventOutro,
+  updateEventShareOptions,
   updateEventOverlay,
 } from "../repositories/events.repository";
 import {
@@ -36,6 +38,8 @@ import {
   updateEventExtraInputSchema,
   removeEventExtraInputSchema,
   updateEventWelcomeSchema,
+  updateEventOutroSchema,
+  partialEventShareOptionsSchema,
   updateEventOverlayInputSchema,
 } from "../schemas";
 import type {
@@ -978,6 +982,136 @@ export async function updateEventWelcomeAction(
       error: {
         code: "INTERNAL_ERROR",
         message: error instanceof Error ? error.message : "Failed to update welcome screen",
+      },
+    };
+  }
+}
+
+// ============================================================================
+// Outro Screen Operations
+// ============================================================================
+
+/**
+ * Update event outro configuration
+ */
+export async function updateEventOutroAction(
+  projectId: string,
+  eventId: string,
+  data: unknown
+): Promise<ActionResponse<void>> {
+  // Verify admin authentication
+  const auth = await verifyAdminSecret();
+  if (!auth.authorized) {
+    return {
+      success: false,
+      error: {
+        code: "PERMISSION_DENIED",
+        message: auth.error,
+      },
+    };
+  }
+
+  try {
+    // Validate input
+    const validated = updateEventOutroSchema.safeParse(data);
+    if (!validated.success) {
+      return {
+        success: false,
+        error: {
+          code: "VALIDATION_ERROR",
+          message: validated.error.issues[0]?.message ?? "Invalid input",
+        },
+      };
+    }
+
+    // Verify event exists
+    const event = await getEvent(projectId, eventId);
+    if (!event) {
+      return {
+        success: false,
+        error: {
+          code: "EVENT_NOT_FOUND",
+          message: "Event not found",
+        },
+      };
+    }
+
+    // Update the outro configuration
+    await updateEventOutro(projectId, eventId, validated.data);
+
+    revalidatePath(`/[companySlug]/${projectId}/${eventId}`, "page");
+
+    return { success: true, data: undefined };
+  } catch (error) {
+    console.error("updateEventOutroAction error:", error);
+    return {
+      success: false,
+      error: {
+        code: "INTERNAL_ERROR",
+        message: error instanceof Error ? error.message : "Failed to update outro configuration",
+      },
+    };
+  }
+}
+
+/**
+ * Update event share options configuration
+ */
+export async function updateEventShareOptionsAction(
+  projectId: string,
+  eventId: string,
+  data: unknown
+): Promise<ActionResponse<void>> {
+  // Verify admin authentication
+  const auth = await verifyAdminSecret();
+  if (!auth.authorized) {
+    return {
+      success: false,
+      error: {
+        code: "PERMISSION_DENIED",
+        message: auth.error,
+      },
+    };
+  }
+
+  try {
+    // Validate input
+    const validated = partialEventShareOptionsSchema.safeParse(data);
+    if (!validated.success) {
+      return {
+        success: false,
+        error: {
+          code: "VALIDATION_ERROR",
+          message: validated.error.issues[0]?.message ?? "Invalid input",
+        },
+      };
+    }
+
+    // Verify event exists
+    const event = await getEvent(projectId, eventId);
+    if (!event) {
+      return {
+        success: false,
+        error: {
+          code: "EVENT_NOT_FOUND",
+          message: "Event not found",
+        },
+      };
+    }
+
+    // Update the share options configuration
+    await updateEventShareOptions(projectId, eventId, validated.data);
+
+    revalidatePath(`/[companySlug]/${projectId}/${eventId}`, "page");
+
+    return { success: true, data: undefined };
+  } catch (error) {
+    console.error("updateEventShareOptionsAction error:", error);
+    return {
+      success: false,
+      error: {
+        code: "INTERNAL_ERROR",
+        message: error instanceof Error ? error.message : "Failed to update share options",
       },
     };
   }
