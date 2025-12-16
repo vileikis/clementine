@@ -28,7 +28,6 @@ export function EventDetailsHeader({
   companySlug,
   projectId,
   event,
-  projectName,
 }: EventDetailsHeaderProps) {
   const pathname = usePathname();
   const [isRenameOpen, setIsRenameOpen] = useState(false);
