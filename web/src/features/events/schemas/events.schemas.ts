@@ -70,11 +70,11 @@ export const experienceLayoutSchema = z.enum(["list", "grid"]);
  * Note: layout is required; use DEFAULT_EVENT_WELCOME for default values
  */
 export const eventWelcomeSchema = z.object({
-  title: z.string().max(100).nullable().optional(),
-  description: z.string().max(500).nullable().optional(),
-  mediaUrl: z.url().nullable().optional(),
-  mediaType: z.enum(["image", "video"]).nullable().optional(),
-  layout: experienceLayoutSchema,
+  title: z.string().max(100).nullable().default("Choose your experience"),
+  description: z.string().max(500).nullable().default(null),
+  mediaUrl: z.url().nullable().default(null),
+  mediaType: z.enum(["image", "video"]).nullable().default(null),
+  layout: experienceLayoutSchema.default("list"),
 });
 
 /**
@@ -106,12 +106,13 @@ export const shareSocialSchema = z.enum([
 
 /**
  * Event outro screen configuration schema
+ * Uses .default(null) to handle partial Firestore documents gracefully
  */
 export const eventOutroSchema = z.object({
-  title: z.string().max(100).nullable().optional(),
-  description: z.string().max(500).nullable().optional(),
-  ctaLabel: z.string().max(50).nullable().optional(),
-  ctaUrl: z.string().url().nullable().optional(),
+  title: z.string().max(100).nullable().optional().default(null),
+  description: z.string().max(500).nullable().optional().default(null),
+  ctaLabel: z.string().max(50).nullable().optional().default(null),
+  ctaUrl: z.string().url().nullable().optional().default(null),
 });
 
 /**
@@ -121,12 +122,13 @@ export const partialEventOutroSchema = eventOutroSchema.partial();
 
 /**
  * Event share options configuration schema
+ * Uses .default() to handle partial Firestore documents gracefully
  */
 export const eventShareOptionsSchema = z.object({
-  allowDownload: z.boolean(),
-  allowSystemShare: z.boolean(),
-  allowEmail: z.boolean(),
-  socials: z.array(shareSocialSchema),
+  allowDownload: z.boolean().default(true),
+  allowSystemShare: z.boolean().default(true),
+  allowEmail: z.boolean().default(false),
+  socials: z.array(shareSocialSchema).default([]),
 });
 
 /**
