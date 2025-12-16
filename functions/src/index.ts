@@ -31,3 +31,9 @@ export const helloWorld = onRequest(
     timestamp: new Date().toISOString(),
   })
 })
+
+/**
+ * Media Processing Pipeline
+ */
+export { processMedia } from './http/processMedia'
+export { processMediaJob } from './tasks/processMediaJob'

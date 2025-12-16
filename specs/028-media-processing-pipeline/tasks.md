@@ -25,9 +25,9 @@
 
 **Purpose**: Initialize Cloud Functions workspace and install dependencies
 
-- [ ] T001 Install FFmpeg dependencies in functions/package.json (fluent-ffmpeg@^2.1.2, ffmpeg-static@^5.2.0, tmp@^0.2.3)
-- [ ] T002 [P] Create Firebase Admin SDK initialization in functions/src/lib/firebase-admin.ts
-- [ ] T003 [P] Create Zod validation schemas in functions/src/lib/schemas/media-pipeline.schema.ts
+- [X] T001 Install FFmpeg dependencies in functions/package.json (fluent-ffmpeg@^2.1.2, ffmpeg-static@^5.2.0, tmp@^0.2.3)
+- [X] T002 [P] Create Firebase Admin SDK initialization in functions/src/lib/firebase-admin.ts
+- [X] T003 [P] Create Zod validation schemas in functions/src/lib/schemas/media-pipeline.schema.ts
 
 ---
 
@@ -37,13 +37,13 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T004 Create media-pipeline service structure in functions/src/services/media-pipeline/
-- [ ] T005 [P] Implement pipeline configuration logic in functions/src/services/media-pipeline/config.ts (aspect ratio mapping, format detection)
-- [ ] T006 [P] Implement Storage operations in functions/src/services/media-pipeline/storage.ts (download inputAssets, upload outputs with public URLs)
-- [ ] T007 [P] Implement session state management in functions/src/services/media-pipeline/session.ts (fetch, mark pending/running/failed, update outputs, cleanup processing field)
-- [ ] T008 Create FFmpeg wrapper with error handling in functions/src/services/media-pipeline/ffmpeg.ts (promise wrapper, timeout, categorized errors, temp file management)
-- [ ] T009 Create HTTP Cloud Function endpoint in functions/src/http/processMedia.ts (validate request, check session exists, check not already processing, queue Cloud Task)
-- [ ] T010 Create Cloud Task handler in functions/src/tasks/processMediaJob.ts (extract payload, mark session running, orchestrate pipeline, handle errors)
+- [X] T004 Create media-pipeline service structure in functions/src/services/media-pipeline/
+- [X] T005 [P] Implement pipeline configuration logic in functions/src/services/media-pipeline/config.ts (aspect ratio mapping, format detection)
+- [X] T006 [P] Implement Storage operations in functions/src/services/media-pipeline/storage.ts (download inputAssets, upload outputs with public URLs)
+- [X] T007 [P] Implement session state management in functions/src/services/media-pipeline/session.ts (fetch, mark pending/running/failed, update outputs, cleanup processing field)
+- [X] T008 Create FFmpeg wrapper with error handling in functions/src/services/media-pipeline/ffmpeg.ts (promise wrapper, timeout, categorized errors, temp file management)
+- [X] T009 Create HTTP Cloud Function endpoint in functions/src/http/processMedia.ts (validate request, check session exists, check not already processing, queue Cloud Task)
+- [X] T010 Create Cloud Task handler in functions/src/tasks/processMediaJob.ts (extract payload, mark session running, orchestrate pipeline, handle errors)
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
