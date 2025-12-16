@@ -25,7 +25,7 @@
 
 **Purpose**: Initialize Cloud Functions workspace and install dependencies
 
-- [ ] T001 Install FFmpeg dependencies in functions/package.json (fluent-ffmpeg@^2.1.2, ffmpeg-static@^5.2.0, tmp-promise@^3.0.3)
+- [ ] T001 Install FFmpeg dependencies in functions/package.json (fluent-ffmpeg@^2.1.2, ffmpeg-static@^5.2.0, tmp@^0.2.3)
 - [ ] T002 [P] Create Firebase Admin SDK initialization in functions/src/lib/firebase-admin.ts
 - [ ] T003 [P] Create Zod validation schemas in functions/src/lib/schemas/media-pipeline.schema.ts
 

@@ -779,20 +779,26 @@ const generateResponsiveThumbnails = async (inputPath, outputDir) => {
 
 ## 7. Temp File Management (/tmp Directory)
 
-### Decision: tmp-promise Package with Graceful Cleanup
+### Decision: tmp Package with util.promisify
 
 **Selected Approach:**
-Use `tmp-promise` package for automatic temporary file management with graceful cleanup on process exit, combined with explicit cleanup in try-finally blocks for reliability in Cloud Functions.
+Use `tmp` package with Node.js built-in `util.promisify` for automatic temporary file management with graceful cleanup on process exit, combined with explicit cleanup in try-finally blocks for reliability in Cloud Functions.
 
 ### Rationale
 
-1. **Automatic Cleanup**: `tmp-promise` automatically removes temp files on process exit
-2. **Graceful Handling**: `setGracefulCleanup()` ensures cleanup even on uncaught exceptions
-3. **Promise-Based**: Async/await support matches modern Node.js patterns
-4. **Disposer Pattern**: Built-in disposers make cleanup code cleaner
+1. **Automatic Cleanup**: `tmp` automatically removes temp files on process exit via `setGracefulCleanup()`
+2. **Actively Maintained**: More recent updates than tmp-promise wrapper
+3. **Promise-Based**: Use Node.js `util.promisify` for async/await support (built-in, no wrapper dependency)
+4. **Graceful Handling**: `setGracefulCleanup()` ensures cleanup even on uncaught exceptions
 5. **Cloud Functions Safe**: Handles warm container scenarios where /tmp persists
+6. **No Extra Dependencies**: One less package to maintain (no wrapper)
 
 ### Alternatives Considered
+
+**tmp-promise Package:**
+- Pros: Ready-made promise API, disposer pattern
+- Cons: Last updated 4 years ago (2021), adds wrapper dependency
+- Verdict: Unnecessary when Node.js has built-in `util.promisify`
 
 **Manual fs.unlink:**
 - Pros: No dependencies, full control
@@ -802,7 +808,7 @@ Use `tmp-promise` package for automatic temporary file management with graceful 
 **temp Package:**
 - Pros: Automatic cleanup, track files
 - Cons: Callback-based API (older pattern), less active maintenance
-- Verdict: tmp-promise is better for modern async/await code
+- Verdict: tmp is better maintained and more widely used
 
 **No Cleanup (Rely on Cold Starts):**
 - Pros: Simplest implementation
@@ -818,45 +824,50 @@ Use `tmp-promise` package for automatic temporary file management with graceful 
 
 **Installation:**
 ```bash
-npm install tmp-promise
+npm install tmp
 ```
 
 **Basic Setup:**
 
 ```javascript
-const tmp = require('tmp-promise');
+const tmp = require('tmp');
+const { promisify } = require('util');
+
+// Promisify the callback-based API
+const tmpFile = promisify(tmp.file);
+const tmpDir = promisify(tmp.dir);
 
 // Enable automatic cleanup on process exit
 tmp.setGracefulCleanup();
 ```
 
-**Pattern 1: Automatic Cleanup with Disposer (Recommended):**
+**Pattern 1: Temp File with Cleanup (Recommended):**
 
 ```javascript
 const processMedia = async (inputBuffer) => {
-  // Create temp file that auto-cleans when disposed
-  return tmp.file({ postfix: '.jpg' }).then(async (tmpFile) => {
-    try {
-      // Write input
-      await fs.promises.writeFile(tmpFile.path, inputBuffer);
+  // Create temp file
+  const tmpFileObj = await tmpFile({ postfix: '.jpg' });
 
-      // Process with FFmpeg
-      const outputPath = `${tmpFile.path}-output.jpg`;
-      await runFFmpegCommand(tmpFile.path, outputPath);
+  try {
+    // Write input
+    await fs.promises.writeFile(tmpFileObj.path, inputBuffer);
 
-      // Read output
-      const outputBuffer = await fs.promises.readFile(outputPath);
+    // Process with FFmpeg
+    const outputPath = `${tmpFileObj.path}-output.jpg`;
+    await runFFmpegCommand(tmpFileObj.path, outputPath);
 
-      // Manual cleanup of additional files
-      await fs.promises.unlink(outputPath);
+    // Read output
+    const outputBuffer = await fs.promises.readFile(outputPath);
 
-      return outputBuffer;
+    // Manual cleanup of additional files
+    await fs.promises.unlink(outputPath);
 
-    } finally {
-      // tmpFile.cleanup() is automatically called
-      await tmpFile.cleanup();
-    }
-  });
+    return outputBuffer;
+
+  } finally {
+    // Cleanup temp file
+    tmpFileObj.cleanup();
+  }
 };
 ```
 
@@ -864,19 +875,20 @@ const processMedia = async (inputBuffer) => {
 
 ```javascript
 const processMultipleFrames = async (frameBuffers) => {
-  const tmpDir = await tmp.dir({ unsafeCleanup: true }); // unsafeCleanup removes non-empty dirs
+  // Create temp directory (unsafeCleanup removes non-empty dirs)
+  const tmpDirObj = await tmpDir({ unsafeCleanup: true });
 
   try {
     // Write all frames
     const framePaths = await Promise.all(
       frameBuffers.map((buffer, i) => {
-        const path = `${tmpDir.path}/frame-${i.toString().padStart(3, '0')}.jpg`;
+        const path = `${tmpDirObj.path}/frame-${i.toString().padStart(3, '0')}.jpg`;
         return fs.promises.writeFile(path, buffer).then(() => path);
       })
     );
 
     // Process with FFmpeg
-    const outputPath = `${tmpDir.path}/output.gif`;
+    const outputPath = `${tmpDirObj.path}/output.gif`;
     await generateGIF(framePaths, outputPath);
 
     // Read output
@@ -886,7 +898,7 @@ const processMultipleFrames = async (frameBuffers) => {
 
   } finally {
     // Clean up entire directory
-    await tmpDir.cleanup();
+    tmpDirObj.cleanup();
   }
 };
 ```
@@ -990,27 +1002,31 @@ const processAndUploadStream = async (inputBuffer, storagePath) => {
 **Complete Example (Recommended Pattern):**
 
 ```javascript
-const tmp = require('tmp-promise');
+const tmp = require('tmp');
+const { promisify } = require('util');
 const fs = require('fs').promises;
+
+// Promisify tmp methods
+const tmpDir = promisify(tmp.dir);
 
 // Initialize at module level
 tmp.setGracefulCleanup();
 
 const processMediaPipeline = async (inputBuffer) => {
   // Create temp directory for all intermediate files
-  const tmpDir = await tmp.dir({ unsafeCleanup: true });
+  const tmpDirObj = await tmpDir({ unsafeCleanup: true });
 
   try {
     // 1. Write input
-    const inputPath = `${tmpDir.path}/input.jpg`;
+    const inputPath = `${tmpDirObj.path}/input.jpg`;
     await fs.writeFile(inputPath, inputBuffer);
 
     // 2. Process full-size image
-    const scaledPath = `${tmpDir.path}/scaled.jpg`;
+    const scaledPath = `${tmpDirObj.path}/scaled.jpg`;
     await scaleImage(inputPath, scaledPath);
 
     // 3. Generate thumbnail
-    const thumbPath = `${tmpDir.path}/thumb.jpg`;
+    const thumbPath = `${tmpDirObj.path}/thumb.jpg`;
     await generateThumbnail(inputPath, thumbPath);
 
     // 4. Read outputs
@@ -1027,10 +1043,8 @@ const processMediaPipeline = async (inputBuffer) => {
 
   } finally {
     // Cleanup happens automatically via unsafeCleanup
-    await tmpDir.cleanup().catch(err => {
-      console.warn('Cleanup warning:', err);
-      // Don't throw - cleanup failures shouldn't fail the function
-    });
+    tmpDirObj.cleanup();
+    // Note: cleanup is synchronous in tmp package
   }
 };
 ```
@@ -1064,9 +1078,9 @@ const logTmpUsage = async () => {
 ```
 
 **Sources:**
-- [tmp-promise - npm](https://www.npmjs.com/package/tmp-promise)
-- [tmp-promise - GitHub](https://github.com/benjamingr/tmp-promise)
 - [tmp - npm](https://www.npmjs.com/package/tmp)
+- [tmp - GitHub](https://github.com/raszi/node-tmp)
+- [Node.js util.promisify documentation](https://nodejs.org/api/util.html#utilpromisifyoriginal)
 - [How to clean up /tmp files after cloud function sends response - AppLoveWorld](https://www.appsloveworld.com/google-cloud-platform/48/how-to-clean-up-tmp-files-after-cloud-function-sends-response)
 - [Secure tempfiles in NodeJS without dependencies - Advanced Web Machinery](https://advancedweb.hu/secure-tempfiles-in-nodejs-without-dependencies/)
 
@@ -1649,10 +1663,12 @@ await processWithProgress(input, output, (progress) => {
   "dependencies": {
     "fluent-ffmpeg": "^2.1.2",
     "ffmpeg-static": "^5.2.0",
-    "tmp-promise": "^3.0.3"
+    "tmp": "^0.2.3"
   }
 }
 ```
+
+**Note**: Use Node.js built-in `util.promisify` for promise-based API (no need for tmp-promise wrapper).
 
 ### Quick Command Reference
 
@@ -1732,9 +1748,10 @@ ffmpeg()
 
 ### Memory Management Checklist
 
-- [ ] Use tmp-promise for automatic cleanup
-- [ ] Call setGracefulCleanup() at module init
-- [ ] Use unsafeCleanup for temp directories
+- [ ] Use tmp package with util.promisify for automatic cleanup
+- [ ] Call tmp.setGracefulCleanup() at module init
+- [ ] Use unsafeCleanup option for temp directories
+- [ ] Always call cleanup() in finally blocks
 - [ ] Validate output files before returning
 - [ ] Stream large files when possible
 - [ ] Limit parallel operations
