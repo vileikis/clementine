@@ -1,7 +1,7 @@
 // Events repository - CRUD operations for events subcollection
 
 import { db } from "@/lib/firebase/admin";
-import type { Event, EventExperienceLink, EventOutro, EventShareOptions } from "../types/event.types";
+import type { Event, EventExperienceLink, EventShareOptions } from "../types/event.types";
 import { DEFAULT_EVENT_WELCOME } from "../types/event.types";
 import { eventSchema, type UpdateEventWelcomeInput, type UpdateEventOutroInput, type UpdateEventOverlayInput } from "../schemas";
 import { DEFAULT_EVENT_THEME, DEFAULT_EVENT_EXTRAS, DEFAULT_EVENT_OVERLAY } from "../constants";

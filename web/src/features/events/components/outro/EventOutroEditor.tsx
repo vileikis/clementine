@@ -1,6 +1,6 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useAutoSave } from "@/hooks/useAutoSave";
@@ -59,8 +59,19 @@ export function EventOutroEditor({ event, projectId }: EventOutroEditorProps) {
   });
 
   // Watch all form fields for live preview
-  const watchedOutro = outroForm.watch();
-  const watchedShareOptions = shareOptionsForm.watch();
+  const watchedOutro = useWatch({ control: outroForm.control });
+  const watchedShareOptions = useWatch({ control: shareOptionsForm.control });
+
+  // Merge watched values with defaults for preview
+  const outroPreviewData: EventOutro = {
+    ...DEFAULT_EVENT_OUTRO,
+    ...watchedOutro,
+  };
+
+  const shareOptionsPreviewData: EventShareOptions = {
+    ...DEFAULT_EVENT_SHARE_OPTIONS,
+    ...watchedShareOptions,
+  };
 
   // Auto-save handler for outro
   const handleOutroUpdate = async (updates: Partial<EventOutro>) => {
@@ -121,8 +132,8 @@ export function EventOutroEditor({ event, projectId }: EventOutroEditorProps) {
       {/* Right column: Preview */}
       <div className="lg:sticky lg:top-6">
         <OutroPreview
-          outro={watchedOutro}
-          shareOptions={watchedShareOptions}
+          outro={outroPreviewData}
+          shareOptions={shareOptionsPreviewData}
           event={event}
         />
       </div>
