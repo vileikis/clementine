@@ -38,7 +38,7 @@ import {
   updateEventExtraInputSchema,
   removeEventExtraInputSchema,
   updateEventWelcomeSchema,
-  partialEventOutroSchema,
+  updateEventOutroSchema,
   partialEventShareOptionsSchema,
   updateEventOverlayInputSchema,
 } from "../schemas";
@@ -1013,7 +1013,7 @@ export async function updateEventOutroAction(
 
   try {
     // Validate input
-    const validated = partialEventOutroSchema.safeParse(data);
+    const validated = updateEventOutroSchema.safeParse(data);
     if (!validated.success) {
       return {
         success: false,

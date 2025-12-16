@@ -109,16 +109,27 @@ export const shareSocialSchema = z.enum([
  * Uses .default(null) to handle partial Firestore documents gracefully
  */
 export const eventOutroSchema = z.object({
-  title: z.string().max(100).nullable().optional().default(null),
-  description: z.string().max(500).nullable().optional().default(null),
-  ctaLabel: z.string().max(50).nullable().optional().default(null),
-  ctaUrl: z.string().url().nullable().optional().default(null),
+  title: z.string().max(100).nullable().default(null),
+  description: z.string().max(500).nullable().default(null),
+  ctaLabel: z.string().max(50).nullable().default(null),
+  ctaUrl: z.url().nullable().default(null),
 });
 
 /**
- * Partial event outro schema for updates
+ * Update event outro schema for server action (partial updates)
  */
-export const partialEventOutroSchema = eventOutroSchema.partial();
+export const updateEventOutroSchema = z.object({
+  title: z.string().max(100).nullable().optional(),
+  description: z.string().max(500).nullable().optional(),
+  ctaLabel: z.string().max(50).nullable().optional(),
+  ctaUrl: z.url().nullable().optional(),
+});
+
+/**
+ * Partial event outro schema for updates (deprecated - use updateEventOutroSchema)
+ * @deprecated Use updateEventOutroSchema instead
+ */
+export const partialEventOutroSchema = updateEventOutroSchema;
 
 /**
  * Event share options configuration schema
@@ -317,7 +328,8 @@ export type ExperienceLayout = z.infer<typeof experienceLayoutSchema>;
 export type EventWelcomeSchema = z.infer<typeof eventWelcomeSchema>;
 export type UpdateEventWelcomeInput = z.infer<typeof updateEventWelcomeSchema>;
 export type EventOutroSchema = z.infer<typeof eventOutroSchema>;
-export type PartialEventOutroInput = z.infer<typeof partialEventOutroSchema>;
+export type UpdateEventOutroInput = z.infer<typeof updateEventOutroSchema>;
+export type PartialEventOutroInput = z.infer<typeof partialEventOutroSchema>; // deprecated
 export type EventShareOptionsSchema = z.infer<typeof eventShareOptionsSchema>;
 export type PartialEventShareOptionsInput = z.infer<typeof partialEventShareOptionsSchema>;
 export type ShareSocial = z.infer<typeof shareSocialSchema>;
