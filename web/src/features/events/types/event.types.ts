@@ -50,7 +50,7 @@ export interface EventWelcome {
   mediaType?: "image" | "video" | null;
 
   /** Layout for experience cards */
-  layout: ExperienceLayout;
+  layout?: ExperienceLayout;
 }
 
 /**
