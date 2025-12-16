@@ -80,9 +80,9 @@ functions/
 web/
 ├── src/
 │   └── features/
-│       └── sessions/                    # Future integration point
+│       └── guest/                       # Future integration point
 │           └── actions/
-│               └── processSession.action.ts  # Server Action to trigger processMedia (future)
+│               └── guests.actions.ts    # Server Action to trigger processMedia (future)
 ```
 
 **Structure Decision**: Backend-focused implementation in `functions/` workspace using Cloud Functions v2. Media processing logic isolated in `services/media-pipeline/` module with co-located tests. HTTP endpoint and Cloud Task handler are thin wrappers that delegate to pipeline service. Web integration (Server Action to call Cloud Function) is out of scope for Stage 1 but structure anticipates future connection.

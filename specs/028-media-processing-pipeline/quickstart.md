@@ -35,7 +35,7 @@ GOOGLE_APPLICATION_CREDENTIALS=../path/to/service-account-key.json
 
 # Cloud Tasks configuration (for local testing)
 CLOUD_TASKS_PROJECT_ID=your-project-id
-CLOUD_TASKS_LOCATION=us-central1
+CLOUD_TASKS_LOCATION=europe-west1
 CLOUD_TASKS_QUEUE=media-processing
 ```
 
@@ -83,7 +83,7 @@ Upload test image to Storage emulator at the path specified in inputAssets.
 #### Trigger Processing
 
 ```bash
-curl -X POST http://localhost:5001/your-project-id/us-central1/processMedia \
+curl -X POST http://localhost:5001/your-project-id/europe-west1/processMedia \
   -H "Content-Type: application/json" \
   -d '{
     "sessionId": "test-session-1",
@@ -114,7 +114,7 @@ Expected response:
 ```bash
 # Create task queue
 gcloud tasks queues create media-processing \
-  --location=us-central1 \
+  --location=europe-west1 \
   --max-attempts=3 \
   --min-backoff=30s \
   --max-concurrent-dispatches=10
@@ -143,8 +143,8 @@ firebase deploy --only functions:processMedia,functions:processMediaJob
 
 Deployment will output function URLs:
 ```
-✔ functions[processMedia(us-central1)] https://us-central1-your-project.cloudfunctions.net/processMedia
-✔ functions[processMediaJob(us-central1)] (task queue function)
+✔ functions[processMedia(europe-west1)] https://europe-west1-your-project.cloudfunctions.net/processMedia
+✔ functions[processMediaJob(europe-west1)] (task queue function)
 ```
 
 ### 4. Test Production
@@ -152,7 +152,7 @@ Deployment will output function URLs:
 Use the deployed function URL:
 
 ```bash
-curl -X POST https://us-central1-your-project.cloudfunctions.net/processMedia \
+curl -X POST https://europe-west1-your-project.cloudfunctions.net/processMedia \
   -H "Content-Type: application/json" \
   -d '{
     "sessionId": "real-session-id",
@@ -218,10 +218,10 @@ firebase functions:log --only processMedia
 
 ```bash
 # List tasks
-gcloud tasks list --queue=media-processing --location=us-central1
+gcloud tasks list --queue=media-processing --location=europe-west1
 
 # View task details
-gcloud tasks describe TASK_ID --queue=media-processing --location=us-central1
+gcloud tasks describe TASK_ID --queue=media-processing --location=europe-west1
 ```
 
 ### Common Issues
