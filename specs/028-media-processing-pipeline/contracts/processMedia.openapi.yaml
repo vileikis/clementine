@@ -9,7 +9,7 @@ info:
     name: Clementine Team
 
 servers:
-  - url: https://us-central1-{project-id}.cloudfunctions.net
+  - url: https://europe-west1-{project-id}.cloudfunctions.net
     description: Firebase Cloud Functions (Gen 2)
     variables:
       project-id:
@@ -60,7 +60,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProcessMediaResponse'
               example:
-                taskId: projects/clementine-prod/locations/us-central1/queues/media-processing/tasks/task-123456
+                taskId: projects/clementine-prod/locations/europe-west1/queues/media-processing/tasks/task-123456
                 message: Processing job queued successfully
         '400':
           description: Bad request - validation error
@@ -151,7 +151,7 @@ components:
         taskId:
           type: string
           description: Cloud Task ID for tracking the processing job
-          example: projects/clementine-prod/locations/us-central1/queues/media-processing/tasks/task-123456
+          example: projects/clementine-prod/locations/europe-west1/queues/media-processing/tasks/task-123456
         message:
           type: string
           description: Human-readable confirmation message
