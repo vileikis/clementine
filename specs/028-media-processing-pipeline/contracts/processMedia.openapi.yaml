@@ -1,0 +1,229 @@
+openapi: 3.0.3
+info:
+  title: Media Processing Pipeline API
+  description: |
+    Stage 1 media processing pipeline for Clementine photobooth platform.
+    Processes single images and multi-frame bursts into final outputs (image, GIF, video).
+  version: 1.0.0
+  contact:
+    name: Clementine Team
+
+servers:
+  - url: https://us-central1-{project-id}.cloudfunctions.net
+    description: Firebase Cloud Functions (Gen 2)
+    variables:
+      project-id:
+        default: clementine-prod
+        description: Firebase project ID
+
+paths:
+  /processMedia:
+    post:
+      summary: Queue media processing job
+      description: |
+        Accepts a session ID and processing configuration, validates the request,
+        and queues an async Cloud Task to process the media. Returns immediately
+        with task ID for tracking. Actual processing happens asynchronously.
+      operationId: processMedia
+      tags:
+        - Media Processing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProcessMediaRequest'
+            examples:
+              single-image-square:
+                summary: Single image, square output
+                value:
+                  sessionId: sess-abc123xyz
+                  outputFormat: image
+                  aspectRatio: square
+              burst-gif-story:
+                summary: Photo burst, animated GIF, story format
+                value:
+                  sessionId: sess-def456uvw
+                  outputFormat: gif
+                  aspectRatio: story
+              burst-video-square:
+                summary: Photo burst, MP4 video, square format
+                value:
+                  sessionId: sess-ghi789rst
+                  outputFormat: video
+                  aspectRatio: square
+      responses:
+        '200':
+          description: Processing job queued successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessMediaResponse'
+              example:
+                taskId: projects/clementine-prod/locations/us-central1/queues/media-processing/tasks/task-123456
+                message: Processing job queued successfully
+        '400':
+          description: Bad request - validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                missing-field:
+                  summary: Missing required field
+                  value:
+                    error: sessionId is required
+                invalid-format:
+                  summary: Invalid output format
+                  value:
+                    error: outputFormat must be one of: image, gif, video
+                invalid-aspect-ratio:
+                  summary: Invalid aspect ratio
+                  value:
+                    error: aspectRatio must be one of: square, story
+                already-processing:
+                  summary: Session already being processed
+                  value:
+                    error: Session is already being processed
+        '404':
+          description: Session not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: Session not found
+        '405':
+          description: Method not allowed (only POST is supported)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: Method not allowed. Only POST is supported.
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: Failed to queue processing job
+
+components:
+  schemas:
+    ProcessMediaRequest:
+      type: object
+      required:
+        - sessionId
+        - outputFormat
+        - aspectRatio
+      properties:
+        sessionId:
+          type: string
+          description: Unique identifier for the session to process
+          minLength: 1
+          example: sess-abc123xyz
+        outputFormat:
+          type: string
+          enum: [image, gif, video]
+          description: |
+            Output format for processed media:
+            - image: Single JPEG output (for single photo or when explicitly requested)
+            - gif: Animated GIF (for multi-frame bursts)
+            - video: MP4 video with H.264 codec (for multi-frame bursts)
+          example: image
+        aspectRatio:
+          type: string
+          enum: [square, story]
+          description: |
+            Target aspect ratio for output:
+            - square: 1080x1080 (1:1 ratio, ideal for Instagram posts)
+            - story: 1080x1920 (9:16 ratio, ideal for Instagram/TikTok stories)
+          example: square
+
+    ProcessMediaResponse:
+      type: object
+      required:
+        - taskId
+        - message
+      properties:
+        taskId:
+          type: string
+          description: Cloud Task ID for tracking the processing job
+          example: projects/clementine-prod/locations/us-central1/queues/media-processing/tasks/task-123456
+        message:
+          type: string
+          description: Human-readable confirmation message
+          example: Processing job queued successfully
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          description: Human-readable error message
+          example: sessionId is required
+
+    SessionOutputs:
+      type: object
+      description: |
+        Final processed media outputs stored in Firestore session document.
+        This schema documents the `session.outputs` field populated after successful processing.
+      required:
+        - primaryUrl
+        - thumbnailUrl
+        - format
+        - dimensions
+        - sizeBytes
+        - completedAt
+        - processingTimeMs
+      properties:
+        primaryUrl:
+          type: string
+          format: uri
+          description: Full public URL to main output file (image/gif/video)
+          example: https://storage.googleapis.com/clementine-prod.appspot.com/projects/proj-abc/results/sess-xyz-output.jpg
+        thumbnailUrl:
+          type: string
+          format: uri
+          description: Full public URL to thumbnail (300px wide JPEG)
+          example: https://storage.googleapis.com/clementine-prod.appspot.com/projects/proj-abc/results/sess-xyz-thumb.jpg
+        format:
+          type: string
+          enum: [image, gif, video]
+          description: Actual output format produced
+          example: image
+        dimensions:
+          type: object
+          required:
+            - width
+            - height
+          properties:
+            width:
+              type: integer
+              description: Output width in pixels
+              example: 1080
+            height:
+              type: integer
+              description: Output height in pixels
+              example: 1080
+        sizeBytes:
+          type: integer
+          description: File size of primary output in bytes
+          example: 245678
+        completedAt:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp when processing completed
+          example: "2025-12-16T10:30:45.123Z"
+        processingTimeMs:
+          type: integer
+          description: Total processing duration in milliseconds
+          example: 8742
+
+tags:
+  - name: Media Processing
+    description: Media processing pipeline endpoints
