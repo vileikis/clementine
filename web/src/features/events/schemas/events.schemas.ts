@@ -126,12 +126,6 @@ export const updateEventOutroSchema = z.object({
 });
 
 /**
- * Partial event outro schema for updates (deprecated - use updateEventOutroSchema)
- * @deprecated Use updateEventOutroSchema instead
- */
-export const partialEventOutroSchema = updateEventOutroSchema;
-
-/**
  * Event share options configuration schema
  * Uses .default() to handle partial Firestore documents gracefully
  */
@@ -329,7 +323,6 @@ export type EventWelcomeSchema = z.infer<typeof eventWelcomeSchema>;
 export type UpdateEventWelcomeInput = z.infer<typeof updateEventWelcomeSchema>;
 export type EventOutroSchema = z.infer<typeof eventOutroSchema>;
 export type UpdateEventOutroInput = z.infer<typeof updateEventOutroSchema>;
-export type PartialEventOutroInput = z.infer<typeof partialEventOutroSchema>; // deprecated
 export type EventShareOptionsSchema = z.infer<typeof eventShareOptionsSchema>;
 export type PartialEventShareOptionsInput = z.infer<typeof partialEventShareOptionsSchema>;
 export type ShareSocial = z.infer<typeof shareSocialSchema>;
