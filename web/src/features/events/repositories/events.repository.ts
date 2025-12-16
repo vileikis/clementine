@@ -3,7 +3,7 @@
 import { db } from "@/lib/firebase/admin";
 import type { Event, EventExperienceLink, EventOutro, EventShareOptions } from "../types/event.types";
 import { DEFAULT_EVENT_WELCOME } from "../types/event.types";
-import { eventSchema, type UpdateEventWelcomeInput, type UpdateEventOverlayInput } from "../schemas";
+import { eventSchema, type UpdateEventWelcomeInput, type UpdateEventOutroInput, type UpdateEventOverlayInput } from "../schemas";
 import { DEFAULT_EVENT_THEME, DEFAULT_EVENT_EXTRAS, DEFAULT_EVENT_OVERLAY } from "../constants";
 import type { ExtraSlot } from "../schemas";
 
@@ -467,7 +467,7 @@ export async function updateEventWelcome(
 export async function updateEventOutro(
   projectId: string,
   eventId: string,
-  outro: Partial<EventOutro>
+  outro: Partial<EventOutro> | UpdateEventOutroInput
 ): Promise<void> {
   const eventRef = getEventsCollection(projectId).doc(eventId);
 
