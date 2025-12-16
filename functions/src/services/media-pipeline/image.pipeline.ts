@@ -1,4 +1,3 @@
-import tmp from 'tmp';
 import * as fs from 'fs/promises';
 import { scaleAndCropImage, generateThumbnail } from './ffmpeg';
 import {
@@ -12,22 +11,8 @@ import {
   updateProcessingStep,
 } from '../../lib/session';
 import { getPipelineConfig } from './config';
+import { createTempDir } from '../../lib/utils';
 import type { SessionOutputs } from '@clementine/shared';
-
-// Enable graceful cleanup
-tmp.setGracefulCleanup();
-
-/**
- * Create temp directory with cleanup callback
- */
-async function createTempDir(): Promise<{ path: string; cleanup: () => void }> {
-  return new Promise((resolve, reject) => {
-    tmp.dir({ unsafeCleanup: true }, (err, path, cleanup) => {
-      if (err) reject(err);
-      else resolve({ path, cleanup });
-    });
-  });
-}
 
 /**
  * Process single image (User Story 1)
