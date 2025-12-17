@@ -1,5 +1,6 @@
 import { onRequest } from 'firebase-functions/v2/https';
 import { getFunctions } from 'firebase-admin/functions';
+import '../lib/firebase-admin'; // Initialize Firebase Admin
 import { processMediaRequestSchema } from '../lib/schemas/media-pipeline.schema';
 import {
   fetchSession,
@@ -57,7 +58,10 @@ export const processMedia = onRequest(
       }
 
       // Queue Cloud Task for async processing
-      const queue = getFunctions().taskQueue('processMediaJob');
+      // Must specify location since function is in europe-west1, not default us-central1
+      const queue = getFunctions().taskQueue(
+        'locations/europe-west1/functions/processMediaJob'
+      );
       await queue.enqueue(
         {
           sessionId,
