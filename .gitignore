@@ -39,3 +39,4 @@ legacy-features/
 
 # Firebase
 firestore-debug.log
+firebase-debug.log
