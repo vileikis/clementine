@@ -1,4 +1,5 @@
 import { onTaskDispatched } from 'firebase-functions/v2/tasks';
+import '../lib/firebase-admin'; // Initialize Firebase Admin
 import { processMediaRequestSchema } from '../lib/schemas/media-pipeline.schema';
 import {
   fetchSession,
@@ -21,10 +22,10 @@ import {
 export const processMediaJob = onTaskDispatched(
   {
     region: 'europe-west1',
-    retryConfig: {
-      maxAttempts: 3,
-      minBackoffSeconds: 30,
-    },
+    // retryConfig: {
+    //   maxAttempts: 1,
+    //   minBackoffSeconds: 30,
+    // },
     rateLimits: {
       maxConcurrentDispatches: 10,
     },

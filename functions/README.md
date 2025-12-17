@@ -102,6 +102,37 @@ See `MANUAL-TESTING.md` for comprehensive test cases and curl commands.
 - **Media**: FFmpeg (via `ffmpeg-static` + direct CLI calls)
 - **Validation**: Zod 3.x
 
+### Firebase Admin SDK - Modular API
+
+**IMPORTANT**: Always use the **modular API** for Firebase Admin SDK, not the global namespace.
+
+✅ **Correct (Modular API)**:
+```typescript
+import { initializeApp } from 'firebase-admin/app';
+import { getFirestore, FieldValue } from 'firebase-admin/firestore';
+import { getStorage } from 'firebase-admin/storage';
+
+initializeApp();
+const db = getFirestore();
+const storage = getStorage();
+```
+
+❌ **Incorrect (Global Namespace)**:
+```typescript
+import * as admin from 'firebase-admin';
+
+admin.initializeApp();
+const db = admin.firestore();
+const storage = admin.storage();
+const FieldValue = admin.firestore.FieldValue; // Can cause undefined issues
+```
+
+**Why modular API?**
+- Better tree-shaking and smaller bundle sizes
+- More reliable in emulator environment
+- Avoids module loading issues with `FieldValue` and other exports
+- Future-proof (Firebase's recommended approach)
+
 ### FFmpeg Operations
 
 - **Image scaling/cropping**: Lanczos filter with center-crop

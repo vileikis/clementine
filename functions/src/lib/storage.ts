@@ -80,16 +80,29 @@ export function getOutputStoragePath(
 /**
  * Parse storage URL to extract storage path
  *
- * @param storageUrl - Full storage URL
+ * @param storageUrl - Full storage URL (supports gs://, https://, and emulator URLs)
  * @returns Storage path without bucket name
  */
 export function parseStorageUrl(storageUrl: string): string {
-  // Handle both gs:// and https:// URLs
+  // Handle Firebase Storage emulator URLs
+  // Format: http://localhost:9199/v0/b/{bucket}/o/{encoded-path}?alt=media
+  if (storageUrl.includes('localhost:9199') || storageUrl.includes('127.0.0.1:9199')) {
+    const match = storageUrl.match(/\/o\/([^?]+)/);
+    if (match && match[1]) {
+      // Decode the URL-encoded path
+      return decodeURIComponent(match[1]);
+    }
+  }
+
+  // Handle gs:// URLs
   if (storageUrl.startsWith('gs://')) {
     // gs://bucket-name/path/to/file.jpg → path/to/file.jpg
     const parts = storageUrl.replace('gs://', '').split('/');
     return parts.slice(1).join('/');
-  } else if (storageUrl.includes('storage.googleapis.com')) {
+  }
+
+  // Handle production storage.googleapis.com URLs
+  if (storageUrl.includes('storage.googleapis.com')) {
     // https://storage.googleapis.com/bucket-name/path/to/file.jpg → path/to/file.jpg
     const urlParts = storageUrl.split('storage.googleapis.com/');
     if (urlParts[1]) {
