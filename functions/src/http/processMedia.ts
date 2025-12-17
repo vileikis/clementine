@@ -1,4 +1,5 @@
 import { onRequest } from 'firebase-functions/v2/https';
+import { getFunctions } from 'firebase-admin/functions';
 import { processMediaRequestSchema } from '../lib/schemas/media-pipeline.schema';
 import {
   fetchSession,
@@ -55,12 +56,22 @@ export const processMedia = onRequest(
         return;
       }
 
+      // Queue Cloud Task for async processing
+      const queue = getFunctions().taskQueue('processMediaJob');
+      await queue.enqueue(
+        {
+          sessionId,
+          outputFormat,
+          aspectRatio,
+        },
+        {
+          scheduleDelaySeconds: 0, // Run immediately
+        }
+      );
+
       // Mark session as pending
       await markSessionPending(sessionId, 1);
 
-      // Queue Cloud Task for async processing
-      // NOTE: Cloud Tasks integration will be implemented in T010
-      // For now, return success response
       res.status(200).json({
         success: true,
         message: 'Processing queued',

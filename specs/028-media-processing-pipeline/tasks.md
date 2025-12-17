@@ -57,12 +57,12 @@
 
 ### Implementation for User Story 1
 
-- [ ] T011 [US1] Implement single image scaling with center-crop in functions/src/services/media-pipeline/ffmpeg.ts (scale to 1080x1080 or 1080x1920, Lanczos algorithm, quality settings)
-- [ ] T012 [US1] Implement thumbnail generation in functions/src/services/media-pipeline/ffmpeg.ts (300px width, maintain aspect ratio, Lanczos scaling, quality 2)
-- [ ] T013 [US1] Implement single image pipeline orchestration in functions/src/services/media-pipeline/pipeline.ts (download input, scale image, generate thumbnail, upload outputs, update session)
-- [ ] T014 [US1] Add validation for single image processing in functions/src/services/media-pipeline/pipeline.ts (check inputAssets.length >= 1, validate file access)
-- [ ] T015 [US1] Add error handling and cleanup in functions/src/services/media-pipeline/pipeline.ts (try-finally for temp files, categorized error responses, logging)
-- [ ] T016 [US1] Create public exports in functions/src/services/media-pipeline/index.ts (export pipeline functions, types, config)
+- [X] T011 [US1] Implement single image scaling with center-crop in functions/src/services/media-pipeline/ffmpeg.ts (scale to 1080x1080 or 1080x1920, Lanczos algorithm, quality settings)
+- [X] T012 [US1] Implement thumbnail generation in functions/src/services/media-pipeline/ffmpeg.ts (300px width, maintain aspect ratio, Lanczos scaling, quality 2)
+- [X] T013 [US1] Implement single image pipeline orchestration in functions/src/services/media-pipeline/image.pipeline.ts (download input, scale image, generate thumbnail, upload outputs, return session outputs)
+- [X] T014 [US1] Add validation for single image processing in functions/src/services/media-pipeline/image.pipeline.ts (check inputAssets.length >= 1, validate file access)
+- [X] T015 [US1] Add error handling and cleanup in functions/src/services/media-pipeline/image.pipeline.ts (try-finally for temp files, categorized error responses, logging)
+- [X] T016 [US1] Create public exports in functions/src/services/media-pipeline/index.ts (export pipeline functions, types, config)
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 

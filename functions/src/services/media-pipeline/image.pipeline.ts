@@ -6,33 +6,27 @@ import {
   getOutputStoragePath,
   parseStorageUrl,
 } from '../../lib/storage';
-import {
-  fetchSession,
-  updateProcessingStep,
-} from '../../lib/session';
+import { updateProcessingStep } from '../../lib/session';
 import { getPipelineConfig } from './config';
 import { createTempDir } from '../../lib/utils';
-import type { SessionOutputs } from '@clementine/shared';
+import type {
+  SessionOutputs,
+  SessionWithProcessing,
+} from '@clementine/shared';
 
 /**
  * Process single image (User Story 1)
  *
- * @param sessionId - Session ID
+ * @param session - Session document (already fetched)
  * @param outputFormat - Requested output format
  * @param aspectRatio - Target aspect ratio
  */
 export async function processSingleImage(
-  sessionId: string,
+  session: SessionWithProcessing,
   outputFormat: 'image' | 'gif' | 'video',
   aspectRatio: 'square' | 'story'
 ): Promise<SessionOutputs> {
   const startTime = Date.now();
-
-  // Fetch session
-  const session = await fetchSession(sessionId);
-  if (!session) {
-    throw new Error('Session not found');
-  }
 
   // Validate inputs
   if (!session.inputAssets || session.inputAssets.length === 0) {
@@ -46,7 +40,7 @@ export async function processSingleImage(
   const tmpDirObj = await createTempDir();
 
   try {
-    await updateProcessingStep(sessionId, 'downloading');
+    await updateProcessingStep(session.id, 'downloading');
 
     // Download first input asset
     const inputAsset = session.inputAssets[0];
@@ -57,7 +51,7 @@ export async function processSingleImage(
     const storagePath = parseStorageUrl(inputAsset.url);
     await downloadFromStorage(storagePath, inputPath);
 
-    await updateProcessingStep(sessionId, 'processing');
+    await updateProcessingStep(session.id, 'processing');
 
     // Scale and crop image
     const scaledPath = `${tmpDirObj.path}/scaled.jpg`;
@@ -72,18 +66,18 @@ export async function processSingleImage(
     const thumbPath = `${tmpDirObj.path}/thumb.jpg`;
     await generateThumbnail(inputPath, thumbPath, 300);
 
-    await updateProcessingStep(sessionId, 'uploading');
+    await updateProcessingStep(session.id, 'uploading');
 
     // Upload outputs to Storage
     const outputStoragePath = getOutputStoragePath(
       session.projectId,
-      sessionId,
+      session.id,
       'output',
       'jpg'
     );
     const thumbStoragePath = getOutputStoragePath(
       session.projectId,
-      sessionId,
+      session.id,
       'thumb',
       'jpg'
     );

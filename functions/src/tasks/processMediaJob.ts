@@ -68,11 +68,11 @@ export const processMediaJob = onTaskDispatched(
       // Route to appropriate pipeline based on format
       let outputs;
       if (actualFormat === 'image') {
-        outputs = await processSingleImage(sessionId, outputFormat, aspectRatio);
+        outputs = await processSingleImage(session, outputFormat, aspectRatio);
       } else if (actualFormat === 'gif') {
-        outputs = await processGIF(sessionId, aspectRatio);
+        outputs = await processGIF(session, aspectRatio);
       } else if (actualFormat === 'video') {
-        outputs = await processVideo(sessionId, aspectRatio);
+        outputs = await processVideo(session, aspectRatio);
       } else {
         throw new Error(`Unknown output format: ${actualFormat}`);
       }

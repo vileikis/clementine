@@ -6,31 +6,25 @@ import {
   getOutputStoragePath,
   parseStorageUrl,
 } from '../../lib/storage';
-import {
-  fetchSession,
-  updateProcessingStep,
-} from '../../lib/session';
+import { updateProcessingStep } from '../../lib/session';
 import { getPipelineConfig } from './config';
 import { createTempDir } from '../../lib/utils';
-import type { SessionOutputs } from '@clementine/shared';
+import type {
+  SessionOutputs,
+  SessionWithProcessing,
+} from '@clementine/shared';
 
 /**
  * Process multi-frame GIF (User Story 2)
  *
- * @param sessionId - Session ID
+ * @param session - Session document (already fetched)
  * @param aspectRatio - Target aspect ratio
  */
 export async function processGIF(
-  sessionId: string,
+  session: SessionWithProcessing,
   aspectRatio: 'square' | 'story'
 ): Promise<SessionOutputs> {
   const startTime = Date.now();
-
-  // Fetch session
-  const session = await fetchSession(sessionId);
-  if (!session) {
-    throw new Error('Session not found');
-  }
 
   // Validate inputs
   if (!session.inputAssets || session.inputAssets.length < 2) {
@@ -44,7 +38,7 @@ export async function processGIF(
   const tmpDirObj = await createTempDir();
 
   try {
-    await updateProcessingStep(sessionId, 'downloading');
+    await updateProcessingStep(session.id, 'downloading');
 
     // Download all frames
     const framePaths: string[] = [];
@@ -57,7 +51,7 @@ export async function processGIF(
       framePaths.push(framePath);
     }
 
-    await updateProcessingStep(sessionId, 'processing');
+    await updateProcessingStep(session.id, 'processing');
 
     // Create GIF
     const gifPath = `${tmpDirObj.path}/output.gif`;
@@ -71,18 +65,18 @@ export async function processGIF(
     }
     await generateThumbnail(firstFrame, thumbPath, 300);
 
-    await updateProcessingStep(sessionId, 'uploading');
+    await updateProcessingStep(session.id, 'uploading');
 
     // Upload outputs to Storage
     const outputStoragePath = getOutputStoragePath(
       session.projectId,
-      sessionId,
+      session.id,
       'output',
       'gif'
     );
     const thumbStoragePath = getOutputStoragePath(
       session.projectId,
-      sessionId,
+      session.id,
       'thumb',
       'jpg'
     );
