@@ -1,13 +1,14 @@
-import ffmpeg from 'fluent-ffmpeg';
+import { spawn } from 'child_process';
 import ffmpegStatic from 'ffmpeg-static';
 import * as fs from 'fs/promises';
-import { promisify } from 'util';
-import tmp from 'tmp';
+import * as tmp from 'tmp';
 
-// Configure fluent-ffmpeg to use the static binary
-if (ffmpegStatic) {
-  ffmpeg.setFfmpegPath(ffmpegStatic);
+// Validate ffmpeg binary path
+if (!ffmpegStatic) {
+  throw new Error('ffmpeg-static binary not found');
 }
+
+const FFMPEG_PATH = ffmpegStatic;
 
 // Enable graceful cleanup
 tmp.setGracefulCleanup();
@@ -59,7 +60,7 @@ const TIMEOUTS = {
 /**
  * Categorize FFmpeg errors based on stderr output
  */
-function categorizeFFmpegError(error: Error, stderr: string): FFmpegError['type'] {
+function categorizeFFmpegError(stderr: string): FFmpegError['type'] {
   const stderrLower = stderr.toLowerCase();
 
   if (
@@ -100,7 +101,7 @@ function categorizeFFmpegError(error: Error, stderr: string): FFmpegError['type'
  * Run FFmpeg command with timeout and error handling
  */
 function runFFmpegCommand(
-  command: ffmpeg.FfmpegCommand,
+  args: string[],
   options: {
     timeout?: number;
     description?: string;
@@ -111,10 +112,15 @@ function runFFmpegCommand(
   return new Promise((resolve, reject) => {
     let timeoutHandle: NodeJS.Timeout | null = null;
     let stderr = '';
+    let stdout = '';
+
+    console.log(`FFmpeg command: ${FFMPEG_PATH} ${args.join(' ')}`);
+
+    const process = spawn(FFMPEG_PATH, args);
 
     if (timeout > 0) {
       timeoutHandle = setTimeout(() => {
-        command.kill('SIGKILL');
+        process.kill('SIGKILL');
         reject(
           new FFmpegError(`${description} timed out after ${timeout}ms`, 'timeout', {
             timeout,
@@ -124,30 +130,46 @@ function runFFmpegCommand(
       }, timeout);
     }
 
-    command
-      .on('start', (commandLine) => {
-        console.log(`FFmpeg command: ${commandLine}`);
-      })
-      .on('stderr', (stderrLine) => {
-        stderr += stderrLine + '\n';
-      })
-      .on('error', (err) => {
-        if (timeoutHandle) clearTimeout(timeoutHandle);
+    process.stdout?.on('data', (data) => {
+      stdout += data.toString();
+    });
 
-        const errorType = categorizeFFmpegError(err, stderr);
-        reject(
-          new FFmpegError(`${description} failed: ${err.message}`, errorType, {
-            originalError: err,
-            stderr,
-          })
-        );
-      })
-      .on('end', () => {
-        if (timeoutHandle) clearTimeout(timeoutHandle);
+    process.stderr?.on('data', (data) => {
+      stderr += data.toString();
+    });
+
+    process.on('error', (err) => {
+      if (timeoutHandle) clearTimeout(timeoutHandle);
+      reject(
+        new FFmpegError(`${description} failed: ${err.message}`, 'unknown', {
+          originalError: err,
+          stderr,
+        })
+      );
+    });
+
+    process.on('close', (code) => {
+      if (timeoutHandle) clearTimeout(timeoutHandle);
+
+      if (code === 0) {
         console.log(`${description} completed successfully`);
         resolve();
-      })
-      .run();
+        return
+      } 
+        const errorType = categorizeFFmpegError(stderr);
+        reject(
+          new FFmpegError(
+            `${description} failed with exit code ${code}`,
+            errorType,
+            {
+              exitCode: code,
+              stderr,
+              stdout,
+            }
+          )
+        );
+      
+    });
   });
 }
 
@@ -199,17 +221,15 @@ export async function scaleAndCropImage(
 ): Promise<void> {
   await validateInputFile(inputPath);
 
-  const command = ffmpeg()
-    .input(inputPath)
-    .outputOptions([
-      '-vf',
-      `scale=${width}:${height}:flags=lanczos:force_original_aspect_ratio=increase,crop=${width}:${height}:(iw-${width})/2:(ih-${height})/2`,
-      '-q:v',
-      '2',
-    ])
-    .output(outputPath);
+  const args = [
+    '-i', inputPath,
+    '-vf', `scale=${width}:${height}:flags=lanczos:force_original_aspect_ratio=increase,crop=${width}:${height}:(iw-${width})/2:(ih-${height})/2`,
+    '-q:v', '2',
+    '-y', // Overwrite output file
+    outputPath
+  ];
 
-  await runFFmpegCommand(command, {
+  await runFFmpegCommand(args, {
     timeout: TIMEOUTS.image_scale,
     description: 'Image scaling',
   });
@@ -238,12 +258,16 @@ export async function generateThumbnail(
 ): Promise<void> {
   await validateInputFile(inputPath);
 
-  const command = ffmpeg()
-    .input(inputPath)
-    .outputOptions(['-vf', `scale=${width}:-1:flags=lanczos`, '-q:v', '2', '-frames:v', '1'])
-    .output(outputPath);
+  const args = [
+    '-i', inputPath,
+    '-vf', `scale=${width}:-1:flags=lanczos`,
+    '-q:v', '2',
+    '-frames:v', '1',
+    '-y', // Overwrite output file
+    outputPath
+  ];
 
-  await runFFmpegCommand(command, {
+  await runFFmpegCommand(args, {
     timeout: TIMEOUTS.thumbnail,
     description: 'Thumbnail generation',
   });
@@ -266,17 +290,15 @@ async function generatePalette(
   palettePath: string,
   width: number
 ): Promise<void> {
-  const command = ffmpeg()
-    .input(framePattern)
-    .inputOptions(['-pattern_type', 'glob'])
-    .complexFilter([
-      'fps=2',
-      `scale=${width}:-1:flags=lanczos`,
-      'palettegen=stats_mode=diff:max_colors=256',
-    ])
-    .output(palettePath);
+  const args = [
+    '-pattern_type', 'glob',
+    '-i', framePattern,
+    '-vf', `fps=2,scale=${width}:-1:flags=lanczos,palettegen=stats_mode=diff:max_colors=256`,
+    '-y', // Overwrite output file
+    palettePath
+  ];
 
-  await runFFmpegCommand(command, {
+  await runFFmpegCommand(args, {
     timeout: TIMEOUTS.gif_small,
     description: 'GIF palette generation',
   });
@@ -317,20 +339,18 @@ export async function createGIF(
     await generatePalette(framePattern, palettePath, width);
 
     // Create GIF using palette
-    const command = ffmpeg()
-      .input(framePattern)
-      .inputOptions(['-pattern_type', 'glob'])
-      .input(palettePath)
-      .complexFilter([
-        'fps=2',
-        `scale=${width}:-1:flags=lanczos[x]`,
-        '[x][1:v]paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle',
-      ])
-      .outputOptions(['-loop', '0'])
-      .output(outputPath);
+    const args = [
+      '-pattern_type', 'glob',
+      '-i', framePattern,
+      '-i', palettePath,
+      '-filter_complex', `fps=2,scale=${width}:-1:flags=lanczos[x];[x][1:v]paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle`,
+      '-loop', '0',
+      '-y', // Overwrite output file
+      outputPath
+    ];
 
     const timeout = framePaths.length < 5 ? TIMEOUTS.gif_small : TIMEOUTS.gif_large;
-    await runFFmpegCommand(command, {
+    await runFFmpegCommand(args, {
       timeout,
       description: 'GIF creation',
     });
@@ -377,38 +397,27 @@ export async function createMP4(
   const frameDir = firstFrame.substring(0, firstFrame.lastIndexOf('/'));
   const framePattern = `${frameDir}/frame-%03d.jpg`;
 
-  const command = ffmpeg()
-    .input(framePattern)
-    .inputOptions(['-framerate', '5'])
-    .outputOptions([
-      '-c:v',
-      'libx264',
-      '-preset',
-      'medium',
-      '-crf',
-      '22',
-      '-pix_fmt',
-      'yuv420p',
-      '-profile:v',
-      'baseline',
-      '-level',
-      '3.0',
-      '-r',
-      '5',
-      '-g',
-      '15',
-      '-keyint_min',
-      '15',
-      '-movflags',
-      '+faststart',
-      '-vf',
-      `scale=${width}:${height}:flags=lanczos,pad=ceil(iw/2)*2:ceil(ih/2)*2`,
-      '-an',
-    ])
-    .output(outputPath);
+  const args = [
+    '-framerate', '5',
+    '-i', framePattern,
+    '-c:v', 'libx264',
+    '-preset', 'medium',
+    '-crf', '22',
+    '-pix_fmt', 'yuv420p',
+    '-profile:v', 'baseline',
+    '-level', '3.0',
+    '-r', '5',
+    '-g', '15',
+    '-keyint_min', '15',
+    '-movflags', '+faststart',
+    '-vf', `scale=${width}:${height}:flags=lanczos,pad=ceil(iw/2)*2:ceil(ih/2)*2`,
+    '-an', // No audio
+    '-y', // Overwrite output file
+    outputPath
+  ];
 
   const timeout = framePaths.length < 10 ? TIMEOUTS.mp4_short : TIMEOUTS.mp4_long;
-  await runFFmpegCommand(command, {
+  await runFFmpegCommand(args, {
     timeout,
     description: 'MP4 creation',
   });
