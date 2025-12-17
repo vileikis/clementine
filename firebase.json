@@ -3,12 +3,9 @@
     "rules": "firebase/firestore.rules",
     "indexes": "firebase/firestore.indexes.json"
   },
-  "storage": [
-    {
-      "bucket": "clementine-7568d.firebasestorage.app",
-      "rules": "firebase/storage.rules"
-    }
-  ],
+  "storage": {
+    "rules": "firebase/storage.rules"
+  },
   "functions": [
     {
       "source": "functions/isolate",
