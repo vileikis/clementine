@@ -1,6 +1,7 @@
 // Event-related TypeScript types
 
 import type { Theme } from "@/features/theming";
+import type { ShareSocial } from "@/features/steps/types/step.types";
 
 /**
  * Layout options for experience cards on the welcome screen
@@ -49,7 +50,7 @@ export interface EventWelcome {
   mediaType?: "image" | "video" | null;
 
   /** Layout for experience cards */
-  layout: ExperienceLayout;
+  layout?: ExperienceLayout;
 }
 
 /**
@@ -88,6 +89,40 @@ export interface EventExtras {
 }
 
 /**
+ * End-of-experience outro message configuration
+ */
+export interface EventOutro {
+  /** Heading text for the outro screen (max 100 chars) */
+  title?: string | null;
+
+  /** Body text below the title (max 500 chars) */
+  description?: string | null;
+
+  /** Button text for call-to-action (max 50 chars) */
+  ctaLabel?: string | null;
+
+  /** URL for the CTA button (must be valid URL) */
+  ctaUrl?: string | null;
+}
+
+/**
+ * Share options configuration controlling guest sharing actions
+ */
+export interface EventShareOptions {
+  /** Show download button for result image */
+  allowDownload: boolean;
+
+  /** Show native share button (Web Share API) */
+  allowSystemShare: boolean;
+
+  /** Show email share option */
+  allowEmail: boolean;
+
+  /** List of enabled social platforms */
+  socials: ShareSocial[];
+}
+
+/**
  * Event entity - a time-bound themed instance under a Project
  *
  * Firestore Path: /projects/{projectId}/events/{eventId}
@@ -116,6 +151,12 @@ export interface Event {
 
   // Welcome screen configuration (optional - use DEFAULT_EVENT_WELCOME when absent)
   welcome?: EventWelcome;
+
+  // End-of-experience outro message (optional)
+  outro?: EventOutro;
+
+  // Guest sharing options (optional)
+  shareOptions?: EventShareOptions;
 
   // Frame overlay configuration (optional - use DEFAULT_EVENT_OVERLAY when absent)
   overlay?: EventOverlayConfig;

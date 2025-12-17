@@ -1,9 +1,9 @@
 // Events repository - CRUD operations for events subcollection
 
 import { db } from "@/lib/firebase/admin";
-import type { Event, EventExperienceLink } from "../types/event.types";
+import type { Event, EventExperienceLink, EventShareOptions } from "../types/event.types";
 import { DEFAULT_EVENT_WELCOME } from "../types/event.types";
-import { eventSchema, type UpdateEventWelcomeInput, type UpdateEventOverlayInput } from "../schemas";
+import { eventSchema, type UpdateEventWelcomeInput, type UpdateEventOutroInput, type UpdateEventOverlayInput } from "../schemas";
 import { DEFAULT_EVENT_THEME, DEFAULT_EVENT_EXTRAS, DEFAULT_EVENT_OVERLAY } from "../constants";
 import type { ExtraSlot } from "../schemas";
 
@@ -437,22 +437,88 @@ export async function updateEventWelcome(
     updatedAt: Date.now(),
   };
 
-  // Only include fields that are explicitly provided
-  if (welcome.title !== undefined) {
-    updateData["welcome.title"] = welcome.title;
-  }
-  if (welcome.description !== undefined) {
-    updateData["welcome.description"] = welcome.description;
-  }
-  if (welcome.mediaUrl !== undefined) {
-    updateData["welcome.mediaUrl"] = welcome.mediaUrl;
-  }
-  if (welcome.mediaType !== undefined) {
-    updateData["welcome.mediaType"] = welcome.mediaType;
-  }
-  if (welcome.layout !== undefined) {
-    updateData["welcome.layout"] = welcome.layout;
-  }
+  // Dynamic field mapping (scalable, DRY)
+  const fieldMappings: Record<keyof UpdateEventWelcomeInput, string> = {
+    title: "welcome.title",
+    description: "welcome.description",
+    mediaUrl: "welcome.mediaUrl",
+    mediaType: "welcome.mediaType",
+    layout: "welcome.layout",
+  };
+
+  Object.entries(welcome).forEach(([key, value]) => {
+    if (value !== undefined && fieldMappings[key as keyof UpdateEventWelcomeInput]) {
+      updateData[fieldMappings[key as keyof UpdateEventWelcomeInput]] = value;
+    }
+  });
+
+  await eventRef.update(updateData);
+}
+
+// ============================================================================
+// Outro Screen Operations
+// ============================================================================
+
+/**
+ * Update outro configuration (partial update with dot notation)
+ */
+export async function updateEventOutro(
+  projectId: string,
+  eventId: string,
+  outro: UpdateEventOutroInput
+): Promise<void> {
+  const eventRef = getEventsCollection(projectId).doc(eventId);
+
+  // Build dot-notation update object
+  const updateData: Record<string, unknown> = {
+    updatedAt: Date.now(),
+  };
+
+  // Dynamic field mapping (scalable, DRY)
+  const fieldMappings: Record<keyof UpdateEventOutroInput, string> = {
+    title: "outro.title",
+    description: "outro.description",
+    ctaLabel: "outro.ctaLabel",
+    ctaUrl: "outro.ctaUrl",
+  };
+
+  Object.entries(outro).forEach(([key, value]) => {
+    if (value !== undefined && fieldMappings[key as keyof UpdateEventOutroInput]) {
+      updateData[fieldMappings[key as keyof UpdateEventOutroInput]] = value;
+    }
+  });
+
+  await eventRef.update(updateData);
+}
+
+/**
+ * Update share options configuration (partial update with dot notation)
+ */
+export async function updateEventShareOptions(
+  projectId: string,
+  eventId: string,
+  shareOptions: Partial<EventShareOptions>
+): Promise<void> {
+  const eventRef = getEventsCollection(projectId).doc(eventId);
+
+  // Build dot-notation update object
+  const updateData: Record<string, unknown> = {
+    updatedAt: Date.now(),
+  };
+
+  // Dynamic field mapping (scalable, DRY)
+  const fieldMappings: Record<keyof EventShareOptions, string> = {
+    allowDownload: "shareOptions.allowDownload",
+    allowSystemShare: "shareOptions.allowSystemShare",
+    allowEmail: "shareOptions.allowEmail",
+    socials: "shareOptions.socials",
+  };
+
+  Object.entries(shareOptions).forEach(([key, value]) => {
+    if (value !== undefined && fieldMappings[key as keyof EventShareOptions]) {
+      updateData[fieldMappings[key as keyof EventShareOptions]] = value;
+    }
+  });
 
   await eventRef.update(updateData);
 }
@@ -476,25 +542,25 @@ export async function updateEventOverlay(
     updatedAt: Date.now(),
   };
 
-  // Square frame updates
-  if (data.square !== undefined) {
-    if (data.square.enabled !== undefined) {
-      updateData["overlay.square.enabled"] = data.square.enabled;
-    }
-    if (data.square.frameUrl !== undefined) {
-      updateData["overlay.square.frameUrl"] = data.square.frameUrl;
-    }
-  }
+  // Flattened field mapping for nested structures (clearer than nested loops)
+  const fieldMappings: Record<string, string> = {
+    "square.enabled": "overlay.square.enabled",
+    "square.frameUrl": "overlay.square.frameUrl",
+    "story.enabled": "overlay.story.enabled",
+    "story.frameUrl": "overlay.story.frameUrl",
+  };
 
-  // Story frame updates
-  if (data.story !== undefined) {
-    if (data.story.enabled !== undefined) {
-      updateData["overlay.story.enabled"] = data.story.enabled;
+  // Map nested fields to Firestore dot notation
+  Object.entries(data).forEach(([aspectRatio, aspectData]) => {
+    if (aspectData !== undefined) {
+      Object.entries(aspectData).forEach(([field, value]) => {
+        const mappingKey = `${aspectRatio}.${field}`;
+        if (value !== undefined && fieldMappings[mappingKey]) {
+          updateData[fieldMappings[mappingKey]] = value;
+        }
+      });
     }
-    if (data.story.frameUrl !== undefined) {
-      updateData["overlay.story.frameUrl"] = data.story.frameUrl;
-    }
-  }
+  });
 
   await eventRef.update(updateData);
 }
