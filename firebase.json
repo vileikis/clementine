@@ -13,16 +13,16 @@
     {
       "source": "functions/isolate",
       "codebase": "default",
-      "ignore": [
-        "node_modules",
-        ".git"
-      ],
+      "ignore": ["node_modules", ".git"],
       "predeploy": [
         "cd functions && pnpm build && npx isolate && cd isolate && npm install"
       ]
     }
   ],
   "emulators": {
+    "auth": {
+      "port": 9099
+    },
     "firestore": {
       "port": 8080
     },
