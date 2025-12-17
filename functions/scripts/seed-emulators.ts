@@ -19,18 +19,27 @@
 import * as admin from 'firebase-admin';
 import * as fs from 'fs/promises';
 import * as path from 'path';
+import type { InputAsset, SessionWithProcessing } from '@clementine/shared';
 
-// Configure emulator endpoints
+// Configure emulator endpoints BEFORE initializing admin
 process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8080';
 process.env.FIREBASE_STORAGE_EMULATOR_HOST = 'localhost:9199';
+process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';
 
 // Initialize Firebase Admin SDK
 admin.initializeApp({
-  projectId: 'demo-clementine',
-  storageBucket: 'demo-clementine.appspot.com',
+  projectId: 'clementine-7568d',
+  storageBucket: 'clementine-7568d.firebasestorage.app',
 });
 
 const db = admin.firestore();
+// Explicitly set settings for emulator
+db.settings({
+  host: 'localhost:8080',
+  ssl: false,
+  ignoreUndefinedProperties: true,
+});
+
 const storage = admin.storage().bucket();
 
 // Shared IDs for related entities (actual docs not created yet)
@@ -86,16 +95,7 @@ async function validateImages(): Promise<void> {
 /**
  * Upload an image to Storage emulator and return metadata
  */
-async function uploadImage(
-  filename: string,
-  index: number
-): Promise<{
-  url: string;
-  filename: string;
-  mimeType: string;
-  sizeBytes: number;
-  uploadedAt: number;
-}> {
+async function uploadImage(filename: string): Promise<InputAsset> {
   const filepath = path.join(IMAGE_DIR, filename);
   const storagePath = `media/${COMPANY_ID}/inputs/${Date.now()}-${filename}`;
 
@@ -130,22 +130,14 @@ async function uploadImage(
 /**
  * Upload all images and return metadata array
  */
-async function uploadAllImages(): Promise<
-  Array<{
-    url: string;
-    filename: string;
-    mimeType: string;
-    sizeBytes: number;
-    uploadedAt: number;
-  }>
-> {
+async function uploadAllImages(): Promise<InputAsset[]> {
   console.log('📤 Uploading images to Storage emulator...');
 
-  const imageMetadata = [];
+  const imageMetadata: InputAsset[] = [];
 
   for (let i = 1; i <= TOTAL_IMAGES; i++) {
     const filename = `photo-${String(i).padStart(2, '0')}.jpg`;
-    const metadata = await uploadImage(filename, i);
+    const metadata = await uploadImage(filename);
     imageMetadata.push(metadata);
   }
 
@@ -156,19 +148,13 @@ async function uploadAllImages(): Promise<
 /**
  * Create session documents in Firestore
  */
-async function createSessions(
-  imageMetadata: Array<{
-    url: string;
-    filename: string;
-    mimeType: string;
-    sizeBytes: number;
-    uploadedAt: number;
-  }>
-): Promise<void> {
+async function createSessions(imageMetadata: InputAsset[]): Promise<void> {
   console.log('📝 Creating session documents...');
 
   const now = Date.now();
-  const baseSession = {
+
+  const baseSession: SessionWithProcessing = {
+    id: '',
     projectId: PROJECT_ID,
     eventId: EVENT_ID,
     companyId: COMPANY_ID,
@@ -179,33 +165,31 @@ async function createSessions(
   };
 
   // Session 1: Single image (photo-01)
-  await db
-    .collection('sessions')
-    .doc(SESSION_IDS.singleImage)
-    .set({
-      ...baseSession,
-      inputAssets: [imageMetadata[0]],
-    });
+  const session1: SessionWithProcessing = {
+    ...baseSession,
+    id: SESSION_IDS.singleImage,
+    inputAssets: [imageMetadata[0]],
+    
+  };
+  await db.collection('sessions').doc(SESSION_IDS.singleImage).set(session1);
   console.log(`   ✓ Created session: ${SESSION_IDS.singleImage} (1 image)`);
 
   // Session 2: Four images (photo-07 through photo-10)
-  await db
-    .collection('sessions')
-    .doc(SESSION_IDS.fourImages)
-    .set({
-      ...baseSession,
-      inputAssets: imageMetadata.slice(6, 10), // indices 6-9 = photos 7-10
-    });
+  const session2: SessionWithProcessing = {
+    ...baseSession,
+    id: SESSION_IDS.fourImages,
+    inputAssets: imageMetadata.slice(6, 10), // indices 6-9 = photos 7-10
+  };
+  await db.collection('sessions').doc(SESSION_IDS.fourImages).set(session2);
   console.log(`   ✓ Created session: ${SESSION_IDS.fourImages} (4 images)`);
 
   // Session 3: All 12 images
-  await db
-    .collection('sessions')
-    .doc(SESSION_IDS.allImages)
-    .set({
-      ...baseSession,
-      inputAssets: imageMetadata,
-    });
+  const session3: SessionWithProcessing = {
+    ...baseSession,
+    id: SESSION_IDS.allImages,
+    inputAssets: imageMetadata,
+  };
+  await db.collection('sessions').doc(SESSION_IDS.allImages).set(session3);
   console.log(`   ✓ Created session: ${SESSION_IDS.allImages} (12 images)`);
 
   console.log('✅ Created 3 session documents\n');
