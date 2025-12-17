@@ -8,9 +8,11 @@
   ],
   "main": "dist/index.js",
   "scripts": {
-    "build": "esbuild src/index.ts --bundle --platform=node --target=node22 --outfile=dist/index.js --external:firebase-admin --external:firebase-functions --sourcemap",
-    "serve": "npm run build && firebase emulators:start --only functions",
-    "clean": "rm -rf dist"
+    "build": "tsc",
+    "build:watch": "tsc -w",
+    "serve": "pnpm build:watch | firebase emulators:start --config ../firebase.emulator.json",
+    "serve:prod": "pnpm build && npx isolate && cd isolate && npm install && cd ../.. && firebase emulators:start",
+    "clean": "rm -rf dist isolate"
   },
   "engines": {
     "node": "22"
@@ -18,7 +20,7 @@
   "dependencies": {
     "@clementine/shared": "workspace:*",
     "firebase-admin": "^13.6.0",
-    "firebase-functions": "^7.0.1"
+    "firebase-functions": "^7.0.2"
   },
   "devDependencies": {
     "esbuild": "^0.20.0",
