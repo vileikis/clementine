@@ -28,7 +28,7 @@ export const helloWorld = onRequest(
     sharedTypesWorking: true,
     testSession: {
       id: "test",
-      projectId: "test-project",
+      projectId: "test-project-v4",
       inputAssetsCount: mockSession.inputAssets?.length,
     },
     timestamp: new Date().toISOString(),

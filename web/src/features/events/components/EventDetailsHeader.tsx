@@ -28,7 +28,6 @@ export function EventDetailsHeader({
   companySlug,
   projectId,
   event,
-  projectName,
 }: EventDetailsHeaderProps) {
   const pathname = usePathname();
   const [isRenameOpen, setIsRenameOpen] = useState(false);
@@ -38,6 +37,11 @@ export function EventDetailsHeader({
       name: "General",
       href: `/${companySlug}/${projectId}/${event.id}/general`,
       segment: "general",
+    },
+    {
+      name: "Outro",
+      href: `/${companySlug}/${projectId}/${event.id}/outro`,
+      segment: "outro",
     },
     {
       name: "Overlays",
