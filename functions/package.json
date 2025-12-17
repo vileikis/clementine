@@ -9,7 +9,8 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "serve": "pnpm build && firebase emulators:start --config ../firebase.emulator.json",
+    "build:watch": "tsc -w",
+    "serve": "pnpm build:watch | firebase emulators:start --config ../firebase.emulator.json",
     "serve:prod": "pnpm build && npx isolate && cd isolate && npm install && cd ../.. && firebase emulators:start",
     "clean": "rm -rf dist isolate"
   },
