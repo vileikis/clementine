@@ -8,11 +8,12 @@
   },
   "functions": [
     {
-      "source": "functions/isolate",
+      "source": "functions",
       "codebase": "default",
-      "ignore": ["node_modules", ".git"],
-      "predeploy": [
-        "cd functions && pnpm build && npx isolate && cd isolate && npm install"
+      "ignore": [
+        "node_modules",
+        ".git",
+        "isolate"
       ]
     }
   ],

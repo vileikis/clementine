@@ -15,6 +15,7 @@
     "fb:deploy:indexes": "firebase deploy --only firestore:indexes",
     "functions:build": "pnpm --filter @clementine/shared build && pnpm --filter @clementine/functions build",
     "functions:serve": "pnpm --filter @clementine/functions serve",
+    "functions:serve:prod": "pnpm --filter @clementine/functions serve:prod",
     "functions:deploy": "./functions/scripts/deploy.sh"
   },
   "keywords": [
