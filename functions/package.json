@@ -12,7 +12,8 @@
     "build:watch": "tsc -w",
     "serve": "pnpm build:watch | firebase emulators:start --config ../firebase.emulator.json",
     "serve:prod": "pnpm build && npx isolate && cd isolate && npm install && cd ../.. && firebase emulators:start",
-    "clean": "rm -rf dist isolate"
+    "clean": "rm -rf dist isolate",
+    "seed": "tsx scripts/seed-emulators.ts"
   },
   "engines": {
     "node": "22"
@@ -29,6 +30,7 @@
     "@types/tmp": "^0.2.6",
     "esbuild": "^0.20.0",
     "isolate-package": "^1.26.1",
+    "tsx": "^4.19.2",
     "typescript": "^5.0.0"
   }
 }
