@@ -275,8 +275,9 @@ The application is organized into feature modules in `web/src/features/`.
 - **White-label** - Fully customizable branding per event
 
 ## Active Technologies
-- TypeScript 5.x (Node.js 20.x runtime for Cloud Functions v2) + Firebase Cloud Functions v2, Firestore Admin SDK, Cloud Tasks, FFmpeg (via fluent-ffmpeg + ffmpeg-static) (028-media-processing-pipeline)
+- TypeScript 5.x (Node.js 22 runtime for Cloud Functions v2) + Firebase Cloud Functions v2, Firestore Admin SDK, Cloud Tasks, FFmpeg (via direct CLI calls with child_process + ffmpeg-static binary) (028-media-processing-pipeline)
 - Firebase Firestore (session documents with processing state), Firebase Storage (input assets, output media) (028-media-processing-pipeline)
+- **Note**: Migrated from `fluent-ffmpeg` to direct FFmpeg CLI calls (December 2024) due to fluent-ffmpeg being unmaintained. See `functions/README.md` for architecture details.
 
 ### Core Stack
 
