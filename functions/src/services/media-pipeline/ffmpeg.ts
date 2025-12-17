@@ -156,18 +156,19 @@ function runFFmpegCommand(
         resolve();
         return
       } 
-        const errorType = categorizeFFmpegError(stderr);
-        reject(
-          new FFmpegError(
-            `${description} failed with exit code ${code}`,
-            errorType,
-            {
-              exitCode: code,
-              stderr,
-              stdout,
-            }
-          )
-        );
+      
+      const errorType = categorizeFFmpegError(stderr);
+      reject(
+        new FFmpegError(
+          `${description} failed with exit code ${code}`,
+          errorType,
+          {
+            exitCode: code,
+            stderr,
+            stdout,
+          }
+        )
+      );
       
     });
   });
