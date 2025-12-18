@@ -7,7 +7,6 @@
 // Pipeline processors
 export { processSingleImage } from './image.pipeline';
 export { processGIF } from './gif.pipeline';
-export { processVideo } from './video.pipeline';
 
 // Configuration
 export { getPipelineConfig, detectOutputFormat } from './config';

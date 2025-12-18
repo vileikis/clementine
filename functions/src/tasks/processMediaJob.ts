@@ -10,7 +10,7 @@ import {
 import {
   processSingleImage,
   processGIF,
-  processVideo,
+  // processVideo,
   detectOutputFormat,
 } from '../services/media-pipeline';
 
@@ -80,7 +80,9 @@ export const processMediaJob = onTaskDispatched(
       } else if (actualFormat === 'gif') {
         outputs = await processGIF(session, pipelineOptions);
       } else if (actualFormat === 'video') {
-        outputs = await processVideo(session, pipelineOptions);
+        // TODO: Implement video processing
+        // outputs = await processVideo(session, pipelineOptions);
+        throw new Error('Video processing not implemented');
       } else {
         throw new Error(`Unknown output format: ${actualFormat}`);
       }
