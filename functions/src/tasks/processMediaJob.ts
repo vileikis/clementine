@@ -37,7 +37,7 @@ export const processMediaJob = onTaskDispatched(
       // Extract payload from task
       const parseResult = processMediaRequestSchema.safeParse(req.data);
       if (!parseResult.success) {
-        console.error('Invalid task payload:', parseResult.error.errors);
+        console.error('Invalid task payload:', parseResult.error.issues);
         throw new Error('Invalid task payload');
       }
 

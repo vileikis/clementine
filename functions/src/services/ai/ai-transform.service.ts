@@ -66,8 +66,12 @@ export async function transformImage(
     // Instantiate AI provider
     const provider = createProvider(config.provider, apiKey);
 
-    // Transform image
-    const transformedBuffer = await provider.transformImage(inputBuffer, config);
+    // Transform image (pass reference image buffers)
+    const transformedBuffer = await provider.transformImage(
+      inputBuffer,
+      config,
+      referenceImageBuffers
+    );
 
     const duration = Date.now() - startTime;
     logger.info('[AI Transform] Transformation completed', {
