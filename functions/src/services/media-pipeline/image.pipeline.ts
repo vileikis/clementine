@@ -4,12 +4,11 @@ import {
   uploadToStorage,
   getOutputStoragePath,
 } from '../../lib/storage';
-import { updateProcessingStep, markSessionFailed } from '../../lib/session';
+import { updateProcessingStep } from '../../lib/session';
 import { getPipelineConfig } from './config';
 import { createTempDir } from '../../lib/utils';
 import { downloadSingleFrame, downloadOverlay } from './pipeline-utils';
-import { transformImage, MOCKED_AI_CONFIG } from '../ai';
-import { AiTransformError } from '../ai/providers/types';
+import { applyAiTransform, handleAiTransformError } from './ai-transform-step';
 import type {
   SessionOutputs,
   SessionWithProcessing,
@@ -20,11 +19,13 @@ import type { PipelineOptions } from '../../lib/schemas/media-pipeline.schema';
  * Process single image (User Story 1)
  *
  * @param session - Session document (already fetched)
- * @param options - Pipeline options (aspectRatio, overlay)
+ * @param options - Pipeline options (aspectRatio, overlay, aiTransform)
+ * @param apiKey - Google AI API key from Firebase Params (required if aiTransform is true)
  */
 export async function processSingleImage(
   session: SessionWithProcessing,
-  options: PipelineOptions
+  options: PipelineOptions,
+  apiKey?: string
 ): Promise<SessionOutputs> {
   const startTime = Date.now();
 
@@ -52,62 +53,14 @@ export async function processSingleImage(
     // Apply AI transformation if requested
     if (options.aiTransform) {
       try {
-        await updateProcessingStep(session.id, 'ai-transform');
-
-        // Read input image as buffer
-        const inputBuffer = await fs.readFile(inputPath);
-
-        // Get API key from environment (Firebase Params will populate this)
-        const apiKey = process.env.GOOGLE_AI_API_KEY || '';
-        if (!apiKey) {
-          throw new AiTransformError(
-            'GOOGLE_AI_API_KEY environment variable not set',
-            'INVALID_CONFIG'
-          );
-        }
-
-        // Transform image using AI service
-        const transformedBuffer = await transformImage(inputBuffer, MOCKED_AI_CONFIG, apiKey);
-
-        // Write transformed buffer to new file
-        const transformedPath = `${tmpDirObj.path}/transformed.jpg`;
-        await fs.writeFile(transformedPath, transformedBuffer);
-
-        // Use transformed image for subsequent pipeline steps
-        inputPath = transformedPath;
+        inputPath = await applyAiTransform(
+          session.id,
+          inputPath,
+          tmpDirObj.path,
+          apiKey || ''
+        );
       } catch (error) {
-        // Handle AI transformation errors
-        let errorCode = 'AI_TRANSFORM_FAILED';
-        let errorMessage = 'AI transformation failed';
-
-        if (error instanceof AiTransformError) {
-          // Map specific AI error codes to session error codes
-          switch (error.code) {
-            case 'REFERENCE_IMAGE_NOT_FOUND':
-              errorCode = 'REFERENCE_IMAGE_NOT_FOUND';
-              errorMessage = `Reference image not found: ${error.message}`;
-              break;
-            case 'INVALID_CONFIG':
-              errorCode = 'AI_CONFIG_INVALID';
-              errorMessage = `Invalid AI config: ${error.message}`;
-              break;
-            case 'API_ERROR':
-            case 'INVALID_INPUT_IMAGE':
-            case 'TIMEOUT':
-            default:
-              errorCode = 'AI_TRANSFORM_FAILED';
-              errorMessage = `AI transformation failed: ${error.message}`;
-              break;
-          }
-        } else if (error instanceof Error) {
-          errorMessage = `AI transformation failed: ${error.message}`;
-        }
-
-        // Mark session as failed
-        await markSessionFailed(session.id, errorCode, errorMessage);
-
-        // Re-throw error to trigger Cloud Tasks retry
-        throw error;
+        await handleAiTransformError(error, session.id);
       }
     }
 
