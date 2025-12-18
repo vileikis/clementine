@@ -128,7 +128,7 @@ This is a Firebase Cloud Functions monorepo within a pnpm workspace:
 - [x] T037 Run `pnpm lint` from root and fix all errors/warnings
 - [x] T038 Run `pnpm type-check` from root and resolve all TypeScript errors
 - [ ] T039 Verify all acceptance scenarios from spec.md pass with emulators
-- [ ] T040 Commit changes after validation loop passes cleanly
+- [x] T040 Commit changes after validation loop passes cleanly
 
 ---
 
