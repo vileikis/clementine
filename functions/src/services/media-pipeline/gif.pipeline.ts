@@ -1,14 +1,13 @@
 import * as fs from 'fs/promises';
 import { createGIF, generateThumbnail } from './ffmpeg';
 import {
-  downloadFromStorage,
   uploadToStorage,
   getOutputStoragePath,
-  parseStorageUrl,
 } from '../../lib/storage';
 import { updateProcessingStep } from '../../lib/session';
 import { getPipelineConfig } from './config';
 import { createTempDir } from '../../lib/utils';
+import { downloadSessionFrames } from './pipeline-utils';
 import type {
   SessionOutputs,
   SessionWithProcessing,
@@ -40,26 +39,28 @@ export async function processGIF(
   try {
     await updateProcessingStep(session.id, 'downloading');
 
-    // Download all frames
-    const framePaths: string[] = [];
-    for (let i = 0; i < session.inputAssets.length; i++) {
-      const asset = session.inputAssets[i];
-      if (!asset) continue;
-      const framePath = `${tmpDirObj.path}/frame-${String(i + 1).padStart(3, '0')}.jpg`;
-      const storagePath = parseStorageUrl(asset.url);
-      await downloadFromStorage(storagePath, framePath);
-      framePaths.push(framePath);
-    }
+    // Download unique frames
+    const downloadedFrames = await downloadSessionFrames(
+      session.inputAssets,
+      tmpDirObj.path
+    );
 
     await updateProcessingStep(session.id, 'processing');
 
+    // Create boomerang sequence: [1,2,3,4] + [3,2,1] = [1,2,3,4,3,2,1]
+    // No file duplication - just reference the same files multiple times
+    const boomerangFrames = [
+      ...downloadedFrames,
+      ...downloadedFrames.slice(0, -1).reverse(),
+    ];
+
     // Create GIF
     const gifPath = `${tmpDirObj.path}/output.gif`;
-    await createGIF(framePaths, gifPath, config.outputWidth);
+    await createGIF(boomerangFrames, gifPath, config.outputWidth);
 
     // Generate thumbnail from first frame
     const thumbPath = `${tmpDirObj.path}/thumb.jpg`;
-    const firstFrame = framePaths[0];
+    const firstFrame = downloadedFrames[0];
     if (!firstFrame) {
       throw new Error('No frames available for thumbnail');
     }

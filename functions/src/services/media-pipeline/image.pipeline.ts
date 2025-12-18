@@ -1,14 +1,13 @@
 import * as fs from 'fs/promises';
 import { scaleAndCropImage, generateThumbnail } from './ffmpeg';
 import {
-  downloadFromStorage,
   uploadToStorage,
   getOutputStoragePath,
-  parseStorageUrl,
 } from '../../lib/storage';
 import { updateProcessingStep } from '../../lib/session';
 import { getPipelineConfig } from './config';
 import { createTempDir } from '../../lib/utils';
+import { downloadSingleFrame } from './pipeline-utils';
 import type {
   SessionOutputs,
   SessionWithProcessing,
@@ -47,9 +46,7 @@ export async function processSingleImage(
     if (!inputAsset) {
       throw new Error('No input asset found');
     }
-    const inputPath = `${tmpDirObj.path}/input.jpg`;
-    const storagePath = parseStorageUrl(inputAsset.url);
-    await downloadFromStorage(storagePath, inputPath);
+    const inputPath = await downloadSingleFrame(inputAsset, tmpDirObj.path, 'input.jpg');
 
     await updateProcessingStep(session.id, 'processing');
 

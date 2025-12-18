@@ -1,7 +1,6 @@
 import { spawn } from 'child_process';
 import ffmpegStatic from 'ffmpeg-static';
 import * as fs from 'fs/promises';
-import * as tmp from 'tmp';
 
 // Validate ffmpeg binary path
 if (!ffmpegStatic) {
@@ -9,21 +8,6 @@ if (!ffmpegStatic) {
 }
 
 const FFMPEG_PATH = ffmpegStatic;
-
-// Enable graceful cleanup
-tmp.setGracefulCleanup();
-
-/**
- * Create temp directory with cleanup callback
- */
-async function createTempDir(): Promise<{ path: string; cleanup: () => void }> {
-  return new Promise((resolve, reject) => {
-    tmp.dir({ unsafeCleanup: true }, (err, path, cleanup) => {
-      if (err) reject(err);
-      else resolve({ path, cleanup });
-    });
-  });
-}
 
 /**
  * Custom error classes for FFmpeg operations
@@ -155,8 +139,8 @@ function runFFmpegCommand(
         console.log(`${description} completed successfully`);
         resolve();
         return
-      } 
-      
+      }
+
       const errorType = categorizeFFmpegError(stderr);
       reject(
         new FFmpegError(
@@ -169,7 +153,7 @@ function runFFmpegCommand(
           }
         )
       );
-      
+
     });
   });
 }
@@ -284,17 +268,19 @@ export async function generateThumbnail(
 }
 
 /**
- * Generate palette for GIF from image sequence
+ * Generate palette for GIF from concat file
  */
 async function generatePalette(
-  framePattern: string,
+  concatFilePath: string,
   palettePath: string,
   width: number
 ): Promise<void> {
   const args = [
-    '-pattern_type', 'glob',
-    '-i', framePattern,
-    '-vf', `fps=2,scale=${width}:-1:flags=lanczos,palettegen=stats_mode=diff:max_colors=256`,
+    '-f', 'concat',
+    '-safe', '0',
+    '-i', concatFilePath,
+    '-vf', `scale=${width}:-1:flags=lanczos,palettegen=stats_mode=diff:max_colors=256`,
+    '-frames:v', '1', // Generate single palette frame
     '-y', // Overwrite output file
     palettePath
   ];
@@ -303,12 +289,22 @@ async function generatePalette(
     timeout: TIMEOUTS.gif_small,
     description: 'GIF palette generation',
   });
+
+  // Validate output
+  const outputStats = await fs.stat(palettePath);
+  if (outputStats.size === 0) {
+    throw new FFmpegError('FFmpeg produced empty palette', 'unknown', {
+      palettePath,
+    });
+  }
 }
 
 /**
  * Create GIF from image sequence using palette
  *
- * @param framePaths - Array of frame file paths
+ * Uses FFmpeg concat demuxer to avoid file duplication for boomerang effects.
+ *
+ * @param framePaths - Array of frame file paths (can contain duplicates)
  * @param outputPath - Path to output GIF
  * @param width - Target width
  */
@@ -317,34 +313,40 @@ export async function createGIF(
   outputPath: string,
   width: number
 ): Promise<void> {
-  // Validate all input frames
-  await Promise.all(framePaths.map((path) => validateInputFile(path)));
-
   // Validate we have frames
-  const firstFrame = framePaths[0];
-  if (!firstFrame) {
+  if (framePaths.length === 0) {
     throw new FFmpegError('No frames provided for GIF', 'validation', {
-      frameCount: framePaths.length,
+      frameCount: 0,
     });
   }
 
-  // Create temp directory for palette
-  const tmpDirObj = await createTempDir();
+  // Validate unique frames exist (framePaths may have duplicates for boomerang)
+  const uniqueFrames = Array.from(new Set(framePaths));
+  await Promise.all(uniqueFrames.map((path) => validateInputFile(path)));
+
+  // Create concat file in same directory as frames
+  const frameDir = framePaths[0]!.substring(0, framePaths[0]!.lastIndexOf('/'));
+  const concatFilePath = `${frameDir}/concat.txt`;
+  const palettePath = `${frameDir}/palette.png`;
 
   try {
-    const frameDir = firstFrame.substring(0, firstFrame.lastIndexOf('/'));
-    const framePattern = `${frameDir}/frame-*.jpg`;
-    const palettePath = `${tmpDirObj.path}/palette.png`;
+    // Create concat file listing all frames in order
+    // Format: file 'path/to/frame.jpg' (one per line)
+    const concatContent = framePaths
+      .map((path) => `file '${path}'`)
+      .join('\n');
+    await fs.writeFile(concatFilePath, concatContent, 'utf-8');
 
-    // Generate palette
-    await generatePalette(framePattern, palettePath, width);
+    // Generate palette from concat file
+    await generatePalette(concatFilePath, palettePath, width);
 
     // Create GIF using palette
     const args = [
-      '-pattern_type', 'glob',
-      '-i', framePattern,
+      '-f', 'concat',
+      '-safe', '0',
+      '-i', concatFilePath,
       '-i', palettePath,
-      '-filter_complex', `fps=2,scale=${width}:-1:flags=lanczos[x];[x][1:v]paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle`,
+      '-filter_complex', `scale=${width}:-1:flags=lanczos[x];[x][1:v]paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle`,
       '-loop', '0',
       '-y', // Overwrite output file
       outputPath
@@ -365,8 +367,16 @@ export async function createGIF(
       });
     }
   } finally {
-    // Cleanup temp directory
-    tmpDirObj.cleanup();
+    // Cleanup temporary files (frames will be cleaned up by caller)
+    try {
+      await Promise.all([
+        fs.unlink(concatFilePath).catch(() => {}),
+        fs.unlink(palettePath).catch(() => {}),
+      ]);
+    } catch (err) {
+      // Ignore cleanup errors
+      console.warn(`Failed to cleanup temporary files: ${(err as Error).message}`);
+    }
   }
 }
 
