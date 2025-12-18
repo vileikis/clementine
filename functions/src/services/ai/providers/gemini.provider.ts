@@ -67,6 +67,8 @@ export class GoogleGeminiProvider implements AiProvider {
         model: config.model,
         inputSize: inputBuffer.length,
         referenceImageCount: referenceImageBuffers?.length || 0,
+        aspectRatio: config.aspectRatio,
+        imageSize: config.imageSize,
       });
 
       // Prepare content parts for Gemini API
@@ -98,10 +100,35 @@ export class GoogleGeminiProvider implements AiProvider {
         text: config.prompt,
       });
 
+      // Build generation config
+      const generationConfig: Record<string, any> = {
+        candidateCount: 1,
+      };
+
+      // Add temperature if specified
+      if (config.temperature !== undefined) {
+        generationConfig['temperature'] = config.temperature;
+      }
+
+      // Build image config
+      const imageConfig: Record<string, string> = {};
+      if (config.aspectRatio) {
+        imageConfig['aspectRatio'] = config.aspectRatio;
+      }
+      if (config.imageSize) {
+        imageConfig['imageSize'] = config.imageSize;
+      }
+
+      // Add imageConfig to generation config if not empty
+      if (Object.keys(imageConfig).length > 0) {
+        generationConfig['imageConfig'] = imageConfig;
+      }
+
       // Call Gemini API
       const response = await this.client.models.generateContent({
         model: config.model,
         contents: contentParts,
+        config: generationConfig,
       });
 
       // Extract transformed image from response

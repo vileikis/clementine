@@ -1,15 +1,14 @@
 import * as fs from 'fs/promises';
 import { defineSecret } from 'firebase-functions/params';
-import { updateProcessingStep, markSessionFailed } from '../../lib/session';
-import { transformImage, MOCKED_AI_CONFIG } from '../ai';
+import { transformImage } from '../ai';
 import { AiTransformError } from '../ai/providers/types';
+import type { AiTransformConfig } from '../ai/providers/types';
 
 /**
  * AI Transform Step for Media Pipeline
  *
  * Handles AI-powered image transformation as a discrete pipeline step.
- * Encapsulates all AI transform logic including state updates, error handling,
- * and buffer management.
+ * Encapsulates AI transform logic with error handling and buffer management.
  */
 
 /**
@@ -21,20 +20,17 @@ export const GOOGLE_AI_API_KEY_SECRET = defineSecret('GOOGLE_AI_API_KEY');
 /**
  * Apply AI transformation to an input image
  *
- * @param sessionId - Session document ID for state tracking
  * @param inputPath - Path to input image file
  * @param tmpDir - Temporary directory for output file
+ * @param config - AI transformation configuration (including aspectRatio, imageSize, etc.)
  * @returns Path to transformed image file
  * @throws {AiTransformError} If transformation fails
  */
 export async function applyAiTransform(
-  sessionId: string,
   inputPath: string,
-  tmpDir: string
+  tmpDir: string,
+  config: AiTransformConfig
 ): Promise<string> {
-  // Update session state to 'ai-transform'
-  await updateProcessingStep(sessionId, 'ai-transform');
-
   // Get API key from secret (defined at module level)
   const apiKey = GOOGLE_AI_API_KEY_SECRET.value();
 
@@ -52,7 +48,7 @@ export async function applyAiTransform(
   // Transform image using AI service
   const transformedBuffer = await transformImage(
     inputBuffer,
-    MOCKED_AI_CONFIG,
+    config,
     apiKey
   );
 
@@ -64,19 +60,18 @@ export async function applyAiTransform(
 }
 
 /**
- * Handle AI transformation errors with specific error code mapping
+ * Map AI transformation errors to session error codes
  *
- * Maps AiTransformError codes to session error codes and marks session as failed.
- * Re-throws error to trigger Cloud Tasks retry mechanism.
+ * Pure function that maps AiTransformError codes to session error codes.
+ * Session management should be done by the caller (pipeline).
  *
  * @param error - Error from AI transformation
- * @param sessionId - Session document ID
- * @throws Always re-throws the error after marking session failed
+ * @returns Object with errorCode and errorMessage for session management
  */
-export async function handleAiTransformError(
-  error: unknown,
-  sessionId: string
-): Promise<never> {
+export function mapAiTransformError(error: unknown): {
+  errorCode: string;
+  errorMessage: string;
+} {
   let errorCode = 'AI_TRANSFORM_FAILED';
   let errorMessage = 'AI transformation failed';
 
@@ -103,9 +98,5 @@ export async function handleAiTransformError(
     errorMessage = `AI transformation failed: ${error.message}`;
   }
 
-  // Mark session as failed
-  await markSessionFailed(sessionId, errorCode, errorMessage);
-
-  // Re-throw error to trigger Cloud Tasks retry
-  throw error;
+  return { errorCode, errorMessage };
 }

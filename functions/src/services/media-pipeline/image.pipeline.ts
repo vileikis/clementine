@@ -4,16 +4,19 @@ import {
   uploadToStorage,
   getOutputStoragePath,
 } from '../../lib/storage';
-import { updateProcessingStep } from '../../lib/session';
+import { updateProcessingStep, markSessionFailed } from '../../lib/session';
 import { getPipelineConfig } from './config';
 import { createTempDir } from '../../lib/utils';
 import { downloadSingleFrame, downloadOverlay } from './pipeline-utils';
-import { applyAiTransform, handleAiTransformError } from './ai-transform-step';
+import { applyAiTransform, mapAiTransformError } from './ai-transform-step';
+import { mapAspectRatioToGemini } from './aspect-ratio-utils';
+import { MOCKED_AI_CONFIG } from '../ai';
 import type {
   SessionOutputs,
   SessionWithProcessing,
 } from '@clementine/shared';
 import type { PipelineOptions } from '../../lib/schemas/media-pipeline.schema';
+import type { AiTransformConfig } from '../ai/providers/types';
 
 /**
  * Process single image (User Story 1)
@@ -51,9 +54,26 @@ export async function processSingleImage(
     // Apply AI transformation if requested
     if (options.aiTransform) {
       try {
-        inputPath = await applyAiTransform(session.id, inputPath, tmpDirObj.path);
+        // Update session state to 'ai-transform'
+        await updateProcessingStep(session.id, 'ai-transform');
+
+        // Enrich AI config with pipeline's aspectRatio
+        const enrichedConfig: AiTransformConfig = {
+          ...MOCKED_AI_CONFIG,
+          aspectRatio: mapAspectRatioToGemini(options.aspectRatio),
+        };
+
+        // Apply AI transformation
+        inputPath = await applyAiTransform(inputPath, tmpDirObj.path, enrichedConfig);
       } catch (error) {
-        await handleAiTransformError(error, session.id);
+        // Map error to session error codes
+        const { errorCode, errorMessage } = mapAiTransformError(error);
+
+        // Mark session as failed
+        await markSessionFailed(session.id, errorCode, errorMessage);
+
+        // Re-throw to trigger Cloud Tasks retry
+        throw error;
       }
     }
 

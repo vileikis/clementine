@@ -26,6 +26,12 @@ export interface AiTransformConfig {
 
   /** Optional: Max tokens for response */
   maxOutputTokens?: number;
+
+  /** Optional: Aspect ratio for generated images (e.g., '1:1', '9:16', '16:9') */
+  aspectRatio?: string;
+
+  /** Optional: Size of generated images ('1K', '2K', '4K') */
+  imageSize?: string;
 }
 
 /**
