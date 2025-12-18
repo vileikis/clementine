@@ -13,16 +13,17 @@ import type {
   SessionOutputs,
   SessionWithProcessing,
 } from '@clementine/shared';
+import type { PipelineOptions } from '../../lib/schemas/media-pipeline.schema';
 
 /**
  * Process multi-frame video (User Story 3)
  *
  * @param session - Session document (already fetched)
- * @param aspectRatio - Target aspect ratio
+ * @param options - Pipeline options (aspectRatio, overlay)
  */
 export async function processVideo(
   session: SessionWithProcessing,
-  aspectRatio: 'square' | 'story'
+  options: PipelineOptions
 ): Promise<SessionOutputs> {
   const startTime = Date.now();
 
@@ -32,7 +33,7 @@ export async function processVideo(
   }
 
   // Get pipeline config
-  const config = getPipelineConfig('video', aspectRatio);
+  const config = getPipelineConfig('video', options.aspectRatio);
 
   // Create temp directory for processing
   const tmpDirObj = await createTempDir();

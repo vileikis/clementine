@@ -12,16 +12,17 @@ import type {
   SessionOutputs,
   SessionWithProcessing,
 } from '@clementine/shared';
+import type { PipelineOptions } from '../../lib/schemas/media-pipeline.schema';
 
 /**
  * Process multi-frame GIF (User Story 2)
  *
  * @param session - Session document (already fetched)
- * @param aspectRatio - Target aspect ratio
+ * @param options - Pipeline options (aspectRatio, overlay)
  */
 export async function processGIF(
   session: SessionWithProcessing,
-  aspectRatio: 'square' | 'story'
+  options: PipelineOptions
 ): Promise<SessionOutputs> {
   const startTime = Date.now();
 
@@ -31,7 +32,7 @@ export async function processGIF(
   }
 
   // Get pipeline config
-  const config = getPipelineConfig('gif', aspectRatio);
+  const config = getPipelineConfig('gif', options.aspectRatio);
 
   // Create temp directory for processing
   const tmpDirObj = await createTempDir();

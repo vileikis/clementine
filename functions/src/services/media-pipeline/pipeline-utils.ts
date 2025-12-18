@@ -47,3 +47,31 @@ export async function downloadSessionFrames(
 
   return framePaths;
 }
+
+/**
+ * Download overlay image from Storage to local temporary directory
+ *
+ * Uses hardcoded overlay paths based on aspect ratio:
+ * - square: media/company-test-001/overlays/square-overlay.png
+ * - story: media/company-test-001/overlays/story-overlay.png
+ *
+ * @param aspectRatio - Target aspect ratio
+ * @param tmpDir - Temporary directory path
+ * @returns Full path to downloaded overlay file
+ */
+export async function downloadOverlay(
+  aspectRatio: 'square' | 'story',
+  tmpDir: string
+): Promise<string> {
+  // Hardcoded overlay paths for testing with emulator
+  const COMPANY_ID = 'company-test-001';
+  const overlayFilename = aspectRatio === 'square'
+    ? 'square-overlay.png'
+    : 'story-overlay.png';
+
+  const storagePath = `media/${COMPANY_ID}/overlays/${overlayFilename}`;
+  const outputPath = `${tmpDir}/overlay.png`;
+
+  await downloadFromStorage(storagePath, outputPath);
+  return outputPath;
+}

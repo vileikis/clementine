@@ -24,6 +24,17 @@ export const processMediaRequestSchema = z.object({
   sessionId: z.string().min(1, 'sessionId is required'),
   outputFormat: z.enum(['image', 'gif', 'video']),
   aspectRatio: z.enum(['square', 'story']),
+  overlay: z.boolean().optional().default(false),
 });
 
 export type ProcessMediaRequest = z.infer<typeof processMediaRequestSchema>;
+
+/**
+ * Pipeline options passed to processing functions
+ */
+export const pipelineOptionsSchema = z.object({
+  aspectRatio: z.enum(['square', 'story']),
+  overlay: z.boolean().optional().default(false),
+});
+
+export type PipelineOptions = z.infer<typeof pipelineOptionsSchema>;
