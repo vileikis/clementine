@@ -1,5 +1,5 @@
 import * as fs from 'fs/promises';
-import { createGIF, generateThumbnail, applyOverlayToMedia } from './ffmpeg';
+import { createGIF, generateThumbnail, applyOverlayToMedia, scaleAndCropImage } from './ffmpeg';
 import {
   uploadToStorage,
   getOutputStoragePath,
@@ -48,11 +48,29 @@ export async function processGIF(
 
     await updateProcessingStep(session.id, 'processing');
 
+    // Scale and crop each frame to exact target dimensions
+    console.log(`[GIF Pipeline] Scaling and cropping ${downloadedFrames.length} frames to ${config.outputWidth}x${config.outputHeight}`);
+    const scaledFrames: string[] = [];
+    for (let i = 0; i < downloadedFrames.length; i++) {
+      const downloadedFrame = downloadedFrames[i];
+      if (!downloadedFrame) continue;
+
+      const scaledPath = `${tmpDirObj.path}/scaled-${String(i + 1).padStart(3, '0')}.jpg`;
+      await scaleAndCropImage(
+        downloadedFrame,
+        scaledPath,
+        config.outputWidth,
+        config.outputHeight
+      );
+      scaledFrames.push(scaledPath);
+      console.log(`[GIF Pipeline] Scaled frame ${i + 1}/${downloadedFrames.length}`);
+    }
+
     // Create boomerang sequence: [1,2,3,4] + [3,2,1] = [1,2,3,4,3,2,1]
     // No file duplication - just reference the same files multiple times
     const boomerangFrames = [
-      ...downloadedFrames,
-      ...downloadedFrames.slice(0, -1).reverse(),
+      ...scaledFrames,
+      ...scaledFrames.slice(0, -1).reverse(),
     ];
 
     // Create GIF
@@ -72,9 +90,9 @@ export async function processGIF(
       finalPath = overlayedPath;
     }
 
-    // Generate thumbnail from first frame
+    // Generate thumbnail from first scaled frame
     const thumbPath = `${tmpDirObj.path}/thumb.jpg`;
-    const firstFrame = downloadedFrames[0];
+    const firstFrame = scaledFrames[0];
     if (!firstFrame) {
       throw new Error('No frames available for thumbnail');
     }
