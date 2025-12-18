@@ -1,4 +1,5 @@
 import { onTaskDispatched } from 'firebase-functions/v2/tasks';
+import { defineSecret } from 'firebase-functions/params';
 import '../lib/firebase-admin'; // Initialize Firebase Admin
 import { processMediaRequestSchema } from '../lib/schemas/media-pipeline.schema';
 import {
@@ -14,6 +15,9 @@ import {
   detectOutputFormat,
 } from '../services/media-pipeline';
 
+// Define Google AI API key secret (Firebase Params)
+const googleAiApiKey = defineSecret('GOOGLE_AI_API_KEY');
+
 /**
  * Cloud Task handler for async media processing
  *
@@ -22,6 +26,7 @@ import {
 export const processMediaJob = onTaskDispatched(
   {
     region: 'europe-west1',
+    secrets: [googleAiApiKey], // Declare secret dependency
     retryConfig: {
       maxAttempts: 0,
       minBackoffSeconds: 30,
@@ -76,10 +81,13 @@ export const processMediaJob = onTaskDispatched(
         aiTransform: aiTransform ?? false,
       };
 
+      // Get Google AI API key from secret
+      const apiKey = googleAiApiKey.value();
+
       // Route to appropriate pipeline based on format
       let outputs;
       if (actualFormat === 'image') {
-        outputs = await processSingleImage(session, pipelineOptions);
+        outputs = await processSingleImage(session, pipelineOptions, apiKey);
       } else if (actualFormat === 'gif') {
         outputs = await processGIF(session, pipelineOptions);
       } else if (actualFormat === 'video') {
