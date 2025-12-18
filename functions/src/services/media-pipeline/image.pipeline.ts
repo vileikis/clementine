@@ -1,5 +1,5 @@
 import * as fs from 'fs/promises';
-import { scaleAndCropImage, generateThumbnail } from './ffmpeg';
+import { scaleAndCropImage, generateThumbnail, applyOverlayToMedia } from './ffmpeg';
 import {
   uploadToStorage,
   getOutputStoragePath,
@@ -7,23 +7,22 @@ import {
 import { updateProcessingStep } from '../../lib/session';
 import { getPipelineConfig } from './config';
 import { createTempDir } from '../../lib/utils';
-import { downloadSingleFrame } from './pipeline-utils';
+import { downloadSingleFrame, downloadOverlay } from './pipeline-utils';
 import type {
   SessionOutputs,
   SessionWithProcessing,
 } from '@clementine/shared';
+import type { PipelineOptions } from '../../lib/schemas/media-pipeline.schema';
 
 /**
  * Process single image (User Story 1)
  *
  * @param session - Session document (already fetched)
- * @param outputFormat - Requested output format
- * @param aspectRatio - Target aspect ratio
+ * @param options - Pipeline options (aspectRatio, overlay)
  */
 export async function processSingleImage(
   session: SessionWithProcessing,
-  outputFormat: 'image' | 'gif' | 'video',
-  aspectRatio: 'square' | 'story'
+  options: PipelineOptions
 ): Promise<SessionOutputs> {
   const startTime = Date.now();
 
@@ -33,7 +32,7 @@ export async function processSingleImage(
   }
 
   // Get pipeline config
-  const config = getPipelineConfig(outputFormat, aspectRatio);
+  const config = getPipelineConfig('image', options.aspectRatio);
 
   // Create temp directory for processing
   const tmpDirObj = await createTempDir();
@@ -59,6 +58,15 @@ export async function processSingleImage(
       config.outputHeight
     );
 
+    // Apply overlay if requested
+    let finalPath = scaledPath;
+    if (options.overlay) {
+      const overlayPath = await downloadOverlay(options.aspectRatio, tmpDirObj.path);
+      const overlayedPath = `${tmpDirObj.path}/final.jpg`;
+      await applyOverlayToMedia(scaledPath, overlayPath, overlayedPath);
+      finalPath = overlayedPath;
+    }
+
     // Generate thumbnail
     const thumbPath = `${tmpDirObj.path}/thumb.jpg`;
     await generateThumbnail(inputPath, thumbPath, 300);
@@ -80,12 +88,12 @@ export async function processSingleImage(
     );
 
     const [primaryUrl, thumbnailUrl] = await Promise.all([
-      uploadToStorage(scaledPath, outputStoragePath),
+      uploadToStorage(finalPath, outputStoragePath),
       uploadToStorage(thumbPath, thumbStoragePath),
     ]);
 
     // Get file size
-    const scaledStats = await fs.stat(scaledPath);
+    const finalStats = await fs.stat(finalPath);
 
     // Create outputs object
     const outputs: SessionOutputs = {
@@ -96,7 +104,7 @@ export async function processSingleImage(
         width: config.outputWidth,
         height: config.outputHeight,
       },
-      sizeBytes: scaledStats.size,
+      sizeBytes: finalStats.size,
       completedAt: Date.now(),
       processingTimeMs: Date.now() - startTime,
     };

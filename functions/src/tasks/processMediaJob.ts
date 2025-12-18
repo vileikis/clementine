@@ -39,11 +39,12 @@ export const processMediaJob = onTaskDispatched(
         throw new Error('Invalid task payload');
       }
 
-      const { sessionId, outputFormat, aspectRatio } = parseResult.data;
+      const { sessionId, outputFormat, aspectRatio, overlay } = parseResult.data;
 
       console.log(`Processing session ${sessionId}`, {
         outputFormat,
         aspectRatio,
+        overlay,
       });
 
       // Fetch session
@@ -66,14 +67,20 @@ export const processMediaJob = onTaskDispatched(
         inputCount: session.inputAssets?.length,
       });
 
+      // Prepare pipeline options
+      const pipelineOptions = {
+        aspectRatio,
+        overlay: overlay ?? false,
+      };
+
       // Route to appropriate pipeline based on format
       let outputs;
       if (actualFormat === 'image') {
-        outputs = await processSingleImage(session, outputFormat, aspectRatio);
+        outputs = await processSingleImage(session, pipelineOptions);
       } else if (actualFormat === 'gif') {
-        outputs = await processGIF(session, aspectRatio);
+        outputs = await processGIF(session, pipelineOptions);
       } else if (actualFormat === 'video') {
-        outputs = await processVideo(session, aspectRatio);
+        outputs = await processVideo(session, pipelineOptions);
       } else {
         throw new Error(`Unknown output format: ${actualFormat}`);
       }
