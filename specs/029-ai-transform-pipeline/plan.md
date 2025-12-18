@@ -110,10 +110,16 @@ functions/
 pnpm add @google/genai
 ```
 
-**Environment Variables**:
+**Firebase Params Configuration**:
+```typescript
+// Using Firebase Params (defineSecret) for API key management
+// Prompts for value on first emulator run and deployment
+// Stored in .secret.local (local) and Secret Manager (production)
+import { defineSecret } from 'firebase-functions/params';
+const googleAiApiKey = defineSecret('GOOGLE_AI_API_KEY');
 ```
-GOOGLE_AI_API_KEY=<gemini-api-key>
-```
+
+Get API key from: https://makersuite.google.com/app/apikey
 
 ---
 

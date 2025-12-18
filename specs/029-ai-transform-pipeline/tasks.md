@@ -25,10 +25,10 @@ This is a Firebase Cloud Functions monorepo within a pnpm workspace:
 
 ## Phase 1: Setup (Dependencies & Configuration)
 
-**Purpose**: Install dependencies and configure environment variables
+**Purpose**: Install dependencies and configure Firebase Params for API keys
 
 - [x] T001 Install @google/genai SDK in functions/package.json
-- [x] T002 Configure GOOGLE_AI_API_KEY environment variable in functions/.env for local development
+- [x] T002 Configure GOOGLE_AI_API_KEY using Firebase Params (defineSecret) - Will be prompted on first emulator run
 - [x] T003 Upload reference images to Firebase Storage at media/company-test-001/ai-reference/ (hobbit-costume.jpg, black-magic-wand.jpg) - Already handled by seed script
 
 ---
