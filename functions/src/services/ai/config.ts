@@ -29,4 +29,6 @@ export const MOCKED_AI_CONFIG: AiTransformConfig = {
     'media/company-test-001/ai-reference/black-magic-wand.jpg',
   ],
   temperature: 0.7,
+  imageSize: '2K', // Default image size (balance of quality vs speed/cost)
+  // aspectRatio will be added dynamically by pipeline based on request
 };
