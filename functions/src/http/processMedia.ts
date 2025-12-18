@@ -31,7 +31,7 @@ export const processMedia = onRequest(
       if (!parseResult.success) {
         res.status(400).json({
           error: 'Invalid request',
-          details: parseResult.error.errors,
+          details: parseResult.error.issues,
         });
         return;
       }

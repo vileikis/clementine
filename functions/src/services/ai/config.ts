@@ -22,7 +22,7 @@ import type { AiTransformConfig } from './providers/types';
  */
 export const MOCKED_AI_CONFIG: AiTransformConfig = {
   provider: 'google',
-  model: 'gemini-3-pro-image-preview',
+  model: 'gemini-2.5-flash-image', // Using Gemini 2.5 Flash Image model (~$0.039/transform)
   prompt: 'Transform this person into a hobbit from Lord of the Rings. Apply fantasy costume, hairy feet, and whimsical background. Maintain facial features and pose.',
   referenceImages: [
     'media/company-test-001/ai-reference/hobbit-costume.jpg',

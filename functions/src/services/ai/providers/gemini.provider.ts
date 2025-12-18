@@ -40,12 +40,14 @@ export class GoogleGeminiProvider implements AiProvider {
    *
    * @param inputBuffer - Input image as buffer (JPEG/PNG)
    * @param config - AI transformation configuration
+   * @param referenceImageBuffers - Reference images as buffers (for style transfer)
    * @returns Transformed image as buffer (JPEG)
    * @throws {AiTransformError} If transformation fails
    */
   async transformImage(
     inputBuffer: Buffer,
-    config: AiTransformConfig
+    config: AiTransformConfig,
+    referenceImageBuffers?: Buffer[]
   ): Promise<Buffer> {
     const startTime = Date.now();
 
@@ -64,31 +66,78 @@ export class GoogleGeminiProvider implements AiProvider {
       logger.info('[Gemini] Starting image transformation', {
         model: config.model,
         inputSize: inputBuffer.length,
-        referenceImageCount: config.referenceImages.length,
+        referenceImageCount: referenceImageBuffers?.length || 0,
       });
 
-      // For mocked implementation, we'll return the input buffer as-is
-      // In production, this will call the actual Gemini API:
-      //
-      // const model = this.client.models.generateContent({
-      //   model: config.model,
-      //   contents: [
-      //     { inlineData: { data: inputBuffer.toString('base64'), mimeType: 'image/jpeg' } },
-      //     { text: config.prompt },
-      //     ...referenceImages as inline data
-      //   ],
-      //   generationConfig: {
-      //     temperature: config.temperature,
-      //     maxOutputTokens: config.maxOutputTokens,
-      //   }
-      // });
-      //
-      // const result = await model;
-      // const transformedBuffer = Buffer.from(result.image, 'base64');
+      // Prepare content parts for Gemini API
+      // Order: reference images (if any), input image, then prompt text
+      const contentParts: Array<{ text?: string; inlineData?: { mimeType: string; data: string } }> = [];
 
-      // MOCKED RESPONSE: Return input buffer as placeholder
-      // TODO: Replace with actual Gemini API call when ready for production
-      const transformedBuffer = inputBuffer;
+      // Add reference images first (for style guidance)
+      if (referenceImageBuffers && referenceImageBuffers.length > 0) {
+        for (const refBuffer of referenceImageBuffers) {
+          contentParts.push({
+            inlineData: {
+              mimeType: 'image/jpeg',
+              data: refBuffer.toString('base64'),
+            },
+          });
+        }
+      }
+
+      // Add input image
+      contentParts.push({
+        inlineData: {
+          mimeType: 'image/jpeg',
+          data: inputBuffer.toString('base64'),
+        },
+      });
+
+      // Add prompt text
+      contentParts.push({
+        text: config.prompt,
+      });
+
+      // Call Gemini API
+      const response = await this.client.models.generateContent({
+        model: config.model,
+        contents: contentParts,
+      });
+
+      // Extract transformed image from response
+      if (!response.candidates || response.candidates.length === 0) {
+        throw new AiTransformError(
+          'No candidates in Gemini API response',
+          'API_ERROR'
+        );
+      }
+
+      const candidate = response.candidates[0];
+      if (!candidate || !candidate.content || !candidate.content.parts) {
+        throw new AiTransformError(
+          'No content parts in Gemini API response',
+          'API_ERROR'
+        );
+      }
+
+      // Find the image part in the response
+      let imageData: string | undefined;
+      for (const part of candidate.content.parts) {
+        if (part.inlineData && part.inlineData.data) {
+          imageData = part.inlineData.data;
+          break;
+        }
+      }
+
+      if (!imageData) {
+        throw new AiTransformError(
+          'No image data in Gemini API response',
+          'API_ERROR'
+        );
+      }
+
+      // Convert base64 image data to buffer
+      const transformedBuffer = Buffer.from(imageData, 'base64');
 
       const duration = Date.now() - startTime;
       logger.info('[Gemini] Image transformation completed', {

@@ -37,12 +37,14 @@ export interface AiProvider {
    *
    * @param inputBuffer - Input image as buffer (JPEG/PNG)
    * @param config - AI transformation configuration
+   * @param referenceImageBuffers - Reference images as buffers (loaded from Storage)
    * @returns Transformed image as buffer (JPEG)
    * @throws {AiTransformError} If transformation fails
    */
   transformImage(
     inputBuffer: Buffer,
-    config: AiTransformConfig
+    config: AiTransformConfig,
+    referenceImageBuffers?: Buffer[]
   ): Promise<Buffer>;
 }
 
