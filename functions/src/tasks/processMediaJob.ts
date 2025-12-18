@@ -22,10 +22,10 @@ import {
 export const processMediaJob = onTaskDispatched(
   {
     region: 'europe-west1',
-    // retryConfig: {
-    //   maxAttempts: 1,
-    //   minBackoffSeconds: 30,
-    // },
+    retryConfig: {
+      maxAttempts: 0,
+      minBackoffSeconds: 30,
+    },
     rateLimits: {
       maxConcurrentDispatches: 10,
     },

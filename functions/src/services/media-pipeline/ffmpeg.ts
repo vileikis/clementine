@@ -273,7 +273,8 @@ export async function generateThumbnail(
 async function generatePalette(
   concatFilePath: string,
   palettePath: string,
-  width: number
+  width: number,
+  fps: number = 2
 ): Promise<void> {
   const args = [
     '-f', 'concat',
@@ -311,7 +312,8 @@ async function generatePalette(
 export async function createGIF(
   framePaths: string[],
   outputPath: string,
-  width: number
+  width: number,
+  fps: number = 2
 ): Promise<void> {
   // Validate we have frames
   if (framePaths.length === 0) {
@@ -330,15 +332,25 @@ export async function createGIF(
   const palettePath = `${frameDir}/palette.png`;
 
   try {
-    // Create concat file listing all frames in order
-    // Format: file 'path/to/frame.jpg' (one per line)
-    const concatContent = framePaths
-      .map((path) => `file '${path}'`)
-      .join('\n');
+    // Create concat file listing all frames in order with duration
+    // Format: file 'path' / duration X / file 'path' ...
+    // Note: Last frame should NOT have duration (or will add extra delay)
+    const frameDuration = 1 / fps; // e.g., 2 fps = 0.5s per frame
+    const concatLines: string[] = [];
+
+    for (let i = 0; i < framePaths.length; i++) {
+      concatLines.push(`file '${framePaths[i]}'`);
+      // Add duration for all frames except the last one
+      if (i < framePaths.length - 1) {
+        concatLines.push(`duration ${frameDuration}`);
+      }
+    }
+
+    const concatContent = concatLines.join('\n');
     await fs.writeFile(concatFilePath, concatContent, 'utf-8');
 
     // Generate palette from concat file
-    await generatePalette(concatFilePath, palettePath, width);
+    await generatePalette(concatFilePath, palettePath, width, fps);
 
     // Create GIF using palette
     const args = [
