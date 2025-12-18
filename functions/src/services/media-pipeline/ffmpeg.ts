@@ -457,6 +457,44 @@ export async function createMP4(
 }
 
 /**
+ * Scale and crop GIF to target dimensions with center-crop
+ *
+ * @param inputPath - Path to input GIF
+ * @param outputPath - Path to output GIF
+ * @param width - Target width
+ * @param height - Target height
+ */
+export async function scaleAndCropGIF(
+  inputPath: string,
+  outputPath: string,
+  width: number,
+  height: number
+): Promise<void> {
+  await validateInputFile(inputPath);
+
+  const args = [
+    '-i', inputPath,
+    '-vf', `scale=${width}:${height}:flags=lanczos:force_original_aspect_ratio=increase,crop=${width}:${height}:(iw-${width})/2:(ih-${height})/2`,
+    '-y', // Overwrite output file
+    outputPath
+  ];
+
+  await runFFmpegCommand(args, {
+    timeout: TIMEOUTS.gif_large, // Use GIF timeout
+    description: 'GIF scaling and cropping',
+  });
+
+  // Validate output
+  const outputStats = await fs.stat(outputPath);
+  if (outputStats.size === 0) {
+    throw new FFmpegError('FFmpeg produced empty GIF after scaling', 'unknown', {
+      inputPath,
+      outputPath,
+    });
+  }
+}
+
+/**
  * Apply overlay image on top of media (image/GIF/video)
  *
  * FFmpeg automatically applies overlay to all frames for animated formats (GIF/video).
