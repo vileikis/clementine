@@ -82,13 +82,9 @@ export async function processGIF(
       finalPath = overlayedPath;
     }
 
-    // Generate thumbnail from first frame
+    // Generate thumbnail from final GIF (includes scaling, cropping, and overlay if applied)
     const thumbPath = `${tmpDirObj.path}/thumb.jpg`;
-    const firstFrame = downloadedFrames[0];
-    if (!firstFrame) {
-      throw new Error('No frames available for thumbnail');
-    }
-    await generateThumbnail(firstFrame, thumbPath, 300);
+    await generateThumbnail(finalPath, thumbPath, 300);
 
     await updateProcessingStep(session.id, 'uploading');
 

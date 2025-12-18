@@ -67,9 +67,9 @@ export async function processSingleImage(
       finalPath = overlayedPath;
     }
 
-    // Generate thumbnail
+    // Generate thumbnail from final result (includes scaling, cropping, and overlay if applied)
     const thumbPath = `${tmpDirObj.path}/thumb.jpg`;
-    await generateThumbnail(inputPath, thumbPath, 300);
+    await generateThumbnail(finalPath, thumbPath, 300);
 
     await updateProcessingStep(session.id, 'uploading');
 
