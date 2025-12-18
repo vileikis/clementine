@@ -335,16 +335,13 @@ export async function createGIF(
   try {
     // Create concat file listing all frames in order with duration
     // Format: file 'path' / duration X / file 'path' ...
-    // Note: Last frame should NOT have duration (or will add extra delay)
+    // For smooth looping GIFs, all frames should have the same duration
     const frameDuration = 1 / fps; // e.g., 2 fps = 0.5s per frame
     const concatLines: string[] = [];
 
     for (let i = 0; i < framePaths.length; i++) {
       concatLines.push(`file '${framePaths[i]}'`);
-      // Add duration for all frames except the last one
-      if (i < framePaths.length - 1) {
-        concatLines.push(`duration ${frameDuration}`);
-      }
+      concatLines.push(`duration ${frameDuration}`);
     }
 
     const concatContent = concatLines.join('\n');
