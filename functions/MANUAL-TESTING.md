@@ -24,11 +24,13 @@ curl -X POST http://127.0.0.1:5003/clementine-7568d/europe-west1/processMedia \
   -d '{
     "sessionId": "session-single-image",
     "outputFormat": "image",
-    "aspectRatio": "square"
+    "aspectRatio": "square",
+    "overlay": true
   }'
 ```
 
 **Expected Response (200 OK):**
+
 ```json
 {
   "success": true,
@@ -40,6 +42,7 @@ curl -X POST http://127.0.0.1:5003/clementine-7568d/europe-west1/processMedia \
 ```
 
 **Check in Emulator UI:**
+
 - **Firestore** → `sessions/session-single-image`
   - Look for `processing` field (should be added)
   - `processing.state` should be `"pending"`
@@ -55,11 +58,13 @@ curl -X POST http://127.0.0.1:5003/clementine-7568d/europe-west1/processMedia \
   -d '{
     "sessionId": "session-single-image",
     "outputFormat": "image",
-    "aspectRatio": "story"
+    "aspectRatio": "story",
+    "overlay": true
   }'
 ```
 
 **Expected Response (200 OK):**
+
 ```json
 {
   "success": true,
@@ -71,6 +76,7 @@ curl -X POST http://127.0.0.1:5003/clementine-7568d/europe-west1/processMedia \
 ```
 
 **Check in Emulator UI:**
+
 - Same as Test 1, verify `processing` field updated
 
 ---
@@ -88,6 +94,7 @@ curl -X POST http://127.0.0.1:5003/clementine-7568d/europe-west1/processMedia \
 ```
 
 **Expected Response (200 OK):**
+
 ```json
 {
   "success": true,
@@ -99,6 +106,7 @@ curl -X POST http://127.0.0.1:5003/clementine-7568d/europe-west1/processMedia \
 ```
 
 **Check in Emulator UI:**
+
 - **Firestore** → `sessions/session-four-images`
   - Verify `inputAssets` array has 4 items
   - Verify `processing.state` = `"pending"`
@@ -113,11 +121,24 @@ curl -X POST http://127.0.0.1:5003/clementine-7568d/europe-west1/processMedia \
   -d '{
     "sessionId": "session-four-images",
     "outputFormat": "gif",
-    "aspectRatio": "story"
+    "aspectRatio": "square",
+    "overlay": true
+  }'
+```
+
+```bash
+curl -X POST http://127.0.0.1:5003/clementine-7568d/europe-west1/processMedia \
+  -H "Content-Type: application/json" \
+  -d '{
+    "sessionId": "session-four-images",
+    "outputFormat": "gif",
+    "aspectRatio": "story",
+    "overlay": true
   }'
 ```
 
 **Expected Response (200 OK):**
+
 - Same structure as Test 3
 
 ---
@@ -135,6 +156,7 @@ curl -X POST http://127.0.0.1:5003/clementine-7568d/europe-west1/processMedia \
 ```
 
 **Expected Response (200 OK):**
+
 ```json
 {
   "success": true,
@@ -146,6 +168,7 @@ curl -X POST http://127.0.0.1:5003/clementine-7568d/europe-west1/processMedia \
 ```
 
 **Check in Emulator UI:**
+
 - **Firestore** → `sessions/session-all-images`
   - Verify `inputAssets` array has 12 items
   - Verify `processing.state` = `"pending"`
@@ -165,6 +188,7 @@ curl -X POST http://127.0.0.1:5003/clementine-7568d/europe-west1/processMedia \
 ```
 
 **Expected Response (200 OK):**
+
 - Same structure as Test 5
 
 ---
@@ -184,6 +208,7 @@ curl -X POST http://127.0.0.1:5003/clementine-7568d/europe-west1/processMedia \
 ```
 
 **Expected Response (404 Not Found):**
+
 ```json
 {
   "error": "Session not found"
@@ -191,6 +216,7 @@ curl -X POST http://127.0.0.1:5003/clementine-7568d/europe-west1/processMedia \
 ```
 
 **Check in Emulator UI:**
+
 - **Firestore** → Verify `sessions/non-existent-session-id` does NOT exist
 
 ---
@@ -208,6 +234,7 @@ curl -X POST http://127.0.0.1:5003/clementine-7568d/europe-west1/processMedia \
 ```
 
 **Expected Response (400 Bad Request):**
+
 ```json
 {
   "error": "Invalid request",
@@ -236,6 +263,7 @@ curl -X POST http://127.0.0.1:5003/clementine-7568d/europe-west1/processMedia \
 ```
 
 **Expected Response (400 Bad Request):**
+
 ```json
 {
   "error": "Invalid request",
@@ -264,6 +292,7 @@ curl -X POST http://127.0.0.1:5003/clementine-7568d/europe-west1/processMedia \
 ```
 
 **Expected Response (400 Bad Request):**
+
 ```json
 {
   "error": "Invalid request",
@@ -291,6 +320,7 @@ curl -X POST http://127.0.0.1:5003/clementine-7568d/europe-west1/processMedia \
 ```
 
 **Expected Response (400 Bad Request):**
+
 ```json
 {
   "error": "Invalid request",
@@ -318,6 +348,7 @@ curl -X POST http://127.0.0.1:5003/clementine-7568d/europe-west1/processMedia \
 ```
 
 **Expected Response (400 Bad Request):**
+
 ```json
 {
   "error": "Invalid request",
@@ -340,6 +371,7 @@ curl -X GET http://127.0.0.1:5003/clementine-7568d/europe-west1/processMedia
 ```
 
 **Expected Response (405 Method Not Allowed):**
+
 ```json
 {
   "error": "Method not allowed"
@@ -365,13 +397,14 @@ For each test, verify:
 
 ## 🎯 Summary
 
-| Category | Count |
-|----------|-------|
-| **Positive Tests** | 6 |
-| **Negative Tests** | 7 |
-| **Total** | 13 |
+| Category           | Count |
+| ------------------ | ----- |
+| **Positive Tests** | 6     |
+| **Negative Tests** | 7     |
+| **Total**          | 13    |
 
 ### Coverage:
+
 - ✅ All 3 output formats (image, gif, video)
 - ✅ Both aspect ratios (square, story)
 - ✅ All 3 seeded sessions
