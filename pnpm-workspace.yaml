@@ -1,5 +1,8 @@
 packages:
-  - 'web'
-  - 'functions'
-  - 'scripts'
-  - 'packages/*'
+  - web
+  - functions
+  - scripts
+  - packages/*
+
+onlyBuiltDependencies:
+  - ffmpeg-static

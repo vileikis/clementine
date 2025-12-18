@@ -4,8 +4,11 @@ import { z } from "zod"
  * Represents a single input file (image or video) submitted by a guest for processing.
  */
 export const inputAssetSchema = z.object({
-  url: z.url(),
-  type: z.enum(["image", "video"]),
+  url: z.string(),
+  filename: z.string(),
+  mimeType: z.string(),
+  sizeBytes: z.number().int().positive(),
+  uploadedAt: z.number().int().positive(),
 })
 
 export type InputAsset = z.infer<typeof inputAssetSchema>
@@ -67,3 +70,36 @@ export const sessionProcessingSchema = z.object({
 })
 
 export type SessionProcessing = z.infer<typeof sessionProcessingSchema>
+
+/**
+ * Complete session schema with all fields for media processing pipeline
+ */
+export const sessionWithProcessingSchema = z.object({
+  id: z.string().min(1),
+  projectId: z.string().min(1),
+  eventId: z.string().min(1),
+  companyId: z.string().min(1),
+  guestId: z.string().min(1),
+  experienceId: z.string().min(1),
+  inputAssets: z.array(inputAssetSchema).optional(),
+  processing: processingStateSchema.optional(),
+  outputs: sessionOutputsSchema.optional(),
+  createdAt: z.number().int().positive(),
+  updatedAt: z.number().int().positive(),
+})
+
+export type SessionWithProcessing = z.infer<typeof sessionWithProcessingSchema>
+
+/**
+ * Pipeline configuration derived from request parameters
+ */
+export const pipelineConfigSchema = z.object({
+  outputFormat: z.enum(['image', 'gif', 'video']),
+  aspectRatio: z.enum(['square', 'story']),
+  outputWidth: z.number().int().positive(),
+  outputHeight: z.number().int().positive(),
+  frameDuration: z.number().positive(), // seconds per frame for GIF
+  fps: z.number().int().positive(), // frames per second for video
+})
+
+export type PipelineConfig = z.infer<typeof pipelineConfigSchema>
