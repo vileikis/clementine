@@ -69,8 +69,6 @@ export class GoogleGeminiProvider implements AiProvider {
       const contentParts = this.buildContentParts(inputBuffer, config, referenceImageBuffers);
       const generationConfig = this.buildGenerationConfig(config);
 
-      console.log('[Gemini] Generation config:', JSON.stringify(generationConfig, null, 2));
-
       // Call Gemini API
       const response = await this.client.models.generateContent({
         model: config.model,

@@ -4,8 +4,8 @@ import type { PipelineConfig } from '../../lib/schemas/media-pipeline.schema';
  * Aspect ratio dimension mappings
  */
 const ASPECT_RATIO_DIMENSIONS = {
-  square: { width: 1080, height: 1080 },
-  story: { width: 1080, height: 1920 },
+  square: { width: 2160, height: 2160 },
+  story: { width: 2160, height: 3840 },
 } as const;
 
 /**
