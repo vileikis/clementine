@@ -52,7 +52,7 @@ export async function processGIF(
     // No file duplication - just reference the same files multiple times
     const boomerangFrames = [
       ...downloadedFrames,
-      ...downloadedFrames.slice(0, -1).reverse(),
+      ...downloadedFrames.slice(1, -1).reverse(),
     ];
 
     // Create GIF (at original frame dimensions)
