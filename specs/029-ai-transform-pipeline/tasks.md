@@ -60,16 +60,16 @@ This is a Firebase Cloud Functions monorepo within a pnpm workspace:
 
 ### Implementation for User Story 1
 
-- [ ] T012 [P] [US1] Add aiTransform field to processMediaRequestSchema in functions/src/lib/schemas/media-pipeline.schema.ts
-- [ ] T013 [P] [US1] Add aiTransform field to pipelineOptionsSchema in functions/src/lib/schemas/media-pipeline.schema.ts
-- [ ] T014 [US1] Extract aiTransform from request body and pass to Cloud Task payload in functions/src/http/processMedia.ts
-- [ ] T015 [US1] Extract aiTransform from task payload and pass to pipelineOptions in functions/src/tasks/processMediaJob.ts
-- [ ] T016 [US1] Import transformImage from services/ai in functions/src/services/media-pipeline/image.pipeline.ts
-- [ ] T017 [US1] Add AI transform step in image.pipeline.ts after downloading input, check options.aiTransform
-- [ ] T018 [US1] Call transformImage() with inputBuffer and MOCKED_AI_CONFIG in functions/src/services/media-pipeline/image.pipeline.ts
-- [ ] T019 [US1] Update session state to 'ai-transform' during transformation in functions/src/services/media-pipeline/image.pipeline.ts
-- [ ] T020 [US1] Use transformed buffer for subsequent pipeline steps (overlay, encoding) in functions/src/services/media-pipeline/image.pipeline.ts
-- [ ] T021 [US1] Wrap AI transform in try-catch and handle AiTransformError → markSessionFailed() in functions/src/services/media-pipeline/image.pipeline.ts
+- [x] T012 [P] [US1] Add aiTransform field to processMediaRequestSchema in functions/src/lib/schemas/media-pipeline.schema.ts
+- [x] T013 [P] [US1] Add aiTransform field to pipelineOptionsSchema in functions/src/lib/schemas/media-pipeline.schema.ts
+- [x] T014 [US1] Extract aiTransform from request body and pass to Cloud Task payload in functions/src/http/processMedia.ts
+- [x] T015 [US1] Extract aiTransform from task payload and pass to pipelineOptions in functions/src/tasks/processMediaJob.ts
+- [x] T016 [US1] Import transformImage from services/ai in functions/src/services/media-pipeline/image.pipeline.ts
+- [x] T017 [US1] Add AI transform step in image.pipeline.ts after downloading input, check options.aiTransform
+- [x] T018 [US1] Call transformImage() with inputBuffer and MOCKED_AI_CONFIG in functions/src/services/media-pipeline/image.pipeline.ts
+- [x] T019 [US1] Update session state to 'ai-transform' during transformation in functions/src/services/media-pipeline/image.pipeline.ts
+- [x] T020 [US1] Use transformed buffer for subsequent pipeline steps (overlay, encoding) in functions/src/services/media-pipeline/image.pipeline.ts
+- [x] T021 [US1] Wrap AI transform in try-catch and handle AiTransformError → markSessionFailed() in functions/src/services/media-pipeline/image.pipeline.ts
 
 **Checkpoint**: Single image with aiTransform: true should complete successfully and produce AI-transformed output
 
@@ -83,9 +83,9 @@ This is a Firebase Cloud Functions monorepo within a pnpm workspace:
 
 ### Implementation for User Story 2
 
-- [ ] T022 [US2] Add check in processGIF() for aiTransform flag in functions/src/services/media-pipeline/gif.pipeline.ts
-- [ ] T023 [US2] Log warning when aiTransform is true but outputFormat is 'gif' in functions/src/services/media-pipeline/gif.pipeline.ts
-- [ ] T024 [US2] Ensure GIF pipeline continues without calling transformImage() in functions/src/services/media-pipeline/gif.pipeline.ts
+- [x] T022 [US2] Add check in processGIF() for aiTransform flag in functions/src/services/media-pipeline/gif.pipeline.ts
+- [x] T023 [US2] Log warning when aiTransform is true but outputFormat is 'gif' in functions/src/services/media-pipeline/gif.pipeline.ts
+- [x] T024 [US2] Ensure GIF pipeline continues without calling transformImage() in functions/src/services/media-pipeline/gif.pipeline.ts
 
 **Checkpoint**: GIF sessions with aiTransform: true should log warning and produce standard GIF without errors
 
@@ -99,11 +99,11 @@ This is a Firebase Cloud Functions monorepo within a pnpm workspace:
 
 ### Implementation for User Story 3
 
-- [ ] T025 [US3] Implement reference image loading logic in transformImage() service in functions/src/services/ai/ai-transform.service.ts
-- [ ] T026 [US3] Download reference images to buffers using Firebase Admin Storage SDK in functions/src/services/ai/ai-transform.service.ts
-- [ ] T027 [US3] Pass reference image buffers to GoogleGeminiProvider.transformImage() in functions/src/services/ai/ai-transform.service.ts
-- [ ] T028 [US3] Validate reference image paths exist in Storage before AI call in functions/src/services/ai/ai-transform.service.ts
-- [ ] T029 [US3] Throw AiTransformError with code 'REFERENCE_IMAGE_NOT_FOUND' if validation fails in functions/src/services/ai/ai-transform.service.ts
+- [x] T025 [US3] Implement reference image loading logic in transformImage() service in functions/src/services/ai/ai-transform.service.ts
+- [x] T026 [US3] Download reference images to buffers using Firebase Admin Storage SDK in functions/src/services/ai/ai-transform.service.ts
+- [x] T027 [US3] Pass reference image buffers to GoogleGeminiProvider.transformImage() in functions/src/services/ai/ai-transform.service.ts
+- [x] T028 [US3] Validate reference image paths exist in Storage before AI call in functions/src/services/ai/ai-transform.service.ts
+- [x] T029 [US3] Throw AiTransformError with code 'REFERENCE_IMAGE_NOT_FOUND' if validation fails in functions/src/services/ai/ai-transform.service.ts
 
 **Checkpoint**: AI transformations should include configured reference images from Storage
 
@@ -113,9 +113,9 @@ This is a Firebase Cloud Functions monorepo within a pnpm workspace:
 
 **Purpose**: Validation, error handling, logging, and documentation
 
-- [ ] T030 [P] Add AI transformation logging (start, completion, duration) in functions/src/services/ai/ai-transform.service.ts
-- [ ] T031 [P] Add error code mapping for AiTransformError types in functions/src/services/media-pipeline/image.pipeline.ts
-- [ ] T032 [P] Update MANUAL-TESTING.md with AI transform test scenarios
+- [x] T030 [P] Add AI transformation logging (start, completion, duration) in functions/src/services/ai/ai-transform.service.ts
+- [x] T031 [P] Add error code mapping for AiTransformError types in functions/src/services/media-pipeline/image.pipeline.ts
+- [x] T032 [P] Update MANUAL-TESTING.md with AI transform test scenarios
 - [ ] T033 Test locally with emulators: Success path (single image with aiTransform: true)
 - [ ] T034 Test locally with emulators: Skip path (GIF with aiTransform: true)
 - [ ] T035 Test locally with emulators: Error path (missing reference image)
@@ -125,8 +125,8 @@ This is a Firebase Cloud Functions monorepo within a pnpm workspace:
 
 **Purpose**: Ensure code quality and correctness before merge
 
-- [ ] T037 Run `pnpm lint` from root and fix all errors/warnings
-- [ ] T038 Run `pnpm type-check` from root and resolve all TypeScript errors
+- [x] T037 Run `pnpm lint` from root and fix all errors/warnings
+- [x] T038 Run `pnpm type-check` from root and resolve all TypeScript errors
 - [ ] T039 Verify all acceptance scenarios from spec.md pass with emulators
 - [ ] T040 Commit changes after validation loop passes cleanly
 

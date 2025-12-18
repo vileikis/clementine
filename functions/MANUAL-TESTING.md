@@ -193,6 +193,102 @@ curl -X POST http://127.0.0.1:5003/clementine-7568d/europe-west1/processMedia \
 
 ---
 
+### Test 6.1: Single Image with AI Transform → Square Image
+
+```bash
+curl -X POST http://127.0.0.1:5003/clementine-7568d/europe-west1/processMedia \
+  -H "Content-Type: application/json" \
+  -d '{
+    "sessionId": "session-single-image",
+    "outputFormat": "image",
+    "aspectRatio": "square",
+    "overlay": true,
+    "aiTransform": true
+  }'
+```
+
+**Expected Response (200 OK):**
+
+```json
+{
+  "success": true,
+  "message": "Processing queued",
+  "sessionId": "session-single-image",
+  "outputFormat": "image",
+  "aspectRatio": "square",
+  "overlay": true,
+  "aiTransform": true
+}
+```
+
+**Check in Emulator UI:**
+
+- **Firestore** → `sessions/session-single-image`
+  - `processing.state` should progress through: `pending` → `initializing` → `downloading` → `ai-transform` → `processing` → `uploading` → `completed`
+- **Logs**: Look for AI transformation logs
+  - `[AI Transform] Starting transformation`
+  - `[AI Transform] Reference images loaded`
+  - `[AI Transform] Transformation completed`
+
+---
+
+### Test 6.2: GIF with AI Transform (Should Skip AI Transform)
+
+```bash
+curl -X POST http://127.0.0.1:5003/clementine-7568d/europe-west1/processMedia \
+  -H "Content-Type: application/json" \
+  -d '{
+    "sessionId": "session-four-images",
+    "outputFormat": "gif",
+    "aspectRatio": "square",
+    "aiTransform": true
+  }'
+```
+
+**Expected Response (200 OK):**
+
+```json
+{
+  "success": true,
+  "message": "Processing queued",
+  "sessionId": "session-four-images",
+  "outputFormat": "gif",
+  "aspectRatio": "square",
+  "overlay": false,
+  "aiTransform": true
+}
+```
+
+**Check in Logs:**
+
+- Should see warning: `[GIF Pipeline] AI transform not supported for GIF format`
+- GIF processing continues normally without AI transformation
+- No `ai-transform` state in processing lifecycle
+
+---
+
+### Test 6.3: AI Transform with Overlay Combination
+
+```bash
+curl -X POST http://127.0.0.1:5003/clementine-7568d/europe-west1/processMedia \
+  -H "Content-Type: application/json" \
+  -d '{
+    "sessionId": "session-single-image",
+    "outputFormat": "image",
+    "aspectRatio": "story",
+    "overlay": true,
+    "aiTransform": true
+  }'
+```
+
+**Expected Behavior:**
+
+- AI transformation applied first
+- Overlay applied to AI-transformed image
+- Both transformations visible in final output
+
+---
+
 ## ❌ NEGATIVE TEST CASES
 
 ### Test 7: Session Not Found
@@ -380,6 +476,60 @@ curl -X GET http://127.0.0.1:5003/clementine-7568d/europe-west1/processMedia
 
 ---
 
+### Test 14: AI Transform with Missing API Key
+
+**Setup:** Unset or remove `GOOGLE_AI_API_KEY` environment variable
+
+```bash
+curl -X POST http://127.0.0.1:5003/clementine-7568d/europe-west1/processMedia \
+  -H "Content-Type: application/json" \
+  -d '{
+    "sessionId": "session-single-image",
+    "outputFormat": "image",
+    "aspectRatio": "square",
+    "aiTransform": true
+  }'
+```
+
+**Expected Behavior:**
+
+- Request queued successfully (200 OK)
+- Processing fails during `ai-transform` state
+- **Firestore** → `sessions/session-single-image`
+  - `processing.state` = `"failed"`
+  - `processing.errorCode` = `"AI_CONFIG_INVALID"`
+  - `processing.errorMessage` contains "GOOGLE_AI_API_KEY"
+
+---
+
+### Test 15: AI Transform with Missing Reference Images
+
+**Setup:** Delete reference images from Storage:
+- `media/company-test-001/ai-reference/hobbit-costume.jpg`
+- `media/company-test-001/ai-reference/black-magic-wand.jpg`
+
+```bash
+curl -X POST http://127.0.0.1:5003/clementine-7568d/europe-west1/processMedia \
+  -H "Content-Type: application/json" \
+  -d '{
+    "sessionId": "session-single-image",
+    "outputFormat": "image",
+    "aspectRatio": "square",
+    "aiTransform": true
+  }'
+```
+
+**Expected Behavior:**
+
+- Request queued successfully (200 OK)
+- Processing fails during `ai-transform` state
+- **Firestore** → `sessions/session-single-image`
+  - `processing.state` = `"failed"`
+  - `processing.errorCode` = `"REFERENCE_IMAGE_NOT_FOUND"`
+  - `processing.errorMessage` contains image path
+
+---
+
 ## 📋 Testing Checklist
 
 For each test, verify:
@@ -399,15 +549,19 @@ For each test, verify:
 
 | Category           | Count |
 | ------------------ | ----- |
-| **Positive Tests** | 6     |
-| **Negative Tests** | 7     |
-| **Total**          | 13    |
+| **Positive Tests** | 9     |
+| **Negative Tests** | 9     |
+| **Total**          | 18    |
 
 ### Coverage:
 
 - ✅ All 3 output formats (image, gif, video)
 - ✅ Both aspect ratios (square, story)
 - ✅ All 3 seeded sessions
+- ✅ AI transformation (single image only)
+- ✅ AI transform + overlay combination
+- ✅ AI transform skip for GIF/video
+- ✅ AI transform error scenarios (missing API key, missing reference images)
 - ✅ Validation errors (missing/invalid fields)
 - ✅ Not found errors
 - ✅ Method not allowed
