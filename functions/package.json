@@ -23,12 +23,11 @@
     "ffmpeg-static": "^5.3.0",
     "firebase-admin": "^13.6.0",
     "firebase-functions": "^7.0.2",
-    "tmp": "^0.2.3",
-    "zod": "^3.24.1"
+    "tmp": "^0.2.5",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@types/tmp": "^0.2.6",
-    "esbuild": "^0.20.0",
     "isolate-package": "^1.26.1",
     "tsx": "^4.19.2",
     "typescript": "^5.0.0"
