@@ -471,13 +471,23 @@ export async function applyOverlayToMedia(
   overlayPath: string,
   outputPath: string
 ): Promise<void> {
+  console.log(`[applyOverlayToMedia] Input: ${inputPath}`);
+  console.log(`[applyOverlayToMedia] Overlay: ${overlayPath}`);
+  console.log(`[applyOverlayToMedia] Output: ${outputPath}`);
+
   await validateInputFile(inputPath);
   await validateInputFile(overlayPath);
+
+  // Get input file stats for debugging
+  const inputStats = await fs.stat(inputPath);
+  const overlayStats = await fs.stat(overlayPath);
+  console.log(`[applyOverlayToMedia] Input size: ${inputStats.size} bytes`);
+  console.log(`[applyOverlayToMedia] Overlay size: ${overlayStats.size} bytes`);
 
   const args = [
     '-i', inputPath,
     '-i', overlayPath,
-    '-filter_complex', '[0:v][1:v]overlay=0:0',
+    '-filter_complex', '[0:v][1:v]overlay=0:0:format=auto',
     '-y', // Overwrite output file
     outputPath
   ];
@@ -489,6 +499,7 @@ export async function applyOverlayToMedia(
 
   // Validate output
   const outputStats = await fs.stat(outputPath);
+  console.log(`[applyOverlayToMedia] Output size: ${outputStats.size} bytes`);
   if (outputStats.size === 0) {
     throw new FFmpegError('FFmpeg produced empty output with overlay', 'unknown', {
       inputPath,
