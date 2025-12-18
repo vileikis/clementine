@@ -39,14 +39,14 @@ This is a Firebase Cloud Functions monorepo within a pnpm workspace:
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T004 [P] Create AiTransformConfig interface in functions/src/services/ai/providers/types.ts
-- [ ] T005 [P] Create AiProvider interface in functions/src/services/ai/providers/types.ts
-- [ ] T006 [P] Create AiTransformError class and AiTransformErrorCode type in functions/src/services/ai/providers/types.ts
-- [ ] T007 Create GoogleGeminiProvider class implementing AiProvider in functions/src/services/ai/providers/gemini.provider.ts
-- [ ] T008 Implement GoogleGeminiProvider.transformImage() method with Gemini API integration in functions/src/services/ai/providers/gemini.provider.ts
-- [ ] T009 Create MOCKED_AI_CONFIG constant in functions/src/services/ai/config.ts
-- [ ] T010 Implement transformImage() orchestration function in functions/src/services/ai/ai-transform.service.ts
-- [ ] T011 Create barrel export in functions/src/services/ai/index.ts for AI services and types
+- [x] T004 [P] Create AiTransformConfig interface in functions/src/services/ai/providers/types.ts
+- [x] T005 [P] Create AiProvider interface in functions/src/services/ai/providers/types.ts
+- [x] T006 [P] Create AiTransformError class and AiTransformErrorCode type in functions/src/services/ai/providers/types.ts
+- [x] T007 Create GoogleGeminiProvider class implementing AiProvider in functions/src/services/ai/providers/gemini.provider.ts
+- [x] T008 Implement GoogleGeminiProvider.transformImage() method with Gemini API integration in functions/src/services/ai/providers/gemini.provider.ts
+- [x] T009 Create MOCKED_AI_CONFIG constant in functions/src/services/ai/config.ts
+- [x] T010 Implement transformImage() orchestration function in functions/src/services/ai/ai-transform.service.ts
+- [x] T011 Create barrel export in functions/src/services/ai/index.ts for AI services and types
 
 **Checkpoint**: AI service infrastructure ready - user story implementation can now begin
 
