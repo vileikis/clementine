@@ -1,4 +1,5 @@
 import * as fs from 'fs/promises';
+import { defineSecret } from 'firebase-functions/params';
 import { updateProcessingStep, markSessionFailed } from '../../lib/session';
 import { transformImage, MOCKED_AI_CONFIG } from '../ai';
 import { AiTransformError } from '../ai/providers/types';
@@ -12,23 +13,30 @@ import { AiTransformError } from '../ai/providers/types';
  */
 
 /**
+ * Google AI API key secret (Firebase Params)
+ * Exported so Cloud Function can declare dependency in config
+ */
+export const GOOGLE_AI_API_KEY_SECRET = defineSecret('GOOGLE_AI_API_KEY');
+
+/**
  * Apply AI transformation to an input image
  *
  * @param sessionId - Session document ID for state tracking
  * @param inputPath - Path to input image file
  * @param tmpDir - Temporary directory for output file
- * @param apiKey - Google AI API key from Firebase Params
  * @returns Path to transformed image file
  * @throws {AiTransformError} If transformation fails
  */
 export async function applyAiTransform(
   sessionId: string,
   inputPath: string,
-  tmpDir: string,
-  apiKey: string
+  tmpDir: string
 ): Promise<string> {
   // Update session state to 'ai-transform'
   await updateProcessingStep(sessionId, 'ai-transform');
+
+  // Get API key from secret (defined at module level)
+  const apiKey = GOOGLE_AI_API_KEY_SECRET.value();
 
   // Validate API key
   if (!apiKey || apiKey.trim().length === 0) {
