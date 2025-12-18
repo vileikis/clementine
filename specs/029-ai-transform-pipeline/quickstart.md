@@ -141,9 +141,9 @@ curl -X POST http://localhost:5001/clementine-dev/europe-west1/processMedia \
 # From repo root
 pnpm install
 
-# Add Google Generative AI SDK
+# Add Google GenAI SDK
 cd functions
-pnpm add @google/generative-ai
+pnpm add @google/genai
 ```
 
 ### 3. Set Environment Variables
@@ -201,12 +201,12 @@ curl -X POST http://localhost:5001/clementine-dev/europe-west1/processMedia \
 
 ### Mocked AI Config
 
-**Location**: `functions/src/services/media-pipeline/config.ts`
+**Location**: `functions/src/services/ai/config.ts`
 
 ```typescript
 export const MOCKED_AI_CONFIG: AiTransformConfig = {
   provider: 'google',
-  model: 'gemini-2.0-flash-exp',
+  model: 'gemini-3-pro-image-preview',
   prompt: 'Transform this person into a hobbit from Lord of the Rings. Apply fantasy costume, hairy feet, and whimsical background. Maintain facial features and pose.',
   referenceImages: [
     'media/company-test-001/ai-reference/hobbit-costume.jpg',
@@ -220,32 +220,13 @@ export const MOCKED_AI_CONFIG: AiTransformConfig = {
 1. Edit `MOCKED_AI_CONFIG` constant
 2. Update `prompt` text
 3. Add/remove reference image paths
-4. Change `model` (e.g., to `gemini-1.5-pro`)
+4. Change `model` (e.g., to `gemini-2.5-flash`)
 
 ---
 
 ## Testing Strategy
 
-### Unit Tests
-
-**Location**: `functions/tests/services/media-pipeline/`
-
-**Run Tests**:
-```bash
-cd functions
-pnpm test
-```
-
-**Key Test Files**:
-- `ai-transform.service.test.ts` - Service orchestration tests
-- `gemini.provider.test.ts` - Gemini provider implementation tests
-
-**Coverage Goals**:
-- 90%+ for AI transform service
-- 90%+ for Gemini provider
-- Error path coverage (all error codes tested)
-
-### Integration Tests
+### Manual Integration Tests
 
 **Manual Testing Steps**:
 
@@ -378,8 +359,8 @@ Error Message: {message}
 
 | Model | Input Price | Output Price | Est. Cost per Transform |
 |-------|-------------|--------------|-------------------------|
-| gemini-2.0-flash-exp | $0.00015/1K tokens | $0.0006/1K tokens | ~$0.05 |
-| gemini-1.5-pro | $0.00125/1K tokens | $0.005/1K tokens | ~$0.40 |
+| gemini-2.5-flash | $0.00015/1K tokens | $0.0006/1K tokens | ~$0.05 |
+| gemini-3-pro-image-preview | $0.00125/1K tokens | $0.005/1K tokens | ~$0.40 |
 
 **Note**: Image inputs count as tokens based on size/resolution
 
@@ -397,7 +378,7 @@ Error Message: {message}
 **Cause**: Reference image paths in config don't exist in Storage
 
 **Fix**:
-1. Check config paths: `functions/src/services/media-pipeline/config.ts`
+1. Check config paths: `functions/src/services/ai/config.ts`
 2. Upload missing images to Storage:
    ```bash
    gsutil cp image.jpg gs://bucket/media/company-test-001/ai-reference/
@@ -432,7 +413,7 @@ Error Message: {message}
 
 **Fix**:
 1. Check input image size (should be <2MB)
-2. Try different model (gemini-2.0-flash-exp is faster than gemini-1.5-pro)
+2. Try different model (gemini-2.5-flash is faster than gemini-3-pro-image-preview)
 3. Reduce reference image count in config
 
 ---
@@ -453,7 +434,6 @@ After implementing this feature:
    ```bash
    pnpm lint
    pnpm type-check
-   pnpm test
    ```
 
 2. **Test locally**: Follow "Local Development Setup" section above
