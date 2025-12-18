@@ -63,6 +63,7 @@ const TOTAL_IMAGES = 12;
 const IMAGE_DIR = path.join(__dirname, '../seed-data/images');
 const OVERLAY_DIR = path.join(__dirname, '../seed-data/overlays');
 const OVERLAY_FILES = ['square-overlay.png', 'story-overlay.png'];
+const AI_REFERENCE_DIR = path.join(__dirname, '../seed-data/ai-reference');
 
 /**
  * Check if all required images exist
@@ -190,6 +191,63 @@ async function uploadOverlays(): Promise<void> {
 }
 
 /**
+ * Upload AI reference images to Storage emulator
+ */
+async function uploadAiReferences(): Promise<void> {
+  console.log('📤 Uploading AI reference images to Storage emulator...');
+
+  try {
+    // Read directory contents
+    const files = await fs.readdir(AI_REFERENCE_DIR);
+    const imageFiles = files.filter(
+      (file) =>
+        file.endsWith('.jpg') ||
+        file.endsWith('.jpeg') ||
+        file.endsWith('.png') ||
+        file.endsWith('.webp')
+    );
+
+    if (imageFiles.length === 0) {
+      console.warn('   ⚠ No image files found in ai-reference directory');
+      return;
+    }
+
+    for (const filename of imageFiles) {
+      const filepath = path.join(AI_REFERENCE_DIR, filename);
+      const storagePath = `media/${COMPANY_ID}/ai-reference/${filename}`;
+
+      // Read file
+      const fileBuffer = await fs.readFile(filepath);
+
+      // Determine content type
+      let contentType = 'image/jpeg';
+      if (filename.endsWith('.png')) contentType = 'image/png';
+      else if (filename.endsWith('.webp')) contentType = 'image/webp';
+
+      // Upload to Storage emulator
+      await storage.file(storagePath).save(fileBuffer, {
+        metadata: {
+          contentType,
+        },
+      });
+
+      // Make file public (emulator only)
+      await storage.file(storagePath).makePublic();
+
+      // Get public URL
+      const publicUrl = `http://localhost:9199/v0/b/${storage.name}/o/${encodeURIComponent(storagePath)}?alt=media`;
+
+      console.log(`   ✓ Uploaded ${filename} → ${storagePath}`);
+      console.log(`     URL: ${publicUrl}`);
+    }
+
+    console.log(`✅ Uploaded ${imageFiles.length} AI reference images\n`);
+  } catch (error) {
+    console.warn('   ⚠ Error uploading AI reference images:', error);
+  }
+}
+
+/**
  * Create session documents in Firestore
  */
 async function createSessions(imageMetadata: InputAsset[]): Promise<void> {
@@ -256,6 +314,9 @@ async function seed(): Promise<void> {
     // Upload overlays
     await uploadOverlays();
 
+    // Upload AI reference images
+    await uploadAiReferences();
+
     // Create sessions
     await createSessions(imageMetadata);
 
@@ -264,6 +325,7 @@ async function seed(): Promise<void> {
     console.log('📊 Summary:');
     console.log(`   - Storage: ${TOTAL_IMAGES} images uploaded`);
     console.log(`   - Storage: ${OVERLAY_FILES.length} overlays uploaded`);
+    console.log('   - Storage: AI reference images uploaded');
     console.log('   - Firestore: 3 sessions created');
     console.log(`\n🔗 View at: http://localhost:4000\n`);
 
