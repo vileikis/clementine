@@ -36,7 +36,8 @@ Ensure clean anatomy, realistic proportions, no extra limbs, and a cohesive, pol
  */
 export const MOCKED_AI_CONFIG: AiTransformConfig = {
   provider: 'google',
-  model: 'gemini-2.5-flash-image', // Using Gemini 2.5 Flash Image model (~$0.039/transform)
+  // model: 'gemini-2.5-flash-image', // Using Gemini 2.5 Flash Image model (~$0.039/transform)
+  model: 'gemini-3-pro-image-preview', // Using Gemini 3 Pro Image Preview model (~$0.40/transform)
   prompt: HOBBIT_PROMPT,
   referenceImages: [
     'media/company-test-001/ai-reference/hobbit-costume.jpg',
