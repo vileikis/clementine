@@ -5,7 +5,7 @@
  * for image-to-image transformation via the @google/genai SDK.
  */
 
-import { GenerateImagesConfig, GoogleGenAI } from '@google/genai';
+import { ContentListUnion, GenerateContentConfig, GoogleGenAI, ImageConfig } from '@google/genai';
 import type { AiProvider, AiTransformConfig } from './types';
 import { AiTransformError } from './types';
 import { logger } from 'firebase-functions/v2';
@@ -68,7 +68,7 @@ export class GoogleGeminiProvider implements AiProvider {
       // Prepare request
       const contentParts = this.buildContentParts(inputBuffer, config, referenceImageBuffers);
       const generationConfig = this.buildGenerationConfig(config);
-
+      
       // Call Gemini API
       const response = await this.client.models.generateContent({
         model: config.model,
@@ -145,8 +145,22 @@ export class GoogleGeminiProvider implements AiProvider {
     inputBuffer: Buffer,
     config: AiTransformConfig,
     referenceImageBuffers?: Buffer[]
-  ): Array<{ text?: string; inlineData?: { mimeType: string; data: string } }> {
-    const contentParts: Array<{ text?: string; inlineData?: { mimeType: string; data: string } }> = [];
+  ): ContentListUnion {
+    const contentParts: ContentListUnion = [];
+
+    // Add prompt text
+    contentParts.push({
+      text: config.prompt,
+    });
+
+    // Add input image
+    contentParts.push({
+      inlineData: {
+        mimeType: 'image/jpeg',
+        data: inputBuffer.toString('base64'),
+      },
+    });
+
 
     // Add reference images first (for style guidance)
     if (referenceImageBuffers && referenceImageBuffers.length > 0) {
@@ -160,19 +174,6 @@ export class GoogleGeminiProvider implements AiProvider {
       }
     }
 
-    // Add input image
-    contentParts.push({
-      inlineData: {
-        mimeType: 'image/jpeg',
-        data: inputBuffer.toString('base64'),
-      },
-    });
-
-    // Add prompt text
-    contentParts.push({
-      text: config.prompt,
-    });
-
     return contentParts;
   }
 
@@ -185,17 +186,22 @@ export class GoogleGeminiProvider implements AiProvider {
    * @param config - AI transformation configuration
    * @returns Generation config object for Gemini API
    */
-  private buildGenerationConfig(config: AiTransformConfig): GenerateImagesConfig {
-    const generationConfig: GenerateImagesConfig = {
-      numberOfImages: 1,
+  private buildGenerationConfig(config: AiTransformConfig): GenerateContentConfig {
+    const generationConfig: GenerateContentConfig = {
     };
 
     // Build image config
+    const imageConfig: ImageConfig = {};
     if (config.aspectRatio) {
-      generationConfig.aspectRatio = config.aspectRatio;
+      imageConfig.aspectRatio = config.aspectRatio;
     }
-    if (config.imageSize) {
-      generationConfig.imageSize = config.imageSize;
+    // if (config.imageSize) {
+    //   imageConfig.imageSize = config.imageSize;
+    // }
+
+    // Add imageConfig to generation config if not empty
+    if (Object.keys(imageConfig).length > 0) {
+      generationConfig.imageConfig = imageConfig;
     }
 
     return generationConfig;
