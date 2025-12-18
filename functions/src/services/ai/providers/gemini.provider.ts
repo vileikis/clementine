@@ -5,7 +5,7 @@
  * for image-to-image transformation via the @google/genai SDK.
  */
 
-import { GoogleGenAI } from '@google/genai';
+import { GenerateImagesConfig, GoogleGenAI } from '@google/genai';
 import type { AiProvider, AiTransformConfig } from './types';
 import { AiTransformError } from './types';
 import { logger } from 'firebase-functions/v2';
@@ -187,28 +187,17 @@ export class GoogleGeminiProvider implements AiProvider {
    * @param config - AI transformation configuration
    * @returns Generation config object for Gemini API
    */
-  private buildGenerationConfig(config: AiTransformConfig): Record<string, any> {
-    const generationConfig: Record<string, any> = {
-      candidateCount: 1,
+  private buildGenerationConfig(config: AiTransformConfig): GenerateImagesConfig {
+    const generationConfig: GenerateImagesConfig = {
+      numberOfImages: 1,
     };
 
-    // Add temperature if specified
-    if (config.temperature !== undefined) {
-      generationConfig['temperature'] = config.temperature;
-    }
-
     // Build image config
-    const imageConfig: Record<string, string> = {};
     if (config.aspectRatio) {
-      imageConfig['aspectRatio'] = config.aspectRatio;
+      generationConfig.aspectRatio = config.aspectRatio;
     }
     if (config.imageSize) {
-      imageConfig['imageSize'] = config.imageSize;
-    }
-
-    // Add imageConfig to generation config if not empty
-    if (Object.keys(imageConfig).length > 0) {
-      generationConfig['imageConfig'] = imageConfig;
+      generationConfig.imageSize = config.imageSize;
     }
 
     return generationConfig;
