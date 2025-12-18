@@ -116,13 +116,13 @@ pending → initializing → downloading → processing → uploading → comple
 
 **Purpose**: Configuration for AI image transformation
 
-**Location**: `functions/src/services/media-pipeline/ai-providers/types.ts`
+**Location**: `functions/src/services/ai/providers/types.ts`
 
 **Schema** (TypeScript):
 ```typescript
 export interface AiTransformConfig {
   provider: 'google';                // AI provider identifier
-  model: string;                     // Model name (e.g., 'gemini-2.0-flash-exp')
+  model: string;                     // Model name (e.g., 'gemini-3-pro-image-preview')
   prompt: string;                    // Transformation prompt text
   referenceImages: string[];         // Firebase Storage paths (NOT URLs)
   temperature?: number;              // Optional: Model temperature (0-1)
@@ -147,7 +147,7 @@ export interface AiTransformConfig {
 ```typescript
 const MOCKED_AI_CONFIG: AiTransformConfig = {
   provider: 'google',
-  model: 'gemini-2.0-flash-exp',
+  model: 'gemini-3-pro-image-preview',
   prompt: 'Transform this person into a hobbit from Lord of the Rings. Apply fantasy costume, hairy feet, and whimsical background. Maintain facial features and pose.',
   referenceImages: [
     'media/company-test-001/ai-reference/hobbit-costume.jpg',
@@ -163,7 +163,7 @@ const MOCKED_AI_CONFIG: AiTransformConfig = {
 
 **Purpose**: Contract for AI transformation service implementations
 
-**Location**: `functions/src/services/media-pipeline/ai-providers/types.ts`
+**Location**: `functions/src/services/ai/providers/types.ts`
 
 **Schema** (TypeScript):
 ```typescript
@@ -198,7 +198,7 @@ export interface AiProvider {
 
 **Purpose**: Typed error for AI transformation failures
 
-**Location**: `functions/src/services/media-pipeline/ai-providers/types.ts`
+**Location**: `functions/src/services/ai/providers/types.ts`
 
 **Schema** (TypeScript):
 ```typescript

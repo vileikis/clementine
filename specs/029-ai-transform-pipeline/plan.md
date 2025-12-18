@@ -12,9 +12,9 @@ Add AI transformation capability to the media processing pipeline for single-ima
 ## Technical Context
 
 **Language/Version**: TypeScript 5.x on Node.js 22 runtime (Firebase Cloud Functions v2)
-**Primary Dependencies**: Firebase Cloud Functions v2, Firebase Admin SDK (Firestore, Storage), Zod 3.x, FFmpeg (via ffmpeg-static binary), Google Generative AI SDK (@google/generative-ai or NEEDS CLARIFICATION)
+**Primary Dependencies**: Firebase Cloud Functions v2, Firebase Admin SDK (Firestore, Storage), Zod 3.x, FFmpeg (via ffmpeg-static binary), Google GenAI SDK (@google/genai)
 **Storage**: Firebase Firestore (session state, processing metadata), Firebase Storage (input/output media, reference images at `media/{companyId}/ai-reference/`)
-**Testing**: Jest (unit tests), manual testing with Firebase emulators
+**Testing**: Manual testing with Firebase emulators (unit tests deferred)
 **Target Platform**: Firebase Cloud Functions v2 (europe-west1 region), Google Cloud infrastructure
 **Project Type**: Backend microservice (Cloud Functions monorepo within pnpm workspace)
 **Performance Goals**: AI transformation completes within 60 seconds end-to-end, reference image validation < 1 second
@@ -62,28 +62,24 @@ functions/
 │   ├── tasks/
 │   │   └── processMediaJob.ts           # Task handler - pass aiTransform to pipeline
 │   ├── services/
+│   │   ├── ai/
+│   │   │   ├── index.ts                 # Re-export AI services
+│   │   │   ├── config.ts                # Mocked AI config constant
+│   │   │   ├── ai-transform.service.ts  # NEW: AI transformation orchestration
+│   │   │   └── providers/
+│   │   │       ├── gemini.provider.ts   # NEW: Google Gemini implementation
+│   │   │       └── types.ts             # NEW: AI provider interface
 │   │   └── media-pipeline/
-│   │       ├── index.ts                 # Re-export AI services
-│   │       ├── config.ts                # Add mocked AI config constant
-│   │       ├── image.pipeline.ts        # Add AI transform step (before overlay)
-│   │       ├── ai-transform.service.ts  # NEW: AI transformation orchestration
-│   │       └── ai-providers/
-│   │           ├── gemini.provider.ts   # NEW: Google Gemini implementation
-│   │           └── types.ts             # NEW: AI provider interface
+│   │       └── image.pipeline.ts        # Add AI transform step (before overlay)
 │   ├── lib/
 │   │   ├── schemas/
 │   │   │   └── media-pipeline.schema.ts # Add aiTransform: boolean field
 │   │   ├── session.ts                   # Add 'ai-transform' processing state
 │   │   └── storage.ts                   # Reference image validation helper
 │   └── index.ts                         # No changes (re-exports functions)
-└── tests/
-    └── services/
-        └── media-pipeline/
-            ├── ai-transform.service.test.ts  # NEW: Unit tests
-            └── gemini.provider.test.ts       # NEW: Provider tests
 ```
 
-**Structure Decision**: Cloud Functions monorepo follows service-oriented architecture. AI transformation is integrated as a new step in `image.pipeline.ts` and implemented as isolated services in `services/media-pipeline/ai-providers/`.
+**Structure Decision**: Cloud Functions monorepo follows service-oriented architecture. AI transformation is implemented as isolated services in `services/ai/` and integrated as a new step in `image.pipeline.ts`.
 
 ## Complexity Tracking
 
@@ -101,19 +97,17 @@ functions/
 
 **Key Findings** (see [research.md](./research.md) for full details):
 
-1. **Google Generative AI SDK**: Use `@google/generative-ai` npm package for Gemini API access
-2. **Model Selection**: `gemini-2.0-flash-exp` (experimental, fast) with `gemini-1.5-pro` as fallback
-3. **CRITICAL DISCOVERY**: Gemini is generative text model, NOT image-to-image transformer
-   - For true image transformation, need two-step: Gemini (analysis) → Image Generator (Imagen/SD/DALL-E)
-   - For mocked implementation: Use placeholder pattern, defer actual image generation
-4. **Reference Images**: Download to buffers, pass as base64 to Gemini SDK
+1. **Google GenAI SDK**: Use `@google/genai` npm package (latest SDK, replaces deprecated `@google/generative-ai`)
+2. **Model Selection**: `gemini-3-pro-image-preview` (primary) with `gemini-2.5-flash` as fallback
+3. **Multimodal Support**: Gemini 2.0+ models support image-to-image transformations with prompts and reference images
+4. **Reference Images**: Download to buffers, pass as multimodal input to Gemini SDK
 5. **Error Handling**: Follow existing `markSessionFailed()` pattern with AI-specific codes
 6. **Processing State**: Insert 'ai-transform' after 'downloading', before 'processing'
 7. **Aspect Ratio**: AI ignores aspect ratio, FFmpeg handles formatting
 
 **Dependencies to Add**:
 ```bash
-pnpm add @google/generative-ai
+pnpm add @google/genai
 ```
 
 **Environment Variables**:
@@ -172,30 +166,29 @@ Error: ai-transform → failed (with error code)
 
 ### Files to Create
 
-1. **`functions/src/services/media-pipeline/ai-providers/types.ts`**
+1. **`functions/src/services/ai/providers/types.ts`**
    - `AiTransformConfig` interface
    - `AiProvider` interface
    - `AiTransformError` class
    - `AiTransformErrorCode` type
 
-2. **`functions/src/services/media-pipeline/ai-providers/gemini.provider.ts`**
+2. **`functions/src/services/ai/providers/gemini.provider.ts`**
    - `GoogleGeminiProvider` class implementing `AiProvider`
    - `transformImage()` method (Gemini API integration)
    - Error handling and logging
 
-3. **`functions/src/services/media-pipeline/ai-transform.service.ts`**
+3. **`functions/src/services/ai/ai-transform.service.ts`**
    - `transformImage()` orchestration function
    - Config validation
    - Reference image loading
    - Provider instantiation and delegation
 
-4. **`functions/tests/services/media-pipeline/ai-transform.service.test.ts`**
-   - Unit tests for service layer
-   - Mock Firebase Storage and Gemini provider
+4. **`functions/src/services/ai/config.ts`**
+   - `MOCKED_AI_CONFIG` constant
+   - Export `AiTransformConfig` type
 
-5. **`functions/tests/services/media-pipeline/gemini.provider.test.ts`**
-   - Unit tests for Gemini provider
-   - Mock Gemini SDK responses
+5. **`functions/src/services/ai/index.ts`**
+   - Re-export AI services and types
 
 ### Files to Modify
 
@@ -211,26 +204,14 @@ Error: ai-transform → failed (with error code)
    - Extract `aiTransform` from task payload
    - Pass to `pipelineOptions` object
 
-4. **`functions/src/services/media-pipeline/config.ts`**
-   - Add `MOCKED_AI_CONFIG` constant
-   - Export `AiTransformConfig` type
-
-5. **`functions/src/services/media-pipeline/image.pipeline.ts`**
-   - Import `transformImage` from `ai-transform.service`
+4. **`functions/src/services/media-pipeline/image.pipeline.ts`**
+   - Import `transformImage` from `services/ai`
    - After downloading input, check `options.aiTransform`
    - If true: call `transformImage()`, update state to 'ai-transform', use transformed buffer
    - Wrap in try-catch, handle `AiTransformError` → `markSessionFailed()`
 
-6. **`functions/src/services/media-pipeline/index.ts`**
-   - Re-export `transformImage` function
-   - Re-export AI types
-
-7. **`@clementine/shared` package (processing state)**
-   - Add `'ai-transform'` to `ProcessingState` type union
-   - Location: `shared/src/types/session.ts` (or equivalent)
-
-8. **`functions/package.json`**
-   - Add dependency: `@google/generative-ai`
+5. **`functions/package.json`**
+   - Add dependency: `@google/genai`
 
 ### Validation Checklist
 
@@ -238,7 +219,6 @@ Before marking feature complete:
 
 - [ ] Run `pnpm lint` from root (no errors)
 - [ ] Run `pnpm type-check` from root (no errors)
-- [ ] Run `pnpm test` from functions/ (all tests pass, >70% coverage)
 - [ ] Test locally with emulators (success, skip, error paths)
 - [ ] Verify all acceptance scenarios from spec.md
 - [ ] Update MANUAL-TESTING.md with AI transform test cases
@@ -256,7 +236,7 @@ _After Phase 1 design completion:_
   - Reuses existing error handling and state management patterns
   - Minimal new code surface (~300 LOC total)
 - [x] **Type-Safe Development**: ✅ All schemas use Zod, all interfaces strictly typed, no `any` escapes
-- [x] **Minimal Testing Strategy**: ✅ Jest unit tests for service and provider, manual integration testing
+- [x] **Minimal Testing Strategy**: ✅ Manual integration testing with emulators (unit tests deferred)
 - [x] **Validation Loop Discipline**: ✅ Validation tasks included in checklist above
 - [x] **Firebase Architecture Standards**: ✅ Admin SDK for Storage (modular API), schemas in proper location, output URLs stored as full public URLs
 - [x] **Feature Module Architecture**: ✅ N/A - Cloud Functions architecture

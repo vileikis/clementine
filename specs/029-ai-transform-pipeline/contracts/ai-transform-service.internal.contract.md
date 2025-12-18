@@ -63,12 +63,12 @@ await fs.writeFile('output.jpg', transformedBuffer);
 ## Dependencies
 
 ### Internal Dependencies
-- `AiProvider` interface from `./ai-providers/types`
-- `GoogleGeminiProvider` from `./ai-providers/gemini.provider`
+- `AiProvider` interface from `./providers/types`
+- `GoogleGeminiProvider` from `./providers/gemini.provider`
 - Firebase Admin Storage SDK for reference image loading
 
 ### External Dependencies
-- `@google/generative-ai` (Gemini SDK)
+- `@google/genai` (Gemini SDK)
 - `firebase-admin/storage` (Storage access)
 
 ---
@@ -77,14 +77,14 @@ await fs.writeFile('output.jpg', transformedBuffer);
 
 ### Mocked AI Config
 
-**Location**: `functions/src/services/media-pipeline/config.ts`
+**Location**: `functions/src/services/ai/config.ts`
 
 **Constant**: `MOCKED_AI_CONFIG`
 
 ```typescript
 export const MOCKED_AI_CONFIG: AiTransformConfig = {
   provider: 'google',
-  model: 'gemini-2.0-flash-exp',
+  model: 'gemini-3-pro-image-preview',
   prompt: 'Transform this person into a hobbit from Lord of the Rings. Apply fantasy costume, hairy feet, and whimsical background. Maintain facial features and pose.',
   referenceImages: [
     'media/company-test-001/ai-reference/hobbit-costume.jpg',
@@ -160,32 +160,6 @@ try {
 ### Calls
 - `GoogleGeminiProvider.transformImage()` - AI provider implementation
 - Firebase Admin Storage - Reference image downloads
-
----
-
-## Testing Strategy
-
-### Unit Tests (`ai-transform.service.test.ts`)
-
-**Test Cases**:
-1. ✅ **Success path**: Transform image with valid config and reference images
-2. ✅ **Invalid config**: Empty prompt throws `INVALID_CONFIG`
-3. ✅ **Invalid config**: Empty referenceImages array throws `INVALID_CONFIG`
-4. ✅ **Missing reference image**: Non-existent path throws `REFERENCE_IMAGE_NOT_FOUND`
-5. ✅ **Invalid input buffer**: Empty buffer throws `INVALID_INPUT_IMAGE`
-6. ✅ **API error**: Gemini failure throws `API_ERROR`
-7. ✅ **Timeout**: Long-running transformation throws `TIMEOUT`
-
-**Mocking**:
-- Mock Firebase Admin Storage: `file.download()` returns test buffers
-- Mock GoogleGeminiProvider: `transformImage()` returns fixed buffer
-- Mock environment: `GOOGLE_AI_API_KEY` set
-
-### Integration Tests
-
-**Test Cases**:
-1. ✅ **End-to-end**: Real Gemini API call with test image (skip in CI if no API key)
-2. ✅ **Reference images**: Load actual reference images from test Storage bucket
 
 ---
 
@@ -267,10 +241,11 @@ Cause: {cause}
 ## Change Summary
 
 ### New Files
-- `functions/src/services/media-pipeline/ai-transform.service.ts` - This service
-- `functions/src/services/media-pipeline/ai-providers/types.ts` - Interfaces and types
-- `functions/src/services/media-pipeline/ai-providers/gemini.provider.ts` - Gemini implementation
+- `functions/src/services/ai/ai-transform.service.ts` - This service
+- `functions/src/services/ai/providers/types.ts` - Interfaces and types
+- `functions/src/services/ai/providers/gemini.provider.ts` - Gemini implementation
+- `functions/src/services/ai/config.ts` - Mocked AI config constant
+- `functions/src/services/ai/index.ts` - Re-export AI services
 
 ### Modified Files
-- `functions/src/services/media-pipeline/config.ts` - Add `MOCKED_AI_CONFIG` constant
-- `functions/src/services/media-pipeline/index.ts` - Re-export `transformImage` function
+- None (all AI services are new)

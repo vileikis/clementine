@@ -4,79 +4,82 @@
 
 ## Research Tasks
 
-### 1. Google Generative AI SDK for Node.js
+### 1. Google GenAI SDK for Node.js
 
 **Unknown**: Which npm package provides Google Gemini API access for Node.js in Firebase Cloud Functions?
 
 **Research Approach**: Check official Google AI documentation and npm registry for Node.js SDK.
 
-**Decision**: Use `@google/generative-ai` npm package (official Google Generative AI SDK)
+**Decision**: Use `@google/genai` npm package (latest official Google GenAI SDK)
 
 **Rationale**:
-- Official Google SDK for Generative AI models (Gemini)
+- Official Google SDK for Generative AI models (Gemini 2.0+)
+- Replaces deprecated `@google/generative-ai` package
 - Native TypeScript support with complete type definitions
-- Supports image input for multimodal models (required for image transformation)
-- Works in Node.js environments including Firebase Cloud Functions
+- Supports multimodal image-to-image transformations (required for AI transform feature)
+- Works in Node.js 20+ environments including Firebase Cloud Functions v2
 - Active maintenance by Google AI team
-- Model support: `gemini-2.0-flash-exp`, `gemini-1.5-pro`, `gemini-1.5-flash` (per documentation)
+- Model support: `gemini-3-pro-image-preview`, `gemini-2.5-flash` and other Gemini 2.0+ models
 
 **Alternatives Considered**:
-- **Google Cloud Vertex AI SDK** (`@google-cloud/vertexai`) - Rejected because it requires more complex GCP authentication and is overkill for simple API key usage. Vertex AI is designed for enterprise deployments with IAM, whereas `@google/generative-ai` works with simple API keys suitable for Cloud Functions.
+- **Deprecated `@google/generative-ai`** - Rejected because it has been deprecated in favor of `@google/genai`
+- **Google Cloud Vertex AI SDK** (`@google-cloud/vertexai`) - Rejected because it requires more complex GCP authentication and is overkill for simple API key usage. Vertex AI is designed for enterprise deployments with IAM, whereas `@google/genai` works with simple API keys suitable for Cloud Functions.
 - **Direct REST API calls** - Rejected because it lacks type safety, requires manual schema maintenance, and loses automatic retry/error handling provided by SDK.
 
 ### 2. Gemini Model Selection
 
 **Unknown**: Which Gemini model name should be used for image transformation in December 2024?
 
-**Research Approach**: Review Google Gemini API documentation for current model availability and image generation capabilities.
+**Research Approach**: Review Google Gemini API documentation for current model availability and image transformation capabilities.
 
-**Decision**: Use `gemini-2.0-flash-exp` as primary model, with `gemini-1.5-pro` as alternative
+**Decision**: Use `gemini-3-pro-image-preview` as primary model, with `gemini-2.5-flash` as fallback
 
 **Rationale**:
-- `gemini-2.0-flash-exp`: Latest experimental model with improved multimodal capabilities (December 2024)
-- Supports image input + text prompts for image-to-image transformation
-- "flash" variant optimized for speed (target: <60 seconds end-to-end)
-- `gemini-1.5-pro`: More stable alternative with proven production track record, use if experimental model has issues
+- `gemini-3-pro-image-preview`: Latest Gemini 3 preview model with advanced multimodal image transformation capabilities
+- Supports image-to-image transformations with prompts and reference images
+- Optimized for image generation and transformation tasks
+- `gemini-2.5-flash`: Fast, reliable fallback model with good multimodal support (target: <60 seconds end-to-end)
 - Both models support reference images via multimodal input
+- Available via `@google/genai` SDK (Gemini 2.0+ models)
 
 **Alternatives Considered**:
-- **gemini-1.0-pro-vision** - Rejected because it's an older model generation with less capable image understanding
-- **gemini-1.5-flash** - Considered but `2.0-flash-exp` offers better performance for image tasks per documentation
-
-**Note**: Model names in spec (`gemini-2.5-flash-image`, `gemini-3-pro-image-preview`) appear to be placeholders. Actual available models as of December 2024 are Gemini 1.5 and 2.0 series.
+- **gemini-1.5-pro** - Rejected because it's an older generation with less capable image transformation
+- **gemini-2.0-flash-exp** - Considered but `3-pro-image-preview` and `2.5-flash` offer better image transformation capabilities
 
 ### 3. Image-to-Image Transformation Pattern
 
 **Unknown**: How does Gemini handle image-to-image transformation? Does it require specific API patterns?
 
-**Research Approach**: Review Google Generative AI SDK documentation for multimodal image generation.
+**Research Approach**: Review Google GenAI SDK documentation for multimodal image generation.
 
-**Decision**: Use `generateContent` with multimodal input (image buffer + text prompt)
+**Decision**: Use `models.generateContent()` with multimodal input (image buffer + text prompt + reference images)
 
 **Rationale**:
-- Gemini models are generative models that produce text/structured output, NOT image-to-image transformers
-- For image transformation, the pattern is:
-  1. Send input image + transformation prompt to Gemini
-  2. Gemini analyzes image and generates a **text description** of the transformed image
-  3. Use that description with a separate image generation model (e.g., Imagen, Stable Diffusion)
-- **CRITICAL FINDING**: Gemini alone CANNOT produce transformed images directly
+- Gemini 2.0+ models support direct image-to-image transformations via multimodal API
+- Pattern for transformation:
+  1. Send input image buffer as multimodal input
+  2. Provide transformation prompt describing desired output
+  3. Optionally include reference images to guide style/content
+  4. Model generates transformed image directly
+- Uses `GoogleGenAI` client from `@google/genai` package:
+  ```typescript
+  const ai = new GoogleGenAI({apiKey: process.env.GOOGLE_AI_API_KEY});
+  const model = ai.models.generateContent({
+    model: 'gemini-3-pro-image-preview',
+    contents: [inputImage, prompt, ...referenceImages]
+  });
+  ```
 
-**Alternative Approach - Imagen via Vertex AI**:
-- Google's Imagen 2 model (via Vertex AI) supports text-to-image generation
-- Could use Gemini to generate enhanced prompts, then Imagen for actual image generation
-- Requires Vertex AI setup, not simple API key
+**Key SDK Features**:
+- Streaming responses for progress tracking
+- Function calling for structured outputs
+- Multimodal inputs (images, audio, video)
+- Built-in retry and error handling
 
-**Alternative Approach - Third-party Image Generation**:
-- Stable Diffusion (via Stability AI API or Replicate)
-- DALL-E 3 (via OpenAI API)
-- Midjourney (via unofficial APIs)
-
-**Recommendation for Implementation**:
-Since Gemini cannot directly transform images, we need a two-step pipeline:
-1. **Gemini**: Analyze input image + generate enhanced description based on prompt
-2. **Image Generator** (Imagen/Stable Diffusion/etc.): Generate new image from description
-
-For mocked implementation, we'll structure the code to support this pattern but use placeholder/mock responses.
+**Implementation Notes**:
+- For mocked implementation: Use simplified mock response pattern
+- Reference images passed as base64 inline data
+- Model handles aspect ratio internally; FFmpeg post-processing handles final formatting
 
 ### 4. Reference Image Handling in Firebase Storage
 
@@ -165,21 +168,20 @@ For mocked implementation, we'll structure the code to support this pattern but 
 ## Summary
 
 **Key Decisions**:
-1. Use `@google/generative-ai` npm package for Gemini API access
-2. Use `gemini-2.0-flash-exp` model (latest experimental) with `gemini-1.5-pro` fallback
-3. **CRITICAL**: Gemini cannot directly transform images; requires two-step pattern (Gemini analysis → separate image generation)
+1. Use `@google/genai` npm package for Gemini API access (replaces deprecated `@google/generative-ai`)
+2. Use `gemini-3-pro-image-preview` model (primary) with `gemini-2.5-flash` fallback
+3. Gemini 2.0+ models support direct image-to-image transformations via multimodal API
 4. Download reference images to buffers, pass as base64 to Gemini SDK
 5. Follow existing error handling pattern with new AI-specific error codes
 6. Insert 'ai-transform' state after 'downloading' in processing lifecycle
 7. AI transform ignores aspect ratio; FFmpeg handles formatting
 
 **Open Questions for Implementation**:
-- Which image generation service to integrate for actual image output? (Imagen/Stable Diffusion/other)
 - For mocked implementation: Return placeholder transformed image or skip AI call entirely?
 
 **Dependencies to Add**:
 ```bash
-pnpm add @google/generative-ai
+pnpm add @google/genai
 ```
 
 **Environment Variables Required**:
