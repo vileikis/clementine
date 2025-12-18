@@ -39,12 +39,14 @@ export const processMediaJob = onTaskDispatched(
         throw new Error('Invalid task payload');
       }
 
-      const { sessionId, outputFormat, aspectRatio, overlay } = parseResult.data;
+      const { sessionId, outputFormat, aspectRatio, overlay, aiTransform } =
+        parseResult.data;
 
       console.log(`Processing session ${sessionId}`, {
         outputFormat,
         aspectRatio,
         overlay,
+        aiTransform,
       });
 
       // Fetch session
@@ -71,6 +73,7 @@ export const processMediaJob = onTaskDispatched(
       const pipelineOptions = {
         aspectRatio,
         overlay: overlay ?? false,
+        aiTransform: aiTransform ?? false,
       };
 
       // Route to appropriate pipeline based on format

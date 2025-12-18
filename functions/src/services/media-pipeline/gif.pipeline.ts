@@ -31,6 +31,14 @@ export async function processGIF(
     throw new Error('GIF requires at least 2 input frames');
   }
 
+  // Check if AI transform was requested (not supported for GIF)
+  if (options.aiTransform) {
+    console.warn(
+      `[GIF Pipeline] AI transform not supported for GIF format (session: ${session.id}). ` +
+      'Continuing with standard GIF processing.'
+    );
+  }
+
   // Get pipeline config
   const config = getPipelineConfig('gif', options.aspectRatio);
 
