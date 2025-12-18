@@ -62,9 +62,13 @@ export async function processGIF(
     // Apply overlay if requested
     let finalPath = gifPath;
     if (options.overlay) {
+      console.log(`[GIF Pipeline] Applying overlay for aspect ratio: ${options.aspectRatio}`);
       const overlayPath = await downloadOverlay(options.aspectRatio, tmpDirObj.path);
+      console.log(`[GIF Pipeline] Overlay downloaded to: ${overlayPath}`);
       const overlayedPath = `${tmpDirObj.path}/final.gif`;
+      console.log(`[GIF Pipeline] Compositing GIF with overlay...`);
       await applyOverlayToMedia(gifPath, overlayPath, overlayedPath);
+      console.log(`[GIF Pipeline] Overlay applied successfully to: ${overlayedPath}`);
       finalPath = overlayedPath;
     }
 

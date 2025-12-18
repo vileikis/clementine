@@ -72,6 +72,12 @@ export async function downloadOverlay(
   const storagePath = `media/${COMPANY_ID}/overlays/${overlayFilename}`;
   const outputPath = `${tmpDir}/overlay.png`;
 
+  console.log(`[downloadOverlay] Aspect ratio: ${aspectRatio}`);
+  console.log(`[downloadOverlay] Storage path: ${storagePath}`);
+  console.log(`[downloadOverlay] Output path: ${outputPath}`);
+
   await downloadFromStorage(storagePath, outputPath);
+
+  console.log(`[downloadOverlay] Successfully downloaded overlay`);
   return outputPath;
 }
