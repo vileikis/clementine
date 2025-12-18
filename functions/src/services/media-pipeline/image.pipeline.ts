@@ -20,12 +20,10 @@ import type { PipelineOptions } from '../../lib/schemas/media-pipeline.schema';
  *
  * @param session - Session document (already fetched)
  * @param options - Pipeline options (aspectRatio, overlay, aiTransform)
- * @param apiKey - Google AI API key from Firebase Params (required if aiTransform is true)
  */
 export async function processSingleImage(
   session: SessionWithProcessing,
-  options: PipelineOptions,
-  apiKey?: string
+  options: PipelineOptions
 ): Promise<SessionOutputs> {
   const startTime = Date.now();
 
@@ -53,12 +51,7 @@ export async function processSingleImage(
     // Apply AI transformation if requested
     if (options.aiTransform) {
       try {
-        inputPath = await applyAiTransform(
-          session.id,
-          inputPath,
-          tmpDirObj.path,
-          apiKey || ''
-        );
+        inputPath = await applyAiTransform(session.id, inputPath, tmpDirObj.path);
       } catch (error) {
         await handleAiTransformError(error, session.id);
       }
