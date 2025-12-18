@@ -5,6 +5,7 @@
  *
  * This script populates the Firestore and Storage emulators with test data:
  * - Uploads 12 test images to Storage
+ * - Uploads 2 overlay images to Storage
  * - Creates 3 session documents with different inputAssets configurations
  *
  * Usage:
@@ -14,6 +15,7 @@
  * Requirements:
  * - Firebase emulators must be running
  * - Test images must exist in seed-data/images/ (see README.md there)
+ * - Overlay images must exist in seed-data/overlays/
  */
 
 import * as admin from 'firebase-admin';
@@ -59,6 +61,8 @@ const SESSION_IDS = {
 // Image configuration
 const TOTAL_IMAGES = 12;
 const IMAGE_DIR = path.join(__dirname, '../seed-data/images');
+const OVERLAY_DIR = path.join(__dirname, '../seed-data/overlays');
+const OVERLAY_FILES = ['square-overlay.png', 'story-overlay.png'];
 
 /**
  * Check if all required images exist
@@ -146,6 +150,46 @@ async function uploadAllImages(): Promise<InputAsset[]> {
 }
 
 /**
+ * Upload overlay files to Storage emulator
+ */
+async function uploadOverlays(): Promise<void> {
+  console.log('📤 Uploading overlays to Storage emulator...');
+
+  for (const filename of OVERLAY_FILES) {
+    const filepath = path.join(OVERLAY_DIR, filename);
+    const storagePath = `media/${COMPANY_ID}/overlays/${filename}`;
+
+    try {
+      // Check if file exists
+      await fs.access(filepath);
+
+      // Read file
+      const fileBuffer = await fs.readFile(filepath);
+
+      // Upload to Storage emulator
+      await storage.file(storagePath).save(fileBuffer, {
+        metadata: {
+          contentType: 'image/png',
+        },
+      });
+
+      // Make file public (emulator only)
+      await storage.file(storagePath).makePublic();
+
+      // Get public URL
+      const publicUrl = `http://localhost:9199/v0/b/${storage.name}/o/${encodeURIComponent(storagePath)}?alt=media`;
+
+      console.log(`   ✓ Uploaded ${filename} → ${storagePath}`);
+      console.log(`     URL: ${publicUrl}`);
+    } catch (error) {
+      console.warn(`   ⚠ Skipping ${filename} (not found or error)`);
+    }
+  }
+
+  console.log(`✅ Uploaded ${OVERLAY_FILES.length} overlays\n`);
+}
+
+/**
  * Create session documents in Firestore
  */
 async function createSessions(imageMetadata: InputAsset[]): Promise<void> {
@@ -209,6 +253,9 @@ async function seed(): Promise<void> {
     // Upload images
     const imageMetadata = await uploadAllImages();
 
+    // Upload overlays
+    await uploadOverlays();
+
     // Create sessions
     await createSessions(imageMetadata);
 
@@ -216,6 +263,7 @@ async function seed(): Promise<void> {
     console.log('✨ Seeding complete!\n');
     console.log('📊 Summary:');
     console.log(`   - Storage: ${TOTAL_IMAGES} images uploaded`);
+    console.log(`   - Storage: ${OVERLAY_FILES.length} overlays uploaded`);
     console.log('   - Firestore: 3 sessions created');
     console.log(`\n🔗 View at: http://localhost:4000\n`);
 
