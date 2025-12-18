@@ -12,19 +12,24 @@
     "build:watch": "tsc -w",
     "serve": "pnpm build:watch | firebase emulators:start --config ../firebase.emulator.json",
     "serve:prod": "pnpm build && npx isolate && cd isolate && npm install && cd ../.. && firebase emulators:start",
-    "clean": "rm -rf dist isolate"
+    "clean": "rm -rf dist isolate",
+    "seed": "tsx scripts/seed-emulators.ts"
   },
   "engines": {
     "node": "22"
   },
   "dependencies": {
     "@clementine/shared": "workspace:*",
+    "ffmpeg-static": "^5.3.0",
     "firebase-admin": "^13.6.0",
-    "firebase-functions": "^7.0.2"
+    "firebase-functions": "^7.0.2",
+    "tmp": "^0.2.5",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
-    "esbuild": "^0.20.0",
+    "@types/tmp": "^0.2.6",
     "isolate-package": "^1.26.1",
+    "tsx": "^4.19.2",
     "typescript": "^5.0.0"
   }
 }

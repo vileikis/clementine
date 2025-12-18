@@ -14,6 +14,7 @@
     "fb:deploy:rules": "firebase deploy --only firestore:rules,storage",
     "fb:deploy:indexes": "firebase deploy --only firestore:indexes",
     "functions:build": "pnpm --filter @clementine/shared build && pnpm --filter @clementine/functions build",
+    "functions:seed": "pnpm --filter @clementine/functions seed",
     "functions:serve": "pnpm --filter @clementine/functions serve",
     "functions:serve:prod": "pnpm --filter @clementine/functions serve:prod",
     "functions:deploy": "./functions/scripts/deploy.sh"
