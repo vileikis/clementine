@@ -1,5 +1,5 @@
 import * as fs from 'fs/promises';
-import { createGIF, generateThumbnail } from './ffmpeg';
+import { createGIF, generateThumbnail, applyOverlayToMedia } from './ffmpeg';
 import {
   uploadToStorage,
   getOutputStoragePath,
@@ -7,7 +7,7 @@ import {
 import { updateProcessingStep } from '../../lib/session';
 import { getPipelineConfig } from './config';
 import { createTempDir } from '../../lib/utils';
-import { downloadSessionFrames } from './pipeline-utils';
+import { downloadSessionFrames, downloadOverlay } from './pipeline-utils';
 import type {
   SessionOutputs,
   SessionWithProcessing,
@@ -59,6 +59,15 @@ export async function processGIF(
     const gifPath = `${tmpDirObj.path}/output.gif`;
     await createGIF(boomerangFrames, gifPath, config.outputWidth);
 
+    // Apply overlay if requested
+    let finalPath = gifPath;
+    if (options.overlay) {
+      const overlayPath = await downloadOverlay(options.aspectRatio, tmpDirObj.path);
+      const overlayedPath = `${tmpDirObj.path}/final.gif`;
+      await applyOverlayToMedia(gifPath, overlayPath, overlayedPath);
+      finalPath = overlayedPath;
+    }
+
     // Generate thumbnail from first frame
     const thumbPath = `${tmpDirObj.path}/thumb.jpg`;
     const firstFrame = downloadedFrames[0];
@@ -84,12 +93,12 @@ export async function processGIF(
     );
 
     const [primaryUrl, thumbnailUrl] = await Promise.all([
-      uploadToStorage(gifPath, outputStoragePath),
+      uploadToStorage(finalPath, outputStoragePath),
       uploadToStorage(thumbPath, thumbStoragePath),
     ]);
 
     // Get file size
-    const gifStats = await fs.stat(gifPath);
+    const finalStats = await fs.stat(finalPath);
 
     // Create outputs object
     const outputs: SessionOutputs = {
@@ -100,7 +109,7 @@ export async function processGIF(
         width: config.outputWidth,
         height: config.outputHeight,
       },
-      sizeBytes: gifStats.size,
+      sizeBytes: finalStats.size,
       completedAt: Date.now(),
       processingTimeMs: Date.now() - startTime,
     };
