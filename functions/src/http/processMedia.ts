@@ -31,12 +31,13 @@ export const processMedia = onRequest(
       if (!parseResult.success) {
         res.status(400).json({
           error: 'Invalid request',
-          details: parseResult.error.errors,
+          details: parseResult.error.issues,
         });
         return;
       }
 
-      const { sessionId, outputFormat, aspectRatio, overlay } = parseResult.data;
+      const { sessionId, outputFormat, aspectRatio, overlay, aiTransform } =
+        parseResult.data;
 
       // Fetch session from Firestore
       const session = await fetchSession(sessionId);
@@ -68,6 +69,7 @@ export const processMedia = onRequest(
           outputFormat,
           aspectRatio,
           overlay,
+          aiTransform,
         },
         {
           scheduleDelaySeconds: 0, // Run immediately
@@ -84,6 +86,7 @@ export const processMedia = onRequest(
         outputFormat,
         aspectRatio,
         overlay,
+        aiTransform,
       });
     } catch (error) {
       console.error('Error in processMedia endpoint:', error);

@@ -25,6 +25,7 @@ export const processMediaRequestSchema = z.object({
   outputFormat: z.enum(['image', 'gif', 'video']),
   aspectRatio: z.enum(['square', 'story']),
   overlay: z.boolean().optional().default(false),
+  aiTransform: z.boolean().optional().default(false),
 });
 
 export type ProcessMediaRequest = z.infer<typeof processMediaRequestSchema>;
@@ -35,6 +36,7 @@ export type ProcessMediaRequest = z.infer<typeof processMediaRequestSchema>;
 export const pipelineOptionsSchema = z.object({
   aspectRatio: z.enum(['square', 'story']),
   overlay: z.boolean().optional().default(false),
+  aiTransform: z.boolean().optional().default(false),
 });
 
 export type PipelineOptions = z.infer<typeof pipelineOptionsSchema>;

@@ -4,21 +4,25 @@ import {
   uploadToStorage,
   getOutputStoragePath,
 } from '../../lib/storage';
-import { updateProcessingStep } from '../../lib/session';
+import { updateProcessingStep, markSessionFailed } from '../../lib/session';
 import { getPipelineConfig } from './config';
 import { createTempDir } from '../../lib/utils';
 import { downloadSingleFrame, downloadOverlay } from './pipeline-utils';
+import { applyAiTransform, mapAiTransformError } from './ai-transform-step';
+import { mapAspectRatioToGemini } from './aspect-ratio-utils';
+import { MOCKED_AI_CONFIG } from '../ai';
 import type {
   SessionOutputs,
   SessionWithProcessing,
 } from '@clementine/shared';
 import type { PipelineOptions } from '../../lib/schemas/media-pipeline.schema';
+import type { AiTransformConfig } from '../ai/providers/types';
 
 /**
  * Process single image (User Story 1)
  *
  * @param session - Session document (already fetched)
- * @param options - Pipeline options (aspectRatio, overlay)
+ * @param options - Pipeline options (aspectRatio, overlay, aiTransform)
  */
 export async function processSingleImage(
   session: SessionWithProcessing,
@@ -45,7 +49,33 @@ export async function processSingleImage(
     if (!inputAsset) {
       throw new Error('No input asset found');
     }
-    const inputPath = await downloadSingleFrame(inputAsset, tmpDirObj.path, 'input.jpg');
+    let inputPath = await downloadSingleFrame(inputAsset, tmpDirObj.path, 'input.jpg');
+
+    // Apply AI transformation if requested
+    if (options.aiTransform) {
+      try {
+        // Update session state to 'ai-transform'
+        await updateProcessingStep(session.id, 'ai-transform');
+
+        // Enrich AI config with pipeline's aspectRatio
+        const enrichedConfig: AiTransformConfig = {
+          ...MOCKED_AI_CONFIG,
+          aspectRatio: mapAspectRatioToGemini(options.aspectRatio),
+        };
+
+        // Apply AI transformation
+        inputPath = await applyAiTransform(inputPath, tmpDirObj.path, enrichedConfig);
+      } catch (error) {
+        // Map error to session error codes
+        const { errorCode, errorMessage } = mapAiTransformError(error);
+
+        // Mark session as failed
+        await markSessionFailed(session.id, errorCode, errorMessage);
+
+        // Re-throw to trigger Cloud Tasks retry
+        throw error;
+      }
+    }
 
     await updateProcessingStep(session.id, 'processing');
 

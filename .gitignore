@@ -10,6 +10,7 @@ node_modules/
 
 # Environment variables
 .env*
+.secret.local
 
 # Build outputs
 .next/
