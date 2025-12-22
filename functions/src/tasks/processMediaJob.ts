@@ -13,6 +13,7 @@ import {
   // processVideo,
   detectOutputFormat,
 } from '../services/media-pipeline';
+import { GOOGLE_AI_API_KEY_SECRET } from '../services/media-pipeline/ai-transform-step';
 
 /**
  * Cloud Task handler for async media processing
@@ -22,6 +23,7 @@ import {
 export const processMediaJob = onTaskDispatched(
   {
     region: 'europe-west1',
+    secrets: [GOOGLE_AI_API_KEY_SECRET], // Declare secret dependency
     retryConfig: {
       maxAttempts: 0,
       minBackoffSeconds: 30,
@@ -35,16 +37,18 @@ export const processMediaJob = onTaskDispatched(
       // Extract payload from task
       const parseResult = processMediaRequestSchema.safeParse(req.data);
       if (!parseResult.success) {
-        console.error('Invalid task payload:', parseResult.error.errors);
+        console.error('Invalid task payload:', parseResult.error.issues);
         throw new Error('Invalid task payload');
       }
 
-      const { sessionId, outputFormat, aspectRatio, overlay } = parseResult.data;
+      const { sessionId, outputFormat, aspectRatio, overlay, aiTransform } =
+        parseResult.data;
 
       console.log(`Processing session ${sessionId}`, {
         outputFormat,
         aspectRatio,
         overlay,
+        aiTransform,
       });
 
       // Fetch session
@@ -71,6 +75,7 @@ export const processMediaJob = onTaskDispatched(
       const pipelineOptions = {
         aspectRatio,
         overlay: overlay ?? false,
+        aiTransform: aiTransform ?? false,
       };
 
       // Route to appropriate pipeline based on format
