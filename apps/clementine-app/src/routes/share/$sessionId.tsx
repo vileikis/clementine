@@ -1,18 +1,12 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { ArrowLeft } from 'lucide-react'
-import type { Session } from '../../types/session'
+import { getSessionById } from '../../data/sessions'
 
 export const Route = createFileRoute('/share/$sessionId')({
   loader: async ({ params }) => {
-    // Fetch session from API
-    const response = await fetch(`/api/sessions/${params.sessionId}`)
-
-    if (!response.ok) {
-      throw new Error('Session not found')
-    }
-
-    const data = (await response.json()) as { session: Session }
-    return data
+    // Get session using server function
+    const session = await getSessionById({ data: params.sessionId })
+    return { session }
   },
 
   // Dynamic head metadata based on session data
@@ -20,7 +14,10 @@ export const Route = createFileRoute('/share/$sessionId')({
     const { session } = loaderData!
     const title = `${session.guestName}'s Photo - ${session.eventName}`
     const description = `Check out ${session.guestName}'s AI-transformed photo from ${session.eventName} on Clementine!`
-    const url = `https://yourapp.com/share/${session.id}`
+
+    // Use environment variable for base URL, fallback to localhost for development
+    const baseUrl = import.meta.env.VITE_APP_URL || 'http://localhost:3000'
+    const url = `${baseUrl}/share/${session.id}`
 
     return {
       meta: [

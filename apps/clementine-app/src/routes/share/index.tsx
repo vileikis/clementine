@@ -1,12 +1,10 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import type { Session } from '../../types/session'
+import { getSessions } from '../../data/sessions'
 
 export const Route = createFileRoute('/share/')({
   loader: async () => {
-    // Fetch sessions from API
-    const response = await fetch('/api/sessions')
-    const data = (await response.json()) as { sessions: Session[] }
-    return data
+    const sessions = await getSessions()
+    return { sessions }
   },
   component: ShareIndex,
 })
