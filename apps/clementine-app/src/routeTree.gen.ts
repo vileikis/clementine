@@ -10,12 +10,16 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ShareIndexRouteImport } from './routes/share/index'
+import { Route as ShareSessionIdRouteImport } from './routes/share/$sessionId'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
 import { Route as ApiTqTodosRouteImport } from './routes/api/tq-todos'
+import { Route as ApiSessionsRouteImport } from './routes/api/sessions'
 import { Route as ApiNamesRouteImport } from './routes/api/names'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs'
 import { Route as DemoStartApiRequestRouteImport } from './routes/demo/start.api-request'
 import { Route as DemoSentryTestingRouteImport } from './routes/demo/sentry.testing'
+import { Route as ApiSessionsSessionIdRouteImport } from './routes/api/sessions.$sessionId'
 import { Route as DemoStartSsrIndexRouteImport } from './routes/demo/start.ssr.index'
 import { Route as DemoStartSsrSpaModeRouteImport } from './routes/demo/start.ssr.spa-mode'
 import { Route as DemoStartSsrFullSsrRouteImport } from './routes/demo/start.ssr.full-ssr'
@@ -26,6 +30,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShareIndexRoute = ShareIndexRouteImport.update({
+  id: '/share/',
+  path: '/share/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShareSessionIdRoute = ShareSessionIdRouteImport.update({
+  id: '/share/$sessionId',
+  path: '/share/$sessionId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
   id: '/demo/tanstack-query',
   path: '/demo/tanstack-query',
@@ -34,6 +48,11 @@ const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
 const ApiTqTodosRoute = ApiTqTodosRouteImport.update({
   id: '/api/tq-todos',
   path: '/api/tq-todos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiSessionsRoute = ApiSessionsRouteImport.update({
+  id: '/api/sessions',
+  path: '/api/sessions',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiNamesRoute = ApiNamesRouteImport.update({
@@ -55,6 +74,11 @@ const DemoSentryTestingRoute = DemoSentryTestingRouteImport.update({
   id: '/demo/sentry/testing',
   path: '/demo/sentry/testing',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ApiSessionsSessionIdRoute = ApiSessionsSessionIdRouteImport.update({
+  id: '/$sessionId',
+  path: '/$sessionId',
+  getParentRoute: () => ApiSessionsRoute,
 } as any)
 const DemoStartSsrIndexRoute = DemoStartSsrIndexRouteImport.update({
   id: '/demo/start/ssr/',
@@ -80,8 +104,12 @@ const DemoStartSsrDataOnlyRoute = DemoStartSsrDataOnlyRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/api/names': typeof ApiNamesRoute
+  '/api/sessions': typeof ApiSessionsRouteWithChildren
   '/api/tq-todos': typeof ApiTqTodosRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/share/$sessionId': typeof ShareSessionIdRoute
+  '/share': typeof ShareIndexRoute
+  '/api/sessions/$sessionId': typeof ApiSessionsSessionIdRoute
   '/demo/sentry/testing': typeof DemoSentryTestingRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
@@ -93,8 +121,12 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/api/names': typeof ApiNamesRoute
+  '/api/sessions': typeof ApiSessionsRouteWithChildren
   '/api/tq-todos': typeof ApiTqTodosRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/share/$sessionId': typeof ShareSessionIdRoute
+  '/share': typeof ShareIndexRoute
+  '/api/sessions/$sessionId': typeof ApiSessionsSessionIdRoute
   '/demo/sentry/testing': typeof DemoSentryTestingRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
@@ -107,8 +139,12 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/api/names': typeof ApiNamesRoute
+  '/api/sessions': typeof ApiSessionsRouteWithChildren
   '/api/tq-todos': typeof ApiTqTodosRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/share/$sessionId': typeof ShareSessionIdRoute
+  '/share/': typeof ShareIndexRoute
+  '/api/sessions/$sessionId': typeof ApiSessionsSessionIdRoute
   '/demo/sentry/testing': typeof DemoSentryTestingRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
@@ -122,8 +158,12 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/api/names'
+    | '/api/sessions'
     | '/api/tq-todos'
     | '/demo/tanstack-query'
+    | '/share/$sessionId'
+    | '/share'
+    | '/api/sessions/$sessionId'
     | '/demo/sentry/testing'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
@@ -135,8 +175,12 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/api/names'
+    | '/api/sessions'
     | '/api/tq-todos'
     | '/demo/tanstack-query'
+    | '/share/$sessionId'
+    | '/share'
+    | '/api/sessions/$sessionId'
     | '/demo/sentry/testing'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
@@ -148,8 +192,12 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/api/names'
+    | '/api/sessions'
     | '/api/tq-todos'
     | '/demo/tanstack-query'
+    | '/share/$sessionId'
+    | '/share/'
+    | '/api/sessions/$sessionId'
     | '/demo/sentry/testing'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
@@ -162,8 +210,11 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ApiNamesRoute: typeof ApiNamesRoute
+  ApiSessionsRoute: typeof ApiSessionsRouteWithChildren
   ApiTqTodosRoute: typeof ApiTqTodosRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
+  ShareSessionIdRoute: typeof ShareSessionIdRoute
+  ShareIndexRoute: typeof ShareIndexRoute
   DemoSentryTestingRoute: typeof DemoSentryTestingRoute
   DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
   DemoStartServerFuncsRoute: typeof DemoStartServerFuncsRoute
@@ -182,6 +233,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/share/': {
+      id: '/share/'
+      path: '/share'
+      fullPath: '/share'
+      preLoaderRoute: typeof ShareIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/share/$sessionId': {
+      id: '/share/$sessionId'
+      path: '/share/$sessionId'
+      fullPath: '/share/$sessionId'
+      preLoaderRoute: typeof ShareSessionIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/demo/tanstack-query': {
       id: '/demo/tanstack-query'
       path: '/demo/tanstack-query'
@@ -194,6 +259,13 @@ declare module '@tanstack/react-router' {
       path: '/api/tq-todos'
       fullPath: '/api/tq-todos'
       preLoaderRoute: typeof ApiTqTodosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/sessions': {
+      id: '/api/sessions'
+      path: '/api/sessions'
+      fullPath: '/api/sessions'
+      preLoaderRoute: typeof ApiSessionsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/names': {
@@ -223,6 +295,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/demo/sentry/testing'
       preLoaderRoute: typeof DemoSentryTestingRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/api/sessions/$sessionId': {
+      id: '/api/sessions/$sessionId'
+      path: '/$sessionId'
+      fullPath: '/api/sessions/$sessionId'
+      preLoaderRoute: typeof ApiSessionsSessionIdRouteImport
+      parentRoute: typeof ApiSessionsRoute
     }
     '/demo/start/ssr/': {
       id: '/demo/start/ssr/'
@@ -255,11 +334,26 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface ApiSessionsRouteChildren {
+  ApiSessionsSessionIdRoute: typeof ApiSessionsSessionIdRoute
+}
+
+const ApiSessionsRouteChildren: ApiSessionsRouteChildren = {
+  ApiSessionsSessionIdRoute: ApiSessionsSessionIdRoute,
+}
+
+const ApiSessionsRouteWithChildren = ApiSessionsRoute._addFileChildren(
+  ApiSessionsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ApiNamesRoute: ApiNamesRoute,
+  ApiSessionsRoute: ApiSessionsRouteWithChildren,
   ApiTqTodosRoute: ApiTqTodosRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
+  ShareSessionIdRoute: ShareSessionIdRoute,
+  ShareIndexRoute: ShareIndexRoute,
   DemoSentryTestingRoute: DemoSentryTestingRoute,
   DemoStartApiRequestRoute: DemoStartApiRequestRoute,
   DemoStartServerFuncsRoute: DemoStartServerFuncsRoute,
