@@ -10,7 +10,7 @@
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "type-check": "tsc --noEmit",
-    "format": "prettier",
+    "format": "prettier --check .",
     "check": "prettier --write . && eslint --fix",
     "start": "node --import ./.output/server/instrument.server.mjs .output/server/index.mjs"
   },

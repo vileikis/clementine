@@ -141,7 +141,7 @@ export function useEvent(projectId: string, eventId: string, realtime = true) {
     // Nested collection path
     useFirestoreNestedRealtimeSync(
       ['projects', projectId, 'events', eventId],
-      ['projects', projectId, 'events', eventId]
+      ['projects', projectId, 'events', eventId],
     )
   }
 
@@ -153,15 +153,19 @@ export function useEvent(projectId: string, eventId: string, realtime = true) {
 // ============================================
 
 export const EventDetailRoute = createFileRoute(
-  '/$companyId/p/$projectId/events/$eventId'
+  '/$companyId/p/$projectId/events/$eventId',
 )({
   // Loader: Prefetch all data during SSR
   loader: async ({ params, context }) => {
     await Promise.all([
-      context.queryClient.ensureQueryData(companyQueryOptions(params.companyId)),
-      context.queryClient.ensureQueryData(projectQueryOptions(params.projectId)),
       context.queryClient.ensureQueryData(
-        eventQueryOptions(params.projectId, params.eventId)
+        companyQueryOptions(params.companyId),
+      ),
+      context.queryClient.ensureQueryData(
+        projectQueryOptions(params.projectId),
+      ),
+      context.queryClient.ensureQueryData(
+        eventQueryOptions(params.projectId, params.eventId),
       ),
     ])
   },

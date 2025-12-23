@@ -64,7 +64,7 @@ export const CompanyLayoutRoute = createFileRoute('/$companyId')({
   loader: async ({ params, context }) => {
     // Prefetch company data - will be cached
     await context.queryClient.ensureQueryData(
-      companyQueryOptions(params.companyId)
+      companyQueryOptions(params.companyId),
     )
   },
 })
@@ -74,21 +74,29 @@ export const ProjectLayoutRoute = createFileRoute('/$companyId/p/$projectId')({
   loader: async ({ params, context }) => {
     // Prefetch both company (from cache) and project
     await Promise.all([
-      context.queryClient.ensureQueryData(companyQueryOptions(params.companyId)),
-      context.queryClient.ensureQueryData(projectQueryOptions(params.projectId)),
+      context.queryClient.ensureQueryData(
+        companyQueryOptions(params.companyId),
+      ),
+      context.queryClient.ensureQueryData(
+        projectQueryOptions(params.projectId),
+      ),
     ])
   },
 })
 
 // Route: /$companyId/p/$projectId/events/$eventId
 export const EventDetailRoute = createFileRoute(
-  '/$companyId/p/$projectId/events/$eventId'
+  '/$companyId/p/$projectId/events/$eventId',
 )({
   loader: async ({ params, context }) => {
     // Prefetch all three - company and project will use cache!
     await Promise.all([
-      context.queryClient.ensureQueryData(companyQueryOptions(params.companyId)),
-      context.queryClient.ensureQueryData(projectQueryOptions(params.projectId)),
+      context.queryClient.ensureQueryData(
+        companyQueryOptions(params.companyId),
+      ),
+      context.queryClient.ensureQueryData(
+        projectQueryOptions(params.projectId),
+      ),
       context.queryClient.ensureQueryData(eventQueryOptions(params.eventId)),
     ])
   },
