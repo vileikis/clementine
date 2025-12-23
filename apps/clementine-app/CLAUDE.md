@@ -22,41 +22,96 @@ This is a **complete rewrite** of the existing Next.js application (`web/`) usin
 
 ## Development Standards
 
-**IMPORTANT**: Before implementing any feature or making changes, you **MUST**:
+**CRITICAL**: Before implementing any feature or making changes, you **MUST**:
 
-1. **Read `standards/README.md`** to understand applicable standards
-2. **Review `standards/global/project-structure.md`** for architecture and organization
+1. **Read `standards/README.md`** - Understand applicable standards
+2. **Review relevant standards** based on your task:
+   - **Architecture**: `standards/global/project-structure.md` + `standards/global/client-first-architecture.md`
+   - **UI Components**: `standards/frontend/component-libraries.md` + `standards/frontend/accessibility.md`
+   - **Performance**: `standards/frontend/performance.md`
+   - **Code Quality**: `standards/global/code-quality.md`
+   - **Security**: `standards/global/security.md`
+   - **Testing**: `standards/testing/overview.md`
 3. **Follow all standards strictly** in your implementation
 
-These standards are critical for maintaining consistency and code quality.
+**These standards are non-negotiable.** They ensure consistency, quality, and maintainability.
 
 ## Technical Stack
 
 ### Core Framework
 - **TanStack Start** - Full-stack React framework
-- **TanStack Router** - Type-safe routing with file-based routing
+- **TanStack Router** - Type-safe file-based routing
 - **React 19** - Latest React with new features
 - **TypeScript 5.7** - Strict mode enabled
 - **Vite 7** - Build tool and dev server
 
-### Styling & UI
+### Styling & UI Components
 - **Tailwind CSS 4** - Utility-first CSS framework
+- **shadcn/ui** - Primary component library (built on Radix UI)
+- **Radix UI** - Unstyled accessible primitives
+- **@dnd-kit** - Drag and drop functionality
 - **lucide-react** - Icon library
 - **class-variance-authority** - Component variants
-- **tailwind-merge + clsx** - Conditional className utilities
+
+**IMPORTANT**: Use **shadcn/ui**, **Radix UI**, and **@dnd-kit** as the foundation for all UI components. Don't reinvent what these libraries already provide. See `standards/frontend/component-libraries.md` for detailed guidance.
 
 ### Data & State
-- **TanStack Query** - Server state management
-- **TanStack Router SSR Query** - SSR integration for queries
+- **Firebase Firestore** - Database (client SDK)
+- **Firebase Storage** - File storage (client SDK)
+- **Firebase Auth** - Authentication (client SDK)
+- **TanStack Query** - Client-side data fetching and caching
+- **Zustand** - Client state management (if needed)
 
 ### Developer Experience
-- **TanStack Router DevTools** - Route debugging
-- **TanStack Query DevTools** - Query debugging
-- **TanStack React DevTools** - React debugging
+- **TanStack DevTools** - Router, Query, and React DevTools
 - **Sentry** - Error tracking and monitoring
 - **Vitest** - Unit testing framework
+- **Testing Library** - Component testing
 - **TypeScript ESLint** - Linting
 - **Prettier** - Code formatting
+
+## Architecture
+
+### Client-First Architecture ⚡
+
+**This application follows a client-first architecture**, not a traditional server-first pattern:
+
+- ✅ **Firebase client SDKs** for all data operations (Firestore, Storage, Auth)
+- ✅ **Client-side business logic** and state management
+- ✅ **Real-time updates** using Firestore listeners
+- ✅ **Security enforced by Firebase rules**, not server code
+- ✅ **SSR only for entry points and SEO** (metadata, Open Graph tags)
+- ⚠️ **Minimal server functions** (use only when absolutely necessary)
+
+**Key principle**: Build for the client, use the server strategically.
+
+See `standards/global/client-first-architecture.md` for complete details on when to use client vs server code.
+
+### Domain-Driven Design (DDD)
+
+Project structure follows DDD principles with clear separation of concerns:
+
+```
+src/
+├── ui-kit/              # Design system (shadcn/ui, Radix, @dnd-kit)
+├── integrations/        # Third-party integrations (Firebase, Sentry)
+├── shared/              # Shared utilities & components
+├── domains/             # Business domains (bounded contexts)
+│   ├── events/          # Events domain
+│   │   ├── management/  # Subdomain
+│   │   ├── theming/     # Subdomain
+│   │   └── shared/      # Domain-specific shared code
+│   └── experiences/     # Experiences domain
+└── routes/              # TanStack Router routes (thin)
+```
+
+**Key principles:**
+- **Domain-first organization** - Code organized by business capability
+- **Thin routes** - Routes import containers from domains
+- **Client-first data** - Firebase client SDK for all data operations
+- **Progressive complexity** - Start simple, add structure as needed
+
+See `standards/global/project-structure.md` for complete architectural guidelines.
 
 ## Commands
 
@@ -80,186 +135,122 @@ pnpm check            # Format + fix linting (all-in-one)
 
 # Testing
 pnpm test             # Run tests with Vitest
+pnpm test --watch     # Watch mode
+pnpm test --ui        # UI mode (visual test runner)
 ```
 
-## Architecture
+## Development Workflow
 
-### Project Structure
+### Before You Start
 
-This project follows a **Domain-Driven Design (DDD)** influenced architecture. See `standards/global/project-structure.md` for full details.
+1. ✅ Read relevant standards (see "Development Standards" section above)
+2. ✅ Understand client-first architecture
+3. ✅ Check which domain your feature belongs to
 
+### Building a Feature
+
+1. **Identify the domain** - Which business domain? (events, experiences, media, etc.)
+2. **Check existing structure** - Does the domain/subdomain exist?
+3. **Create module structure** - Add folders as needed (components, containers, hooks, etc.)
+4. **Build with standards** - Follow DDD principles and all applicable standards
+5. **Create thin route** - Import container from domain module
+
+### Working with UI Components
+
+1. **Check shadcn/ui first** - Does the component exist? Use it!
+   ```bash
+   pnpm dlx shadcn@latest add <component-name>
+   ```
+2. **Use Radix UI** - If shadcn doesn't have it, use Radix primitives
+3. **Use @dnd-kit** - For all drag and drop interactions
+4. **Build on top** - Create domain-specific components using ui-kit components
+
+See `standards/frontend/component-libraries.md` for detailed component library usage.
+
+### Working with Data
+
+**Use Firebase client SDKs directly:**
+
+```tsx
+import { firestore } from '@/integrations/firebase/client'
+import { collection, query, where, onSnapshot } from 'firebase/firestore'
+
+// ✅ Client-side Firestore operations
+function useEvents() {
+  const [events, setEvents] = useState([])
+
+  useEffect(() => {
+    const q = query(
+      collection(firestore, 'events'),
+      where('status', '==', 'active')
+    )
+
+    return onSnapshot(q, (snapshot) => {
+      setEvents(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })))
+    })
+  }, [])
+
+  return events
+}
 ```
-src/
-├── ui-kit/              # Design system (pure components)
-├── integrations/        # Third-party integrations
-├── shared/              # Shared utilities & components
-├── domains/             # Business domains (DDD bounded contexts)
-└── routes/              # TanStack Router routes (thin)
-```
 
-**Key Principles:**
-- **Domain-first organization** - Code organized by business domains, not technical layers
-- **Separation of concerns** - Clear boundaries between infrastructure, shared code, and domains
-- **Thin routes** - Route files are minimal, importing containers from domains
-- **Progressive complexity** - Start simple, add structure as needed
+**Don't create server functions unless absolutely necessary.** See `standards/global/client-first-architecture.md` for when to use server vs client.
 
 ### TypeScript Path Aliases
 
-Configured in `tsconfig.json`:
-
-```typescript
-import { Button } from '@/ui-kit/components/Button'
-import { firestore } from '@/integrations/firebase'
+```tsx
+import { Button } from '@/ui-kit/components/button'
+import { firestore } from '@/integrations/firebase/client'
 import { cn } from '@/shared/lib/cn'
 import { EventsPage } from '@/domains/events/management/containers/EventsPage'
 ```
 
-### TanStack Router
+## Standards Quick Reference
 
-This project uses **file-based routing** with TanStack Router:
+| Task | Standards to Review |
+|------|-------------------|
+| **Setting up architecture** | `global/project-structure.md` + `global/client-first-architecture.md` |
+| **Building UI components** | `frontend/component-libraries.md` + `frontend/accessibility.md` |
+| **Working with data** | `global/client-first-architecture.md` + `global/security.md` |
+| **Optimizing performance** | `frontend/performance.md` |
+| **Writing tests** | `testing/overview.md` |
+| **Code review** | `global/code-quality.md` + `global/security.md` |
 
-- Routes are defined in `src/routes/`
-- Route files should be **thin** - primarily routing configuration
-- Business logic and UI components belong in `domains/`
-- Auto-generated route tree in `src/routeTree.gen.ts`
-
-Example route pattern:
-
-```tsx
-// routes/admin/events/index.tsx
-import { createFileRoute } from '@tanstack/react-router'
-import { EventsPage } from '@/domains/events/management/containers/EventsPage'
-
-export const Route = createFileRoute('/admin/events')({
-  component: EventsPage,
-  loader: async () => {
-    // Data loading logic
-  },
-})
-```
-
-### Component Organization
-
-Components are organized by domain in `src/domains/`:
-
-```
-domains/events/
-├── management/          # Subdomain
-│   ├── components/     # UI components
-│   ├── containers/     # Page-level components (imported by routes)
-│   ├── hooks/          # React hooks
-│   ├── services/       # Business logic & API calls
-│   └── types/          # TypeScript types
-└── shared/             # Shared within events domain only
-```
-
-**Never** define components directly in route files. Always create them in the appropriate domain module.
-
-## Development Workflow
-
-### Starting a New Feature
-
-1. **Identify the domain** - Which business domain does this belong to?
-2. **Check existing structure** - Does the domain/subdomain exist?
-3. **Create module structure** - Add folders as needed (components, containers, hooks, etc.)
-4. **Build the feature** - Follow DDD principles and standards
-5. **Create thin route** - Import container from domain module
-
-### Working with Routes
-
-1. **Create route file** in `src/routes/`
-2. **Create container** in appropriate domain's `containers/` folder
-3. **Import container** in route file
-4. **Keep route minimal** - only routing config, loaders, params
-
-### Adding UI Components
-
-1. **Pure design system?** → Add to `ui-kit/components/`
-2. **Shared business component?** → Add to `shared/components/`
-3. **Domain-specific component?** → Add to `domains/{domain}/components/`
-
-### Adding Utilities
-
-1. **Generic utility (no business logic)?** → Add to `shared/lib/`
-2. **Domain-specific utility?** → Add to `domains/{domain}/utils/`
+**Complete standards**: See `standards/README.md` for all available standards.
 
 ## Integration with Firebase
 
-This project will integrate with Firebase for:
-- **Firestore** - Database
-- **Firebase Storage** - Media storage
-- **Firebase Auth** - Authentication (future)
+### Firebase Services (Client SDK)
 
-Firebase configuration should be in `src/integrations/firebase/`.
-
-## Best Practices
-
-### Code Quality
-
-- **TypeScript strict mode** - All type errors must be resolved
-- **ESLint** - Fix all linting errors before committing
-- **Prettier** - Code must be formatted (`pnpm check` before commit)
-- **No console.log** - Use proper logging or remove debug statements
-
-### Performance
-
-- **Server-side rendering** - Leverage TanStack Start's SSR capabilities
-- **Code splitting** - Use dynamic imports for large components
-- **Query optimization** - Use TanStack Query for efficient data fetching
-- **Image optimization** - Use proper image formats and lazy loading
-
-### Accessibility
-
-- **Semantic HTML** - Use proper HTML elements
-- **ARIA attributes** - When semantic HTML isn't enough
-- **Keyboard navigation** - All interactive elements accessible via keyboard
-- **Focus management** - Clear focus indicators
-
-### Security
-
-- **Input validation** - Validate all user input
-- **XSS prevention** - Sanitize user-generated content
-- **CSRF protection** - Use proper CSRF tokens
-- **Environment variables** - Never commit secrets to version control
-
-## Testing
-
-Tests are written using **Vitest** with **Testing Library**:
-
-```tsx
-// Example test
-import { render, screen } from '@testing-library/react'
-import { Button } from './Button'
-
-test('renders button with text', () => {
-  render(<Button>Click me</Button>)
-  expect(screen.getByText('Click me')).toBeInTheDocument()
-})
+```
+integrations/firebase/
+├── client.ts          # Firebase client SDK initialization
+│   ├── firestore      # Firestore client
+│   ├── storage        # Storage client
+│   └── auth           # Auth client (future)
+└── admin.ts           # Firebase Admin SDK (server functions only)
 ```
 
-Run tests with: `pnpm test`
+**Use client SDK for 90% of code:**
+- Firestore queries and mutations
+- Storage uploads and downloads
+- Authentication
+- Real-time subscriptions
 
-## Monitoring & Debugging
+**Use admin SDK only for:**
+- Operations requiring elevated permissions
+- Server-side metadata generation (SEO)
 
-### Development Tools
-
-- **TanStack Router DevTools** - Inspect routes, params, loaders
-- **TanStack Query DevTools** - Monitor queries, mutations, cache
-- **React DevTools** - Component tree and props inspection
-
-### Error Tracking
-
-- **Sentry** - Integrated for error tracking and performance monitoring
-- Configuration in `src/integrations/sentry/`
+See `standards/global/client-first-architecture.md` for complete Firebase usage guidelines.
 
 ## Migration from Next.js App
 
-As we build this TanStack Start app, we'll gradually migrate features from the Next.js app (`web/`):
+As we build this TanStack Start app, we'll gradually migrate features from `web/`:
 
-1. **Don't copy-paste** - Rewrite following new architecture
+1. **Don't copy-paste** - Rewrite following client-first architecture
 2. **Learn from patterns** - Study existing implementations but adapt to DDD structure
 3. **Test thoroughly** - Ensure feature parity with Next.js app
-4. **Document differences** - Note any behavioral changes
+4. **Document differences** - Note any intentional behavioral changes
 
 The Next.js app remains the reference implementation until this app is production-ready.
 
@@ -271,12 +262,6 @@ The Next.js app remains the reference implementation until this app is productio
 mkdir -p src/domains/new-domain/{components,containers,hooks,services,types}
 ```
 
-### Adding a New Route
-
-1. Create route file: `src/routes/path/to/route.tsx`
-2. Create container: `src/domains/{domain}/containers/RoutePage.tsx`
-3. Import in route file
-
 ### Installing Dependencies
 
 From monorepo root:
@@ -284,32 +269,65 @@ From monorepo root:
 pnpm add <package> --filter clementine-app
 ```
 
-Or from app directory:
+From app directory:
 ```bash
 cd apps/clementine-app
 pnpm add <package>
 ```
 
-### Updating Types
+### Adding shadcn/ui Component
 
-After changing TypeScript types, run:
 ```bash
-pnpm type-check
+pnpm dlx shadcn@latest add <component-name>
+# Components are added to src/ui-kit/components/
 ```
+
+## Pre-Commit Checklist
+
+Before committing code:
+- [ ] Run `pnpm check` (format + lint)
+- [ ] Run `pnpm type-check` (TypeScript)
+- [ ] Run `pnpm test` (if you wrote tests)
+- [ ] Review `standards/global/code-quality.md`
+- [ ] Review `standards/global/security.md`
+- [ ] Remove console.log and debugger statements
 
 ## Resources
 
-- **TanStack Router Docs**: https://tanstack.com/router
-- **TanStack Query Docs**: https://tanstack.com/query
-- **TanStack Start Docs**: https://tanstack.com/start
-- **Tailwind CSS Docs**: https://tailwindcss.com
-- **Vitest Docs**: https://vitest.dev
+### TanStack Ecosystem
+- **TanStack Start**: https://tanstack.com/start
+- **TanStack Router**: https://tanstack.com/router
+- **TanStack Query**: https://tanstack.com/query
+
+### UI Components
+- **shadcn/ui**: https://ui.shadcn.com
+- **Radix UI**: https://www.radix-ui.com
+- **@dnd-kit**: https://docs.dndkit.com
+- **lucide-react**: https://lucide.dev
+
+### Firebase
+- **Firebase Docs**: https://firebase.google.com/docs
+- **Firestore**: https://firebase.google.com/docs/firestore
+- **Storage**: https://firebase.google.com/docs/storage
+- **Auth**: https://firebase.google.com/docs/auth
+
+### Development Tools
+- **Tailwind CSS**: https://tailwindcss.com
+- **Vitest**: https://vitest.dev
+- **Testing Library**: https://testing-library.com/react
 
 ## Getting Help
 
-1. **Check standards** - Review relevant standards in `standards/`
+1. **Check standards** - Review `standards/` directory for guidance
 2. **Check existing code** - Look for similar patterns in the codebase
-3. **Review TanStack docs** - Official documentation is comprehensive
+3. **Review official docs** - TanStack, shadcn/ui, Firebase docs are excellent
 4. **Ask the team** - When in doubt, discuss with the team
 
-Remember: **Consistency is key**. Follow established patterns and standards to maintain a high-quality, maintainable codebase.
+## Remember
+
+**Three core principles:**
+1. **Client-first architecture** - Firebase client SDKs, minimal server code
+2. **Domain-driven design** - Organize by business capability, not technical layer
+3. **Use existing libraries** - shadcn/ui, Radix UI, @dnd-kit before building custom
+
+**Consistency is key.** Follow established patterns and standards to maintain a high-quality, maintainable codebase.

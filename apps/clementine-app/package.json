@@ -1,5 +1,5 @@
 {
-  "name": "clementine-app",
+  "name": "@clementine/app",
   "private": true,
   "type": "module",
   "scripts": {

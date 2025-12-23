@@ -14,23 +14,21 @@ Standards are organized by scope:
 **Always applicable** - standards that apply to all code, regardless of context.
 
 - **[Project Structure](global/project-structure.md)** - Directory organization, DDD principles, module architecture
+- **[Client-First Architecture](global/client-first-architecture.md)** - Firebase client SDK usage, SSR strategy, security model
+- **[Code Quality](global/code-quality.md)** - TypeScript, ESLint, Prettier, code style conventions
+- **[Security](global/security.md)** - Firebase security rules, authentication, input validation
 
 ### `frontend/`
-**UI/UX work** - standards for frontend development (coming soon).
+**UI/UX work** - standards for frontend development.
 
-- Component design patterns
-- Styling conventions (Tailwind CSS)
-- Accessibility guidelines
-- Responsive design principles
-- State management
+- **[Component Libraries](frontend/component-libraries.md)** - shadcn/ui, Radix UI, @dnd-kit usage and patterns
+- **[Accessibility](frontend/accessibility.md)** - WCAG 2.1 compliance, semantic HTML, ARIA, keyboard navigation
+- **[Performance](frontend/performance.md)** - SSR optimization, code splitting, TanStack Query, image optimization
 
 ### `testing/`
-**Test implementation** - standards for writing tests (coming soon).
+**Test implementation** - standards for writing tests.
 
-- Unit testing patterns
-- Integration testing
-- E2E testing with Playwright
-- Test organization
+- **[Testing Overview](testing/overview.md)** - Vitest, Testing Library, component tests, mocking patterns
 
 ## 🚀 Getting Started
 
@@ -42,11 +40,15 @@ Standards are organized by scope:
 
 ### Quick Reference
 
-**Working on project structure?** → `global/project-structure.md`
+**Working on architecture?** → `global/project-structure.md` + `global/client-first-architecture.md`
 
-**Building UI components?** → `frontend/` (coming soon)
+**Building UI components?** → `frontend/component-libraries.md` + `frontend/accessibility.md`
 
-**Writing tests?** → `testing/` (coming soon)
+**Optimizing performance?** → `frontend/performance.md`
+
+**Writing tests?** → `testing/overview.md`
+
+**Code review checklist?** → `global/code-quality.md` + `global/security.md`
 
 ## 🎯 Core Principles
 
@@ -77,8 +79,13 @@ Standards are organized by scope:
 | Standard | Status | Description |
 |----------|--------|-------------|
 | **Project Structure** | ✅ Complete | Directory organization and DDD principles |
-| **Frontend** | 📋 Planned | Component patterns, styling, accessibility |
-| **Testing** | 📋 Planned | Test patterns and organization |
+| **Client-First Architecture** | ✅ Complete | Firebase client SDK, SSR strategy, security model |
+| **Code Quality** | ✅ Complete | TypeScript, ESLint, Prettier, conventions |
+| **Security** | ✅ Complete | Firebase rules, auth, input validation |
+| **Component Libraries** | ✅ Complete | shadcn/ui, Radix UI, @dnd-kit patterns |
+| **Accessibility** | ✅ Complete | WCAG compliance, semantic HTML, ARIA |
+| **Performance** | ✅ Complete | SSR, code splitting, optimization |
+| **Testing** | ✅ Complete | Vitest, Testing Library, mocking |
 
 ## 🔄 Standards Evolution
 
