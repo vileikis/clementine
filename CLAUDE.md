@@ -33,18 +33,21 @@ clementine/
 ### Application Status
 
 **🚀 `apps/clementine-app/` - TanStack Start (Active Development)**
+
 - Modern full-stack React application built with TanStack Start
 - Complete rewrite of the platform with improved architecture
 - **This is the future** - will become the main production app
 - See `apps/clementine-app/CLAUDE.md` for app-specific guidance
 
 **⚠️ `web/` - Next.js 16 (Legacy)**
+
 - Current production application
 - Being gradually replaced by TanStack Start app
 - **Will be deprecated** once migration is complete
 - See `web/CLAUDE.md` for app-specific guidance
 
 **⚙️ `functions/` - Firebase Cloud Functions**
+
 - Backend services for AI image/video processing
 - Webhook handlers for n8n workflow integration
 - Media processing pipeline (FFmpeg)
@@ -53,6 +56,7 @@ clementine/
 ## Technology Stack
 
 ### Frontend Applications
+
 - **TanStack Start** (new app) - Full-stack React framework
 - **Next.js 16** (legacy app) - React framework with App Router
 - **React 19** - Both apps use latest React
@@ -60,12 +64,14 @@ clementine/
 - **Tailwind CSS v4** - Utility-first CSS
 
 ### Backend Services
+
 - **Firebase Cloud Functions v2** - Serverless functions
 - **Firebase Firestore** - NoSQL database
 - **Firebase Storage** - Media storage
 - **FFmpeg** - Media processing
 
 ### Developer Tools
+
 - **pnpm** - Package manager (v10.18.1)
 - **Vitest** - Testing framework
 - **ESLint** - Linting
@@ -140,26 +146,31 @@ See `functions/README.md` for function-specific documentation.
 ### Choosing Where to Work
 
 **For new features or major changes:**
+
 - ✅ Build in `apps/clementine-app/` (TanStack Start app)
 - This is the future of the platform
 
 **For bug fixes or maintenance:**
+
 - ⚠️ Fix in `web/` (Next.js app) if it affects current production
 - Consider if the fix should also be implemented in the new app
 
 **For backend/API work:**
+
 - ⚙️ Work in `functions/` (Firebase Cloud Functions)
 - Backend is shared by both applications
 
 ### Installing Dependencies
 
 **To a specific workspace:**
+
 ```bash
 pnpm add <package> --filter <workspace-name>
-# Example: pnpm add zod --filter clementine-app
+# Example: pnpm add zod --filter @clementine/app
 ```
 
 **To the root (monorepo tooling):**
+
 ```bash
 pnpm add -w <package>
 ```
@@ -168,7 +179,7 @@ pnpm add -w <package>
 
 ```bash
 pnpm --filter <workspace-name> <command>
-# Example: pnpm --filter clementine-app dev
+# Example: pnpm --filter @clementine/app dev
 ```
 
 ## Package Manager
@@ -176,12 +187,14 @@ pnpm --filter <workspace-name> <command>
 This project uses **pnpm** (version 10.18.1) for package management.
 
 **Why pnpm?**
+
 - Efficient disk space usage (content-addressable storage)
 - Fast installation with proper dependency resolution
 - Excellent monorepo support with workspaces
 - Strict dependency management
 
 **Installation:**
+
 ```bash
 npm install -g pnpm@10.18.1
 ```
@@ -215,6 +228,7 @@ We are gradually migrating from the Next.js app to the TanStack Start app:
 4. **Phase 4**: Deprecate and archive Next.js app
 
 During migration:
+
 - Both apps share the same Firebase backend (`functions/`)
 - Both apps use the same Firestore data model
 - Backend APIs remain compatible with both frontends
@@ -232,6 +246,7 @@ firebase/
 ```
 
 Deploy Firebase resources:
+
 ```bash
 pnpm fb:deploy            # All resources
 pnpm fb:deploy:rules      # Security rules only
@@ -251,21 +266,25 @@ See individual workspace documentation for required environment variables.
 ## Best Practices
 
 ### Workspace Independence
+
 - Each app should be independently runnable
 - Share code through proper imports, not copy-paste
 - Keep workspace-specific concerns separate
 
 ### Dependency Management
+
 - Add dependencies to the correct workspace
 - Use workspace protocol (`workspace:*`) for internal packages
 - Keep dependencies up to date
 
 ### Code Quality
+
 - Follow workspace-specific standards
 - Run linting and type checking before commits
 - Write tests for new features
 
 ### Documentation
+
 - Keep CLAUDE.md files up to date
 - Document architecture decisions
 - Update this file when adding/removing workspaces
