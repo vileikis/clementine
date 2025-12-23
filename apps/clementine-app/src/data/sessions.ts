@@ -1,6 +1,5 @@
 import { createServerFn } from '@tanstack/react-start'
-import type {Session} from '../types/session';
-
+import type { Session } from '../types/session'
 
 // Mock session data - centralized source of truth
 export const MOCK_SESSIONS: Session[] = [
@@ -27,7 +26,6 @@ export const MOCK_SESSIONS: Session[] = [
   },
 ]
 
-
 /**
  * Server function to get all sessions
  */
@@ -43,7 +41,7 @@ export const getSessions = createServerFn({
 export const getSessionById = createServerFn({
   method: 'GET',
 })
-.inputValidator((sessionId: string) => sessionId)
+  .inputValidator((sessionId: string) => sessionId)
   .handler(({ data: sessionId }) => {
     const session = MOCK_SESSIONS.find((s) => s.id === sessionId)
 

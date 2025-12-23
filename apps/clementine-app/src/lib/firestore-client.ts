@@ -7,7 +7,13 @@
 
 import { useEffect } from 'react'
 import { useQueryClient, type QueryKey } from '@tanstack/react-query'
-import { getFirestore, doc, onSnapshot, collection, query } from 'firebase/firestore'
+import {
+  getFirestore,
+  doc,
+  onSnapshot,
+  collection,
+  query,
+} from 'firebase/firestore'
 import type { DocumentData, QueryConstraint } from 'firebase/firestore'
 
 /**
@@ -26,7 +32,7 @@ import type { DocumentData, QueryConstraint } from 'firebase/firestore'
 export function useFirestoreDocSync(
   queryKey: QueryKey,
   collectionPath: string,
-  docId: string
+  docId: string,
 ) {
   const queryClient = useQueryClient()
 
@@ -50,7 +56,7 @@ export function useFirestoreDocSync(
       },
       (error) => {
         console.error('[Firestore Doc Sync] Error:', error)
-      }
+      },
     )
 
     return () => unsubscribe()
@@ -70,7 +76,7 @@ export function useFirestoreDocSync(
  */
 export function useFirestoreNestedDocSync(
   queryKey: QueryKey,
-  path: string[] // e.g., ['projects', 'proj-1', 'events', 'evt-1']
+  path: string[], // e.g., ['projects', 'proj-1', 'events', 'evt-1']
 ) {
   const queryClient = useQueryClient()
 
@@ -93,7 +99,7 @@ export function useFirestoreNestedDocSync(
       },
       (error) => {
         console.error('[Firestore Nested Doc Sync] Error:', error)
-      }
+      },
     )
 
     return () => unsubscribe()
@@ -114,11 +120,9 @@ export function useFirestoreNestedDocSync(
  * )
  * ```
  */
-export function useFirestoreCollectionSync<T extends DocumentData = DocumentData>(
-  queryKey: QueryKey,
-  collectionPath: string,
-  constraints?: QueryConstraint[]
-) {
+export function useFirestoreCollectionSync<
+  T extends DocumentData = DocumentData,
+>(queryKey: QueryKey, collectionPath: string, constraints?: QueryConstraint[]) {
   const queryClient = useQueryClient()
 
   useEffect(() => {
@@ -138,7 +142,7 @@ export function useFirestoreCollectionSync<T extends DocumentData = DocumentData
       },
       (error) => {
         console.error('[Firestore Collection Sync] Error:', error)
-      }
+      },
     )
 
     return () => unsubscribe()

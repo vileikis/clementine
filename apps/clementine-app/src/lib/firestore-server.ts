@@ -22,7 +22,7 @@ import type { DocumentData } from 'firebase-admin/firestore'
  */
 export async function getDoc<T extends DocumentData = DocumentData>(
   collectionPath: string,
-  docId: string
+  docId: string,
 ): Promise<T> {
   const db = getFirestore()
   const docSnap = await db.collection(collectionPath).doc(docId).get()
@@ -50,7 +50,7 @@ export async function getDoc<T extends DocumentData = DocumentData>(
  */
 export async function getNestedDoc<T extends DocumentData = DocumentData>(
   path: string[], // e.g., ['projects', 'proj-1', 'events']
-  docId: string
+  docId: string,
 ): Promise<T> {
   const db = getFirestore()
 
@@ -87,7 +87,7 @@ export async function getNestedDoc<T extends DocumentData = DocumentData>(
  * ```
  */
 export async function getCollection<T extends DocumentData = DocumentData>(
-  collectionPath: string
+  collectionPath: string,
 ): Promise<T[]> {
   const db = getFirestore()
   const snapshot = await db.collection(collectionPath).get()
@@ -108,9 +108,9 @@ export async function getCollection<T extends DocumentData = DocumentData>(
  * )
  * ```
  */
-export async function getNestedCollection<T extends DocumentData = DocumentData>(
-  path: string[]
-): Promise<T[]> {
+export async function getNestedCollection<
+  T extends DocumentData = DocumentData,
+>(path: string[]): Promise<T[]> {
   const db = getFirestore()
 
   // Build the nested path

@@ -19,7 +19,12 @@ export {
 } from './firestore-client'
 
 // Re-export server-side helpers
-export { getDoc, getNestedDoc, getCollection, getNestedCollection } from './firestore-server'
+export {
+  getDoc,
+  getNestedDoc,
+  getCollection,
+  getNestedCollection,
+} from './firestore-server'
 
 // Backward compatibility aliases
 export { useFirestoreDocSync as useFirestoreRealtimeSync } from './firestore-client'

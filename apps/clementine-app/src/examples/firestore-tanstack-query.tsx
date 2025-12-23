@@ -69,7 +69,7 @@ export const companyQueryOptions = (companyId: string) =>
 // Helper hook: Subscribe to Firestore and update TanStack Query cache
 export function useFirestoreQuery<T>(
   queryKey: string[],
-  getSnapshot: (db: Firestore) => Promise<DocumentSnapshot>
+  getSnapshot: (db: Firestore) => Promise<DocumentSnapshot>,
 ) {
   const queryClient = useQueryClient()
 
@@ -122,7 +122,7 @@ export function useFirestoreQuery<T>(
       const data = await getSnapshot(
         typeof window === 'undefined'
           ? require('firebase-admin/firestore').getFirestore()
-          : require('firebase/firestore').getFirestore()
+          : require('firebase/firestore').getFirestore(),
       )
       return data
     },
@@ -215,7 +215,7 @@ export function useEventWithRealtime(eventId: string) {
       },
       (error) => {
         console.error('Firestore listener error:', error)
-      }
+      },
     )
 
     return () => unsubscribe()
@@ -241,7 +241,9 @@ function EventDetailComponent() {
 }
 
 // 4. Route definition
-export const EventRoute = createFileRoute('/$companyId/p/$projectId/events/$eventId')({
+export const EventRoute = createFileRoute(
+  '/$companyId/p/$projectId/events/$eventId',
+)({
   loader: async ({ params, context }) => {
     // Prefetch on server using one-time read
     await context.queryClient.ensureQueryData(eventQueryOptions(params.eventId))

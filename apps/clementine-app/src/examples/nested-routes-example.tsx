@@ -16,7 +16,9 @@ export const CompanyRoute = createFileRoute('/companies/$companyId')({
 })
 
 // Child route: /companies/$companyId/p/$projectId
-export const ProjectRoute = createFileRoute('/companies/$companyId/p/$projectId')({
+export const ProjectRoute = createFileRoute(
+  '/companies/$companyId/p/$projectId',
+)({
   loader: async ({ params }) => {
     // You have access to BOTH companyId and projectId
     console.log('Parent ID:', params.companyId)
@@ -77,18 +79,24 @@ export const CompanyRouteV2 = createFileRoute('/companies/$companyId')({
   loader: async ({ params, context }) => {
     // Prefetch and cache company data
     await context.queryClient.ensureQueryData(
-      companyQueryOptions(params.companyId)
+      companyQueryOptions(params.companyId),
     )
   },
 })
 
 // Child route
-export const ProjectRouteV2 = createFileRoute('/companies/$companyId/p/$projectId')({
+export const ProjectRouteV2 = createFileRoute(
+  '/companies/$companyId/p/$projectId',
+)({
   loader: async ({ params, context }) => {
     // Both queries will use cache if available
     await Promise.all([
-      context.queryClient.ensureQueryData(companyQueryOptions(params.companyId)),
-      context.queryClient.ensureQueryData(projectQueryOptions(params.projectId)),
+      context.queryClient.ensureQueryData(
+        companyQueryOptions(params.companyId),
+      ),
+      context.queryClient.ensureQueryData(
+        projectQueryOptions(params.projectId),
+      ),
     ])
   },
 
@@ -133,7 +141,9 @@ export const CompanyLayoutRoute = createFileRoute('/companies/$companyId')({
 })
 
 // Child can access via context parameter
-export const ProjectRouteV3 = createFileRoute('/companies/$companyId/p/$projectId')({
+export const ProjectRouteV3 = createFileRoute(
+  '/companies/$companyId/p/$projectId',
+)({
   loader: async ({ params, context }) => {
     // company is available from parent's beforeLoad
     console.log('Company from parent:', context.company)
