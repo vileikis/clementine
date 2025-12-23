@@ -1,0 +1,40 @@
+{
+  // Prettier formatting
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "eslint.format.enable": false,
+
+  // Language-specific formatters
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  // Exclude patterns for clementine-app
+  "files.watcherExclude": {
+    "**/apps/clementine-app/routeTree.gen.ts": true
+  },
+  "search.exclude": {
+    "**/apps/clementine-app/routeTree.gen.ts": true
+  },
+  "files.readonlyInclude": {
+    "**/apps/clementine-app/routeTree.gen.ts": true
+  }
+}

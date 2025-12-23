@@ -1,0 +1,14 @@
+{
+  // Note: This file is only used when opening apps/clementine-app directly.
+  // When opening the monorepo root, settings from /.vscode/settings.json apply.
+
+  "files.watcherExclude": {
+    "**/routeTree.gen.ts": true
+  },
+  "search.exclude": {
+    "**/routeTree.gen.ts": true
+  },
+  "files.readonlyInclude": {
+    "**/routeTree.gen.ts": true
+  }
+}

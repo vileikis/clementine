@@ -9,7 +9,7 @@
 
 import { useEffect, useCallback } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { z } from "zod";
 import { Plus, Trash2, GripVertical } from "lucide-react";
 import { Form } from "@/components/ui/form";
@@ -86,7 +86,7 @@ export function ProcessingStepEditor({
   };
 
   const form = useForm<ProcessingStepFormValues>({
-    resolver: zodResolver(processingStepFormSchema),
+    resolver: standardSchemaResolver(processingStepFormSchema),
     defaultValues: {
       title: step.title ?? "",
       description: step.description ?? "",
