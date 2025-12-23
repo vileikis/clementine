@@ -23,6 +23,7 @@ export const Route = createFileRoute('/events/$eventId')({
 ```
 
 **When to use SSR:**
+
 - ✅ Entry point pages (landing, event pages)
 - ✅ SEO-critical pages
 - ❌ Highly interactive pages (use client-side data fetching)
@@ -42,7 +43,9 @@ For large components, use dynamic imports:
 import { lazy } from 'react'
 
 // Split heavy components
-const HeavyEditor = lazy(() => import('@/domains/experiences/components/ExperienceEditor'))
+const HeavyEditor = lazy(
+  () => import('@/domains/experiences/components/ExperienceEditor'),
+)
 
 function Page() {
   return (
@@ -77,6 +80,7 @@ function useEvent(eventId: string) {
 ```
 
 **Prefetch data:**
+
 ```tsx
 // Prefetch on hover
 <Link
@@ -113,6 +117,7 @@ Use proper image formats and lazy loading:
 ```
 
 **Image best practices:**
+
 - Use WebP format when possible
 - Provide width and height to prevent layout shift
 - Use `loading="lazy"` for off-screen images
@@ -129,14 +134,14 @@ import { memo, useMemo, useCallback } from 'react'
 function EventsList({ events }) {
   const sortedEvents = useMemo(
     () => events.sort((a, b) => b.createdAt - a.createdAt),
-    [events]
+    [events],
   )
 
   const handleEventClick = useCallback(
     (event) => {
       navigate(`/events/${event.id}`)
     },
-    [navigate]
+    [navigate],
   )
 
   return sortedEvents.map((event) => (
@@ -161,7 +166,7 @@ const q = query(
   where('companyId', '==', companyId),
   where('status', '==', 'active'),
   orderBy('createdAt', 'desc'),
-  limit(20)
+  limit(20),
 )
 
 // ❌ BAD: Fetching all documents
@@ -170,6 +175,7 @@ const allEvents = await getDocs(q) // Could be thousands!
 ```
 
 **Firestore optimization:**
+
 - Always use `limit()` for lists
 - Create composite indexes for complex queries
 - Use `onSnapshot` for real-time updates (don't poll)
@@ -192,7 +198,9 @@ function SearchBar() {
     enabled: debouncedSearch.length > 0,
   })
 
-  return <Input value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+  return (
+    <Input value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+  )
 }
 ```
 
@@ -255,6 +263,7 @@ function reportWebVitals() {
 ### React DevTools Profiler
 
 Profile component renders:
+
 1. Open React DevTools
 2. Go to Profiler tab
 3. Click Record
@@ -304,6 +313,7 @@ Optimize for touch:
 ## Checklist
 
 Before deploying:
+
 - [ ] Run Lighthouse audit (Performance > 90)
 - [ ] Test on mobile device
 - [ ] Check bundle size

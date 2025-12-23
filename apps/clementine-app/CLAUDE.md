@@ -39,6 +39,7 @@ This is a **complete rewrite** of the existing Next.js application (`web/`) usin
 ## Technical Stack
 
 ### Core Framework
+
 - **TanStack Start** - Full-stack React framework
 - **TanStack Router** - Type-safe file-based routing
 - **React 19** - Latest React with new features
@@ -46,6 +47,7 @@ This is a **complete rewrite** of the existing Next.js application (`web/`) usin
 - **Vite 7** - Build tool and dev server
 
 ### Styling & UI Components
+
 - **Tailwind CSS 4** - Utility-first CSS framework
 - **shadcn/ui** - Primary component library (built on Radix UI)
 - **Radix UI** - Unstyled accessible primitives
@@ -56,6 +58,7 @@ This is a **complete rewrite** of the existing Next.js application (`web/`) usin
 **IMPORTANT**: Use **shadcn/ui**, **Radix UI**, and **@dnd-kit** as the foundation for all UI components. Don't reinvent what these libraries already provide. See `standards/frontend/component-libraries.md` for detailed guidance.
 
 ### Data & State
+
 - **Firebase Firestore** - Database (client SDK)
 - **Firebase Storage** - File storage (client SDK)
 - **Firebase Auth** - Authentication (client SDK)
@@ -63,6 +66,7 @@ This is a **complete rewrite** of the existing Next.js application (`web/`) usin
 - **Zustand** - Client state management (if needed)
 
 ### Developer Experience
+
 - **TanStack DevTools** - Router, Query, and React DevTools
 - **Sentry** - Error tracking and monitoring
 - **Vitest** - Unit testing framework
@@ -106,6 +110,7 @@ src/
 ```
 
 **Key principles:**
+
 - **Domain-first organization** - Code organized by business capability
 - **Thin routes** - Routes import containers from domains
 - **Client-first data** - Firebase client SDK for all data operations
@@ -182,11 +187,11 @@ function useEvents() {
   useEffect(() => {
     const q = query(
       collection(firestore, 'events'),
-      where('status', '==', 'active')
+      where('status', '==', 'active'),
     )
 
     return onSnapshot(q, (snapshot) => {
-      setEvents(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })))
+      setEvents(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })))
     })
   }, [])
 
@@ -207,14 +212,14 @@ import { EventsPage } from '@/domains/events/management/containers/EventsPage'
 
 ## Standards Quick Reference
 
-| Task | Standards to Review |
-|------|-------------------|
+| Task                        | Standards to Review                                                   |
+| --------------------------- | --------------------------------------------------------------------- |
 | **Setting up architecture** | `global/project-structure.md` + `global/client-first-architecture.md` |
-| **Building UI components** | `frontend/component-libraries.md` + `frontend/accessibility.md` |
-| **Working with data** | `global/client-first-architecture.md` + `global/security.md` |
-| **Optimizing performance** | `frontend/performance.md` |
-| **Writing tests** | `testing/overview.md` |
-| **Code review** | `global/code-quality.md` + `global/security.md` |
+| **Building UI components**  | `frontend/component-libraries.md` + `frontend/accessibility.md`       |
+| **Working with data**       | `global/client-first-architecture.md` + `global/security.md`          |
+| **Optimizing performance**  | `frontend/performance.md`                                             |
+| **Writing tests**           | `testing/overview.md`                                                 |
+| **Code review**             | `global/code-quality.md` + `global/security.md`                       |
 
 **Complete standards**: See `standards/README.md` for all available standards.
 
@@ -232,12 +237,14 @@ integrations/firebase/
 ```
 
 **Use client SDK for 90% of code:**
+
 - Firestore queries and mutations
 - Storage uploads and downloads
 - Authentication
 - Real-time subscriptions
 
 **Use admin SDK only for:**
+
 - Operations requiring elevated permissions
 - Server-side metadata generation (SEO)
 
@@ -265,11 +272,13 @@ mkdir -p src/domains/new-domain/{components,containers,hooks,services,types}
 ### Installing Dependencies
 
 From monorepo root:
+
 ```bash
 pnpm add <package> --filter clementine-app
 ```
 
 From app directory:
+
 ```bash
 cd apps/clementine-app
 pnpm add <package>
@@ -285,6 +294,7 @@ pnpm dlx shadcn@latest add <component-name>
 ## Pre-Commit Checklist
 
 Before committing code:
+
 - [ ] Run `pnpm check` (format + lint)
 - [ ] Run `pnpm type-check` (TypeScript)
 - [ ] Run `pnpm test` (if you wrote tests)
@@ -295,23 +305,27 @@ Before committing code:
 ## Resources
 
 ### TanStack Ecosystem
+
 - **TanStack Start**: https://tanstack.com/start
 - **TanStack Router**: https://tanstack.com/router
 - **TanStack Query**: https://tanstack.com/query
 
 ### UI Components
+
 - **shadcn/ui**: https://ui.shadcn.com
 - **Radix UI**: https://www.radix-ui.com
 - **@dnd-kit**: https://docs.dndkit.com
 - **lucide-react**: https://lucide.dev
 
 ### Firebase
+
 - **Firebase Docs**: https://firebase.google.com/docs
 - **Firestore**: https://firebase.google.com/docs/firestore
 - **Storage**: https://firebase.google.com/docs/storage
 - **Auth**: https://firebase.google.com/docs/auth
 
 ### Development Tools
+
 - **Tailwind CSS**: https://tailwindcss.com
 - **Vitest**: https://vitest.dev
 - **Testing Library**: https://testing-library.com/react
@@ -326,6 +340,7 @@ Before committing code:
 ## Remember
 
 **Three core principles:**
+
 1. **Client-first architecture** - Firebase client SDKs, minimal server code
 2. **Domain-driven design** - Organize by business capability, not technical layer
 3. **Use existing libraries** - shadcn/ui, Radix UI, @dnd-kit before building custom

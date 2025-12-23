@@ -42,6 +42,7 @@ ui-kit/
 ```
 
 **Characteristics:**
+
 - Zero business logic or domain knowledge
 - Portable across projects
 - Can be extracted to separate package
@@ -64,6 +65,7 @@ integrations/
 ```
 
 **Characteristics:**
+
 - App-wide infrastructure concerns
 - Third-party service wrappers
 - Typically imported in `__root.tsx` or app entry points
@@ -93,6 +95,7 @@ shared/
 ```
 
 **Characteristics:**
+
 - Mix of generic utilities and business-aware components
 - Used by multiple domains
 - Import pattern: `@/shared/lib/utils`
@@ -128,6 +131,7 @@ domains/
 ```
 
 **Characteristics:**
+
 - Each top-level domain is a bounded context with its own ubiquitous language
 - Complex domains contain subdomains
 - Domains can depend on infrastructure and shared code
@@ -150,6 +154,7 @@ routes/
 ```
 
 **Characteristics:**
+
 - Minimal UI logic
 - Import containers from domain modules
 - Handle route-specific concerns (loaders, params, search params)
@@ -163,6 +168,7 @@ routes/
 #### Bounded Contexts (Top-level Domains)
 
 Create a top-level domain when:
+
 - ✅ It represents a distinct business capability
 - ✅ It has its own data models and business rules
 - ✅ It could be explained to non-technical stakeholders as a separate area
@@ -173,12 +179,14 @@ Examples: `events`, `experiences`, `media`, `analytics`
 #### Subdomains (Nested within Domains)
 
 Create a subdomain when:
+
 - ✅ It's part of a larger domain but complex enough to separate
 - ✅ It has 5+ files or multiple concerns
 - ✅ It could grow independently
 - ✅ It has specific responsibilities within parent domain
 
 Example: `domains/events/theming/` is a subdomain because:
+
 - It's part of events (events have themes)
 - Theming is complex (providers, hooks, tokens, utilities)
 - Could grow with more theme capabilities
@@ -186,6 +194,7 @@ Example: `domains/events/theming/` is a subdomain because:
 #### Shared Code (Infrastructure)
 
 Put code in `ui-kit`, `integrations`, or `shared` when:
+
 - ✅ It has no business logic (pure utilities)
 - ✅ It's used by 2+ domains
 - ✅ It could be extracted to an npm package
@@ -207,6 +216,7 @@ Put code in `ui-kit`, `integrations`, or `shared` when:
 ```
 
 If two domains need to communicate:
+
 - Use shared types in `shared/types`
 - Create integration layer
 - Use events/messaging patterns (for complex systems)
@@ -314,24 +324,31 @@ export function EventsPage() {
 ## Best Practices
 
 ### 1. Co-location
+
 Keep related code together within domains/subdomains.
 
 ### 2. Single Responsibility
+
 Each module (domain/subdomain) should have one clear responsibility.
 
 ### 3. Minimize Cross-Domain Dependencies
+
 If you find yourself importing from another domain frequently, consider:
+
 - Moving shared code to `shared/`
 - Creating a new domain that both depend on
 - Refactoring domain boundaries
 
 ### 4. Domain Language
+
 Use domain-specific terminology within each bounded context. The same concept might have different names in different domains.
 
 ### 5. Progressive Complexity
+
 Start simple. Only create subdomains when a domain becomes complex (5+ files, multiple concerns).
 
 ### 6. Avoid Premature Abstraction
+
 Don't create shared utilities for one-off operations. Move code to `shared/` only when it's used by 2+ domains.
 
 ## Migration Guide

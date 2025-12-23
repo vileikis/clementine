@@ -17,6 +17,7 @@ Our UI is built on three foundational libraries:
 ### 1. shadcn/ui (Primary Component Library)
 
 **What it is:**
+
 - Collection of re-usable components
 - Built on top of Radix UI primitives
 - Styled with Tailwind CSS
@@ -24,16 +25,22 @@ Our UI is built on three foundational libraries:
 - Fully customizable
 
 **Installation:**
+
 ```bash
 cd apps/clementine-app
 pnpm dlx shadcn@latest add <component-name>
 ```
 
 **Usage:**
+
 ```tsx
 import { Button } from '@/ui-kit/components/button'
 import { Input } from '@/ui-kit/components/input'
-import { Dialog, DialogTrigger, DialogContent } from '@/ui-kit/components/dialog'
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+} from '@/ui-kit/components/dialog'
 
 function MyComponent() {
   return (
@@ -50,6 +57,7 @@ function MyComponent() {
 ```
 
 **Available Components:**
+
 - Forms: Button, Input, Textarea, Select, Checkbox, RadioGroup, Switch
 - Overlays: Dialog, Sheet, Popover, Tooltip, HoverCard
 - Data Display: Table, Card, Badge, Avatar, Separator
@@ -58,6 +66,7 @@ function MyComponent() {
 - Layout: Accordion, Collapsible, ScrollArea, AspectRatio
 
 **When to use shadcn/ui:**
+
 - ✅ For ANY standard UI component (buttons, inputs, dialogs, etc.)
 - ✅ As the foundation of your `ui-kit/` components
 - ✅ Before building a custom component, check if shadcn has it
@@ -67,12 +76,14 @@ function MyComponent() {
 ### 2. Radix UI (Underlying Primitives)
 
 **What it is:**
+
 - Unstyled, accessible component primitives
 - Powers shadcn/ui under the hood
 - Use directly when shadcn/ui doesn't have what you need
 - Production-ready, WAI-ARIA compliant
 
 **Direct Usage (when needed):**
+
 ```tsx
 import * as RadioGroup from '@radix-ui/react-radio-group'
 import * as Slider from '@radix-ui/react-slider'
@@ -91,11 +102,13 @@ function CustomComponent() {
 ```
 
 **When to use Radix UI directly:**
+
 - ✅ When shadcn/ui doesn't have the component
 - ✅ When you need more control than shadcn provides
 - ✅ When building custom components that need accessibility features
 
 **Available Primitives:**
+
 - Form Controls: Checkbox, Radio Group, Select, Slider, Switch, Toggle
 - Overlays: Dialog, Popover, Tooltip, Context Menu, Dropdown Menu
 - Navigation: Accordion, Tabs, Navigation Menu
@@ -107,17 +120,20 @@ function CustomComponent() {
 ### 3. @dnd-kit (Drag and Drop)
 
 **What it is:**
+
 - Modern drag and drop toolkit for React
 - Performant, accessible, and extensible
 - Supports mouse, touch, and keyboard
 - Used for reordering, sorting, and complex drag interactions
 
 **Installation:**
+
 ```bash
 pnpm add @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities
 ```
 
 **Basic Usage (Sortable List):**
+
 ```tsx
 import {
   DndContext,
@@ -137,13 +153,8 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 
 function SortableItem({ id, children }) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-  } = useSortable({ id })
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id })
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -162,7 +173,7 @@ function SortableList({ items, onReorder }) {
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   )
 
   function handleDragEnd(event) {
@@ -193,6 +204,7 @@ function SortableList({ items, onReorder }) {
 ```
 
 **When to use @dnd-kit:**
+
 - ✅ Reordering lists (steps, tasks, items)
 - ✅ Drag to upload files
 - ✅ Kanban boards
@@ -206,11 +218,13 @@ function SortableList({ items, onReorder }) {
 ### ui-kit/ Components (Design System)
 
 **What goes here:**
+
 - shadcn/ui components (installed via CLI)
 - Custom Radix UI components styled for our design system
 - Base components with no business logic
 
 **Structure:**
+
 ```
 ui-kit/
 ├── components/
@@ -227,6 +241,7 @@ ui-kit/
 ```
 
 **Example ui-kit component:**
+
 ```tsx
 // ui-kit/components/sortable-list.tsx
 import { DndContext, closestCenter } from '@dnd-kit/core'
@@ -253,11 +268,13 @@ export function SortableList<T>({
 ### shared/ Components (Composed Components)
 
 **What goes here:**
+
 - Components built using ui-kit components
 - Business-aware components used across multiple domains
 - Complex compositions
 
 **Example shared component:**
+
 ```tsx
 // shared/components/user-avatar.tsx
 import { Avatar, AvatarImage, AvatarFallback } from '@/ui-kit/components/avatar'
@@ -278,13 +295,20 @@ export function UserAvatar() {
 ### domains/ Components (Domain-Specific)
 
 **What goes here:**
+
 - Components specific to a business domain
 - Use ui-kit and shared components
 
 **Example domain component:**
+
 ```tsx
 // domains/events/components/event-card.tsx
-import { Card, CardHeader, CardTitle, CardContent } from '@/ui-kit/components/card'
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from '@/ui-kit/components/card'
 import { Badge } from '@/ui-kit/components/badge'
 import { Button } from '@/ui-kit/components/button'
 import type { Event } from '../types'
@@ -315,20 +339,26 @@ export function EventCard({ event, onEdit }: EventCardProps) {
 ### 1. Always Check shadcn/ui First
 
 Before building any component:
+
 1. Check shadcn/ui documentation
 2. If it exists, install it: `pnpm dlx shadcn@latest add <component>`
 3. Use it as-is or customize
 
 **Don't reinvent:**
+
 ```tsx
 // ❌ DON'T build custom button
 function CustomButton({ children, ...props }) {
-  return <button className="px-4 py-2 bg-blue-500..." {...props}>{children}</button>
+  return (
+    <button className="px-4 py-2 bg-blue-500..." {...props}>
+      {children}
+    </button>
+  )
 }
 
 // ✅ DO use shadcn button
 import { Button } from '@/ui-kit/components/button'
-<Button>Click me</Button>
+;<Button>Click me</Button>
 ```
 
 ### 2. Extend shadcn/ui Components
@@ -368,7 +398,7 @@ export function Slider({ className, ...props }: SliderPrimitive.SliderProps) {
     <SliderPrimitive.Root
       className={cn(
         'relative flex w-full touch-none select-none items-center',
-        className
+        className,
       )}
       {...props}
     >
@@ -456,11 +486,13 @@ function CreateEventDialog() {
 ### 6. Accessibility is Built-In
 
 These libraries handle accessibility:
+
 - ✅ shadcn/ui components are accessible by default
 - ✅ Radix UI primitives are WAI-ARIA compliant
 - ✅ @dnd-kit supports keyboard navigation
 
 **Don't break accessibility:**
+
 ```tsx
 // ❌ DON'T remove accessibility features
 <Button {...listeners} {...attributes}>
@@ -480,7 +512,7 @@ These libraries handle accessibility:
 ```tsx
 import { Trash2, Edit, Plus, X } from 'lucide-react'
 
-<Button>
+;<Button>
   <Plus className="mr-2 h-4 w-4" />
   Add Item
 </Button>
@@ -512,7 +544,7 @@ const buttonVariants = cva(
       variant: 'default',
       size: 'default',
     },
-  }
+  },
 )
 ```
 
@@ -529,22 +561,25 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 // Usage
-<div className={cn('px-4 py-2', isActive && 'bg-primary', className)} />
+;<div className={cn('px-4 py-2', isActive && 'bg-primary', className)} />
 ```
 
 ## Migration from Other Libraries
 
 ### From Material-UI
+
 - Replace `<Button>` with shadcn `<Button>`
 - Replace `<TextField>` with shadcn `<Input>`
 - Replace `<Dialog>` with shadcn `<Dialog>`
 
 ### From Ant Design
+
 - Replace `<Button>` with shadcn `<Button>`
 - Replace `<Input>` with shadcn `<Input>`
 - Replace `<Modal>` with shadcn `<Dialog>`
 
 ### From Chakra UI
+
 - Replace `<Button>` with shadcn `<Button>`
 - Replace `<Input>` with shadcn `<Input>`
 - Replace `<Modal>` with shadcn `<Dialog>`
@@ -554,11 +589,13 @@ export function cn(...inputs: ClassValue[]) {
 ## Summary
 
 **Component Library Stack:**
+
 1. **shadcn/ui** - First choice for all standard components
 2. **Radix UI** - When shadcn doesn't have it, use Radix primitives
 3. **@dnd-kit** - For all drag and drop interactions
 
 **Key Principles:**
+
 - ✅ Don't build what already exists in shadcn/ui
 - ✅ Extend shadcn components for custom variations
 - ✅ Use Radix UI for advanced/missing components
@@ -567,6 +604,7 @@ export function cn(...inputs: ClassValue[]) {
 - ✅ Compose simple components into complex UIs
 
 **Resources:**
+
 - shadcn/ui: https://ui.shadcn.com
 - Radix UI: https://www.radix-ui.com
 - @dnd-kit: https://docs.dndkit.com

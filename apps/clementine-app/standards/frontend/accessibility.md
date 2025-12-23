@@ -72,6 +72,7 @@ All interactive elements must be keyboard accessible:
 ```
 
 **Tab order:**
+
 - Use `tabIndex={0}` for focusable elements
 - Use `tabIndex={-1}` to remove from tab order
 - Never use `tabIndex` > 0
@@ -88,6 +89,7 @@ Ensure visible focus indicators:
 ```
 
 **Focus management patterns:**
+
 - Trap focus in modals/dialogs (shadcn Dialog does this automatically)
 - Return focus to trigger element when closing modals
 - Move focus to newly revealed content
@@ -140,7 +142,7 @@ shadcn Dialog handles most accessibility automatically:
 import { Dialog, DialogContent, DialogTitle } from '@/ui-kit/components/dialog'
 
 // ✅ Accessible dialog (shadcn handles focus trap, aria, etc.)
-<Dialog>
+;<Dialog>
   <DialogContent>
     <DialogTitle>Confirm Delete</DialogTitle>
     <p>Are you sure you want to delete this event?</p>
@@ -161,17 +163,20 @@ import { Dialog, DialogContent, DialogTitle } from '@/ui-kit/components/dialog'
 ## Testing Accessibility
 
 ### Keyboard Testing
+
 1. Can you navigate to all interactive elements with Tab?
 2. Can you activate elements with Enter/Space?
 3. Can you see where focus is?
 4. Can you close modals with Escape?
 
 ### Screen Reader Testing
+
 - Test with NVDA (Windows) or VoiceOver (Mac)
 - Ensure all content is announced correctly
 - Check that interactive elements have proper labels
 
 ### Automated Testing
+
 ```tsx
 import { render } from '@testing-library/react'
 import { axe, toHaveNoViolations } from 'jest-axe'
