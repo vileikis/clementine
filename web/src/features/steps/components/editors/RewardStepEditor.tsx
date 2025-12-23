@@ -9,7 +9,7 @@
 
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { z } from "zod";
 import { Form } from "@/components/ui/form";
 import {
@@ -87,7 +87,7 @@ export function RewardStepEditor({
   };
 
   const form = useForm<RewardStepFormValues>({
-    resolver: zodResolver(rewardStepFormSchema),
+    resolver: standardSchemaResolver(rewardStepFormSchema),
     defaultValues: {
       title: step.title ?? "",
       description: step.description ?? "",
