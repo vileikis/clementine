@@ -25,6 +25,7 @@ pnpm test --ui     # UI mode (visual test runner)
 ### ✅ Do Test
 
 **Business Logic:**
+
 ```tsx
 // utils/format-date.ts
 export function formatEventDate(date: Date): string {
@@ -48,6 +49,7 @@ describe('formatEventDate', () => {
 ```
 
 **Component Rendering:**
+
 ```tsx
 // components/event-card.test.tsx
 import { render, screen } from '@testing-library/react'
@@ -64,6 +66,7 @@ describe('EventCard', () => {
 ```
 
 **User Interactions:**
+
 ```tsx
 import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, test, expect, vi } from 'vitest'
@@ -312,6 +315,7 @@ test('shows loading state while fetching events', () => {
 ### 2. Use Testing Library Queries Properly
 
 **Priority order:**
+
 1. `getByRole` (most accessible)
 2. `getByLabelText` (forms)
 3. `getByPlaceholderText` (forms)
@@ -372,6 +376,7 @@ pnpm test --coverage
 ```
 
 **Target coverage:**
+
 - Statements: > 80%
 - Branches: > 75%
 - Functions: > 80%

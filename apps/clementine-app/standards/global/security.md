@@ -83,7 +83,11 @@ import { signInWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth'
 // Client-side authentication
 async function signIn(email: string, password: string) {
   try {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password)
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      email,
+      password,
+    )
     return { success: true, user: userCredential.user }
   } catch (error) {
     return { success: false, error }
@@ -193,12 +197,22 @@ function isValidUrl(url: string): boolean {
 }
 
 // Use validated URLs
-function ExternalLink({ href, children }: { href: string; children: React.ReactNode }) {
+function ExternalLink({
+  href,
+  children,
+}: {
+  href: string
+  children: React.ReactNode
+}) {
   if (!isValidUrl(href)) {
     console.error('Invalid URL:', href)
     return <span>{children}</span>
   }
-  return <a href={href} target="_blank" rel="noopener noreferrer">{children}</a>
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer">
+      {children}
+    </a>
+  )
 }
 ```
 
@@ -256,7 +270,9 @@ function SearchBar() {
     }
   }, [debouncedSearch])
 
-  return <Input value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+  return (
+    <Input value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+  )
 }
 ```
 
@@ -291,6 +307,7 @@ function ImageUpload() {
 ```
 
 **Storage rules validation (security):**
+
 ```javascript
 // storage.rules
 match /media/{companyId}/{fileName} {
@@ -353,25 +370,31 @@ Configure in `firebase.json`:
 ## Common Vulnerabilities to Avoid
 
 ### 1. SQL Injection
+
 ✅ Not applicable - using Firestore (NoSQL)
 
 ### 2. XSS (Cross-Site Scripting)
+
 ✅ Prevented by React's automatic escaping
 ⚠️ Sanitize if using `dangerouslySetInnerHTML`
 
 ### 3. CSRF (Cross-Site Request Forgery)
+
 ✅ Firebase handles CSRF protection
 
 ### 4. Insecure Direct Object References
+
 ✅ Prevented by Firestore security rules
 
 ### 5. Sensitive Data Exposure
+
 ⚠️ Never log sensitive data
 ⚠️ Never commit secrets to git
 
 ## Security Checklist
 
 Before deploying:
+
 - [ ] All Firestore rules tested and restrictive
 - [ ] Storage rules validate file types and sizes
 - [ ] No console.log of sensitive data

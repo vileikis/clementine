@@ -11,6 +11,7 @@ This application follows a **client-first architecture** where business logic an
 ## Architecture Philosophy
 
 ### Client-First (Our Approach)
+
 - Firebase client SDKs for all data operations (Firestore, Storage, Auth)
 - Real-time data synchronization with Firestore listeners
 - Client-side business logic and state management
@@ -18,6 +19,7 @@ This application follows a **client-first architecture** where business logic an
 - SSR used for entry points and SEO optimization
 
 ### ❌ NOT Server-First (Traditional Next.js pattern)
+
 - We don't use Server Components as the primary data layer
 - We don't fetch data exclusively through Server Actions
 - We don't rely on server-side business logic for everything
@@ -27,6 +29,7 @@ This application follows a **client-first architecture** where business logic an
 ### ✅ Client-Side (Default - 90% of code)
 
 **Data Operations:**
+
 ```tsx
 import { firestore } from '@/integrations/firebase/client'
 import { collection, query, where, onSnapshot } from 'firebase/firestore'
@@ -38,11 +41,11 @@ function useEvents() {
   useEffect(() => {
     const q = query(
       collection(firestore, 'events'),
-      where('status', '==', 'active')
+      where('status', '==', 'active'),
     )
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      setEvents(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })))
+      setEvents(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })))
     })
 
     return unsubscribe
@@ -53,6 +56,7 @@ function useEvents() {
 ```
 
 **Authentication:**
+
 ```tsx
 import { auth } from '@/integrations/firebase/client'
 import { signInWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth'
@@ -65,6 +69,7 @@ async function signIn(email: string, password: string) {
 ```
 
 **Storage:**
+
 ```tsx
 import { storage } from '@/integrations/firebase/client'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
@@ -79,6 +84,7 @@ async function uploadImage(file: File, path: string) {
 ```
 
 **Use client-side for:**
+
 - ✅ All Firestore queries and mutations
 - ✅ Firebase Authentication
 - ✅ Firebase Storage uploads/downloads
@@ -91,6 +97,7 @@ async function uploadImage(file: File, path: string) {
 ### ⚠️ Server-Side (Minimal - 10% of code)
 
 **SSR for Entry Points:**
+
 ```tsx
 // routes/events/[eventId]/index.tsx
 import { createFileRoute } from '@tanstack/react-router'
@@ -107,19 +114,22 @@ export const Route = createFileRoute('/events/$eventId')({
 ```
 
 **Server Functions for Specific Cases:**
+
 ```tsx
 import { createServerFn } from '@tanstack/react-start'
 import { adminFirestore } from '@/integrations/firebase/admin'
 
 // ✅ Server function for operations requiring admin privileges
-export const deleteUserData = createServerFn({ method: 'POST' })
-  .handler(async ({ data: userId }) => {
+export const deleteUserData = createServerFn({ method: 'POST' }).handler(
+  async ({ data: userId }) => {
     // Admin SDK for elevated permissions
     await adminFirestore.collection('users').doc(userId).delete()
-  })
+  },
+)
 ```
 
 **Use server-side for:**
+
 - ✅ SEO metadata (Open Graph, Twitter Cards, title/description)
 - ✅ Initial page data for SSR (optional performance optimization)
 - ✅ Operations requiring Firebase Admin SDK (elevated permissions)
@@ -132,6 +142,7 @@ export const deleteUserData = createServerFn({ method: 'POST' })
 ### Firestore Client SDK
 
 **Direct client operations:**
+
 ```tsx
 import {
   collection,
@@ -145,7 +156,7 @@ import {
   where,
   orderBy,
   limit,
-  onSnapshot
+  onSnapshot,
 } from 'firebase/firestore'
 import { firestore } from '@/integrations/firebase/client'
 
@@ -165,6 +176,7 @@ const unsubscribe = onSnapshot(docRef, (doc) => {
 ```
 
 **Security through Firestore Rules (not server code):**
+
 ```javascript
 // firestore.rules - Security enforced at database level
 rules_version = '2';
@@ -182,6 +194,7 @@ service cloud.firestore {
 ### Storage Client SDK
 
 **Direct client uploads:**
+
 ```tsx
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage'
 import { storage } from '@/integrations/firebase/client'
@@ -189,7 +202,8 @@ import { storage } from '@/integrations/firebase/client'
 // Upload with progress tracking
 const uploadTask = uploadBytesResumable(storageRef, file)
 
-uploadTask.on('state_changed',
+uploadTask.on(
+  'state_changed',
   (snapshot) => {
     const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
     setUploadProgress(progress)
@@ -200,19 +214,20 @@ uploadTask.on('state_changed',
   async () => {
     const downloadURL = await getDownloadURL(uploadTask.snapshot.ref)
     console.log('File available at:', downloadURL)
-  }
+  },
 )
 ```
 
 ### Authentication Client SDK
 
 **Client-side auth flow:**
+
 ```tsx
 import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
-  createUserWithEmailAndPassword
+  createUserWithEmailAndPassword,
 } from 'firebase/auth'
 import { auth } from '@/integrations/firebase/client'
 
@@ -235,6 +250,7 @@ useEffect(() => {
 ### When to Use SSR
 
 **1. SEO and Social Sharing (Primary use case)**
+
 ```tsx
 // Render metadata server-side for crawlers
 export const Route = createFileRoute('/events/$eventId')({
@@ -258,6 +274,7 @@ export const Route = createFileRoute('/events/$eventId')({
 ```
 
 **2. Initial Page Load Performance (Optional)**
+
 ```tsx
 // Load critical data server-side to avoid loading spinner
 export const Route = createFileRoute('/dashboard')({
@@ -282,6 +299,7 @@ export const Route = createFileRoute('/dashboard')({
 ## Integration with TanStack Query
 
 **Client-side data fetching with caching:**
+
 ```tsx
 import { useQuery } from '@tanstack/react-query'
 import { doc, getDoc } from 'firebase/firestore'
@@ -300,6 +318,7 @@ function useEvent(eventId: string) {
 ```
 
 **Real-time subscriptions with TanStack Query:**
+
 ```tsx
 function useEventRealtime(eventId: string) {
   const queryClient = useQueryClient()
@@ -334,6 +353,7 @@ function useEventRealtime(eventId: string) {
 Security is enforced at the Firebase level, not in application code:
 
 **1. Firestore Security Rules**
+
 ```javascript
 // Declarative security at database level
 rules_version = '2';
@@ -357,6 +377,7 @@ service cloud.firestore {
 ```
 
 **2. Storage Security Rules**
+
 ```javascript
 rules_version = '2';
 service firebase.storage {
@@ -371,6 +392,7 @@ service firebase.storage {
 ```
 
 **3. Authentication Rules**
+
 - Use Firebase Auth client SDK
 - Enforce authentication in Firestore/Storage rules
 - Never trust client-side auth checks for security
@@ -378,18 +400,19 @@ service firebase.storage {
 ### What NOT to Do
 
 ❌ **Don't rely on server-side checks for security:**
+
 ```tsx
 // ❌ BAD: Security through obscurity
-const deleteEvent = createServerFn()
-  .handler(async ({ eventId, userId }) => {
-    // Anyone can call this with any userId!
-    if (userId === ownerId) {
-      await adminFirestore.collection('events').doc(eventId).delete()
-    }
-  })
+const deleteEvent = createServerFn().handler(async ({ eventId, userId }) => {
+  // Anyone can call this with any userId!
+  if (userId === ownerId) {
+    await adminFirestore.collection('events').doc(eventId).delete()
+  }
+})
 ```
 
 ✅ **DO use Firestore rules:**
+
 ```javascript
 // ✅ GOOD: Security at database level
 match /events/{eventId} {
@@ -401,24 +424,31 @@ match /events/{eventId} {
 ## Best Practices
 
 ### 1. Default to Client-Side
+
 Always start with client-side implementation. Only move to server when you have a specific reason.
 
 ### 2. Use Firebase Client SDKs Directly
+
 Don't create unnecessary abstraction layers. Firebase SDKs are well-designed - use them directly.
 
 ### 3. Security in Database Rules
+
 Write comprehensive Firestore and Storage security rules. This is your primary security mechanism.
 
 ### 4. SSR for SEO, Not Security
+
 Use SSR to improve initial page load and SEO. Never use it as a security boundary.
 
 ### 5. Real-Time by Default
+
 Leverage Firestore's real-time capabilities with `onSnapshot` for collaborative features.
 
 ### 6. Server Functions are Rare
+
 If you find yourself writing many server functions, reconsider your architecture.
 
 ### 7. Client-Side State Management
+
 Use TanStack Query for server state, Zustand for client state. Keep state management on the client.
 
 ## Migration from Server-First Patterns
@@ -426,6 +456,7 @@ Use TanStack Query for server state, Zustand for client state. Keep state manage
 If coming from Next.js Server Components or traditional server-first architecture:
 
 ### Before (Server-First)
+
 ```tsx
 // Server Component - fetches on server
 async function EventsPage() {
@@ -435,6 +466,7 @@ async function EventsPage() {
 ```
 
 ### After (Client-First)
+
 ```tsx
 // Client Component - fetches on client with real-time updates
 function EventsPage() {
@@ -448,7 +480,7 @@ function useEventsRealtime() {
   useEffect(() => {
     const q = query(collection(firestore, 'events'))
     return onSnapshot(q, (snapshot) => {
-      setEvents(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })))
+      setEvents(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })))
     })
   }, [])
 
@@ -459,6 +491,7 @@ function useEventsRealtime() {
 ## Summary
 
 **Client-First Architecture means:**
+
 - ✅ Firebase client SDKs for data operations
 - ✅ Client-side business logic
 - ✅ Security through database rules

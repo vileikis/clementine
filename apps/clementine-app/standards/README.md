@@ -11,6 +11,7 @@ These standards ensure consistency, maintainability, and quality across the code
 Standards are organized by scope:
 
 ### `global/`
+
 **Always applicable** - standards that apply to all code, regardless of context.
 
 - **[Project Structure](global/project-structure.md)** - Directory organization, DDD principles, module architecture
@@ -19,6 +20,7 @@ Standards are organized by scope:
 - **[Security](global/security.md)** - Firebase security rules, authentication, input validation
 
 ### `frontend/`
+
 **UI/UX work** - standards for frontend development.
 
 - **[Component Libraries](frontend/component-libraries.md)** - shadcn/ui, Radix UI, @dnd-kit usage and patterns
@@ -26,6 +28,7 @@ Standards are organized by scope:
 - **[Performance](frontend/performance.md)** - SSR optimization, code splitting, TanStack Query, image optimization
 
 ### `testing/`
+
 **Test implementation** - standards for writing tests.
 
 - **[Testing Overview](testing/overview.md)** - Vitest, Testing Library, component tests, mocking patterns
@@ -53,11 +56,13 @@ Standards are organized by scope:
 ## 🎯 Core Principles
 
 ### 1. Domain-Driven Design
+
 - Organize code by business domains, not technical layers
 - Minimize cross-domain dependencies
 - Use clear, domain-specific language
 
 ### 2. Separation of Concerns
+
 - `ui-kit/` - Pure design system
 - `integrations/` - Third-party services
 - `shared/` - Shared utilities
@@ -65,27 +70,29 @@ Standards are organized by scope:
 - `routes/` - Thin routing layer
 
 ### 3. Progressive Complexity
+
 - Start simple, add structure as needed
 - Don't create abstractions for one-off code
 - Only extract to `shared/` when used by 2+ domains
 
 ### 4. Explicit Over Implicit
+
 - Clear import paths with TypeScript aliases
 - Explicit dependencies
 - Well-named files and folders
 
 ## 📚 Standards Status
 
-| Standard | Status | Description |
-|----------|--------|-------------|
-| **Project Structure** | ✅ Complete | Directory organization and DDD principles |
+| Standard                      | Status      | Description                                       |
+| ----------------------------- | ----------- | ------------------------------------------------- |
+| **Project Structure**         | ✅ Complete | Directory organization and DDD principles         |
 | **Client-First Architecture** | ✅ Complete | Firebase client SDK, SSR strategy, security model |
-| **Code Quality** | ✅ Complete | TypeScript, ESLint, Prettier, conventions |
-| **Security** | ✅ Complete | Firebase rules, auth, input validation |
-| **Component Libraries** | ✅ Complete | shadcn/ui, Radix UI, @dnd-kit patterns |
-| **Accessibility** | ✅ Complete | WCAG compliance, semantic HTML, ARIA |
-| **Performance** | ✅ Complete | SSR, code splitting, optimization |
-| **Testing** | ✅ Complete | Vitest, Testing Library, mocking |
+| **Code Quality**              | ✅ Complete | TypeScript, ESLint, Prettier, conventions         |
+| **Security**                  | ✅ Complete | Firebase rules, auth, input validation            |
+| **Component Libraries**       | ✅ Complete | shadcn/ui, Radix UI, @dnd-kit patterns            |
+| **Accessibility**             | ✅ Complete | WCAG compliance, semantic HTML, ARIA              |
+| **Performance**               | ✅ Complete | SSR, code splitting, optimization                 |
+| **Testing**                   | ✅ Complete | Vitest, Testing Library, mocking                  |
 
 ## 🔄 Standards Evolution
 
@@ -94,6 +101,7 @@ These standards are living documents. As the project grows and we learn, standar
 ### Updating Standards
 
 When proposing changes to standards:
+
 1. Discuss with the team
 2. Update relevant documentation
 3. Ensure existing code still aligns (or refactor)
@@ -102,6 +110,7 @@ When proposing changes to standards:
 ## ❓ Questions?
 
 If you're unsure about how to apply these standards:
+
 1. Check existing code for patterns
 2. Review the specific standard in detail
 3. Ask the team for clarification

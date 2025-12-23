@@ -349,6 +349,7 @@ test('EventCard renders event name', () => {
 ## Checklist
 
 Before committing code:
+
 - [ ] Run `pnpm check` (format + lint)
 - [ ] Run `pnpm type-check` (TypeScript)
 - [ ] Remove console.log and debugger statements
