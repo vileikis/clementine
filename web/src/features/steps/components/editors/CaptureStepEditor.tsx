@@ -13,7 +13,7 @@
 
 import { useEffect, useCallback, useMemo } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { z } from "zod";
 import { AlertCircle, ImageIcon } from "lucide-react";
 import { Form } from "@/components/ui/form";
@@ -92,7 +92,7 @@ export function CaptureStepEditor({
   };
 
   const form = useForm<CaptureFormValues>({
-    resolver: zodResolver(captureFormSchema),
+    resolver: standardSchemaResolver(captureFormSchema),
     defaultValues: {
       title: step.title ?? "",
       description: step.description ?? "",
