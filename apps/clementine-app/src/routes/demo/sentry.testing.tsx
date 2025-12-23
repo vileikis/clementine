@@ -10,7 +10,7 @@ import * as fs from 'node:fs/promises'
 import { createFileRoute } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import * as Sentry from '@sentry/tanstackstart-react'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 export const Route = createFileRoute('/demo/sentry/testing')({
   component: RouteComponent,

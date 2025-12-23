@@ -1,5 +1,5 @@
 import { createServerFn } from '@tanstack/react-start'
-import { type Session } from '../types/session'
+import type {Session} from '../types/session';
 
 
 // Mock session data - centralized source of truth
