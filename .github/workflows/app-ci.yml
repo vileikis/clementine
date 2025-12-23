@@ -1,4 +1,4 @@
-name: ClementineApp CI
+name: Clementine App CI
 
 on:
   pull_request:
