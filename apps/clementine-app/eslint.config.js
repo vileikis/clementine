@@ -21,6 +21,7 @@ export default [
     },
     rules: {
       '@typescript-eslint/array-type': ['error', { default: 'array' }],
+      '@typescript-eslint/no-unnecessary-condition': 'off',
     },
   },
 ]

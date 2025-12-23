@@ -33,7 +33,7 @@ export const MOCK_SESSIONS: Session[] = [
  */
 export const getSessions = createServerFn({
   method: 'GET',
-}).handler(async () => {
+}).handler(() => {
   return MOCK_SESSIONS
 })
 
@@ -44,7 +44,7 @@ export const getSessionById = createServerFn({
   method: 'GET',
 })
 .inputValidator((sessionId: string) => sessionId)
-  .handler(async ({ data: sessionId }) => {
+  .handler(({ data: sessionId }) => {
     const session = MOCK_SESSIONS.find((s) => s.id === sessionId)
 
     if (!session) {
