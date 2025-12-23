@@ -1,6 +1,6 @@
 import { createServerFn } from '@tanstack/react-start'
 
-interface PunkSong {
+export interface PunkSong {
   id: number
   name: string
   artist: string
@@ -8,7 +8,7 @@ interface PunkSong {
 
 export const getPunkSongs = createServerFn({
   method: 'GET',
-}).handler(() => [
+}).handler((): PunkSong[] => [
   { id: 1, name: 'Teenage Dirtbag', artist: 'Wheatus' },
   { id: 2, name: 'Smells Like Teen Spirit', artist: 'Nirvana' },
   { id: 3, name: 'The Middle', artist: 'Jimmy Eat World' },
