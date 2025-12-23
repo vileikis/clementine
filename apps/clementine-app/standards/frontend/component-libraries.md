@@ -511,7 +511,6 @@ These libraries handle accessibility:
 
 ```tsx
 import { Trash2, Edit, Plus, X } from 'lucide-react'
-
 ;<Button>
   <Plus className="mr-2 h-4 w-4" />
   Add Item
