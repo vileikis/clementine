@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { useForm, useWatch } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { toast } from "sonner";
 import { ExperiencesSection, ExtrasSection } from "./general";
 import { WelcomeSection, WelcomePreview } from "./welcome";
@@ -32,7 +32,7 @@ interface EventGeneralTabProps {
 export function EventGeneralTab({ event }: EventGeneralTabProps) {
   // Initialize form with welcome data
   const form = useForm<EventWelcome>({
-    resolver: zodResolver(eventWelcomeSchema),
+    resolver: standardSchemaResolver(eventWelcomeSchema),
     defaultValues: event.welcome ?? DEFAULT_EVENT_WELCOME,
   });
 

@@ -10,7 +10,7 @@
 
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { z } from "zod";
 import Image from "next/image";
 import { Form } from "@/components/ui/form";
@@ -117,7 +117,7 @@ export function AiTransformEditor({
   };
 
   const form = useForm<AiTransformFormValues>({
-    resolver: zodResolver(aiTransformFormSchema),
+    resolver: standardSchemaResolver(aiTransformFormSchema),
     defaultValues: {
       config: {
         model: config.model ?? "",

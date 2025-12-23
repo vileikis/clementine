@@ -9,7 +9,7 @@
 
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { z } from "zod";
 import { Form } from "@/components/ui/form";
 import {
@@ -82,7 +82,7 @@ export function YesNoEditor({
   };
 
   const form = useForm<YesNoFormValues>({
-    resolver: zodResolver(yesNoFormSchema),
+    resolver: standardSchemaResolver(yesNoFormSchema),
     defaultValues: {
       title: step.title ?? "",
       description: step.description ?? "",

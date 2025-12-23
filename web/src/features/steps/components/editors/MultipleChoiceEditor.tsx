@@ -9,7 +9,7 @@
 
 import { useEffect, useCallback } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { z } from "zod";
 import { Plus, Trash2, GripVertical } from "lucide-react";
 import { Form } from "@/components/ui/form";
@@ -99,7 +99,7 @@ export function MultipleChoiceEditor({
   };
 
   const form = useForm<MultipleChoiceFormValues>({
-    resolver: zodResolver(multipleChoiceFormSchema),
+    resolver: standardSchemaResolver(multipleChoiceFormSchema),
     defaultValues: {
       title: step.title ?? "",
       description: step.description ?? "",

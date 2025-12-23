@@ -10,7 +10,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { z } from "zod";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
@@ -54,7 +54,7 @@ export function RenameExperienceDialog({
     formState: { errors, isDirty },
     setFocus,
   } = useForm<RenameFormData>({
-    resolver: zodResolver(renameSchema),
+    resolver: standardSchemaResolver(renameSchema),
     defaultValues: {
       name: experience.name,
     },

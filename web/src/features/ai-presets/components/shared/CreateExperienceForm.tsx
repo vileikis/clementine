@@ -19,7 +19,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -59,7 +59,7 @@ export function CreateExperienceForm({ eventId, companyId }: CreateExperienceFor
     setValue,
     formState: { errors, isValid },
   } = useForm<CreateExperienceInput>({
-    resolver: zodResolver(createExperienceSchema),
+    resolver: standardSchemaResolver(createExperienceSchema),
     mode: "onChange", // Enable real-time validation
     defaultValues: {
       companyId, // Set from props
