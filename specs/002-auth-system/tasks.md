@@ -26,13 +26,13 @@ This document breaks down the Firebase Authentication & Authorization System imp
 
 **Tasks**:
 
-- [ ] T001 Install Firebase SDK dependencies (firebase@latest) in apps/clementine-app/package.json
-- [ ] T002 [P] Install Firebase Admin SDK (firebase-admin@latest) in apps/clementine-app/package.json for grant-admin script
-- [ ] T003 [P] Verify Firebase project configuration exists in apps/clementine-app/src/integrations/firebase/client.ts
-- [ ] T004 Create auth domain directory structure: apps/clementine-app/src/domains/auth/{components,providers,hooks,types,__tests__}/
-- [ ] T005 [P] Create scripts directory for admin management: apps/clementine-app/scripts/
+- [X] T001 Install Firebase SDK dependencies (firebase@latest) in apps/clementine-app/package.json
+- [X] T002 [P] Install Firebase Admin SDK (firebase-admin@latest) in apps/clementine-app/package.json for grant-admin script
+- [X] T003 [P] Verify Firebase project configuration exists in apps/clementine-app/src/integrations/firebase/client.ts
+- [X] T004 Create auth domain directory structure: apps/clementine-app/src/domains/auth/{components,providers,hooks,types,__tests__}/
+- [X] T005 [P] Create scripts directory for admin management: apps/clementine-app/scripts/
 - [ ] T006 Verify Google OAuth provider enabled in Firebase Console (manual verification task)
-- [ ] T007 [P] Create TypeScript types file: apps/clementine-app/src/domains/auth/types/auth.types.ts
+- [X] T007 [P] Create TypeScript types file: apps/clementine-app/src/domains/auth/types/auth.types.ts
 
 **Validation**: All directories created, dependencies installed, `pnpm install` completes successfully.
 
@@ -46,11 +46,11 @@ This document breaks down the Firebase Authentication & Authorization System imp
 
 **Tasks**:
 
-- [ ] T008 Implement AuthProvider with onIdTokenChanged listener in apps/clementine-app/src/domains/auth/providers/AuthProvider.tsx
-- [ ] T009 Implement useAuth hook in apps/clementine-app/src/domains/auth/hooks/use-auth.ts
-- [ ] T010 Update root route to include AuthProvider and wait for auth initialization in apps/clementine-app/src/routes/__root.tsx
-- [ ] T011 Create RouterContext type with auth state in apps/clementine-app/src/routes/__root.tsx
-- [ ] T012 Create barrel export (index.ts) for auth domain public API in apps/clementine-app/src/domains/auth/index.ts
+- [X] T008 Implement AuthProvider with onIdTokenChanged listener in apps/clementine-app/src/domains/auth/providers/AuthProvider.tsx
+- [X] T009 Implement useAuth hook in apps/clementine-app/src/domains/auth/hooks/use-auth.ts
+- [X] T010 Update root route to include AuthProvider and wait for auth initialization in apps/clementine-app/src/routes/__root.tsx
+- [X] T011 Create RouterContext type with auth state in apps/clementine-app/src/routes/__root.tsx
+- [X] T012 Create barrel export (index.ts) for auth domain public API in apps/clementine-app/src/domains/auth/index.ts
 - [ ] T013 Write unit test for useAuth hook with different auth states in apps/clementine-app/src/domains/auth/__tests__/use-auth.test.ts
 
 **Validation**:
@@ -75,13 +75,13 @@ This document breaks down the Firebase Authentication & Authorization System imp
 
 **Tasks**:
 
-- [ ] T014 [US1] Create guest route file: apps/clementine-app/src/routes/guest/$projectId/index.tsx
-- [ ] T015 [US1] Implement beforeLoad hook with automatic anonymous sign-in in apps/clementine-app/src/routes/guest/$projectId/index.tsx
-- [ ] T016 [US1] Create GuestPage component (placeholder) in apps/clementine-app/src/routes/guest/$projectId/index.tsx
+- [X] T014 [US1] Create guest route file: apps/clementine-app/src/routes/guest/$projectId/index.tsx
+- [X] T015 [US1] Implement beforeLoad hook with automatic anonymous sign-in in apps/clementine-app/src/routes/guest/$projectId/index.tsx
+- [X] T016 [US1] Create GuestPage component (placeholder) in apps/clementine-app/src/routes/guest/$projectId/index.tsx
 - [ ] T017 [US1] Write unit test for anonymous sign-in logic in apps/clementine-app/src/domains/auth/__tests__/guest-auth.test.ts
 - [ ] T018 [US1] Test manual: Visit /guest/test-project with no session, verify auto sign-in occurs in <2s
 - [ ] T019 [US1] Test manual: Verify existing anonymous session persists across page refreshes
-- [ ] T020 [US1] Run validation loop: pnpm check && pnpm type-check in apps/clementine-app/
+- [X] T020 [US1] Run validation loop: pnpm check && pnpm type-check in apps/clementine-app/
 
 **Story Complete When**:
 - ✅ Unauthenticated users are auto-signed in anonymously on `/guest/[projectId]`

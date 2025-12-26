@@ -8,10 +8,13 @@ import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 import type { QueryClient } from '@tanstack/react-query'
+import type { AuthState } from '@/domains/auth/types/auth.types'
 import appCss from '@/ui-kit/theme/styles.css?url'
+import { AuthProvider, useAuth } from '@/domains/auth/providers/AuthProvider'
 
-interface MyRouterContext {
+export interface MyRouterContext {
   queryClient: QueryClient
+  auth?: AuthState
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
@@ -41,6 +44,25 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 })
 
 function RootComponent() {
+  return (
+    <AuthProvider>
+      <RootLayout />
+    </AuthProvider>
+  )
+}
+
+function RootLayout() {
+  const auth = useAuth()
+
+  // Wait for auth to initialize before rendering routes
+  if (auth.isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        Initializing authentication...
+      </div>
+    )
+  }
+
   return <Outlet />
 }
 
