@@ -3,15 +3,12 @@ import {
   Outlet,
   Scripts,
   createRootRouteWithContext,
-  useMatches,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 import type { QueryClient } from '@tanstack/react-query'
-import type { RouteArea } from '@/domains/navigation'
 import appCss from '@/ui-kit/theme/styles.css?url'
-import { Sidebar } from '@/domains/navigation'
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -39,35 +36,12 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     ],
   }),
 
-  component: RootLayout,
+  component: RootComponent,
   shellComponent: RootDocument,
 })
 
-function RootLayout() {
-  const matches = useMatches()
-  const currentPath = matches[matches.length - 1]?.pathname || '/'
-
-  // Determine route area from path
-  const area: RouteArea = currentPath.startsWith('/admin')
-    ? 'admin'
-    : currentPath.startsWith('/workspace')
-      ? 'workspace'
-      : 'guest'
-
-  // Extract workspaceId from path for workspace area
-  const workspaceId =
-    area === 'workspace'
-      ? currentPath.split('/workspace/')[1]?.split('/')[0]
-      : undefined
-
-  return (
-    <div className="flex min-h-screen bg-background">
-      <Sidebar area={area} workspaceId={workspaceId} />
-      <main className="flex-1">
-        <Outlet />
-      </main>
-    </div>
-  )
+function RootComponent() {
+  return <Outlet />
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
