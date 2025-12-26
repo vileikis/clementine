@@ -129,27 +129,27 @@ apps/clementine-app/
 ├── src/
 │   ├── integrations/
 │   │   └── firebase/
-│   │       ├── client.ts              # Firebase client SDK initialization (existing)
-│   │       ├── admin.ts               # Firebase Admin SDK (existing)
-│   │       └── auth/                  # NEW: Auth integration module
-│   │           ├── index.ts           # Barrel export
-│   │           ├── auth.types.ts      # Auth TypeScript types
-│   │           ├── auth.hooks.ts      # useAuth, useAdminCheck hooks
-│   │           ├── auth.service.ts    # Auth service (signIn, signOut, checkAdmin)
-│   │           └── AuthProvider.tsx   # Auth context provider
+│   │       └── client.ts              # Firebase client SDK initialization (existing)
 │   │
 │   ├── domains/
-│   │   └── auth/                      # NEW: Auth domain
-│   │       ├── index.ts               # Barrel export
+│   │   └── auth/                      # NEW: Auth domain (all auth logic)
+│   │       ├── index.ts               # Barrel export (public API)
 │   │       ├── components/
 │   │       │   ├── LoginPage.tsx      # Login page component
 │   │       │   ├── AuthGuard.tsx      # Route guard component
 │   │       │   └── WaitingMessage.tsx # Non-admin waiting message
+│   │       ├── providers/
+│   │       │   └── AuthProvider.tsx   # Auth context provider
+│   │       ├── hooks/
+│   │       │   └── use-auth.ts        # useAuth, useRequireAdmin hooks
+│   │       ├── types/
+│   │       │   └── auth.types.ts      # Auth TypeScript types
 │   │       └── __tests__/
-│   │           ├── auth.hooks.test.ts
+│   │           ├── use-auth.test.ts
 │   │           └── AuthGuard.test.tsx
 │   │
 │   └── routes/
+│       ├── __root.tsx                 # UPDATED: Root route with auth initialization
 │       ├── login/                     # NEW: Login route
 │       │   └── index.tsx
 │       ├── admin/                     # NEW: Admin route (protected)
@@ -161,24 +161,33 @@ apps/clementine-app/
 │               └── index.tsx
 │
 ├── scripts/                           # NEW: Server-side admin management
-│   └── grant-admin.ts                 # Admin privilege grant script
+│   └── grant-admin.ts                 # Admin privilege grant script (standalone)
 │
 └── firestore.rules                    # UPDATED: Add admin claim checks
-
-functions/                             # Cloud Functions (if needed)
-└── src/
-    └── admin/
-        └── grant-admin.ts             # Alternative: Cloud Function for admin grant
 ```
 
-**Structure Decision**: Web application structure following TanStack Start conventions with domain-driven design. Auth feature is split into two modules:
+**Structure Decision**: Web application structure following TanStack Start conventions with domain-driven design. Auth feature is organized as a single domain module:
 
-1. **`src/integrations/firebase/auth/`** - Low-level Firebase Auth integration (hooks, services, types, provider)
-2. **`src/domains/auth/`** - High-level auth UI components (LoginPage, AuthGuard, waiting messages)
-3. **`src/routes/`** - Route-level integration with auth guards
-4. **`scripts/`** - Server-side admin management script (Node.js, uses Firebase Admin SDK)
+1. **`src/domains/auth/`** - Complete auth domain (vertical slice)
+   - Uses Firebase client SDK directly (imported from `@/integrations/firebase/client`)
+   - Organized by technical concern (components, providers, hooks, types)
+   - Encapsulates all authentication and authorization logic
+   - Public API exported via barrel export (`index.ts`)
 
-This structure follows the project's vertical slice architecture while keeping Firebase integration concerns separate from domain UI logic.
+2. **`src/routes/`** - Route-level integration with auth guards
+   - Root route handles global auth initialization (wait for auth ready)
+   - Individual routes use auth context from providers
+
+3. **`scripts/grant-admin.ts`** - Standalone server-side script
+   - Uses Firebase Admin SDK (NOT included in app bundle)
+   - Runs via `node scripts/grant-admin.ts <email>`
+   - Completely separate from client application
+
+**Key Architectural Decisions**:
+- **No abstraction layer**: Firebase Auth SDK used directly (per architecture.md: "use them directly")
+- **No admin SDK in app**: Admin SDK only in standalone script, never in app `src/`
+- **Client-first**: 100% of in-app auth logic uses Firebase client SDK
+- **Security via rules**: Firestore/Storage rules are the security boundary, not server code
 
 ## Complexity Tracking
 

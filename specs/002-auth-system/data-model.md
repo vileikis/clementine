@@ -287,6 +287,8 @@ service firebase.storage {
 
 ### Auth Types
 
+Location: `src/domains/auth/types/auth.types.ts`
+
 ```typescript
 import type { User, IdTokenResult } from 'firebase/auth'
 
@@ -330,6 +332,15 @@ export interface AuthState {
 export interface RouterContext {
   auth: AuthState
 }
+```
+
+**Import paths:**
+```typescript
+// In application code
+import type { AuthState, CustomClaims } from '@/domains/auth'
+
+// In routes
+import type { RouterContext } from '@/routes/__root'
 ```
 
 ### Admin Grant Script Types
