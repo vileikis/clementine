@@ -1,0 +1,427 @@
+# Implementation Tasks: Firebase Authentication & Authorization System
+
+**Feature**: 002-auth-system
+**Branch**: `002-auth-system`
+**Created**: 2025-12-26
+
+## Overview
+
+This document breaks down the Firebase Authentication & Authorization System implementation into actionable tasks organized by user story priority. Each user story phase is independently testable and can be deployed as an incremental improvement.
+
+**User Stories** (from spec.md):
+- **US1** (P1): Guest Event Participation - Anonymous auth for `/guest/[projectId]`
+- **US2** (P1): Admin Access Control - Route protection for `/admin` and `/workspace`
+- **US3** (P2): Admin Login & Access Request - Google OAuth login with waiting message
+- **US4** (P3): Manual Admin Privilege Grant - Server-side script to grant admin claims
+
+**Implementation Strategy**: Incremental delivery by user story. Each story is a complete, independently testable feature increment.
+
+**MVP Scope**: User Story 1 (Guest Event Participation) - Enables core product value proposition.
+
+---
+
+## Phase 1: Setup & Infrastructure
+
+**Goal**: Initialize project structure and install required dependencies.
+
+**Tasks**:
+
+- [ ] T001 Install Firebase SDK dependencies (firebase@latest) in apps/clementine-app/package.json
+- [ ] T002 [P] Install Firebase Admin SDK (firebase-admin@latest) in apps/clementine-app/package.json for grant-admin script
+- [ ] T003 [P] Verify Firebase project configuration exists in apps/clementine-app/src/integrations/firebase/client.ts
+- [ ] T004 Create auth domain directory structure: apps/clementine-app/src/domains/auth/{components,providers,hooks,types,__tests__}/
+- [ ] T005 [P] Create scripts directory for admin management: apps/clementine-app/scripts/
+- [ ] T006 Verify Google OAuth provider enabled in Firebase Console (manual verification task)
+- [ ] T007 [P] Create TypeScript types file: apps/clementine-app/src/domains/auth/types/auth.types.ts
+
+**Validation**: All directories created, dependencies installed, `pnpm install` completes successfully.
+
+---
+
+## Phase 2: Foundational - Auth Provider & Router Context
+
+**Goal**: Implement core auth state management that all user stories depend on.
+
+**Why Foundational**: Auth provider and router context are required by all subsequent user stories. Must be completed before any story-specific work.
+
+**Tasks**:
+
+- [ ] T008 Implement AuthProvider with onIdTokenChanged listener in apps/clementine-app/src/domains/auth/providers/AuthProvider.tsx
+- [ ] T009 Implement useAuth hook in apps/clementine-app/src/domains/auth/hooks/use-auth.ts
+- [ ] T010 Update root route to include AuthProvider and wait for auth initialization in apps/clementine-app/src/routes/__root.tsx
+- [ ] T011 Create RouterContext type with auth state in apps/clementine-app/src/routes/__root.tsx
+- [ ] T012 Create barrel export (index.ts) for auth domain public API in apps/clementine-app/src/domains/auth/index.ts
+- [ ] T013 Write unit test for useAuth hook with different auth states in apps/clementine-app/src/domains/auth/__tests__/use-auth.test.ts
+
+**Validation**:
+- Root layout renders "Initializing authentication..." until auth.isLoading === false
+- useAuth hook returns correct auth state (user, isAdmin, isAnonymous, isLoading)
+- Unit tests pass for all auth state transitions
+
+**Independent Test**: Start dev server, verify root layout waits for auth before rendering child routes, no race conditions in console.
+
+---
+
+## Phase 3: User Story 1 - Guest Event Participation (P1)
+
+**Story Goal**: Enable automatic anonymous authentication for guests accessing `/guest/[projectId]` routes.
+
+**Priority**: P1 (Core value proposition - guest experience)
+
+**Independent Test Criteria**:
+1. Visit `/guest/test-project` with no existing session → automatically signed in anonymously
+2. Refresh page while on `/guest/test-project` → existing session persists
+3. Admin user visits `/guest/test-project` → can access without being signed out
+
+**Tasks**:
+
+- [ ] T014 [US1] Create guest route file: apps/clementine-app/src/routes/guest/$projectId/index.tsx
+- [ ] T015 [US1] Implement beforeLoad hook with automatic anonymous sign-in in apps/clementine-app/src/routes/guest/$projectId/index.tsx
+- [ ] T016 [US1] Create GuestPage component (placeholder) in apps/clementine-app/src/routes/guest/$projectId/index.tsx
+- [ ] T017 [US1] Write unit test for anonymous sign-in logic in apps/clementine-app/src/domains/auth/__tests__/guest-auth.test.ts
+- [ ] T018 [US1] Test manual: Visit /guest/test-project with no session, verify auto sign-in occurs in <2s
+- [ ] T019 [US1] Test manual: Verify existing anonymous session persists across page refreshes
+- [ ] T020 [US1] Run validation loop: pnpm check && pnpm type-check in apps/clementine-app/
+
+**Story Complete When**:
+- ✅ Unauthenticated users are auto-signed in anonymously on `/guest/[projectId]`
+- ✅ Anonymous session persists across refreshes
+- ✅ Performance: Authentication completes in <2s (SC-001)
+- ✅ All tests pass, validation loop clean
+
+---
+
+## Phase 4: User Story 2 - Admin Access Control (P1)
+
+**Story Goal**: Protect `/admin` and `/workspace` routes, allowing access only to users with `admin: true` custom claim.
+
+**Priority**: P1 (Security boundary - critical before admin features)
+
+**Independent Test Criteria**:
+1. Unauthenticated user visits `/admin` → redirected to `/login`
+2. Anonymous user visits `/admin` → redirected to `/login`
+3. Authenticated non-admin user visits `/admin` → redirected to `/login`
+4. Authenticated admin user visits `/admin` → access granted
+5. Admin user refreshes `/admin` → access persists
+
+**Tasks**:
+
+- [ ] T021 [US2] Create admin route file: apps/clementine-app/src/routes/admin/index.tsx
+- [ ] T022 [US2] Implement admin route guard (beforeLoad) checking isAdmin in apps/clementine-app/src/routes/admin/index.tsx
+- [ ] T023 [US2] Create AdminPage component (placeholder) in apps/clementine-app/src/routes/admin/index.tsx
+- [ ] T024 [P] [US2] Create workspace route file: apps/clementine-app/src/routes/workspace/index.tsx
+- [ ] T025 [P] [US2] Implement workspace route guard (beforeLoad) checking isAdmin in apps/clementine-app/src/routes/workspace/index.tsx
+- [ ] T026 [P] [US2] Create WorkspacePage component (placeholder) in apps/clementine-app/src/routes/workspace/index.tsx
+- [ ] T027 [US2] Create AuthGuard component (optional reusable guard) in apps/clementine-app/src/domains/auth/components/AuthGuard.tsx
+- [ ] T028 [US2] Write unit test for admin route guard logic in apps/clementine-app/src/domains/auth/__tests__/AuthGuard.test.tsx
+- [ ] T029 [US2] Update Firestore security rules with admin claim check (request.auth.token.admin == true) in firestore.rules
+- [ ] T030 [US2] Test manual: Attempt /admin access with unauthenticated state, verify redirect to /login
+- [ ] T031 [US2] Test manual: Attempt /admin access with anonymous user, verify redirect to /login
+- [ ] T032 [US2] Test manual: Attempt /admin access with non-admin authenticated user, verify redirect to /login
+- [ ] T033 [US2] Test manual: Access /admin with admin user (mock custom claim), verify access granted
+- [ ] T034 [US2] Run validation loop: pnpm check && pnpm type-check in apps/clementine-app/
+
+**Story Complete When**:
+- ✅ All unauthorized access attempts to `/admin` and `/workspace` are redirected to `/login` (SC-002)
+- ✅ Admin users can access `/admin` and `/workspace` routes
+- ✅ Admin access persists across refreshes (SC-004)
+- ✅ Firestore security rules enforce admin checks (FR-027)
+- ✅ All tests pass, validation loop clean
+
+---
+
+## Phase 5: User Story 3 - Admin Login & Access Request (P2)
+
+**Story Goal**: Provide Google OAuth login with clear feedback for users awaiting admin access.
+
+**Priority**: P2 (Admin onboarding - manual admin granting is acceptable initially)
+
+**Independent Test Criteria**:
+1. Unauthenticated user visits `/login` → sees Google OAuth button
+2. Non-admin user logs in with Google OAuth → sees waiting message
+3. Non-admin user can still access `/guest/[projectId]` routes
+4. Admin user visits `/login` → redirected to `/admin`
+
+**Tasks**:
+
+- [ ] T035 [US3] Create login route file: apps/clementine-app/src/routes/login/index.tsx
+- [ ] T036 [US3] Implement Google OAuth sign-in flow with signInWithPopup in apps/clementine-app/src/routes/login/index.tsx
+- [ ] T037 [US3] Create LoginPage component with Google OAuth button in apps/clementine-app/src/domains/auth/components/LoginPage.tsx
+- [ ] T038 [US3] Implement redirect logic: admin users to /admin, non-admin users stay on /login in apps/clementine-app/src/routes/login/index.tsx
+- [ ] T039 [US3] Create WaitingMessage component for non-admin authenticated users in apps/clementine-app/src/domains/auth/components/WaitingMessage.tsx
+- [ ] T040 [US3] Add mobile-first styles (320px-768px viewport, 44x44px touch targets) to LoginPage component
+- [ ] T041 [US3] Write unit test for login redirect logic in apps/clementine-app/src/domains/auth/__tests__/LoginPage.test.tsx
+- [ ] T042 [US3] Test manual: Visit /login unauthenticated, verify Google OAuth button appears
+- [ ] T043 [US3] Test manual: Sign in with Google as non-admin user, verify waiting message appears
+- [ ] T044 [US3] Test manual: Verify non-admin user can access /guest/test-project after login
+- [ ] T045 [US3] Test manual: Sign in as admin user, verify redirect to /admin
+- [ ] T046 [US3] Run validation loop: pnpm check && pnpm type-check in apps/clementine-app/
+
+**Story Complete When**:
+- ✅ Google OAuth login works for all user types
+- ✅ Non-admin users see waiting message (FR-018)
+- ✅ Admin users are redirected to `/admin` (FR-017)
+- ✅ Non-admin users can access guest routes (FR-019)
+- ✅ Mobile-first design (320px-768px, 44x44px touch targets)
+- ✅ All tests pass, validation loop clean
+
+---
+
+## Phase 6: User Story 4 - Manual Admin Privilege Grant (P3)
+
+**Story Goal**: Provide server-side script for super admins to grant admin privileges via email.
+
+**Priority**: P3 (Team growth - manual operation acceptable)
+
+**Independent Test Criteria**:
+1. Run script with valid email → admin claim granted successfully
+2. Run script with non-existent email → error message displayed
+3. Run script with anonymous user email → error message displayed
+4. User re-authenticates after admin grant → receives admin access
+
+**Tasks**:
+
+- [ ] T047 [US4] Create grant-admin script file: apps/clementine-app/scripts/grant-admin.ts
+- [ ] T048 [US4] Implement Firebase Admin SDK initialization in apps/clementine-app/scripts/grant-admin.ts
+- [ ] T049 [US4] Implement email validation with Zod schema in apps/clementine-app/scripts/grant-admin.ts
+- [ ] T050 [US4] Implement getUserByEmail lookup in apps/clementine-app/scripts/grant-admin.ts
+- [ ] T051 [US4] Implement anonymous user validation (reject if providerData.length === 0) in apps/clementine-app/scripts/grant-admin.ts
+- [ ] T052 [US4] Implement setCustomUserClaims with admin: true in apps/clementine-app/scripts/grant-admin.ts
+- [ ] T053 [US4] Add CLI argument parsing for email input in apps/clementine-app/scripts/grant-admin.ts
+- [ ] T054 [US4] Add error handling for user-not-found case in apps/clementine-app/scripts/grant-admin.ts
+- [ ] T055 [US4] Write unit test for admin grant logic (mock Firebase Admin SDK) in apps/clementine-app/scripts/__tests__/grant-admin.test.ts
+- [ ] T056 [US4] Test manual: Run script with valid non-admin user email, verify admin claim set
+- [ ] T057 [US4] Test manual: Run script with non-existent email, verify error message
+- [ ] T058 [US4] Test manual: User signs out and back in after admin grant, verify admin access
+- [ ] T059 [US4] Update package.json with script alias: "grant-admin": "node scripts/grant-admin.ts" in apps/clementine-app/package.json
+- [ ] T060 [US4] Run validation loop: pnpm check && pnpm type-check in apps/clementine-app/
+
+**Story Complete When**:
+- ✅ Script accepts email and grants admin claim (FR-021, FR-024)
+- ✅ Script rejects non-existent users (FR-023)
+- ✅ Script rejects anonymous users (FR-026)
+- ✅ Users receive updated claims after re-authentication (FR-025)
+- ✅ All tests pass, validation loop clean
+
+---
+
+## Phase 7: Polish & Cross-Cutting Concerns
+
+**Goal**: Complete security rules, comprehensive testing, documentation, and final validation.
+
+**Tasks**:
+
+- [ ] T061 [P] Update Storage security rules with admin claim check (request.auth.token.admin == true) in storage.rules
+- [ ] T062 Add comprehensive error handling for auth errors (popup-closed-by-user, network-request-failed) in auth components
+- [ ] T063 [P] Add loading states for auth operations (sign-in, redirect) in auth components
+- [ ] T064 Write integration test for full guest flow (visit guest route → auto sign-in → access granted) in apps/clementine-app/src/domains/auth/__tests__/guest-flow.test.ts
+- [ ] T065 [P] Write integration test for full admin flow (login → admin access → refresh persistence) in apps/clementine-app/src/domains/auth/__tests__/admin-flow.test.ts
+- [ ] T066 Add performance monitoring for guest auth (verify <2s sign-in time) in auth provider
+- [ ] T067 Test on real mobile devices (iOS Safari, Android Chrome) for mobile-first validation
+- [ ] T068 [P] Update CLAUDE.md with auth feature context (if applicable) in CLAUDE.md
+- [ ] T069 Run final validation loop: pnpm check && pnpm type-check && pnpm test in apps/clementine-app/
+- [ ] T070 Deploy Firestore and Storage security rules: firebase deploy --only firestore:rules,storage:rules
+- [ ] T071 Manual verification: Test all acceptance scenarios from spec.md across all user stories
+- [ ] T072 Performance verification: Verify SC-001 (guest auth <2s), SC-002 (100% unauthorized blocked), SC-003 (admin immediate access), SC-004 (admin persistence)
+
+**Phase Complete When**:
+- ✅ All security rules deployed and enforced (FR-027, SC-006)
+- ✅ All success criteria validated (SC-001 through SC-008)
+- ✅ Mobile-first design verified on real devices
+- ✅ All tests pass (90%+ coverage for critical paths)
+- ✅ Validation loop clean, ready for production
+
+---
+
+## Dependency Graph
+
+**User Story Completion Order** (based on priorities and dependencies):
+
+```
+Phase 1 (Setup) → Phase 2 (Foundational: Auth Provider)
+                       ↓
+        ┌──────────────┼──────────────┬──────────────┐
+        ↓              ↓              ↓              ↓
+    Phase 3 (US1)  Phase 4 (US2)  Phase 5 (US3)  Phase 6 (US4)
+    Guest Auth     Admin Access   Admin Login    Admin Grant
+    (P1)           (P1)           (P2)           (P3)
+        ↓              ↓              ↓              ↓
+        └──────────────┴──────────────┴──────────────┘
+                       ↓
+              Phase 7 (Polish)
+```
+
+**Dependencies**:
+- **Phase 2 (Foundational)** MUST complete before any user story phase
+- **US1, US2, US3, US4** are independent after Phase 2 (can be implemented in parallel)
+- **Phase 7 (Polish)** requires all user stories complete
+
+**Suggested Implementation Order**:
+1. Phase 1 (Setup) + Phase 2 (Foundational)
+2. Phase 3 (US1 - Guest Auth) → **MVP**
+3. Phase 4 (US2 - Admin Access)
+4. Phase 5 (US3 - Admin Login)
+5. Phase 6 (US4 - Admin Grant)
+6. Phase 7 (Polish)
+
+---
+
+## Parallel Execution Opportunities
+
+### Phase 1 (Setup)
+Tasks that can run in parallel:
+- T001, T002 (dependency installation)
+- T003, T005, T007 (file/directory creation)
+
+### Phase 2 (Foundational)
+Tasks that can run in parallel:
+- None (foundational tasks are sequential)
+
+### Phase 3 (User Story 1)
+Tasks that can run in parallel:
+- T017 (unit tests) can be written while implementing T014-T016
+
+### Phase 4 (User Story 2)
+Tasks that can run in parallel:
+- T024, T025, T026 (workspace route) independent of T021, T022, T023 (admin route)
+- T028 (unit tests) can be written while implementing route guards
+
+### Phase 5 (User Story 3)
+Tasks that can run in parallel:
+- T037, T039 (components) can be developed independently
+- T041 (unit tests) can be written while implementing login flow
+
+### Phase 6 (User Story 4)
+Tasks that can run in parallel:
+- T048-T054 (script implementation) can be developed incrementally
+- T055 (unit tests) can be written while implementing script
+
+### Phase 7 (Polish)
+Tasks that can run in parallel:
+- T061 (storage rules) independent of T062-T063 (error handling)
+- T064, T065 (integration tests) can be written independently
+- T068 (documentation) independent of testing tasks
+
+---
+
+## Testing Strategy
+
+### Unit Tests (90%+ coverage goal for critical paths)
+
+**Auth Provider**:
+- `use-auth.test.ts`: Test auth state transitions (loading → unauthenticated → anonymous → admin)
+- `use-auth.test.ts`: Test isAdmin derived correctly from idTokenResult.claims.admin
+
+**Route Guards**:
+- `AuthGuard.test.tsx`: Test redirects for unauthenticated, anonymous, non-admin users
+- `AuthGuard.test.tsx`: Test admin users can access protected routes
+
+**Components**:
+- `LoginPage.test.tsx`: Test Google OAuth button click triggers signInWithPopup
+- `LoginPage.test.tsx`: Test redirect logic based on admin status
+
+**Scripts**:
+- `grant-admin.test.ts`: Test email validation (valid, invalid, missing)
+- `grant-admin.test.ts`: Test user lookup (exists, not exists)
+- `grant-admin.test.ts`: Test anonymous user rejection
+- `grant-admin.test.ts`: Test custom claims set correctly
+
+### Integration Tests
+
+**Guest Flow** (`guest-flow.test.ts`):
+1. Navigate to `/guest/test-project` unauthenticated
+2. Verify automatic anonymous sign-in
+3. Verify guest page renders
+4. Verify session persists on refresh
+
+**Admin Flow** (`admin-flow.test.ts`):
+1. Navigate to `/login` unauthenticated
+2. Sign in with Google OAuth (mocked)
+3. Verify redirect to `/admin` for admin user
+4. Refresh page, verify admin access persists
+
+### Manual Testing Checklist
+
+**User Story 1** (Guest Auth):
+- [ ] Visit `/guest/test-project` with no session → auto sign-in <2s
+- [ ] Refresh page → session persists
+- [ ] Admin user visits guest route → no sign-out
+
+**User Story 2** (Admin Access):
+- [ ] Unauthenticated user → `/admin` → redirect to `/login`
+- [ ] Anonymous user → `/admin` → redirect to `/login`
+- [ ] Non-admin authenticated → `/admin` → redirect to `/login`
+- [ ] Admin user → `/admin` → access granted
+- [ ] Refresh `/admin` → access persists
+
+**User Story 3** (Admin Login):
+- [ ] Visit `/login` → Google OAuth button visible
+- [ ] Sign in as non-admin → waiting message appears
+- [ ] Non-admin can access `/guest/test-project`
+- [ ] Sign in as admin → redirect to `/admin`
+
+**User Story 4** (Admin Grant):
+- [ ] Run script with valid email → admin claim granted
+- [ ] Run script with invalid email → error message
+- [ ] User signs out and back in → receives admin access
+
+---
+
+## Task Summary
+
+**Total Tasks**: 72
+
+**Tasks by Phase**:
+- Phase 1 (Setup): 7 tasks
+- Phase 2 (Foundational): 6 tasks
+- Phase 3 (US1 - Guest Auth): 7 tasks
+- Phase 4 (US2 - Admin Access): 14 tasks
+- Phase 5 (US3 - Admin Login): 12 tasks
+- Phase 6 (US4 - Admin Grant): 14 tasks
+- Phase 7 (Polish): 12 tasks
+
+**Tasks by User Story**:
+- US1 (P1 - Guest Auth): 7 tasks
+- US2 (P1 - Admin Access): 14 tasks
+- US3 (P2 - Admin Login): 12 tasks
+- US4 (P3 - Admin Grant): 14 tasks
+- Setup + Foundational: 13 tasks
+- Polish: 12 tasks
+
+**Parallelizable Tasks**: 14 tasks marked with [P]
+
+**MVP Scope**: Phase 1 + Phase 2 + Phase 3 (US1) = 20 tasks
+
+**Success Criteria Coverage**:
+- SC-001: T018 (guest auth <2s)
+- SC-002: T030-T033 (unauthorized access blocked)
+- SC-003: T045 (admin immediate access)
+- SC-004: T033, T045 (admin persistence)
+- SC-005: T043, T045 (clear feedback)
+- SC-006: T029, T061 (security rules enforced)
+- SC-007: T058 (re-auth required for claims)
+- SC-008: Covered by Firebase SDK scalability (10k concurrent users)
+
+---
+
+## Format Validation
+
+✅ All tasks follow checklist format: `- [ ] [TaskID] [P?] [Story?] Description with file path`
+✅ All user story tasks include [US1], [US2], [US3], or [US4] label
+✅ All parallelizable tasks include [P] marker
+✅ All tasks include specific file paths
+✅ Task IDs are sequential (T001-T072)
+✅ Each phase has clear goals and validation criteria
+✅ Each user story phase is independently testable
+
+---
+
+## Next Steps
+
+1. **Start with MVP**: Implement Phase 1 + Phase 2 + Phase 3 (US1) for guest authentication
+2. **Incremental Delivery**: Deploy US1, then US2, then US3, then US4
+3. **Parallel Opportunities**: Use [P] markers to identify tasks that can run concurrently
+4. **Validation**: Run `pnpm check && pnpm type-check` after each phase
+5. **Testing**: Achieve 90%+ coverage for critical auth paths before deployment
+
+Ready to begin implementation with `/speckit.implement` or manual task execution.
