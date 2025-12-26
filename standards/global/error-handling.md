@@ -122,67 +122,11 @@ function EventPage({ eventId }: Props) {
 
 ### TanStack Query Error Handling
 
-```typescript
-import { useQuery } from '@tanstack/react-query'
-
-function useEvent(eventId: string) {
-  return useQuery({
-    queryKey: ['events', eventId],
-    queryFn: () => fetchEvent(eventId),
-    // Built-in error handling
-    retry: 3,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-  })
-}
-
-// In component
-function EventPage({ eventId }: Props) {
-  const { data, isLoading, error } = useEvent(eventId)
-
-  if (isLoading) return <Spinner />
-
-  if (error) {
-    return (
-      <ErrorMessage
-        title="Failed to load event"
-        message={error instanceof Error ? error.message : 'Unknown error'}
-      />
-    )
-  }
-
-  return <EventDetails event={data} />
-}
-```
+TanStack Query has built-in retry and error handling. Access errors via `const { error } = useQuery(...)`.
 
 ### Error Boundaries (React)
 
-```typescript
-// app/error.tsx (TanStack Start)
-// app/error.tsx (Next.js)
-
-'use client' // Required for error boundaries
-
-export default function Error({
-  error,
-  reset,
-}: {
-  error: Error & { digest?: string }
-  reset: () => void
-}) {
-  useEffect(() => {
-    // Log error to error reporting service
-    console.error('Error boundary caught:', error)
-  }, [error])
-
-  return (
-    <div className="error-page">
-      <h2>Something went wrong!</h2>
-      <p>We apologize for the inconvenience.</p>
-      <button onClick={reset}>Try again</button>
-    </div>
-  )
-}
-```
+Create `app/error.tsx` with `Error` component for catching rendering errors.
 
 ### Global Error Handler
 
@@ -371,75 +315,17 @@ useEffect(() => {
 
 ### Error Message Template
 
-```typescript
-interface UserError {
-  title: string        // Short, descriptive title
-  message: string      // Clear explanation
-  action?: string      // What user can do
-  code?: string        // Error code for support
-}
-
-function createUserError(error: unknown): UserError {
-  if (error instanceof z.ZodError) {
-    return {
-      title: 'Validation Error',
-      message: formatZodErrors(error),
-      action: 'Please correct the highlighted fields and try again.',
-    }
-  }
-
-  if (error instanceof FirebaseError) {
-    if (error.code === 'permission-denied') {
-      return {
-        title: 'Permission Denied',
-        message: 'You don\'t have permission to perform this action.',
-        action: 'Contact your administrator if you believe this is incorrect.',
-        code: error.code,
-      }
-    }
-  }
-
-  return {
-    title: 'Unexpected Error',
-    message: 'Something went wrong. Please try again.',
-    action: 'If the problem persists, contact support.',
-  }
-}
-```
+Use `UserError` interface with `title`, `message`, `action`, and `code` fields. Map technical errors to user-friendly messages.
 
 ## Error Logging
 
-### ✅ DO: Log Errors Appropriately
+### ✅ DO: Log Errors with Context
 
-```typescript
-// Client-side
-console.error('Client error:', {
-  error: error instanceof Error ? error.message : error,
-  stack: error instanceof Error ? error.stack : undefined,
-  userId: currentUser?.id,
-  context: 'EventPage.handleSubmit',
-})
-
-// Server-side (Firebase Functions)
-import { logger } from 'firebase-functions/v2'
-
-logger.error('Server error', {
-  error: error instanceof Error ? error.message : String(error),
-  stack: error instanceof Error ? error.stack : undefined,
-  functionName: 'processMedia',
-  input: sanitizedInput, // Remove sensitive data
-})
-```
+Log error message, stack, user context, and operation context. Use `logger.error()` in Firebase Functions.
 
 ### ❌ DON'T: Log Sensitive Information
 
-```typescript
-// ❌ Bad - logs user password
-logger.error('Login failed', { email, password })
-
-// ✅ Good - no sensitive data
-logger.error('Login failed', { email, reason: 'Invalid credentials' })
-```
+Never log passwords, tokens, or sensitive user data.
 
 ## Best Practices Summary
 

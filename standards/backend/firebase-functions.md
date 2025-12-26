@@ -87,23 +87,7 @@ const db = getFirestore()
 const storage = getStorage()
 ```
 
-### ❌ DON'T: Use Global Namespace
-
-```typescript
-// ❌ Incorrect - Global namespace (causes issues)
-import * as admin from 'firebase-admin'
-
-admin.initializeApp()
-const db = admin.firestore()
-const storage = admin.storage()
-const FieldValue = admin.firestore.FieldValue // Can be undefined!
-```
-
-**Why modular API:**
-- Better tree-shaking and smaller bundles
-- More reliable in emulator environment
-- Avoids module loading issues with `FieldValue` and other exports
-- Future-proof (Firebase's recommended approach)
+**Why modular API:** Better tree-shaking, emulator reliability, avoids module loading issues (e.g., `FieldValue` undefined with global namespace).
 
 ### Centralized Initialization
 
@@ -394,19 +378,7 @@ pnpm functions:seed
 
 ### Unit Testing
 
-See `testing/testing.md` for Vitest setup guidance for functions.
-
-**Mock Firebase Admin:**
-```typescript
-import { vi } from 'vitest'
-
-vi.mock('firebase-admin/firestore', () => ({
-  getFirestore: vi.fn(() => ({
-    collection: vi.fn(),
-    doc: vi.fn(),
-  })),
-}))
-```
+See `testing/testing.md` for Vitest setup and Firebase mocking patterns.
 
 ### Manual Testing
 
