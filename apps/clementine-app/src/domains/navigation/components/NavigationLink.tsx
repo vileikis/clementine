@@ -9,7 +9,12 @@ interface NavigationLinkProps {
   isCollapsed: boolean
 }
 
-export function NavigationLink({ label, href, icon, isCollapsed }: NavigationLinkProps) {
+export function NavigationLink({
+  label,
+  href,
+  icon,
+  isCollapsed,
+}: NavigationLinkProps) {
   const Icon = icon
 
   return (
