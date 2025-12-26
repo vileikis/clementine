@@ -1,8 +1,8 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState } from 'react'
-import {  getAuth, onIdTokenChanged } from 'firebase/auth'
-import type {User} from 'firebase/auth';
+import { getAuth, onIdTokenChanged } from 'firebase/auth'
+import type { User } from 'firebase/auth'
 import type { AuthState, TypedIdTokenResult } from '../types/auth.types'
 
 const AuthContext = createContext<AuthState | null>(null)

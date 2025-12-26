@@ -2,6 +2,24 @@ Welcome to your new TanStack app!
 
 # Getting Started
 
+## Environment Setup
+
+Before running the application, create a `.env.local` file in the root of this directory with your Firebase configuration:
+
+```env
+# Firebase Configuration
+VITE_FIREBASE_API_KEY=your-api-key
+VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your-project-id
+VITE_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+VITE_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
+VITE_FIREBASE_APP_ID=your-app-id
+```
+
+You can find these values in Firebase Console → Project Settings → General → Your apps → Web app.
+
+## Running the Application
+
 To run this application:
 
 ```bash
