@@ -1,4 +1,5 @@
 import { LogOut, Menu } from 'lucide-react'
+import { useParams } from '@tanstack/react-router'
 import { useSidebarState } from '../hooks'
 import { AdminNav } from './AdminNav'
 import { WorkspaceNav } from './WorkspaceNav'
@@ -15,10 +16,12 @@ const SIDEBAR_ANIMATION_DURATION = 200 // ms
 
 interface SidebarProps {
   area: RouteArea
-  workspaceId?: string
 }
 
-export function Sidebar({ area, workspaceId }: SidebarProps) {
+export function Sidebar({ area }: SidebarProps) {
+  // Get workspaceId from route params if in workspace area
+  const params = useParams({ strict: false })
+  const workspaceId = 'workspaceId' in params ? params.workspaceId : undefined
   const {
     isCollapsed,
     isMobileOpen,

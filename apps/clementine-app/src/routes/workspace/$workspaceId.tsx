@@ -1,6 +1,6 @@
 import { Navigate, createFileRoute } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/workspace/$workspaceId/')({
+export const Route = createFileRoute('/workspace/$workspaceId')({
   component: WorkspaceRedirect,
 })
 
