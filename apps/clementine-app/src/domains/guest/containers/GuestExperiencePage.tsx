@@ -1,14 +1,12 @@
-import { createFileRoute } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import { getAuth, signInAnonymously } from 'firebase/auth'
 import { useAuth } from '@/domains/auth'
 
-export const Route = createFileRoute('/guest/$projectId/')({
-  component: GuestPage,
-})
+interface GuestExperiencePageProps {
+  projectId: string
+}
 
-function GuestPage() {
-  const { projectId } = Route.useParams()
+export function GuestExperiencePage({ projectId }: GuestExperiencePageProps) {
   const auth = useAuth()
 
   // Automatically sign in anonymously if not authenticated
