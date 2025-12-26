@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as WorkspaceIndexRouteImport } from './routes/workspace/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as GuestProjectIdRouteImport } from './routes/guest/$projectId'
 import { Route as AdminWorkspacesRouteImport } from './routes/admin/workspaces'
@@ -21,6 +22,11 @@ import { Route as WorkspaceWorkspaceIdProjectsRouteImport } from './routes/works
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WorkspaceIndexRoute = WorkspaceIndexRouteImport.update({
+  id: '/workspace/',
+  path: '/workspace/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
@@ -68,6 +74,7 @@ export interface FileRoutesByFullPath {
   '/admin/workspaces': typeof AdminWorkspacesRoute
   '/guest/$projectId': typeof GuestProjectIdRoute
   '/admin': typeof AdminIndexRoute
+  '/workspace': typeof WorkspaceIndexRoute
   '/workspace/$workspaceId/projects': typeof WorkspaceWorkspaceIdProjectsRoute
   '/workspace/$workspaceId/settings': typeof WorkspaceWorkspaceIdSettingsRoute
   '/workspace/$workspaceId': typeof WorkspaceWorkspaceIdIndexRoute
@@ -78,6 +85,7 @@ export interface FileRoutesByTo {
   '/admin/workspaces': typeof AdminWorkspacesRoute
   '/guest/$projectId': typeof GuestProjectIdRoute
   '/admin': typeof AdminIndexRoute
+  '/workspace': typeof WorkspaceIndexRoute
   '/workspace/$workspaceId/projects': typeof WorkspaceWorkspaceIdProjectsRoute
   '/workspace/$workspaceId/settings': typeof WorkspaceWorkspaceIdSettingsRoute
   '/workspace/$workspaceId': typeof WorkspaceWorkspaceIdIndexRoute
@@ -89,6 +97,7 @@ export interface FileRoutesById {
   '/admin/workspaces': typeof AdminWorkspacesRoute
   '/guest/$projectId': typeof GuestProjectIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/workspace/': typeof WorkspaceIndexRoute
   '/workspace/$workspaceId/projects': typeof WorkspaceWorkspaceIdProjectsRoute
   '/workspace/$workspaceId/settings': typeof WorkspaceWorkspaceIdSettingsRoute
   '/workspace/$workspaceId/': typeof WorkspaceWorkspaceIdIndexRoute
@@ -101,6 +110,7 @@ export interface FileRouteTypes {
     | '/admin/workspaces'
     | '/guest/$projectId'
     | '/admin'
+    | '/workspace'
     | '/workspace/$workspaceId/projects'
     | '/workspace/$workspaceId/settings'
     | '/workspace/$workspaceId'
@@ -111,6 +121,7 @@ export interface FileRouteTypes {
     | '/admin/workspaces'
     | '/guest/$projectId'
     | '/admin'
+    | '/workspace'
     | '/workspace/$workspaceId/projects'
     | '/workspace/$workspaceId/settings'
     | '/workspace/$workspaceId'
@@ -121,6 +132,7 @@ export interface FileRouteTypes {
     | '/admin/workspaces'
     | '/guest/$projectId'
     | '/admin/'
+    | '/workspace/'
     | '/workspace/$workspaceId/projects'
     | '/workspace/$workspaceId/settings'
     | '/workspace/$workspaceId/'
@@ -132,6 +144,7 @@ export interface RootRouteChildren {
   AdminWorkspacesRoute: typeof AdminWorkspacesRoute
   GuestProjectIdRoute: typeof GuestProjectIdRoute
   AdminIndexRoute: typeof AdminIndexRoute
+  WorkspaceIndexRoute: typeof WorkspaceIndexRoute
   WorkspaceWorkspaceIdProjectsRoute: typeof WorkspaceWorkspaceIdProjectsRoute
   WorkspaceWorkspaceIdSettingsRoute: typeof WorkspaceWorkspaceIdSettingsRoute
   WorkspaceWorkspaceIdIndexRoute: typeof WorkspaceWorkspaceIdIndexRoute
@@ -144,6 +157,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/workspace/': {
+      id: '/workspace/'
+      path: '/workspace'
+      fullPath: '/workspace'
+      preLoaderRoute: typeof WorkspaceIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
@@ -204,6 +224,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminWorkspacesRoute: AdminWorkspacesRoute,
   GuestProjectIdRoute: GuestProjectIdRoute,
   AdminIndexRoute: AdminIndexRoute,
+  WorkspaceIndexRoute: WorkspaceIndexRoute,
   WorkspaceWorkspaceIdProjectsRoute: WorkspaceWorkspaceIdProjectsRoute,
   WorkspaceWorkspaceIdSettingsRoute: WorkspaceWorkspaceIdSettingsRoute,
   WorkspaceWorkspaceIdIndexRoute: WorkspaceWorkspaceIdIndexRoute,

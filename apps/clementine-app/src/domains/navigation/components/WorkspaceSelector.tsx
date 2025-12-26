@@ -1,11 +1,16 @@
 import { MOCK_WORKSPACES } from '../constants'
 import { getWorkspaceInitials } from '../lib'
+import { cn } from '@/shared/lib/utils'
 
 interface WorkspaceSelectorProps {
   workspaceId: string
+  isCollapsed: boolean
 }
 
-export function WorkspaceSelector({ workspaceId }: WorkspaceSelectorProps) {
+export function WorkspaceSelector({
+  workspaceId,
+  isCollapsed,
+}: WorkspaceSelectorProps) {
   const workspace = MOCK_WORKSPACES.find((w) => w.id === workspaceId)
   const initials = getWorkspaceInitials(workspace?.name)
 
@@ -16,8 +21,13 @@ export function WorkspaceSelector({ workspaceId }: WorkspaceSelectorProps) {
   return (
     <button
       onClick={handleClick}
-      className="flex items-center justify-center w-12 h-12 bg-slate-700 text-slate-50 rounded-md hover:bg-slate-600 active:bg-slate-500 font-semibold text-lg transition-colors"
+      className={cn(
+        'flex items-center justify-center rounded-md font-semibold text-lg transition-colors',
+        'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+        isCollapsed ? 'w-10 h-10' : 'w-12 h-12',
+      )}
       aria-label={`Current workspace: ${workspace?.name || 'Unknown'}`}
+      title={workspace?.name || 'Unknown workspace'}
     >
       {initials}
     </button>
