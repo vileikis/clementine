@@ -106,20 +106,20 @@ This document breaks down the Firebase Authentication & Authorization System imp
 
 **Tasks**:
 
-- [ ] T021 [US2] Create admin route file: apps/clementine-app/src/routes/admin/index.tsx
-- [ ] T022 [US2] Implement admin route guard (beforeLoad) checking isAdmin in apps/clementine-app/src/routes/admin/index.tsx
-- [ ] T023 [US2] Create AdminPage component (placeholder) in apps/clementine-app/src/routes/admin/index.tsx
-- [ ] T024 [P] [US2] Create workspace route file: apps/clementine-app/src/routes/workspace/index.tsx
-- [ ] T025 [P] [US2] Implement workspace route guard (beforeLoad) checking isAdmin in apps/clementine-app/src/routes/workspace/index.tsx
-- [ ] T026 [P] [US2] Create WorkspacePage component (placeholder) in apps/clementine-app/src/routes/workspace/index.tsx
-- [ ] T027 [US2] Create AuthGuard component (optional reusable guard) in apps/clementine-app/src/domains/auth/components/AuthGuard.tsx
+- [X] T021 [US2] Create admin route file: apps/clementine-app/src/routes/admin/index.tsx
+- [X] T022 [US2] Implement admin route guard (beforeLoad) checking isAdmin in apps/clementine-app/src/routes/admin/index.tsx
+- [X] T023 [US2] Create AdminPage component (placeholder) in apps/clementine-app/src/routes/admin/index.tsx
+- [X] T024 [P] [US2] Create workspace route file: apps/clementine-app/src/routes/workspace/index.tsx
+- [X] T025 [P] [US2] Implement workspace route guard (beforeLoad) checking isAdmin in apps/clementine-app/src/routes/workspace/index.tsx
+- [X] T026 [P] [US2] Create WorkspacePage component (placeholder) in apps/clementine-app/src/routes/workspace/index.tsx
+- [X] T027 [US2] Create AuthGuard component (optional reusable guard) in apps/clementine-app/src/domains/auth/components/AuthGuard.tsx
 - [ ] T028 [US2] Write unit test for admin route guard logic in apps/clementine-app/src/domains/auth/__tests__/AuthGuard.test.tsx
-- [ ] T029 [US2] Update Firestore security rules with admin claim check (request.auth.token.admin == true) in firestore.rules
+- [X] T029 [US2] Update Firestore security rules with admin claim check (request.auth.token.admin == true) in firestore.rules
 - [ ] T030 [US2] Test manual: Attempt /admin access with unauthenticated state, verify redirect to /login
 - [ ] T031 [US2] Test manual: Attempt /admin access with anonymous user, verify redirect to /login
 - [ ] T032 [US2] Test manual: Attempt /admin access with non-admin authenticated user, verify redirect to /login
 - [ ] T033 [US2] Test manual: Access /admin with admin user (mock custom claim), verify access granted
-- [ ] T034 [US2] Run validation loop: pnpm check && pnpm type-check in apps/clementine-app/
+- [X] T034 [US2] Run validation loop: pnpm check && pnpm type-check in apps/clementine-app/
 
 **Story Complete When**:
 - ✅ All unauthorized access attempts to `/admin` and `/workspace` are redirected to `/login` (SC-002)
@@ -144,18 +144,18 @@ This document breaks down the Firebase Authentication & Authorization System imp
 
 **Tasks**:
 
-- [ ] T035 [US3] Create login route file: apps/clementine-app/src/routes/login/index.tsx
-- [ ] T036 [US3] Implement Google OAuth sign-in flow with signInWithPopup in apps/clementine-app/src/routes/login/index.tsx
-- [ ] T037 [US3] Create LoginPage component with Google OAuth button in apps/clementine-app/src/domains/auth/components/LoginPage.tsx
-- [ ] T038 [US3] Implement redirect logic: admin users to /admin, non-admin users stay on /login in apps/clementine-app/src/routes/login/index.tsx
-- [ ] T039 [US3] Create WaitingMessage component for non-admin authenticated users in apps/clementine-app/src/domains/auth/components/WaitingMessage.tsx
-- [ ] T040 [US3] Add mobile-first styles (320px-768px viewport, 44x44px touch targets) to LoginPage component
+- [X] T035 [US3] Create login route file: apps/clementine-app/src/routes/login/index.tsx
+- [X] T036 [US3] Implement Google OAuth sign-in flow with signInWithPopup in apps/clementine-app/src/routes/login/index.tsx
+- [X] T037 [US3] Create LoginPage component with Google OAuth button in apps/clementine-app/src/domains/auth/components/LoginPage.tsx
+- [X] T038 [US3] Implement redirect logic: admin users to /admin, non-admin users stay on /login in apps/clementine-app/src/routes/login/index.tsx
+- [X] T039 [US3] Create WaitingMessage component for non-admin authenticated users in apps/clementine-app/src/domains/auth/components/WaitingMessage.tsx
+- [X] T040 [US3] Add mobile-first styles (320px-768px viewport, 44x44px touch targets) to LoginPage component
 - [ ] T041 [US3] Write unit test for login redirect logic in apps/clementine-app/src/domains/auth/__tests__/LoginPage.test.tsx
 - [ ] T042 [US3] Test manual: Visit /login unauthenticated, verify Google OAuth button appears
 - [ ] T043 [US3] Test manual: Sign in with Google as non-admin user, verify waiting message appears
 - [ ] T044 [US3] Test manual: Verify non-admin user can access /guest/test-project after login
 - [ ] T045 [US3] Test manual: Sign in as admin user, verify redirect to /admin
-- [ ] T046 [US3] Run validation loop: pnpm check && pnpm type-check in apps/clementine-app/
+- [X] T046 [US3] Run validation loop: pnpm check && pnpm type-check in apps/clementine-app/
 
 **Story Complete When**:
 - ✅ Google OAuth login works for all user types
