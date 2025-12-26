@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getWorkspaceInitials } from '@/domains/navigation'
+import { getWorkspaceInitials } from './getWorkspaceInitials'
 
 describe('getWorkspaceInitials', () => {
   it('returns single letter for single word', () => {
