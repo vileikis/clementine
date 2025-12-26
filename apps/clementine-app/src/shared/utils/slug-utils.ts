@@ -3,14 +3,14 @@
  * Used for URL-friendly company identifiers
  */
 
-const SLUG_LENGTH = { min: 1, max: 50 };
-const SLUG_PATTERN = /^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$/;
+const SLUG_LENGTH = { min: 1, max: 50 }
+const SLUG_PATTERN = /^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$/
 
 /**
  * Generate a short alphanumeric suffix for fallback slugs
  */
 function generateSuffix(): string {
-  return Math.random().toString(36).substring(2, 6);
+  return Math.random().toString(36).substring(2, 6)
 }
 
 /**
@@ -28,16 +28,16 @@ export function generateSlug(name: string): string {
   const slug = name
     .toLowerCase()
     .trim()
-    .replace(/[^a-z0-9]+/g, "-") // Replace non-alphanumeric with hyphens
-    .replace(/^-+|-+$/g, "") // Remove leading/trailing hyphens
-    .substring(0, SLUG_LENGTH.max); // Enforce max length
+    .replace(/[^a-z0-9]+/g, '-') // Replace non-alphanumeric with hyphens
+    .replace(/^-+|-+$/g, '') // Remove leading/trailing hyphens
+    .substring(0, SLUG_LENGTH.max) // Enforce max length
 
   // Fallback for empty or too-short slugs
   if (slug.length < SLUG_LENGTH.min) {
-    return `item-${generateSuffix()}`;
+    return `item-${generateSuffix()}`
   }
 
-  return slug;
+  return slug
 }
 
 /**
@@ -61,5 +61,5 @@ export function isValidSlug(slug: string): boolean {
     slug.length >= SLUG_LENGTH.min &&
     slug.length <= SLUG_LENGTH.max &&
     SLUG_PATTERN.test(slug)
-  );
+  )
 }
