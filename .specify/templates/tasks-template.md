@@ -157,16 +157,6 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] TXXX Security hardening
 - [ ] TXXX Run quickstart.md validation
 
-### Validation Loop (REQUIRED - Constitution Principle V)
-
-**Purpose**: Ensure code quality and correctness before merge
-
-- [ ] TXXX Run `pnpm lint` and fix all errors/warnings
-- [ ] TXXX Run `pnpm type-check` and resolve all TypeScript errors
-- [ ] TXXX Run `pnpm test` and ensure all tests pass
-- [ ] TXXX Verify feature in local dev server (`pnpm dev`)
-- [ ] TXXX Commit only after validation loop passes cleanly
-
 ---
 
 ## Dependencies & Execution Order
