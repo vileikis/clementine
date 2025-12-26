@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { MOCK_WORKSPACES, getWorkspaceInitials } from '@/domains/navigation'
+import { MOCK_WORKSPACES } from '../constants'
+import { getWorkspaceInitials } from '../lib'
 
 describe('WorkspaceSelector logic', () => {
   it('returns correct initials for valid workspace', () => {
