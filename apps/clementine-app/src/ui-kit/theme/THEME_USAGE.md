@@ -140,7 +140,7 @@ toast.custom((t) => (
 
 ## Dark Mode Support
 
-The theme system includes dark mode variants (defined in `src/styles.css`).
+The theme system includes dark mode variants (defined in `src/ui-kit/theme/styles.css`).
 
 To enable dark mode in the future:
 
@@ -157,7 +157,7 @@ import { ThemeProvider } from 'next-themes'
 
 ## Customizing Colors
 
-To change the color palette, edit `src/styles.css`:
+To change the color palette, edit `src/ui-kit/theme/styles.css`:
 
 ```css
 :root {

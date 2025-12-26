@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router'
 import { MOCK_WORKSPACES } from '../constants'
 import { getWorkspaceInitials } from '../lib'
 import { cn } from '@/shared/lib/utils'
@@ -13,9 +14,10 @@ export function WorkspaceSelector({
 }: WorkspaceSelectorProps) {
   const workspace = MOCK_WORKSPACES.find((w) => w.id === workspaceId)
   const initials = getWorkspaceInitials(workspace?.name)
+  const navigate = useNavigate()
 
   const handleClick = () => {
-    window.open('/admin/workspaces', '_blank')
+    navigate({ to: '/admin/workspaces' })
   }
 
   return (
