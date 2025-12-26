@@ -9,198 +9,226 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SplatRouteImport } from './routes/$'
+import { Route as WorkspaceRouteRouteImport } from './routes/workspace/route'
+import { Route as GuestRouteRouteImport } from './routes/guest/route'
+import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ShareIndexRouteImport } from './routes/share/index'
-import { Route as ShareSessionIdRouteImport } from './routes/share/$sessionId'
-import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
-import { Route as ApiTqTodosRouteImport } from './routes/api/tq-todos'
-import { Route as ApiNamesRouteImport } from './routes/api/names'
-import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs'
-import { Route as DemoStartApiRequestRouteImport } from './routes/demo/start.api-request'
-import { Route as DemoSentryTestingRouteImport } from './routes/demo/sentry.testing'
-import { Route as DemoStartSsrIndexRouteImport } from './routes/demo/start.ssr.index'
-import { Route as DemoStartSsrSpaModeRouteImport } from './routes/demo/start.ssr.spa-mode'
-import { Route as DemoStartSsrFullSsrRouteImport } from './routes/demo/start.ssr.full-ssr'
-import { Route as DemoStartSsrDataOnlyRouteImport } from './routes/demo/start.ssr.data-only'
+import { Route as WorkspaceIndexRouteImport } from './routes/workspace/index'
+import { Route as GuestIndexRouteImport } from './routes/guest/index'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as WorkspaceWorkspaceIdRouteImport } from './routes/workspace/$workspaceId'
+import { Route as GuestProjectIdRouteImport } from './routes/guest/$projectId'
+import { Route as AdminWorkspacesRouteImport } from './routes/admin/workspaces'
+import { Route as AdminDevToolsRouteImport } from './routes/admin/dev-tools'
+import { Route as WorkspaceWorkspaceIdSettingsRouteImport } from './routes/workspace/$workspaceId.settings'
+import { Route as WorkspaceWorkspaceIdProjectsRouteImport } from './routes/workspace/$workspaceId.projects'
 
+const SplatRoute = SplatRouteImport.update({
+  id: '/$',
+  path: '/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WorkspaceRouteRoute = WorkspaceRouteRouteImport.update({
+  id: '/workspace',
+  path: '/workspace',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuestRouteRoute = GuestRouteRouteImport.update({
+  id: '/guest',
+  path: '/guest',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRouteRoute = AdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ShareIndexRoute = ShareIndexRouteImport.update({
-  id: '/share/',
-  path: '/share/',
-  getParentRoute: () => rootRouteImport,
+const WorkspaceIndexRoute = WorkspaceIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => WorkspaceRouteRoute,
 } as any)
-const ShareSessionIdRoute = ShareSessionIdRouteImport.update({
-  id: '/share/$sessionId',
-  path: '/share/$sessionId',
-  getParentRoute: () => rootRouteImport,
+const GuestIndexRoute = GuestIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => GuestRouteRoute,
 } as any)
-const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
-  id: '/demo/tanstack-query',
-  path: '/demo/tanstack-query',
-  getParentRoute: () => rootRouteImport,
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRouteRoute,
 } as any)
-const ApiTqTodosRoute = ApiTqTodosRouteImport.update({
-  id: '/api/tq-todos',
-  path: '/api/tq-todos',
-  getParentRoute: () => rootRouteImport,
+const WorkspaceWorkspaceIdRoute = WorkspaceWorkspaceIdRouteImport.update({
+  id: '/$workspaceId',
+  path: '/$workspaceId',
+  getParentRoute: () => WorkspaceRouteRoute,
 } as any)
-const ApiNamesRoute = ApiNamesRouteImport.update({
-  id: '/api/names',
-  path: '/api/names',
-  getParentRoute: () => rootRouteImport,
+const GuestProjectIdRoute = GuestProjectIdRouteImport.update({
+  id: '/$projectId',
+  path: '/$projectId',
+  getParentRoute: () => GuestRouteRoute,
 } as any)
-const DemoStartServerFuncsRoute = DemoStartServerFuncsRouteImport.update({
-  id: '/demo/start/server-funcs',
-  path: '/demo/start/server-funcs',
-  getParentRoute: () => rootRouteImport,
+const AdminWorkspacesRoute = AdminWorkspacesRouteImport.update({
+  id: '/workspaces',
+  path: '/workspaces',
+  getParentRoute: () => AdminRouteRoute,
 } as any)
-const DemoStartApiRequestRoute = DemoStartApiRequestRouteImport.update({
-  id: '/demo/start/api-request',
-  path: '/demo/start/api-request',
-  getParentRoute: () => rootRouteImport,
+const AdminDevToolsRoute = AdminDevToolsRouteImport.update({
+  id: '/dev-tools',
+  path: '/dev-tools',
+  getParentRoute: () => AdminRouteRoute,
 } as any)
-const DemoSentryTestingRoute = DemoSentryTestingRouteImport.update({
-  id: '/demo/sentry/testing',
-  path: '/demo/sentry/testing',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoStartSsrIndexRoute = DemoStartSsrIndexRouteImport.update({
-  id: '/demo/start/ssr/',
-  path: '/demo/start/ssr/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoStartSsrSpaModeRoute = DemoStartSsrSpaModeRouteImport.update({
-  id: '/demo/start/ssr/spa-mode',
-  path: '/demo/start/ssr/spa-mode',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoStartSsrFullSsrRoute = DemoStartSsrFullSsrRouteImport.update({
-  id: '/demo/start/ssr/full-ssr',
-  path: '/demo/start/ssr/full-ssr',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoStartSsrDataOnlyRoute = DemoStartSsrDataOnlyRouteImport.update({
-  id: '/demo/start/ssr/data-only',
-  path: '/demo/start/ssr/data-only',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const WorkspaceWorkspaceIdSettingsRoute =
+  WorkspaceWorkspaceIdSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => WorkspaceWorkspaceIdRoute,
+  } as any)
+const WorkspaceWorkspaceIdProjectsRoute =
+  WorkspaceWorkspaceIdProjectsRouteImport.update({
+    id: '/projects',
+    path: '/projects',
+    getParentRoute: () => WorkspaceWorkspaceIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/api/names': typeof ApiNamesRoute
-  '/api/tq-todos': typeof ApiTqTodosRoute
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
-  '/share/$sessionId': typeof ShareSessionIdRoute
-  '/share': typeof ShareIndexRoute
-  '/demo/sentry/testing': typeof DemoSentryTestingRoute
-  '/demo/start/api-request': typeof DemoStartApiRequestRoute
-  '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
-  '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
-  '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
-  '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
-  '/demo/start/ssr': typeof DemoStartSsrIndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
+  '/guest': typeof GuestRouteRouteWithChildren
+  '/workspace': typeof WorkspaceRouteRouteWithChildren
+  '/$': typeof SplatRoute
+  '/admin/dev-tools': typeof AdminDevToolsRoute
+  '/admin/workspaces': typeof AdminWorkspacesRoute
+  '/guest/$projectId': typeof GuestProjectIdRoute
+  '/workspace/$workspaceId': typeof WorkspaceWorkspaceIdRouteWithChildren
+  '/admin/': typeof AdminIndexRoute
+  '/guest/': typeof GuestIndexRoute
+  '/workspace/': typeof WorkspaceIndexRoute
+  '/workspace/$workspaceId/projects': typeof WorkspaceWorkspaceIdProjectsRoute
+  '/workspace/$workspaceId/settings': typeof WorkspaceWorkspaceIdSettingsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/api/names': typeof ApiNamesRoute
-  '/api/tq-todos': typeof ApiTqTodosRoute
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
-  '/share/$sessionId': typeof ShareSessionIdRoute
-  '/share': typeof ShareIndexRoute
-  '/demo/sentry/testing': typeof DemoSentryTestingRoute
-  '/demo/start/api-request': typeof DemoStartApiRequestRoute
-  '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
-  '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
-  '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
-  '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
-  '/demo/start/ssr': typeof DemoStartSsrIndexRoute
+  '/$': typeof SplatRoute
+  '/admin/dev-tools': typeof AdminDevToolsRoute
+  '/admin/workspaces': typeof AdminWorkspacesRoute
+  '/guest/$projectId': typeof GuestProjectIdRoute
+  '/workspace/$workspaceId': typeof WorkspaceWorkspaceIdRouteWithChildren
+  '/admin': typeof AdminIndexRoute
+  '/guest': typeof GuestIndexRoute
+  '/workspace': typeof WorkspaceIndexRoute
+  '/workspace/$workspaceId/projects': typeof WorkspaceWorkspaceIdProjectsRoute
+  '/workspace/$workspaceId/settings': typeof WorkspaceWorkspaceIdSettingsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/api/names': typeof ApiNamesRoute
-  '/api/tq-todos': typeof ApiTqTodosRoute
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
-  '/share/$sessionId': typeof ShareSessionIdRoute
-  '/share/': typeof ShareIndexRoute
-  '/demo/sentry/testing': typeof DemoSentryTestingRoute
-  '/demo/start/api-request': typeof DemoStartApiRequestRoute
-  '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
-  '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
-  '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
-  '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
-  '/demo/start/ssr/': typeof DemoStartSsrIndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
+  '/guest': typeof GuestRouteRouteWithChildren
+  '/workspace': typeof WorkspaceRouteRouteWithChildren
+  '/$': typeof SplatRoute
+  '/admin/dev-tools': typeof AdminDevToolsRoute
+  '/admin/workspaces': typeof AdminWorkspacesRoute
+  '/guest/$projectId': typeof GuestProjectIdRoute
+  '/workspace/$workspaceId': typeof WorkspaceWorkspaceIdRouteWithChildren
+  '/admin/': typeof AdminIndexRoute
+  '/guest/': typeof GuestIndexRoute
+  '/workspace/': typeof WorkspaceIndexRoute
+  '/workspace/$workspaceId/projects': typeof WorkspaceWorkspaceIdProjectsRoute
+  '/workspace/$workspaceId/settings': typeof WorkspaceWorkspaceIdSettingsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/api/names'
-    | '/api/tq-todos'
-    | '/demo/tanstack-query'
-    | '/share/$sessionId'
-    | '/share'
-    | '/demo/sentry/testing'
-    | '/demo/start/api-request'
-    | '/demo/start/server-funcs'
-    | '/demo/start/ssr/data-only'
-    | '/demo/start/ssr/full-ssr'
-    | '/demo/start/ssr/spa-mode'
-    | '/demo/start/ssr'
+    | '/admin'
+    | '/guest'
+    | '/workspace'
+    | '/$'
+    | '/admin/dev-tools'
+    | '/admin/workspaces'
+    | '/guest/$projectId'
+    | '/workspace/$workspaceId'
+    | '/admin/'
+    | '/guest/'
+    | '/workspace/'
+    | '/workspace/$workspaceId/projects'
+    | '/workspace/$workspaceId/settings'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/api/names'
-    | '/api/tq-todos'
-    | '/demo/tanstack-query'
-    | '/share/$sessionId'
-    | '/share'
-    | '/demo/sentry/testing'
-    | '/demo/start/api-request'
-    | '/demo/start/server-funcs'
-    | '/demo/start/ssr/data-only'
-    | '/demo/start/ssr/full-ssr'
-    | '/demo/start/ssr/spa-mode'
-    | '/demo/start/ssr'
+    | '/$'
+    | '/admin/dev-tools'
+    | '/admin/workspaces'
+    | '/guest/$projectId'
+    | '/workspace/$workspaceId'
+    | '/admin'
+    | '/guest'
+    | '/workspace'
+    | '/workspace/$workspaceId/projects'
+    | '/workspace/$workspaceId/settings'
   id:
     | '__root__'
     | '/'
-    | '/api/names'
-    | '/api/tq-todos'
-    | '/demo/tanstack-query'
-    | '/share/$sessionId'
-    | '/share/'
-    | '/demo/sentry/testing'
-    | '/demo/start/api-request'
-    | '/demo/start/server-funcs'
-    | '/demo/start/ssr/data-only'
-    | '/demo/start/ssr/full-ssr'
-    | '/demo/start/ssr/spa-mode'
-    | '/demo/start/ssr/'
+    | '/admin'
+    | '/guest'
+    | '/workspace'
+    | '/$'
+    | '/admin/dev-tools'
+    | '/admin/workspaces'
+    | '/guest/$projectId'
+    | '/workspace/$workspaceId'
+    | '/admin/'
+    | '/guest/'
+    | '/workspace/'
+    | '/workspace/$workspaceId/projects'
+    | '/workspace/$workspaceId/settings'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ApiNamesRoute: typeof ApiNamesRoute
-  ApiTqTodosRoute: typeof ApiTqTodosRoute
-  DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
-  ShareSessionIdRoute: typeof ShareSessionIdRoute
-  ShareIndexRoute: typeof ShareIndexRoute
-  DemoSentryTestingRoute: typeof DemoSentryTestingRoute
-  DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
-  DemoStartServerFuncsRoute: typeof DemoStartServerFuncsRoute
-  DemoStartSsrDataOnlyRoute: typeof DemoStartSsrDataOnlyRoute
-  DemoStartSsrFullSsrRoute: typeof DemoStartSsrFullSsrRoute
-  DemoStartSsrSpaModeRoute: typeof DemoStartSsrSpaModeRoute
-  DemoStartSsrIndexRoute: typeof DemoStartSsrIndexRoute
+  AdminRouteRoute: typeof AdminRouteRouteWithChildren
+  GuestRouteRoute: typeof GuestRouteRouteWithChildren
+  WorkspaceRouteRoute: typeof WorkspaceRouteRouteWithChildren
+  SplatRoute: typeof SplatRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/$': {
+      id: '/$'
+      path: '/$'
+      fullPath: '/$'
+      preLoaderRoute: typeof SplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/workspace': {
+      id: '/workspace'
+      path: '/workspace'
+      fullPath: '/workspace'
+      preLoaderRoute: typeof WorkspaceRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guest': {
+      id: '/guest'
+      path: '/guest'
+      fullPath: '/guest'
+      preLoaderRoute: typeof GuestRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -208,107 +236,135 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/share/': {
-      id: '/share/'
-      path: '/share'
-      fullPath: '/share'
-      preLoaderRoute: typeof ShareIndexRouteImport
-      parentRoute: typeof rootRouteImport
+    '/workspace/': {
+      id: '/workspace/'
+      path: '/'
+      fullPath: '/workspace/'
+      preLoaderRoute: typeof WorkspaceIndexRouteImport
+      parentRoute: typeof WorkspaceRouteRoute
     }
-    '/share/$sessionId': {
-      id: '/share/$sessionId'
-      path: '/share/$sessionId'
-      fullPath: '/share/$sessionId'
-      preLoaderRoute: typeof ShareSessionIdRouteImport
-      parentRoute: typeof rootRouteImport
+    '/guest/': {
+      id: '/guest/'
+      path: '/'
+      fullPath: '/guest/'
+      preLoaderRoute: typeof GuestIndexRouteImport
+      parentRoute: typeof GuestRouteRoute
     }
-    '/demo/tanstack-query': {
-      id: '/demo/tanstack-query'
-      path: '/demo/tanstack-query'
-      fullPath: '/demo/tanstack-query'
-      preLoaderRoute: typeof DemoTanstackQueryRouteImport
-      parentRoute: typeof rootRouteImport
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
     }
-    '/api/tq-todos': {
-      id: '/api/tq-todos'
-      path: '/api/tq-todos'
-      fullPath: '/api/tq-todos'
-      preLoaderRoute: typeof ApiTqTodosRouteImport
-      parentRoute: typeof rootRouteImport
+    '/workspace/$workspaceId': {
+      id: '/workspace/$workspaceId'
+      path: '/$workspaceId'
+      fullPath: '/workspace/$workspaceId'
+      preLoaderRoute: typeof WorkspaceWorkspaceIdRouteImport
+      parentRoute: typeof WorkspaceRouteRoute
     }
-    '/api/names': {
-      id: '/api/names'
-      path: '/api/names'
-      fullPath: '/api/names'
-      preLoaderRoute: typeof ApiNamesRouteImport
-      parentRoute: typeof rootRouteImport
+    '/guest/$projectId': {
+      id: '/guest/$projectId'
+      path: '/$projectId'
+      fullPath: '/guest/$projectId'
+      preLoaderRoute: typeof GuestProjectIdRouteImport
+      parentRoute: typeof GuestRouteRoute
     }
-    '/demo/start/server-funcs': {
-      id: '/demo/start/server-funcs'
-      path: '/demo/start/server-funcs'
-      fullPath: '/demo/start/server-funcs'
-      preLoaderRoute: typeof DemoStartServerFuncsRouteImport
-      parentRoute: typeof rootRouteImport
+    '/admin/workspaces': {
+      id: '/admin/workspaces'
+      path: '/workspaces'
+      fullPath: '/admin/workspaces'
+      preLoaderRoute: typeof AdminWorkspacesRouteImport
+      parentRoute: typeof AdminRouteRoute
     }
-    '/demo/start/api-request': {
-      id: '/demo/start/api-request'
-      path: '/demo/start/api-request'
-      fullPath: '/demo/start/api-request'
-      preLoaderRoute: typeof DemoStartApiRequestRouteImport
-      parentRoute: typeof rootRouteImport
+    '/admin/dev-tools': {
+      id: '/admin/dev-tools'
+      path: '/dev-tools'
+      fullPath: '/admin/dev-tools'
+      preLoaderRoute: typeof AdminDevToolsRouteImport
+      parentRoute: typeof AdminRouteRoute
     }
-    '/demo/sentry/testing': {
-      id: '/demo/sentry/testing'
-      path: '/demo/sentry/testing'
-      fullPath: '/demo/sentry/testing'
-      preLoaderRoute: typeof DemoSentryTestingRouteImport
-      parentRoute: typeof rootRouteImport
+    '/workspace/$workspaceId/settings': {
+      id: '/workspace/$workspaceId/settings'
+      path: '/settings'
+      fullPath: '/workspace/$workspaceId/settings'
+      preLoaderRoute: typeof WorkspaceWorkspaceIdSettingsRouteImport
+      parentRoute: typeof WorkspaceWorkspaceIdRoute
     }
-    '/demo/start/ssr/': {
-      id: '/demo/start/ssr/'
-      path: '/demo/start/ssr'
-      fullPath: '/demo/start/ssr'
-      preLoaderRoute: typeof DemoStartSsrIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/start/ssr/spa-mode': {
-      id: '/demo/start/ssr/spa-mode'
-      path: '/demo/start/ssr/spa-mode'
-      fullPath: '/demo/start/ssr/spa-mode'
-      preLoaderRoute: typeof DemoStartSsrSpaModeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/start/ssr/full-ssr': {
-      id: '/demo/start/ssr/full-ssr'
-      path: '/demo/start/ssr/full-ssr'
-      fullPath: '/demo/start/ssr/full-ssr'
-      preLoaderRoute: typeof DemoStartSsrFullSsrRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/start/ssr/data-only': {
-      id: '/demo/start/ssr/data-only'
-      path: '/demo/start/ssr/data-only'
-      fullPath: '/demo/start/ssr/data-only'
-      preLoaderRoute: typeof DemoStartSsrDataOnlyRouteImport
-      parentRoute: typeof rootRouteImport
+    '/workspace/$workspaceId/projects': {
+      id: '/workspace/$workspaceId/projects'
+      path: '/projects'
+      fullPath: '/workspace/$workspaceId/projects'
+      preLoaderRoute: typeof WorkspaceWorkspaceIdProjectsRouteImport
+      parentRoute: typeof WorkspaceWorkspaceIdRoute
     }
   }
 }
 
+interface AdminRouteRouteChildren {
+  AdminDevToolsRoute: typeof AdminDevToolsRoute
+  AdminWorkspacesRoute: typeof AdminWorkspacesRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminDevToolsRoute: AdminDevToolsRoute,
+  AdminWorkspacesRoute: AdminWorkspacesRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
+  AdminRouteRouteChildren,
+)
+
+interface GuestRouteRouteChildren {
+  GuestProjectIdRoute: typeof GuestProjectIdRoute
+  GuestIndexRoute: typeof GuestIndexRoute
+}
+
+const GuestRouteRouteChildren: GuestRouteRouteChildren = {
+  GuestProjectIdRoute: GuestProjectIdRoute,
+  GuestIndexRoute: GuestIndexRoute,
+}
+
+const GuestRouteRouteWithChildren = GuestRouteRoute._addFileChildren(
+  GuestRouteRouteChildren,
+)
+
+interface WorkspaceWorkspaceIdRouteChildren {
+  WorkspaceWorkspaceIdProjectsRoute: typeof WorkspaceWorkspaceIdProjectsRoute
+  WorkspaceWorkspaceIdSettingsRoute: typeof WorkspaceWorkspaceIdSettingsRoute
+}
+
+const WorkspaceWorkspaceIdRouteChildren: WorkspaceWorkspaceIdRouteChildren = {
+  WorkspaceWorkspaceIdProjectsRoute: WorkspaceWorkspaceIdProjectsRoute,
+  WorkspaceWorkspaceIdSettingsRoute: WorkspaceWorkspaceIdSettingsRoute,
+}
+
+const WorkspaceWorkspaceIdRouteWithChildren =
+  WorkspaceWorkspaceIdRoute._addFileChildren(WorkspaceWorkspaceIdRouteChildren)
+
+interface WorkspaceRouteRouteChildren {
+  WorkspaceWorkspaceIdRoute: typeof WorkspaceWorkspaceIdRouteWithChildren
+  WorkspaceIndexRoute: typeof WorkspaceIndexRoute
+}
+
+const WorkspaceRouteRouteChildren: WorkspaceRouteRouteChildren = {
+  WorkspaceWorkspaceIdRoute: WorkspaceWorkspaceIdRouteWithChildren,
+  WorkspaceIndexRoute: WorkspaceIndexRoute,
+}
+
+const WorkspaceRouteRouteWithChildren = WorkspaceRouteRoute._addFileChildren(
+  WorkspaceRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ApiNamesRoute: ApiNamesRoute,
-  ApiTqTodosRoute: ApiTqTodosRoute,
-  DemoTanstackQueryRoute: DemoTanstackQueryRoute,
-  ShareSessionIdRoute: ShareSessionIdRoute,
-  ShareIndexRoute: ShareIndexRoute,
-  DemoSentryTestingRoute: DemoSentryTestingRoute,
-  DemoStartApiRequestRoute: DemoStartApiRequestRoute,
-  DemoStartServerFuncsRoute: DemoStartServerFuncsRoute,
-  DemoStartSsrDataOnlyRoute: DemoStartSsrDataOnlyRoute,
-  DemoStartSsrFullSsrRoute: DemoStartSsrFullSsrRoute,
-  DemoStartSsrSpaModeRoute: DemoStartSsrSpaModeRoute,
-  DemoStartSsrIndexRoute: DemoStartSsrIndexRoute,
+  AdminRouteRoute: AdminRouteRouteWithChildren,
+  GuestRouteRoute: GuestRouteRouteWithChildren,
+  WorkspaceRouteRoute: WorkspaceRouteRouteWithChildren,
+  SplatRoute: SplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
