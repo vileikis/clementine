@@ -1,118 +1,237 @@
 # Development Standards
 
-This directory contains development standards and best practices for the Clementine TanStack Start application.
+This directory contains development standards and best practices for the Clementine monorepo.
 
-## 📋 Overview
+## Overview
 
-These standards ensure consistency, maintainability, and quality across the codebase. All developers and AI agents working on this project **MUST** read and follow these standards before making any changes.
+These standards ensure consistency, maintainability, and quality across all workspaces. All developers and AI agents working on this project **MUST** read and follow these standards before making any changes.
 
-## 📁 Standards Organization
+**Philosophy:** Principles over prescriptions. Standards focus on "why" and best practices, with minimal code examples.
 
-Standards are organized by scope:
+## Standards Organization
 
-### `global/`
+### `global/` - Cross-Cutting Concerns
 
 **Always applicable** - standards that apply to all code, regardless of context.
 
-- **[Project Structure](global/project-structure.md)** - Directory organization, DDD principles, module architecture
-- **[Client-First Architecture](global/client-first-architecture.md)** - Firebase client SDK usage, SSR strategy, security model
-- **[Code Quality](global/code-quality.md)** - TypeScript, ESLint, Prettier, code style conventions
-- **[Security](global/security.md)** - Firebase security rules, authentication, input validation
+| Standard | Description |
+|----------|-------------|
+| **[Code Quality](global/code-quality.md)** | TypeScript, ESLint, Prettier, strict mode |
+| **[Coding Style](global/coding-style.md)** | Naming conventions, imports, formatting |
+| **[Error Handling](global/error-handling.md)** | Type-safe errors, user messaging, logging |
+| **[Security](global/security.md)** | Firebase security, authentication, input validation |
+| **[Zod Validation](global/zod-validation.md)** | Schema validation, Firestore vs generic patterns |
 
-### `frontend/`
+### `frontend/` - TanStack Start Application
 
-**UI/UX work** - standards for frontend development.
+**UI/UX work** - standards for building the TanStack Start frontend.
 
-- **[Component Libraries](frontend/component-libraries.md)** - shadcn/ui, Radix UI, @dnd-kit usage and patterns
-- **[Accessibility](frontend/accessibility.md)** - WCAG 2.1 compliance, semantic HTML, ARIA, keyboard navigation
-- **[Performance](frontend/performance.md)** - SSR optimization, code splitting, TanStack Query, image optimization
+| Standard | Description |
+|----------|-------------|
+| **[Architecture](frontend/architecture.md)** | Client-first Firebase approach, SSR strategy |
+| **[Component Libraries](frontend/component-libraries.md)** | shadcn/ui, Radix UI, @dnd-kit usage |
+| **[Routing](frontend/routing.md)** | TanStack Router patterns, file-based routing |
+| **[State Management](frontend/state-management.md)** | Zustand, client state, server state separation |
+| **[Accessibility](frontend/accessibility.md)** | WCAG 2.1 compliance, semantic HTML, ARIA |
+| **[Performance](frontend/performance.md)** | SSR optimization, code splitting, lazy loading |
 
-### `testing/`
+### `backend/` - Firebase Backend Services
 
-**Test implementation** - standards for writing tests.
+**Backend work** - standards for Firestore and Cloud Functions.
 
-- **[Testing Overview](testing/overview.md)** - Vitest, Testing Library, component tests, mocking patterns
+| Standard | Description |
+|----------|-------------|
+| **[Firestore](backend/firestore.md)** | Collections, data model, queries, indexes |
+| **[Firestore Security](backend/firestore-security.md)** | Security rules, access control patterns |
+| **[Firebase Functions](backend/firebase-functions.md)** | Cloud Functions design, structure, media pipeline |
 
-## 🚀 Getting Started
+### `testing/` - Testing Practices
+
+**Test implementation** - standards for writing tests across all workspaces.
+
+| Standard | Description |
+|----------|-------------|
+| **[Testing](testing/testing.md)** | Vitest, Testing Library, mocking patterns |
+
+## Quick Start
 
 ### Before Making Any Changes
 
-1. **Read `global/project-structure.md`** - Understand the architecture
-2. **Review relevant standards** - Check standards for your task area
-3. **Follow patterns strictly** - Consistency is critical
+1. **Identify your work area:**
+   - Frontend feature? → Read `frontend/` standards
+   - Backend API? → Read `backend/` standards
+   - Testing? → Read `testing/testing.md`
 
-### Quick Reference
+2. **Always read `global/` standards:**
+   - Code quality and style
+   - Error handling
+   - Validation patterns
+   - Security principles
 
-**Working on architecture?** → `global/project-structure.md` + `global/client-first-architecture.md`
+3. **Follow patterns strictly** - consistency is critical
 
-**Building UI components?** → `frontend/component-libraries.md` + `frontend/accessibility.md`
+### Quick Reference by Task
 
-**Optimizing performance?** → `frontend/performance.md`
+| Task | Standards to Review |
+|------|---------------------|
+| **New TanStack feature** | `frontend/architecture.md`, `frontend/routing.md`, `global/code-quality.md` |
+| **UI components** | `frontend/component-libraries.md`, `frontend/accessibility.md` |
+| **Firestore queries** | `backend/firestore.md`, `backend/firestore-security.md` |
+| **Cloud Functions** | `backend/firebase-functions.md`, `global/error-handling.md` |
+| **Form validation** | `global/zod-validation.md`, `global/error-handling.md` |
+| **Writing tests** | `testing/testing.md` |
+| **Code review** | `global/code-quality.md`, `global/security.md` |
 
-**Writing tests?** → `testing/overview.md`
+## Core Principles
 
-**Code review checklist?** → `global/code-quality.md` + `global/security.md`
+### 1. Client-First Architecture (Frontend)
 
-## 🎯 Core Principles
+- Firebase client SDKs for all data operations
+- Real-time subscriptions with Firestore listeners
+- Minimal server-side code
+- Security enforced by Firebase rules
 
-### 1. Domain-Driven Design
+**See:** `frontend/architecture.md`
 
-- Organize code by business domains, not technical layers
-- Minimize cross-domain dependencies
-- Use clear, domain-specific language
+### 2. Domain-Driven Design (Frontend)
 
-### 2. Separation of Concerns
+- Organize by business domain, not technical layer
+- Thin routes, thick domains
+- Co-located components, hooks, and services
 
-- `ui-kit/` - Pure design system
-- `integrations/` - Third-party services
-- `shared/` - Shared utilities
-- `domains/` - Business logic
-- `routes/` - Thin routing layer
+**See:** `global/project-structure.md` (in app-specific CLAUDE.md)
 
-### 3. Progressive Complexity
+### 3. Type Safety Everywhere
 
-- Start simple, add structure as needed
-- Don't create abstractions for one-off code
-- Only extract to `shared/` when used by 2+ domains
+- TypeScript strict mode enabled
+- Zod validation for all inputs
+- No `any` types
+- Explicit error handling
 
-### 4. Explicit Over Implicit
+**See:** `global/code-quality.md`, `global/zod-validation.md`
 
-- Clear import paths with TypeScript aliases
-- Explicit dependencies
-- Well-named files and folders
+### 4. Firestore-Safe Patterns
 
-## 📚 Standards Status
+- Use `.nullable().default(null)` for optional fields
+- Never allow `undefined` values
+- Use `passthrough()` for schema evolution
+- Flat collection design
 
-| Standard                      | Status      | Description                                       |
-| ----------------------------- | ----------- | ------------------------------------------------- |
-| **Project Structure**         | ✅ Complete | Directory organization and DDD principles         |
-| **Client-First Architecture** | ✅ Complete | Firebase client SDK, SSR strategy, security model |
-| **Code Quality**              | ✅ Complete | TypeScript, ESLint, Prettier, conventions         |
-| **Security**                  | ✅ Complete | Firebase rules, auth, input validation            |
-| **Component Libraries**       | ✅ Complete | shadcn/ui, Radix UI, @dnd-kit patterns            |
-| **Accessibility**             | ✅ Complete | WCAG compliance, semantic HTML, ARIA              |
-| **Performance**               | ✅ Complete | SSR, code splitting, optimization                 |
-| **Testing**                   | ✅ Complete | Vitest, Testing Library, mocking                  |
+**See:** `global/zod-validation.md`, `backend/firestore.md`
 
-## 🔄 Standards Evolution
+### 5. Accessibility First
+
+- WCAG 2.1 AA compliance
+- Semantic HTML
+- Keyboard navigation
+- Screen reader support
+
+**See:** `frontend/accessibility.md`
+
+### 6. Testing for Confidence
+
+- Vitest across all workspaces
+- Test user behavior, not implementation
+- Mock Firebase appropriately
+- Meaningful test names
+
+**See:** `testing/testing.md`
+
+## Standards Evolution
 
 These standards are living documents. As the project grows and we learn, standards will be updated to reflect best practices.
 
-### Updating Standards
-
-When proposing changes to standards:
+### Proposing Changes
 
 1. Discuss with the team
 2. Update relevant documentation
-3. Ensure existing code still aligns (or refactor)
+3. Ensure existing code still aligns (or plan refactor)
 4. Update this README if adding new standards
 
-## ❓ Questions?
+### Version History
 
-If you're unsure about how to apply these standards:
+**v2.0.0** - 2024-12-26
+- Reorganized for monorepo structure
+- Added backend/ folder for Firestore and Functions
+- Renamed validation.md → zod-validation.md with Firestore patterns
+- Added coding-style.md and error-handling.md to global/
+- Moved client-first-architecture.md → frontend/architecture.md
+- Added routing.md and state-management.md to frontend/
+- Renamed testing/overview.md → testing/testing.md with Vitest guidance
+- Focus on principles over code examples
 
-1. Check existing code for patterns
-2. Review the specific standard in detail
-3. Ask the team for clarification
+**v1.0.0** - 2024-12-23
+- Initial standards for TanStack Start app
 
-Remember: **Consistency is more important than perfection.** When in doubt, follow existing patterns.
+## Workspace-Specific Notes
+
+### TanStack Start App (`apps/clementine-app/`)
+
+**Primary application** - new development happens here.
+
+**Key standards:**
+- `frontend/` - All frontend standards apply
+- `global/` - All global standards apply
+- `testing/testing.md` - Vitest already configured
+
+### Firebase Functions (`functions/`)
+
+**Backend services** - AI processing, media pipeline.
+
+**Key standards:**
+- `backend/firebase-functions.md` - Function design patterns
+- `backend/firestore.md` - Data access patterns
+- `global/zod-validation.md` - Input validation
+- `testing/testing.md` - Add Vitest for testing
+
+### Next.js App (`web/`)
+
+**Legacy application** - being deprecated, do not add new features.
+
+See `web/standards/` for legacy-specific standards.
+
+## Frequently Asked Questions
+
+### Why separate Firestore and Firestore Security?
+
+- **firestore.md** - Data modeling, queries, client/admin SDK usage
+- **firestore-security.md** - Security rules, access control, authentication
+
+Different concerns, different audiences.
+
+### Why Zod-specific validation standard?
+
+Zod is used everywhere (frontend, backend, schemas). Having dedicated guidance ensures:
+- Consistent patterns across workspaces
+- Clear Firestore-safe vs generic TypeScript patterns
+- Single source of truth for validation
+
+### Do I need to read all standards?
+
+No! Read based on your task:
+- Always read relevant `global/` standards
+- Read domain-specific standards (`frontend/`, `backend/`)
+- Reference others as needed
+
+### What if I disagree with a standard?
+
+1. Discuss with the team
+2. Propose alternative with rationale
+3. Update standard if team agrees
+4. Consistency > personal preference
+
+## Getting Help
+
+1. **Check standards** - Review relevant standards first
+2. **Check existing code** - Look for similar patterns in the codebase
+3. **Ask the team** - When in doubt, discuss with the team
+
+## Remember
+
+**Three golden rules:**
+
+1. **Read before you code** - Check relevant standards first
+2. **Consistency over cleverness** - Follow established patterns
+3. **Principles over prescriptions** - Understand the "why", not just the "how"
+
+**Consistency is key.** These standards exist to maintain a high-quality, maintainable codebase. When in doubt, follow the patterns you see in existing code.
