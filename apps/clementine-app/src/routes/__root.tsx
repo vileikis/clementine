@@ -8,7 +8,7 @@ import {
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
-import appCss from '../styles.css?url'
+import appCss from '../shared/theme/styles.css?url'
 import type { QueryClient } from '@tanstack/react-query'
 import type { RouteArea } from '@/domains/navigation'
 import { Sidebar } from '@/domains/navigation'
