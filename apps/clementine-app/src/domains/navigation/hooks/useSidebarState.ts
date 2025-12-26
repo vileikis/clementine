@@ -1,19 +1,26 @@
 import { useCallback, useState } from 'react'
 
 export function useSidebarState() {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isCollapsed, setIsCollapsed] = useState(false)
+  const [isMobileOpen, setIsMobileOpen] = useState(false)
 
-  const toggle = useCallback(() => {
-    setIsOpen((prev) => !prev)
+  const toggleCollapsed = useCallback(() => {
+    setIsCollapsed((prev) => !prev)
   }, [])
 
-  const open = useCallback(() => {
-    setIsOpen(true)
+  const toggleMobileOpen = useCallback(() => {
+    setIsMobileOpen((prev) => !prev)
   }, [])
 
-  const close = useCallback(() => {
-    setIsOpen(false)
+  const closeMobile = useCallback(() => {
+    setIsMobileOpen(false)
   }, [])
 
-  return { isOpen, toggle, open, close }
+  return {
+    isCollapsed,
+    isMobileOpen,
+    toggleCollapsed,
+    toggleMobileOpen,
+    closeMobile,
+  }
 }

@@ -61,11 +61,11 @@ function RootLayout() {
       : undefined
 
   return (
-    <div className="flex min-h-screen bg-slate-900">
+    <div className="flex min-h-screen bg-background">
+      <Sidebar area={area} workspaceId={workspaceId} />
       <main className="flex-1">
         <Outlet />
       </main>
-      <Sidebar area={area} workspaceId={workspaceId} />
     </div>
   )
 }
