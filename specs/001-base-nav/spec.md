@@ -61,18 +61,18 @@ A guest user visiting a project link needs a clean, distraction-free interface w
 
 ---
 
-### User Story 4 - Logout Functionality (Priority: P2)
+### User Story 4 - Logout UI Placeholder (Priority: P3)
 
-Users need a consistent way to sign out from any authenticated area of the application.
+Users need to see where the logout functionality will be located in the navigation interface.
 
-**Why this priority**: Security feature that's important but not blocking for initial navigation structure testing. Can be implemented after base navigation is working.
+**Why this priority**: This is a UI placeholder only since authentication is out of scope for this phase. It establishes the visual structure but doesn't need to be functional yet.
 
-**Independent Test**: Can be fully tested by clicking the logout button in the sidebar and verifying the user is signed out. Works independently across both admin and workspace areas.
+**Independent Test**: Can be fully tested by verifying the logout button appears in the correct position in the sidebar. No actual authentication logic needed.
 
 **Acceptance Scenarios**:
 
 1. **Given** the sidebar is open on /admin or /workspace pages, **When** the user views the sidebar, **Then** they see a logout button at the bottom
-2. **Given** the sidebar is open, **When** the user clicks the logout button, **Then** they are signed out and redirected to the login page
+2. **Given** the sidebar is open, **When** the user clicks the logout button, **Then** the button shows a visual response (e.g., hover state) but no authentication action occurs
 
 ---
 
@@ -81,9 +81,10 @@ Users need a consistent way to sign out from any authenticated area of the appli
 - What happens when a user navigates directly to /admin without a trailing route (should redirect to /admin/workspaces)?
 - What happens when a user navigates directly to /workspace/[workspaceId] without a trailing route (should redirect to /workspace/[workspaceId]/projects)?
 - What happens when workspace name has only one word (display single capitalized letter)?
-- What happens when workspace name is empty or null (should display a fallback identifier)?
+- What happens when workspace name is empty or null (should display a fallback identifier - e.g., "?")?
 - How does the sidebar behave on mobile/narrow viewports?
-- What happens when navigating between different workspace IDs (sidebar should update workspace selector)?
+- What happens when navigating between different workspace IDs (sidebar should update workspace selector using mock data)?
+- What happens when a workspaceId in the URL doesn't match any mock workspace data (should display fallback or show error state)?
 
 ## Requirements *(mandatory)*
 
@@ -93,16 +94,17 @@ Users need a consistent way to sign out from any authenticated area of the appli
 - **FR-002**: System MUST display a collapsible sidebar navigation on all /admin and /workspace routes
 - **FR-003**: System MUST NOT display any sidebar navigation on /guest routes
 - **FR-004**: Sidebar MUST include a hamburger icon at the top for toggling open/closed state
-- **FR-005**: Sidebar MUST include a logout button at the bottom (on /admin and /workspace routes)
+- **FR-005**: Sidebar MUST include a logout button placeholder at the bottom (visual only, no authentication logic required)
 - **FR-006**: Admin sidebar MUST display two navigation items: "Workspaces" and "Dev Tools"
 - **FR-007**: Workspace sidebar MUST display a workspace selector followed by two navigation items: "Projects" and "Settings"
 - **FR-008**: Workspace selector MUST display workspace initials calculated as the first letter of the first two words in the workspace name, capitalized (e.g., "Acme" → "A", "Acme Inc" → "AI", "Acme Corporation Inc" → "AC")
-- **FR-009**: Workspace selector MUST open /admin/workspaces in a new tab when clicked
-- **FR-010**: System MUST redirect /admin to /admin/workspaces as the default route
-- **FR-011**: System MUST redirect /workspace/[workspaceId] to /workspace/[workspaceId]/projects as the default route
-- **FR-012**: All placeholder pages MUST display "WIP" text instead of real content
-- **FR-013**: System MUST apply monochrome styling to the navigation interface
-- **FR-014**: System MUST remove the existing home page that is no longer relevant
+- **FR-009**: Workspace selector MUST use mock workspace data (hardcoded workspace names for testing workspace selector logic)
+- **FR-010**: Workspace selector MUST open /admin/workspaces in a new tab when clicked
+- **FR-011**: System MUST redirect /admin to /admin/workspaces as the default route
+- **FR-012**: System MUST redirect /workspace/[workspaceId] to /workspace/[workspaceId]/projects as the default route
+- **FR-013**: All placeholder pages MUST display "WIP" text instead of real content
+- **FR-014**: System MUST apply monochrome styling to the navigation interface
+- **FR-015**: System MUST remove the existing home page that is no longer relevant
 
 ### Key Entities
 
@@ -120,3 +122,16 @@ Users need a consistent way to sign out from any authenticated area of the appli
 - **SC-004**: Sidebar toggle animation completes within 300ms for smooth user experience
 - **SC-005**: All WIP placeholder pages load and display within 1 second
 - **SC-006**: Navigation state persists correctly when moving between different workspace IDs (workspace selector updates appropriately)
+
+## Out of Scope
+
+The following items are explicitly **not included** in this feature:
+
+- **Authentication System**: No login, logout, or session management logic. The logout button is a visual placeholder only.
+- **Real Data Fetching**: No integration with Firebase or any backend services. All workspace information uses hardcoded mock data.
+- **User Permissions**: No role-based access control or permission checks.
+- **Workspace Management**: No ability to create, edit, or delete workspaces. Use predefined mock workspace data.
+- **Project Management**: No ability to create, edit, or delete projects.
+- **Real Content**: All pages show "WIP" placeholder text instead of functional content.
+
+**Rationale**: This feature establishes the navigation structure and visual framework only. Authentication, data fetching, and business logic will be added in subsequent features.
