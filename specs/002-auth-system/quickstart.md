@@ -37,14 +37,14 @@ pnpm add firebase-admin
 
 ### 2. Initialize Firebase Auth
 
-Create `src/integrations/firebase/auth/AuthProvider.tsx`:
+Create `src/domains/auth/providers/AuthProvider.tsx`:
 
 ```typescript
 'use client'
 
 import { createContext, useContext, useEffect, useState } from 'react'
 import { getAuth, onIdTokenChanged, type User } from 'firebase/auth'
-import type { AuthState, TypedIdTokenResult } from './auth.types'
+import type { AuthState, TypedIdTokenResult } from '../types/auth.types'
 
 const AuthContext = createContext<AuthState | null>(null)
 
@@ -94,14 +94,20 @@ export function useAuth() {
 }
 ```
 
-### 3. Set Up Router Context
+Create `src/domains/auth/hooks/use-auth.ts`:
+
+```typescript
+export { useAuth } from '../providers/AuthProvider'
+```
+
+### 3. Set Up Router Context with Auth Initialization
 
 Update `src/routes/__root.tsx`:
 
 ```typescript
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
-import { AuthProvider, useAuth } from '@/integrations/firebase/auth'
-import type { AuthState } from '@/integrations/firebase/auth/auth.types'
+import { AuthProvider, useAuth } from '@/domains/auth'
+import type { AuthState } from '@/domains/auth/types/auth.types'
 
 export interface RouterContext {
   auth: AuthState
@@ -122,13 +128,16 @@ function RootComponent() {
 function RootLayout() {
   const auth = useAuth()
 
-  return (
-    <RouterOutlet auth={auth}>
-      <Outlet />
-    </RouterOutlet>
-  )
+  // Wait for auth to initialize before rendering routes
+  if (auth.isLoading) {
+    return <div>Initializing authentication...</div>
+  }
+
+  return <Outlet context={{ auth }} />
 }
 ```
+
+**Key Pattern**: The root layout waits for `auth.isLoading` to become `false` before rendering child routes. This ensures that all route guards have access to fully initialized auth state - no timeouts needed.
 
 ### 4. Create Admin Route Guard
 
@@ -142,10 +151,8 @@ export const Route = createFileRoute('/admin')({
   beforeLoad: ({ context }: { context: RouterContext }) => {
     const { auth } = context
 
-    // Wait for auth to resolve
-    if (auth.isLoading) {
-      throw new Promise((resolve) => setTimeout(resolve, 100))
-    }
+    // Auth is guaranteed to be ready (root layout waits)
+    // No need to check isLoading
 
     // Redirect if not admin
     if (!auth.user || auth.isAnonymous || !auth.isAdmin) {
@@ -163,6 +170,8 @@ function AdminPage() {
 }
 ```
 
+**Why no timeout needed**: The root layout (`__root.tsx`) blocks rendering until `auth.isLoading === false`, so by the time `beforeLoad` runs, auth state is guaranteed to be resolved.
+
 ### 5. Create Guest Auto Sign-In
 
 Create `src/routes/guest/$projectId/index.tsx`:
@@ -170,21 +179,20 @@ Create `src/routes/guest/$projectId/index.tsx`:
 ```typescript
 import { createFileRoute } from '@tanstack/react-router'
 import { getAuth, signInAnonymously } from 'firebase/auth'
+import type { RouterContext } from '@/routes/__root'
 
 export const Route = createFileRoute('/guest/$projectId')({
-  beforeLoad: async ({ context }) => {
+  beforeLoad: async ({ context }: { context: RouterContext }) => {
     const { auth: authState } = context
 
-    // Wait for auth to resolve
-    if (authState.isLoading) {
-      await new Promise((resolve) => setTimeout(resolve, 100))
-    }
-
+    // Auth is guaranteed to be ready (root layout waits)
     // If unauthenticated, sign in anonymously
     if (!authState.user) {
       const auth = getAuth()
       await signInAnonymously(auth)
     }
+
+    // If already authenticated (anonymous or OAuth), continue
   },
   component: GuestPage,
 })
@@ -194,6 +202,8 @@ function GuestPage() {
   return <div>Guest Experience: {projectId}</div>
 }
 ```
+
+**Why no timeout needed**: Auth state is already resolved by the time this runs. We simply check if a user exists, and if not, sign them in anonymously.
 
 ## Common Tasks
 
@@ -244,11 +254,13 @@ grantAdmin(email).catch(console.error)
 ### Check Admin Status
 
 ```typescript
-import { useAuth } from '@/integrations/firebase/auth'
+import { useAuth } from '@/domains/auth'
 
 function MyComponent() {
   const { isAdmin, isLoading } = useAuth()
 
+  // In components, isLoading might still be true briefly on mount
+  // Root layout prevents routes from loading, but components can render during transitions
   if (isLoading) return <div>Loading...</div>
   if (!isAdmin) return <div>Access Denied</div>
 
@@ -420,13 +432,22 @@ describe('Admin Route Guard', () => {
 
 ### Issue: Route guards run before auth resolves
 
-**Solution**: Check that `beforeLoad` waits for `auth.isLoading === false`:
+**Solution**: Ensure the root layout (`__root.tsx`) waits for auth before rendering routes:
 
 ```typescript
-if (auth.isLoading) {
-  throw new Promise((resolve) => setTimeout(resolve, 100))
+function RootLayout() {
+  const auth = useAuth()
+
+  // Block rendering until auth is ready
+  if (auth.isLoading) {
+    return <div>Initializing authentication...</div>
+  }
+
+  return <Outlet context={{ auth }} />
 }
 ```
+
+This ensures `beforeLoad` hooks in child routes always have access to resolved auth state.
 
 ### Issue: Admin user redirected to /login after admin grant
 

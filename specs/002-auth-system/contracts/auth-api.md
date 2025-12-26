@@ -421,16 +421,14 @@ export async function grantAdminPrivileges(email: string) {
 **Request** (Route Definition):
 ```typescript
 import { createFileRoute, redirect } from '@tanstack/react-router'
-import type { RouterContext } from '@/integrations/firebase/auth'
+import type { RouterContext } from '@/routes/__root'
 
 export const Route = createFileRoute('/admin')({
   beforeLoad: ({ context }: { context: RouterContext }) => {
     const { auth } = context
 
-    // Wait for auth to resolve
-    if (auth.isLoading) {
-      throw new Promise((resolve) => setTimeout(resolve, 100))
-    }
+    // Auth is guaranteed to be ready (root layout waits for isLoading === false)
+    // No need to check isLoading or use timeouts
 
     // Check authentication
     if (!auth.user) {
@@ -508,15 +506,14 @@ redirect({
 ```typescript
 import { createFileRoute } from '@tanstack/react-router'
 import { getAuth, signInAnonymously } from 'firebase/auth'
+import type { RouterContext } from '@/routes/__root'
 
 export const Route = createFileRoute('/guest/$projectId')({
-  beforeLoad: async ({ context }) => {
+  beforeLoad: async ({ context }: { context: RouterContext }) => {
     const { auth: authState } = context
 
-    // Wait for auth to resolve
-    if (authState.isLoading) {
-      await new Promise((resolve) => setTimeout(resolve, 100))
-    }
+    // Auth is guaranteed to be ready (root layout waits for isLoading === false)
+    // No need to check isLoading or use timeouts
 
     // If already authenticated (anonymous or OAuth), continue
     if (authState.user) {
@@ -553,6 +550,8 @@ export const Route = createFileRoute('/guest/$projectId')({
 ## TypeScript Type Definitions
 
 ### Auth API Types
+
+Location: `src/domains/auth/types/auth.types.ts`
 
 ```typescript
 import type { User, IdTokenResult, UserCredential } from 'firebase/auth'
@@ -605,6 +604,18 @@ export interface GrantAdminResult {
   email: string
   message: string
 }
+```
+
+**Import paths:**
+```typescript
+// In application code
+import type { AuthState, CustomClaims } from '@/domains/auth'
+
+// In routes
+import type { RouterContext } from '@/routes/__root'
+
+// In grant-admin script
+import type { GrantAdminInput, GrantAdminResult } from './grant-admin'
 ```
 
 ---
