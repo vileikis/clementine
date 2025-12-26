@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { signInAnonymously } from 'firebase/auth'
 import { auth as firebaseAuth } from '@/integrations/firebase/client'
 import { useAuth } from '@/domains/auth'
@@ -9,12 +9,21 @@ interface GuestExperiencePageProps {
 
 export function GuestExperiencePage({ projectId }: GuestExperiencePageProps) {
   const auth = useAuth()
+  const signingInRef = useRef(false)
 
   // Automatically sign in anonymously if not authenticated
   useEffect(() => {
     async function ensureAuth() {
-      if (!auth.user && !auth.isLoading) {
+      // Prevent duplicate sign-in attempts (React Strict Mode runs effects twice)
+      if (auth.user || auth.isLoading || signingInRef.current) {
+        return
+      }
+
+      signingInRef.current = true
+      try {
         await signInAnonymously(firebaseAuth)
+      } finally {
+        signingInRef.current = false
       }
     }
     ensureAuth()
