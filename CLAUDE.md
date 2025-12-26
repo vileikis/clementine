@@ -307,3 +307,10 @@ See individual workspace documentation for required environment variables.
 ---
 
 **Remember**: This is a monorepo overview. For app-specific guidance, refer to the CLAUDE.md file in each workspace directory.
+
+## Active Technologies
+- TypeScript 5.7 (strict mode) (001-base-nav)
+- N/A (using hardcoded mock workspace data, no database integration) (001-base-nav)
+
+## Recent Changes
+- 001-base-nav: Added TypeScript 5.7 (strict mode)
