@@ -311,6 +311,8 @@ See individual workspace documentation for required environment variables.
 ## Active Technologies
 - TypeScript 5.7 (strict mode) (001-base-nav)
 - N/A (using hardcoded mock workspace data, no database integration) (001-base-nav)
+- TypeScript 5.7 (strict mode) + TanStack Start 1.132, React 19.2, Firebase SDK (Auth, Firestore, Admin), TanStack Router 1.132, TanStack Query 5.66 (002-auth-system)
+- Firebase Firestore (NoSQL database), Firebase Storage (media) (002-auth-system)
 
 ## Recent Changes
 - 001-base-nav: Added TypeScript 5.7 (strict mode)
