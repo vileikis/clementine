@@ -194,50 +194,24 @@ vi.mock('./utils', () => ({
   formatDate: vi.fn(() => '2024-01-01'),
 }))
 
-// Partial mock
-vi.mock('./api', async (importOriginal) => {
-  const actual = await importOriginal()
-  return {
-    ...actual,
-    fetchUser: vi.fn(), // Override one export
-  }
-})
+// Partial mock - override specific exports
+vi.mock('./api', async (importOriginal) => ({
+  ...await importOriginal(),
+  fetchUser: vi.fn(), // Override one export only
+}))
 ```
 
 #### Mock Firebase
 
-**Firestore (Client SDK):**
 ```typescript
-import { vi } from 'vitest'
-
+// Firestore Client SDK
 vi.mock('firebase/firestore', () => ({
-  collection: vi.fn(),
-  doc: vi.fn(),
-  getDoc: vi.fn(),
-  setDoc: vi.fn(),
-  updateDoc: vi.fn(),
-  deleteDoc: vi.fn(),
-  onSnapshot: vi.fn(),
+  collection: vi.fn(), doc: vi.fn(), getDoc: vi.fn(), onSnapshot: vi.fn(),
 }))
-```
 
-**Firestore (Admin SDK):**
-```typescript
-import { vi } from 'vitest'
-
+// Firestore Admin SDK
 vi.mock('firebase-admin/firestore', () => ({
-  getFirestore: vi.fn(() => ({
-    collection: vi.fn(() => ({
-      doc: vi.fn(() => ({
-        get: vi.fn(),
-        set: vi.fn(),
-        update: vi.fn(),
-      })),
-    })),
-  })),
-  FieldValue: {
-    serverTimestamp: vi.fn(() => Date.now()),
-  },
+  getFirestore: vi.fn(() => ({ collection: vi.fn() })),
 }))
 ```
 
@@ -295,149 +269,36 @@ describe('useEvents', () => {
 
 ## Test Organization
 
-### AAA Pattern (Arrange, Act, Assert)
-
-```typescript
-it('creates new event', async () => {
-  // Arrange - setup
-  const input = { name: 'Test Event', companyId: 'comp_123' }
-  const mockCreate = vi.fn()
-
-  // Act - perform action
-  const result = await createEvent(input)
-
-  // Assert - verify results
-  expect(mockCreate).toHaveBeenCalledWith(input)
-  expect(result).toEqual({ id: 'evt_123', ...input })
-})
-```
+### AAA Pattern
+**Arrange** (setup) → **Act** (perform action) → **Assert** (verify results)
 
 ### Test Isolation
-
-```typescript
-import { beforeEach, afterEach } from 'vitest'
-
-describe('SessionManager', () => {
-  beforeEach(() => {
-    // Setup before each test
-    vi.clearAllMocks()
-  })
-
-  afterEach(() => {
-    // Cleanup after each test
-    vi.restoreAllMocks()
-  })
-
-  it('test 1', () => {
-    // Each test starts fresh
-  })
-
-  it('test 2', () => {
-    // Isolated from test 1
-  })
-})
-```
+Use `beforeEach`/`afterEach` with `vi.clearAllMocks()` and `vi.restoreAllMocks()` to ensure test independence.
 
 ## Best Practices
 
 ### ✅ DO: Test User Behavior
 
-```typescript
-// ✅ Good - tests what user sees
-it('shows success message after form submission', async () => {
-  render(<EventForm />)
-
-  fireEvent.change(screen.getByLabelText('Event Name'), {
-    target: { value: 'My Event' },
-  })
-  fireEvent.click(screen.getByRole('button', { name: 'Create' }))
-
-  await waitFor(() => {
-    expect(screen.getByText('Event created successfully')).toBeInTheDocument()
-  })
-})
-
-// ❌ Bad - tests implementation details
-it('calls handleSubmit when form is submitted', () => {
-  const handleSubmit = vi.fn()
-  render(<EventForm onSubmit={handleSubmit} />)
-  // Testing internal prop, not user behavior
-})
-```
+✅ Test what users see/do: form submissions, button clicks, error messages
+❌ Don't test implementation: internal props, function calls
 
 ### ✅ DO: Use Descriptive Test Names
 
-```typescript
-// ✅ Good - clear what's being tested
-it('displays error when event name exceeds 100 characters', () => {})
-it('disables submit button while form is submitting', () => {})
-it('redirects to events list after successful creation', () => {})
-
-// ❌ Bad - vague
-it('works correctly', () => {})
-it('handles input', () => {})
-```
+✅ `it('displays error when event name exceeds 100 characters')`
+❌ `it('works correctly')`
 
 ### ✅ DO: Test Edge Cases
 
-```typescript
-describe('EventCard', () => {
-  it('renders with minimal data', () => {
-    render(<EventCard name="Event" />)
-  })
-
-  it('handles very long event names', () => {
-    const longName = 'A'.repeat(200)
-    render(<EventCard name={longName} />)
-  })
-
-  it('renders when optional fields are null', () => {
-    render(<EventCard name="Event" description={null} />)
-  })
-
-  it('handles missing onClick handler', () => {
-    render(<EventCard name="Event" />) // No onClick provided
-    fireEvent.click(screen.getByRole('button'))
-    // Should not throw
-  })
-})
-```
+Test: minimal data, very long inputs, null values, missing handlers.
 
 ### ❌ DON'T: Test Third-Party Libraries
 
-```typescript
-// ❌ Bad - testing Firestore, not your code
-it('firestore updates document', async () => {
-  await updateDoc(docRef, { name: 'New Name' })
-  const doc = await getDoc(docRef)
-  expect(doc.data().name).toBe('New Name')
-})
+❌ Don't test Firestore/Firebase directly
+✅ Test your abstractions that use Firebase
 
-// ✅ Good - test your abstraction
-it('updates event name', async () => {
-  await updateEventName('evt_123', 'New Name')
-  expect(mockUpdateDoc).toHaveBeenCalledWith(
-    expect.anything(),
-    { name: 'New Name' }
-  )
-})
-```
+## Snapshot Testing
 
-## Snapshot Testing (Use Sparingly)
-
-```typescript
-import { it, expect } from 'vitest'
-
-it('matches snapshot', () => {
-  const { container } = render(<EventCard name="Test" />)
-  expect(container).toMatchSnapshot()
-})
-```
-
-**⚠️ Use snapshots sparingly:**
-- Snapshots are brittle
-- Hard to review changes
-- Better to test specific behaviors
+⚠️ **Use sparingly** - snapshots are brittle, hard to review. Prefer specific assertions.
 
 ## Coverage
 

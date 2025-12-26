@@ -31,31 +31,6 @@ cd apps/clementine-app
 pnpm dlx shadcn@latest add <component-name>
 ```
 
-**Usage:**
-
-```tsx
-import { Button } from '@/ui-kit/components/button'
-import { Input } from '@/ui-kit/components/input'
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-} from '@/ui-kit/components/dialog'
-
-function MyComponent() {
-  return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button>Open Dialog</Button>
-      </DialogTrigger>
-      <DialogContent>
-        <Input placeholder="Enter text..." />
-      </DialogContent>
-    </Dialog>
-  )
-}
-```
-
 **Available Components:**
 
 - Forms: Button, Input, Textarea, Select, Checkbox, RadioGroup, Switch
@@ -81,25 +56,6 @@ function MyComponent() {
 - Powers shadcn/ui under the hood
 - Use directly when shadcn/ui doesn't have what you need
 - Production-ready, WAI-ARIA compliant
-
-**Direct Usage (when needed):**
-
-```tsx
-import * as RadioGroup from '@radix-ui/react-radio-group'
-import * as Slider from '@radix-ui/react-slider'
-
-// Use Radix directly if shadcn doesn't have the component yet
-function CustomComponent() {
-  return (
-    <Slider.Root className="..." defaultValue={[50]} max={100} step={1}>
-      <Slider.Track className="...">
-        <Slider.Range className="..." />
-      </Slider.Track>
-      <Slider.Thumb className="..." />
-    </Slider.Root>
-  )
-}
-```
 
 **When to use Radix UI directly:**
 
@@ -130,77 +86,6 @@ function CustomComponent() {
 
 ```bash
 pnpm add @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities
-```
-
-**Basic Usage (Sortable List):**
-
-```tsx
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core'
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  useSortable,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
-
-function SortableItem({ id, children }) {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id })
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  }
-
-  return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      {children}
-    </div>
-  )
-}
-
-function SortableList({ items, onReorder }) {
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    }),
-  )
-
-  function handleDragEnd(event) {
-    const { active, over } = event
-    if (active.id !== over.id) {
-      const oldIndex = items.indexOf(active.id)
-      const newIndex = items.indexOf(over.id)
-      onReorder(arrayMove(items, oldIndex, newIndex))
-    }
-  }
-
-  return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragEnd={handleDragEnd}
-    >
-      <SortableContext items={items} strategy={verticalListSortingStrategy}>
-        {items.map((id) => (
-          <SortableItem key={id} id={id}>
-            Item {id}
-          </SortableItem>
-        ))}
-      </SortableContext>
-    </DndContext>
-  )
-}
 ```
 
 **When to use @dnd-kit:**
@@ -240,30 +125,7 @@ ui-kit/
     └── cn.ts                # tailwind-merge + clsx
 ```
 
-**Example ui-kit component:**
-
-```tsx
-// ui-kit/components/sortable-list.tsx
-import { DndContext, closestCenter } from '@dnd-kit/core'
-import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
-
-interface SortableListProps<T> {
-  items: T[]
-  onReorder: (items: T[]) => void
-  renderItem: (item: T) => React.ReactNode
-  getItemId: (item: T) => string
-}
-
-export function SortableList<T>({
-  items,
-  onReorder,
-  renderItem,
-  getItemId,
-}: SortableListProps<T>) {
-  // Reusable sortable list component
-  // ...
-}
-```
+**Example:** Reusable `SortableList<T>` wrapper component for @dnd-kit.
 
 ### shared/ Components (Composed Components)
 
@@ -273,24 +135,7 @@ export function SortableList<T>({
 - Business-aware components used across multiple domains
 - Complex compositions
 
-**Example shared component:**
-
-```tsx
-// shared/components/user-avatar.tsx
-import { Avatar, AvatarImage, AvatarFallback } from '@/ui-kit/components/avatar'
-import { useCurrentUser } from '@/shared/hooks/use-current-user'
-
-export function UserAvatar() {
-  const user = useCurrentUser()
-
-  return (
-    <Avatar>
-      <AvatarImage src={user.photoURL} />
-      <AvatarFallback>{user.initials}</AvatarFallback>
-    </Avatar>
-  )
-}
-```
+**Example:** `UserAvatar` composing ui-kit `Avatar` with user context.
 
 ### domains/ Components (Domain-Specific)
 
@@ -299,40 +144,7 @@ export function UserAvatar() {
 - Components specific to a business domain
 - Use ui-kit and shared components
 
-**Example domain component:**
-
-```tsx
-// domains/events/components/event-card.tsx
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from '@/ui-kit/components/card'
-import { Badge } from '@/ui-kit/components/badge'
-import { Button } from '@/ui-kit/components/button'
-import type { Event } from '../types'
-
-interface EventCardProps {
-  event: Event
-  onEdit: (event: Event) => void
-}
-
-export function EventCard({ event, onEdit }: EventCardProps) {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{event.name}</CardTitle>
-        <Badge>{event.status}</Badge>
-      </CardHeader>
-      <CardContent>
-        <p>{event.description}</p>
-        <Button onClick={() => onEdit(event)}>Edit Event</Button>
-      </CardContent>
-    </Card>
-  )
-}
-```
+**Example:** `EventCard` composing `Card`, `Badge`, and `Button` from ui-kit.
 
 ## Best Practices
 
@@ -344,22 +156,8 @@ Before building any component:
 2. If it exists, install it: `pnpm dlx shadcn@latest add <component>`
 3. Use it as-is or customize
 
-**Don't reinvent:**
-
-```tsx
-// ❌ DON'T build custom button
-function CustomButton({ children, ...props }) {
-  return (
-    <button className="px-4 py-2 bg-blue-500..." {...props}>
-      {children}
-    </button>
-  )
-}
-
-// ✅ DO use shadcn button
-import { Button } from '@/ui-kit/components/button'
-;<Button>Click me</Button>
-```
+❌ **DON'T:** Build custom buttons, dialogs, inputs from scratch
+✅ **DO:** Use shadcn/ui `Button`, `Dialog`, `Input` components
 
 ### 2. Extend shadcn/ui Components
 
@@ -415,73 +213,11 @@ export function Slider({ className, ...props }: SliderPrimitive.SliderProps) {
 
 Create reusable drag and drop components:
 
-```tsx
-// ui-kit/components/sortable-list.tsx
-// Generic sortable list component that can be reused across domains
-```
-
-```tsx
-// domains/experiences/components/steps-editor.tsx
-import { SortableList } from '@/ui-kit/components/sortable-list'
-
-function StepsEditor({ steps, onReorder }) {
-  return (
-    <SortableList
-      items={steps}
-      onReorder={onReorder}
-      getItemId={(step) => step.id}
-      renderItem={(step) => <StepCard step={step} />}
-    />
-  )
-}
-```
+**Example:** `StepsEditor` using `SortableList` from ui-kit with `<StepCard>` renderer.
 
 ### 5. Compose Components
 
-Build complex UIs by composing simple components:
-
-```tsx
-// Complex dialog using shadcn components
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/ui-kit/components/dialog'
-import { Button } from '@/ui-kit/components/button'
-import { Input } from '@/ui-kit/components/input'
-import { Label } from '@/ui-kit/components/label'
-
-function CreateEventDialog() {
-  return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button>Create Event</Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Create New Event</DialogTitle>
-          <DialogDescription>
-            Enter the details for your new event.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="space-y-4">
-          <div>
-            <Label htmlFor="name">Event Name</Label>
-            <Input id="name" placeholder="My Awesome Event" />
-          </div>
-        </div>
-        <DialogFooter>
-          <Button type="submit">Create Event</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  )
-}
-```
+Build complex UIs by composing: `Dialog` + `DialogHeader` + `Input` + `Button` = `CreateEventDialog`.
 
 ### 6. Accessibility is Built-In
 
@@ -519,33 +255,7 @@ import { Trash2, Edit, Plus, X } from 'lucide-react'
 
 ### Utilities: class-variance-authority (CVA)
 
-For creating variant-based components:
-
-```tsx
-import { cva, type VariantProps } from 'class-variance-authority'
-
-const buttonVariants = cva(
-  'inline-flex items-center justify-center rounded-md',
-  {
-    variants: {
-      variant: {
-        default: 'bg-primary text-primary-foreground',
-        destructive: 'bg-destructive text-destructive-foreground',
-        outline: 'border border-input bg-background',
-      },
-      size: {
-        default: 'h-10 px-4 py-2',
-        sm: 'h-9 rounded-md px-3',
-        lg: 'h-11 rounded-md px-8',
-      },
-    },
-    defaultVariants: {
-      variant: 'default',
-      size: 'default',
-    },
-  },
-)
-```
+For creating variant-based components (size, variant, etc.). shadcn/ui uses CVA internally.
 
 ### Styling: tailwind-merge + clsx
 
@@ -565,25 +275,7 @@ export function cn(...inputs: ClassValue[]) {
 
 ## Migration from Other Libraries
 
-### From Material-UI
-
-- Replace `<Button>` with shadcn `<Button>`
-- Replace `<TextField>` with shadcn `<Input>`
-- Replace `<Dialog>` with shadcn `<Dialog>`
-
-### From Ant Design
-
-- Replace `<Button>` with shadcn `<Button>`
-- Replace `<Input>` with shadcn `<Input>`
-- Replace `<Modal>` with shadcn `<Dialog>`
-
-### From Chakra UI
-
-- Replace `<Button>` with shadcn `<Button>`
-- Replace `<Input>` with shadcn `<Input>`
-- Replace `<Modal>` with shadcn `<Dialog>`
-
-**Pattern**: shadcn/ui has equivalents for most common components from other libraries.
+shadcn/ui has equivalents for most common components from Material-UI, Ant Design, and Chakra UI.
 
 ## Summary
 
