@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
-import { getAuth, signInAnonymously } from 'firebase/auth'
+import { signInAnonymously } from 'firebase/auth'
+import { auth as firebaseAuth } from '@/integrations/firebase/client'
 import { useAuth } from '@/domains/auth'
 
 interface GuestExperiencePageProps {
@@ -13,7 +14,6 @@ export function GuestExperiencePage({ projectId }: GuestExperiencePageProps) {
   useEffect(() => {
     async function ensureAuth() {
       if (!auth.user && !auth.isLoading) {
-        const firebaseAuth = getAuth()
         await signInAnonymously(firebaseAuth)
       }
     }

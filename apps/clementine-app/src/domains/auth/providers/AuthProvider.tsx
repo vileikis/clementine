@@ -1,9 +1,10 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState } from 'react'
-import { getAuth, onIdTokenChanged } from 'firebase/auth'
+import { onIdTokenChanged } from 'firebase/auth'
 import type { User } from 'firebase/auth'
 import type { AuthState, TypedIdTokenResult } from '../types/auth.types'
+import { auth } from '@/integrations/firebase/client'
 
 const AuthContext = createContext<AuthState | null>(null)
 
@@ -17,8 +18,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   })
 
   useEffect(() => {
-    const auth = getAuth()
-
     // Use onIdTokenChanged to detect custom claims changes
     const unsubscribe = onIdTokenChanged(auth, async (user: User | null) => {
       if (user) {
