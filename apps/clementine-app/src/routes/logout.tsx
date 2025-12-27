@@ -1,8 +1,8 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { signOut } from 'firebase/auth'
+import { useEffect } from 'react'
 import { auth } from '@/integrations/firebase/client'
 import { logoutFn } from '@/domains/auth/server/functions'
-import { useEffect } from 'react'
 
 // Logout route - handles user logout
 // Clears both client-side Firebase auth and server-side session

@@ -384,15 +384,15 @@ This document breaks down the Firebase Authentication & Authorization System imp
 
 **Tasks**:
 
-- [ ] T061 [P] Update Storage security rules with admin claim check (request.auth.token.admin == true) in storage.rules
-- [ ] T062 Add comprehensive error handling for auth errors (popup-closed-by-user, network-request-failed) in auth components
-- [ ] T063 [P] Add loading states for auth operations (sign-in, redirect) in auth components
+- [X] T061 [P] Update Storage security rules with admin claim check (request.auth.token.admin == true) in storage.rules
+- [X] T062 Add comprehensive error handling for auth errors (popup-closed-by-user, network-request-failed) in auth components
+- [X] T063 [P] Add loading states for auth operations (sign-in, redirect) in auth components
 - [ ] T064 Write integration test for full guest flow (visit guest route → auto sign-in → access granted) in apps/clementine-app/src/domains/auth/__tests__/guest-flow.test.ts
 - [ ] T065 [P] Write integration test for full admin flow (login → admin access → refresh persistence) in apps/clementine-app/src/domains/auth/__tests__/admin-flow.test.ts
 - [ ] T066 Add performance monitoring for guest auth (verify <2s sign-in time) in auth provider
 - [ ] T067 Test on real mobile devices (iOS Safari, Android Chrome) for mobile-first validation
-- [ ] T068 [P] Update CLAUDE.md with auth feature context (if applicable) in CLAUDE.md
-- [ ] T069 Run final validation loop: pnpm check && pnpm type-check && pnpm test in apps/clementine-app/
+- [X] T068 [P] Update CLAUDE.md with auth feature context (if applicable) in CLAUDE.md
+- [X] T069 Run final validation loop: pnpm check && pnpm type-check && pnpm test in apps/clementine-app/
 - [ ] T070 Deploy Firestore and Storage security rules: firebase deploy --only firestore:rules,storage:rules
 - [ ] T071 Manual verification: Test all acceptance scenarios from spec.md across all user stories
 - [ ] T072 Performance verification: Verify SC-001 (guest auth <2s), SC-002 (100% unauthorized blocked), SC-003 (admin immediate access), SC-004 (admin persistence)

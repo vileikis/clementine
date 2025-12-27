@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { TriangleAlert } from 'lucide-react'
 import { signOut } from 'firebase/auth'
 import { useServerFn } from '@tanstack/react-start'
@@ -11,15 +12,18 @@ import { Button } from '@/ui-kit/components/button'
 export function WaitingMessage() {
   const { user } = useAuth()
   const serverLogout = useServerFn(logoutFn)
+  const [isSigningOut, setIsSigningOut] = useState(false)
 
   const handleSignOut = async () => {
     try {
+      setIsSigningOut(true)
       // Sign out from Firebase (client-side)
       await signOut(auth)
       // Clear server session and redirect
       await serverLogout()
     } catch (err) {
       console.error('Sign-out error:', err)
+      setIsSigningOut(false)
     }
   }
 
@@ -91,8 +95,16 @@ export function WaitingMessage() {
                 variant="outline"
                 size="lg"
                 className="w-full min-h-[44px]"
+                disabled={isSigningOut}
               >
-                Sign Out
+                {isSigningOut ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-foreground"></div>
+                    <span>Signing out...</span>
+                  </>
+                ) : (
+                  <span>Sign Out</span>
+                )}
               </Button>
             </div>
           </div>
