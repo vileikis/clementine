@@ -118,6 +118,16 @@ src/
 
 See `standards/global/project-structure.md` for complete architectural guidelines.
 
+### Authentication & Authorization
+
+**Firebase Authentication** with hybrid client-server approach is used for all authentication and authorization.
+
+**Key principle**: All auth checks MUST happen server-side. Client-side auth state is for UX only, never for security.
+
+For complete authentication standards, implementation patterns, and security guidelines, see:
+- **Authentication Standard**: `../../standards/global/authentication.md`
+- **Feature Specification**: `../../specs/002-auth-system/spec.md`
+
 ## Commands
 
 Run all commands from **`apps/clementine-app/`** directory:
@@ -217,6 +227,7 @@ import { EventsPage } from '@/domains/events/management/containers/EventsPage'
 | **Setting up architecture** | `global/project-structure.md` + `global/client-first-architecture.md` |
 | **Building UI components**  | `frontend/component-libraries.md` + `frontend/accessibility.md`       |
 | **Working with data**       | `global/client-first-architecture.md` + `global/security.md`          |
+| **Implementing auth**       | `global/authentication.md` + `global/security.md`                     |
 | **Optimizing performance**  | `frontend/performance.md`                                             |
 | **Writing tests**           | `testing/overview.md`                                                 |
 | **Code review**             | `global/code-quality.md` + `global/security.md`                       |
