@@ -83,7 +83,7 @@ export function WaitingMessage() {
             </div>
 
             {/* Next steps */}
-            <div className="bg-info/10 rounded-md p-4">
+            <div className="bg-info rounded-md p-4">
               <h3 className="text-sm font-medium text-info-foreground mb-2">
                 What happens next?
               </h3>
