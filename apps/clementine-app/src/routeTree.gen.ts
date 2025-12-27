@@ -9,14 +9,14 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as LogoutRouteImport } from './routes/logout'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as SplatRouteImport } from './routes/$'
 import { Route as WorkspaceRouteRouteImport } from './routes/workspace/route'
 import { Route as GuestRouteRouteImport } from './routes/guest/route'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WorkspaceIndexRouteImport } from './routes/workspace/index'
-import { Route as LogoutIndexRouteImport } from './routes/logout/index'
-import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as GuestIndexRouteImport } from './routes/guest/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as WorkspaceWorkspaceIdRouteImport } from './routes/workspace/$workspaceId'
@@ -26,6 +26,16 @@ import { Route as AdminDevToolsRouteImport } from './routes/admin/dev-tools'
 import { Route as WorkspaceWorkspaceIdSettingsRouteImport } from './routes/workspace/$workspaceId.settings'
 import { Route as WorkspaceWorkspaceIdProjectsRouteImport } from './routes/workspace/$workspaceId.projects'
 
+const LogoutRoute = LogoutRouteImport.update({
+  id: '/logout',
+  path: '/logout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SplatRoute = SplatRouteImport.update({
   id: '/$',
   path: '/$',
@@ -55,16 +65,6 @@ const WorkspaceIndexRoute = WorkspaceIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => WorkspaceRouteRoute,
-} as any)
-const LogoutIndexRoute = LogoutIndexRouteImport.update({
-  id: '/logout/',
-  path: '/logout/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginIndexRoute = LoginIndexRouteImport.update({
-  id: '/login/',
-  path: '/login/',
-  getParentRoute: () => rootRouteImport,
 } as any)
 const GuestIndexRoute = GuestIndexRouteImport.update({
   id: '/',
@@ -115,14 +115,14 @@ export interface FileRoutesByFullPath {
   '/guest': typeof GuestRouteRouteWithChildren
   '/workspace': typeof WorkspaceRouteRouteWithChildren
   '/$': typeof SplatRoute
+  '/login': typeof LoginRoute
+  '/logout': typeof LogoutRoute
   '/admin/dev-tools': typeof AdminDevToolsRoute
   '/admin/workspaces': typeof AdminWorkspacesRoute
   '/guest/$projectId': typeof GuestProjectIdRoute
   '/workspace/$workspaceId': typeof WorkspaceWorkspaceIdRouteWithChildren
   '/admin/': typeof AdminIndexRoute
   '/guest/': typeof GuestIndexRoute
-  '/login': typeof LoginIndexRoute
-  '/logout': typeof LogoutIndexRoute
   '/workspace/': typeof WorkspaceIndexRoute
   '/workspace/$workspaceId/projects': typeof WorkspaceWorkspaceIdProjectsRoute
   '/workspace/$workspaceId/settings': typeof WorkspaceWorkspaceIdSettingsRoute
@@ -130,14 +130,14 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
+  '/login': typeof LoginRoute
+  '/logout': typeof LogoutRoute
   '/admin/dev-tools': typeof AdminDevToolsRoute
   '/admin/workspaces': typeof AdminWorkspacesRoute
   '/guest/$projectId': typeof GuestProjectIdRoute
   '/workspace/$workspaceId': typeof WorkspaceWorkspaceIdRouteWithChildren
   '/admin': typeof AdminIndexRoute
   '/guest': typeof GuestIndexRoute
-  '/login': typeof LoginIndexRoute
-  '/logout': typeof LogoutIndexRoute
   '/workspace': typeof WorkspaceIndexRoute
   '/workspace/$workspaceId/projects': typeof WorkspaceWorkspaceIdProjectsRoute
   '/workspace/$workspaceId/settings': typeof WorkspaceWorkspaceIdSettingsRoute
@@ -149,14 +149,14 @@ export interface FileRoutesById {
   '/guest': typeof GuestRouteRouteWithChildren
   '/workspace': typeof WorkspaceRouteRouteWithChildren
   '/$': typeof SplatRoute
+  '/login': typeof LoginRoute
+  '/logout': typeof LogoutRoute
   '/admin/dev-tools': typeof AdminDevToolsRoute
   '/admin/workspaces': typeof AdminWorkspacesRoute
   '/guest/$projectId': typeof GuestProjectIdRoute
   '/workspace/$workspaceId': typeof WorkspaceWorkspaceIdRouteWithChildren
   '/admin/': typeof AdminIndexRoute
   '/guest/': typeof GuestIndexRoute
-  '/login/': typeof LoginIndexRoute
-  '/logout/': typeof LogoutIndexRoute
   '/workspace/': typeof WorkspaceIndexRoute
   '/workspace/$workspaceId/projects': typeof WorkspaceWorkspaceIdProjectsRoute
   '/workspace/$workspaceId/settings': typeof WorkspaceWorkspaceIdSettingsRoute
@@ -169,14 +169,14 @@ export interface FileRouteTypes {
     | '/guest'
     | '/workspace'
     | '/$'
+    | '/login'
+    | '/logout'
     | '/admin/dev-tools'
     | '/admin/workspaces'
     | '/guest/$projectId'
     | '/workspace/$workspaceId'
     | '/admin/'
     | '/guest/'
-    | '/login'
-    | '/logout'
     | '/workspace/'
     | '/workspace/$workspaceId/projects'
     | '/workspace/$workspaceId/settings'
@@ -184,14 +184,14 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/$'
+    | '/login'
+    | '/logout'
     | '/admin/dev-tools'
     | '/admin/workspaces'
     | '/guest/$projectId'
     | '/workspace/$workspaceId'
     | '/admin'
     | '/guest'
-    | '/login'
-    | '/logout'
     | '/workspace'
     | '/workspace/$workspaceId/projects'
     | '/workspace/$workspaceId/settings'
@@ -202,14 +202,14 @@ export interface FileRouteTypes {
     | '/guest'
     | '/workspace'
     | '/$'
+    | '/login'
+    | '/logout'
     | '/admin/dev-tools'
     | '/admin/workspaces'
     | '/guest/$projectId'
     | '/workspace/$workspaceId'
     | '/admin/'
     | '/guest/'
-    | '/login/'
-    | '/logout/'
     | '/workspace/'
     | '/workspace/$workspaceId/projects'
     | '/workspace/$workspaceId/settings'
@@ -221,12 +221,26 @@ export interface RootRouteChildren {
   GuestRouteRoute: typeof GuestRouteRouteWithChildren
   WorkspaceRouteRoute: typeof WorkspaceRouteRouteWithChildren
   SplatRoute: typeof SplatRoute
-  LoginIndexRoute: typeof LoginIndexRoute
-  LogoutIndexRoute: typeof LogoutIndexRoute
+  LoginRoute: typeof LoginRoute
+  LogoutRoute: typeof LogoutRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/logout': {
+      id: '/logout'
+      path: '/logout'
+      fullPath: '/logout'
+      preLoaderRoute: typeof LogoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/$': {
       id: '/$'
       path: '/$'
@@ -268,20 +282,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/workspace/'
       preLoaderRoute: typeof WorkspaceIndexRouteImport
       parentRoute: typeof WorkspaceRouteRoute
-    }
-    '/logout/': {
-      id: '/logout/'
-      path: '/logout'
-      fullPath: '/logout'
-      preLoaderRoute: typeof LogoutIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login/': {
-      id: '/login/'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginIndexRouteImport
-      parentRoute: typeof rootRouteImport
     }
     '/guest/': {
       id: '/guest/'
@@ -405,8 +405,8 @@ const rootRouteChildren: RootRouteChildren = {
   GuestRouteRoute: GuestRouteRouteWithChildren,
   WorkspaceRouteRoute: WorkspaceRouteRouteWithChildren,
   SplatRoute: SplatRoute,
-  LoginIndexRoute: LoginIndexRoute,
-  LogoutIndexRoute: LogoutIndexRoute,
+  LoginRoute: LoginRoute,
+  LogoutRoute: LogoutRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

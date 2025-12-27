@@ -42,6 +42,6 @@ function LogoutPage() {
   )
 }
 
-export const Route = createFileRoute('/logout/')({
+export const Route = createFileRoute('/logout')({
   component: LogoutPage,
 })
