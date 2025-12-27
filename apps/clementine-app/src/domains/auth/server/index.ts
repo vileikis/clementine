@@ -14,9 +14,4 @@
 export { useAppSession, type SessionData } from './session'
 
 // Server functions for auth
-export {
-  getCurrentUserFn,
-  createSessionFn,
-  logoutFn,
-  grantAdminFn,
-} from './functions'
+export { getCurrentUserFn, createSessionFn, logoutFn } from './functions'

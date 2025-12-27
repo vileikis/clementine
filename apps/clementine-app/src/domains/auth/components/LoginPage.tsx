@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { signInWithEmailAndPassword } from 'firebase/auth'
 import { useServerFn } from '@tanstack/react-start'
 import { useAuth } from '../providers/AuthProvider'
-import { createSessionFn } from '../server'
+import { createSessionFn } from '../server/functions'
 import { WaitingMessage } from './WaitingMessage'
 import { auth } from '@/integrations/firebase/client'
 
@@ -91,10 +91,10 @@ export function LoginPage() {
   // Show loading state while auth initializes
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
-          <p className="text-sm text-gray-600">Loading...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-foreground mx-auto mb-4"></div>
+          <p className="text-sm text-muted-foreground">Loading...</p>
         </div>
       </div>
     )
@@ -107,24 +107,24 @@ export function LoginPage() {
 
   // Show login page for unauthenticated or anonymous users
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="max-w-md w-full space-y-8">
         {/* Header */}
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900">Welcome Back</h1>
-          <p className="mt-2 text-sm text-gray-600">
+          <h1 className="text-3xl font-bold text-foreground">Welcome Back</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
             Sign in to access the admin dashboard
           </p>
         </div>
 
         {/* Sign-in card */}
-        <div className="bg-white shadow rounded-lg p-8">
+        <div className="bg-card shadow rounded-lg p-8">
           <form onSubmit={handleEmailPasswordSignIn} className="space-y-6">
             {/* Email input */}
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-medium text-card-foreground mb-1"
               >
                 Email address
               </label>
@@ -136,7 +136,7 @@ export function LoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 min-h-[44px] border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-4 py-3 min-h-[44px] border border-input bg-background text-foreground rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={isSigningIn}
                 placeholder="you@example.com"
               />
@@ -146,7 +146,7 @@ export function LoginPage() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-medium text-card-foreground mb-1"
               >
                 Password
               </label>
@@ -159,7 +159,7 @@ export function LoginPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 pr-12 min-h-[44px] border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-4 py-3 pr-12 min-h-[44px] border border-input bg-background text-foreground rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={isSigningIn}
                   placeholder="Enter your password"
                 />
@@ -172,7 +172,7 @@ export function LoginPage() {
                 >
                   {showPassword ? (
                     <svg
-                      className="h-5 w-5 text-gray-400"
+                      className="h-5 w-5 text-muted-foreground"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -186,7 +186,7 @@ export function LoginPage() {
                     </svg>
                   ) : (
                     <svg
-                      className="h-5 w-5 text-gray-400"
+                      className="h-5 w-5 text-muted-foreground"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -213,11 +213,11 @@ export function LoginPage() {
             <button
               type="submit"
               disabled={isSigningIn}
-              className="w-full flex items-center justify-center gap-3 px-6 py-3 min-h-[44px] border border-transparent rounded-md shadow-sm bg-blue-600 text-white font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="w-full flex items-center justify-center gap-3 px-6 py-3 min-h-[44px] border border-transparent rounded-md shadow-sm bg-primary text-primary-foreground font-medium hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {isSigningIn ? (
                 <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary-foreground"></div>
                   <span>Signing in...</span>
                 </>
               ) : (
@@ -227,11 +227,11 @@ export function LoginPage() {
 
             {/* Error message */}
             {error && (
-              <div className="rounded-md bg-red-50 p-4">
+              <div className="rounded-md bg-destructive/10 p-4">
                 <div className="flex">
                   <div className="flex-shrink-0">
                     <svg
-                      className="h-5 w-5 text-red-400"
+                      className="h-5 w-5 text-destructive"
                       viewBox="0 0 20 20"
                       fill="currentColor"
                     >
@@ -243,14 +243,14 @@ export function LoginPage() {
                     </svg>
                   </div>
                   <div className="ml-3">
-                    <p className="text-sm text-red-700">{error}</p>
+                    <p className="text-sm text-destructive">{error}</p>
                   </div>
                 </div>
               </div>
             )}
 
             {/* Info message */}
-            <div className="text-center text-sm text-gray-500">
+            <div className="text-center text-sm text-muted-foreground">
               <p>Admin access is required to use this application.</p>
               <p className="mt-1">
                 Contact your administrator if you need access.
@@ -260,7 +260,7 @@ export function LoginPage() {
         </div>
 
         {/* Footer */}
-        <div className="text-center text-xs text-gray-500">
+        <div className="text-center text-xs text-muted-foreground">
           <p>
             By signing in, you agree to our Terms of Service and Privacy Policy.
           </p>
