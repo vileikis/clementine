@@ -1,21 +1,21 @@
 import { signOut } from 'firebase/auth'
 import { useServerFn } from '@tanstack/react-start'
 import { useAuth } from '../providers/AuthProvider'
-import { signOutFn } from '../server/functions'
+import { logoutFn } from '../server/functions'
 import { auth } from '@/integrations/firebase/client'
 
 // T039: Create WaitingMessage component for non-admin authenticated users
 
 export function WaitingMessage() {
   const { user } = useAuth()
-  const serverSignOut = useServerFn(signOutFn)
+  const serverLogout = useServerFn(logoutFn)
 
   const handleSignOut = async () => {
     try {
       // Sign out from Firebase (client-side)
       await signOut(auth)
       // Clear server session and redirect
-      await serverSignOut()
+      await serverLogout()
     } catch (err) {
       console.error('Sign-out error:', err)
     }

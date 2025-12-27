@@ -1,37 +1,84 @@
 import { useState } from 'react'
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth'
+import { signInWithEmailAndPassword } from 'firebase/auth'
+import { useServerFn } from '@tanstack/react-start'
 import { useAuth } from '../providers/AuthProvider'
+import { createSessionFn } from '../server'
 import { WaitingMessage } from './WaitingMessage'
 import { auth } from '@/integrations/firebase/client'
 
-// T037: Create LoginPage component with Google OAuth button
-// T036: Implement Google OAuth sign-in flow with signInWithPopup
-// T040: Add mobile-first styles (320px-768px viewport, 44x44px touch targets)
+// T140: Replace Google OAuth button with email/password login form
+// T141: Implement email input field with validation (email format)
+// T142: Implement password input field with show/hide toggle
+// T143: Implement form submission with signInWithEmailAndPassword()
+// T144: Add error handling for email/password errors
+// T151: Apply mobile-first styles (320px-768px viewport)
+// T152: Ensure form inputs meet 44x44px minimum touch target
 
 export function LoginPage() {
   const { isAdmin, user, isAnonymous, isLoading } = useAuth()
   const [isSigningIn, setIsSigningIn] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const createSession = useServerFn(createSessionFn)
 
-  const handleGoogleSignIn = async () => {
+  const handleEmailPasswordSignIn = async (e: React.FormEvent) => {
+    e.preventDefault()
     setIsSigningIn(true)
     setError(null)
 
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      setError('Please enter a valid email address.')
+      setIsSigningIn(false)
+      return
+    }
+
+    if (!password) {
+      setError('Please enter your password.')
+      setIsSigningIn(false)
+      return
+    }
+
     try {
-      const provider = new GoogleAuthProvider()
-      await signInWithPopup(auth, provider)
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password,
+      )
+
+      // Create session after successful authentication
+      const idToken = await userCredential.user.getIdToken()
+      await createSession({ data: { idToken } })
+
       // After sign-in, redirect logic is handled by beforeLoad in route
     } catch (err) {
       console.error('Sign-in error:', err)
 
       // Handle specific Firebase auth errors
       if (err instanceof Error) {
-        if (err.message.includes('popup-closed-by-user')) {
-          setError('Sign-in cancelled. Please try again.')
-        } else if (err.message.includes('network-request-failed')) {
-          setError('Network error. Please check your connection.')
-        } else {
-          setError('Sign-in failed. Please try again.')
+        const errorCode = (err as any).code
+        switch (errorCode) {
+          case 'auth/invalid-email':
+            setError('Invalid email address.')
+            break
+          case 'auth/wrong-password':
+          case 'auth/user-not-found':
+          case 'auth/invalid-credential':
+            setError('Invalid email or password.')
+            break
+          case 'auth/too-many-requests':
+            setError(
+              'Too many failed attempts. Please try again later or reset your password.',
+            )
+            break
+          case 'auth/network-request-failed':
+            setError('Network error. Please check your connection.')
+            break
+          default:
+            setError('Sign-in failed. Please try again.')
         }
       } else {
         setError('An unexpected error occurred.')
@@ -72,40 +119,109 @@ export function LoginPage() {
 
         {/* Sign-in card */}
         <div className="bg-white shadow rounded-lg p-8">
-          <div className="space-y-6">
-            {/* Google Sign-in button (44x44px minimum touch target) */}
+          <form onSubmit={handleEmailPasswordSignIn} className="space-y-6">
+            {/* Email input */}
+            <div>
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Email address
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-3 min-h-[44px] border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={isSigningIn}
+                placeholder="you@example.com"
+              />
+            </div>
+
+            {/* Password input with show/hide toggle */}
+            <div>
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="current-password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-4 py-3 pr-12 min-h-[44px] border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={isSigningIn}
+                  placeholder="Enter your password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 flex items-center pr-3 min-h-[44px] min-w-[44px]"
+                  disabled={isSigningIn}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? (
+                    <svg
+                      className="h-5 w-5 text-gray-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
+                      />
+                    </svg>
+                  ) : (
+                    <svg
+                      className="h-5 w-5 text-gray-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                      />
+                    </svg>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Sign in button (44x44px minimum touch target) */}
             <button
-              onClick={handleGoogleSignIn}
+              type="submit"
               disabled={isSigningIn}
-              className="w-full flex items-center justify-center gap-3 px-6 py-3 min-h-[44px] border border-gray-300 rounded-md shadow-sm bg-white text-gray-700 font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="w-full flex items-center justify-center gap-3 px-6 py-3 min-h-[44px] border border-transparent rounded-md shadow-sm bg-blue-600 text-white font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {isSigningIn ? (
                 <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-900"></div>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                   <span>Signing in...</span>
                 </>
               ) : (
-                <>
-                  <svg className="w-5 h-5" viewBox="0 0 24 24">
-                    <path
-                      fill="currentColor"
-                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                    />
-                    <path
-                      fill="currentColor"
-                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                    />
-                    <path
-                      fill="currentColor"
-                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                    />
-                    <path
-                      fill="currentColor"
-                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                    />
-                  </svg>
-                  <span>Sign in with Google</span>
-                </>
+                <span>Sign in</span>
               )}
             </button>
 
@@ -140,7 +256,7 @@ export function LoginPage() {
                 Contact your administrator if you need access.
               </p>
             </div>
-          </div>
+          </form>
         </div>
 
         {/* Footer */}

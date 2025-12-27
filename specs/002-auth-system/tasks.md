@@ -281,34 +281,34 @@ This document breaks down the Firebase Authentication & Authorization System imp
 
 ### Step 1: Update Specification Documents (T137-T139)
 
-- [ ] T137 Update spec.md User Story 3 to replace Google OAuth with email/password authentication
-- [ ] T138 Update spec.md acceptance scenarios to reflect email/password login flow
-- [ ] T139 Update spec.md FR-003 to specify email/password as authentication method
+- [X] T137 Update spec.md User Story 3 to replace Google OAuth with email/password authentication
+- [X] T138 Update spec.md acceptance scenarios to reflect email/password login flow
+- [X] T139 Update spec.md FR-003 to specify email/password as authentication method
 
 ### Step 2: Update LoginPage Component (T140-T144)
 
-- [ ] T140 Replace Google OAuth button with email/password login form in LoginPage.tsx
-- [ ] T141 Implement email input field with validation (email format)
-- [ ] T142 Implement password input field with show/hide toggle
-- [ ] T143 Implement form submission with signInWithEmailAndPassword()
-- [ ] T144 Add error handling for email/password errors (invalid-email, wrong-password, user-not-found, too-many-requests)
+- [X] T140 Replace Google OAuth button with email/password login form in LoginPage.tsx
+- [X] T141 Implement email input field with validation (email format)
+- [X] T142 Implement password input field with show/hide toggle
+- [X] T143 Implement form submission with signInWithEmailAndPassword()
+- [X] T144 Add error handling for email/password errors (invalid-email, wrong-password, user-not-found, too-many-requests)
 
 ### Step 3: Update Server Function Naming (T145-T148)
 
-- [ ] T145 Rename signOutFn to logoutFn in src/domains/auth/server/functions.ts
-- [ ] T146 Update function exports in src/domains/auth/server/index.ts
-- [ ] T147 Update function imports in WaitingMessage.tsx
-- [ ] T148 Update function references in barrel export src/domains/auth/index.ts
+- [X] T145 Rename signOutFn to logoutFn in src/domains/auth/server/functions.ts
+- [X] T146 Update function exports in src/domains/auth/server/index.ts
+- [X] T147 Update function imports in WaitingMessage.tsx
+- [X] T148 Update function references in barrel export src/domains/auth/index.ts
 
 ### Step 4: Remove Google OAuth Dependencies (T149-T150)
 
-- [ ] T149 Remove GoogleAuthProvider import from LoginPage.tsx
-- [ ] T150 Remove Google OAuth specific error handling from LoginPage.tsx
+- [X] T149 Remove GoogleAuthProvider import from LoginPage.tsx
+- [X] T150 Remove Google OAuth specific error handling from LoginPage.tsx
 
 ### Step 5: Update Mobile-First Styles (T151-T152)
 
-- [ ] T151 Apply mobile-first styles to email/password form (320px-768px viewport)
-- [ ] T152 Ensure form inputs meet 44x44px minimum touch target
+- [X] T151 Apply mobile-first styles to email/password form (320px-768px viewport)
+- [X] T152 Ensure form inputs meet 44x44px minimum touch target
 
 ### Step 6: Testing & Validation (T153-T157)
 
@@ -316,7 +316,7 @@ This document breaks down the Firebase Authentication & Authorization System imp
 - [ ] T154 Test manual: Login with invalid credentials (wrong password)
 - [ ] T155 Test manual: Login with non-existent user (user not created in Firebase Console)
 - [ ] T156 Test manual: Verify admin user redirected to /admin after login
-- [ ] T157 Run validation loop: `pnpm check && pnpm type-check`
+- [X] T157 Run validation loop: `pnpm check && pnpm type-check`
 
 **Phase Complete When**:
 - ✅ Email/password login works for all user types (users created manually in Firebase Console)
