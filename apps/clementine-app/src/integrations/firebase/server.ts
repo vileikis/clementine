@@ -1,4 +1,4 @@
-import * as admin from 'firebase-admin'
+import admin from 'firebase-admin'
 
 /**
  * Firebase Admin SDK initialization for server-side operations
@@ -13,7 +13,7 @@ import * as admin from 'firebase-admin'
  * - FIREBASE_ADMIN_PRIVATE_KEY
  */
 
-if (!admin.apps.length) {
+if (!admin.apps || admin.apps.length === 0) {
   admin.initializeApp({
     credential: admin.credential.cert({
       projectId: process.env.FIREBASE_ADMIN_PROJECT_ID,
@@ -28,4 +28,4 @@ export const adminDb = admin.firestore()
 export const adminStorage = admin.storage()
 
 // Export admin module for advanced use cases
-export { admin }
+export default admin
