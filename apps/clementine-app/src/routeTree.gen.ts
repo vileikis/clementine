@@ -9,6 +9,8 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as LogoutRouteImport } from './routes/logout'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as SplatRouteImport } from './routes/$'
 import { Route as WorkspaceRouteRouteImport } from './routes/workspace/route'
 import { Route as GuestRouteRouteImport } from './routes/guest/route'
@@ -24,6 +26,16 @@ import { Route as AdminDevToolsRouteImport } from './routes/admin/dev-tools'
 import { Route as WorkspaceWorkspaceIdSettingsRouteImport } from './routes/workspace/$workspaceId.settings'
 import { Route as WorkspaceWorkspaceIdProjectsRouteImport } from './routes/workspace/$workspaceId.projects'
 
+const LogoutRoute = LogoutRouteImport.update({
+  id: '/logout',
+  path: '/logout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SplatRoute = SplatRouteImport.update({
   id: '/$',
   path: '/$',
@@ -103,6 +115,8 @@ export interface FileRoutesByFullPath {
   '/guest': typeof GuestRouteRouteWithChildren
   '/workspace': typeof WorkspaceRouteRouteWithChildren
   '/$': typeof SplatRoute
+  '/login': typeof LoginRoute
+  '/logout': typeof LogoutRoute
   '/admin/dev-tools': typeof AdminDevToolsRoute
   '/admin/workspaces': typeof AdminWorkspacesRoute
   '/guest/$projectId': typeof GuestProjectIdRoute
@@ -116,6 +130,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
+  '/login': typeof LoginRoute
+  '/logout': typeof LogoutRoute
   '/admin/dev-tools': typeof AdminDevToolsRoute
   '/admin/workspaces': typeof AdminWorkspacesRoute
   '/guest/$projectId': typeof GuestProjectIdRoute
@@ -133,6 +149,8 @@ export interface FileRoutesById {
   '/guest': typeof GuestRouteRouteWithChildren
   '/workspace': typeof WorkspaceRouteRouteWithChildren
   '/$': typeof SplatRoute
+  '/login': typeof LoginRoute
+  '/logout': typeof LogoutRoute
   '/admin/dev-tools': typeof AdminDevToolsRoute
   '/admin/workspaces': typeof AdminWorkspacesRoute
   '/guest/$projectId': typeof GuestProjectIdRoute
@@ -151,6 +169,8 @@ export interface FileRouteTypes {
     | '/guest'
     | '/workspace'
     | '/$'
+    | '/login'
+    | '/logout'
     | '/admin/dev-tools'
     | '/admin/workspaces'
     | '/guest/$projectId'
@@ -164,6 +184,8 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/$'
+    | '/login'
+    | '/logout'
     | '/admin/dev-tools'
     | '/admin/workspaces'
     | '/guest/$projectId'
@@ -180,6 +202,8 @@ export interface FileRouteTypes {
     | '/guest'
     | '/workspace'
     | '/$'
+    | '/login'
+    | '/logout'
     | '/admin/dev-tools'
     | '/admin/workspaces'
     | '/guest/$projectId'
@@ -197,10 +221,26 @@ export interface RootRouteChildren {
   GuestRouteRoute: typeof GuestRouteRouteWithChildren
   WorkspaceRouteRoute: typeof WorkspaceRouteRouteWithChildren
   SplatRoute: typeof SplatRoute
+  LoginRoute: typeof LoginRoute
+  LogoutRoute: typeof LogoutRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/logout': {
+      id: '/logout'
+      path: '/logout'
+      fullPath: '/logout'
+      preLoaderRoute: typeof LogoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/$': {
       id: '/$'
       path: '/$'
@@ -365,6 +405,8 @@ const rootRouteChildren: RootRouteChildren = {
   GuestRouteRoute: GuestRouteRouteWithChildren,
   WorkspaceRouteRoute: WorkspaceRouteRouteWithChildren,
   SplatRoute: SplatRoute,
+  LoginRoute: LoginRoute,
+  LogoutRoute: LogoutRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
