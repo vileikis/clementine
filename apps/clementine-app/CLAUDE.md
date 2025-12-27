@@ -125,6 +125,7 @@ See `standards/global/project-structure.md` for complete architectural guideline
 **Key principle**: All auth checks MUST happen server-side. Client-side auth state is for UX only, never for security.
 
 For complete authentication standards, implementation patterns, and security guidelines, see:
+
 - **Authentication Standard**: `../../standards/global/authentication.md`
 - **Feature Specification**: `../../specs/002-auth-system/spec.md`
 
