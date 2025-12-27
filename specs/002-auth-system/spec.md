@@ -43,19 +43,21 @@ A platform administrator needs to access workspace management and admin features
 
 ### User Story 3 - Admin Login & Access Request (Priority: P2)
 
-A user needs to authenticate with Google OAuth to request admin access. If they don't have admin privileges yet, they are informed to wait for approval while still being able to access guest experiences.
+A user needs to authenticate with email and password to request admin access. If they don't have admin privileges yet, they are informed to wait for approval while still being able to access guest experiences.
 
 **Why this priority**: This enables the onboarding flow for new admins and provides clear feedback about access status. It's lower priority than core access control because manual admin granting is acceptable initially.
 
-**Independent Test**: Can be fully tested by logging in with Google OAuth as a non-admin user and verifying the waiting message appears, then accessing a guest route to confirm guest functionality remains available.
+**Independent Test**: Can be fully tested by logging in with email/password as a non-admin user and verifying the waiting message appears, then accessing a guest route to confirm guest functionality remains available.
 
 **Acceptance Scenarios**:
 
-1. **Given** an unauthenticated user, **When** they visit `/login`, **Then** they see a Google OAuth login option
-2. **Given** an anonymous user, **When** they visit `/login`, **Then** they see a Google OAuth login option
+1. **Given** an unauthenticated user, **When** they visit `/login`, **Then** they see an email/password login form (no sign-up option)
+2. **Given** an anonymous user, **When** they visit `/login`, **Then** they see an email/password login form (no sign-up option)
 3. **Given** an authenticated admin user, **When** they visit `/login`, **Then** they are redirected to `/admin`
-4. **Given** a user logs in with Google OAuth, **When** they do not have the `admin: true` claim, **Then** they see a message: "You are logged in. Waiting for an administrator to grant access."
-5. **Given** a logged-in user without admin access, **When** they visit `/guest/[projectId]`, **Then** they can access guest experiences normally
+4. **Given** a user with credentials created in Firebase Console, **When** they log in with valid email/password, **Then** they are authenticated successfully
+5. **Given** a user logs in with valid credentials, **When** they do not have the `admin: true` claim, **Then** they see a message: "You are logged in. Waiting for an administrator to grant access."
+6. **Given** a logged-in user without admin access, **When** they visit `/guest/[projectId]`, **Then** they can access guest experiences normally
+7. **Given** a user enters invalid credentials, **When** they submit the login form, **Then** they see a clear error message (e.g., "Invalid email or password")
 
 ---
 
@@ -91,7 +93,7 @@ A super administrator needs to grant admin privileges to a new team member. They
 
 - **FR-001**: System MUST support Firebase Authentication as the authentication provider
 - **FR-002**: System MUST automatically sign in unauthenticated users as anonymous when they access `/guest/[projectId]` routes
-- **FR-003**: System MUST support Google OAuth as the authentication method for admin login
+- **FR-003**: System MUST support email/password authentication as the authentication method for admin login and user registration
 - **FR-004**: System MUST expose a global auth loading state that indicates when Firebase auth is being initialized or resolved
 - **FR-005**: System MUST prevent route guards from executing until Firebase auth state is fully resolved and ID token with claims is available
 
@@ -113,7 +115,9 @@ A super administrator needs to grant admin privileges to a new team member. They
 
 #### Login Flow
 
-- **FR-016**: System MUST display Google OAuth login interface on the `/login` page for unauthenticated and anonymous users
+- **FR-016**: System MUST display email/password login form on the `/login` page for unauthenticated and anonymous users
+- **FR-016a**: System MUST NOT provide sign-up or account creation functionality (users are created manually in Firebase Console)
+- **FR-016b**: System MUST validate email format and provide clear error messages for invalid credentials
 - **FR-017**: System MUST redirect authenticated admin users from `/login` to `/admin`
 - **FR-018**: System MUST display a waiting message ("You are logged in. Waiting for an administrator to grant access.") for users who successfully authenticate but lack the `admin: true` claim
 - **FR-019**: System MUST allow authenticated non-admin users to access `/guest/[projectId]` routes while waiting for admin access
@@ -160,21 +164,27 @@ A super administrator needs to grant admin privileges to a new team member. They
 - Firebase Authentication is already configured in the project
 - Firebase Admin SDK is available for server-side operations
 - Firestore security rules can be deployed and updated as part of this feature
-- Google OAuth is configured as a sign-in provider in Firebase Authentication
+- Email/password authentication is enabled as a sign-in provider in Firebase Authentication
 - The platform uses a standard web session model where tokens expire and refresh according to Firebase defaults (1 hour access tokens)
 - Admin privilege grants are infrequent enough that manual operation is acceptable (fewer than 10 grants per week initially)
 - Token refresh happens automatically via Firebase SDK without requiring application-level intervention
 - The `/login` route will be a new page created as part of this feature
+- User accounts are created manually by administrators in Firebase Console (no self-service registration)
+- User creation frequency is low enough that manual operation via Firebase Console is acceptable
 
 ## Out of Scope *(mandatory)*
 
+- Self-service user registration or sign-up (users created manually in Firebase Console)
 - Self-service admin signup or role request workflows
 - Role management via Firestore fields or custom database schemas
 - Multiple admin role levels (e.g., editor, viewer, super-admin)
 - Admin impersonation of guest users
 - Account linking between anonymous sessions and authenticated accounts
-- Password-based authentication (only Google OAuth for admin login)
+- OAuth providers (Google, GitHub, etc.) - only email/password for admin login
 - Email verification workflows
 - Multi-factor authentication (MFA)
+- Password reset/forgot password functionality (may be added in future)
+- Password strength requirements beyond Firebase defaults
+- User profile management in the application
 - Session management UI (e.g., viewing active sessions, remote logout)
 - Automated admin access approval workflows
