@@ -12,7 +12,8 @@
     "type-check": "tsc --noEmit",
     "format": "prettier --check .",
     "check": "prettier --write . && eslint --fix",
-    "start": "node --import ./.output/server/instrument.server.mjs .output/server/index.mjs"
+    "start": "node --import ./.output/server/instrument.server.mjs .output/server/index.mjs",
+    "grant-admin": "tsx scripts/grant-admin.ts"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",
@@ -38,7 +39,8 @@
     "tailwind-merge": "^3.0.2",
     "tailwindcss": "^4.0.6",
     "tw-animate-css": "^1.3.6",
-    "vite-tsconfig-paths": "^6.0.2"
+    "vite-tsconfig-paths": "^6.0.2",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@tanstack/devtools-vite": "^0.3.11",
@@ -52,6 +54,7 @@
     "eslint": "^9.39.1",
     "jsdom": "^27.0.0",
     "prettier": "^3.5.3",
+    "tsx": "^4.21.0",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.50.1",
     "vite": "^7.1.7",
