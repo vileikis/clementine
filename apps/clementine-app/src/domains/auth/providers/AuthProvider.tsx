@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react'
 import { onIdTokenChanged } from 'firebase/auth'
+import { useServerFn } from '@tanstack/react-start'
 import { createSessionFn } from '../server/functions'
 import type { User } from 'firebase/auth'
 import type { AuthState, TypedIdTokenResult } from '../types/auth.types'
@@ -18,6 +19,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     idTokenResult: null,
   })
 
+  // Wrap server function with useServerFn hook
+  const createSession = useServerFn(createSessionFn)
+
   useEffect(() => {
     // Use onIdTokenChanged to detect custom claims changes
     const unsubscribe = onIdTokenChanged(auth, async (user: User | null) => {
@@ -28,7 +32,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           (await user.getIdTokenResult()) as TypedIdTokenResult
 
         // Create server session with ID token
-        await createSessionFn({ data: { idToken } })
+        await createSession({ data: { idToken } })
 
         setAuthState({
           user,
@@ -50,7 +54,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     })
 
     return () => unsubscribe()
-  }, [])
+  }, [createSession])
 
   return (
     <AuthContext.Provider value={authState}>{children}</AuthContext.Provider>
