@@ -20,11 +20,12 @@
 
 // Load environment variables from .env.local
 import { config } from 'dotenv'
-config({ path: '.env.local' })
 
 import { cert, getApps, initializeApp } from 'firebase-admin/app'
 import { getAuth } from 'firebase-admin/auth'
 import { z } from 'zod'
+
+config({ path: '.env.local' })
 
 // Email validation schema (T049)
 const GrantAdminSchema = z.object({

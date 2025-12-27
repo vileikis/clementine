@@ -1,9 +1,10 @@
 import { useReducer } from 'react'
 import { signInWithEmailAndPassword } from 'firebase/auth'
 import { useServerFn } from '@tanstack/react-start'
-import { auth } from '@/integrations/firebase/client'
+import { useRouter } from '@tanstack/react-router'
 import { createSessionFn } from '../server/functions'
 import { mapFirebaseAuthError } from '../utils/mapFirebaseAuthError'
+import { auth } from '@/integrations/firebase/client'
 
 // State type
 interface SignInState {
@@ -59,6 +60,7 @@ function signInReducer(state: SignInState, action: SignInAction): SignInState {
 export function useEmailPasswordSignIn() {
   const [state, dispatch] = useReducer(signInReducer, initialState)
   const createSession = useServerFn(createSessionFn)
+  const router = useRouter()
 
   const setEmail = (email: string) => {
     dispatch({ type: 'SET_EMAIL', payload: email })
@@ -88,7 +90,11 @@ export function useEmailPasswordSignIn() {
       await createSession({ data: { idToken } })
 
       dispatch({ type: 'SIGN_IN_SUCCESS' })
-      // Redirect logic is handled by beforeLoad in route
+
+      // Invalidate and navigate to trigger route guards
+      // This will redirect to /admin if user is admin, or show waiting message if not
+      await router.invalidate()
+      router.navigate({ to: '/admin' })
     } catch (err) {
       console.error('Sign-in error:', err)
       const errorMessage = mapFirebaseAuthError(err)
