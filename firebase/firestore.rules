@@ -1,67 +1,31 @@
 rules_version = '2';
 
-// Firestore Security Rules for Clementine POC
-// Strategy: Hybrid Client SDK + Admin SDK approach
-// - Allow all reads (Client SDK can subscribe to real-time updates)
-// - Deny all writes (force all mutations through Server Actions with Admin SDK)
-//
-// Why this approach?
-// ✅ Client SDK can read/subscribe to Firestore (real-time session updates in guest flow)
-// ✅ All mutations enforced through Server Actions (server-side validation + business logic)
-// ✅ Business logic stays secure on the server
-// ✅ Ready to tighten rules in MVP phase when authentication is added
-//
-// POC Limitations:
-// - No authentication required
-// - No rate limiting
-// - No user-specific access control
-//
-// Future MVP Rules (when authentication is added):
-// - Organizers can only read/write their own events
-// - Guests can only read live events and their own sessions
-// - Admin SDK still handles all mutations for validation
+// Firestore Security Rules for Clementine
+// Auth System: Admin users have full access, non-admin rules to be defined later
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // POC: Allow all reads, deny all writes
-    // All writes MUST go through Server Actions using Admin SDK
-    match /{document=**} {
-      allow read: if true;
-      allow write: if false; // Server Actions only
+    // Helper function: Check if user is admin
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.admin == true;
     }
+    
+    function isAuthenticated() {                                                                                                         
+      return request.auth != null                                                                                                        
+        && request.auth.token.firebase.sign_in_provider != 'anonymous';                                                                  
+    }                                                                                                                                    
 
-    // Future: Granular rules example (commented out for POC)
-    //
-    // match /events/{eventId} {
-    //   // Anyone can read live events
-    //   allow read: if resource.data.status == 'live' || isOrganizer(eventId);
-    //
-    //   // Only organizers can write events (via Admin SDK Server Actions)
-    //   allow write: if false; // Server Actions only
-    //
-    //   match /sessions/{sessionId} {
-    //     // Anyone can read sessions (for real-time updates in guest flow)
-    //     allow read: if true;
-    //
-    //     // All session mutations via Server Actions
-    //     allow write: if false; // Server Actions only
-    //   }
-    // }
-    //
-    // match /stats/{eventId} {
-    //   allow read: if isOrganizer(eventId);
-    //   allow write: if false; // Server Actions only
-    // }
-    //
-    // // Helper functions for future use
-    // function isAuthenticated() {
-    //   return request.auth != null;
-    // }
-    //
-    // function isOrganizer(eventId) {
-    //   return isAuthenticated() &&
-    //          get(/databases/$(database)/documents/events/$(eventId)).data.organizerId == request.auth.uid;
-    // }
+    function isAnyUser() {                                                                                                               
+      return request.auth != null;                                                                                                       
+    }    
+
+    // Admin users: Full access to everything
+    // Non-admin users: Will be handled later (currently deny all writes, allow reads)
+    match /{document=**} {
+      allow read: if true; // Allow reads for now (will be restricted per collection later)
+      allow write: if isAdmin(); // Only admins can write
+    }
   }
 }

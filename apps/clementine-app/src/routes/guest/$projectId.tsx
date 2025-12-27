@@ -1,13 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { GuestExperiencePage } from '@/domains/guest'
 
 export const Route = createFileRoute('/guest/$projectId')({
   component: GuestProjectPage,
 })
 
 function GuestProjectPage() {
-  return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold">WIP</h1>
-    </div>
-  )
+  const { projectId } = Route.useParams()
+  return <GuestExperiencePage projectId={projectId} />
 }
