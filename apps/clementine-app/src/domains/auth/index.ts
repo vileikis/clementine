@@ -17,7 +17,7 @@ export {
 export {
   getCurrentUserFn,
   createSessionFn,
-  signOutFn,
+  logoutFn,
   grantAdminFn,
 } from './server/functions'
 

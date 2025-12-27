@@ -17,6 +17,6 @@ export { useAppSession, type SessionData } from './session'
 export {
   getCurrentUserFn,
   createSessionFn,
-  signOutFn,
+  logoutFn,
   grantAdminFn,
 } from './functions'

@@ -68,20 +68,18 @@ export const createSessionFn = createServerFn({
   })
 
 /**
- * Sign out user and clear server session
+ * Logout user and clear server session
  *
  * Clears HTTP-only session cookie and redirects to home page.
  * Client must also call Firebase Auth signOut() separately.
  *
- * @throws Redirect to home page after sign out
+ * @throws Redirect to home page after logout
  */
-export const signOutFn = createServerFn({ method: 'POST' }).handler(
-  async () => {
-    const session = await useAppSession()
-    await session.clear()
-    throw redirect({ to: '/' })
-  },
-)
+export const logoutFn = createServerFn({ method: 'POST' }).handler(async () => {
+  const session = await useAppSession()
+  await session.clear()
+  throw redirect({ to: '/login' })
+})
 
 /**
  * Grant admin privileges to user by email
