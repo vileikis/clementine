@@ -1,8 +1,10 @@
+import { TriangleAlert } from 'lucide-react'
 import { signOut } from 'firebase/auth'
 import { useServerFn } from '@tanstack/react-start'
 import { useAuth } from '../providers/AuthProvider'
 import { logoutFn } from '../server/functions'
 import { auth } from '@/integrations/firebase/client'
+import { Button } from '@/ui-kit/components/button'
 
 // T039: Create WaitingMessage component for non-admin authenticated users
 
@@ -27,19 +29,7 @@ export function WaitingMessage() {
         {/* Header */}
         <div className="text-center">
           <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-warning/20 mb-4">
-            <svg
-              className="h-6 w-6 text-warning-foreground"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-              />
-            </svg>
+            <TriangleAlert className="h-6 w-6 text-warning-foreground" />
           </div>
           <h1 className="text-3xl font-bold text-foreground">Access Pending</h1>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -96,12 +86,14 @@ export function WaitingMessage() {
 
             {/* Sign out button (44x44px minimum touch target) */}
             <div className="border-t border-border pt-6">
-              <button
+              <Button
                 onClick={handleSignOut}
-                className="w-full flex items-center justify-center px-6 py-3 min-h-[44px] border border-input rounded-md shadow-sm bg-background text-foreground font-medium hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring transition-colors"
+                variant="outline"
+                size="lg"
+                className="w-full min-h-[44px]"
               >
                 Sign Out
-              </button>
+              </Button>
             </div>
           </div>
         </div>

@@ -354,20 +354,20 @@ This document breaks down the Firebase Authentication & Authorization System imp
 
 **Tasks**:
 
-- [ ] T047 [US4] Create grant-admin script file: apps/clementine-app/scripts/grant-admin.ts
-- [ ] T048 [US4] Implement Firebase Admin SDK initialization in apps/clementine-app/scripts/grant-admin.ts
-- [ ] T049 [US4] Implement email validation with Zod schema in apps/clementine-app/scripts/grant-admin.ts
-- [ ] T050 [US4] Implement getUserByEmail lookup in apps/clementine-app/scripts/grant-admin.ts
-- [ ] T051 [US4] Implement anonymous user validation (reject if providerData.length === 0) in apps/clementine-app/scripts/grant-admin.ts
-- [ ] T052 [US4] Implement setCustomUserClaims with admin: true in apps/clementine-app/scripts/grant-admin.ts
-- [ ] T053 [US4] Add CLI argument parsing for email input in apps/clementine-app/scripts/grant-admin.ts
-- [ ] T054 [US4] Add error handling for user-not-found case in apps/clementine-app/scripts/grant-admin.ts
+- [X] T047 [US4] Create grant-admin script file: apps/clementine-app/scripts/grant-admin.ts
+- [X] T048 [US4] Implement Firebase Admin SDK initialization in apps/clementine-app/scripts/grant-admin.ts
+- [X] T049 [US4] Implement email validation with Zod schema in apps/clementine-app/scripts/grant-admin.ts
+- [X] T050 [US4] Implement getUserByEmail lookup in apps/clementine-app/scripts/grant-admin.ts
+- [X] T051 [US4] Implement anonymous user validation (reject if providerData.length === 0) in apps/clementine-app/scripts/grant-admin.ts
+- [X] T052 [US4] Implement setCustomUserClaims with admin: true in apps/clementine-app/scripts/grant-admin.ts
+- [X] T053 [US4] Add CLI argument parsing for email input in apps/clementine-app/scripts/grant-admin.ts
+- [X] T054 [US4] Add error handling for user-not-found case in apps/clementine-app/scripts/grant-admin.ts
 - [ ] T055 [US4] Write unit test for admin grant logic (mock Firebase Admin SDK) in apps/clementine-app/scripts/__tests__/grant-admin.test.ts
 - [ ] T056 [US4] Test manual: Run script with valid non-admin user email, verify admin claim set
 - [ ] T057 [US4] Test manual: Run script with non-existent email, verify error message
 - [ ] T058 [US4] Test manual: User signs out and back in after admin grant, verify admin access
-- [ ] T059 [US4] Update package.json with script alias: "grant-admin": "node scripts/grant-admin.ts" in apps/clementine-app/package.json
-- [ ] T060 [US4] Run validation loop: pnpm check && pnpm type-check in apps/clementine-app/
+- [X] T059 [US4] Update package.json with script alias: "grant-admin": "node scripts/grant-admin.ts" in apps/clementine-app/package.json
+- [X] T060 [US4] Run validation loop: pnpm check && pnpm type-check in apps/clementine-app/
 
 **Story Complete When**:
 - ✅ Script accepts email and grants admin claim (FR-021, FR-024)
