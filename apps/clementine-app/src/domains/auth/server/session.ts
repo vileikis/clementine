@@ -1,5 +1,18 @@
 import { useSession } from '@tanstack/react-start/server'
 
+// Validate SESSION_SECRET at module load time (fail fast)
+function getSessionSecret(): string {
+  const secret = process.env.SESSION_SECRET?.trim()
+  if (!secret) {
+    throw new Error(
+      'SESSION_SECRET environment variable is required for session encryption',
+    )
+  }
+  return secret
+}
+
+const SESSION_SECRET = getSessionSecret()
+
 /**
  * Session data structure for authenticated users
  *
@@ -34,6 +47,6 @@ export type SessionData = {
 export function useAppSession() {
   return useSession<SessionData>({
     name: 'clementine-session',
-    password: process.env.SESSION_SECRET!,
+    password: SESSION_SECRET,
   })
 }

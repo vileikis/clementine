@@ -41,7 +41,7 @@ This standard defines how authentication and authorization are implemented acros
 
 ### TanStack Start Application
 
-```
+```text
 src/domains/auth/
 ├── providers/
 │   └── AuthProvider.tsx          # Auth context (client-side state)

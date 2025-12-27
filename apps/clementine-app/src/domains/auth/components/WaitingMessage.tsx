@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { TriangleAlert } from 'lucide-react'
 import { signOut } from 'firebase/auth'
 import { useServerFn } from '@tanstack/react-start'
+import * as Sentry from '@sentry/tanstackstart-react'
 import { useAuth } from '../providers/AuthProvider'
 import { logoutFn } from '../server/functions'
 import { auth } from '@/integrations/firebase/client'
@@ -22,7 +23,9 @@ export function WaitingMessage() {
       // Clear server session and redirect
       await serverLogout()
     } catch (err) {
-      console.error('Sign-out error:', err)
+      Sentry.captureException(err, {
+        tags: { component: 'WaitingMessage', action: 'sign-out' },
+      })
       setIsSigningOut(false)
     }
   }

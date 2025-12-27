@@ -13,18 +13,16 @@ function LogoutPage() {
   useEffect(() => {
     const performLogout = async () => {
       try {
-        console.log('Starting logout process...')
-
         // Step 1: Clear client-side Firebase auth state
         await signOut(auth)
-        console.log('Client-side auth cleared')
 
-        // Step 2: Clear server-side session
+        // Step 2: Clear server-side session (this may throw a redirect)
         await logoutFn()
-        console.log('Server-side session cleared')
+
+        // If logoutFn doesn't redirect, navigate manually
+        navigate({ to: '/login' })
       } catch (error) {
         // logoutFn throws a redirect, catch it and navigate manually
-        console.log('Logout completed, navigating to /login')
         navigate({ to: '/login' })
       }
     }

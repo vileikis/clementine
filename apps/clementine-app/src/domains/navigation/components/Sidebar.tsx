@@ -2,6 +2,7 @@ import { LogOut, Menu } from 'lucide-react'
 import { useParams } from '@tanstack/react-router'
 import { signOut } from 'firebase/auth'
 import { useServerFn } from '@tanstack/react-start'
+import * as Sentry from '@sentry/tanstackstart-react'
 import { useSidebarState } from '../hooks'
 import { AdminNav } from './AdminNav'
 import { WorkspaceNav } from './WorkspaceNav'
@@ -118,7 +119,9 @@ function SidebarContent({
       // Clear server session and redirect to /login
       await serverLogout()
     } catch (err) {
-      console.error('Logout error:', err)
+      Sentry.captureException(err, {
+        tags: { component: 'Sidebar', action: 'logout' },
+      })
     }
   }
 
