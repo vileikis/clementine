@@ -29,7 +29,7 @@ export async function requireAdmin() {
   const user = await getCurrentUserFn()
 
   if (!user || user.isAnonymous || !user.isAdmin) {
-    throw redirect({ to: '/' as const })
+    throw redirect({ to: '/login' })
   }
 
   return user
