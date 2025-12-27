@@ -243,10 +243,10 @@ This document breaks down the Firebase Authentication & Authorization System imp
 - [X] T039 [US3] Create WaitingMessage component for non-admin authenticated users in apps/clementine-app/src/domains/auth/components/WaitingMessage.tsx
 - [X] T040 [US3] Add mobile-first styles (320px-768px viewport, 44x44px touch targets) to LoginPage component
 - [ ] T041 [US3] Write unit test for login redirect logic in apps/clementine-app/src/domains/auth/__tests__/LoginPage.test.tsx
-- [ ] T042 [US3] Test manual: Visit /login unauthenticated, verify Google OAuth button appears
+- [X] T042 [US3] Test manual: Visit /login unauthenticated, verify Google OAuth button appears
 - [ ] T043 [US3] Test manual: Sign in with Google as non-admin user, verify waiting message appears
-- [ ] T044 [US3] Test manual: Verify non-admin user can access /guest/test-project after login
-- [ ] T045 [US3] Test manual: Sign in as admin user, verify redirect to /admin
+- [X] T044 [US3] Test manual: Verify non-admin user can access /guest/test-project after login
+- [X] T045 [US3] Test manual: Sign in as admin user, verify redirect to /admin
 - [X] T046 [US3] Run validation loop: pnpm check && pnpm type-check in apps/clementine-app/
 
 **Story Complete When**:
@@ -312,10 +312,10 @@ This document breaks down the Firebase Authentication & Authorization System imp
 
 ### Step 6: Testing & Validation (T153-T157)
 
-- [ ] T153 Test manual: Login with valid email/password credentials (user created in Firebase Console)
-- [ ] T154 Test manual: Login with invalid credentials (wrong password)
-- [ ] T155 Test manual: Login with non-existent user (user not created in Firebase Console)
-- [ ] T156 Test manual: Verify admin user redirected to /admin after login
+- [X] T153 Test manual: Login with valid email/password credentials (user created in Firebase Console)
+- [X] T154 Test manual: Login with invalid credentials (wrong password)
+- [X] T155 Test manual: Login with non-existent user (user not created in Firebase Console)
+- [X] T156 Test manual: Verify admin user redirected to /admin after login
 - [X] T157 Run validation loop: `pnpm check && pnpm type-check`
 
 **Phase Complete When**:
@@ -363,9 +363,9 @@ This document breaks down the Firebase Authentication & Authorization System imp
 - [X] T053 [US4] Add CLI argument parsing for email input in apps/clementine-app/scripts/grant-admin.ts
 - [X] T054 [US4] Add error handling for user-not-found case in apps/clementine-app/scripts/grant-admin.ts
 - [ ] T055 [US4] Write unit test for admin grant logic (mock Firebase Admin SDK) in apps/clementine-app/scripts/__tests__/grant-admin.test.ts
-- [ ] T056 [US4] Test manual: Run script with valid non-admin user email, verify admin claim set
+- [X] T056 [US4] Test manual: Run script with valid non-admin user email, verify admin claim set
 - [X] T057 [US4] Test manual: Run script with non-existent email, verify error message
-- [ ] T058 [US4] Test manual: User signs out and back in after admin grant, verify admin access
+- [X] T058 [US4] Test manual: User signs out and back in after admin grant, verify admin access
 - [X] T059 [US4] Update package.json with script alias: "grant-admin": "node scripts/grant-admin.ts" in apps/clementine-app/package.json
 - [X] T060 [US4] Run validation loop: pnpm check && pnpm type-check in apps/clementine-app/
 
