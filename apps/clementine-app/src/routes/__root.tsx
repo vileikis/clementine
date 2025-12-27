@@ -8,13 +8,11 @@ import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 import type { QueryClient } from '@tanstack/react-query'
-import type { AuthState } from '@/domains/auth/types/auth.types'
 import appCss from '@/ui-kit/theme/styles.css?url'
 import { AuthProvider, useAuth } from '@/domains/auth/providers/AuthProvider'
 
 export interface MyRouterContext {
   queryClient: QueryClient
-  auth?: AuthState
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
