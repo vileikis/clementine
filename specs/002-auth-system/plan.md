@@ -7,7 +7,7 @@
 
 ## Summary
 
-Implement a secure Firebase-based authentication and authorization system that automatically authenticates guest users anonymously for event participation while restricting admin features to users with `admin: true` custom claims. The system will use Google OAuth for admin login, Firebase custom claims for authorization, and enforce security through client routing (UX), server functions, and Firestore/Storage security rules.
+Implement a secure Firebase-based authentication and authorization system that automatically authenticates guest users anonymously for event participation while restricting admin features to users with `admin: true` custom claims. The system will use email/password authentication for admin login and user registration, Firebase custom claims for authorization, and enforce security through client routing (UX), server functions, and Firestore/Storage security rules.
 
 ## Technical Context
 
@@ -28,7 +28,7 @@ Implement a secure Firebase-based authentication and authorization system that a
 ### I. Mobile-First Design ✅ PASS
 
 - Login page will be mobile-optimized (320px-768px primary viewport)
-- All interactive elements (Google OAuth button, form inputs) meet 44x44px touch target minimum
+- All interactive elements (email/password form inputs, buttons) meet 44x44px touch target minimum
 - Performance target: <2s guest auth on 4G networks (spec SC-001: <2s access to event experiences)
 - Testing required on real mobile devices before completion
 
@@ -42,7 +42,7 @@ Implement a secure Firebase-based authentication and authorization system that a
 - No dead code: No commented-out code will be committed
 - DRY: Auth state management centralized, route guard logic reusable
 
-**Justification**: Auth system is straightforward - anonymous sign-in, Google OAuth, custom claims. No premature abstraction needed.
+**Justification**: Auth system is straightforward - anonymous sign-in, email/password authentication, custom claims. No premature abstraction needed.
 
 ### III. Type-Safe Development ✅ PASS
 
@@ -77,7 +77,7 @@ Implement a secure Firebase-based authentication and authorization system that a
 
 ### VI. Frontend Architecture ✅ PASS
 
-- **Client-first pattern**: Firebase Auth client SDK for all auth operations (signInAnonymously, signInWithPopup, getIdTokenResult)
+- **Client-first pattern**: Firebase Auth client SDK for all auth operations (signInAnonymously, signInWithEmailAndPassword, getIdTokenResult)
 - **SSR strategy**: `/login` route uses SSR only for metadata (SEO), auth logic is client-side
 - **Security enforcement**: Route guards client-side (UX), Firestore/Storage rules enforce security (mandatory per FR-009)
 - **Real-time**: Auth state changes handled via `onAuthStateChanged` listener
@@ -87,12 +87,13 @@ Implement a secure Firebase-based authentication and authorization system that a
 
 ### VII. Backend & Firebase ✅ PASS
 
-- **Client SDK**: Used for `signInAnonymously`, `signInWithPopup`, `getIdTokenResult`, `onAuthStateChanged`
-- **Admin SDK**: Used ONLY for server-side admin grant script (`setCustomUserClaims`)
+- **Client SDK**: Used for `signInAnonymously`, `signInWithEmailAndPassword`, `getIdTokenResult`, `onAuthStateChanged`
+- **Admin SDK**: Used ONLY for server-side operations (admin grant script via `setCustomUserClaims`, user creation in Firebase Console)
+- **User Creation**: Manual operation via Firebase Console - no self-service registration in application
 - **Security rules**: Firestore/Storage rules will check `request.auth.token.admin == true` for admin operations (FR-027)
 - **Public URLs**: Not applicable for auth (no media storage in auth flow)
 
-**Justification**: Auth follows hybrid pattern - client SDK for user-facing operations, Admin SDK for privileged operations (admin grant).
+**Justification**: Auth follows hybrid pattern - client SDK for user-facing operations, Admin SDK for privileged operations (admin grant, user creation). Manual user management is acceptable for low-volume use case.
 
 ### VIII. Project Structure ✅ PASS
 
