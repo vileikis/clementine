@@ -1,5 +1,6 @@
 import { createServerFn } from '@tanstack/react-start'
 import { redirect } from '@tanstack/react-router'
+import * as Sentry from '@sentry/tanstackstart-react'
 import { useAppSession } from './session'
 import { adminAuth } from '@/integrations/firebase/server'
 
@@ -62,7 +63,9 @@ export const createSessionFn = createServerFn({
 
       return { success: true }
     } catch (error) {
-      console.error('Session creation failed:', error)
+      Sentry.captureException(error, {
+        tags: { function: 'createSessionFn', action: 'session-creation' },
+      })
       return { success: false, error: 'Invalid token' }
     }
   })

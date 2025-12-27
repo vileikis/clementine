@@ -29,8 +29,9 @@ export function generateSlug(name: string): string {
     .toLowerCase()
     .trim()
     .replace(/[^a-z0-9]+/g, '-') // Replace non-alphanumeric with hyphens
-    .replace(/^-+|-+$/g, '') // Remove leading/trailing hyphens
+    .replace(/-+/g, '-') // Collapse consecutive hyphens
     .substring(0, SLUG_LENGTH.max) // Enforce max length
+    .replace(/^-+|-+$/g, '') // Remove leading/trailing hyphens (after truncation)
 
   // Fallback for empty or too-short slugs
   if (slug.length < SLUG_LENGTH.min) {

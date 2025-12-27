@@ -2,6 +2,7 @@ import { useReducer } from 'react'
 import { signInWithEmailAndPassword } from 'firebase/auth'
 import { useServerFn } from '@tanstack/react-start'
 import { useRouter } from '@tanstack/react-router'
+import * as Sentry from '@sentry/tanstackstart-react'
 import { createSessionFn } from '../server/functions'
 import { mapFirebaseAuthError } from '../utils/mapFirebaseAuthError'
 import { auth } from '@/integrations/firebase/client'
@@ -96,7 +97,9 @@ export function useEmailPasswordSignIn() {
       await router.invalidate()
       router.navigate({ to: '/admin' })
     } catch (err) {
-      console.error('Sign-in error:', err)
+      Sentry.captureException(err, {
+        tags: { component: 'useEmailPasswordSignIn', action: 'sign-in' },
+      })
       const errorMessage = mapFirebaseAuthError(err)
       dispatch({ type: 'SIGN_IN_ERROR', payload: errorMessage })
     }

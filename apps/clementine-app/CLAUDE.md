@@ -127,7 +127,6 @@ See `standards/global/project-structure.md` for complete architectural guideline
 For complete authentication standards, implementation patterns, and security guidelines, see:
 
 - **Authentication Standard**: `../../standards/global/authentication.md`
-- **Feature Specification**: `../../specs/002-auth-system/spec.md`
 
 ## Commands
 
