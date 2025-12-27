@@ -1,4 +1,5 @@
 import { signOut } from 'firebase/auth'
+import { useServerFn } from '@tanstack/react-start'
 import { useAuth } from '../providers/AuthProvider'
 import { signOutFn } from '../server/functions'
 import { auth } from '@/integrations/firebase/client'
@@ -7,13 +8,14 @@ import { auth } from '@/integrations/firebase/client'
 
 export function WaitingMessage() {
   const { user } = useAuth()
+  const serverSignOut = useServerFn(signOutFn)
 
   const handleSignOut = async () => {
     try {
       // Sign out from Firebase (client-side)
       await signOut(auth)
       // Clear server session and redirect
-      await signOutFn()
+      await serverSignOut()
     } catch (err) {
       console.error('Sign-out error:', err)
     }

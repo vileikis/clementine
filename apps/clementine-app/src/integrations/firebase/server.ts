@@ -13,19 +13,16 @@ import * as admin from 'firebase-admin'
  * - FIREBASE_ADMIN_PRIVATE_KEY
  */
 
-// Initialize Firebase Admin SDK (singleton pattern)
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert({
       projectId: process.env.FIREBASE_ADMIN_PROJECT_ID,
       clientEmail: process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
-      // Private key needs to be properly formatted (replace literal \n with newlines)
       privateKey: process.env.FIREBASE_ADMIN_PRIVATE_KEY?.replace(/\\n/g, '\n'),
     }),
+    storageBucket: process.env.FIREBASE_ADMIN_STORAGE_BUCKET,
   })
 }
-
-// Export admin services for use in server functions
 export const adminAuth = admin.auth()
 export const adminDb = admin.firestore()
 export const adminStorage = admin.storage()
