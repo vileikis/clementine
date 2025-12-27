@@ -364,7 +364,7 @@ This document breaks down the Firebase Authentication & Authorization System imp
 - [X] T054 [US4] Add error handling for user-not-found case in apps/clementine-app/scripts/grant-admin.ts
 - [ ] T055 [US4] Write unit test for admin grant logic (mock Firebase Admin SDK) in apps/clementine-app/scripts/__tests__/grant-admin.test.ts
 - [ ] T056 [US4] Test manual: Run script with valid non-admin user email, verify admin claim set
-- [ ] T057 [US4] Test manual: Run script with non-existent email, verify error message
+- [X] T057 [US4] Test manual: Run script with non-existent email, verify error message
 - [ ] T058 [US4] Test manual: User signs out and back in after admin grant, verify admin access
 - [X] T059 [US4] Update package.json with script alias: "grant-admin": "node scripts/grant-admin.ts" in apps/clementine-app/package.json
 - [X] T060 [US4] Run validation loop: pnpm check && pnpm type-check in apps/clementine-app/
