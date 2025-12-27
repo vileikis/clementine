@@ -119,45 +119,45 @@ This document breaks down the Firebase Authentication & Authorization System imp
 
 ### Step 2: Server Infrastructure (T106-T110)
 
-- [ ] T106 Install firebase-admin dependency: `pnpm add firebase-admin`
-- [ ] T107 Create src/integrations/firebase/server.ts (Firebase Admin SDK setup)
-- [ ] T108 Create src/domains/auth/server/session.ts (session management)
-- [ ] T109 Create src/domains/auth/server/functions.ts (server functions)
-- [ ] T110 Create src/domains/auth/server/index.ts (server exports)
+- [X] T106 Install firebase-admin dependency: `pnpm add firebase-admin`
+- [X] T107 Create src/integrations/firebase/server.ts (Firebase Admin SDK setup)
+- [X] T108 Create src/domains/auth/server/session.ts (session management)
+- [X] T109 Create src/domains/auth/server/functions.ts (server functions)
+- [X] T110 Create src/domains/auth/server/index.ts (server exports)
 
 ### Step 3: Server Functions Implementation (T111-T115)
 
-- [ ] T111 Implement getCurrentUserFn server function
-- [ ] T112 Implement createSessionFn server function
-- [ ] T113 Implement signOutFn server function
-- [ ] T114 Implement grantAdminFn server function (for Phase 6)
-- [ ] T115 Export all server functions from server/index.ts
+- [X] T111 Implement getCurrentUserFn server function
+- [X] T112 Implement createSessionFn server function
+- [X] T113 Implement signOutFn server function
+- [X] T114 Implement grantAdminFn server function (for Phase 6)
+- [X] T115 Export all server functions from server/index.ts
 
 ### Step 4: Bridge Client & Server Auth (T116-T119)
 
-- [ ] T116 Update AuthProvider to call createSessionFn on auth state change
-- [ ] T117 Update LoginPage to create session after Google sign-in
-- [ ] T118 Update WaitingMessage to use signOutFn
+- [X] T116 Update AuthProvider to call createSessionFn on auth state change
+- [X] T117 Update LoginPage to create session after Google sign-in
+- [X] T118 Update WaitingMessage to use signOutFn
 - [ ] T119 Test client-server auth sync (verify session created on login)
 
 ### Step 5: Refactor & Update Route Guards (T120-T124)
 
-- [ ] T120 Move components/AuthGuard.tsx → lib/guards.ts
-- [ ] T121 Rewrite guard functions to use server functions (async)
-- [ ] T122 Update admin/route.tsx beforeLoad to use requireAdmin()
-- [ ] T123 Update workspace/route.tsx beforeLoad to use requireAdmin()
-- [ ] T124 Update login/index.tsx beforeLoad to use server function
+- [X] T120 Move components/AuthGuard.tsx → lib/guards.ts
+- [X] T121 Rewrite guard functions to use server functions (async)
+- [X] T122 Update admin/route.tsx beforeLoad to use requireAdmin()
+- [X] T123 Update workspace/route.tsx beforeLoad to use requireAdmin()
+- [X] T124 Update login/index.tsx beforeLoad to use server function
 
 ### Step 6: Clean Up Router Context (T125-T127)
 
-- [ ] T125 Remove auth from MyRouterContext in __root.tsx
-- [ ] T126 Update RootLayout to only use useAuth for UI rendering
-- [ ] T127 Verify router.tsx context doesn't reference auth
+- [X] T125 Remove auth from MyRouterContext in __root.tsx
+- [X] T126 Update RootLayout to only use useAuth for UI rendering
+- [X] T127 Verify router.tsx context doesn't reference auth
 
 ### Step 7: File Structure Refactoring (T128-T129)
 
-- [ ] T128 Move components/LoginPage.tsx → containers/LoginPage.tsx
-- [ ] T129 Update imports and exports in auth/index.ts
+- [X] T128 Move components/LoginPage.tsx → containers/LoginPage.tsx
+- [X] T129 Update imports and exports in auth/index.ts
 
 ### Step 8: Validation & Testing (T130-T136)
 
@@ -167,7 +167,7 @@ This document breaks down the Firebase Authentication & Authorization System imp
 - [ ] T133 Test sign-out: Verify session cleared and redirected
 - [ ] T134 Test anonymous user: Can access /guest/[projectId] but not /admin
 - [ ] T135 Test Google OAuth: Sign in creates session, admin redirected to /admin
-- [ ] T136 Run validation loop: `pnpm check && pnpm type-check`
+- [X] T136 Run validation loop: `pnpm check && pnpm type-check`
 
 **Phase Complete When**:
 - ✅ All existing functionality works (Phases 1-5)

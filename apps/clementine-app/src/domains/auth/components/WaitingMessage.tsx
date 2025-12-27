@@ -1,5 +1,6 @@
 import { signOut } from 'firebase/auth'
 import { useAuth } from '../providers/AuthProvider'
+import { signOutFn } from '../server/functions'
 import { auth } from '@/integrations/firebase/client'
 
 // T039: Create WaitingMessage component for non-admin authenticated users
@@ -9,7 +10,10 @@ export function WaitingMessage() {
 
   const handleSignOut = async () => {
     try {
+      // Sign out from Firebase (client-side)
       await signOut(auth)
+      // Clear server session and redirect
+      await signOutFn()
     } catch (err) {
       console.error('Sign-out error:', err)
     }

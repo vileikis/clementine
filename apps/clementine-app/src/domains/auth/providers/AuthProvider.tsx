@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react'
 import { onIdTokenChanged } from 'firebase/auth'
+import { createSessionFn } from '../server/functions'
 import type { User } from 'firebase/auth'
 import type { AuthState, TypedIdTokenResult } from '../types/auth.types'
 import { auth } from '@/integrations/firebase/client'
@@ -21,8 +22,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Use onIdTokenChanged to detect custom claims changes
     const unsubscribe = onIdTokenChanged(auth, async (user: User | null) => {
       if (user) {
+        // Get ID token and custom claims
+        const idToken = await user.getIdToken()
         const idTokenResult =
           (await user.getIdTokenResult()) as TypedIdTokenResult
+
+        // Create server session with ID token
+        await createSessionFn({ data: { idToken } })
 
         setAuthState({
           user,
@@ -32,6 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           idTokenResult,
         })
       } else {
+        // User signed out - client state only (session cleared by signOutFn)
         setAuthState({
           user: null,
           isAdmin: false,
