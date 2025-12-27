@@ -124,31 +124,38 @@ Error: Auth not available in context
 
 ```
 apps/clementine-app/src/
-├── server/
-│   ├── auth/
-│   │   ├── session.ts          # Session management
-│   │   ├── auth.functions.ts   # Server functions for auth
-│   │   └── firebase-admin.ts   # Firebase Admin SDK setup
-│   └── index.ts                # Server exports
+├── integrations/
+│   └── firebase/
+│       ├── client.ts           # Existing - Firebase Client SDK
+│       └── server.ts           # NEW - Firebase Admin SDK
+├── domains/
+│   └── auth/
+│       ├── components/         # Existing
+│       ├── containers/         # NEW - LoginPage moved here
+│       ├── hooks/              # Existing
+│       ├── lib/                # NEW - guards.ts (moved from components/)
+│       ├── providers/          # Existing
+│       ├── server/             # NEW - Server auth code
+│       │   ├── session.ts      # Session management
+│       │   ├── functions.ts    # Server functions for auth
+│       │   └── index.ts        # Server exports
+│       ├── types/              # Existing
+│       └── index.ts            # Existing
 ```
 
 **Dependencies to Install**:
 ```bash
-pnpm add firebase-admin vinxi
+# From apps/clementine-app/ directory
+pnpm add firebase-admin
 ```
 
-**Environment Variables**:
-```env
-# Server-side (add to apps/clementine-app/.env)
-SESSION_SECRET=<generate-32-char-secret>
-FIREBASE_ADMIN_PROJECT_ID=<your-project-id>
-FIREBASE_ADMIN_CLIENT_EMAIL=<service-account-email>
-FIREBASE_ADMIN_PRIVATE_KEY=<service-account-private-key>
-```
+**Environment Variables Setup**:
+
+See detailed setup instructions in [Environment Variables Setup](#environment-variables-setup) section below.
 
 ### 2. Session Management
 
-**Create**: `src/server/auth/session.ts`
+**Create**: `src/domains/auth/server/session.ts`
 
 ```typescript
 import { useSession } from '@tanstack/react-start/server'
@@ -176,7 +183,7 @@ export function useAppSession() {
 
 ### 3. Firebase Admin SDK Setup
 
-**Create**: `src/server/auth/firebase-admin.ts`
+**Create**: `src/integrations/firebase/server.ts`
 
 ```typescript
 import * as admin from 'firebase-admin'
@@ -204,13 +211,13 @@ export const auth = () => getFirebaseAdmin().auth()
 
 ### 4. Server Functions for Auth
 
-**Create**: `src/server/auth/auth.functions.ts`
+**Create**: `src/domains/auth/server/functions.ts`
 
 ```typescript
 import { createServerFn } from '@tanstack/react-start'
 import { redirect } from '@tanstack/react-router'
 import { useAppSession } from './session'
-import { auth } from './firebase-admin'
+import { auth } from '@/integrations/firebase/server'
 
 // Get current user from session
 export const getCurrentUserFn = createServerFn({ method: 'GET' }).handler(
@@ -300,7 +307,7 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import { onAuthStateChanged } from 'firebase/auth'
 import { auth } from '@/integrations/firebase/client'
 import { useServerFn } from '@tanstack/react-start'
-import { createSessionFn } from '@/server/auth/auth.functions'
+import { createSessionFn } from '../server/functions'
 import type { AuthState } from '../types/auth.types'
 
 const AuthContext = createContext<AuthState | null>(null)
@@ -366,7 +373,7 @@ export function useAuth() {
 
 ```typescript
 import { redirect } from '@tanstack/react-router'
-import { getCurrentUserFn } from '@/server/auth/auth.functions'
+import { getCurrentUserFn } from '../server/functions'
 
 /**
  * Require admin user (works on both server and client)
@@ -690,18 +697,201 @@ If migration fails or causes issues:
 
 ---
 
+---
+
+## Environment Variables Setup
+
+### Prerequisites
+
+Before setting up environment variables, you need:
+1. A Firebase project (should already exist from Phase 1)
+2. Firebase Admin SDK service account credentials
+3. A secure session secret
+
+### Step-by-Step Setup
+
+#### Step 1: Generate Session Secret
+
+Generate a secure random string for session encryption:
+
+```bash
+# Option 1: Using OpenSSL (recommended)
+openssl rand -base64 32
+
+# Option 2: Using Node.js
+node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
+```
+
+Copy the output - you'll use it as `SESSION_SECRET`.
+
+#### Step 2: Download Firebase Service Account
+
+1. Go to [Firebase Console](https://console.firebase.google.com)
+2. Select your project
+3. Click **⚙️ Settings** → **Project Settings**
+4. Navigate to **Service Accounts** tab
+5. Click **Generate new private key** button
+6. Confirm and download the JSON file (e.g., `firebase-service-account.json`)
+
+**⚠️ Important**: Keep this file secure! It grants admin access to your Firebase project.
+
+#### Step 3: Extract Credentials from JSON
+
+Open the downloaded JSON file. It will look like this:
+
+```json
+{
+  "type": "service_account",
+  "project_id": "your-project-id",
+  "private_key_id": "abc123...",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBA...\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-xxxxx@your-project.iam.gserviceaccount.com",
+  "client_id": "123456789",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  ...
+}
+```
+
+Extract these three values:
+- `project_id` → **FIREBASE_ADMIN_PROJECT_ID**
+- `client_email` → **FIREBASE_ADMIN_CLIENT_EMAIL**
+- `private_key` → **FIREBASE_ADMIN_PRIVATE_KEY**
+
+#### Step 4: Create/Update .env.local File
+
+**Location**: `/Users/iggyvileikis/Projects/@attempt-n2/clementine/apps/clementine-app/.env.local`
+
+Add the following variables:
+
+```bash
+# ============================================
+# Session Management
+# ============================================
+# Generate with: openssl rand -base64 32
+SESSION_SECRET="paste-your-generated-secret-here"
+
+# ============================================
+# Firebase Admin SDK (Server-Side)
+# ============================================
+# Get these from Firebase Console → Project Settings → Service Accounts → Generate Private Key
+
+# Project ID (from service account JSON: "project_id")
+FIREBASE_ADMIN_PROJECT_ID="your-project-id"
+
+# Service account email (from service account JSON: "client_email")
+FIREBASE_ADMIN_CLIENT_EMAIL="firebase-adminsdk-xxxxx@your-project.iam.gserviceaccount.com"
+
+# Private key (from service account JSON: "private_key")
+# IMPORTANT: Keep the quotes and newlines as-is
+FIREBASE_ADMIN_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----
+MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC...
+(your full multi-line private key here)
+...
+-----END PRIVATE KEY-----"
+```
+
+**Important Notes**:
+- Keep the entire private key in quotes (including BEGIN/END markers)
+- Preserve all newlines (`\n`) in the private key
+- Don't remove or modify the quotes around the private key
+
+#### Step 5: Verify .env.local is Gitignored
+
+Check that `.env.local` is in `.gitignore`:
+
+```bash
+# In apps/clementine-app/.gitignore
+.env.local
+.env*.local
+```
+
+**⚠️ Critical**: Never commit `.env.local` or service account credentials to git!
+
+#### Step 6: Test Environment Variables
+
+Create a test script to verify environment variables are loaded:
+
+```typescript
+// apps/clementine-app/scripts/test-env.ts
+console.log('Testing environment variables...')
+console.log('SESSION_SECRET:', process.env.SESSION_SECRET ? '✓ Set' : '✗ Missing')
+console.log('FIREBASE_ADMIN_PROJECT_ID:', process.env.FIREBASE_ADMIN_PROJECT_ID ? '✓ Set' : '✗ Missing')
+console.log('FIREBASE_ADMIN_CLIENT_EMAIL:', process.env.FIREBASE_ADMIN_CLIENT_EMAIL ? '✓ Set' : '✗ Missing')
+console.log('FIREBASE_ADMIN_PRIVATE_KEY:', process.env.FIREBASE_ADMIN_PRIVATE_KEY ? '✓ Set' : '✗ Missing')
+```
+
+Run with:
+```bash
+tsx scripts/test-env.ts
+```
+
+Should output:
+```
+Testing environment variables...
+SESSION_SECRET: ✓ Set
+FIREBASE_ADMIN_PROJECT_ID: ✓ Set
+FIREBASE_ADMIN_CLIENT_EMAIL: ✓ Set
+FIREBASE_ADMIN_PRIVATE_KEY: ✓ Set
+```
+
+### Production Deployment
+
+For production environments (Vercel, Netlify, etc.):
+
+1. **Don't use .env.local** - Add variables through platform's dashboard
+2. **Use platform's secret manager**:
+   - Vercel: Project Settings → Environment Variables
+   - Netlify: Site Settings → Environment Variables
+3. **Set for production environment** only (not preview/development)
+4. **Redeploy** after adding variables
+
+### Troubleshooting
+
+**Error: "Unable to parse private key"**
+- Check that private key has proper quotes and newlines
+- Ensure no extra spaces or characters
+- Verify BEGIN/END markers are intact
+
+**Error: "SESSION_SECRET must be at least 32 characters"**
+- Regenerate with `openssl rand -base64 32`
+- Ensure no trailing spaces or newlines
+
+**Error: "Permission denied" from Firebase Admin**
+- Verify service account has correct roles
+- Check project_id matches your Firebase project
+- Regenerate service account key if needed
+
+### Security Best Practices
+
+✅ **Do**:
+- Store credentials in `.env.local` (gitignored)
+- Use environment variables in production
+- Rotate service account keys periodically
+- Use different service accounts for dev/staging/prod
+
+❌ **Don't**:
+- Commit credentials to git
+- Share service account JSON files
+- Use production credentials in development
+- Log or expose private keys in code
+
+---
+
 ## References
 
 - TanStack Start Auth Docs: https://tanstack.com/start/latest/docs/framework/react/guide/authentication
 - TanStack Router Auth Guide: https://tanstack.com/router/v1/docs/framework/react/guide/authenticated-routes
 - Firebase Admin SDK: https://firebase.google.com/docs/auth/admin
 - Firebase Session Cookies: https://firebase.google.com/docs/auth/admin/manage-cookies
+- Firebase Service Accounts: https://firebase.google.com/docs/admin/setup#initialize-sdk
 
 ---
 
 **Next Steps**:
-1. Review this migration plan with team
-2. Get approval to proceed with Phase 3.5
-3. Implement changes following task breakdown
-4. Validate thoroughly before proceeding to Phase 6
-5. Update tasks.md with Phase 3.5 tasks once approved
+1. ✅ Review this migration plan with team
+2. ✅ Get approval to proceed with Phase 3.5
+3. ⏭️ Set up environment variables (follow guide above)
+4. ⏭️ Update tasks.md with Phase 3.5 tasks
+5. ⏭️ Implement changes following task breakdown
+6. ⏭️ Validate thoroughly before proceeding to Phase 6

@@ -91,6 +91,98 @@ This document breaks down the Firebase Authentication & Authorization System imp
 
 ---
 
+## Phase 3.5: Server-Side Auth Migration ⚠️ BLOCKING
+
+**Goal**: Migrate from client-side auth to server-side validation (hybrid approach) to fix SSR issues and enable proper route protection.
+
+**Status**: Planning - Requires approval before implementation
+
+**Background**: Current client-side auth implementation fails on SSR because `beforeLoad` hooks run on both server and client. Firebase Client SDK only works in browser, causing "Auth not available in context" errors on initial page load.
+
+**Solution**: Implement server-side auth validation using TanStack Start server functions while maintaining client-side Firestore/Storage access (hybrid approach).
+
+**Documentation**: See [server-auth-migration.md](./server-auth-migration.md) for complete migration plan, architectural decisions, and detailed implementation guide.
+
+**Impact**: Blocks completion of Phase 4-7 until resolved. All route guards must be updated to work on both server and client.
+
+**Priority**: High (must complete before Phase 4-7 can be finalized)
+
+**Tasks**:
+
+### Step 1: Environment Setup (T101-T105)
+
+- [ ] T101 Generate SESSION_SECRET with `openssl rand -base64 32`
+- [ ] T102 Download Firebase Admin service account JSON from Console
+- [ ] T103 Extract credentials and add to .env.local (SESSION_SECRET, FIREBASE_ADMIN_*)
+- [ ] T104 Verify .env.local is gitignored
+- [ ] T105 Test environment variables are loaded correctly
+
+### Step 2: Server Infrastructure (T106-T110)
+
+- [ ] T106 Install firebase-admin dependency: `pnpm add firebase-admin`
+- [ ] T107 Create src/integrations/firebase/server.ts (Firebase Admin SDK setup)
+- [ ] T108 Create src/domains/auth/server/session.ts (session management)
+- [ ] T109 Create src/domains/auth/server/functions.ts (server functions)
+- [ ] T110 Create src/domains/auth/server/index.ts (server exports)
+
+### Step 3: Server Functions Implementation (T111-T115)
+
+- [ ] T111 Implement getCurrentUserFn server function
+- [ ] T112 Implement createSessionFn server function
+- [ ] T113 Implement signOutFn server function
+- [ ] T114 Implement grantAdminFn server function (for Phase 6)
+- [ ] T115 Export all server functions from server/index.ts
+
+### Step 4: Bridge Client & Server Auth (T116-T119)
+
+- [ ] T116 Update AuthProvider to call createSessionFn on auth state change
+- [ ] T117 Update LoginPage to create session after Google sign-in
+- [ ] T118 Update WaitingMessage to use signOutFn
+- [ ] T119 Test client-server auth sync (verify session created on login)
+
+### Step 5: Refactor & Update Route Guards (T120-T124)
+
+- [ ] T120 Move components/AuthGuard.tsx → lib/guards.ts
+- [ ] T121 Rewrite guard functions to use server functions (async)
+- [ ] T122 Update admin/route.tsx beforeLoad to use requireAdmin()
+- [ ] T123 Update workspace/route.tsx beforeLoad to use requireAdmin()
+- [ ] T124 Update login/index.tsx beforeLoad to use server function
+
+### Step 6: Clean Up Router Context (T125-T127)
+
+- [ ] T125 Remove auth from MyRouterContext in __root.tsx
+- [ ] T126 Update RootLayout to only use useAuth for UI rendering
+- [ ] T127 Verify router.tsx context doesn't reference auth
+
+### Step 7: File Structure Refactoring (T128-T129)
+
+- [ ] T128 Move components/LoginPage.tsx → containers/LoginPage.tsx
+- [ ] T129 Update imports and exports in auth/index.ts
+
+### Step 8: Validation & Testing (T130-T136)
+
+- [ ] T130 Test SSR: Hard refresh on /admin (should redirect on server, no error)
+- [ ] T131 Test client navigation: Click to /admin (should redirect on client)
+- [ ] T132 Test session persistence: Refresh page, verify session maintained
+- [ ] T133 Test sign-out: Verify session cleared and redirected
+- [ ] T134 Test anonymous user: Can access /guest/[projectId] but not /admin
+- [ ] T135 Test Google OAuth: Sign in creates session, admin redirected to /admin
+- [ ] T136 Run validation loop: `pnpm check && pnpm type-check`
+
+**Phase Complete When**:
+- ✅ All existing functionality works (Phases 1-5)
+- ✅ Server-side auth validation working in beforeLoad
+- ✅ No "Auth not available in context" errors
+- ✅ Proper SSR for protected routes (no flash before redirect)
+- ✅ Session management working (persist across refreshes)
+- ✅ Client-side Firestore/Storage access unchanged
+- ✅ All validation tests pass (T130-T136)
+- ✅ Code quality checks pass (pnpm check && pnpm type-check)
+
+**Estimated Time**: 4-6 hours
+
+---
+
 ## Phase 4: User Story 2 - Admin Access Control (P1)
 
 **Story Goal**: Protect `/admin` and `/workspace` routes, allowing access only to users with `admin: true` custom claim.
