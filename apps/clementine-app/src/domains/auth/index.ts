@@ -14,12 +14,7 @@ export {
 } from './lib/guards'
 
 // Server functions (for direct use in components/routes)
-export {
-  getCurrentUserFn,
-  createSessionFn,
-  logoutFn,
-  grantAdminFn,
-} from './server/functions'
+export { getCurrentUserFn, createSessionFn, logoutFn } from './server/functions'
 
 // TypeScript types
 export type {
