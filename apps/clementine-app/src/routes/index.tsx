@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { Link, createFileRoute } from '@tanstack/react-router'
 import { handleRootRoute } from '@/domains/auth/guards'
 
 export const Route = createFileRoute('/')({
@@ -16,9 +16,9 @@ function RootPage() {
           organizer.
         </p>
         <div className="pt-4">
-          <a href="/login" className="text-sm text-primary hover:underline">
+          <Link to="/login" className="text-sm text-primary hover:underline">
             Admin Login →
-          </a>
+          </Link>
         </div>
       </div>
     </div>
