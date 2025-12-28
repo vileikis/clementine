@@ -1,40 +1,37 @@
 <!--
   SYNC IMPACT REPORT
 
-  Version Change: NEW → 1.0.0 (Initial version for new constitution structure)
+  Version Change: 1.0.0 → 1.1.0 (MINOR - Material expansion of Principle V)
 
   Modified Principles:
-  - Migrated from legacy constitution (features/memory/constitution.md v1.2.0)
-  - Streamlined to 8 core principles (previously 7 in old structure)
-  - Added "Validation Gates" as explicit principle (previously embedded in Principle V)
-  - Simplified by referencing /standards/ directory instead of duplicating content
-  - Added Frontend Architecture principle with client-first pattern
-  - Restructured Backend & Firebase principle to reference multiple standard files
+  - Principle V: Validation Gates
+    - OLD: Technical validation only (format, lint, type-check)
+    - NEW: Technical validation + Standards compliance review
+    - Added mandatory standards compliance check before marking features complete
+    - Expanded validation loop to include standards verification
 
   Added Sections:
-  - Standards Compliance section (governance)
-  - More explicit validation enforcement with pnpm app:check command
+  - Standards Compliance Review subsection in Principle V
+  - Reference to design-system.md and other standards for compliance enforcement
+  - Explicit requirement to review code against applicable standards before commit
 
   Removed Sections:
-  - Technical Standards section (now referenced via /standards/ directory)
-  - Development Workflow section (now in project CLAUDE.md)
-  - Monorepo Structure section (now in project CLAUDE.md)
+  - None
 
   Templates Requiring Updates:
-  ✅ plan-template.md - Constitution Check section will reference new principles
-  ✅ spec-template.md - Aligned with new principle structure
-  ✅ tasks-template.md - Aligned with new validation gate requirements
+  ✅ plan-template.md - Constitution Check section already references gates (no change needed)
+  ✅ spec-template.md - Already references standards (no change needed)
+  ✅ tasks-template.md - Already includes validation tasks (no change needed)
 
   Follow-up TODOs:
-  - Update plan-template.md Constitution Check to reflect new 8 principles
-  - Ensure all spec templates reference /standards/ directory appropriately
-  - Archive old constitution at features/memory/constitution.md (legacy reference)
+  - None (all templates already align with expanded validation gates)
 
-  Migration Notes:
-  - Old constitution (features/memory/constitution.md v1.2.0) served as reference
-  - New constitution adopts lighter, reference-based approach
-  - Version reset to 1.0.0 as this is a structural rewrite, not an amendment
-  - Ratification date set to today (2025-12-26) as first version of new structure
+  Amendment Rationale:
+  - Added standards compliance gate to Principle V (Validation Gates)
+  - Ensures code is reviewed against /standards/ directory before completion
+  - Particularly important for new design-system.md strict compliance rules
+  - Prevents standards violations from reaching code review or production
+  - Maintains backward compatibility (existing validation gates still required)
 -->
 
 # Clementine Constitution
@@ -93,7 +90,9 @@ Testing is pragmatic and focused on value - write minimal tests during developme
 
 ### V. Validation Gates
 
-Before marking any feature complete or committing code, MUST run validation loop to ensure code quality and correctness.
+Before marking any feature complete or committing code, MUST run validation loop to ensure code quality, correctness, and standards compliance.
+
+#### Technical Validation (Automated)
 
 - **Before every commit**: Run format, lint, type-check
 - **Auto-fix command**: `pnpm app:check` (applies lint and format fixes automatically)
@@ -101,9 +100,30 @@ Before marking any feature complete or committing code, MUST run validation loop
 - **Breaking changes**: Verify in local dev server (`pnpm dev`) before committing
 - Commit only after validation loop passes cleanly
 
-**Rationale**: Validation gates catch issues early before they reach code review or production. This discipline prevents broken main branch states and ensures every commit meets quality standards. The `pnpm app:check` command automates fixes where possible, reducing manual toil.
+#### Standards Compliance Review (Manual)
 
-**Reference**: See `standards/global/code-quality.md` for validation workflows.
+**Before marking feature complete**, MUST review code against applicable standards:
+
+1. **Identify applicable standards** from `/standards/` directory based on your changes:
+   - **UI/Frontend work** → Review `frontend/design-system.md` + `frontend/component-libraries.md`
+   - **Data/Backend work** → Review `backend/firestore.md` + `backend/firestore-security.md`
+   - **New features** → Review `global/project-structure.md` + domain-specific standards
+   - **All changes** → Review `global/code-quality.md` + `global/security.md`
+
+2. **Verify compliance** with each applicable standard:
+   - Design System: No hard-coded colors? Using theme tokens? Paired background/foreground?
+   - Component Libraries: Using shadcn/ui? Extending properly? Accessibility preserved?
+   - Project Structure: Following vertical slice architecture? Correct file naming?
+   - Code Quality: Clean, simple, well-named? No dead code?
+   - Security: Input validated? No XSS/injection vulnerabilities?
+
+3. **Document deviations** (if any):
+   - If you MUST deviate from a standard, document why in code comments or PR description
+   - Get approval for standard deviations before merging
+
+**Rationale**: Validation gates catch issues early before they reach code review or production. Technical validation ensures basic quality (linting, types). Standards compliance ensures architectural consistency, design system adherence, and security best practices. Together, they prevent broken main branch states and maintain codebase quality.
+
+**Reference**: See `standards/global/code-quality.md` for validation workflows and standards index.
 
 ### VI. Frontend Architecture
 
@@ -162,6 +182,7 @@ All development MUST adhere to standards defined in `/standards/` directory:
 ### Frontend Standards (UI/UX Work)
 
 - **Architecture** (`frontend/architecture.md`): Client-first pattern, SSR strategy
+- **Design System** (`frontend/design-system.md`): Theme tokens, strict compliance rules
 - **Component Libraries** (`frontend/component-libraries.md`): shadcn/ui patterns
 - **Responsive Design** (`frontend/responsive.md`): Mobile-first breakpoints
 - **Accessibility** (`frontend/accessibility.md`): WCAG AA compliance
@@ -179,7 +200,7 @@ All development MUST adhere to standards defined in `/standards/` directory:
 
 - **Testing** (`testing/testing.md`): Jest patterns, coverage goals, testing philosophy
 
-**Enforcement**: All code reviews MUST verify adherence to applicable standards. Feature specifications MUST reference relevant standards before implementation begins.
+**Enforcement**: All code reviews MUST verify adherence to applicable standards. Feature specifications MUST reference relevant standards before implementation begins. Validation gates (Principle V) MUST include standards compliance review.
 
 ## Governance
 
@@ -191,17 +212,24 @@ This constitution supersedes all other development practices, conventions, and p
 
 All pull requests MUST pass validation gates before merge:
 
-1. **Format** → **Lint** → **Type-check** → **Test**
-2. **Auto-fix command**: `pnpm app:check` for automated lint and format fixes
-3. **No merge without clean validation**: All checks must pass
-4. **Breaking changes**: Verify in local dev server before committing
+1. **Technical Validation** (Automated):
+   - **Format** → **Lint** → **Type-check** → **Test**
+   - **Auto-fix command**: `pnpm app:check` for automated lint and format fixes
+   - **No merge without clean validation**: All checks must pass
+   - **Breaking changes**: Verify in local dev server before committing
+
+2. **Standards Compliance** (Manual Review):
+   - **Identify applicable standards** based on files changed
+   - **Verify compliance** with each applicable standard
+   - **Document deviations** if standard cannot be followed (with justification)
+   - **No merge without standards review**: Code reviewers MUST verify compliance
 
 ### Standards Compliance Review
 
 - All PRs MUST verify compliance with constitution principles
 - Code reviewers MUST enforce standards and principles
 - Features MUST reference applicable standards from `/standards/` directory before implementation
-- Validation loop MUST pass before merge
+- Validation loop (technical + standards) MUST pass before merge
 - Complexity violations MUST be explicitly justified in implementation plan
 
 ### Simplicity Justification
@@ -225,4 +253,4 @@ Constitution changes require:
 4. **Propagation**: Update all affected templates, standards, and documentation
 5. **Sync Impact Report**: Document changes at top of constitution file (HTML comment)
 
-**Version**: 1.0.0 | **Ratified**: 2025-12-26 | **Last Amended**: 2025-12-26
+**Version**: 1.1.0 | **Ratified**: 2025-12-26 | **Last Amended**: 2025-12-28
