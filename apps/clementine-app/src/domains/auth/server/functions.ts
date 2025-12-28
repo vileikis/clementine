@@ -1,7 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 import { redirect } from '@tanstack/react-router'
 import * as Sentry from '@sentry/tanstackstart-react'
-import { useAppSession } from './session'
+import { useAppSession } from './session.server'
 import type { SessionUser } from '../types/session.types'
 import { adminAuth } from '@/integrations/firebase/server'
 
