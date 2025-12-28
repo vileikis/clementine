@@ -106,13 +106,13 @@ src/
 │   │   ├── theming/     # Subdomain
 │   │   └── shared/      # Domain-specific shared code
 │   └── experiences/     # Experiences domain
-└── routes/              # TanStack Router routes (thin)
+└── app/                 # TanStack Router routes (thin)
 ```
 
 **Key principles:**
 
 - **Domain-first organization** - Code organized by business capability
-- **Thin routes** - Routes import containers from domains
+- **Thin app routes** - Routes import containers from domains
 - **Client-first data** - Firebase client SDK for all data operations
 - **Progressive complexity** - Start simple, add structure as needed
 
