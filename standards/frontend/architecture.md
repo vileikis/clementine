@@ -99,7 +99,7 @@ async function uploadImage(file: File, path: string) {
 **SSR for Entry Points:**
 
 ```tsx
-// routes/events/[eventId]/index.tsx
+// app/events/[eventId]/index.tsx
 import { createFileRoute } from '@tanstack/react-router'
 import { getEventMetadata } from '@/domains/events/services/metadata.server'
 

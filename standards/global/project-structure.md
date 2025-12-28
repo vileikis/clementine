@@ -14,7 +14,7 @@ src/
 ├── integrations/        # Third-party integrations
 ├── shared/              # Shared utilities & components
 ├── domains/             # Business domains (DDD bounded contexts)
-└── routes/              # TanStack Router routes (thin)
+└── app/                 # TanStack Router routes (thin)
 ```
 
 ## Layer Descriptions
@@ -138,12 +138,12 @@ domains/
 - Cross-domain dependencies should be minimized
 - Import pattern: `@/domains/events/theming/components/ThemeProvider`
 
-### 5. `routes/` - Routing Layer (Thin)
+### 5. `app/` - Routing Layer (Thin)
 
 TanStack Router route definitions. Keep these minimal - primarily routing configuration.
 
 ```
-routes/
+app/
 ├── __root.tsx
 ├── index.tsx
 ├── admin/
@@ -228,7 +228,7 @@ Each domain/subdomain should follow this structure:
 ```
 domain-name/
 ├── components/          # UI components (domain-specific)
-├── containers/          # Page-level components (imported by routes)
+├── containers/          # Page-level components (imported by app routes)
 ├── hooks/               # React hooks (domain-specific)
 ├── services/            # Business logic & API calls
 ├── types/               # TypeScript types
@@ -253,7 +253,7 @@ Configured in `tsconfig.json`:
       "@/integrations/*": ["./src/integrations/*"],
       "@/shared/*": ["./src/shared/*"],
       "@/domains/*": ["./src/domains/*"],
-      "@/routes/*": ["./src/routes/*"]
+      "@/app/*": ["./src/app/*"]
     }
   }
 }
@@ -279,7 +279,7 @@ import { EventThemeProvider } from '@/domains/events/theming/components/ThemePro
 import { useEventTheme } from '@/domains/events/theming/hooks/useEventTheme'
 
 // Routes (in domain containers)
-import { Route } from '@/routes/admin/events'
+import { Route } from '@/app/admin/events'
 ```
 
 ## Route File Pattern
@@ -287,7 +287,7 @@ import { Route } from '@/routes/admin/events'
 Keep route files thin by importing containers from domains:
 
 ```tsx
-// routes/admin/events/index.tsx
+// app/admin/events/index.tsx
 import { createFileRoute } from '@tanstack/react-router'
 import { EventsPage } from '@/domains/events/management/containers/EventsPage'
 import { getEvents } from '@/domains/events/management/services/events.service'
@@ -302,7 +302,7 @@ export const Route = createFileRoute('/admin/events')({
 // domains/events/management/containers/EventsPage.tsx
 import { useCallback } from 'react'
 import { useRouter } from '@tanstack/react-router'
-import { Route } from '@/routes/admin/events'
+import { Route } from '@/app/admin/events'
 import { EventList } from '../components/EventList'
 import { EventFilters } from '../components/EventFilters'
 
@@ -357,10 +357,10 @@ When refactoring existing code:
 
 1. **Identify the domain** - Where does this code belong?
 2. **Create domain structure** - Set up folders as needed
-3. **Move containers** - Extract page components from routes
+3. **Move containers** - Extract page components from app routes
 4. **Extract shared code** - Move truly shared utilities to `shared/`
 5. **Update imports** - Use new path aliases
-6. **Update routes** - Make them thin, import containers
+6. **Update app routes** - Make them thin, import containers
 
 ## Summary
 
@@ -368,6 +368,6 @@ When refactoring existing code:
 - **`integrations/`** - Third-party service setup
 - **`shared/`** - Shared utilities and components (used by multiple domains)
 - **`domains/`** - Business logic organized by bounded contexts (DDD)
-- **`routes/`** - Thin routing layer, imports containers from domains
+- **`app/`** - Thin routing layer, imports containers from domains
 
 Follow DDD principles, minimize dependencies, and keep code organized by domain responsibility.

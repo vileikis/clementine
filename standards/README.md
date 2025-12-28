@@ -96,7 +96,7 @@ These standards ensure consistency, maintainability, and quality across all work
 ### 2. Domain-Driven Design (Frontend)
 
 - Organize by business domain, not technical layer
-- Thin routes, thick domains
+- Thin app routes, thick domains
 - Co-located components, hooks, and services
 
 **See:** `global/project-structure.md` (in app-specific CLAUDE.md)

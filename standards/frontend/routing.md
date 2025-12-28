@@ -5,7 +5,7 @@ This document defines routing patterns and best practices for TanStack Router.
 ## Core Principles
 
 ### 1. File-Based Routing
-- Routes defined by file structure in `src/routes/`
+- Routes defined by file structure in `src/app/`
 - Type-safe route definitions
 - Automatic route generation
 
@@ -22,7 +22,7 @@ This document defines routing patterns and best practices for TanStack Router.
 ## Route Structure
 
 ```
-src/routes/
+src/app/
 ├── __root.tsx                 # Root layout
 ├── index.tsx                  # Home page (/)
 ├── events/
@@ -40,7 +40,7 @@ src/routes/
 ## Route File Pattern
 
 ```typescript
-// src/routes/events/index.tsx
+// src/app/events/index.tsx
 import { createFileRoute } from '@tanstack/react-router'
 import { EventsPage } from '@/domains/events/management/containers/EventsPage'
 
@@ -54,7 +54,7 @@ export const Route = createFileRoute('/events')({
 ## Dynamic Routes
 
 ```typescript
-// src/routes/events/$eventId.tsx
+// src/app/events/$eventId.tsx
 import { createFileRoute } from '@tanstack/react-router'
 import { EventDetailPage } from '@/domains/events/management/containers/EventDetailPage'
 
