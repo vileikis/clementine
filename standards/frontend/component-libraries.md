@@ -12,6 +12,17 @@ Our UI is built on three foundational libraries:
 
 **Key Principle**: Don't reinvent the wheel. Use these battle-tested libraries for all UI needs.
 
+## Styling Components
+
+**All components MUST use design tokens from the theme system.**
+
+When building or customizing components:
+- ✅ Use theme tokens for all colors, spacing, and visual properties
+- ✅ Never hard-code colors or bypass the theme system
+- ✅ Follow strict compliance rules for design token usage
+
+**See**: `standards/frontend/design-system.md` for complete theming rules, available tokens, and governance.
+
 ## Component Library Stack
 
 ### 1. shadcn/ui (Primary Component Library)
@@ -293,10 +304,15 @@ shadcn/ui has equivalents for most common components from Material-UI, Ant Desig
 - ✅ Wrap @dnd-kit for reusable drag interactions
 - ✅ Accessibility is built-in - don't break it
 - ✅ Compose simple components into complex UIs
+- ✅ **Always use design tokens for styling** - See `design-system.md`
 
 **Resources:**
 
-- shadcn/ui: https://ui.shadcn.com
-- Radix UI: https://www.radix-ui.com
-- @dnd-kit: https://docs.dndkit.com
-- lucide-react: https://lucide.dev
+- **Component Libraries:**
+  - shadcn/ui: https://ui.shadcn.com
+  - Radix UI: https://www.radix-ui.com
+  - @dnd-kit: https://docs.dndkit.com
+  - lucide-react: https://lucide.dev
+- **Standards:**
+  - Design System: `standards/frontend/design-system.md`
+  - UI Kit Guide: `src/ui-kit/README.md`
