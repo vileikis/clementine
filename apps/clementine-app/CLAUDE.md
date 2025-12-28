@@ -216,7 +216,6 @@ function useEvents() {
 ```tsx
 import { Button } from '@/ui-kit/components/button'
 import { firestore } from '@/integrations/firebase/client'
-import { cn } from '@/shared/lib/cn'
 import { EventsPage } from '@/domains/events/management/containers/EventsPage'
 ```
 

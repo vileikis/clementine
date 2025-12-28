@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import type { LucideIcon } from 'lucide-react'
-import { cn } from '@/shared/lib/utils'
+import { cn } from '@/shared/utils'
 
 interface NavigationLinkProps {
   label: string
