@@ -72,12 +72,31 @@ export const createSessionFn = createServerFn({
   })
 
 /**
- * Logout user and clear server session
+ * Clear server session
  *
- * Clears HTTP-only session cookie and redirects to home page.
+ * Clears HTTP-only session cookie. Does NOT redirect or sign out from Firebase.
+ * Use this from AuthProvider's logout method for centralized logout logic.
+ *
+ * @returns Success result
+ */
+export const clearSessionFn = createServerFn({ method: 'POST' }).handler(
+  async (): Promise<{ success: true }> => {
+    const session = await useAppSession()
+    await session.clear()
+    return { success: true }
+  },
+)
+
+/**
+ * @deprecated Use AuthProvider's logout method instead
+ *
+ * Legacy logout function with redirect.
+ * This function will be removed in a future version.
+ *
+ * Clears HTTP-only session cookie and redirects to /login.
  * Client must also call Firebase Auth signOut() separately.
  *
- * @throws Redirect to home page after logout
+ * @throws Redirect to /login after logout
  */
 export const logoutFn = createServerFn({ method: 'POST' }).handler(async () => {
   const session = await useAppSession()

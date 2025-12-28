@@ -1,14 +1,26 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState } from 'react'
-import { onIdTokenChanged } from 'firebase/auth'
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react'
+import { onIdTokenChanged, signOut } from 'firebase/auth'
+import { useRouter } from '@tanstack/react-router'
 import { useServerFn } from '@tanstack/react-start'
-import { createSessionFn } from '../server/functions'
+import * as Sentry from '@sentry/tanstackstart-react'
+import { clearSessionFn, createSessionFn } from '../server/functions'
 import type { User } from 'firebase/auth'
-import type { AuthState, TypedIdTokenResult } from '../types/auth.types'
+import type {
+  AuthContextValue,
+  AuthState,
+  TypedIdTokenResult,
+} from '../types/auth.types'
 import { auth } from '@/integrations/firebase/client'
 
-const AuthContext = createContext<AuthState | null>(null)
+const AuthContext = createContext<AuthContextValue | null>(null)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [authState, setAuthState] = useState<AuthState>({
@@ -19,8 +31,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     idTokenResult: null,
   })
 
-  // Wrap server function with useServerFn hook
+  const router = useRouter()
+
+  // Wrap server functions with useServerFn hook
   const createSession = useServerFn(createSessionFn)
+  const clearSession = useServerFn(clearSessionFn)
+
+  /**
+   * Logout user (clears both Firebase auth and server session)
+   * Automatically navigates to /login after logout
+   */
+  const logout = useCallback(async () => {
+    try {
+      // 1. Clear Firebase client auth
+      await signOut(auth)
+
+      // 2. Clear server session
+      await clearSession()
+
+      // 3. Navigate to login
+      router.navigate({ to: '/login' })
+    } catch (error) {
+      Sentry.captureException(error, {
+        tags: { component: 'AuthProvider', action: 'logout' },
+      })
+      // Defensive: Navigate to login even if error occurred
+      router.navigate({ to: '/login' })
+    }
+  }, [clearSession, router])
 
   useEffect(() => {
     // Use onIdTokenChanged to detect custom claims changes
@@ -56,9 +94,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => unsubscribe()
   }, [createSession])
 
-  return (
-    <AuthContext.Provider value={authState}>{children}</AuthContext.Provider>
-  )
+  const value: AuthContextValue = {
+    ...authState,
+    logout,
+  }
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 
 export function useAuth() {
