@@ -5,11 +5,9 @@ export const Route = createFileRoute('/workspace/$workspaceSlug/settings')({
 })
 
 function SettingsPage() {
-  const { workspaceSlug } = Route.useParams()
-  console.log('settings workspaceSlug', workspaceSlug)
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold">WIP</h1>
+      <h1 className="text-2xl font-bold">Settings WIP</h1>
     </div>
   )
 }

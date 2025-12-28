@@ -2,12 +2,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   collection,
   doc,
-  getDocs,
-  limit,
-  query,
   runTransaction,
   serverTimestamp,
-  where,
 } from 'firebase/firestore'
 import type { WithFieldValue } from 'firebase/firestore'
 import type {
@@ -43,11 +39,15 @@ export function useCreateWorkspace() {
 
       // Run transaction - Firestore ensures atomicity at database level
       return await runTransaction(firestore, async (transaction) => {
-        // Check if slug exists (case-insensitive, includes deleted workspaces)
-        const q = query(workspacesRef, where('slug', '==', slug), limit(1))
-        const existingSnapshot = await getDocs(q)
+        // Use dedicated slugs collection for atomic uniqueness check
+        // This ensures transaction.get participates in the transaction
+        const slugsRef = collection(firestore, 'workspace_slugs')
+        const slugDocRef = doc(slugsRef, slug)
 
-        if (!existingSnapshot.empty) {
+        // Atomic check: transaction.get ensures no race conditions
+        const slugDoc = await transaction.get(slugDocRef)
+
+        if (slugDoc.exists()) {
           throw new Error('Slug already exists')
         }
 
@@ -64,6 +64,12 @@ export function useCreateWorkspace() {
           updatedAt: serverTimestamp(),
         }
 
+        // Atomic write: both slug claim and workspace creation in same transaction
+        transaction.set(slugDocRef, {
+          workspaceId: newWorkspaceRef.id,
+          slug,
+          createdAt: serverTimestamp(),
+        })
         transaction.set(newWorkspaceRef, workspaceData)
 
         return { id: newWorkspaceRef.id, slug }
@@ -72,10 +78,6 @@ export function useCreateWorkspace() {
     onSuccess: () => {
       // Real-time updates via onSnapshot, but invalidate for consistency
       queryClient.invalidateQueries({ queryKey: ['workspaces'] })
-    },
-    onError: (error) => {
-      console.error('Failed to create workspace:', error)
-      // Error available in mutation.error for UI
     },
   })
 }

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { collection, getDocs, limit, query, where } from 'firebase/firestore'
-import type { Workspace } from '../types/workspace.types'
+import { workspaceSchema } from '../schemas/workspace.schemas'
 import { firestore } from '@/integrations/firebase/client'
 
 /**
@@ -34,7 +34,9 @@ export function useWorkspace(slug: string | undefined) {
         return null
       }
 
-      return snapshot.docs[0].data() as Workspace
+      // Runtime validation using Zod schema
+      // Validates all required fields and enforces business rules
+      return workspaceSchema.parse(snapshot.docs[0].data())
     },
     enabled: !!slug, // Only run query if slug is provided
     staleTime: 1000 * 60 * 5, // 5 minutes

@@ -34,9 +34,5 @@ export function useDeleteWorkspace() {
       // Real-time updates via onSnapshot, but invalidate for consistency
       queryClient.invalidateQueries({ queryKey: ['workspaces'] })
     },
-    onError: (error) => {
-      console.error('Failed to delete workspace:', error)
-      // Error available in mutation.error for UI
-    },
   })
 }
