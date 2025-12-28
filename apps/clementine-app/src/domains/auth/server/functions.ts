@@ -15,19 +15,24 @@ import { adminAuth } from '@/integrations/firebase/server'
  */
 export const getCurrentUserFn = createServerFn({ method: 'GET' }).handler(
   async (): Promise<SessionUser | null> => {
-    const session = await useAppSession()
-    const { userId, email, isAdmin, isAnonymous } = session.data
+    return Sentry.startSpan(
+      { name: 'getCurrentUserFn', op: 'auth.session' },
+      async () => {
+        const session = await useAppSession()
+        const { userId, email, isAdmin, isAnonymous } = session.data
 
-    if (!userId) {
-      return null
-    }
+        if (!userId) {
+          return null
+        }
 
-    return {
-      userId,
-      email: email || undefined,
-      isAdmin: isAdmin || false,
-      isAnonymous: isAnonymous || false,
-    }
+        return {
+          userId,
+          email: email || undefined,
+          isAdmin: isAdmin || false,
+          isAnonymous: isAnonymous || false,
+        }
+      },
+    )
   },
 )
 
@@ -45,30 +50,36 @@ export const createSessionFn = createServerFn({
 })
   .inputValidator((data: { idToken: string }) => data)
   .handler(async ({ data }) => {
-    try {
-      // Verify ID token with Firebase Admin SDK
-      const decodedToken = await adminAuth.verifyIdToken(data.idToken)
+    return Sentry.startSpan(
+      { name: 'createSessionFn', op: 'auth.session.create' },
+      async () => {
+        try {
+          // Verify ID token with Firebase Admin SDK
+          const decodedToken = await adminAuth.verifyIdToken(data.idToken)
 
-      // Extract custom claims and user metadata
-      const isAdmin = decodedToken.admin === true
-      const isAnonymous = decodedToken.firebase.sign_in_provider === 'anonymous'
+          // Extract custom claims and user metadata
+          const isAdmin = decodedToken.admin === true
+          const isAnonymous =
+            decodedToken.firebase.sign_in_provider === 'anonymous'
 
-      // Update server session with user data
-      const session = await useAppSession()
-      await session.update({
-        userId: decodedToken.uid,
-        email: decodedToken.email,
-        isAdmin,
-        isAnonymous,
-      })
+          // Update server session with user data
+          const session = await useAppSession()
+          await session.update({
+            userId: decodedToken.uid,
+            email: decodedToken.email,
+            isAdmin,
+            isAnonymous,
+          })
 
-      return { success: true }
-    } catch (error) {
-      Sentry.captureException(error, {
-        tags: { function: 'createSessionFn', action: 'session-creation' },
-      })
-      return { success: false, error: 'Invalid token' }
-    }
+          return { success: true }
+        } catch (error) {
+          Sentry.captureException(error, {
+            tags: { function: 'createSessionFn', action: 'session-creation' },
+          })
+          return { success: false, error: 'Invalid token' }
+        }
+      },
+    )
   })
 
 /**
@@ -81,9 +92,14 @@ export const createSessionFn = createServerFn({
  */
 export const clearSessionFn = createServerFn({ method: 'POST' }).handler(
   async (): Promise<{ success: true }> => {
-    const session = await useAppSession()
-    await session.clear()
-    return { success: true }
+    return Sentry.startSpan(
+      { name: 'clearSessionFn', op: 'auth.session.clear' },
+      async () => {
+        const session = await useAppSession()
+        await session.clear()
+        return { success: true }
+      },
+    )
   },
 )
 
@@ -99,7 +115,12 @@ export const clearSessionFn = createServerFn({ method: 'POST' }).handler(
  * @throws Redirect to /login after logout
  */
 export const logoutFn = createServerFn({ method: 'POST' }).handler(async () => {
-  const session = await useAppSession()
-  await session.clear()
-  throw redirect({ to: '/login' })
+  return Sentry.startSpan(
+    { name: 'logoutFn', op: 'auth.session.logout' },
+    async () => {
+      const session = await useAppSession()
+      await session.clear()
+      throw redirect({ to: '/login' })
+    },
+  )
 })
