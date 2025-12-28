@@ -16,7 +16,7 @@
 
 import { redirect } from '@tanstack/react-router'
 import { getCurrentUserFn } from '../server/functions'
-import { isAdmin, isNonAdmin, isAnyUser } from '../utils/authChecks'
+import { isAdmin, isAnyUser, isNonAdmin } from '../utils/authChecks'
 
 /**
  * Require admin user (works on both server and client)

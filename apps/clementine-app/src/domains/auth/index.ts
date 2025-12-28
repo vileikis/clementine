@@ -16,5 +16,4 @@ export * from './server/functions'
 
 // TypeScript types
 export type * from './types/auth.types'
-
-export type { SessionData } from './server/session'
+export type * from './types/session.types'
