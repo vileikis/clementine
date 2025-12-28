@@ -25,12 +25,12 @@
 
 **Purpose**: Project initialization, Firestore configuration, and shared workspace entity
 
-- [ ] T001 Create Firestore collection indexes in firebase/firestore.indexes.json (slug+status, status+createdAt compound indexes)
-- [ ] T002 [P] Update Firestore security rules in firebase/firestore.rules (admin-only read/write with data validation helpers)
-- [ ] T003 [P] Create Workspace entity types in apps/clementine-app/src/domains/workspace/types/workspace.types.ts
-- [ ] T004 [P] Create Workspace Zod schemas in apps/clementine-app/src/domains/workspace/schemas/workspace.schemas.ts
-- [ ] T005 [P] Create workspace constants in apps/clementine-app/src/domains/workspace/constants/workspace.constants.ts
-- [ ] T006 [P] Create workspace barrel export in apps/clementine-app/src/domains/workspace/index.ts (types, schemas, constants only)
+- [X] T001 Create Firestore collection indexes in firebase/firestore.indexes.json (slug+status, status+createdAt compound indexes)
+- [X] T002 [P] Update Firestore security rules in firebase/firestore.rules (admin-only read/write with data validation helpers)
+- [X] T003 [P] Create Workspace entity types in apps/clementine-app/src/domains/workspace/types/workspace.types.ts
+- [X] T004 [P] Create Workspace Zod schemas in apps/clementine-app/src/domains/workspace/schemas/workspace.schemas.ts
+- [X] T005 [P] Create workspace constants in apps/clementine-app/src/domains/workspace/constants/workspace.constants.ts
+- [X] T006 [P] Create workspace barrel export in apps/clementine-app/src/domains/workspace/index.ts (types, schemas, constants only)
 
 **Checkpoint**: Workspace entity defined, Firestore configured
 
@@ -42,9 +42,9 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T007 Deploy Firestore indexes using pnpm fb:deploy:indexes
-- [ ] T008 Deploy Firestore security rules using pnpm fb:deploy:rules
-- [ ] T009 Verify admin authentication guard exists at apps/clementine-app/src/domains/auth/guards/guards.ts (requireAdmin function)
+- [X] T007 Deploy Firestore indexes using pnpm fb:deploy:indexes
+- [X] T008 Deploy Firestore security rules using pnpm fb:deploy:rules
+- [X] T009 Verify admin authentication guard exists at apps/clementine-app/src/domains/auth/guards/guards.ts (requireAdmin function)
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -63,13 +63,13 @@
 
 ### Implementation for User Story 1
 
-- [ ] T010 [P] [US1] Create useWorkspaces hook in apps/clementine-app/src/domains/admin/workspace/hooks/useWorkspaces.ts (list all active workspaces with onSnapshot)
-- [ ] T011 [P] [US1] Create WorkspaceList component in apps/clementine-app/src/domains/admin/workspace/components/WorkspaceList.tsx
-- [ ] T012 [P] [US1] Create WorkspaceListItem component in apps/clementine-app/src/domains/admin/workspace/components/WorkspaceListItem.tsx
-- [ ] T013 [P] [US1] Create WorkspaceListEmpty component in apps/clementine-app/src/domains/admin/workspace/components/WorkspaceListEmpty.tsx
-- [ ] T014 [US1] Create WorkspacesPage container in apps/clementine-app/src/domains/admin/workspace/containers/WorkspacesPage.tsx (integrates WorkspaceList, data fetching)
-- [ ] T015 [US1] Create /admin/workspaces route in apps/clementine-app/src/routes/admin/workspaces.tsx (with requireAdmin guard)
-- [ ] T016 [US1] Add navigation link to workspace list in admin navigation (if admin nav exists)
+- [X] T010 [P] [US1] Create useWorkspaces hook in apps/clementine-app/src/domains/admin/workspace/hooks/useWorkspaces.ts (list all active workspaces with onSnapshot)
+- [X] T011 [P] [US1] Create WorkspaceList component in apps/clementine-app/src/domains/admin/workspace/components/WorkspaceList.tsx
+- [X] T012 [P] [US1] Create WorkspaceListItem component in apps/clementine-app/src/domains/admin/workspace/components/WorkspaceListItem.tsx
+- [X] T013 [P] [US1] Create WorkspaceListEmpty component in apps/clementine-app/src/domains/admin/workspace/components/WorkspaceListEmpty.tsx
+- [X] T014 [US1] Create WorkspacesPage container in apps/clementine-app/src/domains/admin/workspace/containers/WorkspacesPage.tsx (integrates WorkspaceList, data fetching)
+- [X] T015 [US1] Create /admin/workspaces route in apps/clementine-app/src/routes/admin/workspaces.tsx (with requireAdmin guard)
+- [X] T016 [US1] Navigation link to workspace list already exists in AdminNav component
 
 **Checkpoint**: Admins can view active workspaces, click to navigate, see real-time updates
 
