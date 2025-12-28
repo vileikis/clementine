@@ -1,31 +1,21 @@
 import { useState } from 'react'
 import { TriangleAlert } from 'lucide-react'
-import { signOut } from 'firebase/auth'
-import { useServerFn } from '@tanstack/react-start'
-import * as Sentry from '@sentry/tanstackstart-react'
 import { useAuth } from '../providers/AuthProvider'
-import { logoutFn } from '../server/functions'
-import { auth } from '@/integrations/firebase/client'
 import { Button } from '@/ui-kit/components/button'
 
 // T039: Create WaitingMessage component for non-admin authenticated users
 
 export function WaitingMessage() {
-  const { user } = useAuth()
-  const serverLogout = useServerFn(logoutFn)
+  const { user, logout } = useAuth()
   const [isSigningOut, setIsSigningOut] = useState(false)
 
   const handleSignOut = async () => {
+    setIsSigningOut(true)
     try {
-      setIsSigningOut(true)
-      // Sign out from Firebase (client-side)
-      await signOut(auth)
-      // Clear server session and redirect
-      await serverLogout()
-    } catch (err) {
-      Sentry.captureException(err, {
-        tags: { component: 'WaitingMessage', action: 'sign-out' },
-      })
+      await logout()
+      // Note: logout navigates to /login, so isSigningOut reset is not needed
+    } catch {
+      // If logout fails, reset state so user can retry
       setIsSigningOut(false)
     }
   }

@@ -1,6 +1,6 @@
 import { Outlet, createFileRoute } from '@tanstack/react-router'
 import { Sidebar } from '@/domains/navigation'
-import { requireAdmin } from '@/domains/auth/lib/guards'
+import { requireAdmin } from '@/domains/auth/guards'
 
 // T025: Implement workspace route guard (beforeLoad) checking isAdmin
 // Updated for server-side auth validation (T123)

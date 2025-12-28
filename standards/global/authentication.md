@@ -20,6 +20,7 @@ This standard defines how authentication and authorization are implemented acros
 ### Authentication Methods
 
 1. **Email/Password** (Admin users)
+
    - Login only - no self-service registration
    - Users created manually in Firebase Console
    - Non-admin users see waiting message after login
@@ -77,19 +78,19 @@ routes/
 
 ```tsx
 // ✅ CORRECT: Server-side auth check
-export const Route = createFileRoute('/admin')({
+export const Route = createFileRoute("/admin")({
   beforeLoad: async ({ context }) => {
     // Uses server function to verify session
-    await requireAdmin({ context })
+    await requireAdmin({ context });
   },
   component: AdminPage,
-})
+});
 
 // ❌ WRONG: Client-side auth check
 function AdminPage() {
-  const { isAdmin } = useAuth() // Client state only
-  if (!isAdmin) return <Navigate to="/login" /> // Too late, security bypass
-  return <div>Admin content</div>
+  const { isAdmin } = useAuth(); // Client state only
+  if (!isAdmin) return <Navigate to="/login" />; // Too late, security bypass
+  return <div>Admin content</div>;
 }
 ```
 
@@ -99,40 +100,40 @@ Client-side auth checks are for **UX only**, never for security:
 
 ```tsx
 function MyComponent() {
-  const { isAdmin, isLoading } = useAuth()
+  const { isAdmin, isLoading } = useAuth();
 
-  if (isLoading) return <div>Loading...</div>
-  if (!isAdmin) return <div>Access denied</div> // UX only, not security
+  if (isLoading) return <div>Loading...</div>;
+  if (!isAdmin) return <div>Access denied</div>; // UX only, not security
 
-  return <div>Admin content</div>
+  return <div>Admin content</div>;
 }
 ```
 
 ### Protecting Routes
 
 ```tsx
-export const Route = createFileRoute('/protected')({
+export const Route = createFileRoute("/protected")({
   beforeLoad: async ({ context }) => {
-    await requireAdmin({ context }) // Server-side check (security boundary)
+    await requireAdmin({ context }); // Server-side check (security boundary)
   },
   component: ProtectedPage,
-})
+});
 ```
 
 ### Logout
 
 ```tsx
-import { logoutFn } from '@/domains/auth/server'
-import { useServerFn } from '@tanstack/react-start'
+import { logoutFn } from "@/domains/auth/server";
+import { useServerFn } from "@tanstack/react-start";
 
 function MyComponent() {
-  const logout = useServerFn(logoutFn)
+  const logout = useServerFn(logoutFn);
 
   const handleLogout = async () => {
-    await logout() // Clears session and redirects
-  }
+    await logout(); // Clears session and redirects
+  };
 
-  return <button onClick={handleLogout}>Sign Out</button>
+  return <button onClick={handleLogout}>Sign Out</button>;
 }
 ```
 
@@ -160,6 +161,7 @@ pnpm grant-admin user@example.com
 ### Security Rules
 
 **Firestore Rules:**
+
 ```javascript
 function isAdmin() {
   return request.auth != null
@@ -173,6 +175,7 @@ match /{document=**} {
 ```
 
 **Storage Rules:**
+
 ```javascript
 function isAdmin() {
   return request.auth != null
@@ -221,13 +224,6 @@ match /{allPaths=**} {
 ✅ **DO**: Validate sessions on every server request
 ✅ **DO**: Use security rules as the enforcement layer
 ✅ **DO**: Keep auth logic in the `auth` domain
-
-## Related Documentation
-
-- **Feature Specification**: `specs/002-auth-system/spec.md`
-- **Implementation Plan**: `specs/002-auth-system/plan.md`
-- **API Reference**: `specs/002-auth-system/contracts/auth-api.md`
-- **Research**: `specs/002-auth-system/research.md`
 
 ## Version History
 

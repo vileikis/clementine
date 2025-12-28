@@ -15,7 +15,7 @@ export interface TypedIdTokenResult extends IdTokenResult {
 }
 
 /**
- * Auth state managed by AuthProvider
+ * Auth state data (managed by AuthProvider)
  */
 export interface AuthState {
   /** Current Firebase Auth user (null if unauthenticated) */
@@ -35,8 +35,18 @@ export interface AuthState {
 }
 
 /**
- * Router context including auth state
+ * Auth actions (methods provided by AuthProvider)
  */
-export interface RouterContext {
-  auth: AuthState
+export interface AuthActions {
+  /**
+   * Logout user (clears both Firebase auth and server session)
+   * Automatically navigates to /login after logout
+   */
+  logout: () => Promise<void>
 }
+
+/**
+ * Complete auth context value (state + actions)
+ * This is what useAuth() returns
+ */
+export type AuthContextValue = AuthState & AuthActions
