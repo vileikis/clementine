@@ -1,14 +1,14 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   collection,
+  getDocs,
+  onSnapshot,
+  orderBy,
   query,
   where,
-  orderBy,
-  onSnapshot,
-  getDocs,
 } from 'firebase/firestore'
-import { firestore } from '@/integrations/firebase/client'
 import type { Workspace } from '@/domains/workspace/types/workspace.types'
+import { firestore } from '@/integrations/firebase/client'
 
 /**
  * List active workspaces with real-time updates (admin only)
@@ -32,7 +32,7 @@ export function useWorkspaces() {
       const q = query(
         collection(firestore, 'workspaces'),
         where('status', '==', 'active'),
-        orderBy('createdAt', 'desc')
+        orderBy('createdAt', 'desc'),
       )
 
       // Initial fetch
@@ -40,9 +40,9 @@ export function useWorkspaces() {
       const workspaces = snapshot.docs.map((doc) => doc.data() as Workspace)
 
       // Set up real-time listener
-      onSnapshot(q, (snapshot) => {
-        const updatedWorkspaces = snapshot.docs.map(
-          (doc) => doc.data() as Workspace
+      onSnapshot(q, (realtimeSnapshot) => {
+        const updatedWorkspaces = realtimeSnapshot.docs.map(
+          (doc) => doc.data() as Workspace,
         )
         queryClient.setQueryData(['workspaces', 'active'], updatedWorkspaces)
       })
