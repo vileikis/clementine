@@ -221,15 +221,16 @@ import { EventsPage } from '@/domains/events/management/containers/EventsPage'
 
 ## Standards Quick Reference
 
-| Task                        | Standards to Review                                                   |
-| --------------------------- | --------------------------------------------------------------------- |
-| **Setting up architecture** | `global/project-structure.md` + `global/client-first-architecture.md` |
-| **Building UI components**  | `frontend/component-libraries.md` + `frontend/accessibility.md`       |
-| **Working with data**       | `global/client-first-architecture.md` + `global/security.md`          |
-| **Implementing auth**       | `global/authentication.md` + `global/security.md`                     |
-| **Optimizing performance**  | `frontend/performance.md`                                             |
-| **Writing tests**           | `testing/overview.md`                                                 |
-| **Code review**             | `global/code-quality.md` + `global/security.md`                       |
+| Task                        | Standards to Review                                                                       |
+| --------------------------- | ----------------------------------------------------------------------------------------- |
+| **Setting up architecture** | `global/project-structure.md` + `global/client-first-architecture.md`                     |
+| **Building UI components**  | `frontend/component-libraries.md` + `frontend/design-system.md` + `frontend/accessibility.md` |
+| **Styling components**      | `frontend/design-system.md`                                                               |
+| **Working with data**       | `global/client-first-architecture.md` + `global/security.md`                              |
+| **Implementing auth**       | `global/authentication.md` + `global/security.md`                                         |
+| **Optimizing performance**  | `frontend/performance.md`                                                                 |
+| **Writing tests**           | `testing/overview.md`                                                                     |
+| **Code review**             | `global/code-quality.md` + `global/security.md`                                           |
 
 **Complete standards**: See `standards/README.md` for all available standards.
 
