@@ -63,7 +63,7 @@ src/domains/auth/
 scripts/
 └── grant-admin.ts                 # Admin privilege grant script (Firebase Admin SDK)
 
-routes/
+app/
 ├── __root.tsx                     # Auth initialization (waits for auth before rendering)
 ├── login/index.tsx                # Login route (redirects admin users)
 ├── admin/index.tsx                # Admin dashboard (protected)
