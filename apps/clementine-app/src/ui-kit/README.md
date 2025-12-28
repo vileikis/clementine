@@ -301,6 +301,7 @@ The theme uses **OKLCH color space** for perceptually uniform colors:
 - **H (Hue)**: 0-360 degrees (red = 0, green = 150, blue = 250)
 
 **Example:**
+
 ```css
 --success: oklch(0.65 0.15 150);
 /* 0.65 = medium-light
@@ -324,6 +325,7 @@ Components are automatically added to `src/ui-kit/components/`.
 ### Creating Custom Components
 
 **Step 1: Check if it exists**
+
 - Does shadcn/ui have it? Install it.
 - Does Radix UI have a primitive? Use it.
 - Can you compose existing ui-kit components? Do that.
@@ -342,7 +344,7 @@ export function CustomComponent({ className, ...props }) {
         // Use theme tokens
         'bg-background text-foreground border-border',
         'rounded-lg p-4',
-        className
+        className,
       )}
       {...props}
     />
@@ -391,6 +393,7 @@ Export from the component file and use throughout the app.
 ```
 
 Now use it:
+
 ```tsx
 <div className="bg-highlight text-highlight-foreground" />
 ```
@@ -418,6 +421,7 @@ export function EventCard({ event }) {
 ```
 
 **Domain components should:**
+
 - ✅ Use ui-kit components as building blocks
 - ✅ Use theme tokens for all styling
 - ✅ Extend ui-kit components for domain-specific needs
@@ -446,6 +450,7 @@ export function EventCard({ event }) {
 ## Summary
 
 **ui-kit provides:**
+
 - 🎨 **Components** - shadcn/ui components and custom Radix primitives
 - 🎨 **Theme System** - Design tokens for consistent, maintainable styling
 - 🌓 **Dark Mode** - Automatic dark mode support
@@ -453,6 +458,7 @@ export function EventCard({ event }) {
 - 📦 **Reusability** - Shared components used across all domains
 
 **Key principles:**
+
 1. Use ui-kit components before building custom ones
 2. Always use theme tokens, never hard-code colors
 3. Pair background and foreground tokens correctly
