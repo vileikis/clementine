@@ -33,8 +33,8 @@ export const Route = createFileRoute('/events/$eventId')({
 Split code by route automatically (TanStack Router does this):
 
 ```tsx
-// Routes are automatically code-split
-// No manual lazy() needed for routes
+// App routes are automatically code-split
+// No manual lazy() needed for app routes
 ```
 
 For large components, use dynamic imports:
