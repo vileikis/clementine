@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { doc, serverTimestamp, updateDoc } from 'firebase/firestore'
+import * as Sentry from '@sentry/tanstackstart-react'
 import type { UpdateData } from 'firebase/firestore'
 import type { Workspace } from '@/domains/workspace'
 import { firestore } from '@/integrations/firebase/client'
@@ -33,6 +34,20 @@ export function useDeleteWorkspace() {
     onSuccess: () => {
       // Real-time updates via onSnapshot, but invalidate for consistency
       queryClient.invalidateQueries({ queryKey: ['workspaces'] })
+    },
+    onError: (error) => {
+      // All delete errors are unexpected (permission, network, etc.)
+      // Report to Sentry for monitoring
+      Sentry.captureException(error, {
+        tags: {
+          domain: 'admin/workspace',
+          action: 'delete-workspace',
+        },
+        extra: {
+          errorType: 'workspace-deletion-failure',
+        },
+      })
+      // Error available in mutation.error for UI display
     },
   })
 }
