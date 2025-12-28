@@ -5,6 +5,7 @@ import {
   runTransaction,
   serverTimestamp,
 } from 'firebase/firestore'
+import * as Sentry from '@sentry/tanstackstart-react'
 import type { WithFieldValue } from 'firebase/firestore'
 import type {
   CreateWorkspaceSchemaType,
@@ -14,6 +15,19 @@ import type {
 import { createWorkspaceSchema } from '@/domains/workspace'
 import { firestore } from '@/integrations/firebase/client'
 import { generateSlug } from '@/shared/utils/slug-utils'
+
+/**
+ * Determine if error should be reported to Sentry
+ * Expected validation errors should not be reported
+ */
+function shouldReportError(error: unknown): boolean {
+  if (error instanceof Error) {
+    // Don't report expected validation errors
+    const expectedErrors = ['Slug already exists', 'Invalid workspace name']
+    return !expectedErrors.some((msg) => error.message.includes(msg))
+  }
+  return true // Report unknown error types
+}
 
 /**
  * Create workspace mutation (dedicated hook with full business logic)
@@ -78,6 +92,21 @@ export function useCreateWorkspace() {
     onSuccess: () => {
       // Real-time updates via onSnapshot, but invalidate for consistency
       queryClient.invalidateQueries({ queryKey: ['workspaces'] })
+    },
+    onError: (error) => {
+      // Report unexpected errors to Sentry (skip validation errors)
+      if (shouldReportError(error)) {
+        Sentry.captureException(error, {
+          tags: {
+            domain: 'admin/workspace',
+            action: 'create-workspace',
+          },
+          extra: {
+            errorType: 'workspace-creation-failure',
+          },
+        })
+      }
+      // Error available in mutation.error for UI display
     },
   })
 }
