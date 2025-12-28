@@ -11,7 +11,8 @@
  */
 
 // Session management
-export { useAppSession, type SessionData } from './session'
+export { useAppSession } from './session'
+export type { SessionData } from '../types/session.types'
 
 // Server functions for auth
 export { getCurrentUserFn, createSessionFn, logoutFn } from './functions'

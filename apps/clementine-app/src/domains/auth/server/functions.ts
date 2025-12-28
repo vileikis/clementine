@@ -2,6 +2,7 @@ import { createServerFn } from '@tanstack/react-start'
 import { redirect } from '@tanstack/react-router'
 import * as Sentry from '@sentry/tanstackstart-react'
 import { useAppSession } from './session'
+import type { SessionUser } from '../types/session.types'
 import { adminAuth } from '@/integrations/firebase/server'
 
 /**
@@ -13,7 +14,7 @@ import { adminAuth } from '@/integrations/firebase/server'
  * @returns User data or null if unauthenticated
  */
 export const getCurrentUserFn = createServerFn({ method: 'GET' }).handler(
-  async () => {
+  async (): Promise<SessionUser | null> => {
     const session = await useAppSession()
     const { userId, email, isAdmin, isAnonymous } = session.data
 

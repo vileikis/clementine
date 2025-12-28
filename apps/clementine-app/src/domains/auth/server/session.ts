@@ -1,4 +1,5 @@
 import { useSession } from '@tanstack/react-start/server'
+import type { SessionData } from '../types/session.types'
 
 // Validate SESSION_SECRET at module load time (fail fast)
 function getSessionSecret(): string {
@@ -12,23 +13,6 @@ function getSessionSecret(): string {
 }
 
 const SESSION_SECRET = getSessionSecret()
-
-/**
- * Session data structure for authenticated users
- *
- * This data is stored in an HTTP-only cookie and is NOT accessible from client code.
- * It represents the server-side authentication state.
- */
-export type SessionData = {
-  /** Firebase user ID */
-  userId?: string
-  /** User email (for OAuth users, undefined for anonymous) */
-  email?: string
-  /** Whether user has admin: true custom claim */
-  isAdmin?: boolean
-  /** Whether user is an anonymous user */
-  isAnonymous?: boolean
-}
 
 /**
  * Get or create server-side session for auth state
