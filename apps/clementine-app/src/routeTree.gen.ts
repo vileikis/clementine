@@ -19,12 +19,12 @@ import { Route as IndexRouteImport } from './app/index'
 import { Route as WorkspaceIndexRouteImport } from './app/workspace/index'
 import { Route as GuestIndexRouteImport } from './app/guest/index'
 import { Route as AdminIndexRouteImport } from './app/admin/index'
-import { Route as WorkspaceWorkspaceIdRouteImport } from './app/workspace/$workspaceId'
+import { Route as WorkspaceWorkspaceSlugRouteImport } from './app/workspace/$workspaceSlug'
 import { Route as GuestProjectIdRouteImport } from './app/guest/$projectId'
 import { Route as AdminWorkspacesRouteImport } from './app/admin/workspaces'
 import { Route as AdminDevToolsRouteImport } from './app/admin/dev-tools'
-import { Route as WorkspaceWorkspaceIdSettingsRouteImport } from './app/workspace/$workspaceId.settings'
-import { Route as WorkspaceWorkspaceIdProjectsRouteImport } from './app/workspace/$workspaceId.projects'
+import { Route as WorkspaceWorkspaceSlugSettingsRouteImport } from './app/workspace/$workspaceSlug.settings'
+import { Route as WorkspaceWorkspaceSlugProjectsRouteImport } from './app/workspace/$workspaceSlug.projects'
 
 const LogoutRoute = LogoutRouteImport.update({
   id: '/logout',
@@ -76,9 +76,9 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRouteRoute,
 } as any)
-const WorkspaceWorkspaceIdRoute = WorkspaceWorkspaceIdRouteImport.update({
-  id: '/$workspaceId',
-  path: '/$workspaceId',
+const WorkspaceWorkspaceSlugRoute = WorkspaceWorkspaceSlugRouteImport.update({
+  id: '/$workspaceSlug',
+  path: '/$workspaceSlug',
   getParentRoute: () => WorkspaceRouteRoute,
 } as any)
 const GuestProjectIdRoute = GuestProjectIdRouteImport.update({
@@ -96,17 +96,17 @@ const AdminDevToolsRoute = AdminDevToolsRouteImport.update({
   path: '/dev-tools',
   getParentRoute: () => AdminRouteRoute,
 } as any)
-const WorkspaceWorkspaceIdSettingsRoute =
-  WorkspaceWorkspaceIdSettingsRouteImport.update({
+const WorkspaceWorkspaceSlugSettingsRoute =
+  WorkspaceWorkspaceSlugSettingsRouteImport.update({
     id: '/settings',
     path: '/settings',
-    getParentRoute: () => WorkspaceWorkspaceIdRoute,
+    getParentRoute: () => WorkspaceWorkspaceSlugRoute,
   } as any)
-const WorkspaceWorkspaceIdProjectsRoute =
-  WorkspaceWorkspaceIdProjectsRouteImport.update({
+const WorkspaceWorkspaceSlugProjectsRoute =
+  WorkspaceWorkspaceSlugProjectsRouteImport.update({
     id: '/projects',
     path: '/projects',
-    getParentRoute: () => WorkspaceWorkspaceIdRoute,
+    getParentRoute: () => WorkspaceWorkspaceSlugRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -120,12 +120,12 @@ export interface FileRoutesByFullPath {
   '/admin/dev-tools': typeof AdminDevToolsRoute
   '/admin/workspaces': typeof AdminWorkspacesRoute
   '/guest/$projectId': typeof GuestProjectIdRoute
-  '/workspace/$workspaceId': typeof WorkspaceWorkspaceIdRouteWithChildren
+  '/workspace/$workspaceSlug': typeof WorkspaceWorkspaceSlugRouteWithChildren
   '/admin/': typeof AdminIndexRoute
   '/guest/': typeof GuestIndexRoute
   '/workspace/': typeof WorkspaceIndexRoute
-  '/workspace/$workspaceId/projects': typeof WorkspaceWorkspaceIdProjectsRoute
-  '/workspace/$workspaceId/settings': typeof WorkspaceWorkspaceIdSettingsRoute
+  '/workspace/$workspaceSlug/projects': typeof WorkspaceWorkspaceSlugProjectsRoute
+  '/workspace/$workspaceSlug/settings': typeof WorkspaceWorkspaceSlugSettingsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -135,12 +135,12 @@ export interface FileRoutesByTo {
   '/admin/dev-tools': typeof AdminDevToolsRoute
   '/admin/workspaces': typeof AdminWorkspacesRoute
   '/guest/$projectId': typeof GuestProjectIdRoute
-  '/workspace/$workspaceId': typeof WorkspaceWorkspaceIdRouteWithChildren
+  '/workspace/$workspaceSlug': typeof WorkspaceWorkspaceSlugRouteWithChildren
   '/admin': typeof AdminIndexRoute
   '/guest': typeof GuestIndexRoute
   '/workspace': typeof WorkspaceIndexRoute
-  '/workspace/$workspaceId/projects': typeof WorkspaceWorkspaceIdProjectsRoute
-  '/workspace/$workspaceId/settings': typeof WorkspaceWorkspaceIdSettingsRoute
+  '/workspace/$workspaceSlug/projects': typeof WorkspaceWorkspaceSlugProjectsRoute
+  '/workspace/$workspaceSlug/settings': typeof WorkspaceWorkspaceSlugSettingsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -154,12 +154,12 @@ export interface FileRoutesById {
   '/admin/dev-tools': typeof AdminDevToolsRoute
   '/admin/workspaces': typeof AdminWorkspacesRoute
   '/guest/$projectId': typeof GuestProjectIdRoute
-  '/workspace/$workspaceId': typeof WorkspaceWorkspaceIdRouteWithChildren
+  '/workspace/$workspaceSlug': typeof WorkspaceWorkspaceSlugRouteWithChildren
   '/admin/': typeof AdminIndexRoute
   '/guest/': typeof GuestIndexRoute
   '/workspace/': typeof WorkspaceIndexRoute
-  '/workspace/$workspaceId/projects': typeof WorkspaceWorkspaceIdProjectsRoute
-  '/workspace/$workspaceId/settings': typeof WorkspaceWorkspaceIdSettingsRoute
+  '/workspace/$workspaceSlug/projects': typeof WorkspaceWorkspaceSlugProjectsRoute
+  '/workspace/$workspaceSlug/settings': typeof WorkspaceWorkspaceSlugSettingsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -174,12 +174,12 @@ export interface FileRouteTypes {
     | '/admin/dev-tools'
     | '/admin/workspaces'
     | '/guest/$projectId'
-    | '/workspace/$workspaceId'
+    | '/workspace/$workspaceSlug'
     | '/admin/'
     | '/guest/'
     | '/workspace/'
-    | '/workspace/$workspaceId/projects'
-    | '/workspace/$workspaceId/settings'
+    | '/workspace/$workspaceSlug/projects'
+    | '/workspace/$workspaceSlug/settings'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -189,12 +189,12 @@ export interface FileRouteTypes {
     | '/admin/dev-tools'
     | '/admin/workspaces'
     | '/guest/$projectId'
-    | '/workspace/$workspaceId'
+    | '/workspace/$workspaceSlug'
     | '/admin'
     | '/guest'
     | '/workspace'
-    | '/workspace/$workspaceId/projects'
-    | '/workspace/$workspaceId/settings'
+    | '/workspace/$workspaceSlug/projects'
+    | '/workspace/$workspaceSlug/settings'
   id:
     | '__root__'
     | '/'
@@ -207,12 +207,12 @@ export interface FileRouteTypes {
     | '/admin/dev-tools'
     | '/admin/workspaces'
     | '/guest/$projectId'
-    | '/workspace/$workspaceId'
+    | '/workspace/$workspaceSlug'
     | '/admin/'
     | '/guest/'
     | '/workspace/'
-    | '/workspace/$workspaceId/projects'
-    | '/workspace/$workspaceId/settings'
+    | '/workspace/$workspaceSlug/projects'
+    | '/workspace/$workspaceSlug/settings'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -297,11 +297,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRouteRoute
     }
-    '/workspace/$workspaceId': {
-      id: '/workspace/$workspaceId'
-      path: '/$workspaceId'
-      fullPath: '/workspace/$workspaceId'
-      preLoaderRoute: typeof WorkspaceWorkspaceIdRouteImport
+    '/workspace/$workspaceSlug': {
+      id: '/workspace/$workspaceSlug'
+      path: '/$workspaceSlug'
+      fullPath: '/workspace/$workspaceSlug'
+      preLoaderRoute: typeof WorkspaceWorkspaceSlugRouteImport
       parentRoute: typeof WorkspaceRouteRoute
     }
     '/guest/$projectId': {
@@ -325,19 +325,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminDevToolsRouteImport
       parentRoute: typeof AdminRouteRoute
     }
-    '/workspace/$workspaceId/settings': {
-      id: '/workspace/$workspaceId/settings'
+    '/workspace/$workspaceSlug/settings': {
+      id: '/workspace/$workspaceSlug/settings'
       path: '/settings'
-      fullPath: '/workspace/$workspaceId/settings'
-      preLoaderRoute: typeof WorkspaceWorkspaceIdSettingsRouteImport
-      parentRoute: typeof WorkspaceWorkspaceIdRoute
+      fullPath: '/workspace/$workspaceSlug/settings'
+      preLoaderRoute: typeof WorkspaceWorkspaceSlugSettingsRouteImport
+      parentRoute: typeof WorkspaceWorkspaceSlugRoute
     }
-    '/workspace/$workspaceId/projects': {
-      id: '/workspace/$workspaceId/projects'
+    '/workspace/$workspaceSlug/projects': {
+      id: '/workspace/$workspaceSlug/projects'
       path: '/projects'
-      fullPath: '/workspace/$workspaceId/projects'
-      preLoaderRoute: typeof WorkspaceWorkspaceIdProjectsRouteImport
-      parentRoute: typeof WorkspaceWorkspaceIdRoute
+      fullPath: '/workspace/$workspaceSlug/projects'
+      preLoaderRoute: typeof WorkspaceWorkspaceSlugProjectsRouteImport
+      parentRoute: typeof WorkspaceWorkspaceSlugRoute
     }
   }
 }
@@ -372,26 +372,29 @@ const GuestRouteRouteWithChildren = GuestRouteRoute._addFileChildren(
   GuestRouteRouteChildren,
 )
 
-interface WorkspaceWorkspaceIdRouteChildren {
-  WorkspaceWorkspaceIdProjectsRoute: typeof WorkspaceWorkspaceIdProjectsRoute
-  WorkspaceWorkspaceIdSettingsRoute: typeof WorkspaceWorkspaceIdSettingsRoute
+interface WorkspaceWorkspaceSlugRouteChildren {
+  WorkspaceWorkspaceSlugProjectsRoute: typeof WorkspaceWorkspaceSlugProjectsRoute
+  WorkspaceWorkspaceSlugSettingsRoute: typeof WorkspaceWorkspaceSlugSettingsRoute
 }
 
-const WorkspaceWorkspaceIdRouteChildren: WorkspaceWorkspaceIdRouteChildren = {
-  WorkspaceWorkspaceIdProjectsRoute: WorkspaceWorkspaceIdProjectsRoute,
-  WorkspaceWorkspaceIdSettingsRoute: WorkspaceWorkspaceIdSettingsRoute,
-}
+const WorkspaceWorkspaceSlugRouteChildren: WorkspaceWorkspaceSlugRouteChildren =
+  {
+    WorkspaceWorkspaceSlugProjectsRoute: WorkspaceWorkspaceSlugProjectsRoute,
+    WorkspaceWorkspaceSlugSettingsRoute: WorkspaceWorkspaceSlugSettingsRoute,
+  }
 
-const WorkspaceWorkspaceIdRouteWithChildren =
-  WorkspaceWorkspaceIdRoute._addFileChildren(WorkspaceWorkspaceIdRouteChildren)
+const WorkspaceWorkspaceSlugRouteWithChildren =
+  WorkspaceWorkspaceSlugRoute._addFileChildren(
+    WorkspaceWorkspaceSlugRouteChildren,
+  )
 
 interface WorkspaceRouteRouteChildren {
-  WorkspaceWorkspaceIdRoute: typeof WorkspaceWorkspaceIdRouteWithChildren
+  WorkspaceWorkspaceSlugRoute: typeof WorkspaceWorkspaceSlugRouteWithChildren
   WorkspaceIndexRoute: typeof WorkspaceIndexRoute
 }
 
 const WorkspaceRouteRouteChildren: WorkspaceRouteRouteChildren = {
-  WorkspaceWorkspaceIdRoute: WorkspaceWorkspaceIdRouteWithChildren,
+  WorkspaceWorkspaceSlugRoute: WorkspaceWorkspaceSlugRouteWithChildren,
   WorkspaceIndexRoute: WorkspaceIndexRoute,
 }
 

@@ -18,8 +18,8 @@ export function WorkspaceListItem({ workspace }: WorkspaceListItemProps) {
   return (
     <div className="flex items-center justify-between rounded-lg border bg-card p-4">
       <Link
-        to="/workspace/$workspaceId"
-        params={{ workspaceId: workspace.slug }}
+        to="/workspace/$workspaceSlug"
+        params={{ workspaceSlug: workspace.slug }}
         className="flex flex-col gap-1 flex-1 hover:opacity-80 transition-opacity"
       >
         <h3 className="font-semibold text-foreground">{workspace.name}</h3>
@@ -28,8 +28,8 @@ export function WorkspaceListItem({ workspace }: WorkspaceListItemProps) {
 
       <div className="flex items-center gap-2">
         <Link
-          to="/workspace/$workspaceId"
-          params={{ workspaceId: workspace.slug }}
+          to="/workspace/$workspaceSlug"
+          params={{ workspaceSlug: workspace.slug }}
         >
           <Button variant="ghost" size="sm" className="min-h-[44px]">
             View

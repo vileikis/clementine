@@ -20,9 +20,9 @@ interface SidebarProps {
 }
 
 export function Sidebar({ area }: SidebarProps) {
-  // Get workspaceId from route params if in workspace area
+  // Get workspaceSlug from route params if in workspace area
   const params = useParams({ strict: false })
-  const workspaceId = 'workspaceId' in params ? params.workspaceId : undefined
+  const workspaceId = 'workspaceSlug' in params ? params.workspaceSlug : undefined
   const {
     isCollapsed,
     isMobileOpen,

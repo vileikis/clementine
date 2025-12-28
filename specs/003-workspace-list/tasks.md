@@ -68,7 +68,7 @@
 - [X] T012 [P] [US1] Create WorkspaceListItem component in apps/clementine-app/src/domains/admin/workspace/components/WorkspaceListItem.tsx
 - [X] T013 [P] [US1] Create WorkspaceListEmpty component in apps/clementine-app/src/domains/admin/workspace/components/WorkspaceListEmpty.tsx
 - [X] T014 [US1] Create WorkspacesPage container in apps/clementine-app/src/domains/admin/workspace/containers/WorkspacesPage.tsx (integrates WorkspaceList, data fetching)
-- [X] T015 [US1] Create /admin/workspaces route in apps/clementine-app/src/routes/admin/workspaces.tsx (with requireAdmin guard)
+- [X] T015 [US1] Create /admin/workspaces route in apps/clementine-app/src/app/admin/workspaces.tsx (with requireAdmin guard)
 - [X] T016 [US1] Navigation link to workspace list already exists in AdminNav component
 
 **Checkpoint**: Admins can view active workspaces, click to navigate, see real-time updates
@@ -115,7 +115,7 @@
 
 ### Implementation for User Story 3
 
-- [X] T022 [P] [US3] Create workspace slug route in apps/clementine-app/src/routes/workspace/$workspaceSlug.tsx (dynamic route with requireAdmin guard)
+- [X] T022 [P] [US3] Create workspace slug route in apps/clementine-app/src/app/workspace/$workspaceSlug.tsx (dynamic route, requireAdmin guard from parent route)
 - [X] T023 [US3] Implement workspace resolution by slug query (where slug == param.toLowerCase() and status == 'active')
 - [X] T024 [US3] Add "Workspace not found" error handling for invalid/deleted workspace slugs
 - [X] T025 [US3] Create basic workspace page placeholder component (can be enhanced later with workspace editor)
