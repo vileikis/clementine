@@ -1,11 +1,10 @@
-import { redirect } from '@tanstack/react-router'
-import { getCurrentUserFn } from '../server/functions'
-
 /**
  * Route guards for authentication and authorization
  *
  * These functions use server functions (getCurrentUserFn) to validate auth state,
  * which means they work on both server (SSR) and client (navigation).
+ *
+ * All guards throw redirects when requirements are not met.
  *
  * Usage in route beforeLoad:
  * ```tsx
@@ -15,6 +14,15 @@ import { getCurrentUserFn } from '../server/functions'
  * ```
  */
 
+import { redirect } from '@tanstack/react-router'
+import { getCurrentUserFn } from '../server/functions'
+import {
+  isAdmin,
+  isAnyUser,
+  isAuthenticated,
+  isNonAdmin,
+} from '../utils/authChecks'
+
 /**
  * Require admin user (works on both server and client)
  *
@@ -23,12 +31,12 @@ import { getCurrentUserFn } from '../server/functions'
  * 2. Not anonymous
  * 3. Has admin: true custom claim
  *
- * @throws Redirect to / if requirements not met
+ * @throws Redirect to /login if requirements not met
  */
 export async function requireAdmin() {
   const user = await getCurrentUserFn()
 
-  if (!user || user.isAnonymous || !user.isAdmin) {
+  if (!isAdmin(user)) {
     throw redirect({ to: '/login' })
   }
 
@@ -47,7 +55,7 @@ export async function requireAdmin() {
 export async function requireAuth() {
   const user = await getCurrentUserFn()
 
-  if (!user || user.isAnonymous) {
+  if (isAuthenticated(user)) {
     throw redirect({ to: '/' })
   }
 
@@ -64,7 +72,7 @@ export async function requireAuth() {
 export async function requireUser() {
   const user = await getCurrentUserFn()
 
-  if (!user) {
+  if (!isAnyUser(user)) {
     throw redirect({ to: '/' })
   }
 
@@ -81,9 +89,34 @@ export async function requireUser() {
 export async function redirectIfAdmin() {
   const user = await getCurrentUserFn()
 
-  if (user && !user.isAnonymous && user.isAdmin) {
+  if (isAdmin(user)) {
     throw redirect({ to: '/admin' })
   }
 
   return user
+}
+
+/**
+ * Root route handler - smart redirect based on user type
+ *
+ * Redirects:
+ * - Admin users → /admin/workspaces
+ * - Non-admin authenticated users → /login (will see waiting message)
+ * - Anonymous/unauthenticated users → render root page (friendly message)
+ *
+ * @throws Redirect based on user type
+ */
+export async function handleRootRoute() {
+  const user = await getCurrentUserFn()
+
+  if (isAdmin(user)) {
+    throw redirect({ to: '/admin/workspaces' })
+  }
+
+  if (isNonAdmin(user)) {
+    throw redirect({ to: '/login' })
+  }
+
+  // Anonymous or unauthenticated users - render root page
+  return { user }
 }

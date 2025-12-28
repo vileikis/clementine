@@ -1,7 +1,7 @@
 import { useNavigate } from '@tanstack/react-router'
 import { MOCK_WORKSPACES } from '../constants'
 import { getWorkspaceInitials } from '../lib'
-import { cn } from '@/shared/lib/utils'
+import { cn } from '@/shared/utils'
 
 interface WorkspaceSelectorProps {
   workspaceId: string
