@@ -6,22 +6,15 @@ export { LoginPage } from './components/LoginPage'
 export { WaitingMessage } from './components/WaitingMessage'
 
 // Route guards (server-side, work on both server and client)
-export {
-  requireAdmin,
-  requireAuth,
-  requireUser,
-  redirectIfAdmin,
-} from './lib/guards'
+export * from './guards'
+
+// Auth type helpers (pure functions for conditional logic)
+export * from './utils'
 
 // Server functions (for direct use in components/routes)
-export { getCurrentUserFn, createSessionFn, logoutFn } from './server/functions'
+export * from './server/functions'
 
 // TypeScript types
-export type {
-  AuthState,
-  CustomClaims,
-  TypedIdTokenResult,
-  RouterContext,
-} from './types/auth.types'
+export type * from './types/auth.types'
 
 export type { SessionData } from './server/session'

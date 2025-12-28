@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { LoginPage } from '@/domains/auth/components/LoginPage'
-import { redirectIfAdmin } from '@/domains/auth/lib/guards'
+import { redirectIfAdmin } from '@/domains/auth/guards'
 
 // T035: Create login route file
 // T038: Implement redirect logic: admin users to /admin, non-admin users stay on /login
