@@ -12,7 +12,7 @@ export * from './guards'
 export * from './utils'
 
 // Server functions (for direct use in components/routes)
-export * from './server/functions'
+export * from './server'
 
 // TypeScript types
 export type * from './types/auth.types'
