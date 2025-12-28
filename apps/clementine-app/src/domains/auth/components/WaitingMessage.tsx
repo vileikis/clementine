@@ -11,8 +11,13 @@ export function WaitingMessage() {
 
   const handleSignOut = async () => {
     setIsSigningOut(true)
-    await logout()
-    // Note: logout navigates to /login, so isSigningOut reset is not needed
+    try {
+      await logout()
+      // Note: logout navigates to /login, so isSigningOut reset is not needed
+    } catch {
+      // If logout fails, reset state so user can retry
+      setIsSigningOut(false)
+    }
   }
 
   return (
