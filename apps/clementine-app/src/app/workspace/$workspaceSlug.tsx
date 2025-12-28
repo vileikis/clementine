@@ -1,18 +1,17 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { WorkspacePage } from '@/domains/workspace/containers/WorkspacePage'
+import { Outlet, createFileRoute } from '@tanstack/react-router'
 
 /**
- * Workspace detail route
+ * Workspace layout route
  *
  * Route: /workspace/:workspaceSlug
  * Access: Admin only (enforced by parent route requireAdmin guard)
  *
- * Displays workspace detail page with workspace-specific features.
- * Shows "Workspace not found" for invalid/deleted workspace slugs.
+ * Layout route that renders child routes (projects, settings, etc.)
  */
 export const Route = createFileRoute('/workspace/$workspaceSlug')({
-  component: () => {
-    const { workspaceSlug } = Route.useParams()
-    return <WorkspacePage slug={workspaceSlug} />
-  },
+  component: WorkspaceLayout,
 })
+
+function WorkspaceLayout() {
+  return <Outlet />
+}
