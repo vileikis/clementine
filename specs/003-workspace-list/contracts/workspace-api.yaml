@@ -1,0 +1,390 @@
+openapi: 3.0.3
+info:
+  title: Workspace Management Operations Contract
+  description: |
+    Admin workspace management operations for Clementine platform.
+
+    **⚠️ NOTE**: This project uses **client-first architecture**. This contract describes
+    Firestore client SDK operations, NOT REST API endpoints. There are no server functions
+    or HTTP endpoints - all operations happen via Firebase Firestore client SDK.
+
+    **Architecture**: Client-first (Firebase client SDK)
+    **Authentication**: Firebase Auth with admin custom claim (`admin: true`)
+    **Authorization**: Firestore security rules (enforced at database level)
+    **Data Layer**: Firestore collections accessed via client SDK
+
+    This contract serves as documentation for the expected behavior of client-side operations.
+  version: 1.0.0
+  contact:
+    name: Clementine API Support
+
+servers:
+  - url: firestore://clementine-production
+    description: Production Firestore database
+  - url: firestore://clementine-dev
+    description: Development Firestore database
+
+tags:
+  - name: Workspaces
+    description: Workspace CRUD operations via Firestore client SDK (admin only)
+
+paths:
+  /workspaces:
+    get:
+      tags:
+        - Workspaces
+      summary: List active workspaces
+      description: |
+        Retrieves all active workspaces sorted by creation date (newest first).
+        Soft-deleted workspaces are excluded from results.
+
+        **Authorization**: Admin only
+        **Real-time**: Client should use Firestore `onSnapshot` for real-time updates
+      operationId: listWorkspaces
+      security:
+        - firebaseAuth: []
+      responses:
+        '200':
+          description: Successfully retrieved workspace list
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - workspaces
+                properties:
+                  workspaces:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Workspace'
+              example:
+                workspaces:
+                  - id: wks_abc123
+                    name: Summer Campaign 2025
+                    slug: summer-campaign-2025
+                    status: active
+                    deletedAt: null
+                    createdAt: 1735488000000
+                    updatedAt: 1735488000000
+                  - id: wks_def456
+                    name: Product Launch
+                    slug: product-launch
+                    status: active
+                    deletedAt: null
+                    createdAt: 1735401600000
+                    updatedAt: 1735401600000
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      tags:
+        - Workspaces
+      summary: Create new workspace
+      description: |
+        Creates a new workspace with admin-provided name and optional slug.
+        If slug is not provided, it is auto-generated from the workspace name.
+
+        **Slug Uniqueness**: Enforced client-side via Firestore client SDK transaction (case-insensitive, atomicity guaranteed at database level).
+        **Slug Reuse**: Deleted workspace slugs cannot be reused.
+        **Authorization**: Admin only (enforced by Firestore security rules)
+      operationId: createWorkspace
+      security:
+        - firebaseAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWorkspaceInput'
+            examples:
+              withSlug:
+                summary: Create with custom slug
+                value:
+                  name: Acme Corporation
+                  slug: acme-corp
+              autoSlug:
+                summary: Create with auto-generated slug
+                value:
+                  name: Summer Campaign 2025
+      responses:
+        '201':
+          description: Workspace created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateWorkspaceResponse'
+              example:
+                id: wks_abc123xyz
+                slug: summer-campaign-2025
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '409':
+          description: Slug already exists (conflict)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: Slug already exists
+                code: SLUG_CONFLICT
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /workspaces/{slug}:
+    get:
+      tags:
+        - Workspaces
+      summary: Get workspace by slug
+      description: |
+        Retrieves a single workspace by its unique slug.
+        Only active workspaces are returned; deleted workspaces return 404.
+
+        **Authorization**: Admin only
+        **Case Sensitivity**: Slug matching is case-insensitive
+      operationId: getWorkspaceBySlug
+      security:
+        - firebaseAuth: []
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          description: Unique workspace slug (case-insensitive)
+          schema:
+            type: string
+            pattern: '^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$'
+          example: summer-campaign-2025
+      responses:
+        '200':
+          description: Workspace found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workspace'
+              example:
+                id: wks_abc123
+                name: Summer Campaign 2025
+                slug: summer-campaign-2025
+                status: active
+                deletedAt: null
+                createdAt: 1735488000000
+                updatedAt: 1735488000000
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: Workspace not found (or deleted)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: Workspace not found
+                code: WORKSPACE_NOT_FOUND
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /workspaces/{id}/delete:
+    patch:
+      tags:
+        - Workspaces
+      summary: Soft delete workspace
+      description: |
+        Soft deletes a workspace by setting status to "deleted" and recording deletion timestamp.
+        The workspace slug becomes permanently unavailable for reuse.
+
+        **Confirmation**: Client should show confirmation dialog before calling this endpoint.
+        **Irreversible**: Soft delete cannot be undone (no restore operation).
+        **Authorization**: Admin only
+      operationId: deleteWorkspace
+      security:
+        - firebaseAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Workspace ID to delete
+          schema:
+            type: string
+          example: wks_abc123
+      responses:
+        '200':
+          description: Workspace soft deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: Workspace not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: Workspace not found
+                code: WORKSPACE_NOT_FOUND
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    WorkspaceStatus:
+      type: string
+      enum:
+        - active
+        - deleted
+      description: |
+        Workspace lifecycle state:
+        - `active`: Workspace is accessible and visible in lists
+        - `deleted`: Workspace is soft-deleted (hidden, slug unavailable for reuse)
+
+    Workspace:
+      type: object
+      required:
+        - id
+        - name
+        - slug
+        - status
+        - deletedAt
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          description: Unique workspace identifier (Firestore document ID)
+          example: wks_abc123xyz
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Human-readable workspace name
+          example: Summer Campaign 2025
+        slug:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: '^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$'
+          description: URL-safe unique identifier (lowercase, alphanumeric + hyphens)
+          example: summer-campaign-2025
+        status:
+          $ref: '#/components/schemas/WorkspaceStatus'
+        deletedAt:
+          type: number
+          nullable: true
+          description: Unix timestamp (ms) when workspace was deleted (null if active)
+          example: null
+        createdAt:
+          type: number
+          description: Unix timestamp (ms) when workspace was created
+          example: 1735488000000
+        updatedAt:
+          type: number
+          description: Unix timestamp (ms) of last modification
+          example: 1735488000000
+
+    CreateWorkspaceInput:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Human-readable workspace name
+          example: Summer Campaign 2025
+        slug:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: '^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$'
+          description: Optional custom slug (auto-generated from name if not provided)
+          example: summer-campaign-2025
+
+    CreateWorkspaceResponse:
+      type: object
+      required:
+        - id
+        - slug
+      properties:
+        id:
+          type: string
+          description: Newly created workspace ID
+          example: wks_abc123xyz
+        slug:
+          type: string
+          description: Workspace slug (auto-generated or custom)
+          example: summer-campaign-2025
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - code
+      properties:
+        error:
+          type: string
+          description: Human-readable error message
+          example: Slug already exists
+        code:
+          type: string
+          description: Machine-readable error code
+          enum:
+            - UNAUTHORIZED
+            - BAD_REQUEST
+            - SLUG_CONFLICT
+            - WORKSPACE_NOT_FOUND
+            - INTERNAL_SERVER_ERROR
+          example: SLUG_CONFLICT
+
+  securitySchemes:
+    firebaseAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        Firebase Authentication with admin custom claim.
+        User must have `admin: true` custom claim in their ID token.
+        Validated by Firestore security rules at database level.
+        No server-side session - authentication handled by Firebase Auth client SDK.
+
+  responses:
+    UnauthorizedError:
+      description: Unauthorized - Admin access required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: Unauthorized - Admin access required
+            code: UNAUTHORIZED
+
+    BadRequestError:
+      description: Bad Request - Invalid input
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: Invalid input - Name is required
+            code: BAD_REQUEST
+
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: Internal server error
+            code: INTERNAL_SERVER_ERROR
