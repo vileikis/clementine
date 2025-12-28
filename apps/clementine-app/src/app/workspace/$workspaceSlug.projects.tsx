@@ -5,11 +5,9 @@ export const Route = createFileRoute('/workspace/$workspaceSlug/projects')({
 })
 
 function ProjectsPage() {
-  const { workspaceSlug } = Route.useParams()
-  console.log('projects workspaceSlug', workspaceSlug)
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold">WIP</h1>
+      <h1 className="text-2xl font-bold">Projects WIP</h1>
     </div>
   )
 }

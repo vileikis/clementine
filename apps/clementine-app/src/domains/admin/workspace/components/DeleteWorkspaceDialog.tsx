@@ -3,7 +3,6 @@ import { useDeleteWorkspace } from '../hooks/useDeleteWorkspace'
 import type { Workspace } from '@/domains/workspace/types/workspace.types'
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -12,6 +11,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/ui-kit/components/alert-dialog'
+import { Button } from '@/ui-kit/components/button'
 
 interface DeleteWorkspaceDialogProps {
   workspace: Workspace
@@ -40,11 +40,11 @@ export function DeleteWorkspaceDialog({
   const handleDelete = async () => {
     try {
       await deleteMutation.mutateAsync(workspace.id)
-      // Dialog will close automatically on success
+      // Close dialog only on success
       onOpenChange?.(false)
     } catch (error) {
-      // Error is available in deleteMutation.error
-      console.error('Failed to delete workspace:', error)
+      // Error is displayed via deleteMutation.error in the UI
+      // Keep dialog open so user can see the error message
     }
   }
 
@@ -101,7 +101,7 @@ export function DeleteWorkspaceDialog({
           >
             Cancel
           </AlertDialogCancel>
-          <AlertDialogAction
+          <Button
             onClick={handleDelete}
             disabled={deleteMutation.isPending}
             className="min-h-[44px] bg-destructive text-white hover:bg-destructive/90"
@@ -114,7 +114,7 @@ export function DeleteWorkspaceDialog({
             ) : (
               <span>Delete Workspace</span>
             )}
-          </AlertDialogAction>
+          </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

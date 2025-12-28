@@ -8,9 +8,10 @@ import { WorkspaceList } from '../components/WorkspaceList'
  *
  * Features:
  * - View all active workspaces
+ * - Create new workspace (links to /admin/workspaces/create)
  * - Click workspace to navigate to /workspace/[slug]
+ * - Delete workspace with confirmation
  * - Real-time updates when workspaces are created/deleted
- * - (Future) Create workspace button will be added in US2
  */
 export function WorkspacesPage() {
   return (
