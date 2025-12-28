@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   collection,
@@ -26,6 +27,22 @@ import { firestore } from '@/integrations/firebase/client'
 export function useWorkspaces() {
   const queryClient = useQueryClient()
 
+  // Set up real-time listener separately from queryFn
+  useEffect(() => {
+    const q = query(
+      collection(firestore, 'workspaces'),
+      where('status', '==', 'active'),
+      orderBy('createdAt', 'desc'),
+    )
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const workspaces = snapshot.docs.map((doc) => doc.data() as Workspace)
+      queryClient.setQueryData(['workspaces', 'active'], workspaces)
+    })
+
+    return () => unsubscribe()
+  }, [queryClient])
+
   return useQuery<Workspace[]>({
     queryKey: ['workspaces', 'active'],
     queryFn: async () => {
@@ -35,19 +52,9 @@ export function useWorkspaces() {
         orderBy('createdAt', 'desc'),
       )
 
-      // Initial fetch
+      // Initial fetch only
       const snapshot = await getDocs(q)
-      const workspaces = snapshot.docs.map((doc) => doc.data() as Workspace)
-
-      // Set up real-time listener
-      onSnapshot(q, (realtimeSnapshot) => {
-        const updatedWorkspaces = realtimeSnapshot.docs.map(
-          (doc) => doc.data() as Workspace,
-        )
-        queryClient.setQueryData(['workspaces', 'active'], updatedWorkspaces)
-      })
-
-      return workspaces
+      return snapshot.docs.map((doc) => doc.data() as Workspace)
     },
     staleTime: Infinity, // Real-time via onSnapshot
     refetchOnWindowFocus: false,
