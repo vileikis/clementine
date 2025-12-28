@@ -1,5 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { doc, updateDoc } from 'firebase/firestore'
+import { doc, serverTimestamp, updateDoc } from 'firebase/firestore'
+import type { UpdateData } from 'firebase/firestore'
+import type { Workspace } from '@/domains/workspace'
 import { firestore } from '@/integrations/firebase/client'
 
 /**
@@ -8,6 +10,7 @@ import { firestore } from '@/integrations/firebase/client'
  * Admin-only operation. Follows "mutations via dedicated hooks" pattern.
  * Performs soft delete by updating status and deletedAt fields.
  * Security enforced via Firestore rules (admin-only writes with data validation).
+ * Timestamps use serverTimestamp() for accuracy (server-side time, not client clock).
  */
 export function useDeleteWorkspace() {
   const queryClient = useQueryClient()
@@ -17,12 +20,13 @@ export function useDeleteWorkspace() {
       const workspaceRef = doc(firestore, 'workspaces', workspaceId)
 
       // Soft delete - Firestore rules validate admin access and structure
-      const now = Date.now()
-      await updateDoc(workspaceRef, {
+      const updateData: UpdateData<Workspace> = {
         status: 'deleted',
-        deletedAt: now,
-        updatedAt: now,
-      })
+        deletedAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      }
+
+      await updateDoc(workspaceRef, updateData)
 
       return workspaceId
     },

@@ -1,10 +1,5 @@
 // Types (public API - reused by admin and workspace contexts)
-export type {
-  Workspace,
-  WorkspaceStatus,
-  CreateWorkspaceInput,
-  DeleteWorkspaceInput,
-} from './types/workspace.types'
+export type * from './types/workspace.types'
 
 // Schemas (public API - reused for validation)
 export {

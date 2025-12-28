@@ -6,16 +6,18 @@ import {
   limit,
   query,
   runTransaction,
+  serverTimestamp,
   where,
 } from 'firebase/firestore'
+import type { WithFieldValue } from 'firebase/firestore'
 import type {
+  CreateWorkspaceSchemaType,
   Workspace,
   WorkspaceStatus,
-} from '@/domains/workspace/types/workspace.types'
-import type { CreateWorkspaceSchemaType } from '@/domains/workspace/schemas/workspace.schemas'
+} from '@/domains/workspace'
+import { createWorkspaceSchema } from '@/domains/workspace'
 import { firestore } from '@/integrations/firebase/client'
 import { generateSlug } from '@/shared/utils/slug-utils'
-import { createWorkspaceSchema } from '@/domains/workspace/schemas/workspace.schemas'
 
 /**
  * Create workspace mutation (dedicated hook with full business logic)
@@ -25,6 +27,7 @@ import { createWorkspaceSchema } from '@/domains/workspace/schemas/workspace.sch
  *
  * Uses Firestore client SDK transaction to enforce slug uniqueness atomically.
  * Security enforced via Firestore rules (admin-only writes with data validation).
+ * Timestamps use serverTimestamp() for accuracy (server-side time, not client clock).
  */
 export function useCreateWorkspace() {
   const queryClient = useQueryClient()
@@ -50,16 +53,15 @@ export function useCreateWorkspace() {
 
         // Create workspace
         const newWorkspaceRef = doc(workspacesRef)
-        const now = Date.now()
 
-        const workspaceData: Workspace = {
+        const workspaceData: WithFieldValue<Workspace> = {
           id: newWorkspaceRef.id,
           name: validated.name,
           slug,
           status: 'active' as WorkspaceStatus,
           deletedAt: null,
-          createdAt: now,
-          updatedAt: now,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
         }
 
         transaction.set(newWorkspaceRef, workspaceData)
