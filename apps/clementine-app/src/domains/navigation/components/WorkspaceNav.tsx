@@ -11,12 +11,12 @@ interface WorkspaceNavProps {
 const workspaceNavItemsTemplate: NavItem[] = [
   {
     label: 'Projects',
-    href: '/workspace/$workspaceId/projects',
+    href: '/workspace/$workspaceSlug/projects',
     icon: FolderOpen,
   },
   {
     label: 'Settings',
-    href: '/workspace/$workspaceId/settings',
+    href: '/workspace/$workspaceSlug/settings',
     icon: Settings,
   },
 ]
@@ -27,7 +27,7 @@ export function WorkspaceNav({ workspaceId, isCollapsed }: WorkspaceNavProps) {
       <WorkspaceSelector workspaceId={workspaceId} isCollapsed={isCollapsed} />
       <nav className="flex flex-col gap-4">
         {workspaceNavItemsTemplate.map((item) => {
-          const href = item.href.replace('$workspaceId', workspaceId)
+          const href = item.href.replace('$workspaceSlug', workspaceId)
           return (
             <NavigationLink
               key={item.label}
