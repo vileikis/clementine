@@ -10,7 +10,7 @@ import { WorkspacesPage } from '@/domains/admin/workspace/containers/WorkspacesP
  *
  * Displays list of all active workspaces with navigation to workspace detail pages.
  */
-export const Route = createFileRoute('/admin/workspaces')({
+export const Route = createFileRoute('/admin/workspaces/')({
   beforeLoad: async () => {
     await requireAdmin()
   },

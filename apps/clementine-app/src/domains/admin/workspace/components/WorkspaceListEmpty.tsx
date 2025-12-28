@@ -1,5 +1,5 @@
+import { Link } from '@tanstack/react-router'
 import { Plus } from 'lucide-react'
-import { CreateWorkspaceSheet } from './CreateWorkspaceSheet'
 import { Button } from '@/ui-kit/components/button'
 
 /**
@@ -7,7 +7,7 @@ import { Button } from '@/ui-kit/components/button'
  *
  * Displayed when no active workspaces exist.
  * Shows friendly message encouraging admin to create first workspace.
- * Includes "Create workspace" button to launch creation sheet.
+ * Includes "Create workspace" button to navigate to creation page.
  */
 export function WorkspaceListEmpty() {
   return (
@@ -16,14 +16,12 @@ export function WorkspaceListEmpty() {
       <p className="mb-4 text-sm text-muted-foreground">
         Get started by creating your first workspace
       </p>
-      <CreateWorkspaceSheet
-        trigger={
-          <Button className="min-h-[44px]">
-            <Plus className="size-4" />
-            <span>Create Workspace</span>
-          </Button>
-        }
-      />
+      <Link to="/admin/workspaces/create">
+        <Button className="min-h-[44px]">
+          <Plus className="size-4" />
+          <span>Create Workspace</span>
+        </Button>
+      </Link>
     </div>
   )
 }

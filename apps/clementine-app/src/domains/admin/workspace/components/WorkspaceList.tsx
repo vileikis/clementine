@@ -1,8 +1,8 @@
+import { Link } from '@tanstack/react-router'
 import { Plus } from 'lucide-react'
 import { useWorkspaces } from '../hooks/useWorkspaces'
 import { WorkspaceListEmpty } from './WorkspaceListEmpty'
 import { WorkspaceListItem } from './WorkspaceListItem'
-import { CreateWorkspaceSheet } from './CreateWorkspaceSheet'
 import { Button } from '@/ui-kit/components/button'
 
 /**
@@ -47,14 +47,12 @@ export function WorkspaceList() {
             {workspaces.length === 1 ? 'workspace' : 'workspaces'}
           </p>
         </div>
-        <CreateWorkspaceSheet
-          trigger={
-            <Button className="min-h-[44px]">
-              <Plus className="size-4" />
-              <span>Create Workspace</span>
-            </Button>
-          }
-        />
+        <Link to="/admin/workspaces/create">
+          <Button className="min-h-[44px]">
+            <Plus className="size-4" />
+            <span>Create Workspace</span>
+          </Button>
+        </Link>
       </div>
 
       {/* Workspace list */}
