@@ -346,6 +346,283 @@ function useEventRealtime(eventId: string) {
 }
 ```
 
+**Mutations via dedicated hooks:**
+
+Business entities often have complex nested structures. Create specific mutation hooks for each business operation rather than generic update hooks.
+
+```tsx
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { doc, updateDoc, addDoc, deleteDoc, arrayUnion, arrayRemove } from 'firebase/firestore'
+import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage'
+import { firestore, storage } from '@/integrations/firebase/client'
+
+// Event structure example:
+// {
+//   id: string
+//   welcomeScreen: { title, subtitle, logo }
+//   theme: { primaryColor, secondaryColor, font }
+//   overlays: [{ id, url, type, position }]
+//   shareDefaults: { message, hashtags, platforms }
+//   experiences: [{ id, name, prompt, settings }]
+// }
+
+// ✅ Update welcome screen configuration
+function useUpdateWelcomeScreen(eventId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (welcomeData: { title: string; subtitle: string; logo?: string }) => {
+      const docRef = doc(firestore, 'events', eventId)
+      await updateDoc(docRef, {
+        'welcomeScreen.title': welcomeData.title,
+        'welcomeScreen.subtitle': welcomeData.subtitle,
+        ...(welcomeData.logo && { 'welcomeScreen.logo': welcomeData.logo }),
+      })
+      return welcomeData
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['event', eventId] })
+    },
+  })
+}
+
+// ✅ Update theme settings
+function useUpdateTheme(eventId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (theme: { primaryColor?: string; secondaryColor?: string; font?: string }) => {
+      const docRef = doc(firestore, 'events', eventId)
+      const updates: Record<string, string> = {}
+      if (theme.primaryColor) updates['theme.primaryColor'] = theme.primaryColor
+      if (theme.secondaryColor) updates['theme.secondaryColor'] = theme.secondaryColor
+      if (theme.font) updates['theme.font'] = theme.font
+
+      await updateDoc(docRef, updates)
+      return theme
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['event', eventId] })
+    },
+  })
+}
+
+// ✅ Upload and add overlay to event
+function useUploadOverlay(eventId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ file, type, position }: {
+      file: File
+      type: 'frame' | 'sticker' | 'filter'
+      position: { x: number; y: number }
+    }) => {
+      // Upload to Firebase Storage
+      const storageRef = ref(storage, `events/${eventId}/overlays/${Date.now()}_${file.name}`)
+      const snapshot = await uploadBytes(storageRef, file)
+      const url = await getDownloadURL(snapshot.ref)
+
+      // Add to Firestore overlays array
+      const overlay = { id: crypto.randomUUID(), url, type, position }
+      const docRef = doc(firestore, 'events', eventId)
+      await updateDoc(docRef, {
+        overlays: arrayUnion(overlay)
+      })
+
+      return overlay
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['event', eventId] })
+    },
+  })
+}
+
+// ✅ Delete overlay from event
+function useDeleteOverlay(eventId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (overlay: { id: string; url: string }) => {
+      // Remove from Storage
+      const storageRef = ref(storage, overlay.url)
+      await deleteObject(storageRef)
+
+      // Remove from Firestore array
+      const docRef = doc(firestore, 'events', eventId)
+      await updateDoc(docRef, {
+        overlays: arrayRemove(overlay)
+      })
+
+      return overlay.id
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['event', eventId] })
+    },
+  })
+}
+
+// ✅ Update share options
+function useUpdateShareOptions(eventId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (shareOptions: {
+      message?: string
+      hashtags?: string[]
+      platforms?: string[]
+    }) => {
+      const docRef = doc(firestore, 'events', eventId)
+      const updates: Record<string, unknown> = {}
+      if (shareOptions.message) updates['shareDefaults.message'] = shareOptions.message
+      if (shareOptions.hashtags) updates['shareDefaults.hashtags'] = shareOptions.hashtags
+      if (shareOptions.platforms) updates['shareDefaults.platforms'] = shareOptions.platforms
+
+      await updateDoc(docRef, updates)
+      return shareOptions
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['event', eventId] })
+    },
+  })
+}
+
+// ✅ Create new experience within event
+function useCreateExperience(eventId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (experience: {
+      name: string
+      prompt: string
+      settings: Record<string, unknown>
+    }) => {
+      const newExperience = {
+        id: crypto.randomUUID(),
+        ...experience,
+        createdAt: new Date().toISOString(),
+      }
+
+      const docRef = doc(firestore, 'events', eventId)
+      await updateDoc(docRef, {
+        experiences: arrayUnion(newExperience)
+      })
+
+      return newExperience
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['event', eventId] })
+    },
+  })
+}
+
+// ✅ Update specific experience
+function useUpdateExperience(eventId: string, experienceId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (updates: {
+      name?: string
+      prompt?: string
+      settings?: Record<string, unknown>
+    }) => {
+      // Fetch current event to update the specific experience in the array
+      const docRef = doc(firestore, 'events', eventId)
+      const docSnap = await getDoc(docRef)
+
+      if (!docSnap.exists()) throw new Error('Event not found')
+
+      const experiences = docSnap.data().experiences || []
+      const updatedExperiences = experiences.map((exp: Experience) =>
+        exp.id === experienceId ? { ...exp, ...updates } : exp
+      )
+
+      await updateDoc(docRef, { experiences: updatedExperiences })
+      return updates
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['event', eventId] })
+    },
+  })
+}
+
+// Usage in components
+function WelcomeScreenEditor({ eventId }: { eventId: string }) {
+  const updateWelcome = useUpdateWelcomeScreen(eventId)
+
+  const handleSave = (data: { title: string; subtitle: string }) => {
+    updateWelcome.mutate(data, {
+      onSuccess: () => {
+        toast.success('Welcome screen updated!')
+      },
+      onError: (error) => {
+        toast.error('Failed to update welcome screen')
+      },
+    })
+  }
+
+  return (
+    <form onSubmit={(e) => {
+      e.preventDefault()
+      const formData = new FormData(e.currentTarget)
+      handleSave({
+        title: formData.get('title') as string,
+        subtitle: formData.get('subtitle') as string,
+      })
+    }}>
+      <input name="title" placeholder="Welcome title" />
+      <input name="subtitle" placeholder="Subtitle" />
+      <button type="submit" disabled={updateWelcome.isPending}>
+        {updateWelcome.isPending ? 'Saving...' : 'Save'}
+      </button>
+    </form>
+  )
+}
+
+function OverlayManager({ eventId }: { eventId: string }) {
+  const uploadOverlay = useUploadOverlay(eventId)
+  const deleteOverlay = useDeleteOverlay(eventId)
+
+  const handleUpload = (file: File) => {
+    uploadOverlay.mutate({
+      file,
+      type: 'frame',
+      position: { x: 0, y: 0 },
+    })
+  }
+
+  const handleDelete = (overlay: { id: string; url: string }) => {
+    if (confirm('Delete this overlay?')) {
+      deleteOverlay.mutate(overlay)
+    }
+  }
+
+  return (
+    <div>
+      <input
+        type="file"
+        onChange={(e) => e.target.files?.[0] && handleUpload(e.target.files[0])}
+        disabled={uploadOverlay.isPending}
+      />
+      {uploadOverlay.isPending && <p>Uploading...</p>}
+      {/* Render overlays with delete buttons */}
+    </div>
+  )
+}
+```
+
+**Key principles for mutations:**
+
+- ✅ **Business-oriented hook names**: Use `useUpdateWelcomeScreen`, `useUploadOverlay`, not generic `useUpdateEvent`
+- ✅ **One hook per business operation**: Each specific action gets its own dedicated hook
+- ✅ **Work with nested structures**: Update specific nested fields using dot notation or array operations
+- ✅ **Combine Storage + Firestore**: Handle file uploads and database updates together in one mutation
+- ✅ **Use TanStack Query's `useMutation`**: Provides loading states, error handling, and optimistic updates
+- ✅ **Handle cache invalidation**: Invalidate relevant queries in `onSuccess` callbacks
+- ✅ **Use Firestore client SDK directly**: `updateDoc`, `arrayUnion`, `arrayRemove`, etc.
+- ✅ **Keep mutation logic in hooks**: Components should call hooks, not contain business logic
+- ❌ **Never use generic update hooks**: Avoid `useUpdateEvent` that updates the entire entity
+- ❌ **Never use server functions for CRUD**: Basic create/read/update/delete operations stay client-side
+
 ## Security Model
 
 ### Client-First Security
