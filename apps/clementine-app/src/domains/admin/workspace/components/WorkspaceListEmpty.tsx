@@ -1,9 +1,13 @@
+import { Plus } from 'lucide-react'
+import { CreateWorkspaceSheet } from './CreateWorkspaceSheet'
+import { Button } from '@/ui-kit/components/button'
+
 /**
  * Empty state for workspace list
  *
  * Displayed when no active workspaces exist.
  * Shows friendly message encouraging admin to create first workspace.
- * Will include "Create workspace" button once creation feature is implemented (US2).
+ * Includes "Create workspace" button to launch creation sheet.
  */
 export function WorkspaceListEmpty() {
   return (
@@ -12,7 +16,14 @@ export function WorkspaceListEmpty() {
       <p className="mb-4 text-sm text-muted-foreground">
         Get started by creating your first workspace
       </p>
-      {/* Create workspace button will be added in US2 (T020) */}
+      <CreateWorkspaceSheet
+        trigger={
+          <Button className="min-h-[44px]">
+            <Plus className="size-4" />
+            <span>Create Workspace</span>
+          </Button>
+        }
+      />
     </div>
   )
 }

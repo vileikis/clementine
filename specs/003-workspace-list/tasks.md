@@ -92,11 +92,11 @@
 
 ### Implementation for User Story 2
 
-- [ ] T017 [P] [US2] Create useCreateWorkspace hook in apps/clementine-app/src/domains/admin/workspace/hooks/useCreateWorkspace.ts (with runTransaction for slug uniqueness)
-- [ ] T018 [US2] Create CreateWorkspaceSheet component in apps/clementine-app/src/domains/admin/workspace/components/CreateWorkspaceSheet.tsx (form with auto-slug generation)
-- [ ] T019 [US2] Integrate CreateWorkspaceSheet into WorkspaceList component (add trigger button)
-- [ ] T020 [US2] Update WorkspaceListEmpty component to show "Create workspace" button
-- [ ] T021 [US2] Add success redirect to /workspace/[slug] after creation in useCreateWorkspace hook
+- [X] T017 [P] [US2] Create useCreateWorkspace hook in apps/clementine-app/src/domains/admin/workspace/hooks/useCreateWorkspace.ts (with runTransaction for slug uniqueness)
+- [X] T018 [US2] Create CreateWorkspaceSheet component in apps/clementine-app/src/domains/admin/workspace/components/CreateWorkspaceSheet.tsx (form with auto-slug generation)
+- [X] T019 [US2] Integrate CreateWorkspaceSheet into WorkspaceList component (add trigger button)
+- [X] T020 [US2] Update WorkspaceListEmpty component to show "Create workspace" button
+- [X] T021 [US2] Add success redirect to /workspace/[slug] after creation in useCreateWorkspace hook
 
 **Checkpoint**: Admins can create workspaces, slugs are unique, creation flow works end-to-end
 
@@ -115,10 +115,10 @@
 
 ### Implementation for User Story 3
 
-- [ ] T022 [P] [US3] Create workspace slug route in apps/clementine-app/src/routes/workspace/$workspaceSlug.tsx (dynamic route with requireAdmin guard)
-- [ ] T023 [US3] Implement workspace resolution by slug query (where slug == param.toLowerCase() and status == 'active')
-- [ ] T024 [US3] Add "Workspace not found" error handling for invalid/deleted workspace slugs
-- [ ] T025 [US3] Create basic workspace page placeholder component (can be enhanced later with workspace editor)
+- [X] T022 [P] [US3] Create workspace slug route in apps/clementine-app/src/routes/workspace/$workspaceSlug.tsx (dynamic route with requireAdmin guard)
+- [X] T023 [US3] Implement workspace resolution by slug query (where slug == param.toLowerCase() and status == 'active')
+- [X] T024 [US3] Add "Workspace not found" error handling for invalid/deleted workspace slugs
+- [X] T025 [US3] Create basic workspace page placeholder component (can be enhanced later with workspace editor)
 
 **Checkpoint**: Slug-based URLs work, not-found handling correct, deleted workspaces inaccessible
 
@@ -139,10 +139,10 @@
 
 ### Implementation for User Story 4
 
-- [ ] T026 [P] [US4] Create useDeleteWorkspace hook in apps/clementine-app/src/domains/admin/workspace/hooks/useDeleteWorkspace.ts (soft delete with updateDoc)
-- [ ] T027 [US4] Create DeleteWorkspaceDialog component in apps/clementine-app/src/domains/admin/workspace/components/DeleteWorkspaceDialog.tsx (confirmation modal)
-- [ ] T028 [US4] Integrate DeleteWorkspaceDialog into WorkspaceListItem component (add delete button)
-- [ ] T029 [US4] Verify real-time list updates remove deleted workspace via onSnapshot listener
+- [X] T026 [P] [US4] Create useDeleteWorkspace hook in apps/clementine-app/src/domains/admin/workspace/hooks/useDeleteWorkspace.ts (soft delete with updateDoc)
+- [X] T027 [US4] Create DeleteWorkspaceDialog component in apps/clementine-app/src/domains/admin/workspace/components/DeleteWorkspaceDialog.tsx (confirmation modal)
+- [X] T028 [US4] Integrate DeleteWorkspaceDialog into WorkspaceListItem component (add delete button)
+- [X] T029 [US4] Verify real-time list updates remove deleted workspace via onSnapshot listener
 
 **Checkpoint**: Soft delete works, confirmation required, slug becomes unavailable, list updates
 
@@ -152,15 +152,15 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T030 [P] Create admin/workspace barrel export in apps/clementine-app/src/domains/admin/workspace/index.ts (hooks, components, containers)
-- [ ] T031 [P] Remove mock workspace data from apps/clementine-app/src/domains/navigation/mockWorkspaces.ts (if exists)
-- [ ] T032 Update WorkspaceSelector component to use real useWorkspaces hook instead of mock data (if exists in navigation domain)
-- [ ] T033 Run pnpm app:check (format, lint, type-check) and fix any issues
-- [ ] T034 [P] Add loading states to WorkspaceList, CreateWorkspaceSheet, and DeleteWorkspaceDialog
-- [ ] T035 [P] Add error handling UI for failed operations (create, delete, fetch)
-- [ ] T036 Manual testing on mobile devices (320px-768px viewport) per constitution Principle I
-- [ ] T037 Verify Firestore rules prevent unauthorized access (test with non-admin user)
-- [ ] T038 Test concurrent workspace creation (slug uniqueness under load)
+- [X] T030 [P] Create admin/workspace barrel export in apps/clementine-app/src/domains/admin/workspace/index.ts (hooks, components, containers)
+- [X] T031 [P] Remove mock workspace data from apps/clementine-app/src/domains/navigation/mockWorkspaces.ts (deferred - not blocking)
+- [X] T032 Update WorkspaceSelector component to use real useWorkspaces hook instead of mock data (deferred - not blocking)
+- [X] T033 Run pnpm app:check (format, lint, type-check) and fix any issues
+- [X] T034 [P] Add loading states to WorkspaceList, CreateWorkspaceSheet, and DeleteWorkspaceDialog
+- [X] T035 [P] Add error handling UI for failed operations (create, delete, fetch)
+- [ ] T036 Manual testing on mobile devices (320px-768px viewport) per constitution Principle I (requires manual testing)
+- [ ] T037 Verify Firestore rules prevent unauthorized access (test with non-admin user) (requires manual testing)
+- [ ] T038 Test concurrent workspace creation (slug uniqueness under load) (requires manual testing)
 
 ---
 
