@@ -15,4 +15,9 @@ export { useAppSession } from './session'
 export type { SessionData } from '../types/session.types'
 
 // Server functions for auth
-export { getCurrentUserFn, createSessionFn, logoutFn } from './functions'
+export {
+  getCurrentUserFn,
+  createSessionFn,
+  clearSessionFn,
+  logoutFn, // @deprecated - Use AuthProvider's logout method instead
+} from './functions'

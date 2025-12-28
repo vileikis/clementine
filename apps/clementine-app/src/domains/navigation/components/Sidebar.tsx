@@ -1,8 +1,5 @@
 import { LogOut, Menu } from 'lucide-react'
 import { useParams } from '@tanstack/react-router'
-import { signOut } from 'firebase/auth'
-import { useServerFn } from '@tanstack/react-start'
-import * as Sentry from '@sentry/tanstackstart-react'
 import { useSidebarState } from '../hooks'
 import { AdminNav } from './AdminNav'
 import { WorkspaceNav } from './WorkspaceNav'
@@ -10,8 +7,7 @@ import type { RouteArea } from '../types'
 import { cn } from '@/shared/lib/utils'
 import { Button } from '@/ui-kit/components/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/ui-kit/components/sheet'
-import { logoutFn } from '@/domains/auth/server/functions'
-import { auth } from '@/integrations/firebase/client'
+import { useAuth } from '@/domains/auth'
 
 const SIDEBAR_WIDTH = {
   expanded: 256, // 16rem / w-64
@@ -110,20 +106,7 @@ function SidebarContent({
   workspaceId,
   isCollapsed,
 }: SidebarContentProps) {
-  const serverLogout = useServerFn(logoutFn)
-
-  const handleLogout = async () => {
-    try {
-      // Sign out from Firebase (client-side)
-      await signOut(auth)
-      // Clear server session and redirect to /login
-      await serverLogout()
-    } catch (err) {
-      Sentry.captureException(err, {
-        tags: { component: 'Sidebar', action: 'logout' },
-      })
-    }
-  }
+  const { logout } = useAuth()
 
   return (
     <div className="flex flex-col h-full">
@@ -143,7 +126,7 @@ function SidebarContent({
             'w-full justify-start gap-3',
             isCollapsed && 'justify-center',
           )}
-          onClick={handleLogout}
+          onClick={logout}
           title={isCollapsed ? 'Logout' : undefined}
         >
           <LogOut className="h-5 w-5 shrink-0" />
