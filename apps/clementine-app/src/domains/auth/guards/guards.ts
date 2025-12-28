@@ -16,7 +16,12 @@
 
 import { redirect } from '@tanstack/react-router'
 import { getCurrentUserFn } from '../server/functions'
-import { isAdmin, isAnyUser, isNonAdmin } from '../utils/authChecks'
+import {
+  isAdmin,
+  isAnyUser,
+  isAuthenticated,
+  isNonAdmin,
+} from '../utils/authChecks'
 
 /**
  * Require admin user (works on both server and client)
@@ -50,7 +55,7 @@ export async function requireAdmin() {
 export async function requireAuth() {
   const user = await getCurrentUserFn()
 
-  if (!user || user.isAnonymous) {
+  if (isAuthenticated(user)) {
     throw redirect({ to: '/' })
   }
 

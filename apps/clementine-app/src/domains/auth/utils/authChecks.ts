@@ -51,3 +51,10 @@ export function isAnyUser(user: SessionUser | null): boolean {
 export function isUnauthenticated(user: SessionUser | null): boolean {
   return !user
 }
+
+/**
+ * Check if user is authenticated
+ */
+export function isAuthenticated(user: SessionUser | null): boolean {
+  return !user || user.isAnonymous
+}
