@@ -269,6 +269,55 @@ describe('useEvents', () => {
 
 ## Test Organization
 
+### File Location: Co-locate Tests with Code
+
+**IMPORTANT:** Test files MUST be co-located with the code they test, NOT in a separate top-level test directory.
+
+#### ✅ CORRECT: Co-located Tests
+
+```
+/domains/workspace/
+  /hooks/
+    useWorkspace.ts
+    useWorkspace.test.ts       ← co-located with hook
+  /store/
+    useWorkspaceStore.ts
+    useWorkspaceStore.test.ts  ← co-located with store
+  /actions/
+    updateWorkspace.ts
+    updateWorkspace.test.ts    ← co-located with action
+  /components/
+    WorkspaceCard.tsx
+    WorkspaceCard.test.tsx     ← co-located with component
+  /lib/
+    formatWorkspace.ts
+    formatWorkspace.test.ts    ← co-located with utility
+```
+
+#### ❌ INCORRECT: Separate Test Directory
+
+```
+/src/
+  /tests/                      ← ❌ DO NOT create tests here
+    useWorkspace.test.ts       ← ❌ Tests separated from code
+    WorkspaceCard.test.tsx     ← ❌ Hard to find and maintain
+  /domains/workspace/
+    /hooks/
+      useWorkspace.ts          ← Code here
+```
+
+**Why co-locate tests?**
+- ✅ Easier to find tests related to specific code
+- ✅ Tests move/delete with the code they test
+- ✅ Clearer what code is tested vs untested
+- ✅ Follows modern testing best practices
+- ✅ Better developer experience
+
+**Naming convention:**
+- Use `.test.ts` for TypeScript files
+- Use `.test.tsx` for React components
+- Match the filename: `useWorkspace.ts` → `useWorkspace.test.ts`
+
 ### AAA Pattern
 **Arrange** (setup) → **Act** (perform action) → **Assert** (verify results)
 
