@@ -35,16 +35,27 @@ export function DevToolsPreviewShell() {
   }
 
   return (
-    <div className="flex h-screen">
-      {/* Left: Prop Controls (25%) */}
-      <PropControlsPanel
-        config={config}
-        onConfigChange={setConfig}
-        onReset={handleReset}
-      />
+    <div className="flex h-full flex-col">
+      {/* Header */}
+      <div className="border-b px-6 py-4">
+        <h1 className="text-2xl font-bold">Preview Shell</h1>
+        <p className="text-sm text-muted-foreground">
+          Device preview testing interface
+        </p>
+      </div>
 
-      {/* Right: Preview Area (75%) */}
-      <PreviewArea key={remountKey} config={config} />
+      {/* Two-column layout */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Left: Prop Controls (25%) */}
+        <PropControlsPanel
+          config={config}
+          onConfigChange={setConfig}
+          onReset={handleReset}
+        />
+
+        {/* Right: Preview Area (75%) */}
+        <PreviewArea key={remountKey} config={config} />
+      </div>
     </div>
   )
 }

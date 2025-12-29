@@ -2,13 +2,16 @@
 
 import { Monitor, Smartphone } from 'lucide-react'
 import type { ViewportSwitcherProps } from '../types/preview-shell.types'
-import { cn } from '@/shared/utils'
+import {
+  ToggleGroup,
+  ToggleGroupItem,
+} from '@/ui-kit/components/ui/toggle-group'
 
 /**
  * Viewport Switcher Component
  *
- * Toggle buttons for switching between mobile and desktop viewports
- * Supports size variants and accessibility requirements
+ * Toggle group for switching between mobile and desktop viewports
+ * Uses Radix UI Toggle Group for accessible toggle functionality
  */
 export function ViewportSwitcher({
   mode,
@@ -16,46 +19,32 @@ export function ViewportSwitcher({
   size = 'md',
   className,
 }: ViewportSwitcherProps) {
-  const buttonSize = size === 'sm' ? 'h-10 w-10' : 'h-11 w-11'
+  const itemSize = size === 'sm' ? 'sm' : 'default'
   const iconSize = size === 'sm' ? 18 : 20
 
   return (
-    <div
-      className={cn(
-        'flex items-center gap-1 rounded-lg border bg-background p-1',
-        className,
-      )}
+    <ToggleGroup
+      type="single"
+      value={mode}
+      onValueChange={(value) => {
+        if (value) onModeChange(value as typeof mode)
+      }}
+      className={className}
     >
-      <button
-        type="button"
-        onClick={() => onModeChange('mobile')}
-        className={cn(
-          'flex items-center justify-center rounded-md transition-all',
-          buttonSize,
-          mode === 'mobile'
-            ? 'bg-primary text-primary-foreground shadow-sm'
-            : 'text-muted-foreground hover:bg-muted hover:text-foreground',
-        )}
+      <ToggleGroupItem
+        value="mobile"
         aria-label="Switch to mobile viewport"
-        aria-pressed={mode === 'mobile'}
+        size={itemSize}
       >
         <Smartphone size={iconSize} />
-      </button>
-      <button
-        type="button"
-        onClick={() => onModeChange('desktop')}
-        className={cn(
-          'flex items-center justify-center rounded-md transition-all',
-          buttonSize,
-          mode === 'desktop'
-            ? 'bg-primary text-primary-foreground shadow-sm'
-            : 'text-muted-foreground hover:bg-muted hover:text-foreground',
-        )}
+      </ToggleGroupItem>
+      <ToggleGroupItem
+        value="desktop"
         aria-label="Switch to desktop viewport"
-        aria-pressed={mode === 'desktop'}
+        size={itemSize}
       >
         <Monitor size={iconSize} />
-      </button>
-    </div>
+      </ToggleGroupItem>
+    </ToggleGroup>
   )
 }

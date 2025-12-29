@@ -44,57 +44,40 @@ export function PropControlsPanel({
 
   return (
     <div className="flex w-1/4 flex-col border-r bg-muted/30 p-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold">Preview Shell</h1>
-        <p className="text-sm text-muted-foreground">
-          Dev-tools testing interface
-        </p>
-      </div>
-
-      <div className="space-y-6">
+      <div className="space-y-4">
         {/* Enable Viewport Switcher */}
-        <div className="space-y-2">
+        <div className="flex items-center justify-between">
           <Label
             htmlFor="enable-viewport-switcher"
             className="text-sm font-medium"
           >
             Viewport Switcher
           </Label>
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="enable-viewport-switcher"
-              checked={config.enableViewportSwitcher}
-              onCheckedChange={(checked: boolean) =>
-                handleChange('enableViewportSwitcher', checked)
-              }
-            />
-            <span className="text-sm text-muted-foreground">
-              {config.enableViewportSwitcher ? 'Enabled' : 'Disabled'}
-            </span>
-          </div>
+          <Switch
+            id="enable-viewport-switcher"
+            checked={config.enableViewportSwitcher}
+            onCheckedChange={(checked: boolean) =>
+              handleChange('enableViewportSwitcher', checked)
+            }
+          />
         </div>
 
         {/* Enable Fullscreen */}
-        <div className="space-y-2">
+        <div className="flex items-center justify-between">
           <Label htmlFor="enable-fullscreen" className="text-sm font-medium">
             Fullscreen Mode
           </Label>
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="enable-fullscreen"
-              checked={config.enableFullscreen}
-              onCheckedChange={(checked: boolean) =>
-                handleChange('enableFullscreen', checked)
-              }
-            />
-            <span className="text-sm text-muted-foreground">
-              {config.enableFullscreen ? 'Enabled' : 'Disabled'}
-            </span>
-          </div>
+          <Switch
+            id="enable-fullscreen"
+            checked={config.enableFullscreen}
+            onCheckedChange={(checked: boolean) =>
+              handleChange('enableFullscreen', checked)
+            }
+          />
         </div>
 
         {/* Default Viewport */}
-        <div className="space-y-2">
+        <div className="flex items-center justify-between gap-4">
           <Label htmlFor="default-viewport" className="text-sm font-medium">
             Default Viewport
           </Label>
@@ -104,12 +87,12 @@ export function PropControlsPanel({
               handleChange('defaultViewport', value as ViewportMode)
             }
           >
-            <SelectTrigger id="default-viewport">
+            <SelectTrigger id="default-viewport" className="w-[140px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="mobile">Mobile (375×667)</SelectItem>
-              <SelectItem value="desktop">Desktop (900×600)</SelectItem>
+              <SelectItem value="mobile">Mobile</SelectItem>
+              <SelectItem value="desktop">Desktop</SelectItem>
             </SelectContent>
           </Select>
         </div>

@@ -17,10 +17,10 @@ export function FullscreenTrigger({
 }: FullscreenTriggerProps) {
   return (
     <Button
-      variant="outline"
+      variant="ghost"
       size="icon"
       onClick={onClick}
-      className={cn('h-11 w-11', className)}
+      className={cn('h-9 w-9', className)}
       aria-label="Enter fullscreen mode"
     >
       <Maximize2 size={20} />
