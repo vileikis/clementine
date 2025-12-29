@@ -95,7 +95,6 @@ export function useEmailPasswordSignIn() {
       // Invalidate and navigate to workspace landing page
       // This will redirect to last visited workspace (if exists) or /admin/workspaces
       await router.invalidate()
-      router.navigate({ to: '/workspace' })
     } catch (err) {
       Sentry.captureException(err, {
         tags: { component: 'useEmailPasswordSignIn', action: 'sign-in' },
