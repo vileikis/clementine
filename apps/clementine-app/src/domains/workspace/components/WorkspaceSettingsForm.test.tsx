@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -76,10 +76,10 @@ describe('WorkspaceSettingsForm', () => {
 
       const nameInput = screen.getByLabelText(
         /workspace name/i,
-      ) as HTMLInputElement
+      )
       const slugInput = screen.getByLabelText(
         /workspace slug/i,
-      ) as HTMLInputElement
+      )
 
       expect(nameInput.value).toBe('Acme Corp')
       expect(slugInput.value).toBe('acme-corp')
@@ -161,7 +161,7 @@ describe('WorkspaceSettingsForm', () => {
 
       const nameInput = screen.getByLabelText(
         /workspace name/i,
-      ) as HTMLInputElement
+      )
 
       // Change name
       await user.clear(nameInput)

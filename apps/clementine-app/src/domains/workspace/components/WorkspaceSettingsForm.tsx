@@ -1,6 +1,9 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate } from '@tanstack/react-router'
+import { useUpdateWorkspace } from '../hooks/useUpdateWorkspace'
+import { updateWorkspaceSchema } from '../schemas/workspace.schemas'
+import type { UpdateWorkspaceInput, Workspace } from '../types/workspace.types'
 import { Button } from '@/ui-kit/components/button'
 import { Input } from '@/ui-kit/components/input'
 import {
@@ -12,9 +15,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/ui-kit/components/form'
-import { useUpdateWorkspace } from '../hooks/useUpdateWorkspace'
-import { updateWorkspaceSchema } from '../schemas/workspace.schemas'
-import type { UpdateWorkspaceInput, Workspace } from '../types/workspace.types'
 
 interface WorkspaceSettingsFormProps {
   workspace: Workspace
