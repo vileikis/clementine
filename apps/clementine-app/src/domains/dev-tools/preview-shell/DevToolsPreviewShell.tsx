@@ -37,7 +37,7 @@ export function DevToolsPreviewShell() {
   return (
     <div className="flex h-full flex-col">
       {/* Header */}
-      <div className="border-b px-6 py-4">
+      <div className="px-6 py-4">
         <h1 className="text-2xl font-bold">Preview Shell</h1>
         <p className="text-sm text-muted-foreground">
           Device preview testing interface
@@ -45,7 +45,7 @@ export function DevToolsPreviewShell() {
       </div>
 
       {/* Two-column layout */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden gap-2">
         {/* Left: Prop Controls (25%) */}
         <PropControlsPanel
           config={config}

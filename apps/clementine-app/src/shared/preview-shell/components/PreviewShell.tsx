@@ -44,9 +44,11 @@ export function PreviewShell({
     }
   }
 
+  const isMobile = currentMode === 'mobile'
+
   return (
     <ViewportProvider mode={currentMode}>
-      <div className={cn('space-y-4', className)}>
+      <div className={cn('flex flex-col h-full', className)}>
         {/* Controls */}
         <PreviewShellControls
           mode={currentMode}
@@ -56,10 +58,18 @@ export function PreviewShell({
           onFullscreenClick={enter}
         />
 
-        {/* Device Frame */}
-        <DeviceFrame>
-          <div className="h-full overflow-auto">{children}</div>
-        </DeviceFrame>
+        {/* Device Frame with wrapper for proper layout */}
+        <div
+          className={cn(
+            'flex min-h-0 p-4',
+            // Mobile: center the fixed-size frame
+            isMobile && 'justify-center',
+            // Desktop: fill available space with flex column for proper height
+            !isMobile && 'flex-1 flex-col',
+          )}
+        >
+          <DeviceFrame>{children}</DeviceFrame>
+        </div>
 
         {/* Fullscreen Overlay */}
         {enableFullscreen && (
@@ -70,9 +80,7 @@ export function PreviewShell({
             showViewportSwitcher={enableViewportSwitcher}
             onModeChange={handleModeChange}
           >
-            <DeviceFrame>
-              <div className="h-full overflow-auto">{children}</div>
-            </DeviceFrame>
+            <DeviceFrame>{children}</DeviceFrame>
           </FullscreenOverlay>
         )}
       </div>

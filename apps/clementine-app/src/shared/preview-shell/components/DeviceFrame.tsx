@@ -7,27 +7,48 @@ import { cn } from '@/shared/utils'
 /**
  * Device Frame Component
  *
- * Renders a fixed-size container with viewport-specific dimensions
- * Mobile: 375x667px (iPhone SE), Desktop: 900x600px
+ * Renders a responsive container with viewport-specific behavior:
+ * - Mobile: Fixed dimensions (375x667px iPhone SE)
+ * - Desktop: Fills available space with minimum height
  */
 export function DeviceFrame({
   children,
   className,
 }: Omit<DeviceFrameProps, 'mode'>) {
-  const { dimensions } = useViewportContext()
+  const { mode, dimensions } = useViewportContext()
+  const isMobile = mode === 'mobile'
 
   return (
     <div
       className={cn(
-        'mx-auto overflow-hidden rounded-lg border bg-background shadow-lg transition-all duration-200',
+        // Frame styling
+        'overflow-hidden rounded-lg border bg-background shadow-lg transition-all duration-200',
+        // Desktop fills available space using flex-grow (not h-full which needs explicit parent height)
+        !isMobile && 'w-full flex-1 flex flex-col',
         className,
       )}
-      style={{
-        width: `${dimensions.width}px`,
-        height: `${dimensions.height}px`,
-      }}
+      style={
+        isMobile
+          ? {
+              // Mobile: fixed dimensions
+              width: `${dimensions.width}px`,
+              height: `${dimensions.height}px`,
+            }
+          : {
+              // Desktop: minimum height for visual presence
+              minHeight: `${dimensions.height}px`,
+            }
+      }
     >
-      {children}
+      {/* Content container - fills frame, overflow handled by children */}
+      <div
+        className={cn(
+          'relative w-full',
+          isMobile ? 'h-full' : 'flex-1 flex flex-col',
+        )}
+      >
+        {children}
+      </div>
     </div>
   )
 }

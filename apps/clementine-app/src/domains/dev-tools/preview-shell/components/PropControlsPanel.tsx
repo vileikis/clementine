@@ -43,7 +43,7 @@ export function PropControlsPanel({
   }
 
   return (
-    <div className="flex w-1/4 flex-col border-r bg-muted/30 p-6">
+    <div className="flex w-1/4 flex-col bg-muted/30 p-6">
       <div className="space-y-4">
         {/* Enable Viewport Switcher */}
         <div className="flex items-center justify-between">

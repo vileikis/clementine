@@ -23,6 +23,7 @@ export function FullscreenOverlay({
   className,
 }: FullscreenOverlayProps) {
   const { mode } = useViewportContext()
+  const isMobile = mode === 'mobile'
 
   if (!isOpen) return null
 
@@ -57,8 +58,16 @@ export function FullscreenOverlay({
         </div>
       </div>
 
-      {/* Content Area */}
-      <div className="flex flex-1 items-center justify-center overflow-auto p-4">
+      {/* Content Area - mobile centered, desktop fills space */}
+      <div
+        className={cn(
+          'flex flex-1 overflow-auto p-6',
+          // Mobile: center the fixed-size frame
+          isMobile && 'items-center justify-center',
+          // Desktop: fill available space with flex column
+          !isMobile && 'flex-col',
+        )}
+      >
         {children}
       </div>
     </div>
