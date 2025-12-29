@@ -1,6 +1,7 @@
 'use client'
 
 import type { ViewportMode } from '@/shared/preview-shell'
+import type { ComponentConfig } from '../types'
 import { Button } from '@/ui-kit/components/button'
 import { Label } from '@/ui-kit/components/label'
 import { Switch } from '@/ui-kit/components/ui/switch'
@@ -11,12 +12,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/ui-kit/components/ui/select'
-
-interface ComponentConfig {
-  enableViewportSwitcher: boolean
-  enableFullscreen: boolean
-  defaultViewport: ViewportMode
-}
 
 interface PropControlsPanelProps {
   config: ComponentConfig

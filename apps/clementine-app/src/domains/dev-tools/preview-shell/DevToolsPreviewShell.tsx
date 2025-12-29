@@ -3,13 +3,7 @@
 import { useState } from 'react'
 import { PropControlsPanel } from './components/PropControlsPanel'
 import { PreviewArea } from './components/PreviewArea'
-import type { ViewportMode } from '@/shared/preview-shell'
-
-interface ComponentConfig {
-  enableViewportSwitcher: boolean
-  enableFullscreen: boolean
-  defaultViewport: ViewportMode
-}
+import type { ComponentConfig } from './types'
 
 /**
  * Dev-Tools Preview Shell Container

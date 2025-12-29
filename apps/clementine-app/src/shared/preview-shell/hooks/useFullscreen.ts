@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type {
   UseFullscreenOptions,
   UseFullscreenReturn,
@@ -11,6 +11,9 @@ import type {
  *
  * Manages fullscreen overlay state with callbacks and keyboard handling
  * Handles Escape key for closing and body scroll prevention
+ *
+ * Note: onEnter and onExit callbacks are stored in refs to ensure
+ * enter/exit/toggle functions remain stable across re-renders
  */
 export function useFullscreen(
   options: UseFullscreenOptions = {},
@@ -18,15 +21,28 @@ export function useFullscreen(
   const { onEnter, onExit } = options
   const [isFullscreen, setIsFullscreen] = useState(false)
 
+  // Store callbacks in refs to avoid recreating enter/exit functions
+  const onEnterRef = useRef(onEnter)
+  const onExitRef = useRef(onExit)
+
+  // Update refs when callbacks change
+  useEffect(() => {
+    onEnterRef.current = onEnter
+  }, [onEnter])
+
+  useEffect(() => {
+    onExitRef.current = onExit
+  }, [onExit])
+
   const enter = useCallback(() => {
     setIsFullscreen(true)
-    onEnter?.()
-  }, [onEnter])
+    onEnterRef.current?.()
+  }, [])
 
   const exit = useCallback(() => {
     setIsFullscreen(false)
-    onExit?.()
-  }, [onExit])
+    onExitRef.current?.()
+  }, [])
 
   const toggle = useCallback(() => {
     if (isFullscreen) {
