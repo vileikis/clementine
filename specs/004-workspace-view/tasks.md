@@ -63,15 +63,15 @@ This is a TanStack Start web application with domain-driven design:
 
 ### Navigation Domain Updates for User Story 1
 
-- [ ] T014 [P] [US1] Update getWorkspaceInitials in apps/clementine-app/src/domains/navigation/lib/getWorkspaceInitials.ts (fix to match spec: 1-2 letters)
-- [ ] T015 [P] [US1] Write tests for getWorkspaceInitials in apps/clementine-app/src/domains/navigation/lib/getWorkspaceInitials.test.ts
-- [ ] T016 [US1] Update WorkspaceSelector in apps/clementine-app/src/domains/navigation/components/WorkspaceSelector.tsx (fetch real workspace data by slug using useWorkspace hook)
-- [ ] T017 [US1] Update WorkspaceNav in apps/clementine-app/src/domains/navigation/components/WorkspaceNav.tsx (use real workspaceSlug from params instead of workspaceId)
+- [X] T014 [P] [US1] Update getWorkspaceInitials in apps/clementine-app/src/domains/navigation/lib/getWorkspaceInitials.ts (fix to match spec: 1-2 letters)
+- [X] T015 [P] [US1] Write tests for getWorkspaceInitials in apps/clementine-app/src/domains/navigation/lib/getWorkspaceInitials.test.ts
+- [X] T016 [US1] Update WorkspaceSelector in apps/clementine-app/src/domains/navigation/components/WorkspaceSelector.tsx (fetch real workspace data by slug using useWorkspace hook)
+- [X] T017 [US1] Update WorkspaceNav in apps/clementine-app/src/domains/navigation/components/WorkspaceNav.tsx (use real workspaceSlug from params instead of workspaceId)
 
 ### Routing for User Story 1
 
-- [ ] T018 [US1] Update workspace route loader in apps/clementine-app/src/app/workspace/$workspaceSlug.tsx (add beforeLoad with workspace resolution, store lastVisitedWorkspaceSlug)
-- [ ] T019 [P] [US1] Update NotFound component in apps/clementine-app/src/shared/components/NotFound.tsx (make generic with props for title, message, actionLabel, actionHref)
+- [X] T018 [US1] Update workspace route loader in apps/clementine-app/src/app/workspace/$workspaceSlug.tsx (add beforeLoad with workspace resolution, store lastVisitedWorkspaceSlug)
+- [X] T019 [P] [US1] Update NotFound component in apps/clementine-app/src/shared/components/NotFound.tsx (make generic with props for title, message, actionLabel, actionHref)
 
 **Checkpoint**: At this point, User Story 1 should be fully functional - admins can view workspace context by slug with proper 404 handling
 
@@ -85,10 +85,10 @@ This is a TanStack Start web application with domain-driven design:
 
 ### Implementation for User Story 2
 
-- [ ] T020 [P] [US2] Create WorkspaceSettingsForm component in apps/clementine-app/src/domains/workspace/components/WorkspaceSettingsForm.tsx (shadcn/ui Form with React Hook Form + Zod)
-- [ ] T021 [P] [US2] Write tests for WorkspaceSettingsForm in apps/clementine-app/src/domains/workspace/components/WorkspaceSettingsForm.test.tsx
-- [ ] T022 [US2] Create settings route in apps/clementine-app/src/app/workspace/$workspaceSlug.settings.tsx (render WorkspaceSettingsForm, handle slug redirect)
-- [ ] T023 [US2] Update workspace domain barrel exports in apps/clementine-app/src/domains/workspace/index.ts (export WorkspaceSettingsForm)
+- [X] T020 [P] [US2] Create WorkspaceSettingsForm component in apps/clementine-app/src/domains/workspace/components/WorkspaceSettingsForm.tsx (shadcn/ui Form with React Hook Form + Zod)
+- [X] T021 [P] [US2] Write tests for WorkspaceSettingsForm in apps/clementine-app/src/domains/workspace/components/WorkspaceSettingsForm.test.tsx
+- [X] T022 [US2] Create settings route in apps/clementine-app/src/app/workspace/$workspaceSlug.settings.tsx (render WorkspaceSettingsForm, handle slug redirect)
+- [X] T023 [US2] Update workspace domain barrel exports in apps/clementine-app/src/domains/workspace/index.ts (export WorkspaceSettingsForm)
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently - admins can view workspace context AND edit settings
 
@@ -102,8 +102,8 @@ This is a TanStack Start web application with domain-driven design:
 
 ### Routing for User Story 3
 
-- [ ] T024 [US3] Update root route in apps/clementine-app/src/app/index.tsx (add beforeLoad with redirect logic based on lastVisitedWorkspaceSlug)
-- [ ] T025 [US3] Create workspace index route in apps/clementine-app/src/app/workspace.tsx (redirect to lastVisitedWorkspaceSlug or /admin)
+- [X] T024 [US3] Update root route in apps/clementine-app/src/app/index.tsx (add beforeLoad with redirect logic based on lastVisitedWorkspaceSlug)
+- [X] T025 [US3] Create workspace index route in apps/clementine-app/src/app/workspace.tsx (redirect to lastVisitedWorkspaceSlug or /admin)
 
 **Checkpoint**: All three user stories should now work independently - workspace context view, settings edit, and session persistence
 
@@ -117,7 +117,7 @@ This is a TanStack Start web application with domain-driven design:
 
 ### Implementation for User Story 4
 
-- [ ] T026 [US4] Verify projects route exists in apps/clementine-app/src/app/workspace/$workspaceSlug.projects.tsx (add "Projects" header if missing)
+- [X] T026 [US4] Verify projects route exists in apps/clementine-app/src/app/workspace/$workspaceSlug.projects.tsx (add "Projects" header if missing)
 
 **Checkpoint**: All user stories complete - workspace view, settings, session persistence, and projects placeholder all functional
 
@@ -127,9 +127,9 @@ This is a TanStack Start web application with domain-driven design:
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T027 [P] Deploy Firestore security rules (pnpm fb:deploy:rules)
-- [ ] T028 [P] Create Firestore indexes if needed (slug + status compound index)
-- [ ] T029 Run validation loop (pnpm app:check - format, lint, type-check)
+- [X] T027 [P] Deploy Firestore security rules (pnpm fb:deploy:rules)
+- [X] T028 [P] Create Firestore indexes if needed (slug + status compound index)
+- [X] T029 Run validation loop (pnpm app:check - format, lint, type-check)
 - [ ] T030 Run all tests (pnpm test)
 - [ ] T031 Manual testing on mobile viewport (320px-768px)
 - [ ] T032 Standards compliance review (check against frontend/design-system.md, global/security.md, backend/firestore-security.md)
