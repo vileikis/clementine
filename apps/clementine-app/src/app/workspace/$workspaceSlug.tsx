@@ -1,5 +1,6 @@
 import { Outlet, createFileRoute } from '@tanstack/react-router'
-import { useWorkspaceStore, useWorkspace } from '@/domains/workspace'
+import { useEffect } from 'react'
+import { useWorkspace, useWorkspaceStore } from '@/domains/workspace'
 import { NotFound } from '@/shared/components/NotFound'
 
 /**
@@ -9,23 +10,26 @@ import { NotFound } from '@/shared/components/NotFound'
  * Access: Admin only (enforced by parent route requireAdmin guard)
  *
  * Layout route that renders child routes (projects, settings, etc.)
- * Stores last visited workspace for session persistence
+ * Stores last visited workspace in localStorage for session persistence (client-side only)
  * Workspace data is fetched via useWorkspace hook (TanStack Query cache)
  */
 export const Route = createFileRoute('/workspace/$workspaceSlug')({
-  beforeLoad: ({ params }) => {
-    const { workspaceSlug } = params
-
-    // Store last visited workspace for session persistence
-    // Workspace fetch happens via useWorkspace hook in child components
-    useWorkspaceStore.getState().setLastVisitedWorkspaceSlug(workspaceSlug)
-  },
   component: WorkspaceLayout,
 })
 
 function WorkspaceLayout() {
   const { workspaceSlug } = Route.useParams()
   const { data: workspace, isLoading, isError } = useWorkspace(workspaceSlug)
+  const setLastVisitedWorkspaceSlug = useWorkspaceStore(
+    (state) => state.setLastVisitedWorkspaceSlug,
+  )
+
+  // Store last visited workspace (client-side only, runs after hydration)
+  useEffect(() => {
+    if (workspaceSlug) {
+      setLastVisitedWorkspaceSlug(workspaceSlug)
+    }
+  }, [workspaceSlug, setLastVisitedWorkspaceSlug])
 
   // Loading state
   if (isLoading) {

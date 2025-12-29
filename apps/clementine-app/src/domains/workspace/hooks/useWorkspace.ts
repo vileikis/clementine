@@ -1,7 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 import { collection, getDocs, limit, query, where } from 'firebase/firestore'
 import { workspaceSchema } from '../schemas/workspace.schemas'
+import type { Workspace } from '../types/workspace.types'
 import { firestore } from '@/integrations/firebase/client'
+import { convertFirestoreDoc } from '@/shared/utils'
 
 /**
  * Fetch a single workspace by slug
@@ -13,7 +15,7 @@ import { firestore } from '@/integrations/firebase/client'
  * @returns Workspace data or undefined if not found
  */
 export function useWorkspace(slug: string | undefined) {
-  return useQuery({
+  return useQuery<Workspace | null>({
     queryKey: ['workspace', slug?.toLowerCase()],
     queryFn: async () => {
       if (!slug) {
@@ -35,12 +37,10 @@ export function useWorkspace(slug: string | undefined) {
       }
 
       const doc = snapshot.docs[0]
-      // Runtime validation using Zod schema
-      // Validates all required fields and enforces business rules
-      return workspaceSchema.parse({
-        id: doc.id,
-        ...doc.data(),
-      })
+
+      // Convert Firestore Timestamps to numbers and validate with Zod schema
+      // Throws ZodError if validation fails (caught by TanStack Query)
+      return convertFirestoreDoc(doc, workspaceSchema)
     },
     enabled: !!slug, // Only run query if slug is provided
     staleTime: 1000 * 60 * 5, // 5 minutes
