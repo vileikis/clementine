@@ -107,13 +107,16 @@ describe('ThemeProvider', () => {
         },
       }
 
-      const { getByTestId } = render(
+      const { getByTestId, unmount } = render(
         <ThemeProvider theme={themeWithRadius}>
           <TestConsumer />
         </ThemeProvider>,
       )
 
       expect(getByTestId('button-radius').textContent).toBe(expected)
+
+      // Unmount to prevent multiple elements with same testid
+      unmount()
     })
   })
 

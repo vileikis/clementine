@@ -1,5 +1,3 @@
-'use client'
-
 import { useMemo } from 'react'
 import { useEventTheme } from './useEventTheme'
 import type { CSSProperties } from 'react'

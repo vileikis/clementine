@@ -40,10 +40,10 @@ describe('ThemedBackground', () => {
     )
 
     const bgImageDiv = container.querySelector(
-      '[style*="backgroundImage"]',
+      '[style*="background-image"]',
     ) as HTMLElement
-    expect(bgImageDiv).toBeDefined()
-    expect(bgImageDiv.style.backgroundImage).toContain(
+    expect(bgImageDiv).not.toBeNull()
+    expect(bgImageDiv?.style.backgroundImage).toContain(
       'https://example.com/bg.jpg',
     )
   })

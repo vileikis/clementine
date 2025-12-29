@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { ThemeProvider } from '../components/ThemeProvider'
 import { useThemedStyles } from './useThemedStyles'
+import type { ThemedStyles } from './useThemedStyles'
 import type { Theme } from '../types'
 
 const mockTheme: Theme = {
@@ -245,15 +246,28 @@ describe('useThemedStyles', () => {
   })
 
   it('should memoize style objects', () => {
+    let previousStyles: ThemedStyles | null = null
+    let sameReference = false
+
     function MemoTest() {
-      const styles1 = useThemedStyles()
-      const styles2 = useThemedStyles()
-      return (
-        <div data-testid="same-reference">{String(styles1 === styles2)}</div>
-      )
+      const styles = useThemedStyles()
+
+      if (previousStyles !== null) {
+        sameReference = styles === previousStyles
+      }
+      previousStyles = styles
+
+      return <div data-testid="same-reference">{String(sameReference)}</div>
     }
 
-    render(
+    const { rerender } = render(
+      <ThemeProvider theme={mockTheme}>
+        <MemoTest />
+      </ThemeProvider>,
+    )
+
+    // Re-render with same theme object reference
+    rerender(
       <ThemeProvider theme={mockTheme}>
         <MemoTest />
       </ThemeProvider>,
