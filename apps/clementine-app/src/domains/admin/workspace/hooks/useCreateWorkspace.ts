@@ -70,7 +70,7 @@ export function useCreateWorkspace() {
       }
 
       // Create workspace in transaction
-      return await runTransaction(firestore, async (transaction) => {
+      return await runTransaction(firestore, (transaction) => {
         const newWorkspaceRef = doc(workspacesRef)
 
         const workspaceData: WithFieldValue<Workspace> = {

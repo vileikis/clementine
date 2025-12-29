@@ -84,7 +84,7 @@ export function useUpdateWorkspace() {
         }
 
         // Perform update
-        await runTransaction(firestore, async (transaction) => {
+        await runTransaction(firestore, (transaction) => {
           const updates: UpdateData<Workspace> = {
             updatedAt: serverTimestamp(),
           }
@@ -102,7 +102,7 @@ export function useUpdateWorkspace() {
         })
       } else {
         // Only name is changing - simple update
-        await runTransaction(firestore, async (transaction) => {
+        await runTransaction(firestore, (transaction) => {
           const updates: UpdateData<Workspace> = {
             updatedAt: serverTimestamp(),
           }
