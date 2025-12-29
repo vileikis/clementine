@@ -33,7 +33,6 @@ export interface PreviewShellProps {
 
 export interface DeviceFrameProps {
   children: React.ReactNode
-  mode: ViewportMode
   className?: string
 }
 

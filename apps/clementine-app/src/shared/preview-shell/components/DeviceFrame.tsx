@@ -11,10 +11,7 @@ import { cn } from '@/shared/utils'
  * - Mobile: Fixed dimensions (375x667px iPhone SE)
  * - Desktop: Fills available space with minimum height
  */
-export function DeviceFrame({
-  children,
-  className,
-}: Omit<DeviceFrameProps, 'mode'>) {
+export function DeviceFrame({ children, className }: DeviceFrameProps) {
   const { mode, dimensions } = useViewportContext()
   const isMobile = mode === 'mobile'
 
