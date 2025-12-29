@@ -84,8 +84,7 @@ export function useUpdateWorkspace() {
         }
 
         // Perform update
-        // eslint-disable-next-line @typescript-eslint/require-await
-        await runTransaction(firestore, async (transaction) => {
+        await runTransaction(firestore, (transaction) => {
           const updates: UpdateData<Workspace> = {
             updatedAt: serverTimestamp(),
           }
@@ -100,11 +99,12 @@ export function useUpdateWorkspace() {
 
           // Update workspace - Firestore rules validate admin access
           transaction.update(workspaceRef, updates)
+
+          return Promise.resolve()
         })
       } else {
         // Only name is changing - simple update
-        // eslint-disable-next-line @typescript-eslint/require-await
-        await runTransaction(firestore, async (transaction) => {
+        await runTransaction(firestore, (transaction) => {
           const updates: UpdateData<Workspace> = {
             updatedAt: serverTimestamp(),
           }
@@ -114,6 +114,8 @@ export function useUpdateWorkspace() {
           }
 
           transaction.update(workspaceRef, updates)
+
+          return Promise.resolve()
         })
       }
     },
