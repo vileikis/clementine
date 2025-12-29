@@ -2,13 +2,13 @@
 
 ## Goal
 
-Migrate the **camera module** from the Next.js app (`web/src/features/camera/`) to the TanStack Start app (`apps/clementine-app/src/domains/guest/camera/`) and create **dev-tools testing interface** to enable photo capture functionality for guest-facing photobooth experiences.
+Migrate the **camera module** from the Next.js app (`web/src/features/camera/`) to the TanStack Start app (`apps/clementine-app/src/shared/camera/`) and create **dev-tools testing interface** to enable photo capture functionality across multiple domains (guest experiences, dev-tools, and future admin simulators).
 
 ---
 
 ## Overview
 
-The camera module is **domain-specific business logic** that provides:
+The camera module is **shared technical infrastructure** that provides:
 - Live camera preview with browser MediaDevices API
 - Photo capture from video stream using Canvas
 - Library picker fallback when camera unavailable
@@ -16,7 +16,7 @@ The camera module is **domain-specific business logic** that provides:
 - Permission management following Expo-style patterns
 - Comprehensive error handling with typed error codes
 
-**Migration Target:** `/apps/clementine-app/src/domains/guest/camera/`
+**Migration Target:** `/apps/clementine-app/src/shared/camera/`
 
 **Dev Tools Target:** `/apps/clementine-app/src/domains/dev-tools/camera/`
 
@@ -273,7 +273,7 @@ The following import paths MUST be updated:
 ### Barrel Exports
 
 - MUST maintain barrel export pattern (`index.ts` re-exports)
-- MUST export module from `/domains/guest/index.ts`
+- MUST export module from `/shared/index.ts`
 - MUST export dev-tools components from `/domains/dev-tools/camera/index.ts`
 
 ---
@@ -289,7 +289,7 @@ Before marking migration complete:
 - ✅ Dev server runs without warnings
 
 **Standards Compliance (Manual):**
-- ✅ Review `standards/global/project-structure.md` (domain-driven design, vertical slices)
+- ✅ Review `standards/global/project-structure.md` (barrel exports, shared infrastructure)
 - ✅ Review `standards/global/code-quality.md` (clean code, simplicity)
 - ✅ Review `standards/frontend/component-libraries.md` (shadcn/ui usage)
 - ✅ Review `standards/frontend/accessibility.md` (ARIA labels, touch targets, keyboard support)
@@ -323,7 +323,7 @@ Before marking migration complete:
 
 ### Module Migration
 
-- [ ] All files copied to `/apps/clementine-app/src/domains/guest/camera/`
+- [ ] All files copied to `/apps/clementine-app/src/shared/camera/`
 - [ ] `next/image` replaced with TanStack Start solution
 - [ ] Import paths updated to TanStack Start conventions
 - [ ] All barrel exports maintain public API surface
@@ -398,7 +398,7 @@ Before marking migration complete:
 
 **Rationale:**
 - Independent module (no feature dependencies)
-- Domain-specific to guest flow
+- Shared infrastructure used across multiple domains (guest, dev-tools, experiences)
 - Requires next/image migration investigation
 - Critical for photo capture functionality
 
@@ -426,8 +426,8 @@ Before marking migration complete:
 - **Used by:** Guest photo submission flow, step capture experiences
 
 ### Target Module
-- **Location:** `/apps/clementine-app/src/domains/guest/camera/`
-- **Classification:** Domain-specific business logic (guest domain)
+- **Location:** `/apps/clementine-app/src/shared/camera/`
+- **Classification:** Shared technical infrastructure
 - **Exports:** Public API via barrel exports (CameraCapture + types + constants)
 
 ### Dev Tools Location
@@ -453,4 +453,4 @@ Before marking migration complete:
 - ✅ All component interactions work smoothly
 - ✅ No memory leaks (object URLs cleaned up)
 - ✅ No breaking changes to public API
-- ✅ Module can be used by guest flow features
+- ✅ Module can be imported and used across all domains (guest, dev-tools, experiences)
