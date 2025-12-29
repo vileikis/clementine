@@ -113,11 +113,9 @@ export async function handleRootRoute() {
   const user = await getCurrentUserFn()
 
   if (isAdmin(user)) {
-    // Check for last visited workspace (from Zustand persist middleware)
-    // Note: This runs server-side (SSR), so we can't access client localStorage directly
-    // The workspace.tsx route will handle the redirect if there's a lastVisitedWorkspaceSlug
-    // For root route, always redirect to /admin for simplicity
-    throw redirect({ to: '/admin' })
+    // Admin users go directly to workspace management
+    // The workspace routes will handle session persistence (last visited workspace)
+    throw redirect({ to: '/admin/workspaces' })
   }
 
   if (isNonAdmin(user)) {

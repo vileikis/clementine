@@ -1,8 +1,8 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate } from '@tanstack/react-router'
-import { Button } from '@/ui-kit/components/ui/button'
-import { Input } from '@/ui-kit/components/ui/input'
+import { Button } from '@/ui-kit/components/button'
+import { Input } from '@/ui-kit/components/input'
 import {
   Form,
   FormControl,
@@ -11,7 +11,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/ui-kit/components/ui/form'
+} from '@/ui-kit/components/form'
 import { useUpdateWorkspace } from '../hooks/useUpdateWorkspace'
 import { updateWorkspaceSchema } from '../schemas/workspace.schemas'
 import type { UpdateWorkspaceInput, Workspace } from '../types/workspace.types'
