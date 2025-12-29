@@ -70,7 +70,8 @@ export function useCreateWorkspace() {
       }
 
       // Create workspace in transaction
-      return await runTransaction(firestore, (transaction) => {
+      // eslint-disable-next-line @typescript-eslint/require-await
+      return await runTransaction(firestore, async (transaction) => {
         const newWorkspaceRef = doc(workspacesRef)
 
         const workspaceData: WithFieldValue<Workspace> = {

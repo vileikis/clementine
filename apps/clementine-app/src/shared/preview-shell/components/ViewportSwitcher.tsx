@@ -5,7 +5,7 @@ import type { ViewportSwitcherProps } from '../types/preview-shell.types'
 import {
   ToggleGroup,
   ToggleGroupItem,
-} from '@/ui-kit/components/ui/toggle-group'
+} from '@/ui-kit/components/toggle-group'
 
 /**
  * Viewport Switcher Component
@@ -26,7 +26,7 @@ export function ViewportSwitcher({
     <ToggleGroup
       type="single"
       value={mode}
-      onValueChange={(value) => {
+      onValueChange={(value: string) => {
         if (value) onModeChange(value as typeof mode)
       }}
       className={className}
