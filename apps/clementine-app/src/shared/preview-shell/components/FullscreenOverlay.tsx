@@ -19,6 +19,7 @@ export function FullscreenOverlay({
   children,
   title = 'Preview',
   showViewportSwitcher = false,
+  onModeChange,
   className,
 }: FullscreenOverlayProps) {
   const { mode } = useViewportContext()
@@ -37,12 +38,10 @@ export function FullscreenOverlay({
         <h2 className="text-lg font-semibold">{title}</h2>
 
         <div className="flex items-center gap-2">
-          {showViewportSwitcher && (
+          {showViewportSwitcher && onModeChange && (
             <ViewportSwitcher
               mode={mode}
-              onModeChange={() => {
-                // Mode change handled by global store automatically
-              }}
+              onModeChange={onModeChange}
               size="sm"
             />
           )}

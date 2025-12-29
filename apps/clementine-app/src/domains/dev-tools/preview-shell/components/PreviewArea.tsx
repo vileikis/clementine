@@ -22,11 +22,10 @@ interface PreviewAreaProps {
  */
 export function PreviewArea({ config }: PreviewAreaProps) {
   return (
-    <div className="flex flex-1 flex-col items-center justify-center bg-background p-8">
+    <div className="flex flex-1 flex-col bg-background">
       <PreviewShell
         enableViewportSwitcher={config.enableViewportSwitcher}
         enableFullscreen={config.enableFullscreen}
-        viewportMode={config.defaultViewport}
       >
         {/* Rich Sample Content */}
         <div className="space-y-6 p-6">

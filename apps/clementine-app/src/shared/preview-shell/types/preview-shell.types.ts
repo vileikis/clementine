@@ -50,6 +50,7 @@ export interface FullscreenOverlayProps {
   children: React.ReactNode
   title?: string
   showViewportSwitcher?: boolean
+  onModeChange?: (mode: ViewportMode) => void
   className?: string
 }
 
