@@ -21,42 +21,12 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    // Helper function to validate workspace data on create
-    function isValidWorkspaceCreate() {
-      let data = request.resource.data;
-      return data.status == 'active'
-        && data.deletedAt == null
-        && data.createdAt is number
-        && data.updatedAt is number
-        && data.name is string
-        && data.slug is string
-        && data.id is string;
-    }
-
-    // Helper function to validate workspace update (soft delete)
-    function isValidWorkspaceUpdate() {
-      let data = request.resource.data;
-      let oldData = resource.data;
-
-      // Only allow status and deletedAt changes (soft delete)
-      return data.diff(oldData).affectedKeys().hasOnly(['status', 'deletedAt', 'updatedAt'])
-        && data.status == 'deleted'
-        && data.deletedAt is number
-        && data.updatedAt is number;
-    }
-
     // Workspace collection rules
     match /workspaces/{workspaceId} {
-      // Allow admins to read any workspace (including deleted for slug uniqueness checks)
-      allow read: if isAdmin();
+      // Admins have full access to workspaces
+      allow read, create, update: if isAdmin();
 
-      // Allow admins to create workspaces (with validation)
-      allow create: if isAdmin() && isValidWorkspaceCreate();
-
-      // Allow admins to update workspaces (soft delete only)
-      allow update: if isAdmin() && isValidWorkspaceUpdate();
-
-      // Deny hard deletes
+      // Deny hard deletes - use server functions for soft delete
       allow delete: if false;
     }
 

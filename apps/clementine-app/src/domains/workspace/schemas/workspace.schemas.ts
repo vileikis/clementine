@@ -70,8 +70,30 @@ export const deleteWorkspaceSchema = z.object({
 })
 
 /**
+ * Input schema for updating workspace name and/or slug
+ */
+export const updateWorkspaceSchema = z
+  .object({
+    id: z.string().min(1, 'Workspace ID is required'),
+    name: z
+      .string()
+      .min(WORKSPACE_NAME.min, 'Name is required')
+      .max(
+        WORKSPACE_NAME.max,
+        `Name must be ${WORKSPACE_NAME.max} characters or less`,
+      )
+      .optional(),
+    slug: slugSchema.optional(),
+  })
+  .refine((data) => data.name !== undefined || data.slug !== undefined, {
+    message: 'At least one field (name or slug) must be provided',
+    path: ['name'],
+  })
+
+/**
  * Type inference from schemas
  */
 export type WorkspaceSchema = z.infer<typeof workspaceSchema>
 export type CreateWorkspaceSchemaType = z.infer<typeof createWorkspaceSchema>
 export type DeleteWorkspaceSchemaType = z.infer<typeof deleteWorkspaceSchema>
+export type UpdateWorkspaceSchemaType = z.infer<typeof updateWorkspaceSchema>
