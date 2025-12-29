@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router'
 import { useWorkspace } from '../hooks/useWorkspace'
 
 interface WorkspacePageProps {
@@ -47,12 +48,12 @@ export function WorkspacePage({ slug }: WorkspacePageProps) {
           <p className="text-sm text-muted-foreground mb-4">
             The workspace "{slug}" does not exist or has been deleted.
           </p>
-          <a
-            href="/admin/workspaces"
+          <Link
+            to="/admin/workspaces"
             className="text-sm text-primary hover:underline"
           >
             Back to workspaces
-          </a>
+          </Link>
         </div>
       </div>
     )

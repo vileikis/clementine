@@ -92,10 +92,10 @@ export function useEmailPasswordSignIn() {
 
       dispatch({ type: 'SIGN_IN_SUCCESS' })
 
-      // Invalidate and navigate to trigger route guards
-      // This will redirect to /admin if user is admin, or show waiting message if not
+      // Invalidate and navigate to workspace landing page
+      // This will redirect to last visited workspace (if exists) or /admin/workspaces
       await router.invalidate()
-      router.navigate({ to: '/admin' })
+      router.navigate({ to: '/workspace' })
     } catch (err) {
       Sentry.captureException(err, {
         tags: { component: 'useEmailPasswordSignIn', action: 'sign-in' },
