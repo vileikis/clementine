@@ -100,17 +100,24 @@ export async function redirectIfAdmin() {
  * Root route handler - smart redirect based on user type
  *
  * Redirects:
- * - Admin users → /admin/workspaces
+ * - Admin users → last visited workspace (if exists) or /admin
  * - Non-admin authenticated users → /login (will see waiting message)
  * - Anonymous/unauthenticated users → render root page (friendly message)
  *
- * @throws Redirect based on user type
+ * Session persistence: If admin has previously visited a workspace,
+ * redirect to that workspace for continuity.
+ *
+ * @throws Redirect based on user type and workspace history
  */
 export async function handleRootRoute() {
   const user = await getCurrentUserFn()
 
   if (isAdmin(user)) {
-    throw redirect({ to: '/admin/workspaces' })
+    // Check for last visited workspace (from Zustand persist middleware)
+    // Note: This runs server-side (SSR), so we can't access client localStorage directly
+    // The workspace.tsx route will handle the redirect if there's a lastVisitedWorkspaceSlug
+    // For root route, always redirect to /admin for simplicity
+    throw redirect({ to: '/admin' })
   }
 
   if (isNonAdmin(user)) {

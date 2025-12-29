@@ -82,7 +82,9 @@ describe('useWorkspaceStore', () => {
 
   it('should access state imperatively via getState()', () => {
     act(() => {
-      useWorkspaceStore.setState({ lastVisitedWorkspaceSlug: 'imperative-test' })
+      useWorkspaceStore.setState({
+        lastVisitedWorkspaceSlug: 'imperative-test',
+      })
     })
 
     const state = useWorkspaceStore.getState()

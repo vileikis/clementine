@@ -85,13 +85,10 @@ export const updateWorkspaceSchema = z
       .optional(),
     slug: slugSchema.optional(),
   })
-  .refine(
-    (data) => data.name !== undefined || data.slug !== undefined,
-    {
-      message: 'At least one field (name or slug) must be provided',
-      path: ['name'],
-    },
-  )
+  .refine((data) => data.name !== undefined || data.slug !== undefined, {
+    message: 'At least one field (name or slug) must be provided',
+    path: ['name'],
+  })
 
 /**
  * Type inference from schemas

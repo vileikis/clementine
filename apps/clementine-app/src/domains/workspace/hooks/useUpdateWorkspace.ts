@@ -79,10 +79,7 @@ export function useUpdateWorkspace() {
         const existingDocs = await getDocs(slugQuery)
 
         // Reject if slug exists and belongs to a different workspace
-        if (
-          !existingDocs.empty &&
-          existingDocs.docs[0].id !== validated.id
-        ) {
+        if (!existingDocs.empty && existingDocs.docs[0].id !== validated.id) {
           throw new Error('Slug already in use')
         }
 
