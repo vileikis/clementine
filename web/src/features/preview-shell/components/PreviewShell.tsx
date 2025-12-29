@@ -67,7 +67,11 @@ export function PreviewShell({
   const mode = isControlled ? controlledViewport : globalMode;
 
   // Fullscreen state management
-  const { isFullscreen, enter: enterFullscreen, exit: exitFullscreen } = useFullscreen({
+  const {
+    isFullscreen,
+    enter: enterFullscreen,
+    exit: exitFullscreen,
+  } = useFullscreen({
     onEnter: onFullscreenEnter,
     onExit: onFullscreenExit,
   });
@@ -131,7 +135,9 @@ export function PreviewShell({
             title="Preview"
             onExit={handleFullscreenExit}
             viewportMode={mode}
-            onViewportChange={enableViewportSwitcher ? handleViewportChange : undefined}
+            onViewportChange={
+              enableViewportSwitcher ? handleViewportChange : undefined
+            }
             enableViewportSwitcher={enableViewportSwitcher}
           >
             <DeviceFrame viewportMode={mode}>{children}</DeviceFrame>
