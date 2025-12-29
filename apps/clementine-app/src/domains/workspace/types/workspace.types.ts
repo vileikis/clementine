@@ -49,3 +49,17 @@ export interface DeleteWorkspaceInput {
   /** Workspace ID to delete */
   id: string
 }
+
+/**
+ * Input data for updating workspace name and/or slug
+ */
+export interface UpdateWorkspaceInput {
+  /** Workspace ID to update */
+  id: string
+
+  /** New workspace name (optional, 1-100 characters) */
+  name?: string
+
+  /** New workspace slug (optional, 1-50 characters, must be unique) */
+  slug?: string
+}

@@ -4,7 +4,7 @@ import { WorkspaceSelector } from './WorkspaceSelector'
 import type { NavItem } from '../types'
 
 interface WorkspaceNavProps {
-  workspaceId: string
+  workspaceSlug: string
   isCollapsed: boolean
 }
 
@@ -21,13 +21,19 @@ const workspaceNavItemsTemplate: NavItem[] = [
   },
 ]
 
-export function WorkspaceNav({ workspaceId, isCollapsed }: WorkspaceNavProps) {
+export function WorkspaceNav({
+  workspaceSlug,
+  isCollapsed,
+}: WorkspaceNavProps) {
   return (
     <div className="flex flex-col gap-4">
-      <WorkspaceSelector workspaceId={workspaceId} isCollapsed={isCollapsed} />
+      <WorkspaceSelector
+        workspaceSlug={workspaceSlug}
+        isCollapsed={isCollapsed}
+      />
       <nav className="flex flex-col gap-4">
         {workspaceNavItemsTemplate.map((item) => {
-          const href = item.href.replace('$workspaceSlug', workspaceId)
+          const href = item.href.replace('$workspaceSlug', workspaceSlug)
           return (
             <NavigationLink
               key={item.label}
