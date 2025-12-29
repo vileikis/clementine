@@ -28,10 +28,10 @@ This is a TanStack Start web application with domain-driven design:
 
 **Purpose**: Update existing infrastructure and add new schemas/types for workspace feature
 
-- [ ] T001 [P] Update workspace schemas in apps/clementine-app/src/domains/workspace/schemas/workspace.schemas.ts (add updateWorkspaceSchema)
-- [ ] T002 [P] Update workspace types in apps/clementine-app/src/domains/workspace/types/workspace.types.ts (add UpdateWorkspaceInput)
-- [ ] T003 [P] Update Firestore security rules in firestore.rules (add admin-only workspace collection rules)
-- [ ] T004 Create store directory apps/clementine-app/src/domains/workspace/store/
+- [X] T001 [P] Update workspace schemas in apps/clementine-app/src/domains/workspace/schemas/workspace.schemas.ts (add updateWorkspaceSchema)
+- [X] T002 [P] Update workspace types in apps/clementine-app/src/domains/workspace/types/workspace.types.ts (add UpdateWorkspaceInput)
+- [X] T003 [P] Update Firestore security rules in firestore.rules (add admin-only workspace collection rules)
+- [X] T004 Create store directory apps/clementine-app/src/domains/workspace/store/
 
 ---
 
@@ -41,15 +41,15 @@ This is a TanStack Start web application with domain-driven design:
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T005 Implement Zustand store with persist middleware in apps/clementine-app/src/domains/workspace/store/useWorkspaceStore.ts
-- [ ] T006 Write tests for useWorkspaceStore in apps/clementine-app/src/domains/workspace/store/useWorkspaceStore.test.ts
-- [ ] T007 [P] Implement useWorkspace hook (fetch by slug) in apps/clementine-app/src/domains/workspace/hooks/useWorkspace.ts
-- [ ] T008 [P] Write tests for useWorkspace hook in apps/clementine-app/src/domains/workspace/hooks/useWorkspace.test.ts
-- [ ] T009 [P] Implement updateWorkspace server action in apps/clementine-app/src/domains/workspace/actions/updateWorkspace.ts
-- [ ] T010 [P] Write tests for updateWorkspace action in apps/clementine-app/src/domains/workspace/actions/updateWorkspace.test.ts
-- [ ] T011 [P] Implement useUpdateWorkspace mutation hook in apps/clementine-app/src/domains/workspace/hooks/useUpdateWorkspace.ts
-- [ ] T012 [P] Write tests for useUpdateWorkspace hook in apps/clementine-app/src/domains/workspace/hooks/useUpdateWorkspace.test.ts
-- [ ] T013 Update workspace domain barrel exports in apps/clementine-app/src/domains/workspace/index.ts
+- [X] T005 Implement Zustand store with persist middleware in apps/clementine-app/src/domains/workspace/store/useWorkspaceStore.ts
+- [X] T006 Write tests for useWorkspaceStore in apps/clementine-app/src/domains/workspace/store/useWorkspaceStore.test.ts
+- [X] T007 [P] Implement useWorkspace hook (fetch by slug) in apps/clementine-app/src/domains/workspace/hooks/useWorkspace.ts
+- [X] T008 [P] Write tests for useWorkspace hook in apps/clementine-app/src/domains/workspace/hooks/useWorkspace.test.ts
+- [X] T009 [P] Implement updateWorkspace server action in apps/clementine-app/src/domains/workspace/actions/updateWorkspace.ts
+- [X] T010 [P] Write tests for updateWorkspace action in apps/clementine-app/src/domains/workspace/actions/updateWorkspace.test.ts
+- [X] T011 [P] Implement useUpdateWorkspace mutation hook in apps/clementine-app/src/domains/workspace/hooks/useUpdateWorkspace.ts
+- [X] T012 [P] Write tests for useUpdateWorkspace hook in apps/clementine-app/src/domains/workspace/hooks/useUpdateWorkspace.test.ts
+- [X] T013 Update workspace domain barrel exports in apps/clementine-app/src/domains/workspace/index.ts
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
