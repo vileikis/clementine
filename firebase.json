@@ -10,7 +10,10 @@
     {
       "source": "functions/isolate",
       "codebase": "default",
-      "ignore": ["node_modules", ".git"],
+      "ignore": [
+        "node_modules",
+        ".git"
+      ],
       "predeploy": [
         "cd functions && pnpm build && npx isolate && cd isolate && npm install"
       ]
@@ -33,5 +36,16 @@
       "enabled": true,
       "port": 4000
     }
+  },
+  "apphosting": {
+    "backendId": "clementine-be",
+    "rootDir": "/apps/clementine-app",
+    "ignore": [
+      "node_modules",
+      ".git",
+      "firebase-debug.log",
+      "firebase-debug.*.log",
+      "functions"
+    ]
   }
 }
