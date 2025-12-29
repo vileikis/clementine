@@ -21,14 +21,14 @@ import { Route as GuestIndexRouteImport } from './app/guest/index'
 import { Route as AdminIndexRouteImport } from './app/admin/index'
 import { Route as WorkspaceWorkspaceSlugRouteImport } from './app/workspace/$workspaceSlug'
 import { Route as GuestProjectIdRouteImport } from './app/guest/$projectId'
-import { Route as AdminDevToolsRouteImport } from './app/admin/dev-tools'
+import { Route as AdminDevToolsRouteRouteImport } from './app/admin/dev-tools/route'
 import { Route as WorkspaceWorkspaceSlugIndexRouteImport } from './app/workspace/$workspaceSlug.index'
 import { Route as AdminWorkspacesIndexRouteImport } from './app/admin/workspaces/index'
 import { Route as WorkspaceWorkspaceSlugSettingsRouteImport } from './app/workspace/$workspaceSlug.settings'
 import { Route as WorkspaceWorkspaceSlugProjectsRouteImport } from './app/workspace/$workspaceSlug.projects'
 import { Route as AdminWorkspacesCreateRouteImport } from './app/admin/workspaces/create'
-import { Route as AdminDevToolsPreviewShellRouteImport } from './app/admin/dev-tools.preview-shell'
-import { Route as AdminDevToolsCameraRouteImport } from './app/admin/dev-tools.camera'
+import { Route as AdminDevToolsPreviewShellRouteImport } from './app/admin/dev-tools/preview-shell'
+import { Route as AdminDevToolsCameraRouteImport } from './app/admin/dev-tools/camera'
 
 const LogoutRoute = LogoutRouteImport.update({
   id: '/logout',
@@ -90,7 +90,7 @@ const GuestProjectIdRoute = GuestProjectIdRouteImport.update({
   path: '/$projectId',
   getParentRoute: () => GuestRouteRoute,
 } as any)
-const AdminDevToolsRoute = AdminDevToolsRouteImport.update({
+const AdminDevToolsRouteRoute = AdminDevToolsRouteRouteImport.update({
   id: '/dev-tools',
   path: '/dev-tools',
   getParentRoute: () => AdminRouteRoute,
@@ -127,12 +127,12 @@ const AdminDevToolsPreviewShellRoute =
   AdminDevToolsPreviewShellRouteImport.update({
     id: '/preview-shell',
     path: '/preview-shell',
-    getParentRoute: () => AdminDevToolsRoute,
+    getParentRoute: () => AdminDevToolsRouteRoute,
   } as any)
 const AdminDevToolsCameraRoute = AdminDevToolsCameraRouteImport.update({
   id: '/camera',
   path: '/camera',
-  getParentRoute: () => AdminDevToolsRoute,
+  getParentRoute: () => AdminDevToolsRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -143,7 +143,7 @@ export interface FileRoutesByFullPath {
   '/$': typeof SplatRoute
   '/login': typeof LoginRoute
   '/logout': typeof LogoutRoute
-  '/admin/dev-tools': typeof AdminDevToolsRouteWithChildren
+  '/admin/dev-tools': typeof AdminDevToolsRouteRouteWithChildren
   '/guest/$projectId': typeof GuestProjectIdRoute
   '/workspace/$workspaceSlug': typeof WorkspaceWorkspaceSlugRouteWithChildren
   '/admin/': typeof AdminIndexRoute
@@ -162,7 +162,7 @@ export interface FileRoutesByTo {
   '/$': typeof SplatRoute
   '/login': typeof LoginRoute
   '/logout': typeof LogoutRoute
-  '/admin/dev-tools': typeof AdminDevToolsRouteWithChildren
+  '/admin/dev-tools': typeof AdminDevToolsRouteRouteWithChildren
   '/guest/$projectId': typeof GuestProjectIdRoute
   '/admin': typeof AdminIndexRoute
   '/guest': typeof GuestIndexRoute
@@ -184,7 +184,7 @@ export interface FileRoutesById {
   '/$': typeof SplatRoute
   '/login': typeof LoginRoute
   '/logout': typeof LogoutRoute
-  '/admin/dev-tools': typeof AdminDevToolsRouteWithChildren
+  '/admin/dev-tools': typeof AdminDevToolsRouteRouteWithChildren
   '/guest/$projectId': typeof GuestProjectIdRoute
   '/workspace/$workspaceSlug': typeof WorkspaceWorkspaceSlugRouteWithChildren
   '/admin/': typeof AdminIndexRoute
@@ -363,7 +363,7 @@ declare module '@tanstack/react-router' {
       id: '/admin/dev-tools'
       path: '/dev-tools'
       fullPath: '/admin/dev-tools'
-      preLoaderRoute: typeof AdminDevToolsRouteImport
+      preLoaderRoute: typeof AdminDevToolsRouteRouteImport
       parentRoute: typeof AdminRouteRoute
     }
     '/workspace/$workspaceSlug/': {
@@ -406,41 +406,40 @@ declare module '@tanstack/react-router' {
       path: '/preview-shell'
       fullPath: '/admin/dev-tools/preview-shell'
       preLoaderRoute: typeof AdminDevToolsPreviewShellRouteImport
-      parentRoute: typeof AdminDevToolsRoute
+      parentRoute: typeof AdminDevToolsRouteRoute
     }
     '/admin/dev-tools/camera': {
       id: '/admin/dev-tools/camera'
       path: '/camera'
       fullPath: '/admin/dev-tools/camera'
       preLoaderRoute: typeof AdminDevToolsCameraRouteImport
-      parentRoute: typeof AdminDevToolsRoute
+      parentRoute: typeof AdminDevToolsRouteRoute
     }
   }
 }
 
-interface AdminDevToolsRouteChildren {
+interface AdminDevToolsRouteRouteChildren {
   AdminDevToolsCameraRoute: typeof AdminDevToolsCameraRoute
   AdminDevToolsPreviewShellRoute: typeof AdminDevToolsPreviewShellRoute
 }
 
-const AdminDevToolsRouteChildren: AdminDevToolsRouteChildren = {
+const AdminDevToolsRouteRouteChildren: AdminDevToolsRouteRouteChildren = {
   AdminDevToolsCameraRoute: AdminDevToolsCameraRoute,
   AdminDevToolsPreviewShellRoute: AdminDevToolsPreviewShellRoute,
 }
 
-const AdminDevToolsRouteWithChildren = AdminDevToolsRoute._addFileChildren(
-  AdminDevToolsRouteChildren,
-)
+const AdminDevToolsRouteRouteWithChildren =
+  AdminDevToolsRouteRoute._addFileChildren(AdminDevToolsRouteRouteChildren)
 
 interface AdminRouteRouteChildren {
-  AdminDevToolsRoute: typeof AdminDevToolsRouteWithChildren
+  AdminDevToolsRouteRoute: typeof AdminDevToolsRouteRouteWithChildren
   AdminIndexRoute: typeof AdminIndexRoute
   AdminWorkspacesCreateRoute: typeof AdminWorkspacesCreateRoute
   AdminWorkspacesIndexRoute: typeof AdminWorkspacesIndexRoute
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
-  AdminDevToolsRoute: AdminDevToolsRouteWithChildren,
+  AdminDevToolsRouteRoute: AdminDevToolsRouteRouteWithChildren,
   AdminIndexRoute: AdminIndexRoute,
   AdminWorkspacesCreateRoute: AdminWorkspacesCreateRoute,
   AdminWorkspacesIndexRoute: AdminWorkspacesIndexRoute,
