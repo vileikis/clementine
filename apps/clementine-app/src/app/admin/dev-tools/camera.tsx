@@ -1,5 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
 
+/**
+ * Route: /admin/dev-tools/camera
+ *
+ * Camera dev tools testing interface (work in progress)
+ */
 export const Route = createFileRoute('/admin/dev-tools/camera')({
   component: CameraDevToolsPage,
 })

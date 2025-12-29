@@ -1,16 +1,15 @@
-import {
-  Link,
-  Outlet,
-  createFileRoute,
-  useMatchRoute,
-} from '@tanstack/react-router'
+'use client'
+
+import { Link, Outlet, useMatchRoute } from '@tanstack/react-router'
 import { cn } from '@/shared/utils'
 
-export const Route = createFileRoute('/admin/dev-tools')({
-  component: DevToolsLayout,
-})
-
-function DevToolsLayout() {
+/**
+ * DevTools Layout Container
+ *
+ * Main layout component for development tools interface
+ * Provides tabbed navigation between different dev tool modules
+ */
+export function DevTools() {
   const matchRoute = useMatchRoute()
   const isPreviewShellActive = matchRoute({
     to: '/admin/dev-tools/preview-shell',
