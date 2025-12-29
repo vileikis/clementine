@@ -26,10 +26,10 @@
 
 **Purpose**: Install dependencies and prepare directory structure
 
-- [ ] T001 Install zustand dependency via `pnpm add zustand --filter @clementine/app`
-- [ ] T002 Create target directory structure at apps/clementine-app/src/shared/preview-shell/
-- [ ] T003 [P] Create dev-tools directory structure at apps/clementine-app/src/domains/dev-tools/preview-shell/
-- [ ] T004 [P] Create route directory at apps/clementine-app/app/admin/dev-tools/
+- [X] T001 Install zustand dependency via `pnpm add zustand --filter @clementine/app`
+- [X] T002 Create target directory structure at apps/clementine-app/src/shared/preview-shell/
+- [X] T003 [P] Create dev-tools directory structure at apps/clementine-app/src/domains/dev-tools/preview-shell/
+- [X] T004 [P] Create route directory at apps/clementine-app/app/admin/dev-tools/
 
 ---
 
@@ -41,39 +41,39 @@
 
 ### Module Migration
 
-- [ ] T005 [P] Copy types/preview-shell.types.ts from web/src/features/preview-shell/ to apps/clementine-app/src/shared/preview-shell/types/
-- [ ] T006 [P] Copy constants/viewport.constants.ts from web/src/features/preview-shell/ to apps/clementine-app/src/shared/preview-shell/constants/
-- [ ] T007 [P] Copy store/viewportStore.ts from web/src/features/preview-shell/ to apps/clementine-app/src/shared/preview-shell/store/
-- [ ] T008 [P] Copy context/ViewportContext.tsx from web/src/features/preview-shell/ to apps/clementine-app/src/shared/preview-shell/context/
-- [ ] T009 [P] Copy hooks/useViewport.ts from web/src/features/preview-shell/ to apps/clementine-app/src/shared/preview-shell/hooks/
-- [ ] T010 [P] Copy hooks/useFullscreen.ts from web/src/features/preview-shell/ to apps/clementine-app/src/shared/preview-shell/hooks/
+- [X] T005 [P] Copy types/preview-shell.types.ts from web/src/features/preview-shell/ to apps/clementine-app/src/shared/preview-shell/types/
+- [X] T006 [P] Copy constants/viewport.constants.ts from web/src/features/preview-shell/ to apps/clementine-app/src/shared/preview-shell/constants/
+- [X] T007 [P] Copy store/viewportStore.ts from web/src/features/preview-shell/ to apps/clementine-app/src/shared/preview-shell/store/
+- [X] T008 [P] Copy context/ViewportContext.tsx from web/src/features/preview-shell/ to apps/clementine-app/src/shared/preview-shell/context/
+- [X] T009 [P] Copy hooks/useViewport.ts from web/src/features/preview-shell/ to apps/clementine-app/src/shared/preview-shell/hooks/
+- [X] T010 [P] Copy hooks/useFullscreen.ts from web/src/features/preview-shell/ to apps/clementine-app/src/shared/preview-shell/hooks/
 
 ### Component Migration
 
-- [ ] T011 [P] Copy components/DeviceFrame.tsx from web/src/features/preview-shell/ to apps/clementine-app/src/shared/preview-shell/components/
-- [ ] T012 [P] Copy components/ViewportSwitcher.tsx from web/src/features/preview-shell/ to apps/clementine-app/src/shared/preview-shell/components/
-- [ ] T013 [P] Copy components/FullscreenTrigger.tsx from web/src/features/preview-shell/ to apps/clementine-app/src/shared/preview-shell/components/
-- [ ] T014 [P] Copy components/FullscreenOverlay.tsx from web/src/features/preview-shell/ to apps/clementine-app/src/shared/preview-shell/components/
-- [ ] T015 Copy components/PreviewShell.tsx from web/src/features/preview-shell/ to apps/clementine-app/src/shared/preview-shell/components/
+- [X] T011 [P] Copy components/DeviceFrame.tsx from web/src/features/preview-shell/ to apps/clementine-app/src/shared/preview-shell/components/
+- [X] T012 [P] Copy components/ViewportSwitcher.tsx from web/src/features/preview-shell/ to apps/clementine-app/src/shared/preview-shell/components/
+- [X] T013 [P] Copy components/FullscreenTrigger.tsx from web/src/features/preview-shell/ to apps/clementine-app/src/shared/preview-shell/components/
+- [X] T014 [P] Copy components/FullscreenOverlay.tsx from web/src/features/preview-shell/ to apps/clementine-app/src/shared/preview-shell/components/
+- [X] T015 Copy components/PreviewShell.tsx from web/src/features/preview-shell/ to apps/clementine-app/src/shared/preview-shell/components/
 
 ### Import Path Updates
 
-- [ ] T016 Update import paths in apps/clementine-app/src/shared/preview-shell/components/DeviceFrame.tsx: replace @/lib/utils with @/shared/utils
-- [ ] T017 Update import paths in apps/clementine-app/src/shared/preview-shell/components/ViewportSwitcher.tsx: replace @/lib/utils with @/shared/utils
-- [ ] T018 Update import paths in apps/clementine-app/src/shared/preview-shell/components/FullscreenTrigger.tsx: replace @/lib/utils with @/shared/utils and @/components/ui/button with @/ui-kit/components/button
-- [ ] T019 Update import paths in apps/clementine-app/src/shared/preview-shell/components/FullscreenOverlay.tsx: replace @/lib/utils with @/shared/utils and @/components/ui/button with @/ui-kit/components/button
-- [ ] T020 Update import paths in apps/clementine-app/src/shared/preview-shell/components/PreviewShell.tsx: replace @/lib/utils with @/shared/utils
+- [X] T016 Update import paths in apps/clementine-app/src/shared/preview-shell/components/DeviceFrame.tsx: replace @/lib/utils with @/shared/utils
+- [X] T017 Update import paths in apps/clementine-app/src/shared/preview-shell/components/ViewportSwitcher.tsx: replace @/lib/utils with @/shared/utils
+- [X] T018 Update import paths in apps/clementine-app/src/shared/preview-shell/components/FullscreenTrigger.tsx: replace @/lib/utils with @/shared/utils and @/components/ui/button with @/ui-kit/components/button
+- [X] T019 Update import paths in apps/clementine-app/src/shared/preview-shell/components/FullscreenOverlay.tsx: replace @/lib/utils with @/shared/utils and @/components/ui/button with @/ui-kit/components/button
+- [X] T020 Update import paths in apps/clementine-app/src/shared/preview-shell/components/PreviewShell.tsx: replace @/lib/utils with @/shared/utils
 
 ### Barrel Exports
 
-- [ ] T021 [P] Create apps/clementine-app/src/shared/preview-shell/types/index.ts with type exports
-- [ ] T022 [P] Create apps/clementine-app/src/shared/preview-shell/constants/index.ts with constant exports
-- [ ] T023 [P] Create apps/clementine-app/src/shared/preview-shell/store/index.ts with store exports
-- [ ] T024 [P] Create apps/clementine-app/src/shared/preview-shell/context/index.ts with context exports
-- [ ] T025 [P] Create apps/clementine-app/src/shared/preview-shell/hooks/index.ts with hook exports
-- [ ] T026 [P] Create apps/clementine-app/src/shared/preview-shell/components/index.ts with component exports
-- [ ] T027 Create apps/clementine-app/src/shared/preview-shell/index.ts with main barrel export (all subdirectories)
-- [ ] T028 Update apps/clementine-app/src/shared/index.ts to export preview-shell module
+- [X] T021 [P] Create apps/clementine-app/src/shared/preview-shell/types/index.ts with type exports
+- [X] T022 [P] Create apps/clementine-app/src/shared/preview-shell/constants/index.ts with constant exports
+- [X] T023 [P] Create apps/clementine-app/src/shared/preview-shell/store/index.ts with store exports
+- [X] T024 [P] Create apps/clementine-app/src/shared/preview-shell/context/index.ts with context exports
+- [X] T025 [P] Create apps/clementine-app/src/shared/preview-shell/hooks/index.ts with hook exports
+- [X] T026 [P] Create apps/clementine-app/src/shared/preview-shell/components/index.ts with component exports
+- [X] T027 Create apps/clementine-app/src/shared/preview-shell/index.ts with main barrel export (all subdirectories)
+- [X] T028 Update apps/clementine-app/src/shared/index.ts to export preview-shell module
 
 **Checkpoint**: Foundation ready - preview-shell module is fully migrated and importable
 
@@ -87,18 +87,18 @@
 
 ### Dev-Tools Components
 
-- [ ] T029 [P] [US1] Create PropControlsPanel component in apps/clementine-app/src/domains/dev-tools/preview-shell/components/PropControlsPanel.tsx with Switch/Select controls
-- [ ] T030 [P] [US1] Create PreviewArea component in apps/clementine-app/src/domains/dev-tools/preview-shell/components/PreviewArea.tsx with sample content
-- [ ] T031 [US1] Create DevToolsPreviewShell container in apps/clementine-app/src/domains/dev-tools/preview-shell/DevToolsPreviewShell.tsx with state management
+- [X] T029 [P] [US1] Create PropControlsPanel component in apps/clementine-app/src/domains/dev-tools/preview-shell/components/PropControlsPanel.tsx with Switch/Select controls
+- [X] T030 [P] [US1] Create PreviewArea component in apps/clementine-app/src/domains/dev-tools/preview-shell/components/PreviewArea.tsx with sample content
+- [X] T031 [US1] Create DevToolsPreviewShell container in apps/clementine-app/src/domains/dev-tools/preview-shell/DevToolsPreviewShell.tsx with state management
 
 ### Barrel Exports (Dev-Tools)
 
-- [ ] T032 [P] [US1] Create apps/clementine-app/src/domains/dev-tools/preview-shell/components/index.ts with component exports
-- [ ] T033 [US1] Create apps/clementine-app/src/domains/dev-tools/preview-shell/index.ts exporting DevToolsPreviewShell
+- [X] T032 [P] [US1] Create apps/clementine-app/src/domains/dev-tools/preview-shell/components/index.ts with component exports
+- [X] T033 [US1] Create apps/clementine-app/src/domains/dev-tools/preview-shell/index.ts exporting DevToolsPreviewShell
 
 ### Route Integration
 
-- [ ] T034 [US1] Create route file at apps/clementine-app/app/admin/dev-tools/preview-shell.tsx importing DevToolsPreviewShell
+- [X] T034 [US1] Create route file at apps/clementine-app/app/admin/dev-tools/preview-shell.tsx importing DevToolsPreviewShell
 
 ### Manual Testing & Validation
 
