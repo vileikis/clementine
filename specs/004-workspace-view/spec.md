@@ -41,7 +41,28 @@ An admin edits a workspace's name and slug via the settings page, with validatio
 
 ---
 
-### User Story 3 - View Projects Placeholder (Priority: P3)
+### User Story 3 - Remember Last Visited Workspace (Priority: P3)
+
+An admin's last visited workspace slug is remembered and used to automatically redirect them to that workspace when they access the root or workspace routes, providing seamless workspace continuity across sessions.
+
+**Why this priority**: This significantly improves the UX by reducing navigation friction. Admins typically work within a single workspace context, so automatic redirection saves time and provides a more focused experience.
+
+**Independent Test**: Can be fully tested by visiting a workspace, closing the browser, reopening and navigating to `/` or `/workspace`, and verifying the redirect to the last visited workspace occurs. Delivers value by eliminating repetitive navigation.
+
+**Acceptance Scenarios**:
+
+1. **Given** an admin has successfully navigated to `/workspace/acme-corp`, **When** the workspace is resolved successfully, **Then** "acme-corp" is stored in localStorage as `lastVisitedWorkspaceSlug`
+2. **Given** an admin has a `lastVisitedWorkspaceSlug` of "acme-corp" in localStorage, **When** the admin navigates to `/` (root), **Then** they are automatically redirected to `/workspace/acme-corp`
+3. **Given** an admin has a `lastVisitedWorkspaceSlug` of "acme-corp" in localStorage, **When** the admin navigates to `/workspace` (without a slug), **Then** they are automatically redirected to `/workspace/acme-corp`
+4. **Given** an admin has a `lastVisitedWorkspaceSlug` pointing to a workspace that no longer exists or is deleted, **When** the admin navigates to `/` or `/workspace`, **Then** they are redirected to the workspace route and see the standard 404 state with a link back to `/admin/workspaces`
+5. **Given** an admin has NO `lastVisitedWorkspaceSlug` stored (first-time user), **When** the admin navigates to `/` or `/workspace`, **Then** they are redirected to `/admin` (which auto-redirects to `/admin/workspaces`)
+6. **Given** an admin is logged out and logs in from `/login`, **When** authentication completes and there is a pre-login intended URL, **Then** the admin is redirected to the intended URL (pre-login URL takes priority over `lastVisitedWorkspaceSlug`)
+7. **Given** an admin is logged out and logs in from `/login` with NO pre-login intended URL, **When** authentication completes and `lastVisitedWorkspaceSlug` exists, **Then** the admin is redirected to `/workspace/[lastVisitedWorkspaceSlug]`
+8. **Given** an admin has a `lastVisitedWorkspaceSlug` stored, **When** the admin navigates to `/admin/workspaces` or other routes like `/admin/**` or `/guest/**`, **Then** NO automatic redirection occurs (redirect only from `/` and `/workspace` exact matches)
+
+---
+
+### User Story 4 - View Projects Placeholder (Priority: P4)
 
 An admin navigates to the projects page within a workspace context and sees a placeholder header indicating where future project management will occur.
 
@@ -63,6 +84,10 @@ An admin navigates to the projects page within a workspace context and sees a pl
 - What happens when an admin bookmarks a workspace URL and the slug is changed by another admin? (The bookmarked URL should show a 404 state)
 - What happens when the URL contains a malformed or injection-attempt slug? (The system should handle gracefully with 404, not crash)
 - How does the system handle workspace resolution when the database is temporarily unavailable? (Should show an appropriate error state, not crash)
+- What happens when an admin's `lastVisitedWorkspaceSlug` is stored but localStorage is cleared or corrupted? (System should handle gracefully, treat as first-time user, redirect to `/admin`)
+- What happens when an admin changes a workspace slug while that workspace is stored as their `lastVisitedWorkspaceSlug`? (The stored slug becomes invalid, next redirect will show 404)
+- What happens when multiple browser tabs have different workspace contexts and the admin navigates in one tab? (Each navigation updates the shared localStorage, last navigation wins)
+- What happens when localStorage is disabled or unavailable in the browser? (System should function without session persistence, no crashes)
 
 ## Requirements *(mandatory)*
 
@@ -111,6 +136,19 @@ An admin navigates to the projects page within a workspace context and sees a pl
 - **FR-021**: System MUST provide a projects page at `/workspace/[workspaceSlug]/projects` that displays a header with the text "Projects"
 - **FR-022**: Projects page MUST use the same workspace resolution logic as other workspace routes (active workspaces only)
 
+**Workspace Session Persistence**
+
+- **FR-026**: When an admin successfully navigates to any `/workspace/[workspaceSlug]` route and the workspace is resolved successfully, the system MUST store the workspace slug in browser localStorage under the key `lastVisitedWorkspaceSlug`
+- **FR-027**: System MUST use Zustand with persist middleware to manage the `lastVisitedWorkspaceSlug` state, automatically syncing between in-memory state and localStorage
+- **FR-028**: When an admin navigates to `/` (root route - exact match), the system MUST check for a stored `lastVisitedWorkspaceSlug` and redirect to `/workspace/[lastVisitedWorkspaceSlug]` if it exists
+- **FR-029**: When an admin navigates to `/workspace` (without a slug - exact match), the system MUST check for a stored `lastVisitedWorkspaceSlug` and redirect to `/workspace/[lastVisitedWorkspaceSlug]` if it exists
+- **FR-030**: When an admin navigates to `/` or `/workspace` and NO `lastVisitedWorkspaceSlug` is stored, the system MUST redirect to `/admin` (which auto-redirects to `/admin/workspaces`)
+- **FR-031**: When an admin logs in from `/login` and there is a pre-login intended URL, the system MUST redirect to the intended URL (pre-login URL takes priority over `lastVisitedWorkspaceSlug`)
+- **FR-032**: When an admin logs in from `/login` with NO pre-login intended URL and a `lastVisitedWorkspaceSlug` exists, the system MUST redirect to `/workspace/[lastVisitedWorkspaceSlug]`
+- **FR-033**: Automatic redirection based on `lastVisitedWorkspaceSlug` MUST ONLY occur for exact matches of `/` and `/workspace` routes - NOT for `/admin/**`, `/guest/**`, or any other routes
+- **FR-034**: System MUST handle localStorage being unavailable or disabled gracefully without crashing - workspace navigation continues to work without session persistence
+- **FR-035**: When a stored `lastVisitedWorkspaceSlug` points to a workspace that no longer exists or is deleted, the system MUST allow the redirect to proceed and let the workspace route display the standard 404 state
+
 **Data Integrity**
 
 - **FR-023**: System MUST maintain the schema invariant: if `status == "deleted"` then `deletedAt != null`
@@ -132,6 +170,9 @@ An admin navigates to the projects page within a workspace context and sees a pl
 - **SC-005**: Admins attempting to access non-existent or deleted workspaces see a helpful 404 state 100% of the time
 - **SC-006**: All workspace routes are inaccessible to non-admin users (0% unauthorized access)
 - **SC-007**: Zero data corruption incidents where workspace slug uniqueness is violated or schema invariants are broken
+- **SC-008**: When an admin visits a workspace and later navigates to `/` or `/workspace`, they are automatically redirected to their last visited workspace within 1 second (90% of cases - excluding deleted workspaces)
+- **SC-009**: Workspace slug is persisted in localStorage within 100ms of successful workspace resolution
+- **SC-010**: Automatic redirection behavior works consistently across browser sessions (survives logout, browser restart, and page refresh)
 
 ## Assumptions
 
@@ -150,6 +191,14 @@ An admin navigates to the projects page within a workspace context and sees a pl
 7. **URL Encoding**: Assuming workspace slugs in URLs will be properly URL-encoded/decoded when necessary.
 
 8. **Error States**: Assuming friendly error states should maintain the overall application layout (sidebar, navigation) but replace the main content area with error messaging.
+
+9. **localStorage Availability**: Assuming browser localStorage is available in 95%+ of use cases. System will degrade gracefully when localStorage is unavailable (no session persistence, but core functionality remains intact).
+
+10. **Zustand Persist Middleware**: Assuming Zustand's persist middleware is used to automatically sync the `lastVisitedWorkspaceSlug` state between in-memory store and localStorage. The middleware handles serialization, deserialization, and storage operations.
+
+11. **localStorage Key**: Assuming the localStorage key will be `lastVisitedWorkspaceSlug` (or similar namespaced variant like `clementine:lastVisitedWorkspaceSlug` if namespacing is needed to avoid conflicts).
+
+12. **Pre-login Redirect Mechanism**: Assuming the authentication system already has a mechanism to capture and restore pre-login intended URLs. The session persistence logic will integrate with this existing mechanism to determine redirect priority.
 
 ## Out of Scope
 
