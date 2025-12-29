@@ -1,26 +1,26 @@
-"use client";
+'use client'
 
-import type { CSSProperties, ReactNode } from "react";
-import { cn } from "@/lib/utils";
-import type { ThemeBackground } from "../types";
+import type { CSSProperties, ReactNode } from 'react'
+import type { ThemeBackground } from '../types'
+import { cn } from '@/shared/utils'
 
 interface ThemedBackgroundProps {
   /** Content to render above the background */
-  children: ReactNode;
+  children: ReactNode
   /** Background configuration (color, image, overlay) */
-  background?: Partial<ThemeBackground>;
+  background?: Partial<ThemeBackground>
   /** CSS font-family to apply to the container */
-  fontFamily?: string | null;
+  fontFamily?: string | null
   /** Additional CSS classes for the outer container */
-  className?: string;
+  className?: string
   /** Additional inline styles for the outer container */
-  style?: CSSProperties;
+  style?: CSSProperties
   /**
    * Override classes for the content wrapper.
    * Default provides centered, max-width content with vertical centering.
    * Pass empty string to disable content wrapper entirely.
    */
-  contentClassName?: string;
+  contentClassName?: string
 }
 
 /**
@@ -59,16 +59,16 @@ export function ThemedBackground({
   style,
   contentClassName,
 }: ThemedBackgroundProps) {
-  const bgColor = background?.color ?? "#FFFFFF";
-  const bgImage = background?.image;
-  const overlayOpacity = background?.overlayOpacity ?? 0;
+  const bgColor = background?.color ?? '#FFFFFF'
+  const bgImage = background?.image
+  const overlayOpacity = background?.overlayOpacity ?? 0
 
   // Check if content wrapper should be rendered
-  const hasContentWrapper = contentClassName !== "";
+  const hasContentWrapper = contentClassName !== ''
 
   return (
     <div
-      className={cn("relative flex flex-1 flex-col overflow-hidden", className)}
+      className={cn('relative flex flex-1 flex-col overflow-hidden', className)}
       style={{
         backgroundColor: bgColor,
         fontFamily: fontFamily ?? undefined,
@@ -95,8 +95,8 @@ export function ThemedBackground({
       {hasContentWrapper ? (
         <div
           className={cn(
-            "relative z-10 flex flex-1 flex-col items-center justify-center overflow-auto px-4 py-8",
-            contentClassName
+            'relative z-10 flex flex-1 flex-col items-center justify-center overflow-auto px-4 py-8',
+            contentClassName,
           )}
         >
           <div className="w-full max-w-3xl">{children}</div>
@@ -105,5 +105,5 @@ export function ThemedBackground({
         <div className="relative z-10 flex flex-1 flex-col">{children}</div>
       )}
     </div>
-  );
+  )
 }

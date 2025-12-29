@@ -1,7 +1,8 @@
-"use client";
+'use client'
 
-import { useContext } from "react";
-import { ThemeContext, type ThemeContextValue } from "../context/ThemeContext";
+import { useContext } from 'react'
+import { ThemeContext } from '../context/ThemeContext'
+import type { ThemeContextValue } from '../context/ThemeContext'
 
 /**
  * Hook to access the theme context values.
@@ -29,9 +30,9 @@ import { ThemeContext, type ThemeContextValue } from "../context/ThemeContext";
  * ```
  */
 export function useEventTheme(): ThemeContextValue {
-  const context = useContext(ThemeContext);
+  const context = useContext(ThemeContext)
   if (!context) {
-    throw new Error("useEventTheme must be used within a ThemeProvider");
+    throw new Error('useEventTheme must be used within a ThemeProvider')
   }
-  return context;
+  return context
 }

@@ -6,4 +6,4 @@ export {
   themeBackgroundSchema,
   themeSchema,
   updateThemeSchema,
-} from "./theme.schemas";
+} from './theme.schemas'

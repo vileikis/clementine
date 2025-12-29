@@ -1,15 +1,17 @@
-"use client";
+'use client'
 
-import { useMemo, type ReactNode } from "react";
-import { ThemeContext, type ThemeContextValue } from "../context/ThemeContext";
-import type { Theme } from "../types";
-import { BUTTON_RADIUS_MAP } from "../constants";
+import { useMemo } from 'react'
+import { ThemeContext } from '../context/ThemeContext'
+import { BUTTON_RADIUS_MAP } from '../constants'
+import type { ReactNode } from 'react'
+import type { ThemeContextValue } from '../context/ThemeContext'
+import type { Theme } from '../types'
 
 interface ThemeProviderProps {
   /** The theme configuration to provide */
-  theme: Theme;
+  theme: Theme
   /** Child components that will have access to the theme */
-  children: ReactNode;
+  children: ReactNode
 }
 
 /**
@@ -34,10 +36,8 @@ export function ThemeProvider({ theme, children }: ThemeProviderProps) {
       buttonBgColor: theme.button.backgroundColor ?? theme.primaryColor,
       buttonTextColor: theme.button.textColor,
       buttonRadius: BUTTON_RADIUS_MAP[theme.button.radius],
-    };
-  }, [theme]);
+    }
+  }, [theme])
 
-  return (
-    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
-  );
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
 }
