@@ -1,2 +1,2 @@
 // Context barrel export
-export { ThemeContext, type ThemeContextValue } from "./ThemeContext";
+export { ThemeContext, type ThemeContextValue } from './ThemeContext'

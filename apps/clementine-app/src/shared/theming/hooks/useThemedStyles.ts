@@ -1,18 +1,19 @@
-"use client";
+'use client'
 
-import { useMemo, type CSSProperties } from "react";
-import { useEventTheme } from "./useEventTheme";
+import { useMemo } from 'react'
+import { useEventTheme } from './useEventTheme'
+import type { CSSProperties } from 'react'
 
 /**
  * Style objects returned by useThemedStyles hook
  */
 export interface ThemedStyles {
   /** Text styles: color and textAlign */
-  text: CSSProperties;
+  text: CSSProperties
   /** Button styles: backgroundColor, color, borderRadius */
-  button: CSSProperties;
+  button: CSSProperties
   /** Background styles: backgroundColor, backgroundImage (if present), fontFamily (if present) */
-  background: CSSProperties;
+  background: CSSProperties
 }
 
 /**
@@ -37,34 +38,35 @@ export interface ThemedStyles {
  * ```
  */
 export function useThemedStyles(): ThemedStyles {
-  const { theme, buttonBgColor, buttonTextColor, buttonRadius } = useEventTheme();
+  const { theme, buttonBgColor, buttonTextColor, buttonRadius } =
+    useEventTheme()
 
   return useMemo<ThemedStyles>(() => {
     const textStyles: CSSProperties = {
       color: theme.text.color,
       textAlign: theme.text.alignment,
-    };
+    }
 
     const buttonStyles: CSSProperties = {
       backgroundColor: buttonBgColor,
       color: buttonTextColor,
       borderRadius: buttonRadius,
-    };
+    }
 
     const backgroundStyles: CSSProperties = {
       backgroundColor: theme.background.color,
       ...(theme.background.image && {
         backgroundImage: `url(${theme.background.image})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
       }),
       ...(theme.fontFamily && { fontFamily: theme.fontFamily }),
-    };
+    }
 
     return {
       text: textStyles,
       button: buttonStyles,
       background: backgroundStyles,
-    };
-  }, [theme, buttonBgColor, buttonTextColor, buttonRadius]);
+    }
+  }, [theme, buttonBgColor, buttonTextColor, buttonRadius])
 }

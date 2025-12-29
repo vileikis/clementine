@@ -1,16 +1,16 @@
 /**
  * Button border radius presets
  */
-export type ButtonRadius = "none" | "sm" | "md" | "full";
+export type ButtonRadius = 'none' | 'sm' | 'md' | 'full'
 
 /**
  * Text styling configuration
  */
 export interface ThemeText {
   /** Text color in hex format (#RRGGBB) */
-  color: string;
+  color: string
   /** Text alignment */
-  alignment: "left" | "center" | "right";
+  alignment: 'left' | 'center' | 'right'
 }
 
 /**
@@ -18,11 +18,11 @@ export interface ThemeText {
  */
 export interface ThemeButton {
   /** Button background color in hex; falls back to primaryColor if null */
-  backgroundColor?: string | null;
+  backgroundColor?: string | null
   /** Button text color in hex format (#RRGGBB) */
-  textColor: string;
+  textColor: string
   /** Border radius preset */
-  radius: ButtonRadius;
+  radius: ButtonRadius
 }
 
 /**
@@ -30,11 +30,11 @@ export interface ThemeButton {
  */
 export interface ThemeBackground {
   /** Background color in hex format (#RRGGBB) */
-  color: string;
+  color: string
   /** Full public URL to background image */
-  image?: string | null;
+  image?: string | null
   /** Overlay opacity from 0 to 1 */
-  overlayOpacity: number;
+  overlayOpacity: number
 }
 
 /**
@@ -45,13 +45,13 @@ export interface ThemeBackground {
  */
 export interface Theme {
   /** Anchor color in hex format (#RRGGBB) */
-  primaryColor: string;
+  primaryColor: string
   /** CSS font-family string */
-  fontFamily?: string | null;
+  fontFamily?: string | null
   /** Text styling configuration */
-  text: ThemeText;
+  text: ThemeText
   /** Button styling configuration */
-  button: ThemeButton;
+  button: ThemeButton
   /** Background styling configuration */
-  background: ThemeBackground;
+  background: ThemeBackground
 }
