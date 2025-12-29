@@ -4,11 +4,14 @@
 
 Migrate the **theming module** from the Next.js app (`web/src/features/theming/`) to the TanStack Start app (`apps/clementine-app/src/shared/theming/`) to provide centralized theming infrastructure for guest-facing experiences.
 
+**Status**: Files have already been copied to the target location. This migration focuses on updating imports, ensuring compatibility, and validating functionality.
+
 ---
 
 ## Overview
 
 The theming module is **shared UI/utility infrastructure** that provides:
+
 - Unified `Theme` interface for visual customization
 - React Context-based theming system (`ThemeProvider`)
 - Type-safe runtime validation with Zod schemas
@@ -26,6 +29,7 @@ The theming module is **shared UI/utility infrastructure** that provides:
 The migrated module MUST maintain the following exports:
 
 **Types:**
+
 - `Theme` - Main theme interface (primaryColor, fontFamily, text, button, background)
 - `ThemeText` - Text styling (color, alignment)
 - `ThemeButton` - Button styling (backgroundColor, textColor, radius)
@@ -34,42 +38,50 @@ The migrated module MUST maintain the following exports:
 - `ThemeContextValue` - Context value shape
 
 **Components:**
+
 - `ThemeProvider` - Context provider with computed values and fallbacks
 - `ThemedBackground` - Themed background container with content wrapper
 
 **Hooks:**
+
 - `useEventTheme()` - Access theme context values
 - `useThemedStyles()` - Compute inline CSS styles from theme
 
 **Schemas:**
+
 - `COLOR_REGEX` - Hex color validation pattern
 - `themeSchema` - Full Theme validation
 - `updateThemeSchema` - Partial Theme validation
 - `themeTextSchema`, `themeButtonSchema`, `themeBackgroundSchema` - Sub-schemas
 
 **Constants:**
+
 - `BUTTON_RADIUS_MAP` - Radius preset → CSS value mapping
 
 ### Core Functionality
 
 **ThemeProvider Requirements:**
+
 - MUST wrap descendant components with theme context
 - MUST compute derived values with fallbacks (e.g., buttonBgColor → primaryColor)
 - MUST use `useMemo` for performance optimization
 - MUST map button radius presets to CSS values
 
 **ThemedBackground Requirements:**
+
 - MUST render full-height container with themed background
 - MUST support background color, image, and overlay opacity
 - MUST include optional content wrapper (max-width 768px, centered)
 - MUST allow customization via `contentClassName` prop
 
 **useEventTheme Requirements:**
+
 - MUST access theme context values
 - MUST throw error if used outside `ThemeProvider`
 - MUST return computed `ThemeContextValue`
 
 **useThemedStyles Requirements:**
+
 - MUST compute inline CSS style objects from theme
 - MUST return `.text`, `.button`, and `.background` CSSProperties
 - MUST use `useMemo` for performance
@@ -77,6 +89,7 @@ The migrated module MUST maintain the following exports:
 ### Validation Schemas
 
 **Theme Validation:**
+
 - `primaryColor` - Hex color (required)
 - `fontFamily` - String (optional)
 - `text.color` - Hex color (required)
@@ -89,6 +102,7 @@ The migrated module MUST maintain the following exports:
 - `background.overlayOpacity` - 0-1 number (required)
 
 **Zod v4 Compatibility:**
+
 - MUST verify all schemas work with Zod v4.1.12
 - MUST update any deprecated Zod APIs if needed
 
@@ -99,6 +113,7 @@ The migrated module MUST maintain the following exports:
 ### Import Path Updates
 
 The following import paths MUST be updated:
+
 - `@/lib/utils` → `@/shared/utils`
 
 ### Client Component Handling
@@ -119,17 +134,20 @@ The following import paths MUST be updated:
 Before marking migration complete:
 
 **Technical Validation (Automated):**
+
 - ✅ `pnpm check` (format + lint + auto-fix)
 - ✅ `pnpm type-check` (zero TypeScript errors)
 - ✅ Module builds without errors
 - ✅ No console warnings in dev server
 
 **Standards Compliance (Manual):**
+
 - ✅ Review `standards/global/project-structure.md` (barrel exports, file naming)
 - ✅ Review `standards/global/code-quality.md` (clean code, simplicity)
 - ✅ Review `standards/frontend/design-system.md` (theme integration patterns)
 
 **Functional Verification:**
+
 - ✅ ThemeProvider wraps components successfully
 - ✅ useEventTheme() returns correct values
 - ✅ useThemedStyles() generates valid CSS
@@ -142,7 +160,7 @@ Before marking migration complete:
 
 ### Module Migration
 
-- [ ] All files copied to `/apps/clementine-app/src/shared/theming/`
+- [x] All files copied to `/apps/clementine-app/src/shared/theming/`
 - [ ] Import paths updated to TanStack Start conventions
 - [ ] All barrel exports maintain public API surface
 - [ ] Module structure preserved (types/, schemas/, components/, hooks/, context/, constants/)
@@ -192,6 +210,7 @@ Before marking migration complete:
 **Priority:** 2 (Second)
 
 **Rationale:**
+
 - No external feature dependencies
 - Simplest migration (no external packages, minimal path updates)
 - Foundation for all themed experiences
@@ -213,11 +232,13 @@ Before marking migration complete:
 ## References
 
 ### Source Module
+
 - **Location:** `/web/src/features/theming/`
 - **Files:** ~10 files (types, schemas, components, hooks, context, constants)
 - **Used by:** 38+ files across projects, events, steps, guest flows, admin features
 
 ### Target Module
+
 - **Location:** `/apps/clementine-app/src/shared/theming/`
 - **Classification:** Shared UI/utility infrastructure
 - **Exports:** Public API preserved via barrel exports
