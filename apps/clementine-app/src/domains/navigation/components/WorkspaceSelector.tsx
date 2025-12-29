@@ -1,18 +1,18 @@
 import { useNavigate } from '@tanstack/react-router'
-import { MOCK_WORKSPACES } from '../constants'
+import { useWorkspace } from '@/domains/workspace'
 import { getWorkspaceInitials } from '../lib'
 import { cn } from '@/shared/utils'
 
 interface WorkspaceSelectorProps {
-  workspaceId: string
+  workspaceSlug: string
   isCollapsed: boolean
 }
 
 export function WorkspaceSelector({
-  workspaceId,
+  workspaceSlug,
   isCollapsed,
 }: WorkspaceSelectorProps) {
-  const workspace = MOCK_WORKSPACES.find((w) => w.id === workspaceId)
+  const { data: workspace } = useWorkspace(workspaceSlug)
   const initials = getWorkspaceInitials(workspace?.name)
   const navigate = useNavigate()
 

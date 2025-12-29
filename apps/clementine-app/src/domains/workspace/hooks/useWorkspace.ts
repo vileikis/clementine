@@ -34,9 +34,13 @@ export function useWorkspace(slug: string | undefined) {
         return null
       }
 
+      const doc = snapshot.docs[0]
       // Runtime validation using Zod schema
       // Validates all required fields and enforces business rules
-      return workspaceSchema.parse(snapshot.docs[0].data())
+      return workspaceSchema.parse({
+        id: doc.id,
+        ...doc.data(),
+      })
     },
     enabled: !!slug, // Only run query if slug is provided
     staleTime: 1000 * 60 * 5, // 5 minutes
