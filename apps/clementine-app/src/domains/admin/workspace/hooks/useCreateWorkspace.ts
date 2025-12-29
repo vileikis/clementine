@@ -2,8 +2,12 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   collection,
   doc,
+  getDocs,
+  limit,
+  query,
   runTransaction,
   serverTimestamp,
+  where,
 } from 'firebase/firestore'
 import * as Sentry from '@sentry/tanstackstart-react'
 import type { WithFieldValue } from 'firebase/firestore'
@@ -51,21 +55,22 @@ export function useCreateWorkspace() {
       // Generate or validate slug
       const slug = validated.slug?.toLowerCase() || generateSlug(validated.name)
 
-      // Run transaction - Firestore ensures atomicity at database level
+      // Check slug uniqueness before transaction
+      const slugQuery = query(
+        workspacesRef,
+        where('slug', '==', slug),
+        where('status', '==', 'active'),
+        limit(1),
+      )
+
+      const existingDocs = await getDocs(slugQuery)
+
+      if (!existingDocs.empty) {
+        throw new Error('Slug already exists')
+      }
+
+      // Create workspace in transaction
       return await runTransaction(firestore, async (transaction) => {
-        // Use dedicated slugs collection for atomic uniqueness check
-        // This ensures transaction.get participates in the transaction
-        const slugsRef = collection(firestore, 'workspace_slugs')
-        const slugDocRef = doc(slugsRef, slug)
-
-        // Atomic check: transaction.get ensures no race conditions
-        const slugDoc = await transaction.get(slugDocRef)
-
-        if (slugDoc.exists()) {
-          throw new Error('Slug already exists')
-        }
-
-        // Create workspace
         const newWorkspaceRef = doc(workspacesRef)
 
         const workspaceData: WithFieldValue<Workspace> = {
@@ -78,12 +83,6 @@ export function useCreateWorkspace() {
           updatedAt: serverTimestamp(),
         }
 
-        // Atomic write: both slug claim and workspace creation in same transaction
-        transaction.set(slugDocRef, {
-          workspaceId: newWorkspaceRef.id,
-          slug,
-          createdAt: serverTimestamp(),
-        })
         transaction.set(newWorkspaceRef, workspaceData)
 
         return { id: newWorkspaceRef.id, slug }

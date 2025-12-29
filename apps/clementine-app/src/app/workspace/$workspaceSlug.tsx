@@ -1,9 +1,6 @@
 import { Outlet, createFileRoute } from '@tanstack/react-router'
-import { collection, query, where, getDocs } from 'firebase/firestore'
-import { firestore } from '@/integrations/firebase/client'
-import { useWorkspaceStore } from '@/domains/workspace'
+import { useWorkspaceStore, useWorkspace } from '@/domains/workspace'
 import { NotFound } from '@/shared/components/NotFound'
-import type { Workspace } from '@/domains/workspace'
 
 /**
  * Workspace layout route
@@ -12,42 +9,39 @@ import type { Workspace } from '@/domains/workspace'
  * Access: Admin only (enforced by parent route requireAdmin guard)
  *
  * Layout route that renders child routes (projects, settings, etc.)
- * Resolves workspace by slug and stores last visited workspace for session persistence
+ * Stores last visited workspace for session persistence
+ * Workspace data is fetched via useWorkspace hook (TanStack Query cache)
  */
 export const Route = createFileRoute('/workspace/$workspaceSlug')({
-  beforeLoad: async ({ params }) => {
+  beforeLoad: ({ params }) => {
     const { workspaceSlug } = params
 
-    // Resolve workspace by slug
-    const q = query(
-      collection(firestore, 'workspaces'),
-      where('slug', '==', workspaceSlug),
-      where('status', '==', 'active'),
-    )
-
-    const snapshot = await getDocs(q)
-
-    if (snapshot.empty) {
-      // Workspace not found - will trigger notFoundComponent
-      return { workspace: null }
-    }
-
-    const doc = snapshot.docs[0]
-    const workspace: Workspace = {
-      id: doc.id,
-      ...(doc.data() as Omit<Workspace, 'id'>),
-    }
-
     // Store last visited workspace for session persistence
+    // Workspace fetch happens via useWorkspace hook in child components
     useWorkspaceStore.getState().setLastVisitedWorkspaceSlug(workspaceSlug)
-
-    return { workspace }
   },
   component: WorkspaceLayout,
-  notFoundComponent: WorkspaceNotFound,
 })
 
 function WorkspaceLayout() {
+  const { workspaceSlug } = Route.useParams()
+  const { data: workspace, isLoading, isError } = useWorkspace(workspaceSlug)
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-muted-foreground">Loading workspace...</div>
+      </div>
+    )
+  }
+
+  // Error or not found
+  if (isError || !workspace) {
+    return <WorkspaceNotFound />
+  }
+
+  // Workspace loaded successfully
   return <Outlet />
 }
 
