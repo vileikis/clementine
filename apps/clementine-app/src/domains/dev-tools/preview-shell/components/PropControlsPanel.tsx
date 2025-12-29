@@ -4,14 +4,14 @@ import type { ViewportMode } from '@/shared/preview-shell'
 import type { ComponentConfig } from '../types'
 import { Button } from '@/ui-kit/components/button'
 import { Label } from '@/ui-kit/components/label'
-import { Switch } from '@/ui-kit/components/ui/switch'
+import { Switch } from '@/ui-kit/components/switch'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/ui-kit/components/ui/select'
+} from '@/ui-kit/components/select'
 
 interface PropControlsPanelProps {
   config: ComponentConfig

@@ -77,8 +77,8 @@ describe('WorkspaceSettingsForm', () => {
       const nameInput = screen.getByLabelText(/workspace name/i)
       const slugInput = screen.getByLabelText(/workspace slug/i)
 
-      expect(nameInput.value).toBe('Acme Corp')
-      expect(slugInput.value).toBe('acme-corp')
+      expect((nameInput as HTMLInputElement).value).toBe('Acme Corp')
+      expect((slugInput as HTMLInputElement).value).toBe('acme-corp')
     })
 
     it('should render save button disabled initially (no changes)', () => {
@@ -162,7 +162,7 @@ describe('WorkspaceSettingsForm', () => {
       await user.type(nameInput, 'New Name')
 
       await waitFor(() => {
-        expect(nameInput.value).toBe('New Name')
+        expect((nameInput as HTMLInputElement).value).toBe('New Name')
       })
 
       // Click cancel
@@ -170,7 +170,7 @@ describe('WorkspaceSettingsForm', () => {
       await user.click(cancelButton)
 
       await waitFor(() => {
-        expect(nameInput.value).toBe('Acme Corp')
+        expect((nameInput as HTMLInputElement).value).toBe('Acme Corp')
       })
     })
   })

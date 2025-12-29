@@ -37,7 +37,7 @@ export const useWorkspaceStore = create<WorkspaceStore>()(
     }),
     {
       name: 'workspace-storage',
-      onRehydrateStorage: () => (state, error) => {
+      onRehydrateStorage: () => (_state, error) => {
         if (error) {
           console.warn('Failed to rehydrate workspace state:', error)
         }

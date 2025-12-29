@@ -84,7 +84,8 @@ export function useUpdateWorkspace() {
         }
 
         // Perform update
-        await runTransaction(firestore, (transaction) => {
+        // eslint-disable-next-line @typescript-eslint/require-await
+        await runTransaction(firestore, async (transaction) => {
           const updates: UpdateData<Workspace> = {
             updatedAt: serverTimestamp(),
           }
@@ -102,7 +103,8 @@ export function useUpdateWorkspace() {
         })
       } else {
         // Only name is changing - simple update
-        await runTransaction(firestore, (transaction) => {
+        // eslint-disable-next-line @typescript-eslint/require-await
+        await runTransaction(firestore, async (transaction) => {
           const updates: UpdateData<Workspace> = {
             updatedAt: serverTimestamp(),
           }
