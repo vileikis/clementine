@@ -6,27 +6,28 @@ import viteTsConfigPaths from 'vite-tsconfig-paths'
 import tailwindcss from '@tailwindcss/vite'
 import { nitro } from 'nitro/vite'
 
-const config = defineConfig({
+const config = defineConfig(({ mode }) => ({
   plugins: [
     devtools(),
-    nitro(),
+    mode !== 'test' && nitro(),
     // this is the plugin that enables path aliases
     viteTsConfigPaths({
       projects: ['./tsconfig.json'],
     }),
     tailwindcss(),
-    tanstackStart({
-      router: {
-        routesDirectory: 'app', // Relative to srcDirectory (defaults to 'src')
-      },
-    }),
+    mode !== 'test' &&
+      tanstackStart({
+        router: {
+          routesDirectory: 'app', // Relative to srcDirectory (defaults to 'src')
+        },
+      }),
     viteReact(),
-  ],
+  ].filter(Boolean),
   test: {
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./vitest.setup.ts'],
   },
-})
+}))
 
 export default config
