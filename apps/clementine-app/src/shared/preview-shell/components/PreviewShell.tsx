@@ -71,6 +71,7 @@ export function PreviewShell({
             onClose={exit}
             title="Preview"
             showViewportSwitcher={enableViewportSwitcher}
+            onModeChange={handleModeChange}
           >
             <DeviceFrame>
               <div className="h-full overflow-auto">{children}</div>

@@ -18,7 +18,7 @@
 - **Monorepo workspace**: `apps/clementine-app/`
 - **Shared module**: `apps/clementine-app/src/shared/preview-shell/`
 - **Dev-tools domain**: `apps/clementine-app/src/domains/dev-tools/preview-shell/`
-- **Routes**: `apps/clementine-app/app/admin/dev-tools/`
+- **Routes**: `apps/clementine-app/src/app/admin/` (using dot notation for nested routes)
 
 ---
 
@@ -98,7 +98,7 @@
 
 ### Route Integration
 
-- [X] T034 [US1] Create route file at apps/clementine-app/app/admin/dev-tools/preview-shell.tsx importing DevToolsPreviewShell
+- [X] T034 [US1] Create route file at apps/clementine-app/src/app/admin/dev-tools.preview-shell.tsx importing DevToolsPreviewShell
 
 ### Manual Testing & Validation
 
