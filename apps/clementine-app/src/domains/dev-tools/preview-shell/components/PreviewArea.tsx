@@ -22,7 +22,7 @@ interface PreviewAreaProps {
  */
 export function PreviewArea({ config }: PreviewAreaProps) {
   return (
-    <div className="flex flex-1 flex-col bg-background">
+    <div className="flex flex-1 flex-col overflow-auto bg-background ">
       <PreviewShell
         enableViewportSwitcher={config.enableViewportSwitcher}
         enableFullscreen={config.enableFullscreen}

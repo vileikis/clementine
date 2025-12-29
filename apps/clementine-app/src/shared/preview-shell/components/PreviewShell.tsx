@@ -4,8 +4,7 @@ import { ViewportProvider } from '../context/ViewportContext'
 import { useViewportStore } from '../store/viewportStore'
 import { useFullscreen } from '../hooks/useFullscreen'
 import { DeviceFrame } from './DeviceFrame'
-import { ViewportSwitcher } from './ViewportSwitcher'
-import { FullscreenTrigger } from './FullscreenTrigger'
+import { PreviewShellControls } from './PreviewShellControls'
 import { FullscreenOverlay } from './FullscreenOverlay'
 import type { PreviewShellProps } from '../types/preview-shell.types'
 import { cn } from '@/shared/utils'
@@ -47,17 +46,15 @@ export function PreviewShell({
 
   return (
     <ViewportProvider mode={currentMode}>
-      <div className={cn('relative', className)}>
-        {/* Controls Header */}
-        <div className="mb-4 flex items-center justify-center gap-2">
-          {enableViewportSwitcher && (
-            <ViewportSwitcher
-              mode={currentMode}
-              onModeChange={handleModeChange}
-            />
-          )}
-          {enableFullscreen && <FullscreenTrigger onClick={enter} />}
-        </div>
+      <div className={cn('space-y-4', className)}>
+        {/* Controls */}
+        <PreviewShellControls
+          mode={currentMode}
+          onModeChange={handleModeChange}
+          enableViewportSwitcher={enableViewportSwitcher}
+          enableFullscreen={enableFullscreen}
+          onFullscreenClick={enter}
+        />
 
         {/* Device Frame */}
         <DeviceFrame>
