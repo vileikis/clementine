@@ -2,10 +2,7 @@
 
 import { Monitor, Smartphone } from 'lucide-react'
 import type { ViewportSwitcherProps } from '../types/preview-shell.types'
-import {
-  ToggleGroup,
-  ToggleGroupItem,
-} from '@/ui-kit/components/toggle-group'
+import { ToggleGroup, ToggleGroupItem } from '@/ui-kit/components/toggle-group'
 
 /**
  * Viewport Switcher Component
