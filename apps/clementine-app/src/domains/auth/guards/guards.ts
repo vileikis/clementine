@@ -90,7 +90,7 @@ export async function redirectIfAdmin() {
   const user = await getCurrentUserFn()
 
   if (isAdmin(user)) {
-    throw redirect({ to: '/admin' })
+    throw redirect({ to: '/workspace' })
   }
 
   return user
@@ -100,17 +100,22 @@ export async function redirectIfAdmin() {
  * Root route handler - smart redirect based on user type
  *
  * Redirects:
- * - Admin users → /admin/workspaces
+ * - Admin users → last visited workspace (if exists) or /admin
  * - Non-admin authenticated users → /login (will see waiting message)
  * - Anonymous/unauthenticated users → render root page (friendly message)
  *
- * @throws Redirect based on user type
+ * Session persistence: If admin has previously visited a workspace,
+ * redirect to that workspace for continuity.
+ *
+ * @throws Redirect based on user type and workspace history
  */
 export async function handleRootRoute() {
   const user = await getCurrentUserFn()
 
   if (isAdmin(user)) {
-    throw redirect({ to: '/admin/workspaces' })
+    // Admin users go directly to workspace management
+    // The workspace routes will handle session persistence (last visited workspace)
+    throw redirect({ to: '/workspace' })
   }
 
   if (isNonAdmin(user)) {

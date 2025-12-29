@@ -24,9 +24,9 @@ const config = defineConfig(({ mode }) => ({
     viteReact(),
   ].filter(Boolean),
   test: {
-    environment: 'jsdom',
     globals: true,
-    setupFiles: [],
+    environment: 'jsdom',
+    setupFiles: ['./vitest.setup.ts'],
   },
 }))
 
