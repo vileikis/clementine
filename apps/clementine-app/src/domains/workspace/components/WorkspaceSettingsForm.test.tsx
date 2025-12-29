@@ -74,12 +74,8 @@ describe('WorkspaceSettingsForm', () => {
     it('should pre-populate form with workspace data', () => {
       renderWithProviders(mockWorkspace)
 
-      const nameInput = screen.getByLabelText(
-        /workspace name/i,
-      )
-      const slugInput = screen.getByLabelText(
-        /workspace slug/i,
-      )
+      const nameInput = screen.getByLabelText(/workspace name/i)
+      const slugInput = screen.getByLabelText(/workspace slug/i)
 
       expect(nameInput.value).toBe('Acme Corp')
       expect(slugInput.value).toBe('acme-corp')
@@ -159,9 +155,7 @@ describe('WorkspaceSettingsForm', () => {
       const user = userEvent.setup()
       renderWithProviders(mockWorkspace)
 
-      const nameInput = screen.getByLabelText(
-        /workspace name/i,
-      )
+      const nameInput = screen.getByLabelText(/workspace name/i)
 
       // Change name
       await user.clear(nameInput)

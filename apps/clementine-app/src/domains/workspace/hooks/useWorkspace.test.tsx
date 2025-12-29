@@ -110,9 +110,8 @@ describe('useWorkspace', () => {
     })
 
     // Query key should have lowercase slug
-    const queryKey = queryClient
-      .getQueryCache()
-      .getAll()[0]?.queryKey as string[]
+    const queryKey = queryClient.getQueryCache().getAll()[0]
+      ?.queryKey as string[]
     expect(queryKey[1]).toBe('acme-corp')
   })
 
