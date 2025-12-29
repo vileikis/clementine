@@ -6,7 +6,13 @@ import { WorkspaceNav } from './WorkspaceNav'
 import type { RouteArea } from '../types'
 import { cn } from '@/shared/utils'
 import { Button } from '@/ui-kit/components/button'
-import { Sheet, SheetContent, SheetTrigger } from '@/ui-kit/components/sheet'
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetTitle,
+  SheetTrigger,
+} from '@/ui-kit/components/sheet'
 import { useAuth } from '@/domains/auth'
 
 const SIDEBAR_WIDTH = {
@@ -22,7 +28,7 @@ interface SidebarProps {
 export function Sidebar({ area }: SidebarProps) {
   // Get workspaceSlug from route params if in workspace area
   const params = useParams({ strict: false })
-  const workspaceId =
+  const workspaceSlug =
     'workspaceSlug' in params ? params.workspaceSlug : undefined
   const {
     isCollapsed,
@@ -50,10 +56,32 @@ export function Sidebar({ area }: SidebarProps) {
               <Menu className="w-5 h-5" />
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-64 bg-background border-r">
+          <SheetContent
+            side="left"
+            className="w-64 bg-background border-r [&>button]:hidden"
+          >
+            {/* Visually hidden title and description for screen readers */}
+            <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+            <SheetDescription className="sr-only">
+              Navigate through workspaces, projects, and settings
+            </SheetDescription>
+
+            {/* Hamburger menu close button */}
+            <div className="px-2 py-3">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={closeMobile}
+                className="h-11 w-11"
+                aria-label="Close navigation"
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
+            </div>
+
             <SidebarContent
               area={area}
-              workspaceId={workspaceId}
+              workspaceSlug={workspaceSlug}
               isCollapsed={false}
               onNavigate={closeMobile}
             />
@@ -87,7 +115,7 @@ export function Sidebar({ area }: SidebarProps) {
 
         <SidebarContent
           area={area}
-          workspaceId={workspaceId}
+          workspaceSlug={workspaceSlug}
           isCollapsed={isCollapsed}
         />
       </aside>
@@ -97,14 +125,14 @@ export function Sidebar({ area }: SidebarProps) {
 
 interface SidebarContentProps {
   area: RouteArea
-  workspaceId?: string
+  workspaceSlug?: string
   isCollapsed: boolean
   onNavigate?: () => void
 }
 
 function SidebarContent({
   area,
-  workspaceId,
+  workspaceSlug,
   isCollapsed,
 }: SidebarContentProps) {
   const { logout } = useAuth()
@@ -114,8 +142,11 @@ function SidebarContent({
       {/* Navigation content */}
       <div className="flex-1 px-2">
         {area === 'admin' && <AdminNav isCollapsed={isCollapsed} />}
-        {area === 'workspace' && workspaceId && (
-          <WorkspaceNav workspaceId={workspaceId} isCollapsed={isCollapsed} />
+        {area === 'workspace' && workspaceSlug && (
+          <WorkspaceNav
+            workspaceSlug={workspaceSlug}
+            isCollapsed={isCollapsed}
+          />
         )}
       </div>
 
