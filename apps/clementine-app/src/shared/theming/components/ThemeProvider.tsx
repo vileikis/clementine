@@ -1,5 +1,3 @@
-'use client'
-
 import { useMemo } from 'react'
 import { ThemeContext } from '../context/ThemeContext'
 import { BUTTON_RADIUS_MAP } from '../constants'
