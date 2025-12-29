@@ -1,4 +1,5 @@
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { useEffect } from 'react'
 import { useWorkspaceStore } from '@/domains/workspace'
 
 /**
@@ -12,21 +13,40 @@ import { useWorkspaceStore } from '@/domains/workspace'
  * - /admin/workspaces (if no workspace history)
  *
  * This provides seamless continuity - admins return to where they left off.
+ *
+ * Note: Redirect happens client-side (useEffect) because localStorage
+ * is not available during SSR (beforeLoad runs on server).
  */
 export const Route = createFileRoute('/workspace/')({
-  beforeLoad: () => {
-    // Get last visited workspace slug from Zustand store (localStorage)
-    const { lastVisitedWorkspaceSlug } = useWorkspaceStore.getState()
+  component: WorkspaceRedirect,
+})
 
+function WorkspaceRedirect() {
+  const navigate = useNavigate()
+  const { lastVisitedWorkspaceSlug } = useWorkspaceStore()
+
+  useEffect(() => {
+    // Client-side redirect after mount (when localStorage is available)
     if (lastVisitedWorkspaceSlug) {
       // Redirect to last visited workspace
-      throw redirect({
+      navigate({
         to: '/workspace/$workspaceSlug',
         params: { workspaceSlug: lastVisitedWorkspaceSlug },
+        replace: true, // Replace history entry (don't add /workspace to history)
+      })
+    } else {
+      // No workspace history - redirect to admin workspaces list
+      navigate({
+        to: '/admin/workspaces',
+        replace: true,
       })
     }
+  }, [lastVisitedWorkspaceSlug, navigate])
 
-    // No workspace history - redirect to admin workspaces list
-    throw redirect({ to: '/admin/workspaces' })
-  },
-})
+  // Show loading state while redirecting
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="text-muted-foreground">Loading...</div>
+    </div>
+  )
+}
