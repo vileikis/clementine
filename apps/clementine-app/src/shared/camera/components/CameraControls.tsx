@@ -1,5 +1,3 @@
-"use client";
-
 /**
  * CameraControls Component
  *
@@ -7,29 +5,29 @@
  * 64x64px capture button for easy touch targeting.
  */
 
-import { Camera, SwitchCamera, ImageIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import type { CameraCaptureLabels } from "../types";
-import { DEFAULT_LABELS } from "../constants";
+import { Camera, ImageIcon, SwitchCamera } from 'lucide-react'
+import { DEFAULT_LABELS } from '../constants'
+import type { CameraCaptureLabels } from '../types'
+import { Button } from '@/ui-kit/components/button'
+import { cn } from '@/shared/utils'
 
 interface CameraControlsProps {
   /** Custom labels for i18n */
-  labels?: CameraCaptureLabels;
+  labels?: CameraCaptureLabels
   /** Whether capture is in progress */
-  isCapturing?: boolean;
+  isCapturing?: boolean
   /** Whether to show flip camera button */
-  showFlipButton?: boolean;
+  showFlipButton?: boolean
   /** Whether to show library button */
-  showLibraryButton?: boolean;
+  showLibraryButton?: boolean
   /** Called when user taps capture button */
-  onCapture: () => void;
+  onCapture: () => void
   /** Called when user taps flip camera button */
-  onFlipCamera?: () => void;
+  onFlipCamera?: () => void
   /** Called when user taps library button */
-  onOpenLibrary?: () => void;
+  onOpenLibrary?: () => void
   /** Additional CSS classes */
-  className?: string;
+  className?: string
 }
 
 /**
@@ -45,13 +43,13 @@ export function CameraControls({
   onOpenLibrary,
   className,
 }: CameraControlsProps) {
-  const mergedLabels = { ...DEFAULT_LABELS, ...labels };
+  const mergedLabels = { ...DEFAULT_LABELS, ...labels }
 
   return (
     <div
       className={cn(
-        "flex items-center justify-center gap-6 p-4 bg-black/50",
-        className
+        'flex items-center justify-center gap-6 p-4 bg-black/50',
+        className,
       )}
     >
       {/* Library button (left) - only render when handler is provided */}
@@ -78,12 +76,12 @@ export function CameraControls({
         onClick={onCapture}
         disabled={isCapturing}
         className={cn(
-          "size-16 rounded-full bg-white border-4 border-white/50",
-          "flex items-center justify-center",
-          "transition-all duration-150",
-          "hover:scale-105 active:scale-95",
-          "disabled:opacity-50 disabled:cursor-not-allowed",
-          "focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black"
+          'size-16 rounded-full bg-white border-4 border-white/50',
+          'flex items-center justify-center',
+          'transition-all duration-150',
+          'hover:scale-105 active:scale-95',
+          'disabled:opacity-50 disabled:cursor-not-allowed',
+          'focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black',
         )}
         aria-label={mergedLabels.capture}
       >
@@ -107,5 +105,5 @@ export function CameraControls({
         <div className="size-12" />
       )}
     </div>
-  );
+  )
 }

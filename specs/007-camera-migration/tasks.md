@@ -29,8 +29,8 @@
 
 **Purpose**: Prepare camera module structure and verify dependencies
 
-- [ ] T001 Create containers/ folder in apps/clementine-app/src/shared/camera/
-- [ ] T002 [P] Verify shadcn/ui components installed (Switch, Select, Label) by importing from @/ui-kit/components/
+- [X] T001 Create containers/ folder in apps/clementine-app/src/shared/camera/
+- [X] T002 [P] Verify shadcn/ui components installed (Switch, Select, Label) by importing from @/ui-kit/components/
 
 ---
 
@@ -42,33 +42,33 @@
 
 ### File Structure
 
-- [ ] T003 Move CameraCapture.tsx from components/ to containers/ folder
-- [ ] T004 [P] Update containers/index.ts to export CameraCapture
-- [ ] T005 [P] Update shared/camera/index.ts barrel export to include CameraCapture from containers/
+- [X] T003 Move CameraCapture.tsx from components/ to containers/ folder
+- [X] T004 [P] Update containers/index.ts to export CameraCapture
+- [X] T005 [P] Update shared/camera/index.ts barrel export to include CameraCapture from containers/
 
 ### Remove Next.js Artifacts
 
-- [ ] T006 [P] [Module] Remove "use client" directive from containers/CameraCapture.tsx
-- [ ] T007 [P] [Module] Remove "use client" directive from components/CameraView.tsx
-- [ ] T008 [P] [Module] Remove "use client" directive from components/CameraControls.tsx
-- [ ] T009 [P] [Module] Remove "use client" directive from components/PhotoReview.tsx
-- [ ] T010 [P] [Module] Remove "use client" directive from components/PermissionPrompt.tsx
-- [ ] T011 [P] [Module] Remove "use client" directive from components/ErrorState.tsx
-- [ ] T012 [P] [Module] Remove "use client" directive from components/LibraryPicker.tsx
-- [ ] T013 [P] [Module] Remove "use client" directive from hooks/useCameraPermission.ts
-- [ ] T014 [P] [Module] Remove "use client" directive from hooks/useLibraryPicker.ts
+- [X] T006 [P] [Module] Remove "use client" directive from containers/CameraCapture.tsx
+- [X] T007 [P] [Module] Remove "use client" directive from components/CameraView.tsx
+- [X] T008 [P] [Module] Remove "use client" directive from components/CameraControls.tsx
+- [X] T009 [P] [Module] Remove "use client" directive from components/PhotoReview.tsx
+- [X] T010 [P] [Module] Remove "use client" directive from components/PermissionPrompt.tsx
+- [X] T011 [P] [Module] Remove "use client" directive from components/ErrorState.tsx
+- [X] T012 [P] [Module] Remove "use client" directive from components/LibraryPicker.tsx
+- [X] T013 [P] [Module] Remove "use client" directive from hooks/useCameraPermission.ts
+- [X] T014 [P] [Module] Remove "use client" directive from hooks/useLibraryPicker.ts
 
 ### Fix Image Component
 
-- [ ] T015 [Module] Replace next/image Image component with standard <img> tag in components/PhotoReview.tsx
+- [X] T015 [Module] Replace next/image Image component with standard <img> tag in components/PhotoReview.tsx
 
 ### Fix Import Paths
 
 **Note**: ui-kit uses flat component structure (no nested folders). All imports from `@/components/ui/*` should go to `@/ui-kit/components/*` (single file, not folder).
 
-- [ ] T016 [P] [Module] Update imports from @/lib/utils to @/shared/utils across all camera module files
-- [ ] T017 [P] [Module] Update imports from @/components/ui/button to @/ui-kit/components/button across all camera module files (flat structure)
-- [ ] T018 [P] [Module] Update any other Next.js-specific imports to TanStack Start equivalents
+- [X] T016 [P] [Module] Update imports from @/lib/utils to @/shared/utils across all camera module files
+- [X] T017 [P] [Module] Update imports from @/components/ui/button to @/ui-kit/components/button across all camera module files (flat structure)
+- [X] T018 [P] [Module] Update any other Next.js-specific imports to TanStack Start equivalents
 
 **Checkpoint**: Module structure updated, ready for testing
 
@@ -80,25 +80,25 @@
 
 ### Move Utility Tests
 
-- [ ] T019 [P] [Module] Move tests/shared/camera/capture.test.ts to lib/capture.test.ts
-- [ ] T020 [P] [Module] Move tests/shared/camera/camera-reducer.test.ts to lib/camera-reducer.test.ts
-- [ ] T021 [P] [Module] Move tests/shared/camera/errors.test.ts to lib/errors.test.ts
-- [ ] T022 [P] [Module] Move tests/shared/camera/image-utils.test.ts to lib/image-utils.test.ts
+- [X] T019 [P] [Module] Move tests/shared/camera/capture.test.ts to lib/capture.test.ts
+- [X] T020 [P] [Module] Move tests/shared/camera/camera-reducer.test.ts to lib/camera-reducer.test.ts
+- [X] T021 [P] [Module] Move tests/shared/camera/errors.test.ts to lib/errors.test.ts
+- [X] T022 [P] [Module] Move tests/shared/camera/image-utils.test.ts to lib/image-utils.test.ts
 
 ### Create Component Tests (Collocated)
 
-- [ ] T023 [P] [Module] Create containers/CameraCapture.test.tsx for CameraCapture component tests
-- [ ] T024 [P] [Module] Create components/CameraView.test.tsx for CameraView component tests
-- [ ] T025 [P] [Module] Create components/CameraControls.test.tsx for CameraControls component tests
-- [ ] T026 [P] [Module] Create components/PhotoReview.test.tsx for PhotoReview component tests
-- [ ] T027 [P] [Module] Create hooks/useCameraPermission.test.ts for useCameraPermission hook tests
-- [ ] T028 [P] [Module] Create hooks/useLibraryPicker.test.ts for useLibraryPicker hook tests
-- [ ] T029 [P] [Module] Create lib/device-utils.test.ts for device utility tests
+- [X] T023 [P] [Module] Create containers/CameraCapture.test.tsx for CameraCapture component tests
+- [X] T024 [P] [Module] Create components/CameraView.test.tsx for CameraView component tests
+- [X] T025 [P] [Module] Create components/CameraControls.test.tsx for CameraControls component tests
+- [X] T026 [P] [Module] Create components/PhotoReview.test.tsx for PhotoReview component tests
+- [X] T027 [P] [Module] Create hooks/useCameraPermission.test.ts for useCameraPermission hook tests
+- [X] T028 [P] [Module] Create hooks/useLibraryPicker.test.ts for useLibraryPicker hook tests
+- [X] T029 [P] [Module] Create lib/device-utils.test.ts for device utility tests
 
 ### Update Test Imports
 
-- [ ] T030 [Module] Update all test files to use correct import paths for TanStack Start
-- [ ] T031 [Module] Remove old tests/shared/camera/ directory after verifying all tests moved
+- [X] T030 [Module] Update all test files to use correct import paths for TanStack Start
+- [X] T031 [Module] Remove old tests/shared/camera/ directory after verifying all tests moved
 
 **Checkpoint**: Tests collocated, ready to run
 
@@ -110,9 +110,9 @@
 
 ### Technical Validation
 
-- [ ] T032 Run pnpm check (format + lint + auto-fix) on camera module files
-- [ ] T033 Run pnpm type-check and fix any TypeScript errors in camera module
-- [ ] T034 Run pnpm dev and verify dev server starts without errors
+- [X] T032 Run pnpm check (format + lint + auto-fix) on camera module files
+- [X] T033 Run pnpm type-check and fix any TypeScript errors in camera module
+- [X] T034 Run pnpm dev and verify dev server starts without errors
 - [ ] T035 Run unit tests with pnpm test and verify all camera module tests pass
 
 ### Functional Verification (Manual Browser Testing)

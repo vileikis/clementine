@@ -5,26 +5,26 @@
  * Extracted and enhanced from web/src/features/guest/lib/capture.ts
  */
 
-import { CAPTURE_QUALITY } from "../constants";
-import type { AspectRatio } from "../types";
+import { CAPTURE_QUALITY } from '../constants'
+import type { AspectRatio } from '../types'
 
 /**
  * Numeric aspect ratio values (width / height)
  */
 const ASPECT_RATIO_VALUES: Record<AspectRatio, number> = {
-  "3:4": 3 / 4, // 0.75 - portrait
-  "1:1": 1, // 1.0  - square
-  "9:16": 9 / 16, // 0.5625 - tall portrait (stories/reels)
-};
+  '3:4': 3 / 4, // 0.75 - portrait
+  '1:1': 1, // 1.0  - square
+  '9:16': 9 / 16, // 0.5625 - tall portrait (stories/reels)
+}
 
 /**
  * Crop region for extracting a portion of the video frame
  */
 interface CropRegion {
-  sx: number; // source x
-  sy: number; // source y
-  sw: number; // source width
-  sh: number; // source height
+  sx: number // source x
+  sy: number // source y
+  sw: number // source width
+  sh: number // source height
 }
 
 /**
@@ -32,9 +32,9 @@ interface CropRegion {
  */
 export interface CaptureOptions {
   /** Aspect ratio to crop to */
-  aspectRatio?: AspectRatio;
+  aspectRatio?: AspectRatio
   /** Mirror horizontally (for front camera selfies) */
-  mirror?: boolean;
+  mirror?: boolean
 }
 
 /**
@@ -48,29 +48,29 @@ export interface CaptureOptions {
 export function calculateCropRegion(
   videoWidth: number,
   videoHeight: number,
-  aspectRatio: AspectRatio
+  aspectRatio: AspectRatio,
 ): CropRegion {
-  const targetRatio = ASPECT_RATIO_VALUES[aspectRatio];
-  const videoRatio = videoWidth / videoHeight;
+  const targetRatio = ASPECT_RATIO_VALUES[aspectRatio]
+  const videoRatio = videoWidth / videoHeight
 
-  let sw: number;
-  let sh: number;
+  let sw: number
+  let sh: number
 
   if (videoRatio > targetRatio) {
     // Video is wider than target - crop sides
-    sh = videoHeight;
-    sw = videoHeight * targetRatio;
+    sh = videoHeight
+    sw = videoHeight * targetRatio
   } else {
     // Video is taller than target - crop top/bottom
-    sw = videoWidth;
-    sh = videoWidth / targetRatio;
+    sw = videoWidth
+    sh = videoWidth / targetRatio
   }
 
   // Center the crop region
-  const sx = (videoWidth - sw) / 2;
-  const sy = (videoHeight - sh) / 2;
+  const sx = (videoWidth - sw) / 2
+  const sy = (videoHeight - sh) / 2
 
-  return { sx, sy, sw, sh };
+  return { sx, sy, sw, sh }
 }
 
 /**
@@ -83,30 +83,30 @@ export function calculateCropRegion(
  */
 export async function captureFromVideo(
   video: HTMLVideoElement,
-  options: CaptureOptions = {}
+  options: CaptureOptions = {},
 ): Promise<Blob> {
-  const { aspectRatio, mirror = false } = options;
-  const videoWidth = video.videoWidth;
-  const videoHeight = video.videoHeight;
+  const { aspectRatio, mirror = false } = options
+  const videoWidth = video.videoWidth
+  const videoHeight = video.videoHeight
 
   // Calculate crop region if aspect ratio specified
   const crop = aspectRatio
     ? calculateCropRegion(videoWidth, videoHeight, aspectRatio)
-    : { sx: 0, sy: 0, sw: videoWidth, sh: videoHeight };
+    : { sx: 0, sy: 0, sw: videoWidth, sh: videoHeight }
 
-  const canvas = document.createElement("canvas");
-  canvas.width = crop.sw;
-  canvas.height = crop.sh;
+  const canvas = document.createElement('canvas')
+  canvas.width = crop.sw
+  canvas.height = crop.sh
 
-  const ctx = canvas.getContext("2d");
+  const ctx = canvas.getContext('2d')
   if (!ctx) {
-    throw new Error("Could not get canvas context");
+    throw new Error('Could not get canvas context')
   }
 
   // Mirror horizontally if requested (for front camera selfies)
   if (mirror) {
-    ctx.translate(canvas.width, 0);
-    ctx.scale(-1, 1);
+    ctx.translate(canvas.width, 0)
+    ctx.scale(-1, 1)
   }
 
   // Draw cropped region to canvas
@@ -119,22 +119,22 @@ export async function captureFromVideo(
     0,
     0,
     crop.sw,
-    crop.sh // dest rect
-  );
+    crop.sh, // dest rect
+  )
 
   return new Promise((resolve, reject) => {
     canvas.toBlob(
       (blob) => {
         if (!blob) {
-          reject(new Error("Capture failed: blob creation failed"));
-          return;
+          reject(new Error('Capture failed: blob creation failed'))
+          return
         }
-        resolve(blob);
+        resolve(blob)
       },
-      "image/jpeg",
-      CAPTURE_QUALITY
-    );
-  });
+      'image/jpeg',
+      CAPTURE_QUALITY,
+    )
+  })
 }
 
 /**
@@ -144,8 +144,8 @@ export async function captureFromVideo(
  * @param prefix - Optional filename prefix (default: "capture")
  * @returns File object suitable for upload
  */
-export function createCaptureFile(blob: Blob, prefix = "capture"): File {
-  const timestamp = Date.now();
-  const filename = `${prefix}-${timestamp}.jpg`;
-  return new File([blob], filename, { type: "image/jpeg" });
+export function createCaptureFile(blob: Blob, prefix = 'capture'): File {
+  const timestamp = Date.now()
+  const filename = `${prefix}-${timestamp}.jpg`
+  return new File([blob], filename, { type: 'image/jpeg' })
 }

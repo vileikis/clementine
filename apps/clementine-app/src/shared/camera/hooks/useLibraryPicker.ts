@@ -1,5 +1,3 @@
-"use client";
-
 /**
  * useLibraryPicker Hook
  *
@@ -7,25 +5,26 @@
  * Extracted from usePhotoCapture to separate concerns.
  */
 
-import { useRef, useCallback, type RefObject, type ChangeEvent } from "react";
-import type { CapturedPhoto, CameraCaptureError } from "../types";
-import { getImageDimensions } from "../lib";
-import { validateImageFile } from "../schemas";
+import { useCallback, useRef } from 'react'
+import { getImageDimensions } from '../lib'
+import { validateImageFile } from '../schemas'
+import type { ChangeEvent, RefObject } from 'react'
+import type { CameraCaptureError, CapturedPhoto } from '../types'
 
 interface UseLibraryPickerOptions {
   /** Called when a photo is selected and processed */
-  onSelect?: (photo: CapturedPhoto) => void;
+  onSelect?: (photo: CapturedPhoto) => void
   /** Called when an error occurs */
-  onError?: (error: CameraCaptureError) => void;
+  onError?: (error: CameraCaptureError) => void
 }
 
 interface UseLibraryPickerReturn {
   /** Ref to attach to hidden file input */
-  fileInputRef: RefObject<HTMLInputElement | null>;
+  fileInputRef: RefObject<HTMLInputElement | null>
   /** Programmatically open the file picker */
-  openPicker: () => void;
+  openPicker: () => void
   /** Handle file input change event */
-  handleFileChange: (event: ChangeEvent<HTMLInputElement>) => Promise<void>;
+  handleFileChange: (event: ChangeEvent<HTMLInputElement>) => Promise<void>
 }
 
 /**
@@ -50,65 +49,65 @@ interface UseLibraryPickerReturn {
  * ```
  */
 export function useLibraryPicker(
-  options: UseLibraryPickerOptions = {}
+  options: UseLibraryPickerOptions = {},
 ): UseLibraryPickerReturn {
-  const { onSelect, onError } = options;
+  const { onSelect, onError } = options
 
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
 
   // Open file picker programmatically
   const openPicker = useCallback(() => {
-    fileInputRef.current?.click();
-  }, []);
+    fileInputRef.current?.click()
+  }, [])
 
   // Process selected file
   const handleFileChange = useCallback(
     async (event: ChangeEvent<HTMLInputElement>) => {
-      const file = event.target.files?.[0];
-      if (!file) return;
+      const file = event.target.files?.[0]
+      if (!file) return
 
       // Reset input so same file can be selected again
-      event.target.value = "";
+      event.target.value = ''
 
       // Validate file type and size
-      const validation = validateImageFile(file);
+      const validation = validateImageFile(file)
       if (!validation.success) {
         const error: CameraCaptureError = {
-          code: "INVALID_FILE_TYPE",
-          message: validation.error ?? "Please select an image file",
-        };
-        onError?.(error);
-        return;
+          code: 'INVALID_FILE_TYPE',
+          message: validation.error ?? 'Please select an image file',
+        }
+        onError?.(error)
+        return
       }
 
       try {
-        const dimensions = await getImageDimensions(file);
-        const previewUrl = URL.createObjectURL(file);
+        const dimensions = await getImageDimensions(file)
+        const previewUrl = URL.createObjectURL(file)
 
         const photo: CapturedPhoto = {
           previewUrl,
           file,
-          method: "library",
+          method: 'library',
           width: dimensions.width,
           height: dimensions.height,
-        };
+        }
 
-        onSelect?.(photo);
+        onSelect?.(photo)
       } catch (err) {
         const error: CameraCaptureError = {
-          code: "CAPTURE_FAILED",
+          code: 'CAPTURE_FAILED',
           message:
-            err instanceof Error ? err.message : "Failed to process image",
-        };
-        onError?.(error);
+            err instanceof Error ? err.message : 'Failed to process image',
+        }
+        onError?.(error)
       }
     },
-    [onSelect, onError]
-  );
+    [onSelect, onError],
+  )
 
   return {
     fileInputRef,
     openPicker,
     handleFileChange,
-  };
+  }
 }

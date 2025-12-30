@@ -1,5 +1,3 @@
-"use client";
-
 /**
  * PermissionPrompt Component
  *
@@ -7,26 +5,26 @@
  * Shows different UI for undetermined vs denied permission states.
  */
 
-import { Camera, CameraOff } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import type { CameraCaptureLabels, PermissionState } from "../types";
-import { DEFAULT_LABELS } from "../constants";
+import { Camera, CameraOff } from 'lucide-react'
+import { DEFAULT_LABELS } from '../constants'
+import type { CameraCaptureLabels, PermissionState } from '../types'
+import { Button } from '@/ui-kit/components/button'
 
 interface PermissionPromptProps {
   /** Custom labels for i18n */
-  labels?: CameraCaptureLabels;
+  labels?: CameraCaptureLabels
   /** Current permission status */
-  permissionStatus: PermissionState;
+  permissionStatus: PermissionState
   /** Called when user taps Allow Camera button */
-  onRequestPermission: () => void;
+  onRequestPermission: () => void
 }
 
 /**
  * Detect if running in a mobile browser
  */
 function isMobileBrowser(): boolean {
-  if (typeof navigator === "undefined") return false;
-  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  if (typeof navigator === 'undefined') return false
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
 }
 
 /**
@@ -34,9 +32,9 @@ function isMobileBrowser(): boolean {
  */
 function getDeniedInstructions(): string {
   if (isMobileBrowser()) {
-    return "To use the camera, please go to your device settings, find your browser app, and enable camera access. Then return here and refresh the page.";
+    return 'To use the camera, please go to your device settings, find your browser app, and enable camera access. Then return here and refresh the page.'
   }
-  return "To use the camera, click the camera icon in your browser's address bar or go to site settings and allow camera access. Then refresh this page.";
+  return "To use the camera, click the camera icon in your browser's address bar or go to site settings and allow camera access. Then refresh this page."
 }
 
 /**
@@ -46,8 +44,8 @@ function UndeterminedPrompt({
   labels,
   onRequestPermission,
 }: {
-  labels: Required<CameraCaptureLabels>;
-  onRequestPermission: () => void;
+  labels: Required<CameraCaptureLabels>
+  onRequestPermission: () => void
 }) {
   return (
     <div className="flex flex-col items-center justify-center h-full p-6 text-center bg-black">
@@ -77,20 +75,15 @@ function UndeterminedPrompt({
         </Button>
       </div>
     </div>
-  );
+  )
 }
 
 /**
  * Permission prompt for denied state - user has blocked camera access
  */
 
-function DeniedPrompt({
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  labels,
-}: {
-  labels: Required<CameraCaptureLabels>;
-}) {
-  const instructions = getDeniedInstructions();
+function DeniedPrompt({ labels }: { labels: Required<CameraCaptureLabels> }) {
+  const instructions = getDeniedInstructions()
 
   return (
     <div className="flex flex-col items-center justify-center h-full p-6 text-center bg-black">
@@ -105,11 +98,9 @@ function DeniedPrompt({
       </h2>
 
       {/* Description */}
-      <p className="text-white/70 max-w-xs">
-        {instructions}
-      </p>
+      <p className="text-white/70 max-w-xs">{instructions}</p>
     </div>
-  );
+  )
 }
 
 /**
@@ -120,10 +111,10 @@ export function PermissionPrompt({
   permissionStatus,
   onRequestPermission,
 }: PermissionPromptProps) {
-  const mergedLabels = { ...DEFAULT_LABELS, ...labels };
+  const mergedLabels = { ...DEFAULT_LABELS, ...labels }
 
-  if (permissionStatus === "denied") {
-    return <DeniedPrompt labels={mergedLabels} />;
+  if (permissionStatus === 'denied') {
+    return <DeniedPrompt labels={mergedLabels} />
   }
 
   return (
@@ -131,5 +122,5 @@ export function PermissionPrompt({
       labels={mergedLabels}
       onRequestPermission={onRequestPermission}
     />
-  );
+  )
 }

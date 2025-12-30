@@ -14,13 +14,14 @@ These are bundled into your client-side JavaScript and are visible to anyone:
 
 ```yaml
 - variable: VITE_FIREBASE_API_KEY
-  value: AIzaSy...  # ✅ OK to commit - this is public anyway
+  value: AIzaSy... # ✅ OK to commit - this is public anyway
   availability:
     - BUILD
     - RUNTIME
 ```
 
 **Client-side variables:**
+
 - `VITE_FIREBASE_API_KEY`
 - `VITE_FIREBASE_PROJECT_ID`
 - `VITE_FIREBASE_AUTH_DOMAIN`
@@ -36,12 +37,13 @@ These are only available on the server and should **never** be exposed:
 
 ```yaml
 - variable: SESSION_SECRET
-  secret: SESSION_SECRET  # ✅ References Secret Manager, NOT the actual value
+  secret: SESSION_SECRET # ✅ References Secret Manager, NOT the actual value
   availability:
     - RUNTIME
 ```
 
 **Server-side secrets:**
+
 - `SESSION_SECRET`
 - `FIREBASE_ADMIN_PROJECT_ID`
 - `FIREBASE_ADMIN_CLIENT_EMAIL`
@@ -121,9 +123,10 @@ gcloud secrets delete SECRET_NAME --project=clementine-7568d
 ## How It Works
 
 1. **In `apphosting.yaml`:**
+
    ```yaml
    - variable: SESSION_SECRET
-     secret: SESSION_SECRET  # References the secret name
+     secret: SESSION_SECRET # References the secret name
    ```
 
 2. **In Google Cloud Secret Manager:**

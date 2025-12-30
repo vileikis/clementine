@@ -15,4 +15,4 @@ export type {
   CameraState,
   CameraAction,
   PermissionState,
-} from "./camera.types";
+} from './camera.types'

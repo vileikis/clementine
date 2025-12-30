@@ -6,8 +6,8 @@
  */
 
 // Main component and its props
-export { CameraCapture } from "./components/CameraCapture";
-export type { CameraCaptureProps } from "./components/CameraCapture";
+export { CameraCapture } from './containers/CameraCapture'
+export type { CameraCaptureProps } from './containers/CameraCapture'
 
 // Public types
 export type {
@@ -19,7 +19,7 @@ export type {
   AspectRatio,
   CameraFacing,
   CameraFacingConfig,
-} from "./types";
+} from './types'
 
 // Default labels for consumers who want to customize
-export { DEFAULT_LABELS } from "./constants";
+export { DEFAULT_LABELS } from './constants'

@@ -8,26 +8,26 @@
 /**
  * How the photo was obtained
  */
-export type CaptureMethod = "camera" | "library";
+export type CaptureMethod = 'camera' | 'library'
 
 /**
  * Typed error codes for exhaustive handling
  */
 export type CameraCaptureErrorCode =
-  | "PERMISSION_DENIED"
-  | "PERMISSION_DISMISSED"
-  | "CAMERA_UNAVAILABLE"
-  | "CAMERA_IN_USE"
-  | "CAPTURE_FAILED"
-  | "INVALID_FILE_TYPE"
-  | "UNKNOWN";
+  | 'PERMISSION_DENIED'
+  | 'PERMISSION_DISMISSED'
+  | 'CAMERA_UNAVAILABLE'
+  | 'CAMERA_IN_USE'
+  | 'CAPTURE_FAILED'
+  | 'INVALID_FILE_TYPE'
+  | 'UNKNOWN'
 
 /**
  * Error object with typed code and message
  */
 export interface CameraCaptureError {
-  code: CameraCaptureErrorCode;
-  message: string;
+  code: CameraCaptureErrorCode
+  message: string
 }
 
 /**
@@ -35,64 +35,64 @@ export interface CameraCaptureError {
  */
 export interface CapturedPhoto {
   /** Object URL for immediate display (created via URL.createObjectURL) */
-  previewUrl: string;
+  previewUrl: string
   /** Raw file object for upload to storage */
-  file: File;
+  file: File
   /** How the photo was obtained */
-  method: CaptureMethod;
+  method: CaptureMethod
   /** Image width in pixels */
-  width: number;
+  width: number
   /** Image height in pixels */
-  height: number;
+  height: number
 }
 
 /**
  * Camera facing direction
  */
-export type CameraFacing = "user" | "environment";
+export type CameraFacing = 'user' | 'environment'
 
 /**
  * Camera facing configuration prop
  */
-export type CameraFacingConfig = "user" | "environment" | "both";
+export type CameraFacingConfig = 'user' | 'environment' | 'both'
 
 /**
  * Aspect ratio guide options
  */
-export type AspectRatio = "3:4" | "1:1" | "9:16";
+export type AspectRatio = '3:4' | '1:1' | '9:16'
 
 /**
  * Customizable labels for internationalization
  */
 export interface CameraCaptureLabels {
   /** Permission prompt title */
-  permissionTitle?: string;
+  permissionTitle?: string
   /** Permission prompt description */
-  permissionDescription?: string;
+  permissionDescription?: string
   /** Permission button text */
-  allowCamera?: string;
+  allowCamera?: string
   /** Capture button aria-label */
-  capture?: string;
+  capture?: string
   /** Flip button aria-label */
-  flipCamera?: string;
+  flipCamera?: string
   /** Library button aria-label */
-  openLibrary?: string;
+  openLibrary?: string
   /** Retake button text */
-  retake?: string;
+  retake?: string
   /** Confirm button text */
-  confirm?: string;
+  confirm?: string
   /** Cancel button text */
-  cancel?: string;
+  cancel?: string
   /** Denied error title */
-  permissionDenied?: string;
+  permissionDenied?: string
   /** Denied error hint */
-  permissionDeniedHint?: string;
+  permissionDeniedHint?: string
   /** Unavailable error title */
-  cameraUnavailable?: string;
+  cameraUnavailable?: string
   /** In-use error title */
-  cameraInUse?: string;
+  cameraInUse?: string
   /** Capture error message */
-  captureError?: string;
+  captureError?: string
 }
 
 /**
@@ -101,27 +101,24 @@ export interface CameraCaptureLabels {
  * Note: Permission states are handled by useCameraPermission hook.
  * This reducer only tracks UI state after permission is granted.
  */
-export type CameraStateStatus =
-  | "camera-active"
-  | "photo-review"
-  | "error";
+export type CameraStateStatus = 'camera-active' | 'photo-review' | 'error'
 
 /**
  * Internal state machine state (used by CameraCapture)
  */
 export type CameraState =
-  | { status: "camera-active" }
-  | { status: "photo-review"; photo: CapturedPhoto }
-  | { status: "error"; error: CameraCaptureError };
+  | { status: 'camera-active' }
+  | { status: 'photo-review'; photo: CapturedPhoto }
+  | { status: 'error'; error: CameraCaptureError }
 
 /**
  * Internal state machine actions
  */
 export type CameraAction =
-  | { type: "CAMERA_READY" }
-  | { type: "PHOTO_CAPTURED"; photo: CapturedPhoto }
-  | { type: "RETAKE" }
-  | { type: "ERROR"; error: CameraCaptureError };
+  | { type: 'CAMERA_READY' }
+  | { type: 'PHOTO_CAPTURED'; photo: CapturedPhoto }
+  | { type: 'RETAKE' }
+  | { type: 'ERROR'; error: CameraCaptureError }
 
 /**
  * Permission state for useCameraPermission hook
@@ -133,8 +130,8 @@ export type CameraAction =
  * - unavailable: No camera hardware available
  */
 export type PermissionState =
-  | "unknown"
-  | "undetermined"
-  | "granted"
-  | "denied"
-  | "unavailable";
+  | 'unknown'
+  | 'undetermined'
+  | 'granted'
+  | 'denied'
+  | 'unavailable'

@@ -8,7 +8,7 @@
  * Check if MediaDevices API is available
  */
 export function isMediaDevicesAvailable(): boolean {
-  return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+  return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)
 }
 
 /**
@@ -17,15 +17,15 @@ export function isMediaDevicesAvailable(): boolean {
  */
 export async function checkCameraPermission(): Promise<PermissionState | null> {
   if (!navigator.permissions?.query) {
-    return null;
+    return null
   }
 
   try {
     const status = await navigator.permissions.query({
-      name: "camera" as PermissionName,
-    });
-    return status.state;
+      name: 'camera' as PermissionName,
+    })
+    return status.state
   } catch {
-    return null;
+    return null
   }
 }

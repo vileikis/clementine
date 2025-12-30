@@ -8,8 +8,8 @@
  * Image dimensions result
  */
 export interface ImageDimensions {
-  width: number;
-  height: number;
+  width: number
+  height: number
 }
 
 /**
@@ -21,24 +21,24 @@ export interface ImageDimensions {
  */
 export function getImageDimensions(file: File): Promise<ImageDimensions> {
   return new Promise((resolve, reject) => {
-    const img = new Image();
-    const url = URL.createObjectURL(file);
+    const img = new Image()
+    const url = URL.createObjectURL(file)
 
     img.onload = () => {
-      URL.revokeObjectURL(url);
+      URL.revokeObjectURL(url)
       resolve({
         width: img.naturalWidth,
         height: img.naturalHeight,
-      });
-    };
+      })
+    }
 
     img.onerror = () => {
-      URL.revokeObjectURL(url);
-      reject(new Error("Failed to load image"));
-    };
+      URL.revokeObjectURL(url)
+      reject(new Error('Failed to load image'))
+    }
 
-    img.src = url;
-  });
+    img.src = url
+  })
 }
 
 /**
@@ -51,5 +51,5 @@ export function getVideoDimensions(video: HTMLVideoElement): ImageDimensions {
   return {
     width: video.videoWidth,
     height: video.videoHeight,
-  };
+  }
 }

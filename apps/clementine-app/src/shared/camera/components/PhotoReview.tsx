@@ -1,30 +1,27 @@
-"use client";
-
 /**
  * PhotoReview Component
  *
  * Displays captured photo with confirm and retake actions.
  */
 
-import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import type { CapturedPhoto, CameraCaptureLabels } from "../types";
-import { DEFAULT_LABELS } from "../constants";
+import { DEFAULT_LABELS } from '../constants'
+import type { CameraCaptureLabels, CapturedPhoto } from '../types'
+import { Button } from '@/ui-kit/components/button'
+import { cn } from '@/shared/utils'
 
 interface PhotoReviewProps {
   /** The captured photo to review */
-  photo: CapturedPhoto;
+  photo: CapturedPhoto
   /** Custom labels for i18n */
-  labels?: CameraCaptureLabels;
+  labels?: CameraCaptureLabels
   /** Whether submission is in progress */
-  isSubmitting?: boolean;
+  isSubmitting?: boolean
   /** Called when user confirms photo */
-  onConfirm: () => void;
+  onConfirm: () => void
   /** Called when user wants to retake */
-  onRetake?: () => void;
+  onRetake?: () => void
   /** Additional CSS classes */
-  className?: string;
+  className?: string
 }
 
 /**
@@ -38,18 +35,16 @@ export function PhotoReview({
   onRetake,
   className,
 }: PhotoReviewProps) {
-  const mergedLabels = { ...DEFAULT_LABELS, ...labels };
+  const mergedLabels = { ...DEFAULT_LABELS, ...labels }
 
   return (
-    <div className={cn("flex flex-col h-full bg-black", className)}>
+    <div className={cn('flex flex-col h-full bg-black', className)}>
       {/* Photo preview */}
       <div className="flex-1 relative">
-        <Image
+        <img
           src={photo.previewUrl}
           alt="Captured photo preview"
-          fill
-          className="object-contain"
-          priority
+          className="w-full h-full object-contain"
         />
       </div>
 
@@ -71,9 +66,9 @@ export function PhotoReview({
           disabled={isSubmitting}
           className="flex-1 min-h-[44px] bg-white text-black hover:bg-white/90"
         >
-          {isSubmitting ? "Processing..." : mergedLabels.confirm}
+          {isSubmitting ? 'Processing...' : mergedLabels.confirm}
         </Button>
       </div>
     </div>
-  );
+  )
 }
