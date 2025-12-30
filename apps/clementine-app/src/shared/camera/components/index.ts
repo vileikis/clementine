@@ -1,0 +1,11 @@
+/**
+ * Camera Module Components - Barrel Export
+ */
+
+export { PermissionPrompt } from './PermissionPrompt'
+export { CameraView, type CameraViewRef } from './CameraView'
+export { CameraControls } from './CameraControls'
+export { PhotoReview } from './PhotoReview'
+export { LibraryPicker } from './LibraryPicker'
+export type { LibraryPickerRef } from './LibraryPicker'
+export { ErrorState } from './ErrorState'

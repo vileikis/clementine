@@ -1,0 +1,1 @@
+/Users/iggyvileikis/Projects/@attempt-n2/migrate-camera/requirements/007-camera-migration.md
