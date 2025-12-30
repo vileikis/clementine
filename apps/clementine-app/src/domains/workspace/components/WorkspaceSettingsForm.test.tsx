@@ -51,7 +51,9 @@ async function renderWithProviders(workspace: Workspace) {
 
   // Wait for the form to be fully rendered (check for the save button which is always present)
   await waitFor(() => {
-    expect(screen.getByRole('button', { name: /save changes/i })).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: /save changes/i }),
+    ).toBeInTheDocument()
   })
 
   return result!
