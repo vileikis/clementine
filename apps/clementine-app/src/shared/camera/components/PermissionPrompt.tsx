@@ -56,7 +56,7 @@ function UndeterminedPrompt({
 
       {/* Header */}
       <h2 className="text-xl font-semibold mb-2 text-white">
-        Allow camera access
+        {labels.permissionTitle}
       </h2>
 
       {/* Description */}
@@ -82,7 +82,7 @@ function UndeterminedPrompt({
  * Permission prompt for denied state - user has blocked camera access
  */
 
-function DeniedPrompt({ labels }: { labels: Required<CameraCaptureLabels> }) {
+function DeniedPrompt() {
   const instructions = getDeniedInstructions()
 
   return (
@@ -114,7 +114,7 @@ export function PermissionPrompt({
   const mergedLabels = { ...DEFAULT_LABELS, ...labels }
 
   if (permissionStatus === 'denied') {
-    return <DeniedPrompt labels={mergedLabels} />
+    return <DeniedPrompt />
   }
 
   return (

@@ -38,14 +38,18 @@ function getErrorTitle(
   switch (code) {
     case 'PERMISSION_DENIED':
       return labels.permissionDenied
+    case 'PERMISSION_DISMISSED':
+      return labels.permissionDismissed
     case 'CAMERA_UNAVAILABLE':
       return labels.cameraUnavailable
     case 'CAMERA_IN_USE':
       return labels.cameraInUse
     case 'CAPTURE_FAILED':
       return labels.captureError
-    default:
-      return 'Something went wrong'
+    case 'INVALID_FILE_TYPE':
+      return labels.invalidFileType
+    case 'UNKNOWN':
+      return labels.unknownError
   }
 }
 
@@ -60,9 +64,9 @@ function getErrorHint(
     case 'PERMISSION_DENIED':
       return labels.permissionDeniedHint
     case 'CAMERA_IN_USE':
-      return 'Close other apps using the camera and try again'
+      return labels.cameraInUseHint
     case 'CAMERA_UNAVAILABLE':
-      return 'You can still upload a photo from your library'
+      return labels.cameraUnavailableHint
     default:
       return null
   }
@@ -120,7 +124,7 @@ export function ErrorState({
             className="w-full min-h-[44px]"
           >
             <RefreshCw className="size-4 mr-2" />
-            Try Again
+            {mergedLabels.retry}
           </Button>
         )}
 

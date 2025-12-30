@@ -83,16 +83,28 @@ export interface CameraCaptureLabels {
   confirm?: string
   /** Cancel button text */
   cancel?: string
+  /** Retry button text */
+  retry?: string
   /** Denied error title */
   permissionDenied?: string
   /** Denied error hint */
   permissionDeniedHint?: string
+  /** Dismissed error title */
+  permissionDismissed?: string
   /** Unavailable error title */
   cameraUnavailable?: string
+  /** Unavailable error hint */
+  cameraUnavailableHint?: string
   /** In-use error title */
   cameraInUse?: string
-  /** Capture error message */
+  /** In-use error hint */
+  cameraInUseHint?: string
+  /** Capture error title */
   captureError?: string
+  /** Invalid file type error title */
+  invalidFileType?: string
+  /** Unknown error title */
+  unknownError?: string
 }
 
 /**

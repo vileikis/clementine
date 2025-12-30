@@ -270,14 +270,16 @@ export const CameraView = forwardRef<CameraViewRef, CameraViewProps>(
     )
 
     // Auto-start camera on mount, stop on unmount
+    // Only run on mount/unmount - facing changes handled by switchCamera
+    // Dependencies intentionally omitted to prevent re-initialization
     useEffect(() => {
-      startCamera(facing)
+      startCamera(initialFacing)
 
       return () => {
         stopCamera()
       }
-      // Only run on mount/unmount - facing changes handled by switchCamera
-    }, [facing, startCamera, stopCamera])
+       
+    }, [])
 
     // Handle tab visibility change - pause/resume when tab loses/gains focus
     useEffect(() => {

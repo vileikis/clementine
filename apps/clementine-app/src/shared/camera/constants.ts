@@ -19,11 +19,17 @@ export const DEFAULT_LABELS: Required<CameraCaptureLabels> = {
   retake: 'Retake',
   confirm: 'Use Photo',
   cancel: 'Cancel',
+  retry: 'Try Again',
   permissionDenied: 'Camera access denied',
   permissionDeniedHint: 'Please enable camera in your browser settings',
+  permissionDismissed: 'Permission request dismissed',
   cameraUnavailable: 'Camera not available',
-  cameraInUse: 'Camera is in use by another application',
+  cameraUnavailableHint: 'You can still upload a photo from your library',
+  cameraInUse: 'Camera is in use',
+  cameraInUseHint: 'Close other apps using the camera and try again',
   captureError: 'Failed to capture photo',
+  invalidFileType: 'Invalid file type',
+  unknownError: 'Something went wrong',
 }
 
 /**
