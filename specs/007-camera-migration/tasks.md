@@ -145,9 +145,9 @@
 
 **Purpose**: Create dev-tools route and page structure
 
-- [ ] T052 [DevTools] Create route file apps/clementine-app/src/routes/admin/dev-tools/camera.tsx
-- [ ] T053 [DevTools] Create dev-tools camera module folder apps/clementine-app/src/domains/dev-tools/camera/
-- [ ] T054 [DevTools] Create barrel export apps/clementine-app/src/domains/dev-tools/camera/index.ts
+- [X] T052 [DevTools] Create route file apps/clementine-app/src/routes/admin/dev-tools/camera.tsx
+- [X] T053 [DevTools] Create dev-tools camera module folder apps/clementine-app/src/domains/dev-tools/camera/
+- [X] T054 [DevTools] Create barrel export apps/clementine-app/src/domains/dev-tools/camera/index.ts
 
 **Checkpoint**: Dev tools route structure ready
 
@@ -159,32 +159,32 @@
 
 ### Column 1: Prop Controls
 
-- [ ] T055 [DevTools] Create PropControls.tsx component in domains/dev-tools/camera/ with Switch for enableLibrary
-- [ ] T056 [DevTools] Add Select for cameraFacing prop (user, environment, both) in PropControls.tsx
-- [ ] T057 [DevTools] Add Select for initialFacing prop (user, environment) in PropControls.tsx
-- [ ] T058 [DevTools] Add Select for aspectRatio prop (none, 3:4, 1:1, 9:16) in PropControls.tsx
-- [ ] T059 [DevTools] Add Reset & Remount button to PropControls.tsx
-- [ ] T060 [DevTools] Implement prop state management and onChange handlers in PropControls.tsx
+- [X] T055 [DevTools] Create PropControls.tsx component in domains/dev-tools/camera/ with Switch for enableLibrary
+- [X] T056 [DevTools] Add Select for cameraFacing prop (user, environment, both) in PropControls.tsx
+- [X] T057 [DevTools] Add Select for initialFacing prop (user, environment) in PropControls.tsx
+- [X] T058 [DevTools] Add Select for aspectRatio prop (none, 3:4, 1:1, 9:16) in PropControls.tsx
+- [X] T059 [DevTools] Add Reset & Remount button to PropControls.tsx
+- [X] T060 [DevTools] Implement prop state management and onChange handlers in PropControls.tsx
 
 ### Column 3: Callback Log
 
-- [ ] T061 [P] [DevTools] Create CallbackLog.tsx component in domains/dev-tools/camera/
-- [ ] T062 [DevTools] Implement timestamp formatting (HH:MM:SS.mmm) in CallbackLog.tsx
-- [ ] T063 [DevTools] Implement payload formatting for CapturedPhoto (method, dimensions, fileName, fileSize) in CallbackLog.tsx
-- [ ] T064 [DevTools] Implement payload formatting for CameraCaptureError (code, message) in CallbackLog.tsx
-- [ ] T065 [DevTools] Add reverse chronological display (newest first) in CallbackLog.tsx
-- [ ] T066 [DevTools] Add Clear log button to CallbackLog.tsx
-- [ ] T067 [DevTools] Add scrollable container for long logs in CallbackLog.tsx
+- [X] T061 [P] [DevTools] Create CallbackLog.tsx component in domains/dev-tools/camera/
+- [X] T062 [DevTools] Implement timestamp formatting (HH:MM:SS.mmm) in CallbackLog.tsx
+- [X] T063 [DevTools] Implement payload formatting for CapturedPhoto (method, dimensions, fileName, fileSize) in CallbackLog.tsx
+- [X] T064 [DevTools] Implement payload formatting for CameraCaptureError (code, message) in CallbackLog.tsx
+- [X] T065 [DevTools] Add reverse chronological display (newest first) in CallbackLog.tsx
+- [X] T066 [DevTools] Add Clear log button to CallbackLog.tsx
+- [X] T067 [DevTools] Add scrollable container for long logs in CallbackLog.tsx
 
 ### Main Page Component
 
-- [ ] T068 [DevTools] Create CameraDevTools.tsx main component in domains/dev-tools/camera/
-- [ ] T069 [DevTools] Implement three-column layout in CameraDevTools.tsx (PropControls, Preview, CallbackLog)
-- [ ] T070 [DevTools] Add mobile viewport container (375×667px) for camera preview in CameraDevTools.tsx
-- [ ] T071 [DevTools] Implement CameraCapture with dynamic props from PropControls in CameraDevTools.tsx
-- [ ] T072 [DevTools] Implement callback handlers (onPhoto, onSubmit, onError, onRetake, onCancel) that log to CallbackLog
-- [ ] T073 [DevTools] Implement reset & remount functionality (key change) in CameraDevTools.tsx
-- [ ] T074 [DevTools] Connect all components in route file routes/admin/dev-tools/camera.tsx
+- [X] T068 [DevTools] Create CameraDevTools.tsx main component in domains/dev-tools/camera/
+- [X] T069 [DevTools] Implement three-column layout in CameraDevTools.tsx (PropControls, Preview, CallbackLog)
+- [X] T070 [DevTools] Add mobile viewport container (375×667px) for camera preview in CameraDevTools.tsx
+- [X] T071 [DevTools] Implement CameraCapture with dynamic props from PropControls in CameraDevTools.tsx
+- [X] T072 [DevTools] Implement callback handlers (onPhoto, onSubmit, onError, onRetake, onCancel) that log to CallbackLog
+- [X] T073 [DevTools] Implement reset & remount functionality (key change) in CameraDevTools.tsx
+- [X] T074 [DevTools] Connect all components in route file routes/admin/dev-tools/camera.tsx
 
 **Checkpoint**: Dev tools interface complete
 
@@ -196,9 +196,9 @@
 
 ### Technical Validation
 
-- [ ] T075 Run pnpm check (format + lint + auto-fix) on dev-tools files
-- [ ] T076 Run pnpm type-check and fix any TypeScript errors in dev-tools
-- [ ] T077 Verify /admin/dev-tools/camera route loads without errors
+- [X] T075 Run pnpm check (format + lint + auto-fix) on dev-tools files
+- [X] T076 Run pnpm type-check and fix any TypeScript errors in dev-tools
+- [X] T077 Verify /admin/dev-tools/camera route loads without errors
 
 ### Functional Verification (Manual Testing)
 
