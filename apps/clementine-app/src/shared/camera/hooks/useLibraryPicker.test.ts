@@ -2,7 +2,7 @@
  * Tests for useLibraryPicker hook
  */
 
-import { describe, expect, it } from 'vitest'
+import { describe, it } from 'vitest'
 
 describe('useLibraryPicker', () => {
   it.todo('should provide open method to trigger file picker')

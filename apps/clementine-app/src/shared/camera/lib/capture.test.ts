@@ -2,7 +2,7 @@
  * Tests for capture utility (Canvas-based photo capture)
  */
 
-import { describe, expect, it } from 'vitest'
+import { describe, it } from 'vitest'
 
 describe('capture utility', () => {
   it.todo('should capture photo from video element using Canvas API')

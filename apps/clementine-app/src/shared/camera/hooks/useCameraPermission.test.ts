@@ -2,7 +2,7 @@
  * Tests for useCameraPermission hook
  */
 
-import { describe, expect, it } from 'vitest'
+import { describe, it } from 'vitest'
 
 describe('useCameraPermission', () => {
   it.todo('should return initial permission state')

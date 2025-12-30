@@ -2,7 +2,7 @@
  * Tests for device utility functions
  */
 
-import { describe, expect, it } from 'vitest'
+import { describe, it } from 'vitest'
 
 describe('device utilities', () => {
   it.todo('should detect MediaDevices API availability')

@@ -2,7 +2,7 @@
  * Tests for CameraControls component
  */
 
-import { describe, expect, it } from 'vitest'
+import { describe, it } from 'vitest'
 
 describe('CameraControls', () => {
   it.todo('should render capture button')

@@ -2,7 +2,7 @@
  * Tests for PhotoReview component
  */
 
-import { describe, expect, it } from 'vitest'
+import { describe, it } from 'vitest'
 
 describe('PhotoReview', () => {
   it.todo('should display captured photo preview')

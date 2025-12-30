@@ -2,7 +2,7 @@
  * Tests for CameraCapture container component
  */
 
-import { describe, expect, it } from 'vitest'
+import { describe, it } from 'vitest'
 
 describe('CameraCapture', () => {
   it.todo('should render permission prompt when permission is undetermined')

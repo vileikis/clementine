@@ -2,7 +2,7 @@
  * Tests for camera state machine reducer
  */
 
-import { describe, expect, it } from 'vitest'
+import { describe, it } from 'vitest'
 
 describe('camera reducer', () => {
   it.todo('should handle permission state transitions')

@@ -2,7 +2,7 @@
  * Tests for CameraView component
  */
 
-import { describe, expect, it } from 'vitest'
+import { describe, it } from 'vitest'
 
 describe('CameraView', () => {
   it.todo('should start camera stream on mount')

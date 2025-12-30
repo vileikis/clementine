@@ -278,7 +278,6 @@ export const CameraView = forwardRef<CameraViewRef, CameraViewProps>(
       return () => {
         stopCamera()
       }
-       
     }, [])
 
     // Handle tab visibility change - pause/resume when tab loses/gains focus
