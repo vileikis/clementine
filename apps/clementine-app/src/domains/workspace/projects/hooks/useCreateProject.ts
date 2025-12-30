@@ -1,8 +1,13 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore'
+import {
+  collection,
+  doc,
+  runTransaction,
+  serverTimestamp,
+} from 'firebase/firestore'
 import { useNavigate } from '@tanstack/react-router'
 import * as Sentry from '@sentry/tanstackstart-react'
-import type { UpdateData } from 'firebase/firestore'
+import type { WithFieldValue } from 'firebase/firestore'
 import type { CreateProjectInput, Project } from '../types'
 import { firestore } from '@/integrations/firebase/client'
 
@@ -21,22 +26,29 @@ export function useCreateProject() {
     mutationFn: async (input: CreateProjectInput) => {
       const projectsRef = collection(firestore, 'projects')
 
-      const newProject: UpdateData<Project> = {
-        name: input.name || 'Untitled project',
-        workspaceId: input.workspaceId,
-        status: 'draft' as const,
-        activeEventId: null,
-        deletedAt: null,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      }
+      // Create project in transaction to ensure server timestamps are applied
+      return await runTransaction(firestore, (transaction) => {
+        const newProjectRef = doc(projectsRef)
 
-      const docRef = await addDoc(projectsRef, newProject)
-      return {
-        projectId: docRef.id,
-        workspaceId: input.workspaceId,
-        workspaceSlug: input.workspaceSlug,
-      }
+        const newProject: WithFieldValue<Project> = {
+          id: newProjectRef.id,
+          name: input.name || 'Untitled project',
+          workspaceId: input.workspaceId,
+          status: 'draft' as const,
+          activeEventId: null,
+          deletedAt: null,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        }
+
+        transaction.set(newProjectRef, newProject)
+
+        return Promise.resolve({
+          projectId: newProjectRef.id,
+          workspaceId: input.workspaceId,
+          workspaceSlug: input.workspaceSlug,
+        })
+      })
     },
     onSuccess: ({ projectId, workspaceId, workspaceSlug }) => {
       // Invalidate projects list
