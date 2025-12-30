@@ -1,20 +1,36 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderHook, waitFor } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { getDocs } from 'firebase/firestore'
 import { useWorkspace } from './useWorkspace'
+
+// Create mock functions using vi.hoisted to avoid hoisting issues
+const { mockGetDocs, mockCollection, mockQuery, mockWhere, mockLimit } =
+  vi.hoisted(() => ({
+    mockGetDocs: vi.fn(),
+    mockCollection: vi.fn(),
+    mockQuery: vi.fn(),
+    mockWhere: vi.fn(),
+    mockLimit: vi.fn(),
+  }))
 
 // Mock Firebase Firestore
 vi.mock('firebase/firestore', () => ({
-  collection: vi.fn(),
-  query: vi.fn(),
-  where: vi.fn(),
-  limit: vi.fn(),
-  getDocs: vi.fn(),
+  collection: mockCollection,
+  query: mockQuery,
+  where: mockWhere,
+  limit: mockLimit,
+  getDocs: mockGetDocs,
 }))
 
 vi.mock('@/integrations/firebase/client', () => ({
   firestore: {},
+}))
+
+vi.mock('@/shared/utils', () => ({
+  convertFirestoreDoc: vi.fn((doc, schema) => {
+    const data = doc.data()
+    return { id: doc.id, ...data }
+  }),
 }))
 
 describe('useWorkspace', () => {
@@ -28,7 +44,12 @@ describe('useWorkspace', () => {
         },
       },
     })
-    vi.clearAllMocks()
+    // Reset all mocks
+    mockGetDocs.mockReset()
+    mockCollection.mockReset()
+    mockQuery.mockReset()
+    mockWhere.mockReset()
+    mockLimit.mockReset()
   })
 
   const wrapper = ({ children }: { children: React.ReactNode }) => (
@@ -36,7 +57,7 @@ describe('useWorkspace', () => {
   )
 
   it('should return null when workspace is not found', async () => {
-    vi.mocked(getDocs).mockResolvedValueOnce({
+    mockGetDocs.mockResolvedValueOnce({
       empty: true,
       docs: [],
     } as any)
@@ -63,7 +84,7 @@ describe('useWorkspace', () => {
       updatedAt: 1234567890,
     }
 
-    vi.mocked(getDocs).mockResolvedValueOnce({
+    mockGetDocs.mockResolvedValueOnce({
       empty: false,
       docs: [
         {
@@ -94,11 +115,11 @@ describe('useWorkspace', () => {
 
     expect(result.current.isPending).toBe(true)
     expect(result.current.fetchStatus).toBe('idle')
-    expect(getDocs).not.toHaveBeenCalled()
+    expect(mockGetDocs).not.toHaveBeenCalled()
   })
 
   it('should normalize slug to lowercase', async () => {
-    vi.mocked(getDocs).mockResolvedValueOnce({
+    mockGetDocs.mockResolvedValueOnce({
       empty: true,
       docs: [],
     } as any)
@@ -106,7 +127,7 @@ describe('useWorkspace', () => {
     renderHook(() => useWorkspace('ACME-CORP'), { wrapper })
 
     await waitFor(() => {
-      expect(getDocs).toHaveBeenCalled()
+      expect(mockGetDocs).toHaveBeenCalled()
     })
 
     // Query key should have lowercase slug
@@ -126,7 +147,7 @@ describe('useWorkspace', () => {
       updatedAt: 1234567890,
     }
 
-    vi.mocked(getDocs).mockResolvedValueOnce({
+    mockGetDocs.mockResolvedValueOnce({
       empty: false,
       docs: [
         {
@@ -151,12 +172,12 @@ describe('useWorkspace', () => {
       expect(result.current.isSuccess).toBe(true)
     })
 
-    expect(getDocs).toHaveBeenCalledTimes(1)
+    expect(mockGetDocs).toHaveBeenCalledTimes(1)
 
     // Rerender should not trigger new fetch (cached)
     rerender()
 
-    expect(getDocs).toHaveBeenCalledTimes(1)
+    expect(mockGetDocs).toHaveBeenCalledTimes(1)
     expect(result.current.data).toEqual(mockWorkspace)
   })
 })
