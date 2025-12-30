@@ -16,7 +16,7 @@ Migrate the camera module from Next.js (`web/src/features/camera/`) to TanStack 
 - React 19.2 (hooks: useState, useReducer, useCallback, useMemo, useEffect, useRef)
 - TanStack Start 1.132 (SSR framework)
 - lucide-react v0.561.0 (icons)
-- shadcn/ui (Button, Switch, Select, Label components)
+- shadcn/ui components from @/ui-kit/components (flat structure): button, switch, select, label
 - Browser APIs: MediaDevices, Canvas, Blob/File, URL.createObjectURL
 
 **Storage**: N/A (client-only module, no database integration)
@@ -418,10 +418,12 @@ type CameraCaptureErrorCode =
 
 **Changes Required**:
 - `@/lib/utils` → `@/shared/utils`
-- `@/components/ui/button` → `@/ui-kit/components/button`
+- `@/components/ui/button` → `@/ui-kit/components/button` (ui-kit uses flat structure, no nested folders)
 - `next/image` → `<img>` (for blob URL previews)
 - Move `CameraCapture.tsx` → `containers/` folder
 - Remove all `"use client"` directives (Next.js artifact)
+
+**Note**: Camera module components stay in `shared/camera/components/` (feature components, NOT ui-kit components)
 
 **Validation**: `pnpm type-check` passes
 

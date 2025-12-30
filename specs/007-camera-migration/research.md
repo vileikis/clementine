@@ -112,6 +112,8 @@ Dev-tools testing interface requires Switch, Select, and Label components. Need 
 
 ### Findings
 
+**UI-Kit Structure**: The ui-kit uses a **flat component structure** - all components are in `apps/clementine-app/src/ui-kit/components/` with no nested folders.
+
 #### Switch Component ✅
 
 - **Location**: `apps/clementine-app/src/ui-kit/components/switch.tsx`
