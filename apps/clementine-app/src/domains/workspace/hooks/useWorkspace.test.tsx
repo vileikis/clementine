@@ -27,7 +27,7 @@ vi.mock('@/integrations/firebase/client', () => ({
 }))
 
 vi.mock('@/shared/utils', () => ({
-  convertFirestoreDoc: vi.fn((doc, _schema) => {
+  convertFirestoreDoc: vi.fn((doc) => {
     const data = doc.data()
     return { id: doc.id, ...data }
   }),

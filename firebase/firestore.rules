@@ -30,6 +30,18 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // Projects collection rules
+    match /projects/{projectId} {
+      // Admins have full access to workspaces
+      allow read, create, update: if isAdmin();
+
+      // READ: Allow all authenticated users to read non-deleted projects
+      allow read: if isAnyUser() && resource.data.status != 'deleted';
+
+      // DELETE: Forbidden - use soft delete (status='deleted')
+      allow delete: if false;
+    }
+
     // Admin users: Full access to everything
     // Non-admin users: Will be handled later (currently deny all writes, allow reads)
     match /{document=**} {

@@ -25,10 +25,17 @@ import { Route as AdminDevToolsRouteRouteImport } from './app/admin/dev-tools/ro
 import { Route as WorkspaceWorkspaceSlugIndexRouteImport } from './app/workspace/$workspaceSlug.index'
 import { Route as AdminWorkspacesIndexRouteImport } from './app/admin/workspaces/index'
 import { Route as WorkspaceWorkspaceSlugSettingsRouteImport } from './app/workspace/$workspaceSlug.settings'
-import { Route as WorkspaceWorkspaceSlugProjectsRouteImport } from './app/workspace/$workspaceSlug.projects'
 import { Route as AdminWorkspacesCreateRouteImport } from './app/admin/workspaces/create'
 import { Route as AdminDevToolsPreviewShellRouteImport } from './app/admin/dev-tools/preview-shell'
 import { Route as AdminDevToolsCameraRouteImport } from './app/admin/dev-tools/camera'
+import { Route as WorkspaceWorkspaceSlugProjectsIndexRouteImport } from './app/workspace/$workspaceSlug.projects/index'
+import { Route as WorkspaceWorkspaceSlugProjectsProjectIdRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId'
+import { Route as WorkspaceWorkspaceSlugProjectsProjectIdIndexRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId.index'
+import { Route as WorkspaceWorkspaceSlugProjectsProjectIdEventsIndexRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId.events/index'
+import { Route as WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId.events/$eventId'
+import { Route as WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdIndexRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId.events/$eventId.index'
+import { Route as WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdWelcomeRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId.events/$eventId.welcome'
+import { Route as WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdThemeRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId.events/$eventId.theme'
 
 const LogoutRoute = LogoutRouteImport.update({
   id: '/logout',
@@ -112,12 +119,6 @@ const WorkspaceWorkspaceSlugSettingsRoute =
     path: '/settings',
     getParentRoute: () => WorkspaceWorkspaceSlugRoute,
   } as any)
-const WorkspaceWorkspaceSlugProjectsRoute =
-  WorkspaceWorkspaceSlugProjectsRouteImport.update({
-    id: '/projects',
-    path: '/projects',
-    getParentRoute: () => WorkspaceWorkspaceSlugRoute,
-  } as any)
 const AdminWorkspacesCreateRoute = AdminWorkspacesCreateRouteImport.update({
   id: '/workspaces/create',
   path: '/workspaces/create',
@@ -134,6 +135,59 @@ const AdminDevToolsCameraRoute = AdminDevToolsCameraRouteImport.update({
   path: '/camera',
   getParentRoute: () => AdminDevToolsRouteRoute,
 } as any)
+const WorkspaceWorkspaceSlugProjectsIndexRoute =
+  WorkspaceWorkspaceSlugProjectsIndexRouteImport.update({
+    id: '/projects/',
+    path: '/projects/',
+    getParentRoute: () => WorkspaceWorkspaceSlugRoute,
+  } as any)
+const WorkspaceWorkspaceSlugProjectsProjectIdRoute =
+  WorkspaceWorkspaceSlugProjectsProjectIdRouteImport.update({
+    id: '/projects/$projectId',
+    path: '/projects/$projectId',
+    getParentRoute: () => WorkspaceWorkspaceSlugRoute,
+  } as any)
+const WorkspaceWorkspaceSlugProjectsProjectIdIndexRoute =
+  WorkspaceWorkspaceSlugProjectsProjectIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => WorkspaceWorkspaceSlugProjectsProjectIdRoute,
+  } as any)
+const WorkspaceWorkspaceSlugProjectsProjectIdEventsIndexRoute =
+  WorkspaceWorkspaceSlugProjectsProjectIdEventsIndexRouteImport.update({
+    id: '/events/',
+    path: '/events/',
+    getParentRoute: () => WorkspaceWorkspaceSlugProjectsProjectIdRoute,
+  } as any)
+const WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdRoute =
+  WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdRouteImport.update({
+    id: '/events/$eventId',
+    path: '/events/$eventId',
+    getParentRoute: () => WorkspaceWorkspaceSlugProjectsProjectIdRoute,
+  } as any)
+const WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdIndexRoute =
+  WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () =>
+      WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdRoute,
+  } as any)
+const WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdWelcomeRoute =
+  WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdWelcomeRouteImport.update(
+    {
+      id: '/welcome',
+      path: '/welcome',
+      getParentRoute: () =>
+        WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdRoute,
+    } as any,
+  )
+const WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdThemeRoute =
+  WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdThemeRouteImport.update({
+    id: '/theme',
+    path: '/theme',
+    getParentRoute: () =>
+      WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -152,10 +206,17 @@ export interface FileRoutesByFullPath {
   '/admin/dev-tools/camera': typeof AdminDevToolsCameraRoute
   '/admin/dev-tools/preview-shell': typeof AdminDevToolsPreviewShellRoute
   '/admin/workspaces/create': typeof AdminWorkspacesCreateRoute
-  '/workspace/$workspaceSlug/projects': typeof WorkspaceWorkspaceSlugProjectsRoute
   '/workspace/$workspaceSlug/settings': typeof WorkspaceWorkspaceSlugSettingsRoute
   '/admin/workspaces': typeof AdminWorkspacesIndexRoute
   '/workspace/$workspaceSlug/': typeof WorkspaceWorkspaceSlugIndexRoute
+  '/workspace/$workspaceSlug/projects/$projectId': typeof WorkspaceWorkspaceSlugProjectsProjectIdRouteWithChildren
+  '/workspace/$workspaceSlug/projects': typeof WorkspaceWorkspaceSlugProjectsIndexRoute
+  '/workspace/$workspaceSlug/projects/$projectId/': typeof WorkspaceWorkspaceSlugProjectsProjectIdIndexRoute
+  '/workspace/$workspaceSlug/projects/$projectId/events/$eventId': typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdRouteWithChildren
+  '/workspace/$workspaceSlug/projects/$projectId/events': typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsIndexRoute
+  '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/theme': typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdThemeRoute
+  '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/welcome': typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdWelcomeRoute
+  '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/': typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -170,10 +231,15 @@ export interface FileRoutesByTo {
   '/admin/dev-tools/camera': typeof AdminDevToolsCameraRoute
   '/admin/dev-tools/preview-shell': typeof AdminDevToolsPreviewShellRoute
   '/admin/workspaces/create': typeof AdminWorkspacesCreateRoute
-  '/workspace/$workspaceSlug/projects': typeof WorkspaceWorkspaceSlugProjectsRoute
   '/workspace/$workspaceSlug/settings': typeof WorkspaceWorkspaceSlugSettingsRoute
   '/admin/workspaces': typeof AdminWorkspacesIndexRoute
   '/workspace/$workspaceSlug': typeof WorkspaceWorkspaceSlugIndexRoute
+  '/workspace/$workspaceSlug/projects': typeof WorkspaceWorkspaceSlugProjectsIndexRoute
+  '/workspace/$workspaceSlug/projects/$projectId': typeof WorkspaceWorkspaceSlugProjectsProjectIdIndexRoute
+  '/workspace/$workspaceSlug/projects/$projectId/events': typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsIndexRoute
+  '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/theme': typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdThemeRoute
+  '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/welcome': typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdWelcomeRoute
+  '/workspace/$workspaceSlug/projects/$projectId/events/$eventId': typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -193,10 +259,17 @@ export interface FileRoutesById {
   '/admin/dev-tools/camera': typeof AdminDevToolsCameraRoute
   '/admin/dev-tools/preview-shell': typeof AdminDevToolsPreviewShellRoute
   '/admin/workspaces/create': typeof AdminWorkspacesCreateRoute
-  '/workspace/$workspaceSlug/projects': typeof WorkspaceWorkspaceSlugProjectsRoute
   '/workspace/$workspaceSlug/settings': typeof WorkspaceWorkspaceSlugSettingsRoute
   '/admin/workspaces/': typeof AdminWorkspacesIndexRoute
   '/workspace/$workspaceSlug/': typeof WorkspaceWorkspaceSlugIndexRoute
+  '/workspace/$workspaceSlug/projects/$projectId': typeof WorkspaceWorkspaceSlugProjectsProjectIdRouteWithChildren
+  '/workspace/$workspaceSlug/projects/': typeof WorkspaceWorkspaceSlugProjectsIndexRoute
+  '/workspace/$workspaceSlug/projects/$projectId/': typeof WorkspaceWorkspaceSlugProjectsProjectIdIndexRoute
+  '/workspace/$workspaceSlug/projects/$projectId/events/$eventId': typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdRouteWithChildren
+  '/workspace/$workspaceSlug/projects/$projectId/events/': typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsIndexRoute
+  '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/theme': typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdThemeRoute
+  '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/welcome': typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdWelcomeRoute
+  '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/': typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -217,10 +290,17 @@ export interface FileRouteTypes {
     | '/admin/dev-tools/camera'
     | '/admin/dev-tools/preview-shell'
     | '/admin/workspaces/create'
-    | '/workspace/$workspaceSlug/projects'
     | '/workspace/$workspaceSlug/settings'
     | '/admin/workspaces'
     | '/workspace/$workspaceSlug/'
+    | '/workspace/$workspaceSlug/projects/$projectId'
+    | '/workspace/$workspaceSlug/projects'
+    | '/workspace/$workspaceSlug/projects/$projectId/'
+    | '/workspace/$workspaceSlug/projects/$projectId/events/$eventId'
+    | '/workspace/$workspaceSlug/projects/$projectId/events'
+    | '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/theme'
+    | '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/welcome'
+    | '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -235,10 +315,15 @@ export interface FileRouteTypes {
     | '/admin/dev-tools/camera'
     | '/admin/dev-tools/preview-shell'
     | '/admin/workspaces/create'
-    | '/workspace/$workspaceSlug/projects'
     | '/workspace/$workspaceSlug/settings'
     | '/admin/workspaces'
     | '/workspace/$workspaceSlug'
+    | '/workspace/$workspaceSlug/projects'
+    | '/workspace/$workspaceSlug/projects/$projectId'
+    | '/workspace/$workspaceSlug/projects/$projectId/events'
+    | '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/theme'
+    | '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/welcome'
+    | '/workspace/$workspaceSlug/projects/$projectId/events/$eventId'
   id:
     | '__root__'
     | '/'
@@ -257,10 +342,17 @@ export interface FileRouteTypes {
     | '/admin/dev-tools/camera'
     | '/admin/dev-tools/preview-shell'
     | '/admin/workspaces/create'
-    | '/workspace/$workspaceSlug/projects'
     | '/workspace/$workspaceSlug/settings'
     | '/admin/workspaces/'
     | '/workspace/$workspaceSlug/'
+    | '/workspace/$workspaceSlug/projects/$projectId'
+    | '/workspace/$workspaceSlug/projects/'
+    | '/workspace/$workspaceSlug/projects/$projectId/'
+    | '/workspace/$workspaceSlug/projects/$projectId/events/$eventId'
+    | '/workspace/$workspaceSlug/projects/$projectId/events/'
+    | '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/theme'
+    | '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/welcome'
+    | '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -387,13 +479,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkspaceWorkspaceSlugSettingsRouteImport
       parentRoute: typeof WorkspaceWorkspaceSlugRoute
     }
-    '/workspace/$workspaceSlug/projects': {
-      id: '/workspace/$workspaceSlug/projects'
-      path: '/projects'
-      fullPath: '/workspace/$workspaceSlug/projects'
-      preLoaderRoute: typeof WorkspaceWorkspaceSlugProjectsRouteImport
-      parentRoute: typeof WorkspaceWorkspaceSlugRoute
-    }
     '/admin/workspaces/create': {
       id: '/admin/workspaces/create'
       path: '/workspaces/create'
@@ -414,6 +499,62 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/dev-tools/camera'
       preLoaderRoute: typeof AdminDevToolsCameraRouteImport
       parentRoute: typeof AdminDevToolsRouteRoute
+    }
+    '/workspace/$workspaceSlug/projects/': {
+      id: '/workspace/$workspaceSlug/projects/'
+      path: '/projects'
+      fullPath: '/workspace/$workspaceSlug/projects'
+      preLoaderRoute: typeof WorkspaceWorkspaceSlugProjectsIndexRouteImport
+      parentRoute: typeof WorkspaceWorkspaceSlugRoute
+    }
+    '/workspace/$workspaceSlug/projects/$projectId': {
+      id: '/workspace/$workspaceSlug/projects/$projectId'
+      path: '/projects/$projectId'
+      fullPath: '/workspace/$workspaceSlug/projects/$projectId'
+      preLoaderRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdRouteImport
+      parentRoute: typeof WorkspaceWorkspaceSlugRoute
+    }
+    '/workspace/$workspaceSlug/projects/$projectId/': {
+      id: '/workspace/$workspaceSlug/projects/$projectId/'
+      path: '/'
+      fullPath: '/workspace/$workspaceSlug/projects/$projectId/'
+      preLoaderRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdIndexRouteImport
+      parentRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdRoute
+    }
+    '/workspace/$workspaceSlug/projects/$projectId/events/': {
+      id: '/workspace/$workspaceSlug/projects/$projectId/events/'
+      path: '/events'
+      fullPath: '/workspace/$workspaceSlug/projects/$projectId/events'
+      preLoaderRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsIndexRouteImport
+      parentRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdRoute
+    }
+    '/workspace/$workspaceSlug/projects/$projectId/events/$eventId': {
+      id: '/workspace/$workspaceSlug/projects/$projectId/events/$eventId'
+      path: '/events/$eventId'
+      fullPath: '/workspace/$workspaceSlug/projects/$projectId/events/$eventId'
+      preLoaderRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdRouteImport
+      parentRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdRoute
+    }
+    '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/': {
+      id: '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/'
+      path: '/'
+      fullPath: '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/'
+      preLoaderRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdIndexRouteImport
+      parentRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdRoute
+    }
+    '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/welcome': {
+      id: '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/welcome'
+      path: '/welcome'
+      fullPath: '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/welcome'
+      preLoaderRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdWelcomeRouteImport
+      parentRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdRoute
+    }
+    '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/theme': {
+      id: '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/theme'
+      path: '/theme'
+      fullPath: '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/theme'
+      preLoaderRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdThemeRouteImport
+      parentRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdRoute
     }
   }
 }
@@ -463,17 +604,63 @@ const GuestRouteRouteWithChildren = GuestRouteRoute._addFileChildren(
   GuestRouteRouteChildren,
 )
 
+interface WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdRouteChildren {
+  WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdThemeRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdThemeRoute
+  WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdWelcomeRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdWelcomeRoute
+  WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdIndexRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdIndexRoute
+}
+
+const WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdRouteChildren: WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdRouteChildren =
+  {
+    WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdThemeRoute:
+      WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdThemeRoute,
+    WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdWelcomeRoute:
+      WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdWelcomeRoute,
+    WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdIndexRoute:
+      WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdIndexRoute,
+  }
+
+const WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdRouteWithChildren =
+  WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdRoute._addFileChildren(
+    WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdRouteChildren,
+  )
+
+interface WorkspaceWorkspaceSlugProjectsProjectIdRouteChildren {
+  WorkspaceWorkspaceSlugProjectsProjectIdIndexRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdIndexRoute
+  WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdRouteWithChildren
+  WorkspaceWorkspaceSlugProjectsProjectIdEventsIndexRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsIndexRoute
+}
+
+const WorkspaceWorkspaceSlugProjectsProjectIdRouteChildren: WorkspaceWorkspaceSlugProjectsProjectIdRouteChildren =
+  {
+    WorkspaceWorkspaceSlugProjectsProjectIdIndexRoute:
+      WorkspaceWorkspaceSlugProjectsProjectIdIndexRoute,
+    WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdRoute:
+      WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdRouteWithChildren,
+    WorkspaceWorkspaceSlugProjectsProjectIdEventsIndexRoute:
+      WorkspaceWorkspaceSlugProjectsProjectIdEventsIndexRoute,
+  }
+
+const WorkspaceWorkspaceSlugProjectsProjectIdRouteWithChildren =
+  WorkspaceWorkspaceSlugProjectsProjectIdRoute._addFileChildren(
+    WorkspaceWorkspaceSlugProjectsProjectIdRouteChildren,
+  )
+
 interface WorkspaceWorkspaceSlugRouteChildren {
-  WorkspaceWorkspaceSlugProjectsRoute: typeof WorkspaceWorkspaceSlugProjectsRoute
   WorkspaceWorkspaceSlugSettingsRoute: typeof WorkspaceWorkspaceSlugSettingsRoute
   WorkspaceWorkspaceSlugIndexRoute: typeof WorkspaceWorkspaceSlugIndexRoute
+  WorkspaceWorkspaceSlugProjectsProjectIdRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdRouteWithChildren
+  WorkspaceWorkspaceSlugProjectsIndexRoute: typeof WorkspaceWorkspaceSlugProjectsIndexRoute
 }
 
 const WorkspaceWorkspaceSlugRouteChildren: WorkspaceWorkspaceSlugRouteChildren =
   {
-    WorkspaceWorkspaceSlugProjectsRoute: WorkspaceWorkspaceSlugProjectsRoute,
     WorkspaceWorkspaceSlugSettingsRoute: WorkspaceWorkspaceSlugSettingsRoute,
     WorkspaceWorkspaceSlugIndexRoute: WorkspaceWorkspaceSlugIndexRoute,
+    WorkspaceWorkspaceSlugProjectsProjectIdRoute:
+      WorkspaceWorkspaceSlugProjectsProjectIdRouteWithChildren,
+    WorkspaceWorkspaceSlugProjectsIndexRoute:
+      WorkspaceWorkspaceSlugProjectsIndexRoute,
   }
 
 const WorkspaceWorkspaceSlugRouteWithChildren =
