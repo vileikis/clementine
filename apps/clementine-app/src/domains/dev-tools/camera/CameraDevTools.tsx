@@ -44,7 +44,7 @@ export function CameraDevTools() {
   return (
     <div className="flex overflow-hidden">
       {/* Column 1: Prop Controls */}
-      <div className="flex w-80 flex-shrink-0 flex-col overflow-y-auto">
+      <div className="flex w-64 shrink-0 flex-col overflow-y-auto">
         <CameraPropControls
           config={config}
           onConfigChange={setConfig}
@@ -53,9 +53,9 @@ export function CameraDevTools() {
       </div>
 
       {/* Column 2: Camera Preview (Mobile Viewport) */}
-      <div className="flex flex-1 items-center justify-center overflow-y-auto bg-muted/10 p-8">
+      <div className="flex flex-1 items-center justify-center overflow-y-auto bg-muted/10 p-4">
         <div className="flex flex-col items-center">
-          <div className="mb-4">
+          <div className="mb-3">
             <h3 className="text-sm font-medium text-muted-foreground">
               Mobile Preview (375×667px)
             </h3>
@@ -93,7 +93,7 @@ export function CameraDevTools() {
       </div>
 
       {/* Column 3: Callback Log */}
-      <div className="flex w-96 flex-shrink-0 flex-col overflow-y-auto">
+      <div className="flex w-80 shrink-0 flex-col overflow-y-auto">
         <CallbackLog events={events} onClear={handleClearLog} />
       </div>
     </div>
