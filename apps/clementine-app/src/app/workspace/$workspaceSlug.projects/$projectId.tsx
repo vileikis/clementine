@@ -1,4 +1,4 @@
-import { createFileRoute, notFound, Outlet } from '@tanstack/react-router'
+import { Outlet, createFileRoute, notFound } from '@tanstack/react-router'
 import { doc, getDoc } from 'firebase/firestore'
 import { projectSchema } from '@/domains/workspace/projects/schemas'
 import { firestore } from '@/integrations/firebase/client'

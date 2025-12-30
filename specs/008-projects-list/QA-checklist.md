@@ -89,48 +89,48 @@
 
 ### TC3.1: List Display - Basic
 
-- [ ] Ensure you have 3-5 projects in workspace
-- [ ] Navigate to `/workspace/[workspaceSlug]/projects`
-- [ ] **Expected**: All active projects display in cards
-- [ ] **Expected**: Each card shows project name
-- [ ] **Expected**: Each card shows status badge (draft/live)
-- [ ] **Expected**: Draft status badge has "secondary" variant styling
-- [ ] **Expected**: Live status badge has "default" variant styling
-- [ ] **Expected**: Each card has delete button (trash icon)
+- [x] Ensure you have 3-5 projects in workspace
+- [x] Navigate to `/workspace/[workspaceSlug]/projects`
+- [x] **Expected**: All active projects display in cards
+- [x] **Expected**: Each card shows project name
+- [x] **Expected**: Each card shows status badge (draft/live)
+- [x] **Expected**: Draft status badge has "secondary" variant styling
+- [x] **Expected**: Live status badge has "default" variant styling
+- [x] **Expected**: Each card has delete button (trash icon)
 
 ### TC3.2: List Display - Sorting
 
-- [ ] Check order of projects in list
-- [ ] **Expected**: Projects sorted by creation date descending (newest first)
-- [ ] Create a new project
-- [ ] Navigate back to list
-- [ ] **Expected**: New project appears at top of list
+- [x] Check order of projects in list
+- [x] **Expected**: Projects sorted by creation date descending (newest first)
+- [x] Create a new project
+- [x] Navigate back to list
+- [x] **Expected**: New project appears at top of list
 
 ### TC3.3: List Display - Real-time Updates
 
-- [ ] Open projects list in Browser Tab 1
-- [ ] Open Firebase Console in Browser Tab 2
-- [ ] In Firebase Console, manually update a project's name
-- [ ] Switch back to Tab 1 (projects list)
-- [ ] **Expected**: Project name updates in real-time (no page refresh needed)
+- [x] Open projects list in Browser Tab 1
+- [x] Open Firebase Console in Browser Tab 2
+- [x] In Firebase Console, manually update a project's name
+- [x] Switch back to Tab 1 (projects list)
+- [x] **Expected**: Project name updates in real-time (no page refresh needed)
 - [ ] **Expected**: Update happens within 1-2 seconds
 
 ### TC3.4: List Display - Performance
 
-- [ ] Create 20+ projects (use Firestore console for speed)
-- [ ] Reload projects list page
-- [ ] **Expected**: Page loads in < 2 seconds
-- [ ] **Expected**: All projects render correctly
-- [ ] **Expected**: No layout shift or flickering
-- [ ] **Expected**: Smooth scrolling
+- [x] Create 20+ projects (use Firestore console for speed)
+- [x] Reload projects list page
+- [x] **Expected**: Page loads in < 2 seconds
+- [x] **Expected**: All projects render correctly
+- [x] **Expected**: No layout shift or flickering
+- [x] **Expected**: Smooth scrolling
 
 ### TC3.5: Loading State
 
-- [ ] Clear browser cache
-- [ ] Navigate to projects list
-- [ ] **Expected**: Loading skeletons display while fetching
-- [ ] **Expected**: Skeletons have same layout as actual cards
-- [ ] **Expected**: Transition from loading to content is smooth
+- [x] Clear browser cache
+- [x] Navigate to projects list
+- [x] **Expected**: Loading skeletons display while fetching
+- [x] **Expected**: Skeletons have same layout as actual cards
+- [x] **Expected**: Transition from loading to content is smooth
 
 ---
 
@@ -140,39 +140,39 @@
 
 ### TC4.1: Delete Confirmation Dialog
 
-- [ ] Click delete button (trash icon) on any project
-- [ ] **Expected**: Confirmation dialog appears
-- [ ] **Expected**: Dialog title is "Delete Project"
-- [ ] **Expected**: Dialog message includes project name
-- [ ] **Expected**: "Cancel" button is visible
-- [ ] **Expected**: "Delete" button is visible with destructive styling (red)
+- [x] Click delete button (trash icon) on any project
+- [x] **Expected**: Confirmation dialog appears
+- [x] **Expected**: Dialog title is "Delete Project"
+- [x] **Expected**: Dialog message includes project name
+- [x] **Expected**: "Cancel" button is visible
+- [x] **Expected**: "Delete" button is visible with destructive styling (red)
 
 ### TC4.2: Cancel Deletion
 
-- [ ] Open delete dialog for a project
-- [ ] Click "Cancel" button
-- [ ] **Expected**: Dialog closes
-- [ ] **Expected**: Project remains in list
-- [ ] **Expected**: Project still exists in Firestore
-- [ ] Click delete button again
-- [ ] Click outside dialog (backdrop)
-- [ ] **Expected**: Dialog closes
-- [ ] **Expected**: Project remains in list
+- [x] Open delete dialog for a project
+- [x] Click "Cancel" button
+- [x] **Expected**: Dialog closes
+- [x] **Expected**: Project remains in list
+- [x] **Expected**: Project still exists in Firestore
+- [x] Click delete button again
+- [x] Click outside dialog (backdrop)
+- [x] **Expected**: Dialog closes
+- [x] **Expected**: Project remains in list
 
 ### TC4.3: Confirm Deletion
 
-- [ ] Note the project ID before deletion
-- [ ] Open delete dialog for a project
-- [ ] Click "Delete" button
-- [ ] **Expected**: Button shows "Deleting..." text while processing
-- [ ] **Expected**: Button is disabled during deletion
-- [ ] **Expected**: Dialog closes after successful deletion
-- [ ] **Expected**: Project disappears from list immediately
-- [ ] **Expected**: Real-time update (no page reload needed)
-- [ ] Check Firestore
-- [ ] **Expected**: Project document has `status: "deleted"`
-- [ ] **Expected**: Project document has `deletedAt` timestamp
-- [ ] **Expected**: Project document has updated `updatedAt` timestamp
+- [x] Note the project ID before deletion
+- [x] Open delete dialog for a project
+- [x] Click "Delete" button
+- [x] **Expected**: Button shows "Deleting..." text while processing
+- [x] **Expected**: Button is disabled during deletion
+- [x] **Expected**: Dialog closes after successful deletion
+- [x] **Expected**: Project disappears from list immediately
+- [x] **Expected**: Real-time update (no page reload needed)
+- [x] Check Firestore
+- [x] **Expected**: Project document has `status: "deleted"`
+- [x] **Expected**: Project document has `deletedAt` timestamp
+- [x] **Expected**: Project document has updated `updatedAt` timestamp
 
 ### TC4.4: Delete Project - 404 on Direct Access
 
