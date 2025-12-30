@@ -2,7 +2,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore'
 import { useNavigate } from '@tanstack/react-router'
 import * as Sentry from '@sentry/tanstackstart-react'
-import type { CreateProjectInput } from '../types'
+import type { UpdateData } from 'firebase/firestore'
+import type { CreateProjectInput, Project } from '../types'
 import { firestore } from '@/integrations/firebase/client'
 
 /**
@@ -20,7 +21,7 @@ export function useCreateProject() {
     mutationFn: async (input: CreateProjectInput) => {
       const projectsRef = collection(firestore, 'projects')
 
-      const newProject = {
+      const newProject: UpdateData<Project> = {
         name: input.name || 'Untitled project',
         workspaceId: input.workspaceId,
         status: 'draft' as const,
