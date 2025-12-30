@@ -317,6 +317,8 @@ See individual workspace documentation for required environment variables.
 - Firebase Firestore (NoSQL database), Firebase Storage (media), localStorage (browser session persistence) (004-workspace-view)
 - TypeScript 5.7 (strict mode) + React 19.2, Zod v4.1.12, Tailwind CSS v4, TanStack Start 1.132 (006-theming-migration)
 - N/A (theming module is client-only, data comes from Firestore but is handled by domain features) (006-theming-migration)
+- TypeScript 5.7 (strict mode) + TanStack Start 1.132, React 19.2, Firebase SDK (Firestore, Auth), TanStack Router 1.132, TanStack Query 5.66, Zod 4.1, shadcn/ui, Radix UI, Tailwind CSS 4 (008-projects-list)
+- Firebase Firestore (NoSQL database), Firebase Storage (media files) (008-projects-list)
 
 ## Recent Changes
 - 001-base-nav: Added TypeScript 5.7 (strict mode)
