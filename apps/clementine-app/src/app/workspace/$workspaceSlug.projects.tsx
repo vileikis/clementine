@@ -1,27 +1,14 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { ProjectsPage } from '@/domains/workspace/projects'
+import { Outlet, createFileRoute } from '@tanstack/react-router'
 
 /**
- * Projects list page route
+ * Projects layout route
  *
  * Route: /workspace/:workspaceSlug/projects
  * Access: Admin only (enforced by parent route requireAdmin guard)
  *
- * Lists all active projects in the workspace with create/delete actions.
+ * Layout route for projects - renders child routes (index for list, $projectId for details).
  * Workspace context is maintained via parent route.
  */
 export const Route = createFileRoute('/workspace/$workspaceSlug/projects')({
-  component: ProjectsPageRoute,
+  component: Outlet,
 })
-
-function ProjectsPageRoute() {
-  const { workspaceSlug } = Route.useParams()
-
-  // TODO: Get actual workspaceId from workspace context/loader
-  // For now, using workspaceSlug as workspaceId (temporary)
-  const workspaceId = workspaceSlug
-
-  return (
-    <ProjectsPage workspaceId={workspaceId} workspaceSlug={workspaceSlug} />
-  )
-}
