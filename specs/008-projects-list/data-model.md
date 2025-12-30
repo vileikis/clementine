@@ -213,7 +213,7 @@ export const deleteProjectInputSchema = z.object({
 
 Projects are secured at the database level via Firestore security rules. All operations enforce workspace-scoped access control.
 
-**Rules Pattern** (to be added to `firestore.rules`):
+**Rules Pattern** (to be added to `firebase/firestore.rules` at monorepo root):
 
 ```javascript
 // Projects collection rules

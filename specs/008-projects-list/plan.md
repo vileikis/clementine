@@ -85,7 +85,7 @@ Enable workspace admins to view, create, access, and soft-delete projects within
 **Status**: PASS - Client SDK only, security enforced via Firestore rules
 
 ### Principle VIII: Project Structure ✅
-- Vertical slice architecture: `domains/admin/projects/` domain module
+- Vertical slice architecture: `domains/workspace/projects/` domain module (workspace-scoped, not admin-scoped)
 - Organized by technical concern (components/, hooks/, containers/, types/, schemas/)
 - Explicit file naming: `[domain].[purpose].[ext]` pattern
 - Barrel exports in every folder
@@ -114,8 +114,8 @@ specs/[###-feature]/
 ```text
 apps/clementine-app/src/
 ├── domains/
-│   └── admin/
-│       └── projects/                    # New feature domain module
+│   └── workspace/
+│       └── projects/                    # New feature domain module (workspace-scoped)
 │           ├── components/              # UI components (ProjectListItem, DeleteProjectDialog)
 │           │   ├── index.ts
 │           │   ├── ProjectListItem.tsx
@@ -145,11 +145,16 @@ apps/clementine-app/src/
 │
 └── integrations/
     └── firebase/
-        ├── client.ts                    # Firestore client (existing, no changes)
-        └── firestore.rules              # Security rules (updated for projects collection)
+        └── client.ts                    # Firestore client (existing, no changes)
+
+firebase/                                # Monorepo root (outside apps/clementine-app/)
+├── firestore.rules                      # Security rules (updated for projects collection)
+└── firestore.indexes.json               # Indexes (updated for projects queries)
 ```
 
-**Structure Decision**: Feature follows vertical slice architecture within `domains/admin/projects/`. Routes in `app/workspace/` import containers from the domain module. All business logic, hooks, and components are co-located in the domain module following DDD principles. Security enforced via Firestore rules, not server code (client-first architecture).
+**Structure Decision**: Feature follows vertical slice architecture within `domains/workspace/projects/` (workspace-scoped domain, not admin domain). Routes in `app/workspace/` import containers from the domain module. All business logic, hooks, and components are co-located in the domain module following DDD principles. Security enforced via Firestore rules (monorepo root level), not server code (client-first architecture).
+
+**Reference Pattern**: Use `domains/admin/workspace/` as reference for hooks structure (useWorkspaces, useDeleteWorkspace) and component patterns (WorkspaceListItem, DeleteWorkspaceDialog, WorkspaceListEmpty).
 
 ## Complexity Tracking
 
@@ -181,7 +186,7 @@ After completing Phase 0 (Research) and Phase 1 (Design), all design artifacts h
 - No violations introduced during design phase
 
 **Principle II: Clean Code & Simplicity** ✅ PASS
-- Vertical slice architecture maintained (domains/admin/projects/)
+- Vertical slice architecture maintained (domains/workspace/projects/)
 - No premature abstractions introduced
 - Each component/hook has single responsibility
 - No violations introduced during design phase

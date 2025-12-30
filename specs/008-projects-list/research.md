@@ -8,6 +8,10 @@
 
 This document consolidates research findings from analyzing the existing Clementine codebase to inform the Projects feature implementation. Research focused on establishing patterns, best practices, and architectural decisions.
 
+**Primary Reference Pattern**: `domains/admin/workspace/` (useWorkspaces, useDeleteWorkspace, useCreateWorkspace, WorkspaceListItem, DeleteWorkspaceDialog, WorkspaceListEmpty)
+
+**Implementation Location**: `domains/workspace/projects/` (workspace-scoped domain module)
+
 ## 1. Firestore Collection Design
 
 ### Research Question

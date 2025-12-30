@@ -26,8 +26,10 @@ Before starting implementation:
 
 #### 1.1 Create Domain Module Structure
 
+**Reference**: Use `domains/admin/workspace/` as reference for structure patterns (hooks, components, containers)
+
 ```bash
-cd apps/clementine-app/src/domains/admin
+cd apps/clementine-app/src/domains/workspace
 mkdir -p projects/{types,schemas,hooks,components,containers}
 touch projects/{types,schemas,hooks,components,containers}/index.ts
 touch projects/index.ts
@@ -35,7 +37,7 @@ touch projects/index.ts
 
 #### 1.2 Define TypeScript Types
 
-**File**: `domains/admin/projects/types/project.types.ts`
+**File**: `domains/workspace/projects/types/project.types.ts`
 
 ```typescript
 /**
@@ -95,7 +97,7 @@ export interface DeleteProjectInput {
 }
 ```
 
-**Barrel Export**: `domains/admin/projects/types/index.ts`
+**Barrel Export**: `domains/workspace/projects/types/index.ts`
 
 ```typescript
 export * from './project.types'
@@ -103,7 +105,7 @@ export * from './project.types'
 
 #### 1.3 Define Zod Validation Schemas
 
-**File**: `domains/admin/projects/schemas/project.schemas.ts`
+**File**: `domains/workspace/projects/schemas/project.schemas.ts`
 
 ```typescript
 import { z } from 'zod'
@@ -135,7 +137,7 @@ export type CreateProjectInputSchemaType = z.infer<typeof createProjectInputSche
 export type DeleteProjectInputSchemaType = z.infer<typeof deleteProjectInputSchema>
 ```
 
-**Barrel Export**: `domains/admin/projects/schemas/index.ts`
+**Barrel Export**: `domains/workspace/projects/schemas/index.ts`
 
 ```typescript
 export * from './project.schemas'
@@ -171,12 +173,14 @@ Edit `firebase/firestore.rules` and add the projects rules block from `contracts
 **Step 3**: Deploy to Firebase
 
 ```bash
-# From monorepo root
+# From monorepo root (/Users/iggyvileikis/Projects/@attempt-n2/clementine)
 pnpm fb:deploy:indexes   # Deploy indexes (wait for build to complete)
 pnpm fb:deploy:rules     # Deploy security rules
 ```
 
 **Verification**: Check Firebase Console to confirm index is active and rules are deployed.
+
+**Note**: Firestore rules and indexes are at monorepo root level (`firebase/firestore.rules` and `firebase/firestore.indexes.json`), NOT inside the app directory.
 
 ---
 
@@ -186,7 +190,7 @@ pnpm fb:deploy:rules     # Deploy security rules
 
 #### 2.1 Create `useProjects` Hook (List Projects)
 
-**File**: `domains/admin/projects/hooks/useProjects.ts`
+**File**: `domains/workspace/projects/hooks/useProjects.ts`
 
 ```typescript
 import { useEffect } from 'react'
@@ -263,7 +267,7 @@ export function useProjects(workspaceId: string) {
 
 #### 2.2 Create `useCreateProject` Hook
 
-**File**: `domains/admin/projects/hooks/useCreateProject.ts`
+**File**: `domains/workspace/projects/hooks/useCreateProject.ts`
 
 ```typescript
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -330,7 +334,7 @@ export function useCreateProject() {
 
 #### 2.3 Create `useDeleteProject` Hook
 
-**File**: `domains/admin/projects/hooks/useDeleteProject.ts`
+**File**: `domains/workspace/projects/hooks/useDeleteProject.ts`
 
 ```typescript
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -381,7 +385,7 @@ export function useDeleteProject() {
 }
 ```
 
-**Barrel Export**: `domains/admin/projects/hooks/index.ts`
+**Barrel Export**: `domains/workspace/projects/hooks/index.ts`
 
 ```typescript
 export * from './useProjects'
@@ -397,7 +401,7 @@ export * from './useDeleteProject'
 
 #### 3.1 Create `ProjectListEmpty` Component
 
-**File**: `domains/admin/projects/components/ProjectListEmpty.tsx`
+**File**: `domains/workspace/projects/components/ProjectListEmpty.tsx`
 
 ```typescript
 import { Button } from '@/ui-kit/components/button'
@@ -422,7 +426,7 @@ export function ProjectListEmpty({ onCreateProject }: ProjectListEmptyProps) {
 
 #### 3.2 Create `DeleteProjectDialog` Component
 
-**File**: `domains/admin/projects/components/DeleteProjectDialog.tsx`
+**File**: `domains/workspace/projects/components/DeleteProjectDialog.tsx`
 
 ```typescript
 import { Button } from '@/ui-kit/components/button'
@@ -484,7 +488,7 @@ export function DeleteProjectDialog({
 
 #### 3.3 Create `ProjectListItem` Component
 
-**File**: `domains/admin/projects/components/ProjectListItem.tsx`
+**File**: `domains/workspace/projects/components/ProjectListItem.tsx`
 
 ```typescript
 import { useState } from 'react'
@@ -553,7 +557,7 @@ export function ProjectListItem({
 }
 ```
 
-**Barrel Export**: `domains/admin/projects/components/index.ts`
+**Barrel Export**: `domains/workspace/projects/components/index.ts`
 
 ```typescript
 export * from './ProjectListEmpty'
@@ -569,7 +573,7 @@ export * from './ProjectListItem'
 
 #### 4.1 Create `ProjectsPage` Container
 
-**File**: `domains/admin/projects/containers/ProjectsPage.tsx`
+**File**: `domains/workspace/projects/containers/ProjectsPage.tsx`
 
 ```typescript
 import { Button } from '@/ui-kit/components/button'
@@ -636,7 +640,7 @@ export function ProjectsPage({ workspaceId, workspaceSlug }: ProjectsPageProps) 
 
 #### 4.2 Create `ProjectDetailsPage` Container
 
-**File**: `domains/admin/projects/containers/ProjectDetailsPage.tsx`
+**File**: `domains/workspace/projects/containers/ProjectDetailsPage.tsx`
 
 ```typescript
 export function ProjectDetailsPage() {
@@ -651,7 +655,7 @@ export function ProjectDetailsPage() {
 }
 ```
 
-**Barrel Export**: `domains/admin/projects/containers/index.ts`
+**Barrel Export**: `domains/workspace/projects/containers/index.ts`
 
 ```typescript
 export * from './ProjectsPage'
@@ -670,7 +674,7 @@ export * from './ProjectDetailsPage'
 
 ```typescript
 import { createFileRoute } from '@tanstack/react-router'
-import { ProjectsPage } from '@/domains/admin/projects'
+import { ProjectsPage } from '@/domains/workspace/projects'
 
 /**
  * Projects list page route
@@ -703,9 +707,9 @@ function ProjectsPageRoute() {
 ```typescript
 import { createFileRoute, notFound } from '@tanstack/react-router'
 import { doc, getDoc } from 'firebase/firestore'
-import { ProjectDetailsPage } from '@/domains/admin/projects'
+import { ProjectDetailsPage } from '@/domains/workspace/projects'
 import { firestore } from '@/integrations/firebase/client'
-import type { Project } from '@/domains/admin/projects/types'
+import type { Project } from '@/domains/workspace/projects/types'
 
 /**
  * Project details page route
@@ -751,7 +755,7 @@ export const Route = createFileRoute(
 
 **Estimated Time**: 5 minutes
 
-**File**: `domains/admin/projects/index.ts`
+**File**: `domains/workspace/projects/index.ts`
 
 ```typescript
 // Export only public API (components, hooks, types)
@@ -798,7 +802,7 @@ Start dev server: `pnpm dev`
 
 #### 7.3 Write Unit Tests (Optional, per Constitution)
 
-**File**: `domains/admin/projects/hooks/useProjects.test.ts`
+**File**: `domains/workspace/projects/hooks/useProjects.test.ts`
 
 ```typescript
 import { renderHook, waitFor } from '@testing-library/react'

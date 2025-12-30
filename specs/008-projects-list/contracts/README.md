@@ -20,9 +20,9 @@ Firestore security rules for the `projects` collection. These rules enforce:
 - **Immutability**: Prevents workspace transfers and other invalid mutations
 
 **Deployment**:
-1. Copy the rules block from `firestore.rules` into the main `firebase/firestore.rules` file
+1. Copy the rules block from `contracts/firestore.rules` into the main `firebase/firestore.rules` file at **monorepo root** (NOT inside apps/clementine-app/)
 2. Add the rules after the existing `workspaces` rules block
-3. Deploy via `pnpm fb:deploy:rules` or `pnpm fb:deploy`
+3. Deploy via `pnpm fb:deploy:rules` or `pnpm fb:deploy` from monorepo root
 
 **Testing**:
 - Use Firebase Emulator to test rules before production deployment
