@@ -1,12 +1,9 @@
 import { useState } from 'react'
-import { PropControls } from './PropControls'
+import { CameraPropControls } from './CameraPropControls'
 import { CallbackLog } from './CallbackLog'
-import type { CameraPropConfig } from './PropControls'
+import type { CameraPropConfig } from './CameraPropControls'
 import type { CallbackEvent } from './CallbackLog'
-import type {
-  CameraCaptureError,
-  CapturedPhoto,
-} from '@/shared/camera/types'
+import type { CameraCaptureError, CapturedPhoto } from '@/shared/camera/types'
 import { CameraCapture } from '@/shared/camera'
 
 const DEFAULT_CONFIG: CameraPropConfig = {
@@ -45,10 +42,10 @@ export function CameraDevTools() {
   }
 
   return (
-    <div className="flex h-screen">
+    <div className="flex overflow-hidden">
       {/* Column 1: Prop Controls */}
-      <div className="w-80 flex-shrink-0">
-        <PropControls
+      <div className="flex w-80 flex-shrink-0 flex-col overflow-y-auto">
+        <CameraPropControls
           config={config}
           onConfigChange={setConfig}
           onResetRemount={handleResetRemount}
@@ -56,7 +53,7 @@ export function CameraDevTools() {
       </div>
 
       {/* Column 2: Camera Preview (Mobile Viewport) */}
-      <div className="flex flex-1 items-center justify-center bg-muted/10 p-8">
+      <div className="flex flex-1 items-center justify-center overflow-y-auto bg-muted/10 p-8">
         <div className="flex flex-col items-center">
           <div className="mb-4">
             <h3 className="text-sm font-medium text-muted-foreground">
@@ -96,7 +93,7 @@ export function CameraDevTools() {
       </div>
 
       {/* Column 3: Callback Log */}
-      <div className="w-96 flex-shrink-0">
+      <div className="flex w-96 flex-shrink-0 flex-col overflow-y-auto">
         <CallbackLog events={events} onClear={handleClearLog} />
       </div>
     </div>

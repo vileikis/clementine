@@ -1,3 +1,3 @@
 export { CameraDevTools } from './CameraDevTools'
-export { PropControls } from './PropControls'
+export { CameraPropControls } from './CameraPropControls'
 export { CallbackLog } from './CallbackLog'
