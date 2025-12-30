@@ -1,18 +1,39 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderHook, waitFor } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { runTransaction } from 'firebase/firestore'
 import { useUpdateWorkspace } from './useUpdateWorkspace'
+
+// Create mock functions using vi.hoisted to avoid hoisting issues
+const {
+  mockRunTransaction,
+  mockDoc,
+  mockCollection,
+  mockQuery,
+  mockWhere,
+  mockLimit,
+  mockGetDocs,
+  mockServerTimestamp,
+} = vi.hoisted(() => ({
+  mockRunTransaction: vi.fn(),
+  mockDoc: vi.fn(),
+  mockCollection: vi.fn(),
+  mockQuery: vi.fn(),
+  mockWhere: vi.fn(),
+  mockLimit: vi.fn(),
+  mockGetDocs: vi.fn(),
+  mockServerTimestamp: vi.fn(() => 'SERVER_TIMESTAMP'),
+}))
 
 // Mock Firestore
 vi.mock('firebase/firestore', () => ({
-  doc: vi.fn(),
-  collection: vi.fn(),
-  query: vi.fn(),
-  where: vi.fn(),
-  limit: vi.fn(),
-  runTransaction: vi.fn(),
-  serverTimestamp: vi.fn(() => 'SERVER_TIMESTAMP'),
+  doc: mockDoc,
+  collection: mockCollection,
+  query: mockQuery,
+  where: mockWhere,
+  limit: mockLimit,
+  getDocs: mockGetDocs,
+  runTransaction: mockRunTransaction,
+  serverTimestamp: mockServerTimestamp,
 }))
 
 vi.mock('@/integrations/firebase/client', () => ({
@@ -38,7 +59,15 @@ describe('useUpdateWorkspace', () => {
         },
       },
     })
-    vi.clearAllMocks()
+    // Reset all mocks
+    mockRunTransaction.mockReset()
+    mockDoc.mockReset()
+    mockCollection.mockReset()
+    mockQuery.mockReset()
+    mockWhere.mockReset()
+    mockLimit.mockReset()
+    mockGetDocs.mockReset()
+    mockServerTimestamp.mockReset()
   })
 
   const wrapper = ({ children }: { children: React.ReactNode }) => (
@@ -50,7 +79,7 @@ describe('useUpdateWorkspace', () => {
       update: vi.fn(),
     }
 
-    vi.mocked(runTransaction).mockImplementation(async (_, callback) => {
+    mockRunTransaction.mockImplementation(async (_, callback) => {
       await callback(mockTransaction as any)
     })
 
@@ -77,11 +106,14 @@ describe('useUpdateWorkspace', () => {
       set: vi.fn(),
     }
 
+    // Mock getDocs to return empty (slug doesn't exist)
+    mockGetDocs.mockResolvedValueOnce({
+      empty: true,
+      docs: [],
+    } as any)
+
     // Mock slug doesn't exist (unique)
-    vi.mocked(runTransaction).mockImplementation(async (_, callback) => {
-      mockTransaction.get.mockResolvedValueOnce({
-        exists: () => false,
-      } as any)
+    mockRunTransaction.mockImplementation(async (_, callback) => {
       await callback(mockTransaction as any)
     })
 
@@ -98,9 +130,8 @@ describe('useUpdateWorkspace', () => {
       expect(result.current.isSuccess).toBe(true)
     })
 
-    expect(mockTransaction.get).toHaveBeenCalled()
+    expect(mockGetDocs).toHaveBeenCalled()
     expect(mockTransaction.update).toHaveBeenCalled()
-    expect(mockTransaction.set).toHaveBeenCalled()
   })
 
   it('should throw error if slug already in use', async () => {
@@ -108,12 +139,14 @@ describe('useUpdateWorkspace', () => {
       get: vi.fn(),
     }
 
+    // Mock getDocs to return existing slug for different workspace
+    mockGetDocs.mockResolvedValueOnce({
+      empty: false,
+      docs: [{ id: 'different-workspace-id' }],
+    } as any)
+
     // Mock slug exists for different workspace
-    vi.mocked(runTransaction).mockImplementation(async (_, callback) => {
-      mockTransaction.get.mockResolvedValueOnce({
-        exists: () => true,
-        data: () => ({ workspaceId: 'different-workspace-id' }),
-      } as any)
+    mockRunTransaction.mockImplementation(async (_, callback) => {
       await callback(mockTransaction as any)
     })
 
@@ -139,12 +172,14 @@ describe('useUpdateWorkspace', () => {
       set: vi.fn(),
     }
 
+    // Mock getDocs to return existing slug for same workspace
+    mockGetDocs.mockResolvedValueOnce({
+      empty: false,
+      docs: [{ id: 'workspace-1' }],
+    } as any)
+
     // Mock slug exists for same workspace
-    vi.mocked(runTransaction).mockImplementation(async (_, callback) => {
-      mockTransaction.get.mockResolvedValueOnce({
-        exists: () => true,
-        data: () => ({ workspaceId: 'workspace-1' }),
-      } as any)
+    mockRunTransaction.mockImplementation(async (_, callback) => {
       await callback(mockTransaction as any)
     })
 
@@ -161,6 +196,7 @@ describe('useUpdateWorkspace', () => {
       expect(result.current.isSuccess).toBe(true)
     })
 
+    expect(mockGetDocs).toHaveBeenCalled()
     expect(mockTransaction.update).toHaveBeenCalled()
   })
 
@@ -169,7 +205,7 @@ describe('useUpdateWorkspace', () => {
       update: vi.fn(),
     }
 
-    vi.mocked(runTransaction).mockImplementation(async (_, callback) => {
+    mockRunTransaction.mockImplementation(async (_, callback) => {
       await callback(mockTransaction as any)
     })
 
@@ -194,7 +230,7 @@ describe('useUpdateWorkspace', () => {
       resolveTransaction = resolve
     })
 
-    vi.mocked(runTransaction).mockReturnValue(transactionPromise as any)
+    mockRunTransaction.mockReturnValue(transactionPromise as any)
 
     const { result } = renderHook(() => useUpdateWorkspace(), { wrapper })
 
