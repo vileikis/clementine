@@ -14,14 +14,15 @@
 import { useCallback, useMemo, useReducer, useRef, useState } from 'react'
 import { DEFAULT_LABELS } from '../constants'
 import { INITIAL_CAMERA_STATE, cameraReducer } from '../lib'
-import { useCameraPermission } from '../hooks/useCameraPermission'
-import { useLibraryPicker } from '../hooks/useLibraryPicker'
-import { PermissionPrompt } from '../components/PermissionPrompt'
-import { CameraView } from '../components/CameraView'
-import { CameraControls } from '../components/CameraControls'
-import { PhotoReview } from '../components/PhotoReview'
-import { ErrorState } from '../components/ErrorState'
-import type { CameraViewRef } from '../components/CameraView'
+import { useCameraPermission, useLibraryPicker } from '../hooks'
+import {
+  CameraControls,
+  CameraView,
+  ErrorState,
+  PermissionPrompt,
+  PhotoReview,
+} from '../components'
+import type { CameraViewRef } from '../components'
 import type {
   AspectRatio,
   CameraCaptureError,

@@ -260,21 +260,39 @@
 
 ## Dependencies & Execution Order
 
+### ⚡ Revised Execution Order (Optimal)
+
+**Reason for change**: Dev-tools interface makes browser testing much easier. Build the testing UI first, then use it for validation.
+
+**Recommended sequence:**
+1. ✅ Phase 1 (Setup) - COMPLETED
+2. ✅ Phase 2 (Structure Fixes) - COMPLETED
+3. ✅ Phase 3 (Test Collocation) - COMPLETED
+4. ✅ Phase 4 (Technical Validation Only: T032-T034) - COMPLETED
+5. ⏭️ Phase 5 (Dev Tools Route Setup) - NEXT
+6. ⏭️ Phase 6 (Dev Tools Components)
+7. 🔄 Phase 4 (Browser Testing: T036-T051) - Resume with dev-tools
+8. 🔄 Phase 7 (Dev Tools Validation)
+9. 🔄 Phase 8 (Final Validation)
+
 ### Phase Dependencies
 
 - **Phase 1 (Setup)**: No dependencies - can start immediately
 - **Phase 2 (Structure Fixes)**: Depends on Phase 1 completion
 - **Phase 3 (Test Collocation)**: Depends on Phase 2 completion
-- **Phase 4 (Module Validation)**: Depends on Phases 2 & 3 completion
+- **Phase 4 (Technical Validation)**: Depends on Phases 2 & 3 completion
+  - **T032-T034 (Technical)**: Can complete immediately after Phase 3
+  - **T036-T051 (Browser testing)**: Better done AFTER Phase 6 (using dev-tools interface)
 - **Phase 5 (Dev Tools Route)**: Can start after Phase 2 (independent of Phase 3 & 4)
 - **Phase 6 (Dev Tools Components)**: Depends on Phase 5 completion
-- **Phase 7 (Dev Tools Validation)**: Depends on Phases 4 & 6 completion (both module and dev-tools ready)
+- **Phase 7 (Dev Tools Validation)**: Depends on Phase 4 browser testing & Phase 6 completion
 - **Phase 8 (Final Validation)**: Depends on all previous phases
 
 ### Part Dependencies
 
-- **Module Migration (Phases 2-4)**: Must complete before dev-tools can be fully functional
-- **Dev Tools (Phases 5-7)**: Can start structure work early, but needs working camera module for testing
+- **Module Migration (Phases 2-3)**: Must complete before dev-tools implementation
+- **Dev Tools (Phases 5-6)**: Requires migrated camera module, makes browser testing easier
+- **Browser Testing (Phase 4 manual tasks)**: Benefits from dev-tools interface
 
 ### Task Groups (Parallelizable)
 
@@ -346,39 +364,52 @@ Task: T105 - Add code comments
 
 ## Implementation Strategy
 
-### MVP Approach (Module Migration First)
+### ⚡ Revised Optimal Approach (Dev Tools First)
 
-1. **Complete Phases 1-4**: Camera module migrated and validated
-2. **STOP and VALIDATE**: Test camera module independently (import in existing features)
-3. **Deploy camera module**: Can be used by guest photo submission, experiences
-4. **Continue with Phases 5-7**: Add dev-tools testing interface
-5. **Final validation (Phase 8)**: Complete end-to-end testing
+**Strategy**: Build the testing interface before doing manual browser validation.
+
+1. ✅ **Complete Phases 1-3**: Camera module structure migrated (DONE)
+2. ✅ **Complete Phase 4 (Technical)**: Format, lint, type-check pass (DONE)
+3. ⏭️ **Complete Phases 5-6**: Build dev-tools testing interface (NEXT)
+4. 🔄 **Resume Phase 4 (Browser)**: Use dev-tools to test all camera configurations
+5. 🔄 **Complete Phases 7-8**: Final validation and polish
+
+**Why this order?**
+- Dev-tools provides prop controls, mobile preview, and callback logging
+- Makes testing 10x easier than manually creating test pages
+- Can quickly iterate through all configurations (facing, aspect ratios, library toggle)
+- Event log shows exactly what's happening (onPhoto, onSubmit, onError)
 
 ### Incremental Delivery
 
-**Milestone 1: Module Structure Fixed (Phase 2)**
+**Milestone 1: Module Structure Fixed (Phase 2)** ✅
 - Camera module imports updated, Next.js artifacts removed
-- Can proceed with testing (even if some tests fail initially)
+- Can proceed with dev-tools implementation
 
-**Milestone 2: Tests Organized (Phase 3)**
+**Milestone 2: Tests Organized (Phase 3)** ✅
 - All tests collocated with source files
 - Project follows modern testing practices
-- Can run full test suite
+- Ready for test implementation
 
-**Milestone 3: Module Validated (Phase 4)**
-- Camera module fully functional in TanStack Start
-- Ready for production use
-- Can be imported by other domains
+**Milestone 3: Technical Validation (Phase 4 - Partial)** ✅
+- Format/lint/type-check passes
+- Dev server starts successfully
+- Module can be imported
 
-**Milestone 4: Dev Tools Ready (Phases 5-7)**
+**Milestone 4: Dev Tools Ready (Phases 5-6)** ⏭️
 - Interactive testing playground available
 - Can test all camera configurations easily
-- Speeds up future camera feature development
+- Enables efficient browser validation
 
-**Milestone 5: Production Ready (Phase 8)**
+**Milestone 5: Module Validated (Phase 4 - Complete)** 🔄
+- Camera module fully tested in browsers
+- All configurations verified working
+- Ready for production use
+
+**Milestone 6: Production Ready (Phases 7-8)** 🔄
 - Cross-browser tested
 - Documentation complete
-- Full test coverage achieved
+- Full validation achieved
 
 ### Parallel Team Strategy
 
