@@ -1,18 +1,17 @@
-import { createFileRoute, notFound } from '@tanstack/react-router'
+import { createFileRoute, notFound, Outlet } from '@tanstack/react-router'
 import { doc, getDoc } from 'firebase/firestore'
-import { ProjectDetailsPage } from '@/domains/workspace/projects'
 import { projectSchema } from '@/domains/workspace/projects/schemas'
 import { firestore } from '@/integrations/firebase/client'
 import { convertFirestoreDoc } from '@/shared/utils/firestore-utils'
 
 /**
- * Project details page route
+ * Project layout route
  *
  * Route: /workspace/:workspaceSlug/projects/:projectId
  * Access: Admin only (enforced by parent route)
  *
- * Displays project details (placeholder for now).
- * Returns 404 for non-existent or soft-deleted projects.
+ * Layout for project routes (details, events, etc.)
+ * Loads project data and makes it available to child routes.
  */
 export const Route = createFileRoute(
   '/workspace/$workspaceSlug/projects/$projectId',
@@ -39,5 +38,5 @@ export const Route = createFileRoute(
 
     return { project }
   },
-  component: ProjectDetailsPage,
+  component: Outlet, // Render child routes
 })

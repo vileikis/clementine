@@ -2,7 +2,7 @@
 
 **Feature**: `008-projects-list`
 **Date**: 2025-12-30
-**Tester**: ******\_\_\_******
+**Tester**: **\*\***\_\_\_**\*\***
 **Environment**: ☐ Local Dev ☐ Staging ☐ Production
 
 ## Pre-Test Setup
@@ -31,12 +31,12 @@
 
 ### TC1.2: Empty State Interactions
 
-- [ ] Hover over "Create Project" button
-- [ ] **Expected**: Button shows hover state (visual feedback)
-- [ ] Click "Create Project" button
-- [ ] **Expected**: Navigate to project details page
-- [ ] **Expected**: URL changes to `/workspace/[workspaceSlug]/projects/[new-project-id]`
-- [ ] **Expected**: New project appears in Firestore (check Firebase Console)
+- [x] Hover over "Create Project" button
+- [x] **Expected**: Button shows hover state (visual feedback)
+- [x] Click "Create Project" button
+- [x] **Expected**: Navigate to project details page
+- [x] **Expected**: URL changes to `/workspace/[workspaceSlug]/projects/[new-project-id]`
+- [x] **Expected**: New project appears in Firestore (check Firebase Console)
 
 ---
 
@@ -46,40 +46,40 @@
 
 ### TC2.1: Create Project from Empty State
 
-- [ ] Start with no projects in workspace
-- [ ] Click "Create Project" from empty state
-- [ ] **Expected**: Project created with name "Untitled project"
-- [ ] **Expected**: Project status is "draft"
-- [ ] **Expected**: Redirected to `/workspace/[workspaceSlug]/projects/[projectId]`
-- [ ] **Expected**: "Project details – work in progress" placeholder displays
+- [x] Start with no projects in workspace
+- [x] Click "Create Project" from empty state
+- [x] **Expected**: Project created with name "Untitled project"
+- [x] **Expected**: Project status is "draft"
+- [x] **Expected**: Redirected to `/workspace/[workspaceSlug]/projects/[projectId]`
+- [x] **Expected**: "Project details – work in progress" placeholder displays
 - [ ] **Expected**: No errors in console
 
 ### TC2.2: Create Project from List View
 
-- [ ] Navigate back to projects list
-- [ ] **Expected**: Previously created project displays in list
-- [ ] Click "Create Project" button in header
-- [ ] **Expected**: New project created
-- [ ] **Expected**: Redirected to new project details page
-- [ ] **Expected**: Total of 2 projects now in workspace
+- [x] Navigate back to projects list
+- [x] **Expected**: Previously created project displays in list
+- [x] Click "Create Project" button in header
+- [x] **Expected**: New project created
+- [x] **Expected**: Redirected to new project details page
+- [x] **Expected**: Total of 2 projects now in workspace
 
 ### TC2.3: Create Multiple Projects
 
-- [ ] Create 5 more projects rapidly (click create 5 times)
-- [ ] **Expected**: All projects created successfully
-- [ ] **Expected**: No duplicate project names cause issues
-- [ ] **Expected**: All projects appear in list
-- [ ] **Expected**: Projects sorted by creation date (newest first)
+- [x] Create 5 more projects rapidly (click create 5 times)
+- [x] **Expected**: All projects created successfully
+- [x] **Expected**: No duplicate project names cause issues
+- [x] **Expected**: All projects appear in list
+- [x] **Expected**: Projects sorted by creation date (newest first)
 
 ### TC2.4: Create Project - Network Error Handling
 
-- [ ] Disconnect from internet / stop Firebase emulator
-- [ ] Try to create a project
-- [ ] **Expected**: Error is logged to Sentry (check Sentry dashboard if configured)
-- [ ] **Expected**: User sees error feedback (mutation fails gracefully)
-- [ ] Reconnect internet
-- [ ] Try creating project again
-- [ ] **Expected**: Works correctly after reconnection
+- [x] Disconnect from internet / stop Firebase emulator
+- [x] Try to create a project
+- [x] **Expected**: Error is logged to Sentry (check Sentry dashboard if configured)
+- [x] **Expected**: User sees error feedback (mutation fails gracefully)
+- [x] Reconnect internet
+- [x] Try creating project again
+- [x] **Expected**: Works correctly after reconnection
 
 ---
 
@@ -513,13 +513,13 @@
 
 **QA Result**: ☐ PASS ☐ FAIL ☐ PASS WITH MINOR ISSUES
 
-**Critical Bugs Found**: ******\_\_\_******
+**Critical Bugs Found**: **\*\***\_\_\_**\*\***
 
-**Minor Issues Found**: ******\_\_\_******
+**Minor Issues Found**: **\*\***\_\_\_**\*\***
 
-**Tested By**: ******\_\_\_******
+**Tested By**: **\*\***\_\_\_**\*\***
 
-**Date**: ******\_\_\_******
+**Date**: **\*\***\_\_\_**\*\***
 
 **Notes**:
 
