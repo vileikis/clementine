@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { ProjectsPage } from '@/domains/workspace/projects'
+import { useWorkspace } from '@/domains/workspace'
 
 /**
  * Projects list page route (index)
@@ -17,11 +18,12 @@ export const Route = createFileRoute('/workspace/$workspaceSlug/projects/')({
 function ProjectsPageRoute() {
   const { workspaceSlug } = Route.useParams()
 
-  // TODO: Get actual workspaceId from workspace context/loader
-  // For now, using workspaceSlug as workspaceId (temporary)
-  const workspaceId = workspaceSlug
+  const { data: workspace } = useWorkspace(workspaceSlug)
 
   return (
-    <ProjectsPage workspaceId={workspaceId} workspaceSlug={workspaceSlug} />
+    <ProjectsPage
+      workspaceId={workspace?.id || ''}
+      workspaceSlug={workspaceSlug}
+    />
   )
 }
