@@ -17,7 +17,7 @@ export function ProjectsPage({
   const deleteProject = useDeleteProject()
 
   const handleCreateProject = () => {
-    createProject.mutate({ workspaceId })
+    createProject.mutate({ workspaceId, workspaceSlug })
   }
 
   const handleDeleteProject = (projectId: string) => {

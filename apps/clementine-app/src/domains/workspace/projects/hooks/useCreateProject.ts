@@ -31,9 +31,13 @@ export function useCreateProject() {
       }
 
       const docRef = await addDoc(projectsRef, newProject)
-      return { projectId: docRef.id, workspaceId: input.workspaceId }
+      return {
+        projectId: docRef.id,
+        workspaceId: input.workspaceId,
+        workspaceSlug: input.workspaceSlug,
+      }
     },
-    onSuccess: ({ projectId, workspaceId }) => {
+    onSuccess: ({ projectId, workspaceId, workspaceSlug }) => {
       // Invalidate projects list
       queryClient.invalidateQueries({
         queryKey: ['projects', workspaceId],
@@ -42,7 +46,7 @@ export function useCreateProject() {
       // Navigate to project details page
       navigate({
         to: '/workspace/$workspaceSlug/projects/$projectId',
-        params: { workspaceSlug: workspaceId, projectId },
+        params: { workspaceSlug, projectId },
       })
     },
     onError: (error) => {

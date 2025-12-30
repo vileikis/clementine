@@ -8,8 +8,10 @@ import {
   query,
   where,
 } from 'firebase/firestore'
+import { projectSchema } from '../schemas'
 import type { Project } from '../types'
 import { firestore } from '@/integrations/firebase/client'
+import { convertFirestoreDoc } from '@/shared/utils/firestore-utils'
 
 /**
  * List active projects in workspace with real-time updates (admin only)
@@ -18,6 +20,7 @@ import { firestore } from '@/integrations/firebase/client'
  * - Real-time updates via Firestore onSnapshot
  * - Filters by workspaceId and excludes soft-deleted projects
  * - Sorted by createdAt descending (newest first)
+ * - Proper Firestore type conversion (Timestamps → numbers)
  *
  * @param workspaceId - Workspace to list projects from
  * @returns TanStack Query result with projects array
@@ -36,10 +39,9 @@ export function useProjects(workspaceId: string) {
     )
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const projects = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Project[]
+      const projects = snapshot.docs.map((doc) =>
+        convertFirestoreDoc(doc, projectSchema),
+      )
       queryClient.setQueryData(['projects', workspaceId], projects)
     })
 
@@ -59,10 +61,7 @@ export function useProjects(workspaceId: string) {
 
       // Initial fetch only
       const snapshot = await getDocs(q)
-      return snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Project[]
+      return snapshot.docs.map((doc) => convertFirestoreDoc(doc, projectSchema))
     },
     staleTime: Infinity,
     refetchOnWindowFocus: false,

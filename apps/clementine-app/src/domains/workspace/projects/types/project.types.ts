@@ -42,6 +42,9 @@ export interface CreateProjectInput {
   /** Parent workspace ID */
   workspaceId: string
 
+  /** Workspace slug for navigation after creation */
+  workspaceSlug: string
+
   /** Optional custom name (defaults to "Untitled project") */
   name?: string
 }
