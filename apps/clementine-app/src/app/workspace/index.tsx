@@ -29,10 +29,6 @@ function WorkspaceRedirect() {
     // Client-side redirect after mount (when localStorage is available)
     if (lastVisitedWorkspaceSlug) {
       // Redirect to last visited workspace
-      console.log(
-        '--- Redirecting to last visited workspace',
-        lastVisitedWorkspaceSlug,
-      )
       navigate({
         to: '/workspace/$workspaceSlug',
         params: { workspaceSlug: lastVisitedWorkspaceSlug },
@@ -40,7 +36,6 @@ function WorkspaceRedirect() {
       })
     } else {
       // No workspace history - redirect to admin workspaces list
-      console.log('--- Redirecting to admin workspaces list')
       navigate({
         to: '/admin/workspaces',
         replace: true,

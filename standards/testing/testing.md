@@ -4,19 +4,35 @@ This document defines testing principles and patterns using Vitest and Testing L
 
 ## Core Principles
 
-###
+### 1. Co-locate Tests with Code
 
- 1. Test Behavior, Not Implementation
+**CRITICAL**: Tests MUST live next to the code they test, NOT in a separate test directory.
+
+```
+/domains/workspace/hooks/
+  useWorkspace.ts
+  useWorkspace.test.ts       ← Next to the hook
+```
+
+**Why co-location is mandatory:**
+- ✅ Tests move/delete with the code automatically
+- ✅ Immediately visible what's tested vs untested
+- ✅ Easier to find and update tests
+- ✅ Modern best practice across industry
+
+See "Test Organization" section for detailed examples.
+
+### 2. Test Behavior, Not Implementation
 - Test what users see and do
 - Don't test internal implementation details
 - Tests should survive refactoring
 
-### 2. Write Tests That Inspire Confidence
+### 3. Write Tests That Inspire Confidence
 - Cover critical user paths
 - Test edge cases and error scenarios
 - Prefer integration tests over unit tests when appropriate
 
-### 3. Consistent Testing Patterns
+### 4. Consistent Testing Patterns
 - Same tools across frontend and backend (Vitest)
 - Same testing patterns across workspaces
 - Clear, readable test structure

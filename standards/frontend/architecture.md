@@ -296,9 +296,23 @@ export const Route = createFileRoute('/dashboard')({
 - ❌ Don't use SSR to "protect" data (use Firestore security rules)
 - ❌ Don't render entire pages server-side if they're highly interactive
 
-## Integration with TanStack Query
+## Data Fetching Patterns
 
-**Client-side data fetching with caching:**
+**For comprehensive patterns on data fetching with TanStack Query and Firestore, see:**
+
+**📄 [Data Fetching Standard](./data-fetching.md)**
+
+Key topics covered:
+- Query hooks for reading data with real-time updates
+- Mutation hooks with transactions
+- Why ALWAYS use transactions with `serverTimestamp()`
+- Route loading strategy (query over loader)
+- Firestore type conversion with `convertFirestoreDoc()`
+- Query keys convention
+- Error handling patterns
+- Complete reference implementations
+
+**Quick example - see data-fetching.md for full patterns:**
 
 ```tsx
 import { useQuery } from '@tanstack/react-query'
@@ -306,35 +320,6 @@ import { doc, getDoc } from 'firebase/firestore'
 import { firestore } from '@/integrations/firebase/client'
 
 function useEvent(eventId: string) {
-  return useQuery({
-    queryKey: ['event', eventId],
-    queryFn: async () => {
-      const docRef = doc(firestore, 'events', eventId)
-      const docSnap = await getDoc(docRef)
-      return docSnap.exists() ? { id: docSnap.id, ...docSnap.data() } : null
-    },
-  })
-}
-```
-
-**Real-time subscriptions with TanStack Query:**
-
-```tsx
-function useEventRealtime(eventId: string) {
-  const queryClient = useQueryClient()
-
-  useEffect(() => {
-    const docRef = doc(firestore, 'events', eventId)
-    const unsubscribe = onSnapshot(docRef, (snapshot) => {
-      queryClient.setQueryData(['event', eventId], {
-        id: snapshot.id,
-        ...snapshot.data(),
-      })
-    })
-
-    return unsubscribe
-  }, [eventId, queryClient])
-
   return useQuery({
     queryKey: ['event', eventId],
     queryFn: async () => {
