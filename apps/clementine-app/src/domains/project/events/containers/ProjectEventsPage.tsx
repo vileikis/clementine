@@ -24,7 +24,10 @@ export interface ProjectEventsPageProps {
  * <ProjectEventsPage projectId={projectId} activeEventId={project.activeEventId} />
  * ```
  */
-export function ProjectEventsPage({ projectId, activeEventId }: ProjectEventsPageProps) {
+export function ProjectEventsPage({
+  projectId,
+  activeEventId,
+}: ProjectEventsPageProps) {
   // Real-time events subscription
   const { data: events, isLoading, error } = useProjectEvents(projectId)
 
@@ -37,7 +40,9 @@ export function ProjectEventsPage({ projectId, activeEventId }: ProjectEventsPag
             Failed to load events
           </h3>
           <p className="text-muted-foreground">
-            {error instanceof Error ? error.message : 'An unknown error occurred'}
+            {error instanceof Error
+              ? error.message
+              : 'An unknown error occurred'}
           </p>
         </div>
       </div>
@@ -45,7 +50,7 @@ export function ProjectEventsPage({ projectId, activeEventId }: ProjectEventsPag
   }
 
   return (
-    <div className="container max-w-4xl py-8">
+    <div className="p-6">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">Events</h1>
         <CreateProjectEventButton projectId={projectId} />
