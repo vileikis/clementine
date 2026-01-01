@@ -1,51 +1,64 @@
 openapi: 3.1.0
 info:
-  title: Events Management API
+  title: Project Events Management API
   version: 1.0.0
   description: |
-    API contract for managing events within projects.
+    API contract for managing project events within projects.
 
     **NOTE**: This is for DOCUMENTATION ONLY. The actual implementation uses
     Firestore client SDK (not REST API). This contract describes the logical
     API surface in OpenAPI format for clarity and reference.
 
+    **Firestore Structure**: Project events are stored in subcollections:
+    `projects/{projectId}/events/{eventId}`
+
+    The `projectId` is implicit in the document path, NOT stored as a field.
+
     **Authentication**: All endpoints require workspace admin authorization.
-    Security is enforced via Firebase Firestore security rules.
+    Security is enforced via Firebase Firestore security rules with simple
+    admin checks only (per `standards/backend/firestore-security.md`).
+
+    **Validation**: Data validation happens in application code using Zod schemas,
+    NOT in Firestore security rules.
 
 servers:
   - url: https://firestore.googleapis.com/v1
     description: Firebase Firestore (client SDK)
 
 tags:
-  - name: Events
-    description: Event management operations (create, read, update, delete, activate)
+  - name: Project Events
+    description: Project event management operations (create, read, update, delete, activate)
 
 paths:
-  /events:
+  /projects/{projectId}/events:
     get:
-      summary: Get all events for a project
+      summary: Get all project events for a project
       description: |
-        Returns all non-deleted events for a project, ordered by creation date (newest first).
+        Returns all non-deleted project events for a project, ordered by creation date (newest first).
         Only accessible by workspace admins.
-      operationId: getEvents
+
+        Implementation: Firestore subcollection query
+        Path: `projects/{projectId}/events`
+        Filter: `where('status', '==', 'draft')`
+      operationId: getProjectEvents
       tags:
-        - Events
+        - Project Events
       parameters:
         - name: projectId
-          in: query
+          in: path
           required: true
           schema:
             type: string
-          description: Project ID to filter events
+          description: Project ID (determines subcollection path)
       responses:
         '200':
-          description: List of events
+          description: List of project events
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Event'
+                  $ref: '#/components/schemas/ProjectEvent'
         '403':
           description: Forbidden - User is not workspace admin
           content:
@@ -60,27 +73,38 @@ paths:
                 $ref: '#/components/schemas/Error'
 
     post:
-      summary: Create a new event
+      summary: Create a new project event
       description: |
-        Creates a new event for a project with status "draft".
-        The event is not active by default.
+        Creates a new project event for a project with status "draft".
+        The project event is not active by default.
         Only accessible by workspace admins.
-      operationId: createEvent
+
+        Implementation: Firestore subcollection addDoc
+        Path: `projects/{projectId}/events`
+        Validation: Zod schema validation in application code (NOT security rules)
+      operationId: createProjectEvent
       tags:
-        - Events
+        - Project Events
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Project ID (determines subcollection path)
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateEventInput'
+              $ref: '#/components/schemas/CreateProjectEventInput'
       responses:
         '201':
-          description: Event created successfully
+          description: Project event created successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Event'
+                $ref: '#/components/schemas/ProjectEvent'
         '400':
           description: Bad Request - Invalid input
           content:
@@ -100,30 +124,39 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /events/{eventId}:
+  /projects/{projectId}/events/{eventId}:
     get:
-      summary: Get a single event by ID
+      summary: Get a single project event by ID
       description: |
-        Returns a single event by ID.
-        Returns 404 if event doesn't exist or is deleted.
+        Returns a single project event by ID.
+        Returns 404 if project event doesn't exist or is deleted.
         Only accessible by workspace admins.
-      operationId: getEvent
+
+        Implementation: Firestore document get
+        Path: `projects/{projectId}/events/{eventId}`
+      operationId: getProjectEvent
       tags:
-        - Events
+        - Project Events
       parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Project ID (for subcollection path)
         - name: eventId
           in: path
           required: true
           schema:
             type: string
-          description: Event ID
+          description: Project event ID
       responses:
         '200':
-          description: Event found
+          description: Project event found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Event'
+                $ref: '#/components/schemas/ProjectEvent'
         '403':
           description: Forbidden - User is not workspace admin
           content:
@@ -131,40 +164,49 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '404':
-          description: Not Found - Event not found or deleted
+          description: Not Found - Project event not found or deleted
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
 
     patch:
-      summary: Rename an event
+      summary: Rename a project event
       description: |
-        Updates the name of an existing event.
+        Updates the name of an existing project event.
         Only accessible by workspace admins.
-      operationId: renameEvent
+
+        Implementation: Firestore updateDoc on subcollection document
+        Validation: Zod schema validation in application code (NOT security rules)
+      operationId: renameProjectEvent
       tags:
-        - Events
+        - Project Events
       parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Project ID (for subcollection path)
         - name: eventId
           in: path
           required: true
           schema:
             type: string
-          description: Event ID
+          description: Project event ID
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateEventInput'
+              $ref: '#/components/schemas/UpdateProjectEventInput'
       responses:
         '200':
-          description: Event renamed successfully
+          description: Project event renamed successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Event'
+                $ref: '#/components/schemas/ProjectEvent'
         '400':
           description: Bad Request - Invalid input
           content:
@@ -178,35 +220,43 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '404':
-          description: Not Found - Event not found or deleted
+          description: Not Found - Project event not found or deleted
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
 
     delete:
-      summary: Soft-delete an event
+      summary: Soft-delete a project event
       description: |
-        Soft-deletes an event by setting status to "deleted".
-        If the event is currently active, the project will have no active event.
+        Soft-deletes a project event by setting status to "deleted".
+        If the project event is currently active, the project will have no active event.
         Only accessible by workspace admins.
-      operationId: deleteEvent
+
+        Implementation: Firestore transaction (soft delete + clear activeEventId if needed)
+      operationId: deleteProjectEvent
       tags:
-        - Events
+        - Project Events
       parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Project ID (for subcollection path)
         - name: eventId
           in: path
           required: true
           schema:
             type: string
-          description: Event ID
+          description: Project event ID
       responses:
         '200':
-          description: Event deleted successfully
+          description: Project event deleted successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Event'
+                $ref: '#/components/schemas/ProjectEvent'
         '403':
           description: Forbidden - User is not workspace admin
           content:
@@ -214,45 +264,47 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '404':
-          description: Not Found - Event not found or already deleted
+          description: Not Found - Project event not found or already deleted
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /events/{eventId}/activate:
+  /projects/{projectId}/events/{eventId}/activate:
     post:
-      summary: Activate an event
+      summary: Activate a project event
       description: |
-        Activates an event for a project.
-        Only one event can be active per project. If another event is currently
+        Activates a project event for a project.
+        Only one project event can be active per project. If another project event is currently
         active, it will be automatically deactivated.
         Only accessible by workspace admins.
-      operationId: activateEvent
+
+        Implementation: Firestore transaction (verify event + atomically update project.activeEventId)
+      operationId: activateProjectEvent
       tags:
-        - Events
+        - Project Events
       parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Project ID
         - name: eventId
           in: path
           required: true
           schema:
             type: string
-          description: Event ID to activate
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ActivateEventInput'
+          description: Project event ID to activate
       responses:
         '200':
-          description: Event activated successfully
+          description: Project event activated successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Event'
+                $ref: '#/components/schemas/ProjectEvent'
         '400':
-          description: Bad Request - Cannot activate deleted event
+          description: Bad Request - Cannot activate deleted project event
           content:
             application/json:
               schema:
@@ -264,7 +316,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '404':
-          description: Not Found - Event not found, deleted, or doesn't belong to project
+          description: Not Found - Project event not found, deleted, or doesn't belong to project
           content:
             application/json:
               schema:
@@ -272,14 +324,16 @@ paths:
 
   /projects/{projectId}/active-event:
     get:
-      summary: Get the currently active event for a project
+      summary: Get the currently active project event for a project
       description: |
-        Returns the currently active event for a project.
-        Returns null if no event is active.
+        Returns the currently active project event for a project.
+        Returns null if no project event is active.
         Only accessible by workspace admins.
-      operationId: getActiveEvent
+
+        Implementation: Read project.activeEventId, then fetch event from subcollection
+      operationId: getActiveProjectEvent
       tags:
-        - Events
+        - Project Events
       parameters:
         - name: projectId
           in: path
@@ -289,12 +343,12 @@ paths:
           description: Project ID
       responses:
         '200':
-          description: Active event (or null if none)
+          description: Active project event (or null if none)
           content:
             application/json:
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/Event'
+                  - $ref: '#/components/schemas/ProjectEvent'
                   - type: "null"
         '403':
           description: Forbidden - User is not workspace admin
@@ -310,14 +364,16 @@ paths:
                 $ref: '#/components/schemas/Error'
 
     delete:
-      summary: Deactivate the currently active event
+      summary: Deactivate the currently active project event
       description: |
-        Deactivates the currently active event for a project.
-        After deactivation, the project will have no active event.
+        Deactivates the currently active project event for a project.
+        After deactivation, the project will have no active project event.
         Only accessible by workspace admins.
-      operationId: deactivateEvent
+
+        Implementation: Update project.activeEventId to null
+      operationId: deactivateProjectEvent
       tags:
-        - Events
+        - Project Events
       parameters:
         - name: projectId
           in: path
@@ -327,7 +383,7 @@ paths:
           description: Project ID
       responses:
         '200':
-          description: Event deactivated successfully
+          description: Project event deactivated successfully
           content:
             application/json:
               schema:
@@ -351,12 +407,16 @@ paths:
 
 components:
   schemas:
-    Event:
+    ProjectEvent:
       type: object
-      description: An AI-powered photo booth experience within a project
+      description: |
+        An AI-powered photo booth experience within a project.
+
+        Stored in Firestore subcollection: `projects/{projectId}/events/{eventId}`
+
+        Note: projectId is implicit in the subcollection path, NOT stored as a field.
       required:
         - id
-        - projectId
         - name
         - status
         - createdAt
@@ -366,18 +426,14 @@ components:
           type: string
           description: Unique identifier (Firestore document ID)
           example: "evt_abc123"
-        projectId:
-          type: string
-          description: Reference to parent project
-          example: "proj_xyz789"
         name:
           type: string
-          description: Event display name
+          description: Project event display name
           minLength: 1
           maxLength: 100
           example: "Summer Festival 2026"
         status:
-          $ref: '#/components/schemas/EventStatus'
+          $ref: '#/components/schemas/ProjectEventStatus'
         createdAt:
           type: integer
           description: Creation timestamp (milliseconds since epoch)
@@ -392,55 +448,41 @@ components:
           description: Soft delete timestamp (null if not deleted)
           example: null
 
-    EventStatus:
+    ProjectEventStatus:
       type: string
-      description: Event lifecycle status
+      description: Project event lifecycle status
       enum:
         - draft
         - deleted
       example: "draft"
 
-    CreateEventInput:
+    CreateProjectEventInput:
       type: object
-      description: Input for creating a new event
-      required:
-        - projectId
+      description: |
+        Input for creating a new project event.
+
+        Note: projectId is NOT in the input - it's determined by the subcollection path.
       properties:
-        projectId:
-          type: string
-          description: Parent project ID
-          example: "proj_xyz789"
         name:
           type: string
-          description: Event name (defaults to "Untitled event" if not provided)
+          description: Project event name (defaults to "Untitled event" if not provided)
           minLength: 1
           maxLength: 100
           default: "Untitled event"
           example: "Summer Festival 2026"
 
-    UpdateEventInput:
+    UpdateProjectEventInput:
       type: object
-      description: Input for updating an existing event
+      description: Input for updating an existing project event
       required:
         - name
       properties:
         name:
           type: string
-          description: New event name
+          description: New project event name
           minLength: 1
           maxLength: 100
           example: "Summer Festival 2026 - Updated"
-
-    ActivateEventInput:
-      type: object
-      description: Input for activating an event
-      required:
-        - projectId
-      properties:
-        projectId:
-          type: string
-          description: Project ID
-          example: "proj_xyz789"
 
     Error:
       type: object
@@ -461,18 +503,31 @@ components:
         message:
           type: string
           description: Human-readable error message
-          example: "Event not found"
+          example: "Project event not found"
         details:
           type: string
           description: Additional error context
-          example: "Event evt_abc123 does not exist or has been deleted"
+          example: "Project event evt_abc123 does not exist or has been deleted"
 
   securitySchemes:
     FirebaseAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: Firebase Authentication JWT token
+      description: |
+        Firebase Authentication JWT token with admin custom claim.
+
+        Security Rules: Simple admin checks only (per standards/backend/firestore-security.md)
+
+        ```javascript
+        match /projects/{projectId}/events/{eventId} {
+          allow read: if isAdmin();
+          allow create, update: if isAdmin();
+          allow delete: if false;  // Soft delete only
+        }
+        ```
+
+        Data Validation: Handled by Zod schemas in application code, NOT in security rules.
 
 security:
   - FirebaseAuth: []
