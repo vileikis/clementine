@@ -1,0 +1,189 @@
+# GraphQL-Style Contract: Events Management API
+#
+# NOTE: This is for DOCUMENTATION ONLY. The actual implementation uses
+# Firestore client SDK (not GraphQL). This contract describes the logical
+# API surface in GraphQL format for clarity and consistency.
+
+"""
+An AI-powered photo booth experience within a project.
+Events can be created, renamed, activated, and soft-deleted.
+"""
+type Event {
+  """Unique identifier (Firestore document ID)"""
+  id: ID!
+
+  """Reference to parent project"""
+  projectId: ID!
+
+  """Event display name"""
+  name: String!
+
+  """Lifecycle status (draft or deleted)"""
+  status: EventStatus!
+
+  """Creation timestamp (milliseconds since epoch)"""
+  createdAt: Int!
+
+  """Last update timestamp (milliseconds since epoch)"""
+  updatedAt: Int!
+
+  """Soft delete timestamp (null if not deleted)"""
+  deletedAt: Int
+}
+
+"""
+Event lifecycle status enumeration
+"""
+enum EventStatus {
+  """Event is active and can be used"""
+  DRAFT
+
+  """Event is soft-deleted and hidden from all queries"""
+  DELETED
+}
+
+"""
+Input for creating a new event
+"""
+input CreateEventInput {
+  """Parent project ID"""
+  projectId: ID!
+
+  """Event name (defaults to "Untitled event" if not provided)"""
+  name: String
+}
+
+"""
+Input for updating an existing event
+"""
+input UpdateEventInput {
+  """New event name"""
+  name: String!
+}
+
+"""
+Input for activating an event
+"""
+input ActivateEventInput {
+  """Project ID"""
+  projectId: ID!
+
+  """Event ID to activate"""
+  eventId: ID!
+}
+
+"""
+Input for deactivating the currently active event
+"""
+input DeactivateEventInput {
+  """Project ID"""
+  projectId: ID!
+}
+
+"""
+Queries for reading event data
+"""
+type Query {
+  """
+  Get all non-deleted events for a project.
+  Events are ordered by creation date (newest first).
+  Only accessible by workspace admins.
+  """
+  getEvents(projectId: ID!): [Event!]!
+
+  """
+  Get a single event by ID.
+  Returns null if event doesn't exist or is deleted.
+  Only accessible by workspace admins.
+  """
+  getEvent(eventId: ID!): Event
+
+  """
+  Get the currently active event for a project.
+  Returns null if no event is active.
+  Only accessible by workspace admins.
+  """
+  getActiveEvent(projectId: ID!): Event
+}
+
+"""
+Mutations for modifying event data
+"""
+type Mutation {
+  """
+  Create a new event for a project.
+  The event is created with status "draft" and is not active by default.
+  Returns the newly created event.
+  Only accessible by workspace admins.
+
+  Errors:
+  - 404: Project not found
+  - 403: User is not workspace admin
+  """
+  createEvent(input: CreateEventInput!): Event!
+
+  """
+  Rename an existing event.
+  Returns the updated event.
+  Only accessible by workspace admins.
+
+  Errors:
+  - 404: Event not found or deleted
+  - 403: User is not workspace admin
+  - 400: Invalid name (empty or too long)
+  """
+  renameEvent(eventId: ID!, input: UpdateEventInput!): Event!
+
+  """
+  Soft-delete an event.
+  The event status is set to "deleted" and it's removed from all queries.
+  If the event is currently active, the project will have no active event.
+  Returns the deleted event.
+  Only accessible by workspace admins.
+
+  Errors:
+  - 404: Event not found or already deleted
+  - 403: User is not workspace admin
+  """
+  deleteEvent(eventId: ID!): Event!
+
+  """
+  Activate an event for a project.
+  Only one event can be active per project. If another event is currently
+  active, it will be automatically deactivated.
+  Returns the activated event.
+  Only accessible by workspace admins.
+
+  Errors:
+  - 404: Event not found, deleted, or doesn't belong to project
+  - 403: User is not workspace admin
+  - 400: Cannot activate deleted event
+  """
+  activateEvent(input: ActivateEventInput!): Event!
+
+  """
+  Deactivate the currently active event for a project.
+  After deactivation, the project will have no active event.
+  Returns true if deactivation succeeded.
+  Only accessible by workspace admins.
+
+  Errors:
+  - 404: Project not found
+  - 403: User is not workspace admin
+  """
+  deactivateEvent(input: DeactivateEventInput!): Boolean!
+}
+
+"""
+Error types for better error handling
+"""
+type EventError {
+  """Error code (e.g., NOT_FOUND, FORBIDDEN, BAD_REQUEST)"""
+  code: String!
+
+  """Human-readable error message"""
+  message: String!
+
+  """Additional error context"""
+  details: String
+}

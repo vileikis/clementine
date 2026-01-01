@@ -1,0 +1,478 @@
+openapi: 3.1.0
+info:
+  title: Events Management API
+  version: 1.0.0
+  description: |
+    API contract for managing events within projects.
+
+    **NOTE**: This is for DOCUMENTATION ONLY. The actual implementation uses
+    Firestore client SDK (not REST API). This contract describes the logical
+    API surface in OpenAPI format for clarity and reference.
+
+    **Authentication**: All endpoints require workspace admin authorization.
+    Security is enforced via Firebase Firestore security rules.
+
+servers:
+  - url: https://firestore.googleapis.com/v1
+    description: Firebase Firestore (client SDK)
+
+tags:
+  - name: Events
+    description: Event management operations (create, read, update, delete, activate)
+
+paths:
+  /events:
+    get:
+      summary: Get all events for a project
+      description: |
+        Returns all non-deleted events for a project, ordered by creation date (newest first).
+        Only accessible by workspace admins.
+      operationId: getEvents
+      tags:
+        - Events
+      parameters:
+        - name: projectId
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Project ID to filter events
+      responses:
+        '200':
+          description: List of events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+        '403':
+          description: Forbidden - User is not workspace admin
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found - Project not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    post:
+      summary: Create a new event
+      description: |
+        Creates a new event for a project with status "draft".
+        The event is not active by default.
+        Only accessible by workspace admins.
+      operationId: createEvent
+      tags:
+        - Events
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEventInput'
+      responses:
+        '201':
+          description: Event created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        '400':
+          description: Bad Request - Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden - User is not workspace admin
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found - Project not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /events/{eventId}:
+    get:
+      summary: Get a single event by ID
+      description: |
+        Returns a single event by ID.
+        Returns 404 if event doesn't exist or is deleted.
+        Only accessible by workspace admins.
+      operationId: getEvent
+      tags:
+        - Events
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Event ID
+      responses:
+        '200':
+          description: Event found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        '403':
+          description: Forbidden - User is not workspace admin
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found - Event not found or deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    patch:
+      summary: Rename an event
+      description: |
+        Updates the name of an existing event.
+        Only accessible by workspace admins.
+      operationId: renameEvent
+      tags:
+        - Events
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Event ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEventInput'
+      responses:
+        '200':
+          description: Event renamed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        '400':
+          description: Bad Request - Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden - User is not workspace admin
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found - Event not found or deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      summary: Soft-delete an event
+      description: |
+        Soft-deletes an event by setting status to "deleted".
+        If the event is currently active, the project will have no active event.
+        Only accessible by workspace admins.
+      operationId: deleteEvent
+      tags:
+        - Events
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Event ID
+      responses:
+        '200':
+          description: Event deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        '403':
+          description: Forbidden - User is not workspace admin
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found - Event not found or already deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /events/{eventId}/activate:
+    post:
+      summary: Activate an event
+      description: |
+        Activates an event for a project.
+        Only one event can be active per project. If another event is currently
+        active, it will be automatically deactivated.
+        Only accessible by workspace admins.
+      operationId: activateEvent
+      tags:
+        - Events
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Event ID to activate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActivateEventInput'
+      responses:
+        '200':
+          description: Event activated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        '400':
+          description: Bad Request - Cannot activate deleted event
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden - User is not workspace admin
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found - Event not found, deleted, or doesn't belong to project
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /projects/{projectId}/active-event:
+    get:
+      summary: Get the currently active event for a project
+      description: |
+        Returns the currently active event for a project.
+        Returns null if no event is active.
+        Only accessible by workspace admins.
+      operationId: getActiveEvent
+      tags:
+        - Events
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Project ID
+      responses:
+        '200':
+          description: Active event (or null if none)
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Event'
+                  - type: "null"
+        '403':
+          description: Forbidden - User is not workspace admin
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found - Project not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      summary: Deactivate the currently active event
+      description: |
+        Deactivates the currently active event for a project.
+        After deactivation, the project will have no active event.
+        Only accessible by workspace admins.
+      operationId: deactivateEvent
+      tags:
+        - Events
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Project ID
+      responses:
+        '200':
+          description: Event deactivated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+        '403':
+          description: Forbidden - User is not workspace admin
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found - Project not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    Event:
+      type: object
+      description: An AI-powered photo booth experience within a project
+      required:
+        - id
+        - projectId
+        - name
+        - status
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          description: Unique identifier (Firestore document ID)
+          example: "evt_abc123"
+        projectId:
+          type: string
+          description: Reference to parent project
+          example: "proj_xyz789"
+        name:
+          type: string
+          description: Event display name
+          minLength: 1
+          maxLength: 100
+          example: "Summer Festival 2026"
+        status:
+          $ref: '#/components/schemas/EventStatus'
+        createdAt:
+          type: integer
+          description: Creation timestamp (milliseconds since epoch)
+          example: 1704067200000
+        updatedAt:
+          type: integer
+          description: Last update timestamp (milliseconds since epoch)
+          example: 1704153600000
+        deletedAt:
+          type: integer
+          nullable: true
+          description: Soft delete timestamp (null if not deleted)
+          example: null
+
+    EventStatus:
+      type: string
+      description: Event lifecycle status
+      enum:
+        - draft
+        - deleted
+      example: "draft"
+
+    CreateEventInput:
+      type: object
+      description: Input for creating a new event
+      required:
+        - projectId
+      properties:
+        projectId:
+          type: string
+          description: Parent project ID
+          example: "proj_xyz789"
+        name:
+          type: string
+          description: Event name (defaults to "Untitled event" if not provided)
+          minLength: 1
+          maxLength: 100
+          default: "Untitled event"
+          example: "Summer Festival 2026"
+
+    UpdateEventInput:
+      type: object
+      description: Input for updating an existing event
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: New event name
+          minLength: 1
+          maxLength: 100
+          example: "Summer Festival 2026 - Updated"
+
+    ActivateEventInput:
+      type: object
+      description: Input for activating an event
+      required:
+        - projectId
+      properties:
+        projectId:
+          type: string
+          description: Project ID
+          example: "proj_xyz789"
+
+    Error:
+      type: object
+      description: Error response
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: Error code
+          enum:
+            - NOT_FOUND
+            - FORBIDDEN
+            - BAD_REQUEST
+            - INTERNAL_ERROR
+          example: "NOT_FOUND"
+        message:
+          type: string
+          description: Human-readable error message
+          example: "Event not found"
+        details:
+          type: string
+          description: Additional error context
+          example: "Event evt_abc123 does not exist or has been deleted"
+
+  securitySchemes:
+    FirebaseAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Firebase Authentication JWT token
+
+security:
+  - FirebaseAuth: []
