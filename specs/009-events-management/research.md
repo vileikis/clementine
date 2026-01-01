@@ -2,11 +2,11 @@
 
 **Feature**: 009-events-management
 **Date**: 2026-01-01
-**Status**: Complete - No research needed (all patterns known from existing codebase)
+**Status**: Complete - All decisions confirmed (Updated for subcollection structure)
 
 ## Overview
 
-All technical decisions and patterns for the Events Management feature are well-established in the existing Clementine codebase. This document consolidates the research findings and confirms all technology choices align with existing standards and constitution principles.
+All technical decisions and patterns for the Project Events Management feature are well-established in the existing Clementine codebase. This document consolidates the research findings and confirms all technology choices align with existing standards and constitution principles.
 
 ## Technology Stack (Confirmed)
 
@@ -23,16 +23,17 @@ All technical decisions and patterns for the Events Management feature are well-
 - **Status**: ✅ Confirmed - No research needed
 
 ### Data Layer
-- **Decision**: Firebase Firestore (client SDK) for all data operations
-- **Rationale**: Client-first architecture (Constitution Principle VI), real-time updates, security via rules
+- **Decision**: Firebase Firestore subcollections (client SDK) for all data operations
+- **Structure**: `projects/{projectId}/events/{eventId}` (subcollection, not top-level)
+- **Rationale**: Clear ownership, projectId implicit in path, aligns with domain model, efficient queries
 - **Source**: `standards/global/client-first-architecture.md`, `standards/backend/firestore.md`
-- **Status**: ✅ Confirmed - No research needed
+- **Status**: ✅ Confirmed - Subcollection structure chosen
 
 ### Validation
-- **Decision**: Zod 4.1 for runtime validation
-- **Rationale**: Constitution Principle III mandates runtime validation, existing standard in codebase
-- **Source**: `standards/global/zod-validation.md`, existing schemas in workspace domain
-- **Status**: ✅ Confirmed - No research needed
+- **Decision**: Zod 4.1 for runtime validation (in application code, NOT security rules)
+- **Rationale**: Constitution Principle III mandates runtime validation. Standards require validation in application code, not Firestore rules.
+- **Source**: `standards/global/zod-validation.md`, `standards/backend/firestore-security.md`
+- **Status**: ✅ Confirmed - Application-level validation only
 
 ### UI Components
 - **Decision**: shadcn/ui + Radix UI for all UI primitives
@@ -47,53 +48,74 @@ All technical decisions and patterns for the Events Management feature are well-
 - **Source**: `standards/frontend/design-system.md`
 - **Status**: ✅ Confirmed - No research needed
 
+### Security Rules
+- **Decision**: Simple admin-only checks (NO data validation in rules)
+- **Rationale**: Follows `standards/backend/firestore-security.md` - rules check WHO, Zod validates WHAT
+- **Pattern**: `allow read, write: if isAdmin(); allow delete: if false`
+- **Source**: `standards/backend/firestore-security.md`
+- **Status**: ✅ Confirmed - Simple authentication checks only
+
 ## Architecture Patterns (Confirmed)
 
 ### Domain Structure
-- **Decision**: Vertical slice under `workspace/projects/events/`
-- **Rationale**: Constitution Principle VIII, DDD principles, co-locates related code
+- **Decision**: Top-level `/domains/project/events/` domain
+- **Rationale**: Clear separation from workspace features and future event editing features (/domains/event)
 - **Structure**:
   ```
-  events/
+  /domains/project/events/
   ├── components/  # UI components
-  ├── containers/  # Container components
+  ├── containers/  # ProjectEventsPage
   ├── hooks/       # React hooks (queries, mutations)
   ├── schemas/     # Zod validation schemas
   ├── types/       # TypeScript types
   └── index.ts     # Barrel export
   ```
-- **Source**: `standards/global/project-structure.md`, existing workspace/projects structure
-- **Status**: ✅ Confirmed - Follows existing pattern
+- **Source**: `standards/global/project-structure.md`
+- **Status**: ✅ Confirmed - New top-level project domain
+
+### Firestore Subcollection Structure
+- **Decision**: `projects/{projectId}/events/{eventId}` (subcollection)
+- **Rationale**:
+  - Clear ownership: events physically nested under projects
+  - projectId implicit in path (not stored as field)
+  - Simpler data model (one less field to manage)
+  - Efficient queries within a project
+  - Collection group queries available for cross-project scenarios
+- **Source**: User decision, aligns with Firestore best practices
+- **Status**: ✅ Confirmed - Subcollection chosen over top-level collection
 
 ### Client-First Architecture
-- **Decision**: All CRUD operations via Firestore client SDK, security via Firestore rules
-- **Rationale**: Constitution Principle VI, existing architecture pattern
+- **Decision**: All CRUD operations via Firestore client SDK, security via simple Firestore rules
+- **Rationale**: Constitution Principle VI, existing architecture pattern, standards compliance
 - **Pattern**:
-  - ✅ Read: `onSnapshot()` for real-time updates
-  - ✅ Create: `addDoc()` with Zod-validated input
-  - ✅ Update: `updateDoc()` with Zod-validated input
+  - ✅ Read: `onSnapshot()` for real-time updates on subcollection
+  - ✅ Create: `addDoc(collection(firestore, 'projects/{id}/events'))` with Zod-validated input
+  - ✅ Update: `updateDoc()` on subcollection document with Zod-validated input
   - ✅ Delete: `updateDoc()` with status = "deleted" (soft delete)
-  - ✅ Security: Firestore rules enforce workspace admin authorization
-- **Source**: `standards/global/client-first-architecture.md`, existing workspace hooks
-- **Status**: ✅ Confirmed - Follows existing pattern
+  - ✅ Security: Simple admin checks (`isAdmin()` only, no data validation)
+- **Source**: `standards/global/client-first-architecture.md`, `standards/backend/firestore-security.md`
+- **Status**: ✅ Confirmed - Follows existing pattern with simplified security
 
 ### Real-Time Subscriptions
 - **Decision**: Use `onSnapshot()` in custom hooks wrapped with TanStack Query
 - **Rationale**: Existing pattern in workspace domain, provides real-time updates with caching
 - **Pattern**:
   ```typescript
-  export function useEvents(projectId: string) {
+  export function useProjectEvents(projectId: string) {
     return useQuery({
-      queryKey: ['events', projectId],
+      queryKey: ['projectEvents', projectId],
       queryFn: () => {
-        return new Promise<Event[]>((resolve) => {
+        return new Promise<ProjectEvent[]>((resolve) => {
+          // Subcollection path (projectId in path, not query filter)
           const q = query(
-            collection(firestore, 'events'),
-            where('projectId', '==', projectId),
-            where('status', '!=', 'deleted')
+            collection(firestore, `projects/${projectId}/events`),
+            where('status', '==', 'draft'),
+            orderBy('createdAt', 'desc')
           )
           const unsubscribe = onSnapshot(q, (snapshot) => {
-            const events = snapshot.docs.map(doc => eventSchema.parse({ id: doc.id, ...doc.data() }))
+            const events = snapshot.docs.map(doc =>
+              projectEventSchema.parse({ id: doc.id, ...doc.data() })
+            )
             resolve(events)
           })
           return () => unsubscribe()
@@ -103,195 +125,140 @@ All technical decisions and patterns for the Events Management feature are well-
   }
   ```
 - **Source**: Existing workspace hooks pattern
-- **Status**: ✅ Confirmed - Will adapt existing pattern
+- **Status**: ✅ Confirmed - Adapted for subcollection paths
 
 ### Mutations with TanStack Query
 - **Decision**: Use `useMutation()` for all write operations
 - **Rationale**: Existing pattern, provides optimistic updates, error handling, onSuccess callbacks
 - **Pattern**:
   ```typescript
-  export function useCreateEvent() {
+  export function useCreateProjectEvent(projectId: string) {
     const queryClient = useQueryClient()
     return useMutation({
-      mutationFn: async ({ projectId, name }: CreateEventInput) => {
-        const input = createEventSchema.parse({ projectId, name })
-        const docRef = await addDoc(collection(firestore, 'events'), {
-          ...input,
+      mutationFn: async (input: CreateProjectEventInput) => {
+        const validated = createProjectEventInputSchema.parse(input)
+        // Subcollection path (projectId in path)
+        const eventsRef = collection(firestore, `projects/${projectId}/events`)
+        const docRef = await addDoc(eventsRef, {
+          ...validated,
           status: 'draft',
           createdAt: Date.now(),
           updatedAt: Date.now(),
           deletedAt: null
         })
-        return { id: docRef.id, ...input }
+        return { id: docRef.id, ...validated }
       },
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['events'] })
+        queryClient.invalidateQueries({ queryKey: ['projectEvents', projectId] })
       }
     })
   }
   ```
 - **Source**: Existing workspace mutation hooks
-- **Status**: ✅ Confirmed - Will adapt existing pattern
+- **Status**: ✅ Confirmed - Adapted for subcollection structure
 
 ## Data Model Design (Confirmed)
 
-### Event Entity
-- **Decision**: Firestore collection `events` with soft delete via `status` field
+### ProjectEvent Entity
+- **Decision**: Firestore subcollection `projects/{projectId}/events` with soft delete via `status` field
 - **Fields**:
   - `id`: string (Firestore document ID)
-  - `projectId`: string (reference to parent project)
+  - ~~`projectId`: NOT STORED~~ (implicit in subcollection path)
   - `name`: string (default: "Untitled event")
   - `status`: "draft" | "deleted" (soft delete mechanism)
   - `createdAt`: number (timestamp)
   - `updatedAt`: number (timestamp)
   - `deletedAt`: number | null (soft delete timestamp)
-- **Indexes**: `projectId`, `status`, composite `projectId + status`
-- **Source**: Feature spec data model, existing Firestore patterns
-- **Status**: ✅ Confirmed - Aligns with spec
+- **Indexes**: Collection group composite: `status + createdAt`
+- **Source**: Feature spec data model, Firestore subcollection patterns
+- **Status**: ✅ Confirmed - Subcollection structure, projectId implicit
 
 ### Project Entity Update
 - **Decision**: Add `activeEventId` field to existing `projects` collection
-- **Field**: `activeEventId`: string | null (references single active event, null if none active)
-- **Rationale**: Atomic enforcement of single active event constraint
-- **Migration**: Field will be added via Firestore update (no migration script needed, null by default)
+- **Field**: `activeEventId`: string | null (references single active event ID, null if none active)
+- **Rationale**: Atomic enforcement of single active event constraint, simple field addition
+- **Migration**: No migration script needed (null by default)
 - **Source**: Feature spec requirements
 - **Status**: ✅ Confirmed - Simple field addition
 
 ### Relationships
-- **Event → Project**: Many-to-One (event.projectId references project.id)
-- **Project → ActiveEvent**: Optional One-to-One (project.activeEventId references event.id or null)
+- **ProjectEvent → Project**: Many-to-One via subcollection path `projects/{projectId}/events/{eventId}`
+- **Project → ActiveEvent**: Optional One-to-One via `project.activeEventId` field
 - **Source**: Feature spec requirements
-- **Status**: ✅ Confirmed - Clear relationships
+- **Status**: ✅ Confirmed - Clear relationships via subcollection path
 
 ## Security & Authorization (Confirmed)
 
-### Firestore Security Rules
-- **Decision**: Enforce workspace admin authorization via Firestore rules
+### Firestore Security Rules (Simplified)
+- **Decision**: Simple admin-only checks (per `standards/backend/firestore-security.md`)
 - **Pattern**:
   ```javascript
-  match /events/{eventId} {
-    // Read: Allow workspace admins of parent project's workspace
-    allow read: if isWorkspaceAdmin(getProject(resource.data.projectId).workspaceId);
-
-    // Write: Allow workspace admins only
-    allow create: if isWorkspaceAdmin(getProject(request.resource.data.projectId).workspaceId);
-    allow update: if isWorkspaceAdmin(getProject(resource.data.projectId).workspaceId);
-    allow delete: if false; // Soft delete only, no hard deletes
+  // Simple admin check only (NO data validation)
+  match /projects/{projectId}/events/{eventId} {
+    allow read: if isAdmin();
+    allow create, update: if isAdmin();
+    allow delete: if false;  // Soft delete only
   }
   ```
-- **Source**: `standards/backend/firestore-security.md`, existing workspace rules
-- **Status**: ✅ Confirmed - Will adapt existing workspace admin pattern
+- **Key Principles**:
+  - ✅ Rules check WHO can access (authentication/authorization)
+  - ✅ Zod schemas validate WHAT is valid (data validation in app code)
+  - ✅ No expensive `get()` calls
+  - ✅ No data validation in rules (violates standards)
+  - ✅ Easy to understand and maintain
+- **Source**: `standards/backend/firestore-security.md`
+- **Status**: ✅ Confirmed - Simplified to follow standards
 
 ### Client-Side Authorization
 - **Decision**: UI controls hide/show based on auth state, but security enforced server-side
-- **Pattern**: Check `currentUser` in hooks, disable/hide controls if not workspace admin
+- **Pattern**: Check `currentUser` and `admin` custom claim in hooks, disable/hide controls if not admin
 - **Source**: `standards/global/security.md`, existing auth patterns
 - **Status**: ✅ Confirmed - Security in rules, UX in client
 
-## UI Component Decisions (Confirmed)
+## Technology Decisions Summary
 
-### Components from shadcn/ui
-All components already available in `apps/clementine-app/src/ui-kit/components/`:
-
-1. **AlertDialog** - Deletion confirmation
-   - **Usage**: Confirm before soft-deleting event
-   - **Status**: ✅ Available - `ui-kit/components/alert-dialog.tsx`
-
-2. **Switch** - Event activation toggle
-   - **Usage**: Toggle active/inactive state for events
-   - **Status**: ✅ Available - `ui-kit/components/switch.tsx`
-
-3. **DropdownMenu** - Context menu for rename/delete
-   - **Usage**: Right-click or three-dot menu on event items
-   - **Status**: ✅ Needs installation - `pnpm dlx shadcn@latest add dropdown-menu`
-
-4. **Button** - Create event button
-   - **Usage**: Primary action to create new event
-   - **Status**: ✅ Available - `ui-kit/components/button.tsx`
-
-5. **Dialog** - Rename event dialog
-   - **Usage**: Modal for renaming event
-   - **Status**: ✅ Available - `ui-kit/components/dialog.tsx`
-
-6. **Input** - Text input for event name
-   - **Usage**: Name input in rename dialog
-   - **Status**: ✅ Available - `ui-kit/components/input.tsx`
-
-### Custom Components Needed
-- **EventsList**: List container with empty state
-- **EventItem**: Individual event row with activation switch and context menu
-- **CreateEventButton**: Button with create icon
-- **DeleteEventDialog**: AlertDialog wrapper with confirmation logic
-- **RenameEventDialog**: Dialog wrapper with form and validation
-
-**Source**: `standards/frontend/component-libraries.md`
-**Status**: ✅ Confirmed - Build on shadcn/ui primitives
-
-## Mobile-First Design (Confirmed)
-
-### Touch Targets
-- **Decision**: All interactive elements 44x44px minimum
-- **Elements**: Event items (entire row clickable), activation switch, context menu trigger
-- **Source**: Constitution Principle I
-- **Status**: ✅ Confirmed - Will enforce in implementation
-
-### Responsive Breakpoints
-- **Decision**: Use Tailwind CSS 4 mobile-first breakpoints
-- **Breakpoints**: `sm: 640px`, `md: 768px`, `lg: 1024px`
-- **Primary Target**: 320px-768px (mobile and tablet)
-- **Source**: `standards/frontend/responsive.md`
-- **Status**: ✅ Confirmed - Existing standard
-
-### Performance Targets
-- **Page Load**: < 2 seconds on 4G networks
-- **Real-Time Updates**: < 500ms from Firestore change to UI update
-- **Event Operations**: < 2 seconds (create, rename, delete, activate)
-- **Source**: Constitution Principle I, feature spec success criteria
-- **Status**: ✅ Confirmed - Will measure in implementation
-
-## Testing Strategy (Confirmed)
-
-### Unit Tests (Vitest)
-- **Hooks**: `useEvents`, `useCreateEvent`, `useDeleteEvent`, `useRenameEvent`, `useActivateEvent`
-- **Pattern**: Mock Firestore, test hook behavior and error handling
-- **Source**: `standards/testing/testing.md`
-- **Status**: ✅ Confirmed - Will write unit tests for all hooks
-
-### Component Tests (Testing Library)
-- **Components**: `EventsList`, `EventItem`, `CreateEventButton`, `DeleteEventDialog`, `RenameEventDialog`
-- **Pattern**: Render with mock data, test user interactions (click, toggle, submit)
-- **Source**: `standards/testing/testing.md`
-- **Status**: ✅ Confirmed - Will write component tests
-
-### Coverage Goals
-- **Overall**: 70%+
-- **Critical Paths**: 90%+ (event creation, activation, deletion)
-- **Source**: Constitution Principle IV
-- **Status**: ✅ Confirmed - Minimal testing strategy
+| Decision | Rationale | Alternatives Considered |
+|----------|-----------|------------------------|
+| **Firestore subcollection** | Clear ownership, projectId implicit in path, aligns with domain model | Top-level collection (rejected: projectId as redundant field, less clear ownership) |
+| **Simple admin-only security rules** | Follows standards (rules check WHO, Zod validates WHAT), easy to maintain | Complex rules with data validation (rejected: violates standards, expensive get() calls, hard to maintain) |
+| **"ProjectEvent" terminology** | Clear, unambiguous, distinguishes from other event types | "Event" (rejected: too generic), "ProjectActivity" (rejected: less clear) |
+| **Top-level /domains/project** | Clear bounded context, scales as project features grow, parallel to future /domains/event | Nested under /domains/workspace (rejected: less clear separation, harder to scale) |
+| Client-first with Firestore client SDK | Constitution Principle VI, real-time updates, reduces complexity | Server-first (rejected: loses real-time, increases complexity) |
+| Zod for validation (app code only) | Constitution Principle III, standards compliance | Validation in security rules (rejected: violates standards) |
+| TanStack Query for mutations | Existing pattern, caching, optimistic updates | Direct Firestore calls (rejected: loses caching) |
+| Soft delete via status field | Data preservation, spec requirement | Hard delete (rejected: spec requires soft delete) |
+| activeEventId on project document | Atomic single-active constraint | activeEventId on event (rejected: cannot enforce atomically) |
+| shadcn/ui components | Existing standard, accessible, mobile-friendly | Custom components (rejected: reinvents wheel) |
 
 ## Best Practices Summary
 
-### Firestore Client SDK
-- ✅ Use `onSnapshot()` for real-time subscriptions
-- ✅ Handle cleanup in `useEffect` return
-- ✅ Validate all inputs with Zod before writing
-- ✅ Parse all outputs with Zod after reading
-- ✅ Use composite queries for filtering (projectId + status)
-- **Source**: `standards/backend/firestore.md`
+### Firestore Subcollections
+- ✅ Use subcollection path for parent reference (not stored field)
+- ✅ Query subcollection with `collection(firestore, 'projects/{id}/events')`
+- ✅ Use collection group queries for cross-project scenarios
+- ✅ Keep subcollection name simple ("events" not "projectEvents")
+- **Source**: Firestore best practices
+
+### Firestore Security Rules
+- ✅ **Simple authentication checks only** (`isAdmin()`)
+- ✅ **No data validation** (use Zod in app code)
+- ✅ **No expensive get() calls**
+- ✅ **Easy to understand and maintain**
+- **Source**: `standards/backend/firestore-security.md`
 
 ### TanStack Query
-- ✅ Use `useQuery()` for subscriptions with `queryKey: ['events', projectId]`
+- ✅ Use `useQuery()` for subscriptions with `queryKey: ['projectEvents', projectId]`
 - ✅ Use `useMutation()` for write operations
 - ✅ Invalidate queries in `onSuccess` callbacks
 - ✅ Use optimistic updates for instant feedback (optional)
 - **Source**: `standards/frontend/state-management.md`
 
 ### Zod Validation
-- ✅ Define schemas for Event, CreateEventInput, UpdateEventInput
+- ✅ Define schemas for ProjectEvent, CreateProjectEventInput, UpdateProjectEventInput
 - ✅ Use `.parse()` for server-side validation (throws on error)
 - ✅ Use `.safeParse()` for client-side validation (returns result object)
-- ✅ Validate both inputs and outputs from Firestore
-- **Source**: `standards/global/zod-validation.md`
+- ✅ **Validate in application code, NOT security rules**
+- **Source**: `standards/global/zod-validation.md`, `standards/backend/firestore-security.md`
 
 ### shadcn/ui Components
 - ✅ Use existing components from `ui-kit/components/`
@@ -309,62 +276,69 @@ All components already available in `apps/clementine-app/src/ui-kit/components/`
 
 ## Alternatives Considered & Rejected
 
-### 1. Server-First Architecture
+### 1. Top-Level Collection vs Subcollection
+- **Alternative**: Use top-level `events` collection with `projectId` field
+- **Rejected Because**: Subcollection provides clearer ownership, eliminates redundant projectId field, aligns better with domain model
+- **Decision**: ✅ Use subcollection `projects/{projectId}/events`
+
+### 2. Complex Security Rules with Data Validation
+- **Alternative**: Validate data shape, field values, business logic in Firestore security rules
+- **Rejected Because**: Violates `standards/backend/firestore-security.md`, hard to maintain, expensive get() calls, poor error messages
+- **Decision**: ✅ Use simple admin checks only, validate with Zod in app code
+
+### 3. Nested Under Workspace Domain
+- **Alternative**: Place events under `/domains/workspace/projects/events`
+- **Rejected Because**: Less clear bounded context, harder to scale as project features grow, doesn't parallel future /domains/event structure
+- **Decision**: ✅ Use top-level `/domains/project` domain
+
+### 4. Server-First Architecture
 - **Alternative**: Use TanStack Start server functions for all CRUD operations
-- **Rejected Because**: Violates Constitution Principle VI (client-first architecture), loses real-time updates, increases complexity, adds latency
+- **Rejected Because**: Violates Constitution Principle VI, loses real-time updates, increases complexity
 - **Decision**: ✅ Use client-first with Firestore client SDK
 
-### 2. Hard Delete
+### 5. Hard Delete
 - **Alternative**: Permanently delete events from Firestore
-- **Rejected Because**: Feature spec explicitly requires soft delete, loses data for potential recovery, complicates audit trails
+- **Rejected Because**: Spec requires soft delete, loses data for recovery
 - **Decision**: ✅ Use soft delete via status field
 
-### 3. Active Flag on Event
+### 6. Active Flag on Event
 - **Alternative**: Store `isActive: boolean` on each event document
-- **Rejected Because**: Cannot atomically enforce single active event constraint, requires complex queries and race condition handling
+- **Rejected Because**: Cannot enforce single active constraint atomically, race conditions
 - **Decision**: ✅ Store `activeEventId` on project document
-
-### 4. Custom Modal Components
-- **Alternative**: Build custom dialog/modal components from scratch
-- **Rejected Because**: Reinvents shadcn/ui AlertDialog and Dialog, loses accessibility, violates component library standard
-- **Decision**: ✅ Use shadcn/ui AlertDialog and Dialog
-
-### 5. Right-Click Context Menu
-- **Alternative**: Use browser's native context menu (right-click)
-- **Rejected Because**: Not mobile-friendly (no right-click on touch devices), poor UX on mobile
-- **Decision**: ✅ Use Radix DropdownMenu (works on both desktop and mobile)
-
-### 6. Custom Switch Component
-- **Alternative**: Build custom toggle switch from scratch
-- **Rejected Because**: Reinvents shadcn/ui Switch, loses accessibility, violates component library standard
-- **Decision**: ✅ Use shadcn/ui Switch
 
 ## Risks & Mitigations
 
 ### Risk 1: Concurrent Activation
-- **Risk**: Two admins activate different events simultaneously, violating single active constraint
+- **Risk**: Two admins activate different events simultaneously
 - **Mitigation**: Use Firestore transaction for activation to ensure atomic update of `project.activeEventId`
-- **Status**: ✅ Mitigated
+- **Status**: ✅ Mitigated with transaction pattern
 
 ### Risk 2: Deleted Event Still Active
-- **Risk**: Admin deletes the currently active event, leaving stale `activeEventId` reference
-- **Mitigation**: Firestore transaction: when deleting event, check if it's active and clear `project.activeEventId` if so
-- **Status**: ✅ Mitigated
+- **Risk**: Admin deletes currently active event, leaving stale `activeEventId`
+- **Mitigation**: Firestore transaction: when deleting event, check if active and clear `project.activeEventId`
+- **Status**: ✅ Mitigated with transaction pattern
 
 ### Risk 3: Real-Time Update Performance
 - **Risk**: Large number of events causes slow real-time updates
-- **Mitigation**: Firestore composite index on `projectId + status`, client-side pagination if needed (spec supports up to 100 events)
-- **Status**: ✅ Mitigated
+- **Mitigation**: Firestore collection group index on `status + createdAt`, subcollection queries are already scoped to project
+- **Status**: ✅ Mitigated with indexes and subcollection structure
 
 ### Risk 4: Mobile Touch Target Size
-- **Risk**: Small touch targets cause accidental taps on mobile
-- **Mitigation**: Enforce 44x44px minimum touch targets, test on real mobile devices, use larger tap areas for critical actions
-- **Status**: ✅ Mitigated
+- **Risk**: Small touch targets cause accidental taps
+- **Mitigation**: Enforce 44x44px minimum, test on real devices
+- **Status**: ✅ Mitigated with mobile-first design
 
 ## Summary
 
-**Research Status**: ✅ COMPLETE - No unknowns remain
+**Research Status**: ✅ COMPLETE - All decisions confirmed
 
-All technology decisions, architecture patterns, and implementation approaches are confirmed and aligned with existing codebase standards. The Events Management feature will follow established patterns from the workspace domain, use existing component libraries (shadcn/ui, Radix UI), and adhere to all constitution principles.
+All technology decisions, architecture patterns, and implementation approaches are confirmed and aligned with existing codebase standards. The Project Events Management feature will follow established patterns from the workspace domain, use existing component libraries (shadcn/ui, Radix UI), adhere to all constitution principles, and follow simplified security rules per standards.
 
-**Next Phase**: Proceed to Phase 1 (Design & Contracts) to create data-model.md and API contracts.
+**Key Architectural Decisions**:
+1. ✅ Firestore subcollection structure (`projects/{projectId}/events`)
+2. ✅ Simple admin-only security rules (no data validation in rules)
+3. ✅ Top-level `/domains/project` domain (parallel to future `/domains/event`)
+4. ✅ "ProjectEvent" terminology for clarity
+5. ✅ Validation in application code with Zod (not in security rules)
+
+**Next Phase**: Proceed to implementation with confirmed architecture and patterns.

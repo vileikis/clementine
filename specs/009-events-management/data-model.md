@@ -2,33 +2,33 @@
 
 **Feature**: 009-events-management
 **Date**: 2026-01-01
-**Status**: Final
+**Status**: Final (Updated for subcollection structure)
 
 ## Overview
 
-This document defines the data model for the Events Management feature, including entity schemas, relationships, validation rules, state transitions, and Firestore collection structure.
+This document defines the data model for the Project Events Management feature, including entity schemas, relationships, validation rules, state transitions, and Firestore subcollection structure.
 
 ## Entities
 
-### Event
+### ProjectEvent
 
-Represents an AI-powered photo booth experience within a project. Events can be created, renamed, activated, and soft-deleted by workspace admins.
+Represents an AI-powered photo booth experience within a project. Project events can be created, renamed, activated, and soft-deleted by workspace admins.
 
-**Firestore Collection**: `events`
+**Firestore Subcollection**: `projects/{projectId}/events/{eventId}`
 
 **Schema**:
 
 ```typescript
-export type EventStatus = "draft" | "deleted"
+export type ProjectEventStatus = "draft" | "deleted"
 
-export type Event = {
-  id: string                 // Firestore document ID (auto-generated)
-  projectId: string          // Reference to parent project (required)
-  name: string               // Event display name (default: "Untitled event")
-  status: EventStatus        // Event lifecycle status (default: "draft")
-  createdAt: number          // Creation timestamp (milliseconds since epoch)
-  updatedAt: number          // Last update timestamp (milliseconds since epoch)
-  deletedAt: number | null   // Soft delete timestamp (null if not deleted)
+export type ProjectEvent = {
+  id: string                      // Firestore document ID (auto-generated)
+  // Note: projectId is implicit in the document path, not stored as a field
+  name: string                    // Project event display name (default: "Untitled event")
+  status: ProjectEventStatus      // Project event lifecycle status (default: "draft")
+  createdAt: number               // Creation timestamp (milliseconds since epoch)
+  updatedAt: number               // Last update timestamp (milliseconds since epoch)
+  deletedAt: number | null        // Soft delete timestamp (null if not deleted)
 }
 ```
 
@@ -37,12 +37,13 @@ export type Event = {
 | Field | Type | Required | Default | Constraints |
 |-------|------|----------|---------|-------------|
 | `id` | string | Yes | Auto-generated | Firestore document ID |
-| `projectId` | string | Yes | - | Must reference existing project |
 | `name` | string | Yes | "Untitled event" | Min length: 1, Max length: 100 |
-| `status` | EventStatus | Yes | "draft" | Enum: "draft" \| "deleted" |
+| `status` | ProjectEventStatus | Yes | "draft" | Enum: "draft" \| "deleted" |
 | `createdAt` | number | Yes | `Date.now()` | Positive integer timestamp |
 | `updatedAt` | number | Yes | `Date.now()` | Positive integer timestamp |
 | `deletedAt` | number \| null | Yes | null | Positive integer or null |
+
+**Note**: `projectId` is NOT stored as a field - it's implicit in the Firestore document path `projects/{projectId}/events/{eventId}`.
 
 **Indexes**:
 
@@ -50,9 +51,8 @@ export type Event = {
 // Firestore composite indexes
 {
   collectionGroup: "events",
-  queryScope: "COLLECTION",
+  queryScope: "COLLECTION_GROUP",
   fields: [
-    { fieldPath: "projectId", order: "ASCENDING" },
     { fieldPath: "status", order: "ASCENDING" },
     { fieldPath: "createdAt", order: "DESCENDING" }
   ]
@@ -64,20 +64,19 @@ export type Event = {
 ```typescript
 import { z } from 'zod'
 
-export const eventStatusSchema = z.enum(['draft', 'deleted'])
+export const projectEventStatusSchema = z.enum(['draft', 'deleted'])
 
-export const eventSchema = z.object({
+export const projectEventSchema = z.object({
   id: z.string().min(1),
-  projectId: z.string().min(1),
   name: z.string().min(1).max(100),
-  status: eventStatusSchema,
+  status: projectEventStatusSchema,
   createdAt: z.number().int().positive(),
   updatedAt: z.number().int().positive(),
   deletedAt: z.number().int().positive().nullable()
 })
 
-export type Event = z.infer<typeof eventSchema>
-export type EventStatus = z.infer<typeof eventStatusSchema>
+export type ProjectEvent = z.infer<typeof projectEventSchema>
+export type ProjectEventStatus = z.infer<typeof projectEventStatusSchema>
 ```
 
 **State Transitions**:
@@ -94,27 +93,27 @@ export type EventStatus = z.infer<typeof eventStatusSchema>
 
 **Business Rules**:
 
-1. **Soft Delete Only**: Events are never hard-deleted. Deletion sets `status = "deleted"` and `deletedAt = Date.now()`
-2. **Deleted Events Hidden**: Events with `status === "deleted"` are excluded from all queries
-3. **Deleted Events Inaccessible**: Direct access to deleted events returns 404 Not Found
-4. **No Activation When Deleted**: Deleted events cannot be activated
-5. **No Rename When Deleted**: Deleted events cannot be renamed
-6. **Creation Default**: New events always have `status = "draft"` and `deletedAt = null`
+1. **Soft Delete Only**: Project events are never hard-deleted. Deletion sets `status = "deleted"` and `deletedAt = Date.now()`
+2. **Deleted Events Hidden**: Project events with `status === "deleted"` are excluded from all queries
+3. **Deleted Events Inaccessible**: Direct access to deleted project events returns 404 Not Found
+4. **No Activation When Deleted**: Deleted project events cannot be activated
+5. **No Rename When Deleted**: Deleted project events cannot be renamed
+6. **Creation Default**: New project events always have `status = "draft"` and `deletedAt = null`
 
 ---
 
 ### Project (Updated)
 
-Existing entity with new field added for active event management.
+Existing entity with new field added for active project event management.
 
-**Firestore Collection**: `projects`
+**Firestore Collection**: `projects/{projectId}`
 
 **New Field**:
 
 ```typescript
 export type Project = {
   // ... existing fields ...
-  activeEventId: string | null   // Reference to currently active event (null if none)
+  activeEventId: string | null   // Reference to currently active project event (null if none)
 }
 ```
 
@@ -122,7 +121,7 @@ export type Project = {
 
 | Field | Type | Required | Default | Constraints |
 |-------|------|----------|---------|-------------|
-| `activeEventId` | string \| null | Yes | null | Must reference existing non-deleted event or be null |
+| `activeEventId` | string \| null | Yes | null | Must reference existing non-deleted project event or be null |
 
 **Validation Rules**:
 
@@ -136,77 +135,86 @@ export const projectSchema = z.object({
 
 **Business Rules**:
 
-1. **Single Active Event**: `activeEventId` can reference at most one event at any time
+1. **Single Active Event**: `activeEventId` can reference at most one project event at any time
 2. **No Active Event Allowed**: `activeEventId` can be null (project has no active event)
 3. **Atomic Activation**: Setting `activeEventId` must atomically clear previous value (Firestore transaction)
-4. **Deleted Event Check**: If referenced event is deleted, `activeEventId` must be cleared to null
-5. **Cross-Project Constraint**: An event can only be active in its parent project (enforced by `event.projectId === project.id`)
+4. **Deleted Event Check**: If referenced project event is deleted, `activeEventId` must be cleared to null
+5. **Same Project Constraint**: An event can only be active in its parent project (enforced by subcollection path)
 
 ---
 
 ## Relationships
 
-### Event → Project (Many-to-One)
+### ProjectEvent → Project (Many-to-One)
 
-**Relationship**: Each event belongs to exactly one project.
+**Relationship**: Each project event belongs to exactly one project (via Firestore subcollection path).
 
 **Implementation**:
-- **Foreign Key**: `event.projectId` references `project.id`
-- **Cardinality**: Many events to one project
-- **Cascade Behavior**: When project is deleted, all events should be soft-deleted (via Firestore security rules or application logic)
+- **Subcollection Path**: `projects/{projectId}/events/{eventId}`
+- **Cardinality**: Many project events to one project
+- **Implicit Parent Reference**: projectId is in the path, not stored as a field
+- **Cascade Behavior**: When project is deleted, all project events should be soft-deleted (via application logic or scheduled job)
 
 **Queries**:
 
 ```typescript
-// Get all non-deleted events for a project
-const eventsRef = collection(firestore, 'events')
+// Get all non-deleted project events for a project
+const eventsRef = collection(firestore, `projects/${projectId}/events`)
 const q = query(
   eventsRef,
-  where('projectId', '==', projectId),
   where('status', '==', 'draft'),
   orderBy('createdAt', 'desc')
 )
+
+// Real-time subscription
+const unsubscribe = onSnapshot(q, (snapshot) => {
+  const events = snapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  }))
+})
 ```
 
 ---
 
 ### Project → ActiveEvent (Optional One-to-One)
 
-**Relationship**: Each project has at most one active event (or none).
+**Relationship**: Each project has at most one active project event (or none).
 
 **Implementation**:
-- **Foreign Key**: `project.activeEventId` references `event.id` (nullable)
-- **Cardinality**: One project to zero or one event
-- **Constraint**: `project.activeEventId` must reference an event where `event.status === "draft"` and `event.projectId === project.id`
+- **Foreign Key**: `project.activeEventId` references project event ID (nullable)
+- **Cardinality**: One project to zero or one project event
+- **Constraint**: `project.activeEventId` must reference an event where `event.status === "draft"` and event exists in `projects/{projectId}/events/`
 
 **Queries**:
 
 ```typescript
-// Get active event for a project
+// Get active project event for a project
 const projectRef = doc(firestore, 'projects', projectId)
 const projectDoc = await getDoc(projectRef)
 const activeEventId = projectDoc.data()?.activeEventId
 
 if (activeEventId) {
-  const eventRef = doc(firestore, 'events', activeEventId)
+  const eventRef = doc(firestore, `projects/${projectId}/events`, activeEventId)
   const eventDoc = await getDoc(eventRef)
-  const activeEvent = eventSchema.parse({ id: eventDoc.id, ...eventDoc.data() })
+  if (eventDoc.exists()) {
+    const activeEvent = projectEventSchema.parse({ id: eventDoc.id, ...eventDoc.data() })
+  }
 }
 ```
 
 **Activation Transaction**:
 
 ```typescript
-// Atomically activate event (ensure single active constraint)
+// Atomically activate project event (ensure single active constraint)
 await runTransaction(firestore, async (transaction) => {
   const projectRef = doc(firestore, 'projects', projectId)
-  const eventRef = doc(firestore, 'events', eventId)
+  const eventRef = doc(firestore, `projects/${projectId}/events`, eventId)
 
-  // Verify event exists and belongs to project
+  // Verify event exists and is not deleted
   const eventDoc = await transaction.get(eventRef)
-  if (!eventDoc.exists()) throw new Error('Event not found')
-  if (eventDoc.data().projectId !== projectId) throw new Error('Event does not belong to project')
-  if (eventDoc.data().status === 'deleted') throw new Error('Cannot activate deleted event')
+  if (!eventDoc.exists()) throw new Error('Project event not found')
+  if (eventDoc.data().status === 'deleted') throw new Error('Cannot activate deleted project event')
 
   // Atomically update activeEventId (clears previous active event)
   transaction.update(projectRef, { activeEventId: eventId })
@@ -217,7 +225,9 @@ await runTransaction(firestore, async (transaction) => {
 
 ## Firestore Security Rules
 
-Security rules enforce workspace admin authorization and prevent invalid state transitions.
+Security rules enforce workspace admin authorization with simple authentication checks (per `standards/backend/firestore-security.md`).
+
+**Key Principle**: Security rules check **WHO** can access data. Data validation happens with Zod schemas in application code.
 
 ```javascript
 rules_version = '2';
@@ -225,32 +235,19 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper function: Check if user is workspace admin
-    function isWorkspaceAdmin(workspaceId) {
+    // Helper function: Check if user is admin
+    function isAdmin() {
       return request.auth != null &&
-             exists(/databases/$(database)/documents/workspaces/$(workspaceId)/members/$(request.auth.uid)) &&
-             get(/databases/$(database)/documents/workspaces/$(workspaceId)/members/$(request.auth.uid)).data.role == 'admin';
+             request.auth.token.admin == true;
     }
 
-    // Helper function: Get project document
-    function getProject(projectId) {
-      return get(/databases/$(database)/documents/projects/$(projectId));
-    }
+    // Project events subcollection (simple admin check only)
+    match /projects/{projectId}/events/{eventId} {
+      // Read: Allow admins only
+      allow read: if isAdmin();
 
-    // Events collection
-    match /events/{eventId} {
-      // Read: Allow workspace admins of parent project's workspace
-      allow read: if isWorkspaceAdmin(getProject(resource.data.projectId).data.workspaceId);
-
-      // Create: Allow workspace admins, validate required fields
-      allow create: if isWorkspaceAdmin(getProject(request.resource.data.projectId).data.workspaceId) &&
-                       request.resource.data.keys().hasAll(['projectId', 'name', 'status', 'createdAt', 'updatedAt', 'deletedAt']) &&
-                       request.resource.data.status == 'draft' &&
-                       request.resource.data.deletedAt == null;
-
-      // Update: Allow workspace admins, prevent changing projectId
-      allow update: if isWorkspaceAdmin(getProject(resource.data.projectId).data.workspaceId) &&
-                       request.resource.data.projectId == resource.data.projectId;
+      // Write: Allow admins only
+      allow create, update: if isAdmin();
 
       // Delete: Deny hard deletes (soft delete only via update)
       allow delete: if false;
@@ -258,14 +255,14 @@ service cloud.firestore {
 
     // Projects collection (existing rules with activeEventId addition)
     match /projects/{projectId} {
-      // ... existing rules ...
+      // Read: Public (for guest links)
+      allow read: if true;
 
-      // Update activeEventId: Allow workspace admins, validate event belongs to project
-      allow update: if isWorkspaceAdmin(resource.data.workspaceId) &&
-                       (request.resource.data.activeEventId == null ||
-                        (exists(/databases/$(database)/documents/events/$(request.resource.data.activeEventId)) &&
-                         get(/databases/$(database)/documents/events/$(request.resource.data.activeEventId)).data.projectId == projectId &&
-                         get(/databases/$(database)/documents/events/$(request.resource.data.activeEventId)).data.status == 'draft'));
+      // Write: Admins only
+      allow create, update: if isAdmin();
+
+      // Delete: Deny hard deletes
+      allow delete: if false;
     }
   }
 }
@@ -273,127 +270,141 @@ service cloud.firestore {
 
 **Security Guarantees**:
 
-1. ✅ Only workspace admins can read, create, update events
+1. ✅ Only admins can read, create, update project events
 2. ✅ Hard deletes are prevented (soft delete only)
-3. ✅ `projectId` cannot be changed after creation (prevents moving events between projects)
-4. ✅ Active event must belong to project and not be deleted
-5. ✅ Required fields are enforced on creation
+3. ✅ Projects are publicly readable (for guest links)
+4. ✅ **Simple authentication checks only** (no data validation)
+5. ✅ **No expensive get() calls** (no nested database lookups)
+6. ✅ **Easy to understand and maintain**
+
+**Data Validation**: All data validation (status, required fields, name length, etc.) happens in Zod schemas in application code, NOT in security rules.
 
 ---
 
 ## Input/Output Schemas
 
-### Create Event Input
+### Create Project Event Input
 
 ```typescript
-export const createEventInputSchema = z.object({
-  projectId: z.string().min(1),
+export const createProjectEventInputSchema = z.object({
+  // projectId is NOT in the input - it's derived from the subcollection path
   name: z.string().min(1).max(100).optional().default('Untitled event')
 })
 
-export type CreateEventInput = z.infer<typeof createEventInputSchema>
+export type CreateProjectEventInput = z.infer<typeof createProjectEventInputSchema>
 ```
 
 **Usage**:
 
 ```typescript
-const input = createEventInputSchema.parse({ projectId: 'project-123' })
-// => { projectId: 'project-123', name: 'Untitled event' }
+const input = createProjectEventInputSchema.parse({ name: 'Summer Festival' })
+// => { name: 'Summer Festival' }
+
+// Create in subcollection (projectId in path, not data)
+const eventsRef = collection(firestore, `projects/${projectId}/events`)
+await addDoc(eventsRef, {
+  ...input,
+  status: 'draft',
+  createdAt: Date.now(),
+  updatedAt: Date.now(),
+  deletedAt: null
+})
 ```
 
 ---
 
-### Update Event Input
+### Update Project Event Input
 
 ```typescript
-export const updateEventInputSchema = z.object({
+export const updateProjectEventInputSchema = z.object({
   name: z.string().min(1).max(100)
 })
 
-export type UpdateEventInput = z.infer<typeof updateEventInputSchema>
+export type UpdateProjectEventInput = z.infer<typeof updateProjectEventInputSchema>
 ```
 
 **Usage**:
 
 ```typescript
-const input = updateEventInputSchema.parse({ name: 'Summer Festival 2026' })
+const input = updateProjectEventInputSchema.parse({ name: 'Summer Festival 2026' })
 // => { name: 'Summer Festival 2026' }
 ```
 
 ---
 
-### Delete Event Input
+### Delete Project Event Input
 
 ```typescript
-export const deleteEventInputSchema = z.object({
+export const deleteProjectEventInputSchema = z.object({
+  projectId: z.string().min(1),  // Needed to construct subcollection path
   eventId: z.string().min(1)
 })
 
-export type DeleteEventInput = z.infer<typeof deleteEventInputSchema>
+export type DeleteProjectEventInput = z.infer<typeof deleteProjectEventInputSchema>
 ```
 
 **Usage**:
 
 ```typescript
-const input = deleteEventInputSchema.parse({ eventId: 'event-456' })
-// => { eventId: 'event-456' }
+const input = deleteProjectEventInputSchema.parse({ projectId: 'proj-123', eventId: 'event-456' })
+// => { projectId: 'proj-123', eventId: 'event-456' }
 ```
 
 ---
 
-### Activate Event Input
+### Activate Project Event Input
 
 ```typescript
-export const activateEventInputSchema = z.object({
+export const activateProjectEventInputSchema = z.object({
   projectId: z.string().min(1),
   eventId: z.string().min(1)
 })
 
-export type ActivateEventInput = z.infer<typeof activateEventInputSchema>
+export type ActivateProjectEventInput = z.infer<typeof activateProjectEventInputSchema>
 ```
 
 **Usage**:
 
 ```typescript
-const input = activateEventInputSchema.parse({ projectId: 'project-123', eventId: 'event-456' })
-// => { projectId: 'project-123', eventId: 'event-456' }
+const input = activateProjectEventInputSchema.parse({ projectId: 'proj-123', eventId: 'event-456' })
+// => { projectId: 'proj-123', eventId: 'event-456' }
 ```
 
 ---
 
-### Deactivate Event Input
+### Deactivate Project Event Input
 
 ```typescript
-export const deactivateEventInputSchema = z.object({
+export const deactivateProjectEventInputSchema = z.object({
   projectId: z.string().min(1)
 })
 
-export type DeactivateEventInput = z.infer<typeof deactivateEventInputSchema>
+export type DeactivateProjectEventInput = z.infer<typeof deactivateProjectEventInputSchema>
 ```
 
 **Usage**:
 
 ```typescript
-const input = deactivateEventInputSchema.parse({ projectId: 'project-123' })
-// => { projectId: 'project-123' }
+const input = deactivateProjectEventInputSchema.parse({ projectId: 'proj-123' })
+// => { projectId: 'proj-123' }
 ```
 
 ---
 
 ## Error Scenarios
 
-### Event Not Found
+### Project Event Not Found
 
-**Scenario**: Client requests event that doesn't exist or is deleted
+**Scenario**: Client requests project event that doesn't exist or is deleted
 
 **Response**: 404 Not Found (treat deleted events as non-existent)
 
 **Validation**:
 
 ```typescript
-const eventDoc = await getDoc(doc(firestore, 'events', eventId))
+const eventDoc = await getDoc(doc(firestore, `projects/${projectId}/events`, eventId))
 if (!eventDoc.exists() || eventDoc.data().status === 'deleted') {
-  throw new Error('Event not found')
+  throw new Error('Project event not found')
 }
 ```
 
@@ -401,9 +412,9 @@ if (!eventDoc.exists() || eventDoc.data().status === 'deleted') {
 
 ### Project Not Found
 
-**Scenario**: Client creates event for non-existent project
+**Scenario**: Client creates project event for non-existent project
 
-**Response**: 400 Bad Request (invalid projectId reference)
+**Response**: 400 Bad Request (invalid projectId in path)
 
 **Validation**:
 
@@ -418,26 +429,26 @@ if (!projectDoc.exists() || projectDoc.data().status === 'deleted') {
 
 ### Unauthorized Access
 
-**Scenario**: User is not workspace admin for project's workspace
+**Scenario**: User is not admin
 
 **Response**: 403 Forbidden (Firestore security rules block access)
 
-**Enforcement**: Firestore security rules (see above)
+**Enforcement**: Firestore security rules check `request.auth.token.admin == true`
 
 ---
 
 ### Invalid Activation
 
-**Scenario**: Attempt to activate deleted event
+**Scenario**: Attempt to activate deleted project event
 
-**Response**: 400 Bad Request (cannot activate deleted event)
+**Response**: 400 Bad Request (cannot activate deleted project event)
 
 **Validation**:
 
 ```typescript
-const eventDoc = await getDoc(doc(firestore, 'events', eventId))
+const eventDoc = await getDoc(doc(firestore, `projects/${projectId}/events`, eventId))
 if (eventDoc.data().status === 'deleted') {
-  throw new Error('Cannot activate deleted event')
+  throw new Error('Cannot activate deleted project event')
 }
 ```
 
@@ -445,7 +456,7 @@ if (eventDoc.data().status === 'deleted') {
 
 ### Concurrent Activation
 
-**Scenario**: Two admins activate different events simultaneously
+**Scenario**: Two admins activate different project events simultaneously
 
 **Response**: Last write wins (Firestore transaction ensures atomic update)
 
@@ -466,29 +477,21 @@ if (eventDoc.data().status === 'deleted') {
 - Existing projects without this field will read as `null` (Firestore returns `undefined`, Zod coerces to `null`)
 - No data transformation required
 
-**Firestore Update**:
-
-```typescript
-// No migration needed - field will be added on first activation
-// Existing projects: activeEventId = undefined (coerced to null by Zod)
-// New projects: activeEventId = null (explicit default)
-```
-
 ---
 
-### Create Events Collection
+### Create Project Events Subcollection
 
-**Required**: Yes (new collection)
+**Required**: Yes (new subcollection structure)
 
 **Migration Strategy**: No migration needed (new feature, no existing data)
 
-**Initial State**: Empty collection (will be populated as admins create events)
+**Initial State**: Empty subcollections (will be populated as admins create project events)
 
 ---
 
 ### Firestore Indexes
 
-**Required**: Yes (composite index for efficient queries)
+**Required**: Yes (collection group index for cross-project queries)
 
 **Index Configuration**:
 
@@ -499,9 +502,8 @@ Add to `firestore.indexes.json`:
   "indexes": [
     {
       "collectionGroup": "events",
-      "queryScope": "COLLECTION",
+      "queryScope": "COLLECTION_GROUP",
       "fields": [
-        { "fieldPath": "projectId", "order": "ASCENDING" },
         { "fieldPath": "status", "order": "ASCENDING" },
         { "fieldPath": "createdAt", "order": "DESCENDING" }
       ]
@@ -520,14 +522,20 @@ firebase deploy --only firestore:indexes
 
 ## Summary
 
-**Data Model Status**: ✅ COMPLETE
+**Data Model Status**: ✅ COMPLETE (Updated for subcollection structure)
 
-**Entities**: 2 (Event, Project)
-**New Collections**: 1 (events)
+**Entities**: 2 (ProjectEvent, Project)
+**New Subcollections**: 1 (`projects/{projectId}/events`)
 **Modified Collections**: 1 (projects - add activeEventId field)
-**Relationships**: 2 (Event → Project, Project → ActiveEvent)
-**Validation Schemas**: 7 (event, createEventInput, updateEventInput, deleteEventInput, activateEventInput, deactivateEventInput, eventStatus)
-**Security Rules**: Defined for events collection and project activeEventId updates
+**Relationships**: 2 (ProjectEvent → Project via subcollection path, Project → ActiveEvent via activeEventId)
+**Validation Schemas**: 7 (projectEvent, createProjectEventInput, updateProjectEventInput, deleteProjectEventInput, activateProjectEventInput, deactivateProjectEventInput, projectEventStatus)
+**Security Rules**: Simple admin checks only (per standards)
 **Migration Required**: No (new feature, backward-compatible field addition)
 
-**Next Step**: Define API contracts in `contracts/` directory.
+**Key Changes from Original Plan**:
+- ✅ Subcollection structure instead of top-level collection
+- ✅ projectId implicit in path (not stored as field)
+- ✅ Simplified security rules (admin checks only, no data validation)
+- ✅ Renamed from "Event" to "ProjectEvent" for clarity
+
+**Next Step**: Update API contracts in `contracts/` directory.

@@ -7,7 +7,7 @@
 
 ## Summary
 
-Enable workspace admins to manage events within a project through a comprehensive events management interface. Admins can create new events with default naming, view all active events in a list, activate exactly one event at a time (or none), rename events for organization, and soft-delete events to maintain workspace cleanliness. The implementation follows client-first architecture with Firebase Firestore for data persistence, TanStack Query for client-side data management, and strict type safety with Zod validation.
+Enable workspace admins to manage project events within a project through a comprehensive project events management interface. Admins can create new project events with default naming, view all active project events in a list, activate exactly one project event at a time (or none), rename project events for organization, and soft-delete project events to maintain workspace cleanliness. The implementation follows client-first architecture with Firebase Firestore subcollections for data persistence, TanStack Query for client-side data management, and strict type safety with Zod validation.
 
 ## Technical Context
 
@@ -70,15 +70,15 @@ Enable workspace admins to manage events within a project through a comprehensiv
 ### ✅ Principle VIII: Project Structure
 
 - **Status**: COMPLIANT
-- **Evidence**: Vertical slice architecture within workspace domain, events will be a subdomain under `workspace/projects/events`, organized by technical concern with barrel exports
+- **Evidence**: Vertical slice architecture with new top-level project domain, project events will be under `/domains/project/events`, organized by technical concern with barrel exports
 - **Implementation**:
   ```
-  src/domains/workspace/projects/events/
-  ├── components/       # EventsList, EventItem, CreateEventButton
-  ├── containers/       # EventsManagementContainer
-  ├── hooks/           # useEvents, useCreateEvent, useDeleteEvent, useActivateEvent
-  ├── schemas/         # eventSchema, createEventSchema, updateEventSchema
-  ├── types/           # Event, EventStatus
+  src/domains/project/events/
+  ├── components/       # ProjectEventsList, ProjectEventItem, CreateProjectEventButton
+  ├── containers/       # ProjectEventsPage
+  ├── hooks/           # useProjectEvents, useCreateProjectEvent, useDeleteProjectEvent, useActivateProjectEvent
+  ├── schemas/         # projectEventSchema, createProjectEventSchema, updateProjectEventSchema
+  ├── types/           # ProjectEvent, ProjectEventStatus
   └── index.ts         # Barrel export (components, hooks, types only)
   ```
 
@@ -122,37 +122,35 @@ specs/009-events-management/
 ```text
 apps/clementine-app/src/
 ├── domains/
-│   └── workspace/
-│       ├── projects/
-│       │   ├── events/                    # NEW: Events management subdomain
-│       │   │   ├── components/
-│       │   │   │   ├── EventsList.tsx     # List of events with empty state
-│       │   │   │   ├── EventItem.tsx      # Individual event with activation switch and context menu
-│       │   │   │   ├── CreateEventButton.tsx  # Button to create new event
-│       │   │   │   ├── DeleteEventDialog.tsx  # Confirmation dialog for deletion
-│       │   │   │   └── RenameEventDialog.tsx  # Dialog for renaming event
-│       │   │   ├── containers/
-│       │   │   │   └── EventsManagementContainer.tsx  # Main container for project detail page
-│       │   │   ├── hooks/
-│       │   │   │   ├── useEvents.ts       # Real-time event list subscription
-│       │   │   │   ├── useCreateEvent.ts  # Create event mutation
-│       │   │   │   ├── useDeleteEvent.ts  # Soft delete event mutation
-│       │   │   │   ├── useRenameEvent.ts  # Rename event mutation
-│       │   │   │   └── useActivateEvent.ts # Activate/deactivate event mutation
-│       │   │   ├── schemas/
-│       │   │   │   ├── event.schema.ts    # Event entity Zod schema
-│       │   │   │   ├── createEvent.schema.ts  # Create event input schema
-│       │   │   │   ├── updateEvent.schema.ts  # Update event input schema
-│       │   │   │   └── index.ts           # Schema exports
-│       │   │   ├── types/
-│       │   │   │   ├── event.types.ts     # Event, EventStatus types
-│       │   │   │   └── index.ts           # Type exports
-│       │   │   └── index.ts               # Barrel export (components, hooks, types)
-│       │   ├── components/                # Existing
-│       │   ├── containers/                # Existing
-│       │   ├── hooks/                     # Existing
-│       │   ├── schemas/                   # Existing - may need to add activeEventId to project schema
-│       │   └── types/                     # Existing
+│   ├── project/                           # NEW: Project domain (top-level)
+│   │   └── events/                        # NEW: Project events subdomain
+│   │       ├── components/
+│   │       │   ├── ProjectEventsList.tsx  # List of project events with empty state
+│   │       │   ├── ProjectEventItem.tsx   # Individual project event with activation switch and context menu
+│   │       │   ├── CreateProjectEventButton.tsx  # Button to create new project event
+│   │       │   ├── DeleteProjectEventDialog.tsx  # Confirmation dialog for deletion
+│   │       │   └── RenameProjectEventDialog.tsx  # Dialog for renaming project event
+│   │       ├── containers/
+│   │       │   └── ProjectEventsPage.tsx  # Main page component for project detail page
+│   │       ├── hooks/
+│   │       │   ├── useProjectEvents.ts    # Real-time project events list subscription
+│   │       │   ├── useCreateProjectEvent.ts  # Create project event mutation
+│   │       │   ├── useDeleteProjectEvent.ts  # Soft delete project event mutation
+│   │       │   ├── useRenameProjectEvent.ts  # Rename project event mutation
+│   │       │   └── useActivateProjectEvent.ts # Activate/deactivate project event mutation
+│   │       ├── schemas/
+│   │       │   ├── project-event.schema.ts    # ProjectEvent entity Zod schema
+│   │       │   ├── create-project-event.schema.ts  # Create project event input schema
+│   │       │   ├── update-project-event.schema.ts  # Update project event input schema
+│   │       │   └── index.ts               # Schema exports
+│   │       ├── types/
+│   │       │   ├── project-event.types.ts # ProjectEvent, ProjectEventStatus types
+│   │       │   └── index.ts               # Type exports
+│   │       └── index.ts                   # Barrel export (components, hooks, types only)
+│   └── workspace/                         # Existing
+│       ├── projects/                      # Existing - Projects list/management
+│       │   ├── schemas/                   # MODIFIED: Add activeEventId to project schema
+│       │   └── ...
 │       └── ...
 ├── integrations/
 │   └── firebase/
@@ -164,10 +162,14 @@ apps/clementine-app/src/
             └── $workspaceSlug/
                 └── projects/
                     └── $projectId/
-                        └── index.tsx      # MODIFIED: Import EventsManagementContainer
+                        └── index.tsx      # MODIFIED: Import ProjectEventsPage
 ```
 
-**Structure Decision**: Using vertical slice architecture within the existing `workspace/projects` domain. Events management is a subdomain under projects (since events belong to projects). This follows DDD principles and keeps event-related code co-located. The structure supports independent development, testing, and modification of the events feature without affecting other workspace or project functionality.
+**Structure Decision**: Using vertical slice architecture with a new top-level `project` domain. This separates project-level features (project events list, sharing, settings) from workspace-level features and from future event editing features (which will live in `/domains/event`). The structure follows DDD principles with clear bounded contexts:
+- `/domains/project` - Project details and management (events list, sharing, settings)
+- `/domains/event` - Future: Individual event editing (welcome-editor, theme-editor, settings)
+
+This parallel structure makes the architecture intuitive and scalable as both domains grow independently. Project events are stored as Firestore subcollections under `projects/{projectId}/events/{eventId}`, making ownership explicit and queries efficient.
 
 ## Complexity Tracking
 
@@ -182,23 +184,27 @@ No violations - this section is not needed.
 All technical context is known from existing codebase patterns. No research needed.
 
 **Resolved**:
-- ✅ Firebase Firestore patterns: Use existing client SDK patterns from workspace/projects domain
+- ✅ Firebase Firestore patterns: Use subcollection structure `projects/{projectId}/events` with client SDK
 - ✅ TanStack Query patterns: Use existing mutation and query hooks from workspace domain
 - ✅ shadcn/ui components: Use AlertDialog (deletion confirmation), Switch (activation toggle), DropdownMenu (context menu for rename/delete)
 - ✅ Radix UI primitives: Already integrated via shadcn/ui
-- ✅ Real-time subscriptions: Use existing onSnapshot patterns from workspace hooks
+- ✅ Real-time subscriptions: Use existing onSnapshot patterns with subcollection paths
 - ✅ Soft delete patterns: Status field with "draft" | "deleted" enum
 - ✅ Single active event constraint: Store activeEventId on project document, atomic update on activation
+- ✅ Security rules: Simple admin checks only (per standards/backend/firestore-security.md)
 
 ### Technology Decisions
 
 | Decision | Rationale | Alternatives Considered |
 |----------|-----------|------------------------|
+| Firestore subcollection structure | Clear ownership (events under projects), projectId implicit in path, aligns with domain model. | Top-level collection (rejected: less clear ownership, projectId as field redundant), separate collection with complex joins (rejected: Firestore doesn't support joins) |
 | Client-first with Firestore client SDK | Aligns with constitution Principle VI and existing architecture. Enables real-time updates, reduces server complexity. | Server-first with API routes (rejected: increases complexity, loses real-time updates, violates architecture principles) |
-| Zod for validation | Constitution Principle III mandates runtime validation. Already used throughout codebase. | TypeScript only (rejected: no runtime validation), io-ts (rejected: Zod already standard in codebase) |
+| Simple admin-only security rules | Follows standards/backend/firestore-security.md. Simple authentication checks only, no data validation in rules. | Complex rules with data validation (rejected: violates standards, hard to maintain, expensive get() calls) |
+| Zod for validation | Constitution Principle III mandates runtime validation. Already used throughout codebase. All data validation in application code, not security rules. | TypeScript only (rejected: no runtime validation), validation in security rules (rejected: violates standards) |
 | TanStack Query for mutations | Existing pattern in workspace domain. Provides caching, optimistic updates, error handling. | Direct Firestore calls (rejected: loses caching and error handling), custom hooks (rejected: reinvents TanStack Query) |
 | Soft delete via status field | Preserves data for potential recovery, simpler than hard delete with cascade. Spec explicitly requires soft delete. | Hard delete with cascade (rejected: spec requires soft delete), separate deleted collection (rejected: adds complexity) |
 | activeEventId on project document | Atomic constraint enforcement (only one active event), simple to query and update. | activeEventId on event document (rejected: cannot enforce single active constraint atomically), separate activeEvents collection (rejected: over-engineering) |
+| "ProjectEvent" terminology | Clear, unambiguous naming. Distinguishes from other event types (system events, analytics events). | "Event" (rejected: too generic, potential conflicts), "ProjectActivity" (rejected: less clear), keep subcollection named "events" (simpler paths) |
 | shadcn/ui AlertDialog for deletion | Matches existing component library standard. Accessible, mobile-friendly confirmation. | Custom modal (rejected: reinvents AlertDialog), browser confirm() (rejected: not mobile-friendly, poor UX) |
 | shadcn/ui Switch for activation | Mobile-friendly toggle control, clear visual feedback, accessible. | Checkbox (rejected: switch is clearer for activation state), button (rejected: less intuitive for on/off state) |
 | Radix DropdownMenu for context menu | Matches existing component library standard. Accessible, mobile-friendly menu. | Custom context menu (rejected: reinvents DropdownMenu), right-click context menu (rejected: not mobile-friendly) |
@@ -220,17 +226,18 @@ All technical context is known from existing codebase patterns. No research need
 See [data-model.md](./data-model.md) for complete entity definitions, relationships, validation rules, and state transitions.
 
 **Summary**:
-- **Event Entity**: id, projectId, name, status, createdAt, updatedAt, deletedAt
-- **Project Entity Update**: Add activeEventId field (optional, references single active event)
-- **Relationships**: Event belongs to Project, Project has many Events, Project has optional activeEvent reference
+- **ProjectEvent Entity**: id, name, status, createdAt, updatedAt, deletedAt (stored in `projects/{projectId}/events` subcollection)
+- **Project Entity Update**: Add activeEventId field (optional, references single active project event)
+- **Relationships**: ProjectEvent belongs to Project (via subcollection path), Project has many ProjectEvents, Project has optional activeEvent reference
+- **Security**: Simple admin-only rules (no data validation in rules, per standards)
 
 ### API Contracts
 
 See [contracts/](./contracts/) for complete API specifications.
 
 **Summary**:
-- **Queries**: getEvents(projectId) → Event[], getEvent(eventId) → Event
-- **Mutations**: createEvent(projectId, name?) → Event, updateEvent(eventId, name) → Event, deleteEvent(eventId) → void, activateEvent(projectId, eventId) → void, deactivateEvent(projectId) → void
+- **Queries**: getProjectEvents(projectId) → ProjectEvent[], getProjectEvent(projectId, eventId) → ProjectEvent
+- **Mutations**: createProjectEvent(projectId, name?) → ProjectEvent, updateProjectEvent(projectId, eventId, name) → ProjectEvent, deleteProjectEvent(projectId, eventId) → void, activateProjectEvent(projectId, eventId) → void, deactivateProjectEvent(projectId) → void
 
 ### Quickstart Guide
 
@@ -249,14 +256,14 @@ See [quickstart.md](./quickstart.md) for developer onboarding and implementation
 ### ✅ Principle II: Clean Code & Simplicity
 
 - **Status**: COMPLIANT
-- **Design Evidence**: 5 focused components (EventsList, EventItem, CreateEventButton, DeleteEventDialog, RenameEventDialog), 5 single-purpose hooks (useEvents, useCreateEvent, useRenameEvent, useDeleteEvent, useActivateEvent). No complex abstractions.
+- **Design Evidence**: 5 focused components (ProjectEventsList, ProjectEventItem, CreateProjectEventButton, DeleteProjectEventDialog, RenameProjectEventDialog), 5 single-purpose hooks (useProjectEvents, useCreateProjectEvent, useRenameProjectEvent, useDeleteProjectEvent, useActivateProjectEvent). No complex abstractions. Subcollection structure simplifies queries (projectId in path, not field).
 - **No Changes**: Design maintains simplicity
 
 ### ✅ Principle III: Type-Safe Development
 
 - **Status**: COMPLIANT
-- **Design Evidence**: All schemas defined with Zod (eventSchema, createEventInputSchema, updateEventInputSchema, activateEventInputSchema, deactivateEventInputSchema). Runtime validation for all Firestore operations. Strict TypeScript types derived from Zod schemas.
-- **No Changes**: Design maintains type safety
+- **Design Evidence**: All schemas defined with Zod (projectEventSchema, createProjectEventInputSchema, updateProjectEventInputSchema, activateProjectEventInputSchema, deactivateProjectEventInputSchema). Runtime validation for all Firestore operations in application code (NOT in security rules, per standards). Strict TypeScript types derived from Zod schemas.
+- **No Changes**: Design maintains type safety with validation in application code only
 
 ### ✅ Principle IV: Minimal Testing Strategy
 
@@ -273,20 +280,20 @@ See [quickstart.md](./quickstart.md) for developer onboarding and implementation
 ### ✅ Principle VI: Frontend Architecture
 
 - **Status**: COMPLIANT
-- **Design Evidence**: All operations use Firestore client SDK (collection, query, onSnapshot, addDoc, updateDoc, runTransaction). Security enforced via Firestore rules. Real-time updates via onSnapshot. Zero server functions.
-- **No Changes**: Design maintains client-first architecture
+- **Design Evidence**: All operations use Firestore client SDK with subcollection paths (collection, query, onSnapshot, addDoc, updateDoc, runTransaction). Security enforced via simple admin-only Firestore rules (per standards). Real-time updates via onSnapshot. Zero server functions.
+- **No Changes**: Design maintains client-first architecture with subcollections
 
 ### ✅ Principle VII: Backend & Firebase
 
 - **Status**: COMPLIANT
-- **Design Evidence**: Client SDK for reads (onSnapshot), writes (addDoc, updateDoc), and transactions. Security rules enforce workspace admin authorization. Soft delete via status field (no hard deletes).
-- **No Changes**: Design maintains Firebase best practices
+- **Design Evidence**: Client SDK for reads (onSnapshot on subcollection), writes (addDoc, updateDoc on subcollection), and transactions. Security rules use simple admin checks ONLY (no data validation in rules, per standards/backend/firestore-security.md). Soft delete via status field (no hard deletes).
+- **Key Improvement**: Simplified security rules to follow standards (admin checks only, no expensive get() calls, no data validation)
 
 ### ✅ Principle VIII: Project Structure
 
 - **Status**: COMPLIANT
-- **Design Evidence**: Vertical slice architecture implemented under `workspace/projects/events/`. Organized by technical concern (components/, hooks/, schemas/, types/). Barrel exports defined. Restricted public API (components, hooks, types only).
-- **No Changes**: Design maintains vertical slice architecture
+- **Design Evidence**: Vertical slice architecture implemented under new top-level `/domains/project/events/` domain. Organized by technical concern (components/, containers/, hooks/, schemas/, types/). Barrel exports defined. Restricted public API (components, hooks, types only). Clear separation from future `/domains/event` (event editing).
+- **Key Change**: New top-level `/domains/project` domain (vs nested under workspace)
 
 ### Standards Compliance Re-Check
 
