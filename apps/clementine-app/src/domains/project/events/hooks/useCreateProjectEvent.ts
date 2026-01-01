@@ -2,11 +2,27 @@
 // Mutation hook for creating new project events
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { collection, addDoc, type Firestore } from 'firebase/firestore'
+import {
+  collection,
+  doc,
+  runTransaction,
+  serverTimestamp,
+} from 'firebase/firestore'
+import * as Sentry from '@sentry/tanstackstart-react'
 import { createProjectEventInputSchema } from '../schemas/create-project-event.schema'
+import type { WithFieldValue } from 'firebase/firestore'
 import type { CreateProjectEventInput, ProjectEvent } from '../types/project-event.types'
+import { firestore } from '@/integrations/firebase/client'
 
-export function useCreateProjectEvent(firestore: Firestore, projectId: string) {
+/**
+ * Create project event mutation (admin-only operation)
+ *
+ * Creates a new project event with default values.
+ * Uses transaction to ensure serverTimestamp() resolves before returning,
+ * preventing Zod parse errors from real-time listeners.
+ * Security enforced via Firestore rules.
+ */
+export function useCreateProjectEvent(projectId: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
@@ -15,32 +31,47 @@ export function useCreateProjectEvent(firestore: Firestore, projectId: string) {
 
       const eventsRef = collection(firestore, `projects/${projectId}/events`)
 
-      const now = Date.now()
-      const docRef = await addDoc(eventsRef, {
-        name: validated.name,
-        status: 'draft',
-        createdAt: now,
-        updatedAt: now,
-        deletedAt: null,
-      })
+      // ALWAYS use transaction with serverTimestamp()
+      return await runTransaction(firestore, (transaction) => {
+        const newEventRef = doc(eventsRef)
 
-      const newEvent: ProjectEvent = {
-        id: docRef.id,
-        name: validated.name,
-        status: 'draft',
-        createdAt: now,
-        updatedAt: now,
-        deletedAt: null,
-      }
+        const newEvent: WithFieldValue<ProjectEvent> = {
+          id: newEventRef.id,
+          name: validated.name,
+          status: 'draft' as const,
+          createdAt: serverTimestamp(), // Transaction ensures this resolves
+          updatedAt: serverTimestamp(),
+          deletedAt: null,
+        }
+
+        transaction.set(newEventRef, newEvent)
+
+        return Promise.resolve({
+          eventId: newEventRef.id,
+          projectId,
+        })
+      })
+    },
+    onSuccess: () => {
+      // Invalidate project events list
+      queryClient.invalidateQueries({
+        queryKey: ['projectEvents', projectId],
+      })
 
       // T029: Navigation to event detail page will be added here
       // TODO: Add navigation after event creation
-      // Example: navigate({ to: '/workspace/$workspaceSlug/projects/$projectId/events/$eventId', params: { eventId: newEvent.id } })
-
-      return newEvent
+      // Example: navigate({ to: '/workspace/$workspaceSlug/projects/$projectId/events/$eventId', params: { eventId } })
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['projectEvents', projectId] })
+    onError: (error) => {
+      Sentry.captureException(error, {
+        tags: {
+          domain: 'project/events',
+          action: 'create-project-event',
+        },
+        extra: {
+          errorType: 'event-creation-failure',
+        },
+      })
     },
   })
 }

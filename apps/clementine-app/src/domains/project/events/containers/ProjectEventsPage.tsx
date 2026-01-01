@@ -6,8 +6,6 @@
 import { useProjectEvents } from '../hooks/useProjectEvents'
 import { ProjectEventsList } from '../components/ProjectEventsList'
 import { CreateProjectEventButton } from '../components/CreateProjectEventButton'
-// TODO: Import firestore instance from integrations
-// import { firestore } from '@/integrations/firebase/client'
 
 export interface ProjectEventsPageProps {
   /** Project ID */
@@ -27,11 +25,8 @@ export interface ProjectEventsPageProps {
  * ```
  */
 export function ProjectEventsPage({ projectId, activeEventId }: ProjectEventsPageProps) {
-  // TODO: Replace with actual firestore instance
-  const firestore = null as any // Placeholder
-
   // Real-time events subscription
-  const { data: events, isLoading, error } = useProjectEvents(firestore, projectId)
+  const { data: events, isLoading, error } = useProjectEvents(projectId)
 
   // Error state
   if (error) {

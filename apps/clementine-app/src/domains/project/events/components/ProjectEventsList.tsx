@@ -1,8 +1,8 @@
 // ProjectEventsList component
 // Displays list of project events with empty state
 
-import type { ProjectEvent } from '../types/project-event.types'
 import { ProjectEventItem } from './ProjectEventItem'
+import type { ProjectEvent } from '../types/project-event.types'
 
 export interface ProjectEventsListProps {
   /** List of project events to display */

@@ -6,9 +6,7 @@ import { z } from 'zod'
 /**
  * Project event lifecycle status schema
  */
-export const projectEventStatusSchema = z.enum(['draft', 'deleted'], {
-  errorMap: () => ({ message: 'Status must be either "draft" or "deleted"' }),
-})
+export const projectEventStatusSchema = z.enum(['draft', 'deleted'])
 
 /**
  * ProjectEvent entity schema

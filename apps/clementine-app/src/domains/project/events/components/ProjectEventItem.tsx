@@ -27,7 +27,7 @@ export interface ProjectEventItemProps {
  * />
  * ```
  */
-export function ProjectEventItem({ event, projectId, isActive }: ProjectEventItemProps) {
+export function ProjectEventItem({ event, projectId: _projectId, isActive }: ProjectEventItemProps) {
   return (
     <div
       className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"

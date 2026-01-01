@@ -4,8 +4,6 @@
 'use client'
 
 import { useCreateProjectEvent } from '../hooks/useCreateProjectEvent'
-// TODO: Import firestore instance from integrations
-// import { firestore } from '@/integrations/firebase/client'
 
 export interface CreateProjectEventButtonProps {
   /** Project ID */
@@ -31,18 +29,15 @@ export function CreateProjectEventButton({
   projectId,
   onEventCreated,
 }: CreateProjectEventButtonProps) {
-  // TODO: Replace with actual firestore instance
-  const firestore = null as any // Placeholder
-
-  const createEvent = useCreateProjectEvent(firestore, projectId)
+  const createEvent = useCreateProjectEvent(projectId)
 
   const handleCreate = async () => {
     try {
-      const newEvent = await createEvent.mutateAsync({})
+      const result = await createEvent.mutateAsync({})
 
       // Call optional callback with new event ID
       if (onEventCreated) {
-        onEventCreated(newEvent.id)
+        onEventCreated(result.eventId)
       }
     } catch (error) {
       console.error('Failed to create event:', error)
