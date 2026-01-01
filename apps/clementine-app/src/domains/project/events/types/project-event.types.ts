@@ -3,10 +3,10 @@
 
 /**
  * Project event lifecycle status
- * - draft: Event is active and can be used
+ * - active: Event is active and can be used
  * - deleted: Event is soft-deleted and hidden from all queries
  */
-export type ProjectEventStatus = 'draft' | 'deleted'
+export type ProjectEventStatus = 'active' | 'deleted'
 
 /**
  * ProjectEvent entity

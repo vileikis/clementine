@@ -6,7 +6,7 @@ import { z } from 'zod'
 /**
  * Project event lifecycle status schema
  */
-export const projectEventStatusSchema = z.enum(['draft', 'deleted'])
+export const projectEventStatusSchema = z.enum(['active', 'deleted'])
 
 /**
  * ProjectEvent entity schema

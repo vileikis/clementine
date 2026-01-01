@@ -38,7 +38,7 @@ export function useCreateProjectEvent(projectId: string) {
         const newEvent: WithFieldValue<ProjectEvent> = {
           id: newEventRef.id,
           name: validated.name,
-          status: 'draft' as const,
+          status: 'active' as const,
           createdAt: serverTimestamp(), // Transaction ensures this resolves
           updatedAt: serverTimestamp(),
           deletedAt: null,

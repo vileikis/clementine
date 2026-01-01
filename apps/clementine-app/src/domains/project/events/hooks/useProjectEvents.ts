@@ -40,7 +40,7 @@ export function useProjectEvents(projectId: string) {
   useEffect(() => {
     const q = query(
       collection(firestore, `projects/${projectId}/events`),
-      where('status', '==', 'draft'),
+      where('status', '==', 'active'),
       orderBy('createdAt', 'desc')
     )
 
@@ -60,7 +60,7 @@ export function useProjectEvents(projectId: string) {
     queryFn: async () => {
       const q = query(
         collection(firestore, `projects/${projectId}/events`),
-        where('status', '==', 'draft'),
+        where('status', '==', 'active'),
         orderBy('createdAt', 'desc')
       )
 
