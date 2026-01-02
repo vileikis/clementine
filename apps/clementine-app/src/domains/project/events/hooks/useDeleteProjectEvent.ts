@@ -44,6 +44,10 @@ export function useDeleteProjectEvent(projectId: string) {
         )
         const projectRef = doc(firestore, 'projects', validated.projectId)
 
+        // Read project data first (all reads must happen before writes)
+        const projectDoc = await transaction.get(projectRef)
+        const projectData = projectDoc.data()
+
         // Soft delete event
         transaction.update(eventRef, {
           status: 'deleted',
@@ -52,8 +56,6 @@ export function useDeleteProjectEvent(projectId: string) {
         })
 
         // Clear activeEventId if this event was active
-        const projectDoc = await transaction.get(projectRef)
-        const projectData = projectDoc.data()
         if (projectData?.activeEventId === validated.eventId) {
           transaction.update(projectRef, {
             activeEventId: null,
