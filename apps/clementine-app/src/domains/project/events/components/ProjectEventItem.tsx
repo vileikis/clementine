@@ -4,6 +4,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useNavigate, useParams } from '@tanstack/react-router'
 import { MoreVertical, Pencil, Trash2 } from 'lucide-react'
 import { Switch } from '@/ui-kit/components/switch'
 import { Button } from '@/ui-kit/components/button'
@@ -53,6 +54,8 @@ export function ProjectEventItem({ event, projectId, isActive }: ProjectEventIte
   const [renameDialogOpen, setRenameDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const activateProjectEvent = useActivateProjectEvent(projectId)
+  const navigate = useNavigate()
+  const { workspaceSlug } = useParams({ strict: false })
 
   const handleToggle = async (checked: boolean) => {
     if (checked) {
@@ -64,11 +67,23 @@ export function ProjectEventItem({ event, projectId, isActive }: ProjectEventIte
     }
   }
 
+  const handleEventClick = () => {
+    navigate({
+      to: '/workspace/$workspaceSlug/projects/$projectId/events/$eventId',
+      params: {
+        workspaceSlug: workspaceSlug as string,
+        projectId,
+        eventId: event.id,
+      },
+    })
+  }
+
   return (
     <>
       <div
-        className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+        className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
         role="listitem"
+        onClick={handleEventClick}
       >
         {/* Event name and status */}
         <div className="flex flex-col gap-1">
@@ -79,7 +94,7 @@ export function ProjectEventItem({ event, projectId, isActive }: ProjectEventIte
         </div>
 
         {/* Controls: activation switch + context menu */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
           {/* Activation switch */}
           <div className="flex items-center gap-2">
             <label htmlFor={`activate-${event.id}`} className="text-sm text-muted-foreground">
