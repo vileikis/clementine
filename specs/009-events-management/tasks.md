@@ -103,7 +103,7 @@ This is a TanStack Start application in a monorepo:
 - [ ] T032 [P] [US1] Component test for CreateProjectEventButton in apps/clementine-app/src/domains/project/events/components/__tests__/CreateProjectEventButton.test.tsx (Deferred - requires test infrastructure)
 - [ ] T033 [P] [US1] Integration test for event creation flow in apps/clementine-app/src/domains/project/events/__tests__/integration/create-event.test.tsx (Deferred - requires test infrastructure)
 
-**Checkpoint**: At this point, User Stories 1 AND 5 should both work independently - admins can view and create events
+**Checkpoint**: ✅ COMPLETE - User Stories 1 AND 5 work independently - admins can view and create events (Tested by user)
 
 ---
 
@@ -115,13 +115,13 @@ This is a TanStack Start application in a monorepo:
 
 ### Implementation for User Story 2
 
-- [ ] T034 [P] [US2] Create activateProjectEventInputSchema in apps/clementine-app/src/domains/project/events/schemas/activate-project-event.schema.ts
-- [ ] T035 [P] [US2] Create deactivateProjectEventInputSchema in apps/clementine-app/src/domains/project/events/schemas/deactivate-project-event.schema.ts
-- [ ] T036 [US2] Create useActivateProjectEvent mutation hook with transaction logic in apps/clementine-app/src/domains/project/events/hooks/useActivateProjectEvent.ts
-- [ ] T037 [US2] Add activation Switch component to ProjectEventItem in apps/clementine-app/src/domains/project/events/components/ProjectEventItem.tsx
-- [ ] T038 [US2] Update ProjectEventsList to pass activeEventId to ProjectEventItem in apps/clementine-app/src/domains/project/events/components/ProjectEventsList.tsx
-- [ ] T039 [US2] Update useProjectEvents hook to also fetch project.activeEventId in apps/clementine-app/src/domains/project/events/hooks/useProjectEvents.ts
-- [ ] T040 [US2] Add visual indication of active event status in ProjectEventItem in apps/clementine-app/src/domains/project/events/components/ProjectEventItem.tsx
+- [X] T034 [P] [US2] Create activateProjectEventInputSchema in apps/clementine-app/src/domains/project/events/schemas/activate-project-event.schema.ts
+- [X] T035 [P] [US2] Create deactivateProjectEventInputSchema in apps/clementine-app/src/domains/project/events/schemas/deactivate-project-event.schema.ts
+- [X] T036 [US2] Create useActivateProjectEvent mutation hook with transaction logic in apps/clementine-app/src/domains/project/events/hooks/useActivateProjectEvent.ts
+- [X] T037 [US2] Add activation Switch component to ProjectEventItem in apps/clementine-app/src/domains/project/events/components/ProjectEventItem.tsx
+- [X] T038 [US2] Update ProjectEventsList to pass activeEventId to ProjectEventItem in apps/clementine-app/src/domains/project/events/components/ProjectEventsList.tsx
+- [X] T039 [US2] Update useProjectEvents hook to also fetch project.activeEventId in apps/clementine-app/src/domains/project/events/hooks/useProjectEvents.ts
+- [X] T040 [US2] Add visual indication of active event status in ProjectEventItem in apps/clementine-app/src/domains/project/events/components/ProjectEventItem.tsx
 
 ### Tests for User Story 2
 
@@ -142,11 +142,11 @@ This is a TanStack Start application in a monorepo:
 
 ### Implementation for User Story 3
 
-- [ ] T045 [P] [US3] Create updateProjectEventInputSchema in apps/clementine-app/src/domains/project/events/schemas/update-project-event.schema.ts
-- [ ] T046 [US3] Create useRenameProjectEvent mutation hook in apps/clementine-app/src/domains/project/events/hooks/useRenameProjectEvent.ts
-- [ ] T047 [US3] Create RenameProjectEventDialog component in apps/clementine-app/src/domains/project/events/components/RenameProjectEventDialog.tsx
-- [ ] T048 [US3] Add DropdownMenu context menu to ProjectEventItem in apps/clementine-app/src/domains/project/events/components/ProjectEventItem.tsx
-- [ ] T049 [US3] Add "Rename" option to context menu that opens RenameProjectEventDialog in apps/clementine-app/src/domains/project/events/components/ProjectEventItem.tsx
+- [X] T045 [P] [US3] Create updateProjectEventInputSchema in apps/clementine-app/src/domains/project/events/schemas/update-project-event.schema.ts
+- [X] T046 [US3] Create useRenameProjectEvent mutation hook in apps/clementine-app/src/domains/project/events/hooks/useRenameProjectEvent.ts
+- [X] T047 [US3] Create RenameProjectEventDialog component in apps/clementine-app/src/domains/project/events/components/RenameProjectEventDialog.tsx
+- [X] T048 [US3] Add DropdownMenu context menu to ProjectEventItem in apps/clementine-app/src/domains/project/events/components/ProjectEventItem.tsx
+- [X] T049 [US3] Add "Rename" option to context menu that opens RenameProjectEventDialog in apps/clementine-app/src/domains/project/events/components/ProjectEventItem.tsx
 
 ### Tests for User Story 3
 
@@ -167,11 +167,11 @@ This is a TanStack Start application in a monorepo:
 
 ### Implementation for User Story 4
 
-- [ ] T054 [P] [US4] Create deleteProjectEventInputSchema in apps/clementine-app/src/domains/project/events/schemas/delete-project-event.schema.ts
-- [ ] T055 [US4] Create useDeleteProjectEvent mutation hook with transaction logic in apps/clementine-app/src/domains/project/events/hooks/useDeleteProjectEvent.ts
-- [ ] T056 [US4] Create DeleteProjectEventDialog component with confirmation in apps/clementine-app/src/domains/project/events/components/DeleteProjectEventDialog.tsx
-- [ ] T057 [US4] Add "Delete" option to context menu in ProjectEventItem in apps/clementine-app/src/domains/project/events/components/ProjectEventItem.tsx
-- [ ] T058 [US4] Update useDeleteProjectEvent to clear activeEventId if deleted event was active in apps/clementine-app/src/domains/project/events/hooks/useDeleteProjectEvent.ts
+- [X] T054 [P] [US4] Create deleteProjectEventInputSchema in apps/clementine-app/src/domains/project/events/schemas/delete-project-event.schema.ts
+- [X] T055 [US4] Create useDeleteProjectEvent mutation hook with transaction logic in apps/clementine-app/src/domains/project/events/hooks/useDeleteProjectEvent.ts
+- [X] T056 [US4] Create DeleteProjectEventDialog component with confirmation in apps/clementine-app/src/domains/project/events/components/DeleteProjectEventDialog.tsx
+- [X] T057 [US4] Add "Delete" option to context menu in ProjectEventItem in apps/clementine-app/src/domains/project/events/components/ProjectEventItem.tsx
+- [X] T058 [US4] Update useDeleteProjectEvent to clear activeEventId if deleted event was active in apps/clementine-app/src/domains/project/events/hooks/useDeleteProjectEvent.ts
 
 ### Tests for User Story 4
 

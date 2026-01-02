@@ -8,16 +8,14 @@ import { ProjectEventsPage } from '@/domains/project/events'
  * Access: Admin only (enforced by parent route)
  *
  * Displays project events management interface.
- * Project data is loaded by parent route and available via useLoaderData().
+ * ProjectEventsPage now fetches activeEventId automatically via useProjectEvents hook.
  */
 export const Route = createFileRoute(
   '/workspace/$workspaceSlug/projects/$projectId/',
 )({
   component: function ProjectDetailsRoute() {
     const { projectId } = Route.useParams()
-    // TODO: Get activeEventId from parent loader data
-    const activeEventId = null
 
-    return <ProjectEventsPage projectId={projectId} activeEventId={activeEventId} />
+    return <ProjectEventsPage projectId={projectId} />
   },
 })

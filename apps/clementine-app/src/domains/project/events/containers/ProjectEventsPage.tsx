@@ -10,26 +10,21 @@ import { CreateProjectEventButton } from '../components/CreateProjectEventButton
 export interface ProjectEventsPageProps {
   /** Project ID */
   projectId: string
-
-  /** Currently active event ID (from project.activeEventId) */
-  activeEventId?: string | null
 }
 
 /**
  * ProjectEventsPage container component
  * Manages project events list display and real-time updates
+ * Now fetches activeEventId automatically via useProjectEvents hook
  *
  * @example
  * ```tsx
- * <ProjectEventsPage projectId={projectId} activeEventId={project.activeEventId} />
+ * <ProjectEventsPage projectId={projectId} />
  * ```
  */
-export function ProjectEventsPage({
-  projectId,
-  activeEventId,
-}: ProjectEventsPageProps) {
-  // Real-time events subscription
-  const { data: events, isLoading, error } = useProjectEvents(projectId)
+export function ProjectEventsPage({ projectId }: ProjectEventsPageProps) {
+  // Real-time events subscription (includes activeEventId)
+  const { data, isLoading, error } = useProjectEvents(projectId)
 
   // Error state
   if (error) {
@@ -57,9 +52,9 @@ export function ProjectEventsPage({
       </div>
 
       <ProjectEventsList
-        events={events || []}
+        events={data?.events || []}
         projectId={projectId}
-        activeEventId={activeEventId}
+        activeEventId={data?.activeEventId}
         isLoading={isLoading}
       />
     </div>
