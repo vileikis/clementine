@@ -8,8 +8,7 @@ import {
   query,
   where,
 } from 'firebase/firestore'
-import { projectSchema } from '../schemas'
-import type { Project } from '../types'
+import { projectSchema, type Project } from '@clementine/shared'
 import { firestore } from '@/integrations/firebase/client'
 import { convertFirestoreDoc } from '@/shared/utils/firestore-utils'
 

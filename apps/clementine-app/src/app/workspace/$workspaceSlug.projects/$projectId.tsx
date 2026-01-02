@@ -1,6 +1,6 @@
 import { Outlet, createFileRoute, notFound } from '@tanstack/react-router'
 import { doc, getDoc } from 'firebase/firestore'
-import { projectSchema } from '@/domains/workspace/projects/schemas'
+import { projectSchema } from '@clementine/shared'
 import { firestore } from '@/integrations/firebase/client'
 import { convertFirestoreDoc } from '@/shared/utils/firestore-utils'
 

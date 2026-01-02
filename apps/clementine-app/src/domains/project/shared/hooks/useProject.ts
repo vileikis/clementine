@@ -4,8 +4,10 @@
 import { useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { doc, getDoc, onSnapshot } from 'firebase/firestore'
-import type { Project } from '../types/project.types'
+import { projectSchema } from '@clementine/shared'
+import type { Project } from '@clementine/shared'
 import { firestore } from '@/integrations/firebase/client'
+import { convertFirestoreDoc } from '@/shared/utils/firestore-utils'
 
 /**
  * Fetch project with real-time updates
@@ -38,12 +40,8 @@ export function useProject(projectId: string) {
         return
       }
 
-      const projectData = snapshot.data()
-      const project: Project = {
-        id: snapshot.id,
-        activeEventId: projectData?.activeEventId ?? null,
-        // Add more fields as they're needed
-      }
+      // Convert Firestore document (Timestamps → numbers) and validate with schema
+      const project = convertFirestoreDoc(snapshot, projectSchema)
 
       queryClient.setQueryData<Project>(['project', projectId], project)
     })
@@ -63,12 +61,8 @@ export function useProject(projectId: string) {
         return null
       }
 
-      const projectData = projectSnapshot.data()
-      return {
-        id: projectSnapshot.id,
-        activeEventId: projectData?.activeEventId ?? null,
-        // Add more fields as they're needed
-      }
+      // Convert Firestore document (Timestamps → numbers) and validate with schema
+      return convertFirestoreDoc(projectSnapshot, projectSchema)
     },
     staleTime: Infinity, // Never stale (real-time via onSnapshot)
     refetchOnWindowFocus: false, // Disable refetch (real-time handles it)

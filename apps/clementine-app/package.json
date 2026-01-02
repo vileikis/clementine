@@ -16,6 +16,7 @@
     "grant-admin": "tsx scripts/grant-admin.ts"
   },
   "dependencies": {
+    "@clementine/shared": "workspace:*",
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-alert-dialog": "^1.1.15",
     "@radix-ui/react-dialog": "^1.1.15",

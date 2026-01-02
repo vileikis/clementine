@@ -1,31 +1,33 @@
+// Project operation schemas
+// Input validation for project operations (app-specific)
+// Note: Core Project entity schema is in @clementine/shared
+
 import { z } from 'zod'
 
-export const projectStatusSchema = z.enum(['draft', 'live', 'deleted'])
-
-export const projectSchema = z.object({
-  id: z.string().min(1),
-  name: z.string().min(1).max(100),
-  workspaceId: z.string().min(1),
-  status: projectStatusSchema,
-  activeEventId: z.string().nullable(),
-  deletedAt: z.number().nullable(),
-  createdAt: z.number(),
-  updatedAt: z.number(),
-})
-
+/**
+ * Create project input schema
+ * Validates input for creating a new project
+ */
 export const createProjectInputSchema = z.object({
-  workspaceId: z.string().min(1),
-  name: z.string().min(1).max(100).optional().default('Untitled project'),
+  workspaceId: z.string().min(1, 'Workspace ID is required'),
+  name: z
+    .string()
+    .min(1, 'Project name is required')
+    .max(100, 'Project name too long')
+    .optional()
+    .default('Untitled project'),
 })
 
+/**
+ * Delete project input schema
+ * Validates input for soft-deleting a project
+ */
 export const deleteProjectInputSchema = z.object({
-  id: z.string().min(1),
+  id: z.string().min(1, 'Project ID is required'),
 })
 
-export type ProjectSchemaType = z.infer<typeof projectSchema>
-export type CreateProjectInputSchemaType = z.infer<
-  typeof createProjectInputSchema
->
-export type DeleteProjectInputSchemaType = z.infer<
-  typeof deleteProjectInputSchema
->
+/**
+ * Type exports
+ */
+export type CreateProjectInput = z.infer<typeof createProjectInputSchema>
+export type DeleteProjectInput = z.infer<typeof deleteProjectInputSchema>
