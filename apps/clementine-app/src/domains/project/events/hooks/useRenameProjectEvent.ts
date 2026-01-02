@@ -4,7 +4,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { doc, updateDoc, serverTimestamp } from 'firebase/firestore'
 import * as Sentry from '@sentry/tanstackstart-react'
-import { updateProjectEventInputSchema } from '../schemas/update-project-event.schema'
+import { updateProjectEventInputSchema } from '../schemas'
 import { firestore } from '@/integrations/firebase/client'
 
 export interface RenameProjectEventInput {

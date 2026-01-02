@@ -8,7 +8,7 @@ import {
   serverTimestamp,
 } from 'firebase/firestore'
 import * as Sentry from '@sentry/tanstackstart-react'
-import { deleteProjectEventInputSchema } from '../schemas/delete-project-event.schema'
+import { deleteProjectEventInputSchema } from '../schemas'
 import { firestore } from '@/integrations/firebase/client'
 
 export interface DeleteProjectEventInput {

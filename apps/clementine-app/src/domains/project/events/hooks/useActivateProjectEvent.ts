@@ -8,8 +8,10 @@ import {
   serverTimestamp,
 } from 'firebase/firestore'
 import * as Sentry from '@sentry/tanstackstart-react'
-import { activateProjectEventInputSchema } from '../schemas/activate-project-event.schema'
-import { deactivateProjectEventInputSchema } from '../schemas/deactivate-project-event.schema'
+import {
+  activateProjectEventInputSchema,
+  deactivateProjectEventInputSchema,
+} from '../schemas'
 import { firestore } from '@/integrations/firebase/client'
 
 type ActivateProjectEventInput =
