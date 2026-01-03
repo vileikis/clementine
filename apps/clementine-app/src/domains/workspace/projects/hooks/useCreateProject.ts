@@ -5,7 +5,6 @@ import {
   runTransaction,
   serverTimestamp,
 } from 'firebase/firestore'
-import { useNavigate } from '@tanstack/react-router'
 import * as Sentry from '@sentry/tanstackstart-react'
 import type { WithFieldValue } from 'firebase/firestore'
 import type { CreateProjectInput, Project } from '../types'
@@ -14,13 +13,13 @@ import { firestore } from '@/integrations/firebase/client'
 /**
  * Create project mutation (admin-only operation)
  *
- * Creates a new project with default values and redirects to project details page.
- * Follows "mutations via dedicated hooks" pattern.
+ * Creates a new project with default values.
+ * Follows single responsibility principle: handles mutation only, no navigation.
+ * Consumer handles navigation using the returned project data.
  * Security enforced via Firestore rules.
  */
 export function useCreateProject() {
   const queryClient = useQueryClient()
-  const navigate = useNavigate()
 
   return useMutation({
     mutationFn: async (input: CreateProjectInput) => {
@@ -50,17 +49,12 @@ export function useCreateProject() {
         })
       })
     },
-    onSuccess: ({ projectId, workspaceId, workspaceSlug }) => {
+    onSuccess: ({ workspaceId }) => {
       // Invalidate projects list
       queryClient.invalidateQueries({
         queryKey: ['projects', workspaceId],
       })
-
-      // Navigate to project details page
-      navigate({
-        to: '/workspace/$workspaceSlug/projects/$projectId',
-        params: { workspaceSlug, projectId },
-      })
+      // No navigation - consumer handles this using return value
     },
     onError: (error) => {
       Sentry.captureException(error, {

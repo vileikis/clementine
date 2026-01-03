@@ -27,7 +27,19 @@ export const deleteProjectInputSchema = z.object({
 })
 
 /**
+ * Update project input schema
+ * Validates input for updating project fields (rename operation)
+ */
+export const updateProjectInputSchema = z.object({
+  name: z
+    .string()
+    .min(1, 'Project name is required')
+    .max(100, 'Project name too long'),
+})
+
+/**
  * Type exports
  */
 export type CreateProjectInput = z.infer<typeof createProjectInputSchema>
 export type DeleteProjectInput = z.infer<typeof deleteProjectInputSchema>
+export type UpdateProjectInput = z.infer<typeof updateProjectInputSchema>
