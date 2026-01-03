@@ -40,6 +40,19 @@ service cloud.firestore {
 
       // DELETE: Forbidden - use soft delete (status='deleted')
       allow delete: if false;
+
+      // Project events subcollection (simple admin-only checks)
+      // Security rules check WHO can access - Zod schemas validate WHAT is valid
+      match /events/{eventId} {
+        // WRITE: Allow admins only (create, update)
+        allow read, create, update: if isAdmin();
+
+        // READ: Allow all authenticated users to read events
+        allow read: if isAnyUser();
+
+        // DELETE: Deny hard deletes (soft delete only via update)
+        allow delete: if false;
+      }
     }
 
     // Admin users: Full access to everything

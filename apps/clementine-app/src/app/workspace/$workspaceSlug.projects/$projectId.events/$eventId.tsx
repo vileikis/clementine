@@ -1,4 +1,9 @@
-import { Link, Outlet, createFileRoute } from '@tanstack/react-router'
+import { Link, Outlet, createFileRoute, notFound } from '@tanstack/react-router'
+import { doc, getDoc } from 'firebase/firestore'
+import { firestore } from '@/integrations/firebase/client'
+import { projectEventSchema } from '@/domains/project/events/schemas'
+import { convertFirestoreDoc } from '@/shared/utils/firestore-utils'
+import { NotFound } from '@/shared/components/NotFound'
 
 /**
  * Event layout route
@@ -12,7 +17,33 @@ import { Link, Outlet, createFileRoute } from '@tanstack/react-router'
 export const Route = createFileRoute(
   '/workspace/$workspaceSlug/projects/$projectId/events/$eventId',
 )({
+  loader: async ({ params }) => {
+    // Fetch event from subcollection
+    const eventRef = doc(
+      firestore,
+      'projects',
+      params.projectId,
+      'events',
+      params.eventId,
+    )
+    const eventDoc = await getDoc(eventRef)
+
+    if (!eventDoc.exists()) {
+      throw notFound()
+    }
+
+    // Convert Firestore document (Timestamps → numbers) and validate with schema
+    const event = convertFirestoreDoc(eventDoc, projectEventSchema)
+
+    // Return 404 for soft-deleted events
+    if (event.status === 'deleted') {
+      throw notFound()
+    }
+
+    return { event }
+  },
   component: EventLayout,
+  notFoundComponent: EventNotFound,
 })
 
 function EventLayout() {
@@ -48,5 +79,18 @@ function EventLayout() {
       </div>
       <Outlet /> {/* Child route renders here */}
     </div>
+  )
+}
+
+function EventNotFound() {
+  const { workspaceSlug, projectId } = Route.useParams()
+
+  return (
+    <NotFound
+      title="Event Not Found"
+      message="The event you're looking for doesn't exist or has been deleted."
+      actionLabel="View All Events"
+      actionHref={`/workspace/${workspaceSlug}/projects/${projectId}/events`}
+    />
   )
 }

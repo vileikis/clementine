@@ -1,0 +1,257 @@
+# GraphQL-Style Contract: Project Events Management API
+#
+# NOTE: This is for DOCUMENTATION ONLY. The actual implementation uses
+# Firestore client SDK (not GraphQL). This contract describes the logical
+# API surface in GraphQL format for clarity and consistency.
+
+"""
+An AI-powered photo booth experience within a project.
+Project events can be created, renamed, activated, and soft-deleted.
+
+Stored in Firestore subcollection: projects/{projectId}/events/{eventId}
+Note: projectId is implicit in the subcollection path, not stored as a field.
+"""
+type ProjectEvent {
+  """Unique identifier (Firestore document ID)"""
+  id: ID!
+
+  """Event display name"""
+  name: String!
+
+  """Lifecycle status (draft or deleted)"""
+  status: ProjectEventStatus!
+
+  """Creation timestamp (milliseconds since epoch)"""
+  createdAt: Int!
+
+  """Last update timestamp (milliseconds since epoch)"""
+  updatedAt: Int!
+
+  """Soft delete timestamp (null if not deleted)"""
+  deletedAt: Int
+}
+
+"""
+Project event lifecycle status enumeration
+"""
+enum ProjectEventStatus {
+  """Project event is active and can be used"""
+  DRAFT
+
+  """Project event is soft-deleted and hidden from all queries"""
+  DELETED
+}
+
+"""
+Input for creating a new project event
+"""
+input CreateProjectEventInput {
+  """
+  Project ID (determines subcollection path)
+  Note: This is used to construct the Firestore path, not stored as a field
+  """
+  projectId: ID!
+
+  """Event name (defaults to "Untitled event" if not provided)"""
+  name: String
+}
+
+"""
+Input for updating an existing project event
+"""
+input UpdateProjectEventInput {
+  """Project ID (for subcollection path)"""
+  projectId: ID!
+
+  """Event ID to update"""
+  eventId: ID!
+
+  """New event name"""
+  name: String!
+}
+
+"""
+Input for deleting a project event (soft delete)
+"""
+input DeleteProjectEventInput {
+  """Project ID (for subcollection path)"""
+  projectId: ID!
+
+  """Event ID to delete"""
+  eventId: ID!
+}
+
+"""
+Input for activating a project event
+"""
+input ActivateProjectEventInput {
+  """Project ID"""
+  projectId: ID!
+
+  """Event ID to activate"""
+  eventId: ID!
+}
+
+"""
+Input for deactivating the currently active project event
+"""
+input DeactivateProjectEventInput {
+  """Project ID"""
+  projectId: ID!
+}
+
+"""
+Queries for reading project event data
+"""
+type Query {
+  """
+  Get all non-deleted project events for a project.
+  Project events are ordered by creation date (newest first).
+  Only accessible by workspace admins.
+
+  Implementation: Firestore subcollection query
+  Path: projects/{projectId}/events
+  Filter: where('status', '==', 'draft')
+  """
+  getProjectEvents(projectId: ID!): [ProjectEvent!]!
+
+  """
+  Get a single project event by ID.
+  Returns null if project event doesn't exist or is deleted.
+  Only accessible by workspace admins.
+
+  Implementation: Firestore document get
+  Path: projects/{projectId}/events/{eventId}
+  """
+  getProjectEvent(projectId: ID!, eventId: ID!): ProjectEvent
+
+  """
+  Get the currently active project event for a project.
+  Returns null if no project event is active.
+  Only accessible by workspace admins.
+
+  Implementation: Read project.activeEventId, then fetch event
+  """
+  getActiveProjectEvent(projectId: ID!): ProjectEvent
+}
+
+"""
+Mutations for modifying project event data
+"""
+type Mutation {
+  """
+  Create a new project event for a project.
+  The project event is created with status "draft" and is not active by default.
+  Returns the newly created project event.
+  Only accessible by workspace admins.
+
+  Implementation: Firestore subcollection addDoc
+  Path: projects/{projectId}/events
+  Validation: Zod schema validation in application code (NOT security rules)
+
+  Errors:
+  - 404: Project not found
+  - 403: User is not admin
+  """
+  createProjectEvent(input: CreateProjectEventInput!): ProjectEvent!
+
+  """
+  Rename an existing project event.
+  Returns the updated project event.
+  Only accessible by workspace admins.
+
+  Implementation: Firestore updateDoc on subcollection document
+  Validation: Zod schema validation in application code (NOT security rules)
+
+  Errors:
+  - 404: Project event not found or deleted
+  - 403: User is not admin
+  - 400: Invalid name (empty or too long)
+  """
+  renameProjectEvent(input: UpdateProjectEventInput!): ProjectEvent!
+
+  """
+  Soft-delete a project event.
+  The project event status is set to "deleted" and it's removed from all queries.
+  If the project event is currently active, the project will have no active event.
+  Returns the deleted project event.
+  Only accessible by workspace admins.
+
+  Implementation: Firestore transaction (soft delete + clear activeEventId if needed)
+
+  Errors:
+  - 404: Project event not found or already deleted
+  - 403: User is not admin
+  """
+  deleteProjectEvent(input: DeleteProjectEventInput!): ProjectEvent!
+
+  """
+  Activate a project event for a project.
+  Only one project event can be active per project. If another project event is currently
+  active, it will be automatically deactivated.
+  Returns the activated project event.
+  Only accessible by workspace admins.
+
+  Implementation: Firestore transaction (verify event + atomically update project.activeEventId)
+
+  Errors:
+  - 404: Project event not found, deleted, or doesn't belong to project
+  - 403: User is not admin
+  - 400: Cannot activate deleted project event
+  """
+  activateProjectEvent(input: ActivateProjectEventInput!): ProjectEvent!
+
+  """
+  Deactivate the currently active project event for a project.
+  After deactivation, the project will have no active project event.
+  Returns true if deactivation succeeded.
+  Only accessible by workspace admins.
+
+  Implementation: Update project.activeEventId to null
+
+  Errors:
+  - 404: Project not found
+  - 403: User is not admin
+  """
+  deactivateProjectEvent(input: DeactivateProjectEventInput!): Boolean!
+}
+
+"""
+Error types for better error handling
+"""
+type ProjectEventError {
+  """Error code (e.g., NOT_FOUND, FORBIDDEN, BAD_REQUEST)"""
+  code: String!
+
+  """Human-readable error message"""
+  message: String!
+
+  """Additional error context"""
+  details: String
+}
+
+"""
+Security & Implementation Notes:
+
+1. Firestore Structure:
+   - Subcollection: projects/{projectId}/events/{eventId}
+   - projectId is implicit in path (NOT stored as field)
+   - Project document has activeEventId field (references single active event)
+
+2. Security Rules:
+   - Simple admin-only checks: allow read, write: if isAdmin()
+   - NO data validation in rules (per standards/backend/firestore-security.md)
+   - Data validation happens in application code with Zod schemas
+
+3. Client-First Architecture:
+   - All operations use Firestore client SDK
+   - Real-time updates via onSnapshot() on subcollection
+   - TanStack Query for mutations and caching
+   - Zero server functions (unless absolutely necessary)
+
+4. Key Principles:
+   - Rules check WHO can access (authentication/authorization)
+   - Zod schemas validate WHAT is valid (data validation in app code)
+   - Subcollection structure makes ownership explicit (projectId in path)
+   - Simple, maintainable security rules
+"""

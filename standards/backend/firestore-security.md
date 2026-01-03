@@ -4,161 +4,190 @@ This document defines principles and patterns for Firestore security rules and a
 
 ## Core Principles
 
-### 1. Secure by Default
-- Deny access unless explicitly allowed
-- Never trust client input
-- Validate all data server-side
+### 1. Simple Authentication Checks Only
+- Security rules check **WHO** can access data
+- Zod schemas validate **WHAT** data is valid
+- Keep rules simple and maintainable
 
-### 2. Read/Write Separation
-- Allow granular read access for real-time updates
-- Restrict writes to enforce business logic
-- Use security rules as last line of defense
+### 2. No Data Validation in Rules
+- Don't validate data shape in security rules
+- Don't check field lengths or enums
+- Use Zod schemas in application code instead
 
-### 3. Authentication-Ready
-- Design rules for future authentication
-- Plan for user-specific access control
-- Keep POC simple, tighten for production
+### 3. Admin SDK for Deletes
+- Soft deletes (status updates) via client SDK
+- Hard deletes (actual removal) via Admin SDK in scheduled jobs
+- Never allow deletes in security rules
 
-## Current Strategy (POC)
+### 4. Case-by-Case Permissions
+- Some collections are public read (e.g., projects for guest links)
+- Some collections require authentication
+- Admin-only writes for management operations
 
-### Allow All Reads, Deny All Writes
+## Current Strategy (Production)
+
+### Simple Authentication-Based Rules
+
+**Core principle**: Security rules check WHO can access, Zod schemas validate WHAT data is valid.
 
 ```javascript
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read: if true;   // Client SDK can read/subscribe
-      allow write: if false; // Force all writes through server logic
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null && !request.auth.token.isAnonymous;
     }
+
+    function isAdmin() {
+      return isAuthenticated() && request.auth.token.admin == true;
+    }
+
+    // Workspaces - admin read/write, no deletes
+    match /workspaces/{workspaceId} {
+      allow read: if isAdmin();
+      allow create, update: if isAdmin();
+      allow delete: if false; // Handled by Admin SDK scheduled jobs
+    }
+
+    // Projects - public read, admin write, no deletes
+    match /projects/{projectId} {
+      allow read: if true; // Public read for guest links
+      allow create, update: if isAdmin();
+      allow delete: if false; // Handled by Admin SDK scheduled jobs
+    }
+
+    // Events - case-by-case permissions
+    match /events/{eventId} {
+      allow read: if resource.data.status == 'live' || isAdmin();
+      allow create, update: if isAdmin();
+      allow delete: if false;
+    }
+
+    // Add more collections as needed with similar patterns
   }
 }
 ```
 
 **Why this approach:**
-- ✅ Client SDK can read and subscribe to real-time updates
-- ✅ All mutations enforced through server-side validation
-- ✅ Business logic stays secure
-- ✅ Ready to tighten when authentication is added
+- ✅ Simple authentication and role checks only
+- ✅ Data validation happens with Zod schemas in application code
+- ✅ Deletes handled by Admin SDK with proper business logic
+- ✅ Easy to understand and maintain
+- ✅ Case-by-case permissions per collection
 
 **Location:** `/firebase/firestore.rules`
 
-## Future Authentication Patterns
+## What to Validate Where
 
-### User-Specific Access Control
-
-When authentication is added:
+### ✅ IN Security Rules (Authentication/Authorization)
 
 ```javascript
-// Helper functions
-function isAuthenticated() {
-  return request.auth != null;
-}
+// ✅ Check if user is authenticated
+allow read: if request.auth != null
 
-function isOwner(companyId) {
-  return isAuthenticated() &&
-         get(/databases/$(database)/documents/companies/$(companyId))
-           .data.ownerId == request.auth.uid;
-}
+// ✅ Check if user is admin
+allow write: if request.auth.token.admin == true
 
-function isTeamMember(companyId) {
-  return isAuthenticated() &&
-         request.auth.uid in get(/databases/$(database)/documents/companies/$(companyId))
-           .data.teamMembers;
-}
+// ✅ Check resource status for conditional access
+allow read: if resource.data.status == 'live'
+
+// ✅ Prevent deletes (use Admin SDK instead)
+allow delete: if false
 ```
 
-### Granular Collection Rules
-
-```javascript
-// Companies - only owners can write
-match /companies/{companyId} {
-  allow read: if isAuthenticated();
-  allow write: if isOwner(companyId);
-}
-
-// Projects - company members only
-match /projects/{projectId} {
-  allow read: if true; // Public read for guest links
-  allow write: if isOwner(resource.data.companyId);
-}
-
-// Events - guests can read live events
-match /projects/{projectId}/events/{eventId} {
-  allow read: if resource.data.status == 'live' ||
-                 isOwner(resource.data.companyId);
-  allow write: if false; // Server-side only for validation
-}
-
-// Experiences - company-scoped
-match /experiences/{experienceId} {
-  allow read: if isOwner(resource.data.companyId) ||
-                 isTeamMember(resource.data.companyId);
-  allow write: if false; // Server-side only
-}
-```
-
-## Security Rule Patterns
-
-### ✅ DO: Validate Data Shape
-
-```javascript
-function isValidEvent(data) {
-  return data.keys().hasAll(['name', 'projectId', 'companyId', 'status']) &&
-         data.name is string &&
-         data.name.size() > 0 &&
-         data.name.size() <= 100 &&
-         data.status in ['draft', 'live', 'archived'];
-}
-
-match /events/{eventId} {
-  allow create: if isValidEvent(request.resource.data);
-  allow update: if isValidEvent(request.resource.data);
-}
-```
-
-### ✅ DO: Prevent Data Tampering
-
-```javascript
-// Don't allow users to change their own companyId
-match /projects/{projectId} {
-  allow update: if request.resource.data.companyId == resource.data.companyId;
-}
-```
-
-### ✅ DO: Use Field-Level Validation
-
-```javascript
-function validStatusTransition(before, after) {
-  return (before == 'draft' && after == 'live') ||
-         (before == 'live' && after == 'archived') ||
-         (before == after); // No change is valid
-}
-
-match /events/{eventId} {
-  allow update: if validStatusTransition(
-    resource.data.status,
-    request.resource.data.status
-  );
-}
-```
-
-### ❌ DON'T: Rely Only on Security Rules
-
-Security rules are the **last line of defense**, not the only defense:
+### ✅ IN Application Code (Data Validation)
 
 ```typescript
-// ❌ Bad: Client writes directly
-await setDoc(doc(firestore, 'events', id), data)
+// ✅ Validate data shape with Zod
+const projectSchema = z.object({
+  name: z.string().min(1).max(100),
+  status: z.enum(['draft', 'active', 'archived']),
+  workspaceId: z.string(),
+})
 
-// ✅ Good: Server-side validation first
-await createEventAction(data) // Validates, then uses Admin SDK
+// ✅ Validate before mutation
+const validated = projectSchema.parse(input)
+await createProject(validated)
 ```
 
-**Why:**
+### ❌ DON'T: Validate Data in Rules
+
+```javascript
+// ❌ Don't validate data shape in rules
+function isValidEvent(data) {
+  return data.keys().hasAll(['name', 'projectId']) &&
+         data.name is string &&
+         data.name.size() > 0 &&
+         data.name.size() <= 100
+}
+
+// ❌ Don't check field values
+allow write: if request.resource.data.status in ['draft', 'live', 'archived']
+
+// ❌ Don't validate business logic
+function validStatusTransition(before, after) {
+  return (before == 'draft' && after == 'live')
+}
+```
+
+**Why NOT validate in rules:**
 - Rules are limited in complexity
-- Rules can't enforce complex business logic
-- Rules can't call external APIs
-- Server-side validation is more maintainable
+- Hard to maintain and debug
+- Can't provide good error messages
+- Zod schemas are more powerful and flexible
+
+## Common Patterns
+
+### Public Read, Admin Write
+
+```javascript
+match /projects/{projectId} {
+  allow read: if true; // Anyone can read
+  allow write: if isAdmin(); // Only admins can write
+  allow delete: if false; // No deletes
+}
+```
+
+### Conditional Read Based on Status
+
+```javascript
+match /events/{eventId} {
+  // Live events are public, others are admin-only
+  allow read: if resource.data.status == 'live' || isAdmin();
+  allow write: if isAdmin();
+  allow delete: if false;
+}
+```
+
+### Admin-Only Access
+
+```javascript
+match /workspaces/{workspaceId} {
+  allow read: if isAdmin();
+  allow write: if isAdmin();
+  allow delete: if false; // Handled by scheduled jobs
+}
+```
+
+## Storage Security Rules
+
+Similar simple patterns for Firebase Storage:
+
+```javascript
+// /firebase/storage.rules
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Public read, admin write
+    match /media/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null &&
+                      request.auth.token.admin == true;
+      allow delete: if false; // Handled by Admin SDK
+    }
+  }
+}
+```
 
 ## Testing Security Rules
 
@@ -168,114 +197,89 @@ await createEventAction(data) // Validates, then uses Admin SDK
 firebase emulators:start
 ```
 
-### Unit Testing Rules
+Test rules locally before deploying.
 
-Use `@firebase/rules-unit-testing` for automated testing:
+### Manual Testing
+
+1. Open Firebase Console → Firestore → Rules
+2. Use Rules Playground to simulate requests
+3. Test as authenticated user, admin, and anonymous
+
+### Automated Testing (Optional)
+
+Use `@firebase/rules-unit-testing` for automated tests:
 
 ```typescript
-import { initializeTestEnvironment } from '@firebase/rules-unit-testing'
+import { initializeTestEnvironment, assertSucceeds, assertFails } from '@firebase/rules-unit-testing'
 
 const testEnv = await initializeTestEnvironment({
   projectId: 'test-project',
-  firestore: {
-    rules: fs.readFileSync('firestore.rules', 'utf8'),
-  },
+  firestore: { rules: fs.readFileSync('firestore.rules', 'utf8') },
 })
 
-// Test as unauthenticated user
+// Test unauthenticated access
 const unauthedDb = testEnv.unauthenticatedContext().firestore()
-await assertFails(
-  setDoc(doc(unauthedDb, 'events/test'), { name: 'Test' })
-)
+await assertFails(setDoc(doc(unauthedDb, 'workspaces/test'), {}))
 
-// Test as authenticated user
-const authedDb = testEnv.authenticatedContext('user123').firestore()
-await assertSucceeds(
-  getDoc(doc(authedDb, 'events/test'))
-)
-```
-
-## Storage Security Rules
-
-Similar patterns apply to Firebase Storage:
-
-```javascript
-// /firebase/storage.rules
-rules_version = '2';
-service firebase.storage {
-  match /b/{bucket}/o {
-    // POC: Allow all reads, deny writes
-    match /{allPaths=**} {
-      allow read: if true;
-      allow write: if false; // Server-side only
-    }
-
-    // Future: Authenticated uploads
-    match /media/{companyId}/{mediaType}/{fileName} {
-      allow read: if true;
-      allow write: if request.auth != null &&
-                      request.auth.uid in get(/databases/$(database)/documents/companies/$(companyId))
-                        .data.teamMembers;
-    }
-  }
-}
+// Test admin access
+const adminDb = testEnv.authenticatedContext('admin', { admin: true }).firestore()
+await assertSucceeds(setDoc(doc(adminDb, 'workspaces/test'), { name: 'Test' }))
 ```
 
 ## Best Practices
 
 ### ✅ DO: Keep Rules Simple
 
-- Complex logic belongs in server-side code
-- Use rules for basic access control only
-- Validate data shape, not business rules
+- Only check authentication and roles
+- No data validation (use Zod schemas)
+- No complex business logic
 
-### ✅ DO: Plan for Scale
-
-- Avoid expensive `get()` calls in rules
-- Cache user permissions in custom claims
-- Use security rules for coarse-grained access
-
-### ✅ DO: Version Security Rules
+### ✅ DO: Use Custom Claims for Roles
 
 ```javascript
-// Add version comment at top of rules file
+// Store roles in custom claims, not Firestore
+function isAdmin() {
+  return request.auth.token.admin == true
+}
+```
+
+### ✅ DO: Disable Deletes in Rules
+
+```javascript
+// Always disable deletes (use Admin SDK instead)
+allow delete: if false
+```
+
+### ✅ DO: Version and Document Changes
+
+Add version comment at top of rules file:
+
+```javascript
 // Version: 2.0.0
 // Last updated: 2024-12-26
-// Changes: Added company-scoped access control
+// Changes: Added admin-based access control
 ```
 
-### ✅ DO: Document Rule Changes
-
-Keep changelog in `/firebase/README.md`:
-
-```markdown
-## Security Rules Changelog
-
-### v2.0.0 - 2024-12-26
-- Added authentication-based access control
-- Restricted writes to company owners
-- Allowed public reads for live events
-
-### v1.0.0 - 2024-01-01
-- Initial POC rules (allow all reads, deny all writes)
-```
-
-### ❌ DON'T: Expose Sensitive Data in Rules
+### ❌ DON'T: Validate Data Shape
 
 ```javascript
-// ❌ Don't check passwords in rules
-allow read: if request.auth.token.password == resource.data.password
+// ❌ Bad: Validating data in rules
+allow write: if request.resource.data.name is string &&
+               request.resource.data.name.size() > 0
 
-// ✅ Use proper authentication
-allow read: if request.auth != null
+// ✅ Good: Validate with Zod schemas in code
+const validated = schema.parse(data)
 ```
 
-### ❌ DON'T: Use Rules for Rate Limiting
+### ❌ DON'T: Use Expensive get() Calls
 
-Security rules can't rate limit. Use:
-- Firebase App Check for abuse prevention
-- Cloud Functions with rate limiting middleware
-- Firestore quotas and limits
+```javascript
+// ❌ Bad: Expensive database lookups
+allow read: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isPremium
+
+// ✅ Good: Use custom claims
+allow read: if request.auth.token.isPremium == true
+```
 
 ## Deployment
 
@@ -285,55 +289,52 @@ Security rules can't rate limit. Use:
 pnpm fb:deploy:rules
 ```
 
-### Deploy Rules with Indexes
+### Deploy All Firebase Resources
 
 ```bash
 pnpm fb:deploy
 ```
 
-### Validate Before Deploy
+### Test Before Production
+
+Always test rules in Firebase emulator before deploying:
 
 ```bash
-firebase deploy --only firestore:rules --project=staging
-# Test in staging first
-firebase deploy --only firestore:rules --project=production
+firebase emulators:start
+# Test your application with the new rules
+# Deploy when confident
+pnpm fb:deploy:rules
 ```
 
-## Monitoring & Debugging
+## Monitoring
 
-### Check Rule Denials
+### Check Rule Denials in Console
 
-In Firebase Console:
-1. Firestore → Rules → Playground
-2. Test rules with sample requests
-3. View detailed evaluation logs
+1. Open Firebase Console → Firestore → Rules
+2. Use Rules Playground to simulate requests
+3. Test different auth states (admin, authenticated, anonymous)
 
-### Enable Debug Logging
+### Debug Permission Denied Errors
 
-```typescript
-import { enableIndexedDbPersistence } from 'firebase/firestore'
-import { firestore } from '@/integrations/firebase/client'
+When you see "Missing or insufficient permissions":
 
-// Enable logging in development
-if (process.env.NODE_ENV === 'development') {
-  enableIndexedDbPersistence(firestore, { forceOwnership: true })
-}
-```
+1. Check if user is authenticated
+2. Check if user has required custom claims (e.g., `admin: true`)
+3. Verify collection permissions match expected pattern
+4. Test in Rules Playground with actual user token
 
 ## Quick Reference
 
 | Scenario | Pattern |
 |----------|---------|
-| **POC (current)** | Allow all reads, deny all writes |
-| **Authenticated users** | Check `request.auth != null` |
-| **Owner-only access** | Check `request.auth.uid == resource.data.ownerId` |
-| **Public reads** | `allow read: if true` |
-| **Server-only writes** | `allow write: if false` |
-| **Validate data shape** | Use helper functions with `.keys().hasAll()` |
-| **Field-level rules** | Compare `resource.data` vs `request.resource.data` |
+| **Admin-only** | `allow read, write: if isAdmin()` |
+| **Public read, admin write** | `allow read: if true; allow write: if isAdmin()` |
+| **Conditional read** | `allow read: if resource.data.status == 'live' \|\| isAdmin()` |
+| **No deletes** | `allow delete: if false` |
+| **Authenticated users** | `allow read: if request.auth != null` |
 
 ## Resources
 
 - [Firestore Security Rules Docs](https://firebase.google.com/docs/firestore/security/get-started)
-- [Security Rules Unit Testing](https://firebase.google.com/docs/firestore/security/test-rules-emulator)
-- [Common Rule Patterns](https://firebase.google.com/docs/firestore/security/rules-conditions)
+- [Security Rules Testing](https://firebase.google.com/docs/firestore/security/test-rules-emulator)
+- [Custom Claims](https://firebase.google.com/docs/auth/admin/custom-claims)

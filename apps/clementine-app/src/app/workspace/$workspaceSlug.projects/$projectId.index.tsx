@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { ProjectDetailsPage } from '@/domains/workspace/projects'
+import { ProjectEventsPage } from '@/domains/project/events'
 
 /**
  * Project details page route (index)
@@ -7,11 +7,15 @@ import { ProjectDetailsPage } from '@/domains/workspace/projects'
  * Route: /workspace/:workspaceSlug/projects/:projectId (exact match)
  * Access: Admin only (enforced by parent route)
  *
- * Displays project details (placeholder for now).
- * Project data is loaded by parent route and available via useLoaderData().
+ * Displays project events management interface.
+ * ProjectEventsPage now fetches activeEventId automatically via useProjectEvents hook.
  */
 export const Route = createFileRoute(
   '/workspace/$workspaceSlug/projects/$projectId/',
 )({
-  component: ProjectDetailsPage,
+  component: function ProjectDetailsRoute() {
+    const { projectId } = Route.useParams()
+
+    return <ProjectEventsPage projectId={projectId} />
+  },
 })

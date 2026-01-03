@@ -21,6 +21,7 @@ function EventIndexRedirect() {
     <Navigate
       to="/workspace/$workspaceSlug/projects/$projectId/events/$eventId/welcome"
       params={{ workspaceSlug, projectId, eventId }}
+      replace={true}
     />
   )
 }

@@ -10,6 +10,7 @@ import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 import type { QueryClient } from '@tanstack/react-query'
 import appCss from '@/ui-kit/theme/styles.css?url'
 import { AuthProvider, useAuth } from '@/domains/auth/providers/AuthProvider'
+import { Toaster } from '@/ui-kit/components/sonner'
 
 export interface MyRouterContext {
   queryClient: QueryClient
@@ -72,6 +73,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         {children}
+        <Toaster />
         <TanStackDevtools
           config={{
             position: 'bottom-right',
