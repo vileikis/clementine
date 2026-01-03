@@ -1,5 +1,5 @@
 import { Outlet, createFileRoute } from '@tanstack/react-router'
-import { useServerFn } from '@tanstack/react-start/client'
+import { useServerFn } from '@tanstack/react-start'
 import { useEffect } from 'react'
 import { useWorkspace } from '@/domains/workspace'
 import { setLastVisitedWorkspaceFn } from '@/domains/auth/server'
