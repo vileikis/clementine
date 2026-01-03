@@ -44,11 +44,11 @@ service cloud.firestore {
       // Project events subcollection (simple admin-only checks)
       // Security rules check WHO can access - Zod schemas validate WHAT is valid
       match /events/{eventId} {
-        // READ: Allow admins only
-        allow read: if isAdmin();
-
         // WRITE: Allow admins only (create, update)
-        allow create, update: if isAdmin();
+        allow read, create, update: if isAdmin();
+
+        // READ: Allow all authenticated users to read events
+        allow read: if isAnyUser();
 
         // DELETE: Deny hard deletes (soft delete only via update)
         allow delete: if false;
