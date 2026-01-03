@@ -1,7 +1,7 @@
-import {  useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { useRenameProject } from '../hooks/useRenameProject'
-import type {FormEvent} from 'react';
+import type { FormEvent } from 'react'
 import {
   Dialog,
   DialogContent,
