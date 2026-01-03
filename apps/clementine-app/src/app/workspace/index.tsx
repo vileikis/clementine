@@ -1,6 +1,6 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useEffect } from 'react'
-import { useWorkspaceStore } from '@/domains/workspace'
+import { createFileRoute, redirect } from '@tanstack/react-router'
+import { getCurrentUserFn } from '@/domains/auth/server'
+import { isAdmin } from '@/domains/auth/utils/authChecks'
 
 /**
  * Workspace index route
@@ -8,45 +8,32 @@ import { useWorkspaceStore } from '@/domains/workspace'
  * Route: /workspace
  * Access: Admin only (enforced by parent route requireAdmin guard)
  *
- * Redirects admin to:
- * - Last visited workspace (if exists in localStorage)
- * - /admin/workspaces (if no workspace history)
+ * Server-side redirect based on session data:
+ * - Redirects to last visited workspace (if exists in session)
+ * - Falls back to /admin/workspaces (if no workspace history)
  *
- * This provides seamless continuity - admins return to where they left off.
- *
- * Note: Redirect happens client-side (useEffect) because localStorage
- * is not available during SSR (beforeLoad runs on server).
+ * Uses beforeLoad for instant server-side redirect (no loading flash).
  */
 export const Route = createFileRoute('/workspace/')({
-  component: WorkspaceRedirect,
-})
+  beforeLoad: async () => {
+    const user = await getCurrentUserFn()
 
-function WorkspaceRedirect() {
-  const navigate = useNavigate()
-  const { lastVisitedWorkspaceSlug } = useWorkspaceStore()
+    // Parent route already enforces admin, but double-check for safety
+    if (!user || !isAdmin(user)) {
+      throw redirect({ to: '/login' })
+    }
 
-  useEffect(() => {
-    // Client-side redirect after mount (when localStorage is available)
-    if (lastVisitedWorkspaceSlug) {
-      // Redirect to last visited workspace
-      navigate({
+    // Redirect to last visited workspace if exists
+    if (user.lastVisitedWorkspaceSlug) {
+      throw redirect({
         to: '/workspace/$workspaceSlug',
-        params: { workspaceSlug: lastVisitedWorkspaceSlug },
-        replace: true, // Replace history entry (don't add /workspace to history)
-      })
-    } else {
-      // No workspace history - redirect to admin workspaces list
-      navigate({
-        to: '/admin/workspaces',
-        replace: true,
+        params: { workspaceSlug: user.lastVisitedWorkspaceSlug },
       })
     }
-  }, [lastVisitedWorkspaceSlug, navigate])
 
-  // Show loading state while redirecting
-  return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="text-muted-foreground">Loading...</div>
-    </div>
-  )
-}
+    // No workspace history - redirect to workspaces list
+    throw redirect({
+      to: '/admin/workspaces',
+    })
+  },
+})

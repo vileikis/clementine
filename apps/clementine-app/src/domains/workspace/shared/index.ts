@@ -24,6 +24,3 @@ export { WORKSPACE_NAME, WORKSPACE_SLUG } from './constants/workspace.constants'
 
 // Hooks
 export { useWorkspace } from './hooks/useWorkspace'
-
-// Store
-export { useWorkspaceStore } from './store/useWorkspaceStore'
