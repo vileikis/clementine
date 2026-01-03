@@ -31,9 +31,9 @@ This is a TanStack Start web application within a monorepo structure:
 
 **Purpose**: Create component files and TypeScript interfaces
 
-- [ ] T001 [P] Create TypeScript interfaces for BreadcrumbItem, ActionButton, TopNavBarProps in apps/clementine-app/src/domains/navigation/components/TopNavBar.tsx
-- [ ] T002 [P] Create empty component file apps/clementine-app/src/domains/navigation/components/TopNavBreadcrumb.tsx
-- [ ] T003 [P] Create empty component file apps/clementine-app/src/domains/navigation/components/TopNavActions.tsx
+- [X] T001 [P] Create TypeScript interfaces for BreadcrumbItem, ActionButton, TopNavBarProps in apps/clementine-app/src/domains/navigation/components/TopNavBar.tsx
+- [X] T002 [P] Create empty component file apps/clementine-app/src/domains/navigation/components/TopNavBreadcrumb.tsx
+- [X] T003 [P] Create empty component file apps/clementine-app/src/domains/navigation/components/TopNavActions.tsx
 
 ---
 
@@ -43,10 +43,10 @@ This is a TanStack Start web application within a monorepo structure:
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T004 [US1] Implement TopNavBreadcrumb component in apps/clementine-app/src/domains/navigation/components/TopNavBreadcrumb.tsx with breadcrumb rendering, separators, and truncation
-- [ ] T005 [US1] Implement TopNavActions component in apps/clementine-app/src/domains/navigation/components/TopNavActions.tsx with button mapping and layout
-- [ ] T006 [US1] Implement TopNavBar container component in apps/clementine-app/src/domains/navigation/components/TopNavBar.tsx with horizontal flex layout, border styling, and theme tokens
-- [ ] T007 Update barrel export in apps/clementine-app/src/domains/navigation/components/index.ts to export TopNavBar and type interfaces (not internal components)
+- [X] T004 [US1] Implement TopNavBreadcrumb component in apps/clementine-app/src/domains/navigation/components/TopNavBreadcrumb.tsx with breadcrumb rendering, separators, and truncation
+- [X] T005 [US1] Implement TopNavActions component in apps/clementine-app/src/domains/navigation/components/TopNavActions.tsx with button mapping and layout
+- [X] T006 [US1] Implement TopNavBar container component in apps/clementine-app/src/domains/navigation/components/TopNavBar.tsx with horizontal flex layout, border styling, and theme tokens
+- [X] T007 Update barrel export in apps/clementine-app/src/domains/navigation/components/index.ts to export TopNavBar and type interfaces (not internal components)
 
 **Checkpoint**: Core navigation components ready - user story integration can now begin
 
@@ -60,10 +60,10 @@ This is a TanStack Start web application within a monorepo structure:
 
 ### Implementation for User Story 1
 
-- [ ] T008 [US1] Import TopNavBar component and required icons (FolderOpen, Share2) in apps/clementine-app/src/app/workspace/$workspaceSlug.projects/$projectId.tsx
-- [ ] T009 [US1] Create breadcrumbs array with project name and folder icon in apps/clementine-app/src/app/workspace/$workspaceSlug.projects/$projectId.tsx using loader data
-- [ ] T010 [US1] Create actions array with share button and toast handler in apps/clementine-app/src/app/workspace/$workspaceSlug.projects/$projectId.tsx
-- [ ] T011 [US1] Render TopNavBar component before Outlet in apps/clementine-app/src/app/workspace/$workspaceSlug.projects/$projectId.tsx layout
+- [X] T008 [US1] Import TopNavBar component and required icons (FolderOpen, Share2) in apps/clementine-app/src/app/workspace/$workspaceSlug.projects/$projectId.tsx
+- [X] T009 [US1] Create breadcrumbs array with project name and folder icon in apps/clementine-app/src/app/workspace/$workspaceSlug.projects/$projectId.tsx using loader data
+- [X] T010 [US1] Create actions array with share button and toast handler in apps/clementine-app/src/app/workspace/$workspaceSlug.projects/$projectId.tsx
+- [X] T011 [US1] Render TopNavBar component before Outlet in apps/clementine-app/src/app/workspace/$workspaceSlug.projects/$projectId.tsx layout
 
 **Checkpoint**: At this point, project pages show top navigation bar with breadcrumb and share button. Clicking share shows toast. User Story 1 is fully functional and independently testable.
 
@@ -77,11 +77,11 @@ This is a TanStack Start web application within a monorepo structure:
 
 ### Implementation for User Story 2
 
-- [ ] T012 [US2] Import TopNavBar component and FolderOpen icon in apps/clementine-app/src/app/workspace/$workspaceSlug.projects/$projectId.events/$eventId.tsx
-- [ ] T013 [US2] Get project and event data from loaders and route params in apps/clementine-app/src/app/workspace/$workspaceSlug.projects/$projectId.events/$eventId.tsx
-- [ ] T014 [US2] Create breadcrumbs array with clickable project link and event name in apps/clementine-app/src/app/workspace/$workspaceSlug.projects/$projectId.events/$eventId.tsx
-- [ ] T015 [US2] Create empty actions array (no actions for US2) in apps/clementine-app/src/app/workspace/$workspaceSlug.projects/$projectId.events/$eventId.tsx
-- [ ] T016 [US2] Render TopNavBar component before existing EventLayout content in apps/clementine-app/src/app/workspace/$workspaceSlug.projects/$projectId.events/$eventId.tsx
+- [X] T012 [US2] Import TopNavBar component and FolderOpen icon in apps/clementine-app/src/app/workspace/$workspaceSlug.projects/$projectId.events/$eventId.tsx
+- [X] T013 [US2] Get project and event data from loaders and route params in apps/clementine-app/src/app/workspace/$workspaceSlug.projects/$projectId.events/$eventId.tsx
+- [X] T014 [US2] Create breadcrumbs array with clickable project link and event name in apps/clementine-app/src/app/workspace/$workspaceSlug.projects/$projectId.events/$eventId.tsx
+- [X] T015 [US2] Create empty actions array (no actions for US2) in apps/clementine-app/src/app/workspace/$workspaceSlug.projects/$projectId.events/$eventId.tsx
+- [X] T016 [US2] Render TopNavBar component before existing EventLayout content in apps/clementine-app/src/app/workspace/$workspaceSlug.projects/$projectId.events/$eventId.tsx
 
 **Checkpoint**: At this point, event pages show top navigation bar with breadcrumb trail. Clicking project name navigates to project page. User Stories 1 AND 2 both work independently.
 
@@ -95,8 +95,8 @@ This is a TanStack Start web application within a monorepo structure:
 
 ### Implementation for User Story 3
 
-- [ ] T017 [US3] Import Play and Upload icons from lucide-react in apps/clementine-app/src/app/workspace/$workspaceSlug.projects/$projectId.events/$eventId.tsx
-- [ ] T018 [US3] Update actions array in apps/clementine-app/src/app/workspace/$workspaceSlug.projects/$projectId.events/$eventId.tsx to include play and publish buttons with toast handlers and ARIA labels
+- [X] T017 [US3] Import Play and Upload icons from lucide-react in apps/clementine-app/src/app/workspace/$workspaceSlug.projects/$projectId.events/$eventId.tsx
+- [X] T018 [US3] Update actions array in apps/clementine-app/src/app/workspace/$workspaceSlug.projects/$projectId.events/$eventId.tsx to include play and publish buttons with toast handlers and ARIA labels
 
 **Checkpoint**: All user stories complete. Event pages now show full navigation with breadcrumb and action buttons.
 
@@ -106,14 +106,14 @@ This is a TanStack Start web application within a monorepo structure:
 
 **Purpose**: Responsive testing, validation, and final quality checks
 
-- [ ] T019 [P] Test breadcrumb text truncation on narrow screens (320px, 375px) using Chrome DevTools responsive mode
-- [ ] T020 [P] Test action button touch targets on mobile (verify 44x44px minimum) using browser developer tools
-- [ ] T021 [P] Verify no hard-coded colors (all theme tokens) by reviewing component source code
-- [ ] T022 Test breadcrumb navigation (click project name on event page) in local dev server
-- [ ] T023 Test all action button clicks trigger correct toast messages in local dev server
-- [ ] T024 Run validation workflow: pnpm app:check (format, lint, type-check) in apps/clementine-app/
-- [ ] T025 Manual standards review against frontend/design-system.md, frontend/component-libraries.md, global/project-structure.md per validation gates
-- [ ] T026 Test full user journeys from quickstart.md validation checklist
+- [X] T019 [P] Test breadcrumb text truncation on narrow screens (320px, 375px) using Chrome DevTools responsive mode
+- [X] T020 [P] Test action button touch targets on mobile (verify 44x44px minimum) using browser developer tools
+- [X] T021 [P] Verify no hard-coded colors (all theme tokens) by reviewing component source code
+- [X] T022 Test breadcrumb navigation (click project name on event page) in local dev server
+- [X] T023 Test all action button clicks trigger correct toast messages in local dev server
+- [X] T024 Run validation workflow: pnpm app:check (format, lint, type-check) in apps/clementine-app/
+- [X] T025 Manual standards review against frontend/design-system.md, frontend/component-libraries.md, global/project-structure.md per validation gates
+- [X] T026 Test full user journeys from quickstart.md validation checklist
 
 ---
 
