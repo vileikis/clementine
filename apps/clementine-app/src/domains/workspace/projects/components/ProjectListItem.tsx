@@ -1,14 +1,23 @@
 import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
-import { Trash2 } from 'lucide-react'
+import { MoreVertical, Pencil, Trash2 } from 'lucide-react'
 import { DeleteProjectDialog } from './DeleteProjectDialog'
+import { RenameProjectDialog } from './RenameProjectDialog'
 import type { Project } from '../types'
 import { Badge } from '@/ui-kit/components/badge'
 import { Button } from '@/ui-kit/components/button'
 import { Card } from '@/ui-kit/components/card'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/ui-kit/components/dropdown-menu'
 
 interface ProjectListItemProps {
   project: Project
+  workspaceId: string
   workspaceSlug: string
   onDelete: (projectId: string) => void
   isDeleting: boolean
@@ -16,11 +25,13 @@ interface ProjectListItemProps {
 
 export function ProjectListItem({
   project,
+  workspaceId,
   workspaceSlug,
   onDelete,
   isDeleting,
 }: ProjectListItemProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [showRenameDialog, setShowRenameDialog] = useState(false)
 
   const handleDelete = () => {
     onDelete(project.id)
@@ -43,17 +54,46 @@ export function ProjectListItem({
               {project.status}
             </Badge>
           </Link>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setShowDeleteDialog(true)}
-            disabled={isDeleting}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+
+          {/* Context menu */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-11 w-11">
+                <MoreVertical className="h-4 w-4" />
+                <span className="sr-only">Actions</span>
+              </Button>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setShowRenameDialog(true)}>
+                <Pencil className="mr-2 h-4 w-4" />
+                Rename
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator />
+
+              <DropdownMenuItem
+                onClick={() => setShowDeleteDialog(true)}
+                className="text-destructive"
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </Card>
 
+      {/* Rename dialog */}
+      <RenameProjectDialog
+        projectId={project.id}
+        workspaceId={workspaceId}
+        initialName={project.name}
+        open={showRenameDialog}
+        onOpenChange={setShowRenameDialog}
+      />
+
+      {/* Delete dialog */}
       <DeleteProjectDialog
         open={showDeleteDialog}
         projectName={project.name}

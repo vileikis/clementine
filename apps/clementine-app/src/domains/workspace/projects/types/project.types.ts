@@ -56,3 +56,22 @@ export interface DeleteProjectInput {
   /** Project ID to delete */
   id: string
 }
+
+/**
+ * Input data for renaming a project
+ */
+export interface RenameProjectInput {
+  /** Project ID to rename */
+  projectId: string
+
+  /** New project name (1-100 characters) */
+  name: string
+}
+
+/**
+ * Input data for updating project fields
+ */
+export interface UpdateProjectInput {
+  /** New project name (1-100 characters) */
+  name: string
+}

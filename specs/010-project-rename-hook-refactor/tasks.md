@@ -83,14 +83,14 @@ All foundational infrastructure is already in place:
 
 ### Implementation for User Story 1
 
-- [ ] T001 [P] [US1] Add `updateProjectInputSchema` and `UpdateProjectInput` type to `apps/clementine-app/src/domains/workspace/projects/schemas/project.schemas.ts`
-- [ ] T002 [P] [US1] Add `RenameProjectInput` and `UpdateProjectInput` interfaces to `apps/clementine-app/src/domains/workspace/projects/types/project.types.ts`
-- [ ] T003 [US1] Create `useRenameProject` hook in `apps/clementine-app/src/domains/workspace/projects/hooks/useRenameProject.ts` (depends on T001, T002)
-- [ ] T004 [US1] Export `useRenameProject` from `apps/clementine-app/src/domains/workspace/projects/hooks/index.ts` (depends on T003)
-- [ ] T005 [US1] Create `RenameProjectDialog` component in `apps/clementine-app/src/domains/workspace/projects/components/RenameProjectDialog.tsx` (depends on T003)
-- [ ] T006 [US1] Export `RenameProjectDialog` from `apps/clementine-app/src/domains/workspace/projects/components/index.ts` (depends on T005)
-- [ ] T007 [US1] Update `ProjectListItem` to add context menu (DropdownMenu) in `apps/clementine-app/src/domains/workspace/projects/components/ProjectListItem.tsx` (depends on T005)
-- [ ] T008 [US1] Update `ProjectsPage` to pass `workspaceId` prop to `ProjectListItem` in `apps/clementine-app/src/domains/workspace/projects/containers/ProjectsPage.tsx` (depends on T007)
+- [X] T001 [P] [US1] Add `updateProjectInputSchema` and `UpdateProjectInput` type to `apps/clementine-app/src/domains/workspace/projects/schemas/project.schemas.ts`
+- [X] T002 [P] [US1] Add `RenameProjectInput` and `UpdateProjectInput` interfaces to `apps/clementine-app/src/domains/workspace/projects/types/project.types.ts`
+- [X] T003 [US1] Create `useRenameProject` hook in `apps/clementine-app/src/domains/workspace/projects/hooks/useRenameProject.ts` (depends on T001, T002)
+- [X] T004 [US1] Export `useRenameProject` from `apps/clementine-app/src/domains/workspace/projects/hooks/index.ts` (depends on T003)
+- [X] T005 [US1] Create `RenameProjectDialog` component in `apps/clementine-app/src/domains/workspace/projects/components/RenameProjectDialog.tsx` (depends on T003)
+- [X] T006 [US1] Export `RenameProjectDialog` from `apps/clementine-app/src/domains/workspace/projects/components/index.ts` (depends on T005)
+- [X] T007 [US1] Update `ProjectListItem` to add context menu (DropdownMenu) in `apps/clementine-app/src/domains/workspace/projects/components/ProjectListItem.tsx` (depends on T005)
+- [X] T008 [US1] Update `ProjectsPage` to pass `workspaceId` prop to `ProjectListItem` in `apps/clementine-app/src/domains/workspace/projects/containers/ProjectsPage.tsx` (depends on T007)
 
 **Checkpoint**: At this point, User Story 1 should be fully functional - admins can rename projects via context menu
 
@@ -117,8 +117,8 @@ All foundational infrastructure is already in place:
 
 ### Implementation for User Story 2
 
-- [ ] T009 [P] [US2] Remove navigation side effect from `useCreateProject` hook in `apps/clementine-app/src/domains/workspace/projects/hooks/useCreateProject.ts`
-- [ ] T010 [US2] Update `ProjectsPage` to handle navigation after create using `mutateAsync` in `apps/clementine-app/src/domains/workspace/projects/containers/ProjectsPage.tsx` (depends on T009)
+- [X] T009 [P] [US2] Remove navigation side effect from `useCreateProject` hook in `apps/clementine-app/src/domains/workspace/projects/hooks/useCreateProject.ts`
+- [X] T010 [US2] Update `ProjectsPage` to handle navigation after create using `mutateAsync` in `apps/clementine-app/src/domains/workspace/projects/containers/ProjectsPage.tsx` (depends on T009)
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently - create project still navigates (from consumer), rename works via context menu
 
