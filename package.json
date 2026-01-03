@@ -25,7 +25,8 @@
     "functions:seed": "pnpm --filter @clementine/functions seed",
     "functions:serve": "pnpm --filter @clementine/functions serve",
     "functions:serve:prod": "pnpm --filter @clementine/functions serve:prod",
-    "functions:deploy": "./functions/scripts/deploy.sh"
+    "functions:deploy": "./functions/scripts/deploy.sh",
+    "worktree": "./scripts/new-worktree.sh"
   },
   "keywords": [
     "ai",

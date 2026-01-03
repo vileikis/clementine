@@ -6,10 +6,7 @@ import { Button } from '@/ui-kit/components/button'
 import { Input } from '@/ui-kit/components/input'
 import { Label } from '@/ui-kit/components/label'
 import { generateSlug, isValidSlug } from '@/shared/utils/slug-utils'
-import {
-  WORKSPACE_NAME,
-  WORKSPACE_SLUG,
-} from '@/domains/workspace/constants/workspace.constants'
+import { WORKSPACE_NAME, WORKSPACE_SLUG } from '@/domains/workspace'
 
 /**
  * Create workspace page
