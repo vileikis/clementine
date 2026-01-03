@@ -49,11 +49,11 @@ Complete feature delivery includes:
 
 ### Tasks
 
-- [ ] T001 Verify feature branch is checked out (010-session-workspace-persistence)
-- [ ] T002 [P] Read existing session types in apps/clementine-app/src/domains/auth/types/session.types.ts
-- [ ] T003 [P] Read existing createSessionFn in apps/clementine-app/src/domains/auth/server/functions.ts
-- [ ] T004 [P] Read existing getCurrentUserFn in apps/clementine-app/src/domains/auth/server/functions.ts
-- [ ] T005 Run pnpm app:check to verify clean starting state
+- [X] T001 Verify feature branch is checked out (010-session-workspace-persistence)
+- [X] T002 [P] Read existing session types in apps/clementine-app/src/domains/auth/types/session.types.ts
+- [X] T003 [P] Read existing createSessionFn in apps/clementine-app/src/domains/auth/server/functions.ts
+- [X] T004 [P] Read existing getCurrentUserFn in apps/clementine-app/src/domains/auth/server/functions.ts
+- [X] T005 Run pnpm app:check to verify clean starting state
 
 **Completion Criteria**:
 - ✅ All existing auth session code understood
@@ -75,9 +75,9 @@ This phase is foundational because session types are used by all subsequent user
 
 ### Tasks
 
-- [ ] T006 Extend SessionData interface with lastVisitedWorkspaceSlug field in apps/clementine-app/src/domains/auth/types/session.types.ts
-- [ ] T007 Extend SessionUser interface with lastVisitedWorkspaceSlug field in apps/clementine-app/src/domains/auth/types/session.types.ts
-- [ ] T008 Run pnpm app:check to verify type changes compile without errors
+- [X] T006 Extend SessionData interface with lastVisitedWorkspaceSlug field in apps/clementine-app/src/domains/auth/types/session.types.ts
+- [X] T007 Extend SessionUser interface with lastVisitedWorkspaceSlug field in apps/clementine-app/src/domains/auth/types/session.types.ts
+- [X] T008 Run pnpm app:check to verify type changes compile without errors
 
 **Completion Criteria**:
 - ✅ SessionData includes `lastVisitedWorkspaceSlug?: string`
@@ -120,12 +120,12 @@ const sessionUser: SessionUser = {
 
 ### Tasks
 
-- [ ] T009 [US2] Create setLastVisitedWorkspaceFn server function in apps/clementine-app/src/domains/auth/server/functions.ts
-- [ ] T010 [US2] Add input validator to setLastVisitedWorkspaceFn for workspaceSlug parameter
-- [ ] T011 [US2] Implement authentication check (userId must exist in session)
-- [ ] T012 [US2] Implement session update with field preservation (spread operator)
-- [ ] T013 [US2] Export setLastVisitedWorkspaceFn from apps/clementine-app/src/domains/auth/server/index.ts
-- [ ] T014 [US2] Run pnpm app:check to verify server function compiles
+- [X] T009 [US2] Create setLastVisitedWorkspaceFn server function in apps/clementine-app/src/domains/auth/server/functions.ts
+- [X] T010 [US2] Add input validator to setLastVisitedWorkspaceFn for workspaceSlug parameter
+- [X] T011 [US2] Implement authentication check (userId must exist in session)
+- [X] T012 [US2] Implement session update with field preservation (spread operator)
+- [X] T013 [US2] Export setLastVisitedWorkspaceFn from apps/clementine-app/src/domains/auth/server/index.ts
+- [X] T014 [US2] Run pnpm app:check to verify server function compiles
 
 **Completion Criteria**:
 - ✅ `setLastVisitedWorkspaceFn` server function created
@@ -166,10 +166,10 @@ await setWorkspace({ data: { workspaceSlug: 'test-workspace' } })
 
 ### Tasks
 
-- [ ] T015 [P] [US3] Update getCurrentUserFn to include lastVisitedWorkspaceSlug in destructuring in apps/clementine-app/src/domains/auth/server/functions.ts
-- [ ] T016 [P] [US3] Update getCurrentUserFn return statement to include lastVisitedWorkspaceSlug field
-- [ ] T017 [US3] Run pnpm app:check to verify changes compile
-- [ ] T018 [US3] Update createSessionFn to preserve existing lastVisitedWorkspaceSlug on token refresh in apps/clementine-app/src/domains/auth/server/functions.ts
+- [X] T015 [P] [US3] Update getCurrentUserFn to include lastVisitedWorkspaceSlug in destructuring in apps/clementine-app/src/domains/auth/server/functions.ts
+- [X] T016 [P] [US3] Update getCurrentUserFn return statement to include lastVisitedWorkspaceSlug field
+- [X] T017 [US3] Run pnpm app:check to verify changes compile
+- [X] T018 [US3] Update createSessionFn to preserve existing lastVisitedWorkspaceSlug on token refresh in apps/clementine-app/src/domains/auth/server/functions.ts
 
 **Completion Criteria**:
 - ✅ `getCurrentUserFn` returns `lastVisitedWorkspaceSlug` when present in session
@@ -212,11 +212,11 @@ console.log(userAfterRefresh.lastVisitedWorkspaceSlug)
 
 ### Tasks
 
-- [ ] T019 [US4] Replace entire /workspace/index.tsx with server-side beforeLoad redirect logic in apps/clementine-app/src/app/workspace/index.tsx
-- [ ] T020 [US4] Import getCurrentUserFn and isAdmin helper in apps/clementine-app/src/app/workspace/index.tsx
-- [ ] T021 [US4] Implement beforeLoad logic: check admin, redirect based on lastVisitedWorkspaceSlug
-- [ ] T022 [US4] Remove old WorkspaceRedirect component and useWorkspaceStore import from apps/clementine-app/src/app/workspace/index.tsx
-- [ ] T023 [US4] Run pnpm app:check to verify route changes compile
+- [X] T019 [US4] Replace entire /workspace/index.tsx with server-side beforeLoad redirect logic in apps/clementine-app/src/app/workspace/index.tsx
+- [X] T020 [US4] Import getCurrentUserFn and isAdmin helper in apps/clementine-app/src/app/workspace/index.tsx
+- [X] T021 [US4] Implement beforeLoad logic: check admin, redirect based on lastVisitedWorkspaceSlug
+- [X] T022 [US4] Remove old WorkspaceRedirect component and useWorkspaceStore import from apps/clementine-app/src/app/workspace/index.tsx
+- [X] T023 [US4] Run pnpm app:check to verify route changes compile
 
 **Completion Criteria**:
 - ✅ Admin visiting `/workspace` with workspace history → instant redirect to `/workspace/$lastVisitedWorkspaceSlug`
@@ -258,11 +258,11 @@ console.log(userAfterRefresh.lastVisitedWorkspaceSlug)
 
 ### Tasks
 
-- [ ] T024 [US5] Import setLastVisitedWorkspaceFn and useServerFn in apps/clementine-app/src/app/workspace/$workspaceSlug.tsx
-- [ ] T025 [US5] Replace useWorkspaceStore with useServerFn(setLastVisitedWorkspaceFn) in WorkspaceLayout component
-- [ ] T026 [US5] Update useEffect to call setLastVisitedWorkspaceFn only when isSuccess && workspace in apps/clementine-app/src/app/workspace/$workspaceSlug.tsx
-- [ ] T027 [US5] Remove useWorkspaceStore import from apps/clementine-app/src/app/workspace/$workspaceSlug.tsx
-- [ ] T028 [US5] Run pnpm app:check to verify changes compile
+- [X] T024 [US5] Import setLastVisitedWorkspaceFn and useServerFn in apps/clementine-app/src/app/workspace/$workspaceSlug.tsx
+- [X] T025 [US5] Replace useWorkspaceStore with useServerFn(setLastVisitedWorkspaceFn) in WorkspaceLayout component
+- [X] T026 [US5] Update useEffect to call setLastVisitedWorkspaceFn only when isSuccess && workspace in apps/clementine-app/src/app/workspace/$workspaceSlug.tsx
+- [X] T027 [US5] Remove useWorkspaceStore import from apps/clementine-app/src/app/workspace/$workspaceSlug.tsx
+- [X] T028 [US5] Run pnpm app:check to verify changes compile
 
 **Completion Criteria**:
 - ✅ Visiting valid workspace → session updated with workspace slug
@@ -302,10 +302,10 @@ console.log(userAfterRefresh.lastVisitedWorkspaceSlug)
 
 ### Tasks
 
-- [ ] T029 [US6] Delete apps/clementine-app/src/domains/workspace/store/useWorkspaceStore.ts file
-- [ ] T030 [US6] Remove useWorkspaceStore export from apps/clementine-app/src/domains/workspace/index.ts
-- [ ] T031 [US6] Search codebase for any remaining useWorkspaceStore imports (should be zero)
-- [ ] T032 [US6] Run pnpm app:check to verify no broken imports
+- [X] T029 [US6] Delete apps/clementine-app/src/domains/workspace/store/useWorkspaceStore.ts file
+- [X] T030 [US6] Remove useWorkspaceStore export from apps/clementine-app/src/domains/workspace/index.ts
+- [X] T031 [US6] Search codebase for any remaining useWorkspaceStore imports (should be zero)
+- [X] T032 [US6] Run pnpm app:check to verify no broken imports
 
 **Completion Criteria**:
 - ✅ `useWorkspaceStore.ts` file deleted
@@ -340,12 +340,12 @@ ls src/domains/workspace/store/
 
 ### Tasks
 
-- [ ] T033 Run pnpm app:check (format, lint, type-check) from apps/clementine-app
-- [ ] T034 Verify no localStorage references remain in workspace domain
-- [ ] T035 Test end-to-end flow: login → visit workspace → navigate to /workspace → redirect works
-- [ ] T036 Test cross-tab session persistence (open /workspace in Tab 2 after visiting workspace in Tab 1)
-- [ ] T037 Test invalid workspace doesn't corrupt session (visit /workspace/nonexistent → no session update)
-- [ ] T038 Standards compliance review: frontend/architecture.md, global/code-quality.md, global/project-structure.md
+- [X] T033 Run pnpm app:check (format, lint, type-check) from apps/clementine-app
+- [X] T034 Verify no localStorage references remain in workspace domain
+- [X] T035 Test end-to-end flow: login → visit workspace → navigate to /workspace → redirect works
+- [X] T036 Test cross-tab session persistence (open /workspace in Tab 2 after visiting workspace in Tab 1)
+- [X] T037 Test invalid workspace doesn't corrupt session (visit /workspace/nonexistent → no session update)
+- [X] T038 Standards compliance review: frontend/architecture.md, global/code-quality.md, global/project-structure.md
 
 **Completion Criteria**:
 - ✅ All acceptance criteria from spec.md met

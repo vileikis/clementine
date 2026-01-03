@@ -16,6 +16,13 @@ export interface SessionData {
 
   /** Whether user is authenticated anonymously */
   isAnonymous?: boolean
+
+  /**
+   * Last visited workspace slug (session persistence)
+   * Undefined until user visits first workspace
+   * @example "acme-corp-events"
+   */
+  lastVisitedWorkspaceSlug?: string
 }
 
 /**
@@ -36,4 +43,12 @@ export interface SessionUser {
 
   /** Whether user is authenticated anonymously */
   isAnonymous: boolean
+
+  /**
+   * Last visited workspace slug (session persistence)
+   * Undefined until user visits first workspace
+   * Used for server-side redirects in /workspace route
+   * @example "acme-corp-events"
+   */
+  lastVisitedWorkspaceSlug?: string
 }

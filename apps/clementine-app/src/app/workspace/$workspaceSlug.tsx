@@ -1,6 +1,8 @@
 import { Outlet, createFileRoute } from '@tanstack/react-router'
+import { useServerFn } from '@tanstack/react-start/client'
 import { useEffect } from 'react'
-import { useWorkspace, useWorkspaceStore } from '@/domains/workspace'
+import { useWorkspace } from '@/domains/workspace'
+import { setLastVisitedWorkspaceFn } from '@/domains/auth/server'
 import { NotFound } from '@/shared/components/NotFound'
 
 /**
@@ -10,7 +12,7 @@ import { NotFound } from '@/shared/components/NotFound'
  * Access: Admin only (enforced by parent route requireAdmin guard)
  *
  * Layout route that renders child routes (projects, settings, etc.)
- * Stores last visited workspace in localStorage for session persistence (client-side only)
+ * Stores last visited workspace in server session for cross-device persistence
  * Workspace data is fetched via useWorkspace hook (TanStack Query cache)
  */
 export const Route = createFileRoute('/workspace/$workspaceSlug')({
@@ -19,17 +21,23 @@ export const Route = createFileRoute('/workspace/$workspaceSlug')({
 
 function WorkspaceLayout() {
   const { workspaceSlug } = Route.useParams()
-  const { data: workspace, isLoading, isError } = useWorkspace(workspaceSlug)
-  const setLastVisitedWorkspaceSlug = useWorkspaceStore(
-    (state) => state.setLastVisitedWorkspaceSlug,
-  )
+  const {
+    data: workspace,
+    isSuccess,
+    isLoading,
+    isError,
+  } = useWorkspace(workspaceSlug)
+  const setLastVisitedWorkspace = useServerFn(setLastVisitedWorkspaceFn)
 
-  // Store last visited workspace (client-side only, runs after hydration)
+  // Update server session after workspace successfully loads
+  // Only runs when workspace exists (prevents saving invalid slugs)
   useEffect(() => {
-    if (workspaceSlug) {
-      setLastVisitedWorkspaceSlug(workspaceSlug)
+    if (isSuccess && workspace) {
+      // Fire-and-forget server function call
+      // No need to await - session update is non-critical
+      setLastVisitedWorkspace({ data: { workspaceSlug } })
     }
-  }, [workspaceSlug, setLastVisitedWorkspaceSlug])
+  }, [isSuccess, workspace, workspaceSlug, setLastVisitedWorkspace])
 
   // Loading state
   if (isLoading) {

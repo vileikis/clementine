@@ -26,9 +26,6 @@ export { WORKSPACE_NAME, WORKSPACE_SLUG } from './constants/workspace.constants'
 export { useWorkspace } from './hooks/useWorkspace'
 export { useUpdateWorkspace } from './hooks/useUpdateWorkspace'
 
-// Zustand store (session persistence)
-export { useWorkspaceStore } from './store/useWorkspaceStore'
-
 // Components (workspace-specific UI components)
 export { WorkspaceSettingsForm } from './components/WorkspaceSettingsForm'
 
