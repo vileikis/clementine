@@ -28,15 +28,12 @@ export const Route = createFileRoute('/workspace/')({
       throw redirect({
         to: '/workspace/$workspaceSlug',
         params: { workspaceSlug: user.lastVisitedWorkspaceSlug },
-        replace: true, // Don't add /workspace to history
       })
     }
 
     // No workspace history - redirect to workspaces list
     throw redirect({
       to: '/admin/workspaces',
-      replace: true,
     })
   },
-  component: () => null, // Never renders (always redirects in beforeLoad)
 })
