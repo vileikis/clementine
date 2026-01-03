@@ -23,8 +23,14 @@ export const projectEventSchema = z.object({
     .min(1, 'Event name cannot be empty')
     .max(100, 'Event name cannot exceed 100 characters'),
   status: projectEventStatusSchema,
-  createdAt: z.number().int().positive('Creation timestamp must be a positive integer'),
-  updatedAt: z.number().int().positive('Update timestamp must be a positive integer'),
+  createdAt: z
+    .number()
+    .int()
+    .positive('Creation timestamp must be a positive integer'),
+  updatedAt: z
+    .number()
+    .int()
+    .positive('Update timestamp must be a positive integer'),
   deletedAt: z
     .number()
     .int()
@@ -53,7 +59,10 @@ export const createProjectEventInputSchema = z.object({
  * Update project event input schema
  */
 export const updateProjectEventInputSchema = z.object({
-  name: z.string().min(1, 'Event name is required').max(100, 'Event name too long'),
+  name: z
+    .string()
+    .min(1, 'Event name is required')
+    .max(100, 'Event name too long'),
 })
 
 /**
@@ -85,8 +94,18 @@ export const deleteProjectEventInputSchema = z.object({
 
 export type ProjectEvent = z.infer<typeof projectEventSchema>
 export type ProjectEventStatus = z.infer<typeof projectEventStatusSchema>
-export type CreateProjectEventInput = z.infer<typeof createProjectEventInputSchema>
-export type UpdateProjectEventInput = z.infer<typeof updateProjectEventInputSchema>
-export type ActivateProjectEventInput = z.infer<typeof activateProjectEventInputSchema>
-export type DeactivateProjectEventInput = z.infer<typeof deactivateProjectEventInputSchema>
-export type DeleteProjectEventInput = z.infer<typeof deleteProjectEventInputSchema>
+export type CreateProjectEventInput = z.infer<
+  typeof createProjectEventInputSchema
+>
+export type UpdateProjectEventInput = z.infer<
+  typeof updateProjectEventInputSchema
+>
+export type ActivateProjectEventInput = z.infer<
+  typeof activateProjectEventInputSchema
+>
+export type DeactivateProjectEventInput = z.infer<
+  typeof deactivateProjectEventInputSchema
+>
+export type DeleteProjectEventInput = z.infer<
+  typeof deleteProjectEventInputSchema
+>

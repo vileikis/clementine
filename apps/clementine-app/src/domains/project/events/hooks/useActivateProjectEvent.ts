@@ -2,11 +2,7 @@
 // Mutation hook for activating/deactivating project events with transaction logic
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import {
-  doc,
-  runTransaction,
-  serverTimestamp,
-} from 'firebase/firestore'
+import { doc, runTransaction, serverTimestamp } from 'firebase/firestore'
 import * as Sentry from '@sentry/tanstackstart-react'
 import {
   activateProjectEventInputSchema,

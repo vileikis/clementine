@@ -2,7 +2,7 @@
 // Mutation hook for renaming project events
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { doc, updateDoc, serverTimestamp } from 'firebase/firestore'
+import { doc, serverTimestamp, updateDoc } from 'firebase/firestore'
 import * as Sentry from '@sentry/tanstackstart-react'
 import { updateProjectEventInputSchema } from '../schemas'
 import { firestore } from '@/integrations/firebase/client'
@@ -25,11 +25,7 @@ export function useRenameProjectEvent(projectId: string) {
     mutationFn: async ({ eventId, name }: RenameProjectEventInput) => {
       const validated = updateProjectEventInputSchema.parse({ name })
 
-      const eventRef = doc(
-        firestore,
-        `projects/${projectId}/events`,
-        eventId,
-      )
+      const eventRef = doc(firestore, `projects/${projectId}/events`, eventId)
 
       await updateDoc(eventRef, {
         name: validated.name,

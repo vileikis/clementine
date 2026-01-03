@@ -45,15 +45,18 @@ export function useProjectEvents(projectId: string) {
     const eventsQuery = query(
       collection(firestore, `projects/${projectId}/events`),
       where('status', '==', 'active'),
-      orderBy('createdAt', 'desc')
+      orderBy('createdAt', 'desc'),
     )
 
     const unsubscribe = onSnapshot(eventsQuery, (snapshot) => {
       const events = snapshot.docs.map((doc) =>
-        convertFirestoreDoc(doc, projectEventSchema)
+        convertFirestoreDoc(doc, projectEventSchema),
       )
 
-      queryClient.setQueryData<ProjectEvent[]>(['projectEvents', projectId], events)
+      queryClient.setQueryData<ProjectEvent[]>(
+        ['projectEvents', projectId],
+        events,
+      )
     })
 
     return () => {
@@ -67,13 +70,13 @@ export function useProjectEvents(projectId: string) {
       const eventsQuery = query(
         collection(firestore, `projects/${projectId}/events`),
         where('status', '==', 'active'),
-        orderBy('createdAt', 'desc')
+        orderBy('createdAt', 'desc'),
       )
 
       const eventsSnapshot = await getDocs(eventsQuery)
 
       return eventsSnapshot.docs.map((doc) =>
-        convertFirestoreDoc(doc, projectEventSchema)
+        convertFirestoreDoc(doc, projectEventSchema),
       )
     },
     staleTime: Infinity, // Never stale (real-time via onSnapshot)

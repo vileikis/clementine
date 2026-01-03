@@ -53,7 +53,8 @@ export function ProjectEventsList({
         <div className="text-center max-w-md">
           <h3 className="text-lg font-semibold mb-2">No events yet</h3>
           <p className="text-muted-foreground">
-            Create your first event to start setting up your photo booth experience.
+            Create your first event to start setting up your photo booth
+            experience.
           </p>
         </div>
       </div>

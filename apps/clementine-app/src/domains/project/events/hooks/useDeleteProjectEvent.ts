@@ -2,11 +2,7 @@
 // Mutation hook for soft-deleting project events with transaction logic
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import {
-  doc,
-  runTransaction,
-  serverTimestamp,
-} from 'firebase/firestore'
+import { doc, runTransaction, serverTimestamp } from 'firebase/firestore'
 import * as Sentry from '@sentry/tanstackstart-react'
 import { deleteProjectEventInputSchema } from '../schemas'
 import { firestore } from '@/integrations/firebase/client'
@@ -30,7 +26,10 @@ export function useDeleteProjectEvent(projectId: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async ({ projectId: pid, eventId }: DeleteProjectEventInput) => {
+    mutationFn: async ({
+      projectId: pid,
+      eventId,
+    }: DeleteProjectEventInput) => {
       const validated = deleteProjectEventInputSchema.parse({
         projectId: pid,
         eventId,

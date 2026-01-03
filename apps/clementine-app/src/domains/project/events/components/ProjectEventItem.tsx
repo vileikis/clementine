@@ -6,8 +6,10 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from '@tanstack/react-router'
 import { MoreVertical, Pencil, Trash2 } from 'lucide-react'
-import { Switch } from '@/ui-kit/components/switch'
-import { Button } from '@/ui-kit/components/button'
+import { useActivateProjectEvent } from '../hooks/useActivateProjectEvent'
+import { RenameProjectEventDialog } from './RenameProjectEventDialog'
+import { DeleteProjectEventDialog } from './DeleteProjectEventDialog'
+import type { ProjectEvent } from '../types/project-event.types'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,10 +17,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/ui-kit/components/ui/dropdown-menu'
-import { useActivateProjectEvent } from '../hooks/useActivateProjectEvent'
-import { RenameProjectEventDialog } from './RenameProjectEventDialog'
-import { DeleteProjectEventDialog } from './DeleteProjectEventDialog'
-import type { ProjectEvent } from '../types/project-event.types'
+import { Button } from '@/ui-kit/components/button'
+import { Switch } from '@/ui-kit/components/switch'
 
 export interface ProjectEventItemProps {
   /** Project event to display */
@@ -50,7 +50,11 @@ export interface ProjectEventItemProps {
  * />
  * ```
  */
-export function ProjectEventItem({ event, projectId, isActive }: ProjectEventItemProps) {
+export function ProjectEventItem({
+  event,
+  projectId,
+  isActive,
+}: ProjectEventItemProps) {
   const [renameDialogOpen, setRenameDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const activateProjectEvent = useActivateProjectEvent(projectId)
@@ -94,10 +98,16 @@ export function ProjectEventItem({ event, projectId, isActive }: ProjectEventIte
         </div>
 
         {/* Controls: activation switch + context menu */}
-        <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="flex items-center gap-2"
+          onClick={(e) => e.stopPropagation()}
+        >
           {/* Activation switch */}
           <div className="flex items-center gap-2">
-            <label htmlFor={`activate-${event.id}`} className="text-sm text-muted-foreground">
+            <label
+              htmlFor={`activate-${event.id}`}
+              className="text-sm text-muted-foreground"
+            >
               Active
             </label>
             <Switch

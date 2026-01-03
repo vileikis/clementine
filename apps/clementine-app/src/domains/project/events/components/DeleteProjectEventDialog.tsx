@@ -3,6 +3,7 @@
 
 'use client'
 
+import { useDeleteProjectEvent } from '../hooks/useDeleteProjectEvent'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,7 +14,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/ui-kit/components/alert-dialog'
-import { useDeleteProjectEvent } from '../hooks/useDeleteProjectEvent'
 
 export interface DeleteProjectEventDialogProps {
   /** Event ID to delete */
@@ -78,8 +78,8 @@ export function DeleteProjectEventDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>Delete Event?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. The event "{eventName}" will be permanently deleted
-            and will no longer be accessible.
+            This action cannot be undone. The event "{eventName}" will be
+            permanently deleted and will no longer be accessible.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

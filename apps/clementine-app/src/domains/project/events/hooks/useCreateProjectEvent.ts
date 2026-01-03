@@ -11,7 +11,10 @@ import {
 import * as Sentry from '@sentry/tanstackstart-react'
 import { createProjectEventInputSchema } from '../schemas'
 import type { WithFieldValue } from 'firebase/firestore'
-import type { CreateProjectEventInput, ProjectEvent } from '../types/project-event.types'
+import type {
+  CreateProjectEventInput,
+  ProjectEvent,
+} from '../types/project-event.types'
 import { firestore } from '@/integrations/firebase/client'
 
 /**

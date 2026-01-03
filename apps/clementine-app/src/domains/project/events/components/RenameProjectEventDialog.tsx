@@ -4,6 +4,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRenameProjectEvent } from '../hooks/useRenameProjectEvent'
 import {
   Dialog,
   DialogContent,
@@ -15,7 +16,6 @@ import {
 import { Button } from '@/ui-kit/components/button'
 import { Input } from '@/ui-kit/components/input'
 import { Label } from '@/ui-kit/components/label'
-import { useRenameProjectEvent } from '../hooks/useRenameProjectEvent'
 
 export interface RenameProjectEventDialogProps {
   /** Event ID to rename */
@@ -90,7 +90,8 @@ export function RenameProjectEventDialog({
           <DialogHeader>
             <DialogTitle>Rename Event</DialogTitle>
             <DialogDescription>
-              Enter a new name for this event. The name will be updated across all views.
+              Enter a new name for this event. The name will be updated across
+              all views.
             </DialogDescription>
           </DialogHeader>
 
