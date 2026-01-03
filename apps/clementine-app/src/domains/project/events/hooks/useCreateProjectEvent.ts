@@ -14,7 +14,7 @@ import type { WithFieldValue } from 'firebase/firestore'
 import type {
   CreateProjectEventInput,
   ProjectEvent,
-} from '../types/project-event.types'
+} from '../schemas/project-event.schema'
 import { firestore } from '@/integrations/firebase/client'
 
 /**
@@ -40,7 +40,7 @@ export function useCreateProjectEvent(projectId: string) {
 
         const newEvent: WithFieldValue<ProjectEvent> = {
           id: newEventRef.id,
-          name: validated.name,
+          name: validated.name ?? 'Untitled event',
           status: 'active' as const,
           createdAt: serverTimestamp(), // Transaction ensures this resolves
           updatedAt: serverTimestamp(),

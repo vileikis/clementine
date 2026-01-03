@@ -1,4 +1,4 @@
 // Schema barrel export
-// Internal use only - not exported from domain index
+// Schemas and types - types are re-exported from domain index
 
 export * from './project-event.schema'

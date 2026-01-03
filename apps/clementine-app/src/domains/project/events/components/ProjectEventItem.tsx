@@ -6,10 +6,11 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from '@tanstack/react-router'
 import { MoreVertical, Pencil, Trash2 } from 'lucide-react'
+import { toast } from 'sonner'
 import { useActivateProjectEvent } from '../hooks/useActivateProjectEvent'
 import { RenameProjectEventDialog } from './RenameProjectEventDialog'
 import { DeleteProjectEventDialog } from './DeleteProjectEventDialog'
-import type { ProjectEvent } from '../types/project-event.types'
+import type { ProjectEvent } from '../schemas/project-event.schema'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -62,12 +63,24 @@ export function ProjectEventItem({
   const { workspaceSlug } = useParams({ strict: false })
 
   const handleToggle = async (checked: boolean) => {
-    if (checked) {
-      // Activate this event
-      await activateProjectEvent.mutateAsync({ eventId: event.id, projectId })
-    } else {
-      // Deactivate (set activeEventId to null)
-      await activateProjectEvent.mutateAsync({ eventId: null, projectId })
+    try {
+      if (checked) {
+        // Activate this event
+        await activateProjectEvent.mutateAsync({ eventId: event.id, projectId })
+      } else {
+        // Deactivate (set activeEventId to null)
+        await activateProjectEvent.mutateAsync({ eventId: null, projectId })
+      }
+    } catch (error) {
+      // Show error notification
+      toast.error(
+        checked
+          ? 'Failed to activate event. Please try again.'
+          : 'Failed to deactivate event. Please try again.',
+      )
+
+      // Log error for debugging
+      console.error('Event activation toggle failed:', error)
     }
   }
 

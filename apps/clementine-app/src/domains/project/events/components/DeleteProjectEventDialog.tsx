@@ -38,7 +38,7 @@ export interface DeleteProjectEventDialogProps {
  * Confirmation dialog for soft-deleting project events
  *
  * Features:
- * - Clear warning message about permanent deletion
+ * - Clear warning message about deletion
  * - Loading state during mutation
  * - Auto-close on successful deletion
  * - Keyboard shortcuts (Enter to confirm, Escape to cancel)
@@ -67,7 +67,7 @@ export function DeleteProjectEventDialog({
     try {
       await deleteProjectEvent.mutateAsync({ eventId, projectId })
       toast.success('Event deleted', {
-        description: 'The event has been permanently deleted.',
+        description: 'The event has been deleted.',
       })
       onOpenChange(false)
     } catch (error) {
@@ -84,8 +84,8 @@ export function DeleteProjectEventDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>Delete Event?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. The event "{eventName}" will be
-            permanently deleted and will no longer be accessible.
+            The event "{eventName}" will be deleted and will no longer be
+            accessible.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="gap-2">

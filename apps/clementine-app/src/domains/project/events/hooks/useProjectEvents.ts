@@ -12,7 +12,7 @@ import {
   where,
 } from 'firebase/firestore'
 import { projectEventSchema } from '../schemas/project-event.schema'
-import type { ProjectEvent } from '../types/project-event.types'
+import type { ProjectEvent } from '../schemas/project-event.schema'
 import { firestore } from '@/integrations/firebase/client'
 import { convertFirestoreDoc } from '@/shared/utils/firestore-utils'
 

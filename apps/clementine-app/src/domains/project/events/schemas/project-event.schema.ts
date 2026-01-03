@@ -46,14 +46,15 @@ export const projectEventSchema = z.object({
  * Create project event input schema
  * Note: projectId is NOT in the input - it's derived from the subcollection path
  */
-export const createProjectEventInputSchema = z.object({
-  name: z
-    .string()
-    .min(1, 'Event name cannot be empty')
-    .max(100, 'Event name cannot exceed 100 characters')
-    .optional()
-    .default('Untitled event'),
-})
+export const createProjectEventInputSchema = z
+  .object({
+    name: z
+      .string()
+      .min(1, 'Event name cannot be empty')
+      .max(100, 'Event name cannot exceed 100 characters')
+      .optional(),
+  })
+  .default({ name: 'Untitled event' })
 
 /**
  * Update project event input schema
