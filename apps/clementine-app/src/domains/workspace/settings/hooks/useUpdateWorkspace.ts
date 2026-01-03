@@ -10,11 +10,8 @@ import {
   where,
 } from 'firebase/firestore'
 import * as Sentry from '@sentry/tanstackstart-react'
-import {
-  
-  updateWorkspaceSchema
-} from '../../shared/schemas/workspace.schemas'
-import type {UpdateWorkspaceSchemaType} from '../../shared/schemas/workspace.schemas';
+import { updateWorkspaceSchema } from '../../shared/schemas/workspace.schemas'
+import type { UpdateWorkspaceSchemaType } from '../../shared/schemas/workspace.schemas'
 import type { UpdateData } from 'firebase/firestore'
 import type { Workspace } from '@clementine/shared'
 import { firestore } from '@/integrations/firebase/client'

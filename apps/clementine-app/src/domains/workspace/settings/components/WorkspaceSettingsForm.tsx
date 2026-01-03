@@ -2,11 +2,8 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate } from '@tanstack/react-router'
 import { useUpdateWorkspace } from '../hooks/useUpdateWorkspace'
-import {
-  
-  updateWorkspaceSchema
-} from '../../shared/schemas/workspace.schemas'
-import type {UpdateWorkspaceSchemaType} from '../../shared/schemas/workspace.schemas';
+import { updateWorkspaceSchema } from '../../shared/schemas/workspace.schemas'
+import type { UpdateWorkspaceSchemaType } from '../../shared/schemas/workspace.schemas'
 import type { Workspace } from '@clementine/shared'
 import { Button } from '@/ui-kit/components/button'
 import { Input } from '@/ui-kit/components/input'
