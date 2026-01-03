@@ -3,6 +3,7 @@
 
 'use client'
 
+import { toast } from 'sonner'
 import { useDeleteProjectEvent } from '../hooks/useDeleteProjectEvent'
 import {
   AlertDialog,
@@ -65,16 +66,21 @@ export function DeleteProjectEventDialog({
   const handleDelete = async () => {
     try {
       await deleteProjectEvent.mutateAsync({ eventId, projectId })
+      toast.success('Event deleted', {
+        description: 'The event has been permanently deleted.',
+      })
       onOpenChange(false)
     } catch (error) {
-      // Error is handled by mutation hook (Sentry)
-      console.error('Failed to delete event:', error)
+      toast.error('Failed to delete event', {
+        description:
+          error instanceof Error ? error.message : 'An unknown error occurred',
+      })
     }
   }
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
+      <AlertDialogContent className="sm:max-w-[425px]">
         <AlertDialogHeader>
           <AlertDialogTitle>Delete Event?</AlertDialogTitle>
           <AlertDialogDescription>
@@ -82,14 +88,17 @@ export function DeleteProjectEventDialog({
             permanently deleted and will no longer be accessible.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel disabled={deleteProjectEvent.isPending}>
+        <AlertDialogFooter className="gap-2">
+          <AlertDialogCancel
+            disabled={deleteProjectEvent.isPending}
+            className="min-h-[44px]"
+          >
             Cancel
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDelete}
             disabled={deleteProjectEvent.isPending}
-            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90 min-h-[44px]"
           >
             {deleteProjectEvent.isPending ? 'Deleting...' : 'Delete'}
           </AlertDialogAction>

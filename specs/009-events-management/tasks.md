@@ -188,14 +188,14 @@ This is a TanStack Start application in a monorepo:
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T063 [P] Add mobile-responsive styles (44x44px touch targets) to all components in apps/clementine-app/src/domains/project/events/components/
-- [ ] T064 [P] Add loading states for all mutations in components in apps/clementine-app/src/domains/project/events/components/
-- [ ] T065 [P] Add error handling and user feedback for all operations in apps/clementine-app/src/domains/project/events/hooks/
-- [ ] T066 [P] Add accessibility attributes (ARIA labels, keyboard navigation) to all interactive components in apps/clementine-app/src/domains/project/events/components/
+- [X] T063 [P] Add mobile-responsive styles (44x44px touch targets) to all components in apps/clementine-app/src/domains/project/events/components/
+- [X] T064 [P] Add loading states for all mutations in components in apps/clementine-app/src/domains/project/events/components/
+- [X] T065 [P] Add error handling and user feedback for all operations in apps/clementine-app/src/domains/project/events/hooks/
+- [X] T066 [P] Add accessibility attributes (ARIA labels, keyboard navigation) to all interactive components in apps/clementine-app/src/domains/project/events/components/
 - [ ] T067 Add optimistic updates to all mutations for instant feedback in apps/clementine-app/src/domains/project/events/hooks/
-- [ ] T068 [P] Add comprehensive error messages for Firestore operations in apps/clementine-app/src/domains/project/events/hooks/
-- [ ] T069 Run validation loop: pnpm app:check (format, lint, auto-fixes) from apps/clementine-app/
-- [ ] T070 Run type checking: pnpm type-check from apps/clementine-app/
+- [X] T068 [P] Add comprehensive error messages for Firestore operations in apps/clementine-app/src/domains/project/events/hooks/
+- [X] T069 Run validation loop: pnpm app:check (format, lint, auto-fixes) from apps/clementine-app/
+- [X] T070 Run type checking: pnpm type-check from apps/clementine-app/
 - [ ] T071 Run test suite: pnpm test from apps/clementine-app/
 - [ ] T072 Verify quickstart.md scenarios work as documented in specs/009-events-management/quickstart.md
 - [ ] T073 Test on real mobile devices (iOS Safari, Android Chrome) for touch targets and responsiveness

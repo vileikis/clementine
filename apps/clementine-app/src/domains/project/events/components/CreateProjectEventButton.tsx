@@ -3,7 +3,10 @@
 
 'use client'
 
+import { Plus } from 'lucide-react'
+import { toast } from 'sonner'
 import { useCreateProjectEvent } from '../hooks/useCreateProjectEvent'
+import { Button } from '@/ui-kit/components/button'
 
 export interface CreateProjectEventButtonProps {
   /** Project ID */
@@ -16,6 +19,8 @@ export interface CreateProjectEventButtonProps {
 /**
  * CreateProjectEventButton component
  * Button to create a new project event with default name "Untitled event"
+ *
+ * Mobile-optimized with 44x44px minimum touch target
  *
  * @example
  * ```tsx
@@ -35,24 +40,31 @@ export function CreateProjectEventButton({
     try {
       const result = await createEvent.mutateAsync({})
 
+      toast.success('Event created', {
+        description: 'Your new event is ready to configure.',
+      })
+
       // Call optional callback with new event ID
       if (onEventCreated) {
         onEventCreated(result.eventId)
       }
     } catch (error) {
-      console.error('Failed to create event:', error)
-      // Error handling will be improved in polish phase
+      toast.error('Failed to create event', {
+        description:
+          error instanceof Error ? error.message : 'An unknown error occurred',
+      })
     }
   }
 
   return (
-    <button
+    <Button
       onClick={handleCreate}
       disabled={createEvent.isPending}
-      className="inline-flex items-center justify-center px-4 py-2 bg-primary text-primary-foreground rounded-md font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+      className="min-h-[44px] min-w-[44px]"
       aria-label="Create new event"
     >
+      <Plus className="mr-2 h-4 w-4" />
       {createEvent.isPending ? 'Creating...' : 'Create Event'}
-    </button>
+    </Button>
   )
 }

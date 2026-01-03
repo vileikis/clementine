@@ -85,12 +85,12 @@ export function ProjectEventItem({
   return (
     <>
       <div
-        className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
+        className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer gap-4 min-h-[44px]"
         role="listitem"
         onClick={handleEventClick}
       >
         {/* Event name and status */}
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1 flex-1">
           <h4 className="font-medium">{event.name}</h4>
           {isActive && (
             <span className="text-xs text-green-600 font-medium">● Active</span>
@@ -99,14 +99,14 @@ export function ProjectEventItem({
 
         {/* Controls: activation switch + context menu */}
         <div
-          className="flex items-center gap-2"
+          className="flex items-center gap-3 justify-end"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Activation switch */}
           <div className="flex items-center gap-2">
             <label
               htmlFor={`activate-${event.id}`}
-              className="text-sm text-muted-foreground"
+              className="text-sm text-muted-foreground hidden sm:inline"
             >
               Active
             </label>
@@ -125,21 +125,24 @@ export function ProjectEventItem({
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8"
+                className="min-h-[44px] min-w-[44px]"
                 aria-label={`Actions for ${event.name}`}
               >
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setRenameDialogOpen(true)}>
+            <DropdownMenuContent align="end" className="min-w-[160px]">
+              <DropdownMenuItem
+                onClick={() => setRenameDialogOpen(true)}
+                className="min-h-[44px] cursor-pointer"
+              >
                 <Pencil className="mr-2 h-4 w-4" />
                 Rename
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => setDeleteDialogOpen(true)}
-                className="text-destructive focus:text-destructive"
+                className="text-destructive focus:text-destructive min-h-[44px] cursor-pointer"
               >
                 <Trash2 className="mr-2 h-4 w-4" />
                 Delete

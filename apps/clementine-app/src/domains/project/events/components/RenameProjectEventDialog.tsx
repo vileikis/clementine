@@ -4,6 +4,7 @@
 'use client'
 
 import { useState } from 'react'
+import { toast } from 'sonner'
 import { useRenameProjectEvent } from '../hooks/useRenameProjectEvent'
 import {
   Dialog,
@@ -74,12 +75,17 @@ export function RenameProjectEventDialog({
 
     try {
       await renameProjectEvent.mutateAsync({ eventId, name: name.trim() })
+      toast.success('Event renamed', {
+        description: 'Your event name has been updated successfully.',
+      })
       onOpenChange(false)
       // Reset to initial name for next open
       setName(initialName)
     } catch (error) {
-      // Error is handled by mutation hook (Sentry)
-      console.error('Failed to rename event:', error)
+      toast.error('Failed to rename event', {
+        description:
+          error instanceof Error ? error.message : 'An unknown error occurred',
+      })
     }
   }
 
@@ -110,18 +116,20 @@ export function RenameProjectEventDialog({
             </div>
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="gap-2">
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={renameProjectEvent.isPending}
+              className="min-h-[44px]"
             >
               Cancel
             </Button>
             <Button
               type="submit"
               disabled={renameProjectEvent.isPending || name.trim() === ''}
+              className="min-h-[44px]"
             >
               {renameProjectEvent.isPending ? 'Saving...' : 'Rename'}
             </Button>

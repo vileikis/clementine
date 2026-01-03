@@ -3,6 +3,7 @@ import { doc, getDoc } from 'firebase/firestore'
 import { projectSchema } from '@clementine/shared'
 import { firestore } from '@/integrations/firebase/client'
 import { convertFirestoreDoc } from '@/shared/utils/firestore-utils'
+import { NotFound } from '@/shared/components/NotFound'
 
 /**
  * Project layout route
@@ -39,4 +40,18 @@ export const Route = createFileRoute(
     return { project }
   },
   component: Outlet, // Render child routes
+  notFoundComponent: ProjectNotFound,
 })
+
+function ProjectNotFound() {
+  const { workspaceSlug } = Route.useParams()
+
+  return (
+    <NotFound
+      title="Project Not Found"
+      message="The project you're looking for doesn't exist or has been deleted."
+      actionLabel="View All Projects"
+      actionHref={`/workspace/${workspaceSlug}/projects`}
+    />
+  )
+}
