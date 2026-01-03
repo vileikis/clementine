@@ -19,7 +19,7 @@ export const Route = createFileRoute('/workspace/')({
     const user = await getCurrentUserFn()
 
     // Parent route already enforces admin, but double-check for safety
-    if (!isAdmin(user)) {
+    if (!user || !isAdmin(user)) {
       throw redirect({ to: '/login' })
     }
 
