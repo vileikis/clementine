@@ -1,17 +1,17 @@
 import { Link } from '@tanstack/react-router'
-import { useWorkspace } from '../hooks/useWorkspace'
+import { useWorkspace } from '../../shared/hooks/useWorkspace'
 
-interface WorkspacePageProps {
+interface WorkspaceSettingsPageProps {
   slug: string
 }
 
 /**
- * Workspace detail page
+ * Workspace settings page
  *
- * Displays workspace information and future workspace-specific features.
+ * Displays workspace settings and configuration options.
  * Currently shows a placeholder - will be enhanced with workspace editor in future iterations.
  */
-export function WorkspacePage({ slug }: WorkspacePageProps) {
+export function WorkspaceSettingsPage({ slug }: WorkspaceSettingsPageProps) {
   const { data: workspace, isLoading, error } = useWorkspace(slug)
 
   if (isLoading) {

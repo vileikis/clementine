@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router'
 import { Trash2 } from 'lucide-react'
 import { DeleteWorkspaceDialog } from './DeleteWorkspaceDialog'
-import type { Workspace } from '@/domains/workspace/types/workspace.types'
+import type { Workspace } from '@clementine/shared'
 import { Button } from '@/ui-kit/components/button'
 
 interface WorkspaceListItemProps {

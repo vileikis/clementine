@@ -1,6 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useWorkspace } from '@/domains/workspace'
-import { WorkspaceSettingsForm } from '@/domains/workspace/components/WorkspaceSettingsForm'
+import { WorkspaceSettingsForm, useWorkspace } from '@/domains/workspace'
 
 /**
  * Workspace settings page route

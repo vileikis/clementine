@@ -10,9 +10,10 @@ import {
   where,
 } from 'firebase/firestore'
 import * as Sentry from '@sentry/tanstackstart-react'
-import { updateWorkspaceSchema } from '../schemas/workspace.schemas'
+import { updateWorkspaceSchema } from '../../shared/schemas/workspace.schemas'
+import type { UpdateWorkspaceSchemaType } from '../../shared/schemas/workspace.schemas'
 import type { UpdateData } from 'firebase/firestore'
-import type { UpdateWorkspaceInput, Workspace } from '../types/workspace.types'
+import type { Workspace } from '@clementine/shared'
 import { firestore } from '@/integrations/firebase/client'
 
 /**
@@ -59,7 +60,7 @@ export function useUpdateWorkspace() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (input: UpdateWorkspaceInput) => {
+    mutationFn: async (input: UpdateWorkspaceSchemaType) => {
       // Validate input with Zod schema
       const validated = updateWorkspaceSchema.parse(input)
 

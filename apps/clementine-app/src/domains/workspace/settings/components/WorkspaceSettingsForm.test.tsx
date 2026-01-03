@@ -9,7 +9,7 @@ import {
   createRouter,
 } from '@tanstack/react-router'
 import { WorkspaceSettingsForm } from './WorkspaceSettingsForm'
-import type { Workspace } from '../types/workspace.types'
+import type { Workspace } from '@clementine/shared'
 
 // Mock useUpdateWorkspace hook
 vi.mock('../hooks/useUpdateWorkspace', () => ({

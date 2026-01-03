@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { collection, getDocs, limit, query, where } from 'firebase/firestore'
-import { workspaceSchema } from '../schemas/workspace.schemas'
-import type { Workspace } from '../types/workspace.types'
+import { workspaceSchema } from '@clementine/shared'
+import type { Workspace } from '@clementine/shared'
 import { firestore } from '@/integrations/firebase/client'
 import { convertFirestoreDoc } from '@/shared/utils'
 
