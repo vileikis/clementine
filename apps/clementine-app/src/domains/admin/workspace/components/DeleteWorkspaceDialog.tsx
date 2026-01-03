@@ -1,6 +1,6 @@
 import { CircleAlert } from 'lucide-react'
 import { useDeleteWorkspace } from '../hooks/useDeleteWorkspace'
-import type { Workspace } from '@/domains/workspace/types/workspace.types'
+import type { Workspace } from '@clementine/shared'
 import {
   AlertDialog,
   AlertDialogCancel,

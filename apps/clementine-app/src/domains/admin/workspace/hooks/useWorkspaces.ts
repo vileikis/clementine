@@ -8,7 +8,7 @@ import {
   query,
   where,
 } from 'firebase/firestore'
-import type { Workspace } from '@/domains/workspace/types/workspace.types'
+import type { Workspace } from '@clementine/shared'
 import { firestore } from '@/integrations/firebase/client'
 
 /**

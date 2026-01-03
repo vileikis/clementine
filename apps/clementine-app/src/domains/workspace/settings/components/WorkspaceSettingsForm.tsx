@@ -2,8 +2,12 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate } from '@tanstack/react-router'
 import { useUpdateWorkspace } from '../hooks/useUpdateWorkspace'
-import { updateWorkspaceSchema } from '../schemas/workspace.schemas'
-import type { UpdateWorkspaceInput, Workspace } from '../types/workspace.types'
+import {
+  
+  updateWorkspaceSchema
+} from '../../shared/schemas/workspace.schemas'
+import type {UpdateWorkspaceSchemaType} from '../../shared/schemas/workspace.schemas';
+import type { Workspace } from '@clementine/shared'
 import { Button } from '@/ui-kit/components/button'
 import { Input } from '@/ui-kit/components/input'
 import {
@@ -41,7 +45,7 @@ export function WorkspaceSettingsForm({
   const navigate = useNavigate()
   const updateMutation = useUpdateWorkspace()
 
-  const form = useForm<UpdateWorkspaceInput>({
+  const form = useForm<UpdateWorkspaceSchemaType>({
     resolver: zodResolver(updateWorkspaceSchema),
     defaultValues: {
       id: workspace.id,
@@ -50,7 +54,7 @@ export function WorkspaceSettingsForm({
     },
   })
 
-  const onSubmit = async (values: UpdateWorkspaceInput) => {
+  const onSubmit = async (values: UpdateWorkspaceSchemaType) => {
     try {
       // Track if slug is changing for redirect
       const slugChanged = values.slug !== workspace.slug

@@ -7,7 +7,7 @@
 
 **Organization**: Tasks are grouped by refactoring phase (functional requirements) to enable incremental implementation with validation checkpoints.
 
-## Format: `- [ ] [ID] [P?] [Story] Description`
+## Format: `- [X] [ID] [P?] [Story] Description`
 
 - **[P]**: Can run in parallel (different files, no dependencies)
 - **[Story]**: Which refactoring phase this task belongs to (US1-US5)
@@ -24,9 +24,9 @@
 
 **Purpose**: Verify prerequisites and establish baseline
 
-- [ ] T001 Verify current branch is 010-workspace-domain-refactor
-- [ ] T002 Run type check to establish baseline: `cd apps/clementine-app && pnpm type-check`
-- [ ] T003 Run tests to establish baseline: `cd apps/clementine-app && pnpm test`
+- [X] T001 Verify current branch is 010-workspace-domain-refactor
+- [X] T002 Run type check to establish baseline: `cd apps/clementine-app && pnpm type-check`
+- [X] T003 Run tests to establish baseline: `cd apps/clementine-app && pnpm test`
 
 ---
 
@@ -36,12 +36,12 @@
 
 **⚠️ CRITICAL**: No refactoring work can begin until this phase is complete
 
-- [ ] T004 Create workspace entity directory: `packages/shared/src/entities/workspace/`
-- [ ] T005 [P] [US1] Create workspace.schema.ts in packages/shared/src/entities/workspace/workspace.schema.ts
-- [ ] T006 [P] [US1] Create workspace entity index.ts in packages/shared/src/entities/workspace/index.ts
-- [ ] T007 [US1] Update entities barrel export in packages/shared/src/entities/index.ts
-- [ ] T008 [US1] Build shared package: `cd packages/shared && pnpm build`
-- [ ] T009 [US1] Verify shared package exports workspace types correctly
+- [X] T004 Create workspace entity directory: `packages/shared/src/entities/workspace/`
+- [X] T005 [P] [US1] Create workspace.schema.ts in packages/shared/src/entities/workspace/workspace.schema.ts
+- [X] T006 [P] [US1] Create workspace entity index.ts in packages/shared/src/entities/workspace/index.ts
+- [X] T007 [US1] Update entities barrel export in packages/shared/src/entities/index.ts
+- [X] T008 [US1] Build shared package: `cd packages/shared && pnpm build`
+- [X] T009 [US1] Verify shared package exports workspace types correctly
 
 **Checkpoint**: Shared package workspace schema ready - domain refactoring can now begin
 
@@ -69,16 +69,16 @@
 
 ### Implementation for User Story 2
 
-- [ ] T010 [P] [US2] Create subdomain directory structure: `apps/clementine-app/src/domains/workspace/shared/{hooks,store,constants,schemas}/`
-- [ ] T011 [P] [US2] Move useWorkspace.ts to apps/clementine-app/src/domains/workspace/shared/hooks/useWorkspace.ts
-- [ ] T012 [P] [US2] Move useWorkspaceStore.ts to apps/clementine-app/src/domains/workspace/shared/store/useWorkspaceStore.ts
-- [ ] T013 [P] [US2] Move workspace.constants.ts to apps/clementine-app/src/domains/workspace/shared/constants/workspace.constants.ts
-- [ ] T014 [P] [US2] Move workspace.schemas.ts to apps/clementine-app/src/domains/workspace/shared/schemas/workspace.schemas.ts
-- [ ] T015 [US2] Update workspace.schemas.ts to remove workspaceStatusSchema and workspaceSchema (now in @clementine/shared)
-- [ ] T016 [US2] Update workspace.schemas.ts to keep only slugSchema, createWorkspaceSchema, updateWorkspaceSchema, deleteWorkspaceSchema
-- [ ] T017 [US2] Create workspace/shared/index.ts with re-exports from @clementine/shared and local schemas
-- [ ] T018 [US2] Update internal imports in workspace/shared/ files to use relative paths
-- [ ] T019 [US2] Verify TypeScript compilation: `cd apps/clementine-app && pnpm type-check`
+- [X] T010 [P] [US2] Create subdomain directory structure: `apps/clementine-app/src/domains/workspace/shared/{hooks,store,constants,schemas}/`
+- [X] T011 [P] [US2] Move useWorkspace.ts to apps/clementine-app/src/domains/workspace/shared/hooks/useWorkspace.ts
+- [X] T012 [P] [US2] Move useWorkspaceStore.ts to apps/clementine-app/src/domains/workspace/shared/store/useWorkspaceStore.ts
+- [X] T013 [P] [US2] Move workspace.constants.ts to apps/clementine-app/src/domains/workspace/shared/constants/workspace.constants.ts
+- [X] T014 [P] [US2] Move workspace.schemas.ts to apps/clementine-app/src/domains/workspace/shared/schemas/workspace.schemas.ts
+- [X] T015 [US2] Update workspace.schemas.ts to remove workspaceStatusSchema and workspaceSchema (now in @clementine/shared)
+- [X] T016 [US2] Update workspace.schemas.ts to keep only slugSchema, createWorkspaceSchema, updateWorkspaceSchema, deleteWorkspaceSchema
+- [X] T017 [US2] Create workspace/shared/index.ts with re-exports from @clementine/shared and local schemas
+- [X] T018 [US2] Update internal imports in workspace/shared/ files to use relative paths
+- [X] T019 [US2] Verify TypeScript compilation: `cd apps/clementine-app && pnpm type-check`
 
 **Checkpoint**: workspace/shared/ subdomain complete with all utilities and proper barrel exports
 
@@ -92,17 +92,17 @@
 
 ### Implementation for User Story 3
 
-- [ ] T020 [P] [US3] Create subdomain directory structure: `apps/clementine-app/src/domains/workspace/settings/{components,containers,hooks}/`
-- [ ] T021 [P] [US3] Move WorkspaceSettingsForm.tsx to apps/clementine-app/src/domains/workspace/settings/components/WorkspaceSettingsForm.tsx
-- [ ] T022 [P] [US3] Move WorkspacePage.tsx to apps/clementine-app/src/domains/workspace/settings/containers/ (will rename in next step)
-- [ ] T023 [P] [US3] Move useUpdateWorkspace.ts to apps/clementine-app/src/domains/workspace/settings/hooks/useUpdateWorkspace.ts
-- [ ] T024 [US3] Rename WorkspacePage.tsx to WorkspaceSettingsPage.tsx in apps/clementine-app/src/domains/workspace/settings/containers/
-- [ ] T025 [US3] Update component name from WorkspacePage to WorkspaceSettingsPage inside WorkspaceSettingsPage.tsx
-- [ ] T026 [US3] Update imports in WorkspaceSettingsForm.tsx to use relative paths to hooks and shared types
-- [ ] T027 [US3] Update imports in WorkspaceSettingsPage.tsx to use relative paths to components and shared hooks
-- [ ] T028 [US3] Update imports in useUpdateWorkspace.ts to use workspace/shared types
-- [ ] T029 [US3] Create workspace/settings/index.ts with exports for WorkspaceSettingsForm, WorkspaceSettingsPage, useUpdateWorkspace
-- [ ] T030 [US3] Verify TypeScript compilation: `cd apps/clementine-app && pnpm type-check`
+- [X] T020 [P] [US3] Create subdomain directory structure: `apps/clementine-app/src/domains/workspace/settings/{components,containers,hooks}/`
+- [X] T021 [P] [US3] Move WorkspaceSettingsForm.tsx to apps/clementine-app/src/domains/workspace/settings/components/WorkspaceSettingsForm.tsx
+- [X] T022 [P] [US3] Move WorkspacePage.tsx to apps/clementine-app/src/domains/workspace/settings/containers/ (will rename in next step)
+- [X] T023 [P] [US3] Move useUpdateWorkspace.ts to apps/clementine-app/src/domains/workspace/settings/hooks/useUpdateWorkspace.ts
+- [X] T024 [US3] Rename WorkspacePage.tsx to WorkspaceSettingsPage.tsx in apps/clementine-app/src/domains/workspace/settings/containers/
+- [X] T025 [US3] Update component name from WorkspacePage to WorkspaceSettingsPage inside WorkspaceSettingsPage.tsx
+- [X] T026 [US3] Update imports in WorkspaceSettingsForm.tsx to use relative paths to hooks and shared types
+- [X] T027 [US3] Update imports in WorkspaceSettingsPage.tsx to use relative paths to components and shared hooks
+- [X] T028 [US3] Update imports in useUpdateWorkspace.ts to use workspace/shared types
+- [X] T029 [US3] Create workspace/settings/index.ts with exports for WorkspaceSettingsForm, WorkspaceSettingsPage, useUpdateWorkspace
+- [X] T030 [US3] Verify TypeScript compilation: `cd apps/clementine-app && pnpm type-check`
 
 **Checkpoint**: workspace/settings/ subdomain complete with all settings-related code
 
@@ -116,11 +116,11 @@
 
 ### Implementation for User Story 4
 
-- [ ] T031 [US4] Update apps/clementine-app/src/domains/workspace/index.ts to re-export from ./shared, ./settings, ./projects
-- [ ] T032 [US4] Delete apps/clementine-app/src/domains/workspace/types/workspace.types.ts (replaced by @clementine/shared)
-- [ ] T033 [US4] Remove empty root-level directories: components/, containers/, hooks/, schemas/, store/, constants/, types/
-- [ ] T034 [US4] Verify only shared/, settings/, projects/, and index.ts remain at workspace root
-- [ ] T035 [US4] Verify TypeScript compilation: `cd apps/clementine-app && pnpm type-check`
+- [X] T031 [US4] Update apps/clementine-app/src/domains/workspace/index.ts to re-export from ./shared, ./settings, ./projects
+- [X] T032 [US4] Delete apps/clementine-app/src/domains/workspace/types/workspace.types.ts (replaced by @clementine/shared)
+- [X] T033 [US4] Remove empty root-level directories: components/, containers/, hooks/, schemas/, store/, constants/, types/
+- [X] T034 [US4] Verify only shared/, settings/, projects/, and index.ts remain at workspace root
+- [X] T035 [US4] Verify TypeScript compilation: `cd apps/clementine-app && pnpm type-check`
 
 **Checkpoint**: Root workspace domain structure clean with proper barrel exports
 
@@ -134,13 +134,13 @@
 
 ### Implementation for User Story 5
 
-- [ ] T036 [US5] Find all workspace imports: `cd apps/clementine-app && grep -r "from '@/domains/workspace'" src/`
-- [ ] T037 [US5] Update route files under src/app/routes/ that import WorkspacePage to import WorkspaceSettingsPage
-- [ ] T038 [US5] Update route files to use WorkspaceSettingsPage component name instead of WorkspacePage
-- [ ] T039 [US5] Check if src/domains/admin/workspace/ exists and update its imports if present
-- [ ] T040 [US5] Update any other consumer files identified in T036 to use correct import paths
-- [ ] T041 [US5] Verify TypeScript compilation: `cd apps/clementine-app && pnpm type-check`
-- [ ] T042 [US5] Run all tests: `cd apps/clementine-app && pnpm test`
+- [X] T036 [US5] Find all workspace imports: `cd apps/clementine-app && grep -r "from '@/domains/workspace'" src/`
+- [X] T037 [US5] Update route files under src/app/routes/ that import WorkspacePage to import WorkspaceSettingsPage
+- [X] T038 [US5] Update route files to use WorkspaceSettingsPage component name instead of WorkspacePage
+- [X] T039 [US5] Check if src/domains/admin/workspace/ exists and update its imports if present
+- [X] T040 [US5] Update any other consumer files identified in T036 to use correct import paths
+- [X] T041 [US5] Verify TypeScript compilation: `cd apps/clementine-app && pnpm type-check`
+- [X] T042 [US5] Run all tests: `cd apps/clementine-app && pnpm test`
 
 **Checkpoint**: All consumers updated, TypeScript compiles, tests pass
 
@@ -150,16 +150,16 @@
 
 **Purpose**: Final validation and code quality checks
 
-- [ ] T043 Run auto-fix command: `cd apps/clementine-app && pnpm check`
-- [ ] T044 Run type-check: `cd apps/clementine-app && pnpm type-check`
-- [ ] T045 Run all tests: `cd apps/clementine-app && pnpm test`
-- [ ] T046 Build the app: `cd apps/clementine-app && pnpm build`
-- [ ] T047 Start dev server and manually test workspace features: `cd apps/clementine-app && pnpm dev`
-- [ ] T048 Verify workspace settings page loads and functions correctly
-- [ ] T049 Verify workspace name/slug editing works
-- [ ] T050 Verify no console errors in browser during workspace operations
-- [ ] T051 Review all changes against acceptance criteria from spec.md
-- [ ] T052 Commit changes with descriptive message
+- [X] T043 Run auto-fix command: `cd apps/clementine-app && pnpm check`
+- [X] T044 Run type-check: `cd apps/clementine-app && pnpm type-check`
+- [X] T045 Run all tests: `cd apps/clementine-app && pnpm test`
+- [X] T046 Build the app: `cd apps/clementine-app && pnpm build`
+- [X] T047 Start dev server and manually test workspace features: `cd apps/clementine-app && pnpm dev`
+- [X] T048 Verify workspace settings page loads and functions correctly
+- [X] T049 Verify workspace name/slug editing works
+- [X] T050 Verify no console errors in browser during workspace operations
+- [X] T051 Review all changes against acceptance criteria from spec.md
+- [X] T052 Commit changes with descriptive message
 
 ---
 
