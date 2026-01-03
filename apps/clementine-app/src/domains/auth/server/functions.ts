@@ -19,7 +19,13 @@ export const getCurrentUserFn = createServerFn({ method: 'GET' }).handler(
       { name: 'getCurrentUserFn', op: 'auth.session' },
       async () => {
         const session = await useAppSession()
-        const { userId, email, isAdmin, isAnonymous } = session.data
+        const {
+          userId,
+          email,
+          isAdmin,
+          isAnonymous,
+          lastVisitedWorkspaceSlug,
+        } = session.data
 
         if (!userId) {
           return null
@@ -30,6 +36,7 @@ export const getCurrentUserFn = createServerFn({ method: 'GET' }).handler(
           email: email || undefined,
           isAdmin: isAdmin || false,
           isAnonymous: isAnonymous || false,
+          lastVisitedWorkspaceSlug,
         }
       },
     )
@@ -64,11 +71,16 @@ export const createSessionFn = createServerFn({
 
           // Update server session with user data
           const session = await useAppSession()
+
+          // Preserve existing workspace preference during token refresh
+          const existingWorkspaceSlug = session.data.lastVisitedWorkspaceSlug
+
           await session.update({
             userId: decodedToken.uid,
             email: decodedToken.email,
             isAdmin,
             isAnonymous,
+            lastVisitedWorkspaceSlug: existingWorkspaceSlug,
           })
 
           return { success: true }
@@ -78,6 +90,41 @@ export const createSessionFn = createServerFn({
           })
           return { success: false, error: 'Invalid token' }
         }
+      },
+    )
+  })
+
+/**
+ * Update last visited workspace in server session
+ *
+ * Called from workspace layout route after workspace data is confirmed valid.
+ * Preserves all existing session data while updating workspace preference.
+ *
+ * @param data.workspaceSlug - Workspace slug to store in session
+ * @returns Success result
+ */
+export const setLastVisitedWorkspaceFn = createServerFn({
+  method: 'POST',
+})
+  .inputValidator((data: { workspaceSlug: string }) => data)
+  .handler(async ({ data }) => {
+    return Sentry.startSpan(
+      { name: 'setLastVisitedWorkspaceFn', op: 'workspace.session.update' },
+      async () => {
+        const session = await useAppSession()
+
+        // Require authentication
+        if (!session.data.userId) {
+          return { success: false, error: 'Unauthenticated' }
+        }
+
+        // Preserve all existing session fields
+        await session.update({
+          ...session.data,
+          lastVisitedWorkspaceSlug: data.workspaceSlug,
+        })
+
+        return { success: true }
       },
     )
   })

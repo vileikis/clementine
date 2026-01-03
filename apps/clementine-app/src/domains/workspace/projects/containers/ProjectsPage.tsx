@@ -1,3 +1,5 @@
+import { useNavigate } from '@tanstack/react-router'
+import { toast } from 'sonner'
 import { useCreateProject, useDeleteProject, useProjects } from '../hooks'
 import { ProjectListEmpty, ProjectListItem } from '../components'
 import { Button } from '@/ui-kit/components/button'
@@ -15,9 +17,28 @@ export function ProjectsPage({
   const { data: projects, isLoading } = useProjects(workspaceId)
   const createProject = useCreateProject()
   const deleteProject = useDeleteProject()
+  const navigate = useNavigate()
 
-  const handleCreateProject = () => {
-    createProject.mutate({ workspaceId, workspaceSlug })
+  const handleCreateProject = async () => {
+    try {
+      const result = await createProject.mutateAsync({
+        workspaceId,
+        workspaceSlug,
+      })
+
+      // Consumer handles navigation
+      navigate({
+        to: '/workspace/$workspaceSlug/projects/$projectId',
+        params: {
+          workspaceSlug: result.workspaceSlug,
+          projectId: result.projectId,
+        },
+      })
+
+      toast.success('Project created')
+    } catch (error) {
+      toast.error('Failed to create project')
+    }
   }
 
   const handleDeleteProject = (projectId: string) => {
@@ -51,6 +72,7 @@ export function ProjectsPage({
             <ProjectListItem
               key={project.id}
               project={project}
+              workspaceId={workspaceId}
               workspaceSlug={workspaceSlug}
               onDelete={handleDeleteProject}
               isDeleting={deleteProject.isPending}
