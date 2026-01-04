@@ -27,10 +27,10 @@ This project uses TanStack Start monorepo structure:
 
 **Purpose**: Install dependencies and create domain structure
 
-- [ ] T001 Install react-qr-code dependency via pnpm
-- [ ] T002 Create domain directory structure at apps/clementine-app/src/domains/project/share/
-- [ ] T003 [P] Create subdirectories: components/, hooks/, utils/
-- [ ] T004 [P] Create placeholder files: types.ts, index.ts
+- [X] T001 Install react-qr-code dependency via pnpm
+- [X] T002 Create domain directory structure at apps/clementine-app/src/domains/project/share/
+- [X] T003 [P] Create subdirectories: components/, hooks/, utils/
+- [X] T004 [P] Create placeholder files: types.ts, index.ts
 
 ---
 
@@ -40,11 +40,11 @@ This project uses TanStack Start monorepo structure:
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T005 [P] Create Zod validation schemas in apps/clementine-app/src/domains/project/share/utils/validation.ts
-- [ ] T006 [P] Implement guest URL generation utility in apps/clementine-app/src/domains/project/share/utils/shareUrl.utils.ts
-- [ ] T007 [P] Create TypeScript type definitions in apps/clementine-app/src/domains/project/share/types.ts
-- [ ] T008 [P] Write unit tests for validation schemas in apps/clementine-app/src/domains/project/share/utils/validation.test.ts
-- [ ] T009 [P] Write unit tests for URL generation in apps/clementine-app/src/domains/project/share/utils/shareUrl.utils.test.ts
+- [X] T005 [P] Create Zod validation schemas in apps/clementine-app/src/domains/project/share/utils/validation.ts
+- [X] T006 [P] Implement guest URL generation utility in apps/clementine-app/src/domains/project/share/utils/shareUrl.utils.ts
+- [X] T007 [P] Create TypeScript type definitions in apps/clementine-app/src/domains/project/share/types.ts
+- [X] T008 [P] Write unit tests for validation schemas in apps/clementine-app/src/domains/project/share/utils/validation.test.ts
+- [X] T009 [P] Write unit tests for URL generation in apps/clementine-app/src/domains/project/share/utils/shareUrl.utils.test.ts
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -58,15 +58,15 @@ This project uses TanStack Start monorepo structure:
 
 ### Implementation for User Story 1
 
-- [ ] T010 [P] [US1] Create useCopyToClipboard hook in apps/clementine-app/src/domains/project/share/hooks/useCopyToClipboard.tsx
-- [ ] T011 [P] [US1] Create ShareLinkSection component in apps/clementine-app/src/domains/project/share/components/ShareLinkSection.tsx
-- [ ] T012 [US1] Create ShareDialog component skeleton in apps/clementine-app/src/domains/project/share/components/ShareDialog.tsx
-- [ ] T013 [US1] Integrate ShareLinkSection into ShareDialog
-- [ ] T014 [US1] Add Share button to project route TopNavActions in apps/clementine-app/src/app/workspace/$workspaceSlug.projects/$projectId.tsx
-- [ ] T015 [US1] Wire up dialog open/close state management
-- [ ] T016 [P] [US1] Write component test for ShareLinkSection in apps/clementine-app/src/domains/project/share/components/ShareLinkSection.test.tsx
-- [ ] T017 [P] [US1] Write hook test for useCopyToClipboard in apps/clementine-app/src/domains/project/share/hooks/useCopyToClipboard.test.tsx
-- [ ] T018 [P] [US1] Write component test for ShareDialog in apps/clementine-app/src/domains/project/share/components/ShareDialog.test.tsx
+- [X] T010 [P] [US1] Create useCopyToClipboard hook in apps/clementine-app/src/domains/project/share/hooks/useCopyToClipboard.tsx
+- [X] T011 [P] [US1] Create ShareLinkSection component in apps/clementine-app/src/domains/project/share/components/ShareLinkSection.tsx
+- [X] T012 [US1] Create ShareDialog component skeleton in apps/clementine-app/src/domains/project/share/components/ShareDialog.tsx
+- [X] T013 [US1] Integrate ShareLinkSection into ShareDialog
+- [X] T014 [US1] Add Share button to project route TopNavActions in apps/clementine-app/src/app/workspace/$workspaceSlug.projects/$projectId.index.tsx
+- [X] T015 [US1] Wire up dialog open/close state management
+- [X] T016 [P] [US1] Write component test for ShareLinkSection in apps/clementine-app/src/domains/project/share/components/ShareLinkSection.test.tsx
+- [X] T017 [P] [US1] Write hook test for useCopyToClipboard in apps/clementine-app/src/domains/project/share/hooks/useCopyToClipboard.test.tsx
+- [X] T018 [P] [US1] Write component test for ShareDialog in apps/clementine-app/src/domains/project/share/components/ShareDialog.test.tsx
 
 **Checkpoint**: At this point, users can open share dialog and copy guest link - US1 is fully functional and testable independently
 
