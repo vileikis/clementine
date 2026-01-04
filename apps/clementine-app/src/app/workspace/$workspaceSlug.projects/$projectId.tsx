@@ -1,10 +1,9 @@
 import { Outlet, createFileRoute, notFound } from '@tanstack/react-router'
 import { doc, getDoc } from 'firebase/firestore'
-import { FolderOpen, Share2 } from 'lucide-react'
-import { toast } from 'sonner'
+import { projectSchema } from '@clementine/shared'
 import { firestore } from '@/integrations/firebase/client'
+import { convertFirestoreDoc } from '@/shared/utils/firestore-utils'
 import { NotFound } from '@/shared/components/NotFound'
-import { TopNavBar } from '@/domains/navigation'
 
 /**
  * Project layout route
@@ -14,6 +13,9 @@ import { TopNavBar } from '@/domains/navigation'
  *
  * Layout for project routes (details, events, etc.)
  * Loads project data and makes it available to child routes.
+ *
+ * Note: TopNavBar is rendered by child routes (e.g., event routes)
+ * to avoid duplicate navigation bars in nested routes.
  */
 export const Route = createFileRoute(
   '/workspace/$workspaceSlug/projects/$projectId',
@@ -27,12 +29,8 @@ export const Route = createFileRoute(
       throw notFound()
     }
 
-    // Get project data
-    const project = { id: projectDoc.id, ...projectDoc.data() } as {
-      id: string
-      name: string
-      status: string
-    }
+    // Convert Firestore document (Timestamps → numbers) and validate with schema
+    const project = convertFirestoreDoc(projectDoc, projectSchema)
 
     // Return 404 for soft-deleted projects
     if (project.status === 'deleted') {
@@ -49,29 +47,7 @@ export const Route = createFileRoute(
 })
 
 function ProjectLayout() {
-  const { project } = Route.useLoaderData()
-
-  return (
-    <>
-      <TopNavBar
-        breadcrumbs={[
-          {
-            label: project.name,
-            icon: FolderOpen,
-          },
-        ]}
-        actions={[
-          {
-            label: 'Share',
-            icon: Share2,
-            onClick: () => toast.success('Coming soon'),
-            variant: 'ghost',
-          },
-        ]}
-      />
-      <Outlet />
-    </>
-  )
+  return <Outlet />
 }
 
 function ProjectNotFound() {

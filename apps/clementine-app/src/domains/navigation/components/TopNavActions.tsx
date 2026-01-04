@@ -14,17 +14,20 @@ export function TopNavActions({ actions }: TopNavActionsProps) {
     <div className="flex items-center gap-2">
       {actions.map((action, index) => {
         const Icon = action.icon
+        const isIconOnly = !action.label
         return (
           <Button
             key={index}
             variant={action.variant ?? 'ghost'}
-            size="sm"
+            size={isIconOnly ? 'icon' : 'sm'}
             onClick={action.onClick}
             aria-label={action.ariaLabel ?? action.label}
-            className="gap-2"
+            className={isIconOnly ? '' : 'gap-2'}
           >
             <Icon className="size-4" />
-            <span className="hidden sm:inline">{action.label}</span>
+            {!isIconOnly && (
+              <span className="hidden sm:inline">{action.label}</span>
+            )}
           </Button>
         )
       })}

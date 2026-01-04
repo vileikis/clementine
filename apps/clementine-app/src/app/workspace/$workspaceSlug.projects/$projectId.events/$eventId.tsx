@@ -2,6 +2,7 @@ import { Link, Outlet, createFileRoute, notFound } from '@tanstack/react-router'
 import { doc, getDoc } from 'firebase/firestore'
 import { FolderOpen, Play, Upload } from 'lucide-react'
 import { toast } from 'sonner'
+import { projectSchema } from '@clementine/shared'
 import { firestore } from '@/integrations/firebase/client'
 import { projectEventSchema } from '@/domains/project/events/schemas'
 import { convertFirestoreDoc } from '@/shared/utils/firestore-utils'
@@ -29,12 +30,7 @@ export const Route = createFileRoute(
       throw notFound()
     }
 
-    const project = { id: projectDoc.id, ...projectDoc.data() } as {
-      id: string
-      name: string
-      status: string
-    }
-
+    const project = convertFirestoreDoc(projectDoc, projectSchema)
     // Fetch event from subcollection
     const eventRef = doc(
       firestore,
@@ -68,6 +64,7 @@ function EventLayout() {
   const { event, project } = Route.useLoaderData()
 
   const projectPath = `/workspace/${workspaceSlug}/projects/${projectId}`
+  const projectsListPath = `/workspace/${workspaceSlug}/projects`
 
   return (
     <>
@@ -77,6 +74,7 @@ function EventLayout() {
             label: project.name,
             href: projectPath,
             icon: FolderOpen,
+            iconHref: projectsListPath,
           },
           {
             label: event.name,
@@ -84,7 +82,6 @@ function EventLayout() {
         ]}
         actions={[
           {
-            label: 'Preview',
             icon: Play,
             onClick: () => toast.success('Coming soon'),
             variant: 'ghost',

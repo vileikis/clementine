@@ -12,11 +12,14 @@ export interface BreadcrumbItem {
 
   /** Optional icon component (typically used for first item) */
   icon?: LucideIcon
+
+  /** Optional separate href for the icon (if present, icon becomes a separate clickable link) */
+  iconHref?: string
 }
 
 export interface ActionButton {
-  /** Button label text */
-  label: string
+  /** Button label text (optional - if not provided, button will be icon-only) */
+  label?: string
 
   /** Icon component to display in button */
   icon: LucideIcon
@@ -27,7 +30,7 @@ export interface ActionButton {
   /** Button style variant (defaults to 'ghost') */
   variant?: 'default' | 'outline' | 'ghost'
 
-  /** Accessible label for screen readers (defaults to label) */
+  /** Accessible label for screen readers (required for icon-only buttons, defaults to label) */
   ariaLabel?: string
 }
 
