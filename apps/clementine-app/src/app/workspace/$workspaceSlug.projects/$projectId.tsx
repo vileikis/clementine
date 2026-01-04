@@ -13,6 +13,9 @@ import { NotFound } from '@/shared/components/NotFound'
  *
  * Layout for project routes (details, events, etc.)
  * Loads project data and makes it available to child routes.
+ *
+ * Note: TopNavBar is rendered by child routes (e.g., event routes)
+ * to avoid duplicate navigation bars in nested routes.
  */
 export const Route = createFileRoute(
   '/workspace/$workspaceSlug/projects/$projectId',
@@ -39,9 +42,13 @@ export const Route = createFileRoute(
 
     return { project }
   },
-  component: Outlet, // Render child routes
+  component: ProjectLayout,
   notFoundComponent: ProjectNotFound,
 })
+
+function ProjectLayout() {
+  return <Outlet />
+}
 
 function ProjectNotFound() {
   const { workspaceSlug } = Route.useParams()
