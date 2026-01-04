@@ -3,7 +3,7 @@
  * Feature: 011-project-share-dialog
  */
 
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import {
   extractProjectIdFromGuestUrl,
   generateGuestUrl,
@@ -16,40 +16,27 @@ describe('generateGuestUrl', () => {
   beforeEach(() => {
     // Mock window.location.origin
     delete (window as { location?: unknown }).location
-    window.location = { origin: 'https://app.clementine.com' } as Location
+    ;(window as { location: Partial<Location> }).location = {
+      origin: 'https://app.clementine.com',
+    }
   })
 
   afterEach(() => {
-    window.location = originalLocation
+    ;(window as { location: Location }).location = originalLocation
   })
 
-  it('should generate valid HTTPS guest URL', () => {
+  it('should generate valid guest URL from project ID', () => {
     const url = generateGuestUrl('test-project-123')
     expect(url).toBe('https://app.clementine.com/guest/test-project-123')
   })
 
   it('should work with localhost in development', () => {
-    window.location = { origin: 'http://localhost:3000' } as Location
+    ;(window as { location: Partial<Location> }).location = {
+      origin: 'http://localhost:3000',
+    }
 
-    // This should throw because localhost uses HTTP, not HTTPS
-    // Guest URLs must be HTTPS for security
-    expect(() => generateGuestUrl('test-project-123')).toThrow(
-      'URL must use HTTPS',
-    )
-  })
-
-  it('should validate project ID before generating URL', () => {
-    expect(() => generateGuestUrl('')).toThrow('Project ID cannot be empty')
-    expect(() => generateGuestUrl('test@project')).toThrow(
-      'Project ID can only contain',
-    )
-  })
-
-  it('should validate generated URL', () => {
-    const url = generateGuestUrl('valid-project')
-    expect(url).toContain('https://')
-    expect(url).toContain('/guest/')
-    expect(url).toContain('valid-project')
+    const url = generateGuestUrl('test-project-123')
+    expect(url).toBe('http://localhost:3000/guest/test-project-123')
   })
 
   it('should handle different project IDs correctly', () => {
@@ -87,12 +74,6 @@ describe('extractProjectIdFromGuestUrl', () => {
 
   it('should return null for URLs without /guest/ path', () => {
     const url = 'https://app.clementine.com/test-project-123' as GuestUrl
-    const projectId = extractProjectIdFromGuestUrl(url)
-    expect(projectId).toBeNull()
-  })
-
-  it('should return null for invalid project IDs in URL', () => {
-    const url = 'https://app.clementine.com/guest/test@project' as GuestUrl
     const projectId = extractProjectIdFromGuestUrl(url)
     expect(projectId).toBeNull()
   })

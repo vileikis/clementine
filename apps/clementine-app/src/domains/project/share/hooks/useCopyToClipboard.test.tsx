@@ -88,9 +88,11 @@ describe('useCopyToClipboard', () => {
     // Make Clipboard API unavailable
     Object.assign(navigator, { clipboard: undefined })
 
-    const execCommandMock = vi
-      .spyOn(document, 'execCommand')
-      .mockReturnValue(true)
+    // Mock execCommand function
+    const execCommandMock = vi.fn().mockReturnValue(true)
+    document.execCommand =
+      execCommandMock as unknown as typeof document.execCommand
+
     const { result } = renderHook(() => useCopyToClipboard())
     const testText = 'https://app.clementine.com/guest/test-project'
 
@@ -102,7 +104,8 @@ describe('useCopyToClipboard', () => {
     expect(toast.success).toHaveBeenCalled()
     expect(result.current.copySuccess).toBe(true)
 
-    execCommandMock.mockRestore()
+    // Restore clipboard
+    Object.assign(navigator, { clipboard: mockClipboard })
   })
 
   it('should show error toast when copy fails', async () => {
