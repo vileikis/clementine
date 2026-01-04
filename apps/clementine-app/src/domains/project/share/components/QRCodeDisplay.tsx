@@ -5,31 +5,22 @@
 
 import QRCodeSVG from 'react-qr-code'
 import { Download, RefreshCw } from 'lucide-react'
-import type { GuestUrl, QRCodeErrorLevel } from '../types'
+import type { QRCodeOptions } from '../types'
 import { Button } from '@/ui-kit/components/button'
 
 export interface QRCodeDisplayProps {
   /**
-   * Guest URL to encode in QR code
+   * QR code generation options from hook
+   * Contains value, size, level, colors, and seed
    */
-  guestUrl: GuestUrl
+  qrOptions: QRCodeOptions
 
   /**
-   * QR code size in pixels
-   * @default 256 (display size in dialog)
+   * Override display size (for dialog vs download)
+   * If not provided, uses qrOptions.size
+   * @default qrOptions.size
    */
-  size?: number
-
-  /**
-   * Error correction level
-   * @default 'M' (Medium - 15% tolerance)
-   */
-  level?: QRCodeErrorLevel
-
-  /**
-   * Random seed for visual variation
-   */
-  seed?: number
+  displaySize?: number
 
   /**
    * Callback when regenerate button clicked
@@ -59,25 +50,25 @@ export interface QRCodeDisplayProps {
  * @returns QRCodeDisplay component
  */
 export function QRCodeDisplay({
-  guestUrl,
-  size = 256,
-  level = 'M',
-  seed,
+  qrOptions,
+  displaySize,
   onRegenerate,
   onDownload,
   isDownloading = false,
 }: QRCodeDisplayProps) {
+  const size = displaySize ?? qrOptions.size ?? 256
+
   return (
     <div className="space-y-4">
       <div className="flex justify-center rounded-lg border border-border bg-background p-4">
         <QRCodeSVG
-          value={guestUrl}
+          value={qrOptions.value}
           size={size}
-          level={level}
-          fgColor="#000000"
-          bgColor="#FFFFFF"
+          level={qrOptions.level ?? 'M'}
+          fgColor={qrOptions.fgColor ?? '#000000'}
+          bgColor={qrOptions.bgColor ?? '#FFFFFF'}
           data-qr-code // Used for DOM selection in download functionality
-          data-seed={seed} // Track seed for testing
+          data-seed={qrOptions.seed} // Track seed for testing
         />
       </div>
 

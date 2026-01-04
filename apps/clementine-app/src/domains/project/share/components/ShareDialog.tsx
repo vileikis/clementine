@@ -75,10 +75,8 @@ export function ShareDialog({
 
           {/* Phase 4 (US2): QR code display with Phase 5 (US3): regenerate/download */}
           <QRCodeDisplay
-            guestUrl={guestUrl}
-            size={256}
-            level={qrOptions.level}
-            seed={qrOptions.seed}
+            qrOptions={qrOptions}
+            displaySize={256}
             onRegenerate={regenerateQRCode}
             onDownload={handleDownload}
             isDownloading={isDownloading}

@@ -92,7 +92,6 @@ export function useCopyToClipboard(): UseCopyToClipboardReturn {
     } finally {
       setIsCopying(false)
       // Reset success state after 3 seconds
-      setTimeout(() => setCopySuccess(false), 3000)
       // Store timeout ID for cleanup
       resetTimeoutRef.current = window.setTimeout(() => {
         setCopySuccess(false)
