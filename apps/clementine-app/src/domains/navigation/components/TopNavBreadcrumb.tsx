@@ -19,19 +19,23 @@ export function TopNavBreadcrumb({ items }: TopNavBreadcrumbProps) {
           <div key={index} className="flex items-center gap-2 min-w-0">
             {/* Separate icon link (if iconHref is provided) */}
             {hasIconLink && Icon && (
-              <Link
-                to={item.iconHref}
-                className="flex-shrink-0 hover:text-primary transition-colors"
-              >
-                <Icon className="size-4" />
-              </Link>
+              <>
+                <Link
+                  to={item.iconHref}
+                  className="flex-shrink-0 hover:text-primary transition-colors"
+                >
+                  <Icon className="size-4" />
+                </Link>
+                {/* Separator after icon */}
+                <ChevronRight className="flex-shrink-0 size-4 text-muted-foreground" />
+              </>
             )}
 
             {/* Text breadcrumb (clickable or static) */}
             {isClickable ? (
               <Link
                 to={item.href}
-                className="flex items-center gap-2 min-w-0 hover:text-primary transition-colors"
+                className="flex items-center gap-2 min-w-0 hover:text-primary hover:underline transition-colors"
               >
                 {!hasIconLink && Icon && (
                   <Icon className="flex-shrink-0 size-4" />

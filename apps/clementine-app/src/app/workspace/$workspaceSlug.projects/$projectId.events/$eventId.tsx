@@ -23,7 +23,8 @@ export const Route = createFileRoute(
 )({
   loader: async ({ params }) => {
     // Fetch project (needed for breadcrumb)
-    const projectRef = doc(firestore, 'projects', params.projectId)
+    const projectPath = `projects/${params.projectId}`
+    const projectRef = doc(firestore, projectPath)
     const projectDoc = await getDoc(projectRef)
 
     if (!projectDoc.exists()) {
@@ -32,13 +33,8 @@ export const Route = createFileRoute(
 
     const project = convertFirestoreDoc(projectDoc, projectSchema)
     // Fetch event from subcollection
-    const eventRef = doc(
-      firestore,
-      'projects',
-      params.projectId,
-      'events',
-      params.eventId,
-    )
+    const eventPath = `projects/${params.projectId}/events/${params.eventId}`
+    const eventRef = doc(firestore, eventPath)
     const eventDoc = await getDoc(eventRef)
 
     if (!eventDoc.exists()) {
