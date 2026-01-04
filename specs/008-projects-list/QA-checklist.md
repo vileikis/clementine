@@ -184,19 +184,19 @@
 
 ### TC4.5: Delete Project - Real-time List Update
 
-- [ ] Open projects list in Browser Tab 1
-- [ ] Open same projects list in Browser Tab 2
-- [ ] In Tab 1, delete a project
-- [ ] Switch to Tab 2
-- [ ] **Expected**: Deleted project disappears from Tab 2 automatically
-- [ ] **Expected**: Update happens within 1-2 seconds
+- [x] Open projects list in Browser Tab 1
+- [x] Open same projects list in Browser Tab 2
+- [x] In Tab 1, delete a project
+- [x] Switch to Tab 2
+- [x] **Expected**: Deleted project disappears from Tab 2 automatically
+- [x] **Expected**: Update happens within 1-2 seconds
 
 ### TC4.6: Delete Last Project
 
-- [ ] Delete all projects except one
-- [ ] Delete the last project
-- [ ] **Expected**: Empty state displays after deletion
-- [ ] **Expected**: "Create Project" CTA is visible
+- [x] Delete all projects except one
+- [x] Delete the last project
+- [x] **Expected**: Empty state displays after deletion
+- [x] **Expected**: "Create Project" CTA is visible
 
 ---
 

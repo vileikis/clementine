@@ -1,9 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { FolderOpen, Share2 } from 'lucide-react'
-import { toast } from 'sonner'
+import { useState } from 'react'
 import { ProjectEventsPage } from '@/domains/project/events'
 import { TopNavBar } from '@/domains/navigation'
 import { useProject } from '@/domains/project/shared'
+import { ShareDialog } from '@/domains/project/share'
 
 /**
  * Project details page route (index)
@@ -21,6 +22,7 @@ export const Route = createFileRoute(
     const { workspaceSlug, projectId } = Route.useParams()
     const { data: project } = useProject(projectId)
     const projectsListPath = `/workspace/${workspaceSlug}/projects`
+    const [shareDialogOpen, setShareDialogOpen] = useState(false)
 
     // Show loading state while project loads
     if (!project) {
@@ -41,12 +43,18 @@ export const Route = createFileRoute(
             {
               label: 'Share',
               icon: Share2,
-              onClick: () => toast.success('Coming soon'),
-              variant: 'ghost',
+              onClick: () => setShareDialogOpen(true),
+              variant: 'default',
+              ariaLabel: 'Share project with guests',
             },
           ]}
         />
         <ProjectEventsPage projectId={projectId} />
+        <ShareDialog
+          projectId={projectId}
+          open={shareDialogOpen}
+          onOpenChange={setShareDialogOpen}
+        />
       </>
     )
   },
