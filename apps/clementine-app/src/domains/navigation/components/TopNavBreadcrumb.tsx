@@ -30,7 +30,10 @@ export function TopNavBreadcrumb({ items }: TopNavBreadcrumbProps) {
                 <>
                   <ShadcnBreadcrumbItem>
                     <BreadcrumbLink asChild>
-                      <Link to={item.iconHref} className="flex-shrink-0">
+                      <Link
+                        to={item.iconHref}
+                        className="flex-shrink-0 rounded-md p-1 -m-1 hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 transition-colors"
+                      >
                         <Icon className="size-4" />
                       </Link>
                     </BreadcrumbLink>
@@ -45,7 +48,7 @@ export function TopNavBreadcrumb({ items }: TopNavBreadcrumbProps) {
                   <BreadcrumbLink asChild>
                     <Link
                       to={item.href}
-                      className="flex items-center gap-1.5 min-w-0"
+                      className="flex items-center gap-1.5 min-w-0 rounded-md px-2 py-1 -mx-2 -my-1 hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 transition-colors"
                     >
                       {!hasIconLink && Icon && (
                         <Icon className="flex-shrink-0 size-4" />
