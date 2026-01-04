@@ -325,6 +325,7 @@ See individual workspace documentation for required environment variables.
 - N/A (pure code refactoring, no data migration) (010-workspace-domain-refactor)
 - TypeScript 5.7 (strict mode) + TanStack Start 1.132, React 19.2, Firebase SDK (Firestore client, Admin), TanStack Router 1.132, TanStack Query 5.66 (010-session-workspace-persistence)
 - Server session storage (encrypted HTTP-only cookie via TanStack Start), Firebase Firestore (read-only workspace data) (010-session-workspace-persistence)
+- N/A (no data persistence - feature is entirely client-side URL generation and display) (011-project-share-dialog)
 
 ## Recent Changes
 - 001-base-nav: Added TypeScript 5.7 (strict mode)
