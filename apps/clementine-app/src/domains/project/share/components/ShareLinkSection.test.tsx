@@ -78,7 +78,7 @@ describe('ShareLinkSection', () => {
       />,
     )
 
-    const input = screen.getByLabelText('Guest Link')
+    const input = screen.getByLabelText<HTMLInputElement>('Guest Link')
     const selectSpy = vi.spyOn(input, 'select')
 
     fireEvent.click(input)

@@ -82,7 +82,6 @@ export function useQRCodeGenerator(
       await downloadQRCodeAsPng(svgElement, projectId || 'project', 512)
       toast.success('QR code downloaded')
     } catch (error) {
-      console.error('Download failed:', error)
       toast.error('Failed to download QR code. Please try again.')
     } finally {
       setIsDownloading(false)

@@ -71,7 +71,6 @@ export function useCopyToClipboard(): UseCopyToClipboardReturn {
       toast.success('Link copied to clipboard')
       return true
     } catch (error) {
-      console.error('Copy to clipboard failed:', error)
       toast.error('Failed to copy link. Please copy manually.')
       return false
     } finally {
