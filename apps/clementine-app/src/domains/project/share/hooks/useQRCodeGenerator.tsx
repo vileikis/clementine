@@ -16,7 +16,7 @@ export interface UseQRCodeGeneratorReturn {
 
   /**
    * Regenerate QR code with new visual pattern
-   * (Changes seed to create different QR appearance for same URL)
+   * (Appends timestamp query param to URL to change QR appearance)
    */
   regenerateQRCode: () => void
 
@@ -52,9 +52,10 @@ export function useQRCodeGenerator(
   const [isDownloading, setIsDownloading] = useState(false)
 
   // Memoize QR options to prevent unnecessary re-renders
+  // Append seed as query param to change QR visual pattern (react-qr-code is deterministic on value)
   const qrOptions: QRCodeOptions = useMemo(
     () => ({
-      value: guestUrl,
+      value: `${guestUrl}?_qr=${qrSeed}` as GuestUrl,
       size: 512,
       level: 'M', // Medium error correction (15% damage tolerance)
       fgColor: '#000000', // Black QR modules
@@ -66,7 +67,7 @@ export function useQRCodeGenerator(
 
   const regenerateQRCode = () => {
     setQrSeed(Date.now())
-    toast.success('QR code regenerated')
+    toast.success('QR code regenerated with new pattern')
   }
 
   const downloadQRCode = async (): Promise<void> => {

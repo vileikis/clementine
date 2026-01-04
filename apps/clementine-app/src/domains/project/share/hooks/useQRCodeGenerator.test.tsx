@@ -27,7 +27,7 @@ describe('useQRCodeGenerator', () => {
     const { result } = renderHook(() => useQRCodeGenerator(mockGuestUrl))
 
     expect(result.current.qrOptions).toMatchObject({
-      value: mockGuestUrl,
+      value: `${mockGuestUrl}?_qr=1234567890`,
       size: 512,
       level: 'M',
       fgColor: '#000000',
@@ -37,10 +37,12 @@ describe('useQRCodeGenerator', () => {
     expect(result.current.isDownloading).toBe(false)
   })
 
-  it('should generate QR options for given guest URL', () => {
+  it('should generate QR options with query param for visual variation', () => {
     const { result } = renderHook(() => useQRCodeGenerator(mockGuestUrl))
 
-    expect(result.current.qrOptions.value).toBe(mockGuestUrl)
+    // Value should include the guest URL and a query param for visual variation
+    expect(result.current.qrOptions.value).toContain(mockGuestUrl)
+    expect(result.current.qrOptions.value).toContain('?_qr=')
   })
 
   it('should use medium error correction level by default', () => {
@@ -65,14 +67,16 @@ describe('useQRCodeGenerator', () => {
     expect(result.current.qrOptions.seed).not.toBe(initialSeed)
   })
 
-  it('should preserve guest URL when regenerating', () => {
+  it('should preserve base guest URL when regenerating', () => {
     const { result } = renderHook(() => useQRCodeGenerator(mockGuestUrl))
 
     act(() => {
       result.current.regenerateQRCode()
     })
 
-    expect(result.current.qrOptions.value).toBe(mockGuestUrl)
+    // Should still contain the base guest URL (with different query param)
+    expect(result.current.qrOptions.value).toContain(mockGuestUrl)
+    expect(result.current.qrOptions.value).toContain('?_qr=')
   })
 
   it('should update QR options when guest URL changes', () => {
@@ -83,12 +87,13 @@ describe('useQRCodeGenerator', () => {
       },
     )
 
-    expect(result.current.qrOptions.value).toBe(mockGuestUrl)
+    expect(result.current.qrOptions.value).toContain(mockGuestUrl)
 
     const newUrl = 'https://app.clementine.com/guest/new-project' as GuestUrl
     rerender({ url: newUrl })
 
-    expect(result.current.qrOptions.value).toBe(newUrl)
+    expect(result.current.qrOptions.value).toContain(newUrl)
+    expect(result.current.qrOptions.value).toContain('?_qr=')
   })
 
   it('should provide downloadQRCode function', () => {

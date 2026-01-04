@@ -32,6 +32,19 @@ vi.mock('../hooks/useCopyToClipboard', () => ({
   }),
 }))
 
+vi.mock('../hooks/useQRCodeGenerator', () => ({
+  useQRCodeGenerator: () => ({
+    qrOptions: {
+      value: 'https://app.clementine.com/guest/test-project-123',
+      size: 256,
+      level: 'M',
+    },
+    regenerateQRCode: vi.fn(),
+    downloadQRCode: vi.fn(),
+    isDownloading: false,
+  }),
+}))
+
 // Mock window.location
 const mockLocation = {
   origin: 'https://app.clementine.com',

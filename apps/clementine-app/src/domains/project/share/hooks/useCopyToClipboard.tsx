@@ -3,7 +3,7 @@
  * Feature: 011-project-share-dialog
  */
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 export interface UseCopyToClipboardReturn {
@@ -36,10 +36,26 @@ export interface UseCopyToClipboardReturn {
 export function useCopyToClipboard(): UseCopyToClipboardReturn {
   const [isCopying, setIsCopying] = useState(false)
   const [copySuccess, setCopySuccess] = useState(false)
+  const resetTimeoutRef = useRef<number | null>(null)
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (resetTimeoutRef.current !== null) {
+        clearTimeout(resetTimeoutRef.current)
+      }
+    }
+  }, [])
 
   const copyToClipboard = async (text: string): Promise<boolean> => {
     setIsCopying(true)
     setCopySuccess(false)
+
+    // Clear any existing timeout to avoid overlapping timers
+    if (resetTimeoutRef.current !== null) {
+      clearTimeout(resetTimeoutRef.current)
+      resetTimeoutRef.current = null
+    }
 
     try {
       // Try modern Clipboard API first (requires HTTPS or localhost)
@@ -77,6 +93,11 @@ export function useCopyToClipboard(): UseCopyToClipboardReturn {
       setIsCopying(false)
       // Reset success state after 3 seconds
       setTimeout(() => setCopySuccess(false), 3000)
+      // Store timeout ID for cleanup
+      resetTimeoutRef.current = window.setTimeout(() => {
+        setCopySuccess(false)
+        resetTimeoutRef.current = null
+      }, 3000)
     }
   }
 
