@@ -10,27 +10,31 @@
  */
 function deepNormalize(value: unknown): unknown {
   // Treat empty strings, null, and undefined as equivalent
-  if (value === "" || value === null || value === undefined) {
-    return null;
+  if (value === '' || value === null || value === undefined) {
+    return null
   }
 
   // Recursively normalize arrays
   if (Array.isArray(value)) {
-    return value.map(deepNormalize);
+    return value.map(deepNormalize)
   }
 
   // Recursively normalize objects (but not special types like Date)
-  if (typeof value === "object" && value !== null && value.constructor === Object) {
-    const normalized: Record<string, unknown> = {};
+  if (
+    typeof value === 'object' &&
+    value !== null &&
+    value.constructor === Object
+  ) {
+    const normalized: Record<string, unknown> = {}
     // Sort keys for consistent comparison regardless of property order
-    const sortedKeys = Object.keys(value).sort();
+    const sortedKeys = Object.keys(value).sort()
     for (const key of sortedKeys) {
-      normalized[key] = deepNormalize((value as Record<string, unknown>)[key]);
+      normalized[key] = deepNormalize((value as Record<string, unknown>)[key])
     }
-    return normalized;
+    return normalized
   }
 
-  return value;
+  return value
 }
 
 /**
@@ -45,32 +49,32 @@ function deepNormalize(value: unknown): unknown {
 export function getChangedFields<T extends Record<string, unknown>>(
   formValues: T,
   originalValues: Record<string, unknown>,
-  fieldsToCompare: (keyof T)[]
+  fieldsToCompare: (keyof T)[],
 ): Partial<T> {
-  const updates: Partial<T> = {};
+  const updates: Partial<T> = {}
 
   for (const key of fieldsToCompare) {
-    const formValue = formValues[key];
-    const originalValue = originalValues[key as string];
+    const formValue = formValues[key]
+    const originalValue = originalValues[key as string]
 
     // Deep normalize both values before comparison
-    const normalizedFormValue = deepNormalize(formValue);
-    const normalizedOriginalValue = deepNormalize(originalValue);
+    const normalizedFormValue = deepNormalize(formValue)
+    const normalizedOriginalValue = deepNormalize(originalValue)
 
     // Use JSON.stringify for comparison (now with sorted keys and normalized values)
     const hasChanged =
       JSON.stringify(normalizedFormValue) !==
-      JSON.stringify(normalizedOriginalValue);
+      JSON.stringify(normalizedOriginalValue)
 
     if (hasChanged) {
       // For string fields, convert empty strings to null for storage
-      if (typeof formValue === "string") {
-        updates[key] = (formValue || null) as T[keyof T];
+      if (typeof formValue === 'string') {
+        updates[key] = (formValue || null) as T[keyof T]
       } else {
-        updates[key] = formValue;
+        updates[key] = formValue
       }
     }
   }
 
-  return updates;
+  return updates
 }

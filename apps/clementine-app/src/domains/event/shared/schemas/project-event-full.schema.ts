@@ -24,59 +24,57 @@ import { projectEventConfigSchema } from './project-event-config.schema'
  *
  * This schema uses Firestore-safe patterns:
  * - Optional fields use `.nullable().default(null)` (Firestore doesn't support undefined)
- * - Uses `.passthrough()` for forward compatibility with future fields
+ * - Uses `z.looseObject()` for forward compatibility with future fields
  */
-export const projectEventFullSchema = z
-  .object({
-    /**
-     * ADMIN METADATA
-     * Managed by @domains/project/events/
-     */
+export const projectEventFullSchema = z.looseObject({
+  /**
+   * ADMIN METADATA
+   * Managed by @domains/project/events/
+   */
 
-    /** Unique event identifier (Firestore document ID) */
-    id: z.string(),
+  /** Unique event identifier (Firestore document ID) */
+  id: z.string(),
 
-    /** Event display name */
-    name: z.string(),
+  /** Event display name */
+  name: z.string(),
 
-    /** Event lifecycle status */
-    status: z.enum(['active', 'deleted']).default('active'),
+  /** Event lifecycle status */
+  status: z.enum(['active', 'deleted']).default('active'),
 
-    /** Creation timestamp (Unix ms) */
-    createdAt: z.number(),
+  /** Creation timestamp (Unix ms) */
+  createdAt: z.number(),
 
-    /** Last update timestamp (Unix ms) */
-    updatedAt: z.number(),
+  /** Last update timestamp (Unix ms) */
+  updatedAt: z.number(),
 
-    /** Soft delete timestamp (Unix ms) */
-    deletedAt: z.number().nullable().default(null),
+  /** Soft delete timestamp (Unix ms) */
+  deletedAt: z.number().nullable().default(null),
 
-    /**
-     * GUEST-FACING CONFIGURATION
-     * Managed by @domains/event/
-     */
+  /**
+   * GUEST-FACING CONFIGURATION
+   * Managed by @domains/event/
+   */
 
-    /** Draft configuration (work in progress) */
-    draftConfig: projectEventConfigSchema.nullable().default(null),
+  /** Draft configuration (work in progress) */
+  draftConfig: projectEventConfigSchema.nullable().default(null),
 
-    /** Published configuration (live for guests) */
-    publishedConfig: projectEventConfigSchema.nullable().default(null),
+  /** Published configuration (live for guests) */
+  publishedConfig: projectEventConfigSchema.nullable().default(null),
 
-    /**
-     * PUBLISH TRACKING
-     * Managed by @domains/event/
-     */
+  /**
+   * PUBLISH TRACKING
+   * Managed by @domains/event/
+   */
 
-    /** Draft version number (starts at 1, not 0) */
-    draftVersion: z.number().default(1),
+  /** Draft version number (starts at 1, not 0) */
+  draftVersion: z.number().default(1),
 
-    /** Published version number */
-    publishedVersion: z.number().nullable().default(null),
+  /** Published version number */
+  publishedVersion: z.number().nullable().default(null),
 
-    /** Publish timestamp (Unix ms) */
-    publishedAt: z.number().nullable().default(null),
-  })
-  .passthrough() // Allow unknown fields for future evolution
+  /** Publish timestamp (Unix ms) */
+  publishedAt: z.number().nullable().default(null),
+}) // Allow unknown fields for future evolution
 
 /**
  * TypeScript type for complete event document

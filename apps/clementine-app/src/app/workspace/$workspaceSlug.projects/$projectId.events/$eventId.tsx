@@ -49,7 +49,9 @@ export const Route = createFileRoute(
       throw notFound()
     }
 
-    return { event, project }
+    // Type assertion to work around z.looseObject() index signature incompatibility
+    // z.looseObject() adds [x: string]: unknown which conflicts with TanStack Router's expected {}
+    return { event, project } as any
   },
   component: EventLayout,
   notFoundComponent: EventNotFound,

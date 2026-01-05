@@ -58,32 +58,30 @@ export const sharingConfigSchema = z.object({
  *
  * This schema uses Firestore-safe patterns:
  * - Optional fields use `.nullable().default(null)` (Firestore doesn't support undefined)
- * - Uses `.passthrough()` for forward compatibility with future fields
+ * - Uses `z.looseObject()` for forward compatibility with future fields
  */
-export const projectEventConfigSchema = z
-  .object({
-    /**
-     * Schema version for migration tracking
-     */
-    schemaVersion: z.number().default(CURRENT_CONFIG_VERSION),
+export const projectEventConfigSchema = z.looseObject({
+  /**
+   * Schema version for migration tracking
+   */
+  schemaVersion: z.number().default(CURRENT_CONFIG_VERSION),
 
-    /**
-     * Visual theme configuration
-     * Full embedded theme object (not a reference)
-     */
-    theme: themeSchema.nullable().default(null),
+  /**
+   * Visual theme configuration
+   * Full embedded theme object (not a reference)
+   */
+  theme: themeSchema.nullable().default(null),
 
-    /**
-     * Overlay images by aspect ratio
-     */
-    overlays: overlaysConfigSchema,
+  /**
+   * Overlay images by aspect ratio
+   */
+  overlays: overlaysConfigSchema,
 
-    /**
-     * Sharing configuration
-     */
-    sharing: sharingConfigSchema.nullable().default(null),
-  })
-  .passthrough() // Allow unknown fields for future evolution
+  /**
+   * Sharing configuration
+   */
+  sharing: sharingConfigSchema.nullable().default(null),
+}) // Allow unknown fields for future evolution
 
 /**
  * TypeScript types exported from schemas

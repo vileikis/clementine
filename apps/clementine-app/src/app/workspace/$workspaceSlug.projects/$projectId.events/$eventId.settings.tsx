@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { EventSettingsPage } from '@/domains/event'
 
 /**
  * Settings tab route
@@ -11,16 +12,5 @@ import { createFileRoute } from '@tanstack/react-router'
 export const Route = createFileRoute(
   '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/settings',
 )({
-  component: SettingsPage,
+  component: EventSettingsPage,
 })
-
-function SettingsPage() {
-  return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold">Settings Tab</h2>
-      <p className="text-muted-foreground mt-2">
-        Work in progress - Settings editor (overlays, sharing) coming soon
-      </p>
-    </div>
-  )
-}

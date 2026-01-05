@@ -5,6 +5,9 @@
  * Exports components, types, and schemas.
  */
 export { EventDesignerPage } from './designer'
+export { WelcomeEditorPage } from './welcome'
+export { ThemeEditorPage } from './theme'
+export { EventSettingsPage } from './settings'
 export type {
   ProjectEventConfig,
   ProjectEventFull,
