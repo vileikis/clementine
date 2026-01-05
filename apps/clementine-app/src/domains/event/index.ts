@@ -2,12 +2,16 @@
  * Event Domain Barrel Export
  *
  * Main entry point for the event domain.
- * Exports components, types, and schemas.
+ * Exports components, types, schemas, hooks, and queries.
  */
+
+// Components
 export { EventDesignerPage } from './designer'
 export { WelcomeEditorPage } from './welcome'
 export { ThemeEditorPage } from './theme'
 export { EventSettingsPage } from './settings'
+
+// Types
 export type {
   ProjectEventConfig,
   ProjectEventFull,
@@ -15,7 +19,15 @@ export type {
   SharingConfig,
   SocialSharingConfig,
 } from './shared/types'
+
+// Schemas
 export {
   projectEventConfigSchema,
   projectEventFullSchema,
 } from './shared/schemas'
+
+// Hooks
+export { useProjectEvent } from './shared/hooks'
+
+// Queries
+export { projectEventQuery } from './shared/queries'

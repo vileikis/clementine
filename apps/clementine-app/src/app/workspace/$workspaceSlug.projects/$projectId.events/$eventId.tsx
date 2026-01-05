@@ -1,11 +1,12 @@
 import { createFileRoute, notFound } from '@tanstack/react-router'
-import { doc, getDoc } from 'firebase/firestore'
 import { FolderOpen, Play, Upload } from 'lucide-react'
 import { toast } from 'sonner'
-import { projectSchema } from '@clementine/shared'
-import { firestore } from '@/integrations/firebase/client'
-import { EventDesignerPage, projectEventFullSchema } from '@/domains/event'
-import { convertFirestoreDoc } from '@/shared/utils/firestore-utils'
+import {
+  EventDesignerPage,
+  projectEventQuery,
+  useProjectEvent,
+} from '@/domains/event'
+import { projectQuery, useProject } from '@/domains/project'
 import { NotFound } from '@/shared/components/NotFound'
 import { TopNavBar } from '@/domains/navigation'
 
@@ -21,45 +22,43 @@ import { TopNavBar } from '@/domains/navigation'
 export const Route = createFileRoute(
   '/workspace/$workspaceSlug/projects/$projectId/events/$eventId',
 )({
-  loader: async ({ params }) => {
-    // Fetch project (needed for breadcrumb)
-    const projectPath = `projects/${params.projectId}`
-    const projectRef = doc(firestore, projectPath)
-    const projectDoc = await getDoc(projectRef)
+  loader: async ({ params, context }) => {
+    // Ensure event data is in cache (fetches if not cached)
+    const event = await context.queryClient.ensureQueryData(
+      projectEventQuery(params.projectId, params.eventId),
+    )
 
-    if (!projectDoc.exists()) {
+    // Handle 404 cases
+    if (!event) {
       throw notFound()
     }
-
-    const project = convertFirestoreDoc(projectDoc, projectSchema)
-    // Fetch event from subcollection
-    const eventPath = `projects/${params.projectId}/events/${params.eventId}`
-    const eventRef = doc(firestore, eventPath)
-    const eventDoc = await getDoc(eventRef)
-
-    if (!eventDoc.exists()) {
-      throw notFound()
-    }
-
-    // Convert Firestore document (Timestamps → numbers) and validate with schema
-    const event = convertFirestoreDoc(eventDoc, projectEventFullSchema)
 
     // Return 404 for soft-deleted events
     if (event.status === 'deleted') {
       throw notFound()
     }
 
-    // Type assertion to work around z.looseObject() index signature incompatibility
-    // z.looseObject() adds [x: string]: unknown which conflicts with TanStack Router's expected {}
-    return { event, project } as any
+    // Prefetch project data for breadcrumb (non-blocking)
+    context.queryClient.prefetchQuery(projectQuery(params.projectId))
+
+    // No need to return data - it's in cache for hooks to consume
   },
   component: EventLayout,
   notFoundComponent: EventNotFound,
 })
 
 function EventLayout() {
-  const { workspaceSlug, projectId } = Route.useParams()
-  const { event, project } = Route.useLoaderData()
+  const { workspaceSlug, projectId, eventId } = Route.useParams()
+
+  // Get data from hooks (real-time updates enabled)
+  const { data: project } = useProject(projectId)
+  const { data: event } = useProjectEvent(projectId, eventId)
+
+  // Data should be immediately available from loader cache
+  // These checks are safety guards only
+  if (!project || !event) {
+    return null
+  }
 
   const projectPath = `/workspace/${workspaceSlug}/projects/${projectId}`
   const projectsListPath = `/workspace/${workspaceSlug}/projects`
