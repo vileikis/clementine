@@ -5,8 +5,8 @@
  * Exports components, types, schemas, hooks, and queries.
  */
 
-// Components
-export { EventDesignerPage } from './designer'
+// Components & Containers
+export { EventDesignerPage, EventDesignerLayout } from './designer'
 export { WelcomeEditorPage } from './welcome'
 export { ThemeEditorPage } from './theme'
 export { EventSettingsPage } from './settings'

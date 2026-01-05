@@ -1,14 +1,11 @@
 import { createFileRoute, notFound } from '@tanstack/react-router'
-import { FolderOpen, Play, Upload } from 'lucide-react'
-import { toast } from 'sonner'
 import {
-  EventDesignerPage,
+  EventDesignerLayout,
   projectEventQuery,
   useProjectEvent,
 } from '@/domains/event'
 import { projectQuery, useProject } from '@/domains/project'
 import { NotFound } from '@/shared/components/NotFound'
-import { TopNavBar } from '@/domains/navigation'
 
 /**
  * Event layout route
@@ -60,43 +57,12 @@ function EventLayout() {
     return null
   }
 
-  const projectPath = `/workspace/${workspaceSlug}/projects/${projectId}`
-  const projectsListPath = `/workspace/${workspaceSlug}/projects`
-
   return (
-    <>
-      {/* TOP NAV BAR */}
-      <TopNavBar
-        breadcrumbs={[
-          {
-            label: project.name,
-            href: projectPath,
-            icon: FolderOpen,
-            iconHref: projectsListPath,
-          },
-          {
-            label: event.name,
-          },
-        ]}
-        actions={[
-          {
-            icon: Play,
-            onClick: () => toast.success('Coming soon'),
-            variant: 'ghost',
-            ariaLabel: 'Preview event',
-          },
-          {
-            label: 'Publish',
-            icon: Upload,
-            onClick: () => toast.success('Coming soon'),
-            variant: 'default',
-            ariaLabel: 'Publish event',
-          },
-        ]}
-      />
-      {/* BODY */}
-      <EventDesignerPage />
-    </>
+    <EventDesignerLayout
+      event={event}
+      project={project}
+      workspaceSlug={workspaceSlug}
+    />
   )
 }
 

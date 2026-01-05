@@ -25,10 +25,10 @@
 
 **Purpose**: Validate prerequisites and prepare development environment
 
-- [ ] T001 Verify feature branch 012-event-settings-sharing-publish exists and is checked out
-- [ ] T002 Verify existing event domain structure matches plan.md expectations
-- [ ] T003 Verify existing schemas (projectEventConfigSchema, sharingConfigSchema) are complete
-- [ ] T004 Verify existing hooks (useProjectEvent, useAutoSave) are available
+- [X] T001 Verify feature branch 012-event-settings-sharing-publish exists and is checked out
+- [X] T002 Verify existing event domain structure matches plan.md expectations
+- [X] T003 Verify existing schemas (projectEventConfigSchema, sharingConfigSchema) are complete
+- [X] T004 Verify existing hooks (useProjectEvent, useAutoSave) are available
 
 ---
 
@@ -38,12 +38,12 @@
 
 **⚠️ CRITICAL**: No UI work can begin until this phase is complete
 
-- [ ] T005 Create shared transaction helper in apps/clementine-app/src/domains/event/shared/lib/updateEventConfigField.ts
-- [ ] T006 [P] Create useUpdateShareOptions mutation hook in apps/clementine-app/src/domains/event/settings/hooks/useUpdateShareOptions.ts
-- [ ] T007 [P] Create usePublishEvent mutation hook in apps/clementine-app/src/domains/event/designer/hooks/usePublishEvent.ts
-- [ ] T008 Update event/shared barrel export to include updateEventConfigField in apps/clementine-app/src/domains/event/shared/index.ts
-- [ ] T009 [P] Update designer barrel export to include usePublishEvent in apps/clementine-app/src/domains/event/designer/index.ts
-- [ ] T010 [P] Update settings barrel export to include useUpdateShareOptions in apps/clementine-app/src/domains/event/settings/index.ts
+- [X] T005 Create shared transaction helper in apps/clementine-app/src/domains/event/shared/lib/updateEventConfigField.ts
+- [X] T006 [P] Create useUpdateShareOptions mutation hook in apps/clementine-app/src/domains/event/settings/hooks/useUpdateShareOptions.ts
+- [X] T007 [P] Create usePublishEvent mutation hook in apps/clementine-app/src/domains/event/designer/hooks/usePublishEvent.ts
+- [X] T008 Update event/shared barrel export to include updateEventConfigField in apps/clementine-app/src/domains/event/shared/index.ts
+- [X] T009 [P] Update designer barrel export to include usePublishEvent in apps/clementine-app/src/domains/event/designer/index.ts
+- [X] T010 [P] Update settings barrel export to include useUpdateShareOptions in apps/clementine-app/src/domains/event/settings/index.ts
 
 **Checkpoint**: Foundation ready - UI implementation can now begin in parallel
 
@@ -57,10 +57,10 @@
 
 ### Implementation for User Story 1
 
-- [ ] T011 [P] [US1] Create EventDesignerTopBar component in apps/clementine-app/src/domains/event/designer/components/EventDesignerTopBar.tsx
-- [ ] T012 [US1] Create EventDesignerLayout container in apps/clementine-app/src/domains/event/designer/containers/EventDesignerLayout.tsx (depends on T011)
-- [ ] T013 [US1] Update designer barrel export to include EventDesignerTopBar and EventDesignerLayout in apps/clementine-app/src/domains/event/designer/index.ts
-- [ ] T014 [US1] Refactor route file to use EventDesignerLayout in apps/clementine-app/src/app/workspace/$workspaceSlug.projects/$projectId.events/$eventId.tsx
+- [X] T011 [P] [US1] Create EventDesignerTopBar component in apps/clementine-app/src/domains/event/designer/components/EventDesignerTopBar.tsx
+- [X] T012 [US1] Create EventDesignerLayout container in apps/clementine-app/src/domains/event/designer/containers/EventDesignerLayout.tsx (depends on T011)
+- [X] T013 [US1] Update designer barrel export to include EventDesignerTopBar and EventDesignerLayout in apps/clementine-app/src/domains/event/designer/index.ts
+- [X] T014 [US1] Refactor route file to use EventDesignerLayout in apps/clementine-app/src/app/workspace/$workspaceSlug.projects/$projectId.events/$eventId.tsx
 
 **Checkpoint**: Event designer now has domain-owned layout with publish button (disabled until sharing UI implemented)
 
