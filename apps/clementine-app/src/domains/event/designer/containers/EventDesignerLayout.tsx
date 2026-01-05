@@ -2,15 +2,17 @@
  * EventDesignerLayout Container
  *
  * Domain-owned layout for event designer. Handles publish workflow,
- * change detection, and integrates EventDesignerTopBar + EventDesignerPage.
+ * change detection, and integrates TopNavBar + EventDesignerPage.
  */
 import { useMemo } from 'react'
+import { FolderOpen, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
-import { EventDesignerTopBar } from '../components/EventDesignerTopBar'
 import { usePublishEvent } from '../hooks/usePublishEvent'
 import { EventDesignerPage } from './EventDesignerPage'
 import type { ProjectEventFull } from '@/domains/event/shared/schemas'
 import type { Project } from '@/domains/workspace/projects/types/project.types'
+import { Button } from '@/ui-kit/components/button'
+import { TopNavBar } from '@/domains/navigation'
 
 interface EventDesignerLayoutProps {
   event: ProjectEventFull
@@ -71,14 +73,42 @@ export function EventDesignerLayout({
 
   return (
     <div className="flex h-screen flex-col">
-      <EventDesignerTopBar
-        projectName={project.name}
-        projectPath={projectPath}
-        projectsListPath={projectsListPath}
-        eventName={event.name}
-        hasUnpublishedChanges={hasUnpublishedChanges}
-        isPublishing={publishEvent.isPending}
-        onPublish={handlePublish}
+      <TopNavBar
+        breadcrumbs={[
+          {
+            label: project.name,
+            href: projectPath,
+            icon: FolderOpen,
+            iconHref: projectsListPath,
+          },
+          {
+            label: event.name,
+          },
+        ]}
+        left={
+          hasUnpublishedChanges && (
+            <div className="flex items-center gap-1.5 rounded-full bg-yellow-50 dark:bg-yellow-950 px-2.5 py-1 text-xs font-medium text-yellow-700 dark:text-yellow-400">
+              <div className="h-2 w-2 rounded-full bg-yellow-500" />
+              New changes
+            </div>
+          )
+        }
+        right={
+          <>
+            <Button variant="outline" disabled>
+              Preview
+            </Button>
+            <Button
+              onClick={handlePublish}
+              disabled={!hasUnpublishedChanges || publishEvent.isPending}
+            >
+              {publishEvent.isPending && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              Publish
+            </Button>
+          </>
+        }
       />
       <EventDesignerPage />
     </div>
