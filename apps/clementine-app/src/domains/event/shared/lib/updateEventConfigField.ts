@@ -1,13 +1,13 @@
 /**
  * Shared Transaction Helper: updateEventConfigField
  *
- * Updates event config fields using Firestore dot notation for atomic updates.
- * No read-merge-write pattern - uses direct field paths for better performance.
+ * Updates event config fields using Firestore dot notation with transactions.
+ * Uses transactions to ensure immediate snapshot updates with correct values.
  *
  * Benefits:
  * - Atomic updates (no race conditions)
- * - No unnecessary reads
- * - Simpler code (no merge logic)
+ * - Immediate correct values (no snapshot delay)
+ * - Version increment handled properly
  * - Firestore-native approach
  *
  * @example
@@ -25,11 +25,18 @@
  * })
  * ```
  */
-import { doc, increment, serverTimestamp, updateDoc } from 'firebase/firestore'
+import {
+  doc,
+  increment,
+  runTransaction,
+  serverTimestamp,
+} from 'firebase/firestore'
+import type { UpdateData } from 'firebase/firestore'
+import type { ProjectEventFull } from '../schemas'
 import { firestore } from '@/integrations/firebase/client'
 
 /**
- * Update event config fields using dot notation
+ * Update event config fields using dot notation with transaction
  *
  * @param projectId - Project ID
  * @param eventId - Event ID
@@ -41,19 +48,25 @@ export async function updateEventConfigField(
   eventId: string,
   updates: Record<string, unknown>,
 ): Promise<void> {
-  const eventRef = doc(firestore, `projects/${projectId}/events`, eventId)
+  await runTransaction(firestore, async (transaction) => {
+    const eventRef = doc(firestore, `projects/${projectId}/events/${eventId}`)
 
-  // Transform updates to Firestore paths with draftConfig prefix
-  const firestoreUpdates: Record<string, unknown> = {}
+    // Transform updates to Firestore paths with draftConfig prefix
+    const firestoreUpdates: Record<string, unknown> = {}
+    for (const [key, value] of Object.entries(updates)) {
+      firestoreUpdates[`draftConfig.${key}`] = value
+    }
 
-  for (const [key, value] of Object.entries(updates)) {
-    firestoreUpdates[`draftConfig.${key}`] = value
-  }
+    // Atomic update with version increment
+    // Note: Firestore will throw clear error if document doesn't exist
+    const updateData: UpdateData<ProjectEventFull> = {
+      ...firestoreUpdates,
+      draftVersion: increment(1),
+      updatedAt: serverTimestamp(),
+    }
 
-  // Atomic update with version increment
-  await updateDoc(eventRef, {
-    ...firestoreUpdates,
-    draftVersion: increment(1),
-    updatedAt: serverTimestamp(),
+    transaction.update(eventRef, updateData)
+
+    return Promise.resolve()
   })
 }

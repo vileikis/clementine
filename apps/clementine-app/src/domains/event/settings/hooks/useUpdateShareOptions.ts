@@ -60,12 +60,12 @@ export function useUpdateShareOptions(projectId: string, eventId: string) {
       })
     },
 
-    // Error: report to Sentry with domain-specific tags
+    // Error: report to Sentry for debugging
     onError: (error) => {
       Sentry.captureException(error, {
         tags: {
           domain: 'event/settings',
-          action: 'update-share-options', // <- Domain-specific tracking!
+          action: 'update-share-options',
         },
         extra: {
           errorType: 'sharing-config-update-failure',

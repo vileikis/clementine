@@ -8,6 +8,7 @@ import {
   FaXTwitter,
 } from 'react-icons/fa6'
 import { FaTelegramPlane } from 'react-icons/fa'
+import { toast } from 'sonner'
 import { useUpdateShareOptions } from '../hooks/useUpdateShareOptions'
 import { SharingOptionCard } from './SharingOptionCard'
 import type { ProjectEventFull } from '@/domains/event/shared/schemas'
@@ -54,12 +55,21 @@ export function SharingSection({
     },
   })
 
-  const { handleBlur } = useAutoSave({
+  // Auto-save with toast feedback
+  const { triggerSave } = useAutoSave({
     form,
     originalValues: sharing ?? {},
     onUpdate: async (updates) => {
-      // Hook handles dot notation transformation internally
-      await updateShareOptions.mutateAsync(updates)
+      try {
+        await updateShareOptions.mutateAsync(updates)
+        toast.success('Sharing options saved')
+      } catch (error) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : 'Failed to save sharing options'
+        toast.error(message)
+      }
     },
     fieldsToCompare: [
       'download',
@@ -78,9 +88,10 @@ export function SharingSection({
   // Watch form values for rendering
   const formValues = useWatch({ control: form.control })
 
-  // Toggle handler with type safety
+  // Toggle handler: update form + trigger save
   const toggleField = (field: keyof SharingFormValues) => {
     form.setValue(field, !formValues[field], { shouldDirty: true })
+    triggerSave()
   }
 
   return (
@@ -92,7 +103,7 @@ export function SharingSection({
         </p>
       </div>
 
-      <form onBlur={handleBlur} className="space-y-6">
+      <div className="space-y-6">
         {/* Main Options */}
         <div>
           <h4 className="mb-4 text-lg font-medium">Main Options</h4>
@@ -160,7 +171,7 @@ export function SharingSection({
             />
           </div>
         </div>
-      </form>
+      </div>
     </div>
   )
 }
