@@ -336,3 +336,10 @@ See individual workspace documentation for required environment variables.
 - Vitest (testing)
 - ESLint (linting)
 - Prettier (formatting)
+
+## Active Technologies
+- TypeScript 5.7.2 (strict mode, ES2022 target) + TanStack Start 1.132.0, React 19.2.0, TanStack Router 1.132.0, TanStack Query 5.66.5, Firebase SDK 12.5.0 (012-event-settings-sharing-publish)
+- Firebase Firestore (NoSQL database with client SDK), Firebase Storage (media files) (012-event-settings-sharing-publish)
+
+## Recent Changes
+- 012-event-settings-sharing-publish: Added TypeScript 5.7.2 (strict mode, ES2022 target) + TanStack Start 1.132.0, React 19.2.0, TanStack Router 1.132.0, TanStack Query 5.66.5, Firebase SDK 12.5.0
