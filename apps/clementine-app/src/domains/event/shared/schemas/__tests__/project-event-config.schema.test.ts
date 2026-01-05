@@ -9,7 +9,6 @@ import {
   overlaysConfigSchema,
   projectEventConfigSchema,
   sharingConfigSchema,
-  socialSharingConfigSchema,
 } from '../project-event-config.schema'
 
 describe('projectEventConfigSchema', () => {
@@ -100,17 +99,15 @@ describe('projectEventConfigSchema', () => {
         theme: null,
         overlays: null,
         sharing: {
-          downloadEnabled: true,
-          copyLinkEnabled: true,
-          socials: {
-            email: false,
-            instagram: true,
-            facebook: true,
-            linkedin: false,
-            twitter: false,
-            tiktok: false,
-            telegram: false,
-          },
+          download: true,
+          copyLink: true,
+          email: false,
+          instagram: true,
+          facebook: true,
+          linkedin: false,
+          twitter: false,
+          tiktok: false,
+          telegram: false,
         },
       }
 
@@ -186,12 +183,14 @@ describe('projectEventConfigSchema', () => {
     })
   })
 
-  describe('socialSharingConfigSchema', () => {
-    it('should apply defaults (all false) for missing social platforms', () => {
-      const emptySocials = {}
+  describe('sharingConfigSchema', () => {
+    it('should apply defaults (download and copyLink enabled, socials disabled)', () => {
+      const emptySharing = {}
 
-      const result = socialSharingConfigSchema.parse(emptySocials)
+      const result = sharingConfigSchema.parse(emptySharing)
 
+      expect(result.download).toBe(true)
+      expect(result.copyLink).toBe(true)
       expect(result.email).toBe(false)
       expect(result.instagram).toBe(false)
       expect(result.facebook).toBe(false)
@@ -201,44 +200,43 @@ describe('projectEventConfigSchema', () => {
       expect(result.telegram).toBe(false)
     })
 
-    it('should validate partial social config (some enabled)', () => {
-      const partialSocials = {
-        instagram: true,
-        facebook: true,
-      }
-
-      const result = socialSharingConfigSchema.parse(partialSocials)
-
-      expect(result.instagram).toBe(true)
-      expect(result.facebook).toBe(true)
-      expect(result.email).toBe(false) // default
-      expect(result.linkedin).toBe(false) // default
-    })
-  })
-
-  describe('sharingConfigSchema', () => {
-    it('should apply defaults (download and copy enabled)', () => {
-      const emptySharing = {}
-
-      const result = sharingConfigSchema.parse(emptySharing)
-
-      expect(result.downloadEnabled).toBe(true)
-      expect(result.copyLinkEnabled).toBe(true)
-      expect(result.socials).toBeNull()
-    })
-
     it('should validate sharing with all options disabled', () => {
       const noSharing = {
-        downloadEnabled: false,
-        copyLinkEnabled: false,
-        socials: null,
+        download: false,
+        copyLink: false,
+        email: false,
+        instagram: false,
+        facebook: false,
+        linkedin: false,
+        twitter: false,
+        tiktok: false,
+        telegram: false,
       }
 
       const result = sharingConfigSchema.parse(noSharing)
 
-      expect(result.downloadEnabled).toBe(false)
-      expect(result.copyLinkEnabled).toBe(false)
-      expect(result.socials).toBeNull()
+      expect(result.download).toBe(false)
+      expect(result.copyLink).toBe(false)
+      expect(result.email).toBe(false)
+      expect(result.instagram).toBe(false)
+    })
+
+    it('should validate partial sharing config (some socials enabled)', () => {
+      const partialSharing = {
+        instagram: true,
+        facebook: true,
+      }
+
+      const result = sharingConfigSchema.parse(partialSharing)
+
+      // Explicitly provided values
+      expect(result.instagram).toBe(true)
+      expect(result.facebook).toBe(true)
+      // Defaults applied
+      expect(result.download).toBe(true)
+      expect(result.copyLink).toBe(true)
+      expect(result.email).toBe(false)
+      expect(result.linkedin).toBe(false)
     })
   })
 })

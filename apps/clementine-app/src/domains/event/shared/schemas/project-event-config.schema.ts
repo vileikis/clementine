@@ -27,9 +27,12 @@ export const overlaysConfigSchema = z
   .default(null)
 
 /**
- * Social media platform enable/disable flags
+ * Guest sharing preferences and options
+ * Flattened structure for simpler updates using Firestore dot notation
  */
-export const socialSharingConfigSchema = z.object({
+export const sharingConfigSchema = z.object({
+  download: z.boolean().default(true),
+  copyLink: z.boolean().default(true),
   email: z.boolean().default(false),
   instagram: z.boolean().default(false),
   facebook: z.boolean().default(false),
@@ -37,15 +40,6 @@ export const socialSharingConfigSchema = z.object({
   twitter: z.boolean().default(false),
   tiktok: z.boolean().default(false),
   telegram: z.boolean().default(false),
-})
-
-/**
- * Guest sharing preferences and options
- */
-export const sharingConfigSchema = z.object({
-  downloadEnabled: z.boolean().default(true),
-  copyLinkEnabled: z.boolean().default(true),
-  socials: socialSharingConfigSchema.nullable().default(null),
 })
 
 /**
@@ -89,4 +83,3 @@ export const projectEventConfigSchema = z.looseObject({
 export type ProjectEventConfig = z.infer<typeof projectEventConfigSchema>
 export type OverlaysConfig = z.infer<typeof overlaysConfigSchema>
 export type SharingConfig = z.infer<typeof sharingConfigSchema>
-export type SocialSharingConfig = z.infer<typeof socialSharingConfigSchema>

@@ -8,5 +8,4 @@ export type {
   ProjectEventFull,
   OverlaysConfig,
   SharingConfig,
-  SocialSharingConfig,
 } from '../schemas'

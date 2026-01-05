@@ -1,87 +1,59 @@
 /**
  * Shared Transaction Helper: updateEventConfigField
  *
- * Reusable helper for simple event config field updates.
- * Handles lazy initialization, version increment, and atomic transactions.
+ * Updates event config fields using Firestore dot notation for atomic updates.
+ * No read-merge-write pattern - uses direct field paths for better performance.
  *
- * Use this for simple field replacements (theme, overlays).
- * For complex deep merge operations (sharing with nested socials), use custom hooks.
- */
-import { doc, runTransaction, serverTimestamp } from 'firebase/firestore'
-import type { UpdateData } from 'firebase/firestore'
-import type { ProjectEventConfig, ProjectEventFull } from '../schemas'
-import { firestore } from '@/integrations/firebase/client'
-
-/**
- * Update a single field in event configuration with lazy initialization
- *
- * @param projectId - Project ID
- * @param eventId - Event ID
- * @param field - Field name in ProjectEventConfig (type-safe)
- * @param value - New value for the field
- * @returns Updated config
+ * Benefits:
+ * - Atomic updates (no race conditions)
+ * - No unnecessary reads
+ * - Simpler code (no merge logic)
+ * - Firestore-native approach
  *
  * @example
  * ```typescript
- * // Update theme
- * await updateEventConfigField(
- *   projectId,
- *   eventId,
- *   'theme',
- *   { primaryColor: '#FF0000', ... }
- * )
+ * // Update single field
+ * await updateEventConfigField(projectId, eventId, {
+ *   'theme.primaryColor': '#FF0000'
+ * })
  *
- * // Update overlays
- * await updateEventConfigField(
- *   projectId,
- *   eventId,
- *   'overlays',
- *   { '1:1': 'https://...', '9:16': 'https://...' }
- * )
+ * // Update multiple fields atomically
+ * await updateEventConfigField(projectId, eventId, {
+ *   'sharing.download': false,
+ *   'sharing.instagram': true,
+ *   'sharing.facebook': true
+ * })
  * ```
  */
-export async function updateEventConfigField<
-  TKey extends keyof ProjectEventConfig,
->(
+import { doc, increment, serverTimestamp, updateDoc } from 'firebase/firestore'
+import { firestore } from '@/integrations/firebase/client'
+
+/**
+ * Update event config fields using dot notation
+ *
+ * @param projectId - Project ID
+ * @param eventId - Event ID
+ * @param updates - Field updates using dot notation (e.g., { 'sharing.download': false })
+ * @returns Promise that resolves when update completes
+ */
+export async function updateEventConfigField(
   projectId: string,
   eventId: string,
-  field: TKey,
-  value: ProjectEventConfig[TKey],
-): Promise<ProjectEventConfig> {
-  return await runTransaction(firestore, async (transaction) => {
-    const eventRef = doc(firestore, `projects/${projectId}/events`, eventId)
-    const eventDoc = await transaction.get(eventRef)
+  updates: Record<string, unknown>,
+): Promise<void> {
+  const eventRef = doc(firestore, `projects/${projectId}/events`, eventId)
 
-    if (!eventDoc.exists()) {
-      throw new Error(`Event ${eventId} not found`)
-    }
+  // Transform updates to Firestore paths with draftConfig prefix
+  const firestoreUpdates: Record<string, unknown> = {}
 
-    const currentEvent = eventDoc.data() as ProjectEventFull
+  for (const [key, value] of Object.entries(updates)) {
+    firestoreUpdates[`draftConfig.${key}`] = value
+  }
 
-    // Lazy initialization of draftConfig
-    const currentDraft = currentEvent.draftConfig ?? {
-      schemaVersion: 1,
-      theme: null,
-      overlays: null,
-      sharing: null,
-    }
-
-    // Update field
-    const updatedDraft: ProjectEventConfig = {
-      ...currentDraft,
-      [field]: value,
-    }
-
-    // Increment version
-    const currentVersion = currentEvent.draftVersion ?? 0
-
-    // Write update
-    transaction.update(eventRef, {
-      draftConfig: updatedDraft,
-      draftVersion: currentVersion + 1,
-      updatedAt: serverTimestamp(),
-    } as UpdateData<ProjectEventFull>)
-
-    return updatedDraft
+  // Atomic update with version increment
+  await updateDoc(eventRef, {
+    ...firestoreUpdates,
+    draftVersion: increment(1),
+    updatedAt: serverTimestamp(),
   })
 }

@@ -1,9 +1,10 @@
 import type { LucideIcon } from 'lucide-react'
+import type { IconType } from 'react-icons'
 import { Button } from '@/ui-kit/components/button'
 import { cn } from '@/shared/utils/index'
 
 interface SharingOptionCardProps {
-  icon: LucideIcon
+  icon: LucideIcon | IconType
   label: string
   enabled: boolean
   onClick: () => void

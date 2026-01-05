@@ -1,32 +1,28 @@
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
+import { Download, Link2, Mail } from 'lucide-react'
 import {
-  Download,
-  Facebook,
-  Instagram,
-  Link2,
-  Linkedin,
-  Mail,
-  MessageCircle,
-  Twitter,
-  Video,
-} from 'lucide-react'
+  FaFacebookF,
+  FaInstagram,
+  FaLinkedinIn,
+  FaTiktok,
+  FaXTwitter,
+} from 'react-icons/fa6'
+import { FaTelegramPlane } from 'react-icons/fa'
 import { useUpdateShareOptions } from '../hooks/useUpdateShareOptions'
 import { SharingOptionCard } from './SharingOptionCard'
 import type { ProjectEventFull } from '@/domains/event/shared/schemas'
 import { useAutoSave } from '@/shared/forms/hooks/useAutoSave'
 
 interface SharingFormValues {
-  downloadEnabled: boolean
-  copyLinkEnabled: boolean
-  socials: {
-    email: boolean
-    instagram: boolean
-    facebook: boolean
-    linkedin: boolean
-    twitter: boolean
-    tiktok: boolean
-    telegram: boolean
-  }
+  download: boolean
+  copyLink: boolean
+  email: boolean
+  instagram: boolean
+  facebook: boolean
+  linkedin: boolean
+  twitter: boolean
+  tiktok: boolean
+  telegram: boolean
 }
 
 interface SharingSectionProps {
@@ -46,17 +42,15 @@ export function SharingSection({
 
   const form = useForm<SharingFormValues>({
     defaultValues: {
-      downloadEnabled: sharing?.downloadEnabled ?? true,
-      copyLinkEnabled: sharing?.copyLinkEnabled ?? true,
-      socials: {
-        email: sharing?.socials?.email ?? false,
-        instagram: sharing?.socials?.instagram ?? false,
-        facebook: sharing?.socials?.facebook ?? false,
-        linkedin: sharing?.socials?.linkedin ?? false,
-        twitter: sharing?.socials?.twitter ?? false,
-        tiktok: sharing?.socials?.tiktok ?? false,
-        telegram: sharing?.socials?.telegram ?? false,
-      },
+      download: sharing?.download ?? true,
+      copyLink: sharing?.copyLink ?? true,
+      email: sharing?.email ?? false,
+      instagram: sharing?.instagram ?? false,
+      facebook: sharing?.facebook ?? false,
+      linkedin: sharing?.linkedin ?? false,
+      twitter: sharing?.twitter ?? false,
+      tiktok: sharing?.tiktok ?? false,
+      telegram: sharing?.telegram ?? false,
     },
   })
 
@@ -64,25 +58,29 @@ export function SharingSection({
     form,
     originalValues: sharing ?? {},
     onUpdate: async (updates) => {
+      // Hook handles dot notation transformation internally
       await updateShareOptions.mutateAsync(updates)
     },
-    fieldsToCompare: ['downloadEnabled', 'copyLinkEnabled', 'socials'],
+    fieldsToCompare: [
+      'download',
+      'copyLink',
+      'email',
+      'instagram',
+      'facebook',
+      'linkedin',
+      'twitter',
+      'tiktok',
+      'telegram',
+    ],
     debounceMs: 300,
   })
 
-  const toggleField = (field: keyof SharingFormValues | string) => {
-    if (field === 'downloadEnabled' || field === 'copyLinkEnabled') {
-      form.setValue(field, !form.watch(field), { shouldDirty: true })
-    } else if (field.startsWith('socials.')) {
-      const socialField = field.split(
-        '.',
-      )[1] as keyof SharingFormValues['socials']
-      form.setValue(
-        `socials.${socialField}`,
-        !form.watch(`socials.${socialField}`),
-        { shouldDirty: true },
-      )
-    }
+  // Watch form values for rendering
+  const formValues = useWatch({ control: form.control })
+
+  // Toggle handler with type safety
+  const toggleField = (field: keyof SharingFormValues) => {
+    form.setValue(field, !formValues[field], { shouldDirty: true })
   }
 
   return (
@@ -102,14 +100,14 @@ export function SharingSection({
             <SharingOptionCard
               icon={Download}
               label="Download"
-              enabled={form.watch('downloadEnabled')}
-              onClick={() => toggleField('downloadEnabled')}
+              enabled={formValues.download ?? true}
+              onClick={() => toggleField('download')}
             />
             <SharingOptionCard
               icon={Link2}
               label="Copy Link"
-              enabled={form.watch('copyLinkEnabled')}
-              onClick={() => toggleField('copyLinkEnabled')}
+              enabled={formValues.copyLink ?? true}
+              onClick={() => toggleField('copyLink')}
             />
           </div>
         </div>
@@ -121,44 +119,44 @@ export function SharingSection({
             <SharingOptionCard
               icon={Mail}
               label="Email"
-              enabled={form.watch('socials.email')}
-              onClick={() => toggleField('socials.email')}
+              enabled={formValues.email ?? false}
+              onClick={() => toggleField('email')}
             />
             <SharingOptionCard
-              icon={Instagram}
+              icon={FaInstagram}
               label="Instagram"
-              enabled={form.watch('socials.instagram')}
-              onClick={() => toggleField('socials.instagram')}
+              enabled={formValues.instagram ?? false}
+              onClick={() => toggleField('instagram')}
             />
             <SharingOptionCard
-              icon={Facebook}
+              icon={FaFacebookF}
               label="Facebook"
-              enabled={form.watch('socials.facebook')}
-              onClick={() => toggleField('socials.facebook')}
+              enabled={formValues.facebook ?? false}
+              onClick={() => toggleField('facebook')}
             />
             <SharingOptionCard
-              icon={Linkedin}
+              icon={FaLinkedinIn}
               label="LinkedIn"
-              enabled={form.watch('socials.linkedin')}
-              onClick={() => toggleField('socials.linkedin')}
+              enabled={formValues.linkedin ?? false}
+              onClick={() => toggleField('linkedin')}
             />
             <SharingOptionCard
-              icon={Twitter}
+              icon={FaXTwitter}
               label="Twitter"
-              enabled={form.watch('socials.twitter')}
-              onClick={() => toggleField('socials.twitter')}
+              enabled={formValues.twitter ?? false}
+              onClick={() => toggleField('twitter')}
             />
             <SharingOptionCard
-              icon={Video}
+              icon={FaTiktok}
               label="TikTok"
-              enabled={form.watch('socials.tiktok')}
-              onClick={() => toggleField('socials.tiktok')}
+              enabled={formValues.tiktok ?? false}
+              onClick={() => toggleField('tiktok')}
             />
             <SharingOptionCard
-              icon={MessageCircle}
+              icon={FaTelegramPlane}
               label="Telegram"
-              enabled={form.watch('socials.telegram')}
-              onClick={() => toggleField('socials.telegram')}
+              enabled={formValues.telegram ?? false}
+              onClick={() => toggleField('telegram')}
             />
           </div>
         </div>
