@@ -15,13 +15,11 @@ export const Route = createFileRoute(
 })
 
 function EventWelcomePage() {
-  const { eventId } = Route.useParams()
-
   return (
-    <div>
-      <h2 className="text-xl font-semibold mb-4">Welcome</h2>
-      <p className="text-muted-foreground">
-        Welcome page for event {eventId} – work in progress.
+    <div className="p-6">
+      <h2 className="text-2xl font-bold">Welcome Tab</h2>
+      <p className="text-muted-foreground mt-2">
+        Work in progress - Welcome screen editor coming soon
       </p>
     </div>
   )
