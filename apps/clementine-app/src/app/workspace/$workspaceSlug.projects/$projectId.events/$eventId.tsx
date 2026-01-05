@@ -64,6 +64,7 @@ function EventLayout() {
 
   return (
     <>
+      {/* TOP NAV BAR */}
       <TopNavBar
         breadcrumbs={[
           {
@@ -92,6 +93,7 @@ function EventLayout() {
           },
         ]}
       />
+      {/* BODY */}
       <div className="p-6">
         <div className="mb-6">
           <h1 className="text-2xl font-bold">Event: {eventId}</h1>
