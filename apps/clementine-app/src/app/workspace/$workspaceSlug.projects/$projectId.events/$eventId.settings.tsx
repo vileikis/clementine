@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { EventSettingsPage } from '@/domains/event'
+import { SettingsSharingPage } from '@/domains/event/settings'
 
 /**
  * Settings tab route
@@ -7,10 +7,10 @@ import { EventSettingsPage } from '@/domains/event'
  * Route: /workspace/:workspaceSlug/projects/:projectId/events/:eventId/settings
  * Access: Admin only (enforced by parent route)
  *
- * WIP: Settings editor (overlays, sharing) placeholder
+ * Renders the settings page with sharing configuration UI
  */
 export const Route = createFileRoute(
   '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/settings',
 )({
-  component: EventSettingsPage,
+  component: SettingsSharingPage,
 })

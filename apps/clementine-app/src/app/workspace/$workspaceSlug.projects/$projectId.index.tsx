@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { FolderOpen, Share2 } from 'lucide-react'
 import { useState } from 'react'
 import { ProjectEventsPage } from '@/domains/project/events'
-import { TopNavBar } from '@/domains/navigation'
+import { TopNavActions, TopNavBar } from '@/domains/navigation'
 import { useProject } from '@/domains/project/shared'
 import { ShareDialog } from '@/domains/project/share'
 
@@ -39,15 +39,19 @@ export const Route = createFileRoute(
               iconHref: projectsListPath,
             },
           ]}
-          actions={[
-            {
-              label: 'Share',
-              icon: Share2,
-              onClick: () => setShareDialogOpen(true),
-              variant: 'default',
-              ariaLabel: 'Share project with guests',
-            },
-          ]}
+          right={
+            <TopNavActions
+              actions={[
+                {
+                  label: 'Share',
+                  icon: Share2,
+                  onClick: () => setShareDialogOpen(true),
+                  variant: 'default',
+                  ariaLabel: 'Share project with guests',
+                },
+              ]}
+            />
+          }
         />
         <ProjectEventsPage projectId={projectId} />
         <ShareDialog

@@ -23,27 +23,37 @@ interface UseAutoSaveOptions<TFormValues extends FieldValues, TOriginal> {
 }
 
 interface UseAutoSaveResult {
-  /** Blur handler to attach to the form */
-  handleBlur: () => void
+  /** Trigger save manually (can be called on blur, change, or any event) */
+  triggerSave: () => void
 }
 
 /**
- * Custom hook for debounced auto-save on form blur.
+ * Custom hook for debounced auto-save.
+ * Can be triggered on blur, change, or any other event.
  *
  * @example
  * ```tsx
- * const { handleBlur } = useAutoSave({
+ * // Example 1: Save on blur (text inputs)
+ * const { triggerSave } = useAutoSave({
  *   form,
  *   originalValues: data,
  *   onUpdate,
- *   fieldsToCompare: ['title', 'description', 'mediaUrl', 'ctaLabel', 'config'],
+ *   fieldsToCompare: ['title', 'description'],
  * });
  *
- * return (
- *   <form onBlur={handleBlur}>
- *     ...
- *   </form>
- * );
+ * return <form onBlur={triggerSave}>...</form>
+ *
+ * // Example 2: Save on change (toggle buttons)
+ * const { triggerSave } = useAutoSave({
+ *   form,
+ *   originalValues: data,
+ *   onUpdate,
+ *   fieldsToCompare: ['enabled', 'visible'],
+ * });
+ *
+ * useEffect(() => {
+ *   if (!isInitialMount) triggerSave()
+ * }, [formValues])
  * ```
  */
 export function useAutoSave<TFormValues extends FieldValues, TOriginal>({
@@ -55,8 +65,8 @@ export function useAutoSave<TFormValues extends FieldValues, TOriginal>({
 }: UseAutoSaveOptions<TFormValues, TOriginal>): UseAutoSaveResult {
   const debounceRef = useRef<NodeJS.Timeout | null>(null)
 
-  // Debounced auto-save on blur
-  const handleBlur = useCallback(() => {
+  // Debounced auto-save (can be triggered by any event)
+  const triggerSave = useCallback(() => {
     // Clear any pending debounce
     if (debounceRef.current) {
       clearTimeout(debounceRef.current)
@@ -90,5 +100,7 @@ export function useAutoSave<TFormValues extends FieldValues, TOriginal>({
     }
   }, [])
 
-  return { handleBlur }
+  return {
+    triggerSave,
+  }
 }

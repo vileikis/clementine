@@ -1,5 +1,4 @@
 import { TopNavBreadcrumb } from './TopNavBreadcrumb'
-import { TopNavActions } from './TopNavActions'
 import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/shared/utils/style-utils'
 
@@ -17,44 +16,64 @@ export interface BreadcrumbItem {
   iconHref?: string
 }
 
-export interface ActionButton {
-  /** Button label text (optional - if not provided, button will be icon-only) */
-  label?: string
-
-  /** Icon component to display in button */
-  icon: LucideIcon
-
-  /** Click handler function */
-  onClick: () => void
-
-  /** Button style variant (defaults to 'ghost') */
-  variant?: 'default' | 'outline' | 'ghost'
-
-  /** Accessible label for screen readers (required for icon-only buttons, defaults to label) */
-  ariaLabel?: string
-}
-
 export interface TopNavBarProps {
-  /** Array of breadcrumb items to display (left side) */
+  /** Array of breadcrumb items to display */
   breadcrumbs: BreadcrumbItem[]
 
-  /** Array of action buttons to display (right side) */
-  actions: ActionButton[]
+  /** Optional custom content to render after breadcrumbs (left side) */
+  left?: React.ReactNode
+
+  /** Optional custom content to render on the right side (actions, buttons, etc.) */
+  right?: React.ReactNode
 
   /** Optional additional CSS classes */
   className?: string
 }
 
-export function TopNavBar({ breadcrumbs, actions, className }: TopNavBarProps) {
+/**
+ * TopNavBar Component
+ *
+ * Flexible top navigation bar with breadcrumbs and custom content areas.
+ * Supports composition pattern for maximum flexibility.
+ *
+ * @example
+ * ```tsx
+ * <TopNavBar
+ *   breadcrumbs={[
+ *     { label: 'Projects', icon: FolderOpen, iconHref: '/projects' },
+ *     { label: 'My Project', href: '/projects/123' }
+ *   ]}
+ *   left={<Badge>New changes</Badge>}
+ *   right={
+ *     <>
+ *       <Button variant="outline">Preview</Button>
+ *       <Button>Publish</Button>
+ *     </>
+ *   }
+ * />
+ * ```
+ */
+export function TopNavBar({
+  breadcrumbs,
+  left,
+  right,
+  className,
+}: TopNavBarProps) {
   return (
     <nav
       className={cn(
-        'flex items-center justify-between border-b bg-background px-4 py-3',
+        'flex h-16 items-center justify-between border-b bg-background px-6',
         className,
       )}
     >
-      <TopNavBreadcrumb items={breadcrumbs} />
-      <TopNavActions actions={actions} />
+      {/* Left side: breadcrumbs + custom content */}
+      <div className="flex items-center gap-2">
+        <TopNavBreadcrumb items={breadcrumbs} />
+        {left}
+      </div>
+
+      {/* Right side: custom content */}
+      {right && <div className="flex items-center gap-2">{right}</div>}
     </nav>
   )
 }
