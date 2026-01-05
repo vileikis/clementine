@@ -24,7 +24,7 @@ interface UseAutoSaveOptions<TFormValues extends FieldValues, TOriginal> {
 
 interface UseAutoSaveResult {
   /** Blur handler to attach to the form */
-  handleBlur: () => Promise<void>
+  handleBlur: () => void
 }
 
 /**
@@ -56,7 +56,7 @@ export function useAutoSave<TFormValues extends FieldValues, TOriginal>({
   const debounceRef = useRef<NodeJS.Timeout | null>(null)
 
   // Debounced auto-save on blur
-  const handleBlur = useCallback(async () => {
+  const handleBlur = useCallback(() => {
     // Clear any pending debounce
     if (debounceRef.current) {
       clearTimeout(debounceRef.current)
