@@ -308,24 +308,31 @@ See individual workspace documentation for required environment variables.
 
 **Remember**: This is a monorepo overview. For app-specific guidance, refer to the CLAUDE.md file in each workspace directory.
 
-## Active Technologies
-- TypeScript 5.7 (strict mode) (001-base-nav)
-- N/A (using hardcoded mock workspace data, no database integration) (001-base-nav)
-- TypeScript 5.7 (strict mode) + TanStack Start 1.132, React 19.2, Firebase SDK (Auth, Firestore, Admin), TanStack Router 1.132, TanStack Query 5.66 (002-auth-system)
-- Firebase Firestore (NoSQL database), Firebase Storage (media) (002-auth-system)
-- TypeScript 5.7 (strict mode) + TanStack Start 1.132, React 19.2, Firebase SDK (Auth, Firestore, Admin), TanStack Router 1.132, TanStack Query 5.66, Zustand 5.x (persist middleware), Zod 4.1, shadcn/ui, Radix UI, Tailwind CSS 4 (004-workspace-view)
-- Firebase Firestore (NoSQL database), Firebase Storage (media), localStorage (browser session persistence) (004-workspace-view)
-- TypeScript 5.7 (strict mode) + React 19.2, Zod v4.1.12, Tailwind CSS v4, TanStack Start 1.132 (006-theming-migration)
-- N/A (theming module is client-only, data comes from Firestore but is handled by domain features) (006-theming-migration)
-- TypeScript 5.7 (strict mode) + TanStack Start 1.132, React 19.2, Firebase SDK (Firestore, Auth), TanStack Router 1.132, TanStack Query 5.66, Zod 4.1, shadcn/ui, Radix UI, Tailwind CSS 4 (008-projects-list)
-- Firebase Firestore (NoSQL database), Firebase Storage (media files) (008-projects-list)
-- TypeScript 5.7 (strict mode) + React 19.2, TanStack Start 1.132, TanStack Router 1.132, Lucide React (icons), Sonner (toasts), shadcn/ui components (010-project-event-topnav)
-- Firebase Firestore (existing project/event data loaded via route loaders) (010-project-event-topnav)
-- TypeScript 5.7.2 (strict mode, ES2022 target) + TanStack Start 1.132.0, React 19.2.0, TanStack Router 1.132.0, TanStack Query 5.66.5, Firebase SDK 12.5.0 (Firestore, Auth), Zod 4.1.12 (010-project-rename-hook-refactor)
-- N/A (pure code refactoring, no data migration) (010-workspace-domain-refactor)
-- TypeScript 5.7 (strict mode) + TanStack Start 1.132, React 19.2, Firebase SDK (Firestore client, Admin), TanStack Router 1.132, TanStack Query 5.66 (010-session-workspace-persistence)
-- Server session storage (encrypted HTTP-only cookie via TanStack Start), Firebase Firestore (read-only workspace data) (010-session-workspace-persistence)
-- N/A (no data persistence - feature is entirely client-side URL generation and display) (011-project-share-dialog)
+## Current Tech Stack
 
-## Recent Changes
-- 001-base-nav: Added TypeScript 5.7 (strict mode)
+### TanStack Start App (apps/clementine-app/)
+- TypeScript 5.7.2 (strict mode, ES2022 target)
+- TanStack Start 1.132.0
+- React 19.2.0
+- TanStack Router 1.132.0
+- TanStack Query 5.66.5
+- Zustand 5.x (state management with persist middleware)
+- Zod 4.1.12 (validation)
+- shadcn/ui + Radix UI (components)
+- Tailwind CSS v4
+- Firebase SDK 12.5.0 (Auth, Firestore client)
+- Lucide React (icons)
+- Sonner (toasts)
+
+### Backend (functions/)
+- Firebase Cloud Functions v2
+- Firebase Admin SDK
+- Firebase Firestore (NoSQL database)
+- Firebase Storage (media files)
+- FFmpeg (media processing)
+
+### Development Tools
+- pnpm 10.18.1 (package manager)
+- Vitest (testing)
+- ESLint (linting)
+- Prettier (formatting)

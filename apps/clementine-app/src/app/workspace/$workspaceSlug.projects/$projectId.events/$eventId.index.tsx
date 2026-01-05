@@ -1,4 +1,4 @@
-import { Navigate, createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 
 /**
  * Event index route (redirect)
@@ -6,22 +6,15 @@ import { Navigate, createFileRoute } from '@tanstack/react-router'
  * Route: /workspace/:workspaceSlug/projects/:projectId/events/:eventId (exact match)
  * Access: Admin only (enforced by parent route)
  *
- * Redirects to the welcome tab by default.
+ * Redirects to the welcome tab by default using beforeLoad.
  */
 export const Route = createFileRoute(
   '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/',
 )({
-  component: EventIndexRedirect,
+  beforeLoad: ({ params }) => {
+    throw redirect({
+      to: '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/welcome',
+      params,
+    })
+  },
 })
-
-function EventIndexRedirect() {
-  const { workspaceSlug, projectId, eventId } = Route.useParams()
-
-  return (
-    <Navigate
-      to="/workspace/$workspaceSlug/projects/$projectId/events/$eventId/welcome"
-      params={{ workspaceSlug, projectId, eventId }}
-      replace={true}
-    />
-  )
-}

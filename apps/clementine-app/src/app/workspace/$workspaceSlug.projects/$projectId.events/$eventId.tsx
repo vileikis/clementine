@@ -1,11 +1,12 @@
-import { Link, Outlet, createFileRoute, notFound } from '@tanstack/react-router'
-import { doc, getDoc } from 'firebase/firestore'
+import { createFileRoute, notFound } from '@tanstack/react-router'
 import { FolderOpen, Play, Upload } from 'lucide-react'
 import { toast } from 'sonner'
-import { projectSchema } from '@clementine/shared'
-import { firestore } from '@/integrations/firebase/client'
-import { projectEventSchema } from '@/domains/project/events/schemas'
-import { convertFirestoreDoc } from '@/shared/utils/firestore-utils'
+import {
+  EventDesignerPage,
+  projectEventQuery,
+  useProjectEvent,
+} from '@/domains/event'
+import { projectQuery, useProject } from '@/domains/project'
 import { NotFound } from '@/shared/components/NotFound'
 import { TopNavBar } from '@/domains/navigation'
 
@@ -21,35 +22,26 @@ import { TopNavBar } from '@/domains/navigation'
 export const Route = createFileRoute(
   '/workspace/$workspaceSlug/projects/$projectId/events/$eventId',
 )({
-  loader: async ({ params }) => {
-    // Fetch project (needed for breadcrumb)
-    const projectPath = `projects/${params.projectId}`
-    const projectRef = doc(firestore, projectPath)
-    const projectDoc = await getDoc(projectRef)
+  loader: async ({ params, context }) => {
+    // Ensure event data is in cache (fetches if not cached)
+    const event = await context.queryClient.ensureQueryData(
+      projectEventQuery(params.projectId, params.eventId),
+    )
 
-    if (!projectDoc.exists()) {
+    // Handle 404 cases
+    if (!event) {
       throw notFound()
     }
-
-    const project = convertFirestoreDoc(projectDoc, projectSchema)
-    // Fetch event from subcollection
-    const eventPath = `projects/${params.projectId}/events/${params.eventId}`
-    const eventRef = doc(firestore, eventPath)
-    const eventDoc = await getDoc(eventRef)
-
-    if (!eventDoc.exists()) {
-      throw notFound()
-    }
-
-    // Convert Firestore document (Timestamps → numbers) and validate with schema
-    const event = convertFirestoreDoc(eventDoc, projectEventSchema)
 
     // Return 404 for soft-deleted events
     if (event.status === 'deleted') {
       throw notFound()
     }
 
-    return { event, project }
+    // Prefetch project data for breadcrumb (non-blocking)
+    context.queryClient.prefetchQuery(projectQuery(params.projectId))
+
+    // No need to return data - it's in cache for hooks to consume
   },
   component: EventLayout,
   notFoundComponent: EventNotFound,
@@ -57,13 +49,23 @@ export const Route = createFileRoute(
 
 function EventLayout() {
   const { workspaceSlug, projectId, eventId } = Route.useParams()
-  const { event, project } = Route.useLoaderData()
+
+  // Get data from hooks (real-time updates enabled)
+  const { data: project } = useProject(projectId)
+  const { data: event } = useProjectEvent(projectId, eventId)
+
+  // Data should be immediately available from loader cache
+  // These checks are safety guards only
+  if (!project || !event) {
+    return null
+  }
 
   const projectPath = `/workspace/${workspaceSlug}/projects/${projectId}`
   const projectsListPath = `/workspace/${workspaceSlug}/projects`
 
   return (
     <>
+      {/* TOP NAV BAR */}
       <TopNavBar
         breadcrumbs={[
           {
@@ -92,35 +94,8 @@ function EventLayout() {
           },
         ]}
       />
-      <div className="p-6">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold">Event: {eventId}</h1>
-          <div className="flex gap-4 mt-4 border-b">
-            {/* TODO: Replace with proper tab navigation component */}
-            <Link
-              to="/workspace/$workspaceSlug/projects/$projectId/events/$eventId/welcome"
-              params={{ workspaceSlug, projectId, eventId }}
-              className="px-4 py-2"
-              activeProps={{
-                className: 'border-b-2 border-primary',
-              }}
-            >
-              Welcome
-            </Link>
-            <Link
-              to="/workspace/$workspaceSlug/projects/$projectId/events/$eventId/theme"
-              params={{ workspaceSlug, projectId, eventId }}
-              className="px-4 py-2"
-              activeProps={{
-                className: 'border-b-2 border-primary',
-              }}
-            >
-              Theme
-            </Link>
-          </div>
-        </div>
-        <Outlet /> {/* Child route renders here */}
-      </div>
+      {/* BODY */}
+      <EventDesignerPage />
     </>
   )
 }

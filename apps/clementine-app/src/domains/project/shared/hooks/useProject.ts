@@ -3,8 +3,9 @@
 
 import { useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { doc, getDoc, onSnapshot } from 'firebase/firestore'
+import { doc, onSnapshot } from 'firebase/firestore'
 import { projectSchema } from '@clementine/shared'
+import { projectQuery } from '../queries/project.query'
 import type { Project } from '@clementine/shared'
 import { firestore } from '@/integrations/firebase/client'
 import { convertFirestoreDoc } from '@/shared/utils/firestore-utils'
@@ -51,19 +52,8 @@ export function useProject(projectId: string) {
     }
   }, [projectId, queryClient])
 
-  return useQuery<Project | null>({
-    queryKey: ['project', projectId],
-    queryFn: async () => {
-      const projectRef = doc(firestore, 'projects', projectId)
-      const projectSnapshot = await getDoc(projectRef)
-
-      if (!projectSnapshot.exists()) {
-        return null
-      }
-
-      // Convert Firestore document (Timestamps → numbers) and validate with schema
-      return convertFirestoreDoc(projectSnapshot, projectSchema)
-    },
+  return useQuery({
+    ...projectQuery(projectId),
     staleTime: Infinity, // Never stale (real-time via onSnapshot)
     refetchOnWindowFocus: false, // Disable refetch (real-time handles it)
   })

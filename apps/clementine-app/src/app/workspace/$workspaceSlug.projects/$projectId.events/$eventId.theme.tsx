@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { ThemeEditorPage } from '@/domains/event'
 
 /**
  * Event theme tab route
@@ -11,18 +12,5 @@ import { createFileRoute } from '@tanstack/react-router'
 export const Route = createFileRoute(
   '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/theme',
 )({
-  component: EventThemePage,
+  component: ThemeEditorPage,
 })
-
-function EventThemePage() {
-  const { eventId } = Route.useParams()
-
-  return (
-    <div>
-      <h2 className="text-xl font-semibold mb-4">Theme</h2>
-      <p className="text-muted-foreground">
-        Theme customization for event {eventId} – work in progress.
-      </p>
-    </div>
-  )
-}
