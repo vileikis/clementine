@@ -1,1 +1,1 @@
-export { useUpdateShareOptions } from './useUpdateShareOptions'
+export { useUpdateOverlays } from './useUpdateOverlays'

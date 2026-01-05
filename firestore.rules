@@ -1,0 +1,42 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isMember(workspaceId) {
+      return isAuthenticated() &&
+             exists(/databases/$(database)/documents/workspaces/$(workspaceId)/members/$(request.auth.uid));
+    }
+
+    function isAdmin(workspaceId) {
+      return isAuthenticated() &&
+             get(/databases/$(database)/documents/workspaces/$(workspaceId)/members/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // MediaAsset rules (NEW - 013-event-settings-overlays)
+    match /workspaces/{workspaceId}/mediaAssets/{assetId} {
+      // Any workspace member can read media assets
+      allow read: if isMember(workspaceId);
+
+      // Only admins can create media assets
+      allow create: if isAdmin(workspaceId) &&
+                       request.resource.data.keys().hasAll([
+                         'fileName', 'filePath', 'url', 'fileSize', 'mimeType',
+                         'width', 'height', 'uploadedAt', 'uploadedBy', 'type', 'status'
+                       ]) &&
+                       request.resource.data.status == 'active' &&
+                       request.resource.data.fileSize <= 5 * 1024 * 1024 &&  // 5MB max
+                       request.resource.data.mimeType in ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+
+      // Only admins can update (soft delete)
+      allow update: if isAdmin(workspaceId) &&
+                       request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']) &&
+                       request.resource.data.status == 'deleted';
+    }
+
+    // Add other collection rules here as needed
+  }
+}

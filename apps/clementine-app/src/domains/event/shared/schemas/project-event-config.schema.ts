@@ -15,13 +15,35 @@ import { themeSchema } from '@/shared/theming/schemas/theme.schemas'
 export const CURRENT_CONFIG_VERSION = 1
 
 /**
+ * Overlay Reference Schema
+ *
+ * References a MediaAsset document for use as an overlay
+ * Stores both ID (tracking) and URL (fast rendering)
+ */
+export const overlayReferenceSchema = z
+  .object({
+    /**
+     * MediaAsset document ID
+     * Reference: workspaces/{workspaceId}/mediaAssets/{mediaAssetId}
+     */
+    mediaAssetId: z.string(),
+
+    /**
+     * Firebase Storage download URL
+     * Fast rendering without extra Firestore query or getDownloadURL call
+     */
+    url: z.string().url(),
+  })
+  .nullable()
+
+/**
  * Overlay images for different aspect ratios
  * Applied to guest photos based on their orientation
  */
 export const overlaysConfigSchema = z
   .object({
-    '1:1': z.string().url().nullable().default(null),
-    '9:16': z.string().url().nullable().default(null),
+    '1:1': overlayReferenceSchema.default(null),
+    '9:16': overlayReferenceSchema.default(null),
   })
   .nullable()
   .default(null)
@@ -81,5 +103,6 @@ export const projectEventConfigSchema = z.looseObject({
  * TypeScript types exported from schemas
  */
 export type ProjectEventConfig = z.infer<typeof projectEventConfigSchema>
+export type OverlayReference = z.infer<typeof overlayReferenceSchema>
 export type OverlaysConfig = z.infer<typeof overlaysConfigSchema>
 export type SharingConfig = z.infer<typeof sharingConfigSchema>

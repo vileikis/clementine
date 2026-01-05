@@ -1,0 +1,33 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isMember(workspaceId) {
+      return isAuthenticated() &&
+             firestore.exists(/databases/(default)/documents/workspaces/$(workspaceId)/members/$(request.auth.uid));
+    }
+
+    function isAdmin(workspaceId) {
+      return isAuthenticated() &&
+             firestore.get(/databases/(default)/documents/workspaces/$(workspaceId)/members/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Media files rules (NEW - 013-event-settings-overlays)
+    match /workspaces/{workspaceId}/media/{fileName} {
+      // Any workspace member can read files
+      allow read: if isMember(workspaceId);
+
+      // Only admins can upload files
+      allow create: if isAdmin(workspaceId) &&
+                       request.resource.size <= 5 * 1024 * 1024 &&  // 5MB max
+                       request.resource.contentType.matches('image/(png|jpeg|jpg|webp)');
+
+      // No updates or deletes (files are immutable)
+      allow update, delete: if false;
+    }
+  }
+}
