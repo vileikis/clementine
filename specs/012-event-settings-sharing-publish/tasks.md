@@ -74,11 +74,11 @@
 
 ### Implementation for User Story 2
 
-- [ ] T015 [P] [US2] Create SharingOptionCard component in apps/clementine-app/src/domains/event/settings/components/SharingOptionCard.tsx
-- [ ] T016 [P] [US2] Create SharingSection component in apps/clementine-app/src/domains/event/settings/components/SharingSection.tsx
-- [ ] T017 [US2] Create SettingsSharingPage container in apps/clementine-app/src/domains/event/settings/containers/SettingsSharingPage.tsx (depends on T016)
-- [ ] T018 [US2] Update settings barrel export to include SharingSection and SettingsSharingPage in apps/clementine-app/src/domains/event/settings/index.ts
-- [ ] T019 [US2] Update settings route to use SettingsSharingPage in apps/clementine-app/src/app/workspace/$workspaceSlug.projects/$projectId.events/$eventId.settings.tsx
+- [X] T015 [P] [US2] Create SharingOptionCard component in apps/clementine-app/src/domains/event/settings/components/SharingOptionCard.tsx
+- [X] T016 [P] [US2] Create SharingSection component in apps/clementine-app/src/domains/event/settings/components/SharingSection.tsx
+- [X] T017 [US2] Create SettingsSharingPage container in apps/clementine-app/src/domains/event/settings/containers/SettingsSharingPage.tsx (depends on T016)
+- [X] T018 [US2] Update settings barrel export to include SharingSection and SettingsSharingPage in apps/clementine-app/src/domains/event/settings/index.ts
+- [X] T019 [US2] Update settings route to use SettingsSharingPage in apps/clementine-app/src/app/workspace/$workspaceSlug.projects/$projectId.events/$eventId.settings.tsx
 
 **Checkpoint**: Settings tab renders, sharing cards toggle correctly, auto-save works, draftVersion increments
 
@@ -92,13 +92,13 @@
 
 ### Implementation for User Story 3
 
-- [ ] T020 [US3] Verify EventDesignerLayout hasUnpublishedChanges logic detects never-published state (publishedVersion === null)
-- [ ] T021 [US3] Verify EventDesignerLayout hasUnpublishedChanges logic detects new changes (draftVersion > publishedVersion)
-- [ ] T022 [US3] Verify EventDesignerTopBar shows "New changes" badge when hasUnpublishedChanges is true
-- [ ] T023 [US3] Verify EventDesignerTopBar hides badge when hasUnpublishedChanges is false
-- [ ] T024 [US3] Verify publish button calls usePublishEvent mutation and shows loading state
-- [ ] T025 [US3] Verify publish success shows toast notification "Event published successfully"
-- [ ] T026 [US3] Verify publish failure shows error toast with error message
+- [X] T020 [US3] Verify EventDesignerLayout hasUnpublishedChanges logic detects never-published state (publishedVersion === null)
+- [X] T021 [US3] Verify EventDesignerLayout hasUnpublishedChanges logic detects new changes (draftVersion > publishedVersion)
+- [X] T022 [US3] Verify EventDesignerTopBar shows "New changes" badge when hasUnpublishedChanges is true
+- [X] T023 [US3] Verify EventDesignerTopBar hides badge when hasUnpublishedChanges is false
+- [X] T024 [US3] Verify publish button calls usePublishEvent mutation and shows loading state
+- [X] T025 [US3] Verify publish success shows toast notification "Event published successfully"
+- [X] T026 [US3] Verify publish failure shows error toast with error message
 
 **Checkpoint**: Complete draft/publish workflow functional - edit → auto-save → publish → sync
 
