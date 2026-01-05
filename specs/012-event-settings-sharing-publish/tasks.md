@@ -108,25 +108,25 @@
 
 **Purpose**: Final validation, accessibility, mobile testing, code quality
 
-- [ ] T027 [P] Manual test: Complete flow (edit → auto-save → publish) on desktop
-- [ ] T028 [P] Manual test: Complete flow (edit → auto-save → publish) on mobile (320px viewport)
-- [ ] T029 [P] Accessibility test: Keyboard navigation (Tab, Enter, Space) works for all interactive elements
-- [ ] T030 [P] Accessibility test: All buttons have >= 44x44px touch targets
-- [ ] T031 [P] Accessibility test: Cards have correct aria-pressed state when toggled
-- [ ] T032 Manual test: Auto-save debouncing (toggle multiple cards quickly, verify only 1 Firestore write after 300ms)
-- [ ] T033 Manual test: Deep merge preserves existing social flags (toggle Instagram, verify Facebook flag unchanged)
-- [ ] T034 Manual test: Lazy initialization creates draftConfig on first edit (start with null draftConfig)
-- [ ] T035 Manual test: Edge case - publish button disabled when no draftConfig exists
-- [ ] T036 Manual test: Edge case - publish button disabled when draftVersion === publishedVersion
-- [ ] T037 [P] Code quality: Run pnpm check (format + lint) in apps/clementine-app/
-- [ ] T038 [P] Code quality: Run pnpm type-check in apps/clementine-app/
-- [ ] T039 [P] Standards compliance: Verify using theme tokens (no hard-coded colors) in all new components
-- [ ] T040 [P] Standards compliance: Verify paired background/foreground colors (bg-blue-50 + text-blue-600)
-- [ ] T041 [P] Standards compliance: Verify all components follow shadcn/ui patterns (Button, cn() utility)
-- [ ] T042 [P] Standards compliance: Verify domain structure follows DDD (event domain owns UI)
-- [ ] T043 [P] Standards compliance: Verify barrel exports correct (only public API exported)
-- [ ] T044 Verify Firestore security rules allow draftConfig and publishedConfig updates (if not already present)
-- [ ] T045 Run quickstart.md validation - execute all manual test scenarios from quickstart guide
+- [X] T027 [P] Manual test: Complete flow (edit → auto-save → publish) on desktop
+- [X] T028 [P] Manual test: Complete flow (edit → auto-save → publish) on mobile (320px viewport)
+- [X] T029 [P] Accessibility test: Keyboard navigation (Tab, Enter, Space) works for all interactive elements
+- [X] T030 [P] Accessibility test: All buttons have >= 44x44px touch targets
+- [X] T031 [P] Accessibility test: Cards have correct aria-pressed state when toggled
+- [X] T032 Manual test: Auto-save debouncing (toggle multiple cards quickly, verify only 1 Firestore write after 300ms)
+- [X] T033 Manual test: Deep merge preserves existing social flags (toggle Instagram, verify Facebook flag unchanged)
+- [X] T034 Manual test: Lazy initialization creates draftConfig on first edit (start with null draftConfig)
+- [X] T035 Manual test: Edge case - publish button disabled when no draftConfig exists
+- [X] T036 Manual test: Edge case - publish button disabled when draftVersion === publishedVersion
+- [X] T037 [P] Code quality: Run pnpm check (format + lint) in apps/clementine-app/
+- [X] T038 [P] Code quality: Run pnpm type-check in apps/clementine-app/
+- [X] T039 [P] Standards compliance: Verify using theme tokens (no hard-coded colors) in all new components
+- [X] T040 [P] Standards compliance: Verify paired background/foreground colors (bg-blue-50 + text-blue-600)
+- [X] T041 [P] Standards compliance: Verify all components follow shadcn/ui patterns (Button, cn() utility)
+- [X] T042 [P] Standards compliance: Verify domain structure follows DDD (event domain owns UI)
+- [X] T043 [P] Standards compliance: Verify barrel exports correct (only public API exported)
+- [X] T044 Verify Firestore security rules allow draftConfig and publishedConfig updates (if not already present)
+- [X] T045 Run quickstart.md validation - execute all manual test scenarios from quickstart guide
 
 ---
 
