@@ -85,6 +85,7 @@ export function EventDesignerLayout({
   return (
     <div className="flex h-screen flex-col">
       <TopNavBar
+        className="shrink-0"
         breadcrumbs={[
           {
             label: project.name,
