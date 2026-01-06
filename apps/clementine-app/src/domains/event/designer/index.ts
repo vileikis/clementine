@@ -5,8 +5,7 @@
  */
 
 // Containers
-export { EventDesignerPage } from './containers/EventDesignerPage'
-export { EventDesignerLayout } from './containers/EventDesignerLayout'
+export * from './containers'
 
 // Hooks
-export { usePublishEvent } from './hooks/usePublishEvent'
+export * from './hooks'
