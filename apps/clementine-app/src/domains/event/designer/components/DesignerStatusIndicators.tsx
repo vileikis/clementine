@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Check, Loader2 } from 'lucide-react'
-import { useEventDesignerStore } from '../stores/useEventDesignerStore'
+import { useEventDesignerStore } from '../stores'
 
 /**
  * Status indicators for the event designer.

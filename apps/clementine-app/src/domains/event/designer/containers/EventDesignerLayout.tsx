@@ -7,12 +7,15 @@
 import { useEffect, useMemo } from 'react'
 import { FolderOpen, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
-import { usePublishEvent } from '../hooks/usePublishEvent'
-import { DesignerStatusIndicators } from '../components'
+import { usePublishEvent } from '../hooks'
+import {
+  DesignerStatusIndicators,
+  UnpublishedChangesBadge,
+} from '../components'
 import { useEventDesignerStore } from '../stores'
 import { EventDesignerPage } from './EventDesignerPage'
-import type { ProjectEventFull } from '@/domains/event/shared/schemas'
-import type { Project } from '@/domains/workspace/projects/types/project.types'
+import type { ProjectEventFull } from '@/domains/event/shared'
+import type { Project } from '@/domains/workspace/projects'
 import { Button } from '@/ui-kit/components/button'
 import { TopNavBar } from '@/domains/navigation'
 
@@ -96,12 +99,10 @@ export function EventDesignerLayout({
         right={
           <>
             <DesignerStatusIndicators />
-            {hasUnpublishedChanges && (
-              <div className="flex items-center gap-1.5 rounded-full bg-yellow-50 dark:bg-yellow-950 px-2.5 py-1 text-xs font-medium text-yellow-700 dark:text-yellow-400">
-                <div className="h-2 w-2 rounded-full bg-yellow-500" />
-                New changes
-              </div>
-            )}
+            <UnpublishedChangesBadge
+              draftVersion={event.draftVersion}
+              publishedVersion={event.publishedVersion}
+            />
             <Button variant="outline" disabled>
               Preview
             </Button>
