@@ -33,11 +33,8 @@
  */
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import * as Sentry from '@sentry/tanstackstart-react'
-import {
-
-  updateSharingConfigSchema
-} from '../schemas'
-import type {UpdateSharingConfig} from '../schemas';
+import { updateSharingConfigSchema } from '../schemas'
+import type { UpdateSharingConfig } from '../schemas'
 import { prefixKeys, updateEventConfigField } from '@/domains/event/shared'
 
 /**
