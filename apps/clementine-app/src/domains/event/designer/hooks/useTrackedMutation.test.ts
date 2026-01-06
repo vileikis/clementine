@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { renderHook, waitFor } from '@testing-library/react'
+import { act, renderHook, waitFor } from '@testing-library/react'
 import { useEventDesignerStore } from '../stores/useEventDesignerStore'
 import { useTrackedMutation } from './useTrackedMutation'
 import type { UseMutationResult } from '@tanstack/react-query'
@@ -30,8 +30,10 @@ function createMockMutation(
 
 describe('useTrackedMutation', () => {
   beforeEach(() => {
-    // Reset store state before each test
-    useEventDesignerStore.getState().resetSaveState()
+    // Reset store state before each test (wrap in act to avoid warnings)
+    act(() => {
+      useEventDesignerStore.getState().resetSaveState()
+    })
   })
 
   it('should call startSave on idle → pending transition', async () => {
@@ -55,8 +57,10 @@ describe('useTrackedMutation', () => {
 
     const { rerender } = renderHook(() => useTrackedMutation(mutation))
 
-    // Manually increment to simulate the save started
-    useEventDesignerStore.getState().startSave()
+    // Manually increment to simulate the save started (wrap in act)
+    act(() => {
+      useEventDesignerStore.getState().startSave()
+    })
     expect(useEventDesignerStore.getState().pendingSaves).toBe(1)
 
     // Transition to idle

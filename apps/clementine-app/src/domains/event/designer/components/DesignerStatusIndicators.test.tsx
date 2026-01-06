@@ -5,8 +5,10 @@ import { DesignerStatusIndicators } from './DesignerStatusIndicators'
 
 describe('DesignerStatusIndicators', () => {
   beforeEach(() => {
-    // Reset store state before each test
-    useEventDesignerStore.getState().resetSaveState()
+    // Reset store state before each test (wrap in act)
+    act(() => {
+      useEventDesignerStore.getState().resetSaveState()
+    })
     vi.useFakeTimers()
   })
 
@@ -24,7 +26,9 @@ describe('DesignerStatusIndicators', () => {
   it('should show spinner when pendingSaves > 0', () => {
     const { startSave } = useEventDesignerStore.getState()
 
-    startSave()
+    act(() => {
+      startSave()
+    })
 
     render(<DesignerStatusIndicators />)
 
@@ -39,8 +43,10 @@ describe('DesignerStatusIndicators', () => {
   it('should show checkmark for 3 seconds after save completes', () => {
     const { startSave, completeSave } = useEventDesignerStore.getState()
 
-    startSave()
-    completeSave()
+    act(() => {
+      startSave()
+      completeSave()
+    })
 
     render(<DesignerStatusIndicators />)
 
@@ -61,8 +67,10 @@ describe('DesignerStatusIndicators', () => {
     const { startSave, completeSave } = useEventDesignerStore.getState()
 
     // Complete a save
-    startSave()
-    completeSave()
+    act(() => {
+      startSave()
+      completeSave()
+    })
 
     const { rerender } = render(<DesignerStatusIndicators />)
 
@@ -72,8 +80,8 @@ describe('DesignerStatusIndicators', () => {
     // Start a new save before 3 seconds
     act(() => {
       vi.advanceTimersByTime(1000) // 1 second elapsed
+      startSave()
     })
-    startSave()
     rerender(<DesignerStatusIndicators />)
 
     // Spinner should replace checkmark
@@ -84,8 +92,10 @@ describe('DesignerStatusIndicators', () => {
   it('should clean up timer on unmount', () => {
     const { startSave, completeSave } = useEventDesignerStore.getState()
 
-    startSave()
-    completeSave()
+    act(() => {
+      startSave()
+      completeSave()
+    })
 
     const { unmount } = render(<DesignerStatusIndicators />)
 
@@ -102,9 +112,11 @@ describe('DesignerStatusIndicators', () => {
   it('should show spinner for multiple concurrent saves', () => {
     const { startSave } = useEventDesignerStore.getState()
 
-    startSave()
-    startSave()
-    startSave()
+    act(() => {
+      startSave()
+      startSave()
+      startSave()
+    })
 
     render(<DesignerStatusIndicators />)
 
@@ -114,8 +126,10 @@ describe('DesignerStatusIndicators', () => {
   it('should NOT show checkmark until ALL saves complete', () => {
     const { startSave, completeSave } = useEventDesignerStore.getState()
 
-    startSave()
-    startSave()
+    act(() => {
+      startSave()
+      startSave()
+    })
 
     const { rerender } = render(<DesignerStatusIndicators />)
 
@@ -123,7 +137,9 @@ describe('DesignerStatusIndicators', () => {
     expect(screen.getByText('Saving changes...')).toBeTruthy()
 
     // Complete first save
-    completeSave()
+    act(() => {
+      completeSave()
+    })
     rerender(<DesignerStatusIndicators />)
 
     // Spinner should STILL be visible (one save pending)
@@ -131,7 +147,9 @@ describe('DesignerStatusIndicators', () => {
     expect(screen.queryByText('Changes saved successfully')).not.toBeTruthy()
 
     // Complete second save
-    completeSave()
+    act(() => {
+      completeSave()
+    })
     rerender(<DesignerStatusIndicators />)
 
     // Now checkmark should appear
@@ -141,7 +159,9 @@ describe('DesignerStatusIndicators', () => {
   it('should have proper ARIA attributes', () => {
     const { startSave } = useEventDesignerStore.getState()
 
-    startSave()
+    act(() => {
+      startSave()
+    })
 
     const { container } = render(<DesignerStatusIndicators />)
 
@@ -156,11 +176,15 @@ describe('DesignerStatusIndicators', () => {
     const { rerender } = render(<DesignerStatusIndicators />)
 
     // Rapid sequence: start → complete → start → complete
-    startSave()
+    act(() => {
+      startSave()
+    })
     rerender(<DesignerStatusIndicators />)
     expect(screen.getByText('Saving changes...')).toBeTruthy()
 
-    completeSave()
+    act(() => {
+      completeSave()
+    })
     rerender(<DesignerStatusIndicators />)
     expect(screen.getByText('Changes saved successfully')).toBeTruthy()
 
@@ -168,11 +192,15 @@ describe('DesignerStatusIndicators', () => {
       vi.advanceTimersByTime(500) // Wait 0.5 seconds
     })
 
-    startSave()
+    act(() => {
+      startSave()
+    })
     rerender(<DesignerStatusIndicators />)
     expect(screen.getByText('Saving changes...')).toBeTruthy()
 
-    completeSave()
+    act(() => {
+      completeSave()
+    })
     rerender(<DesignerStatusIndicators />)
     expect(screen.getByText('Changes saved successfully')).toBeTruthy()
   })
