@@ -1,7 +1,6 @@
-import { useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { Upload, X } from 'lucide-react'
 import type { OverlayReference } from '@/domains/event/shared'
-import { Button } from '@/ui-kit/components/button'
 import { Card } from '@/ui-kit/components/card'
 import { Progress } from '@/ui-kit/components/ui/progress'
 
@@ -10,6 +9,11 @@ interface OverlayFrameProps {
    * Aspect ratio label (e.g., "1:1 Square", "9:16 Portrait")
    */
   label: string
+
+  /**
+   * Aspect ratio value (e.g., "1:1", "9:16")
+   */
+  ratio: string
 
   /**
    * Current overlay reference (null if none)
@@ -44,6 +48,7 @@ interface OverlayFrameProps {
 
 export function OverlayFrame({
   label,
+  ratio,
   overlayRef,
   onUpload,
   onRemove,
@@ -53,7 +58,9 @@ export function OverlayFrame({
 }: OverlayFrameProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isDragging, setIsDragging] = useState(false)
-  const [isHoveringRemove, setIsHoveringRemove] = useState(false)
+
+  // Convert ratio format (1:1 -> 1/1, 9:16 -> 9/16)
+  const cssRatio = useMemo(() => ratio.replace(':', '/'), [ratio])
 
   // Drag and drop handlers
   const handleDrop = (e: React.DragEvent) => {
@@ -97,91 +104,111 @@ export function OverlayFrame({
   // State: Empty
   if (!overlayRef && !isUploading) {
     return (
-      <Card
-        className={`relative flex flex-col items-center justify-center gap-3 border-2 border-dashed p-6 transition-colors ${
-          isDragging
-            ? 'border-primary bg-primary/5'
-            : 'border-border hover:border-primary/50 hover:bg-muted/50'
-        } cursor-pointer`}
-        onDrop={handleDrop}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onClick={handleClick}
-      >
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/png,image/jpeg,image/jpg,image/webp"
-          onChange={handleFileInput}
-          style={{ display: 'none' }}
-          aria-label={`Upload ${label} overlay image`}
-        />
-        <Upload className="h-8 w-8 text-muted-foreground" />
-        <div className="text-center">
-          <p className="text-sm font-medium">{label}</p>
-          <p className="text-xs text-muted-foreground">
-            Drop image or click to upload
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            PNG, JPG, WebP • Max 5MB
-          </p>
-        </div>
-      </Card>
+      <div className="max-w-xs">
+        <Card className="relative border-0 shadow-none p-0 ">
+          <div
+            className={`relative w-full h-80 flex items-center justify-center border-2 border-dashed transition-colors cursor-pointer ${
+              isDragging
+                ? 'border-primary bg-primary/5'
+                : 'border-border hover:border-primary/50 hover:bg-muted/50'
+            }`}
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onClick={handleClick}
+          >
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/jpg,image/webp"
+              onChange={handleFileInput}
+              style={{ display: 'none' }}
+              aria-label={`Upload ${label} overlay image`}
+            />
+            <div
+              className="relative h-full max-w-full flex flex-col items-center justify-center gap-3 p-2"
+              style={{ aspectRatio: cssRatio }}
+            >
+              <Upload className="h-8 w-8 text-muted-foreground" />
+              <div className="text-center">
+                <p className="text-sm font-medium">{label}</p>
+                <p className="text-xs text-muted-foreground">
+                  Drop image or click to upload
+                </p>
+              </div>
+            </div>
+          </div>
+        </Card>
+        <p className="text-sm text-center text-muted-foreground mt-2">
+          {label}
+        </p>
+      </div>
     )
   }
 
   // State: Uploading
   if (isUploading) {
     return (
-      <Card className="relative flex flex-col gap-3 border-2 p-6">
-        <div className="text-center">
-          <p className="text-sm font-medium">{label}</p>
-          <p className="text-xs text-muted-foreground">
-            {uploadingFileName || 'Uploading...'}
-          </p>
-        </div>
-        <Progress value={uploadProgress} className="h-2" />
-        <p
-          className="text-center text-xs text-muted-foreground"
-          aria-live="polite"
-        >
-          Uploading {Math.round(uploadProgress)}%
+      <div className="max-w-xs">
+        <Card className="relative border-0 shadow-none p-0">
+          <div className="relative w-full h-80 flex items-center justify-center">
+            <div
+              className="relative h-full max-w-full flex flex-col items-center justify-center gap-3 px-6"
+              style={{ aspectRatio: cssRatio }}
+            >
+              <div className="text-center">
+                <p className="text-sm font-medium">{label}</p>
+                <p className="text-xs text-muted-foreground">
+                  {uploadingFileName || 'Uploading...'}
+                </p>
+              </div>
+              <Progress value={uploadProgress} className="h-2 w-full" />
+              <p
+                className="text-center text-xs text-muted-foreground"
+                aria-live="polite"
+              >
+                Uploading {Math.round(uploadProgress)}%
+              </p>
+            </div>
+          </div>
+        </Card>
+        <p className="text-sm text-center text-muted-foreground mt-2">
+          {label}
         </p>
-      </Card>
+      </div>
     )
   }
 
   // State: Uploaded
   if (overlayRef) {
     return (
-      <Card
-        className="group relative overflow-hidden border-2 p-0"
-        onMouseEnter={() => setIsHoveringRemove(true)}
-        onMouseLeave={() => setIsHoveringRemove(false)}
-      >
-        <div className="aspect-square w-full">
-          <img
-            src={overlayRef.url}
-            alt={`${label} overlay`}
-            className="h-full w-full object-cover"
-          />
-        </div>
-        {isHoveringRemove && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/50 transition-opacity">
-            <Button
-              variant="destructive"
-              size="icon"
-              onClick={handleRemove}
-              aria-label={`Remove ${label} overlay`}
+      <div className="max-w-xs group">
+        <Card className="relative border-0 shadow-none p-0 transition-all hover:shadow-md">
+          <div className="relative w-full h-80 flex items-center justify-center">
+            <div
+              className="relative h-full max-w-full bg-muted"
+              style={{ aspectRatio: cssRatio }}
             >
-              <X className="h-5 w-5" />
-            </Button>
+              <img
+                src={overlayRef.url}
+                alt={`${label} overlay`}
+                className="w-full h-full object-contain"
+              />
+              {/* Remove button - always visible on mobile (< md), visible on hover for desktop */}
+              <button
+                onClick={handleRemove}
+                className="absolute top-2 right-2 p-1.5 bg-background/80 hover:bg-background rounded-full shadow-md transition-all cursor-pointer md:opacity-0 md:group-hover:opacity-100"
+                aria-label={`Remove ${label} overlay`}
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
           </div>
-        )}
-        <div className="p-2 text-center">
-          <p className="text-xs font-medium">{label}</p>
-        </div>
-      </Card>
+        </Card>
+        <p className="text-sm text-center text-muted-foreground mt-2">
+          {label}
+        </p>
+      </div>
     )
   }
 
