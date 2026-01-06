@@ -38,9 +38,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import * as Sentry from '@sentry/tanstackstart-react'
 import {
-  updateEventConfigField,
-  updateOverlaysConfigSchema,
-} from '@/domains/event/shared'
+  
+  updateOverlaysConfigSchema
+} from '../schemas'
+import type {UpdateOverlaysConfig} from '../schemas';
+import { updateEventConfigField } from '@/domains/event/shared'
 
 /**
  * Hook for updating event overlays with domain-specific tracking
@@ -49,7 +51,7 @@ export function useUpdateOverlays(projectId: string, eventId: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (updates: Record<string, unknown>) => {
+    mutationFn: async (updates: UpdateOverlaysConfig) => {
       // Validate partial overlay updates
       const validated = updateOverlaysConfigSchema.parse(updates)
 

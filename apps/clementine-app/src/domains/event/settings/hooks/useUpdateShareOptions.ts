@@ -33,6 +33,11 @@
  */
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import * as Sentry from '@sentry/tanstackstart-react'
+import {
+  
+  updateSharingConfigSchema
+} from '../schemas'
+import type {UpdateSharingConfig} from '../schemas';
 import { updateEventConfigField } from '@/domains/event/shared'
 
 /**
@@ -42,10 +47,13 @@ export function useUpdateShareOptions(projectId: string, eventId: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (updates: Record<string, unknown>) => {
+    mutationFn: async (updates: UpdateSharingConfig) => {
+      // Validate partial sharing updates
+      const validated = updateSharingConfigSchema.parse(updates)
+
       // Transform to dot notation with 'sharing.' prefix
       const dotNotationUpdates: Record<string, unknown> = {}
-      for (const [key, value] of Object.entries(updates)) {
+      for (const [key, value] of Object.entries(validated)) {
         dotNotationUpdates[`sharing.${key}`] = value
       }
 
