@@ -34,11 +34,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import * as Sentry from '@sentry/tanstackstart-react'
 import {
-  
+
   updateSharingConfigSchema
 } from '../schemas'
 import type {UpdateSharingConfig} from '../schemas';
-import { updateEventConfigField } from '@/domains/event/shared'
+import { prefixKeys, updateEventConfigField } from '@/domains/event/shared'
 
 /**
  * Hook for updating event sharing options with domain-specific tracking
@@ -52,10 +52,7 @@ export function useUpdateShareOptions(projectId: string, eventId: string) {
       const validated = updateSharingConfigSchema.parse(updates)
 
       // Transform to dot notation with 'sharing.' prefix
-      const dotNotationUpdates: Record<string, unknown> = {}
-      for (const [key, value] of Object.entries(validated)) {
-        dotNotationUpdates[`sharing.${key}`] = value
-      }
+      const dotNotationUpdates = prefixKeys(validated, 'sharing')
 
       // Use shared helper for atomic Firestore update
       await updateEventConfigField(projectId, eventId, dotNotationUpdates)

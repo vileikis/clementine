@@ -38,11 +38,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import * as Sentry from '@sentry/tanstackstart-react'
 import {
-  
+
   updateOverlaysConfigSchema
 } from '../schemas'
 import type {UpdateOverlaysConfig} from '../schemas';
-import { updateEventConfigField } from '@/domains/event/shared'
+import { prefixKeys, updateEventConfigField } from '@/domains/event/shared'
 
 /**
  * Hook for updating event overlays with domain-specific tracking
@@ -58,10 +58,7 @@ export function useUpdateOverlays(projectId: string, eventId: string) {
       console.log('------validated', JSON.stringify(validated, null, 2))
 
       // Transform to dot notation with 'overlays.' prefix
-      const dotNotationUpdates: Record<string, unknown> = {}
-      for (const [key, value] of Object.entries(validated)) {
-        dotNotationUpdates[`overlays.${key}`] = value
-      }
+      const dotNotationUpdates = prefixKeys(validated, 'overlays')
 
       console.log(
         '------dotNotationUpdates',
