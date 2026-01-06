@@ -18,3 +18,4 @@ export * from './types'
 
 // Lib
 export { updateEventConfigField } from './lib/updateEventConfigField'
+export { prefixKeys } from './lib/prefixKeys'

@@ -82,8 +82,14 @@ describe('projectEventConfigSchema', () => {
         schemaVersion: 1,
         theme: null,
         overlays: {
-          '1:1': 'https://storage.googleapis.com/square.png',
-          '9:16': 'https://storage.googleapis.com/portrait.png',
+          '1:1': {
+            mediaAssetId: 'asset-123',
+            url: 'https://storage.googleapis.com/square.png',
+          },
+          '9:16': {
+            mediaAssetId: 'asset-456',
+            url: 'https://storage.googleapis.com/portrait.png',
+          },
         },
         sharing: null,
       }
@@ -155,8 +161,14 @@ describe('projectEventConfigSchema', () => {
 
     it('should validate overlays with valid URLs', () => {
       const validOverlays = {
-        '1:1': 'https://example.com/square.png',
-        '9:16': 'https://example.com/portrait.png',
+        '1:1': {
+          mediaAssetId: 'asset-123',
+          url: 'https://example.com/square.png',
+        },
+        '9:16': {
+          mediaAssetId: 'asset-456',
+          url: 'https://example.com/portrait.png',
+        },
       }
 
       const result = overlaysConfigSchema.parse(validOverlays)
@@ -165,7 +177,10 @@ describe('projectEventConfigSchema', () => {
 
     it('should validate partial overlays (null for missing aspect ratios)', () => {
       const partialOverlays = {
-        '1:1': 'https://example.com/square.png',
+        '1:1': {
+          mediaAssetId: 'asset-123',
+          url: 'https://example.com/square.png',
+        },
         '9:16': null,
       }
 
@@ -175,7 +190,10 @@ describe('projectEventConfigSchema', () => {
 
     it('should reject invalid URLs', () => {
       const invalidOverlays = {
-        '1:1': 'not-a-url',
+        '1:1': {
+          mediaAssetId: 'asset-123',
+          url: 'not-a-url',
+        },
         '9:16': null,
       }
 
