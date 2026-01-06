@@ -33,7 +33,7 @@
  */
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import * as Sentry from '@sentry/tanstackstart-react'
-import { updateEventConfigField } from '@/domains/event/shared/lib/updateEventConfigField'
+import { updateEventConfigField } from '@/domains/event/shared'
 
 /**
  * Hook for updating event sharing options with domain-specific tracking

@@ -1,11 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { doc, increment, updateDoc } from 'firebase/firestore'
-import type {OverlayReference} from '@/domains/event/shared/schemas/project-event-config.schema';
+import type { OverlayReference } from '@/domains/event/shared'
 import { firestore } from '@/integrations/firebase/client'
-import {
-  
-  overlaysConfigSchema
-} from '@/domains/event/shared/schemas/project-event-config.schema'
+import { overlaysConfigSchema } from '@/domains/event/shared'
 
 /**
  * Update overlays parameters

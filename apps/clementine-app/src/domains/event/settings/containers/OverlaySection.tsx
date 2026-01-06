@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { OverlayFrame } from '../components/OverlayFrame'
+import { OverlayFrame } from '../components'
 import { useUpdateOverlays } from '../hooks'
-import type { OverlayReference } from '@/domains/event/shared/schemas/project-event-config.schema'
+import type { OverlayReference } from '@/domains/event/shared'
 import { useUploadMediaAsset } from '@/domains/media-library'
 
 interface OverlaySectionProps {
@@ -119,7 +119,7 @@ export function OverlaySection({
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-semibold">Overlay Images</h3>
+        <h3 className="text-2xl font-semibold">Overlay Images</h3>
         <p className="text-sm text-muted-foreground">
           Upload overlay images for different aspect ratios. These will be
           applied to guest photos.

@@ -3,30 +3,24 @@ service firebase.storage {
   match /b/{bucket}/o {
     // Helper functions
     function isAuthenticated() {
-      return request.auth != null;
+      return request.auth != null && !request.auth.token.isAnonymous;
     }
 
-    function isMember(workspaceId) {
-      return isAuthenticated() &&
-             firestore.exists(/databases/(default)/documents/workspaces/$(workspaceId)/members/$(request.auth.uid));
+    function isAdmin() {
+      return isAuthenticated() && request.auth.token.admin == true;
     }
 
-    function isAdmin(workspaceId) {
-      return isAuthenticated() &&
-             firestore.get(/databases/(default)/documents/workspaces/$(workspaceId)/members/$(request.auth.uid)).data.role == 'admin';
-    }
-
-    // Media files rules (NEW - 013-event-settings-overlays)
+    // Media files rules (013-event-settings-overlays)
+    // Authentication-based access control - file validation in client code
     match /workspaces/{workspaceId}/media/{fileName} {
-      // Any workspace member can read files
-      allow read: if isMember(workspaceId);
+      // Authenticated users can read files
+      allow read: if isAuthenticated();
 
       // Only admins can upload files
-      allow create: if isAdmin(workspaceId) &&
-                       request.resource.size <= 5 * 1024 * 1024 &&  // 5MB max
-                       request.resource.contentType.matches('image/(png|jpeg|jpg|webp)');
+      allow create: if isAdmin();
 
       // No updates or deletes (files are immutable)
+      // Deletes handled by Admin SDK scheduled jobs
       allow update, delete: if false;
     }
   }

@@ -1,51 +1,13 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { addDoc, collection } from 'firebase/firestore'
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage'
-import { nanoid } from 'nanoid'
+import {
+  generateFileName,
+  getImageDimensions,
+  validateFile,
+} from '../utils/upload.utils'
 import type { MediaAsset } from '../schemas/media-asset.schema'
 import { firestore, storage } from '@/integrations/firebase/client'
-
-// File validation constants
-const ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp']
-const MAX_SIZE = 5 * 1024 * 1024 // 5MB
-
-// Helper: Validate file type and size
-function validateFile(file: File): void {
-  if (!ALLOWED_TYPES.includes(file.type)) {
-    throw new Error('Only PNG, JPG, and WebP images are supported')
-  }
-  if (file.size > MAX_SIZE) {
-    throw new Error('File must be under 5MB')
-  }
-}
-
-// Helper: Extract image dimensions
-async function getImageDimensions(
-  file: File,
-): Promise<{ width: number; height: number }> {
-  return new Promise((resolve, reject) => {
-    const img = new Image()
-    const url = URL.createObjectURL(file)
-
-    img.onload = () => {
-      URL.revokeObjectURL(url)
-      resolve({ width: img.naturalWidth, height: img.naturalHeight })
-    }
-
-    img.onerror = () => {
-      URL.revokeObjectURL(url)
-      reject(new Error('Failed to load image'))
-    }
-
-    img.src = url
-  })
-}
-
-// Helper: Generate unique file name
-function generateFileName(originalFile: File): string {
-  const ext = originalFile.name.split('.').pop() || 'png'
-  return `overlay-${nanoid()}.${ext}`
-}
 
 // Upload media asset parameters
 interface UploadMediaAssetParams {
