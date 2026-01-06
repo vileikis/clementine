@@ -1,6 +1,5 @@
 import { useParams } from '@tanstack/react-router'
-import { SharingSection } from '../components'
-import { OverlaySection } from './OverlaySection'
+import { OverlaySection, SharingSection } from '../components'
 import { useProjectEvent } from '@/domains/event/shared'
 import { useAuth } from '@/domains/auth'
 import { useWorkspace } from '@/domains/workspace'

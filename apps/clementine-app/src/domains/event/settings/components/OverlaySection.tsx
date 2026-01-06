@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { OverlayFrame } from '../components'
 import { useUpdateOverlays } from '../hooks'
+import { OverlayFrame } from '.'
 import type { OverlayReference } from '@/domains/event/shared'
 import { useUploadMediaAsset } from '@/domains/media-library'
 

@@ -1,3 +1,7 @@
+// Sharing
 export { SharingSection } from './SharingSection'
-export { OverlayFrame } from './OverlayFrame'
 export { SharingOptionCard } from './SharingOptionCard'
+
+// Overlay
+export { OverlayFrame } from './OverlayFrame'
+export { OverlaySection } from './OverlaySection'
