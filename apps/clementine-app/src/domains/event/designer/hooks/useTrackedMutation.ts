@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { useEventDesignerStore } from '../stores/useEventDesignerStore'
+import { useEventDesignerStore } from '../stores'
 import type { UseMutationResult } from '@tanstack/react-query'
 
 /**

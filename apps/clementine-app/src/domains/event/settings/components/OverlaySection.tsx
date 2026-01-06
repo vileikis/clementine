@@ -1,9 +1,8 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { useUpdateOverlays } from '../hooks'
+import { useUpdateOverlays, useUploadAndUpdateOverlays } from '../hooks'
 import { OverlayFrame } from '.'
 import type { OverlayReference } from '@/domains/event/shared'
-import { useUploadMediaAsset } from '@/domains/media-library'
 
 interface OverlaySectionProps {
   /**
@@ -56,7 +55,15 @@ export function OverlaySection({
     fileName: '',
   })
 
-  const uploadAsset = useUploadMediaAsset(workspaceId, userId)
+  // Composition hook: Upload + update as single tracked operation
+  const uploadAndUpdate = useUploadAndUpdateOverlays(
+    projectId,
+    eventId,
+    workspaceId,
+    userId,
+  )
+
+  // For remove operation (config update only, no upload)
   const updateOverlays = useUpdateOverlays(projectId, eventId)
 
   // Handle upload for a specific aspect ratio
@@ -69,18 +76,14 @@ export function OverlaySection({
         fileName: file.name,
       })
 
-      // Upload to Storage + create MediaAsset
-      const { mediaAssetId, url } = await uploadAsset.mutateAsync({
+      // Single operation: Upload to Storage + update event config
+      // This is tracked as ONE save operation by useTrackedMutation
+      await uploadAndUpdate.mutateAsync({
         file,
-        type: 'overlay',
+        aspectRatio,
         onProgress: (progress) => {
           setUploadState((prev) => ({ ...prev, progress }))
         },
-      })
-
-      // Update event config
-      await updateOverlays.mutateAsync({
-        [aspectRatio]: { mediaAssetId, url },
       })
 
       // Success

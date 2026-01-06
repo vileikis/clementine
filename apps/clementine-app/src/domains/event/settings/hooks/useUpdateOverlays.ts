@@ -40,7 +40,7 @@ import * as Sentry from '@sentry/tanstackstart-react'
 import { updateOverlaysConfigSchema } from '../schemas'
 import type { UpdateOverlaysConfig } from '../schemas'
 import { prefixKeys, updateEventConfigField } from '@/domains/event/shared'
-import { useTrackedMutation } from '@/domains/event/designer/hooks'
+import { useTrackedMutation } from '@/domains/event/designer'
 
 /**
  * Hook for updating event overlays with domain-specific tracking

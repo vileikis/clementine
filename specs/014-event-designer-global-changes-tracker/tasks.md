@@ -112,10 +112,31 @@
 - [ ] T043 [P] [US2] Integrate useTrackedMutation in useUpdateShareOptions hook at apps/clementine-app/app/domains/event/settings/hooks/useUpdateShareOptions.ts
 - [ ] T044 [P] [US2] Wrap useMutation return with useTrackedMutation in useUpdateShareOptions.ts
 - [ ] T045 [P] [US2] Import useTrackedMutation from designer hooks in useUpdateShareOptions.ts
+- [X] T040a [US2] Create useUploadAndUpdateOverlays composition hook at apps/clementine-app/app/domains/event/settings/hooks/useUploadAndUpdateOverlays.ts
+- [X] T040b [US2] Update OverlaySection to use useUploadAndUpdateOverlays at apps/clementine-app/app/domains/event/settings/components/OverlaySection.tsx
+- [X] T040c [US2] Add useUploadAndUpdateOverlays to barrel exports at apps/clementine-app/app/domains/event/settings/hooks/index.ts
 - [ ] T046 [US2] Add DesignerStatusIndicators to EventDesignerLayout right slot in apps/clementine-app/app/domains/event/designer/containers/EventDesignerLayout.tsx
 - [ ] T047 [US2] Import DesignerStatusIndicators component in EventDesignerLayout.tsx
 - [ ] T048 [US2] Import useEventDesignerStore hook in EventDesignerLayout.tsx
 - [ ] T049 [US2] Add cleanup effect calling resetSaveState on unmount in EventDesignerLayout.tsx
+
+**Architecture Note - Composition Hook Pattern**:
+Tasks T040a-T040c implement a composition hook pattern to solve the overlay upload tracking issue.
+The problem was that overlay uploads involve TWO operations:
+1. Upload file to Storage (via useUploadMediaAsset from media-library domain)
+2. Update event config (via useUpdateOverlays from event/settings domain)
+
+Initially, only step 2 was tracked by useTrackedMutation, causing the save indicator to only show
+during config update, missing the longer file upload step.
+
+**Solution**: Create useUploadAndUpdateOverlays composition hook that:
+- Combines both operations into a single mutation
+- Wraps the composed mutation with useTrackedMutation
+- Treats upload + update as ONE atomic operation from user's perspective
+- Maintains clean domain separation (media-library remains event-agnostic)
+
+This pattern can be reused for other upload scenarios (backgrounds, logos, previews, etc.)
+by creating similar composition hooks (e.g., useUploadAndUpdateBackground).
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently - multiple saves tracked correctly
 
