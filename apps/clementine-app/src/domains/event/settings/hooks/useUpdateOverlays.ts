@@ -1,52 +1,94 @@
+/**
+ * Domain-Specific Hook: useUpdateOverlays
+ *
+ * Specialized mutation hook for updating event overlay configuration.
+ * Wraps updateEventConfigField with domain-specific error tracking.
+ *
+ * Why a separate hook?
+ * - Better error tracking (Sentry tags: "update-overlays")
+ * - Domain-specific semantics (clear intent)
+ * - Type safety for overlay fields
+ * - Easier debugging and monitoring
+ *
+ * @param projectId - Project ID
+ * @param eventId - Event ID
+ * @returns TanStack Query mutation for overlay updates
+ *
+ * @example
+ * ```tsx
+ * const updateOverlays = useUpdateOverlays(projectId, eventId)
+ *
+ * // Update single overlay (doesn't affect other overlays)
+ * await updateOverlays.mutateAsync({
+ *   '1:1': { mediaAssetId: 'abc', url: 'https://...' }
+ * })
+ *
+ * // Update multiple overlays atomically
+ * await updateOverlays.mutateAsync({
+ *   '1:1': { mediaAssetId: 'abc', url: 'https://...' },
+ *   '9:16': { mediaAssetId: 'xyz', url: 'https://...' }
+ * })
+ *
+ * // Remove an overlay
+ * await updateOverlays.mutateAsync({
+ *   '1:1': null
+ * })
+ * ```
+ */
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { doc, increment, updateDoc } from 'firebase/firestore'
-import type { OverlayReference } from '@/domains/event/shared'
-import { firestore } from '@/integrations/firebase/client'
-import { overlaysConfigSchema } from '@/domains/event/shared'
+import * as Sentry from '@sentry/tanstackstart-react'
+import {
+  updateEventConfigField,
+  updateOverlaysConfigSchema,
+} from '@/domains/event/shared'
 
 /**
- * Update overlays parameters
- */
-interface UpdateOverlaysParams {
-  '1:1'?: OverlayReference | null
-  '9:16'?: OverlayReference | null
-}
-
-/**
- * Update event overlays
- */
-async function updateEventOverlays(
-  projectId: string,
-  eventId: string,
-  overlays: UpdateOverlaysParams,
-): Promise<void> {
-  // Validate overlay config
-  const validated = overlaysConfigSchema.parse(overlays)
-
-  // Get event document reference
-  const eventRef = doc(firestore, `projects/${projectId}/events/${eventId}`)
-
-  // Update event config
-  await updateDoc(eventRef, {
-    'draftConfig.overlays': validated,
-    draftVersion: increment(1),
-    updatedAt: Date.now(),
-  })
-}
-
-/**
- * Hook: Update event overlays
+ * Hook for updating event overlays with domain-specific tracking
  */
 export function useUpdateOverlays(projectId: string, eventId: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (overlays: UpdateOverlaysParams) =>
-      updateEventOverlays(projectId, eventId, overlays),
+    mutationFn: async (updates: Record<string, unknown>) => {
+      // Validate partial overlay updates
+      const validated = updateOverlaysConfigSchema.parse(updates)
+
+      console.log('------validated', JSON.stringify(validated, null, 2))
+
+      // Transform to dot notation with 'overlays.' prefix
+      const dotNotationUpdates: Record<string, unknown> = {}
+      for (const [key, value] of Object.entries(validated)) {
+        dotNotationUpdates[`overlays.${key}`] = value
+      }
+
+      console.log(
+        '------dotNotationUpdates',
+        JSON.stringify(dotNotationUpdates, null, 2),
+      )
+
+      // Use shared helper for atomic Firestore update
+      await updateEventConfigField(projectId, eventId, dotNotationUpdates)
+    },
+
+    // Success: invalidate queries to trigger re-fetch
     onSuccess: () => {
-      // Invalidate event query to trigger re-fetch
       queryClient.invalidateQueries({
-        queryKey: ['event', projectId, eventId],
+        queryKey: ['project-event', projectId, eventId],
+      })
+    },
+
+    // Error: report to Sentry for debugging
+    onError: (error) => {
+      Sentry.captureException(error, {
+        tags: {
+          domain: 'event/settings',
+          action: 'update-overlays',
+        },
+        extra: {
+          errorType: 'overlays-config-update-failure',
+          projectId,
+          eventId,
+        },
       })
     },
   })

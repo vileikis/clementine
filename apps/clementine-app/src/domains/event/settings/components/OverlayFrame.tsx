@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { Upload, X } from 'lucide-react'
-import type { OverlayReference } from '@/domains/event/shared/schemas/project-event-config.schema'
+import type { OverlayReference } from '@/domains/event/shared'
 import { Button } from '@/ui-kit/components/button'
 import { Card } from '@/ui-kit/components/card'
 import { Progress } from '@/ui-kit/components/ui/progress'
