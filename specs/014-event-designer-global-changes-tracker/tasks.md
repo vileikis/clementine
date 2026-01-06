@@ -25,12 +25,12 @@
 
 **Purpose**: Create folder structure and barrel exports for new designer domain components
 
-- [ ] T001 Create stores directory at apps/clementine-app/app/domains/event/designer/stores/
-- [ ] T002 [P] Create barrel export file apps/clementine-app/app/domains/event/designer/stores/index.ts
-- [ ] T003 [P] Verify hooks directory exists at apps/clementine-app/app/domains/event/designer/hooks/
-- [ ] T004 [P] Verify components directory exists at apps/clementine-app/app/domains/event/designer/components/
+- [X] T001 Create stores directory at apps/clementine-app/app/domains/event/designer/stores/
+- [X] T002 [P] Create barrel export file apps/clementine-app/app/domains/event/designer/stores/index.ts
+- [X] T003 [P] Verify hooks directory exists at apps/clementine-app/app/domains/event/designer/hooks/
+- [X] T004 [P] Verify components directory exists at apps/clementine-app/app/domains/event/designer/components/
 
-**Checkpoint**: Folder structure ready for implementation
+**Checkpoint**: Folder structure ready for implementation ✓ COMPLETE
 
 ---
 
@@ -40,15 +40,15 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T005 Create useEventDesignerStore.ts with Zustand store interface in apps/clementine-app/app/domains/event/designer/stores/useEventDesignerStore.ts
-- [ ] T006 Implement store state (pendingSaves: number, lastCompletedAt: number | null) in useEventDesignerStore.ts
-- [ ] T007 Implement startSave action (increment pendingSaves) in useEventDesignerStore.ts
-- [ ] T008 Implement completeSave action (decrement pendingSaves, set lastCompletedAt when 0) in useEventDesignerStore.ts
-- [ ] T009 Implement resetSaveState action (reset to initial state) in useEventDesignerStore.ts
-- [ ] T010 Add TypeScript interface EventDesignerStore with proper typing in useEventDesignerStore.ts
-- [ ] T011 Export store from apps/clementine-app/app/domains/event/designer/stores/index.ts
+- [X] T005 Create useEventDesignerStore.ts with Zustand store interface in apps/clementine-app/app/domains/event/designer/stores/useEventDesignerStore.ts
+- [X] T006 Implement store state (pendingSaves: number, lastCompletedAt: number | null) in useEventDesignerStore.ts
+- [X] T007 Implement startSave action (increment pendingSaves) in useEventDesignerStore.ts
+- [X] T008 Implement completeSave action (decrement pendingSaves, set lastCompletedAt when 0) in useEventDesignerStore.ts
+- [X] T009 Implement resetSaveState action (reset to initial state) in useEventDesignerStore.ts
+- [X] T010 Add TypeScript interface EventDesignerStore with proper typing in useEventDesignerStore.ts
+- [X] T011 Export store from apps/clementine-app/app/domains/event/designer/stores/index.ts
 
-**Checkpoint**: Foundation ready - user story implementation can now begin in parallel
+**Checkpoint**: Foundation ready - user story implementation can now begin in parallel ✓ COMPLETE
 
 ---
 
@@ -62,39 +62,39 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T012 [P] [US1] Write store test for startSave increments counter in apps/clementine-app/app/domains/event/designer/stores/useEventDesignerStore.test.ts
-- [ ] T013 [P] [US1] Write store test for completeSave decrements counter in useEventDesignerStore.test.ts
-- [ ] T014 [P] [US1] Write store test for completeSave sets lastCompletedAt when counter reaches 0 in useEventDesignerStore.test.ts
-- [ ] T015 [P] [US1] Write store test for resetSaveState clears all state in useEventDesignerStore.test.ts
+- [X] T012 [P] [US1] Write store test for startSave increments counter in apps/clementine-app/app/domains/event/designer/stores/useEventDesignerStore.test.ts
+- [X] T013 [P] [US1] Write store test for completeSave decrements counter in useEventDesignerStore.test.ts
+- [X] T014 [P] [US1] Write store test for completeSave sets lastCompletedAt when counter reaches 0 in useEventDesignerStore.test.ts
+- [X] T015 [P] [US1] Write store test for resetSaveState clears all state in useEventDesignerStore.test.ts
 
 ### Implementation for User Story 1
 
-- [ ] T016 [P] [US1] Create useTrackedMutation hook with TypeScript generics in apps/clementine-app/app/domains/event/designer/hooks/useTrackedMutation.ts
-- [ ] T017 [US1] Implement state transition tracking (idle → pending, pending → idle) using useRef in useTrackedMutation.ts
-- [ ] T018 [US1] Call startSave on mutation.isPending transition to true in useTrackedMutation.ts
-- [ ] T019 [US1] Call completeSave on mutation.isPending transition to false in useTrackedMutation.ts
-- [ ] T020 [US1] Add passthrough return (no mutation modification) in useTrackedMutation.ts
-- [ ] T021 [US1] Export useTrackedMutation from apps/clementine-app/app/domains/event/designer/hooks/index.ts
-- [ ] T022 [P] [US1] Write hook test for idle → pending transition calls startSave in apps/clementine-app/app/domains/event/designer/hooks/useTrackedMutation.test.ts
-- [ ] T023 [P] [US1] Write hook test for pending → idle transition calls completeSave in useTrackedMutation.test.ts
-- [ ] T024 [P] [US1] Write hook test for no double-counting on re-renders in useTrackedMutation.test.ts
-- [ ] T025 [P] [US1] Create DesignerStatusIndicators component in apps/clementine-app/app/domains/event/designer/components/DesignerStatusIndicators.tsx
-- [ ] T026 [US1] Add useEventDesignerStore subscription (pendingSaves, lastCompletedAt) in DesignerStatusIndicators.tsx
-- [ ] T027 [US1] Compute isSaving derived state (pendingSaves > 0) in DesignerStatusIndicators.tsx
-- [ ] T028 [US1] Implement 3-second timer logic with useEffect and setTimeout in DesignerStatusIndicators.tsx
-- [ ] T029 [US1] Add timer cleanup in useEffect return function in DesignerStatusIndicators.tsx
-- [ ] T030 [US1] Render Loader2 spinner when isSaving is true in DesignerStatusIndicators.tsx
-- [ ] T031 [US1] Render Check checkmark when showSuccess is true in DesignerStatusIndicators.tsx
-- [ ] T032 [US1] Return null when idle (no spinner or checkmark) in DesignerStatusIndicators.tsx
-- [ ] T033 [US1] Add ARIA attributes (role="status", aria-live="polite") in DesignerStatusIndicators.tsx
-- [ ] T034 [US1] Add sr-only labels for screen readers in DesignerStatusIndicators.tsx
-- [ ] T035 [US1] Apply Tailwind classes (h-4 w-4, animate-spin, text colors) in DesignerStatusIndicators.tsx
-- [ ] T036 [US1] Export DesignerStatusIndicators from apps/clementine-app/app/domains/event/designer/components/index.ts
-- [ ] T037 [P] [US1] Write component test for shows spinner when pendingSaves > 0 in apps/clementine-app/app/domains/event/designer/components/DesignerStatusIndicators.test.tsx
-- [ ] T038 [P] [US1] Write component test for shows checkmark for 3 seconds in DesignerStatusIndicators.test.tsx
-- [ ] T039 [P] [US1] Write component test for timer cleanup on unmount in DesignerStatusIndicators.test.tsx
+- [X] T016 [P] [US1] Create useTrackedMutation hook with TypeScript generics in apps/clementine-app/app/domains/event/designer/hooks/useTrackedMutation.ts
+- [X] T017 [US1] Implement state transition tracking (idle → pending, pending → idle) using useRef in useTrackedMutation.ts
+- [X] T018 [US1] Call startSave on mutation.isPending transition to true in useTrackedMutation.ts
+- [X] T019 [US1] Call completeSave on mutation.isPending transition to false in useTrackedMutation.ts
+- [X] T020 [US1] Add passthrough return (no mutation modification) in useTrackedMutation.ts
+- [X] T021 [US1] Export useTrackedMutation from apps/clementine-app/app/domains/event/designer/hooks/index.ts
+- [X] T022 [P] [US1] Write hook test for idle → pending transition calls startSave in apps/clementine-app/app/domains/event/designer/hooks/useTrackedMutation.test.ts
+- [X] T023 [P] [US1] Write hook test for pending → idle transition calls completeSave in useTrackedMutation.test.ts
+- [X] T024 [P] [US1] Write hook test for no double-counting on re-renders in useTrackedMutation.test.ts
+- [X] T025 [P] [US1] Create DesignerStatusIndicators component in apps/clementine-app/app/domains/event/designer/components/DesignerStatusIndicators.tsx
+- [X] T026 [US1] Add useEventDesignerStore subscription (pendingSaves, lastCompletedAt) in DesignerStatusIndicators.tsx
+- [X] T027 [US1] Compute isSaving derived state (pendingSaves > 0) in DesignerStatusIndicators.tsx
+- [X] T028 [US1] Implement 3-second timer logic with useEffect and setTimeout in DesignerStatusIndicators.tsx
+- [X] T029 [US1] Add timer cleanup in useEffect return function in DesignerStatusIndicators.tsx
+- [X] T030 [US1] Render Loader2 spinner when isSaving is true in DesignerStatusIndicators.tsx
+- [X] T031 [US1] Render Check checkmark when showSuccess is true in DesignerStatusIndicators.tsx
+- [X] T032 [US1] Return null when idle (no spinner or checkmark) in DesignerStatusIndicators.tsx
+- [X] T033 [US1] Add ARIA attributes (role="status", aria-live="polite") in DesignerStatusIndicators.tsx
+- [X] T034 [US1] Add sr-only labels for screen readers in DesignerStatusIndicators.tsx
+- [X] T035 [US1] Apply Tailwind classes (h-4 w-4, animate-spin, text colors) in DesignerStatusIndicators.tsx
+- [X] T036 [US1] Export DesignerStatusIndicators from apps/clementine-app/app/domains/event/designer/components/index.ts
+- [X] T037 [P] [US1] Write component test for shows spinner when pendingSaves > 0 in apps/clementine-app/app/domains/event/designer/components/DesignerStatusIndicators.test.tsx
+- [X] T038 [P] [US1] Write component test for shows checkmark for 3 seconds in DesignerStatusIndicators.test.tsx
+- [X] T039 [P] [US1] Write component test for timer cleanup on unmount in DesignerStatusIndicators.test.tsx
 
-**Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
+**Checkpoint**: At this point, User Story 1 should be fully functional and testable independently ✓ COMPLETE
 
 ---
 

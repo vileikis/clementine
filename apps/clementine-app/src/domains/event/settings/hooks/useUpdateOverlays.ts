@@ -40,6 +40,7 @@ import * as Sentry from '@sentry/tanstackstart-react'
 import { updateOverlaysConfigSchema } from '../schemas'
 import type { UpdateOverlaysConfig } from '../schemas'
 import { prefixKeys, updateEventConfigField } from '@/domains/event/shared'
+import { useTrackedMutation } from '@/domains/event/designer/hooks'
 
 /**
  * Hook for updating event overlays with domain-specific tracking
@@ -47,7 +48,7 @@ import { prefixKeys, updateEventConfigField } from '@/domains/event/shared'
 export function useUpdateOverlays(projectId: string, eventId: string) {
   const queryClient = useQueryClient()
 
-  return useMutation({
+  const mutation = useMutation({
     mutationFn: async (updates: UpdateOverlaysConfig) => {
       // Validate partial overlay updates
       const validated = updateOverlaysConfigSchema.parse(updates)
@@ -81,4 +82,6 @@ export function useUpdateOverlays(projectId: string, eventId: string) {
       })
     },
   })
+
+  return useTrackedMutation(mutation)
 }

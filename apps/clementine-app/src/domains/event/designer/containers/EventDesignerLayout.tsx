@@ -4,10 +4,12 @@
  * Domain-owned layout for event designer. Handles publish workflow,
  * change detection, and integrates TopNavBar + EventDesignerPage.
  */
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { FolderOpen, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { usePublishEvent } from '../hooks/usePublishEvent'
+import { DesignerStatusIndicators } from '../components'
+import { useEventDesignerStore } from '../stores'
 import { EventDesignerPage } from './EventDesignerPage'
 import type { ProjectEventFull } from '@/domains/event/shared/schemas'
 import type { Project } from '@/domains/workspace/projects/types/project.types'
@@ -43,6 +45,7 @@ export function EventDesignerLayout({
   workspaceSlug,
 }: EventDesignerLayoutProps) {
   const publishEvent = usePublishEvent(project.id, event.id)
+  const { resetSaveState } = useEventDesignerStore()
 
   // Compute paths for breadcrumb navigation
   const projectPath = `/workspace/${workspaceSlug}/projects/${project.id}`
@@ -55,6 +58,11 @@ export function EventDesignerLayout({
       event.draftVersion !== null && event.draftVersion > event.publishedVersion
     )
   }, [event.draftVersion, event.publishedVersion])
+
+  // Cleanup: reset save state on unmount
+  useEffect(() => {
+    return () => resetSaveState()
+  }, [resetSaveState])
 
   // Publish handler
   const handlePublish = async () => {
@@ -85,16 +93,15 @@ export function EventDesignerLayout({
             label: event.name,
           },
         ]}
-        left={
-          hasUnpublishedChanges && (
-            <div className="flex items-center gap-1.5 rounded-full bg-yellow-50 dark:bg-yellow-950 px-2.5 py-1 text-xs font-medium text-yellow-700 dark:text-yellow-400">
-              <div className="h-2 w-2 rounded-full bg-yellow-500" />
-              New changes
-            </div>
-          )
-        }
         right={
           <>
+            <DesignerStatusIndicators />
+            {hasUnpublishedChanges && (
+              <div className="flex items-center gap-1.5 rounded-full bg-yellow-50 dark:bg-yellow-950 px-2.5 py-1 text-xs font-medium text-yellow-700 dark:text-yellow-400">
+                <div className="h-2 w-2 rounded-full bg-yellow-500" />
+                New changes
+              </div>
+            )}
             <Button variant="outline" disabled>
               Preview
             </Button>

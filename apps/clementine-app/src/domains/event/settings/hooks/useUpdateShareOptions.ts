@@ -36,6 +36,7 @@ import * as Sentry from '@sentry/tanstackstart-react'
 import { updateSharingConfigSchema } from '../schemas'
 import type { UpdateSharingConfig } from '../schemas'
 import { prefixKeys, updateEventConfigField } from '@/domains/event/shared'
+import { useTrackedMutation } from '@/domains/event/designer/hooks'
 
 /**
  * Hook for updating event sharing options with domain-specific tracking
@@ -43,7 +44,7 @@ import { prefixKeys, updateEventConfigField } from '@/domains/event/shared'
 export function useUpdateShareOptions(projectId: string, eventId: string) {
   const queryClient = useQueryClient()
 
-  return useMutation({
+  const mutation = useMutation({
     mutationFn: async (updates: UpdateSharingConfig) => {
       // Validate partial sharing updates
       const validated = updateSharingConfigSchema.parse(updates)
@@ -77,4 +78,6 @@ export function useUpdateShareOptions(projectId: string, eventId: string) {
       })
     },
   })
+
+  return useTrackedMutation(mutation)
 }
