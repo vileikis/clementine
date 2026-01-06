@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { SettingsSharingPage } from '@/domains/event/settings'
+import { EventSettingsPage } from '@/domains/event/settings'
 
 /**
  * Settings tab route
@@ -12,5 +12,5 @@ import { SettingsSharingPage } from '@/domains/event/settings'
 export const Route = createFileRoute(
   '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/settings',
 )({
-  component: SettingsSharingPage,
+  component: EventSettingsPage,
 })

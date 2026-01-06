@@ -1,12 +1,10 @@
 /**
  * Settings Subdomain Barrel Export
  */
-export { EventSettingsPage } from './containers/EventSettingsPage'
-export { SettingsSharingPage } from './containers/SettingsSharingPage'
+export { EventSettingsPage } from './containers'
 
 // Components
-export { SharingOptionCard } from './components/SharingOptionCard'
-export { SharingSection } from './components/SharingSection'
+export { SharingOptionCard, SharingSection } from './components'
 
 // Hooks
-export { useUpdateShareOptions } from './hooks/useUpdateShareOptions'
+export { useUpdateShareOptions } from './hooks'
