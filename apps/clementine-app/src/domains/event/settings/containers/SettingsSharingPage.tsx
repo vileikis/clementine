@@ -3,24 +3,24 @@ import { SharingSection } from '../components'
 import { OverlaySection } from './OverlaySection'
 import { useProjectEvent } from '@/domains/event/shared'
 import { useAuth } from '@/domains/auth'
+import { useWorkspace } from '@/domains/workspace'
 
 export function SettingsSharingPage() {
-  const { projectId, eventId } = useParams({ strict: false })
+  const { projectId, eventId, workspaceSlug } = useParams({ strict: false })
   const { data: event } = useProjectEvent(projectId!, eventId!)
+  const { data: workspace } = useWorkspace(workspaceSlug)
   const { user } = useAuth()
 
-  if (!event || !user) return null
-
-  // TODO: Get workspaceId from project or workspace context
-  // For now, this needs to be provided by the route/context
-  const workspaceId = 'PLACEHOLDER_WORKSPACE_ID'
+  if (!event || !user || !workspace) {
+    return null
+  }
 
   return (
     <div className="space-y-8 p-6">
       <OverlaySection
         projectId={projectId!}
         eventId={eventId!}
-        workspaceId={workspaceId}
+        workspaceId={workspace.id}
         userId={user.uid}
         overlays={event.draftConfig?.overlays || null}
       />
