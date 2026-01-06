@@ -84,13 +84,6 @@ describe('prefixKeys', () => {
       expect(result).toEqual({})
     })
 
-    it('should handle empty string as prefix', () => {
-      const input = { key: 'value' }
-      const result = prefixKeys(input, '')
-
-      expect(result['.key']).toBe('value')
-    })
-
     it('should handle single character keys', () => {
       const input = { a: 1, b: 2, c: 3 }
       const result = prefixKeys(input, 'prefix')
@@ -98,6 +91,42 @@ describe('prefixKeys', () => {
       expect(result['prefix.a']).toBe(1)
       expect(result['prefix.b']).toBe(2)
       expect(result['prefix.c']).toBe(3)
+    })
+  })
+
+  describe('prefix validation', () => {
+    it('should throw error for empty string prefix', () => {
+      const input = { key: 'value' }
+
+      expect(() => prefixKeys(input, '')).toThrow(
+        'prefixKeys: prefix must be a non-empty string',
+      )
+    })
+
+    it('should throw error for whitespace-only prefix', () => {
+      const input = { key: 'value' }
+
+      expect(() => prefixKeys(input, '   ')).toThrow(
+        'prefixKeys: prefix must be a non-empty string',
+      )
+    })
+
+    it('should throw error for undefined prefix', () => {
+      const input = { key: 'value' }
+
+      // @ts-expect-error - Testing runtime validation
+      expect(() => prefixKeys(input, undefined)).toThrow(
+        'prefixKeys: prefix must be a non-empty string',
+      )
+    })
+
+    it('should throw error for null prefix', () => {
+      const input = { key: 'value' }
+
+      // @ts-expect-error - Testing runtime validation
+      expect(() => prefixKeys(input, null)).toThrow(
+        'prefixKeys: prefix must be a non-empty string',
+      )
     })
   })
 
