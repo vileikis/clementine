@@ -37,11 +37,8 @@
  */
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import * as Sentry from '@sentry/tanstackstart-react'
-import {
-
-  updateOverlaysConfigSchema
-} from '../schemas'
-import type {UpdateOverlaysConfig} from '../schemas';
+import { updateOverlaysConfigSchema } from '../schemas'
+import type { UpdateOverlaysConfig } from '../schemas'
 import { prefixKeys, updateEventConfigField } from '@/domains/event/shared'
 
 /**
@@ -55,15 +52,8 @@ export function useUpdateOverlays(projectId: string, eventId: string) {
       // Validate partial overlay updates
       const validated = updateOverlaysConfigSchema.parse(updates)
 
-      console.log('------validated', JSON.stringify(validated, null, 2))
-
       // Transform to dot notation with 'overlays.' prefix
       const dotNotationUpdates = prefixKeys(validated, 'overlays')
-
-      console.log(
-        '------dotNotationUpdates',
-        JSON.stringify(dotNotationUpdates, null, 2),
-      )
 
       // Use shared helper for atomic Firestore update
       await updateEventConfigField(projectId, eventId, dotNotationUpdates)
