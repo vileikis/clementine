@@ -23,7 +23,6 @@ import type { CSSProperties, ElementType, ReactNode } from 'react'
 import type { Theme } from '../../types'
 import { cn } from '@/shared/utils'
 
-
 /** Text size variants with corresponding font sizes and weights */
 export type TextVariant = 'heading' | 'body' | 'small'
 
@@ -70,7 +69,8 @@ export function ThemedText({
   const Element = as ?? VARIANT_ELEMENTS[variant]
 
   // Get text alignment: explicit 'align' prop > theme.text.alignment
-  const textAlign = align === 'inherit' ? undefined : (align ?? theme.text.alignment)
+  const textAlign =
+    align === 'inherit' ? undefined : (align ?? theme.text.alignment)
 
   const style: CSSProperties = {
     color: theme.text.color,
@@ -79,10 +79,7 @@ export function ThemedText({
   }
 
   return (
-    <Element
-      className={cn(VARIANT_CLASSES[variant], className)}
-      style={style}
-    >
+    <Element className={cn(VARIANT_CLASSES[variant], className)} style={style}>
       {children}
     </Element>
   )

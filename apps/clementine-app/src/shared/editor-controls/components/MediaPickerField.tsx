@@ -5,7 +5,7 @@
  * Used for background images and other media uploads.
  */
 
-import { useId, useRef } from 'react'
+import { useId, useRef, useState } from 'react'
 import { ImagePlus, Loader2, Trash2 } from 'lucide-react'
 import type { MediaPickerFieldProps } from '../types'
 import { Button } from '@/ui-kit/components/button'
@@ -24,11 +24,17 @@ export function MediaPickerField({
 }: MediaPickerFieldProps) {
   const id = useId()
   const inputRef = useRef<HTMLInputElement>(null)
+  const [isDragging, setIsDragging] = useState(false)
 
   const handleClick = () => {
     if (!disabled && !uploading) {
       inputRef.current?.click()
     }
+  }
+
+  const handleReplace = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    handleClick()
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,6 +49,26 @@ export function MediaPickerField({
   const handleRemove = (e: React.MouseEvent) => {
     e.stopPropagation()
     onChange(null)
+  }
+
+  // Drag and drop handlers
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+    if (disabled || uploading) return
+    const file = e.dataTransfer.files[0]
+    if (file) onUpload(file)
+  }
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    if (!disabled && !uploading) {
+      setIsDragging(true)
+    }
+  }
+
+  const handleDragLeave = () => {
+    setIsDragging(false)
   }
 
   const hasImage = value !== null
@@ -64,17 +90,23 @@ export function MediaPickerField({
       />
 
       <div
-        onClick={handleClick}
+        onClick={hasImage ? undefined : handleClick}
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
         role="button"
-        tabIndex={disabled ? -1 : 0}
-        onKeyDown={(e) => e.key === 'Enter' && handleClick()}
+        tabIndex={disabled || hasImage ? -1 : 0}
+        onKeyDown={(e) => e.key === 'Enter' && !hasImage && handleClick()}
         className={cn(
           'relative aspect-video w-full rounded-lg border-2 border-dashed transition-colors',
           'flex items-center justify-center overflow-hidden',
           disabled
             ? 'cursor-not-allowed opacity-50'
-            : 'cursor-pointer hover:border-ring hover:bg-muted/50',
+            : hasImage
+              ? 'cursor-default'
+              : 'cursor-pointer hover:border-ring hover:bg-muted/50',
           hasImage ? 'border-transparent' : 'border-border',
+          isDragging && !hasImage && 'border-primary bg-primary/5',
         )}
       >
         {hasImage ? (
@@ -91,7 +123,7 @@ export function MediaPickerField({
                 type="button"
                 variant="secondary"
                 size="sm"
-                onClick={handleClick}
+                onClick={handleReplace}
                 disabled={uploading}
               >
                 <ImagePlus className="mr-2 size-4" />
@@ -122,7 +154,9 @@ export function MediaPickerField({
             ) : (
               <>
                 <ImagePlus className="size-8" />
-                <span className="text-sm">Click to upload</span>
+                <span className="text-sm">
+                  {isDragging ? 'Drop image here' : 'Click or drag to upload'}
+                </span>
               </>
             )}
           </div>

@@ -46,6 +46,6 @@ export function useThemeWithOverride(themeOverride?: Theme): Theme {
 
   // No theme available - throw helpful error
   throw new Error(
-    'Themed components require either a ThemeProvider ancestor or a theme prop'
+    'Themed components require either a ThemeProvider ancestor or a theme prop',
   )
 }

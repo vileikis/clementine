@@ -40,7 +40,7 @@ function createWrapper(theme: Theme) {
           buttonRadius: '0.5rem',
         },
       },
-      children
+      children,
     )
   }
 }
@@ -75,7 +75,7 @@ describe('useThemeWithOverride', () => {
     expect(() => {
       renderHook(() => useThemeWithOverride())
     }).toThrow(
-      'Themed components require either a ThemeProvider ancestor or a theme prop'
+      'Themed components require either a ThemeProvider ancestor or a theme prop',
     )
 
     consoleSpy.mockRestore()

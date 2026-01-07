@@ -18,8 +18,6 @@
  * ```
  */
 
-
-
 import { BUTTON_RADIUS_MAP } from '../../constants'
 import { useThemeWithOverride } from '../../hooks/useThemeWithOverride'
 import type { ButtonHTMLAttributes, CSSProperties, ReactNode } from 'react'
@@ -36,7 +34,10 @@ const SIZE_CLASSES: Record<ButtonSize, string> = {
   lg: 'px-8 py-4 text-lg',
 }
 
-export interface ThemedButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'style'> {
+export interface ThemedButtonProps extends Omit<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  'style'
+> {
   /** Button content */
   children: ReactNode
   /** Button size variant (defaults to 'md') */
@@ -74,7 +75,7 @@ export function ThemedButton({
       disabled={disabled}
       className={cn(
         SIZE_CLASSES[size],
-        'font-medium shadow-sm transition-opacity',
+        'font-bold shadow-sm transition-opacity',
         'hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2',
         'disabled:cursor-not-allowed disabled:opacity-50',
         className,

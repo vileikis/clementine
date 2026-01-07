@@ -170,7 +170,12 @@ export function ThemeControls({
           value={theme.background.image?.url ?? null}
           onChange={(value) =>
             // When removing, set to null; MediaPickerField doesn't handle creating new MediaReference (that's done via onUpload)
-            onUpdate({ background: { ...theme.background, image: value === null ? null : theme.background.image } })
+            onUpdate({
+              background: {
+                ...theme.background,
+                image: value === null ? null : theme.background.image,
+              },
+            })
           }
           onUpload={onUploadBackground}
           accept="image/*"

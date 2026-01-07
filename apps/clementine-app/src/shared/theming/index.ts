@@ -30,7 +30,12 @@ export { ThemeProvider } from './providers'
 
 // Components
 export { ThemedBackground, ThemedText, ThemedButton } from './components'
-export type { ThemedTextProps, TextVariant, ThemedButtonProps, ButtonSize } from './components'
+export type {
+  ThemedTextProps,
+  TextVariant,
+  ThemedButtonProps,
+  ButtonSize,
+} from './components'
 
 // Hooks
 export { useEventTheme, useThemedStyles, useThemeWithOverride } from './hooks'
