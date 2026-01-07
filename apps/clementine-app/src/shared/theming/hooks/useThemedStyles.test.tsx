@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { ThemeProvider } from '../components/ThemeProvider'
+import { ThemeProvider } from '../providers/ThemeProvider'
 import { useThemedStyles } from './useThemedStyles'
 import type { ThemedStyles } from './useThemedStyles'
 import type { Theme } from '../types'
@@ -19,7 +19,7 @@ const mockTheme: Theme = {
   },
   background: {
     color: '#F0F0F0',
-    image: 'https://example.com/bg.jpg',
+    image: { mediaAssetId: 'abc123', url: 'https://example.com/bg.jpg' },
     overlayOpacity: 0.5,
   },
 }

@@ -25,7 +25,7 @@ describe('ThemeContext', () => {
         },
         background: {
           color: '#FFFFFF',
-          image: 'https://example.com/bg.jpg',
+          image: { mediaAssetId: 'abc123', url: 'https://example.com/bg.jpg' },
           overlayOpacity: 0.5,
         },
       },

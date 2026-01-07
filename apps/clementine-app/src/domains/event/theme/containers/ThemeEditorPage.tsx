@@ -104,13 +104,17 @@ export function ThemeEditorPage() {
       setUploadProgress(0)
 
       try {
-        const { url } = await uploadBackground.mutateAsync({
+        const { mediaAssetId, url } = await uploadBackground.mutateAsync({
           file,
           onProgress: (progress) => setUploadProgress(progress),
         })
 
-        // Update form with new URL and trigger save
-        form.setValue('background.image', url, { shouldDirty: true })
+        // Update form with full MediaReference object and trigger save
+        form.setValue(
+          'background.image',
+          { mediaAssetId, url },
+          { shouldDirty: true },
+        )
         triggerSave()
         toast.success('Background image uploaded')
       } catch (error) {
@@ -151,7 +155,7 @@ export function ThemeEditorPage() {
       </div>
 
       {/* Right: Controls */}
-      <aside className="w-80 flex-shrink-0 border-l border-border overflow-y-auto bg-card">
+      <aside className="w-80 shrink-0 border-l border-border overflow-y-auto bg-card">
         <div className="sticky top-0 z-10 border-b border-border bg-card px-4 py-3">
           <h2 className="font-semibold">Theme</h2>
         </div>

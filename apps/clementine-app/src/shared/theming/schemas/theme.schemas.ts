@@ -2,6 +2,8 @@
 // Following standards/global/zod-validation.md patterns
 import { z } from 'zod'
 
+import { mediaReferenceSchema } from './media-reference.schema'
+
 /** Hex color regex pattern */
 export const COLOR_REGEX = /^#[0-9A-Fa-f]{6}$/
 
@@ -44,7 +46,7 @@ export const themeBackgroundSchema = z.object({
     .string()
     .regex(COLOR_REGEX, 'Invalid hex color format')
     .default('#FFFFFF'), // White background for light theme
-  image: z.url().nullable().default(null),
+  image: mediaReferenceSchema.nullable().default(null),
   overlayOpacity: z.number().min(0).max(1).default(0.3),
 })
 

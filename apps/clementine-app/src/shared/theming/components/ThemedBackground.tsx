@@ -14,9 +14,11 @@ interface ThemedBackgroundProps {
   /** Additional inline styles for the outer container */
   style?: CSSProperties
   /**
-   * Override classes for the content wrapper.
-   * Default provides centered, max-width content with vertical centering.
-   * Pass empty string to disable content wrapper entirely.
+   * Additional classes for the content container.
+   * Default provides max-width constraint (max-w-3xl).
+   * Use to override width, add padding, flex layout, etc.
+   * @example contentClassName="max-w-xl p-8" // narrower with padding
+   * @example contentClassName="max-w-none" // full width
    */
   contentClassName?: string
 }
@@ -24,28 +26,26 @@ interface ThemedBackgroundProps {
 /**
  * Renders a full-height container with themed background and centered content.
  *
- * Default behavior:
- * - Outer container: fills available space (flex-1), flex column
- * - Content: max-width 768px, horizontally centered, vertically centered, scrollable
- *
- * Use `contentClassName` to override content wrapper behavior, or pass empty string
- * to render children directly without a wrapper.
+ * Structure:
+ * - Outer container: fills available space, handles background color/image/overlay
+ * - Position wrapper: centers content vertically and horizontally, handles overflow
+ * - Content container: max-width constraint, receives contentClassName
  *
  * @example
  * ```tsx
- * // Standard usage - centered content with max-width
+ * // Standard usage - centered content with default max-width
  * <ThemedBackground background={theme.background} fontFamily={theme.fontFamily}>
  *   <PageContent />
  * </ThemedBackground>
  *
- * // Custom content layout
- * <ThemedBackground contentClassName="p-4">
- *   <FullWidthContent />
+ * // Custom content layout with padding and flex
+ * <ThemedBackground contentClassName="flex flex-col gap-8 p-8">
+ *   <Content />
  * </ThemedBackground>
  *
- * // No content wrapper
- * <ThemedBackground contentClassName="">
- *   <CustomLayout />
+ * // Full width content (override max-width)
+ * <ThemedBackground contentClassName="max-w-none">
+ *   <FullWidthContent />
  * </ThemedBackground>
  * ```
  */
@@ -58,11 +58,8 @@ export function ThemedBackground({
   contentClassName,
 }: ThemedBackgroundProps) {
   const bgColor = background?.color ?? '#FFFFFF'
-  const bgImage = background?.image
+  const bgImage = background?.image?.url ?? null
   const overlayOpacity = background?.overlayOpacity ?? 0
-
-  // Check if content wrapper should be rendered
-  const hasContentWrapper = contentClassName !== ''
 
   return (
     <div
@@ -89,19 +86,13 @@ export function ThemedBackground({
         />
       )}
 
-      {/* Content wrapper with sensible defaults */}
-      {hasContentWrapper ? (
-        <div
-          className={cn(
-            'relative z-10 flex flex-1 flex-col items-center justify-center overflow-auto px-4 py-8',
-            contentClassName,
-          )}
-        >
-          <div className="w-full max-w-3xl">{children}</div>
+      {/* Position wrapper: centers content, handles overflow */}
+      <div className="relative z-10 flex flex-1 flex-col items-center justify-center overflow-auto px-4 py-8">
+        {/* Content container: max-width + contentClassName */}
+        <div className={cn('w-full max-w-3xl', contentClassName)}>
+          {children}
         </div>
-      ) : (
-        <div className="relative z-10 flex flex-1 flex-col">{children}</div>
-      )}
+      </div>
     </div>
   )
 }

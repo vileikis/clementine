@@ -64,7 +64,10 @@ describe('projectEventConfigSchema', () => {
           },
           background: {
             color: '#F5F5F5',
-            image: 'https://example.com/bg.jpg',
+            image: {
+              mediaAssetId: 'abc123',
+              url: 'https://example.com/bg.jpg',
+            },
             overlayOpacity: 0.5,
           },
         },
