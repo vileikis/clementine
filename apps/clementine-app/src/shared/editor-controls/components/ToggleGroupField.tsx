@@ -5,7 +5,6 @@
  * Commonly used for alignment, radius, and other enum-like selections.
  */
 
-import { useId } from 'react'
 import { EditorRow } from './EditorRow'
 import type { ToggleGroupFieldProps } from '../types'
 import { ToggleGroup, ToggleGroupItem } from '@/ui-kit/components/toggle-group'
@@ -17,10 +16,8 @@ export function ToggleGroupField<T extends string = string>({
   options,
   disabled = false,
 }: ToggleGroupFieldProps<T>) {
-  const id = useId()
-
   return (
-    <EditorRow label={label} htmlFor={id}>
+    <EditorRow label={label}>
       <ToggleGroup
         type="single"
         value={value}

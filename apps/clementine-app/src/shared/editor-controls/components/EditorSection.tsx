@@ -21,12 +21,12 @@ export function EditorSection({
 }: EditorSectionProps) {
   return (
     <Collapsible defaultOpen={defaultOpen} className="border-b border-border">
-      <CollapsibleTrigger className="flex w-full items-center justify-between px-4 py-3 text-sm font-medium hover:bg-muted/50 transition-colors">
+      <CollapsibleTrigger className="group flex w-full items-center justify-between px-4 py-3 text-sm font-medium hover:bg-muted/50 transition-colors">
         <span>{title}</span>
         <ChevronDown
           className={cn(
             'size-4 text-muted-foreground transition-transform duration-200',
-            '[&[data-state=open]>svg]:rotate-180',
+            'group-data-[state=open]:rotate-180',
           )}
         />
       </CollapsibleTrigger>

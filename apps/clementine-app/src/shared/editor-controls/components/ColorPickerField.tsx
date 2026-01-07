@@ -77,8 +77,10 @@ export function ColorPickerField({
   }
 
   const handleColorInputChange = (newColor: string) => {
-    setLocalHex(newColor)
-    onChange(newColor)
+    // Normalize to uppercase for consistent preset matching
+    const normalized = newColor.toUpperCase()
+    setLocalHex(normalized)
+    onChange(normalized)
   }
 
   const handleHexInputChange = (input: string) => {
