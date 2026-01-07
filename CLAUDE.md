@@ -345,6 +345,8 @@ See individual workspace documentation for required environment variables.
 - TypeScript 5.7.2 (strict mode, ES2022 target) + TanStack Start 1.132.0, React 19.2.0, TanStack Query 5.66.5, TanStack Router 1.132.0, React Hook Form, Zod 4.1.12 (015-event-theme-editor)
 - Firebase Firestore (client SDK) - updates to `event.draftConfig.theme` (015-event-theme-editor)
 - TypeScript 5.7.2 (strict mode, ES2022 target) + React 19.2.0, TanStack Start 1.132.0, Zod 4.1.12, Tailwind CSS 4, Lucide Reac (016-themed-primitives)
+- TypeScript 5.7.2 (strict mode, ES2022 target) + TanStack Start 1.132.0, React 19.2.0, TanStack Query 5.66.5, React Hook Form, Zod 4.1.12 (017-welcome-editor)
+- Firebase Firestore (client SDK) - updates to `event.draftConfig.welcome` (017-welcome-editor)
 
 ## Recent Changes
 - 012-event-settings-sharing-publish: Added TypeScript 5.7.2 (strict mode, ES2022 target) + TanStack Start 1.132.0, React 19.2.0, TanStack Router 1.132.0, TanStack Query 5.66.5, Firebase SDK 12.5.0
