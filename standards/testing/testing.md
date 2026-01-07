@@ -6,12 +6,17 @@ This document defines testing principles and patterns using Vitest and Testing L
 
 ### 1. Co-locate Tests with Code
 
-**CRITICAL**: Tests MUST live next to the code they test, NOT in a separate test directory.
+**CRITICAL**: Tests MUST live next to the code they test. **NEVER** create separate test directories.
 
 ```
+✅ CORRECT:
 /domains/workspace/hooks/
   useWorkspace.ts
   useWorkspace.test.ts       ← Next to the hook
+
+❌ PROHIBITED:
+/__tests__/                   ← Never create __tests__ folders
+/tests/                       ← Never create tests directories
 ```
 
 **Why co-location is mandatory:**
@@ -20,7 +25,7 @@ This document defines testing principles and patterns using Vitest and Testing L
 - ✅ Easier to find and update tests
 - ✅ Modern best practice across industry
 
-See "Test Organization" section for detailed examples.
+See "Test Organization" section for detailed examples and prohibited patterns.
 
 ### 2. Test Behavior, Not Implementation
 - Test what users see and do
@@ -32,7 +37,38 @@ See "Test Organization" section for detailed examples.
 - Test edge cases and error scenarios
 - Prefer integration tests over unit tests when appropriate
 
-### 4. Consistent Testing Patterns
+### 4. Wrap State Updates in `act()`
+
+**CRITICAL for React tests**: Code that causes React state updates MUST be wrapped in `act()`:
+
+```typescript
+import { act, render, screen } from '@testing-library/react'
+
+// ✅ CORRECT: Wrap state updates in act()
+act(() => {
+  useStore.getState().updateValue('new value')
+})
+
+// ✅ CORRECT: Wrap timer advances in act()
+act(() => {
+  vi.advanceTimersByTime(3000)
+})
+
+// ✅ CORRECT: Wrap event triggers that cause state updates
+act(() => {
+  fireEvent.click(button)
+})
+```
+
+**Why this is mandatory:**
+- Ensures you're testing the behavior users see in the browser
+- Prevents "not wrapped in act(...)" warnings
+- Guarantees all state updates and effects are processed before assertions
+- Required by React Testing Library for predictable test behavior
+
+See [React docs on act()](https://react.dev/link/wrap-tests-with-act) for more details.
+
+### 5. Consistent Testing Patterns
 - Same tools across frontend and backend (Vitest)
 - Same testing patterns across workspaces
 - Clear, readable test structure
@@ -310,17 +346,27 @@ describe('useEvents', () => {
     formatWorkspace.test.ts    ← co-located with utility
 ```
 
-#### ❌ INCORRECT: Separate Test Directory
+#### ❌ INCORRECT: Separate Test Directories
+
+**DO NOT create any of these patterns:**
 
 ```
 /src/
-  /tests/                      ← ❌ DO NOT create tests here
-    useWorkspace.test.ts       ← ❌ Tests separated from code
-    WorkspaceCard.test.tsx     ← ❌ Hard to find and maintain
+  /tests/                      ← ❌ DO NOT create top-level tests folder
+    useWorkspace.test.ts
+  /__tests__/                  ← ❌ DO NOT create __tests__ folders
+    useWorkspace.test.ts
   /domains/workspace/
     /hooks/
-      useWorkspace.ts          ← Code here
+      /__tests__/              ← ❌ DO NOT create __tests__ next to code either
+        useWorkspace.test.ts
+      useWorkspace.ts          ← Code here without co-located test
 ```
+
+**Explicitly prohibited patterns:**
+- ❌ `__tests__/` folders at any level
+- ❌ `/tests/` or `/test/` directories
+- ❌ Any separation of tests from their source files
 
 **Why co-locate tests?**
 - ✅ Easier to find tests related to specific code

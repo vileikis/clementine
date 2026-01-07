@@ -15,9 +15,15 @@ This document defines principles and patterns for schema validation using Zod.
 - Use explicit defaults
 
 ### 3. Forward Compatibility
-- Allow unknown fields with `passthrough()`
+- Allow unknown fields with `z.looseObject()` (Zod v4)
 - Add new fields as optional with defaults
 - Schema evolution without breaking changes
+
+### 4. Use Zod v4 Features
+- **CRITICAL**: Use Zod v4 APIs, avoid deprecated patterns
+- Use `z.looseObject()` instead of `.passthrough()`
+- Use top-level validators (`z.email()`, `z.uuid()`) instead of chained methods
+- See "Zod v4 Features" section for complete migration guide
 
 ## Schema Naming Convention
 
@@ -136,13 +142,22 @@ description: z.string().nullable().default(null)
 - `.default(null)` already handles missing fields
 - Harder to reason about types
 
-### ✅ DO: Use `passthrough()` for Schema Evolution
+### ✅ DO: Use `z.looseObject()` for Schema Evolution (Zod v4)
+
+**IMPORTANT**: `.passthrough()` is deprecated in Zod v4. Use `z.looseObject()` instead.
 
 ```typescript
+// ✅ Zod v4: Use looseObject()
+const eventSchema = z.looseObject({
+  name: z.string(),
+  companyId: z.string(),
+})
+
+// ❌ Deprecated: Don't use passthrough()
 const eventSchema = z.object({
   name: z.string(),
   companyId: z.string(),
-}).passthrough() // ✅ Allow unknown fields
+}).passthrough()
 
 // Old document with extra fields
 const oldDoc = {
@@ -162,11 +177,13 @@ await setDoc(docRef, result)
 - Forward compatibility (new fields added later)
 - Backward compatibility (old fields preserved)
 - Safe schema migrations
+- Zod v4 native API (no deprecated methods)
 
 ### Summary: Firestore-Safe Patterns
 
 ```typescript
-const firestoreSafeSchema = z.object({
+// ✅ Zod v4: Use looseObject() for schema evolution
+const firestoreSafeSchema = z.looseObject({
   // Required field
   name: z.string(),
 
@@ -181,8 +198,7 @@ const firestoreSafeSchema = z.object({
 
   // Optional array
   tags: z.array(z.string()).default([]),
-
-}).passthrough() // Allow unknown fields for schema evolution
+})
 ```
 
 ## Generic TypeScript Patterns
@@ -361,6 +377,41 @@ const eventSchema = z.object({
 
 ## Zod v4 Features
 
+**CRITICAL**: This project uses Zod v4. Always use v4 APIs and avoid deprecated patterns.
+
+### Deprecated → Modern API Migration
+
+| Deprecated (v3) | Modern (v4) | Notes |
+|-----------------|-------------|-------|
+| `.passthrough()` | `z.looseObject()` | Use looseObject for schema evolution |
+| `z.string().email()` | `z.email()` | Top-level validators |
+| `z.string().url()` | `z.url()` | Top-level validators |
+| `z.string().uuid()` | `z.uuid()` | Top-level validators |
+
+### z.looseObject() vs .passthrough()
+
+```typescript
+// ✅ Zod v4: looseObject() - allows unknown fields
+const eventSchema = z.looseObject({
+  name: z.string(),
+  status: z.enum(['active', 'inactive']),
+})
+
+// ❌ Deprecated: passthrough() - don't use
+const eventSchema = z.object({
+  name: z.string(),
+}).passthrough()
+```
+
+**When to use `z.looseObject()`:**
+- Firestore schemas (preserve unknown fields during reads/writes)
+- API responses that may have additional fields
+- Any schema that needs forward compatibility
+
+**When to use `z.object()` (strict):**
+- Form validation (reject unexpected fields)
+- Internal data structures where extra fields indicate bugs
+
 ### Top-Level String Validators
 
 Zod v4 introduces dedicated validators for common formats:
@@ -454,7 +505,8 @@ function EventForm() {
 
 - Use `.nullable().default(null)` for optional fields in Firestore schemas
 - Use `.default([])` for optional arrays
-- Use `passthrough()` for schema evolution
+- Use `z.looseObject()` for schema evolution (Zod v4)
+- Use top-level validators (`z.email()`, `z.uuid()`, etc.) in Zod v4
 - Extract nested schemas to named constants
 - Extract validation constraints to constants
 - Use discriminated unions for polymorphic data
@@ -462,6 +514,8 @@ function EventForm() {
 
 ### ❌ DON'T
 
+- Use `.passthrough()` - deprecated in Zod v4, use `z.looseObject()` instead
+- Use `z.string().email()` - deprecated, use `z.email()` instead
 - Mix `.nullable()` with `.optional()` unnecessarily
 - Allow `undefined` values in Firestore schemas
 - Use PascalCase for schema variable names
@@ -473,8 +527,8 @@ function EventForm() {
 ## Quick Reference
 
 ```typescript
-// Firestore schema template
-const firestoreSchema = z.object({
+// Firestore schema template (Zod v4)
+const firestoreSchema = z.looseObject({
   // Required
   id: z.string(),
   name: z.string(),
@@ -490,13 +544,13 @@ const firestoreSchema = z.object({
 
   // Optional array
   tags: z.array(z.string()).default([]),
+})
 
-}).passthrough()
-
-// Generic TypeScript schema template
+// Generic TypeScript schema template (strict)
 const genericSchema = z.object({
   id: z.string(),
   name: z.string(),
+  email: z.email(),      // ✅ Zod v4 top-level validator
   optional: z.string().optional(),
   withDefault: z.boolean().default(true),
 })
