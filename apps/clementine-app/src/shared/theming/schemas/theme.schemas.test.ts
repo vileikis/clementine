@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
+  BUTTON_RADIUS_OPTIONS,
   COLOR_REGEX,
-  THEME_DEFAULTS,
   themeBackgroundSchema,
   themeButtonSchema,
   themeSchema,
@@ -33,6 +33,12 @@ describe('COLOR_REGEX', () => {
   })
 })
 
+describe('BUTTON_RADIUS_OPTIONS', () => {
+  it('should contain expected options', () => {
+    expect(BUTTON_RADIUS_OPTIONS).toEqual(['square', 'rounded', 'pill'])
+  })
+})
+
 describe('themeTextSchema', () => {
   it('should validate valid theme text configuration', () => {
     const validText = {
@@ -55,7 +61,7 @@ describe('themeTextSchema', () => {
 
   it('should apply defaults for missing fields', () => {
     const result = themeTextSchema.parse({})
-    expect(result.color).toBe('#FFFFFF')
+    expect(result.color).toBe('#1E1E1E') // Dark text for light theme
     expect(result.alignment).toBe('center')
   })
 
@@ -83,7 +89,7 @@ describe('themeButtonSchema', () => {
     const validButton = {
       backgroundColor: '#FF5733',
       textColor: '#FFFFFF',
-      radius: 'md',
+      radius: 'rounded',
     }
     expect(() => themeButtonSchema.parse(validButton)).not.toThrow()
   })
@@ -92,7 +98,7 @@ describe('themeButtonSchema', () => {
     const buttonWithNullBg = {
       backgroundColor: null,
       textColor: '#FFFFFF',
-      radius: 'md',
+      radius: 'rounded',
     }
     const result = themeButtonSchema.parse(buttonWithNullBg)
     expect(result.backgroundColor).toBeNull()
@@ -101,7 +107,7 @@ describe('themeButtonSchema', () => {
   it('should default backgroundColor to null when not provided', () => {
     const buttonWithoutBg = {
       textColor: '#FFFFFF',
-      radius: 'md',
+      radius: 'rounded',
     }
     const result = themeButtonSchema.parse(buttonWithoutBg)
     expect(result.backgroundColor).toBeNull()
@@ -111,11 +117,11 @@ describe('themeButtonSchema', () => {
     const result = themeButtonSchema.parse({})
     expect(result.backgroundColor).toBeNull()
     expect(result.textColor).toBe('#FFFFFF')
-    expect(result.radius).toBe('md')
+    expect(result.radius).toBe('rounded')
   })
 
   it('should accept all radius presets', () => {
-    const radii = ['none', 'sm', 'md', 'full']
+    const radii = ['square', 'rounded', 'pill']
     radii.forEach((radius) => {
       const button = {
         backgroundColor: '#FF5733',
@@ -130,7 +136,7 @@ describe('themeButtonSchema', () => {
     const invalidButton = {
       backgroundColor: 'blue',
       textColor: '#FFFFFF',
-      radius: 'md',
+      radius: 'rounded',
     }
     expect(() => themeButtonSchema.parse(invalidButton)).toThrow(
       'Invalid hex color format',
@@ -141,7 +147,7 @@ describe('themeButtonSchema', () => {
     const invalidButton = {
       backgroundColor: '#FF5733',
       textColor: 'white',
-      radius: 'md',
+      radius: 'rounded',
     }
     expect(() => themeButtonSchema.parse(invalidButton)).toThrow(
       'Invalid hex color format',
@@ -189,9 +195,9 @@ describe('themeBackgroundSchema', () => {
 
   it('should apply defaults for missing fields', () => {
     const result = themeBackgroundSchema.parse({})
-    expect(result.color).toBe('#1E1E1E')
+    expect(result.color).toBe('#FFFFFF') // White background for light theme
     expect(result.image).toBeNull()
-    expect(result.overlayOpacity).toBe(0.5)
+    expect(result.overlayOpacity).toBe(0.3)
   })
 
   it('should accept overlayOpacity of 0', () => {
@@ -262,7 +268,7 @@ describe('themeSchema', () => {
     button: {
       backgroundColor: '#00FF00',
       textColor: '#FFFFFF',
-      radius: 'md',
+      radius: 'rounded',
     },
     background: {
       color: '#F0F0F0',
@@ -304,16 +310,16 @@ describe('themeSchema', () => {
     const result = themeSchema.parse({})
     expect(result.fontFamily).toBeNull()
     expect(result.primaryColor).toBe('#3B82F6')
-    expect(result.text).toEqual({ color: '#FFFFFF', alignment: 'center' })
+    expect(result.text).toEqual({ color: '#1E1E1E', alignment: 'center' })
     expect(result.button).toEqual({
       backgroundColor: null,
       textColor: '#FFFFFF',
-      radius: 'md',
+      radius: 'rounded',
     })
     expect(result.background).toEqual({
-      color: '#1E1E1E',
+      color: '#FFFFFF',
       image: null,
-      overlayOpacity: 0.5,
+      overlayOpacity: 0.3,
     })
   })
 
@@ -328,18 +334,5 @@ describe('themeSchema', () => {
     expect(() => themeSchema.parse(themeWithInvalidNested)).toThrow(
       'Invalid hex color format',
     )
-  })
-})
-
-describe('THEME_DEFAULTS', () => {
-  it('should contain expected default values', () => {
-    expect(THEME_DEFAULTS.text.color).toBe('#FFFFFF')
-    expect(THEME_DEFAULTS.text.alignment).toBe('center')
-    expect(THEME_DEFAULTS.button.backgroundColor).toBeNull()
-    expect(THEME_DEFAULTS.button.textColor).toBe('#FFFFFF')
-    expect(THEME_DEFAULTS.button.radius).toBe('md')
-    expect(THEME_DEFAULTS.background.color).toBe('#1E1E1E')
-    expect(THEME_DEFAULTS.background.image).toBeNull()
-    expect(THEME_DEFAULTS.background.overlayOpacity).toBe(0.5)
   })
 })

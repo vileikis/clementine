@@ -21,7 +21,7 @@ describe('ThemeContext', () => {
         button: {
           backgroundColor: '#FF5733',
           textColor: '#FFFFFF',
-          radius: 'md' as const,
+          radius: 'rounded' as const,
         },
         background: {
           color: '#FFFFFF',

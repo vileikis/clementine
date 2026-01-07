@@ -154,9 +154,6 @@ export function ThemeEditorPage() {
       <aside className="w-80 flex-shrink-0 border-l border-border overflow-y-auto bg-card">
         <div className="sticky top-0 z-10 border-b border-border bg-card px-4 py-3">
           <h2 className="font-semibold">Theme</h2>
-          <p className="text-xs text-muted-foreground">
-            Customize your event appearance
-          </p>
         </div>
         <ThemeControls
           theme={previewTheme}

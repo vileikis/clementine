@@ -1,12 +1,12 @@
 /**
  * ColorPickerField Component
  *
- * A color picker with native color input and hex text input.
+ * A color picker with preset color palette, custom color input, and hex field.
  * Supports optional nullable values for transparent/no color.
  */
 
-import { useEffect, useId, useState } from 'react'
-import { X } from 'lucide-react'
+import { useEffect, useId, useRef, useState } from 'react'
+import { Pipette, X } from 'lucide-react'
 import { EditorRow } from './EditorRow'
 import type { ColorPickerFieldProps } from '../types'
 import {
@@ -17,6 +17,38 @@ import {
 import { Input } from '@/ui-kit/components/input'
 import { Button } from '@/ui-kit/components/button'
 import { COLOR_REGEX } from '@/shared/theming/schemas/theme.schemas'
+import { cn } from '@/shared/utils'
+
+/** Preset color palette - curated for common use cases */
+const COLOR_PRESETS = [
+  // Row 1: Neutrals
+  '#FFFFFF',
+  '#F5F5F5',
+  '#E5E5E5',
+  '#A3A3A3',
+  '#737373',
+  '#404040',
+  '#171717',
+  '#000000',
+  // Row 2: Primary colors
+  '#EF4444',
+  '#F97316',
+  '#EAB308',
+  '#22C55E',
+  '#14B8A6',
+  '#3B82F6',
+  '#8B5CF6',
+  '#EC4899',
+  // Row 3: Light variants
+  '#FEE2E2',
+  '#FFEDD5',
+  '#FEF9C3',
+  '#DCFCE7',
+  '#CCFBF1',
+  '#DBEAFE',
+  '#EDE9FE',
+  '#FCE7F3',
+]
 
 export function ColorPickerField({
   label,
@@ -26,6 +58,7 @@ export function ColorPickerField({
   disabled = false,
 }: ColorPickerFieldProps) {
   const id = useId()
+  const colorInputRef = useRef<HTMLInputElement>(null)
   // Local state for hex input (allows invalid intermediate states)
   const [localHex, setLocalHex] = useState(value ?? '#000000')
 
@@ -34,9 +67,17 @@ export function ColorPickerField({
     setLocalHex(value ?? '#000000')
   }, [value])
 
+  const handlePresetClick = (color: string) => {
+    setLocalHex(color)
+    onChange(color)
+  }
+
+  const handleCustomColorClick = () => {
+    colorInputRef.current?.click()
+  }
+
   const handleColorInputChange = (newColor: string) => {
     setLocalHex(newColor)
-    // Native color picker always returns valid hex
     onChange(newColor)
   }
 
@@ -80,25 +121,62 @@ export function ColorPickerField({
             aria-label={`Select ${label.toLowerCase()} color`}
           />
         </PopoverTrigger>
-        <PopoverContent className="w-56 space-y-3">
-          {/* Native color picker */}
-          <input
-            type="color"
-            value={displayColor}
-            onChange={(e) => handleColorInputChange(e.target.value)}
-            disabled={disabled}
-            className="h-32 w-full cursor-pointer rounded border-0"
-          />
+        <PopoverContent className="w-[232px] space-y-3 p-3">
+          {/* Color palette grid */}
+          <div className="grid grid-cols-8 gap-1">
+            {COLOR_PRESETS.map((color) => (
+              <button
+                key={color}
+                type="button"
+                disabled={disabled}
+                onClick={() => handlePresetClick(color)}
+                className={cn(
+                  'size-6 rounded border transition-all hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50',
+                  value === color
+                    ? 'ring-2 ring-ring ring-offset-1'
+                    : 'border-border',
+                )}
+                style={{ backgroundColor: color }}
+                aria-label={`Select color ${color}`}
+              />
+            ))}
+          </div>
 
-          {/* Hex input */}
-          <Input
-            value={localHex.toUpperCase()}
-            onChange={(e) => handleHexInputChange(e.target.value)}
-            placeholder="#000000"
-            disabled={disabled}
-            maxLength={7}
-            className="font-mono text-sm"
-          />
+          {/* Custom color picker + Hex input row */}
+          <div className="flex items-center gap-2">
+            {/* Hidden native color input */}
+            <input
+              ref={colorInputRef}
+              type="color"
+              value={displayColor}
+              onChange={(e) => handleColorInputChange(e.target.value)}
+              disabled={disabled}
+              className="sr-only"
+            />
+
+            {/* Custom color button */}
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={handleCustomColorClick}
+              disabled={disabled}
+              className="shrink-0"
+              aria-label="Pick custom color"
+            >
+              <Pipette className="size-4" />
+            </Button>
+
+            {/* Hex input */}
+            <Input
+              value={localHex.toUpperCase()}
+              onChange={(e) => handleHexInputChange(e.target.value)}
+              placeholder="#000000"
+              disabled={disabled}
+              maxLength={7}
+              className="font-mono text-sm"
+            />
+          </div>
 
           {/* Clear button (only if nullable) */}
           {nullable && hasColor && (

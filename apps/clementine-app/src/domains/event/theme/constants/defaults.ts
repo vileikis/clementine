@@ -5,8 +5,8 @@
  * Use this when initializing form state or providing fallbacks.
  */
 
-import type {Theme} from '@/shared/theming/schemas/theme.schemas';
-import {  themeSchema } from '@/shared/theming/schemas/theme.schemas'
+import type { Theme } from '@/shared/theming/schemas/theme.schemas'
+import { themeSchema } from '@/shared/theming/schemas/theme.schemas'
 
 /**
  * Default theme with all fields populated from schema defaults.

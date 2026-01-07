@@ -18,16 +18,14 @@ export interface ThemePreviewProps {
  */
 function getButtonRadius(radius: Theme['button']['radius']): string {
   switch (radius) {
-    case 'none':
+    case 'square':
       return '0'
-    case 'sm':
-      return '4px'
-    case 'md':
-      return '8px'
-    case 'full':
+    case 'rounded':
+      return '0.5rem'
+    case 'pill':
       return '9999px'
     default:
-      return '8px' // fallback to 'md'
+      return '0.5rem' // fallback to 'rounded'
   }
 }
 

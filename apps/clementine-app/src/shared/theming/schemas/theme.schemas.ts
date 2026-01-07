@@ -5,6 +5,10 @@ import { z } from 'zod'
 /** Hex color regex pattern */
 export const COLOR_REGEX = /^#[0-9A-Fa-f]{6}$/
 
+/** Button radius options */
+export const BUTTON_RADIUS_OPTIONS = ['square', 'rounded', 'pill'] as const
+export type ButtonRadius = (typeof BUTTON_RADIUS_OPTIONS)[number]
+
 /**
  * Theme text configuration schema
  */
@@ -12,7 +16,7 @@ export const themeTextSchema = z.object({
   color: z
     .string()
     .regex(COLOR_REGEX, 'Invalid hex color format')
-    .default('#FFFFFF'),
+    .default('#1E1E1E'), // Dark text for light theme
   alignment: z.enum(['left', 'center', 'right']).default('center'),
 })
 
@@ -24,12 +28,12 @@ export const themeButtonSchema = z.object({
     .string()
     .regex(COLOR_REGEX, 'Invalid hex color format')
     .nullable()
-    .default(null),
+    .default(null), // Falls back to primaryColor
   textColor: z
     .string()
     .regex(COLOR_REGEX, 'Invalid hex color format')
     .default('#FFFFFF'),
-  radius: z.enum(['none', 'sm', 'md', 'full']).default('md'),
+  radius: z.enum(BUTTON_RADIUS_OPTIONS).default('rounded'),
 })
 
 /**
@@ -39,40 +43,38 @@ export const themeBackgroundSchema = z.object({
   color: z
     .string()
     .regex(COLOR_REGEX, 'Invalid hex color format')
-    .default('#1E1E1E'),
+    .default('#FFFFFF'), // White background for light theme
   image: z.url().nullable().default(null),
-  overlayOpacity: z.number().min(0).max(1).default(0.5),
+  overlayOpacity: z.number().min(0).max(1).default(0.3),
 })
-
-/**
- * Default values for nested theme objects
- * Used by schema defaults and form initialization
- */
-export const THEME_DEFAULTS = {
-  text: { color: '#FFFFFF', alignment: 'center' as const },
-  button: {
-    backgroundColor: null,
-    textColor: '#FFFFFF',
-    radius: 'md' as const,
-  },
-  background: { color: '#1E1E1E', image: null, overlayOpacity: 0.5 },
-}
 
 /**
  * Complete theme schema for visual customization
  * Used by Project.theme and Event.theme
  *
  * All fields have defaults - parsing partial data fills missing fields.
+ * Default theme is light (dark text on white background).
  */
 export const themeSchema = z.object({
   fontFamily: z.string().nullable().default(null),
   primaryColor: z
     .string()
     .regex(COLOR_REGEX, 'Invalid hex color format')
-    .default('#3B82F6'),
-  text: themeTextSchema.default(THEME_DEFAULTS.text),
-  button: themeButtonSchema.default(THEME_DEFAULTS.button),
-  background: themeBackgroundSchema.default(THEME_DEFAULTS.background),
+    .default('#3B82F6'), // Blue primary
+  text: themeTextSchema.default({
+    color: '#1E1E1E',
+    alignment: 'center',
+  }),
+  button: themeButtonSchema.default({
+    backgroundColor: null,
+    textColor: '#FFFFFF',
+    radius: 'rounded',
+  }),
+  background: themeBackgroundSchema.default({
+    color: '#FFFFFF',
+    image: null,
+    overlayOpacity: 0.3,
+  }),
 })
 
 /**

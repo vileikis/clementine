@@ -6,8 +6,16 @@
  */
 
 import { AlignCenter, AlignLeft, AlignRight } from 'lucide-react'
+import {
+  TbBorderCornerPill,
+  TbBorderCornerRounded,
+  TbBorderCornerSquare,
+} from 'react-icons/tb'
 import { FONT_OPTIONS } from '../constants'
-import type { Theme } from '@/shared/theming/schemas/theme.schemas'
+import type {
+  ButtonRadius,
+  Theme,
+} from '@/shared/theming/schemas/theme.schemas'
 import type { EditorOption } from '@/shared/editor-controls'
 import {
   ColorPickerField,
@@ -44,12 +52,23 @@ const ALIGNMENT_OPTIONS: EditorOption<'left' | 'center' | 'right'>[] = [
   { value: 'right', label: 'Right', icon: <AlignRight className="size-4" /> },
 ]
 
-// Button radius options
-const RADIUS_OPTIONS: EditorOption<'none' | 'sm' | 'md' | 'full'>[] = [
-  { value: 'none', label: 'None' },
-  { value: 'sm', label: 'S' },
-  { value: 'md', label: 'M' },
-  { value: 'full', label: 'Full' },
+// Button radius options with icons
+const RADIUS_OPTIONS: EditorOption<ButtonRadius>[] = [
+  {
+    value: 'square',
+    label: 'Square',
+    icon: <TbBorderCornerSquare className="size-4" />,
+  },
+  {
+    value: 'rounded',
+    label: 'Rounded',
+    icon: <TbBorderCornerRounded className="size-4" />,
+  },
+  {
+    value: 'pill',
+    label: 'Pill',
+    icon: <TbBorderCornerPill className="size-4" />,
+  },
 ]
 
 export function ThemeControls({
@@ -77,7 +96,7 @@ export function ThemeControls({
           label="Text color"
           value={theme.text.color}
           onChange={(value) =>
-            onUpdate({ text: { ...theme.text, color: value ?? '#FFFFFF' } })
+            onUpdate({ text: { ...theme.text, color: value ?? '#1E1E1E' } })
           }
           disabled={disabled}
         />
@@ -141,7 +160,7 @@ export function ThemeControls({
           value={theme.background.color}
           onChange={(value) =>
             onUpdate({
-              background: { ...theme.background, color: value ?? '#1E1E1E' },
+              background: { ...theme.background, color: value ?? '#FFFFFF' },
             })
           }
           disabled={disabled}
