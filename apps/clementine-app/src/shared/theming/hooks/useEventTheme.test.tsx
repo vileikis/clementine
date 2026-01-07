@@ -14,7 +14,7 @@ const mockTheme: Theme = {
   button: {
     backgroundColor: '#00FF00',
     textColor: '#FFFFFF',
-    radius: 'md',
+    radius: 'rounded',
   },
   background: {
     color: '#FFFFFF',

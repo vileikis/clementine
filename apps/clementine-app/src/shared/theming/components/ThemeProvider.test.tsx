@@ -28,7 +28,7 @@ const mockTheme: Theme = {
   button: {
     backgroundColor: '#00FF00',
     textColor: '#FFFFFF',
-    radius: 'md',
+    radius: 'rounded',
   },
   background: {
     color: '#FFFFFF',
@@ -92,10 +92,9 @@ describe('ThemeProvider', () => {
 
   it('should map all radius presets correctly', () => {
     const radiusTests = [
-      { preset: 'none' as const, expected: '0' },
-      { preset: 'sm' as const, expected: '0.25rem' },
-      { preset: 'md' as const, expected: '0.5rem' },
-      { preset: 'full' as const, expected: '9999px' },
+      { preset: 'square' as const, expected: '0' },
+      { preset: 'rounded' as const, expected: '0.5rem' },
+      { preset: 'pill' as const, expected: '9999px' },
     ]
 
     radiusTests.forEach(({ preset, expected }) => {

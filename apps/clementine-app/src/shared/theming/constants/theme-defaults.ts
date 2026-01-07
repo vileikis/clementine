@@ -1,4 +1,4 @@
-import type { ButtonRadius } from '../types'
+import type { ButtonRadius } from '../schemas/theme.schemas'
 
 /**
  * Maps button radius preset names to CSS border-radius values.
@@ -7,8 +7,7 @@ import type { ButtonRadius } from '../types'
  * to ensure consistent button styling across the application.
  */
 export const BUTTON_RADIUS_MAP: Record<ButtonRadius, string> = {
-  none: '0',
-  sm: '0.25rem',
-  md: '0.5rem',
-  full: '9999px',
+  square: '0',
+  rounded: '0.5rem',
+  pill: '9999px',
 }

@@ -13,11 +13,11 @@ export type { ThemeContextValue } from './context'
 // Schemas
 export {
   COLOR_REGEX,
+  BUTTON_RADIUS_OPTIONS,
   themeTextSchema,
   themeButtonSchema,
   themeBackgroundSchema,
   themeSchema,
-  updateThemeSchema,
 } from './schemas'
 
 // Constants

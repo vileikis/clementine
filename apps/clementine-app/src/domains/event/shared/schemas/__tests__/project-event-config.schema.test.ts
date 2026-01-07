@@ -60,7 +60,7 @@ describe('projectEventConfigSchema', () => {
           button: {
             backgroundColor: '#FF6B6B',
             textColor: '#FFFFFF',
-            radius: 'md' as const,
+            radius: 'rounded' as const,
           },
           background: {
             color: '#F5F5F5',

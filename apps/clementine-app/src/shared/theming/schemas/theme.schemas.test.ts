@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import {
+  BUTTON_RADIUS_OPTIONS,
   COLOR_REGEX,
   themeBackgroundSchema,
   themeButtonSchema,
   themeSchema,
   themeTextSchema,
-  updateThemeSchema,
 } from './theme.schemas'
 
 describe('COLOR_REGEX', () => {
@@ -33,6 +33,12 @@ describe('COLOR_REGEX', () => {
   })
 })
 
+describe('BUTTON_RADIUS_OPTIONS', () => {
+  it('should contain expected options', () => {
+    expect(BUTTON_RADIUS_OPTIONS).toEqual(['square', 'rounded', 'pill'])
+  })
+})
+
 describe('themeTextSchema', () => {
   it('should validate valid theme text configuration', () => {
     const validText = {
@@ -51,6 +57,12 @@ describe('themeTextSchema', () => {
       }
       expect(() => themeTextSchema.parse(text)).not.toThrow()
     })
+  })
+
+  it('should apply defaults for missing fields', () => {
+    const result = themeTextSchema.parse({})
+    expect(result.color).toBe('#1E1E1E') // Dark text for light theme
+    expect(result.alignment).toBe('center')
   })
 
   it('should reject invalid hex color', () => {
@@ -77,7 +89,7 @@ describe('themeButtonSchema', () => {
     const validButton = {
       backgroundColor: '#FF5733',
       textColor: '#FFFFFF',
-      radius: 'md',
+      radius: 'rounded',
     }
     expect(() => themeButtonSchema.parse(validButton)).not.toThrow()
   })
@@ -86,7 +98,7 @@ describe('themeButtonSchema', () => {
     const buttonWithNullBg = {
       backgroundColor: null,
       textColor: '#FFFFFF',
-      radius: 'md',
+      radius: 'rounded',
     }
     const result = themeButtonSchema.parse(buttonWithNullBg)
     expect(result.backgroundColor).toBeNull()
@@ -95,14 +107,21 @@ describe('themeButtonSchema', () => {
   it('should default backgroundColor to null when not provided', () => {
     const buttonWithoutBg = {
       textColor: '#FFFFFF',
-      radius: 'md',
+      radius: 'rounded',
     }
     const result = themeButtonSchema.parse(buttonWithoutBg)
     expect(result.backgroundColor).toBeNull()
   })
 
+  it('should apply defaults for missing fields', () => {
+    const result = themeButtonSchema.parse({})
+    expect(result.backgroundColor).toBeNull()
+    expect(result.textColor).toBe('#FFFFFF')
+    expect(result.radius).toBe('rounded')
+  })
+
   it('should accept all radius presets', () => {
-    const radii = ['none', 'sm', 'md', 'full']
+    const radii = ['square', 'rounded', 'pill']
     radii.forEach((radius) => {
       const button = {
         backgroundColor: '#FF5733',
@@ -117,7 +136,7 @@ describe('themeButtonSchema', () => {
     const invalidButton = {
       backgroundColor: 'blue',
       textColor: '#FFFFFF',
-      radius: 'md',
+      radius: 'rounded',
     }
     expect(() => themeButtonSchema.parse(invalidButton)).toThrow(
       'Invalid hex color format',
@@ -128,7 +147,7 @@ describe('themeButtonSchema', () => {
     const invalidButton = {
       backgroundColor: '#FF5733',
       textColor: 'white',
-      radius: 'md',
+      radius: 'rounded',
     }
     expect(() => themeButtonSchema.parse(invalidButton)).toThrow(
       'Invalid hex color format',
@@ -172,6 +191,13 @@ describe('themeBackgroundSchema', () => {
     }
     const result = themeBackgroundSchema.parse(bgWithoutImage)
     expect(result.image).toBeNull()
+  })
+
+  it('should apply defaults for missing fields', () => {
+    const result = themeBackgroundSchema.parse({})
+    expect(result.color).toBe('#FFFFFF') // White background for light theme
+    expect(result.image).toBeNull()
+    expect(result.overlayOpacity).toBe(0.3)
   })
 
   it('should accept overlayOpacity of 0', () => {
@@ -242,7 +268,7 @@ describe('themeSchema', () => {
     button: {
       backgroundColor: '#00FF00',
       textColor: '#FFFFFF',
-      radius: 'md',
+      radius: 'rounded',
     },
     background: {
       color: '#F0F0F0',
@@ -280,24 +306,21 @@ describe('themeSchema', () => {
     )
   })
 
-  it('should reject missing primaryColor', () => {
-    const { primaryColor, ...themeWithoutPrimary } = validTheme
-    expect(() => themeSchema.parse(themeWithoutPrimary)).toThrow()
-  })
-
-  it('should reject missing text configuration', () => {
-    const { text, ...themeWithoutText } = validTheme
-    expect(() => themeSchema.parse(themeWithoutText)).toThrow()
-  })
-
-  it('should reject missing button configuration', () => {
-    const { button, ...themeWithoutButton } = validTheme
-    expect(() => themeSchema.parse(themeWithoutButton)).toThrow()
-  })
-
-  it('should reject missing background configuration', () => {
-    const { background, ...themeWithoutBackground } = validTheme
-    expect(() => themeSchema.parse(themeWithoutBackground)).toThrow()
+  it('should apply all defaults when parsing empty object', () => {
+    const result = themeSchema.parse({})
+    expect(result.fontFamily).toBeNull()
+    expect(result.primaryColor).toBe('#3B82F6')
+    expect(result.text).toEqual({ color: '#1E1E1E', alignment: 'center' })
+    expect(result.button).toEqual({
+      backgroundColor: null,
+      textColor: '#FFFFFF',
+      radius: 'rounded',
+    })
+    expect(result.background).toEqual({
+      color: '#FFFFFF',
+      image: null,
+      overlayOpacity: 0.3,
+    })
   })
 
   it('should validate nested schemas correctly', () => {
@@ -311,94 +334,5 @@ describe('themeSchema', () => {
     expect(() => themeSchema.parse(themeWithInvalidNested)).toThrow(
       'Invalid hex color format',
     )
-  })
-})
-
-describe('updateThemeSchema', () => {
-  it('should validate empty update object', () => {
-    expect(() => updateThemeSchema.parse({})).not.toThrow()
-  })
-
-  it('should validate partial theme update with only primaryColor', () => {
-    const partialUpdate = {
-      primaryColor: '#FF0000',
-    }
-    expect(() => updateThemeSchema.parse(partialUpdate)).not.toThrow()
-  })
-
-  it('should validate partial theme update with only text', () => {
-    const partialUpdate = {
-      text: {
-        color: '#000000',
-      },
-    }
-    expect(() => updateThemeSchema.parse(partialUpdate)).not.toThrow()
-  })
-
-  it('should validate partial theme update with only text alignment', () => {
-    const partialUpdate = {
-      text: {
-        alignment: 'left',
-      },
-    }
-    expect(() => updateThemeSchema.parse(partialUpdate)).not.toThrow()
-  })
-
-  it('should validate partial theme update with only button background', () => {
-    const partialUpdate = {
-      button: {
-        backgroundColor: '#00FF00',
-      },
-    }
-    expect(() => updateThemeSchema.parse(partialUpdate)).not.toThrow()
-  })
-
-  it('should validate partial theme update with multiple fields', () => {
-    const partialUpdate = {
-      primaryColor: '#FF0000',
-      text: {
-        color: '#FFFFFF',
-      },
-      button: {
-        radius: 'full',
-      },
-    }
-    expect(() => updateThemeSchema.parse(partialUpdate)).not.toThrow()
-  })
-
-  it('should reject invalid primaryColor in update', () => {
-    const invalidUpdate = {
-      primaryColor: 'red',
-    }
-    expect(() => updateThemeSchema.parse(invalidUpdate)).toThrow(
-      'Invalid hex color format',
-    )
-  })
-
-  it('should reject invalid nested color in update', () => {
-    const invalidUpdate = {
-      text: {
-        color: 'black',
-      },
-    }
-    expect(() => updateThemeSchema.parse(invalidUpdate)).toThrow(
-      'Invalid hex color format',
-    )
-  })
-
-  it('should allow null fontFamily in update', () => {
-    const updateWithNullFont = {
-      fontFamily: null,
-    }
-    expect(() => updateThemeSchema.parse(updateWithNullFont)).not.toThrow()
-  })
-
-  it('should allow null button backgroundColor in update', () => {
-    const updateWithNullBg = {
-      button: {
-        backgroundColor: null,
-      },
-    }
-    expect(() => updateThemeSchema.parse(updateWithNullBg)).not.toThrow()
   })
 })
