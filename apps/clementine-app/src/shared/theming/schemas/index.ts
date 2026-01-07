@@ -5,5 +5,12 @@ export {
   themeButtonSchema,
   themeBackgroundSchema,
   themeSchema,
-  updateThemeSchema,
+  THEME_DEFAULTS,
+} from './theme.schemas'
+
+export type {
+  Theme,
+  ThemeText,
+  ThemeButton,
+  ThemeBackground,
 } from './theme.schemas'

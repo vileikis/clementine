@@ -17,7 +17,7 @@ export {
   themeButtonSchema,
   themeBackgroundSchema,
   themeSchema,
-  updateThemeSchema,
+  THEME_DEFAULTS,
 } from './schemas'
 
 // Constants

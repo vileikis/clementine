@@ -1,26 +1,15 @@
 /**
  * Default Theme Values
  *
- * Default theme configuration used when an event has no theme set.
+ * Derived from themeSchema defaults - single source of truth.
+ * Use this when initializing form state or providing fallbacks.
  */
 
-import type { Theme } from '@/shared/theming/schemas/theme.schemas'
+import type {Theme} from '@/shared/theming/schemas/theme.schemas';
+import {  themeSchema } from '@/shared/theming/schemas/theme.schemas'
 
-export const DEFAULT_THEME: Theme = {
-  fontFamily: null,
-  primaryColor: '#3B82F6',
-  text: {
-    color: '#FFFFFF',
-    alignment: 'center',
-  },
-  button: {
-    backgroundColor: null,
-    textColor: '#FFFFFF',
-    radius: 'md',
-  },
-  background: {
-    color: '#1E1E1E',
-    image: null,
-    overlayOpacity: 0.5,
-  },
-}
+/**
+ * Default theme with all fields populated from schema defaults.
+ * Parsing an empty object applies all .default() values.
+ */
+export const DEFAULT_THEME: Theme = themeSchema.parse({})

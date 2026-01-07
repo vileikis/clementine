@@ -9,14 +9,12 @@ import { useCallback, useState } from 'react'
 import { useParams } from '@tanstack/react-router'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
-import { ThemeControls } from '../components/ThemeControls'
-import { ThemePreview } from '../components/ThemePreview'
-import { useUpdateTheme } from '../hooks/useUpdateTheme'
-import { useUploadAndUpdateBackground } from '../hooks/useUploadAndUpdateBackground'
+import { ThemeControls, ThemePreview } from '../components'
+import { useUpdateTheme, useUploadAndUpdateBackground } from '../hooks'
 import { DEFAULT_THEME } from '../constants'
-import type { Theme } from '@/shared/theming/schemas/theme.schemas'
+import type { Theme } from '@/shared/theming'
 import { PreviewShell } from '@/shared/preview-shell'
-import { useAutoSave } from '@/shared/forms/hooks/useAutoSave'
+import { useAutoSave } from '@/shared/forms'
 import { useProjectEvent } from '@/domains/event/shared'
 import { useWorkspace } from '@/domains/workspace'
 import { useAuth } from '@/domains/auth'
@@ -52,8 +50,6 @@ export function ThemeEditorPage() {
   // Mutations
   const updateTheme = useUpdateTheme(projectId!, eventId!)
   const uploadBackground = useUploadAndUpdateBackground(
-    projectId!,
-    eventId!,
     workspace?.id ?? '',
     user?.uid ?? '',
   )
@@ -62,9 +58,11 @@ export function ThemeEditorPage() {
   const { triggerSave } = useAutoSave({
     form,
     originalValues: currentTheme,
-    onUpdate: async (updates) => {
+    onUpdate: async () => {
       try {
-        await updateTheme.mutateAsync(updates)
+        // Push complete theme object (not partial updates)
+        const fullTheme = form.getValues()
+        await updateTheme.mutateAsync(fullTheme)
         // No toast - save indicator handles feedback
       } catch (error) {
         const message =
@@ -111,8 +109,9 @@ export function ThemeEditorPage() {
           onProgress: (progress) => setUploadProgress(progress),
         })
 
-        // Update form with new URL
+        // Update form with new URL and trigger save
         form.setValue('background.image', url, { shouldDirty: true })
+        triggerSave()
         toast.success('Background image uploaded')
       } catch (error) {
         const message =
@@ -125,7 +124,7 @@ export function ThemeEditorPage() {
         setUploadProgress(undefined)
       }
     },
-    [uploadBackground, form, workspace?.id, user?.uid],
+    [uploadBackground, form, workspace?.id, user?.uid, triggerSave],
   )
 
   // Loading state

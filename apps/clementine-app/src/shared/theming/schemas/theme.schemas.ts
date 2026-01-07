@@ -1,4 +1,5 @@
 // Zod schemas for Theme validation
+// Following standards/global/zod-validation.md patterns
 import { z } from 'zod'
 
 /** Hex color regex pattern */
@@ -8,8 +9,11 @@ export const COLOR_REGEX = /^#[0-9A-Fa-f]{6}$/
  * Theme text configuration schema
  */
 export const themeTextSchema = z.object({
-  color: z.string().regex(COLOR_REGEX, 'Invalid hex color format'),
-  alignment: z.enum(['left', 'center', 'right']),
+  color: z
+    .string()
+    .regex(COLOR_REGEX, 'Invalid hex color format')
+    .default('#FFFFFF'),
+  alignment: z.enum(['left', 'center', 'right']).default('center'),
 })
 
 /**
@@ -20,75 +24,55 @@ export const themeButtonSchema = z.object({
     .string()
     .regex(COLOR_REGEX, 'Invalid hex color format')
     .nullable()
-    .optional()
     .default(null),
-  textColor: z.string().regex(COLOR_REGEX, 'Invalid hex color format'),
-  radius: z.enum(['none', 'sm', 'md', 'full']),
+  textColor: z
+    .string()
+    .regex(COLOR_REGEX, 'Invalid hex color format')
+    .default('#FFFFFF'),
+  radius: z.enum(['none', 'sm', 'md', 'full']).default('md'),
 })
 
 /**
  * Theme background configuration schema
  */
 export const themeBackgroundSchema = z.object({
-  color: z.string().regex(COLOR_REGEX, 'Invalid hex color format'),
-  image: z.string().url().nullable().optional().default(null),
-  overlayOpacity: z.number().min(0).max(1),
+  color: z
+    .string()
+    .regex(COLOR_REGEX, 'Invalid hex color format')
+    .default('#1E1E1E'),
+  image: z.url().nullable().default(null),
+  overlayOpacity: z.number().min(0).max(1).default(0.5),
 })
+
+/**
+ * Default values for nested theme objects
+ * Used by schema defaults and form initialization
+ */
+export const THEME_DEFAULTS = {
+  text: { color: '#FFFFFF', alignment: 'center' as const },
+  button: {
+    backgroundColor: null,
+    textColor: '#FFFFFF',
+    radius: 'md' as const,
+  },
+  background: { color: '#1E1E1E', image: null, overlayOpacity: 0.5 },
+}
 
 /**
  * Complete theme schema for visual customization
  * Used by Project.theme and Event.theme
+ *
+ * All fields have defaults - parsing partial data fills missing fields.
  */
 export const themeSchema = z.object({
-  fontFamily: z.string().nullable().optional().default(null),
-  primaryColor: z.string().regex(COLOR_REGEX, 'Invalid hex color format'),
-  text: themeTextSchema,
-  button: themeButtonSchema,
-  background: themeBackgroundSchema,
-})
-
-/**
- * Partial theme schema for updates (all fields optional)
- */
-export const updateThemeSchema = z.object({
-  fontFamily: z.string().nullable().optional(),
+  fontFamily: z.string().nullable().default(null),
   primaryColor: z
     .string()
     .regex(COLOR_REGEX, 'Invalid hex color format')
-    .optional(),
-  text: z
-    .object({
-      color: z
-        .string()
-        .regex(COLOR_REGEX, 'Invalid hex color format')
-        .optional(),
-      alignment: z.enum(['left', 'center', 'right']).optional(),
-    })
-    .optional(),
-  button: z
-    .object({
-      backgroundColor: z
-        .string()
-        .regex(COLOR_REGEX, 'Invalid hex color format')
-        .nullable()
-        .optional(),
-      textColor: z
-        .string()
-        .regex(COLOR_REGEX, 'Invalid hex color format')
-        .optional(),
-      radius: z.enum(['none', 'sm', 'md', 'full']).optional(),
-    })
-    .optional(),
-  background: z
-    .object({
-      color: z
-        .string()
-        .regex(COLOR_REGEX, 'Invalid hex color format')
-        .optional(),
-      image: z.string().url().nullable().optional(),
-      overlayOpacity: z.number().min(0).max(1).optional(),
-    })
-    .optional(),
+    .default('#3B82F6'),
+  text: themeTextSchema.default(THEME_DEFAULTS.text),
+  button: themeButtonSchema.default(THEME_DEFAULTS.button),
+  background: themeBackgroundSchema.default(THEME_DEFAULTS.background),
 })
 
 /**
@@ -98,4 +82,3 @@ export type Theme = z.infer<typeof themeSchema>
 export type ThemeText = z.infer<typeof themeTextSchema>
 export type ThemeButton = z.infer<typeof themeButtonSchema>
 export type ThemeBackground = z.infer<typeof themeBackgroundSchema>
-export type UpdateTheme = z.infer<typeof updateThemeSchema>
