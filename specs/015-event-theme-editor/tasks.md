@@ -26,10 +26,10 @@ Based on plan.md structure (TanStack Start web app):
 
 **Purpose**: Create directory structure and barrel exports for new modules
 
-- [ ] T001 Create editor-controls module directories at `apps/clementine-app/src/shared/editor-controls/{components,types}/`
-- [ ] T002 Create theme domain module directories at `apps/clementine-app/src/domains/event/theme/{components,containers,hooks,constants}/`
-- [ ] T003 [P] Create barrel export file at `apps/clementine-app/src/shared/editor-controls/index.ts`
-- [ ] T004 [P] Create barrel export file at `apps/clementine-app/src/domains/event/theme/index.ts`
+- [X] T001 Create editor-controls module directories at `apps/clementine-app/src/shared/editor-controls/{components,types}/`
+- [X] T002 Create theme domain module directories at `apps/clementine-app/src/domains/event/theme/{components,containers,hooks,constants}/`
+- [X] T003 [P] Create barrel export file at `apps/clementine-app/src/shared/editor-controls/index.ts`
+- [X] T004 [P] Create barrel export file at `apps/clementine-app/src/domains/event/theme/index.ts`
 
 ---
 
@@ -41,21 +41,21 @@ Based on plan.md structure (TanStack Start web app):
 
 ### Layout Components
 
-- [ ] T005 [P] Create EditorSection component with collapsible functionality using shadcn Collapsible at `apps/clementine-app/src/shared/editor-controls/components/EditorSection.tsx`
-- [ ] T006 [P] Create EditorRow component with label+control grid layout at `apps/clementine-app/src/shared/editor-controls/components/EditorRow.tsx`
+- [X] T005 [P] Create EditorSection component with collapsible functionality using shadcn Collapsible at `apps/clementine-app/src/shared/editor-controls/components/EditorSection.tsx`
+- [X] T006 [P] Create EditorRow component with label+control grid layout at `apps/clementine-app/src/shared/editor-controls/components/EditorRow.tsx`
 
 ### Field Components
 
-- [ ] T007 [P] Create ColorPickerField component with native color picker and hex input in shadcn Popover at `apps/clementine-app/src/shared/editor-controls/components/ColorPickerField.tsx`
-- [ ] T008 [P] Create SelectField component wrapping shadcn Select at `apps/clementine-app/src/shared/editor-controls/components/SelectField.tsx`
-- [ ] T009 [P] Create ToggleGroupField component wrapping shadcn ToggleGroup at `apps/clementine-app/src/shared/editor-controls/components/ToggleGroupField.tsx`
-- [ ] T010 [P] Create SliderField component wrapping shadcn Slider with value display at `apps/clementine-app/src/shared/editor-controls/components/SliderField.tsx`
-- [ ] T011 [P] Create MediaPickerField component with upload and preview functionality at `apps/clementine-app/src/shared/editor-controls/components/MediaPickerField.tsx`
+- [X] T007 [P] Create ColorPickerField component with native color picker and hex input in shadcn Popover at `apps/clementine-app/src/shared/editor-controls/components/ColorPickerField.tsx`
+- [X] T008 [P] Create SelectField component wrapping shadcn Select at `apps/clementine-app/src/shared/editor-controls/components/SelectField.tsx`
+- [X] T009 [P] Create ToggleGroupField component wrapping shadcn ToggleGroup at `apps/clementine-app/src/shared/editor-controls/components/ToggleGroupField.tsx`
+- [X] T010 [P] Create SliderField component wrapping shadcn Slider with value display at `apps/clementine-app/src/shared/editor-controls/components/SliderField.tsx`
+- [X] T011 [P] Create MediaPickerField component with upload and preview functionality at `apps/clementine-app/src/shared/editor-controls/components/MediaPickerField.tsx`
 
 ### Types and Exports
 
-- [ ] T012 [P] Create shared types for all editor control props at `apps/clementine-app/src/shared/editor-controls/types/index.ts`
-- [ ] T013 Create components barrel export at `apps/clementine-app/src/shared/editor-controls/components/index.ts` (depends on T005-T011)
+- [X] T012 [P] Create shared types for all editor control props at `apps/clementine-app/src/shared/editor-controls/types/index.ts`
+- [X] T013 Create components barrel export at `apps/clementine-app/src/shared/editor-controls/components/index.ts` (depends on T005-T011)
 
 **Checkpoint**: Editor controls module complete - can be used by theme editor and future editors
 
@@ -69,13 +69,13 @@ Based on plan.md structure (TanStack Start web app):
 
 ### Constants
 
-- [ ] T014 [P] [G1] Create font options constant array at `apps/clementine-app/src/domains/event/theme/constants/fonts.ts`
-- [ ] T015 [P] [G1] Create constants barrel export at `apps/clementine-app/src/domains/event/theme/constants/index.ts`
+- [X] T014 [P] [G1] Create font options constant array at `apps/clementine-app/src/domains/event/theme/constants/fonts.ts`
+- [X] T015 [P] [G1] Create constants barrel export at `apps/clementine-app/src/domains/event/theme/constants/index.ts`
 
 ### Theme Controls Component
 
-- [ ] T016 [G1] Create ThemeControls component with all four sections (Text, Colors, Buttons, Background) using editor controls at `apps/clementine-app/src/domains/event/theme/components/ThemeControls.tsx` (depends on T013, T014)
-- [ ] T017 [G1] Create components barrel export at `apps/clementine-app/src/domains/event/theme/components/index.ts` (depends on T016)
+- [X] T016 [G1] Create ThemeControls component with all four sections (Text, Colors, Buttons, Background) using editor controls at `apps/clementine-app/src/domains/event/theme/components/ThemeControls.tsx` (depends on T013, T014)
+- [X] T017 [G1] Create components barrel export at `apps/clementine-app/src/domains/event/theme/components/index.ts` (depends on T016)
 
 **Checkpoint**: Theme controls render and accept user input - can be tested standalone with mock data
 
@@ -89,8 +89,8 @@ Based on plan.md structure (TanStack Start web app):
 
 ### Preview Component
 
-- [ ] T018 [G2] Create ThemePreview display-only component showing background, text samples, and button with theme applied at `apps/clementine-app/src/domains/event/theme/components/ThemePreview.tsx`
-- [ ] T019 [G2] Update components barrel export to include ThemePreview at `apps/clementine-app/src/domains/event/theme/components/index.ts` (depends on T018)
+- [X] T018 [G2] Create ThemePreview display-only component showing background, text samples, and button with theme applied at `apps/clementine-app/src/domains/event/theme/components/ThemePreview.tsx`
+- [X] T019 [G2] Update components barrel export to include ThemePreview at `apps/clementine-app/src/domains/event/theme/components/index.ts` (depends on T018)
 
 **Checkpoint**: ThemePreview renders correctly with theme data passed as props
 
@@ -104,9 +104,9 @@ Based on plan.md structure (TanStack Start web app):
 
 ### Hooks
 
-- [ ] T020 [P] [G3] Create useUpdateTheme hook with TanStack Query mutation and tracked mutation wrapper at `apps/clementine-app/src/domains/event/theme/hooks/useUpdateTheme.ts`
-- [ ] T021 [P] [G3] Create useUploadAndUpdateBackground composite hook combining upload and theme update at `apps/clementine-app/src/domains/event/theme/hooks/useUploadAndUpdateBackground.ts`
-- [ ] T022 [G3] Create hooks barrel export at `apps/clementine-app/src/domains/event/theme/hooks/index.ts` (depends on T020, T021)
+- [X] T020 [P] [G3] Create useUpdateTheme hook with TanStack Query mutation and tracked mutation wrapper at `apps/clementine-app/src/domains/event/theme/hooks/useUpdateTheme.ts`
+- [X] T021 [P] [G3] Create useUploadAndUpdateBackground composite hook combining upload and theme update at `apps/clementine-app/src/domains/event/theme/hooks/useUploadAndUpdateBackground.ts`
+- [X] T022 [G3] Create hooks barrel export at `apps/clementine-app/src/domains/event/theme/hooks/index.ts` (depends on T020, T021)
 
 **Checkpoint**: Hooks can be tested in isolation with mock API calls
 
@@ -120,12 +120,12 @@ Based on plan.md structure (TanStack Start web app):
 
 ### Container
 
-- [ ] T023 [G4] Create ThemeEditorPage container with 2-column layout (PreviewShell + ThemeControls), React Hook Form setup, and useAutoSave integration at `apps/clementine-app/src/domains/event/theme/containers/ThemeEditorPage.tsx` (depends on T016, T018, T022)
-- [ ] T024 [G4] Create containers barrel export at `apps/clementine-app/src/domains/event/theme/containers/index.ts` (depends on T023)
+- [X] T023 [G4] Create ThemeEditorPage container with 2-column layout (PreviewShell + ThemeControls), React Hook Form setup, and useAutoSave integration at `apps/clementine-app/src/domains/event/theme/containers/ThemeEditorPage.tsx` (depends on T016, T018, T022)
+- [X] T024 [G4] Create containers barrel export at `apps/clementine-app/src/domains/event/theme/containers/index.ts` (depends on T023)
 
 ### Route Integration
 
-- [ ] T025 [G4] Create theme route file importing ThemeEditorPage at `apps/clementine-app/src/app/routes/workspace.$workspaceSlug.projects.$projectId.events.$eventId.theme.tsx` (depends on T024)
+- [X] T025 [G4] Create theme route file importing ThemeEditorPage at `apps/clementine-app/src/app/routes/workspace.$workspaceSlug.projects.$projectId.events.$eventId.theme.tsx` (depends on T024)
 
 **Checkpoint**: Theme editor fully functional - all success criteria met
 
@@ -135,8 +135,8 @@ Based on plan.md structure (TanStack Start web app):
 
 **Purpose**: Final validation and cleanup
 
-- [ ] T026 Run `pnpm check` (format + lint) in `apps/clementine-app/`
-- [ ] T027 Run `pnpm type-check` in `apps/clementine-app/`
+- [X] T026 Run `pnpm check` (format + lint) in `apps/clementine-app/`
+- [X] T027 Run `pnpm type-check` in `apps/clementine-app/`
 - [ ] T028 Manual verification: Test all theme properties update correctly
 - [ ] T029 Manual verification: Test real-time preview updates
 - [ ] T030 Manual verification: Test auto-save with 300ms debounce

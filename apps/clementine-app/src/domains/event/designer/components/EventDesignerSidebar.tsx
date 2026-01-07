@@ -28,11 +28,11 @@ interface SidebarSectionItem {
     onClick: () => void
     ariaLabel: string
   }
-  items: Array<{
+  items: {
     id: string
     label: string
     to: string
-  }>
+  }[]
 }
 
 export type SidebarItem = SidebarLinkItem | SidebarSectionItem

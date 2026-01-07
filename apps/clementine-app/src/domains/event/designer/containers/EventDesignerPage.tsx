@@ -5,10 +5,8 @@
  * Provides a 2-column layout: left sidebar with tabs, right content area with outlet.
  */
 import { Outlet } from '@tanstack/react-router'
-import {
-  EventDesignerSidebar,
-  type SidebarItem,
-} from '../components/EventDesignerSidebar'
+import { EventDesignerSidebar } from '../components/EventDesignerSidebar'
+import type { SidebarItem } from '../components/EventDesignerSidebar'
 
 const sidebarItems: SidebarItem[] = [
   {

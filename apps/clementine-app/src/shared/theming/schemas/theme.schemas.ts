@@ -90,3 +90,12 @@ export const updateThemeSchema = z.object({
     })
     .optional(),
 })
+
+/**
+ * TypeScript types inferred from schemas
+ */
+export type Theme = z.infer<typeof themeSchema>
+export type ThemeText = z.infer<typeof themeTextSchema>
+export type ThemeButton = z.infer<typeof themeButtonSchema>
+export type ThemeBackground = z.infer<typeof themeBackgroundSchema>
+export type UpdateTheme = z.infer<typeof updateThemeSchema>
