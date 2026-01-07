@@ -2,11 +2,13 @@ import { describe, expect, it } from 'vitest'
 import {
   BUTTON_RADIUS_OPTIONS,
   COLOR_REGEX,
+  normalizeBackgroundImage,
   themeBackgroundSchema,
   themeButtonSchema,
   themeSchema,
   themeTextSchema,
 } from './theme.schemas'
+import { mediaReferenceSchema } from './media-reference.schema'
 
 describe('COLOR_REGEX', () => {
   it('should match valid hex colors', () => {
@@ -36,6 +38,82 @@ describe('COLOR_REGEX', () => {
 describe('BUTTON_RADIUS_OPTIONS', () => {
   it('should contain expected options', () => {
     expect(BUTTON_RADIUS_OPTIONS).toEqual(['square', 'rounded', 'pill'])
+  })
+})
+
+describe('mediaReferenceSchema', () => {
+  it('should validate valid media reference', () => {
+    const validRef = {
+      mediaAssetId: 'abc123',
+      url: 'https://storage.googleapis.com/bucket/image.jpg',
+    }
+    expect(() => mediaReferenceSchema.parse(validRef)).not.toThrow()
+  })
+
+  it('should accept empty mediaAssetId for legacy data', () => {
+    const legacyRef = {
+      mediaAssetId: '',
+      url: 'https://storage.googleapis.com/bucket/image.jpg',
+    }
+    const result = mediaReferenceSchema.parse(legacyRef)
+    expect(result.mediaAssetId).toBe('')
+    expect(result.url).toBe('https://storage.googleapis.com/bucket/image.jpg')
+  })
+
+  it('should reject missing mediaAssetId', () => {
+    const invalidRef = {
+      url: 'https://storage.googleapis.com/bucket/image.jpg',
+    }
+    expect(() => mediaReferenceSchema.parse(invalidRef)).toThrow()
+  })
+
+  it('should reject missing url', () => {
+    const invalidRef = {
+      mediaAssetId: 'abc123',
+    }
+    expect(() => mediaReferenceSchema.parse(invalidRef)).toThrow()
+  })
+
+  it('should reject invalid url format', () => {
+    const invalidRef = {
+      mediaAssetId: 'abc123',
+      url: 'not-a-url',
+    }
+    expect(() => mediaReferenceSchema.parse(invalidRef)).toThrow()
+  })
+})
+
+describe('normalizeBackgroundImage', () => {
+  it('should return null for null input', () => {
+    expect(normalizeBackgroundImage(null)).toBeNull()
+  })
+
+  it('should return null for undefined input', () => {
+    expect(normalizeBackgroundImage(undefined)).toBeNull()
+  })
+
+  it('should convert string URL to MediaReference', () => {
+    const url = 'https://storage.googleapis.com/bucket/image.jpg'
+    const result = normalizeBackgroundImage(url)
+    expect(result).toEqual({
+      mediaAssetId: '',
+      url,
+    })
+  })
+
+  it('should passthrough MediaReference object', () => {
+    const ref = {
+      mediaAssetId: 'abc123',
+      url: 'https://storage.googleapis.com/bucket/image.jpg',
+    }
+    const result = normalizeBackgroundImage(ref)
+    expect(result).toEqual(ref)
+  })
+
+  it('should return null for non-string/non-object input', () => {
+    expect(normalizeBackgroundImage(123)).toBeNull()
+    expect(normalizeBackgroundImage(true)).toBeNull()
+    expect(normalizeBackgroundImage([])).toBeNull()
   })
 })
 
@@ -165,13 +243,33 @@ describe('themeButtonSchema', () => {
 })
 
 describe('themeBackgroundSchema', () => {
-  it('should validate valid theme background configuration', () => {
+  it('should validate valid theme background with MediaReference image', () => {
     const validBackground = {
+      color: '#FFFFFF',
+      image: {
+        mediaAssetId: 'abc123',
+        url: 'https://example.com/bg.jpg',
+      },
+      overlayOpacity: 0.5,
+    }
+    const result = themeBackgroundSchema.parse(validBackground)
+    expect(result.image).toEqual({
+      mediaAssetId: 'abc123',
+      url: 'https://example.com/bg.jpg',
+    })
+  })
+
+  it('should migrate legacy string URL to MediaReference', () => {
+    const legacyBackground = {
       color: '#FFFFFF',
       image: 'https://example.com/bg.jpg',
       overlayOpacity: 0.5,
     }
-    expect(() => themeBackgroundSchema.parse(validBackground)).not.toThrow()
+    const result = themeBackgroundSchema.parse(legacyBackground)
+    expect(result.image).toEqual({
+      mediaAssetId: '',
+      url: 'https://example.com/bg.jpg',
+    })
   })
 
   it('should accept null image', () => {
@@ -203,7 +301,7 @@ describe('themeBackgroundSchema', () => {
   it('should accept overlayOpacity of 0', () => {
     const bgWithZeroOpacity = {
       color: '#FFFFFF',
-      image: 'https://example.com/bg.jpg',
+      image: { mediaAssetId: 'abc', url: 'https://example.com/bg.jpg' },
       overlayOpacity: 0,
     }
     expect(() => themeBackgroundSchema.parse(bgWithZeroOpacity)).not.toThrow()
@@ -212,7 +310,7 @@ describe('themeBackgroundSchema', () => {
   it('should accept overlayOpacity of 1', () => {
     const bgWithFullOpacity = {
       color: '#FFFFFF',
-      image: 'https://example.com/bg.jpg',
+      image: { mediaAssetId: 'abc', url: 'https://example.com/bg.jpg' },
       overlayOpacity: 1,
     }
     expect(() => themeBackgroundSchema.parse(bgWithFullOpacity)).not.toThrow()
@@ -221,7 +319,7 @@ describe('themeBackgroundSchema', () => {
   it('should reject overlayOpacity less than 0', () => {
     const invalidBg = {
       color: '#FFFFFF',
-      image: 'https://example.com/bg.jpg',
+      image: { mediaAssetId: 'abc', url: 'https://example.com/bg.jpg' },
       overlayOpacity: -0.1,
     }
     expect(() => themeBackgroundSchema.parse(invalidBg)).toThrow()
@@ -230,7 +328,7 @@ describe('themeBackgroundSchema', () => {
   it('should reject overlayOpacity greater than 1', () => {
     const invalidBg = {
       color: '#FFFFFF',
-      image: 'https://example.com/bg.jpg',
+      image: { mediaAssetId: 'abc', url: 'https://example.com/bg.jpg' },
       overlayOpacity: 1.1,
     }
     expect(() => themeBackgroundSchema.parse(invalidBg)).toThrow()
@@ -239,7 +337,7 @@ describe('themeBackgroundSchema', () => {
   it('should reject invalid background color', () => {
     const invalidBg = {
       color: 'white',
-      image: 'https://example.com/bg.jpg',
+      image: { mediaAssetId: 'abc', url: 'https://example.com/bg.jpg' },
       overlayOpacity: 0.5,
     }
     expect(() => themeBackgroundSchema.parse(invalidBg)).toThrow(
@@ -247,7 +345,16 @@ describe('themeBackgroundSchema', () => {
     )
   })
 
-  it('should reject invalid image URL', () => {
+  it('should reject invalid MediaReference with bad URL', () => {
+    const invalidBg = {
+      color: '#FFFFFF',
+      image: { mediaAssetId: 'abc', url: 'not-a-url' },
+      overlayOpacity: 0.5,
+    }
+    expect(() => themeBackgroundSchema.parse(invalidBg)).toThrow()
+  })
+
+  it('should reject legacy string that is not a valid URL', () => {
     const invalidBg = {
       color: '#FFFFFF',
       image: 'not-a-url',
@@ -272,7 +379,10 @@ describe('themeSchema', () => {
     },
     background: {
       color: '#F0F0F0',
-      image: 'https://example.com/bg.jpg',
+      image: {
+        mediaAssetId: 'abc123',
+        url: 'https://example.com/bg.jpg',
+      },
       overlayOpacity: 0.5,
     },
   }

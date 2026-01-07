@@ -167,9 +167,10 @@ export function ThemeControls({
         />
         <MediaPickerField
           label="Image"
-          value={theme.background.image}
+          value={theme.background.image?.url ?? null}
           onChange={(value) =>
-            onUpdate({ background: { ...theme.background, image: value } })
+            // When removing, set to null; MediaPickerField doesn't handle creating new MediaReference (that's done via onUpload)
+            onUpdate({ background: { ...theme.background, image: value === null ? null : theme.background.image } })
           }
           onUpload={onUploadBackground}
           accept="image/*"
@@ -178,7 +179,7 @@ export function ThemeControls({
           uploadProgress={uploadProgress}
           disabled={disabled}
         />
-        {theme.background.image && (
+        {theme.background.image?.url && (
           <SliderField
             label="Overlay opacity"
             value={theme.background.overlayOpacity * 100}

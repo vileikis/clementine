@@ -23,9 +23,9 @@ Base path: `apps/clementine-app/src/`
 
 **Purpose**: Prepare directory structure for reorganization
 
-- [ ] T001 Create providers directory in `apps/clementine-app/src/shared/theming/providers/`
-- [ ] T002 [P] Create primitives directory in `apps/clementine-app/src/shared/theming/components/primitives/`
-- [ ] T003 [P] Create inputs placeholder directory in `apps/clementine-app/src/shared/theming/components/inputs/`
+- [X] T001 Create providers directory in `apps/clementine-app/src/shared/theming/providers/`
+- [X] T002 [P] Create primitives directory in `apps/clementine-app/src/shared/theming/components/primitives/`
+- [X] T003 [P] Create inputs placeholder directory in `apps/clementine-app/src/shared/theming/components/inputs/`
 
 ---
 
@@ -35,12 +35,12 @@ Base path: `apps/clementine-app/src/`
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T004 Create MediaReference schema in `apps/clementine-app/src/shared/theming/schemas/media-reference.schema.ts`
-- [ ] T005 Add normalizeBackgroundImage helper function to `apps/clementine-app/src/shared/theming/schemas/theme.schemas.ts`
-- [ ] T006 Update themeBackgroundSchema to use MediaReference with preprocess in `apps/clementine-app/src/shared/theming/schemas/theme.schemas.ts`
-- [ ] T007 Update schemas barrel export in `apps/clementine-app/src/shared/theming/schemas/index.ts`
-- [ ] T008 Create useThemeWithOverride hook in `apps/clementine-app/src/shared/theming/hooks/useThemeWithOverride.ts`
-- [ ] T009 Update hooks barrel export in `apps/clementine-app/src/shared/theming/hooks/index.ts`
+- [X] T004 Create MediaReference schema in `apps/clementine-app/src/shared/theming/schemas/media-reference.schema.ts`
+- [X] T005 Add normalizeBackgroundImage helper function to `apps/clementine-app/src/shared/theming/schemas/theme.schemas.ts`
+- [X] T006 Update themeBackgroundSchema to use MediaReference with preprocess in `apps/clementine-app/src/shared/theming/schemas/theme.schemas.ts`
+- [X] T007 Update schemas barrel export in `apps/clementine-app/src/shared/theming/schemas/index.ts`
+- [X] T008 Create useThemeWithOverride hook in `apps/clementine-app/src/shared/theming/hooks/useThemeWithOverride.ts`
+- [X] T009 Update hooks barrel export in `apps/clementine-app/src/shared/theming/hooks/index.ts`
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
@@ -56,9 +56,9 @@ Base path: `apps/clementine-app/src/`
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation changes are complete**
 
-- [ ] T010 [US1] Add MediaReference schema unit tests in `apps/clementine-app/src/shared/theming/schemas/theme.schemas.test.ts`
-- [ ] T011 [US1] Add themeBackgroundSchema migration tests (string→MediaReference) in `apps/clementine-app/src/shared/theming/schemas/theme.schemas.test.ts`
-- [ ] T012 [US1] Add useThemeWithOverride hook tests in `apps/clementine-app/src/shared/theming/hooks/useThemeWithOverride.test.ts`
+- [X] T010 [US1] Add MediaReference schema unit tests in `apps/clementine-app/src/shared/theming/schemas/theme.schemas.test.ts`
+- [X] T011 [US1] Add themeBackgroundSchema migration tests (string→MediaReference) in `apps/clementine-app/src/shared/theming/schemas/theme.schemas.test.ts`
+- [X] T012 [US1] Add useThemeWithOverride hook tests in `apps/clementine-app/src/shared/theming/hooks/useThemeWithOverride.test.ts`
 
 **Checkpoint**: Schema foundation is validated and backward compatible
 
@@ -72,11 +72,11 @@ Base path: `apps/clementine-app/src/`
 
 ### Implementation for User Story 2
 
-- [ ] T013 [US2] Move ThemeProvider.tsx from `apps/clementine-app/src/shared/theming/components/ThemeProvider.tsx` to `apps/clementine-app/src/shared/theming/providers/ThemeProvider.tsx`
-- [ ] T014 [US2] Create providers barrel export in `apps/clementine-app/src/shared/theming/providers/index.ts`
-- [ ] T015 [US2] Update components barrel to remove ThemeProvider in `apps/clementine-app/src/shared/theming/components/index.ts`
-- [ ] T016 [US2] Create inputs placeholder barrel export in `apps/clementine-app/src/shared/theming/components/inputs/index.ts`
-- [ ] T017 [US2] Update main theming barrel export in `apps/clementine-app/src/shared/theming/index.ts`
+- [X] T013 [US2] Move ThemeProvider.tsx from `apps/clementine-app/src/shared/theming/components/ThemeProvider.tsx` to `apps/clementine-app/src/shared/theming/providers/ThemeProvider.tsx`
+- [X] T014 [US2] Create providers barrel export in `apps/clementine-app/src/shared/theming/providers/index.ts`
+- [X] T015 [US2] Update components barrel to remove ThemeProvider in `apps/clementine-app/src/shared/theming/components/index.ts`
+- [X] T016 [US2] Create inputs placeholder barrel export in `apps/clementine-app/src/shared/theming/components/inputs/index.ts`
+- [X] T017 [US2] Update main theming barrel export in `apps/clementine-app/src/shared/theming/index.ts`
 
 **Checkpoint**: Directory structure reorganized, all imports still work
 
@@ -90,10 +90,10 @@ Base path: `apps/clementine-app/src/`
 
 ### Implementation for User Story 3
 
-- [ ] T018 [US3] Create ThemedText component in `apps/clementine-app/src/shared/theming/components/primitives/ThemedText.tsx`
-- [ ] T019 [US3] Create primitives barrel export in `apps/clementine-app/src/shared/theming/components/primitives/index.ts`
-- [ ] T020 [US3] Update components barrel to export primitives in `apps/clementine-app/src/shared/theming/components/index.ts`
-- [ ] T021 [US3] Update main theming barrel to export ThemedText in `apps/clementine-app/src/shared/theming/index.ts`
+- [X] T018 [US3] Create ThemedText component in `apps/clementine-app/src/shared/theming/components/primitives/ThemedText.tsx`
+- [X] T019 [US3] Create primitives barrel export in `apps/clementine-app/src/shared/theming/components/primitives/index.ts`
+- [X] T020 [US3] Update components barrel to export primitives in `apps/clementine-app/src/shared/theming/components/index.ts`
+- [X] T021 [US3] Update main theming barrel to export ThemedText in `apps/clementine-app/src/shared/theming/index.ts`
 
 **Checkpoint**: ThemedText component available and working with context or prop override
 
@@ -107,9 +107,9 @@ Base path: `apps/clementine-app/src/`
 
 ### Implementation for User Story 4
 
-- [ ] T022 [P] [US4] Create ThemedButton component in `apps/clementine-app/src/shared/theming/components/primitives/ThemedButton.tsx`
-- [ ] T023 [US4] Update primitives barrel to export ThemedButton in `apps/clementine-app/src/shared/theming/components/primitives/index.ts`
-- [ ] T024 [US4] Update main theming barrel to export ThemedButton in `apps/clementine-app/src/shared/theming/index.ts`
+- [X] T022 [P] [US4] Create ThemedButton component in `apps/clementine-app/src/shared/theming/components/primitives/ThemedButton.tsx`
+- [X] T023 [US4] Update primitives barrel to export ThemedButton in `apps/clementine-app/src/shared/theming/components/primitives/index.ts`
+- [X] T024 [US4] Update main theming barrel to export ThemedButton in `apps/clementine-app/src/shared/theming/index.ts`
 
 **Checkpoint**: ThemedButton component available and working with context or prop override
 
@@ -123,10 +123,10 @@ Base path: `apps/clementine-app/src/`
 
 ### Implementation for User Story 5
 
-- [ ] T025 [US5] Update ThemedBackground to access image.url from MediaReference in `apps/clementine-app/src/shared/theming/components/ThemedBackground.tsx`
-- [ ] T026 [US5] Update ThemedBackground props type to use MediaReference in `apps/clementine-app/src/shared/theming/components/ThemedBackground.tsx`
-- [ ] T027 [US5] Refactor ThemePreview to use ThemedText, ThemedButton, ThemedBackground primitives in `apps/clementine-app/src/domains/event/theme/components/ThemePreview.tsx`
-- [ ] T028 [US5] Remove duplicate getButtonRadius function from ThemePreview (use shared BUTTON_RADIUS_MAP)
+- [X] T025 [US5] Update ThemedBackground to access image.url from MediaReference in `apps/clementine-app/src/shared/theming/components/ThemedBackground.tsx`
+- [X] T026 [US5] Update ThemedBackground props type to use MediaReference in `apps/clementine-app/src/shared/theming/components/ThemedBackground.tsx`
+- [X] T027 [US5] Refactor ThemePreview to use ThemedText, ThemedButton, ThemedBackground primitives in `apps/clementine-app/src/domains/event/theme/components/ThemePreview.tsx`
+- [X] T028 [US5] Remove duplicate getButtonRadius function from ThemePreview (use shared BUTTON_RADIUS_MAP)
 
 **Checkpoint**: Existing components updated, visual appearance unchanged
 
@@ -140,8 +140,8 @@ Base path: `apps/clementine-app/src/`
 
 ### Implementation for User Story 6
 
-- [ ] T029 [US6] Update useUploadAndUpdateBackground to store MediaReference in `apps/clementine-app/src/domains/event/theme/hooks/useUploadAndUpdateBackground.ts`
-- [ ] T030 [US6] Update any form state handling to work with MediaReference structure in `apps/clementine-app/src/domains/event/theme/containers/ThemeEditorPage.tsx`
+- [X] T029 [US6] Update useUploadAndUpdateBackground to store MediaReference in `apps/clementine-app/src/domains/event/theme/hooks/useUploadAndUpdateBackground.ts`
+- [X] T030 [US6] Update any form state handling to work with MediaReference structure in `apps/clementine-app/src/domains/event/theme/containers/ThemeEditorPage.tsx`
 
 **Checkpoint**: Background image uploads work with full MediaReference structure
 
@@ -151,11 +151,11 @@ Base path: `apps/clementine-app/src/`
 
 **Purpose**: Final validation, type updates, and cleanup
 
-- [ ] T031 [P] Update ThemeBackground type in `apps/clementine-app/src/shared/theming/types/theme.types.ts` to use MediaReference
-- [ ] T032 [P] Update MediaReference type export in `apps/clementine-app/src/shared/theming/types/index.ts`
-- [ ] T033 Run `pnpm type-check` to verify all types are correct
-- [ ] T034 Run `pnpm lint` to verify code style
-- [ ] T035 Run `pnpm test` to verify all tests pass
+- [X] T031 [P] Update ThemeBackground type in `apps/clementine-app/src/shared/theming/types/theme.types.ts` to use MediaReference (implicit via schema infer)
+- [X] T032 [P] Update MediaReference type export in `apps/clementine-app/src/shared/theming/types/index.ts` (exported via schemas)
+- [X] T033 Run `pnpm type-check` to verify all types are correct
+- [X] T034 Run `pnpm lint` to verify code style
+- [X] T035 Run `pnpm test` to verify all tests pass
 - [ ] T036 Manual verification: Test Theme Editor with new/existing events
 - [ ] T037 Manual verification: Test legacy events with string background.image URLs (migration)
 

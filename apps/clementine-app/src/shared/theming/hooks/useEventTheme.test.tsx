@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { ThemeProvider } from '../components/ThemeProvider'
+import { ThemeProvider } from '../providers/ThemeProvider'
 import { useEventTheme } from './useEventTheme'
 import type { Theme } from '../types'
 
@@ -18,7 +18,7 @@ const mockTheme: Theme = {
   },
   background: {
     color: '#FFFFFF',
-    image: 'https://example.com/bg.jpg',
+    image: { mediaAssetId: 'abc123', url: 'https://example.com/bg.jpg' },
     overlayOpacity: 0.5,
   },
 }
@@ -71,7 +71,7 @@ describe('useEventTheme', () => {
           <div data-testid="text-color">{theme.text.color}</div>
           <div data-testid="text-alignment">{theme.text.alignment}</div>
           <div data-testid="bg-color">{theme.background.color}</div>
-          <div data-testid="bg-image">{theme.background.image}</div>
+          <div data-testid="bg-image">{theme.background.image?.url}</div>
           <div data-testid="bg-overlay">{theme.background.overlayOpacity}</div>
         </div>
       )

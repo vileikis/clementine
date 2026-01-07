@@ -58,7 +58,8 @@ export function ThemedBackground({
   contentClassName,
 }: ThemedBackgroundProps) {
   const bgColor = background?.color ?? '#FFFFFF'
-  const bgImage = background?.image
+  // Support both MediaReference object and legacy string URLs
+  const bgImage = background?.image?.url ?? null
   const overlayOpacity = background?.overlayOpacity ?? 0
 
   // Check if content wrapper should be rendered

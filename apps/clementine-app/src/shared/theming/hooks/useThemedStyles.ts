@@ -53,8 +53,9 @@ export function useThemedStyles(): ThemedStyles {
 
     const backgroundStyles: CSSProperties = {
       backgroundColor: theme.background.color,
-      ...(theme.background.image && {
-        backgroundImage: `url(${theme.background.image})`,
+      // Use image.url from MediaReference object
+      ...(theme.background.image?.url && {
+        backgroundImage: `url(${theme.background.image.url})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }),
