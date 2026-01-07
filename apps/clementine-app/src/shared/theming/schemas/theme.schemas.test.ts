@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 import {
   BUTTON_RADIUS_OPTIONS,
   COLOR_REGEX,
-  normalizeBackgroundImage,
   themeBackgroundSchema,
   themeButtonSchema,
   themeSchema,
@@ -80,40 +79,6 @@ describe('mediaReferenceSchema', () => {
       url: 'not-a-url',
     }
     expect(() => mediaReferenceSchema.parse(invalidRef)).toThrow()
-  })
-})
-
-describe('normalizeBackgroundImage', () => {
-  it('should return null for null input', () => {
-    expect(normalizeBackgroundImage(null)).toBeNull()
-  })
-
-  it('should return null for undefined input', () => {
-    expect(normalizeBackgroundImage(undefined)).toBeNull()
-  })
-
-  it('should convert string URL to MediaReference', () => {
-    const url = 'https://storage.googleapis.com/bucket/image.jpg'
-    const result = normalizeBackgroundImage(url)
-    expect(result).toEqual({
-      mediaAssetId: '',
-      url,
-    })
-  })
-
-  it('should passthrough MediaReference object', () => {
-    const ref = {
-      mediaAssetId: 'abc123',
-      url: 'https://storage.googleapis.com/bucket/image.jpg',
-    }
-    const result = normalizeBackgroundImage(ref)
-    expect(result).toEqual(ref)
-  })
-
-  it('should return null for non-string/non-object input', () => {
-    expect(normalizeBackgroundImage(123)).toBeNull()
-    expect(normalizeBackgroundImage(true)).toBeNull()
-    expect(normalizeBackgroundImage([])).toBeNull()
   })
 })
 
@@ -259,19 +224,6 @@ describe('themeBackgroundSchema', () => {
     })
   })
 
-  it('should migrate legacy string URL to MediaReference', () => {
-    const legacyBackground = {
-      color: '#FFFFFF',
-      image: 'https://example.com/bg.jpg',
-      overlayOpacity: 0.5,
-    }
-    const result = themeBackgroundSchema.parse(legacyBackground)
-    expect(result.image).toEqual({
-      mediaAssetId: '',
-      url: 'https://example.com/bg.jpg',
-    })
-  })
-
   it('should accept null image', () => {
     const bgWithNullImage = {
       color: '#FFFFFF',
@@ -349,15 +301,6 @@ describe('themeBackgroundSchema', () => {
     const invalidBg = {
       color: '#FFFFFF',
       image: { mediaAssetId: 'abc', url: 'not-a-url' },
-      overlayOpacity: 0.5,
-    }
-    expect(() => themeBackgroundSchema.parse(invalidBg)).toThrow()
-  })
-
-  it('should reject legacy string that is not a valid URL', () => {
-    const invalidBg = {
-      color: '#FFFFFF',
-      image: 'not-a-url',
       overlayOpacity: 0.5,
     }
     expect(() => themeBackgroundSchema.parse(invalidBg)).toThrow()

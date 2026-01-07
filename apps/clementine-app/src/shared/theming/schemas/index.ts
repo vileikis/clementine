@@ -8,7 +8,6 @@ export type { MediaReference } from './media-reference.schema'
 export {
   COLOR_REGEX,
   BUTTON_RADIUS_OPTIONS,
-  normalizeBackgroundImage,
   themeTextSchema,
   themeButtonSchema,
   themeBackgroundSchema,

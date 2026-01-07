@@ -16,7 +16,6 @@ export {
   COLOR_REGEX,
   BUTTON_RADIUS_OPTIONS,
   mediaReferenceSchema,
-  normalizeBackgroundImage,
   themeTextSchema,
   themeButtonSchema,
   themeBackgroundSchema,

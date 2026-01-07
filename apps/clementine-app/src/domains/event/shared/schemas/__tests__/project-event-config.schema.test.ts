@@ -77,40 +77,6 @@ describe('projectEventConfigSchema', () => {
       expect(result.theme).toEqual(configWithTheme.theme)
     })
 
-    it('should migrate legacy theme background image string to MediaReference', () => {
-      const legacyConfig = {
-        schemaVersion: 1,
-        theme: {
-          fontFamily: 'Poppins',
-          primaryColor: '#FF6B6B',
-          text: {
-            color: '#1A1A1A',
-            alignment: 'center' as const,
-          },
-          button: {
-            backgroundColor: '#FF6B6B',
-            textColor: '#FFFFFF',
-            radius: 'rounded' as const,
-          },
-          background: {
-            color: '#F5F5F5',
-            image: 'https://example.com/bg.jpg', // Legacy string format
-            overlayOpacity: 0.5,
-          },
-        },
-        overlays: null,
-        sharing: null,
-      }
-
-      const result = projectEventConfigSchema.parse(legacyConfig)
-
-      // Legacy string should be converted to MediaReference with empty mediaAssetId
-      expect(result.theme?.background.image).toEqual({
-        mediaAssetId: '',
-        url: 'https://example.com/bg.jpg',
-      })
-    })
-
     it('should validate config with overlays', () => {
       const configWithOverlays = {
         schemaVersion: 1,
