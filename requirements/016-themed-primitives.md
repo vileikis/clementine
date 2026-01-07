@@ -9,9 +9,11 @@ This requirement establishes the foundation for all themed UI by extracting comm
 ## Goals
 
 1. Create reusable `ThemedText` and `ThemedButton` components that consume theme from context
-2. Refactor `ThemePreview.tsx` to use these primitives (validation + reference implementation)
-3. Reorganize `shared/theming/` structure with `providers/` and `components/primitives/`
-4. Establish patterns for future themed components (inputs, cards, etc.)
+2. Define `MediaReference` schema as a shared type for all media asset references
+3. Update theme background schema to use `MediaReference` instead of plain URL string
+4. Refactor `ThemePreview.tsx` and `ThemedBackground.tsx` to use new primitives and schema
+5. Reorganize `shared/theming/` structure with `providers/` and `components/primitives/`
+6. Establish patterns for future themed components (inputs, cards, etc.)
 
 ## Technical Context
 
@@ -22,7 +24,7 @@ The theme system is defined in `@/shared/theming/`:
 - **Provider**: `ThemeProvider` wraps components needing theme access
 - **Hook**: `useEventTheme()` accesses theme from context
 
-### Theme Structure
+### Theme Structure (Current)
 
 ```typescript
 interface Theme {
@@ -35,11 +37,39 @@ interface Theme {
   button: {
     backgroundColor: string | null // hex color, falls back to primaryColor
     textColor: string // hex color
-    radius: 'none' | 'sm' | 'md' | 'full'
+    radius: 'square' | 'rounded' | 'pill'
   }
   background: {
     color: string // hex color
-    image: string | null // URL
+    image: string | null // URL ← CHANGING TO MediaReference
+    overlayOpacity: number // 0-1 decimal
+  }
+}
+```
+
+### Theme Structure (After This PRD)
+
+```typescript
+interface MediaReference {
+  mediaAssetId: string // MediaAsset document ID
+  url: string // Firebase Storage download URL
+}
+
+interface Theme {
+  fontFamily: string | null
+  primaryColor: string // hex color
+  text: {
+    color: string // hex color
+    alignment: 'left' | 'center' | 'right'
+  }
+  button: {
+    backgroundColor: string | null // hex color, falls back to primaryColor
+    textColor: string // hex color
+    radius: 'square' | 'rounded' | 'pill'
+  }
+  background: {
+    color: string // hex color
+    image: MediaReference | null // NOW includes mediaAssetId for tracking
     overlayOpacity: number // 0-1 decimal
   }
 }
@@ -82,11 +112,14 @@ shared/theming/
 │   │   └── index.ts
 │   ├── inputs/                  # NEW - Placeholder for future inputs
 │   │   └── index.ts
-│   ├── ThemedBackground.tsx     # Existing
+│   ├── ThemedBackground.tsx     # UPDATED - access image.url
 │   └── index.ts
 ├── context/                     # Existing
 ├── hooks/                       # Existing
-├── schemas/                     # Existing
+├── schemas/
+│   ├── media-reference.schema.ts  # NEW - Shared MediaReference schema
+│   ├── theme.schemas.ts           # UPDATED - use MediaReference
+│   └── index.ts
 ├── types/                       # Existing
 ├── constants/                   # Existing
 └── index.ts
@@ -193,11 +226,11 @@ interface ThemedButtonProps {
 
 **Radius Mapping:**
 ```typescript
+// Matches BUTTON_RADIUS_OPTIONS from theme.schemas.ts: 'square' | 'rounded' | 'pill'
 const BUTTON_RADIUS_MAP = {
-  none: '0',
-  sm: '4px',
-  md: '8px',
-  full: '9999px',
+  square: '0',
+  rounded: '8px',
+  pill: '9999px',
 }
 ```
 
@@ -236,6 +269,147 @@ function useThemeWithOverride(themeOverride?: Theme): Theme {
 }
 ```
 
+## Schema Changes
+
+### MediaReference Schema
+
+Create `@/shared/theming/schemas/media-reference.schema.ts`:
+
+```typescript
+import { z } from 'zod'
+
+/**
+ * Media Reference Schema
+ *
+ * Reusable schema for referencing MediaAsset documents.
+ * Stores both ID (for tracking/management) and URL (for fast rendering).
+ *
+ * Used by:
+ * - theme.background.image
+ * - overlays (1:1, 9:16)
+ * - welcome.media
+ * - Future media references
+ */
+export const mediaReferenceSchema = z.object({
+  /** MediaAsset document ID (workspaces/{workspaceId}/mediaAssets/{id}) */
+  mediaAssetId: z.string(),
+  /** Firebase Storage download URL for fast rendering */
+  url: z.string().url(),
+})
+
+export type MediaReference = z.infer<typeof mediaReferenceSchema>
+```
+
+### Theme Background Schema Update
+
+Update `@/shared/theming/schemas/theme.schemas.ts`:
+
+```typescript
+import { mediaReferenceSchema } from './media-reference.schema'
+
+// BEFORE:
+export const themeBackgroundSchema = z.object({
+  color: z.string().regex(COLOR_REGEX),
+  image: z.string().url().nullable().default(null), // Plain URL
+  overlayOpacity: z.number().min(0).max(1).default(0),
+})
+
+// AFTER:
+export const themeBackgroundSchema = z.object({
+  color: z.string().regex(COLOR_REGEX),
+  image: mediaReferenceSchema.nullable().default(null), // MediaReference
+  overlayOpacity: z.number().min(0).max(1).default(0),
+})
+```
+
+### Update Schema for Theme Updates
+
+The `updateThemeSchema` needs to handle the new structure:
+
+```typescript
+// BEFORE:
+background: z.object({
+  color: z.string().regex(COLOR_REGEX).optional(),
+  image: z.string().url().nullable().optional(),
+  overlayOpacity: z.number().min(0).max(1).optional(),
+}).optional(),
+
+// AFTER:
+background: z.object({
+  color: z.string().regex(COLOR_REGEX).optional(),
+  image: mediaReferenceSchema.nullable().optional(),
+  overlayOpacity: z.number().min(0).max(1).optional(),
+}).optional(),
+```
+
+## ThemedBackground Update
+
+Update `@/shared/theming/components/ThemedBackground.tsx` to access the URL from MediaReference:
+
+```tsx
+// BEFORE:
+const bgImage = background?.image
+
+// AFTER:
+const bgImage = background?.image?.url
+
+// Full context:
+export function ThemedBackground({
+  children,
+  background,
+  fontFamily,
+  className,
+  style,
+  contentClassName,
+}: ThemedBackgroundProps) {
+  const bgColor = background?.color ?? '#FFFFFF'
+  const bgImage = background?.image?.url  // ← Access .url from MediaReference
+  const overlayOpacity = background?.overlayOpacity ?? 0
+
+  // ... rest unchanged
+}
+```
+
+### Type Update
+
+Update `@/shared/theming/types/theme.types.ts`:
+
+```typescript
+import type { MediaReference } from '../schemas/media-reference.schema'
+
+// BEFORE:
+export interface ThemeBackground {
+  color: string
+  image: string | null
+  overlayOpacity: number
+}
+
+// AFTER:
+export interface ThemeBackground {
+  color: string
+  image: MediaReference | null
+  overlayOpacity: number
+}
+```
+
+## Theme Editor Hook Update
+
+Update `@/domains/event/theme/hooks/useUploadAndUpdateBackground.ts`:
+
+The hook already returns `{ mediaAssetId, url }` from upload - now it should store both:
+
+```typescript
+// BEFORE:
+await updateTheme.mutateAsync({
+  background: { image: url },  // Only URL
+})
+
+// AFTER:
+await updateTheme.mutateAsync({
+  background: { image: { mediaAssetId, url } },  // Full MediaReference
+})
+```
+
 ## ThemePreview Refactor
 
 ### Current Implementation
@@ -258,18 +432,21 @@ function useThemeWithOverride(themeOverride?: Theme): Theme {
 
 ### Refactored Implementation
 
-Use themed primitives with theme prop (no provider needed for preview):
+Use all themed primitives - `ThemedBackground`, `ThemedText`, and `ThemedButton`:
 
 ```tsx
-import { ThemedText, ThemedButton } from '@/shared/theming'
+import { ThemedText, ThemedButton, ThemedBackground } from '@/shared/theming'
 
 export function ThemePreview({ theme }: ThemePreviewProps) {
   return (
-    <div className="..." style={{ backgroundColor: theme.background.color }}>
-      {/* Background image layer - unchanged */}
-
-      {/* Content layer */}
-      <div className="relative flex h-full flex-col items-center justify-center gap-8 p-8">
+    <ThemedBackground
+      background={theme.background}
+      fontFamily={theme.fontFamily}
+      className="h-full"
+      contentClassName=""  // Disable default content wrapper for custom layout
+    >
+      {/* Content layer - ThemedBackground handles bg color, image, and overlay */}
+      <div className="relative z-10 flex h-full flex-col items-center justify-center gap-8 p-8">
         <div className="w-full space-y-4">
           <ThemedText variant="heading" theme={theme}>
             Event Title
@@ -294,16 +471,23 @@ export function ThemePreview({ theme }: ThemePreviewProps) {
           </ThemedText>
         </div>
       </div>
-    </div>
+    </ThemedBackground>
   )
 }
 ```
 
+**Note:** `ThemedBackground` already handles:
+- Background color (`theme.background.color`)
+- Background image (`theme.background.image?.url`) - updated to access MediaReference
+- Overlay opacity (`theme.background.overlayOpacity`)
+- Font family (`theme.fontFamily`)
+
 **Benefits:**
-- Reduced code duplication
-- Consistent styling logic
+- Uses all three themed primitives (`ThemedBackground`, `ThemedText`, `ThemedButton`)
+- Reduced code duplication - no manual background/image/overlay handling
+- Consistent styling logic across all themed components
 - Easier maintenance
-- Validates primitive components work correctly
+- Validates that all primitive components work correctly together
 
 ## Implementation Notes
 
@@ -380,6 +564,9 @@ apps/clementine-app/src/shared/theming/
 │   ├── inputs/
 │   │   └── index.ts             # NEW (placeholder)
 │   └── index.ts                 # UPDATE exports
+├── schemas/
+│   ├── media-reference.schema.ts  # NEW
+│   └── index.ts                   # UPDATE exports
 └── index.ts                     # UPDATE exports
 ```
 
@@ -389,10 +576,18 @@ apps/clementine-app/src/shared/theming/
 apps/clementine-app/src/
 ├── shared/theming/
 │   ├── index.ts                 # Update barrel exports
-│   └── components/index.ts      # Update exports, remove ThemeProvider
+│   ├── components/
+│   │   ├── index.ts             # Update exports, remove ThemeProvider
+│   │   └── ThemedBackground.tsx # Update to access image.url
+│   ├── schemas/
+│   │   └── theme.schemas.ts     # Use MediaReference for background.image
+│   └── types/
+│       └── theme.types.ts       # Update ThemeBackground interface
 ├── domains/event/theme/
-│   └── components/
-│       └── ThemePreview.tsx     # Refactor to use primitives
+│   ├── components/
+│   │   └── ThemePreview.tsx     # Refactor to use primitives + image.url
+│   └── hooks/
+│       └── useUploadAndUpdateBackground.ts  # Store full MediaReference
 ```
 
 ### Import Updates
@@ -417,10 +612,15 @@ Any file importing `ThemeProvider` from `@/shared/theming` will continue to work
 
 1. `ThemedText` and `ThemedButton` components are implemented and exported
 2. Components work both with ThemeProvider context and direct theme prop
-3. `ThemePreview` is refactored to use primitives with no visual changes
-4. `shared/theming/` directory is reorganized with `providers/` folder
-5. All existing imports continue to work (barrel exports updated)
-6. Theme editor preview looks identical before and after refactor
+3. `MediaReference` schema is defined and exported from `@/shared/theming`
+4. Theme background schema uses `MediaReference` instead of plain URL string
+5. `ThemedBackground` correctly accesses `image.url` from MediaReference
+6. `ThemePreview` is refactored to use all three primitives (`ThemedBackground`, `ThemedText`, `ThemedButton`)
+7. Theme editor upload hook stores full `{ mediaAssetId, url }` object
+8. `shared/theming/` directory is reorganized with `providers/` folder
+9. All existing imports continue to work (barrel exports updated)
+10. Theme editor preview looks identical before and after refactor
+11. Button radius uses correct values: `'square' | 'rounded' | 'pill'` (matching existing schema)
 
 ## Dependencies
 

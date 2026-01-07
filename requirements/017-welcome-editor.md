@@ -13,7 +13,9 @@ Create a Welcome Editor for the event designer that allows admins to customize t
 
 ## Prerequisites
 
-- **016-themed-primitives**: `ThemedText`, `ThemedButton` components must be implemented first
+- **016-themed-primitives**: Must be implemented first. Provides:
+  - `ThemedText`, `ThemedButton` components
+  - `MediaReference` schema (used for welcome.media)
 
 ## Route
 
@@ -30,28 +32,24 @@ Accessed via the "Welcome" tab in the event designer sidebar (already configured
 The editor modifies `event.draftConfig.welcome` which will follow this schema:
 
 ```typescript
+// MediaReference is imported from @/shared/theming (defined in 016-themed-primitives)
+import type { MediaReference } from '@/shared/theming'
+
 interface WelcomeConfig {
   /** Welcome screen title */
   title: string // default: "Choose your experience"
   /** Welcome screen description */
   description: string | null
-  /** Hero media (image) */
+  /** Hero media (image) - uses shared MediaReference type */
   media: MediaReference | null
   /** Experience cards layout */
   layout: 'list' | 'grid'
-}
-
-interface MediaReference {
-  /** MediaAsset document ID */
-  mediaAssetId: string
-  /** Firebase Storage download URL */
-  url: string
 }
 ```
 
 ### Dependencies
 
-- **Themed Primitives**: `@/shared/theming` (ThemedText, ThemedButton, ThemedBackground, ThemeProvider)
+- **Themed Primitives**: `@/shared/theming` (ThemedText, ThemedButton, ThemedBackground, ThemeProvider, MediaReference)
 - **Preview Shell**: `@/shared/preview-shell/`
 - **Editor Controls**: `@/shared/editor-controls/`
 - **Media Upload**: `@/domains/media-library/` (useUploadMediaAsset hook)
@@ -93,20 +91,7 @@ domains/event/welcome/
 Add to `@/domains/event/shared/schemas/project-event-config.schema.ts`:
 
 ```typescript
-/**
- * Media Reference Schema
- *
- * Reusable schema for referencing MediaAsset documents.
- * Stores both ID (tracking) and URL (fast rendering).
- */
-export const mediaReferenceSchema = z
-  .object({
-    /** MediaAsset document ID */
-    mediaAssetId: z.string(),
-    /** Firebase Storage download URL */
-    url: z.string().url(),
-  })
-  .nullable()
+import { mediaReferenceSchema } from '@/shared/theming/schemas/media-reference.schema'
 
 /**
  * Welcome screen configuration
@@ -116,8 +101,8 @@ export const welcomeConfigSchema = z.object({
   title: z.string().default('Choose your experience'),
   /** Welcome screen description */
   description: z.string().nullable().default(null),
-  /** Hero media (image) */
-  media: mediaReferenceSchema.default(null),
+  /** Hero media (image) - uses shared MediaReference from theming */
+  media: mediaReferenceSchema.nullable().default(null),
   /** Experience cards layout */
   layout: z.enum(['list', 'grid']).default('list'),
 })
@@ -132,7 +117,7 @@ export const projectEventConfigSchema = z.looseObject({
 })
 
 export type WelcomeConfig = z.infer<typeof welcomeConfigSchema>
-export type MediaReference = z.infer<typeof mediaReferenceSchema>
+// Note: MediaReference type is exported from @/shared/theming
 ```
 
 ### Update Schema
@@ -141,7 +126,7 @@ In `@/domains/event/welcome/schemas/welcome.schemas.ts`:
 
 ```typescript
 import { z } from 'zod'
-import { mediaReferenceSchema } from '@/domains/event/shared/schemas/project-event-config.schema'
+import { mediaReferenceSchema } from '@/shared/theming/schemas/media-reference.schema'
 
 /**
  * Schema for partial welcome updates
@@ -150,7 +135,7 @@ import { mediaReferenceSchema } from '@/domains/event/shared/schemas/project-eve
 export const updateWelcomeSchema = z.object({
   title: z.string().optional(),
   description: z.string().nullable().optional(),
-  media: mediaReferenceSchema.optional(),
+  media: mediaReferenceSchema.nullable().optional(),
   layout: z.enum(['list', 'grid']).optional(),
 })
 
@@ -670,5 +655,8 @@ apps/clementine-app/src/domains/event/shared/schemas/
 
 ## Dependencies
 
-- **016-themed-primitives**: ThemedText, ThemedButton, ThemedBackground must be available
+- **016-themed-primitives**: Must be completed first. Provides:
+  - `ThemedText`, `ThemedButton` components
+  - `ThemedBackground` component
+  - `MediaReference` schema and type
 - **Existing**: Editor controls, Preview shell, Media library, Designer tracking
