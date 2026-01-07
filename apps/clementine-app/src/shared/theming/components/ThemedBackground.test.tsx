@@ -198,16 +198,22 @@ describe('ThemedBackground', () => {
     expect(contentWrapper).toBeDefined()
   })
 
-  it('should disable content wrapper when contentClassName is empty string', () => {
+  it('should apply contentClassName to content container', () => {
     const { container } = render(
-      <ThemedBackground background={mockBackground} contentClassName="">
+      <ThemedBackground
+        background={mockBackground}
+        contentClassName="flex flex-col gap-4"
+      >
         <div data-testid="child">Content</div>
       </ThemedBackground>,
     )
 
-    // Content wrapper should not have the default centered classes
-    const contentWrapper = container.querySelector('[class*="items-center"]')
-    expect(contentWrapper).toBeNull()
+    // Content container should have both default max-w-3xl and custom classes
+    const contentContainer = container.querySelector('[class*="max-w-3xl"]')
+    expect(contentContainer).toBeDefined()
+    expect(contentContainer?.className).toContain('flex')
+    expect(contentContainer?.className).toContain('flex-col')
+    expect(contentContainer?.className).toContain('gap-4')
   })
 
   it('should use white background color when background prop is not provided', () => {
