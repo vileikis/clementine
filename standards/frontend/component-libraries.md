@@ -123,17 +123,18 @@ pnpm add @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities
 
 ```
 ui-kit/
-├── components/
+├── ui/
+│   ├── index.ts             # Barrel export
 │   ├── button.tsx           # shadcn/ui
 │   ├── input.tsx            # shadcn/ui
 │   ├── dialog.tsx           # shadcn/ui
 │   ├── slider.tsx           # Custom Radix component
-│   └── sortable-list.tsx    # @dnd-kit wrapper
-├── tokens/
-│   ├── colors.ts
-│   └── spacing.ts
-└── utils/
-    └── cn.ts                # tailwind-merge + clsx
+│   └── ...                  # Other shadcn components
+├── theme/
+│   └── styles.css           # Theme tokens (CSS variables)
+└── README.md
+
+# Note: cn utility is at src/shared/utils/style-utils.ts
 ```
 
 **Example:** Reusable `SortableList<T>` wrapper component for @dnd-kit.
@@ -198,9 +199,9 @@ export function IconButton({ icon: Icon, label, ...props }: IconButtonProps) {
 If shadcn doesn't have a component:
 
 ```tsx
-// ui-kit/components/slider.tsx
+// ui-kit/ui/slider.tsx
 import * as SliderPrimitive from '@radix-ui/react-slider'
-import { cn } from '@/ui-kit/utils/cn'
+import { cn } from '@/shared/utils/style-utils'
 
 export function Slider({ className, ...props }: SliderPrimitive.SliderProps) {
   return (
@@ -315,4 +316,4 @@ shadcn/ui has equivalents for most common components from Material-UI, Ant Desig
   - lucide-react: https://lucide.dev
 - **Standards:**
   - Design System: `standards/frontend/design-system.md`
-  - UI Kit Guide: `src/ui-kit/README.md`
+  - UI Kit Guide: `apps/clementine-app/src/ui-kit/README.md`

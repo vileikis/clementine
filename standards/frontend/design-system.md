@@ -7,7 +7,7 @@ This document defines the design token system and theming standards for the Clem
 Our design system is built on three core principles:
 
 1. **Token-First Approach** - All visual properties (colors, spacing, radius) come from design tokens
-2. **Single Source of Truth** - The theme system (`src/ui-kit/theme/styles.css`) is authoritative
+2. **Single Source of Truth** - The theme system (`apps/clementine-app/src/ui-kit/theme/styles.css`) is authoritative
 3. **Strict Compliance** - No exceptions to token usage rules
 
 **Key Principle**: Design tokens provide consistency, maintainability, and effortless theming (including dark mode).
@@ -17,8 +17,12 @@ Our design system is built on three core principles:
 ### Location
 
 ```
-src/ui-kit/theme/
-└── styles.css          # Theme tokens (CSS variables)
+apps/clementine-app/src/ui-kit/
+├── theme/
+│   └── styles.css      # Theme tokens (CSS variables)
+├── ui/
+│   └── ...             # shadcn/ui components
+└── README.md
 ```
 
 ### Token Structure
@@ -135,7 +139,7 @@ Tokens are automatically exposed to Tailwind via the `@theme inline` directive.
 
 Strict compliance applies to:
 
-- ✅ **ui-kit components** - All components in `src/ui-kit/components/`
+- ✅ **ui-kit components** - All components in `apps/clementine-app/src/ui-kit/ui/`
 - ✅ **Domain components** - All components in `src/domains/*/components/`
 - ✅ **Shared components** - All components in `src/shared/components/`
 - ✅ **Container components** - All components in `src/domains/*/containers/`
@@ -237,7 +241,7 @@ Do NOT add tokens for:
 **Step 1: Verify Need**
 
 Check existing tokens first:
-- Review `src/ui-kit/theme/styles.css` - Does a suitable token exist?
+- Review `apps/clementine-app/src/ui-kit/theme/styles.css` - Does a suitable token exist?
 - Check opacity modifiers - Can `bg-success/10` solve your need?
 - Consider combinations - Can `bg-muted border-border` work?
 
@@ -251,7 +255,7 @@ If genuinely needed:
 
 **Step 3: Add to Theme**
 
-Edit `src/ui-kit/theme/styles.css`:
+Edit `apps/clementine-app/src/ui-kit/theme/styles.css`:
 
 ```css
 :root {
@@ -284,7 +288,7 @@ Edit `src/ui-kit/theme/styles.css`:
 Update this standard:
 - Add token to "Available Design Tokens" section
 - Add usage example
-- Update `src/ui-kit/README.md` if relevant
+- Update `apps/clementine-app/src/ui-kit/README.md` if relevant
 
 **Step 5: Use the Token**
 
@@ -486,7 +490,7 @@ The theme uses **OKLCH color space** for perceptually uniform colors:
 
 ### Customizing Colors
 
-To change the color palette, edit `src/ui-kit/theme/styles.css`:
+To change the color palette, edit `apps/clementine-app/src/ui-kit/theme/styles.css`:
 
 ```css
 :root {
@@ -509,7 +513,7 @@ To change the color palette, edit `src/ui-kit/theme/styles.css`:
 
 ### How It Works
 
-1. **CSS variables defined** in `src/ui-kit/theme/styles.css`
+1. **CSS variables defined** in `apps/clementine-app/src/ui-kit/theme/styles.css`
 2. **Exposed to Tailwind** via `@theme inline` directive
 3. **Used as utility classes** like `bg-primary`, `text-success`
 
@@ -630,7 +634,7 @@ export default {
 
 ✅ **DO: Add to Theme System**
 
-Add to `src/ui-kit/theme/styles.css` instead, following the token addition process.
+Add to `apps/clementine-app/src/ui-kit/theme/styles.css` instead, following the token addition process.
 
 ## Reference
 
@@ -651,7 +655,7 @@ Add to `src/ui-kit/theme/styles.css` instead, following the token addition proce
 
 ### Related Documentation
 
-- **Theme Usage Guide**: `src/ui-kit/README.md` - Developer-facing usage examples
+- **Theme Usage Guide**: `apps/clementine-app/src/ui-kit/README.md` - Developer-facing usage examples
 - **Component Libraries**: `standards/frontend/component-libraries.md` - Which libraries to use
 - **Accessibility**: `standards/frontend/accessibility.md` - Ensuring accessible contrast
 - **Tailwind Docs**: https://tailwindcss.com/docs/customizing-colors
@@ -678,7 +682,7 @@ Consider adding ESLint rules to catch violations:
 ## Summary
 
 **Core Rules:**
-1. ✅ Use design tokens from `src/ui-kit/theme/styles.css` ALWAYS
+1. ✅ Use design tokens from `apps/clementine-app/src/ui-kit/theme/styles.css` ALWAYS
 2. ✅ No ad-hoc colors, spacing, or values without adding to theme
 3. ✅ Semantic colors for semantic purposes
 4. ✅ Always pair background with foreground tokens
@@ -692,6 +696,6 @@ Consider adding ESLint rules to catch violations:
 - 📦 Maintainable codebase
 
 **Resources:**
-- Theme file: `src/ui-kit/theme/styles.css`
-- Usage guide: `src/ui-kit/README.md`
+- Theme file: `apps/clementine-app/src/ui-kit/theme/styles.css`
+- Usage guide: `apps/clementine-app/src/ui-kit/README.md`
 - OKLCH picker: https://oklch.com/
