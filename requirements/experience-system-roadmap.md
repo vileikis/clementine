@@ -1,8 +1,12 @@
 # Experience System Roadmap
 
+> **Related Documents:**
+> - [Architecture: Experiences System](./arch-expereinces-system.md)
+> - [PRD: Experience Editor & Picker](./epic-experience-system-prd.md)
+
 ## Overview
 
-This roadmap implements the Experience System epic as defined in the PRD and architecture docs. An Experience is a step-based interactive flow (info → input → capture → transform → share) scoped to an Event.
+This roadmap implements the Experience System epic. An Experience is a step-based interactive flow (info → input → capture → transform → share) scoped to an Event.
 
 **Key architectural decisions:**
 - `/join/[projectId]` route (project has `activeEventId` pointing to live event)
@@ -33,41 +37,128 @@ This roadmap implements the Experience System epic as defined in the PRD and arc
 
 ---
 
-## Phase 1 — Event Integration (without Experience Editor)
+## Phase 1 — Main Experiences Integration (without Experience Editor)
 
-**Goal:** Admin can manage experiences as entities before editing them.
+**Goal:** Admin can manage main experiences as entities before editing them.
+
+**Location:** `apps/clementine-app/src/domains/event/experiences/`
+
+This creates a new subdomain under `event/` (alongside `designer/`, `settings/`, `theme/`, `welcome/`).
 
 **Deliverables:**
 
-*Event Designer UI additions:*
-- [ ] Create experience (empty draft) button
-- [ ] Experience list in event designer (navigate to editor route)
-- [ ] Enable/disable experience toggle
-- [ ] Duplicate experience action
-- [ ] Soft delete experience action
-- [ ] Reorder main experiences (drag & drop)
+*New module: `domains/event/experiences/`*
+- [ ] `schemas/experience.schema.ts` - Zod schema for experience document
+- [ ] `types/experience.types.ts` - TypeScript types
+- [ ] `hooks/useExperiences.ts` - Fetch experiences list (names, ids, enabled state)
+- [ ] `hooks/useCreateExperience.ts` - Create mutation
+- [ ] `hooks/useDuplicateExperience.ts` - Duplicate mutation
+- [ ] `hooks/useRenameExperience.ts` - Rename mutation
+- [ ] `hooks/useReorderExperiences.ts` - Reorder main experiences
+- [ ] `hooks/useToggleExperience.ts` - Enable/disable mutation
+- [ ] `hooks/useDeleteExperience.ts` - Soft delete mutation
 
-*Event config wiring:*
-- [ ] Add experiences config to event schema:
+*Event Designer Sidebar additions (`EventDesignerSidebar.tsx`):*
+
+```
+┌─────────────────────────┐
+│ Welcome                 │  ← existing link
+│ Theme                   │  ← existing link
+│ Settings                │  ← existing link
+├─────────────────────────┤
+│ EXPERIENCES        [+]  │  ← section header with add button
+│   ├ Experience A   ⋮    │  ← draggable, click → editor route
+│   ├ Experience B   ⋮    │     context menu: rename, duplicate,
+│   └ Experience C   ⋮    │     enable/disable, delete
+└─────────────────────────┘
+```
+
+- [ ] Add "Experiences" section to `EventDesignerSidebar`
+- [ ] Add [+] button → navigates to `/workspace/$slug/projects/$projectId/events/$eventId/create-experience`
+- [ ] Create experience route (name input + submit)
+- [ ] List experiences with drag-to-reorder (using @dnd-kit)
+- [ ] Context menu per experience: rename, duplicate, enable/disable, soft delete
+- [ ] Click experience → navigate to editor route (placeholder for now)
+
+*Event config schema:*
+- [ ] Add `main` array to event config schema:
   ```typescript
   event.draftConfig.experiences = {
-    main: Array<{ experienceId, enabled }>
-    pregate?: { experienceId, enabled }
-    preshare?: { experienceId, enabled }
+    main: Array<{ experienceId: string; enabled: boolean }>
   }
   ```
-- [ ] Firestore subcollection: `/projects/{projectId}/events/{eventId}/experiences/{experienceId}`
+
+*Firestore:*
+- [ ] Subcollection: `/projects/{projectId}/events/{eventId}/experiences/{experienceId}`
 
 **Testable outcome:**
-- Admin can create multiple experiences
+- Admin can create multiple main experiences
 - Toggle enabled/disabled
-- Reorder main experiences
+- Reorder main experiences via drag & drop
+- Duplicate/rename/delete experiences
 - Navigate to experience editor route (placeholder)
 - Changes reflected in event config
 
-**NOT doing:** Editor, Runtime, Guest flow
+**NOT doing:** Extra slots (pregate/preshare), Editor, Runtime, Guest flow
 
 **Parallelizable:** 🟢 Yes (Event UI ↔ persistence hooks)
+
+---
+
+## Phase 1.5 — Extra Slots (Pregate & Preshare)
+
+**Goal:** Admin can assign experiences to pregate and preshare slots.
+
+**Location:** Same module `domains/event/experiences/`
+
+**Deliverables:**
+
+*Additional hooks:*
+- [ ] `hooks/useAssignExtraSlot.ts` - Assign experience to pregate/preshare
+- [ ] `hooks/useClearExtraSlot.ts` - Remove experience from slot
+
+*Event Designer Sidebar additions:*
+
+```
+┌─────────────────────────┐
+│ EXPERIENCES        [+]  │
+│   ├ Experience A   ⋮    │
+│   └ Experience B   ⋮    │
+├─────────────────────────┤
+│ EXTRAS                  │  ← section header (no add button here)
+│   Pregate: [+ Add]      │  ← empty state: "+ Add" navigates to /create-experience
+│   Preshare: Welcome XP  │  ← filled state: show name + slot label
+└─────────────────────────┘
+```
+
+- [ ] Add "Extras" section to sidebar
+- [ ] Pregate slot UI:
+  - Empty: "Pregate: [+ Add]" → navigates to `/create-experience?slot=pregate`
+  - Filled: "Pregate: {name}" + context menu (clear slot, click → editor)
+- [ ] Preshare slot UI (same pattern with `?slot=preshare`)
+- [ ] Update `/create-experience` route to handle optional `slot` query param
+  - If `slot` param present, assign newly created experience to that slot after creation
+
+*Event config schema:*
+- [ ] Add optional slots to event config:
+  ```typescript
+  event.draftConfig.experiences = {
+    main: Array<{ experienceId: string; enabled: boolean }>,
+    pregate?: { experienceId: string; enabled: boolean },
+    preshare?: { experienceId: string; enabled: boolean }
+  }
+  ```
+
+**Testable outcome:**
+- Admin can assign any experience to pregate slot
+- Admin can assign any experience to preshare slot
+- Slots show clear labels ("Pregate:", "Preshare:")
+- Can clear/swap slot assignments
+- **Cannot** reorder or duplicate extra slots (they're single assignments)
+
+**NOT doing:** Editor, Runtime, Guest flow
+
+**Parallelizable:** 🟢 Yes (can run after Phase 1 main list is stable)
 
 ---
 
@@ -259,19 +350,22 @@ This roadmap implements the Experience System epic as defined in the PRD and arc
 
 ## Critical Files to Modify/Create
 
-**New domains to create:**
-- `apps/clementine-app/src/domains/experience/`
-- `apps/clementine-app/src/domains/session/`
+**New domains/subdomains to create:**
+- `apps/clementine-app/src/domains/experience/` - Core experience domain (runtime, steps, editor)
+- `apps/clementine-app/src/domains/session/` - Session domain (guest + preview sessions)
+- `apps/clementine-app/src/domains/event/experiences/` - Event-level experience management (list, CRUD)
 
 **Existing files to modify:**
 - `apps/clementine-app/src/domains/event/shared/schemas/project-event-config.schema.ts` (add experiences config)
-- `apps/clementine-app/src/domains/event/designer/` (add experience management UI)
+- `apps/clementine-app/src/domains/event/designer/containers/EventDesignerPage.tsx` (add sidebar sections)
+- `apps/clementine-app/src/domains/event/designer/components/EventDesignerSidebar.tsx` (add Experiences + Extra sections)
 - `apps/clementine-app/src/domains/guest/containers/GuestExperiencePage.tsx` (implement join flow)
 - `apps/clementine-app/src/domains/project/` (add `activeEventId` field)
 
 **New routes to create:**
-- `/join/[projectId]` - Guest join flow
-- `/workspace/[slug]/project/[projectId]/event/[eventId]/experience/[experienceId]` - Experience editor
+- `/workspace/$slug/projects/$projectId/events/$eventId/create-experience` - Create experience form
+- `/workspace/$slug/projects/$projectId/events/$eventId/experience/$experienceId` - Experience editor
+- `/join/$projectId` - Guest join flow
 
 **Shared modules to leverage:**
 - `src/shared/camera/` - For capture steps
@@ -286,7 +380,9 @@ This roadmap implements the Experience System epic as defined in the PRD and arc
 ```
 Phase 0 (Foundations)
     ↓
-Phase 1 (Event Integration) ←→ Phase 2 (Guest Join Shell)  [parallel]
+Phase 1 (Main Experiences)
+    ↓
+Phase 1.5 (Extra Slots) ←→ Phase 2 (Guest Join Shell)  [parallel]
     ↓                              ↓
     └──────────────────────────────┘
                   ↓
