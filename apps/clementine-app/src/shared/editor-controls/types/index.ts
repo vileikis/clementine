@@ -133,3 +133,33 @@ export interface MediaPickerFieldProps extends EditorFieldBaseProps {
   /** Upload progress (0-100) */
   uploadProgress?: number
 }
+
+/**
+ * Props for TextField component
+ */
+export interface TextFieldProps extends EditorFieldBaseProps {
+  /** Current text value */
+  value: string
+  /** Callback when text changes */
+  onChange: (value: string) => void
+  /** Placeholder text */
+  placeholder?: string
+  /** Maximum character length (enables counter when set) */
+  maxLength?: number
+}
+
+/**
+ * Props for TextareaField component
+ */
+export interface TextareaFieldProps extends EditorFieldBaseProps {
+  /** Current text value (null for empty) */
+  value: string | null
+  /** Callback when text changes (returns null for empty string) */
+  onChange: (value: string | null) => void
+  /** Placeholder text */
+  placeholder?: string
+  /** Maximum character length (enables counter when set) */
+  maxLength?: number
+  /** Number of visible text rows */
+  rows?: number
+}

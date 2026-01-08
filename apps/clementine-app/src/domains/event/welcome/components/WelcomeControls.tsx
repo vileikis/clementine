@@ -6,17 +6,20 @@
  */
 
 import { LayoutGrid, LayoutList } from 'lucide-react'
-import type { WelcomeConfig } from '@/domains/event/shared'
+import {
+  WELCOME_DESCRIPTION_MAX_LENGTH,
+  WELCOME_TITLE_MAX_LENGTH,
+} from '../constants'
 import type { ExperiencePickerLayout } from '../schemas'
+import type { WelcomeConfig } from '@/domains/event/shared'
 import type { EditorOption } from '@/shared/editor-controls'
 import {
   EditorSection,
   MediaPickerField,
+  TextField,
+  TextareaField,
   ToggleGroupField,
 } from '@/shared/editor-controls'
-import { Input } from '@/ui-kit/components/input'
-import { Textarea } from '@/ui-kit/components/ui/textarea'
-import { Label } from '@/ui-kit/components/label'
 
 export interface WelcomeControlsProps {
   /** Current welcome values */
@@ -51,41 +54,23 @@ export function WelcomeControls({
     <div className="space-y-0">
       {/* Content Section - title, description, hero media */}
       <EditorSection title="Content">
-        <div className="space-y-2">
-          <Label
-            htmlFor="welcome-title"
-            className="text-sm font-normal text-muted-foreground"
-          >
-            Title
-          </Label>
-          <Input
-            id="welcome-title"
-            value={welcome.title}
-            onChange={(e) => onUpdate({ title: e.target.value })}
-            placeholder="Enter welcome title"
-            disabled={disabled}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label
-            htmlFor="welcome-description"
-            className="text-sm font-normal text-muted-foreground"
-          >
-            Description
-          </Label>
-          <Textarea
-            id="welcome-description"
-            value={welcome.description ?? ''}
-            onChange={(e) =>
-              onUpdate({
-                description: e.target.value || null,
-              })
-            }
-            placeholder="Optional description"
-            disabled={disabled}
-            rows={3}
-          />
-        </div>
+        <TextField
+          label="Title"
+          value={welcome.title}
+          onChange={(value) => onUpdate({ title: value })}
+          placeholder="Enter welcome title"
+          maxLength={WELCOME_TITLE_MAX_LENGTH}
+          disabled={disabled}
+        />
+        <TextareaField
+          label="Description"
+          value={welcome.description}
+          onChange={(value) => onUpdate({ description: value })}
+          placeholder="Optional description"
+          maxLength={WELCOME_DESCRIPTION_MAX_LENGTH}
+          rows={3}
+          disabled={disabled}
+        />
         <MediaPickerField
           label="Hero Image"
           value={welcome.media?.url ?? null}

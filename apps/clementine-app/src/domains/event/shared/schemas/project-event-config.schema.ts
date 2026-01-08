@@ -83,6 +83,9 @@ export const sharingConfigSchema = z.object({
  *
  * Customizable welcome screen content for guest-facing experience.
  * Hero media, title, description, and experience card layout.
+ *
+ * Note: This read schema is permissive (no max limits) to handle existing data.
+ * Write validation with limits is enforced by updateWelcomeSchema.
  */
 export const welcomeConfigSchema = z.object({
   /** Welcome screen title */
