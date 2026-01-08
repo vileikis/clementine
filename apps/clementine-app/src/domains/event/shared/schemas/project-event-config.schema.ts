@@ -8,6 +8,7 @@
  */
 import { z } from 'zod'
 import { themeSchema } from '@/shared/theming/schemas/theme.schemas'
+import { mediaReferenceSchema } from '@/shared/theming'
 
 /**
  * Current schema version for event configuration
@@ -49,6 +50,19 @@ export const overlaysConfigSchema = z
   .default(null)
 
 /**
+ * Experience Picker Layout
+ *
+ * Layout options for displaying experience cards on the welcome screen.
+ * - list: Vertical stack of experience cards
+ * - grid: Grid layout of experience cards
+ */
+export const experiencePickerLayoutSchema = z.enum(['list', 'grid'])
+
+export type ExperiencePickerLayout = z.infer<
+  typeof experiencePickerLayoutSchema
+>
+
+/**
  * Guest sharing preferences and options
  * Flattened structure for simpler updates using Firestore dot notation
  */
@@ -62,6 +76,26 @@ export const sharingConfigSchema = z.object({
   twitter: z.boolean().default(false),
   tiktok: z.boolean().default(false),
   telegram: z.boolean().default(false),
+})
+
+/**
+ * Welcome Screen Configuration
+ *
+ * Customizable welcome screen content for guest-facing experience.
+ * Hero media, title, description, and experience card layout.
+ *
+ * Note: This read schema is permissive (no max limits) to handle existing data.
+ * Write validation with limits is enforced by updateWelcomeSchema.
+ */
+export const welcomeConfigSchema = z.object({
+  /** Welcome screen title */
+  title: z.string().default('Choose your experience'),
+  /** Welcome screen description */
+  description: z.string().nullable().default(null),
+  /** Hero media (image) - uses shared MediaReference type */
+  media: mediaReferenceSchema.nullable().default(null),
+  /** Experience cards layout */
+  layout: experiencePickerLayoutSchema.default('list'),
 })
 
 /**
@@ -97,6 +131,11 @@ export const projectEventConfigSchema = z.looseObject({
    * Sharing configuration
    */
   sharing: sharingConfigSchema.nullable().default(null),
+
+  /**
+   * Welcome screen configuration
+   */
+  welcome: welcomeConfigSchema.nullable().default(null),
 }) // Allow unknown fields for future evolution
 
 /**
@@ -106,3 +145,4 @@ export type ProjectEventConfig = z.infer<typeof projectEventConfigSchema>
 export type OverlayReference = z.infer<typeof overlayReferenceSchema>
 export type OverlaysConfig = z.infer<typeof overlaysConfigSchema>
 export type SharingConfig = z.infer<typeof sharingConfigSchema>
+export type WelcomeConfig = z.infer<typeof welcomeConfigSchema>

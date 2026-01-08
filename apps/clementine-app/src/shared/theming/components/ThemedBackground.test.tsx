@@ -1,18 +1,45 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import { ThemeProvider } from '../providers/ThemeProvider'
 import { ThemedBackground } from './ThemedBackground'
-import type { ThemeBackground } from '../types'
+import type { Theme, ThemeBackground } from '../types'
 
-const mockBackground: ThemeBackground = {
-  color: '#FFFFFF',
-  image: { mediaAssetId: 'abc123', url: 'https://example.com/bg.jpg' },
-  overlayOpacity: 0.5,
+const mockTheme: Theme = {
+  fontFamily: 'Inter, sans-serif',
+  primaryColor: '#3B82F6',
+  text: {
+    color: '#1F2937',
+    alignment: 'center',
+  },
+  button: {
+    backgroundColor: '#3B82F6',
+    textColor: '#FFFFFF',
+    radius: 'rounded',
+  },
+  background: {
+    color: '#FFFFFF',
+    image: { mediaAssetId: 'abc123', url: 'https://example.com/bg.jpg' },
+    overlayOpacity: 0.5,
+  },
+}
+
+const mockBackgroundOverride: ThemeBackground = {
+  color: '#FF0000',
+  image: {
+    mediaAssetId: 'override123',
+    url: 'https://example.com/override.jpg',
+  },
+  overlayOpacity: 0.3,
+}
+
+function renderWithTheme(ui: React.ReactElement, theme: Theme = mockTheme) {
+  return render(<ThemeProvider theme={theme}>{ui}</ThemeProvider>)
 }
 
 describe('ThemedBackground', () => {
   it('should render children', () => {
-    render(
-      <ThemedBackground background={mockBackground}>
+    renderWithTheme(
+      <ThemedBackground>
         <div data-testid="child">Child Content</div>
       </ThemedBackground>,
     )
@@ -21,9 +48,9 @@ describe('ThemedBackground', () => {
     expect(screen.getByTestId('child').textContent).toBe('Child Content')
   })
 
-  it('should apply background color', () => {
-    const { container } = render(
-      <ThemedBackground background={mockBackground}>
+  it('should apply background color from theme context', () => {
+    const { container } = renderWithTheme(
+      <ThemedBackground>
         <div>Content</div>
       </ThemedBackground>,
     )
@@ -32,9 +59,9 @@ describe('ThemedBackground', () => {
     expect(outerDiv.style.backgroundColor).toBe('rgb(255, 255, 255)') // #FFFFFF converted
   })
 
-  it('should render background image', () => {
-    const { container } = render(
-      <ThemedBackground background={mockBackground}>
+  it('should render background image from theme context', () => {
+    const { container } = renderWithTheme(
+      <ThemedBackground>
         <div>Content</div>
       </ThemedBackground>,
     )
@@ -48,9 +75,9 @@ describe('ThemedBackground', () => {
     )
   })
 
-  it('should render overlay with correct opacity', () => {
-    const { container } = render(
-      <ThemedBackground background={mockBackground}>
+  it('should render overlay with correct opacity from theme context', () => {
+    const { container } = renderWithTheme(
+      <ThemedBackground>
         <div>Content</div>
       </ThemedBackground>,
     )
@@ -62,203 +89,250 @@ describe('ThemedBackground', () => {
     expect(overlayDiv.style.opacity).toBe('0.5')
   })
 
-  it('should not render background image when image is null', () => {
-    const bgWithoutImage: ThemeBackground = {
-      ...mockBackground,
-      image: null,
-    }
-
-    const { container } = render(
-      <ThemedBackground background={bgWithoutImage}>
-        <div>Content</div>
-      </ThemedBackground>,
-    )
-
-    const bgImageDiv = container.querySelector('[style*="backgroundImage"]')
-    expect(bgImageDiv).toBeNull()
-  })
-
-  it('should not render overlay when overlayOpacity is 0', () => {
-    const bgWithNoOverlay: ThemeBackground = {
-      ...mockBackground,
-      overlayOpacity: 0,
-    }
-
-    const { container } = render(
-      <ThemedBackground background={bgWithNoOverlay}>
-        <div>Content</div>
-      </ThemedBackground>,
-    )
-
-    // Overlay should not be rendered when opacity is 0
-    const overlays = container.querySelectorAll(
-      '[class*="pointer-events-none"]',
-    )
-    const visibleOverlay = Array.from(overlays).find((el) => {
-      const htmlEl = el as HTMLElement
-      return htmlEl.style.opacity && parseFloat(htmlEl.style.opacity) > 0
-    })
-    expect(visibleOverlay).toBeUndefined()
-  })
-
-  it('should not render overlay when image is null', () => {
-    const bgWithoutImage: ThemeBackground = {
-      ...mockBackground,
-      image: null,
-      overlayOpacity: 0.5,
-    }
-
-    const { container } = render(
-      <ThemedBackground background={bgWithoutImage}>
-        <div>Content</div>
-      </ThemedBackground>,
-    )
-
-    // Overlay should not be rendered when there's no image
-    const overlays = container.querySelectorAll(
-      '[class*="pointer-events-none"]',
-    )
-    expect(overlays.length).toBe(0)
-  })
-
-  it('should apply fontFamily to container', () => {
-    const { container } = render(
-      <ThemedBackground
-        background={mockBackground}
-        fontFamily="Arial, sans-serif"
-      >
+  it('should apply fontFamily from theme context', () => {
+    const { container } = renderWithTheme(
+      <ThemedBackground>
         <div>Content</div>
       </ThemedBackground>,
     )
 
     const outerDiv = container.firstChild as HTMLElement
-    expect(outerDiv.style.fontFamily).toBe('Arial, sans-serif')
+    expect(outerDiv.style.fontFamily).toBe('Inter, sans-serif')
   })
 
-  it('should not apply fontFamily when null', () => {
-    const { container } = render(
-      <ThemedBackground background={mockBackground} fontFamily={null}>
+  it('should not apply fontFamily when theme.fontFamily is null', () => {
+    const themeWithoutFont: Theme = {
+      ...mockTheme,
+      fontFamily: null,
+    }
+
+    const { container } = renderWithTheme(
+      <ThemedBackground>
         <div>Content</div>
       </ThemedBackground>,
+      themeWithoutFont,
     )
 
     const outerDiv = container.firstChild as HTMLElement
     expect(outerDiv.style.fontFamily).toBe('')
   })
 
-  it('should apply custom className to container', () => {
-    const { container } = render(
-      <ThemedBackground background={mockBackground} className="custom-class">
-        <div>Content</div>
-      </ThemedBackground>,
-    )
+  // Background prop override tests
+  describe('background prop override', () => {
+    it('should use background prop instead of theme.background when provided', () => {
+      const { container } = renderWithTheme(
+        <ThemedBackground background={mockBackgroundOverride}>
+          <div>Content</div>
+        </ThemedBackground>,
+      )
 
-    const outerDiv = container.firstChild as HTMLElement
-    expect(outerDiv.className).toContain('custom-class')
+      const outerDiv = container.firstChild as HTMLElement
+      expect(outerDiv.style.backgroundColor).toBe('rgb(255, 0, 0)') // #FF0000 converted
+    })
+
+    it('should use background prop image instead of theme image', () => {
+      const { container } = renderWithTheme(
+        <ThemedBackground background={mockBackgroundOverride}>
+          <div>Content</div>
+        </ThemedBackground>,
+      )
+
+      const bgImageDiv = container.querySelector(
+        '[style*="background-image"]',
+      ) as HTMLElement
+      expect(bgImageDiv?.style.backgroundImage).toContain(
+        'https://example.com/override.jpg',
+      )
+    })
+
+    it('should use background prop overlayOpacity instead of theme', () => {
+      const { container } = renderWithTheme(
+        <ThemedBackground background={mockBackgroundOverride}>
+          <div>Content</div>
+        </ThemedBackground>,
+      )
+
+      const overlayDiv = container.querySelector(
+        '[style*="opacity"]',
+      ) as HTMLElement
+      expect(overlayDiv.style.opacity).toBe('0.3')
+    })
   })
 
-  it('should apply custom style prop to container', () => {
-    const { container } = render(
-      <ThemedBackground
-        background={mockBackground}
-        style={{ padding: '20px', margin: '10px' }}
-      >
-        <div>Content</div>
-      </ThemedBackground>,
-    )
+  // No image/overlay tests
+  describe('without background image', () => {
+    it('should not render background image when image is null in theme', () => {
+      const themeWithoutImage: Theme = {
+        ...mockTheme,
+        background: {
+          ...mockTheme.background,
+          image: null,
+        },
+      }
 
-    const outerDiv = container.firstChild as HTMLElement
-    expect(outerDiv.style.padding).toBe('20px')
-    expect(outerDiv.style.margin).toBe('10px')
+      const { container } = renderWithTheme(
+        <ThemedBackground>
+          <div>Content</div>
+        </ThemedBackground>,
+        themeWithoutImage,
+      )
+
+      const bgImageDiv = container.querySelector('[style*="backgroundImage"]')
+      expect(bgImageDiv).toBeNull()
+    })
+
+    it('should not render overlay when overlayOpacity is 0', () => {
+      const themeWithNoOverlay: Theme = {
+        ...mockTheme,
+        background: {
+          ...mockTheme.background,
+          overlayOpacity: 0,
+        },
+      }
+
+      const { container } = renderWithTheme(
+        <ThemedBackground>
+          <div>Content</div>
+        </ThemedBackground>,
+        themeWithNoOverlay,
+      )
+
+      // Overlay should not be rendered when opacity is 0
+      const overlays = container.querySelectorAll(
+        '[class*="pointer-events-none"]',
+      )
+      const visibleOverlay = Array.from(overlays).find((el) => {
+        const htmlEl = el as HTMLElement
+        return htmlEl.style.opacity && parseFloat(htmlEl.style.opacity) > 0
+      })
+      expect(visibleOverlay).toBeUndefined()
+    })
+
+    it('should not render overlay when image is null', () => {
+      const themeWithoutImage: Theme = {
+        ...mockTheme,
+        background: {
+          ...mockTheme.background,
+          image: null,
+          overlayOpacity: 0.5,
+        },
+      }
+
+      const { container } = renderWithTheme(
+        <ThemedBackground>
+          <div>Content</div>
+        </ThemedBackground>,
+        themeWithoutImage,
+      )
+
+      // Overlay should not be rendered when there's no image
+      const overlays = container.querySelectorAll(
+        '[class*="pointer-events-none"]',
+      )
+      expect(overlays.length).toBe(0)
+    })
   })
 
-  it('should render default content wrapper', () => {
-    const { container } = render(
-      <ThemedBackground background={mockBackground}>
-        <div data-testid="child">Content</div>
-      </ThemedBackground>,
-    )
+  // Styling props tests
+  describe('styling props', () => {
+    it('should apply custom className to container', () => {
+      const { container } = renderWithTheme(
+        <ThemedBackground className="custom-class">
+          <div>Content</div>
+        </ThemedBackground>,
+      )
 
-    // Default content wrapper should exist
-    const contentWrapper = container.querySelector('[class*="items-center"]')
-    expect(contentWrapper).toBeDefined()
+      const outerDiv = container.firstChild as HTMLElement
+      expect(outerDiv.className).toContain('custom-class')
+    })
+
+    it('should apply custom style prop to container', () => {
+      const { container } = renderWithTheme(
+        <ThemedBackground style={{ padding: '20px', margin: '10px' }}>
+          <div>Content</div>
+        </ThemedBackground>,
+      )
+
+      const outerDiv = container.firstChild as HTMLElement
+      expect(outerDiv.style.padding).toBe('20px')
+      expect(outerDiv.style.margin).toBe('10px')
+    })
+
+    it('should apply custom contentClassName', () => {
+      const { container } = renderWithTheme(
+        <ThemedBackground contentClassName="custom-content">
+          <div>Content</div>
+        </ThemedBackground>,
+      )
+
+      const contentWrapper = container.querySelector(
+        '[class*="custom-content"]',
+      )
+      expect(contentWrapper).not.toBeNull()
+    })
+
+    it('should apply contentClassName to content container with default classes', () => {
+      const { container } = renderWithTheme(
+        <ThemedBackground contentClassName="flex flex-col gap-4">
+          <div data-testid="child">Content</div>
+        </ThemedBackground>,
+      )
+
+      // Content container should have both default max-w-3xl and custom classes
+      const contentContainer = container.querySelector('[class*="max-w-3xl"]')
+      expect(contentContainer).not.toBeNull()
+      expect(contentContainer?.className).toContain('flex')
+      expect(contentContainer?.className).toContain('flex-col')
+      expect(contentContainer?.className).toContain('gap-4')
+    })
   })
 
-  it('should apply custom contentClassName', () => {
-    const { container } = render(
-      <ThemedBackground
-        background={mockBackground}
-        contentClassName="custom-content"
-      >
-        <div>Content</div>
-      </ThemedBackground>,
-    )
+  // Default styles tests
+  describe('default styles', () => {
+    it('should render with all default styles', () => {
+      const { container } = renderWithTheme(
+        <ThemedBackground>
+          <div data-testid="child">Content</div>
+        </ThemedBackground>,
+      )
 
-    const contentWrapper = container.querySelector('[class*="custom-content"]')
-    expect(contentWrapper).toBeDefined()
+      const outerDiv = container.firstChild as HTMLElement
+      expect(outerDiv.className).toContain('relative')
+      expect(outerDiv.className).toContain('flex')
+      expect(outerDiv.className).toContain('flex-1')
+      expect(outerDiv.className).toContain('flex-col')
+      expect(outerDiv.className).toContain('overflow-hidden')
+      expect(screen.getByTestId('child')).toBeDefined()
+    })
+
+    it('should render default content wrapper', () => {
+      const { container } = renderWithTheme(
+        <ThemedBackground>
+          <div data-testid="child">Content</div>
+        </ThemedBackground>,
+      )
+
+      // Default content wrapper should exist
+      const contentWrapper = container.querySelector('[class*="items-center"]')
+      expect(contentWrapper).toBeDefined()
+    })
   })
 
-  it('should apply contentClassName to content container', () => {
-    const { container } = render(
-      <ThemedBackground
-        background={mockBackground}
-        contentClassName="flex flex-col gap-4"
-      >
-        <div data-testid="child">Content</div>
-      </ThemedBackground>,
-    )
+  // Error handling
+  describe('error handling', () => {
+    it('should throw when used outside ThemeProvider', () => {
+      // Suppress console.error for this test
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
-    // Content container should have both default max-w-3xl and custom classes
-    const contentContainer = container.querySelector('[class*="max-w-3xl"]')
-    expect(contentContainer).toBeDefined()
-    expect(contentContainer?.className).toContain('flex')
-    expect(contentContainer?.className).toContain('flex-col')
-    expect(contentContainer?.className).toContain('gap-4')
-  })
+      expect(() => {
+        render(
+          <ThemedBackground>
+            <div>Content</div>
+          </ThemedBackground>,
+        )
+      }).toThrow('useEventTheme must be used within a ThemeProvider')
 
-  it('should use white background color when background prop is not provided', () => {
-    const { container } = render(
-      <ThemedBackground>
-        <div>Content</div>
-      </ThemedBackground>,
-    )
-
-    const outerDiv = container.firstChild as HTMLElement
-    expect(outerDiv.style.backgroundColor).toBe('rgb(255, 255, 255)') // #FFFFFF converted
-  })
-
-  it('should handle partial background configuration', () => {
-    const partialBg: Partial<ThemeBackground> = {
-      color: '#FF0000',
-    }
-
-    const { container } = render(
-      <ThemedBackground background={partialBg}>
-        <div>Content</div>
-      </ThemedBackground>,
-    )
-
-    const outerDiv = container.firstChild as HTMLElement
-    expect(outerDiv.style.backgroundColor).toBe('rgb(255, 0, 0)') // #FF0000 converted
-
-    // Should not render background image (not provided)
-    const bgImageDiv = container.querySelector('[style*="backgroundImage"]')
-    expect(bgImageDiv).toBeNull()
-  })
-
-  it('should render with all default styles when no props provided except children', () => {
-    const { container } = render(
-      <ThemedBackground>
-        <div data-testid="child">Content</div>
-      </ThemedBackground>,
-    )
-
-    const outerDiv = container.firstChild as HTMLElement
-    expect(outerDiv.className).toContain('relative')
-    expect(outerDiv.className).toContain('flex')
-    expect(outerDiv.className).toContain('flex-1')
-    expect(outerDiv.className).toContain('flex-col')
-    expect(outerDiv.className).toContain('overflow-hidden')
-    expect(screen.getByTestId('child')).toBeDefined()
+      consoleSpy.mockRestore()
+    })
   })
 })
