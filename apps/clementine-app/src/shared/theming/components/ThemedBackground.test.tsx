@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { ThemedBackground } from './ThemedBackground'
 import { ThemeProvider } from '../providers/ThemeProvider'
+import { ThemedBackground } from './ThemedBackground'
 import type { Theme, ThemeBackground } from '../types'
 
 const mockTheme: Theme = {
@@ -25,14 +25,14 @@ const mockTheme: Theme = {
 
 const mockBackgroundOverride: ThemeBackground = {
   color: '#FF0000',
-  image: { mediaAssetId: 'override123', url: 'https://example.com/override.jpg' },
+  image: {
+    mediaAssetId: 'override123',
+    url: 'https://example.com/override.jpg',
+  },
   overlayOpacity: 0.3,
 }
 
-function renderWithTheme(
-  ui: React.ReactElement,
-  theme: Theme = mockTheme,
-) {
+function renderWithTheme(ui: React.ReactElement, theme: Theme = mockTheme) {
   return render(<ThemeProvider theme={theme}>{ui}</ThemeProvider>)
 }
 
@@ -265,7 +265,9 @@ describe('ThemedBackground', () => {
         </ThemedBackground>,
       )
 
-      const contentWrapper = container.querySelector('[class*="custom-content"]')
+      const contentWrapper = container.querySelector(
+        '[class*="custom-content"]',
+      )
       expect(contentWrapper).toBeDefined()
     })
 

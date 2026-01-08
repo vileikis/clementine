@@ -1,6 +1,6 @@
+import { useEventTheme } from '../hooks/useEventTheme'
 import type { CSSProperties, ReactNode } from 'react'
 import type { ThemeBackground } from '../types'
-import { useEventTheme } from '../hooks/useEventTheme'
 import { cn } from '@/shared/utils'
 
 interface ThemedBackgroundProps {
