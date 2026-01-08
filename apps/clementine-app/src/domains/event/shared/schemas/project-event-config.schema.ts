@@ -50,6 +50,19 @@ export const overlaysConfigSchema = z
   .default(null)
 
 /**
+ * Experience Picker Layout
+ *
+ * Layout options for displaying experience cards on the welcome screen.
+ * - list: Vertical stack of experience cards
+ * - grid: Grid layout of experience cards
+ */
+export const experiencePickerLayoutSchema = z.enum(['list', 'grid'])
+
+export type ExperiencePickerLayout = z.infer<
+  typeof experiencePickerLayoutSchema
+>
+
+/**
  * Guest sharing preferences and options
  * Flattened structure for simpler updates using Firestore dot notation
  */
@@ -79,7 +92,7 @@ export const welcomeConfigSchema = z.object({
   /** Hero media (image) - uses shared MediaReference type */
   media: mediaReferenceSchema.nullable().default(null),
   /** Experience cards layout */
-  layout: z.enum(['list', 'grid']).default('list'),
+  layout: experiencePickerLayoutSchema.default('list'),
 })
 
 /**

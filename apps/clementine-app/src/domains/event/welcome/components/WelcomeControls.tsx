@@ -2,11 +2,12 @@
  * WelcomeControls Component
  *
  * Right panel control interface for customizing welcome screen properties.
- * Organized into sections: Content, Media, Layout.
+ * Organized into sections: Content (title, description, media), Experiences (layout).
  */
 
 import { LayoutGrid, LayoutList } from 'lucide-react'
 import type { WelcomeConfig } from '@/domains/event/shared'
+import type { ExperiencePickerLayout } from '../schemas'
 import type { EditorOption } from '@/shared/editor-controls'
 import {
   EditorSection,
@@ -32,8 +33,8 @@ export interface WelcomeControlsProps {
   uploadProgress?: number
 }
 
-// Layout options
-const LAYOUT_OPTIONS: EditorOption<'list' | 'grid'>[] = [
+// Layout options for experience picker
+const LAYOUT_OPTIONS: EditorOption<ExperiencePickerLayout>[] = [
   { value: 'list', label: 'List', icon: <LayoutList className="size-4" /> },
   { value: 'grid', label: 'Grid', icon: <LayoutGrid className="size-4" /> },
 ]
@@ -48,7 +49,7 @@ export function WelcomeControls({
 }: WelcomeControlsProps) {
   return (
     <div className="space-y-0">
-      {/* Content Section */}
+      {/* Content Section - title, description, hero media */}
       <EditorSection title="Content">
         <div className="space-y-2">
           <Label
@@ -85,10 +86,6 @@ export function WelcomeControls({
             rows={3}
           />
         </div>
-      </EditorSection>
-
-      {/* Media Section */}
-      <EditorSection title="Media">
         <MediaPickerField
           label="Hero Image"
           value={welcome.media?.url ?? null}
@@ -107,10 +104,10 @@ export function WelcomeControls({
         />
       </EditorSection>
 
-      {/* Layout Section */}
-      <EditorSection title="Layout">
+      {/* Experiences Section - layout (future: experience list) */}
+      <EditorSection title="Experiences">
         <ToggleGroupField
-          label="Experience cards"
+          label="Layout"
           value={welcome.layout}
           onChange={(value) => onUpdate({ layout: value })}
           options={LAYOUT_OPTIONS}

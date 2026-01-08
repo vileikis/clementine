@@ -71,7 +71,7 @@ export function ThemeEditorPage() {
       }
     },
     fieldsToCompare: THEME_FIELDS_TO_COMPARE,
-    debounceMs: 300,
+    debounceMs: 2000,
   })
 
   // Watch form values for live preview
