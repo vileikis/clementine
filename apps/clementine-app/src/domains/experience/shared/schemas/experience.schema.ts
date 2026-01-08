@@ -13,17 +13,32 @@
 import { z } from 'zod'
 
 /**
+ * Experience status enum schema
+ * Lifecycle state of an experience
+ */
+export const experienceStatusSchema = z.enum(['active', 'deleted'])
+
+/**
  * Experience Profile enum schema
  *
  * Defines valid experience patterns for validation.
- * Forward declaration - full implementation in profile.types.ts
+ * - freeform: Any valid step sequence
+ * - main_default: Default main experience flow
+ * - pregate_default: Pre-gate experience flow
+ * - preshare_default: Pre-share experience flow
  */
 export const experienceProfileSchema = z.enum([
-  'free',
-  'photobooth',
-  'survey',
-  'gallery',
+  'freeform',
+  'main_default',
+  'pregate_default',
+  'preshare_default',
 ])
+
+/**
+ * Config version schema
+ * Indicates whether config is draft or published
+ */
+export const configVersionSchema = z.enum(['draft', 'published'])
 
 /**
  * Step config placeholder schema
@@ -41,19 +56,14 @@ export const stepConfigSchema = z.looseObject({
  * Experience Config Schema
  *
  * Configuration object that defines the structure and behavior of an experience.
- * Contains schema version, profile type, and step definitions.
+ * Contains version indicator and step definitions.
  */
 export const experienceConfigSchema = z.looseObject({
   /**
-   * Schema version for migration tracking
+   * Config version indicator
+   * Indicates whether this is a draft or published config
    */
-  schemaVersion: z.number().default(1),
-
-  /**
-   * Experience profile type
-   * Determines validation rules for step sequences
-   */
-  profile: experienceProfileSchema.default('free'),
+  version: configVersionSchema,
 
   /**
    * Array of step configurations
@@ -83,7 +93,13 @@ export const experienceSchema = z.looseObject({
    */
 
   /** Experience lifecycle status */
-  status: z.enum(['active', 'deleted']).default('active'),
+  status: experienceStatusSchema.default('active'),
+
+  /**
+   * Experience profile type
+   * Determines validation rules for step sequences
+   */
+  profile: experienceProfileSchema.default('freeform'),
 
   /** Creation timestamp (Unix ms) */
   createdAt: z.number(),
@@ -99,10 +115,10 @@ export const experienceSchema = z.looseObject({
    */
 
   /** Draft configuration (work in progress) */
-  draftConfig: experienceConfigSchema.nullable().default(null),
+  draft: experienceConfigSchema.nullable().default(null),
 
   /** Published configuration (live for guests) */
-  publishedConfig: experienceConfigSchema.nullable().default(null),
+  published: experienceConfigSchema.nullable().default(null),
 
   /**
    * VERSION TRACKING
@@ -123,4 +139,6 @@ export const experienceSchema = z.looseObject({
  */
 export type Experience = z.infer<typeof experienceSchema>
 export type ExperienceConfig = z.infer<typeof experienceConfigSchema>
-export type ExperienceProfileValue = z.infer<typeof experienceProfileSchema>
+export type ExperienceStatus = z.infer<typeof experienceStatusSchema>
+export type ExperienceProfile = z.infer<typeof experienceProfileSchema>
+export type ConfigVersion = z.infer<typeof configVersionSchema>

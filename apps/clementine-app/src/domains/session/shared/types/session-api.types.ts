@@ -1,52 +1,62 @@
 /**
- * Session API Types
+ * Session API Schemas and Types
  *
- * Type shapes for session API operations.
- * These are interface definitions only for Phase 0 - implementation comes in Phase 3.
+ * Zod schemas and types for session API operations.
+ * These are schema definitions only for Phase 0 - implementation comes in Phase 3.
  */
-import type { MediaReference } from '@/shared/theming/schemas/media-reference.schema'
-import type {
-  ConfigSource,
-  Session,
-  SessionMode,
+import { z } from 'zod'
+
+import {
+  configSourceSchema,
+  sessionModeSchema,
 } from '../schemas/session.schema'
+import type { Session } from '../schemas/session.schema'
+import { mediaReferenceSchema } from '@/shared/theming'
 
 /**
- * Input for creating a new session
+ * Create session input schema
  */
-export interface CreateSessionInput {
+export const createSessionInputSchema = z.object({
   /** Parent project ID */
-  projectId: string
+  projectId: z.string(),
 
   /** Parent event ID */
-  eventId: string
+  eventId: z.string(),
 
   /** Experience to execute */
-  experienceId: string
+  experienceId: z.string(),
 
   /** Session mode (preview or guest) */
-  mode: SessionMode
+  mode: sessionModeSchema,
 
   /** Config source (draft or published) */
-  configSource: ConfigSource
-}
+  configSource: configSourceSchema,
+})
 
 /**
- * Input for updating session progress
+ * Update session progress input schema
  */
-export interface UpdateSessionProgressInput {
+export const updateSessionProgressInputSchema = z.object({
   /** Session to update */
-  sessionId: string
+  sessionId: z.string(),
 
   /** New step index */
-  currentStepIndex: number
+  currentStepIndex: z.number(),
 
-  /** Updated answers (optional, merged with existing) */
-  answers?: Record<string, unknown>
+  /** Updated inputs (optional, merged with existing) */
+  inputs: z.record(z.string(), z.unknown()).optional(),
 
   /** Updated outputs (optional, merged with existing) */
-  outputs?: Record<string, MediaReference>
-}
+  outputs: z.record(z.string(), mediaReferenceSchema).optional(),
+})
+
+/**
+ * TypeScript types inferred from schemas
+ */
+export type CreateSessionInput = z.infer<typeof createSessionInputSchema>
+export type UpdateSessionProgressInput = z.infer<
+  typeof updateSessionProgressInputSchema
+>
 
 /**
  * Create session function type

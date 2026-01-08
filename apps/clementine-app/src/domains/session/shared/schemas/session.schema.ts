@@ -86,8 +86,8 @@ export const sessionSchema = z.looseObject({
    * ACCUMULATED DATA
    */
 
-  /** Answers collected during the session, keyed by step ID */
-  answers: z.record(z.string(), z.unknown()).default({}),
+  /** Inputs collected during the session (form data, photos, etc.), keyed by step ID */
+  inputs: z.record(z.string(), z.unknown()).default({}),
 
   /** Media outputs generated during the session, keyed by step ID */
   outputs: z.record(z.string(), mediaReferenceSchema).default({}),

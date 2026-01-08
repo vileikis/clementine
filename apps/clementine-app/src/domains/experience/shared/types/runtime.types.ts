@@ -6,7 +6,7 @@
  *
  * This is an interface definition only for Phase 0 - implementation comes in Phase 3.
  */
-import type { MediaReference } from '../schemas/media-reference.schema'
+import type { MediaReference } from '@/shared/theming'
 import type { Step } from './step.types'
 
 /**
@@ -23,8 +23,8 @@ export interface RuntimeState {
   /** Current step index (0-based) */
   currentStepIndex: number
 
-  /** Collected answers keyed by step ID */
-  answers: Record<string, unknown>
+  /** Collected inputs keyed by step ID (form data, photos, etc.) */
+  inputs: Record<string, unknown>
 
   /** Generated outputs (media) keyed by step ID */
   outputs: Record<string, MediaReference>
@@ -50,7 +50,7 @@ export interface RuntimeState {
  * await engine.next()
  *
  * // Collect data
- * engine.setAnswer('step1', { response: 'yes' })
+ * engine.setInput('step1', { photo: photoData })
  *
  * // Check state
  * if (engine.isComplete) {
@@ -120,11 +120,11 @@ export interface RuntimeEngine {
    */
 
   /**
-   * Set the answer for a step
+   * Set the input for a step (form data, photos, etc.)
    * @param stepId - The step ID
-   * @param answer - The answer value (type depends on step type)
+   * @param input - The input value (type depends on step type)
    */
-  setAnswer: (stepId: string, answer: unknown) => void
+  setInput: (stepId: string, input: unknown) => void
 
   /**
    * Set a media reference for a step
@@ -138,11 +138,11 @@ export interface RuntimeEngine {
    */
 
   /**
-   * Get the answer for a step
+   * Get the input for a step
    * @param stepId - The step ID
-   * @returns The answer value, or undefined if not set
+   * @returns The input value, or undefined if not set
    */
-  getAnswer: (stepId: string) => unknown | undefined
+  getInput: (stepId: string) => unknown | undefined
 
   /**
    * Get the output media for a step

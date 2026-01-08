@@ -1,41 +1,19 @@
 /**
  * Experience Profile Types
  *
- * Defines experience profiles and their validators.
+ * Defines experience profile validators.
  * Profiles determine valid step sequences and constraints for an experience.
  *
  * Available Profiles:
- * - Free: Any valid step sequence
- * - Photobooth: Requires capture → transform → share
- * - Survey: Input steps only, no media
- * - Gallery: View-only, no capture
+ * - freeform: Any valid step sequence
+ * - main_default: Default main experience flow
+ * - pregate_default: Pre-gate experience flow
+ * - preshare_default: Pre-share experience flow
  */
-import { z } from 'zod'
-import type { ExperienceConfig } from '../schemas/experience.schema'
-
-/**
- * Experience Profile enum
- * Defines the preset patterns for experience validation
- */
-export enum ExperienceProfile {
-  /** Any valid step sequence - no constraints */
-  Free = 'free',
-
-  /** Requires capture → transform → share flow */
-  Photobooth = 'photobooth',
-
-  /** Input steps only, no media capture/transform */
-  Survey = 'survey',
-
-  /** View-only gallery, no capture allowed */
-  Gallery = 'gallery',
-}
-
-/**
- * Zod schema for ExperienceProfile enum
- * Use for runtime validation
- */
-export const experienceProfileEnumSchema = z.nativeEnum(ExperienceProfile)
+import type {
+  ExperienceConfig,
+  ExperienceProfile,
+} from '../schemas/experience.schema'
 
 /**
  * Profile validation result
@@ -80,10 +58,10 @@ const createEmptyValidator = (): ProfileValidator => {
  * Future phases will implement actual validation logic
  */
 export const profileValidators: Record<ExperienceProfile, ProfileValidator> = {
-  [ExperienceProfile.Free]: createEmptyValidator(),
-  [ExperienceProfile.Photobooth]: createEmptyValidator(),
-  [ExperienceProfile.Survey]: createEmptyValidator(),
-  [ExperienceProfile.Gallery]: createEmptyValidator(),
+  freeform: createEmptyValidator(),
+  main_default: createEmptyValidator(),
+  pregate_default: createEmptyValidator(),
+  preshare_default: createEmptyValidator(),
 }
 
 /**
@@ -95,10 +73,7 @@ export const profileValidators: Record<ExperienceProfile, ProfileValidator> = {
  *
  * @example
  * ```typescript
- * const result = validateExperienceProfile(
- *   ExperienceProfile.Photobooth,
- *   experienceConfig
- * )
+ * const result = validateExperienceProfile('main_default', experienceConfig)
  *
  * if (!result.valid) {
  *   console.error('Validation failed:', result.errors)
