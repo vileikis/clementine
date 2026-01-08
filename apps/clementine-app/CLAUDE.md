@@ -97,16 +97,57 @@ Project structure follows DDD principles with clear separation of concerns:
 
 ```
 src/
-├── ui-kit/              # Design system (shadcn/ui, Radix, @dnd-kit)
+├── app/                 # TanStack Router routes (thin - import from domains)
+├── ui-kit/              # Design system (shadcn/ui components)
 ├── integrations/        # Third-party integrations (Firebase, Sentry)
-├── shared/              # Shared utilities & components
-├── domains/             # Business domains (bounded contexts)
-│   ├── events/          # Events domain
-│   │   ├── management/  # Subdomain
-│   │   ├── theming/     # Subdomain
-│   │   └── shared/      # Domain-specific shared code
-│   └── experiences/     # Experiences domain
-└── app/                 # TanStack Router routes (thin)
+├── shared/              # Cross-cutting modules used across domains
+│   ├── camera/          # Camera capture & photo functionality
+│   ├── editor-controls/ # Reusable editor UI (sliders, pickers, etc.)
+│   ├── preview-shell/   # Preview container with viewport switcher
+│   ├── theming/         # Theme utilities & CSS variable generation
+│   ├── forms/           # Form utilities
+│   ├── components/      # Generic shared components
+│   └── utils/           # Utility functions
+└── domains/             # Business domains (bounded contexts)
+    ├── admin/           # Workspace admin (super-admin functions)
+    ├── auth/            # Authentication & login
+    ├── dev-tools/       # Development utilities (camera preview, etc.)
+    ├── event/           # Event designer (see detail below)
+    ├── guest/           # Guest photo experience (public-facing)
+    ├── media-library/   # Media asset management
+    ├── navigation/      # Sidebar, top nav, breadcrumbs
+    ├── project/         # Project management (events list, sharing)
+    └── workspace/       # Workspace settings & project list
+```
+
+#### Event Domain (Core)
+
+The `event` domain is the heart of the application - the event designer/editor:
+
+```
+domains/event/
+├── designer/            # Main editor layout & state
+│   ├── containers/      # EventDesignerLayout (orchestrates tabs)
+│   ├── stores/          # Zustand stores (changes tracker, etc.)
+│   └── hooks/           # Designer-specific hooks
+├── settings/            # Settings tab (sharing, overlay, publish)
+│   ├── containers/      # SettingsTab container
+│   ├── components/      # OverlayFrame, SharingOptionCard, etc.
+│   └── hooks/           # Settings mutations
+├── theme/               # Theme tab (colors, fonts, branding)
+│   ├── containers/      # ThemeEditorTab container
+│   ├── components/      # Theme editor form sections
+│   └── constants/       # Default values, presets
+├── welcome/             # Welcome tab (welcome screen editor)
+│   ├── containers/      # WelcomeEditorTab container
+│   ├── components/      # Welcome screen form & preview
+│   └── schemas/         # Zod validation schemas
+└── shared/              # Shared across event subdomains
+    ├── types/           # Event types & interfaces
+    ├── schemas/         # Zod schemas (eventConfigSchema, etc.)
+    ├── queries/         # TanStack Query hooks (useEvent, etc.)
+    ├── hooks/           # Shared hooks (useEventMutations, etc.)
+    └── lib/             # Utility functions
 ```
 
 **Key principles:**
