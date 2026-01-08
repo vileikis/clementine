@@ -8,6 +8,7 @@
  */
 import { z } from 'zod'
 import { themeSchema } from '@/shared/theming/schemas/theme.schemas'
+import { mediaReferenceSchema } from '@/shared/theming'
 
 /**
  * Current schema version for event configuration
@@ -65,6 +66,23 @@ export const sharingConfigSchema = z.object({
 })
 
 /**
+ * Welcome Screen Configuration
+ *
+ * Customizable welcome screen content for guest-facing experience.
+ * Hero media, title, description, and experience card layout.
+ */
+export const welcomeConfigSchema = z.object({
+  /** Welcome screen title */
+  title: z.string().default('Choose your experience'),
+  /** Welcome screen description */
+  description: z.string().nullable().default(null),
+  /** Hero media (image) - uses shared MediaReference type */
+  media: mediaReferenceSchema.nullable().default(null),
+  /** Experience cards layout */
+  layout: z.enum(['list', 'grid']).default('list'),
+})
+
+/**
  * Complete guest-facing event configuration
  *
  * Contains all settings that affect the guest experience:
@@ -97,6 +115,11 @@ export const projectEventConfigSchema = z.looseObject({
    * Sharing configuration
    */
   sharing: sharingConfigSchema.nullable().default(null),
+
+  /**
+   * Welcome screen configuration
+   */
+  welcome: welcomeConfigSchema.nullable().default(null),
 }) // Allow unknown fields for future evolution
 
 /**
@@ -106,3 +129,4 @@ export type ProjectEventConfig = z.infer<typeof projectEventConfigSchema>
 export type OverlayReference = z.infer<typeof overlayReferenceSchema>
 export type OverlaysConfig = z.infer<typeof overlaysConfigSchema>
 export type SharingConfig = z.infer<typeof sharingConfigSchema>
+export type WelcomeConfig = z.infer<typeof welcomeConfigSchema>
