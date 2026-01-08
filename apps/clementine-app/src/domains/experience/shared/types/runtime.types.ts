@@ -7,13 +7,11 @@
  * This is an interface definition only for Phase 0 - implementation comes in Phase 3.
  */
 import type { MediaReference } from '@/shared/theming'
+import type { SessionMode } from '@/domains/session'
 import type { Step } from './step.types'
 
-/**
- * Session mode type
- * Re-exported here for runtime engine use
- */
-export type SessionMode = 'preview' | 'guest'
+// Re-export SessionMode for convenience
+export type { SessionMode }
 
 /**
  * Runtime state snapshot
