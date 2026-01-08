@@ -25,13 +25,13 @@
 
 **Purpose**: Merge unique files and remove duplicates from `components/ui/`
 
-- [ ] T001 [P] Move `apps/clementine-app/src/ui-kit/components/ui/breadcrumb.tsx` to `apps/clementine-app/src/ui-kit/components/breadcrumb.tsx`
-- [ ] T002 [P] Move `apps/clementine-app/src/ui-kit/components/ui/progress.tsx` to `apps/clementine-app/src/ui-kit/components/progress.tsx`
-- [ ] T003 [P] Move `apps/clementine-app/src/ui-kit/components/ui/textarea.tsx` to `apps/clementine-app/src/ui-kit/components/textarea.tsx`
-- [ ] T004 [P] Delete duplicate `apps/clementine-app/src/ui-kit/components/ui/button.tsx`
-- [ ] T005 [P] Delete duplicate `apps/clementine-app/src/ui-kit/components/ui/card.tsx`
-- [ ] T006 [P] Delete duplicate `apps/clementine-app/src/ui-kit/components/ui/dropdown-menu.tsx`
-- [ ] T007 Delete empty folder `apps/clementine-app/src/ui-kit/components/ui/`
+- [X] T001 [P] Move `apps/clementine-app/src/ui-kit/components/ui/breadcrumb.tsx` to `apps/clementine-app/src/ui-kit/components/breadcrumb.tsx`
+- [X] T002 [P] Move `apps/clementine-app/src/ui-kit/components/ui/progress.tsx` to `apps/clementine-app/src/ui-kit/components/progress.tsx`
+- [X] T003 [P] Move `apps/clementine-app/src/ui-kit/components/ui/textarea.tsx` to `apps/clementine-app/src/ui-kit/components/textarea.tsx`
+- [X] T004 [P] Delete duplicate `apps/clementine-app/src/ui-kit/components/ui/button.tsx`
+- [X] T005 [P] Delete duplicate `apps/clementine-app/src/ui-kit/components/ui/card.tsx`
+- [X] T006 [P] Delete duplicate `apps/clementine-app/src/ui-kit/components/ui/dropdown-menu.tsx`
+- [X] T007 Delete empty folder `apps/clementine-app/src/ui-kit/components/ui/`
 
 **Checkpoint**: No `components/ui/` folder exists, all components in `components/`
 
@@ -41,7 +41,7 @@
 
 **Purpose**: Rename `components/` to `ui/` for cleaner imports
 
-- [ ] T008 Rename directory `apps/clementine-app/src/ui-kit/components/` to `apps/clementine-app/src/ui-kit/ui/`
+- [X] T008 Rename directory `apps/clementine-app/src/ui-kit/components/` to `apps/clementine-app/src/ui-kit/ui/`
 
 **Checkpoint**: Components now live in `ui-kit/ui/`
 
@@ -51,7 +51,7 @@
 
 **Purpose**: Create unified barrel export for all UI components
 
-- [ ] T009 Create barrel export file `apps/clementine-app/src/ui-kit/ui/index.ts` with exports for all 23 components
+- [X] T009 Create barrel export file `apps/clementine-app/src/ui-kit/ui/index.ts` with exports for all 23 components
 
 **Checkpoint**: All components exportable via `@/ui-kit/ui`
 
@@ -63,14 +63,14 @@
 
 ### Legacy `components/ui/` imports (4 files)
 
-- [ ] T010 [P] Update imports in `apps/clementine-app/src/shared/editor-controls/components/TextareaField.tsx` from `@/ui-kit/components/ui/textarea` to `@/ui-kit/ui/textarea`
-- [ ] T011 [P] Update imports in `apps/clementine-app/src/domains/event/settings/components/OverlayFrame.tsx` from `@/ui-kit/components/ui/progress` to `@/ui-kit/ui/progress`
-- [ ] T012 [P] Update imports in `apps/clementine-app/src/domains/navigation/components/TopNavBreadcrumb.tsx` from `@/ui-kit/components/ui/breadcrumb` to `@/ui-kit/ui/breadcrumb`
-- [ ] T013 [P] Update imports in `apps/clementine-app/src/domains/project/events/components/ProjectEventItem.tsx` from `@/ui-kit/components/ui/dropdown-menu` to `@/ui-kit/ui/dropdown-menu`
+- [X] T010 [P] Update imports in `apps/clementine-app/src/shared/editor-controls/components/TextareaField.tsx` from `@/ui-kit/components/ui/textarea` to `@/ui-kit/ui/textarea`
+- [X] T011 [P] Update imports in `apps/clementine-app/src/domains/event/settings/components/OverlayFrame.tsx` from `@/ui-kit/components/ui/progress` to `@/ui-kit/ui/progress`
+- [X] T012 [P] Update imports in `apps/clementine-app/src/domains/navigation/components/TopNavBreadcrumb.tsx` from `@/ui-kit/components/ui/breadcrumb` to `@/ui-kit/ui/breadcrumb`
+- [X] T013 [P] Update imports in `apps/clementine-app/src/domains/project/events/components/ProjectEventItem.tsx` from `@/ui-kit/components/ui/dropdown-menu` to `@/ui-kit/ui/dropdown-menu`
 
 ### Standard `components/` imports (~38 files)
 
-- [ ] T014 Update all imports matching `@/ui-kit/components/` to `@/ui-kit/ui/` across the codebase using find-and-replace
+- [X] T014 Update all imports matching `@/ui-kit/components/` to `@/ui-kit/ui/` across the codebase using find-and-replace
 
 **Checkpoint**: All imports use `@/ui-kit/ui/` pattern
 
@@ -80,8 +80,8 @@
 
 **Purpose**: Update shadcn/ui configuration and documentation
 
-- [ ] T015 [P] Update `apps/clementine-app/components.json` aliases from `"components": "@/ui-kit/components"` to `"components": "@/ui-kit/ui"` and add `"ui": "@/ui-kit/ui"`
-- [ ] T016 [P] Update `apps/clementine-app/src/ui-kit/README.md` to reflect new structure
+- [X] T015 [P] Update `apps/clementine-app/components.json` aliases from `"components": "@/ui-kit/components"` to `"components": "@/ui-kit/ui"` and add `"ui": "@/ui-kit/ui"`
+- [X] T016 [P] Update `apps/clementine-app/src/ui-kit/README.md` to reflect new structure
 
 **Checkpoint**: shadcn CLI will install to correct location
 
@@ -91,9 +91,9 @@
 
 **Purpose**: Verify refactoring is complete and correct
 
-- [ ] T017 Run `pnpm type-check` in `apps/clementine-app/` to verify all imports resolve
-- [ ] T018 Run `pnpm build` in `apps/clementine-app/` to verify production build succeeds
-- [ ] T019 Run `pnpm lint` in `apps/clementine-app/` to verify no linting errors
+- [X] T017 Run `pnpm type-check` in `apps/clementine-app/` to verify all imports resolve
+- [X] T018 Run `pnpm build` in `apps/clementine-app/` to verify production build succeeds
+- [X] T019 Run `pnpm lint` in `apps/clementine-app/` to verify no linting errors
 
 **Checkpoint**: All validation passes - refactoring complete
 

@@ -10,8 +10,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/ui-kit/components/alert-dialog'
-import { Button } from '@/ui-kit/components/button'
+} from '@/ui-kit/ui/alert-dialog'
+import { Button } from '@/ui-kit/ui/button'
 
 interface DeleteWorkspaceDialogProps {
   workspace: Workspace

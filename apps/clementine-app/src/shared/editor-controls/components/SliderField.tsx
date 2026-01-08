@@ -8,7 +8,7 @@
 import { useId } from 'react'
 import { EditorRow } from './EditorRow'
 import type { SliderFieldProps } from '../types'
-import { Slider } from '@/ui-kit/components/slider'
+import { Slider } from '@/ui-kit/ui/slider'
 
 export function SliderField({
   label,

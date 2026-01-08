@@ -1,8 +1,8 @@
 import { useMemo, useRef, useState } from 'react'
 import { Upload, X } from 'lucide-react'
 import type { OverlayReference } from '@/domains/event/shared'
-import { Card } from '@/ui-kit/components/card'
-import { Progress } from '@/ui-kit/components/ui/progress'
+import { Card } from '@/ui-kit/ui/card'
+import { Progress } from '@/ui-kit/ui/progress'
 
 interface OverlayFrameProps {
   /**

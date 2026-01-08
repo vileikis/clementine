@@ -8,8 +8,8 @@
 import { useId } from 'react'
 import { getCounterColorClass } from '../utils'
 import type { TextFieldProps } from '../types'
-import { Input } from '@/ui-kit/components/input'
-import { Label } from '@/ui-kit/components/label'
+import { Input } from '@/ui-kit/ui/input'
+import { Label } from '@/ui-kit/ui/label'
 import { cn } from '@/shared/utils'
 
 export function TextField({

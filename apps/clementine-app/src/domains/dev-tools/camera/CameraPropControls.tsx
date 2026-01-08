@@ -1,14 +1,14 @@
 import type { AspectRatio, CameraFacingConfig } from '@/shared/camera/types'
-import { Label } from '@/ui-kit/components/label'
+import { Label } from '@/ui-kit/ui/label'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/ui-kit/components/select'
-import { Switch } from '@/ui-kit/components/switch'
-import { Button } from '@/ui-kit/components/button'
+} from '@/ui-kit/ui/select'
+import { Switch } from '@/ui-kit/ui/switch'
+import { Button } from '@/ui-kit/ui/button'
 
 export interface CameraPropConfig {
   enableLibrary: boolean

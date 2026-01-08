@@ -7,7 +7,7 @@
 
 import { EditorRow } from './EditorRow'
 import type { ToggleGroupFieldProps } from '../types'
-import { ToggleGroup, ToggleGroupItem } from '@/ui-kit/components/toggle-group'
+import { ToggleGroup, ToggleGroupItem } from '@/ui-kit/ui/toggle-group'
 
 export function ToggleGroupField<T extends string = string>({
   label,

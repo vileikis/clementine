@@ -16,7 +16,7 @@ import { useEventDesignerStore } from '../stores'
 import { EventDesignerPage } from './EventDesignerPage'
 import type { ProjectEventFull } from '@/domains/event/shared'
 import type { Project } from '@/domains/workspace/projects'
-import { Button } from '@/ui-kit/components/button'
+import { Button } from '@/ui-kit/ui/button'
 import { TopNavBar } from '@/domains/navigation'
 
 interface EventDesignerLayoutProps {

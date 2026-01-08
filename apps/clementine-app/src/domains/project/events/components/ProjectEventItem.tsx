@@ -17,9 +17,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/ui-kit/components/ui/dropdown-menu'
-import { Button } from '@/ui-kit/components/button'
-import { Switch } from '@/ui-kit/components/switch'
+} from '@/ui-kit/ui/dropdown-menu'
+import { Button } from '@/ui-kit/ui/button'
+import { Switch } from '@/ui-kit/ui/switch'
 
 export interface ProjectEventItemProps {
   /** Project event to display */

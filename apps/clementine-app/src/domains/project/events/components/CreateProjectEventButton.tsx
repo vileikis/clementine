@@ -6,7 +6,7 @@
 import { Plus } from 'lucide-react'
 import { toast } from 'sonner'
 import { useCreateProjectEvent } from '../hooks/useCreateProjectEvent'
-import { Button } from '@/ui-kit/components/button'
+import { Button } from '@/ui-kit/ui/button'
 
 export interface CreateProjectEventButtonProps {
   /** Project ID */

@@ -4,16 +4,16 @@ import { MoreVertical, Pencil, Trash2 } from 'lucide-react'
 import { DeleteProjectDialog } from './DeleteProjectDialog'
 import { RenameProjectDialog } from './RenameProjectDialog'
 import type { Project } from '../types'
-import { Badge } from '@/ui-kit/components/badge'
-import { Button } from '@/ui-kit/components/button'
-import { Card } from '@/ui-kit/components/card'
+import { Badge } from '@/ui-kit/ui/badge'
+import { Button } from '@/ui-kit/ui/button'
+import { Card } from '@/ui-kit/ui/card'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/ui-kit/components/dropdown-menu'
+} from '@/ui-kit/ui/dropdown-menu'
 
 interface ProjectListItemProps {
   project: Project

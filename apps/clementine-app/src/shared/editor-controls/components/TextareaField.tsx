@@ -8,8 +8,8 @@
 import { useId } from 'react'
 import { getCounterColorClass } from '../utils'
 import type { TextareaFieldProps } from '../types'
-import { Textarea } from '@/ui-kit/components/ui/textarea'
-import { Label } from '@/ui-kit/components/label'
+import { Textarea } from '@/ui-kit/ui/textarea'
+import { Label } from '@/ui-kit/ui/label'
 import { cn } from '@/shared/utils'
 
 export function TextareaField({

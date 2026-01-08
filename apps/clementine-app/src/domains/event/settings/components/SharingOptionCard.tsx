@@ -1,6 +1,6 @@
 import type { LucideIcon } from 'lucide-react'
 import type { IconType } from 'react-icons'
-import { Button } from '@/ui-kit/components/button'
+import { Button } from '@/ui-kit/ui/button'
 import { cn } from '@/shared/utils/index'
 
 interface SharingOptionCardProps {

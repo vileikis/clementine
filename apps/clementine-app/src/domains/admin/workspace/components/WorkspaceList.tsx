@@ -3,7 +3,7 @@ import { Plus } from 'lucide-react'
 import { useWorkspaces } from '../hooks/useWorkspaces'
 import { WorkspaceListEmpty } from './WorkspaceListEmpty'
 import { WorkspaceListItem } from './WorkspaceListItem'
-import { Button } from '@/ui-kit/components/button'
+import { Button } from '@/ui-kit/ui/button'
 
 /**
  * List of active workspaces with loading and empty states

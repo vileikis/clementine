@@ -8,7 +8,7 @@
 import { AlertCircle, ImageIcon, RefreshCw } from 'lucide-react'
 import { DEFAULT_LABELS } from '../constants'
 import type { CameraCaptureError, CameraCaptureLabels } from '../types'
-import { Button } from '@/ui-kit/components/button'
+import { Button } from '@/ui-kit/ui/button'
 import { cn } from '@/shared/utils'
 
 interface ErrorStateProps {

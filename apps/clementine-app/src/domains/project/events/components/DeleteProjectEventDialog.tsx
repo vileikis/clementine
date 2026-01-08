@@ -14,7 +14,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/ui-kit/components/alert-dialog'
+} from '@/ui-kit/ui/alert-dialog'
 
 export interface DeleteProjectEventDialogProps {
   /** Event ID to delete */

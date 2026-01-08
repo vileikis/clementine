@@ -7,7 +7,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
   BreadcrumbItem as ShadcnBreadcrumbItem,
-} from '@/ui-kit/components/ui/breadcrumb'
+} from '@/ui-kit/ui/breadcrumb'
 
 interface TopNavBreadcrumbProps {
   items: BreadcrumbItem[]

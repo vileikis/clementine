@@ -12,7 +12,7 @@ import type { ControllerProps, FieldPath, FieldValues } from 'react-hook-form'
 import type * as LabelPrimitive from '@radix-ui/react-label'
 
 import { cn } from '@/shared/utils/index'
-import { Label } from '@/ui-kit/components/label'
+import { Label } from '@/ui-kit/ui/label'
 
 const Form = FormProvider
 

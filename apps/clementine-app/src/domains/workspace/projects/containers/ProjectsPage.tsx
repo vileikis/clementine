@@ -2,8 +2,8 @@ import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { useCreateProject, useDeleteProject, useProjects } from '../hooks'
 import { ProjectListEmpty, ProjectListItem } from '../components'
-import { Button } from '@/ui-kit/components/button'
-import { Skeleton } from '@/ui-kit/components/skeleton'
+import { Button } from '@/ui-kit/ui/button'
+import { Skeleton } from '@/ui-kit/ui/skeleton'
 
 interface ProjectsPageProps {
   workspaceId: string

@@ -1,4 +1,4 @@
-import { Button } from '@/ui-kit/components/button'
+import { Button } from '@/ui-kit/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -6,7 +6,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/ui-kit/components/dialog'
+} from '@/ui-kit/ui/dialog'
 
 interface DeleteProjectDialogProps {
   open: boolean
