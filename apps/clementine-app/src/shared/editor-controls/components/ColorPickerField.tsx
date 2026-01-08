@@ -9,13 +9,9 @@ import { useEffect, useId, useRef, useState } from 'react'
 import { Pipette, X } from 'lucide-react'
 import { EditorRow } from './EditorRow'
 import type { ColorPickerFieldProps } from '../types'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/ui-kit/components/popover'
-import { Input } from '@/ui-kit/components/input'
-import { Button } from '@/ui-kit/components/button'
+import { Popover, PopoverContent, PopoverTrigger } from '@/ui-kit/ui/popover'
+import { Input } from '@/ui-kit/ui/input'
+import { Button } from '@/ui-kit/ui/button'
 import { COLOR_REGEX } from '@/shared/theming/schemas/theme.schemas'
 import { cn } from '@/shared/utils'
 

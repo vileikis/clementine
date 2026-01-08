@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react'
-import { Button } from '@/ui-kit/components/button'
+import { Button } from '@/ui-kit/ui/button'
 
 /**
  * Action button configuration for TopNavActions utility component

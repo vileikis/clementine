@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { Button } from '@/ui-kit/components/button'
+import { Button } from '@/ui-kit/ui/button'
 
 interface NotFoundProps {
   /** Title for the 404 state */

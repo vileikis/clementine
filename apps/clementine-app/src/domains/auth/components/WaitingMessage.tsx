@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { TriangleAlert } from 'lucide-react'
 import { useAuth } from '../providers/AuthProvider'
-import { Button } from '@/ui-kit/components/button'
+import { Button } from '@/ui-kit/ui/button'
 
 // T039: Create WaitingMessage component for non-admin authenticated users
 

@@ -1,6 +1,6 @@
 import type { CameraCaptureError, CapturedPhoto } from '@/shared/camera/types'
-import { Button } from '@/ui-kit/components/button'
-import { ScrollArea } from '@/ui-kit/components/scroll-area'
+import { Button } from '@/ui-kit/ui/button'
+import { ScrollArea } from '@/ui-kit/ui/scroll-area'
 
 export interface CallbackEvent {
   id: string

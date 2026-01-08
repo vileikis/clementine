@@ -15,10 +15,11 @@ The UI Kit serves two primary purposes:
 
 ```
 ui-kit/
-├── components/         # UI components (shadcn/ui, custom Radix)
+├── ui/                # UI components (shadcn/ui, custom Radix)
 │   ├── button.tsx
 │   ├── input.tsx
 │   ├── dialog.tsx
+│   ├── index.ts       # Barrel export for all components
 │   └── ...
 └── theme/             # Theme system (design tokens)
     └── styles.css     # CSS variables and Tailwind config
@@ -28,7 +29,7 @@ ui-kit/
 
 ### shadcn/ui Components
 
-The majority of components in `ui-kit/components/` are from [shadcn/ui](https://ui.shadcn.com), a collection of beautiful, accessible components built on Radix UI.
+The majority of components in `ui-kit/ui/` are from [shadcn/ui](https://ui.shadcn.com), a collection of beautiful, accessible components built on Radix UI.
 
 **Installing new components:**
 
@@ -37,7 +38,7 @@ cd apps/clementine-app
 pnpm dlx shadcn@latest add <component-name>
 ```
 
-This will install the component into `src/ui-kit/components/`.
+This will install the component into `src/ui-kit/ui/`.
 
 **Available components:**
 
@@ -52,7 +53,7 @@ See the [shadcn/ui docs](https://ui.shadcn.com/docs/components/accordion) for fu
 
 ### Custom Components
 
-You can also create custom components in `ui-kit/components/` by:
+You can also create custom components in `ui-kit/ui/` by:
 
 1. **Extending shadcn/ui components** - Build on existing components
 2. **Styling Radix UI primitives** - Use Radix for components shadcn doesn't have
@@ -61,7 +62,7 @@ You can also create custom components in `ui-kit/components/` by:
 **Example: Custom Icon Button**
 
 ```tsx
-// ui-kit/components/icon-button.tsx
+// ui-kit/ui/icon-button.tsx
 import { Button, type ButtonProps } from './button'
 import type { LucideIcon } from 'lucide-react'
 
@@ -320,7 +321,7 @@ cd apps/clementine-app
 pnpm dlx shadcn@latest add <component-name>
 ```
 
-Components are automatically added to `src/ui-kit/components/`.
+Components are automatically added to `src/ui-kit/ui/`.
 
 ### Creating Custom Components
 
@@ -333,7 +334,7 @@ Components are automatically added to `src/ui-kit/components/`.
 **Step 2: Create the component**
 
 ```tsx
-// ui-kit/components/custom-component.tsx
+// ui-kit/ui/custom-component.tsx
 import * as Primitive from '@radix-ui/react-primitive'
 import { cn } from '@/shared/utils'
 
@@ -404,8 +405,8 @@ Now use it:
 
 ```tsx
 // Domain component using ui-kit
-import { Button } from '@/ui-kit/components/button'
-import { Card } from '@/ui-kit/components/card'
+import { Button } from '@/ui-kit/ui/button'
+import { Card } from '@/ui-kit/ui/card'
 
 export function EventCard({ event }) {
   return (

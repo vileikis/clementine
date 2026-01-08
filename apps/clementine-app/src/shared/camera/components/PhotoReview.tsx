@@ -6,7 +6,7 @@
 
 import { DEFAULT_LABELS } from '../constants'
 import type { CameraCaptureLabels, CapturedPhoto } from '../types'
-import { Button } from '@/ui-kit/components/button'
+import { Button } from '@/ui-kit/ui/button'
 import { cn } from '@/shared/utils'
 
 interface PhotoReviewProps {

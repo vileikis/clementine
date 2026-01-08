@@ -2,7 +2,7 @@
 
 import type { ViewportMode } from '@/shared/preview-shell'
 import { PreviewShell } from '@/shared/preview-shell'
-import { Button } from '@/ui-kit/components/button'
+import { Button } from '@/ui-kit/ui/button'
 
 interface ComponentConfig {
   enableViewportSwitcher: boolean

@@ -1,5 +1,5 @@
-import { Button } from '@/ui-kit/components/button'
-import { Card } from '@/ui-kit/components/card'
+import { Button } from '@/ui-kit/ui/button'
+import { Card } from '@/ui-kit/ui/card'
 
 interface ProjectListEmptyProps {
   onCreateProject: () => void

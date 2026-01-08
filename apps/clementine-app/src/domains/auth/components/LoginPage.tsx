@@ -2,8 +2,8 @@ import { CircleAlert, Eye, EyeOff } from 'lucide-react'
 import { useAuth } from '../providers/AuthProvider'
 import { useEmailPasswordSignIn } from '../hooks/useEmailPasswordSignIn'
 import { WaitingMessage } from './WaitingMessage'
-import { Button } from '@/ui-kit/components/button'
-import { Input } from '@/ui-kit/components/input'
+import { Button } from '@/ui-kit/ui/button'
+import { Input } from '@/ui-kit/ui/input'
 
 export function LoginPage() {
   const { isAdmin, user, isAnonymous, isLoading } = useAuth()

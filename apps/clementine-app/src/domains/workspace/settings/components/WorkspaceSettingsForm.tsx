@@ -5,8 +5,8 @@ import { useUpdateWorkspace } from '../hooks/useUpdateWorkspace'
 import { updateWorkspaceSchema } from '../../shared/schemas/workspace.schemas'
 import type { UpdateWorkspaceSchemaType } from '../../shared/schemas/workspace.schemas'
 import type { Workspace } from '@clementine/shared'
-import { Button } from '@/ui-kit/components/button'
-import { Input } from '@/ui-kit/components/input'
+import { Button } from '@/ui-kit/ui/button'
+import { Input } from '@/ui-kit/ui/input'
 import {
   Form,
   FormControl,
@@ -15,7 +15,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/ui-kit/components/form'
+} from '@/ui-kit/ui/form'
 
 interface WorkspaceSettingsFormProps {
   workspace: Workspace

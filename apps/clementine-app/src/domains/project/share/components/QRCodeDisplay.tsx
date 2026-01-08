@@ -6,7 +6,7 @@
 import QRCodeSVG from 'react-qr-code'
 import { Download, RefreshCw } from 'lucide-react'
 import type { QRCodeOptions } from '../types'
-import { Button } from '@/ui-kit/components/button'
+import { Button } from '@/ui-kit/ui/button'
 
 export interface QRCodeDisplayProps {
   /**

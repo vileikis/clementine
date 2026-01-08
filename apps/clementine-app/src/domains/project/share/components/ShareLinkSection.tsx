@@ -4,7 +4,7 @@
  */
 
 import { Check, Copy } from 'lucide-react'
-import { Button } from '@/ui-kit/components/button'
+import { Button } from '@/ui-kit/ui/button'
 
 export interface ShareLinkSectionProps {
   /**

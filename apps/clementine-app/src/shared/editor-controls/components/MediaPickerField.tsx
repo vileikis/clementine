@@ -8,7 +8,7 @@
 import { useId, useRef, useState } from 'react'
 import { ImagePlus, Loader2, Trash2 } from 'lucide-react'
 import type { MediaPickerFieldProps } from '../types'
-import { Button } from '@/ui-kit/components/button'
+import { Button } from '@/ui-kit/ui/button'
 import { cn } from '@/shared/utils'
 
 export function MediaPickerField({

@@ -13,7 +13,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/ui-kit/components/select'
+} from '@/ui-kit/ui/select'
 
 export function SelectField<T extends string = string>({
   label,

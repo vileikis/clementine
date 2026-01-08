@@ -11,7 +11,7 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from '@/ui-kit/components/collapsible'
+} from '@/ui-kit/ui/collapsible'
 import { cn } from '@/shared/utils'
 
 export function EditorSection({

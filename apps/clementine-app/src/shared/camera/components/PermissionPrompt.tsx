@@ -8,7 +8,7 @@
 import { Camera, CameraOff } from 'lucide-react'
 import { DEFAULT_LABELS } from '../constants'
 import type { CameraCaptureLabels, PermissionState } from '../types'
-import { Button } from '@/ui-kit/components/button'
+import { Button } from '@/ui-kit/ui/button'
 
 interface PermissionPromptProps {
   /** Custom labels for i18n */

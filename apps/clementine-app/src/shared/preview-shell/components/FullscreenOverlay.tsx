@@ -4,7 +4,7 @@ import { X } from 'lucide-react'
 import { useViewportContext } from '../context/ViewportContext'
 import { ViewportSwitcher } from './ViewportSwitcher'
 import type { FullscreenOverlayProps } from '../types/preview-shell.types'
-import { Button } from '@/ui-kit/components/button'
+import { Button } from '@/ui-kit/ui/button'
 import { cn } from '@/shared/utils'
 
 /**

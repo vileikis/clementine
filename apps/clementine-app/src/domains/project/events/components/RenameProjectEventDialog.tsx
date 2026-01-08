@@ -13,10 +13,10 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/ui-kit/components/dialog'
-import { Button } from '@/ui-kit/components/button'
-import { Input } from '@/ui-kit/components/input'
-import { Label } from '@/ui-kit/components/label'
+} from '@/ui-kit/ui/dialog'
+import { Button } from '@/ui-kit/ui/button'
+import { Input } from '@/ui-kit/ui/input'
+import { Label } from '@/ui-kit/ui/label'
 
 export interface RenameProjectEventDialogProps {
   /** Event ID to rename */

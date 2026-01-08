@@ -6,7 +6,7 @@
  */
 
 import type { EditorRowProps } from '../types'
-import { Label } from '@/ui-kit/components/label'
+import { Label } from '@/ui-kit/ui/label'
 import { cn } from '@/shared/utils'
 
 export function EditorRow({

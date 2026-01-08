@@ -16,7 +16,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/ui-kit/components/dialog'
+} from '@/ui-kit/ui/dialog'
 
 /**
  * Main share dialog component

@@ -5,14 +5,14 @@ import { AdminNav } from './AdminNav'
 import { WorkspaceNav } from './WorkspaceNav'
 import type { RouteArea } from '../types'
 import { cn } from '@/shared/utils'
-import { Button } from '@/ui-kit/components/button'
+import { Button } from '@/ui-kit/ui/button'
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetTitle,
   SheetTrigger,
-} from '@/ui-kit/components/sheet'
+} from '@/ui-kit/ui/sheet'
 import { useAuth } from '@/domains/auth'
 
 const SIDEBAR_WIDTH = {
