@@ -19,6 +19,7 @@ import { useProjectEvent } from '@/domains/event/shared'
 import { useWorkspace } from '@/domains/workspace'
 import { useAuth } from '@/domains/auth'
 import { DEFAULT_THEME } from '@/domains/event/theme/constants'
+import { ThemeProvider } from '@/shared/theming'
 
 // Fields to compare for auto-save change detection
 const WELCOME_FIELDS_TO_COMPARE: (keyof WelcomeConfig)[] = [
@@ -144,7 +145,9 @@ export function WelcomeEditorPage() {
       {/* Left: Preview */}
       <div className="flex-1 min-w-0">
         <PreviewShell enableViewportSwitcher enableFullscreen>
-          <WelcomePreview welcome={previewWelcome} theme={currentTheme} />
+          <ThemeProvider theme={currentTheme}>
+            <WelcomePreview welcome={previewWelcome} />
+          </ThemeProvider>
         </PreviewShell>
       </div>
 

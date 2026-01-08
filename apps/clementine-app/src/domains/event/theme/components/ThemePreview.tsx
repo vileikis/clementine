@@ -4,38 +4,35 @@
  * Display-only preview component showing how the theme will appear
  * in the guest-facing experience. Uses ThemedText, ThemedButton, and
  * ThemedBackground primitives from shared theming module.
+ *
+ * Must be used within a ThemeProvider.
  */
 
-import type { Theme } from '@/shared/theming/schemas/theme.schemas'
-import { ThemedBackground, ThemedButton, ThemedText } from '@/shared/theming'
+import {
+  ThemedBackground,
+  ThemedButton,
+  ThemedText,
+  useEventTheme,
+} from '@/shared/theming'
 
-export interface ThemePreviewProps {
-  /** Theme to preview */
-  theme: Theme
-}
+export function ThemePreview() {
+  const { theme } = useEventTheme()
 
-export function ThemePreview({ theme }: ThemePreviewProps) {
   return (
     <ThemedBackground
-      background={theme.background}
-      fontFamily={theme.fontFamily}
       className="h-full w-full"
       contentClassName="flex flex-col items-center justify-center gap-8 p-8"
     >
       {/* Text samples */}
       <div className="space-y-4 w-full">
-        <ThemedText variant="heading" theme={theme}>
-          Event Title
-        </ThemedText>
-        <ThemedText variant="body" theme={theme} className="opacity-90">
+        <ThemedText variant="heading">Event Title</ThemedText>
+        <ThemedText variant="body" className="opacity-90">
           Sample text preview showing how your content will appear to guests
         </ThemedText>
       </div>
 
       {/* Button sample */}
-      <ThemedButton theme={theme} size="md">
-        Sample Button
-      </ThemedButton>
+      <ThemedButton size="md">Sample Button</ThemedButton>
 
       {/* Primary color accent */}
       <div className="flex items-center gap-2">
@@ -43,9 +40,7 @@ export function ThemePreview({ theme }: ThemePreviewProps) {
           className="size-4 rounded-full"
           style={{ backgroundColor: theme.primaryColor }}
         />
-        <ThemedText variant="small" theme={theme}>
-          Primary accent color
-        </ThemedText>
+        <ThemedText variant="small">Primary accent color</ThemedText>
       </div>
     </ThemedBackground>
   )

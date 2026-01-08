@@ -13,6 +13,7 @@ import { ThemeControls, ThemePreview } from '../components'
 import { useUpdateTheme, useUploadAndUpdateBackground } from '../hooks'
 import { DEFAULT_THEME } from '../constants'
 import type { Theme } from '@/shared/theming'
+import { ThemeProvider } from '@/shared/theming'
 import { PreviewShell } from '@/shared/preview-shell'
 import { useAutoSave } from '@/shared/forms'
 import { useProjectEvent } from '@/domains/event/shared'
@@ -150,7 +151,9 @@ export function ThemeEditorPage() {
       {/* Left: Preview */}
       <div className="flex-1 min-w-0">
         <PreviewShell enableViewportSwitcher enableFullscreen>
-          <ThemePreview theme={previewTheme} />
+          <ThemeProvider theme={previewTheme}>
+            <ThemePreview />
+          </ThemeProvider>
         </PreviewShell>
       </div>
 

@@ -3,4 +3,4 @@
  */
 
 export { ThemeControls, type ThemeControlsProps } from './ThemeControls'
-export { ThemePreview, type ThemePreviewProps } from './ThemePreview'
+export { ThemePreview } from './ThemePreview'

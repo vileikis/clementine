@@ -7,7 +7,7 @@ export { ThemeEditorPage } from './containers'
 
 // Components
 export { ThemeControls, ThemePreview } from './components'
-export type { ThemeControlsProps, ThemePreviewProps } from './components'
+export type { ThemeControlsProps } from './components'
 
 // Hooks
 export { useUpdateTheme, useUploadAndUpdateBackground } from './hooks'
