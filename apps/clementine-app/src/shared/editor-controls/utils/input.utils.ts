@@ -11,6 +11,7 @@
  * getCounterColorClass(100, 100) // 'text-destructive' (at/over limit)
  */
 export function getCounterColorClass(current: number, max: number): string {
+  if (max <= 0 || current < 0) return 'text-muted-foreground'
   const ratio = current / max
   if (ratio >= 1) return 'text-destructive'
   if (ratio >= 0.8) return 'text-amber-500'

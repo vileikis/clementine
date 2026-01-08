@@ -268,7 +268,7 @@ describe('ThemedBackground', () => {
       const contentWrapper = container.querySelector(
         '[class*="custom-content"]',
       )
-      expect(contentWrapper).toBeDefined()
+      expect(contentWrapper).not.toBeNull()
     })
 
     it('should apply contentClassName to content container with default classes', () => {
@@ -280,7 +280,7 @@ describe('ThemedBackground', () => {
 
       // Content container should have both default max-w-3xl and custom classes
       const contentContainer = container.querySelector('[class*="max-w-3xl"]')
-      expect(contentContainer).toBeDefined()
+      expect(contentContainer).not.toBeNull()
       expect(contentContainer?.className).toContain('flex')
       expect(contentContainer?.className).toContain('flex-col')
       expect(contentContainer?.className).toContain('gap-4')
