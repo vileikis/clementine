@@ -17,12 +17,14 @@ import type { ExperienceProfile, ExperienceSlot } from '../shared/schemas'
  * This mapping is also defined in slot-validation.ts but duplicated
  * here for the slot-compatibility module's independent API.
  */
-export const SLOT_ALLOWED_PROFILES: Record<ExperienceSlot, ExperienceProfile[]> =
-  {
-    main: ['freeform', 'survey'],
-    pregate: ['informational', 'survey'],
-    preshare: ['informational', 'survey'],
-  }
+export const SLOT_ALLOWED_PROFILES: Record<
+  ExperienceSlot,
+  ExperienceProfile[]
+> = {
+  main: ['freeform', 'survey'],
+  pregate: ['informational', 'survey'],
+  preshare: ['informational', 'survey'],
+}
 
 /**
  * Check if a profile is compatible with a slot
@@ -57,7 +59,9 @@ export function isProfileCompatibleWithSlot(
  * getCompatibleProfiles('pregate') // ['informational', 'survey']
  * ```
  */
-export function getCompatibleProfiles(slot: ExperienceSlot): ExperienceProfile[] {
+export function getCompatibleProfiles(
+  slot: ExperienceSlot,
+): ExperienceProfile[] {
   return SLOT_ALLOWED_PROFILES[slot]
 }
 
@@ -74,7 +78,9 @@ export function getCompatibleProfiles(slot: ExperienceSlot): ExperienceProfile[]
  * getCompatibleSlots('informational') // ['pregate', 'preshare']
  * ```
  */
-export function getCompatibleSlots(profile: ExperienceProfile): ExperienceSlot[] {
+export function getCompatibleSlots(
+  profile: ExperienceProfile,
+): ExperienceSlot[] {
   const slots: ExperienceSlot[] = []
 
   for (const [slot, allowedProfiles] of Object.entries(SLOT_ALLOWED_PROFILES)) {

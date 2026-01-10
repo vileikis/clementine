@@ -7,7 +7,13 @@
  */
 import { useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { collection, onSnapshot, orderBy, query, where } from 'firebase/firestore'
+import {
+  collection,
+  onSnapshot,
+  orderBy,
+  query,
+  where,
+} from 'firebase/firestore'
 import { workspaceExperienceSchema } from '../schemas'
 import { workspaceExperiencesQuery } from '../queries/workspace-experiences.query'
 import type { WorkspaceExperience } from '../schemas'

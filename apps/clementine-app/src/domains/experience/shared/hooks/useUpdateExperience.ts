@@ -107,9 +107,7 @@ export function useUpdateExperience() {
         const experienceSnapshot = await getDoc(experienceRef)
 
         if (!experienceSnapshot.exists()) {
-          throw new Error(
-            `Experience not found: ${validated.experienceId}`,
-          )
+          throw new Error(`Experience not found: ${validated.experienceId}`)
         }
 
         const currentData = experienceSnapshot.data()

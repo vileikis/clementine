@@ -7,5 +7,9 @@
 export { useCreateExperience } from './useCreateExperience'
 export { useWorkspaceExperiences } from './useWorkspaceExperiences'
 export { useWorkspaceExperience } from './useWorkspaceExperience'
-export { useUpdateExperience, ProfileImmutableError, UpdateDeletedExperienceError } from './useUpdateExperience'
+export {
+  useUpdateExperience,
+  ProfileImmutableError,
+  UpdateDeletedExperienceError,
+} from './useUpdateExperience'
 export { useDeleteExperience } from './useDeleteExperience'

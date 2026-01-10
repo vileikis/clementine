@@ -11,7 +11,10 @@
  * - Uses `z.looseObject()` for forward compatibility with future fields
  */
 import { z } from 'zod'
-import { experienceProfileSchema, experienceStatusSchema } from './experience.schema'
+import {
+  experienceProfileSchema,
+  experienceStatusSchema,
+} from './experience.schema'
 
 /**
  * Experience Media Schema

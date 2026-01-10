@@ -62,7 +62,9 @@ describe('isProfileCompatibleWithSlot', () => {
 
   describe('preshare slot', () => {
     it('should allow informational profile', () => {
-      expect(isProfileCompatibleWithSlot('informational', 'preshare')).toBe(true)
+      expect(isProfileCompatibleWithSlot('informational', 'preshare')).toBe(
+        true,
+      )
     })
 
     it('should allow survey profile', () => {
