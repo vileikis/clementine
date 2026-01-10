@@ -5,10 +5,9 @@
  * Profiles determine valid step sequences and constraints for an experience.
  *
  * Available Profiles:
- * - freeform: Any valid step sequence
- * - main_default: Default main experience flow
- * - pregate_default: Pre-gate experience flow
- * - preshare_default: Pre-share experience flow
+ * - freeform: info, input, capture, transform, share (all steps)
+ * - survey: info, input, capture, share (no transform)
+ * - informational: info only
  */
 import type {
   ExperienceConfig,
@@ -59,9 +58,8 @@ const createEmptyValidator = (): ProfileValidator => {
  */
 export const profileValidators: Record<ExperienceProfile, ProfileValidator> = {
   freeform: createEmptyValidator(),
-  main_default: createEmptyValidator(),
-  pregate_default: createEmptyValidator(),
-  preshare_default: createEmptyValidator(),
+  survey: createEmptyValidator(),
+  informational: createEmptyValidator(),
 }
 
 /**
@@ -73,7 +71,7 @@ export const profileValidators: Record<ExperienceProfile, ProfileValidator> = {
  *
  * @example
  * ```typescript
- * const result = validateExperienceProfile('main_default', experienceConfig)
+ * const result = validateExperienceProfile('survey', experienceConfig)
  *
  * if (!result.valid) {
  *   console.error('Validation failed:', result.errors)

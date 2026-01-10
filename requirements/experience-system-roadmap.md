@@ -1,6 +1,8 @@
 # Experience System Roadmap
 
-> **Related Documents:**
+> **MUST READ Documents:**
+> NOTE for AI dev agents: Before starting planning on any of the phases, make sure to read related docs below
+>
 > - [Architecture: Experiences System](./arch-expereinces-system.md)
 > - [PRD: Workspace Experiences](./epic-experience-system-prd.md)
 

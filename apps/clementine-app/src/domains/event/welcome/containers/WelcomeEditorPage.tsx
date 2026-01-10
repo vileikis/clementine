@@ -9,7 +9,7 @@ import { useCallback, useState } from 'react'
 import { useParams } from '@tanstack/react-router'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
-import { WelcomeControls, WelcomePreview } from '../components'
+import { WelcomeConfigPanel, WelcomePreview } from '../components'
 import { useUpdateWelcome, useUploadAndUpdateHeroMedia } from '../hooks'
 import { DEFAULT_WELCOME } from '../constants'
 import type { WelcomeConfig } from '@/domains/event/shared'
@@ -156,7 +156,7 @@ export function WelcomeEditorPage() {
         <div className="sticky top-0 z-10 border-b border-border bg-card px-4 py-3">
           <h2 className="font-semibold">Welcome</h2>
         </div>
-        <WelcomeControls
+        <WelcomeConfigPanel
           welcome={previewWelcome}
           onUpdate={handleUpdate}
           onUploadHeroMedia={handleUploadHeroMedia}
