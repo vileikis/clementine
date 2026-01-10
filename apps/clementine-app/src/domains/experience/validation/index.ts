@@ -2,8 +2,7 @@
  * Experience Validation Domain
  *
  * Profile validation rules and slot compatibility.
- *
- * IMPORT BOUNDARY: This subdomain is internal to experience domain.
+ * Publicly exported via the main experience barrel.
  */
 
 // Slot validation
@@ -18,4 +17,4 @@ export {
   profileValidators,
   type ProfileValidator,
   type ProfileValidationResult,
-} from '../shared/types/profile.types'
+} from '../shared'
