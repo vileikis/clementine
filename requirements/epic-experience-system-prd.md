@@ -313,58 +313,122 @@ Created when guest first visits `/join/[projectId]`.
 
 ## 6. Admin UX (Event-Scoped, MVP)
 
-### Experience Creation
+### Experience Management Locations
 
-- Triggered from Event editor only
-- "Create new experience" action
-- Created under workspace, but feels event-local
-- Creation flow:
-  1. Select slot (main, pregate, or preshare)
-  2. Enter experience name
-  3. Select profile (filtered by slot compatibility)
-  4. Experience created and assigned to slot
+| Slot | Location | Component |
+|------|----------|-----------|
+| `main` | Welcome tab → WelcomeConfigPanel | `ExperienceSlotManager` (mode: list) |
+| `pregate` | Settings tab → "Guest Flow" section | `ExperienceSlotManager` (mode: single) |
+| `preshare` | Settings tab → "Guest Flow" section | `ExperienceSlotManager` (mode: single) |
 
-### Experience Picker (Select Existing)
+**Rationale:** Main experiences appear on Welcome screen (WYSIWYG). Pregate/preshare run before/after Welcome, so they belong in Settings.
 
-Used when assigning an experience to an Event slot.
+**Cross-reference:** WelcomeConfigPanel shows callout with link to Settings when pregate/preshare are configured.
 
-**Data Source:**
-- Lists all workspace-scoped experiences where `status === 'active'`
-- Not filtered by project
-- Sorted by `updatedAt` DESC (most recently edited first)
+### Experience List Item UX
 
-**Picker Behavior:**
+```
+┌─────────────────────────────────────────────────┐
+│ ⋮⋮  [thumbnail] Experience Name      [toggle] ⋯│
+└─────────────────────────────────────────────────┘
+     ↑                                    ↑      ↑
+  drag handle              enable/disable   context menu
+  (list mode only)                          (Edit, Remove)
+```
 
-| Aspect | Behavior |
-|--------|----------|
-| Trigger | "Add experience" or "Replace experience" opens modal |
-| List contents | Name, profile, optional thumbnail |
-| Selection | Attaches `experienceId` to target slot, closes modal |
-| Profile filtering | Only shows experiences with compatible profiles for the slot |
-| Duplicates | Experiences already in the event are disabled with reason |
-| Create new | Primary action: "Create new experience" |
-| Empty state | "No experiences yet" + "Create new experience" button |
+| Element | Visibility | Action |
+|---------|------------|--------|
+| Drag handle | List mode only | Reorder experiences |
+| Toggle | Always | Enable/disable experience |
+| Context menu | Always | Edit (opens editor), Remove (from event) |
 
-**Explicit Non-Requirements:**
-- No search
-- No filters
-- No tags
-- No pagination
-- No edit/rename/delete inside picker
-- No "used by X events" indicators
-- No project-level scoping
-- No marketplace or templates
+### Add/Create Flow (State Machine)
 
-### Experience Assignment
+All panels render under the same route (no URL changes):
 
-- One experience per slot type (pregate/preshare are single)
-- Main slot can have multiple experiences
-- Same experience cannot be assigned twice in the same event
+```
+WelcomeConfigPanel (or Settings "Guest Flow")
+    ↓ [+ Add Experience]
+ConnectExperiencePanel
+    ├─ [← Back] → return to config panel
+    ├─ [Select existing] → assign to slot → return to config panel
+    └─ [+ Create New]
+        ↓
+CreateExperiencePanel
+    ├─ [← Back] → return to ConnectExperiencePanel
+    └─ [Create] → create & assign → return to config panel
+```
 
-### Experience Removal from Event
+**ConnectExperiencePanel contents:**
+- Back button
+- List of workspace experiences (filtered by slot-compatible profiles)
+- Experiences already in event are disabled
+- "Create new experience" primary action
 
-- Removes reference only
+**CreateExperiencePanel contents:**
+- Back button
+- Name input (required)
+- Profile selector (filtered by slot compatibility)
+- Create button
+
+### ExperienceSlotManager Component
+
+Reusable component encapsulating the state machine:
+
+```typescript
+interface ExperienceSlotManagerProps {
+  mode: 'list' | 'single'
+  slot: 'main' | 'pregate' | 'preshare'
+  label?: string  // e.g., "Before Welcome", "Before Share"
+  experiences: ExperienceReference[]
+  onUpdate: (experiences: ExperienceReference[]) => void
+}
+```
+
+| Mode | Behavior |
+|------|----------|
+| `list` | Multiple items, drag-to-reorder, "Add" always visible |
+| `single` | 0 or 1 item, no reorder, "Add" only when empty |
+
+### Experience Editor Navigation
+
+**Separate layout:** Experience editor uses `ExperienceDesignerLayout` (not nested in event tabs).
+
+**Route:** `/workspace/$slug/projects/$projectId/events/$eventId/experience/$experienceId`
+
+**Breadcrumbs:**
+```
+[📁 Project Name] / [Event Name] / Experience Name
+      ↑                  ↑
+  clickable          clickable (returns to event designer)
+```
+
+**Layout:** 3-column (step list | step preview | step config panel)
+
+### Experience Picker Filtering
+
+| Slot | Shown Profiles |
+|------|----------------|
+| `main` | freeform, survey |
+| `pregate` | informational, survey |
+| `preshare` | informational, survey |
+
+Experiences already assigned to any slot in the current event are disabled with reason.
+
+### Empty States
+
+| Context | Display |
+|---------|---------|
+| Main experiences (none) | "Add Experience" CTA button |
+| Main experiences (some) | List + "Add Experience" button at bottom |
+| Pregate/preshare (none) | "Add Experience" CTA button |
+| Pregate/preshare (filled) | Single item (no add button) |
+
+### Experience Removal
+
+- Removes reference from event only
 - Does not delete experience from workspace
+- Available via context menu → "Remove"
 
 ### No Dedicated Experience Library UI (MVP)
 

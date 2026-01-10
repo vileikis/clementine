@@ -45,20 +45,23 @@ Define how the Experiences system is built and organized in the codebase, ensuri
 
 - `domains/experience`
 
-  - Step registry (types, schemas, renderer binding)
-  - Profile rules & validation
-  - Editor UI (step list, config panels, non-interactive preview)
-  - Runtime engine (step runner + orchestration primitives)
+  - `shared/` - Schemas, types, CRUD hooks (owns experience data)
+  - `steps/` - Step registry (types, schemas, renderer binding)
+  - `validation/` - Profile rules & validation
+  - `runtime/` - Runtime engine (step runner + orchestration primitives)
+  - `editor/` - Experience editor UI (step list, config panels, preview)
 
 - `domains/event`
 
   - Event designer/editor
-  - Attaching experiences to event slots (main/pregate/preshare)
+  - `experiences/` - Thin UI layer for experience assignment
+    - `ExperienceSlotManager` component
+    - `ConnectExperiencePanel`, `CreateExperiencePanel`
   - Event publish flow (creates experience releases)
-  - Experience Picker configuration (ordering, enabled flags)
-  - Welcome screen editor
+  - Welcome screen editor (`WelcomeConfigPanel`)
+  - Settings page (`EventSettingsPage` with "Guest Flow" section)
 
-- `domains/session` (new domain)
+- `domains/session`
 
   - Session creation for both `guest` and `preview`
   - Session state subscription and updates
@@ -70,11 +73,6 @@ Define how the Experiences system is built and organized in the codebase, ensuri
   - Guest shell routes and UX chrome
   - Uses experience runtime engine + sessions to run flows
   - Welcome screen rendering (guest mode)
-
-- `domains/workspace`
-
-  - Workspace-level experience CRUD (experiences subcollection)
-  - Experience listing for picker
 
 ### Non-domain modules used
 
@@ -97,13 +95,25 @@ Define how the Experiences system is built and organized in the codebase, ensuri
 
    - It can expose hooks and services used by both.
 
-4. **`domains/workspace` owns experience CRUD; `domains/event` references experiences.**
+4. **`domains/experience` owns experience CRUD; `domains/event` provides UI for assignment.**
 
-   - Event domain reads experiences for assignment, does not own them.
+   - Experience domain owns schemas, types, and data hooks
+   - Event domain imports from `domains/experience/shared/` for data operations
+   - No circular dependencies
 
 5. `src/shared/*` remains cross-cutting UI/utilities only.
 
    - No experience business rules in `src/shared`.
+
+**Dependency flow:**
+```
+domains/experience/shared/ ← pure types, schemas, hooks
+         ↓
+domains/event/experiences/ ← UI for assignment (picker, panels)
+         ↓
+domains/event/welcome/     ← WelcomeConfigPanel uses ExperienceSlotManager
+domains/event/settings/    ← Settings uses ExperienceSlotManager for extras
+```
 
 ---
 
@@ -398,32 +408,81 @@ The editor writes draft state to persistence via mutations in experience domain.
 
 `domains/event` responsibilities:
 
-### Experience Picker (Select Existing)
+### ExperienceSlotManager Component
 
-- Modal to select workspace experience
-- Filtered by slot-compatible profiles
-- Shows: name, profile, thumbnail
-- Disables experiences already in event
+Reusable component that encapsulates the state machine for managing experiences:
+
+```typescript
+interface ExperienceSlotManagerProps {
+  mode: 'list' | 'single'
+  slot: 'main' | 'pregate' | 'preshare'
+  label?: string  // e.g., "Before Welcome", "Before Share"
+  experiences: ExperienceReference[]
+  onUpdate: (experiences: ExperienceReference[]) => void
+}
+```
+
+| Mode | Behavior |
+|------|----------|
+| `list` | Multiple items, drag-to-reorder, "Add" always visible |
+| `single` | 0 or 1 item, no reorder, "Add" only when empty |
+
+**Internal state machine:**
+```
+default → ConnectExperiencePanel → CreateExperiencePanel → default
+```
+
+### Experience List Item UX
+
+```
+┌─────────────────────────────────────────────────┐
+│ ⋮⋮  [thumbnail] Experience Name      [toggle] ⋯│
+└─────────────────────────────────────────────────┘
+     ↑                                    ↑      ↑
+  drag handle              enable/disable   context menu
+  (list mode only)                          (Edit, Remove)
+```
+
+### Experience Assignment Locations
+
+| Slot | Location | Component |
+|------|----------|-----------|
+| `main` | Welcome tab → WelcomeConfigPanel | ExperienceSlotManager (list) |
+| `pregate` | Settings tab → "Guest Flow" | ExperienceSlotManager (single) |
+| `preshare` | Settings tab → "Guest Flow" | ExperienceSlotManager (single) |
+
+### Panels (State Machine)
+
+**ConnectExperiencePanel:**
+- Back button
+- List of workspace experiences (filtered by slot profile)
+- Disabled items for already-assigned experiences
 - "Create new" primary action
 
-### Experience Creation
+**CreateExperiencePanel:**
+- Back button
+- Name input
+- Profile selector (filtered by slot)
+- Create button
 
-- From event context (feels event-local)
-- Creates experience in workspace
-- Assigns to slot immediately
-- Creation flow: name + profile (filtered by slot)
+### Experience Editor Navigation
 
-### Experience Assignment
+Experience editor uses separate `ExperienceDesignerLayout` (not nested in event tabs).
 
-- Choose experiences for:
+**Route:** `/workspace/$slug/projects/$projectId/events/$eventId/experience/$experienceId`
 
-  - `main[]` (ordered, enabled flags, multiple allowed)
-  - `pregate` (single, optional)
-  - `preshare` (single, optional)
+**Breadcrumbs:**
+```
+[📁 Project Name] / [Event Name] / Experience Name
+      ↑                  ↑
+  clickable          clickable (returns to event)
+```
 
-- Control enabled/disabled without deletion
-- Launch Experience Editor route for a selected experience
-- Event publish triggers experience release creation
+**Layout:** 3-column (step list | step preview | StepConfigPanel)
+
+### Event Publish
+
+Event publish triggers experience release creation for all enabled experiences.
 
 ---
 
@@ -483,7 +542,24 @@ This architecture keeps those possible without rewriting core boundaries.
 
 ---
 
-## 16. Summary of Non-negotiables
+## 16. Naming Conventions
+
+Consistent naming for config/control panels:
+
+| Component | Purpose |
+|-----------|---------|
+| `WelcomeConfigPanel` | Welcome screen configuration (rename from WelcomeControls) |
+| `ThemeConfigPanel` | Theme configuration (rename from ThemeControls) |
+| `StepConfigPanel` | Step configuration in experience editor |
+| `ConnectExperiencePanel` | Experience picker (select existing) |
+| `CreateExperiencePanel` | Experience creation form |
+| `ExperienceSlotManager` | Manages experience list/slot with state machine |
+
+**Convention:** Use `*ConfigPanel` suffix for right-side configuration panels.
+
+---
+
+## 17. Summary of Non-negotiables
 
 - Single step registry (no duplicate step implementations)
 - Single runtime engine used by preview + guest
@@ -494,3 +570,5 @@ This architecture keeps those possible without rewriting core boundaries.
 - WYSIWYG for step renderers (same component, two modes)
 - Profile-based step filtering in editor
 - Experiences are workspace-scoped, UX is event-scoped
+- `*ConfigPanel` naming convention for config panels
+- `ExperienceDesignerLayout` separate from `EventDesignerLayout`

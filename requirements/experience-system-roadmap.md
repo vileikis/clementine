@@ -12,152 +12,86 @@ This roadmap implements the Experience System with **workspace-scoped experience
 
 **Key architectural decisions:**
 
-- Experiences are stored at workspace level (`/workspaces/{workspaceId}/experiences`)
+- Experiences stored at workspace level (`/workspaces/{workspaceId}/experiences`)
 - UX is event-scoped (experiences managed from event context)
 - Publishing creates immutable releases (`/projects/{projectId}/experienceReleases`)
 - `/join/[projectId]` resolves one active event
 - WYSIWYG for Welcome screen and step renderers (same component, two modes)
+- `ExperienceDesignerLayout` separate from `EventDesignerLayout`
 
 **Roadmap principles:**
 
-- Each phase is **small, functional, and testable**
-- No bundling multiple functional things into one phase
-- No limit on number of phases
-- Phases can run in parallel when independent
+- Each phase is **small, functional, and UI-testable**
+- Foundation phases may be technical-only
+- No bundling unrelated features into one phase
 
 ---
 
-## Phase 0 — Structural Foundations (No UI)
+## Phase 0 — Structural Foundations
 
-**Goal:** Establish domain scaffolding without breaking the app.
+**Goal:** Establish domain scaffolding and naming conventions.
 
 **Deliverables:**
 
 - [ ] Create `domains/experience/` scaffolding
-  - `/shared/` (types, schemas)
-  - `/steps/` (step registry skeleton)
-  - `/validation/` (profile rules placeholder)
-  - `/runtime/` (engine interface placeholder)
-  - `/editor/` (placeholder)
+  - `shared/` (schemas, types, hooks placeholder)
+  - `steps/` (step registry skeleton)
+  - `validation/` (profile rules placeholder)
+  - `runtime/` (engine interface placeholder)
+  - `editor/` (placeholder)
 - [ ] Create `domains/session/` scaffolding
   - Session types and schemas
   - API shape (`createSession`, `subscribeSession`)
-- [ ] Add `activeEventId` field to project data model
-- [ ] Define `ExperienceProfile` enum: `freeform`, `survey`, `informational`
+- [ ] Define `ExperienceProfile` type: `'freeform' | 'survey' | 'informational'`
+- [ ] Add `activeEventId` field to project schema
+- [ ] **Rename existing components:**
+  - `WelcomeControls` → `WelcomeConfigPanel`
+  - `ThemeControls` → `ThemeConfigPanel`
 
 **Testable outcome:**
 
 - App boots with new domains
 - No circular dependencies
 - TypeScript compiles with new types
-
-**Parallelizable:** Yes
+- Renamed components work correctly
 
 ---
 
-## Phase 1 — Experience Profiles & Slot Compatibility
+## Phase 1 — Experience Data Layer
 
-**Goal:** Define profile constraints and slot compatibility rules.
+**Goal:** Enable workspace experience CRUD operations.
 
-**Location:** `domains/experience/validation/`
+**Location:** `domains/experience/shared/`
 
 **Deliverables:**
 
-- [ ] `profiles.ts` - Profile definitions
-  ```typescript
-  type ExperienceProfile = 'freeform' | 'survey' | 'informational'
-  ```
-- [ ] `profile-constraints.ts` - Step category constraints per profile
-  ```typescript
-  // freeform: all categories
-  // survey: info, input, capture, share (no transform)
-  // informational: info only
-  ```
-- [ ] `slot-compatibility.ts` - Slot → profile mapping
-  ```typescript
-  // main: freeform, survey
-  // pregate: informational, survey
-  // preshare: informational, survey
-  ```
-- [ ] `validateProfile(profile, steps)` - Returns validation result
-- [ ] Unit tests for profile validation
+- [ ] `schemas/workspace-experience.schema.ts` - Experience document schema
+- [ ] `types/workspace-experience.types.ts` - TypeScript types
+- [ ] `hooks/useWorkspaceExperiences.ts` - List experiences
+- [ ] `hooks/useWorkspaceExperience.ts` - Get single experience
+- [ ] `hooks/useCreateExperience.ts` - Create with name + profile
+- [ ] `hooks/useUpdateExperience.ts` - Update experience
+- [ ] `hooks/useDeleteExperience.ts` - Soft delete
+- [ ] Firestore security rules for `/workspaces/{workspaceId}/experiences`
+- [ ] Profile validation utilities (`validateProfile`, slot compatibility)
 
 **Testable outcome:**
 
-- Profile validation correctly accepts/rejects step combinations
-- Slot compatibility correctly filters profiles
-
-**Parallelizable:** Yes (independent of UI)
-
----
-
-## Phase 2 — Workspace Experience Data Model
-
-**Goal:** Establish Firestore structure for workspace experiences.
-
-**Location:** `domains/workspace/experiences/` (new subdomain)
-
-**Deliverables:**
-
-- [ ] `schemas/experience.schema.ts` - Zod schema
-  ```typescript
-  {
-    id: string
-    name: string
-    status: 'active' | 'deleted'
-    profile: ExperienceProfile
-    media?: { mediaAssetId: string; url: string }
-    steps: Step[]
-    createdAt: number
-    updatedAt: number
-  }
-  ```
-- [ ] `types/experience.types.ts` - TypeScript types
-- [ ] Firestore path: `/workspaces/{workspaceId}/experiences/{experienceId}`
-- [ ] Security rules for workspace experiences (admin-only)
-
-**Testable outcome:**
-
-- Experience schema validates correctly
-- Security rules allow admin access, deny guest access
-
-**Parallelizable:** Yes (independent of UI)
+- Can create/read/update/delete experiences via Firestore console
+- Profile validation works correctly
+- Security rules enforce admin-only access
 
 ---
 
-## Phase 3 — Workspace Experience CRUD Hooks
+## Phase 2 — Event Config Experiences Schema
 
-**Goal:** Enable creating, reading, updating, deleting experiences.
-
-**Location:** `domains/workspace/experiences/hooks/`
-
-**Deliverables:**
-
-- [ ] `useWorkspaceExperiences.ts` - List experiences for workspace
-- [ ] `useWorkspaceExperience.ts` - Get single experience
-- [ ] `useCreateExperience.ts` - Create with name + profile
-- [ ] `useUpdateExperience.ts` - Update experience (name, steps, media)
-- [ ] `useDeleteExperience.ts` - Soft delete (status = 'deleted')
-
-**Testable outcome:**
-
-- CRUD operations work via hooks
-- Experiences persist in Firestore
-- Soft delete sets status correctly
-
-**Parallelizable:** Yes (after Phase 2)
-
----
-
-## Phase 4 — Event Config Experiences Schema
-
-**Goal:** Add experiences field to event draftConfig/publishedConfig.
+**Goal:** Add experiences field to event configuration.
 
 **Location:** `domains/event/shared/schemas/`
 
 **Deliverables:**
 
-- [ ] Update `project-event-config.schema.ts` to include:
+- [ ] Update `project-event-config.schema.ts`:
   ```typescript
   experiences: {
     main: Array<{ experienceId: string; enabled: boolean }>
@@ -165,398 +99,211 @@ This roadmap implements the Experience System with **workspace-scoped experience
     preshare?: { experienceId: string; enabled: boolean }
   }
   ```
-- [ ] Add `experienceReleases` collection schema for publishedConfig
-- [ ] Migration strategy for existing events (default to empty experiences)
+- [ ] Add `experienceReleases` collection schema
+- [ ] Migration strategy for existing events (default empty experiences)
 
 **Testable outcome:**
 
 - Event config schema validates with experiences field
 - Existing events continue to work
 
-**Parallelizable:** Yes (after Phase 2)
-
 ---
 
-## Phase 5 — Experience Picker Modal (Select Existing)
+## Phase 3 — ExperienceSlotManager & Panels
 
-**Goal:** Admin can select existing workspace experience for a slot.
+**Goal:** Create reusable components for experience management.
 
 **Location:** `domains/event/experiences/`
 
 **Deliverables:**
 
-- [ ] `components/ExperiencePicker.tsx` - Modal component
-  - Lists active workspace experiences
-  - Sorted by updatedAt DESC
-  - Shows: name, profile, thumbnail
-  - Filters by slot-compatible profiles
-  - Disables experiences already in event
-  - "Create new" primary action
-- [ ] `hooks/useExperiencesForPicker.ts` - Query with filtering
-- [ ] Empty state: "No experiences yet" + create button
+- [ ] `components/ExperienceSlotManager.tsx`
+  - Props: `mode: 'list' | 'single'`, `slot`, `experiences`, `onUpdate`
+  - Internal state machine (default → connecting → creating)
+- [ ] `components/ExperienceListItem.tsx`
+  - Drag handle (list mode), thumbnail, name, toggle, context menu
+- [ ] `components/ConnectExperiencePanel.tsx`
+  - Back button, experience list (filtered by slot), "Create new" action
+- [ ] `components/CreateExperiencePanel.tsx`
+  - Back button, name input, profile selector, create button
+- [ ] `hooks/useExperiencesForSlot.ts` - Filtered query for picker
 
 **Testable outcome:**
 
-- Picker opens and lists experiences
-- Profile filtering works correctly
-- Duplicates are disabled
-- Selection closes modal and returns experienceId
-
-**NOT doing:** Actual assignment to event (next phase)
-
-**Parallelizable:** Yes (after Phase 3)
+- Components render correctly in isolation (Storybook or manual)
+- State machine transitions work
+- Profile filtering works
 
 ---
 
-## Phase 6 — Experience Creation Flow
+## Phase 4 — Main Experiences in WelcomeConfigPanel
 
-**Goal:** Admin can create new experience from event context.
+**Goal:** Admin can manage main experiences from Welcome tab.
 
-**Location:** `domains/event/experiences/`
+**Location:** `domains/event/welcome/`
 
 **Deliverables:**
 
-- [ ] `components/CreateExperienceForm.tsx`
-  - Name input (required)
-  - Profile selector (filtered by target slot)
-  - Submit creates experience and assigns to slot
-- [ ] Route: `/workspace/$slug/projects/$projectId/events/$eventId/create-experience?slot=[slot]`
-- [ ] Integration with workspace experience CRUD
+- [ ] Integrate `ExperienceSlotManager` into `WelcomeConfigPanel`
+  - Mode: `list`, slot: `main`
+  - Below layout toggle in "Experiences" section
+- [ ] Wire up mutations to update `draftConfig.experiences.main`
+- [ ] "Add Experience" button always visible
+- [ ] Experience list item with toggle, context menu (Edit, Remove)
+- [ ] Drag-to-reorder with @dnd-kit
 
 **Testable outcome:**
 
-- Create form shows only slot-compatible profiles
-- Submitting creates experience in workspace
-- Experience is assigned to target slot
-
-**Parallelizable:** Yes (after Phase 5)
+- Admin can add experiences from Welcome tab
+- Can reorder, toggle, remove experiences
+- Changes persist to Firestore
 
 ---
 
-## Phase 7 — Event Sidebar: Main Experiences Section
+## Phase 5 — Extra Slots in Settings
 
-**Goal:** Display and manage main experiences in Event Designer sidebar.
+**Goal:** Admin can manage pregate/preshare from Settings tab.
 
-**Location:** `domains/event/designer/`
+**Location:** `domains/event/settings/`
 
 **Deliverables:**
 
-- [ ] Add "Experiences" section to `EventDesignerSidebar.tsx`
-  ```
-  ┌─────────────────────────┐
-  │ Welcome                 │
-  │ Theme                   │
-  │ Settings                │
-  ├─────────────────────────┤
-  │ EXPERIENCES        [+]  │  ← section header
-  │   ├ Experience A   ⋮    │  ← draggable item
-  │   └ Experience B   ⋮    │
-  └─────────────────────────┘
-  ```
-- [ ] [+] button opens Experience Picker modal
-- [ ] Context menu: rename, duplicate, enable/disable, remove from event
-- [ ] Click experience → navigate to editor route (placeholder)
+- [ ] Add "Guest Flow" section to `EventSettingsPage`
+- [ ] Integrate `ExperienceSlotManager` for pregate (mode: single)
+- [ ] Integrate `ExperienceSlotManager` for preshare (mode: single)
+- [ ] Clear labels: "Before Welcome (Pregate)", "Before Share (Preshare)"
+- [ ] Add callout in `WelcomeConfigPanel` when extras configured (link to Settings)
 
 **Testable outcome:**
 
-- Main experiences display in sidebar
-- Add button opens picker
-- Context menu actions work
-
-**NOT doing:** Drag-to-reorder (next phase), pregate/preshare (later phase)
-
-**Parallelizable:** Yes (after Phase 5, 6)
+- Admin can add/remove pregate experience from Settings
+- Admin can add/remove preshare experience from Settings
+- Callout appears in Welcome tab when extras exist
 
 ---
 
-## Phase 8 — Main Experiences Reordering
+## Phase 6 — Welcome Screen WYSIWYG
 
-**Goal:** Admin can reorder main experiences via drag and drop.
-
-**Location:** `domains/event/designer/`
-
-**Deliverables:**
-
-- [ ] Integrate @dnd-kit for sidebar reordering
-- [ ] `useReorderMainExperiences.ts` - Mutation hook
-- [ ] Persist order to `draftConfig.experiences.main`
-
-**Testable outcome:**
-
-- Drag and drop reorders experiences
-- Order persists to Firestore
-- Order reflected in sidebar
-
-**Parallelizable:** Yes (after Phase 7)
-
----
-
-## Phase 9 — Pregate & Preshare Slots UI
-
-**Goal:** Admin can assign experiences to pregate and preshare slots.
-
-**Location:** `domains/event/designer/`
-
-**Deliverables:**
-
-- [ ] Add "Extras" section to sidebar
-  ```
-  ┌─────────────────────────┐
-  │ EXPERIENCES        [+]  │
-  │   ├ Experience A   ⋮    │
-  │   └ Experience B   ⋮    │
-  ├─────────────────────────┤
-  │ EXTRAS                  │
-  │   Pregate: [+ Add]      │  ← empty state
-  │   Preshare: Welcome XP  │  ← filled state
-  └─────────────────────────┘
-  ```
-- [ ] Pregate slot UI (single, optional)
-- [ ] Preshare slot UI (single, optional)
-- [ ] "Add" opens picker filtered for slot
-- [ ] Context menu: clear slot, edit experience
-
-**Testable outcome:**
-
-- Pregate/preshare slots show in sidebar
-- Can assign experience to each slot
-- Can clear slot assignment
-- Profile filtering works for each slot
-
-**Parallelizable:** Yes (after Phase 7)
-
----
-
-## Phase 10 — Welcome Screen Experience Cards
-
-**Goal:** Welcome screen preview shows actual experiences (WYSIWYG).
+**Goal:** Welcome preview shows actual experiences.
 
 **Location:** `domains/event/welcome/` + `src/shared/`
 
 **Deliverables:**
 
-- [ ] `shared/components/ExperienceCard.tsx` - Shared card component
-  - Shows: thumbnail, name
+- [ ] `shared/components/ExperienceCard.tsx` - Shared card (thumbnail, name)
   - Supports `mode: 'edit' | 'run'`
-- [ ] `shared/components/ExperiencePicker.tsx` - Shared picker/grid
+- [ ] `shared/components/ExperiencePickerGrid.tsx` - List/grid layout
   - Supports `layout: 'list' | 'grid'`
-  - Supports `mode: 'edit' | 'run'`
 - [ ] Update `WelcomePreview.tsx` to render actual experiences
-  - Resolve experiences from `draftConfig.experiences.main`
-  - Fetch experience data (name, media) from workspace
+  - Resolve from `draftConfig.experiences.main`
+  - Fetch experience data (name, media)
   - Render using shared components
 
 **Testable outcome:**
 
-- Welcome preview shows actual experience cards
-- Cards respect layout setting (list/grid)
-- Adding/removing experiences updates preview immediately
-
-**Parallelizable:** Yes (after Phase 7)
+- Welcome preview shows experience cards (not placeholder)
+- Cards update when experiences added/removed
+- Layout toggle (list/grid) works
 
 ---
 
-## Phase 11 — Step Registry Implementation
+## Phase 7 — Experience Editor Layout
 
-**Goal:** Define step types with schemas, defaults, and renderer bindings.
+**Goal:** Create dedicated experience editor with 3-column layout.
+
+**Location:** `domains/experience/editor/`
+
+**Deliverables:**
+
+- [ ] `containers/ExperienceDesignerLayout.tsx`
+  - Breadcrumbs: Project / Event / Experience
+  - No event tabs (Welcome, Theme, Settings)
+- [ ] `containers/ExperienceEditorPage.tsx`
+  - 3-column layout: step list | preview | config panel
+- [ ] Route: `/workspace/$slug/projects/$projectId/events/$eventId/experience/$experienceId`
+- [ ] Load experience from workspace
+- [ ] Navigation from context menu "Edit" action
+
+**Testable outcome:**
+
+- Clicking "Edit" from experience list opens editor
+- Editor shows 3-column layout
+- Breadcrumb navigation works (back to event)
+
+---
+
+## Phase 8 — Step Registry & Config Panels
+
+**Goal:** Define step types with schemas and config forms.
 
 **Location:** `domains/experience/steps/`
 
 **Deliverables:**
 
-- [ ] `registry.ts` - Step registry with:
-  - Step type enumeration
-  - Config schema per step
-  - Default config factory per step
-  - Renderer binding per step
-  - Editor config panel binding per step
-- [ ] Populate schemas for MVP steps:
+- [ ] `registry.ts` - Step registry with type enumeration
+- [ ] Step schemas (Zod) for:
   - `info`
   - `input.scale`, `input.yesNo`, `input.multiSelect`, `input.shortText`, `input.longText`
-  - `capture.photo` (placeholder config)
-  - `transform.pipeline` (placeholder config)
+  - `capture.photo` (placeholder)
+  - `transform.pipeline` (placeholder)
   - `share`
+- [ ] Default config factories per step
+- [ ] `StepConfigPanel` components for each step type
+- [ ] Profile-based step filtering utility
 
 **Testable outcome:**
 
 - Step registry exports all MVP step types
-- Each step has valid schema and defaults
-- Adding new step type is contained change
-
-**Parallelizable:** Yes (independent)
+- Config panels render correctly
+- Profile filtering returns correct step types
 
 ---
 
-## Phase 12 — Experience Editor Layout
+## Phase 9 — Experience Editor: Step List & Selection
 
-**Goal:** Create the experience editor page structure.
+**Goal:** Admin can view, select, and manage steps.
 
 **Location:** `domains/experience/editor/`
 
 **Deliverables:**
 
-- [ ] Route: `/workspace/$slug/projects/$projectId/events/$eventId/experience/$experienceId`
-- [ ] `containers/ExperienceEditorPage.tsx` - Main container
-- [ ] Layout: step list (left) + preview (center) + config panel (right)
-- [ ] Load experience from workspace
-- [ ] Wire up with auto-save pattern
-
-**Testable outcome:**
-
-- Editor route loads and displays 3-column layout
-- Experience data loads from Firestore
-- Basic navigation works (back to event)
-
-**NOT doing:** Step list interactions (next phase)
-
-**Parallelizable:** Yes (after Phase 11)
-
----
-
-## Phase 13 — Experience Editor: Step List
-
-**Goal:** Admin can view, select, and navigate steps.
-
-**Location:** `domains/experience/editor/`
-
-**Deliverables:**
-
-- [ ] `components/StepList.tsx` - Step list component
-  - Display steps with icons and labels
-  - Selected step highlighting
-  - Click to select step
-- [ ] URL sync: `?step=[stepId]`
-- [ ] Default to first step if none selected
-
-**Testable outcome:**
-
-- Step list displays all steps
-- Clicking step updates selection
-- URL reflects selected step
-
-**NOT doing:** Add/remove/reorder (future phases)
-
-**Parallelizable:** Yes (after Phase 12)
-
----
-
-## Phase 14 — Experience Editor: Step Preview (Edit Mode)
-
-**Goal:** Center panel shows non-interactive step preview.
-
-**Location:** `domains/experience/editor/`
-
-**Deliverables:**
-
-- [ ] `components/StepPreview.tsx` - Preview container
-- [ ] `StepRenderer(mode='edit')` - Non-interactive rendering
-- [ ] Wire up with PreviewShell for viewport switching
-- [ ] Preview updates immediately on config changes
-
-**Testable outcome:**
-
-- Selected step renders in center panel
-- Preview is non-interactive
-- Config changes reflect immediately
-
-**Parallelizable:** Yes (after Phase 13)
-
----
-
-## Phase 15 — Experience Editor: Step Config Panel
-
-**Goal:** Right panel shows step configuration form.
-
-**Location:** `domains/experience/editor/`
-
-**Deliverables:**
-
-- [ ] `components/StepConfigPanel.tsx` - Config panel container
-- [ ] Per-step config forms (from registry)
-  - Start with `info` step config
-- [ ] Auto-save on config changes
-- [ ] Validation feedback
-
-**Testable outcome:**
-
-- Config panel shows form for selected step
-- Changes persist to Firestore
-- Preview updates on changes
-
-**Parallelizable:** Yes (after Phase 14)
-
----
-
-## Phase 16 — Experience Editor: Add Step
-
-**Goal:** Admin can add steps to experience.
-
-**Location:** `domains/experience/editor/`
-
-**Deliverables:**
-
-- [ ] "Add step" button/action
-- [ ] Step type picker (filtered by profile)
-- [ ] Insert step at end (or after selected)
-- [ ] New step selected after add
-
-**Testable outcome:**
-
-- Add button shows allowed step types only
-- Adding step updates list and persists
-- New step is selected
-
-**Parallelizable:** Yes (after Phase 15)
-
----
-
-## Phase 17 — Experience Editor: Remove & Reorder Steps
-
-**Goal:** Admin can remove and reorder steps.
-
-**Location:** `domains/experience/editor/`
-
-**Deliverables:**
-
-- [ ] Remove step action (with confirmation for non-empty)
+- [ ] `components/StepList.tsx` - Display steps with icons/labels
+- [ ] Step selection with URL sync (`?step=[stepId]`)
+- [ ] "Add step" action with step type picker (filtered by profile)
+- [ ] Remove step action (via context menu)
 - [ ] Drag-to-reorder steps (@dnd-kit)
-- [ ] Handle selected step removal gracefully
 
 **Testable outcome:**
 
-- Remove step works and persists
-- Reorder works and persists
-- UI stays consistent after operations
-
-**Parallelizable:** Yes (after Phase 16)
+- Step list shows all steps in experience
+- Can add/remove/reorder steps
+- Profile filtering limits step types
 
 ---
 
-## Phase 18 — Input Step Config Forms
+## Phase 10 — Experience Editor: Step Preview & Config
 
-**Goal:** Config forms for all input step types.
+**Goal:** Admin can configure steps with live preview.
 
-**Location:** `domains/experience/steps/input/`
+**Location:** `domains/experience/editor/`
 
 **Deliverables:**
 
-- [ ] `input.scale` config form (min, max, labels)
-- [ ] `input.yesNo` config form (labels)
-- [ ] `input.multiSelect` config form (options, min/max selections)
-- [ ] `input.shortText` config form (placeholder, validation)
-- [ ] `input.longText` config form (placeholder, max length)
+- [ ] `components/StepPreview.tsx` - Center preview panel
+- [ ] `StepRenderer(mode='edit')` - Non-interactive preview
+- [ ] Wire up `StepConfigPanel` to right panel
+- [ ] Auto-save step config changes
+- [ ] Preview updates immediately on changes
 
 **Testable outcome:**
 
-- Each input step type has working config form
-- Config persists correctly
-- Preview updates on config changes
-
-**Parallelizable:** Yes (after Phase 15)
+- Selecting step shows preview and config
+- Editing config updates preview immediately
+- Changes persist to Firestore
 
 ---
 
-## Phase 19 — Session Domain Implementation
+## Phase 11 — Session Domain
 
 **Goal:** Enable session creation and subscription.
 
@@ -568,8 +315,7 @@ This roadmap implements the Experience System with **workspace-scoped experience
 - [ ] `hooks/useCreateSession.ts`
 - [ ] `hooks/useSession.ts` - Subscribe to session
 - [ ] `hooks/useUpdateSession.ts`
-- [ ] Firestore path: `/projects/{projectId}/sessions/{sessionId}`
-- [ ] Security rules for sessions
+- [ ] Firestore security rules for sessions
 
 **Testable outcome:**
 
@@ -577,11 +323,9 @@ This roadmap implements the Experience System with **workspace-scoped experience
 - Can subscribe to session updates
 - Session persists to Firestore
 
-**Parallelizable:** Yes (independent)
-
 ---
 
-## Phase 20 — Experience Runtime Engine Core
+## Phase 12 — Experience Runtime Engine
 
 **Goal:** Step sequencing and state management.
 
@@ -602,11 +346,9 @@ This roadmap implements the Experience System with **workspace-scoped experience
 - State accumulates as expected
 - Navigation boundaries enforced
 
-**Parallelizable:** Yes (after Phase 19)
-
 ---
 
-## Phase 21 — Step Renderers (Run Mode): Info & Input
+## Phase 13 — Step Renderers (Run Mode)
 
 **Goal:** Interactive step rendering for guest/preview.
 
@@ -615,13 +357,10 @@ This roadmap implements the Experience System with **workspace-scoped experience
 **Deliverables:**
 
 - [ ] `StepRenderer(mode='run')` - Interactive rendering
-- [ ] `info` step renderer (display only, proceed button)
+- [ ] `info` step renderer (display + proceed)
 - [ ] Input step renderers (interactive forms):
-  - `input.scale`
-  - `input.yesNo`
-  - `input.multiSelect`
-  - `input.shortText`
-  - `input.longText`
+  - `input.scale`, `input.yesNo`, `input.multiSelect`
+  - `input.shortText`, `input.longText`
 
 **Testable outcome:**
 
@@ -629,11 +368,9 @@ This roadmap implements the Experience System with **workspace-scoped experience
 - User input captured correctly
 - Proceed/back navigation works
 
-**Parallelizable:** Yes (after Phase 20)
-
 ---
 
-## Phase 22 — Admin Preview Integration
+## Phase 14 — Admin Preview
 
 **Goal:** Admin can preview experience using runtime.
 
@@ -642,7 +379,7 @@ This roadmap implements the Experience System with **workspace-scoped experience
 **Deliverables:**
 
 - [ ] "Preview" button in experience editor
-- [ ] Preview modal/page using runtime
+- [ ] Preview modal/fullscreen using runtime
 - [ ] Create preview session (`mode='preview'`, `configSource='draft'`)
 - [ ] Use same step renderers as guest
 
@@ -652,59 +389,32 @@ This roadmap implements the Experience System with **workspace-scoped experience
 - Session created with preview mode
 - Steps are interactive
 
-**Parallelizable:** Yes (after Phase 21)
-
 ---
 
-## Phase 23 — Guest Record & Join Shell
+## Phase 15 — Guest Join & Welcome
 
-**Goal:** Guest record creation and join route basics.
+**Goal:** Guest can access event and see welcome screen.
 
 **Location:** `domains/guest/`
 
 **Deliverables:**
 
-- [ ] `/join/[projectId]` route implementation
+- [ ] `/join/[projectId]` route
 - [ ] Resolve chain: project → activeEventId → event (published)
 - [ ] Create guest record if not exists
-- [ ] Error states: 404, Coming Soon (no active event)
-
-**Testable outcome:**
-
-- Valid project link loads
-- Guest record created in Firestore
-- Error states display correctly
-
-**NOT doing:** Welcome screen with experiences (next phase)
-
-**Parallelizable:** Yes (after Phase 4)
-
----
-
-## Phase 24 — Guest Welcome Screen
-
-**Goal:** Guest sees welcome screen with experience picker.
-
-**Location:** `domains/guest/`
-
-**Deliverables:**
-
-- [ ] Load `publishedConfig` experiences
-- [ ] Load experience releases for display data
+- [ ] Load `publishedConfig` experiences and releases
 - [ ] Render `WelcomeScreen(mode='run')` with shared components
-- [ ] Experience selection navigates to experience route
+- [ ] Error states: 404, Coming Soon
 
 **Testable outcome:**
 
-- Welcome screen shows experiences from publishedConfig
-- Experiences render with name and thumbnail
-- Selection navigates to experience flow
-
-**Parallelizable:** Yes (after Phase 23, Phase 10)
+- Valid project link loads welcome screen
+- Experiences display from publishedConfig
+- Guest record created
 
 ---
 
-## Phase 25 — Guest Experience Flow
+## Phase 16 — Guest Experience Flow
 
 **Goal:** Guest can run selected experience.
 
@@ -724,11 +434,9 @@ This roadmap implements the Experience System with **workspace-scoped experience
 - Session created with correct data
 - Steps execute correctly
 
-**Parallelizable:** Yes (after Phase 24)
-
 ---
 
-## Phase 26 — Experience Release Creation
+## Phase 17 — Experience Release & Publish
 
 **Goal:** Event publish creates immutable releases.
 
@@ -742,116 +450,61 @@ This roadmap implements the Experience System with **workspace-scoped experience
   - Freeze experience data (profile, media, steps)
 - [ ] Write releaseIds to `publishedConfig.experiences`
 - [ ] Transaction for atomicity
+- [ ] Pre-publish validation (profile constraints, step completeness)
 
 **Testable outcome:**
 
 - Publishing event creates releases
-- Releases contain frozen experience data
-- publishedConfig references releaseIds
-
-**Parallelizable:** Yes (after Phase 25)
-
----
-
-## Phase 27 — Publish Validation
-
-**Goal:** Prevent invalid experiences from being published.
-
-**Location:** `domains/experience/validation/`
-
-**Deliverables:**
-
-- [ ] Pre-publish validation for each experience
-  - Profile constraints
-  - Step config completeness
-  - Required step ordering
-- [ ] Block publish on validation errors
-- [ ] Show validation errors in UI
-
-**Testable outcome:**
-
 - Invalid experiences block publish
-- Errors are clear and actionable
-- Valid experiences publish successfully
-
-**Parallelizable:** Yes (after Phase 26)
+- Guest sees published experiences only
 
 ---
 
-## Phase 28 — Capture Step: Photo
+## Phase 18 — Capture & Share Steps
 
-**Goal:** Add photo capture capability.
+**Goal:** Photo capture and sharing functionality.
 
-**Location:** `domains/experience/steps/capture/`
+**Location:** `domains/experience/steps/`
 
 **Deliverables:**
 
-- [ ] `capture.photo` step config form
-- [ ] `capture.photo` step renderer (edit mode)
-- [ ] `capture.photo` step renderer (run mode)
+- [ ] `capture.photo` step config and renderers
   - Camera capture via `shared/camera`
   - File upload fallback
 - [ ] Runtime support for media output
+- [ ] `share` step config and renderers
+  - Download, copy link, social sharing
+  - Consume upstream media/result
 
 **Testable outcome:**
 
 - Photo capture works in preview and guest
-- Captured photo stored correctly
-- Media output available for downstream steps
-
-**Parallelizable:** Yes (after Phase 21)
-
----
-
-## Phase 29 — Share Step
-
-**Goal:** Guest can share/download result.
-
-**Location:** `domains/experience/steps/share/`
-
-**Deliverables:**
-
-- [ ] `share` step config form
-- [ ] `share` step renderer (edit mode)
-- [ ] `share` step renderer (run mode)
-  - Download button
-  - Copy link
-  - Social sharing (based on event config)
-- [ ] Consume upstream media/result
-
-**Testable outcome:**
-
 - Share step displays result
-- Download works
-- Sharing options match event config
-
-**Parallelizable:** Yes (after Phase 28)
+- Full info → capture → share flow works
 
 ---
 
-## Phase 30 — Pregate & Preshare Runtime Integration
+## Phase 19 — Pregate & Preshare Runtime
 
-**Goal:** Pregate and preshare experiences run in guest flow.
+**Goal:** Extra experiences run in guest flow.
 
 **Location:** `domains/guest/`
 
 **Deliverables:**
 
 - [ ] Run pregate experience before welcome (if enabled)
-- [ ] Run preshare experience before share step (if enabled)
+- [ ] Run preshare experience after main, before share (if enabled)
 - [ ] Proper sequencing and state handling
 
 **Testable outcome:**
 
 - Pregate runs before welcome
-- Preshare runs before share
+- Preshare runs at correct point
 - Flow completes correctly
-
-**Parallelizable:** Yes (after Phase 25)
 
 ---
 
-## Phase 31 — Transform Step (Heavy Track)
+## Phase 20 — Transform Step (Heavy Track)
 
 **Goal:** Add async AI processing.
 
@@ -859,8 +512,7 @@ This roadmap implements the Experience System with **workspace-scoped experience
 
 **Deliverables:**
 
-- [ ] `transform.pipeline` step config form
-- [ ] `transform.pipeline` step renderer (shows progress)
+- [ ] `transform.pipeline` step config and renderers
 - [ ] Cloud Function for transform job
 - [ ] Session-based job tracking
 - [ ] Runtime waits for completion
@@ -871,13 +523,10 @@ This roadmap implements the Experience System with **workspace-scoped experience
 - Transform job triggers correctly
 - Progress displays in UI
 - Result available for share step
-- Errors handled gracefully
-
-**Parallelizable:** Partial (cloud infra ↔ frontend)
 
 ---
 
-## Phase 32 — Polish & Hardening
+## Phase 21 — Polish & Hardening
 
 **Goal:** Production-ready cleanup.
 
@@ -885,12 +534,9 @@ This roadmap implements the Experience System with **workspace-scoped experience
 
 - [ ] Soft delete handling in all UIs
 - [ ] Hide deleted/disabled experiences everywhere
-- [ ] Preview session visibility rules
 - [ ] Error boundary coverage
 - [ ] Loading states polish
 - [ ] Edge case handling
-
-**Parallelizable:** Yes (independent polish tasks)
 
 ---
 
@@ -900,91 +546,71 @@ This roadmap implements the Experience System with **workspace-scoped experience
 
 - `apps/clementine-app/src/domains/experience/` - Core experience domain
 - `apps/clementine-app/src/domains/session/` - Session domain
-- `apps/clementine-app/src/domains/workspace/experiences/` - Workspace experience CRUD
-- `apps/clementine-app/src/domains/event/experiences/` - Event-level experience management
+- `apps/clementine-app/src/domains/event/experiences/` - Experience assignment UI
 
 **Existing files to modify:**
 
 - `apps/clementine-app/src/domains/event/shared/schemas/project-event-config.schema.ts`
-- `apps/clementine-app/src/domains/event/designer/components/EventDesignerSidebar.tsx`
-- `apps/clementine-app/src/domains/event/welcome/components/WelcomePreview.tsx`
+- `apps/clementine-app/src/domains/event/welcome/components/WelcomeControls.tsx` → rename to `WelcomeConfigPanel.tsx`
+- `apps/clementine-app/src/domains/event/theme/components/ThemeControls.tsx` → rename to `ThemeConfigPanel.tsx`
+- `apps/clementine-app/src/domains/event/settings/containers/EventSettingsPage.tsx`
 - `apps/clementine-app/src/domains/project/shared/schemas/` (add activeEventId)
 
 **New routes:**
 
-- `/workspace/$slug/projects/$projectId/events/$eventId/create-experience`
 - `/workspace/$slug/projects/$projectId/events/$eventId/experience/$experienceId`
 - `/join/$projectId`
 - `/join/$projectId/experience/$experienceId`
 
-**Shared modules to create/extend:**
+**Shared modules to create:**
 
 - `src/shared/components/ExperienceCard.tsx`
-- `src/shared/components/ExperiencePicker.tsx` (guest-facing)
+- `src/shared/components/ExperiencePickerGrid.tsx`
 
 ---
 
 ## Dependency Graph
 
 ```
-Phase 0 (Foundations)
+Phase 0 (Foundations + Naming)
     ↓
-    ├── Phase 1 (Profiles)
-    ├── Phase 2 (Data Model)
-    │       ↓
-    │   Phase 3 (CRUD Hooks)
-    │       ↓
-    │   Phase 5 (Picker Modal) ────┐
-    │       ↓                      │
-    │   Phase 6 (Create Flow)      │
-    │       ↓                      │
-    │   Phase 7 (Sidebar Main)     │
-    │       ↓                      │
-    │   ├── Phase 8 (Reorder)      │
-    │   ├── Phase 9 (Extras)       │
-    │   └── Phase 10 (Welcome WYSIWYG) ←┘
-    │
-    └── Phase 4 (Event Config Schema)
-            ↓
-        Phase 23 (Join Shell)
-            ↓
-        Phase 24 (Guest Welcome) ← Phase 10
-            ↓
-        Phase 25 (Guest Flow) ← Phase 21
+Phase 1 (Data Layer)
+    ↓
+Phase 2 (Event Config Schema)
+    ↓
+Phase 3 (SlotManager & Panels)
+    ↓
+├── Phase 4 (Main in Welcome)
+├── Phase 5 (Extras in Settings)
+└── Phase 6 (Welcome WYSIWYG)
+    ↓
+Phase 7 (Editor Layout)
+    ↓
+Phase 8 (Step Registry)
+    ↓
+├── Phase 9 (Step List)
+└── Phase 10 (Step Preview & Config)
 
-Phase 11 (Step Registry)
+Phase 11 (Session Domain)
     ↓
-Phase 12 (Editor Layout)
+Phase 12 (Runtime Engine)
     ↓
-Phase 13 (Step List)
+Phase 13 (Step Renderers Run)
     ↓
-Phase 14 (Step Preview)
-    ↓
-Phase 15 (Config Panel)
-    ↓
-├── Phase 16 (Add Step)
-├── Phase 17 (Remove/Reorder)
-└── Phase 18 (Input Configs)
-
-Phase 19 (Session Domain)
-    ↓
-Phase 20 (Runtime Engine)
-    ↓
-Phase 21 (Step Renderers Run)
-    ↓
-├── Phase 22 (Admin Preview)
-├── Phase 28 (Capture Photo)
-│       ↓
-│   Phase 29 (Share Step)
-└── Phase 25 (Guest Flow)
+├── Phase 14 (Admin Preview)
+└── Phase 15 (Guest Join & Welcome)
         ↓
-    Phase 26 (Releases)
+    Phase 16 (Guest Flow)
         ↓
-    Phase 27 (Validation)
-
-Phase 30 (Pregate/Preshare Runtime) ← Phase 25
-Phase 31 (Transform) ← Phase 28
-Phase 32 (Polish) ← all
+    Phase 17 (Release & Publish)
+        ↓
+    Phase 18 (Capture & Share)
+        ↓
+    Phase 19 (Pregate/Preshare Runtime)
+        ↓
+    Phase 20 (Transform - Heavy)
+        ↓
+    Phase 21 (Polish)
 ```
 
 ---
@@ -996,8 +622,8 @@ Phase 32 (Polish) ← all
 - Workspace-scoped experiences with event-scoped UX
 - Three profiles: freeform, survey, informational
 - Three slots: main (array), pregate (single), preshare (single)
-- Experience picker with profile filtering
-- Experience editor with step management
+- ExperienceSlotManager with state machine
+- Experience editor (3-column, separate layout)
 - WYSIWYG Welcome screen
 - Guest join flow with experience selection
 - Session-based runtime
@@ -1010,6 +636,6 @@ Phase 32 (Polish) ← all
 - Marketplace / Templates
 - Version history
 - Video/GIF capture (placeholder only)
-- Transform step (Phase 31, heavy track)
+- Transform step (Phase 20, heavy track)
 - Analytics dashboards
 - Role/permission granularity
