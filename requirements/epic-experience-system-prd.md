@@ -1,181 +1,434 @@
-# PRD: Experience Editor & Experience Picker
+# PRD: Workspace Experiences (Event-Scoped UX, MVP)
 
-## 1. Objective
-
-Enable admins to **create, edit, preview, and publish Experiences**, where an Experience is a **step-based interactive flow** composed of steps such as info, input, capture, transform, and share.
-
-Experiences are:
-
-- **Scoped to an Event**
-- **Stored under the Event as a subcollection**
-- **Referenced by event configuration**
-- **Versioned (draft / published)**
-- **Published only via Event publish**
-
-Events may include:
-
-- Multiple **main experiences** (shown via Experience Picker)
-- Optional **pregate** experience
-- Optional **preshare** experience
+> **Related Documents:**
+> - [Architecture: Experiences System](./arch-expereinces-system.md)
+> - [Roadmap: Experience System](./experience-system-roadmap.md)
 
 ---
 
-## 2. Core Concepts
+## 1. Goal & Non-Goals
 
-### Experience
+### Goal
 
-A self-contained interactive flow composed of ordered steps.
+Enable admins to:
 
-- Owned by a single Event
-- Draft and published snapshots
-- Cannot be published independently
-- Can be enabled/disabled without deletion
+- Create and manage **mutable Experiences** at the workspace level
+- Assign Experiences to Events via an **event-scoped UX**
+- Publish Events in a way that **freezes runtime configuration**
+- Allow guests to reliably consume **published experiences only**
 
-### Step
+### Non-Goals (Explicitly Out of Scope)
 
-A typed unit of interaction or processing with a defined input/output contract.
-
-### Experience Picker
-
-UI on the Welcome screen allowing guests to select one of multiple enabled main experiences.
-
-### Experience Profile
-
-A constraint ruleset that governs allowed step types and ordering.
+- Marketplace or cross-workspace sharing
+- Experience templates
+- Experience version history UI
+- Workspace-scoped admin permissions
+- Draft rollback / diffing
+- Public project state abstraction (using project doc directly for MVP)
+- Experience Library UI (global browsing, search, filters)
 
 ---
 
-## 3. Firestore Structure (Relevant)
+## 2. Core Concepts (Authoritative Definitions)
+
+### Experience (Mutable)
+
+- **Workspace-scoped**
+- Edited over time
+- Never directly consumed by guests
+- Source of truth for publishing
+
+### Experience Release (Immutable)
+
+- **Project-scoped**
+- Created at Event publish time
+- Frozen copy of Experience draft
+- Referenced by Events
+- Consumed by guests
+
+### Event
+
+- **Project-scoped**
+- References Experiences in `draftConfig`
+- References ExperienceReleases in `publishedConfig`
+- Can be re-published multiple times
+
+### Session
+
+Represents an execution of an experience.
+
+- Can be `preview` or `guest` mode
+- Always references:
+  - `experienceId`
+  - `eventId`
+  - `projectId`
+  - `releaseId` (required for guest, absent for preview)
+- Uses either draft or published config depending on mode
+
+---
+
+## 3. Experience Profiles
+
+Profiles define **what step types an experience can contain**. Profile is set at creation time and **cannot be changed** afterward.
+
+### MVP Profiles
+
+| Profile | Allowed Step Categories | Use Case |
+|---------|------------------------|----------|
+| `freeform` | info, input, capture, transform, share | Full flexibility for main experiences |
+| `survey` | info, input, capture, share | Data collection, feedback (no AI transform) |
+| `informational` | info only | Display-only content (welcome, instructions) |
+
+### Slot Compatibility
+
+| Slot | Allowed Profiles | Cardinality |
+|------|-----------------|-------------|
+| `main` | freeform, survey | Array (multiple) |
+| `pregate` | informational, survey | Single (optional) |
+| `preshare` | informational, survey | Single (optional) |
+
+### Profile Rules
+
+- Profile is **immutable** after experience creation
+- Step add menu shows **only allowed step types** for the profile
+- Validation on save catches any invalid states
+- Admin cannot change profile; must create new experience
+
+### Future Profiles (Out of Scope for MVP)
+
+- `photo` - capture, transform, share (photo booth)
+- `video` - capture, transform, share (video booth)
+- `gif` - capture, transform, share (GIF booth)
+- `ai_photo` - info, input, capture, transform, share (AI headshots)
+
+---
+
+## 4. Step Types
+
+Steps are typed units of interaction or processing.
+
+### Step Categories
+
+| Category | Description |
+|----------|-------------|
+| `info` | Display informational content |
+| `input` | Collect user input |
+| `capture` | Capture media from user |
+| `transform` | AI processing pipeline |
+| `share` | Sharing/download step |
+
+### MVP Step Types
+
+| Type | Category | Description |
+|------|----------|-------------|
+| `info` | info | Display information (title, description, media) |
+| `input.scale` | input | Opinion scale (1-5, 1-10) |
+| `input.yesNo` | input | Yes/No question |
+| `input.multiSelect` | input | Multiple choice selection |
+| `input.shortText` | input | Short text input |
+| `input.longText` | input | Long text input |
+| `capture.photo` | capture | Photo capture (camera + upload) |
+| `capture.video` | capture | Video capture |
+| `capture.gif` | capture | GIF capture |
+| `transform.pipeline` | transform | AI processing pipeline |
+| `share` | share | Sharing and download options |
+
+### Step Contracts
+
+- `transform.pipeline` must produce `resultAssetId`
+- `share` consumes `resultAssetId` (requires upstream transform or capture)
+
+---
+
+## 5. Firebase Data Model (MVP)
+
+### 5.1 Workspaces
+
+```
+/workspaces/{workspaceId}
+  name
+  createdAt
+```
+
+### 5.2 Workspace Experiences (Mutable, Admin-Only)
+
+```
+/workspaces/{workspaceId}/experiences/{experienceId}
+{
+  id: string
+  name: string
+  status: 'active' | 'deleted'
+
+  profile: 'freeform' | 'survey' | 'informational'
+
+  media?: {
+    mediaAssetId: string
+    url: string
+  }
+
+  steps: Step[]
+
+  createdAt: number
+  updatedAt: number
+}
+```
+
+**Notes:**
+- No base64 or binary data
+- Media always referenced by URL (thumbnail for picker/welcome screen)
+- Soft deletion only (no cascading behavior in MVP)
+- `steps` uses existing `Step` union type from codebase
+
+### 5.3 Projects
 
 ```
 /projects/{projectId}
-  /events/{eventId}
-    event (doc)
-    /experiences/{experienceId}
-      experience (doc)
-  /sessions/{sessionId}
-
-```
-
-- `experienceId` is Firestore-generated
-- Sessions are project-scoped
-
----
-
-## 4. Functional Requirements
-
-### 4.1 Experience Management
-
-Admins must be able to:
-
-- **Create experience**
-  - Creates a new experience under the event
-  - Experience starts in draft state
-- **Rename experience**
-- **Duplicate experience**
-  - Creates a new experience doc with copied draft content
-- **Enable / disable experience**
-  - Disabled experiences are hidden from guest flows
-- **Soft delete experience**
-  - Sets `status = 'deleted'`
-  - Deleted experiences are not selectable
-- **View publish state**
-  - Clear indication whether draft differs from published
-- **Preview experience**
-  - Runs experience using draft config
-  - Creates preview session
-- **See which event the experience belongs to**
-  - Context is always the current event
-
-❌ Admins **cannot publish experiences independently**
-
----
-
-### 4.2 Experience Composition (Editor)
-
-Admins must be able to:
-
-- **Add steps**
-- **Remove steps**
-- **Reorder steps**
-- **Edit step configuration**
-- **See a live preview of each step while editing**
-- **Switch between steps via step list**
-- **See validation errors inline**
-
-Editor behavior:
-
-- Step add menu is filtered by Experience Profile
-- Invalid steps or flows are clearly marked
-- Editor allows saving drafts even if invalid
-- Publishing is blocked if validation fails
-
----
-
-### 4.3 Step Validation Rules
-
-An experience **cannot be published** if:
-
-- Profile constraints are violated
-- Required step ordering rules are broken
-- A transform step lacks required inputs
-- A share step has no upstream output
-- Any step has invalid or incomplete configuration
-
----
-
-### 4.4 Event Integration
-
-Admins must be able to:
-
-- **Attach experiences to event**
-  - Main (multiple)
-  - Pregate (optional)
-  - Preshare (optional)
-- **Reorder main experiences**
-  - Order controls Experience Picker
-- **Enable / disable attached experiences**
-- **Preview event using draft config**
-- **Publish event**
-
----
-
-## 5. Event Configuration Model
-
-```tsx
-event.draftConfig.experiences = {
-  main: Array<{
-    experienceId: string
-    version: 'draft' | 'published'
-    enabled: boolean
-  }>
-
-  pregate?: {
-    experienceId: string
-    version: 'draft' | 'published'
-    enabled: boolean
-  }
-
-  preshare?: {
-    experienceId: string
-    version: 'draft' | 'published'
-    enabled: boolean
-  }
+{
+  workspaceId: string
+  name: string
+  activeEventId: string | null
+  status: 'active' | 'deleted'
+  createdAt: number
+  updatedAt: number
 }
-
 ```
 
-### Rules
+Guests can read this doc in MVP (accepted risk).
 
-- Order of `main[]` defines picker order
-- Disabled experiences are skipped in guest flow
-- References use `{experienceId, version}` only
+### 5.4 Events
+
+```
+/projects/{projectId}/events/{eventId}
+{
+  name: string
+  status: 'draft' | 'published' | 'deleted'
+
+  draftConfig: {
+    // ... existing config (theme, overlays, sharing, welcome) ...
+
+    experiences: {
+      main: Array<{
+        experienceId: string
+        enabled: boolean
+      }>
+      pregate?: {
+        experienceId: string
+        enabled: boolean
+      }
+      preshare?: {
+        experienceId: string
+        enabled: boolean
+      }
+    }
+  }
+
+  publishedConfig?: {
+    // ... existing config (theme, overlays, sharing, welcome) ...
+
+    experiences: {
+      main: Array<{
+        experienceId: string
+        releaseId: string
+        enabled: boolean
+      }>
+      pregate?: {
+        experienceId: string
+        releaseId: string
+        enabled: boolean
+      }
+      preshare?: {
+        experienceId: string
+        releaseId: string
+        enabled: boolean
+      }
+    }
+  }
+
+  publishedAt?: number
+  publishedBy?: string
+
+  createdAt: number
+  updatedAt: number
+  draftRevision: number
+}
+```
+
+### 5.5 Experience Releases (Immutable, Guest-Readable)
+
+```
+/projects/{projectId}/experienceReleases/{releaseId}
+{
+  experienceId: string
+  sourceEventId: string
+  data: {
+    profile: 'freeform' | 'survey' | 'informational'
+    media?: { mediaAssetId: string; url: string }
+    steps: Step[]
+  }
+  createdAt: number
+  createdBy: string
+}
+```
+
+**Rules:**
+- Immutable after creation
+- May be reused across events in the same project
+- Guests never read workspace experiences directly
+
+### 5.6 Guests
+
+```
+/projects/{projectId}/guests/{guestId}
+{
+  authUid: string
+  createdAt: number
+}
+```
+
+Created when guest first visits `/join/[projectId]`.
+
+### 5.7 Sessions
+
+```
+/projects/{projectId}/sessions/{sessionId}
+{
+  projectId: string
+  eventId: string
+  experienceId: string
+  releaseId?: string        // present if guest, absent if preview
+  guestId?: string          // present if guest
+  mode: 'preview' | 'guest'
+  configSource: 'draft' | 'published'
+
+  answers: [...]
+  createdAt: number
+}
+```
+
+**Rules:**
+- Preview sessions: Created by admin, may use draft config, excluded from guest analytics
+- Guest sessions: Must use published config, require releaseId
 
 ---
 
-## 6. Guest Flow
+## 6. Admin UX (Event-Scoped, MVP)
 
-1. Guest opens event
+### Experience Creation
+
+- Triggered from Event editor only
+- "Create new experience" action
+- Created under workspace, but feels event-local
+- Creation flow:
+  1. Select slot (main, pregate, or preshare)
+  2. Enter experience name
+  3. Select profile (filtered by slot compatibility)
+  4. Experience created and assigned to slot
+
+### Experience Picker (Select Existing)
+
+Used when assigning an experience to an Event slot.
+
+**Data Source:**
+- Lists all workspace-scoped experiences where `status === 'active'`
+- Not filtered by project
+- Sorted by `updatedAt` DESC (most recently edited first)
+
+**Picker Behavior:**
+
+| Aspect | Behavior |
+|--------|----------|
+| Trigger | "Add experience" or "Replace experience" opens modal |
+| List contents | Name, profile, optional thumbnail |
+| Selection | Attaches `experienceId` to target slot, closes modal |
+| Profile filtering | Only shows experiences with compatible profiles for the slot |
+| Duplicates | Experiences already in the event are disabled with reason |
+| Create new | Primary action: "Create new experience" |
+| Empty state | "No experiences yet" + "Create new experience" button |
+
+**Explicit Non-Requirements:**
+- No search
+- No filters
+- No tags
+- No pagination
+- No edit/rename/delete inside picker
+- No "used by X events" indicators
+- No project-level scoping
+- No marketplace or templates
+
+### Experience Assignment
+
+- One experience per slot type (pregate/preshare are single)
+- Main slot can have multiple experiences
+- Same experience cannot be assigned twice in the same event
+
+### Experience Removal from Event
+
+- Removes reference only
+- Does not delete experience from workspace
+
+### No Dedicated Experience Library UI (MVP)
+
+- No global browsing
+- No bulk management
+- Minimal surface area
+
+---
+
+## 7. Event Publishing — Production-Safe Algorithm
+
+### Preconditions
+
+1. **Load Event** - Fail if missing, deleted, or user unauthorized
+2. **Validate draftConfig** - Enabled experiences must exist, no duplicate experienceIds across slots
+3. **Load all referenced Experiences** (workspace-scoped) - Fail if any enabled experience is missing or deleted
+
+### Publish Steps (Atomic)
+
+1. **Capture draftRevision** - Read `event.draftRevision`
+
+2. **Prepare Releases** - For each enabled experience:
+   - Build immutable payload from experience draft
+   - Create `/experienceReleases/{releaseId}`
+
+3. **Transaction** - Inside Firestore transaction:
+   - Re-read event
+   - Abort if `draftRevision` changed
+   - Write `publishedConfig` referencing releaseIds
+   - Set: `publishedAt`, `publishedBy`, `status = 'published'`, `updatedAt = now`
+
+4. **Success** - Event is live, guests see published config only
+
+### Failure Modes (Explicit)
+
+| Failure | Action |
+|---------|--------|
+| Missing/deleted experience | Fail publish |
+| Event edited during publish | Abort and retry |
+| Partial publish | Never allowed |
+
+---
+
+## 8. Guest Flow
+
+### Join Route: `/join/{projectId}`
+
+1. **Read project** - Must exist
+2. **Read activeEventId** - Must exist
+3. **Read event** - Must exist and be published
+4. **Load publishedConfig**
+5. **Load referenced experienceReleases**
+6. **Create guest record** if not exists (`/projects/{projectId}/guests/{guestId}`)
+7. **Render Welcome screen** with experience picker
+
+### Experience Selection
+
+- Guest picks experience from Welcome screen
+- Navigate to `/join/{projectId}/experience/{experienceId}?session={sessionId}`
+- Create session doc with `guestId`, `eventId`, `experienceId`, `releaseId`
+
+### Full Guest Flow
+
+1. Guest opens event (via `/join/{projectId}`)
 2. Optional pregate experience runs (if enabled)
 3. Welcome screen shows Experience Picker
 4. Guest selects one enabled main experience
@@ -185,89 +438,116 @@ event.draftConfig.experiences = {
 
 ---
 
-## 7. Preview vs Guest Sessions
+## 9. Security Model (MVP)
+
+### Admin
+
+Full access everywhere.
+
+### Guest
+
+**Read:**
+- `/projects/{projectId}` (accepted risk for MVP)
+- `/projects/{projectId}/events/{eventId}` (published fields only)
+- `/projects/{projectId}/experienceReleases/{releaseId}`
+
+**Write:**
+- `/projects/{projectId}/sessions`
+- `/projects/{projectId}/guests/{guestId}` (own doc only)
+
+**No access to:**
+- `/workspaces/*`
+- Mutable experiences
+- `draftConfig`
+
+---
+
+## 10. Preview vs Guest Sessions
 
 Sessions are stored under `/projects/{projectId}/sessions`.
 
-### Session Properties (Relevant)
+### Session Properties
 
-```tsx
-session {
-  projectId
-  eventId
-  experienceId
-  mode: 'preview' | 'guest'
-  configSource: 'draft' | 'published'
-}
+| Property | Preview | Guest |
+|----------|---------|-------|
+| `mode` | `'preview'` | `'guest'` |
+| `configSource` | `'draft'` | `'published'` |
+| `releaseId` | absent | required |
+| `guestId` | absent | required |
+| Analytics | Excluded | Included |
 
-```
-
-- Preview sessions:
-  - Created by admin preview
-  - Visible in admin tooling
-  - Excluded from guest analytics
-- Guest sessions:
-  - Created by live guests
-  - Use published config only
-
-Both session types are required to support async transform jobs.
+Both session types support async transform jobs.
 
 ---
 
-## 8. Publishing Semantics (Critical)
+## 11. Step Validation Rules
 
-### Event Publish
+An experience **cannot be published** if:
 
-When publishing an event:
+- Profile constraints are violated (step type not allowed for profile)
+- Required step ordering rules are broken
+- A transform step lacks required inputs
+- A share step has no upstream output
+- Any step has invalid or incomplete configuration
 
-1. `event.draftConfig` → `event.publishedConfig`
-2. For each referenced experience:
-   - `experience.draft` → `experience.published`
-3. Live guests read **only published config and published experience snapshots**
-
-### Invariants
-
-- Draft changes never affect live behavior
-- Experiences cannot be published independently
-- Live behavior changes only via event publish
+Validation timing:
+- **On step add**: Only show allowed step types (preventive)
+- **On save**: Validate and show errors/warnings (informative)
+- **On publish**: Hard gate (blocking)
 
 ---
 
-## 9. Deletion & Cleanup
+## 12. Explicit MVP Tradeoffs (Intentional)
 
-- Removing an experience from event config does not delete it
-- Soft-deleted experiences remain until event cleanup
-- Event cleanup job deletes:
-  - Event doc
-  - All subcollections (experiences, etc.)
-
----
-
-## 10. Step Types (MVP)
-
-- `info`
-- `input.scale`
-- `input.yesNo`
-- `input.multiSelect`
-- `input.shortText`
-- `input.longText`
-- `capture.photo` (camera + upload)
-- `capture.video`
-- `capture.gif`
-- `transform.pipeline`
-- `share`
-
-### Contracts
-
-- `transform.pipeline` must return `resultAssetId`
-- `share` consumes `resultAssetId`
+- Project doc is guest-readable (accepted risk)
+- No public state abstraction yet
+- No experience deletion enforcement
+- No template / marketplace concerns
+- No admin role granularity
 
 ---
 
-## 11. Out of Scope
+## 13. MVP Cut List (DO NOT BUILD)
 
-- Event duplication
-- Experience templates
-- Guest galleries
-- Analytics dashboards
-- Conditional branching
+These are explicitly forbidden for MVP:
+
+| Item | Reason |
+|------|--------|
+| Experience Library UI | Event-scoped UX decided; library adds cognitive load |
+| Marketplace / Templates / Sharing | Learn everything, do nothing pattern |
+| Experience Version History | Published releases already act as history |
+| Release Reuse / Hashing | Optimization before need; disk is cheap |
+| Public Project State Abstraction | Consciously accepted risk for MVP |
+| Soft-Delete Semantics UX | MVP trusts operator competence |
+| Fancy Analytics | Log sessions correctly, analyze later |
+| Role / Permission Granularity | Concierge-only; fake complexity |
+
+---
+
+## 14. Frozen Decisions (Do Not Revisit)
+
+These are frozen unless reality breaks them:
+
+- Experiences are **workspace-scoped**
+- UX is **event-scoped**
+- Guests **never read mutable experiences**
+- Publish **creates immutable releases**
+- `/join/[projectId]` resolves **one active event**
+- MVP **trusts admin competence**
+
+If you reopen these while coding, you are self-sabotaging.
+
+---
+
+## 15. What This Architecture Enables
+
+- Safe publish semantics
+- No guest exposure to drafts
+- Reusable releases without syncing complexity
+- Event-centric UX that doesn't fight the architecture
+- Clean path to:
+  - Experience library UI
+  - Templates
+  - Marketplace
+  - Public project state
+  - Workspace admins
