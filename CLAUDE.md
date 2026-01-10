@@ -293,6 +293,8 @@ See individual workspace documentation for required environment variables.
 ## Active Technologies
 - TypeScript 5.7.2 (strict mode, ES2022 target) + Zod 4.1.12 (validation), TanStack Query 5.66.5 (data fetching), Firebase SDK 12.5.0 (Firestore) (019-exp-system-foundations)
 - Firebase Firestore (NoSQL) - subcollection pattern for experiences and sessions (019-exp-system-foundations)
+- TypeScript 5.7.2 (strict mode, ES2022 target) + TanStack Query 5.66.5, Zod 4.1.12, Firebase SDK 12.5.0 (021-exp-data-layer)
+- Firebase Firestore (NoSQL) - subcollection pattern at `/workspaces/{workspaceId}/experiences/{experienceId}` (021-exp-data-layer)
 
 ## Recent Changes
 - 019-exp-system-foundations: Added TypeScript 5.7.2 (strict mode, ES2022 target) + Zod 4.1.12 (validation), TanStack Query 5.66.5 (data fetching), Firebase SDK 12.5.0 (Firestore)
