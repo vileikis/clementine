@@ -25,6 +25,7 @@ describe('projectEventFullSchema', () => {
           overlays: null,
           sharing: null,
           welcome: null,
+          experiences: null,
         },
         publishedConfig: null,
 

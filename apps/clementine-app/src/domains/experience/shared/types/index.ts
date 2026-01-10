@@ -7,6 +7,9 @@
 // Experience types
 export * from './experience.types'
 
+// Workspace experience types
+export * from './workspace-experience.types'
+
 // Step types
 export * from './step.types'
 

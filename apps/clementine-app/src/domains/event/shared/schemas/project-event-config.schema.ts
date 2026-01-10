@@ -7,6 +7,7 @@
  * Cross-reference: See project-event-full.schema.ts for complete ProjectEvent schema
  */
 import { z } from 'zod'
+import { eventExperiencesConfigSchema } from './event-experiences-config.schema'
 import { themeSchema } from '@/shared/theming/schemas/theme.schemas'
 import { mediaReferenceSchema } from '@/shared/theming'
 
@@ -136,6 +137,12 @@ export const projectEventConfigSchema = z.looseObject({
    * Welcome screen configuration
    */
   welcome: welcomeConfigSchema.nullable().default(null),
+
+  /**
+   * Experience assignments configuration
+   * Defines which experiences are assigned to main, pregate, and preshare slots
+   */
+  experiences: eventExperiencesConfigSchema.nullable().default(null),
 }) // Allow unknown fields for future evolution
 
 /**

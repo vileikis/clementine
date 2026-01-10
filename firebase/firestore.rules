@@ -28,6 +28,16 @@ service cloud.firestore {
 
       // Deny hard deletes - use server functions for soft delete
       allow delete: if false;
+
+      // Workspace experiences subcollection
+      // Experiences are mutable templates owned by workspaces
+      match /experiences/{experienceId} {
+        // Admins can read, create, and update experiences
+        allow read, create, update: if isAdmin();
+
+        // Deny hard deletes - use soft delete (status='deleted')
+        allow delete: if false;
+      }
     }
 
     // Projects collection rules
@@ -51,6 +61,22 @@ service cloud.firestore {
         allow read: if isAnyUser();
 
         // DELETE: Deny hard deletes (soft delete only via update)
+        allow delete: if false;
+      }
+
+      // Experience releases subcollection
+      // Immutable snapshots of experiences created at event publish time
+      match /experienceReleases/{releaseId} {
+        // Guests can read releases (public)
+        allow read: if true;
+
+        // Only admins can create releases (during event publish)
+        allow create: if isAdmin();
+
+        // No updates allowed - releases are immutable
+        allow update: if false;
+
+        // No deletes allowed
         allow delete: if false;
       }
     }
