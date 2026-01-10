@@ -9,7 +9,7 @@ import { useCallback, useState } from 'react'
 import { useParams } from '@tanstack/react-router'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
-import { ThemeControls, ThemePreview } from '../components'
+import { ThemeConfigPanel, ThemePreview } from '../components'
 import { useUpdateTheme, useUploadAndUpdateBackground } from '../hooks'
 import { DEFAULT_THEME } from '../constants'
 import type { Theme } from '@/shared/theming'
@@ -162,7 +162,7 @@ export function ThemeEditorPage() {
         <div className="sticky top-0 z-10 border-b border-border bg-card px-4 py-3">
           <h2 className="font-semibold">Theme</h2>
         </div>
-        <ThemeControls
+        <ThemeConfigPanel
           theme={previewTheme}
           onUpdate={handleUpdate}
           onUploadBackground={handleUploadBackground}

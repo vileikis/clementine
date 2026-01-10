@@ -34,10 +34,10 @@
 
 **⚠️ CRITICAL**: These tasks affect shared types that multiple stories depend on
 
-- [ ] T001 Update ExperienceProfile enum values from `(freeform, main_default, pregate_default, preshare_default)` to `(freeform, survey, informational)` in `apps/clementine-app/src/domains/experience/shared/schemas/experience.schema.ts`
-- [ ] T002 Add ExperienceSlot enum schema with values `(main, pregate, preshare)` in `apps/clementine-app/src/domains/experience/shared/schemas/experience.schema.ts`
-- [ ] T003 Export ExperienceSlot type from schema barrel file at `apps/clementine-app/src/domains/experience/shared/schemas/index.ts`
-- [ ] T004 Update profileValidators record keys to match new profile values `(freeform, survey, informational)` in `apps/clementine-app/src/domains/experience/shared/types/profile.types.ts`
+- [X] T001 Update ExperienceProfile enum values from `(freeform, main_default, pregate_default, preshare_default)` to `(freeform, survey, informational)` in `apps/clementine-app/src/domains/experience/shared/schemas/experience.schema.ts`
+- [X] T002 Add ExperienceSlot enum schema with values `(main, pregate, preshare)` in `apps/clementine-app/src/domains/experience/shared/schemas/experience.schema.ts`
+- [X] T003 Export ExperienceSlot type from schema barrel file at `apps/clementine-app/src/domains/experience/shared/schemas/index.ts`
+- [X] T004 Update profileValidators record keys to match new profile values `(freeform, survey, informational)` in `apps/clementine-app/src/domains/experience/shared/types/profile.types.ts`
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
@@ -51,12 +51,12 @@
 
 ### Implementation for User Story 1
 
-- [ ] T005 [P] [US1] Create steps subdomain placeholder at `apps/clementine-app/src/domains/experience/steps/index.ts`
-- [ ] T006 [P] [US1] Create runtime subdomain placeholder at `apps/clementine-app/src/domains/experience/runtime/index.ts`
-- [ ] T007 [P] [US1] Create editor subdomain placeholder at `apps/clementine-app/src/domains/experience/editor/index.ts`
-- [ ] T008 [US1] Create validation subdomain with slot compatibility at `apps/clementine-app/src/domains/experience/validation/index.ts`
-- [ ] T009 [US1] Update experience domain barrel export to include all subdomains at `apps/clementine-app/src/domains/experience/index.ts`
-- [ ] T010 [US1] Add import boundary documentation comments to experience domain index
+- [X] T005 [P] [US1] Create steps subdomain placeholder at `apps/clementine-app/src/domains/experience/steps/index.ts`
+- [X] T006 [P] [US1] Create runtime subdomain placeholder at `apps/clementine-app/src/domains/experience/runtime/index.ts`
+- [X] T007 [P] [US1] Create editor subdomain placeholder at `apps/clementine-app/src/domains/experience/editor/index.ts`
+- [X] T008 [US1] Create validation subdomain with slot compatibility at `apps/clementine-app/src/domains/experience/validation/index.ts`
+- [X] T009 [US1] Update experience domain barrel export to include all subdomains at `apps/clementine-app/src/domains/experience/index.ts`
+- [X] T010 [US1] Add import boundary documentation comments to experience domain index
 
 **Checkpoint**: User Story 1 complete - experience domain has all required subdirectories
 
@@ -70,9 +70,9 @@
 
 ### Implementation for User Story 2
 
-- [ ] T011 [US2] Add SLOT_ALLOWED_PROFILES constant mapping in `apps/clementine-app/src/domains/experience/validation/index.ts`
-- [ ] T012 [US2] Add isProfileAllowedInSlot helper function in `apps/clementine-app/src/domains/experience/validation/index.ts`
-- [ ] T013 [US2] Re-export profile validation types from validation index at `apps/clementine-app/src/domains/experience/validation/index.ts`
+- [X] T011 [US2] Add SLOT_ALLOWED_PROFILES constant mapping in `apps/clementine-app/src/domains/experience/validation/index.ts`
+- [X] T012 [US2] Add isProfileAllowedInSlot helper function in `apps/clementine-app/src/domains/experience/validation/index.ts`
+- [X] T013 [US2] Re-export profile validation types from validation index at `apps/clementine-app/src/domains/experience/validation/index.ts`
 
 **Checkpoint**: User Story 2 complete - profile and slot types are fully functional
 
@@ -86,8 +86,8 @@
 
 ### Implementation for User Story 3
 
-- [ ] T014 [US3] Verify activeEventId field exists in project schema at `packages/shared/src/entities/project/project.schema.ts`
-- [ ] T015 [US3] Document activeEventId usage in project types at `apps/clementine-app/src/domains/workspace/projects/types/project.types.ts` (add JSDoc if missing)
+- [X] T014 [US3] Verify activeEventId field exists in project schema at `packages/shared/src/entities/project/project.schema.ts`
+- [X] T015 [US3] Document activeEventId usage in project types at `apps/clementine-app/src/domains/workspace/projects/types/project.types.ts` (add JSDoc if missing)
 
 **Checkpoint**: User Story 3 complete - project schema verified
 
@@ -101,14 +101,14 @@
 
 ### Implementation for User Story 4
 
-- [ ] T016 [P] [US4] Rename WelcomeControls.tsx to WelcomeConfigPanel.tsx at `apps/clementine-app/src/domains/event/welcome/components/`
-- [ ] T017 [P] [US4] Rename ThemeControls.tsx to ThemeConfigPanel.tsx at `apps/clementine-app/src/domains/event/theme/components/`
-- [ ] T018 [US4] Update WelcomeConfigPanel component and interface names in `apps/clementine-app/src/domains/event/welcome/components/WelcomeConfigPanel.tsx`
-- [ ] T019 [US4] Update ThemeConfigPanel component and interface names in `apps/clementine-app/src/domains/event/theme/components/ThemeConfigPanel.tsx`
-- [ ] T020 [US4] Update barrel export for welcome components at `apps/clementine-app/src/domains/event/welcome/components/index.ts`
-- [ ] T021 [US4] Update barrel export for theme components at `apps/clementine-app/src/domains/event/theme/components/index.ts`
-- [ ] T022 [US4] Update WelcomeEditorPage.tsx imports at `apps/clementine-app/src/domains/event/welcome/containers/WelcomeEditorPage.tsx`
-- [ ] T023 [US4] Update ThemeEditorPage.tsx imports at `apps/clementine-app/src/domains/event/theme/containers/ThemeEditorPage.tsx`
+- [X] T016 [P] [US4] Rename WelcomeControls.tsx to WelcomeConfigPanel.tsx at `apps/clementine-app/src/domains/event/welcome/components/`
+- [X] T017 [P] [US4] Rename ThemeControls.tsx to ThemeConfigPanel.tsx at `apps/clementine-app/src/domains/event/theme/components/`
+- [X] T018 [US4] Update WelcomeConfigPanel component and interface names in `apps/clementine-app/src/domains/event/welcome/components/WelcomeConfigPanel.tsx`
+- [X] T019 [US4] Update ThemeConfigPanel component and interface names in `apps/clementine-app/src/domains/event/theme/components/ThemeConfigPanel.tsx`
+- [X] T020 [US4] Update barrel export for welcome components at `apps/clementine-app/src/domains/event/welcome/components/index.ts`
+- [X] T021 [US4] Update barrel export for theme components at `apps/clementine-app/src/domains/event/theme/components/index.ts`
+- [X] T022 [US4] Update WelcomeEditorPage.tsx imports at `apps/clementine-app/src/domains/event/welcome/containers/WelcomeEditorPage.tsx`
+- [X] T023 [US4] Update ThemeEditorPage.tsx imports at `apps/clementine-app/src/domains/event/theme/containers/ThemeEditorPage.tsx`
 
 **Checkpoint**: User Story 4 complete - components renamed with all imports updated
 
@@ -118,11 +118,11 @@
 
 **Purpose**: Final verification and cleanup
 
-- [ ] T024 Run TypeScript type-check with `pnpm type-check` in apps/clementine-app
-- [ ] T025 Run linting and formatting with `pnpm check` in apps/clementine-app
-- [ ] T026 Verify application boots with `pnpm dev` in apps/clementine-app
-- [ ] T027 Verify no circular dependency warnings in build output
-- [ ] T028 Update quickstart.md verification checklist (mark items complete)
+- [X] T024 Run TypeScript type-check with `pnpm type-check` in apps/clementine-app
+- [X] T025 Run linting and formatting with `pnpm check` in apps/clementine-app
+- [X] T026 Verify application boots with `pnpm dev` in apps/clementine-app
+- [X] T027 Verify no circular dependency warnings in build output
+- [X] T028 Update quickstart.md verification checklist (mark items complete)
 
 ---
 

@@ -21,18 +21,26 @@ export const experienceStatusSchema = z.enum(['active', 'deleted'])
 /**
  * Experience Profile enum schema
  *
- * Defines valid experience patterns for validation.
- * - freeform: Any valid step sequence
- * - main_default: Default main experience flow
- * - pregate_default: Pre-gate experience flow
- * - preshare_default: Pre-share experience flow
+ * Categorizes experiences by their allowed step types:
+ * - freeform: info, input, capture, transform, share (all steps)
+ * - survey: info, input, capture, share (no transform)
+ * - informational: info only
  */
 export const experienceProfileSchema = z.enum([
   'freeform',
-  'main_default',
-  'pregate_default',
-  'preshare_default',
+  'survey',
+  'informational',
 ])
+
+/**
+ * Experience Slot enum schema
+ *
+ * Defines where an experience can be assigned in an event:
+ * - main: Primary experiences shown after welcome (array, multiple allowed)
+ * - pregate: Optional experience before welcome (single)
+ * - preshare: Optional experience after main, before share (single)
+ */
+export const experienceSlotSchema = z.enum(['main', 'pregate', 'preshare'])
 
 /**
  * Config version schema
@@ -141,4 +149,5 @@ export type Experience = z.infer<typeof experienceSchema>
 export type ExperienceConfig = z.infer<typeof experienceConfigSchema>
 export type ExperienceStatus = z.infer<typeof experienceStatusSchema>
 export type ExperienceProfile = z.infer<typeof experienceProfileSchema>
+export type ExperienceSlot = z.infer<typeof experienceSlotSchema>
 export type ConfigVersion = z.infer<typeof configVersionSchema>

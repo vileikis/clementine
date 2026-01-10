@@ -323,19 +323,19 @@ pnpm dev
 
 ## Verification Checklist
 
-- [ ] ExperienceProfile enum updated to `freeform | survey | informational`
-- [ ] ExperienceSlot type added
-- [ ] Profile validators updated for new profiles
-- [ ] `steps/` subdirectory created with placeholder
-- [ ] `validation/` subdirectory created with slot compatibility
-- [ ] `runtime/` subdirectory created with placeholder
-- [ ] `editor/` subdirectory created with placeholder
-- [ ] Experience domain barrel export updated
-- [ ] WelcomeControls → WelcomeConfigPanel (file, component, imports)
-- [ ] ThemeControls → ThemeConfigPanel (file, component, imports)
-- [ ] `pnpm type-check` passes
-- [ ] `pnpm check` passes
-- [ ] `pnpm dev` boots successfully
+- [X] ExperienceProfile enum updated to `freeform | survey | informational`
+- [X] ExperienceSlot type added
+- [X] Profile validators updated for new profiles
+- [X] `steps/` subdirectory created with placeholder
+- [X] `validation/` subdirectory created with slot compatibility
+- [X] `runtime/` subdirectory created with placeholder
+- [X] `editor/` subdirectory created with placeholder
+- [X] Experience domain barrel export updated
+- [X] WelcomeControls → WelcomeConfigPanel (file, component, imports)
+- [X] ThemeControls → ThemeConfigPanel (file, component, imports)
+- [X] `pnpm type-check` passes
+- [X] `pnpm check` passes
+- [X] `pnpm dev` boots successfully
 
 ---
 
