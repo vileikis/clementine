@@ -12,13 +12,12 @@ import {
   onSnapshot,
   orderBy,
   query,
-  where
+  where,
 } from 'firebase/firestore'
 import * as Sentry from '@sentry/tanstackstart-react'
 import { workspaceExperienceSchema } from '../schemas'
 import { workspaceExperiencesQuery } from '../queries/workspace-experiences.query'
-import type {
-  FirestoreError} from 'firebase/firestore';
+import type { FirestoreError } from 'firebase/firestore'
 import type { WorkspaceExperience } from '../schemas'
 import { firestore } from '@/integrations/firebase/client'
 import { convertFirestoreDoc } from '@/shared/utils/firestore-utils'
@@ -75,6 +74,7 @@ export function useWorkspaceExperiences(workspaceId: string) {
         )
       },
       (error: FirestoreError) => {
+        // Log error but preserve existing cached data
         Sentry.captureException(error, {
           tags: {
             domain: 'experience',
@@ -84,12 +84,6 @@ export function useWorkspaceExperiences(workspaceId: string) {
             workspaceId,
           },
         })
-
-        // Set to empty array to indicate data is unavailable
-        queryClient.setQueryData<WorkspaceExperience[]>(
-          ['workspaceExperiences', workspaceId],
-          [],
-        )
       },
     )
 
