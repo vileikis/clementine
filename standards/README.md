@@ -184,12 +184,6 @@ These standards are living documents. As the project grows and we learn, standar
 - `global/zod-validation.md` - Input validation
 - `testing/testing.md` - Add Vitest for testing
 
-### Next.js App (`web/`)
-
-**Legacy application** - being deprecated, do not add new features.
-
-See `web/standards/` for legacy-specific standards.
-
 ## Frequently Asked Questions
 
 ### Why separate Firestore and Firestore Security?

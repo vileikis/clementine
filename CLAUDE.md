@@ -23,8 +23,7 @@ This is a **pnpm workspace monorepo** containing multiple applications and packa
 ```
 clementine/
 ├── apps/
-│   └── clementine-app/       # TanStack Start application (NEW - Future production)
-├── web/                       # Next.js 16 application (Legacy - being replaced)
+│   └── clementine-app/       # TanStack Start application (Production)
 ├── functions/                 # Firebase Cloud Functions (AI processing, webhooks)
 ├── scripts/                   # Monorepo utility scripts
 └── packages/                  # Shared packages (if any)
@@ -32,34 +31,24 @@ clementine/
 
 ### Application Status
 
-**🚀 `apps/clementine-app/` - TanStack Start (Active Development)**
+**🚀 `apps/clementine-app/` - TanStack Start (Production)**
 
 - Modern full-stack React application built with TanStack Start
-- Complete rewrite of the platform with improved architecture
-- **This is the future** - will become the main production app
+- Production application deployed via Firebase App Hosting
 - See `apps/clementine-app/CLAUDE.md` for app-specific guidance
-
-**⚠️ `web/` - Next.js 16 (Legacy)**
-
-- Current production application
-- Being gradually replaced by TanStack Start app
-- **Will be deprecated** once migration is complete
-- See `web/CLAUDE.md` for app-specific guidance
 
 **⚙️ `functions/` - Firebase Cloud Functions**
 
 - Backend services for AI image/video processing
 - Webhook handlers for n8n workflow integration
 - Media processing pipeline (FFmpeg)
-- Shared by both web applications
 
 ## Technology Stack
 
-### Frontend Applications
+### Frontend Application
 
-- **TanStack Start** (new app) - Full-stack React framework
-- **Next.js 16** (legacy app) - React framework with App Router
-- **React 19** - Both apps use latest React
+- **TanStack Start** - Full-stack React framework
+- **React 19** - Latest React
 - **TypeScript 5.x** - Strict mode enabled
 - **Tailwind CSS v4** - Utility-first CSS
 
@@ -82,14 +71,14 @@ clementine/
 Run these commands from the **monorepo root**:
 
 ```bash
-# Development (runs legacy Next.js app by default)
-pnpm dev              # Start Next.js dev server (port 3000)
+# Development
+pnpm dev              # Start TanStack Start dev server
 
-# Building & Running (legacy Next.js app)
-pnpm build            # Build Next.js production app
-pnpm start            # Start Next.js production server
+# Building & Running
+pnpm build            # Build production app
+pnpm start            # Start production server
 
-# Code Quality (legacy Next.js app)
+# Code Quality
 pnpm lint             # Run ESLint
 pnpm type-check       # TypeScript type checking
 pnpm test             # Run tests
@@ -105,11 +94,9 @@ pnpm fb:deploy:rules  # Deploy Firestore/Storage rules only
 pnpm fb:deploy:indexes # Deploy Firestore indexes only
 ```
 
-**Note**: Global commands currently target the legacy Next.js app (`web/`) for backwards compatibility.
-
 ## Working with Specific Apps
 
-### TanStack Start App (New)
+### TanStack Start App
 
 ```bash
 cd apps/clementine-app
@@ -119,17 +106,6 @@ pnpm test             # Run tests
 ```
 
 See `apps/clementine-app/CLAUDE.md` for complete guidance.
-
-### Next.js App (Legacy)
-
-```bash
-cd web
-pnpm dev              # Start Next.js dev server
-pnpm build            # Build production app
-pnpm test             # Run tests
-```
-
-See `web/CLAUDE.md` for complete guidance.
 
 ### Firebase Functions
 
@@ -145,20 +121,13 @@ See `functions/README.md` for function-specific documentation.
 
 ### Choosing Where to Work
 
-**For new features or major changes:**
+**For frontend features:**
 
 - ✅ Build in `apps/clementine-app/` (TanStack Start app)
-- This is the future of the platform
-
-**For bug fixes or maintenance:**
-
-- ⚠️ Fix in `web/` (Next.js app) if it affects current production
-- Consider if the fix should also be implemented in the new app
 
 **For backend/API work:**
 
 - ⚙️ Work in `functions/` (Firebase Cloud Functions)
-- Backend is shared by both applications
 
 ### Installing Dependencies
 
@@ -201,37 +170,21 @@ npm install -g pnpm@10.18.1
 
 ## Workspace-Specific Documentation
 
-Each workspace has its own `CLAUDE.md` file with detailed guidance:
+Each workspace has its own documentation:
 
 - **TanStack Start App**: `apps/clementine-app/CLAUDE.md`
-- **Next.js App**: `web/CLAUDE.md`
 - **Cloud Functions**: `functions/README.md`
 
 These files are automatically discovered by Claude Code based on your working context.
 
 ## Standards & Guidelines
 
-Standards are maintained at the workspace level:
+Standards are maintained at the monorepo level in `standards/`:
 
-- **TanStack Start App**: `apps/clementine-app/standards/`
-- **Next.js App**: `web/standards/`
-
-Each app has its own standards to avoid confusion between different tech stacks and architectural patterns.
-
-## Migration Strategy
-
-We are gradually migrating from the Next.js app to the TanStack Start app:
-
-1. **Phase 1 (Current)**: Build TanStack Start app with core features
-2. **Phase 2**: Achieve feature parity with Next.js app
-3. **Phase 3**: Switch production traffic to TanStack Start app
-4. **Phase 4**: Deprecate and archive Next.js app
-
-During migration:
-
-- Both apps share the same Firebase backend (`functions/`)
-- Both apps use the same Firestore data model
-- Backend APIs remain compatible with both frontends
+- `standards/frontend/` - Frontend architecture, components, state management
+- `standards/backend/` - Firebase functions, Firestore patterns
+- `standards/global/` - Code quality, security, authentication
+- `standards/testing/` - Testing patterns
 
 ## Firebase Configuration
 
@@ -258,7 +211,6 @@ pnpm fb:deploy:indexes    # Indexes only
 Each workspace manages its own environment variables:
 
 - **TanStack Start App**: `apps/clementine-app/.env`
-- **Next.js App**: `web/.env.local`
 - **Cloud Functions**: `functions/.env`
 
 See individual workspace documentation for required environment variables.
@@ -301,12 +253,11 @@ See individual workspace documentation for required environment variables.
 - **pnpm Docs**: https://pnpm.io
 - **pnpm Workspaces**: https://pnpm.io/workspaces
 - **TanStack Start**: https://tanstack.com/start
-- **Next.js**: https://nextjs.org
 - **Firebase**: https://firebase.google.com/docs
 
 ---
 
-**Remember**: This is a monorepo overview. For app-specific guidance, refer to the CLAUDE.md file in each workspace directory.
+**Remember**: This is a monorepo overview. For app-specific guidance, refer to `apps/clementine-app/CLAUDE.md`.
 
 ## Current Tech Stack
 
