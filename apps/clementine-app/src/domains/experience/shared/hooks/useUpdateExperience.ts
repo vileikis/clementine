@@ -10,12 +10,7 @@
  * - updatedAt is automatically set
  */
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import {
-  doc,
-  getDoc,
-  runTransaction,
-  serverTimestamp,
-} from 'firebase/firestore'
+import { doc, runTransaction, serverTimestamp } from 'firebase/firestore'
 import * as Sentry from '@sentry/tanstackstart-react'
 import { z } from 'zod'
 import type { UpdateExperienceInput } from '../types/workspace-experience.types'
@@ -103,17 +98,15 @@ export function useUpdateExperience() {
 
       // Use transaction to ensure atomic read-then-write
       await runTransaction(firestore, async (transaction) => {
-        // Read current state
-        const experienceSnapshot = await getDoc(experienceRef)
+        // Read current state using transaction.get for consistency
+        const experienceSnapshot = await transaction.get(experienceRef)
 
         if (!experienceSnapshot.exists()) {
           throw new Error(`Experience not found: ${validated.experienceId}`)
         }
 
-        const currentData = experienceSnapshot.data()
-
         // Reject updates on deleted experiences
-        if (currentData.status === 'deleted') {
+        if (experienceSnapshot.data().status === 'deleted') {
           throw new UpdateDeletedExperienceError(validated.experienceId)
         }
 

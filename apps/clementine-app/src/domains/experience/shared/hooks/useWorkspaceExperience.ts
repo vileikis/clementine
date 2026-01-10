@@ -8,8 +8,10 @@
 import { useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { doc, onSnapshot } from 'firebase/firestore'
+import * as Sentry from '@sentry/tanstackstart-react'
 import { workspaceExperienceSchema } from '../schemas'
 import { workspaceExperienceQuery } from '../queries/workspace-experience.query'
+import type { FirestoreError } from 'firebase/firestore';
 import type { WorkspaceExperience } from '../schemas'
 import { firestore } from '@/integrations/firebase/client'
 import { convertFirestoreDoc } from '@/shared/utils/firestore-utils'
@@ -54,25 +56,46 @@ export function useWorkspaceExperience(
       experienceId,
     )
 
-    const unsubscribe = onSnapshot(experienceRef, (snapshot) => {
-      if (!snapshot.exists()) {
+    const unsubscribe = onSnapshot(
+      experienceRef,
+      (snapshot) => {
+        if (!snapshot.exists()) {
+          queryClient.setQueryData<WorkspaceExperience | null>(
+            ['workspaceExperience', workspaceId, experienceId],
+            null,
+          )
+          return
+        }
+
+        const experience = convertFirestoreDoc(
+          snapshot,
+          workspaceExperienceSchema,
+        )
+
+        queryClient.setQueryData<WorkspaceExperience>(
+          ['workspaceExperience', workspaceId, experienceId],
+          experience,
+        )
+      },
+      (error: FirestoreError) => {
+        Sentry.captureException(error, {
+          tags: {
+            domain: 'experience',
+            action: 'experience-snapshot-listener',
+          },
+          extra: {
+            workspaceId,
+            experienceId,
+          },
+        })
+
+        // Set to null to indicate data is unavailable
         queryClient.setQueryData<WorkspaceExperience | null>(
           ['workspaceExperience', workspaceId, experienceId],
           null,
         )
-        return
-      }
-
-      const experience = convertFirestoreDoc(
-        snapshot,
-        workspaceExperienceSchema,
-      )
-
-      queryClient.setQueryData<WorkspaceExperience>(
-        ['workspaceExperience', workspaceId, experienceId],
-        experience,
-      )
-    })
+      },
+    )
 
     return () => {
       unsubscribe()

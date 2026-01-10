@@ -12,10 +12,13 @@ import {
   onSnapshot,
   orderBy,
   query,
-  where,
+  where
 } from 'firebase/firestore'
+import * as Sentry from '@sentry/tanstackstart-react'
 import { workspaceExperienceSchema } from '../schemas'
 import { workspaceExperiencesQuery } from '../queries/workspace-experiences.query'
+import type {
+  FirestoreError} from 'firebase/firestore';
 import type { WorkspaceExperience } from '../schemas'
 import { firestore } from '@/integrations/firebase/client'
 import { convertFirestoreDoc } from '@/shared/utils/firestore-utils'
@@ -59,16 +62,36 @@ export function useWorkspaceExperiences(workspaceId: string) {
       orderBy('updatedAt', 'desc'),
     )
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const experiences = snapshot.docs.map((doc) =>
-        convertFirestoreDoc(doc, workspaceExperienceSchema),
-      )
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const experiences = snapshot.docs.map((doc) =>
+          convertFirestoreDoc(doc, workspaceExperienceSchema),
+        )
 
-      queryClient.setQueryData<WorkspaceExperience[]>(
-        ['workspaceExperiences', workspaceId],
-        experiences,
-      )
-    })
+        queryClient.setQueryData<WorkspaceExperience[]>(
+          ['workspaceExperiences', workspaceId],
+          experiences,
+        )
+      },
+      (error: FirestoreError) => {
+        Sentry.captureException(error, {
+          tags: {
+            domain: 'experience',
+            action: 'experiences-snapshot-listener',
+          },
+          extra: {
+            workspaceId,
+          },
+        })
+
+        // Set to empty array to indicate data is unavailable
+        queryClient.setQueryData<WorkspaceExperience[]>(
+          ['workspaceExperiences', workspaceId],
+          [],
+        )
+      },
+    )
 
     return () => {
       unsubscribe()

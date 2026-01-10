@@ -13,9 +13,6 @@ import type { ExperienceProfile, ExperienceSlot } from '../shared/schemas'
 
 /**
  * Allowed profiles per slot type
- *
- * This mapping is also defined in slot-validation.ts but duplicated
- * here for the slot-compatibility module's independent API.
  */
 export const SLOT_ALLOWED_PROFILES: Record<
   ExperienceSlot,

@@ -5,13 +5,7 @@
  * Publicly exported via the main experience barrel.
  */
 
-// Slot validation (legacy)
-export {
-  SLOT_ALLOWED_PROFILES as SLOT_ALLOWED_PROFILES_LEGACY,
-  isProfileAllowedInSlot,
-} from './slot-validation'
-
-// Profile validation (from shared - legacy)
+// Profile validation (from shared)
 export {
   validateExperienceProfile,
   profileValidators,
@@ -19,7 +13,7 @@ export {
   type ProfileValidationResult,
 } from '../shared'
 
-// Profile rules (new implementation)
+// Profile rules
 export {
   STEP_TYPE_CATEGORIES,
   PROFILE_ALLOWED_STEP_CATEGORIES,
@@ -31,7 +25,7 @@ export {
   type ProfileValidationResult as StepValidationResult,
 } from './profile-rules'
 
-// Slot compatibility (new implementation)
+// Slot compatibility
 export {
   SLOT_ALLOWED_PROFILES,
   isProfileCompatibleWithSlot,

@@ -11,12 +11,7 @@
  * - Idempotent: deleting already-deleted experience is a no-op
  */
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import {
-  doc,
-  getDoc,
-  runTransaction,
-  serverTimestamp,
-} from 'firebase/firestore'
+import { doc, runTransaction, serverTimestamp } from 'firebase/firestore'
 import * as Sentry from '@sentry/tanstackstart-react'
 import { z } from 'zod'
 import type { DeleteExperienceInput } from '../types/workspace-experience.types'
@@ -70,17 +65,14 @@ export function useDeleteExperience() {
 
       // Use transaction for atomic read-then-write
       await runTransaction(firestore, async (transaction) => {
-        // Read current state
-        const experienceSnapshot = await getDoc(experienceRef)
+        // Read current state using transaction.get for consistency
+        const experienceSnapshot = await transaction.get(experienceRef)
 
-        if (!experienceSnapshot.exists()) {
-          throw new Error(`Experience not found: ${validated.experienceId}`)
-        }
-
-        const currentData = experienceSnapshot.data()
-
-        // Idempotent: already deleted is a no-op
-        if (currentData.status === 'deleted') {
+        // Idempotent: non-existent or already deleted is a no-op
+        if (
+          !experienceSnapshot.exists() ||
+          experienceSnapshot.data().status === 'deleted'
+        ) {
           return
         }
 
