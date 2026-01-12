@@ -1,25 +1,31 @@
 import { Link } from '@tanstack/react-router'
+import { useSidebarState } from '../../hooks'
 import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/shared/utils'
 
 interface NavigationLinkProps {
   label: string
-  href: string
+  to: string
+  params?: Record<string, string>
   icon?: LucideIcon
   isCollapsed: boolean
 }
 
 export function NavigationLink({
   label,
-  href,
+  to,
+  params,
   icon,
   isCollapsed,
 }: NavigationLinkProps) {
+  const { closeMobile } = useSidebarState()
   const Icon = icon
 
   return (
     <Link
-      to={href}
+      to={to}
+      params={params}
+      onClick={closeMobile}
       className={cn(
         'group flex transition-all',
         isCollapsed

@@ -5,10 +5,8 @@ export interface Workspace {
   name: string
 }
 
-export type RouteArea = 'admin' | 'workspace' | 'guest'
-
 export interface NavItem {
   label: string
-  href: string
+  to: string
   icon?: LucideIcon
 }

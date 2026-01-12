@@ -23,10 +23,10 @@ All paths are relative to `apps/clementine-app/src/`.
 
 **Purpose**: Create folder structure for new navigation organization
 
-- [ ] T001 [P] Create shell folder: `domains/navigation/components/shell/`
-- [ ] T002 [P] Create admin folder: `domains/navigation/components/admin/`
-- [ ] T003 [P] Create workspace folder: `domains/navigation/components/workspace/`
-- [ ] T004 [P] Create shared folder: `domains/navigation/components/shared/`
+- [X] T001 [P] Create shell folder: `domains/navigation/components/shell/`
+- [X] T002 [P] Create admin folder: `domains/navigation/components/admin/`
+- [X] T003 [P] Create workspace folder: `domains/navigation/components/workspace/`
+- [X] T004 [P] Create shared folder: `domains/navigation/components/shared/`
 
 **Checkpoint**: Folder structure ready for component migration
 
@@ -38,10 +38,10 @@ All paths are relative to `apps/clementine-app/src/`.
 
 **⚠️ CRITICAL**: Shared components must be complete before area-specific sidebars can be created
 
-- [ ] T005 Update NavItem type: rename `href` to `to` in `domains/navigation/types/navigation.types.ts`
-- [ ] T006 Move and update NavigationLink: copy from `domains/navigation/components/NavigationLink.tsx` to `domains/navigation/components/shared/NavigationLink.tsx`, add `params` prop and `closeMobile` on click
-- [ ] T007 [P] Create LogoutButton component: extract from Sidebar into `domains/navigation/components/shared/LogoutButton.tsx`
-- [ ] T008 Create shared barrel export: `domains/navigation/components/shared/index.ts`
+- [X] T005 Update NavItem type: rename `href` to `to` in `domains/navigation/types/navigation.types.ts`
+- [X] T006 Move and update NavigationLink: copy from `domains/navigation/components/NavigationLink.tsx` to `domains/navigation/components/shared/NavigationLink.tsx`, add `params` prop and `closeMobile` on click
+- [X] T007 [P] Create LogoutButton component: extract from Sidebar into `domains/navigation/components/shared/LogoutButton.tsx`
+- [X] T008 Create shared barrel export: `domains/navigation/components/shared/index.ts`
 
 **Checkpoint**: Shared components ready - area sidebars can now be created
 
@@ -55,8 +55,8 @@ All paths are relative to `apps/clementine-app/src/`.
 
 ### Implementation for MS1
 
-- [ ] T009 [MS1] Create AppSidebarShell component in `domains/navigation/components/shell/AppSidebarShell.tsx` (extract from Sidebar.tsx, preserve SIDEBAR_WIDTH and SIDEBAR_ANIMATION_DURATION constants)
-- [ ] T010 [MS1] Create shell barrel export: `domains/navigation/components/shell/index.ts`
+- [X] T009 [MS1] Create AppSidebarShell component in `domains/navigation/components/shell/AppSidebarShell.tsx` (extract from Sidebar.tsx, preserve SIDEBAR_WIDTH and SIDEBAR_ANIMATION_DURATION constants)
+- [X] T010 [MS1] Create shell barrel export: `domains/navigation/components/shell/index.ts`
 
 **Checkpoint**: Shell component exists and can be composed by area sidebars
 
@@ -70,9 +70,9 @@ All paths are relative to `apps/clementine-app/src/`.
 
 ### Implementation for MS2
 
-- [ ] T011 [P] [MS2] Create adminNavItems config: `domains/navigation/components/admin/adminNavItems.ts` (use `to` instead of `href`)
-- [ ] T012 [MS2] Create AdminSidebar component: `domains/navigation/components/admin/AdminSidebar.tsx` (compose AppSidebarShell with NavigationLink and LogoutButton)
-- [ ] T013 [MS2] Create admin barrel export: `domains/navigation/components/admin/index.ts`
+- [X] T011 [P] [MS2] Create adminNavItems config: `domains/navigation/components/admin/adminNavItems.ts` (use `to` instead of `href`)
+- [X] T012 [MS2] Create AdminSidebar component: `domains/navigation/components/admin/AdminSidebar.tsx` (compose AppSidebarShell with NavigationLink and LogoutButton)
+- [X] T013 [MS2] Create admin barrel export: `domains/navigation/components/admin/index.ts`
 
 **Checkpoint**: AdminSidebar is self-contained and ready for route integration
 
@@ -86,10 +86,10 @@ All paths are relative to `apps/clementine-app/src/`.
 
 ### Implementation for MS3
 
-- [ ] T014 [P] [MS3] Create workspaceNavItems config: `domains/navigation/components/workspace/workspaceNavItems.ts` (use `to` with `$workspaceSlug` placeholder)
-- [ ] T015 [MS3] Move WorkspaceSelector: copy `domains/navigation/components/WorkspaceSelector.tsx` to `domains/navigation/components/workspace/WorkspaceSelector.tsx`
-- [ ] T016 [MS3] Create WorkspaceSidebar component: `domains/navigation/components/workspace/WorkspaceSidebar.tsx` (compose AppSidebarShell, pass params to NavigationLink)
-- [ ] T017 [MS3] Create workspace barrel export: `domains/navigation/components/workspace/index.ts`
+- [X] T014 [P] [MS3] Create workspaceNavItems config: `domains/navigation/components/workspace/workspaceNavItems.ts` (use `to` with `$workspaceSlug` placeholder)
+- [X] T015 [MS3] Move WorkspaceSelector: copy `domains/navigation/components/WorkspaceSelector.tsx` to `domains/navigation/components/workspace/WorkspaceSelector.tsx`
+- [X] T016 [MS3] Create WorkspaceSidebar component: `domains/navigation/components/workspace/WorkspaceSidebar.tsx` (compose AppSidebarShell, pass params to NavigationLink)
+- [X] T017 [MS3] Create workspace barrel export: `domains/navigation/components/workspace/index.ts`
 
 **Checkpoint**: WorkspaceSidebar is self-contained and ready for route integration
 
@@ -103,10 +103,10 @@ All paths are relative to `apps/clementine-app/src/`.
 
 ### Implementation for MS4
 
-- [ ] T018 [P] [MS4] Update admin route: change `app/admin/route.tsx` to import and use `AdminSidebar` instead of `<Sidebar area="admin" />`
-- [ ] T019 [P] [MS4] Update workspace route: change `app/workspace/route.tsx` to import and use `WorkspaceSidebar` with `workspaceSlug` prop
-- [ ] T020 [MS4] Update components barrel export: `domains/navigation/components/index.ts` to export from shell/, admin/, workspace/, shared/ subfolders
-- [ ] T021 [MS4] Update domain barrel export: `domains/navigation/index.ts` to export new components (AdminSidebar, WorkspaceSidebar, AppSidebarShell, LogoutButton)
+- [X] T018 [P] [MS4] Update admin route: change `app/admin/route.tsx` to import and use `AdminSidebar` instead of `<Sidebar area="admin" />`
+- [X] T019 [P] [MS4] Update workspace route: change `app/workspace/route.tsx` to import and use `WorkspaceSidebar` with `workspaceSlug` prop
+- [X] T020 [MS4] Update components barrel export: `domains/navigation/components/index.ts` to export from shell/, admin/, workspace/, shared/ subfolders
+- [X] T021 [MS4] Update domain barrel export: `domains/navigation/index.ts` to export new components (AdminSidebar, WorkspaceSidebar, AppSidebarShell, LogoutButton)
 
 **Checkpoint**: Application works with new sidebar components; old Sidebar is no longer used
 
@@ -120,12 +120,12 @@ All paths are relative to `apps/clementine-app/src/`.
 
 ### Implementation for MS5
 
-- [ ] T022 [P] [MS5] Delete old Sidebar component: `domains/navigation/components/Sidebar.tsx`
-- [ ] T023 [P] [MS5] Delete old AdminNav component: `domains/navigation/components/AdminNav.tsx`
-- [ ] T024 [P] [MS5] Delete old WorkspaceNav component: `domains/navigation/components/WorkspaceNav.tsx`
-- [ ] T025 [P] [MS5] Delete old NavigationLink from root: `domains/navigation/components/NavigationLink.tsx` (now in shared/)
-- [ ] T026 [P] [MS5] Delete old WorkspaceSelector from root: `domains/navigation/components/WorkspaceSelector.tsx` (now in workspace/)
-- [ ] T027 [MS5] Remove RouteArea type from exports if no longer needed: check `domains/navigation/types/navigation.types.ts`
+- [X] T022 [P] [MS5] Delete old Sidebar component: `domains/navigation/components/Sidebar.tsx`
+- [X] T023 [P] [MS5] Delete old AdminNav component: `domains/navigation/components/AdminNav.tsx`
+- [X] T024 [P] [MS5] Delete old WorkspaceNav component: `domains/navigation/components/WorkspaceNav.tsx`
+- [X] T025 [P] [MS5] Delete old NavigationLink from root: `domains/navigation/components/NavigationLink.tsx` (now in shared/)
+- [X] T026 [P] [MS5] Delete old WorkspaceSelector from root: `domains/navigation/components/WorkspaceSelector.tsx` (now in workspace/)
+- [X] T027 [MS5] Remove RouteArea type from exports if no longer needed: check `domains/navigation/types/navigation.types.ts`
 
 **Checkpoint**: All deprecated files removed; codebase is clean
 
@@ -135,8 +135,8 @@ All paths are relative to `apps/clementine-app/src/`.
 
 **Purpose**: Final verification and validation gates
 
-- [ ] T028 Run type-check: `pnpm type-check` from `apps/clementine-app/`
-- [ ] T029 Run lint and format: `pnpm check` from `apps/clementine-app/`
+- [X] T028 Run type-check: `pnpm type-check` from `apps/clementine-app/`
+- [X] T029 Run lint and format: `pnpm check` from `apps/clementine-app/`
 - [ ] T030 Manual verification: Desktop sidebar collapse/expand works correctly
 - [ ] T031 Manual verification: Mobile sheet opens/closes correctly
 - [ ] T032 Manual verification: Mobile sheet closes on navigation

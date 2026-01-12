@@ -1,5 +1,5 @@
 import { useNavigate } from '@tanstack/react-router'
-import { getWorkspaceInitials } from '../lib'
+import { getWorkspaceInitials } from '../../lib'
 import { useWorkspace } from '@/domains/workspace'
 import { cn } from '@/shared/utils'
 

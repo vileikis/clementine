@@ -1,5 +1,5 @@
 import { Outlet, createFileRoute } from '@tanstack/react-router'
-import { Sidebar } from '@/domains/navigation'
+import { AdminSidebar } from '@/domains/navigation'
 import { requireAdmin } from '@/domains/auth/guards'
 
 // T022: Implement admin route guard (beforeLoad) checking isAdmin
@@ -15,7 +15,7 @@ export const Route = createFileRoute('/admin')({
 function AdminLayout() {
   return (
     <div className="flex min-h-screen bg-background">
-      <Sidebar area="admin" />
+      <AdminSidebar />
       <main className="flex-1">
         <Outlet />
       </main>

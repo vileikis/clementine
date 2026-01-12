@@ -1,9 +1,6 @@
-import { LogOut, Menu } from 'lucide-react'
-import { useParams } from '@tanstack/react-router'
-import { useSidebarState } from '../hooks'
-import { AdminNav } from './AdminNav'
-import { WorkspaceNav } from './WorkspaceNav'
-import type { RouteArea } from '../types'
+import { Menu } from 'lucide-react'
+import { useSidebarState } from '../../hooks'
+import type { ReactNode } from 'react'
 import { cn } from '@/shared/utils'
 import { Button } from '@/ui-kit/ui/button'
 import {
@@ -13,7 +10,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/ui-kit/ui/sheet'
-import { useAuth } from '@/domains/auth'
 
 const SIDEBAR_WIDTH = {
   expanded: 256, // 16rem / w-64
@@ -21,15 +17,11 @@ const SIDEBAR_WIDTH = {
 }
 const SIDEBAR_ANIMATION_DURATION = 200 // ms
 
-interface SidebarProps {
-  area: RouteArea
+interface AppSidebarShellProps {
+  children: ReactNode
 }
 
-export function Sidebar({ area }: SidebarProps) {
-  // Get workspaceSlug from route params if in workspace area
-  const params = useParams({ strict: false })
-  const workspaceSlug =
-    'workspaceSlug' in params ? params.workspaceSlug : undefined
+export function AppSidebarShell({ children }: AppSidebarShellProps) {
   const {
     isCollapsed,
     isMobileOpen,
@@ -37,10 +29,6 @@ export function Sidebar({ area }: SidebarProps) {
     toggleMobileOpen,
     closeMobile,
   } = useSidebarState()
-
-  if (area === 'guest') {
-    return null
-  }
 
   return (
     <>
@@ -79,12 +67,7 @@ export function Sidebar({ area }: SidebarProps) {
               </Button>
             </div>
 
-            <SidebarContent
-              area={area}
-              workspaceSlug={workspaceSlug}
-              isCollapsed={false}
-              onNavigate={closeMobile}
-            />
+            {children}
           </SheetContent>
         </Sheet>
       </div>
@@ -113,58 +96,8 @@ export function Sidebar({ area }: SidebarProps) {
           </Button>
         </div>
 
-        <SidebarContent
-          area={area}
-          workspaceSlug={workspaceSlug}
-          isCollapsed={isCollapsed}
-        />
+        {children}
       </aside>
     </>
-  )
-}
-
-interface SidebarContentProps {
-  area: RouteArea
-  workspaceSlug?: string
-  isCollapsed: boolean
-  onNavigate?: () => void
-}
-
-function SidebarContent({
-  area,
-  workspaceSlug,
-  isCollapsed,
-}: SidebarContentProps) {
-  const { logout } = useAuth()
-
-  return (
-    <div className="flex flex-col h-full">
-      {/* Navigation content */}
-      <div className="flex-1 px-2">
-        {area === 'admin' && <AdminNav isCollapsed={isCollapsed} />}
-        {area === 'workspace' && workspaceSlug && (
-          <WorkspaceNav
-            workspaceSlug={workspaceSlug}
-            isCollapsed={isCollapsed}
-          />
-        )}
-      </div>
-
-      {/* Logout button */}
-      <div className="px-2 py-3">
-        <Button
-          variant="ghost"
-          className={cn(
-            'w-full justify-start gap-3',
-            isCollapsed && 'justify-center',
-          )}
-          onClick={logout}
-          title={isCollapsed ? 'Logout' : undefined}
-        >
-          <LogOut className="h-5 w-5 shrink-0" />
-          {!isCollapsed && <span>Logout</span>}
-        </Button>
-      </div>
-    </div>
   )
 }

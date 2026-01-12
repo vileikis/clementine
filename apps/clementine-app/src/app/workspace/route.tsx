@@ -1,5 +1,5 @@
-import { Outlet, createFileRoute } from '@tanstack/react-router'
-import { Sidebar } from '@/domains/navigation'
+import { Outlet, createFileRoute, useParams } from '@tanstack/react-router'
+import { WorkspaceSidebar } from '@/domains/navigation'
 import { requireAdmin } from '@/domains/auth/guards'
 
 // T025: Implement workspace route guard (beforeLoad) checking isAdmin
@@ -13,9 +13,22 @@ export const Route = createFileRoute('/workspace')({
 })
 
 function WorkspaceLayout() {
+  const params = useParams({ strict: false })
+  const workspaceSlug =
+    'workspaceSlug' in params ? params.workspaceSlug : undefined
+
+  // Show nothing if no workspace slug (shouldn't happen in normal flow)
+  if (!workspaceSlug) {
+    return (
+      <main className="flex-1 min-h-screen bg-background">
+        <Outlet />
+      </main>
+    )
+  }
+
   return (
     <div className="flex min-h-screen bg-background">
-      <Sidebar area="workspace" />
+      <WorkspaceSidebar workspaceSlug={workspaceSlug} />
       <main className="flex-1">
         <Outlet />
       </main>

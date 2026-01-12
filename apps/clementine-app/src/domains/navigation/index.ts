@@ -1,7 +1,29 @@
 // Navigation domain barrel export
-export * from './components'
-export * from './hooks'
+
+// Components
+export {
+  AppSidebarShell,
+  AdminSidebar,
+  WorkspaceSidebar,
+  WorkspaceSelector,
+  NavigationLink,
+  LogoutButton,
+  TopNavBar,
+  TopNavActions,
+} from './components'
+export type { BreadcrumbItem, TopNavBarProps, ActionButton } from './components'
+
+// Hooks
+export { useSidebarState } from './hooks'
+
+// Store
 export * from './store'
-export * from './types'
+
+// Types
+export type { NavItem, Workspace } from './types'
+
+// Constants
 export * from './constants'
+
+// Lib
 export * from './lib'
