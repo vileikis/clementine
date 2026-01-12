@@ -8,7 +8,7 @@ This guide covers implementing the bottom-up composition pattern for the app nav
 
 ## Prerequisites
 
-- Working development environment: `pnpm dev` runs successfully
+- Working development environment: `pnpm app:dev` runs successfully (from root), or `pnpm dev` from `apps/clementine-app/`
 - Familiarity with navigation domain: `src/domains/navigation/`
 - Understanding of TanStack Router Link component
 
@@ -529,10 +529,10 @@ export type { NavItem, RouteArea, Workspace } from './types'
 
 ## Validation Checklist
 
-After implementation, verify:
+After implementation, verify (run from `apps/clementine-app/`, or use `pnpm app:*` from root):
 
-- [ ] `pnpm type-check` passes
-- [ ] `pnpm lint` passes (or `pnpm check` to auto-fix)
+- [ ] `pnpm type-check` passes (or `pnpm app:type-check` from root)
+- [ ] `pnpm lint` passes (or `pnpm check` / `pnpm app:check` to auto-fix)
 - [ ] Desktop sidebar collapses/expands correctly
 - [ ] Mobile sheet opens/closes correctly
 - [ ] Mobile sheet closes on navigation

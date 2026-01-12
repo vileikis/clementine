@@ -116,7 +116,7 @@ All paths are relative to `apps/clementine-app/src/`.
 
 **Goal**: Remove deprecated files and verify clean state
 
-**Independent Test**: `pnpm type-check` and `pnpm lint` pass; no dead code
+**Independent Test**: `pnpm type-check` and `pnpm lint` pass (from `apps/clementine-app/`, or `pnpm app:type-check` / `pnpm app:lint` from root); no dead code
 
 ### Implementation for MS5
 
@@ -135,8 +135,10 @@ All paths are relative to `apps/clementine-app/src/`.
 
 **Purpose**: Final verification and validation gates
 
-- [X] T028 Run type-check: `pnpm type-check` from `apps/clementine-app/`
-- [X] T029 Run lint and format: `pnpm check` from `apps/clementine-app/`
+> **Note:** Commands can be run from `apps/clementine-app/` directly, or from the monorepo root using the `app:*` prefix (e.g., `pnpm app:type-check`).
+
+- [X] T028 Run type-check: `pnpm type-check` from `apps/clementine-app/` (or `pnpm app:type-check` from root)
+- [X] T029 Run lint and format: `pnpm check` from `apps/clementine-app/` (or `pnpm app:check` from root)
 - [ ] T030 Manual verification: Desktop sidebar collapse/expand works correctly
 - [ ] T031 Manual verification: Mobile sheet opens/closes correctly
 - [ ] T032 Manual verification: Mobile sheet closes on navigation

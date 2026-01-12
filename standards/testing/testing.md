@@ -102,7 +102,10 @@ See [React docs on act()](https://react.dev/link/wrap-tests-with-act) for more d
 **Already configured** in `apps/clementine-app/`
 
 ```bash
-cd apps/clementine-app
+# From monorepo root:
+pnpm app:test       # Run all tests
+
+# Or from apps/clementine-app/:
 pnpm test           # Run all tests
 pnpm test --watch   # Watch mode
 pnpm test --ui      # Visual UI mode
@@ -414,7 +417,7 @@ Test: minimal data, very long inputs, null values, missing handlers.
 ## Coverage
 
 ```bash
-# Run tests with coverage
+# Run tests with coverage (from apps/clementine-app/)
 pnpm test --coverage
 
 # Coverage thresholds in vitest.config.ts

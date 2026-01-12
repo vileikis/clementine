@@ -33,7 +33,7 @@ service cloud.firestore {
       // Authentication-based access control - data validation in Zod schemas
       match /mediaAssets/{assetId} {
         // Authenticated users can read media assets
-        allow read: if isAuthenticated();
+        allow read: if isAnyUser();
 
         // Only admins can create media assets
         allow create: if isAdmin();

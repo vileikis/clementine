@@ -30,8 +30,8 @@ pnpm install
 cp web/.env.local.example web/.env.local
 # Edit web/.env.local with your Firebase credentials
 
-# Start development server
-pnpm dev
+# Start development server (from root)
+pnpm app:dev
 
 # Visit http://localhost:3000
 ```
@@ -203,23 +203,28 @@ See [standards/global/tech-stack.md](standards/global/tech-stack.md) for complet
 
 Run from the **root directory**:
 
+> **Note:** App scripts use the `app:*` prefix to clarify they target the TanStack Start app.
+
 ```bash
 # Development
-pnpm dev              # Start Next.js dev server (port 3000)
+pnpm app:dev          # Start TanStack Start dev server (port 3000)
 
 # Building & Running
-pnpm build            # Build production web app
-pnpm start            # Start production server
+pnpm app:build        # Build production app
+pnpm app:start        # Start production server
 
 # Code Quality
-pnpm lint             # Run ESLint on web app
-pnpm type-check       # TypeScript type checking (web app only)
+pnpm app:lint         # Run ESLint on app
+pnpm app:type-check   # TypeScript type checking
+pnpm app:format       # Check Prettier formatting
+pnpm app:check        # Format + fix linting (all-in-one)
+pnpm app:test         # Run tests
 ```
 
-### Working in the web workspace
+### Working in the app workspace
 
 ```bash
-cd web
+cd apps/clementine-app
 pnpm dev              # Local dev server
 pnpm build            # Production build
 pnpm lint             # Lint only
@@ -269,14 +274,14 @@ See [.specify/memory/product.md](.specify/memory/product.md) for:
 ## 🧪 Testing (Planned)
 
 ```bash
-# Unit & integration tests (Vitest)
-pnpm test
-pnpm test:watch
-pnpm test:coverage
+# Unit & integration tests (Vitest) - run from root
+pnpm app:test
 
-# E2E tests (Playwright)
-pnpm test:e2e
-pnpm test:e2e:ui
+# Or from app directory
+cd apps/clementine-app
+pnpm test
+pnpm test --watch
+pnpm test --coverage
 ```
 
 Coverage goals:
@@ -288,16 +293,15 @@ Coverage goals:
 
 ## 🚢 Deployment
 
-Recommended hosting: **Vercel** (optimized for Next.js)
+Production app is deployed via **Firebase App Hosting**.
 
 ```bash
-# Build for production
-pnpm build
+# Build for production (from root)
+pnpm app:build
 
-# Environment variables required:
-# - NEXT_PUBLIC_API_URL
-# - FIREBASE_ADMIN_KEY (server-only)
-# - DATABASE_URL (server-only)
+# Or from app directory
+cd apps/clementine-app
+pnpm build
 ```
 
 ## 🤝 Contributing
@@ -305,7 +309,7 @@ pnpm build
 1. Follow the [coding standards](standards/)
 2. Use the [spec-driven workflow](#spec-driven-workflow)
 3. Write tests for critical paths
-4. Ensure `pnpm lint` and `pnpm type-check` pass
+4. Ensure `pnpm app:lint` and `pnpm app:type-check` pass (from root), or run `pnpm check` from `apps/clementine-app/`
 
 ## 📚 Documentation
 
