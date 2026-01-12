@@ -11,6 +11,7 @@ import type { QueryClient } from '@tanstack/react-query'
 import appCss from '@/ui-kit/theme/styles.css?url'
 import { AuthProvider, useAuth } from '@/domains/auth/providers/AuthProvider'
 import { Toaster } from '@/ui-kit/ui/sonner'
+import { TooltipProvider } from '@/ui-kit/ui/tooltip'
 
 export interface MyRouterContext {
   queryClient: QueryClient
@@ -44,9 +45,11 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 
 function RootComponent() {
   return (
-    <AuthProvider>
-      <RootLayout />
-    </AuthProvider>
+    <TooltipProvider>
+      <AuthProvider>
+        <RootLayout />
+      </AuthProvider>
+    </TooltipProvider>
   )
 }
 
