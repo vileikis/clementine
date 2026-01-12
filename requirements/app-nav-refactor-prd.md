@@ -65,6 +65,90 @@ AdminSidebar | WorkspaceSidebar (area-specific, self-contained)
 
 ## Detailed Design
 
+### NavigationLink - Type-Safe Params
+
+**Current approach (hack):**
+```tsx
+// WorkspaceNav.tsx - string replacement
+const href = item.href.replace('$workspaceSlug', workspaceSlug)
+<NavigationLink href={href} ... />
+```
+
+**Improved approach (type-safe):**
+
+TanStack Router's `Link` component has a `params` prop for type-safe route parameters. `NavigationLink` should use this pattern:
+
+```tsx
+// shared/NavigationLink.tsx
+interface NavigationLinkProps {
+  label: string
+  to: string  // route path with param placeholders e.g., '/workspace/$workspaceSlug/projects'
+  params?: Record<string, string>
+  icon?: LucideIcon
+  isCollapsed: boolean
+}
+
+export function NavigationLink({
+  label,
+  to,
+  params,
+  icon,
+  isCollapsed,
+}: NavigationLinkProps) {
+  const Icon = icon
+
+  return (
+    <Link
+      to={to}
+      params={params}
+      className={cn(...)}
+      activeProps={{ className: ... }}
+    >
+      {/* ... */}
+    </Link>
+  )
+}
+```
+
+**NavItem type update:**
+
+```tsx
+// types.ts
+interface NavItem {
+  label: string
+  to: string  // renamed from href, keeps param placeholders
+  icon?: LucideIcon
+}
+```
+
+**Usage in WorkspaceSidebar:**
+
+```tsx
+// workspace/workspaceNavItems.ts
+export const workspaceNavItems: NavItem[] = [
+  { label: 'Projects', to: '/workspace/$workspaceSlug/projects', icon: FolderOpen },
+  { label: 'Settings', to: '/workspace/$workspaceSlug/settings', icon: Settings },
+]
+
+// workspace/WorkspaceSidebar.tsx
+{workspaceNavItems.map((item) => (
+  <NavigationLink
+    key={item.label}
+    label={item.label}
+    to={item.to}
+    params={{ workspaceSlug }}  // passed once, applies to all items
+    icon={item.icon}
+    isCollapsed={isCollapsed}
+  />
+))}
+```
+
+**Benefits:**
+- Type-safe route params (TanStack Router validates)
+- No string manipulation hacks
+- Consistent with rest of codebase (e.g., `WorkspaceListItem.tsx`)
+- Cleaner, more idiomatic code
+
 ### AppSidebarShell
 
 Generic shell component that handles:
@@ -149,8 +233,10 @@ export function WorkspaceSidebar({ workspaceSlug }: Props) {
             {workspaceNavItems.map((item) => (
               <NavigationLink
                 key={item.label}
-                {...item}
-                href={item.href.replace('$workspaceSlug', workspaceSlug)}
+                label={item.label}
+                to={item.to}
+                params={{ workspaceSlug }}
+                icon={item.icon}
                 isCollapsed={isCollapsed}
               />
             ))}
@@ -200,6 +286,7 @@ import { AppSidebarShell } from '../shell'
 import { NavigationLink, LogoutButton } from '../shared'
 import { WorkspaceSelector } from './WorkspaceSelector'
 import { workspaceNavItems } from './workspaceNavItems'
+import { useSidebarState } from '../../hooks'
 
 interface WorkspaceSidebarProps {
   workspaceSlug: string
@@ -221,7 +308,8 @@ export function WorkspaceSidebar({ workspaceSlug }: WorkspaceSidebarProps) {
               <NavigationLink
                 key={item.label}
                 label={item.label}
-                href={item.href.replace('$workspaceSlug', workspaceSlug)}
+                to={item.to}
+                params={{ workspaceSlug }}
                 icon={item.icon}
                 isCollapsed={isCollapsed}
               />
@@ -245,17 +333,17 @@ import type { NavItem } from '../../types'
 export const workspaceNavItems: NavItem[] = [
   {
     label: 'Projects',
-    href: '/workspace/$workspaceSlug/projects',
+    to: '/workspace/$workspaceSlug/projects',
     icon: FolderOpen,
   },
   {
     label: 'Experiences',
-    href: '/workspace/$workspaceSlug/experiences',
+    to: '/workspace/$workspaceSlug/experiences',
     icon: Sparkles,
   },
   {
     label: 'Settings',
-    href: '/workspace/$workspaceSlug/settings',
+    to: '/workspace/$workspaceSlug/settings',
     icon: Settings,
   },
 ]
