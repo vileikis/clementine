@@ -153,10 +153,10 @@
 
 - [x] T044 Run `pnpm app:check` to verify linting and formatting
 - [x] T045 Run `pnpm app:type-check` to verify TypeScript compilation
-- [ ] T046 Deploy Firestore rules with `pnpm fb:deploy:rules`
-- [ ] T047 Deploy Firestore indexes with `pnpm fb:deploy:indexes`
-- [ ] T048 Manual validation: Test all acceptance scenarios from spec.md
-- [ ] T049 Review code against standards/frontend/design-system.md for compliance
+- [x] T046 Deploy Firestore rules with `pnpm fb:deploy:rules`
+- [x] T047 Deploy Firestore indexes with `pnpm fb:deploy:indexes`
+- [x] T048 Manual validation: Test all acceptance scenarios from spec.md
+- [x] T049 Review code against standards/frontend/design-system.md for compliance
 
 ---
 
@@ -190,12 +190,15 @@
 ### Parallel Opportunities
 
 **Phase 1 (Setup)**:
+
 - T002, T003, T004, T005 can run in parallel after T001
 
 **Phase 2 (Foundational)**:
+
 - T010, T011, T012, T013 can run in parallel after T009
 
 **Phase 3-7 (User Stories)**:
+
 - US1 and US2 can start in parallel
 - Within US1: T016, T017, T018 can run in parallel
 - Within US2: T025, T026 can run in parallel

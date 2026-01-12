@@ -67,12 +67,13 @@ export function useDeleteExperience() {
       )
 
       // Soft delete: update status and set deletedAt timestamp
-      await runTransaction(firestore, async (transaction) => {
+      await runTransaction(firestore, (transaction) => {
         transaction.update(experienceRef, {
           status: 'deleted',
           deletedAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
         })
+        return Promise.resolve()
       })
 
       return {

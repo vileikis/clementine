@@ -75,7 +75,7 @@ export function useCreateExperience() {
       )
 
       // Create in transaction to ensure serverTimestamp() resolves correctly
-      return await runTransaction(firestore, async (transaction) => {
+      return await runTransaction(firestore, (transaction) => {
         const newRef = doc(experiencesRef)
 
         const newExperience: WithFieldValue<Experience> = {
@@ -95,10 +95,10 @@ export function useCreateExperience() {
 
         transaction.set(newRef, newExperience)
 
-        return {
+        return Promise.resolve({
           experienceId: newRef.id,
           workspaceId: validated.workspaceId,
-        }
+        })
       })
     },
     onSuccess: ({ workspaceId }) => {

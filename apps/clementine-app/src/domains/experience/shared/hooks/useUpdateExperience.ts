@@ -81,8 +81,9 @@ export function useUpdateExperience() {
       }
 
       // Update in transaction
-      await runTransaction(firestore, async (transaction) => {
+      await runTransaction(firestore, (transaction) => {
         transaction.update(experienceRef, updateData)
+        return Promise.resolve()
       })
 
       return {

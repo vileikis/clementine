@@ -61,18 +61,11 @@ export function ExperienceDesignerLayout({
   }, [resetSaveState])
 
   // Publish handler (placeholder for now)
-  const handlePublish = async () => {
-    try {
-      // TODO: Implement publish mutation
-      toast.success('Experience published', {
-        description: 'Your changes are now live.',
-      })
-    } catch (error) {
-      toast.error('Publish failed', {
-        description:
-          error instanceof Error ? error.message : 'An error occurred',
-      })
-    }
+  const handlePublish = () => {
+    // TODO: Implement publish mutation
+    toast.success('Experience published', {
+      description: 'Your changes are now live.',
+    })
   }
 
   return (
