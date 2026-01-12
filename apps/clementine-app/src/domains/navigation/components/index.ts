@@ -1,9 +1,16 @@
 // Barrel export for navigation components
-export * from './Sidebar'
-export * from './AdminNav'
-export * from './WorkspaceNav'
-export * from './WorkspaceSelector'
-export * from './NavigationLink'
+
+// Shell (generic)
+export { AppSidebarShell } from './shell'
+
+// Area-specific sidebars
+export { AdminSidebar } from './admin'
+export { WorkspaceSidebar, WorkspaceSelector } from './workspace'
+
+// Shared components
+export { NavigationLink, LogoutButton } from './shared'
+
+// Top navigation
 export { TopNavBar } from './TopNavBar'
 export type { BreadcrumbItem, TopNavBarProps } from './TopNavBar'
 export { TopNavActions } from './TopNavActions'

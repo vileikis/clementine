@@ -1,8 +1,8 @@
-# Architecture Doc: Experiences System (Editor + Runtime)
+# Architecture: Experiences System
 
 > **Related Documents:**
-> - [PRD: Workspace Experiences](./epic-experience-system-prd.md)
-> - [Roadmap: Experience System](./experience-system-roadmap.md)
+> - [Overview: Experience System](./experience-system-overview.md)
+> - [Epic PRDs](./experience-system-overview.md#epic-roadmap)
 
 ---
 
@@ -25,10 +25,11 @@ Define how the Experiences system is built and organized in the codebase, ensuri
 
 **Design-time (Admin)**
 
-- Experience Editor (edit steps/config)
+- Experience Library (browse, create, manage experiences)
+- Experience Editor (edit steps/config, publish)
 - Event Designer integration (attach experiences to event slots)
+- Share Screen Editor (configure event-level share screen)
 - Preview (runs draft config through real runtime/session)
-- Welcome screen preview (shows actual experiences from draft)
 
 **Run-time (Guest + Preview)**
 
@@ -36,6 +37,7 @@ Define how the Experiences system is built and organized in the codebase, ensuri
 - Sessions persist state to support async jobs (transform pipeline)
 - Guest uses published config; Preview uses draft config
 - Welcome screen renders experience picker with layout options
+- Share screen displays result with download/sharing options
 
 ---
 
@@ -46,6 +48,7 @@ Define how the Experiences system is built and organized in the codebase, ensuri
 - `domains/experience`
 
   - `shared/` - Schemas, types, CRUD hooks (owns experience data)
+  - `library/` - Experience Library UI (list, create)
   - `steps/` - Step registry (types, schemas, renderer binding)
   - `validation/` - Profile rules & validation
   - `runtime/` - Runtime engine (step runner + orchestration primitives)
@@ -57,7 +60,7 @@ Define how the Experiences system is built and organized in the codebase, ensuri
   - `experiences/` - Thin UI layer for experience assignment
     - `ExperienceSlotManager` component
     - `ConnectExperiencePanel`, `CreateExperiencePanel`
-  - Event publish flow (creates experience releases)
+  - `share/` - Share screen editor
   - Welcome screen editor (`WelcomeConfigPanel`)
   - Settings page (`EventSettingsPage` with "Guest Flow" section)
 
@@ -66,13 +69,14 @@ Define how the Experiences system is built and organized in the codebase, ensuri
   - Session creation for both `guest` and `preview`
   - Session state subscription and updates
   - Session mode handling (preview vs guest)
-  - Session lifecycle utilities (e.g., closing session)
+  - Session lifecycle utilities
 
 - `domains/guest`
 
   - Guest shell routes and UX chrome
   - Uses experience runtime engine + sessions to run flows
   - Welcome screen rendering (guest mode)
+  - Share screen rendering (guest mode)
 
 ### Non-domain modules used
 
@@ -83,7 +87,7 @@ Define how the Experiences system is built and organized in the codebase, ensuri
 
 ---
 
-## 4. Import & Dependency Rules (to avoid a hairball)
+## 4. Import & Dependency Rules
 
 1. **`domains/experience` must not import from `domains/event` or `domains/guest`.**
 
@@ -107,12 +111,16 @@ Define how the Experiences system is built and organized in the codebase, ensuri
 
 **Dependency flow:**
 ```
-domains/experience/shared/ ← pure types, schemas, hooks
+domains/experience/shared/   ← pure types, schemas, hooks
          ↓
-domains/event/experiences/ ← UI for assignment (picker, panels)
+domains/experience/library/  ← Experience Library UI
+domains/experience/editor/   ← Experience Editor UI
          ↓
-domains/event/welcome/     ← WelcomeConfigPanel uses ExperienceSlotManager
-domains/event/settings/    ← Settings uses ExperienceSlotManager for extras
+domains/event/experiences/   ← UI for assignment (picker, panels)
+         ↓
+domains/event/welcome/       ← WelcomeConfigPanel uses ExperienceSlotManager
+domains/event/settings/      ← Settings uses ExperienceSlotManager for extras
+domains/event/share/         ← Share screen editor
 ```
 
 ---
@@ -135,6 +143,19 @@ Responsibilities:
   - optional editor config panel binding
 
 **Goal:** adding a new step type is a contained change.
+
+**MVP Step Types:**
+
+| Type | Category | Description |
+|------|----------|-------------|
+| `info` | info | Display information |
+| `input.scale` | input | Opinion scale |
+| `input.yesNo` | input | Yes/No question |
+| `input.multiSelect` | input | Multiple choice |
+| `input.shortText` | input | Short text input |
+| `input.longText` | input | Long text input |
+| `capture.photo` | capture | Photo capture |
+| `transform.pipeline` | transform | AI processing (placeholder) |
 
 ---
 
@@ -160,38 +181,7 @@ This prevents divergence between admin preview and guest.
 
 ---
 
-### 5.3 Welcome Screen: One Implementation, Two Modes
-
-The Welcome screen follows the same pattern as step renderers:
-
-- `mode: 'edit' | 'run'`
-
-**Welcome screen includes:**
-
-- Themed background
-- Hero media
-- Title
-- Description
-- Experience picker (respects `layout: 'list' | 'grid'`)
-
-**Run mode**
-
-- Interactive (experience selection triggers navigation)
-- Reads from published config
-- Used by **guest flow** (`/join/[projectId]`)
-
-**Edit mode**
-
-- Non-interactive visual preview
-- Reads from draft config
-- Shows actual experiences from `draftConfig.experiences.main`
-- Used inside **Welcome Editor** (`WelcomeEditorPage.tsx`)
-
-**WYSIWYG guarantee:** Admin sees exactly what guests will see.
-
----
-
-### 5.4 Experience Profiles
+### 5.3 Experience Profiles
 
 Lives in `domains/experience/validation`.
 
@@ -199,17 +189,17 @@ Lives in `domains/experience/validation`.
 
 | Profile | Allowed Step Categories |
 |---------|------------------------|
-| `freeform` | info, input, capture, transform, share |
-| `survey` | info, input, capture, share |
-| `informational` | info only |
+| `freeform` | info, input, capture, transform |
+| `survey` | info, input, capture |
+| `story` | info only |
 
 **Slot Compatibility:**
 
 | Slot | Allowed Profiles |
 |------|-----------------|
 | `main` | freeform, survey |
-| `pregate` | informational, survey |
-| `preshare` | informational, survey |
+| `pregate` | story, survey |
+| `preshare` | story, survey |
 
 **Profile Rules:**
 
@@ -220,7 +210,7 @@ Lives in `domains/experience/validation`.
 
 ---
 
-### 5.5 Experience Runtime Engine (Shared)
+### 5.4 Experience Runtime Engine (Shared)
 
 Lives in `domains/experience/runtime`.
 
@@ -233,60 +223,137 @@ Responsibilities:
   - accumulated answers/inputs
   - produced outputs (e.g., `resultAssetId`)
 
-- Enforce prerequisites (e.g., share requires result)
 - Expose an API for UI bindings:
 
   - `currentStep`
-  - `canProceed`
+  - `canGoBack`, `canGoNext`
   - `next()`, `back()`
-  - `setAnswer(...)`, `setMedia(...)` etc. (abstracted)
+  - `setAnswer(...)`, `setMedia(...)` etc.
 
 **Important:** runtime is UI-agnostic; UI uses it via hooks/adapters.
 
 ---
 
-### 5.6 Profile Validation (Constraint Rules)
+### 5.5 Share Screen (Event-Scoped)
 
-Lives in `domains/experience/validation`.
+The share screen is **event-scoped**, not experience-scoped.
 
-Responsibilities:
+- Configured in Event Designer (Share tab)
+- Displays after any experience completes
+- Contains: result media, title, description, CTA, sharing options
+- Same share screen for all experiences in an event
 
-- Validate step sequence against `ExperienceProfile`
-- Provide:
+**Share screen follows the same two-mode pattern:**
 
-  - blocking publish errors
-  - inline editor warnings/errors (step-level)
-
-- Run on:
-
-  - editor interactions (best-effort feedback)
-  - publish action (hard gate)
+- `mode: 'edit'` - Non-interactive preview in editor
+- `mode: 'run'` - Interactive with download/share buttons
 
 ---
 
-## 6. Session Integration (Preview + Guest)
+## 6. Data Model
+
+### 6.1 Experience Document
+
+**Path:** `/workspaces/{workspaceId}/experiences/{experienceId}`
+
+```typescript
+{
+  // Identity
+  id: string
+  name: string
+
+  // Metadata
+  status: 'active' | 'deleted'
+  profile: 'freeform' | 'survey' | 'story'
+  media: { mediaAssetId: string; url: string } | null
+
+  // Configuration
+  draft: { steps: Step[] }
+  published: { steps: Step[] } | null
+
+  // Timestamps
+  createdAt: number
+  updatedAt: number
+  publishedAt: number | null
+  publishedBy: string | null
+  deletedAt: number | null
+}
+```
+
+**Key design decisions:**
+
+- **Media at root level** (not in draft/published) for easy list display
+- **Draft/published on same doc** - no separate releases collection
+- **All events share current published version** - instant updates everywhere
+
+### 6.2 Session Document
+
+**Path:** `/workspaces/{workspaceId}/sessions/{sessionId}`
+
+```typescript
+{
+  id: string
+  workspaceId: string
+  experienceId: string
+  mode: 'preview' | 'guest'
+
+  // Progress
+  currentStepIndex: number
+  status: 'active' | 'completed' | 'abandoned'
+
+  // Collected data
+  answers: Array<{ stepId, stepType, value, answeredAt }>
+  capturedMedia: Array<{ stepId, mediaAssetId, url, capturedAt }>
+
+  // Result
+  resultAssetId: string | null
+  resultUrl: string | null
+
+  // Timestamps
+  createdAt: number
+  updatedAt: number
+  completedAt: number | null
+}
+```
+
+### 6.3 Event Config (experiences field)
+
+```typescript
+// In projectEventConfigSchema
+experiences: {
+  main: Array<{ experienceId: string; enabled: boolean }>
+  pregate: { experienceId: string; enabled: boolean } | null
+  preshare: { experienceId: string; enabled: boolean } | null
+}
+
+shareScreen: {
+  title: string
+  description: string | null
+  cta: { label: string; action: 'restart' | 'external'; url: string | null } | null
+}
+
+sharing: {
+  download: { enabled: boolean; quality: 'original' | 'optimized' }
+  copyLink: { enabled: boolean }
+  social: { facebook, twitter, instagram, whatsapp, email }
+}
+```
+
+---
+
+## 7. Session Integration (Preview + Guest)
 
 ### Why sessions are required
 
 Transform steps trigger asynchronous jobs; the job orchestration depends on persisted session state and outputs.
 
-### Session domain responsibilities
-
-`domains/session` provides:
-
-- `createSession({ eventId, experienceId, releaseId?, guestId?, mode, configSource })`
-- `subscribeSession(sessionId)` (realtime updates)
-- `updateSessionProgress(...)` (when needed)
-- `closeSession(...)` or mark complete
-
-### Session properties by mode
+### Session modes
 
 | Property | Preview | Guest |
 |----------|---------|-------|
 | `mode` | `'preview'` | `'guest'` |
-| `configSource` | `'draft'` | `'published'` |
-| `releaseId` | absent | required |
-| `guestId` | absent | required |
+| Config source | draft | published |
+| Analytics | Excluded | Included |
 
 ### Mode differences handled outside step UI
 
@@ -300,31 +367,41 @@ These are top-level runtime/session concerns, not per-step forks.
 
 ---
 
-## 7. Admin Experiences: Editor vs Preview
+## 8. Admin Experiences: Library, Editor, Preview
 
-### Experience Editor (Admin)
+### Experience Library
 
-- Edits experience `draft`:
+Located at `domains/experience/library/`.
 
-  - step order
-  - step configs
+- Browse workspace experiences
+- Filter by profile
+- Create new experiences
+- Navigate to editor
 
+**Route:** `/workspace/:slug/experiences`
+
+### Experience Editor
+
+Located at `domains/experience/editor/`.
+
+- 3-column layout: step list | preview | config panel
+- Edits experience `draft.steps`
 - Uses `StepRenderer(mode='edit')` for visual preview
+- Auto-saves changes
+- Publish button copies draft → published
+
+**Route:** `/workspace/:slug/experiences/:experienceId`
 
 ### Admin Preview
 
-- Runs the experience using the same run-time stack as guest:
-
-  - `StepRenderer(mode='run')`
-  - runtime engine
-  - sessions + async jobs
-
-- Uses `configSource='draft'` and `mode='preview'`
+- Runs the experience using the same runtime stack as guest
+- Uses draft config and `mode='preview'`
+- Creates preview session
 - Rendered inside admin UI via `shared/preview-shell`
 
 ---
 
-## 8. Welcome Screen: Editor vs Guest
+## 9. Welcome Screen: Editor vs Guest
 
 ### Welcome Editor (Admin)
 
@@ -341,72 +418,62 @@ Located at `domains/guest/`.
 
 - Reads from `publishedConfig`
 - Uses `WelcomeScreen(mode='run')`
-- Shows experiences from `publishedConfig.experiences.main`
+- Shows experiences with published data
 - Interactive (clicking experience navigates to experience flow)
 
-### Shared Component
-
-```typescript
-// Shared Welcome screen component
-interface WelcomeScreenProps {
-  mode: 'edit' | 'run'
-  config: WelcomeConfig
-  experiences: ExperienceCard[]  // Resolved from draft or published
-  layout: 'list' | 'grid'
-  onSelectExperience?: (experienceId: string) => void  // Only in run mode
-}
-```
+**WYSIWYG guarantee:** Admin sees exactly what guests will see.
 
 ---
 
-## 9. Guest Experience Runner
+## 10. Routing
 
-Guest routes:
+### Admin Routes
 
-- Load event published config
-- Load experience releases from `publishedConfig.experiences`
-- Start session (`mode='guest', configSource='published'`)
-- Run selected experience through runtime engine (run mode)
-- Capture, transform, share follow normal runtime progression
+| Route | Purpose |
+|-------|---------|
+| `/workspace/:slug/experiences` | Experience Library |
+| `/workspace/:slug/experiences/create` | Create experience |
+| `/workspace/:slug/experiences/:id` | Experience editor |
+| `/workspace/:slug/projects/:projectId/events/:eventId` | Event designer |
+| `/workspace/:slug/projects/:projectId/events/:eventId/share` | Share screen editor |
 
----
+### Guest Routes
 
-## 10. Routing & State Ownership
-
-### Experience Editor route
-
-`/workspace/[slug]/project/[projectId]/event/[eventId]/experience/[experienceId]?step=[stepId]`
-
-Rules:
-
-- `stepId` is optional and used only for "selected step in editor UI"
-- If missing/invalid, default to first step
-- Step list edits must gracefully handle stale `stepId`
-
-### Guest routes
-
-- `/join/[projectId]` - Welcome screen with experience picker
-- `/join/[projectId]/experience/[experienceId]?session=[sessionId]` - Experience runner
+| Route | Purpose |
+|-------|---------|
+| `/join/:projectId` | Welcome screen |
+| `/join/:projectId/pregate` | Pregate experience |
+| `/join/:projectId/experience/:experienceId` | Main experience |
+| `/join/:projectId/preshare` | Preshare experience |
+| `/join/:projectId/share` | Share screen |
 
 ---
 
-## 11. Editor UX Composition (High-level wiring)
+## 11. Publishing Flow
 
-In `domains/experience/editor`:
+### Experience Publish
 
-- Left: step list (select/reorder/add/remove)
-- Center: preview shell + StepRenderer(edit)
-- Right: step config panel (from registry)
+Triggered by admin in Experience Editor:
 
-The editor writes draft state to persistence via mutations in experience domain.
+1. Validate draft steps against profile constraints
+2. Copy `draft` to `published`
+3. Set `publishedAt` and `publishedBy`
 
-**Step add menu:** Filtered by experience profile. Admin only sees step types allowed for the profile.
+**Invariant:** All events using this experience immediately see the new published version.
+
+### Event Publish
+
+Triggered by admin in Event Designer:
+
+1. Validate all enabled experiences are published
+2. Copy `draftConfig` to `publishedConfig`
+3. Set event status and timestamps
+
+**Invariant:** Event publish does NOT create experience snapshots. Events always reference current published experience version.
 
 ---
 
 ## 12. Event Designer Integration
-
-`domains/event` responsibilities:
 
 ### ExperienceSlotManager Component
 
@@ -416,7 +483,7 @@ Reusable component that encapsulates the state machine for managing experiences:
 interface ExperienceSlotManagerProps {
   mode: 'list' | 'single'
   slot: 'main' | 'pregate' | 'preshare'
-  label?: string  // e.g., "Before Welcome", "Before Share"
+  workspaceId: string
   experiences: ExperienceReference[]
   onUpdate: (experiences: ExperienceReference[]) => void
 }
@@ -432,17 +499,6 @@ interface ExperienceSlotManagerProps {
 default → ConnectExperiencePanel → CreateExperiencePanel → default
 ```
 
-### Experience List Item UX
-
-```
-┌─────────────────────────────────────────────────┐
-│ ⋮⋮  [thumbnail] Experience Name      [toggle] ⋯│
-└─────────────────────────────────────────────────┘
-     ↑                                    ↑      ↑
-  drag handle              enable/disable   context menu
-  (list mode only)                          (Edit, Remove)
-```
-
 ### Experience Assignment Locations
 
 | Slot | Location | Component |
@@ -451,64 +507,13 @@ default → ConnectExperiencePanel → CreateExperiencePanel → default
 | `pregate` | Settings tab → "Guest Flow" | ExperienceSlotManager (single) |
 | `preshare` | Settings tab → "Guest Flow" | ExperienceSlotManager (single) |
 
-### Panels (State Machine)
+### Edit Navigation
 
-**ConnectExperiencePanel:**
-- Back button
-- List of workspace experiences (filtered by slot profile)
-- Disabled items for already-assigned experiences
-- "Create new" primary action
-
-**CreateExperiencePanel:**
-- Back button
-- Name input
-- Profile selector (filtered by slot)
-- Create button
-
-### Experience Editor Navigation
-
-Experience editor uses separate `ExperienceDesignerLayout` (not nested in event tabs).
-
-**Route:** `/workspace/$slug/projects/$projectId/events/$eventId/experience/$experienceId`
-
-**Breadcrumbs:**
-```
-[📁 Project Name] / [Event Name] / Experience Name
-      ↑                  ↑
-  clickable          clickable (returns to event)
-```
-
-**Layout:** 3-column (step list | step preview | StepConfigPanel)
-
-### Event Publish
-
-Event publish triggers experience release creation for all enabled experiences.
+"Edit" action in experience list opens experience editor **in a new browser tab** (experience editor is not nested in event context).
 
 ---
 
-## 13. Publishing Flow
-
-### Event Publish
-
-When publishing an event:
-
-1. Load all referenced experiences (workspace-scoped)
-2. For each enabled experience:
-   - Create immutable release in `/projects/{projectId}/experienceReleases/{releaseId}`
-   - Release contains frozen copy of experience draft
-3. Write `publishedConfig` with releaseIds
-4. Transaction ensures atomicity
-
-### Invariants
-
-- Draft changes never affect live behavior
-- Experiences cannot be published independently
-- Live behavior changes only via event publish
-- Guests read only from experience releases (immutable)
-
----
-
-## 14. Testing Strategy (Minimal but essential)
+## 13. Testing Strategy
 
 ### Unit tests (experience domain)
 
@@ -517,39 +522,41 @@ When publishing an event:
 - Runtime engine state transitions:
 
   - next/back boundaries
-  - dependency enforcement (share requires result)
-  - transform output propagation
+  - answer/media collection
 
 ### Integration tests
 
-- Preview session path triggers async jobs and completes
+- Preview session path creates session and completes
 - Guest path identical step UI in run mode
-- Event publish creates releases and locks live behavior
+- Experience publish updates published field
+- Event publish validates experience states
 - Welcome screen renders same in edit and run modes
 
 ---
 
-## 15. Open Extensions (Explicitly Not MVP)
+## 14. Open Extensions (Explicitly Not MVP)
 
 - Branching/conditional steps
 - Cross-experience navigation
-- Template library (separate from experiences)
+- Template library / marketplace
 - Multi-locale content tooling
 - Rich analytics dashboards
-- Experience Library UI
+- Video/GIF capture
+- Transform pipeline (placeholder only in MVP)
 
 This architecture keeps those possible without rewriting core boundaries.
 
 ---
 
-## 16. Naming Conventions
+## 15. Naming Conventions
 
 Consistent naming for config/control panels:
 
 | Component | Purpose |
 |-----------|---------|
-| `WelcomeConfigPanel` | Welcome screen configuration (rename from WelcomeControls) |
-| `ThemeConfigPanel` | Theme configuration (rename from ThemeControls) |
+| `WelcomeConfigPanel` | Welcome screen configuration |
+| `ThemeConfigPanel` | Theme configuration |
+| `ShareConfigPanel` | Share screen configuration |
 | `StepConfigPanel` | Step configuration in experience editor |
 | `ConnectExperiencePanel` | Experience picker (select existing) |
 | `CreateExperiencePanel` | Experience creation form |
@@ -559,16 +566,18 @@ Consistent naming for config/control panels:
 
 ---
 
-## 17. Summary of Non-negotiables
+## 16. Summary of Non-negotiables
 
 - Single step registry (no duplicate step implementations)
 - Single runtime engine used by preview + guest
-- Sessions are persisted for both preview and guest to support async transforms
-- Event publish is the only publishing action; creates immutable releases
+- Sessions are persisted for both preview and guest
 - Clear import boundaries to prevent domain coupling
 - WYSIWYG for Welcome screen (same component, two modes)
 - WYSIWYG for step renderers (same component, two modes)
+- WYSIWYG for share screen (same component, two modes)
 - Profile-based step filtering in editor
-- Experiences are workspace-scoped, UX is event-scoped
+- Experiences are workspace-scoped with dedicated Library UI
+- Draft/published on same experience doc (no releases)
+- All events share current published experience version
+- Share screen is event-scoped (not experience step)
 - `*ConfigPanel` naming convention for config panels
-- `ExperienceDesignerLayout` separate from `EventDesignerLayout`

@@ -28,6 +28,22 @@ service cloud.firestore {
 
       // Deny hard deletes - use server functions for soft delete
       allow delete: if false;
+
+      // MediaAsset subcollection rules (013-event-settings-overlays)
+      // Authentication-based access control - data validation in Zod schemas
+      match /mediaAssets/{assetId} {
+        // Authenticated users can read media assets
+        allow read: if isAnyUser();
+
+        // Only admins can create media assets
+        allow create: if isAdmin();
+
+        // Only admins can update (soft delete)
+        allow update: if isAdmin();
+
+        // No deletes - handled by Admin SDK scheduled jobs
+        allow delete: if false;
+      }
     }
 
     // Projects collection rules

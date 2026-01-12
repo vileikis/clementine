@@ -313,11 +313,13 @@ const inactiveEvents = filterEventsByStatus(events, 'inactive')
 ### ✅ DO: Let Prettier Handle Formatting
 
 ```bash
-# Format all files
-pnpm format
+# From apps/clementine-app/:
+pnpm format           # Check formatting
+pnpm check            # Format + fix linting
 
-# Fix formatting issues
-pnpm check
+# From monorepo root:
+pnpm app:format       # Check formatting
+pnpm app:check        # Format + fix linting
 ```
 
 **Don't:** Manually format code. Use Prettier.
@@ -413,17 +415,20 @@ items.forEach(item => {
 
 **Linting:** ESLint
 ```bash
+# From apps/clementine-app/ (or pnpm app:lint from root)
 pnpm lint
 pnpm lint:fix
 ```
 
 **Formatting:** Prettier
 ```bash
+# From apps/clementine-app/ (or pnpm app:format / pnpm app:check from root)
 pnpm format
 pnpm check  # Format + lint fix
 ```
 
 **Type Checking:** TypeScript
 ```bash
+# From apps/clementine-app/ (or pnpm app:type-check from root)
 pnpm type-check
 ```

@@ -70,18 +70,22 @@ clementine/
 
 Run these commands from the **monorepo root**:
 
+> **Note:** App scripts were renamed from `pnpm dev` to `pnpm app:dev` (etc.) to clarify they target the TanStack Start app.
+
 ```bash
 # Development
-pnpm dev              # Start TanStack Start dev server
+pnpm app:dev          # Start TanStack Start dev server
 
 # Building & Running
-pnpm build            # Build production app
-pnpm start            # Start production server
+pnpm app:build        # Build production app
+pnpm app:start        # Start production server
 
 # Code Quality
-pnpm lint             # Run ESLint
-pnpm type-check       # TypeScript type checking
-pnpm test             # Run tests
+pnpm app:lint         # Run ESLint
+pnpm app:type-check   # TypeScript type checking
+pnpm app:format       # Check Prettier formatting
+pnpm app:check        # Format + fix linting (all-in-one)
+pnpm app:test         # Run tests
 
 # Firebase Cloud Functions
 pnpm functions:build  # Build Cloud Functions
@@ -291,6 +295,8 @@ See individual workspace documentation for required environment variables.
 ## Active Technologies
 - TypeScript 5.7.2 (strict mode, ES2022 target) + Zod 4.1.12 (validation), TanStack Query 5.66.5 (data fetching), Firebase SDK 12.5.0 (Firestore) (019-exp-system-foundations)
 - Firebase Firestore (NoSQL) - subcollection pattern for experiences and sessions (019-exp-system-foundations)
+- TypeScript 5.7.2 (strict mode enabled) + TanStack Start 1.132.0, TanStack Router 1.132.0, React 19.2.0, Zustand 5.x (020-app-nav-refactor)
+- N/A (navigation state persisted to localStorage via Zustand) (020-app-nav-refactor)
 
 ## Recent Changes
 - 019-exp-system-foundations: Added TypeScript 5.7.2 (strict mode, ES2022 target) + Zod 4.1.12 (validation), TanStack Query 5.66.5 (data fetching), Firebase SDK 12.5.0 (Firestore)

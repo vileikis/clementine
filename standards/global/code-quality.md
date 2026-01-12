@@ -59,6 +59,7 @@ function handleEvent(event) {
 ### Run Linting
 
 ```bash
+# From apps/clementine-app/ (or pnpm app:lint from root)
 pnpm lint        # Check for issues
 pnpm lint:fix    # Auto-fix issues
 ```
@@ -76,6 +77,7 @@ pnpm lint:fix    # Auto-fix issues
 ### Auto-Format
 
 ```bash
+# From apps/clementine-app/ (or pnpm app:format / pnpm app:check from root)
 pnpm format      # Check formatting
 pnpm check       # Format + lint fix (all-in-one)
 ```
@@ -85,6 +87,7 @@ pnpm check       # Format + lint fix (all-in-one)
 Format code before committing:
 
 ```bash
+# From apps/clementine-app/ (or pnpm app:check from root)
 pnpm check
 ```
 
@@ -348,7 +351,7 @@ test('EventCard renders event name', () => {
 
 ## Checklist
 
-Before committing code:
+Before committing code (run from `apps/clementine-app/` or use `pnpm app:*` from root):
 
 - [ ] Run `pnpm check` (format + lint)
 - [ ] Run `pnpm type-check` (TypeScript)
