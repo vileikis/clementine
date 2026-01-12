@@ -81,13 +81,9 @@ export function ExperienceDesignerLayout({
         className="shrink-0"
         breadcrumbs={[
           {
-            label: 'Experiences',
-            href: experiencesPath,
+            label: experience.name,
             icon: Sparkles,
             iconHref: experiencesPath,
-          },
-          {
-            label: experience.name,
           },
         ]}
         right={
