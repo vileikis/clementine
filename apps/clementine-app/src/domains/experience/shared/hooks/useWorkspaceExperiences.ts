@@ -3,12 +3,13 @@
  *
  * Lists all active experiences in a workspace with optional profile filtering.
  * Features real-time updates via Firestore onSnapshot listener.
+ *
+ * Pattern: Combines Firebase onSnapshot (real-time) with TanStack Query (caching)
  */
 import { useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   collection,
-  getDocs,
   onSnapshot,
   orderBy,
   query,
@@ -16,7 +17,7 @@ import {
 } from 'firebase/firestore'
 
 import { experienceSchema } from '../schemas/experience.schema'
-import { experienceKeys } from '../queries/experience.query'
+import { experienceKeys, experiencesQuery } from '../queries/experience.query'
 import type {
   Experience,
   ExperienceProfile,
@@ -37,6 +38,7 @@ export interface ExperienceFilters {
  *
  * Features:
  * - Real-time updates via Firestore onSnapshot
+ * - TanStack Query cache integration
  * - Filters to status === 'active' (excludes soft-deleted)
  * - Optional profile filtering
  * - Sorted by createdAt descending (newest first)
@@ -86,10 +88,10 @@ export function useWorkspaceExperiences(
     }
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const experiences = snapshot.docs.map((doc) =>
-        convertFirestoreDoc(doc, experienceSchema),
+      const experiences = snapshot.docs.map((docSnapshot) =>
+        convertFirestoreDoc(docSnapshot, experienceSchema),
       )
-      queryClient.setQueryData(
+      queryClient.setQueryData<Experience[]>(
         experienceKeys.list(workspaceId, filters),
         experiences,
       )
@@ -98,36 +100,5 @@ export function useWorkspaceExperiences(
     return () => unsubscribe()
   }, [workspaceId, filters?.profile, queryClient])
 
-  return useQuery<Experience[]>({
-    queryKey: experienceKeys.list(workspaceId, filters),
-    queryFn: async () => {
-      const experiencesRef = collection(
-        firestore,
-        `workspaces/${workspaceId}/experiences`,
-      )
-
-      let q = query(
-        experiencesRef,
-        where('status', '==', 'active'),
-        orderBy('createdAt', 'desc'),
-      )
-
-      if (filters?.profile) {
-        q = query(
-          experiencesRef,
-          where('status', '==', 'active'),
-          where('profile', '==', filters.profile),
-          orderBy('createdAt', 'desc'),
-        )
-      }
-
-      // Initial fetch
-      const snapshot = await getDocs(q)
-      return snapshot.docs.map((doc) =>
-        convertFirestoreDoc(doc, experienceSchema),
-      )
-    },
-    staleTime: Infinity, // Data kept fresh by onSnapshot listener
-    refetchOnWindowFocus: false,
-  })
+  return useQuery(experiencesQuery(workspaceId, filters))
 }

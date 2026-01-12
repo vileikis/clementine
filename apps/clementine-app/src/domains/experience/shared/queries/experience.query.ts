@@ -3,7 +3,11 @@
  *
  * TanStack Query options factories for experience data fetching.
  * Used in route loaders and components for consistent query configuration.
+ *
+ * Pattern: Query options factory following TanStack Query best practices
+ * @see https://tanstack.com/query/latest/docs/framework/react/guides/query-options
  */
+import { queryOptions } from '@tanstack/react-query'
 import {
   collection,
   doc,
@@ -13,9 +17,8 @@ import {
   query,
   where,
 } from 'firebase/firestore'
-import { experienceSchema } from '../schemas/experience.schema'
-import type { QueryOptions } from '@tanstack/react-query'
 
+import { experienceSchema } from '../schemas/experience.schema'
 import type {
   Experience,
   ExperienceProfile,
@@ -50,17 +53,28 @@ export const experienceKeys = {
 /**
  * Query options for fetching experiences list
  *
+ * Note: staleTime=Infinity because data is kept fresh by onSnapshot listener in hooks
+ *
  * @param workspaceId - Workspace to fetch experiences from
  * @param filters - Optional filters (profile type)
- * @returns QueryOptions for use with useQuery or prefetchQuery
+ * @returns Query options for use with useQuery or prefetchQuery
+ *
+ * @example
+ * ```typescript
+ * // In hook
+ * return useQuery(experiencesQuery(workspaceId, filters))
+ *
+ * // In loader
+ * await context.queryClient.ensureQueryData(experiencesQuery(workspaceId))
+ * ```
  */
-export function experiencesQuery(
+export const experiencesQuery = (
   workspaceId: string,
   filters?: { profile?: ExperienceProfile },
-): QueryOptions<Experience[]> {
-  return {
+) =>
+  queryOptions({
     queryKey: experienceKeys.list(workspaceId, filters),
-    queryFn: async () => {
+    queryFn: async (): Promise<Experience[]> => {
       const experiencesRef = collection(
         firestore,
         `workspaces/${workspaceId}/experiences`,
@@ -87,23 +101,34 @@ export function experiencesQuery(
         convertFirestoreDoc(docSnapshot, experienceSchema),
       )
     },
-  }
-}
+    staleTime: Infinity,
+    refetchOnWindowFocus: false,
+  })
 
 /**
  * Query options for fetching a single experience
  *
+ * Note: staleTime=Infinity because data is kept fresh by onSnapshot listener in hooks
+ *
  * @param workspaceId - Workspace containing the experience
  * @param experienceId - Experience document ID
- * @returns QueryOptions for use with useQuery or prefetchQuery
+ * @returns Query options for use with useQuery or prefetchQuery
+ *
+ * @example
+ * ```typescript
+ * // In hook
+ * return useQuery(experienceQuery(workspaceId, experienceId))
+ *
+ * // In loader
+ * const exp = await context.queryClient.ensureQueryData(
+ *   experienceQuery(workspaceId, experienceId)
+ * )
+ * ```
  */
-export function experienceQuery(
-  workspaceId: string,
-  experienceId: string,
-): QueryOptions<Experience | null> {
-  return {
+export const experienceQuery = (workspaceId: string, experienceId: string) =>
+  queryOptions({
     queryKey: experienceKeys.detail(workspaceId, experienceId),
-    queryFn: async () => {
+    queryFn: async (): Promise<Experience | null> => {
       const experienceRef = doc(
         firestore,
         `workspaces/${workspaceId}/experiences/${experienceId}`,
@@ -117,5 +142,6 @@ export function experienceQuery(
 
       return convertFirestoreDoc(snapshot, experienceSchema)
     },
-  }
-}
+    staleTime: Infinity,
+    refetchOnWindowFocus: false,
+  })

@@ -2,13 +2,16 @@
  * useWorkspaceExperience Hook
  *
  * Fetches a single experience by ID with real-time updates.
+ *
+ * Pattern: Combines Firebase onSnapshot (real-time) with TanStack Query (caching)
+ * Reference: Follows same pattern as useProjectEvent hook
  */
 import { useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { doc, getDoc, onSnapshot } from 'firebase/firestore'
+import { doc, onSnapshot } from 'firebase/firestore'
 
 import { experienceSchema } from '../schemas/experience.schema'
-import { experienceKeys } from '../queries/experience.query'
+import { experienceKeys, experienceQuery } from '../queries/experience.query'
 import type { Experience } from '../schemas/experience.schema'
 import { firestore } from '@/integrations/firebase/client'
 import { convertFirestoreDoc } from '@/shared/utils/firestore-utils'
@@ -18,8 +21,14 @@ import { convertFirestoreDoc } from '@/shared/utils/firestore-utils'
  *
  * Features:
  * - Real-time updates via Firestore onSnapshot
+ * - TanStack Query cache integration
+ * - Automatic subscription cleanup
  * - Returns null if document doesn't exist (no error thrown)
- * - Validates document against experienceSchema
+ *
+ * Data Flow:
+ * 1. Route loader can call ensureQueryData() → Warms cache with initial data
+ * 2. Component calls useWorkspaceExperience() → Returns cached data immediately
+ * 3. onSnapshot listener updates cache → Component re-renders with new data
  *
  * @param workspaceId - Workspace containing the experience
  * @param experienceId - Experience document ID
@@ -52,7 +61,7 @@ export function useWorkspaceExperience(
 
     const unsubscribe = onSnapshot(experienceRef, (snapshot) => {
       if (!snapshot.exists()) {
-        queryClient.setQueryData(
+        queryClient.setQueryData<Experience | null>(
           experienceKeys.detail(workspaceId, experienceId),
           null,
         )
@@ -60,7 +69,7 @@ export function useWorkspaceExperience(
       }
 
       const experience = convertFirestoreDoc(snapshot, experienceSchema)
-      queryClient.setQueryData(
+      queryClient.setQueryData<Experience>(
         experienceKeys.detail(workspaceId, experienceId),
         experience,
       )
@@ -69,23 +78,5 @@ export function useWorkspaceExperience(
     return () => unsubscribe()
   }, [workspaceId, experienceId, queryClient])
 
-  return useQuery<Experience | null>({
-    queryKey: experienceKeys.detail(workspaceId, experienceId),
-    queryFn: async () => {
-      const experienceRef = doc(
-        firestore,
-        `workspaces/${workspaceId}/experiences/${experienceId}`,
-      )
-
-      const snapshot = await getDoc(experienceRef)
-
-      if (!snapshot.exists()) {
-        return null
-      }
-
-      return convertFirestoreDoc(snapshot, experienceSchema)
-    },
-    staleTime: Infinity, // Data kept fresh by onSnapshot listener
-    refetchOnWindowFocus: false,
-  })
+  return useQuery(experienceQuery(workspaceId, experienceId))
 }
