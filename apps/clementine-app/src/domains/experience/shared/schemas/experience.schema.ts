@@ -2,9 +2,9 @@
  * Experience Schema
  *
  * Defines the structure for Experience documents stored in Firestore.
- * An experience is a step-based interactive flow scoped to an Event.
+ * An experience is a step-based interactive flow scoped to a Workspace.
  *
- * Firestore Path: /projects/{projectId}/events/{eventId}/experiences/{experienceId}
+ * Firestore Path: /workspaces/{workspaceId}/experiences/{experienceId}
  *
  * This schema uses Firestore-safe patterns:
  * - Optional fields use `.nullable().default(null)` (Firestore doesn't support undefined)
@@ -21,24 +21,29 @@ export const experienceStatusSchema = z.enum(['active', 'deleted'])
 /**
  * Experience Profile enum schema
  *
- * Defines valid experience patterns for validation.
- * - freeform: Any valid step sequence
- * - main_default: Default main experience flow
- * - pregate_default: Pre-gate experience flow
- * - preshare_default: Pre-share experience flow
+ * Defines valid experience profiles that determine allowed step types.
+ * - freeform: Full flexibility with info, input, capture, transform steps
+ * - survey: Data collection with info, input, capture steps
+ * - story: Display only with info steps
+ *
+ * Profile is immutable after experience creation.
  */
-export const experienceProfileSchema = z.enum([
-  'freeform',
-  'main_default',
-  'pregate_default',
-  'preshare_default',
-])
+export const experienceProfileSchema = z.enum(['freeform', 'survey', 'story'])
 
 /**
- * Config version schema
- * Indicates whether config is draft or published
+ * Experience media schema
+ *
+ * Optional thumbnail or cover image for an experience.
+ * Stored at root level for efficient list queries.
  */
-export const configVersionSchema = z.enum(['draft', 'published'])
+export const experienceMediaSchema = z
+  .object({
+    /** Reference to media asset in media library */
+    mediaAssetId: z.string().min(1),
+    /** Full public URL for immediate rendering */
+    url: z.string().url(),
+  })
+  .nullable()
 
 /**
  * Step config placeholder schema
@@ -56,15 +61,9 @@ export const stepConfigSchema = z.looseObject({
  * Experience Config Schema
  *
  * Configuration object that defines the structure and behavior of an experience.
- * Contains version indicator and step definitions.
+ * Contains step definitions (version removed for simplicity).
  */
 export const experienceConfigSchema = z.looseObject({
-  /**
-   * Config version indicator
-   * Indicates whether this is a draft or published config
-   */
-  version: configVersionSchema,
-
   /**
    * Array of step configurations
    * Defines the sequence of steps in the experience
@@ -98,8 +97,12 @@ export const experienceSchema = z.looseObject({
   /**
    * Experience profile type
    * Determines validation rules for step sequences
+   * Immutable after creation
    */
-  profile: experienceProfileSchema.default('freeform'),
+  profile: experienceProfileSchema,
+
+  /** Optional thumbnail/cover image */
+  media: experienceMediaSchema.default(null),
 
   /** Creation timestamp (Unix ms) */
   createdAt: z.number(),
@@ -115,23 +118,20 @@ export const experienceSchema = z.looseObject({
    */
 
   /** Draft configuration (work in progress) */
-  draft: experienceConfigSchema.nullable().default(null),
+  draft: experienceConfigSchema,
 
-  /** Published configuration (live for guests) */
+  /** Published configuration (live for guests, null until first publish) */
   published: experienceConfigSchema.nullable().default(null),
 
   /**
-   * VERSION TRACKING
+   * PUBLISH TRACKING
    */
 
-  /** Draft version number (starts at 1, not 0) */
-  draftVersion: z.number().default(1),
-
-  /** Published version number */
-  publishedVersion: z.number().nullable().default(null),
-
-  /** Publish timestamp (Unix ms) */
+  /** Last publish timestamp (Unix ms) */
   publishedAt: z.number().nullable().default(null),
+
+  /** UID of admin who last published */
+  publishedBy: z.string().nullable().default(null),
 })
 
 /**
@@ -141,4 +141,4 @@ export type Experience = z.infer<typeof experienceSchema>
 export type ExperienceConfig = z.infer<typeof experienceConfigSchema>
 export type ExperienceStatus = z.infer<typeof experienceStatusSchema>
 export type ExperienceProfile = z.infer<typeof experienceProfileSchema>
-export type ConfigVersion = z.infer<typeof configVersionSchema>
+export type ExperienceMedia = z.infer<typeof experienceMediaSchema>

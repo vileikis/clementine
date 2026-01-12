@@ -7,17 +7,15 @@
 import { useEffect, useMemo } from 'react'
 import { FolderOpen, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
+
 import { usePublishEvent } from '../hooks'
-import {
-  DesignerStatusIndicators,
-  UnpublishedChangesBadge,
-} from '../components'
 import { useEventDesignerStore } from '../stores'
 import { EventDesignerPage } from './EventDesignerPage'
 import type { ProjectEventFull } from '@/domains/event/shared'
 import type { Project } from '@/domains/workspace/projects'
-import { Button } from '@/ui-kit/ui/button'
 import { TopNavBar } from '@/domains/navigation'
+import { EditorChangesBadge, EditorSaveStatus } from '@/shared/editor-status'
+import { Button } from '@/ui-kit/ui/button'
 
 interface EventDesignerLayoutProps {
   event: ProjectEventFull
@@ -48,7 +46,8 @@ export function EventDesignerLayout({
   workspaceSlug,
 }: EventDesignerLayoutProps) {
   const publishEvent = usePublishEvent(project.id, event.id)
-  const { resetSaveState } = useEventDesignerStore()
+  const { pendingSaves, lastCompletedAt, resetSaveState } =
+    useEventDesignerStore()
 
   // Compute paths for breadcrumb navigation
   const projectPath = `/workspace/${workspaceSlug}/projects/${project.id}`
@@ -99,8 +98,11 @@ export function EventDesignerLayout({
         ]}
         right={
           <>
-            <DesignerStatusIndicators />
-            <UnpublishedChangesBadge
+            <EditorSaveStatus
+              pendingSaves={pendingSaves}
+              lastCompletedAt={lastCompletedAt}
+            />
+            <EditorChangesBadge
               draftVersion={event.draftVersion}
               publishedVersion={event.publishedVersion}
             />

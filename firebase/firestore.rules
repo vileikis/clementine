@@ -44,6 +44,23 @@ service cloud.firestore {
         // No deletes - handled by Admin SDK scheduled jobs
         allow delete: if false;
       }
+
+      // Experience subcollection rules (021-experience-data-library)
+      // Workspace-scoped experiences with admin-only writes
+      match /experiences/{experienceId} {
+        // READ: Authenticated users can read experiences
+        // Guests will read full document in E5+; client filters to published field
+        allow read: if isAnyUser();
+
+        // CREATE: Only admins can create experiences
+        allow create: if isAdmin();
+
+        // UPDATE: Only admins can update experiences
+        allow update: if isAdmin();
+
+        // DELETE: Forbid hard deletes - use soft delete (status='deleted')
+        allow delete: if false;
+      }
     }
 
     // Projects collection rules

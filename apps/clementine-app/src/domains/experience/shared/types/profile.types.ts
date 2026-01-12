@@ -1,19 +1,65 @@
 /**
  * Experience Profile Types
  *
- * Defines experience profile validators.
+ * Defines experience profile validators and metadata.
  * Profiles determine valid step sequences and constraints for an experience.
  *
  * Available Profiles:
- * - freeform: Any valid step sequence
- * - main_default: Default main experience flow
- * - pregate_default: Pre-gate experience flow
- * - preshare_default: Pre-share experience flow
+ * - freeform: Full flexibility with info, input, capture, transform steps
+ * - survey: Data collection with info, input, capture steps
+ * - story: Display only with info steps
+ *
+ * Note: Profile is immutable after experience creation.
  */
 import type {
   ExperienceConfig,
   ExperienceProfile,
 } from '../schemas/experience.schema'
+import type { StepCategory } from './step.types'
+
+/**
+ * Slot types where experiences can be used
+ */
+export type SlotType = 'main' | 'pregate' | 'preshare'
+
+/**
+ * Profile metadata describing capabilities
+ */
+export interface ProfileMetadata {
+  /** Human-readable label */
+  label: string
+  /** Description for users */
+  description: string
+  /** Allowed step categories */
+  allowedStepCategories: StepCategory[]
+  /** Compatible slot types */
+  slotCompatibility: SlotType[]
+}
+
+/**
+ * Profile metadata record
+ * Static information about each profile type
+ */
+export const profileMetadata: Record<ExperienceProfile, ProfileMetadata> = {
+  freeform: {
+    label: 'Freeform',
+    description: 'Full flexibility with any step types',
+    allowedStepCategories: ['info', 'input', 'capture', 'transform'],
+    slotCompatibility: ['main'],
+  },
+  survey: {
+    label: 'Survey',
+    description: 'Data collection with info, input, and capture steps',
+    allowedStepCategories: ['info', 'input', 'capture'],
+    slotCompatibility: ['main', 'pregate', 'preshare'],
+  },
+  story: {
+    label: 'Story',
+    description: 'Display-only with info steps',
+    allowedStepCategories: ['info'],
+    slotCompatibility: ['pregate', 'preshare'],
+  },
+}
 
 /**
  * Profile validation result
@@ -40,7 +86,9 @@ export type ProfileValidator = (
 
 /**
  * Empty validator factory
- * Creates a validator that always passes (for Phase 0)
+ * Creates a validator that always passes
+ *
+ * E1 Scope: All profiles use empty validators (validation deferred to E2)
  */
 const createEmptyValidator = (): ProfileValidator => {
   return () => ({
@@ -54,14 +102,13 @@ const createEmptyValidator = (): ProfileValidator => {
  * Profile validators record
  * Maps each profile to its validator function
  *
- * Phase 0: All validators return valid=true
- * Future phases will implement actual validation logic
+ * E1 Scope: All validators return valid=true
+ * E2 will implement actual validation logic using profileMetadata
  */
 export const profileValidators: Record<ExperienceProfile, ProfileValidator> = {
   freeform: createEmptyValidator(),
-  main_default: createEmptyValidator(),
-  pregate_default: createEmptyValidator(),
-  preshare_default: createEmptyValidator(),
+  survey: createEmptyValidator(),
+  story: createEmptyValidator(),
 }
 
 /**
@@ -73,7 +120,7 @@ export const profileValidators: Record<ExperienceProfile, ProfileValidator> = {
  *
  * @example
  * ```typescript
- * const result = validateExperienceProfile('main_default', experienceConfig)
+ * const result = validateExperienceProfile('survey', experienceConfig)
  *
  * if (!result.valid) {
  *   console.error('Validation failed:', result.errors)

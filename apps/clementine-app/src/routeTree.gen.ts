@@ -29,7 +29,10 @@ import { Route as AdminWorkspacesCreateRouteImport } from './app/admin/workspace
 import { Route as AdminDevToolsPreviewShellRouteImport } from './app/admin/dev-tools/preview-shell'
 import { Route as AdminDevToolsCameraRouteImport } from './app/admin/dev-tools/camera'
 import { Route as WorkspaceWorkspaceSlugProjectsIndexRouteImport } from './app/workspace/$workspaceSlug.projects/index'
+import { Route as WorkspaceWorkspaceSlugExperiencesIndexRouteImport } from './app/workspace/$workspaceSlug.experiences/index'
 import { Route as WorkspaceWorkspaceSlugProjectsProjectIdRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId'
+import { Route as WorkspaceWorkspaceSlugExperiencesCreateRouteImport } from './app/workspace/$workspaceSlug.experiences/create'
+import { Route as WorkspaceWorkspaceSlugExperiencesExperienceIdRouteImport } from './app/workspace/$workspaceSlug.experiences/$experienceId'
 import { Route as WorkspaceWorkspaceSlugProjectsProjectIdIndexRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId.index'
 import { Route as WorkspaceWorkspaceSlugProjectsProjectIdEventsIndexRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId.events/index'
 import { Route as WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId.events/$eventId'
@@ -142,10 +145,28 @@ const WorkspaceWorkspaceSlugProjectsIndexRoute =
     path: '/projects/',
     getParentRoute: () => WorkspaceWorkspaceSlugRoute,
   } as any)
+const WorkspaceWorkspaceSlugExperiencesIndexRoute =
+  WorkspaceWorkspaceSlugExperiencesIndexRouteImport.update({
+    id: '/experiences/',
+    path: '/experiences/',
+    getParentRoute: () => WorkspaceWorkspaceSlugRoute,
+  } as any)
 const WorkspaceWorkspaceSlugProjectsProjectIdRoute =
   WorkspaceWorkspaceSlugProjectsProjectIdRouteImport.update({
     id: '/projects/$projectId',
     path: '/projects/$projectId',
+    getParentRoute: () => WorkspaceWorkspaceSlugRoute,
+  } as any)
+const WorkspaceWorkspaceSlugExperiencesCreateRoute =
+  WorkspaceWorkspaceSlugExperiencesCreateRouteImport.update({
+    id: '/experiences/create',
+    path: '/experiences/create',
+    getParentRoute: () => WorkspaceWorkspaceSlugRoute,
+  } as any)
+const WorkspaceWorkspaceSlugExperiencesExperienceIdRoute =
+  WorkspaceWorkspaceSlugExperiencesExperienceIdRouteImport.update({
+    id: '/experiences/$experienceId',
+    path: '/experiences/$experienceId',
     getParentRoute: () => WorkspaceWorkspaceSlugRoute,
   } as any)
 const WorkspaceWorkspaceSlugProjectsProjectIdIndexRoute =
@@ -219,7 +240,10 @@ export interface FileRoutesByFullPath {
   '/workspace/$workspaceSlug/settings': typeof WorkspaceWorkspaceSlugSettingsRoute
   '/admin/workspaces': typeof AdminWorkspacesIndexRoute
   '/workspace/$workspaceSlug/': typeof WorkspaceWorkspaceSlugIndexRoute
+  '/workspace/$workspaceSlug/experiences/$experienceId': typeof WorkspaceWorkspaceSlugExperiencesExperienceIdRoute
+  '/workspace/$workspaceSlug/experiences/create': typeof WorkspaceWorkspaceSlugExperiencesCreateRoute
   '/workspace/$workspaceSlug/projects/$projectId': typeof WorkspaceWorkspaceSlugProjectsProjectIdRouteWithChildren
+  '/workspace/$workspaceSlug/experiences': typeof WorkspaceWorkspaceSlugExperiencesIndexRoute
   '/workspace/$workspaceSlug/projects': typeof WorkspaceWorkspaceSlugProjectsIndexRoute
   '/workspace/$workspaceSlug/projects/$projectId/': typeof WorkspaceWorkspaceSlugProjectsProjectIdIndexRoute
   '/workspace/$workspaceSlug/projects/$projectId/events/$eventId': typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdRouteWithChildren
@@ -245,6 +269,9 @@ export interface FileRoutesByTo {
   '/workspace/$workspaceSlug/settings': typeof WorkspaceWorkspaceSlugSettingsRoute
   '/admin/workspaces': typeof AdminWorkspacesIndexRoute
   '/workspace/$workspaceSlug': typeof WorkspaceWorkspaceSlugIndexRoute
+  '/workspace/$workspaceSlug/experiences/$experienceId': typeof WorkspaceWorkspaceSlugExperiencesExperienceIdRoute
+  '/workspace/$workspaceSlug/experiences/create': typeof WorkspaceWorkspaceSlugExperiencesCreateRoute
+  '/workspace/$workspaceSlug/experiences': typeof WorkspaceWorkspaceSlugExperiencesIndexRoute
   '/workspace/$workspaceSlug/projects': typeof WorkspaceWorkspaceSlugProjectsIndexRoute
   '/workspace/$workspaceSlug/projects/$projectId': typeof WorkspaceWorkspaceSlugProjectsProjectIdIndexRoute
   '/workspace/$workspaceSlug/projects/$projectId/events': typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsIndexRoute
@@ -274,7 +301,10 @@ export interface FileRoutesById {
   '/workspace/$workspaceSlug/settings': typeof WorkspaceWorkspaceSlugSettingsRoute
   '/admin/workspaces/': typeof AdminWorkspacesIndexRoute
   '/workspace/$workspaceSlug/': typeof WorkspaceWorkspaceSlugIndexRoute
+  '/workspace/$workspaceSlug/experiences/$experienceId': typeof WorkspaceWorkspaceSlugExperiencesExperienceIdRoute
+  '/workspace/$workspaceSlug/experiences/create': typeof WorkspaceWorkspaceSlugExperiencesCreateRoute
   '/workspace/$workspaceSlug/projects/$projectId': typeof WorkspaceWorkspaceSlugProjectsProjectIdRouteWithChildren
+  '/workspace/$workspaceSlug/experiences/': typeof WorkspaceWorkspaceSlugExperiencesIndexRoute
   '/workspace/$workspaceSlug/projects/': typeof WorkspaceWorkspaceSlugProjectsIndexRoute
   '/workspace/$workspaceSlug/projects/$projectId/': typeof WorkspaceWorkspaceSlugProjectsProjectIdIndexRoute
   '/workspace/$workspaceSlug/projects/$projectId/events/$eventId': typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdRouteWithChildren
@@ -306,7 +336,10 @@ export interface FileRouteTypes {
     | '/workspace/$workspaceSlug/settings'
     | '/admin/workspaces'
     | '/workspace/$workspaceSlug/'
+    | '/workspace/$workspaceSlug/experiences/$experienceId'
+    | '/workspace/$workspaceSlug/experiences/create'
     | '/workspace/$workspaceSlug/projects/$projectId'
+    | '/workspace/$workspaceSlug/experiences'
     | '/workspace/$workspaceSlug/projects'
     | '/workspace/$workspaceSlug/projects/$projectId/'
     | '/workspace/$workspaceSlug/projects/$projectId/events/$eventId'
@@ -332,6 +365,9 @@ export interface FileRouteTypes {
     | '/workspace/$workspaceSlug/settings'
     | '/admin/workspaces'
     | '/workspace/$workspaceSlug'
+    | '/workspace/$workspaceSlug/experiences/$experienceId'
+    | '/workspace/$workspaceSlug/experiences/create'
+    | '/workspace/$workspaceSlug/experiences'
     | '/workspace/$workspaceSlug/projects'
     | '/workspace/$workspaceSlug/projects/$projectId'
     | '/workspace/$workspaceSlug/projects/$projectId/events'
@@ -360,7 +396,10 @@ export interface FileRouteTypes {
     | '/workspace/$workspaceSlug/settings'
     | '/admin/workspaces/'
     | '/workspace/$workspaceSlug/'
+    | '/workspace/$workspaceSlug/experiences/$experienceId'
+    | '/workspace/$workspaceSlug/experiences/create'
     | '/workspace/$workspaceSlug/projects/$projectId'
+    | '/workspace/$workspaceSlug/experiences/'
     | '/workspace/$workspaceSlug/projects/'
     | '/workspace/$workspaceSlug/projects/$projectId/'
     | '/workspace/$workspaceSlug/projects/$projectId/events/$eventId'
@@ -523,11 +562,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkspaceWorkspaceSlugProjectsIndexRouteImport
       parentRoute: typeof WorkspaceWorkspaceSlugRoute
     }
+    '/workspace/$workspaceSlug/experiences/': {
+      id: '/workspace/$workspaceSlug/experiences/'
+      path: '/experiences'
+      fullPath: '/workspace/$workspaceSlug/experiences'
+      preLoaderRoute: typeof WorkspaceWorkspaceSlugExperiencesIndexRouteImport
+      parentRoute: typeof WorkspaceWorkspaceSlugRoute
+    }
     '/workspace/$workspaceSlug/projects/$projectId': {
       id: '/workspace/$workspaceSlug/projects/$projectId'
       path: '/projects/$projectId'
       fullPath: '/workspace/$workspaceSlug/projects/$projectId'
       preLoaderRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdRouteImport
+      parentRoute: typeof WorkspaceWorkspaceSlugRoute
+    }
+    '/workspace/$workspaceSlug/experiences/create': {
+      id: '/workspace/$workspaceSlug/experiences/create'
+      path: '/experiences/create'
+      fullPath: '/workspace/$workspaceSlug/experiences/create'
+      preLoaderRoute: typeof WorkspaceWorkspaceSlugExperiencesCreateRouteImport
+      parentRoute: typeof WorkspaceWorkspaceSlugRoute
+    }
+    '/workspace/$workspaceSlug/experiences/$experienceId': {
+      id: '/workspace/$workspaceSlug/experiences/$experienceId'
+      path: '/experiences/$experienceId'
+      fullPath: '/workspace/$workspaceSlug/experiences/$experienceId'
+      preLoaderRoute: typeof WorkspaceWorkspaceSlugExperiencesExperienceIdRouteImport
       parentRoute: typeof WorkspaceWorkspaceSlugRoute
     }
     '/workspace/$workspaceSlug/projects/$projectId/': {
@@ -675,7 +735,10 @@ const WorkspaceWorkspaceSlugProjectsProjectIdRouteWithChildren =
 interface WorkspaceWorkspaceSlugRouteChildren {
   WorkspaceWorkspaceSlugSettingsRoute: typeof WorkspaceWorkspaceSlugSettingsRoute
   WorkspaceWorkspaceSlugIndexRoute: typeof WorkspaceWorkspaceSlugIndexRoute
+  WorkspaceWorkspaceSlugExperiencesExperienceIdRoute: typeof WorkspaceWorkspaceSlugExperiencesExperienceIdRoute
+  WorkspaceWorkspaceSlugExperiencesCreateRoute: typeof WorkspaceWorkspaceSlugExperiencesCreateRoute
   WorkspaceWorkspaceSlugProjectsProjectIdRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdRouteWithChildren
+  WorkspaceWorkspaceSlugExperiencesIndexRoute: typeof WorkspaceWorkspaceSlugExperiencesIndexRoute
   WorkspaceWorkspaceSlugProjectsIndexRoute: typeof WorkspaceWorkspaceSlugProjectsIndexRoute
 }
 
@@ -683,8 +746,14 @@ const WorkspaceWorkspaceSlugRouteChildren: WorkspaceWorkspaceSlugRouteChildren =
   {
     WorkspaceWorkspaceSlugSettingsRoute: WorkspaceWorkspaceSlugSettingsRoute,
     WorkspaceWorkspaceSlugIndexRoute: WorkspaceWorkspaceSlugIndexRoute,
+    WorkspaceWorkspaceSlugExperiencesExperienceIdRoute:
+      WorkspaceWorkspaceSlugExperiencesExperienceIdRoute,
+    WorkspaceWorkspaceSlugExperiencesCreateRoute:
+      WorkspaceWorkspaceSlugExperiencesCreateRoute,
     WorkspaceWorkspaceSlugProjectsProjectIdRoute:
       WorkspaceWorkspaceSlugProjectsProjectIdRouteWithChildren,
+    WorkspaceWorkspaceSlugExperiencesIndexRoute:
+      WorkspaceWorkspaceSlugExperiencesIndexRoute,
     WorkspaceWorkspaceSlugProjectsIndexRoute:
       WorkspaceWorkspaceSlugProjectsIndexRoute,
   }
