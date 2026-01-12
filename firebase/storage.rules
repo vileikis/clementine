@@ -16,6 +16,20 @@ service firebase.storage {
       return request.auth != null;                                                                                                       
     }    
 
+    // Media files rules (013-event-settings-overlays)
+    // Authentication-based access control - file validation in client code
+    match /workspaces/{workspaceId}/media/{fileName} {
+      // Authenticated users can read files
+      allow read: if isAnyUser();
+
+      // Only admins can upload files
+      allow create: if isAdmin();
+
+      // No updates or deletes (files are immutable)
+      // Deletes handled by Admin SDK scheduled jobs
+      allow update, delete: if false;
+    }
+
     // Workspace storage: Anonymous users can read, admins can read/write
     match /workspaces/{workspaceId}/{allPaths=**} {
       allow read: if isAnyUser(); // Any authenticated user (including anonymous)
