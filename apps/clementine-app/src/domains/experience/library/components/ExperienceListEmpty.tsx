@@ -9,7 +9,6 @@
 import type { ExperienceProfile } from '@/domains/experience/shared'
 import { profileMetadata } from '@/domains/experience/shared'
 import { Button } from '@/ui-kit/ui/button'
-import { Card } from '@/ui-kit/ui/card'
 
 interface ExperienceListEmptyProps {
   /** Empty state variant */
@@ -49,13 +48,13 @@ export function ExperienceListEmpty({
 }: ExperienceListEmptyProps) {
   if (variant === 'no-experiences') {
     return (
-      <Card className="p-8 text-center">
+      <div className="p-8 text-center">
         <h3 className="text-lg font-semibold">No experiences yet</h3>
         <p className="text-muted-foreground mt-2 mb-4">
           Create your first experience to get started
         </p>
         {onCreate && <Button onClick={onCreate}>Create Experience</Button>}
-      </Card>
+      </div>
     )
   }
 
@@ -63,16 +62,12 @@ export function ExperienceListEmpty({
   const profileLabel = profile ? profileMetadata[profile].label : 'this type'
 
   return (
-    <Card className="p-8 text-center">
+    <div className="p-8 text-center">
       <h3 className="text-lg font-semibold">No {profileLabel} experiences</h3>
       <p className="text-muted-foreground mt-2 mb-4">
         Try a different filter or create a new experience
       </p>
-      {onClearFilter && (
-        <Button variant="outline" onClick={onClearFilter}>
-          Clear Filter
-        </Button>
-      )}
-    </Card>
+      {onClearFilter && <Button onClick={onClearFilter}>Clear Filter</Button>}
+    </div>
   )
 }

@@ -10,16 +10,9 @@ import { Label } from '@/ui-kit/ui/label'
 import { cn } from '@/shared/utils/style-utils'
 
 /**
- * Profile option with styling information
+ * Profile options
  */
-const profileOptions: {
-  value: ExperienceProfile
-  colorClass: string
-}[] = [
-  { value: 'freeform', colorClass: 'border-blue-500' },
-  { value: 'survey', colorClass: 'border-green-500' },
-  { value: 'story', colorClass: 'border-purple-500' },
-]
+const profileOptions: ExperienceProfile[] = ['freeform', 'survey', 'story']
 
 interface ProfileSelectorProps {
   /** Currently selected profile */
@@ -53,16 +46,16 @@ export function ProfileSelector({
     <div className="space-y-3">
       <Label className="text-sm font-medium">Profile Type</Label>
       <div className="space-y-2">
-        {profileOptions.map((option) => {
-          const meta = profileMetadata[option.value]
-          const isSelected = value === option.value
+        {profileOptions.map((profile) => {
+          const meta = profileMetadata[profile]
+          const isSelected = value === profile
 
           return (
             <label
-              key={option.value}
+              key={profile}
               className={cn(
                 'flex items-start gap-3 p-3 border rounded-lg cursor-pointer transition-colors',
-                isSelected && `border-2 ${option.colorClass} bg-muted/50`,
+                isSelected && 'border-2 border-primary bg-muted/50',
                 !isSelected && 'border-border hover:bg-muted/50',
                 disabled && 'opacity-50 cursor-not-allowed',
               )}
@@ -70,9 +63,9 @@ export function ProfileSelector({
               <input
                 type="radio"
                 name="profile"
-                value={option.value}
+                value={profile}
                 checked={isSelected}
-                onChange={() => onChange(option.value)}
+                onChange={() => onChange(profile)}
                 disabled={disabled}
                 className="mt-1 h-4 w-4"
               />

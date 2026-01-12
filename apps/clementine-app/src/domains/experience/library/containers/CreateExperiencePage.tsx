@@ -9,7 +9,6 @@ import { toast } from 'sonner'
 
 import { CreateExperienceForm } from '../components'
 import { useCreateExperience } from '@/domains/experience/shared'
-import { Card } from '@/ui-kit/ui/card'
 
 interface CreateExperiencePageProps {
   /** Workspace ID for experience creation */
@@ -74,14 +73,14 @@ export function CreateExperiencePage({
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">Create Experience</h1>
 
-      <Card className="p-6 max-w-xl">
+      <div className="max-w-xl">
         <CreateExperienceForm
           workspaceId={workspaceId}
           onSubmit={handleSubmit}
           isSubmitting={createExperience.isPending}
           onCancel={handleCancel}
         />
-      </Card>
+      </div>
     </div>
   )
 }
