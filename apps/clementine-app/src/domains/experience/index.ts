@@ -6,7 +6,9 @@
  * Usage:
  * ```typescript
  * import { Experience, experienceSchema, Step } from '@/domains/experience'
+ * import { ExperiencesPage, ProfileBadge } from '@/domains/experience/library'
  * ```
  */
 
 export * from './shared'
+export * from './library'

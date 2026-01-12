@@ -25,12 +25,12 @@
 
 **Purpose**: Update schemas and security rules that all user stories depend on
 
-- [ ] T001 Update experience schema with new profiles (freeform, survey, story) and media field in `apps/clementine-app/src/domains/experience/shared/schemas/experience.schema.ts`
-- [ ] T002 [P] Update profile validators with new profile definitions in `apps/clementine-app/src/domains/experience/shared/types/profile.types.ts`
-- [ ] T003 [P] Create input schemas (create, update, delete) in `apps/clementine-app/src/domains/experience/shared/schemas/experience.input.schemas.ts`
-- [ ] T004 [P] Add experience security rules to `firebase/firestore.rules`
-- [ ] T005 [P] Add composite indexes for experiences collection to `firebase/firestore.indexes.json`
-- [ ] T006 Update barrel exports in `apps/clementine-app/src/domains/experience/shared/schemas/index.ts`
+- [x] T001 Update experience schema with new profiles (freeform, survey, story) and media field in `apps/clementine-app/src/domains/experience/shared/schemas/experience.schema.ts`
+- [x] T002 [P] Update profile validators with new profile definitions in `apps/clementine-app/src/domains/experience/shared/types/profile.types.ts`
+- [x] T003 [P] Create input schemas (create, update, delete) in `apps/clementine-app/src/domains/experience/shared/schemas/experience.input.schemas.ts`
+- [x] T004 [P] Add experience security rules to `firebase/firestore.rules`
+- [x] T005 [P] Add composite indexes for experiences collection to `firebase/firestore.indexes.json`
+- [x] T006 Update barrel exports in `apps/clementine-app/src/domains/experience/shared/schemas/index.ts`
 
 ---
 
@@ -40,15 +40,15 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T007 Create query options factories in `apps/clementine-app/src/domains/experience/shared/queries/experience.query.ts`
-- [ ] T008 Create barrel export in `apps/clementine-app/src/domains/experience/shared/queries/index.ts`
-- [ ] T009 Implement useWorkspaceExperiences hook with real-time listener in `apps/clementine-app/src/domains/experience/shared/hooks/useWorkspaceExperiences.ts`
-- [ ] T010 [P] Implement useWorkspaceExperience hook for single doc in `apps/clementine-app/src/domains/experience/shared/hooks/useWorkspaceExperience.ts`
-- [ ] T011 [P] Implement useCreateExperience mutation hook in `apps/clementine-app/src/domains/experience/shared/hooks/useCreateExperience.ts`
-- [ ] T012 [P] Implement useUpdateExperience mutation hook in `apps/clementine-app/src/domains/experience/shared/hooks/useUpdateExperience.ts`
-- [ ] T013 [P] Implement useDeleteExperience mutation hook in `apps/clementine-app/src/domains/experience/shared/hooks/useDeleteExperience.ts`
-- [ ] T014 Create barrel export for hooks in `apps/clementine-app/src/domains/experience/shared/hooks/index.ts`
-- [ ] T015 Update domain barrel export in `apps/clementine-app/src/domains/experience/shared/index.ts`
+- [x] T007 Create query options factories in `apps/clementine-app/src/domains/experience/shared/queries/experience.query.ts`
+- [x] T008 Create barrel export in `apps/clementine-app/src/domains/experience/shared/queries/index.ts`
+- [x] T009 Implement useWorkspaceExperiences hook with real-time listener in `apps/clementine-app/src/domains/experience/shared/hooks/useWorkspaceExperiences.ts`
+- [x] T010 [P] Implement useWorkspaceExperience hook for single doc in `apps/clementine-app/src/domains/experience/shared/hooks/useWorkspaceExperience.ts`
+- [x] T011 [P] Implement useCreateExperience mutation hook in `apps/clementine-app/src/domains/experience/shared/hooks/useCreateExperience.ts`
+- [x] T012 [P] Implement useUpdateExperience mutation hook in `apps/clementine-app/src/domains/experience/shared/hooks/useUpdateExperience.ts`
+- [x] T013 [P] Implement useDeleteExperience mutation hook in `apps/clementine-app/src/domains/experience/shared/hooks/useDeleteExperience.ts`
+- [x] T014 Create barrel export for hooks in `apps/clementine-app/src/domains/experience/shared/hooks/index.ts`
+- [x] T015 Update domain barrel export in `apps/clementine-app/src/domains/experience/shared/index.ts`
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -62,15 +62,15 @@
 
 ### Implementation for User Story 1
 
-- [ ] T016 [P] [US1] Create ProfileBadge component in `apps/clementine-app/src/domains/experience/library/components/ProfileBadge.tsx`
-- [ ] T017 [P] [US1] Create ExperienceListEmpty component with two variants in `apps/clementine-app/src/domains/experience/library/components/ExperienceListEmpty.tsx`
-- [ ] T018 [P] [US1] Create ExperienceListItem component with thumbnail, name, badge, status in `apps/clementine-app/src/domains/experience/library/components/ExperienceListItem.tsx`
-- [ ] T019 [US1] Create ExperiencesPage container with profile filter tabs in `apps/clementine-app/src/domains/experience/library/containers/ExperiencesPage.tsx`
-- [ ] T020 [US1] Create barrel exports for library components in `apps/clementine-app/src/domains/experience/library/components/index.ts`
-- [ ] T021 [US1] Create barrel exports for library containers in `apps/clementine-app/src/domains/experience/library/containers/index.ts`
-- [ ] T022 [US1] Create library subdomain barrel export in `apps/clementine-app/src/domains/experience/library/index.ts`
-- [ ] T023 [US1] Update experience domain barrel export in `apps/clementine-app/src/domains/experience/index.ts`
-- [ ] T024 [US1] Create experiences list route in `apps/clementine-app/src/app/workspace/$workspaceSlug.experiences/index.tsx`
+- [x] T016 [P] [US1] Create ProfileBadge component in `apps/clementine-app/src/domains/experience/library/components/ProfileBadge.tsx`
+- [x] T017 [P] [US1] Create ExperienceListEmpty component with two variants in `apps/clementine-app/src/domains/experience/library/components/ExperienceListEmpty.tsx`
+- [x] T018 [P] [US1] Create ExperienceListItem component with thumbnail, name, badge, status in `apps/clementine-app/src/domains/experience/library/components/ExperienceListItem.tsx`
+- [x] T019 [US1] Create ExperiencesPage container with profile filter tabs in `apps/clementine-app/src/domains/experience/library/containers/ExperiencesPage.tsx`
+- [x] T020 [US1] Create barrel exports for library components in `apps/clementine-app/src/domains/experience/library/components/index.ts`
+- [x] T021 [US1] Create barrel exports for library containers in `apps/clementine-app/src/domains/experience/library/containers/index.ts`
+- [x] T022 [US1] Create library subdomain barrel export in `apps/clementine-app/src/domains/experience/library/index.ts`
+- [x] T023 [US1] Update experience domain barrel export in `apps/clementine-app/src/domains/experience/index.ts`
+- [x] T024 [US1] Create experiences list route in `apps/clementine-app/src/app/workspace/$workspaceSlug.experiences/index.tsx`
 
 **Checkpoint**: User Story 1 complete - admins can view and filter experience library
 
@@ -84,13 +84,13 @@
 
 ### Implementation for User Story 2
 
-- [ ] T025 [P] [US2] Create ProfileSelector component with radio/select and descriptions in `apps/clementine-app/src/domains/experience/library/components/ProfileSelector.tsx`
-- [ ] T026 [P] [US2] Create CreateExperienceForm component with validation in `apps/clementine-app/src/domains/experience/library/components/CreateExperienceForm.tsx`
-- [ ] T027 [US2] Create CreateExperiencePage container in `apps/clementine-app/src/domains/experience/library/containers/CreateExperiencePage.tsx`
-- [ ] T028 [US2] Update library components barrel export in `apps/clementine-app/src/domains/experience/library/components/index.ts`
-- [ ] T029 [US2] Update library containers barrel export in `apps/clementine-app/src/domains/experience/library/containers/index.ts`
-- [ ] T030 [US2] Create experience create route in `apps/clementine-app/src/app/workspace/$workspaceSlug.experiences/create.tsx`
-- [ ] T031 [US2] Add "Create Experience" button to ExperiencesPage linking to create route in `apps/clementine-app/src/domains/experience/library/containers/ExperiencesPage.tsx`
+- [x] T025 [P] [US2] Create ProfileSelector component with radio/select and descriptions in `apps/clementine-app/src/domains/experience/library/components/ProfileSelector.tsx`
+- [x] T026 [P] [US2] Create CreateExperienceForm component with validation in `apps/clementine-app/src/domains/experience/library/components/CreateExperienceForm.tsx`
+- [x] T027 [US2] Create CreateExperiencePage container in `apps/clementine-app/src/domains/experience/library/containers/CreateExperiencePage.tsx`
+- [x] T028 [US2] Update library components barrel export in `apps/clementine-app/src/domains/experience/library/components/index.ts`
+- [x] T029 [US2] Update library containers barrel export in `apps/clementine-app/src/domains/experience/library/containers/index.ts`
+- [x] T030 [US2] Create experience create route in `apps/clementine-app/src/app/workspace/$workspaceSlug.experiences/create.tsx`
+- [x] T031 [US2] Add "Create Experience" button to ExperiencesPage linking to create route in `apps/clementine-app/src/domains/experience/library/containers/ExperiencesPage.tsx`
 
 **Checkpoint**: User Stories 1 AND 2 complete - admins can view library and create new experiences
 
@@ -104,10 +104,10 @@
 
 ### Implementation for User Story 3
 
-- [ ] T032 [US3] Create RenameExperienceDialog component in `apps/clementine-app/src/domains/experience/library/components/RenameExperienceDialog.tsx`
-- [ ] T033 [US3] Update library components barrel export in `apps/clementine-app/src/domains/experience/library/components/index.ts`
-- [ ] T034 [US3] Add context menu with rename action to ExperienceListItem in `apps/clementine-app/src/domains/experience/library/components/ExperienceListItem.tsx`
-- [ ] T035 [US3] Wire rename dialog to ExperiencesPage state in `apps/clementine-app/src/domains/experience/library/containers/ExperiencesPage.tsx`
+- [x] T032 [US3] Create RenameExperienceDialog component in `apps/clementine-app/src/domains/experience/library/components/RenameExperienceDialog.tsx`
+- [x] T033 [US3] Update library components barrel export in `apps/clementine-app/src/domains/experience/library/components/index.ts`
+- [x] T034 [US3] Add context menu with rename action to ExperienceListItem in `apps/clementine-app/src/domains/experience/library/components/ExperienceListItem.tsx`
+- [x] T035 [US3] Wire rename dialog to ExperiencesPage state in `apps/clementine-app/src/domains/experience/library/containers/ExperiencesPage.tsx`
 
 **Checkpoint**: User Stories 1, 2, AND 3 complete - admins can view, create, and rename experiences
 
@@ -121,10 +121,10 @@
 
 ### Implementation for User Story 4
 
-- [ ] T036 [US4] Create DeleteExperienceDialog component in `apps/clementine-app/src/domains/experience/library/components/DeleteExperienceDialog.tsx`
-- [ ] T037 [US4] Update library components barrel export in `apps/clementine-app/src/domains/experience/library/components/index.ts`
-- [ ] T038 [US4] Add delete action to ExperienceListItem context menu in `apps/clementine-app/src/domains/experience/library/components/ExperienceListItem.tsx`
-- [ ] T039 [US4] Wire delete dialog to ExperiencesPage state in `apps/clementine-app/src/domains/experience/library/containers/ExperiencesPage.tsx`
+- [x] T036 [US4] Create DeleteExperienceDialog component in `apps/clementine-app/src/domains/experience/library/components/DeleteExperienceDialog.tsx`
+- [x] T037 [US4] Update library components barrel export in `apps/clementine-app/src/domains/experience/library/components/index.ts`
+- [x] T038 [US4] Add delete action to ExperienceListItem context menu in `apps/clementine-app/src/domains/experience/library/components/ExperienceListItem.tsx`
+- [x] T039 [US4] Wire delete dialog to ExperiencesPage state in `apps/clementine-app/src/domains/experience/library/containers/ExperiencesPage.tsx`
 
 **Checkpoint**: User Stories 1-4 complete - full CRUD functionality for experiences
 
@@ -138,10 +138,10 @@
 
 ### Implementation for User Story 5
 
-- [ ] T040 [US5] Create ExperienceEditorPage container with breadcrumb and placeholder in `apps/clementine-app/src/domains/experience/library/containers/ExperienceEditorPage.tsx`
-- [ ] T041 [US5] Update library containers barrel export in `apps/clementine-app/src/domains/experience/library/containers/index.ts`
-- [ ] T042 [US5] Create experience editor route in `apps/clementine-app/src/app/workspace/$workspaceSlug.experiences/$experienceId.tsx`
-- [ ] T043 [US5] Wire ExperienceListItem click to navigate to editor in `apps/clementine-app/src/domains/experience/library/components/ExperienceListItem.tsx`
+- [x] T040 [US5] Create ExperienceEditorPage container with breadcrumb and placeholder in `apps/clementine-app/src/domains/experience/library/containers/ExperienceEditorPage.tsx`
+- [x] T041 [US5] Update library containers barrel export in `apps/clementine-app/src/domains/experience/library/containers/index.ts`
+- [x] T042 [US5] Create experience editor route in `apps/clementine-app/src/app/workspace/$workspaceSlug.experiences/$experienceId.tsx`
+- [x] T043 [US5] Wire ExperienceListItem click to navigate to editor in `apps/clementine-app/src/domains/experience/library/components/ExperienceListItem.tsx`
 
 **Checkpoint**: All 5 user stories complete - full library experience with navigation to editor shell
 
@@ -151,8 +151,8 @@
 
 **Purpose**: Final validation and cleanup
 
-- [ ] T044 Run `pnpm app:check` to verify linting and formatting
-- [ ] T045 Run `pnpm app:type-check` to verify TypeScript compilation
+- [x] T044 Run `pnpm app:check` to verify linting and formatting
+- [x] T045 Run `pnpm app:type-check` to verify TypeScript compilation
 - [ ] T046 Deploy Firestore rules with `pnpm fb:deploy:rules`
 - [ ] T047 Deploy Firestore indexes with `pnpm fb:deploy:indexes`
 - [ ] T048 Manual validation: Test all acceptance scenarios from spec.md

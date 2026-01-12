@@ -7,9 +7,9 @@
 
 // Re-export types inferred from schemas
 export type {
-  ConfigVersion,
   Experience,
   ExperienceConfig,
+  ExperienceMedia,
   ExperienceProfile,
   ExperienceStatus,
 } from '../schemas/experience.schema'
