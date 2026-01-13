@@ -15,6 +15,10 @@
  * // Size variants
  * <ThemedButton size="lg">Large Button</ThemedButton>
  * <ThemedButton size="sm">Small Button</ThemedButton>
+ *
+ * // Style variants
+ * <ThemedButton variant="primary">Primary Action</ThemedButton>
+ * <ThemedButton variant="outline">Secondary Action</ThemedButton>
  * ```
  */
 
@@ -26,6 +30,9 @@ import { cn } from '@/shared/utils'
 
 /** Button size variants */
 export type ButtonSize = 'sm' | 'md' | 'lg'
+
+/** Button style variants */
+export type ButtonVariant = 'primary' | 'outline'
 
 /** Size-based Tailwind classes for padding and font size */
 const SIZE_CLASSES: Record<ButtonSize, string> = {
@@ -42,6 +49,8 @@ export interface ThemedButtonProps extends Omit<
   children: ReactNode
   /** Button size variant (defaults to 'md') */
   size?: ButtonSize
+  /** Button style variant (defaults to 'primary') */
+  variant?: ButtonVariant
   /** Theme override for use without ThemeProvider */
   theme?: Theme
 }
@@ -49,6 +58,7 @@ export interface ThemedButtonProps extends Omit<
 export function ThemedButton({
   children,
   size = 'md',
+  variant = 'primary',
   theme: themeOverride,
   className,
   disabled,
@@ -58,16 +68,28 @@ export function ThemedButton({
   const theme = useThemeWithOverride(themeOverride)
 
   // Compute button colors with fallback
-  const backgroundColor = theme.button.backgroundColor ?? theme.primaryColor
-  const textColor = theme.button.textColor
+  const primaryBgColor = theme.button.backgroundColor ?? theme.primaryColor
+  const primaryTextColor = theme.button.textColor
   const borderRadius = BUTTON_RADIUS_MAP[theme.button.radius]
 
-  const style: CSSProperties = {
-    backgroundColor,
-    color: textColor,
-    borderRadius,
-    fontFamily: theme.fontFamily ?? undefined,
-  }
+  // Style based on variant
+  const style: CSSProperties =
+    variant === 'primary'
+      ? {
+          backgroundColor: primaryBgColor,
+          color: primaryTextColor,
+          borderRadius,
+          fontFamily: theme.fontFamily ?? undefined,
+        }
+      : {
+          backgroundColor: `color-mix(in srgb, ${theme.text.color} 10%, transparent)`,
+          color: theme.text.color,
+          borderRadius,
+          borderWidth: '1px',
+          borderStyle: 'solid',
+          borderColor: `color-mix(in srgb, ${theme.text.color} 40%, transparent)`,
+          fontFamily: theme.fontFamily ?? undefined,
+        }
 
   return (
     <button
@@ -75,8 +97,10 @@ export function ThemedButton({
       disabled={disabled}
       className={cn(
         SIZE_CLASSES[size],
-        'font-bold shadow-sm transition-opacity',
-        'hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2',
+        'inline-flex items-center justify-center',
+        'font-bold transition-opacity',
+        variant === 'primary' && 'shadow-sm',
+        'hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-offset-2',
         'disabled:cursor-not-allowed disabled:opacity-50',
         className,
       )}

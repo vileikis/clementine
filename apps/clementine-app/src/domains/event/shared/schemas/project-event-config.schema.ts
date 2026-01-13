@@ -63,10 +63,11 @@ export type ExperiencePickerLayout = z.infer<
 >
 
 /**
- * Guest sharing preferences and options
+ * Guest sharing preferences and options (platform toggles)
+ * Renamed from sharingConfigSchema to shareOptionsConfigSchema (FR-017)
  * Flattened structure for simpler updates using Firestore dot notation
  */
-export const sharingConfigSchema = z.object({
+export const shareOptionsConfigSchema = z.object({
   download: z.boolean().default(true),
   copyLink: z.boolean().default(true),
   email: z.boolean().default(false),
@@ -76,6 +77,78 @@ export const sharingConfigSchema = z.object({
   twitter: z.boolean().default(false),
   tiktok: z.boolean().default(false),
   telegram: z.boolean().default(false),
+})
+
+/**
+ * @deprecated Use shareOptionsConfigSchema instead
+ * Alias for backward compatibility
+ */
+export const sharingConfigSchema = shareOptionsConfigSchema
+
+/**
+ * CTA (Call-to-Action) Configuration
+ *
+ * Configuration for the call-to-action button on the share screen.
+ * When label is null, CTA button is hidden.
+ *
+ * Note: This read schema is permissive to handle existing data.
+ * Write validation is enforced by ctaWriteSchema.
+ */
+export const ctaConfigSchema = z.object({
+  /** Button text label. When null, CTA button is hidden. */
+  label: z.string().nullable().default(null),
+  /** Destination URL. Required when label is provided. */
+  url: z.string().nullable().default(null),
+})
+
+/**
+ * CTA Write Schema
+ *
+ * Stricter validation for writing CTA config.
+ * Enforces: if label is provided, url must also be provided.
+ */
+export const ctaWriteSchema = ctaConfigSchema.refine(
+  (data) => {
+    // If label is provided, url must also be provided
+    if (data.label !== null && data.url === null) {
+      return false
+    }
+    return true
+  },
+  {
+    message: 'CTA url is required when label is provided',
+    path: ['url'],
+  },
+)
+
+/**
+ * Share Screen Configuration
+ *
+ * Customizable share screen content for guest-facing experience.
+ * Title, description, and CTA button configuration.
+ *
+ * Note: This read schema is permissive (no max limits) to handle existing data.
+ * Write validation with limits is enforced by updateShareSchema.
+ */
+export const shareConfigSchema = z.object({
+  /** Share screen title text. When null, title area is hidden. */
+  title: z.string().nullable().default(null),
+  /** Share screen description text. When null, description area is hidden. */
+  description: z.string().nullable().default(null),
+  /** CTA button configuration. When null or label is null, button is hidden. */
+  cta: ctaConfigSchema.nullable().default(null),
+})
+
+/**
+ * Share Write Schema
+ *
+ * Stricter validation for writing share config.
+ * Uses ctaWriteSchema to enforce CTA cross-field validation.
+ */
+export const shareWriteSchema = z.object({
+  title: z.string().nullable().default(null),
+  description: z.string().nullable().default(null),
+  cta: ctaWriteSchema.nullable().default(null),
 })
 
 /**
@@ -105,6 +178,7 @@ export const welcomeConfigSchema = z.object({
  * - Visual theme (colors, fonts, backgrounds)
  * - Overlay images for photo composition
  * - Sharing options and social media integrations
+ * - Share screen content configuration
  *
  * This schema uses Firestore-safe patterns:
  * - Optional fields use `.nullable().default(null)` (Firestore doesn't support undefined)
@@ -128,9 +202,22 @@ export const projectEventConfigSchema = z.looseObject({
   overlays: overlaysConfigSchema,
 
   /**
-   * Sharing configuration
+   * Share options (platform toggles)
+   * Renamed from 'sharing' to 'shareOptions' (FR-017)
+   */
+  shareOptions: shareOptionsConfigSchema.nullable().default(null),
+
+  /**
+   * @deprecated Use shareOptions instead
+   * Alias for backward compatibility - reads from old field name
    */
   sharing: sharingConfigSchema.nullable().default(null),
+
+  /**
+   * Share screen content configuration
+   * Title, description, and CTA button
+   */
+  share: shareConfigSchema.nullable().default(null),
 
   /**
    * Welcome screen configuration
@@ -144,5 +231,9 @@ export const projectEventConfigSchema = z.looseObject({
 export type ProjectEventConfig = z.infer<typeof projectEventConfigSchema>
 export type OverlayReference = z.infer<typeof overlayReferenceSchema>
 export type OverlaysConfig = z.infer<typeof overlaysConfigSchema>
+export type ShareOptionsConfig = z.infer<typeof shareOptionsConfigSchema>
+/** @deprecated Use ShareOptionsConfig instead */
 export type SharingConfig = z.infer<typeof sharingConfigSchema>
 export type WelcomeConfig = z.infer<typeof welcomeConfigSchema>
+export type CtaConfig = z.infer<typeof ctaConfigSchema>
+export type ShareConfig = z.infer<typeof shareConfigSchema>
