@@ -93,6 +93,8 @@ As an event creator on the Settings page, I want to see the settings content cen
 - **FR-009**: The EventSettingsPage MUST display its content horizontally centered
 - **FR-010**: The tabs MUST maintain correct active state based on the current URL/route
 - **FR-011**: The TopNavBar MUST continue to function normally when no tabs are provided (backward compatibility)
+- **FR-012**: The WelcomeControls component MUST be renamed to WelcomeConfigPanel for naming consistency
+- **FR-013**: The ThemeControls component MUST be renamed to ThemeConfigPanel for naming consistency
 
 ### Key Entities
 

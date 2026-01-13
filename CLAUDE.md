@@ -299,6 +299,8 @@ See individual workspace documentation for required environment variables.
 - N/A (navigation state persisted to localStorage via Zustand) (020-app-nav-refactor)
 - TypeScript 5.7.2 (strict mode, ES2022 target) + TanStack Start 1.132.0, React 19.2.0, TanStack Router 1.132.0, TanStack Query 5.66.5, Zustand 5.0.9, Zod 4.1.12, Firebase SDK 12.5.0 (001-experience-data-library)
 - Firebase Firestore (client SDK) - workspace subcollection pattern `/workspaces/{workspaceId}/experiences/{experienceId}` (001-experience-data-library)
+- TypeScript 5.7.2 (strict mode, ES2022 target) + TanStack Start 1.132.0, TanStack Router 1.132.0, React 19.2.0, Tailwind CSS v4 (023-top-bar-with-tabs)
+- N/A (no data layer changes) (023-top-bar-with-tabs)
 
 ## Recent Changes
 - 019-exp-system-foundations: Added TypeScript 5.7.2 (strict mode, ES2022 target) + Zod 4.1.12 (validation), TanStack Query 5.66.5 (data fetching), Firebase SDK 12.5.0 (Firestore)
