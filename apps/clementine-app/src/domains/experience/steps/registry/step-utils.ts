@@ -95,6 +95,10 @@ export function getStepsByCategoryForProfile(
 
 /**
  * Create a new step with a unique ID and default config
+ *
+ * Note: Type assertion is required because TypeScript can't infer
+ * which discriminated union variant we're creating at compile time.
+ * The registry guarantees the type and config are correctly paired.
  */
 export function createStep(type: StepType): Step {
   const definition = stepRegistry[type]
@@ -106,7 +110,7 @@ export function createStep(type: StepType): Step {
     id: crypto.randomUUID(),
     type,
     config: definition.defaultConfig(),
-  }
+  } as Step
 }
 
 /**

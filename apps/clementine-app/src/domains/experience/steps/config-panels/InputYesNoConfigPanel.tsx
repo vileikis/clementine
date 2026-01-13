@@ -2,36 +2,49 @@
  * Input Yes/No Config Panel
  *
  * Configuration panel for yes/no question steps.
- * Fields: question.
+ * Fields: title, required.
  */
 import type { StepConfigPanelProps } from '../registry/step-registry'
 import type { InputYesNoStepConfig } from '../schemas/input-yes-no.schema'
 import { Input } from '@/ui-kit/ui/input'
 import { Label } from '@/ui-kit/ui/label'
+import { Switch } from '@/ui-kit/ui/switch'
 
 export function InputYesNoConfigPanel({
-  config,
+  step,
   onConfigChange,
   disabled,
 }: StepConfigPanelProps) {
-  const { question } = config as InputYesNoStepConfig
+  const config = step.config as InputYesNoStepConfig
+  const { title, required } = config
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Question */}
+      {/* Title */}
       <div className="flex flex-col gap-2">
-        <Label htmlFor="question">Question *</Label>
+        <Label htmlFor="title">Title *</Label>
         <Input
-          id="question"
-          value={question}
-          onChange={(e) => onConfigChange({ question: e.target.value })}
+          id="title"
+          value={title}
+          onChange={(e) => onConfigChange({ title: e.target.value })}
           placeholder="Enter your yes/no question..."
           maxLength={200}
           disabled={disabled}
         />
         <span className="text-xs text-muted-foreground">
-          {question.length}/200 characters
+          {title.length}/200 characters
         </span>
+      </div>
+
+      {/* Required toggle */}
+      <div className="flex items-center justify-between">
+        <Label htmlFor="required">Required</Label>
+        <Switch
+          id="required"
+          checked={required}
+          onCheckedChange={(checked) => onConfigChange({ required: checked })}
+          disabled={disabled}
+        />
       </div>
     </div>
   )

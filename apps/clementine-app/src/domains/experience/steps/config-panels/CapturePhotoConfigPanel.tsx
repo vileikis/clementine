@@ -2,76 +2,55 @@
  * Capture Photo Config Panel
  *
  * Configuration panel for photo capture steps.
- * Fields: instructions, countdown.
+ * Fields: aspectRatio.
  */
 import type { StepConfigPanelProps } from '../registry/step-registry'
-import type { CapturePhotoStepConfig } from '../schemas/capture-photo.schema'
-import { Input } from '@/ui-kit/ui/input'
+import type {
+  AspectRatio,
+  CapturePhotoStepConfig,
+} from '../schemas/capture-photo.schema'
 import { Label } from '@/ui-kit/ui/label'
-import { Slider } from '@/ui-kit/ui/slider'
-import { Switch } from '@/ui-kit/ui/switch'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/ui-kit/ui/select'
 
 export function CapturePhotoConfigPanel({
-  config,
+  step,
   onConfigChange,
   disabled,
 }: StepConfigPanelProps) {
-  const { instructions, countdown } = config as CapturePhotoStepConfig
-
-  const countdownEnabled = countdown > 0
+  const config = step.config as CapturePhotoStepConfig
+  const { aspectRatio } = config
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Instructions */}
+      {/* Aspect Ratio */}
       <div className="flex flex-col gap-2">
-        <Label htmlFor="instructions">Instructions</Label>
-        <Input
-          id="instructions"
-          value={instructions}
-          onChange={(e) => onConfigChange({ instructions: e.target.value })}
-          placeholder="e.g., Strike a pose!"
-          maxLength={200}
-          disabled={disabled}
-        />
-        <span className="text-xs text-muted-foreground">
-          {instructions.length}/200 characters
-        </span>
-      </div>
-
-      {/* Countdown toggle */}
-      <div className="flex items-center justify-between">
-        <Label htmlFor="countdown-enabled">Enable countdown</Label>
-        <Switch
-          id="countdown-enabled"
-          checked={countdownEnabled}
-          onCheckedChange={(checked) =>
-            onConfigChange({ countdown: checked ? 3 : 0 })
+        <Label htmlFor="aspectRatio">Aspect Ratio</Label>
+        <Select
+          value={aspectRatio}
+          onValueChange={(value: AspectRatio) =>
+            onConfigChange({ aspectRatio: value })
           }
           disabled={disabled}
-        />
-      </div>
-
-      {/* Countdown value */}
-      {countdownEnabled && (
-        <div className="flex flex-col gap-2">
-          <Label>Countdown: {countdown} seconds</Label>
-          <Slider
-            value={[countdown]}
-            onValueChange={([value]) => onConfigChange({ countdown: value })}
-            min={1}
-            max={10}
-            step={1}
-            disabled={disabled}
-          />
-        </div>
-      )}
-
-      {/* Overlay - placeholder for future */}
-      <div className="flex flex-col gap-2">
-        <Label>Overlay</Label>
-        <div className="rounded-lg border border-dashed p-4 text-center text-sm text-muted-foreground">
-          Overlay picker coming soon
-        </div>
+        >
+          <SelectTrigger id="aspectRatio">
+            <SelectValue placeholder="Select aspect ratio" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="1:1">Square (1:1)</SelectItem>
+            <SelectItem value="9:16">Portrait (9:16)</SelectItem>
+          </SelectContent>
+        </Select>
+        <span className="text-xs text-muted-foreground">
+          {aspectRatio === '1:1'
+            ? 'Best for profile photos and social media posts'
+            : 'Best for stories and full-screen mobile displays'}
+        </span>
       </div>
     </div>
   )

@@ -7,8 +7,9 @@
 import type { StepRendererProps } from '../registry/step-registry'
 import type { InfoStepConfig } from '../schemas/info.schema'
 
-export function InfoStepRenderer({ config }: StepRendererProps) {
-  const { title, description, media } = config as InfoStepConfig
+export function InfoStepRenderer({ step }: StepRendererProps) {
+  const config = step.config as InfoStepConfig
+  const { title, description, media } = config
 
   return (
     <div className="flex flex-col items-center justify-center gap-4 p-6 text-center">

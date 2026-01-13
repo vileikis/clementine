@@ -15,7 +15,7 @@ export const mediaAssetSchema = z
     /** Reference to media asset in media library */
     mediaAssetId: z.string().min(1),
     /** Full public URL for immediate rendering */
-    url: z.string().url(),
+    url: z.url(),
   })
   .nullable()
 

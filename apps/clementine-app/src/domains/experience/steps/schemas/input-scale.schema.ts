@@ -11,8 +11,10 @@ import { z } from 'zod'
  */
 export const inputScaleStepConfigSchema = z
   .object({
-    /** Question text (required, 1-200 chars) */
-    question: z.string().min(1).max(200),
+    /** Title text (required, 1-200 chars) */
+    title: z.string().min(1).max(200),
+    /** Whether this step is required */
+    required: z.boolean().default(false),
     /** Minimum value on scale (0-10, default 1) */
     min: z.number().int().min(0).max(10).default(1),
     /** Maximum value on scale (1-10, default 5, must be > min) */
@@ -34,7 +36,8 @@ export type InputScaleStepConfig = z.infer<typeof inputScaleStepConfigSchema>
  */
 export function createDefaultInputScaleConfig(): InputScaleStepConfig {
   return {
-    question: '',
+    title: '',
+    required: false,
     min: 1,
     max: 5,
     minLabel: undefined,

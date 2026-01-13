@@ -2,20 +2,21 @@
  * Input Yes/No Renderer
  *
  * Edit-mode renderer for yes/no question steps.
- * Shows question with disabled Yes/No buttons.
+ * Shows title with disabled Yes/No buttons.
  */
 import type { StepRendererProps } from '../registry/step-registry'
 import type { InputYesNoStepConfig } from '../schemas/input-yes-no.schema'
 import { Button } from '@/ui-kit/ui/button'
 
-export function InputYesNoRenderer({ config }: StepRendererProps) {
-  const { question } = config as InputYesNoStepConfig
+export function InputYesNoRenderer({ step }: StepRendererProps) {
+  const config = step.config as InputYesNoStepConfig
+  const { title } = config
 
   return (
     <div className="flex flex-col items-center gap-6 p-6">
-      {/* Question */}
+      {/* Title */}
       <p className="text-center text-lg font-medium">
-        {question || (
+        {title || (
           <span className="text-muted-foreground">Enter your question...</span>
         )}
       </p>

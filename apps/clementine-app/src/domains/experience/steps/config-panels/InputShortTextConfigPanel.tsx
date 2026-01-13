@@ -2,33 +2,45 @@
  * Input Short Text Config Panel
  *
  * Configuration panel for short text input steps.
- * Fields: question, placeholder, maxLength.
+ * Fields: title, required, placeholder, maxLength.
  */
 import type { StepConfigPanelProps } from '../registry/step-registry'
 import type { InputShortTextStepConfig } from '../schemas/input-short-text.schema'
 import { Input } from '@/ui-kit/ui/input'
 import { Label } from '@/ui-kit/ui/label'
 import { Slider } from '@/ui-kit/ui/slider'
+import { Switch } from '@/ui-kit/ui/switch'
 
 export function InputShortTextConfigPanel({
-  config,
+  step,
   onConfigChange,
   disabled,
 }: StepConfigPanelProps) {
-  const { question, placeholder, maxLength } =
-    config as InputShortTextStepConfig
+  const config = step.config as InputShortTextStepConfig
+  const { title, required, placeholder, maxLength } = config
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Question */}
+      {/* Title */}
       <div className="flex flex-col gap-2">
-        <Label htmlFor="question">Question *</Label>
+        <Label htmlFor="title">Title *</Label>
         <Input
-          id="question"
-          value={question}
-          onChange={(e) => onConfigChange({ question: e.target.value })}
+          id="title"
+          value={title}
+          onChange={(e) => onConfigChange({ title: e.target.value })}
           placeholder="Enter your question..."
           maxLength={200}
+          disabled={disabled}
+        />
+      </div>
+
+      {/* Required toggle */}
+      <div className="flex items-center justify-between">
+        <Label htmlFor="required">Required</Label>
+        <Switch
+          id="required"
+          checked={required}
+          onCheckedChange={(checked) => onConfigChange({ required: checked })}
           disabled={disabled}
         />
       </div>

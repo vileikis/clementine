@@ -7,7 +7,9 @@
 import { Sparkles } from 'lucide-react'
 import type { StepConfigPanelProps } from '../registry/step-registry'
 
-export function TransformPipelineConfigPanel(_props: StepConfigPanelProps) {
+export function TransformPipelineConfigPanel({
+  step: _step,
+}: StepConfigPanelProps) {
   return (
     <div className="flex flex-col items-center justify-center gap-4 p-6 text-center">
       <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted">

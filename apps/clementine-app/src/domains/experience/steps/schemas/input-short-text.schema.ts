@@ -9,8 +9,10 @@ import { z } from 'zod'
  * Input short text step configuration schema
  */
 export const inputShortTextStepConfigSchema = z.object({
-  /** Question text (required, 1-200 chars) */
-  question: z.string().min(1).max(200),
+  /** Title text (required, 1-200 chars) */
+  title: z.string().min(1).max(200),
+  /** Whether this step is required */
+  required: z.boolean().default(false),
   /** Placeholder text (max 100 chars) */
   placeholder: z.string().max(100).default(''),
   /** Maximum length of response (1-200 chars, default 100) */
@@ -26,7 +28,8 @@ export type InputShortTextStepConfig = z.infer<
  */
 export function createDefaultInputShortTextConfig(): InputShortTextStepConfig {
   return {
-    question: '',
+    title: '',
+    required: false,
     placeholder: '',
     maxLength: 100,
   }

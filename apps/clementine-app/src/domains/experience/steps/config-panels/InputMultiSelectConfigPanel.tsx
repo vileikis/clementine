@@ -2,7 +2,7 @@
  * Input Multi-Select Config Panel
  *
  * Configuration panel for multiple choice steps.
- * Fields: question, options, minSelect, maxSelect.
+ * Fields: title, required, options, multiSelect.
  */
 import { Plus, Trash2 } from 'lucide-react'
 import type { StepConfigPanelProps } from '../registry/step-registry'
@@ -10,15 +10,15 @@ import type { InputMultiSelectStepConfig } from '../schemas/input-multi-select.s
 import { Button } from '@/ui-kit/ui/button'
 import { Input } from '@/ui-kit/ui/input'
 import { Label } from '@/ui-kit/ui/label'
-import { Slider } from '@/ui-kit/ui/slider'
+import { Switch } from '@/ui-kit/ui/switch'
 
 export function InputMultiSelectConfigPanel({
-  config,
+  step,
   onConfigChange,
   disabled,
 }: StepConfigPanelProps) {
-  const { question, options, minSelect, maxSelect } =
-    config as InputMultiSelectStepConfig
+  const config = step.config as InputMultiSelectStepConfig
+  const { title, required, options, multiSelect } = config
 
   const handleOptionChange = (index: number, value: string) => {
     const newOptions = [...options]
@@ -41,15 +41,26 @@ export function InputMultiSelectConfigPanel({
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Question */}
+      {/* Title */}
       <div className="flex flex-col gap-2">
-        <Label htmlFor="question">Question *</Label>
+        <Label htmlFor="title">Title *</Label>
         <Input
-          id="question"
-          value={question}
-          onChange={(e) => onConfigChange({ question: e.target.value })}
+          id="title"
+          value={title}
+          onChange={(e) => onConfigChange({ title: e.target.value })}
           placeholder="Enter your question..."
           maxLength={200}
+          disabled={disabled}
+        />
+      </div>
+
+      {/* Required toggle */}
+      <div className="flex items-center justify-between">
+        <Label htmlFor="required">Required</Label>
+        <Switch
+          id="required"
+          checked={required}
+          onCheckedChange={(checked) => onConfigChange({ required: checked })}
           disabled={disabled}
         />
       </div>
@@ -96,28 +107,22 @@ export function InputMultiSelectConfigPanel({
         )}
       </div>
 
-      {/* Min selections */}
-      <div className="flex flex-col gap-2">
-        <Label>Minimum selections: {minSelect}</Label>
-        <Slider
-          value={[minSelect]}
-          onValueChange={([value]) => onConfigChange({ minSelect: value })}
-          min={0}
-          max={options.length}
-          step={1}
-          disabled={disabled}
-        />
-      </div>
-
-      {/* Max selections */}
-      <div className="flex flex-col gap-2">
-        <Label>Maximum selections: {maxSelect ?? options.length}</Label>
-        <Slider
-          value={[maxSelect ?? options.length]}
-          onValueChange={([value]) => onConfigChange({ maxSelect: value })}
-          min={minSelect || 1}
-          max={options.length}
-          step={1}
+      {/* Multi-select toggle */}
+      <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-1">
+          <Label htmlFor="multiSelect">Allow multiple selections</Label>
+          <span className="text-xs text-muted-foreground">
+            {multiSelect
+              ? 'Users can select multiple options'
+              : 'Users can only select one option'}
+          </span>
+        </div>
+        <Switch
+          id="multiSelect"
+          checked={multiSelect}
+          onCheckedChange={(checked) =>
+            onConfigChange({ multiSelect: checked })
+          }
           disabled={disabled}
         />
       </div>

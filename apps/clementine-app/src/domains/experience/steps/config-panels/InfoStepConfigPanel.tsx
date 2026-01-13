@@ -11,11 +11,12 @@ import { Label } from '@/ui-kit/ui/label'
 import { Textarea } from '@/ui-kit/ui/textarea'
 
 export function InfoStepConfigPanel({
-  config,
+  step,
   onConfigChange,
   disabled,
 }: StepConfigPanelProps) {
-  const { title, description } = config as InfoStepConfig
+  const config = step.config as InfoStepConfig
+  const { title, description } = config
 
   return (
     <div className="flex flex-col gap-6">

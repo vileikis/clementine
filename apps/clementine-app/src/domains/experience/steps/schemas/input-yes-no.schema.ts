@@ -9,8 +9,10 @@ import { z } from 'zod'
  * Input yes/no step configuration schema
  */
 export const inputYesNoStepConfigSchema = z.object({
-  /** Question text (required, 1-200 chars) */
-  question: z.string().min(1).max(200),
+  /** Title text (required, 1-200 chars) */
+  title: z.string().min(1).max(200),
+  /** Whether this step is required */
+  required: z.boolean().default(false),
 })
 
 export type InputYesNoStepConfig = z.infer<typeof inputYesNoStepConfigSchema>
@@ -20,6 +22,7 @@ export type InputYesNoStepConfig = z.infer<typeof inputYesNoStepConfigSchema>
  */
 export function createDefaultInputYesNoConfig(): InputYesNoStepConfig {
   return {
-    question: '',
+    title: '',
+    required: false,
   }
 }
