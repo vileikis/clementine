@@ -39,6 +39,7 @@ import { Route as WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdRouteImpor
 import { Route as WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdIndexRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId.events/$eventId.index'
 import { Route as WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdWelcomeRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId.events/$eventId.welcome'
 import { Route as WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdThemeRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId.events/$eventId.theme'
+import { Route as WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdShareRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId.events/$eventId.share'
 import { Route as WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdSettingsRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId.events/$eventId.settings'
 
 const LogoutRoute = LogoutRouteImport.update({
@@ -210,6 +211,13 @@ const WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdThemeRoute =
     getParentRoute: () =>
       WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdRoute,
   } as any)
+const WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdShareRoute =
+  WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdShareRouteImport.update({
+    id: '/share',
+    path: '/share',
+    getParentRoute: () =>
+      WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdRoute,
+  } as any)
 const WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdSettingsRoute =
   WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdSettingsRouteImport.update(
     {
@@ -249,6 +257,7 @@ export interface FileRoutesByFullPath {
   '/workspace/$workspaceSlug/projects/$projectId/events/$eventId': typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdRouteWithChildren
   '/workspace/$workspaceSlug/projects/$projectId/events': typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsIndexRoute
   '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/settings': typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdSettingsRoute
+  '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/share': typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdShareRoute
   '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/theme': typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdThemeRoute
   '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/welcome': typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdWelcomeRoute
   '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/': typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdIndexRoute
@@ -276,6 +285,7 @@ export interface FileRoutesByTo {
   '/workspace/$workspaceSlug/projects/$projectId': typeof WorkspaceWorkspaceSlugProjectsProjectIdIndexRoute
   '/workspace/$workspaceSlug/projects/$projectId/events': typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsIndexRoute
   '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/settings': typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdSettingsRoute
+  '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/share': typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdShareRoute
   '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/theme': typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdThemeRoute
   '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/welcome': typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdWelcomeRoute
   '/workspace/$workspaceSlug/projects/$projectId/events/$eventId': typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdIndexRoute
@@ -310,6 +320,7 @@ export interface FileRoutesById {
   '/workspace/$workspaceSlug/projects/$projectId/events/$eventId': typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdRouteWithChildren
   '/workspace/$workspaceSlug/projects/$projectId/events/': typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsIndexRoute
   '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/settings': typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdSettingsRoute
+  '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/share': typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdShareRoute
   '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/theme': typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdThemeRoute
   '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/welcome': typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdWelcomeRoute
   '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/': typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdIndexRoute
@@ -345,6 +356,7 @@ export interface FileRouteTypes {
     | '/workspace/$workspaceSlug/projects/$projectId/events/$eventId'
     | '/workspace/$workspaceSlug/projects/$projectId/events'
     | '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/settings'
+    | '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/share'
     | '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/theme'
     | '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/welcome'
     | '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/'
@@ -372,6 +384,7 @@ export interface FileRouteTypes {
     | '/workspace/$workspaceSlug/projects/$projectId'
     | '/workspace/$workspaceSlug/projects/$projectId/events'
     | '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/settings'
+    | '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/share'
     | '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/theme'
     | '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/welcome'
     | '/workspace/$workspaceSlug/projects/$projectId/events/$eventId'
@@ -405,6 +418,7 @@ export interface FileRouteTypes {
     | '/workspace/$workspaceSlug/projects/$projectId/events/$eventId'
     | '/workspace/$workspaceSlug/projects/$projectId/events/'
     | '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/settings'
+    | '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/share'
     | '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/theme'
     | '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/welcome'
     | '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/'
@@ -632,6 +646,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdThemeRouteImport
       parentRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdRoute
     }
+    '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/share': {
+      id: '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/share'
+      path: '/share'
+      fullPath: '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/share'
+      preLoaderRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdShareRouteImport
+      parentRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdRoute
+    }
     '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/settings': {
       id: '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/settings'
       path: '/settings'
@@ -689,6 +710,7 @@ const GuestRouteRouteWithChildren = GuestRouteRoute._addFileChildren(
 
 interface WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdRouteChildren {
   WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdSettingsRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdSettingsRoute
+  WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdShareRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdShareRoute
   WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdThemeRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdThemeRoute
   WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdWelcomeRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdWelcomeRoute
   WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdIndexRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdIndexRoute
@@ -698,6 +720,8 @@ const WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdRouteChildren: Workspa
   {
     WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdSettingsRoute:
       WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdSettingsRoute,
+    WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdShareRoute:
+      WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdShareRoute,
     WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdThemeRoute:
       WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdThemeRoute,
     WorkspaceWorkspaceSlugProjectsProjectIdEventsEventIdWelcomeRoute:

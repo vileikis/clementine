@@ -25,6 +25,11 @@ const eventDesignerTabs: TabItem[] = [
     to: '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/welcome',
   },
   {
+    id: 'share',
+    label: 'Share',
+    to: '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/share',
+  },
+  {
     id: 'theme',
     label: 'Theme',
     to: '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/theme',

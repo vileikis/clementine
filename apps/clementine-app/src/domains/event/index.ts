@@ -9,6 +9,7 @@
 export { EventDesignerPage, EventDesignerLayout } from './designer'
 export { WelcomeEditorPage } from './welcome'
 export { ThemeEditorPage } from './theme'
+export { ShareEditorPage } from './share'
 export { EventSettingsPage } from './settings'
 
 // Types

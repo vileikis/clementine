@@ -39,7 +39,9 @@ export function SharingSection({
 }: SharingSectionProps) {
   const updateShareOptions = useUpdateShareOptions(projectId, eventId)
 
-  const sharing = event.draftConfig?.sharing
+  // Read from shareOptions (renamed from sharing - FR-017)
+  // Fall back to sharing for backward compatibility with existing data
+  const sharing = event.draftConfig?.shareOptions ?? event.draftConfig?.sharing
 
   const form = useForm<SharingFormValues>({
     defaultValues: {
