@@ -2,7 +2,9 @@
  * Designer Components Barrel Export
  *
  * Components for the experience designer layout.
- * Note: Components will be exported here as they are created in Phase 3.
  */
-
-// Designer components will be exported here as they are created in Phase 3
+export { AddStepDialog } from './AddStepDialog'
+export { StepList } from './StepList'
+export { StepListItem } from './StepListItem'
+export { StepConfigPanel } from './StepConfigPanel'
+export { StepPreview } from './StepPreview'

@@ -104,17 +104,17 @@ All paths are relative to `apps/clementine-app/src/`:
 
 ### Editor Components for US1
 
-- [ ] T039 [US1] Create AddStepDialog in `domains/experience/designer/components/AddStepDialog.tsx` using Dialog from shadcn/ui, showing step types grouped by category, filtered by experience profile
-- [ ] T040 [US1] Create StepListItem in `domains/experience/designer/components/StepListItem.tsx` showing step icon, label, selected state indicator
-- [ ] T041 [US1] Create StepList in `domains/experience/designer/components/StepList.tsx` with "Add Step" button, step items, selection handling (no DnD yet)
-- [ ] T042 [US1] Create StepConfigPanel in `domains/experience/designer/components/StepConfigPanel.tsx` that routes to correct config panel based on selected step type, passes onConfigChange callback
-- [ ] T043 [US1] Create StepPreview in `domains/experience/designer/components/StepPreview.tsx` wrapping PreviewShell, rendering correct step renderer based on selected step, showing "No step selected" placeholder
-- [ ] T044 [US1] Create useStepSelection hook in `domains/experience/designer/hooks/useStepSelection.ts` syncing selected step ID with URL search param `?step=`
+- [X] T039 [US1] Create AddStepDialog in `domains/experience/designer/components/AddStepDialog.tsx` using Dialog from shadcn/ui, showing step types grouped by category, filtered by experience profile
+- [X] T040 [US1] Create StepListItem in `domains/experience/designer/components/StepListItem.tsx` showing step icon, label, selected state indicator
+- [X] T041 [US1] Create StepList in `domains/experience/designer/components/StepList.tsx` with "Add Step" button, step items, selection handling (no DnD yet)
+- [X] T042 [US1] Create StepConfigPanel in `domains/experience/designer/components/StepConfigPanel.tsx` that routes to correct config panel based on selected step type, passes onConfigChange callback
+- [X] T043 [US1] Create StepPreview in `domains/experience/designer/components/StepPreview.tsx` wrapping PreviewShell, rendering correct step renderer based on selected step, showing "No step selected" placeholder
+- [X] T044 [US1] Create useStepSelection hook in `domains/experience/designer/hooks/useStepSelection.ts` syncing selected step ID with URL search param `?step=`
 
 ### Editor Layout for US1
 
-- [ ] T045 [US1] Implement 3-column layout in `domains/experience/designer/containers/ExperienceDesignerPage.tsx` with StepList (left), StepPreview (center), StepConfigPanel (right), responsive breakpoints
-- [ ] T046 [US1] Update designer barrel exports in `domains/experience/designer/components/index.ts` and `domains/experience/designer/hooks/index.ts`
+- [X] T045 [US1] Implement 3-column layout in `domains/experience/designer/containers/ExperienceDesignerPage.tsx` with StepList (left), StepPreview (center), StepConfigPanel (right), responsive breakpoints
+- [X] T046 [US1] Update designer barrel exports in `domains/experience/designer/components/index.ts` and `domains/experience/designer/hooks/index.ts`
 
 **Checkpoint**: User Story 1 complete - admin can add and configure steps with live preview. Fully testable independently.
 

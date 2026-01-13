@@ -96,7 +96,10 @@ export function ExperienceDesignerLayout({
           </>
         }
       />
-      <ExperienceDesignerPage />
+      <ExperienceDesignerPage
+        experience={experience}
+        workspaceSlug={workspaceSlug}
+      />
     </div>
   )
 }
