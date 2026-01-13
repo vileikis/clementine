@@ -24,14 +24,14 @@ All paths are relative to `apps/clementine-app/src/`:
 
 **Purpose**: Create folder structure and barrel exports for the step system
 
-- [ ] T001 Create folder structure for `domains/experience/steps/` with subdirectories: `registry/`, `schemas/`, `renderers/`, `config-panels/`
-- [ ] T002 [P] Create barrel export `domains/experience/steps/index.ts`
-- [ ] T003 [P] Create barrel export `domains/experience/steps/registry/index.ts`
-- [ ] T004 [P] Create barrel export `domains/experience/steps/schemas/index.ts`
-- [ ] T005 [P] Create barrel export `domains/experience/steps/renderers/index.ts`
-- [ ] T006 [P] Create barrel export `domains/experience/steps/config-panels/index.ts`
-- [ ] T007 [P] Create barrel export `domains/experience/designer/components/index.ts`
-- [ ] T008 [P] Create barrel export `domains/experience/designer/hooks/index.ts`
+- [X] T001 Create folder structure for `domains/experience/steps/` with subdirectories: `registry/`, `schemas/`, `renderers/`, `config-panels/`
+- [X] T002 [P] Create barrel export `domains/experience/steps/index.ts`
+- [X] T003 [P] Create barrel export `domains/experience/steps/registry/index.ts`
+- [X] T004 [P] Create barrel export `domains/experience/steps/schemas/index.ts`
+- [X] T005 [P] Create barrel export `domains/experience/steps/renderers/index.ts`
+- [X] T006 [P] Create barrel export `domains/experience/steps/config-panels/index.ts`
+- [X] T007 [P] Create barrel export `domains/experience/designer/components/index.ts`
+- [X] T008 [P] Create barrel export `domains/experience/designer/hooks/index.ts`
 
 ---
 
@@ -43,21 +43,21 @@ All paths are relative to `apps/clementine-app/src/`:
 
 ### Step Config Schemas (all parallelizable)
 
-- [ ] T009 [P] Create info step config schema in `domains/experience/steps/schemas/info.schema.ts` with fields: title (optional, max 200), description (optional, max 1000), media (optional MediaAsset)
-- [ ] T010 [P] Create input-scale step config schema in `domains/experience/steps/schemas/input-scale.schema.ts` with fields: question (required, 1-200), min (default 1), max (default 5), minLabel, maxLabel
-- [ ] T011 [P] Create input-yes-no step config schema in `domains/experience/steps/schemas/input-yes-no.schema.ts` with fields: question (required, 1-200)
-- [ ] T012 [P] Create input-multi-select step config schema in `domains/experience/steps/schemas/input-multi-select.schema.ts` with fields: question (required), options (2-10 items), minSelect (default 0), maxSelect
-- [ ] T013 [P] Create input-short-text step config schema in `domains/experience/steps/schemas/input-short-text.schema.ts` with fields: question (required), placeholder, maxLength (default 100)
-- [ ] T014 [P] Create input-long-text step config schema in `domains/experience/steps/schemas/input-long-text.schema.ts` with fields: question (required), placeholder, maxLength (default 500)
-- [ ] T015 [P] Create capture-photo step config schema in `domains/experience/steps/schemas/capture-photo.schema.ts` with fields: instructions, countdown (0-10), overlay (future)
-- [ ] T016 [P] Create transform-pipeline step config schema in `domains/experience/steps/schemas/transform-pipeline.schema.ts` (empty config for MVP)
-- [ ] T017 Update schemas barrel export in `domains/experience/steps/schemas/index.ts` to re-export all schemas
+- [X] T009 [P] Create info step config schema in `domains/experience/steps/schemas/info.schema.ts` with fields: title (optional, max 200), description (optional, max 1000), media (optional MediaAsset)
+- [X] T010 [P] Create input-scale step config schema in `domains/experience/steps/schemas/input-scale.schema.ts` with fields: question (required, 1-200), min (default 1), max (default 5), minLabel, maxLabel
+- [X] T011 [P] Create input-yes-no step config schema in `domains/experience/steps/schemas/input-yes-no.schema.ts` with fields: question (required, 1-200)
+- [X] T012 [P] Create input-multi-select step config schema in `domains/experience/steps/schemas/input-multi-select.schema.ts` with fields: question (required), options (2-10 items), minSelect (default 0), maxSelect
+- [X] T013 [P] Create input-short-text step config schema in `domains/experience/steps/schemas/input-short-text.schema.ts` with fields: question (required), placeholder, maxLength (default 100)
+- [X] T014 [P] Create input-long-text step config schema in `domains/experience/steps/schemas/input-long-text.schema.ts` with fields: question (required), placeholder, maxLength (default 500)
+- [X] T015 [P] Create capture-photo step config schema in `domains/experience/steps/schemas/capture-photo.schema.ts` with fields: instructions, countdown (0-10), overlay (future)
+- [X] T016 [P] Create transform-pipeline step config schema in `domains/experience/steps/schemas/transform-pipeline.schema.ts` (empty config for MVP)
+- [X] T017 Update schemas barrel export in `domains/experience/steps/schemas/index.ts` to re-export all schemas
 
 ### Step Registry
 
-- [ ] T018 Create step registry in `domains/experience/steps/registry/step-registry.ts` with StepDefinition interface, 8 step type entries (type, category, label, description, icon, configSchema, defaultConfig, lazy EditRenderer, lazy ConfigPanel)
-- [ ] T019 Create step utilities in `domains/experience/steps/registry/step-utils.ts` with: getStepDefinition(), getStepTypesForProfile(), createStep(), getStepsByCategory()
-- [ ] T020 Update registry barrel export in `domains/experience/steps/registry/index.ts`
+- [X] T018 Create step registry in `domains/experience/steps/registry/step-registry.ts` with StepDefinition interface, 8 step type entries (type, category, label, description, icon, configSchema, defaultConfig, lazy EditRenderer, lazy ConfigPanel)
+- [X] T019 Create step utilities in `domains/experience/steps/registry/step-utils.ts` with: getStepDefinition(), getStepTypesForProfile(), createStep(), getStepsByCategory()
+- [X] T020 Update registry barrel export in `domains/experience/steps/registry/index.ts`
 
 **Checkpoint**: Foundation ready - step registry and schemas complete, user story implementation can begin
 
@@ -71,27 +71,27 @@ All paths are relative to `apps/clementine-app/src/`:
 
 ### Edit-Mode Renderers for US1 (parallelizable)
 
-- [ ] T021 [P] [US1] Create InfoStepRenderer in `domains/experience/steps/renderers/InfoStepRenderer.tsx` showing title (or "Add a title..."), description, media placeholder
-- [ ] T022 [P] [US1] Create InputScaleRenderer in `domains/experience/steps/renderers/InputScaleRenderer.tsx` showing question, disabled scale buttons with min/max labels
-- [ ] T023 [P] [US1] Create InputYesNoRenderer in `domains/experience/steps/renderers/InputYesNoRenderer.tsx` showing question with Yes/No buttons (disabled)
-- [ ] T024 [P] [US1] Create InputMultiSelectRenderer in `domains/experience/steps/renderers/InputMultiSelectRenderer.tsx` showing question with checkbox options (disabled)
-- [ ] T025 [P] [US1] Create InputShortTextRenderer in `domains/experience/steps/renderers/InputShortTextRenderer.tsx` showing question with single-line input (disabled)
-- [ ] T026 [P] [US1] Create InputLongTextRenderer in `domains/experience/steps/renderers/InputLongTextRenderer.tsx` showing question with textarea (disabled)
-- [ ] T027 [P] [US1] Create CapturePhotoRenderer in `domains/experience/steps/renderers/CapturePhotoRenderer.tsx` showing camera placeholder, instructions, countdown
-- [ ] T028 [P] [US1] Create TransformPipelineRenderer in `domains/experience/steps/renderers/TransformPipelineRenderer.tsx` showing "AI Processing" title with "Coming soon" badge
-- [ ] T029 [US1] Update renderers barrel export in `domains/experience/steps/renderers/index.ts`
+- [X] T021 [P] [US1] Create InfoStepRenderer in `domains/experience/steps/renderers/InfoStepRenderer.tsx` showing title (or "Add a title..."), description, media placeholder
+- [X] T022 [P] [US1] Create InputScaleRenderer in `domains/experience/steps/renderers/InputScaleRenderer.tsx` showing question, disabled scale buttons with min/max labels
+- [X] T023 [P] [US1] Create InputYesNoRenderer in `domains/experience/steps/renderers/InputYesNoRenderer.tsx` showing question with Yes/No buttons (disabled)
+- [X] T024 [P] [US1] Create InputMultiSelectRenderer in `domains/experience/steps/renderers/InputMultiSelectRenderer.tsx` showing question with checkbox options (disabled)
+- [X] T025 [P] [US1] Create InputShortTextRenderer in `domains/experience/steps/renderers/InputShortTextRenderer.tsx` showing question with single-line input (disabled)
+- [X] T026 [P] [US1] Create InputLongTextRenderer in `domains/experience/steps/renderers/InputLongTextRenderer.tsx` showing question with textarea (disabled)
+- [X] T027 [P] [US1] Create CapturePhotoRenderer in `domains/experience/steps/renderers/CapturePhotoRenderer.tsx` showing camera placeholder, instructions, countdown
+- [X] T028 [P] [US1] Create TransformPipelineRenderer in `domains/experience/steps/renderers/TransformPipelineRenderer.tsx` showing "AI Processing" title with "Coming soon" badge
+- [X] T029 [US1] Update renderers barrel export in `domains/experience/steps/renderers/index.ts`
 
 ### Config Panels for US1 (parallelizable)
 
-- [ ] T030 [P] [US1] Create InfoStepConfigPanel in `domains/experience/steps/config-panels/InfoStepConfigPanel.tsx` with TextField (title), TextareaField (description), MediaPickerField (media) using EditorControls
-- [ ] T031 [P] [US1] Create InputScaleConfigPanel in `domains/experience/steps/config-panels/InputScaleConfigPanel.tsx` with TextField (question), SliderField (min/max), TextField (minLabel/maxLabel)
-- [ ] T032 [P] [US1] Create InputYesNoConfigPanel in `domains/experience/steps/config-panels/InputYesNoConfigPanel.tsx` with TextField (question)
-- [ ] T033 [P] [US1] Create InputMultiSelectConfigPanel in `domains/experience/steps/config-panels/InputMultiSelectConfigPanel.tsx` with TextField (question), editable options list, SliderField (minSelect/maxSelect)
-- [ ] T034 [P] [US1] Create InputShortTextConfigPanel in `domains/experience/steps/config-panels/InputShortTextConfigPanel.tsx` with TextField (question, placeholder), SliderField (maxLength)
-- [ ] T035 [P] [US1] Create InputLongTextConfigPanel in `domains/experience/steps/config-panels/InputLongTextConfigPanel.tsx` with TextField (question, placeholder), SliderField (maxLength)
-- [ ] T036 [P] [US1] Create CapturePhotoConfigPanel in `domains/experience/steps/config-panels/CapturePhotoConfigPanel.tsx` with TextField (instructions), ToggleGroupField (countdown enabled), SliderField (countdown value)
-- [ ] T037 [P] [US1] Create TransformPipelineConfigPanel in `domains/experience/steps/config-panels/TransformPipelineConfigPanel.tsx` showing "Coming soon - no configuration available"
-- [ ] T038 [US1] Update config-panels barrel export in `domains/experience/steps/config-panels/index.ts`
+- [X] T030 [P] [US1] Create InfoStepConfigPanel in `domains/experience/steps/config-panels/InfoStepConfigPanel.tsx` with TextField (title), TextareaField (description), MediaPickerField (media) using EditorControls
+- [X] T031 [P] [US1] Create InputScaleConfigPanel in `domains/experience/steps/config-panels/InputScaleConfigPanel.tsx` with TextField (question), SliderField (min/max), TextField (minLabel/maxLabel)
+- [X] T032 [P] [US1] Create InputYesNoConfigPanel in `domains/experience/steps/config-panels/InputYesNoConfigPanel.tsx` with TextField (question)
+- [X] T033 [P] [US1] Create InputMultiSelectConfigPanel in `domains/experience/steps/config-panels/InputMultiSelectConfigPanel.tsx` with TextField (question), editable options list, SliderField (minSelect/maxSelect)
+- [X] T034 [P] [US1] Create InputShortTextConfigPanel in `domains/experience/steps/config-panels/InputShortTextConfigPanel.tsx` with TextField (question, placeholder), SliderField (maxLength)
+- [X] T035 [P] [US1] Create InputLongTextConfigPanel in `domains/experience/steps/config-panels/InputLongTextConfigPanel.tsx` with TextField (question, placeholder), SliderField (maxLength)
+- [X] T036 [P] [US1] Create CapturePhotoConfigPanel in `domains/experience/steps/config-panels/CapturePhotoConfigPanel.tsx` with TextField (instructions), ToggleGroupField (countdown enabled), SliderField (countdown value)
+- [X] T037 [P] [US1] Create TransformPipelineConfigPanel in `domains/experience/steps/config-panels/TransformPipelineConfigPanel.tsx` showing "Coming soon - no configuration available"
+- [X] T038 [US1] Update config-panels barrel export in `domains/experience/steps/config-panels/index.ts`
 
 ### Editor Components for US1
 
