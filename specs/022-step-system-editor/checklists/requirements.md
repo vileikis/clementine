@@ -34,6 +34,6 @@
 - Specification derived from Epic E2 requirements document which provided comprehensive detail
 - All step types and their configuration fields are clearly defined
 - Profile-based filtering rules are explicitly documented
-- Auto-save timing (500ms debounce) and publish workflow are specified
+- Auto-save timing (2s debounce) and publish workflow are specified
 - Dependencies on E1 (data layer) are documented in Assumptions
 - Out of scope items clearly reference dependent epics (E3, E5, E9)

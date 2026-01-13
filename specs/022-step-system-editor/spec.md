@@ -50,7 +50,7 @@ As an admin, I want my changes to be automatically saved so that I don't lose wo
 
 **Acceptance Scenarios**:
 
-1. **Given** I modify a step configuration, **When** I stop making changes for 500ms, **Then** the system auto-saves and shows "Saving..." then "Saved" indicator
+1. **Given** I modify a step configuration, **When** I stop making changes for 2 seconds, **Then** the system auto-saves and shows "Saving..." then "Saved" indicator
 2. **Given** I have unsaved changes, **When** I refresh the page, **Then** my changes have been saved and appear when the page reloads
 3. **Given** I add, reorder, or delete steps, **When** the action completes, **Then** the system auto-saves the updated step list
 
@@ -150,7 +150,7 @@ As an admin, I want to see how my steps will appear to guests so that I can ensu
 
 **Auto-Save**
 
-- **FR-020**: System MUST auto-save changes to draft after 500ms of inactivity
+- **FR-020**: System MUST auto-save changes to draft after 2 seconds of inactivity
 - **FR-021**: System MUST display save status indicator (Saving.../Saved)
 - **FR-022**: System MUST save step list order, step configurations, and step additions/deletions
 
