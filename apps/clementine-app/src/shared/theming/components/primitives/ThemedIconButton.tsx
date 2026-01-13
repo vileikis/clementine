@@ -50,8 +50,10 @@ const SIZE_CLASSES: Record<IconButtonSize, string> = {
   lg: 'h-14 w-14', // 56px
 }
 
-export interface ThemedIconButtonProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'style'> {
+export interface ThemedIconButtonProps extends Omit<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  'style'
+> {
   /** Icon content */
   children: ReactNode
   /** Button size variant (defaults to 'md' - 44px touch target) */
