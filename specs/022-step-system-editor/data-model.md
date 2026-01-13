@@ -101,7 +101,8 @@ type StepCategory = 'info' | 'input' | 'capture' | 'transform'
 
 | Field | Type | Required | Default | Constraints |
 |-------|------|----------|---------|-------------|
-| question | string | Yes | - | 1-200 chars |
+| title | string | Yes | - | 1-200 chars |
+| required | boolean | No | false | - |
 | min | number | No | 1 | Integer 0-10 |
 | max | number | No | 5 | Integer 1-10, must be > min |
 | minLabel | string | No | undefined | Max 50 chars |
@@ -111,22 +112,24 @@ type StepCategory = 'info' | 'input' | 'capture' | 'transform'
 
 | Field | Type | Required | Default | Constraints |
 |-------|------|----------|---------|-------------|
-| question | string | Yes | - | 1-200 chars |
+| title | string | Yes | - | 1-200 chars |
+| required | boolean | No | false | - |
 
 ### InputMultiSelectConfig
 
 | Field | Type | Required | Default | Constraints |
 |-------|------|----------|---------|-------------|
-| question | string | Yes | - | 1-200 chars |
+| title | string | Yes | - | 1-200 chars |
+| required | boolean | No | false | - |
 | options | string[] | Yes | - | 2-10 items, each 1-100 chars |
-| minSelect | number | No | 0 | Integer >= 0 |
-| maxSelect | number | No | options.length | Integer >= minSelect |
+| multiSelect | boolean | No | false | false = single select, true = multi select |
 
 ### InputShortTextConfig
 
 | Field | Type | Required | Default | Constraints |
 |-------|------|----------|---------|-------------|
-| question | string | Yes | - | 1-200 chars |
+| title | string | Yes | - | 1-200 chars |
+| required | boolean | No | false | - |
 | placeholder | string | No | '' | Max 100 chars |
 | maxLength | number | No | 100 | Integer 1-200 |
 
@@ -134,7 +137,8 @@ type StepCategory = 'info' | 'input' | 'capture' | 'transform'
 
 | Field | Type | Required | Default | Constraints |
 |-------|------|----------|---------|-------------|
-| question | string | Yes | - | 1-200 chars |
+| title | string | Yes | - | 1-200 chars |
+| required | boolean | No | false | - |
 | placeholder | string | No | '' | Max 200 chars |
 | maxLength | number | No | 500 | Integer 1-2000 |
 
@@ -142,9 +146,7 @@ type StepCategory = 'info' | 'input' | 'capture' | 'transform'
 
 | Field | Type | Required | Default | Constraints |
 |-------|------|----------|---------|-------------|
-| instructions | string | No | '' | Max 200 chars |
-| countdown | number | No | 0 | Integer 0-10 (0 = disabled) |
-| overlay | MediaAsset | No | null | Future feature |
+| aspectRatio | '1:1' \| '9:16' | No | '1:1' | Enum value |
 
 ### TransformPipelineConfig
 
@@ -240,7 +242,8 @@ type StepCategory = 'info' | 'input' | 'capture' | 'transform'
         id: "step_002",
         type: "input.scale",
         config: {
-          question: "How would you rate this event?",
+          title: "How would you rate this event?",
+          required: false,
           min: 1,
           max: 5,
           minLabel: "Poor",
@@ -251,9 +254,7 @@ type StepCategory = 'info' | 'input' | 'capture' | 'transform'
         id: "step_003",
         type: "capture.photo",
         config: {
-          instructions: "Take a selfie!",
-          countdown: 3,
-          overlay: null
+          aspectRatio: "1:1"
         }
       }
     ]

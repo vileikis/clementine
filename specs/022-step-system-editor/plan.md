@@ -89,13 +89,14 @@ apps/clementine-app/src/
 │   │   │   └── index.ts
 │   │   ├── schemas/
 │   │   │   ├── info.schema.ts       # Info step config schema
-│   │   │   ├── input-scale.schema.ts
-│   │   │   ├── input-yes-no.schema.ts
-│   │   │   ├── input-multi-select.schema.ts
-│   │   │   ├── input-short-text.schema.ts
-│   │   │   ├── input-long-text.schema.ts
-│   │   │   ├── capture-photo.schema.ts
-│   │   │   ├── transform-pipeline.schema.ts
+│   │   │   ├── input-scale.schema.ts      # title, required, min, max, labels
+│   │   │   ├── input-yes-no.schema.ts     # title, required
+│   │   │   ├── input-multi-select.schema.ts # title, required, options, multiSelect
+│   │   │   ├── input-short-text.schema.ts # title, required, placeholder, maxLength
+│   │   │   ├── input-long-text.schema.ts  # title, required, placeholder, maxLength
+│   │   │   ├── capture-photo.schema.ts    # aspectRatio ('1:1' | '9:16')
+│   │   │   ├── transform-pipeline.schema.ts # (empty config for MVP)
+│   │   │   ├── step.schema.ts       # Zod discriminated union for Step type
 │   │   │   └── index.ts
 │   │   ├── renderers/               # Edit-mode step previews
 │   │   │   ├── InfoStepRenderer.tsx
