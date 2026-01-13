@@ -7,12 +7,11 @@
  */
 import {
   DndContext,
-  
   KeyboardSensor,
   PointerSensor,
   closestCenter,
   useSensor,
-  useSensors
+  useSensors,
 } from '@dnd-kit/core'
 import {
   SortableContext,
@@ -22,7 +21,7 @@ import {
 import { Plus } from 'lucide-react'
 
 import { StepListItem } from './StepListItem'
-import type {DragEndEvent} from '@dnd-kit/core';
+import type { DragEndEvent } from '@dnd-kit/core'
 import type { Step } from '../../steps/registry/step-registry'
 import { Button } from '@/ui-kit/ui/button'
 import { ScrollArea } from '@/ui-kit/ui/scroll-area'

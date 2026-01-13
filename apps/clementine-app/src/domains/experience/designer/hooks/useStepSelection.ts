@@ -5,9 +5,14 @@
  * Enables deep linking to specific steps via ?step={stepId}.
  */
 import { useCallback, useMemo } from 'react'
-import { useRouter, useRouterState } from '@tanstack/react-router'
+import { getRouteApi } from '@tanstack/react-router'
 
 import type { Step } from '../../steps/registry/step-registry'
+
+// Get typed route API for the experience designer route
+const routeApi = getRouteApi(
+  '/workspace/$workspaceSlug/experiences/$experienceId',
+)
 
 /**
  * Search params schema for experience designer
@@ -21,6 +26,9 @@ export interface ExperienceDesignerSearch {
  *
  * Provides selected step and selection handlers that update the URL.
  * This enables deep linking to specific steps and browser history navigation.
+ *
+ * Uses TanStack Router's native navigate() for optimized URL updates
+ * that integrate properly with React's concurrent features.
  *
  * @param steps - Array of steps to select from
  * @returns Selection state and handlers
@@ -42,14 +50,12 @@ export interface ExperienceDesignerSearch {
  * ```
  */
 export function useStepSelection(steps: Step[]) {
-  const router = useRouter()
-  const routerState = useRouterState()
+  // Use typed route API for proper search params handling
+  const navigate = routeApi.useNavigate()
+  const search = routeApi.useSearch()
 
-  // Get current step ID from URL search params
-  const selectedStepId = useMemo(() => {
-    const searchParams = new URLSearchParams(routerState.location.searchStr)
-    return searchParams.get('step')
-  }, [routerState.location.searchStr])
+  // Get current step ID from search params
+  const selectedStepId = search?.step ?? null
 
   // Find the selected step from the list
   const selectedStep = useMemo(() => {
@@ -57,38 +63,28 @@ export function useStepSelection(steps: Step[]) {
     return steps.find((s) => s.id === selectedStepId) ?? null
   }, [steps, selectedStepId])
 
-  // Update URL with new step selection
+  // Update URL with new step selection using TanStack Router's navigate
+  // Uses functional update to avoid stale closure issues
   const selectStep = useCallback(
     (stepId: string) => {
-      const searchParams = new URLSearchParams(routerState.location.searchStr)
-      searchParams.set('step', stepId)
-      const newSearch = searchParams.toString()
-
-      router.history.replace(`${routerState.location.pathname}?${newSearch}`)
+      navigate({
+        search: (prev) => ({ ...prev, step: stepId }),
+        replace: true,
+      })
     },
-    [
-      router.history,
-      routerState.location.pathname,
-      routerState.location.searchStr,
-    ],
+    [navigate],
   )
 
   // Clear step selection
   const clearSelection = useCallback(() => {
-    const searchParams = new URLSearchParams(routerState.location.searchStr)
-    searchParams.delete('step')
-    const newSearch = searchParams.toString()
-
-    const newPath = newSearch
-      ? `${routerState.location.pathname}?${newSearch}`
-      : routerState.location.pathname
-
-    router.history.replace(newPath)
-  }, [
-    router.history,
-    routerState.location.pathname,
-    routerState.location.searchStr,
-  ])
+    navigate({
+      search: (prev) => {
+        const { step: _, ...rest } = prev
+        return rest
+      },
+      replace: true,
+    })
+  }, [navigate])
 
   return {
     /** Currently selected step, or null if none */
