@@ -46,7 +46,7 @@ export function ExperienceDesignerPage({
   )
 
   // Step selection with URL sync
-  const { selectedStep, selectStep } = useStepSelection(steps)
+  const { selectedStep, selectStep, clearSelection } = useStepSelection(steps)
 
   // Add step dialog state
   const [showAddDialog, setShowAddDialog] = useState(false)
@@ -78,6 +78,39 @@ export function ExperienceDesignerPage({
     [selectedStep],
   )
 
+  // Handle reordering steps
+  const handleReorderSteps = useCallback((newSteps: Step[]) => {
+    setSteps(newSteps)
+  }, [])
+
+  // Handle deleting a step
+  const handleDeleteStep = useCallback(
+    (stepId: string) => {
+      setSteps((prevSteps) => {
+        const stepIndex = prevSteps.findIndex((step) => step.id === stepId)
+        const newSteps = prevSteps.filter((step) => step.id !== stepId)
+
+        // If we're deleting the selected step, update selection
+        if (selectedStep?.id === stepId) {
+          // Select the next step, or the previous one if we deleted the last
+          // Or clear selection if no steps remain
+          if (newSteps.length === 0) {
+            clearSelection()
+          } else if (stepIndex >= newSteps.length) {
+            // Deleted the last step, select the new last step
+            selectStep(newSteps[newSteps.length - 1].id)
+          } else {
+            // Select the step that's now at the deleted step's position
+            selectStep(newSteps[stepIndex].id)
+          }
+        }
+
+        return newSteps
+      })
+    },
+    [selectedStep?.id, selectStep, clearSelection],
+  )
+
   return (
     <div className="flex flex-1 overflow-hidden">
       {/* Left column: Step list */}
@@ -86,6 +119,8 @@ export function ExperienceDesignerPage({
           steps={steps}
           selectedStepId={selectedStep?.id ?? null}
           onSelectStep={selectStep}
+          onReorderSteps={handleReorderSteps}
+          onDeleteStep={handleDeleteStep}
           onAddStep={() => setShowAddDialog(true)}
         />
       </aside>

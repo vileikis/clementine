@@ -128,10 +128,10 @@ All paths are relative to `apps/clementine-app/src/`:
 
 ### Implementation for US2
 
-- [ ] T047 [US2] Add @dnd-kit dependencies if not present: `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities`
-- [ ] T048 [US2] Enhance StepListItem in `domains/experience/designer/components/StepListItem.tsx` with drag handle using useSortable from @dnd-kit, add delete action via DropdownMenu context menu
-- [ ] T049 [US2] Enhance StepList in `domains/experience/designer/components/StepList.tsx` with DndContext and SortableContext from @dnd-kit, implement onDragEnd handler to reorder steps
-- [ ] T050 [US2] Add selection handling for deleted step in `domains/experience/designer/containers/ExperienceDesignerPage.tsx`: select next step or clear selection if no steps remain
+- [X] T047 [US2] Add @dnd-kit dependencies if not present: `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities`
+- [X] T048 [US2] Enhance StepListItem in `domains/experience/designer/components/StepListItem.tsx` with drag handle using useSortable from @dnd-kit, add delete action via DropdownMenu context menu
+- [X] T049 [US2] Enhance StepList in `domains/experience/designer/components/StepList.tsx` with DndContext and SortableContext from @dnd-kit, implement onDragEnd handler to reorder steps
+- [X] T050 [US2] Add selection handling for deleted step in `domains/experience/designer/containers/ExperienceDesignerPage.tsx`: select next step or clear selection if no steps remain
 
 **Checkpoint**: User Story 2 complete - admin can reorder and delete steps. Works independently with US1.
 
