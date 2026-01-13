@@ -49,8 +49,9 @@ export function useUpdateShareOptions(projectId: string, eventId: string) {
       // Validate partial sharing updates
       const validated = updateSharingConfigSchema.parse(updates)
 
-      // Transform to dot notation with 'sharing.' prefix
-      const dotNotationUpdates = prefixKeys(validated, 'sharing')
+      // Transform to dot notation with 'shareOptions.' prefix
+      // Note: Renamed from 'sharing' to 'shareOptions' (FR-017)
+      const dotNotationUpdates = prefixKeys(validated, 'shareOptions')
 
       // Use shared helper for atomic Firestore update
       await updateEventConfigField(projectId, eventId, dotNotationUpdates)
