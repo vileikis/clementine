@@ -49,7 +49,7 @@ export function SelectOptionCard({
       className={cn(
         'h-auto w-full cursor-pointer flex-row items-center justify-start gap-2 px-3 py-2 transition-all',
         enabled
-          ? 'border-primary bg-primary/10 hover:border-primary/80'
+          ? 'border-info bg-info/10 hover:border-info/80'
           : 'bg-muted hover:bg-muted/80',
         className,
       )}
@@ -59,13 +59,13 @@ export function SelectOptionCard({
       <Icon
         className={cn(
           'h-4 w-4 shrink-0 transition-colors',
-          enabled ? 'text-primary' : 'text-muted-foreground',
+          enabled ? 'text-info' : 'text-muted-foreground',
         )}
       />
       <span
         className={cn(
           'text-sm font-medium truncate',
-          enabled ? 'text-primary' : 'text-foreground',
+          enabled ? 'text-info' : 'text-foreground',
         )}
       >
         {label}
