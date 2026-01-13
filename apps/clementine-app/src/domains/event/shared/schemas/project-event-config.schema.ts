@@ -90,6 +90,9 @@ export const sharingConfigSchema = shareOptionsConfigSchema
  *
  * Configuration for the call-to-action button on the share screen.
  * When label is null, CTA button is hidden.
+ *
+ * Note: This read schema is permissive to handle existing data.
+ * Write validation is enforced by ctaWriteSchema.
  */
 export const ctaConfigSchema = z.object({
   /** Button text label. When null, CTA button is hidden. */
@@ -97,6 +100,26 @@ export const ctaConfigSchema = z.object({
   /** Destination URL. Required when label is provided. */
   url: z.string().nullable().default(null),
 })
+
+/**
+ * CTA Write Schema
+ *
+ * Stricter validation for writing CTA config.
+ * Enforces: if label is provided, url must also be provided.
+ */
+export const ctaWriteSchema = ctaConfigSchema.refine(
+  (data) => {
+    // If label is provided, url must also be provided
+    if (data.label !== null && data.url === null) {
+      return false
+    }
+    return true
+  },
+  {
+    message: 'CTA url is required when label is provided',
+    path: ['url'],
+  },
+)
 
 /**
  * Share Screen Configuration
@@ -114,6 +137,18 @@ export const shareConfigSchema = z.object({
   description: z.string().nullable().default(null),
   /** CTA button configuration. When null or label is null, button is hidden. */
   cta: ctaConfigSchema.nullable().default(null),
+})
+
+/**
+ * Share Write Schema
+ *
+ * Stricter validation for writing share config.
+ * Uses ctaWriteSchema to enforce CTA cross-field validation.
+ */
+export const shareWriteSchema = z.object({
+  title: z.string().nullable().default(null),
+  description: z.string().nullable().default(null),
+  cta: ctaWriteSchema.nullable().default(null),
 })
 
 /**

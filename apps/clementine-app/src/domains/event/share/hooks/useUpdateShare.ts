@@ -24,7 +24,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import * as Sentry from '@sentry/tanstackstart-react'
 import type { ShareConfig } from '@/domains/event/shared/schemas'
 import {
-  shareConfigSchema,
+  shareWriteSchema,
   updateEventConfigField,
 } from '@/domains/event/shared'
 import { useTrackedMutation } from '@/domains/event/designer'
@@ -37,8 +37,8 @@ export function useUpdateShare(projectId: string, eventId: string) {
 
   const mutation = useMutation({
     mutationFn: async (share: ShareConfig) => {
-      // Validate complete share object
-      const validated = shareConfigSchema.parse(share)
+      // Validate with write schema (stricter than read schema)
+      const validated = shareWriteSchema.parse(share)
 
       // Push entire share object (atomic replacement)
       await updateEventConfigField(projectId, eventId, { share: validated })
