@@ -1,7 +1,7 @@
 /**
  * ThemeEditorPage Container
  *
- * 2-column layout with live preview (left) and controls (right).
+ * 2-column layout with live preview (right) and controls (left).
  * Integrates with auto-save, tracked mutations, and PreviewShell.
  */
 
