@@ -15,16 +15,22 @@ export function EventSettingsPage() {
   }
 
   return (
-    <div className="space-y-8 p-6">
-      <OverlaySection
-        projectId={projectId!}
-        eventId={eventId!}
-        workspaceId={workspace.id}
-        userId={user.uid}
-        overlays={event.draftConfig?.overlays || null}
-      />
+    <div className="flex justify-center p-6">
+      <div className="w-full max-w-3xl space-y-8">
+        <OverlaySection
+          projectId={projectId!}
+          eventId={eventId!}
+          workspaceId={workspace.id}
+          userId={user.uid}
+          overlays={event.draftConfig?.overlays || null}
+        />
 
-      <SharingSection event={event} projectId={projectId!} eventId={eventId!} />
+        <SharingSection
+          event={event}
+          projectId={projectId!}
+          eventId={eventId!}
+        />
+      </div>
     </div>
   )
 }

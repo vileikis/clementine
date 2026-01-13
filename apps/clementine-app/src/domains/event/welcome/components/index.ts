@@ -1,2 +1,2 @@
 export * from './WelcomePreview'
-export * from './WelcomeControls'
+export * from './WelcomeConfigPanel'

@@ -37,12 +37,12 @@ This feature extends existing components. No new project setup needed.
 
 **⚠️ CRITICAL**: User Story 1 and 2 depend on NavTabs existing
 
-- [ ] T001 Create TabItem interface and NavTabsProps types in apps/clementine-app/src/domains/navigation/components/NavTabs.tsx
-- [ ] T002 Implement NavTabs component with horizontal tab rendering using TanStack Router Link in apps/clementine-app/src/domains/navigation/components/NavTabs.tsx
-- [ ] T003 Add active state detection using useMatchRoute hook in apps/clementine-app/src/domains/navigation/components/NavTabs.tsx
-- [ ] T004 Style NavTabs using design tokens (border-b-2 border-primary for active) in apps/clementine-app/src/domains/navigation/components/NavTabs.tsx
-- [ ] T005 Export NavTabs and TabItem from apps/clementine-app/src/domains/navigation/components/index.ts
-- [ ] T006 Re-export NavTabs types from apps/clementine-app/src/domains/navigation/index.ts
+- [X] T001 Create TabItem interface and NavTabsProps types in apps/clementine-app/src/domains/navigation/components/NavTabs.tsx
+- [X] T002 Implement NavTabs component with horizontal tab rendering using TanStack Router Link in apps/clementine-app/src/domains/navigation/components/NavTabs.tsx
+- [X] T003 Add active state detection using useMatchRoute hook in apps/clementine-app/src/domains/navigation/components/NavTabs.tsx
+- [X] T004 Style NavTabs using design tokens (border-b-2 border-primary for active) in apps/clementine-app/src/domains/navigation/components/NavTabs.tsx
+- [X] T005 Export NavTabs and TabItem from apps/clementine-app/src/domains/navigation/components/index.ts
+- [X] T006 Re-export NavTabs types from apps/clementine-app/src/domains/navigation/index.ts
 
 **Checkpoint**: NavTabs component available for use - user story implementation can begin
 
@@ -56,14 +56,14 @@ This feature extends existing components. No new project setup needed.
 
 ### Implementation for User Stories 1 & 2
 
-- [ ] T007 [US1] [US2] Add optional tabs prop (TabItem[]) to TopNavBarProps interface in apps/clementine-app/src/domains/navigation/components/TopNavBar.tsx
-- [ ] T008 [US1] [US2] Import NavTabs component in apps/clementine-app/src/domains/navigation/components/TopNavBar.tsx
-- [ ] T009 [US1] [US2] Modify TopNavBar to render two rows when tabs provided: Row 1 (breadcrumbs+left+right), Row 2 (NavTabs) in apps/clementine-app/src/domains/navigation/components/TopNavBar.tsx
-- [ ] T010 [US1] [US2] Ensure TopNavBar renders single row when no tabs (backward compatibility) in apps/clementine-app/src/domains/navigation/components/TopNavBar.tsx
-- [ ] T011 [US1] Define eventDesignerTabs configuration array (Welcome, Theme, Settings) in apps/clementine-app/src/domains/event/designer/containers/EventDesignerLayout.tsx
-- [ ] T012 [US1] Pass tabs prop to TopNavBar in apps/clementine-app/src/domains/event/designer/containers/EventDesignerLayout.tsx
-- [ ] T013 [US1] Remove EventDesignerSidebar import and usage from apps/clementine-app/src/domains/event/designer/containers/EventDesignerPage.tsx
-- [ ] T014 [US1] Update EventDesignerPage layout to render only Outlet (no sidebar) in apps/clementine-app/src/domains/event/designer/containers/EventDesignerPage.tsx
+- [X] T007 [US1] [US2] Add optional tabs prop (TabItem[]) to TopNavBarProps interface in apps/clementine-app/src/domains/navigation/components/TopNavBar.tsx
+- [X] T008 [US1] [US2] Import NavTabs component in apps/clementine-app/src/domains/navigation/components/TopNavBar.tsx
+- [X] T009 [US1] [US2] Modify TopNavBar to render two rows when tabs provided: Row 1 (breadcrumbs+left+right), Row 2 (NavTabs) in apps/clementine-app/src/domains/navigation/components/TopNavBar.tsx
+- [X] T010 [US1] [US2] Ensure TopNavBar renders single row when no tabs (backward compatibility) in apps/clementine-app/src/domains/navigation/components/TopNavBar.tsx
+- [X] T011 [US1] Define eventDesignerTabs configuration array (Welcome, Theme, Settings) in apps/clementine-app/src/domains/event/designer/containers/EventDesignerLayout.tsx
+- [X] T012 [US1] Pass tabs prop to TopNavBar in apps/clementine-app/src/domains/event/designer/containers/EventDesignerLayout.tsx
+- [X] T013 [US1] Remove EventDesignerSidebar import and usage from apps/clementine-app/src/domains/event/designer/containers/EventDesignerPage.tsx
+- [X] T014 [US1] Update EventDesignerPage layout to render only Outlet (no sidebar) in apps/clementine-app/src/domains/event/designer/containers/EventDesignerPage.tsx
 
 **Checkpoint**: Horizontal tabs visible in event designer, navigation works between all three tabs. US1 and US2 complete.
 
@@ -77,21 +77,21 @@ This feature extends existing components. No new project setup needed.
 
 ### Welcome Editor Changes
 
-- [ ] T015 [P] [US3] Rename file from WelcomeControls.tsx to WelcomeConfigPanel.tsx in apps/clementine-app/src/domains/event/welcome/components/
-- [ ] T016 [US3] Update component name from WelcomeControls to WelcomeConfigPanel in apps/clementine-app/src/domains/event/welcome/components/WelcomeConfigPanel.tsx
-- [ ] T017 [US3] Update export in apps/clementine-app/src/domains/event/welcome/components/index.ts to export WelcomeConfigPanel
-- [ ] T018 [US3] Update import in WelcomeEditorPage from WelcomeControls to WelcomeConfigPanel in apps/clementine-app/src/domains/event/welcome/containers/WelcomeEditorPage.tsx
-- [ ] T019 [US3] Swap column order in WelcomeEditorPage: move controls aside to left, preview div to right in apps/clementine-app/src/domains/event/welcome/containers/WelcomeEditorPage.tsx
-- [ ] T020 [US3] Change border-l to border-r on controls aside in apps/clementine-app/src/domains/event/welcome/containers/WelcomeEditorPage.tsx
+- [X] T015 [P] [US3] Rename file from WelcomeControls.tsx to WelcomeConfigPanel.tsx in apps/clementine-app/src/domains/event/welcome/components/
+- [X] T016 [US3] Update component name from WelcomeControls to WelcomeConfigPanel in apps/clementine-app/src/domains/event/welcome/components/WelcomeConfigPanel.tsx
+- [X] T017 [US3] Update export in apps/clementine-app/src/domains/event/welcome/components/index.ts to export WelcomeConfigPanel
+- [X] T018 [US3] Update import in WelcomeEditorPage from WelcomeControls to WelcomeConfigPanel in apps/clementine-app/src/domains/event/welcome/containers/WelcomeEditorPage.tsx
+- [X] T019 [US3] Swap column order in WelcomeEditorPage: move controls aside to left, preview div to right in apps/clementine-app/src/domains/event/welcome/containers/WelcomeEditorPage.tsx
+- [X] T020 [US3] Change border-l to border-r on controls aside in apps/clementine-app/src/domains/event/welcome/containers/WelcomeEditorPage.tsx
 
 ### Theme Editor Changes
 
-- [ ] T021 [P] [US3] Rename file from ThemeControls.tsx to ThemeConfigPanel.tsx in apps/clementine-app/src/domains/event/theme/components/
-- [ ] T022 [US3] Update component name from ThemeControls to ThemeConfigPanel in apps/clementine-app/src/domains/event/theme/components/ThemeConfigPanel.tsx
-- [ ] T023 [US3] Update export in apps/clementine-app/src/domains/event/theme/components/index.ts to export ThemeConfigPanel
-- [ ] T024 [US3] Update import in ThemeEditorPage from ThemeControls to ThemeConfigPanel in apps/clementine-app/src/domains/event/theme/containers/ThemeEditorPage.tsx
-- [ ] T025 [US3] Swap column order in ThemeEditorPage: move controls aside to left, preview div to right in apps/clementine-app/src/domains/event/theme/containers/ThemeEditorPage.tsx
-- [ ] T026 [US3] Change border-l to border-r on controls aside in apps/clementine-app/src/domains/event/theme/containers/ThemeEditorPage.tsx
+- [X] T021 [P] [US3] Rename file from ThemeControls.tsx to ThemeConfigPanel.tsx in apps/clementine-app/src/domains/event/theme/components/
+- [X] T022 [US3] Update component name from ThemeControls to ThemeConfigPanel in apps/clementine-app/src/domains/event/theme/components/ThemeConfigPanel.tsx
+- [X] T023 [US3] Update export in apps/clementine-app/src/domains/event/theme/components/index.ts to export ThemeConfigPanel
+- [X] T024 [US3] Update import in ThemeEditorPage from ThemeControls to ThemeConfigPanel in apps/clementine-app/src/domains/event/theme/containers/ThemeEditorPage.tsx
+- [X] T025 [US3] Swap column order in ThemeEditorPage: move controls aside to left, preview div to right in apps/clementine-app/src/domains/event/theme/containers/ThemeEditorPage.tsx
+- [X] T026 [US3] Change border-l to border-r on controls aside in apps/clementine-app/src/domains/event/theme/containers/ThemeEditorPage.tsx
 
 **Checkpoint**: Welcome and Theme editors show controls on left, preview on right. Components renamed for consistency. US3 complete.
 
@@ -105,9 +105,9 @@ This feature extends existing components. No new project setup needed.
 
 ### Implementation for User Story 4
 
-- [ ] T027 [US4] Wrap existing content in flex container with justify-center in apps/clementine-app/src/domains/event/settings/containers/EventSettingsPage.tsx
-- [ ] T028 [US4] Add max-w-3xl constraint to content wrapper for readability in apps/clementine-app/src/domains/event/settings/containers/EventSettingsPage.tsx
-- [ ] T029 [US4] Ensure padding and spacing are appropriate for centered layout in apps/clementine-app/src/domains/event/settings/containers/EventSettingsPage.tsx
+- [X] T027 [US4] Wrap existing content in flex container with justify-center in apps/clementine-app/src/domains/event/settings/containers/EventSettingsPage.tsx
+- [X] T028 [US4] Add max-w-3xl constraint to content wrapper for readability in apps/clementine-app/src/domains/event/settings/containers/EventSettingsPage.tsx
+- [X] T029 [US4] Ensure padding and spacing are appropriate for centered layout in apps/clementine-app/src/domains/event/settings/containers/EventSettingsPage.tsx
 
 **Checkpoint**: Settings page content centered with max-width. US4 complete.
 
@@ -117,14 +117,14 @@ This feature extends existing components. No new project setup needed.
 
 **Purpose**: Validation, cleanup, and final verification
 
-- [ ] T030 Run validation gates with pnpm app:check from apps/clementine-app/
-- [ ] T031 Run type checking with pnpm app:type-check from apps/clementine-app/
-- [ ] T032 [P] Review all changes against design-system.md (verify design tokens used)
-- [ ] T033 [P] Test navigation flow: Welcome → Theme → Settings tabs
-- [ ] T034 [P] Test active state highlighting on each tab
-- [ ] T035 [P] Test editor layouts: verify controls-left/preview-right on Welcome and Theme
-- [ ] T036 [P] Test Settings page centered layout
-- [ ] T037 Evaluate if EventDesignerSidebar.tsx can be removed (now unused) from apps/clementine-app/src/domains/event/designer/components/
+- [X] T030 Run validation gates with pnpm app:check from apps/clementine-app/
+- [X] T031 Run type checking with pnpm app:type-check from apps/clementine-app/
+- [X] T032 [P] Review all changes against design-system.md (verify design tokens used)
+- [X] T033 [P] Test navigation flow: Welcome → Theme → Settings tabs
+- [X] T034 [P] Test active state highlighting on each tab
+- [X] T035 [P] Test editor layouts: verify controls-left/preview-right on Welcome and Theme
+- [X] T036 [P] Test Settings page centered layout
+- [X] T037 Evaluate if EventDesignerSidebar.tsx can be removed (now unused) from apps/clementine-app/src/domains/event/designer/components/
 
 ---
 

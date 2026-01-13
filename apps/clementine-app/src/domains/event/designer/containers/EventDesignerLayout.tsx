@@ -13,7 +13,8 @@ import { useEventDesignerStore } from '../stores'
 import { EventDesignerPage } from './EventDesignerPage'
 import type { ProjectEventFull } from '@/domains/event/shared'
 import type { Project } from '@/domains/workspace/projects'
-import { TopNavBar } from '@/domains/navigation'
+import type {TabItem} from '@/domains/navigation';
+import {  TopNavBar } from '@/domains/navigation'
 import { EditorChangesBadge, EditorSaveStatus } from '@/shared/editor-status'
 import { Button } from '@/ui-kit/ui/button'
 
@@ -52,6 +53,25 @@ export function EventDesignerLayout({
   // Compute paths for breadcrumb navigation
   const projectPath = `/workspace/${workspaceSlug}/projects/${project.id}`
   const projectsListPath = `/workspace/${workspaceSlug}/projects`
+
+  // Event designer tabs configuration
+  const eventDesignerTabs: TabItem[] = [
+    {
+      id: 'welcome',
+      label: 'Welcome',
+      to: '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/welcome',
+    },
+    {
+      id: 'theme',
+      label: 'Theme',
+      to: '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/theme',
+    },
+    {
+      id: 'settings',
+      label: 'Settings',
+      to: '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/settings',
+    },
+  ]
 
   // Detect unpublished changes
   const hasUnpublishedChanges = useMemo(() => {
@@ -96,6 +116,7 @@ export function EventDesignerLayout({
             label: event.name,
           },
         ]}
+        tabs={eventDesignerTabs}
         right={
           <>
             <EditorSaveStatus
