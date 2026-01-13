@@ -13,8 +13,8 @@ import { useEventDesignerStore } from '../stores'
 import { EventDesignerPage } from './EventDesignerPage'
 import type { ProjectEventFull } from '@/domains/event/shared'
 import type { Project } from '@/domains/workspace/projects'
-import type {TabItem} from '@/domains/navigation';
-import {  TopNavBar } from '@/domains/navigation'
+import type { TabItem } from '@/domains/navigation'
+import { TopNavBar } from '@/domains/navigation'
 import { EditorChangesBadge, EditorSaveStatus } from '@/shared/editor-status'
 import { Button } from '@/ui-kit/ui/button'
 

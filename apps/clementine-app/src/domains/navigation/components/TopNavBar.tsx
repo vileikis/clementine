@@ -1,6 +1,6 @@
 import { TopNavBreadcrumb } from './TopNavBreadcrumb'
-import { NavTabs  } from './NavTabs'
-import type {TabItem} from './NavTabs';
+import { NavTabs } from './NavTabs'
+import type { TabItem } from './NavTabs'
 import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/shared/utils/style-utils'
 
