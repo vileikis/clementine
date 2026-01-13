@@ -10,8 +10,15 @@ export {
   LogoutButton,
   TopNavBar,
   TopNavActions,
+  NavTabs,
 } from './components'
-export type { BreadcrumbItem, TopNavBarProps, ActionButton } from './components'
+export type {
+  BreadcrumbItem,
+  TopNavBarProps,
+  ActionButton,
+  TabItem,
+  NavTabsProps,
+} from './components'
 
 // Hooks
 export { useSidebarState } from './hooks'

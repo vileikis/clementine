@@ -1,49 +1,21 @@
 /**
  * EventDesignerPage Container
  *
- * Layout shell for the event designer with vertical tabs navigation.
- * Provides a 2-column layout: left sidebar with tabs, right content area with outlet.
+ * Layout shell for the event designer.
+ * Navigation is handled via horizontal tabs in TopNavBar (see EventDesignerLayout).
  */
 import { Outlet } from '@tanstack/react-router'
-import { EventDesignerSidebar } from '../components/EventDesignerSidebar'
-import type { SidebarItem } from '../components/EventDesignerSidebar'
-
-const sidebarItems: SidebarItem[] = [
-  {
-    type: 'link',
-    id: 'welcome',
-    label: 'Welcome',
-    to: '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/welcome',
-  },
-  {
-    type: 'link',
-    id: 'theme',
-    label: 'Theme',
-    to: '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/theme',
-  },
-  {
-    type: 'link',
-    id: 'settings',
-    label: 'Settings',
-    to: '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/settings',
-  },
-]
 
 /**
  * EventDesignerPage component
  *
- * Renders the event designer interface with:
- * - Left sidebar: Vertical tabs for Welcome, Theme, Settings
- * - Right content area: Active tab content (rendered via Outlet)
+ * Renders the event designer content area.
+ * Horizontal tabs navigation is handled by TopNavBar in EventDesignerLayout.
  */
 export function EventDesignerPage() {
   return (
-    <div className="flex h-full">
-      <EventDesignerSidebar items={sidebarItems} />
-
-      <main className="flex-1 overflow-auto">
-        <Outlet />
-      </main>
-    </div>
+    <main className="h-full overflow-auto">
+      <Outlet />
+    </main>
   )
 }

@@ -1,7 +1,7 @@
 /**
  * ThemeEditorPage Container
  *
- * 2-column layout with live preview (left) and controls (right).
+ * 2-column layout with live preview (right) and controls (left).
  * Integrates with auto-save, tracked mutations, and PreviewShell.
  */
 
@@ -9,7 +9,7 @@ import { useCallback, useState } from 'react'
 import { useParams } from '@tanstack/react-router'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
-import { ThemeControls, ThemePreview } from '../components'
+import { ThemeConfigPanel, ThemePreview } from '../components'
 import { useUpdateTheme, useUploadAndUpdateBackground } from '../hooks'
 import { DEFAULT_THEME } from '../constants'
 import type { Theme } from '@/shared/theming'
@@ -148,21 +148,12 @@ export function ThemeEditorPage() {
 
   return (
     <div className="flex h-full">
-      {/* Left: Preview */}
-      <div className="flex-1 min-w-0">
-        <PreviewShell enableViewportSwitcher enableFullscreen>
-          <ThemeProvider theme={previewTheme}>
-            <ThemePreview />
-          </ThemeProvider>
-        </PreviewShell>
-      </div>
-
-      {/* Right: Controls */}
-      <aside className="w-80 shrink-0 border-l border-border overflow-y-auto bg-card">
+      {/* Left: Controls */}
+      <aside className="w-80 shrink-0 border-r border-border overflow-y-auto bg-card">
         <div className="sticky top-0 z-10 border-b border-border bg-card px-4 py-3">
           <h2 className="font-semibold">Theme</h2>
         </div>
-        <ThemeControls
+        <ThemeConfigPanel
           theme={previewTheme}
           onUpdate={handleUpdate}
           onUploadBackground={handleUploadBackground}
@@ -170,6 +161,15 @@ export function ThemeEditorPage() {
           uploadProgress={uploadProgress}
         />
       </aside>
+
+      {/* Right: Preview */}
+      <div className="flex-1 min-w-0">
+        <PreviewShell enableViewportSwitcher enableFullscreen>
+          <ThemeProvider theme={previewTheme}>
+            <ThemePreview />
+          </ThemeProvider>
+        </PreviewShell>
+      </div>
     </div>
   )
 }

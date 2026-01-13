@@ -7,15 +7,34 @@
 import { useEffect, useMemo } from 'react'
 import { FolderOpen, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
-
 import { usePublishEvent } from '../hooks'
 import { useEventDesignerStore } from '../stores'
 import { EventDesignerPage } from './EventDesignerPage'
 import type { ProjectEventFull } from '@/domains/event/shared'
 import type { Project } from '@/domains/workspace/projects'
+import type { TabItem } from '@/domains/navigation'
 import { TopNavBar } from '@/domains/navigation'
 import { EditorChangesBadge, EditorSaveStatus } from '@/shared/editor-status'
 import { Button } from '@/ui-kit/ui/button'
+
+// Event designer tabs configuration
+const eventDesignerTabs: TabItem[] = [
+  {
+    id: 'welcome',
+    label: 'Welcome',
+    to: '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/welcome',
+  },
+  {
+    id: 'theme',
+    label: 'Theme',
+    to: '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/theme',
+  },
+  {
+    id: 'settings',
+    label: 'Settings',
+    to: '/workspace/$workspaceSlug/projects/$projectId/events/$eventId/settings',
+  },
+]
 
 interface EventDesignerLayoutProps {
   event: ProjectEventFull
@@ -96,6 +115,7 @@ export function EventDesignerLayout({
             label: event.name,
           },
         ]}
+        tabs={eventDesignerTabs}
         right={
           <>
             <EditorSaveStatus
