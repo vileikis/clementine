@@ -2,8 +2,8 @@
  * SharePreview Component
  *
  * Display-only preview component showing how the share screen will appear
- * in the guest-facing experience. Uses ThemedText and ThemedBackground
- * primitives from shared theming module.
+ * in the guest-facing experience. Uses ThemedText, ThemedBackground,
+ * ThemedButton, and ThemedIconButton primitives from shared theming module.
  *
  * Two-zone layout:
  * 1. Scrollable content zone (top): Title, description, media placeholder
@@ -30,8 +30,12 @@ import { FaTelegramPlane } from 'react-icons/fa'
 import type { ShareConfig, ShareOptionsConfig } from '@/domains/event/shared'
 import type { LucideIcon } from 'lucide-react'
 import type { IconType } from 'react-icons'
-import { ThemedBackground, ThemedText, useEventTheme } from '@/shared/theming'
-import { Button } from '@/ui-kit/ui/button'
+import {
+  ThemedBackground,
+  ThemedButton,
+  ThemedIconButton,
+  ThemedText,
+} from '@/shared/theming'
 
 export interface SharePreviewProps {
   /** Share config to preview */
@@ -70,8 +74,6 @@ const SHARE_ICON_ORDER: (keyof ShareOptionsConfig)[] = [
 ]
 
 export function SharePreview({ share, shareOptions }: SharePreviewProps) {
-  const { theme } = useEventTheme()
-
   // Get enabled icons in order
   const enabledIcons = SHARE_ICON_ORDER.filter(
     (platform) => shareOptions[platform],
@@ -85,7 +87,7 @@ export function SharePreview({ share, shareOptions }: SharePreviewProps) {
       {/* Scrollable content zone */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {/* Media placeholder */}
-        <div className="aspect-square bg-muted/50 rounded-lg flex items-center justify-center">
+        <div className="aspect-square bg-muted rounded-lg flex items-center justify-center">
           <ImageIcon className="h-12 w-12 text-muted-foreground/50" />
         </div>
 
@@ -112,29 +114,29 @@ export function SharePreview({ share, shareOptions }: SharePreviewProps) {
             {enabledIcons.map((platform) => {
               const { icon: Icon, label } = PLATFORM_ICONS[platform]
               return (
-                <button
+                <ThemedIconButton
                   key={platform}
-                  className="flex h-11 w-11 items-center justify-center rounded-full border border-current/20 transition-colors hover:bg-current/10 disabled:opacity-50"
-                  style={{ color: theme.text.color }}
                   title={label}
                   aria-label={label}
                 >
                   <Icon className="h-5 w-5" />
-                </button>
+                </ThemedIconButton>
               )
             })}
           </div>
         )}
 
-        {/* Start over button (always visible in preview) */}
-        <Button variant="outline" className="w-full">
+        {/* Start over button (secondary/outline style) */}
+        <ThemedButton variant="outline" size="md" className="w-full">
           <RotateCcw className="mr-2 h-4 w-4" />
           Start over
-        </Button>
+        </ThemedButton>
 
-        {/* CTA button (hidden when label is null/empty) */}
+        {/* CTA button (primary style, hidden when label is null/empty) */}
         {share.cta?.label && (
-          <Button className="w-full">{share.cta.label}</Button>
+          <ThemedButton variant="primary" size="md" className="w-full">
+            {share.cta.label}
+          </ThemedButton>
         )}
       </div>
     </ThemedBackground>

@@ -29,12 +29,20 @@ export { BUTTON_RADIUS_MAP } from './constants'
 export { ThemeProvider } from './providers'
 
 // Components
-export { ThemedBackground, ThemedText, ThemedButton } from './components'
+export {
+  ThemedBackground,
+  ThemedText,
+  ThemedButton,
+  ThemedIconButton,
+} from './components'
 export type {
   ThemedTextProps,
   TextVariant,
   ThemedButtonProps,
   ButtonSize,
+  ButtonVariant,
+  ThemedIconButtonProps,
+  IconButtonSize,
 } from './components'
 
 // Hooks
