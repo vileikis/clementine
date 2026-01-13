@@ -2,7 +2,7 @@
  * Input Scale Renderer
  *
  * Edit-mode renderer for opinion scale steps.
- * Shows title and disabled scale buttons.
+ * Shows title and disabled scale buttons that wrap to fit available space.
  */
 import type { StepRendererProps } from '../registry/step-registry'
 import type { InputScaleStepConfig } from '../schemas/input-scale.schema'
@@ -23,9 +23,9 @@ export function InputScaleRenderer({ step }: StepRendererProps) {
         )}
       </p>
 
-      {/* Scale buttons */}
-      <div className="flex flex-col items-center gap-2">
-        <div className="flex gap-2">
+      {/* Scale buttons - wrap to fit available space */}
+      <div className="flex w-full flex-col items-center gap-2">
+        <div className="flex flex-wrap justify-center gap-2">
           {scaleValues.map((value) => (
             <button
               key={value}
@@ -39,7 +39,7 @@ export function InputScaleRenderer({ step }: StepRendererProps) {
 
         {/* Labels */}
         {(minLabel || maxLabel) && (
-          <div className="flex w-full justify-between text-xs text-muted-foreground">
+          <div className="flex w-full max-w-xs justify-between text-xs text-muted-foreground">
             <span>{minLabel}</span>
             <span>{maxLabel}</span>
           </div>

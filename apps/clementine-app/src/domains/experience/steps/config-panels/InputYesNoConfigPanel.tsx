@@ -6,8 +6,7 @@
  */
 import type { StepConfigPanelProps } from '../registry/step-registry'
 import type { InputYesNoStepConfig } from '../schemas/input-yes-no.schema'
-import { Input } from '@/ui-kit/ui/input'
-import { Label } from '@/ui-kit/ui/label'
+import { EditorRow, EditorSection, TextField } from '@/shared/editor-controls'
 import { Switch } from '@/ui-kit/ui/switch'
 
 export function InputYesNoConfigPanel({
@@ -19,33 +18,24 @@ export function InputYesNoConfigPanel({
   const { title, required } = config
 
   return (
-    <div className="flex flex-col gap-6">
-      {/* Title */}
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="title">Title *</Label>
-        <Input
-          id="title"
+    <div className="space-y-0">
+      <EditorSection title="Question">
+        <TextField
+          label="Title"
           value={title}
-          onChange={(e) => onConfigChange({ title: e.target.value })}
+          onChange={(value) => onConfigChange({ title: value })}
           placeholder="Enter your yes/no question..."
           maxLength={200}
           disabled={disabled}
         />
-        <span className="text-xs text-muted-foreground">
-          {title.length}/200 characters
-        </span>
-      </div>
-
-      {/* Required toggle */}
-      <div className="flex items-center justify-between">
-        <Label htmlFor="required">Required</Label>
-        <Switch
-          id="required"
-          checked={required}
-          onCheckedChange={(checked) => onConfigChange({ required: checked })}
-          disabled={disabled}
-        />
-      </div>
+        <EditorRow label="Required">
+          <Switch
+            checked={required}
+            onCheckedChange={(checked) => onConfigChange({ required: checked })}
+            disabled={disabled}
+          />
+        </EditorRow>
+      </EditorSection>
     </div>
   )
 }

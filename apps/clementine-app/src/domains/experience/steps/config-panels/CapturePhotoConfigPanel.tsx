@@ -9,14 +9,14 @@ import type {
   AspectRatio,
   CapturePhotoStepConfig,
 } from '../schemas/capture-photo.schema'
-import { Label } from '@/ui-kit/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/ui-kit/ui/select'
+import type { EditorOption } from '@/shared/editor-controls'
+import { EditorSection, SelectField } from '@/shared/editor-controls'
+
+// Aspect ratio options
+const ASPECT_RATIO_OPTIONS: EditorOption<AspectRatio>[] = [
+  { value: '1:1', label: 'Square (1:1)' },
+  { value: '9:16', label: 'Portrait (9:16)' },
+]
 
 export function CapturePhotoConfigPanel({
   step,
@@ -27,31 +27,21 @@ export function CapturePhotoConfigPanel({
   const { aspectRatio } = config
 
   return (
-    <div className="flex flex-col gap-6">
-      {/* Aspect Ratio */}
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="aspectRatio">Aspect Ratio</Label>
-        <Select
+    <div className="space-y-0">
+      <EditorSection title="Camera">
+        <SelectField
+          label="Aspect Ratio"
           value={aspectRatio}
-          onValueChange={(value: AspectRatio) =>
-            onConfigChange({ aspectRatio: value })
-          }
+          onChange={(value) => onConfigChange({ aspectRatio: value })}
+          options={ASPECT_RATIO_OPTIONS}
           disabled={disabled}
-        >
-          <SelectTrigger id="aspectRatio">
-            <SelectValue placeholder="Select aspect ratio" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="1:1">Square (1:1)</SelectItem>
-            <SelectItem value="9:16">Portrait (9:16)</SelectItem>
-          </SelectContent>
-        </Select>
-        <span className="text-xs text-muted-foreground">
+        />
+        <p className="text-xs text-muted-foreground">
           {aspectRatio === '1:1'
             ? 'Best for profile photos and social media posts'
             : 'Best for stories and full-screen mobile displays'}
-        </span>
-      </div>
+        </p>
+      </EditorSection>
     </div>
   )
 }

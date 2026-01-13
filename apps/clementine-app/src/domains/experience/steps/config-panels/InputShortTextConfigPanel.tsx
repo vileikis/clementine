@@ -6,9 +6,12 @@
  */
 import type { StepConfigPanelProps } from '../registry/step-registry'
 import type { InputShortTextStepConfig } from '../schemas/input-short-text.schema'
-import { Input } from '@/ui-kit/ui/input'
-import { Label } from '@/ui-kit/ui/label'
-import { Slider } from '@/ui-kit/ui/slider'
+import {
+  EditorRow,
+  EditorSection,
+  SliderField,
+  TextField,
+} from '@/shared/editor-controls'
 import { Switch } from '@/ui-kit/ui/switch'
 
 export function InputShortTextConfigPanel({
@@ -20,56 +23,45 @@ export function InputShortTextConfigPanel({
   const { title, required, placeholder, maxLength } = config
 
   return (
-    <div className="flex flex-col gap-6">
-      {/* Title */}
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="title">Title *</Label>
-        <Input
-          id="title"
+    <div className="space-y-0">
+      <EditorSection title="Question">
+        <TextField
+          label="Title"
           value={title}
-          onChange={(e) => onConfigChange({ title: e.target.value })}
+          onChange={(value) => onConfigChange({ title: value })}
           placeholder="Enter your question..."
           maxLength={200}
           disabled={disabled}
         />
-      </div>
+        <EditorRow label="Required">
+          <Switch
+            checked={required}
+            onCheckedChange={(checked) => onConfigChange({ required: checked })}
+            disabled={disabled}
+          />
+        </EditorRow>
+      </EditorSection>
 
-      {/* Required toggle */}
-      <div className="flex items-center justify-between">
-        <Label htmlFor="required">Required</Label>
-        <Switch
-          id="required"
-          checked={required}
-          onCheckedChange={(checked) => onConfigChange({ required: checked })}
-          disabled={disabled}
-        />
-      </div>
-
-      {/* Placeholder */}
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="placeholder">Placeholder text</Label>
-        <Input
-          id="placeholder"
+      <EditorSection title="Input Settings">
+        <TextField
+          label="Placeholder"
           value={placeholder}
-          onChange={(e) => onConfigChange({ placeholder: e.target.value })}
+          onChange={(value) => onConfigChange({ placeholder: value })}
           placeholder="e.g., Type your answer..."
           maxLength={100}
           disabled={disabled}
         />
-      </div>
-
-      {/* Max length */}
-      <div className="flex flex-col gap-2">
-        <Label>Maximum length: {maxLength} characters</Label>
-        <Slider
-          value={[maxLength]}
-          onValueChange={([value]) => onConfigChange({ maxLength: value })}
+        <SliderField
+          label="Max length"
+          value={maxLength}
+          onChange={(value) => onConfigChange({ maxLength: value })}
           min={10}
           max={200}
           step={10}
+          formatValue={(v) => `${v} chars`}
           disabled={disabled}
         />
-      </div>
+      </EditorSection>
     </div>
   )
 }

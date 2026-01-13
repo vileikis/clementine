@@ -6,10 +6,30 @@
  */
 import type { StepConfigPanelProps } from '../registry/step-registry'
 import type { InputScaleStepConfig } from '../schemas/input-scale.schema'
-import { Input } from '@/ui-kit/ui/input'
-import { Label } from '@/ui-kit/ui/label'
-import { Slider } from '@/ui-kit/ui/slider'
+import type { EditorOption } from '@/shared/editor-controls'
+import {
+  EditorRow,
+  EditorSection,
+  SelectField,
+  TextField,
+} from '@/shared/editor-controls'
 import { Switch } from '@/ui-kit/ui/switch'
+
+// Minimum value options (0-1)
+const MIN_OPTIONS: EditorOption<string>[] = [
+  { value: '0', label: '0' },
+  { value: '1', label: '1' },
+]
+
+// Maximum value options (5-10)
+const MAX_OPTIONS: EditorOption<string>[] = [
+  { value: '5', label: '5' },
+  { value: '6', label: '6' },
+  { value: '7', label: '7' },
+  { value: '8', label: '8' },
+  { value: '9', label: '9' },
+  { value: '10', label: '10' },
+]
 
 export function InputScaleConfigPanel({
   step,
@@ -20,86 +40,60 @@ export function InputScaleConfigPanel({
   const { title, required, min, max, minLabel, maxLabel } = config
 
   return (
-    <div className="flex flex-col gap-6">
-      {/* Title */}
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="title">Title *</Label>
-        <Input
-          id="title"
+    <div className="space-y-0">
+      <EditorSection title="Question">
+        <TextField
+          label="Title"
           value={title}
-          onChange={(e) => onConfigChange({ title: e.target.value })}
+          onChange={(value) => onConfigChange({ title: value })}
           placeholder="Enter your question..."
           maxLength={200}
           disabled={disabled}
         />
-      </div>
+        <EditorRow label="Required">
+          <Switch
+            checked={required}
+            onCheckedChange={(checked) => onConfigChange({ required: checked })}
+            disabled={disabled}
+          />
+        </EditorRow>
+      </EditorSection>
 
-      {/* Required toggle */}
-      <div className="flex items-center justify-between">
-        <Label htmlFor="required">Required</Label>
-        <Switch
-          id="required"
-          checked={required}
-          onCheckedChange={(checked) => onConfigChange({ required: checked })}
+      <EditorSection title="Scale Range">
+        <SelectField
+          label="Minimum"
+          value={String(min)}
+          onChange={(value) => onConfigChange({ min: Number(value) })}
+          options={MIN_OPTIONS}
           disabled={disabled}
         />
-      </div>
-
-      {/* Min value */}
-      <div className="flex flex-col gap-2">
-        <Label>Minimum value: {min}</Label>
-        <Slider
-          value={[min]}
-          onValueChange={([value]) => onConfigChange({ min: value })}
-          min={0}
-          max={9}
-          step={1}
+        <SelectField
+          label="Maximum"
+          value={String(max)}
+          onChange={(value) => onConfigChange({ max: Number(value) })}
+          options={MAX_OPTIONS}
           disabled={disabled}
         />
-      </div>
+      </EditorSection>
 
-      {/* Max value */}
-      <div className="flex flex-col gap-2">
-        <Label>Maximum value: {max}</Label>
-        <Slider
-          value={[max]}
-          onValueChange={([value]) => onConfigChange({ max: value })}
-          min={1}
-          max={10}
-          step={1}
-          disabled={disabled}
-        />
-      </div>
-
-      {/* Min label */}
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="minLabel">Minimum label</Label>
-        <Input
-          id="minLabel"
+      <EditorSection title="Labels">
+        <TextField
+          label="Minimum label"
           value={minLabel ?? ''}
-          onChange={(e) =>
-            onConfigChange({ minLabel: e.target.value || undefined })
-          }
+          onChange={(value) => onConfigChange({ minLabel: value || undefined })}
           placeholder="e.g., Poor"
           maxLength={50}
           disabled={disabled}
         />
-      </div>
-
-      {/* Max label */}
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="maxLabel">Maximum label</Label>
-        <Input
-          id="maxLabel"
+        <TextField
+          label="Maximum label"
           value={maxLabel ?? ''}
-          onChange={(e) =>
-            onConfigChange({ maxLabel: e.target.value || undefined })
-          }
+          onChange={(value) => onConfigChange({ maxLabel: value || undefined })}
           placeholder="e.g., Excellent"
           maxLength={50}
           disabled={disabled}
         />
-      </div>
+      </EditorSection>
     </div>
   )
 }

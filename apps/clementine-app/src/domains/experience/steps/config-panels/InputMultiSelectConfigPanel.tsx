@@ -5,8 +5,10 @@
  * Fields: title, required, options, multiSelect.
  */
 import { Plus, Trash2 } from 'lucide-react'
+
 import type { StepConfigPanelProps } from '../registry/step-registry'
 import type { InputMultiSelectStepConfig } from '../schemas/input-multi-select.schema'
+import { EditorRow, EditorSection, TextField } from '@/shared/editor-controls'
 import { Button } from '@/ui-kit/ui/button'
 import { Input } from '@/ui-kit/ui/input'
 import { Label } from '@/ui-kit/ui/label'
@@ -40,92 +42,85 @@ export function InputMultiSelectConfigPanel({
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      {/* Title */}
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="title">Title *</Label>
-        <Input
-          id="title"
+    <div className="space-y-0">
+      <EditorSection title="Question">
+        <TextField
+          label="Title"
           value={title}
-          onChange={(e) => onConfigChange({ title: e.target.value })}
+          onChange={(value) => onConfigChange({ title: value })}
           placeholder="Enter your question..."
           maxLength={200}
           disabled={disabled}
         />
-      </div>
-
-      {/* Required toggle */}
-      <div className="flex items-center justify-between">
-        <Label htmlFor="required">Required</Label>
-        <Switch
-          id="required"
-          checked={required}
-          onCheckedChange={(checked) => onConfigChange({ required: checked })}
-          disabled={disabled}
-        />
-      </div>
-
-      {/* Options */}
-      <div className="flex flex-col gap-2">
-        <Label>Options ({options.length}/10)</Label>
-        <div className="flex flex-col gap-2">
-          {options.map((option, index) => (
-            <div key={index} className="flex items-center gap-2">
-              <Input
-                value={option}
-                onChange={(e) => handleOptionChange(index, e.target.value)}
-                placeholder={`Option ${index + 1}`}
-                maxLength={100}
-                disabled={disabled}
-              />
-              {options.length > 2 && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleRemoveOption(index)}
-                  disabled={disabled}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
-          ))}
-        </div>
-        {options.length < 10 && (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleAddOption}
+        <EditorRow label="Required">
+          <Switch
+            checked={required}
+            onCheckedChange={(checked) => onConfigChange({ required: checked })}
             disabled={disabled}
-            className="mt-2"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Add option
-          </Button>
-        )}
-      </div>
+          />
+        </EditorRow>
+      </EditorSection>
 
-      {/* Multi-select toggle */}
-      <div className="flex items-center justify-between">
-        <div className="flex flex-col gap-1">
-          <Label htmlFor="multiSelect">Allow multiple selections</Label>
-          <span className="text-xs text-muted-foreground">
-            {multiSelect
-              ? 'Users can select multiple options'
-              : 'Users can only select one option'}
-          </span>
+      <EditorSection title="Options">
+        <div className="space-y-2">
+          <Label className="text-sm font-normal text-muted-foreground">
+            Choices ({options.length}/10)
+          </Label>
+          <div className="flex flex-col gap-2">
+            {options.map((option, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <Input
+                  value={option}
+                  onChange={(e) => handleOptionChange(index, e.target.value)}
+                  placeholder={`Option ${index + 1}`}
+                  maxLength={100}
+                  disabled={disabled}
+                />
+                {options.length > 2 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleRemoveOption(index)}
+                    disabled={disabled}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            ))}
+          </div>
+          {options.length < 10 && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleAddOption}
+              disabled={disabled}
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Add option
+            </Button>
+          )}
         </div>
-        <Switch
-          id="multiSelect"
-          checked={multiSelect}
-          onCheckedChange={(checked) =>
-            onConfigChange({ multiSelect: checked })
-          }
-          disabled={disabled}
-        />
-      </div>
+      </EditorSection>
+
+      <EditorSection title="Behavior">
+        <EditorRow label="Allow multiple selections">
+          <Switch
+            checked={multiSelect}
+            onCheckedChange={(checked) =>
+              onConfigChange({ multiSelect: checked })
+            }
+            disabled={disabled}
+          />
+        </EditorRow>
+        <p className="text-xs text-muted-foreground">
+          {multiSelect
+            ? 'Users can select multiple options'
+            : 'Users can only select one option'}
+        </p>
+      </EditorSection>
     </div>
   )
 }

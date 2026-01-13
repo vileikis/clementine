@@ -82,13 +82,11 @@ export function StepConfigPanel({
 
       {/* Config panel content */}
       <ScrollArea className="flex-1">
-        <div className="p-4">
-          <ConfigPanelRouter
-            step={step}
-            onConfigChange={onConfigChange}
-            disabled={disabled}
-          />
-        </div>
+        <ConfigPanelRouter
+          step={step}
+          onConfigChange={onConfigChange}
+          disabled={disabled}
+        />
       </ScrollArea>
     </div>
   )
