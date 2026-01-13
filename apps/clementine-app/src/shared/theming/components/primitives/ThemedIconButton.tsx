@@ -21,6 +21,14 @@
  * <ThemedIconButton size="sm" aria-label="Copy">
  *   <CopyIcon className="h-4 w-4" />
  * </ThemedIconButton>
+ *
+ * // Style variants
+ * <ThemedIconButton variant="primary" aria-label="Share">
+ *   <ShareIcon className="h-5 w-5" />
+ * </ThemedIconButton>
+ * <ThemedIconButton variant="outline" aria-label="Copy">
+ *   <CopyIcon className="h-5 w-5" />
+ * </ThemedIconButton>
  * ```
  */
 
@@ -32,6 +40,9 @@ import { cn } from '@/shared/utils'
 /** Icon button size variants */
 export type IconButtonSize = 'sm' | 'md' | 'lg'
 
+/** Icon button style variants */
+export type IconButtonVariant = 'primary' | 'outline'
+
 /** Size-based dimensions (maintaining touch targets) */
 const SIZE_CLASSES: Record<IconButtonSize, string> = {
   sm: 'h-9 w-9', // 36px
@@ -39,14 +50,14 @@ const SIZE_CLASSES: Record<IconButtonSize, string> = {
   lg: 'h-14 w-14', // 56px
 }
 
-export interface ThemedIconButtonProps extends Omit<
-  ButtonHTMLAttributes<HTMLButtonElement>,
-  'style'
-> {
+export interface ThemedIconButtonProps
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'style'> {
   /** Icon content */
   children: ReactNode
   /** Button size variant (defaults to 'md' - 44px touch target) */
   size?: IconButtonSize
+  /** Button style variant (defaults to 'outline') */
+  variant?: IconButtonVariant
   /** Theme override for use without ThemeProvider */
   theme?: Theme
 }
@@ -54,6 +65,7 @@ export interface ThemedIconButtonProps extends Omit<
 export function ThemedIconButton({
   children,
   size = 'md',
+  variant = 'outline',
   theme: themeOverride,
   className,
   disabled,
@@ -62,10 +74,24 @@ export function ThemedIconButton({
 }: ThemedIconButtonProps) {
   const theme = useThemeWithOverride(themeOverride)
 
-  const style: CSSProperties = {
-    color: theme.text.color,
-    borderColor: `color-mix(in srgb, ${theme.text.color} 25%, transparent)`,
-  }
+  // Compute button colors with fallback
+  const primaryBgColor = theme.button.backgroundColor ?? theme.primaryColor
+  const primaryTextColor = theme.button.textColor
+
+  // Style based on variant
+  const style: CSSProperties =
+    variant === 'primary'
+      ? {
+          backgroundColor: primaryBgColor,
+          color: primaryTextColor,
+        }
+      : {
+          backgroundColor: `color-mix(in srgb, ${theme.text.color} 10%, transparent)`,
+          color: theme.text.color,
+          borderWidth: '1px',
+          borderStyle: 'solid',
+          borderColor: `color-mix(in srgb, ${theme.text.color} 40%, transparent)`,
+        }
 
   return (
     <button
@@ -74,9 +100,9 @@ export function ThemedIconButton({
       className={cn(
         SIZE_CLASSES[size],
         'flex items-center justify-center',
-        'rounded-full border',
-        'transition-colors',
-        'hover:bg-current/10',
+        'rounded-full',
+        'transition-opacity',
+        'hover:opacity-80',
         'focus:outline-none focus:ring-2 focus:ring-offset-2',
         'disabled:cursor-not-allowed disabled:opacity-50',
         className,

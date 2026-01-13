@@ -82,12 +82,12 @@ export function ThemedButton({
           fontFamily: theme.fontFamily ?? undefined,
         }
       : {
-          backgroundColor: 'transparent',
+          backgroundColor: `color-mix(in srgb, ${theme.text.color} 10%, transparent)`,
           color: theme.text.color,
           borderRadius,
           borderWidth: '1px',
           borderStyle: 'solid',
-          borderColor: `color-mix(in srgb, ${theme.text.color} 30%, transparent)`,
+          borderColor: `color-mix(in srgb, ${theme.text.color} 40%, transparent)`,
           fontFamily: theme.fontFamily ?? undefined,
         }
 

@@ -126,18 +126,18 @@ export function SharePreview({ share, shareOptions }: SharePreviewProps) {
           </div>
         )}
 
-        {/* Start over button (secondary/outline style) */}
-        <ThemedButton variant="outline" size="md" className="w-full">
-          <RotateCcw className="mr-2 h-4 w-4" />
-          Start over
-        </ThemedButton>
-
         {/* CTA button (primary style, hidden when label is null/empty) */}
         {share.cta?.label && (
           <ThemedButton variant="primary" size="md" className="w-full">
             {share.cta.label}
           </ThemedButton>
         )}
+
+        {/* Start over button (secondary/outline style) */}
+        <ThemedButton variant="outline" size="md" className="w-full">
+          <RotateCcw className="mr-2 h-4 w-4" />
+          Start over
+        </ThemedButton>
       </div>
     </ThemedBackground>
   )

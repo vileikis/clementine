@@ -10,4 +10,8 @@ export type {
 } from './ThemedButton'
 
 export { ThemedIconButton } from './ThemedIconButton'
-export type { ThemedIconButtonProps, IconButtonSize } from './ThemedIconButton'
+export type {
+  ThemedIconButtonProps,
+  IconButtonSize,
+  IconButtonVariant,
+} from './ThemedIconButton'

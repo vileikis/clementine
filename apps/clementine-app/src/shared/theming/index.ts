@@ -43,6 +43,7 @@ export type {
   ButtonVariant,
   ThemedIconButtonProps,
   IconButtonSize,
+  IconButtonVariant,
 } from './components'
 
 // Hooks
