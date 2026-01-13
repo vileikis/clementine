@@ -1,7 +1,7 @@
 /**
- * ThemeControls Component
+ * ThemeConfigPanel Component
  *
- * Right panel control interface for customizing theme properties.
+ * Left panel control interface for customizing theme properties.
  * Organized into collapsible sections: Text, Colors, Buttons, Background.
  */
 
@@ -26,7 +26,7 @@ import {
   ToggleGroupField,
 } from '@/shared/editor-controls'
 
-export interface ThemeControlsProps {
+export interface ThemeConfigPanelProps {
   /** Current theme values */
   theme: Theme
   /** Callback when a theme field is updated */
@@ -71,14 +71,14 @@ const RADIUS_OPTIONS: EditorOption<ButtonRadius>[] = [
   },
 ]
 
-export function ThemeControls({
+export function ThemeConfigPanel({
   theme,
   onUpdate,
   onUploadBackground,
   disabled = false,
   uploadingBackground = false,
   uploadProgress,
-}: ThemeControlsProps) {
+}: ThemeConfigPanelProps) {
   return (
     <div className="space-y-0">
       {/* Text Section */}

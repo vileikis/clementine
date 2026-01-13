@@ -1,7 +1,7 @@
 /**
- * WelcomeControls Component
+ * WelcomeConfigPanel Component
  *
- * Right panel control interface for customizing welcome screen properties.
+ * Left panel control interface for customizing welcome screen properties.
  * Organized into sections: Content (title, description, media), Experiences (layout).
  */
 
@@ -21,7 +21,7 @@ import {
   ToggleGroupField,
 } from '@/shared/editor-controls'
 
-export interface WelcomeControlsProps {
+export interface WelcomeConfigPanelProps {
   /** Current welcome values */
   welcome: WelcomeConfig
   /** Callback when a welcome field is updated */
@@ -42,14 +42,14 @@ const LAYOUT_OPTIONS: EditorOption<ExperiencePickerLayout>[] = [
   { value: 'grid', label: 'Grid', icon: <LayoutGrid className="size-4" /> },
 ]
 
-export function WelcomeControls({
+export function WelcomeConfigPanel({
   welcome,
   onUpdate,
   onUploadHeroMedia,
   disabled = false,
   uploadingHeroMedia = false,
   uploadProgress,
-}: WelcomeControlsProps) {
+}: WelcomeConfigPanelProps) {
   return (
     <div className="space-y-0">
       {/* Content Section - title, description, hero media */}

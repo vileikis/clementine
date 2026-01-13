@@ -1,4 +1,6 @@
 import { TopNavBreadcrumb } from './TopNavBreadcrumb'
+import { NavTabs } from './NavTabs'
+import type { TabItem } from './NavTabs'
 import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/shared/utils/style-utils'
 
@@ -19,6 +21,9 @@ export interface BreadcrumbItem {
 export interface TopNavBarProps {
   /** Array of breadcrumb items to display */
   breadcrumbs: BreadcrumbItem[]
+
+  /** Optional tabs to display in a second row below breadcrumbs */
+  tabs?: TabItem[]
 
   /** Optional custom content to render after breadcrumbs (left side) */
   left?: React.ReactNode
@@ -55,25 +60,30 @@ export interface TopNavBarProps {
  */
 export function TopNavBar({
   breadcrumbs,
+  tabs,
   left,
   right,
   className,
 }: TopNavBarProps) {
+  const hasTabs = tabs && tabs.length > 0
+
   return (
-    <nav
-      className={cn(
-        'flex h-16 items-center justify-between border-b bg-background px-6',
-        className,
-      )}
-    >
-      {/* Left side: breadcrumbs + custom content */}
-      <div className="flex items-center gap-2">
-        <TopNavBreadcrumb items={breadcrumbs} />
-        {left}
+    <nav className={cn('flex flex-col border-b bg-background', className)}>
+      {/* Row 1: Breadcrumbs + left + right content */}
+      <div className="flex h-16 items-center justify-between px-6">
+        <div className="flex items-center gap-2">
+          <TopNavBreadcrumb items={breadcrumbs} />
+          {left}
+        </div>
+        {right && <div className="flex items-center gap-2">{right}</div>}
       </div>
 
-      {/* Right side: custom content */}
-      {right && <div className="flex items-center gap-2">{right}</div>}
+      {/* Row 2: Tabs (conditional) */}
+      {hasTabs && (
+        <div className="px-6">
+          <NavTabs tabs={tabs} />
+        </div>
+      )}
     </nav>
   )
 }

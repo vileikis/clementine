@@ -2,5 +2,8 @@
  * Theme Components
  */
 
-export { ThemeControls, type ThemeControlsProps } from './ThemeControls'
+export {
+  ThemeConfigPanel,
+  type ThemeConfigPanelProps,
+} from './ThemeConfigPanel'
 export { ThemePreview } from './ThemePreview'

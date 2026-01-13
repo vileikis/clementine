@@ -1,7 +1,7 @@
 /**
  * WelcomeEditorPage Container
  *
- * 2-column layout with live preview (left) and controls (right).
+ * 2-column layout with live preview (right) and controls (left).
  * Integrates with auto-save, tracked mutations, and PreviewShell.
  */
 
@@ -9,7 +9,7 @@ import { useCallback, useState } from 'react'
 import { useParams } from '@tanstack/react-router'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
-import { WelcomeControls, WelcomePreview } from '../components'
+import { WelcomeConfigPanel, WelcomePreview } from '../components'
 import { useUpdateWelcome, useUploadAndUpdateHeroMedia } from '../hooks'
 import { DEFAULT_WELCOME } from '../constants'
 import type { WelcomeConfig } from '@/domains/event/shared'
@@ -142,21 +142,12 @@ export function WelcomeEditorPage() {
 
   return (
     <div className="flex h-full">
-      {/* Left: Preview */}
-      <div className="flex-1 min-w-0">
-        <PreviewShell enableViewportSwitcher enableFullscreen>
-          <ThemeProvider theme={currentTheme}>
-            <WelcomePreview welcome={previewWelcome} />
-          </ThemeProvider>
-        </PreviewShell>
-      </div>
-
-      {/* Right: Controls */}
-      <aside className="w-80 shrink-0 border-l border-border overflow-y-auto bg-card">
+      {/* Left: Controls */}
+      <aside className="w-80 shrink-0 border-r border-border overflow-y-auto bg-card">
         <div className="sticky top-0 z-10 border-b border-border bg-card px-4 py-3">
           <h2 className="font-semibold">Welcome</h2>
         </div>
-        <WelcomeControls
+        <WelcomeConfigPanel
           welcome={previewWelcome}
           onUpdate={handleUpdate}
           onUploadHeroMedia={handleUploadHeroMedia}
@@ -164,6 +155,15 @@ export function WelcomeEditorPage() {
           uploadProgress={uploadProgress}
         />
       </aside>
+
+      {/* Right: Preview */}
+      <div className="flex-1 min-w-0">
+        <PreviewShell enableViewportSwitcher enableFullscreen>
+          <ThemeProvider theme={currentTheme}>
+            <WelcomePreview welcome={previewWelcome} />
+          </ThemeProvider>
+        </PreviewShell>
+      </div>
     </div>
   )
 }
