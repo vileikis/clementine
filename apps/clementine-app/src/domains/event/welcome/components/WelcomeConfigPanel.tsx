@@ -122,31 +122,6 @@ export function WelcomeConfigPanel({
 
       {/* Experiences Section - layout and experience list */}
       <EditorSection title="Experiences">
-        {/* Info callout when pregate or preshare is configured */}
-        {hasGuestFlowExperiences && (
-          <Alert className="mb-4">
-            <Info className="h-4 w-4" />
-            <AlertDescription className="text-xs">
-              {pregateExperience && preshareExperience ? (
-                <>
-                  Pregate and preshare experiences are configured in{' '}
-                  <span className="font-medium">Settings</span>.
-                </>
-              ) : pregateExperience ? (
-                <>
-                  A pregate experience is configured in{' '}
-                  <span className="font-medium">Settings</span>.
-                </>
-              ) : (
-                <>
-                  A preshare experience is configured in{' '}
-                  <span className="font-medium">Settings</span>.
-                </>
-              )}
-            </AlertDescription>
-          </Alert>
-        )}
-
         <ToggleGroupField
           label="Layout"
           value={welcome.layout}
@@ -171,6 +146,31 @@ export function WelcomeConfigPanel({
             isLoading={disabled}
           />
         </div>
+
+        {/* Info callout when pregate or preshare is configured */}
+        {hasGuestFlowExperiences && (
+          <Alert className="mb-4">
+            <Info className="h-4 w-4" />
+            <AlertDescription className="text-xs">
+              {pregateExperience && preshareExperience ? (
+                <>
+                  Pregate and preshare experiences are configured in{' '}
+                  <span className="font-medium">Settings</span>.
+                </>
+              ) : pregateExperience ? (
+                <>
+                  A pregate experience is configured in{' '}
+                  <span className="font-medium">Settings</span>.
+                </>
+              ) : (
+                <>
+                  A preshare experience is configured in{' '}
+                  <span className="font-medium">Settings</span>.
+                </>
+              )}
+            </AlertDescription>
+          </Alert>
+        )}
       </EditorSection>
     </div>
   )

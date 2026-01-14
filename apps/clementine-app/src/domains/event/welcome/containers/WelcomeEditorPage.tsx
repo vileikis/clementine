@@ -13,7 +13,7 @@ import { WelcomeConfigPanel, WelcomePreview } from '../components'
 import { useUpdateWelcome, useUploadAndUpdateHeroMedia } from '../hooks'
 import { DEFAULT_WELCOME } from '../constants'
 import type { WelcomeConfig } from '@/domains/event/shared'
-import type {MainExperienceReference} from '@/domains/event/experiences';
+import type { MainExperienceReference } from '@/domains/event/experiences'
 import { PreviewShell } from '@/shared/preview-shell'
 import { useAutoSave } from '@/shared/forms'
 import { useProjectEvent } from '@/domains/event/shared'
@@ -22,9 +22,8 @@ import { useAuth } from '@/domains/auth'
 import { DEFAULT_THEME } from '@/domains/event/theme/constants'
 import { ThemeProvider } from '@/shared/theming'
 import {
-  
   useExperiencesForSlot,
-  useUpdateEventExperiences
+  useUpdateEventExperiences,
 } from '@/domains/event/experiences'
 
 // Fields to compare for auto-save change detection

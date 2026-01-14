@@ -17,8 +17,8 @@ import {
   where,
 } from 'firebase/firestore'
 
-import { SLOT_PROFILES  } from '../constants'
-import type {SlotType} from '../constants';
+import { SLOT_PROFILES } from '../constants'
+import type { SlotType } from '../constants'
 import type { Experience } from '@/domains/experience/shared/schemas/experience.schema'
 import { experienceSchema } from '@/domains/experience/shared/schemas/experience.schema'
 import { firestore } from '@/integrations/firebase/client'

@@ -167,11 +167,18 @@ export function ExperienceListView({
   onToggleOverlay,
   onRemove,
 }: ExperienceListViewProps) {
-  // Details sheet state
-  const [selectedReference, setSelectedReference] =
-    useState<MainExperienceReference | null>(null)
+  // Details sheet state - only store the ID, derive reference from experiences prop
+  const [selectedExperienceId, setSelectedExperienceId] = useState<
+    string | null
+  >(null)
   const [selectedExperience, setSelectedExperience] =
     useState<Experience | null>(null)
+
+  // Derive current reference from experiences prop (stays in sync with updates)
+  const selectedReference = selectedExperienceId
+    ? (experiences.find((exp) => exp.experienceId === selectedExperienceId) ??
+      null)
+    : null
 
   // Configure sensors for drag and drop
   const sensors = useSensors(
@@ -207,17 +214,14 @@ export function ExperienceListView({
   }
 
   // Handle opening details sheet
-  const handleOpenDetails = (
-    reference: MainExperienceReference,
-    experience: Experience,
-  ) => {
-    setSelectedReference(reference)
+  const handleOpenDetails = (experienceId: string, experience: Experience) => {
+    setSelectedExperienceId(experienceId)
     setSelectedExperience(experience)
   }
 
   // Handle closing details sheet
   const handleCloseDetails = () => {
-    setSelectedReference(null)
+    setSelectedExperienceId(null)
     setSelectedExperience(null)
   }
 
@@ -254,7 +258,7 @@ export function ExperienceListView({
                 }
                 onRemove={() => onRemove(reference.experienceId)}
                 onOpenDetails={(experience) =>
-                  handleOpenDetails(reference, experience)
+                  handleOpenDetails(reference.experienceId, experience)
                 }
               />
             ))}
