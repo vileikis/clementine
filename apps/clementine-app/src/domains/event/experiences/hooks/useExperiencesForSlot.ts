@@ -7,7 +7,7 @@
  * Pattern: Combines Firebase onSnapshot (real-time) with TanStack Query (caching)
  */
 import { useEffect } from 'react'
-import { useQuery, useQueryClient, queryOptions } from '@tanstack/react-query'
+import { queryOptions, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   collection,
   getDocs,
@@ -17,9 +17,10 @@ import {
   where,
 } from 'firebase/firestore'
 
+import { SLOT_PROFILES  } from '../constants'
+import type {SlotType} from '../constants';
 import type { Experience } from '@/domains/experience/shared/schemas/experience.schema'
 import { experienceSchema } from '@/domains/experience/shared/schemas/experience.schema'
-import { SLOT_PROFILES, type SlotType } from '../constants'
 import { firestore } from '@/integrations/firebase/client'
 import { convertFirestoreDoc } from '@/shared/utils/firestore-utils'
 

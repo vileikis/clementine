@@ -4,7 +4,13 @@
  * Individual experience item within a slot manager.
  * Features drag handle, toggles, and context menu with edit/remove actions.
  */
-import { GripVertical, MoreVertical, ExternalLink, Trash2 } from 'lucide-react'
+import { ExternalLink, GripVertical, MoreVertical, Trash2 } from 'lucide-react'
+import type { Experience } from '@/domains/experience/shared'
+import type {
+  ExperienceReference,
+  MainExperienceReference,
+} from '../schemas/event-experiences.schema'
+import type { SlotType } from '../constants'
 import { ProfileBadge } from '@/domains/experience/library/components/ProfileBadge'
 import { Switch } from '@/ui-kit/ui/switch'
 import { Label } from '@/ui-kit/ui/label'
@@ -15,12 +21,6 @@ import {
   DropdownMenuTrigger,
 } from '@/ui-kit/ui/dropdown-menu'
 import { Button } from '@/ui-kit/ui/button'
-import type { Experience } from '@/domains/experience/shared'
-import type {
-  ExperienceReference,
-  MainExperienceReference,
-} from '../schemas/event-experiences.schema'
-import type { SlotType } from '../constants'
 import { cn } from '@/shared/utils/style-utils'
 
 export interface ExperienceSlotItemProps {
@@ -170,7 +170,10 @@ export function ExperienceSlotItem({
       <div className="flex flex-col gap-2">
         {/* Enable Toggle */}
         <div className="flex items-center gap-2">
-          <Label htmlFor={`enabled-${reference.experienceId}`} className="text-xs">
+          <Label
+            htmlFor={`enabled-${reference.experienceId}`}
+            className="text-xs"
+          >
             Enabled
           </Label>
           <Switch
@@ -192,7 +195,7 @@ export function ExperienceSlotItem({
             <Switch
               id={`overlay-${reference.experienceId}`}
               checked={reference.applyOverlay}
-              onCheckedChange={onToggleOverlay!}
+              onCheckedChange={onToggleOverlay}
             />
           </div>
         )}

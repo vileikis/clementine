@@ -63,8 +63,8 @@
 - [X] T015 [US1] Create ExperienceSlotItem component with drag handle, toggles, and context menu at apps/clementine-app/src/domains/event/experiences/components/ExperienceSlotItem.tsx
 - [X] T016 [US1] Create ExperienceSlotManager component with @dnd-kit drag-and-drop at apps/clementine-app/src/domains/event/experiences/components/ExperienceSlotManager.tsx
 - [X] T017 [US1] Update barrel exports with all new components at apps/clementine-app/src/domains/event/experiences/index.ts
-- [ ] T018 [US1] Add Experiences section to WelcomeConfigPanel using ExperienceSlotManager (mode='list', slot='main') at apps/clementine-app/src/domains/event/welcome/components/WelcomeConfigPanel.tsx
-- [ ] T019 [US1] Update WelcomePreview to display connected experiences using ExperienceCard at apps/clementine-app/src/domains/event/welcome/components/WelcomePreview.tsx
+- [X] T018 [US1] Add Experiences section to WelcomeConfigPanel using ExperienceSlotManager (mode='list', slot='main') at apps/clementine-app/src/domains/event/welcome/components/WelcomeConfigPanel.tsx
+- [X] T019 [US1] Update WelcomePreview to display connected experiences using ExperienceCard at apps/clementine-app/src/domains/event/welcome/components/WelcomePreview.tsx
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently. Admins can add, reorder, toggle, and remove main experiences.
 
@@ -78,8 +78,8 @@
 
 ### Implementation for User Story 2
 
-- [ ] T020 [US2] Add Guest Flow section with pregate slot to EventSettingsPage using ExperienceSlotManager (mode='single', slot='pregate') at apps/clementine-app/src/domains/event/settings/containers/EventSettingsPage.tsx
-- [ ] T021 [US2] Add info callout in WelcomeConfigPanel when pregate is configured, linking to Settings tab at apps/clementine-app/src/domains/event/welcome/components/WelcomeConfigPanel.tsx
+- [X] T020 [US2] Add Guest Flow section with pregate slot to EventSettingsPage using ExperienceSlotManager (mode='single', slot='pregate') at apps/clementine-app/src/domains/event/settings/containers/EventSettingsPage.tsx
+- [X] T021 [US2] Add info callout in WelcomeConfigPanel when pregate is configured, linking to Settings tab at apps/clementine-app/src/domains/event/welcome/components/WelcomeConfigPanel.tsx
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently. Pregate slot accepts only survey/story profiles.
 
@@ -93,8 +93,8 @@
 
 ### Implementation for User Story 3
 
-- [ ] T022 [US3] Add preshare slot to Guest Flow section in EventSettingsPage using ExperienceSlotManager (mode='single', slot='preshare') at apps/clementine-app/src/domains/event/settings/containers/EventSettingsPage.tsx
-- [ ] T023 [US3] Update info callout in WelcomeConfigPanel to include preshare status at apps/clementine-app/src/domains/event/welcome/components/WelcomeConfigPanel.tsx
+- [X] T022 [US3] Add preshare slot to Guest Flow section in EventSettingsPage using ExperienceSlotManager (mode='single', slot='preshare') at apps/clementine-app/src/domains/event/settings/containers/EventSettingsPage.tsx
+- [X] T023 [US3] Update info callout in WelcomeConfigPanel to include preshare status at apps/clementine-app/src/domains/event/welcome/components/WelcomeConfigPanel.tsx
 
 **Checkpoint**: All three experience slots (main, pregate, preshare) are now configurable.
 
@@ -108,8 +108,8 @@
 
 ### Implementation for User Story 4
 
-- [ ] T024 [US4] Enhance ExperienceCard to support disabled state (dimmed appearance) at apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx
-- [ ] T025 [US4] Enhance WelcomePreview to show real-time updates when experiences are added, removed, reordered, or toggled at apps/clementine-app/src/domains/event/welcome/components/WelcomePreview.tsx
+- [X] T024 [US4] Enhance ExperienceCard to support disabled state (dimmed appearance) at apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx
+- [X] T025 [US4] Enhance WelcomePreview to show real-time updates when experiences are added, removed, reordered, or toggled at apps/clementine-app/src/domains/event/welcome/components/WelcomePreview.tsx
 
 **Checkpoint**: Preview now shows actual experience cards that update in real-time with configuration changes.
 
@@ -123,7 +123,7 @@
 
 ### Implementation for User Story 5
 
-- [ ] T026 [US5] Add "Create New Experience" button to ConnectExperienceDrawer that opens /workspace/{workspaceSlug}/experiences/new in new tab at apps/clementine-app/src/domains/event/experiences/components/ConnectExperienceDrawer.tsx
+- [X] T026 [US5] Add "Create New Experience" button to ConnectExperienceDrawer that opens /workspace/{workspaceSlug}/experiences/new in new tab at apps/clementine-app/src/domains/event/experiences/components/ConnectExperienceDrawer.tsx
 
 **Checkpoint**: All user stories should now be independently functional.
 
@@ -133,11 +133,11 @@
 
 **Purpose**: Handle edge cases and improvements that affect multiple user stories
 
-- [ ] T027 [P] Handle missing experience gracefully (deleted from workspace while assigned) - show "Missing Experience" placeholder in ExperienceSlotItem at apps/clementine-app/src/domains/event/experiences/components/ExperienceSlotItem.tsx
-- [ ] T028 [P] Add empty state message to ConnectExperienceDrawer when no compatible experiences exist at apps/clementine-app/src/domains/event/experiences/components/ConnectExperienceDrawer.tsx
-- [ ] T029 [P] Add "No experiences found" empty state for search results in ConnectExperienceDrawer at apps/clementine-app/src/domains/event/experiences/components/ConnectExperienceDrawer.tsx
-- [ ] T030 Run pnpm app:check to validate linting, formatting, and type checking
-- [ ] T031 Run pnpm app:test to verify no regressions
+- [X] T027 [P] Handle missing experience gracefully (deleted from workspace while assigned) - show "Missing Experience" placeholder in ExperienceSlotItem at apps/clementine-app/src/domains/event/experiences/components/ExperienceSlotItem.tsx
+- [X] T028 [P] Add empty state message to ConnectExperienceDrawer when no compatible experiences exist at apps/clementine-app/src/domains/event/experiences/components/ConnectExperienceDrawer.tsx
+- [X] T029 [P] Add "No experiences found" empty state for search results in ConnectExperienceDrawer at apps/clementine-app/src/domains/event/experiences/components/ConnectExperienceDrawer.tsx
+- [X] T030 Run pnpm app:check to validate linting, formatting, and type checking
+- [X] T031 Run pnpm app:test to verify no regressions
 
 ---
 

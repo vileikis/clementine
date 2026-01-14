@@ -95,7 +95,10 @@ export function useUpdateEventExperiences({
   return useMutation({
     mutationFn: async (input: UpdateExperiencesInput) => {
       await runTransaction(firestore, async (transaction) => {
-        const eventRef = doc(firestore, `projects/${projectId}/events/${eventId}`)
+        const eventRef = doc(
+          firestore,
+          `projects/${projectId}/events/${eventId}`,
+        )
 
         // Read current state
         const eventDoc = await transaction.get(eventRef)

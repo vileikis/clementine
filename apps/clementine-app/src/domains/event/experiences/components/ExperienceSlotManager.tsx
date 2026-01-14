@@ -4,7 +4,7 @@
  * Main orchestrator component for managing experiences in a slot.
  * Handles display, drag-and-drop reordering, and connecting/removing experiences.
  */
-import { useState, useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import {
   DndContext,
   KeyboardSensor,
@@ -16,23 +16,23 @@ import {
 import {
   SortableContext,
   sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
   useSortable,
+  verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import type { DragEndEvent } from '@dnd-kit/core'
 import { Plus } from 'lucide-react'
-import { Button } from '@/ui-kit/ui/button'
+import { useQuery } from '@tanstack/react-query'
 import { ExperienceSlotItem } from './ExperienceSlotItem'
 import { ExperienceSlotEmpty } from './ExperienceSlotEmpty'
 import { ConnectExperienceDrawer } from './ConnectExperienceDrawer'
-import { useQuery } from '@tanstack/react-query'
-import { experienceQuery } from '@/domains/experience/shared/queries/experience.query'
+import type { DragEndEvent } from '@dnd-kit/core'
 import type {
   ExperienceReference,
   MainExperienceReference,
 } from '../schemas/event-experiences.schema'
-import type { SlotType, SlotMode } from '../constants'
+import type { SlotMode, SlotType } from '../constants'
+import { experienceQuery } from '@/domains/experience/shared/queries/experience.query'
+import { Button } from '@/ui-kit/ui/button'
 
 export interface ExperienceSlotManagerProps {
   /**
@@ -222,9 +222,7 @@ export function ExperienceSlotManager({
 
   // Handle adding experience from drawer
   const handleSelect = (experienceId: string) => {
-    const newReference:
-      | ExperienceReference
-      | MainExperienceReference =
+    const newReference: ExperienceReference | MainExperienceReference =
       slot === 'main'
         ? { experienceId, enabled: true, applyOverlay: true }
         : { experienceId, enabled: true }

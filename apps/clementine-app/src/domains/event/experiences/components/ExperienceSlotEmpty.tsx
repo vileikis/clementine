@@ -5,8 +5,8 @@
  * Shows contextual message and add button.
  */
 import { Plus } from 'lucide-react'
+import type { SlotMode, SlotType } from '../constants'
 import { Button } from '@/ui-kit/ui/button'
-import type { SlotType, SlotMode } from '../constants'
 
 export interface ExperienceSlotEmptyProps {
   /** Slot type for context message */
@@ -22,7 +22,10 @@ export interface ExperienceSlotEmptyProps {
 /**
  * Slot-specific empty state messages
  */
-const EMPTY_STATE_MESSAGES: Record<SlotType, { title: string; description: string }> = {
+const EMPTY_STATE_MESSAGES: Record<
+  SlotType,
+  { title: string; description: string }
+> = {
   main: {
     title: 'No experiences added',
     description: 'Add experiences to let guests choose what to do.',
@@ -67,12 +70,7 @@ export function ExperienceSlotEmpty({
         <h3 className="font-medium text-sm text-muted-foreground">{title}</h3>
         <p className="text-xs text-muted-foreground">{description}</p>
       </div>
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={onAdd}
-        className="gap-2"
-      >
+      <Button variant="outline" size="sm" onClick={onAdd} className="gap-2">
         <Plus className="h-4 w-4" />
         Add Experience
       </Button>

@@ -98,7 +98,9 @@ export function ExperienceCard({
   return (
     <div className={cardClasses} onClick={handleClick}>
       {/* Thumbnail */}
-      <div className={cn(thumbnailClasses, 'rounded-md overflow-hidden bg-muted')}>
+      <div
+        className={cn(thumbnailClasses, 'rounded-md overflow-hidden bg-muted')}
+      >
         {experience.media?.url ? (
           <img
             src={experience.media.url}
@@ -114,7 +116,12 @@ export function ExperienceCard({
       </div>
 
       {/* Content */}
-      <div className={cn('flex flex-col gap-2', layout === 'list' ? 'flex-1 min-w-0' : '')}>
+      <div
+        className={cn(
+          'flex flex-col gap-2',
+          layout === 'list' ? 'flex-1 min-w-0' : '',
+        )}
+      >
         <h3 className="font-medium text-sm truncate">{experience.name}</h3>
         <ProfileBadge profile={experience.profile} />
       </div>

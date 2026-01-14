@@ -5,7 +5,7 @@
  * Organized into sections: Content (title, description, media), Experiences (layout).
  */
 
-import { LayoutGrid, LayoutList } from 'lucide-react'
+import { Info, LayoutGrid, LayoutList } from 'lucide-react'
 import {
   WELCOME_DESCRIPTION_MAX_LENGTH,
   WELCOME_TITLE_MAX_LENGTH,
@@ -13,6 +13,10 @@ import {
 import type { ExperiencePickerLayout } from '../schemas'
 import type { WelcomeConfig } from '@/domains/event/shared'
 import type { EditorOption } from '@/shared/editor-controls'
+import type {
+  ExperienceReference,
+  MainExperienceReference,
+} from '@/domains/event/experiences'
 import {
   EditorSection,
   MediaPickerField,
@@ -21,7 +25,7 @@ import {
   ToggleGroupField,
 } from '@/shared/editor-controls'
 import { ExperienceSlotManager } from '@/domains/event/experiences'
-import type { MainExperienceReference } from '@/domains/event/experiences'
+import { Alert, AlertDescription } from '@/ui-kit/ui/alert'
 
 export interface WelcomeConfigPanelProps {
   /** Current welcome values */
@@ -46,6 +50,10 @@ export interface WelcomeConfigPanelProps {
   assignedExperienceIds: string[]
   /** Callback when main experiences are updated */
   onUpdateMainExperiences: (experiences: MainExperienceReference[]) => void
+  /** Pregate experience (optional, for info callout) */
+  pregateExperience?: ExperienceReference | null
+  /** Preshare experience (optional, for info callout) */
+  preshareExperience?: ExperienceReference | null
 }
 
 // Layout options for experience picker
@@ -66,7 +74,13 @@ export function WelcomeConfigPanel({
   mainExperiences,
   assignedExperienceIds,
   onUpdateMainExperiences,
+  pregateExperience,
+  preshareExperience,
 }: WelcomeConfigPanelProps) {
+  // Check if pregate or preshare is configured
+  const hasGuestFlowExperiences = Boolean(
+    pregateExperience || preshareExperience,
+  )
   return (
     <div className="space-y-0">
       {/* Content Section - title, description, hero media */}
@@ -108,6 +122,31 @@ export function WelcomeConfigPanel({
 
       {/* Experiences Section - layout and experience list */}
       <EditorSection title="Experiences">
+        {/* Info callout when pregate or preshare is configured */}
+        {hasGuestFlowExperiences && (
+          <Alert className="mb-4">
+            <Info className="h-4 w-4" />
+            <AlertDescription className="text-xs">
+              {pregateExperience && preshareExperience ? (
+                <>
+                  Pregate and preshare experiences are configured in{' '}
+                  <span className="font-medium">Settings</span>.
+                </>
+              ) : pregateExperience ? (
+                <>
+                  A pregate experience is configured in{' '}
+                  <span className="font-medium">Settings</span>.
+                </>
+              ) : (
+                <>
+                  A preshare experience is configured in{' '}
+                  <span className="font-medium">Settings</span>.
+                </>
+              )}
+            </AlertDescription>
+          </Alert>
+        )}
+
         <ToggleGroupField
           label="Layout"
           value={welcome.layout}

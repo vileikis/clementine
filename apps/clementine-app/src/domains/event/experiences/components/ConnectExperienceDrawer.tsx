@@ -5,19 +5,19 @@
  * Features search, profile filtering, and create new experience button.
  */
 import { useMemo, useState } from 'react'
-import { Search, Plus, ExternalLink } from 'lucide-react'
+import { ExternalLink, Plus, Search } from 'lucide-react'
+import { useExperiencesForSlot } from '../hooks/useExperiencesForSlot'
+import { ConnectExperienceItem } from './ConnectExperienceItem'
+import type { SlotType } from '../constants'
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
-  SheetDescription,
 } from '@/ui-kit/ui/sheet'
 import { Input } from '@/ui-kit/ui/input'
 import { Button } from '@/ui-kit/ui/button'
-import { ConnectExperienceItem } from './ConnectExperienceItem'
-import { useExperiencesForSlot } from '../hooks/useExperiencesForSlot'
-import type { SlotType } from '../constants'
 
 export interface ConnectExperienceDrawerProps {
   /** Controlled open state */
@@ -87,9 +87,7 @@ export function ConnectExperienceDrawer({
     const query = searchQuery.toLowerCase().trim()
     if (!query) return experiences
 
-    return experiences.filter((exp) =>
-      exp.name.toLowerCase().includes(query),
-    )
+    return experiences.filter((exp) => exp.name.toLowerCase().includes(query))
   }, [experiences, searchQuery])
 
   // Mark assigned experiences
@@ -152,7 +150,9 @@ export function ConnectExperienceDrawer({
             ) : filteredExperiences.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 gap-2">
                 <p className="text-sm font-medium text-muted-foreground">
-                  {searchQuery ? 'No experiences found' : 'No compatible experiences'}
+                  {searchQuery
+                    ? 'No experiences found'
+                    : 'No compatible experiences'}
                 </p>
                 <p className="text-xs text-muted-foreground text-center">
                   {searchQuery

@@ -22,6 +22,7 @@ describe('projectEventConfigSchema', () => {
         welcome: null,
         share: null,
         shareOptions: null,
+        experiences: null,
       }
 
       const result = projectEventConfigSchema.parse(validConfig)

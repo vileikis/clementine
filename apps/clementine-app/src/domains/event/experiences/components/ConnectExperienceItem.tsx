@@ -84,7 +84,9 @@ export function ConnectExperienceItem({
       {/* Content */}
       <div className="flex-1 min-w-0 flex flex-col gap-2">
         <div className="flex items-center gap-2">
-          <h3 className="font-medium text-sm truncate flex-1">{experience.name}</h3>
+          <h3 className="font-medium text-sm truncate flex-1">
+            {experience.name}
+          </h3>
           {isAssigned && (
             <Badge variant="secondary" className="text-xs">
               In use
