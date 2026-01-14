@@ -2,9 +2,11 @@
  * StepConfigPanelContainer
  *
  * Container that manages step config editing with debounced auto-save.
- * Separates config editing concerns from the main designer page.
+ * Uses react-hook-form + useAutoSave pattern (aligned with WelcomeEditorPage).
  */
 import { useCallback, useEffect, useRef } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 
 import { StepConfigPanel } from '../components/StepConfigPanel'
 import { useExperienceDesignerStore } from '../stores'
@@ -12,6 +14,7 @@ import { useUpdateExperienceDraft } from '../hooks/useUpdateExperienceDraft'
 import type { Step, StepConfig } from '../../steps/registry/step-registry'
 import type { Experience } from '../../shared/schemas/experience.schema'
 import { useTrackedMutation } from '@/shared/editor-status'
+import { useAutoSave } from '@/shared/forms'
 
 interface StepConfigPanelContainerProps {
   /** Currently selected step */
@@ -28,17 +31,20 @@ interface StepConfigPanelContainerProps {
   disabled?: boolean
 }
 
-/** Debounce delay for config changes (2 seconds) */
-const CONFIG_DEBOUNCE_MS = 2000
+/**
+ * Generic config type for react-hook-form.
+ * StepConfig is a union type, so we use Record<string, unknown> for form management.
+ */
+type FormConfig = Record<string, unknown>
 
 /**
  * Container for step config editing
  *
- * Responsibilities:
- * - Provides debounced onConfigChange handler
- * - Updates local state immediately for live preview
- * - Saves to Firestore after 2s of inactivity
- * - Tracks save status via editor store
+ * Architecture (aligned with WelcomeEditorPage):
+ * - Uses react-hook-form to manage selected step's config
+ * - Uses useAutoSave for 2s debounced saves
+ * - Updates local steps state immediately for live preview
+ * - Saves to Firestore after debounce period
  *
  * @example
  * ```tsx
@@ -63,30 +69,67 @@ export function StepConfigPanelContainer({
   const baseMutation = useUpdateExperienceDraft()
   const updateDraft = useTrackedMutation(baseMutation, store)
 
-  const debounceRef = useRef<NodeJS.Timeout | null>(null)
-  const pendingStepsRef = useRef<Step[] | null>(null)
+  // Track current steps for save (updated via ref to avoid stale closures)
+  const stepsRef = useRef(steps)
+  stepsRef.current = steps
 
-  // Save function
-  const saveConfig = useCallback(
-    async (stepsToSave: Step[]) => {
-      await updateDraft.mutateAsync({
-        workspaceId,
-        experienceId: experience.id,
-        draft: {
-          ...experience.draft,
-          steps: stepsToSave as unknown as typeof experience.draft.steps,
-        },
-      })
+  // Form setup - manages the selected step's config
+  // Use FormConfig (Record<string, unknown>) since StepConfig is a union type
+  const form = useForm<FormConfig>({
+    defaultValues: (step?.config ?? {}) as FormConfig,
+  })
+
+  // Reset form when selected step changes
+  useEffect(() => {
+    if (step) {
+      form.reset(step.config as FormConfig)
+    }
+  }, [step?.id, step?.config, form])
+
+  // Auto-save with debounce (2 seconds)
+  // fieldsToCompare omitted = compare all fields automatically
+  const { triggerSave } = useAutoSave({
+    form,
+    originalValues: (step?.config ?? {}) as FormConfig,
+    onUpdate: async () => {
+      if (!step) return
+
+      try {
+        // Get current steps from ref (avoids stale closure)
+        const currentSteps = stepsRef.current
+
+        // Save full steps array with updated config
+        await updateDraft.mutateAsync({
+          workspaceId,
+          experienceId: experience.id,
+          draft: {
+            ...experience.draft,
+            steps: currentSteps as unknown as typeof experience.draft.steps,
+          },
+        })
+        // No toast - EditorSaveStatus indicator handles feedback
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : 'Failed to save step config'
+        toast.error(message)
+      }
     },
-    [workspaceId, experience.id, experience.draft, updateDraft],
-  )
+    debounceMs: 2000,
+  })
 
-  // Debounced config change handler
+  // Handle config changes from config panels
   const handleConfigChange = useCallback(
     (updates: Partial<StepConfig>) => {
       if (!step) return
 
-      // Update local state immediately for live preview
+      // Update form values
+      for (const [key, value] of Object.entries(updates)) {
+        form.setValue(key, value, {
+          shouldDirty: true,
+        })
+      }
+
+      // Update local steps state immediately for live preview
       const updatedSteps = steps.map((s) =>
         s.id === step.id
           ? ({ ...s, config: { ...s.config, ...updates } } as Step)
@@ -94,38 +137,11 @@ export function StepConfigPanelContainer({
       )
       onStepsChange(updatedSteps)
 
-      // Store pending steps for debounced save
-      pendingStepsRef.current = updatedSteps
-
-      // Clear existing debounce
-      if (debounceRef.current) {
-        clearTimeout(debounceRef.current)
-      }
-
-      // Schedule save after debounce
-      debounceRef.current = setTimeout(() => {
-        if (pendingStepsRef.current) {
-          saveConfig(pendingStepsRef.current)
-          pendingStepsRef.current = null
-        }
-      }, CONFIG_DEBOUNCE_MS)
+      // Trigger debounced save
+      triggerSave()
     },
-    [step, steps, onStepsChange, saveConfig],
+    [step, steps, form, onStepsChange, triggerSave],
   )
-
-  // Cleanup on unmount or step change
-  useEffect(() => {
-    return () => {
-      // Save any pending changes before cleanup
-      if (debounceRef.current) {
-        clearTimeout(debounceRef.current)
-      }
-      if (pendingStepsRef.current) {
-        saveConfig(pendingStepsRef.current)
-        pendingStepsRef.current = null
-      }
-    }
-  }, [step?.id, saveConfig])
 
   return (
     <StepConfigPanel

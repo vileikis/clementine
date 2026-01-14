@@ -16,8 +16,11 @@ interface UseAutoSaveOptions<TFormValues extends FieldValues, TOriginal> {
   originalValues: TOriginal
   /** Callback to persist changes */
   onUpdate: (updates: Partial<TFormValues>) => Promise<void>
-  /** Fields to check for changes (e.g., ['title', 'description', 'config']) */
-  fieldsToCompare: (keyof TFormValues)[]
+  /**
+   * Fields to check for changes (e.g., ['title', 'description', 'config']).
+   * If empty or undefined, compares all fields from both form and original values.
+   */
+  fieldsToCompare?: (keyof TFormValues)[]
   /** Debounce delay in milliseconds (default: 300) */
   debounceMs?: number
 }
