@@ -104,7 +104,7 @@ export function ConnectExperienceDrawer({
 
   // Handle create new experience
   const handleCreateNew = () => {
-    window.open(`/workspace/${workspaceSlug}/experiences/new`, '_blank')
+    window.open(`/workspace/${workspaceSlug}/experiences/create`, '_blank')
   }
 
   return (
@@ -117,7 +117,7 @@ export function ConnectExperienceDrawer({
           </SheetDescription>
         </SheetHeader>
 
-        <div className="flex flex-col gap-4 h-full overflow-hidden">
+        <div className="flex flex-col gap-4 h-full overflow-hidden px-4">
           {/* Search */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
