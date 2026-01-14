@@ -201,13 +201,13 @@ All paths are relative to `apps/clementine-app/src/`:
 
 **Purpose**: Improvements affecting multiple user stories
 
-- [ ] T065 [P] Add mobile responsive layout to ExperienceDesignerPage using Sheet for config panel on small screens
-- [ ] T066 [P] Add keyboard navigation support to StepList (arrow keys to navigate, Enter to select, Delete to remove)
-- [ ] T067 Validate all components follow design-system.md standards (theme tokens, no hard-coded colors)
-- [ ] T068 Run `pnpm app:check` (lint + format) and fix any issues
-- [ ] T069 Run `pnpm app:type-check` and fix any TypeScript errors
-- [ ] T070 Manual test per quickstart.md validation scenarios
-- [ ] T071 Verify standards compliance per constitution (mobile-first, type-safe, clean code)
+- [X] T065 [P] Add mobile responsive layout to ExperienceDesignerPage using Sheet for config panel on small screens
+- [X] T066 [P] Add keyboard navigation support to StepList (arrow keys to navigate, Enter to select, Delete to remove)
+- [X] T067 Validate all components follow design-system.md standards (theme tokens, no hard-coded colors)
+- [X] T068 Run `pnpm app:check` (lint + format) and fix any issues
+- [X] T069 Run `pnpm app:type-check` and fix any TypeScript errors
+- [X] T070 Manual test per quickstart.md validation scenarios
+- [X] T071 Verify standards compliance per constitution (mobile-first, type-safe, clean code)
 
 ---
 

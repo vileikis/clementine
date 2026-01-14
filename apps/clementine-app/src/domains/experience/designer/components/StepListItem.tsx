@@ -82,6 +82,9 @@ export function StepListItem({
     <div
       ref={setNodeRef}
       style={style}
+      role="option"
+      id={step.id}
+      aria-selected={isSelected}
       className={cn(
         'group flex items-center gap-1 rounded-md',
         'transition-colors duration-150',

@@ -3,8 +3,9 @@
  *
  * Left sidebar showing the list of steps in the experience.
  * Includes "Add Step" button, step items with selection handling,
- * and drag-and-drop reordering support.
+ * drag-and-drop reordering, and keyboard navigation support.
  */
+import { useCallback, useRef } from 'react'
 import {
   DndContext,
   KeyboardSensor,
@@ -50,6 +51,11 @@ interface StepListProps {
  * Shows empty state when no steps exist.
  * Supports keyboard and pointer-based drag-and-drop.
  *
+ * Keyboard navigation:
+ * - Arrow Up/Down: Navigate between steps
+ * - Enter: Select focused step
+ * - Delete/Backspace: Delete focused step
+ *
  * @example
  * ```tsx
  * <StepList
@@ -71,6 +77,7 @@ export function StepList({
   onAddStep,
   disabled,
 }: StepListProps) {
+  const listRef = useRef<HTMLDivElement>(null)
   // Configure sensors for drag and drop
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -100,6 +107,54 @@ export function StepList({
     }
   }
 
+  // Handle keyboard navigation for step list
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent) => {
+      if (disabled || steps.length === 0) return
+
+      const currentIndex = selectedStepId
+        ? steps.findIndex((step) => step.id === selectedStepId)
+        : -1
+
+      switch (event.key) {
+        case 'ArrowUp':
+        case 'ArrowDown': {
+          event.preventDefault()
+          const direction = event.key === 'ArrowUp' ? -1 : 1
+          const nextIndex =
+            currentIndex === -1
+              ? 0
+              : Math.max(
+                  0,
+                  Math.min(steps.length - 1, currentIndex + direction),
+                )
+          onSelectStep(steps[nextIndex].id)
+          break
+        }
+        case 'Delete':
+        case 'Backspace': {
+          if (selectedStepId && currentIndex !== -1) {
+            event.preventDefault()
+            onDeleteStep(selectedStepId)
+          }
+          break
+        }
+        case 'Enter':
+        case ' ': {
+          if (currentIndex !== -1) {
+            event.preventDefault()
+            // Already selected, no action needed
+          } else if (steps.length > 0) {
+            event.preventDefault()
+            onSelectStep(steps[0].id)
+          }
+          break
+        }
+      }
+    },
+    [disabled, steps, selectedStepId, onSelectStep, onDeleteStep],
+  )
+
   return (
     <div className="flex h-full flex-col">
       {/* Header with Add button */}
@@ -116,9 +171,17 @@ export function StepList({
         </Button>
       </div>
 
-      {/* Step list */}
+      {/* Step list with keyboard navigation */}
       <ScrollArea className="flex-1">
-        <div className="flex flex-col gap-1 p-2">
+        <div
+          ref={listRef}
+          role="listbox"
+          tabIndex={disabled ? -1 : 0}
+          aria-label="Steps"
+          aria-activedescendant={selectedStepId ?? undefined}
+          onKeyDown={handleKeyDown}
+          className="flex flex-col gap-1 p-2 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
+        >
           {steps.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8 text-center">
               <p className="text-sm text-muted-foreground">No steps yet</p>
