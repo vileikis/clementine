@@ -105,6 +105,11 @@ export function useExperiencesForSlot(workspaceId: string, slot: SlotType) {
 
   // Set up real-time listener
   useEffect(() => {
+    // Guard: Skip Firestore operations if workspaceId is empty
+    if (!workspaceId) {
+      return
+    }
+
     const experiencesRef = collection(
       firestore,
       `workspaces/${workspaceId}/experiences`,

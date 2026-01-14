@@ -63,9 +63,7 @@ interface SortableListItemProps {
   reference: MainExperienceReference
   workspaceId: string
   workspaceSlug: string
-  slot: SlotType
   onToggleEnabled: (enabled: boolean) => void
-  onToggleOverlay: (applyOverlay: boolean) => void
   onRemove: () => void
   onOpenDetails: (experience: Experience) => void
 }
@@ -249,12 +247,8 @@ export function ExperienceListView({
                 reference={reference}
                 workspaceId={workspaceId}
                 workspaceSlug={workspaceSlug}
-                slot={slot}
                 onToggleEnabled={(enabled) =>
                   onToggleEnabled(reference.experienceId, enabled)
-                }
-                onToggleOverlay={(applyOverlay) =>
-                  onToggleOverlay(reference.experienceId, applyOverlay)
                 }
                 onRemove={() => onRemove(reference.experienceId)}
                 onOpenDetails={(experience) =>

@@ -10,7 +10,7 @@ import { useWorkspace } from '@/domains/workspace'
 
 export function EventSettingsPage() {
   const { projectId, eventId, workspaceSlug } = useParams({ strict: false })
-  const { data: event } = useProjectEvent(projectId!, eventId!)
+  const { data: event } = useProjectEvent(projectId ?? '', eventId ?? '')
   const { data: workspace } = useWorkspace(workspaceSlug)
   const { user } = useAuth()
 
@@ -27,15 +27,16 @@ export function EventSettingsPage() {
     return ids
   }, [mainExperiences, pregateExperience, preshareExperience])
 
-  // Mutation for updating experiences
+  // Mutation for updating experiences (use safe fallbacks)
   const updateEventExperiences = useUpdateEventExperiences({
-    projectId: projectId!,
-    eventId: eventId!,
+    projectId: projectId ?? '',
+    eventId: eventId ?? '',
   })
 
   // Handler for updating pregate experience
   const handleUpdatePregate = useCallback(
     async (experience: ExperienceReference | null) => {
+      if (!projectId || !eventId) return
       try {
         await updateEventExperiences.mutateAsync({ pregate: experience })
         // No toast - changes are reflected immediately via real-time updates
@@ -53,6 +54,7 @@ export function EventSettingsPage() {
   // Handler for updating preshare experience
   const handleUpdatePreshare = useCallback(
     async (experience: ExperienceReference | null) => {
+      if (!projectId || !eventId) return
       try {
         await updateEventExperiences.mutateAsync({ preshare: experience })
         // No toast - changes are reflected immediately via real-time updates
@@ -64,10 +66,10 @@ export function EventSettingsPage() {
         toast.error(message)
       }
     },
-    [updateEventExperiences],
+    [updateEventExperiences, projectId, eventId],
   )
 
-  if (!event || !user || !workspace) {
+  if (!event || !user || !workspace || !projectId || !eventId) {
     return null
   }
 
@@ -85,18 +87,14 @@ export function EventSettingsPage() {
         />
 
         <OverlaySection
-          projectId={projectId!}
-          eventId={eventId!}
+          projectId={projectId}
+          eventId={eventId}
           workspaceId={workspace.id}
           userId={user.uid}
           overlays={event.draftConfig?.overlays || null}
         />
 
-        <SharingSection
-          event={event}
-          projectId={projectId!}
-          eventId={eventId!}
-        />
+        <SharingSection event={event} projectId={projectId} eventId={eventId} />
       </div>
     </div>
   )

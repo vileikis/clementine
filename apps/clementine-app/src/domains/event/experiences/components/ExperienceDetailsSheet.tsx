@@ -170,7 +170,7 @@ export function ExperienceDetailsSheet({
             </div>
 
             {/* Overlay Toggle (main slot only) */}
-            {showOverlayToggle && (
+            {showOverlayToggle && onToggleOverlay && (
               <div className="flex items-center justify-between py-2">
                 <div className="space-y-0.5">
                   <Label htmlFor="experience-overlay">Apply Overlay</Label>
@@ -181,7 +181,7 @@ export function ExperienceDetailsSheet({
                 <Switch
                   id="experience-overlay"
                   checked={reference.applyOverlay}
-                  onCheckedChange={onToggleOverlay}
+                  onCheckedChange={(checked) => onToggleOverlay(checked)}
                 />
               </div>
             )}

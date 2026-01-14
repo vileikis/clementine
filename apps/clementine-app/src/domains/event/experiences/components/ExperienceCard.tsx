@@ -95,8 +95,16 @@ export function ExperienceCard({
     }
   }
 
-  return (
-    <div className={cardClasses} onClick={handleClick}>
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (isInteractive && (event.key === 'Enter' || event.key === ' ')) {
+      event.preventDefault()
+      onClick()
+    }
+  }
+
+  // Card content (shared between interactive and non-interactive variants)
+  const cardContent = (
+    <>
       {/* Thumbnail */}
       <div
         className={cn(thumbnailClasses, 'rounded-md overflow-hidden bg-muted')}
@@ -125,6 +133,23 @@ export function ExperienceCard({
         <h3 className="font-medium text-sm truncate">{experience.name}</h3>
         <ProfileBadge profile={experience.profile} />
       </div>
-    </div>
+    </>
   )
+
+  // Render as interactive button when in run mode with onClick
+  if (isInteractive) {
+    return (
+      <button
+        type="button"
+        className={cardClasses}
+        onClick={handleClick}
+        onKeyDown={handleKeyDown}
+      >
+        {cardContent}
+      </button>
+    )
+  }
+
+  // Render as non-interactive div otherwise
+  return <div className={cardClasses}>{cardContent}</div>
 }
