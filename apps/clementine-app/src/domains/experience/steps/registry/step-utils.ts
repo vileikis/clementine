@@ -1,0 +1,138 @@
+/**
+ * Step Utilities
+ *
+ * Helper functions for working with the step registry.
+ */
+import { stepRegistry } from './step-registry'
+import type {
+  Step,
+  StepCategory,
+  StepDefinition,
+  StepType,
+} from './step-registry'
+import type { ExperienceProfile } from '../../shared/schemas/experience.schema'
+
+/**
+ * Profile-to-allowed-categories mapping
+ */
+const PROFILE_ALLOWED_CATEGORIES: Record<ExperienceProfile, StepCategory[]> = {
+  freeform: ['info', 'input', 'capture', 'transform'],
+  survey: ['info', 'input', 'capture'],
+  story: ['info'],
+}
+
+/**
+ * Get a step definition by type
+ */
+export function getStepDefinition(type: StepType): StepDefinition | undefined {
+  return stepRegistry[type]
+}
+
+/**
+ * Get all step types allowed for a specific profile
+ */
+export function getStepTypesForProfile(profile: ExperienceProfile): StepType[] {
+  const allowedCategories = PROFILE_ALLOWED_CATEGORIES[profile]
+
+  return Object.values(stepRegistry)
+    .filter((def) => allowedCategories.includes(def.category))
+    .map((def) => def.type)
+}
+
+/**
+ * Get step definitions allowed for a specific profile
+ */
+export function getStepDefinitionsForProfile(
+  profile: ExperienceProfile,
+): StepDefinition[] {
+  const allowedCategories = PROFILE_ALLOWED_CATEGORIES[profile]
+
+  return Object.values(stepRegistry).filter((def) =>
+    allowedCategories.includes(def.category),
+  )
+}
+
+/**
+ * Get all step definitions grouped by category
+ */
+export function getStepsByCategory(): Record<StepCategory, StepDefinition[]> {
+  const grouped: Record<StepCategory, StepDefinition[]> = {
+    info: [],
+    input: [],
+    capture: [],
+    transform: [],
+  }
+
+  for (const definition of Object.values(stepRegistry)) {
+    grouped[definition.category].push(definition)
+  }
+
+  return grouped
+}
+
+/**
+ * Get step definitions grouped by category, filtered by profile
+ */
+export function getStepsByCategoryForProfile(
+  profile: ExperienceProfile,
+): Record<StepCategory, StepDefinition[]> {
+  const allowedCategories = PROFILE_ALLOWED_CATEGORIES[profile]
+  const grouped: Record<StepCategory, StepDefinition[]> = {
+    info: [],
+    input: [],
+    capture: [],
+    transform: [],
+  }
+
+  for (const definition of Object.values(stepRegistry)) {
+    if (allowedCategories.includes(definition.category)) {
+      grouped[definition.category].push(definition)
+    }
+  }
+
+  return grouped
+}
+
+/**
+ * Create a new step with a unique ID and default config
+ *
+ * Note: Type assertion is required because TypeScript can't infer
+ * which discriminated union variant we're creating at compile time.
+ * The registry guarantees the type and config are correctly paired.
+ */
+export function createStep(type: StepType): Step {
+  const definition = stepRegistry[type]
+  if (!definition) {
+    throw new Error(`Unknown step type: ${type}`)
+  }
+
+  return {
+    id: crypto.randomUUID(),
+    type,
+    config: definition.defaultConfig(),
+  } as Step
+}
+
+/**
+ * Check if a step type is allowed for a profile
+ */
+export function isStepTypeAllowedForProfile(
+  type: StepType,
+  profile: ExperienceProfile,
+): boolean {
+  const allowedTypes = getStepTypesForProfile(profile)
+  return allowedTypes.includes(type)
+}
+
+/**
+ * Get category label for display
+ */
+export function getCategoryLabel(category: StepCategory): string {
+  const labels: Record<StepCategory, string> = {
+    info: 'Information',
+    input: 'Input',
+    capture: 'Capture',
+    transform: 'Transform',
+  }
+  return labels[category]
+}

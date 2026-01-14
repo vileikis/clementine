@@ -43,17 +43,29 @@ function deepNormalize(value: unknown): unknown {
  *
  * @param formValues - Current form values
  * @param originalValues - Original values to compare against
- * @param fieldsToCompare - Array of field keys to check for changes
+ * @param fieldsToCompare - Array of field keys to check for changes.
+ *   If empty or undefined, compares all keys from both objects.
  * @returns Object containing only the fields that have changed
  */
 export function getChangedFields<T extends Record<string, unknown>>(
   formValues: T,
   originalValues: Record<string, unknown>,
-  fieldsToCompare: (keyof T)[],
+  fieldsToCompare?: (keyof T)[],
 ): Partial<T> {
   const updates: Partial<T> = {}
 
-  for (const key of fieldsToCompare) {
+  // If no fields specified, compare all keys from both objects
+  const keysToCompare =
+    fieldsToCompare && fieldsToCompare.length > 0
+      ? fieldsToCompare
+      : ([
+          ...new Set([
+            ...Object.keys(formValues),
+            ...Object.keys(originalValues),
+          ]),
+        ] as (keyof T)[])
+
+  for (const key of keysToCompare) {
     const formValue = formValues[key]
     const originalValue = originalValues[key as string]
 

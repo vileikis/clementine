@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { z } from 'zod'
 
 import {
   ExperienceDesignerLayout,
@@ -9,18 +10,31 @@ import { NotFound } from '@/shared/components/NotFound'
 import { Skeleton } from '@/ui-kit/ui/skeleton'
 
 /**
+ * Search params schema for experience designer
+ */
+const experienceDesignerSearchSchema = z.object({
+  step: z.string().optional(),
+})
+
+export type ExperienceDesignerSearch = z.infer<
+  typeof experienceDesignerSearchSchema
+>
+
+/**
  * Experience designer route
  *
  * Route: /workspace/:workspaceSlug/experiences/:experienceId
  * Access: Admin only (enforced by parent route requireAdmin guard)
  *
  * Layout for the experience editor/designer.
+ * Search params: ?step={stepId} for deep linking to specific steps
  */
 export const Route = createFileRoute(
   '/workspace/$workspaceSlug/experiences/$experienceId',
 )({
   component: ExperienceDesignerRoute,
   notFoundComponent: ExperienceNotFound,
+  validateSearch: experienceDesignerSearchSchema,
 })
 
 function ExperienceDesignerRoute() {
@@ -62,6 +76,7 @@ function ExperienceDesignerRoute() {
     <ExperienceDesignerLayout
       experience={experience}
       workspaceSlug={workspaceSlug}
+      workspaceId={workspace.id}
     />
   )
 }

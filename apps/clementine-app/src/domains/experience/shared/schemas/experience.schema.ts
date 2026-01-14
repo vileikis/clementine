@@ -46,15 +46,19 @@ export const experienceMediaSchema = z
   .nullable()
 
 /**
- * Step config placeholder schema
+ * Step schema
  *
- * Placeholder for step configuration - full implementation in step-registry.schema.ts
+ * Defines the structure of a step stored in Firestore.
+ * Note: `category` and `label` are registry metadata, not stored in documents.
+ * They are derived at runtime from the step registry using the `type` field.
  */
-export const stepConfigSchema = z.looseObject({
+export const stepSchema = z.looseObject({
+  /** Unique step identifier within the experience (UUID) */
   id: z.string(),
-  category: z.string(),
+  /** Step type from registry (e.g., 'info', 'input.scale') */
   type: z.string(),
-  label: z.string(),
+  /** Step-specific configuration object */
+  config: z.record(z.string(), z.unknown()).default({}),
 })
 
 /**
@@ -65,10 +69,10 @@ export const stepConfigSchema = z.looseObject({
  */
 export const experienceConfigSchema = z.looseObject({
   /**
-   * Array of step configurations
+   * Array of steps
    * Defines the sequence of steps in the experience
    */
-  steps: z.array(stepConfigSchema).default([]),
+  steps: z.array(stepSchema).default([]),
 })
 
 /**
@@ -142,3 +146,4 @@ export type ExperienceConfig = z.infer<typeof experienceConfigSchema>
 export type ExperienceStatus = z.infer<typeof experienceStatusSchema>
 export type ExperienceProfile = z.infer<typeof experienceProfileSchema>
 export type ExperienceMedia = z.infer<typeof experienceMediaSchema>
+export type ExperienceStep = z.infer<typeof stepSchema>

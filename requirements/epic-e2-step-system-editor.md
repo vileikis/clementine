@@ -32,35 +32,35 @@ Enable admins to build experiences by adding, configuring, and previewing steps 
 
 ### 2.1 Step Categories
 
-| Category | Description | Profiles |
-|----------|-------------|----------|
-| `info` | Display content | freeform, survey, story |
-| `input` | Collect user input | freeform, survey |
-| `capture` | Capture media | freeform, survey |
-| `transform` | AI processing | freeform only |
+| Category    | Description        | Profiles                |
+| ----------- | ------------------ | ----------------------- |
+| `info`      | Display content    | freeform, survey, story |
+| `input`     | Collect user input | freeform, survey        |
+| `capture`   | Capture media      | freeform, survey        |
+| `transform` | AI processing      | freeform only           |
 
 ### 2.2 MVP Step Types
 
-| Type | Category | Description | Config Fields |
-|------|----------|-------------|---------------|
-| `info` | info | Display information | title, description, media |
-| `input.scale` | input | Opinion scale | question, min, max, labels |
-| `input.yesNo` | input | Yes/No question | question |
-| `input.multiSelect` | input | Multiple choice | question, options, minSelect, maxSelect |
-| `input.shortText` | input | Short text input | question, placeholder, maxLength |
-| `input.longText` | input | Long text input | question, placeholder, maxLength |
-| `capture.photo` | capture | Photo capture | instructions, countdown, overlay |
-| `transform.pipeline` | transform | AI processing | (placeholder - "Coming soon") |
+| Type                 | Category  | Description         | Config Fields                           |
+| -------------------- | --------- | ------------------- | --------------------------------------- |
+| `info`               | info      | Display information | title, description, media               |
+| `input.scale`        | input     | Opinion scale       | question, min, max, labels              |
+| `input.yesNo`        | input     | Yes/No question     | question                                |
+| `input.multiSelect`  | input     | Multiple choice     | question, options, minSelect, maxSelect |
+| `input.shortText`    | input     | Short text input    | question, placeholder, maxLength        |
+| `input.longText`     | input     | Long text input     | question, placeholder, maxLength        |
+| `capture.photo`      | capture   | Photo capture       | instructions, countdown, overlay        |
+| `transform.pipeline` | transform | AI processing       | (placeholder - "Coming soon")           |
 
 **Note:** `transform.pipeline` shows "Coming soon" in edit mode preview and has a "Continue" button in run mode (E5). Full implementation in E9.
 
 ### 2.3 Profile-Based Filtering
 
-| Profile | Allowed Categories | Allowed Step Types |
-|---------|-------------------|-------------------|
-| `freeform` | info, input, capture, transform | All |
-| `survey` | info, input, capture | All except transform.* |
-| `story` | info | info only |
+| Profile    | Allowed Categories              | Allowed Step Types      |
+| ---------- | ------------------------------- | ----------------------- |
+| `freeform` | info, input, capture, transform | All                     |
+| `survey`   | info, input, capture            | All except transform.\* |
+| `story`    | info                            | info only               |
 
 ---
 
@@ -94,12 +94,12 @@ const stepRegistry: Record<string, StepDefinition> = {
 
 ```typescript
 export const stepSchema = z.object({
-  id: z.string(),                 // UUID
-  type: z.string(),               // Step type from registry
-  config: z.record(z.any()),      // Type-specific config
-})
+  id: z.string(), // UUID
+  type: z.string(), // Step type from registry
+  config: z.record(z.any()), // Type-specific config
+});
 
-export type Step = z.infer<typeof stepSchema>
+export type Step = z.infer<typeof stepSchema>;
 ```
 
 ---
@@ -128,30 +128,35 @@ export type Step = z.infer<typeof stepSchema>
 
 ### 4.2 Components
 
-**ExperienceEditorPage** (`domains/experience/editor/containers/`)
+**ExperienceEditorPage** (`domains/experience/designer/containers/`)
+
 - Loads experience data
 - Manages selected step state (URL param: `?step=stepId`)
 - Orchestrates 3-column layout
 - Handles auto-save and publish
 
-**StepList** (`domains/experience/editor/components/`)
+**StepList** (`domains/experience/designer/components/`)
+
 - Displays steps with icons and labels
 - Selected step highlighted
 - Drag-to-reorder with @dnd-kit
 - "Add Step" button opens step type picker
 - Context menu: Delete step
 
-**StepPreview** (`domains/experience/editor/components/`)
+**StepPreview** (`domains/experience/designer/components/`)
+
 - Phone frame preview shell
 - Renders `StepRenderer` in edit mode
 - Shows placeholder when no step selected
 
-**StepConfigPanel** (`domains/experience/editor/components/`)
+**StepConfigPanel** (`domains/experience/designer/components/`)
+
 - Renders config panel from step registry
 - Form fields update step config
 - Changes trigger auto-save
 
-**AddStepDialog** (`domains/experience/editor/components/`)
+**AddStepDialog** (`domains/experience/designer/components/`)
+
 - Modal with step type grid
 - Filtered by experience profile
 - Groups by category
@@ -165,12 +170,12 @@ export type Step = z.infer<typeof stepSchema>
 
 ```typescript
 interface StepRendererProps {
-  mode: 'edit' | 'run'
-  step: Step
-  config: StepConfig
+  mode: "edit" | "run";
+  step: Step;
+  config: StepConfig;
   // Run mode props (not used in edit)
-  onNext?: () => void
-  onAnswer?: (answer: unknown) => void
+  onNext?: () => void;
+  onAnswer?: (answer: unknown) => void;
 }
 ```
 
@@ -184,21 +189,25 @@ interface StepRendererProps {
 ### 5.3 Renderer Examples
 
 **InfoStepRenderer (edit mode)**
+
 - Shows title (or "Add a title...")
 - Shows description (or placeholder)
 - Shows media if configured
 
 **InputScaleRenderer (edit mode)**
+
 - Shows question text
 - Shows scale buttons (disabled)
 - Shows min/max labels
 
 **CapturePhotoRenderer (edit mode)**
+
 - Shows camera placeholder graphic
 - Shows instructions text
 - Shows countdown value
 
 **TransformPipelineRenderer (edit mode)**
+
 - Shows "AI Processing" title
 - Shows "Coming soon" badge
 - Shows placeholder graphic
@@ -212,11 +221,13 @@ interface StepRendererProps {
 Each step type has a dedicated config panel with appropriate form fields.
 
 **InfoStepConfigPanel**
+
 - Title input
 - Description textarea
 - Media picker (from media library)
 
 **InputScaleConfigPanel**
+
 - Question input
 - Min value (number)
 - Max value (number)
@@ -224,30 +235,36 @@ Each step type has a dedicated config panel with appropriate form fields.
 - Max label input
 
 **InputYesNoConfigPanel**
+
 - Question input
 
 **InputMultiSelectConfigPanel**
+
 - Question input
 - Options list (add/remove/reorder)
 - Min selections
 - Max selections
 
 **InputShortTextConfigPanel**
+
 - Question input
 - Placeholder input
 - Max length
 
 **InputLongTextConfigPanel**
+
 - Question input
 - Placeholder input
 - Max length
 
 **CapturePhotoConfigPanel**
+
 - Instructions input
 - Countdown toggle + value
 - Overlay picker (future)
 
 **TransformPipelineConfigPanel**
+
 - "Coming soon" message
 - No configurable options yet
 
@@ -273,6 +290,7 @@ Each step type has a dedicated config panel with appropriate form fields.
 ### 7.3 Publish Validation
 
 Before publish, validate:
+
 - At least one step exists
 - All steps have valid config (per schema)
 - Profile constraints satisfied (step types allowed)
@@ -353,7 +371,7 @@ domains/experience/
 │       ├── InfoStepConfigPanel.tsx
 │       ├── InputScaleConfigPanel.tsx
 │       └── ...
-├── editor/
+├── designer/
 │   ├── containers/
 │   │   └── ExperienceEditorPage.tsx
 │   └── components/
@@ -371,11 +389,11 @@ domains/experience/
 
 ## 11. Out of Scope
 
-| Item | Epic |
-|------|------|
-| Run mode renderers | E5 |
-| Event-experience assignment | E3 |
-| Session creation | E5 |
-| Runtime engine | E5 |
-| Photo capture implementation | E5 |
-| Transform pipeline implementation | E9 |
+| Item                              | Epic |
+| --------------------------------- | ---- |
+| Run mode renderers                | E5   |
+| Event-experience assignment       | E3   |
+| Session creation                  | E5   |
+| Runtime engine                    | E5   |
+| Photo capture implementation      | E5   |
+| Transform pipeline implementation | E9   |
