@@ -3,6 +3,10 @@
  *
  * Main content area for the experience designer with 3-column layout.
  * Left: Step list | Center: Preview | Right: Config panel
+ *
+ * Handles:
+ * - Step list operations (add, delete, reorder) with immediate save
+ * - Config editing is delegated to StepConfigPanelContainer (debounced save)
  */
 import { useCallback, useState } from 'react'
 
@@ -10,25 +14,24 @@ import { createStep } from '../../steps/registry/step-utils'
 import { AddStepDialog } from '../components/AddStepDialog'
 import { StepList } from '../components/StepList'
 import { StepPreview } from '../components/StepPreview'
-import { StepConfigPanel } from '../components/StepConfigPanel'
 import { useStepSelection } from '../hooks/useStepSelection'
-import type {
-  Step,
-  StepConfig,
-  StepType,
-} from '../../steps/registry/step-registry'
+import { useUpdateDraftSteps } from '../hooks/useUpdateDraftSteps'
+import { StepConfigPanelContainer } from './StepConfigPanelContainer'
+import type { Step, StepType } from '../../steps/registry/step-registry'
 import type { Experience } from '@/domains/experience/shared'
 
 interface ExperienceDesignerPageProps {
   experience: Experience
   workspaceSlug: string
+  workspaceId: string
 }
 
 /**
  * Experience designer with 3-column responsive layout
  *
- * Manages local step state for immediate UI updates.
- * Auto-save to draft will be added in Phase 5 (US3).
+ * Architecture:
+ * - List operations (add/delete/reorder): Save immediately via useUpdateDraftSteps
+ * - Config editing: Delegated to StepConfigPanelContainer with 2s debounce
  *
  * Layout:
  * - Desktop (lg+): 3 columns
@@ -37,10 +40,9 @@ interface ExperienceDesignerPageProps {
  */
 export function ExperienceDesignerPage({
   experience,
+  workspaceId,
 }: ExperienceDesignerPageProps) {
   // Local step state for immediate UI updates
-  // This starts with the draft steps from the experience
-  // We use unknown as an intermediate type since Firestore returns a loose schema
   const [steps, setSteps] = useState<Step[]>(
     () => (experience.draft.steps ?? []) as unknown as Step[],
   )
@@ -51,64 +53,65 @@ export function ExperienceDesignerPage({
   // Add step dialog state
   const [showAddDialog, setShowAddDialog] = useState(false)
 
-  // Handle adding a new step
+  // Mutation for immediate saves (list operations)
+  const updateSteps = useUpdateDraftSteps(workspaceId, experience.id)
+
+  // Handle adding a new step (immediate save)
   const handleAddStep = useCallback(
     (type: StepType) => {
       const newStep = createStep(type)
-      setSteps((prev) => [...prev, newStep])
+      const newSteps = [...steps, newStep]
+
+      // Update local state
+      setSteps(newSteps)
+
+      // Save immediately
+      updateSteps.mutate({ steps: newSteps })
+
       // Auto-select the new step
       selectStep(newStep.id)
     },
-    [selectStep],
+    [steps, selectStep, updateSteps],
   )
 
-  // Handle step config changes
-  const handleConfigChange = useCallback(
-    (updates: Partial<StepConfig>) => {
-      if (!selectedStep) return
+  // Handle reordering steps (immediate save)
+  const handleReorderSteps = useCallback(
+    (newSteps: Step[]) => {
+      // Update local state
+      setSteps(newSteps)
 
-      setSteps((prev) =>
-        prev.map((step) =>
-          step.id === selectedStep.id
-            ? ({ ...step, config: { ...step.config, ...updates } } as Step)
-            : step,
-        ),
-      )
+      // Save immediately
+      updateSteps.mutate({ steps: newSteps })
     },
-    [selectedStep],
+    [updateSteps],
   )
 
-  // Handle reordering steps
-  const handleReorderSteps = useCallback((newSteps: Step[]) => {
-    setSteps(newSteps)
-  }, [])
-
-  // Handle deleting a step
+  // Handle deleting a step (immediate save)
   const handleDeleteStep = useCallback(
     (stepId: string) => {
-      setSteps((prevSteps) => {
-        const stepIndex = prevSteps.findIndex((step) => step.id === stepId)
-        const newSteps = prevSteps.filter((step) => step.id !== stepId)
+      const stepIndex = steps.findIndex((step) => step.id === stepId)
+      const newSteps = steps.filter((step) => step.id !== stepId)
 
-        // If we're deleting the selected step, update selection
-        if (selectedStep?.id === stepId) {
-          // Select the next step, or the previous one if we deleted the last
-          // Or clear selection if no steps remain
-          if (newSteps.length === 0) {
-            clearSelection()
-          } else if (stepIndex >= newSteps.length) {
-            // Deleted the last step, select the new last step
-            selectStep(newSteps[newSteps.length - 1].id)
-          } else {
-            // Select the step that's now at the deleted step's position
-            selectStep(newSteps[stepIndex].id)
-          }
+      // Update local state
+      setSteps(newSteps)
+
+      // Save immediately
+      updateSteps.mutate({ steps: newSteps })
+
+      // Update selection if we deleted the selected step
+      if (selectedStep?.id === stepId) {
+        if (newSteps.length === 0) {
+          clearSelection()
+        } else if (stepIndex >= newSteps.length) {
+          // Deleted the last step, select the new last step
+          selectStep(newSteps[newSteps.length - 1].id)
+        } else {
+          // Select the step that's now at the deleted step's position
+          selectStep(newSteps[stepIndex].id)
         }
-
-        return newSteps
-      })
+      }
     },
-    [selectedStep?.id, selectStep, clearSelection],
+    [steps, selectedStep?.id, selectStep, clearSelection, updateSteps],
   )
 
   return (
@@ -130,11 +133,14 @@ export function ExperienceDesignerPage({
         <StepPreview step={selectedStep} />
       </main>
 
-      {/* Right column: Config panel */}
+      {/* Right column: Config panel (with debounced auto-save) */}
       <aside className="hidden w-80 shrink-0 border-l bg-background lg:block">
-        <StepConfigPanel
+        <StepConfigPanelContainer
           step={selectedStep}
-          onConfigChange={handleConfigChange}
+          steps={steps}
+          experience={experience}
+          workspaceId={workspaceId}
+          onStepsChange={setSteps}
         />
       </aside>
 

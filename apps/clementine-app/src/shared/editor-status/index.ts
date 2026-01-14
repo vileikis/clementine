@@ -8,6 +8,10 @@
 // Components
 export { EditorChangesBadge, EditorSaveStatus } from './components'
 
+// Hooks
+export { useTrackedMutation } from './hooks'
+export type { SaveTrackingStore } from './hooks'
+
 // Store factory
 export { createEditorStore } from './store'
 

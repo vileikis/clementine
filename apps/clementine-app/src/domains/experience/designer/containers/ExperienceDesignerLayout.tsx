@@ -18,6 +18,7 @@ import { Button } from '@/ui-kit/ui/button'
 interface ExperienceDesignerLayoutProps {
   experience: Experience
   workspaceSlug: string
+  workspaceId: string
 }
 
 /**
@@ -40,6 +41,7 @@ interface ExperienceDesignerLayoutProps {
 export function ExperienceDesignerLayout({
   experience,
   workspaceSlug,
+  workspaceId,
 }: ExperienceDesignerLayoutProps) {
   const { pendingSaves, lastCompletedAt, resetSaveState } =
     useExperienceDesignerStore()
@@ -99,6 +101,7 @@ export function ExperienceDesignerLayout({
       <ExperienceDesignerPage
         experience={experience}
         workspaceSlug={workspaceSlug}
+        workspaceId={workspaceId}
       />
     </div>
   )

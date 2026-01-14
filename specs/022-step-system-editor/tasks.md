@@ -152,10 +152,10 @@ All paths are relative to `apps/clementine-app/src/`:
 > export const useExperienceDesignerStore = createEditorStore()
 > ```
 
-- [ ] T051 [US3] Create useUpdateExperienceDraft hook in `domains/experience/designer/hooks/useUpdateExperienceDraft.ts` wrapping useMutation to update experience.draft in Firestore with serverTimestamp()
-- [ ] T052 [US3] Integrate useAutoSave in `domains/experience/designer/containers/ExperienceDesignerPage.tsx` with 2000ms debounce, watching steps array changes, calling useUpdateExperienceDraft
-- [ ] T053 [US3] Wire useExperienceDesignerStore (startSave/completeSave) with useUpdateExperienceDraft mutation for save status tracking
-- [ ] T054 [US3] Add EditorSaveStatus indicator to ExperienceDesignerLayout header showing pendingSaves and lastCompletedAt from store
+- [X] T051 [US3] Create useUpdateExperienceDraft hook in `domains/experience/designer/hooks/useUpdateExperienceDraft.ts` wrapping useMutation to update experience.draft in Firestore with serverTimestamp()
+- [X] T052 [US3] Integrate useAutoSave in `domains/experience/designer/containers/ExperienceDesignerPage.tsx` with 2000ms debounce, watching steps array changes, calling useUpdateExperienceDraft
+- [X] T053 [US3] Wire useExperienceDesignerStore (startSave/completeSave) with useUpdateExperienceDraft mutation for save status tracking
+- [X] T054 [US3] Add EditorSaveStatus indicator to ExperienceDesignerLayout header showing pendingSaves and lastCompletedAt from store
 
 **Checkpoint**: User Story 3 complete - changes auto-save with visual feedback. Works with US1 and US2.
 
