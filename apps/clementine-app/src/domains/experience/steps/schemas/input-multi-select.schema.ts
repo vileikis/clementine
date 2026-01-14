@@ -9,8 +9,8 @@ import { z } from 'zod'
  * Input multi-select step configuration schema
  */
 export const inputMultiSelectStepConfigSchema = z.object({
-  /** Title text (required, 1-200 chars) */
-  title: z.string().min(1).max(200),
+  /** Title text (max 200 chars, empty allowed for drafts) */
+  title: z.string().max(200),
   /** Whether this step is required */
   required: z.boolean().default(false),
   /** Available options (2-10 items, each 1-100 chars) */
