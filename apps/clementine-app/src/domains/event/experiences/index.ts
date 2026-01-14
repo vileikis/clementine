@@ -1,0 +1,13 @@
+// Barrel exports for event-experience integration feature
+// This file will be populated as components, hooks, and schemas are created
+
+export * from './constants'
+export * from './schemas/event-experiences.schema'
+export * from './hooks/useExperiencesForSlot'
+export * from './hooks/useUpdateEventExperiences'
+export * from './components/ExperienceCard'
+export * from './components/ExperienceSlotEmpty'
+export * from './components/ConnectExperienceItem'
+export * from './components/ExperienceSlotItem'
+export * from './components/ConnectExperienceDrawer'
+export * from './components/ExperienceSlotManager'

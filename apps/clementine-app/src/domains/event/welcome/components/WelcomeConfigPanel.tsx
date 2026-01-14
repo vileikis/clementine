@@ -20,6 +20,8 @@ import {
   TextareaField,
   ToggleGroupField,
 } from '@/shared/editor-controls'
+import { ExperienceSlotManager } from '@/domains/event/experiences'
+import type { MainExperienceReference } from '@/domains/event/experiences'
 
 export interface WelcomeConfigPanelProps {
   /** Current welcome values */
@@ -34,6 +36,16 @@ export interface WelcomeConfigPanelProps {
   uploadingHeroMedia?: boolean
   /** Hero media upload progress (0-100) */
   uploadProgress?: number
+  /** Workspace ID for fetching experiences */
+  workspaceId: string
+  /** Workspace slug for experience links */
+  workspaceSlug: string
+  /** Main experiences array */
+  mainExperiences: MainExperienceReference[]
+  /** All assigned experience IDs across all slots */
+  assignedExperienceIds: string[]
+  /** Callback when main experiences are updated */
+  onUpdateMainExperiences: (experiences: MainExperienceReference[]) => void
 }
 
 // Layout options for experience picker
@@ -49,6 +61,11 @@ export function WelcomeConfigPanel({
   disabled = false,
   uploadingHeroMedia = false,
   uploadProgress,
+  workspaceId,
+  workspaceSlug,
+  mainExperiences,
+  assignedExperienceIds,
+  onUpdateMainExperiences,
 }: WelcomeConfigPanelProps) {
   return (
     <div className="space-y-0">
@@ -89,7 +106,7 @@ export function WelcomeConfigPanel({
         />
       </EditorSection>
 
-      {/* Experiences Section - layout (future: experience list) */}
+      {/* Experiences Section - layout and experience list */}
       <EditorSection title="Experiences">
         <ToggleGroupField
           label="Layout"
@@ -98,6 +115,21 @@ export function WelcomeConfigPanel({
           options={LAYOUT_OPTIONS}
           disabled={disabled}
         />
+
+        {/* Experience Slot Manager for main experiences */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Connected Experiences</label>
+          <ExperienceSlotManager
+            mode="list"
+            slot="main"
+            workspaceId={workspaceId}
+            workspaceSlug={workspaceSlug}
+            experiences={mainExperiences}
+            onUpdate={onUpdateMainExperiences}
+            assignedExperienceIds={assignedExperienceIds}
+            isLoading={disabled}
+          />
+        </div>
       </EditorSection>
     </div>
   )

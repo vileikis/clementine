@@ -9,6 +9,7 @@
 import { z } from 'zod'
 import { themeSchema } from '@/shared/theming/schemas/theme.schemas'
 import { mediaReferenceSchema } from '@/shared/theming'
+import { experiencesConfigSchema } from '@/domains/event/experiences/schemas/event-experiences.schema'
 
 /**
  * Current schema version for event configuration
@@ -223,6 +224,12 @@ export const projectEventConfigSchema = z.looseObject({
    * Welcome screen configuration
    */
   welcome: welcomeConfigSchema.nullable().default(null),
+
+  /**
+   * Experience slot assignments
+   * Defines which experiences are connected to this event
+   */
+  experiences: experiencesConfigSchema.nullable().default(null),
 }) // Allow unknown fields for future evolution
 
 /**
@@ -237,3 +244,6 @@ export type SharingConfig = z.infer<typeof sharingConfigSchema>
 export type WelcomeConfig = z.infer<typeof welcomeConfigSchema>
 export type CtaConfig = z.infer<typeof ctaConfigSchema>
 export type ShareConfig = z.infer<typeof shareConfigSchema>
+
+// Re-export experiences types for convenience
+export type { ExperiencesConfig } from '@/domains/event/experiences/schemas/event-experiences.schema'

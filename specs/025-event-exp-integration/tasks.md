@@ -24,9 +24,9 @@
 
 **Purpose**: Project initialization and feature module structure
 
-- [ ] T001 Create experiences module directory structure at apps/clementine-app/src/domains/event/experiences/
-- [ ] T002 [P] Create barrel exports file at apps/clementine-app/src/domains/event/experiences/index.ts
-- [ ] T003 [P] Create constants file with SLOT_PROFILES mapping at apps/clementine-app/src/domains/event/experiences/constants.ts
+- [X] T001 Create experiences module directory structure at apps/clementine-app/src/domains/event/experiences/
+- [X] T002 [P] Create barrel exports file at apps/clementine-app/src/domains/event/experiences/index.ts
+- [X] T003 [P] Create constants file with SLOT_PROFILES mapping at apps/clementine-app/src/domains/event/experiences/constants.ts
 
 ---
 
@@ -36,13 +36,13 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T004 Create ExperienceReference and MainExperienceReference schemas at apps/clementine-app/src/domains/event/experiences/schemas/event-experiences.schema.ts
-- [ ] T005 Create ExperiencesConfig schema at apps/clementine-app/src/domains/event/experiences/schemas/event-experiences.schema.ts
-- [ ] T006 Export schema types (ExperienceReference, MainExperienceReference, ExperiencesConfig, SlotType, SlotMode) from schema file
-- [ ] T007 Update projectEventConfigSchema to add experiences field at apps/clementine-app/src/domains/event/shared/schemas/project-event-config.schema.ts
-- [ ] T008 Create useExperiencesForSlot hook with Firestore real-time queries at apps/clementine-app/src/domains/event/experiences/hooks/useExperiencesForSlot.ts
-- [ ] T009 Create useUpdateEventExperiences hook with Firestore transactions at apps/clementine-app/src/domains/event/experiences/hooks/useUpdateEventExperiences.ts
-- [ ] T010 Update barrel exports to include hooks and schemas at apps/clementine-app/src/domains/event/experiences/index.ts
+- [X] T004 Create ExperienceReference and MainExperienceReference schemas at apps/clementine-app/src/domains/event/experiences/schemas/event-experiences.schema.ts
+- [X] T005 Create ExperiencesConfig schema at apps/clementine-app/src/domains/event/experiences/schemas/event-experiences.schema.ts
+- [X] T006 Export schema types (ExperienceReference, MainExperienceReference, ExperiencesConfig, SlotType, SlotMode) from schema file
+- [X] T007 Update projectEventConfigSchema to add experiences field at apps/clementine-app/src/domains/event/shared/schemas/project-event-config.schema.ts
+- [X] T008 Create useExperiencesForSlot hook with Firestore real-time queries at apps/clementine-app/src/domains/event/experiences/hooks/useExperiencesForSlot.ts
+- [X] T009 Create useUpdateEventExperiences hook with Firestore transactions at apps/clementine-app/src/domains/event/experiences/hooks/useUpdateEventExperiences.ts
+- [X] T010 Update barrel exports to include hooks and schemas at apps/clementine-app/src/domains/event/experiences/index.ts
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -56,13 +56,13 @@
 
 ### Implementation for User Story 1
 
-- [ ] T011 [P] [US1] Create ExperienceCard component for welcome preview at apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx
-- [ ] T012 [P] [US1] Create ConnectExperienceItem component for drawer list items at apps/clementine-app/src/domains/event/experiences/components/ConnectExperienceItem.tsx
-- [ ] T013 [P] [US1] Create ExperienceSlotEmpty component for empty state at apps/clementine-app/src/domains/event/experiences/components/ExperienceSlotEmpty.tsx
-- [ ] T014 [US1] Create ConnectExperienceDrawer component with search and selection at apps/clementine-app/src/domains/event/experiences/components/ConnectExperienceDrawer.tsx
-- [ ] T015 [US1] Create ExperienceSlotItem component with drag handle, toggles, and context menu at apps/clementine-app/src/domains/event/experiences/components/ExperienceSlotItem.tsx
-- [ ] T016 [US1] Create ExperienceSlotManager component with @dnd-kit drag-and-drop at apps/clementine-app/src/domains/event/experiences/components/ExperienceSlotManager.tsx
-- [ ] T017 [US1] Update barrel exports with all new components at apps/clementine-app/src/domains/event/experiences/index.ts
+- [X] T011 [P] [US1] Create ExperienceCard component for welcome preview at apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx
+- [X] T012 [P] [US1] Create ConnectExperienceItem component for drawer list items at apps/clementine-app/src/domains/event/experiences/components/ConnectExperienceItem.tsx
+- [X] T013 [P] [US1] Create ExperienceSlotEmpty component for empty state at apps/clementine-app/src/domains/event/experiences/components/ExperienceSlotEmpty.tsx
+- [X] T014 [US1] Create ConnectExperienceDrawer component with search and selection at apps/clementine-app/src/domains/event/experiences/components/ConnectExperienceDrawer.tsx
+- [X] T015 [US1] Create ExperienceSlotItem component with drag handle, toggles, and context menu at apps/clementine-app/src/domains/event/experiences/components/ExperienceSlotItem.tsx
+- [X] T016 [US1] Create ExperienceSlotManager component with @dnd-kit drag-and-drop at apps/clementine-app/src/domains/event/experiences/components/ExperienceSlotManager.tsx
+- [X] T017 [US1] Update barrel exports with all new components at apps/clementine-app/src/domains/event/experiences/index.ts
 - [ ] T018 [US1] Add Experiences section to WelcomeConfigPanel using ExperienceSlotManager (mode='list', slot='main') at apps/clementine-app/src/domains/event/welcome/components/WelcomeConfigPanel.tsx
 - [ ] T019 [US1] Update WelcomePreview to display connected experiences using ExperienceCard at apps/clementine-app/src/domains/event/welcome/components/WelcomePreview.tsx
 
