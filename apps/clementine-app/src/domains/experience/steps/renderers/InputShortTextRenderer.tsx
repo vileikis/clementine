@@ -29,7 +29,6 @@ export function InputShortTextRenderer({ step, onSubmit }: StepRendererProps) {
         {/* Input */}
         <ThemedInput
           placeholder={placeholder || 'Type your answer...'}
-          disabled
           className="w-full"
         />
       </div>

@@ -33,7 +33,7 @@ export function InputScaleRenderer({ step, onSubmit }: StepRendererProps) {
         <div className="flex w-full flex-col items-center gap-3">
           <div className="flex flex-wrap justify-center gap-3">
             {scaleValues.map((value) => (
-              <ThemedScaleButton key={value} value={value} disabled />
+              <ThemedScaleButton key={value} value={value} />
             ))}
           </div>
 

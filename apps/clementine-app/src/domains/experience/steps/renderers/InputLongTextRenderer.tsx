@@ -29,7 +29,6 @@ export function InputLongTextRenderer({ step, onSubmit }: StepRendererProps) {
         {/* Textarea */}
         <ThemedTextarea
           placeholder={placeholder || 'Type your answer...'}
-          disabled
           rows={4}
           className="w-full"
         />

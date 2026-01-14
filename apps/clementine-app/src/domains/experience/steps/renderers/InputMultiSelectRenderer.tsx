@@ -2,20 +2,20 @@
  * Input Multi-Select Renderer
  *
  * Renderer for multiple choice steps.
- * Shows title with checkbox/radio options using themed styling.
+ * Shows title with pill-style selectable options using themed styling.
  * Uses StepLayout for responsive layout with submit button.
  */
 import { StepLayout } from './StepLayout'
 import type { StepRendererProps } from '../registry/step-registry'
 import type { InputMultiSelectStepConfig } from '../schemas/input-multi-select.schema'
-import { ThemedCheckbox, ThemedRadio, ThemedText } from '@/shared/theming'
+import { ThemedSelectOption, ThemedText } from '@/shared/theming'
 
 export function InputMultiSelectRenderer({
   step,
   onSubmit,
 }: StepRendererProps) {
   const config = step.config as InputMultiSelectStepConfig
-  const { title, options, multiSelect } = config
+  const { title, options } = config
 
   return (
     <StepLayout onSubmit={onSubmit}>
@@ -29,27 +29,11 @@ export function InputMultiSelectRenderer({
           {title || <span className="opacity-50">Enter your question...</span>}
         </ThemedText>
 
-        {/* Options */}
-        <div className="flex flex-col gap-2 w-full">
-          {options.map((option, index) =>
-            multiSelect ? (
-              <ThemedCheckbox
-                key={index}
-                label={option}
-                disabled
-                checked={false}
-              />
-            ) : (
-              <ThemedRadio
-                key={index}
-                name={`option-${step.id}`}
-                value={option}
-                label={option}
-                disabled
-                checked={false}
-              />
-            ),
-          )}
+        {/* Options - pill style for both single and multi select */}
+        <div className="flex flex-col gap-3 w-full">
+          {options.map((option, index) => (
+            <ThemedSelectOption key={index} label={option} selected={false} />
+          ))}
         </div>
       </div>
     </StepLayout>

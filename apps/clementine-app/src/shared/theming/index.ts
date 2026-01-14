@@ -40,6 +40,7 @@ export {
   ThemedCheckbox,
   ThemedRadio,
   ThemedScaleButton,
+  ThemedSelectOption,
 } from './components'
 export type {
   ThemedTextProps,
@@ -56,6 +57,7 @@ export type {
   ThemedCheckboxProps,
   ThemedRadioProps,
   ThemedScaleButtonProps,
+  ThemedSelectOptionProps,
 } from './components'
 
 // Hooks

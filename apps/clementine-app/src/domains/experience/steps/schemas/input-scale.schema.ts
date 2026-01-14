@@ -33,6 +33,7 @@ export type InputScaleStepConfig = z.infer<typeof inputScaleStepConfigSchema>
 
 /**
  * Default config factory for input scale steps
+ * Note: Optional fields are omitted (not set to undefined) for Firestore compatibility
  */
 export function createDefaultInputScaleConfig(): InputScaleStepConfig {
   return {
@@ -40,7 +41,6 @@ export function createDefaultInputScaleConfig(): InputScaleStepConfig {
     required: false,
     min: 1,
     max: 5,
-    minLabel: undefined,
-    maxLabel: undefined,
+    // minLabel and maxLabel are optional - omit them rather than setting to undefined
   }
 }

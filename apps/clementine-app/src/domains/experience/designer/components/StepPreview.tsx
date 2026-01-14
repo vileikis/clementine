@@ -17,9 +17,9 @@ import {
   TransformPipelineRenderer,
 } from '../../steps/renderers'
 import type { Step } from '../../steps/registry/step-registry'
-import type {Theme} from '@/shared/theming';
+import type { Theme } from '@/shared/theming'
 import { PreviewShell } from '@/shared/preview-shell'
-import {  ThemeProvider, themeSchema } from '@/shared/theming'
+import { ThemeProvider, themeSchema } from '@/shared/theming'
 
 /** Default theme for step preview (using schema defaults) */
 const DEFAULT_PREVIEW_THEME: Theme = themeSchema.parse({})

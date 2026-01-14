@@ -13,3 +13,6 @@ export type { ThemedRadioProps } from './ThemedRadio'
 
 export { ThemedScaleButton } from './ThemedScaleButton'
 export type { ThemedScaleButtonProps } from './ThemedScaleButton'
+
+export { ThemedSelectOption } from './ThemedSelectOption'
+export type { ThemedSelectOptionProps } from './ThemedSelectOption'

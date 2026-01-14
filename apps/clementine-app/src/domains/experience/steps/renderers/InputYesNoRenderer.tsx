@@ -28,20 +28,10 @@ export function InputYesNoRenderer({ step, onSubmit }: StepRendererProps) {
 
         {/* Yes/No buttons */}
         <div className="flex gap-4">
-          <ThemedButton
-            variant="outline"
-            size="lg"
-            disabled
-            className="min-w-24"
-          >
+          <ThemedButton variant="outline" size="lg" className="min-w-24">
             Yes
           </ThemedButton>
-          <ThemedButton
-            variant="outline"
-            size="lg"
-            disabled
-            className="min-w-24"
-          >
+          <ThemedButton variant="outline" size="lg" className="min-w-24">
             No
           </ThemedButton>
         </div>
