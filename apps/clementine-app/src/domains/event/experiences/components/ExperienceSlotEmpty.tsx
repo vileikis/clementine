@@ -59,7 +59,7 @@ const EMPTY_STATE_MESSAGES: Record<
  */
 export function ExperienceSlotEmpty({
   slot,
-  mode,
+  mode: _mode,
   onAdd,
 }: ExperienceSlotEmptyProps) {
   const { title, description } = EMPTY_STATE_MESSAGES[slot]

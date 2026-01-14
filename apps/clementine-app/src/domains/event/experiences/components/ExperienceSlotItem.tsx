@@ -1,19 +1,17 @@
 /**
  * ExperienceSlotItem Component
  *
- * Individual experience item within a slot manager.
- * Features drag handle, toggles, and context menu with edit/remove actions.
+ * Simplified experience item card for slot manager.
+ * Shows image, name, enabled toggle, and context menu.
+ * Clicking the card opens the details sheet.
  */
-import { ExternalLink, GripVertical, MoreVertical, Trash2 } from 'lucide-react'
+import { ExternalLink, MoreVertical, Trash2 } from 'lucide-react'
 import type { Experience } from '@/domains/experience/shared'
 import type {
   ExperienceReference,
   MainExperienceReference,
 } from '../schemas/event-experiences.schema'
-import type { SlotType } from '../constants'
-import { ProfileBadge } from '@/domains/experience/library/components/ProfileBadge'
 import { Switch } from '@/ui-kit/ui/switch'
-import { Label } from '@/ui-kit/ui/label'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,46 +28,31 @@ export interface ExperienceSlotItemProps {
   /** Full experience data (fetched separately) */
   experience: Experience | null
 
-  /** Slot type - controls which toggles are shown */
-  slot: SlotType
-
-  /** Whether in list mode (shows drag handle) */
-  isListMode: boolean
-
   /** Workspace slug for edit link */
   workspaceSlug: string
 
   /** Callback when enabled state changes */
   onToggleEnabled: (enabled: boolean) => void
 
-  /** Callback when overlay state changes (main slot only) */
-  onToggleOverlay?: (applyOverlay: boolean) => void
+  /** Callback when card is clicked (opens details sheet) */
+  onClick: () => void
 
   /** Callback when item is removed */
   onRemove: () => void
 
-  /** Callback for opening edit in new tab */
-  onEdit: () => void
+  /** Optional drag handle element (rendered by parent for list mode) */
+  dragHandle?: React.ReactNode
 }
 
 /**
- * Check if reference is MainExperienceReference
- */
-function isMainReference(
-  ref: ExperienceReference | MainExperienceReference,
-): ref is MainExperienceReference {
-  return 'applyOverlay' in ref
-}
-
-/**
- * Slot item component for managing experience connections
+ * Simplified slot item component for displaying connected experiences
  *
  * Features:
- * - Drag handle (list mode only)
- * - Thumbnail, name, profile badge
- * - Enable toggle
- * - Overlay toggle (main slot only)
+ * - Thumbnail and name
+ * - Enable toggle (no label)
  * - Context menu with edit and remove actions
+ * - Clickable card to open details sheet
+ * - Optional drag handle slot
  * - Missing experience placeholder
  *
  * @example
@@ -77,31 +60,28 @@ function isMainReference(
  * <ExperienceSlotItem
  *   reference={reference}
  *   experience={experience}
- *   slot="main"
- *   isListMode={true}
  *   workspaceSlug={workspaceSlug}
  *   onToggleEnabled={(enabled) => updateReference({ enabled })}
- *   onToggleOverlay={(applyOverlay) => updateReference({ applyOverlay })}
+ *   onClick={() => setDetailsOpen(true)}
  *   onRemove={() => removeFromSlot(reference.experienceId)}
- *   onEdit={() => openEditor(reference.experienceId)}
+ *   dragHandle={<DragHandle />}
  * />
  * ```
  */
 export function ExperienceSlotItem({
   reference,
   experience,
-  slot,
-  isListMode,
   workspaceSlug,
   onToggleEnabled,
-  onToggleOverlay,
+  onClick,
   onRemove,
-  onEdit,
+  dragHandle,
 }: ExperienceSlotItemProps) {
   // Handle missing experience (deleted from workspace)
   if (!experience) {
     return (
       <div className="flex items-center gap-3 p-3 rounded-lg border bg-muted/50">
+        {dragHandle}
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-muted-foreground">
             Missing Experience
@@ -123,93 +103,73 @@ export function ExperienceSlotItem({
     )
   }
 
-  const isMainSlot = slot === 'main'
-  const showOverlayToggle = isMainSlot && isMainReference(reference)
+  const handleEdit = () => {
+    window.open(
+      `/workspace/${workspaceSlug}/experiences/${reference.experienceId}`,
+      '_blank',
+    )
+  }
 
   return (
-    <div className="flex items-center gap-3 p-3 rounded-lg border bg-card">
-      {/* Drag Handle (list mode only) */}
-      {isListMode && (
-        <div className="cursor-grab active:cursor-grabbing text-muted-foreground">
-          <GripVertical className="h-5 w-5" />
-        </div>
-      )}
+    <div className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
+      {/* Drag Handle (provided by parent) */}
+      {dragHandle}
 
-      {/* Thumbnail */}
-      <div className="w-12 h-12 shrink-0 rounded-md overflow-hidden bg-muted">
-        {experience.media?.url ? (
-          <img
-            src={experience.media.url}
-            alt={experience.name}
-            className={cn('w-full h-full object-cover', {
-              'opacity-50': !reference.enabled,
-            })}
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-            <span className="text-xs">No image</span>
-          </div>
-        )}
-      </div>
-
-      {/* Content */}
-      <div className="flex-1 min-w-0 flex flex-col gap-2">
-        <div className="flex items-center gap-2">
-          <h3
-            className={cn('font-medium text-sm truncate flex-1', {
-              'text-muted-foreground': !reference.enabled,
-            })}
-          >
-            {experience.name}
-          </h3>
-        </div>
-        <ProfileBadge profile={experience.profile} />
-      </div>
-
-      {/* Toggles */}
-      <div className="flex flex-col gap-2">
-        {/* Enable Toggle */}
-        <div className="flex items-center gap-2">
-          <Label
-            htmlFor={`enabled-${reference.experienceId}`}
-            className="text-xs"
-          >
-            Enabled
-          </Label>
-          <Switch
-            id={`enabled-${reference.experienceId}`}
-            checked={reference.enabled}
-            onCheckedChange={onToggleEnabled}
-          />
-        </div>
-
-        {/* Overlay Toggle (main slot only) */}
-        {showOverlayToggle && (
-          <div className="flex items-center gap-2">
-            <Label
-              htmlFor={`overlay-${reference.experienceId}`}
-              className="text-xs"
-            >
-              Overlay
-            </Label>
-            <Switch
-              id={`overlay-${reference.experienceId}`}
-              checked={reference.applyOverlay}
-              onCheckedChange={onToggleOverlay}
+      {/* Clickable Card Content */}
+      <button
+        type="button"
+        onClick={onClick}
+        className="flex items-center gap-3 flex-1 min-w-0 text-left"
+      >
+        {/* Thumbnail */}
+        <div className="w-10 h-10 shrink-0 rounded-md overflow-hidden bg-muted">
+          {experience.media?.url ? (
+            <img
+              src={experience.media.url}
+              alt={experience.name}
+              className={cn('w-full h-full object-cover', {
+                'opacity-50': !reference.enabled,
+              })}
             />
-          </div>
-        )}
-      </div>
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+              <span className="text-[10px]">No img</span>
+            </div>
+          )}
+        </div>
+
+        {/* Name */}
+        <h3
+          className={cn('font-medium text-sm truncate flex-1', {
+            'text-muted-foreground': !reference.enabled,
+          })}
+        >
+          {experience.name}
+        </h3>
+      </button>
+
+      {/* Enable Toggle (no label) */}
+      <Switch
+        checked={reference.enabled}
+        onCheckedChange={onToggleEnabled}
+        onClick={(e) => e.stopPropagation()}
+        aria-label={`Enable ${experience.name}`}
+      />
 
       {/* Context Menu */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="shrink-0">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="shrink-0 h-8 w-8"
+            onClick={(e) => e.stopPropagation()}
+          >
             <MoreVertical className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={onEdit} className="gap-2">
+          <DropdownMenuItem onClick={handleEdit} className="gap-2">
             <ExternalLink className="h-4 w-4" />
             Edit in new tab
           </DropdownMenuItem>

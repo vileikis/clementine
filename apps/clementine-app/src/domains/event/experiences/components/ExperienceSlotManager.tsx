@@ -1,37 +1,20 @@
 /**
  * ExperienceSlotManager Component
  *
- * Main orchestrator component for managing experiences in a slot.
- * Handles display, drag-and-drop reordering, and connecting/removing experiences.
+ * Thin orchestrator for managing experiences in a slot.
+ * Delegates to specialized components for list and single modes.
  */
-import { useMemo, useState } from 'react'
-import {
-  DndContext,
-  KeyboardSensor,
-  PointerSensor,
-  closestCenter,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core'
-import {
-  SortableContext,
-  sortableKeyboardCoordinates,
-  useSortable,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
+import { useState } from 'react'
 import { Plus } from 'lucide-react'
-import { useQuery } from '@tanstack/react-query'
-import { ExperienceSlotItem } from './ExperienceSlotItem'
 import { ExperienceSlotEmpty } from './ExperienceSlotEmpty'
 import { ConnectExperienceDrawer } from './ConnectExperienceDrawer'
-import type { DragEndEvent } from '@dnd-kit/core'
+import { ExperienceListView } from './ExperienceListView'
+import { SingleExperienceView } from './SingleExperienceView'
 import type {
   ExperienceReference,
   MainExperienceReference,
 } from '../schemas/event-experiences.schema'
 import type { SlotMode, SlotType } from '../constants'
-import { experienceQuery } from '@/domains/experience/shared/queries/experience.query'
 import { Button } from '@/ui-kit/ui/button'
 
 export interface ExperienceSlotManagerProps {
@@ -75,75 +58,13 @@ export interface ExperienceSlotManagerProps {
 }
 
 /**
- * Sortable wrapper component for drag-and-drop
- */
-function SortableExperienceItem({
-  reference,
-  workspaceId,
-  workspaceSlug,
-  slot,
-  isListMode,
-  assignedExperienceIds,
-  onToggleEnabled,
-  onToggleOverlay,
-  onRemove,
-}: {
-  reference: ExperienceReference | MainExperienceReference
-  workspaceId: string
-  workspaceSlug: string
-  slot: SlotType
-  isListMode: boolean
-  assignedExperienceIds: string[]
-  onToggleEnabled: (enabled: boolean) => void
-  onToggleOverlay?: (applyOverlay: boolean) => void
-  onRemove: () => void
-}) {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: reference.experienceId })
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  }
-
-  // Fetch experience details
-  const { data: experience = null } = useQuery(
-    experienceQuery(workspaceId, reference.experienceId),
-  )
-
-  // Handle edit in new tab
-  const handleEdit = () => {
-    window.open(
-      `/workspace/${workspaceSlug}/experiences/${reference.experienceId}`,
-      '_blank',
-    )
-  }
-
-  return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <ExperienceSlotItem
-        reference={reference}
-        experience={experience}
-        slot={slot}
-        isListMode={isListMode}
-        workspaceSlug={workspaceSlug}
-        onToggleEnabled={onToggleEnabled}
-        onToggleOverlay={onToggleOverlay}
-        onRemove={onRemove}
-        onEdit={handleEdit}
-      />
-    </div>
-  )
-}
-
-/**
  * Slot manager component for connecting and managing experiences
  *
  * Features:
  * - List mode: Multiple items with drag-and-drop reordering
  * - Single mode: 0 or 1 item, no reordering
  * - Connect drawer for adding experiences
- * - Toggle enabled/overlay states
+ * - Toggle enabled/overlay states via details sheet
  * - Remove experiences
  * - Empty state when no experiences
  *
@@ -187,39 +108,6 @@ export function ExperienceSlotManager({
   const isListMode = mode === 'list'
   const isEmpty = experiences.length === 0
 
-  // Configure sensors for drag and drop
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8, // Require 8px movement before drag starts
-      },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    }),
-  )
-
-  // Handle drag end to reorder experiences
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event
-
-    if (over && active.id !== over.id) {
-      const oldIndex = experiences.findIndex(
-        (exp) => exp.experienceId === active.id,
-      )
-      const newIndex = experiences.findIndex(
-        (exp) => exp.experienceId === over.id,
-      )
-
-      if (oldIndex !== -1 && newIndex !== -1) {
-        const newExperiences = [...experiences]
-        const [movedItem] = newExperiences.splice(oldIndex, 1)
-        newExperiences.splice(newIndex, 0, movedItem)
-        onUpdate(newExperiences)
-      }
-    }
-  }
-
   // Handle adding experience from drawer
   const handleSelect = (experienceId: string) => {
     const newReference: ExperienceReference | MainExperienceReference =
@@ -261,15 +149,16 @@ export function ExperienceSlotManager({
     )
   }
 
-  // Experience IDs for sortable context
-  const experienceIds = useMemo(
-    () => experiences.map((exp) => exp.experienceId),
-    [experiences],
-  )
+  // Handle reorder (list mode only)
+  const handleReorder = (
+    newExperiences: (ExperienceReference | MainExperienceReference)[],
+  ) => {
+    onUpdate(newExperiences)
+  }
 
   return (
     <div className="space-y-3">
-      {/* Experience List */}
+      {/* Experience List or Empty State */}
       {isEmpty ? (
         <ExperienceSlotEmpty
           slot={slot}
@@ -280,85 +169,28 @@ export function ExperienceSlotManager({
         <>
           {isListMode ? (
             // List mode with drag-and-drop
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragEnd={handleDragEnd}
-            >
-              <SortableContext
-                items={experienceIds}
-                strategy={verticalListSortingStrategy}
-              >
-                <div className="space-y-2">
-                  {experiences.map((reference) => (
-                    <SortableExperienceItem
-                      key={reference.experienceId}
-                      reference={reference}
-                      workspaceId={workspaceId}
-                      workspaceSlug={workspaceSlug}
-                      slot={slot}
-                      isListMode={isListMode}
-                      assignedExperienceIds={assignedExperienceIds}
-                      onToggleEnabled={(enabled) =>
-                        handleToggleEnabled(reference.experienceId, enabled)
-                      }
-                      onToggleOverlay={
-                        slot === 'main'
-                          ? (applyOverlay) =>
-                              handleToggleOverlay(
-                                reference.experienceId,
-                                applyOverlay,
-                              )
-                          : undefined
-                      }
-                      onRemove={() => handleRemove(reference.experienceId)}
-                    />
-                  ))}
-                </div>
-              </SortableContext>
-            </DndContext>
+            <ExperienceListView
+              slot={slot}
+              workspaceId={workspaceId}
+              workspaceSlug={workspaceSlug}
+              experiences={experiences as MainExperienceReference[]}
+              onReorder={handleReorder}
+              onToggleEnabled={handleToggleEnabled}
+              onToggleOverlay={handleToggleOverlay}
+              onRemove={handleRemove}
+            />
           ) : (
-            // Single mode without drag-and-drop
-            <div className="space-y-2">
-              {experiences.map((reference) => {
-                // Fetch experience details
-                const { data: experience = null } = useQuery(
-                  experienceQuery(workspaceId, reference.experienceId),
-                )
-
-                const handleEdit = () => {
-                  window.open(
-                    `/workspace/${workspaceSlug}/experiences/${reference.experienceId}`,
-                    '_blank',
-                  )
-                }
-
-                return (
-                  <ExperienceSlotItem
-                    key={reference.experienceId}
-                    reference={reference}
-                    experience={experience}
-                    slot={slot}
-                    isListMode={false}
-                    workspaceSlug={workspaceSlug}
-                    onToggleEnabled={(enabled) =>
-                      handleToggleEnabled(reference.experienceId, enabled)
-                    }
-                    onToggleOverlay={
-                      slot === 'main' && 'applyOverlay' in reference
-                        ? (applyOverlay) =>
-                            handleToggleOverlay(
-                              reference.experienceId,
-                              applyOverlay,
-                            )
-                        : undefined
-                    }
-                    onRemove={() => handleRemove(reference.experienceId)}
-                    onEdit={handleEdit}
-                  />
-                )
-              })}
-            </div>
+            // Single mode - render first item only
+            <SingleExperienceView
+              slot={slot}
+              workspaceId={workspaceId}
+              workspaceSlug={workspaceSlug}
+              reference={experiences[0] as ExperienceReference}
+              onToggleEnabled={(enabled) =>
+                handleToggleEnabled(experiences[0].experienceId, enabled)
+              }
+              onRemove={() => handleRemove(experiences[0].experienceId)}
+            />
           )}
 
           {/* Add Button (list mode only) */}

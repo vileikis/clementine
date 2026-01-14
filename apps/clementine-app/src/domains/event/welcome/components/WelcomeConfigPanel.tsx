@@ -164,7 +164,9 @@ export function WelcomeConfigPanel({
             workspaceId={workspaceId}
             workspaceSlug={workspaceSlug}
             experiences={mainExperiences}
-            onUpdate={onUpdateMainExperiences}
+            onUpdate={(exps) =>
+              onUpdateMainExperiences(exps as MainExperienceReference[])
+            }
             assignedExperienceIds={assignedExperienceIds}
             isLoading={disabled}
           />
