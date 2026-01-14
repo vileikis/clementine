@@ -169,11 +169,11 @@ All paths are relative to `apps/clementine-app/src/`:
 
 ### Implementation for US4
 
-- [ ] T055 [US4] Create validateForPublish function in `domains/experience/designer/hooks/usePublishExperience.ts` checking: steps.length > 0, all configs valid per schema, step types allowed for profile
-- [ ] T056 [US4] Create usePublishExperience hook in `domains/experience/designer/hooks/usePublishExperience.ts` that validates, then copies draft to published with publishedAt/publishedBy
-- [ ] T057 [US4] Wire Publish button in `domains/experience/designer/containers/ExperienceDesignerLayout.tsx` to usePublishExperience, show loading state during publish
-- [ ] T058 [US4] Display validation errors in UI when publish fails: use toast or inline error list showing specific field/step issues
-- [ ] T059 [US4] Show success toast notification on publish completion using Sonner
+- [X] T055 [US4] Create validateForPublish function in `domains/experience/designer/hooks/usePublishExperience.ts` checking: steps.length > 0, all configs valid per schema, step types allowed for profile
+- [X] T056 [US4] Create usePublishExperience hook in `domains/experience/designer/hooks/usePublishExperience.ts` that validates, then copies draft to published with publishedAt/publishedBy
+- [X] T057 [US4] Wire Publish button in `domains/experience/designer/containers/ExperienceDesignerLayout.tsx` to usePublishExperience, show loading state during publish
+- [X] T058 [US4] Display validation errors in UI when publish fails: use toast or inline error list showing specific field/step issues
+- [X] T059 [US4] Show success toast notification on publish completion using Sonner
 
 **Checkpoint**: User Story 4 complete - admin can publish experiences with validation. Full editing workflow functional.
 

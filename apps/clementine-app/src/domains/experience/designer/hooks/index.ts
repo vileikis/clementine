@@ -15,3 +15,18 @@ export type {
 
 export { useUpdateDraftSteps } from './useUpdateDraftSteps'
 export type { UpdateDraftStepsInput } from './useUpdateDraftSteps'
+
+// Publish hooks
+export {
+  usePublishExperience,
+  validateForPublish,
+  formatValidationErrors,
+  isValidationError,
+  isPublishSuccess,
+} from './usePublishExperience'
+export type {
+  PublishExperienceInput,
+  PublishExperienceResult,
+  PublishValidationError,
+  PublishValidationResult,
+} from './usePublishExperience'
