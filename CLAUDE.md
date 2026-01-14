@@ -305,6 +305,8 @@ See individual workspace documentation for required environment variables.
 - N/A (no data layer changes) (023-top-bar-with-tabs)
 - TypeScript 5.7.2 (strict mode, ES2022 target) + TanStack Start 1.132.0, TanStack Router 1.132.0, React 19.2.0, TanStack Query 5.66.5, Zod 4.1.12, react-hook-form, shadcn/ui, Radix UI (024-share-editor)
 - Firebase Firestore (client SDK) - `projects/{projectId}/events/{eventId}` with nested `draftConfig.share` field (024-share-editor)
+- TypeScript 5.7.2 (strict mode, ES2022 target) + TanStack Start 1.132.0, TanStack Query 5.66.5, TanStack Router 1.132.0, React 19.2.0, Zod 4.1.12, @dnd-kit/core, @dnd-kit/sortable, shadcn/ui (Sheet component) (025-event-exp-integration)
+- Firebase Firestore (client SDK) - extends `projectEventConfigSchema` with `experiences` field (025-event-exp-integration)
 
 ## Recent Changes
 - 019-exp-system-foundations: Added TypeScript 5.7.2 (strict mode, ES2022 target) + Zod 4.1.12 (validation), TanStack Query 5.66.5 (data fetching), Firebase SDK 12.5.0 (Firestore)

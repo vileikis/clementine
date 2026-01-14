@@ -5,7 +5,7 @@
  * Integrates with auto-save, tracked mutations, and PreviewShell.
  */
 
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useParams } from '@tanstack/react-router'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -13,6 +13,7 @@ import { WelcomeConfigPanel, WelcomePreview } from '../components'
 import { useUpdateWelcome, useUploadAndUpdateHeroMedia } from '../hooks'
 import { DEFAULT_WELCOME } from '../constants'
 import type { WelcomeConfig } from '@/domains/event/shared'
+import type { MainExperienceReference } from '@/domains/event/experiences'
 import { PreviewShell } from '@/shared/preview-shell'
 import { useAutoSave } from '@/shared/forms'
 import { useProjectEvent } from '@/domains/event/shared'
@@ -20,6 +21,10 @@ import { useWorkspace } from '@/domains/workspace'
 import { useAuth } from '@/domains/auth'
 import { DEFAULT_THEME } from '@/domains/event/theme/constants'
 import { ThemeProvider } from '@/shared/theming'
+import {
+  useExperiencesForSlot,
+  useUpdateEventExperiences,
+} from '@/domains/event/experiences'
 
 // Fields to compare for auto-save change detection
 const WELCOME_FIELDS_TO_COMPARE: (keyof WelcomeConfig)[] = [
@@ -45,6 +50,35 @@ export function WelcomeEditorPage() {
   // Get current theme from event or use defaults
   const currentTheme = event?.draftConfig?.theme ?? DEFAULT_THEME
 
+  // Get current experiences from event
+  const mainExperiences = event?.draftConfig?.experiences?.main ?? []
+  const pregateExperience = event?.draftConfig?.experiences?.pregate
+  const preshareExperience = event?.draftConfig?.experiences?.preshare
+
+  // Fetch available experiences for the main slot
+  const { data: availableExperiences = [] } = useExperiencesForSlot(
+    workspace?.id ?? '',
+    'main',
+  )
+
+  // Get all assigned experience IDs across all slots
+  const assignedExperienceIds = useMemo(() => {
+    const ids: string[] = [...mainExperiences.map((exp) => exp.experienceId)]
+    if (pregateExperience) ids.push(pregateExperience.experienceId)
+    if (preshareExperience) ids.push(preshareExperience.experienceId)
+    return ids
+  }, [mainExperiences, pregateExperience, preshareExperience])
+
+  // Filter available experiences to get details for main experiences
+  const mainExperienceDetails = useMemo(() => {
+    const experienceMap = new Map(
+      availableExperiences.map((exp) => [exp.id, exp]),
+    )
+    return mainExperiences
+      .map((ref) => experienceMap.get(ref.experienceId))
+      .filter((exp): exp is NonNullable<typeof exp> => exp !== undefined)
+  }, [mainExperiences, availableExperiences])
+
   // Form setup
   const form = useForm<WelcomeConfig>({
     defaultValues: currentWelcome,
@@ -57,6 +91,10 @@ export function WelcomeEditorPage() {
     workspace?.id ?? '',
     user?.uid ?? '',
   )
+  const updateEventExperiences = useUpdateEventExperiences({
+    projectId: projectId!,
+    eventId: eventId!,
+  })
 
   // Auto-save with debounce
   const { triggerSave } = useAutoSave({
@@ -129,6 +167,23 @@ export function WelcomeEditorPage() {
     [uploadHeroMedia, form, workspace?.id, user?.uid, triggerSave],
   )
 
+  // Handler for updating main experiences
+  const handleUpdateMainExperiences = useCallback(
+    async (experiences: MainExperienceReference[]) => {
+      try {
+        await updateEventExperiences.mutateAsync({ main: experiences })
+        // No toast - changes are reflected immediately via real-time updates
+      } catch (error) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : 'Failed to update experiences'
+        toast.error(message)
+      }
+    },
+    [updateEventExperiences],
+  )
+
   // Loading state
   if (!event || !user || !workspace) {
     return null
@@ -153,6 +208,13 @@ export function WelcomeEditorPage() {
           onUploadHeroMedia={handleUploadHeroMedia}
           uploadingHeroMedia={isUploading}
           uploadProgress={uploadProgress}
+          workspaceId={workspace.id}
+          workspaceSlug={workspaceSlug!}
+          mainExperiences={mainExperiences}
+          assignedExperienceIds={assignedExperienceIds}
+          onUpdateMainExperiences={handleUpdateMainExperiences}
+          pregateExperience={pregateExperience}
+          preshareExperience={preshareExperience}
         />
       </aside>
 
@@ -160,7 +222,11 @@ export function WelcomeEditorPage() {
       <div className="flex-1 min-w-0">
         <PreviewShell enableViewportSwitcher enableFullscreen>
           <ThemeProvider theme={currentTheme}>
-            <WelcomePreview welcome={previewWelcome} />
+            <WelcomePreview
+              welcome={previewWelcome}
+              mainExperiences={mainExperiences}
+              experienceDetails={mainExperienceDetails}
+            />
           </ThemeProvider>
         </PreviewShell>
       </div>

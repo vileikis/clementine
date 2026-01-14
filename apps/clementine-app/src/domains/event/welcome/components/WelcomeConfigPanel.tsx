@@ -5,7 +5,7 @@
  * Organized into sections: Content (title, description, media), Experiences (layout).
  */
 
-import { LayoutGrid, LayoutList } from 'lucide-react'
+import { Info, LayoutGrid, LayoutList } from 'lucide-react'
 import {
   WELCOME_DESCRIPTION_MAX_LENGTH,
   WELCOME_TITLE_MAX_LENGTH,
@@ -13,6 +13,10 @@ import {
 import type { ExperiencePickerLayout } from '../schemas'
 import type { WelcomeConfig } from '@/domains/event/shared'
 import type { EditorOption } from '@/shared/editor-controls'
+import type {
+  ExperienceReference,
+  MainExperienceReference,
+} from '@/domains/event/experiences'
 import {
   EditorSection,
   MediaPickerField,
@@ -20,6 +24,8 @@ import {
   TextareaField,
   ToggleGroupField,
 } from '@/shared/editor-controls'
+import { ExperienceSlotManager } from '@/domains/event/experiences'
+import { Alert, AlertDescription } from '@/ui-kit/ui/alert'
 
 export interface WelcomeConfigPanelProps {
   /** Current welcome values */
@@ -34,6 +40,20 @@ export interface WelcomeConfigPanelProps {
   uploadingHeroMedia?: boolean
   /** Hero media upload progress (0-100) */
   uploadProgress?: number
+  /** Workspace ID for fetching experiences */
+  workspaceId: string
+  /** Workspace slug for experience links */
+  workspaceSlug: string
+  /** Main experiences array */
+  mainExperiences: MainExperienceReference[]
+  /** All assigned experience IDs across all slots */
+  assignedExperienceIds: string[]
+  /** Callback when main experiences are updated */
+  onUpdateMainExperiences: (experiences: MainExperienceReference[]) => void
+  /** Pregate experience (optional, for info callout) */
+  pregateExperience?: ExperienceReference | null
+  /** Preshare experience (optional, for info callout) */
+  preshareExperience?: ExperienceReference | null
 }
 
 // Layout options for experience picker
@@ -49,7 +69,18 @@ export function WelcomeConfigPanel({
   disabled = false,
   uploadingHeroMedia = false,
   uploadProgress,
+  workspaceId,
+  workspaceSlug,
+  mainExperiences,
+  assignedExperienceIds,
+  onUpdateMainExperiences,
+  pregateExperience,
+  preshareExperience,
 }: WelcomeConfigPanelProps) {
+  // Check if pregate or preshare is configured
+  const hasGuestFlowExperiences = Boolean(
+    pregateExperience || preshareExperience,
+  )
   return (
     <div className="space-y-0">
       {/* Content Section - title, description, hero media */}
@@ -89,7 +120,7 @@ export function WelcomeConfigPanel({
         />
       </EditorSection>
 
-      {/* Experiences Section - layout (future: experience list) */}
+      {/* Experiences Section - layout and experience list */}
       <EditorSection title="Experiences">
         <ToggleGroupField
           label="Layout"
@@ -98,6 +129,48 @@ export function WelcomeConfigPanel({
           options={LAYOUT_OPTIONS}
           disabled={disabled}
         />
+
+        {/* Experience Slot Manager for main experiences */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Connected Experiences</label>
+          <ExperienceSlotManager
+            mode="list"
+            slot="main"
+            workspaceId={workspaceId}
+            workspaceSlug={workspaceSlug}
+            experiences={mainExperiences}
+            onUpdate={(exps) =>
+              onUpdateMainExperiences(exps as MainExperienceReference[])
+            }
+            assignedExperienceIds={assignedExperienceIds}
+            isLoading={disabled}
+          />
+        </div>
+
+        {/* Info callout when pregate or preshare is configured */}
+        {hasGuestFlowExperiences && (
+          <Alert className="mb-4">
+            <Info className="h-4 w-4" />
+            <AlertDescription className="text-xs">
+              {pregateExperience && preshareExperience ? (
+                <>
+                  Pregate and preshare experiences are configured in{' '}
+                  <span className="font-medium">Settings</span>.
+                </>
+              ) : pregateExperience ? (
+                <>
+                  A pregate experience is configured in{' '}
+                  <span className="font-medium">Settings</span>.
+                </>
+              ) : (
+                <>
+                  A preshare experience is configured in{' '}
+                  <span className="font-medium">Settings</span>.
+                </>
+              )}
+            </AlertDescription>
+          </Alert>
+        )}
       </EditorSection>
     </div>
   )

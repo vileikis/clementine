@@ -14,7 +14,8 @@ Enable admins to connect workspace experiences to events, managing which experie
 
 - Experience assignment UI in event designer
 - ExperienceSlotManager component (reusable)
-- Main experiences in Welcome tab
+- ConnectExperienceDrawer (slide-over panel with search)
+- Main experiences in Welcome tab (with overlay toggle)
 - Pregate/preshare experiences in Settings tab
 - Welcome screen WYSIWYG (shows actual experience cards)
 - Event config schema updates for experiences field
@@ -38,6 +39,7 @@ experiences: {
   main: Array<{
     experienceId: string
     enabled: boolean
+    applyOverlay: boolean  // Whether to apply event overlay on result media
   }>
   pregate: {
     experienceId: string
@@ -76,7 +78,12 @@ interface ExperienceSlotManagerProps {
 interface ExperienceReference {
   experienceId: string
   enabled: boolean
+  applyOverlay?: boolean  // Only for main slot
 }
+
+// Default values when connecting an experience:
+// - enabled: true
+// - applyOverlay: true (main slot only)
 ```
 
 ### 3.2 Mode Behavior
@@ -86,17 +93,19 @@ interface ExperienceReference {
 | `list` | Multiple items, drag-to-reorder, "Add" always visible |
 | `single` | 0 or 1 item, no reorder, "Add" only when empty |
 
-### 3.3 Internal State Machine
+### 3.3 Panel Management
+
+The slot manager controls opening/closing of the ConnectExperienceDrawer:
 
 ```
-default → ConnectExperiencePanel → CreateExperiencePanel → default
-    ↑______________|_______________________|
+default ←→ ConnectExperienceDrawer (slide-over)
 ```
 
 States:
-- **default**: Shows experience list/item
-- **connecting**: Shows experience picker
-- **creating**: Shows create experience form
+- **default**: Shows experience list/item with "Add" button
+- **drawer open**: ConnectExperienceDrawer slides in from right
+
+Note: Creating new experiences opens a new browser tab to `/workspace/$workspaceSlug/experiences/new`
 
 ---
 
@@ -105,11 +114,11 @@ States:
 ### 4.1 Layout
 
 ```
-┌─────────────────────────────────────────────────┐
-│ ⋮⋮  [thumb] Experience Name  [badge]  [toggle] ⋯│
-└─────────────────────────────────────────────────┘
-     ↑      ↑          ↑          ↑        ↑     ↑
-  drag   media      name      profile  enable  menu
+┌───────────────────────────────────────────────────────────────┐
+│ ⋮⋮  [thumb] Experience Name  [badge]  [overlay] [toggle] ⋯   │
+└───────────────────────────────────────────────────────────────┘
+     ↑      ↑          ↑          ↑         ↑        ↑      ↑
+  drag   media      name      profile   overlay   enable  menu
 ```
 
 ### 4.2 Elements
@@ -120,7 +129,8 @@ States:
 | Thumbnail | Always | Visual identifier |
 | Name | Always | - |
 | Profile badge | Always | Visual indicator |
-| Toggle | Always | Enable/disable |
+| Overlay toggle | Main slot only | Toggle applyOverlay flag |
+| Enable toggle | Always | Enable/disable experience |
 | Context menu | Always | Edit (new tab), Remove |
 
 ### 4.3 Context Menu Actions
@@ -130,81 +140,61 @@ States:
 
 ---
 
-## 5. ConnectExperiencePanel
+## 5. ConnectExperienceDrawer
+
+A slide-over drawer panel that opens from the right side when user clicks "Add" to connect an experience.
 
 ### 5.1 Layout
 
 ```
 ┌─────────────────────────────────────┐
-│ ← Back                              │
+│ Connect Experience              ✕   │
 ├─────────────────────────────────────┤
-│ Select Experience                   │
+│ ┌─────────────────────────────────┐ │
+│ │ 🔍 Search experiences...        │ │
+│ └─────────────────────────────────┘ │
+│                                     │
+│ Available Experiences               │
 │                                     │
 │ ┌─────────────────────────────────┐ │
-│ │ [thumb] Exp 1        [freeform] │ │
+│ │ [thumb] Exp 1        [freeform] │ │ ← click to connect
 │ ├─────────────────────────────────┤ │
-│ │ [thumb] Exp 2 (in use) [survey] │ │ ← disabled
+│ │ [thumb] Exp 2 (in use) [survey] │ │ ← disabled, already assigned
 │ ├─────────────────────────────────┤ │
 │ │ [thumb] Exp 3        [freeform] │ │
 │ └─────────────────────────────────┘ │
 │                                     │
-│ [+ Create New Experience]           │
+│ ─────────────────────────────────── │
+│                                     │
+│ [+ Create New Experience ↗]         │ ← opens new tab
 └─────────────────────────────────────┘
 ```
 
-### 5.2 Filtering
+### 5.2 Search
+
+- Search field with magnifying glass icon at the top
+- **Filter as-you-type** with 300ms debounce
+- Filters experiences by name (case-insensitive)
+- Shows "No experiences found" when search has no results
+- Clear button (×) appears when search has text
+
+### 5.3 Filtering
 
 - Shows only experiences matching slot's allowed profiles
-- Experiences already assigned to this event are disabled
+- Experiences already assigned to this event are disabled with "(in use)" indicator
 - Shows profile badge on each item
 
-### 5.3 Actions
+### 5.4 Actions
 
-- **Back**: Return to default state
-- **Select**: Assigns experience to slot, returns to default
-- **Create New**: Navigates to creating state
-
----
-
-## 6. CreateExperiencePanel
-
-### 6.1 Layout
-
-```
-┌─────────────────────────────────────┐
-│ ← Back                              │
-├─────────────────────────────────────┤
-│ Create Experience                   │
-│                                     │
-│ Name                                │
-│ [________________________]          │
-│                                     │
-│ Profile                             │
-│ ○ Freeform - Full flexibility       │
-│ ● Survey - Data collection          │
-│ ○ Story - Display only              │
-│                                     │
-│ [Create]                            │
-└─────────────────────────────────────┘
-```
-
-### 6.2 Profile Options
-
-Filtered by slot compatibility:
-- **main**: freeform, survey
-- **pregate**: survey, story
-- **preshare**: survey, story
-
-### 6.3 Actions
-
-- **Back**: Return to connecting state
-- **Create**: Creates experience, assigns to slot, returns to default
+- **Close (✕)**: Closes drawer, returns to default state
+- **Select item**: Connects experience to slot, closes drawer
+- **Create New Experience**: Opens `/workspace/$workspaceSlug/experiences/new` in new browser tab (drawer remains open)
 
 ---
 
-## 7. Welcome Tab Integration
+## 6. Welcome Tab Integration
 
-### 7.1 WelcomeConfigPanel Updates
+### 6.1 WelcomeConfigPanel Updates
 
 Add "Experiences" section below existing welcome config:
 
@@ -226,15 +216,15 @@ Add "Experiences" section below existing welcome config:
 └─────────────────────────────────────┘
 ```
 
-### 7.2 Callout
+### 6.2 Callout
 
 If pregate or preshare experiences are configured, show info callout with link to Settings tab.
 
 ---
 
-## 8. Settings Tab Integration
+## 7. Settings Tab Integration
 
-### 8.1 Guest Flow Section
+### 7.1 Guest Flow Section
 
 Add "Guest Flow" section to EventSettingsPage:
 
@@ -257,13 +247,13 @@ Add "Guest Flow" section to EventSettingsPage:
 
 ---
 
-## 9. Welcome Screen WYSIWYG
+## 8. Welcome Screen WYSIWYG
 
-### 9.1 Preview Updates
+### 8.1 Preview Updates
 
 The welcome preview (center column) should show actual experience cards from `draftConfig.experiences.main`.
 
-### 9.2 ExperienceCard Component
+### 8.2 ExperienceCard Component
 
 Shared component for displaying experience in welcome screen:
 
@@ -276,7 +266,7 @@ interface ExperienceCardProps {
 }
 ```
 
-### 9.3 Edit Mode Behavior
+### 8.3 Edit Mode Behavior
 
 - Shows experience thumbnail, name, profile badge
 - Non-interactive (clicking does nothing)
@@ -285,7 +275,7 @@ interface ExperienceCardProps {
 
 ---
 
-## 10. Implementation Phases
+## 9. Implementation Phases
 
 ### Phase 1: Schema Updates
 
@@ -293,15 +283,15 @@ Add experiences field to event config schema. Handle migration for existing even
 
 ### Phase 2: ExperienceSlotManager
 
-Build reusable slot manager component with state machine, list/single modes.
+Build reusable slot manager component with list/single modes and drawer state management.
 
 ### Phase 3: Experience List Item
 
-Build list item with thumbnail, badge, toggle, drag handle, context menu.
+Build list item with thumbnail, badge, enable toggle, overlay toggle (main slot only), drag handle, context menu.
 
-### Phase 4: Connect & Create Panels
+### Phase 4: ConnectExperienceDrawer
 
-Build experience picker and create form panels with proper filtering.
+Build slide-over drawer with search, experience list, profile filtering, and "Create New" link (opens new tab).
 
 ### Phase 5: Welcome Tab Integration
 
@@ -317,20 +307,24 @@ Update welcome preview to show actual experience cards from draft config.
 
 ---
 
-## 11. Acceptance Criteria
+## 10. Acceptance Criteria
 
 ### Must Have
 
 - [ ] Event config includes experiences field (main, pregate, preshare)
+- [ ] Main experiences include applyOverlay flag (defaults to true)
 - [ ] Admin can add main experiences from Welcome tab
 - [ ] Admin can reorder main experiences via drag-and-drop
 - [ ] Admin can enable/disable experiences
+- [ ] Admin can toggle applyOverlay for main experiences
 - [ ] Admin can remove experiences from event
 - [ ] Admin can add pregate experience from Settings
 - [ ] Admin can add preshare experience from Settings
+- [ ] Connect drawer opens as slide-over panel from right
+- [ ] Connect drawer has search field with as-you-type filtering
 - [ ] Experience picker filters by slot-compatible profiles
 - [ ] Already-assigned experiences are disabled in picker
-- [ ] Admin can create new experience from picker
+- [ ] "Create New Experience" opens create page in new browser tab
 - [ ] "Edit" opens experience editor in new tab
 - [ ] Welcome preview shows actual experience cards
 - [ ] Callout appears when pregate/preshare configured
@@ -342,7 +336,7 @@ Update welcome preview to show actual experience cards from draft config.
 
 ---
 
-## 12. Technical Notes
+## 11. Technical Notes
 
 ### Folder Structure
 
@@ -352,8 +346,7 @@ domains/event/
 │   ├── components/
 │   │   ├── ExperienceSlotManager.tsx
 │   │   ├── ExperienceListItem.tsx
-│   │   ├── ConnectExperiencePanel.tsx
-│   │   ├── CreateExperiencePanel.tsx
+│   │   ├── ConnectExperienceDrawer.tsx   # Slide-over with search
 │   │   └── ExperienceCard.tsx
 │   └── hooks/
 │       └── useExperiencesForSlot.ts
@@ -374,7 +367,7 @@ domains/event/
 
 ---
 
-## 13. Out of Scope
+## 12. Out of Scope
 
 | Item | Epic |
 |------|------|

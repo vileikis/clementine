@@ -27,6 +27,7 @@ describe('projectEventFullSchema', () => {
           welcome: null,
           share: null,
           shareOptions: null,
+          experiences: null,
         },
         publishedConfig: null,
 
