@@ -1,33 +1,39 @@
 /**
  * Input Long Text Renderer
  *
- * Edit-mode renderer for long text input steps.
- * Shows title with disabled textarea.
+ * Renderer for long text input steps.
+ * Shows title with textarea using themed styling.
+ * Uses StepLayout for responsive layout with submit button.
  */
+import { StepLayout } from './StepLayout'
 import type { StepRendererProps } from '../registry/step-registry'
 import type { InputLongTextStepConfig } from '../schemas/input-long-text.schema'
-import { Textarea } from '@/ui-kit/ui/textarea'
+import { ThemedText, ThemedTextarea } from '@/shared/theming'
 
-export function InputLongTextRenderer({ step }: StepRendererProps) {
+export function InputLongTextRenderer({ step, onSubmit }: StepRendererProps) {
   const config = step.config as InputLongTextStepConfig
   const { title, placeholder } = config
 
   return (
-    <div className="flex flex-col items-center gap-6 p-6">
-      {/* Title */}
-      <p className="text-center text-lg font-medium">
-        {title || (
-          <span className="text-muted-foreground">Enter your question...</span>
-        )}
-      </p>
+    <StepLayout onSubmit={onSubmit}>
+      <div className="flex flex-col items-center gap-8 w-full max-w-md">
+        {/* Title */}
+        <ThemedText
+          variant="body"
+          as="p"
+          className="text-center text-lg font-medium"
+        >
+          {title || <span className="opacity-50">Enter your question...</span>}
+        </ThemedText>
 
-      {/* Textarea */}
-      <Textarea
-        placeholder={placeholder || 'Type your answer...'}
-        disabled
-        className="max-w-sm"
-        rows={4}
-      />
-    </div>
+        {/* Textarea */}
+        <ThemedTextarea
+          placeholder={placeholder || 'Type your answer...'}
+          disabled
+          rows={4}
+          className="w-full"
+        />
+      </div>
+    </StepLayout>
   )
 }

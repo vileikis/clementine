@@ -187,11 +187,11 @@ All paths are relative to `apps/clementine-app/src/`:
 
 ### Implementation for US5
 
-- [ ] T060 [US5] Enhance InfoStepRenderer to show "Add a title..." placeholder when title empty, "Add a description..." when description empty
-- [ ] T061 [US5] Enhance InputScaleRenderer to show placeholder question text when empty, proper scale visualization
-- [ ] T062 [US5] Enhance all input renderers (YesNo, MultiSelect, ShortText, LongText) with appropriate placeholder states
-- [ ] T063 [US5] Enhance CapturePhotoRenderer to show countdown overlay if countdown > 0
-- [ ] T064 [US5] Ensure preview updates synchronously (<100ms) when config changes by using local state before auto-save
+- [X] T060 [US5] Enhance InfoStepRenderer to show "Add a title..." placeholder when title empty, "Add a description..." when description empty
+- [X] T061 [US5] Enhance InputScaleRenderer to show placeholder question text when empty, proper scale visualization
+- [X] T062 [US5] Enhance all input renderers (YesNo, MultiSelect, ShortText, LongText) with appropriate placeholder states
+- [X] T063 [US5] ~~Enhance CapturePhotoRenderer to show countdown overlay if countdown > 0~~ (Removed - no countdown in capture step)
+- [X] T064 [US5] Ensure preview updates synchronously (<100ms) when config changes by using local state before auto-save
 
 **Checkpoint**: User Story 5 complete - all previews show accurate placeholders and live updates. Full feature complete.
 

@@ -72,7 +72,9 @@ export interface PublishExperienceResult {
  * }
  * ```
  */
-export function validateForPublish(experience: Experience): PublishValidationResult {
+export function validateForPublish(
+  experience: Experience,
+): PublishValidationResult {
   const errors: PublishValidationError[] = []
 
   // Rule 1: At least one step

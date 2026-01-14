@@ -63,11 +63,15 @@ import type {
 export type { Step, StepCategory, StepConfig, StepType }
 
 /**
- * Props for step renderers (edit-mode preview)
+ * Props for step renderers (edit-mode preview and guest-mode run)
  */
 export interface StepRendererProps {
+  /** Rendering mode - edit shows disabled controls, run allows interaction */
   mode: 'edit' | 'run'
+  /** The step being rendered */
   step: Step
+  /** Optional submit handler - when provided, the Next button is enabled */
+  onSubmit?: () => void
 }
 
 /**

@@ -1,36 +1,52 @@
 /**
  * Capture Photo Renderer
  *
- * Edit-mode renderer for photo capture steps.
- * Shows camera placeholder with aspect ratio indicator.
+ * Renderer for photo capture steps.
+ * Shows camera placeholder with aspect ratio indicator using themed styling.
+ * Uses StepLayout for responsive layout with submit button.
+ *
+ * Note: No countdown functionality in this implementation.
  */
 import { Camera } from 'lucide-react'
+import { StepLayout } from './StepLayout'
 import type { StepRendererProps } from '../registry/step-registry'
 import type { CapturePhotoStepConfig } from '../schemas/capture-photo.schema'
+import { ThemedText, useEventTheme } from '@/shared/theming'
 
-export function CapturePhotoRenderer({ step }: StepRendererProps) {
+export function CapturePhotoRenderer({ step, onSubmit }: StepRendererProps) {
   const config = step.config as CapturePhotoStepConfig
   const { aspectRatio } = config
+  const { theme } = useEventTheme()
 
   // Calculate dimensions based on aspect ratio
   const isSquare = aspectRatio === '1:1'
 
   return (
-    <div className="flex flex-col items-center gap-6 p-6">
-      {/* Camera placeholder with aspect ratio */}
-      <div
-        className={`flex flex-col items-center justify-center rounded-lg bg-muted ${
-          isSquare ? 'h-48 w-48' : 'h-64 w-36'
-        }`}
-      >
-        <Camera className="h-12 w-12 text-muted-foreground" />
-        <span className="mt-2 text-sm text-muted-foreground">Camera</span>
-      </div>
+    <StepLayout onSubmit={onSubmit} buttonLabel="Capture">
+      <div className="flex flex-col items-center gap-6 w-full max-w-md">
+        {/* Camera placeholder with aspect ratio */}
+        <div
+          className={`flex flex-col items-center justify-center rounded-lg ${
+            isSquare ? 'h-64 w-64' : 'h-80 w-44'
+          }`}
+          style={{
+            backgroundColor: `color-mix(in srgb, ${theme.text.color} 10%, transparent)`,
+          }}
+        >
+          <Camera
+            className="h-16 w-16"
+            style={{ color: theme.text.color, opacity: 0.5 }}
+          />
+          <ThemedText variant="body" className="mt-3 opacity-60">
+            Camera
+          </ThemedText>
+        </div>
 
-      {/* Aspect ratio indicator */}
-      <div className="text-xs text-muted-foreground">
-        Aspect ratio: {aspectRatio}
+        {/* Aspect ratio indicator */}
+        <ThemedText variant="small" className="opacity-60">
+          Aspect ratio: {aspectRatio}
+        </ThemedText>
       </div>
-    </div>
+    </StepLayout>
   )
 }

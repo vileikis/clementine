@@ -3,7 +3,9 @@
  *
  * Center column showing a preview of the selected step.
  * Wraps PreviewShell for viewport switching and device frame.
+ * Uses ThemeProvider for themed step renderers.
  */
+import { useMemo } from 'react'
 import {
   CapturePhotoRenderer,
   InfoStepRenderer,
@@ -15,11 +17,18 @@ import {
   TransformPipelineRenderer,
 } from '../../steps/renderers'
 import type { Step } from '../../steps/registry/step-registry'
+import type {Theme} from '@/shared/theming';
 import { PreviewShell } from '@/shared/preview-shell'
+import {  ThemeProvider, themeSchema } from '@/shared/theming'
+
+/** Default theme for step preview (using schema defaults) */
+const DEFAULT_PREVIEW_THEME: Theme = themeSchema.parse({})
 
 interface StepPreviewProps {
   /** The currently selected step, or null if no step selected */
   step: Step | null
+  /** Optional theme override for preview */
+  theme?: Theme
 }
 
 /**
@@ -27,17 +36,26 @@ interface StepPreviewProps {
  *
  * Shows a visual preview of the selected step in a device frame.
  * Supports viewport switching between mobile and desktop.
+ * Wraps content in ThemeProvider for themed styling.
  *
  * @example
  * ```tsx
  * <StepPreview step={selectedStep} />
+ *
+ * // With custom theme
+ * <StepPreview step={selectedStep} theme={customTheme} />
  * ```
  */
-export function StepPreview({ step }: StepPreviewProps) {
+export function StepPreview({ step, theme }: StepPreviewProps) {
+  // Memoize the theme to avoid unnecessary re-renders
+  const previewTheme = useMemo(() => theme ?? DEFAULT_PREVIEW_THEME, [theme])
+
   return (
     <div className="flex h-full flex-col bg-muted/30">
       <PreviewShell enableViewportSwitcher enableFullscreen>
-        {step ? <StepRendererRouter step={step} /> : <NoStepSelected />}
+        <ThemeProvider theme={previewTheme}>
+          {step ? <StepRendererRouter step={step} /> : <NoStepSelected />}
+        </ThemeProvider>
       </PreviewShell>
     </div>
   )

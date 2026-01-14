@@ -1,40 +1,55 @@
 /**
  * Info Step Renderer
  *
- * Edit-mode renderer for info/display steps.
- * Shows title, description, and media placeholder.
+ * Renderer for info/display steps.
+ * Shows title, description, and media with themed styling.
+ * Uses StepLayout for responsive layout with submit button.
  */
+import { StepLayout } from './StepLayout'
 import type { StepRendererProps } from '../registry/step-registry'
 import type { InfoStepConfig } from '../schemas/info.schema'
+import { ThemedText, useEventTheme } from '@/shared/theming'
 
-export function InfoStepRenderer({ step }: StepRendererProps) {
+export function InfoStepRenderer({ step, onSubmit }: StepRendererProps) {
   const config = step.config as InfoStepConfig
   const { title, description, media } = config
+  const { theme } = useEventTheme()
 
   return (
-    <div className="flex flex-col items-center justify-center gap-4 p-6 text-center">
-      {/* Media placeholder */}
-      {media ? (
-        <img
-          src={media.url}
-          alt=""
-          className="max-h-48 w-auto rounded-lg object-contain"
-        />
-      ) : (
-        <div className="flex h-32 w-32 items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/25">
-          <span className="text-xs text-muted-foreground">No media</span>
-        </div>
-      )}
+    <StepLayout onSubmit={onSubmit}>
+      <div className="flex flex-col items-center gap-6 text-center w-full max-w-md">
+        {/* Media */}
+        {media ? (
+          <img
+            src={media.url}
+            alt=""
+            className="max-h-48 w-auto rounded-lg object-contain"
+          />
+        ) : (
+          <div
+            className="flex h-32 w-32 items-center justify-center rounded-lg border-2 border-dashed"
+            style={{
+              borderColor: `color-mix(in srgb, ${theme.text.color} 25%, transparent)`,
+            }}
+          >
+            <ThemedText variant="small" className="opacity-60">
+              No media
+            </ThemedText>
+          </div>
+        )}
 
-      {/* Title */}
-      <h2 className="text-xl font-semibold">
-        {title || <span className="text-muted-foreground">Add a title...</span>}
-      </h2>
+        {/* Title */}
+        <ThemedText variant="heading" as="h2">
+          {title || <span className="opacity-50">Add a title...</span>}
+        </ThemedText>
 
-      {/* Description */}
-      <p className="max-w-sm text-sm text-muted-foreground">
-        {description || 'Add a description...'}
-      </p>
-    </div>
+        {/* Description */}
+        <ThemedText variant="body" className="opacity-90">
+          {description || (
+            <span className="opacity-50">Add a description...</span>
+          )}
+        </ThemedText>
+      </div>
+    </StepLayout>
   )
 }
