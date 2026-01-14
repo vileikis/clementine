@@ -1,6 +1,12 @@
-import { useEffect, useRef } from 'react'
+/**
+ * Tracked Mutation Hook for Event Designer
+ *
+ * Domain-specific wrapper around the shared useTrackedMutation hook.
+ * Automatically uses the event designer store.
+ */
 import { useEventDesignerStore } from '../stores'
 import type { UseMutationResult } from '@tanstack/react-query'
+import { useTrackedMutation as useTrackedMutationBase } from '@/shared/editor-status'
 
 /**
  * Wrapper hook that tracks TanStack Query mutation state transitions.
@@ -27,22 +33,6 @@ import type { UseMutationResult } from '@tanstack/react-query'
 export function useTrackedMutation<TData, TError, TVariables>(
   mutation: UseMutationResult<TData, TError, TVariables>,
 ): UseMutationResult<TData, TError, TVariables> {
-  const { startSave, completeSave } = useEventDesignerStore()
-  const prevIsPending = useRef(mutation.isPending)
-
-  useEffect(() => {
-    // Detect state transitions (not current state) to prevent double-counting
-    if (mutation.isPending && !prevIsPending.current) {
-      // Transition: idle → pending
-      startSave()
-    } else if (!mutation.isPending && prevIsPending.current) {
-      // Transition: pending → idle (both success and error)
-      completeSave()
-    }
-
-    // Update ref after comparison
-    prevIsPending.current = mutation.isPending
-  }, [mutation.isPending, startSave, completeSave])
-
-  return mutation // Passthrough - no mutation modification
+  const store = useEventDesignerStore()
+  return useTrackedMutationBase(mutation, store)
 }

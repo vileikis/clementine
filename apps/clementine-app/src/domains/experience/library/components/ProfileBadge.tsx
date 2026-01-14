@@ -2,22 +2,23 @@
  * ProfileBadge Component
  *
  * Displays a colored badge indicating the experience profile type.
- * Colors follow the design system:
- * - freeform: blue
- * - survey: green
- * - story: purple
+ * Colors use theme tokens with opacity modifiers:
+ * - freeform: info (blue) for general purpose
+ * - survey: success (green) for data collection
+ * - story: accent for narrative experiences
  */
 import type { ExperienceProfile } from '@/domains/experience/shared'
 import { Badge } from '@/ui-kit/ui/badge'
 import { cn } from '@/shared/utils/style-utils'
 
 /**
- * Color classes for each profile type
+ * Color classes for each profile type using theme tokens
+ * Uses opacity modifiers for subtle backgrounds per design-system.md
  */
 const profileColors: Record<ExperienceProfile, string> = {
-  freeform: 'bg-blue-100 text-blue-800 hover:bg-blue-100',
-  survey: 'bg-green-100 text-green-800 hover:bg-green-100',
-  story: 'bg-purple-100 text-purple-800 hover:bg-purple-100',
+  freeform: 'bg-info/10 text-info hover:bg-info/15',
+  survey: 'bg-success/10 text-success hover:bg-success/15',
+  story: 'bg-accent text-accent-foreground hover:bg-accent/80',
 }
 
 /**

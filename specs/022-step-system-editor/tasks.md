@@ -152,10 +152,10 @@ All paths are relative to `apps/clementine-app/src/`:
 > export const useExperienceDesignerStore = createEditorStore()
 > ```
 
-- [ ] T051 [US3] Create useUpdateExperienceDraft hook in `domains/experience/designer/hooks/useUpdateExperienceDraft.ts` wrapping useMutation to update experience.draft in Firestore with serverTimestamp()
-- [ ] T052 [US3] Integrate useAutoSave in `domains/experience/designer/containers/ExperienceDesignerPage.tsx` with 2000ms debounce, watching steps array changes, calling useUpdateExperienceDraft
-- [ ] T053 [US3] Wire useExperienceDesignerStore (startSave/completeSave) with useUpdateExperienceDraft mutation for save status tracking
-- [ ] T054 [US3] Add EditorSaveStatus indicator to ExperienceDesignerLayout header showing pendingSaves and lastCompletedAt from store
+- [X] T051 [US3] Create useUpdateExperienceDraft hook in `domains/experience/designer/hooks/useUpdateExperienceDraft.ts` wrapping useMutation to update experience.draft in Firestore with serverTimestamp()
+- [X] T052 [US3] Integrate useAutoSave in `domains/experience/designer/containers/ExperienceDesignerPage.tsx` with 2000ms debounce, watching steps array changes, calling useUpdateExperienceDraft
+- [X] T053 [US3] Wire useExperienceDesignerStore (startSave/completeSave) with useUpdateExperienceDraft mutation for save status tracking
+- [X] T054 [US3] Add EditorSaveStatus indicator to ExperienceDesignerLayout header showing pendingSaves and lastCompletedAt from store
 
 **Checkpoint**: User Story 3 complete - changes auto-save with visual feedback. Works with US1 and US2.
 
@@ -169,11 +169,11 @@ All paths are relative to `apps/clementine-app/src/`:
 
 ### Implementation for US4
 
-- [ ] T055 [US4] Create validateForPublish function in `domains/experience/designer/hooks/usePublishExperience.ts` checking: steps.length > 0, all configs valid per schema, step types allowed for profile
-- [ ] T056 [US4] Create usePublishExperience hook in `domains/experience/designer/hooks/usePublishExperience.ts` that validates, then copies draft to published with publishedAt/publishedBy
-- [ ] T057 [US4] Wire Publish button in `domains/experience/designer/containers/ExperienceDesignerLayout.tsx` to usePublishExperience, show loading state during publish
-- [ ] T058 [US4] Display validation errors in UI when publish fails: use toast or inline error list showing specific field/step issues
-- [ ] T059 [US4] Show success toast notification on publish completion using Sonner
+- [X] T055 [US4] Create validateForPublish function in `domains/experience/designer/hooks/usePublishExperience.ts` checking: steps.length > 0, all configs valid per schema, step types allowed for profile
+- [X] T056 [US4] Create usePublishExperience hook in `domains/experience/designer/hooks/usePublishExperience.ts` that validates, then copies draft to published with publishedAt/publishedBy
+- [X] T057 [US4] Wire Publish button in `domains/experience/designer/containers/ExperienceDesignerLayout.tsx` to usePublishExperience, show loading state during publish
+- [X] T058 [US4] Display validation errors in UI when publish fails: use toast or inline error list showing specific field/step issues
+- [X] T059 [US4] Show success toast notification on publish completion using Sonner
 
 **Checkpoint**: User Story 4 complete - admin can publish experiences with validation. Full editing workflow functional.
 
@@ -187,11 +187,11 @@ All paths are relative to `apps/clementine-app/src/`:
 
 ### Implementation for US5
 
-- [ ] T060 [US5] Enhance InfoStepRenderer to show "Add a title..." placeholder when title empty, "Add a description..." when description empty
-- [ ] T061 [US5] Enhance InputScaleRenderer to show placeholder question text when empty, proper scale visualization
-- [ ] T062 [US5] Enhance all input renderers (YesNo, MultiSelect, ShortText, LongText) with appropriate placeholder states
-- [ ] T063 [US5] Enhance CapturePhotoRenderer to show countdown overlay if countdown > 0
-- [ ] T064 [US5] Ensure preview updates synchronously (<100ms) when config changes by using local state before auto-save
+- [X] T060 [US5] Enhance InfoStepRenderer to show "Add a title..." placeholder when title empty, "Add a description..." when description empty
+- [X] T061 [US5] Enhance InputScaleRenderer to show placeholder question text when empty, proper scale visualization
+- [X] T062 [US5] Enhance all input renderers (YesNo, MultiSelect, ShortText, LongText) with appropriate placeholder states
+- [X] T063 [US5] ~~Enhance CapturePhotoRenderer to show countdown overlay if countdown > 0~~ (Removed - no countdown in capture step)
+- [X] T064 [US5] Ensure preview updates synchronously (<100ms) when config changes by using local state before auto-save
 
 **Checkpoint**: User Story 5 complete - all previews show accurate placeholders and live updates. Full feature complete.
 
@@ -201,13 +201,13 @@ All paths are relative to `apps/clementine-app/src/`:
 
 **Purpose**: Improvements affecting multiple user stories
 
-- [ ] T065 [P] Add mobile responsive layout to ExperienceDesignerPage using Sheet for config panel on small screens
-- [ ] T066 [P] Add keyboard navigation support to StepList (arrow keys to navigate, Enter to select, Delete to remove)
-- [ ] T067 Validate all components follow design-system.md standards (theme tokens, no hard-coded colors)
-- [ ] T068 Run `pnpm app:check` (lint + format) and fix any issues
-- [ ] T069 Run `pnpm app:type-check` and fix any TypeScript errors
-- [ ] T070 Manual test per quickstart.md validation scenarios
-- [ ] T071 Verify standards compliance per constitution (mobile-first, type-safe, clean code)
+- [X] T065 [P] Add mobile responsive layout to ExperienceDesignerPage using Sheet for config panel on small screens
+- [X] T066 [P] Add keyboard navigation support to StepList (arrow keys to navigate, Enter to select, Delete to remove)
+- [X] T067 Validate all components follow design-system.md standards (theme tokens, no hard-coded colors)
+- [X] T068 Run `pnpm app:check` (lint + format) and fix any issues
+- [X] T069 Run `pnpm app:type-check` and fix any TypeScript errors
+- [X] T070 Manual test per quickstart.md validation scenarios
+- [X] T071 Verify standards compliance per constitution (mobile-first, type-safe, clean code)
 
 ---
 

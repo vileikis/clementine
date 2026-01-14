@@ -76,6 +76,7 @@ function ExperienceDesignerRoute() {
     <ExperienceDesignerLayout
       experience={experience}
       workspaceSlug={workspaceSlug}
+      workspaceId={workspace.id}
     />
   )
 }

@@ -11,8 +11,8 @@ import { z } from 'zod'
  */
 export const inputScaleStepConfigSchema = z
   .object({
-    /** Title text (required, 1-200 chars) */
-    title: z.string().min(1).max(200),
+    /** Title text (max 200 chars, empty allowed for drafts) */
+    title: z.string().max(200),
     /** Whether this step is required */
     required: z.boolean().default(false),
     /** Minimum value on scale (0-10, default 1) */
@@ -33,6 +33,7 @@ export type InputScaleStepConfig = z.infer<typeof inputScaleStepConfigSchema>
 
 /**
  * Default config factory for input scale steps
+ * Note: Optional fields are omitted (not set to undefined) for Firestore compatibility
  */
 export function createDefaultInputScaleConfig(): InputScaleStepConfig {
   return {
@@ -40,7 +41,6 @@ export function createDefaultInputScaleConfig(): InputScaleStepConfig {
     required: false,
     min: 1,
     max: 5,
-    minLabel: undefined,
-    maxLabel: undefined,
+    // minLabel and maxLabel are optional - omit them rather than setting to undefined
   }
 }

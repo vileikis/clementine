@@ -146,3 +146,4 @@ export type ExperienceConfig = z.infer<typeof experienceConfigSchema>
 export type ExperienceStatus = z.infer<typeof experienceStatusSchema>
 export type ExperienceProfile = z.infer<typeof experienceProfileSchema>
 export type ExperienceMedia = z.infer<typeof experienceMediaSchema>
+export type ExperienceStep = z.infer<typeof stepSchema>

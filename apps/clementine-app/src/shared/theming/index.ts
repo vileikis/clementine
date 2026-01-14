@@ -34,6 +34,13 @@ export {
   ThemedText,
   ThemedButton,
   ThemedIconButton,
+  // Inputs
+  ThemedInput,
+  ThemedTextarea,
+  ThemedCheckbox,
+  ThemedRadio,
+  ThemedScaleButton,
+  ThemedSelectOption,
 } from './components'
 export type {
   ThemedTextProps,
@@ -44,6 +51,13 @@ export type {
   ThemedIconButtonProps,
   IconButtonSize,
   IconButtonVariant,
+  // Input types
+  ThemedInputProps,
+  ThemedTextareaProps,
+  ThemedCheckboxProps,
+  ThemedRadioProps,
+  ThemedScaleButtonProps,
+  ThemedSelectOptionProps,
 } from './components'
 
 // Hooks
