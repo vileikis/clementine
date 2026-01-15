@@ -8,7 +8,7 @@
  */
 import type { MediaReference } from '@/shared/theming'
 import type { SessionMode } from '@/domains/session'
-import type { Step } from './step.types'
+import type { ExperienceStep } from '../schemas/experience.schema'
 
 // Re-export SessionMode for convenience
 export type { SessionMode }
@@ -75,7 +75,7 @@ export interface RuntimeEngine {
    */
 
   /** Current step object, or null if no steps */
-  readonly currentStep: Step | null
+  readonly currentStep: ExperienceStep | null
 
   /** Current step index (0-based) */
   readonly currentStepIndex: number

@@ -93,55 +93,55 @@
 
 ### Schema Updates (AD-002)
 
-- [ ] T023 [AD-002] Update session schema to use `answers: Answer[]` array in `src/domains/session/shared/schemas/session.schema.ts`
-- [ ] T024 [AD-002] Add `Answer` schema (stepId, stepType, value, answeredAt) in `src/domains/session/shared/schemas/session.schema.ts`
-- [ ] T025 [AD-002] Update session schema to use `capturedMedia: CapturedMedia[]` array in `src/domains/session/shared/schemas/session.schema.ts`
-- [ ] T026 [AD-002] Add `CapturedMedia` schema (stepId, assetId, url, createdAt) in `src/domains/session/shared/schemas/session.schema.ts`
-- [ ] T027 [AD-002] Add `result: SessionResult | null` field to session schema in `src/domains/session/shared/schemas/session.schema.ts`
-- [ ] T028 [AD-002] Add `workspaceId` field to session schema in `src/domains/session/shared/schemas/session.schema.ts`
-- [ ] T029 [AD-002] Rename `activeJobId` to `jobId` in session schema in `src/domains/session/shared/schemas/session.schema.ts`
-- [ ] T030 [AD-002] Remove deprecated `inputs` and `outputs` fields from session schema
+- [X] T023 [AD-002] Update session schema to use `answers: Answer[]` array in `src/domains/session/shared/schemas/session.schema.ts`
+- [X] T024 [AD-002] Add `Answer` schema (stepId, stepType, value, answeredAt) in `src/domains/session/shared/schemas/session.schema.ts`
+- [X] T025 [AD-002] Update session schema to use `capturedMedia: CapturedMedia[]` array in `src/domains/session/shared/schemas/session.schema.ts`
+- [X] T026 [AD-002] Add `CapturedMedia` schema (stepId, assetId, url, createdAt) in `src/domains/session/shared/schemas/session.schema.ts`
+- [X] T027 [AD-002] Add `result: SessionResult | null` field to session schema in `src/domains/session/shared/schemas/session.schema.ts`
+- [X] T028 [AD-002] Add `workspaceId` field to session schema in `src/domains/session/shared/schemas/session.schema.ts`
+- [X] T029 [AD-002] Rename `activeJobId` to `jobId` in session schema in `src/domains/session/shared/schemas/session.schema.ts`
+- [X] T030 [AD-002] Remove deprecated `inputs` and `outputs` fields from session schema
 
 ### Session Hooks Refactor (AD-004, AD-005)
 
-- [ ] T031 [AD-005] Update useSubscribeSession to use `convertFirestoreData` utility in `src/domains/session/shared/hooks/useSubscribeSession.ts`
-- [ ] T032 [AD-004] Remove queryClient.invalidateQueries from useUpdateSessionProgress in `src/domains/session/shared/hooks/useUpdateSessionProgress.ts`
-- [ ] T033 [AD-004] Remove queryClient.invalidateQueries from useCompleteSession in `src/domains/session/shared/hooks/useCompleteSession.ts`
-- [ ] T034 [AD-004] Remove queryClient.invalidateQueries from useAbandonSession in `src/domains/session/shared/hooks/useAbandonSession.ts`
-- [ ] T035 [AD-002] Update useCreateSession to include workspaceId in session creation in `src/domains/session/shared/hooks/useCreateSession.ts`
-- [ ] T036 [AD-002] Update useUpdateSessionProgress to use answers/capturedMedia arrays in `src/domains/session/shared/hooks/useUpdateSessionProgress.ts`
-- [ ] T037 [AD-002] Update session-api.types.ts with new input schemas for answers/capturedMedia
+- [X] T031 [AD-005] Update useSubscribeSession to use `convertFirestoreData` utility in `src/domains/session/shared/hooks/useSubscribeSession.ts`
+- [X] T032 [AD-004] Remove queryClient.invalidateQueries from useUpdateSessionProgress in `src/domains/session/shared/hooks/useUpdateSessionProgress.ts`
+- [X] T033 [AD-004] Remove queryClient.invalidateQueries from useCompleteSession in `src/domains/session/shared/hooks/useCompleteSession.ts`
+- [X] T034 [AD-004] Remove queryClient.invalidateQueries from useAbandonSession in `src/domains/session/shared/hooks/useAbandonSession.ts`
+- [X] T035 [AD-002] Update useCreateSession to include workspaceId in session creation in `src/domains/session/shared/hooks/useCreateSession.ts`
+- [X] T036 [AD-002] Update useUpdateSessionProgress to use answers/capturedMedia arrays in `src/domains/session/shared/hooks/useUpdateSessionProgress.ts`
+- [X] T037 [AD-002] Update session-api.types.ts with new input schemas for answers/capturedMedia
 
 ### Step Validation (AD-003)
 
-- [ ] T038 [AD-003] Create step-validation.ts with `validateStepInput` function in `src/domains/experience/steps/registry/step-validation.ts`
-- [ ] T039 [AD-003] Implement validation for info step (always valid) in `src/domains/experience/steps/registry/step-validation.ts`
-- [ ] T040 [AD-003] Implement validation for input.scale step (value within min/max) in `src/domains/experience/steps/registry/step-validation.ts`
-- [ ] T041 [AD-003] Implement validation for input.yesNo step (boolean value) in `src/domains/experience/steps/registry/step-validation.ts`
-- [ ] T042 [AD-003] Implement validation for input.multiSelect step (valid options, min/max selection) in `src/domains/experience/steps/registry/step-validation.ts`
-- [ ] T043 [AD-003] Implement validation for input.shortText/longText steps (maxLength, required) in `src/domains/experience/steps/registry/step-validation.ts`
-- [ ] T044 [AD-003] Implement validation for capture/transform steps (placeholder - always valid) in `src/domains/experience/steps/registry/step-validation.ts`
-- [ ] T045 [AD-003] Update step registry barrel export to include validation in `src/domains/experience/steps/registry/index.ts`
+- [X] T038 [AD-003] Create step-validation.ts with `validateStepInput` function in `src/domains/experience/steps/registry/step-validation.ts`
+- [X] T039 [AD-003] Implement validation for info step (always valid) in `src/domains/experience/steps/registry/step-validation.ts`
+- [X] T040 [AD-003] Implement validation for input.scale step (value within min/max) in `src/domains/experience/steps/registry/step-validation.ts`
+- [X] T041 [AD-003] Implement validation for input.yesNo step (boolean value) in `src/domains/experience/steps/registry/step-validation.ts`
+- [X] T042 [AD-003] Implement validation for input.multiSelect step (valid options, min/max selection) in `src/domains/experience/steps/registry/step-validation.ts`
+- [X] T043 [AD-003] Implement validation for input.shortText/longText steps (maxLength, required) in `src/domains/experience/steps/registry/step-validation.ts`
+- [X] T044 [AD-003] Implement validation for capture/transform steps (placeholder - always valid) in `src/domains/experience/steps/registry/step-validation.ts`
+- [X] T045 [AD-003] Update step registry barrel export to include validation in `src/domains/experience/steps/registry/index.ts`
 
 ### Zustand Store (AD-001)
 
-- [ ] T046 [AD-001] Create stores folder at `src/domains/experience/runtime/stores/`
-- [ ] T047 [AD-001] Create useSessionRuntimeStore with state fields in `src/domains/experience/runtime/stores/useSessionRuntimeStore.ts`
-- [ ] T048 [AD-001] Implement initFromSession action to hydrate store from session document
-- [ ] T049 [AD-001] Implement setAnswer action with answeredAt timestamp
-- [ ] T050 [AD-001] Implement setCapturedMedia action
-- [ ] T051 [AD-001] Implement navigation actions (goToStep, nextStep, previousStep)
-- [ ] T052 [AD-001] Implement syncToFirestore action using useUpdateSessionProgress
-- [ ] T053 [AD-001] Implement complete action with Firestore sync
-- [ ] T054 [AD-001] Create stores barrel export in `src/domains/experience/runtime/stores/index.ts`
-- [ ] T055 [AD-001] Update runtime barrel export to include stores in `src/domains/experience/runtime/index.ts`
+- [X] T046 [AD-001] Create stores folder at `src/domains/experience/runtime/stores/`
+- [X] T047 [AD-001] Create useSessionRuntimeStore with state fields in `src/domains/experience/runtime/stores/useSessionRuntimeStore.ts`
+- [X] T048 [AD-001] Implement initFromSession action to hydrate store from session document
+- [X] T049 [AD-001] Implement setAnswer action with answeredAt timestamp
+- [X] T050 [AD-001] Implement setCapturedMedia action
+- [X] T051 [AD-001] Implement navigation actions (goToStep, nextStep, previousStep)
+- [X] T052 [AD-001] Implement syncToFirestore action using useUpdateSessionProgress
+- [X] T053 [AD-001] Implement complete action with Firestore sync
+- [X] T054 [AD-001] Create stores barrel export in `src/domains/experience/runtime/stores/index.ts`
+- [X] T055 [AD-001] Update runtime barrel export to include stores in `src/domains/experience/runtime/index.ts`
 
 ### Runtime Hook Refactor
 
-- [ ] T056 Refactor useExperienceRuntime to use useSessionRuntimeStore in `src/domains/experience/runtime/hooks/useExperienceRuntime.ts`
-- [ ] T057 Remove inline isValidInput function from useExperienceRuntime (use registry validation)
-- [ ] T058 Update useExperienceRuntime to sync only on meaningful events (not back navigation)
-- [ ] T059 Verify runtime hook tests pass with new architecture
+- [X] T056 Refactor useExperienceRuntime to use useSessionRuntimeStore in `src/domains/experience/runtime/hooks/useExperienceRuntime.ts`
+- [X] T057 Remove inline isValidInput function from useExperienceRuntime (use registry validation)
+- [X] T058 Update useExperienceRuntime to sync only on meaningful events (not back navigation)
+- [X] T059 Verify runtime hook tests pass with new architecture
 
 **Checkpoint**: Architecture aligned with epic spec - Zustand store for runtime, structured answers array, validation in registry.
 

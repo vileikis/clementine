@@ -2,16 +2,17 @@
  * Session API Schemas and Types
  *
  * Zod schemas and types for session API operations.
- * These are schema definitions only for Phase 0 - implementation comes in Phase 3.
  */
 import { z } from 'zod'
 
 import {
+  answerSchema,
+  capturedMediaSchema,
   configSourceSchema,
   sessionModeSchema,
+  sessionResultSchema,
 } from '../schemas/session.schema'
 import type { Session } from '../schemas/session.schema'
-import { mediaReferenceSchema } from '@/shared/theming'
 
 /**
  * Create session input schema
@@ -19,6 +20,9 @@ import { mediaReferenceSchema } from '@/shared/theming'
 export const createSessionInputSchema = z.object({
   /** Parent project ID */
   projectId: z.string(),
+
+  /** Workspace ID for cross-project analytics */
+  workspaceId: z.string(),
 
   /** Parent event ID */
   eventId: z.string(),
@@ -40,14 +44,33 @@ export const updateSessionProgressInputSchema = z.object({
   /** Session to update */
   sessionId: z.string(),
 
-  /** New step index */
-  currentStepIndex: z.number(),
+  /** New step index (optional) */
+  currentStepIndex: z.number().optional(),
 
-  /** Updated inputs (optional, merged with existing) */
-  inputs: z.record(z.string(), z.unknown()).optional(),
+  /** Answers to merge (optional) */
+  answers: z.array(answerSchema).optional(),
 
-  /** Updated outputs (optional, merged with existing) */
-  outputs: z.record(z.string(), mediaReferenceSchema).optional(),
+  /** Captured media to merge (optional) */
+  capturedMedia: z.array(capturedMediaSchema).optional(),
+
+  /** Final result (optional) */
+  result: sessionResultSchema.optional(),
+})
+
+/**
+ * Complete session input schema
+ */
+export const completeSessionInputSchema = z.object({
+  /** Session to complete */
+  sessionId: z.string().min(1),
+})
+
+/**
+ * Abandon session input schema
+ */
+export const abandonSessionInputSchema = z.object({
+  /** Session to abandon */
+  sessionId: z.string().min(1),
 })
 
 /**
@@ -57,6 +80,8 @@ export type CreateSessionInput = z.infer<typeof createSessionInputSchema>
 export type UpdateSessionProgressInput = z.infer<
   typeof updateSessionProgressInputSchema
 >
+export type CompleteSessionInput = z.infer<typeof completeSessionInputSchema>
+export type AbandonSessionInput = z.infer<typeof abandonSessionInputSchema>
 
 /**
  * Create session function type
