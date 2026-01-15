@@ -2,7 +2,5 @@
  * Runtime Hooks - Barrel Export
  */
 
-export {
-  useExperienceRuntime,
-  type RuntimeConfig,
-} from './useExperienceRuntime'
+// Public API - useRuntime is the main hook for children of ExperienceRuntime
+export { useRuntime, type RuntimeAPI } from './useRuntime'

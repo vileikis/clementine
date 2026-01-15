@@ -9,4 +9,3 @@ export {
 } from './useSubscribeSession'
 export { useUpdateSessionProgress } from './useUpdateSessionProgress'
 export { useCompleteSession } from './useCompleteSession'
-export { useAbandonSession } from './useAbandonSession'

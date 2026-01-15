@@ -71,7 +71,8 @@ export function useCreateSession() {
       )
 
       // Create in transaction to ensure serverTimestamp() resolves correctly
-      return await runTransaction(firestore, (transaction) => {
+      // eslint-disable-next-line @typescript-eslint/require-await -- callback must be async for TypeScript inference
+      return await runTransaction(firestore, async (transaction) => {
         const newRef = doc(sessionsRef)
         const now = Date.now()
         const currentUser = auth.currentUser
@@ -88,7 +89,7 @@ export function useCreateSession() {
           currentStepIndex: 0,
           answers: [],
           capturedMedia: [],
-          result: null,
+          resultMedia: null,
           jobId: null,
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),

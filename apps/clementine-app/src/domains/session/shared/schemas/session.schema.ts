@@ -66,10 +66,10 @@ export const capturedMediaSchema = z.object({
 })
 
 /**
- * SessionResult schema
+ * SessionResultMedia schema
  * Represents the final output from transform/capture
  */
-export const sessionResultSchema = z.object({
+export const sessionResultMediaSchema = z.object({
   /** Step that produced the result */
   stepId: z.string(),
   /** Result asset ID */
@@ -139,8 +139,8 @@ export const sessionSchema = z.looseObject({
   /** Media captured from capture steps */
   capturedMedia: z.array(capturedMediaSchema).default([]),
 
-  /** Final result from transform/capture */
-  result: sessionResultSchema.nullable().default(null),
+  /** Final result media from transform/capture */
+  resultMedia: sessionResultMediaSchema.nullable().default(null),
 
   /**
    * TRANSFORM JOB TRACKING
@@ -179,4 +179,4 @@ export type ConfigSource = z.infer<typeof configSourceSchema>
 export type SessionStatus = z.infer<typeof sessionStatusSchema>
 export type Answer = z.infer<typeof answerSchema>
 export type CapturedMedia = z.infer<typeof capturedMediaSchema>
-export type SessionResult = z.infer<typeof sessionResultSchema>
+export type SessionResultMedia = z.infer<typeof sessionResultMediaSchema>

@@ -10,7 +10,7 @@ import {
   capturedMediaSchema,
   configSourceSchema,
   sessionModeSchema,
-  sessionResultSchema,
+  sessionResultMediaSchema,
 } from '../schemas/session.schema'
 import type { Session } from '../schemas/session.schema'
 
@@ -53,8 +53,8 @@ export const updateSessionProgressInputSchema = z.object({
   /** Captured media to merge (optional) */
   capturedMedia: z.array(capturedMediaSchema).optional(),
 
-  /** Final result (optional) */
-  result: sessionResultSchema.optional(),
+  /** Final result media (optional) */
+  resultMedia: sessionResultMediaSchema.optional(),
 })
 
 /**

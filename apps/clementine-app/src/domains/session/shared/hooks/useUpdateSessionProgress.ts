@@ -107,9 +107,9 @@ export function useUpdateSessionProgress() {
           updates.capturedMedia = mergedMedia
         }
 
-        // Set result if provided
-        if (validated.result) {
-          updates.result = validated.result
+        // Set resultMedia if provided
+        if (validated.resultMedia) {
+          updates.resultMedia = validated.resultMedia
         }
 
         transaction.update(sessionRef, updates)

@@ -7,11 +7,23 @@
  * This is an interface definition only for Phase 0 - implementation comes in Phase 3.
  */
 import type { MediaReference } from '@/shared/theming'
-import type { SessionMode } from '@/domains/session'
+import type {
+  Answer,
+  SessionMode,
+  SessionResultMedia,
+} from '@/domains/session'
 import type { ExperienceStep } from '../schemas/experience.schema'
 
 // Re-export SessionMode for convenience
 export type { SessionMode }
+
+/**
+ * Captured media reference for runtime state
+ */
+export interface CapturedMediaRef {
+  assetId: string
+  url: string
+}
 
 /**
  * Runtime state snapshot
@@ -21,11 +33,14 @@ export interface RuntimeState {
   /** Current step index (0-based) */
   currentStepIndex: number
 
-  /** Collected inputs keyed by step ID (form data, photos, etc.) */
-  inputs: Record<string, unknown>
+  /** Collected answers keyed by step ID */
+  answers: Record<string, Answer['value']>
 
-  /** Generated outputs (media) keyed by step ID */
-  outputs: Record<string, MediaReference>
+  /** Captured media keyed by step ID */
+  capturedMedia: Record<string, CapturedMediaRef>
+
+  /** Final result media from transform/capture */
+  resultMedia: SessionResultMedia | null
 }
 
 /**

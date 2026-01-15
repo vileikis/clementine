@@ -1,4 +1,4 @@
 /**
  * Runtime Stores Barrel Export
  */
-export * from './useSessionRuntimeStore'
+export * from './experienceRuntimeStore'

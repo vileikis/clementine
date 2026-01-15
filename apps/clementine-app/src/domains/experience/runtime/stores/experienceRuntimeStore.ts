@@ -1,5 +1,5 @@
 /**
- * Session Runtime Store
+ * Experience Runtime Store
  *
  * Zustand store for managing runtime state during experience execution.
  * Separates UI navigation state from Firestore session persistence.
@@ -17,14 +17,14 @@ import type {
   Answer,
   CapturedMedia,
   Session,
-  SessionResult,
+  SessionResultMedia,
 } from '@/domains/session'
 import type { ExperienceStep } from '../../shared/schemas/experience.schema'
 
 /**
- * Session runtime state
+ * Experience runtime state
  */
-export interface SessionRuntimeState {
+export interface ExperienceRuntimeState {
   // Identity
   sessionId: string | null
   projectId: string | null
@@ -40,7 +40,7 @@ export interface SessionRuntimeState {
   // Collected data
   answers: Answer[]
   capturedMedia: CapturedMedia[]
-  result: SessionResult | null
+  resultMedia: SessionResultMedia | null
 
   // Sync status
   isSyncing: boolean
@@ -48,9 +48,9 @@ export interface SessionRuntimeState {
 }
 
 /**
- * Session runtime actions
+ * Experience runtime actions
  */
-export interface SessionRuntimeActions {
+export interface ExperienceRuntimeActions {
   /**
    * Initialize store from a session document
    * Call this when the session is first loaded or changes
@@ -81,9 +81,9 @@ export interface SessionRuntimeActions {
   ) => void
 
   /**
-   * Set the final result
+   * Set the final result media
    */
-  setResult: (result: SessionResult) => void
+  setResultMedia: (resultMedia: SessionResultMedia) => void
 
   /**
    * Navigate to a specific step (previously visited only)
@@ -151,12 +151,13 @@ export interface SessionRuntimeActions {
   reset: () => void
 }
 
-export type SessionRuntimeStore = SessionRuntimeState & SessionRuntimeActions
+export type ExperienceRuntimeStore = ExperienceRuntimeState &
+  ExperienceRuntimeActions
 
 /**
  * Initial state for the store
  */
-const initialState: SessionRuntimeState = {
+const initialState: ExperienceRuntimeState = {
   sessionId: null,
   projectId: null,
   experienceId: null,
@@ -165,18 +166,18 @@ const initialState: SessionRuntimeState = {
   isComplete: false,
   answers: [],
   capturedMedia: [],
-  result: null,
+  resultMedia: null,
   isSyncing: false,
   lastSyncedAt: null,
 }
 
 /**
- * Create the session runtime store
+ * Create the experience runtime store
  *
  * @example
  * ```tsx
  * function RuntimeComponent({ session, steps, experienceId }) {
- *   const store = useSessionRuntimeStore()
+ *   const store = useExperienceRuntimeStore()
  *
  *   // Initialize on mount
  *   useEffect(() => {
@@ -197,7 +198,7 @@ const initialState: SessionRuntimeState = {
  * }
  * ```
  */
-export const useSessionRuntimeStore = create<SessionRuntimeStore>(
+export const useExperienceRuntimeStore = create<ExperienceRuntimeStore>(
   (set, get) => ({
     ...initialState,
 
@@ -211,7 +212,7 @@ export const useSessionRuntimeStore = create<SessionRuntimeStore>(
         isComplete: session.status === 'completed',
         answers: session.answers ?? [],
         capturedMedia: session.capturedMedia ?? [],
-        result: session.result ?? null,
+        resultMedia: session.resultMedia ?? null,
         isSyncing: false,
         lastSyncedAt: null,
       })
@@ -267,8 +268,8 @@ export const useSessionRuntimeStore = create<SessionRuntimeStore>(
       })
     },
 
-    setResult: (result) => {
-      set({ result })
+    setResultMedia: (resultMedia) => {
+      set({ resultMedia })
     },
 
     goToStep: (index) => {
@@ -367,16 +368,17 @@ export const useSessionRuntimeStore = create<SessionRuntimeStore>(
 /**
  * Selector for getting the current step
  */
-export const selectCurrentStep = (state: SessionRuntimeStore) =>
+export const selectCurrentStep = (state: ExperienceRuntimeStore) =>
   state.steps[state.currentStepIndex] ?? null
 
 /**
  * Selector for getting the total number of steps
  */
-export const selectTotalSteps = (state: SessionRuntimeStore) =>
+export const selectTotalSteps = (state: ExperienceRuntimeStore) =>
   state.steps.length
 
 /**
  * Selector for checking if experience is complete
  */
-export const selectIsComplete = (state: SessionRuntimeStore) => state.isComplete
+export const selectIsComplete = (state: ExperienceRuntimeStore) =>
+  state.isComplete
