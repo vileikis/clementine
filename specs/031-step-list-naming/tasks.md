@@ -32,8 +32,8 @@
 
 **Purpose**: Add helper function that both user stories depend on
 
-- [ ] T001 Add `getStepDisplayLabel` helper function in `apps/clementine-app/src/domains/experience/steps/registry/step-utils.ts`
-- [ ] T002 Export `getStepDisplayLabel` from step-utils.ts barrel export (if applicable)
+- [x] T001 Add `getStepDisplayLabel` helper function in `apps/clementine-app/src/domains/experience/steps/registry/step-utils.ts`
+- [x] T002 Export `getStepDisplayLabel` from step-utils.ts barrel export (if applicable)
 
 **Checkpoint**: Helper function ready for use by StepListItem component
 
@@ -53,15 +53,15 @@
 
 > **NOTE: Write tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T003 [P] [US1] Add unit test: returns custom title when present and non-empty in `apps/clementine-app/src/domains/experience/steps/registry/step-utils.test.ts`
-- [ ] T004 [P] [US1] Add unit test: returns default label when title is whitespace-only in `apps/clementine-app/src/domains/experience/steps/registry/step-utils.test.ts`
-- [ ] T005 [P] [US2] Add unit test: returns default label when title is empty string in `apps/clementine-app/src/domains/experience/steps/registry/step-utils.test.ts`
-- [ ] T006 [P] [US2] Add unit test: returns default label when step type has no title field in `apps/clementine-app/src/domains/experience/steps/registry/step-utils.test.ts`
+- [x] T003 [P] [US1] Add unit test: returns custom title when present and non-empty in `apps/clementine-app/src/domains/experience/steps/registry/step-utils.test.ts`
+- [x] T004 [P] [US1] Add unit test: returns default label when title is whitespace-only in `apps/clementine-app/src/domains/experience/steps/registry/step-utils.test.ts`
+- [x] T005 [P] [US2] Add unit test: returns default label when title is empty string in `apps/clementine-app/src/domains/experience/steps/registry/step-utils.test.ts`
+- [x] T006 [P] [US2] Add unit test: returns default label when step type has no title field in `apps/clementine-app/src/domains/experience/steps/registry/step-utils.test.ts`
 
 ### Implementation for User Stories 1 & 2
 
-- [ ] T007 [US1] Update StepListItem import to include `getStepDisplayLabel` in `apps/clementine-app/src/domains/experience/designer/components/StepListItem.tsx`
-- [ ] T008 [US1] Replace `definition.label` with `getStepDisplayLabel(step, definition)` call in `apps/clementine-app/src/domains/experience/designer/components/StepListItem.tsx`
+- [x] T007 [US1] Update StepListItem import to include `getStepDisplayLabel` in `apps/clementine-app/src/domains/experience/designer/components/StepListItem.tsx`
+- [x] T008 [US1] Replace `definition.label` with `getStepDisplayLabel(step, definition)` call in `apps/clementine-app/src/domains/experience/designer/components/StepListItem.tsx`
 
 **Checkpoint**: Custom titles display when set, default labels display as fallback
 
@@ -71,9 +71,9 @@
 
 **Purpose**: Ensure quality and no regressions
 
-- [ ] T009 Run `pnpm app:check` to verify lint and format pass
-- [ ] T010 Run `pnpm app:type-check` to verify TypeScript compilation
-- [ ] T011 Run `pnpm app:test` to verify all tests pass
+- [x] T009 Run `pnpm app:check` to verify lint and format pass
+- [x] T010 Run `pnpm app:type-check` to verify TypeScript compilation
+- [x] T011 Run `pnpm app:test` to verify all tests pass (note: pre-existing Firebase API key issue in unrelated test)
 - [ ] T012 Manual verification: create info step with title, verify title shows in step list
 - [ ] T013 Manual verification: create capture.photo step (no title field), verify "Photo Capture" label shows
 - [ ] T014 Manual verification: verify drag-drop, selection, and deletion still work (no regressions)
