@@ -2,11 +2,13 @@
  * ExperienceCard Component
  *
  * Card component for displaying experience in welcome screen preview.
- * Shows thumbnail, name, and profile badge.
+ * Shows thumbnail and name with theme-derived styling.
  * Supports different layouts (list/grid) and modes (edit/run).
  */
+import type { CSSProperties } from 'react'
 import type { Experience } from '@/domains/experience/shared'
-import { ProfileBadge } from '@/domains/experience/library/components/ProfileBadge'
+import type { Theme } from '@/shared/theming'
+import { useThemeWithOverride } from '@/shared/theming'
 import { cn } from '@/shared/utils/style-utils'
 
 export interface ExperienceCardProps {
@@ -27,11 +29,11 @@ export interface ExperienceCardProps {
    */
   mode: 'edit' | 'run'
 
-  /** Whether experience is enabled (affects opacity in edit mode) */
-  enabled?: boolean
-
   /** Click handler (only used in run mode) */
   onClick?: () => void
+
+  /** Theme override for use without ThemeProvider */
+  theme?: Theme
 }
 
 /**
@@ -39,12 +41,11 @@ export interface ExperienceCardProps {
  *
  * @example
  * ```tsx
- * // List layout (edit mode)
+ * // List layout (edit mode - WYSIWYG preview)
  * <ExperienceCard
  *   experience={experience}
  *   layout="list"
  *   mode="edit"
- *   enabled={true}
  * />
  *
  * // Grid layout (run mode)
@@ -60,25 +61,43 @@ export function ExperienceCard({
   experience,
   layout,
   mode,
-  enabled = true,
   onClick,
+  theme: themeOverride,
 }: ExperienceCardProps) {
+  const theme = useThemeWithOverride(themeOverride)
   const isInteractive = mode === 'run' && onClick
-  const isDisabled = mode === 'edit' && !enabled
 
-  // Base styles
+  // Display name with fallback for empty names
+  const displayName = experience.name || 'Untitled Experience'
+
+  // Themed card styles using color-mix for semi-transparent backgrounds
+  const cardStyle: CSSProperties = {
+    backgroundColor: `color-mix(in srgb, ${theme.text.color} 8%, transparent)`,
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: `color-mix(in srgb, ${theme.text.color} 15%, transparent)`,
+    fontFamily: theme.fontFamily ?? undefined,
+  }
+
+  // Themed placeholder styles
+  const placeholderStyle: CSSProperties = {
+    backgroundColor: `color-mix(in srgb, ${theme.text.color} 5%, transparent)`,
+    color: `color-mix(in srgb, ${theme.text.color} 40%, transparent)`,
+  }
+
+  // Text color style
+  const textStyle: CSSProperties = {
+    color: theme.text.color,
+  }
+
+  // Base classes (layout and interaction behavior, no hardcoded colors)
+  // Edit mode is WYSIWYG - same visual appearance as run mode, just non-interactive
   const cardClasses = cn(
-    'flex gap-3 p-3 rounded-lg border bg-card text-card-foreground',
+    'flex gap-3 p-3 rounded-lg min-h-[44px] transition-colors cursor-pointer select-none',
     {
       // Layout-specific styles
       'flex-row items-center': layout === 'list',
       'flex-col': layout === 'grid',
-
-      // Interactive styles
-      'cursor-pointer hover:bg-accent transition-colors': isInteractive,
-
-      // Disabled state (dimmed in edit mode)
-      'opacity-50': isDisabled,
     },
   )
 
@@ -107,17 +126,18 @@ export function ExperienceCard({
     <>
       {/* Thumbnail */}
       <div
-        className={cn(thumbnailClasses, 'rounded-md overflow-hidden bg-muted')}
+        className={cn(thumbnailClasses, 'rounded-md overflow-hidden')}
+        style={placeholderStyle}
       >
         {experience.media?.url ? (
           <img
             src={experience.media.url}
-            alt={experience.name}
+            alt={displayName}
             className="w-full h-full object-cover"
           />
         ) : (
           // Placeholder when no media
-          <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+          <div className="w-full h-full flex items-center justify-center">
             <span className="text-xs">No image</span>
           </div>
         )}
@@ -126,30 +146,60 @@ export function ExperienceCard({
       {/* Content */}
       <div
         className={cn(
-          'flex flex-col gap-2',
+          'flex flex-col',
           layout === 'list' ? 'flex-1 min-w-0' : '',
         )}
       >
-        <h3 className="font-medium text-sm truncate">{experience.name}</h3>
-        <ProfileBadge profile={experience.profile} />
+        <h3 className="font-medium text-sm truncate" style={textStyle}>
+          {displayName}
+        </h3>
       </div>
     </>
   )
+
+  // Hover style for interactive cards (slightly increased opacity)
+  const hoverStyle: CSSProperties = {
+    backgroundColor: `color-mix(in srgb, ${theme.text.color} 12%, transparent)`,
+  }
 
   // Render as interactive button when in run mode with onClick
   if (isInteractive) {
     return (
       <button
         type="button"
-        className={cardClasses}
+        className={cn(cardClasses, 'focus:outline-none focus:ring-2 group')}
+        style={{
+          ...cardStyle,
+          // @ts-expect-error CSS custom property for focus ring color
+          '--tw-ring-color': theme.primaryColor,
+        }}
         onClick={handleClick}
         onKeyDown={handleKeyDown}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = hoverStyle.backgroundColor!
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = cardStyle.backgroundColor!
+        }}
       >
         {cardContent}
       </button>
     )
   }
 
-  // Render as non-interactive div otherwise
-  return <div className={cardClasses}>{cardContent}</div>
+  // Render as non-interactive div otherwise (edit mode - WYSIWYG with hover but no click)
+  return (
+    <div
+      className={cardClasses}
+      style={cardStyle}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.backgroundColor = hoverStyle.backgroundColor!
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.backgroundColor = cardStyle.backgroundColor!
+      }}
+    >
+      {cardContent}
+    </div>
+  )
 }

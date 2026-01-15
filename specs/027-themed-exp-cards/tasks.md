@@ -24,8 +24,8 @@
 
 **Purpose**: Prepare component for refactoring
 
-- [ ] T001 Read current ExperienceCard implementation in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
-- [ ] T002 Verify theming dependencies are available by checking exports in `apps/clementine-app/src/shared/theming/index.ts`
+- [X] T001 Read current ExperienceCard implementation in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
+- [X] T002 Verify theming dependencies are available by checking exports in `apps/clementine-app/src/shared/theming/index.ts`
 
 **Checkpoint**: Ready to begin implementation
 
@@ -35,10 +35,10 @@
 
 **Purpose**: Update component interface and imports before modifying implementation
 
-- [ ] T003 Add `Theme` type import from `@/shared/theming` in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
-- [ ] T004 Add `useThemeWithOverride` hook import from `@/shared/theming` in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
-- [ ] T005 Add optional `theme?: Theme` prop to `ExperienceCardProps` interface in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
-- [ ] T006 Remove `ProfileBadge` import from `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
+- [X] T003 Add `Theme` type import from `@/shared/theming` in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
+- [X] T004 Add `useThemeWithOverride` hook import from `@/shared/theming` in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
+- [X] T005 Add optional `theme?: Theme` prop to `ExperienceCardProps` interface in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
+- [X] T006 Remove `ProfileBadge` import from `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
 
 **Checkpoint**: Interface updated, ready for implementation changes
 
@@ -52,14 +52,14 @@
 
 ### Implementation for User Story 1
 
-- [ ] T007 [US1] Add `useThemeWithOverride(themeOverride)` hook call at start of component function, destructuring `theme` prop in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
-- [ ] T008 [US1] Create `cardStyle: CSSProperties` object with themed background using `color-mix(in srgb, ${theme.text.color} 8%, transparent)` in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
-- [ ] T009 [US1] Add themed border styles to `cardStyle` with `borderWidth: '1px'`, `borderStyle: 'solid'`, `borderColor` using `color-mix(in srgb, ${theme.text.color} 15%, transparent)` in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
-- [ ] T010 [US1] Add `fontFamily: theme.fontFamily ?? undefined` to `cardStyle` in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
-- [ ] T011 [US1] Replace hardcoded `bg-card text-card-foreground` classes with `style={cardStyle}` prop on card container element in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
-- [ ] T012 [US1] Update placeholder div styling to use themed colors: `backgroundColor: color-mix(in srgb, ${theme.text.color} 5%, transparent)` and `color: color-mix(in srgb, ${theme.text.color} 40%, transparent)` in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
-- [ ] T013 [US1] Apply `theme.text.color` to experience name text element (either via style prop or by using ThemedText component) in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
-- [ ] T014 [US1] Add focus ring styling using theme primary color for run mode: `focus:ring-[${theme.primaryColor}]` or equivalent inline style in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
+- [X] T007 [US1] Add `useThemeWithOverride(themeOverride)` hook call at start of component function, destructuring `theme` prop in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
+- [X] T008 [US1] Create `cardStyle: CSSProperties` object with themed background using `color-mix(in srgb, ${theme.text.color} 8%, transparent)` in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
+- [X] T009 [US1] Add themed border styles to `cardStyle` with `borderWidth: '1px'`, `borderStyle: 'solid'`, `borderColor` using `color-mix(in srgb, ${theme.text.color} 15%, transparent)` in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
+- [X] T010 [US1] Add `fontFamily: theme.fontFamily ?? undefined` to `cardStyle` in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
+- [X] T011 [US1] Replace hardcoded `bg-card text-card-foreground` classes with `style={cardStyle}` prop on card container element in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
+- [X] T012 [US1] Update placeholder div styling to use themed colors: `backgroundColor: color-mix(in srgb, ${theme.text.color} 5%, transparent)` and `color: color-mix(in srgb, ${theme.text.color} 40%, transparent)` in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
+- [X] T013 [US1] Apply `theme.text.color` to experience name text element (either via style prop or by using ThemedText component) in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
+- [X] T014 [US1] Add focus ring styling using theme primary color for run mode: `focus:ring-[${theme.primaryColor}]` or equivalent inline style in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
 
 **Checkpoint**: Cards display with theme-derived colors - verify in WelcomePreview with custom theme
 
@@ -73,10 +73,10 @@
 
 ### Implementation for User Story 2
 
-- [ ] T015 [US2] Remove `<ProfileBadge profile={experience.profile} />` JSX from card content in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
-- [ ] T016 [US2] Add fallback for empty experience name: `const displayName = experience.name || 'Untitled Experience'` in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
-- [ ] T017 [US2] Update name rendering to use `displayName` variable instead of `experience.name` directly in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
-- [ ] T018 [US2] Ensure name text has `truncate` class for single-line ellipsis truncation in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
+- [X] T015 [US2] Remove `<ProfileBadge profile={experience.profile} />` JSX from card content in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
+- [X] T016 [US2] Add fallback for empty experience name: `const displayName = experience.name || 'Untitled Experience'` in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
+- [X] T017 [US2] Update name rendering to use `displayName` variable instead of `experience.name` directly in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
+- [X] T018 [US2] Ensure name text has `truncate` class for single-line ellipsis truncation in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
 
 **Checkpoint**: Cards show only media + name with fallback text - no ProfileBadge visible
 
@@ -90,9 +90,9 @@
 
 ### Implementation for User Story 3
 
-- [ ] T019 [US3] Verify `cardStyle` is applied regardless of `layout` prop value (list or grid) in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
-- [ ] T020 [US3] Ensure thumbnail placeholder uses themed styles in both layouts in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
-- [ ] T021 [US3] Verify interactive hover state uses themed styling (slightly increased opacity) for run mode in both layouts in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
+- [X] T019 [US3] Verify `cardStyle` is applied regardless of `layout` prop value (list or grid) in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
+- [X] T020 [US3] Ensure thumbnail placeholder uses themed styles in both layouts in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
+- [X] T021 [US3] Verify interactive hover state uses themed styling (slightly increased opacity) for run mode in both layouts in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
 
 **Checkpoint**: Both list and grid layouts display consistent themed appearance
 
@@ -102,12 +102,12 @@
 
 **Purpose**: Final cleanup and accessibility verification
 
-- [ ] T022 Ensure `min-h-[44px]` class is on card container for touch target compliance (Constitution Principle I) in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
-- [ ] T023 Verify keyboard navigation still works in run mode (Enter/Space triggers onClick) in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
-- [ ] T024 Run `pnpm app:check` to verify linting and formatting pass
-- [ ] T025 Run `pnpm app:type-check` to verify TypeScript compilation succeeds
+- [X] T022 Ensure `min-h-[44px]` class is on card container for touch target compliance (Constitution Principle I) in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
+- [X] T023 Verify keyboard navigation still works in run mode (Enter/Space triggers onClick) in `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
+- [X] T024 Run `pnpm app:check` to verify linting and formatting pass
+- [X] T025 Run `pnpm app:type-check` to verify TypeScript compilation succeeds
 - [ ] T026 Manually test in WelcomePreview: verify themed cards with custom colors, default colors, both layouts, with/without media
-- [ ] T027 Remove any unused imports or dead code from `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
+- [X] T027 Remove any unused imports or dead code from `apps/clementine-app/src/domains/event/experiences/components/ExperienceCard.tsx`
 
 ---
 
