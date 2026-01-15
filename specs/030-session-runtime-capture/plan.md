@@ -102,11 +102,19 @@ apps/clementine-app/app/
 │       ├── shared/
 │       │   └── types/
 │       │       └── runtime.types.ts          # EXISTS - RuntimeEngine interface
-│       ├── runtime/                          # TO CREATE - new folder
+│       ├── runtime/                          # EXISTS - runtime folder
 │       │   ├── hooks/
-│       │   │   ├── useExperienceRuntime.ts   # TO CREATE - runtime engine hook
+│       │   │   ├── useExperienceRuntime.ts   # EXISTS - TO REFACTOR (use Zustand)
+│       │   │   └── index.ts                  # EXISTS
+│       │   ├── stores/
+│       │   │   ├── useSessionRuntimeStore.ts # TO CREATE - Zustand store (AD-001)
 │       │   │   └── index.ts                  # TO CREATE
-│       │   └── index.ts                      # TO CREATE
+│       │   └── index.ts                      # EXISTS
+│       ├── steps/
+│       │   └── registry/
+│       │       ├── step-registry.ts          # EXISTS
+│       │       ├── step-validation.ts        # TO CREATE - input validation (AD-003)
+│       │       └── index.ts                  # MODIFY - add validation export
 │       ├── designer/
 │       │   ├── components/
 │       │   │   └── PreviewModal.tsx          # TO CREATE - preview UI
@@ -132,6 +140,66 @@ apps/clementine-app/app/
 ```
 
 **Structure Decision**: Following existing domain-driven architecture. Session hooks in `/domains/session/shared/hooks/`, runtime engine in new `/domains/experience/runtime/` folder to keep runtime logic separate from designer logic.
+
+## Architectural Decisions
+
+### AD-001: Zustand Store for Runtime State
+
+**Decision**: Use Zustand store for runtime navigation state, separate from Firestore session persistence.
+
+**Rationale**:
+- **Firestore session** = persistent progress (for recovery/analytics)
+- **Zustand store** = runtime navigation (for immediate UI updates)
+- Navigation (back/forward) updates Zustand immediately without Firestore writes
+- Firestore sync only on "meaningful" events: answer submitted, step completed, session complete
+- Reduces unnecessary Firestore writes during step review
+
+**Files**:
+- `src/domains/experience/runtime/stores/useSessionRuntimeStore.ts` (TO CREATE)
+
+### AD-002: Session Schema Alignment with Epic
+
+**Decision**: Update session schema to match E5 epic specification with structured arrays.
+
+**Changes**:
+- Replace `inputs: Record<string, unknown>` → `answers: Answer[]` (with stepType, answeredAt)
+- Replace `outputs: Record<string, MediaReference>` → `capturedMedia: CapturedMedia[]`
+- Add explicit `result: SessionResult | null` for final output
+- Add `workspaceId` for cross-project analytics
+- Rename `activeJobId` → `jobId`
+
+**Rationale**: Structured arrays enable better analytics (queries by stepType, timing analysis).
+
+### AD-003: Step Input Validation in Registry
+
+**Decision**: Move input validation logic to step registry, co-located with step definitions.
+
+**Rationale**:
+- Validation rules are defined by step config (min/max, required, maxLength)
+- Each step type owns its validation
+- Extensible via registry pattern (matches existing `step-registry.ts`)
+- Cleaner separation from runtime hook
+
+**Files**:
+- `src/domains/experience/steps/registry/step-validation.ts` (TO CREATE)
+
+### AD-004: Remove Query Invalidation from Session Hooks
+
+**Decision**: Remove `queryClient.invalidateQueries()` from session mutation hooks.
+
+**Rationale**:
+- `useSubscribeSession` uses `onSnapshot` for real-time updates
+- Subscription auto-syncs state changes
+- Query invalidation is unnecessary overhead
+
+### AD-005: Use convertFirestoreData Utility
+
+**Decision**: Use existing `convertFirestoreData()` utility for Firestore type conversion.
+
+**Rationale**:
+- Consistent handling of Timestamps, DocumentReferences, GeoPoints
+- Already exists at `@/shared/utils/firestore-utils`
+- Replaces manual timestamp conversion in `useSubscribeSession`
 
 ## Complexity Tracking
 

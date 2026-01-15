@@ -17,7 +17,7 @@ This document defines the data entities for the Session & Runtime Foundation fea
 
 **Firestore Path**: `/projects/{projectId}/sessions/{sessionId}`
 
-**Source**: `/src/domains/session/shared/schemas/session.schema.ts` (exists)
+**Source**: `/src/domains/session/shared/schemas/session.schema.ts` (TO UPDATE)
 
 #### Fields
 
@@ -27,17 +27,45 @@ This document defines the data entities for the Session & Runtime Foundation fea
 | `projectId` | string | Yes | - | Parent project ID |
 | `eventId` | string | Yes | - | Event that triggered this session |
 | `experienceId` | string | Yes | - | Experience configuration being executed |
+| `workspaceId` | string | Yes | - | Workspace ID for cross-project queries |
 | `mode` | enum | Yes | - | Session mode: `'preview'` \| `'guest'` |
 | `configSource` | enum | Yes | - | Which config to use: `'draft'` \| `'published'` |
 | `status` | enum | No | `'active'` | Lifecycle status: `'active'` \| `'completed'` \| `'abandoned'` \| `'error'` |
-| `currentStepIndex` | number | No | `0` | Current step index (0-based) |
-| `inputs` | Record<string, unknown> | No | `{}` | Step inputs keyed by step ID |
-| `outputs` | Record<string, MediaReference> | No | `{}` | Generated media keyed by step ID |
-| `activeJobId` | string \| null | No | `null` | Transform job ID (for async processing) |
-| `resultAssetId` | string \| null | No | `null` | Final result asset ID |
+| `currentStepIndex` | number | No | `0` | Current step index (0-based, for recovery) |
+| `answers` | Answer[] | No | `[]` | Collected answers from input steps |
+| `capturedMedia` | CapturedMedia[] | No | `[]` | Media captured from capture steps |
+| `result` | SessionResult \| null | No | `null` | Final result from transform/capture |
+| `jobId` | string \| null | No | `null` | Active transform job ID |
+| `createdBy` | string \| null | No | `null` | User ID who created session (for security rules) |
 | `createdAt` | number | Yes | - | Creation timestamp (Unix ms) |
 | `updatedAt` | number | Yes | - | Last update timestamp (Unix ms) |
 | `completedAt` | number \| null | No | `null` | Completion timestamp (Unix ms) |
+
+#### Nested Types
+
+**Answer** (collected from input steps):
+| Field | Type | Description |
+|-------|------|-------------|
+| `stepId` | string | Step that collected this answer |
+| `stepType` | string | Step type (e.g., 'input.scale', 'input.yesNo') |
+| `value` | string \| number \| boolean \| string[] | The answer value |
+| `answeredAt` | number | Timestamp when answered (Unix ms) |
+
+**CapturedMedia** (from capture steps):
+| Field | Type | Description |
+|-------|------|-------------|
+| `stepId` | string | Step that captured this media |
+| `assetId` | string | Media asset ID in storage |
+| `url` | string | Public URL to the asset |
+| `createdAt` | number | Capture timestamp (Unix ms) |
+
+**SessionResult** (final output):
+| Field | Type | Description |
+|-------|------|-------------|
+| `stepId` | string | Step that produced the result |
+| `assetId` | string | Result asset ID |
+| `url` | string | Public URL to the result |
+| `createdAt` | number | Result creation timestamp (Unix ms) |
 
 #### Validation Rules
 
@@ -46,6 +74,8 @@ This document defines the data entities for the Session & Runtime Foundation fea
 - `configSource`: Must be `'draft'` or `'published'`
 - `status`: Must be one of `'active'`, `'completed'`, `'abandoned'`, `'error'`
 - `currentStepIndex`: Non-negative integer
+- `answers[].stepType`: Must match valid step type from registry
+- `answers[].value`: Type must match step type expectations
 
 #### State Transitions
 
@@ -74,9 +104,45 @@ This document defines the data entities for the Session & Runtime Foundation fea
 
 ---
 
-### 2. RuntimeState (In-Memory)
+### 2. SessionRuntimeStore (Zustand - In-Memory)
 
-**Description**: Represents the current state of an experience execution. Used internally by the runtime engine, not persisted directly (derived from session document).
+**Description**: Zustand store for runtime state management during experience execution. Separates UI navigation state from Firestore persistence.
+
+**Source**: `/src/domains/experience/runtime/stores/useSessionRuntimeStore.ts` (TO CREATE)
+
+**Design Rationale**:
+- **Firestore session** = persistent progress (for recovery, analytics)
+- **Zustand store** = runtime navigation state (for immediate UI updates)
+- Navigation (back/forward) updates Zustand immediately, syncs to Firestore on "meaningful" events (answer submitted, step completed)
+
+#### Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `currentStepIndex` | number | Current step index for UI (0-based) |
+| `answers` | Answer[] | Answers collected during runtime |
+| `capturedMedia` | CapturedMedia[] | Media captured during runtime |
+| `isComplete` | boolean | Whether experience has completed |
+| `isSyncing` | boolean | Whether currently syncing to Firestore |
+
+#### Actions
+
+| Action | Description |
+|--------|-------------|
+| `initFromSession(session)` | Initialize store from session document |
+| `setAnswer(stepId, stepType, value)` | Record an answer for a step |
+| `setCapturedMedia(stepId, media)` | Record captured media for a step |
+| `goToStep(index)` | Navigate to a specific step (no Firestore sync) |
+| `nextStep()` | Move to next step (triggers Firestore sync) |
+| `previousStep()` | Move to previous step (no Firestore sync) |
+| `complete()` | Mark experience as complete (triggers Firestore sync) |
+| `syncToFirestore()` | Persist current state to Firestore |
+
+---
+
+### 3. RuntimeState (Legacy - In-Memory)
+
+**Description**: Simple state snapshot type used by RuntimeEngine interface. May be deprecated in favor of SessionRuntimeStore.
 
 **Source**: `/src/domains/experience/shared/types/runtime.types.ts` (exists)
 
@@ -90,7 +156,7 @@ This document defines the data entities for the Session & Runtime Foundation fea
 
 ---
 
-### 3. MediaReference (Shared)
+### 4. MediaReference (Shared)
 
 **Description**: Reference to a media asset stored in Firebase Storage.
 
@@ -115,9 +181,10 @@ This document defines the data entities for the Session & Runtime Foundation fea
 
 ```typescript
 {
-  projectId: string     // Required - parent project
-  eventId: string       // Required - triggering event
-  experienceId: string  // Required - experience to run
+  projectId: string       // Required - parent project
+  eventId: string         // Required - triggering event
+  experienceId: string    // Required - experience to run
+  workspaceId: string     // Required - workspace for cross-project queries
   mode: 'preview' | 'guest'  // Required - session mode
   configSource: 'draft' | 'published'  // Required - config to use
 }
@@ -129,10 +196,12 @@ This document defines the data entities for the Session & Runtime Foundation fea
 
 ```typescript
 {
+  projectId: string              // Required - project containing session
   sessionId: string              // Required - session to update
   currentStepIndex?: number      // Optional - new step index
-  inputs?: Record<string, unknown>  // Optional - updated inputs
-  outputs?: Record<string, MediaReference>  // Optional - updated outputs
+  answers?: Answer[]             // Optional - answers to merge
+  capturedMedia?: CapturedMedia[]  // Optional - media to merge
+  result?: SessionResult         // Optional - final result
 }
 ```
 
@@ -142,7 +211,19 @@ This document defines the data entities for the Session & Runtime Foundation fea
 
 ```typescript
 {
+  projectId: string  // Required - project containing session
   sessionId: string  // Required - session to complete
+}
+```
+
+### AbandonSessionInput
+
+**Purpose**: Input for marking a session as abandoned.
+
+```typescript
+{
+  projectId: string  // Required - project containing session
+  sessionId: string  // Required - session to abandon
 }
 ```
 
@@ -211,5 +292,9 @@ See `firebase/firestore.rules` for implementation. Summary:
 
 - Session schema uses `z.looseObject()` for forward compatibility with future fields
 - Timestamps use Unix milliseconds for consistency with Firestore
-- `inputs` uses `Record<string, unknown>` to support various input types (string, number, boolean, array)
-- `outputs` is strongly typed with `MediaReference` schema
+- `answers` array structure enables analytics queries by `stepType` and timing analysis via `answeredAt`
+- `capturedMedia` and `result` use explicit structure rather than generic `Record<string, unknown>`
+- `workspaceId` enables cross-project analytics queries
+- `currentStepIndex` in Firestore is for session recovery, not real-time navigation state
+- Zustand store provides immediate UI updates for navigation; Firestore sync happens on meaningful events
+- Use `convertFirestoreData()` utility from `@/shared/utils/firestore-utils` for consistent type conversion
