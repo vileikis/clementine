@@ -136,3 +136,20 @@ export function getCategoryLabel(category: StepCategory): string {
   }
   return labels[category]
 }
+
+/**
+ * Get the display label for a step
+ * Returns custom title if present and non-empty, otherwise default label
+ */
+export function getStepDisplayLabel(
+  step: Step,
+  definition: StepDefinition,
+): string {
+  if ('title' in step.config && typeof step.config.title === 'string') {
+    const trimmedTitle = step.config.title.trim()
+    if (trimmedTitle) {
+      return trimmedTitle
+    }
+  }
+  return definition.label
+}

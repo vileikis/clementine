@@ -172,7 +172,7 @@ export function StepList({
       </div>
 
       {/* Step list with keyboard navigation */}
-      <ScrollArea className="flex-1">
+      <ScrollArea className="min-h-0 flex-1">
         <div
           ref={listRef}
           role="listbox"
