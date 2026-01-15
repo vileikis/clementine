@@ -19,9 +19,9 @@
 
 **Purpose**: Add version fields to Experience schema
 
-- [ ] T001 Add `draftVersion` field to experienceSchema in `domains/experience/shared/schemas/experience.schema.ts`
-- [ ] T002 Add `publishedVersion` field to experienceSchema in `domains/experience/shared/schemas/experience.schema.ts`
-- [ ] T003 Export updated Experience type from `domains/experience/shared/schemas/experience.schema.ts`
+- [x] T001 Add `draftVersion` field to experienceSchema in `domains/experience/shared/schemas/experience.schema.ts`
+- [x] T002 Add `publishedVersion` field to experienceSchema in `domains/experience/shared/schemas/experience.schema.ts`
+- [x] T003 Export updated Experience type from `domains/experience/shared/schemas/experience.schema.ts`
 
 **Checkpoint**: Schema updated with version fields, backward compatible via Zod defaults
 
@@ -33,11 +33,11 @@
 
 **⚠️ CRITICAL**: US2 and US4 depend on this helper
 
-- [ ] T004 Create `updateExperienceConfigField.ts` in `domains/experience/shared/lib/`
-- [ ] T005 Implement transaction-based update with `increment(1)` for draftVersion in `domains/experience/shared/lib/updateExperienceConfigField.ts`
-- [ ] T006 Add dot-notation prefix transformation for nested field updates in `domains/experience/shared/lib/updateExperienceConfigField.ts`
-- [ ] T007 Export helper from `domains/experience/shared/lib/index.ts` barrel file
-- [ ] T008 [P] Add unit test for updateExperienceConfigField in `domains/experience/shared/lib/__tests__/updateExperienceConfigField.test.ts`
+- [x] T004 Create `updateExperienceConfigField.ts` in `domains/experience/shared/lib/`
+- [x] T005 Implement transaction-based update with `increment(1)` for draftVersion in `domains/experience/shared/lib/updateExperienceConfigField.ts`
+- [x] T006 Add dot-notation prefix transformation for nested field updates in `domains/experience/shared/lib/updateExperienceConfigField.ts`
+- [x] T007 Export helper from `domains/experience/shared/lib/index.ts` barrel file
+- [x] T008 [P] Add unit test for updateExperienceConfigField in `domains/experience/shared/lib/__tests__/updateExperienceConfigField.test.ts`
 
 **Checkpoint**: Shared helper ready - user story implementation can now begin
 
@@ -51,13 +51,13 @@
 
 ### Tests for User Story 1
 
-- [ ] T009 [P] [US1] Add schema unit tests for version field defaults in `domains/experience/shared/schemas/__tests__/experience.schema.test.ts`
+- [x] T009 [P] [US1] Add schema unit tests for version field defaults in `domains/experience/shared/schemas/__tests__/experience.schema.test.ts`
 
 ### Implementation for User Story 1
 
-- [ ] T010 [US1] Update EditorChangesBadge props in ExperienceDesignerLayout to use `experience.draftVersion` in `domains/experience/designer/containers/ExperienceDesignerLayout.tsx`
-- [ ] T011 [US1] Update EditorChangesBadge props in ExperienceDesignerLayout to use `experience.publishedVersion` in `domains/experience/designer/containers/ExperienceDesignerLayout.tsx`
-- [ ] T012 [US1] Remove existing deep-comparison change detection logic from ExperienceDesignerLayout in `domains/experience/designer/containers/ExperienceDesignerLayout.tsx`
+- [x] T010 [US1] Update EditorChangesBadge props in ExperienceDesignerLayout to use `experience.draftVersion` in `domains/experience/designer/containers/ExperienceDesignerLayout.tsx`
+- [x] T011 [US1] Update EditorChangesBadge props in ExperienceDesignerLayout to use `experience.publishedVersion` in `domains/experience/designer/containers/ExperienceDesignerLayout.tsx`
+- [x] T012 [US1] Remove existing deep-comparison change detection logic from ExperienceDesignerLayout in `domains/experience/designer/containers/ExperienceDesignerLayout.tsx`
 
 **Checkpoint**: EditorChangesBadge shows accurate version state - US1 independently testable
 
@@ -71,10 +71,10 @@
 
 ### Implementation for User Story 2
 
-- [ ] T013 [US2] Refactor useUpdateExperienceDraft to use updateExperienceConfigField helper in `domains/experience/designer/hooks/useUpdateExperienceDraft.ts`
-- [ ] T014 [US2] Ensure draftVersion increment and updatedAt timestamp update in useUpdateExperienceDraft in `domains/experience/designer/hooks/useUpdateExperienceDraft.ts`
-- [ ] T015 [US2] Preserve existing Sentry error reporting in useUpdateExperienceDraft in `domains/experience/designer/hooks/useUpdateExperienceDraft.ts`
-- [ ] T016 [US2] Verify query cache invalidation pattern in useUpdateExperienceDraft in `domains/experience/designer/hooks/useUpdateExperienceDraft.ts`
+- [x] T013 [US2] Refactor useUpdateExperienceDraft to use updateExperienceConfigField helper in `domains/experience/designer/hooks/useUpdateExperienceDraft.ts`
+- [x] T014 [US2] Ensure draftVersion increment and updatedAt timestamp update in useUpdateExperienceDraft in `domains/experience/designer/hooks/useUpdateExperienceDraft.ts`
+- [x] T015 [US2] Preserve existing Sentry error reporting in useUpdateExperienceDraft in `domains/experience/designer/hooks/useUpdateExperienceDraft.ts`
+- [x] T016 [US2] Verify query cache invalidation pattern in useUpdateExperienceDraft in `domains/experience/designer/hooks/useUpdateExperienceDraft.ts`
 
 **Checkpoint**: Draft edits increment version atomically - US2 independently testable
 
@@ -88,10 +88,10 @@
 
 ### Implementation for User Story 3
 
-- [ ] T017 [US3] Add publishedVersion sync to usePublishExperience transaction in `domains/experience/designer/hooks/usePublishExperience.ts`
-- [ ] T018 [US3] Read current draftVersion in transaction before setting publishedVersion in `domains/experience/designer/hooks/usePublishExperience.ts`
-- [ ] T019 [US3] Update return type to include version info in usePublishExperience in `domains/experience/designer/hooks/usePublishExperience.ts`
-- [ ] T020 [US3] Verify cache invalidation triggers UI update in usePublishExperience in `domains/experience/designer/hooks/usePublishExperience.ts`
+- [x] T017 [US3] Add publishedVersion sync to usePublishExperience transaction in `domains/experience/designer/hooks/usePublishExperience.ts`
+- [x] T018 [US3] Read current draftVersion in transaction before setting publishedVersion in `domains/experience/designer/hooks/usePublishExperience.ts`
+- [x] T019 [US3] Update return type to include version info in usePublishExperience in `domains/experience/designer/hooks/usePublishExperience.ts`
+- [x] T020 [US3] Verify cache invalidation triggers UI update in usePublishExperience in `domains/experience/designer/hooks/usePublishExperience.ts`
 
 **Checkpoint**: Publish syncs versions - US3 independently testable
 
@@ -105,9 +105,9 @@
 
 ### Implementation for User Story 4
 
-- [ ] T021 [US4] Refactor useUpdateDraftSteps to use updateExperienceConfigField with dot-notation in `domains/experience/designer/hooks/useUpdateDraftSteps.ts`
-- [ ] T022 [US4] Ensure partial update uses `draft.steps` prefix in useUpdateDraftSteps in `domains/experience/designer/hooks/useUpdateDraftSteps.ts`
-- [ ] T023 [US4] Preserve existing error handling and cache invalidation in useUpdateDraftSteps in `domains/experience/designer/hooks/useUpdateDraftSteps.ts`
+- [x] T021 [US4] Refactor useUpdateDraftSteps to use updateExperienceConfigField with dot-notation in `domains/experience/designer/hooks/useUpdateDraftSteps.ts`
+- [x] T022 [US4] Ensure partial update uses `draft.steps` prefix in useUpdateDraftSteps in `domains/experience/designer/hooks/useUpdateDraftSteps.ts`
+- [x] T023 [US4] Preserve existing error handling and cache invalidation in useUpdateDraftSteps in `domains/experience/designer/hooks/useUpdateDraftSteps.ts`
 
 **Checkpoint**: Partial updates use dot-notation - US4 independently testable
 
@@ -117,9 +117,9 @@
 
 **Purpose**: Validation, cleanup, and final verification
 
-- [ ] T024 [P] Run `pnpm app:check` to verify linting and formatting
-- [ ] T025 [P] Run `pnpm app:type-check` to verify TypeScript compilation
-- [ ] T026 [P] Run `pnpm app:test` to verify all unit tests pass
+- [x] T024 [P] Run `pnpm app:check` to verify linting and formatting
+- [x] T025 [P] Run `pnpm app:type-check` to verify TypeScript compilation
+- [x] T026 [P] Run `pnpm app:test` to verify all unit tests pass
 - [ ] T027 Manually test quickstart.md validation scenarios in browser
 - [ ] T028 Verify backward compatibility with existing experiences (no version fields in Firestore)
 
