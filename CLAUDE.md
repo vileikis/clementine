@@ -307,8 +307,12 @@ See individual workspace documentation for required environment variables.
 - Firebase Firestore (client SDK) - `projects/{projectId}/events/{eventId}` with nested `draftConfig.share` field (024-share-editor)
 - TypeScript 5.7.2 (strict mode, ES2022 target) + TanStack Start 1.132.0, TanStack Query 5.66.5, TanStack Router 1.132.0, React 19.2.0, Zod 4.1.12, @dnd-kit/core, @dnd-kit/sortable, shadcn/ui (Sheet component) (025-event-exp-integration)
 - Firebase Firestore (client SDK) - extends `projectEventConfigSchema` with `experiences` field (025-event-exp-integration)
+- TypeScript 5.7.2 (strict mode, ES2022 target) + React 19.2.0, TanStack Query 5.66.5, shadcn/ui (Radix Dialog), Zod 4.1.12 (026-event-rename)
+- Firebase Firestore (client SDK) - `/projects/{projectId}/events/{eventId}` (026-event-rename)
 - TypeScript 5.7.2 (strict mode, ES2022 target) + React 19.2.0, TanStack Start 1.132.0, Tailwind CSS v4 (027-themed-exp-cards)
 - N/A (no data changes - uses existing Experience and Theme entities) (027-themed-exp-cards)
+- TypeScript 5.7.2 (strict mode, ES2022 target) + React 19.2.0, TanStack Start 1.132.0, Zod 4.1.12, shadcn/ui (031-step-list-naming)
+- N/A (no data model changes - display logic only) (031-step-list-naming)
 
 ## Recent Changes
 - 019-exp-system-foundations: Added TypeScript 5.7.2 (strict mode, ES2022 target) + Zod 4.1.12 (validation), TanStack Query 5.66.5 (data fetching), Firebase SDK 12.5.0 (Firestore)

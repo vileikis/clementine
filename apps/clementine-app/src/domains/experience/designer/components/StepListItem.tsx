@@ -8,7 +8,10 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { GripVertical, MoreVertical, Trash2 } from 'lucide-react'
 
-import { getStepDefinition } from '../../steps/registry/step-utils'
+import {
+  getStepDefinition,
+  getStepDisplayLabel,
+} from '../../steps/registry/step-utils'
 import type { Step } from '../../steps/registry/step-registry'
 import { cn } from '@/shared/utils'
 import {
@@ -121,7 +124,9 @@ export function StepListItem({
         )}
       >
         <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />
-        <span className="truncate">{definition.label}</span>
+        <span className="min-w-0 line-clamp-2">
+          {getStepDisplayLabel(step, definition)}
+        </span>
         {isSelected && (
           <span className="ml-auto h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
         )}
