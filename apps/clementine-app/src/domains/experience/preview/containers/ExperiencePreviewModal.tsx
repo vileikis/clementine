@@ -39,6 +39,7 @@ import { StepRendererRouter } from '../components/StepRendererRouter'
 import type { Experience } from '@/domains/experience/shared'
 import type { Session } from '@/domains/session'
 import type { Theme } from '@/shared/theming'
+import { useGhostProject } from '@/domains/project/shared'
 import { useCreateSession, useSubscribeSession } from '@/domains/session'
 import { ThemeProvider, themeSchema } from '@/shared/theming'
 import { Dialog, DialogContent, DialogTitle } from '@/ui-kit/ui/dialog'
@@ -65,13 +66,6 @@ export interface ExperiencePreviewModalProps {
 const DEFAULT_PREVIEW_THEME: Theme = themeSchema.parse({})
 
 /**
- * Preview session placeholder IDs
- * Used for standalone experience preview without event context
- */
-const PREVIEW_PROJECT_ID = '__preview__'
-const PREVIEW_EVENT_ID = '__preview__'
-
-/**
  * ExperiencePreviewModal Component
  *
  * Full-screen modal for previewing experience execution.
@@ -83,6 +77,10 @@ export function ExperiencePreviewModal({
   experience,
   workspaceId,
 }: ExperiencePreviewModalProps) {
+  // Ghost project for preview sessions
+  const { data: ghostProjectId, isLoading: isGhostLoading } =
+    useGhostProject(workspaceId)
+
   // Session state
   const [sessionId, setSessionId] = useState<string | null>(null)
   const [session, setSession] = useState<Session | null>(null)
@@ -94,7 +92,7 @@ export function ExperiencePreviewModal({
 
   // Subscribe to session updates
   const { session: subscribedSession } = useSubscribeSession(
-    sessionId ? PREVIEW_PROJECT_ID : null,
+    sessionId && ghostProjectId ? ghostProjectId : null,
     sessionId,
   )
 
@@ -111,17 +109,17 @@ export function ExperiencePreviewModal({
   // Theme for preview (using default for now)
   const previewTheme = DEFAULT_PREVIEW_THEME
 
-  // Initialize session when modal opens
+  // Initialize session when modal opens (wait for ghost project)
   useEffect(() => {
-    if (open && !sessionId && !isInitializing) {
+    if (open && !sessionId && !isInitializing && ghostProjectId) {
       setIsInitializing(true)
       setError(null)
 
       createSession
         .mutateAsync({
-          projectId: PREVIEW_PROJECT_ID,
+          projectId: ghostProjectId,
           workspaceId,
-          eventId: PREVIEW_EVENT_ID,
+          eventId: null, // No event for preview sessions
           experienceId: experience.id,
           mode: 'preview',
           configSource: 'draft',
@@ -142,6 +140,7 @@ export function ExperiencePreviewModal({
     open,
     sessionId,
     isInitializing,
+    ghostProjectId,
     createSession,
     workspaceId,
     experience.id,
@@ -214,7 +213,7 @@ export function ExperiencePreviewModal({
         {/* Content area */}
         <div className="h-full pt-14">
           {/* Loading state */}
-          {isInitializing && (
+          {(isGhostLoading || isInitializing) && (
             <div className="flex h-full items-center justify-center">
               <div className="flex flex-col items-center gap-4">
                 <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -238,7 +237,7 @@ export function ExperiencePreviewModal({
           )}
 
           {/* Empty steps state */}
-          {!isInitializing && !error && steps.length === 0 && (
+          {!isGhostLoading && !isInitializing && !error && steps.length === 0 && (
             <div className="flex h-full items-center justify-center">
               <div className="flex flex-col items-center gap-4 text-center">
                 <p className="text-sm text-muted-foreground">
@@ -252,7 +251,7 @@ export function ExperiencePreviewModal({
           )}
 
           {/* Runtime content */}
-          {!isInitializing && !error && session && steps.length > 0 && (
+          {!isGhostLoading && !isInitializing && !error && session && steps.length > 0 && (
             <ThemeProvider theme={previewTheme}>
               <ExperienceRuntime
                 experienceId={experience.id}

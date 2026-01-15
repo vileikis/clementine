@@ -23,8 +23,8 @@ export const createSessionInputSchema = z.object({
   /** Workspace ID for cross-project analytics */
   workspaceId: z.string(),
 
-  /** Parent event ID */
-  eventId: z.string(),
+  /** Parent event ID (null for preview sessions) */
+  eventId: z.string().nullable(),
 
   /** Experience to execute */
   experienceId: z.string(),

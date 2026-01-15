@@ -34,6 +34,7 @@ export function useCreateProject() {
           name: input.name || 'Untitled project',
           workspaceId: input.workspaceId,
           status: 'draft' as const,
+          type: 'standard' as const,
           activeEventId: null,
           deletedAt: null,
           createdAt: serverTimestamp(),

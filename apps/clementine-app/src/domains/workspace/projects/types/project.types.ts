@@ -7,6 +7,13 @@
 export type ProjectStatus = 'draft' | 'live' | 'deleted'
 
 /**
+ * Project type
+ * - standard: Regular user-created project
+ * - ghost: System-managed project for preview sessions
+ */
+export type ProjectType = 'standard' | 'ghost'
+
+/**
  * Project entity representing a photo/video experience
  */
 export interface Project {
@@ -21,6 +28,9 @@ export interface Project {
 
   /** Current lifecycle state (draft | live | deleted) */
   status: ProjectStatus
+
+  /** Project type (standard for user projects, ghost for preview sessions) */
+  type: ProjectType
 
   /** Reference to currently active event (null if no active event) */
   activeEventId: string | null
