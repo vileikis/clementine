@@ -1,25 +1,26 @@
-# Epic E5: Session, Runtime & Capture
+# Epic E5: Session & Runtime Foundation
 
 > **Epic Series:** Experience System
 > **Dependencies:** E2 (Step System & Editor)
-> **Enables:** E7 (Guest Experience Execution)
+> **Enables:** E5.2 (Photo Capture), E7 (Guest Experience Execution)
 
 ---
 
 ## 1. Goal
 
-Enable experience execution through a runtime engine with session-based state management, including photo capture functionality.
+Enable experience execution through a runtime engine with session-based state management.
 
 **This epic delivers:**
 
 - Session domain (create, subscribe, update)
 - Runtime engine (step sequencing, state management)
-- Step renderers (run mode) for all step types
-- Photo capture step with camera integration
+- Step renderers (run mode) for input and info steps
 - Admin preview (test experience in editor)
+- Placeholder renderers for capture and transform steps
 
 **This epic does NOT include:**
 
+- Photo capture with camera integration (E5.2)
 - Guest routes and access (E6)
 - Guest experience flow (E7)
 - Transform pipeline (E9)
@@ -31,13 +32,19 @@ Enable experience execution through a runtime engine with session-based state ma
 
 ### 2.1 Session Document
 
-**Path:** `/workspaces/{workspaceId}/sessions/{sessionId}`
+**Path:** `/projects/{projectId}/sessions/{sessionId}`
+
+Sessions are scoped to projects since guests interact with events (which live under projects). This enables cleaner security rules and analytics queries at the project/event level.
 
 ```typescript
 {
   id: string
-  workspaceId: string
-  experienceId: string
+
+  // Hierarchy references
+  projectId: string       // parent collection
+  eventId: string         // which event triggered this session
+  experienceId: string    // which experience config was used
+  workspaceId: string     // for cross-project queries if needed
 
   mode: 'preview' | 'guest'
 
@@ -45,25 +52,29 @@ Enable experience execution through a runtime engine with session-based state ma
   currentStepIndex: number
   status: 'active' | 'completed' | 'abandoned'
 
-  // Collected data
+  // Collected data from input steps
   answers: Array<{
     stepId: string
     stepType: string
-    value: unknown
+    value: string | number | boolean | string[]  // explicit types for analytics
     answeredAt: number
   }>
 
-  // Captured media
+  // Captured media from capture steps
   capturedMedia: Array<{
     stepId: string
-    mediaAssetId: string
+    assetId: string
     url: string
-    capturedAt: number
+    createdAt: number
   }>
 
-  // Result (from transform or final capture)
-  resultAssetId: string | null
-  resultUrl: string | null
+  // Final result (from transform or final capture)
+  result: {
+    stepId: string        // which step produced this
+    assetId: string
+    url: string
+    createdAt: number
+  } | null
 
   // Timestamps
   createdAt: number
@@ -108,7 +119,7 @@ interface ExperienceRuntime {
   goToStep(index: number): void
 
   // Data collection
-  setAnswer(stepId: string, value: unknown): void
+  setAnswer(stepId: string, value: string | number | boolean | string[]): void
   setMedia(stepId: string, media: CapturedMedia): void
 
   // Completion
@@ -147,8 +158,8 @@ interface StepRendererProps {
   config: StepConfig
 
   // Run mode only
-  answer?: unknown
-  onAnswer?: (value: unknown) => void
+  answer?: string | number | boolean | string[]
+  onAnswer?: (value: string | number | boolean | string[]) => void
   onNext?: () => void
   onBack?: () => void
   canGoBack?: boolean
@@ -178,8 +189,9 @@ interface StepRendererProps {
 - Selection proceeds to next step
 
 **InputMultiSelectRenderer (run mode)**
-- Shows question with option checkboxes
-- Validates min/max selections
+- Shows question with option buttons/checkboxes
+- Single select: radio-style selection
+- Multi select: checkbox-style, validates min/max
 - "Continue" enabled when valid
 
 **InputShortTextRenderer (run mode)**
@@ -192,62 +204,22 @@ interface StepRendererProps {
 - Validates max length
 - "Continue" enabled when valid
 
-**CapturePhotoRenderer (run mode)**
-- Camera preview from `shared/camera`
-- Countdown timer (if configured)
-- Capture button
-- Retake option
-- "Continue" after capture
+**CapturePhotoRenderer (run mode) - PLACEHOLDER**
+- Shows placeholder message: "Camera capture"
+- Displays step instructions if configured
+- "Continue" button (skips capture for now)
+- Full camera integration in E5.2
 
-**TransformPipelineRenderer (run mode)**
+**TransformPipelineRenderer (run mode) - PLACEHOLDER**
 - Shows "Processing..." message
 - "Continue" button (placeholder until E9)
 - No actual processing yet
 
 ---
 
-## 5. Photo Capture Step
+## 5. Admin Preview
 
-### 5.1 Integration with shared/camera
-
-Leverage existing `shared/camera` module:
-- Camera permissions handling
-- Camera preview component
-- Photo capture functionality
-- Upload fallback
-
-### 5.2 Capture Flow
-
-```
-Camera Preview → Countdown (optional) → Capture → Preview → Confirm/Retake
-```
-
-### 5.3 Storage Integration
-
-On capture:
-1. Upload to Firebase Storage via media asset system
-2. Create MediaAsset record
-3. Store reference in session.capturedMedia
-4. Set as resultAssetId (for share screen)
-
-### 5.4 Config Options
-
-```typescript
-interface CapturePhotoConfig {
-  instructions: string | null
-  countdown: {
-    enabled: boolean
-    seconds: number  // 3, 5, 10
-  }
-  // Future: overlay, filters
-}
-```
-
----
-
-## 6. Admin Preview
-
-### 6.1 Preview Flow
+### 5.1 Preview Flow
 
 1. Admin clicks "Preview" in experience editor
 2. Creates preview session (mode: 'preview')
@@ -255,28 +227,28 @@ interface CapturePhotoConfig {
 4. Runs through steps using runtime
 5. Can close at any time
 
-### 6.2 Preview UI
+### 5.2 Preview UI
 
 ```
 ┌─────────────────────────────────────┐
 │ Preview Mode                    [×] │
 ├─────────────────────────────────────┤
 │                                     │
-│     ┌─────────────────────┐        │
-│     │                     │        │
-│     │   [Step Renderer]   │        │
-│     │     (run mode)      │        │
-│     │                     │        │
-│     │   [Continue]        │        │
-│     │                     │        │
-│     └─────────────────────┘        │
+│     ┌─────────────────────────┐    │
+│     │                         │    │
+│     │   [Step Renderer]       │    │
+│     │     (run mode)          │    │
+│     │                         │    │
+│     │   [Continue]            │    │
+│     │                         │    │
+│     └─────────────────────────┘    │
 │                                     │
 │     Step 2 of 5                     │
 │                                     │
 └─────────────────────────────────────┘
 ```
 
-### 6.3 Preview Session Behavior
+### 5.3 Preview Session Behavior
 
 - Uses draft config (not published)
 - Excluded from analytics
@@ -285,21 +257,22 @@ interface CapturePhotoConfig {
 
 ---
 
-## 7. Security Rules
+## 6. Security Rules
 
-### 7.1 Session Rules
+### 6.1 Session Rules
 
 ```javascript
-match /workspaces/{workspaceId}/sessions/{sessionId} {
-  // Admins can read all sessions
-  allow read: if isAdmin();
+match /projects/{projectId}/sessions/{sessionId} {
+  // Project admins can read all sessions
+  allow read: if isProjectAdmin(projectId);
 
   // Authenticated users can read own session
   allow read: if request.auth != null
     && resource.data.createdBy == request.auth.uid;
 
-  // Authenticated users can create sessions
-  allow create: if request.auth != null;
+  // Authenticated users can create sessions for accessible projects
+  allow create: if request.auth != null
+    && canAccessProject(projectId);
 
   // Only session owner can update
   allow update: if request.auth != null
@@ -312,7 +285,7 @@ match /workspaces/{workspaceId}/sessions/{sessionId} {
 
 ---
 
-## 8. Implementation Phases
+## 7. Implementation Phases
 
 ### Phase 1: Session Domain
 
@@ -324,32 +297,29 @@ Build runtime engine with step sequencing, navigation, and state management hook
 
 ### Phase 3: Step Renderers (Run Mode)
 
-Convert edit mode renderers to support run mode. Implement interactive behavior for all step types.
+Convert edit mode renderers to support run mode. Implement interactive behavior for input and info steps. Add placeholder renderers for capture and transform.
 
-### Phase 4: Photo Capture Integration
-
-Integrate shared/camera module with capture step. Implement storage upload flow.
-
-### Phase 5: Admin Preview
+### Phase 4: Admin Preview
 
 Build preview modal in experience editor. Wire up session creation and runtime.
 
-### Phase 6: Polish & Testing
+### Phase 5: Polish & Testing
 
-Handle edge cases, loading states, error recovery, session cleanup.
+Handle edge cases, loading states, error recovery.
 
 ---
 
-## 9. Acceptance Criteria
+## 8. Acceptance Criteria
 
 ### Must Have
 
-- [ ] Session documents created and persisted
+- [ ] Session documents created and persisted under projects
 - [ ] Runtime engine sequences through steps correctly
-- [ ] All step renderers work in run mode
-- [ ] Input steps collect and persist answers
-- [ ] Photo capture uses camera with countdown
-- [ ] Captured photos upload to storage
+- [ ] Info step renderer works in run mode
+- [ ] All input step renderers work in run mode
+- [ ] Input steps collect and persist answers (including arrays for multi-select)
+- [ ] Capture step shows placeholder with Continue button
+- [ ] Transform step shows placeholder with Continue button
 - [ ] Admin preview runs experience from editor
 - [ ] Preview uses draft config
 - [ ] Back/forward navigation works correctly
@@ -358,12 +328,11 @@ Handle edge cases, loading states, error recovery, session cleanup.
 ### Nice to Have
 
 - [ ] Session recovery on page refresh
-- [ ] Photo retake with limit
-- [ ] Camera flip (front/back)
+- [ ] Progress indicator in preview
 
 ---
 
-## 10. Technical Notes
+## 9. Technical Notes
 
 ### Folder Structure
 
@@ -385,27 +354,24 @@ domains/
 │   │   └── renderers/
 │   │       ├── InfoStepRenderer.tsx      # Updated for run mode
 │   │       ├── InputScaleRenderer.tsx    # Updated
-│   │       ├── CapturePhotoRenderer.tsx  # Updated with camera
+│   │       ├── CapturePhotoRenderer.tsx  # Placeholder for now
 │   │       └── ...
 │   └── editor/
 │       └── components/
 │           └── PreviewModal.tsx
-└── shared/
-    └── camera/                           # Existing module
 ```
 
 ### Dependencies
 
-- `shared/camera` - Camera capture functionality
 - `shared/preview-shell` - Phone frame for preview
-- `integrations/firebase/storage` - Media upload
 
 ---
 
-## 11. Out of Scope
+## 10. Out of Scope
 
 | Item | Epic |
 |------|------|
+| Photo capture with camera | E5.2 |
 | Guest routes | E6 |
 | Guest experience flow | E7 |
 | Transform processing | E9 |
