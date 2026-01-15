@@ -80,15 +80,11 @@ export function ExperienceRuntime({
   const updateProgress = useUpdateSessionProgress()
   const completeSession = useCompleteSession()
 
-  // Refs for tracking previous state (to detect changes)
-  const prevStepIndexRef = useRef<number | null>(null)
-  const prevMediaCountRef = useRef<number>(0)
-  const prevIsCompleteRef = useRef<boolean>(false)
-  const isInitializedRef = useRef<boolean>(false)
-
-  // Debounce timer ref for answer updates
+  // Refs
+  const isInitializedRef = useRef(false)
+  const prevStepIndexRef = useRef<number>(session.currentStepIndex ?? 0)
   const answerDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const prevAnswersLengthRef = useRef<number>(0)
+  const hasCompletedRef = useRef(session.status === 'completed')
 
   // Sync to Firestore helper
   const syncToFirestore = useCallback(
@@ -116,16 +112,11 @@ export function ExperienceRuntime({
   // Initialize store from session on mount or session change
   useEffect(() => {
     store.initFromSession(session, steps, experienceId)
-
-    // Initialize refs after store init
     prevStepIndexRef.current = session.currentStepIndex ?? 0
-    prevMediaCountRef.current = session.capturedMedia?.length ?? 0
-    prevIsCompleteRef.current = session.status === 'completed'
-    prevAnswersLengthRef.current = session.answers?.length ?? 0
+    hasCompletedRef.current = session.status === 'completed'
     isInitializedRef.current = true
 
     return () => {
-      // Cleanup on unmount
       isInitializedRef.current = false
     }
   }, [session.id, experienceId, steps])
@@ -137,15 +128,14 @@ export function ExperienceRuntime({
     }
   }, [steps.length, store.isComplete])
 
-  // React to forward navigation → sync to Firestore
+  // React to step changes
   useEffect(() => {
-    // Skip if not initialized
-    if (!isInitializedRef.current || prevStepIndexRef.current === null) return
+    if (!isInitializedRef.current) return
 
     const current = store.currentStepIndex
     const prev = prevStepIndexRef.current
 
-    // Only sync on forward navigation (making progress)
+    // Only sync stepIndex on forward navigation
     if (current > prev) {
       syncToFirestore({
         currentStepIndex: current,
@@ -154,7 +144,7 @@ export function ExperienceRuntime({
       })
     }
 
-    // Fire onStepChange callback when step changes (forward or back)
+    // Fire onStepChange callback on any step change
     if (current !== prev) {
       const currentStep = store.steps[current]
       if (currentStep) {
@@ -165,45 +155,19 @@ export function ExperienceRuntime({
     prevStepIndexRef.current = current
   }, [store.currentStepIndex, store.answers, store.capturedMedia, store.steps, syncToFirestore, onStepChange])
 
-  // React to new media capture → sync immediately
+  // React to answer changes - debounced sync
+  // Zustand creates new array reference on change, so this fires on content changes too
   useEffect(() => {
-    // Skip if not initialized
     if (!isInitializedRef.current) return
+    if (store.answers.length === 0) return
 
-    const currentCount = store.capturedMedia.length
-    const prevCount = prevMediaCountRef.current
-
-    // Sync when new media is added
-    if (currentCount > prevCount) {
-      syncToFirestore({ capturedMedia: store.capturedMedia })
+    if (answerDebounceRef.current) {
+      clearTimeout(answerDebounceRef.current)
     }
 
-    prevMediaCountRef.current = currentCount
-  }, [store.capturedMedia, syncToFirestore])
-
-  // React to answer changes → debounced sync
-  useEffect(() => {
-    // Skip if not initialized
-    if (!isInitializedRef.current) return
-
-    const currentLength = store.answers.length
-    const prevLength = prevAnswersLengthRef.current
-
-    // Only sync if answers were added or modified
-    // We detect this by checking if the answers array changed
-    if (currentLength !== prevLength || currentLength > 0) {
-      // Clear existing debounce
-      if (answerDebounceRef.current) {
-        clearTimeout(answerDebounceRef.current)
-      }
-
-      // Debounce the sync
-      answerDebounceRef.current = setTimeout(() => {
-        syncToFirestore({ answers: store.answers })
-      }, 300)
-    }
-
-    prevAnswersLengthRef.current = currentLength
+    answerDebounceRef.current = setTimeout(() => {
+      syncToFirestore({ answers: store.answers })
+    }, 300)
 
     return () => {
       if (answerDebounceRef.current) {
@@ -212,29 +176,37 @@ export function ExperienceRuntime({
     }
   }, [store.answers, syncToFirestore])
 
-  // React to completion → complete session in Firestore
+  // React to media changes - immediate sync
+  // Zustand creates new array reference on change, so this fires on content changes too
   useEffect(() => {
-    // Skip if not initialized or was already complete
-    if (!isInitializedRef.current || prevIsCompleteRef.current) return
+    if (!isInitializedRef.current) return
+    if (store.capturedMedia.length === 0) return
 
-    if (store.isComplete && !prevIsCompleteRef.current) {
-      completeSession
-        .mutateAsync({
-          projectId: session.projectId,
-          sessionId: session.id,
-        })
-        .then(() => {
-          onComplete?.()
-        })
-        .catch((error) => {
-          onError?.(error instanceof Error ? error : new Error('Complete failed'))
-        })
-    }
+    syncToFirestore({ capturedMedia: store.capturedMedia })
+  }, [store.capturedMedia, syncToFirestore])
 
-    prevIsCompleteRef.current = store.isComplete
+  // React to completion
+  useEffect(() => {
+    if (!isInitializedRef.current) return
+    if (!store.isComplete) return
+    if (hasCompletedRef.current) return // Already completed
+
+    hasCompletedRef.current = true
+
+    completeSession
+      .mutateAsync({
+        projectId: session.projectId,
+        sessionId: session.id,
+      })
+      .then(() => {
+        onComplete?.()
+      })
+      .catch((error) => {
+        onError?.(error instanceof Error ? error : new Error('Complete failed'))
+      })
   }, [store.isComplete, session.projectId, session.id, completeSession, onComplete, onError])
 
-  // Cleanup debounce timer on unmount
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (answerDebounceRef.current) {
