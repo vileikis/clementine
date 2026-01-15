@@ -3,29 +3,36 @@
  *
  * Mutation hook for updating session progress during experience execution.
  * Updates current step index, answers array, and captured media.
+ *
+ * Uses direct updateDoc (no transaction) since the runtime store is the
+ * source of truth during execution.
  */
 import { useMutation } from '@tanstack/react-query'
-import { doc, runTransaction, serverTimestamp } from 'firebase/firestore'
+import { doc, serverTimestamp, updateDoc } from 'firebase/firestore'
 import * as Sentry from '@sentry/tanstackstart-react'
 
-import { updateSessionProgressInputSchema } from '../types/session-api.types'
-import type { UpdateSessionProgressInput } from '../types/session-api.types'
-import type { Answer, CapturedMedia } from '../schemas/session.schema'
+import type { UpdateData } from 'firebase/firestore'
+import type { Answer, CapturedMedia, Session } from '../schemas/session.schema'
+
 import { firestore } from '@/integrations/firebase/client'
 
 /**
- * Input type for update mutation with projectId
+ * Input type for update mutation
  */
-interface UpdateProgressInput extends UpdateSessionProgressInput {
+interface UpdateProgressInput {
   projectId: string
+  sessionId: string
+  currentStepIndex?: number
+  answers?: Answer[]
+  capturedMedia?: CapturedMedia[]
 }
 
 /**
  * Hook for updating session progress
  *
  * Features:
- * - Validates input with Zod schema
- * - Merges answers/capturedMedia arrays with existing data
+ * - Direct updateDoc (no transaction overhead)
+ * - Type-safe updates with UpdateData<Session>
  * - Updates serverTimestamp on each write
  * - No query invalidation needed (useSubscribeSession uses onSnapshot)
  * - Captures errors to Sentry
@@ -43,7 +50,7 @@ interface UpdateProgressInput extends UpdateSessionProgressInput {
  *       projectId: session.projectId,
  *       sessionId: session.id,
  *       currentStepIndex: currentStepIndex + 1,
- *       answers: [answer],
+ *       answers: [...existingAnswers, answer],
  *     })
  *   }
  * }
@@ -51,69 +58,33 @@ interface UpdateProgressInput extends UpdateSessionProgressInput {
  */
 export function useUpdateSessionProgress() {
   return useMutation<void, Error, UpdateProgressInput>({
-    mutationFn: async (input) => {
-      // Validate input (excluding projectId which is not in the schema)
-      const { projectId, ...progressInput } = input
-      const validated = updateSessionProgressInputSchema.parse(progressInput)
-
+    mutationFn: async ({
+      projectId,
+      sessionId,
+      currentStepIndex,
+      answers,
+      capturedMedia,
+    }) => {
       const sessionRef = doc(
         firestore,
-        `projects/${projectId}/sessions/${validated.sessionId}`,
+        `projects/${projectId}/sessions/${sessionId}`,
       )
 
-      await runTransaction(firestore, async (transaction) => {
-        const sessionDoc = await transaction.get(sessionRef)
+      const updates: UpdateData<Session> = {
+        updatedAt: serverTimestamp(),
+      }
 
-        if (!sessionDoc.exists()) {
-          throw new Error(`Session ${validated.sessionId} not found`)
-        }
+      if (currentStepIndex !== undefined) {
+        updates.currentStepIndex = currentStepIndex
+      }
+      if (answers) {
+        updates.answers = answers
+      }
+      if (capturedMedia) {
+        updates.capturedMedia = capturedMedia
+      }
 
-        const existingData = sessionDoc.data()
-
-        // Build update object
-        const updates: Record<string, unknown> = {
-          updatedAt: serverTimestamp(),
-        }
-
-        // Update currentStepIndex if provided
-        if (validated.currentStepIndex !== undefined) {
-          updates.currentStepIndex = validated.currentStepIndex
-        }
-
-        // Merge answers array if provided (replace by stepId, append new)
-        if (validated.answers && validated.answers.length > 0) {
-          const existingAnswers: Answer[] = existingData.answers ?? []
-          const newStepIds = new Set(validated.answers.map((a) => a.stepId))
-          // Keep answers for steps not being updated, then add new ones
-          const mergedAnswers = [
-            ...existingAnswers.filter((a) => !newStepIds.has(a.stepId)),
-            ...validated.answers,
-          ]
-          updates.answers = mergedAnswers
-        }
-
-        // Merge capturedMedia array if provided (replace by stepId, append new)
-        if (validated.capturedMedia && validated.capturedMedia.length > 0) {
-          const existingMedia: CapturedMedia[] =
-            existingData.capturedMedia ?? []
-          const newStepIds = new Set(
-            validated.capturedMedia.map((m) => m.stepId),
-          )
-          // Keep media for steps not being updated, then add new ones
-          const mergedMedia = [
-            ...existingMedia.filter((m) => !newStepIds.has(m.stepId)),
-            ...validated.capturedMedia,
-          ]
-          updates.capturedMedia = mergedMedia
-        }
-
-        // Set resultMedia if provided
-        if (validated.resultMedia) {
-          updates.resultMedia = validated.resultMedia
-        }
-
-        transaction.update(sessionRef, updates)
-      })
+      await updateDoc(sessionRef, updates)
     },
     onError: (error, { sessionId }) => {
       Sentry.captureException(error, {

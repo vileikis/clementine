@@ -10,7 +10,6 @@ import {
   capturedMediaSchema,
   configSourceSchema,
   sessionModeSchema,
-  sessionResultMediaSchema,
 } from '../schemas/session.schema'
 import type { Session } from '../schemas/session.schema'
 
@@ -39,6 +38,8 @@ export const createSessionInputSchema = z.object({
 
 /**
  * Update session progress input schema
+ *
+ * Note: resultMedia is intentionally excluded - it's written by cloud functions only.
  */
 export const updateSessionProgressInputSchema = z.object({
   /** Session to update */
@@ -47,14 +48,11 @@ export const updateSessionProgressInputSchema = z.object({
   /** New step index (optional) */
   currentStepIndex: z.number().optional(),
 
-  /** Answers to merge (optional) */
+  /** Answers to set (optional) - overwrites existing */
   answers: z.array(answerSchema).optional(),
 
-  /** Captured media to merge (optional) */
+  /** Captured media to set (optional) - overwrites existing */
   capturedMedia: z.array(capturedMediaSchema).optional(),
-
-  /** Final result media (optional) */
-  resultMedia: sessionResultMediaSchema.optional(),
 })
 
 /**
