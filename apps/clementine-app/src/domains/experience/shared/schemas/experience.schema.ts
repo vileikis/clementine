@@ -128,6 +128,16 @@ export const experienceSchema = z.looseObject({
   published: experienceConfigSchema.nullable().default(null),
 
   /**
+   * VERSIONING
+   */
+
+  /** Draft version number (starts at 1, increments on each edit) */
+  draftVersion: z.number().default(1),
+
+  /** Published version number (syncs with draftVersion on publish, null until first publish) */
+  publishedVersion: z.number().nullable().default(null),
+
+  /**
    * PUBLISH TRACKING
    */
 

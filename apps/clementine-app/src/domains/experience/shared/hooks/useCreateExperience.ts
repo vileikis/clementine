@@ -86,6 +86,8 @@ export function useCreateExperience() {
           media: null,
           draft: { steps: [] },
           published: null,
+          draftVersion: 1,
+          publishedVersion: null,
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
           publishedAt: null,

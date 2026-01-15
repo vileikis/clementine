@@ -230,8 +230,10 @@ export function usePublishExperience() {
           throw new Error('Cannot publish: no draft configuration exists')
         }
 
+        // Sync publishedVersion with current draftVersion
         transaction.update(experienceRef, {
           published: currentExperience.draft,
+          publishedVersion: currentExperience.draftVersion,
           publishedAt: serverTimestamp(),
           publishedBy: null, // TODO: Add current user ID when auth is integrated
           updatedAt: serverTimestamp(),
