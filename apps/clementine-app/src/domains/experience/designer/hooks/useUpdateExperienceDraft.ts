@@ -3,9 +3,15 @@
  *
  * Mutation hook for updating the draft section of an experience.
  * Used by auto-save to persist step changes with serverTimestamp().
+ * Atomically increments draftVersion on each update.
  */
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { doc, runTransaction, serverTimestamp } from 'firebase/firestore'
+import {
+  doc,
+  increment,
+  runTransaction,
+  serverTimestamp,
+} from 'firebase/firestore'
 import * as Sentry from '@sentry/tanstackstart-react'
 
 import { experienceKeys } from '../../shared/queries/experience.query'
@@ -75,10 +81,11 @@ export function useUpdateExperienceDraft() {
         `workspaces/${workspaceId}/experiences/${experienceId}`,
       )
 
-      // Update draft and timestamp in transaction
+      // Update draft with atomic version increment in transaction
       await runTransaction(firestore, (transaction) => {
         transaction.update(experienceRef, {
           draft,
+          draftVersion: increment(1),
           updatedAt: serverTimestamp(),
         })
         return Promise.resolve()

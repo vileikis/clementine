@@ -4,16 +4,16 @@
  * Mutation hook for updating the steps array in an experience draft.
  * Used for immediate saves after add/delete/reorder operations.
  * Integrates with editor store for save status tracking.
+ * Atomically increments draftVersion on each update using shared helper.
  */
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { doc, runTransaction, serverTimestamp } from 'firebase/firestore'
 import * as Sentry from '@sentry/tanstackstart-react'
 
 import { useExperienceDesignerStore } from '../stores'
 import { experienceKeys } from '../../shared/queries/experience.query'
+import { updateExperienceConfigField } from '../../shared/lib'
 import type { Step } from '../../steps/registry/step-registry'
 import { useTrackedMutation } from '@/shared/editor-status'
-import { firestore } from '@/integrations/firebase/client'
 
 /**
  * Input for updating draft steps
@@ -59,18 +59,9 @@ export function useUpdateDraftSteps(workspaceId: string, experienceId: string) {
 
   const mutation = useMutation<void, Error, UpdateDraftStepsInput>({
     mutationFn: async ({ steps }) => {
-      const experienceRef = doc(
-        firestore,
-        `workspaces/${workspaceId}/experiences/${experienceId}`,
-      )
-
-      // Update steps in transaction
-      await runTransaction(firestore, (transaction) => {
-        transaction.update(experienceRef, {
-          'draft.steps': steps,
-          updatedAt: serverTimestamp(),
-        })
-        return Promise.resolve()
+      // Use shared helper for atomic version increment with dot-notation
+      await updateExperienceConfigField(workspaceId, experienceId, {
+        steps,
       })
     },
     onSuccess: () => {

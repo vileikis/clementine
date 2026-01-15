@@ -311,6 +311,9 @@ See individual workspace documentation for required environment variables.
 - Firebase Firestore (client SDK) - `/projects/{projectId}/events/{eventId}` (026-event-rename)
 - TypeScript 5.7.2 (strict mode enabled, ES2022 target) + TanStack Start 1.132.0, React 19.2.0, TanStack Query 5.66.5, Zod 4.1.12, Zustand 5.0.9, Firebase SDK 12.5.0 (030-session-runtime-capture)
 - Firebase Firestore (client SDK) - `/projects/{projectId}/sessions/{sessionId}` (030-session-runtime-capture)
+- TypeScript 5.7.2 (strict mode, ES2022 target) + React 19.2.0, TanStack Start 1.132.0, Zod 4.1.12, shadcn/ui (031-step-list-naming)
+- N/A (no data model changes - display logic only) (031-step-list-naming)
+- TypeScript 5.7.2 (strict mode, ES2022 target) + TanStack Start 1.132.0, TanStack Query 5.66.5, React 19.2.0, Zod 4.1.12, Firebase SDK 12.5.0 (030-exp-versioning)
 
 ## Recent Changes
 - 019-exp-system-foundations: Added TypeScript 5.7.2 (strict mode, ES2022 target) + Zod 4.1.12 (validation), TanStack Query 5.66.5 (data fetching), Firebase SDK 12.5.0 (Firestore)

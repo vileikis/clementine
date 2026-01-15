@@ -58,41 +58,15 @@ export function ExperienceDesignerLayout({
   // Compute paths for breadcrumb navigation
   const experiencesPath = `/workspace/${workspaceSlug}/experiences`
 
-  // Detect unpublished changes by comparing draft and published
+  // Detect unpublished changes using version-based comparison
   const hasUnpublishedChanges = useMemo(() => {
-    const draftSteps = experience.draft?.steps ?? []
-    const publishedSteps = experience.published?.steps ?? []
-
-    // If never published, any draft with steps is unpublished
-    if (!experience.published) {
-      return draftSteps.length > 0
+    // Never published: always has unpublished changes (if draft exists)
+    if (experience.publishedVersion === null) {
+      return experience.draft !== null
     }
-
-    // Different number of steps = changes
-    if (draftSteps.length !== publishedSteps.length) {
-      return true
-    }
-
-    // Compare each step by id, type, and config
-    // Using sorted JSON keys to avoid property order issues
-    const normalizeConfig = (config: Record<string, unknown>) =>
-      JSON.stringify(config, Object.keys(config).sort())
-
-    for (let i = 0; i < draftSteps.length; i++) {
-      const draft = draftSteps[i]
-      const published = publishedSteps[i]
-
-      if (
-        draft.id !== published.id ||
-        draft.type !== published.type ||
-        normalizeConfig(draft.config) !== normalizeConfig(published.config)
-      ) {
-        return true
-      }
-    }
-
-    return false
-  }, [experience.draft, experience.published])
+    // Has changes if draft version is higher than published version
+    return experience.draftVersion > experience.publishedVersion
+  }, [experience.draftVersion, experience.publishedVersion, experience.draft])
 
   // Cleanup: reset save state on unmount
   useEffect(() => {
@@ -158,8 +132,8 @@ export function ExperienceDesignerLayout({
               lastCompletedAt={lastCompletedAt}
             />
             <EditorChangesBadge
-              draftVersion={experience.draft ? 1 : null}
-              publishedVersion={experience.published ? 1 : null}
+              draftVersion={experience.draftVersion}
+              publishedVersion={experience.publishedVersion}
             />
             <Button variant="outline" disabled>
               Preview
