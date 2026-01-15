@@ -124,7 +124,7 @@ export function StepListItem({
         )}
       >
         <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />
-        <span className="truncate">
+        <span className="min-w-0 line-clamp-2">
           {getStepDisplayLabel(step, definition)}
         </span>
         {isSelected && (
