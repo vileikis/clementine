@@ -147,6 +147,35 @@
 
 ---
 
+## ⚠️ IMPORTANT: ExperienceRuntime Container Pattern Refactoring Complete
+
+**Before proceeding with Phase 4 and beyond**, review the refactored runtime implementation:
+
+📁 **Review**: `apps/clementine-app/src/domains/experience/runtime/`
+
+### What was implemented (see `experience-runtime-container.md`):
+
+1. **Store renamed**: `useSessionRuntimeStore` → `useExperienceRuntimeStore` (in `stores/experienceRuntimeStore.ts`)
+2. **Terminology aligned**: `result` → `resultMedia`, `SessionResult` → `SessionResultMedia`
+3. **RuntimeState updated**: `inputs`/`outputs` → `answers`/`capturedMedia` with `resultMedia`
+4. **Container pattern**: `ExperienceRuntime.tsx` container with reactive Firestore sync
+5. **Public hook**: `useRuntime()` - curated API for children components
+6. **Removed**: `useAbandonSession` hook, `useExperienceRuntime` hook (replaced by container pattern)
+
+### Architecture:
+```
+ExperienceRuntime (Container)     → Orchestrates lifecycle, reactive Firestore sync
+    └── useExperienceRuntimeStore → Pure state + synchronous actions
+    └── useRuntime()              → Public hook for children (exposes store directly)
+```
+
+### Key patterns:
+- **Store is pure**: No side effects, just state management
+- **Container handles sync**: Subscribes to store changes, syncs reactively
+- **Children use `useRuntime()`**: Call store actions, container reacts automatically
+
+---
+
 ## Phase 4: User Story 2 - Runtime Engine Sequences Steps (Priority: P1)
 
 **Goal**: Runtime engine manages step sequencing, navigation, and state synchronization.
