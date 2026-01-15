@@ -72,16 +72,16 @@ export function ExperienceCard({
 
   // Themed card styles using color-mix for semi-transparent backgrounds
   const cardStyle: CSSProperties = {
-    backgroundColor: `color-mix(in srgb, ${theme.text.color} 8%, transparent)`,
+    backgroundColor: `color-mix(in srgb, ${theme.primaryColor} 8%, transparent)`,
     borderWidth: '1px',
     borderStyle: 'solid',
-    borderColor: `color-mix(in srgb, ${theme.text.color} 15%, transparent)`,
+    borderColor: `color-mix(in srgb, ${theme.primaryColor} 20%, transparent)`,
     fontFamily: theme.fontFamily ?? undefined,
   }
 
   // Themed placeholder styles
   const placeholderStyle: CSSProperties = {
-    backgroundColor: `color-mix(in srgb, ${theme.text.color} 5%, transparent)`,
+    backgroundColor: `color-mix(in srgb, ${theme.primaryColor} 10%, transparent)`,
     color: `color-mix(in srgb, ${theme.text.color} 40%, transparent)`,
   }
 
@@ -157,9 +157,9 @@ export function ExperienceCard({
     </>
   )
 
-  // Hover style for interactive cards (slightly increased opacity)
+  // Hover style for cards (slightly increased opacity)
   const hoverStyle: CSSProperties = {
-    backgroundColor: `color-mix(in srgb, ${theme.text.color} 12%, transparent)`,
+    backgroundColor: `color-mix(in srgb, ${theme.primaryColor} 15%, transparent)`,
   }
 
   // Render as interactive button when in run mode with onClick
