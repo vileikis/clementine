@@ -3,7 +3,7 @@
 
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { useRenameProjectEvent } from '../hooks/useRenameProjectEvent'
 import {
@@ -66,6 +66,13 @@ export function RenameProjectEventDialog({
   const [name, setName] = useState(initialName)
   const renameProjectEvent = useRenameProjectEvent(projectId)
 
+  // Sync input state when dialog opens or initialName changes
+  useEffect(() => {
+    if (open) {
+      setName(initialName)
+    }
+  }, [open, initialName])
+
   const handleRename = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -79,8 +86,6 @@ export function RenameProjectEventDialog({
         description: 'Your event name has been updated successfully.',
       })
       onOpenChange(false)
-      // Reset to initial name for next open
-      setName(initialName)
     } catch (error) {
       toast.error('Failed to rename event', {
         description:

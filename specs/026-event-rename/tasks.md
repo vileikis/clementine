@@ -24,7 +24,7 @@
 
 **Purpose**: No setup needed - working in existing codebase
 
-- [ ] T001 Verify branch `026-event-rename` is checked out and up to date with main
+- [X] T001 Verify branch `026-event-rename` is checked out and up to date with main
 
 **Checkpoint**: Ready to implement
 
@@ -38,9 +38,9 @@
 
 ### Implementation for User Story 1
 
-- [ ] T002 [US1] Add `useEffect` import to React import statement in `apps/clementine-app/src/domains/project/events/components/RenameProjectEventDialog.tsx`
-- [ ] T003 [US1] Add state synchronization effect after useState declaration in `apps/clementine-app/src/domains/project/events/components/RenameProjectEventDialog.tsx`
-- [ ] T004 [US1] Remove redundant `setName(initialName)` from handleRename success path in `apps/clementine-app/src/domains/project/events/components/RenameProjectEventDialog.tsx`
+- [X] T002 [US1] Add `useEffect` import to React import statement in `apps/clementine-app/src/domains/project/events/components/RenameProjectEventDialog.tsx`
+- [X] T003 [US1] Add state synchronization effect after useState declaration in `apps/clementine-app/src/domains/project/events/components/RenameProjectEventDialog.tsx`
+- [X] T004 [US1] Remove redundant `setName(initialName)` from handleRename success path in `apps/clementine-app/src/domains/project/events/components/RenameProjectEventDialog.tsx`
 
 **Checkpoint**: User Story 1 complete - dialog shows current name after rename
 
@@ -56,7 +56,7 @@
 
 > No additional code changes needed - the `useEffect` from US1 handles this case automatically by including `initialName` in the dependency array. When the parent component's data updates (via TanStack Query cache invalidation), the `initialName` prop changes, triggering the effect.
 
-- [ ] T005 [US2] Verify external update scenario works with US1 implementation (manual test only)
+- [X] T005 [US2] Verify external update scenario works with US1 implementation (manual test only)
 
 **Checkpoint**: User Story 2 complete - dialog reflects external changes
 
@@ -66,8 +66,8 @@
 
 **Purpose**: Final validation and code quality checks
 
-- [ ] T006 Run `pnpm app:check` to fix formatting and lint issues
-- [ ] T007 Run `pnpm app:type-check` to verify TypeScript compliance
+- [X] T006 Run `pnpm app:check` to fix formatting and lint issues
+- [X] T007 Run `pnpm app:type-check` to verify TypeScript compliance
 - [ ] T008 Manual test: Complete all scenarios from quickstart.md
 - [ ] T009 Verify existing functionality preserved (keyboard shortcuts, validation, error handling)
 
