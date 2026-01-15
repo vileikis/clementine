@@ -87,7 +87,6 @@ export function WelcomePreview({
                 experience={experience}
                 layout={welcome.layout}
                 mode="edit"
-                enabled={true}
               />
             ))}
           </div>
