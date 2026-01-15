@@ -153,7 +153,14 @@ export function ExperienceRuntime({
     }
 
     prevStepIndexRef.current = current
-  }, [store.currentStepIndex, store.answers, store.capturedMedia, store.steps, syncToFirestore, onStepChange])
+  }, [
+    store.currentStepIndex,
+    store.answers,
+    store.capturedMedia,
+    store.steps,
+    syncToFirestore,
+    onStepChange,
+  ])
 
   // React to answer changes - debounced sync
   // Zustand creates new array reference on change, so this fires on content changes too
@@ -204,7 +211,14 @@ export function ExperienceRuntime({
       .catch((error) => {
         onError?.(error instanceof Error ? error : new Error('Complete failed'))
       })
-  }, [store.isComplete, session.projectId, session.id, completeSession, onComplete, onError])
+  }, [
+    store.isComplete,
+    session.projectId,
+    session.id,
+    completeSession,
+    onComplete,
+    onError,
+  ])
 
   // Cleanup on unmount
   useEffect(() => {

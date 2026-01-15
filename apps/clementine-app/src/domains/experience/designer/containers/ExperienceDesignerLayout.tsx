@@ -4,7 +4,7 @@
  * Domain-owned layout for experience designer. Handles publish workflow,
  * change detection, and integrates TopNavBar + ExperienceDesignerPage.
  */
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Loader2, Sparkles } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -14,6 +14,7 @@ import {
   isValidationError,
   usePublishExperience,
 } from '../hooks'
+import { ExperiencePreviewModal } from '../../preview'
 import { ExperienceDesignerPage } from './ExperienceDesignerPage'
 import type { Experience } from '@/domains/experience/shared'
 import type { Step } from '@/domains/experience/steps'
@@ -54,6 +55,9 @@ export function ExperienceDesignerLayout({
     useExperienceDesignerStore()
 
   const publishExperience = usePublishExperience()
+
+  // Preview modal state
+  const [showPreview, setShowPreview] = useState(false)
 
   // Compute paths for breadcrumb navigation
   const experiencesPath = `/workspace/${workspaceSlug}/experiences`
@@ -135,7 +139,7 @@ export function ExperienceDesignerLayout({
               draftVersion={experience.draftVersion}
               publishedVersion={experience.publishedVersion}
             />
-            <Button variant="outline" disabled>
+            <Button variant="outline" onClick={() => setShowPreview(true)}>
               Preview
             </Button>
             <Button
@@ -153,6 +157,14 @@ export function ExperienceDesignerLayout({
       <ExperienceDesignerPage
         experience={experience}
         workspaceSlug={workspaceSlug}
+        workspaceId={workspaceId}
+      />
+
+      {/* Preview Modal */}
+      <ExperiencePreviewModal
+        open={showPreview}
+        onOpenChange={setShowPreview}
+        experience={experience}
         workspaceId={workspaceId}
       />
     </div>

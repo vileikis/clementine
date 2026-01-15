@@ -186,14 +186,14 @@ ExperienceRuntime (Container)     → Orchestrates lifecycle, reactive Firestore
 
 **Note**: Most US2 functionality is now implemented in Phase 3.5 via the Zustand store refactor. These tasks verify and complete the integration.
 
-- [ ] T060 [US2] Verify step sequencing works via Zustand store (steps execute 0 → n)
-- [ ] T061 [US2] Verify canGoBack/canProceed computed correctly from store state
-- [ ] T062 [US2] Verify next() triggers Firestore sync via store action
-- [ ] T063 [US2] Verify back() updates store without Firestore sync
-- [ ] T064 [US2] Verify goToStep() works for previously visited steps only
-- [ ] T065 [US2] Verify setAnswer() records answer with timestamp and syncs
-- [ ] T066 [US2] Verify completion flow triggers Firestore sync and callback
-- [ ] T067 [US2] Verify zero steps edge case (immediate completion)
+- [X] T060 [US2] Verify step sequencing works via Zustand store (steps execute 0 → n)
+- [X] T061 [US2] Verify canGoBack/canProceed computed correctly from store state
+- [X] T062 [US2] Verify next() triggers Firestore sync via store action
+- [X] T063 [US2] Verify back() updates store without Firestore sync
+- [X] T064 [US2] Verify goToStep() works for previously visited steps only
+- [X] T065 [US2] Verify setAnswer() records answer with timestamp and syncs
+- [X] T066 [US2] Verify completion flow triggers Firestore sync and callback
+- [X] T067 [US2] Verify zero steps edge case (immediate completion)
 
 **Checkpoint**: Runtime engine operational - step sequencing, navigation, and session sync work correctly.
 
@@ -207,9 +207,9 @@ ExperienceRuntime (Container)     → Orchestrates lifecycle, reactive Firestore
 
 ### Implementation for User Story 4
 
-- [ ] T068 [P] [US4] Add run mode support to InfoStepRenderer in `src/domains/experience/steps/renderers/InfoStepRenderer.tsx`
-- [ ] T069 [US4] Display title, description, and optional media in run mode in `src/domains/experience/steps/renderers/InfoStepRenderer.tsx`
-- [ ] T070 [US4] Wire StepLayout with onSubmit, onBack, canGoBack props in `src/domains/experience/steps/renderers/InfoStepRenderer.tsx`
+- [X] T068 [P] [US4] Add run mode support to InfoStepRenderer in `src/domains/experience/steps/renderers/InfoStepRenderer.tsx`
+- [X] T069 [US4] Display title, description, and optional media in run mode in `src/domains/experience/steps/renderers/InfoStepRenderer.tsx`
+- [X] T070 [US4] Wire StepLayout with onSubmit, onBack, canGoBack props in `src/domains/experience/steps/renderers/InfoStepRenderer.tsx`
 
 **Checkpoint**: Info steps work in run mode with navigation.
 
@@ -225,32 +225,32 @@ ExperienceRuntime (Container)     → Orchestrates lifecycle, reactive Firestore
 
 #### Input Scale (FR-021)
 
-- [ ] T071 [P] [US3] Add run mode support to InputScaleRenderer in `src/domains/experience/steps/renderers/InputScaleRenderer.tsx`
-- [ ] T072 [US3] Implement clickable scale buttons with selection state in `src/domains/experience/steps/renderers/InputScaleRenderer.tsx`
-- [ ] T073 [US3] Wire InputScaleRenderer to use store setAnswer action
+- [X] T071 [P] [US3] Add run mode support to InputScaleRenderer in `src/domains/experience/steps/renderers/InputScaleRenderer.tsx`
+- [X] T072 [US3] Implement clickable scale buttons with selection state in `src/domains/experience/steps/renderers/InputScaleRenderer.tsx`
+- [X] T073 [US3] Wire InputScaleRenderer to use store setAnswer action
 
 #### Input Yes/No (FR-022)
 
-- [ ] T074 [P] [US3] Add run mode support to InputYesNoRenderer in `src/domains/experience/steps/renderers/InputYesNoRenderer.tsx`
-- [ ] T075 [US3] Implement clickable Yes/No buttons with selection state in `src/domains/experience/steps/renderers/InputYesNoRenderer.tsx`
+- [X] T074 [P] [US3] Add run mode support to InputYesNoRenderer in `src/domains/experience/steps/renderers/InputYesNoRenderer.tsx`
+- [X] T075 [US3] Implement clickable Yes/No buttons with selection state in `src/domains/experience/steps/renderers/InputYesNoRenderer.tsx`
 
 #### Input Multi-Select (FR-023)
 
-- [ ] T076 [P] [US3] Add run mode support to InputMultiSelectRenderer in `src/domains/experience/steps/renderers/InputMultiSelectRenderer.tsx`
-- [ ] T077 [US3] Implement checkbox/radio selection based on allowMultiple config in `src/domains/experience/steps/renderers/InputMultiSelectRenderer.tsx`
-- [ ] T078 [US3] Wire InputMultiSelectRenderer to use store setAnswer action
+- [X] T076 [P] [US3] Add run mode support to InputMultiSelectRenderer in `src/domains/experience/steps/renderers/InputMultiSelectRenderer.tsx`
+- [X] T077 [US3] Implement checkbox/radio selection based on allowMultiple config in `src/domains/experience/steps/renderers/InputMultiSelectRenderer.tsx`
+- [X] T078 [US3] Wire InputMultiSelectRenderer to use store setAnswer action
 
 #### Input Short Text (FR-024)
 
-- [ ] T079 [P] [US3] Add run mode support to InputShortTextRenderer in `src/domains/experience/steps/renderers/InputShortTextRenderer.tsx`
-- [ ] T080 [US3] Implement text input with character count in `src/domains/experience/steps/renderers/InputShortTextRenderer.tsx`
-- [ ] T081 [US3] Wire InputShortTextRenderer to use store setAnswer action
+- [X] T079 [P] [US3] Add run mode support to InputShortTextRenderer in `src/domains/experience/steps/renderers/InputShortTextRenderer.tsx`
+- [X] T080 [US3] Implement text input with character count in `src/domains/experience/steps/renderers/InputShortTextRenderer.tsx`
+- [X] T081 [US3] Wire InputShortTextRenderer to use store setAnswer action
 
 #### Input Long Text (FR-025)
 
-- [ ] T082 [P] [US3] Add run mode support to InputLongTextRenderer in `src/domains/experience/steps/renderers/InputLongTextRenderer.tsx`
-- [ ] T083 [US3] Implement textarea with character count in `src/domains/experience/steps/renderers/InputLongTextRenderer.tsx`
-- [ ] T084 [US3] Wire InputLongTextRenderer to use store setAnswer action
+- [X] T082 [P] [US3] Add run mode support to InputLongTextRenderer in `src/domains/experience/steps/renderers/InputLongTextRenderer.tsx`
+- [X] T083 [US3] Implement textarea with character count in `src/domains/experience/steps/renderers/InputLongTextRenderer.tsx`
+- [X] T084 [US3] Wire InputLongTextRenderer to use store setAnswer action
 
 **Checkpoint**: All input step types work in run mode with validation.
 
@@ -264,10 +264,10 @@ ExperienceRuntime (Container)     → Orchestrates lifecycle, reactive Firestore
 
 ### Implementation for User Story 6
 
-- [ ] T085 [P] [US6] Add placeholder run mode to CapturePhotoRenderer in `src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx`
-- [ ] T086 [US6] Display "Camera capture" message and instructions in `src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx`
-- [ ] T087 [P] [US6] Add placeholder run mode to TransformPipelineRenderer in `src/domains/experience/steps/renderers/TransformPipelineRenderer.tsx`
-- [ ] T088 [US6] Display "Processing..." placeholder message in `src/domains/experience/steps/renderers/TransformPipelineRenderer.tsx`
+- [X] T085 [P] [US6] Add placeholder run mode to CapturePhotoRenderer in `src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx`
+- [X] T086 [US6] Display "Camera capture" message and instructions in `src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx`
+- [X] T087 [P] [US6] Add placeholder run mode to TransformPipelineRenderer in `src/domains/experience/steps/renderers/TransformPipelineRenderer.tsx`
+- [X] T088 [US6] Display "Processing..." placeholder message in `src/domains/experience/steps/renderers/TransformPipelineRenderer.tsx`
 
 **Checkpoint**: Placeholder steps allow full experience flow testing.
 
@@ -281,16 +281,16 @@ ExperienceRuntime (Container)     → Orchestrates lifecycle, reactive Firestore
 
 ### Implementation for User Story 1
 
-- [ ] T089 [US1] Create PreviewModal component in `src/domains/experience/designer/components/PreviewModal.tsx`
-- [ ] T090 [US1] Implement modal open/close with PreviewShell wrapper in `src/domains/experience/designer/components/PreviewModal.tsx`
-- [ ] T091 [US1] Create session on preview open (mode='preview', configSource='draft') in `src/domains/experience/designer/components/PreviewModal.tsx`
-- [ ] T092 [US1] Wire runtime engine to PreviewModal in `src/domains/experience/designer/components/PreviewModal.tsx`
-- [ ] T093 [US1] Implement step progress indicator (Step X of Y) in `src/domains/experience/designer/components/PreviewModal.tsx`
-- [ ] T094 [US1] Route to correct step renderer based on step type in `src/domains/experience/designer/components/PreviewModal.tsx`
-- [ ] T095 [US1] Handle preview close (abandon session if incomplete) in `src/domains/experience/designer/components/PreviewModal.tsx`
-- [ ] T096 [US1] Add Preview button to ExperienceDesignerPage in `src/domains/experience/designer/containers/ExperienceDesignerPage.tsx`
-- [ ] T097 [US1] Wire Preview button to open PreviewModal with current experience in `src/domains/experience/designer/containers/ExperienceDesignerPage.tsx`
-- [ ] T098 [US1] Update designer components barrel export in `src/domains/experience/designer/components/index.ts`
+- [X] T089 [US1] Create ExperiencePreviewModal component in `src/domains/experience/preview/containers/ExperiencePreviewModal.tsx`
+- [X] T090 [US1] Implement modal open/close with fullscreen layout in `src/domains/experience/preview/containers/ExperiencePreviewModal.tsx`
+- [X] T091 [US1] Create session on preview open (mode='preview', configSource='draft') in `src/domains/experience/preview/containers/ExperiencePreviewModal.tsx`
+- [X] T092 [US1] Wire runtime engine to ExperiencePreviewModal in `src/domains/experience/preview/containers/ExperiencePreviewModal.tsx`
+- [X] T093 [US1] Route to correct step renderer based on step type in `src/domains/experience/preview/components/StepRendererRouter.tsx`
+- [X] T094 [US1] Wire useRuntime() hook for navigation actions in `src/domains/experience/preview/containers/ExperiencePreviewModal.tsx`
+- [X] T095 [US1] Add close button and completion toast feedback in `src/domains/experience/preview/containers/ExperiencePreviewModal.tsx`
+- [X] T096 [US1] Wire Preview button in ExperienceDesignerLayout to open modal in `src/domains/experience/designer/containers/ExperienceDesignerLayout.tsx`
+- [X] T097 [US1] Export ExperiencePreviewModal from preview index in `src/domains/experience/preview/index.ts`
+- [X] T098 [US1] Export preview module from experience domain in `src/domains/experience/index.ts`
 
 **Checkpoint**: Admin preview fully functional - can test entire experience from editor.
 
@@ -300,13 +300,13 @@ ExperienceRuntime (Container)     → Orchestrates lifecycle, reactive Firestore
 
 **Purpose**: Final validation, edge cases, and documentation
 
-- [ ] T099 Handle network errors in session updates with toast feedback
-- [ ] T100 Add loading states during session creation and updates
-- [ ] T101 Handle experience with missing step configuration gracefully
+- [X] T099 Handle network errors in session updates with toast feedback
+- [X] T100 Add loading states during session creation and updates
+- [X] T101 Handle experience with missing step configuration gracefully
 - [ ] T102 Verify mobile-first design (320px viewport) for all run mode renderers
 - [ ] T103 Verify touch targets meet 44x44px minimum
-- [ ] T104 Run `pnpm app:check` and fix any lint/format issues
-- [ ] T105 Run `pnpm app:type-check` and fix any type errors
+- [X] T104 Run `pnpm app:check` and fix any lint/format issues
+- [X] T105 Run `pnpm app:type-check` and fix any type errors
 - [ ] T106 Manual testing: Complete full preview flow with all step types
 
 ---
