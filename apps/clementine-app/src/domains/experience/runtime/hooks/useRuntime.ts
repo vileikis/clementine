@@ -4,31 +4,22 @@
  * Public hook for accessing runtime state within ExperienceRuntime container.
  * Provides a curated API for children components to interact with the runtime.
  *
- * This hook should only be used inside an ExperienceRuntime container.
+ * This hook exposes store state and actions directly. The ExperienceRuntime
+ * container handles all side effects (Firestore sync) reactively by subscribing
+ * to store state changes.
+ *
+ * Must be used inside an ExperienceRuntime container.
  */
 import { useCallback } from 'react'
 
 import { useExperienceRuntimeStore } from '../stores/experienceRuntimeStore'
 import type { MediaReference } from '@/shared/theming'
-import type { Answer, CapturedMedia } from '@/domains/session'
+import type { Answer } from '@/domains/session'
 import type {
   CapturedMediaRef,
   RuntimeState,
 } from '../../shared/types/runtime.types'
 import type { ExperienceStep } from '../../shared/schemas/experience.schema'
-
-/**
- * Runtime callbacks stored by ExperienceRuntime container
- */
-interface RuntimeCallbacks {
-  syncToFirestore: (options: {
-    currentStepIndex?: number
-    answers?: Answer[]
-    capturedMedia?: CapturedMedia[]
-  }) => Promise<void>
-  completeSession: () => Promise<void>
-  debounceTimerRef: React.MutableRefObject<ReturnType<typeof setTimeout> | null>
-}
 
 /**
  * Return type for useRuntime hook
@@ -44,7 +35,7 @@ export interface RuntimeAPI {
   isSyncing: boolean
 
   // Navigation actions
-  next: () => Promise<void>
+  next: () => void
   back: () => void
   goToStep: (index: number) => void
 
@@ -63,6 +54,9 @@ export interface RuntimeAPI {
  *
  * Must be used within an ExperienceRuntime container.
  * Throws if the store is not initialized.
+ *
+ * The container handles all Firestore synchronization reactively -
+ * this hook just exposes store state and actions.
  *
  * @returns RuntimeAPI - Curated API for runtime interaction
  *
@@ -106,55 +100,35 @@ export function useRuntime(): RuntimeAPI {
     )
   }
 
-  // Get callbacks from container
-  const getCallbacks = (): RuntimeCallbacks => {
-    const callbacks = (window as any).__experienceRuntimeCallbacks
-    if (!callbacks) {
-      throw new Error(
-        'Runtime callbacks not found. Make sure you are inside an ExperienceRuntime container.',
-      )
-    }
-    return callbacks
-  }
-
-  // Navigation: next (triggers Firestore sync)
-  const next = useCallback(async () => {
+  // Navigation: next
+  // Just updates store state - container handles Firestore sync reactively
+  const next = useCallback(() => {
     if (!store.canProceed()) {
       throw new Error('Cannot proceed: current step is not complete')
     }
 
     const currentStepIndex = store.currentStepIndex
     const totalSteps = store.steps.length
-    const callbacks = getCallbacks()
 
-    // Check if on last step
+    // Check if on last step → complete
     if (currentStepIndex >= totalSteps - 1) {
-      // Complete the experience
-      await callbacks.completeSession()
+      store.complete()
       return
     }
 
     // Move to next step
-    if (store.nextStep()) {
-      // Sync new state to Firestore
-      await callbacks.syncToFirestore({
-        currentStepIndex: store.currentStepIndex,
-        answers: store.answers,
-        capturedMedia: store.capturedMedia,
-      })
-    }
+    store.nextStep()
   }, [store])
 
-  // Navigation: back (does NOT trigger Firestore sync)
+  // Navigation: back
   const back = useCallback(() => {
     if (!store.canGoBack()) {
       throw new Error('Cannot go back: already at first step')
     }
     store.previousStep()
-    // No Firestore sync on back navigation
   }, [store])
 
-  // Navigation: goToStep (does NOT trigger Firestore sync)
+  // Navigation: goToStep
   const goToStep = useCallback(
     (index: number) => {
       const totalSteps = store.steps.length
@@ -164,51 +138,30 @@ export function useRuntime(): RuntimeAPI {
       if (index > store.currentStepIndex) {
         throw new Error('Cannot skip ahead to unvisited steps')
       }
-
       store.goToStep(index)
-      // No Firestore sync on goToStep navigation
     },
     [store],
   )
 
-  // Data mutation: setAnswer (with debounced Firestore sync)
+  // Data mutation: setAnswer
+  // Just updates store - container handles debounced Firestore sync
   const setAnswer = useCallback(
     (stepId: string, value: Answer['value']) => {
       const currentStep = store.getCurrentStep()
       if (!currentStep) return
-
-      // Store the answer
       store.setAnswer(stepId, currentStep.type, value)
-
-      const callbacks = getCallbacks()
-
-      // Debounced sync to Firestore
-      if (callbacks.debounceTimerRef.current) {
-        clearTimeout(callbacks.debounceTimerRef.current)
-      }
-      callbacks.debounceTimerRef.current = setTimeout(() => {
-        callbacks.syncToFirestore({
-          answers: store.answers,
-        })
-      }, 300)
     },
     [store],
   )
 
-  // Data mutation: setMedia (immediate Firestore sync)
+  // Data mutation: setMedia
+  // Just updates store - container handles immediate Firestore sync
   const setMedia = useCallback(
     (stepId: string, mediaRef: MediaReference) => {
       store.setCapturedMedia(stepId, {
         assetId: mediaRef.url, // Using URL as assetId for now
         url: mediaRef.url,
         createdAt: Date.now(),
-      })
-
-      const callbacks = getCallbacks()
-
-      // Immediate sync for media
-      callbacks.syncToFirestore({
-        capturedMedia: store.capturedMedia,
       })
     },
     [store],
