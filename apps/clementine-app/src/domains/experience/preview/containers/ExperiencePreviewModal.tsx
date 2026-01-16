@@ -104,10 +104,14 @@ export function ExperiencePreviewModal({
   }, [subscribedSession])
 
   // Get steps from draft config
-  const steps = (experience.draft?.steps ?? [])
+  const steps = experience.draft?.steps ?? []
 
   // Theme for preview (using default for now)
   const previewTheme = DEFAULT_PREVIEW_THEME
+
+  // Derived state for cleaner render conditions
+  const isLoading = isGhostLoading || isInitializing
+  const isReady = !isLoading && !error
 
   // Initialize session when modal opens (wait for ghost project)
   useEffect(() => {
@@ -213,7 +217,7 @@ export function ExperiencePreviewModal({
         {/* Content area */}
         <div className="h-full pt-14">
           {/* Loading state */}
-          {(isGhostLoading || isInitializing) && (
+          {isLoading && (
             <div className="flex h-full items-center justify-center">
               <div className="flex flex-col items-center gap-4">
                 <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -237,7 +241,7 @@ export function ExperiencePreviewModal({
           )}
 
           {/* Empty steps state */}
-          {!isGhostLoading && !isInitializing && !error && steps.length === 0 && (
+          {isReady && steps.length === 0 && (
             <div className="flex h-full items-center justify-center">
               <div className="flex flex-col items-center gap-4 text-center">
                 <p className="text-sm text-muted-foreground">
@@ -251,7 +255,7 @@ export function ExperiencePreviewModal({
           )}
 
           {/* Runtime content */}
-          {!isGhostLoading && !isInitializing && !error && session && steps.length > 0 && (
+          {isReady && session && steps.length > 0 && (
             <ThemeProvider theme={previewTheme}>
               <ExperienceRuntime
                 experienceId={experience.id}
