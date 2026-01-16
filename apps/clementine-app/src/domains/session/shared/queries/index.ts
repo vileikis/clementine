@@ -2,4 +2,4 @@
  * Session Queries - Barrel Export
  */
 
-export { sessionKeys } from './session.query'
+export { sessionKeys, sessionQuery } from './session.query'

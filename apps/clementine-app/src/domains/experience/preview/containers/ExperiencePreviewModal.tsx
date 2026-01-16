@@ -91,7 +91,7 @@ export function ExperiencePreviewModal({
   const createSession = useCreateSession()
 
   // Subscribe to session updates
-  const { session: subscribedSession } = useSubscribeSession(
+  const { data: subscribedSession } = useSubscribeSession(
     sessionId && ghostProjectId ? ghostProjectId : null,
     sessionId,
   )
