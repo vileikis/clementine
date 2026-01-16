@@ -45,9 +45,6 @@ export const updateSessionProgressInputSchema = z.object({
   /** Session to update */
   sessionId: z.string(),
 
-  /** New step index (optional) */
-  currentStepIndex: z.number().optional(),
-
   /** Answers to set (optional) - overwrites existing */
   answers: z.array(answerSchema).optional(),
 

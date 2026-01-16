@@ -4,10 +4,10 @@
  * Mutation hook for marking a session as completed.
  * Sets status to 'completed' and records completedAt timestamp.
  *
- * Uses direct updateDoc (no transaction) for simplicity.
+ * Uses transaction for consistency.
  */
 import { useMutation } from '@tanstack/react-query'
-import { doc, serverTimestamp, updateDoc } from 'firebase/firestore'
+import { doc, runTransaction, serverTimestamp } from 'firebase/firestore'
 import * as Sentry from '@sentry/tanstackstart-react'
 
 import { firestore } from '@/integrations/firebase/client'
@@ -24,7 +24,7 @@ interface CompleteSessionInput {
  * Hook for completing a session
  *
  * Features:
- * - Direct updateDoc (no transaction overhead)
+ * - Uses transaction for consistency
  * - Updates status to 'completed'
  * - Sets completedAt and updatedAt timestamps
  * - No query invalidation needed (useSubscribeSession uses onSnapshot)
@@ -55,10 +55,13 @@ export function useCompleteSession() {
         `projects/${projectId}/sessions/${sessionId}`,
       )
 
-      await updateDoc(sessionRef, {
-        status: 'completed',
-        completedAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
+      // eslint-disable-next-line @typescript-eslint/require-await -- callback must be async for TypeScript inference
+      await runTransaction(firestore, async (transaction) => {
+        transaction.update(sessionRef, {
+          status: 'completed',
+          completedAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        })
       })
     },
     onError: (error, { sessionId }) => {

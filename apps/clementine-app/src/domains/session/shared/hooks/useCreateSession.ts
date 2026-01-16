@@ -35,7 +35,7 @@ export interface CreateSessionResult {
  * Features:
  * - Validates input with Zod schema
  * - Creates document in transaction with serverTimestamp()
- * - Initializes with status: 'active', currentStepIndex: 0
+ * - Initializes with status: 'active'
  * - No query invalidation needed (useSubscribeSession uses onSnapshot)
  * - Captures errors to Sentry
  *
@@ -86,7 +86,6 @@ export function useCreateSession() {
           mode: validated.mode,
           configSource: validated.configSource,
           status: 'active',
-          currentStepIndex: 0,
           answers: [],
           capturedMedia: [],
           resultMedia: null,

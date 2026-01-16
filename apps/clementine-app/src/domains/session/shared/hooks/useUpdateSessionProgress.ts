@@ -2,13 +2,12 @@
  * useUpdateSessionProgress Hook
  *
  * Mutation hook for updating session progress during experience execution.
- * Updates current step index, answers array, and captured media.
+ * Updates answers array and captured media.
  *
- * Uses direct updateDoc (no transaction) since the runtime store is the
- * source of truth during execution.
+ * Uses transaction for consistency.
  */
 import { useMutation } from '@tanstack/react-query'
-import { doc, serverTimestamp, updateDoc } from 'firebase/firestore'
+import { doc, runTransaction, serverTimestamp } from 'firebase/firestore'
 import * as Sentry from '@sentry/tanstackstart-react'
 
 import type { UpdateData } from 'firebase/firestore'
@@ -22,7 +21,6 @@ import { firestore } from '@/integrations/firebase/client'
 interface UpdateProgressInput {
   projectId: string
   sessionId: string
-  currentStepIndex?: number
   answers?: Answer[]
   capturedMedia?: CapturedMedia[]
 }
@@ -31,7 +29,7 @@ interface UpdateProgressInput {
  * Hook for updating session progress
  *
  * Features:
- * - Direct updateDoc (no transaction overhead)
+ * - Uses transaction for consistency
  * - Type-safe updates with UpdateData<Session>
  * - Updates serverTimestamp on each write
  * - No query invalidation needed (useSubscribeSession uses onSnapshot)
@@ -49,7 +47,6 @@ interface UpdateProgressInput {
  *     updateProgress.mutate({
  *       projectId: session.projectId,
  *       sessionId: session.id,
- *       currentStepIndex: currentStepIndex + 1,
  *       answers: [...existingAnswers, answer],
  *     })
  *   }
@@ -58,33 +55,27 @@ interface UpdateProgressInput {
  */
 export function useUpdateSessionProgress() {
   return useMutation<void, Error, UpdateProgressInput>({
-    mutationFn: async ({
-      projectId,
-      sessionId,
-      currentStepIndex,
-      answers,
-      capturedMedia,
-    }) => {
+    mutationFn: async ({ projectId, sessionId, answers, capturedMedia }) => {
       const sessionRef = doc(
         firestore,
         `projects/${projectId}/sessions/${sessionId}`,
       )
 
-      const updates: UpdateData<Session> = {
-        updatedAt: serverTimestamp(),
-      }
+      // eslint-disable-next-line @typescript-eslint/require-await -- callback must be async for TypeScript inference
+      await runTransaction(firestore, async (transaction) => {
+        const updates: UpdateData<Session> = {
+          updatedAt: serverTimestamp(),
+        }
 
-      if (currentStepIndex !== undefined) {
-        updates.currentStepIndex = currentStepIndex
-      }
-      if (answers) {
-        updates.answers = answers
-      }
-      if (capturedMedia) {
-        updates.capturedMedia = capturedMedia
-      }
+        if (answers) {
+          updates.answers = answers
+        }
+        if (capturedMedia) {
+          updates.capturedMedia = capturedMedia
+        }
 
-      await updateDoc(sessionRef, updates)
+        transaction.update(sessionRef, updates)
+      })
     },
     onError: (error, { sessionId }) => {
       Sentry.captureException(error, {

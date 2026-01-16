@@ -83,7 +83,7 @@ export function ExperienceRuntime({
   const completeSession = useCompleteSession()
 
   // Refs for tracking state changes
-  const prevStepIndexRef = useRef<number>(session.currentStepIndex ?? 0)
+  const prevStepIndexRef = useRef<number>(0)
   const hasCompletedRef = useRef(session.status === 'completed')
 
   // Initialize store synchronously before paint using useLayoutEffect
@@ -91,7 +91,7 @@ export function ExperienceRuntime({
   useLayoutEffect(() => {
     if (!store.sessionId || store.sessionId !== session.id) {
       store.initFromSession(session, steps, experienceId)
-      prevStepIndexRef.current = session.currentStepIndex ?? 0
+      prevStepIndexRef.current = 0
       hasCompletedRef.current = session.status === 'completed'
     }
   }, [session.id, experienceId, steps, store.sessionId, store.initFromSession, session])
@@ -99,7 +99,6 @@ export function ExperienceRuntime({
   // Sync to Firestore helper - used on navigation events
   const syncToFirestore = useCallback(
     async (options: {
-      currentStepIndex?: number
       answers?: typeof store.answers
       capturedMedia?: typeof store.capturedMedia
     }) => {
@@ -140,10 +139,9 @@ export function ExperienceRuntime({
     const current = store.currentStepIndex
     const prev = prevStepIndexRef.current
 
-    // Sync to Firestore on forward navigation
+    // Sync answers/media to Firestore on forward navigation
     if (current > prev) {
       syncToFirestore({
-        currentStepIndex: current,
         answers: store.answers,
         capturedMedia: store.capturedMedia,
       })

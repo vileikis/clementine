@@ -126,9 +126,6 @@ export const sessionSchema = z.looseObject({
   /** Current session status */
   status: sessionStatusSchema.default('active'),
 
-  /** Current step index (0-based, for recovery) */
-  currentStepIndex: z.number().default(0),
-
   /**
    * ACCUMULATED DATA
    */

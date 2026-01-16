@@ -208,12 +208,22 @@ export const useExperienceRuntimeStore = create<ExperienceRuntimeStore>(
     ...initialState,
 
     initFromSession: (session, steps, experienceId) => {
+      // Derive starting step from answers (find first unanswered step)
+      const answeredStepIds = new Set(
+        (session.answers ?? []).map((a) => a.stepId),
+      )
+      const firstUnansweredIndex = steps.findIndex(
+        (step) => !answeredStepIds.has(step.id),
+      )
+      const startingIndex =
+        firstUnansweredIndex === -1 ? steps.length : firstUnansweredIndex
+
       set({
         sessionId: session.id,
         projectId: session.projectId,
         experienceId,
         steps,
-        currentStepIndex: session.currentStepIndex ?? 0,
+        currentStepIndex: startingIndex,
         isComplete: session.status === 'completed',
         answers: session.answers ?? [],
         capturedMedia: session.capturedMedia ?? [],
