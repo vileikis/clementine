@@ -9,7 +9,7 @@
  * - Container = subscribes to store changes, triggers side effects reactively
  * - Children = call store actions directly via useRuntime()
  */
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 import { useExperienceRuntimeStore } from '../stores/experienceRuntimeStore'
 import type { ExperienceStep } from '../../shared/schemas/experience.schema'
@@ -80,11 +80,26 @@ export function ExperienceRuntime({
   const updateProgress = useUpdateSessionProgress()
   const completeSession = useCompleteSession()
 
+  // State for tracking store readiness
+  const [isStoreReady, setIsStoreReady] = useState(false)
+
   // Refs
   const isInitializedRef = useRef(false)
   const prevStepIndexRef = useRef<number>(session.currentStepIndex ?? 0)
   const answerDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const hasCompletedRef = useRef(session.status === 'completed')
+
+  // Initialize store synchronously before paint using useLayoutEffect
+  // This ensures useRuntime() works in children during initial render
+  useLayoutEffect(() => {
+    if (!store.sessionId || store.sessionId !== session.id) {
+      store.initFromSession(session, steps, experienceId)
+      prevStepIndexRef.current = session.currentStepIndex ?? 0
+      hasCompletedRef.current = session.status === 'completed'
+      isInitializedRef.current = true
+    }
+    setIsStoreReady(true)
+  }, [session.id, experienceId, steps, store, session])
 
   // Sync to Firestore helper
   const syncToFirestore = useCallback(
@@ -109,17 +124,13 @@ export function ExperienceRuntime({
     [session.projectId, session.id, updateProgress, onError, store],
   )
 
-  // Initialize store from session on mount or session change
+  // Reset isStoreReady when session changes
   useEffect(() => {
-    store.initFromSession(session, steps, experienceId)
-    prevStepIndexRef.current = session.currentStepIndex ?? 0
-    hasCompletedRef.current = session.status === 'completed'
-    isInitializedRef.current = true
-
     return () => {
       isInitializedRef.current = false
+      setIsStoreReady(false)
     }
-  }, [session.id, experienceId, steps])
+  }, [session.id])
 
   // Handle zero steps edge case
   useEffect(() => {
@@ -229,6 +240,11 @@ export function ExperienceRuntime({
       store.reset()
     }
   }, [])
+
+  // Don't render children until store is initialized
+  if (!isStoreReady) {
+    return null
+  }
 
   return <>{children}</>
 }
