@@ -98,8 +98,10 @@ service cloud.firestore {
 
         // CREATE: Authenticated users can create sessions
         // Session must reference valid project (projectId matches path)
+        // Session createdBy must match the authenticated user's UID
         allow create: if isAnyUser()
-          && request.resource.data.projectId == projectId;
+          && request.resource.data.projectId == projectId
+          && request.resource.data.createdBy == request.auth.uid;
 
         // UPDATE: Only session creator can update their session
         // Or admins can update any session

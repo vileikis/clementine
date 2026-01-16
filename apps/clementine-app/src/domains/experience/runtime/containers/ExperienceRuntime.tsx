@@ -179,6 +179,9 @@ export function ExperienceRuntime({
     if (!store.isComplete) return
     if (hasCompletedRef.current) return // Already completed
 
+    // Cancellation flag to prevent acting after unmount
+    let cancelled = false
+
     hasCompletedRef.current = true
 
     // Sync final state before completing
@@ -187,17 +190,24 @@ export function ExperienceRuntime({
       capturedMedia: store.capturedMedia,
     })
       .then(() => {
+        if (cancelled) return
         return completeSession.mutateAsync({
           projectId: session.projectId,
           sessionId: session.id,
         })
       })
       .then(() => {
+        if (cancelled) return
         onComplete?.()
       })
       .catch((error) => {
+        if (cancelled) return
         onError?.(error instanceof Error ? error : new Error('Complete failed'))
       })
+
+    return () => {
+      cancelled = true
+    }
   }, [
     store.isReady,
     store.isComplete,

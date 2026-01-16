@@ -12,8 +12,7 @@
  * - Caches result in TanStack Query
  */
 import { useQuery } from '@tanstack/react-query'
-import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore'
-import * as Sentry from '@sentry/tanstackstart-react'
+import { doc, runTransaction, serverTimestamp } from 'firebase/firestore'
 import { getGhostProjectId } from '../lib/ghost-project.utils'
 import type { WithFieldValue } from 'firebase/firestore'
 import type { Project } from '@clementine/shared'
@@ -44,40 +43,36 @@ export function useGhostProject(workspaceId: string) {
       const ghostProjectId = getGhostProjectId(workspaceId)
       const projectRef = doc(firestore, 'projects', ghostProjectId)
 
-      // Check if ghost project exists
-      const existing = await getDoc(projectRef)
-      if (existing.exists()) {
-        return ghostProjectId
-      }
+      // Use transaction to atomically check and create ghost project
+      // This prevents race conditions when concurrent callers both see no document
+      await runTransaction(firestore, async (transaction) => {
+        const existing = await transaction.get(projectRef)
 
-      // Create ghost project with required fields
-      const ghostProject: WithFieldValue<Project> = {
-        id: ghostProjectId,
-        name: 'Ghost Project', // System name, never displayed
-        workspaceId,
-        status: 'live' as const, // Always live so sessions can be created
-        type: 'ghost' as const,
-        activeEventId: null,
-        deletedAt: null,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      }
+        if (existing.exists()) {
+          // Project already exists, nothing to do
+          return
+        }
 
-      await setDoc(projectRef, ghostProject)
+        // Create ghost project with required fields
+        const ghostProject: WithFieldValue<Project> = {
+          id: ghostProjectId,
+          name: 'Ghost Project', // System name, never displayed
+          workspaceId,
+          status: 'live' as const, // Always live so sessions can be created
+          type: 'ghost' as const,
+          activeEventId: null,
+          deletedAt: null,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        }
+
+        transaction.set(projectRef, ghostProject)
+      })
+
       return ghostProjectId
     },
     staleTime: Infinity, // Ghost project never changes
     retry: 2, // Retry on transient failures
-    meta: {
-      errorHandler: (error: Error) => {
-        Sentry.captureException(error, {
-          tags: {
-            domain: 'project',
-            action: 'get-or-create-ghost-project',
-          },
-          extra: { workspaceId },
-        })
-      },
-    },
+    // Error handling: relies on global QueryCache.onError configured in root-provider.tsx
   })
 }
