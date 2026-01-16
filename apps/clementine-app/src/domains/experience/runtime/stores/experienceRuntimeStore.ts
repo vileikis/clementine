@@ -42,6 +42,10 @@ export interface ExperienceRuntimeState {
   capturedMedia: CapturedMedia[]
   resultMedia: SessionResultMedia | null
 
+  // Lifecycle status
+  /** Whether the store has been initialized and is ready for use */
+  isReady: boolean
+
   // Sync status
   isSyncing: boolean
   lastSyncedAt: number | null
@@ -167,6 +171,7 @@ const initialState: ExperienceRuntimeState = {
   answers: [],
   capturedMedia: [],
   resultMedia: null,
+  isReady: false,
   isSyncing: false,
   lastSyncedAt: null,
 }
@@ -213,6 +218,7 @@ export const useExperienceRuntimeStore = create<ExperienceRuntimeStore>(
         answers: session.answers ?? [],
         capturedMedia: session.capturedMedia ?? [],
         resultMedia: session.resultMedia ?? null,
+        isReady: true,
         isSyncing: false,
         lastSyncedAt: null,
       })
@@ -382,3 +388,4 @@ export const selectTotalSteps = (state: ExperienceRuntimeStore) =>
  */
 export const selectIsComplete = (state: ExperienceRuntimeStore) =>
   state.isComplete
+

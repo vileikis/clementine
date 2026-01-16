@@ -2,20 +2,19 @@
  * ExperienceRuntime Container
  *
  * Orchestrates experience execution by initializing the runtime store,
- * subscribing to state changes, and handling Firestore synchronization reactively.
+ * subscribing to state changes, and handling Firestore synchronization on navigation.
  *
  * Architecture:
  * - Store = pure state + synchronous actions
- * - Container = subscribes to store changes, triggers side effects reactively
+ * - Container = initializes store, syncs to Firestore on navigation events
  * - Children = call store actions directly via useRuntime()
+ *
+ * Sync Strategy:
+ * - Answers and media are saved to store immediately (local state)
+ * - Firestore sync happens on forward navigation (next step or complete)
+ * - This minimizes Firestore writes while ensuring data is persisted at meaningful moments
  */
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef } from 'react'
 
 import { useExperienceRuntimeStore } from '../stores/experienceRuntimeStore'
 import type { ExperienceStep } from '../../shared/schemas/experience.schema'
@@ -47,11 +46,8 @@ export interface ExperienceRuntimeProps {
 /**
  * ExperienceRuntime Container Component
  *
- * Uses a reactive pattern:
- * - Initializes store from session on mount
- * - Subscribes to store state changes
- * - Triggers Firestore sync reactively when state changes
- * - Fires lifecycle callbacks at appropriate times
+ * Initializes the runtime store and handles Firestore synchronization.
+ * Sync happens on navigation (forward only) rather than reactively on every change.
  *
  * @example
  * ```tsx
@@ -86,13 +82,8 @@ export function ExperienceRuntime({
   const updateProgress = useUpdateSessionProgress()
   const completeSession = useCompleteSession()
 
-  // State for tracking store readiness
-  const [isStoreReady, setIsStoreReady] = useState(false)
-
-  // Refs
-  const isInitializedRef = useRef(false)
+  // Refs for tracking state changes
   const prevStepIndexRef = useRef<number>(session.currentStepIndex ?? 0)
-  const answerDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const hasCompletedRef = useRef(session.status === 'completed')
 
   // Initialize store synchronously before paint using useLayoutEffect
@@ -102,12 +93,10 @@ export function ExperienceRuntime({
       store.initFromSession(session, steps, experienceId)
       prevStepIndexRef.current = session.currentStepIndex ?? 0
       hasCompletedRef.current = session.status === 'completed'
-      isInitializedRef.current = true
     }
-    setIsStoreReady(true)
-  }, [session.id, experienceId, steps, store, session])
+  }, [session.id, experienceId, steps, store.sessionId, store.initFromSession, session])
 
-  // Sync to Firestore helper
+  // Sync to Firestore helper - used on navigation events
   const syncToFirestore = useCallback(
     async (options: {
       currentStepIndex?: number
@@ -127,32 +116,31 @@ export function ExperienceRuntime({
         onError?.(error instanceof Error ? error : new Error('Sync failed'))
       }
     },
-    [session.projectId, session.id, updateProgress, onError, store],
+    [
+      session.projectId,
+      session.id,
+      updateProgress,
+      onError,
+      store.setSyncing,
+      store.markSynced,
+    ],
   )
-
-  // Reset isStoreReady when session changes
-  useEffect(() => {
-    return () => {
-      isInitializedRef.current = false
-      setIsStoreReady(false)
-    }
-  }, [session.id])
 
   // Handle zero steps edge case
   useEffect(() => {
     if (steps.length === 0 && !store.isComplete) {
       store.complete()
     }
-  }, [steps.length, store.isComplete])
+  }, [steps.length, store.isComplete, store.complete])
 
-  // React to step changes
+  // React to step changes - sync on forward navigation only
   useEffect(() => {
-    if (!isInitializedRef.current) return
+    if (!store.isReady) return
 
     const current = store.currentStepIndex
     const prev = prevStepIndexRef.current
 
-    // Only sync stepIndex on forward navigation
+    // Sync to Firestore on forward navigation
     if (current > prev) {
       syncToFirestore({
         currentStepIndex: current,
@@ -171,6 +159,7 @@ export function ExperienceRuntime({
 
     prevStepIndexRef.current = current
   }, [
+    store.isReady,
     store.currentStepIndex,
     store.answers,
     store.capturedMedia,
@@ -179,60 +168,42 @@ export function ExperienceRuntime({
     onStepChange,
   ])
 
-  // React to answer changes - debounced sync
-  // Zustand creates new array reference on change, so this fires on content changes too
-  useEffect(() => {
-    if (!isInitializedRef.current) return
-    if (store.answers.length === 0) return
-
-    if (answerDebounceRef.current) {
-      clearTimeout(answerDebounceRef.current)
-    }
-
-    answerDebounceRef.current = setTimeout(() => {
-      syncToFirestore({ answers: store.answers })
-    }, 300)
-
-    return () => {
-      if (answerDebounceRef.current) {
-        clearTimeout(answerDebounceRef.current)
-      }
-    }
-  }, [store.answers, syncToFirestore])
-
-  // React to media changes - immediate sync
-  // Zustand creates new array reference on change, so this fires on content changes too
-  useEffect(() => {
-    if (!isInitializedRef.current) return
-    if (store.capturedMedia.length === 0) return
-
-    syncToFirestore({ capturedMedia: store.capturedMedia })
-  }, [store.capturedMedia, syncToFirestore])
-
   // React to completion
   useEffect(() => {
-    if (!isInitializedRef.current) return
+    if (!store.isReady) return
     if (!store.isComplete) return
     if (hasCompletedRef.current) return // Already completed
 
     hasCompletedRef.current = true
 
-    completeSession
-      .mutateAsync({
-        projectId: session.projectId,
-        sessionId: session.id,
+    // Sync final state before completing
+    syncToFirestore({
+      answers: store.answers,
+      capturedMedia: store.capturedMedia,
+    })
+      .then(() => {
+        return completeSession.mutateAsync({
+          projectId: session.projectId,
+          sessionId: session.id,
+        })
       })
       .then(() => {
         onComplete?.()
       })
       .catch((error) => {
-        onError?.(error instanceof Error ? error : new Error('Complete failed'))
+        onError?.(
+          error instanceof Error ? error : new Error('Complete failed'),
+        )
       })
   }, [
+    store.isReady,
     store.isComplete,
+    store.answers,
+    store.capturedMedia,
     session.projectId,
     session.id,
     completeSession,
+    syncToFirestore,
     onComplete,
     onError,
   ])
@@ -240,15 +211,12 @@ export function ExperienceRuntime({
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (answerDebounceRef.current) {
-        clearTimeout(answerDebounceRef.current)
-      }
       store.reset()
     }
-  }, [])
+  }, [store.reset])
 
   // Don't render children until store is initialized
-  if (!isStoreReady) {
+  if (!store.isReady) {
     return null
   }
 
