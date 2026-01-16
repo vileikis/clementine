@@ -45,7 +45,11 @@ export function StepPreview({ step, theme }: StepPreviewProps) {
     <div className="flex h-full flex-col bg-muted/30">
       <PreviewShell enableViewportSwitcher enableFullscreen>
         <ThemeProvider theme={previewTheme}>
-          {step ? <StepRendererRouter step={step} mode="edit" /> : <NoStepSelected />}
+          {step ? (
+            <StepRendererRouter step={step} mode="edit" />
+          ) : (
+            <NoStepSelected />
+          )}
         </ThemeProvider>
       </PreviewShell>
     </div>

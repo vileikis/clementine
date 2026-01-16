@@ -3,4 +3,7 @@
  *
  * Shared components for step rendering.
  */
-export { StepRendererRouter, type StepRendererRouterProps } from './StepRendererRouter'
+export {
+  StepRendererRouter,
+  type StepRendererRouterProps,
+} from './StepRendererRouter'

@@ -32,7 +32,7 @@ import {
   InputYesNoRenderer,
   TransformPipelineRenderer,
 } from '../renderers'
-import type { StepRendererProps, Step } from '../registry/step-registry'
+import type { Step, StepRendererProps } from '../registry/step-registry'
 
 /**
  * Generic step type that accepts both Step (from registry) and ExperienceStep (from Firestore)
@@ -47,7 +47,10 @@ type GenericStep = {
 /**
  * Props for StepRendererRouter
  */
-export interface StepRendererRouterProps extends Omit<StepRendererProps, 'step'> {
+export interface StepRendererRouterProps extends Omit<
+  StepRendererProps,
+  'step'
+> {
   /** The step to render - accepts both Step and ExperienceStep types */
   step: Step | GenericStep
 }

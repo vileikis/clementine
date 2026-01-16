@@ -9,7 +9,13 @@
  * - Container = subscribes to store changes, triggers side effects reactively
  * - Children = call store actions directly via useRuntime()
  */
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react'
 
 import { useExperienceRuntimeStore } from '../stores/experienceRuntimeStore'
 import type { ExperienceStep } from '../../shared/schemas/experience.schema'
