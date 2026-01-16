@@ -3,3 +3,4 @@
  */
 export * from './step-registry'
 export * from './step-utils'
+export * from './step-validation'

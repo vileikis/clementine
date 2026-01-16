@@ -11,7 +11,6 @@
  * - Uses `z.looseObject()` for forward compatibility with future fields
  */
 import { z } from 'zod'
-import { mediaReferenceSchema } from '@/shared/theming/schemas/media-reference.schema'
 
 /**
  * Session mode schema
@@ -37,6 +36,51 @@ export const sessionStatusSchema = z.enum([
 ])
 
 /**
+ * Answer schema
+ * Represents a collected answer from an input step
+ */
+export const answerSchema = z.object({
+  /** Step that collected this answer */
+  stepId: z.string(),
+  /** Step type (e.g., 'input.scale', 'input.yesNo') */
+  stepType: z.string(),
+  /** The answer value - type varies by step type */
+  value: z.union([z.string(), z.number(), z.boolean(), z.array(z.string())]),
+  /** Timestamp when answered (Unix ms) */
+  answeredAt: z.number(),
+})
+
+/**
+ * CapturedMedia schema
+ * Represents media captured from a capture step
+ */
+export const capturedMediaSchema = z.object({
+  /** Step that captured this media */
+  stepId: z.string(),
+  /** Media asset ID in storage */
+  assetId: z.string(),
+  /** Public URL to the asset */
+  url: z.string(),
+  /** Capture timestamp (Unix ms) */
+  createdAt: z.number(),
+})
+
+/**
+ * SessionResultMedia schema
+ * Represents the final output from transform/capture
+ */
+export const sessionResultMediaSchema = z.object({
+  /** Step that produced the result */
+  stepId: z.string(),
+  /** Result asset ID */
+  assetId: z.string(),
+  /** Public URL to the result */
+  url: z.string(),
+  /** Result creation timestamp (Unix ms) */
+  createdAt: z.number(),
+})
+
+/**
  * Session Schema
  *
  * Complete session document schema for tracking experience execution.
@@ -56,8 +100,11 @@ export const sessionSchema = z.looseObject({
   /** Parent project ID */
   projectId: z.string(),
 
-  /** Parent event ID */
-  eventId: z.string(),
+  /** Workspace ID for cross-project analytics */
+  workspaceId: z.string(),
+
+  /** Parent event ID (null for preview sessions) */
+  eventId: z.string().nullable(),
 
   /** Experience being executed */
   experienceId: z.string(),
@@ -79,28 +126,32 @@ export const sessionSchema = z.looseObject({
   /** Current session status */
   status: sessionStatusSchema.default('active'),
 
-  /** Current step index (0-based) */
-  currentStepIndex: z.number().default(0),
-
   /**
    * ACCUMULATED DATA
    */
 
-  /** Inputs collected during the session (form data, photos, etc.), keyed by step ID */
-  inputs: z.record(z.string(), z.unknown()).default({}),
+  /** Answers collected from input steps */
+  answers: z.array(answerSchema).default([]),
 
-  /** Media outputs generated during the session, keyed by step ID */
-  outputs: z.record(z.string(), mediaReferenceSchema).default({}),
+  /** Media captured from capture steps */
+  capturedMedia: z.array(capturedMediaSchema).default([]),
+
+  /** Final result media from transform/capture */
+  resultMedia: sessionResultMediaSchema.nullable().default(null),
 
   /**
    * TRANSFORM JOB TRACKING
    */
 
-  /** Active transform job ID (for async processing) */
-  activeJobId: z.string().nullable().default(null),
+  /** Transform job ID (for async processing) */
+  jobId: z.string().nullable().default(null),
 
-  /** Result asset ID from transform job */
-  resultAssetId: z.string().nullable().default(null),
+  /**
+   * OWNERSHIP
+   */
+
+  /** User ID who created this session (for security rules) */
+  createdBy: z.string().nullable().default(null),
 
   /**
    * TIMESTAMPS
@@ -123,3 +174,6 @@ export type Session = z.infer<typeof sessionSchema>
 export type SessionMode = z.infer<typeof sessionModeSchema>
 export type ConfigSource = z.infer<typeof configSourceSchema>
 export type SessionStatus = z.infer<typeof sessionStatusSchema>
+export type Answer = z.infer<typeof answerSchema>
+export type CapturedMedia = z.infer<typeof capturedMediaSchema>
+export type SessionResultMedia = z.infer<typeof sessionResultMediaSchema>

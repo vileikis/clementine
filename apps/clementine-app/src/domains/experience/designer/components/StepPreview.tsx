@@ -6,16 +6,7 @@
  * Uses ThemeProvider for themed step renderers.
  */
 import { useMemo } from 'react'
-import {
-  CapturePhotoRenderer,
-  InfoStepRenderer,
-  InputLongTextRenderer,
-  InputMultiSelectRenderer,
-  InputScaleRenderer,
-  InputShortTextRenderer,
-  InputYesNoRenderer,
-  TransformPipelineRenderer,
-} from '../../steps/renderers'
+import { StepRendererRouter } from '../../steps'
 import type { Step } from '../../steps/registry/step-registry'
 import type { Theme } from '@/shared/theming'
 import { PreviewShell } from '@/shared/preview-shell'
@@ -54,7 +45,11 @@ export function StepPreview({ step, theme }: StepPreviewProps) {
     <div className="flex h-full flex-col bg-muted/30">
       <PreviewShell enableViewportSwitcher enableFullscreen>
         <ThemeProvider theme={previewTheme}>
-          {step ? <StepRendererRouter step={step} /> : <NoStepSelected />}
+          {step ? (
+            <StepRendererRouter step={step} mode="edit" />
+          ) : (
+            <NoStepSelected />
+          )}
         </ThemeProvider>
       </PreviewShell>
     </div>
@@ -72,39 +67,4 @@ function NoStepSelected() {
       </p>
     </div>
   )
-}
-
-/**
- * Routes to the correct renderer based on step type
- */
-function StepRendererRouter({ step }: { step: Step }) {
-  const props = { mode: 'edit' as const, step }
-
-  switch (step.type) {
-    case 'info':
-      return <InfoStepRenderer {...props} />
-    case 'input.scale':
-      return <InputScaleRenderer {...props} />
-    case 'input.yesNo':
-      return <InputYesNoRenderer {...props} />
-    case 'input.multiSelect':
-      return <InputMultiSelectRenderer {...props} />
-    case 'input.shortText':
-      return <InputShortTextRenderer {...props} />
-    case 'input.longText':
-      return <InputLongTextRenderer {...props} />
-    case 'capture.photo':
-      return <CapturePhotoRenderer {...props} />
-    case 'transform.pipeline':
-      return <TransformPipelineRenderer {...props} />
-    default:
-      // Type-safe exhaustive check - this should never happen
-      return (
-        <div className="flex h-full items-center justify-center p-6">
-          <p className="text-sm text-muted-foreground">
-            Unknown step type: {(step as Step).type}
-          </p>
-        </div>
-      )
-  }
 }

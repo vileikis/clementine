@@ -33,6 +33,7 @@ export function useProjects(workspaceId: string) {
     const q = query(
       collection(firestore, 'projects'),
       where('workspaceId', '==', workspaceId),
+      where('type', '==', 'standard'), // Exclude ghost projects
       where('status', '!=', 'deleted'),
       orderBy('status'), // Required for != query
       orderBy('createdAt', 'desc'),
@@ -54,6 +55,7 @@ export function useProjects(workspaceId: string) {
       const q = query(
         collection(firestore, 'projects'),
         where('workspaceId', '==', workspaceId),
+        where('type', '==', 'standard'), // Exclude ghost projects
         where('status', '!=', 'deleted'),
         orderBy('status'),
         orderBy('createdAt', 'desc'),

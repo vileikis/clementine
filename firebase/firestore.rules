@@ -86,6 +86,31 @@ service cloud.firestore {
         // DELETE: Deny hard deletes (soft delete only via update)
         allow delete: if false;
       }
+
+      // Project sessions subcollection (030-session-runtime-capture)
+      // Sessions track guest/admin execution of experiences
+      // Path: /projects/{projectId}/sessions/{sessionId}
+      match /sessions/{sessionId} {
+        // READ: Admins can read all sessions
+        // Authenticated users can read their own sessions
+        allow read: if isAdmin()
+          || (isAnyUser() && resource.data.createdBy == request.auth.uid);
+
+        // CREATE: Authenticated users can create sessions
+        // Session must reference valid project (projectId matches path)
+        // Session createdBy must match the authenticated user's UID
+        allow create: if isAnyUser()
+          && request.resource.data.projectId == projectId
+          && request.resource.data.createdBy == request.auth.uid;
+
+        // UPDATE: Only session creator can update their session
+        // Or admins can update any session
+        allow update: if isAdmin()
+          || (isAnyUser() && resource.data.createdBy == request.auth.uid);
+
+        // DELETE: Forbidden - sessions are historical records
+        allow delete: if false;
+      }
     }
 
     // Admin users: Full access to everything

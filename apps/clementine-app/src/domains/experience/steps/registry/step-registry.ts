@@ -63,6 +63,11 @@ import type {
 export type { Step, StepCategory, StepConfig, StepType }
 
 /**
+ * Answer value type for step inputs
+ */
+export type AnswerValue = string | number | boolean | string[]
+
+/**
  * Props for step renderers (edit-mode preview and guest-mode run)
  */
 export interface StepRendererProps {
@@ -72,6 +77,18 @@ export interface StepRendererProps {
   step: Step
   /** Optional submit handler - when provided, the Next button is enabled */
   onSubmit?: () => void
+
+  // Run mode props (only used when mode === 'run')
+  /** Current answer value (run mode only) */
+  answer?: AnswerValue
+  /** Callback when user provides/updates answer (run mode only) */
+  onAnswer?: (value: AnswerValue) => void
+  /** Callback to go back (run mode only) */
+  onBack?: () => void
+  /** Whether back navigation is available (run mode only) */
+  canGoBack?: boolean
+  /** Whether proceeding is allowed (run mode only) */
+  canProceed?: boolean
 }
 
 /**
