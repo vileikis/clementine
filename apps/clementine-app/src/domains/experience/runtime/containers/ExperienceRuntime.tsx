@@ -94,7 +94,14 @@ export function ExperienceRuntime({
       prevStepIndexRef.current = 0
       hasCompletedRef.current = session.status === 'completed'
     }
-  }, [session.id, experienceId, steps, store.sessionId, store.initFromSession, session])
+  }, [
+    session.id,
+    experienceId,
+    steps,
+    store.sessionId,
+    store.initFromSession,
+    session,
+  ])
 
   // Sync to Firestore helper - used on navigation events
   const syncToFirestore = useCallback(
@@ -118,7 +125,7 @@ export function ExperienceRuntime({
     [
       session.projectId,
       session.id,
-      updateProgress,
+      updateProgress.mutateAsync,
       onError,
       store.setSyncing,
       store.markSynced,
@@ -189,9 +196,7 @@ export function ExperienceRuntime({
         onComplete?.()
       })
       .catch((error) => {
-        onError?.(
-          error instanceof Error ? error : new Error('Complete failed'),
-        )
+        onError?.(error instanceof Error ? error : new Error('Complete failed'))
       })
   }, [
     store.isReady,

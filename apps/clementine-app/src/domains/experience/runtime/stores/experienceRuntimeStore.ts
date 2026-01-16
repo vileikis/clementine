@@ -398,4 +398,3 @@ export const selectTotalSteps = (state: ExperienceRuntimeStore) =>
  */
 export const selectIsComplete = (state: ExperienceRuntimeStore) =>
   state.isComplete
-

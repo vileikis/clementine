@@ -34,10 +34,9 @@ import { useCallback, useEffect, useState } from 'react'
 import { Loader2, X } from 'lucide-react'
 import { toast } from 'sonner'
 
-import { ExperienceRuntime, useRuntime } from '../../runtime'
-import { StepRendererRouter } from '../components/StepRendererRouter'
+import { ExperienceRuntime } from '../../runtime'
+import { PreviewRuntimeContent } from '../components'
 import type { Experience } from '@/domains/experience/shared'
-import type { Session } from '@/domains/session'
 import type { Theme } from '@/shared/theming'
 import { useGhostProject } from '@/domains/project/shared'
 import { useCreateSession, useSubscribeSession } from '@/domains/session'
@@ -81,27 +80,17 @@ export function ExperiencePreviewModal({
   const { data: ghostProjectId, isLoading: isGhostLoading } =
     useGhostProject(workspaceId)
 
-  // Session state
+  // Session ID state - enables subscription once session is created
   const [sessionId, setSessionId] = useState<string | null>(null)
-  const [session, setSession] = useState<Session | null>(null)
-  const [isInitializing, setIsInitializing] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
   // Mutations
   const createSession = useCreateSession()
 
-  // Subscribe to session updates
-  const { data: subscribedSession } = useSubscribeSession(
+  // Subscribe to session updates (disabled until sessionId is set)
+  const { data: session } = useSubscribeSession(
     sessionId && ghostProjectId ? ghostProjectId : null,
     sessionId,
   )
-
-  // Sync subscribed session to local state
-  useEffect(() => {
-    if (subscribedSession) {
-      setSession(subscribedSession)
-    }
-  }, [subscribedSession])
 
   // Get steps from draft config
   const steps = experience.draft?.steps ?? []
@@ -110,55 +99,58 @@ export function ExperiencePreviewModal({
   const previewTheme = DEFAULT_PREVIEW_THEME
 
   // Derived state for cleaner render conditions
-  const isLoading = isGhostLoading || isInitializing
-  const isReady = !isLoading && !error
+  const isLoading = isGhostLoading || createSession.isPending
+  const error = createSession.error
+    ? createSession.error instanceof Error
+      ? createSession.error.message
+      : 'Failed to create session'
+    : null
+  const isReady = !isLoading && !error && session
 
   // Initialize session when modal opens (wait for ghost project)
   useEffect(() => {
-    if (open && !sessionId && !isInitializing && ghostProjectId) {
-      setIsInitializing(true)
-      setError(null)
+    if (!open || sessionId || !ghostProjectId) {
+      return
+    }
 
-      createSession
-        .mutateAsync({
-          projectId: ghostProjectId,
-          workspaceId,
-          eventId: null, // No event for preview sessions
-          experienceId: experience.id,
-          mode: 'preview',
-          configSource: 'draft',
-        })
-        .then((result) => {
-          setSessionId(result.sessionId)
-          setSession(result.session)
-          setIsInitializing(false)
-        })
-        .catch((err) => {
-          setError(
-            err instanceof Error ? err.message : 'Failed to create session',
-          )
-          setIsInitializing(false)
-        })
+    let cancelled = false
+
+    createSession
+      .mutateAsync({
+        projectId: ghostProjectId,
+        workspaceId,
+        eventId: null, // No event for preview sessions
+        experienceId: experience.id,
+        mode: 'preview',
+        configSource: 'draft',
+      })
+      .then((result) => {
+        if (cancelled) return
+        setSessionId(result.sessionId)
+      })
+      .catch(() => {
+        // Error is captured in createSession.error
+      })
+
+    return () => {
+      cancelled = true
     }
   }, [
     open,
     sessionId,
-    isInitializing,
     ghostProjectId,
-    createSession,
     workspaceId,
     experience.id,
+    createSession.mutateAsync,
   ])
 
   // Reset state when modal closes
   useEffect(() => {
     if (!open) {
       setSessionId(null)
-      setSession(null)
-      setError(null)
-      setIsInitializing(false)
+      createSession.reset()
     }
-  }, [open])
+  }, [open, createSession.reset])
 
   // Handle close
   const handleClose = useCallback(() => {
@@ -176,7 +168,6 @@ export function ExperiencePreviewModal({
 
   // Handle runtime errors
   const handleError = useCallback((err: Error) => {
-    console.error('Runtime error:', err)
     toast.error('Preview error', {
       description: err.message,
     })
@@ -187,7 +178,7 @@ export function ExperiencePreviewModal({
       <DialogContent
         className={cn(
           // Full screen modal for preview
-          'max-w-full h-[100dvh] w-screen p-0 rounded-none sm:rounded-none',
+          'max-w-full h-dvh w-screen p-0 rounded-none sm:rounded-none',
           // Remove default max-width
           'sm:max-w-full',
         )}
@@ -241,7 +232,7 @@ export function ExperiencePreviewModal({
           )}
 
           {/* Empty steps state */}
-          {isReady && steps.length === 0 && (
+          {!isLoading && !error && steps.length === 0 && (
             <div className="flex h-full items-center justify-center">
               <div className="flex flex-col items-center gap-4 text-center">
                 <p className="text-sm text-muted-foreground">
@@ -255,7 +246,7 @@ export function ExperiencePreviewModal({
           )}
 
           {/* Runtime content */}
-          {isReady && session && steps.length > 0 && (
+          {isReady && steps.length > 0 && (
             <ThemeProvider theme={previewTheme}>
               <ExperienceRuntime
                 experienceId={experience.id}
@@ -271,86 +262,5 @@ export function ExperiencePreviewModal({
         </div>
       </DialogContent>
     </Dialog>
-  )
-}
-
-/**
- * Inner component that uses the runtime hook
- * Must be rendered inside ExperienceRuntime
- */
-function PreviewRuntimeContent() {
-  const runtime = useRuntime()
-
-  const {
-    currentStep,
-    canProceed,
-    canGoBack,
-    next,
-    back,
-    setAnswer,
-    getAnswer,
-    isComplete,
-  } = runtime
-
-  // Handle answer change
-  const handleAnswer = useCallback(
-    (value: string | number | boolean | string[]) => {
-      if (currentStep) {
-        setAnswer(currentStep.id, value)
-      }
-    },
-    [currentStep, setAnswer],
-  )
-
-  // Show completion message
-  if (isComplete) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <div className="flex flex-col items-center gap-4 text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-            <svg
-              className="h-8 w-8 text-green-600"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
-          </div>
-          <p className="text-lg font-medium">Preview Complete!</p>
-          <p className="text-sm text-muted-foreground">
-            All steps have been completed.
-          </p>
-        </div>
-      </div>
-    )
-  }
-
-  // No current step
-  if (!currentStep) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <p className="text-sm text-muted-foreground">No step to display</p>
-      </div>
-    )
-  }
-
-  // Render current step
-  return (
-    <StepRendererRouter
-      step={currentStep}
-      mode="run"
-      answer={getAnswer(currentStep.id)}
-      onAnswer={handleAnswer}
-      onSubmit={next}
-      onBack={back}
-      canGoBack={canGoBack}
-      canProceed={canProceed}
-    />
   )
 }
