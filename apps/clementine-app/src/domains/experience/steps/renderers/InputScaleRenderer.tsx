@@ -53,11 +53,7 @@ export function InputScaleRenderer({
     >
       <div className="flex flex-col items-center gap-8 w-full max-w-md">
         {/* Title */}
-        <ThemedText
-          variant="body"
-          as="p"
-          className="text-center text-lg font-medium"
-        >
+        <ThemedText variant="heading" as="h2">
           {title ||
             (mode === 'edit' ? (
               <span className="opacity-50">Enter your question...</span>
