@@ -159,12 +159,33 @@ export declare function CapturePhotoRenderer(
 // =============================================================================
 
 /**
+ * ARCHITECTURAL DECISION:
+ *
+ * This renderer builds its own themed UI using ThemedButton, ThemedText, StepLayout.
+ * It does NOT reuse these shared/camera components:
+ * - PermissionPrompt (hardcoded styling)
+ * - PhotoReview (hardcoded styling)
+ * - CameraControls (hardcoded styling)
+ * - ErrorState (hardcoded styling)
+ *
+ * Those components remain for the CameraCapture container (used by dev tools).
+ *
+ * WHAT IS REUSED:
+ * - useCameraPermission hook
+ * - usePhotoCapture hook
+ * - useLibraryPicker hook
+ * - CameraView component (video element only)
+ * - getDeniedInstructions() utility (extracted to lib/permission-utils.ts)
+ */
+
+/**
  * Dependencies:
- * - useCameraPermission: Permission state management
- * - usePhotoCapture: Capture flow orchestration
- * - useLibraryPicker: File upload fallback
+ * - useCameraPermission: Permission state management (REUSE)
+ * - usePhotoCapture: Capture flow orchestration (NEW)
+ * - useLibraryPicker: File upload fallback (REUSE)
  * - useExperienceRuntimeStore: Session context for uploads
- * - CameraView: Video element rendering
+ * - CameraView: Video element rendering (REUSE)
+ * - getDeniedInstructions: Platform-specific instructions (REUSE - extracted)
  * - ThemedButton, ThemedText: Themed UI components
  * - StepLayout: Responsive layout wrapper
  *
@@ -175,7 +196,7 @@ export declare function CapturePhotoRenderer(
  * - Calls onSubmit after successful capture/upload
  *
  * Error Handling:
- * - Camera errors: Show error state with retry/fallback options
+ * - Camera errors: Show themed error state with retry/fallback options
  * - Upload errors: Show retry option, preserve captured photo
- * - Permission errors: Show fallback to file upload
+ * - Permission errors: Show themed fallback to file upload
  */

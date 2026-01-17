@@ -10,7 +10,7 @@ This guide provides a quick reference for implementing photo capture functionali
 
 ## Prerequisites
 
-- Branch: `052-photo-capture`
+- Branch: `033-photo-capture`
 - Dependencies: All existing (no new packages needed)
 - Environment: HTTPS required for camera API (use local dev server)
 
@@ -18,7 +18,42 @@ This guide provides a quick reference for implementing photo capture functionali
 
 ## Implementation Order
 
-### Phase 1: Create `usePhotoCapture` Hook
+### Phase 1: Extract Permission Utilities
+
+**File**: `apps/clementine-app/src/shared/camera/lib/permission-utils.ts`
+
+Extract utilities from `PermissionPrompt.tsx` for reuse in themed renderer:
+
+```typescript
+/**
+ * Permission Utilities
+ *
+ * Extracted from PermissionPrompt.tsx for reuse in themed renderers.
+ * These utilities provide platform-specific behavior without UI coupling.
+ */
+
+/**
+ * Detect if running in a mobile browser
+ */
+export function isMobileBrowser(): boolean {
+  if (typeof navigator === 'undefined') return false
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+}
+
+/**
+ * Get instructions for enabling camera based on platform
+ */
+export function getDeniedInstructions(): string {
+  if (isMobileBrowser()) {
+    return 'To use the camera, please go to your device settings, find your browser app, and enable camera access. Then return here and refresh the page.'
+  }
+  return "To use the camera, click the camera icon in your browser's address bar or go to site settings and allow camera access. Then refresh this page."
+}
+```
+
+Update `shared/camera/lib/index.ts` to export these utilities.
+
+### Phase 2: Create `usePhotoCapture` Hook
 
 **File**: `apps/clementine-app/src/shared/camera/hooks/usePhotoCapture.ts`
 
@@ -113,11 +148,7 @@ export function usePhotoCapture({
 }
 ```
 
-### Phase 2: Update Type Exports
-
-**File**: `apps/clementine-app/src/shared/camera/types/camera.types.ts`
-
-Add the new types (already exported from hook file, update index.ts):
+### Phase 3: Update Type Exports
 
 **File**: `apps/clementine-app/src/shared/camera/index.ts`
 
@@ -129,56 +160,140 @@ export type {
   UsePhotoCaptureOptions,
   UsePhotoCaptureReturn,
 } from './hooks/usePhotoCapture'
+
+// Add permission utilities
+export { isMobileBrowser, getDeniedInstructions } from './lib/permission-utils'
 ```
 
-### Phase 3: Update `CapturePhotoRenderer`
+### Phase 4: Update `CapturePhotoRenderer`
 
 **File**: `apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx`
 
+**Key architectural decision**: Build themed UI directly using `ThemedButton`, `ThemedText`, `StepLayout`. Do NOT reuse `PermissionPrompt`, `PhotoReview`, `CameraControls` components - those stay for the `CameraCapture` container.
+
 Key changes:
-1. Import camera hooks and components
-2. Handle permission states
-3. Implement capture flow UI
-4. Add storage upload on confirm
-5. Update runtime store with captured media
+1. Import camera hooks (NOT components except CameraView)
+2. Import `getDeniedInstructions` utility
+3. Handle all 5 permission states with themed UI
+4. Implement capture flow UI with themed components
+5. Add storage upload on confirm
+6. Update runtime store with captured media
 
 ```typescript
-// Pseudocode structure
 function CapturePhotoRenderer({ step, mode, onSubmit, onBack, canGoBack }) {
-  // Edit mode: return placeholder (existing)
+  const config = step.config as CapturePhotoStepConfig
+  const { theme } = useEventTheme()
+
+  // Edit mode: return placeholder (existing pattern)
   if (mode === 'edit') {
-    return <EditModePlaceholder config={config} />
+    return (
+      <StepLayout>
+        <div className="flex flex-col items-center ...">
+          <Camera style={{ color: theme.text.color, opacity: 0.5 }} />
+          <ThemedText variant="body">Camera</ThemedText>
+        </div>
+        <ThemedText variant="small">Aspect ratio: {config.aspectRatio}</ThemedText>
+      </StepLayout>
+    )
   }
 
-  // Run mode: camera integration
+  // Run mode: full camera integration
   const cameraRef = useRef<CameraViewRef>(null)
   const { status: permStatus, requestPermission } = useCameraPermission()
   const { status, photo, capture, retake, confirm, setStatus } = usePhotoCapture({ cameraRef })
+  const { openPicker, fileInputRef, handleFileChange } = useLibraryPicker({...})
 
-  // Handle permission states
-  if (permStatus === 'unknown') return <Loading />
-  if (permStatus === 'denied' || permStatus === 'unavailable') {
-    return <FallbackUpload />
+  // Permission: unknown (loading)
+  if (permStatus === 'unknown') {
+    return (
+      <StepLayout>
+        <div className="animate-spin ..." />
+        <ThemedText variant="body">Preparing camera...</ThemedText>
+      </StepLayout>
+    )
   }
+
+  // Permission: undetermined (prompt)
   if (permStatus === 'undetermined') {
-    return <PermissionPrompt onRequest={requestPermission} />
+    return (
+      <StepLayout>
+        <Camera style={{ color: theme.text.color }} />
+        <ThemedText variant="heading">Camera Access Needed</ThemedText>
+        <ThemedText variant="body">We need camera access to take your photo</ThemedText>
+        <ThemedButton onClick={requestPermission}>Allow Camera</ThemedButton>
+      </StepLayout>
+    )
   }
 
-  // Handle capture states
-  switch (status) {
-    case 'camera-active':
-      return <CameraActiveUI cameraRef={cameraRef} onCapture={capture} />
-    case 'photo-preview':
-      return <PhotoReviewUI photo={photo} onRetake={retake} onConfirm={handleConfirm} />
-    case 'uploading':
-      return <UploadingUI photo={photo} />
-    case 'error':
-      return <ErrorUI onRetry={retake} />
+  // Permission: denied
+  if (permStatus === 'denied') {
+    return (
+      <StepLayout>
+        <CameraOff style={{ color: theme.text.color }} />
+        <ThemedText variant="heading">Camera Blocked</ThemedText>
+        <ThemedText variant="body">{getDeniedInstructions()}</ThemedText>
+        <ThemedButton onClick={openPicker}>Upload a Photo Instead</ThemedButton>
+      </StepLayout>
+    )
   }
+
+  // Permission: unavailable (no hardware)
+  if (permStatus === 'unavailable') {
+    return (
+      <StepLayout>
+        <CameraOff style={{ color: theme.text.color }} />
+        <ThemedText variant="heading">No Camera Detected</ThemedText>
+        <ThemedButton onClick={openPicker}>Upload a Photo Instead</ThemedButton>
+      </StepLayout>
+    )
+  }
+
+  // Permission: granted - show capture flow
+  // Camera active
+  if (status === 'camera-active' || status === 'idle') {
+    return (
+      <StepLayout onBack={onBack} canGoBack={canGoBack}>
+        <CameraView ref={cameraRef} aspectRatio={config.aspectRatio} />
+        <ThemedButton onClick={capture}>Take Photo</ThemedButton>
+      </StepLayout>
+    )
+  }
+
+  // Photo preview
+  if (status === 'photo-preview' && photo) {
+    return (
+      <StepLayout>
+        <img src={photo.previewUrl} alt="Captured photo" />
+        <div className="flex gap-4">
+          <ThemedButton variant="outline" onClick={retake}>Retake</ThemedButton>
+          <ThemedButton onClick={handleConfirm}>Continue</ThemedButton>
+        </div>
+      </StepLayout>
+    )
+  }
+
+  // Uploading
+  if (status === 'uploading') {
+    return (
+      <StepLayout>
+        <img src={photo?.previewUrl} alt="Uploading..." />
+        <div className="animate-spin ..." />
+        <ThemedText variant="body">Saving...</ThemedText>
+      </StepLayout>
+    )
+  }
+
+  // Error
+  return (
+    <StepLayout>
+      <ThemedText variant="heading">Something went wrong</ThemedText>
+      <ThemedButton onClick={retake}>Try Again</ThemedButton>
+    </StepLayout>
+  )
 }
 ```
 
-### Phase 4: Storage Upload Function
+### Phase 5: Storage Upload Function
 
 Create upload utility in the renderer or extract to a hook:
 
@@ -213,7 +328,7 @@ async function uploadCapturedPhoto({
 }
 ```
 
-### Phase 5: Update Step Validation
+### Phase 6: Update Step Validation
 
 **File**: `apps/clementine-app/src/domains/experience/steps/registry/step-validation.ts`
 
@@ -299,11 +414,14 @@ describe('usePhotoCapture', () => {
 ## Files Modified/Created
 
 ### New Files
+- `apps/clementine-app/src/shared/camera/lib/permission-utils.ts` (extracted utilities)
 - `apps/clementine-app/src/shared/camera/hooks/usePhotoCapture.ts`
 - `apps/clementine-app/src/shared/camera/hooks/usePhotoCapture.test.ts`
 
 ### Modified Files
+- `apps/clementine-app/src/shared/camera/lib/index.ts` (add permission-utils export)
 - `apps/clementine-app/src/shared/camera/index.ts` (exports)
+- `apps/clementine-app/src/shared/camera/components/PermissionPrompt.tsx` (import from permission-utils)
 - `apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx`
 - `apps/clementine-app/src/domains/experience/steps/registry/step-validation.ts`
 

@@ -83,17 +83,20 @@ specs/033-photo-capture/
 apps/clementine-app/src/
 ├── shared/camera/
 │   ├── hooks/
-│   │   ├── useCameraPermission.ts     # Existing - permission state
-│   │   ├── useLibraryPicker.ts        # Existing - file picker
+│   │   ├── useCameraPermission.ts     # REUSE - permission state hook
+│   │   ├── useLibraryPicker.ts        # REUSE - file picker hook
 │   │   └── usePhotoCapture.ts         # NEW - capture orchestration hook
+│   ├── lib/
+│   │   ├── permission-utils.ts        # NEW - extract isMobileBrowser(), getDeniedInstructions()
+│   │   └── ...                        # Existing utilities (capture.ts, etc.)
 │   ├── components/
-│   │   ├── CameraView.tsx             # Existing - video element
-│   │   ├── CameraControls.tsx         # Existing - capture buttons
-│   │   ├── PhotoReview.tsx            # Existing - photo review UI
-│   │   └── PermissionPrompt.tsx       # Existing - permission UI
+│   │   ├── CameraView.tsx             # REUSE - video element only
+│   │   ├── CameraControls.tsx         # NOT REUSED - stays for CameraCapture container
+│   │   ├── PhotoReview.tsx            # NOT REUSED - stays for CameraCapture container
+│   │   └── PermissionPrompt.tsx       # NOT REUSED - stays for CameraCapture container
 │   ├── types/
 │   │   └── camera.types.ts            # Existing - extend with hook types
-│   └── index.ts                       # Update exports
+│   └── index.ts                       # Update exports (add permission-utils)
 │
 ├── domains/experience/steps/
 │   ├── renderers/
@@ -113,6 +116,8 @@ apps/clementine-app/src/
 ```
 
 **Structure Decision**: Follows existing patterns - camera primitives in `shared/camera`, step renderer in `domains/experience/steps/renderers`, session persistence in `domains/session`.
+
+**Key Architectural Decision**: `CapturePhotoRenderer` builds its own themed UI using `ThemedButton`, `ThemedText`, and `StepLayout`. It does NOT reuse `PermissionPrompt`, `PhotoReview`, `CameraControls`, or `ErrorState` components from `shared/camera`. Those components remain for the `CameraCapture` container (used by dev tools). Only hooks (`useCameraPermission`, `useLibraryPicker`), `CameraView`, and extracted utilities (`getDeniedInstructions`) are reused.
 
 ## Complexity Tracking
 

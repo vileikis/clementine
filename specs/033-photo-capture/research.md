@@ -74,29 +74,76 @@ Note: This differs from workspace media assets (`/workspaces/{wsId}/media/`) bec
 
 ## 3. Permission Handling Patterns
 
-### Decision: Use existing `useCameraPermission` hook with fallback UI
+### Decision: Reuse hook + utilities, build themed UI for each state
 
-**Rationale**: The existing hook follows Expo pattern and handles:
-- Permission states: `unknown`, `undetermined`, `granted`, `denied`, `unavailable`
-- Browser compatibility (Permissions API fallback)
-- Stream cleanup after permission check
+**Rationale**: The existing `useCameraPermission` hook handles all permission logic. The existing `PermissionPrompt` component has useful utilities (`isMobileBrowser`, `getDeniedInstructions`) but uses non-themed UI. We extract the utilities and build themed UI in the renderer.
+
+**What we reuse:**
+- `useCameraPermission` hook - permission state management
+- `isMobileBrowser()` - platform detection (extract to `lib/permission-utils.ts`)
+- `getDeniedInstructions()` - platform-specific instructions (extract to `lib/permission-utils.ts`)
+
+**What we DON'T reuse:**
+- `PermissionPrompt` component - has hardcoded styling, not themed
+- `ErrorState` component - same reason
+
+**Permission States & Themed UI:**
+
+| State | Behavior |
+|-------|----------|
+| `unknown` | Show themed loading spinner |
+| `undetermined` | ThemedText explanation + ThemedButton "Allow Camera" |
+| `granted` | Proceed to capture flow |
+| `denied` | ThemedText + `getDeniedInstructions()` + ThemedButton fallback |
+| `unavailable` | ThemedText "No camera" + ThemedButton fallback |
 
 **Implementation in Renderer**:
 ```tsx
 const { status: permStatus, requestPermission } = useCameraPermission()
+const { openPicker } = useLibraryPicker(...)
 
-// Initial check
-if (permStatus === 'unknown') return <Loading />
-
-// Not granted - show prompt or denied message
-if (permStatus !== 'granted') {
-  return permStatus === 'denied'
-    ? <PermissionDeniedUI onFallback={showFilePicker} />
-    : <PermissionPromptUI onRequest={requestPermission} />
+// Loading
+if (permStatus === 'unknown') {
+  return <StepLayout><LoadingSpinner /></StepLayout>
 }
 
-// Permission granted - show camera
-return <CameraView ... />
+// Prompt to allow
+if (permStatus === 'undetermined') {
+  return (
+    <StepLayout>
+      <Camera style={{ color: theme.text.color }} />
+      <ThemedText variant="heading">Camera Access Needed</ThemedText>
+      <ThemedText variant="body">We need camera access to take your photo</ThemedText>
+      <ThemedButton onClick={requestPermission}>Allow Camera</ThemedButton>
+    </StepLayout>
+  )
+}
+
+// Denied - show instructions + fallback
+if (permStatus === 'denied') {
+  return (
+    <StepLayout>
+      <CameraOff style={{ color: theme.text.color }} />
+      <ThemedText variant="heading">Camera Blocked</ThemedText>
+      <ThemedText variant="body">{getDeniedInstructions()}</ThemedText>
+      <ThemedButton onClick={openPicker}>Upload a Photo Instead</ThemedButton>
+    </StepLayout>
+  )
+}
+
+// Unavailable - no hardware
+if (permStatus === 'unavailable') {
+  return (
+    <StepLayout>
+      <CameraOff style={{ color: theme.text.color }} />
+      <ThemedText variant="heading">No Camera Detected</ThemedText>
+      <ThemedButton onClick={openPicker}>Upload a Photo Instead</ThemedButton>
+    </StepLayout>
+  )
+}
+
+// Granted - show capture flow
+return <CaptureFlow ... />
 ```
 
 ---
@@ -252,11 +299,29 @@ const confirm = async () => {
 
 ## Dependencies Summary
 
+### Reused from `shared/camera`
+
 | Dependency | Purpose | Status |
 |------------|---------|--------|
-| `useCameraPermission` | Permission state | Existing |
-| `CameraView` | Video element + capture | Existing |
-| `useLibraryPicker` | File fallback | Existing |
+| `useCameraPermission` | Permission state hook | Existing - REUSE |
+| `useLibraryPicker` | File picker hook | Existing - REUSE |
+| `CameraView` | Video element + capture | Existing - REUSE |
+| `isMobileBrowser()` | Platform detection | Extract to `lib/permission-utils.ts` |
+| `getDeniedInstructions()` | Platform-specific text | Extract to `lib/permission-utils.ts` |
+
+### NOT Reused (stay for CameraCapture container)
+
+| Component | Reason |
+|-----------|--------|
+| `PermissionPrompt` | Has hardcoded styling, not themed |
+| `PhotoReview` | Has hardcoded styling, not themed |
+| `CameraControls` | Has hardcoded styling, not themed |
+| `ErrorState` | Has hardcoded styling, not themed |
+
+### Other Dependencies
+
+| Dependency | Purpose | Status |
+|------------|---------|--------|
 | `Firebase Storage SDK` | Photo upload | Existing |
 | `useExperienceRuntimeStore` | Session state | Existing |
 | `ThemedButton/ThemedText` | Themed UI | Existing |
