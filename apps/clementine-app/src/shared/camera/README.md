@@ -136,10 +136,10 @@ const photo = await cameraRef.current?.takePhoto()
 
 ```typescript
 interface CapturedPhoto {
-  file: File           // Blob for upload
-  previewUrl: string   // Local blob URL for preview
-  width: number        // Image width in pixels
-  height: number       // Image height in pixels
+  file: File // Blob for upload
+  previewUrl: string // Local blob URL for preview
+  width: number // Image width in pixels
+  height: number // Image height in pixels
 }
 
 interface CameraCaptureError {
@@ -198,11 +198,11 @@ Single image capture with review.
 ```typescript
 // hooks/usePhotoCapture.ts (to be extracted)
 const {
-  status,     // 'idle' | 'camera-active' | 'photo-preview' | 'uploading' | 'error'
-  photo,      // CapturedPhoto | null
-  capture,    // () => Promise<void>
-  retake,     // () => void
-  confirm,    // () => Promise<void>
+  status, // 'idle' | 'camera-active' | 'photo-preview' | 'uploading' | 'error'
+  photo, // CapturedPhoto | null
+  capture, // () => Promise<void>
+  retake, // () => void
+  confirm, // () => Promise<void>
 } = usePhotoCapture({ cameraRef })
 ```
 
@@ -213,23 +213,24 @@ Burst capture of multiple frames assembled into a GIF.
 ```typescript
 // hooks/useGifCapture.ts (future)
 const {
-  status,        // 'idle' | 'countdown' | 'capturing' | 'preview' | 'uploading' | 'error'
-  frames,        // CapturedFrame[] (0-4 during capture)
-  currentFrame,  // number (0-3 during capture)
-  gif,           // CapturedMedia | null (assembled GIF)
-  progress,      // number (0-100 for capture progress)
-  capture,       // () => Promise<void> - starts burst sequence
-  retake,        // () => void
-  confirm,       // () => Promise<void>
+  status, // 'idle' | 'countdown' | 'capturing' | 'preview' | 'uploading' | 'error'
+  frames, // CapturedFrame[] (0-4 during capture)
+  currentFrame, // number (0-3 during capture)
+  gif, // CapturedMedia | null (assembled GIF)
+  progress, // number (0-100 for capture progress)
+  capture, // () => Promise<void> - starts burst sequence
+  retake, // () => void
+  confirm, // () => Promise<void>
 } = useGifCapture({
   cameraRef,
   frameCount: 4,
   frameInterval: 500, // ms between frames
-  countdown: { enabled: true, seconds: 3 }
+  countdown: { enabled: true, seconds: 3 },
 })
 ```
 
 **GIF capture flow:**
+
 1. User taps capture
 2. Optional countdown (3, 2, 1...)
 3. Capture 4 frames with interval (e.g., 500ms apart)
@@ -243,23 +244,24 @@ Video recording with duration limit.
 ```typescript
 // hooks/useVideoCapture.ts (future)
 const {
-  status,          // 'idle' | 'countdown' | 'recording' | 'preview' | 'uploading' | 'error'
-  video,           // CapturedVideo | null
-  duration,        // number (current recording duration in seconds)
-  maxDuration,     // number (auto-stop limit)
-  isRecording,     // boolean
-  startRecording,  // () => void
-  stopRecording,   // () => void
-  retake,          // () => void
-  confirm,         // () => Promise<void>
+  status, // 'idle' | 'countdown' | 'recording' | 'preview' | 'uploading' | 'error'
+  video, // CapturedVideo | null
+  duration, // number (current recording duration in seconds)
+  maxDuration, // number (auto-stop limit)
+  isRecording, // boolean
+  startRecording, // () => void
+  stopRecording, // () => void
+  retake, // () => void
+  confirm, // () => Promise<void>
 } = useVideoCapture({
   cameraRef,
   maxDuration: 15, // seconds, auto-stop
-  countdown: { enabled: false }
+  countdown: { enabled: false },
 })
 ```
 
 **Video capture flow:**
+
 1. User taps record
 2. Recording starts, duration timer shows
 3. User taps stop OR auto-stop at maxDuration
@@ -272,12 +274,7 @@ Shared countdown logic for all modes:
 
 ```typescript
 // hooks/useCountdown.ts (future)
-const {
-  isActive,
-  secondsRemaining,
-  start,
-  cancel,
-} = useCountdown({
+const { isActive, secondsRemaining, start, cancel } = useCountdown({
   seconds: 3,
   onComplete: () => capture(),
 })
@@ -337,13 +334,13 @@ domains/experience/steps/
 
 ## Browser Support
 
-| Browser | Camera API | MediaRecorder (Video) |
-|---------|------------|----------------------|
-| Chrome (desktop) | Full | Full |
-| Chrome (mobile) | Full | Full |
-| Safari (desktop) | Full | Full (14.1+) |
-| Safari (iOS) | Full | Full (14.5+) |
-| Firefox | Full | Full |
+| Browser          | Camera API | MediaRecorder (Video) |
+| ---------------- | ---------- | --------------------- |
+| Chrome (desktop) | Full       | Full                  |
+| Chrome (mobile)  | Full       | Full                  |
+| Safari (desktop) | Full       | Full (14.1+)          |
+| Safari (iOS)     | Full       | Full (14.5+)          |
+| Firefox          | Full       | Full                  |
 
 **Note**: Camera API requires HTTPS in production.
 
@@ -365,6 +362,7 @@ pnpm test src/shared/camera
 ```
 
 Key test files:
+
 - `hooks/useCameraPermission.test.ts`
 - `hooks/useLibraryPicker.test.ts`
 - `components/CameraView.test.tsx`

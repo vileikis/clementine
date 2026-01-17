@@ -24,8 +24,8 @@
 
 **Purpose**: Extract utilities and create foundational types for photo capture
 
-- [ ] T001 [P] Create permission utilities file in apps/clementine-app/src/shared/camera/lib/permission-utils.ts
-- [ ] T002 [P] Add PhotoCaptureStatus and hook types to apps/clementine-app/src/shared/camera/types/camera.types.ts
+- [X] T001 [P] Create permission utilities file in apps/clementine-app/src/shared/camera/lib/permission-utils.ts
+- [X] T002 [P] Add PhotoCaptureStatus and hook types to apps/clementine-app/src/shared/camera/types/camera.types.ts
 
 ---
 
@@ -35,10 +35,10 @@
 
 **⚠️ CRITICAL**: CapturePhotoRenderer implementation cannot begin until this phase is complete
 
-- [ ] T003 Create usePhotoCapture hook in apps/clementine-app/src/shared/camera/hooks/usePhotoCapture.ts
-- [ ] T004 Update shared/camera lib index to export permission utilities in apps/clementine-app/src/shared/camera/lib/index.ts
-- [ ] T005 Update shared/camera main index to export usePhotoCapture hook and types in apps/clementine-app/src/shared/camera/index.ts
-- [ ] T006 Update PermissionPrompt to import from permission-utils instead of inline functions in apps/clementine-app/src/shared/camera/components/PermissionPrompt.tsx
+- [X] T003 Create usePhotoCapture hook in apps/clementine-app/src/shared/camera/hooks/usePhotoCapture.ts
+- [X] T004 Update shared/camera lib index to export permission utilities in apps/clementine-app/src/shared/camera/lib/index.ts
+- [X] T005 Update shared/camera main index to export usePhotoCapture hook and types in apps/clementine-app/src/shared/camera/index.ts
+- [X] T006 Update PermissionPrompt to import from permission-utils instead of inline functions in apps/clementine-app/src/shared/camera/components/PermissionPrompt.tsx
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
@@ -57,9 +57,9 @@
 
 ### Implementation for User Story 1
 
-- [ ] T007 [US1] Add permission state handling (unknown, undetermined, granted) to CapturePhotoRenderer in apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx
-- [ ] T008 [US1] Implement themed permission prompt UI with ThemedButton/ThemedText in apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx
-- [ ] T009 [US1] Implement camera-active state showing CameraView with Take Photo button in apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx
+- [X] T007 [US1] Add permission state handling (unknown, undetermined, granted) to CapturePhotoRenderer in apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx
+- [X] T008 [US1] Implement themed permission prompt UI with ThemedButton/ThemedText in apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx
+- [X] T009 [US1] Implement camera-active state showing CameraView with Take Photo button in apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx
 
 **Checkpoint**: At this point, permission flow and camera preview should work with themed UI
 
@@ -78,10 +78,10 @@
 
 ### Implementation for User Story 2
 
-- [ ] T010 [US2] Implement photo-preview state with captured image display in apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx
-- [ ] T011 [US2] Add Retake and Continue buttons with ThemedButton in photo-preview state in apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx
-- [ ] T012 [US2] Wire capture() action to Take Photo button in apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx
-- [ ] T013 [US2] Wire retake() action to Retake button in apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx
+- [X] T010 [US2] Implement photo-preview state with captured image display in apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx
+- [X] T011 [US2] Add Retake and Continue buttons with ThemedButton in photo-preview state in apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx
+- [X] T012 [US2] Wire capture() action to Take Photo button in apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx
+- [X] T013 [US2] Wire retake() action to Retake button in apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx
 
 **Checkpoint**: At this point, full capture/review/retake flow should work locally (no upload yet)
 
@@ -99,10 +99,10 @@
 
 ### Implementation for User Story 3
 
-- [ ] T014 [US3] Create uploadCapturedPhoto helper function in apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx
-- [ ] T015 [US3] Implement uploading state with loading indicator in apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx
-- [ ] T016 [US3] Wire confirm flow to upload photo and update runtime store with captured media in apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx
-- [ ] T017 [US3] Call onSubmit after successful upload to proceed to next step in apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx
+- [X] T014 [US3] Create uploadCapturedPhoto helper function in apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx
+- [X] T015 [US3] Implement uploading state with loading indicator in apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx
+- [X] T016 [US3] Wire confirm flow to upload photo and update runtime store with captured media in apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx
+- [X] T017 [US3] Call onSubmit after successful upload to proceed to next step in apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx
 
 **Checkpoint**: At this point, full capture → upload → persist → continue flow should work
 
@@ -119,10 +119,10 @@
 
 ### Implementation for User Story 4
 
-- [ ] T018 [US4] Implement denied permission state with getDeniedInstructions() in apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx
-- [ ] T019 [US4] Implement unavailable permission state (no camera hardware) in apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx
-- [ ] T020 [US4] Wire useLibraryPicker hook for file upload fallback in apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx
-- [ ] T021 [US4] Add hidden file input and wire to Upload Photo button in apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx
+- [X] T018 [US4] Implement denied permission state with getDeniedInstructions() in apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx
+- [X] T019 [US4] Implement unavailable permission state (no camera hardware) in apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx
+- [X] T020 [US4] Wire useLibraryPicker hook for file upload fallback in apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx
+- [X] T021 [US4] Add hidden file input and wire to Upload Photo button in apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx
 
 **Checkpoint**: At this point, all camera permission scenarios should work with fallback to file upload
 
@@ -139,9 +139,9 @@
 
 ### Implementation for User Story 5
 
-- [ ] T022 [US5] Verify edit mode placeholder shows camera icon and aspect ratio in apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx
-- [ ] T023 [US5] Implement error state with retry and fallback options in apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx
-- [ ] T024 [US5] Add blob URL cleanup in useEffect cleanup and retake flow in apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx
+- [X] T022 [US5] Verify edit mode placeholder shows camera icon and aspect ratio in apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx
+- [X] T023 [US5] Implement error state with retry and fallback options in apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx
+- [X] T024 [US5] Add blob URL cleanup in useEffect cleanup and retake flow in apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer.tsx
 
 **Checkpoint**: All user stories should now be independently functional
 
@@ -151,9 +151,9 @@
 
 **Purpose**: Validation, cleanup, and verification
 
-- [ ] T025 [P] Add capture.photo case to step validation in apps/clementine-app/src/domains/experience/steps/registry/step-validation.ts
-- [ ] T026 Run pnpm app:check to verify formatting and linting
-- [ ] T027 Run pnpm app:type-check to verify TypeScript compilation
+- [X] T025 [P] Add capture.photo case to step validation in apps/clementine-app/src/domains/experience/steps/registry/step-validation.ts
+- [X] T026 Run pnpm app:check to verify formatting and linting
+- [X] T027 Run pnpm app:type-check to verify TypeScript compilation
 - [ ] T028 Run quickstart.md manual testing checklist
 
 ---

@@ -147,3 +147,51 @@ export type PermissionState =
   | 'granted'
   | 'denied'
   | 'unavailable'
+
+/**
+ * Status states for the photo capture flow.
+ * Used by usePhotoCapture hook to track capture state machine.
+ */
+export type PhotoCaptureStatus =
+  | 'idle'
+  | 'camera-active'
+  | 'photo-preview'
+  | 'uploading'
+  | 'error'
+
+/**
+ * Options for the usePhotoCapture hook.
+ */
+export interface UsePhotoCaptureOptions {
+  /** Ref to the CameraView component for taking photos */
+  cameraRef: React.RefObject<CameraViewRef | null>
+  /** Optional callback when photo is captured (before confirmation) */
+  onCapture?: (photo: CapturedPhoto) => void
+}
+
+/**
+ * Return value of the usePhotoCapture hook.
+ * Provides state and actions for the capture flow.
+ */
+export interface UsePhotoCaptureReturn {
+  /** Current status of the capture flow */
+  status: PhotoCaptureStatus
+  /** Captured photo (available in 'photo-preview' status) */
+  photo: CapturedPhoto | null
+  /** Error details (available in 'error' status) */
+  error: CameraCaptureError | null
+  /** Trigger photo capture from camera */
+  capture: () => Promise<void>
+  /** Discard captured photo and return to camera */
+  retake: () => void
+  /** Confirm photo and return it for upload */
+  confirm: () => CapturedPhoto
+  /** Reset to idle state */
+  reset: () => void
+  /** Set the capture status manually */
+  setStatus: (status: PhotoCaptureStatus) => void
+}
+
+// Forward reference for CameraViewRef - actual type is in CameraView.tsx
+
+type CameraViewRef = any
