@@ -171,13 +171,17 @@ function CapturePhotoRenderer({ step, mode, onSubmit, onBack, canGoBack }: StepR
     confirm
   } = usePhotoCapture({ cameraRef })
 
-  // Edit mode: show placeholder
+  // Edit mode: show placeholder with camera icon
   if (mode === 'edit') {
     return (
       <StepLayout>
-        <div className="aspect-square bg-muted flex items-center justify-center">
-          <ThemedText variant="muted">Camera preview</ThemedText>
+        <div className="aspect-square bg-muted/10 flex flex-col items-center justify-center rounded-lg">
+          <Camera className="h-16 w-16 opacity-50" />
+          <ThemedText variant="body" className="mt-3 opacity-60">Camera</ThemedText>
         </div>
+        <ThemedText variant="small" className="opacity-60">
+          Aspect ratio: {config.aspectRatio}
+        </ThemedText>
       </StepLayout>
     )
   }
@@ -259,21 +263,23 @@ function CapturePhotoRenderer({ step, mode, onSubmit, onBack, canGoBack }: StepR
 
 ### 5.4 Edit Mode UI
 
-In edit mode, show a placeholder with configuration:
+In edit mode, show a placeholder with camera icon and configuration (preserving current pattern):
 
 ```
 ┌─────────────────────────────────┐
 │                                 │
 │    ┌─────────────────────┐     │
 │    │                     │     │
-│    │  [Camera Placeholder]│     │
+│    │      📷 Camera      │     │  ← Camera icon + label
 │    │                     │     │
 │    └─────────────────────┘     │
 │                                 │
-│    Aspect Ratio: [1:1 ▼]       │
+│    Aspect Ratio: 1:1           │  ← Config indicator
 │                                 │
 └─────────────────────────────────┘
 ```
+
+**Note**: The edit mode placeholder uses the same camera icon pattern as the current `CapturePhotoRenderer`, with aspect ratio reflected in the container dimensions.
 
 ---
 
@@ -357,9 +363,13 @@ On capture confirmation:
 
 ### 7.2 Storage Path
 
+Photo captures are stored as session inputs:
+
 ```
-/workspaces/{workspaceId}/sessions/{sessionId}/captures/{assetId}.jpg
+/workspaces/{workspaceId}/projects/{projectId}/sessions/{sessionId}/inputs/{assetId}.jpg
 ```
+
+**Note**: The session context provides `workspaceId`, `projectId`, and `sessionId`. The `assetId` is generated at capture time.
 
 ### 7.3 CapturedPhoto Type
 
@@ -426,8 +436,9 @@ If camera is unavailable or permission denied, offer file upload as fallback:
 
 ## 9. Implementation Phases
 
-### Phase 1: Camera Hook Refactoring
+### Phase 1: Camera Foundation
 
+- Rename `PermissionState` to `CameraPermissionStatus` to differentiate from browser's `PermissionState`
 - Extract `usePhotoCapture` hook from existing `CameraCapture` component
 - Ensure `CameraView` is a pure video element component
 - Verify `useCameraPermission` works standalone
