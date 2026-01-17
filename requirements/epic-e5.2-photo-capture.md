@@ -371,7 +371,23 @@ Photo captures are stored as session inputs:
 
 **Note**: The session context provides `workspaceId`, `projectId`, and `sessionId`. The `assetId` is generated at capture time.
 
-### 7.3 CapturedPhoto Type
+### 7.3 Optional Upload
+
+The renderer should support scenarios where upload is not needed (e.g., dev tools testing):
+
+```typescript
+interface CapturePhotoRendererProps extends StepRendererProps {
+  /** Optional callback for photo submission. If not provided, onSubmit is called with local photo only. */
+  onPhotoCapture?: (photo: CapturedPhoto) => Promise<void>
+}
+```
+
+When `onPhotoCapture` is not provided or session context is unavailable, the renderer:
+- Completes the capture flow locally (preview, confirm)
+- Calls `onSubmit` without uploading
+- Useful for dev tools and testing scenarios
+
+### 7.4 CapturedPhoto Type
 
 ```typescript
 interface CapturedPhoto {
@@ -386,7 +402,7 @@ interface CapturedPhoto {
 }
 ```
 
-### 7.4 Session Media Reference
+### 7.5 Session Media Reference
 
 ```typescript
 interface CapturedMedia {
@@ -554,3 +570,27 @@ Each mode will have:
 - Shared camera primitives (CameraView, permission handling)
 
 See `shared/camera/README.md` for camera module architecture details.
+
+### Future: Dev Tools Consolidation
+
+After this epic, the `CameraCapture` container in `shared/camera/containers/` should be deprecated in favor of using `CapturePhotoRenderer` directly:
+
+**Current state:**
+- `CameraCapture` - Standalone component with built-in UI (used by dev tools)
+- `CapturePhotoRenderer` - Themed renderer (used by guest experience)
+
+**Target state:**
+- Dev tools use `CapturePhotoRenderer` with default theme and no upload handler
+- `CameraCapture` deprecated/removed
+- Single source of truth for camera capture UI
+
+**Migration steps (post-epic):**
+1. Wrap dev tools camera preview in `EventThemeProvider` with default theme
+2. Use `CapturePhotoRenderer` in run mode without `onPhotoCapture`
+3. Remove or deprecate `CameraCapture` container
+4. Update `shared/camera/README.md` to reflect new patterns
+
+**Benefits:**
+- Dev tools test the actual guest-facing component
+- Less code to maintain
+- Bug fixes apply everywhere
