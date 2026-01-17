@@ -12,42 +12,94 @@ Implement photo capture functionality with camera integration, enabling guests t
 
 **This epic delivers:**
 
-- Camera integration with `shared/camera` module
-- Photo capture flow (preview → countdown → capture → confirm/retake)
+- Hook-based camera integration via `shared/camera` module
+- Photo capture flow (preview → capture → confirm/retake)
+- Themed UI via `CapturePhotoRenderer` using `shared/theming`
 - Storage upload integration
 - Session media persistence
 - Camera permissions handling
 
 **This epic does NOT include:**
 
-- Video/GIF capture (Future)
+- Video/GIF capture (Future - see camera module architecture)
+- Countdown timer (Future enhancement)
 - Real-time filters/overlays (Future)
 - Transform processing (E9)
 
 ---
 
-## 2. Capture Flow
+## 2. Architecture
 
-### 2.1 User Journey
+### 2.1 Layered Approach
+
+The photo capture system uses a **hook-based architecture** (Option B) with clear separation of concerns:
 
 ```
-┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
-│   Camera    │ →  │  Countdown  │ →  │   Preview   │ →  │  Continue   │
-│   Preview   │    │  (optional) │    │   Photo     │    │  to Next    │
-└─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘
-       ↑                                     │
-       └──────────── Retake ─────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│  Layer 3: CapturePhotoRenderer (themed UI)                      │
+│  ─────────────────────────────────────────────────────────────  │
+│  • Uses ThemedButton, ThemedText, StepLayout                    │
+│  • Owns all user-facing UI and interactions                     │
+│  • Handles step navigation (onSubmit, onBack)                   │
+│  • Consumes hooks from Layer 2                                  │
+└─────────────────────────────────────────────────────────────────┘
+                              ▲
+                              │ uses
+                              │
+┌─────────────────────────────────────────────────────────────────┐
+│  Layer 2: usePhotoCapture hook (orchestration)                  │
+│  ─────────────────────────────────────────────────────────────  │
+│  • Photo capture state machine                                  │
+│  • Capture, retake, confirm actions                             │
+│  • Returns: status, photo, capture(), retake(), confirm()       │
+└─────────────────────────────────────────────────────────────────┘
+                              ▲
+                              │ uses
+                              │
+┌─────────────────────────────────────────────────────────────────┐
+│  Layer 1: Camera Primitives (shared/camera)                     │
+│  ─────────────────────────────────────────────────────────────  │
+│  • useCameraPermission - permission state management            │
+│  • CameraView - renders video element only                      │
+│  • takeSnapshot() - captures frame from stream                  │
+│  • No UI chrome, no buttons                                     │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-### 2.2 States
+### 2.2 Why This Architecture
+
+- **Theming**: Renderers use `shared/theming` components (ThemedButton, ThemedText) for brand-consistent guest UI
+- **Reusability**: Camera primitives are UI-agnostic, usable outside step renderers
+- **Testability**: Hooks can be tested in isolation
+- **Extensibility**: Future capture modes (GIF, video) add new hooks + renderers, share primitives
+
+---
+
+## 3. Capture Flow
+
+### 3.1 User Journey
+
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│     Camera      │ →  │     Photo       │ →  │    Continue     │
+│     Preview     │    │     Review      │    │    to Next      │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+                              │
+                              ↓ Retake
+                       ┌─────────────────┐
+                       │     Camera      │
+                       │     Preview     │
+                       └─────────────────┘
+```
+
+### 3.2 States
 
 | State | Description |
 |-------|-------------|
+| `idle` | Initial state, camera not started |
 | `requesting-permission` | Requesting camera access |
 | `permission-denied` | User denied camera access |
-| `camera-preview` | Live camera feed showing |
-| `countdown` | Countdown timer running |
-| `capturing` | Photo being captured |
+| `camera-active` | Live camera feed showing |
 | `photo-preview` | Captured photo shown for review |
 | `uploading` | Photo uploading to storage |
 | `complete` | Photo saved, ready to continue |
@@ -55,38 +107,125 @@ Implement photo capture functionality with camera integration, enabling guests t
 
 ---
 
-## 3. CapturePhotoRenderer (Full Implementation)
+## 4. Config Schema
 
-### 3.1 Component Structure
+### 4.1 CapturePhotoStepConfig
+
+The config is intentionally minimal:
 
 ```typescript
-interface CapturePhotoRendererProps {
-  mode: 'edit' | 'run'
-  step: Step
-  config: CapturePhotoConfig
+const capturePhotoStepConfigSchema = z.object({
+  /** Aspect ratio for the captured photo */
+  aspectRatio: z.enum(['1:1', '9:16']).default('1:1'),
+})
 
-  // Run mode only
-  onMedia?: (media: CapturedMedia) => void
-  onNext?: () => void
-  onBack?: () => void
-  canGoBack?: boolean
-}
+type CapturePhotoStepConfig = z.infer<typeof capturePhotoStepConfigSchema>
+```
 
-interface CapturePhotoConfig {
-  instructions: string | null
-  countdown: {
-    enabled: boolean
-    seconds: number  // 3, 5, 10
-  }
-  camera: {
-    facing: 'user' | 'environment'  // front or back camera
+### 4.2 Default Config
+
+```typescript
+function createDefaultCapturePhotoConfig(): CapturePhotoStepConfig {
+  return {
+    aspectRatio: '1:1',
   }
 }
 ```
 
-### 3.2 Run Mode UI
+**Note**: Additional config options (countdown, camera facing, instructions) may be added in future iterations.
 
-**Camera Preview State**
+---
+
+## 5. CapturePhotoRenderer
+
+### 5.1 Component Structure
+
+```typescript
+interface CapturePhotoRendererProps extends StepRendererProps {
+  // Inherited from StepRendererProps:
+  // step: Step
+  // mode: 'edit' | 'run'
+  // onSubmit?: () => void
+  // onBack?: () => void
+  // canGoBack?: boolean
+  // canProceed?: boolean
+}
+```
+
+### 5.2 Implementation Pattern
+
+```typescript
+function CapturePhotoRenderer({ step, mode, onSubmit, onBack, canGoBack }: StepRendererProps) {
+  const config = step.config as CapturePhotoStepConfig
+  const cameraRef = useRef<CameraViewRef>(null)
+
+  // Layer 1: Camera permission
+  const { status: permStatus, requestPermission } = useCameraPermission()
+
+  // Layer 2: Photo capture orchestration
+  const {
+    status,
+    photo,
+    capture,
+    retake,
+    confirm
+  } = usePhotoCapture({ cameraRef })
+
+  // Edit mode: show placeholder
+  if (mode === 'edit') {
+    return (
+      <StepLayout>
+        <div className="aspect-square bg-muted flex items-center justify-center">
+          <ThemedText variant="muted">Camera preview</ThemedText>
+        </div>
+      </StepLayout>
+    )
+  }
+
+  // Run mode: permission denied
+  if (permStatus === 'denied') {
+    return (
+      <StepLayout>
+        <ThemedText>Camera access is required</ThemedText>
+        <ThemedButton onClick={requestPermission}>Allow Camera</ThemedButton>
+        {/* Or show file upload fallback */}
+      </StepLayout>
+    )
+  }
+
+  // Run mode: camera active
+  if (status === 'camera-active') {
+    return (
+      <StepLayout onBack={onBack} canGoBack={canGoBack}>
+        <CameraView
+          ref={cameraRef}
+          aspectRatio={config.aspectRatio}
+        />
+        <ThemedButton onClick={capture}>Take Photo</ThemedButton>
+      </StepLayout>
+    )
+  }
+
+  // Run mode: photo review
+  if (status === 'photo-preview' && photo) {
+    return (
+      <StepLayout>
+        <img src={photo.previewUrl} alt="Captured photo" />
+        <div className="flex gap-4">
+          <ThemedButton variant="outline" onClick={retake}>Retake</ThemedButton>
+          <ThemedButton onClick={() => confirm().then(onSubmit)}>Continue</ThemedButton>
+        </div>
+      </StepLayout>
+    )
+  }
+
+  // ... uploading, error states
+}
+```
+
+### 5.3 Run Mode UI
+
+**Camera Active State**
 ```
 ┌─────────────────────────────────┐
 │                                 │
@@ -97,29 +236,12 @@ interface CapturePhotoConfig {
 │    │                     │     │
 │    └─────────────────────┘     │
 │                                 │
-│    "Smile and look at camera"  │
-│                                 │
-│    [🔄]           [📷 Capture] │
+│         [Take Photo]            │  ← ThemedButton
 │                                 │
 └─────────────────────────────────┘
 ```
 
-**Countdown State**
-```
-┌─────────────────────────────────┐
-│                                 │
-│    ┌─────────────────────┐     │
-│    │                     │     │
-│    │   [Camera Feed]     │     │
-│    │       ┌───┐         │     │
-│    │       │ 3 │         │     │
-│    │       └───┘         │     │
-│    └─────────────────────┘     │
-│                                 │
-└─────────────────────────────────┘
-```
-
-**Photo Preview State**
+**Photo Review State**
 ```
 ┌─────────────────────────────────┐
 │                                 │
@@ -130,65 +252,100 @@ interface CapturePhotoConfig {
 │    │                     │     │
 │    └─────────────────────┘     │
 │                                 │
-│    [Retake]        [Continue]  │
+│    [Retake]        [Continue]  │  ← ThemedButtons
 │                                 │
 └─────────────────────────────────┘
 ```
 
-### 3.3 Edit Mode UI
+### 5.4 Edit Mode UI
 
-In edit mode, show configuration options:
-- Instructions text input
-- Countdown toggle and duration selector
-- Default camera facing selector
-- Preview placeholder (no live camera in editor)
-
----
-
-## 4. Integration with shared/camera
-
-### 4.1 Camera Module Usage
-
-Leverage existing `shared/camera` module capabilities:
-
-```typescript
-import {
-  useCamera,
-  CameraPreview,
-  requestCameraPermission,
-  capturePhoto
-} from '@/shared/camera'
-```
-
-### 4.2 Required Camera Features
-
-| Feature | Description |
-|---------|-------------|
-| Permission request | Request camera access with fallback messaging |
-| Live preview | Display camera feed in component |
-| Photo capture | Capture still image from stream |
-| Camera switch | Toggle front/back camera |
-| Stream cleanup | Properly release camera on unmount |
-
-### 4.3 Fallback: File Upload
-
-If camera is unavailable or permission denied, offer file upload as fallback:
+In edit mode, show a placeholder with configuration:
 
 ```
 ┌─────────────────────────────────┐
 │                                 │
-│    Camera not available         │
+│    ┌─────────────────────┐     │
+│    │                     │     │
+│    │  [Camera Placeholder]│     │
+│    │                     │     │
+│    └─────────────────────┘     │
 │                                 │
-│    [Upload a Photo Instead]     │
+│    Aspect Ratio: [1:1 ▼]       │
 │                                 │
 └─────────────────────────────────┘
 ```
 
 ---
 
-## 5. Storage Integration
+## 6. Camera Module Hooks
 
-### 5.1 Upload Flow
+### 6.1 useCameraPermission
+
+Manages camera permission state:
+
+```typescript
+interface UseCameraPermissionReturn {
+  status: 'unknown' | 'undetermined' | 'granted' | 'denied' | 'unavailable'
+  requestPermission: () => Promise<void>
+  error: CameraCaptureError | null
+}
+
+const { status, requestPermission, error } = useCameraPermission()
+```
+
+### 6.2 usePhotoCapture
+
+Orchestrates the photo capture flow:
+
+```typescript
+interface UsePhotoCaptureOptions {
+  cameraRef: RefObject<CameraViewRef>
+  onCapture?: (photo: CapturedPhoto) => void
+}
+
+interface UsePhotoCaptureReturn {
+  status: 'idle' | 'camera-active' | 'photo-preview' | 'uploading' | 'error'
+  photo: CapturedPhoto | null
+  error: CameraCaptureError | null
+  capture: () => Promise<void>
+  retake: () => void
+  confirm: () => Promise<void>
+}
+
+const { status, photo, capture, retake, confirm } = usePhotoCapture({ cameraRef })
+```
+
+### 6.3 CameraView Component
+
+Renders only the video element:
+
+```typescript
+interface CameraViewProps {
+  facing?: 'user' | 'environment'
+  aspectRatio?: '1:1' | '9:16'
+  onReady?: () => void
+  onError?: (error: CameraCaptureError) => void
+}
+
+interface CameraViewRef {
+  takePhoto: () => Promise<CapturedPhoto | null>
+  switchCamera: () => Promise<void>
+  hasMultipleCameras: boolean
+}
+
+<CameraView
+  ref={cameraRef}
+  aspectRatio="1:1"
+  onReady={handleReady}
+  onError={handleError}
+/>
+```
+
+---
+
+## 7. Storage Integration
+
+### 7.1 Upload Flow
 
 On capture confirmation:
 
@@ -196,15 +353,30 @@ On capture confirmation:
 2. Upload to Firebase Storage via media asset system
 3. Create MediaAsset record
 4. Store reference in session.capturedMedia
-5. Optionally set as session.result (if this is the final capture)
+5. Call onSubmit to proceed to next step
 
-### 5.2 Storage Path
+### 7.2 Storage Path
 
 ```
 /workspaces/{workspaceId}/sessions/{sessionId}/captures/{assetId}.jpg
 ```
 
-### 5.3 Media Asset Record
+### 7.3 CapturedPhoto Type
+
+```typescript
+interface CapturedPhoto {
+  /** Blob for upload */
+  file: File
+  /** Local preview URL (blob URL) */
+  previewUrl: string
+  /** Width in pixels */
+  width: number
+  /** Height in pixels */
+  height: number
+}
+```
+
+### 7.4 Session Media Reference
 
 ```typescript
 interface CapturedMedia {
@@ -217,9 +389,9 @@ interface CapturedMedia {
 
 ---
 
-## 6. Error Handling
+## 8. Error Handling
 
-### 6.1 Camera Errors
+### 8.1 Camera Errors
 
 | Error | User Message | Recovery |
 |-------|--------------|----------|
@@ -228,7 +400,7 @@ interface CapturedMedia {
 | Camera in use | "Camera is being used by another app." | Retry button |
 | Stream error | "Camera error occurred." | Retry button |
 
-### 6.2 Upload Errors
+### 8.2 Upload Errors
 
 | Error | User Message | Recovery |
 |-------|--------------|----------|
@@ -236,101 +408,77 @@ interface CapturedMedia {
 | Storage error | "Unable to save photo." | Retry button |
 | Timeout | "Upload taking too long." | Retry button |
 
----
+### 8.3 Fallback: File Upload
 
-## 7. Config Options
+If camera is unavailable or permission denied, offer file upload as fallback:
 
-### 7.1 CapturePhotoConfig Schema
-
-```typescript
-const capturePhotoConfigSchema = z.object({
-  instructions: z.string().max(200).nullable(),
-  countdown: z.object({
-    enabled: z.boolean().default(true),
-    seconds: z.number().min(1).max(10).default(3),
-  }),
-  camera: z.object({
-    facing: z.enum(['user', 'environment']).default('user'),
-  }),
-})
 ```
-
-### 7.2 Default Config
-
-```typescript
-function createDefaultCapturePhotoConfig(): CapturePhotoConfig {
-  return {
-    instructions: null,
-    countdown: {
-      enabled: true,
-      seconds: 3,
-    },
-    camera: {
-      facing: 'user',
-    },
-  }
-}
+┌─────────────────────────────────┐
+│                                 │
+│    Camera not available         │
+│                                 │
+│    [Upload a Photo Instead]     │  ← ThemedButton
+│                                 │
+└─────────────────────────────────┘
 ```
 
 ---
 
-## 8. Implementation Phases
+## 9. Implementation Phases
 
-### Phase 1: Camera Integration
+### Phase 1: Camera Hook Refactoring
 
-- Integrate `shared/camera` module with CapturePhotoRenderer
-- Implement camera preview state
-- Add camera permission handling
-- Implement camera switch (front/back)
+- Extract `usePhotoCapture` hook from existing `CameraCapture` component
+- Ensure `CameraView` is a pure video element component
+- Verify `useCameraPermission` works standalone
 
-### Phase 2: Capture Flow
+### Phase 2: CapturePhotoRenderer
 
-- Implement countdown timer
-- Implement photo capture
-- Implement photo preview state
-- Add retake functionality
+- Create `CapturePhotoRenderer` using hooks + themed components
+- Implement edit mode (placeholder + config)
+- Implement run mode (camera active, photo review states)
+- Integrate with `StepLayout` for navigation
 
 ### Phase 3: Storage Upload
 
 - Implement storage upload on confirm
 - Create MediaAsset record
-- Update session.capturedMedia
+- Update session.capturedMedia via runtime
 - Handle upload progress/errors
 
-### Phase 4: Fallback & Polish
+### Phase 4: Polish & Fallback
 
 - Implement file upload fallback
-- Polish error states and messaging
-- Handle edge cases (camera switch during countdown, etc.)
+- Polish error states with themed UI
+- Handle edge cases (unmount during upload, etc.)
 - Test on various devices/browsers
 
 ---
 
-## 9. Acceptance Criteria
+## 10. Acceptance Criteria
 
 ### Must Have
 
 - [ ] Camera permission requested and handled gracefully
 - [ ] Live camera preview displays in capture step
-- [ ] Countdown timer works when enabled
 - [ ] Photo capture produces image from camera stream
 - [ ] Captured photo preview shows for review
 - [ ] Retake returns to camera preview
 - [ ] Confirm uploads photo to storage
 - [ ] Captured media stored in session document
-- [ ] Camera switch toggles front/back
+- [ ] All UI uses themed components (ThemedButton, ThemedText)
 - [ ] File upload fallback when camera unavailable
+- [ ] Edit mode shows placeholder with aspect ratio config
 
 ### Nice to Have
 
-- [ ] Retake limit (configurable max retakes)
+- [ ] Camera switch (front/back) button
 - [ ] Upload progress indicator
-- [ ] Photo quality/compression options
-- [ ] Mirror mode toggle for selfie camera
+- [ ] Photo compression before upload
 
 ---
 
-## 10. Technical Notes
+## 11. Technical Notes
 
 ### Browser Support
 
@@ -348,24 +496,50 @@ function createDefaultCapturePhotoConfig(): CapturePhotoConfig {
 
 - Release camera stream when not in use
 - Compress images before upload (target: < 1MB)
-- Use appropriate image dimensions (max 1920x1080)
-- Lazy load camera component
+- Use appropriate image dimensions based on aspect ratio
+- Clean up blob URLs after upload
 
 ### Dependencies
 
-- `shared/camera` - Camera capture functionality
+- `shared/camera` - Camera hooks and CameraView component
+- `shared/theming` - ThemedButton, ThemedText for branded UI
 - `integrations/firebase/storage` - Media upload
 - Session hooks from E5
 
 ---
 
-## 11. Out of Scope
+## 12. Out of Scope
 
-| Item | Epic/Future |
-|------|-------------|
-| Video capture | Future |
-| GIF capture | Future |
+| Item | Notes |
+|------|-------|
+| Video capture | Future - will use `useVideoCapture` hook |
+| GIF capture | Future - will use `useGifCapture` hook |
+| Countdown timer | Future enhancement to hooks |
 | Real-time filters | Future |
 | AR overlays | Future |
 | Multi-photo capture | Future |
 | Transform processing | E9 |
+
+### Future Capture Modes Architecture
+
+The hook-based architecture supports future capture modes:
+
+```
+shared/camera/hooks/
+├── useCameraPermission.ts   # Shared across all modes
+├── usePhotoCapture.ts       # Single image capture
+├── useGifCapture.ts         # Future: burst of 4 frames
+└── useVideoCapture.ts       # Future: video recording
+
+domains/experience/steps/renderers/
+├── CapturePhotoRenderer.tsx # This epic
+├── CaptureGifRenderer.tsx   # Future
+└── CaptureVideoRenderer.tsx # Future
+```
+
+Each mode will have:
+- Dedicated hook with mode-specific state machine
+- Dedicated renderer with mode-specific UI
+- Shared camera primitives (CameraView, permission handling)
+
+See `shared/camera/README.md` for camera module architecture details.
