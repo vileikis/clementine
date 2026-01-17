@@ -102,52 +102,54 @@ src/
 ├── integrations/        # Third-party integrations (Firebase, Sentry)
 ├── shared/              # Cross-cutting modules used across domains
 │   ├── camera/          # Camera capture & photo functionality
+│   ├── components/      # Generic shared components
 │   ├── editor-controls/ # Reusable editor UI (sliders, pickers, etc.)
+│   ├── editor-status/   # Editor save status tracking & indicators
+│   ├── forms/           # Form utilities
 │   ├── preview-shell/   # Preview container with viewport switcher
 │   ├── theming/         # Theme utilities & CSS variable generation
-│   ├── forms/           # Form utilities
-│   ├── components/      # Generic shared components
 │   └── utils/           # Utility functions
 └── domains/             # Business domains (bounded contexts)
     ├── admin/           # Workspace admin (super-admin functions)
     ├── auth/            # Authentication & login
     ├── dev-tools/       # Development utilities (camera preview, etc.)
     ├── event/           # Event designer (see detail below)
+    ├── experience/      # Experience system (designer, library, runtime)
     ├── guest/           # Guest photo experience (public-facing)
     ├── media-library/   # Media asset management
     ├── navigation/      # Sidebar, top nav, breadcrumbs
     ├── project/         # Project management (events list, sharing)
+    ├── session/         # Session capture & tracking
     └── workspace/       # Workspace settings & project list
 ```
 
-#### Event Domain (Core)
+#### Event Domain
 
-The `event` domain is the heart of the application - the event designer/editor:
+The `event` domain handles event configuration and the event designer/editor:
 
 ```
 domains/event/
 ├── designer/            # Main editor layout & state
-│   ├── containers/      # EventDesignerLayout (orchestrates tabs)
-│   ├── stores/          # Zustand stores (changes tracker, etc.)
-│   └── hooks/           # Designer-specific hooks
-├── settings/            # Settings tab (sharing, overlay, publish)
-│   ├── containers/      # SettingsTab container
-│   ├── components/      # OverlayFrame, SharingOptionCard, etc.
-│   └── hooks/           # Settings mutations
+├── experiences/         # Experience selection & management within events
+├── settings/            # Settings tab (overlay, publish settings)
+├── share/               # Sharing configuration tab
 ├── theme/               # Theme tab (colors, fonts, branding)
-│   ├── containers/      # ThemeEditorTab container
-│   ├── components/      # Theme editor form sections
-│   └── constants/       # Default values, presets
-├── welcome/             # Welcome tab (welcome screen editor)
-│   ├── containers/      # WelcomeEditorTab container
-│   ├── components/      # Welcome screen form & preview
-│   └── schemas/         # Zod validation schemas
-└── shared/              # Shared across event subdomains
-    ├── types/           # Event types & interfaces
-    ├── schemas/         # Zod schemas (eventConfigSchema, etc.)
-    ├── queries/         # TanStack Query hooks (useEvent, etc.)
-    ├── hooks/           # Shared hooks (useEventMutations, etc.)
-    └── lib/             # Utility functions
+├── welcome/             # Welcome screen editor tab
+└── shared/              # Shared types, schemas, queries, hooks
+```
+
+#### Experience Domain
+
+The `experience` domain is the core of AI photo/video experiences:
+
+```
+domains/experience/
+├── designer/            # Experience editor/designer
+├── library/             # Experience library & selection
+├── preview/             # Experience preview components
+├── runtime/             # Guest-facing experience runtime
+├── steps/               # Step system (capture, transform, etc.)
+└── shared/              # Shared types, schemas, queries
 ```
 
 **Key principles:**
