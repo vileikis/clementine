@@ -1,0 +1,138 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 800" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif">
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-opacity="0.1"/>
+    </filter>
+    <pattern id="diagonalHatch" patternUnits="userSpaceOnUse" width="8" height="8">
+      <path d="M-2,2 l4,-4 M0,8 l8,-8 M6,10 l4,-4" stroke="#ef4444" stroke-width="1" stroke-opacity="0.3"/>
+    </pattern>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1000" height="800" fill="#f8fafc"/>
+  
+  <!-- Title -->
+  <text x="500" y="35" text-anchor="middle" font-size="24" font-weight="700" fill="#1e293b">Data &amp; Security Model</text>
+  <text x="500" y="58" text-anchor="middle" font-size="13" fill="#64748b">What data lives where, and who can access it</text>
+  
+  <!-- Two Main Zones -->
+  <!-- Client Zone -->
+  <rect x="40" y="85" width="450" height="600" rx="16" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+  <rect x="40" y="85" width="450" height="45" rx="16" fill="#3b82f6"/>
+  <rect x="40" y="110" width="450" height="20" fill="#3b82f6"/>
+  <text x="265" y="115" text-anchor="middle" font-size="16" font-weight="600" fill="white">📱 CLIENT SIDE</text>
+  <text x="265" y="150" text-anchor="middle" font-size="11" fill="#3b82f6">Visible to browser / mobile app</text>
+  
+  <!-- Server Zone -->
+  <rect x="510" y="85" width="450" height="600" rx="16" fill="#fef3c7" stroke="#fcd34d" stroke-width="2"/>
+  <rect x="510" y="85" width="450" height="45" rx="16" fill="#f59e0b"/>
+  <rect x="510" y="110" width="450" height="20" fill="#f59e0b"/>
+  <text x="735" y="115" text-anchor="middle" font-size="16" font-weight="600" fill="white">☁️ SERVER SIDE</text>
+  <text x="735" y="150" text-anchor="middle" font-size="11" fill="#b45309">Protected by Firebase Admin SDK</text>
+  
+  <!-- CLIENT SIDE CONTENT -->
+  <!-- Experience Document -->
+  <rect x="60" y="175" width="410" height="180" rx="12" fill="white" filter="url(#shadow)"/>
+  <text x="80" y="200" font-size="13" font-weight="600" fill="#1e293b">Experience Document</text>
+  <text x="80" y="218" font-size="10" fill="#64748b">/experiences/{experienceId}</text>
+  
+  <rect x="80" y="235" width="370" height="100" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text x="95" y="258" font-size="10" font-family="monospace" fill="#475569">steps: [</text>
+  <text x="105" y="275" font-size="10" font-family="monospace" fill="#475569">{ type: "input.multiSelect", ... },</text>
+  <text x="105" y="292" font-size="10" font-family="monospace" fill="#475569">{ type: "capture.photo", ... },</text>
+  <text x="105" y="309" font-size="10" font-family="monospace" fill="#6366f1">{ type: "transform.pipeline",</text>
+  <text x="115" y="326" font-size="10" font-family="monospace" fill="#6366f1">  config: { nodeCount: 3, ... } } ← minimal</text>
+  
+  <!-- Session Document -->
+  <rect x="60" y="370" width="410" height="160" rx="12" fill="white" filter="url(#shadow)"/>
+  <text x="80" y="395" font-size="13" font-weight="600" fill="#1e293b">Session Document</text>
+  <text x="80" y="413" font-size="10" fill="#64748b">/projects/{id}/sessions/{sessionId}</text>
+  
+  <rect x="80" y="430" width="370" height="80" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text x="95" y="453" font-size="10" font-family="monospace" fill="#475569">answers: [{ stepId, value }, ...],</text>
+  <text x="95" y="470" font-size="10" font-family="monospace" fill="#475569">capturedMedia: [{ url, assetId }, ...],</text>
+  <text x="95" y="487" font-size="10" font-family="monospace" fill="#22c55e">jobStatus: "running" | "completed",</text>
+  <text x="95" y="504" font-size="10" font-family="monospace" fill="#22c55e">resultMedia: { url, assetId }</text>
+  
+  <!-- What Guests See -->
+  <rect x="60" y="545" width="195" height="120" rx="12" fill="#f0fdf4" filter="url(#shadow)"/>
+  <text x="80" y="570" font-size="12" font-weight="600" fill="#166534">👤 Guest Can See</text>
+  <text x="80" y="592" font-size="10" fill="#475569">✓ Step types &amp; content</text>
+  <text x="80" y="609" font-size="10" fill="#475569">✓ Their own answers</text>
+  <text x="80" y="626" font-size="10" fill="#475569">✓ Job status (processing)</text>
+  <text x="80" y="643" font-size="10" fill="#475569">✓ Final result image</text>
+  
+  <!-- What Guests Can't See -->
+  <rect x="275" y="545" width="195" height="120" rx="12" fill="#fee2e2" filter="url(#shadow)"/>
+  <text x="295" y="570" font-size="12" font-weight="600" fill="#b91c1c">🚫 Guest Cannot See</text>
+  <text x="295" y="592" font-size="10" fill="#475569">✗ AI prompts</text>
+  <text x="295" y="609" font-size="10" fill="#475569">✗ Node configurations</text>
+  <text x="295" y="626" font-size="10" fill="#475569">✗ Reference images</text>
+  <text x="295" y="643" font-size="10" fill="#475569">✗ Variable mappings</text>
+  
+  <!-- SERVER SIDE CONTENT -->
+  <!-- Transform Config (Secret) -->
+  <rect x="530" y="175" width="410" height="260" rx="12" fill="white" filter="url(#shadow)"/>
+  <rect x="530" y="175" width="410" height="35" rx="12" fill="#dc2626"/>
+  <rect x="530" y="195" width="410" height="15" fill="#dc2626"/>
+  <text x="550" y="200" font-size="13" font-weight="600" fill="white">🔒 Transform Config (SECRET)</text>
+  <text x="550" y="230" font-size="10" fill="#64748b">/experiences/{expId}/transformConfigs/{stepId}</text>
+  
+  <rect x="550" y="250" width="370" height="165" rx="8" fill="#fef2f2" stroke="#fecaca"/>
+  <text x="565" y="273" font-size="10" font-family="monospace" fill="#991b1b">variableMappings: {</text>
+  <text x="575" y="290" font-size="10" font-family="monospace" fill="#991b1b">  pet: { stepId: "step1", type: "answer" }</text>
+  <text x="565" y="307" font-size="10" font-family="monospace" fill="#991b1b">},</text>
+  <text x="565" y="324" font-size="10" font-family="monospace" fill="#991b1b">nodes: [{</text>
+  <text x="575" y="341" font-size="10" font-family="monospace" fill="#991b1b">  type: "aiImage",</text>
+  <text x="575" y="358" font-size="10" font-family="monospace" fill="#991b1b">  promptTemplate: "Transform into...",</text>
+  <text x="575" y="375" font-size="10" font-family="monospace" fill="#991b1b">  references: [{ assetId, url }]</text>
+  <text x="565" y="392" font-size="10" font-family="monospace" fill="#991b1b">}]</text>
+  
+  <!-- Hatch overlay for secret -->
+  <rect x="550" y="250" width="370" height="165" rx="8" fill="url(#diagonalHatch)"/>
+  
+  <!-- Job Document -->
+  <rect x="530" y="455" width="410" height="130" rx="12" fill="white" filter="url(#shadow)"/>
+  <text x="550" y="480" font-size="13" font-weight="600" fill="#1e293b">Job Document</text>
+  <text x="550" y="498" font-size="10" fill="#64748b">/projects/{id}/jobs/{jobId}</text>
+  
+  <rect x="550" y="515" width="370" height="50" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text x="565" y="538" font-size="10" font-family="monospace" fill="#475569">status, progress, inputs (snapshot),</text>
+  <text x="565" y="555" font-size="10" font-family="monospace" fill="#475569">output: { assetId, url }, error</text>
+  
+  <!-- Cloud Functions -->
+  <rect x="530" y="600" width="200" height="70" rx="12" fill="#faf5ff" filter="url(#shadow)"/>
+  <text x="550" y="625" font-size="12" font-weight="600" fill="#7c3aed">⚡ Cloud Functions</text>
+  <text x="550" y="645" font-size="10" fill="#475569">Read transform config</text>
+  <text x="550" y="660" font-size="10" fill="#475569">Execute pipeline nodes</text>
+  
+  <!-- Firestore Rules -->
+  <rect x="750" y="600" width="190" height="70" rx="12" fill="#fef3c7" filter="url(#shadow)"/>
+  <text x="770" y="625" font-size="12" font-weight="600" fill="#b45309">🛡️ Security Rules</text>
+  <text x="770" y="645" font-size="10" fill="#475569">Block client access to</text>
+  <text x="770" y="660" font-size="10" fill="#475569">transformConfigs collection</text>
+  
+  <!-- Access Matrix -->
+  <rect x="40" y="700" width="920" height="85" rx="12" fill="white" filter="url(#shadow)"/>
+  <text x="500" y="725" text-anchor="middle" font-size="14" font-weight="600" fill="#1e293b">Access Matrix</text>
+  
+  <!-- Table Headers -->
+  <text x="300" y="752" text-anchor="middle" font-size="10" font-weight="600" fill="#64748b">Data</text>
+  <text x="470" y="752" text-anchor="middle" font-size="10" font-weight="600" fill="#64748b">Admin</text>
+  <text x="580" y="752" text-anchor="middle" font-size="10" font-weight="600" fill="#64748b">Guest (own session)</text>
+  <text x="720" y="752" text-anchor="middle" font-size="10" font-weight="600" fill="#64748b">Cloud Functions</text>
+  <text x="860" y="752" text-anchor="middle" font-size="10" font-weight="600" fill="#64748b">Other Guests</text>
+  
+  <!-- Table Rows -->
+  <line x1="60" y1="760" x2="940" y2="760" stroke="#e2e8f0" stroke-width="1"/>
+  
+  <text x="300" y="775" text-anchor="middle" font-size="10" fill="#475569">Transform Config</text>
+  <text x="470" y="775" text-anchor="middle" font-size="14" fill="#22c55e">✓</text>
+  <text x="580" y="775" text-anchor="middle" font-size="14" fill="#ef4444">✗</text>
+  <text x="720" y="775" text-anchor="middle" font-size="14" fill="#22c55e">✓</text>
+  <text x="860" y="775" text-anchor="middle" font-size="14" fill="#ef4444">✗</text>
+  
+  <!-- Arrows showing data flow -->
+  <path d="M 490 350 Q 510 350 510 280" stroke="#94a3b8" stroke-width="2" fill="none" stroke-dasharray="4"/>
+  <text x="500" y="310" font-size="9" fill="#64748b" transform="rotate(-90, 500, 310)">references</text>
+</svg>

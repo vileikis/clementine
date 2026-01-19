@@ -1,0 +1,153 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 700" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif">
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-opacity="0.1"/>
+    </filter>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#6366f1"/>
+      <stop offset="100%" style="stop-color:#8b5cf6"/>
+    </linearGradient>
+    <linearGradient id="nodeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f8fafc"/>
+      <stop offset="100%" style="stop-color:#f1f5f9"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="900" height="700" fill="#f8fafc"/>
+  
+  <!-- Title -->
+  <text x="450" y="40" text-anchor="middle" font-size="24" font-weight="700" fill="#1e293b">Admin: Transform Pipeline Editor</text>
+  <text x="450" y="62" text-anchor="middle" font-size="13" fill="#64748b">Configure how guest photos are transformed using AI and image processing</text>
+  
+  <!-- Main Panel -->
+  <rect x="50" y="90" width="500" height="580" rx="12" fill="white" filter="url(#shadow)"/>
+  
+  <!-- Panel Header -->
+  <rect x="50" y="90" width="500" height="50" rx="12" fill="url(#headerGrad)"/>
+  <rect x="50" y="120" width="500" height="20" fill="url(#headerGrad)"/>
+  <text x="70" y="122" font-size="16" font-weight="600" fill="white">Transform Pipeline</text>
+  
+  <!-- INPUTS Section -->
+  <text x="70" y="170" font-size="12" font-weight="600" fill="#6366f1" letter-spacing="1">INPUTS</text>
+  <text x="70" y="188" font-size="11" fill="#64748b">Map variables from previous steps</text>
+  
+  <!-- Variable Cards -->
+  <rect x="70" y="200" width="220" height="50" rx="8" fill="#f0fdf4" stroke="#86efac" stroke-width="1"/>
+  <circle cx="90" cy="225" r="12" fill="#22c55e"/>
+  <text x="90" y="229" text-anchor="middle" font-size="10" fill="white" font-weight="600">A</text>
+  <text x="110" y="220" font-size="12" font-weight="600" fill="#166534">pet</text>
+  <text x="110" y="236" font-size="10" fill="#64748b">← "Pet Choice" step answer</text>
+  
+  <rect x="300" y="200" width="220" height="50" rx="8" fill="#f0fdf4" stroke="#86efac" stroke-width="1"/>
+  <circle cx="320" cy="225" r="12" fill="#22c55e"/>
+  <text x="320" y="229" text-anchor="middle" font-size="10" fill="white" font-weight="600">A</text>
+  <text x="340" y="220" font-size="12" font-weight="600" fill="#166534">phrase</text>
+  <text x="340" y="236" font-size="10" fill="#64748b">← "Custom Text" step answer</text>
+  
+  <rect x="70" y="258" width="220" height="50" rx="8" fill="#eff6ff" stroke="#93c5fd" stroke-width="1"/>
+  <circle cx="90" cy="283" r="12" fill="#3b82f6"/>
+  <text x="90" y="287" text-anchor="middle" font-size="10" fill="white" font-weight="600">📷</text>
+  <text x="110" y="278" font-size="12" font-weight="600" fill="#1e40af">photo</text>
+  <text x="110" y="294" font-size="10" fill="#64748b">← "Photo Capture" step media</text>
+  
+  <rect x="300" y="258" width="100" height="50" rx="8" fill="white" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4"/>
+  <text x="350" y="288" text-anchor="middle" font-size="20" fill="#cbd5e1">+</text>
+  
+  <!-- PIPELINE Section -->
+  <text x="70" y="340" font-size="12" font-weight="600" fill="#6366f1" letter-spacing="1">PIPELINE</text>
+  <text x="70" y="358" font-size="11" fill="#64748b">Drag to reorder • Each node transforms the image</text>
+  
+  <!-- Node 1 -->
+  <rect x="70" y="370" width="460" height="60" rx="8" fill="url(#nodeGrad)" stroke="#e2e8f0" stroke-width="1"/>
+  <rect x="70" y="370" width="6" height="60" rx="3" fill="#f59e0b"/>
+  <text x="88" y="392" font-size="10" fill="#94a3b8">≡</text>
+  <circle cx="115" cy="400" r="16" fill="#fef3c7"/>
+  <text x="115" y="405" text-anchor="middle" font-size="14">✂️</text>
+  <text x="145" y="395" font-size="13" font-weight="600" fill="#1e293b">Remove Background</text>
+  <text x="145" y="412" font-size="11" fill="#64748b">Input: photo variable</text>
+  <rect x="460" y="385" width="50" height="26" rx="4" fill="#f1f5f9"/>
+  <text x="485" y="402" text-anchor="middle" font-size="11" fill="#6366f1">Edit</text>
+  
+  <!-- Node 2 -->
+  <rect x="70" y="440" width="460" height="60" rx="8" fill="url(#nodeGrad)" stroke="#e2e8f0" stroke-width="1"/>
+  <rect x="70" y="440" width="6" height="60" rx="3" fill="#8b5cf6"/>
+  <text x="88" y="462" font-size="10" fill="#94a3b8">≡</text>
+  <circle cx="115" cy="470" r="16" fill="#ede9fe"/>
+  <text x="115" y="475" text-anchor="middle" font-size="14">🤖</text>
+  <text x="145" y="465" font-size="13" font-weight="600" fill="#1e293b">AI Transform</text>
+  <text x="145" y="482" font-size="11" fill="#64748b">Prompt uses: pet, phrase • Model: Gemini 2.5</text>
+  <rect x="460" y="455" width="50" height="26" rx="4" fill="#f1f5f9"/>
+  <text x="485" y="472" text-anchor="middle" font-size="11" fill="#6366f1">Edit</text>
+  
+  <!-- Node 3 -->
+  <rect x="70" y="510" width="460" height="60" rx="8" fill="url(#nodeGrad)" stroke="#e2e8f0" stroke-width="1"/>
+  <rect x="70" y="510" width="6" height="60" rx="3" fill="#06b6d4"/>
+  <text x="88" y="532" font-size="10" fill="#94a3b8">≡</text>
+  <circle cx="115" cy="540" r="16" fill="#cffafe"/>
+  <text x="115" y="545" text-anchor="middle" font-size="14">🖼️</text>
+  <text x="145" y="535" font-size="13" font-weight="600" fill="#1e293b">Apply Overlay</text>
+  <text x="145" y="552" font-size="11" fill="#64748b">Brand frame overlay</text>
+  <rect x="460" y="525" width="50" height="26" rx="4" fill="#f1f5f9"/>
+  <text x="485" y="542" text-anchor="middle" font-size="11" fill="#6366f1">Edit</text>
+  
+  <!-- Add Node Button -->
+  <rect x="70" y="580" width="460" height="40" rx="8" fill="white" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4"/>
+  <text x="300" y="605" text-anchor="middle" font-size="13" fill="#94a3b8">+ Add Transform Node</text>
+  
+  <!-- OUTPUT Section -->
+  <text x="70" y="650" font-size="12" font-weight="600" fill="#6366f1" letter-spacing="1">OUTPUT</text>
+  <rect x="140" y="635" width="80" height="28" rx="4" fill="#f1f5f9" stroke="#e2e8f0"/>
+  <text x="180" y="654" text-anchor="middle" font-size="12" fill="#1e293b">Image ▾</text>
+  <text x="240" y="654" font-size="11" fill="#64748b">Est. time: ~30 seconds</text>
+  
+  <!-- Right Side Panel - Node Editor Preview -->
+  <rect x="580" y="90" width="280" height="400" rx="12" fill="white" filter="url(#shadow)"/>
+  <rect x="580" y="90" width="280" height="45" rx="12" fill="#1e293b"/>
+  <rect x="580" y="115" width="280" height="20" fill="#1e293b"/>
+  <text x="600" y="120" font-size="14" font-weight="600" fill="white">Edit: AI Transform Node</text>
+  
+  <text x="600" y="160" font-size="11" font-weight="500" fill="#64748b">PROMPT TEMPLATE</text>
+  <rect x="600" y="170" width="240" height="100" rx="6" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text x="612" y="190" font-size="11" fill="#1e293b">Transform the person into a</text>
+  <text x="612" y="206" font-size="11" fill="#1e293b">hobbit character with</text>
+  <rect x="612" y="212" width="40" height="18" rx="3" fill="#dbeafe"/>
+  <text x="632" y="225" text-anchor="middle" font-size="10" fill="#2563eb" font-weight="500">{{pet}}</text>
+  <text x="658" y="225" font-size="11" fill="#1e293b">in their</text>
+  <text x="612" y="245" font-size="11" fill="#1e293b">hands. Add text:</text>
+  <rect x="702" y="231" width="55" height="18" rx="3" fill="#dbeafe"/>
+  <text x="729" y="244" text-anchor="middle" font-size="10" fill="#2563eb" font-weight="500">{{phrase}}</text>
+  
+  <rect x="600" y="278" width="120" height="26" rx="4" fill="#eff6ff" stroke="#bfdbfe"/>
+  <text x="660" y="296" text-anchor="middle" font-size="11" fill="#2563eb">+ Insert Variable</text>
+  
+  <text x="600" y="330" font-size="11" font-weight="500" fill="#64748b">REFERENCE IMAGES</text>
+  <rect x="600" y="340" width="55" height="55" rx="6" fill="#fef3c7" stroke="#fcd34d"/>
+  <text x="627" y="372" text-anchor="middle" font-size="20">🐱</text>
+  <text x="627" y="388" text-anchor="middle" font-size="9" fill="#92400e">cat</text>
+  <rect x="665" y="340" width="55" height="55" rx="6" fill="#fef3c7" stroke="#fcd34d"/>
+  <text x="692" y="372" text-anchor="middle" font-size="20">🐕</text>
+  <text x="692" y="388" text-anchor="middle" font-size="9" fill="#92400e">dog</text>
+  <rect x="730" y="340" width="55" height="55" rx="6" fill="#f1f5f9" stroke="#e2e8f0" stroke-dasharray="3"/>
+  <text x="757" y="375" text-anchor="middle" font-size="18" fill="#cbd5e1">+</text>
+  
+  <text x="600" y="425" font-size="11" font-weight="500" fill="#64748b">AI MODEL</text>
+  <rect x="600" y="435" width="140" height="28" rx="4" fill="#f1f5f9" stroke="#e2e8f0"/>
+  <text x="670" y="454" text-anchor="middle" font-size="12" fill="#1e293b">Gemini 2.5 Pro ▾</text>
+  
+  <!-- Legend -->
+  <rect x="580" y="520" width="280" height="150" rx="12" fill="#fefce8" filter="url(#shadow)"/>
+  <text x="600" y="548" font-size="12" font-weight="600" fill="#854d0e">💡 How It Works</text>
+  
+  <circle cx="600" y="575" r="4" fill="#22c55e"/>
+  <text x="612" y="579" font-size="11" fill="#1e293b">Variables pull data from guest answers</text>
+  
+  <circle cx="600" y="600" r="4" fill="#3b82f6"/>
+  <text x="612" y="604" font-size="11" fill="#1e293b">Nodes process images in order (top→bottom)</text>
+  
+  <circle cx="600" y="625" r="4" fill="#8b5cf6"/>
+  <text x="612" y="629" font-size="11" fill="#1e293b">AI nodes use prompts + reference images</text>
+  
+  <circle cx="600" y="650" r="4" fill="#06b6d4"/>
+  <text x="612" y="654" font-size="11" fill="#1e293b">Overlays add frames &amp; branding</text>
+</svg>

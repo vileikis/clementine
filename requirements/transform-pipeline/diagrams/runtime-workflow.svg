@@ -1,0 +1,198 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 800" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif">
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-opacity="0.1"/>
+    </filter>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#64748b"/>
+    </marker>
+    <marker id="arrowDown" markerWidth="10" markerHeight="10" refX="3" refY="9" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L6,0 L3,9 z" fill="#64748b"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#22c55e"/>
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1100" height="800" fill="#f8fafc"/>
+  
+  <!-- Title -->
+  <text x="550" y="35" text-anchor="middle" font-size="24" font-weight="700" fill="#1e293b">Experience Runtime Workflow</text>
+  <text x="550" y="58" text-anchor="middle" font-size="13" fill="#64748b">From guest journey to AI-transformed result</text>
+  
+  <!-- Lane Labels -->
+  <rect x="40" y="80" width="100" height="30" rx="6" fill="#dbeafe"/>
+  <text x="90" y="100" text-anchor="middle" font-size="11" font-weight="600" fill="#1e40af">👤 GUEST</text>
+  
+  <rect x="40" y="270" width="100" height="30" rx="6" fill="#fae8ff"/>
+  <text x="90" y="290" text-anchor="middle" font-size="11" font-weight="600" fill="#a21caf">📱 CLIENT APP</text>
+  
+  <rect x="40" y="460" width="100" height="30" rx="6" fill="#fef3c7"/>
+  <text x="90" y="480" text-anchor="middle" font-size="11" font-weight="600" fill="#b45309">☁️ CLOUD</text>
+  
+  <!-- Swim Lane Dividers -->
+  <line x1="40" y1="250" x2="1060" y2="250" stroke="#e2e8f0" stroke-width="2" stroke-dasharray="8,4"/>
+  <line x1="40" y1="440" x2="1060" y2="440" stroke="#e2e8f0" stroke-width="2" stroke-dasharray="8,4"/>
+  
+  <!-- GUEST LANE -->
+  <!-- Step 1: Welcome -->
+  <rect x="160" y="120" width="120" height="100" rx="12" fill="white" filter="url(#shadow)"/>
+  <circle cx="220" cy="155" r="20" fill="#eff6ff"/>
+  <text x="220" y="162" text-anchor="middle" font-size="18">👋</text>
+  <text x="220" y="190" text-anchor="middle" font-size="11" font-weight="600" fill="#1e293b">1. Welcome</text>
+  <text x="220" y="205" text-anchor="middle" font-size="10" fill="#64748b">Info screen</text>
+  
+  <!-- Arrow -->
+  <line x1="290" y1="170" x2="330" y2="170" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- Step 2: Questions -->
+  <rect x="340" y="120" width="120" height="100" rx="12" fill="white" filter="url(#shadow)"/>
+  <circle cx="400" cy="155" r="20" fill="#f0fdf4"/>
+  <text x="400" y="162" text-anchor="middle" font-size="18">❓</text>
+  <text x="400" y="190" text-anchor="middle" font-size="11" font-weight="600" fill="#1e293b">2. Questions</text>
+  <text x="400" y="205" text-anchor="middle" font-size="10" fill="#64748b">Pet, phrase, etc.</text>
+  
+  <!-- Arrow -->
+  <line x1="470" y1="170" x2="510" y2="170" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- Step 3: Photo -->
+  <rect x="520" y="120" width="120" height="100" rx="12" fill="white" filter="url(#shadow)"/>
+  <circle cx="580" cy="155" r="20" fill="#fef3c7"/>
+  <text x="580" y="162" text-anchor="middle" font-size="18">📸</text>
+  <text x="580" y="190" text-anchor="middle" font-size="11" font-weight="600" fill="#1e293b">3. Photo</text>
+  <text x="580" y="205" text-anchor="middle" font-size="10" fill="#64748b">Take selfie</text>
+  
+  <!-- Arrow -->
+  <line x1="650" y1="170" x2="690" y2="170" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- Step 4: Processing -->
+  <rect x="700" y="120" width="120" height="100" rx="12" fill="#faf5ff" filter="url(#shadow)" stroke="#c4b5fd" stroke-width="2"/>
+  <circle cx="760" cy="155" r="20" fill="#ede9fe"/>
+  <text x="760" y="162" text-anchor="middle" font-size="18">⏳</text>
+  <text x="760" y="190" text-anchor="middle" font-size="11" font-weight="600" fill="#7c3aed">4. Processing</text>
+  <text x="760" y="205" text-anchor="middle" font-size="10" fill="#64748b">Wait for magic</text>
+  
+  <!-- Arrow -->
+  <line x1="830" y1="170" x2="870" y2="170" stroke="#22c55e" stroke-width="2" marker-end="url(#arrowGreen)"/>
+  
+  <!-- Step 5: Result -->
+  <rect x="880" y="120" width="120" height="100" rx="12" fill="#f0fdf4" filter="url(#shadow)" stroke="#86efac" stroke-width="2"/>
+  <circle cx="940" cy="155" r="20" fill="#dcfce7"/>
+  <text x="940" y="162" text-anchor="middle" font-size="18">🎉</text>
+  <text x="940" y="190" text-anchor="middle" font-size="11" font-weight="600" fill="#166534">5. Result!</text>
+  <text x="940" y="205" text-anchor="middle" font-size="10" fill="#64748b">Share screen</text>
+  
+  <!-- CLIENT APP LANE -->
+  <!-- Runtime Container -->
+  <rect x="160" y="310" width="300" height="110" rx="12" fill="white" filter="url(#shadow)"/>
+  <text x="180" y="335" font-size="12" font-weight="600" fill="#1e293b">Experience Runtime Container</text>
+  <text x="180" y="355" font-size="10" fill="#64748b">• Renders each step in sequence</text>
+  <text x="180" y="372" font-size="10" fill="#64748b">• Saves answers to Session document</text>
+  <text x="180" y="389" font-size="10" fill="#64748b">• Uploads captured photo to Storage</text>
+  <text x="180" y="406" font-size="10" fill="#64748b">• Subscribes to Firestore for updates</text>
+  
+  <!-- Arrow down from Guest Steps -->
+  <line x1="400" y1="230" x2="400" y2="300" stroke="#64748b" stroke-width="2" marker-end="url(#arrowDown)"/>
+  
+  <!-- Transform Trigger -->
+  <rect x="520" y="310" width="180" height="110" rx="12" fill="#faf5ff" filter="url(#shadow)"/>
+  <text x="540" y="335" font-size="12" font-weight="600" fill="#7c3aed">Transform Step Reached</text>
+  <rect x="540" y="350" width="140" height="30" rx="6" fill="#ede9fe"/>
+  <text x="610" y="370" text-anchor="middle" font-size="10" fill="#7c3aed">startTransformJob()</text>
+  <text x="540" y="400" font-size="10" fill="#64748b">Calls HTTP Function</text>
+  <text x="540" y="415" font-size="10" fill="#64748b">with sessionId + stepId</text>
+  
+  <!-- Arrow -->
+  <line x1="470" y1="365" x2="510" y2="365" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- Firestore Listener -->
+  <rect x="760" y="310" width="180" height="110" rx="12" fill="white" filter="url(#shadow)"/>
+  <text x="780" y="335" font-size="12" font-weight="600" fill="#1e293b">Firestore Listener</text>
+  <text x="780" y="360" font-size="10" fill="#64748b">Watching session for:</text>
+  <rect x="795" y="370" width="80" height="20" rx="4" fill="#fef3c7"/>
+  <text x="835" y="385" text-anchor="middle" font-size="9" fill="#b45309">jobStatus</text>
+  <rect x="885" y="370" width="40" height="20" rx="4" fill="#dcfce7"/>
+  <text x="905" y="385" text-anchor="middle" font-size="9" fill="#166534">result</text>
+  <text x="780" y="410" font-size="10" fill="#64748b">Updates UI in real-time</text>
+  
+  <!-- Bidirectional arrow -->
+  <line x1="710" y1="365" x2="750" y2="365" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- CLOUD LANE -->
+  <!-- HTTP Function -->
+  <rect x="160" y="500" width="200" height="130" rx="12" fill="white" filter="url(#shadow)"/>
+  <rect x="160" y="500" width="200" height="8" rx="4" fill="#f59e0b"/>
+  <text x="180" y="530" font-size="12" font-weight="600" fill="#1e293b">HTTP Function</text>
+  <text x="180" y="548" font-size="10" fill="#64748b" font-style="italic">startTransformPipeline</text>
+  <text x="180" y="575" font-size="10" fill="#475569">1. Validates session</text>
+  <text x="180" y="592" font-size="10" fill="#475569">2. Creates Job document</text>
+  <text x="180" y="609" font-size="10" fill="#475569">3. Queues Cloud Task</text>
+  <text x="180" y="626" font-size="10" fill="#475569">4. Returns jobId</text>
+  
+  <!-- Arrow down from Client -->
+  <line x1="610" y1="430" x2="610" y2="475" stroke="#8b5cf6" stroke-width="2"/>
+  <line x1="610" y1="475" x2="270" y2="475" stroke="#8b5cf6" stroke-width="2"/>
+  <line x1="270" y1="475" x2="270" y2="490" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arrowDown)"/>
+  
+  <!-- Arrow to Cloud Task -->
+  <line x1="370" y1="565" x2="420" y2="565" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- Cloud Task -->
+  <rect x="430" y="500" width="260" height="180" rx="12" fill="white" filter="url(#shadow)"/>
+  <rect x="430" y="500" width="260" height="8" rx="4" fill="#8b5cf6"/>
+  <text x="450" y="530" font-size="12" font-weight="600" fill="#1e293b">Cloud Task (up to 10 min)</text>
+  <text x="450" y="548" font-size="10" fill="#64748b" font-style="italic">transformPipelineJob</text>
+  <text x="450" y="575" font-size="10" fill="#475569">1. Fetches Transform Config</text>
+  <text x="450" y="592" font-size="10" fill="#475569">2. Resolves variables from session</text>
+  <text x="450" y="609" font-size="10" fill="#475569">3. Executes nodes in order:</text>
+  
+  <!-- Mini pipeline -->
+  <rect x="470" y="618" width="50" height="22" rx="4" fill="#fef3c7"/>
+  <text x="495" y="634" text-anchor="middle" font-size="8" fill="#b45309">RemBg</text>
+  <text x="528" y="634" fill="#64748b">→</text>
+  <rect x="540" y="618" width="40" height="22" rx="4" fill="#ede9fe"/>
+  <text x="560" y="634" text-anchor="middle" font-size="8" fill="#7c3aed">AI</text>
+  <text x="588" y="634" fill="#64748b">→</text>
+  <rect x="600" y="618" width="55" height="22" rx="4" fill="#cffafe"/>
+  <text x="627" y="634" text-anchor="middle" font-size="8" fill="#0891b2">Overlay</text>
+  
+  <text x="450" y="665" font-size="10" fill="#475569">4. Uploads result to Storage</text>
+  
+  <!-- Firestore -->
+  <rect x="760" y="500" width="180" height="180" rx="12" fill="white" filter="url(#shadow)"/>
+  <rect x="760" y="500" width="180" height="8" rx="4" fill="#f97316"/>
+  <text x="780" y="530" font-size="12" font-weight="600" fill="#1e293b">Firestore Database</text>
+  
+  <rect x="780" y="545" width="140" height="45" rx="6" fill="#fff7ed" stroke="#fdba74"/>
+  <text x="850" y="563" text-anchor="middle" font-size="10" font-weight="500" fill="#c2410c">Session Document</text>
+  <text x="850" y="580" text-anchor="middle" font-size="9" fill="#9a3412">jobStatus, resultMedia</text>
+  
+  <rect x="780" y="600" width="140" height="45" rx="6" fill="#fef3c7" stroke="#fcd34d"/>
+  <text x="850" y="618" text-anchor="middle" font-size="10" font-weight="500" fill="#b45309">Job Document</text>
+  <text x="850" y="635" text-anchor="middle" font-size="9" fill="#92400e">progress, status, output</text>
+  
+  <rect x="780" y="655" width="140" height="25" rx="6" fill="#fee2e2" stroke="#fca5a5"/>
+  <text x="850" y="673" text-anchor="middle" font-size="9" fill="#991b1b">Transform Config (secret)</text>
+  
+  <!-- Arrows between Cloud Task and Firestore -->
+  <line x1="700" y1="565" x2="750" y2="565" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="725" y="555" text-anchor="middle" font-size="8" fill="#64748b">updates</text>
+  
+  <!-- Arrow from Firestore to Client Listener -->
+  <line x1="850" y1="490" x2="850" y2="430" stroke="#22c55e" stroke-width="2" marker-end="url(#arrowGreen)"/>
+  <text x="865" y="460" font-size="8" fill="#22c55e">real-time</text>
+  
+  <!-- Legend -->
+  <rect x="40" y="720" width="1020" height="60" rx="12" fill="white" filter="url(#shadow)"/>
+  <text x="70" y="745" font-size="11" font-weight="600" fill="#1e293b">Key Points:</text>
+  
+  <circle cx="200" cy="750" r="6" fill="#8b5cf6"/>
+  <text x="215" y="755" font-size="10" fill="#475569">Transform config (prompts) stays server-side</text>
+  
+  <circle cx="480" cy="750" r="6" fill="#22c55e"/>
+  <text x="495" y="755" font-size="10" fill="#475569">Client gets real-time status via Firestore</text>
+  
+  <circle cx="730" cy="750" r="6" fill="#f59e0b"/>
+  <text x="745" y="755" font-size="10" fill="#475569">Processing happens async in Cloud Tasks</text>
+</svg>

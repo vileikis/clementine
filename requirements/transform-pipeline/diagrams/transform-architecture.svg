@@ -1,0 +1,167 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 750" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif">
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-opacity="0.12"/>
+    </filter>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f8fafc"/>
+      <stop offset="100%" style="stop-color:#f1f5f9"/>
+    </linearGradient>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#94a3b8"/>
+    </marker>
+    <marker id="arrowPurple" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#8b5cf6"/>
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1000" height="750" fill="url(#bgGrad)"/>
+  
+  <!-- Title -->
+  <text x="500" y="40" text-anchor="middle" font-size="26" font-weight="700" fill="#1e293b">Transform Pipeline Architecture</text>
+  <text x="500" y="65" text-anchor="middle" font-size="14" fill="#64748b">How images flow through transformation nodes</text>
+  
+  <!-- Main Flow Container -->
+  <rect x="40" y="90" width="920" height="200" rx="16" fill="white" filter="url(#shadow)"/>
+  
+  <!-- Section Headers -->
+  <rect x="60" y="105" width="80" height="24" rx="4" fill="#dbeafe"/>
+  <text x="100" y="122" text-anchor="middle" font-size="11" font-weight="600" fill="#1e40af">INPUTS</text>
+  
+  <rect x="400" y="105" width="200" height="24" rx="4" fill="#f3e8ff"/>
+  <text x="500" y="122" text-anchor="middle" font-size="11" font-weight="600" fill="#7c3aed">PIPELINE (Ordered Nodes)</text>
+  
+  <rect x="860" y="105" width="80" height="24" rx="4" fill="#dcfce7"/>
+  <text x="900" y="122" text-anchor="middle" font-size="11" font-weight="600" fill="#166534">OUTPUT</text>
+  
+  <!-- Input Box -->
+  <rect x="60" y="145" width="150" height="120" rx="12" fill="#eff6ff" stroke="#bfdbfe" stroke-width="2"/>
+  <text x="135" y="175" text-anchor="middle" font-size="12" font-weight="600" fill="#1e40af">Variable Mappings</text>
+  
+  <rect x="75" y="190" width="120" height="24" rx="4" fill="white"/>
+  <text x="135" y="207" text-anchor="middle" font-size="10" fill="#475569">photo → Step 3 media</text>
+  
+  <rect x="75" y="220" width="120" height="24" rx="4" fill="white"/>
+  <text x="135" y="237" text-anchor="middle" font-size="10" fill="#475569">pet → Step 1 answer</text>
+  
+  <!-- Arrow from Input to Pipeline -->
+  <line x1="220" y1="205" x2="270" y2="205" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- Pipeline Nodes -->
+  <!-- Node 1 -->
+  <rect x="280" y="145" width="140" height="120" rx="12" fill="#fefce8" stroke="#fcd34d" stroke-width="2"/>
+  <circle cx="350" cy="180" r="20" fill="#fef3c7"/>
+  <text x="350" y="186" text-anchor="middle" font-size="18">✂️</text>
+  <text x="350" y="215" text-anchor="middle" font-size="11" font-weight="600" fill="#854d0e">Remove</text>
+  <text x="350" y="230" text-anchor="middle" font-size="11" font-weight="600" fill="#854d0e">Background</text>
+  <text x="350" y="252" text-anchor="middle" font-size="9" fill="#a16207">Extracts subject</text>
+  
+  <!-- Arrow -->
+  <line x1="430" y1="205" x2="460" y2="205" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arrowPurple)"/>
+  
+  <!-- Node 2 -->
+  <rect x="470" y="145" width="140" height="120" rx="12" fill="#faf5ff" stroke="#c4b5fd" stroke-width="2"/>
+  <circle cx="540" cy="180" r="20" fill="#ede9fe"/>
+  <text x="540" y="186" text-anchor="middle" font-size="18">🤖</text>
+  <text x="540" y="215" text-anchor="middle" font-size="11" font-weight="600" fill="#6d28d9">AI Image</text>
+  <text x="540" y="230" text-anchor="middle" font-size="11" font-weight="600" fill="#6d28d9">Transform</text>
+  <text x="540" y="252" text-anchor="middle" font-size="9" fill="#7c3aed">Uses Gemini AI</text>
+  
+  <!-- Arrow -->
+  <line x1="620" y1="205" x2="650" y2="205" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arrowPurple)"/>
+  
+  <!-- Node 3 -->
+  <rect x="660" y="145" width="140" height="120" rx="12" fill="#ecfeff" stroke="#67e8f9" stroke-width="2"/>
+  <circle cx="730" cy="180" r="20" fill="#cffafe"/>
+  <text x="730" y="186" text-anchor="middle" font-size="18">🖼️</text>
+  <text x="730" y="215" text-anchor="middle" font-size="11" font-weight="600" fill="#0e7490">Apply</text>
+  <text x="730" y="230" text-anchor="middle" font-size="11" font-weight="600" fill="#0e7490">Overlay</text>
+  <text x="730" y="252" text-anchor="middle" font-size="9" fill="#0891b2">Adds branding</text>
+  
+  <!-- Arrow to Output -->
+  <line x1="810" y1="205" x2="850" y2="205" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- Output Box -->
+  <rect x="860" y="155" width="80" height="100" rx="12" fill="#dcfce7" stroke="#86efac" stroke-width="2"/>
+  <text x="900" y="195" text-anchor="middle" font-size="28">🎨</text>
+  <text x="900" y="225" text-anchor="middle" font-size="11" font-weight="600" fill="#166534">Final</text>
+  <text x="900" y="240" text-anchor="middle" font-size="11" font-weight="600" fill="#166534">Image</text>
+  
+  <!-- Node Types Section -->
+  <text x="500" y="330" text-anchor="middle" font-size="18" font-weight="700" fill="#1e293b">Available Node Types (MVP)</text>
+  
+  <!-- Node Type Cards -->
+  <!-- Remove Background -->
+  <rect x="60" y="360" width="210" height="160" rx="12" fill="white" filter="url(#shadow)"/>
+  <rect x="60" y="360" width="210" height="8" rx="4" fill="#f59e0b"/>
+  <circle cx="165" cy="410" r="28" fill="#fef3c7"/>
+  <text x="165" y="418" text-anchor="middle" font-size="26">✂️</text>
+  <text x="165" y="455" text-anchor="middle" font-size="14" font-weight="600" fill="#1e293b">Remove Background</text>
+  <text x="165" y="475" text-anchor="middle" font-size="11" fill="#64748b">Extracts subject from image</text>
+  <text x="165" y="495" text-anchor="middle" font-size="11" fill="#64748b">Output: PNG with transparency</text>
+  
+  <!-- Background Swap -->
+  <rect x="290" y="360" width="210" height="160" rx="12" fill="white" filter="url(#shadow)"/>
+  <rect x="290" y="360" width="210" height="8" rx="4" fill="#22c55e"/>
+  <circle cx="395" cy="410" r="28" fill="#dcfce7"/>
+  <text x="395" y="418" text-anchor="middle" font-size="26">🏞️</text>
+  <text x="395" y="455" text-anchor="middle" font-size="14" font-weight="600" fill="#1e293b">Background Swap</text>
+  <text x="395" y="475" text-anchor="middle" font-size="11" fill="#64748b">Replaces background with</text>
+  <text x="395" y="495" text-anchor="middle" font-size="11" fill="#64748b">static image or AI-generated</text>
+  
+  <!-- Apply Overlay -->
+  <rect x="520" y="360" width="210" height="160" rx="12" fill="white" filter="url(#shadow)"/>
+  <rect x="520" y="360" width="210" height="8" rx="4" fill="#06b6d4"/>
+  <circle cx="625" cy="410" r="28" fill="#cffafe"/>
+  <text x="625" y="418" text-anchor="middle" font-size="26">🖼️</text>
+  <text x="625" y="455" text-anchor="middle" font-size="14" font-weight="600" fill="#1e293b">Apply Overlay</text>
+  <text x="625" y="475" text-anchor="middle" font-size="11" fill="#64748b">Adds frames, watermarks,</text>
+  <text x="625" y="495" text-anchor="middle" font-size="11" fill="#64748b">branding on top of image</text>
+  
+  <!-- AI Image -->
+  <rect x="750" y="360" width="210" height="160" rx="12" fill="white" filter="url(#shadow)"/>
+  <rect x="750" y="360" width="210" height="8" rx="4" fill="#8b5cf6"/>
+  <circle cx="855" cy="410" r="28" fill="#ede9fe"/>
+  <text x="855" y="418" text-anchor="middle" font-size="26">🤖</text>
+  <text x="855" y="455" text-anchor="middle" font-size="14" font-weight="600" fill="#1e293b">AI Image Transform</text>
+  <text x="855" y="475" text-anchor="middle" font-size="11" fill="#64748b">Full AI transformation with</text>
+  <text x="855" y="495" text-anchor="middle" font-size="11" fill="#64748b">dynamic prompts &amp; references</text>
+  
+  <!-- Variable Resolution Example -->
+  <rect x="60" y="550" width="900" height="170" rx="12" fill="white" filter="url(#shadow)"/>
+  <text x="500" y="580" text-anchor="middle" font-size="14" font-weight="600" fill="#1e293b">Variable Resolution Example</text>
+  
+  <!-- Template -->
+  <rect x="80" y="600" width="350" height="100" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text x="95" y="620" font-size="10" font-weight="600" fill="#64748b">PROMPT TEMPLATE</text>
+  <text x="95" y="645" font-size="12" fill="#1e293b">"Transform into a hobbit with</text>
+  <rect x="95" y="652" width="42" height="18" rx="3" fill="#dbeafe"/>
+  <text x="116" y="665" text-anchor="middle" font-size="10" fill="#2563eb" font-weight="600">{{pet}}</text>
+  <text x="145" y="665" font-size="12" fill="#1e293b">in hands.</text>
+  <text x="95" y="685" font-size="12" fill="#1e293b">Add text:</text>
+  <rect x="155" y="672" width="55" height="18" rx="3" fill="#dbeafe"/>
+  <text x="182" y="685" text-anchor="middle" font-size="10" fill="#2563eb" font-weight="600">{{phrase}}</text>
+  <text x="215" y="685" font-size="12" fill="#1e293b">"</text>
+  
+  <!-- Arrow -->
+  <text x="470" y="655" text-anchor="middle" font-size="24" fill="#8b5cf6">→</text>
+  <text x="470" y="675" text-anchor="middle" font-size="10" fill="#64748b">resolves to</text>
+  
+  <!-- Resolved -->
+  <rect x="530" y="600" width="410" height="100" rx="8" fill="#f0fdf4" stroke="#86efac"/>
+  <text x="545" y="620" font-size="10" font-weight="600" fill="#166534">RESOLVED PROMPT (at runtime)</text>
+  <text x="545" y="645" font-size="12" fill="#1e293b">"Transform into a hobbit with</text>
+  <rect x="545" y="652" width="30" height="18" rx="3" fill="#bbf7d0"/>
+  <text x="560" y="665" text-anchor="middle" font-size="10" fill="#166534" font-weight="600">cat</text>
+  <text x="583" y="665" font-size="12" fill="#1e293b">in hands.</text>
+  <text x="545" y="685" font-size="12" fill="#1e293b">Add text:</text>
+  <rect x="605" y="672" width="100" height="18" rx="3" fill="#bbf7d0"/>
+  <text x="655" y="685" text-anchor="middle" font-size="10" fill="#166534" font-weight="600">Adventure awaits!</text>
+  <text x="710" y="685" font-size="12" fill="#1e293b">"</text>
+  
+  <!-- Guest Answers Note -->
+  <rect x="740" y="630" width="180" height="50" rx="6" fill="#fef3c7" stroke="#fcd34d"/>
+  <text x="830" y="650" text-anchor="middle" font-size="10" font-weight="500" fill="#92400e">Guest answered:</text>
+  <text x="830" y="668" text-anchor="middle" font-size="10" fill="#78350f">pet = "cat", phrase = "Adventure..."</text>
+</svg>
