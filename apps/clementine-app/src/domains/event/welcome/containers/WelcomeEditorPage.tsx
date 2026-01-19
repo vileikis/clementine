@@ -197,6 +197,19 @@ export function WelcomeEditorPage() {
 
   return (
     <div className="flex h-full">
+      {/* Right: Preview */}
+      <div className="flex-1 min-w-0">
+        <PreviewShell enableViewportSwitcher enableFullscreen>
+          <ThemeProvider theme={currentTheme}>
+            <WelcomePreview
+              welcome={previewWelcome}
+              mainExperiences={mainExperiences}
+              experienceDetails={mainExperienceDetails}
+            />
+          </ThemeProvider>
+        </PreviewShell>
+      </div>
+
       {/* Left: Controls */}
       <aside className="w-80 shrink-0 border-r border-border overflow-y-auto bg-card">
         <div className="sticky top-0 z-10 border-b border-border bg-card px-4 py-3">
@@ -217,19 +230,6 @@ export function WelcomeEditorPage() {
           preshareExperience={preshareExperience}
         />
       </aside>
-
-      {/* Right: Preview */}
-      <div className="flex-1 min-w-0">
-        <PreviewShell enableViewportSwitcher enableFullscreen>
-          <ThemeProvider theme={currentTheme}>
-            <WelcomePreview
-              welcome={previewWelcome}
-              mainExperiences={mainExperiences}
-              experienceDetails={mainExperienceDetails}
-            />
-          </ThemeProvider>
-        </PreviewShell>
-      </div>
     </div>
   )
 }

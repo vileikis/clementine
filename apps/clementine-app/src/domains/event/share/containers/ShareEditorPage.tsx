@@ -205,6 +205,18 @@ export function ShareEditorPage() {
 
   return (
     <div className="flex h-full">
+      {/* Right: Preview */}
+      <div className="flex-1 min-w-0">
+        <PreviewShell enableViewportSwitcher enableFullscreen>
+          <ThemeProvider theme={currentTheme}>
+            <SharePreview
+              share={previewShare}
+              shareOptions={displayShareOptions}
+            />
+          </ThemeProvider>
+        </PreviewShell>
+      </div>
+
       {/* Left: Controls */}
       <aside className="w-80 shrink-0 border-r border-border overflow-y-auto bg-card">
         <div className="sticky top-0 z-10 border-b border-border bg-card px-4 py-3">
@@ -220,18 +232,6 @@ export function ShareEditorPage() {
           onCtaUrlBlur={handleCtaUrlBlur}
         />
       </aside>
-
-      {/* Right: Preview */}
-      <div className="flex-1 min-w-0">
-        <PreviewShell enableViewportSwitcher enableFullscreen>
-          <ThemeProvider theme={currentTheme}>
-            <SharePreview
-              share={previewShare}
-              shareOptions={displayShareOptions}
-            />
-          </ThemeProvider>
-        </PreviewShell>
-      </div>
     </div>
   )
 }
