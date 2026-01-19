@@ -116,6 +116,33 @@ Guest completes experience steps
 
 ## 2. Data Schemas
 
+### 2.0 Step Schema Update (All Steps)
+
+```typescript
+// apps/clementine-app/src/domains/experience/steps/schemas/step.schema.ts
+
+/**
+ * Base step fields - ALL steps get these
+ * Adding `name` field for display and variable referencing
+ */
+export const baseStepSchema = z.object({
+  /** Unique step identifier (UUID) */
+  id: z.uuid(),
+
+  /** Step type from registry */
+  type: stepTypeSchema,
+
+  /** Human-readable name (NEW - required)
+   * Auto-generated on creation: "Photo Capture 1", "Scale Question 2"
+   * User can edit
+   */
+  name: z.string().min(1).max(50),
+
+  /** Type-specific config */
+  config: z.record(z.string(), z.unknown()),
+})
+```
+
 ### 2.1 Transform Step Config (Client-Visible - Minimal)
 
 ```typescript
@@ -146,21 +173,22 @@ export const transformPipelineStepConfigSchema = z.object({
 // functions/src/lib/schemas/transform-config.schema.ts
 
 /**
- * Step reference - points to data from a previous step
+ * Variable mapping - maps a variable name to a step's data
+ * Used at root level of transform config
  */
-export const stepReferenceSchema = z.object({
-  /** Type of reference */
+export const variableMappingSchema = z.object({
+  /** Type of data being referenced */
   type: z.enum(['answer', 'capturedMedia']),
 
-  /** ID of the step to reference */
+  /** ID of the step to get data from */
   stepId: z.string(),
 
-  /** Optional: specific field within the answer (for multi-select, etc.) */
+  /** Optional: specific field within the answer (for structured answers) */
   field: z.string().nullable().default(null),
 })
 
 /**
- * Media reference - points to a media asset
+ * Media reference - points to a media asset in the media library
  */
 export const mediaReferenceSchema = z.object({
   /** Asset ID in media library */
@@ -174,13 +202,13 @@ export const mediaReferenceSchema = z.object({
 })
 
 /**
- * Node input source - where the node gets its input
+ * Node input source - where the node gets its input image/media
  */
 export const nodeInputSourceSchema = z.discriminatedUnion('source', [
-  // From a previous step's captured media
+  // From a variable (defined in variableMappings)
   z.object({
-    source: z.literal('capturedMedia'),
-    stepId: z.string(),
+    source: z.literal('variable'),
+    variableName: z.string(),
   }),
   // From the previous node's output
   z.object({
@@ -206,6 +234,22 @@ export const removeBackgroundNodeSchema = z.object({
 })
 
 /**
+ * Background source - either static asset or node output
+ */
+export const backgroundSourceSchema = z.discriminatedUnion('type', [
+  // Static background image from media library
+  z.object({
+    type: z.literal('asset'),
+    asset: mediaReferenceSchema,
+  }),
+  // Dynamic background from another node's output (e.g., AI-generated)
+  z.object({
+    type: z.literal('node'),
+    nodeId: z.string(),
+  }),
+])
+
+/**
  * Background Swap Node
  */
 export const backgroundSwapNodeSchema = z.object({
@@ -213,8 +257,8 @@ export const backgroundSwapNodeSchema = z.object({
   type: z.literal('backgroundSwap'),
   input: nodeInputSourceSchema,
 
-  /** Static background image */
-  backgroundAsset: mediaReferenceSchema,
+  /** Background source - static asset OR node output */
+  backgroundSource: backgroundSourceSchema,
 })
 
 /**
@@ -246,9 +290,8 @@ export const aiImageNodeSchema = z.object({
   /**
    * Prompt template with variable placeholders
    * Variables use {{variableName}} syntax
-   * Special variables:
-   * - {{step:stepId}} - replaced with answer from step
-   * - {{step:stepId:fieldName}} - replaced with specific field from step answer
+   * Variables must be defined in root-level variableMappings
+   * Example: "Transform with {{pet}} in hands"
    */
   promptTemplate: z.string().min(1).max(5000),
 
@@ -264,13 +307,6 @@ export const aiImageNodeSchema = z.object({
 
   /** Output aspect ratio */
   aspectRatio: z.enum(['1:1', '3:2', '2:3', '9:16', '16:9']).default('1:1'),
-
-  /**
-   * Variable mappings - maps step inputs to prompt variables
-   * Key: variable name in prompt (without {{ }})
-   * Value: step reference
-   */
-  variableMappings: z.record(z.string(), stepReferenceSchema).default({}),
 })
 
 /**
@@ -320,6 +356,11 @@ export const transformNodeSchema = z.discriminatedUnion('type', [
 
 /**
  * Complete Transform Config (Server-Only)
+ *
+ * Structure:
+ * - variableMappings: INPUTS - map variable names to step data
+ * - nodes: PIPELINE - ordered array of transform operations
+ * - outputFormat: OUTPUT - final format
  */
 export const transformConfigSchema = z.object({
   /** Step ID this config belongs to */
@@ -334,10 +375,29 @@ export const transformConfigSchema = z.object({
   /** Whether this is draft or published */
   configType: z.enum(['draft', 'published']),
 
-  /** Ordered array of transform nodes */
+  /**
+   * INPUTS: Variable mappings
+   * Maps variable names to step data (answers or captured media)
+   * These variables can be used in node inputs and prompt templates
+   *
+   * Example:
+   * {
+   *   pet: { type: "answer", stepId: "step1" },
+   *   photo: { type: "capturedMedia", stepId: "step3" }
+   * }
+   */
+  variableMappings: z.record(z.string(), variableMappingSchema).default({}),
+
+  /**
+   * PIPELINE: Ordered array of transform nodes
+   * Nodes execute sequentially, each can reference:
+   * - Variables from variableMappings
+   * - Previous node's output
+   * - Specific node's output (by nodeId)
+   */
   nodes: z.array(transformNodeSchema).min(1),
 
-  /** Expected output format */
+  /** OUTPUT: Expected output format */
   outputFormat: z.enum(['image', 'gif', 'video']).default('image'),
 
   /** Timestamps */
@@ -347,6 +407,7 @@ export const transformConfigSchema = z.object({
 
 export type TransformConfig = z.infer<typeof transformConfigSchema>
 export type TransformNode = z.infer<typeof transformNodeSchema>
+export type VariableMapping = z.infer<typeof variableMappingSchema>
 ```
 
 ### 2.3 Job Schema

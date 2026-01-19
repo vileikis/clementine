@@ -36,7 +36,9 @@ A composable transform pipeline that:
 | Validation | Loose on draft save, strict on publish |
 | Transform Position | Must be last step in experience |
 | Transforms per Experience | One (MVP) |
-| Variables | Auto-generated from step names |
+| Step Naming | Add `name` field to all steps |
+| Variable Location | Root-level `variableMappings` (not in nodes) |
+| Variable Creation | Admin-defined, decoupled from step names |
 | Timeout | 10 minutes |
 | Guest Progress | Progress bar + generic messages |
 

@@ -175,57 +175,95 @@ Flow:
 
 ---
 
-## Variable Referencing System
+## Step Naming
 
-### Decision: Auto-Generated Variables with Override Option
+### Decision: Add `name` Field to All Steps
 
-**Approach**: Variables auto-generated from step names (camelCase), admin can rename if needed.
+**Problem**: Steps lack consistent identifiers for display and variable referencing.
 
-**How it works**:
+**Solution**: Add required `name` field to base step schema:
 
-1. **Auto-generation**: When transform step is added, system scans previous input steps and generates variables:
-   ```
-   Step: "Pet Choice" (input.multiSelect) → Variable: {{petChoice}}
-   Step: "Your Phrase" (input.shortText)  → Variable: {{yourPhrase}}
-   Step: "Photo" (capture.photo)          → Variable: {{photo}} (media reference)
-   ```
+```typescript
+// All steps get this
+{
+  id: z.uuid(),
+  type: z.literal('capture.photo'),
+  name: z.string().min(1).max(50),  // NEW: Required
+  config: { ... }
+}
+```
 
-2. **Admin UI**: Shows "Available Variables" panel:
-   ```
-   ┌─────────────────────────────────────────┐
-   │ Available Variables                      │
-   ├─────────────────────────────────────────┤
-   │ {{petChoice}}    ← Pet Choice (Step 1)  │
-   │ {{yourPhrase}}   ← Your Phrase (Step 2) │
-   │ {{photo}}        ← Photo (Step 3)       │
-   │                                          │
-   │ [Rename Variable...]                     │
-   └─────────────────────────────────────────┘
-   ```
-
-3. **Insert Variable**: Button in prompt editor shows dropdown of variables
-
-4. **Override**: Admin can rename variables for clarity:
-   ```
-   {{petChoice}} → {{pet}}  (renamed)
-   ```
-
-5. **Storage**: Transform config stores mapping:
-   ```typescript
-   variableMappings: {
-     pet: { type: "answer", stepId: "step1" },
-     yourPhrase: { type: "answer", stepId: "step2" },
-     photo: { type: "capturedMedia", stepId: "step3" }
-   }
-   ```
-
-6. **Sync**: If step is renamed, variable name stays the same (decoupled after creation)
+**Auto-generated defaults on creation**:
+- "Info 1", "Info 2"
+- "Scale Question 1"
+- "Photo Capture 1", "Photo Capture 2"
+- "AI Transform"
 
 **Benefits**:
-- Human-readable by default
-- No manual setup required
-- Can be customized when needed
-- Decoupled from step names after creation
+- Differentiates multiple steps of same type
+- Human-readable in step list
+- Used for variable name suggestions
+
+---
+
+## Variable Referencing System
+
+### Decision: Root-Level Variable Mappings (Decoupled from Steps)
+
+**Approach**: Variables defined at transform config root level, separate from nodes.
+
+**Structure**:
+```typescript
+{
+  stepId: "transform1",
+  experienceId: "exp1",
+
+  // INPUTS: Root-level variable definitions
+  variableMappings: {
+    pet: { stepId: "step1", type: "answer" },
+    phrase: { stepId: "step2", type: "answer" },
+    photo: { stepId: "step3", type: "capturedMedia" }
+  },
+
+  // PIPELINE: Nodes reference variables
+  nodes: [
+    {
+      type: "removeBackground",
+      input: { source: "variable", variableName: "photo" }
+    },
+    {
+      type: "aiImage",
+      promptTemplate: "Transform with {{pet}}. Text: {{phrase}}"
+    }
+  ],
+
+  outputFormat: "image"
+}
+```
+
+**Mental Model**:
+```
+INPUTS (variableMappings)  →  PIPELINE (nodes)  →  OUTPUT
+```
+
+**Admin UI Flow**:
+1. Admin clicks "+ Add" in INPUTS section
+2. Modal shows available steps (by name): "Pet Choice", "Photo Capture 1"
+3. Select step
+4. System suggests variable name (camelCase from step name): `petChoice`
+5. Admin can accept or rename to `pet`
+6. Variable added to mappings, available in nodes
+
+**Why root-level (not input node)**:
+- Clean separation: inputs vs transforms
+- Single place to manage all variable mappings
+- Easy validation: every `{{var}}` must exist in mappings
+- Nodes stay focused on transformation logic
+
+**Benefits**:
+- Step renames don't break prompts (decoupled)
+- Clear mental model
+- Easy to validate completeness
 
 ---
 
@@ -252,4 +290,6 @@ Flow:
 | D17 | Multiple Transforms | One per experience (MVP) |
 | D18 | Templates | Defer, use experience duplication |
 | D19 | Versioning | Auto-version on publish |
-| D20 | Variables | Auto-generated from step names |
+| D20 | Step Naming | Add `name` field to all steps |
+| D21 | Variable Location | Root-level `variableMappings` in transform config |
+| D22 | Variable Creation | Admin-defined, decoupled from step names |
