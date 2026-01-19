@@ -6,14 +6,17 @@ The Transform Pipeline step is a special step type that processes media (photos,
 
 ## Status
 
-**Phase**: Requirements Gathering
+**Phase**: Requirements Complete (Ready for Implementation Planning)
 **Last Updated**: 2026-01-19
 
 ## Documents
 
 - [spec.md](./spec.md) - Detailed technical specification
 - [use-cases.md](./use-cases.md) - Detailed use case examples
-- [open-questions.md](./open-questions.md) - Questions requiring decisions
+- [decisions.md](./decisions.md) - **Finalized decisions** (20 decisions made)
+- [open-questions.md](./open-questions.md) - Original questions (now answered)
+- [risks.md](./risks.md) - Risk analysis and mitigations
+- [discussion.md](./discussion.md) - Design discussion points
 
 ## Quick Summary
 
@@ -25,23 +28,35 @@ A composable transform pipeline that:
 3. Can reference inputs from previous steps (text answers, captured media)
 4. Supports multiple output formats (image → GIF → video in future)
 
+### Key Decisions Made
+
+| Decision | Choice |
+|----------|--------|
+| Config Storage | `/experiences/{expId}/transformConfigs/{stepId}` |
+| Validation | Loose on draft save, strict on publish |
+| Transform Position | Must be last step in experience |
+| Transforms per Experience | One (MVP) |
+| Variables | Auto-generated from step names |
+| Timeout | 10 minutes |
+| Guest Progress | Progress bar + generic messages |
+
 ### Key Constraints
 
 - **Security**: Transform config (prompts, node details) must stay server-side
 - **Flexibility**: Nodes must be composable and reorderable
 - **Extensibility**: Easy to add new node types
-- **Performance**: Must complete in reasonable time for guest experience
+- **Performance**: Must complete in 10 minutes max
 
 ### Node Types (MVP)
 
-1. Remove Background
-2. Background Swap (static image)
-3. Apply Overlay
-4. AI Image Generation
+1. **Remove Background** - Extract subject from image
+2. **Background Swap** - Apply static OR AI-generated background
+3. **Apply Overlay** - Add frames, watermarks, branding
+4. **AI Image** - Full AI transformation with dynamic prompts
 
 ### Future Node Types
 
-- Compose GIF
+- Compose GIF (multi-frame)
 - Apply Video Background
 - Face Swap
 - Style Transfer
