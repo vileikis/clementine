@@ -1,0 +1,182 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 800" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif">
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-opacity="0.12"/>
+    </filter>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#8b5cf6"/>
+    </marker>
+    <marker id="arrowDown" markerWidth="10" markerHeight="10" refX="3" refY="9" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L6,0 L3,9 z" fill="#8b5cf6"/>
+    </marker>
+    <linearGradient id="magicGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7c3aed"/>
+      <stop offset="100%" style="stop-color:#db2777"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1000" height="800" fill="#faf5ff"/>
+  
+  <!-- Title -->
+  <text x="500" y="40" text-anchor="middle" font-size="24" font-weight="700" fill="#1e293b">Use Case: Hobbitify — AI-Generated Background</text>
+  <text x="500" y="65" text-anchor="middle" font-size="14" fill="#64748b">Guest describes their fantasy background → AI generates it → Composited portrait</text>
+  
+  <!-- GUEST JOURNEY SECTION -->
+  <text x="60" y="105" font-size="12" font-weight="600" fill="#7c3aed" letter-spacing="1">GUEST JOURNEY (3 STEPS)</text>
+  
+  <!-- Step cards -->
+  <rect x="100" y="120" width="200" height="100" rx="10" fill="white" filter="url(#shadow)"/>
+  <rect x="100" y="120" width="200" height="6" rx="3" fill="#22c55e"/>
+  <text x="200" y="160" text-anchor="middle" font-size="28">✨</text>
+  <text x="200" y="188" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">1. Describe Background</text>
+  <text x="200" y="206" text-anchor="middle" font-size="10" fill="#64748b">"A mystical forest with</text>
+  <text x="200" y="218" text-anchor="middle" font-size="10" fill="#64748b">glowing mushrooms"</text>
+  
+  <line x1="320" y1="170" x2="380" y2="170" stroke="#cbd5e1" stroke-width="2"/>
+  
+  <rect x="400" y="120" width="200" height="100" rx="10" fill="white" filter="url(#shadow)"/>
+  <rect x="400" y="120" width="200" height="6" rx="3" fill="#3b82f6"/>
+  <text x="500" y="165" text-anchor="middle" font-size="28">📸</text>
+  <text x="500" y="193" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">2. Take Photo</text>
+  <text x="500" y="210" text-anchor="middle" font-size="10" fill="#64748b">Capture selfie</text>
+  
+  <line x1="620" y1="170" x2="680" y2="170" stroke="#cbd5e1" stroke-width="2"/>
+  
+  <rect x="700" y="120" width="200" height="100" rx="10" fill="#faf5ff" filter="url(#shadow)" stroke="#c4b5fd" stroke-width="2"/>
+  <text x="800" y="165" text-anchor="middle" font-size="28">⏳</text>
+  <text x="800" y="193" text-anchor="middle" font-size="12" font-weight="600" fill="#7c3aed">3. AI Processing</text>
+  <text x="800" y="210" text-anchor="middle" font-size="10" fill="#64748b">~30-45 seconds</text>
+  
+  <!-- TRANSFORM PIPELINE SECTION -->
+  <text x="60" y="270" font-size="12" font-weight="600" fill="#8b5cf6" letter-spacing="1">MULTI-NODE TRANSFORM PIPELINE</text>
+  <text x="60" y="288" font-size="10" fill="#64748b">Three nodes working together: AI generates background, removes photo background, then composites</text>
+  
+  <!-- Big transform box -->
+  <rect x="50" y="300" width="900" height="310" rx="14" fill="white" filter="url(#shadow)"/>
+  
+  <!-- Input Variables -->
+  <rect x="70" y="320" width="140" height="80" rx="8" fill="#f0fdf4" stroke="#86efac"/>
+  <text x="140" y="345" text-anchor="middle" font-size="10" font-weight="600" fill="#166534">Guest Input</text>
+  <text x="80" y="365" font-size="9" fill="#475569">bgDescription =</text>
+  <text x="80" y="380" font-size="8" fill="#475569" font-style="italic">"Mystical forest..."</text>
+  
+  <rect x="70" y="410" width="140" height="55" rx="8" fill="#eff6ff" stroke="#93c5fd"/>
+  <text x="140" y="433" text-anchor="middle" font-size="10" font-weight="600" fill="#1e40af">Guest Photo</text>
+  <text x="140" y="453" text-anchor="middle" font-size="18">🧑</text>
+  
+  <!-- Arrow to Node 1 -->
+  <line x1="220" y1="360" x2="260" y2="360" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- NODE 1: Generate Background -->
+  <rect x="280" y="320" width="200" height="145" rx="10" fill="#faf5ff" stroke="#c4b5fd" stroke-width="2"/>
+  <rect x="280" y="320" width="200" height="6" rx="3" fill="#8b5cf6"/>
+  <circle cx="310" cy="355" r="14" fill="#ede9fe"/>
+  <text x="310" y="360" text-anchor="middle" font-size="12">🤖</text>
+  <text x="335" y="352" font-size="11" font-weight="600" fill="#1e293b">Node 1</text>
+  <text x="335" y="367" font-size="9" fill="#64748b">AI Generate Background</text>
+  
+  <rect x="295" y="380" width="170" height="70" rx="4" fill="white" stroke="#e2e8f0"/>
+  <text x="305" y="398" font-size="8" fill="#64748b">PROMPT:</text>
+  <text x="305" y="412" font-size="8" fill="#1e293b">"Generate fantasy scene:</text>
+  <rect x="305" y="418" width="90" height="12" rx="2" fill="#bbf7d0"/>
+  <text x="350" y="427" text-anchor="middle" font-size="7" fill="#166534">{{bgDescription}}</text>
+  <text x="305" y="442" font-size="8" fill="#1e293b">No people, just environment"</text>
+  
+  <!-- Arrow from Node 1 to connector -->
+  <line x1="480" y1="360" x2="530" y2="360" stroke="#8b5cf6" stroke-width="2"/>
+  <line x1="530" y1="360" x2="530" y2="480" stroke="#8b5cf6" stroke-width="2"/>
+  
+  <!-- NODE 2: Remove Background -->
+  <line x1="220" y1="437" x2="260" y2="437" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <rect x="280" y="475" width="200" height="115" rx="10" fill="#fefce8" stroke="#fcd34d" stroke-width="2"/>
+  <rect x="280" y="475" width="200" height="6" rx="3" fill="#f59e0b"/>
+  <circle cx="310" cy="510" r="14" fill="#fef3c7"/>
+  <text x="310" y="515" text-anchor="middle" font-size="12">✂️</text>
+  <text x="335" y="507" font-size="11" font-weight="600" fill="#1e293b">Node 2</text>
+  <text x="335" y="522" font-size="9" fill="#64748b">Remove Background</text>
+  
+  <rect x="295" y="540" width="170" height="40" rx="4" fill="white" stroke="#e2e8f0"/>
+  <text x="305" y="555" font-size="8" fill="#64748b">Input: Guest photo</text>
+  <text x="305" y="570" font-size="8" fill="#64748b">Mode: Keep Subject</text>
+  
+  <!-- Arrow from Node 2 to Node 3 -->
+  <line x1="480" y1="530" x2="530" y2="530" stroke="#8b5cf6" stroke-width="2"/>
+  <line x1="530" y1="480" x2="530" y2="530" stroke="#8b5cf6" stroke-width="2"/>
+  <line x1="530" y1="505" x2="560" y2="505" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- NODE 3: Background Swap -->
+  <rect x="580" y="400" width="220" height="210" rx="10" fill="#ecfeff" stroke="#67e8f9" stroke-width="2"/>
+  <rect x="580" y="400" width="220" height="6" rx="3" fill="#06b6d4"/>
+  <circle cx="610" cy="435" r="14" fill="#cffafe"/>
+  <text x="610" y="440" text-anchor="middle" font-size="12">🏞️</text>
+  <text x="635" y="432" font-size="11" font-weight="600" fill="#1e293b">Node 3</text>
+  <text x="635" y="447" font-size="9" fill="#64748b">Background Swap</text>
+  
+  <rect x="595" y="465" width="190" height="130" rx="4" fill="white" stroke="#e2e8f0"/>
+  <text x="605" y="485" font-size="8" fill="#64748b">INPUTS:</text>
+  
+  <rect x="605" y="495" width="80" height="40" rx="4" fill="#fef3c7" stroke="#fcd34d"/>
+  <text x="645" y="515" text-anchor="middle" font-size="16">🧑</text>
+  <text x="645" y="530" text-anchor="middle" font-size="7" fill="#92400e">Subject (Node 2)</text>
+  
+  <text x="695" y="515" font-size="14" fill="#64748b">+</text>
+  
+  <rect x="710" y="495" width="65" height="40" rx="4" fill="#dcfce7" stroke="#86efac"/>
+  <text x="742" y="515" text-anchor="middle" font-size="16">🌲</text>
+  <text x="742" y="530" text-anchor="middle" font-size="7" fill="#166534">BG (Node 1)</text>
+  
+  <text x="690" y="560" text-anchor="middle" font-size="9" fill="#64748b">↓ Composite together</text>
+  
+  <rect x="620" y="570" width="130" height="18" rx="3" fill="#f0fdf4"/>
+  <text x="685" y="583" text-anchor="middle" font-size="8" fill="#166534">Final merged image</text>
+  
+  <!-- Arrow to Output -->
+  <line x1="810" y1="505" x2="850" y2="505" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- Output -->
+  <rect x="870" y="420" width="60" height="170" rx="8" fill="#dcfce7" stroke="#86efac" stroke-width="2"/>
+  <text x="900" y="490" text-anchor="middle" font-size="28">🎨</text>
+  <text x="900" y="520" text-anchor="middle" font-size="9" font-weight="600" fill="#166534">Output</text>
+  <text x="900" y="535" text-anchor="middle" font-size="8" fill="#64748b">Final</text>
+  <text x="900" y="547" text-anchor="middle" font-size="8" fill="#64748b">Image</text>
+  
+  <!-- RESULT SECTION -->
+  <text x="60" y="645" font-size="12" font-weight="600" fill="#db2777" letter-spacing="1">THE MAGIC: AI-GENERATED UNIQUE BACKGROUNDS</text>
+  
+  <!-- Visual explanation -->
+  <rect x="50" y="660" width="280" height="120" rx="12" fill="white" filter="url(#shadow)"/>
+  <text x="190" y="690" text-anchor="middle" font-size="11" font-weight="600" fill="#1e293b">Guest describes:</text>
+  <rect x="70" y="700" width="240" height="60" rx="6" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text x="190" y="725" text-anchor="middle" font-size="10" fill="#475569" font-style="italic">"A mystical forest with</text>
+  <text x="190" y="742" text-anchor="middle" font-size="10" fill="#475569" font-style="italic">glowing mushrooms"</text>
+  
+  <!-- Arrow -->
+  <text x="360" y="720" font-size="28" fill="#8b5cf6">→</text>
+  
+  <!-- AI Generated -->
+  <rect x="400" y="660" width="150" height="120" rx="12" fill="url(#magicGrad)"/>
+  <text x="475" y="710" text-anchor="middle" font-size="32">🌲✨🍄</text>
+  <text x="475" y="745" text-anchor="middle" font-size="10" fill="white" font-weight="500">AI-Generated BG</text>
+  <text x="475" y="762" text-anchor="middle" font-size="9" fill="#fce7f3">Unique every time!</text>
+  
+  <!-- Plus -->
+  <text x="580" y="720" font-size="28" fill="#64748b">+</text>
+  
+  <!-- Subject -->
+  <rect x="620" y="660" width="100" height="120" rx="12" fill="white" filter="url(#shadow)"/>
+  <text x="670" y="715" text-anchor="middle" font-size="40">🧑</text>
+  <text x="670" y="755" text-anchor="middle" font-size="9" fill="#64748b">Extracted</text>
+  <text x="670" y="768" text-anchor="middle" font-size="9" fill="#64748b">Subject</text>
+  
+  <!-- Equals -->
+  <text x="750" y="720" font-size="28" fill="#64748b">=</text>
+  
+  <!-- Final -->
+  <rect x="790" y="660" width="160" height="120" rx="12" fill="#dcfce7" stroke="#86efac" stroke-width="2"/>
+  <text x="870" y="705" text-anchor="middle" font-size="11" font-weight="600" fill="#166534">🧙 Final Portrait</text>
+  <text x="870" y="725" text-anchor="middle" font-size="9" fill="#475569">Guest in their own</text>
+  <text x="870" y="740" text-anchor="middle" font-size="9" fill="#475569">custom fantasy world!</text>
+  <text x="870" y="765" text-anchor="middle" font-size="8" fill="#64748b">Completely unique result</text>
+</svg>

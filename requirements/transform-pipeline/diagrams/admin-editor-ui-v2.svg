@@ -1,0 +1,161 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 950" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif">
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-opacity="0.1"/>
+    </filter>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#6366f1"/>
+      <stop offset="100%" style="stop-color:#8b5cf6"/>
+    </linearGradient>
+    <linearGradient id="nodeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f8fafc"/>
+      <stop offset="100%" style="stop-color:#f1f5f9"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="700" height="950" fill="#f8fafc"/>
+  
+  <!-- Title -->
+  <text x="350" y="35" text-anchor="middle" font-size="22" font-weight="700" fill="#1e293b">Admin: Transform Pipeline Editor (v2)</text>
+  <text x="350" y="55" text-anchor="middle" font-size="12" fill="#64748b">Inline node configuration — expand each node to edit</text>
+  
+  <!-- Main Panel -->
+  <rect x="50" y="75" width="600" height="850" rx="12" fill="white" filter="url(#shadow)"/>
+  
+  <!-- Panel Header -->
+  <rect x="50" y="75" width="600" height="45" rx="12" fill="url(#headerGrad)"/>
+  <rect x="50" y="100" width="600" height="20" fill="url(#headerGrad)"/>
+  <text x="70" y="105" font-size="15" font-weight="600" fill="white">Transform Pipeline</text>
+  
+  <!-- INPUTS Section -->
+  <text x="70" y="150" font-size="11" font-weight="600" fill="#6366f1" letter-spacing="1">INPUTS</text>
+  <text x="70" y="166" font-size="10" fill="#64748b">Map variables from previous steps</text>
+  
+  <!-- Variable Cards Row -->
+  <rect x="70" y="180" width="170" height="42" rx="6" fill="#f0fdf4" stroke="#86efac" stroke-width="1"/>
+  <circle cx="88" cy="201" r="10" fill="#22c55e"/>
+  <text x="88" y="205" text-anchor="middle" font-size="9" fill="white" font-weight="600">A</text>
+  <text x="105" y="196" font-size="11" font-weight="600" fill="#166534">pet</text>
+  <text x="105" y="210" font-size="9" fill="#64748b">← Pet Choice answer</text>
+  
+  <rect x="250" y="180" width="170" height="42" rx="6" fill="#f0fdf4" stroke="#86efac" stroke-width="1"/>
+  <circle cx="268" cy="201" r="10" fill="#22c55e"/>
+  <text x="268" y="205" text-anchor="middle" font-size="9" fill="white" font-weight="600">A</text>
+  <text x="285" y="196" font-size="11" font-weight="600" fill="#166534">phrase</text>
+  <text x="285" y="210" font-size="9" fill="#64748b">← Custom Text answer</text>
+  
+  <rect x="430" y="180" width="170" height="42" rx="6" fill="#eff6ff" stroke="#93c5fd" stroke-width="1"/>
+  <circle cx="448" cy="201" r="10" fill="#3b82f6"/>
+  <text x="448" y="205" text-anchor="middle" font-size="9" fill="white" font-weight="600">📷</text>
+  <text x="465" y="196" font-size="11" font-weight="600" fill="#1e40af">photo</text>
+  <text x="465" y="210" font-size="9" fill="#64748b">← Photo Capture media</text>
+  
+  <rect x="610" y="180" width="30" height="42" rx="6" fill="white" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3"/>
+  <text x="625" y="206" text-anchor="middle" font-size="16" fill="#cbd5e1">+</text>
+  
+  <!-- PIPELINE Section -->
+  <text x="70" y="255" font-size="11" font-weight="600" fill="#6366f1" letter-spacing="1">PIPELINE</text>
+  <text x="70" y="271" font-size="10" fill="#64748b">Click node to expand • Drag to reorder</text>
+  
+  <!-- Node 1: Collapsed -->
+  <rect x="70" y="285" width="560" height="50" rx="8" fill="url(#nodeGrad)" stroke="#e2e8f0" stroke-width="1"/>
+  <rect x="70" y="285" width="5" height="50" rx="2" fill="#f59e0b"/>
+  <text x="88" y="305" font-size="9" fill="#94a3b8">≡</text>
+  <circle cx="112" cy="310" r="14" fill="#fef3c7"/>
+  <text x="112" y="315" text-anchor="middle" font-size="12">✂️</text>
+  <text x="138" y="305" font-size="12" font-weight="600" fill="#1e293b">Remove Background</text>
+  <text x="138" y="320" font-size="10" fill="#64748b">Input: photo • Mode: Keep Subject</text>
+  <text x="590" y="315" text-anchor="middle" font-size="14" fill="#94a3b8">▸</text>
+  
+  <!-- Node 2: Expanded (AI Transform) -->
+  <rect x="70" y="345" width="560" height="280" rx="8" fill="url(#nodeGrad)" stroke="#c4b5fd" stroke-width="2"/>
+  <rect x="70" y="345" width="5" height="280" rx="2" fill="#8b5cf6"/>
+  
+  <!-- Node 2 Header -->
+  <text x="88" y="370" font-size="9" fill="#94a3b8">≡</text>
+  <circle cx="112" cy="370" r="14" fill="#ede9fe"/>
+  <text x="112" y="375" text-anchor="middle" font-size="12">🤖</text>
+  <text x="138" y="368" font-size="12" font-weight="600" fill="#1e293b">AI Transform</text>
+  <text x="138" y="383" font-size="10" fill="#64748b">Full AI-powered image transformation</text>
+  <text x="590" y="375" text-anchor="middle" font-size="14" fill="#8b5cf6">▾</text>
+  
+  <!-- Expanded Config Area -->
+  <rect x="90" y="400" width="520" height="210" rx="6" fill="white" stroke="#e2e8f0"/>
+  
+  <!-- Input Source -->
+  <text x="105" y="422" font-size="10" font-weight="500" fill="#64748b">INPUT</text>
+  <rect x="155" y="408" width="140" height="24" rx="4" fill="#f1f5f9" stroke="#e2e8f0"/>
+  <text x="225" y="424" text-anchor="middle" font-size="10" fill="#1e293b">Previous Node ▾</text>
+  
+  <text x="320" y="422" font-size="10" font-weight="500" fill="#64748b">MODEL</text>
+  <rect x="365" y="408" width="130" height="24" rx="4" fill="#f1f5f9" stroke="#e2e8f0"/>
+  <text x="430" y="424" text-anchor="middle" font-size="10" fill="#1e293b">Gemini 2.5 Pro ▾</text>
+  
+  <!-- Prompt Template -->
+  <text x="105" y="455" font-size="10" font-weight="500" fill="#64748b">PROMPT TEMPLATE</text>
+  <rect x="105" y="462" width="490" height="70" rx="4" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text x="115" y="480" font-size="10" fill="#1e293b">Transform the person into a hobbit character with</text>
+  <rect x="115" y="486" width="35" height="16" rx="3" fill="#dbeafe"/>
+  <text x="132" y="498" text-anchor="middle" font-size="9" fill="#2563eb" font-weight="500">{{pet}}</text>
+  <text x="157" y="498" font-size="10" fill="#1e293b">in their hands.</text>
+  <text x="115" y="515" font-size="10" fill="#1e293b">Add text at bottom:</text>
+  <rect x="208" y="503" width="50" height="16" rx="3" fill="#dbeafe"/>
+  <text x="233" y="515" text-anchor="middle" font-size="9" fill="#2563eb" font-weight="500">{{phrase}}</text>
+  
+  <rect x="500" y="462" width="90" height="24" rx="4" fill="#eff6ff" stroke="#bfdbfe"/>
+  <text x="545" y="478" text-anchor="middle" font-size="9" fill="#2563eb">+ Variable</text>
+  
+  <!-- Reference Images -->
+  <text x="105" y="555" font-size="10" font-weight="500" fill="#64748b">REFERENCE IMAGES</text>
+  <rect x="105" y="562" width="45" height="45" rx="4" fill="#fef3c7" stroke="#fcd34d"/>
+  <text x="127" y="588" text-anchor="middle" font-size="16">🐱</text>
+  <text x="127" y="602" text-anchor="middle" font-size="8" fill="#92400e">cat</text>
+  <rect x="158" y="562" width="45" height="45" rx="4" fill="#fef3c7" stroke="#fcd34d"/>
+  <text x="180" y="588" text-anchor="middle" font-size="16">🐕</text>
+  <text x="180" y="602" text-anchor="middle" font-size="8" fill="#92400e">dog</text>
+  <rect x="211" y="562" width="45" height="45" rx="4" fill="#fef3c7" stroke="#fcd34d"/>
+  <text x="233" y="588" text-anchor="middle" font-size="16">🐔</text>
+  <text x="233" y="602" text-anchor="middle" font-size="8" fill="#92400e">chicken</text>
+  <rect x="264" y="562" width="35" height="45" rx="4" fill="#f1f5f9" stroke="#e2e8f0" stroke-dasharray="2"/>
+  <text x="281" y="590" text-anchor="middle" font-size="14" fill="#cbd5e1">+</text>
+  
+  <!-- Aspect Ratio -->
+  <text x="340" y="575" font-size="10" font-weight="500" fill="#64748b">ASPECT</text>
+  <rect x="385" y="562" width="70" height="24" rx="4" fill="#f1f5f9" stroke="#e2e8f0"/>
+  <text x="420" y="578" text-anchor="middle" font-size="10" fill="#1e293b">3:2 ▾</text>
+  
+  <!-- Node 3: Collapsed -->
+  <rect x="70" y="635" width="560" height="50" rx="8" fill="url(#nodeGrad)" stroke="#e2e8f0" stroke-width="1"/>
+  <rect x="70" y="635" width="5" height="50" rx="2" fill="#06b6d4"/>
+  <text x="88" y="655" font-size="9" fill="#94a3b8">≡</text>
+  <circle cx="112" cy="660" r="14" fill="#cffafe"/>
+  <text x="112" y="665" text-anchor="middle" font-size="12">🖼️</text>
+  <text x="138" y="655" font-size="12" font-weight="600" fill="#1e293b">Apply Overlay</text>
+  <text x="138" y="670" font-size="10" fill="#64748b">Brand frame • Stretch • 100% opacity</text>
+  <text x="590" y="665" text-anchor="middle" font-size="14" fill="#94a3b8">▸</text>
+  
+  <!-- Add Node Button -->
+  <rect x="70" y="695" width="560" height="36" rx="8" fill="white" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4"/>
+  <text x="350" y="718" text-anchor="middle" font-size="11" fill="#94a3b8">+ Add Transform Node</text>
+  
+  <!-- OUTPUT Section -->
+  <text x="70" y="765" font-size="11" font-weight="600" fill="#6366f1" letter-spacing="1">OUTPUT</text>
+  <rect x="140" y="750" width="70" height="26" rx="4" fill="#f1f5f9" stroke="#e2e8f0"/>
+  <text x="175" y="768" text-anchor="middle" font-size="11" fill="#1e293b">Image ▾</text>
+  <text x="230" y="768" font-size="10" fill="#64748b">Est. time: ~30 seconds</text>
+  
+  <!-- Action Buttons -->
+  <rect x="400" y="750" width="100" height="32" rx="6" fill="#f1f5f9" stroke="#e2e8f0"/>
+  <text x="450" y="771" text-anchor="middle" font-size="11" fill="#64748b">Test Pipeline</text>
+  <rect x="510" y="750" width="100" height="32" rx="6" fill="#6366f1"/>
+  <text x="560" y="771" text-anchor="middle" font-size="11" fill="white" font-weight="500">Save Draft</text>
+  
+  <!-- Comparison Note -->
+  <rect x="70" y="810" width="560" height="95" rx="10" fill="#fefce8" stroke="#fcd34d"/>
+  <text x="90" y="835" font-size="11" font-weight="600" fill="#854d0e">💡 This Layout (v2) vs Sidebar Layout (v1)</text>
+  
+  <text x="90" y="858" font-size="10" fill="#78350f">✓ Inline config — see all settings at a glance when expanded</text>
+  <text x="90" y="875" font-size="10" fill="#78350f">✓ Single column — easier scrolling, no horizontal split</text>
+  <text x="90" y="892" font-size="10" fill="#78350f">✓ Accordion pattern — familiar UX, focus on one node at a time</text>
+</svg>
