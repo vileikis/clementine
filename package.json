@@ -23,6 +23,7 @@
     "functions:serve": "pnpm --filter @clementine/functions serve",
     "functions:serve:prod": "pnpm --filter @clementine/functions serve:prod",
     "functions:deploy": "./functions/scripts/deploy.sh",
+    "app:deploy": "./scripts/deploy-app.sh",
     "fb:deploy": "firebase deploy",
     "fb:deploy:rules": "firebase deploy --only firestore:rules,storage",
     "fb:deploy:indexes": "firebase deploy --only firestore:indexes",
