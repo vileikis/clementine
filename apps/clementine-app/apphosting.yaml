@@ -1,6 +1,7 @@
 # Settings for Backend (on Cloud Run).
 # See https://firebase.google.com/docs/app-hosting/configure#cloud-run
 runConfig:
+  runCommand: node --import ./.output/server/instrument.server.mjs .output/server/index.mjs
   minInstances: 0
   # maxInstances: 100
   # concurrency: 80
