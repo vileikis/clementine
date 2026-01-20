@@ -8,12 +8,12 @@
  * Reference: Follows useSubscribeSession pattern for query structure
  */
 import { useQueries } from '@tanstack/react-query'
-import { useProject } from '@/domains/project/shared/hooks/useProject'
-import { useProjectEvent } from '@/domains/event/shared/hooks/useProjectEvent'
-import { experienceQuery } from '@/domains/experience/shared'
 import type { Project } from '@clementine/shared'
 import type { ProjectEventFull } from '@/domains/event/shared'
 import type { Experience } from '@/domains/experience/shared'
+import { useProject } from '@/domains/project/shared/hooks/useProject'
+import { useProjectEvent } from '@/domains/event/shared/hooks/useProjectEvent'
+import { experienceQuery } from '@/domains/experience/shared'
 
 /**
  * Minimal experience data needed for card display

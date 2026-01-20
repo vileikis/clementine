@@ -9,7 +9,7 @@ import { useCallback, useMemo, useState } from 'react'
 import { useParams } from '@tanstack/react-router'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
-import { WelcomeConfigPanel, WelcomePreview } from '../components'
+import { WelcomeConfigPanel, WelcomeRenderer } from '../components'
 import { useUpdateWelcome, useUploadAndUpdateHeroMedia } from '../hooks'
 import { DEFAULT_WELCOME } from '../constants'
 import type { WelcomeConfig } from '@/domains/event/shared'
@@ -201,10 +201,11 @@ export function WelcomeEditorPage() {
       <div className="flex-1 min-w-0">
         <PreviewShell enableViewportSwitcher enableFullscreen>
           <ThemeProvider theme={currentTheme}>
-            <WelcomePreview
+            <WelcomeRenderer
               welcome={previewWelcome}
               mainExperiences={mainExperiences}
               experienceDetails={mainExperienceDetails}
+              mode="edit"
             />
           </ThemeProvider>
         </PreviewShell>

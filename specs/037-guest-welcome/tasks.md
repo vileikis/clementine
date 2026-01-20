@@ -52,7 +52,7 @@ Base path: `apps/clementine-app/src/`
 
 ---
 
-## Phase 2.5: WYSIWYG Refactoring (NEW - Required Before US1)
+## Phase 2.5: WYSIWYG Refactoring (NEW - Required Before US1) ✅ COMPLETE
 
 **Purpose**: Refactor WelcomePreview → WelcomeRenderer for edit/run mode parity (WYSIWYG principle)
 
@@ -60,24 +60,24 @@ Base path: `apps/clementine-app/src/`
 
 ### Refactoring Tasks
 
-- [ ] T014-R Move ExperienceCard from `src/domains/event/experiences/components/ExperienceCard.tsx` to `src/domains/event/welcome/components/ExperienceCard.tsx`
-- [ ] T015-R Update ExperienceCard import in WelcomePreview to use local path
-- [ ] T016-R Update `src/domains/event/experiences/components/index.ts` to remove ExperienceCard export
-- [ ] T017-R Update `src/domains/event/experiences/index.ts` if needed
-- [ ] T018-R Create `src/domains/event/welcome/components/index.ts` barrel export with ExperienceCard
-- [ ] T019-R Rename WelcomePreview to WelcomeRenderer in `src/domains/event/welcome/components/WelcomeRenderer.tsx`
-- [ ] T020-R Add `mode: 'edit' | 'run'` prop to WelcomeRenderer interface
-- [ ] T021-R Add `onSelectExperience?: (experienceId: string) => void` prop to WelcomeRenderer (required when mode='run')
-- [ ] T022-R Pass mode and onSelectExperience to ExperienceCard within WelcomeRenderer
-- [ ] T023-R Update all existing imports of WelcomePreview to use WelcomeRenderer (search codebase)
-- [ ] T024-R Update `src/domains/event/welcome/index.ts` barrel export with WelcomeRenderer and ExperienceCard
-- [ ] T025-R Run validation: `pnpm app:check` and `pnpm app:type-check` to ensure refactoring is complete
+- [X] T014-R Move ExperienceCard from `src/domains/event/experiences/components/ExperienceCard.tsx` to `src/domains/event/welcome/components/ExperienceCard.tsx`
+- [X] T015-R Update ExperienceCard import in WelcomePreview to use local path
+- [X] T016-R Update `src/domains/event/experiences/components/index.ts` to remove ExperienceCard export
+- [X] T017-R Update `src/domains/event/experiences/index.ts` if needed
+- [X] T018-R Create `src/domains/event/welcome/components/index.ts` barrel export with ExperienceCard
+- [X] T019-R Rename WelcomePreview to WelcomeRenderer in `src/domains/event/welcome/components/WelcomeRenderer.tsx`
+- [X] T020-R Add `mode: 'edit' | 'run'` prop to WelcomeRenderer interface
+- [X] T021-R Add `onSelectExperience?: (experienceId: string) => void` prop to WelcomeRenderer (required when mode='run')
+- [X] T022-R Pass mode and onSelectExperience to ExperienceCard within WelcomeRenderer
+- [X] T023-R Update all existing imports of WelcomePreview to use WelcomeRenderer (search codebase)
+- [X] T024-R Update `src/domains/event/welcome/index.ts` barrel export with WelcomeRenderer and ExperienceCard
+- [X] T025-R Run validation: `pnpm app:check` and `pnpm app:type-check` to ensure refactoring is complete
 
-**Checkpoint**: WelcomeRenderer ready for both edit and run modes
+**Checkpoint**: WelcomeRenderer ready for both edit and run modes ✅
 
 ---
 
-## Phase 3: User Story 1 - Guest Accesses Event via Shareable Link (Priority: P1) 🎯 MVP
+## Phase 3: User Story 1 - Guest Accesses Event via Shareable Link (Priority: P1) 🎯 MVP ✅ COMPLETE
 
 **Goal**: Guests can visit `/join/{projectId}` and see the welcome screen with event branding and available experiences.
 
@@ -91,16 +91,16 @@ Base path: `apps/clementine-app/src/`
 
 ### Container Implementation (Uses Refactored WelcomeRenderer)
 
-- [ ] T029 [US1] Create WelcomeScreenPage container using useGuestAccess, useGuestRecord, ThemeProvider, and WelcomeRenderer in `src/domains/guest/containers/WelcomeScreenPage.tsx`
-- [ ] T030 [US1] Update containers barrel export with WelcomeScreenPage in `src/domains/guest/containers/index.ts`
-- [ ] T031 [US1] Wire WelcomeScreenPage to join route in `src/app/join/$projectId.tsx`
-- [ ] T032 [US1] Update guest domain root export with all new public exports in `src/domains/guest/index.ts`
+- [X] T029 [US1] Create WelcomeScreenPage container using useGuestAccess, useGuestRecord, ThemeProvider, and WelcomeRenderer in `src/domains/guest/containers/WelcomeScreenPage.tsx`
+- [X] T030 [US1] Update containers barrel export with WelcomeScreenPage in `src/domains/guest/containers/index.ts`
+- [X] T031 [US1] Wire WelcomeScreenPage to join route in `src/app/join/$projectId.tsx`
+- [X] T032 [US1] Update guest domain root export with all new public exports in `src/domains/guest/index.ts`
 
-**Checkpoint**: User Story 1 complete - guests can view welcome screen with experiences
+**Checkpoint**: User Story 1 complete - guests can view welcome screen with experiences ✅
 
 ---
 
-## Phase 4: User Story 2 - Guest Selects an Experience (Priority: P2)
+## Phase 4: User Story 2 - Guest Selects an Experience (Priority: P2) ✅ COMPLETE
 
 **Goal**: Guests can click an experience card, a session is created, and they navigate to the experience page with session ID in URL.
 
@@ -108,17 +108,17 @@ Base path: `apps/clementine-app/src/`
 
 ### Implementation for User Story 2
 
-- [ ] T033 [US2] Add experience selection handler to WelcomeScreenPage using useCreateSession (pass to WelcomeRenderer's onSelectExperience) in `src/domains/guest/containers/WelcomeScreenPage.tsx`
-- [ ] T034 [US2] Create ExperiencePlaceholder container showing session ID and placeholder message in `src/domains/guest/containers/ExperiencePlaceholder.tsx`
-- [ ] T035 [US2] Update containers barrel export with ExperiencePlaceholder in `src/domains/guest/containers/index.ts`
-- [ ] T036 [US2] Wire ExperiencePlaceholder to experience route with session query param handling in `src/app/join/$projectId.experience/$experienceId.tsx`
-- [ ] T037 [US2] Handle missing session ID case - create new session automatically in `src/domains/guest/containers/ExperiencePlaceholder.tsx`
+- [X] T033 [US2] Add experience selection handler to WelcomeScreenPage using useCreateSession (pass to WelcomeRenderer's onSelectExperience) in `src/domains/guest/containers/WelcomeScreenPage.tsx`
+- [X] T034 [US2] Create ExperiencePlaceholder container showing session ID and placeholder message in `src/domains/guest/containers/ExperiencePlaceholder.tsx`
+- [X] T035 [US2] Update containers barrel export with ExperiencePlaceholder in `src/domains/guest/containers/index.ts`
+- [X] T036 [US2] Wire ExperiencePlaceholder to experience route with session query param handling in `src/app/join/$projectId.experience/$experienceId.tsx`
+- [X] T037 [US2] Handle missing session ID case - create new session automatically in `src/domains/guest/containers/ExperiencePlaceholder.tsx`
 
-**Checkpoint**: User Story 2 complete - guests can select experiences and see placeholder
+**Checkpoint**: User Story 2 complete - guests can select experiences and see placeholder ✅
 
 ---
 
-## Phase 5: User Story 3 - Guest Encounters Invalid or Unavailable Event (Priority: P3)
+## Phase 5: User Story 3 - Guest Encounters Invalid or Unavailable Event (Priority: P3) ✅ COMPLETE
 
 **Goal**: Guests visiting invalid URLs or unpublished events see appropriate error pages.
 
@@ -126,15 +126,15 @@ Base path: `apps/clementine-app/src/`
 
 ### Implementation for User Story 3
 
-- [ ] T038 [US3] Add not-found state handling (project or event missing) to WelcomeScreenPage rendering ErrorPage in `src/domains/guest/containers/WelcomeScreenPage.tsx`
-- [ ] T039 [US3] Add coming-soon state handling (no active event or not published) to WelcomeScreenPage rendering ComingSoonPage in `src/domains/guest/containers/WelcomeScreenPage.tsx`
-- [ ] T040 [US3] Add loading state with skeleton UI to WelcomeScreenPage in `src/domains/guest/containers/WelcomeScreenPage.tsx`
+- [X] T038 [US3] Add not-found state handling (project or event missing) to WelcomeScreenPage rendering ErrorPage in `src/domains/guest/containers/WelcomeScreenPage.tsx`
+- [X] T039 [US3] Add coming-soon state handling (no active event or not published) to WelcomeScreenPage rendering ComingSoonPage in `src/domains/guest/containers/WelcomeScreenPage.tsx`
+- [X] T040 [US3] Add loading state with skeleton UI to WelcomeScreenPage in `src/domains/guest/containers/WelcomeScreenPage.tsx`
 
-**Checkpoint**: User Story 3 complete - all error states handled gracefully
+**Checkpoint**: User Story 3 complete - all error states handled gracefully ✅
 
 ---
 
-## Phase 6: User Story 4 - Guest Views Event with No Available Experiences (Priority: P4)
+## Phase 6: User Story 4 - Guest Views Event with No Available Experiences (Priority: P4) ✅ COMPLETE
 
 **Goal**: Guests visiting a valid event with no enabled experiences see a helpful message.
 
@@ -142,25 +142,27 @@ Base path: `apps/clementine-app/src/`
 
 ### Implementation for User Story 4
 
-- [ ] T041 [US4] Add empty experiences state to WelcomeScreenPage showing "No experiences available" message in `src/domains/guest/containers/WelcomeScreenPage.tsx`
-- [ ] T042 [US4] Style empty state message consistent with welcome screen theme in `src/domains/guest/containers/WelcomeScreenPage.tsx`
+- [X] T041 [US4] Add empty experiences state to WelcomeScreenPage showing "No experiences available" message in `src/domains/guest/containers/WelcomeScreenPage.tsx`
+  - Note: Handled by WelcomeRenderer which shows "Experiences will appear here" placeholder when empty
+- [X] T042 [US4] Style empty state message consistent with welcome screen theme in `src/domains/guest/containers/WelcomeScreenPage.tsx`
+  - Note: Styling is inherited from WelcomeRenderer's themed implementation
 
-**Checkpoint**: User Story 4 complete - all edge cases handled
+**Checkpoint**: User Story 4 complete - all edge cases handled ✅
 
 ---
 
-## Phase 7: Polish & Cross-Cutting Concerns
+## Phase 7: Polish & Cross-Cutting Concerns ✅ COMPLETE
 
 **Purpose**: Cleanup and validation
 
-- [ ] T043 Delete old guest route layout in `src/app/guest/route.tsx`
-- [ ] T044 [P] Delete old guest project route in `src/app/guest/$projectId.tsx`
-- [ ] T045 [P] Delete old guest index route in `src/app/guest/index.tsx`
-- [ ] T046 [P] Remove or archive GuestExperiencePage.tsx (keep for reference or delete) in `src/domains/guest/containers/GuestExperiencePage.tsx`
-- [ ] T047 Delete duplicate ExperienceCard.tsx created in guest domain (if exists) in `src/domains/guest/components/ExperienceCard.tsx`
-- [ ] T048 Delete duplicate ExperienceCardList.tsx created in guest domain (if exists) in `src/domains/guest/components/ExperienceCardList.tsx`
-- [ ] T049 Run validation: `pnpm app:check` (format + lint)
-- [ ] T050 Run type check: `pnpm app:type-check`
+- [X] T043 Delete old guest route layout in `src/app/guest/route.tsx`
+- [X] T044 [P] Delete old guest project route in `src/app/guest/$projectId.tsx`
+- [X] T045 [P] Delete old guest index route in `src/app/guest/index.tsx`
+- [X] T046 [P] Remove or archive GuestExperiencePage.tsx (keep for reference or delete) in `src/domains/guest/containers/GuestExperiencePage.tsx`
+- [X] T047 Delete duplicate ExperienceCard.tsx created in guest domain (if exists) in `src/domains/guest/components/ExperienceCard.tsx`
+- [X] T048 Delete duplicate ExperienceCardList.tsx created in guest domain (if exists) in `src/domains/guest/components/ExperienceCardList.tsx`
+- [X] T049 Run validation: `pnpm app:check` (format + lint)
+- [X] T050 Run type check: `pnpm app:type-check`
 - [ ] T051 Manual verification using quickstart.md checklist
 
 ---

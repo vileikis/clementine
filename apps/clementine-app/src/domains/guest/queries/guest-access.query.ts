@@ -10,9 +10,9 @@
 import { queryOptions } from '@tanstack/react-query'
 import { doc, getDoc } from 'firebase/firestore'
 import { projectSchema } from '@clementine/shared'
+import type { Project } from '@clementine/shared'
 import { firestore } from '@/integrations/firebase/client'
 import { convertFirestoreDoc } from '@/shared/utils/firestore-utils'
-import type { Project } from '@clementine/shared'
 
 /**
  * Query key factory for guest access

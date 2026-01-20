@@ -1,20 +1,28 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { z } from 'zod'
+import { ExperiencePlaceholder } from '@/domains/guest'
 
-export const Route = createFileRoute('/join/$projectId/experience/$experienceId')({
+// Search params schema for session ID
+const searchSchema = z.object({
+  session: z.string().optional(),
+})
+
+export const Route = createFileRoute(
+  '/join/$projectId/experience/$experienceId',
+)({
+  validateSearch: searchSchema,
   component: JoinExperiencePage,
 })
 
 function JoinExperiencePage() {
   const { projectId, experienceId } = Route.useParams()
+  const { session } = Route.useSearch()
 
-  // Placeholder - will be replaced with ExperiencePlaceholder in Phase 4
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold">Experience</h1>
-        <p className="text-muted-foreground mt-2">Project ID: {projectId}</p>
-        <p className="text-muted-foreground">Experience ID: {experienceId}</p>
-      </div>
-    </div>
+    <ExperiencePlaceholder
+      projectId={projectId}
+      experienceId={experienceId}
+      sessionId={session}
+    />
   )
 }

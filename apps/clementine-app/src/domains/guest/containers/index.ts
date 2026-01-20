@@ -1,1 +1,2 @@
-export * from './GuestExperiencePage'
+export * from './WelcomeScreenPage'
+export * from './ExperiencePlaceholder'

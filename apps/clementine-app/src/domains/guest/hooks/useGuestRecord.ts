@@ -9,11 +9,11 @@
  */
 import { useEffect, useRef, useState } from 'react'
 import { signInAnonymously } from 'firebase/auth'
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
+import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore'
 import * as Sentry from '@sentry/tanstackstart-react'
+import type { Guest } from '../schemas/guest.schema'
 import { auth as firebaseAuth, firestore } from '@/integrations/firebase/client'
 import { useAuth } from '@/domains/auth'
-import type { Guest } from '../schemas/guest.schema'
 
 export interface UseGuestRecordReturn {
   /** Guest record if exists */
@@ -105,7 +105,10 @@ export function useGuestRecord(projectId: string): UseGuestRecordReturn {
 
       try {
         const authUid = auth.user.uid
-        const guestRef = doc(firestore, `projects/${projectId}/guests/${authUid}`)
+        const guestRef = doc(
+          firestore,
+          `projects/${projectId}/guests/${authUid}`,
+        )
 
         // Check if guest record already exists
         const existingDoc = await getDoc(guestRef)
@@ -120,7 +123,7 @@ export function useGuestRecord(projectId: string): UseGuestRecordReturn {
             createdAt:
               typeof data.createdAt === 'number'
                 ? data.createdAt
-                : data.createdAt?.toMillis?.() ?? Date.now(),
+                : (data.createdAt?.toMillis?.() ?? Date.now()),
           })
         } else {
           // Create new guest record

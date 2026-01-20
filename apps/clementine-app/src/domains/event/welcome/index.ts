@@ -8,7 +8,12 @@
 export { WelcomeEditorPage } from './containers'
 
 // Components
-export { WelcomePreview, WelcomeConfigPanel } from './components'
+export {
+  WelcomeRenderer,
+  WelcomeConfigPanel,
+  ExperienceCard,
+} from './components'
+export type { WelcomeRendererProps, ExperienceCardProps } from './components'
 
 // Hooks
 export { useUpdateWelcome, useUploadAndUpdateHeroMedia } from './hooks'
