@@ -79,6 +79,9 @@ export function CapturePhotoRunMode({
   const [isUploading, setIsUploading] = useState(false)
   const [uploadError, setUploadError] = useState<string | null>(null)
 
+  // Track if device has multiple cameras (for switch button)
+  const [hasMultipleCameras, setHasMultipleCameras] = useState(false)
+
   /**
    * Handle confirm: upload photo and update session
    */
@@ -166,7 +169,14 @@ export function CapturePhotoRunMode({
   // Handle camera ready
   const handleCameraReady = useCallback(() => {
     setStatus('camera-active')
+    // Update hasMultipleCameras from camera ref
+    setHasMultipleCameras(cameraRef.current?.hasMultipleCameras ?? false)
   }, [setStatus])
+
+  // Handle switch camera
+  const handleSwitchCamera = useCallback(async () => {
+    await cameraRef.current?.switchCamera()
+  }, [])
 
   // Handle camera error
   const handleCameraError = useCallback((err: CameraCaptureError) => {
@@ -268,9 +278,11 @@ export function CapturePhotoRunMode({
         cameraRef={cameraRef}
         aspectRatio={aspectRatio}
         fileInputRef={fileInputRef}
+        hasMultipleCameras={hasMultipleCameras}
         onCameraReady={handleCameraReady}
         onCameraError={handleCameraError}
         onCapture={capture}
+        onSwitchCamera={handleSwitchCamera}
         onOpenPicker={openPicker}
         onFileChange={handleFileChange}
       />
