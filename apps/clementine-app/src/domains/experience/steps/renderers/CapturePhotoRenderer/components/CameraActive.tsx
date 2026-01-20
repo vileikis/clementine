@@ -6,8 +6,8 @@
 
 import type { RefObject } from 'react'
 import type { AspectRatio, CameraCaptureError } from '@/shared/camera/types'
-import type {CameraViewRef} from '@/shared/camera';
-import { CameraView  } from '@/shared/camera'
+import type { CameraViewRef } from '@/shared/camera'
+import { CameraView } from '@/shared/camera'
 import { ThemedButton, useEventTheme } from '@/shared/theming'
 
 interface CameraActiveProps {
