@@ -41,7 +41,9 @@ A composable transform pipeline that:
 | Variable Location | Root-level `variableMappings` |
 | Variable Defaults | Support `defaultValue` for fallbacks |
 | Timeout | 10 minutes |
-| Guest Progress | Progress bar + generic messages |
+| Guest Progress | Generic loading state (no customization) |
+| AI Retries | None - single attempt |
+| Error UX | Friendly message + "Start Over" button |
 
 ### Key Constraints
 

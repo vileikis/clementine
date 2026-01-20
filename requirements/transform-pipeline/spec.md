@@ -480,8 +480,8 @@ export const transformConfigSchema = z.object({
   /** OUTPUT: Expected output format */
   outputFormat: z.enum(['image', 'gif', 'video']).default('image'),
 
-  /** Loading message shown during processing */
-  loadingMessage: z.string().max(200).nullable().default(null),
+  // Note: No loadingMessage for MVP - using generic "Creating your masterpiece..."
+  // Future: Add customizable loading messages
 })
 
 export type TransformConfig = z.infer<typeof transformConfigSchema>

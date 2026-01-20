@@ -68,14 +68,50 @@ backgroundSource:
 
 ---
 
+### D29: Transform Error UX
+**Question**: What should guests see when transform pipeline fails?
+**Decision**: Friendly error state with restart option
+
+**Error state UI**:
+```
+┌─────────────────────────────────────────┐
+│                                          │
+│            😕                            │
+│                                          │
+│   Oops, something went wrong.            │
+│                                          │
+│   Please contact the event organizer     │
+│   or start over.                         │
+│                                          │
+│         [ Start Over ]                   │
+│                                          │
+└─────────────────────────────────────────┘
+```
+
+**Behavior**:
+- "Start Over" button restarts the experience from the beginning
+- Creates new session, clears all answers and captured media
+- No retry option (to avoid infinite loops on persistent errors)
+
+**Server-side**:
+- Full error details logged in Cloud Functions
+- Job document stores error code and message for debugging
+- No technical details exposed to guest
+
+---
+
 ### D7: Guest Progress Visibility
 **Question**: Q7 - Should guests see job progress details?
-**Decision**: **Options B + C combined** - Progress bar AND step messages
-**Rationale**: Good UX without exposing implementation details.
+**Decision**: **Generic loading state only** (simplified for MVP)
 
-Guest sees:
-- Progress bar (percentage)
-- Generic step message: "Removing background...", "Applying AI magic...", "Finishing up..."
+**Rationale**: Keep MVP simple, no custom loading messages.
+
+**Guest sees during processing**:
+- Loading spinner/animation
+- Generic message: "Creating your masterpiece..." (hardcoded)
+- No progress bar or step-specific messages for MVP
+
+**Future consideration**: Add customizable loading messages and progress indicators.
 
 ---
 
@@ -88,8 +124,19 @@ Guest sees:
 
 ### D9: AI Model Retry Strategy
 **Question**: Q9 - How to handle AI model failures?
-**Decision**: **Option B** - Retry node 3 times with exponential backoff
-**Rationale**: Handles transient failures, fails fast on persistent issues.
+**Decision**: **No retries** - Single attempt, show error state on failure
+
+**Rationale**:
+- Simplifies implementation for MVP
+- Users see error state and can restart experience
+- Server-side logging captures errors for debugging
+- Avoids complexity of retry logic and state management
+
+**Error handling flow**:
+1. AI call fails (rate limit, model error, timeout)
+2. Job marked as failed with error details
+3. Client shows friendly error state
+4. User can restart experience
 
 ---
 
@@ -409,9 +456,9 @@ AI-POWERED
 | D4 | Node References | `previousNode` + named references + variables |
 | D5 | BackgroundSwap | Accepts assets AND node outputs |
 | D6 | Error Security | Sanitized client errors, detailed server logs |
-| D7 | Guest Progress | Progress bar + generic step messages |
+| D7 | Guest Progress | Generic loading state only (no customization) |
 | D8 | GIF Complexity | Verbose config for MVP |
-| D9 | AI Retries | 3 retries with exponential backoff |
+| D9 | AI Retries | **No retries** - single attempt, show error state |
 | D10 | Timeout | 10 minutes |
 | D11 | Validation | Loose draft, strict publish |
 | D12 | Prompt UI | Rich editor with Insert Variable |
@@ -431,3 +478,4 @@ AI-POWERED
 | D26 | Variable Defaults | Support `defaultValue` for fallback |
 | D27 | Node Types (MVP) | Cut Out, Combine, Background Swap, AI Image |
 | D28 | Node Naming | User-friendly names with icons |
+| D29 | Error UX | Friendly message + "Start Over" (restarts experience) |
