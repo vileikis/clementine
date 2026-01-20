@@ -4,8 +4,8 @@
  * Shown when device has no camera hardware. Provides fallback to file upload.
  */
 
-import type { RefObject } from 'react'
 import { CameraOff } from 'lucide-react'
+import type { RefObject } from 'react'
 import { ThemedButton, ThemedText, useEventTheme } from '@/shared/theming'
 
 interface PermissionUnavailableProps {

@@ -4,8 +4,8 @@
  * Shown when camera access is blocked. Provides fallback to file upload.
  */
 
-import type { RefObject } from 'react'
 import { CameraOff } from 'lucide-react'
+import type { RefObject } from 'react'
 import { getDeniedInstructions } from '@/shared/camera'
 import { ThemedButton, ThemedText, useEventTheme } from '@/shared/theming'
 

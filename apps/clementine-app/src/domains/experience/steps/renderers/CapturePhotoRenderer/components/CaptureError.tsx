@@ -4,8 +4,8 @@
  * Shown when capture or upload fails. Provides retry and fallback options.
  */
 
-import type { RefObject } from 'react'
 import { CameraOff } from 'lucide-react'
+import type { RefObject } from 'react'
 import { ThemedButton, ThemedText, useEventTheme } from '@/shared/theming'
 
 interface CaptureErrorProps {

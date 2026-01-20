@@ -4,8 +4,8 @@
  * Shows captured photo with retake and confirm options.
  */
 
-import { ThemedButton } from '@/shared/theming'
 import type { CapturedPhoto } from '@/shared/camera'
+import { ThemedButton } from '@/shared/theming'
 
 interface PhotoPreviewProps {
   photo: CapturedPhoto

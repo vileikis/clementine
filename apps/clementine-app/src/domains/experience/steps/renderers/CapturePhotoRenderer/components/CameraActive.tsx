@@ -5,9 +5,10 @@
  */
 
 import type { RefObject } from 'react'
-import { CameraView, type CameraViewRef } from '@/shared/camera'
-import { ThemedButton, useEventTheme } from '@/shared/theming'
 import type { AspectRatio, CameraCaptureError } from '@/shared/camera/types'
+import type {CameraViewRef} from '@/shared/camera';
+import { CameraView  } from '@/shared/camera'
+import { ThemedButton, useEventTheme } from '@/shared/theming'
 
 interface CameraActiveProps {
   cameraRef: RefObject<CameraViewRef | null>

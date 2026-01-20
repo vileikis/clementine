@@ -6,8 +6,8 @@
 
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage'
 import { nanoid } from 'nanoid'
-import { storage } from '@/integrations/firebase/client'
 import type { CapturedPhoto } from '@/shared/camera'
+import { storage } from '@/integrations/firebase/client'
 
 interface UploadPhotoParams {
   photo: CapturedPhoto
