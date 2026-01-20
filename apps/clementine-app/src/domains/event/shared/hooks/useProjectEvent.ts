@@ -51,6 +51,11 @@ export function useProjectEvent(projectId: string, eventId: string) {
 
   // Set up real-time listener for event
   useEffect(() => {
+    // Skip listener setup if eventId is empty (prevents invalid Firestore paths)
+    if (!eventId) {
+      return
+    }
+
     const eventRef = doc(firestore, `projects/${projectId}/events/${eventId}`)
 
     const unsubscribe = onSnapshot(eventRef, (snapshot) => {

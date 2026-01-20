@@ -51,4 +51,6 @@ export const projectEventQuery = (projectId: string, eventId: string) =>
 
       return convertFirestoreDoc(eventSnapshot, projectEventFullSchema)
     },
+    // Disable query when eventId is empty (prevents invalid Firestore paths)
+    enabled: !!projectId && !!eventId,
   })
