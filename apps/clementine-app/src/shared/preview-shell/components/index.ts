@@ -1,5 +1,14 @@
 export { PreviewShellControls } from './PreviewShellControls'
-export { DeviceFrame } from './DeviceFrame'
-export { ViewportSwitcher } from './ViewportSwitcher'
-export { FullscreenOverlay } from './FullscreenOverlay'
-export { FullscreenTrigger } from './FullscreenTrigger'
+export { DeviceFrame, type DeviceFrameProps } from './DeviceFrame'
+export {
+  ViewportSwitcher,
+  type ViewportSwitcherProps,
+} from './ViewportSwitcher'
+export {
+  FullscreenOverlay,
+  type FullscreenOverlayProps,
+} from './FullscreenOverlay'
+export {
+  FullscreenTrigger,
+  type FullscreenTriggerProps,
+} from './FullscreenTrigger'

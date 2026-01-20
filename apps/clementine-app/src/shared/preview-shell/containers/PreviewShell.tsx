@@ -8,8 +8,17 @@ import {
   FullscreenOverlay,
   PreviewShellControls,
 } from '../components'
-import type { PreviewShellProps } from '../types/preview-shell.types'
+import type { ViewportMode } from '../types/preview-shell.types'
 import { cn } from '@/shared/utils'
+
+export interface PreviewShellProps {
+  children: React.ReactNode
+  enableViewportSwitcher?: boolean
+  enableFullscreen?: boolean
+  viewportMode?: ViewportMode
+  onViewportChange?: (mode: ViewportMode) => void
+  className?: string
+}
 
 /**
  * Preview Shell Component

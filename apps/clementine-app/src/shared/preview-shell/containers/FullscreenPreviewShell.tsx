@@ -5,7 +5,17 @@ import { ViewportProvider } from '../context/ViewportContext'
 import { useViewportStore } from '../store/viewportStore'
 import { useFullscreen } from '../hooks/useFullscreen'
 import { DeviceFrame, FullscreenOverlay } from '../components'
-import type { FullscreenPreviewShellProps } from '../types/preview-shell.types'
+
+export interface FullscreenPreviewShellProps {
+  /** Whether the fullscreen preview is open */
+  isOpen: boolean
+  /** Callback when the preview should close */
+  onClose: () => void
+  /** Content to render in the preview */
+  children: React.ReactNode
+  /** Whether to show the viewport switcher (default: true) */
+  showViewportSwitcher?: boolean
+}
 
 /**
  * Fullscreen Preview Shell Component

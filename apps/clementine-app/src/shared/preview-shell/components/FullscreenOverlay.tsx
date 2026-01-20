@@ -3,9 +3,18 @@
 import { X } from 'lucide-react'
 import { useViewportContext } from '../context/ViewportContext'
 import { ViewportSwitcher } from './ViewportSwitcher'
-import type { FullscreenOverlayProps } from '../types/preview-shell.types'
+import type { ViewportMode } from '../types/preview-shell.types'
 import { Button } from '@/ui-kit/ui/button'
 import { cn } from '@/shared/utils'
+
+export interface FullscreenOverlayProps {
+  isOpen: boolean
+  onClose: () => void
+  children: React.ReactNode
+  showViewportSwitcher?: boolean
+  onModeChange?: (mode: ViewportMode) => void
+  className?: string
+}
 
 /**
  * Fullscreen Overlay Component
