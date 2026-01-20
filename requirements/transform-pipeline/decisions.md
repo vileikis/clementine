@@ -156,8 +156,54 @@ Flow:
 
 ### D17: Multiple Transform Steps
 **Question**: Q17 - Allow multiple transform steps per experience?
-**Decision**: **Restrict to ONE transform step per experience for MVP**
+**Decision**: **Restrict to ONE transform per experience**
 **Rationale**: Adding is easier than removing. Simplifies validation and mental model.
+
+---
+
+### D23: Transform Storage Location
+**Question**: Should transform config be in separate server-only collection?
+**Decision**: **Embed in experience document** (no separate `transformConfigs` collection)
+
+**Rationale**:
+- Competitor validation: Major players don't hide prompts, customers don't churn
+- Speed to market: Separate collection = separate CRUD, sync logic, versioning
+- Concierge phase: Early users are trusted partners
+- Migration later: Moving to subcollection is mechanical work if needed
+
+**Guardrails**:
+- Don't market "secure prompts" as a feature until implemented
+- Document as intentional technical debt
+- Revisit trigger: Enterprise customer requests, proven prompt theft
+
+---
+
+### D24: Transform Schema Position
+**Question**: Should transform be in steps array or separate field?
+**Decision**: **Separate `transform` field** at same level as `steps`
+
+**Schema**:
+```typescript
+experienceConfigSchema = z.object({
+  steps: z.array(stepSchema),        // User-facing steps only
+  transform: transformConfigSchema.nullable()  // Separate slot
+})
+```
+
+**Rationale**:
+- Clean semantic separation: steps = user-facing, transform = processing
+- No reordering concerns - it's a field, not an array item
+- Optional by nature (`null` = no transform)
+- Clear mental model: "Users go through steps, then we transform"
+
+**Runtime adaptation**: Virtual step injection - append transform as synthetic step at end when iterating.
+
+---
+
+### D25: Transform Always Last
+**Question**: Can transform be positioned anywhere in experience?
+**Decision**: **Transform is always last** - enforced by schema (separate slot)
+**Rationale**: Natural endpoint. All data must be collected before processing.
 
 ---
 
@@ -215,14 +261,23 @@ Flow:
 **Structure**:
 ```typescript
 {
-  stepId: "transform1",
-  experienceId: "exp1",
-
   // INPUTS: Root-level variable definitions
   variableMappings: {
-    pet: { stepId: "step1", type: "answer" },
-    phrase: { stepId: "step2", type: "answer" },
-    photo: { stepId: "step3", type: "capturedMedia" }
+    pet: {
+      stepId: "step1",
+      type: "answer",
+      defaultValue: "cat"  // Fallback if step answer is empty/missing
+    },
+    phrase: {
+      stepId: "step2",
+      type: "answer",
+      defaultValue: "Hello!"  // Fallback value
+    },
+    photo: {
+      stepId: "step3",
+      type: "capturedMedia",
+      defaultValue: null  // No fallback for required media
+    }
   },
 
   // PIPELINE: Nodes reference variables
@@ -239,6 +294,23 @@ Flow:
 
   outputFormat: "image"
 }
+```
+
+**Variable Mapping with Default Values**:
+```typescript
+variableMappingSchema = z.object({
+  type: z.enum(['answer', 'capturedMedia']),
+  stepId: z.string(),
+  field: z.string().nullable().default(null),
+
+  // Default/fallback value if step data is empty or missing
+  defaultValue: z.union([
+    z.string(),
+    z.number(),
+    z.boolean(),
+    z.null()
+  ]).default(null)
+})
 ```
 
 **Mental Model**:
@@ -264,6 +336,66 @@ INPUTS (variableMappings)  →  PIPELINE (nodes)  →  OUTPUT
 - Step renames don't break prompts (decoupled)
 - Clear mental model
 - Easy to validate completeness
+- Default values provide graceful fallback
+
+---
+
+## Transform Nodes
+
+### Decision: MVP Node Set with User-Friendly Names
+
+**Node Types (MVP)**:
+
+| Internal Name | Display Name | Icon | Description |
+|---------------|--------------|------|-------------|
+| `removeBackground` | **Cut Out** | ✂️ | Remove background, keep subject |
+| `composite` | **Combine** | 🔲 | Layer multiple images together |
+| `backgroundSwap` | **Background Swap** | 🖼️ | Replace background (convenience node) |
+| `aiImage` | **AI Image** | ✨ | Generate/transform with AI |
+
+**Future Nodes**:
+
+| Internal Name | Display Name | Icon | Description |
+|---------------|--------------|------|-------------|
+| `aiVideo` | **AI Video** | 🎬 | Generate video with AI |
+| `aiText` | **AI Text** | 📝 | Generate dynamic text |
+
+**Node Details**:
+
+1. **Cut Out** (`removeBackground`)
+   - Input: Image
+   - Output: Image with transparent background
+   - Config: `mode: "keepSubject" | "keepBackground"`
+
+2. **Combine** (`composite`)
+   - Input: Multiple layers
+   - Output: Single composited image/video
+   - Config: `layers[]` with background, content, overlay
+   - Handles: static + static = image, static + video = video
+
+3. **Background Swap** (`backgroundSwap`)
+   - Input: Image with subject
+   - Output: Subject on new background
+   - Config: `backgroundSource` (asset or node output)
+   - Note: Convenience node - internally uses removeBackground + composite
+   - Simplifies common use case without manual pipeline setup
+
+4. **AI Image** (`aiImage`)
+   - Input: Image + prompt + references
+   - Output: AI-generated/transformed image
+   - Config: `promptTemplate`, `model`, `aspectRatio`, `references[]`
+
+**UI Grouping**:
+```
+BASIC
+  - Cut Out
+  - Combine
+  - Background Swap
+
+AI-POWERED
+  - AI Image
+  (Future: AI Video, AI Text)
+```
 
 ---
 
@@ -271,10 +403,10 @@ INPUTS (variableMappings)  →  PIPELINE (nodes)  →  OUTPUT
 
 | # | Topic | Decision |
 |---|-------|----------|
-| D1 | Storage Location | `/experiences/{expId}/transformConfigs/{stepId}` |
-| D2 | Draft/Published | Separate docs with `configType` field |
+| D1 | ~~Storage Location~~ | ~~`/experiences/{expId}/transformConfigs/{stepId}`~~ → See D23 |
+| D2 | ~~Draft/Published~~ | ~~Separate docs~~ → Embedded, follows experience versioning |
 | D3 | Intermediate Format | In-memory processing |
-| D4 | Node References | `previousNode` + named references |
+| D4 | Node References | `previousNode` + named references + variables |
 | D5 | BackgroundSwap | Accepts assets AND node outputs |
 | D6 | Error Security | Sanitized client errors, detailed server logs |
 | D7 | Guest Progress | Progress bar + generic step messages |
@@ -284,12 +416,18 @@ INPUTS (variableMappings)  →  PIPELINE (nodes)  →  OUTPUT
 | D11 | Validation | Loose draft, strict publish |
 | D12 | Prompt UI | Rich editor with Insert Variable |
 | D13 | Preview | Use ExperiencePreviewModal |
-| D14 | Reordering | Allow any, validate on save |
+| D14 | Reordering | Allow any order for nodes, validate on save |
 | D15 | Step Deletion | Warn + allow + fix before publish |
-| D16 | Transform Position | Must be last step |
-| D17 | Multiple Transforms | One per experience (MVP) |
+| D16 | Transform Position | Always last (enforced by schema) |
+| D17 | Multiple Transforms | One per experience |
 | D18 | Templates | Defer, use experience duplication |
-| D19 | Versioning | Auto-version on publish |
+| D19 | Versioning | Auto-version on publish (follows experience) |
 | D20 | Step Naming | Add `name` field to all steps |
-| D21 | Variable Location | Root-level `variableMappings` in transform config |
+| D21 | Variable Location | Root-level `variableMappings` in transform |
 | D22 | Variable Creation | Admin-defined, decoupled from step names |
+| D23 | Transform Storage | **Embed in experience doc** (no separate collection) |
+| D24 | Transform Schema | **Separate `transform` field** (not in steps array) |
+| D25 | Transform Position | Always last, enforced by separate slot |
+| D26 | Variable Defaults | Support `defaultValue` for fallback |
+| D27 | Node Types (MVP) | Cut Out, Combine, Background Swap, AI Image |
+| D28 | Node Naming | User-friendly names with icons |

@@ -32,13 +32,14 @@ A composable transform pipeline that:
 
 | Decision | Choice |
 |----------|--------|
-| Config Storage | `/experiences/{expId}/transformConfigs/{stepId}` |
+| Config Storage | **Embedded in experience doc** (no separate collection) |
+| Schema Position | Separate `transform` field (not in steps array) |
 | Validation | Loose on draft save, strict on publish |
-| Transform Position | Must be last step in experience |
-| Transforms per Experience | One (MVP) |
+| Transform Position | Always last (enforced by separate slot) |
+| Transforms per Experience | One |
 | Step Naming | Add `name` field to all steps |
-| Variable Location | Root-level `variableMappings` (not in nodes) |
-| Variable Creation | Admin-defined, decoupled from step names |
+| Variable Location | Root-level `variableMappings` |
+| Variable Defaults | Support `defaultValue` for fallbacks |
 | Timeout | 10 minutes |
 | Guest Progress | Progress bar + generic messages |
 
@@ -51,14 +52,16 @@ A composable transform pipeline that:
 
 ### Node Types (MVP)
 
-1. **Remove Background** - Extract subject from image
-2. **Background Swap** - Apply static OR AI-generated background
-3. **Apply Overlay** - Add frames, watermarks, branding
-4. **AI Image** - Full AI transformation with dynamic prompts
+| Internal | Display Name | Icon | Description |
+|----------|--------------|------|-------------|
+| `removeBackground` | **Cut Out** | ✂️ | Extract subject from image |
+| `composite` | **Combine** | 🔲 | Layer multiple images together |
+| `backgroundSwap` | **Background Swap** | 🖼️ | Replace background (convenience node) |
+| `aiImage` | **AI Image** | ✨ | AI transformation with dynamic prompts |
 
 ### Future Node Types
 
-- Compose GIF (multi-frame)
-- Apply Video Background
-- Face Swap
-- Style Transfer
+| Internal | Display Name | Icon |
+|----------|--------------|------|
+| `aiVideo` | **AI Video** | 🎬 |
+| `aiText` | **AI Text** | 📝 |

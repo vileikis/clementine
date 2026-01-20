@@ -2,116 +2,143 @@
 
 ## 1. Architecture Overview
 
-### 1.1 Client-Server Split
+### 1.1 Data Model (Simplified for MVP)
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                              CLIENT SIDE                                 │
+│                         EXPERIENCE DOCUMENT                              │
+│  Path: /workspaces/{workspaceId}/experiences/{experienceId}              │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                          │
-│  Experience Config (draft/published)                                     │
-│  ┌────────────────────────────────────────────────────────────────────┐ │
-│  │ steps: [                                                            │ │
-│  │   { id: "step1", type: "input.multiSelect", config: {...} },       │ │
-│  │   { id: "step2", type: "capture.photo", config: {...} },           │ │
-│  │   { id: "step3", type: "transform.pipeline", config: {             │ │
-│  │       // REDACTED - Only metadata visible to client                │ │
-│  │       nodeCount: 3,                                                 │ │
-│  │       estimatedDurationSec: 30,                                     │ │
-│  │       outputFormat: "image"                                         │ │
-│  │   }}                                                                │ │
-│  │ ]                                                                   │ │
-│  └────────────────────────────────────────────────────────────────────┘ │
+│  draft: {                                                                │
+│    steps: [                                                              │
+│      { id: "step1", name: "Pet Choice", type: "input.multiSelect", ...}, │
+│      { id: "step2", name: "Your Photo", type: "capture.photo", ...}      │
+│    ],                                                                    │
 │                                                                          │
-│  Session (subscribed via Firestore)                                      │
-│  ┌────────────────────────────────────────────────────────────────────┐ │
-│  │ answers: [...],                                                     │ │
-│  │ capturedMedia: [...],                                               │ │
-│  │ jobId: "job123" | null,                                             │ │
-│  │ jobStatus: "pending" | "running" | "completed" | "failed" | null,   │ │
-│  │ resultMedia: { url, assetId, ... } | null                           │ │
-│  └────────────────────────────────────────────────────────────────────┘ │
+│    // Transform is separate slot, not in steps array                     │
+│    transform: {                                                          │
+│      variableMappings: {                                                 │
+│        pet: { stepId: "step1", type: "answer", defaultValue: "cat" },    │
+│        photo: { stepId: "step2", type: "capturedMedia" }                 │
+│      },                                                                  │
+│      nodes: [                                                            │
+│        { type: "removeBackground", input: {...} },                       │
+│        { type: "aiImage", promptTemplate: "...", ... }                   │
+│      ],                                                                  │
+│      outputFormat: "image"                                               │
+│    }                                                                     │
+│  },                                                                      │
+│                                                                          │
+│  published: { ... }  // Same structure, snapshotted on publish           │
 │                                                                          │
 └─────────────────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                             SERVER SIDE                                  │
+│                           SESSION DOCUMENT                               │
+│  Path: /projects/{projectId}/sessions/{sessionId}                        │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                          │
-│  Transform Config (Firestore - separate collection or subcollection)     │
-│  Path: /experiences/{experienceId}/transformConfigs/{stepId}             │
-│     OR /projects/{projectId}/transformConfigs/{stepId}                   │
-│  ┌────────────────────────────────────────────────────────────────────┐ │
-│  │ stepId: "step3",                                                    │ │
-│  │ nodes: [                                                            │ │
-│  │   { type: "removeBackground", input: "capture:step2", ... },        │ │
-│  │   { type: "aiImage", prompt: "...", references: [...], ... },       │ │
-│  │   { type: "applyOverlay", overlayAssetId: "...", ... }              │ │
-│  │ ],                                                                  │ │
-│  │ outputFormat: "image",                                              │ │
-│  │ createdAt: ...,                                                     │ │
-│  │ updatedAt: ...                                                      │ │
-│  └────────────────────────────────────────────────────────────────────┘ │
+│  answers: [...],                   // Collected from input steps         │
+│  capturedMedia: [...],             // Collected from capture steps       │
+│  jobId: "job123" | null,           // Transform job reference            │
+│  jobStatus: "pending" | "running" | "completed" | "failed" | null,       │
+│  resultMedia: { url, assetId, ... } | null                               │
 │                                                                          │
-│  Job Document (Firestore)                                                │
+└─────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                             JOB DOCUMENT                                 │
 │  Path: /projects/{projectId}/jobs/{jobId}                                │
-│  ┌────────────────────────────────────────────────────────────────────┐ │
-│  │ id: "job123",                                                       │ │
-│  │ sessionId: "session456",                                            │ │
-│  │ experienceId: "exp789",                                             │ │
-│  │ stepId: "step3",                                                    │ │
-│  │ status: "pending" | "running" | "completed" | "failed",             │ │
-│  │ progress: { currentNode: 2, totalNodes: 3, message: "..." },        │ │
-│  │ inputs: { answers: [...], capturedMedia: [...] },                   │ │
-│  │ outputs: { assetId, url, format, ... } | null,                      │ │
-│  │ error: { code, message } | null,                                    │ │
-│  │ createdAt: ...,                                                     │ │
-│  │ startedAt: ...,                                                     │ │
-│  │ completedAt: ...                                                    │ │
-│  └────────────────────────────────────────────────────────────────────┘ │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  id: "job123",                                                           │
+│  sessionId: "session456",                                                │
+│  experienceId: "exp789",                                                 │
+│  status: "pending" | "running" | "completed" | "failed",                 │
+│  progress: { currentNode: 2, totalNodes: 3, message: "..." },            │
+│  inputs: { answers: [...], capturedMedia: [...] },                       │
+│  output: { assetId, url, format, ... } | null,                           │
+│  error: { code, message } | null,                                        │
+│  timestamps: { created, started, completed }                             │
 │                                                                          │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
+
+**Note**: Transform config is embedded in experience document (no separate collection).
+This simplifies versioning (follows experience draft/published) and speeds up MVP delivery.
+See decisions.md D23 for rationale.
 
 ### 1.2 Data Flow
 
 ```
-Guest completes experience steps
-            │
-            ▼
-┌─────────────────────────────┐
-│ Client: Transform Renderer  │
-│ - Shows loading UI          │
-│ - Calls startTransformJob() │
-└─────────────────────────────┘
-            │
-            ▼
-┌─────────────────────────────┐
-│ HTTP Function:              │
-│ startTransformPipeline      │
-│ - Validates session         │
-│ - Creates job document      │
-│ - Queues Cloud Task         │
-│ - Updates session.jobId     │
-└─────────────────────────────┘
-            │
-            ▼
-┌─────────────────────────────┐
-│ Cloud Task:                 │
-│ transformPipelineJob        │
-│ - Fetches transform config  │
-│ - Resolves step references  │
-│ - Executes nodes in order   │
-│ - Uploads result to Storage │
-│ - Updates session.resultMedia│
-└─────────────────────────────┘
-            │
-            ▼
-┌─────────────────────────────┐
-│ Client: Firestore listener  │
-│ - Detects jobStatus change  │
-│ - Redirects to share screen │
-└─────────────────────────────┘
+Guest completes experience steps (info, input, capture)
+                    │
+                    ▼
+┌───────────────────────────────────────┐
+│ Client: Runtime detects all steps done │
+│ - Checks if experience.transform exists│
+│ - If yes, shows transform phase UI     │
+│ - Calls startTransformJob()            │
+└───────────────────────────────────────┘
+                    │
+                    ▼
+┌───────────────────────────────────────┐
+│ HTTP Function: startTransformPipeline  │
+│ - Validates session                    │
+│ - Fetches experience with transform    │
+│ - Creates job document                 │
+│ - Queues Cloud Task                    │
+│ - Updates session.jobId                │
+└───────────────────────────────────────┘
+                    │
+                    ▼
+┌───────────────────────────────────────┐
+│ Cloud Task: transformPipelineJob       │
+│ - Reads transform config from job/exp  │
+│ - Resolves variables from session data │
+│ - Executes nodes in order              │
+│ - Uploads result to Storage            │
+│ - Updates session.resultMedia          │
+│ - Updates session.jobStatus            │
+└───────────────────────────────────────┘
+                    │
+                    ▼
+┌───────────────────────────────────────┐
+│ Client: Firestore subscription         │
+│ - Detects session.jobStatus change     │
+│ - Shows progress during "running"      │
+│ - On "completed", redirects to share   │
+│ - On "failed", shows error + retry     │
+└───────────────────────────────────────┘
+```
+
+### 1.3 Runtime Adaptation
+
+Since transform is a separate slot (not in steps array), the runtime handles it as a phase:
+
+```typescript
+// ExperienceRuntime pseudo-code
+
+const allSteps = useMemo(() => {
+  const base = experience.draft.steps
+
+  // Inject transform as virtual step at end
+  if (experience.draft.transform) {
+    return [
+      ...base,
+      {
+        id: 'transform',
+        type: 'transform.pipeline',
+        name: 'Processing',
+        config: experience.draft.transform
+      }
+    ]
+  }
+  return base
+}, [experience.draft])
+
+// Rest of runtime iterates through allSteps as normal
 ```
 
 ## 2. Data Schemas
@@ -143,34 +170,35 @@ export const baseStepSchema = z.object({
 })
 ```
 
-### 2.1 Transform Step Config (Client-Visible - Minimal)
+### 2.1 Experience Config Schema (Updated)
 
 ```typescript
-// apps/clementine-app/src/domains/experience/steps/schemas/transform-pipeline.schema.ts
+// apps/clementine-app/src/domains/experience/shared/schemas/experience.schema.ts
 
 /**
- * Client-visible transform config
- * Contains ONLY non-sensitive metadata
+ * Experience Config - contains steps and optional transform
+ * Transform is a separate slot, not in steps array
  */
-export const transformPipelineStepConfigSchema = z.object({
-  /** Number of nodes in pipeline (for progress estimation) */
-  nodeCount: z.number().int().min(1).default(1),
+export const experienceConfigSchema = z.looseObject({
+  /**
+   * User-facing steps (info, input, capture)
+   * Does NOT include transform - that's a separate slot
+   */
+  steps: z.array(stepSchema).default([]),
 
-  /** Estimated processing duration in seconds */
-  estimatedDurationSec: z.number().int().min(1).default(30),
-
-  /** Expected output format */
-  outputFormat: z.enum(['image', 'gif', 'video']).default('image'),
-
-  /** Loading message to show during processing */
-  loadingMessage: z.string().max(200).nullable().default(null),
+  /**
+   * Transform configuration (optional)
+   * Processed after all steps complete
+   * null = no transform, experience ends after last step
+   */
+  transform: transformConfigSchema.nullable().default(null),
 })
 ```
 
-### 2.2 Transform Config (Server-Only - Full Details)
+### 2.2 Transform Config (Embedded in Experience)
 
 ```typescript
-// functions/src/lib/schemas/transform-config.schema.ts
+// apps/clementine-app/src/domains/experience/shared/schemas/transform.schema.ts
 
 /**
  * Variable mapping - maps a variable name to a step's data
@@ -185,6 +213,17 @@ export const variableMappingSchema = z.object({
 
   /** Optional: specific field within the answer (for structured answers) */
   field: z.string().nullable().default(null),
+
+  /**
+   * Default/fallback value if step data is empty or missing
+   * Used when: step was skipped, answer is empty, or step doesn't exist
+   */
+  defaultValue: z.union([
+    z.string(),
+    z.number(),
+    z.boolean(),
+    z.null()
+  ]).default(null),
 })
 
 /**
@@ -223,6 +262,9 @@ export const nodeInputSourceSchema = z.discriminatedUnion('source', [
 
 /**
  * Remove Background Node
+ *
+ * Display name: "Cut Out"
+ * Icon: ✂️
  */
 export const removeBackgroundNodeSchema = z.object({
   id: z.string().uuid(),
@@ -250,7 +292,17 @@ export const backgroundSourceSchema = z.discriminatedUnion('type', [
 ])
 
 /**
- * Background Swap Node
+ * Background Swap Node (Convenience Node)
+ *
+ * Display name: "Background Swap"
+ * Icon: 🖼️
+ *
+ * This is a convenience node that internally combines:
+ * 1. Remove background from input
+ * 2. Composite subject onto new background
+ *
+ * Simplifies the common use case of replacing backgrounds
+ * without requiring manual removeBackground + composite setup.
  */
 export const backgroundSwapNodeSchema = z.object({
   id: z.string().uuid(),
@@ -262,25 +314,56 @@ export const backgroundSwapNodeSchema = z.object({
 })
 
 /**
- * Apply Overlay Node
+ * Layer configuration for composite node
  */
-export const applyOverlayNodeSchema = z.object({
-  id: z.string().uuid(),
-  type: z.literal('applyOverlay'),
-  input: nodeInputSourceSchema,
+export const compositeLayerSchema = z.object({
+  /** Layer source - variable, node output, or asset */
+  source: z.discriminatedUnion('type', [
+    z.object({ type: z.literal('variable'), variableName: z.string() }),
+    z.object({ type: z.literal('node'), nodeId: z.string() }),
+    z.object({ type: z.literal('previousNode') }),
+    z.object({ type: z.literal('asset'), asset: mediaReferenceSchema }),
+  ]),
 
-  /** Overlay image (PNG with transparency) */
-  overlayAsset: mediaReferenceSchema,
+  /** Position in stack (0 = bottom/background) */
+  zIndex: z.number().int().min(0).default(0),
 
-  /** Position of overlay */
-  position: z.enum(['stretch', 'center', 'topLeft', 'topRight', 'bottomLeft', 'bottomRight']).default('stretch'),
+  /** How to fit the layer */
+  fit: z.enum(['cover', 'contain', 'stretch', 'none']).default('cover'),
 
   /** Opacity (0-1) */
   opacity: z.number().min(0).max(1).default(1),
 })
 
 /**
+ * Composite Node (Unified Layering)
+ *
+ * Display name: "Combine"
+ * Icon: 🔲
+ *
+ * Replaces separate backgroundSwap and applyOverlay nodes.
+ * Layers multiple images together with configurable stacking order.
+ * If any layer is video, output becomes video.
+ */
+export const compositeNodeSchema = z.object({
+  id: z.string().uuid(),
+  type: z.literal('composite'),
+
+  /**
+   * Layers to combine (ordered by zIndex)
+   * Typically: background (0), content (1), overlay (2)
+   */
+  layers: z.array(compositeLayerSchema).min(1),
+
+  /** Output format - auto-detect from inputs or force specific format */
+  outputFormat: z.enum(['auto', 'image', 'gif', 'video']).default('auto'),
+})
+
+/**
  * AI Image Generation Node
+ *
+ * Display name: "AI Image"
+ * Icon: ✨
  */
 export const aiImageNodeSchema = z.object({
   id: z.string().uuid(),
@@ -342,39 +425,36 @@ export const applyVideoBackgroundNodeSchema = z.object({
 })
 
 /**
- * Union of all node types
+ * Union of all node types (MVP)
+ *
+ * Node naming:
+ * - removeBackground → "Cut Out" ✂️
+ * - composite → "Combine" 🔲
+ * - backgroundSwap → "Background Swap" 🖼️ (convenience node)
+ * - aiImage → "AI Image" ✨
  */
 export const transformNodeSchema = z.discriminatedUnion('type', [
-  removeBackgroundNodeSchema,
-  backgroundSwapNodeSchema,
-  applyOverlayNodeSchema,
-  aiImageNodeSchema,
+  removeBackgroundNodeSchema,   // Cut Out
+  compositeNodeSchema,          // Combine
+  backgroundSwapNodeSchema,     // Background Swap (convenience)
+  aiImageNodeSchema,            // AI Image
   // Future:
-  // composeGifNodeSchema,
-  // applyVideoBackgroundNodeSchema,
+  // aiVideoNodeSchema,         // AI Video 🎬
+  // aiTextNodeSchema,          // AI Text 📝
 ])
 
 /**
- * Complete Transform Config (Server-Only)
+ * Complete Transform Config (Embedded in Experience)
  *
  * Structure:
  * - variableMappings: INPUTS - map variable names to step data
  * - nodes: PIPELINE - ordered array of transform operations
  * - outputFormat: OUTPUT - final format
+ *
+ * Note: This is embedded in experience.draft.transform and experience.published.transform
+ * No separate collection needed - versioning follows experience versioning.
  */
 export const transformConfigSchema = z.object({
-  /** Step ID this config belongs to */
-  stepId: z.string(),
-
-  /** Experience ID */
-  experienceId: z.string(),
-
-  /** Version (syncs with experience draft/published version) */
-  version: z.number().int().min(1),
-
-  /** Whether this is draft or published */
-  configType: z.enum(['draft', 'published']),
-
   /**
    * INPUTS: Variable mappings
    * Maps variable names to step data (answers or captured media)
@@ -382,8 +462,8 @@ export const transformConfigSchema = z.object({
    *
    * Example:
    * {
-   *   pet: { type: "answer", stepId: "step1" },
-   *   photo: { type: "capturedMedia", stepId: "step3" }
+   *   pet: { type: "answer", stepId: "step1", defaultValue: "cat" },
+   *   photo: { type: "capturedMedia", stepId: "step3", defaultValue: null }
    * }
    */
   variableMappings: z.record(z.string(), variableMappingSchema).default({}),
@@ -400,9 +480,8 @@ export const transformConfigSchema = z.object({
   /** OUTPUT: Expected output format */
   outputFormat: z.enum(['image', 'gif', 'video']).default('image'),
 
-  /** Timestamps */
-  createdAt: z.number(),
-  updatedAt: z.number(),
+  /** Loading message shown during processing */
+  loadingMessage: z.string().max(200).nullable().default(null),
 })
 
 export type TransformConfig = z.infer<typeof transformConfigSchema>

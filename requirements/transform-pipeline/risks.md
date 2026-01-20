@@ -1,25 +1,37 @@
 # Transform Pipeline - Risks & Mitigations
 
-## Critical Risks
+## Re-evaluated Risks
 
-### R1: Prompt/Config Leakage to Clients
+### R1: Prompt/Config Visibility to Clients
 
-**Risk**: Transform configuration (prompts, node details, referenced assets) could be exposed to end users through:
+**Risk**: Transform configuration (prompts, node details) visible to technically-savvy users through:
 - Experience document returned to client
-- Error messages
 - Network inspection
-- Client-side logging
 
-**Impact**: HIGH - Competitive advantage lost, potential security issues
+**Impact**: **LOW** (Re-evaluated from HIGH)
 
-**Mitigations**:
-1. Store transform config in separate server-only Firestore collection
-2. Client-visible step config contains only metadata (nodeCount, estimatedDuration)
-3. Error messages sanitized before returning to client
-4. Server-side only access via Firebase Admin SDK
-5. Security rules explicitly deny client read access to transform configs
+**Re-evaluation rationale**:
+1. **Competitor validation**: Major market players (established photobooth SaaS) don't hide prompts, customers don't churn over this
+2. **Who sees it?**: Only guests who inspect network requests - tiny fraction of users
+3. **What's actually proprietary?**: Platform, UX, and speed of execution are the moat, not prompts
+4. **Reverse engineering**: Users could screenshot outputs and reverse-engineer prompts anyway
+5. **Concierge phase**: Early users are trusted partners, not adversaries
 
-**Status**: Design addressed in spec.md
+**Decision**: **Accept risk for MVP** - Embed transform config in experience document
+
+**Mitigations** (still applied):
+1. Error messages sanitized before returning to client
+2. Don't market "secure prompts" as a feature
+3. Document as intentional technical debt
+
+**Revisit triggers**:
+- Enterprise customer explicitly requests prompt security
+- Evidence of prompt copying in the wild
+- Scaling beyond concierge phase with untrusted users
+
+**Migration path if needed**: Move to `/experiences/{expId}/transformConfigs/{stepId}` subcollection with admin-only security rules
+
+**Status**: Accepted for MVP
 
 ---
 
@@ -222,8 +234,8 @@
 
 | Risk | Likelihood | Impact | Priority |
 |------|------------|--------|----------|
-| R1: Config Leakage | Medium | High | **P0** |
-| R2: Step Reference Integrity | High | Medium | **P0** |
+| R1: Config Visibility | Medium | **Low** | **P3** (Accepted) |
+| R2: Step Reference Integrity | High | Medium | **P1** |
 | R3: Timeout | Medium | Medium | **P1** |
 | R4: AI Failures | High | Medium | **P1** |
 | R5: Storage Costs | Medium | Low | **P2** |
@@ -238,6 +250,6 @@
 
 ## Next Steps
 
-1. Address P0 risks in initial design
-2. Plan P1 mitigations for MVP
-3. Document P2/P3 for post-MVP consideration
+1. Address P1 risks in initial design (R2, R3, R4, R6)
+2. Plan P2 mitigations for post-MVP
+3. R1 (Config Visibility) accepted for MVP - revisit if enterprise customers request
