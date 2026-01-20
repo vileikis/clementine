@@ -73,6 +73,7 @@ export function CapturePhotoRunMode({
     capture,
     retake,
     setStatus,
+    setPhotoForPreview,
   } = usePhotoCapture({ cameraRef })
 
   // Uploading state (separate from capture status for better control)
@@ -128,11 +129,11 @@ export function CapturePhotoRunMode({
     [photo, sessionId, projectId, step.id, setCapturedMedia, onSubmit],
   )
 
-  // Library picker for fallback
+  // Library picker - goes to preview first so user can confirm
   const { fileInputRef, openPicker, handleFileChange } = useLibraryPicker({
     onSelect: (selectedPhoto) => {
-      // Library picker bypasses camera, upload directly
-      handleConfirmAndUpload(selectedPhoto)
+      // Go to preview screen so user can confirm before upload
+      setPhotoForPreview(selectedPhoto)
     },
     onError: (err) => {
       setUploadError(err.message)

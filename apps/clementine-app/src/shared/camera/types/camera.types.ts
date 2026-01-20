@@ -190,6 +190,8 @@ export interface UsePhotoCaptureReturn {
   reset: () => void
   /** Set the capture status manually */
   setStatus: (status: PhotoCaptureStatus) => void
+  /** Set a photo directly (e.g., from library) and go to preview */
+  setPhotoForPreview: (photo: CapturedPhoto) => void
 }
 
 // Forward reference for CameraViewRef - actual type is in CameraView.tsx
