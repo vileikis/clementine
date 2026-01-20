@@ -173,11 +173,7 @@ export function ExperiencePreviewModal({
   }, [])
 
   return (
-    <FullscreenPreviewShell
-      isOpen={open}
-      onClose={handleClose}
-      title="Preview Mode"
-    >
+    <FullscreenPreviewShell isOpen={open} onClose={handleClose}>
       {/* Loading state */}
       {isLoading && (
         <div className="flex h-full items-center justify-center">

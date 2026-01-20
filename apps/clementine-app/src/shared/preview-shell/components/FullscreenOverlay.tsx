@@ -17,7 +17,6 @@ export function FullscreenOverlay({
   isOpen,
   onClose,
   children,
-  title = 'Preview',
   showViewportSwitcher = false,
   onModeChange,
   className,
@@ -35,17 +34,8 @@ export function FullscreenOverlay({
       )}
     >
       {/* Header */}
-      <div className="flex h-14 items-center justify-between border-b px-4">
-        <h2 className="text-lg font-semibold">{title}</h2>
-
+      <div className="flex h-14 items-center justify-center px-4">
         <div className="flex items-center gap-2">
-          {showViewportSwitcher && onModeChange && (
-            <ViewportSwitcher
-              mode={mode}
-              onModeChange={onModeChange}
-              size="sm"
-            />
-          )}
           <Button
             variant="ghost"
             size="icon"
@@ -55,6 +45,13 @@ export function FullscreenOverlay({
           >
             <X size={20} />
           </Button>
+          {showViewportSwitcher && onModeChange && (
+            <ViewportSwitcher
+              mode={mode}
+              onModeChange={onModeChange}
+              size="sm"
+            />
+          )}
         </div>
       </div>
 

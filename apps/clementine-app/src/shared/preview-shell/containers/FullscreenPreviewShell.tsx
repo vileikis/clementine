@@ -4,8 +4,7 @@ import { useEffect } from 'react'
 import { ViewportProvider } from '../context/ViewportContext'
 import { useViewportStore } from '../store/viewportStore'
 import { useFullscreen } from '../hooks/useFullscreen'
-import { DeviceFrame } from '../components/DeviceFrame'
-import { FullscreenOverlay } from '../components/FullscreenOverlay'
+import { DeviceFrame, FullscreenOverlay } from '../components'
 import type { FullscreenPreviewShellProps } from '../types/preview-shell.types'
 
 /**
@@ -19,11 +18,7 @@ import type { FullscreenPreviewShellProps } from '../types/preview-shell.types'
  *
  * @example
  * ```tsx
- * <FullscreenPreviewShell
- *   isOpen={open}
- *   onClose={handleClose}
- *   title="Preview Mode"
- * >
+ * <FullscreenPreviewShell isOpen={open} onClose={handleClose}>
  *   <MyPreviewContent />
  * </FullscreenPreviewShell>
  * ```
@@ -32,7 +27,6 @@ export function FullscreenPreviewShell({
   isOpen,
   onClose,
   children,
-  title = 'Preview',
   showViewportSwitcher = true,
 }: FullscreenPreviewShellProps) {
   // Viewport state from global store (persists across sessions)
@@ -57,7 +51,6 @@ export function FullscreenPreviewShell({
       <FullscreenOverlay
         isOpen={isOpen}
         onClose={onClose}
-        title={title}
         showViewportSwitcher={showViewportSwitcher}
         onModeChange={setMode}
       >

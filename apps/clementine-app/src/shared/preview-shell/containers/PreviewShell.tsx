@@ -3,9 +3,11 @@
 import { ViewportProvider } from '../context/ViewportContext'
 import { useViewportStore } from '../store/viewportStore'
 import { useFullscreen } from '../hooks/useFullscreen'
-import { DeviceFrame } from '../components/DeviceFrame'
-import { PreviewShellControls } from '../components/PreviewShellControls'
-import { FullscreenOverlay } from '../components/FullscreenOverlay'
+import {
+  DeviceFrame,
+  FullscreenOverlay,
+  PreviewShellControls,
+} from '../components'
 import type { PreviewShellProps } from '../types/preview-shell.types'
 import { cn } from '@/shared/utils'
 
@@ -79,7 +81,6 @@ export function PreviewShell({
           <FullscreenOverlay
             isOpen={isFullscreen}
             onClose={exit}
-            title="Preview"
             showViewportSwitcher={enableViewportSwitcher}
             onModeChange={handleModeChange}
           >

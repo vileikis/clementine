@@ -47,7 +47,6 @@ export interface FullscreenOverlayProps {
   isOpen: boolean
   onClose: () => void
   children: React.ReactNode
-  title?: string
   showViewportSwitcher?: boolean
   onModeChange?: (mode: ViewportMode) => void
   className?: string
@@ -89,8 +88,6 @@ export interface FullscreenPreviewShellProps {
   onClose: () => void
   /** Content to render in the preview */
   children: React.ReactNode
-  /** Title shown in the header */
-  title?: string
   /** Whether to show the viewport switcher (default: true) */
   showViewportSwitcher?: boolean
 }
