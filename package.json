@@ -4,22 +4,27 @@
   "description": "Clementine - the digital AI photobooth",
   "private": true,
   "scripts": {
-    "app:dev": "pnpm --filter @clementine/app dev",
-    "app:build": "pnpm --filter @clementine/app build",
+    "build": "turbo run build",
+    "dev": "turbo run dev --filter=@clementine/app",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "type-check": "turbo run type-check",
+    "app:dev": "turbo run dev --filter=@clementine/app",
+    "app:build": "turbo run build --filter=@clementine/app",
     "app:start": "pnpm --filter @clementine/app start",
-    "app:lint": "pnpm --filter @clementine/app lint",
-    "app:type-check": "pnpm --filter @clementine/app type-check",
+    "app:lint": "turbo run lint --filter=@clementine/app",
+    "app:type-check": "turbo run type-check --filter=@clementine/app",
     "app:format": "pnpm --filter @clementine/app format",
     "app:check": "pnpm --filter @clementine/app check",
-    "app:test": "pnpm --filter @clementine/app test",
-    "fb:deploy": "firebase deploy",
-    "fb:deploy:rules": "firebase deploy --only firestore:rules,storage",
-    "fb:deploy:indexes": "firebase deploy --only firestore:indexes",
-    "functions:build": "pnpm --filter @clementine/shared build && pnpm --filter @clementine/functions build",
+    "app:test": "turbo run test --filter=@clementine/app",
+    "functions:build": "turbo run build --filter=@clementine/functions",
     "functions:seed": "pnpm --filter @clementine/functions seed",
     "functions:serve": "pnpm --filter @clementine/functions serve",
     "functions:serve:prod": "pnpm --filter @clementine/functions serve:prod",
     "functions:deploy": "./functions/scripts/deploy.sh",
+    "fb:deploy": "firebase deploy",
+    "fb:deploy:rules": "firebase deploy --only firestore:rules,storage",
+    "fb:deploy:indexes": "firebase deploy --only firestore:indexes",
     "worktree": "./scripts/new-worktree.sh"
   },
   "keywords": [
@@ -27,5 +32,8 @@
     "photobooth",
     "monorepo"
   ],
-  "packageManager": "pnpm@10.18.1"
+  "packageManager": "pnpm@10.18.1",
+  "devDependencies": {
+    "turbo": "^2.7.5"
+  }
 }
