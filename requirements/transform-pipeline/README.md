@@ -6,14 +6,15 @@ The Transform Pipeline step is a special step type that processes media (photos,
 
 ## Status
 
-**Phase**: Requirements Complete (Ready for Implementation Planning)
-**Last Updated**: 2026-01-19
+**Phase**: Implementation Planning Complete
+**Last Updated**: 2026-01-20
 
 ## Documents
 
+- [prd-phases.md](./prd-phases.md) - **Implementation phases** (8 phases defined)
 - [spec.md](./spec.md) - Detailed technical specification
 - [use-cases.md](./use-cases.md) - Detailed use case examples
-- [decisions.md](./decisions.md) - **Finalized decisions** (20 decisions made)
+- [decisions.md](./decisions.md) - Finalized decisions (29 decisions made)
 - [open-questions.md](./open-questions.md) - Original questions (now answered)
 - [risks.md](./risks.md) - Risk analysis and mitigations
 - [discussion.md](./discussion.md) - Design discussion points
