@@ -13,7 +13,9 @@ interface CapturePhotoEditModeProps {
   aspectRatio: '1:1' | '9:16'
 }
 
-export function CapturePhotoEditMode({ aspectRatio }: CapturePhotoEditModeProps) {
+export function CapturePhotoEditMode({
+  aspectRatio,
+}: CapturePhotoEditModeProps) {
   const { theme } = useEventTheme()
   const isSquare = aspectRatio === '1:1'
 

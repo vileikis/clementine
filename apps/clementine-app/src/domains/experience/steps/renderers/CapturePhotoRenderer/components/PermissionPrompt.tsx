@@ -11,7 +11,9 @@ interface PermissionPromptProps {
   onRequestPermission: () => void
 }
 
-export function PermissionPrompt({ onRequestPermission }: PermissionPromptProps) {
+export function PermissionPrompt({
+  onRequestPermission,
+}: PermissionPromptProps) {
   const { theme } = useEventTheme()
 
   return (
@@ -37,11 +39,7 @@ export function PermissionPrompt({ onRequestPermission }: PermissionPromptProps)
       </ThemedText>
 
       {/* Action button */}
-      <ThemedButton
-        onClick={onRequestPermission}
-        size="lg"
-        className="w-full"
-      >
+      <ThemedButton onClick={onRequestPermission} size="lg" className="w-full">
         Allow Camera
       </ThemedButton>
     </div>

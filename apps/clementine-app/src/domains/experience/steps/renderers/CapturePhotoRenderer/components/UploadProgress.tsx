@@ -5,8 +5,8 @@
  */
 
 import { Loader2 } from 'lucide-react'
-import { ThemedText } from '@/shared/theming'
 import type { CapturedPhoto } from '@/shared/camera'
+import { ThemedText } from '@/shared/theming'
 
 interface UploadProgressProps {
   photo: CapturedPhoto | null
@@ -30,7 +30,10 @@ export function UploadProgress({ photo, isSquare }: UploadProgressProps) {
           />
           {/* Overlay with spinner */}
           <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-            <Loader2 className="h-12 w-12 animate-spin" style={{ color: 'white' }} />
+            <Loader2
+              className="h-12 w-12 animate-spin"
+              style={{ color: 'white' }}
+            />
           </div>
         </div>
       )}

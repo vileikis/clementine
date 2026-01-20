@@ -33,8 +33,16 @@ import {
   UploadProgress,
 } from './components'
 import type { StepRendererProps } from '../../registry/step-registry'
-import type { CameraViewRef, CapturedPhoto, CameraCaptureError } from '@/shared/camera'
-import { useCameraPermission, useLibraryPicker, usePhotoCapture } from '@/shared/camera'
+import type {
+  CameraCaptureError,
+  CameraViewRef,
+  CapturedPhoto,
+} from '@/shared/camera'
+import {
+  useCameraPermission,
+  useLibraryPicker,
+  usePhotoCapture,
+} from '@/shared/camera'
 
 interface CapturePhotoRunModeProps {
   step: StepRendererProps['step']
@@ -167,7 +175,8 @@ export function CapturePhotoRunMode({
   }, [])
 
   // Derive error message for error state
-  const errorMessage = uploadError || error?.message || 'Failed to capture photo'
+  const errorMessage =
+    uploadError || error?.message || 'Failed to capture photo'
 
   // Permission: unknown (loading)
   if (permStatus === 'unknown') {
