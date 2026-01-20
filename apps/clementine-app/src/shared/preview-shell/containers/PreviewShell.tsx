@@ -3,17 +3,20 @@
 import { ViewportProvider } from '../context/ViewportContext'
 import { useViewportStore } from '../store/viewportStore'
 import { useFullscreen } from '../hooks/useFullscreen'
-import { DeviceFrame } from './DeviceFrame'
-import { PreviewShellControls } from './PreviewShellControls'
-import { FullscreenOverlay } from './FullscreenOverlay'
+import { DeviceFrame } from '../components/DeviceFrame'
+import { PreviewShellControls } from '../components/PreviewShellControls'
+import { FullscreenOverlay } from '../components/FullscreenOverlay'
 import type { PreviewShellProps } from '../types/preview-shell.types'
 import { cn } from '@/shared/utils'
 
 /**
  * Preview Shell Component
  *
- * Main orchestrator for viewport switching and fullscreen state management
- * Supports both controlled and uncontrolled viewport modes
+ * 2-column editor layout with inline preview and optional fullscreen mode.
+ * Supports both controlled and uncontrolled viewport modes.
+ *
+ * Use this for editor pages with live preview (e.g., ShareEditorPage, ThemeEditorPage).
+ * For fullscreen-only modals, use FullscreenPreviewShell instead.
  */
 export function PreviewShell({
   children,

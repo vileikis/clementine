@@ -81,3 +81,16 @@ export interface UseFullscreenReturn {
   exit: () => void
   toggle: () => void
 }
+
+export interface FullscreenPreviewShellProps {
+  /** Whether the fullscreen preview is open */
+  isOpen: boolean
+  /** Callback when the preview should close */
+  onClose: () => void
+  /** Content to render in the preview */
+  children: React.ReactNode
+  /** Title shown in the header */
+  title?: string
+  /** Whether to show the viewport switcher (default: true) */
+  showViewportSwitcher?: boolean
+}

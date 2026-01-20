@@ -1,6 +1,8 @@
-// Components
+// Containers (composed shells)
+export { PreviewShell, FullscreenPreviewShell } from './containers'
+
+// Components (primitives)
 export {
-  PreviewShell,
   DeviceFrame,
   ViewportSwitcher,
   FullscreenOverlay,

@@ -25,8 +25,8 @@
 
 **Purpose**: Verify prerequisites and understand current implementation
 
-- [ ] T001 Review current ExperiencePreviewModal.tsx implementation in `apps/clementine-app/src/domains/experience/preview/containers/ExperiencePreviewModal.tsx`
-- [ ] T002 Verify preview-shell exports are available by checking `apps/clementine-app/src/shared/preview-shell/index.ts`
+- [X] T001 Review current ExperiencePreviewModal.tsx implementation in `apps/clementine-app/src/domains/experience/preview/containers/ExperiencePreviewModal.tsx`
+- [X] T002 Verify preview-shell exports are available by checking `apps/clementine-app/src/shared/preview-shell/index.ts`
 
 ---
 
@@ -38,12 +38,12 @@
 
 ### Implementation for User Story 1
 
-- [ ] T003 [US1] Update imports: remove Dialog/DialogContent/DialogTitle, add FullscreenOverlay/DeviceFrame/ViewportProvider from `@/shared/preview-shell` in `apps/clementine-app/src/domains/experience/preview/containers/ExperiencePreviewModal.tsx`
-- [ ] T004 [US1] Remove custom header div (absolute positioned with close button) in `apps/clementine-app/src/domains/experience/preview/containers/ExperiencePreviewModal.tsx`
-- [ ] T005 [US1] Replace Dialog wrapper with FullscreenOverlay: set `isOpen={open}`, `onClose={handleClose}`, `title="Preview Mode"` in `apps/clementine-app/src/domains/experience/preview/containers/ExperiencePreviewModal.tsx`
-- [ ] T006 [US1] Remove pt-14 padding from content wrapper (no longer needed without absolute header) in `apps/clementine-app/src/domains/experience/preview/containers/ExperiencePreviewModal.tsx`
-- [ ] T007 [US1] Wrap content states (loading/error/empty/runtime) in DeviceFrame component in `apps/clementine-app/src/domains/experience/preview/containers/ExperiencePreviewModal.tsx`
-- [ ] T008 [US1] Remove unused imports (X icon, cn utility if no longer needed) in `apps/clementine-app/src/domains/experience/preview/containers/ExperiencePreviewModal.tsx`
+- [X] T003 [US1] Update imports: remove Dialog/DialogContent/DialogTitle, add FullscreenOverlay/DeviceFrame/ViewportProvider from `@/shared/preview-shell` in `apps/clementine-app/src/domains/experience/preview/containers/ExperiencePreviewModal.tsx`
+- [X] T004 [US1] Remove custom header div (absolute positioned with close button) in `apps/clementine-app/src/domains/experience/preview/containers/ExperiencePreviewModal.tsx`
+- [X] T005 [US1] Replace Dialog wrapper with FullscreenOverlay: set `isOpen={open}`, `onClose={handleClose}`, `title="Preview Mode"` in `apps/clementine-app/src/domains/experience/preview/containers/ExperiencePreviewModal.tsx`
+- [X] T006 [US1] Remove pt-14 padding from content wrapper (no longer needed without absolute header) in `apps/clementine-app/src/domains/experience/preview/containers/ExperiencePreviewModal.tsx`
+- [X] T007 [US1] Wrap content states (loading/error/empty/runtime) in DeviceFrame component in `apps/clementine-app/src/domains/experience/preview/containers/ExperiencePreviewModal.tsx`
+- [X] T008 [US1] Remove unused imports (X icon, cn utility if no longer needed) in `apps/clementine-app/src/domains/experience/preview/containers/ExperiencePreviewModal.tsx`
 
 **Checkpoint**: Preview opens in fullscreen overlay with close button - basic functionality working
 
@@ -57,10 +57,10 @@
 
 ### Implementation for User Story 2
 
-- [ ] T009 [US2] Add useViewportStore import from `@/shared/preview-shell` in `apps/clementine-app/src/domains/experience/preview/containers/ExperiencePreviewModal.tsx`
-- [ ] T010 [US2] Add viewport state hook: `const { mode, setMode } = useViewportStore()` in `apps/clementine-app/src/domains/experience/preview/containers/ExperiencePreviewModal.tsx`
-- [ ] T011 [US2] Wrap FullscreenOverlay with ViewportProvider: `<ViewportProvider mode={mode}>` in `apps/clementine-app/src/domains/experience/preview/containers/ExperiencePreviewModal.tsx`
-- [ ] T012 [US2] Enable viewport switcher: add `showViewportSwitcher` and `onModeChange={setMode}` props to FullscreenOverlay in `apps/clementine-app/src/domains/experience/preview/containers/ExperiencePreviewModal.tsx`
+- [X] T009 [US2] Add useViewportStore import from `@/shared/preview-shell` in `apps/clementine-app/src/domains/experience/preview/containers/ExperiencePreviewModal.tsx`
+- [X] T010 [US2] Add viewport state hook: `const { mode, setMode } = useViewportStore()` in `apps/clementine-app/src/domains/experience/preview/containers/ExperiencePreviewModal.tsx`
+- [X] T011 [US2] Wrap FullscreenOverlay with ViewportProvider: `<ViewportProvider mode={mode}>` in `apps/clementine-app/src/domains/experience/preview/containers/ExperiencePreviewModal.tsx`
+- [X] T012 [US2] Enable viewport switcher: add `showViewportSwitcher` and `onModeChange={setMode}` props to FullscreenOverlay in `apps/clementine-app/src/domains/experience/preview/containers/ExperiencePreviewModal.tsx`
 
 **Checkpoint**: Viewport switching works and persists across preview sessions
 
@@ -74,8 +74,8 @@
 
 ### Verification for User Story 3
 
-- [ ] T013 [US3] Verify FullscreenOverlay usage matches ShareEditorPage pattern by comparing with `apps/clementine-app/src/domains/event/share/containers/ShareEditorPage.tsx`
-- [ ] T014 [US3] Ensure viewport switcher has same size="sm" prop for consistency in `apps/clementine-app/src/domains/experience/preview/containers/ExperiencePreviewModal.tsx`
+- [X] T013 [US3] Verify FullscreenOverlay usage matches ShareEditorPage pattern by comparing with `apps/clementine-app/src/domains/event/share/containers/ShareEditorPage.tsx`
+- [X] T014 [US3] Ensure viewport switcher has same size="sm" prop for consistency in `apps/clementine-app/src/domains/experience/preview/containers/ExperiencePreviewModal.tsx`
 
 **Checkpoint**: Preview UI is consistent with other editor previews
 
@@ -85,9 +85,9 @@
 
 **Purpose**: Final validation and cleanup
 
-- [ ] T015 Run `pnpm lint` from `apps/clementine-app/` to verify no linting errors
-- [ ] T016 Run `pnpm type-check` from `apps/clementine-app/` to verify TypeScript compiles
-- [ ] T017 Run `pnpm check` from `apps/clementine-app/` to auto-fix format and lint issues
+- [X] T015 Run `pnpm lint` from `apps/clementine-app/` to verify no linting errors
+- [X] T016 Run `pnpm type-check` from `apps/clementine-app/` to verify TypeScript compiles
+- [X] T017 Run `pnpm check` from `apps/clementine-app/` to auto-fix format and lint issues
 - [ ] T018 Manual testing: execute all quickstart.md test scenarios (open preview, viewport switch, escape key, edge cases)
 - [ ] T019 Verify against spec.md acceptance scenarios for all user stories
 

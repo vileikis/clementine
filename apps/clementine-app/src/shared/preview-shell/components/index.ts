@@ -1,4 +1,3 @@
-export { PreviewShell } from './PreviewShell'
 export { PreviewShellControls } from './PreviewShellControls'
 export { DeviceFrame } from './DeviceFrame'
 export { ViewportSwitcher } from './ViewportSwitcher'
