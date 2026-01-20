@@ -6,9 +6,10 @@
  */
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { GripVertical, MoreVertical, Trash2 } from 'lucide-react'
+import { MoreVertical, Trash2 } from 'lucide-react'
 
 import {
+  getCategoryColorClasses,
   getStepDefinition,
   getStepDisplayLabel,
 } from '../../steps/registry/step-utils'
@@ -35,11 +36,11 @@ interface StepListItemProps {
 }
 
 /**
- * Step list item with icon, label, drag handle, and context menu
+ * Step list item with icon, label, and context menu
  *
  * Displays step type icon and label with visual selection state.
  * Click to select the step for editing.
- * Drag via the grip handle to reorder.
+ * Drag from anywhere on the item to reorder.
  * Use context menu to delete.
  *
  * @example
@@ -80,50 +81,45 @@ export function StepListItem({
   }
 
   const Icon = definition.icon
+  const colorClasses = getCategoryColorClasses(definition.category)
 
   return (
     <div
       ref={setNodeRef}
       style={style}
+      {...attributes}
+      {...listeners}
       role="option"
       id={step.id}
       aria-selected={isSelected}
       className={cn(
-        'group flex items-center gap-1 rounded-md',
+        'group flex items-center gap-2 rounded-md cursor-pointer',
         'transition-colors duration-150',
-        isDragging && 'opacity-50',
+        isDragging && 'opacity-50 cursor-grabbing',
         isSelected && 'bg-accent text-accent-foreground',
         !isSelected && 'hover:bg-accent/50',
+        disabled && 'cursor-default',
       )}
     >
-      {/* Drag handle */}
-      <button
-        type="button"
-        className={cn(
-          'flex h-8 w-6 shrink-0 cursor-grab touch-none items-center justify-center text-muted-foreground',
-          'opacity-0 transition-opacity group-hover:opacity-100',
-          'focus-visible:opacity-100 focus-visible:outline-none',
-          isDragging && 'cursor-grabbing opacity-100',
-          disabled && 'pointer-events-none',
-        )}
-        {...attributes}
-        {...listeners}
-      >
-        <GripVertical className="h-4 w-4" />
-      </button>
-
       {/* Main clickable area */}
       <button
         type="button"
         onClick={onClick}
         disabled={disabled}
         className={cn(
-          'flex min-w-0 flex-1 items-center gap-3 py-2 pr-1 text-left text-sm',
+          'flex min-w-0 flex-1 cursor-pointer items-center gap-3 py-2 pl-2 pr-1 text-left text-sm',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
           'disabled:pointer-events-none disabled:opacity-50',
         )}
       >
-        <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />
+        <div
+          className={cn(
+            'flex h-6 w-6 shrink-0 items-center justify-center rounded-md',
+            colorClasses.wrapper,
+          )}
+        >
+          <Icon className={cn('h-4 w-4', colorClasses.icon)} />
+        </div>
         <span className="min-w-0 line-clamp-2">
           {getStepDisplayLabel(step, definition)}
         </span>

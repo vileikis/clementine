@@ -1,9 +1,13 @@
 'use client'
 
 import { Maximize2 } from 'lucide-react'
-import type { FullscreenTriggerProps } from '../types/preview-shell.types'
 import { Button } from '@/ui-kit/ui/button'
 import { cn } from '@/shared/utils'
+
+export interface FullscreenTriggerProps {
+  onClick: () => void
+  className?: string
+}
 
 /**
  * Fullscreen Trigger Component

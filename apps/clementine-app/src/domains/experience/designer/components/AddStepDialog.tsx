@@ -5,6 +5,7 @@
  * Shows step types grouped by category, filtered by experience profile.
  */
 import {
+  getCategoryColorClasses,
   getCategoryLabel,
   getStepsByCategoryForProfile,
 } from '../../steps/registry/step-utils'
@@ -91,6 +92,7 @@ export function AddStepDialog({
               <div className="grid grid-cols-2 gap-2">
                 {steps.map((stepDef) => {
                   const Icon = stepDef.icon
+                  const colorClasses = getCategoryColorClasses(stepDef.category)
                   return (
                     <Button
                       key={stepDef.type}
@@ -102,7 +104,14 @@ export function AddStepDialog({
                       onClick={() => handleStepSelect(stepDef.type)}
                     >
                       <div className="flex items-center gap-2">
-                        <Icon className="h-4 w-4 shrink-0" />
+                        <div
+                          className={cn(
+                            'flex h-6 w-6 shrink-0 items-center justify-center rounded-md',
+                            colorClasses.wrapper,
+                          )}
+                        >
+                          <Icon className={cn('h-4 w-4', colorClasses.icon)} />
+                        </div>
                         <span className="font-medium">{stepDef.label}</span>
                       </div>
                       <span className="text-xs text-muted-foreground line-clamp-2">
