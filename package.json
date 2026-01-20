@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
+    "start": "pnpm --filter @clementine/app start",
     "dev": "turbo run dev --filter=@clementine/app",
     "test": "turbo run test",
     "lint": "turbo run lint",
