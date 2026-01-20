@@ -2,26 +2,37 @@
  * Upload Progress State
  *
  * Shows photo with upload spinner overlay while saving.
+ * Uses CSS aspect-ratio for responsive sizing.
  */
 
 import { Loader2 } from 'lucide-react'
 import type { CapturedPhoto } from '@/shared/camera'
+import type { AspectRatio } from '../../../schemas/capture-photo.schema'
 import { ThemedText } from '@/shared/theming'
+
+/**
+ * CSS aspect-ratio values for the preview container
+ */
+const ASPECT_RATIO_CSS: Record<AspectRatio, string> = {
+  '1:1': '1 / 1',
+  '9:16': '9 / 16',
+  '3:2': '3 / 2',
+  '2:3': '2 / 3',
+}
 
 interface UploadProgressProps {
   photo: CapturedPhoto | null
-  isSquare: boolean
+  aspectRatio: AspectRatio
 }
 
-export function UploadProgress({ photo, isSquare }: UploadProgressProps) {
+export function UploadProgress({ photo, aspectRatio }: UploadProgressProps) {
   return (
     <div className="flex flex-col items-center gap-6 w-full max-w-md">
-      {/* Preview image */}
+      {/* Preview image - responsive sizing */}
       {photo?.previewUrl && (
         <div
-          className={`relative overflow-hidden rounded-lg ${
-            isSquare ? 'w-64 h-64' : 'w-44 h-80'
-          }`}
+          className="relative w-full max-h-full overflow-hidden rounded-lg"
+          style={{ aspectRatio: ASPECT_RATIO_CSS[aspectRatio] }}
         >
           <img
             src={photo.previewUrl}

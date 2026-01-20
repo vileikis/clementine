@@ -113,6 +113,22 @@ export function usePhotoCapture({
     setStatus('idle')
   }, [photo])
 
+  /**
+   * Set a photo directly (e.g., from library picker) and go to preview
+   */
+  const setPhotoForPreview = useCallback(
+    (selectedPhoto: CapturedPhoto) => {
+      // Revoke old preview URL if any
+      if (photo?.previewUrl) {
+        URL.revokeObjectURL(photo.previewUrl)
+      }
+      setPhoto(selectedPhoto)
+      setError(null)
+      setStatus('photo-preview')
+    },
+    [photo],
+  )
+
   return {
     status,
     photo,
@@ -122,5 +138,6 @@ export function usePhotoCapture({
     confirm,
     reset,
     setStatus,
+    setPhotoForPreview,
   }
 }

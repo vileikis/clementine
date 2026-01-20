@@ -59,7 +59,7 @@ export type CameraFacingConfig = 'user' | 'environment' | 'both'
 /**
  * Aspect ratio guide options
  */
-export type AspectRatio = '3:4' | '1:1' | '9:16'
+export type AspectRatio = '1:1' | '9:16' | '3:2' | '2:3'
 
 /**
  * Customizable labels for internationalization
@@ -190,6 +190,8 @@ export interface UsePhotoCaptureReturn {
   reset: () => void
   /** Set the capture status manually */
   setStatus: (status: PhotoCaptureStatus) => void
+  /** Set a photo directly (e.g., from library) and go to preview */
+  setPhotoForPreview: (photo: CapturedPhoto) => void
 }
 
 // Forward reference for CameraViewRef - actual type is in CameraView.tsx

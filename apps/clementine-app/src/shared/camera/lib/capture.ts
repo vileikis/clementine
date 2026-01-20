@@ -12,9 +12,10 @@ import type { AspectRatio } from '../types'
  * Numeric aspect ratio values (width / height)
  */
 const ASPECT_RATIO_VALUES: Record<AspectRatio, number> = {
-  '3:4': 3 / 4, // 0.75 - portrait
   '1:1': 1, // 1.0  - square
   '9:16': 9 / 16, // 0.5625 - tall portrait (stories/reels)
+  '3:2': 3 / 2, // 1.5 - landscape
+  '2:3': 2 / 3, // 0.667 - tall portrait
 }
 
 /**

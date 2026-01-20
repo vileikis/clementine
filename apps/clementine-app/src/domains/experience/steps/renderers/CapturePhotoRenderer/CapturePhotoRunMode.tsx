@@ -38,6 +38,7 @@ import type {
   CameraViewRef,
   CapturedPhoto,
 } from '@/shared/camera'
+import type { AspectRatio } from '../../schemas/capture-photo.schema'
 import {
   useCameraPermission,
   useLibraryPicker,
@@ -46,8 +47,7 @@ import {
 
 interface CapturePhotoRunModeProps {
   step: StepRendererProps['step']
-  aspectRatio: '1:1' | '9:16'
-  isSquare: boolean
+  aspectRatio: AspectRatio
   onSubmit?: () => void
   onBack?: () => void
   canGoBack?: boolean
@@ -56,7 +56,6 @@ interface CapturePhotoRunModeProps {
 export function CapturePhotoRunMode({
   step,
   aspectRatio,
-  isSquare,
   onSubmit,
   onBack,
   canGoBack,
@@ -74,11 +73,15 @@ export function CapturePhotoRunMode({
     capture,
     retake,
     setStatus,
+    setPhotoForPreview,
   } = usePhotoCapture({ cameraRef })
 
   // Uploading state (separate from capture status for better control)
   const [isUploading, setIsUploading] = useState(false)
   const [uploadError, setUploadError] = useState<string | null>(null)
+
+  // Track if device has multiple cameras (for switch button)
+  const [hasMultipleCameras, setHasMultipleCameras] = useState(false)
 
   /**
    * Handle confirm: upload photo and update session
@@ -126,11 +129,13 @@ export function CapturePhotoRunMode({
     [photo, sessionId, projectId, step.id, setCapturedMedia, onSubmit],
   )
 
-  // Library picker for fallback
+  // Library picker - goes to preview first so user can confirm
   const { fileInputRef, openPicker, handleFileChange } = useLibraryPicker({
     onSelect: (selectedPhoto) => {
-      // Library picker bypasses camera, upload directly
-      handleConfirmAndUpload(selectedPhoto)
+      // Clear any existing upload error before showing preview
+      setUploadError(null)
+      // Go to preview screen so user can confirm before upload
+      setPhotoForPreview(selectedPhoto)
     },
     onError: (err) => {
       setUploadError(err.message)
@@ -167,7 +172,14 @@ export function CapturePhotoRunMode({
   // Handle camera ready
   const handleCameraReady = useCallback(() => {
     setStatus('camera-active')
+    // Update hasMultipleCameras from camera ref
+    setHasMultipleCameras(cameraRef.current?.hasMultipleCameras ?? false)
   }, [setStatus])
+
+  // Handle switch camera
+  const handleSwitchCamera = useCallback(async () => {
+    await cameraRef.current?.switchCamera()
+  }, [])
 
   // Handle camera error
   const handleCameraError = useCallback((err: CameraCaptureError) => {
@@ -228,7 +240,7 @@ export function CapturePhotoRunMode({
   if (isUploading) {
     return (
       <StepLayout hideButton>
-        <UploadProgress photo={photo} isSquare={isSquare} />
+        <UploadProgress photo={photo} aspectRatio={aspectRatio} />
       </StepLayout>
     )
   }
@@ -254,7 +266,7 @@ export function CapturePhotoRunMode({
       <StepLayout hideButton>
         <PhotoPreview
           photo={photo}
-          isSquare={isSquare}
+          aspectRatio={aspectRatio}
           onRetake={retake}
           onConfirm={handleConfirm}
         />
@@ -269,9 +281,11 @@ export function CapturePhotoRunMode({
         cameraRef={cameraRef}
         aspectRatio={aspectRatio}
         fileInputRef={fileInputRef}
+        hasMultipleCameras={hasMultipleCameras}
         onCameraReady={handleCameraReady}
         onCameraError={handleCameraError}
         onCapture={capture}
+        onSwitchCamera={handleSwitchCamera}
         onOpenPicker={openPicker}
         onFileChange={handleFileChange}
       />

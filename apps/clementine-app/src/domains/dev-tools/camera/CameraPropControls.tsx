@@ -117,9 +117,10 @@ export function CameraPropControls({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="none">None</SelectItem>
-            <SelectItem value="3:4">3:4 Portrait</SelectItem>
             <SelectItem value="1:1">1:1 Square</SelectItem>
             <SelectItem value="9:16">9:16 Stories</SelectItem>
+            <SelectItem value="3:2">3:2 Landscape</SelectItem>
+            <SelectItem value="2:3">2:3 Portrait</SelectItem>
           </SelectContent>
         </Select>
       </div>
