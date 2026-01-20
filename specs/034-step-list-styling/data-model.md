@@ -1,6 +1,6 @@
 # Data Model: Step List Styling Updates
 
-**Feature**: 001-step-list-styling
+**Feature**: 034-step-list-styling
 **Date**: 2026-01-20
 
 ## Overview

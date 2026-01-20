@@ -1,6 +1,6 @@
 # Feature Specification: Step List Styling Updates
 
-**Feature Branch**: `001-step-list-styling`
+**Feature Branch**: `034-step-list-styling`
 **Created**: 2026-01-20
 **Status**: Draft
 **Input**: User description: "Update StepList, StepListItem, and AddStepDialog styling and behavior with category-based colors, rounded icon wrappers, remove drag handles, and cursor pointer on hover with drag interaction"

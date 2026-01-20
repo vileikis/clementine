@@ -1,7 +1,7 @@
 # Implementation Plan: Step List Styling Updates
 
-**Branch**: `001-step-list-styling` | **Date**: 2026-01-20 | **Spec**: [spec.md](./spec.md)
-**Input**: Feature specification from `/specs/001-step-list-styling/spec.md`
+**Branch**: `034-step-list-styling` | **Date**: 2026-01-20 | **Spec**: [spec.md](./spec.md)
+**Input**: Feature specification from `/specs/034-step-list-styling/spec.md`
 
 ## Summary
 
@@ -47,7 +47,7 @@ Update the visual styling and interaction behavior of the StepList, StepListItem
 ### Documentation (this feature)
 
 ```text
-specs/001-step-list-styling/
+specs/034-step-list-styling/
 ├── plan.md              # This file
 ├── research.md          # Phase 0 output
 ├── data-model.md        # Phase 1 output (minimal - UI-only feature)

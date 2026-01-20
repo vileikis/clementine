@@ -1,6 +1,6 @@
 # Tasks: Step List Styling Updates
 
-**Input**: Design documents from `/specs/001-step-list-styling/`
+**Input**: Design documents from `/specs/034-step-list-styling/`
 **Prerequisites**: plan.md, spec.md, research.md, data-model.md
 
 **Tests**: Not requested - manual visual testing appropriate for UI styling changes.
