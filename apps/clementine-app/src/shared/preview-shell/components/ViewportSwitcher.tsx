@@ -1,8 +1,15 @@
 'use client'
 
 import { Monitor, Smartphone } from 'lucide-react'
-import type { ViewportSwitcherProps } from '../types/preview-shell.types'
+import type { ViewportMode } from '../types/preview-shell.types'
 import { ToggleGroup, ToggleGroupItem } from '@/ui-kit/ui/toggle-group'
+
+export interface ViewportSwitcherProps {
+  mode: ViewportMode
+  onModeChange: (mode: ViewportMode) => void
+  size?: 'sm' | 'md'
+  className?: string
+}
 
 /**
  * Viewport Switcher Component
