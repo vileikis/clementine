@@ -34,16 +34,9 @@ export const captureStepConfigSchema = z.looseObject({})
 export const transformStepConfigSchema = z.looseObject({})
 
 /**
- * Share step config schema (placeholder)
- * Will contain: download options, social platforms, etc.
- */
-export const shareStepConfigSchema = z.looseObject({})
-
-/**
  * TypeScript types inferred from schemas
  */
 export type InfoStepConfig = z.infer<typeof infoStepConfigSchema>
 export type InputStepConfig = z.infer<typeof inputStepConfigSchema>
 export type CaptureStepConfig = z.infer<typeof captureStepConfigSchema>
 export type TransformStepConfig = z.infer<typeof transformStepConfigSchema>
-export type ShareStepConfig = z.infer<typeof shareStepConfigSchema>

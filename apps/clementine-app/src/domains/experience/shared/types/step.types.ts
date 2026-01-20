@@ -9,13 +9,11 @@
  * - input: User input collection (forms, questions)
  * - capture: Media capture (photo, video, gif)
  * - transform: AI processing pipeline
- * - share: Sharing/download step
  */
 import type {
   CaptureStepConfig,
   InfoStepConfig,
   InputStepConfig,
-  ShareStepConfig,
   TransformStepConfig,
 } from '../schemas/step-registry.schema'
 
@@ -23,7 +21,7 @@ import type {
  * Step category type
  * Defines the high-level purpose of a step
  */
-export type StepCategory = 'info' | 'input' | 'capture' | 'transform' | 'share'
+export type StepCategory = 'info' | 'input' | 'capture' | 'transform'
 
 /**
  * Base step interface
@@ -84,16 +82,6 @@ export interface TransformStep extends BaseStep {
 }
 
 /**
- * Share Step
- * Enables sharing/downloading of the final result
- */
-export interface ShareStep extends BaseStep {
-  category: 'share'
-  type: 'share'
-  config: ShareStepConfig
-}
-
-/**
  * Step discriminated union
  * Use this type when working with any step to get proper type narrowing
  *
@@ -111,9 +99,4 @@ export interface ShareStep extends BaseStep {
  * }
  * ```
  */
-export type Step =
-  | InfoStep
-  | InputStep
-  | CaptureStep
-  | TransformStep
-  | ShareStep
+export type Step = InfoStep | InputStep | CaptureStep | TransformStep

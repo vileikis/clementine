@@ -1,8 +1,12 @@
 'use client'
 
 import { useViewportContext } from '../context/ViewportContext'
-import type { DeviceFrameProps } from '../types/preview-shell.types'
 import { cn } from '@/shared/utils'
+
+export interface DeviceFrameProps {
+  children: React.ReactNode
+  className?: string
+}
 
 /**
  * Device Frame Component

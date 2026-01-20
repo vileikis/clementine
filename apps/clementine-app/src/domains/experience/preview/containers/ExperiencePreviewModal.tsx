@@ -31,7 +31,7 @@
  * ```
  */
 import { useCallback, useEffect, useState } from 'react'
-import { Loader2, X } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { ExperienceRuntime } from '../../runtime'
@@ -41,9 +41,8 @@ import type { Theme } from '@/shared/theming'
 import { useGhostProject } from '@/domains/project/shared'
 import { useCreateSession, useSubscribeSession } from '@/domains/session'
 import { ThemeProvider, themeSchema } from '@/shared/theming'
-import { Dialog, DialogContent, DialogTitle } from '@/ui-kit/ui/dialog'
+import { FullscreenPreviewShell } from '@/shared/preview-shell'
 import { Button } from '@/ui-kit/ui/button'
-import { cn } from '@/shared/utils'
 
 /**
  * Props for ExperiencePreviewModal
@@ -174,93 +173,57 @@ export function ExperiencePreviewModal({
   }, [])
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        className={cn(
-          // Full screen modal for preview
-          'max-w-full h-dvh w-screen p-0 rounded-none sm:rounded-none',
-          // Remove default max-width
-          'sm:max-w-full',
-        )}
-        showCloseButton={false}
-      >
-        {/* Hidden title for accessibility */}
-        <DialogTitle className="sr-only">
-          Preview: {experience.name}
-        </DialogTitle>
+    <FullscreenPreviewShell isOpen={open} onClose={handleClose}>
+      {/* Loading state */}
+      {isLoading && (
+        <div className="flex h-full items-center justify-center">
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            <p className="text-sm text-muted-foreground">Starting preview...</p>
+          </div>
+        </div>
+      )}
 
-        {/* Header with close button */}
-        <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-4 py-3 bg-background/80 backdrop-blur-sm border-b">
-          <span className="text-sm font-medium text-muted-foreground">
-            Preview Mode
-          </span>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleClose}
-            className="h-8 w-8"
+      {/* Error state */}
+      {error && (
+        <div className="flex h-full items-center justify-center">
+          <div className="flex flex-col items-center gap-4 text-center">
+            <p className="text-sm text-destructive">{error}</p>
+            <Button variant="outline" onClick={handleClose}>
+              Close
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Empty steps state */}
+      {!isLoading && !error && steps.length === 0 && (
+        <div className="flex h-full items-center justify-center">
+          <div className="flex flex-col items-center gap-4 text-center">
+            <p className="text-sm text-muted-foreground">
+              No steps to preview. Add some steps first.
+            </p>
+            <Button variant="outline" onClick={handleClose}>
+              Close
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Runtime content */}
+      {isReady && steps.length > 0 && (
+        <ThemeProvider theme={previewTheme}>
+          <ExperienceRuntime
+            experienceId={experience.id}
+            steps={steps}
+            session={session}
+            onComplete={handleComplete}
+            onError={handleError}
           >
-            <X className="h-4 w-4" />
-            <span className="sr-only">Close preview</span>
-          </Button>
-        </div>
-
-        {/* Content area */}
-        <div className="h-full pt-14">
-          {/* Loading state */}
-          {isLoading && (
-            <div className="flex h-full items-center justify-center">
-              <div className="flex flex-col items-center gap-4">
-                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                <p className="text-sm text-muted-foreground">
-                  Starting preview...
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Error state */}
-          {error && (
-            <div className="flex h-full items-center justify-center">
-              <div className="flex flex-col items-center gap-4 text-center">
-                <p className="text-sm text-destructive">{error}</p>
-                <Button variant="outline" onClick={handleClose}>
-                  Close
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {/* Empty steps state */}
-          {!isLoading && !error && steps.length === 0 && (
-            <div className="flex h-full items-center justify-center">
-              <div className="flex flex-col items-center gap-4 text-center">
-                <p className="text-sm text-muted-foreground">
-                  No steps to preview. Add some steps first.
-                </p>
-                <Button variant="outline" onClick={handleClose}>
-                  Close
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {/* Runtime content */}
-          {isReady && steps.length > 0 && (
-            <ThemeProvider theme={previewTheme}>
-              <ExperienceRuntime
-                experienceId={experience.id}
-                steps={steps}
-                session={session}
-                onComplete={handleComplete}
-                onError={handleError}
-              >
-                <PreviewRuntimeContent />
-              </ExperienceRuntime>
-            </ThemeProvider>
-          )}
-        </div>
-      </DialogContent>
-    </Dialog>
+            <PreviewRuntimeContent />
+          </ExperienceRuntime>
+        </ThemeProvider>
+      )}
+    </FullscreenPreviewShell>
   )
 }
