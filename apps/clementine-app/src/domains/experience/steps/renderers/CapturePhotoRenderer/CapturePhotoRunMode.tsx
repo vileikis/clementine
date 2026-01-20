@@ -132,6 +132,8 @@ export function CapturePhotoRunMode({
   // Library picker - goes to preview first so user can confirm
   const { fileInputRef, openPicker, handleFileChange } = useLibraryPicker({
     onSelect: (selectedPhoto) => {
+      // Clear any existing upload error before showing preview
+      setUploadError(null)
       // Go to preview screen so user can confirm before upload
       setPhotoForPreview(selectedPhoto)
     },

@@ -59,7 +59,7 @@ export type CameraFacingConfig = 'user' | 'environment' | 'both'
 /**
  * Aspect ratio guide options
  */
-export type AspectRatio = '3:4' | '1:1' | '9:16' | '3:2' | '2:3'
+export type AspectRatio = '1:1' | '9:16' | '3:2' | '2:3'
 
 /**
  * Customizable labels for internationalization

@@ -10,26 +10,28 @@ import {
 } from './capture'
 
 describe('calculateCropRegion', () => {
-  it('should calculate crop for video wider than target aspect ratio (3:4)', () => {
-    // Video is 1920x1080 (16:9), target is 3:4
+  it('should calculate crop for video wider than target aspect ratio (2:3)', () => {
+    // Video is 1920x1080 (16:9), target is 2:3
     // Should crop width
-    const result = calculateCropRegion(1920, 1080, '3:4')
+    const result = calculateCropRegion(1920, 1080, '2:3')
 
-    expect(result.sw).toBe(810) // 1080 * 0.75
+    const expectedWidth = 1080 * (2 / 3) // 720
+    expect(result.sw).toBe(expectedWidth)
     expect(result.sh).toBe(1080)
-    expect(result.sx).toBe((1920 - 810) / 2) // Centered horizontally
+    expect(result.sx).toBe((1920 - expectedWidth) / 2) // Centered horizontally
     expect(result.sy).toBe(0)
   })
 
-  it('should calculate crop for video taller than target aspect ratio (3:4)', () => {
-    // Video is 1080x1920 (9:16), target is 3:4
+  it('should calculate crop for video taller than target aspect ratio (2:3)', () => {
+    // Video is 1080x1920 (9:16), target is 2:3
     // Should crop height
-    const result = calculateCropRegion(1080, 1920, '3:4')
+    const result = calculateCropRegion(1080, 1920, '2:3')
 
+    const expectedHeight = 1080 / (2 / 3) // 1620
     expect(result.sw).toBe(1080)
-    expect(result.sh).toBe(1440) // 1080 / 0.75
+    expect(result.sh).toBe(expectedHeight)
     expect(result.sx).toBe(0)
-    expect(result.sy).toBe((1920 - 1440) / 2) // Centered vertically
+    expect(result.sy).toBe((1920 - expectedHeight) / 2) // Centered vertically
   })
 
   it('should calculate square crop (1:1) from landscape video', () => {
@@ -118,9 +120,9 @@ describe('captureFromVideo', () => {
   })
 
   it('should apply aspect ratio cropping correctly', async () => {
-    await captureFromVideo(mockVideo, { aspectRatio: '3:4' })
+    await captureFromVideo(mockVideo, { aspectRatio: '2:3' })
 
-    const expectedWidth = 810 // 1080 * 0.75
+    const expectedWidth = 1080 * (2 / 3) // 720
     expect(mockCanvas.width).toBe(expectedWidth)
     expect(mockCanvas.height).toBe(1080)
 

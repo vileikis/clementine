@@ -276,22 +276,6 @@ importers:
         specifier: ^5.0.0
         version: 5.9.3
 
-  scripts:
-    dependencies:
-      firebase-admin:
-        specifier: ^13.6.0
-        version: 13.6.0(encoding@0.1.13)
-    devDependencies:
-      '@types/node':
-        specifier: ^20
-        version: 20.19.24
-      tsx:
-        specifier: ^4.21.0
-        version: 4.21.0
-      typescript:
-        specifier: ^5
-        version: 5.9.3
-
 packages:
 
   '@acemir/cssom@0.9.29':
@@ -3038,9 +3022,6 @@ packages:
 
   '@types/node@10.17.60':
     resolution: {integrity: sha512-F0KIgDJfy2nA3zMLmWGKxcH2ZVEtCZXHHdOQs2gSaQ27+lNeEfGxzkIw90aXswATX7AZ33tahPbzy6KAfUreVw==}
-
-  '@types/node@20.19.24':
-    resolution: {integrity: sha512-FE5u0ezmi6y9OZEzlJfg37mqqf6ZDSF2V/NLjUyGrR9uTZ7Sb9F7bLNZ03S4XVUNRWGA7Ck4c1kK+YnuWjl+DA==}
 
   '@types/node@22.19.0':
     resolution: {integrity: sha512-xpr/lmLPQEj+TUnHmR+Ab91/glhJvsqcjB+yY0Ix9GO70H6Lb4FHH5GeqdOE5btAx7eIMwuHkp4H2MSkLcqWbA==}
@@ -9423,10 +9404,6 @@ snapshots:
       '@types/node': 22.19.0
 
   '@types/node@10.17.60': {}
-
-  '@types/node@20.19.24':
-    dependencies:
-      undici-types: 6.21.0
 
   '@types/node@22.19.0':
     dependencies:
