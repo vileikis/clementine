@@ -317,30 +317,6 @@ pnpm build
 - **[Standards](standards/)** - Technical conventions & best practices
 - **[Specifications](specs/)** - Project/feature specs
 
-## 🎯 Roadmap
-
-### Phase 1 (Current)
-
-- [ ] Event creation & management
-- [ ] Guest photo upload experience
-- [ ] AI image transformation pipeline (n8n)
-- [ ] Basic analytics dashboard
-
-### Phase 2 (Planned)
-
-- [ ] Firebase authentication
-- [ ] User accounts & saved events
-- [ ] Advanced analytics & insights
-- [ ] Social sharing integrations
-- [ ] Embeddable widget
-
-### Phase 3 (Future)
-
-- [ ] Video transformations
-- [ ] Multi-language support
-- [ ] White-label API
-- [ ] Enterprise features
-
 ## 📄 License
 
 [Add license information]

@@ -25,8 +25,8 @@ clementine/
 ├── apps/
 │   └── clementine-app/       # TanStack Start application (Production)
 ├── functions/                 # Firebase Cloud Functions (AI processing, webhooks)
-├── scripts/                   # Monorepo utility scripts
-└── packages/                  # Shared packages (if any)
+├── scripts/                   # Bash utility scripts (deploy, worktree, etc.)
+└── packages/                  # Shared packages
 ```
 
 ### Application Status
@@ -91,6 +91,10 @@ pnpm app:test         # Run tests
 pnpm functions:build  # Build Cloud Functions
 pnpm functions:serve  # Serve functions locally
 pnpm functions:deploy # Deploy functions to Firebase
+
+# App Hosting Deployment
+pnpm app:deploy       # Deploy current branch to Firebase App Hosting
+pnpm app:deploy <branch>  # Deploy specific branch
 
 # Firebase Deployment
 pnpm fb:deploy        # Deploy all Firebase resources
@@ -208,6 +212,27 @@ Deploy Firebase resources:
 pnpm fb:deploy            # All resources
 pnpm fb:deploy:rules      # Security rules only
 pnpm fb:deploy:indexes    # Indexes only
+```
+
+## Scripts
+
+The `scripts/` directory contains **bash utility scripts only**:
+
+```
+scripts/
+├── deploy-app.sh     # Deploy to Firebase App Hosting
+└── new-worktree.sh   # Create git worktree
+```
+
+**Database Migrations:** Place migration scripts in `functions/scripts/migrations/`. This keeps them close to Firebase Admin SDK setup and shared utilities.
+
+```
+functions/
+├── scripts/
+│   ├── migrations/           # Database migration scripts
+│   │   └── 2024-01-example.ts
+│   └── seed-emulators.ts     # Emulator seeding
+└── src/
 ```
 
 ## Environment Variables
