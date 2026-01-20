@@ -8,6 +8,11 @@ if [ -n "$1" ]; then
   BRANCH="$1"
 else
   BRANCH=$(git rev-parse --abbrev-ref HEAD)
+  if [ "$BRANCH" = "HEAD" ]; then
+    echo "Error: Cannot deploy from detached HEAD state."
+    echo "Either checkout a branch or specify a branch name: pnpm app:deploy <branch>"
+    exit 1
+  fi
 fi
 
 # Check for uncommitted changes
