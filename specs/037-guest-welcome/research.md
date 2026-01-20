@@ -267,41 +267,66 @@ const handleSelectExperience = async (experienceId: string) => {
 
 ---
 
-## 7. Experience Card Component
+## 7. Welcome Screen Component (WYSIWYG Approach)
 
-### Decision: Create new ExperienceCard in guest domain, inspired by WelcomePreview
+### Decision: Refactor WelcomePreview → WelcomeRenderer for both edit and run modes
 
 **Rationale:**
-- `WelcomePreview` at `domains/event/welcome/components/WelcomePreview.tsx:61-98` shows experience listing
-- Guest domain needs interactive (clickable) cards vs. preview-only cards
-- Keep run-mode specific logic in guest domain
+- `WelcomePreview` at `domains/event/welcome/components/WelcomePreview.tsx` already renders the complete welcome screen
+- `ExperienceCard` at `domains/event/experiences/components/ExperienceCard.tsx` already supports `mode: 'edit' | 'run'`
+- **WYSIWYG Principle**: What creators see in preview should be identical to what guests see
+- This follows the same pattern as step renderers (used in both preview and ExperienceRuntime)
 
 **Alternatives Considered:**
-- Reuse WelcomePreview directly - Rejected: It's edit-mode preview, needs click handlers for run-mode
-- Extract to shared - Rejected: Only guest domain needs interactive cards
+- Create duplicate components in guest domain - **Rejected**: Violates DRY, risks visual divergence
+- Keep components separate for edit/run - **Rejected**: Requires maintaining two implementations in sync
+
+**Refactoring Plan:**
+1. **Move ExperienceCard** from `domains/event/experiences/` to `domains/event/welcome/` (semantic organization)
+2. **Rename WelcomePreview → WelcomeRenderer** (clarifies it's used for both edit and run)
+3. **Add mode prop** to WelcomeRenderer interface
+4. **Add onSelectExperience prop** for run mode interaction
 
 **Implementation Pattern:**
 ```tsx
-interface ExperienceCardProps {
-  experience: {
-    id: string
-    name: string
-    media: { url: string } | null
-  }
-  onSelect: (experienceId: string) => void
+// WelcomeRenderer (refactored from WelcomePreview)
+interface WelcomeRendererProps {
+  welcome: WelcomeConfig
+  mainExperiences?: MainExperienceReference[]
+  experienceDetails?: Experience[]
+  mode: 'edit' | 'run'  // NEW
+  onSelectExperience?: (experienceId: string) => void  // NEW (required when mode='run')
 }
 
-export function ExperienceCard({ experience, onSelect }: ExperienceCardProps) {
-  return (
-    <button
-      onClick={() => onSelect(experience.id)}
-      className="w-full min-h-[44px] ..." // 44px min touch target
-    >
-      {/* thumbnail + name */}
-    </button>
-  )
-}
+// ExperienceCard already supports mode
+<ExperienceCard
+  experience={experience}
+  layout={welcome.layout}
+  mode={mode}  // 'edit' or 'run'
+  onClick={mode === 'run' ? () => onSelectExperience?.(experience.id) : undefined}
+/>
 ```
+
+**Usage in Guest Domain:**
+```tsx
+// WelcomeScreenPage.tsx - trivially simple
+import { WelcomeRenderer } from '@/domains/event/welcome'
+
+<ThemeProvider theme={theme}>
+  <WelcomeRenderer
+    welcome={welcome}
+    mainExperiences={enabledExperiences}
+    experienceDetails={experienceDetails}
+    mode="run"
+    onSelectExperience={handleSelectExperience}
+  />
+</ThemeProvider>
+```
+
+**Reference Files:**
+- `domains/event/welcome/components/WelcomePreview.tsx` - Current implementation
+- `domains/event/experiences/components/ExperienceCard.tsx` - Already supports mode prop
+- `domains/experience/runtime/containers/ExperienceRuntime.tsx` - Pattern for reusing renderers
 
 ---
 

@@ -83,39 +83,58 @@ specs/037-guest-welcome/
 ```text
 apps/clementine-app/src/
 ├── app/
-│   └── join/                           # NEW: Guest join routes
-│       ├── route.tsx                   # Guest layout (Outlet, no sidebar)
-│       ├── $projectId.tsx              # Welcome screen route
+│   └── join/                           # NEW: Guest join routes ✅ CREATED
+│       ├── route.tsx                   # Guest layout (Outlet, no sidebar) ✅
+│       ├── $projectId.tsx              # Welcome screen route ✅
 │       └── $projectId.experience/
-│           └── $experienceId.tsx       # Experience placeholder route
+│           └── $experienceId.tsx       # Experience placeholder route ✅
 ├── domains/
+│   ├── event/
+│   │   └── welcome/                    # REFACTORED: Welcome screen (edit + run mode)
+│   │       ├── components/
+│   │       │   ├── WelcomeRenderer.tsx # RENAMED from WelcomePreview (supports mode)
+│   │       │   ├── ExperienceCard.tsx  # MOVED from domains/event/experiences/
+│   │       │   └── index.ts
+│   │       └── index.ts
 │   └── guest/                          # Guest domain (vertical slice)
 │       ├── containers/
-│       │   ├── WelcomeScreenPage.tsx   # NEW: Welcome screen container
+│       │   ├── WelcomeScreenPage.tsx   # NEW: Uses WelcomeRenderer with mode='run'
 │       │   ├── ExperiencePlaceholder.tsx # NEW: Placeholder for E7
 │       │   └── index.ts
 │       ├── components/
-│       │   ├── ErrorPage.tsx           # NEW: 404 error page
-│       │   ├── ComingSoonPage.tsx      # NEW: Coming soon page
-│       │   ├── ExperienceCard.tsx      # NEW: Clickable experience card
-│       │   └── index.ts
+│       │   ├── ErrorPage.tsx           # NEW: 404 error page ✅
+│       │   ├── ComingSoonPage.tsx      # NEW: Coming soon page ✅
+│       │   └── index.ts                # ✅
 │       ├── hooks/
-│       │   ├── useGuestAccess.ts       # NEW: Access validation
-│       │   ├── useGuestRecord.ts       # NEW: Guest record management
-│       │   ├── usePublishedEvent.ts    # NEW: Published event data
-│       │   └── index.ts
+│       │   ├── useGuestAccess.ts       # NEW: Access validation ✅
+│       │   ├── useGuestRecord.ts       # NEW: Guest record management ✅
+│       │   └── index.ts                # ✅
 │       ├── schemas/
-│       │   └── guest.schema.ts         # NEW: Guest record schema
-│       └── index.ts
+│       │   └── guest.schema.ts         # NEW: Guest record schema ✅
+│       ├── queries/
+│       │   └── guest-access.query.ts   # NEW: Query key factory ✅
+│       └── index.ts                    # ✅
 
 # Files to migrate/remove:
 # - DELETE: app/guest/$projectId.tsx (replaced by app/join/$projectId.tsx)
 # - DELETE: app/guest/route.tsx (replaced by app/join/route.tsx)
 # - DELETE: app/guest/index.tsx (replaced by proper 404 handling)
-# - MIGRATE: domains/guest/containers/GuestExperiencePage.tsx → WelcomeScreenPage.tsx
+# - DELETE: domains/guest/containers/GuestExperiencePage.tsx (obsolete)
+# - MOVE: domains/event/experiences/components/ExperienceCard.tsx → domains/event/welcome/components/
+# - RENAME: domains/event/welcome/components/WelcomePreview.tsx → WelcomeRenderer.tsx
 ```
 
-**Structure Decision**: Following existing vertical slice architecture. Guest domain already exists with containers - we'll add components, hooks, and schemas subdirectories. Routes move from `/guest/` to `/join/` to match epic specification.
+**Structure Decision**: Following WYSIWYG principle - the same `WelcomeRenderer` component renders the welcome screen in both:
+- **Edit mode**: Designer preview (non-interactive) in event editor
+- **Run mode**: Guest experience (interactive with session creation)
+
+This follows the pattern established by step renderers (used in both preview and ExperienceRuntime).
+
+**Why not duplicate components in guest domain?**
+- Violates DRY principle
+- Risks visual divergence between preview and live experience
+- Requires maintaining two implementations in sync
+- The existing `ExperienceCard` already supports `mode: 'edit' | 'run'`
 
 ## Complexity Tracking
 
@@ -124,5 +143,8 @@ apps/clementine-app/src/
 | Item | Notes |
 |------|-------|
 | Existing patterns | Reusing: useProject, useProjectEvent, useCreateSession, ThemeProvider |
-| New components | ErrorPage, ComingSoonPage, ExperienceCard - all simple presentational |
+| Refactored components | WelcomePreview → WelcomeRenderer (add mode prop for edit/run) |
+| Moved components | ExperienceCard from event/experiences → event/welcome (semantic organization) |
+| New guest components | ErrorPage, ComingSoonPage - simple presentational (no duplication) |
 | Route change | `/guest/` → `/join/` as specified in epic (breaking change but pre-production) |
+| WYSIWYG principle | Same WelcomeRenderer for both designer preview and guest run mode |
