@@ -23,7 +23,6 @@ export function CapturePhotoRenderer({
 }: StepRendererProps) {
   const config = step.config as CapturePhotoStepConfig
   const { aspectRatio } = config
-  const isSquare = aspectRatio === '1:1'
 
   if (mode === 'edit') {
     return <CapturePhotoEditMode aspectRatio={aspectRatio} />
@@ -33,7 +32,6 @@ export function CapturePhotoRenderer({
     <CapturePhotoRunMode
       step={step}
       aspectRatio={aspectRatio}
-      isSquare={isSquare}
       onSubmit={onSubmit}
       onBack={onBack}
       canGoBack={canGoBack}

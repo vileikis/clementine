@@ -37,11 +37,11 @@ This feature modifies existing files only. No new project structure or dependenc
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T001 [P] Extend AspectRatio type union to add '3:2' and '2:3' in `src/shared/camera/types/camera.types.ts`
-- [ ] T002 [P] Add numeric values for 3:2 (1.5) and 2:3 (0.667) to ASPECT_RATIO_VALUES in `src/shared/camera/lib/capture.ts`
-- [ ] T003 [P] Add CSS values for 3:2 and 2:3 to ASPECT_RATIO_CSS in `src/shared/camera/components/CameraView.tsx`
-- [ ] T004 Extend aspectRatioSchema Zod enum to include '3:2' and '2:3' in `src/domains/experience/steps/schemas/capture-photo.schema.ts`
-- [ ] T005 Run type-check to verify no type errors: `pnpm type-check`
+- [X] T001 [P] Extend AspectRatio type union to add '3:2' and '2:3' in `src/shared/camera/types/camera.types.ts`
+- [X] T002 [P] Add numeric values for 3:2 (1.5) and 2:3 (0.667) to ASPECT_RATIO_VALUES in `src/shared/camera/lib/capture.ts`
+- [X] T003 [P] Add CSS values for 3:2 and 2:3 to ASPECT_RATIO_CSS in `src/shared/camera/components/CameraView.tsx`
+- [X] T004 Extend aspectRatioSchema Zod enum to include '3:2' and '2:3' in `src/domains/experience/steps/schemas/capture-photo.schema.ts`
+- [X] T005 Run type-check to verify no type errors: `pnpm type-check`
 
 **Checkpoint**: Foundation ready - all aspect ratio types and constants extended. User story implementation can now begin.
 
@@ -55,8 +55,8 @@ This feature modifies existing files only. No new project structure or dependenc
 
 ### Implementation for User Story 1
 
-- [ ] T006 [US1] Add Landscape (3:2) and Tall Portrait (2:3) options to ASPECT_RATIO_OPTIONS array in `src/domains/experience/steps/config-panels/CapturePhotoConfigPanel.tsx`
-- [ ] T007 [US1] Update help text logic to include descriptions for new aspect ratios in `src/domains/experience/steps/config-panels/CapturePhotoConfigPanel.tsx`
+- [X] T006 [US1] Add Landscape (3:2) and Tall Portrait (2:3) options to ASPECT_RATIO_OPTIONS array in `src/domains/experience/steps/config-panels/CapturePhotoConfigPanel.tsx`
+- [X] T007 [US1] Update help text logic to include descriptions for new aspect ratios in `src/domains/experience/steps/config-panels/CapturePhotoConfigPanel.tsx`
 - [ ] T008 [US1] Verify config panel renders correctly with all 4 options in dev server
 
 **Checkpoint**: User Story 1 complete - creators can now select and save any of the 4 aspect ratios
@@ -71,8 +71,8 @@ This feature modifies existing files only. No new project structure or dependenc
 
 ### Implementation for User Story 2
 
-- [ ] T009 [US2] Verify CameraView renders correctly with 3:2 aspect ratio (CSS aspect-ratio property)
-- [ ] T010 [US2] Verify captureFromVideo correctly crops to 3:2 ratio using calculateCropRegion in `src/shared/camera/lib/capture.ts`
+- [X] T009 [US2] Verify CameraView renders correctly with 3:2 aspect ratio (CSS aspect-ratio property)
+- [X] T010 [US2] Verify captureFromVideo correctly crops to 3:2 ratio using calculateCropRegion in `src/shared/camera/lib/capture.ts`
 - [ ] T011 [US2] Test 3:2 capture end-to-end in dev server
 
 **Checkpoint**: User Story 2 complete - guests can capture landscape photos in 3:2 format
@@ -87,8 +87,8 @@ This feature modifies existing files only. No new project structure or dependenc
 
 ### Implementation for User Story 3
 
-- [ ] T012 [US3] Verify CameraView renders correctly with 2:3 aspect ratio (CSS aspect-ratio property)
-- [ ] T013 [US3] Verify captureFromVideo correctly crops to 2:3 ratio using calculateCropRegion in `src/shared/camera/lib/capture.ts`
+- [X] T012 [US3] Verify CameraView renders correctly with 2:3 aspect ratio (CSS aspect-ratio property)
+- [X] T013 [US3] Verify captureFromVideo correctly crops to 2:3 ratio using calculateCropRegion in `src/shared/camera/lib/capture.ts`
 - [ ] T014 [US3] Test 2:3 capture end-to-end in dev server
 
 **Checkpoint**: User Story 3 complete - guests can capture tall portrait photos in 2:3 format
@@ -103,11 +103,11 @@ This feature modifies existing files only. No new project structure or dependenc
 
 ### Implementation for User Story 4
 
-- [ ] T015 [US4] Update PhotoPreview props interface: replace `isSquare: boolean` with `aspectRatio: string` in `src/domains/experience/steps/renderers/CapturePhotoRenderer/components/PhotoPreview.tsx`
-- [ ] T016 [US4] Add ASPECT_RATIO_CSS constant to PhotoPreview component in `src/domains/experience/steps/renderers/CapturePhotoRenderer/components/PhotoPreview.tsx`
-- [ ] T017 [US4] Replace fixed dimension classes with responsive CSS using aspect-ratio property in `src/domains/experience/steps/renderers/CapturePhotoRenderer/components/PhotoPreview.tsx`
-- [ ] T018 [US4] Update CapturePhotoRunMode to pass aspectRatio prop instead of isSquare to PhotoPreview in `src/domains/experience/steps/renderers/CapturePhotoRenderer/CapturePhotoRunMode.tsx`
-- [ ] T019 [US4] Update CapturePhotoRunMode props interface to use extended AspectRatio type in `src/domains/experience/steps/renderers/CapturePhotoRenderer/CapturePhotoRunMode.tsx`
+- [X] T015 [US4] Update PhotoPreview props interface: replace `isSquare: boolean` with `aspectRatio: string` in `src/domains/experience/steps/renderers/CapturePhotoRenderer/components/PhotoPreview.tsx`
+- [X] T016 [US4] Add ASPECT_RATIO_CSS constant to PhotoPreview component in `src/domains/experience/steps/renderers/CapturePhotoRenderer/components/PhotoPreview.tsx`
+- [X] T017 [US4] Replace fixed dimension classes with responsive CSS using aspect-ratio property in `src/domains/experience/steps/renderers/CapturePhotoRenderer/components/PhotoPreview.tsx`
+- [X] T018 [US4] Update CapturePhotoRunMode to pass aspectRatio prop instead of isSquare to PhotoPreview in `src/domains/experience/steps/renderers/CapturePhotoRenderer/CapturePhotoRunMode.tsx`
+- [X] T019 [US4] Update CapturePhotoRunMode props interface to use extended AspectRatio type in `src/domains/experience/steps/renderers/CapturePhotoRenderer/CapturePhotoRunMode.tsx`
 - [ ] T020 [US4] Test responsive preview sizing across all 4 aspect ratios in dev server
 
 **Checkpoint**: User Story 4 complete - photo preview now uses responsive sizing for all aspect ratios
@@ -118,8 +118,8 @@ This feature modifies existing files only. No new project structure or dependenc
 
 **Purpose**: Final validation and cleanup
 
-- [ ] T021 Run full validation suite: `pnpm app:check` (format + lint)
-- [ ] T022 Run type-check: `pnpm type-check`
+- [X] T021 Run full validation suite: `pnpm app:check` (format + lint)
+- [X] T022 Run type-check: `pnpm type-check`
 - [ ] T023 Test all 4 aspect ratios end-to-end on mobile viewport (320px-428px)
 - [ ] T024 Verify existing 1:1 and 9:16 functionality unchanged (regression test)
 - [ ] T025 Run quickstart.md validation checklist

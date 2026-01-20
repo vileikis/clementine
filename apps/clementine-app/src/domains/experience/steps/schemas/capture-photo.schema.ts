@@ -8,7 +8,7 @@ import { z } from 'zod'
 /**
  * Aspect ratio options for photo capture
  */
-export const aspectRatioSchema = z.enum(['1:1', '9:16'])
+export const aspectRatioSchema = z.enum(['1:1', '9:16', '3:2', '2:3'])
 
 /**
  * Capture photo step configuration schema

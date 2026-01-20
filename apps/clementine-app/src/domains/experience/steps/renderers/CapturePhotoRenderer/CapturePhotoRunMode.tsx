@@ -38,6 +38,7 @@ import type {
   CameraViewRef,
   CapturedPhoto,
 } from '@/shared/camera'
+import type { AspectRatio } from '../../schemas/capture-photo.schema'
 import {
   useCameraPermission,
   useLibraryPicker,
@@ -46,8 +47,7 @@ import {
 
 interface CapturePhotoRunModeProps {
   step: StepRendererProps['step']
-  aspectRatio: '1:1' | '9:16'
-  isSquare: boolean
+  aspectRatio: AspectRatio
   onSubmit?: () => void
   onBack?: () => void
   canGoBack?: boolean
@@ -56,7 +56,6 @@ interface CapturePhotoRunModeProps {
 export function CapturePhotoRunMode({
   step,
   aspectRatio,
-  isSquare,
   onSubmit,
   onBack,
   canGoBack,
@@ -228,7 +227,7 @@ export function CapturePhotoRunMode({
   if (isUploading) {
     return (
       <StepLayout hideButton>
-        <UploadProgress photo={photo} isSquare={isSquare} />
+        <UploadProgress photo={photo} aspectRatio={aspectRatio} />
       </StepLayout>
     )
   }
@@ -254,7 +253,7 @@ export function CapturePhotoRunMode({
       <StepLayout hideButton>
         <PhotoPreview
           photo={photo}
-          isSquare={isSquare}
+          aspectRatio={aspectRatio}
           onRetake={retake}
           onConfirm={handleConfirm}
         />
