@@ -153,3 +153,28 @@ export function getStepDisplayLabel(
   }
   return definition.label
 }
+
+/**
+ * Color classes for step category styling
+ */
+export interface CategoryColorClasses {
+  /** Background class for the icon wrapper */
+  wrapper: string
+  /** Foreground/text class for the icon */
+  icon: string
+}
+
+/**
+ * Get Tailwind color classes for a step category
+ */
+export function getCategoryColorClasses(
+  category: StepCategory,
+): CategoryColorClasses {
+  const colorMap: Record<StepCategory, CategoryColorClasses> = {
+    info: { wrapper: 'bg-muted', icon: 'text-muted-foreground' },
+    input: { wrapper: 'bg-info/10', icon: 'text-info' },
+    capture: { wrapper: 'bg-success/10', icon: 'text-success' },
+    transform: { wrapper: 'bg-destructive/10', icon: 'text-destructive' },
+  }
+  return colorMap[category]
+}

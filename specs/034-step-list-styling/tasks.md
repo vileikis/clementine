@@ -25,7 +25,7 @@
 
 **Purpose**: Create the shared utility function that both US1 and US2 depend on
 
-- [ ] T001 Add `CategoryColorClasses` interface and `getCategoryColorClasses()` utility function in `apps/clementine-app/src/domains/experience/steps/registry/step-utils.ts`
+- [X] T001 Add `CategoryColorClasses` interface and `getCategoryColorClasses()` utility function in `apps/clementine-app/src/domains/experience/steps/registry/step-utils.ts`
 
 **Details for T001**:
 ```typescript
@@ -65,9 +65,9 @@ export function getCategoryColorClasses(category: StepCategory): CategoryColorCl
 
 ### Implementation for User Story 1
 
-- [ ] T002 [US1] Import `getCategoryColorClasses` in `apps/clementine-app/src/domains/experience/designer/components/StepListItem.tsx`
+- [X] T002 [US1] Import `getCategoryColorClasses` in `apps/clementine-app/src/domains/experience/designer/components/StepListItem.tsx`
 
-- [ ] T003 [US1] Add colored icon wrapper around the step icon in `apps/clementine-app/src/domains/experience/designer/components/StepListItem.tsx`
+- [X] T003 [US1] Add colored icon wrapper around the step icon in `apps/clementine-app/src/domains/experience/designer/components/StepListItem.tsx`
 
 **Details for T003**:
 - Get category from `definition.category`
@@ -110,9 +110,9 @@ const colorClasses = getCategoryColorClasses(definition.category)
 
 ### Implementation for User Story 2
 
-- [ ] T006 [US2] Import `getCategoryColorClasses` in `apps/clementine-app/src/domains/experience/designer/components/AddStepDialog.tsx`
+- [X] T006 [US2] Import `getCategoryColorClasses` in `apps/clementine-app/src/domains/experience/designer/components/AddStepDialog.tsx`
 
-- [ ] T007 [US2] Add colored icon wrapper around step type icons in the dialog buttons in `apps/clementine-app/src/domains/experience/designer/components/AddStepDialog.tsx`
+- [X] T007 [US2] Add colored icon wrapper around step type icons in the dialog buttons in `apps/clementine-app/src/domains/experience/designer/components/AddStepDialog.tsx`
 
 **Details for T007**:
 - Inside the `steps.map()` loop, get color classes via `getCategoryColorClasses(stepDef.category)`
@@ -155,13 +155,13 @@ const colorClasses = getCategoryColorClasses(stepDef.category)
 
 ### Implementation for User Story 3
 
-- [ ] T009 [US3] Remove the drag handle button (GripVertical) from `apps/clementine-app/src/domains/experience/designer/components/StepListItem.tsx`
+- [X] T009 [US3] Remove the drag handle button (GripVertical) from `apps/clementine-app/src/domains/experience/designer/components/StepListItem.tsx`
 
 **Details for T009**:
 - Remove the entire drag handle `<button>` element (lines ~100-113 in original file)
 - Remove the `GripVertical` import from lucide-react if no longer used elsewhere
 
-- [ ] T010 [US3] Move `{...attributes}` and `{...listeners}` from the removed drag handle to the parent container div in `apps/clementine-app/src/domains/experience/designer/components/StepListItem.tsx`
+- [X] T010 [US3] Move `{...attributes}` and `{...listeners}` from the removed drag handle to the parent container div in `apps/clementine-app/src/domains/experience/designer/components/StepListItem.tsx`
 
 **Details for T010**:
 - Add `{...attributes}` and `{...listeners}` to the outer `<div ref={setNodeRef}>` element
@@ -177,7 +177,7 @@ const colorClasses = getCategoryColorClasses(stepDef.category)
 <div ref={setNodeRef} style={style} {...attributes} {...listeners} role="option" ...>
 ```
 
-- [ ] T011 [US3] Update cursor classes on the parent container in `apps/clementine-app/src/domains/experience/designer/components/StepListItem.tsx`
+- [X] T011 [US3] Update cursor classes on the parent container in `apps/clementine-app/src/domains/experience/designer/components/StepListItem.tsx`
 
 **Details for T011**:
 - Add `cursor-pointer` as default cursor
@@ -196,13 +196,13 @@ className={cn(
 )}
 ```
 
-- [ ] T012 [US3] Adjust the internal button (onClick handler) to not block drag interaction in `apps/clementine-app/src/domains/experience/designer/components/StepListItem.tsx`
+- [X] T012 [US3] Adjust the internal button (onClick handler) to not block drag interaction in `apps/clementine-app/src/domains/experience/designer/components/StepListItem.tsx`
 
 **Details for T012**:
 - The inner button for selection can remain, but may need `pointer-events-none` during drag if there are issues
 - Test that clicking still selects and dragging still reorders
 
-- [ ] T013 [US3] Remove unused `GripVertical` import from `apps/clementine-app/src/domains/experience/designer/components/StepList.tsx` if present
+- [X] T013 [US3] Remove unused `GripVertical` import from `apps/clementine-app/src/domains/experience/designer/components/StepList.tsx` if present
 
 - [ ] T014 [US3] Verify drag-to-reorder works from any point on the step item
 
@@ -216,11 +216,11 @@ className={cn(
 
 **Purpose**: Final validation and cleanup
 
-- [ ] T016 Run `pnpm app:check` (format + lint fixes) in `apps/clementine-app/`
+- [X] T016 Run `pnpm app:check` (format + lint fixes) in `apps/clementine-app/`
 
-- [ ] T017 Run `pnpm app:type-check` to verify no TypeScript errors in `apps/clementine-app/`
+- [X] T017 Run `pnpm app:type-check` to verify no TypeScript errors in `apps/clementine-app/`
 
-- [ ] T018 Verify design system compliance - no hard-coded colors, all using theme tokens
+- [X] T018 Verify design system compliance - no hard-coded colors, all using theme tokens
 
 - [ ] T019 Test all acceptance scenarios from spec.md:
   - Information step → grey/muted wrapper ✓
