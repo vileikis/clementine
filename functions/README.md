@@ -52,6 +52,7 @@ functions/
 │   │   └── schemas/                # Zod validation schemas
 │   └── index.ts                    # Function exports
 ├── scripts/
+│   ├── migrations/                  # Database migration scripts
 │   └── seed-emulators.ts           # Seed test data for local dev
 └── seed-data/
     └── images/                     # Test images for seeding
@@ -132,6 +133,18 @@ const FieldValue = admin.firestore.FieldValue; // Can cause undefined issues
 - More reliable in emulator environment
 - Avoids module loading issues with `FieldValue` and other exports
 - Future-proof (Firebase's recommended approach)
+
+### Database Migrations
+
+Place Firestore data migration scripts in `scripts/migrations/`:
+
+```bash
+# Run a migration
+cd functions
+pnpm tsx scripts/migrations/2024-01-example.ts
+```
+
+Migrations have access to Firebase Admin SDK and shared utilities from this workspace.
 
 ### FFmpeg Operations
 
