@@ -15,4 +15,7 @@ export type {
   CameraState,
   CameraAction,
   PermissionState,
+  PhotoCaptureStatus,
+  UsePhotoCaptureOptions,
+  UsePhotoCaptureReturn,
 } from './camera.types'

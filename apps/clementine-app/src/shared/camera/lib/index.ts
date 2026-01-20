@@ -13,4 +13,6 @@ export { isMediaDevicesAvailable, checkCameraPermission } from './utils'
 
 export { cameraReducer, INITIAL_CAMERA_STATE } from './cameraReducer'
 
+export { isMobileBrowser, getDeniedInstructions } from './permission-utils'
+
 export type { ImageDimensions } from './image-utils'

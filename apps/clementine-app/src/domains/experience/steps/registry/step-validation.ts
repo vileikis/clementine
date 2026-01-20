@@ -68,6 +68,11 @@ export function validateStepInput(
       return validateTextInput(config, input, isRequired)
 
     case 'capture.photo':
+      // Capture steps: validation handled by the renderer
+      // The renderer controls canProceed based on having captured media
+      // and calls onSubmit directly after successful upload
+      return { isValid: true }
+
     case 'transform.pipeline':
       // Placeholder steps - always valid for now
       return { isValid: true }
