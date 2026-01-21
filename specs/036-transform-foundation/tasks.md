@@ -147,8 +147,8 @@
 
 - [X] T035 [P] [US5] Add jobs collection security rules in `firebase/firestore.rules` (admin read, deny all writes)
 - [X] T036 [P] [US5] Add job query indexes in `firebase/firestore.indexes.json`
-- [ ] T037 [US5] Deploy security rules via `pnpm fb:deploy:rules`
-- [ ] T038 [US5] Deploy indexes via `pnpm fb:deploy:indexes`
+- [X] T037 [US5] Deploy security rules via `pnpm fb:deploy:rules`
+- [X] T038 [US5] Deploy indexes via `pnpm fb:deploy:indexes`
 
 **Checkpoint**: Security rules in place - can verify admin read/guest denied
 
@@ -164,7 +164,7 @@
 - [X] T042 Build and type-check app: `pnpm --filter @clementine/app type-check`
 - [X] T043 Build functions: `pnpm --filter @clementine/functions build`
 - [X] T044 Run validation: `pnpm --filter @clementine/app lint`
-- [ ] T045 Manual validation: Run quickstart.md checklist to verify all features work
+- [X] T045 Manual validation: Run quickstart.md checklist to verify all features work
 
 ---
 
@@ -286,19 +286,19 @@ All tasks focus on:
 
 ### 9.1 Move Theme Schema to Shared
 
-- [ ] T046 [P] Create `packages/shared/src/schemas/theme/media-reference.schema.ts` - copy from `apps/clementine-app/src/shared/theming/schemas/media-reference.schema.ts`
-- [ ] T047 [P] Create `packages/shared/src/schemas/theme/theme.schema.ts` - copy from `apps/clementine-app/src/shared/theming/schemas/theme.schemas.ts` (update imports to use local media-reference)
-- [ ] T048 Create barrel export in `packages/shared/src/schemas/theme/index.ts`
-- [ ] T049 Update `packages/shared/src/schemas/index.ts` to export theme schemas
+- [X] T046 [P] Create `packages/shared/src/schemas/theme/media-reference.schema.ts` - copy from `apps/clementine-app/src/shared/theming/schemas/media-reference.schema.ts`
+- [X] T047 [P] Create `packages/shared/src/schemas/theme/theme.schema.ts` - copy from `apps/clementine-app/src/shared/theming/schemas/theme.schemas.ts` (update imports to use local media-reference)
+- [X] T048 Create barrel export in `packages/shared/src/schemas/theme/index.ts`
+- [X] T049 Update `packages/shared/src/schemas/index.ts` to export theme schemas
 
 ### 9.2 Move Experiences Schema to Shared
 
-- [ ] T050 [P] Create `packages/shared/src/schemas/event/experiences.schema.ts` - copy from `apps/clementine-app/src/domains/event/experiences/schemas/event-experiences.schema.ts`
-- [ ] T051 Update `packages/shared/src/schemas/event/index.ts` to export experiences schemas
+- [X] T050 [P] Create `packages/shared/src/schemas/event/experiences.schema.ts` - copy from `apps/clementine-app/src/domains/event/experiences/schemas/event-experiences.schema.ts`
+- [X] T051 Update `packages/shared/src/schemas/event/index.ts` to export experiences schemas
 
 ### 9.3 Update Shared Event Config Schema
 
-- [ ] T052 Update `packages/shared/src/schemas/event/project-event-config.schema.ts`:
+- [X] T052 Update `packages/shared/src/schemas/event/project-event-config.schema.ts`:
   - Import `themeSchema` from `../theme`
   - Import `experiencesConfigSchema` from `./experiences.schema`
   - Add `theme` field to `projectEventConfigSchema`
@@ -307,30 +307,30 @@ All tasks focus on:
 
 ### 9.4 Update Job Schema to Use Shared Schemas
 
-- [ ] T053 Update `packages/shared/src/schemas/job/job.schema.ts`:
+- [X] T053 Update `packages/shared/src/schemas/job/job.schema.ts`:
   - Import `mainExperienceReferenceSchema` from `../event/experiences.schema`
   - Add experience reference to `eventContextSnapshotSchema` (for `applyOverlay` tracking)
 
 ### 9.5 App Consolidation - Remove Duplicates
 
-- [ ] T054 Update `apps/clementine-app/src/domains/event/shared/schemas/project-event-config.schema.ts`:
+- [X] T054 Update `apps/clementine-app/src/domains/event/shared/schemas/project-event-config.schema.ts`:
   - Import overlay, share, welcome, shareOptions schemas from `@clementine/shared`
   - Remove duplicate schema definitions
   - Keep only app-specific WRITE schemas (ctaWriteSchema, shareWriteSchema, etc.)
-- [ ] T055 Update `apps/clementine-app/src/shared/theming/schemas/theme.schemas.ts`:
+- [X] T055 Update `apps/clementine-app/src/shared/theming/schemas/theme.schemas.ts`:
   - Re-export from `@clementine/shared` instead of defining
   - Keep any app-specific extensions if needed
-- [ ] T056 Update `apps/clementine-app/src/domains/event/experiences/schemas/event-experiences.schema.ts`:
+- [X] T056 Update `apps/clementine-app/src/domains/event/experiences/schemas/event-experiences.schema.ts`:
   - Re-export from `@clementine/shared` instead of defining
-- [ ] T057 Update all app imports that used local schemas to use re-exports
+- [X] T057 Update all app imports that used local schemas to use re-exports
 
 ### 9.6 Validation
 
-- [ ] T058 Build shared package: `pnpm --filter @clementine/shared build`
-- [ ] T059 Build and type-check app: `pnpm --filter @clementine/app type-check`
-- [ ] T060 Build functions: `pnpm --filter @clementine/functions build`
-- [ ] T061 Run app tests: `pnpm --filter @clementine/app test`
-- [ ] T062 Manual validation: Verify event designer still works (create/edit events)
+- [X] T058 Build shared package: `pnpm --filter @clementine/shared build`
+- [X] T059 Build and type-check app: `pnpm --filter @clementine/app type-check`
+- [X] T060 Build functions: `pnpm --filter @clementine/functions build`
+- [X] T061 Run app tests: `pnpm --filter @clementine/app test`
+- [X] T062 Manual validation: Verify event designer still works (create/edit events)
 
 **Checkpoint**: Single source of truth for event schemas, job can access applyOverlay
 

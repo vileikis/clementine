@@ -14,6 +14,7 @@
 import { z } from 'zod'
 import { answerSchema, capturedMediaSchema } from '../session/session.schema'
 import { overlayReferenceSchema } from '../event/project-event-config.schema'
+import { mainExperienceReferenceSchema } from '../event/experiences.schema'
 import { transformConfigSchema } from '../experience/transform.schema'
 
 /**
@@ -96,12 +97,14 @@ export const transformConfigSnapshotSchema = transformConfigSchema
 /**
  * Snapshot of event context at job creation
  *
- * Captures overlay reference and whether to apply it.
- * Reuses overlayReferenceSchema for consistency.
+ * Captures overlay reference and experience reference for applyOverlay tracking.
+ * Reuses overlayReferenceSchema and mainExperienceReferenceSchema for consistency.
  */
 export const eventContextSnapshotSchema = z.looseObject({
   overlay: overlayReferenceSchema,
   applyOverlay: z.boolean(),
+  /** Experience reference snapshot (from mainExperienceReferenceSchema) */
+  experienceRef: mainExperienceReferenceSchema.nullable().default(null),
 })
 
 /**

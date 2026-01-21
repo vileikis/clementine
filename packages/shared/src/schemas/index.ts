@@ -23,6 +23,9 @@ export * from './project'
 // Workspace domain
 export * from './workspace'
 
+// Theme domain
+export * from './theme'
+
 // Legacy: Media processing schemas (used by existing media pipeline)
 // These are separate from the new transform pipeline schemas
 // TODO: Remove when old media pipeline functions are deleted

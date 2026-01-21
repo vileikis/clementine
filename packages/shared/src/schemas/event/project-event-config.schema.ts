@@ -1,14 +1,16 @@
 /**
  * Project Event Configuration Schema (Shared)
  *
- * Simplified event configuration schema for shared kernel.
- * Contains core fields needed by both app and functions.
+ * Complete event configuration schema for shared kernel.
+ * Contains all fields needed by both app and functions, including theme and experiences.
  *
- * Note: Full theming and experiences configuration is handled by app-specific schemas
- * that extend or re-export from this base. This schema focuses on the minimal
- * structure needed for cross-package usage.
+ * This is the single source of truth for event configuration structure.
+ * App-specific WRITE schemas (with validation limits) are defined in the app domain.
  */
 import { z } from 'zod'
+
+import { themeSchema, mediaReferenceSchema } from '../theme'
+import { experiencesConfigSchema } from './experiences.schema'
 
 /**
  * Current schema version for event configuration
@@ -79,39 +81,34 @@ export const shareConfigSchema = z.object({
 })
 
 /**
- * Media Reference Schema (simplified)
- */
-export const mediaReferenceSchema = z
-  .object({
-    mediaAssetId: z.string(),
-    url: z.url(),
-  })
-  .nullable()
-
-/**
  * Welcome Screen Configuration
  */
 export const welcomeConfigSchema = z.object({
   title: z.string().default('Choose your experience'),
   description: z.string().nullable().default(null),
-  media: mediaReferenceSchema.default(null),
+  media: mediaReferenceSchema.nullable().default(null),
   layout: experiencePickerLayoutSchema.default('list'),
 })
 
 /**
- * Base Event Configuration Schema
+ * Complete Event Configuration Schema
  *
- * This is a loose object to allow app-specific extensions (theme, experiences)
- * without breaking the shared schema.
+ * Includes all fields: overlays, share, welcome, theme, and experiences.
+ * This is a loose object for forward compatibility.
  */
 export const projectEventConfigSchema = z.looseObject({
   schemaVersion: z.number().default(CURRENT_CONFIG_VERSION),
   overlays: overlaysConfigSchema,
   shareOptions: shareOptionsConfigSchema.nullable().default(null),
+  /**
+   * @deprecated Use shareOptions instead. Kept for backward compatibility
+   * with existing data that used 'sharing' field name.
+   */
+  sharing: shareOptionsConfigSchema.nullable().default(null),
   share: shareConfigSchema.nullable().default(null),
   welcome: welcomeConfigSchema.nullable().default(null),
-  // Note: theme and experiences are handled by app-specific schemas
-  // since they have complex app-specific dependencies
+  theme: themeSchema.nullable().default(null),
+  experiences: experiencesConfigSchema.nullable().default(null),
 })
 
 /**
@@ -125,4 +122,6 @@ export type WelcomeConfig = z.infer<typeof welcomeConfigSchema>
 export type CtaConfig = z.infer<typeof ctaConfigSchema>
 export type ShareConfig = z.infer<typeof shareConfigSchema>
 export type ExperiencePickerLayout = z.infer<typeof experiencePickerLayoutSchema>
-export type MediaReference = z.infer<typeof mediaReferenceSchema>
+
+// Re-export MediaReference from theme (single source of truth)
+export { mediaReferenceSchema, type MediaReference } from '../theme'

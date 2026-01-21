@@ -17,7 +17,7 @@ export type {
   ProjectEventConfig,
   ProjectEventFull,
   OverlaysConfig,
-  SharingConfig,
+  ShareOptionsConfig,
 } from './shared/types'
 
 // Schemas
