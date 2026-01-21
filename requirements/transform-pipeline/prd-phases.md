@@ -16,7 +16,7 @@ This document breaks down the Transform Pipeline feature into incremental phases
 
 | Phase | Name | Status | Dependencies |
 |-------|------|--------|--------------|
-| 1 | Foundation & Schema | Not Started | - |
+| 1 | Foundation & Schema | **Completed** | - |
 | 2 | Backend Pipeline Infrastructure | Not Started | Phase 1 |
 | 3 | Creator Config UI (Basic) | Not Started | Phase 1 |
 | 4 | Runtime & Step Integration | Not Started | Phase 2, 3 |
@@ -29,9 +29,13 @@ This document breaks down the Transform Pipeline feature into incremental phases
 
 ## Phase 1: Foundation & Schema
 
-**Status**: Not Started
+**Status**: **Completed** (2026-01-21)
 
 **Goal**: Establish data model changes to support transform pipeline.
+
+**Implementation**: See [/specs/036-transform-foundation/](/specs/036-transform-foundation/) for detailed implementation artifacts.
+
+> **Note**: The actual implementation expanded significantly beyond the original scope. See [implementation-notes.md](./implementation-notes.md) for details on the shared kernel consolidation that was performed.
 
 ### Scope
 
@@ -53,12 +57,12 @@ This document breaks down the Transform Pipeline feature into incremental phases
 
 ### Acceptance Criteria
 
-- [ ] Steps have `name` field with auto-generation on creation
-- [ ] Experience schema accepts `transform: null | TransformConfig`
-- [ ] Existing experiences work unchanged (transform defaults to null)
-- [ ] Job schema is defined and validated
-- [ ] Session schema includes job tracking fields
-- [ ] Security rules allow admin read on jobs, server-only write
+- [x] Steps have `name` field with auto-generation on creation
+- [x] Experience schema accepts `transform: null | TransformConfig`
+- [x] Existing experiences work unchanged (transform defaults to null)
+- [x] Job schema is defined and validated
+- [x] Session schema includes job tracking fields
+- [x] Security rules allow admin read on jobs, server-only write
 
 ---
 
