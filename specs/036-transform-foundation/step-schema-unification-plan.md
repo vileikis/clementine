@@ -3,6 +3,14 @@
 **Branch**: `036-transform-foundation` | **Date**: 2026-01-21 | **Parent**: [plan.md](./plan.md)
 **Context**: Follow-up to initial shared kernel consolidation
 
+> **Status: IMPLEMENTED** (2026-01-21)
+> All phases completed successfully. Validation results:
+> - `pnpm shared:build` - passes
+> - `pnpm shared:test` - 115 tests pass
+> - `pnpm app:type-check` - passes
+> - `pnpm app:test` - 315 tests pass
+> - `pnpm app:build` - passes
+
 ## Summary
 
 Unify step schemas by moving the discriminated union `stepSchema` and all step-specific config schemas from the app to the shared kernel. This eliminates unsafe type casts and establishes a single source of truth for step validation across app and functions.
@@ -251,19 +259,19 @@ apps/clementine-app/src/domains/experience/
 
 After each phase:
 
-- [ ] `pnpm shared:build` passes
-- [ ] `pnpm shared:test` passes
-- [ ] `pnpm app:type-check` passes
-- [ ] `pnpm app:test` passes
-- [ ] `pnpm app:build` passes
+- [x] `pnpm shared:build` passes
+- [x] `pnpm shared:test` passes
+- [x] `pnpm app:type-check` passes
+- [x] `pnpm app:test` passes
+- [x] `pnpm app:build` passes
 
 Final validation:
 
-- [ ] No `as unknown as` casts for step types
-- [ ] `Experience.draft.steps` is `ExperienceStep[]`
-- [ ] All step config types use `Experience*` prefix
-- [ ] No duplicate schema definitions
-- [ ] Step registry (icons, labels) still works in app
+- [x] No `as unknown as` casts for step types
+- [x] `Experience.draft.steps` is `ExperienceStep[]`
+- [x] All step config types use `Experience*` prefix
+- [x] No duplicate schema definitions
+- [x] Step registry (icons, labels) still works in app
 
 ---
 
