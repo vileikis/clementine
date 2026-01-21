@@ -32,17 +32,22 @@ export const variableMappingSchema = z.looseObject({
 })
 
 /**
+ * Aspect ratio options for transform output
+ */
+export const outputAspectRatioSchema = z.enum(['1:1', '9:16', '3:2', '2:3'])
+
+/**
  * Output format configuration
+ *
+ * Defines post-processing settings for the pipeline output.
+ * Note: The output TYPE (image/gif/video) is determined by the pipeline nodes,
+ * not by this configuration. This controls resize/crop and quality.
  */
 export const outputFormatSchema = z.looseObject({
-  /** Output type */
-  type: z.enum(['image', 'gif', 'video']),
-  /** Output width in pixels */
-  width: z.number().int().positive().optional(),
-  /** Output height in pixels */
-  height: z.number().int().positive().optional(),
-  /** Quality (0-100) */
-  quality: z.number().min(0).max(100).optional(),
+  /** Target aspect ratio for resize/crop */
+  aspectRatio: outputAspectRatioSchema.nullable().default(null),
+  /** Compression quality (0-100) */
+  quality: z.number().min(0).max(100).nullable().default(null),
 })
 
 /**
@@ -62,3 +67,4 @@ export type TransformConfig = z.infer<typeof transformConfigSchema>
 export type TransformNode = z.infer<typeof transformNodeSchema>
 export type VariableMapping = z.infer<typeof variableMappingSchema>
 export type OutputFormat = z.infer<typeof outputFormatSchema>
+export type OutputAspectRatio = z.infer<typeof outputAspectRatioSchema>

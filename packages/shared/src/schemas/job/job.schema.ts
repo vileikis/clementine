@@ -33,7 +33,7 @@ export const jobStatusSchema = z.enum([
 export const jobProgressSchema = z.object({
   currentStep: z.string(),
   percentage: z.number().min(0).max(100),
-  message: z.string().optional(),
+  message: z.string().nullable().default(null),
 })
 
 /**
@@ -42,23 +42,34 @@ export const jobProgressSchema = z.object({
 export const jobErrorSchema = z.object({
   code: z.string(),
   message: z.string(),
-  step: z.string().optional(),
+  step: z.string().nullable().default(null),
   isRetryable: z.boolean(),
   timestamp: z.number().int().positive(),
 })
 
 /**
  * Job output reference
+ *
+ * Contains metadata about the final output produced by the transform pipeline.
+ * The format is determined by the pipeline nodes, not configuration.
  */
 export const jobOutputSchema = z.object({
+  /** Output asset ID in storage */
   assetId: z.string(),
+  /** Public URL to the output */
   url: z.url(),
+  /** Actual output format (determined by pipeline) */
   format: z.enum(['image', 'gif', 'video']),
+  /** Output dimensions after resize/crop */
   dimensions: z.object({
     width: z.number().int().positive(),
     height: z.number().int().positive(),
   }),
+  /** Output file size in bytes */
   sizeBytes: z.number().int().positive(),
+  /** Thumbnail URL (generated during post-processing) */
+  thumbnailUrl: z.url().nullable().default(null),
+  /** Total processing time in milliseconds */
   processingTimeMs: z.number().int().nonnegative(),
 })
 
