@@ -31,7 +31,7 @@ const THEME_FIELDS_TO_COMPARE: (keyof Theme)[] = [
 
 export function ThemeEditorPage() {
   const { projectId, eventId, workspaceSlug } = useParams({ strict: false })
-  const { data: event } = useProjectEvent(projectId!, eventId!)
+  const { data: event } = useProjectEvent(projectId, eventId)
   const { data: workspace } = useWorkspace(workspaceSlug)
   const { user } = useAuth()
 

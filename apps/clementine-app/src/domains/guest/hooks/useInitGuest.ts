@@ -91,7 +91,7 @@ export function useInitGuest(projectId: string): InitGuestState {
     projectId,
     guestQuery.isLoading,
     guestQuery.data,
-    createGuestMutation,
+    createGuestMutation.mutate,
   ])
 
   // Reset create attempt flag if projectId changes

@@ -51,7 +51,11 @@ export function WelcomeScreenPage({ projectId }: WelcomeScreenPageProps) {
 
   // Authentication: Check if user is authenticated, sign in anonymously if not
   const { user, isLoading: authLoading } = useAuth()
-  const { signIn: signInAnonymously, isSigningIn, error: signInError } = useAnonymousSignIn()
+  const {
+    signIn: signInAnonymously,
+    isSigningIn,
+    error: signInError,
+  } = useAnonymousSignIn()
 
   // Auto-trigger anonymous sign-in if not authenticated
   useEffect(() => {
@@ -102,7 +106,12 @@ export function WelcomeScreenPage({ projectId }: WelcomeScreenPageProps) {
   }
 
   // Show loading state while authenticating, fetching data, or creating guest record
-  if (authLoading || isSigningIn || access.status === 'loading' || guestState.status === 'loading') {
+  if (
+    authLoading ||
+    isSigningIn ||
+    access.status === 'loading' ||
+    guestState.status === 'loading'
+  ) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="text-center">

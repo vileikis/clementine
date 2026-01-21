@@ -65,7 +65,11 @@ export function ExperiencePlaceholder({
 
   // Authentication: Check if user is authenticated, sign in anonymously if not
   const { user, isLoading: authLoading } = useAuth()
-  const { signIn: signInAnonymously, isSigningIn, error: signInError } = useAnonymousSignIn()
+  const {
+    signIn: signInAnonymously,
+    isSigningIn,
+    error: signInError,
+  } = useAnonymousSignIn()
 
   // Auto-trigger anonymous sign-in if not authenticated
   useEffect(() => {

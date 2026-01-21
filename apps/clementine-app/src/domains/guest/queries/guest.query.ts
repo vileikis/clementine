@@ -43,10 +43,7 @@ export function guestQuery(projectId: string, guestId: string) {
   return queryOptions<Guest | null>({
     queryKey: guestKeys.record(projectId, guestId),
     queryFn: async () => {
-      const guestRef = doc(
-        firestore,
-        `projects/${projectId}/guests/${guestId}`,
-      )
+      const guestRef = doc(firestore, `projects/${projectId}/guests/${guestId}`)
       const snapshot = await getDoc(guestRef)
 
       if (!snapshot.exists()) {
