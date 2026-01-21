@@ -17,8 +17,9 @@ import { transformPipelineStepConfigSchema } from './transform-pipeline.schema'
 /**
  * Step name schema
  * Human-readable name for identification and transform variable mapping
+ * Trims whitespace before validation so whitespace-only names are rejected
  */
-export const stepNameSchema = z.string().min(1).max(50).optional()
+export const stepNameSchema = z.string().trim().min(1).max(50).optional()
 
 /**
  * Step type enumeration schema
