@@ -12,6 +12,9 @@ import { z } from 'zod'
 
 // Re-export READ schemas from shared kernel (single source of truth)
 export {
+  // Event full document schemas
+  projectEventFullSchema,
+  projectEventStatusSchema,
   // Event config schemas
   CURRENT_CONFIG_VERSION,
   overlayReferenceSchema,
@@ -33,6 +36,8 @@ export {
   experienceReferenceSchema,
   mainExperienceReferenceSchema,
   // Types
+  type ProjectEventFull,
+  type ProjectEventStatus,
   type ProjectEventConfig,
   type OverlayReference,
   type OverlaysConfig,

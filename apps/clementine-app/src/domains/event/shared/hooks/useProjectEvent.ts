@@ -9,9 +9,8 @@
 import { useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { doc, onSnapshot } from 'firebase/firestore'
-import { projectEventFullSchema } from '../schemas/project-event-full.schema'
+import { projectEventFullSchema, type ProjectEventFull } from '../schemas'
 import { projectEventQuery } from '../queries/project-event.query'
-import type { ProjectEventFull } from '../schemas/project-event-full.schema'
 import { convertFirestoreDoc } from '@/shared/utils/firestore-utils'
 import { firestore } from '@/integrations/firebase/client'
 
