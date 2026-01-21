@@ -4,7 +4,7 @@
  * Centralized validation logic for step inputs in run mode.
  * Each step type defines its own validation rules based on config.
  */
-import type { ExperienceStep } from '../../shared/schemas/experience.schema'
+import type { ExperienceStep } from '../../shared/schemas'
 
 /**
  * Validation result for a step input

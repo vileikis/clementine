@@ -1,6 +1,9 @@
-// Project entity schema
-// Core Project entity definition for Firestore
-
+/**
+ * Project Entity Schema
+ *
+ * Core Project entity definition for Firestore.
+ * Collection: projects/{projectId}
+ */
 import { z } from 'zod'
 
 /**
@@ -18,8 +21,6 @@ export const projectTypeSchema = z.enum(['standard', 'ghost'])
 /**
  * Project entity schema
  * Represents a project in Firestore
- *
- * Collection: projects/{projectId}
  */
 export const projectSchema = z.object({
   id: z.string().min(1, 'Project ID is required'),

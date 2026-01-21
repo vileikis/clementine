@@ -15,6 +15,12 @@ import { inputYesNoStepConfigSchema } from './input-yes-no.schema'
 import { transformPipelineStepConfigSchema } from './transform-pipeline.schema'
 
 /**
+ * Step name schema
+ * Human-readable name for identification and transform variable mapping
+ */
+export const stepNameSchema = z.string().min(1).max(50).optional()
+
+/**
  * Step type enumeration schema
  */
 export const stepTypeSchema = z.enum([
@@ -40,52 +46,61 @@ export const stepCategorySchema = z.enum([
 
 /**
  * Individual step schemas with type discriminator
+ * Each step now includes an optional name field for identification
  */
 export const infoStepSchema = z.object({
   id: z.uuid(),
   type: z.literal('info'),
+  name: stepNameSchema,
   config: infoStepConfigSchema,
 })
 
 export const inputScaleStepSchema = z.object({
   id: z.uuid(),
   type: z.literal('input.scale'),
+  name: stepNameSchema,
   config: inputScaleStepConfigSchema,
 })
 
 export const inputYesNoStepSchema = z.object({
   id: z.uuid(),
   type: z.literal('input.yesNo'),
+  name: stepNameSchema,
   config: inputYesNoStepConfigSchema,
 })
 
 export const inputMultiSelectStepSchema = z.object({
   id: z.uuid(),
   type: z.literal('input.multiSelect'),
+  name: stepNameSchema,
   config: inputMultiSelectStepConfigSchema,
 })
 
 export const inputShortTextStepSchema = z.object({
   id: z.uuid(),
   type: z.literal('input.shortText'),
+  name: stepNameSchema,
   config: inputShortTextStepConfigSchema,
 })
 
 export const inputLongTextStepSchema = z.object({
   id: z.uuid(),
   type: z.literal('input.longText'),
+  name: stepNameSchema,
   config: inputLongTextStepConfigSchema,
 })
 
 export const capturePhotoStepSchema = z.object({
   id: z.uuid(),
   type: z.literal('capture.photo'),
+  name: stepNameSchema,
   config: capturePhotoStepConfigSchema,
 })
 
 export const transformPipelineStepSchema = z.object({
   id: z.uuid(),
   type: z.literal('transform.pipeline'),
+  name: stepNameSchema,
   config: transformPipelineStepConfigSchema,
 })
 

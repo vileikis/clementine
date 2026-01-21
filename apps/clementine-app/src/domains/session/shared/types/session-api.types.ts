@@ -10,8 +10,8 @@ import {
   capturedMediaSchema,
   configSourceSchema,
   sessionModeSchema,
-} from '../schemas/session.schema'
-import type { Session } from '../schemas/session.schema'
+} from '../schemas'
+import type { Session } from '../schemas'
 
 /**
  * Create session input schema

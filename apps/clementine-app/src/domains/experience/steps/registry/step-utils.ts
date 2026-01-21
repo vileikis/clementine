@@ -3,6 +3,7 @@
  *
  * Helper functions for working with the step registry.
  */
+import { generateStepName } from '../helpers/step-name.helpers'
 import { stepRegistry } from './step-registry'
 import type {
   Step,
@@ -10,7 +11,7 @@ import type {
   StepDefinition,
   StepType,
 } from './step-registry'
-import type { ExperienceProfile } from '../../shared/schemas/experience.schema'
+import type { ExperienceProfile } from '../../shared/schemas'
 
 /**
  * Profile-to-allowed-categories mapping
@@ -94,13 +95,19 @@ export function getStepsByCategoryForProfile(
 }
 
 /**
- * Create a new step with a unique ID and default config
+ * Create a new step with a unique ID, auto-generated name, and default config
+ *
+ * @param type - The type of step to create
+ * @param existingSteps - Current steps in the experience (for name generation)
  *
  * Note: Type assertion is required because TypeScript can't infer
  * which discriminated union variant we're creating at compile time.
  * The registry guarantees the type and config are correctly paired.
  */
-export function createStep(type: StepType): Step {
+export function createStep(
+  type: StepType,
+  existingSteps: Pick<Step, 'type'>[] = [],
+): Step {
   const definition = stepRegistry[type]
   if (!definition) {
     throw new Error(`Unknown step type: ${type}`)
@@ -109,6 +116,7 @@ export function createStep(type: StepType): Step {
   return {
     id: crypto.randomUUID(),
     type,
+    name: generateStepName(existingSteps, type),
     config: definition.defaultConfig(),
   } as Step
 }

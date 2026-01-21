@@ -24,10 +24,12 @@ import type {
 export type StepCategory = 'info' | 'input' | 'capture' | 'transform'
 
 /**
- * Base step interface
- * Common properties shared by all step types
+ * Base step interface for app-level step variants
+ * Common properties shared by all step types in the category-based system
+ *
+ * Note: For Firestore schema step type, use BaseStep from ../schemas
  */
-export interface BaseStep {
+export interface BaseStepDefinition {
   /** Unique step identifier within the experience */
   id: string
 
@@ -45,7 +47,7 @@ export interface BaseStep {
  * Info Step
  * Displays informational content (welcome, instructions, etc.)
  */
-export interface InfoStep extends BaseStep {
+export interface InfoStep extends BaseStepDefinition {
   category: 'info'
   type: 'info'
   config: InfoStepConfig
@@ -55,7 +57,7 @@ export interface InfoStep extends BaseStep {
  * Input Step
  * Collects user input through various form types
  */
-export interface InputStep extends BaseStep {
+export interface InputStep extends BaseStepDefinition {
   category: 'input'
   type: 'yesNo' | 'scale' | 'shortText' | 'longText' | 'multiSelect'
   config: InputStepConfig
@@ -65,7 +67,7 @@ export interface InputStep extends BaseStep {
  * Capture Step
  * Captures media from the user (photo, video, gif)
  */
-export interface CaptureStep extends BaseStep {
+export interface CaptureStep extends BaseStepDefinition {
   category: 'capture'
   type: 'photo' | 'video' | 'gif'
   config: CaptureStepConfig
@@ -75,7 +77,7 @@ export interface CaptureStep extends BaseStep {
  * Transform Step
  * Processes captured media through AI pipeline
  */
-export interface TransformStep extends BaseStep {
+export interface TransformStep extends BaseStepDefinition {
   category: 'transform'
   type: 'pipeline'
   config: TransformStepConfig

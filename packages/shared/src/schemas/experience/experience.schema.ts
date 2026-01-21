@@ -1,5 +1,5 @@
 /**
- * Experience Schema
+ * Experience Schema (Shared)
  *
  * Defines the structure for Experience documents stored in Firestore.
  * An experience is a step-based interactive flow scoped to a Workspace.
@@ -11,6 +11,8 @@
  * - Uses `z.looseObject()` for forward compatibility with future fields
  */
 import { z } from 'zod'
+import { baseStepSchema } from './step.schema'
+import { transformConfigSchema } from './transform.schema'
 
 /**
  * Experience status enum schema
@@ -46,33 +48,16 @@ export const experienceMediaSchema = z
   .nullable()
 
 /**
- * Step schema
- *
- * Defines the structure of a step stored in Firestore.
- * Note: `category` and `label` are registry metadata, not stored in documents.
- * They are derived at runtime from the step registry using the `type` field.
- */
-export const stepSchema = z.looseObject({
-  /** Unique step identifier within the experience (UUID) */
-  id: z.string(),
-  /** Step type from registry (e.g., 'info', 'input.scale') */
-  type: z.string(),
-  /** Step-specific configuration object */
-  config: z.record(z.string(), z.unknown()).default({}),
-})
-
-/**
  * Experience Config Schema
  *
  * Configuration object that defines the structure and behavior of an experience.
- * Contains step definitions (version removed for simplicity).
+ * Contains step definitions and optional transform pipeline configuration.
  */
 export const experienceConfigSchema = z.looseObject({
-  /**
-   * Array of steps
-   * Defines the sequence of steps in the experience
-   */
-  steps: z.array(stepSchema).default([]),
+  /** Array of steps in the experience */
+  steps: z.array(baseStepSchema).default([]),
+  /** Optional transform pipeline configuration */
+  transform: transformConfigSchema.nullable().default(null),
 })
 
 /**
@@ -156,4 +141,3 @@ export type ExperienceConfig = z.infer<typeof experienceConfigSchema>
 export type ExperienceStatus = z.infer<typeof experienceStatusSchema>
 export type ExperienceProfile = z.infer<typeof experienceProfileSchema>
 export type ExperienceMedia = z.infer<typeof experienceMediaSchema>
-export type ExperienceStep = z.infer<typeof stepSchema>

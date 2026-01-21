@@ -1,15 +1,9 @@
 /**
  * Experience Types
  *
- * TypeScript interfaces and types for the Experience entity.
- * Re-exports inferred types from schemas and provides additional interfaces.
+ * Additional experience-related types beyond what's in schemas.
+ * Base types (Experience, ExperienceConfig, etc.) are exported from schemas.
  */
 
-// Re-export types inferred from schemas
-export type {
-  Experience,
-  ExperienceConfig,
-  ExperienceMedia,
-  ExperienceProfile,
-  ExperienceStatus,
-} from '../schemas/experience.schema'
+// Note: Base experience types are exported from ../schemas
+// This file is for additional app-specific types if needed

@@ -15,7 +15,7 @@ import { experienceKeys } from '../../shared/queries/experience.query'
 import { stepRegistry } from '../../steps/registry/step-registry'
 import { getStepTypesForProfile } from '../../steps/registry/step-utils'
 import type { UpdateData } from 'firebase/firestore'
-import type { Experience } from '../../shared/schemas/experience.schema'
+import type { Experience } from '../../shared/schemas'
 import type { Step, StepType } from '../../steps/schemas/step.schema'
 import { firestore } from '@/integrations/firebase/client'
 

@@ -11,6 +11,7 @@
  * - Uses `z.looseObject()` for forward compatibility with future fields
  */
 import { z } from 'zod'
+import { jobStatusSchema } from '../job/job.schema'
 
 /**
  * Session mode schema
@@ -146,6 +147,9 @@ export const sessionSchema = z.looseObject({
   /** Transform job ID (for async processing) */
   jobId: z.string().nullable().default(null),
 
+  /** Transform job status (synced from job document) */
+  jobStatus: jobStatusSchema.nullable().default(null),
+
   /**
    * OWNERSHIP
    */
@@ -177,3 +181,6 @@ export type SessionStatus = z.infer<typeof sessionStatusSchema>
 export type Answer = z.infer<typeof answerSchema>
 export type CapturedMedia = z.infer<typeof capturedMediaSchema>
 export type SessionResultMedia = z.infer<typeof sessionResultMediaSchema>
+
+// Re-export JobStatus for convenience
+export { jobStatusSchema, type JobStatus } from '../job/job.schema'

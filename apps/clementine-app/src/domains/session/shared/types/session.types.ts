@@ -1,13 +1,9 @@
 /**
  * Session Types
  *
- * Re-exports session entity types from schemas.
+ * Additional session-related types beyond what's in schemas.
+ * Base types (Session, SessionMode, etc.) are exported from schemas.
  */
 
-// Re-export types inferred from schemas
-export type {
-  Session,
-  SessionMode,
-  ConfigSource,
-  SessionStatus,
-} from '../schemas/session.schema'
+// Note: Base session types are exported from ../schemas
+// This file is for additional app-specific types if needed

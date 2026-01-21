@@ -11,10 +11,7 @@
  *
  * Note: Profile is immutable after experience creation.
  */
-import type {
-  ExperienceConfig,
-  ExperienceProfile,
-} from '../schemas/experience.schema'
+import type { ExperienceConfig, ExperienceProfile } from '../schemas'
 import type { StepCategory } from './step.types'
 
 /**

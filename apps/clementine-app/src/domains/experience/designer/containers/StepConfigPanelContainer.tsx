@@ -12,7 +12,7 @@ import { StepConfigPanel } from '../components/StepConfigPanel'
 import { useExperienceDesignerStore } from '../stores'
 import { useUpdateExperienceDraft } from '../hooks/useUpdateExperienceDraft'
 import type { Step, StepConfig } from '../../steps/registry/step-registry'
-import type { Experience } from '../../shared/schemas/experience.schema'
+import type { Experience } from '../../shared/schemas'
 import { useTrackedMutation } from '@/shared/editor-status'
 import { useAutoSave } from '@/shared/forms'
 

@@ -1,6 +1,9 @@
-// Workspace entity schema
-// Core Workspace entity definition for Firestore
-
+/**
+ * Workspace Entity Schema
+ *
+ * Core Workspace entity definition for Firestore.
+ * Collection: workspaces/{workspaceId}
+ */
 import { z } from 'zod'
 
 /**
@@ -12,8 +15,6 @@ export const workspaceStatusSchema = z.enum(['active', 'deleted'])
 /**
  * Workspace entity schema
  * Represents a workspace document in Firestore
- *
- * Collection: workspaces/{workspaceId}
  */
 export const workspaceSchema = z.object({
   id: z.string().min(1, 'Workspace ID is required'),

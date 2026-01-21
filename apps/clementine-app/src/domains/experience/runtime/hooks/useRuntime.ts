@@ -19,7 +19,7 @@ import type {
   CapturedMediaRef,
   RuntimeState,
 } from '../../shared/types/runtime.types'
-import type { ExperienceStep } from '../../shared/schemas/experience.schema'
+import type { ExperienceStep } from '../../shared/schemas'
 
 /**
  * Return type for useRuntime hook
