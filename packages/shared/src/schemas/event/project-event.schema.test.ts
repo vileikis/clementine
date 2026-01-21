@@ -97,8 +97,8 @@ describe('projectEventFullSchema', () => {
       futureField: 'value',
       metadata: { custom: true },
     })
-    expect((result as Record<string, unknown>).futureField).toBe('value')
-    expect((result as Record<string, unknown>).metadata).toEqual({ custom: true })
+    expect((result as Record<string, unknown>)['futureField']).toBe('value')
+    expect((result as Record<string, unknown>)['metadata']).toEqual({ custom: true })
   })
 
   describe('version tracking', () => {

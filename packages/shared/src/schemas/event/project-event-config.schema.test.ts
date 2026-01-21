@@ -185,8 +185,8 @@ describe('projectEventConfigSchema', () => {
       futureField: 'some value',
       anotherFutureField: 123,
     })
-    expect((result as Record<string, unknown>).futureField).toBe('some value')
-    expect((result as Record<string, unknown>).anotherFutureField).toBe(123)
+    expect((result as Record<string, unknown>)['futureField']).toBe('some value')
+    expect((result as Record<string, unknown>)['anotherFutureField']).toBe(123)
   })
 
   it('composes nested schemas correctly', () => {

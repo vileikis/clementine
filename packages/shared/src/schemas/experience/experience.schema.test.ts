@@ -98,7 +98,7 @@ describe('experienceConfigSchema', () => {
     const result = experienceConfigSchema.parse({
       futureField: 'value',
     })
-    expect((result as Record<string, unknown>).futureField).toBe('value')
+    expect((result as Record<string, unknown>)['futureField']).toBe('value')
   })
 })
 
@@ -241,6 +241,6 @@ describe('experienceSchema', () => {
       ...validMinimalExperience,
       futureField: 'value',
     })
-    expect((result as Record<string, unknown>).futureField).toBe('value')
+    expect((result as Record<string, unknown>)['futureField']).toBe('value')
   })
 })

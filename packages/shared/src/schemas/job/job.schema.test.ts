@@ -207,7 +207,7 @@ describe('sessionInputsSnapshotSchema', () => {
       capturedMedia: [],
       legacyField: 'value',
     })
-    expect((result as Record<string, unknown>).legacyField).toBe('value')
+    expect((result as Record<string, unknown>)['legacyField']).toBe('value')
   })
 })
 
@@ -261,7 +261,7 @@ describe('jobSnapshotSchema', () => {
       ...validSnapshot,
       futureContext: { data: 'value' },
     })
-    expect((result as Record<string, unknown>).futureContext).toEqual({ data: 'value' })
+    expect((result as Record<string, unknown>)['futureContext']).toEqual({ data: 'value' })
   })
 })
 
@@ -359,7 +359,7 @@ describe('jobSchema', () => {
       retryCount: 3,
       metadata: { source: 'api' },
     })
-    expect((result as Record<string, unknown>).retryCount).toBe(3)
-    expect((result as Record<string, unknown>).metadata).toEqual({ source: 'api' })
+    expect((result as Record<string, unknown>)['retryCount']).toBe(3)
+    expect((result as Record<string, unknown>)['metadata']).toEqual({ source: 'api' })
   })
 })
