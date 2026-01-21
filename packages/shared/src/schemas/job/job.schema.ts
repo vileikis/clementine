@@ -16,17 +16,10 @@ import { answerSchema, capturedMediaSchema } from '../session/session.schema'
 import { overlayReferenceSchema } from '../event/project-event-config.schema'
 import { mainExperienceReferenceSchema } from '../event/experiences.schema'
 import { transformConfigSchema } from '../experience/transform.schema'
+import { jobStatusSchema } from './job-status.schema'
 
-/**
- * Job status schema (for transform job tracking)
- */
-export const jobStatusSchema = z.enum([
-  'pending',
-  'running',
-  'completed',
-  'failed',
-  'cancelled',
-])
+// Re-export jobStatusSchema for convenience
+export { jobStatusSchema, type JobStatus } from './job-status.schema'
 
 /**
  * Job progress tracking
@@ -157,7 +150,6 @@ export const jobSchema = z.looseObject({
 })
 
 export type Job = z.infer<typeof jobSchema>
-export type JobStatus = z.infer<typeof jobStatusSchema>
 export type JobProgress = z.infer<typeof jobProgressSchema>
 export type JobError = z.infer<typeof jobErrorSchema>
 export type JobOutput = z.infer<typeof jobOutputSchema>

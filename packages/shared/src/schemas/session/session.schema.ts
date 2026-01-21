@@ -11,7 +11,7 @@
  * - Uses `z.looseObject()` for forward compatibility with future fields
  */
 import { z } from 'zod'
-import { jobStatusSchema } from '../job/job.schema'
+import { jobStatusSchema } from '../job/job-status.schema'
 
 /**
  * Session mode schema
@@ -183,4 +183,4 @@ export type CapturedMedia = z.infer<typeof capturedMediaSchema>
 export type SessionResultMedia = z.infer<typeof sessionResultMediaSchema>
 
 // Re-export JobStatus for convenience
-export { jobStatusSchema, type JobStatus } from '../job/job.schema'
+export { jobStatusSchema, type JobStatus } from '../job/job-status.schema'
