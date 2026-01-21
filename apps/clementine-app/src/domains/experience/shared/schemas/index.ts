@@ -5,8 +5,6 @@
  * Core experience schemas are imported from @clementine/shared.
  */
 
-import type { BaseStep as _BaseStep } from '@clementine/shared'
-
 // Re-export core experience schemas from shared kernel
 export {
   experienceSchema,
@@ -24,15 +22,17 @@ export {
   type ExperienceStatus,
   type ExperienceProfile,
   type ExperienceMedia,
+  type BaseStep,
   type TransformConfig,
   type TransformNode,
   type VariableMapping,
   type OutputFormat,
 } from '@clementine/shared'
 
-// Backward compatibility: export both BaseStep and ExperienceStep
-export type BaseStep = _BaseStep
-export type ExperienceStep = _BaseStep
+// Domain-specific alias: BaseStep → ExperienceStep
+// BaseStep is the shared kernel name (minimal Firestore schema)
+// ExperienceStep is more contextual for this domain's usage
+export type { BaseStep as ExperienceStep } from '@clementine/shared'
 
 // Experience input schemas (for mutations) - app-specific
 export * from './experience.input.schemas'
