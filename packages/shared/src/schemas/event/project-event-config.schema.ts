@@ -26,7 +26,7 @@ export const overlayReferenceSchema = z
     /** MediaAsset document ID */
     mediaAssetId: z.string(),
     /** Firebase Storage download URL */
-    url: z.string().url(),
+    url: z.url(),
   })
   .nullable()
 
@@ -84,7 +84,7 @@ export const shareConfigSchema = z.object({
 export const mediaReferenceSchema = z
   .object({
     mediaAssetId: z.string(),
-    url: z.string().url(),
+    url: z.url(),
   })
   .nullable()
 

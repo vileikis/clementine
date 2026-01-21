@@ -5,8 +5,16 @@
  * Contains full execution context snapshot for reproducibility.
  *
  * Firestore Path: /projects/{projectId}/jobs/{jobId}
+ *
+ * Snapshot schemas use z.looseObject() for forward compatibility:
+ * - Old jobs with extra fields (e.g., stepName) still parse
+ * - New jobs use current schema definitions
+ * - Schema evolution is natural as the system evolves
  */
 import { z } from 'zod'
+import { answerSchema, capturedMediaSchema } from '../session/session.schema'
+import { overlayReferenceSchema } from '../event/project-event-config.schema'
+import { transformConfigSchema } from '../experience/transform.schema'
 
 /**
  * Job status schema (for transform job tracking)
@@ -44,7 +52,7 @@ export const jobErrorSchema = z.object({
  */
 export const jobOutputSchema = z.object({
   assetId: z.string(),
-  url: z.string().url(),
+  url: z.url(),
   format: z.enum(['image', 'gif', 'video']),
   dimensions: z.object({
     width: z.number().int().positive(),
@@ -56,68 +64,32 @@ export const jobOutputSchema = z.object({
 
 /**
  * Snapshot of session inputs at job creation
+ *
+ * Reuses session schemas for consistency. z.looseObject() ensures
+ * old jobs with extra fields (e.g., stepName from earlier versions)
+ * still parse successfully.
  */
-export const sessionInputsSnapshotSchema = z.object({
-  answers: z.array(
-    z.object({
-      stepId: z.string(),
-      stepType: z.string(),
-      stepName: z.string(),
-      value: z.union([z.string(), z.number(), z.boolean(), z.array(z.string())]),
-      answeredAt: z.number(),
-    }),
-  ),
-  capturedMedia: z.array(
-    z.object({
-      stepId: z.string(),
-      stepName: z.string(),
-      assetId: z.string(),
-      url: z.string(),
-      createdAt: z.number(),
-    }),
-  ),
+export const sessionInputsSnapshotSchema = z.looseObject({
+  answers: z.array(answerSchema),
+  capturedMedia: z.array(capturedMediaSchema),
 })
 
 /**
  * Snapshot of transform configuration at job creation
+ *
+ * Reuses transformConfigSchema from experience for consistency.
+ * Schema is already a z.looseObject() so old jobs with extra fields still parse.
  */
-export const transformConfigSnapshotSchema = z.object({
-  nodes: z.array(
-    z.object({
-      id: z.string(),
-      type: z.string(),
-      config: z.record(z.string(), z.unknown()),
-    }),
-  ),
-  variableMappings: z.array(
-    z.object({
-      source: z.string(),
-      target: z.string(),
-      mappingType: z.string(),
-    }),
-  ),
-  outputFormat: z
-    .object({
-      type: z.enum(['image', 'gif', 'video']),
-      width: z.number().optional(),
-      height: z.number().optional(),
-      quality: z.number().optional(),
-    })
-    .nullable(),
-})
+export const transformConfigSnapshotSchema = transformConfigSchema
 
 /**
  * Snapshot of event context at job creation
+ *
+ * Captures overlay reference and whether to apply it.
+ * Reuses overlayReferenceSchema for consistency.
  */
-export const eventContextSnapshotSchema = z.object({
-  overlaySettings: z
-    .object({
-      enabled: z.boolean(),
-      mediaAssetId: z.string().nullable(),
-      position: z.string().optional(),
-      opacity: z.number().optional(),
-    })
-    .nullable(),
+export const eventContextSnapshotSchema = z.looseObject({
+  overlay: overlayReferenceSchema,
   applyOverlay: z.boolean(),
 })
 
@@ -132,7 +104,7 @@ export const versionSnapshotSchema = z.object({
 /**
  * Complete job execution snapshot
  */
-export const jobSnapshotSchema = z.object({
+export const jobSnapshotSchema = z.looseObject({
   sessionInputs: sessionInputsSnapshotSchema,
   transformConfig: transformConfigSnapshotSchema,
   eventContext: eventContextSnapshotSchema,
