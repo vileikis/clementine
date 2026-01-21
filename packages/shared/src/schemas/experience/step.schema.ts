@@ -124,41 +124,11 @@ export const experienceStepSchema = z.discriminatedUnion('type', [
 ])
 
 /**
- * Base step schema for loose validation (backward compatibility)
- * Used for Firestore documents that may have unknown step types
- *
- * @deprecated Use `experienceStepSchema` for type-safe validation
- */
-export const experienceStepBaseSchema = z.looseObject({
-  /** Unique step identifier within the experience (UUID) */
-  id: z.string(),
-  /** Step type from registry (e.g., 'info', 'input.scale') */
-  type: z.string(),
-  /** Human-readable step name for identification and variable mapping */
-  name: z.string().min(1).max(50).optional(),
-  /** Step-specific configuration object */
-  config: z.record(z.string(), z.unknown()).default({}),
-})
-
-/**
- * Legacy alias for backward compatibility
- * @deprecated Use `experienceStepBaseSchema` instead
- */
-export const baseStepSchema = experienceStepBaseSchema
-
-/**
  * TypeScript types inferred from schemas
  */
 export type ExperienceStepType = z.infer<typeof experienceStepTypeSchema>
 export type ExperienceStepCategory = z.infer<typeof experienceStepCategorySchema>
 export type ExperienceStep = z.infer<typeof experienceStepSchema>
-export type ExperienceStepBase = z.infer<typeof experienceStepBaseSchema>
-
-/**
- * Legacy type alias
- * @deprecated Use `ExperienceStepBase` instead
- */
-export type BaseStep = ExperienceStepBase
 
 /**
  * Union of all step config types

@@ -42,9 +42,6 @@ export {
   experienceTransformPipelineStepConfigSchema,
   experienceAspectRatioSchema,
   experienceMediaAssetSchema,
-  // Legacy aliases (deprecated)
-  baseStepSchema,
-  experienceStepBaseSchema,
   // Types
   type Experience,
   type ExperienceConfig,
@@ -60,7 +57,6 @@ export {
   type ExperienceStepType,
   type ExperienceStepCategory,
   type ExperienceStepConfig,
-  type ExperienceStepBase,
   // Step config types
   type ExperienceInfoStepConfig,
   type ExperienceInputScaleStepConfig,
@@ -72,8 +68,6 @@ export {
   type ExperienceTransformPipelineStepConfig,
   type ExperienceAspectRatio,
   type ExperienceMediaAsset,
-  // Legacy type aliases (deprecated)
-  type BaseStep,
 } from '@clementine/shared'
 
 // Experience input schemas (for mutations) - app-specific
