@@ -12,7 +12,7 @@
 import { CapturePhotoEditMode } from './CapturePhotoEditMode'
 import { CapturePhotoRunMode } from './CapturePhotoRunMode'
 import type { StepRendererProps } from '../../registry/step-registry'
-import type { CapturePhotoStepConfig } from '../../schemas/capture-photo.schema'
+import type { ExperienceCapturePhotoStepConfig } from '@clementine/shared'
 
 export function CapturePhotoRenderer({
   step,
@@ -21,7 +21,7 @@ export function CapturePhotoRenderer({
   onBack,
   canGoBack,
 }: StepRendererProps) {
-  const config = step.config as CapturePhotoStepConfig
+  const config = step.config as ExperienceCapturePhotoStepConfig
   const { aspectRatio } = config
 
   if (mode === 'edit') {

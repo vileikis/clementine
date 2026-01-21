@@ -18,11 +18,8 @@ import {
   where,
 } from 'firebase/firestore'
 
-import { experienceSchema } from '../schemas/experience.schema'
-import type {
-  Experience,
-  ExperienceProfile,
-} from '../schemas/experience.schema'
+import { experienceSchema } from '../schemas'
+import type { Experience, ExperienceProfile } from '../schemas'
 import { firestore } from '@/integrations/firebase/client'
 import { convertFirestoreDoc } from '@/shared/utils/firestore-utils'
 

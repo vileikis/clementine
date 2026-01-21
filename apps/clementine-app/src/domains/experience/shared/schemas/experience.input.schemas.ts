@@ -9,7 +9,7 @@ import { z } from 'zod'
 import {
   experienceMediaSchema,
   experienceProfileSchema,
-} from './experience.schema'
+} from '@clementine/shared'
 
 /**
  * Create Experience Input Schema

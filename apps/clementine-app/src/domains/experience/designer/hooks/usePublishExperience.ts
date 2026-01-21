@@ -15,8 +15,8 @@ import { experienceKeys } from '../../shared/queries/experience.query'
 import { stepRegistry } from '../../steps/registry/step-registry'
 import { getStepTypesForProfile } from '../../steps/registry/step-utils'
 import type { UpdateData } from 'firebase/firestore'
-import type { Experience } from '../../shared/schemas/experience.schema'
-import type { Step, StepType } from '../../steps/schemas/step.schema'
+import type { Experience } from '../../shared/schemas'
+import type { Step } from '../../steps/registry/step-registry'
 import { firestore } from '@/integrations/firebase/client'
 
 /**
@@ -88,7 +88,7 @@ export function validateForPublish(
 
   // Rule 2: All steps have valid config
   for (const step of experience.draft.steps) {
-    const definition = stepRegistry[step.type as StepType]
+    const definition = stepRegistry[step.type]
     if (!definition) {
       errors.push({
         field: 'steps',
@@ -113,7 +113,7 @@ export function validateForPublish(
   // Rule 3: Profile constraints
   const allowedTypes = getStepTypesForProfile(experience.profile)
   for (const step of experience.draft.steps) {
-    if (!allowedTypes.includes(step.type as StepType)) {
+    if (!allowedTypes.includes(step.type)) {
       errors.push({
         field: 'steps',
         stepId: step.id,

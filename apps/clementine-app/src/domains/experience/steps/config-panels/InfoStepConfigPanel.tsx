@@ -5,7 +5,7 @@
  * Fields: title, description, media.
  */
 import type { StepConfigPanelProps } from '../registry/step-registry'
-import type { InfoStepConfig } from '../schemas/info.schema'
+import type { ExperienceInfoStepConfig } from '@clementine/shared'
 import {
   EditorSection,
   MediaPickerField,
@@ -18,7 +18,7 @@ export function InfoStepConfigPanel({
   onConfigChange,
   disabled,
 }: StepConfigPanelProps) {
-  const config = step.config as InfoStepConfig
+  const config = step.config as ExperienceInfoStepConfig
   const { title, description } = config
 
   return (

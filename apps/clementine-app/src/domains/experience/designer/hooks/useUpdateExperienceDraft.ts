@@ -15,7 +15,7 @@ import {
 import * as Sentry from '@sentry/tanstackstart-react'
 
 import { experienceKeys } from '../../shared/queries/experience.query'
-import type { ExperienceConfig } from '../../shared/schemas/experience.schema'
+import type { ExperienceConfig } from '../../shared/schemas'
 import { firestore } from '@/integrations/firebase/client'
 
 /**

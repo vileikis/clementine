@@ -1,7 +1,7 @@
 import { useParams } from '@tanstack/react-router'
 import { useCallback, useMemo } from 'react'
 import { toast } from 'sonner'
-import { GuestFlowSection, OverlaySection, SharingSection } from '../components'
+import { GuestFlowSection, OverlaySection } from '../components'
 import type { ExperienceReference } from '@/domains/event/experiences'
 import { useUpdateEventExperiences } from '@/domains/event/experiences'
 import { useProjectEvent } from '@/domains/event/shared'
@@ -93,8 +93,6 @@ export function EventSettingsPage() {
           userId={user.uid}
           overlays={event.draftConfig?.overlays || null}
         />
-
-        <SharingSection event={event} projectId={projectId} eventId={eventId} />
       </div>
     </div>
   )

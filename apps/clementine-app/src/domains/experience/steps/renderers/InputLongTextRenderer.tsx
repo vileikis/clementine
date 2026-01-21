@@ -12,7 +12,7 @@
 import { useCallback } from 'react'
 import { StepLayout } from './StepLayout'
 import type { StepRendererProps } from '../registry/step-registry'
-import type { InputLongTextStepConfig } from '../schemas/input-long-text.schema'
+import type { ExperienceInputLongTextStepConfig } from '@clementine/shared'
 import { ThemedText, ThemedTextarea } from '@/shared/theming'
 
 export function InputLongTextRenderer({
@@ -25,7 +25,7 @@ export function InputLongTextRenderer({
   canGoBack,
   canProceed,
 }: StepRendererProps) {
-  const config = step.config as InputLongTextStepConfig
+  const config = step.config as ExperienceInputLongTextStepConfig
   const { title, placeholder, maxLength } = config
 
   // Current value

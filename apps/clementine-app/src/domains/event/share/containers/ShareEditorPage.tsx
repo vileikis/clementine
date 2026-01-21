@@ -53,11 +53,8 @@ export function ShareEditorPage() {
   const currentShare = event?.draftConfig?.share ?? DEFAULT_SHARE
 
   // Get current share options from event or use defaults
-  // Fall back to 'sharing' for backward compatibility
   const currentShareOptions =
-    event?.draftConfig?.shareOptions ??
-    event?.draftConfig?.sharing ??
-    DEFAULT_SHARE_OPTIONS
+    event?.draftConfig?.shareOptions ?? DEFAULT_SHARE_OPTIONS
 
   // Get current theme from event or use defaults
   const currentTheme = event?.draftConfig?.theme ?? DEFAULT_THEME

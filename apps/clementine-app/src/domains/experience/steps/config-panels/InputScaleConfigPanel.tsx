@@ -5,7 +5,7 @@
  * Fields: title, required, min, max, minLabel, maxLabel.
  */
 import type { StepConfigPanelProps } from '../registry/step-registry'
-import type { InputScaleStepConfig } from '../schemas/input-scale.schema'
+import type { ExperienceInputScaleStepConfig } from '@clementine/shared'
 import type { EditorOption } from '@/shared/editor-controls'
 import {
   EditorRow,
@@ -36,7 +36,7 @@ export function InputScaleConfigPanel({
   onConfigChange,
   disabled,
 }: StepConfigPanelProps) {
-  const config = step.config as InputScaleStepConfig
+  const config = step.config as ExperienceInputScaleStepConfig
   const { title, required, min, max, minLabel, maxLabel } = config
 
   return (

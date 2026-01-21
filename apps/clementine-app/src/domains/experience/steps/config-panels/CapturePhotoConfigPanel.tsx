@@ -6,14 +6,14 @@
  */
 import type { StepConfigPanelProps } from '../registry/step-registry'
 import type {
-  AspectRatio,
-  CapturePhotoStepConfig,
-} from '../schemas/capture-photo.schema'
+  ExperienceAspectRatio,
+  ExperienceCapturePhotoStepConfig,
+} from '@clementine/shared'
 import type { EditorOption } from '@/shared/editor-controls'
 import { EditorSection, SelectField } from '@/shared/editor-controls'
 
 // Aspect ratio options
-const ASPECT_RATIO_OPTIONS: EditorOption<AspectRatio>[] = [
+const ASPECT_RATIO_OPTIONS: EditorOption<ExperienceAspectRatio>[] = [
   { value: '1:1', label: 'Square (1:1)' },
   { value: '9:16', label: 'Portrait (9:16)' },
   { value: '3:2', label: 'Landscape (3:2)' },
@@ -25,7 +25,7 @@ export function CapturePhotoConfigPanel({
   onConfigChange,
   disabled,
 }: StepConfigPanelProps) {
-  const config = step.config as CapturePhotoStepConfig
+  const config = step.config as ExperienceCapturePhotoStepConfig
   const { aspectRatio } = config
 
   return (

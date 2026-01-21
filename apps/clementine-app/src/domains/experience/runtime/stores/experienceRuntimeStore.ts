@@ -19,7 +19,7 @@ import type {
   Session,
   SessionResultMedia,
 } from '@/domains/session'
-import type { ExperienceStep } from '../../shared/schemas/experience.schema'
+import type { ExperienceStep } from '../../shared/schemas'
 
 /**
  * Experience runtime state

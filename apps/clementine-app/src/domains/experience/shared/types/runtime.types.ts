@@ -8,7 +8,7 @@
  */
 import type { MediaReference } from '@/shared/theming'
 import type { Answer, SessionMode, SessionResultMedia } from '@/domains/session'
-import type { ExperienceStep } from '../schemas/experience.schema'
+import type { ExperienceStep } from '../schemas'
 
 // Re-export SessionMode for convenience
 export type { SessionMode }

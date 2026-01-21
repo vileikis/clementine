@@ -12,7 +12,7 @@
 import { useCallback } from 'react'
 import { StepLayout } from './StepLayout'
 import type { StepRendererProps } from '../registry/step-registry'
-import type { InputShortTextStepConfig } from '../schemas/input-short-text.schema'
+import type { ExperienceInputShortTextStepConfig } from '@clementine/shared'
 import { ThemedInput, ThemedText } from '@/shared/theming'
 
 export function InputShortTextRenderer({
@@ -25,7 +25,7 @@ export function InputShortTextRenderer({
   canGoBack,
   canProceed,
 }: StepRendererProps) {
-  const config = step.config as InputShortTextStepConfig
+  const config = step.config as ExperienceInputShortTextStepConfig
   const { title, placeholder, maxLength } = config
 
   // Current value

@@ -11,7 +11,7 @@
  */
 import { StepLayout } from './StepLayout'
 import type { StepRendererProps } from '../registry/step-registry'
-import type { InfoStepConfig } from '../schemas/info.schema'
+import type { ExperienceInfoStepConfig } from '@clementine/shared'
 import { ThemedText, useEventTheme } from '@/shared/theming'
 
 export function InfoStepRenderer({
@@ -21,7 +21,7 @@ export function InfoStepRenderer({
   onBack,
   canGoBack,
 }: StepRendererProps) {
-  const config = step.config as InfoStepConfig
+  const config = step.config as ExperienceInfoStepConfig
   const { title, description, media } = config
   const { theme } = useEventTheme()
 

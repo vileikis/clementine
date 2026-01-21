@@ -15,7 +15,7 @@ import { createExperienceInputSchema } from '../schemas/experience.input.schemas
 import { experienceKeys } from '../queries/experience.query'
 import type { WithFieldValue } from 'firebase/firestore'
 
-import type { Experience } from '../schemas/experience.schema'
+import type { Experience } from '../schemas'
 import type { CreateExperienceInput } from '../schemas/experience.input.schemas'
 import { firestore } from '@/integrations/firebase/client'
 
@@ -84,7 +84,7 @@ export function useCreateExperience() {
           profile: validated.profile,
           status: 'active',
           media: null,
-          draft: { steps: [] },
+          draft: { steps: [], transform: null },
           published: null,
           draftVersion: 1,
           publishedVersion: null,

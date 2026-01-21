@@ -38,7 +38,7 @@ import type {
   CameraViewRef,
   CapturedPhoto,
 } from '@/shared/camera'
-import type { AspectRatio } from '../../schemas/capture-photo.schema'
+import type { ExperienceAspectRatio } from '@clementine/shared'
 import {
   useCameraPermission,
   useLibraryPicker,
@@ -47,7 +47,7 @@ import {
 
 interface CapturePhotoRunModeProps {
   step: StepRendererProps['step']
-  aspectRatio: AspectRatio
+  aspectRatio: ExperienceAspectRatio
   onSubmit?: () => void
   onBack?: () => void
   canGoBack?: boolean
