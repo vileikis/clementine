@@ -1,8 +1,8 @@
 /**
- * useEnsureGuestRecord Hook
+ * useInitGuest Hook
  *
- * Convenience hook that ensures a guest record exists for the current user.
- * Orchestrates fetching and creating the guest record as needed.
+ * Orchestration hook that initializes a guest for the current user.
+ * Handles fetching existing guest or creating one if needed.
  *
  * Prerequisites:
  * - User must be authenticated (anonymous or admin)
@@ -10,36 +10,36 @@
  *
  * Flow:
  * 1. Wait for authentication to complete
- * 2. Fetch existing guest record
- * 3. If no record exists, create one
+ * 2. Fetch existing guest
+ * 3. If no guest exists, create one
  * 4. Return ready state with guest data
  */
 import { useEffect, useRef } from 'react'
-import { useGuestRecord } from './useGuestRecord'
-import { useCreateGuestRecord } from './useCreateGuestRecord'
+import { useGuest } from './useGuest'
+import { useCreateGuest } from './useCreateGuest'
 import type { Guest } from '../schemas/guest.schema'
 import { useAuth } from '@/domains/auth'
 
-export type EnsureGuestRecordState =
+export type InitGuestState =
   | { status: 'loading' }
   | { status: 'error'; error: Error }
   | { status: 'ready'; guest: Guest }
 
 /**
- * Hook that ensures a guest record exists for the authenticated user
+ * Hook that initializes a guest for the authenticated user
  *
  * Handles the complete flow:
  * 1. Waits for user authentication
- * 2. Checks for existing guest record
- * 3. Creates record if it doesn't exist
+ * 2. Checks for existing guest
+ * 3. Creates guest if it doesn't exist
  *
- * @param projectId - Project ID for the guest record
+ * @param projectId - Project ID for the guest
  * @returns State object with loading, error, or ready status
  *
  * @example
  * ```tsx
  * function GuestContent({ projectId }: { projectId: string }) {
- *   const guestState = useEnsureGuestRecord(projectId)
+ *   const guestState = useInitGuest(projectId)
  *
  *   if (guestState.status === 'loading') {
  *     return <Loading />
@@ -54,15 +54,15 @@ export type EnsureGuestRecordState =
  * }
  * ```
  */
-export function useEnsureGuestRecord(projectId: string): EnsureGuestRecordState {
+export function useInitGuest(projectId: string): InitGuestState {
   const { user, isLoading: authLoading } = useAuth()
-  const createGuestMutation = useCreateGuestRecord()
+  const createGuestMutation = useCreateGuest()
   const createAttemptedRef = useRef(false)
 
   // Only fetch if user is authenticated
-  const guestQuery = useGuestRecord(projectId, user?.uid ?? '')
+  const guestQuery = useGuest(projectId, user?.uid ?? '')
 
-  // Auto-create guest record if it doesn't exist
+  // Auto-create guest if it doesn't exist
   useEffect(() => {
     // Wait for auth and query to complete
     if (authLoading || guestQuery.isLoading || !user) {
@@ -79,7 +79,7 @@ export function useEnsureGuestRecord(projectId: string): EnsureGuestRecordState 
       return
     }
 
-    // Create guest record
+    // Create guest
     createAttemptedRef.current = true
     createGuestMutation.mutate({
       projectId,

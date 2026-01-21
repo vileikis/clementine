@@ -16,7 +16,7 @@ import { Link, useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { ArrowLeft } from 'lucide-react'
 import { useGuestAccess } from '../hooks/useGuestAccess'
-import { useEnsureGuestRecord } from '../hooks/useEnsureGuestRecord'
+import { useInitGuest } from '../hooks/useInitGuest'
 import { ComingSoonPage, ErrorPage } from '../components'
 import { useCreateSession } from '@/domains/session/shared'
 import { useAnonymousSignIn, useAuth } from '@/domains/auth'
@@ -75,7 +75,7 @@ export function ExperiencePlaceholder({
   }, [authLoading, user, isSigningIn, signInAnonymously])
 
   const access = useGuestAccess(projectId)
-  const guestState = useEnsureGuestRecord(projectId)
+  const guestState = useInitGuest(projectId)
   const createSession = useCreateSession()
   const creatingSessionRef = useRef(false)
 

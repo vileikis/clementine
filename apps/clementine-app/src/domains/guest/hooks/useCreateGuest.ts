@@ -1,7 +1,7 @@
 /**
- * useCreateGuestRecord Hook
+ * useCreateGuest Hook
  *
- * Mutation hook for creating a new guest record in Firestore.
+ * Mutation hook for creating a new guest in Firestore.
  * Used when a user (anonymous or admin) first visits a project.
  *
  * Path: /projects/{projectId}/guests/{guestId}
@@ -24,7 +24,7 @@ export interface CreateGuestResult {
 }
 
 /**
- * Hook for creating a new guest record
+ * Hook for creating a new guest
  *
  * Features:
  * - Validates input with Zod schema
@@ -39,7 +39,7 @@ export interface CreateGuestResult {
  * ```tsx
  * function GuestInit({ projectId }: { projectId: string }) {
  *   const { user } = useAuth()
- *   const createGuest = useCreateGuestRecord()
+ *   const createGuest = useCreateGuest()
  *
  *   useEffect(() => {
  *     if (user && !guestExists) {
@@ -52,7 +52,7 @@ export interface CreateGuestResult {
  * }
  * ```
  */
-export function useCreateGuestRecord() {
+export function useCreateGuest() {
   const queryClient = useQueryClient()
 
   return useMutation<CreateGuestResult, Error, CreateGuestInput>({
@@ -95,7 +95,7 @@ export function useCreateGuestRecord() {
       })
     },
     onSuccess: (result, input) => {
-      // Update query cache with the new guest record
+      // Update query cache with the new guest
       queryClient.setQueryData(
         guestKeys.record(input.projectId, input.authUid),
         result.guest,
@@ -105,7 +105,7 @@ export function useCreateGuestRecord() {
       Sentry.captureException(error, {
         tags: {
           domain: 'guest',
-          action: 'create-guest-record',
+          action: 'create-guest',
         },
       })
     },

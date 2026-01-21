@@ -15,7 +15,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { useGuestAccess } from '../hooks/useGuestAccess'
-import { useEnsureGuestRecord } from '../hooks/useEnsureGuestRecord'
+import { useInitGuest } from '../hooks/useInitGuest'
 import { ComingSoonPage, ErrorPage } from '../components'
 import { DEFAULT_WELCOME, WelcomeRenderer } from '@/domains/event/welcome'
 import { ThemeProvider } from '@/shared/theming'
@@ -63,8 +63,8 @@ export function WelcomeScreenPage({ projectId }: WelcomeScreenPageProps) {
   // Guest access validation (project, event, experiences)
   const access = useGuestAccess(projectId)
 
-  // Guest record management (only runs once authenticated)
-  const guestState = useEnsureGuestRecord(projectId)
+  // Guest initialization (only runs once authenticated)
+  const guestState = useInitGuest(projectId)
 
   const createSession = useCreateSession()
 
