@@ -8,7 +8,7 @@ import {
   CURRENT_CONFIG_VERSION,
   overlaysConfigSchema,
   projectEventConfigSchema,
-  sharingConfigSchema,
+  shareOptionsConfigSchema,
 } from '../project-event-config.schema'
 
 describe('projectEventConfigSchema', () => {
@@ -18,10 +18,9 @@ describe('projectEventConfigSchema', () => {
         schemaVersion: 1,
         theme: null,
         overlays: null,
-        sharing: null,
+        shareOptions: null,
         welcome: null,
         share: null,
-        shareOptions: null,
         experiences: null,
       }
 
@@ -39,7 +38,7 @@ describe('projectEventConfigSchema', () => {
 
       expect(result.theme).toBeNull()
       expect(result.overlays).toBeNull()
-      expect(result.sharing).toBeNull()
+      expect(result.shareOptions).toBeNull()
     })
 
     it('should use CURRENT_CONFIG_VERSION as default for schemaVersion', () => {
@@ -76,7 +75,7 @@ describe('projectEventConfigSchema', () => {
           },
         },
         overlays: null,
-        sharing: null,
+        shareOptions: null,
       }
 
       const result = projectEventConfigSchema.parse(configWithTheme)
@@ -98,7 +97,7 @@ describe('projectEventConfigSchema', () => {
             url: 'https://storage.googleapis.com/portrait.png',
           },
         },
-        sharing: null,
+        shareOptions: null,
       }
 
       const result = projectEventConfigSchema.parse(configWithOverlays)
@@ -111,7 +110,7 @@ describe('projectEventConfigSchema', () => {
         schemaVersion: 1,
         theme: null,
         overlays: null,
-        sharing: {
+        shareOptions: {
           download: true,
           copyLink: true,
           email: false,
@@ -126,7 +125,7 @@ describe('projectEventConfigSchema', () => {
 
       const result = projectEventConfigSchema.parse(configWithSharing)
 
-      expect(result.sharing).toEqual(configWithSharing.sharing)
+      expect(result.shareOptions).toEqual(configWithSharing.shareOptions)
     })
   })
 
@@ -139,7 +138,7 @@ describe('projectEventConfigSchema', () => {
       // All optional fields should be null, not undefined (Firestore-safe)
       expect(result.theme).toBeNull()
       expect(result.overlays).toBeNull()
-      expect(result.sharing).toBeNull()
+      expect(result.shareOptions).toBeNull()
     })
 
     it('should allow unknown fields (passthrough)', () => {
@@ -147,7 +146,7 @@ describe('projectEventConfigSchema', () => {
         schemaVersion: 1,
         theme: null,
         overlays: null,
-        sharing: null,
+        shareOptions: null,
         unknownField: 'future feature',
         anotherUnknown: 123,
       }
@@ -208,11 +207,11 @@ describe('projectEventConfigSchema', () => {
     })
   })
 
-  describe('sharingConfigSchema', () => {
+  describe('shareOptionsConfigSchema', () => {
     it('should apply defaults (download and copyLink enabled, socials disabled)', () => {
       const emptySharing = {}
 
-      const result = sharingConfigSchema.parse(emptySharing)
+      const result = shareOptionsConfigSchema.parse(emptySharing)
 
       expect(result.download).toBe(true)
       expect(result.copyLink).toBe(true)
@@ -238,7 +237,7 @@ describe('projectEventConfigSchema', () => {
         telegram: false,
       }
 
-      const result = sharingConfigSchema.parse(noSharing)
+      const result = shareOptionsConfigSchema.parse(noSharing)
 
       expect(result.download).toBe(false)
       expect(result.copyLink).toBe(false)
@@ -252,7 +251,7 @@ describe('projectEventConfigSchema', () => {
         facebook: true,
       }
 
-      const result = sharingConfigSchema.parse(partialSharing)
+      const result = shareOptionsConfigSchema.parse(partialSharing)
 
       // Explicitly provided values
       expect(result.instagram).toBe(true)

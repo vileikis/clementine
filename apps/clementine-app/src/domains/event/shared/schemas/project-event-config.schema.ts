@@ -51,12 +51,6 @@ export {
   type MainExperienceReference,
 } from '@clementine/shared'
 
-/**
- * @deprecated Use shareOptionsConfigSchema instead
- * Alias for backward compatibility
- */
-export { shareOptionsConfigSchema as sharingConfigSchema } from '@clementine/shared'
-
 // =============================================================================
 // App-specific WRITE schemas (with validation limits)
 // =============================================================================
