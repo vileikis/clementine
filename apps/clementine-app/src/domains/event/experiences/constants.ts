@@ -1,4 +1,4 @@
-import type { ExperienceProfile } from '@/domains/experience/shared/types'
+import type { ExperienceProfile } from '@/domains/experience/shared/schemas'
 
 /**
  * Slot type definition

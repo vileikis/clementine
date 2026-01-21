@@ -5,7 +5,7 @@
  * Fields: title, required, placeholder, maxLength.
  */
 import type { StepConfigPanelProps } from '../registry/step-registry'
-import type { InputLongTextStepConfig } from '../schemas/input-long-text.schema'
+import type { ExperienceInputLongTextStepConfig } from '@clementine/shared'
 import {
   EditorRow,
   EditorSection,
@@ -19,7 +19,7 @@ export function InputLongTextConfigPanel({
   onConfigChange,
   disabled,
 }: StepConfigPanelProps) {
-  const config = step.config as InputLongTextStepConfig
+  const config = step.config as ExperienceInputLongTextStepConfig
   const { title, required, placeholder, maxLength } = config
 
   return (

@@ -12,7 +12,7 @@
 import { useCallback } from 'react'
 import { StepLayout } from './StepLayout'
 import type { StepRendererProps } from '../registry/step-registry'
-import type { InputYesNoStepConfig } from '../schemas/input-yes-no.schema'
+import type { ExperienceInputYesNoStepConfig } from '@clementine/shared'
 import { ThemedButton, ThemedText } from '@/shared/theming'
 
 export function InputYesNoRenderer({
@@ -25,7 +25,7 @@ export function InputYesNoRenderer({
   canGoBack,
   canProceed,
 }: StepRendererProps) {
-  const config = step.config as InputYesNoStepConfig
+  const config = step.config as ExperienceInputYesNoStepConfig
   const { title } = config
 
   // Current selected value

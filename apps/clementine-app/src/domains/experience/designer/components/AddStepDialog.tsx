@@ -9,7 +9,7 @@ import {
   getCategoryLabel,
   getStepsByCategoryForProfile,
 } from '../../steps/registry/step-utils'
-import type { ExperienceProfile } from '../../shared/schemas/experience.schema'
+import type { ExperienceProfile } from '../../shared/schemas'
 import type { StepCategory, StepType } from '../../steps/registry/step-registry'
 import { Button } from '@/ui-kit/ui/button'
 import {

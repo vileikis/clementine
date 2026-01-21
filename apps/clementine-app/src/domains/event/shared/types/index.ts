@@ -7,5 +7,5 @@ export type {
   ProjectEventConfig,
   ProjectEventFull,
   OverlaysConfig,
-  SharingConfig,
+  ShareOptionsConfig,
 } from '../schemas'

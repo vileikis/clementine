@@ -11,7 +11,7 @@ import { doc, runTransaction, serverTimestamp } from 'firebase/firestore'
 import * as Sentry from '@sentry/tanstackstart-react'
 
 import type { UpdateData } from 'firebase/firestore'
-import type { Answer, CapturedMedia, Session } from '../schemas/session.schema'
+import type { Answer, CapturedMedia, Session } from '../schemas'
 
 import { firestore } from '@/integrations/firebase/client'
 

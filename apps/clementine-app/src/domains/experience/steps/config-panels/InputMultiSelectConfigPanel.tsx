@@ -7,7 +7,7 @@
 import { Plus, Trash2 } from 'lucide-react'
 
 import type { StepConfigPanelProps } from '../registry/step-registry'
-import type { InputMultiSelectStepConfig } from '../schemas/input-multi-select.schema'
+import type { ExperienceInputMultiSelectStepConfig } from '@clementine/shared'
 import { EditorRow, EditorSection, TextField } from '@/shared/editor-controls'
 import { Button } from '@/ui-kit/ui/button'
 import { Input } from '@/ui-kit/ui/input'
@@ -19,7 +19,7 @@ export function InputMultiSelectConfigPanel({
   onConfigChange,
   disabled,
 }: StepConfigPanelProps) {
-  const config = step.config as InputMultiSelectStepConfig
+  const config = step.config as ExperienceInputMultiSelectStepConfig
   const { title, required, options, multiSelect } = config
 
   const handleOptionChange = (index: number, value: string) => {

@@ -15,7 +15,7 @@ import * as Sentry from '@sentry/tanstackstart-react'
 
 import { createSessionInputSchema } from '../types/session-api.types'
 import type { WithFieldValue } from 'firebase/firestore'
-import type { Session } from '../schemas/session.schema'
+import type { Session } from '../schemas'
 import type { CreateSessionInput } from '../types/session-api.types'
 import { auth, firestore } from '@/integrations/firebase/client'
 
@@ -90,6 +90,7 @@ export function useCreateSession() {
           capturedMedia: [],
           resultMedia: null,
           jobId: null,
+          jobStatus: null,
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
           completedAt: null,

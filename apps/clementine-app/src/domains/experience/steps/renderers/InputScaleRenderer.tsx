@@ -12,7 +12,7 @@
 import { useCallback } from 'react'
 import { StepLayout } from './StepLayout'
 import type { StepRendererProps } from '../registry/step-registry'
-import type { InputScaleStepConfig } from '../schemas/input-scale.schema'
+import type { ExperienceInputScaleStepConfig } from '@clementine/shared'
 import { ThemedScaleButton, ThemedText } from '@/shared/theming'
 
 export function InputScaleRenderer({
@@ -25,7 +25,7 @@ export function InputScaleRenderer({
   canGoBack,
   canProceed,
 }: StepRendererProps) {
-  const config = step.config as InputScaleStepConfig
+  const config = step.config as ExperienceInputScaleStepConfig
   const { title, min, max, minLabel, maxLabel } = config
 
   // Generate scale values

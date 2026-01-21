@@ -19,48 +19,42 @@ import {
 } from 'lucide-react'
 
 import {
-  capturePhotoStepConfigSchema,
+  experienceCapturePhotoStepConfigSchema,
+  experienceInfoStepConfigSchema,
+  experienceInputLongTextStepConfigSchema,
+  experienceInputMultiSelectStepConfigSchema,
+  experienceInputScaleStepConfigSchema,
+  experienceInputShortTextStepConfigSchema,
+  experienceInputYesNoStepConfigSchema,
+  experienceTransformPipelineStepConfigSchema,
+} from '@clementine/shared'
+import {
   createDefaultCapturePhotoConfig,
-} from '../schemas/capture-photo.schema'
-import {
   createDefaultInfoConfig,
-  infoStepConfigSchema,
-} from '../schemas/info.schema'
-import {
   createDefaultInputLongTextConfig,
-  inputLongTextStepConfigSchema,
-} from '../schemas/input-long-text.schema'
-import {
   createDefaultInputMultiSelectConfig,
-  inputMultiSelectStepConfigSchema,
-} from '../schemas/input-multi-select.schema'
-import {
   createDefaultInputScaleConfig,
-  inputScaleStepConfigSchema,
-} from '../schemas/input-scale.schema'
-import {
   createDefaultInputShortTextConfig,
-  inputShortTextStepConfigSchema,
-} from '../schemas/input-short-text.schema'
-import {
   createDefaultInputYesNoConfig,
-  inputYesNoStepConfigSchema,
-} from '../schemas/input-yes-no.schema'
-import {
   createDefaultTransformPipelineConfig,
-  transformPipelineStepConfigSchema,
-} from '../schemas/transform-pipeline.schema'
+} from '../defaults'
+import type {
+  ExperienceStep,
+  ExperienceStepCategory,
+  ExperienceStepConfig,
+  ExperienceStepType,
+} from '@clementine/shared'
+
 import type { LucideIcon } from 'lucide-react'
 import type { z } from 'zod'
-import type {
-  Step,
-  StepCategory,
-  StepConfig,
-  StepType,
-} from '../schemas/step.schema'
 
-// Re-export types from step.schema for convenience
-export type { Step, StepCategory, StepConfig, StepType }
+// Re-export types for convenience (using new names)
+export type {
+  ExperienceStep as Step,
+  ExperienceStepCategory as StepCategory,
+  ExperienceStepConfig as StepConfig,
+  ExperienceStepType as StepType,
+}
 
 /**
  * Answer value type for step inputs
@@ -74,7 +68,7 @@ export interface StepRendererProps {
   /** Rendering mode - edit shows disabled controls, run allows interaction */
   mode: 'edit' | 'run'
   /** The step being rendered */
-  step: Step
+  step: ExperienceStep
   /** Optional submit handler - when provided, the Next button is enabled */
   onSubmit?: () => void
 
@@ -95,8 +89,8 @@ export interface StepRendererProps {
  * Props for step configuration panels
  */
 export interface StepConfigPanelProps {
-  step: Step
-  onConfigChange: (updates: Partial<StepConfig>) => void
+  step: ExperienceStep
+  onConfigChange: (updates: Partial<ExperienceStepConfig>) => void
   disabled?: boolean
 }
 
@@ -105,9 +99,9 @@ export interface StepConfigPanelProps {
  */
 export interface StepDefinition {
   /** Step type identifier */
-  type: StepType
+  type: ExperienceStepType
   /** Category for grouping */
-  category: StepCategory
+  category: ExperienceStepCategory
   /** Display label */
   label: string
   /** Description for add step dialog */
@@ -117,20 +111,20 @@ export interface StepDefinition {
   /** Zod schema for validation */
   configSchema: z.ZodSchema
   /** Factory for default config */
-  defaultConfig: () => StepConfig
+  defaultConfig: () => ExperienceStepConfig
 }
 
 /**
  * Step registry with all step type definitions
  */
-export const stepRegistry: Record<StepType, StepDefinition> = {
+export const stepRegistry: Record<ExperienceStepType, StepDefinition> = {
   info: {
     type: 'info',
     category: 'info',
     label: 'Information',
     description: 'Display text, images, or instructions',
     icon: Info,
-    configSchema: infoStepConfigSchema,
+    configSchema: experienceInfoStepConfigSchema,
     defaultConfig: createDefaultInfoConfig,
   },
   'input.scale': {
@@ -139,7 +133,7 @@ export const stepRegistry: Record<StepType, StepDefinition> = {
     label: 'Opinion Scale',
     description: 'Collect ratings on a numeric scale',
     icon: SlidersHorizontal,
-    configSchema: inputScaleStepConfigSchema,
+    configSchema: experienceInputScaleStepConfigSchema,
     defaultConfig: createDefaultInputScaleConfig,
   },
   'input.yesNo': {
@@ -148,7 +142,7 @@ export const stepRegistry: Record<StepType, StepDefinition> = {
     label: 'Yes/No',
     description: 'Simple binary choice question',
     icon: CircleDot,
-    configSchema: inputYesNoStepConfigSchema,
+    configSchema: experienceInputYesNoStepConfigSchema,
     defaultConfig: createDefaultInputYesNoConfig,
   },
   'input.multiSelect': {
@@ -157,7 +151,7 @@ export const stepRegistry: Record<StepType, StepDefinition> = {
     label: 'Multiple Choice',
     description: 'Select from multiple options',
     icon: ListChecks,
-    configSchema: inputMultiSelectStepConfigSchema,
+    configSchema: experienceInputMultiSelectStepConfigSchema,
     defaultConfig: createDefaultInputMultiSelectConfig,
   },
   'input.shortText': {
@@ -166,7 +160,7 @@ export const stepRegistry: Record<StepType, StepDefinition> = {
     label: 'Short Answer',
     description: 'Single-line text response',
     icon: Type,
-    configSchema: inputShortTextStepConfigSchema,
+    configSchema: experienceInputShortTextStepConfigSchema,
     defaultConfig: createDefaultInputShortTextConfig,
   },
   'input.longText': {
@@ -175,7 +169,7 @@ export const stepRegistry: Record<StepType, StepDefinition> = {
     label: 'Long Answer',
     description: 'Multi-line text response',
     icon: AlignLeft,
-    configSchema: inputLongTextStepConfigSchema,
+    configSchema: experienceInputLongTextStepConfigSchema,
     defaultConfig: createDefaultInputLongTextConfig,
   },
   'capture.photo': {
@@ -184,7 +178,7 @@ export const stepRegistry: Record<StepType, StepDefinition> = {
     label: 'Photo Capture',
     description: 'Take a photo with the camera',
     icon: Camera,
-    configSchema: capturePhotoStepConfigSchema,
+    configSchema: experienceCapturePhotoStepConfigSchema,
     defaultConfig: createDefaultCapturePhotoConfig,
   },
   'transform.pipeline': {
@@ -193,7 +187,7 @@ export const stepRegistry: Record<StepType, StepDefinition> = {
     label: 'AI Transform',
     description: 'Process with AI pipeline',
     icon: Sparkles,
-    configSchema: transformPipelineStepConfigSchema,
+    configSchema: experienceTransformPipelineStepConfigSchema,
     defaultConfig: createDefaultTransformPipelineConfig,
   },
 }
@@ -201,4 +195,4 @@ export const stepRegistry: Record<StepType, StepDefinition> = {
 /**
  * All available step types
  */
-export const STEP_TYPES = Object.keys(stepRegistry) as StepType[]
+export const STEP_TYPES = Object.keys(stepRegistry) as ExperienceStepType[]

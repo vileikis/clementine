@@ -12,7 +12,7 @@
 import { useCallback } from 'react'
 import { StepLayout } from './StepLayout'
 import type { StepRendererProps } from '../registry/step-registry'
-import type { InputMultiSelectStepConfig } from '../schemas/input-multi-select.schema'
+import type { ExperienceInputMultiSelectStepConfig } from '@clementine/shared'
 import { ThemedSelectOption, ThemedText } from '@/shared/theming'
 
 export function InputMultiSelectRenderer({
@@ -25,7 +25,7 @@ export function InputMultiSelectRenderer({
   canGoBack,
   canProceed,
 }: StepRendererProps) {
-  const config = step.config as InputMultiSelectStepConfig
+  const config = step.config as ExperienceInputMultiSelectStepConfig
   const { title, options, multiSelect } = config
 
   // Current selected values (always an array)

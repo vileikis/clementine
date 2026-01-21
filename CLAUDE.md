@@ -25,8 +25,9 @@ clementine/
 ├── apps/
 │   └── clementine-app/       # TanStack Start application (Production)
 ├── functions/                 # Firebase Cloud Functions (AI processing, webhooks)
-├── scripts/                   # Bash utility scripts (deploy, worktree, etc.)
-└── packages/                  # Shared packages
+├── packages/
+│   └── shared/               # Shared Zod schemas and TypeScript types
+└── scripts/                   # Bash utility scripts (deploy, worktree, etc.)
 ```
 
 ### Application Status
@@ -42,6 +43,12 @@ clementine/
 - Backend services for AI image/video processing
 - Webhook handlers for n8n workflow integration
 - Media processing pipeline (FFmpeg)
+
+**📦 `packages/shared/` - Shared Schemas**
+
+- Zod validation schemas shared across frontend and backend
+- TypeScript types inferred from schemas
+- Domain schemas: session, job, experience, event, project, workspace, theme
 
 ## Technology Stack
 
@@ -92,6 +99,10 @@ pnpm functions:build  # Build Cloud Functions
 pnpm functions:serve  # Serve functions locally
 pnpm functions:deploy # Deploy functions to Firebase
 
+# Shared Package
+pnpm --filter @clementine/shared build  # Build shared package
+pnpm --filter @clementine/shared test   # Run shared package tests
+
 # App Hosting Deployment
 pnpm app:deploy       # Deploy current branch to Firebase App Hosting
 pnpm app:deploy <branch>  # Deploy specific branch
@@ -125,6 +136,17 @@ pnpm serve            # Serve locally
 
 See `functions/README.md` for function-specific documentation.
 
+### Shared Package
+
+```bash
+cd packages/shared
+pnpm build            # Build package
+pnpm dev              # Watch mode
+pnpm test             # Run tests
+```
+
+See `packages/shared/README.md` for schema documentation.
+
 ## Development Workflow
 
 ### Choosing Where to Work
@@ -136,6 +158,10 @@ See `functions/README.md` for function-specific documentation.
 **For backend/API work:**
 
 - ⚙️ Work in `functions/` (Firebase Cloud Functions)
+
+**For shared types/schemas:**
+
+- 📦 Work in `packages/shared/` (shared Zod schemas)
 
 ### Installing Dependencies
 
@@ -182,6 +208,7 @@ Each workspace has its own documentation:
 
 - **TanStack Start App**: `apps/clementine-app/CLAUDE.md`
 - **Cloud Functions**: `functions/README.md`
+- **Shared Package**: `packages/shared/README.md`
 
 These files are automatically discovered by Claude Code based on your working context.
 
@@ -310,6 +337,11 @@ See individual workspace documentation for required environment variables.
 - Firebase Firestore (NoSQL database)
 - Firebase Storage (media files)
 - FFmpeg (media processing)
+
+### Shared Package (packages/shared/)
+- Zod 4.1.12 (validation schemas)
+- TypeScript (strict mode, ES2020 target)
+- Vitest (testing)
 
 ### Development Tools
 - pnpm 10.18.1 (package manager)

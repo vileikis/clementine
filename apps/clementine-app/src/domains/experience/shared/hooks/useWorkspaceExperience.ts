@@ -10,9 +10,9 @@ import { useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { doc, onSnapshot } from 'firebase/firestore'
 
-import { experienceSchema } from '../schemas/experience.schema'
+import { experienceSchema } from '../schemas'
 import { experienceKeys, experienceQuery } from '../queries/experience.query'
-import type { Experience } from '../schemas/experience.schema'
+import type { Experience } from '../schemas'
 import { firestore } from '@/integrations/firebase/client'
 import { convertFirestoreDoc } from '@/shared/utils/firestore-utils'
 

@@ -12,6 +12,7 @@
 import { useCallback, useState } from 'react'
 import { List, Settings } from 'lucide-react'
 
+import { ensureAllStepsHaveNames } from '../../steps/registry/step-name.helpers'
 import { createStep } from '../../steps/registry/step-utils'
 import { AddStepDialog } from '../components/AddStepDialog'
 import { StepList } from '../components/StepList'
@@ -47,8 +48,9 @@ export function ExperienceDesignerPage({
   workspaceId,
 }: ExperienceDesignerPageProps) {
   // Local step state for immediate UI updates
-  const [steps, setSteps] = useState<Step[]>(
-    () => (experience.draft.steps ?? []) as unknown as Step[],
+  // Apply lazy migration to ensure all steps have names (for backward compatibility)
+  const [steps, setSteps] = useState<Step[]>(() =>
+    ensureAllStepsHaveNames(experience.draft.steps ?? []),
   )
 
   // Step selection with URL sync
@@ -67,7 +69,7 @@ export function ExperienceDesignerPage({
   // Handle adding a new step (immediate save)
   const handleAddStep = useCallback(
     (type: StepType) => {
-      const newStep = createStep(type)
+      const newStep = createStep(type, steps)
       const newSteps = [...steps, newStep]
 
       // Update local state

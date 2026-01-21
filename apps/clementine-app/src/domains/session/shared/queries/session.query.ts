@@ -10,8 +10,8 @@
 import { queryOptions } from '@tanstack/react-query'
 import { doc, getDoc } from 'firebase/firestore'
 
-import { sessionSchema } from '../schemas/session.schema'
-import type { Session } from '../schemas/session.schema'
+import { sessionSchema } from '../schemas'
+import type { Session } from '../schemas'
 import { firestore } from '@/integrations/firebase/client'
 import { convertFirestoreDoc } from '@/shared/utils/firestore-utils'
 

@@ -5,7 +5,7 @@
  * Fields: title, required, placeholder, maxLength.
  */
 import type { StepConfigPanelProps } from '../registry/step-registry'
-import type { InputShortTextStepConfig } from '../schemas/input-short-text.schema'
+import type { ExperienceInputShortTextStepConfig } from '@clementine/shared'
 import {
   EditorRow,
   EditorSection,
@@ -19,7 +19,7 @@ export function InputShortTextConfigPanel({
   onConfigChange,
   disabled,
 }: StepConfigPanelProps) {
-  const config = step.config as InputShortTextStepConfig
+  const config = step.config as ExperienceInputShortTextStepConfig
   const { title, required, placeholder, maxLength } = config
 
   return (

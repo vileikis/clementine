@@ -19,8 +19,8 @@ import {
 
 import { SLOT_PROFILES } from '../constants'
 import type { SlotType } from '../constants'
-import type { Experience } from '@/domains/experience/shared/schemas/experience.schema'
-import { experienceSchema } from '@/domains/experience/shared/schemas/experience.schema'
+import type { Experience } from '@/domains/experience/shared/schemas'
+import { experienceSchema } from '@/domains/experience/shared/schemas'
 import { firestore } from '@/integrations/firebase/client'
 import { convertFirestoreDoc } from '@/shared/utils/firestore-utils'
 

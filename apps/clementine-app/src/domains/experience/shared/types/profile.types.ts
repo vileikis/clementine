@@ -14,8 +14,8 @@
 import type {
   ExperienceConfig,
   ExperienceProfile,
-} from '../schemas/experience.schema'
-import type { StepCategory } from './step.types'
+  ExperienceStepCategory,
+} from '@clementine/shared'
 
 /**
  * Slot types where experiences can be used
@@ -31,7 +31,7 @@ export interface ProfileMetadata {
   /** Description for users */
   description: string
   /** Allowed step categories */
-  allowedStepCategories: StepCategory[]
+  allowedStepCategories: ExperienceStepCategory[]
   /** Compatible slot types */
   slotCompatibility: SlotType[]
 }

@@ -9,8 +9,8 @@
  */
 import { queryOptions } from '@tanstack/react-query'
 import { doc, getDoc } from 'firebase/firestore'
-import { projectEventFullSchema } from '../schemas/project-event-full.schema'
-import type { ProjectEventFull } from '../schemas/project-event-full.schema'
+import { projectEventFullSchema } from '../schemas'
+import type { ProjectEventFull } from '../schemas'
 import { firestore } from '@/integrations/firebase/client'
 import { convertFirestoreDoc } from '@/shared/utils/firestore-utils'
 
