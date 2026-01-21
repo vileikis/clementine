@@ -100,11 +100,6 @@ export const projectEventConfigSchema = z.looseObject({
   schemaVersion: z.number().default(CURRENT_CONFIG_VERSION),
   overlays: overlaysConfigSchema,
   shareOptions: shareOptionsConfigSchema.nullable().default(null),
-  /**
-   * @deprecated Use shareOptions instead. Kept for backward compatibility
-   * with existing data that used 'sharing' field name.
-   */
-  sharing: shareOptionsConfigSchema.nullable().default(null),
   share: shareConfigSchema.nullable().default(null),
   welcome: welcomeConfigSchema.nullable().default(null),
   theme: themeSchema.nullable().default(null),
