@@ -3,7 +3,7 @@
  *
  * Helper functions for working with the step registry.
  */
-import { generateStepName } from '../helpers/step-name.helpers'
+import { generateStepName } from './step-name.helpers'
 import { stepRegistry } from './step-registry'
 import type {
   Step,

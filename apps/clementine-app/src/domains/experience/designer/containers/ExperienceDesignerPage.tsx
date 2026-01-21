@@ -12,7 +12,7 @@
 import { useCallback, useState } from 'react'
 import { List, Settings } from 'lucide-react'
 
-import { ensureAllStepsHaveNames } from '../../steps/helpers/step-name.helpers'
+import { ensureAllStepsHaveNames } from '../../steps/registry/step-name.helpers'
 import { createStep } from '../../steps/registry/step-utils'
 import { AddStepDialog } from '../components/AddStepDialog'
 import { StepList } from '../components/StepList'

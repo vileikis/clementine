@@ -4,7 +4,7 @@
  * Functions for generating and ensuring step names.
  * Names are used for human identification and transform variable mapping.
  */
-import { stepRegistry } from '../registry/step-registry'
+import { stepRegistry } from './step-registry'
 import type { Step, StepType } from '../schemas/step.schema'
 
 /**
