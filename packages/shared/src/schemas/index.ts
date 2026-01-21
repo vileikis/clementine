@@ -25,4 +25,5 @@ export * from './workspace'
 
 // Legacy: Media processing schemas (used by existing media pipeline)
 // These are separate from the new transform pipeline schemas
-export * from './session.schemas'
+// TODO: Remove when old media pipeline functions are deleted
+export * from './session.schemas.legacy'
