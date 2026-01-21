@@ -11,7 +11,7 @@
  * - Uses `z.looseObject()` for forward compatibility with future fields
  */
 import { z } from 'zod'
-import { baseStepSchema } from './step.schema'
+import { experienceStepSchema } from './step.schema'
 import { transformConfigSchema } from './transform.schema'
 
 /**
@@ -54,8 +54,8 @@ export const experienceMediaSchema = z
  * Contains step definitions and optional transform pipeline configuration.
  */
 export const experienceConfigSchema = z.looseObject({
-  /** Array of steps in the experience */
-  steps: z.array(baseStepSchema).default([]),
+  /** Array of steps in the experience (typed discriminated union) */
+  steps: z.array(experienceStepSchema).default([]),
   /** Optional transform pipeline configuration */
   transform: transformConfigSchema.nullable().default(null),
 })

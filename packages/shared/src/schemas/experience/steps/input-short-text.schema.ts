@@ -1,14 +1,14 @@
 /**
- * Input Short Text Step Config Schema
+ * Experience Input Short Text Step Config Schema
  *
  * Configuration for short text input steps (single-line).
  */
 import { z } from 'zod'
 
 /**
- * Input short text step configuration schema
+ * Experience input short text step configuration schema
  */
-export const inputShortTextStepConfigSchema = z.object({
+export const experienceInputShortTextStepConfigSchema = z.object({
   /** Title text (max 200 chars, empty allowed for drafts) */
   title: z.string().max(200),
   /** Whether this step is required */
@@ -19,18 +19,6 @@ export const inputShortTextStepConfigSchema = z.object({
   maxLength: z.number().int().min(1).max(200).default(100),
 })
 
-export type InputShortTextStepConfig = z.infer<
-  typeof inputShortTextStepConfigSchema
+export type ExperienceInputShortTextStepConfig = z.infer<
+  typeof experienceInputShortTextStepConfigSchema
 >
-
-/**
- * Default config factory for input short text steps
- */
-export function createDefaultInputShortTextConfig(): InputShortTextStepConfig {
-  return {
-    title: '',
-    required: false,
-    placeholder: '',
-    maxLength: 100,
-  }
-}

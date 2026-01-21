@@ -5,7 +5,7 @@
  * Fields: title, required.
  */
 import type { StepConfigPanelProps } from '../registry/step-registry'
-import type { InputYesNoStepConfig } from '../schemas/input-yes-no.schema'
+import type { ExperienceInputYesNoStepConfig } from '@clementine/shared'
 import { EditorRow, EditorSection, TextField } from '@/shared/editor-controls'
 import { Switch } from '@/ui-kit/ui/switch'
 
@@ -14,7 +14,7 @@ export function InputYesNoConfigPanel({
   onConfigChange,
   disabled,
 }: StepConfigPanelProps) {
-  const config = step.config as InputYesNoStepConfig
+  const config = step.config as ExperienceInputYesNoStepConfig
   const { title, required } = config
 
   return (

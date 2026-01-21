@@ -1,5 +1,5 @@
 /**
- * Input Scale Step Config Schema
+ * Experience Input Scale Step Config Schema
  *
  * Configuration for opinion/rating scale input steps.
  * Used for collecting numeric ratings or opinions.
@@ -7,9 +7,9 @@
 import { z } from 'zod'
 
 /**
- * Input scale step configuration schema
+ * Experience input scale step configuration schema
  */
-export const inputScaleStepConfigSchema = z
+export const experienceInputScaleStepConfigSchema = z
   .object({
     /** Title text (max 200 chars, empty allowed for drafts) */
     title: z.string().max(200),
@@ -29,18 +29,6 @@ export const inputScaleStepConfigSchema = z
     path: ['max'],
   })
 
-export type InputScaleStepConfig = z.infer<typeof inputScaleStepConfigSchema>
-
-/**
- * Default config factory for input scale steps
- * Note: Optional fields are omitted (not set to undefined) for Firestore compatibility
- */
-export function createDefaultInputScaleConfig(): InputScaleStepConfig {
-  return {
-    title: '',
-    required: false,
-    min: 1,
-    max: 5,
-    // minLabel and maxLabel are optional - omit them rather than setting to undefined
-  }
-}
+export type ExperienceInputScaleStepConfig = z.infer<
+  typeof experienceInputScaleStepConfigSchema
+>

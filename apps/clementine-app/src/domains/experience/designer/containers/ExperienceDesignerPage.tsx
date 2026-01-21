@@ -50,9 +50,7 @@ export function ExperienceDesignerPage({
   // Local step state for immediate UI updates
   // Apply lazy migration to ensure all steps have names (for backward compatibility)
   const [steps, setSteps] = useState<Step[]>(() =>
-    ensureAllStepsHaveNames(
-      (experience.draft.steps ?? []) as unknown as Step[],
-    ),
+    ensureAllStepsHaveNames(experience.draft.steps ?? []),
   )
 
   // Step selection with URL sync

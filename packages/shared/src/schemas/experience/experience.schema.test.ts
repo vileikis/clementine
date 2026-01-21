@@ -77,8 +77,16 @@ describe('experienceConfigSchema', () => {
   it('accepts steps array', () => {
     const result = experienceConfigSchema.parse({
       steps: [
-        { id: 'step-1', type: 'info.welcome', config: {} },
-        { id: 'step-2', type: 'capture.photo', config: {} },
+        {
+          id: '123e4567-e89b-12d3-a456-426614174000',
+          type: 'info',
+          config: { title: '', description: '', media: null },
+        },
+        {
+          id: '123e4567-e89b-12d3-a456-426614174001',
+          type: 'capture.photo',
+          config: { aspectRatio: '1:1' },
+        },
       ],
     })
     expect(result.steps).toHaveLength(2)
@@ -166,8 +174,24 @@ describe('experienceSchema', () => {
     it('accepts both draft and published configs', () => {
       const result = experienceSchema.parse({
         ...validMinimalExperience,
-        draft: { steps: [{ id: 'step-1', type: 'info.welcome' }] },
-        published: { steps: [{ id: 'step-1', type: 'info.welcome' }] },
+        draft: {
+          steps: [
+            {
+              id: '123e4567-e89b-12d3-a456-426614174000',
+              type: 'info',
+              config: { title: '', description: '', media: null },
+            },
+          ],
+        },
+        published: {
+          steps: [
+            {
+              id: '123e4567-e89b-12d3-a456-426614174000',
+              type: 'info',
+              config: { title: '', description: '', media: null },
+            },
+          ],
+        },
       })
       expect(result.draft.steps).toHaveLength(1)
       expect(result.published?.steps).toHaveLength(1)

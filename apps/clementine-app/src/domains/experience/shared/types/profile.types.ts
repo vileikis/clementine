@@ -11,8 +11,11 @@
  *
  * Note: Profile is immutable after experience creation.
  */
-import type { ExperienceConfig, ExperienceProfile } from '../schemas'
-import type { StepCategory } from './step.types'
+import type {
+  ExperienceConfig,
+  ExperienceProfile,
+  ExperienceStepCategory,
+} from '@clementine/shared'
 
 /**
  * Slot types where experiences can be used
@@ -28,7 +31,7 @@ export interface ProfileMetadata {
   /** Description for users */
   description: string
   /** Allowed step categories */
-  allowedStepCategories: StepCategory[]
+  allowedStepCategories: ExperienceStepCategory[]
   /** Compatible slot types */
   slotCompatibility: SlotType[]
 }

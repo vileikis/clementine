@@ -1,14 +1,14 @@
 /**
- * Input Multi-Select Step Config Schema
+ * Experience Input Multi-Select Step Config Schema
  *
  * Configuration for multiple choice selection input steps.
  */
 import { z } from 'zod'
 
 /**
- * Input multi-select step configuration schema
+ * Experience input multi-select step configuration schema
  */
-export const inputMultiSelectStepConfigSchema = z.object({
+export const experienceInputMultiSelectStepConfigSchema = z.object({
   /** Title text (max 200 chars, empty allowed for drafts) */
   title: z.string().max(200),
   /** Whether this step is required */
@@ -19,18 +19,6 @@ export const inputMultiSelectStepConfigSchema = z.object({
   multiSelect: z.boolean().default(false),
 })
 
-export type InputMultiSelectStepConfig = z.infer<
-  typeof inputMultiSelectStepConfigSchema
+export type ExperienceInputMultiSelectStepConfig = z.infer<
+  typeof experienceInputMultiSelectStepConfigSchema
 >
-
-/**
- * Default config factory for input multi-select steps
- */
-export function createDefaultInputMultiSelectConfig(): InputMultiSelectStepConfig {
-  return {
-    title: '',
-    required: false,
-    options: ['Option 1', 'Option 2'],
-    multiSelect: false,
-  }
-}

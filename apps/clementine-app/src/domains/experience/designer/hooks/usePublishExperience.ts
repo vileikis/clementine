@@ -16,7 +16,7 @@ import { stepRegistry } from '../../steps/registry/step-registry'
 import { getStepTypesForProfile } from '../../steps/registry/step-utils'
 import type { UpdateData } from 'firebase/firestore'
 import type { Experience } from '../../shared/schemas'
-import type { Step, StepType } from '../../steps/schemas/step.schema'
+import type { Step, StepType } from '../../steps/registry/step-registry'
 import { firestore } from '@/integrations/firebase/client'
 
 /**

@@ -5,7 +5,7 @@
  * Names are used for human identification and transform variable mapping.
  */
 import { stepRegistry } from './step-registry'
-import type { Step, StepType } from '../schemas/step.schema'
+import type { Step, StepType } from './step-registry'
 
 /**
  * Generate a human-readable step name based on step type and existing steps.

@@ -1,14 +1,14 @@
 /**
- * Input Long Text Step Config Schema
+ * Experience Input Long Text Step Config Schema
  *
  * Configuration for long text input steps (multi-line textarea).
  */
 import { z } from 'zod'
 
 /**
- * Input long text step configuration schema
+ * Experience input long text step configuration schema
  */
-export const inputLongTextStepConfigSchema = z.object({
+export const experienceInputLongTextStepConfigSchema = z.object({
   /** Title text (max 200 chars, empty allowed for drafts) */
   title: z.string().max(200),
   /** Whether this step is required */
@@ -19,18 +19,6 @@ export const inputLongTextStepConfigSchema = z.object({
   maxLength: z.number().int().min(1).max(2000).default(500),
 })
 
-export type InputLongTextStepConfig = z.infer<
-  typeof inputLongTextStepConfigSchema
+export type ExperienceInputLongTextStepConfig = z.infer<
+  typeof experienceInputLongTextStepConfigSchema
 >
-
-/**
- * Default config factory for input long text steps
- */
-export function createDefaultInputLongTextConfig(): InputLongTextStepConfig {
-  return {
-    title: '',
-    required: false,
-    placeholder: '',
-    maxLength: 500,
-  }
-}

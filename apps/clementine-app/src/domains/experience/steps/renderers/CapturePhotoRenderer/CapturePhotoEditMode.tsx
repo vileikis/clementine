@@ -7,13 +7,13 @@
 
 import { Camera } from 'lucide-react'
 import { StepLayout } from '../StepLayout'
-import type { AspectRatio } from '../../schemas/capture-photo.schema'
+import type { ExperienceAspectRatio } from '@clementine/shared'
 import { ThemedText, useEventTheme } from '@/shared/theming'
 
 /**
  * CSS aspect-ratio values for the preview container
  */
-const ASPECT_RATIO_CSS: Record<AspectRatio, string> = {
+const ASPECT_RATIO_CSS: Record<ExperienceAspectRatio, string> = {
   '1:1': '1 / 1',
   '9:16': '9 / 16',
   '3:2': '3 / 2',
@@ -21,7 +21,7 @@ const ASPECT_RATIO_CSS: Record<AspectRatio, string> = {
 }
 
 interface CapturePhotoEditModeProps {
-  aspectRatio: AspectRatio
+  aspectRatio: ExperienceAspectRatio
 }
 
 export function CapturePhotoEditMode({
