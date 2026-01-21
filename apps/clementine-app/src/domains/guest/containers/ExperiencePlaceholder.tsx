@@ -16,9 +16,10 @@ import { Link, useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { ArrowLeft } from 'lucide-react'
 import { useGuestAccess } from '../hooks/useGuestAccess'
-import { useGuestRecord } from '../hooks/useGuestRecord'
+import { useEnsureGuestRecord } from '../hooks/useEnsureGuestRecord'
 import { ComingSoonPage, ErrorPage } from '../components'
 import { useCreateSession } from '@/domains/session/shared'
+import { useAnonymousSignIn, useAuth } from '@/domains/auth'
 
 export interface ExperiencePlaceholderProps {
   /** Project ID from URL params */
@@ -61,8 +62,20 @@ export function ExperiencePlaceholder({
   sessionId: initialSessionId,
 }: ExperiencePlaceholderProps) {
   const navigate = useNavigate()
+
+  // Authentication: Check if user is authenticated, sign in anonymously if not
+  const { user, isLoading: authLoading } = useAuth()
+  const { signIn: signInAnonymously, isSigningIn, error: signInError } = useAnonymousSignIn()
+
+  // Auto-trigger anonymous sign-in if not authenticated
+  useEffect(() => {
+    if (!authLoading && !user && !isSigningIn) {
+      void signInAnonymously()
+    }
+  }, [authLoading, user, isSigningIn, signInAnonymously])
+
   const access = useGuestAccess(projectId)
-  const guestRecord = useGuestRecord(projectId)
+  const guestState = useEnsureGuestRecord(projectId)
   const createSession = useCreateSession()
   const creatingSessionRef = useRef(false)
 
@@ -120,6 +133,16 @@ export function ExperiencePlaceholder({
     navigate,
   ])
 
+  // Handle sign-in error
+  if (signInError) {
+    return (
+      <ErrorPage
+        title="Authentication Error"
+        message="Failed to sign in. Please refresh the page."
+      />
+    )
+  }
+
   // Handle not-found state
   if (access.status === 'not-found') {
     return <ErrorPage message="This experience doesn't exist" />
@@ -132,8 +155,10 @@ export function ExperiencePlaceholder({
 
   // Show loading state
   if (
+    authLoading ||
+    isSigningIn ||
     access.status === 'loading' ||
-    guestRecord.isLoading ||
+    guestState.status === 'loading' ||
     !currentSessionId
   ) {
     return (
@@ -143,6 +168,16 @@ export function ExperiencePlaceholder({
           <p className="text-muted-foreground">Starting your experience...</p>
         </div>
       </div>
+    )
+  }
+
+  // Handle guest record error
+  if (guestState.status === 'error') {
+    return (
+      <ErrorPage
+        title="Error"
+        message="Failed to initialize. Please refresh the page."
+      />
     )
   }
 

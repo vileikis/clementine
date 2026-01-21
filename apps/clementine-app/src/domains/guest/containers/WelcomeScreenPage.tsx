@@ -11,16 +11,17 @@
  * - US3: Guest Encounters Invalid or Unavailable Event (error states)
  * - US4: Guest Views Event with No Available Experiences (empty state)
  */
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { useGuestAccess } from '../hooks/useGuestAccess'
-import { useGuestRecord } from '../hooks/useGuestRecord'
+import { useEnsureGuestRecord } from '../hooks/useEnsureGuestRecord'
 import { ComingSoonPage, ErrorPage } from '../components'
 import { DEFAULT_WELCOME, WelcomeRenderer } from '@/domains/event/welcome'
 import { ThemeProvider } from '@/shared/theming'
 import { useCreateSession } from '@/domains/session/shared'
 import { DEFAULT_THEME } from '@/domains/event/theme/constants'
+import { useAnonymousSignIn, useAuth } from '@/domains/auth'
 
 export interface WelcomeScreenPageProps {
   /** Project ID from URL params */
@@ -47,14 +48,40 @@ export interface WelcomeScreenPageProps {
  */
 export function WelcomeScreenPage({ projectId }: WelcomeScreenPageProps) {
   const navigate = useNavigate()
+
+  // Authentication: Check if user is authenticated, sign in anonymously if not
+  const { user, isLoading: authLoading } = useAuth()
+  const { signIn: signInAnonymously, isSigningIn, error: signInError } = useAnonymousSignIn()
+
+  // Auto-trigger anonymous sign-in if not authenticated
+  useEffect(() => {
+    if (!authLoading && !user && !isSigningIn) {
+      void signInAnonymously()
+    }
+  }, [authLoading, user, isSigningIn, signInAnonymously])
+
+  // Guest access validation (project, event, experiences)
   const access = useGuestAccess(projectId)
-  const guestRecord = useGuestRecord(projectId)
+
+  // Guest record management (only runs once authenticated)
+  const guestState = useEnsureGuestRecord(projectId)
+
   const createSession = useCreateSession()
 
   // Track which experience is being selected for loading state
   const [selectingExperienceId, setSelectingExperienceId] = useState<
     string | null
   >(null)
+
+  // Handle sign-in error
+  if (signInError) {
+    return (
+      <ErrorPage
+        title="Authentication Error"
+        message="Failed to sign in. Please refresh the page."
+      />
+    )
+  }
 
   // US3: Handle not-found state (project or event missing)
   if (access.status === 'not-found') {
@@ -74,8 +101,8 @@ export function WelcomeScreenPage({ projectId }: WelcomeScreenPageProps) {
     return <ComingSoonPage message={message} />
   }
 
-  // Show loading state while fetching data or creating guest record
-  if (access.status === 'loading' || guestRecord.isLoading) {
+  // Show loading state while authenticating, fetching data, or creating guest record
+  if (authLoading || isSigningIn || access.status === 'loading' || guestState.status === 'loading') {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="text-center">
@@ -87,7 +114,7 @@ export function WelcomeScreenPage({ projectId }: WelcomeScreenPageProps) {
   }
 
   // Handle guest record error
-  if (guestRecord.error) {
+  if (guestState.status === 'error') {
     return (
       <ErrorPage
         title="Error"
