@@ -349,3 +349,10 @@ See individual workspace documentation for required environment variables.
 - ESLint (linting)
 - Prettier (formatting)
 
+
+## Active Technologies
+- TypeScript 5.x (strict mode, ES2020 target) + Firebase Functions v2 (7.0.2), Firebase Admin SDK (13.6.0), Zod (4.1.12), @clementine/shared (workspace) (038-pipeline-backend)
+- Firestore (jobs collection at `/projects/{projectId}/jobs/{jobId}`) (038-pipeline-backend)
+
+## Recent Changes
+- 038-pipeline-backend: Added TypeScript 5.x (strict mode, ES2020 target) + Firebase Functions v2 (7.0.2), Firebase Admin SDK (13.6.0), Zod (4.1.12), @clementine/shared (workspace)

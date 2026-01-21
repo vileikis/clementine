@@ -1,0 +1,176 @@
+openapi: 3.0.3
+info:
+  title: Transform Pipeline API
+  description: API for initiating transform pipeline jobs
+  version: 1.0.0
+
+paths:
+  /startTransformPipeline:
+    post:
+      summary: Start Transform Pipeline
+      description: |
+        Initiates a transform pipeline job for a session.
+        Creates a job document, queues a Cloud Task for processing,
+        and updates the session with job tracking information.
+      operationId: startTransformPipeline
+      tags:
+        - Transform
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StartTransformPipelineRequest'
+            examples:
+              basic:
+                summary: Basic request
+                value:
+                  sessionId: "session-abc123"
+                  stepId: "transform-step-1"
+      responses:
+        '200':
+          description: Job created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StartTransformPipelineResponse'
+              examples:
+                success:
+                  summary: Successful response
+                  value:
+                    success: true
+                    jobId: "job-xyz789"
+                    message: "Transform pipeline job created"
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidRequest:
+                  summary: Missing required fields
+                  value:
+                    success: false
+                    error:
+                      code: "INVALID_REQUEST"
+                      message: "Missing required field: sessionId"
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                sessionNotFound:
+                  summary: Session not found
+                  value:
+                    success: false
+                    error:
+                      code: "SESSION_NOT_FOUND"
+                      message: "Session not found"
+                transformNotFound:
+                  summary: Transform config not found
+                  value:
+                    success: false
+                    error:
+                      code: "TRANSFORM_NOT_FOUND"
+                      message: "Experience has no transform configuration"
+        '409':
+          description: Conflict - job already in progress
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                jobInProgress:
+                  summary: Job already in progress
+                  value:
+                    success: false
+                    error:
+                      code: "JOB_IN_PROGRESS"
+                      message: "A job is already in progress for this session"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                internalError:
+                  summary: Internal error
+                  value:
+                    success: false
+                    error:
+                      code: "INTERNAL_ERROR"
+                      message: "An unexpected error occurred"
+
+components:
+  schemas:
+    StartTransformPipelineRequest:
+      type: object
+      required:
+        - sessionId
+        - stepId
+      properties:
+        sessionId:
+          type: string
+          description: The session ID to process
+          minLength: 1
+          example: "session-abc123"
+        stepId:
+          type: string
+          description: The transform step ID
+          minLength: 1
+          example: "transform-step-1"
+
+    StartTransformPipelineResponse:
+      type: object
+      required:
+        - success
+        - jobId
+        - message
+      properties:
+        success:
+          type: boolean
+          description: Whether the request was successful
+          example: true
+        jobId:
+          type: string
+          description: The ID of the created job
+          example: "job-xyz789"
+        message:
+          type: string
+          description: Human-readable status message
+          example: "Transform pipeline job created"
+
+    ErrorResponse:
+      type: object
+      required:
+        - success
+        - error
+      properties:
+        success:
+          type: boolean
+          description: Always false for error responses
+          example: false
+        error:
+          type: object
+          required:
+            - code
+            - message
+          properties:
+            code:
+              type: string
+              description: Machine-readable error code
+              enum:
+                - INVALID_REQUEST
+                - SESSION_NOT_FOUND
+                - TRANSFORM_NOT_FOUND
+                - JOB_IN_PROGRESS
+                - INTERNAL_ERROR
+              example: "SESSION_NOT_FOUND"
+            message:
+              type: string
+              description: Human-readable error message (sanitized for client display)
+              example: "Session not found"

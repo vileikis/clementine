@@ -1,0 +1,81 @@
+# Cloud Task Payload Contract
+# This is not an HTTP API but documents the payload format for the Cloud Task
+
+name: TransformPipelineJob
+description: |
+  Cloud Task handler for executing transform pipeline jobs.
+  Invoked by Cloud Tasks, not directly by HTTP clients.
+
+trigger: Cloud Task (onTaskDispatched)
+region: europe-west1
+timeout: 600 seconds (10 minutes)
+retryConfig:
+  maxAttempts: 0  # No retries per spec D9
+
+payload:
+  type: object
+  required:
+    - jobId
+    - sessionId
+    - projectId
+  properties:
+    jobId:
+      type: string
+      description: The job document ID to process
+      example: "job-xyz789"
+    sessionId:
+      type: string
+      description: The session ID (for validation)
+      example: "session-abc123"
+    projectId:
+      type: string
+      description: The project ID (for Firestore path)
+      example: "project-123"
+
+behavior:
+  onStart:
+    - Fetch job document from /projects/{projectId}/jobs/{jobId}
+    - Validate job status is 'pending'
+    - Update job status to 'running'
+    - Update job startedAt timestamp
+    - Update session jobStatus to 'running'
+
+  onProcess:
+    - Execute pipeline nodes (stub in Phase 2)
+    - Update job progress periodically
+    - Update job updatedAt timestamp
+
+  onSuccess:
+    - Update job status to 'completed'
+    - Update job output with result metadata
+    - Update job completedAt timestamp
+    - Update session jobStatus to 'completed'
+
+  onFailure:
+    - Update job status to 'failed'
+    - Update job error with sanitized message
+    - Update job completedAt timestamp
+    - Update session jobStatus to 'failed'
+    - Log detailed error server-side
+
+  onTimeout:
+    - Cloud Tasks terminates the function
+    - Job remains in 'running' state (requires cleanup)
+    - Future: Add scheduled cleanup for stale jobs
+
+errorCodes:
+  - code: INVALID_INPUT
+    description: Job not found or invalid state
+    isRetryable: false
+
+  - code: PROCESSING_FAILED
+    description: Pipeline execution failed
+    isRetryable: false
+
+  - code: TIMEOUT
+    description: Job exceeded 10-minute limit
+    isRetryable: false
+
+  - code: UNKNOWN
+    description: Unexpected error
+    isRetryable: false
