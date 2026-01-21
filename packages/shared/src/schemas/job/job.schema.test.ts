@@ -202,12 +202,12 @@ describe('sessionInputsSnapshotSchema', () => {
   })
 
   it('preserves unknown fields (looseObject)', () => {
-    const result = sessionInputsSnapshotSchema.parse({
+    const result: Record<string, unknown> = sessionInputsSnapshotSchema.parse({
       answers: [],
       capturedMedia: [],
       legacyField: 'value',
     })
-    expect((result as Record<string, unknown>)['legacyField']).toBe('value')
+    expect(result['legacyField']).toBe('value')
   })
 })
 
@@ -257,11 +257,11 @@ describe('jobSnapshotSchema', () => {
   })
 
   it('preserves unknown fields for schema evolution', () => {
-    const result = jobSnapshotSchema.parse({
+    const result: Record<string, unknown> = jobSnapshotSchema.parse({
       ...validSnapshot,
       futureContext: { data: 'value' },
     })
-    expect((result as Record<string, unknown>)['futureContext']).toEqual({ data: 'value' })
+    expect(result['futureContext']).toEqual({ data: 'value' })
   })
 })
 
@@ -354,12 +354,12 @@ describe('jobSchema', () => {
   })
 
   it('preserves unknown fields (looseObject forward compatibility)', () => {
-    const result = jobSchema.parse({
+    const result: Record<string, unknown> = jobSchema.parse({
       ...validMinimalJob,
       retryCount: 3,
       metadata: { source: 'api' },
     })
-    expect((result as Record<string, unknown>)['retryCount']).toBe(3)
-    expect((result as Record<string, unknown>)['metadata']).toEqual({ source: 'api' })
+    expect(result['retryCount']).toBe(3)
+    expect(result['metadata']).toEqual({ source: 'api' })
   })
 })

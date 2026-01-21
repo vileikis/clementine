@@ -95,10 +95,10 @@ describe('experienceConfigSchema', () => {
   })
 
   it('preserves unknown fields (looseObject)', () => {
-    const result = experienceConfigSchema.parse({
+    const result: Record<string, unknown> = experienceConfigSchema.parse({
       futureField: 'value',
     })
-    expect((result as Record<string, unknown>)['futureField']).toBe('value')
+    expect(result['futureField']).toBe('value')
   })
 })
 
@@ -237,10 +237,10 @@ describe('experienceSchema', () => {
   })
 
   it('preserves unknown fields (looseObject forward compatibility)', () => {
-    const result = experienceSchema.parse({
+    const result: Record<string, unknown> = experienceSchema.parse({
       ...validMinimalExperience,
       futureField: 'value',
     })
-    expect((result as Record<string, unknown>)['futureField']).toBe('value')
+    expect(result['futureField']).toBe('value')
   })
 })

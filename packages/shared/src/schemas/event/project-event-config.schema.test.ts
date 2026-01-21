@@ -181,12 +181,12 @@ describe('projectEventConfigSchema', () => {
   })
 
   it('preserves unknown fields (looseObject forward compatibility)', () => {
-    const result = projectEventConfigSchema.parse({
+    const result: Record<string, unknown> = projectEventConfigSchema.parse({
       futureField: 'some value',
       anotherFutureField: 123,
     })
-    expect((result as Record<string, unknown>)['futureField']).toBe('some value')
-    expect((result as Record<string, unknown>)['anotherFutureField']).toBe(123)
+    expect(result['futureField']).toBe('some value')
+    expect(result['anotherFutureField']).toBe(123)
   })
 
   it('composes nested schemas correctly', () => {

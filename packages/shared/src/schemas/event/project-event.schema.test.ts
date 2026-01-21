@@ -92,13 +92,13 @@ describe('projectEventFullSchema', () => {
   })
 
   it('preserves unknown fields (looseObject forward compatibility)', () => {
-    const result = projectEventFullSchema.parse({
+    const result: Record<string, unknown> = projectEventFullSchema.parse({
       ...validMinimalEvent,
       futureField: 'value',
       metadata: { custom: true },
     })
-    expect((result as Record<string, unknown>)['futureField']).toBe('value')
-    expect((result as Record<string, unknown>)['metadata']).toEqual({ custom: true })
+    expect(result['futureField']).toBe('value')
+    expect(result['metadata']).toEqual({ custom: true })
   })
 
   describe('version tracking', () => {
