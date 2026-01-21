@@ -46,13 +46,15 @@ import { firestore } from '@/integrations/firebase/client'
  * }
  * ```
  */
-export function useProjectEvent(projectId: string, eventId: string) {
+export function useProjectEvent(
+  projectId: string | undefined,
+  eventId: string | undefined,
+) {
   const queryClient = useQueryClient()
 
-  // Set up real-time listener for event
+  // Set up real-time listener for event (only when both IDs are provided)
   useEffect(() => {
-    // Skip listener setup if eventId is empty (prevents invalid Firestore paths)
-    if (!eventId) {
+    if (!projectId || !eventId) {
       return
     }
 

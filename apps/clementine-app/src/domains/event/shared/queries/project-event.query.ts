@@ -38,10 +38,18 @@ import { convertFirestoreDoc } from '@/shared/utils/firestore-utils'
  * return useQuery(projectEventQuery(projectId, eventId))
  * ```
  */
-export const projectEventQuery = (projectId: string, eventId: string) =>
+export const projectEventQuery = (
+  projectId: string | undefined,
+  eventId: string | undefined,
+) =>
   queryOptions({
-    queryKey: ['project-event', projectId, eventId],
+    queryKey: ['project-event', projectId ?? '', eventId ?? ''],
     queryFn: async (): Promise<ProjectEventFull | null> => {
+      // Guard against missing params (should not reach here due to enabled)
+      if (!projectId || !eventId) {
+        return null
+      }
+
       const eventRef = doc(firestore, `projects/${projectId}/events/${eventId}`)
       const eventSnapshot = await getDoc(eventRef)
 
@@ -51,6 +59,6 @@ export const projectEventQuery = (projectId: string, eventId: string) =>
 
       return convertFirestoreDoc(eventSnapshot, projectEventFullSchema)
     },
-    // Disable query when eventId is empty (prevents invalid Firestore paths)
+    // Disable query when IDs are missing (prevents invalid Firestore paths)
     enabled: !!projectId && !!eventId,
   })

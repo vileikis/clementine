@@ -45,10 +45,12 @@ interface UploadHeroMediaResult {
  *
  * Returns the URL for the caller to update form state.
  * Auto-save handles persisting the welcome update to Firestore.
+ *
+ * Accepts undefined params - mutation will throw if called without valid IDs
  */
 export function useUploadAndUpdateHeroMedia(
-  workspaceId: string,
-  userId: string,
+  workspaceId: string | undefined,
+  userId: string | undefined,
 ) {
   const uploadAsset = useUploadMediaAsset(workspaceId, userId)
 
@@ -58,6 +60,12 @@ export function useUploadAndUpdateHeroMedia(
     UploadHeroMediaParams
   >({
     mutationFn: async ({ file, onProgress }) => {
+      // Guard against missing params
+      if (!workspaceId || !userId) {
+        throw new Error(
+          'Cannot upload hero media: missing workspaceId or userId',
+        )
+      }
       // Upload to Storage + create MediaAsset document
       const { mediaAssetId, url } = await uploadAsset.mutateAsync({
         file,

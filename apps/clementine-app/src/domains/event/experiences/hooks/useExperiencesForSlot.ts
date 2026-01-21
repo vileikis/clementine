@@ -40,10 +40,17 @@ export const slotExperiencesKeys = {
  * @param slot - Slot type determines allowed profiles
  * @returns Query options for use with useQuery
  */
-export const slotExperiencesQuery = (workspaceId: string, slot: SlotType) =>
+export const slotExperiencesQuery = (
+  workspaceId: string | undefined,
+  slot: SlotType,
+) =>
   queryOptions({
-    queryKey: slotExperiencesKeys.list(workspaceId, slot),
+    queryKey: slotExperiencesKeys.list(workspaceId ?? '', slot),
     queryFn: async (): Promise<Experience[]> => {
+      // Guard against empty workspaceId (should not reach here due to enabled)
+      if (!workspaceId) {
+        return []
+      }
       const experiencesRef = collection(
         firestore,
         `workspaces/${workspaceId}/experiences`,
@@ -66,6 +73,8 @@ export const slotExperiencesQuery = (workspaceId: string, slot: SlotType) =>
     },
     staleTime: Infinity,
     refetchOnWindowFocus: false,
+    // Disable query when workspaceId is missing
+    enabled: !!workspaceId,
   })
 
 /**
@@ -99,13 +108,15 @@ export const slotExperiencesQuery = (workspaceId: string, slot: SlotType) =>
  * }
  * ```
  */
-export function useExperiencesForSlot(workspaceId: string, slot: SlotType) {
+export function useExperiencesForSlot(
+  workspaceId: string | undefined,
+  slot: SlotType,
+) {
   const queryClient = useQueryClient()
   const allowedProfiles = SLOT_PROFILES[slot]
 
-  // Set up real-time listener
+  // Set up real-time listener (only when workspaceId is provided)
   useEffect(() => {
-    // Guard: Skip Firestore operations if workspaceId is empty
     if (!workspaceId) {
       return
     }

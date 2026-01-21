@@ -37,8 +37,8 @@ const WELCOME_FIELDS_TO_COMPARE: (keyof WelcomeConfig)[] = [
 
 export function WelcomeEditorPage() {
   const { projectId, eventId, workspaceSlug } = useParams({ strict: false })
-  const { data: event } = useProjectEvent(projectId ?? '', eventId ?? '')
-  const { data: workspace } = useWorkspace(workspaceSlug ?? '')
+  const { data: event } = useProjectEvent(projectId, eventId)
+  const { data: workspace } = useWorkspace(workspaceSlug)
   const { user } = useAuth()
 
   // Upload state
@@ -58,7 +58,7 @@ export function WelcomeEditorPage() {
 
   // Fetch available experiences for the main slot
   const { data: availableExperiences = [] } = useExperiencesForSlot(
-    workspace?.id ?? '',
+    workspace?.id,
     'main',
   )
 
@@ -91,15 +91,12 @@ export function WelcomeEditorPage() {
     values: currentWelcome, // Sync form with server data when it changes
   })
 
-  // Mutations
-  const updateWelcome = useUpdateWelcome(projectId ?? '', eventId ?? '')
-  const uploadHeroMedia = useUploadAndUpdateHeroMedia(
-    workspace?.id ?? '',
-    user?.uid ?? '',
-  )
+  // Mutations (hooks handle undefined params gracefully)
+  const updateWelcome = useUpdateWelcome(projectId, eventId)
+  const uploadHeroMedia = useUploadAndUpdateHeroMedia(workspace?.id, user?.uid)
   const updateEventExperiences = useUpdateEventExperiences({
-    projectId: projectId!,
-    eventId: eventId!,
+    projectId,
+    eventId,
   })
 
   // Auto-save with debounce
