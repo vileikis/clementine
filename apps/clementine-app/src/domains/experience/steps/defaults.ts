@@ -6,13 +6,13 @@
  * The schemas themselves are in @clementine/shared.
  */
 import type {
-  ExperienceInfoStepConfig,
-  ExperienceInputScaleStepConfig,
-  ExperienceInputYesNoStepConfig,
-  ExperienceInputMultiSelectStepConfig,
-  ExperienceInputShortTextStepConfig,
-  ExperienceInputLongTextStepConfig,
   ExperienceCapturePhotoStepConfig,
+  ExperienceInfoStepConfig,
+  ExperienceInputLongTextStepConfig,
+  ExperienceInputMultiSelectStepConfig,
+  ExperienceInputScaleStepConfig,
+  ExperienceInputShortTextStepConfig,
+  ExperienceInputYesNoStepConfig,
   ExperienceTransformPipelineStepConfig,
 } from '@clementine/shared'
 

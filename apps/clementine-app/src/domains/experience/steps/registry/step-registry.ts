@@ -19,30 +19,31 @@ import {
 } from 'lucide-react'
 
 import {
-  experienceInfoStepConfigSchema,
-  experienceInputScaleStepConfigSchema,
-  experienceInputYesNoStepConfigSchema,
-  experienceInputMultiSelectStepConfigSchema,
-  experienceInputShortTextStepConfigSchema,
-  experienceInputLongTextStepConfigSchema,
   experienceCapturePhotoStepConfigSchema,
+  experienceInfoStepConfigSchema,
+  experienceInputLongTextStepConfigSchema,
+  experienceInputMultiSelectStepConfigSchema,
+  experienceInputScaleStepConfigSchema,
+  experienceInputShortTextStepConfigSchema,
+  experienceInputYesNoStepConfigSchema,
   experienceTransformPipelineStepConfigSchema,
-  type ExperienceStep,
-  type ExperienceStepCategory,
-  type ExperienceStepConfig,
-  type ExperienceStepType,
 } from '@clementine/shared'
-
 import {
-  createDefaultInfoConfig,
-  createDefaultInputScaleConfig,
-  createDefaultInputYesNoConfig,
-  createDefaultInputMultiSelectConfig,
-  createDefaultInputShortTextConfig,
-  createDefaultInputLongTextConfig,
   createDefaultCapturePhotoConfig,
+  createDefaultInfoConfig,
+  createDefaultInputLongTextConfig,
+  createDefaultInputMultiSelectConfig,
+  createDefaultInputScaleConfig,
+  createDefaultInputShortTextConfig,
+  createDefaultInputYesNoConfig,
   createDefaultTransformPipelineConfig,
 } from '../defaults'
+import type {
+  ExperienceStep,
+  ExperienceStepCategory,
+  ExperienceStepConfig,
+  ExperienceStepType,
+} from '@clementine/shared'
 
 import type { LucideIcon } from 'lucide-react'
 import type { z } from 'zod'
