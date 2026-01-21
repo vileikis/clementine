@@ -111,6 +111,18 @@ service cloud.firestore {
         // DELETE: Forbidden - sessions are historical records
         allow delete: if false;
       }
+
+      // Jobs subcollection (036-transform-foundation)
+      // Transform pipeline job execution tracking
+      // Path: /projects/{projectId}/jobs/{jobId}
+      match /jobs/{jobId} {
+        // READ: Admins only (jobs contain execution details for debugging)
+        allow read: if isAdmin();
+
+        // WRITE: Server only via Admin SDK (never client)
+        // All job creation and updates happen in Cloud Functions
+        allow create, update, delete: if false;
+      }
     }
 
     // Admin users: Full access to everything
