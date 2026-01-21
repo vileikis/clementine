@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { WelcomeScreenPage } from '@/domains/guest'
 
-export const Route = createFileRoute('/join/$projectId')({
+export const Route = createFileRoute('/join/$projectId/')({
   component: JoinProjectPage,
 })
 
