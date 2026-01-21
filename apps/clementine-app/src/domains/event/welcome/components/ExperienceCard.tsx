@@ -6,14 +6,25 @@
  * Supports different layouts (list/grid) and modes (edit/run).
  */
 import type { CSSProperties } from 'react'
-import type { Experience } from '@/domains/experience/shared'
 import type { Theme } from '@/shared/theming'
 import { useThemeWithOverride } from '@/shared/theming'
 import { cn } from '@/shared/utils/style-utils'
 
+/**
+ * Minimal experience data needed for card display
+ */
+export interface ExperienceCardData {
+  /** Experience document ID */
+  id: string
+  /** Display name */
+  name: string
+  /** Thumbnail URL (null if no media) */
+  thumbnailUrl: string | null
+}
+
 export interface ExperienceCardProps {
   /** Experience data to display */
-  experience: Experience
+  experience: ExperienceCardData
 
   /**
    * Layout mode - affects card dimensions and arrangement
@@ -129,9 +140,9 @@ export function ExperienceCard({
         className={cn(thumbnailClasses, 'rounded-md overflow-hidden')}
         style={placeholderStyle}
       >
-        {experience.media?.url ? (
+        {experience.thumbnailUrl ? (
           <img
-            src={experience.media.url}
+            src={experience.thumbnailUrl}
             alt={displayName}
             className="w-full h-full object-cover"
           />

@@ -12,6 +12,7 @@ import { toast } from 'sonner'
 import { WelcomeConfigPanel, WelcomeRenderer } from '../components'
 import { useUpdateWelcome, useUploadAndUpdateHeroMedia } from '../hooks'
 import { DEFAULT_WELCOME } from '../constants'
+import type { ExperienceCardData } from '../components'
 import type { WelcomeConfig } from '@/domains/event/shared'
 import type { MainExperienceReference } from '@/domains/event/experiences'
 import { PreviewShell } from '@/shared/preview-shell'
@@ -36,8 +37,8 @@ const WELCOME_FIELDS_TO_COMPARE: (keyof WelcomeConfig)[] = [
 
 export function WelcomeEditorPage() {
   const { projectId, eventId, workspaceSlug } = useParams({ strict: false })
-  const { data: event } = useProjectEvent(projectId!, eventId!)
-  const { data: workspace } = useWorkspace(workspaceSlug)
+  const { data: event } = useProjectEvent(projectId ?? '', eventId ?? '')
+  const { data: workspace } = useWorkspace(workspaceSlug ?? '')
   const { user } = useAuth()
 
   // Upload state
@@ -69,14 +70,19 @@ export function WelcomeEditorPage() {
     return ids
   }, [mainExperiences, pregateExperience, preshareExperience])
 
-  // Filter available experiences to get details for main experiences
-  const mainExperienceDetails = useMemo(() => {
+  // Filter available experiences and map to card data format for preview
+  const mainExperienceDetails: ExperienceCardData[] = useMemo(() => {
     const experienceMap = new Map(
       availableExperiences.map((exp) => [exp.id, exp]),
     )
     return mainExperiences
       .map((ref) => experienceMap.get(ref.experienceId))
       .filter((exp): exp is NonNullable<typeof exp> => exp !== undefined)
+      .map((exp) => ({
+        id: exp.id,
+        name: exp.name,
+        thumbnailUrl: exp.media?.url ?? null,
+      }))
   }, [mainExperiences, availableExperiences])
 
   // Form setup
@@ -86,7 +92,7 @@ export function WelcomeEditorPage() {
   })
 
   // Mutations
-  const updateWelcome = useUpdateWelcome(projectId!, eventId!)
+  const updateWelcome = useUpdateWelcome(projectId ?? '', eventId ?? '')
   const uploadHeroMedia = useUploadAndUpdateHeroMedia(
     workspace?.id ?? '',
     user?.uid ?? '',
@@ -223,7 +229,7 @@ export function WelcomeEditorPage() {
           uploadingHeroMedia={isUploading}
           uploadProgress={uploadProgress}
           workspaceId={workspace.id}
-          workspaceSlug={workspaceSlug!}
+          workspaceSlug={workspace.slug}
           mainExperiences={mainExperiences}
           assignedExperienceIds={assignedExperienceIds}
           onUpdateMainExperiences={handleUpdateMainExperiences}

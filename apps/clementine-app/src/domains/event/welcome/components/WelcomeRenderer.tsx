@@ -11,9 +11,9 @@
  */
 
 import { ExperienceCard } from './ExperienceCard'
+import type { ExperienceCardData } from './ExperienceCard'
 import type { WelcomeConfig } from '@/domains/event/shared'
 import type { MainExperienceReference } from '@/domains/event/experiences'
-import type { Experience } from '@/domains/experience/shared'
 import { ThemedBackground, ThemedText, useEventTheme } from '@/shared/theming'
 import { cn } from '@/shared/utils/style-utils'
 
@@ -22,8 +22,8 @@ export interface WelcomeRendererProps {
   welcome: WelcomeConfig
   /** Main experiences to display */
   mainExperiences?: MainExperienceReference[]
-  /** Experience details (fetched separately) */
-  experienceDetails?: Experience[]
+  /** Experience details for display (id, name, thumbnail only) */
+  experienceDetails?: ExperienceCardData[]
   /**
    * Display mode
    * - edit: Non-interactive WYSIWYG preview in event designer
@@ -55,7 +55,7 @@ export function WelcomeRenderer({
   // Get experience details for enabled references
   const displayExperiences = enabledExperiences
     .map((ref) => experienceMap.get(ref.experienceId))
-    .filter((exp): exp is Experience => exp !== undefined)
+    .filter((exp): exp is ExperienceCardData => exp !== undefined)
 
   const hasExperiences = displayExperiences.length > 0
 

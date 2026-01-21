@@ -17,7 +17,6 @@ import { toast } from 'sonner'
 import { useGuestAccess } from '../hooks/useGuestAccess'
 import { useGuestRecord } from '../hooks/useGuestRecord'
 import { ComingSoonPage, ErrorPage } from '../components'
-import type { Experience } from '@/domains/experience/shared'
 import { DEFAULT_WELCOME, WelcomeRenderer } from '@/domains/event/welcome'
 import { ThemeProvider } from '@/shared/theming'
 import { useCreateSession } from '@/domains/session/shared'
@@ -104,30 +103,6 @@ export function WelcomeScreenPage({ projectId }: WelcomeScreenPageProps) {
   const theme = publishedConfig.theme ?? DEFAULT_THEME
   const mainExperiences = publishedConfig.experiences?.main ?? []
 
-  // Convert ExperienceCardData back to Experience format for WelcomeRenderer
-  // Note: WelcomeRenderer expects full Experience objects, but we only have card data
-  // We need to create minimal Experience objects that satisfy the interface
-  const experienceDetails: Experience[] = experiences.map((exp) => ({
-    id: exp.id,
-    name: exp.name,
-    status: 'active' as const,
-    profile: 'freeform' as const,
-    media: exp.thumbnailUrl
-      ? { mediaAssetId: '', url: exp.thumbnailUrl }
-      : null,
-    draft: {
-      steps: [],
-    },
-    published: null,
-    draftVersion: 1,
-    publishedVersion: null,
-    deletedAt: null,
-    publishedAt: null,
-    publishedBy: null,
-    createdAt: 0,
-    updatedAt: 0,
-  }))
-
   // US2: Handle experience selection
   const handleSelectExperience = async (experienceId: string) => {
     // Prevent duplicate selections
@@ -163,14 +138,16 @@ export function WelcomeScreenPage({ projectId }: WelcomeScreenPageProps) {
   // WelcomeRenderer shows "Experiences will appear here" placeholder when empty
 
   return (
-    <ThemeProvider theme={theme}>
-      <WelcomeRenderer
-        welcome={welcome}
-        mainExperiences={mainExperiences}
-        experienceDetails={experienceDetails}
-        mode="run"
-        onSelectExperience={handleSelectExperience}
-      />
-    </ThemeProvider>
+    <div className="h-screen">
+      <ThemeProvider theme={theme}>
+        <WelcomeRenderer
+          welcome={welcome}
+          mainExperiences={mainExperiences}
+          experienceDetails={experiences}
+          mode="run"
+          onSelectExperience={handleSelectExperience}
+        />
+      </ThemeProvider>
+    </div>
   )
 }

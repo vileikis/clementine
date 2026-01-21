@@ -13,7 +13,11 @@ export {
   WelcomeConfigPanel,
   ExperienceCard,
 } from './components'
-export type { WelcomeRendererProps, ExperienceCardProps } from './components'
+export type {
+  WelcomeRendererProps,
+  ExperienceCardProps,
+  ExperienceCardData,
+} from './components'
 
 // Hooks
 export { useUpdateWelcome, useUploadAndUpdateHeroMedia } from './hooks'
