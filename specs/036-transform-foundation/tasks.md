@@ -179,6 +179,7 @@
 - **User Stories 3-4 (Phases 5-6)**: Depend on Foundational, can run parallel to US1/US2
 - **User Story 5 (Phase 7)**: Depends on US3/US4 (needs job schema defined)
 - **Polish (Phase 8)**: Depends on all user stories complete
+- **Consolidation (Phase 9)**: Depends on Phase 8 - technical debt cleanup
 
 ### User Story Dependencies
 
@@ -199,6 +200,9 @@ Foundational (Phase 2) ←── BLOCKING
     └────────────────┬────────┘
                      ▼
                Polish (Phase 8)
+                     │
+                     ▼
+          Consolidation (Phase 9) ←── Technical Debt
 ```
 
 ### Within Each User Story
@@ -266,6 +270,101 @@ All tasks focus on:
 - Import/export updates
 - Security rules
 - Type safety
+
+---
+
+## Phase 9: Shared Kernel Consolidation (Event Schemas)
+
+**Purpose**: Consolidate event-related schemas into shared kernel, eliminate duplication between shared package and app
+
+**Background**: Currently the app duplicates schemas that already exist in shared (overlays, share, welcome) and defines additional schemas (theme, experiences) that should be in shared for job schema access. This creates maintenance burden and prevents job schema from accessing `applyOverlay` from experiences config.
+
+**Guiding Principles**:
+- **Shared package** = READ schemas (permissive, for Firestore document parsing)
+- **App** = WRITE schemas (strict validation with limits for updates)
+- Single source of truth for data structures
+
+### 9.1 Move Theme Schema to Shared
+
+- [ ] T046 [P] Create `packages/shared/src/schemas/theme/media-reference.schema.ts` - copy from `apps/clementine-app/src/shared/theming/schemas/media-reference.schema.ts`
+- [ ] T047 [P] Create `packages/shared/src/schemas/theme/theme.schema.ts` - copy from `apps/clementine-app/src/shared/theming/schemas/theme.schemas.ts` (update imports to use local media-reference)
+- [ ] T048 Create barrel export in `packages/shared/src/schemas/theme/index.ts`
+- [ ] T049 Update `packages/shared/src/schemas/index.ts` to export theme schemas
+
+### 9.2 Move Experiences Schema to Shared
+
+- [ ] T050 [P] Create `packages/shared/src/schemas/event/experiences.schema.ts` - copy from `apps/clementine-app/src/domains/event/experiences/schemas/event-experiences.schema.ts`
+- [ ] T051 Update `packages/shared/src/schemas/event/index.ts` to export experiences schemas
+
+### 9.3 Update Shared Event Config Schema
+
+- [ ] T052 Update `packages/shared/src/schemas/event/project-event-config.schema.ts`:
+  - Import `themeSchema` from `../theme`
+  - Import `experiencesConfigSchema` from `./experiences.schema`
+  - Add `theme` field to `projectEventConfigSchema`
+  - Add `experiences` field to `projectEventConfigSchema`
+  - This makes shared schema complete (not a subset)
+
+### 9.4 Update Job Schema to Use Shared Schemas
+
+- [ ] T053 Update `packages/shared/src/schemas/job/job.schema.ts`:
+  - Import `mainExperienceReferenceSchema` from `../event/experiences.schema`
+  - Add experience reference to `eventContextSnapshotSchema` (for `applyOverlay` tracking)
+
+### 9.5 App Consolidation - Remove Duplicates
+
+- [ ] T054 Update `apps/clementine-app/src/domains/event/shared/schemas/project-event-config.schema.ts`:
+  - Import overlay, share, welcome, shareOptions schemas from `@clementine/shared`
+  - Remove duplicate schema definitions
+  - Keep only app-specific WRITE schemas (ctaWriteSchema, shareWriteSchema, etc.)
+- [ ] T055 Update `apps/clementine-app/src/shared/theming/schemas/theme.schemas.ts`:
+  - Re-export from `@clementine/shared` instead of defining
+  - Keep any app-specific extensions if needed
+- [ ] T056 Update `apps/clementine-app/src/domains/event/experiences/schemas/event-experiences.schema.ts`:
+  - Re-export from `@clementine/shared` instead of defining
+- [ ] T057 Update all app imports that used local schemas to use re-exports
+
+### 9.6 Validation
+
+- [ ] T058 Build shared package: `pnpm --filter @clementine/shared build`
+- [ ] T059 Build and type-check app: `pnpm --filter @clementine/app type-check`
+- [ ] T060 Build functions: `pnpm --filter @clementine/functions build`
+- [ ] T061 Run app tests: `pnpm --filter @clementine/app test`
+- [ ] T062 Manual validation: Verify event designer still works (create/edit events)
+
+**Checkpoint**: Single source of truth for event schemas, job can access applyOverlay
+
+---
+
+### Phase 9 Dependency Notes
+
+**Prerequisites**: Phase 8 complete (all user stories done)
+
+**Within Phase 9**:
+- 9.1 (Theme) and 9.2 (Experiences) can run in parallel
+- 9.3 depends on 9.1 + 9.2
+- 9.4 depends on 9.2 (needs experiences schema)
+- 9.5 depends on 9.3 (app needs updated shared schemas)
+- 9.6 depends on all above
+
+**Execution Order**:
+```
+T046, T047, T050 (parallel - move schemas)
+    │
+    ▼
+T048, T049, T051 (barrel exports)
+    │
+    ▼
+T052 (update shared event config)
+    │
+    ├──────────────┐
+    ▼              ▼
+T053 (job)     T054-T057 (app consolidation)
+    │              │
+    └──────┬───────┘
+           ▼
+    T058-T062 (validation)
+```
 
 ---
 
