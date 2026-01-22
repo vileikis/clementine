@@ -13,9 +13,19 @@ await build({
   outdir: 'dist',
   sourcemap: true,
 
-  // Don't bundle node_modules - let Node.js load them
-  // This prevents issues with dynamic requires and native modules
-  packages: 'external',
+  // External packages - not bundled, loaded at runtime by Node.js
+  // Includes: Firebase (runtime requirement), native modules, SDKs
+  // Excludes: @clementine/* workspace packages (bundled inline)
+  external: [
+    'firebase-admin',
+    'firebase-admin/*',
+    'firebase-functions',
+    'firebase-functions/*',
+    '@google/genai',
+    'ffmpeg-static',
+    'tmp',
+    'zod',
+  ],
 
   // Preserve function names for Firebase
   keepNames: true,
