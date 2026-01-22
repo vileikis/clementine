@@ -16,6 +16,7 @@
     "serve:prod": "pnpm build && npx isolate && cd isolate && npm install && cd ../.. && firebase emulators:start",
     "clean": "rm -rf dist isolate",
     "seed": "tsx scripts/seed-emulators.ts",
+    "qa:transform": "./scripts/qa-transform-pipeline.sh",
     "test": "vitest run",
     "test:watch": "vitest"
   },

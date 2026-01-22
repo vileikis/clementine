@@ -8,6 +8,17 @@ Manual QA test cases for the transform pipeline HTTP endpoint and Cloud Task han
 2. Seed test data: `pnpm functions:seed`
 3. Emulator UI: http://localhost:4000
 
+## Quick Run
+
+Run all tests automatically:
+
+```bash
+cd functions
+pnpm qa:transform
+```
+
+This runs `scripts/qa-transform-pipeline.sh` which executes all test cases below.
+
 ## Seeded Test Data
 
 ### Entities
@@ -39,7 +50,7 @@ Manual QA test cases for the transform pipeline HTTP endpoint and Cloud Task han
 
 **Request**:
 ```bash
-curl -X POST "http://localhost:5001/clementine-7568d/europe-west1/startTransformPipeline?projectId=project-test-001" \
+curl -X POST "http://localhost:5003/clementine-7568d/europe-west1/startTransformPipeline?projectId=project-test-001" \
   -H "Content-Type: application/json" \
   -d '{"sessionId": "session-ready", "stepId": "transform-step-1"}'
 ```
@@ -71,7 +82,7 @@ curl -X POST "http://localhost:5001/clementine-7568d/europe-west1/startTransform
 
 **Request**:
 ```bash
-curl -X POST "http://localhost:5001/clementine-7568d/europe-west1/startTransformPipeline?projectId=project-test-001" \
+curl -X POST "http://localhost:5003/clementine-7568d/europe-west1/startTransformPipeline?projectId=project-test-001" \
   -H "Content-Type: application/json" \
   -d '{"sessionId": "session-published", "stepId": "transform-step-1"}'
 ```
@@ -122,7 +133,7 @@ curl -X POST "http://localhost:5001/clementine-7568d/europe-west1/startTransform
 
 **Request**:
 ```bash
-curl -X POST "http://localhost:5001/clementine-7568d/europe-west1/startTransformPipeline?projectId=project-test-001" \
+curl -X POST "http://localhost:5003/clementine-7568d/europe-west1/startTransformPipeline?projectId=project-test-001" \
   -H "Content-Type: application/json" \
   -d '{"sessionId": "non-existent-session", "stepId": "step-1"}'
 ```
@@ -166,7 +177,7 @@ curl -X POST "http://localhost:5001/clementine-7568d/europe-west1/startTransform
 
 **Request**:
 ```bash
-curl -X POST "http://localhost:5001/clementine-7568d/europe-west1/startTransformPipeline?projectId=project-test-001" \
+curl -X POST "http://localhost:5003/clementine-7568d/europe-west1/startTransformPipeline?projectId=project-test-001" \
   -H "Content-Type: application/json" \
   -d '{"sessionId": "session-no-transform", "stepId": "step-1"}'
 ```
@@ -190,7 +201,7 @@ curl -X POST "http://localhost:5001/clementine-7568d/europe-west1/startTransform
 
 **Request**:
 ```bash
-curl -X POST "http://localhost:5001/clementine-7568d/europe-west1/startTransformPipeline?projectId=project-test-001" \
+curl -X POST "http://localhost:5003/clementine-7568d/europe-west1/startTransformPipeline?projectId=project-test-001" \
   -H "Content-Type: application/json" \
   -d '{"sessionId": "session-with-job", "stepId": "step-1"}'
 ```
@@ -214,7 +225,7 @@ curl -X POST "http://localhost:5001/clementine-7568d/europe-west1/startTransform
 
 **Request**:
 ```bash
-curl -X POST "http://localhost:5001/clementine-7568d/europe-west1/startTransformPipeline?projectId=project-test-001" \
+curl -X POST "http://localhost:5003/clementine-7568d/europe-west1/startTransformPipeline?projectId=project-test-001" \
   -H "Content-Type: application/json" \
   -d '{"sessionId": "session-draft-only", "stepId": "step-1"}'
 ```
@@ -238,7 +249,7 @@ curl -X POST "http://localhost:5001/clementine-7568d/europe-west1/startTransform
 
 **Request**:
 ```bash
-curl -X POST "http://localhost:5001/clementine-7568d/europe-west1/startTransformPipeline" \
+curl -X POST "http://localhost:5003/clementine-7568d/europe-west1/startTransformPipeline" \
   -H "Content-Type: application/json" \
   -d '{"sessionId": "session-ready", "stepId": "step-1"}'
 ```
@@ -262,7 +273,7 @@ curl -X POST "http://localhost:5001/clementine-7568d/europe-west1/startTransform
 
 **Request**:
 ```bash
-curl -X POST "http://localhost:5001/clementine-7568d/europe-west1/startTransformPipeline?projectId=project-test-001" \
+curl -X POST "http://localhost:5003/clementine-7568d/europe-west1/startTransformPipeline?projectId=project-test-001" \
   -H "Content-Type: application/json" \
   -d '{"stepId": "step-1"}'
 ```
@@ -286,7 +297,7 @@ curl -X POST "http://localhost:5001/clementine-7568d/europe-west1/startTransform
 
 **Request**:
 ```bash
-curl -X GET "http://localhost:5001/clementine-7568d/europe-west1/startTransformPipeline?projectId=project-test-001"
+curl -X GET "http://localhost:5003/clementine-7568d/europe-west1/startTransformPipeline?projectId=project-test-001"
 ```
 
 **Expected Response** (405):
@@ -325,29 +336,6 @@ After running tests, verify in Firestore Emulator UI:
 - [ ] `jobId` - Set to job document ID
 - [ ] `jobStatus` - Synced with job status
 - [ ] `updatedAt` - Updated on each status change
-
----
-
-## Quick Test Script
-
-Run all happy path tests:
-
-```bash
-#!/bin/bash
-BASE_URL="http://localhost:5001/clementine-7568d/europe-west1"
-PROJECT_ID="project-test-001"
-
-echo "=== TC-001: Draft config ==="
-curl -s -X POST "${BASE_URL}/startTransformPipeline?projectId=${PROJECT_ID}" \
-  -H "Content-Type: application/json" \
-  -d '{"sessionId": "session-ready", "stepId": "transform-step-1"}' | jq .
-
-echo ""
-echo "=== TC-002: Published config ==="
-curl -s -X POST "${BASE_URL}/startTransformPipeline?projectId=${PROJECT_ID}" \
-  -H "Content-Type: application/json" \
-  -d '{"sessionId": "session-published", "stepId": "transform-step-1"}' | jq .
-```
 
 ---
 
