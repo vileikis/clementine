@@ -84,13 +84,7 @@ export function ExperiencePage({
         replace: true,
       })
     }
-  }, [
-    sessionState,
-    initialSessionId,
-    navigate,
-    project.id,
-    experienceId,
-  ])
+  }, [sessionState, initialSessionId, navigate, project.id, experienceId])
 
   // Handle invalid experience (not enabled for this event)
   if (!isExperienceEnabled) {
