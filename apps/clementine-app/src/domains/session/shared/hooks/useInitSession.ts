@@ -85,6 +85,8 @@ export function useInitSession({
 }: UseInitSessionOptions): InitSessionState {
   const createSession = useCreateSession()
   const creatingSessionRef = useRef(false)
+  // Prevents infinite retry loops after a creation failure
+  const sessionCreationFailedRef = useRef(false)
 
   // Track the current session ID (starts with initialSessionId, may be updated after creation)
   const [currentSessionId, setCurrentSessionId] = useState<string | undefined>(
@@ -105,8 +107,13 @@ export function useInitSession({
   // Create session if needed
   useEffect(() => {
     async function createMissingSession() {
-      // Skip if hook is disabled or already creating
-      if (!enabled || creatingSessionRef.current || createSession.isPending) {
+      // Skip if hook is disabled, already creating, or a previous creation failed
+      if (
+        !enabled ||
+        creatingSessionRef.current ||
+        createSession.isPending ||
+        sessionCreationFailedRef.current
+      ) {
         return
       }
 
@@ -124,8 +131,10 @@ export function useInitSession({
             configSource: 'published',
           })
 
+          sessionCreationFailedRef.current = false
           setCurrentSessionId(result.sessionId)
         } catch {
+          sessionCreationFailedRef.current = true
           toast.error('Failed to start experience. Please try again.')
         } finally {
           creatingSessionRef.current = false
@@ -148,8 +157,10 @@ export function useInitSession({
             configSource: 'published',
           })
 
+          sessionCreationFailedRef.current = false
           setCurrentSessionId(result.sessionId)
         } catch {
+          sessionCreationFailedRef.current = true
           toast.error('Failed to start experience. Please try again.')
         } finally {
           creatingSessionRef.current = false
@@ -168,7 +179,7 @@ export function useInitSession({
     workspaceId,
     eventId,
     experienceId,
-    createSession,
+    createSession.mutateAsync,
   ])
 
   // Handle subscription error
