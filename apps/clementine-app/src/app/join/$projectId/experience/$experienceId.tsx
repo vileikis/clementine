@@ -1,6 +1,13 @@
+/**
+ * Experience Page Route
+ *
+ * Child route for individual experience pages.
+ * GuestContext is available via parent layout (GuestLayout).
+ * Session management is handled by ExperiencePage via useInitSession.
+ */
 import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
-import { ExperiencePlaceholder } from '@/domains/guest'
+import { ExperiencePage } from '@/domains/guest'
 
 // Search params schema for session ID
 const searchSchema = z.object({
@@ -15,14 +22,8 @@ export const Route = createFileRoute(
 })
 
 function JoinExperiencePage() {
-  const { projectId, experienceId } = Route.useParams()
+  const { experienceId } = Route.useParams()
   const { session } = Route.useSearch()
 
-  return (
-    <ExperiencePlaceholder
-      projectId={projectId}
-      experienceId={experienceId}
-      sessionId={session}
-    />
-  )
+  return <ExperiencePage experienceId={experienceId} sessionId={session} />
 }
