@@ -32,12 +32,22 @@ import { useTrackedMutation } from '@/domains/event/designer'
 
 /**
  * Hook for updating event welcome config with domain-specific tracking
+ *
+ * Accepts undefined params - mutation will throw if called without valid IDs
  */
-export function useUpdateWelcome(projectId: string, eventId: string) {
+export function useUpdateWelcome(
+  projectId: string | undefined,
+  eventId: string | undefined,
+) {
   const queryClient = useQueryClient()
 
   const mutation = useMutation({
     mutationFn: async (welcome: WelcomeConfig) => {
+      // Guard against missing params
+      if (!projectId || !eventId) {
+        throw new Error('Cannot update welcome: missing projectId or eventId')
+      }
+
       // Validate complete welcome object
       const validated = welcomeConfigSchema.parse(welcome)
 
@@ -47,8 +57,9 @@ export function useUpdateWelcome(projectId: string, eventId: string) {
 
     // Success: invalidate queries to trigger re-fetch
     onSuccess: () => {
+      // Safe to use ! here - mutationFn throws if these are undefined
       queryClient.invalidateQueries({
-        queryKey: ['project-event', projectId, eventId],
+        queryKey: ['project-event', projectId!, eventId!],
       })
     },
 

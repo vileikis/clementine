@@ -47,7 +47,7 @@ const SHARE_FIELDS_TO_COMPARE: (keyof ShareConfig)[] = [
 
 export function ShareEditorPage() {
   const { projectId, eventId } = useParams({ strict: false })
-  const { data: event } = useProjectEvent(projectId!, eventId!)
+  const { data: event } = useProjectEvent(projectId, eventId)
 
   // Get current share from event or use defaults
   const currentShare = event?.draftConfig?.share ?? DEFAULT_SHARE

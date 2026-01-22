@@ -46,11 +46,18 @@ import { firestore } from '@/integrations/firebase/client'
  * }
  * ```
  */
-export function useProjectEvent(projectId: string, eventId: string) {
+export function useProjectEvent(
+  projectId: string | undefined,
+  eventId: string | undefined,
+) {
   const queryClient = useQueryClient()
 
-  // Set up real-time listener for event
+  // Set up real-time listener for event (only when both IDs are provided)
   useEffect(() => {
+    if (!projectId || !eventId) {
+      return
+    }
+
     const eventRef = doc(firestore, `projects/${projectId}/events/${eventId}`)
 
     const unsubscribe = onSnapshot(eventRef, (snapshot) => {

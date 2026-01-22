@@ -87,6 +87,30 @@ service cloud.firestore {
         allow delete: if false;
       }
 
+      // Project guests subcollection (037-guest-welcome)
+      // Guests are anonymous or admin users visiting the project
+      // Path: /projects/{projectId}/guests/{guestId}
+      match /guests/{guestId} {
+        // READ: Users can read their own guest record
+        // Admins can read all guest records
+        allow read: if isAdmin()
+          || (isAnyUser() && guestId == request.auth.uid);
+
+        // CREATE: Authenticated users (including anonymous) can create their own guest record
+        // Guest ID must match the authenticated user's UID
+        // authUid field must match the authenticated user's UID
+        allow create: if isAnyUser()
+          && guestId == request.auth.uid
+          && request.resource.data.authUid == request.auth.uid
+          && request.resource.data.projectId == projectId;
+
+        // UPDATE: Forbidden - guest records are immutable
+        allow update: if false;
+
+        // DELETE: Forbidden - guest records are historical
+        allow delete: if false;
+      }
+
       // Project sessions subcollection (030-session-runtime-capture)
       // Sessions track guest/admin execution of experiences
       // Path: /projects/{projectId}/sessions/{sessionId}

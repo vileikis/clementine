@@ -1,34 +1,49 @@
 /**
- * WelcomePreview Component
+ * WelcomeRenderer Component
  *
- * Display-only preview component showing how the welcome screen will appear
- * in the guest-facing experience. Uses ThemedText and ThemedBackground
- * primitives from shared theming module.
+ * Renders the welcome screen for both edit mode (designer preview) and run mode
+ * (guest interaction). Uses ThemedText and ThemedBackground primitives from shared
+ * theming module.
+ *
+ * WYSIWYG Principle: What creators see in preview is exactly what guests see.
  *
  * Must be used within a ThemeProvider.
  */
 
+import { ExperienceCard } from './ExperienceCard'
+import type { ExperienceCardData } from './ExperienceCard'
 import type { WelcomeConfig } from '@/domains/event/shared'
 import type { MainExperienceReference } from '@/domains/event/experiences'
-import type { Experience } from '@/domains/experience/shared'
 import { ThemedBackground, ThemedText, useEventTheme } from '@/shared/theming'
-import { ExperienceCard } from '@/domains/event/experiences'
 import { cn } from '@/shared/utils/style-utils'
 
-export interface WelcomePreviewProps {
-  /** Welcome config to preview */
+export interface WelcomeRendererProps {
+  /** Welcome config to render */
   welcome: WelcomeConfig
   /** Main experiences to display */
   mainExperiences?: MainExperienceReference[]
-  /** Experience details (fetched separately) */
-  experienceDetails?: Experience[]
+  /** Experience details for display (id, name, thumbnail only) */
+  experienceDetails?: ExperienceCardData[]
+  /**
+   * Display mode
+   * - edit: Non-interactive WYSIWYG preview in event designer
+   * - run: Interactive guest experience with session creation
+   */
+  mode: 'edit' | 'run'
+  /**
+   * Callback when guest selects an experience (required when mode='run')
+   * @param experienceId - ID of the selected experience
+   */
+  onSelectExperience?: (experienceId: string) => void
 }
 
-export function WelcomePreview({
+export function WelcomeRenderer({
   welcome,
   mainExperiences = [],
   experienceDetails = [],
-}: WelcomePreviewProps) {
+  mode,
+  onSelectExperience,
+}: WelcomeRendererProps) {
   const { theme } = useEventTheme()
 
   // Filter to only show enabled experiences
@@ -40,7 +55,7 @@ export function WelcomePreview({
   // Get experience details for enabled references
   const displayExperiences = enabledExperiences
     .map((ref) => experienceMap.get(ref.experienceId))
-    .filter((exp): exp is Experience => exp !== undefined)
+    .filter((exp): exp is ExperienceCardData => exp !== undefined)
 
   const hasExperiences = displayExperiences.length > 0
 
@@ -86,7 +101,12 @@ export function WelcomePreview({
                 key={experience.id}
                 experience={experience}
                 layout={welcome.layout}
-                mode="edit"
+                mode={mode}
+                onClick={
+                  mode === 'run' && onSelectExperience
+                    ? () => onSelectExperience(experience.id)
+                    : undefined
+                }
               />
             ))}
           </div>

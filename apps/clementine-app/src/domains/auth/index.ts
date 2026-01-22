@@ -2,6 +2,9 @@
 
 // Client-side components and providers
 export { AuthProvider, useAuth } from './providers/AuthProvider'
+
+// Authentication hooks
+export { useAnonymousSignIn } from './hooks/useAnonymousSignIn'
 export { LoginPage } from './components/LoginPage'
 export { WaitingMessage } from './components/WaitingMessage'
 

@@ -38,10 +38,11 @@ export interface UpdateExperiencesInput {
 
 /**
  * Parameters for the hook
+ * Accepts undefined - mutation will throw if called without valid IDs
  */
 export interface UseUpdateEventExperiencesParams {
-  projectId: string
-  eventId: string
+  projectId: string | undefined
+  eventId: string | undefined
 }
 
 /**
@@ -94,6 +95,13 @@ export function useUpdateEventExperiences({
 
   return useMutation({
     mutationFn: async (input: UpdateExperiencesInput) => {
+      // Guard against missing params
+      if (!projectId || !eventId) {
+        throw new Error(
+          'Cannot update experiences: missing projectId or eventId',
+        )
+      }
+
       await runTransaction(firestore, async (transaction) => {
         const eventRef = doc(
           firestore,
@@ -134,8 +142,9 @@ export function useUpdateEventExperiences({
 
     // Success: invalidate queries to trigger re-fetch
     onSuccess: () => {
+      // Safe to use ! here - mutationFn throws if these are undefined
       queryClient.invalidateQueries({
-        queryKey: ['project-event', projectId, eventId],
+        queryKey: ['project-event', projectId!, eventId!],
       })
     },
 
@@ -148,8 +157,8 @@ export function useUpdateEventExperiences({
         },
         extra: {
           errorType: 'event-experiences-update-failure',
-          projectId,
-          eventId,
+          projectId: projectId ?? 'undefined',
+          eventId: eventId ?? 'undefined',
         },
       })
     },

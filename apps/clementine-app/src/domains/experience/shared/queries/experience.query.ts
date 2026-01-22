@@ -11,6 +11,7 @@ import { queryOptions } from '@tanstack/react-query'
 import {
   collection,
   doc,
+  documentId,
   getDoc,
   getDocs,
   orderBy,
@@ -45,6 +46,10 @@ export const experienceKeys = {
   /** Key for specific experience detail */
   detail: (workspaceId: string, experienceId: string) =>
     [...experienceKeys.details(), workspaceId, experienceId] as const,
+
+  /** Key for fetching multiple experiences by IDs */
+  byIds: (workspaceId: string, experienceIds: string[]) =>
+    [...experienceKeys.all, 'byIds', workspaceId, experienceIds] as const,
 }
 
 /**
@@ -138,6 +143,56 @@ export const experienceQuery = (workspaceId: string, experienceId: string) =>
       }
 
       return convertFirestoreDoc(snapshot, experienceSchema)
+    },
+    staleTime: Infinity,
+    refetchOnWindowFocus: false,
+  })
+
+/**
+ * Query options for fetching multiple experiences by IDs
+ *
+ * Uses a single Firestore query with documentId() 'in' clause.
+ * Limited to 30 IDs per Firestore constraints.
+ *
+ * @param workspaceId - Workspace containing the experiences
+ * @param experienceIds - Array of experience document IDs to fetch
+ * @returns Query options for use with useQuery
+ *
+ * @example
+ * ```typescript
+ * const { data: experiences } = useQuery(
+ *   experiencesByIdsQuery(workspaceId, ['exp1', 'exp2', 'exp3'])
+ * )
+ * ```
+ */
+export const experiencesByIdsQuery = (
+  workspaceId: string,
+  experienceIds: string[],
+) =>
+  queryOptions({
+    queryKey: experienceKeys.byIds(workspaceId, experienceIds),
+    queryFn: async (): Promise<Experience[]> => {
+      if (experienceIds.length === 0) {
+        return []
+      }
+
+      const experiencesRef = collection(
+        firestore,
+        `workspaces/${workspaceId}/experiences`,
+      )
+
+      // Firestore 'in' queries are limited to 30 items
+      // For most events this is sufficient
+      const q = query(
+        experiencesRef,
+        where(documentId(), 'in', experienceIds),
+        where('status', '==', 'active'),
+      )
+
+      const snapshot = await getDocs(q)
+      return snapshot.docs.map((docSnapshot) =>
+        convertFirestoreDoc(docSnapshot, experienceSchema),
+      )
     },
     staleTime: Infinity,
     refetchOnWindowFocus: false,

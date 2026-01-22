@@ -5,7 +5,7 @@ export * from './constants'
 export * from './schemas/event-experiences.schema'
 export * from './hooks/useExperiencesForSlot'
 export * from './hooks/useUpdateEventExperiences'
-export * from './components/ExperienceCard'
+// Note: ExperienceCard moved to @/domains/event/welcome for WYSIWYG parity
 export * from './components/ExperienceSlotEmpty'
 export * from './components/ConnectExperienceItem'
 export * from './components/ExperienceSlotItem'

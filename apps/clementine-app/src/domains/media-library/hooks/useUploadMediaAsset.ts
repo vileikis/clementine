@@ -101,7 +101,11 @@ async function uploadMediaAsset({
 }
 
 // Hook: Upload media asset
-export function useUploadMediaAsset(workspaceId: string, userId: string) {
+// Accepts undefined params - mutation will throw if called without valid IDs
+export function useUploadMediaAsset(
+  workspaceId: string | undefined,
+  userId: string | undefined,
+) {
   const queryClient = useQueryClient()
 
   return useMutation({
@@ -109,16 +113,23 @@ export function useUploadMediaAsset(workspaceId: string, userId: string) {
       file: File
       type: 'overlay' | 'logo' | 'other'
       onProgress?: (progress: number) => void
-    }) =>
-      uploadMediaAsset({
+    }) => {
+      // Guard against missing params
+      if (!workspaceId || !userId) {
+        throw new Error('Cannot upload media: missing workspaceId or userId')
+      }
+
+      return uploadMediaAsset({
         ...params,
         workspaceId,
         userId,
-      }),
+      })
+    },
     onSuccess: () => {
       // Invalidate queries to trigger re-fetch
+      // Safe to use ! here - mutationFn throws if workspaceId is undefined
       queryClient.invalidateQueries({
-        queryKey: ['mediaAssets', workspaceId],
+        queryKey: ['mediaAssets', workspaceId!],
       })
     },
   })
