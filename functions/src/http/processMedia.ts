@@ -1,12 +1,12 @@
 import { onRequest } from 'firebase-functions/v2/https';
 import { getFunctions } from 'firebase-admin/functions';
-import '../lib/firebase-admin'; // Initialize Firebase Admin
-import { processMediaRequestSchema } from '../lib/schemas/media-pipeline.schema';
+import '../infra/firebase-admin'; // Initialize Firebase Admin
+import { processMediaRequestSchema } from '../schemas/media-pipeline.schema';
 import {
   fetchSession,
   isSessionProcessing,
   markSessionPending,
-} from '../lib/session';
+} from '../repositories/session-legacy';
 
 /**
  * HTTP Cloud Function endpoint to queue media processing jobs

@@ -1,12 +1,12 @@
 import { onTaskDispatched } from 'firebase-functions/v2/tasks';
-import '../lib/firebase-admin'; // Initialize Firebase Admin
-import { processMediaRequestSchema } from '../lib/schemas/media-pipeline.schema';
+import '../infra/firebase-admin'; // Initialize Firebase Admin
+import { processMediaRequestSchema } from '../schemas/media-pipeline.schema';
 import {
   fetchSession,
   markSessionRunning,
   markSessionFailed,
   updateSessionOutputs,
-} from '../lib/session';
+} from '../repositories/session-legacy';
 import {
   processSingleImage,
   processGIF,

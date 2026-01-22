@@ -1,4 +1,4 @@
-import type { PipelineConfig } from '../../lib/schemas/media-pipeline.schema';
+import type { PipelineConfig } from '../../schemas/media-pipeline.schema';
 
 /**
  * Aspect ratio dimension mappings

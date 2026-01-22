@@ -11,20 +11,24 @@
   "scripts": {
     "build": "node esbuild.config.mjs",
     "build:watch": "node esbuild.config.mjs --watch",
+    "type-check": "tsc --noEmit",
     "serve": "pnpm build:watch | firebase emulators:start --config ../firebase.emulator.json",
     "serve:prod": "pnpm build && npx isolate && cd isolate && npm install && cd ../.. && firebase emulators:start",
     "clean": "rm -rf dist isolate",
-    "seed": "tsx scripts/seed-emulators.ts"
+    "seed": "tsx scripts/seed-emulators.ts",
+    "qa:transform": "./scripts/qa-transform-pipeline.sh",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "engines": {
     "node": "22"
   },
   "dependencies": {
     "@clementine/shared": "workspace:*",
-    "@google/genai": "^1.34.0",
+    "@google/genai": "^1.38.0",
     "ffmpeg-static": "^5.3.0",
     "firebase-admin": "^13.6.0",
-    "firebase-functions": "^7.0.2",
+    "firebase-functions": "^7.0.3",
     "tmp": "^0.2.5",
     "zod": "^4.1.12"
   },
@@ -33,6 +37,7 @@
     "esbuild": "^0.27.2",
     "isolate-package": "^1.26.1",
     "tsx": "^4.19.2",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "vitest": "^4.0.17"
   }
 }

@@ -3,10 +3,10 @@ import { scaleAndCropImage, generateThumbnail, applyOverlayToMedia } from './ffm
 import {
   uploadToStorage,
   getOutputStoragePath,
-} from '../../lib/storage';
-import { updateProcessingStep, markSessionFailed } from '../../lib/session';
+} from '../../infra/storage';
+import { updateProcessingStep, markSessionFailed } from '../../repositories/session-legacy';
 import { getPipelineConfig } from './config';
-import { createTempDir } from '../../lib/utils';
+import { createTempDir } from '../../utils/temp';
 import { downloadSingleFrame, downloadOverlay } from './pipeline-utils';
 import { applyAiTransform, mapAiTransformError } from './ai-transform-step';
 import { mapAspectRatioToGemini } from './aspect-ratio-utils';
@@ -15,7 +15,7 @@ import type {
   SessionOutputs,
   SessionWithProcessing,
 } from '@clementine/shared';
-import type { PipelineOptions } from '../../lib/schemas/media-pipeline.schema';
+import type { PipelineOptions } from '../../schemas/media-pipeline.schema';
 import type { AiTransformConfig } from '../ai/providers/types';
 
 /**

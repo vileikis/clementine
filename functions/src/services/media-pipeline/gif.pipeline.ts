@@ -3,16 +3,16 @@ import { createGIF, generateThumbnail, applyOverlayToMedia, scaleAndCropGIF } fr
 import {
   uploadToStorage,
   getOutputStoragePath,
-} from '../../lib/storage';
-import { updateProcessingStep } from '../../lib/session';
+} from '../../infra/storage';
+import { updateProcessingStep } from '../../repositories/session-legacy';
 import { getPipelineConfig } from './config';
-import { createTempDir } from '../../lib/utils';
+import { createTempDir } from '../../utils/temp';
 import { downloadSessionFrames, downloadOverlay } from './pipeline-utils';
 import type {
   SessionOutputs,
   SessionWithProcessing,
 } from '@clementine/shared';
-import type { PipelineOptions } from '../../lib/schemas/media-pipeline.schema';
+import type { PipelineOptions } from '../../schemas/media-pipeline.schema';
 
 /**
  * Process multi-frame GIF (User Story 2)
