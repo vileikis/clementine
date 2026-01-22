@@ -226,7 +226,7 @@ export function createSanitizedError(
   step: string | null = null
 ): JobError {
   const message =
-    SANITIZED_ERROR_MESSAGES[code] ?? SANITIZED_ERROR_MESSAGES['UNKNOWN']
+    SANITIZED_ERROR_MESSAGES[code] ?? SANITIZED_ERROR_MESSAGES['UNKNOWN'] ?? 'An unexpected error occurred.'
 
   return {
     code,

@@ -25,6 +25,7 @@ function createMockSnapshot(overrides: Partial<JobSnapshot> = {}): JobSnapshot {
     transformConfig: {
       nodes: [],
       variableMappings: [],
+      outputFormat: null,
     },
     eventContext: {
       overlay: null,
@@ -50,11 +51,11 @@ describe('buildJobData', () => {
       snapshot,
     })
 
-    expect(result.projectId).toBe('project-123')
-    expect(result.sessionId).toBe('session-456')
-    expect(result.experienceId).toBe('exp-789')
-    expect(result.stepId).toBe('transform-step')
-    expect(result.snapshot).toEqual(snapshot)
+    expect(result['projectId']).toBe('project-123')
+    expect(result['sessionId']).toBe('session-456')
+    expect(result['experienceId']).toBe('exp-789')
+    expect(result['stepId']).toBe('transform-step')
+    expect(result['snapshot']).toEqual(snapshot)
   })
 
   it('sets initial status to pending', () => {
@@ -66,7 +67,7 @@ describe('buildJobData', () => {
       snapshot: createMockSnapshot(),
     })
 
-    expect(result.status).toBe('pending')
+    expect(result['status']).toBe('pending')
   })
 
   it('sets null values for optional fields', () => {
@@ -78,11 +79,11 @@ describe('buildJobData', () => {
       snapshot: createMockSnapshot(),
     })
 
-    expect(result.progress).toBeNull()
-    expect(result.output).toBeNull()
-    expect(result.error).toBeNull()
-    expect(result.startedAt).toBeNull()
-    expect(result.completedAt).toBeNull()
+    expect(result['progress']).toBeNull()
+    expect(result['output']).toBeNull()
+    expect(result['error']).toBeNull()
+    expect(result['startedAt']).toBeNull()
+    expect(result['completedAt']).toBeNull()
   })
 
   it('sets timestamps to current time', () => {
@@ -96,11 +97,11 @@ describe('buildJobData', () => {
     })
     const after = Date.now()
 
-    expect(result.createdAt).toBeGreaterThanOrEqual(before)
-    expect(result.createdAt).toBeLessThanOrEqual(after)
-    expect(result.updatedAt).toBeGreaterThanOrEqual(before)
-    expect(result.updatedAt).toBeLessThanOrEqual(after)
-    expect(result.createdAt).toBe(result.updatedAt)
+    expect(result['createdAt']).toBeGreaterThanOrEqual(before)
+    expect(result['createdAt']).toBeLessThanOrEqual(after)
+    expect(result['updatedAt']).toBeGreaterThanOrEqual(before)
+    expect(result['updatedAt']).toBeLessThanOrEqual(after)
+    expect(result['createdAt']).toBe(result['updatedAt'])
   })
 
   it('accepts null stepId', () => {
@@ -112,7 +113,7 @@ describe('buildJobData', () => {
       snapshot: createMockSnapshot(),
     })
 
-    expect(result.stepId).toBeNull()
+    expect(result['stepId']).toBeNull()
   })
 })
 
@@ -180,9 +181,10 @@ describe('SANITIZED_ERROR_MESSAGES', () => {
     ]
 
     expectedCodes.forEach((code) => {
-      expect(SANITIZED_ERROR_MESSAGES[code]).toBeDefined()
-      expect(typeof SANITIZED_ERROR_MESSAGES[code]).toBe('string')
-      expect(SANITIZED_ERROR_MESSAGES[code].length).toBeGreaterThan(0)
+      const message = SANITIZED_ERROR_MESSAGES[code]
+      expect(message).toBeDefined()
+      expect(typeof message).toBe('string')
+      expect(message!.length).toBeGreaterThan(0)
     })
   })
 
