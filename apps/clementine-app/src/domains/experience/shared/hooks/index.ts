@@ -7,6 +7,7 @@
 // List hooks
 export * from './useWorkspaceExperiences'
 export * from './useWorkspaceExperience'
+export * from './useExperiencesByIds'
 
 // Mutation hooks
 export * from './useCreateExperience'

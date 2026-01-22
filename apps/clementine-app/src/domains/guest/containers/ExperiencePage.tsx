@@ -2,10 +2,11 @@
  * ExperiencePage Container
  *
  * Experience page that handles session lifecycle via useInitSession.
- * Uses GuestContext for project/event data and manages session creation/subscription.
+ * Uses GuestContext for project/event/experience data and manages session creation.
  *
  * Responsibilities:
- * - Get project/event data from GuestContext
+ * - Get project/event/experience data from GuestContext
+ * - Wait for experiences to load (lazy-loaded by GuestLayout)
  * - Initialize session via useInitSession (create or subscribe)
  * - Update URL with session ID when created
  * - Display session info (placeholder until E7 runtime)
@@ -15,6 +16,7 @@
 import { useEffect, useRef } from 'react'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { ArrowLeft } from 'lucide-react'
+
 import { useGuestContext } from '../contexts'
 import { ErrorPage } from '../components'
 import { useInitSession } from '@/domains/session/shared'
@@ -30,10 +32,14 @@ export interface ExperiencePageProps {
  * Experience page with session management
  *
  * This component:
- * 1. Gets project/event data from GuestContext (provided by GuestLayout)
- * 2. Validates that the experienceId is enabled for this event
- * 3. Uses useInitSession to create or subscribe to a session
- * 4. Updates the URL with session ID when a new session is created
+ * 1. Gets project/event/experience data from GuestContext (provided by GuestLayout)
+ * 2. Waits for experiences to load (lazy-loaded)
+ * 3. Validates that the experienceId is enabled for this event
+ * 4. Uses useInitSession to create or subscribe to a session
+ * 5. Updates the URL with session ID when a new session is created
+ *
+ * The full Experience object is available from context for use with
+ * ExperienceRuntime (experience.published contains steps and transform config).
  *
  * @example
  * ```tsx
@@ -50,23 +56,29 @@ export function ExperiencePage({
   sessionId: initialSessionId,
 }: ExperiencePageProps) {
   const navigate = useNavigate()
-  const { project, event } = useGuestContext()
+  const { project, event, experiences, experiencesLoading } = useGuestContext()
   const urlUpdatedRef = useRef(false)
 
-  // Validate that the experience is enabled for this event
+  // Find the experience from context
+  const experience = experiences.find((exp) => exp.id === experienceId)
+
+  // Also validate that the experience is enabled for this event
   const enabledExperiences = event.publishedConfig?.experiences?.main ?? []
   const isExperienceEnabled = enabledExperiences.some(
     (ref) => ref.experienceId === experienceId && ref.enabled,
   )
 
-  // Only initialize session if experience is valid
+  // Experience is valid if it exists in context AND is enabled in publishedConfig
+  const isExperienceValid = !!experience && isExperienceEnabled
+
+  // Only initialize session if experience is valid and loaded
   const sessionState = useInitSession({
     projectId: project.id,
     workspaceId: project.workspaceId,
     eventId: event.id,
     experienceId,
     initialSessionId,
-    enabled: isExperienceEnabled,
+    enabled: isExperienceValid && !experiencesLoading,
   })
 
   // Update URL with session ID when session is created (if not already in URL)
@@ -86,8 +98,20 @@ export function ExperiencePage({
     }
   }, [sessionState, initialSessionId, navigate, project.id, experienceId])
 
-  // Handle invalid experience (not enabled for this event)
-  if (!isExperienceEnabled) {
+  // Show loading state while experiences are loading
+  if (experiencesLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="text-center">
+          <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+          <p className="text-muted-foreground">Loading experience...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Handle invalid experience (not found or not enabled for this event)
+  if (!isExperienceValid) {
     return (
       <ErrorPage
         title="Experience Not Available"
@@ -122,6 +146,7 @@ export function ExperiencePage({
   const { session, sessionId } = sessionState
 
   // Placeholder content (full runtime will be in E7)
+  // Note: experience.published is now available for ExperienceRuntime integration
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
       <div className="text-center max-w-md">
@@ -141,6 +166,9 @@ export function ExperiencePage({
           </p>
           <p className="mt-2 text-muted-foreground text-xs">
             Status: {session.status}
+          </p>
+          <p className="mt-2 text-muted-foreground text-xs">
+            Experience: {experience.name}
           </p>
         </div>
 

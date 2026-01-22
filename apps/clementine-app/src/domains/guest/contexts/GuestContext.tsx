@@ -6,7 +6,8 @@
  * needing to re-fetch or re-initialize in child components.
  *
  * Usage:
- * - GuestLayout renders GuestProvider when state is ready
+ * - GuestLayout renders GuestProvider when base state is ready
+ * - Experiences are lazy-loaded and added to context
  * - Child routes (WelcomeScreen, ExperiencePage) use useGuestContext() to access data
  */
 import { createContext, useContext } from 'react'
@@ -14,13 +15,14 @@ import type { ReactNode } from 'react'
 import type { User } from 'firebase/auth'
 import type { Project } from '@clementine/shared'
 import type { ProjectEventFull } from '@/domains/event/shared'
-import type { ExperienceCardData } from '../hooks/useGuestAccess'
+import type { Experience } from '@/domains/experience/shared'
 import type { Guest } from '../schemas/guest.schema'
 
 /**
  * Value provided by the guest context
  *
  * Contains all data needed by child routes after initialization is complete.
+ * Experiences are lazy-loaded after the base state is ready.
  */
 export interface GuestContextValue {
   /** Authenticated user (anonymous or admin) */
@@ -29,10 +31,12 @@ export interface GuestContextValue {
   project: Project
   /** Active event with published config */
   event: ProjectEventFull
-  /** Enabled experiences for the welcome screen */
-  experiences: ExperienceCardData[]
   /** Guest record for the current user */
   guest: Guest
+  /** Full experience documents for enabled experiences (empty array while loading) */
+  experiences: Experience[]
+  /** Whether experiences are still loading */
+  experiencesLoading: boolean
 }
 
 const GuestContext = createContext<GuestContextValue | null>(null)
@@ -82,14 +86,11 @@ export function GuestProvider({ value, children }: GuestProviderProps) {
  * @example
  * ```tsx
  * function WelcomeScreen() {
- *   const { project, event, experiences, guest } = useGuestContext()
+ *   const { experiences, experiencesLoading } = useGuestContext()
  *
- *   return (
- *     <WelcomeRenderer
- *       welcome={event.publishedConfig!.welcome}
- *       experienceDetails={experiences}
- *     />
- *   )
+ *   if (experiencesLoading) return <SkeletonCards />
+ *
+ *   return <ExperienceCards experiences={experiences} />
  * }
  * ```
  */

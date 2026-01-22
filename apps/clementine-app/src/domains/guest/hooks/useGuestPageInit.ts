@@ -1,13 +1,16 @@
 /**
  * useGuestPageInit Hook
  *
- * Composite hook that combines auth, guest access, and guest initialization
+ * Composite hook that combines auth, guest validation, and guest initialization
  * into a single discriminated union state for the GuestLayout container.
  *
  * Handles:
  * 1. Anonymous authentication (auto sign-in if not authenticated)
- * 2. Guest access validation (project, event, experiences)
+ * 2. Guest validation (project, event existence and publish status)
  * 3. Guest record initialization (fetch or create)
+ *
+ * Note: Experience loading is NOT handled here. GuestLayout fetches
+ * experiences separately after this hook returns 'ready' for lazy loading.
  *
  * Returns a discriminated union state that covers all possible states:
  * - loading: Still initializing
@@ -18,13 +21,12 @@
  * - ready: All data loaded and ready to render
  */
 import { useEffect } from 'react'
-import { useGuestAccess } from './useGuestAccess'
+import { useGuestValidation } from './useGuestValidation'
 import { useInitGuest } from './useInitGuest'
 import type { Project } from '@clementine/shared'
 import type { User } from 'firebase/auth'
 import type { ProjectEventFull } from '@/domains/event/shared'
 import type { Guest } from '../schemas/guest.schema'
-import type { ExperienceCardData } from './useGuestAccess'
 import { useAnonymousSignIn, useAuth } from '@/domains/auth'
 
 /**
@@ -41,7 +43,6 @@ export type GuestPageInitState =
       user: User
       project: Project
       event: ProjectEventFull
-      experiences: ExperienceCardData[]
       guest: Guest
     }
 
@@ -50,8 +51,11 @@ export type GuestPageInitState =
  *
  * Combines:
  * - useAuth() + useAnonymousSignIn() + auto-sign-in effect
- * - useGuestAccess(projectId) for validation
+ * - useGuestValidation(projectId) for project/event validation
  * - useInitGuest(projectId) for guest record
+ *
+ * Note: Experience loading is handled separately by GuestLayout
+ * after this hook returns 'ready' for lazy loading.
  *
  * @param projectId - Project ID from URL params
  * @returns Discriminated union state for rendering
@@ -67,8 +71,7 @@ export type GuestPageInitState =
  *   if (state.status === 'coming-soon') return <ComingSoonPage />
  *   if (state.status === 'error') return <ErrorPage error={state.error} />
  *
- *   // state.status === 'ready'
- *   return <GuestProvider value={state}>{children}</GuestProvider>
+ *   // state.status === 'ready' - now fetch experiences...
  * }
  * ```
  */
@@ -88,8 +91,8 @@ export function useGuestPageInit(projectId: string): GuestPageInitState {
     }
   }, [authLoading, user, isSigningIn, signInAnonymously])
 
-  // Guest access validation (project, event, experiences)
-  const access = useGuestAccess(projectId)
+  // Guest validation (project, event existence and publish status)
+  const validation = useGuestValidation(projectId)
 
   // Guest record initialization (only runs once authenticated)
   const guestState = useInitGuest(projectId)
@@ -103,20 +106,20 @@ export function useGuestPageInit(projectId: string): GuestPageInitState {
   }
 
   // Handle not-found state (project or event missing)
-  if (access.status === 'not-found') {
-    return { status: 'not-found', reason: access.reason }
+  if (validation.status === 'not-found') {
+    return { status: 'not-found', reason: validation.reason }
   }
 
   // Handle coming-soon state (no active event or not published)
-  if (access.status === 'coming-soon') {
-    return { status: 'coming-soon', reason: access.reason }
+  if (validation.status === 'coming-soon') {
+    return { status: 'coming-soon', reason: validation.reason }
   }
 
   // Show loading state while authenticating, fetching data, or creating guest
   if (
     authLoading ||
     isSigningIn ||
-    access.status === 'loading' ||
+    validation.status === 'loading' ||
     guestState.status === 'loading'
   ) {
     return { status: 'loading' }
@@ -127,18 +130,17 @@ export function useGuestPageInit(projectId: string): GuestPageInitState {
     return { status: 'error', error: guestState.error }
   }
 
-  // At this point, access.status === 'ready' and guestState.status === 'ready'
+  // At this point, validation.status === 'ready' and guestState.status === 'ready'
   if (
-    access.status === 'ready' &&
+    validation.status === 'ready' &&
     guestState.status === 'ready' &&
     user !== null
   ) {
     return {
       status: 'ready',
       user,
-      project: access.project,
-      event: access.event,
-      experiences: access.experiences,
+      project: validation.project,
+      event: validation.event,
       guest: guestState.guest,
     }
   }

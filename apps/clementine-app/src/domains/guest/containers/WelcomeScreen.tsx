@@ -5,6 +5,8 @@
  * All initialization (auth, guest access, guest record) is handled by
  * GuestLayout before this component renders.
  *
+ * Experiences are lazy-loaded and converted to card data for display.
+ *
  * Responsibilities:
  * - Display welcome screen with available experiences
  * - Handle experience selection and navigation
@@ -13,8 +15,11 @@
  * - US2: Guest Selects an Experience (experience selection handler)
  * - US4: Guest Views Event with No Available Experiences (empty state)
  */
+import { useMemo } from 'react'
 import { useNavigate } from '@tanstack/react-router'
+
 import { useGuestContext } from '../contexts'
+import type { ExperienceCardData } from '@/domains/event/welcome'
 import { DEFAULT_WELCOME, WelcomeRenderer } from '@/domains/event/welcome'
 import { ThemeProvider } from '@/shared/theming'
 import { DEFAULT_THEME } from '@/domains/event/theme/constants'
@@ -25,6 +30,9 @@ import { DEFAULT_THEME } from '@/domains/event/theme/constants'
  * This component only renders when GuestContext is available (i.e., when
  * GuestLayout has completed initialization). It accesses project, event,
  * and experiences data from context instead of fetching them directly.
+ *
+ * Experiences are lazy-loaded - the welcome screen shell renders immediately
+ * and experience cards appear once loaded.
  *
  * On experience selection, navigates to the experience page. Session creation
  * is handled by ExperiencePage via useInitSession.
@@ -50,6 +58,17 @@ export function WelcomeScreen() {
   const theme = publishedConfig.theme ?? DEFAULT_THEME
   const mainExperiences = publishedConfig.experiences?.main ?? []
 
+  // Derive card data from full experience documents
+  const experienceCardData: ExperienceCardData[] = useMemo(
+    () =>
+      experiences.map((exp) => ({
+        id: exp.id,
+        name: exp.name,
+        thumbnailUrl: exp.media?.url ?? null,
+      })),
+    [experiences],
+  )
+
   // Handle experience selection - just navigate, session created in ExperiencePage
   const handleSelectExperience = (experienceId: string) => {
     void navigate({
@@ -64,7 +83,7 @@ export function WelcomeScreen() {
         <WelcomeRenderer
           welcome={welcome}
           mainExperiences={mainExperiences}
-          experienceDetails={experiences}
+          experienceDetails={experienceCardData}
           mode="run"
           onSelectExperience={handleSelectExperience}
         />
