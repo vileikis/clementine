@@ -9,92 +9,13 @@
  */
 import { onRequest } from 'firebase-functions/v2/https'
 import { getFunctions } from 'firebase-admin/functions'
-import { db } from '../lib/firebase-admin'
 import { fetchSession, updateSessionJobStatus, hasActiveJob } from '../lib/session-v2'
-import { createJob, buildJobData } from '../lib/job'
+import { fetchExperience } from '../lib/experience'
+import { createJob, buildJobData, buildJobSnapshot } from '../lib/job'
 import {
   startTransformPipelineRequestSchema,
   type TransformPipelineJobPayload,
 } from '../lib/schemas/transform-pipeline.schema'
-import {
-  experienceSchema,
-  type Experience,
-  type JobSnapshot,
-  type Session,
-} from '@clementine/shared'
-
-/**
- * Fetch experience from Firestore
- */
-async function fetchExperience(
-  workspaceId: string,
-  experienceId: string
-): Promise<Experience | null> {
-  const doc = await db
-    .collection('workspaces')
-    .doc(workspaceId)
-    .collection('experiences')
-    .doc(experienceId)
-    .get()
-
-  if (!doc.exists) {
-    return null
-  }
-
-  const data = doc.data()
-  if (!data) {
-    return null
-  }
-
-  return experienceSchema.parse({ id: doc.id, ...data })
-}
-
-/**
- * Build job snapshot from session and experience
- */
-function buildJobSnapshot(
-  session: Session,
-  experience: Experience,
-  configSource: 'draft' | 'published'
-): JobSnapshot {
-  const config = configSource === 'draft' ? experience.draft : experience.published
-
-  if (!config) {
-    throw new Error('Experience config not found')
-  }
-
-  return {
-    sessionInputs: {
-      answers: session.answers,
-      capturedMedia: session.capturedMedia,
-    },
-    transformConfig: config.transform!,
-    eventContext: {
-      overlay: null, // Will be populated from event if applicable
-      applyOverlay: false,
-      experienceRef: null,
-    },
-    versions: {
-      experienceVersion:
-        configSource === 'draft'
-          ? experience.draftVersion
-          : (experience.publishedVersion ?? 1),
-      eventVersion: null, // Will be populated from event if applicable
-    },
-  }
-}
-
-/**
- * Queue Cloud Task for job processing
- */
-async function queueTransformJob(payload: TransformPipelineJobPayload): Promise<void> {
-  const queue = getFunctions().taskQueue(
-    'locations/europe-west1/functions/transformPipelineJob'
-  )
-  await queue.enqueue(payload, {
-    scheduleDelaySeconds: 0, // Run immediately
-  })
-}
 
 /**
  * HTTP Cloud Function: startTransformPipeline
@@ -225,3 +146,15 @@ export const startTransformPipeline = onRequest(
     }
   }
 )
+
+/**
+ * Queue Cloud Task for job processing
+ */
+async function queueTransformJob(payload: TransformPipelineJobPayload): Promise<void> {
+  const queue = getFunctions().taskQueue(
+    'locations/europe-west1/functions/transformPipelineJob'
+  )
+  await queue.enqueue(payload, {
+    scheduleDelaySeconds: 0, // Run immediately
+  })
+}

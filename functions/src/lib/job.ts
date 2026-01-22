@@ -13,6 +13,8 @@ import {
   type JobOutput,
   type JobError,
   type JobSnapshot,
+  type Session,
+  type Experience,
 } from '@clementine/shared'
 
 /**
@@ -266,5 +268,48 @@ export function buildJobData(params: {
     updatedAt: now,
     startedAt: null,
     completedAt: null,
+  }
+}
+
+/**
+ * Build job snapshot from session and experience
+ *
+ * Captures the current state of session inputs and experience config
+ * at the time of job creation for immutable processing.
+ *
+ * @param session - Session with answers and captured media
+ * @param experience - Experience with transform config
+ * @param configSource - Which config to use ('draft' or 'published')
+ * @returns JobSnapshot for the job document
+ */
+export function buildJobSnapshot(
+  session: Session,
+  experience: Experience,
+  configSource: 'draft' | 'published'
+): JobSnapshot {
+  const config = configSource === 'draft' ? experience.draft : experience.published
+
+  if (!config) {
+    throw new Error('Experience config not found')
+  }
+
+  return {
+    sessionInputs: {
+      answers: session.answers,
+      capturedMedia: session.capturedMedia,
+    },
+    transformConfig: config.transform!,
+    eventContext: {
+      overlay: null, // Will be populated from event if applicable
+      applyOverlay: false,
+      experienceRef: null,
+    },
+    versions: {
+      experienceVersion:
+        configSource === 'draft'
+          ? experience.draftVersion
+          : (experience.publishedVersion ?? 1),
+      eventVersion: null, // Will be populated from event if applicable
+    },
   }
 }
