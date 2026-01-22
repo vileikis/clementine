@@ -7,21 +7,51 @@ This directory contains all Firebase-related configuration files for the Clement
 ### Security Rules
 
 - **`firestore.rules`** - Firestore database security rules
-  - Controls read/write access to Firestore collections
-  - POC: Allow all reads, deny all writes (force Server Actions)
-  - See file comments for future MVP rules examples
+  - Authentication-based access control using Firebase Auth custom claims
+  - Admin users (with `admin: true` claim) have full read/write access
+  - Authenticated users have scoped access per collection
+  - Soft deletes enforced (hard deletes forbidden)
 
 - **`storage.rules`** - Firebase Storage security rules
-  - Controls access to uploaded images and files
-  - POC: Allow all reads, deny all writes (force Server Actions)
-  - See file comments for future MVP rules examples
+  - Controls access to uploaded images and media files
+  - Authenticated reads, admin-only writes
 
 ### Configuration
 
 - **`firestore.indexes.json`** - Firestore composite indexes
-  - Defines indexes for complex queries
-  - Required for company management feature (status+name, companyId+createdAt)
+  - Defines indexes for complex queries across all collections
   - Firebase automatically creates single-field indexes
+
+## Database Structure
+
+### Top-Level Collections
+
+- **`workspaces`** - Workspace/tenant containers
+  - **`mediaAssets`** (subcollection) - Uploaded media files
+  - **`experiences`** (subcollection) - AI experience configurations
+
+- **`projects`** - Project containers
+  - **`events`** (subcollection) - Event configurations
+  - **`sessions`** (subcollection) - Guest session executions
+  - **`jobs`** (subcollection) - Transform pipeline job tracking
+
+### Indexes
+
+Composite indexes are defined for:
+
+| Collection | Fields | Purpose |
+|------------|--------|---------|
+| workspaces | slug + status | Lookup by slug |
+| workspaces | status + createdAt | List active workspaces |
+| projects | workspaceId + status + createdAt | List projects in workspace |
+| projects | type + workspaceId + status + createdAt | Filter by project type |
+| experiences | status + createdAt | List experiences |
+| experiences | status + profile + createdAt | Filter by profile |
+| sessions | guestId + createdAt | Guest session history |
+| jobs | projectId + status + createdAt | List jobs by project |
+| jobs | sessionId + createdAt | Jobs for a session |
+| events | status + createdAt | List events |
+| events | companyId + createdAt | Events by company |
 
 ## Deployment
 
@@ -29,52 +59,44 @@ Deploy from the **root directory**:
 
 ```bash
 # Deploy only security rules
-pnpm firebase:deploy:rules
+pnpm fb:deploy:rules
 
 # Deploy only Firestore indexes
-firebase deploy --only firestore:indexes
+pnpm fb:deploy:indexes
 
 # Deploy everything (rules + indexes + functions)
-pnpm firebase:deploy
+pnpm fb:deploy
 ```
 
-**Note**: After adding the company management indexes, you must deploy them before the queries will work in production:
+**Note**: After adding new indexes, deploy them before queries will work in production.
 
-```bash
-# From root directory
-firebase deploy --only firestore:indexes
-```
+## Security Strategy
 
-## Security Strategy (POC)
+Uses **authentication-based access control** with Firebase Auth custom claims:
 
-The POC uses a **hybrid Client SDK + Admin SDK** approach:
+### Admin Users (`admin: true` claim)
+- Full read/write access to all collections
+- Can manage workspaces, projects, experiences, events
+- Can view all sessions and jobs
 
-### Client SDK (Frontend)
-- ✅ Can **read** documents (for real-time subscriptions)
-- ❌ **Cannot write** (all mutations via Server Actions)
+### Authenticated Users
+- Can read public data (experiences, events, projects)
+- Can create/read/update their own sessions
+- Cannot access jobs (admin debugging only)
+- Cannot hard delete any documents
 
-### Admin SDK (Server Actions)
-- ✅ Full read/write access with privileged credentials
-- ✅ Business logic and validation enforced server-side
-- ✅ Secure - runs only on the server
+### Server (Admin SDK)
+- Full access via Cloud Functions
+- All job creation/updates happen server-side
+- Business logic and validation enforced
 
-### Why This Approach?
+### Design Principles
 
-1. **Real-time updates work** - Guest flow can subscribe to session changes
-2. **Security enforced** - All mutations go through validated Server Actions
-3. **Business logic secure** - No way to bypass validation from client
-4. **Easy to tighten** - Add authentication and user-specific rules in MVP
-
-## Future: MVP Rules
-
-When authentication is added, the rules will be updated to:
-
-- **Events**: Only organizers can write their own events
-- **Sessions**: Guests can read their own sessions
-- **Storage**: Reference images restricted to organizers
-- **Analytics**: Only organizers can view their event stats
-
-See commented examples in the rules files.
+1. **Authentication required** - All operations require Firebase Auth
+2. **Soft deletes only** - Hard deletes forbidden in rules
+3. **Owner-scoped writes** - Users can only modify their own data
+4. **Admin override** - Admins can access everything
+5. **Server-side jobs** - Job collection is admin-only (Cloud Functions)
 
 ## Testing Rules Locally
 
