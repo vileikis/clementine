@@ -84,7 +84,9 @@ export function GuestLayout({ projectId }: GuestLayoutProps) {
 
   // Handle authentication error
   if (baseState.status === 'auth-error') {
-    return <ErrorPage title="Authentication Error" message={baseState.message} />
+    return (
+      <ErrorPage title="Authentication Error" message={baseState.message} />
+    )
   }
 
   // Handle not-found state (project or event missing)
