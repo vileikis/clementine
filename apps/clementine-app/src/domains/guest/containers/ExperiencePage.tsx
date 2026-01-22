@@ -31,8 +31,9 @@ export interface ExperiencePageProps {
  *
  * This component:
  * 1. Gets project/event data from GuestContext (provided by GuestLayout)
- * 2. Uses useInitSession to create or subscribe to a session
- * 3. Updates the URL with session ID when a new session is created
+ * 2. Validates that the experienceId is enabled for this event
+ * 3. Uses useInitSession to create or subscribe to a session
+ * 4. Updates the URL with session ID when a new session is created
  *
  * @example
  * ```tsx
@@ -52,12 +53,20 @@ export function ExperiencePage({
   const { project, event } = useGuestContext()
   const urlUpdatedRef = useRef(false)
 
+  // Validate that the experience is enabled for this event
+  const enabledExperiences = event.publishedConfig?.experiences?.main ?? []
+  const isExperienceEnabled = enabledExperiences.some(
+    (ref) => ref.experienceId === experienceId && ref.enabled,
+  )
+
+  // Only initialize session if experience is valid
   const sessionState = useInitSession({
     projectId: project.id,
     workspaceId: project.workspaceId,
     eventId: event.id,
     experienceId,
     initialSessionId,
+    enabled: isExperienceEnabled,
   })
 
   // Update URL with session ID when session is created (if not already in URL)
@@ -82,6 +91,16 @@ export function ExperiencePage({
     project.id,
     experienceId,
   ])
+
+  // Handle invalid experience (not enabled for this event)
+  if (!isExperienceEnabled) {
+    return (
+      <ErrorPage
+        title="Experience Not Available"
+        message="This experience is not available. Please go back and select a different one."
+      />
+    )
+  }
 
   // Handle error state
   if (sessionState.status === 'error') {

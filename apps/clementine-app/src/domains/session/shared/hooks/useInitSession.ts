@@ -39,6 +39,8 @@ export interface UseInitSessionOptions {
   experienceId: string
   /** Initial session ID from URL (may be undefined) */
   initialSessionId?: string
+  /** Whether to enable session initialization (default: true) */
+  enabled?: boolean
 }
 
 /**
@@ -79,6 +81,7 @@ export function useInitSession({
   eventId,
   experienceId,
   initialSessionId,
+  enabled = true,
 }: UseInitSessionOptions): InitSessionState {
   const createSession = useCreateSession()
   const creatingSessionRef = useRef(false)
@@ -88,19 +91,22 @@ export function useInitSession({
     initialSessionId,
   )
 
-  // Subscribe to session (only when we have a session ID)
+  // Subscribe to session (only when we have a session ID and hook is enabled)
   const {
     data: session,
     isLoading: subscriptionLoading,
     isFetched: subscriptionFetched,
     error: subscriptionError,
-  } = useSubscribeSession(projectId, currentSessionId ?? null)
+  } = useSubscribeSession(
+    enabled ? projectId : null,
+    enabled ? (currentSessionId ?? null) : null,
+  )
 
   // Create session if needed
   useEffect(() => {
     async function createMissingSession() {
-      // Skip if already creating
-      if (creatingSessionRef.current || createSession.isPending) {
+      // Skip if hook is disabled or already creating
+      if (!enabled || creatingSessionRef.current || createSession.isPending) {
         return
       }
 
@@ -153,6 +159,7 @@ export function useInitSession({
 
     void createMissingSession()
   }, [
+    enabled,
     currentSessionId,
     subscriptionFetched,
     subscriptionLoading,
