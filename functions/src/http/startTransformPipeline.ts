@@ -9,13 +9,13 @@
  */
 import { onRequest } from 'firebase-functions/v2/https'
 import { getFunctions } from 'firebase-admin/functions'
-import { fetchSession, updateSessionJobStatus, hasActiveJob } from '../lib/session-v2'
-import { fetchExperience } from '../lib/experience'
-import { createJob, buildJobData, buildJobSnapshot } from '../lib/job'
+import { fetchSession, updateSessionJobStatus, hasActiveJob } from '../repositories/session'
+import { fetchExperience } from '../repositories/experience'
+import { createJob, buildJobData, buildJobSnapshot } from '../repositories/job'
 import {
   startTransformPipelineRequestSchema,
   type TransformPipelineJobPayload,
-} from '../lib/schemas/transform-pipeline.schema'
+} from '../schemas/transform-pipeline.schema'
 
 /**
  * HTTP Cloud Function: startTransformPipeline

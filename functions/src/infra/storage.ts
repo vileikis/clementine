@@ -1,4 +1,4 @@
-import { storage } from './firebase-admin';
+import { storage } from './firebase-admin'
 import * as fs from 'fs/promises';
 
 /**

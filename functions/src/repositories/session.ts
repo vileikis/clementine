@@ -1,12 +1,12 @@
 /**
- * Session Helpers (v2)
+ * Session Repository
  *
- * Session operations using the new Phase 1 schema and Firestore path.
- * Path: /projects/{projectId}/sessions/{sessionId}
+ * Session CRUD operations using the new Phase 1 schema.
+ * Firestore path: /projects/{projectId}/sessions/{sessionId}
  *
- * DO NOT USE lib/session.ts - it uses legacy schema and old path (/sessions/{id})
+ * Note: session-legacy.ts uses old path (/sessions/{id}) for legacy media pipeline
  */
-import { db } from './firebase-admin'
+import { db } from '../infra/firebase-admin'
 import { sessionSchema, type Session, type JobStatus } from '@clementine/shared'
 
 /**

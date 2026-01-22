@@ -4,7 +4,7 @@
  * CRUD operations for Job documents in Firestore.
  * Path: /projects/{projectId}/jobs/{jobId}
  */
-import { db } from './firebase-admin'
+import { db } from '../infra/firebase-admin'
 import {
   jobSchema,
   type Job,

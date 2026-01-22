@@ -1,7 +1,7 @@
 import {
   downloadFromStorage,
   parseStorageUrl,
-} from '../../lib/storage';
+} from '../../infra/storage';
 import type { InputAsset } from '@clementine/shared';
 
 /**

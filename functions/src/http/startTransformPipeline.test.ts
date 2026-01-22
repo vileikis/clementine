@@ -12,7 +12,7 @@ import {
   startTransformPipelineResponseSchema,
   transformPipelineErrorResponseSchema,
   transformPipelineErrorCodeSchema,
-} from '../lib/schemas/transform-pipeline.schema'
+} from '../schemas/transform-pipeline.schema'
 
 describe('startTransformPipeline request schema', () => {
   it('validates a valid request', () => {

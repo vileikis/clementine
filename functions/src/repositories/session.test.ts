@@ -1,12 +1,12 @@
 /**
- * Session-v2 Helper Tests
+ * Session Repository Tests
  *
- * Unit tests for session-v2 helpers.
+ * Unit tests for session repository helpers.
  * Tests focus on business logic (hasActiveJob) and verify function signatures.
  * Integration tests with Firestore would require emulator setup.
  */
 import { describe, it, expect } from 'vitest'
-import { hasActiveJob } from './session-v2'
+import { hasActiveJob } from './session'
 import type { Session } from '@clementine/shared'
 
 /**
@@ -68,19 +68,19 @@ describe('hasActiveJob', () => {
   })
 })
 
-describe('session-v2 module exports', () => {
+describe('session repository module exports', () => {
   it('exports fetchSession function', async () => {
-    const { fetchSession } = await import('./session-v2')
+    const { fetchSession } = await import('./session')
     expect(typeof fetchSession).toBe('function')
   })
 
   it('exports updateSessionJobStatus function', async () => {
-    const { updateSessionJobStatus } = await import('./session-v2')
+    const { updateSessionJobStatus } = await import('./session')
     expect(typeof updateSessionJobStatus).toBe('function')
   })
 
   it('exports hasActiveJob function', async () => {
-    const { hasActiveJob } = await import('./session-v2')
+    const { hasActiveJob } = await import('./session')
     expect(typeof hasActiveJob).toBe('function')
   })
 })

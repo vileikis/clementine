@@ -4,7 +4,7 @@
  * CRUD operations for Experience documents in Firestore.
  * Path: /workspaces/{workspaceId}/experiences/{experienceId}
  */
-import { db } from './firebase-admin'
+import { db } from '../infra/firebase-admin'
 import { experienceSchema, type Experience } from '@clementine/shared'
 
 /**

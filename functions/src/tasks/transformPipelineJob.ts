@@ -7,8 +7,8 @@
  * See contracts/transform-pipeline-job.yaml for full spec.
  */
 import { onTaskDispatched } from 'firebase-functions/v2/tasks'
-import { transformPipelineJobPayloadSchema } from '../lib/schemas/transform-pipeline.schema'
-import { updateSessionJobStatus } from '../lib/session-v2'
+import { transformPipelineJobPayloadSchema } from '../schemas/transform-pipeline.schema'
+import { updateSessionJobStatus } from '../repositories/session'
 import {
   fetchJob,
   updateJobStarted,
@@ -16,7 +16,7 @@ import {
   updateJobComplete,
   updateJobError,
   createSanitizedError,
-} from '../lib/job'
+} from '../repositories/job'
 import type { JobOutput } from '@clementine/shared'
 
 /**
