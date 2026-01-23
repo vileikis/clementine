@@ -1,0 +1,138 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600">
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.15"/>
+    </filter>
+    <linearGradient id="successGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#dcfce7"/>
+      <stop offset="100%" style="stop-color:#bbf7d0"/>
+    </linearGradient>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#14532d"/>
+      <stop offset="100%" style="stop-color:#166534"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="600" fill="#f8fafc"/>
+
+  <!-- Header -->
+  <rect x="0" y="0" width="900" height="70" fill="url(#headerGrad)"/>
+  <text x="450" y="35" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="600" fill="white" text-anchor="middle">Proposed Structure</text>
+  <text x="450" y="55" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#86efac" text-anchor="middle">Flattened &amp; Simplified</text>
+
+  <!-- Workspaces Section -->
+  <rect x="40" y="95" width="200" height="140" rx="12" fill="white" stroke="#e2e8f0" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="40" y="95" width="200" height="36" rx="12" fill="#dbeafe"/>
+  <rect x="40" y="119" width="200" height="12" fill="#dbeafe"/>
+  <text x="140" y="118" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="600" fill="#1e40af" text-anchor="middle">workspaces/</text>
+
+  <rect x="55" y="145" width="170" height="75" rx="8" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.5"/>
+  <text x="140" y="168" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="500" fill="#1e40af" text-anchor="middle">experiences/</text>
+  <text x="140" y="188" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#64748b" text-anchor="middle">Reusable step flows</text>
+  <text x="140" y="208" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#64748b" text-anchor="middle">(unchanged)</text>
+
+  <!-- Projects Section - Now Clean -->
+  <rect x="280" y="95" width="580" height="390" rx="12" fill="url(#successGrad)" stroke="#22c55e" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="280" y="95" width="580" height="36" rx="12" fill="#4ade80"/>
+  <rect x="280" y="119" width="580" height="12" fill="#4ade80"/>
+  <text x="570" y="118" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="600" fill="#14532d" text-anchor="middle">projects/{projectId}</text>
+
+  <!-- Merged Project document -->
+  <rect x="300" y="145" width="340" height="200" rx="8" fill="white" stroke="#22c55e" stroke-width="2"/>
+  <rect x="300" y="145" width="340" height="32" rx="8" fill="#22c55e"/>
+  <rect x="300" y="169" width="340" height="8" fill="#22c55e"/>
+  <text x="470" y="167" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="600" fill="white" text-anchor="middle">Project Document (Merged)</text>
+
+  <!-- Left column - metadata -->
+  <text x="380" y="200" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" fill="#166534" text-anchor="middle">Metadata</text>
+  <text x="380" y="218" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b" text-anchor="middle">id, name, status</text>
+  <text x="380" y="233" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b" text-anchor="middle">workspaceId</text>
+  <text x="380" y="248" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b" text-anchor="middle">type (standard/ghost)</text>
+
+  <!-- Divider -->
+  <line x1="460" y1="190" x2="460" y2="335" stroke="#d1d5db" stroke-width="1" stroke-dasharray="3,3"/>
+
+  <!-- Right column - config (merged from event) -->
+  <text x="550" y="200" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" fill="#166534" text-anchor="middle">Configuration</text>
+  <text x="550" y="218" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b" text-anchor="middle">draftConfig</text>
+  <text x="550" y="233" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b" text-anchor="middle">publishedConfig</text>
+  <text x="550" y="248" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b" text-anchor="middle">theme, welcome, share</text>
+  <text x="550" y="263" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b" text-anchor="middle">overlays, experiences[]</text>
+
+  <!-- Versioning -->
+  <text x="470" y="290" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" fill="#166534" text-anchor="middle">Versioning</text>
+  <text x="470" y="308" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b" text-anchor="middle">draftVersion, publishedVersion</text>
+  <text x="470" y="323" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b" text-anchor="middle">publishedAt, timestamps</text>
+
+  <!-- Benefits callout -->
+  <rect x="660" y="145" width="185" height="200" rx="8" fill="#f0fdf4" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="752" y="170" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="#15803d" text-anchor="middle">BENEFITS</text>
+
+  <circle cx="680" cy="195" r="3" fill="#22c55e"/>
+  <text x="695" y="199" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#166534">Single document</text>
+
+  <circle cx="680" cy="218" r="3" fill="#22c55e"/>
+  <text x="695" y="222" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#166534">One query for config</text>
+
+  <circle cx="680" cy="241" r="3" fill="#22c55e"/>
+  <text x="695" y="245" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#166534">Simpler mental model</text>
+
+  <circle cx="680" cy="264" r="3" fill="#22c55e"/>
+  <text x="695" y="268" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#166534">Fewer routes/hooks</text>
+
+  <circle cx="680" cy="287" r="3" fill="#22c55e"/>
+  <text x="695" y="291" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#166534">No naming collision</text>
+
+  <circle cx="680" cy="310" r="3" fill="#22c55e"/>
+  <text x="695" y="314" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#166534">~40% less refactoring</text>
+
+  <!-- ELIMINATED badge -->
+  <rect x="660" y="320" width="185" height="25" rx="4" fill="#fef2f2" stroke="#f87171" stroke-width="1"/>
+  <text x="752" y="337" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#dc2626" text-anchor="middle">events/ subcollection REMOVED</text>
+
+  <!-- Subcollections under project -->
+  <rect x="300" y="365" width="130" height="60" rx="6" fill="white" stroke="#86efac" stroke-width="1.5"/>
+  <text x="365" y="388" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="500" fill="#166534" text-anchor="middle">sessions/</text>
+  <text x="365" y="405" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b" text-anchor="middle">Guest interactions</text>
+
+  <rect x="445" y="365" width="130" height="60" rx="6" fill="white" stroke="#86efac" stroke-width="1.5"/>
+  <text x="510" y="388" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="500" fill="#166534" text-anchor="middle">jobs/</text>
+  <text x="510" y="405" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b" text-anchor="middle">Transform tasks</text>
+
+  <rect x="590" y="365" width="130" height="60" rx="6" fill="white" stroke="#86efac" stroke-width="1.5"/>
+  <text x="655" y="388" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="500" fill="#166534" text-anchor="middle">guests/</text>
+  <text x="655" y="405" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b" text-anchor="middle">Guest records</text>
+
+  <!-- Unchanged badge -->
+  <rect x="735" y="377" width="110" height="36" rx="6" fill="#f0fdf4" stroke="#22c55e" stroke-width="1"/>
+  <text x="790" y="393" font-family="system-ui, -apple-system, sans-serif" font-size="9" font-weight="500" fill="#15803d" text-anchor="middle">Paths unchanged</text>
+  <text x="790" y="406" font-family="system-ui, -apple-system, sans-serif" font-size="8" fill="#64748b" text-anchor="middle">Less refactoring!</text>
+
+  <!-- Query path illustration -->
+  <rect x="40" y="440" width="400" height="70" rx="8" fill="white" stroke="#22c55e" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="240" y="463" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="#15803d" text-anchor="middle">New Query Path (Simple)</text>
+  <text x="240" y="486" font-family="ui-monospace, monospace" font-size="12" fill="#166534" text-anchor="middle">projects/{projectId}</text>
+  <text x="240" y="502" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#64748b" text-anchor="middle">Single fetch gets everything</text>
+
+  <!-- UI Flexibility note -->
+  <rect x="460" y="440" width="400" height="70" rx="8" fill="white" stroke="#60a5fa" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="660" y="463" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="#1d4ed8" text-anchor="middle">UI Terminology Freedom</text>
+  <text x="660" y="483" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#64748b" text-anchor="middle">Code uses: projectId, Project, useProject</text>
+  <text x="660" y="500" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#64748b" text-anchor="middle">UI can say: "Events", "Activations", "Projects"</text>
+
+  <!-- Benefits Summary -->
+  <rect x="40" y="525" width="820" height="55" rx="10" fill="#f0fdf4" stroke="#22c55e" stroke-width="2"/>
+  <text x="140" y="555" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#166534" text-anchor="middle">Single query</text>
+  <text x="310" y="555" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#166534" text-anchor="middle">Cleaner model</text>
+  <text x="480" y="555" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#166534" text-anchor="middle">Less code to maintain</text>
+  <text x="660" y="555" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#166534" text-anchor="middle">15-22 hours effort</text>
+  <text x="800" y="555" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#166534" text-anchor="middle">Future flexible</text>
+
+  <!-- Green checkmarks -->
+  <circle cx="70" cy="552" r="4" fill="#22c55e"/>
+  <circle cx="240" cy="552" r="4" fill="#22c55e"/>
+  <circle cx="400" cy="552" r="4" fill="#22c55e"/>
+  <circle cx="580" cy="552" r="4" fill="#22c55e"/>
+  <circle cx="735" cy="552" r="4" fill="#22c55e"/>
+</svg>
