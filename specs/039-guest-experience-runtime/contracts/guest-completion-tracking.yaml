@@ -1,0 +1,77 @@
+# Guest Completion Tracking Contract
+#
+# Defines the interface for updating guest's completed experiences array.
+# This is a Firestore document update, not an HTTP API.
+
+firestore:
+  collection: /projects/{projectId}/guests/{guestId}
+
+  update_completed_experiences:
+    description: |
+      Add a completed experience entry to the guest's completedExperiences array.
+      Used when guest finishes pregate, main, or preshare experience.
+
+    method: updateDoc (Firestore client SDK)
+
+    input:
+      experienceId:
+        type: string
+        required: true
+        description: The experience ID that was completed
+
+      completedAt:
+        type: number
+        required: true
+        description: Unix timestamp (milliseconds) when completed
+
+      sessionId:
+        type: string
+        required: true
+        description: The session ID for analytics linking
+
+    operation: |
+      await updateDoc(doc(firestore, 'projects', projectId, 'guests', guestId), {
+        completedExperiences: arrayUnion({
+          experienceId,
+          completedAt,
+          sessionId,
+        })
+      })
+
+    output:
+      success: void on success, throws on error
+
+    security:
+      rule: |
+        allow update: if request.auth != null
+          && request.auth.uid == resource.data.authUid
+          && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['completedExperiences'])
+
+  check_experience_completed:
+    description: |
+      Check if guest has already completed a specific experience.
+      Used for pregate/preshare skip logic.
+
+    method: Read from guest document (already loaded in context)
+
+    input:
+      experienceId:
+        type: string
+        required: true
+        description: The experience ID to check
+
+      guest:
+        type: Guest
+        required: true
+        description: The guest object from context
+
+    logic: |
+      const hasCompleted = guest.completedExperiences.some(
+        e => e.experienceId === experienceId
+      )
+
+    output:
+      hasCompleted:
+        type: boolean
+        description: True if guest has completed this experience

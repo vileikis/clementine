@@ -1,0 +1,141 @@
+# Session Linking Contract
+#
+# Defines the interface for linking pregate/preshare sessions to main session.
+# This is a Firestore document update, not an HTTP API.
+
+firestore:
+  collection: /projects/{projectId}/sessions/{sessionId}
+
+  update_main_session_id:
+    description: |
+      Update a session's mainSessionId field to link it to a main session.
+      Used after main session is created to update the pregate session.
+
+    method: updateDoc (Firestore client SDK)
+
+    input:
+      projectId:
+        type: string
+        required: true
+        description: Project ID
+
+      sessionId:
+        type: string
+        required: true
+        description: Session ID to update (pregate or preshare session)
+
+      mainSessionId:
+        type: string
+        required: true
+        description: The main session ID to link to
+
+    operation: |
+      await updateDoc(doc(firestore, 'projects', projectId, 'sessions', sessionId), {
+        mainSessionId,
+        updatedAt: Date.now(),
+      })
+
+    output:
+      success: void on success, throws on error
+
+    security:
+      rule: |
+        allow update: if request.auth != null
+          && request.auth.uid == resource.data.createdBy
+          && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['mainSessionId', 'updatedAt'])
+
+  create_session_with_main_session_id:
+    description: |
+      Create a preshare session with mainSessionId already set.
+      Used when navigating from main experience to preshare.
+
+    method: setDoc (Firestore client SDK) - via useCreateSession hook
+
+    input:
+      projectId:
+        type: string
+        required: true
+
+      workspaceId:
+        type: string
+        required: true
+
+      eventId:
+        type: string | null
+        required: true
+
+      experienceId:
+        type: string
+        required: true
+        description: Preshare experience ID
+
+      mainSessionId:
+        type: string
+        required: true
+        description: Main session ID from URL param
+
+      mode:
+        type: "'guest'"
+        required: true
+
+      configSource:
+        type: "'published'"
+        required: true
+
+    operation: |
+      const sessionData = {
+        id: newSessionId,
+        projectId,
+        workspaceId,
+        eventId,
+        experienceId,
+        mode: 'guest',
+        configSource: 'published',
+        status: 'active',
+        answers: [],
+        capturedMedia: [],
+        resultMedia: null,
+        jobId: null,
+        jobStatus: null,
+        mainSessionId,  // Set on creation for preshare
+        createdBy: auth.currentUser.uid,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+        completedAt: null,
+      }
+      await setDoc(doc(firestore, 'projects', projectId, 'sessions', newSessionId), sessionData)
+
+    output:
+      sessionId:
+        type: string
+        description: The newly created session ID
+
+  query_journey_sessions:
+    description: |
+      Query all sessions linked to a main session for analytics.
+      Returns pregate and preshare sessions.
+
+    method: getDocs (Firestore client SDK)
+
+    input:
+      projectId:
+        type: string
+        required: true
+
+      mainSessionId:
+        type: string
+        required: true
+        description: The main session ID to find linked sessions for
+
+    operation: |
+      const query = query(
+        collection(firestore, 'projects', projectId, 'sessions'),
+        where('mainSessionId', '==', mainSessionId)
+      )
+      const snapshot = await getDocs(query)
+
+    output:
+      sessions:
+        type: Session[]
+        description: Array of linked sessions (pregate, preshare)
