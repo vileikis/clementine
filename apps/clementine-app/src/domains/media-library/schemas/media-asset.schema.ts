@@ -43,9 +43,15 @@ export const mediaAssetSchema = z.object({
 
   /**
    * MIME type
-   * Allowed: image/png, image/jpeg, image/jpg, image/webp
+   * Allowed: image/png, image/jpeg, image/jpg, image/webp, image/gif
    */
-  mimeType: z.enum(['image/png', 'image/jpeg', 'image/jpg', 'image/webp']),
+  mimeType: z.enum([
+    'image/png',
+    'image/jpeg',
+    'image/jpg',
+    'image/webp',
+    'image/gif',
+  ]),
 
   /**
    * Image width in pixels
