@@ -124,25 +124,6 @@ export function ExperienceDetailsDialog({
         </DialogHeader>
 
         <div className="space-y-4 py-4">
-          {/* Cover Image */}
-          <div className="space-y-2">
-            <Label>Cover Image</Label>
-            <MediaPickerField
-              value={media?.url ?? null}
-              onChange={(value) => {
-                if (value === null) handleRemoveMedia()
-              }}
-              onUpload={handleUpload}
-              accept="image/png,image/jpeg,image/webp"
-              removable
-              uploading={isUploading}
-              uploadProgress={uploadProgress}
-            />
-            <p className="text-xs text-muted-foreground">
-              Displayed in experience lists and welcome screens
-            </p>
-          </div>
-
           {/* Name */}
           <div className="space-y-2">
             <Label htmlFor="experience-name">Name</Label>
@@ -159,6 +140,23 @@ export function ExperienceDetailsDialog({
             {nameError && (
               <p className="text-xs text-destructive">{nameError}</p>
             )}
+          </div>
+          {/* Cover Image */}
+          <div className="space-y-2">
+            <Label>Cover Image</Label>
+            <div className="w-50 [&>div>div]:aspect-square">
+              <MediaPickerField
+                value={media?.url ?? null}
+                onChange={(value) => {
+                  if (value === null) handleRemoveMedia()
+                }}
+                onUpload={handleUpload}
+                accept="image/png,image/jpeg,image/webp"
+                removable
+                uploading={isUploading}
+                uploadProgress={uploadProgress}
+              />
+            </div>
           </div>
         </div>
 

@@ -24,7 +24,7 @@ export function ExperienceIdentityBadge({
       className="group flex items-center gap-2 rounded-md px-2 py-1 transition-colors hover:bg-accent"
     >
       {/* Thumbnail */}
-      <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center overflow-hidden rounded bg-muted">
+      <div className="flex h-6 w-6 shrink-0 items-center justify-center overflow-hidden rounded bg-muted">
         {experience.media?.url ? (
           <img
             src={experience.media.url}
