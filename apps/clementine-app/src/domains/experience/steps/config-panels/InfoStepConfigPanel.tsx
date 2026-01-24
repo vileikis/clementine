@@ -52,7 +52,6 @@ export function InfoStepConfigPanel({
           onUpload={() => {
             // Media picker coming soon - placeholder
           }}
-          accept="image/*"
           removable
           disabled={disabled}
         />

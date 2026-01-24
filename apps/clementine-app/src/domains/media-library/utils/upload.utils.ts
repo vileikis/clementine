@@ -7,7 +7,7 @@ import { ALLOWED_TYPES, MAX_SIZE } from '../constants'
  */
 export function validateFile(file: File): void {
   if (!ALLOWED_TYPES.includes(file.type as (typeof ALLOWED_TYPES)[number])) {
-    throw new Error('Only PNG, JPG, and WebP images are supported')
+    throw new Error('Only PNG, JPG, WebP, and GIF images are supported')
   }
   if (file.size > MAX_SIZE) {
     throw new Error('File must be under 5MB')

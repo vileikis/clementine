@@ -112,7 +112,6 @@ export function WelcomeConfigPanel({
             })
           }
           onUpload={onUploadHeroMedia}
-          accept="image/*"
           removable
           uploading={uploadingHeroMedia}
           uploadProgress={uploadProgress}
