@@ -144,19 +144,18 @@ export function ExperienceDetailsDialog({
           {/* Cover Image */}
           <div className="space-y-2">
             <Label>Cover Image</Label>
-            <div className="w-50 [&>div>div]:aspect-square">
-              <MediaPickerField
-                value={media?.url ?? null}
-                onChange={(value) => {
-                  if (value === null) handleRemoveMedia()
-                }}
-                onUpload={handleUpload}
-                accept="image/png,image/jpeg,image/webp"
-                removable
-                uploading={isUploading}
-                uploadProgress={uploadProgress}
-              />
-            </div>
+            <MediaPickerField
+              value={media?.url ?? null}
+              onChange={(value) => {
+                if (value === null) handleRemoveMedia()
+              }}
+              onUpload={handleUpload}
+              accept="image/png,image/jpeg,image/webp"
+              removable
+              uploading={isUploading}
+              uploadProgress={uploadProgress}
+              className="aspect-square w-50"
+            />
           </div>
         </div>
 

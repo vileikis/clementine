@@ -21,6 +21,7 @@ export function MediaPickerField({
   uploading = false,
   uploadProgress,
   disabled = false,
+  className,
 }: MediaPickerFieldProps) {
   const id = useId()
   const inputRef = useRef<HTMLInputElement>(null)
@@ -109,6 +110,7 @@ export function MediaPickerField({
               : 'cursor-pointer hover:border-ring hover:bg-muted/50',
           hasImage ? 'border-transparent' : 'border-border',
           isDragging && !hasImage && 'border-primary bg-primary/5',
+          className,
         )}
       >
         {hasImage ? (
