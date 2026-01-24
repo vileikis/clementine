@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { imageMimeTypeSchema } from './image-mime-type.schema'
+
 /**
  * Media Asset Schema
  *
@@ -45,13 +47,7 @@ export const mediaAssetSchema = z.object({
    * MIME type
    * Allowed: image/png, image/jpeg, image/jpg, image/webp, image/gif
    */
-  mimeType: z.enum([
-    'image/png',
-    'image/jpeg',
-    'image/jpg',
-    'image/webp',
-    'image/gif',
-  ]),
+  mimeType: imageMimeTypeSchema,
 
   /**
    * Image width in pixels

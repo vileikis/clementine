@@ -6,6 +6,8 @@
 
 import type { ReactNode } from 'react'
 
+import type { ImageMimeType } from '@/domains/media-library'
+
 /**
  * Base props for all editor field components
  */
@@ -117,8 +119,10 @@ export interface SliderFieldProps extends EditorFieldBaseProps {
 /**
  * Props for MediaPickerField component
  */
-export interface MediaPickerFieldProps
-  extends Omit<EditorFieldBaseProps, 'label'> {
+export interface MediaPickerFieldProps extends Omit<
+  EditorFieldBaseProps,
+  'label'
+> {
   /** Optional field label (omit if providing your own Label component) */
   label?: string
   /** Current media URL (null if no media) */
@@ -127,8 +131,8 @@ export interface MediaPickerFieldProps
   onChange: (value: string | null) => void
   /** Callback when a file is selected for upload */
   onUpload: (file: File) => void
-  /** Accepted file types (e.g., 'image/*') */
-  accept?: string
+  /** Accepted MIME types for file upload */
+  accept?: ImageMimeType | ImageMimeType[]
   /** Whether the media can be removed */
   removable?: boolean
   /** Whether an upload is in progress */

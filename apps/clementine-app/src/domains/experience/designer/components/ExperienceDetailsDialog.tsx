@@ -150,7 +150,7 @@ export function ExperienceDetailsDialog({
                 if (value === null) handleRemoveMedia()
               }}
               onUpload={handleUpload}
-              accept="image/png,image/jpeg,image/webp,image/gif"
+              accept={['image/png', 'image/jpeg', 'image/webp', 'image/gif']}
               removable
               uploading={isUploading}
               uploadProgress={uploadProgress}
