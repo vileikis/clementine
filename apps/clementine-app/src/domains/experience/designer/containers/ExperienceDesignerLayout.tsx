@@ -178,13 +178,15 @@ export function ExperienceDesignerLayout({
       />
 
       {/* Experience Details Dialog */}
-      <ExperienceDetailsDialog
-        open={showDetailsDialog}
-        onOpenChange={setShowDetailsDialog}
-        experience={experience}
-        workspaceId={workspaceId}
-        userId={user?.uid ?? ''}
-      />
+      {user && (
+        <ExperienceDetailsDialog
+          open={showDetailsDialog}
+          onOpenChange={setShowDetailsDialog}
+          experience={experience}
+          workspaceId={workspaceId}
+          userId={user.uid}
+        />
+      )}
     </div>
   )
 }
