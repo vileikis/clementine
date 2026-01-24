@@ -117,7 +117,12 @@ export interface SliderFieldProps extends EditorFieldBaseProps {
 /**
  * Props for MediaPickerField component
  */
-export interface MediaPickerFieldProps extends EditorFieldBaseProps {
+export interface MediaPickerFieldProps extends Omit<
+  EditorFieldBaseProps,
+  'label'
+> {
+  /** Optional field label (omit if providing your own Label component) */
+  label?: string
   /** Current media URL (null if no media) */
   value: string | null
   /** Callback when media is removed */

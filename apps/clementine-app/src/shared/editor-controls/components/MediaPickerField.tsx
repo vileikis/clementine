@@ -75,9 +75,11 @@ export function MediaPickerField({
 
   return (
     <div className="space-y-2">
-      <label className="text-sm font-normal text-muted-foreground">
-        {label}
-      </label>
+      {label && (
+        <label className="text-sm font-normal text-muted-foreground">
+          {label}
+        </label>
+      )}
 
       <input
         ref={inputRef}

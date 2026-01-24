@@ -5,8 +5,8 @@ import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/shared/utils/style-utils'
 
 export interface BreadcrumbItem {
-  /** Display text for the breadcrumb item */
-  label: string
+  /** Display text or custom element for the breadcrumb item */
+  label: React.ReactNode
 
   /** Optional href for navigation (if present, item is clickable) */
   href?: string
