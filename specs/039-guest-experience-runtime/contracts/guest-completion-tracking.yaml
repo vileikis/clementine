@@ -2,11 +2,13 @@
 #
 # Defines the interface for updating guest's completed experiences array.
 # This is a Firestore document update, not an HTTP API.
+#
+# Hook: useMarkExperienceComplete
 
 firestore:
   collection: /projects/{projectId}/guests/{guestId}
 
-  update_completed_experiences:
+  mark_experience_complete:
     description: |
       Add a completed experience entry to the guest's completedExperiences array.
       Used when guest finishes pregate, main, or preshare experience.

@@ -2,11 +2,13 @@
 #
 # Defines the interface for linking pregate/preshare sessions to main session.
 # This is a Firestore document update, not an HTTP API.
+#
+# Hook: useLinkSession
 
 firestore:
   collection: /projects/{projectId}/sessions/{sessionId}
 
-  update_main_session_id:
+  link_session:
     description: |
       Update a session's mainSessionId field to link it to a main session.
       Used after main session is created to update the pregate session.

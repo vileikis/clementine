@@ -73,6 +73,16 @@ routes:
         pregate: z.string().optional(),
       })
 
+    on_mount_check: |
+      // Handle direct URL access - redirect to pregate if needed
+      if (needsPregate()) {
+        navigate({
+          to: '/join/$projectId/pregate',
+          search: { experience: experienceId },
+          replace: true,
+        })
+      }
+
     navigation_in:
       from_welcome:
         method: navigate({ ..., replace: false })

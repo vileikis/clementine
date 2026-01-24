@@ -73,13 +73,13 @@ export const guestSchema = z.object({
 #### 2.1 Completion Tracking Hook
 
 ```typescript
-// apps/clementine-app/src/domains/guest/hooks/useUpdateGuestCompletedExperiences.ts
+// apps/clementine-app/src/domains/guest/hooks/useMarkExperienceComplete.ts
 
 import { doc, updateDoc, arrayUnion } from 'firebase/firestore'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { firestore } from '@/integrations/firebase/client'
 
-export function useUpdateGuestCompletedExperiences() {
+export function useMarkExperienceComplete() {
   const queryClient = useQueryClient()
 
   return useMutation({
@@ -161,13 +161,13 @@ export function usePreshare(guest: Guest, config: ExperiencesConfig | null) {
 ### Phase 3: Session Domain Hook
 
 ```typescript
-// apps/clementine-app/src/domains/session/shared/hooks/useUpdateSessionMainSessionId.ts
+// apps/clementine-app/src/domains/session/shared/hooks/useLinkSession.ts
 
 import { doc, updateDoc } from 'firebase/firestore'
 import { useMutation } from '@tanstack/react-query'
 import { firestore } from '@/integrations/firebase/client'
 
-export function useUpdateSessionMainSessionId() {
+export function useLinkSession() {
   return useMutation({
     mutationFn: async ({
       projectId,
@@ -284,7 +284,7 @@ export function PregatePage({
 }) {
   const navigate = useNavigate()
   const { guest, event } = useGuestContext()
-  const updateCompletion = useUpdateGuestCompletedExperiences()
+  const markComplete = useMarkExperienceComplete()
 
   const pregateExperienceId = event.publishedConfig?.experiences?.pregate?.experienceId
   if (!pregateExperienceId) {
@@ -298,7 +298,7 @@ export function PregatePage({
 
   const handleComplete = async (sessionId: string) => {
     // Record completion
-    await updateCompletion.mutateAsync({
+    await markComplete.mutateAsync({
       projectId,
       guestId: guest.id,
       experienceId: pregateExperienceId,
@@ -320,6 +320,48 @@ export function PregatePage({
       onComplete={handleComplete}
     />
   )
+}
+```
+
+#### 5.2 ExperiencePage (modify existing)
+
+Add pregate redirect check on mount:
+
+```typescript
+// apps/clementine-app/src/domains/guest/containers/ExperiencePage.tsx
+
+export function ExperiencePage({
+  experienceId,
+  sessionId,
+  pregateSessionId,  // From ?pregate= param
+}: {
+  experienceId: string
+  sessionId?: string
+  pregateSessionId?: string
+}) {
+  const navigate = useNavigate()
+  const { guest, event, project } = useGuestContext()
+  const { needsPregate } = usePregate(guest, event.publishedConfig?.experiences)
+
+  // Redirect to pregate if needed (handles direct URL access)
+  useEffect(() => {
+    if (needsPregate()) {
+      navigate({
+        to: '/join/$projectId/pregate',
+        params: { projectId: project.id },
+        search: { experience: experienceId },
+        replace: true,
+      })
+    }
+  }, [needsPregate, experienceId])
+
+  // If redirecting, don't render anything
+  if (needsPregate()) {
+    return null
+  }
+
+  // ... rest of existing ExperiencePage implementation
+  // Including: session init, pregate session linking, preshare navigation
 }
 ```
 

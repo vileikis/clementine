@@ -234,6 +234,10 @@ const triggerTransform = async (projectId: string, sessionId: string, stepId: st
 | Transform trigger | HTTP fetch to `startTransformPipeline` | Fire-and-forget before preshare navigation |
 | URL params | Search params for context passing | Enables deep linking and resumption |
 | GuestContext | No changes needed | Already provides necessary data |
+| Hook naming | `useMarkExperienceComplete`, `useLinkSession` | Shorter, action-oriented names |
+| ExperienceRuntime | No modification needed | Already accepts `onComplete` callback |
+| Direct URL bypass | Redirect to pregate from ExperiencePage | Handles edge case per spec requirement |
+| Context staleness | Accept stale `completedExperiences` within session | Skip logic is for returning guests |
 
 ## Alternatives Considered
 

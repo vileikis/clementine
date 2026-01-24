@@ -70,24 +70,21 @@ apps/clementine-app/
 │   └── domains/
 │       ├── guest/
 │       │   ├── containers/
-│       │   │   ├── WelcomeScreen.tsx            # Modify: add pregate check
-│       │   │   ├── ExperiencePage.tsx           # Modify: add preshare trigger
+│       │   │   ├── WelcomeScreen.tsx            # Modify: add pregate check before navigation
+│       │   │   ├── ExperiencePage.tsx           # Modify: add pregate redirect + preshare trigger
 │       │   │   ├── PregatePage.tsx              # NEW: Pregate page container
 │       │   │   ├── PresharePage.tsx             # NEW: Preshare page container
 │       │   │   └── SharePage.tsx                # NEW: Share page container (placeholder)
 │       │   ├── hooks/
 │       │   │   ├── usePregate.ts                # NEW: Pregate routing logic
 │       │   │   ├── usePreshare.ts               # NEW: Preshare routing logic
-│       │   │   └── useUpdateGuestCompletedExperiences.ts  # NEW: Completion tracking
+│       │   │   └── useMarkExperienceComplete.ts # NEW: Completion tracking
 │       │   └── schemas/
 │       │       └── guest.schema.ts              # Modify: add completedExperiences
-│       ├── session/
-│       │   └── shared/
-│       │       └── hooks/
-│       │           └── useUpdateSessionMainSessionId.ts  # NEW: Session linking
-│       └── experience/
-│           └── runtime/
-│               └── ExperienceRuntime.tsx        # Modify: add onComplete callback for linking
+│       └── session/
+│           └── shared/
+│               └── hooks/
+│                   └── useLinkSession.ts        # NEW: Session linking
 
 packages/shared/
 └── src/
@@ -109,6 +106,54 @@ tests/
 ```
 
 **Structure Decision**: Following existing monorepo structure with TanStack Start app in `apps/clementine-app/`. New routes added under `/join/$projectId/` following flat route pattern per spec Decision 4. New domain hooks/containers added to `domains/guest/` following vertical slice architecture.
+
+## Design Decisions (Plan Phase)
+
+Decisions made during plan review, supplementing spec decisions:
+
+### Hook Naming
+
+| Original Name | Final Name | Rationale |
+|---------------|------------|-----------|
+| `useUpdateGuestCompletedExperiences` | `useMarkExperienceComplete` | Shorter, action-oriented, clear intent |
+| `useUpdateSessionMainSessionId` | `useLinkSession` | Concise, matches "session linking" terminology |
+
+### ExperienceRuntime Modification
+
+**Decision**: No modification needed to `ExperienceRuntime.tsx`.
+
+**Rationale**: ExperienceRuntime already accepts `onComplete` as a callback prop. Each page container (ExperiencePage, PregatePage, PresharePage) provides its own handler with phase-specific logic (completion tracking, navigation, transform trigger).
+
+### Direct URL Access Handling
+
+**Decision**: ExperiencePage checks for pregate requirement on mount and redirects if needed.
+
+**Rationale**:
+- Spec requires: "redirect to pregate (preserving the intended experience ID)"
+- Check uses existing GuestContext (already loaded by GuestLayout)
+- Uses `replace: true` so browser back doesn't return to experience route
+
+**Implementation**:
+```typescript
+// In ExperiencePage, on mount
+if (needsPregate()) {
+  navigate({
+    to: '/join/$projectId/pregate',
+    search: { experience: experienceId },
+    replace: true,
+  })
+}
+```
+
+### GuestContext Persistence
+
+**Decision**: Accept that `completedExperiences` may be stale within a session after mutation.
+
+**Rationale**:
+- GuestLayout stays mounted across all child routes (no refetch on navigation)
+- Skip logic is for returning guests, not current journey
+- Edge case (back navigation after pregate) is acceptable - pregate completion is quick
+- Avoids complexity of optimistic updates or real-time subscriptions for rarely-changing data
 
 ## Complexity Tracking
 
