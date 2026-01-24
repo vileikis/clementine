@@ -24,9 +24,9 @@
 
 **Purpose**: Schema extensions and shared type updates
 
-- [ ] T001 [P] Add mainSessionId field to session schema in packages/shared/src/schemas/session/session.schema.ts
-- [ ] T002 [P] Add completedExperience schema and extend guest schema with completedExperiences array in apps/clementine-app/src/domains/guest/schemas/guest.schema.ts
-- [ ] T003 Rebuild shared package after schema changes (pnpm --filter @clementine/shared build)
+- [X] T001 [P] Add mainSessionId field to session schema in packages/shared/src/schemas/session/session.schema.ts
+- [X] T002 [P] Add completedExperience schema and extend guest schema with completedExperiences array in apps/clementine-app/src/domains/guest/schemas/guest.schema.ts
+- [X] T003 Rebuild shared package after schema changes (pnpm --filter @clementine/shared build)
 
 ---
 
@@ -36,11 +36,11 @@
 
 **CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T004 [P] Create useMarkExperienceComplete hook in apps/clementine-app/src/domains/guest/hooks/useMarkExperienceComplete.ts
-- [ ] T005 [P] Create useLinkSession hook in apps/clementine-app/src/domains/session/shared/hooks/useLinkSession.ts
-- [ ] T006 [P] Create usePregate hook in apps/clementine-app/src/domains/guest/hooks/usePregate.ts
-- [ ] T007 [P] Create usePreshare hook in apps/clementine-app/src/domains/guest/hooks/usePreshare.ts
-- [ ] T008 Export new hooks from domain index files (guest/hooks/index.ts, session/shared/hooks/index.ts)
+- [X] T004 [P] Create useMarkExperienceComplete hook in apps/clementine-app/src/domains/guest/hooks/useMarkExperienceComplete.ts
+- [X] T005 [P] Create useLinkSession hook in apps/clementine-app/src/domains/session/shared/hooks/useLinkSession.ts
+- [X] T006 [P] Create usePregate hook in apps/clementine-app/src/domains/guest/hooks/usePregate.ts
+- [X] T007 [P] Create usePreshare hook in apps/clementine-app/src/domains/guest/hooks/usePreshare.ts
+- [X] T008 Export new hooks from domain index files (guest/hooks/index.ts, session/shared/hooks/index.ts)
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
@@ -54,12 +54,12 @@
 
 ### Implementation for User Story 1
 
-- [ ] T009 [P] [US1] Create SharePage placeholder container in apps/clementine-app/src/domains/guest/containers/SharePage.tsx
-- [ ] T010 [P] [US1] Create share route in apps/clementine-app/src/app/join/$projectId/share.tsx
-- [ ] T011 [US1] Modify ExperiencePage to mark experience complete on session completion in apps/clementine-app/src/domains/guest/containers/ExperiencePage.tsx
-- [ ] T012 [US1] Add transform pipeline trigger on main experience completion in ExperiencePage
-- [ ] T013 [US1] Add navigation to share screen (with replace) on main experience completion in ExperiencePage
-- [ ] T014 [US1] Export SharePage from guest containers index (apps/clementine-app/src/domains/guest/containers/index.ts)
+- [X] T009 [P] [US1] Create SharePage placeholder container in apps/clementine-app/src/domains/guest/containers/SharePage.tsx
+- [X] T010 [P] [US1] Create share route in apps/clementine-app/src/app/join/$projectId/share.tsx
+- [X] T011 [US1] Modify ExperiencePage to mark experience complete on session completion in apps/clementine-app/src/domains/guest/containers/ExperiencePage.tsx
+- [X] T012 [US1] Add transform pipeline trigger on main experience completion in ExperiencePage
+- [X] T013 [US1] Add navigation to share screen (with replace) on main experience completion in ExperiencePage
+- [X] T014 [US1] Export SharePage from guest containers index (apps/clementine-app/src/domains/guest/containers/index.ts)
 
 **Checkpoint**: Guest can complete main experience from welcome to share navigation
 
@@ -73,12 +73,12 @@
 
 ### Implementation for User Story 2
 
-- [ ] T015 [P] [US2] Create PregatePage container in apps/clementine-app/src/domains/guest/containers/PregatePage.tsx
-- [ ] T016 [P] [US2] Create pregate route in apps/clementine-app/src/app/join/$projectId/pregate.tsx
-- [ ] T017 [US2] Modify WelcomeScreen to check pregate requirement and redirect in apps/clementine-app/src/domains/guest/containers/WelcomeScreen.tsx
-- [ ] T018 [US2] Implement pregate completion handler with experience marking and navigation to main (replace) in PregatePage
-- [ ] T019 [US2] Add pregate redirect check on mount in ExperiencePage (handle direct URL access)
-- [ ] T020 [US2] Export PregatePage from guest containers index
+- [X] T015 [P] [US2] Create PregatePage container in apps/clementine-app/src/domains/guest/containers/PregatePage.tsx
+- [X] T016 [P] [US2] Create pregate route in apps/clementine-app/src/app/join/$projectId/pregate.tsx
+- [X] T017 [US2] Modify WelcomeScreen to check pregate requirement and redirect in apps/clementine-app/src/domains/guest/containers/WelcomeScreen.tsx
+- [X] T018 [US2] Implement pregate completion handler with experience marking and navigation to main (replace) in PregatePage
+- [X] T019 [US2] Add pregate redirect check on mount in ExperiencePage (handle direct URL access)
+- [X] T020 [US2] Export PregatePage from guest containers index
 
 **Checkpoint**: Pregate flow works independently - guests route through pregate when required and skip when completed
 
@@ -92,12 +92,12 @@
 
 ### Implementation for User Story 3
 
-- [ ] T021 [P] [US3] Create PresharePage container in apps/clementine-app/src/domains/guest/containers/PresharePage.tsx
-- [ ] T022 [P] [US3] Create preshare route in apps/clementine-app/src/app/join/$projectId/preshare.tsx
-- [ ] T023 [US3] Modify ExperiencePage to check preshare requirement after main completion and navigate accordingly
-- [ ] T024 [US3] Implement preshare completion handler with experience marking and navigation to share (replace) in PresharePage
-- [ ] T025 [US3] Create preshare session with mainSessionId on preshare route mount in PresharePage
-- [ ] T026 [US3] Export PresharePage from guest containers index
+- [X] T021 [P] [US3] Create PresharePage container in apps/clementine-app/src/domains/guest/containers/PresharePage.tsx
+- [X] T022 [P] [US3] Create preshare route in apps/clementine-app/src/app/join/$projectId/preshare.tsx
+- [X] T023 [US3] Modify ExperiencePage to check preshare requirement after main completion and navigate accordingly
+- [X] T024 [US3] Implement preshare completion handler with experience marking and navigation to share (replace) in PresharePage
+- [X] T025 [US3] Create preshare session with mainSessionId on preshare route mount in PresharePage
+- [X] T026 [US3] Export PresharePage from guest containers index
 
 **Checkpoint**: Preshare flow works independently - guests route through preshare when required and skip when completed
 
@@ -111,9 +111,9 @@
 
 ### Implementation for User Story 4
 
-- [ ] T027 [US4] Update pregate session with mainSessionId after main session creation in ExperiencePage
-- [ ] T028 [US4] Ensure preshare session is created with mainSessionId from URL param (verify in PresharePage)
-- [ ] T029 [US4] Pass pregate session ID via URL param when navigating from pregate to main
+- [X] T027 [US4] Update pregate session with mainSessionId after main session creation in ExperiencePage
+- [X] T028 [US4] Ensure preshare session is created with mainSessionId from URL param (verify in PresharePage)
+- [X] T029 [US4] Pass pregate session ID via URL param when navigating from pregate to main
 
 **Checkpoint**: Session linking complete - all journey sessions can be queried via mainSessionId
 
@@ -127,8 +127,8 @@
 
 ### Implementation for User Story 5
 
-- [ ] T030 [US5] Verify all phase transitions use replace: true (pregate->main, main->preshare, preshare->share)
-- [ ] T031 [US5] Verify welcome->pregate and welcome->main use push navigation (not replace)
+- [X] T030 [US5] Verify all phase transitions use replace: true (pregate->main, main->preshare, preshare->share)
+- [X] T031 [US5] Verify welcome->pregate and welcome->main use push navigation (not replace)
 
 **Checkpoint**: Navigation behavior complete - browser back consistently returns to welcome
 
@@ -138,12 +138,12 @@
 
 **Purpose**: Validation, edge cases, and cleanup
 
-- [ ] T032 [P] Handle edge case: pregate experience has zero steps (skip pregate) in PregatePage
-- [ ] T033 [P] Handle edge case: preshare experience has zero steps (skip preshare) in PresharePage
-- [ ] T034 [P] Handle edge case: pregate/preshare experience ID doesn't exist (skip and log error)
-- [ ] T035 [P] Handle edge case: direct URL access to preshare without valid main session (redirect to welcome)
-- [ ] T036 Run validation (pnpm app:check && pnpm app:type-check)
-- [ ] T037 Run quickstart.md verification checklist
+- [X] T032 [P] Handle edge case: pregate experience has zero steps (skip pregate) in PregatePage
+- [X] T033 [P] Handle edge case: preshare experience has zero steps (skip preshare) in PresharePage
+- [X] T034 [P] Handle edge case: pregate/preshare experience ID doesn't exist (skip and log error)
+- [X] T035 [P] Handle edge case: direct URL access to preshare without valid main session (redirect to welcome)
+- [X] T036 Run validation (pnpm app:check && pnpm app:type-check)
+- [X] T037 Run quickstart.md verification checklist
 
 ---
 
