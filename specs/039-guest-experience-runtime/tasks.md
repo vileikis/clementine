@@ -165,19 +165,19 @@
 
 ### Shared Infrastructure
 
-- [ ] T038 [P] Create ThemedLoadingState component in apps/clementine-app/src/domains/guest/components/ThemedLoadingState.tsx
+- [X] T038 [P] Create ThemedLoadingState component in apps/clementine-app/src/domains/guest/components/ThemedLoadingState.tsx
   - Use ThemedBackground for full-screen layout
   - Use themed spinner (primaryColor based)
   - Use ThemedText for loading message
   - Accept `message` prop for customizable text
 
-- [ ] T039 [P] Create ThemedErrorState component in apps/clementine-app/src/domains/guest/components/ThemedErrorState.tsx
+- [X] T039 [P] Create ThemedErrorState component in apps/clementine-app/src/domains/guest/components/ThemedErrorState.tsx
   - Use ThemedBackground for full-screen layout
   - Use ThemedText for error title/message
   - Use ThemedButton (outline variant) for back/retry action
   - Replace ErrorPage usage with this component
 
-- [ ] T040 [P] Create GuestRuntimeContent component in apps/clementine-app/src/domains/guest/components/GuestRuntimeContent.tsx
+- [X] T040 [P] Create GuestRuntimeContent component in apps/clementine-app/src/domains/guest/components/GuestRuntimeContent.tsx
   - Use useRuntime() hook to access step state
   - Wrap with ThemedBackground
   - Render StepRendererRouter in "run" mode
@@ -185,16 +185,16 @@
   - Handle back navigation via back
   - Mobile-first layout
 
-- [ ] T041 Export new components from guest components index (apps/clementine-app/src/domains/guest/components/index.ts)
+- [X] T041 Export new components from guest components index (apps/clementine-app/src/domains/guest/components/index.ts)
 
 ### ExperiencePage Integration
 
-- [ ] T042 [US1] Wrap ExperiencePage with ThemeProvider (theme from event.publishedConfig.theme)
+- [X] T042 [US1] Wrap ExperiencePage with ThemeProvider (theme from event.publishedConfig.theme)
   - Provider wraps entire component return
   - Apply to loading, error, and success states
   - Replace unthemed loading/error states with ThemedLoadingState/ThemedErrorState
 
-- [ ] T043 [US1] Integrate ExperienceRuntime into ExperiencePage success state
+- [X] T043 [US1] Integrate ExperienceRuntime into ExperiencePage success state
   - Replace placeholder div with ExperienceRuntime
   - Pass experience.published.steps, session, handleExperienceComplete as onComplete
   - Render GuestRuntimeContent as child

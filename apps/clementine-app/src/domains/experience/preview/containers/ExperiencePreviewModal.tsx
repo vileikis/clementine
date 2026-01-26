@@ -40,7 +40,7 @@ import type { Experience } from '@/domains/experience/shared'
 import type { Theme } from '@/shared/theming'
 import { useGhostProject } from '@/domains/project/shared'
 import { useCreateSession, useSubscribeSession } from '@/domains/session'
-import { ThemeProvider, themeSchema } from '@/shared/theming'
+import { ThemeProvider, ThemedBackground, themeSchema } from '@/shared/theming'
 import { FullscreenPreviewShell } from '@/shared/preview-shell'
 import { Button } from '@/ui-kit/ui/button'
 
@@ -213,15 +213,20 @@ export function ExperiencePreviewModal({
       {/* Runtime content */}
       {isReady && steps.length > 0 && (
         <ThemeProvider theme={previewTheme}>
-          <ExperienceRuntime
-            experienceId={experience.id}
-            steps={steps}
-            session={session}
-            onComplete={handleComplete}
-            onError={handleError}
+          <ThemedBackground
+            className="h-full w-full"
+            contentClassName="h-full w-full"
           >
-            <PreviewRuntimeContent />
-          </ExperienceRuntime>
+            <ExperienceRuntime
+              experienceId={experience.id}
+              steps={steps}
+              session={session}
+              onComplete={handleComplete}
+              onError={handleError}
+            >
+              <PreviewRuntimeContent />
+            </ExperienceRuntime>
+          </ThemedBackground>
         </ThemeProvider>
       )}
     </FullscreenPreviewShell>
