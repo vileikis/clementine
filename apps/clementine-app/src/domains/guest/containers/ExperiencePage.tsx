@@ -11,7 +11,7 @@
  * - Initialize session via useInitSession (create or subscribe)
  * - Link pregate session to main session after creation
  * - Update URL with session ID when created
- * - Handle experience completion (mark complete, trigger transform, navigate)
+ * - Handle experience completion (mark complete, navigate)
  * - Navigate to preshare or share on completion
  *
  * User Stories:
@@ -42,36 +42,6 @@ export interface ExperiencePageProps {
   sessionId?: string
   /** Pregate session ID from URL query params (for session linking) */
   pregateSessionId?: string
-}
-
-/**
- * Trigger transform pipeline for main experience session
- * Fire-and-forget: errors are logged but don't block navigation
- */
-async function triggerTransformPipeline(params: {
-  projectId: string
-  sessionId: string
-  stepId: string
-}): Promise<void> {
-  const { projectId, sessionId, stepId } = params
-
-  try {
-    const functionsBaseUrl = import.meta.env.VITE_FIREBASE_FUNCTIONS_URL
-    if (!functionsBaseUrl) {
-      console.warn('VITE_FIREBASE_FUNCTIONS_URL not configured')
-      return
-    }
-
-    const url = `${functionsBaseUrl}/startTransformPipeline?projectId=${projectId}`
-    await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sessionId, stepId }),
-    })
-  } catch (error) {
-    // Log but don't throw - fire-and-forget
-    console.error('Failed to trigger transform pipeline:', error)
-  }
 }
 
 /**
@@ -231,21 +201,7 @@ export function ExperiencePage({
       sessionId,
     })
 
-    // 2. Trigger transform pipeline if experience has transform config
-    // Find transform step in experience
-    const transformStep = experience?.published?.steps?.find(
-      (step) => step.type === 'transform.pipeline',
-    )
-    if (transformStep) {
-      // Fire-and-forget - don't await
-      void triggerTransformPipeline({
-        projectId: project.id,
-        sessionId,
-        stepId: transformStep.id,
-      })
-    }
-
-    // 3. Navigate to preshare or share
+    // 2. Navigate to preshare or share
     if (needsPreshare()) {
       // Navigate to preshare with main session ID (replace to hide main from history)
       void navigate({

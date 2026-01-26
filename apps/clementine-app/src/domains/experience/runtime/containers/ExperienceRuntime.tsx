@@ -174,13 +174,12 @@ export function ExperienceRuntime({
   ])
 
   // React to completion
+  // Note: No cancellation pattern - hasCompletedRef prevents re-execution.
+  // Once completion starts, it must run to completion to call onComplete.
   useEffect(() => {
     if (!store.isReady) return
     if (!store.isComplete) return
     if (hasCompletedRef.current) return // Already completed
-
-    // Cancellation flag to prevent acting after unmount
-    let cancelled = false
 
     hasCompletedRef.current = true
 
@@ -189,25 +188,16 @@ export function ExperienceRuntime({
       answers: store.answers,
       capturedMedia: store.capturedMedia,
     })
-      .then(() => {
-        if (cancelled) return
-        return completeSession.mutateAsync({
+      .then(() =>
+        completeSession.mutateAsync({
           projectId: session.projectId,
           sessionId: session.id,
-        })
-      })
-      .then(() => {
-        if (cancelled) return
-        onComplete?.()
-      })
-      .catch((error) => {
-        if (cancelled) return
-        onError?.(error instanceof Error ? error : new Error('Complete failed'))
-      })
-
-    return () => {
-      cancelled = true
-    }
+        }),
+      )
+      .then(() => onComplete?.())
+      .catch((error) =>
+        onError?.(error instanceof Error ? error : new Error('Complete failed')),
+      )
   }, [
     store.isReady,
     store.isComplete,
