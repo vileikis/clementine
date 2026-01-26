@@ -1,6 +1,6 @@
 # Tasks: Media Assets Shared Schema
 
-**Input**: Design documents from `/specs/040-media-assets-shared/`
+**Input**: Design documents from `/specs/042-flatten-structure-refactor/`
 **Prerequisites**: plan.md, spec.md, research.md, data-model.md, quickstart.md
 
 **Tests**: Schema validation tests are included per constitution (Principle IV - Minimal Testing Strategy).
