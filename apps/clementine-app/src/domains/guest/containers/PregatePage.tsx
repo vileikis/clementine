@@ -13,13 +13,19 @@
  * User Story: US2 - Guest Completes Pregate Before Main Experience
  */
 import { useEffect, useRef } from 'react'
-import { Link, useNavigate } from '@tanstack/react-router'
-import { ArrowLeft } from 'lucide-react'
+import { useNavigate } from '@tanstack/react-router'
 
 import { useGuestContext } from '../contexts'
-import { ErrorPage } from '../components'
+import {
+  GuestRuntimeContent,
+  ThemedErrorState,
+  ThemedLoadingState,
+} from '../components'
 import { useMarkExperienceComplete } from '../hooks'
 import { useInitSession } from '@/domains/session/shared'
+import { ExperienceRuntime } from '@/domains/experience/runtime'
+import { ThemeProvider, ThemedBackground } from '@/shared/theming'
+import { DEFAULT_THEME } from '@/domains/event/theme/constants'
 
 export interface PregatePageProps {
   /** Selected main experience ID (to navigate to after pregate) */
@@ -111,20 +117,35 @@ export function PregatePage({ selectedExperienceId }: PregatePageProps) {
       !!pregateExperienceId && !!pregateExperience && !experiencesLoading,
   })
 
-  // Update URL with session ID when created (for resumption support)
+  // Note: We don't update URL for pregate since it's a transient step
+  // If user refreshes, they'll restart pregate (acceptable for short surveys)
   useEffect(() => {
     if (sessionState.status === 'ready' && !urlUpdatedRef.current) {
       urlUpdatedRef.current = true
-      // Note: We don't update URL for pregate since it's a transient step
-      // If user refreshes, they'll restart pregate (acceptable for short surveys)
     }
   }, [sessionState.status])
+
+  // Get theme from event config (with fallback to default)
+  const theme = event.publishedConfig?.theme ?? DEFAULT_THEME
+
+  // Handle error for runtime (logs but doesn't block)
+  const handleRuntimeError = (error: Error) => {
+    console.error('ExperienceRuntime error in pregate:', error)
+  }
+
+  // Helper to navigate back to welcome
+  const navigateToWelcome = () =>
+    navigate({
+      to: '/join/$projectId',
+      params: { projectId: project.id },
+    })
 
   /**
    * Handle pregate completion
    * Called when guest finishes all pregate steps
    */
   const handlePregateComplete = async () => {
+    console.log('-----handlePregateComplete', sessionState.status)
     if (sessionState.status !== 'ready') return
     if (!pregateExperienceId) return
 
@@ -148,106 +169,77 @@ export function PregatePage({ selectedExperienceId }: PregatePageProps) {
     })
   }
 
-  // Show loading state while experiences are loading
-  if (experiencesLoading) {
+  // Determine content to render based on state
+  const renderContent = () => {
+    // Show loading state while experiences are loading
+    if (experiencesLoading) {
+      return <ThemedLoadingState message="Loading..." />
+    }
+
+    // If misconfigured, we're redirecting (handled by useEffect above)
+    if (isMisconfigured) {
+      return <ThemedLoadingState message="Redirecting..." />
+    }
+
+    // Handle error state
+    if (sessionState.status === 'error') {
+      return (
+        <ThemedErrorState
+          title="Error"
+          message="Failed to start pregate experience. Please go back and try again."
+          actionLabel="Go Back"
+          onAction={navigateToWelcome}
+        />
+      )
+    }
+
+    // Show loading state while session is initializing
+    if (sessionState.status === 'loading') {
+      return <ThemedLoadingState message="Starting pregate..." />
+    }
+
+    // sessionState.status === 'ready'
+    const { session } = sessionState
+    const steps = pregateExperience?.published?.steps ?? []
+
+    // Handle empty experience (no steps configured) - edge case already handled
+    // by isMisconfigured check, but keeping for safety
+    if (steps.length === 0) {
+      return (
+        <ThemedErrorState
+          title="Pregate Not Ready"
+          message="This pregate experience doesn't have any steps. Skipping..."
+          actionLabel="Go Back"
+          onAction={navigateToWelcome}
+        />
+      )
+    }
+
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="text-center">
-          <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
-      </div>
+      <ExperienceRuntime
+        experienceId={pregateExperienceId}
+        steps={steps}
+        session={session}
+        onComplete={() => void handlePregateComplete()}
+        onError={handleRuntimeError}
+      >
+        <GuestRuntimeContent />
+      </ExperienceRuntime>
     )
   }
 
-  // If misconfigured, we're redirecting (handled by useEffect above)
-  if (isMisconfigured) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="text-center">
-          <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          <p className="text-muted-foreground">Redirecting...</p>
-        </div>
-      </div>
-    )
-  }
-
-  // Handle error state
-  if (sessionState.status === 'error') {
-    return (
-      <ErrorPage
-        title="Error"
-        message="Failed to start pregate experience. Please go back and try again."
-      />
-    )
-  }
-
-  // Show loading state while session is initializing
-  if (sessionState.status === 'loading') {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="text-center">
-          <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          <p className="text-muted-foreground">Starting pregate...</p>
-        </div>
-      </div>
-    )
-  }
-
-  // sessionState.status === 'ready'
-  const { session, sessionId } = sessionState
-
-  // Placeholder content (full runtime will use ExperienceRuntime)
+  // Render with persistent ThemedBackground
+  // Background stays mounted across all state transitions
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
-      <div className="text-center max-w-md">
-        <h1 className="text-2xl font-bold text-foreground">
-          Before We Begin...
-        </h1>
-        <p className="mt-4 text-muted-foreground">
-          Please complete this quick questionnaire before starting your
-          experience.
-        </p>
-
-        {/* Session info for debugging/verification */}
-        <div className="mt-6 p-4 rounded-lg bg-muted/50 text-left text-sm">
-          <p className="font-medium text-foreground">Pregate Session</p>
-          <p className="mt-2 text-muted-foreground">
-            <span className="font-mono text-xs break-all">{sessionId}</span>
-          </p>
-          <p className="mt-2 text-muted-foreground text-xs">
-            Status: {session.status}
-          </p>
-          <p className="mt-2 text-muted-foreground text-xs">
-            Experience: {pregateExperience?.name ?? 'Unknown'}
-          </p>
-          <p className="mt-2 text-muted-foreground text-xs">
-            Next: {selectedExperienceId.slice(0, 8)}...
-          </p>
-        </div>
-
-        {/* Temporary: Complete button for testing flow */}
-        <button
-          type="button"
-          onClick={() => void handlePregateComplete()}
-          disabled={markExperienceComplete.isPending}
-          className="mt-6 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50"
+    <ThemeProvider theme={theme}>
+      <div className="h-screen">
+        <ThemedBackground
+          className="h-full w-full"
+          contentClassName="h-full w-full"
         >
-          {markExperienceComplete.isPending
-            ? 'Completing...'
-            : 'Complete Pregate (Test)'}
-        </button>
-
-        {/* Back to welcome link */}
-        <Link
-          to="/join/$projectId"
-          params={{ projectId: project.id }}
-          className="mt-4 inline-flex items-center gap-2 text-primary hover:underline"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to welcome screen
-        </Link>
+          {renderContent()}
+        </ThemedBackground>
       </div>
-    </div>
+    </ThemeProvider>
   )
 }

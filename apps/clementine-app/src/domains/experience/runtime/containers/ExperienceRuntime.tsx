@@ -189,7 +189,9 @@ export function ExperienceRuntime({
       )
       .then(() => onComplete?.())
       .catch((error) =>
-        onError?.(error instanceof Error ? error : new Error('Complete failed')),
+        onError?.(
+          error instanceof Error ? error : new Error('Complete failed'),
+        ),
       )
   }, [
     store.isReady,

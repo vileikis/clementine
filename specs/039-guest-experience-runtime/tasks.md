@@ -203,12 +203,12 @@
 
 ### PregatePage Integration
 
-- [ ] T044 [US2] Wrap PregatePage with ThemeProvider
+- [X] T044 [US2] Wrap PregatePage with ThemeProvider
   - Provider wraps entire component return
   - Apply to loading, error, redirecting, and success states
   - Replace unthemed loading/error states with ThemedLoadingState/ThemedErrorState
 
-- [ ] T045 [US2] Integrate ExperienceRuntime into PregatePage success state
+- [X] T045 [US2] Integrate ExperienceRuntime into PregatePage success state
   - Replace placeholder div with ExperienceRuntime
   - Pass pregateExperience.published.steps, session, handlePregateComplete as onComplete
   - Render GuestRuntimeContent as child
@@ -216,12 +216,12 @@
 
 ### PresharePage Integration
 
-- [ ] T046 [US3] Wrap PresharePage with ThemeProvider
+- [X] T046 [US3] Wrap PresharePage with ThemeProvider
   - Provider wraps entire component return
   - Apply to loading, error, redirecting, and success states
   - Replace unthemed loading/error states with ThemedLoadingState/ThemedErrorState
 
-- [ ] T047 [US3] Integrate ExperienceRuntime into PresharePage success state
+- [X] T047 [US3] Integrate ExperienceRuntime into PresharePage success state
   - Replace placeholder div with ExperienceRuntime
   - Pass preshareExperience.published.steps, session, handlePreshareComplete as onComplete
   - Render GuestRuntimeContent as child
@@ -229,7 +229,7 @@
 
 ### Final Validation
 
-- [ ] T048 Run validation (pnpm app:check && pnpm app:type-check)
+- [X] T048 Run validation (pnpm app:check && pnpm app:type-check)
 - [ ] T049 Manual testing: Verify themed loading states appear correctly
 - [ ] T050 Manual testing: Verify themed error states appear correctly
 - [ ] T051 Manual testing: Complete full guest journey (pregate -> main -> preshare -> share)
