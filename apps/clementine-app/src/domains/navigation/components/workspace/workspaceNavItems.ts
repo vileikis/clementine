@@ -1,4 +1,4 @@
-import { FolderOpen, Settings, Sparkles } from 'lucide-react'
+import { FolderOpen, Settings, Sparkles, Wand2 } from 'lucide-react'
 import type { NavItem } from '../../types'
 
 export const workspaceNavItems: NavItem[] = [
@@ -11,6 +11,11 @@ export const workspaceNavItems: NavItem[] = [
     label: 'Experiences',
     to: '/workspace/$workspaceSlug/experiences',
     icon: Sparkles,
+  },
+  {
+    label: 'AI Presets',
+    to: '/workspace/$workspaceSlug/ai-presets',
+    icon: Wand2,
   },
   {
     label: 'Settings',

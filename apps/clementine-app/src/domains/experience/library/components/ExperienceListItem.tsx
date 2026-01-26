@@ -66,7 +66,7 @@ export function ExperienceListItem({
     <Card className="p-4">
       <div className="flex items-center gap-4">
         {/* Thumbnail */}
-        <div className="h-16 w-16 rounded-md bg-muted flex items-center justify-center flex-shrink-0 overflow-hidden">
+        <div className="h-16 w-16 rounded-md bg-muted flex items-center justify-center shrink-0 overflow-hidden">
           {experience.media?.url ? (
             <img
               src={experience.media.url}

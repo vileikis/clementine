@@ -33,9 +33,11 @@ import { Route as AdminDevToolsPreviewShellRouteImport } from './app/admin/dev-t
 import { Route as AdminDevToolsCameraRouteImport } from './app/admin/dev-tools/camera'
 import { Route as WorkspaceWorkspaceSlugProjectsIndexRouteImport } from './app/workspace/$workspaceSlug.projects/index'
 import { Route as WorkspaceWorkspaceSlugExperiencesIndexRouteImport } from './app/workspace/$workspaceSlug.experiences/index'
+import { Route as WorkspaceWorkspaceSlugAiPresetsIndexRouteImport } from './app/workspace/$workspaceSlug.ai-presets/index'
 import { Route as WorkspaceWorkspaceSlugProjectsProjectIdRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId'
 import { Route as WorkspaceWorkspaceSlugExperiencesCreateRouteImport } from './app/workspace/$workspaceSlug.experiences/create'
 import { Route as WorkspaceWorkspaceSlugExperiencesExperienceIdRouteImport } from './app/workspace/$workspaceSlug.experiences/$experienceId'
+import { Route as WorkspaceWorkspaceSlugAiPresetsPresetIdRouteImport } from './app/workspace/$workspaceSlug.ai-presets/$presetId'
 import { Route as JoinProjectIdExperienceExperienceIdRouteImport } from './app/join/$projectId/experience/$experienceId'
 import { Route as WorkspaceWorkspaceSlugProjectsProjectIdIndexRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId.index'
 import { Route as WorkspaceWorkspaceSlugProjectsProjectIdEventsIndexRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId.events/index'
@@ -171,6 +173,12 @@ const WorkspaceWorkspaceSlugExperiencesIndexRoute =
     path: '/experiences/',
     getParentRoute: () => WorkspaceWorkspaceSlugRoute,
   } as any)
+const WorkspaceWorkspaceSlugAiPresetsIndexRoute =
+  WorkspaceWorkspaceSlugAiPresetsIndexRouteImport.update({
+    id: '/ai-presets/',
+    path: '/ai-presets/',
+    getParentRoute: () => WorkspaceWorkspaceSlugRoute,
+  } as any)
 const WorkspaceWorkspaceSlugProjectsProjectIdRoute =
   WorkspaceWorkspaceSlugProjectsProjectIdRouteImport.update({
     id: '/projects/$projectId',
@@ -187,6 +195,12 @@ const WorkspaceWorkspaceSlugExperiencesExperienceIdRoute =
   WorkspaceWorkspaceSlugExperiencesExperienceIdRouteImport.update({
     id: '/experiences/$experienceId',
     path: '/experiences/$experienceId',
+    getParentRoute: () => WorkspaceWorkspaceSlugRoute,
+  } as any)
+const WorkspaceWorkspaceSlugAiPresetsPresetIdRoute =
+  WorkspaceWorkspaceSlugAiPresetsPresetIdRouteImport.update({
+    id: '/ai-presets/$presetId',
+    path: '/ai-presets/$presetId',
     getParentRoute: () => WorkspaceWorkspaceSlugRoute,
   } as any)
 const JoinProjectIdExperienceExperienceIdRoute =
@@ -277,9 +291,11 @@ export interface FileRoutesByFullPath {
   '/join/$projectId/': typeof JoinProjectIdIndexRoute
   '/workspace/$workspaceSlug/': typeof WorkspaceWorkspaceSlugIndexRoute
   '/join/$projectId/experience/$experienceId': typeof JoinProjectIdExperienceExperienceIdRoute
+  '/workspace/$workspaceSlug/ai-presets/$presetId': typeof WorkspaceWorkspaceSlugAiPresetsPresetIdRoute
   '/workspace/$workspaceSlug/experiences/$experienceId': typeof WorkspaceWorkspaceSlugExperiencesExperienceIdRoute
   '/workspace/$workspaceSlug/experiences/create': typeof WorkspaceWorkspaceSlugExperiencesCreateRoute
   '/workspace/$workspaceSlug/projects/$projectId': typeof WorkspaceWorkspaceSlugProjectsProjectIdRouteWithChildren
+  '/workspace/$workspaceSlug/ai-presets': typeof WorkspaceWorkspaceSlugAiPresetsIndexRoute
   '/workspace/$workspaceSlug/experiences': typeof WorkspaceWorkspaceSlugExperiencesIndexRoute
   '/workspace/$workspaceSlug/projects': typeof WorkspaceWorkspaceSlugProjectsIndexRoute
   '/workspace/$workspaceSlug/projects/$projectId/': typeof WorkspaceWorkspaceSlugProjectsProjectIdIndexRoute
@@ -311,8 +327,10 @@ export interface FileRoutesByTo {
   '/join/$projectId': typeof JoinProjectIdIndexRoute
   '/workspace/$workspaceSlug': typeof WorkspaceWorkspaceSlugIndexRoute
   '/join/$projectId/experience/$experienceId': typeof JoinProjectIdExperienceExperienceIdRoute
+  '/workspace/$workspaceSlug/ai-presets/$presetId': typeof WorkspaceWorkspaceSlugAiPresetsPresetIdRoute
   '/workspace/$workspaceSlug/experiences/$experienceId': typeof WorkspaceWorkspaceSlugExperiencesExperienceIdRoute
   '/workspace/$workspaceSlug/experiences/create': typeof WorkspaceWorkspaceSlugExperiencesCreateRoute
+  '/workspace/$workspaceSlug/ai-presets': typeof WorkspaceWorkspaceSlugAiPresetsIndexRoute
   '/workspace/$workspaceSlug/experiences': typeof WorkspaceWorkspaceSlugExperiencesIndexRoute
   '/workspace/$workspaceSlug/projects': typeof WorkspaceWorkspaceSlugProjectsIndexRoute
   '/workspace/$workspaceSlug/projects/$projectId': typeof WorkspaceWorkspaceSlugProjectsProjectIdIndexRoute
@@ -348,9 +366,11 @@ export interface FileRoutesById {
   '/join/$projectId/': typeof JoinProjectIdIndexRoute
   '/workspace/$workspaceSlug/': typeof WorkspaceWorkspaceSlugIndexRoute
   '/join/$projectId/experience/$experienceId': typeof JoinProjectIdExperienceExperienceIdRoute
+  '/workspace/$workspaceSlug/ai-presets/$presetId': typeof WorkspaceWorkspaceSlugAiPresetsPresetIdRoute
   '/workspace/$workspaceSlug/experiences/$experienceId': typeof WorkspaceWorkspaceSlugExperiencesExperienceIdRoute
   '/workspace/$workspaceSlug/experiences/create': typeof WorkspaceWorkspaceSlugExperiencesCreateRoute
   '/workspace/$workspaceSlug/projects/$projectId': typeof WorkspaceWorkspaceSlugProjectsProjectIdRouteWithChildren
+  '/workspace/$workspaceSlug/ai-presets/': typeof WorkspaceWorkspaceSlugAiPresetsIndexRoute
   '/workspace/$workspaceSlug/experiences/': typeof WorkspaceWorkspaceSlugExperiencesIndexRoute
   '/workspace/$workspaceSlug/projects/': typeof WorkspaceWorkspaceSlugProjectsIndexRoute
   '/workspace/$workspaceSlug/projects/$projectId/': typeof WorkspaceWorkspaceSlugProjectsProjectIdIndexRoute
@@ -388,9 +408,11 @@ export interface FileRouteTypes {
     | '/join/$projectId/'
     | '/workspace/$workspaceSlug/'
     | '/join/$projectId/experience/$experienceId'
+    | '/workspace/$workspaceSlug/ai-presets/$presetId'
     | '/workspace/$workspaceSlug/experiences/$experienceId'
     | '/workspace/$workspaceSlug/experiences/create'
     | '/workspace/$workspaceSlug/projects/$projectId'
+    | '/workspace/$workspaceSlug/ai-presets'
     | '/workspace/$workspaceSlug/experiences'
     | '/workspace/$workspaceSlug/projects'
     | '/workspace/$workspaceSlug/projects/$projectId/'
@@ -422,8 +444,10 @@ export interface FileRouteTypes {
     | '/join/$projectId'
     | '/workspace/$workspaceSlug'
     | '/join/$projectId/experience/$experienceId'
+    | '/workspace/$workspaceSlug/ai-presets/$presetId'
     | '/workspace/$workspaceSlug/experiences/$experienceId'
     | '/workspace/$workspaceSlug/experiences/create'
+    | '/workspace/$workspaceSlug/ai-presets'
     | '/workspace/$workspaceSlug/experiences'
     | '/workspace/$workspaceSlug/projects'
     | '/workspace/$workspaceSlug/projects/$projectId'
@@ -458,9 +482,11 @@ export interface FileRouteTypes {
     | '/join/$projectId/'
     | '/workspace/$workspaceSlug/'
     | '/join/$projectId/experience/$experienceId'
+    | '/workspace/$workspaceSlug/ai-presets/$presetId'
     | '/workspace/$workspaceSlug/experiences/$experienceId'
     | '/workspace/$workspaceSlug/experiences/create'
     | '/workspace/$workspaceSlug/projects/$projectId'
+    | '/workspace/$workspaceSlug/ai-presets/'
     | '/workspace/$workspaceSlug/experiences/'
     | '/workspace/$workspaceSlug/projects/'
     | '/workspace/$workspaceSlug/projects/$projectId/'
@@ -653,6 +679,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkspaceWorkspaceSlugExperiencesIndexRouteImport
       parentRoute: typeof WorkspaceWorkspaceSlugRoute
     }
+    '/workspace/$workspaceSlug/ai-presets/': {
+      id: '/workspace/$workspaceSlug/ai-presets/'
+      path: '/ai-presets'
+      fullPath: '/workspace/$workspaceSlug/ai-presets'
+      preLoaderRoute: typeof WorkspaceWorkspaceSlugAiPresetsIndexRouteImport
+      parentRoute: typeof WorkspaceWorkspaceSlugRoute
+    }
     '/workspace/$workspaceSlug/projects/$projectId': {
       id: '/workspace/$workspaceSlug/projects/$projectId'
       path: '/projects/$projectId'
@@ -672,6 +705,13 @@ declare module '@tanstack/react-router' {
       path: '/experiences/$experienceId'
       fullPath: '/workspace/$workspaceSlug/experiences/$experienceId'
       preLoaderRoute: typeof WorkspaceWorkspaceSlugExperiencesExperienceIdRouteImport
+      parentRoute: typeof WorkspaceWorkspaceSlugRoute
+    }
+    '/workspace/$workspaceSlug/ai-presets/$presetId': {
+      id: '/workspace/$workspaceSlug/ai-presets/$presetId'
+      path: '/ai-presets/$presetId'
+      fullPath: '/workspace/$workspaceSlug/ai-presets/$presetId'
+      preLoaderRoute: typeof WorkspaceWorkspaceSlugAiPresetsPresetIdRouteImport
       parentRoute: typeof WorkspaceWorkspaceSlugRoute
     }
     '/join/$projectId/experience/$experienceId': {
@@ -854,9 +894,11 @@ const WorkspaceWorkspaceSlugProjectsProjectIdRouteWithChildren =
 interface WorkspaceWorkspaceSlugRouteChildren {
   WorkspaceWorkspaceSlugSettingsRoute: typeof WorkspaceWorkspaceSlugSettingsRoute
   WorkspaceWorkspaceSlugIndexRoute: typeof WorkspaceWorkspaceSlugIndexRoute
+  WorkspaceWorkspaceSlugAiPresetsPresetIdRoute: typeof WorkspaceWorkspaceSlugAiPresetsPresetIdRoute
   WorkspaceWorkspaceSlugExperiencesExperienceIdRoute: typeof WorkspaceWorkspaceSlugExperiencesExperienceIdRoute
   WorkspaceWorkspaceSlugExperiencesCreateRoute: typeof WorkspaceWorkspaceSlugExperiencesCreateRoute
   WorkspaceWorkspaceSlugProjectsProjectIdRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdRouteWithChildren
+  WorkspaceWorkspaceSlugAiPresetsIndexRoute: typeof WorkspaceWorkspaceSlugAiPresetsIndexRoute
   WorkspaceWorkspaceSlugExperiencesIndexRoute: typeof WorkspaceWorkspaceSlugExperiencesIndexRoute
   WorkspaceWorkspaceSlugProjectsIndexRoute: typeof WorkspaceWorkspaceSlugProjectsIndexRoute
 }
@@ -865,12 +907,16 @@ const WorkspaceWorkspaceSlugRouteChildren: WorkspaceWorkspaceSlugRouteChildren =
   {
     WorkspaceWorkspaceSlugSettingsRoute: WorkspaceWorkspaceSlugSettingsRoute,
     WorkspaceWorkspaceSlugIndexRoute: WorkspaceWorkspaceSlugIndexRoute,
+    WorkspaceWorkspaceSlugAiPresetsPresetIdRoute:
+      WorkspaceWorkspaceSlugAiPresetsPresetIdRoute,
     WorkspaceWorkspaceSlugExperiencesExperienceIdRoute:
       WorkspaceWorkspaceSlugExperiencesExperienceIdRoute,
     WorkspaceWorkspaceSlugExperiencesCreateRoute:
       WorkspaceWorkspaceSlugExperiencesCreateRoute,
     WorkspaceWorkspaceSlugProjectsProjectIdRoute:
       WorkspaceWorkspaceSlugProjectsProjectIdRouteWithChildren,
+    WorkspaceWorkspaceSlugAiPresetsIndexRoute:
+      WorkspaceWorkspaceSlugAiPresetsIndexRoute,
     WorkspaceWorkspaceSlugExperiencesIndexRoute:
       WorkspaceWorkspaceSlugExperiencesIndexRoute,
     WorkspaceWorkspaceSlugProjectsIndexRoute:
