@@ -25,6 +25,9 @@ import { Route as WorkspaceWorkspaceSlugIndexRouteImport } from './app/workspace
 import { Route as JoinProjectIdIndexRouteImport } from './app/join/$projectId/index'
 import { Route as AdminWorkspacesIndexRouteImport } from './app/admin/workspaces/index'
 import { Route as WorkspaceWorkspaceSlugSettingsRouteImport } from './app/workspace/$workspaceSlug.settings'
+import { Route as JoinProjectIdShareRouteImport } from './app/join/$projectId/share'
+import { Route as JoinProjectIdPreshareRouteImport } from './app/join/$projectId/preshare'
+import { Route as JoinProjectIdPregateRouteImport } from './app/join/$projectId/pregate'
 import { Route as AdminWorkspacesCreateRouteImport } from './app/admin/workspaces/create'
 import { Route as AdminDevToolsPreviewShellRouteImport } from './app/admin/dev-tools/preview-shell'
 import { Route as AdminDevToolsCameraRouteImport } from './app/admin/dev-tools/camera'
@@ -127,6 +130,21 @@ const WorkspaceWorkspaceSlugSettingsRoute =
     path: '/settings',
     getParentRoute: () => WorkspaceWorkspaceSlugRoute,
   } as any)
+const JoinProjectIdShareRoute = JoinProjectIdShareRouteImport.update({
+  id: '/share',
+  path: '/share',
+  getParentRoute: () => JoinProjectIdRouteRoute,
+} as any)
+const JoinProjectIdPreshareRoute = JoinProjectIdPreshareRouteImport.update({
+  id: '/preshare',
+  path: '/preshare',
+  getParentRoute: () => JoinProjectIdRouteRoute,
+} as any)
+const JoinProjectIdPregateRoute = JoinProjectIdPregateRouteImport.update({
+  id: '/pregate',
+  path: '/pregate',
+  getParentRoute: () => JoinProjectIdRouteRoute,
+} as any)
 const AdminWorkspacesCreateRoute = AdminWorkspacesCreateRouteImport.update({
   id: '/workspaces/create',
   path: '/workspaces/create',
@@ -265,6 +283,9 @@ export interface FileRoutesByFullPath {
   '/admin/dev-tools/camera': typeof AdminDevToolsCameraRoute
   '/admin/dev-tools/preview-shell': typeof AdminDevToolsPreviewShellRoute
   '/admin/workspaces/create': typeof AdminWorkspacesCreateRoute
+  '/join/$projectId/pregate': typeof JoinProjectIdPregateRoute
+  '/join/$projectId/preshare': typeof JoinProjectIdPreshareRoute
+  '/join/$projectId/share': typeof JoinProjectIdShareRoute
   '/workspace/$workspaceSlug/settings': typeof WorkspaceWorkspaceSlugSettingsRoute
   '/admin/workspaces': typeof AdminWorkspacesIndexRoute
   '/join/$projectId/': typeof JoinProjectIdIndexRoute
@@ -298,6 +319,9 @@ export interface FileRoutesByTo {
   '/admin/dev-tools/camera': typeof AdminDevToolsCameraRoute
   '/admin/dev-tools/preview-shell': typeof AdminDevToolsPreviewShellRoute
   '/admin/workspaces/create': typeof AdminWorkspacesCreateRoute
+  '/join/$projectId/pregate': typeof JoinProjectIdPregateRoute
+  '/join/$projectId/preshare': typeof JoinProjectIdPreshareRoute
+  '/join/$projectId/share': typeof JoinProjectIdShareRoute
   '/workspace/$workspaceSlug/settings': typeof WorkspaceWorkspaceSlugSettingsRoute
   '/admin/workspaces': typeof AdminWorkspacesIndexRoute
   '/join/$projectId': typeof JoinProjectIdIndexRoute
@@ -334,6 +358,9 @@ export interface FileRoutesById {
   '/admin/dev-tools/camera': typeof AdminDevToolsCameraRoute
   '/admin/dev-tools/preview-shell': typeof AdminDevToolsPreviewShellRoute
   '/admin/workspaces/create': typeof AdminWorkspacesCreateRoute
+  '/join/$projectId/pregate': typeof JoinProjectIdPregateRoute
+  '/join/$projectId/preshare': typeof JoinProjectIdPreshareRoute
+  '/join/$projectId/share': typeof JoinProjectIdShareRoute
   '/workspace/$workspaceSlug/settings': typeof WorkspaceWorkspaceSlugSettingsRoute
   '/admin/workspaces/': typeof AdminWorkspacesIndexRoute
   '/join/$projectId/': typeof JoinProjectIdIndexRoute
@@ -373,6 +400,9 @@ export interface FileRouteTypes {
     | '/admin/dev-tools/camera'
     | '/admin/dev-tools/preview-shell'
     | '/admin/workspaces/create'
+    | '/join/$projectId/pregate'
+    | '/join/$projectId/preshare'
+    | '/join/$projectId/share'
     | '/workspace/$workspaceSlug/settings'
     | '/admin/workspaces'
     | '/join/$projectId/'
@@ -406,6 +436,9 @@ export interface FileRouteTypes {
     | '/admin/dev-tools/camera'
     | '/admin/dev-tools/preview-shell'
     | '/admin/workspaces/create'
+    | '/join/$projectId/pregate'
+    | '/join/$projectId/preshare'
+    | '/join/$projectId/share'
     | '/workspace/$workspaceSlug/settings'
     | '/admin/workspaces'
     | '/join/$projectId'
@@ -441,6 +474,9 @@ export interface FileRouteTypes {
     | '/admin/dev-tools/camera'
     | '/admin/dev-tools/preview-shell'
     | '/admin/workspaces/create'
+    | '/join/$projectId/pregate'
+    | '/join/$projectId/preshare'
+    | '/join/$projectId/share'
     | '/workspace/$workspaceSlug/settings'
     | '/admin/workspaces/'
     | '/join/$projectId/'
@@ -586,6 +622,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/workspace/$workspaceSlug/settings'
       preLoaderRoute: typeof WorkspaceWorkspaceSlugSettingsRouteImport
       parentRoute: typeof WorkspaceWorkspaceSlugRoute
+    }
+    '/join/$projectId/share': {
+      id: '/join/$projectId/share'
+      path: '/share'
+      fullPath: '/join/$projectId/share'
+      preLoaderRoute: typeof JoinProjectIdShareRouteImport
+      parentRoute: typeof JoinProjectIdRouteRoute
+    }
+    '/join/$projectId/preshare': {
+      id: '/join/$projectId/preshare'
+      path: '/preshare'
+      fullPath: '/join/$projectId/preshare'
+      preLoaderRoute: typeof JoinProjectIdPreshareRouteImport
+      parentRoute: typeof JoinProjectIdRouteRoute
+    }
+    '/join/$projectId/pregate': {
+      id: '/join/$projectId/pregate'
+      path: '/pregate'
+      fullPath: '/join/$projectId/pregate'
+      preLoaderRoute: typeof JoinProjectIdPregateRouteImport
+      parentRoute: typeof JoinProjectIdRouteRoute
     }
     '/admin/workspaces/create': {
       id: '/admin/workspaces/create'
@@ -755,11 +812,17 @@ const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
 )
 
 interface JoinProjectIdRouteRouteChildren {
+  JoinProjectIdPregateRoute: typeof JoinProjectIdPregateRoute
+  JoinProjectIdPreshareRoute: typeof JoinProjectIdPreshareRoute
+  JoinProjectIdShareRoute: typeof JoinProjectIdShareRoute
   JoinProjectIdIndexRoute: typeof JoinProjectIdIndexRoute
   JoinProjectIdExperienceExperienceIdRoute: typeof JoinProjectIdExperienceExperienceIdRoute
 }
 
 const JoinProjectIdRouteRouteChildren: JoinProjectIdRouteRouteChildren = {
+  JoinProjectIdPregateRoute: JoinProjectIdPregateRoute,
+  JoinProjectIdPreshareRoute: JoinProjectIdPreshareRoute,
+  JoinProjectIdShareRoute: JoinProjectIdShareRoute,
   JoinProjectIdIndexRoute: JoinProjectIdIndexRoute,
   JoinProjectIdExperienceExperienceIdRoute:
     JoinProjectIdExperienceExperienceIdRoute,

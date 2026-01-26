@@ -1,0 +1,103 @@
+# Transform Pipeline Trigger Contract
+#
+# Defines how the client triggers the transform pipeline.
+# Uses existing startTransformPipeline HTTP endpoint.
+
+http:
+  endpoint: startTransformPipeline
+  description: |
+    Trigger transform pipeline for a main experience session.
+    Called at main experience completion, before navigating to preshare/share.
+    Fire-and-forget: don't wait for response before navigation.
+
+  url: https://europe-west1-{firebase-project}.cloudfunctions.net/startTransformPipeline
+
+  method: POST
+
+  query_params:
+    projectId:
+      type: string
+      required: true
+      description: Project ID
+
+  request_body:
+    sessionId:
+      type: string
+      required: true
+      description: Main session ID
+
+    stepId:
+      type: string
+      required: true
+      description: Transform step ID from experience config
+
+  response:
+    success:
+      status: 200
+      body:
+        success: true
+        jobId: string
+        message: "Transform pipeline job created"
+
+    errors:
+      - status: 400
+        code: INVALID_REQUEST
+        description: Missing or invalid parameters
+
+      - status: 404
+        code: SESSION_NOT_FOUND
+        description: Session doesn't exist
+
+      - status: 404
+        code: TRANSFORM_NOT_FOUND
+        description: Experience has no transform config
+
+      - status: 409
+        code: JOB_IN_PROGRESS
+        description: Transform job already running for session
+
+      - status: 500
+        code: INTERNAL_ERROR
+        description: Server error
+
+  client_implementation: |
+    /**
+     * Trigger transform pipeline for main experience session
+     * Fire-and-forget: errors are logged but don't block navigation
+     */
+    const triggerTransformPipeline = async (params: {
+      projectId: string
+      sessionId: string
+      stepId: string
+    }): Promise<void> => {
+      const { projectId, sessionId, stepId } = params
+
+      try {
+        const functionsBaseUrl = import.meta.env.VITE_FIREBASE_FUNCTIONS_URL
+        const url = `${functionsBaseUrl}/startTransformPipeline?projectId=${projectId}`
+
+        await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId, stepId }),
+        })
+      } catch (error) {
+        // Log but don't throw - fire-and-forget
+        console.error('Failed to trigger transform pipeline:', error)
+      }
+    }
+
+  usage_context: |
+    Called in ExperiencePage when main experience completes:
+
+    1. Session marked as 'completed'
+    2. Guest completedExperiences updated
+    3. Check if experience has transform config
+    4. If transform exists: call triggerTransformPipeline()
+    5. Navigate to preshare or share (don't wait for trigger)
+
+  notes:
+    - Existing endpoint from 038-pipeline-backend feature
+    - No changes needed to backend for this feature
+    - Client just needs to call the endpoint
+    - Transform step ID found in experience.published.steps where type = 'transform.pipeline'

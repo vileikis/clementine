@@ -141,6 +141,20 @@ export const sessionSchema = z.looseObject({
   resultMedia: sessionResultMediaSchema.nullable().default(null),
 
   /**
+   * JOURNEY LINKING
+   * For pregate/preshare sessions: references the main session ID
+   * For main sessions: null (they are the anchor)
+   *
+   * Linking Flow:
+   * 1. Pregate session created → mainSessionId: null
+   * 2. Main session created → if pregate exists, update pregate: mainSessionId = main.id
+   * 3. Preshare session created → mainSessionId from URL param (main session ID)
+   *
+   * Query: where mainSessionId == "main-456" returns all related sessions
+   */
+  mainSessionId: z.string().nullable().default(null),
+
+  /**
    * TRANSFORM JOB TRACKING
    */
 

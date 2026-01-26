@@ -10,15 +10,18 @@
  * Responsibilities:
  * - Display welcome screen with available experiences
  * - Handle experience selection and navigation
+ * - Check pregate requirement and redirect if needed
  *
  * User Stories:
- * - US2: Guest Selects an Experience (experience selection handler)
+ * - US1: Guest Executes Main Experience
+ * - US2: Guest Completes Pregate Before Main Experience (pregate check)
  * - US4: Guest Views Event with No Available Experiences (empty state)
  */
 import { useMemo } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 
 import { useGuestContext } from '../contexts'
+import { usePregate } from '../hooks'
 import type { ExperienceCardData } from '@/domains/event/welcome'
 import { DEFAULT_WELCOME, WelcomeRenderer } from '@/domains/event/welcome'
 import { ThemeProvider } from '@/shared/theming'
@@ -34,8 +37,11 @@ import { DEFAULT_THEME } from '@/domains/event/theme/constants'
  * Experiences are lazy-loaded - the welcome screen shell renders immediately
  * and experience cards appear once loaded.
  *
- * On experience selection, navigates to the experience page. Session creation
- * is handled by ExperiencePage via useInitSession.
+ * On experience selection:
+ * - If pregate is required → navigates to pregate route with selected experience ID
+ * - If no pregate → navigates directly to experience page
+ *
+ * Session creation is handled by the destination page (PregatePage or ExperiencePage).
  *
  * @example
  * ```tsx
@@ -51,12 +57,16 @@ import { DEFAULT_THEME } from '@/domains/event/theme/constants'
  */
 export function WelcomeScreen() {
   const navigate = useNavigate()
-  const { project, event, experiences } = useGuestContext()
+  const { project, event, guest, experiences } = useGuestContext()
 
   const publishedConfig = event.publishedConfig!
   const welcome = publishedConfig.welcome ?? DEFAULT_WELCOME
   const theme = publishedConfig.theme ?? DEFAULT_THEME
   const mainExperiences = publishedConfig.experiences?.main ?? []
+  const experiencesConfig = publishedConfig.experiences ?? null
+
+  // Pregate check hook
+  const { needsPregate } = usePregate(guest, experiencesConfig)
 
   // Derive card data from full experience documents
   const experienceCardData: ExperienceCardData[] = useMemo(
@@ -69,12 +79,27 @@ export function WelcomeScreen() {
     [experiences],
   )
 
-  // Handle experience selection - just navigate, session created in ExperiencePage
+  /**
+   * Handle experience selection
+   * Routes to pregate if required, otherwise directly to experience
+   */
   const handleSelectExperience = (experienceId: string) => {
-    void navigate({
-      to: '/join/$projectId/experience/$experienceId',
-      params: { projectId: project.id, experienceId },
-    })
+    if (needsPregate()) {
+      // Route to pregate with selected experience ID preserved
+      // Uses push navigation so back returns to welcome
+      void navigate({
+        to: '/join/$projectId/pregate',
+        params: { projectId: project.id },
+        search: { experience: experienceId },
+      })
+    } else {
+      // Route directly to experience
+      // Uses push navigation so back returns to welcome
+      void navigate({
+        to: '/join/$projectId/experience/$experienceId',
+        params: { projectId: project.id, experienceId },
+      })
+    }
   }
 
   return (

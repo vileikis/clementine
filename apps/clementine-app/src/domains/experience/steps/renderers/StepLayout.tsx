@@ -2,10 +2,12 @@
  * StepLayout Component
  *
  * Shared layout wrapper for all step renderers. Provides:
- * - ThemedBackground for consistent styling
  * - Responsive layout with centered content
  * - Fixed bottom navigation on mobile (Back + Next/Continue)
  * - Flexible content on desktop with buttons in flow
+ *
+ * Note: Does NOT include ThemedBackground - parent page/modal owns the background.
+ * This allows the background to persist across state changes for better performance.
  *
  * Must be used within a ThemeProvider.
  *
@@ -30,7 +32,7 @@
 
 import { ChevronLeft } from 'lucide-react'
 import type { ReactNode } from 'react'
-import { ThemedBackground, ThemedButton } from '@/shared/theming'
+import { ThemedButton } from '@/shared/theming'
 import { Button } from '@/ui-kit/ui/button'
 import { cn } from '@/shared/utils'
 
@@ -68,11 +70,10 @@ export function StepLayout({
   const showBackButton = canGoBack && onBack
 
   return (
-    <ThemedBackground
-      className="h-full w-full"
-      contentClassName={cn(
+    <div
+      className={cn(
         // Full height flex container
-        'flex flex-col min-h-full',
+        'flex h-full w-full flex-col',
         // Mobile: pb for fixed button space
         // Desktop: no extra padding needed
         !hideButton && 'pb-20 md:pb-0',
@@ -96,14 +97,14 @@ export function StepLayout({
       {!hideButton && (
         <>
           {/* Mobile: Fixed bottom buttons */}
-          <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/20 to-transparent md:hidden">
+          <div className="fixed bottom-0 left-0 right-0 p-4 bg-linear-to-t from-black/20 to-transparent md:hidden">
             <div className="flex gap-3">
               {showBackButton && (
                 <Button
                   variant="outline"
                   size="lg"
                   onClick={onBack}
-                  className="flex-shrink-0"
+                  className="shrink-0"
                   aria-label="Go back"
                 >
                   <ChevronLeft className="h-5 w-5" />
@@ -144,6 +145,6 @@ export function StepLayout({
           </div>
         </>
       )}
-    </ThemedBackground>
+    </div>
   )
 }

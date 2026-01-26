@@ -120,8 +120,13 @@ service cloud.firestore {
           && request.resource.data.authUid == request.auth.uid
           && request.resource.data.projectId == projectId;
 
-        // UPDATE: Forbidden - guest records are immutable
-        allow update: if false;
+        // UPDATE: Users can update their own guest record
+        // Only completedExperiences field can be modified (for pregate/preshare tracking)
+        // Admins can update any guest record
+        allow update: if isAdmin()
+          || (isAnyUser()
+              && guestId == request.auth.uid
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['completedExperiences']));
 
         // DELETE: Forbidden - guest records are historical
         allow delete: if false;

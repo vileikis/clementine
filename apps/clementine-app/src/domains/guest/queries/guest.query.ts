@@ -52,7 +52,8 @@ export function guestQuery(projectId: string, guestId: string) {
 
       return convertFirestoreDoc(snapshot, guestSchema)
     },
-    staleTime: Infinity, // Guest record doesn't change once created
+    // Real-time updates handled by onSnapshot in useGuest hook
+    // staleTime not needed since listener keeps cache fresh
     refetchOnWindowFocus: false,
   })
 }

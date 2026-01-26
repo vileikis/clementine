@@ -91,6 +91,7 @@ export function useCreateSession() {
           resultMedia: null,
           jobId: null,
           jobStatus: null,
+          mainSessionId: null,
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
           completedAt: null,
