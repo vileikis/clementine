@@ -1,11 +1,10 @@
-import { z } from 'zod'
-
 /**
  * Image MIME Type Schema
  *
- * Defines the allowed image MIME types for media uploads.
- * Used by media-asset schema and MediaPickerField component.
+ * Allowed image MIME types for upload validation.
  */
+import { z } from 'zod'
+
 export const imageMimeTypeSchema = z.enum([
   'image/png',
   'image/jpeg',

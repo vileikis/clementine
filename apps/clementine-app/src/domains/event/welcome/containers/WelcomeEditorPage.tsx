@@ -149,13 +149,18 @@ export function WelcomeEditorPage() {
       setUploadProgress(0)
 
       try {
-        const { mediaAssetId, url } = await uploadHeroMedia.mutateAsync({
-          file,
-          onProgress: (progress) => setUploadProgress(progress),
-        })
+        const { mediaAssetId, url, filePath } =
+          await uploadHeroMedia.mutateAsync({
+            file,
+            onProgress: (progress) => setUploadProgress(progress),
+          })
 
         // Update form with full MediaReference object and trigger save
-        form.setValue('media', { mediaAssetId, url }, { shouldDirty: true })
+        form.setValue(
+          'media',
+          { mediaAssetId, url, filePath },
+          { shouldDirty: true },
+        )
         triggerSave()
         toast.success('Hero image uploaded')
       } catch (error) {

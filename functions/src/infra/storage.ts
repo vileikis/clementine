@@ -1,5 +1,7 @@
+import type { MediaReference } from '@clementine/shared'
+
 import { storage } from './firebase-admin'
-import * as fs from 'fs/promises';
+import * as fs from 'fs/promises'
 
 /**
  * Download a file from Firebase Storage to local filesystem
@@ -75,6 +77,22 @@ export function getOutputStoragePath(
   extension: string
 ): string {
   return `projects/${projectId}/results/${sessionId}-${type}.${extension}`;
+}
+
+/**
+ * Get storage path from a MediaReference
+ *
+ * Uses filePath directly if available (new documents), otherwise falls back
+ * to parsing the URL (legacy documents without filePath).
+ *
+ * @param ref - MediaReference object containing url and optional filePath
+ * @returns Storage path for use with storage.bucket().file()
+ */
+export function getStoragePathFromMediaReference(ref: MediaReference): string {
+  if (ref.filePath) {
+    return ref.filePath
+  }
+  return parseStorageUrl(ref.url)
 }
 
 /**

@@ -38,6 +38,8 @@ interface UploadHeroMediaResult {
   mediaAssetId: string
   /** Media asset URL */
   url: string
+  /** Storage path for server-side access */
+  filePath: string
 }
 
 /**
@@ -67,13 +69,13 @@ export function useUploadAndUpdateHeroMedia(
         )
       }
       // Upload to Storage + create MediaAsset document
-      const { mediaAssetId, url } = await uploadAsset.mutateAsync({
+      const { mediaAssetId, url, filePath } = await uploadAsset.mutateAsync({
         file,
         type: 'other', // Use 'other' for hero images
         onProgress,
       })
 
-      return { mediaAssetId, url }
+      return { mediaAssetId, url, filePath }
     },
   })
 
