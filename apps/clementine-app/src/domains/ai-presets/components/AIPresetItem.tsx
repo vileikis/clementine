@@ -13,6 +13,7 @@ import { toast } from 'sonner'
 import { useDuplicateAIPreset } from '../hooks/useDuplicateAIPreset'
 import { RenameAIPresetDialog } from './RenameAIPresetDialog'
 import { DeleteAIPresetDialog } from './DeleteAIPresetDialog'
+import type { KeyboardEvent } from 'react'
 import type { AIPreset } from '@clementine/shared'
 import type { MenuSection } from '@/shared/components'
 import { ContextDropdownMenu } from '@/shared/components'
@@ -83,7 +84,7 @@ export function AIPresetItem({ preset, workspaceId }: AIPresetItemProps) {
     })
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+  const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault()
       handlePresetClick()
