@@ -11,7 +11,7 @@ import { z } from 'zod'
 
 export const mediaReferenceSchema = z.looseObject({
   mediaAssetId: z.string(),
-  url: z.string().url(),
+  url: z.url(),
   filePath: z.string().nullable().default(null),
 })
 

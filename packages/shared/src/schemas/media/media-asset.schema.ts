@@ -15,7 +15,7 @@ export const mediaAssetSchema = z.looseObject({
   id: z.string(),
   fileName: z.string(),
   filePath: z.string(),
-  url: z.string().url(),
+  url: z.url(),
   fileSize: z.number().int().positive(),
   mimeType: imageMimeTypeSchema,
   width: z.number().int().positive(),
