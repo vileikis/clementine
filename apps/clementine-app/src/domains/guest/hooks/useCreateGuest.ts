@@ -77,6 +77,7 @@ export function useCreateGuest() {
           projectId: validated.projectId,
           authUid: validated.authUid,
           createdAt: serverTimestamp(),
+          completedExperiences: [], // Initialize empty for new guests
         }
 
         transaction.set(guestRef, newGuest)
@@ -87,6 +88,7 @@ export function useCreateGuest() {
           projectId: validated.projectId,
           authUid: validated.authUid,
           createdAt: now,
+          completedExperiences: [],
         })
 
         return {

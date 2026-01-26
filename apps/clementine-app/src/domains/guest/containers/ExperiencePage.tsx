@@ -7,25 +7,41 @@
  * Responsibilities:
  * - Get project/event/experience data from GuestContext
  * - Wait for experiences to load (lazy-loaded by GuestLayout)
+ * - Redirect to pregate if needed (handles direct URL access)
  * - Initialize session via useInitSession (create or subscribe)
+ * - Link pregate session to main session after creation
  * - Update URL with session ID when created
- * - Display session info (placeholder until E7 runtime)
+ * - Handle experience completion (mark complete, navigate)
+ * - Navigate to preshare or share on completion
  *
- * User Story: US2 - Guest Selects an Experience
+ * User Stories:
+ * - US1: Guest Executes Main Experience
+ * - US2: Guest Completes Pregate Before Main Experience (redirect logic)
+ * - US3: Guest Completes Preshare After Main Experience (navigation)
+ * - US4: Session Progress Tracking and Linking
  */
 import { useEffect, useRef } from 'react'
-import { Link, useNavigate } from '@tanstack/react-router'
-import { ArrowLeft } from 'lucide-react'
+import { useNavigate } from '@tanstack/react-router'
 
 import { useGuestContext } from '../contexts'
-import { ErrorPage } from '../components'
-import { useInitSession } from '@/domains/session/shared'
+import {
+  GuestRuntimeContent,
+  ThemedErrorState,
+  ThemedLoadingState,
+} from '../components'
+import { useMarkExperienceComplete, usePregate, usePreshare } from '../hooks'
+import { useInitSession, useLinkSession } from '@/domains/session/shared'
+import { ExperienceRuntime } from '@/domains/experience/runtime'
+import { ThemeProvider, ThemedBackground } from '@/shared/theming'
+import { DEFAULT_THEME } from '@/domains/event/theme/constants'
 
 export interface ExperiencePageProps {
   /** Experience ID from URL params */
   experienceId: string
   /** Session ID from URL query params (may be undefined) */
   sessionId?: string
+  /** Pregate session ID from URL query params (for session linking) */
+  pregateSessionId?: string
 }
 
 /**
@@ -34,9 +50,12 @@ export interface ExperiencePageProps {
  * This component:
  * 1. Gets project/event/experience data from GuestContext (provided by GuestLayout)
  * 2. Waits for experiences to load (lazy-loaded)
- * 3. Validates that the experienceId is enabled for this event
- * 4. Uses useInitSession to create or subscribe to a session
- * 5. Updates the URL with session ID when a new session is created
+ * 3. Redirects to pregate if needed (handles direct URL access)
+ * 4. Validates that the experienceId is enabled for this event
+ * 5. Uses useInitSession to create or subscribe to a session
+ * 6. Links pregate session to main session after creation
+ * 7. Updates the URL with session ID when a new session is created
+ * 8. Handles completion flow (mark complete, transform, navigation)
  *
  * The full Experience object is available from context for use with
  * ExperienceRuntime (experience.published contains steps and transform config).
@@ -46,18 +65,38 @@ export interface ExperiencePageProps {
  * // In route file: src/app/join/$projectId/experience/$experienceId.tsx
  * function JoinExperiencePage() {
  *   const { experienceId } = Route.useParams()
- *   const { session } = Route.useSearch()
- *   return <ExperiencePage experienceId={experienceId} sessionId={session} />
+ *   const { session, pregate } = Route.useSearch()
+ *   return (
+ *     <ExperiencePage
+ *       experienceId={experienceId}
+ *       sessionId={session}
+ *       pregateSessionId={pregate}
+ *     />
+ *   )
  * }
  * ```
  */
 export function ExperiencePage({
   experienceId,
   sessionId: initialSessionId,
+  pregateSessionId,
 }: ExperiencePageProps) {
   const navigate = useNavigate()
-  const { project, event, experiences, experiencesLoading } = useGuestContext()
+  const { project, event, guest, experiences, experiencesLoading } =
+    useGuestContext()
   const urlUpdatedRef = useRef(false)
+  const pregateLinkedRef = useRef(false)
+
+  // Hooks for pregate/preshare logic
+  const experiencesConfig = event.publishedConfig?.experiences ?? null
+  const { needsPregate } = usePregate(guest, experiencesConfig)
+  const { needsPreshare } = usePreshare(guest, experiencesConfig)
+  const markExperienceComplete = useMarkExperienceComplete()
+  const linkSession = useLinkSession()
+
+  // Check pregate requirement BEFORE any other logic
+  // This handles direct URL access to experience without completing pregate
+  const shouldRedirectToPregate = needsPregate()
 
   // Find the experience from context
   const experience = experiences.find((exp) => exp.id === experienceId)
@@ -71,18 +110,42 @@ export function ExperiencePage({
   // Experience is valid if it exists in context AND is enabled in publishedConfig
   const isExperienceValid = !!experience && isExperienceEnabled
 
-  // Only initialize session if experience is valid and loaded
+  // Only initialize session if experience is valid, loaded, and not redirecting to pregate
+  // Note: We call useInitSession unconditionally to preserve hook order,
+  // but disable it via the enabled flag when redirecting to pregate
   const sessionState = useInitSession({
     projectId: project.id,
     workspaceId: project.workspaceId,
     eventId: event.id,
     experienceId,
     initialSessionId,
-    enabled: isExperienceValid && !experiencesLoading,
+    enabled:
+      isExperienceValid && !experiencesLoading && !shouldRedirectToPregate,
   })
+
+  // Redirect to pregate if needed (handles direct URL access)
+  useEffect(() => {
+    if (shouldRedirectToPregate && !experiencesLoading) {
+      void navigate({
+        to: '/join/$projectId/pregate',
+        params: { projectId: project.id },
+        search: { experience: experienceId },
+        replace: true,
+      })
+    }
+  }, [
+    shouldRedirectToPregate,
+    experiencesLoading,
+    navigate,
+    project.id,
+    experienceId,
+  ])
 
   // Update URL with session ID when session is created (if not already in URL)
   useEffect(() => {
+    // Skip URL update if redirecting to pregate
+    if (shouldRedirectToPregate) return
+
     if (
       sessionState.status === 'ready' &&
       sessionState.sessionId !== initialSessionId &&
@@ -92,96 +155,184 @@ export function ExperiencePage({
       void navigate({
         to: '/join/$projectId/experience/$experienceId',
         params: { projectId: project.id, experienceId },
-        search: { session: sessionState.sessionId },
+        search: { session: sessionState.sessionId, pregate: pregateSessionId },
         replace: true,
       })
     }
-  }, [sessionState, initialSessionId, navigate, project.id, experienceId])
+  }, [
+    sessionState,
+    initialSessionId,
+    navigate,
+    project.id,
+    experienceId,
+    pregateSessionId,
+    shouldRedirectToPregate,
+  ])
 
-  // Show loading state while experiences are loading
-  if (experiencesLoading) {
+  // Link pregate session to main session after main session is created
+  useEffect(() => {
+    // Skip linking if redirecting to pregate
+    if (shouldRedirectToPregate) return
+
+    if (
+      sessionState.status === 'ready' &&
+      pregateSessionId &&
+      !pregateLinkedRef.current
+    ) {
+      pregateLinkedRef.current = true
+      const { sessionId: mainSessionId } = sessionState
+      linkSession.mutate({
+        projectId: project.id,
+        sessionId: pregateSessionId,
+        mainSessionId,
+      })
+    }
+  }, [
+    sessionState,
+    pregateSessionId,
+    linkSession.mutate,
+    project.id,
+    shouldRedirectToPregate,
+  ])
+
+  // If redirecting to pregate, don't render anything
+  if (shouldRedirectToPregate && !experiencesLoading) {
+    return null
+  }
+
+  /**
+   * Handle experience completion
+   * Called when guest finishes all steps in the experience
+   */
+  const handleExperienceComplete = async () => {
+    if (sessionState.status !== 'ready') return
+
+    const { sessionId } = sessionState
+
+    // 1. Mark experience as complete in guest record (best effort - don't block navigation)
+    try {
+      await markExperienceComplete.mutateAsync({
+        projectId: project.id,
+        guestId: guest.id,
+        experienceId,
+      })
+    } catch (error) {
+      console.error('Failed to mark experience complete:', error)
+      // Continue with navigation - guest shouldn't be stuck
+    }
+
+    // 2. Navigate to preshare or share
+    if (needsPreshare()) {
+      // Navigate to preshare with main session ID (replace to hide main from history)
+      void navigate({
+        to: '/join/$projectId/preshare',
+        params: { projectId: project.id },
+        search: { session: sessionId },
+        replace: true,
+      })
+    } else {
+      // Navigate directly to share (replace to hide main from history)
+      void navigate({
+        to: '/join/$projectId/share',
+        params: { projectId: project.id },
+        search: { session: sessionId },
+        replace: true,
+      })
+    }
+  }
+
+  // Get theme from event config (with fallback to default)
+  const theme = event.publishedConfig?.theme ?? DEFAULT_THEME
+
+  // Handle error for runtime (logs but doesn't block)
+  const handleRuntimeError = (error: Error) => {
+    console.error('ExperienceRuntime error:', error)
+  }
+
+  // Helper to navigate back to welcome
+  const navigateToWelcome = () =>
+    navigate({
+      to: '/join/$projectId',
+      params: { projectId: project.id },
+    })
+
+  // Determine content to render based on state
+  const renderContent = () => {
+    // Show loading state while experiences are loading
+    if (experiencesLoading) {
+      return <ThemedLoadingState message="Loading experience..." />
+    }
+
+    // Handle invalid experience (not found or not enabled for this event)
+    if (!isExperienceValid) {
+      return (
+        <ThemedErrorState
+          title="Experience Not Available"
+          message="This experience is not available. Please go back and select a different one."
+          actionLabel="Go Back"
+          onAction={navigateToWelcome}
+        />
+      )
+    }
+
+    // Handle error state
+    if (sessionState.status === 'error') {
+      return (
+        <ThemedErrorState
+          title="Error"
+          message="Failed to start experience. Please go back and try again."
+          actionLabel="Go Back"
+          onAction={navigateToWelcome}
+        />
+      )
+    }
+
+    // Show loading state while session is initializing
+    if (sessionState.status === 'loading') {
+      return <ThemedLoadingState message="Starting your experience..." />
+    }
+
+    // sessionState.status === 'ready'
+    const { session } = sessionState
+    const steps = experience?.published?.steps ?? []
+
+    // Handle empty experience (no steps configured)
+    if (steps.length === 0) {
+      return (
+        <ThemedErrorState
+          title="Experience Not Ready"
+          message="This experience doesn't have any steps yet. Please go back and try a different one."
+          actionLabel="Go Back"
+          onAction={navigateToWelcome}
+        />
+      )
+    }
+
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="text-center">
-          <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          <p className="text-muted-foreground">Loading experience...</p>
-        </div>
-      </div>
+      <ExperienceRuntime
+        experienceId={experienceId}
+        steps={steps}
+        session={session}
+        onComplete={() => void handleExperienceComplete()}
+        onError={handleRuntimeError}
+      >
+        <GuestRuntimeContent />
+      </ExperienceRuntime>
     )
   }
 
-  // Handle invalid experience (not found or not enabled for this event)
-  if (!isExperienceValid) {
-    return (
-      <ErrorPage
-        title="Experience Not Available"
-        message="This experience is not available. Please go back and select a different one."
-      />
-    )
-  }
-
-  // Handle error state
-  if (sessionState.status === 'error') {
-    return (
-      <ErrorPage
-        title="Error"
-        message="Failed to start experience. Please go back and try again."
-      />
-    )
-  }
-
-  // Show loading state while session is initializing
-  if (sessionState.status === 'loading') {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="text-center">
-          <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          <p className="text-muted-foreground">Starting your experience...</p>
-        </div>
-      </div>
-    )
-  }
-
-  // sessionState.status === 'ready'
-  const { session, sessionId } = sessionState
-
-  // Placeholder content (full runtime will be in E7)
-  // Note: experience.published is now available for ExperienceRuntime integration
+  // Render with persistent ThemedBackground
+  // Background stays mounted across all state transitions
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
-      <div className="text-center max-w-md">
-        <h1 className="text-2xl font-bold text-foreground">
-          Experience Starting...
-        </h1>
-        <p className="mt-4 text-muted-foreground">
-          Your experience session has been created. The full experience runtime
-          will be available in Epic E7.
-        </p>
-
-        {/* Session info for debugging/verification */}
-        <div className="mt-6 p-4 rounded-lg bg-muted/50 text-left text-sm">
-          <p className="font-medium text-foreground">Session Details</p>
-          <p className="mt-2 text-muted-foreground">
-            <span className="font-mono text-xs break-all">{sessionId}</span>
-          </p>
-          <p className="mt-2 text-muted-foreground text-xs">
-            Status: {session.status}
-          </p>
-          <p className="mt-2 text-muted-foreground text-xs">
-            Experience: {experience.name}
-          </p>
-        </div>
-
-        {/* Back to welcome link */}
-        <Link
-          to="/join/$projectId"
-          params={{ projectId: project.id }}
-          className="mt-6 inline-flex items-center gap-2 text-primary hover:underline"
+    <ThemeProvider theme={theme}>
+      <div className="h-screen">
+        <ThemedBackground
+          className="h-full w-full"
+          contentClassName="h-full w-full"
         >
-          <ArrowLeft className="h-4 w-4" />
-          Back to welcome screen
-        </Link>
+          {renderContent()}
+        </ThemedBackground>
       </div>
-    </div>
+    </ThemeProvider>
   )
 }

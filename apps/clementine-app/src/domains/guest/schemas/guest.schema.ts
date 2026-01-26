@@ -15,6 +15,7 @@ import { z } from 'zod'
  *
  * Represents an anonymous visitor to a project.
  * Created on first visit, used to associate sessions.
+ * Extended with completedExperiences for pregate/preshare skip logic.
  */
 export const guestSchema = z.object({
   /** Document ID (same as authUid) */
@@ -28,6 +29,15 @@ export const guestSchema = z.object({
 
   /** Creation timestamp (Unix ms) */
   createdAt: z.number(),
+
+  /**
+   * Track completed experience IDs for skip logic.
+   * Used to determine if guest should skip pregate/preshare.
+   *
+   * Simple string array - Firestore's arrayUnion deduplicates automatically.
+   * Session linking can be queried via sessions collection if needed.
+   */
+  completedExperiences: z.array(z.string()).default([]),
 })
 
 export type Guest = z.infer<typeof guestSchema>

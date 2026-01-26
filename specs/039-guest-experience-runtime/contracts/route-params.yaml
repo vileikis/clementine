@@ -1,0 +1,184 @@
+# Route Parameters Contract
+#
+# Defines URL parameters for guest journey routes.
+# TanStack Router with Zod validation.
+
+routes:
+  pregate:
+    path: /join/$projectId/pregate
+    description: Pregate experience route
+
+    path_params:
+      projectId:
+        type: string
+        required: true
+        description: Project ID from URL
+
+    search_params:
+      experience:
+        type: string
+        required: true
+        description: |
+          The main experience ID that guest selected from welcome screen.
+          After pregate completion, redirect to this experience.
+
+    validation_schema: |
+      const searchSchema = z.object({
+        experience: z.string().min(1, 'Experience ID required'),
+      })
+
+    navigation_in:
+      from: /join/$projectId/ (WelcomeScreen)
+      method: navigate({ ..., replace: false })
+      example: /join/proj123/pregate?experience=exp456
+
+    navigation_out:
+      to: /join/$projectId/experience/$experienceId
+      method: navigate({ ..., replace: true })
+      example: /join/proj123/experience/exp456?pregate=sess789
+
+  experience:
+    path: /join/$projectId/experience/$experienceId
+    description: Main experience route
+
+    path_params:
+      projectId:
+        type: string
+        required: true
+        description: Project ID
+
+      experienceId:
+        type: string
+        required: true
+        description: Experience ID to execute
+
+    search_params:
+      session:
+        type: string
+        required: false
+        description: |
+          Existing session ID for resumption.
+          If provided, loads existing session instead of creating new.
+
+      pregate:
+        type: string
+        required: false
+        description: |
+          Pregate session ID for linking.
+          If provided, updates pregate session with mainSessionId after main session creation.
+
+    validation_schema: |
+      const searchSchema = z.object({
+        session: z.string().optional(),
+        pregate: z.string().optional(),
+      })
+
+    on_mount_check: |
+      // Handle direct URL access - redirect to pregate if needed
+      if (needsPregate()) {
+        navigate({
+          to: '/join/$projectId/pregate',
+          search: { experience: experienceId },
+          replace: true,
+        })
+      }
+
+    navigation_in:
+      from_welcome:
+        method: navigate({ ..., replace: false })
+        example: /join/proj123/experience/exp456
+
+      from_pregate:
+        method: navigate({ ..., replace: true })
+        example: /join/proj123/experience/exp456?pregate=sess789
+
+    navigation_out:
+      to_preshare:
+        when: preshare configured and guest hasn't completed it
+        method: navigate({ ..., replace: true })
+        example: /join/proj123/preshare?session=mainSess123
+
+      to_share:
+        when: preshare not needed
+        method: navigate({ ..., replace: true })
+        example: /join/proj123/share?session=mainSess123
+
+  preshare:
+    path: /join/$projectId/preshare
+    description: Preshare experience route
+
+    path_params:
+      projectId:
+        type: string
+        required: true
+        description: Project ID
+
+    search_params:
+      session:
+        type: string
+        required: true
+        description: |
+          Main session ID.
+          Used for:
+          1. Creating preshare session with mainSessionId
+          2. Passing to share screen for result display
+
+    validation_schema: |
+      const searchSchema = z.object({
+        session: z.string().min(1, 'Session ID required'),
+      })
+
+    navigation_in:
+      from: /join/$projectId/experience/$experienceId
+      method: navigate({ ..., replace: true })
+      example: /join/proj123/preshare?session=mainSess123
+
+    navigation_out:
+      to: /join/$projectId/share
+      method: navigate({ ..., replace: true })
+      example: /join/proj123/share?session=mainSess123
+
+  share:
+    path: /join/$projectId/share
+    description: Share screen route (placeholder for this feature)
+
+    path_params:
+      projectId:
+        type: string
+        required: true
+        description: Project ID
+
+    search_params:
+      session:
+        type: string
+        required: true
+        description: |
+          Main session ID.
+          Used to:
+          1. Subscribe to session for jobStatus updates
+          2. Display result media when transform completes
+
+    validation_schema: |
+      const searchSchema = z.object({
+        session: z.string().min(1, 'Session ID required'),
+      })
+
+    navigation_in:
+      from_main:
+        when: no preshare needed
+        method: navigate({ ..., replace: true })
+        example: /join/proj123/share?session=mainSess123
+
+      from_preshare:
+        when: preshare completed
+        method: navigate({ ..., replace: true })
+        example: /join/proj123/share?session=mainSess123
+
+# History Stack Behavior
+#
+# Due to replace: true for phase transitions, browser history stays clean:
+#
+# Journey: welcome → pregate → main → preshare → share
+# History: [welcome, pregate] → [welcome, main] → [welcome, preshare] → [welcome, share]
+#
+# Browser back from any post-welcome phase returns to welcome.

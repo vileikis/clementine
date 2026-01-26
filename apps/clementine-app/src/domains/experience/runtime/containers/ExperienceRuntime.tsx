@@ -104,6 +104,7 @@ export function ExperienceRuntime({
   ])
 
   // Sync to Firestore helper - used on navigation events
+  // Returns a promise that rejects on failure (for completion flow to handle)
   const syncToFirestore = useCallback(
     async (options: {
       answers?: typeof store.answers
@@ -119,7 +120,10 @@ export function ExperienceRuntime({
         store.markSynced()
       } catch (error) {
         store.setSyncing(false)
-        onError?.(error instanceof Error ? error : new Error('Sync failed'))
+        const syncError =
+          error instanceof Error ? error : new Error('Sync failed')
+        onError?.(syncError)
+        throw syncError // Re-throw so callers can handle
       }
     },
     [
@@ -131,13 +135,6 @@ export function ExperienceRuntime({
       store.markSynced,
     ],
   )
-
-  // Handle zero steps edge case
-  useEffect(() => {
-    if (steps.length === 0 && !store.isComplete) {
-      store.complete()
-    }
-  }, [steps.length, store.isComplete, store.complete])
 
   // React to step changes - sync on forward navigation only
   useEffect(() => {
@@ -174,40 +171,44 @@ export function ExperienceRuntime({
   ])
 
   // React to completion
+  // Note: No cancellation pattern - hasCompletedRef prevents re-execution.
+  // Once completion starts, it must run to completion to call onComplete.
+  // Sync must succeed before we mark complete - if sync fails, we don't proceed.
   useEffect(() => {
     if (!store.isReady) return
     if (!store.isComplete) return
     if (hasCompletedRef.current) return // Already completed
 
-    // Cancellation flag to prevent acting after unmount
-    let cancelled = false
-
-    hasCompletedRef.current = true
-
     // Sync final state before completing
-    syncToFirestore({
-      answers: store.answers,
-      capturedMedia: store.capturedMedia,
-    })
-      .then(() => {
-        if (cancelled) return
-        return completeSession.mutateAsync({
+    // Only proceed with completion if sync succeeds
+    const runCompletion = async () => {
+      // Step 1: Sync to Firestore
+      try {
+        await syncToFirestore({
+          answers: store.answers,
+          capturedMedia: store.capturedMedia,
+        })
+      } catch {
+        // Error already reported by syncToFirestore via onError
+        return
+      }
+
+      // Step 2: Mark as completed only after successful sync
+      hasCompletedRef.current = true
+
+      // Step 3: Complete the session
+      try {
+        await completeSession.mutateAsync({
           projectId: session.projectId,
           sessionId: session.id,
         })
-      })
-      .then(() => {
-        if (cancelled) return
         onComplete?.()
-      })
-      .catch((error) => {
-        if (cancelled) return
+      } catch (error) {
         onError?.(error instanceof Error ? error : new Error('Complete failed'))
-      })
-
-    return () => {
-      cancelled = true
+      }
     }
+
+    void runCompletion()
   }, [
     store.isReady,
     store.isComplete,
@@ -215,7 +216,7 @@ export function ExperienceRuntime({
     store.capturedMedia,
     session.projectId,
     session.id,
-    completeSession,
+    completeSession.mutateAsync,
     syncToFirestore,
     onComplete,
     onError,
