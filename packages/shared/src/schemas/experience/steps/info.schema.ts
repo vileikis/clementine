@@ -6,18 +6,7 @@
  */
 import { z } from 'zod'
 
-/**
- * Media asset reference schema
- * Points to an asset in the media library
- */
-export const experienceMediaAssetSchema = z
-  .object({
-    /** Reference to media asset in media library */
-    mediaAssetId: z.string().min(1),
-    /** Full public URL for immediate rendering */
-    url: z.url(),
-  })
-  .nullable()
+import { experienceMediaAssetSchema } from '../../media/media-reference.schema'
 
 /**
  * Experience info step configuration schema
@@ -34,4 +23,9 @@ export const experienceInfoStepConfigSchema = z.object({
 export type ExperienceInfoStepConfig = z.infer<
   typeof experienceInfoStepConfigSchema
 >
-export type ExperienceMediaAsset = z.infer<typeof experienceMediaAssetSchema>
+
+// Re-export for backward compatibility
+export {
+  experienceMediaAssetSchema,
+  type ExperienceMediaAsset,
+} from '../../media/media-reference.schema'

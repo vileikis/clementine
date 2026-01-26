@@ -221,6 +221,7 @@ describe('themeBackgroundSchema', () => {
     expect(result.image).toEqual({
       mediaAssetId: 'abc123',
       url: 'https://example.com/bg.jpg',
+      filePath: null,
     })
   })
 

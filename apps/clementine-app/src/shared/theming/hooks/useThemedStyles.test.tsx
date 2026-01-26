@@ -19,7 +19,11 @@ const mockTheme: Theme = {
   },
   background: {
     color: '#F0F0F0',
-    image: { mediaAssetId: 'abc123', url: 'https://example.com/bg.jpg' },
+    image: {
+      mediaAssetId: 'abc123',
+      url: 'https://example.com/bg.jpg',
+      filePath: null,
+    },
     overlayOpacity: 0.5,
   },
 }

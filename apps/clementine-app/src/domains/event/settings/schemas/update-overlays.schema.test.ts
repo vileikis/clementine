@@ -19,10 +19,10 @@ describe('updateOverlaysConfigSchema', () => {
 
       const result = updateOverlaysConfigSchema.parse(update)
 
-      expect(result).toEqual(update)
       expect(result['1:1']).toEqual({
         mediaAssetId: 'asset-123',
         url: 'https://storage.googleapis.com/square.png',
+        filePath: null,
       })
     })
 
@@ -36,10 +36,10 @@ describe('updateOverlaysConfigSchema', () => {
 
       const result = updateOverlaysConfigSchema.parse(update)
 
-      expect(result).toEqual(update)
       expect(result['9:16']).toEqual({
         mediaAssetId: 'asset-456',
         url: 'https://storage.googleapis.com/portrait.png',
+        filePath: null,
       })
     })
 
@@ -57,9 +57,16 @@ describe('updateOverlaysConfigSchema', () => {
 
       const result = updateOverlaysConfigSchema.parse(update)
 
-      expect(result).toEqual(update)
-      expect(result['1:1']).toBeDefined()
-      expect(result['9:16']).toBeDefined()
+      expect(result['1:1']).toEqual({
+        mediaAssetId: 'asset-123',
+        url: 'https://storage.googleapis.com/square.png',
+        filePath: null,
+      })
+      expect(result['9:16']).toEqual({
+        mediaAssetId: 'asset-456',
+        url: 'https://storage.googleapis.com/portrait.png',
+        filePath: null,
+      })
     })
 
     it('should accept empty object as valid partial update', () => {
@@ -184,7 +191,11 @@ describe('updateOverlaysConfigSchema', () => {
 
       expect(result.success).toBe(true)
       if (result.success) {
-        expect(result.data).toEqual(validUpdate)
+        expect(result.data['1:1']).toEqual({
+          mediaAssetId: 'asset-123',
+          url: 'https://storage.googleapis.com/square.png',
+          filePath: null,
+        })
       }
     })
 
@@ -272,7 +283,11 @@ describe('overlayReferenceSchema', () => {
 
       const result = overlayReferenceSchema.parse(validReference)
 
-      expect(result).toEqual(validReference)
+      expect(result).toEqual({
+        mediaAssetId: 'asset-123',
+        url: 'https://storage.googleapis.com/image.png',
+        filePath: null,
+      })
     })
 
     it('should validate overlay reference with Firebase Storage URL', () => {
@@ -283,7 +298,11 @@ describe('overlayReferenceSchema', () => {
 
       const result = overlayReferenceSchema.parse(validReference)
 
-      expect(result).toEqual(validReference)
+      expect(result).toEqual({
+        mediaAssetId: 'asset-456',
+        url: 'https://firebasestorage.googleapis.com/v0/b/bucket/o/image.png?alt=media&token=abc123',
+        filePath: null,
+      })
     })
 
     it('should accept null as valid overlay reference', () => {

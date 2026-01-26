@@ -20,6 +20,7 @@ describe('overlayReferenceSchema', () => {
     expect(result).toEqual({
       mediaAssetId: 'asset-123',
       url: 'https://example.com/overlay.png',
+      filePath: null,
     })
   })
 
@@ -57,7 +58,7 @@ describe('overlaysConfigSchema', () => {
       '1:1': overlay,
       '9:16': null,
     })
-    expect(result!['1:1']).toEqual(overlay)
+    expect(result!['1:1']).toEqual({ ...overlay, filePath: null })
     expect(result!['9:16']).toBeNull()
   })
 })
@@ -152,6 +153,7 @@ describe('welcomeConfigSchema', () => {
     expect(result.media).toEqual({
       mediaAssetId: 'asset-1',
       url: 'https://example.com/welcome.png',
+      filePath: null,
     })
   })
 })

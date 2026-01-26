@@ -118,7 +118,11 @@ describe('themeBackgroundSchema', () => {
     const result = themeBackgroundSchema.parse({
       image: { mediaAssetId: 'asset-123', url: 'https://example.com/image.png' },
     })
-    expect(result.image).toEqual({ mediaAssetId: 'asset-123', url: 'https://example.com/image.png' })
+    expect(result.image).toEqual({
+      mediaAssetId: 'asset-123',
+      url: 'https://example.com/image.png',
+      filePath: null,
+    })
   })
 
   it('rejects invalid image url format', () => {
