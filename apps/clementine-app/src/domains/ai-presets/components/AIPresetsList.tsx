@@ -11,36 +11,32 @@ export interface AIPresetsListProps {
   /** List of AI presets to display */
   presets: AIPreset[]
 
+  /** Workspace ID for mutations */
+  workspaceId: string
+
   /** Loading state */
   isLoading?: boolean
-
-  /** Render function for dropdown menu items per preset */
-  renderMenuItems?: (preset: AIPreset) => React.ReactNode
 }
 
 /**
  * AIPresetsList component
  *
  * Displays all active AI presets in a list with loading and empty states.
+ * Each item is self-contained with its own context menu and dialogs.
  *
  * @example
  * ```tsx
  * <AIPresetsList
  *   presets={presets}
+ *   workspaceId={workspaceId}
  *   isLoading={isLoading}
- *   renderMenuItems={(preset) => (
- *     <>
- *       <DropdownMenuItem>Rename</DropdownMenuItem>
- *       <DropdownMenuItem>Delete</DropdownMenuItem>
- *     </>
- *   )}
  * />
  * ```
  */
 export function AIPresetsList({
   presets,
+  workspaceId,
   isLoading = false,
-  renderMenuItems,
 }: AIPresetsListProps) {
   // Loading state
   if (isLoading) {
@@ -75,9 +71,7 @@ export function AIPresetsList({
         <AIPresetItem
           key={preset.id}
           preset={preset}
-          renderMenuItems={
-            renderMenuItems ? () => renderMenuItems(preset) : undefined
-          }
+          workspaceId={workspaceId}
         />
       ))}
     </div>

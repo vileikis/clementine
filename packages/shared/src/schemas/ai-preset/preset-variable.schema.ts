@@ -35,15 +35,6 @@ export const textVariableSchema = z.object({
       'Variable name must start with a letter or underscore and contain only alphanumeric characters and underscores',
     ),
 
-  /** Human-readable label for UI */
-  label: z.string().min(1).max(100),
-
-  /** Optional description for documentation */
-  description: z.string().max(500).nullable().default(null),
-
-  /** Whether this variable is required */
-  required: z.boolean().default(true),
-
   /** Default value if not provided or unmapped */
   defaultValue: z.string().nullable().default(null),
 
@@ -65,15 +56,6 @@ export const imageVariableSchema = z.object({
       /^[a-zA-Z_][a-zA-Z0-9_]*$/,
       'Variable name must start with a letter or underscore and contain only alphanumeric characters and underscores',
     ),
-
-  /** Human-readable label for UI */
-  label: z.string().min(1).max(100),
-
-  /** Optional description for documentation */
-  description: z.string().max(500).nullable().default(null),
-
-  /** Whether this variable is required */
-  required: z.boolean().default(true),
 })
 
 /**
