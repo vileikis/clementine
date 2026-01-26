@@ -35,16 +35,35 @@ export interface GuestLayoutProps {
 }
 
 /**
- * Extract enabled experience IDs from published config
+ * Extract all experience IDs from published config
+ * Includes: main experiences, pregate experience, and preshare experience
  */
-function getEnabledExperienceIds(
+function getAllExperienceIds(
   publishedConfig: ProjectEventFull['publishedConfig'],
 ): string[] {
-  return (
+  const ids: string[] = []
+
+  // Add main experiences
+  const mainIds =
     publishedConfig?.experiences?.main
       ?.filter((ref) => ref.enabled)
       ?.map((ref) => ref.experienceId) ?? []
-  )
+  ids.push(...mainIds)
+
+  // Add pregate experience if configured
+  const pregateId = publishedConfig?.experiences?.pregate?.experienceId
+  if (pregateId) {
+    ids.push(pregateId)
+  }
+
+  // Add preshare experience if configured
+  const preshareId = publishedConfig?.experiences?.preshare?.experienceId
+  if (preshareId) {
+    ids.push(preshareId)
+  }
+
+  // Remove duplicates (in case same experience is used in multiple places)
+  return [...new Set(ids)]
 }
 
 /**
@@ -75,7 +94,7 @@ export function GuestLayout({ projectId }: GuestLayoutProps) {
   const isReady = baseState.status === 'ready'
   const workspaceId = isReady ? baseState.project.workspaceId : ''
   const enabledIds = isReady
-    ? getEnabledExperienceIds(baseState.event.publishedConfig)
+    ? getAllExperienceIds(baseState.event.publishedConfig)
     : []
 
   const experiencesQuery = useExperiencesByIds(workspaceId, enabledIds, {
