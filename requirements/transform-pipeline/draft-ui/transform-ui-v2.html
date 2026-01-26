@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transform Pipeline Editor v2</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .mention-variable {
+      background: #dbeafe;
+      color: #1e40af;
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-weight: 500;
+    }
+    .mention-image {
+      background: #dcfce7;
+      color: #166534;
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-weight: 500;
+    }
+    .media-thumb {
+      transition: all 0.15s ease;
+    }
+    .media-thumb:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .media-thumb:hover .media-overlay {
+      opacity: 1;
+    }
+    .media-overlay {
+      opacity: 0;
+      transition: opacity 0.15s ease;
+    }
+    .autocomplete-item:hover {
+      background: #f1f5f9;
+    }
+    .prompt-editor {
+      min-height: 180px;
+      line-height: 1.8;
+    }
+    .prompt-editor:focus {
+      outline: none;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 min-h-screen">
+  <!-- Header -->
+  <div class="bg-slate-900 text-white px-6 py-4">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <button class="text-slate-400 hover:text-white">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        </button>
+        <span class="text-lg font-semibold">Transform Pipeline</span>
+        <span class="text-slate-500">•</span>
+        <span class="text-slate-400 text-sm">Hobbitify Experience</span>
+      </div>
+      <button class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700">
+        Save Changes
+      </button>
+    </div>
+  </div>
+
+  <div class="flex">
+    <!-- Main Content -->
+    <div class="flex-1 p-6 space-y-6">
+
+      <!-- Media Registry - Compact Grid -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="font-semibold text-slate-900">Media</h2>
+            <p class="text-sm text-slate-500">Reference with <span class="mention-image text-xs">@name</span> in your prompt</p>
+          </div>
+          <button class="px-3 py-1.5 bg-slate-100 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-200 flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            Add from Library
+          </button>
+        </div>
+
+        <div class="flex gap-3 flex-wrap">
+          <!-- Captured Media -->
+          <div class="media-thumb relative group cursor-pointer">
+            <div class="w-20 h-20 bg-gradient-to-br from-green-100 to-green-200 rounded-xl flex items-center justify-center text-3xl border-2 border-green-400">
+              📷
+            </div>
+            <div class="media-overlay absolute inset-0 bg-black/50 rounded-xl flex items-center justify-center">
+              <button class="w-6 h-6 bg-red-500 rounded-full text-white text-xs hover:bg-red-600">×</button>
+            </div>
+            <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-green-600 text-white text-xs px-2 py-0.5 rounded-full whitespace-nowrap">
+              user_photo
+            </div>
+          </div>
+
+          <!-- Cat -->
+          <div class="media-thumb relative group cursor-pointer">
+            <div class="w-20 h-20 bg-gradient-to-br from-amber-100 to-amber-200 rounded-xl flex items-center justify-center text-3xl border border-slate-200">
+              🐱
+            </div>
+            <div class="media-overlay absolute inset-0 bg-black/50 rounded-xl flex items-center justify-center">
+              <button class="w-6 h-6 bg-red-500 rounded-full text-white text-xs hover:bg-red-600">×</button>
+            </div>
+            <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-slate-700 text-white text-xs px-2 py-0.5 rounded-full">
+              cat
+            </div>
+          </div>
+
+          <!-- Dog -->
+          <div class="media-thumb relative group cursor-pointer">
+            <div class="w-20 h-20 bg-gradient-to-br from-amber-100 to-amber-200 rounded-xl flex items-center justify-center text-3xl border border-slate-200">
+              🐕
+            </div>
+            <div class="media-overlay absolute inset-0 bg-black/50 rounded-xl flex items-center justify-center">
+              <button class="w-6 h-6 bg-red-500 rounded-full text-white text-xs hover:bg-red-600">×</button>
+            </div>
+            <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-slate-700 text-white text-xs px-2 py-0.5 rounded-full">
+              dog
+            </div>
+          </div>
+
+          <!-- Hobbiton -->
+          <div class="media-thumb relative group cursor-pointer">
+            <div class="w-20 h-20 bg-gradient-to-br from-green-100 to-emerald-200 rounded-xl flex items-center justify-center text-3xl border border-slate-200">
+              🏡
+            </div>
+            <div class="media-overlay absolute inset-0 bg-black/50 rounded-xl flex items-center justify-center">
+              <button class="w-6 h-6 bg-red-500 rounded-full text-white text-xs hover:bg-red-600">×</button>
+            </div>
+            <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-slate-700 text-white text-xs px-2 py-0.5 rounded-full">
+              hobbiton
+            </div>
+          </div>
+
+          <!-- Rivendell -->
+          <div class="media-thumb relative group cursor-pointer">
+            <div class="w-20 h-20 bg-gradient-to-br from-blue-100 to-indigo-200 rounded-xl flex items-center justify-center text-3xl border border-slate-200">
+              🏔️
+            </div>
+            <div class="media-overlay absolute inset-0 bg-black/50 rounded-xl flex items-center justify-center">
+              <button class="w-6 h-6 bg-red-500 rounded-full text-white text-xs hover:bg-red-600">×</button>
+            </div>
+            <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-slate-700 text-white text-xs px-2 py-0.5 rounded-full">
+              rivendell
+            </div>
+          </div>
+
+          <!-- Art Style -->
+          <div class="media-thumb relative group cursor-pointer">
+            <div class="w-20 h-20 bg-gradient-to-br from-violet-100 to-purple-200 rounded-xl flex items-center justify-center text-3xl border border-slate-200">
+              🎨
+            </div>
+            <div class="media-overlay absolute inset-0 bg-black/50 rounded-xl flex items-center justify-center">
+              <button class="w-6 h-6 bg-red-500 rounded-full text-white text-xs hover:bg-red-600">×</button>
+            </div>
+            <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-slate-700 text-white text-xs px-2 py-0.5 rounded-full">
+              art_style
+            </div>
+          </div>
+
+          <!-- Add Button -->
+          <div class="w-20 h-20 border-2 border-dashed border-slate-300 rounded-xl flex items-center justify-center text-slate-400 hover:border-slate-400 hover:text-slate-500 cursor-pointer">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Variables Section -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="font-semibold text-slate-900">Variables</h2>
+            <p class="text-sm text-slate-500">Map step answers to prompt text • Reference with <span class="mention-variable text-xs">@name</span></p>
+          </div>
+          <button class="px-3 py-1.5 bg-slate-100 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-200 flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            Add Variable
+          </button>
+        </div>
+
+        <div class="space-y-3">
+          <!-- Variable: pet -->
+          <details class="group border border-slate-200 rounded-lg overflow-hidden" open>
+            <summary class="flex items-center justify-between px-4 py-3 bg-slate-50 cursor-pointer hover:bg-slate-100">
+              <div class="flex items-center gap-3">
+                <span class="mention-variable font-medium">@pet</span>
+                <span class="text-slate-400">←</span>
+                <span class="text-sm text-slate-600">Pet Choice step</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="text-xs text-slate-500">3 mappings</span>
+                <svg class="w-4 h-4 text-slate-400 group-open:rotate-90 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+              </div>
+            </summary>
+            <div class="p-4 space-y-2 bg-white">
+              <div class="flex items-center gap-3 text-sm">
+                <span class="bg-slate-100 px-3 py-1 rounded font-medium min-w-[80px] text-center">cat</span>
+                <span class="text-slate-400">→</span>
+                <span class="flex-1 bg-slate-50 px-3 py-1.5 rounded border border-slate-200">
+                  holding a cat (see <span class="mention-image text-xs">@cat</span>)
+                </span>
+              </div>
+              <div class="flex items-center gap-3 text-sm">
+                <span class="bg-slate-100 px-3 py-1 rounded font-medium min-w-[80px] text-center">dog</span>
+                <span class="text-slate-400">→</span>
+                <span class="flex-1 bg-slate-50 px-3 py-1.5 rounded border border-slate-200">
+                  holding a dog (see <span class="mention-image text-xs">@dog</span>)
+                </span>
+              </div>
+              <div class="flex items-center gap-3 text-sm">
+                <span class="bg-slate-100 px-3 py-1 rounded font-medium min-w-[80px] text-center">none</span>
+                <span class="text-slate-400">→</span>
+                <span class="flex-1 bg-slate-50 px-3 py-1.5 rounded border border-slate-200">
+                  with empty hands
+                </span>
+              </div>
+              <button class="text-sm text-blue-600 hover:text-blue-700 mt-2">+ Add mapping</button>
+            </div>
+          </details>
+
+          <!-- Variable: background -->
+          <details class="group border border-slate-200 rounded-lg overflow-hidden">
+            <summary class="flex items-center justify-between px-4 py-3 bg-slate-50 cursor-pointer hover:bg-slate-100">
+              <div class="flex items-center gap-3">
+                <span class="mention-variable font-medium">@background</span>
+                <span class="text-slate-400">←</span>
+                <span class="text-sm text-slate-600">Background Choice step</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="text-xs text-slate-500">2 mappings</span>
+                <svg class="w-4 h-4 text-slate-400 group-open:rotate-90 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+              </div>
+            </summary>
+            <div class="p-4 space-y-2 bg-white">
+              <div class="flex items-center gap-3 text-sm">
+                <span class="bg-slate-100 px-3 py-1 rounded font-medium min-w-[80px] text-center">hobbiton</span>
+                <span class="text-slate-400">→</span>
+                <span class="flex-1 bg-slate-50 px-3 py-1.5 rounded border border-slate-200">
+                  in the rolling hills of the Shire <span class="mention-image text-xs">@hobbiton</span>
+                </span>
+              </div>
+              <div class="flex items-center gap-3 text-sm">
+                <span class="bg-slate-100 px-3 py-1 rounded font-medium min-w-[80px] text-center">rivendell</span>
+                <span class="text-slate-400">→</span>
+                <span class="flex-1 bg-slate-50 px-3 py-1.5 rounded border border-slate-200">
+                  in the elven realm of Rivendell <span class="mention-image text-xs">@rivendell</span>
+                </span>
+              </div>
+            </div>
+          </details>
+
+          <!-- Variable: phrase (pass-through) -->
+          <details class="group border border-slate-200 rounded-lg overflow-hidden">
+            <summary class="flex items-center justify-between px-4 py-3 bg-slate-50 cursor-pointer hover:bg-slate-100">
+              <div class="flex items-center gap-3">
+                <span class="mention-variable font-medium">@phrase</span>
+                <span class="text-slate-400">←</span>
+                <span class="text-sm text-slate-600">Phrase Input step</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="text-xs bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full">pass-through</span>
+                <svg class="w-4 h-4 text-slate-400 group-open:rotate-90 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+              </div>
+            </summary>
+            <div class="p-4 bg-white">
+              <div class="text-sm text-slate-500">
+                Raw value from step is used directly in the prompt.
+              </div>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- Prompt Editor -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="font-semibold text-slate-900">Prompt</h2>
+            <p class="text-sm text-slate-500">Type <span class="bg-slate-100 px-1.5 py-0.5 rounded font-mono text-xs">@</span> to insert variables or images</p>
+          </div>
+          <div class="flex gap-3">
+            <select class="px-3 py-1.5 bg-slate-100 border-0 rounded-lg text-sm font-medium">
+              <option>gemini-2.5-pro</option>
+              <option>gemini-2.5-flash</option>
+              <option>gemini-3.0</option>
+            </select>
+            <select class="px-3 py-1.5 bg-slate-100 border-0 rounded-lg text-sm font-medium">
+              <option>3:2</option>
+              <option>1:1</option>
+              <option>2:3</option>
+              <option>16:9</option>
+              <option>9:16</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Editor with Autocomplete -->
+        <div class="relative">
+          <div class="border border-slate-200 rounded-lg p-4 prompt-editor focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-100" contenteditable="false">
+            <p class="mb-3">
+              Transform the person in <span class="mention-image">@user_photo</span> into a hobbit character from Middle-earth.
+            </p>
+            <p class="mb-3">
+              They should be <span class="mention-variable">@pet</span>.
+            </p>
+            <p class="mb-3">
+              Set the scene <span class="mention-variable">@background</span>.
+            </p>
+            <p class="mb-3">
+              Use <span class="mention-image">@art_style</span> as the artistic style reference.
+            </p>
+            <p>
+              Add a text overlay: "<span class="mention-variable">@phrase</span>"
+            </p>
+          </div>
+
+          <!-- Autocomplete Dropdown (shown when typing @) -->
+          <div class="absolute top-24 left-48 bg-white rounded-lg shadow-xl border border-slate-200 w-64 overflow-hidden z-10 hidden" id="autocomplete">
+            <div class="px-3 py-2 text-xs font-semibold text-slate-400 uppercase bg-slate-50">Variables</div>
+            <div class="autocomplete-item px-3 py-2 flex items-center gap-2 cursor-pointer">
+              <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+              <span class="font-medium">pet</span>
+              <span class="text-xs text-slate-400 ml-auto">Pet Choice</span>
+            </div>
+            <div class="autocomplete-item px-3 py-2 flex items-center gap-2 cursor-pointer bg-blue-50">
+              <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+              <span class="font-medium">background</span>
+              <span class="text-xs text-slate-400 ml-auto">Background Choice</span>
+            </div>
+            <div class="autocomplete-item px-3 py-2 flex items-center gap-2 cursor-pointer">
+              <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+              <span class="font-medium">phrase</span>
+              <span class="text-xs text-slate-400 ml-auto">Phrase Input</span>
+            </div>
+            <div class="px-3 py-2 text-xs font-semibold text-slate-400 uppercase bg-slate-50 border-t border-slate-100">Images</div>
+            <div class="autocomplete-item px-3 py-2 flex items-center gap-2 cursor-pointer">
+              <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+              <span class="font-medium">user_photo</span>
+              <span class="text-xs text-slate-400 ml-auto">📷</span>
+            </div>
+            <div class="autocomplete-item px-3 py-2 flex items-center gap-2 cursor-pointer">
+              <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+              <span class="font-medium">cat</span>
+              <span class="text-xs text-slate-400 ml-auto">🐱</span>
+            </div>
+            <div class="autocomplete-item px-3 py-2 flex items-center gap-2 cursor-pointer">
+              <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+              <span class="font-medium">hobbiton</span>
+              <span class="text-xs text-slate-400 ml-auto">🏡</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tip -->
+        <div class="mt-3 flex items-center gap-2 text-sm text-slate-500">
+          <span class="bg-slate-100 px-1.5 py-0.5 rounded font-mono text-xs">@</span>
+          <span>to mention</span>
+          <span class="mx-2">•</span>
+          <span class="w-2 h-2 bg-blue-500 rounded-full inline-block"></span>
+          <span>variable</span>
+          <span class="w-2 h-2 bg-green-500 rounded-full inline-block ml-2"></span>
+          <span>image</span>
+        </div>
+      </div>
+
+      <!-- Preview -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-semibold text-slate-900">Preview</h2>
+          <div class="flex items-center gap-2">
+            <span class="text-sm text-slate-500">Sample:</span>
+            <select class="px-3 py-1.5 bg-slate-100 border-0 rounded-lg text-sm">
+              <option>cat + hobbiton + "Adventure!"</option>
+              <option>dog + rivendell + "Hello!"</option>
+              <option>none + hobbiton + "Welcome!"</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Resolved Prompt -->
+        <div class="bg-slate-900 rounded-lg p-4 font-mono text-sm mb-4">
+          <div class="text-slate-500 text-xs mb-2">Resolved prompt</div>
+          <div class="text-green-400 leading-relaxed whitespace-pre-wrap">Transform the person in @user_photo into a hobbit character from Middle-earth.
+
+They should be holding a cat (see @cat).
+
+Set the scene in the rolling hills of the Shire @hobbiton.
+
+Use @art_style as the artistic style reference.
+
+Add a text overlay: "Adventure!"</div>
+        </div>
+
+        <!-- Images that will be sent -->
+        <div class="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
+          <div class="flex items-center gap-3">
+            <span class="text-sm font-medium text-green-800">Images to send:</span>
+            <div class="flex gap-2">
+              <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center text-lg" title="user_photo">📷</div>
+              <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center text-lg" title="cat">🐱</div>
+              <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center text-lg" title="hobbiton">🏡</div>
+              <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center text-lg" title="art_style">🎨</div>
+            </div>
+          </div>
+          <div class="text-sm text-green-700">
+            <span class="font-semibold">4</span> of 6 images
+          </div>
+        </div>
+
+        <!-- Not included -->
+        <div class="flex items-center gap-3 mt-3 text-sm text-slate-500">
+          <span>Not referenced:</span>
+          <div class="flex gap-2">
+            <div class="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center text-sm opacity-50" title="dog">🐕</div>
+            <div class="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center text-sm opacity-50" title="rivendell">🏔️</div>
+          </div>
+          <span class="text-slate-400">(won't be sent to AI)</span>
+        </div>
+
+        <!-- Validation -->
+        <div class="mt-4 p-3 bg-green-50 rounded-lg border border-green-200 flex items-center gap-2">
+          <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span class="text-sm text-green-800">All references valid</span>
+        </div>
+      </div>
+
+      <!-- Output Format -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+        <h2 class="font-semibold text-slate-900 mb-3">Output Format</h2>
+        <div class="flex gap-2">
+          <button class="px-5 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg">Image</button>
+          <button class="px-5 py-2.5 bg-slate-100 text-slate-600 text-sm font-medium rounded-lg hover:bg-slate-200">GIF</button>
+          <button class="px-5 py-2.5 bg-slate-100 text-slate-600 text-sm font-medium rounded-lg hover:bg-slate-200">Video</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right Sidebar - Quick Reference (optional, collapsible) -->
+    <div class="w-64 bg-white border-l border-slate-200 p-4 hidden lg:block">
+      <h3 class="font-semibold text-slate-900 mb-3">Quick Reference</h3>
+
+      <div class="mb-4">
+        <div class="text-xs font-semibold text-slate-400 uppercase mb-2">Variables</div>
+        <div class="space-y-1">
+          <div class="text-sm"><span class="mention-variable text-xs">@pet</span></div>
+          <div class="text-sm"><span class="mention-variable text-xs">@background</span></div>
+          <div class="text-sm"><span class="mention-variable text-xs">@phrase</span></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="text-xs font-semibold text-slate-400 uppercase mb-2">Images</div>
+        <div class="space-y-1">
+          <div class="text-sm"><span class="mention-image text-xs">@user_photo</span></div>
+          <div class="text-sm"><span class="mention-image text-xs">@cat</span></div>
+          <div class="text-sm"><span class="mention-image text-xs">@dog</span></div>
+          <div class="text-sm"><span class="mention-image text-xs">@hobbiton</span></div>
+          <div class="text-sm"><span class="mention-image text-xs">@rivendell</span></div>
+          <div class="text-sm"><span class="mention-image text-xs">@art_style</span></div>
+        </div>
+      </div>
+
+      <div class="mt-6 p-3 bg-blue-50 rounded-lg text-xs text-blue-800">
+        <strong>Tip:</strong> Only images referenced in the resolved prompt are sent to AI. This saves costs and improves quality.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Demo: Toggle autocomplete visibility on click
+    document.querySelector('.prompt-editor').addEventListener('click', function() {
+      const ac = document.getElementById('autocomplete');
+      ac.classList.toggle('hidden');
+    });
+  </script>
+</body>
+</html>

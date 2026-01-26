@@ -1,0 +1,153 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 750">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#64748b"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#22c55e"/>
+    </marker>
+    <marker id="arrow-blue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#3b82f6"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1100" height="750" fill="#f8fafc"/>
+
+  <!-- Title -->
+  <text x="550" y="35" font-family="system-ui, sans-serif" font-size="22" font-weight="bold" fill="#1e293b" text-anchor="middle">Proposed Transform Architecture</text>
+  <text x="550" y="58" font-family="system-ui, sans-serif" font-size="13" fill="#22c55e" text-anchor="middle">Centralized mediaRegistry + Text-only variableMappings + Prompt-based image inclusion</text>
+
+  <!-- Experience Steps Section -->
+  <rect x="30" y="90" width="180" height="180" rx="8" fill="#e0f2fe" stroke="#0284c7" stroke-width="2"/>
+  <text x="120" y="115" font-family="system-ui, sans-serif" font-size="13" font-weight="bold" fill="#0369a1" text-anchor="middle">Experience Steps</text>
+
+  <rect x="45" y="130" width="150" height="32" rx="4" fill="white" stroke="#0284c7"/>
+  <text x="120" y="150" font-family="system-ui, sans-serif" font-size="10" fill="#1e293b" text-anchor="middle">petStep: "cat"</text>
+
+  <rect x="45" y="170" width="150" height="32" rx="4" fill="white" stroke="#0284c7"/>
+  <text x="120" y="190" font-family="system-ui, sans-serif" font-size="10" fill="#1e293b" text-anchor="middle">bgStep: "hobbiton"</text>
+
+  <rect x="45" y="210" width="150" height="32" rx="4" fill="white" stroke="#0284c7"/>
+  <text x="120" y="230" font-family="system-ui, sans-serif" font-size="10" fill="#1e293b" text-anchor="middle">captureStep: [photo]</text>
+
+  <!-- Media Registry -->
+  <rect x="250" y="90" width="240" height="260" rx="8" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+  <text x="370" y="115" font-family="system-ui, sans-serif" font-size="13" font-weight="bold" fill="#15803d" text-anchor="middle">mediaRegistry</text>
+  <text x="370" y="132" font-family="system-ui, sans-serif" font-size="9" fill="#166534" text-anchor="middle">All images in one place</text>
+
+  <rect x="265" y="145" width="210" height="28" rx="4" fill="white" stroke="#22c55e"/>
+  <text x="370" y="163" font-family="system-ui, sans-serif" font-size="9" fill="#1e293b" text-anchor="middle">{ label: "cat", assetId: "cat123" }</text>
+
+  <rect x="265" y="180" width="210" height="28" rx="4" fill="white" stroke="#22c55e"/>
+  <text x="370" y="198" font-family="system-ui, sans-serif" font-size="9" fill="#1e293b" text-anchor="middle">{ label: "dog", assetId: "dog456" }</text>
+
+  <rect x="265" y="215" width="210" height="28" rx="4" fill="white" stroke="#22c55e"/>
+  <text x="370" y="233" font-family="system-ui, sans-serif" font-size="9" fill="#1e293b" text-anchor="middle">{ label: "hobbiton", assetId: "hob789" }</text>
+
+  <rect x="265" y="250" width="210" height="28" rx="4" fill="white" stroke="#22c55e"/>
+  <text x="370" y="268" font-family="system-ui, sans-serif" font-size="9" fill="#1e293b" text-anchor="middle">{ label: "art_style", assetId: "style99" }</text>
+
+  <rect x="265" y="290" width="210" height="45" rx="4" fill="#bbf7d0" stroke="#22c55e"/>
+  <text x="370" y="308" font-family="system-ui, sans-serif" font-size="9" fill="#15803d" text-anchor="middle">{ type: "capturedMedia",</text>
+  <text x="370" y="323" font-family="system-ui, sans-serif" font-size="9" fill="#15803d" text-anchor="middle">label: "user_photo", stepId }</text>
+
+  <!-- Variable Mappings -->
+  <rect x="530" y="90" width="280" height="260" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+  <text x="670" y="115" font-family="system-ui, sans-serif" font-size="13" font-weight="bold" fill="#b45309" text-anchor="middle">variableMappings</text>
+  <text x="670" y="132" font-family="system-ui, sans-serif" font-size="9" fill="#92400e" text-anchor="middle">Text substitution only (from step answers)</text>
+
+  <rect x="545" y="145" width="250" height="85" rx="4" fill="white" stroke="#d97706"/>
+  <text x="670" y="163" font-family="system-ui, sans-serif" font-size="10" font-weight="600" fill="#1e293b" text-anchor="middle">pet: { stepId: "petStep", valueMap: [</text>
+  <text x="670" y="180" font-family="system-ui, sans-serif" font-size="9" fill="#22c55e" text-anchor="middle">"cat" → "holding a cat (see &lt;cat&gt;)"</text>
+  <text x="670" y="195" font-family="system-ui, sans-serif" font-size="9" fill="#64748b" text-anchor="middle">"dog" → "holding a dog (see &lt;dog&gt;)"</text>
+  <text x="670" y="210" font-family="system-ui, sans-serif" font-size="9" fill="#64748b" text-anchor="middle">"none" → "with empty hands"</text>
+  <text x="670" y="225" font-family="system-ui, sans-serif" font-size="10" fill="#1e293b" text-anchor="middle">]}</text>
+
+  <rect x="545" y="240" width="250" height="50" rx="4" fill="white" stroke="#d97706"/>
+  <text x="670" y="258" font-family="system-ui, sans-serif" font-size="10" font-weight="600" fill="#1e293b" text-anchor="middle">phrase: { stepId: "phraseStep" }</text>
+  <text x="670" y="278" font-family="system-ui, sans-serif" font-size="9" fill="#64748b" text-anchor="middle">No valueMap = pass-through raw value</text>
+
+  <rect x="545" y="300" width="250" height="35" rx="4" fill="#fef9c3" stroke="#d97706"/>
+  <text x="670" y="322" font-family="system-ui, sans-serif" font-size="9" fill="#854d0e" text-anchor="middle">Text can include &lt;label&gt; image refs!</text>
+
+  <!-- AI Image Node -->
+  <rect x="850" y="90" width="220" height="180" rx="8" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+  <text x="960" y="115" font-family="system-ui, sans-serif" font-size="13" font-weight="bold" fill="#6d28d9" text-anchor="middle">AI Image Node</text>
+
+  <rect x="865" y="135" width="190" height="60" rx="4" fill="white" stroke="#7c3aed"/>
+  <text x="960" y="153" font-family="system-ui, sans-serif" font-size="9" fill="#1e293b" text-anchor="middle">promptTemplate:</text>
+  <text x="960" y="168" font-family="system-ui, sans-serif" font-size="8" fill="#3b82f6" text-anchor="middle">"Transform &lt;user_photo&gt; into hobbit</text>
+  <text x="960" y="183" font-family="system-ui, sans-serif" font-size="8" fill="#d97706" text-anchor="middle">{{pet}}. Use &lt;art_style&gt;..."</text>
+
+  <rect x="865" y="205" width="190" height="35" rx="4" fill="white" stroke="#7c3aed"/>
+  <text x="960" y="220" font-family="system-ui, sans-serif" font-size="9" fill="#1e293b" text-anchor="middle">input: { source: "media",</text>
+  <text x="960" y="233" font-family="system-ui, sans-serif" font-size="9" fill="#1e293b" text-anchor="middle">label: "user_photo" }</text>
+
+  <!-- Resolution Flow -->
+  <rect x="30" y="380" width="1040" height="160" rx="8" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2"/>
+  <text x="550" y="405" font-family="system-ui, sans-serif" font-size="14" font-weight="bold" fill="#475569" text-anchor="middle">Resolution Flow</text>
+
+  <!-- Step 1 -->
+  <rect x="50" y="420" width="180" height="50" rx="4" fill="#dbeafe" stroke="#3b82f6" stroke-width="1"/>
+  <text x="140" y="440" font-family="system-ui, sans-serif" font-size="10" font-weight="600" fill="#1e40af" text-anchor="middle">1. Resolve {{variables}}</text>
+  <text x="140" y="455" font-family="system-ui, sans-serif" font-size="8" fill="#1e293b" text-anchor="middle">pet="cat" → text from valueMap</text>
+
+  <!-- Step 2 -->
+  <rect x="260" y="420" width="180" height="50" rx="4" fill="#dbeafe" stroke="#3b82f6" stroke-width="1"/>
+  <text x="350" y="440" font-family="system-ui, sans-serif" font-size="10" font-weight="600" fill="#1e40af" text-anchor="middle">2. Compose Prompt</text>
+  <text x="350" y="455" font-family="system-ui, sans-serif" font-size="8" fill="#1e293b" text-anchor="middle">Insert resolved text</text>
+
+  <!-- Step 3 -->
+  <rect x="470" y="420" width="180" height="50" rx="4" fill="#dcfce7" stroke="#22c55e" stroke-width="1"/>
+  <text x="560" y="440" font-family="system-ui, sans-serif" font-size="10" font-weight="600" fill="#15803d" text-anchor="middle">3. Parse &lt;labels&gt;</text>
+  <text x="560" y="455" font-family="system-ui, sans-serif" font-size="8" fill="#1e293b" text-anchor="middle">Find: user_photo, cat, art_style</text>
+
+  <!-- Step 4 -->
+  <rect x="680" y="420" width="180" height="50" rx="4" fill="#dcfce7" stroke="#22c55e" stroke-width="1"/>
+  <text x="770" y="440" font-family="system-ui, sans-serif" font-size="10" font-weight="600" fill="#15803d" text-anchor="middle">4. Lookup in Registry</text>
+  <text x="770" y="455" font-family="system-ui, sans-serif" font-size="8" fill="#1e293b" text-anchor="middle">Only fetch needed images</text>
+
+  <!-- Step 5 -->
+  <rect x="890" y="420" width="160" height="50" rx="4" fill="#fce7f3" stroke="#db2777" stroke-width="1"/>
+  <text x="970" y="440" font-family="system-ui, sans-serif" font-size="10" font-weight="600" fill="#be185d" text-anchor="middle">5. Build LLM Request</text>
+  <text x="970" y="455" font-family="system-ui, sans-serif" font-size="8" fill="#1e293b" text-anchor="middle">Interleaved labels + images</text>
+
+  <!-- Flow arrows -->
+  <line x1="230" y1="445" x2="255" y2="445" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="440" y1="445" x2="465" y2="445" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="650" y1="445" x2="675" y2="445" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="860" y1="445" x2="885" y2="445" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Result text -->
+  <text x="550" y="500" font-family="system-ui, sans-serif" font-size="11" fill="#64748b" text-anchor="middle">User selected: cat, hobbiton → Only 3 images sent (user_photo, cat, art_style), not all 5!</text>
+  <text x="550" y="520" font-family="system-ui, sans-serif" font-size="11" fill="#22c55e" text-anchor="middle" font-weight="600">dog and hobbiton images NOT sent (not referenced in final prompt)</text>
+
+  <!-- LLM Output -->
+  <rect x="250" y="560" width="600" height="100" rx="8" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+  <text x="550" y="585" font-family="system-ui, sans-serif" font-size="13" font-weight="bold" fill="#15803d" text-anchor="middle">LLM Request (Optimized)</text>
+
+  <text x="270" y="610" font-family="monospace" font-size="10" fill="#1e293b">[</text>
+  <text x="285" y="610" font-family="monospace" font-size="9" fill="#64748b">{ text: "Image Reference ID: &lt;user_photo&gt;" }, { inlineData: ... },</text>
+  <text x="285" y="625" font-family="monospace" font-size="9" fill="#64748b">{ text: "Image Reference ID: &lt;cat&gt;" }, { inlineData: ... },</text>
+  <text x="285" y="640" font-family="monospace" font-size="9" fill="#64748b">{ text: "Image Reference ID: &lt;art_style&gt;" }, { inlineData: ... },</text>
+  <text x="285" y="655" font-family="monospace" font-size="9" fill="#3b82f6">{ text: "Transform &lt;user_photo&gt; into hobbit holding a cat (see &lt;cat&gt;)..." }</text>
+  <text x="830" y="610" font-family="system-ui, sans-serif" font-size="10" fill="#1e293b">]</text>
+
+  <!-- Connection arrows from top sections -->
+  <line x1="120" y1="270" x2="120" y2="310" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4"/>
+  <line x1="120" y1="310" x2="265" y2="310" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Benefits callouts -->
+  <rect x="30" y="680" width="330" height="55" rx="6" fill="#dcfce7" stroke="#22c55e"/>
+  <text x="195" y="700" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" fill="#15803d" text-anchor="middle">Benefit: Single source for all images</text>
+  <text x="195" y="720" font-family="system-ui, sans-serif" font-size="10" fill="#1e293b" text-anchor="middle">mediaRegistry shows complete inventory</text>
+
+  <rect x="385" y="680" width="330" height="55" rx="6" fill="#fef3c7" stroke="#d97706"/>
+  <text x="550" y="700" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" fill="#b45309" text-anchor="middle">Benefit: Text + image refs in one place</text>
+  <text x="550" y="720" font-family="system-ui, sans-serif" font-size="10" fill="#1e293b" text-anchor="middle">valueMap text can include &lt;label&gt; refs</text>
+
+  <rect x="740" y="680" width="330" height="55" rx="6" fill="#ede9fe" stroke="#7c3aed"/>
+  <text x="905" y="700" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" fill="#6d28d9" text-anchor="middle">Benefit: Automatic optimization</text>
+  <text x="905" y="720" font-family="system-ui, sans-serif" font-size="10" fill="#1e293b" text-anchor="middle">Only referenced images sent to LLM</text>
+</svg>
