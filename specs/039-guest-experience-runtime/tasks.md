@@ -147,6 +147,97 @@
 
 ---
 
+## Phase 9: ExperienceRuntime + Theming Integration
+
+**Purpose**:
+1. Wrap all guest pages with ThemeProvider for consistent theming
+2. Replace placeholder test buttons with actual step execution using ExperienceRuntime
+3. Use themed components for loading/error states
+
+**CRITICAL**: This phase makes the feature complete - without it, guests cannot actually execute experience steps
+
+### Theming Components Available
+
+- `ThemeProvider` - Context wrapper (get theme from `event.publishedConfig.theme`)
+- `ThemedBackground` - Full-screen container with themed background color/image
+- `ThemedText` - Themed typography (heading, body, small variants)
+- `ThemedButton` - Themed button with primary/outline variants
+
+### Shared Infrastructure
+
+- [ ] T038 [P] Create ThemedLoadingState component in apps/clementine-app/src/domains/guest/components/ThemedLoadingState.tsx
+  - Use ThemedBackground for full-screen layout
+  - Use themed spinner (primaryColor based)
+  - Use ThemedText for loading message
+  - Accept `message` prop for customizable text
+
+- [ ] T039 [P] Create ThemedErrorState component in apps/clementine-app/src/domains/guest/components/ThemedErrorState.tsx
+  - Use ThemedBackground for full-screen layout
+  - Use ThemedText for error title/message
+  - Use ThemedButton (outline variant) for back/retry action
+  - Replace ErrorPage usage with this component
+
+- [ ] T040 [P] Create GuestRuntimeContent component in apps/clementine-app/src/domains/guest/components/GuestRuntimeContent.tsx
+  - Use useRuntime() hook to access step state
+  - Wrap with ThemedBackground
+  - Render StepRendererRouter in "run" mode
+  - Handle answer submission via setAnswer + next
+  - Handle back navigation via back
+  - Mobile-first layout
+
+- [ ] T041 Export new components from guest components index (apps/clementine-app/src/domains/guest/components/index.ts)
+
+### ExperiencePage Integration
+
+- [ ] T042 [US1] Wrap ExperiencePage with ThemeProvider (theme from event.publishedConfig.theme)
+  - Provider wraps entire component return
+  - Apply to loading, error, and success states
+  - Replace unthemed loading/error states with ThemedLoadingState/ThemedErrorState
+
+- [ ] T043 [US1] Integrate ExperienceRuntime into ExperiencePage success state
+  - Replace placeholder div with ExperienceRuntime
+  - Pass experience.published.steps, session, handleExperienceComplete as onComplete
+  - Render GuestRuntimeContent as child
+  - Pass onError handler for sync errors
+  - Remove placeholder test button and debug info
+
+### PregatePage Integration
+
+- [ ] T044 [US2] Wrap PregatePage with ThemeProvider
+  - Provider wraps entire component return
+  - Apply to loading, error, redirecting, and success states
+  - Replace unthemed loading/error states with ThemedLoadingState/ThemedErrorState
+
+- [ ] T045 [US2] Integrate ExperienceRuntime into PregatePage success state
+  - Replace placeholder div with ExperienceRuntime
+  - Pass pregateExperience.published.steps, session, handlePregateComplete as onComplete
+  - Render GuestRuntimeContent as child
+  - Remove placeholder test button and debug info
+
+### PresharePage Integration
+
+- [ ] T046 [US3] Wrap PresharePage with ThemeProvider
+  - Provider wraps entire component return
+  - Apply to loading, error, redirecting, and success states
+  - Replace unthemed loading/error states with ThemedLoadingState/ThemedErrorState
+
+- [ ] T047 [US3] Integrate ExperienceRuntime into PresharePage success state
+  - Replace placeholder div with ExperienceRuntime
+  - Pass preshareExperience.published.steps, session, handlePreshareComplete as onComplete
+  - Render GuestRuntimeContent as child
+  - Remove placeholder test button and debug info
+
+### Final Validation
+
+- [ ] T048 Run validation (pnpm app:check && pnpm app:type-check)
+- [ ] T049 Manual testing: Verify themed loading states appear correctly
+- [ ] T050 Manual testing: Verify themed error states appear correctly
+- [ ] T051 Manual testing: Complete full guest journey (pregate -> main -> preshare -> share)
+
+**Checkpoint**: Guests can execute actual experience steps with proper theming in all three phases
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies
@@ -160,6 +251,7 @@
   - US4 (Session Linking): Depends on US2/US3 containers existing
   - US5 (Back Navigation): Verification task, depends on all navigation being implemented
 - **Polish (Phase 8)**: Depends on all user stories being complete
+- **ExperienceRuntime + Theming (Phase 9)**: Depends on Phase 8 - integrates ExperienceRuntime and ThemeProvider into all guest pages
 
 ### User Story Dependencies
 
@@ -183,6 +275,7 @@
 - T015 and T016 (pregate page and route) can run in parallel
 - T021 and T022 (preshare page and route) can run in parallel
 - T032, T033, T034, T035 (edge cases) can all run in parallel
+- T038, T039, T040 (themed components) can all run in parallel
 
 ---
 
@@ -245,7 +338,7 @@ With multiple developers:
 
 | Metric | Count |
 |--------|-------|
-| Total Tasks | 37 |
+| Total Tasks | 51 |
 | Setup Phase | 3 |
 | Foundational Phase | 5 |
 | User Story 1 (Main Experience) | 6 |
@@ -254,9 +347,12 @@ With multiple developers:
 | User Story 4 (Session Linking) | 3 |
 | User Story 5 (Back Navigation) | 2 |
 | Polish Phase | 6 |
-| Parallel Opportunities | 15 tasks marked [P] |
+| ExperienceRuntime + Theming Phase | 14 |
+| Parallel Opportunities | 18 tasks marked [P] |
 
 **Suggested MVP Scope**: Phase 1 + Phase 2 + Phase 3 (User Story 1) = 14 tasks
+
+**Full Feature Scope**: All phases including Phase 9 = 51 tasks
 
 ---
 
@@ -268,3 +364,5 @@ With multiple developers:
 - Commit after each task or logical group
 - Stop at any checkpoint to validate story independently
 - All navigation between phases uses replace: true except initial navigation from welcome
+- Phase 9 integrates ExperienceRuntime (step execution) and ThemeProvider (consistent branding) into all guest pages
+- Without Phase 9, guest pages only have placeholder test buttons - Phase 9 makes the feature production-ready
