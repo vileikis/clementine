@@ -11,7 +11,7 @@
  * 4. Creates a MediaAsset document in Firestore
  * 5. Returns the asset ID, URL, and filePath
  */
-import { addDoc, collection } from 'firebase/firestore'
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore'
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage'
 
 import {
@@ -19,7 +19,11 @@ import {
   getImageDimensions,
   validateFile,
 } from '../utils/upload.utils'
-import type { MediaAsset, MediaAssetType } from '@clementine/shared'
+import type {
+  ImageMimeType,
+  MediaAsset,
+  MediaAssetType,
+} from '@clementine/shared'
 
 import { firestore, storage } from '@/integrations/firebase/client'
 
@@ -129,14 +133,10 @@ export async function uploadMediaAsset({
     filePath,
     url: downloadURL,
     fileSize: file.size,
-    mimeType: file.type as
-      | 'image/png'
-      | 'image/jpeg'
-      | 'image/jpg'
-      | 'image/webp',
+    mimeType: file.type as ImageMimeType,
     width,
     height,
-    uploadedAt: Date.now(),
+    uploadedAt: serverTimestamp(),
     uploadedBy: userId,
     type,
     status: 'active',
