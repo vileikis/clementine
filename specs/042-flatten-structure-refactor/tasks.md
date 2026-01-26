@@ -1,141 +1,257 @@
-# Tasks: Media Assets Shared Schema
+# Tasks: Flatten Project/Event Structure
 
 **Input**: Design documents from `/specs/042-flatten-structure-refactor/`
 **Prerequisites**: plan.md, spec.md, research.md, data-model.md, quickstart.md
 
-**Tests**: Schema validation tests are included per constitution (Principle IV - Minimal Testing Strategy).
+**Tests**: Not explicitly requested - focus on manual verification flows from quickstart.md
 
-**Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
+**Organization**: Tasks organized by implementation phase to enable incremental delivery while maintaining code integrity.
 
-## Format: `[ID] [P?] [Story] Description`
+## Format: `[ID] [P?] Description`
 
 - **[P]**: Can run in parallel (different files, no dependencies)
-- **[Story]**: Which user story this task belongs to (e.g., US1, US2, US3, US4)
 - Include exact file paths in descriptions
 
 ## Path Conventions
 
-- **packages/shared/**: Zod schemas (single source of truth)
-- **apps/clementine-app/**: TanStack Start app (frontend)
-- **functions/**: Firebase Cloud Functions (backend)
+- **Shared schemas**: `packages/shared/src/schemas/`
+- **Frontend app**: `apps/clementine-app/src/`
+- **Backend functions**: `functions/src/`
+- **Firebase config**: `firebase/`
 
 ---
 
-## Phase 1: Setup
+## Phase 1: Schema Changes (packages/shared)
 
-**Purpose**: Create media domain structure in shared package
+**Purpose**: Update Zod schemas to flatten event config into project. This phase MUST complete before any other changes.
 
-- [X] T001 Create media domain folder at `packages/shared/src/schemas/media/`
-- [X] T002 Create barrel export file at `packages/shared/src/schemas/media/index.ts`
+**Goal**: Project schema contains config directly, event schemas deleted
 
----
+### Schema Migration
 
-## Phase 2: Foundational (Blocking Prerequisites)
+- [ ] T001 [P] Create `packages/shared/src/schemas/project/project-config.schema.ts` by copying content from `event/project-event-config.schema.ts` and renaming exports (`ProjectEventConfig` → `ProjectConfig`, `projectEventConfigSchema` → `projectConfigSchema`)
+- [ ] T002 [P] Create `packages/shared/src/schemas/project/experiences.schema.ts` by moving content from `event/experiences.schema.ts`
+- [ ] T003 Modify `packages/shared/src/schemas/project/project.schema.ts` to add config fields (`draftConfig`, `publishedConfig`, `draftVersion`, `publishedVersion`, `publishedAt`) and remove `activeEventId` field
+- [ ] T004 Update `packages/shared/src/schemas/project/index.ts` to export new schemas and add backward compatibility aliases (`projectEventConfigSchema`, `ProjectEventConfig`)
+- [ ] T005 Modify `packages/shared/src/schemas/session/session.schema.ts` to remove `eventId` field (keep as looseObject so existing docs still parse)
+- [ ] T006 Delete `packages/shared/src/schemas/event/` folder entirely (project-event.schema.ts, project-event-config.schema.ts, experiences.schema.ts, index.ts)
+- [ ] T007 Update `packages/shared/src/schemas/index.ts` to remove event folder exports and ensure project exports are correct
+- [ ] T008 Run `pnpm --filter @clementine/shared build` and fix any TypeScript errors
 
-**Purpose**: Core schemas that MUST be complete before ANY user story refactoring can begin
-
-**⚠️ CRITICAL**: No user story work can begin until this phase is complete
-
-- [X] T003 [P] Create `imageMimeTypeSchema` enum at `packages/shared/src/schemas/media/image-mime-type.schema.ts`
-- [X] T004 [P] Create `mediaAssetTypeSchema` enum at `packages/shared/src/schemas/media/media-asset-type.schema.ts`
-- [X] T005 [P] Create `mediaAssetStatusSchema` enum at `packages/shared/src/schemas/media/media-asset-status.schema.ts`
-- [X] T006 Create `mediaReferenceSchema` with nullable `filePath` at `packages/shared/src/schemas/media/media-reference.schema.ts`
-- [X] T007 Create `mediaAssetSchema` (full document) at `packages/shared/src/schemas/media/media-asset.schema.ts`
-- [X] T008 Update barrel exports to include all schemas at `packages/shared/src/schemas/media/index.ts`
-- [X] T009 Add media domain export to main barrel at `packages/shared/src/schemas/index.ts`
-- [X] T010 Build shared package and verify compilation with `pnpm --filter @clementine/shared build`
-
-**Checkpoint**: Foundation ready - schemas exist and compile, user story refactoring can begin
+**Checkpoint**: Shared package builds successfully with new schema structure
 
 ---
 
-## Phase 3: User Story 1 - Developer Uses Unified Media Schema (Priority: P1) 🎯 MVP
+## Phase 2: Backend Changes (functions/)
 
-**Goal**: Developers can import unified media schemas from `@clementine/shared` in both app and functions
+**Purpose**: Update Cloud Functions to work with flattened project structure
 
-**Independent Test**: Import schemas in app and functions, verify TypeScript compilation succeeds
+**Goal**: Backend reads config from project document, session creation works without eventId
 
-### Tests for User Story 1
+### Repository Updates
 
-- [X] T011 [P] [US1] Create schema validation tests at `packages/shared/src/schemas/media/media-asset.schema.test.ts`
+- [ ] T009 Modify `functions/src/repositories/session.ts` to remove eventId from session creation and any eventId handling
+- [ ] T010 Search `functions/src/` for any remaining `eventId` references and update accordingly
+- [ ] T011 Verify `functions/src/repositories/job.ts` has no eventId dependencies (jobs reference projectId and experienceId)
 
-### Implementation for User Story 1
+### Migration Script
 
-- [X] T012 [P] [US1] Update theme barrel to re-export from media for backward compat at `packages/shared/src/schemas/theme/index.ts`
-- [X] T013 [P] [US1] Delete old media-reference.schema.ts from theme at `packages/shared/src/schemas/theme/media-reference.schema.ts`
-- [X] T014 [US1] Refactor `overlayReferenceSchema` to use `mediaReferenceSchema` at `packages/shared/src/schemas/event/project-event-config.schema.ts`
-- [X] T015 [US1] Refactor `experienceMediaSchema` to use `mediaReferenceSchema` at `packages/shared/src/schemas/experience/experience.schema.ts`
-- [X] T016 [US1] Refactor `experienceMediaAssetSchema` to use `mediaReferenceSchema` at `packages/shared/src/schemas/experience/steps/info.schema.ts`
-- [X] T017 [US1] Build and verify shared package compiles with `pnpm --filter @clementine/shared build`
-- [X] T018 [US1] Run shared package tests with `pnpm --filter @clementine/shared test`
+- [ ] T012 Create `functions/scripts/migrations/042-flatten-events.ts` migration script that: reads all projects with activeEventId, copies event config to project, removes activeEventId, marks event as migrated
 
-**Checkpoint**: User Story 1 complete - unified schemas available in shared package
+### Build Verification
 
----
+- [ ] T013 Run `pnpm --filter functions build` and fix any TypeScript errors
 
-## Phase 4: User Story 2 - Cloud Function Accesses Storage via filePath (Priority: P2)
-
-**Goal**: Cloud functions can use `filePath` directly for storage access instead of URL parsing
-
-**Independent Test**: Import `mediaReferenceSchema` in functions, verify `filePath` field is accessible
-
-### Implementation for User Story 2
-
-- [X] T019 [US2] Verify functions can import media schemas from `@clementine/shared` (check existing imports)
-- [X] T020 [US2] Update any functions using media references to check for `filePath` before URL parsing at `functions/src/infra/storage.ts`
-- [X] T021 [US2] Build and verify functions compile with `pnpm --filter functions build`
-
-**Checkpoint**: User Story 2 complete - cloud functions can leverage filePath for new documents
+**Checkpoint**: Functions build successfully, migration script ready
 
 ---
 
-## Phase 5: User Story 3 - Existing App Functionality Continues Working (Priority: P2)
+## Phase 3: Frontend Domain Rename (apps/clementine-app/domains)
 
-**Goal**: All existing app features using media references continue working with new schemas
+**Purpose**: Rename `domains/event/` to `domains/project-config/` and update all internal naming
 
-**Independent Test**: App compiles successfully with shared schema imports, existing media features work
+**Goal**: Event domain becomes project-config domain with proper naming conventions
 
-### Implementation for User Story 3
+### Domain Folder Rename
 
-- [X] T022 [P] [US3] Delete app-level `image-mime-type.schema.ts` at `apps/clementine-app/src/domains/media-library/schemas/image-mime-type.schema.ts`
-- [X] T023 [P] [US3] Delete app-level `media-asset.schema.ts` at `apps/clementine-app/src/domains/media-library/schemas/media-asset.schema.ts`
-- [X] T024 [US3] Update media-library schemas barrel to re-export from `@clementine/shared` at `apps/clementine-app/src/domains/media-library/schemas/index.ts`
-- [X] T025 [US3] Update imports in `useUploadMediaAsset.ts` to use shared types at `apps/clementine-app/src/domains/media-library/hooks/useUploadMediaAsset.ts`
-- [X] T026 [US3] Update any other components using media types to import from shared (search for `MediaAsset` imports)
-- [X] T027 [US3] Build and verify app compiles with `pnpm --filter clementine-app build`
-- [X] T028 [US3] Run app type-check with `pnpm --filter clementine-app type-check`
+- [ ] T014 Rename folder `apps/clementine-app/src/domains/event/` to `apps/clementine-app/src/domains/project-config/`
 
-**Checkpoint**: User Story 3 complete - app uses shared schemas, backward compatible
+### Shared Hooks & Queries Rename
+
+- [ ] T015 Rename `domains/project-config/shared/hooks/useProjectEvent.ts` to `useProjectConfig.ts` and update hook name and remove eventId param
+- [ ] T016 Rename `domains/project-config/shared/queries/project-event.query.ts` to `project-config.query.ts` and update query function names
+- [ ] T017 Rename `domains/project-config/shared/lib/updateEventConfigField.ts` to `updateProjectConfigField.ts` and update function name
+
+### Designer Components Rename
+
+- [ ] T018 Rename `domains/project-config/designer/containers/EventDesignerLayout.tsx` to `ProjectConfigDesignerLayout.tsx` and update component name
+- [ ] T019 Rename `domains/project-config/designer/components/EventDesignerSidebar.tsx` to `ProjectConfigDesignerSidebar.tsx` and update component name
+- [ ] T020 Rename `domains/project-config/designer/hooks/usePublishEvent.ts` to `usePublishProjectConfig.ts` and update hook name, remove eventId param
+
+### Settings Components Rename
+
+- [ ] T021 Rename `domains/project-config/settings/containers/EventSettingsPage.tsx` to `ProjectConfigSettingsPage.tsx` and update component name
+
+### Update Internal Imports
+
+- [ ] T022 Update all imports within `domains/project-config/` to use new file names and component names
+- [ ] T023 [P] Update `domains/project-config/theme/hooks/useUpdateTheme.ts` to remove eventId param
+- [ ] T024 [P] Update `domains/project-config/welcome/hooks/useUpdateWelcome.ts` to remove eventId param
+- [ ] T025 [P] Update `domains/project-config/share/hooks/useUpdateShare.ts` to remove eventId param
+- [ ] T026 [P] Update `domains/project-config/settings/hooks/useUpdateShareOptions.ts` to remove eventId param
+- [ ] T027 [P] Update `domains/project-config/settings/hooks/useUpdateOverlays.ts` to remove eventId param
+- [ ] T028 [P] Update `domains/project-config/experiences/hooks/useUpdateEventExperiences.ts` to `useUpdateProjectExperiences.ts` and remove eventId param
+
+### Delete Event CRUD Hooks
+
+- [ ] T029 Delete `domains/project/events/` folder entirely (useProjectEvents, useCreateProjectEvent, useDeleteProjectEvent, useActivateProjectEvent, useRenameProjectEvent)
+
+### Update Project Domain
+
+- [ ] T030 Modify `domains/project/shared/hooks/useProject.ts` to return full project with config fields (ensure schema imports updated)
+- [ ] T031 Modify `domains/project/shared/queries/project.query.ts` to use updated projectSchema with config
+
+**Checkpoint**: Domain structure renamed, all hooks updated internally
 
 ---
 
-## Phase 6: User Story 4 - Upload Logic is Reusable (Priority: P3)
+## Phase 4: Frontend Route Restructure (apps/clementine-app/routes)
 
-**Goal**: Upload orchestration is a standalone service, hook is thin wrapper
+**Purpose**: Flatten routes from `/projects/$projectId/events/$eventId/*` to `/projects/$projectId/*`
 
-**Independent Test**: Upload service function can be called directly without React context
+**Goal**: Designer routes work directly under project without event nesting
 
-### Implementation for User Story 4
+### Create New Routes
 
-- [X] T029 [US4] Create services folder at `apps/clementine-app/src/domains/media-library/services/`
-- [X] T030 [US4] Extract upload logic to service at `apps/clementine-app/src/domains/media-library/services/upload-media-asset.service.ts`
-- [X] T031 [US4] Update service to return `filePath` in result for new uploads
-- [X] T032 [US4] Refactor hook to use service at `apps/clementine-app/src/domains/media-library/hooks/useUploadMediaAsset.ts`
-- [X] T033 [US4] Create barrel export for services at `apps/clementine-app/src/domains/media-library/services/index.ts`
-- [X] T034 [US4] Build and verify app compiles with `pnpm --filter clementine-app build`
+- [ ] T032 Create `apps/clementine-app/src/app/routes/workspace/$workspaceSlug.projects/$projectId.welcome.tsx` based on `$projectId.events/$eventId.welcome.tsx` but using projectId only
+- [ ] T033 Create `apps/clementine-app/src/app/routes/workspace/$workspaceSlug.projects/$projectId.theme.tsx` based on `$projectId.events/$eventId.theme.tsx` but using projectId only
+- [ ] T034 Create `apps/clementine-app/src/app/routes/workspace/$workspaceSlug.projects/$projectId.share.tsx` based on `$projectId.events/$eventId.share.tsx` but using projectId only
+- [ ] T035 Create `apps/clementine-app/src/app/routes/workspace/$workspaceSlug.projects/$projectId.settings.tsx` based on `$projectId.events/$eventId.settings.tsx` but using projectId only
 
-**Checkpoint**: User Story 4 complete - upload logic reusable, returns filePath
+### Update Project Layout Route
+
+- [ ] T036 Modify `apps/clementine-app/src/app/routes/workspace/$workspaceSlug.projects/$projectId.tsx` to include designer layout (previously in $eventId.tsx)
+- [ ] T037 Modify `apps/clementine-app/src/app/routes/workspace/$workspaceSlug.projects/$projectId.index.tsx` to redirect to welcome or show project overview
+
+### Delete Old Event Routes
+
+- [ ] T038 Delete entire `apps/clementine-app/src/app/routes/workspace/$workspaceSlug.projects/$projectId.events/` directory
+
+**Checkpoint**: Routes work at project level without event nesting
 
 ---
 
-## Phase 7: Polish & Cross-Cutting Concerns
+## Phase 5: Update All External Imports
 
-**Purpose**: Documentation and final validation
+**Purpose**: Update all components and files that import from old event domain paths
 
-- [X] T035 [P] Update README with Media domain documentation at `packages/shared/README.md`
-- [X] T036 [P] Run full monorepo type-check with `pnpm app:type-check`
-- [X] T037 Run full validation with `pnpm app:check`
-- [X] T038 Verify quickstart.md examples work by testing imports
+**Goal**: All imports point to project-config domain, no broken imports
+
+### Search and Replace Imports
+
+- [ ] T039 Search all files in `apps/clementine-app/src/` for `@/domains/event/` imports and update to `@/domains/project-config/`
+- [ ] T040 Search all files for `useProjectEvent` usage and update to use `useProject` from project domain (with config) or `useProjectConfig` from project-config domain
+- [ ] T041 Search all files for `usePublishEvent` and update to `usePublishProjectConfig`
+- [ ] T042 Search all files for `EventDesignerLayout` and update to `ProjectConfigDesignerLayout`
+- [ ] T043 Search all files for `EventDesignerSidebar` and update to `ProjectConfigDesignerSidebar`
+- [ ] T044 Search all files for `EventSettingsPage` and update to `ProjectConfigSettingsPage`
+- [ ] T045 Search all files for `updateEventConfigField` and update to `updateProjectConfigField`
+
+### Update Components Using eventId
+
+- [ ] T046 Search all components for `eventId` in useParams() calls and remove
+- [ ] T047 Update all navigation/Link components that include eventId in route params
+
+### Type Import Updates
+
+- [ ] T048 Search for `ProjectEventFull` type imports and update to use `Project` type
+- [ ] T049 Search for `ProjectEventConfig` type imports and update to `ProjectConfig`
+- [ ] T050 Search for `projectEventConfigSchema` imports and update to `projectConfigSchema`
+
+**Checkpoint**: All imports updated, no references to old event domain
+
+---
+
+## Phase 6: Security Rules & Firebase Config
+
+**Purpose**: Update Firestore security rules to remove events subcollection
+
+**Goal**: Security rules work without events match block
+
+### Security Rules
+
+- [ ] T051 Modify `firebase/firestore.rules` to remove the `/projects/{projectId}/events/{eventId}` match block entirely
+
+**Checkpoint**: Security rules updated, no event references
+
+---
+
+## Phase 7: Build & Type Check
+
+**Purpose**: Ensure everything compiles and types are correct
+
+**Goal**: Full build passes with no TypeScript errors
+
+### Build Verification
+
+- [ ] T052 Run `pnpm app:type-check` and fix any TypeScript errors in frontend
+- [ ] T053 Run `pnpm app:lint` and fix any linting errors
+- [ ] T054 Run `pnpm app:build` and verify production build succeeds
+
+**Checkpoint**: Full build passes
+
+---
+
+## Phase 8: Manual Verification
+
+**Purpose**: Verify all user flows work correctly per quickstart.md
+
+**Goal**: All critical flows pass manual testing
+
+### Admin Flow Verification
+
+- [ ] T055 Test: Create new project → verify draftConfig created on project document
+- [ ] T056 Test: Configure theme → verify saves to project.draftConfig.theme
+- [ ] T057 Test: Configure welcome screen → verify saves to project.draftConfig.welcome
+- [ ] T058 Test: Configure share screen → verify saves to project.draftConfig.share
+- [ ] T059 Test: Publish project → verify publishedConfig populated, versions synced
+
+### Guest Flow Verification
+
+- [ ] T060 Test: Join via link → select experience → capture → share (full guest journey)
+- [ ] T061 Test: Guest session created without eventId field
+
+### Preview Flow Verification
+
+- [ ] T062 Test: Admin preview uses draft config correctly (ghost project pattern)
+
+### Real-time Updates Verification
+
+- [ ] T063 Test: Config changes reflect immediately in preview pane
+
+**Checkpoint**: All user flows verified working
+
+---
+
+## Phase 9: Polish & Cleanup
+
+**Purpose**: Final cleanup and documentation
+
+**Goal**: Clean codebase with no dead code
+
+### Dead Code Removal
+
+- [ ] T064 Search for any remaining `activeEventId` references and remove
+- [ ] T065 Search for any remaining `ProjectEventFull` references and remove
+- [ ] T066 Search for any remaining `/events/` route references in navigation and remove
+- [ ] T067 Remove backward compatibility aliases from `packages/shared` if no longer needed
+
+### Final Verification
+
+- [ ] T068 Run `pnpm app:check` (format + lint) one final time
+- [ ] T069 Verify dev server starts without errors: `pnpm app:dev`
+
+**Checkpoint**: Refactor complete, codebase clean
 
 ---
 
@@ -143,106 +259,59 @@
 
 ### Phase Dependencies
 
-- **Setup (Phase 1)**: No dependencies - can start immediately
-- **Foundational (Phase 2)**: Depends on Setup completion - BLOCKS all user stories
-- **User Stories (Phase 3-6)**: All depend on Foundational phase completion
-  - US1 must complete before US2/US3 (schemas must exist)
-  - US2 and US3 can run in parallel after US1
-  - US4 depends on US3 (needs app refactoring complete)
-- **Polish (Phase 7)**: Depends on all user stories being complete
-
-### User Story Dependencies
-
-```
-Phase 1: Setup
-    ↓
-Phase 2: Foundational (BLOCKS ALL)
-    ↓
-Phase 3: US1 - Unified Schemas (P1) 🎯 MVP
-    ↓
-    ├── Phase 4: US2 - Cloud Function filePath (P2)
-    │
-    └── Phase 5: US3 - App Backward Compat (P2)
-            ↓
-        Phase 6: US4 - Upload Service (P3)
-            ↓
-        Phase 7: Polish
-```
-
-### Within Each User Story
-
-- Tests written first (T011)
-- Schema files before barrel exports
-- Shared package before consumers
-- Build verification after changes
+- **Phase 1 (Schema)**: No dependencies - START HERE
+- **Phase 2 (Backend)**: Depends on Phase 1
+- **Phase 3 (Domain Rename)**: Depends on Phase 1
+- **Phase 4 (Routes)**: Depends on Phase 3
+- **Phase 5 (Imports)**: Depends on Phase 3 and Phase 4
+- **Phase 6 (Security)**: Can run in parallel with Phase 3-5
+- **Phase 7 (Build)**: Depends on Phase 1-6
+- **Phase 8 (Verification)**: Depends on Phase 7
+- **Phase 9 (Cleanup)**: Depends on Phase 8
 
 ### Parallel Opportunities
 
-**Within Phase 2 (Foundational)**:
-```bash
-# These can run in parallel:
-T003: imageMimeTypeSchema
-T004: mediaAssetTypeSchema
-T005: mediaAssetStatusSchema
-```
+**Within Phase 1**:
+- T001 and T002 can run in parallel (different files)
 
-**Within Phase 3 (US1)**:
-```bash
-# These can run in parallel:
-T011: Schema validation tests
-T012: Theme barrel update
-T013: Delete old media-reference
-```
+**Within Phase 3**:
+- T023, T024, T025, T026, T027, T028 can run in parallel (different hook files)
 
-**Within Phase 5 (US3)**:
-```bash
-# These can run in parallel:
-T022: Delete image-mime-type.schema.ts
-T023: Delete media-asset.schema.ts
-```
-
-**Within Phase 7 (Polish)**:
-```bash
-# These can run in parallel:
-T035: README update
-T036: Full type-check
-```
+**Between Phases**:
+- Phase 2 and Phase 3 can start in parallel after Phase 1 completes
+- Phase 6 can run anytime after Phase 1
 
 ---
 
 ## Implementation Strategy
 
-### MVP First (User Story 1 Only)
+### Recommended Order
 
-1. Complete Phase 1: Setup (T001-T002)
-2. Complete Phase 2: Foundational (T003-T010)
-3. Complete Phase 3: User Story 1 (T011-T018)
-4. **STOP and VALIDATE**: Shared package builds, tests pass
-5. Deploy/merge if ready
+1. **Complete Phase 1** (Schema) - This is the foundation
+2. **Run Phase 2 and Phase 3 in parallel** - Backend and domain rename are independent
+3. **Complete Phase 4** (Routes) after Phase 3
+4. **Complete Phase 5** (Imports) - comprehensive search/replace
+5. **Complete Phase 6** (Security) - quick update
+6. **Complete Phase 7** (Build) - verify everything compiles
+7. **Complete Phase 8** (Verification) - manual testing
+8. **Complete Phase 9** (Cleanup) - final polish
 
-### Incremental Delivery
+### MVP Stopping Point
 
-1. Setup + Foundational → Schemas exist
-2. Add US1 → Unified schemas available → Merge (MVP!)
-3. Add US2 → Functions can use filePath → Merge
-4. Add US3 → App uses shared schemas → Merge
-5. Add US4 → Upload service extracted → Merge
-6. Each story adds value without breaking previous stories
+After Phase 7 (Build), the refactor is functionally complete. Phase 8 and 9 are verification and polish.
 
-### Single Developer Strategy
+### Risk Mitigation
 
-Execute phases sequentially:
-1. Phase 1 → Phase 2 → Phase 3 (MVP checkpoint)
-2. Phase 4 → Phase 5 (can do in either order)
-3. Phase 6 → Phase 7
+- Run `pnpm app:type-check` frequently during Phase 5 to catch import issues early
+- Keep old event files until Phase 7 passes (delete in Phase 9 if needed for rollback)
+- Test each user flow immediately after its related changes
 
 ---
 
 ## Notes
 
-- [P] tasks = different files, no dependencies
-- [Story] label maps task to specific user story for traceability
-- Each user story should be independently completable and testable
-- Commit after each phase or logical group
-- Stop at any checkpoint to validate story independently
-- Build and type-check frequently to catch issues early
+- TypeScript strict mode will catch most missed references
+- Use `grep -r "eventId" apps/` to find remaining references
+- Use `grep -r "@/domains/event" apps/` to find remaining imports
+- Commit after each phase for easy rollback
+- Total estimated effort: 15-22 hours per spec.md
