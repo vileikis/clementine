@@ -26,12 +26,12 @@
 
 **Purpose**: Project initialization and schema creation in shared package
 
-- [ ] T001 [P] Create preset media entry schema in `packages/shared/src/schemas/ai-preset/preset-media.schema.ts` (extends `mediaReferenceSchema` from `../media` with `name` field)
-- [ ] T002 [P] Create preset variable schemas (text, image, discriminated union) in `packages/shared/src/schemas/ai-preset/preset-variable.schema.ts`
-- [ ] T003 Create main AI Preset entity schema in `packages/shared/src/schemas/ai-preset/ai-preset.schema.ts` (depends on T001, T002)
-- [ ] T004 Create barrel export in `packages/shared/src/schemas/ai-preset/index.ts`
-- [ ] T005 Add ai-preset export to `packages/shared/src/schemas/index.ts`
-- [ ] T006 Build shared package with `pnpm --filter @clementine/shared build`
+- [X] T001 [P] Create preset media entry schema in `packages/shared/src/schemas/ai-preset/preset-media.schema.ts` (extends `mediaReferenceSchema` from `../media` with `name` field)
+- [X] T002 [P] Create preset variable schemas (text, image, discriminated union) in `packages/shared/src/schemas/ai-preset/preset-variable.schema.ts`
+- [X] T003 Create main AI Preset entity schema in `packages/shared/src/schemas/ai-preset/ai-preset.schema.ts` (depends on T001, T002)
+- [X] T004 Create barrel export in `packages/shared/src/schemas/ai-preset/index.ts`
+- [X] T005 Add ai-preset export to `packages/shared/src/schemas/index.ts`
+- [X] T006 Build shared package with `pnpm --filter @clementine/shared build`
 
 ---
 
@@ -41,11 +41,11 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T007 Create domain directory structure at `apps/clementine-app/src/domains/ai-presets/` with subdirectories: components/, containers/, hooks/, schemas/
-- [ ] T008 Create input schemas for mutations in `apps/clementine-app/src/domains/ai-presets/schemas/ai-preset.input.schemas.ts`
-- [ ] T009 Add Firestore security rules for aiPresets collection in `firebase/firestore.rules` (workspace member read, admin write)
-- [ ] T010 Create useWorkspaceAIPresets hook (real-time list query) in `apps/clementine-app/src/domains/ai-presets/hooks/useWorkspaceAIPresets.ts`
-- [ ] T011 Create domain barrel export in `apps/clementine-app/src/domains/ai-presets/index.ts`
+- [X] T007 Create domain directory structure at `apps/clementine-app/src/domains/ai-presets/` with subdirectories: components/, containers/, hooks/, schemas/
+- [X] T008 Create input schemas for mutations in `apps/clementine-app/src/domains/ai-presets/schemas/ai-preset.input.schemas.ts`
+- [X] T009 Add Firestore security rules for aiPresets collection in `firebase/firestore.rules` (workspace member read, admin write)
+- [X] T010 Create useWorkspaceAIPresets hook (real-time list query) in `apps/clementine-app/src/domains/ai-presets/hooks/useWorkspaceAIPresets.ts`
+- [X] T011 Create domain barrel export in `apps/clementine-app/src/domains/ai-presets/index.ts`
 
 **Checkpoint**: Foundation ready - Schemas validated, security rules in place, list query hook available
 
@@ -59,12 +59,12 @@
 
 ### Implementation for User Story 1
 
-- [ ] T012 [US1] Add AI Presets navigation item to `apps/clementine-app/src/domains/navigation/components/workspace/workspaceNavItems.ts` with Wand2 icon
-- [ ] T013 [US1] Create list route file at `apps/clementine-app/src/app/routes/workspace/$workspaceSlug.ai-presets/index.tsx`
-- [ ] T014 [P] [US1] Create AIPresetItem component in `apps/clementine-app/src/domains/ai-presets/components/AIPresetItem.tsx` (card display, click to navigate)
-- [ ] T015 [P] [US1] Create AIPresetsList component in `apps/clementine-app/src/domains/ai-presets/components/AIPresetsList.tsx` (loading/empty/list states)
-- [ ] T016 [US1] Create AIPresetsPage container in `apps/clementine-app/src/domains/ai-presets/containers/AIPresetsPage.tsx` (integrates list with header)
-- [ ] T017 [US1] Update domain barrel export with new components in `apps/clementine-app/src/domains/ai-presets/index.ts`
+- [X] T012 [US1] Add AI Presets navigation item to `apps/clementine-app/src/domains/navigation/components/workspace/workspaceNavItems.ts` with Wand2 icon
+- [X] T013 [US1] Create list route file at `apps/clementine-app/src/app/routes/workspace/$workspaceSlug.ai-presets/index.tsx`
+- [X] T014 [P] [US1] Create AIPresetItem component in `apps/clementine-app/src/domains/ai-presets/components/AIPresetItem.tsx` (card display, click to navigate)
+- [X] T015 [P] [US1] Create AIPresetsList component in `apps/clementine-app/src/domains/ai-presets/components/AIPresetsList.tsx` (loading/empty/list states)
+- [X] T016 [US1] Create AIPresetsPage container in `apps/clementine-app/src/domains/ai-presets/containers/AIPresetsPage.tsx` (integrates list with header)
+- [X] T017 [US1] Update domain barrel export with new components in `apps/clementine-app/src/domains/ai-presets/index.ts`
 
 **Checkpoint**: User Story 1 complete - Users can navigate via sidebar, see loading state, empty state, or list of presets
 
@@ -78,10 +78,10 @@
 
 ### Implementation for User Story 2
 
-- [ ] T018 [US2] Create useCreateAIPreset mutation hook in `apps/clementine-app/src/domains/ai-presets/hooks/useCreateAIPreset.ts`
-- [ ] T019 [US2] Create CreateAIPresetButton component in `apps/clementine-app/src/domains/ai-presets/components/CreateAIPresetButton.tsx` (admin-only visibility)
-- [ ] T020 [US2] Integrate CreateAIPresetButton into AIPresetsPage header in `apps/clementine-app/src/domains/ai-presets/containers/AIPresetsPage.tsx`
-- [ ] T021 [US2] Update domain barrel export in `apps/clementine-app/src/domains/ai-presets/index.ts`
+- [X] T018 [US2] Create useCreateAIPreset mutation hook in `apps/clementine-app/src/domains/ai-presets/hooks/useCreateAIPreset.ts`
+- [X] T019 [US2] Create CreateAIPresetButton component in `apps/clementine-app/src/domains/ai-presets/components/CreateAIPresetButton.tsx` (admin-only visibility)
+- [X] T020 [US2] Integrate CreateAIPresetButton into AIPresetsPage header in `apps/clementine-app/src/domains/ai-presets/containers/AIPresetsPage.tsx`
+- [X] T021 [US2] Update domain barrel export in `apps/clementine-app/src/domains/ai-presets/index.ts`
 
 **Checkpoint**: User Story 2 complete - Admins can create presets, non-admins don't see create button
 
@@ -95,8 +95,8 @@
 
 ### Implementation for User Story 3
 
-- [ ] T022 [US3] Create editor placeholder route at `apps/clementine-app/src/app/routes/workspace/$workspaceSlug.ai-presets/$presetId.tsx`
-- [ ] T023 [US3] Add click handler to AIPresetItem for navigation in `apps/clementine-app/src/domains/ai-presets/components/AIPresetItem.tsx`
+- [X] T022 [US3] Create editor placeholder route at `apps/clementine-app/src/app/routes/workspace/$workspaceSlug.ai-presets/$presetId.tsx`
+- [X] T023 [US3] Add click handler to AIPresetItem for navigation in `apps/clementine-app/src/domains/ai-presets/components/AIPresetItem.tsx`
 
 **Checkpoint**: User Story 3 complete - Clicking preset navigates to editor placeholder page
 
@@ -110,9 +110,9 @@
 
 ### Implementation for User Story 4
 
-- [ ] T024 [US4] Create useDuplicateAIPreset mutation hook in `apps/clementine-app/src/domains/ai-presets/hooks/useDuplicateAIPreset.ts`
-- [ ] T025 [US4] Add Duplicate action to AIPresetItem context menu in `apps/clementine-app/src/domains/ai-presets/components/AIPresetItem.tsx`
-- [ ] T026 [US4] Update domain barrel export in `apps/clementine-app/src/domains/ai-presets/index.ts`
+- [X] T024 [US4] Create useDuplicateAIPreset mutation hook in `apps/clementine-app/src/domains/ai-presets/hooks/useDuplicateAIPreset.ts`
+- [X] T025 [US4] Add Duplicate action to AIPresetItem context menu in `apps/clementine-app/src/domains/ai-presets/components/AIPresetItem.tsx`
+- [X] T026 [US4] Update domain barrel export in `apps/clementine-app/src/domains/ai-presets/index.ts`
 
 **Checkpoint**: User Story 4 complete - Admins can duplicate presets
 
@@ -126,10 +126,10 @@
 
 ### Implementation for User Story 5
 
-- [ ] T027 [US5] Create useRenameAIPreset mutation hook in `apps/clementine-app/src/domains/ai-presets/hooks/useRenameAIPreset.ts`
-- [ ] T028 [US5] Create RenameAIPresetDialog component in `apps/clementine-app/src/domains/ai-presets/components/RenameAIPresetDialog.tsx`
-- [ ] T029 [US5] Add Rename action to AIPresetItem context menu, integrate dialog in `apps/clementine-app/src/domains/ai-presets/components/AIPresetItem.tsx`
-- [ ] T030 [US5] Update domain barrel export in `apps/clementine-app/src/domains/ai-presets/index.ts`
+- [X] T027 [US5] Create useRenameAIPreset mutation hook in `apps/clementine-app/src/domains/ai-presets/hooks/useRenameAIPreset.ts`
+- [X] T028 [US5] Create RenameAIPresetDialog component in `apps/clementine-app/src/domains/ai-presets/components/RenameAIPresetDialog.tsx`
+- [X] T029 [US5] Add Rename action to AIPresetItem context menu, integrate dialog in `apps/clementine-app/src/domains/ai-presets/components/AIPresetItem.tsx`
+- [X] T030 [US5] Update domain barrel export in `apps/clementine-app/src/domains/ai-presets/index.ts`
 
 **Checkpoint**: User Story 5 complete - Admins can rename presets via dialog
 
@@ -143,10 +143,10 @@
 
 ### Implementation for User Story 6
 
-- [ ] T031 [US6] Create useDeleteAIPreset mutation hook in `apps/clementine-app/src/domains/ai-presets/hooks/useDeleteAIPreset.ts`
-- [ ] T032 [US6] Create DeleteAIPresetDialog component in `apps/clementine-app/src/domains/ai-presets/components/DeleteAIPresetDialog.tsx`
-- [ ] T033 [US6] Add Delete action to AIPresetItem context menu, integrate dialog in `apps/clementine-app/src/domains/ai-presets/components/AIPresetItem.tsx`
-- [ ] T034 [US6] Update domain barrel export in `apps/clementine-app/src/domains/ai-presets/index.ts`
+- [X] T031 [US6] Create useDeleteAIPreset mutation hook in `apps/clementine-app/src/domains/ai-presets/hooks/useDeleteAIPreset.ts`
+- [X] T032 [US6] Create DeleteAIPresetDialog component in `apps/clementine-app/src/domains/ai-presets/components/DeleteAIPresetDialog.tsx`
+- [X] T033 [US6] Add Delete action to AIPresetItem context menu, integrate dialog in `apps/clementine-app/src/domains/ai-presets/components/AIPresetItem.tsx`
+- [X] T034 [US6] Update domain barrel export in `apps/clementine-app/src/domains/ai-presets/index.ts`
 
 **Checkpoint**: User Story 6 complete - Admins can delete presets with confirmation
 
@@ -156,7 +156,7 @@
 
 **Purpose**: Final validation and cleanup
 
-- [ ] T035 Run validation gates: `pnpm app:check` and `pnpm app:type-check`
+- [X] T035 Run validation gates: `pnpm app:check` and `pnpm app:type-check`
 - [ ] T036 Verify all CRUD operations work end-to-end per quickstart.md checklist
 - [ ] T037 [P] Verify mobile responsiveness (44x44px touch targets, mobile-first layout)
 - [ ] T038 [P] Verify admin/member permission enforcement across all actions

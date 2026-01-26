@@ -61,6 +61,22 @@ service cloud.firestore {
         // DELETE: Forbid hard deletes - use soft delete (status='deleted')
         allow delete: if false;
       }
+
+      // AI Presets subcollection rules (041-ai-presets-crud)
+      // Workspace-scoped AI presets with admin-only writes
+      match /aiPresets/{presetId} {
+        // READ: Workspace members (authenticated users) can read presets
+        allow read: if isAnyUser();
+
+        // CREATE: Only admins can create presets
+        allow create: if isAdmin();
+
+        // UPDATE: Only admins can update presets (including soft delete)
+        allow update: if isAdmin();
+
+        // DELETE: Forbid hard deletes - use soft delete (status='deleted')
+        allow delete: if false;
+      }
     }
 
     // Projects collection rules
