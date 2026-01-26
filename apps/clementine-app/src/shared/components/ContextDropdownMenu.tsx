@@ -109,10 +109,13 @@ export function ContextDropdownMenu({
   'aria-label': ariaLabel,
 }: ContextDropdownMenuProps) {
   // Convert simple actions to sections format
-  const resolvedSections: MenuSection[] = sections ?? (actions ? [{ items: actions }] : [])
+  const resolvedSections: MenuSection[] =
+    sections ?? (actions ? [{ items: actions }] : [])
 
   // Filter out empty sections
-  const nonEmptySections = resolvedSections.filter((section) => section.items.length > 0)
+  const nonEmptySections = resolvedSections.filter(
+    (section) => section.items.length > 0,
+  )
 
   return (
     <DropdownMenu>
