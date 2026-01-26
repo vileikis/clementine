@@ -14,10 +14,12 @@ import {
   isValidationError,
   usePublishExperience,
 } from '../hooks'
+import { ExperienceDetailsDialog, ExperienceIdentityBadge } from '../components'
 import { ExperiencePreviewModal } from '../../preview'
 import { ExperienceDesignerPage } from './ExperienceDesignerPage'
 import type { Experience } from '@/domains/experience/shared'
 import type { Step } from '@/domains/experience/steps'
+import { useAuth } from '@/domains/auth'
 import { TopNavBar } from '@/domains/navigation'
 import { EditorChangesBadge, EditorSaveStatus } from '@/shared/editor-status'
 import { Button } from '@/ui-kit/ui/button'
@@ -53,11 +55,13 @@ export function ExperienceDesignerLayout({
 }: ExperienceDesignerLayoutProps) {
   const { pendingSaves, lastCompletedAt, resetSaveState } =
     useExperienceDesignerStore()
+  const { user } = useAuth()
 
   const publishExperience = usePublishExperience()
 
-  // Preview modal state
+  // Modal state
   const [showPreview, setShowPreview] = useState(false)
+  const [showDetailsDialog, setShowDetailsDialog] = useState(false)
 
   // Compute paths for breadcrumb navigation
   const experiencesPath = `/workspace/${workspaceSlug}/experiences`
@@ -124,7 +128,12 @@ export function ExperienceDesignerLayout({
         className="shrink-0"
         breadcrumbs={[
           {
-            label: experience.name,
+            label: (
+              <ExperienceIdentityBadge
+                experience={experience}
+                onClick={() => setShowDetailsDialog(true)}
+              />
+            ),
             icon: Sparkles,
             iconHref: experiencesPath,
           },
@@ -167,6 +176,17 @@ export function ExperienceDesignerLayout({
         experience={experience}
         workspaceId={workspaceId}
       />
+
+      {/* Experience Details Dialog */}
+      {user && (
+        <ExperienceDetailsDialog
+          open={showDetailsDialog}
+          onOpenChange={setShowDetailsDialog}
+          experience={experience}
+          workspaceId={workspaceId}
+          userId={user.uid}
+        />
+      )}
     </div>
   )
 }

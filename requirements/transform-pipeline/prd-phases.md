@@ -111,7 +111,7 @@ This document breaks down the Transform Pipeline feature into incremental phases
 
 ### Scope
 
-- Add Transform panel/tab to experience designer
+- Add Transform tab to experience designer (should be shown on same panel where step list)
 - Node list UI (add, remove, reorder)
 - Node type selector (AI Image, Composite, Background Removal, Background Swap)
 - Variable mappings section (add, remove, edit)

@@ -16,15 +16,23 @@ export function MediaPickerField({
   value,
   onChange,
   onUpload,
-  accept = 'image/*',
+  accept,
   removable = true,
   uploading = false,
   uploadProgress,
   disabled = false,
+  className,
 }: MediaPickerFieldProps) {
   const id = useId()
   const inputRef = useRef<HTMLInputElement>(null)
   const [isDragging, setIsDragging] = useState(false)
+
+  // Convert accept prop to comma-separated string for HTML input
+  const acceptString = accept
+    ? Array.isArray(accept)
+      ? accept.join(',')
+      : accept
+    : 'image/*'
 
   const handleClick = () => {
     if (!disabled && !uploading) {
@@ -75,15 +83,17 @@ export function MediaPickerField({
 
   return (
     <div className="space-y-2">
-      <label className="text-sm font-normal text-muted-foreground">
-        {label}
-      </label>
+      {label && (
+        <label className="text-sm font-normal text-muted-foreground">
+          {label}
+        </label>
+      )}
 
       <input
         ref={inputRef}
         id={id}
         type="file"
-        accept={accept}
+        accept={acceptString}
         onChange={handleFileChange}
         disabled={disabled || uploading}
         className="sr-only"
@@ -107,6 +117,7 @@ export function MediaPickerField({
               : 'cursor-pointer hover:border-ring hover:bg-muted/50',
           hasImage ? 'border-transparent' : 'border-border',
           isDragging && !hasImage && 'border-primary bg-primary/5',
+          className,
         )}
       >
         {hasImage ? (

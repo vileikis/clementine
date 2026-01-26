@@ -30,3 +30,6 @@ export type {
   PublishValidationError,
   PublishValidationResult,
 } from './usePublishExperience'
+
+// Cover image upload
+export { useUploadExperienceCover } from './useUploadExperienceCover'

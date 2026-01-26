@@ -178,7 +178,6 @@ export function ThemeConfigPanel({
             })
           }
           onUpload={onUploadBackground}
-          accept="image/*"
           removable
           uploading={uploadingBackground}
           uploadProgress={uploadProgress}

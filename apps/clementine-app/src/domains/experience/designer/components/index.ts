@@ -8,3 +8,7 @@ export { StepList } from './StepList'
 export { StepListItem } from './StepListItem'
 export { StepConfigPanel } from './StepConfigPanel'
 export { StepPreview } from './StepPreview'
+
+// Experience identity components
+export { ExperienceIdentityBadge } from './ExperienceIdentityBadge'
+export { ExperienceDetailsDialog } from './ExperienceDetailsDialog'
