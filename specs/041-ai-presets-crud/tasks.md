@@ -26,7 +26,7 @@
 
 **Purpose**: Project initialization and schema creation in shared package
 
-- [ ] T001 [P] Create preset media entry schema in `packages/shared/src/schemas/ai-preset/preset-media.schema.ts`
+- [ ] T001 [P] Create preset media entry schema in `packages/shared/src/schemas/ai-preset/preset-media.schema.ts` (extends `mediaReferenceSchema` from `../media` with `name` field)
 - [ ] T002 [P] Create preset variable schemas (text, image, discriminated union) in `packages/shared/src/schemas/ai-preset/preset-variable.schema.ts`
 - [ ] T003 Create main AI Preset entity schema in `packages/shared/src/schemas/ai-preset/ai-preset.schema.ts` (depends on T001, T002)
 - [ ] T004 Create barrel export in `packages/shared/src/schemas/ai-preset/index.ts`
@@ -206,7 +206,7 @@
 
 ```bash
 # Launch schema creation in parallel:
-Task: "Create preset media entry schema in packages/shared/src/schemas/ai-preset/preset-media.schema.ts"
+Task: "Create preset media entry schema (extends mediaReferenceSchema with name field)"
 Task: "Create preset variable schemas in packages/shared/src/schemas/ai-preset/preset-variable.schema.ts"
 
 # Then sequentially:
@@ -214,6 +214,8 @@ Task: "Create main AI Preset entity schema" (depends on above)
 Task: "Create barrel export"
 Task: "Build shared package"
 ```
+
+**Note**: T001 extends the existing `mediaReferenceSchema` from `packages/shared/src/schemas/media/` rather than creating a standalone schema. This ensures consistency with how media assets are referenced throughout the platform.
 
 ## Parallel Example: P2 User Stories (US4, US5, US6)
 

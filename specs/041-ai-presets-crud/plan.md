@@ -53,10 +53,13 @@ specs/041-ai-presets-crud/
 ```text
 packages/shared/
 └── src/schemas/
+    ├── media/                        # Shared media schemas (already exists)
+    │   ├── media-reference.schema.ts # Base schema extended by preset-media
+    │   └── ...
     └── ai-preset/
         ├── ai-preset.schema.ts       # Main entity schema
         ├── preset-variable.schema.ts # Variable discriminated union
-        ├── preset-media.schema.ts    # Media registry entry
+        ├── preset-media.schema.ts    # Extends mediaReferenceSchema with name
         └── index.ts                  # Barrel export
 
 apps/clementine-app/

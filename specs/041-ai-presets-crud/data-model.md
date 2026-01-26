@@ -25,7 +25,7 @@ This document defines the data model for AI Presets including Zod schemas, TypeS
   "status": "active",
 
   "mediaRegistry": [
-    { "name": "style_ref", "assetId": "asset_123", "url": "https://..." }
+    { "name": "style_ref", "mediaAssetId": "asset_123", "url": "https://...", "filePath": "workspaces/ws_123/media/style-ref.png" }
   ],
 
   "variables": [
@@ -64,23 +64,24 @@ export type AIPresetStatus = z.infer<typeof aiPresetStatusSchema>
 ```typescript
 // packages/shared/src/schemas/ai-preset/preset-media.schema.ts
 
+import { mediaReferenceSchema } from '../media'
+
 /**
- * Media registry entry - references workspace media library
+ * Media registry entry - extends shared MediaReference with a reference name
  * Used for images that can be included in prompts via @name syntax
+ *
+ * Extends mediaReferenceSchema (mediaAssetId, url, filePath) with:
+ * - name: Reference name used in prompt templates (e.g., @cat, @hobbiton)
  */
-export const presetMediaEntrySchema = z.object({
+export const presetMediaEntrySchema = mediaReferenceSchema.extend({
   /** Reference name used in prompt (e.g., "cat", "hobbiton") - alphanumeric + underscore */
   name: z.string().regex(/^[a-zA-Z_][a-zA-Z0-9_]*$/, 'Invalid reference name'),
-
-  /** Asset ID from workspace media library */
-  assetId: z.string().min(1),
-
-  /** Cached public URL for display (from media library) */
-  url: z.string().url(),
 })
 
 export type PresetMediaEntry = z.infer<typeof presetMediaEntrySchema>
 ```
+
+**Note**: `presetMediaEntrySchema` extends the shared `mediaReferenceSchema` from `packages/shared/src/schemas/media/`. This ensures consistency with how media assets are referenced throughout the platform (themes, overlays, experiences, etc.).
 
 ### 2.3 Value Mapping Entry
 

@@ -11,6 +11,19 @@ This guide provides quick reference for implementing AI Presets CRUD functionali
 
 ## 1. Schema Setup
 
+**Note**: The `presetMediaEntrySchema` extends `mediaReferenceSchema` from the shared media schemas (`packages/shared/src/schemas/media/`). This ensures consistency with how media assets are referenced throughout the platform.
+
+### packages/shared/src/schemas/ai-preset/preset-media.schema.ts
+```typescript
+import { z } from 'zod'
+import { mediaReferenceSchema } from '../media'
+
+// Extends shared MediaReference with a prompt reference name
+export const presetMediaEntrySchema = mediaReferenceSchema.extend({
+  name: z.string().regex(/^[a-zA-Z_][a-zA-Z0-9_]*$/, 'Invalid reference name'),
+})
+```
+
 ### packages/shared/src/schemas/ai-preset/index.ts
 ```typescript
 // Barrel export for AI Preset schemas
