@@ -141,12 +141,17 @@ export function PregatePage({ selectedExperienceId }: PregatePageProps) {
 
     const { sessionId } = sessionState
 
-    // 1. Mark pregate experience as complete in guest record
-    await markExperienceComplete.mutateAsync({
-      projectId: project.id,
-      guestId: guest.id,
-      experienceId: pregateExperienceId,
-    })
+    // 1. Mark pregate experience as complete in guest record (best effort - don't block navigation)
+    try {
+      await markExperienceComplete.mutateAsync({
+        projectId: project.id,
+        guestId: guest.id,
+        experienceId: pregateExperienceId,
+      })
+    } catch (error) {
+      console.error('Failed to mark pregate complete:', error)
+      // Continue with navigation - guest shouldn't be stuck
+    }
 
     // 2. Navigate to main experience with pregate session ID for linking
     // Use replace to remove pregate from browser history

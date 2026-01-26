@@ -181,24 +181,34 @@ export function ExperienceRuntime({
 
     // Sync final state before completing
     // Only proceed with completion if sync succeeds
-    syncToFirestore({
-      answers: store.answers,
-      capturedMedia: store.capturedMedia,
-    })
-      .then(() => {
-        // Mark as completed only after successful sync
-        hasCompletedRef.current = true
-        return completeSession.mutateAsync({
+    const runCompletion = async () => {
+      // Step 1: Sync to Firestore
+      try {
+        await syncToFirestore({
+          answers: store.answers,
+          capturedMedia: store.capturedMedia,
+        })
+      } catch {
+        // Error already reported by syncToFirestore via onError
+        return
+      }
+
+      // Step 2: Mark as completed only after successful sync
+      hasCompletedRef.current = true
+
+      // Step 3: Complete the session
+      try {
+        await completeSession.mutateAsync({
           projectId: session.projectId,
           sessionId: session.id,
         })
-      })
-      .then(() => onComplete?.())
-      .catch((error) => {
-        // syncToFirestore already calls onError internally for sync failures,
-        // but completeSession failures need to be reported here
+        onComplete?.()
+      } catch (error) {
         onError?.(error instanceof Error ? error : new Error('Complete failed'))
-      })
+      }
+    }
+
+    void runCompletion()
   }, [
     store.isReady,
     store.isComplete,
@@ -206,7 +216,7 @@ export function ExperienceRuntime({
     store.capturedMedia,
     session.projectId,
     session.id,
-    completeSession,
+    completeSession.mutateAsync,
     syncToFirestore,
     onComplete,
     onError,

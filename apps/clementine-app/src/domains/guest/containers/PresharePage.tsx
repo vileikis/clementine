@@ -167,12 +167,17 @@ export function PresharePage({ mainSessionId }: PresharePageProps) {
     if (sessionState.status !== 'ready') return
     if (!preshareExperienceId) return
 
-    // 1. Mark preshare experience as complete in guest record
-    await markExperienceComplete.mutateAsync({
-      projectId: project.id,
-      guestId: guest.id,
-      experienceId: preshareExperienceId,
-    })
+    // 1. Mark preshare experience as complete in guest record (best effort - don't block navigation)
+    try {
+      await markExperienceComplete.mutateAsync({
+        projectId: project.id,
+        guestId: guest.id,
+        experienceId: preshareExperienceId,
+      })
+    } catch (error) {
+      console.error('Failed to mark preshare complete:', error)
+      // Continue with navigation - guest shouldn't be stuck
+    }
 
     // 2. Navigate to share screen with main session ID
     // Use replace to remove preshare from browser history

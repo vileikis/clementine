@@ -190,7 +190,7 @@ export function ExperiencePage({
   }, [
     sessionState,
     pregateSessionId,
-    linkSession,
+    linkSession.mutate,
     project.id,
     shouldRedirectToPregate,
   ])
@@ -209,12 +209,17 @@ export function ExperiencePage({
 
     const { sessionId } = sessionState
 
-    // 1. Mark experience as complete in guest record
-    await markExperienceComplete.mutateAsync({
-      projectId: project.id,
-      guestId: guest.id,
-      experienceId,
-    })
+    // 1. Mark experience as complete in guest record (best effort - don't block navigation)
+    try {
+      await markExperienceComplete.mutateAsync({
+        projectId: project.id,
+        guestId: guest.id,
+        experienceId,
+      })
+    } catch (error) {
+      console.error('Failed to mark experience complete:', error)
+      // Continue with navigation - guest shouldn't be stuck
+    }
 
     // 2. Navigate to preshare or share
     if (needsPreshare()) {
