@@ -25,8 +25,8 @@
 
 **Purpose**: Create media domain structure in shared package
 
-- [ ] T001 Create media domain folder at `packages/shared/src/schemas/media/`
-- [ ] T002 Create barrel export file at `packages/shared/src/schemas/media/index.ts`
+- [X] T001 Create media domain folder at `packages/shared/src/schemas/media/`
+- [X] T002 Create barrel export file at `packages/shared/src/schemas/media/index.ts`
 
 ---
 
@@ -36,14 +36,14 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T003 [P] Create `imageMimeTypeSchema` enum at `packages/shared/src/schemas/media/image-mime-type.schema.ts`
-- [ ] T004 [P] Create `mediaAssetTypeSchema` enum at `packages/shared/src/schemas/media/media-asset-type.schema.ts`
-- [ ] T005 [P] Create `mediaAssetStatusSchema` enum at `packages/shared/src/schemas/media/media-asset-status.schema.ts`
-- [ ] T006 Create `mediaReferenceSchema` with nullable `filePath` at `packages/shared/src/schemas/media/media-reference.schema.ts`
-- [ ] T007 Create `mediaAssetSchema` (full document) at `packages/shared/src/schemas/media/media-asset.schema.ts`
-- [ ] T008 Update barrel exports to include all schemas at `packages/shared/src/schemas/media/index.ts`
-- [ ] T009 Add media domain export to main barrel at `packages/shared/src/schemas/index.ts`
-- [ ] T010 Build shared package and verify compilation with `pnpm --filter @clementine/shared build`
+- [X] T003 [P] Create `imageMimeTypeSchema` enum at `packages/shared/src/schemas/media/image-mime-type.schema.ts`
+- [X] T004 [P] Create `mediaAssetTypeSchema` enum at `packages/shared/src/schemas/media/media-asset-type.schema.ts`
+- [X] T005 [P] Create `mediaAssetStatusSchema` enum at `packages/shared/src/schemas/media/media-asset-status.schema.ts`
+- [X] T006 Create `mediaReferenceSchema` with nullable `filePath` at `packages/shared/src/schemas/media/media-reference.schema.ts`
+- [X] T007 Create `mediaAssetSchema` (full document) at `packages/shared/src/schemas/media/media-asset.schema.ts`
+- [X] T008 Update barrel exports to include all schemas at `packages/shared/src/schemas/media/index.ts`
+- [X] T009 Add media domain export to main barrel at `packages/shared/src/schemas/index.ts`
+- [X] T010 Build shared package and verify compilation with `pnpm --filter @clementine/shared build`
 
 **Checkpoint**: Foundation ready - schemas exist and compile, user story refactoring can begin
 
@@ -57,17 +57,17 @@
 
 ### Tests for User Story 1
 
-- [ ] T011 [P] [US1] Create schema validation tests at `packages/shared/src/schemas/media/media-asset.schema.test.ts`
+- [X] T011 [P] [US1] Create schema validation tests at `packages/shared/src/schemas/media/media-asset.schema.test.ts`
 
 ### Implementation for User Story 1
 
-- [ ] T012 [P] [US1] Update theme barrel to re-export from media for backward compat at `packages/shared/src/schemas/theme/index.ts`
-- [ ] T013 [P] [US1] Delete old media-reference.schema.ts from theme at `packages/shared/src/schemas/theme/media-reference.schema.ts`
-- [ ] T014 [US1] Refactor `overlayReferenceSchema` to use `mediaReferenceSchema` at `packages/shared/src/schemas/event/project-event-config.schema.ts`
-- [ ] T015 [US1] Refactor `experienceMediaSchema` to use `mediaReferenceSchema` at `packages/shared/src/schemas/experience/experience.schema.ts`
-- [ ] T016 [US1] Refactor `experienceMediaAssetSchema` to use `mediaReferenceSchema` at `packages/shared/src/schemas/experience/steps/info.schema.ts`
-- [ ] T017 [US1] Build and verify shared package compiles with `pnpm --filter @clementine/shared build`
-- [ ] T018 [US1] Run shared package tests with `pnpm --filter @clementine/shared test`
+- [X] T012 [P] [US1] Update theme barrel to re-export from media for backward compat at `packages/shared/src/schemas/theme/index.ts`
+- [X] T013 [P] [US1] Delete old media-reference.schema.ts from theme at `packages/shared/src/schemas/theme/media-reference.schema.ts`
+- [X] T014 [US1] Refactor `overlayReferenceSchema` to use `mediaReferenceSchema` at `packages/shared/src/schemas/event/project-event-config.schema.ts`
+- [X] T015 [US1] Refactor `experienceMediaSchema` to use `mediaReferenceSchema` at `packages/shared/src/schemas/experience/experience.schema.ts`
+- [X] T016 [US1] Refactor `experienceMediaAssetSchema` to use `mediaReferenceSchema` at `packages/shared/src/schemas/experience/steps/info.schema.ts`
+- [X] T017 [US1] Build and verify shared package compiles with `pnpm --filter @clementine/shared build`
+- [X] T018 [US1] Run shared package tests with `pnpm --filter @clementine/shared test`
 
 **Checkpoint**: User Story 1 complete - unified schemas available in shared package
 
@@ -81,9 +81,9 @@
 
 ### Implementation for User Story 2
 
-- [ ] T019 [US2] Verify functions can import media schemas from `@clementine/shared` (check existing imports)
-- [ ] T020 [US2] Update any functions using media references to check for `filePath` before URL parsing at `functions/src/infra/storage.ts`
-- [ ] T021 [US2] Build and verify functions compile with `pnpm --filter functions build`
+- [X] T019 [US2] Verify functions can import media schemas from `@clementine/shared` (check existing imports)
+- [X] T020 [US2] Update any functions using media references to check for `filePath` before URL parsing at `functions/src/infra/storage.ts`
+- [X] T021 [US2] Build and verify functions compile with `pnpm --filter functions build`
 
 **Checkpoint**: User Story 2 complete - cloud functions can leverage filePath for new documents
 
@@ -97,13 +97,13 @@
 
 ### Implementation for User Story 3
 
-- [ ] T022 [P] [US3] Delete app-level `image-mime-type.schema.ts` at `apps/clementine-app/src/domains/media-library/schemas/image-mime-type.schema.ts`
-- [ ] T023 [P] [US3] Delete app-level `media-asset.schema.ts` at `apps/clementine-app/src/domains/media-library/schemas/media-asset.schema.ts`
-- [ ] T024 [US3] Update media-library schemas barrel to re-export from `@clementine/shared` at `apps/clementine-app/src/domains/media-library/schemas/index.ts`
-- [ ] T025 [US3] Update imports in `useUploadMediaAsset.ts` to use shared types at `apps/clementine-app/src/domains/media-library/hooks/useUploadMediaAsset.ts`
-- [ ] T026 [US3] Update any other components using media types to import from shared (search for `MediaAsset` imports)
-- [ ] T027 [US3] Build and verify app compiles with `pnpm --filter clementine-app build`
-- [ ] T028 [US3] Run app type-check with `pnpm --filter clementine-app type-check`
+- [X] T022 [P] [US3] Delete app-level `image-mime-type.schema.ts` at `apps/clementine-app/src/domains/media-library/schemas/image-mime-type.schema.ts`
+- [X] T023 [P] [US3] Delete app-level `media-asset.schema.ts` at `apps/clementine-app/src/domains/media-library/schemas/media-asset.schema.ts`
+- [X] T024 [US3] Update media-library schemas barrel to re-export from `@clementine/shared` at `apps/clementine-app/src/domains/media-library/schemas/index.ts`
+- [X] T025 [US3] Update imports in `useUploadMediaAsset.ts` to use shared types at `apps/clementine-app/src/domains/media-library/hooks/useUploadMediaAsset.ts`
+- [X] T026 [US3] Update any other components using media types to import from shared (search for `MediaAsset` imports)
+- [X] T027 [US3] Build and verify app compiles with `pnpm --filter clementine-app build`
+- [X] T028 [US3] Run app type-check with `pnpm --filter clementine-app type-check`
 
 **Checkpoint**: User Story 3 complete - app uses shared schemas, backward compatible
 
@@ -117,12 +117,12 @@
 
 ### Implementation for User Story 4
 
-- [ ] T029 [US4] Create services folder at `apps/clementine-app/src/domains/media-library/services/`
-- [ ] T030 [US4] Extract upload logic to service at `apps/clementine-app/src/domains/media-library/services/upload-media-asset.service.ts`
-- [ ] T031 [US4] Update service to return `filePath` in result for new uploads
-- [ ] T032 [US4] Refactor hook to use service at `apps/clementine-app/src/domains/media-library/hooks/useUploadMediaAsset.ts`
-- [ ] T033 [US4] Create barrel export for services at `apps/clementine-app/src/domains/media-library/services/index.ts`
-- [ ] T034 [US4] Build and verify app compiles with `pnpm --filter clementine-app build`
+- [X] T029 [US4] Create services folder at `apps/clementine-app/src/domains/media-library/services/`
+- [X] T030 [US4] Extract upload logic to service at `apps/clementine-app/src/domains/media-library/services/upload-media-asset.service.ts`
+- [X] T031 [US4] Update service to return `filePath` in result for new uploads
+- [X] T032 [US4] Refactor hook to use service at `apps/clementine-app/src/domains/media-library/hooks/useUploadMediaAsset.ts`
+- [X] T033 [US4] Create barrel export for services at `apps/clementine-app/src/domains/media-library/services/index.ts`
+- [X] T034 [US4] Build and verify app compiles with `pnpm --filter clementine-app build`
 
 **Checkpoint**: User Story 4 complete - upload logic reusable, returns filePath
 
@@ -132,10 +132,10 @@
 
 **Purpose**: Documentation and final validation
 
-- [ ] T035 [P] Update README with Media domain documentation at `packages/shared/README.md`
-- [ ] T036 [P] Run full monorepo type-check with `pnpm app:type-check`
-- [ ] T037 Run full validation with `pnpm app:check`
-- [ ] T038 Verify quickstart.md examples work by testing imports
+- [X] T035 [P] Update README with Media domain documentation at `packages/shared/README.md`
+- [X] T036 [P] Run full monorepo type-check with `pnpm app:type-check`
+- [X] T037 Run full validation with `pnpm app:check`
+- [X] T038 Verify quickstart.md examples work by testing imports
 
 ---
 

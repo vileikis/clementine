@@ -55,6 +55,8 @@ interface UploadAndUpdateOverlaysResult {
   mediaAssetId: string
   /** Media asset URL */
   url: string
+  /** Storage path for server-side access */
+  filePath: string
 }
 
 /**
@@ -88,18 +90,18 @@ export function useUploadAndUpdateOverlays(
   >({
     mutationFn: async ({ file, aspectRatio, onProgress }) => {
       // Step 1: Upload to Storage + create MediaAsset document
-      const { mediaAssetId, url } = await uploadAsset.mutateAsync({
+      const { mediaAssetId, url, filePath } = await uploadAsset.mutateAsync({
         file,
         type: 'overlay',
         onProgress,
       })
 
-      // Step 2: Update event config with new overlay reference
+      // Step 2: Update event config with new overlay reference (including filePath)
       await updateOverlays.mutateAsync({
-        [aspectRatio]: { mediaAssetId, url },
+        [aspectRatio]: { mediaAssetId, url, filePath },
       })
 
-      return { mediaAssetId, url }
+      return { mediaAssetId, url, filePath }
     },
   })
 

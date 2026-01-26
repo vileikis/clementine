@@ -9,7 +9,7 @@
  */
 import { z } from 'zod'
 
-import { mediaReferenceSchema } from './media-reference.schema'
+import { mediaReferenceSchema } from '../media/media-reference.schema'
 import {
   DEFAULT_PRIMARY_COLOR,
   DEFAULT_TEXT_COLOR,

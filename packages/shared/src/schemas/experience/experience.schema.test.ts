@@ -41,6 +41,7 @@ describe('experienceMediaSchema', () => {
     expect(result).toEqual({
       mediaAssetId: 'asset-123',
       url: 'https://example.com/image.png',
+      filePath: null,
     })
   })
 
@@ -48,13 +49,14 @@ describe('experienceMediaSchema', () => {
     expect(experienceMediaSchema.parse(null)).toBeNull()
   })
 
-  it('requires non-empty mediaAssetId', () => {
-    expect(() =>
-      experienceMediaSchema.parse({
-        mediaAssetId: '',
-        url: 'https://example.com/image.png',
-      })
-    ).toThrow()
+  it('accepts empty mediaAssetId (for backward compatibility)', () => {
+    // Note: The new schema allows empty strings for backward compatibility
+    // with legacy data that may have empty mediaAssetIds
+    const result = experienceMediaSchema.parse({
+      mediaAssetId: '',
+      url: 'https://example.com/image.png',
+    })
+    expect(result?.mediaAssetId).toBe('')
   })
 
   it('validates URL format', () => {

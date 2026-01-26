@@ -15,6 +15,7 @@ import { useUploadMediaAsset } from '@/domains/media-library'
 interface UploadResult {
   mediaAssetId: string
   url: string
+  filePath: string
 }
 
 export function useUploadExperienceCover(
@@ -43,7 +44,11 @@ export function useUploadExperienceCover(
           onProgress: setUploadProgress,
         })
 
-        return { mediaAssetId: result.mediaAssetId, url: result.url }
+        return {
+          mediaAssetId: result.mediaAssetId,
+          url: result.url,
+          filePath: result.filePath,
+        }
       } catch (error) {
         toast.error(error instanceof Error ? error.message : 'Upload failed')
         return null
