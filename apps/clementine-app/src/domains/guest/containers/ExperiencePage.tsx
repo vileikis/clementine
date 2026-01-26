@@ -276,6 +276,18 @@ export function ExperiencePage({
     const { session } = sessionState
     const steps = experience?.published?.steps ?? []
 
+    // Handle empty experience (no steps configured)
+    if (steps.length === 0) {
+      return (
+        <ThemedErrorState
+          title="Experience Not Ready"
+          message="This experience doesn't have any steps yet. Please go back and try a different one."
+          actionLabel="Go Back"
+          onAction={navigateToWelcome}
+        />
+      )
+    }
+
     return (
       <ExperienceRuntime
         experienceId={experienceId}

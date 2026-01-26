@@ -132,13 +132,6 @@ export function ExperienceRuntime({
     ],
   )
 
-  // Handle zero steps edge case
-  useEffect(() => {
-    if (steps.length === 0 && !store.isComplete) {
-      store.complete()
-    }
-  }, [steps.length, store.isComplete, store.complete])
-
   // React to step changes - sync on forward navigation only
   useEffect(() => {
     if (!store.isReady) return
