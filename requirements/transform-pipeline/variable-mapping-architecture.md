@@ -1,8 +1,21 @@
 # Variable Mapping Architecture
 
-## Status: Proposed
+## Status: Superseded by AI Presets
 **Created**: 2025-01-24
-**Last Updated**: 2025-01-24
+**Last Updated**: 2025-01-26
+
+---
+
+## Architecture Evolution
+
+This document originally proposed embedding variable mappings directly in the Transform Pipeline config. After further analysis (see [Problem Analysis](#problem-analysis-multiple-ai-nodes) below), the architecture evolved to separate concerns:
+
+| Domain | Responsibility | Location |
+|--------|---------------|----------|
+| **AI Presets** | Media registry, variables with value mappings, prompt template, model settings | `/workspaces/{workspaceId}/aiPresets/{presetId}` |
+| **Transform Pipeline** | Node orchestration, variable bindings (1:1 step mapping) | Experience config |
+
+**See:** `/requirements/ai-presets/spec.md` for full AI Presets specification.
 
 ---
 
@@ -10,27 +23,29 @@
 
 1. **Images should be attached to prompt only when they are actually going to be used by the prompt.** No sending 9 images when only 3 are needed.
 
-2. **UX for orchestrating transform pipeline should be seamless and streamlined.** Admins shouldn't have to manage complexity scattered across multiple places.
+2. **AI generation logic should be testable in isolation.** Admins should be able to configure and test prompts without running full sessions.
+
+3. **UX for orchestrating transform pipeline should be seamless and streamlined.** Admins shouldn't have to manage complexity scattered across multiple places.
+
+4. **Separation of concerns.** AI generation configuration (presets) is distinct from pipeline orchestration (transform).
 
 ---
 
 ## Problem Statement
 
-### Current Structure Limitations
+### Original Issues
 
-The original variable mapping design had several issues:
-
-### 1. Prompt Enrichment Gap
+#### 1. Prompt Enrichment Gap
 
 Raw step values often don't map directly to what should appear in AI prompts.
 
 **Example:**
 - User selects: `"cat"`
-- What prompt needs: `"holding a cat (see image <cat>)"`
+- What prompt needs: `"holding a cat (see image @cat)"`
 
 The transformation from user-facing value to prompt-ready text was missing.
 
-### 2. Reference Image Inefficiency
+#### 2. Reference Image Inefficiency
 
 Original design attached all reference images to the AI Image node statically:
 
@@ -52,26 +67,96 @@ Original design attached all reference images to the AI Image node statically:
 - LLM must decide which images are relevant (unpredictable)
 - More images = more potential for confusion/errors
 
-### 3. Scattered Image Definitions
+#### 3. Scattered Image Definitions
 
 An alternative (distributed refs per variable) would scatter image definitions across multiple places, making it hard for admins to see the full picture.
 
-### 4. Mixed Concerns in Variable Mappings
+### Problem Analysis: Multiple AI Nodes
 
-Original design mixed text substitution and media references in the same structure, creating confusion about what `variableMappings` was for.
+When exploring embedding variable mappings directly in transform config, a critical issue emerged:
+
+**Scenario:** Transform pipeline with 2 AI Image nodes:
+- Node 1: Portrait generation (uses `@style`, `@mood`)
+- Node 2: Frame overlay (uses `@frame_style`)
+
+**Problem:** Global variable mappings defined at transform level don't work when different nodes need different variables or different interpretations of the same variable.
+
+**Options Considered:**
+
+| Option | Approach | Issues |
+|--------|----------|--------|
+| A: Node-centric | Each AI node has its own mappings | Duplication, scattered config |
+| B: Direct step refs | Remove variables, reference steps directly | Loses enrichment capability |
+| C: Namespaced | `node1.style`, `node2.frame` | Complex, unintuitive |
+| D: Inheritance | Global + node overrides | Still scattered, complex resolution |
+| **E: AI Presets** | Standalone templates with simple wiring | Clean separation, testable |
+
+**Decision:** Option E - AI Presets provides the best balance of testability, reusability, and clean UX.
 
 ---
 
-## Proposed Solution
+## Final Architecture: AI Presets + Transform Pipeline
 
-### Semantic Separation
+### Separation of Concerns
 
-Two distinct concepts, clearly separated:
+```
+┌─────────────────────────────────────────────────────────────┐
+│                       AI PRESET                              │
+│  (Standalone, testable, reusable)                           │
+├─────────────────────────────────────────────────────────────┤
+│  Media Registry:  @user_photo, @cat, @dog, @hobbiton, ...   │
+│  Variables:       @pet (with value mappings), @background   │
+│  Prompt Template: "Transform @user_photo... @pet... @bg..." │
+│  Model Settings:  gemini-2.5-pro, 3:2 aspect ratio          │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              │ presetId reference
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    TRANSFORM PIPELINE                        │
+│  (Orchestration only)                                        │
+├─────────────────────────────────────────────────────────────┤
+│  AI Image Node:                                              │
+│    presetId: "hobbit-preset-123"                            │
+│    variableBindings: {                                       │
+│      pet: { stepId: "petStep" }         ← 1:1 mapping       │
+│      background: { stepId: "bgStep" }   ← 1:1 mapping       │
+│      user_photo: { stepId: "capture" }  ← for media too     │
+│    }                                                         │
+└─────────────────────────────────────────────────────────────┘
+```
 
-| Concept | Purpose | Syntax in Prompt |
-|---------|---------|------------------|
-| **variableMappings** | Text substitution from step answers | `{{variable}}` |
-| **mediaRegistry** | Image references (static + captured) | `<label>` |
+### Key Insight: Where Value Mappings Live
+
+**Value mappings live in AI Presets, NOT in Transform Pipeline.**
+
+Transform Pipeline only does 1:1 binding:
+- `@pet` → `petStep` (raw value passed to preset)
+- `@background` → `bgStep` (raw value passed to preset)
+
+The AI Preset's variable definition handles the transformation:
+```typescript
+// In AI Preset
+variables: [{
+  name: 'pet',
+  valueMap: [
+    { value: 'cat', text: 'holding a cat (see @cat)' },
+    { value: 'dog', text: 'holding a dog (see @dog)' },
+    { value: 'none', text: 'with empty hands' }
+  ]
+}]
+```
+
+---
+
+## Unified Syntax: @ Mentions
+
+Both variables and media use unified `@name` syntax with visual differentiation:
+
+| Type | Color | Example |
+|------|-------|---------|
+| Variables | Blue | `@pet`, `@background` |
+| Media | Green | `@user_photo`, `@cat` |
 
 ### How LLMs Handle Labeled Images
 
@@ -80,406 +165,229 @@ LLMs like Gemini expect interleaved text labels and images:
 ```javascript
 // Gemini API expects this pattern
 const result = await model.generateContent([
-  { text: "Image Reference ID: <user_photo>" },
+  { text: "Image Reference ID: @user_photo" },
   userPhotoData,
-  { text: "Image Reference ID: <cat>" },
+  { text: "Image Reference ID: @cat" },
   catImageData,
-  { text: "Transform <user_photo> into hobbit holding a cat (see <cat>)..." }
+  { text: "Transform @user_photo into hobbit holding a cat (see @cat)..." }
 ]);
 ```
 
-Our architecture generates this format automatically based on `<label>` references in the resolved prompt.
+Resolution parses `@name` references in the resolved prompt to determine which images to include.
 
 ---
 
-## Schema Design
+## Schema Overview
 
-### Media Registry
-
-Central place for all image sources - static assets and captured media:
+### AI Preset Schema (Full spec in `/requirements/ai-presets/spec.md`)
 
 ```typescript
-const mediaRegistryEntrySchema = z.discriminatedUnion('type', [
-  // Static asset from media library
-  z.object({
-    type: z.literal('asset'),
+const aiPresetSchema = z.object({
+  id: z.string(),
+  workspaceId: z.string(),
+  name: z.string(),
+  description: z.string().optional(),
+
+  // Media from workspace library
+  mediaRegistry: z.array(z.object({
+    name: z.string(),        // Reference name (@name)
+    mediaId: z.string(),     // Workspace media library asset
+    description: z.string().optional(),
+  })),
+
+  // Variables with optional value mappings
+  variables: z.array(z.object({
+    name: z.string(),        // Reference name (@name)
+    type: z.enum(['text', 'image']),
     label: z.string(),
-    assetId: z.string(),
-  }),
-  // Captured media from a step
-  z.object({
-    type: z.literal('capturedMedia'),
-    label: z.string(),
+    required: z.boolean().default(true),
+    defaultValue: z.string().optional(),
+    valueMap: z.array(z.object({
+      value: z.string(),
+      text: z.string(),      // Can include @media refs
+    })).optional(),
+  })),
+
+  promptTemplate: z.string(),
+  model: z.enum(['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-3.0']),
+  aspectRatio: z.enum(['1:1', '3:2', '2:3', '9:16', '16:9']),
+
+  createdAt: z.number(),
+  updatedAt: z.number(),
+  createdBy: z.string(),
+})
+```
+
+### Transform Pipeline AI Image Node (Updated)
+
+```typescript
+const aiImageNodeSchema = z.object({
+  type: z.literal('aiImage'),
+  id: z.string(),
+
+  // Reference to AI Preset
+  presetId: z.string(),
+
+  // 1:1 bindings from preset variables to experience steps
+  variableBindings: z.record(z.string(), z.object({
     stepId: z.string(),
-  }),
-])
+  })),
 
-// Array for ordering support in UI
-const mediaRegistrySchema = z.array(mediaRegistryEntrySchema)
-```
-
-### Variable Mappings
-
-Text substitution from step answers only:
-
-```typescript
-const valueMappingEntrySchema = z.object({
-  /** The step value to match */
-  value: z.string(),
-  /** Text to substitute in prompt (can include <label> image refs) */
-  text: z.string(),
+  // Input image (optional, can come from previous node)
+  input: nodeInputSourceSchema.optional(),
 })
-
-const variableMappingSchema = z.object({
-  /** Step to get answer from */
-  stepId: z.string(),
-
-  /** Value mappings - array for ordering support */
-  valueMap: z.array(valueMappingEntrySchema).optional(),
-
-  /** Fallback when value not mapped or step data missing */
-  default: z.object({
-    text: z.string(),
-  }).optional()
-})
-```
-
-**Note:** No `type` field needed - variableMappings are always from step answers.
-
-### Transform Config
-
-```typescript
-const transformConfigSchema = z.object({
-  /** Central registry of all images (static + captured) */
-  mediaRegistry: mediaRegistrySchema.default([]),
-
-  /** Text substitution mappings (from step answers) */
-  variableMappings: z.record(z.string(), variableMappingSchema).default({}),
-
-  /** Pipeline nodes */
-  nodes: z.array(transformNodeSchema).default([]),
-
-  /** Output format */
-  outputFormat: transformOutputFormatSchema,
-})
-```
-
-### Node Input Source (Updated)
-
-Nodes can reference media by label:
-
-```typescript
-const nodeInputSourceSchema = z.discriminatedUnion('source', [
-  // From media registry by label
-  z.object({
-    source: z.literal('media'),
-    label: z.string(),
-  }),
-  // From previous node output
-  z.object({
-    source: z.literal('previousNode'),
-  }),
-  // From specific node by ID
-  z.object({
-    source: z.literal('node'),
-    nodeId: z.string(),
-  }),
-])
 ```
 
 ---
 
-## Resolution Logic
+## Resolution Flow
 
-### Step 1: Build Media Lookup
+### At Pipeline Execution Time
 
-```typescript
-const mediaLookup = new Map<string, MediaSource>()
-for (const entry of transform.mediaRegistry) {
-  mediaLookup.set(entry.label, entry)
-}
+```
+1. Fetch AI Preset by presetId
+
+2. For each variable binding:
+   - Get raw value from session (stepId)
+   - Pass to preset variable
+
+3. Preset resolution:
+   a. For each variable in prompt:
+      - If valueMap exists: lookup text for raw value
+      - Else: use raw value directly
+
+   b. Replace @variable with resolved text
+
+   c. Parse @media references in resolved prompt
+
+   d. Build image array (only referenced images)
+
+4. Call LLM with resolved prompt + images
 ```
 
-### Step 2: Resolve Text Variables
+### Example Execution
 
+**AI Preset: "Hobbit Portrait"**
 ```typescript
-function resolveVariable(name: string, sessionAnswers: Record<string, any>): string {
-  const mapping = transform.variableMappings[name]
-  const rawValue = sessionAnswers[mapping.stepId]
-
-  if (mapping.valueMap) {
-    const entry = mapping.valueMap.find(e => e.value === rawValue)
-    if (entry) return entry.text
-    if (mapping.default) return mapping.default.text
-    throw new Error(`No mapping for value: ${rawValue}`)
-  }
-
-  // Pass-through mode
-  return rawValue ?? mapping.default?.text ?? ''
-}
-```
-
-### Step 3: Compose Prompt
-
-```typescript
-const resolvedPrompt = promptTemplate.replace(
-  /\{\{(\w+)\}\}/g,
-  (_, name) => resolveVariable(name, sessionAnswers)
-)
-```
-
-### Step 4: Extract Image References
-
-```typescript
-const imageLabels = [...resolvedPrompt.matchAll(/<(\w+)>/g)].map(m => m[1])
-```
-
-### Step 5: Build LLM Request
-
-```typescript
-const parts = []
-
-for (const label of imageLabels) {
-  const media = mediaLookup.get(label)
-  if (!media) throw new Error(`Unknown media label: ${label}`)
-
-  // Add label text
-  parts.push({ text: `Image Reference ID: <${label}>` })
-
-  // Add image data
-  const imageData = await resolveMediaData(media, session)
-  parts.push({ inlineData: imageData })
-}
-
-// Add the prompt
-parts.push({ text: resolvedPrompt })
-```
-
----
-
-## Complete Example
-
-### Transform Config
-
-```typescript
-transform: {
+{
   mediaRegistry: [
-    // Static assets
-    { type: 'asset', label: 'cat', assetId: 'cat123' },
-    { type: 'asset', label: 'dog', assetId: 'dog456' },
-    { type: 'asset', label: 'hobbiton', assetId: 'hob789' },
-    { type: 'asset', label: 'rivendell', assetId: 'riv012' },
-    { type: 'asset', label: 'art_style', assetId: 'style999' },
-
-    // Captured media from steps
-    { type: 'capturedMedia', label: 'user_photo', stepId: 'captureStep' },
+    { name: 'cat', mediaId: 'cat123' },
+    { name: 'dog', mediaId: 'dog456' },
+    { name: 'hobbiton', mediaId: 'hob789' },
+    { name: 'art_style', mediaId: 'style999' },
   ],
-
-  variableMappings: {
-    pet: {
-      stepId: 'petStep',
-      valueMap: [
-        { value: 'cat', text: 'holding a cat (see image <cat>)' },
-        { value: 'dog', text: 'holding a dog (see image <dog>)' },
-        { value: 'none', text: 'with empty hands' }
-      ],
-      default: { text: 'with empty hands' }
+  variables: [
+    {
+      name: 'user_photo',
+      type: 'image',
+      label: 'User Photo'
     },
-
-    background: {
-      stepId: 'bgStep',
+    {
+      name: 'pet',
+      type: 'text',
+      label: 'Pet Companion',
       valueMap: [
-        { value: 'hobbiton', text: 'Set in the Shire with rolling green hills <hobbiton>' },
-        { value: 'rivendell', text: 'Set in the elven realm of Rivendell <rivendell>' }
+        { value: 'cat', text: 'holding a cat (see @cat)' },
+        { value: 'dog', text: 'holding a dog (see @dog)' },
+        { value: 'none', text: 'with empty hands' }
       ]
     },
-
-    phrase: {
-      stepId: 'phraseStep'
-      // No valueMap = pass-through raw value
+    {
+      name: 'background',
+      type: 'text',
+      label: 'Background',
+      valueMap: [
+        { value: 'hobbiton', text: 'in the Shire @hobbiton' },
+        { value: 'rivendell', text: 'in Rivendell @rivendell' }
+      ]
     }
-  },
-
-  nodes: [{
-    type: 'aiImage',
-    input: { source: 'media', label: 'user_photo' },
-    promptTemplate: `
-      Transform the person in <user_photo> into a hobbit character.
-      They should be {{pet}}.
-      {{background}}.
-      Use <art_style> as the artistic reference.
-      Add text overlay: "{{phrase}}"
-    `,
-    model: 'gemini-2.5-pro',
-    aspectRatio: '3:2'
-  }],
-
-  outputFormat: 'image'
+  ],
+  promptTemplate: `
+    Transform @user_photo into a hobbit character.
+    They should be @pet.
+    Set the scene @background.
+    Use @art_style as artistic reference.
+  `
 }
 ```
 
-### Execution with User Selections
-
-**User selects:** cat, hobbiton, "Adventure awaits!"
-
-```
-1. Resolve variables:
-   - {{pet}} → "holding a cat (see image <cat>)"
-   - {{background}} → "Set in the Shire with rolling green hills <hobbiton>"
-   - {{phrase}} → "Adventure awaits!"
-
-2. Composed prompt:
-   "Transform the person in <user_photo> into a hobbit character.
-    They should be holding a cat (see image <cat>).
-    Set in the Shire with rolling green hills <hobbiton>.
-    Use <art_style> as the artistic reference.
-    Add text overlay: "Adventure awaits!""
-
-3. Extract image labels: [user_photo, cat, hobbiton, art_style]
-
-4. Build LLM request:
-   [
-     { text: "Image Reference ID: <user_photo>" },
-     { inlineData: userPhotoData },
-     { text: "Image Reference ID: <cat>" },
-     { inlineData: cat123Data },
-     { text: "Image Reference ID: <hobbiton>" },
-     { inlineData: hob789Data },
-     { text: "Image Reference ID: <art_style>" },
-     { inlineData: style999Data },
-     { text: "Transform the person in <user_photo>..." }
-   ]
-
-5. Images sent: 4 (only what's referenced)
-   Images NOT sent: dog, rivendell (not selected/referenced)
-```
-
----
-
-## Graduated Complexity
-
-The design supports multiple complexity levels:
-
-| Use Case | valueMap | default | Image Refs |
-|----------|----------|---------|------------|
-| Pass-through text | - | optional | - |
-| Text transformation | entries with text | optional | - |
-| Text + image refs | entries with text containing `<label>` | optional | In text |
-
-### Simple Pass-Through
-
-```typescript
-phrase: {
-  stepId: 'phraseStep'
-  // Raw value used directly
-}
-```
-
-### Pass-Through with Fallback
-
-```typescript
-customText: {
-  stepId: 'textStep',
-  default: { text: 'Welcome!' }
-}
-```
-
-### Text Transformation Only
-
-```typescript
-intensity: {
-  stepId: 'scaleStep',
-  valueMap: [
-    { value: '1', text: 'subtle' },
-    { value: '2', text: 'moderate' },
-    { value: '3', text: 'dramatic' }
-  ]
-}
-```
-
-### Text + Image References
-
-```typescript
-pet: {
-  stepId: 'petStep',
-  valueMap: [
-    { value: 'cat', text: 'holding a cat (see <cat>)' },
-    { value: 'dog', text: 'holding a dog (see <dog>)' },
-    { value: 'none', text: 'with empty hands' }
-  ]
-}
-```
-
----
-
-## AI Image Node: Static References
-
-The AI Image node can still have static `references` for images that should always be included regardless of variable selections.
-
+**Transform Pipeline Node:**
 ```typescript
 {
   type: 'aiImage',
-  input: { source: 'media', label: 'user_photo' },
-  promptTemplate: '...',
-
-  // Static refs - always included (legacy support or special cases)
-  references: [
-    { assetId: 'brand-watermark', label: 'watermark' }
-  ]
+  presetId: 'hobbit-preset-123',
+  variableBindings: {
+    user_photo: { stepId: 'captureStep' },
+    pet: { stepId: 'petStep' },
+    background: { stepId: 'bgStep' }
+  }
 }
 ```
 
-**Reference composition at execution:**
-```
-Final images = mediaRegistry refs (from <label> parsing) + node.references (static)
-```
+**Session Answers:** `{ pet: 'cat', background: 'hobbiton' }`
 
-However, the preferred approach is to use mediaRegistry + prompt references for consistency.
+**Execution:**
+```
+1. Resolve @pet: 'cat' → "holding a cat (see @cat)"
+2. Resolve @background: 'hobbiton' → "in the Shire @hobbiton"
+3. Resolved prompt:
+   "Transform @user_photo into a hobbit character.
+    They should be holding a cat (see @cat).
+    Set the scene in the Shire @hobbiton.
+    Use @art_style as artistic reference."
+
+4. Parse @media refs: [user_photo, cat, hobbiton, art_style]
+
+5. Images sent: 4 (only referenced)
+   Images NOT sent: dog, rivendell
+```
 
 ---
 
 ## Design Decisions
 
-### D30: Array for valueMap and mediaRegistry
+### D30: AI Presets as Separate Domain
+
+**Decision**: Create AI Presets as standalone, workspace-level entities
+
+**Rationale**:
+- Testable in isolation (preview + test generation)
+- Reusable across experiences
+- Clean separation from pipeline orchestration
+- Solves multi-node variable conflict problem
+
+### D31: Unified @ Mention Syntax
+
+**Decision**: Use `@name` for both variables and media references
+
+**Rationale**:
+- Familiar pattern (like Cursor IDE, Notion, etc.)
+- Single autocomplete system
+- Visual differentiation via color coding
+- Cleaner than mixed `{{var}}` and `<label>` syntax
+
+### D32: Value Mappings in Preset, Not Pipeline
+
+**Decision**: Value transformations defined in AI Preset, pipeline does 1:1 binding only
+
+**Rationale**:
+- Value mappings are intrinsic to prompt design
+- Can test value mappings in preset editor
+- Pipeline stays simple (just wiring)
+- No duplication of mapping logic
+
+### D33: Array for Media Registry and Variables
 
 **Decision**: Use arrays instead of records/maps
 
 **Rationale**:
 - Supports reordering (drag-and-drop in admin UI)
 - Explicit ordering in data model
-- Lookup: `array.find(entry => entry.value === value)`
-
-### D31: Removed `field` from Variable Mapping
-
-**Decision**: Remove `field` property
-
-**Rationale**:
-- Current step types return simple values (string, number, boolean)
-- No current use case requires field extraction
-- Can add later if needed
-
-### D32: Removed `type` from Variable Mapping
-
-**Decision**: Remove `type` field from variableMappings
-
-**Rationale**:
-- variableMappings are now purely for text substitution from step answers
-- `capturedMedia` moved to mediaRegistry where it semantically belongs
-- No need for type discrimination
-
-### D33: Centralized Media Registry
-
-**Decision**: All images (static assets + captured media) defined in central `mediaRegistry`
-
-**Rationale**:
-- Single place to see all available images
-- Consistent syntax for referencing (`<label>`)
-- Clear separation: mediaRegistry = images, variableMappings = text
-- Better admin UX than scattered refs
+- Consistent with other list-based UI patterns
 
 ### D34: Prompt-Based Image Inclusion
 
-**Decision**: Images included based on `<label>` references in resolved prompt
+**Decision**: Images included based on `@name` references in resolved prompt
 
 **Rationale**:
 - Only referenced images are sent to LLM
@@ -487,88 +395,109 @@ However, the preferred approach is to use mediaRegistry + prompt references for 
 - Automatic optimization - no manual conditional logic
 - Matches how Gemini expects labeled images
 
-### D35: Distinct Syntax for Variables vs Images
+### D35: Workspace Media Library Integration
 
-**Decision**: `{{variable}}` for text, `<label>` for images
+**Decision**: AI Preset media comes from workspace media library
 
 **Rationale**:
-- Clear visual distinction
-- `<label>` matches Gemini's expected reference syntax
-- Familiar patterns (mustache for variables, angle brackets for references)
+- Reuse existing media management infrastructure
+- Consistent asset management across features
+- Thumbnails and metadata already available
+
+---
+
+## Migration Path
+
+### From Inline Transform Config to AI Presets
+
+Existing transform configs with inline prompt configuration will need migration:
+
+1. **Extract to AI Preset**: Create AI Preset from inline config
+2. **Update Node**: Replace inline config with `presetId` + `variableBindings`
+3. **Backward Compatibility**: Support both formats during transition
+
+```typescript
+// Before: Inline config
+{
+  type: 'aiImage',
+  promptTemplate: '...',
+  model: 'gemini-2.5-pro',
+  references: [...]
+}
+
+// After: Preset reference
+{
+  type: 'aiImage',
+  presetId: 'extracted-preset-123',
+  variableBindings: { ... }
+}
+```
 
 ---
 
 ## Potential Risks
 
-### 1. Admin UX Complexity
+### 1. Two-Place Configuration
 
-**Risk**: Admins must understand two concepts (variableMappings + mediaRegistry) and two syntaxes.
-
-**Mitigation**:
-- Clear UI separation with explanatory labels
-- "Insert Variable" and "Insert Image Reference" buttons in prompt editor
-- Validation warnings for undefined references
-
-### 2. Forgotten Image References
-
-**Risk**: Admin writes fragment mentioning an image but forgets `<label>`, so image not included.
+**Risk**: Admins must understand that AI Presets define "what" and Transform Pipeline defines "how/when".
 
 **Mitigation**:
-- This is arguably a feature (explicit is good)
-- Validation can warn about mediaRegistry entries not referenced anywhere
-- Preview functionality shows which images will be included
+- Clear UI separation with navigation
+- Inline preview of preset configuration in pipeline editor
+- Good documentation and onboarding
 
-### 3. Validation Complexity
+### 2. Preset Changes Affect Multiple Pipelines
 
-**Risk**: Need to validate:
-- `<label>` references exist in mediaRegistry
-- `{{variable}}` references exist in variableMappings
-- Referenced assets exist in media library
+**Risk**: Changing a shared AI Preset affects all experiences using it.
 
 **Mitigation**:
-- Validate at publish time
-- Clear error messages pointing to specific issues
-- Preview/test functionality
+- Future: Preset versioning (noted as open question)
+- Current: Clear UI showing which experiences use a preset
+- Option to duplicate preset for isolated changes
 
-### 4. Label Conflicts
+### 3. Validation Across Boundaries
 
-**Risk**: Same label used for different purposes or typos in labels.
-
-**Mitigation**:
-- Labels must be unique in mediaRegistry (enforced)
-- Autocomplete in prompt editor for known labels
-- Case-sensitive matching (clear rules)
-
-### 5. Migration from Current Design
-
-**Risk**: Existing transform configs use old structure.
+**Risk**: Need to validate that pipeline bindings satisfy preset requirements.
 
 **Mitigation**:
-- Schema changes are additive where possible
-- Migration script to convert old format
-- Document breaking changes clearly
+- Validation at publish time
+- Clear error messages: "Preset requires @pet but no binding provided"
+- Real-time validation in pipeline editor
 
-### 6. Regex Parsing Limitations
+### 4. Orphaned Presets
 
-**Risk**: `<label>` pattern might conflict with other text (e.g., HTML tags, comparison operators).
+**Risk**: Presets created but never used, cluttering workspace.
 
 **Mitigation**:
-- Labels are alphanumeric + underscore only: `<[a-zA-Z_][a-zA-Z0-9_]*>`
-- This excludes HTML tags like `<div>` (would need closing tag anyway)
-- Document label naming conventions
+- Future: Show usage count in preset list
+- Future: Archive/cleanup functionality
 
 ---
 
 ## Summary
 
-This architecture cleanly separates:
+The architecture evolved from inline variable mappings to a clean separation:
 
-1. **mediaRegistry**: All images (static + captured), referenced by `<label>`
-2. **variableMappings**: Text substitution from step answers, using `{{variable}}`
+1. **AI Presets**: Self-contained, testable AI generation configurations
+   - Media registry (from workspace library)
+   - Variables with optional value mappings
+   - Prompt template with @ mentions
+   - Model settings
 
-Key benefits:
-- Only referenced images sent to LLM (cost + quality optimization)
-- Single place to manage all images (better UX)
-- Clear mental model (text vs images)
-- Explicit prompt control (what you reference is what you get)
-- Consistent syntax matching LLM expectations
+2. **Transform Pipeline**: Orchestration layer
+   - References AI Presets by ID
+   - Simple 1:1 variable bindings to experience steps
+   - Handles multi-node pipelines cleanly
+
+**Key benefits:**
+- Testable in isolation (preview + test generation in preset editor)
+- Reusable across experiences
+- Clean separation of concerns
+- Solves multi-node variable conflict
+- Only referenced images sent to LLM (cost optimization)
+- Unified @ mention syntax for intuitive editing
+
+**Related Documents:**
+- `/requirements/ai-presets/spec.md` - Full AI Presets specification
+- `/requirements/ai-presets/prd-phases.md` - Implementation phases
+- `/requirements/transform-pipeline/diagrams/transform-ui-pipeline-tab.html` - Pipeline tab mockup
