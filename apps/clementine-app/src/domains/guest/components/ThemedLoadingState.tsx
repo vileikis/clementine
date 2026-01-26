@@ -31,13 +31,19 @@ export function ThemedLoadingState({
   const { theme } = useEventTheme()
 
   return (
-    <div className="flex h-full flex-col items-center justify-center text-center">
+    <div
+      className="flex h-full flex-col items-center justify-center text-center"
+      role="status"
+      aria-live="polite"
+      aria-busy="true"
+    >
       {/* Spinner using primary color */}
       <div
         className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-t-transparent"
         style={{
           borderColor: `${theme.primaryColor} transparent transparent transparent`,
         }}
+        aria-hidden="true"
       />
       <ThemedText variant="body">{message}</ThemedText>
     </div>

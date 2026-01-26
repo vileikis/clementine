@@ -12,7 +12,7 @@
  *
  * User Story: US2 - Guest Completes Pregate Before Main Experience
  */
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 
 import { useGuestContext } from '../contexts'
@@ -60,7 +60,6 @@ export function PregatePage({ selectedExperienceId }: PregatePageProps) {
   const navigate = useNavigate()
   const { project, event, guest, experiences, experiencesLoading } =
     useGuestContext()
-  const urlUpdatedRef = useRef(false)
   const markExperienceComplete = useMarkExperienceComplete()
 
   // Get pregate config from event
@@ -116,14 +115,6 @@ export function PregatePage({ selectedExperienceId }: PregatePageProps) {
     enabled:
       !!pregateExperienceId && !!pregateExperience && !experiencesLoading,
   })
-
-  // Note: We don't update URL for pregate since it's a transient step
-  // If user refreshes, they'll restart pregate (acceptable for short surveys)
-  useEffect(() => {
-    if (sessionState.status === 'ready' && !urlUpdatedRef.current) {
-      urlUpdatedRef.current = true
-    }
-  }, [sessionState.status])
 
   // Get theme from event config (with fallback to default)
   const theme = event.publishedConfig?.theme ?? DEFAULT_THEME

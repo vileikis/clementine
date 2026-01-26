@@ -98,6 +98,31 @@ export function ExperiencePage({
   // This handles direct URL access to experience without completing pregate
   const shouldRedirectToPregate = needsPregate()
 
+  // Find the experience from context
+  const experience = experiences.find((exp) => exp.id === experienceId)
+
+  // Also validate that the experience is enabled for this event
+  const enabledExperiences = event.publishedConfig?.experiences?.main ?? []
+  const isExperienceEnabled = enabledExperiences.some(
+    (ref) => ref.experienceId === experienceId && ref.enabled,
+  )
+
+  // Experience is valid if it exists in context AND is enabled in publishedConfig
+  const isExperienceValid = !!experience && isExperienceEnabled
+
+  // Only initialize session if experience is valid, loaded, and not redirecting to pregate
+  // Note: We call useInitSession unconditionally to preserve hook order,
+  // but disable it via the enabled flag when redirecting to pregate
+  const sessionState = useInitSession({
+    projectId: project.id,
+    workspaceId: project.workspaceId,
+    eventId: event.id,
+    experienceId,
+    initialSessionId,
+    enabled:
+      isExperienceValid && !experiencesLoading && !shouldRedirectToPregate,
+  })
+
   // Redirect to pregate if needed (handles direct URL access)
   useEffect(() => {
     if (shouldRedirectToPregate && !experiencesLoading) {
@@ -116,35 +141,11 @@ export function ExperiencePage({
     experienceId,
   ])
 
-  // If redirecting to pregate, don't render anything
-  if (shouldRedirectToPregate && !experiencesLoading) {
-    return null
-  }
-
-  // Find the experience from context
-  const experience = experiences.find((exp) => exp.id === experienceId)
-
-  // Also validate that the experience is enabled for this event
-  const enabledExperiences = event.publishedConfig?.experiences?.main ?? []
-  const isExperienceEnabled = enabledExperiences.some(
-    (ref) => ref.experienceId === experienceId && ref.enabled,
-  )
-
-  // Experience is valid if it exists in context AND is enabled in publishedConfig
-  const isExperienceValid = !!experience && isExperienceEnabled
-
-  // Only initialize session if experience is valid and loaded
-  const sessionState = useInitSession({
-    projectId: project.id,
-    workspaceId: project.workspaceId,
-    eventId: event.id,
-    experienceId,
-    initialSessionId,
-    enabled: isExperienceValid && !experiencesLoading,
-  })
-
   // Update URL with session ID when session is created (if not already in URL)
   useEffect(() => {
+    // Skip URL update if redirecting to pregate
+    if (shouldRedirectToPregate) return
+
     if (
       sessionState.status === 'ready' &&
       sessionState.sessionId !== initialSessionId &&
@@ -165,10 +166,14 @@ export function ExperiencePage({
     project.id,
     experienceId,
     pregateSessionId,
+    shouldRedirectToPregate,
   ])
 
   // Link pregate session to main session after main session is created
   useEffect(() => {
+    // Skip linking if redirecting to pregate
+    if (shouldRedirectToPregate) return
+
     if (
       sessionState.status === 'ready' &&
       pregateSessionId &&
@@ -182,7 +187,18 @@ export function ExperiencePage({
         mainSessionId,
       })
     }
-  }, [sessionState, pregateSessionId, linkSession, project.id])
+  }, [
+    sessionState,
+    pregateSessionId,
+    linkSession,
+    project.id,
+    shouldRedirectToPregate,
+  ])
+
+  // If redirecting to pregate, don't render anything
+  if (shouldRedirectToPregate && !experiencesLoading) {
+    return null
+  }
 
   /**
    * Handle experience completion
@@ -255,7 +271,7 @@ export function ExperiencePage({
     }
 
     // Handle error state
-    if (sessionState.status == 'error') {
+    if (sessionState.status === 'error') {
       return (
         <ThemedErrorState
           title="Error"

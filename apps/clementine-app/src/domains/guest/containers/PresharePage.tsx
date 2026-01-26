@@ -13,7 +13,7 @@
  *
  * User Story: US3 - Guest Completes Preshare After Main Experience
  */
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 
 import { useGuestContext } from '../contexts'
@@ -62,7 +62,6 @@ export function PresharePage({ mainSessionId }: PresharePageProps) {
   const navigate = useNavigate()
   const { project, event, guest, experiences, experiencesLoading } =
     useGuestContext()
-  const urlUpdatedRef = useRef(false)
   const markExperienceComplete = useMarkExperienceComplete()
 
   // Get preshare config from event
@@ -144,14 +143,6 @@ export function PresharePage({ mainSessionId }: PresharePageProps) {
     // Note: mainSessionId linking happens in useCreateSession when we add the feature
     // For now, we'll update the session after creation
   })
-
-  // Note: We don't update URL for preshare since it's a transient step
-  // The mainSessionId in the URL is what matters for the share screen
-  useEffect(() => {
-    if (sessionState.status === 'ready' && !urlUpdatedRef.current) {
-      urlUpdatedRef.current = true
-    }
-  }, [sessionState.status])
 
   // Get theme from event config (with fallback to default)
   const theme = event.publishedConfig?.theme ?? DEFAULT_THEME

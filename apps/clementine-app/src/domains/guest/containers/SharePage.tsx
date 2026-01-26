@@ -32,9 +32,8 @@ export interface SharePageProps {
  * ```tsx
  * // In route file: src/app/join/$projectId/share.tsx
  * function JoinSharePage() {
- *   const { projectId } = Route.useParams()
  *   const { session } = Route.useSearch()
- *   return <SharePage projectId={projectId} mainSessionId={session} />
+ *   return <SharePage mainSessionId={session} />
  * }
  * ```
  */

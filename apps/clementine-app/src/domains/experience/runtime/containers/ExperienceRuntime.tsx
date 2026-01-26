@@ -104,6 +104,7 @@ export function ExperienceRuntime({
   ])
 
   // Sync to Firestore helper - used on navigation events
+  // Returns a promise that rejects on failure (for completion flow to handle)
   const syncToFirestore = useCallback(
     async (options: {
       answers?: typeof store.answers
@@ -119,7 +120,10 @@ export function ExperienceRuntime({
         store.markSynced()
       } catch (error) {
         store.setSyncing(false)
-        onError?.(error instanceof Error ? error : new Error('Sync failed'))
+        const syncError =
+          error instanceof Error ? error : new Error('Sync failed')
+        onError?.(syncError)
+        throw syncError // Re-throw so callers can handle
       }
     },
     [
@@ -169,30 +173,32 @@ export function ExperienceRuntime({
   // React to completion
   // Note: No cancellation pattern - hasCompletedRef prevents re-execution.
   // Once completion starts, it must run to completion to call onComplete.
+  // Sync must succeed before we mark complete - if sync fails, we don't proceed.
   useEffect(() => {
     if (!store.isReady) return
     if (!store.isComplete) return
     if (hasCompletedRef.current) return // Already completed
 
-    hasCompletedRef.current = true
-
     // Sync final state before completing
+    // Only proceed with completion if sync succeeds
     syncToFirestore({
       answers: store.answers,
       capturedMedia: store.capturedMedia,
     })
-      .then(() =>
-        completeSession.mutateAsync({
+      .then(() => {
+        // Mark as completed only after successful sync
+        hasCompletedRef.current = true
+        return completeSession.mutateAsync({
           projectId: session.projectId,
           sessionId: session.id,
-        }),
-      )
+        })
+      })
       .then(() => onComplete?.())
-      .catch((error) =>
-        onError?.(
-          error instanceof Error ? error : new Error('Complete failed'),
-        ),
-      )
+      .catch((error) => {
+        // syncToFirestore already calls onError internally for sync failures,
+        // but completeSession failures need to be reported here
+        onError?.(error instanceof Error ? error : new Error('Complete failed'))
+      })
   }, [
     store.isReady,
     store.isComplete,

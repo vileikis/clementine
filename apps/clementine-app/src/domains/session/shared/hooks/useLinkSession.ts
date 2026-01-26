@@ -8,7 +8,7 @@
  * Path: /projects/{projectId}/sessions/{sessionId}
  */
 import { useMutation } from '@tanstack/react-query'
-import { doc, updateDoc } from 'firebase/firestore'
+import { doc, serverTimestamp, updateDoc } from 'firebase/firestore'
 import * as Sentry from '@sentry/tanstackstart-react'
 import { firestore } from '@/integrations/firebase/client'
 
@@ -66,7 +66,7 @@ export function useLinkSession() {
 
       await updateDoc(sessionRef, {
         mainSessionId,
-        updatedAt: Date.now(),
+        updatedAt: serverTimestamp(),
       })
     },
     onError: (error, input) => {
