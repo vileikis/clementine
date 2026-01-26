@@ -145,7 +145,6 @@ export function PregatePage({ selectedExperienceId }: PregatePageProps) {
    * Called when guest finishes all pregate steps
    */
   const handlePregateComplete = async () => {
-    console.log('-----handlePregateComplete', sessionState.status)
     if (sessionState.status !== 'ready') return
     if (!pregateExperienceId) return
 
@@ -156,7 +155,6 @@ export function PregatePage({ selectedExperienceId }: PregatePageProps) {
       projectId: project.id,
       guestId: guest.id,
       experienceId: pregateExperienceId,
-      sessionId,
     })
 
     // 2. Navigate to main experience with pregate session ID for linking

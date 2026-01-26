@@ -79,11 +79,8 @@ export function usePreshare(
       if (!preshare.experienceId) return false
 
       // Check if guest has already completed this specific preshare
-      const hasCompleted = guest.completedExperiences.some(
-        (e) => e.experienceId === preshare.experienceId,
-      )
-
-      return !hasCompleted
+      // completedExperiences is now a simple string[] of experience IDs
+      return !guest.completedExperiences.includes(preshare.experienceId)
     }
   }, [guest.completedExperiences, config?.preshare])
 

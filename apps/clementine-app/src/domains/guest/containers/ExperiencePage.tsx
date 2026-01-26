@@ -198,7 +198,6 @@ export function ExperiencePage({
       projectId: project.id,
       guestId: guest.id,
       experienceId,
-      sessionId,
     })
 
     // 2. Navigate to preshare or share

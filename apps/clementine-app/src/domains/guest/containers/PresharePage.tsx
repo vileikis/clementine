@@ -176,14 +176,11 @@ export function PresharePage({ mainSessionId }: PresharePageProps) {
     if (sessionState.status !== 'ready') return
     if (!preshareExperienceId) return
 
-    const { sessionId } = sessionState
-
     // 1. Mark preshare experience as complete in guest record
     await markExperienceComplete.mutateAsync({
       projectId: project.id,
       guestId: guest.id,
       experienceId: preshareExperienceId,
-      sessionId,
     })
 
     // 2. Navigate to share screen with main session ID

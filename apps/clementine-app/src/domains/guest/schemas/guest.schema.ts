@@ -11,25 +11,6 @@
 import { z } from 'zod'
 
 /**
- * Completed Experience Entry
- *
- * Tracks when a guest completed an experience.
- * Used for pregate/preshare skip logic and analytics.
- */
-export const completedExperienceSchema = z.object({
-  /** Experience ID that was completed */
-  experienceId: z.string().min(1, 'Experience ID is required'),
-
-  /** Completion timestamp (Unix ms) */
-  completedAt: z.number(),
-
-  /** Session ID for analytics linking */
-  sessionId: z.string().min(1, 'Session ID is required'),
-})
-
-export type CompletedExperience = z.infer<typeof completedExperienceSchema>
-
-/**
  * Guest entity schema
  *
  * Represents an anonymous visitor to a project.
@@ -50,10 +31,13 @@ export const guestSchema = z.object({
   createdAt: z.number(),
 
   /**
-   * Track completed experiences for skip logic
-   * Used to determine if guest should skip pregate/preshare
+   * Track completed experience IDs for skip logic.
+   * Used to determine if guest should skip pregate/preshare.
+   *
+   * Simple string array - Firestore's arrayUnion deduplicates automatically.
+   * Session linking can be queried via sessions collection if needed.
    */
-  completedExperiences: z.array(completedExperienceSchema).default([]),
+  completedExperiences: z.array(z.string()).default([]),
 })
 
 export type Guest = z.infer<typeof guestSchema>

@@ -5,11 +5,13 @@
  * Used for pregate/preshare skip logic - tracks which experiences a guest has completed.
  *
  * Path: /projects/{projectId}/guests/{guestId}
+ *
+ * Note: No cache invalidation needed - useGuest's onSnapshot listener
+ * automatically updates the cache when the guest document changes.
  */
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { arrayUnion, doc, updateDoc } from 'firebase/firestore'
 import * as Sentry from '@sentry/tanstackstart-react'
-import { guestKeys } from '../queries/guest.query'
 import { firestore } from '@/integrations/firebase/client'
 
 export interface MarkExperienceCompleteInput {
@@ -19,8 +21,6 @@ export interface MarkExperienceCompleteInput {
   guestId: string
   /** Experience ID that was completed */
   experienceId: string
-  /** Session ID for analytics linking */
-  sessionId: string
 }
 
 /**
@@ -28,7 +28,7 @@ export interface MarkExperienceCompleteInput {
  *
  * Features:
  * - Uses Firestore arrayUnion for atomic append
- * - Invalidates guest query cache on success
+ * - Cache updates automatically via useGuest's onSnapshot listener
  * - Captures errors to Sentry
  *
  * Used when:
@@ -40,7 +40,7 @@ export interface MarkExperienceCompleteInput {
  *
  * @example
  * ```tsx
- * function PregatePage({ sessionId }) {
+ * function PregatePage() {
  *   const markComplete = useMarkExperienceComplete()
  *
  *   const handleComplete = async () => {
@@ -48,7 +48,6 @@ export interface MarkExperienceCompleteInput {
  *       projectId: project.id,
  *       guestId: guest.id,
  *       experienceId: pregateExperienceId,
- *       sessionId,
  *     })
  *     // Navigate to main experience
  *   }
@@ -56,26 +55,17 @@ export interface MarkExperienceCompleteInput {
  * ```
  */
 export function useMarkExperienceComplete() {
-  const queryClient = useQueryClient()
-
   return useMutation<void, Error, MarkExperienceCompleteInput>({
-    mutationFn: async ({ projectId, guestId, experienceId, sessionId }) => {
+    mutationFn: async ({ projectId, guestId, experienceId }) => {
       const guestRef = doc(firestore, 'projects', projectId, 'guests', guestId)
 
+      // Simple string array - Firestore's arrayUnion deduplicates automatically
       await updateDoc(guestRef, {
-        completedExperiences: arrayUnion({
-          experienceId,
-          completedAt: Date.now(),
-          sessionId,
-        }),
+        completedExperiences: arrayUnion(experienceId),
       })
     },
-    onSuccess: (_, { projectId, guestId }) => {
-      // Invalidate guest query to refetch updated completedExperiences
-      void queryClient.invalidateQueries({
-        queryKey: guestKeys.record(projectId, guestId),
-      })
-    },
+    // No onSuccess needed - useGuest's onSnapshot listener
+    // automatically updates the cache when the document changes
     onError: (error, input) => {
       Sentry.captureException(error, {
         tags: {

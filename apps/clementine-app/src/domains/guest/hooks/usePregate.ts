@@ -75,11 +75,8 @@ export function usePregate(
       if (!pregate.experienceId) return false
 
       // Check if guest has already completed this specific pregate
-      const hasCompleted = guest.completedExperiences.some(
-        (e) => e.experienceId === pregate.experienceId,
-      )
-
-      return !hasCompleted
+      // completedExperiences is now a simple string[] of experience IDs
+      return !guest.completedExperiences.includes(pregate.experienceId)
     }
   }, [guest.completedExperiences, config?.pregate])
 
