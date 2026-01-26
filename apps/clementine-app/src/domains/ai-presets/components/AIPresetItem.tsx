@@ -14,7 +14,7 @@ import { useDuplicateAIPreset } from '../hooks/useDuplicateAIPreset'
 import { RenameAIPresetDialog } from './RenameAIPresetDialog'
 import { DeleteAIPresetDialog } from './DeleteAIPresetDialog'
 import type { AIPreset } from '@clementine/shared'
-import type { MenuAction } from '@/shared/components'
+import type { MenuSection } from '@/shared/components'
 import { ContextDropdownMenu } from '@/shared/components'
 import { Button } from '@/ui-kit/ui/button'
 
@@ -94,26 +94,34 @@ export function AIPresetItem({ preset, workspaceId }: AIPresetItemProps) {
     }
   }
 
-  const menuActions: MenuAction[] = [
+  const menuSections: MenuSection[] = [
     {
-      key: 'rename',
-      label: 'Rename',
-      icon: Pencil,
-      onClick: () => setShowRenameDialog(true),
+      items: [
+        {
+          key: 'rename',
+          label: 'Rename',
+          icon: Pencil,
+          onClick: () => setShowRenameDialog(true),
+        },
+        {
+          key: 'duplicate',
+          label: 'Duplicate',
+          icon: Copy,
+          onClick: handleDuplicate,
+          disabled: duplicatePreset.isPending,
+        },
+      ],
     },
     {
-      key: 'duplicate',
-      label: 'Duplicate',
-      icon: Copy,
-      onClick: handleDuplicate,
-      disabled: duplicatePreset.isPending,
-    },
-    {
-      key: 'delete',
-      label: 'Delete',
-      icon: Trash2,
-      onClick: () => setShowDeleteDialog(true),
-      destructive: true,
+      items: [
+        {
+          key: 'delete',
+          label: 'Delete',
+          icon: Trash2,
+          onClick: () => setShowDeleteDialog(true),
+          destructive: true,
+        },
+      ],
     },
   ]
 
@@ -160,7 +168,7 @@ export function AIPresetItem({ preset, workspaceId }: AIPresetItemProps) {
                 <MoreVertical className="h-4 w-4" />
               </Button>
             }
-            actions={menuActions}
+            sections={menuSections}
             aria-label={`Actions for ${preset.name}`}
           />
         </div>
