@@ -59,6 +59,37 @@ Workspace schemas for multi-tenant support.
 
 Theme configuration including media references and styling constants.
 
+### Media
+
+Media asset schemas for unified media handling across the platform:
+- `mediaAssetSchema` - Complete media asset document (Firestore)
+- `mediaReferenceSchema` - Lightweight reference for embedding in other documents
+- `imageMimeTypeSchema` - Allowed image MIME types
+- `mediaAssetTypeSchema` - Asset categorization (overlay, logo, other)
+- `mediaAssetStatusSchema` - Lifecycle status (active, deleted)
+
+The `mediaReferenceSchema` includes a nullable `filePath` field for backward compatibility:
+- New uploads populate `filePath` for direct storage access
+- Legacy documents have `filePath: null` and use URL parsing as fallback
+
+```typescript
+import { mediaReferenceSchema, type MediaReference } from '@clementine/shared'
+
+// Create reference with filePath for new uploads
+const ref: MediaReference = {
+  mediaAssetId: 'abc123',
+  url: 'https://firebasestorage.googleapis.com/...',
+  filePath: 'workspaces/ws-123/media/overlay-abc.png',
+}
+
+// Legacy documents parse with filePath defaulting to null
+const legacy = mediaReferenceSchema.parse({
+  mediaAssetId: 'old123',
+  url: 'https://firebasestorage.googleapis.com/...',
+})
+// legacy.filePath === null
+```
+
 ## Development
 
 ```bash

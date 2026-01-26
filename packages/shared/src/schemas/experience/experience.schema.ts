@@ -11,6 +11,8 @@
  * - Uses `z.looseObject()` for forward compatibility with future fields
  */
 import { z } from 'zod'
+
+import { experienceMediaSchema } from '../media/media-reference.schema'
 import { experienceStepSchema } from './step.schema'
 import { transformConfigSchema } from './transform.schema'
 
@@ -31,21 +33,6 @@ export const experienceStatusSchema = z.enum(['active', 'deleted'])
  * Profile is immutable after experience creation.
  */
 export const experienceProfileSchema = z.enum(['freeform', 'survey', 'story'])
-
-/**
- * Experience media schema
- *
- * Optional thumbnail or cover image for an experience.
- * Stored at root level for efficient list queries.
- */
-export const experienceMediaSchema = z
-  .object({
-    /** Reference to media asset in media library */
-    mediaAssetId: z.string().min(1),
-    /** Full public URL for immediate rendering */
-    url: z.url(),
-  })
-  .nullable()
 
 /**
  * Experience Config Schema
@@ -140,4 +127,9 @@ export type Experience = z.infer<typeof experienceSchema>
 export type ExperienceConfig = z.infer<typeof experienceConfigSchema>
 export type ExperienceStatus = z.infer<typeof experienceStatusSchema>
 export type ExperienceProfile = z.infer<typeof experienceProfileSchema>
-export type ExperienceMedia = z.infer<typeof experienceMediaSchema>
+
+// Re-export media schemas for backward compatibility
+export {
+  experienceMediaSchema,
+  type ExperienceMedia,
+} from '../media/media-reference.schema'

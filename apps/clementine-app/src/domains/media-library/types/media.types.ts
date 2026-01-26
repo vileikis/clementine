@@ -1,2 +1,6 @@
-// Export types from schemas
-export type { MediaAsset } from '../schemas/media-asset.schema'
+// Re-export types from shared package
+export type {
+  MediaAsset,
+  MediaReference,
+  ImageMimeType,
+} from '@clementine/shared'

@@ -68,7 +68,11 @@ export function ExperienceDetailsDialog({
   const handleUpload = async (file: File) => {
     const result = await upload(file)
     if (result) {
-      setMedia({ mediaAssetId: result.mediaAssetId, url: result.url })
+      setMedia({
+        mediaAssetId: result.mediaAssetId,
+        url: result.url,
+        filePath: result.filePath,
+      })
     }
   }
 

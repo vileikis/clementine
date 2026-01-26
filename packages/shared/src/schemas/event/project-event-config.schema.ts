@@ -9,28 +9,17 @@
  */
 import { z } from 'zod'
 
-import { themeSchema, mediaReferenceSchema } from '../theme'
+import {
+  mediaReferenceSchema,
+  overlayReferenceSchema,
+} from '../media/media-reference.schema'
+import { themeSchema } from '../theme'
 import { experiencesConfigSchema } from './experiences.schema'
 
 /**
  * Current schema version for event configuration
  */
 export const CURRENT_CONFIG_VERSION = 1
-
-/**
- * Overlay Reference Schema
- *
- * References a MediaAsset document for use as an overlay.
- * Stores both ID (tracking) and URL (fast rendering)
- */
-export const overlayReferenceSchema = z
-  .object({
-    /** MediaAsset document ID */
-    mediaAssetId: z.string(),
-    /** Firebase Storage download URL */
-    url: z.url(),
-  })
-  .nullable()
 
 /**
  * Overlay images for different aspect ratios
@@ -110,7 +99,6 @@ export const projectEventConfigSchema = z.looseObject({
  * TypeScript types exported from schemas
  */
 export type ProjectEventConfig = z.infer<typeof projectEventConfigSchema>
-export type OverlayReference = z.infer<typeof overlayReferenceSchema>
 export type OverlaysConfig = z.infer<typeof overlaysConfigSchema>
 export type ShareOptionsConfig = z.infer<typeof shareOptionsConfigSchema>
 export type WelcomeConfig = z.infer<typeof welcomeConfigSchema>
@@ -118,5 +106,10 @@ export type CtaConfig = z.infer<typeof ctaConfigSchema>
 export type ShareConfig = z.infer<typeof shareConfigSchema>
 export type ExperiencePickerLayout = z.infer<typeof experiencePickerLayoutSchema>
 
-// Re-export MediaReference from theme (single source of truth)
-export { mediaReferenceSchema, type MediaReference } from '../theme'
+// Re-export media schemas for backward compatibility
+export {
+  mediaReferenceSchema,
+  overlayReferenceSchema,
+  type MediaReference,
+  type OverlayReference,
+} from '../media/media-reference.schema'
