@@ -71,13 +71,23 @@ export function AIPresetItem({ preset, workspaceId }: AIPresetItemProps) {
   const mediaCount = preset.mediaRegistry?.length ?? 0
 
   const handlePresetClick = () => {
+    if (!workspaceSlug) {
+      return
+    }
     navigate({
       to: '/workspace/$workspaceSlug/ai-presets/$presetId',
       params: {
-        workspaceSlug: workspaceSlug as string,
+        workspaceSlug,
         presetId: preset.id,
       },
     })
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      handlePresetClick()
+    }
   }
 
   const handleDuplicate = async () => {
@@ -130,7 +140,9 @@ export function AIPresetItem({ preset, workspaceId }: AIPresetItemProps) {
       <div
         className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer gap-4 min-h-[44px]"
         role="listitem"
+        tabIndex={0}
         onClick={handlePresetClick}
+        onKeyDown={handleKeyDown}
       >
         {/* Preset info */}
         <div className="flex flex-col gap-1 flex-1 min-w-0">

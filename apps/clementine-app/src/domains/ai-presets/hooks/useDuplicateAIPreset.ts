@@ -8,7 +8,6 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   collection,
   doc,
-  getDoc,
   runTransaction,
   serverTimestamp,
 } from 'firebase/firestore'
@@ -40,19 +39,17 @@ export function useDuplicateAIPreset(workspaceId: string) {
         firestore,
         `workspaces/${workspaceId}/aiPresets`,
       )
-
-      // Read the original preset
       const originalRef = doc(presetsRef, validated.presetId)
-      const originalDoc = await getDoc(originalRef)
 
-      if (!originalDoc.exists()) {
-        throw new Error(`Preset ${validated.presetId} not found`)
-      }
+      // Use transaction for both read and write to avoid TOCTOU race
+      return await runTransaction(firestore, async (transaction) => {
+        const originalDoc = await transaction.get(originalRef)
 
-      const originalData = originalDoc.data()
+        if (!originalDoc.exists()) {
+          throw new Error(`Preset ${validated.presetId} not found`)
+        }
 
-      // Use transaction to create the duplicate
-      return await runTransaction(firestore, (transaction) => {
+        const originalData = originalDoc.data()
         const newPresetRef = doc(presetsRef)
 
         const duplicateName =
@@ -68,10 +65,10 @@ export function useDuplicateAIPreset(workspaceId: string) {
           createdBy: user?.uid ?? '',
         })
 
-        return Promise.resolve({
+        return {
           presetId: newPresetRef.id,
           workspaceId,
-        })
+        }
       })
     },
     onSuccess: () => {

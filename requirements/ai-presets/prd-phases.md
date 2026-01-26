@@ -23,25 +23,25 @@ Establish the data model and basic CRUD operations for AI Presets.
 
 #### 1.1 Data Model & Schema
 
-- [ ] Create AI Preset Zod schema in `packages/shared`
-- [ ] Define Firestore document structure
-- [ ] Add TypeScript types
+- [x] Create AI Preset Zod schema in `packages/shared`
+- [x] Define Firestore document structure
+- [x] Add TypeScript types
 
 #### 1.2 Firestore Setup
 
-- [ ] Create collection path: `/workspaces/{workspaceId}/aiPresets/{presetId}`
-- [ ] Add security rules (workspace member read, admin write)
+- [x] Create collection path: `/workspaces/{workspaceId}/aiPresets/{presetId}`
+- [x] Add security rules (workspace member read, admin write)
 
 #### 1.3 Basic API Layer
 
-- [ ] Create preset service with CRUD operations:
+- [x] Create preset service with CRUD operations:
   - `createPreset(workspaceId, data)`
   - `getPreset(workspaceId, presetId)`
   - `updatePreset(workspaceId, presetId, data)`
   - `deletePreset(workspaceId, presetId)`
   - `listPresets(workspaceId)`
   - `duplicatePreset(workspaceId, presetId, newName)`
-- [ ] Add React Query hooks for data fetching
+- [x] Add React Query hooks for data fetching
 
 ### Deliverables
 
@@ -66,14 +66,14 @@ Create the workspace-level page to view and manage AI Presets.
 
 #### 2.1 Routing
 
-- [ ] Add route: `/workspace/:workspaceSlug/ai-presets`
-- [ ] Add navigation link in workspace sidebar
+- [x] Add route: `/workspace/:workspaceSlug/ai-presets`
+- [x] Add navigation link in workspace sidebar
 
 #### 2.2 List Page UI
 
-- [ ] Page header with title and "Create Preset" button
+- [x] Page header with title and "Create Preset" button
 - [ ] Search/filter input
-- [ ] Preset cards showing:
+- [x] Preset cards showing:
   - Name
   - Description
   - Model
@@ -81,19 +81,19 @@ Create the workspace-level page to view and manage AI Presets.
   - Variable count
   - Media count
   - Last updated timestamp
-- [ ] Empty state for no presets
-- [ ] Loading state
+- [x] Empty state for no presets
+- [x] Loading state
 
 #### 2.3 Preset Actions
 
-- [ ] Create new preset (opens editor with blank preset)
-- [ ] Duplicate preset (creates copy with "Copy of" prefix)
-- [ ] Rename preset (inline edit or modal)
-- [ ] Delete preset (with confirmation dialog)
+- [x] Create new preset (opens editor with blank preset)
+- [x] Duplicate preset (creates copy with "Copy of" prefix)
+- [x] Rename preset (inline edit or modal)
+- [x] Delete preset (with confirmation dialog)
 
 #### 2.4 Navigation
 
-- [ ] Click preset card → navigate to preset editor page
+- [x] Click preset card → navigate to preset editor page
 
 ### Deliverables
 

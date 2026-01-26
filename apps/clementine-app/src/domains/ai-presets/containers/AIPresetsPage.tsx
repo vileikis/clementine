@@ -41,6 +41,8 @@ export function AIPresetsPage({
   // Fetch presets with real-time updates
   const { data: presets, isLoading } = useWorkspaceAIPresets(workspaceId)
 
+  const isPageLoading = !workspaceId || isLoading
+
   const handlePresetCreated = (presetId: string) => {
     navigate({
       to: '/workspace/$workspaceSlug/ai-presets/$presetId',
@@ -48,8 +50,8 @@ export function AIPresetsPage({
     })
   }
 
-  // Loading state
-  if (isLoading) {
+  // Loading state (also show while workspaceId is not available)
+  if (isPageLoading) {
     return (
       <div className="p-6 space-y-4">
         <div className="flex items-center justify-between">
