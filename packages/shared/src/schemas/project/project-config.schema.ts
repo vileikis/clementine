@@ -1,10 +1,10 @@
 /**
- * Project Event Configuration Schema (Shared)
+ * Project Configuration Schema (Shared)
  *
- * Complete event configuration schema for shared kernel.
+ * Complete project configuration schema for shared kernel.
  * Contains all fields needed by both app and functions, including theme and experiences.
  *
- * This is the single source of truth for event configuration structure.
+ * This is the single source of truth for project configuration structure.
  * App-specific WRITE schemas (with validation limits) are defined in the app domain.
  */
 import { z } from 'zod'
@@ -17,7 +17,7 @@ import { themeSchema } from '../theme'
 import { experiencesConfigSchema } from './experiences.schema'
 
 /**
- * Current schema version for event configuration
+ * Current schema version for project configuration
  */
 export const CURRENT_CONFIG_VERSION = 1
 
@@ -80,12 +80,12 @@ export const welcomeConfigSchema = z.object({
 })
 
 /**
- * Complete Event Configuration Schema
+ * Complete Project Configuration Schema
  *
  * Includes all fields: overlays, share, welcome, theme, and experiences.
  * This is a loose object for forward compatibility.
  */
-export const projectEventConfigSchema = z.looseObject({
+export const projectConfigSchema = z.looseObject({
   schemaVersion: z.number().default(CURRENT_CONFIG_VERSION),
   overlays: overlaysConfigSchema,
   shareOptions: shareOptionsConfigSchema.nullable().default(null),
@@ -98,7 +98,7 @@ export const projectEventConfigSchema = z.looseObject({
 /**
  * TypeScript types exported from schemas
  */
-export type ProjectEventConfig = z.infer<typeof projectEventConfigSchema>
+export type ProjectConfig = z.infer<typeof projectConfigSchema>
 export type OverlaysConfig = z.infer<typeof overlaysConfigSchema>
 export type ShareOptionsConfig = z.infer<typeof shareOptionsConfigSchema>
 export type WelcomeConfig = z.infer<typeof welcomeConfigSchema>
@@ -113,3 +113,9 @@ export {
   type MediaReference,
   type OverlayReference,
 } from '../media/media-reference.schema'
+
+// Backward compatibility aliases (deprecated - use ProjectConfig/projectConfigSchema)
+/** @deprecated Use projectConfigSchema instead */
+export const projectEventConfigSchema = projectConfigSchema
+/** @deprecated Use ProjectConfig instead */
+export type ProjectEventConfig = ProjectConfig

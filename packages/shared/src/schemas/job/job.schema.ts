@@ -13,8 +13,8 @@
  */
 import { z } from 'zod'
 import { answerSchema, capturedMediaSchema } from '../session/session.schema'
-import { overlayReferenceSchema } from '../event/project-event-config.schema'
-import { mainExperienceReferenceSchema } from '../event/experiences.schema'
+import { overlayReferenceSchema } from '../project/project-config.schema'
+import { mainExperienceReferenceSchema } from '../project/experiences.schema'
 import { transformConfigSchema } from '../experience/transform.schema'
 import { jobStatusSchema } from './job-status.schema'
 
@@ -88,17 +88,21 @@ export const sessionInputsSnapshotSchema = z.looseObject({
 export const transformConfigSnapshotSchema = transformConfigSchema
 
 /**
- * Snapshot of event context at job creation
+ * Snapshot of project context at job creation
  *
  * Captures overlay reference and experience reference for applyOverlay tracking.
  * Reuses overlayReferenceSchema and mainExperienceReferenceSchema for consistency.
  */
-export const eventContextSnapshotSchema = z.looseObject({
+export const projectContextSnapshotSchema = z.looseObject({
   overlay: overlayReferenceSchema,
   applyOverlay: z.boolean(),
   /** Experience reference snapshot (from mainExperienceReferenceSchema) */
   experienceRef: mainExperienceReferenceSchema.nullable().default(null),
 })
+
+// Backward compatibility alias
+/** @deprecated Use projectContextSnapshotSchema instead */
+export const eventContextSnapshotSchema = projectContextSnapshotSchema
 
 /**
  * Version snapshot for audit trail
@@ -114,9 +118,12 @@ export const versionSnapshotSchema = z.object({
 export const jobSnapshotSchema = z.looseObject({
   sessionInputs: sessionInputsSnapshotSchema,
   transformConfig: transformConfigSnapshotSchema,
-  eventContext: eventContextSnapshotSchema,
+  projectContext: projectContextSnapshotSchema,
   versions: versionSnapshotSchema,
 })
+
+// Backward compatibility: eventContext is now projectContext
+// Old jobs with eventContext will still parse due to looseObject()
 
 /**
  * Job Document Schema
@@ -156,5 +163,7 @@ export type JobOutput = z.infer<typeof jobOutputSchema>
 export type JobSnapshot = z.infer<typeof jobSnapshotSchema>
 export type SessionInputsSnapshot = z.infer<typeof sessionInputsSnapshotSchema>
 export type TransformConfigSnapshot = z.infer<typeof transformConfigSnapshotSchema>
-export type EventContextSnapshot = z.infer<typeof eventContextSnapshotSchema>
+export type ProjectContextSnapshot = z.infer<typeof projectContextSnapshotSchema>
+/** @deprecated Use ProjectContextSnapshot instead */
+export type EventContextSnapshot = ProjectContextSnapshot
 export type VersionSnapshot = z.infer<typeof versionSnapshotSchema>

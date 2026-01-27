@@ -1,7 +1,7 @@
 /**
- * Event Experiences Schema
+ * Project Experiences Schema
  *
- * Defines how experiences are configured within an event.
+ * Defines how experiences are configured within a project.
  * Supports multiple main experiences and optional pregate/preshare experiences.
  */
 import { z } from 'zod'
@@ -20,12 +20,12 @@ export const experienceReferenceSchema = z.object({
  * Main experience reference - includes overlay control
  */
 export const mainExperienceReferenceSchema = experienceReferenceSchema.extend({
-  /** Whether to apply event overlay on result media */
+  /** Whether to apply project overlay on result media */
   applyOverlay: z.boolean().default(true),
 })
 
 /**
- * Complete experiences configuration for an event
+ * Complete experiences configuration for a project
  */
 export const experiencesConfigSchema = z.object({
   /** Main experiences array (shown on welcome screen) */

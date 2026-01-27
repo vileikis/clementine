@@ -29,14 +29,14 @@
 
 ### Schema Migration
 
-- [ ] T001 [P] Create `packages/shared/src/schemas/project/project-config.schema.ts` by copying content from `event/project-event-config.schema.ts` and renaming exports (`ProjectEventConfig` → `ProjectConfig`, `projectEventConfigSchema` → `projectConfigSchema`)
-- [ ] T002 [P] Create `packages/shared/src/schemas/project/experiences.schema.ts` by moving content from `event/experiences.schema.ts`
-- [ ] T003 Modify `packages/shared/src/schemas/project/project.schema.ts` to add config fields (`draftConfig`, `publishedConfig`, `draftVersion`, `publishedVersion`, `publishedAt`) and remove `activeEventId` field
-- [ ] T004 Update `packages/shared/src/schemas/project/index.ts` to export new schemas and add backward compatibility aliases (`projectEventConfigSchema`, `ProjectEventConfig`)
-- [ ] T005 Modify `packages/shared/src/schemas/session/session.schema.ts` to remove `eventId` field (keep as looseObject so existing docs still parse)
-- [ ] T006 Delete `packages/shared/src/schemas/event/` folder entirely (project-event.schema.ts, project-event-config.schema.ts, experiences.schema.ts, index.ts)
-- [ ] T007 Update `packages/shared/src/schemas/index.ts` to remove event folder exports and ensure project exports are correct
-- [ ] T008 Run `pnpm --filter @clementine/shared build` and fix any TypeScript errors
+- [X] T001 [P] Create `packages/shared/src/schemas/project/project-config.schema.ts` by copying content from `event/project-event-config.schema.ts` and renaming exports (`ProjectEventConfig` → `ProjectConfig`, `projectEventConfigSchema` → `projectConfigSchema`)
+- [X] T002 [P] Create `packages/shared/src/schemas/project/experiences.schema.ts` by moving content from `event/experiences.schema.ts`
+- [X] T003 Modify `packages/shared/src/schemas/project/project.schema.ts` to add config fields (`draftConfig`, `publishedConfig`, `draftVersion`, `publishedVersion`, `publishedAt`) and remove `activeEventId` field
+- [X] T004 Update `packages/shared/src/schemas/project/index.ts` to export new schemas and add backward compatibility aliases (`projectEventConfigSchema`, `ProjectEventConfig`)
+- [X] T005 Modify `packages/shared/src/schemas/session/session.schema.ts` to remove `eventId` field (keep as looseObject so existing docs still parse)
+- [X] T006 Delete `packages/shared/src/schemas/event/` folder entirely (project-event.schema.ts, project-event-config.schema.ts, experiences.schema.ts, index.ts)
+- [X] T007 Update `packages/shared/src/schemas/index.ts` to remove event folder exports and ensure project exports are correct
+- [X] T008 Run `pnpm --filter @clementine/shared build` and fix any TypeScript errors
 
 **Checkpoint**: Shared package builds successfully with new schema structure
 
