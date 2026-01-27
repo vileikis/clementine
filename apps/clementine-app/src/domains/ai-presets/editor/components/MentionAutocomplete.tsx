@@ -2,17 +2,23 @@
  * MentionAutocomplete Component
  *
  * Portal-based autocomplete for @mentions in prompt template editor.
- * Uses React Portal to avoid overflow issues while maintaining manual positioning.
+ * Uses @floating-ui/react for smart positioning with collision detection.
  *
  * Features:
  * - Triggered by @ character
  * - Filters suggestions as user types
  * - Keyboard navigation (up/down arrows, Enter to select, Escape to close)
  * - Color-coded by type (blue for variables, green for media)
- * - Portal rendering to avoid container overflow
+ * - Smart positioning (flips/shifts to stay in viewport)
  */
 import { useEffect, useRef, useState } from 'react'
-import { createPortal } from 'react-dom'
+import {
+  autoUpdate,
+  flip,
+  offset,
+  shift,
+  useFloating,
+} from '@floating-ui/react'
 import { Image, Type } from 'lucide-react'
 import type { PresetMediaEntry, PresetVariable } from '@clementine/shared'
 
@@ -66,6 +72,36 @@ export function MentionAutocomplete({
 }: MentionAutocompleteProps) {
   const [selectedIndex, setSelectedIndex] = useState(0)
   const listRef = useRef<HTMLDivElement>(null)
+
+  // Create virtual element for floating-ui (cursor position)
+  const virtualElement = {
+    getBoundingClientRect: () => ({
+      width: 0,
+      height: 0,
+      x: position.left,
+      y: position.top,
+      top: position.top,
+      left: position.left,
+      right: position.left,
+      bottom: position.top,
+    }),
+  }
+
+  // Setup floating-ui with smart positioning
+  const { refs, floatingStyles } = useFloating({
+    placement: 'bottom-start',
+    middleware: [
+      offset(4), // 4px gap from cursor
+      flip(), // Flip to top if no space below
+      shift({ padding: 8 }), // Shift left/right to stay in viewport (8px margin)
+    ],
+    whileElementsMounted: autoUpdate, // Update position on scroll/resize
+  })
+
+  // Set virtual element as reference
+  useEffect(() => {
+    refs.setReference(virtualElement)
+  }, [position.left, position.top, refs])
 
   // Build suggestion list from variables and media
   const suggestions: MentionSuggestion[] = [
@@ -127,27 +163,22 @@ export function MentionAutocomplete({
 
   // Scroll selected item into view
   useEffect(() => {
-    if (listRef.current) {
-      const selectedElement = listRef.current.children[
-        selectedIndex
-      ] as HTMLElement
-      if (selectedElement) {
-        selectedElement.scrollIntoView({
-          block: 'nearest',
-          behavior: 'smooth',
-        })
-      }
+    if (!listRef.current) return
+
+    const selectedElement = listRef.current.children[selectedIndex]
+    if (selectedElement) {
+      selectedElement.scrollIntoView({
+        block: 'nearest',
+        behavior: 'smooth',
+      })
     }
   }, [selectedIndex])
 
-  // Portal to body to avoid overflow issues
-  const dropdown = (
+  return (
     <div
-      className="fixed z-50 w-64 rounded-md border bg-popover shadow-md"
-      style={{
-        top: `${position.top}px`,
-        left: `${position.left}px`,
-      }}
+      ref={refs.setFloating}
+      style={floatingStyles}
+      className="z-50 w-64 rounded-md border bg-popover shadow-md"
     >
       {filteredSuggestions.length === 0 ? (
         <div className="p-3 text-sm text-muted-foreground">
@@ -189,6 +220,4 @@ export function MentionAutocomplete({
       )}
     </div>
   )
-
-  return createPortal(dropdown, document.body)
 }

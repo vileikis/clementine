@@ -205,10 +205,16 @@ export function PromptTemplateEditor({
 
   /**
    * Handle cursor position changes (arrow keys, clicks)
+   * Ignore ESC key to prevent autocomplete from reopening after close
    */
-  const handleCursorMove = useCallback(() => {
-    updateAutocompleteFromCursor()
-  }, [updateAutocompleteFromCursor])
+  const handleCursorMove = useCallback(
+    (event?: React.KeyboardEvent) => {
+      // Don't reopen autocomplete after ESC key
+      if (event?.key === 'Escape') return
+      updateAutocompleteFromCursor()
+    },
+    [updateAutocompleteFromCursor],
+  )
 
   /**
    * Handle blur - close autocomplete when editor loses focus
@@ -316,8 +322,8 @@ export function PromptTemplateEditor({
         contentEditable={!disabled}
         onInput={handleInput}
         onPaste={handlePaste}
-        onClick={handleCursorMove}
-        onKeyUp={handleCursorMove}
+        onClick={() => handleCursorMove()}
+        onKeyUp={(e) => handleCursorMove(e)}
         onBlur={handleBlur}
         className="min-h-[200px] rounded-md border bg-background p-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
         data-placeholder="Write your prompt template here. Type @ to mention variables or media."
