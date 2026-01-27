@@ -123,19 +123,19 @@
 
 ### Create New Routes
 
-- [ ] T032 Create `apps/clementine-app/src/app/routes/workspace/$workspaceSlug.projects/$projectId.welcome.tsx` based on `$projectId.events/$eventId.welcome.tsx` but using projectId only
-- [ ] T033 Create `apps/clementine-app/src/app/routes/workspace/$workspaceSlug.projects/$projectId.theme.tsx` based on `$projectId.events/$eventId.theme.tsx` but using projectId only
-- [ ] T034 Create `apps/clementine-app/src/app/routes/workspace/$workspaceSlug.projects/$projectId.share.tsx` based on `$projectId.events/$eventId.share.tsx` but using projectId only
-- [ ] T035 Create `apps/clementine-app/src/app/routes/workspace/$workspaceSlug.projects/$projectId.settings.tsx` based on `$projectId.events/$eventId.settings.tsx` but using projectId only
+- [X] T032 Create `apps/clementine-app/src/app/routes/workspace/$workspaceSlug.projects/$projectId.welcome.tsx` based on `$projectId.events/$eventId.welcome.tsx` but using projectId only
+- [X] T033 Create `apps/clementine-app/src/app/routes/workspace/$workspaceSlug.projects/$projectId.theme.tsx` based on `$projectId.events/$eventId.theme.tsx` but using projectId only
+- [X] T034 Create `apps/clementine-app/src/app/routes/workspace/$workspaceSlug.projects/$projectId.share.tsx` based on `$projectId.events/$eventId.share.tsx` but using projectId only
+- [X] T035 Create `apps/clementine-app/src/app/routes/workspace/$workspaceSlug.projects/$projectId.settings.tsx` based on `$projectId.events/$eventId.settings.tsx` but using projectId only
 
 ### Update Project Layout Route
 
-- [ ] T036 Modify `apps/clementine-app/src/app/routes/workspace/$workspaceSlug.projects/$projectId.tsx` to include designer layout (previously in $eventId.tsx)
-- [ ] T037 Modify `apps/clementine-app/src/app/routes/workspace/$workspaceSlug.projects/$projectId.index.tsx` to redirect to welcome or show project overview
+- [X] T036 Modify `apps/clementine-app/src/app/routes/workspace/$workspaceSlug.projects/$projectId.tsx` to include designer layout (previously in $eventId.tsx)
+- [X] T037 Modify `apps/clementine-app/src/app/routes/workspace/$workspaceSlug.projects/$projectId.index.tsx` to redirect to welcome or show project overview
 
 ### Delete Old Event Routes
 
-- [ ] T038 Delete entire `apps/clementine-app/src/app/routes/workspace/$workspaceSlug.projects/$projectId.events/` directory
+- [X] T038 Delete entire `apps/clementine-app/src/app/routes/workspace/$workspaceSlug.projects/$projectId.events/` directory
 
 **Checkpoint**: Routes work at project level without event nesting
 

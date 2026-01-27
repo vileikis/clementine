@@ -1,65 +1,24 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { FolderOpen, Share2 } from 'lucide-react'
-import { useState } from 'react'
-import { ProjectEventsPage } from '@/domains/project/events'
-import { TopNavActions, TopNavBar } from '@/domains/navigation'
-import { useProject } from '@/domains/project/shared'
-import { ShareDialog } from '@/domains/project/share'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 
 /**
- * Project details page route (index)
+ * Project index route - redirects to welcome
  *
  * Route: /workspace/:workspaceSlug/projects/:projectId (exact match)
  * Access: Admin only (enforced by parent route)
  *
- * Displays project events management interface with top navigation bar.
- * ProjectEventsPage now fetches activeEventId automatically via useProjectEvents hook.
+ * Redirects to the welcome tab of the project designer.
+ * The parent route ($projectId.tsx) handles the designer layout.
  */
 export const Route = createFileRoute(
   '/workspace/$workspaceSlug/projects/$projectId/',
 )({
-  component: function ProjectDetailsRoute() {
-    const { workspaceSlug, projectId } = Route.useParams()
-    const { data: project } = useProject(projectId)
-    const projectsListPath = `/workspace/${workspaceSlug}/projects`
-    const [shareDialogOpen, setShareDialogOpen] = useState(false)
-
-    // Show loading state while project loads
-    if (!project) {
-      return null
-    }
-
-    return (
-      <>
-        <TopNavBar
-          breadcrumbs={[
-            {
-              label: project.name,
-              icon: FolderOpen,
-              iconHref: projectsListPath,
-            },
-          ]}
-          right={
-            <TopNavActions
-              actions={[
-                {
-                  label: 'Share',
-                  icon: Share2,
-                  onClick: () => setShareDialogOpen(true),
-                  variant: 'default',
-                  ariaLabel: 'Share project with guests',
-                },
-              ]}
-            />
-          }
-        />
-        <ProjectEventsPage projectId={projectId} />
-        <ShareDialog
-          projectId={projectId}
-          open={shareDialogOpen}
-          onOpenChange={setShareDialogOpen}
-        />
-      </>
-    )
+  beforeLoad: ({ params }) => {
+    throw redirect({
+      to: '/workspace/$workspaceSlug/projects/$projectId/welcome',
+      params: {
+        workspaceSlug: params.workspaceSlug,
+        projectId: params.projectId,
+      },
+    })
   },
 })

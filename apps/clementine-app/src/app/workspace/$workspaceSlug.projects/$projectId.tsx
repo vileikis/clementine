@@ -1,9 +1,11 @@
-import { Outlet, createFileRoute, notFound } from '@tanstack/react-router'
+import { createFileRoute, notFound } from '@tanstack/react-router'
 import { doc, getDoc } from 'firebase/firestore'
 import { projectSchema } from '@clementine/shared'
 import { firestore } from '@/integrations/firebase/client'
 import { convertFirestoreDoc } from '@/shared/utils/firestore-utils'
 import { NotFound } from '@/shared/components/NotFound'
+import { ProjectConfigDesignerLayout } from '@/domains/project-config'
+import { useProject } from '@/domains/project'
 
 /**
  * Project layout route
@@ -11,11 +13,8 @@ import { NotFound } from '@/shared/components/NotFound'
  * Route: /workspace/:workspaceSlug/projects/:projectId
  * Access: Admin only (enforced by parent route)
  *
- * Layout for project routes (details, events, etc.)
- * Loads project data and makes it available to child routes.
- *
- * Note: TopNavBar is rendered by child routes (e.g., event routes)
- * to avoid duplicate navigation bars in nested routes.
+ * Layout for project routes (welcome, theme, share, settings).
+ * Loads project data and renders the designer layout.
  */
 export const Route = createFileRoute(
   '/workspace/$workspaceSlug/projects/$projectId',
@@ -47,7 +46,23 @@ export const Route = createFileRoute(
 })
 
 function ProjectLayout() {
-  return <Outlet />
+  const { workspaceSlug, projectId } = Route.useParams()
+
+  // Get data from hooks (real-time updates enabled)
+  const { data: project } = useProject(projectId)
+
+  // Data should be immediately available from loader cache
+  // This check is a safety guard only
+  if (!project) {
+    return null
+  }
+
+  return (
+    <ProjectConfigDesignerLayout
+      project={project}
+      workspaceSlug={workspaceSlug}
+    />
+  )
 }
 
 function ProjectNotFound() {
