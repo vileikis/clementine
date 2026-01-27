@@ -50,17 +50,17 @@
 
 ### Repository Updates
 
-- [ ] T009 Modify `functions/src/repositories/session.ts` to remove eventId from session creation and any eventId handling
-- [ ] T010 Search `functions/src/` for any remaining `eventId` references and update accordingly
-- [ ] T011 Verify `functions/src/repositories/job.ts` has no eventId dependencies (jobs reference projectId and experienceId)
+- [X] T009 Modify `functions/src/repositories/session.ts` to remove eventId from session creation and any eventId handling
+- [X] T010 Search `functions/src/` for any remaining `eventId` references and update accordingly
+- [X] T011 Verify `functions/src/repositories/job.ts` has no eventId dependencies (jobs reference projectId and experienceId)
 
 ### Migration Script
 
-- [ ] T012 Create `functions/scripts/migrations/042-flatten-events.ts` migration script that: reads all projects with activeEventId, copies event config to project, removes activeEventId, marks event as migrated
+- [X] T012 Create `functions/scripts/migrations/042-flatten-events.ts` migration script that: reads all projects with activeEventId, copies event config to project, removes activeEventId, marks event as migrated
 
 ### Build Verification
 
-- [ ] T013 Run `pnpm --filter functions build` and fix any TypeScript errors
+- [X] T013 Run `pnpm --filter functions build` and fix any TypeScript errors
 
 **Checkpoint**: Functions build successfully, migration script ready
 

@@ -299,8 +299,8 @@ export function buildJobSnapshot(
       capturedMedia: session.capturedMedia,
     },
     transformConfig: config.transform!,
-    eventContext: {
-      overlay: null, // Will be populated from event if applicable
+    projectContext: {
+      overlay: null, // Will be populated from project if applicable
       applyOverlay: false,
       experienceRef: null,
     },
@@ -309,7 +309,7 @@ export function buildJobSnapshot(
         configSource === 'draft'
           ? experience.draftVersion
           : (experience.publishedVersion ?? 1),
-      eventVersion: null, // Will be populated from event if applicable
+      eventVersion: null, // Deprecated - kept for backward compatibility with old jobs
     },
   }
 }
