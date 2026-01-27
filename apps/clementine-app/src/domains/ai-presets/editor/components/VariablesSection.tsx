@@ -43,6 +43,16 @@ interface VariablesSectionProps {
   disabled?: boolean
 }
 
+const generateVariableName = (
+  type: 'text' | 'image',
+  existingNames: string[],
+): string => {
+  // Generate default name
+  const baseName = type === 'text' ? 'text_var' : 'image_var'
+  const existingCount = existingNames.filter((n) => n.includes(baseName)).length
+  return `${baseName}_${existingCount + 1}`
+}
+
 /**
  * Variables section with header, dropdown menu, and drag-and-drop
  *
@@ -84,36 +94,26 @@ export function VariablesSection({
   // Get existing names for uniqueness validation
   const existingNames = variables.map((v) => v.name)
 
-  // Generate unique ID for new variables
-  const generateId = () =>
-    `var_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-
   // Handle add new variable (text or image)
   const handleAddVariable = useCallback(
     async (type: 'text' | 'image') => {
       try {
         // Generate default name
-        const baseName = type === 'text' ? 'text_var' : 'image_var'
-        let name = baseName
-        let counter = 1
-        while (existingNames.includes(name)) {
-          name = `${baseName}_${counter}`
-          counter++
-        }
+        const name = generateVariableName(type, existingNames)
 
         const newVariable: PresetVariable =
           type === 'text'
             ? {
-                id: generateId(),
-                type: 'text',
                 name,
+                id: crypto.randomUUID(),
+                type: 'text',
                 defaultValue: null,
                 valueMap: null,
               }
             : {
-                id: generateId(),
-                type: 'image',
                 name,
+                id: crypto.randomUUID(),
+                type: 'image',
               }
 
         const updatedVariables = [...variables, newVariable]
@@ -126,7 +126,7 @@ export function VariablesSection({
         })
       }
     },
-    [variables, existingNames, updateVariables],
+    [variables, existingNames, updateVariables.mutateAsync],
   )
 
   // Handle rename variable
@@ -149,7 +149,7 @@ export function VariablesSection({
         })
       }
     },
-    [variables, updateVariables],
+    [variables, updateVariables.mutateAsync],
   )
 
   // Handle settings - open dialog
@@ -186,7 +186,7 @@ export function VariablesSection({
         })
       }
     },
-    [variables, updateVariables],
+    [variables, updateVariables.mutateAsync],
   )
 
   // Handle delete variable
@@ -206,7 +206,7 @@ export function VariablesSection({
         })
       }
     },
-    [variables, updateVariables],
+    [variables, updateVariables.mutateAsync],
   )
 
   // Handle drag end to reorder variables
@@ -227,7 +227,7 @@ export function VariablesSection({
         }
       }
     },
-    [variables, updateVariables],
+    [variables, updateVariables.mutateAsync],
   )
 
   const isDisabled = disabled || updateVariables.isPending

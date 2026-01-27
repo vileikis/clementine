@@ -10,11 +10,7 @@ import type { ValueMappingEntry } from '@clementine/shared'
 import { Button } from '@/ui-kit/ui/button'
 import { Input } from '@/ui-kit/ui/input'
 import { Textarea } from '@/ui-kit/ui/textarea'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/ui-kit/ui/tooltip'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui-kit/ui/tooltip'
 import { cn } from '@/shared/utils'
 
 interface ValueMappingsEditorProps {

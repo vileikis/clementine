@@ -207,10 +207,10 @@
 
 ### Implementation for User Story 5
 
-- [ ] T032 [P] [US5] Add AddValueMappingInput schema in `apps/clementine-app/src/domains/ai-presets/editor/schemas/ai-preset-editor.schemas.ts`
-- [ ] T033 [US5] Create ValueMappingsEditor component (table of mappings with add/remove) in `apps/clementine-app/src/domains/ai-presets/editor/components/ValueMappingsEditor.tsx`
-- [ ] T034 [US5] ~~Integrate ValueMappingsEditor into VariableEditor~~ Create settings dialog triggered by VariableCard settings button
-- [ ] T035 [US5] Update barrel exports for US5 component
+- [x] T032 [P] [US5] Add AddValueMappingInput schema in `apps/clementine-app/src/domains/ai-presets/editor/schemas/ai-preset-editor.schemas.ts`
+- [x] T033 [US5] Create ValueMappingsEditor component (table of mappings with add/remove) in `apps/clementine-app/src/domains/ai-presets/editor/components/ValueMappingsEditor.tsx`
+- [x] T034 [US5] ~~Integrate ValueMappingsEditor into VariableEditor~~ Create settings dialog triggered by VariableCard settings button
+- [x] T035 [US5] Update barrel exports for US5 component
 
 **Note**: Phase 6 implementation replaced VariableEditor with inline editing. Settings button in VariableCard will trigger a dialog for default value and value mappings.
 
