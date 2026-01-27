@@ -1,8 +1,8 @@
 /**
- * Generic Hook: useUpdateEventConfig
+ * Generic Hook: useUpdateProjectConfig
  *
- * Mutation hook for updating event config fields using dot notation.
- * Wraps updateEventConfigField helper with TanStack Query for reactivity.
+ * Mutation hook for updating project config fields using dot notation.
+ * Wraps updateProjectConfigField helper with TanStack Query for reactivity.
  *
  * Benefits:
  * - Atomic Firestore updates (no race conditions)
@@ -11,12 +11,11 @@
  * - Supports partial updates (single or multiple fields)
  *
  * @param projectId - Project ID
- * @param eventId - Event ID
  * @returns TanStack Query mutation
  *
  * @example
  * ```tsx
- * const updateConfig = useUpdateEventConfig(projectId, eventId)
+ * const updateConfig = useUpdateProjectConfig(projectId)
  *
  * // Update single field
  * await updateConfig.mutateAsync({
@@ -33,23 +32,26 @@
  */
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import * as Sentry from '@sentry/tanstackstart-react'
-import { updateEventConfigField } from '../lib/updateEventConfigField'
+import { updateProjectConfigField } from '../lib/updateProjectConfigField'
 
 /**
- * Hook for updating event configuration with dot notation
+ * Hook for updating project configuration with dot notation
+ *
+ * @deprecated Use domain-specific hooks (useUpdateWelcome, useUpdateTheme, etc.) instead.
+ * This generic hook is kept for backward compatibility.
  */
-export function useUpdateEventConfig(projectId: string, eventId: string) {
+export function useUpdateEventConfig(projectId: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: async (updates: Record<string, unknown>) => {
-      await updateEventConfigField(projectId, eventId, updates)
+      await updateProjectConfigField(projectId, updates)
     },
 
     // Success: invalidate queries to trigger re-fetch
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['project-event', projectId, eventId],
+        queryKey: ['project', projectId],
       })
     },
 
@@ -57,15 +59,17 @@ export function useUpdateEventConfig(projectId: string, eventId: string) {
     onError: (error) => {
       Sentry.captureException(error, {
         tags: {
-          domain: 'event/shared',
-          action: 'update-event-config',
+          domain: 'project-config/shared',
+          action: 'update-project-config',
         },
         extra: {
-          errorType: 'event-config-update-failure',
+          errorType: 'project-config-update-failure',
           projectId,
-          eventId,
         },
       })
     },
   })
 }
+
+// Provide alias for new naming convention
+export { useUpdateEventConfig as useUpdateProjectConfig }

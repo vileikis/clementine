@@ -25,7 +25,7 @@ import { useMarkExperienceComplete } from '../hooks'
 import { useInitSession } from '@/domains/session/shared'
 import { ExperienceRuntime } from '@/domains/experience/runtime'
 import { ThemeProvider, ThemedBackground } from '@/shared/theming'
-import { DEFAULT_THEME } from '@/domains/event/theme/constants'
+import { DEFAULT_THEME } from '@/domains/project-config/theme/constants'
 
 export interface PregatePageProps {
   /** Selected main experience ID (to navigate to after pregate) */
@@ -58,12 +58,12 @@ export interface PregatePageProps {
  */
 export function PregatePage({ selectedExperienceId }: PregatePageProps) {
   const navigate = useNavigate()
-  const { project, event, guest, experiences, experiencesLoading } =
+  const { project, guest, experiences, experiencesLoading } =
     useGuestContext()
   const markExperienceComplete = useMarkExperienceComplete()
 
-  // Get pregate config from event
-  const pregateConfig = event.publishedConfig?.experiences?.pregate
+  // Get pregate config from project
+  const pregateConfig = project.publishedConfig?.experiences?.pregate
   const pregateExperienceId = pregateConfig?.experienceId
 
   // Find pregate experience from loaded experiences
@@ -109,15 +109,14 @@ export function PregatePage({ selectedExperienceId }: PregatePageProps) {
   const sessionState = useInitSession({
     projectId: project.id,
     workspaceId: project.workspaceId,
-    eventId: event.id,
     experienceId: pregateExperienceId ?? '',
     initialSessionId: undefined,
     enabled:
       !!pregateExperienceId && !!pregateExperience && !experiencesLoading,
   })
 
-  // Get theme from event config (with fallback to default)
-  const theme = event.publishedConfig?.theme ?? DEFAULT_THEME
+  // Get theme from project config (with fallback to default)
+  const theme = project.publishedConfig?.theme ?? DEFAULT_THEME
 
   // Handle error for runtime (logs but doesn't block)
   const handleRuntimeError = (error: Error) => {

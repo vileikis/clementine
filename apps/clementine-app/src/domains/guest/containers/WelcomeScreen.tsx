@@ -22,10 +22,10 @@ import { useNavigate } from '@tanstack/react-router'
 
 import { useGuestContext } from '../contexts'
 import { usePregate } from '../hooks'
-import type { ExperienceCardData } from '@/domains/event/welcome'
-import { DEFAULT_WELCOME, WelcomeRenderer } from '@/domains/event/welcome'
+import type { ExperienceCardData } from '@/domains/project-config/welcome'
+import { DEFAULT_WELCOME, WelcomeRenderer } from '@/domains/project-config/welcome'
 import { ThemeProvider } from '@/shared/theming'
-import { DEFAULT_THEME } from '@/domains/event/theme/constants'
+import { DEFAULT_THEME } from '@/domains/project-config/theme/constants'
 
 /**
  * Welcome screen component (used within GuestLayout)
@@ -57,9 +57,9 @@ import { DEFAULT_THEME } from '@/domains/event/theme/constants'
  */
 export function WelcomeScreen() {
   const navigate = useNavigate()
-  const { project, event, guest, experiences } = useGuestContext()
+  const { project, guest, experiences } = useGuestContext()
 
-  const publishedConfig = event.publishedConfig!
+  const publishedConfig = project.publishedConfig!
   const welcome = publishedConfig.welcome ?? DEFAULT_WELCOME
   const theme = publishedConfig.theme ?? DEFAULT_THEME
   const mainExperiences = publishedConfig.experiences?.main ?? []

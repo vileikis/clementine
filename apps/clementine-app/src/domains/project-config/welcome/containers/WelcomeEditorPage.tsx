@@ -17,14 +17,14 @@ import type { WelcomeConfig } from '@/domains/project-config/shared'
 import type { MainExperienceReference } from '@/domains/project-config/experiences'
 import { PreviewShell } from '@/shared/preview-shell'
 import { useAutoSave } from '@/shared/forms'
-import { useProjectEvent } from '@/domains/project-config/shared'
+import { useProject } from '@/domains/project/shared'
 import { useWorkspace } from '@/domains/workspace'
 import { useAuth } from '@/domains/auth'
 import { DEFAULT_THEME } from '@/domains/project-config/theme/constants'
 import { ThemeProvider } from '@/shared/theming'
 import {
   useExperiencesForSlot,
-  useUpdateEventExperiences,
+  useUpdateProjectExperiences,
 } from '@/domains/project-config/experiences'
 
 // Fields to compare for auto-save change detection
@@ -36,8 +36,8 @@ const WELCOME_FIELDS_TO_COMPARE: (keyof WelcomeConfig)[] = [
 ]
 
 export function WelcomeEditorPage() {
-  const { projectId, eventId, workspaceSlug } = useParams({ strict: false })
-  const { data: event } = useProjectEvent(projectId, eventId)
+  const { projectId, workspaceSlug } = useParams({ strict: false })
+  const { data: project } = useProject(projectId ?? '')
   const { data: workspace } = useWorkspace(workspaceSlug)
   const { user } = useAuth()
 
@@ -45,16 +45,16 @@ export function WelcomeEditorPage() {
   const [uploadProgress, setUploadProgress] = useState<number | undefined>()
   const [isUploading, setIsUploading] = useState(false)
 
-  // Get current welcome from event or use defaults
-  const currentWelcome = event?.draftConfig?.welcome ?? DEFAULT_WELCOME
+  // Get current welcome from project or use defaults
+  const currentWelcome = project?.draftConfig?.welcome ?? DEFAULT_WELCOME
 
-  // Get current theme from event or use defaults
-  const currentTheme = event?.draftConfig?.theme ?? DEFAULT_THEME
+  // Get current theme from project or use defaults
+  const currentTheme = project?.draftConfig?.theme ?? DEFAULT_THEME
 
-  // Get current experiences from event
-  const mainExperiences = event?.draftConfig?.experiences?.main ?? []
-  const pregateExperience = event?.draftConfig?.experiences?.pregate
-  const preshareExperience = event?.draftConfig?.experiences?.preshare
+  // Get current experiences from project
+  const mainExperiences = project?.draftConfig?.experiences?.main ?? []
+  const pregateExperience = project?.draftConfig?.experiences?.pregate
+  const preshareExperience = project?.draftConfig?.experiences?.preshare
 
   // Fetch available experiences for the main slot
   const { data: availableExperiences = [] } = useExperiencesForSlot(
@@ -92,11 +92,10 @@ export function WelcomeEditorPage() {
   })
 
   // Mutations (hooks handle undefined params gracefully)
-  const updateWelcome = useUpdateWelcome(projectId, eventId)
+  const updateWelcome = useUpdateWelcome(projectId)
   const uploadHeroMedia = useUploadAndUpdateHeroMedia(workspace?.id, user?.uid)
-  const updateEventExperiences = useUpdateEventExperiences({
+  const updateProjectExperiences = useUpdateProjectExperiences({
     projectId,
-    eventId,
   })
 
   // Auto-save with debounce
@@ -179,7 +178,7 @@ export function WelcomeEditorPage() {
   const handleUpdateMainExperiences = useCallback(
     async (experiences: MainExperienceReference[]) => {
       try {
-        await updateEventExperiences.mutateAsync({ main: experiences })
+        await updateProjectExperiences.mutateAsync({ main: experiences })
         // No toast - changes are reflected immediately via real-time updates
       } catch (error) {
         const message =
@@ -189,11 +188,11 @@ export function WelcomeEditorPage() {
         toast.error(message)
       }
     },
-    [updateEventExperiences],
+    [updateProjectExperiences],
   )
 
   // Loading state
-  if (!event || !user || !workspace) {
+  if (!project || !user || !workspace) {
     return null
   }
 

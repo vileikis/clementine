@@ -149,24 +149,24 @@
 
 ### Search and Replace Imports
 
-- [ ] T039 Search all files in `apps/clementine-app/src/` for `@/domains/event/` imports and update to `@/domains/project-config/`
-- [ ] T040 Search all files for `useProjectEvent` usage and update to use `useProject` from project domain (with config) or `useProjectConfig` from project-config domain
-- [ ] T041 Search all files for `usePublishEvent` and update to `usePublishProjectConfig`
-- [ ] T042 Search all files for `EventDesignerLayout` and update to `ProjectConfigDesignerLayout`
-- [ ] T043 Search all files for `EventDesignerSidebar` and update to `ProjectConfigDesignerSidebar`
-- [ ] T044 Search all files for `EventSettingsPage` and update to `ProjectConfigSettingsPage`
-- [ ] T045 Search all files for `updateEventConfigField` and update to `updateProjectConfigField`
+- [X] T039 Search all files in `apps/clementine-app/src/` for `@/domains/event/` imports and update to `@/domains/project-config/`
+- [X] T040 Search all files for `useProjectEvent` usage and update to use `useProject` from project domain (with config) or `useProjectConfig` from project-config domain
+- [X] T041 Search all files for `usePublishEvent` and update to `usePublishProjectConfig`
+- [X] T042 Search all files for `EventDesignerLayout` and update to `ProjectConfigDesignerLayout`
+- [X] T043 Search all files for `EventDesignerSidebar` and update to `ProjectConfigDesignerSidebar`
+- [X] T044 Search all files for `EventSettingsPage` and update to `ProjectConfigSettingsPage`
+- [X] T045 Search all files for `updateEventConfigField` and update to `updateProjectConfigField`
 
 ### Update Components Using eventId
 
-- [ ] T046 Search all components for `eventId` in useParams() calls and remove
-- [ ] T047 Update all navigation/Link components that include eventId in route params
+- [X] T046 Search all components for `eventId` in useParams() calls and remove
+- [X] T047 Update all navigation/Link components that include eventId in route params
 
 ### Type Import Updates
 
-- [ ] T048 Search for `ProjectEventFull` type imports and update to use `Project` type
-- [ ] T049 Search for `ProjectEventConfig` type imports and update to `ProjectConfig`
-- [ ] T050 Search for `projectEventConfigSchema` imports and update to `projectConfigSchema`
+- [X] T048 Search for `ProjectEventFull` type imports and update to use `Project` type
+- [X] T049 Search for `ProjectEventConfig` type imports and update to `ProjectConfig`
+- [X] T050 Search for `projectEventConfigSchema` imports and update to `projectConfigSchema`
 
 **Checkpoint**: All imports updated, no references to old event domain
 

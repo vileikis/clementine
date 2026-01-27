@@ -1,13 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, render, screen } from '@testing-library/react'
-import { useEventDesignerStore } from '../stores/useEventDesignerStore'
+import { useProjectConfigDesignerStore } from '../stores/useProjectConfigDesignerStore'
 import { DesignerStatusIndicators } from './DesignerStatusIndicators'
 
 describe('DesignerStatusIndicators', () => {
   beforeEach(() => {
     // Reset store state before each test (wrap in act)
     act(() => {
-      useEventDesignerStore.getState().resetSaveState()
+      useProjectConfigDesignerStore.getState().resetSaveState()
     })
     vi.useFakeTimers()
   })
@@ -24,7 +24,7 @@ describe('DesignerStatusIndicators', () => {
   })
 
   it('should show spinner when pendingSaves > 0', () => {
-    const { startSave } = useEventDesignerStore.getState()
+    const { startSave } = useProjectConfigDesignerStore.getState()
 
     act(() => {
       startSave()
@@ -41,7 +41,7 @@ describe('DesignerStatusIndicators', () => {
   })
 
   it('should show checkmark for 3 seconds after save completes', () => {
-    const { startSave, completeSave } = useEventDesignerStore.getState()
+    const { startSave, completeSave } = useProjectConfigDesignerStore.getState()
 
     act(() => {
       startSave()
@@ -64,7 +64,7 @@ describe('DesignerStatusIndicators', () => {
   })
 
   it('should hide checkmark before 3 seconds if new save starts', () => {
-    const { startSave, completeSave } = useEventDesignerStore.getState()
+    const { startSave, completeSave } = useProjectConfigDesignerStore.getState()
 
     // Complete a save
     act(() => {
@@ -90,7 +90,7 @@ describe('DesignerStatusIndicators', () => {
   })
 
   it('should clean up timer on unmount', () => {
-    const { startSave, completeSave } = useEventDesignerStore.getState()
+    const { startSave, completeSave } = useProjectConfigDesignerStore.getState()
 
     act(() => {
       startSave()
@@ -110,7 +110,7 @@ describe('DesignerStatusIndicators', () => {
   })
 
   it('should show spinner for multiple concurrent saves', () => {
-    const { startSave } = useEventDesignerStore.getState()
+    const { startSave } = useProjectConfigDesignerStore.getState()
 
     act(() => {
       startSave()
@@ -124,7 +124,7 @@ describe('DesignerStatusIndicators', () => {
   })
 
   it('should NOT show checkmark until ALL saves complete', () => {
-    const { startSave, completeSave } = useEventDesignerStore.getState()
+    const { startSave, completeSave } = useProjectConfigDesignerStore.getState()
 
     act(() => {
       startSave()
@@ -157,7 +157,7 @@ describe('DesignerStatusIndicators', () => {
   })
 
   it('should have proper ARIA attributes', () => {
-    const { startSave } = useEventDesignerStore.getState()
+    const { startSave } = useProjectConfigDesignerStore.getState()
 
     act(() => {
       startSave()
@@ -171,7 +171,7 @@ describe('DesignerStatusIndicators', () => {
   })
 
   it('should handle rapid state changes correctly', () => {
-    const { startSave, completeSave } = useEventDesignerStore.getState()
+    const { startSave, completeSave } = useProjectConfigDesignerStore.getState()
 
     const { rerender } = render(<DesignerStatusIndicators />)
 

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, renderHook, waitFor } from '@testing-library/react'
-import { useEventDesignerStore } from '../stores/useEventDesignerStore'
+import { useProjectConfigDesignerStore } from '../stores/useProjectConfigDesignerStore'
 import { useTrackedMutation } from './useTrackedMutation'
 import type { UseMutationResult } from '@tanstack/react-query'
 
@@ -32,7 +32,7 @@ describe('useTrackedMutation', () => {
   beforeEach(() => {
     // Reset store state before each test (wrap in act to avoid warnings)
     act(() => {
-      useEventDesignerStore.getState().resetSaveState()
+      useProjectConfigDesignerStore.getState().resetSaveState()
     })
   })
 
@@ -41,14 +41,14 @@ describe('useTrackedMutation', () => {
 
     const { rerender } = renderHook(() => useTrackedMutation(mutation))
 
-    expect(useEventDesignerStore.getState().pendingSaves).toBe(0)
+    expect(useProjectConfigDesignerStore.getState().pendingSaves).toBe(0)
 
     // Transition to pending
     mutation.isPending = true
     rerender()
 
     await waitFor(() => {
-      expect(useEventDesignerStore.getState().pendingSaves).toBe(1)
+      expect(useProjectConfigDesignerStore.getState().pendingSaves).toBe(1)
     })
   })
 
@@ -59,16 +59,16 @@ describe('useTrackedMutation', () => {
 
     // Manually increment to simulate the save started (wrap in act)
     act(() => {
-      useEventDesignerStore.getState().startSave()
+      useProjectConfigDesignerStore.getState().startSave()
     })
-    expect(useEventDesignerStore.getState().pendingSaves).toBe(1)
+    expect(useProjectConfigDesignerStore.getState().pendingSaves).toBe(1)
 
     // Transition to idle
     mutation.isPending = false
     rerender()
 
     await waitFor(() => {
-      expect(useEventDesignerStore.getState().pendingSaves).toBe(0)
+      expect(useProjectConfigDesignerStore.getState().pendingSaves).toBe(0)
     })
   })
 
@@ -82,14 +82,14 @@ describe('useTrackedMutation', () => {
     rerender()
     rerender()
 
-    expect(useEventDesignerStore.getState().pendingSaves).toBe(0)
+    expect(useProjectConfigDesignerStore.getState().pendingSaves).toBe(0)
 
     // Now transition to pending
     mutation.isPending = true
     rerender()
 
     await waitFor(() => {
-      expect(useEventDesignerStore.getState().pendingSaves).toBe(1)
+      expect(useProjectConfigDesignerStore.getState().pendingSaves).toBe(1)
     })
 
     // Re-render again with pending state
@@ -97,7 +97,7 @@ describe('useTrackedMutation', () => {
     rerender()
 
     // Should still be 1 (no double-counting)
-    expect(useEventDesignerStore.getState().pendingSaves).toBe(1)
+    expect(useProjectConfigDesignerStore.getState().pendingSaves).toBe(1)
   })
 
   it('should track multiple mutation transitions correctly', async () => {
@@ -116,7 +116,7 @@ describe('useTrackedMutation', () => {
     rerender1()
 
     await waitFor(() => {
-      expect(useEventDesignerStore.getState().pendingSaves).toBe(1)
+      expect(useProjectConfigDesignerStore.getState().pendingSaves).toBe(1)
     })
 
     // Start mutation 2
@@ -124,7 +124,7 @@ describe('useTrackedMutation', () => {
     rerender2()
 
     await waitFor(() => {
-      expect(useEventDesignerStore.getState().pendingSaves).toBe(2)
+      expect(useProjectConfigDesignerStore.getState().pendingSaves).toBe(2)
     })
 
     // Complete mutation 1
@@ -132,7 +132,7 @@ describe('useTrackedMutation', () => {
     rerender1()
 
     await waitFor(() => {
-      expect(useEventDesignerStore.getState().pendingSaves).toBe(1)
+      expect(useProjectConfigDesignerStore.getState().pendingSaves).toBe(1)
     })
 
     // Complete mutation 2
@@ -140,8 +140,8 @@ describe('useTrackedMutation', () => {
     rerender2()
 
     await waitFor(() => {
-      expect(useEventDesignerStore.getState().pendingSaves).toBe(0)
-      expect(useEventDesignerStore.getState().lastCompletedAt).not.toBeNull()
+      expect(useProjectConfigDesignerStore.getState().pendingSaves).toBe(0)
+      expect(useProjectConfigDesignerStore.getState().lastCompletedAt).not.toBeNull()
     })
   })
 
@@ -176,7 +176,7 @@ describe('useTrackedMutation', () => {
     rerender()
 
     await waitFor(() => {
-      expect(useEventDesignerStore.getState().pendingSaves).toBe(0)
+      expect(useProjectConfigDesignerStore.getState().pendingSaves).toBe(0)
     })
   })
 })

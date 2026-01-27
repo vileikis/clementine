@@ -118,7 +118,6 @@ export function ExperiencePreviewModal({
       .mutateAsync({
         projectId: ghostProjectId,
         workspaceId,
-        eventId: null, // No event for preview sessions
         experienceId: experience.id,
         mode: 'preview',
         configSource: 'draft',
