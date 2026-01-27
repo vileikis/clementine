@@ -27,7 +27,10 @@ import {
   FaXTwitter,
 } from 'react-icons/fa6'
 import { FaTelegramPlane } from 'react-icons/fa'
-import type { ShareConfig, ShareOptionsConfig } from '@/domains/project-config/shared'
+import type {
+  ShareConfig,
+  ShareOptionsConfig,
+} from '@/domains/project-config/shared'
 import type { LucideIcon } from 'lucide-react'
 import type { IconType } from 'react-icons'
 import {

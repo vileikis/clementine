@@ -82,8 +82,7 @@ export function ExperiencePage({
   pregateSessionId,
 }: ExperiencePageProps) {
   const navigate = useNavigate()
-  const { project, guest, experiences, experiencesLoading } =
-    useGuestContext()
+  const { project, guest, experiences, experiencesLoading } = useGuestContext()
   const urlUpdatedRef = useRef(false)
   const pregateLinkedRef = useRef(false)
 

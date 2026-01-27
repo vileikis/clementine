@@ -3,7 +3,10 @@
  *
  * Limits and defaults for share screen configuration.
  */
-import type { CtaConfig, ShareConfig } from '@/domains/project-config/shared/schemas'
+import type {
+  CtaConfig,
+  ShareConfig,
+} from '@/domains/project-config/shared/schemas'
 
 /**
  * Maximum character length for share title

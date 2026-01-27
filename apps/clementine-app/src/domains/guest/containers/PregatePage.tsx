@@ -58,8 +58,7 @@ export interface PregatePageProps {
  */
 export function PregatePage({ selectedExperienceId }: PregatePageProps) {
   const navigate = useNavigate()
-  const { project, guest, experiences, experiencesLoading } =
-    useGuestContext()
+  const { project, guest, experiences, experiencesLoading } = useGuestContext()
   const markExperienceComplete = useMarkExperienceComplete()
 
   // Get pregate config from project

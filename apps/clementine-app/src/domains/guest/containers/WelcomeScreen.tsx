@@ -23,7 +23,10 @@ import { useNavigate } from '@tanstack/react-router'
 import { useGuestContext } from '../contexts'
 import { usePregate } from '../hooks'
 import type { ExperienceCardData } from '@/domains/project-config/welcome'
-import { DEFAULT_WELCOME, WelcomeRenderer } from '@/domains/project-config/welcome'
+import {
+  DEFAULT_WELCOME,
+  WelcomeRenderer,
+} from '@/domains/project-config/welcome'
 import { ThemeProvider } from '@/shared/theming'
 import { DEFAULT_THEME } from '@/domains/project-config/theme/constants'
 

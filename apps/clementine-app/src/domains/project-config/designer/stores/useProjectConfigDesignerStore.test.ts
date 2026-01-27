@@ -9,7 +9,8 @@ describe('useProjectConfigDesignerStore', () => {
 
   describe('startSave', () => {
     it('should increment pendingSaves counter', () => {
-      const { startSave, pendingSaves } = useProjectConfigDesignerStore.getState()
+      const { startSave, pendingSaves } =
+        useProjectConfigDesignerStore.getState()
 
       expect(pendingSaves).toBe(0)
 
@@ -25,13 +26,16 @@ describe('useProjectConfigDesignerStore', () => {
 
       startSave()
 
-      expect(useProjectConfigDesignerStore.getState().lastCompletedAt).toBeNull()
+      expect(
+        useProjectConfigDesignerStore.getState().lastCompletedAt,
+      ).toBeNull()
     })
   })
 
   describe('completeSave', () => {
     it('should decrement pendingSaves counter', () => {
-      const { startSave, completeSave } = useProjectConfigDesignerStore.getState()
+      const { startSave, completeSave } =
+        useProjectConfigDesignerStore.getState()
 
       // Start 3 saves
       startSave()
@@ -49,14 +53,16 @@ describe('useProjectConfigDesignerStore', () => {
     })
 
     it('should set lastCompletedAt when counter reaches 0', () => {
-      const { startSave, completeSave } = useProjectConfigDesignerStore.getState()
+      const { startSave, completeSave } =
+        useProjectConfigDesignerStore.getState()
 
       // Start and complete 1 save
       startSave()
       const beforeComplete = Date.now()
       completeSave()
 
-      const { pendingSaves, lastCompletedAt } = useProjectConfigDesignerStore.getState()
+      const { pendingSaves, lastCompletedAt } =
+        useProjectConfigDesignerStore.getState()
 
       expect(pendingSaves).toBe(0)
       expect(lastCompletedAt).not.toBeNull()
@@ -65,14 +71,16 @@ describe('useProjectConfigDesignerStore', () => {
     })
 
     it('should NOT set lastCompletedAt when counter > 0', () => {
-      const { startSave, completeSave } = useProjectConfigDesignerStore.getState()
+      const { startSave, completeSave } =
+        useProjectConfigDesignerStore.getState()
 
       // Start 2 saves, complete 1
       startSave()
       startSave()
       completeSave()
 
-      const { pendingSaves, lastCompletedAt } = useProjectConfigDesignerStore.getState()
+      const { pendingSaves, lastCompletedAt } =
+        useProjectConfigDesignerStore.getState()
 
       expect(pendingSaves).toBe(1)
       expect(lastCompletedAt).toBeNull()
@@ -90,7 +98,8 @@ describe('useProjectConfigDesignerStore', () => {
 
   describe('resetSaveState', () => {
     it('should reset all state to initial values', () => {
-      const { startSave, resetSaveState } = useProjectConfigDesignerStore.getState()
+      const { startSave, resetSaveState } =
+        useProjectConfigDesignerStore.getState()
 
       // Modify state
       startSave()
@@ -112,18 +121,23 @@ describe('useProjectConfigDesignerStore', () => {
       // Start and complete a save to set lastCompletedAt
       startSave()
       completeSave()
-      expect(useProjectConfigDesignerStore.getState().lastCompletedAt).not.toBeNull()
+      expect(
+        useProjectConfigDesignerStore.getState().lastCompletedAt,
+      ).not.toBeNull()
 
       // Reset
       resetSaveState()
 
-      expect(useProjectConfigDesignerStore.getState().lastCompletedAt).toBeNull()
+      expect(
+        useProjectConfigDesignerStore.getState().lastCompletedAt,
+      ).toBeNull()
     })
   })
 
   describe('reference counting behavior', () => {
     it('should handle multiple concurrent saves correctly', () => {
-      const { startSave, completeSave } = useProjectConfigDesignerStore.getState()
+      const { startSave, completeSave } =
+        useProjectConfigDesignerStore.getState()
 
       // Simulate 3 saves starting
       startSave() // Save 1
@@ -134,17 +148,23 @@ describe('useProjectConfigDesignerStore', () => {
       // Save 1 completes
       completeSave()
       expect(useProjectConfigDesignerStore.getState().pendingSaves).toBe(2)
-      expect(useProjectConfigDesignerStore.getState().lastCompletedAt).toBeNull()
+      expect(
+        useProjectConfigDesignerStore.getState().lastCompletedAt,
+      ).toBeNull()
 
       // Save 2 completes
       completeSave()
       expect(useProjectConfigDesignerStore.getState().pendingSaves).toBe(1)
-      expect(useProjectConfigDesignerStore.getState().lastCompletedAt).toBeNull()
+      expect(
+        useProjectConfigDesignerStore.getState().lastCompletedAt,
+      ).toBeNull()
 
       // Save 3 completes - lastCompletedAt should now be set
       completeSave()
       expect(useProjectConfigDesignerStore.getState().pendingSaves).toBe(0)
-      expect(useProjectConfigDesignerStore.getState().lastCompletedAt).not.toBeNull()
+      expect(
+        useProjectConfigDesignerStore.getState().lastCompletedAt,
+      ).not.toBeNull()
     })
   })
 })

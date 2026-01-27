@@ -60,8 +60,7 @@ export interface PresharePageProps {
  */
 export function PresharePage({ mainSessionId }: PresharePageProps) {
   const navigate = useNavigate()
-  const { project, guest, experiences, experiencesLoading } =
-    useGuestContext()
+  const { project, guest, experiences, experiencesLoading } = useGuestContext()
   const markExperienceComplete = useMarkExperienceComplete()
 
   // Get preshare config from project

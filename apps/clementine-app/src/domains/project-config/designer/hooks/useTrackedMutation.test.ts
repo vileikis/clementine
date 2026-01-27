@@ -141,7 +141,9 @@ describe('useTrackedMutation', () => {
 
     await waitFor(() => {
       expect(useProjectConfigDesignerStore.getState().pendingSaves).toBe(0)
-      expect(useProjectConfigDesignerStore.getState().lastCompletedAt).not.toBeNull()
+      expect(
+        useProjectConfigDesignerStore.getState().lastCompletedAt,
+      ).not.toBeNull()
     })
   })
 
