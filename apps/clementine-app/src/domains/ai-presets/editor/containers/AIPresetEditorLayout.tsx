@@ -141,6 +141,25 @@ export function AIPresetEditorLayout({
     [preset.mediaRegistry, updatePreset],
   )
 
+  // Handle renaming media in registry
+  const handleRenameMedia = useCallback(
+    async (oldName: string, newName: string) => {
+      try {
+        const updatedRegistry = preset.mediaRegistry.map((m) =>
+          m.name === oldName ? { ...m, name: newName } : m,
+        )
+        await updatePreset.mutateAsync({ mediaRegistry: updatedRegistry })
+        toast.success(`Renamed @${oldName} to @${newName}`)
+      } catch (error) {
+        toast.error('Failed to rename media', {
+          description:
+            error instanceof Error ? error.message : 'An error occurred',
+        })
+      }
+    },
+    [preset.mediaRegistry, updatePreset],
+  )
+
   // Handle removing media from registry
   const handleDeleteMedia = useCallback(
     async (name: string) => {
@@ -226,6 +245,7 @@ export function AIPresetEditorLayout({
             <MediaRegistrySection
               mediaRegistry={preset.mediaRegistry}
               onAdd={handleAddMedia}
+              onRename={handleRenameMedia}
               onDelete={handleDeleteMedia}
               disabled={updatePreset.isPending}
               workspaceId={workspaceId}

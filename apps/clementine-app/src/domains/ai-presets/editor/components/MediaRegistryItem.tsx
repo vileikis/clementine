@@ -2,9 +2,9 @@
  * MediaRegistryItem Component
  *
  * Displays a single media entry from the preset's media registry.
- * Shows thumbnail with name and delete button on hover.
+ * Shows thumbnail with name, edit and delete buttons on hover.
  */
-import { Trash2 } from 'lucide-react'
+import { Pencil, Trash2 } from 'lucide-react'
 
 import type { PresetMediaEntry } from '@clementine/shared'
 import { Button } from '@/ui-kit/ui/button'
@@ -14,6 +14,8 @@ import { cn } from '@/shared/utils'
 interface MediaRegistryItemProps {
   /** Media entry to display */
   media: PresetMediaEntry
+  /** Callback when edit is clicked */
+  onEdit: () => void
   /** Callback when delete is clicked */
   onDelete: () => void
   /** Whether the item is disabled (e.g., during delete operation) */
@@ -21,12 +23,13 @@ interface MediaRegistryItemProps {
 }
 
 /**
- * Media registry item with thumbnail, name, and delete action
+ * Media registry item with thumbnail, name, edit and delete actions
  *
  * @example
  * ```tsx
  * <MediaRegistryItem
  *   media={{ mediaAssetId: '123', url: 'https://...', filePath: '...', name: 'style_ref' }}
+ *   onEdit={() => handleEdit(media)}
  *   onDelete={() => handleDelete('style_ref')}
  *   disabled={isDeleting}
  * />
@@ -34,6 +37,7 @@ interface MediaRegistryItemProps {
  */
 export function MediaRegistryItem({
   media,
+  onEdit,
   onDelete,
   disabled = false,
 }: MediaRegistryItemProps) {
@@ -54,8 +58,19 @@ export function MediaRegistryItem({
               className="h-full w-full object-cover"
             />
 
-            {/* Delete button overlay on hover */}
-            <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
+            {/* Action buttons overlay on hover */}
+            <div className="absolute inset-0 flex items-center justify-center gap-1 bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
+              <Button
+                type="button"
+                variant="secondary"
+                size="icon"
+                onClick={onEdit}
+                disabled={disabled}
+                className="h-8 w-8"
+              >
+                <Pencil className="h-4 w-4" />
+                <span className="sr-only">Edit {media.name}</span>
+              </Button>
               <Button
                 type="button"
                 variant="destructive"

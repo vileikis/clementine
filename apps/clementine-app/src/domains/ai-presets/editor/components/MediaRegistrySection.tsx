@@ -2,13 +2,14 @@
  * MediaRegistrySection Component
  *
  * Section for managing the preset's media registry.
- * Shows a grid of registered media with add/remove functionality.
+ * Shows a grid of registered media with add/edit/remove functionality.
  */
 import { useCallback, useState } from 'react'
 import { Plus } from 'lucide-react'
 
-import { MediaRegistryItem } from './MediaRegistryItem'
 import { AddMediaDialog } from './AddMediaDialog'
+import { EditMediaDialog } from './EditMediaDialog'
+import { MediaRegistryItem } from './MediaRegistryItem'
 import type { AddMediaResult } from './AddMediaDialog'
 import type { PresetMediaEntry } from '@clementine/shared'
 import { cn } from '@/shared/utils'
@@ -18,6 +19,8 @@ interface MediaRegistrySectionProps {
   mediaRegistry: PresetMediaEntry[]
   /** Callback when media is added */
   onAdd: (media: AddMediaResult) => void
+  /** Callback when media name is changed */
+  onRename: (oldName: string, newName: string) => void
   /** Callback when media is deleted */
   onDelete: (name: string) => void
   /** Whether the section is disabled */
@@ -29,13 +32,14 @@ interface MediaRegistrySectionProps {
 }
 
 /**
- * Media registry section with grid display and add functionality
+ * Media registry section with grid display and add/edit/delete functionality
  *
  * @example
  * ```tsx
  * <MediaRegistrySection
  *   mediaRegistry={preset.mediaRegistry}
  *   onAdd={(media) => addToRegistry(media)}
+ *   onRename={(oldName, newName) => renameInRegistry(oldName, newName)}
  *   onDelete={(name) => removeFromRegistry(name)}
  *   disabled={isUpdating}
  *   workspaceId="ws-123"
@@ -46,12 +50,16 @@ interface MediaRegistrySectionProps {
 export function MediaRegistrySection({
   mediaRegistry,
   onAdd,
+  onRename,
   onDelete,
   disabled = false,
   workspaceId,
   userId,
 }: MediaRegistrySectionProps) {
-  const [dialogOpen, setDialogOpen] = useState(false)
+  const [addDialogOpen, setAddDialogOpen] = useState(false)
+  const [editingMedia, setEditingMedia] = useState<PresetMediaEntry | null>(
+    null,
+  )
 
   // Get existing names for uniqueness validation
   const existingNames = mediaRegistry.map((m) => m.name)
@@ -64,6 +72,14 @@ export function MediaRegistrySection({
     [onAdd],
   )
 
+  // Handle rename from edit dialog
+  const handleRename = useCallback(
+    (oldName: string, newName: string) => {
+      onRename(oldName, newName)
+    },
+    [onRename],
+  )
+
   return (
     <div>
       {/* Media grid with add button as first item */}
@@ -71,7 +87,7 @@ export function MediaRegistrySection({
         {/* Add Media button as first grid item */}
         <button
           type="button"
-          onClick={() => setDialogOpen(true)}
+          onClick={() => setAddDialogOpen(true)}
           disabled={disabled}
           className={cn(
             'flex aspect-square items-center justify-center rounded-lg border-2 border-dashed transition-colors',
@@ -89,6 +105,7 @@ export function MediaRegistrySection({
           <MediaRegistryItem
             key={media.name}
             media={media}
+            onEdit={() => setEditingMedia(media)}
             onDelete={() => onDelete(media.name)}
             disabled={disabled}
           />
@@ -97,12 +114,20 @@ export function MediaRegistrySection({
 
       {/* Add Media dialog */}
       <AddMediaDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
+        open={addDialogOpen}
+        onOpenChange={setAddDialogOpen}
         onAdd={handleAdd}
         existingNames={existingNames}
         workspaceId={workspaceId}
         userId={userId}
+      />
+
+      {/* Edit Media dialog */}
+      <EditMediaDialog
+        media={editingMedia}
+        onClose={() => setEditingMedia(null)}
+        onSave={handleRename}
+        existingNames={existingNames}
       />
     </div>
   )

@@ -140,24 +140,28 @@ export function AddMediaDialog({
     }
   }, [])
 
-  // Handle add button click
-  const handleAdd = useCallback(() => {
-    if (!uploadResult || !name || nameError) return
+  // Handle add button click or form submit
+  const handleAdd = useCallback(
+    (e?: React.FormEvent) => {
+      e?.preventDefault()
+      if (!uploadResult || !name || nameError) return
 
-    onAdd({
-      mediaAssetId: uploadResult.mediaAssetId,
-      url: uploadResult.url,
-      filePath: uploadResult.filePath,
-      name,
-    })
+      onAdd({
+        mediaAssetId: uploadResult.mediaAssetId,
+        url: uploadResult.url,
+        filePath: uploadResult.filePath,
+        name,
+      })
 
-    // Reset state and close
-    setName('')
-    setImageUrl(null)
-    setUploadResult(null)
-    setNameError(null)
-    onOpenChange(false)
-  }, [uploadResult, name, nameError, onAdd, onOpenChange])
+      // Reset state and close
+      setName('')
+      setImageUrl(null)
+      setUploadResult(null)
+      setNameError(null)
+      onOpenChange(false)
+    },
+    [uploadResult, name, nameError, onAdd, onOpenChange],
+  )
 
   // Handle cancel/close
   const handleClose = useCallback(() => {
@@ -174,60 +178,62 @@ export function AddMediaDialog({
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Add Media</DialogTitle>
-          <DialogDescription>
-            Upload an image and give it a reference name to use in your prompt
-            template.
-          </DialogDescription>
-        </DialogHeader>
+        <form onSubmit={handleAdd}>
+          <DialogHeader>
+            <DialogTitle>Add Media</DialogTitle>
+            <DialogDescription>
+              Upload an image and give it a reference name to use in your prompt
+              template.
+            </DialogDescription>
+          </DialogHeader>
 
-        <div className="space-y-4 py-4">
-          {/* Image upload */}
-          <MediaPickerField
-            label="Image"
-            value={imageUrl}
-            onChange={handleImageChange}
-            onUpload={handleUpload}
-            uploading={isUploading}
-            uploadProgress={uploadProgress}
-            removable
-            objectFit="contain"
-          />
+          <div className="space-y-4 py-4">
+            {/* Image upload */}
+            <MediaPickerField
+              label="Image"
+              value={imageUrl}
+              onChange={handleImageChange}
+              onUpload={handleUpload}
+              uploading={isUploading}
+              uploadProgress={uploadProgress}
+              removable
+              objectFit="contain"
+            />
 
-          {/* Reference name input */}
-          <div className="space-y-2">
-            <Label htmlFor="media-name">Reference Name</Label>
-            <div className="flex items-center gap-2">
-              <span className="text-muted-foreground">@</span>
-              <Input
-                id="media-name"
-                value={name}
-                onChange={handleNameChange}
-                placeholder="style_ref"
-                disabled={isUploading}
-                className={nameError ? 'border-destructive' : ''}
-              />
+            {/* Reference name input */}
+            <div className="space-y-2">
+              <Label htmlFor="media-name">Reference Name</Label>
+              <div className="flex items-center gap-2">
+                <span className="text-muted-foreground">@</span>
+                <Input
+                  id="media-name"
+                  value={name}
+                  onChange={handleNameChange}
+                  placeholder="style_ref"
+                  disabled={isUploading}
+                  className={nameError ? 'border-destructive' : ''}
+                />
+              </div>
+              {nameError && (
+                <p className="text-sm text-destructive">{nameError}</p>
+              )}
+              <p className="text-xs text-muted-foreground">
+                Use this name to reference the image in your prompt: @
+                {name || 'name'}
+              </p>
             </div>
-            {nameError && (
-              <p className="text-sm text-destructive">{nameError}</p>
-            )}
-            <p className="text-xs text-muted-foreground">
-              Use this name to reference the image in your prompt: @
-              {name || 'name'}
-            </p>
           </div>
-        </div>
 
-        <DialogFooter>
-          <Button type="button" variant="outline" onClick={handleClose}>
-            Cancel
-          </Button>
-          <Button type="button" onClick={handleAdd} disabled={!canAdd}>
-            {isUploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Add
-          </Button>
-        </DialogFooter>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={handleClose}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={!canAdd}>
+              {isUploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Add
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   )
