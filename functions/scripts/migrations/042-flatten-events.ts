@@ -78,6 +78,7 @@ if (isProduction) {
 }
 
 const db = getFirestore()
+db.settings({ ignoreUndefinedProperties: true })
 
 /**
  * Statistics for migration progress tracking
