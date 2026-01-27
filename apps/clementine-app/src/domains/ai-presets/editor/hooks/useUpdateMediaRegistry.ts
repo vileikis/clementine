@@ -24,7 +24,7 @@
  * ])
  * ```
  */
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import * as Sentry from '@sentry/tanstackstart-react'
 import { z } from 'zod'
 import { presetMediaEntrySchema } from '@clementine/shared'
@@ -43,7 +43,6 @@ export type UpdateMediaRegistryInput = z.infer<typeof updateMediaRegistrySchema>
  * Hook for updating AI preset media registry with domain-specific tracking
  */
 export function useUpdateMediaRegistry(workspaceId: string, presetId: string) {
-  const queryClient = useQueryClient()
   const store = useAIPresetEditorStore()
 
   const mutation = useMutation({
@@ -54,16 +53,6 @@ export function useUpdateMediaRegistry(workspaceId: string, presetId: string) {
       // Use shared helper for atomic Firestore update
       await updateAIPresetDraft(workspaceId, presetId, {
         mediaRegistry: validated,
-      })
-    },
-
-    // Success: invalidate queries to trigger re-fetch
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['aiPreset', workspaceId, presetId],
-      })
-      queryClient.invalidateQueries({
-        queryKey: ['aiPresets', workspaceId],
       })
     },
 

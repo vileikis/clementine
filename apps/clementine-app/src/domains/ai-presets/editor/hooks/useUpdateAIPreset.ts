@@ -8,7 +8,7 @@
  * - useUpdateVariables (variables) - Phase 6
  * - useUpdatePromptTemplate (promptTemplate) - Phase 8
  */
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { doc, runTransaction, serverTimestamp } from 'firebase/firestore'
 import * as Sentry from '@sentry/tanstackstart-react'
 import { z } from 'zod'
@@ -52,7 +52,6 @@ export type UpdateAIPresetInput = z.infer<typeof updateAIPresetSchema>
  * ```
  */
 export function useUpdateAIPreset(workspaceId: string, presetId: string) {
-  const queryClient = useQueryClient()
   const store = useAIPresetEditorStore()
 
   const mutation = useMutation({
@@ -79,15 +78,6 @@ export function useUpdateAIPreset(workspaceId: string, presetId: string) {
         })
 
         return { presetId }
-      })
-    },
-    onSuccess: () => {
-      // Invalidate both single preset and list queries
-      queryClient.invalidateQueries({
-        queryKey: ['aiPreset', workspaceId, presetId],
-      })
-      queryClient.invalidateQueries({
-        queryKey: ['aiPresets', workspaceId],
       })
     },
     onError: (error) => {

@@ -4,7 +4,7 @@
  * Mutation hook for publishing AI preset draft to live configuration.
  * Copies draft → published and updates version tracking fields.
  */
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { doc, runTransaction, serverTimestamp } from 'firebase/firestore'
 import * as Sentry from '@sentry/tanstackstart-react'
 import type { AIPreset } from '@clementine/shared'
@@ -47,8 +47,6 @@ interface PublishAIPresetResult {
  * ```
  */
 export function usePublishAIPreset() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: async ({
       workspaceId,
@@ -89,15 +87,6 @@ export function usePublishAIPreset() {
           presetId: preset.id,
           publishedVersion: currentDraftVersion,
         }
-      })
-    },
-    onSuccess: (result, { workspaceId }) => {
-      // Invalidate queries to refresh UI
-      queryClient.invalidateQueries({
-        queryKey: ['aiPreset', workspaceId, result.presetId],
-      })
-      queryClient.invalidateQueries({
-        queryKey: ['aiPresets', workspaceId],
       })
     },
     onError: (error, { workspaceId, preset }) => {

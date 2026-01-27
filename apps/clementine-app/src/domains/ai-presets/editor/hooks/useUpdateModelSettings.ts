@@ -31,7 +31,7 @@
  * })
  * ```
  */
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import * as Sentry from '@sentry/tanstackstart-react'
 import { z } from 'zod'
 import { aiModelSchema, aspectRatioSchema } from '@clementine/shared'
@@ -53,7 +53,6 @@ export type UpdateModelSettingsInput = z.infer<typeof updateModelSettingsSchema>
  * Hook for updating AI preset model settings with domain-specific tracking
  */
 export function useUpdateModelSettings(workspaceId: string, presetId: string) {
-  const queryClient = useQueryClient()
   const store = useAIPresetEditorStore()
 
   const mutation = useMutation({
@@ -63,16 +62,6 @@ export function useUpdateModelSettings(workspaceId: string, presetId: string) {
 
       // Use shared helper for atomic Firestore update
       await updateAIPresetDraft(workspaceId, presetId, validated)
-    },
-
-    // Success: invalidate queries to trigger re-fetch
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['aiPreset', workspaceId, presetId],
-      })
-      queryClient.invalidateQueries({
-        queryKey: ['aiPresets', workspaceId],
-      })
     },
 
     // Error: report to Sentry for debugging

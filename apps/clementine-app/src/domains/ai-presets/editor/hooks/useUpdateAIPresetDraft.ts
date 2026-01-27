@@ -28,7 +28,7 @@
  * })
  * ```
  */
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import * as Sentry from '@sentry/tanstackstart-react'
 import { updateAIPresetDraft } from '../lib/updateAIPresetDraft'
 
@@ -36,21 +36,9 @@ import { updateAIPresetDraft } from '../lib/updateAIPresetDraft'
  * Hook for updating AI preset draft configuration
  */
 export function useUpdateAIPresetDraft(workspaceId: string, presetId: string) {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: async (updates: Record<string, unknown>) => {
       await updateAIPresetDraft(workspaceId, presetId, updates)
-    },
-
-    // Success: invalidate queries to trigger re-fetch
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['aiPreset', workspaceId, presetId],
-      })
-      queryClient.invalidateQueries({
-        queryKey: ['aiPresets', workspaceId],
-      })
     },
 
     // Error: report to Sentry
