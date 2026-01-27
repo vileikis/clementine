@@ -10,7 +10,25 @@ This document defines the data entities, relationships, and validation rules for
 
 ## Core Entities
 
-### AIPreset (Existing)
+### AIPresetConfig (New - Phase 5.5)
+
+Nested configuration object containing all editable preset fields. Used for both published (`config`) and draft (`draftConfig`) states.
+
+| Field | Type | Constraints | Description |
+|-------|------|-------------|-------------|
+| `model` | enum | See values below | AI model selection |
+| `aspectRatio` | enum | See values below | Output image aspect ratio |
+| `mediaRegistry` | PresetMediaEntry[] | Array | Registered media for @mentions |
+| `variables` | PresetVariable[] | Array | Variable definitions |
+| `promptTemplate` | string | Any length | Prompt with @references |
+
+**Model Values**: `'gemini-2.5-flash'` | `'gemini-2.5-pro'` | `'gemini-3.0'`
+
+**Aspect Ratio Values**: `'1:1'` | `'3:2'` | `'2:3'` | `'16:9'` | `'9:16'`
+
+---
+
+### AIPreset (Updated - Phase 5.5)
 
 **Firestore Path**: `/workspaces/{workspaceId}/aiPresets/{presetId}`
 
@@ -24,15 +42,18 @@ This document defines the data entities, relationships, and validation rules for
 | `updatedAt` | number | Unix timestamp (ms) | Last modification time |
 | `deletedAt` | number \| null | Unix timestamp (ms) | Deletion time (soft delete) |
 | `createdBy` | string | User UID | Creator's user ID |
-| `mediaRegistry` | PresetMediaEntry[] | Array | Registered media for @mentions |
-| `variables` | PresetVariable[] | Array | Variable definitions |
-| `promptTemplate` | string | Any length | Prompt with @references |
-| `model` | enum | See values below | AI model selection |
-| `aspectRatio` | enum | See values below | Output image aspect ratio |
+| `config` | AIPresetConfig | Required | Published configuration (used by runtime) |
+| `draftConfig` | AIPresetConfig | Required | Draft configuration (edited in editor) |
 
-**Model Values**: `'gemini-2.5-flash'` | `'gemini-2.5-pro'` | `'gemini-3.0'`
+**Draft/Published Model**:
+- Editor writes to `draftConfig` (auto-save)
+- Publish button copies `draftConfig` → `config`
+- Runtime (experiences) reads from `config` only
+- Similar pattern to Experience entity
 
-**Aspect Ratio Values**: `'1:1'` | `'3:2'` | `'2:3'` | `'16:9'` | `'9:16'`
+**Backwards Compatibility** (Phase 5.5):
+- Migration script moves existing top-level fields into `config` and `draftConfig`
+- New presets are created with both configs identical
 
 ---
 
@@ -92,13 +113,16 @@ Discriminated union based on `type` field.
 
 ### UpdateAIPresetInput
 
-For partial updates via the editor.
+For partial updates via the editor. Updates `draftConfig` only (not published `config`).
 
 ```typescript
 // All fields optional - only changed fields sent
 {
+  // Top-level fields (outside config)
   name?: string                    // 1-100 chars
   description?: string | null      // Max 500 chars
+
+  // Draft config fields (written to draftConfig.*)
   model?: ModelType
   aspectRatio?: AspectRatioType
   mediaRegistry?: PresetMediaEntry[]
@@ -110,6 +134,29 @@ For partial updates via the editor.
 **Validation Rules**:
 - At least one field must be provided
 - Each field validated against its constraints if present
+- Config fields are written to `draftConfig`, not `config`
+- Updates `updatedAt` timestamp
+
+---
+
+### PublishAIPresetInput
+
+For publishing draft changes to the live configuration.
+
+```typescript
+{
+  presetId: string                 // Required - preset to publish
+}
+```
+
+**Behavior**:
+- Copies `draftConfig` → `config`
+- Updates `updatedAt` timestamp
+- Returns updated preset
+
+**Validation Rules**:
+- User must have write permission on workspace
+- Preset must exist and be active
 
 ---
 
@@ -196,17 +243,22 @@ Workspace (1)
     │
     └── AIPreset (many)
             │
-            ├── PresetMediaEntry (many)
-            │       └── References MediaAsset from media library
+            ├── config: AIPresetConfig (published)
+            │       ├── model
+            │       ├── aspectRatio
+            │       ├── mediaRegistry: PresetMediaEntry[]
+            │       │       └── References MediaAsset from media library
+            │       ├── variables: PresetVariable[]
+            │       │       ├── TextVariable
+            │       │       │       └── ValueMappingEntry[]
+            │       │       └── ImageVariable
+            │       └── promptTemplate (string)
+            │               └── Contains @references to Variables and Media
             │
-            ├── PresetVariable (many)
-            │       ├── TextVariable
-            │       │       └── ValueMappingEntry (many)
-            │       └── ImageVariable
-            │
-            └── promptTemplate (string)
-                    └── Contains @references to Variables and Media
+            └── draftConfig: AIPresetConfig (draft - same structure as config)
 ```
+
+**Note**: `config` is read by runtime (experiences), `draftConfig` is edited by the editor.
 
 ---
 
@@ -245,14 +297,46 @@ active ←───────────────────────�
               (no restore)
 ```
 
+### Draft/Publish Workflow (Phase 5.5)
+
+```
+┌─────────────────────────────────────────────────────┐
+│                     AIPreset                         │
+├─────────────────────────────────────────────────────┤
+│  draftConfig                    config              │
+│  ┌──────────────┐              ┌──────────────┐    │
+│  │ model        │              │ model        │    │
+│  │ aspectRatio  │   publish()  │ aspectRatio  │    │
+│  │ mediaRegistry│ ──────────→  │ mediaRegistry│    │
+│  │ variables    │              │ variables    │    │
+│  │ promptTemplate│             │ promptTemplate│   │
+│  └──────────────┘              └──────────────┘    │
+│        ↑                                            │
+│     Editor                        Runtime           │
+│   (auto-save)                   (experiences)       │
+└─────────────────────────────────────────────────────┘
+```
+
+**Workflow**:
+1. Editor loads preset, displays `draftConfig` values
+2. User makes changes → auto-saved to `draftConfig`
+3. "Publish" button copies `draftConfig` → `config`
+4. Experiences use `config` (stable, published version)
+
 ### Editor State (Client-side)
 
 ```
 loading → loaded → editing → saving → saved
                       ↑         │
                       └─────────┘
-                      (auto-save loop)
+                      (auto-save to draftConfig)
+
+saved → hasUnpublishedChanges? → publish → published
 ```
+
+**Change Detection**:
+- Compare `draftConfig` vs `config` to detect unpublished changes
+- Show indicator when draft differs from published
 
 ---
 
@@ -278,4 +362,41 @@ loading → loaded → editing → saving → saved
 - Write: Workspace admins only
 - Path: `/workspaces/{workspaceId}/aiPresets/{presetId}`
 
-No changes needed for Phase 3 (editor uses same CRUD operations).
+**Phase 5.5 Notes**:
+- Same permissions apply to both `config` and `draftConfig` updates
+- Publish operation is a client-side write (copies draftConfig → config)
+- No separate publish permission needed (workspace admin can edit = can publish)
+
+---
+
+## Migration Notes (Phase 5.5)
+
+**Existing AIPreset documents** need migration to new schema structure:
+
+```typescript
+// Migration: Move top-level fields into nested config objects
+const migratedPreset = {
+  ...existingPreset,
+  config: {
+    model: existingPreset.model,
+    aspectRatio: existingPreset.aspectRatio,
+    mediaRegistry: existingPreset.mediaRegistry,
+    variables: existingPreset.variables,
+    promptTemplate: existingPreset.promptTemplate,
+  },
+  draftConfig: {
+    model: existingPreset.model,
+    aspectRatio: existingPreset.aspectRatio,
+    mediaRegistry: existingPreset.mediaRegistry,
+    variables: existingPreset.variables,
+    promptTemplate: existingPreset.promptTemplate,
+  },
+}
+// Remove old top-level fields after migration
+```
+
+**Migration Strategy**:
+1. Create migration script in `functions/scripts/migrations/`
+2. Run against all existing presets
+3. Update schema validators
+4. Deploy updated editor code

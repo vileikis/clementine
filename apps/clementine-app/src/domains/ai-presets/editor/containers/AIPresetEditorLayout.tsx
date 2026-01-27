@@ -100,7 +100,7 @@ export function AIPresetEditorLayout({
         })
       }
     },
-    [updatePreset],
+    [updatePreset.mutateAsync],
   )
 
   // Handle aspect ratio change
@@ -115,7 +115,7 @@ export function AIPresetEditorLayout({
         })
       }
     },
-    [updatePreset],
+    [updatePreset.mutateAsync],
   )
 
   // Handle adding media to registry
@@ -138,7 +138,7 @@ export function AIPresetEditorLayout({
         })
       }
     },
-    [preset.mediaRegistry, updatePreset],
+    [preset.mediaRegistry, updatePreset.mutateAsync],
   )
 
   // Handle renaming media in registry
@@ -157,7 +157,7 @@ export function AIPresetEditorLayout({
         })
       }
     },
-    [preset.mediaRegistry, updatePreset],
+    [preset.mediaRegistry, updatePreset.mutateAsync],
   )
 
   // Handle removing media from registry
@@ -176,7 +176,7 @@ export function AIPresetEditorLayout({
         })
       }
     },
-    [preset.mediaRegistry, updatePreset],
+    [preset.mediaRegistry, updatePreset.mutateAsync],
   )
 
   // Handle explicit save button click

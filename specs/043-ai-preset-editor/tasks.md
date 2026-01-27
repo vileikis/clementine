@@ -104,6 +104,71 @@
 
 ---
 
+## Phase 5.5: Draft/Published Model & Layout Refactor
+
+**Purpose**: Implement draft/published workflow (consistent with Experience pattern) and separate layout concerns for maintainability.
+
+**⚠️ CRITICAL**: This phase refactors the save model. After this phase:
+- All edits auto-save to `draft` field (no data loss)
+- "Publish" button copies draft → published
+- Experiences reference the `published` version
+- Save button is replaced with Publish button
+
+### Part A: Schema Changes
+
+- [ ] T050 Create `aiPresetConfigSchema` in `packages/shared/src/schemas/ai-preset/ai-preset-config.schema.ts` containing: `model`, `aspectRatio`, `mediaRegistry`, `variables`, `promptTemplate`
+- [ ] T051 Update `aiPresetSchema` in `packages/shared/src/schemas/ai-preset/ai-preset.schema.ts`:
+  - Add `draft: aiPresetConfigSchema` field
+  - Add `published: aiPresetConfigSchema.nullable().default(null)` field
+  - Add `draftVersion: z.number().default(1)` field
+  - Add `publishedVersion: z.number().nullable().default(null)` field
+  - Add `publishedAt: z.number().nullable().default(null)` field
+  - Add `publishedBy: z.string().nullable().default(null)` field
+  - Remove top-level `model`, `aspectRatio`, `mediaRegistry`, `variables`, `promptTemplate` (moved to config)
+- [ ] T052 Update barrel exports in `packages/shared/src/schemas/ai-preset/index.ts`
+- [ ] T053 Run `pnpm --filter @clementine/shared build` to verify schema compiles
+
+### Part B: Hook Updates
+
+- [ ] T054 Update `useUpdateAIPreset` hook to write to `draft` field and increment `draftVersion`
+- [ ] T055 Create `usePublishAIPreset` hook in `apps/clementine-app/src/domains/ai-presets/editor/hooks/usePublishAIPreset.ts`:
+  - Copies `draft` → `published`
+  - Sets `publishedVersion` = `draftVersion`
+  - Sets `publishedAt` = serverTimestamp
+  - Sets `publishedBy` = current user UID
+- [ ] T056 Update `useAIPreset` hook to return both draft and published data
+- [ ] T057 Update barrel exports for new hooks
+
+### Part C: Layout Refactor (Follow Experience Pattern)
+
+- [ ] T058 Create `AIPresetEditorContent` container in `apps/clementine-app/src/domains/ai-presets/editor/containers/AIPresetEditorContent.tsx`:
+  - Move two-column layout from AIPresetEditorLayout
+  - Move all section handlers (model, aspect ratio, media, variables, prompt)
+  - Receives `draft` config as prop, calls update handlers
+- [ ] T059 Refactor `AIPresetEditorLayout` container:
+  - Keep TopNavBar with breadcrumbs
+  - Add `EditorChangesBadge` (draftVersion vs publishedVersion)
+  - Replace Save button with Publish button
+  - Add publish handler with validation
+  - Render `AIPresetEditorContent` as child
+- [ ] T060 Update `AIPresetEditorPage` to pass draft/published data to layout
+- [ ] T061 Update barrel exports for refactored containers
+
+### Part D: UI Updates
+
+- [ ] T062 Update all editor sections to read from `preset.draft.*` instead of `preset.*`
+- [ ] T063 Add unpublished changes detection (draftVersion > publishedVersion)
+- [ ] T064 Add publish confirmation toast on success
+- [ ] T065 Add validation error display on publish failure (if draft is invalid)
+
+**Checkpoint**: After this phase:
+- Editor auto-saves to draft (no data loss on browser close)
+- Publish button makes changes live
+- Clear separation of WIP vs published state
+- Layout follows Experience pattern
+
+---
+
 ## Phase 6: User Story 4 - Define Variables (Priority: P4)
 
 **Goal**: Users can create, edit, and delete variables (text and image types) with collapsible cards.
@@ -157,17 +222,19 @@
 
 ---
 
-## Phase 9: User Story 7 - Save and Navigate Away (Priority: P7)
+## Phase 9: User Story 7 - Publish and Navigate Away (Priority: P7)
 
-**Goal**: Users can explicitly save their work via Save button and navigate back to the presets list.
+**Goal**: Users can publish their draft changes via Publish button and navigate back to the presets list.
 
-**Independent Test**: Make changes, click Save, verify changes persist, click the breadcrumb icon and confirm navigation to the list.
+**Independent Test**: Make changes, verify EditorChangesBadge shows unpublished changes, click Publish, verify badge updates, click breadcrumb icon and confirm navigation to the list.
+
+**Note**: This phase depends on Phase 5.5 (Draft/Published Model). The Save button has been replaced with Publish button.
 
 ### Implementation for User Story 7
 
-- [ ] T040 [US7] Add explicit Save button functionality to AIPresetEditorLayout (triggers pending saves)
+- [ ] T040 [US7] Verify Publish button is disabled when no unpublished changes (draftVersion === publishedVersion)
 - [ ] T041 [US7] Ensure breadcrumb icon correctly links back to AI Presets list page
-- [ ] T042 [US7] Verify save status indicator shows correct states (saving spinner, saved checkmark)
+- [ ] T042 [US7] Verify EditorChangesBadge shows correct states (unpublished changes indicator)
 
 **Checkpoint**: All user stories should now be independently functional.
 
@@ -193,9 +260,13 @@
 
 - **Setup (Phase 1)**: No dependencies - can start immediately
 - **Foundational (Phase 2)**: Depends on Setup completion - BLOCKS all user stories
-- **User Stories (Phase 3-9)**: All depend on Foundational phase completion
-  - User stories should be completed in priority order (P1 → P7)
-  - Some parallel work possible within each story
+- **User Stories (Phase 3-5)**: Depend on Foundational phase completion
+- **Draft/Published Refactor (Phase 5.5)**: Depends on Phase 5 completion - BLOCKS remaining phases
+  - Schema changes in shared package
+  - Hook updates for draft/publish workflow
+  - Layout refactor following Experience pattern
+- **User Stories (Phase 6-9)**: Depend on Phase 5.5 completion
+  - Must work with new draft/published model
 - **Polish (Phase 10)**: Depends on all user stories being complete
 
 ### User Story Dependencies
@@ -203,10 +274,11 @@
 - **User Story 1 (P1)**: Can start after Foundational (Phase 2) - No dependencies on other stories
 - **User Story 2 (P2)**: Can start after Foundational (Phase 2) - Integrates into layout from US1
 - **User Story 3 (P3)**: Can start after Foundational (Phase 2) - Integrates into layout from US1
-- **User Story 4 (P4)**: Can start after Foundational (Phase 2) - Integrates into layout from US1
+- **Phase 5.5 (Refactor)**: Must complete after US3, before US4 - Schema and layout changes
+- **User Story 4 (P4)**: Can start after Phase 5.5 - Works with draft model
 - **User Story 5 (P5)**: Depends on US4 completion (variables must exist for value mappings)
 - **User Story 6 (P6)**: Depends on US3 and US4 (needs media and variables for @mention autocomplete)
-- **User Story 7 (P7)**: Depends on US1 (layout must exist for Save button integration)
+- **User Story 7 (P7)**: Depends on Phase 5.5 (Publish button replaces Save button)
 
 ### Within Each User Story
 
@@ -256,11 +328,12 @@ Task: "Integrate MediaRegistrySection into layout..."
 2. Add User Story 1 → Test independently → Deploy/Demo (MVP!)
 3. Add User Story 2 → Test independently → Model settings work
 4. Add User Story 3 → Test independently → Media registry works
-5. Add User Story 4 → Test independently → Variables work
-6. Add User Story 5 → Test independently → Value mappings work
-7. Add User Story 6 → Test independently → Prompt editor works
-8. Add User Story 7 → Test independently → Full save workflow works
-9. Polish phase for production readiness
+5. **Complete Phase 5.5 → Draft/Published refactor → Schema + Layout changes**
+6. Add User Story 4 → Test independently → Variables work (with draft model)
+7. Add User Story 5 → Test independently → Value mappings work
+8. Add User Story 6 → Test independently → Prompt editor works
+9. Add User Story 7 → Test independently → Publish workflow works
+10. Polish phase for production readiness
 
 ### Suggested MVP Scope
 
@@ -280,3 +353,9 @@ Task: "Integrate MediaRegistrySection into layout..."
 - Stop at any checkpoint to validate story independently
 - MediaPickerField is used for simplified upload (full library picker is deferred to separate feature)
 - Editor follows ExperienceDesignerLayout pattern from existing codebase
+- **Draft/Published Model** (Phase 5.5):
+  - All edits auto-save to `draft` field (no data loss)
+  - `Publish` button copies draft → published
+  - Experiences reference the `published` field
+  - Schema uses nested `AIPresetConfig` (consistent with `ExperienceConfig`)
+  - Layout split: `AIPresetEditorLayout` (TopNavBar + publish) → `AIPresetEditorContent` (editor sections)
