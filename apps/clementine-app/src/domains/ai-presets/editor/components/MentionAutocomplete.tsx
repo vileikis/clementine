@@ -1,17 +1,18 @@
 /**
  * MentionAutocomplete Component
  *
- * Dropdown autocomplete for @mentions in prompt template editor.
- * Displays filtered suggestions for variables and media with keyboard navigation.
+ * Portal-based autocomplete for @mentions in prompt template editor.
+ * Uses React Portal to avoid overflow issues while maintaining manual positioning.
  *
  * Features:
  * - Triggered by @ character
  * - Filters suggestions as user types
  * - Keyboard navigation (up/down arrows, Enter to select, Escape to close)
  * - Color-coded by type (blue for variables, green for media)
- * - Positioned at cursor location
+ * - Portal rendering to avoid container overflow
  */
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { Image, Type } from 'lucide-react'
 import type { PresetMediaEntry, PresetVariable } from '@clementine/shared'
 
@@ -28,7 +29,7 @@ interface MentionAutocompleteProps {
   media: PresetMediaEntry[]
   /** Search query (text after @) */
   query: string
-  /** Cursor position for dropdown placement */
+  /** Viewport position for dropdown (fixed positioning) */
   position: { top: number; left: number }
   /** Called when user selects a suggestion */
   onSelect: (suggestion: MentionSuggestion) => void
@@ -39,6 +40,7 @@ interface MentionAutocompleteProps {
 /**
  * Mention autocomplete dropdown with filtered suggestions
  *
+ * Uses React Portal for rendering to avoid container overflow.
  * Displays variables and media filtered by query with keyboard navigation.
  * Variables are shown with blue icon, media with green icon.
  *
@@ -138,58 +140,55 @@ export function MentionAutocomplete({
     }
   }, [selectedIndex])
 
-  // Don't render if no suggestions
-  if (filteredSuggestions.length === 0) {
-    return (
-      <div
-        className="absolute z-50 w-64 rounded-md border bg-popover p-3 text-sm text-muted-foreground shadow-md"
-        style={{
-          top: `${position.top}px`,
-          left: `${position.left}px`,
-        }}
-      >
-        No variables or media found
-      </div>
-    )
-  }
-
-  return (
+  // Portal to body to avoid overflow issues
+  const dropdown = (
     <div
-      ref={listRef}
-      className="absolute z-50 max-h-60 w-64 overflow-y-auto rounded-md border bg-popover shadow-md"
+      className="fixed z-50 w-64 rounded-md border bg-popover shadow-md"
       style={{
         top: `${position.top}px`,
         left: `${position.left}px`,
       }}
     >
-      {filteredSuggestions.map((suggestion, index) => {
-        const isSelected = index === selectedIndex
-        const Icon = suggestion.type === 'variable' ? Type : Image
-        const colorClass =
-          suggestion.type === 'variable' ? 'text-blue-500' : 'text-green-500'
+      {filteredSuggestions.length === 0 ? (
+        <div className="p-3 text-sm text-muted-foreground">
+          No variables or media found
+        </div>
+      ) : (
+        <div ref={listRef} className="max-h-60 overflow-y-auto">
+          {filteredSuggestions.map((suggestion, index) => {
+            const isSelected = index === selectedIndex
+            const Icon = suggestion.type === 'variable' ? Type : Image
+            const colorClass =
+              suggestion.type === 'variable'
+                ? 'text-blue-500'
+                : 'text-green-500'
 
-        return (
-          <button
-            key={`${suggestion.type}-${suggestion.name}`}
-            type="button"
-            className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm transition-colors hover:bg-accent ${
-              isSelected ? 'bg-accent' : ''
-            }`}
-            onClick={() => onSelect(suggestion)}
-            onMouseEnter={() => setSelectedIndex(index)}
-          >
-            <Icon className={`h-4 w-4 flex-shrink-0 ${colorClass}`} />
-            <div className="flex-1 truncate">
-              <div className="font-medium">{suggestion.name}</div>
-              {suggestion.label !== suggestion.name && (
-                <div className="text-xs text-muted-foreground">
-                  {suggestion.label}
+            return (
+              <button
+                key={`${suggestion.type}-${suggestion.name}`}
+                type="button"
+                className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm transition-colors hover:bg-accent ${
+                  isSelected ? 'bg-accent' : ''
+                }`}
+                onClick={() => onSelect(suggestion)}
+                onMouseEnter={() => setSelectedIndex(index)}
+              >
+                <Icon className={`h-4 w-4 shrink-0 ${colorClass}`} />
+                <div className="flex-1 truncate">
+                  <div className="font-medium">{suggestion.name}</div>
+                  {suggestion.label !== suggestion.name && (
+                    <div className="text-xs text-muted-foreground">
+                      {suggestion.label}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          </button>
-        )
-      })}
+              </button>
+            )
+          })}
+        </div>
+      )}
     </div>
   )
+
+  return createPortal(dropdown, document.body)
 }

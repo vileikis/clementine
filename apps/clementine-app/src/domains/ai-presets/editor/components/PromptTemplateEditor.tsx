@@ -177,12 +177,11 @@ export function PromptTemplateEditor({
       const query = atMatch[1]
       setAutocompleteQuery(query)
 
-      // Calculate position for autocomplete dropdown
+      // Calculate viewport position for autocomplete dropdown (fixed positioning)
       const rect = range.getBoundingClientRect()
-      const editorRect = editorRef.current.getBoundingClientRect()
       setAutocompletePosition({
-        top: rect.bottom - editorRect.top + 4,
-        left: rect.left - editorRect.left,
+        top: rect.bottom + 4, // Position below cursor with 4px gap
+        left: rect.left,      // Align with cursor horizontally
       })
       setShowAutocomplete(true)
     } else {
@@ -278,12 +277,37 @@ export function PromptTemplateEditor({
 
   /**
    * Handle paste - strip formatting and convert to plain text
+   * Uses modern Selection API (execCommand is deprecated)
    */
-  const handlePaste = useCallback((event: React.ClipboardEvent) => {
-    event.preventDefault()
-    const text = event.clipboardData.getData('text/plain')
-    document.execCommand('insertText', false, text)
-  }, [])
+  const handlePaste = useCallback(
+    (event: React.ClipboardEvent) => {
+      event.preventDefault()
+      const text = event.clipboardData.getData('text/plain')
+
+      const selection = window.getSelection()
+      if (!selection || selection.rangeCount === 0) return
+
+      const range = selection.getRangeAt(0)
+      range.deleteContents()
+
+      const textNode = document.createTextNode(text)
+      range.insertNode(textNode)
+
+      // Move cursor after inserted text
+      range.setStartAfter(textNode)
+      range.setEndAfter(textNode)
+      selection.removeAllRanges()
+      selection.addRange(range)
+
+      // Trigger input event to update state
+      if (editorRef.current) {
+        const html = editorRef.current.innerHTML
+        const newText = serializeToText(html)
+        setCurrentValue(newText)
+      }
+    },
+    [serializeToText],
+  )
 
   return (
     <div className="relative">
@@ -303,7 +327,7 @@ export function PromptTemplateEditor({
         }}
       />
 
-      {/* Autocomplete dropdown */}
+      {/* Autocomplete dropdown (rendered via portal) */}
       {showAutocomplete && (
         <MentionAutocomplete
           variables={variables}
