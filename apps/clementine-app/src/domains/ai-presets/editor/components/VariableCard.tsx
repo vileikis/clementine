@@ -7,7 +7,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { Image, Settings, Trash2, Type } from 'lucide-react'
+import { Check, Image, Pencil, Settings, Trash2, Type, X } from 'lucide-react'
 import type { PresetVariable } from '@clementine/shared'
 import { Button } from '@/ui-kit/ui/button'
 import { Input } from '@/ui-kit/ui/input'
@@ -102,27 +102,31 @@ export function VariableCard({
     return null
   }
 
-  const handleStartEdit = () => {
+  const handleStartEdit = (e: React.MouseEvent) => {
     if (disabled) return
+    e.stopPropagation() // Prevent drag from triggering
     setIsEditing(true)
     setError(null)
   }
 
-  const handleSave = () => {
-    const validationError = validateName(editValue)
+  const handleSave = (e?: React.MouseEvent) => {
+    e?.stopPropagation()
+    const trimmedValue = editValue.trim()
+    const validationError = validateName(trimmedValue)
     if (validationError) {
       setError(validationError)
       return
     }
 
-    if (editValue !== variable.name) {
-      onRename(variable.id, editValue)
+    if (trimmedValue !== variable.name) {
+      onRename(variable.id, trimmedValue)
     }
     setIsEditing(false)
     setError(null)
   }
 
-  const handleCancel = () => {
+  const handleCancel = (e?: React.MouseEvent) => {
+    e?.stopPropagation()
     setEditValue(variable.name)
     setIsEditing(false)
     setError(null)
@@ -159,9 +163,9 @@ export function VariableCard({
       {...attributes}
       {...listeners}
       className={cn(
-        'group flex items-center gap-3 rounded-lg border bg-card p-3 transition-colors',
+        'group flex items-center gap-3 border-b bg-card py-3',
         isDragging && 'opacity-50 cursor-grabbing',
-        !isDragging && !disabled && 'cursor-grab hover:bg-accent/50',
+        !isDragging && !disabled && 'cursor-grab',
         disabled && 'cursor-not-allowed opacity-50',
       )}
     >
@@ -173,7 +177,7 @@ export function VariableCard({
       {/* Variable name (editable) */}
       <div className="min-w-0 flex-1">
         {isEditing ? (
-          <div className="space-y-1">
+          <div className="flex items-center gap-1">
             <Input
               ref={inputRef}
               value={editValue}
@@ -181,12 +185,29 @@ export function VariableCard({
                 setEditValue(e.target.value)
                 setError(null)
               }}
-              onBlur={handleSave}
               onKeyDown={handleKeyDown}
               placeholder="my_variable"
-              className={cn('h-7 text-sm', error && 'border-destructive')}
+              className={cn(
+                'h-7 text-sm font-mono',
+                error && 'border-destructive',
+              )}
             />
-            {error && <p className="text-xs text-destructive">{error}</p>}
+            <button
+              type="button"
+              onClick={handleSave}
+              className="rounded p-1 hover:bg-accent"
+              aria-label="Save name"
+            >
+              <Check className="h-4 w-4 text-green-600" />
+            </button>
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="rounded p-1 hover:bg-accent"
+              aria-label="Cancel editing"
+            >
+              <X className="h-4 w-4 text-muted-foreground" />
+            </button>
           </div>
         ) : (
           <button
@@ -194,13 +215,21 @@ export function VariableCard({
             onClick={handleStartEdit}
             disabled={disabled}
             className={cn(
-              'font-mono text-sm font-medium text-left w-full',
-              colorClasses,
-              !disabled && 'hover:underline',
+              'group/name flex items-center gap-2 rounded-md px-2 py-1 transition-colors',
+              !disabled && 'hover:bg-accent',
+              disabled && 'cursor-not-allowed',
             )}
           >
-            @{variable.name}
+            <span className={cn('font-mono text-sm font-medium', colorClasses)}>
+              @{variable.name}
+            </span>
+            {!disabled && (
+              <Pencil className="h-3 w-3 text-muted-foreground opacity-0 transition-opacity group-hover/name:opacity-100" />
+            )}
           </button>
+        )}
+        {error && !isEditing && (
+          <p className="mt-1 text-xs text-destructive">{error}</p>
         )}
       </div>
 
