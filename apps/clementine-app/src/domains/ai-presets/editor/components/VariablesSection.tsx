@@ -5,7 +5,7 @@
  * Features header with plus icon + dropdown, drag-and-drop reordering,
  * and inline variable editing.
  */
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import {
   DndContext,
   KeyboardSensor,
@@ -24,6 +24,8 @@ import { toast } from 'sonner'
 
 import { useUpdateVariables } from '../hooks/useUpdateVariables'
 import { VariableCard } from './VariableCard'
+import { VariableSettingsDialog } from './VariableSettingsDialog'
+import type { VariableSettingsUpdate } from './VariableSettingsDialog'
 import type { DragEndEvent } from '@dnd-kit/core'
 import type { PresetVariable } from '@clementine/shared'
 import { Button } from '@/ui-kit/ui/button'
@@ -63,6 +65,8 @@ export function VariablesSection({
   presetId,
   disabled = false,
 }: VariablesSectionProps) {
+  const [selectedVariable, setSelectedVariable] =
+    useState<PresetVariable | null>(null)
   const updateVariables = useUpdateVariables(workspaceId, presetId)
 
   // Configure sensors for drag and drop
@@ -148,15 +152,41 @@ export function VariablesSection({
     [variables, updateVariables],
   )
 
-  // Handle settings (placeholder for now)
+  // Handle settings - open dialog
   const handleSettings = useCallback(
     (id: string) => {
       const variable = variables.find((v) => v.id === id)
       if (variable) {
-        toast.info(`Settings for @${variable.name} coming soon`)
+        setSelectedVariable(variable)
       }
     },
     [variables],
+  )
+
+  // Handle save settings from dialog
+  const handleSaveSettings = useCallback(
+    async (variableId: string, updates: VariableSettingsUpdate) => {
+      try {
+        const updatedVariables = variables.map((v) => {
+          if (v.id === variableId && v.type === 'text') {
+            return {
+              ...v,
+              defaultValue: updates.defaultValue ?? v.defaultValue,
+              valueMap: updates.valueMap ?? v.valueMap,
+            }
+          }
+          return v
+        })
+        await updateVariables.mutateAsync(updatedVariables)
+        toast.success('Variable settings updated')
+      } catch (error) {
+        toast.error('Failed to update settings', {
+          description:
+            error instanceof Error ? error.message : 'An error occurred',
+        })
+      }
+    },
+    [variables, updateVariables],
   )
 
   // Handle delete variable
@@ -279,6 +309,13 @@ export function VariablesSection({
           </SortableContext>
         </DndContext>
       )}
+
+      {/* Variable Settings Dialog */}
+      <VariableSettingsDialog
+        variable={selectedVariable}
+        onClose={() => setSelectedVariable(null)}
+        onSave={handleSaveSettings}
+      />
     </div>
   )
 }

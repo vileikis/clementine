@@ -112,3 +112,18 @@ export const updateVariableInputSchema = z.object({
 })
 
 export type UpdateVariableInput = z.infer<typeof updateVariableInputSchema>
+
+/**
+ * Add Value Mapping Input Schema
+ *
+ * For adding a new value mapping entry to a text variable.
+ * Maps an input value to prompt text (can include @media references).
+ */
+export const addValueMappingInputSchema = z.object({
+  /** The input value to match */
+  value: z.string().min(1, 'Value is required'),
+  /** Text to substitute in prompt (can include @media references) */
+  text: z.string(),
+})
+
+export type AddValueMappingInput = z.infer<typeof addValueMappingInputSchema>
