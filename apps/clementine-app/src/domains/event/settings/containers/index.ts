@@ -1,1 +1,0 @@
-export { EventSettingsPage } from './EventSettingsPage'

@@ -74,42 +74,42 @@
 
 ### Domain Folder Rename
 
-- [ ] T014 Rename folder `apps/clementine-app/src/domains/event/` to `apps/clementine-app/src/domains/project-config/`
+- [X] T014 Rename folder `apps/clementine-app/src/domains/event/` to `apps/clementine-app/src/domains/project-config/`
 
 ### Shared Hooks & Queries Rename
 
-- [ ] T015 Rename `domains/project-config/shared/hooks/useProjectEvent.ts` to `useProjectConfig.ts` and update hook name and remove eventId param
-- [ ] T016 Rename `domains/project-config/shared/queries/project-event.query.ts` to `project-config.query.ts` and update query function names
-- [ ] T017 Rename `domains/project-config/shared/lib/updateEventConfigField.ts` to `updateProjectConfigField.ts` and update function name
+- [X] T015 Rename `domains/project-config/shared/hooks/useProjectEvent.ts` to `useProjectConfig.ts` and update hook name and remove eventId param
+- [X] T016 Rename `domains/project-config/shared/queries/project-event.query.ts` to `project-config.query.ts` and update query function names
+- [X] T017 Rename `domains/project-config/shared/lib/updateEventConfigField.ts` to `updateProjectConfigField.ts` and update function name
 
 ### Designer Components Rename
 
-- [ ] T018 Rename `domains/project-config/designer/containers/EventDesignerLayout.tsx` to `ProjectConfigDesignerLayout.tsx` and update component name
-- [ ] T019 Rename `domains/project-config/designer/components/EventDesignerSidebar.tsx` to `ProjectConfigDesignerSidebar.tsx` and update component name
-- [ ] T020 Rename `domains/project-config/designer/hooks/usePublishEvent.ts` to `usePublishProjectConfig.ts` and update hook name, remove eventId param
+- [X] T018 Rename `domains/project-config/designer/containers/EventDesignerLayout.tsx` to `ProjectConfigDesignerLayout.tsx` and update component name
+- [X] T019 Rename `domains/project-config/designer/components/EventDesignerSidebar.tsx` to `ProjectConfigDesignerSidebar.tsx` and update component name
+- [X] T020 Rename `domains/project-config/designer/hooks/usePublishEvent.ts` to `usePublishProjectConfig.ts` and update hook name, remove eventId param
 
 ### Settings Components Rename
 
-- [ ] T021 Rename `domains/project-config/settings/containers/EventSettingsPage.tsx` to `ProjectConfigSettingsPage.tsx` and update component name
+- [X] T021 Rename `domains/project-config/settings/containers/EventSettingsPage.tsx` to `ProjectConfigSettingsPage.tsx` and update component name
 
 ### Update Internal Imports
 
-- [ ] T022 Update all imports within `domains/project-config/` to use new file names and component names
-- [ ] T023 [P] Update `domains/project-config/theme/hooks/useUpdateTheme.ts` to remove eventId param
-- [ ] T024 [P] Update `domains/project-config/welcome/hooks/useUpdateWelcome.ts` to remove eventId param
-- [ ] T025 [P] Update `domains/project-config/share/hooks/useUpdateShare.ts` to remove eventId param
-- [ ] T026 [P] Update `domains/project-config/settings/hooks/useUpdateShareOptions.ts` to remove eventId param
-- [ ] T027 [P] Update `domains/project-config/settings/hooks/useUpdateOverlays.ts` to remove eventId param
-- [ ] T028 [P] Update `domains/project-config/experiences/hooks/useUpdateEventExperiences.ts` to `useUpdateProjectExperiences.ts` and remove eventId param
+- [X] T022 Update all imports within `domains/project-config/` to use new file names and component names
+- [X] T023 [P] Update `domains/project-config/theme/hooks/useUpdateTheme.ts` to remove eventId param
+- [X] T024 [P] Update `domains/project-config/welcome/hooks/useUpdateWelcome.ts` to remove eventId param
+- [X] T025 [P] Update `domains/project-config/share/hooks/useUpdateShare.ts` to remove eventId param
+- [X] T026 [P] Update `domains/project-config/settings/hooks/useUpdateShareOptions.ts` to remove eventId param
+- [X] T027 [P] Update `domains/project-config/settings/hooks/useUpdateOverlays.ts` to remove eventId param
+- [X] T028 [P] Update `domains/project-config/experiences/hooks/useUpdateEventExperiences.ts` to `useUpdateProjectExperiences.ts` and remove eventId param
 
 ### Delete Event CRUD Hooks
 
-- [ ] T029 Delete `domains/project/events/` folder entirely (useProjectEvents, useCreateProjectEvent, useDeleteProjectEvent, useActivateProjectEvent, useRenameProjectEvent)
+- [X] T029 Delete `domains/project/events/` folder entirely (useProjectEvents, useCreateProjectEvent, useDeleteProjectEvent, useActivateProjectEvent, useRenameProjectEvent)
 
 ### Update Project Domain
 
-- [ ] T030 Modify `domains/project/shared/hooks/useProject.ts` to return full project with config fields (ensure schema imports updated)
-- [ ] T031 Modify `domains/project/shared/queries/project.query.ts` to use updated projectSchema with config
+- [X] T030 Modify `domains/project/shared/hooks/useProject.ts` to return full project with config fields (ensure schema imports updated)
+- [X] T031 Modify `domains/project/shared/queries/project.query.ts` to use updated projectSchema with config
 
 **Checkpoint**: Domain structure renamed, all hooks updated internally
 
