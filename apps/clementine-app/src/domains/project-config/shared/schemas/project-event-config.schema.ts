@@ -56,9 +56,6 @@ export {
   type ExperiencesConfig,
   type ExperienceReference,
   type MainExperienceReference,
-  // Backward compatibility aliases
-  projectEventConfigSchema,
-  type ProjectEventConfig,
 } from '@clementine/shared'
 
 // =============================================================================

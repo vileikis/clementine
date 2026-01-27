@@ -180,7 +180,7 @@
 
 ### Security Rules
 
-- [ ] T051 Modify `firebase/firestore.rules` to remove the `/projects/{projectId}/events/{eventId}` match block entirely
+- [X] T051 Modify `firebase/firestore.rules` to remove the `/projects/{projectId}/events/{eventId}` match block entirely
 
 **Checkpoint**: Security rules updated, no event references
 
@@ -194,9 +194,9 @@
 
 ### Build Verification
 
-- [ ] T052 Run `pnpm app:type-check` and fix any TypeScript errors in frontend
-- [ ] T053 Run `pnpm app:lint` and fix any linting errors
-- [ ] T054 Run `pnpm app:build` and verify production build succeeds
+- [X] T052 Run `pnpm app:type-check` and fix any TypeScript errors in frontend
+- [X] T053 Run `pnpm app:lint` and fix any linting errors
+- [X] T054 Run `pnpm app:build` and verify production build succeeds
 
 **Checkpoint**: Full build passes
 
@@ -241,15 +241,15 @@
 
 ### Dead Code Removal
 
-- [ ] T064 Search for any remaining `activeEventId` references and remove
-- [ ] T065 Search for any remaining `ProjectEventFull` references and remove
-- [ ] T066 Search for any remaining `/events/` route references in navigation and remove
-- [ ] T067 Remove backward compatibility aliases from `packages/shared` if no longer needed
+- [X] T064 Search for any remaining `activeEventId` references and remove
+- [X] T065 Search for any remaining `ProjectEventFull` references and remove
+- [X] T066 Search for any remaining `/events/` route references in navigation and remove
+- [X] T067 Remove backward compatibility aliases from `packages/shared` if no longer needed
 
 ### Final Verification
 
-- [ ] T068 Run `pnpm app:check` (format + lint) one final time
-- [ ] T069 Verify dev server starts without errors: `pnpm app:dev`
+- [X] T068 Run `pnpm app:check` (format + lint) one final time
+- [X] T069 Verify dev server starts without errors: `pnpm app:dev`
 
 **Checkpoint**: Refactor complete, codebase clean
 

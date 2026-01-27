@@ -106,16 +106,10 @@ export type CtaConfig = z.infer<typeof ctaConfigSchema>
 export type ShareConfig = z.infer<typeof shareConfigSchema>
 export type ExperiencePickerLayout = z.infer<typeof experiencePickerLayoutSchema>
 
-// Re-export media schemas for backward compatibility
+// Re-export media schemas
 export {
   mediaReferenceSchema,
   overlayReferenceSchema,
   type MediaReference,
   type OverlayReference,
 } from '../media/media-reference.schema'
-
-// Backward compatibility aliases (deprecated - use ProjectConfig/projectConfigSchema)
-/** @deprecated Use projectConfigSchema instead */
-export const projectEventConfigSchema = projectConfigSchema
-/** @deprecated Use ProjectConfig instead */
-export type ProjectEventConfig = ProjectConfig

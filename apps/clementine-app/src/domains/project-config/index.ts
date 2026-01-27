@@ -27,7 +27,7 @@ export type {
 } from './shared/types'
 
 // Schemas
-export { projectConfigSchema, projectEventConfigSchema } from './shared/schemas'
+export { projectConfigSchema } from './shared/schemas'
 
 // Hooks
 export { useProjectConfig } from './shared/hooks'

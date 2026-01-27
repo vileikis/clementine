@@ -5,7 +5,6 @@
  */
 export type {
   ProjectConfig,
-  ProjectEventConfig,
   Project,
   OverlaysConfig,
   ShareOptionsConfig,

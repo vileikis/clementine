@@ -40,7 +40,7 @@ export const projectConfigQuery = (projectId: string | undefined) => {
   if (!projectId) {
     return {
       queryKey: ['project', ''],
-      queryFn: async () => null,
+      queryFn: () => Promise.resolve(null),
       enabled: false,
     }
   }
