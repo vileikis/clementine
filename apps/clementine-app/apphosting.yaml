@@ -11,6 +11,14 @@ runConfig:
 # See: https://firebase.google.com/docs/app-hosting/configure#environment-variables
 env:
   # ============================================
+  # Build-time optimization
+  # ============================================
+  - variable: NODE_OPTIONS
+    value: --max-old-space-size=4096
+    availability:
+      - BUILD
+
+  # ============================================
   # Client-side variables (public, bundled into client code)
   # These are safe to commit as they're visible to anyone using the app
   # ============================================
