@@ -1,13 +1,14 @@
 /**
  * AI Preset Editor Input Schemas
  *
- * Editor-specific validation schemas for partial updates and mutations.
- * These extend the shared schemas with editor-specific requirements.
+ * Editor-specific validation schemas for mutations.
  *
- * Draft/Published Model (Phase 5.5):
- * - Draft config fields (model, aspectRatio, etc.) are written to preset.draft
- * - Top-level fields (name, description) remain at preset root
- * - draftVersion is incremented on each save
+ * Note: Most section-specific schemas are defined locally in their hooks:
+ * - useUpdateModelSettings has updateModelSettingsSchema
+ * - useUpdateMediaRegistry has updateMediaRegistrySchema
+ * - useUpdateAIPreset has updateAIPresetSchema (name, description)
+ *
+ * This file contains shared schemas that may be used across multiple hooks.
  */
 import { z } from 'zod'
 import {
@@ -20,8 +21,8 @@ import {
 /**
  * Update AI Preset Draft Input Schema
  *
- * For updating draft configuration fields.
- * These fields are written to preset.draft.* and increment draftVersion.
+ * Generic schema for updating any draft configuration field.
+ * Used by useUpdateAIPresetDraft hook.
  */
 export const updateAIPresetDraftInputSchema = z.object({
   /** AI model for generation */
@@ -43,32 +44,6 @@ export const updateAIPresetDraftInputSchema = z.object({
 export type UpdateAIPresetDraftInput = z.infer<
   typeof updateAIPresetDraftInputSchema
 >
-
-/**
- * Update AI Preset Input Schema
- *
- * For partial updates via the editor - all fields optional.
- * At least one field must be provided for a valid update.
- *
- * - Top-level fields (name, description) are written directly to preset
- * - Draft config fields are written to preset.draft.* and increment draftVersion
- */
-export const updateAIPresetInputSchema = z
-  .object({
-    /** Preset display name (1-100 chars) - written to preset.name */
-    name: z.string().min(1).max(100).optional(),
-
-    /** Optional description (max 500 chars) - written to preset.description */
-    description: z.string().max(500).nullable().optional(),
-
-    /** Draft configuration updates - written to preset.draft.* */
-    draft: updateAIPresetDraftInputSchema.optional(),
-  })
-  .refine((data) => Object.keys(data).length > 0, {
-    message: 'At least one field must be provided for update',
-  })
-
-export type UpdateAIPresetInput = z.infer<typeof updateAIPresetInputSchema>
 
 /**
  * Publish AI Preset Input Schema

@@ -1,12 +1,15 @@
 /**
  * MediaRegistrySection Component
  *
- * Section for managing the preset's media registry.
+ * Self-contained section for managing the preset's media registry.
+ * Owns its own update logic using useUpdateMediaRegistry hook.
  * Shows a grid of registered media with add/edit/remove functionality.
  */
 import { useCallback, useState } from 'react'
 import { Plus } from 'lucide-react'
+import { toast } from 'sonner'
 
+import { useUpdateMediaRegistry } from '../hooks/useUpdateMediaRegistry'
 import { AddMediaDialog } from './AddMediaDialog'
 import { EditMediaDialog } from './EditMediaDialog'
 import { MediaRegistryItem } from './MediaRegistryItem'
@@ -17,45 +20,40 @@ import { cn } from '@/shared/utils'
 interface MediaRegistrySectionProps {
   /** Array of registered media entries */
   mediaRegistry: PresetMediaEntry[]
-  /** Callback when media is added */
-  onAdd: (media: AddMediaResult) => void
-  /** Callback when media name is changed */
-  onRename: (oldName: string, newName: string) => void
-  /** Callback when media is deleted */
-  onDelete: (name: string) => void
-  /** Whether the section is disabled */
-  disabled?: boolean
-  /** Workspace ID for upload */
+  /** Workspace ID for updates */
   workspaceId: string
+  /** Preset ID for updates */
+  presetId: string
   /** User ID for upload attribution */
   userId: string
+  /** Whether the section is disabled (e.g., during publish) */
+  disabled?: boolean
 }
 
 /**
  * Media registry section with grid display and add/edit/delete functionality
  *
+ * Self-contained component that handles its own updates via useUpdateMediaRegistry.
+ *
  * @example
  * ```tsx
  * <MediaRegistrySection
- *   mediaRegistry={preset.mediaRegistry}
- *   onAdd={(media) => addToRegistry(media)}
- *   onRename={(oldName, newName) => renameInRegistry(oldName, newName)}
- *   onDelete={(name) => removeFromRegistry(name)}
- *   disabled={isUpdating}
- *   workspaceId="ws-123"
- *   userId="user-456"
+ *   mediaRegistry={preset.draft.mediaRegistry}
+ *   workspaceId={workspaceId}
+ *   presetId={preset.id}
+ *   userId={user.uid}
+ *   disabled={isPublishing}
  * />
  * ```
  */
 export function MediaRegistrySection({
   mediaRegistry,
-  onAdd,
-  onRename,
-  onDelete,
-  disabled = false,
   workspaceId,
+  presetId,
   userId,
+  disabled = false,
 }: MediaRegistrySectionProps) {
+  const updateMediaRegistry = useUpdateMediaRegistry(workspaceId, presetId)
   const [addDialogOpen, setAddDialogOpen] = useState(false)
   const [editingMedia, setEditingMedia] = useState<PresetMediaEntry | null>(
     null,
@@ -66,19 +64,64 @@ export function MediaRegistrySection({
 
   // Handle add from dialog
   const handleAdd = useCallback(
-    (result: AddMediaResult) => {
-      onAdd(result)
+    async (result: AddMediaResult) => {
+      try {
+        const newEntry: PresetMediaEntry = {
+          mediaAssetId: result.mediaAssetId,
+          url: result.url,
+          filePath: result.filePath,
+          name: result.name,
+        }
+        const updatedRegistry = [...mediaRegistry, newEntry]
+        await updateMediaRegistry.mutateAsync(updatedRegistry)
+        toast.success(`Added @${result.name} to media registry`)
+      } catch (error) {
+        toast.error('Failed to add media', {
+          description:
+            error instanceof Error ? error.message : 'An error occurred',
+        })
+      }
     },
-    [onAdd],
+    [mediaRegistry, updateMediaRegistry],
   )
 
   // Handle rename from edit dialog
   const handleRename = useCallback(
-    (oldName: string, newName: string) => {
-      onRename(oldName, newName)
+    async (oldName: string, newName: string) => {
+      try {
+        const updatedRegistry = mediaRegistry.map((m) =>
+          m.name === oldName ? { ...m, name: newName } : m,
+        )
+        await updateMediaRegistry.mutateAsync(updatedRegistry)
+        toast.success(`Renamed @${oldName} to @${newName}`)
+      } catch (error) {
+        toast.error('Failed to rename media', {
+          description:
+            error instanceof Error ? error.message : 'An error occurred',
+        })
+      }
     },
-    [onRename],
+    [mediaRegistry, updateMediaRegistry],
   )
+
+  // Handle delete
+  const handleDelete = useCallback(
+    async (name: string) => {
+      try {
+        const updatedRegistry = mediaRegistry.filter((m) => m.name !== name)
+        await updateMediaRegistry.mutateAsync(updatedRegistry)
+        toast.success(`Removed @${name} from media registry`)
+      } catch (error) {
+        toast.error('Failed to remove media', {
+          description:
+            error instanceof Error ? error.message : 'An error occurred',
+        })
+      }
+    },
+    [mediaRegistry, updateMediaRegistry],
+  )
+
+  const isDisabled = disabled || updateMediaRegistry.isPending
 
   return (
     <div>
@@ -88,10 +131,10 @@ export function MediaRegistrySection({
         <button
           type="button"
           onClick={() => setAddDialogOpen(true)}
-          disabled={disabled}
+          disabled={isDisabled}
           className={cn(
             'flex aspect-square items-center justify-center rounded-lg border-2 border-dashed transition-colors',
-            disabled
+            isDisabled
               ? 'cursor-not-allowed opacity-50'
               : 'cursor-pointer hover:border-primary hover:bg-muted/50',
           )}
@@ -106,8 +149,8 @@ export function MediaRegistrySection({
             key={media.name}
             media={media}
             onEdit={() => setEditingMedia(media)}
-            onDelete={() => onDelete(media.name)}
-            disabled={disabled}
+            onDelete={() => handleDelete(media.name)}
+            disabled={isDisabled}
           />
         ))}
       </div>

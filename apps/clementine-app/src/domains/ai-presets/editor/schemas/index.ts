@@ -5,6 +5,8 @@
  */
 
 export {
-  updateAIPresetInputSchema,
-  type UpdateAIPresetInput,
+  publishAIPresetInputSchema,
+  updateAIPresetDraftInputSchema,
+  type PublishAIPresetInput,
+  type UpdateAIPresetDraftInput,
 } from './ai-preset-editor.schemas'

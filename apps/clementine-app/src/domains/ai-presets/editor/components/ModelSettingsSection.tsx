@@ -1,9 +1,13 @@
 /**
  * ModelSettingsSection Component
  *
- * Configuration section for AI model and aspect ratio selection.
- * Uses SelectField components for dropdown selections.
+ * Self-contained configuration section for AI model and aspect ratio selection.
+ * Owns its own update logic using useUpdateModelSettings hook.
  */
+import { useCallback } from 'react'
+import { toast } from 'sonner'
+
+import { useUpdateModelSettings } from '../hooks/useUpdateModelSettings'
 import type { AIModel, AspectRatio } from '@clementine/shared'
 import { SelectField } from '@/shared/editor-controls'
 
@@ -28,50 +32,84 @@ interface ModelSettingsSectionProps {
   model: AIModel
   /** Current aspect ratio selection */
   aspectRatio: AspectRatio
-  /** Callback when model changes */
-  onModelChange: (model: AIModel) => void
-  /** Callback when aspect ratio changes */
-  onAspectRatioChange: (aspectRatio: AspectRatio) => void
-  /** Whether the section is disabled (e.g., during save) */
+  /** Workspace ID for updates */
+  workspaceId: string
+  /** Preset ID for updates */
+  presetId: string
+  /** Whether the section is disabled (e.g., during publish) */
   disabled?: boolean
 }
 
 /**
  * Model settings section with model and aspect ratio dropdowns
  *
+ * Self-contained component that handles its own updates via useUpdateModelSettings.
+ *
  * @example
  * ```tsx
  * <ModelSettingsSection
- *   model={preset.model}
- *   aspectRatio={preset.aspectRatio}
- *   onModelChange={(model) => updatePreset({ model })}
- *   onAspectRatioChange={(aspectRatio) => updatePreset({ aspectRatio })}
- *   disabled={isUpdating}
+ *   model={preset.draft.model}
+ *   aspectRatio={preset.draft.aspectRatio}
+ *   workspaceId={workspaceId}
+ *   presetId={preset.id}
+ *   disabled={isPublishing}
  * />
  * ```
  */
 export function ModelSettingsSection({
   model,
   aspectRatio,
-  onModelChange,
-  onAspectRatioChange,
+  workspaceId,
+  presetId,
   disabled = false,
 }: ModelSettingsSectionProps) {
+  const updateModelSettings = useUpdateModelSettings(workspaceId, presetId)
+
+  const handleModelChange = useCallback(
+    async (newModel: AIModel) => {
+      try {
+        await updateModelSettings.mutateAsync({ model: newModel })
+      } catch (error) {
+        toast.error('Failed to update model', {
+          description:
+            error instanceof Error ? error.message : 'An error occurred',
+        })
+      }
+    },
+    [updateModelSettings],
+  )
+
+  const handleAspectRatioChange = useCallback(
+    async (newAspectRatio: AspectRatio) => {
+      try {
+        await updateModelSettings.mutateAsync({ aspectRatio: newAspectRatio })
+      } catch (error) {
+        toast.error('Failed to update aspect ratio', {
+          description:
+            error instanceof Error ? error.message : 'An error occurred',
+        })
+      }
+    },
+    [updateModelSettings],
+  )
+
+  const isDisabled = disabled || updateModelSettings.isPending
+
   return (
     <div className="space-y-4">
       <SelectField<AIModel>
         label="Model"
         value={model}
-        onChange={onModelChange}
+        onChange={handleModelChange}
         options={MODEL_OPTIONS}
-        disabled={disabled}
+        disabled={isDisabled}
       />
       <SelectField<AspectRatio>
         label="Aspect Ratio"
         value={aspectRatio}
-        onChange={onAspectRatioChange}
+        onChange={handleAspectRatioChange}
         options={ASPECT_RATIO_OPTIONS}
-        disabled={disabled}
+        disabled={isDisabled}
       />
     </div>
   )

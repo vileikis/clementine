@@ -2,25 +2,16 @@
  * AIPresetEditorContent Container
  *
  * Two-column layout containing all editor sections.
- * Receives draft config as prop and calls update handlers.
+ * This is a pure layout container - sections handle their own updates.
  *
  * Following Experience Designer pattern:
  * - AIPresetEditorLayout handles TopNavBar, publish, and version tracking
- * - AIPresetEditorContent handles the actual editor content
+ * - AIPresetEditorContent handles layout only
+ * - Section components (ModelSettingsSection, MediaRegistrySection) handle their own updates
  */
-import { useCallback } from 'react'
-import { toast } from 'sonner'
-
 import { MediaRegistrySection } from '../components/MediaRegistrySection'
 import { ModelSettingsSection } from '../components/ModelSettingsSection'
-import { useUpdateAIPreset } from '../hooks/useUpdateAIPreset'
-import type { AddMediaResult } from '../components/AddMediaDialog'
-import type {
-  AIModel,
-  AIPresetConfig,
-  AspectRatio,
-  PresetMediaEntry,
-} from '@clementine/shared'
+import type { AIPresetConfig } from '@clementine/shared'
 
 interface AIPresetEditorContentProps {
   draft: AIPresetConfig
@@ -36,6 +27,8 @@ interface AIPresetEditorContentProps {
  * Left panel: Configuration sections (model, media, variables)
  * Right panel: Prompt template editor (Phase 8)
  *
+ * Sections are self-contained and handle their own updates.
+ *
  * @example
  * ```tsx
  * <AIPresetEditorContent
@@ -43,7 +36,7 @@ interface AIPresetEditorContentProps {
  *   workspaceId={workspaceId}
  *   presetId={preset.id}
  *   userId={user.uid}
- *   disabled={isPending}
+ *   disabled={isPublishing}
  * />
  * ```
  */
@@ -54,107 +47,6 @@ export function AIPresetEditorContent({
   userId,
   disabled = false,
 }: AIPresetEditorContentProps) {
-  const updatePreset = useUpdateAIPreset(workspaceId, presetId)
-
-  // Handle model change
-  const handleModelChange = useCallback(
-    async (model: AIModel) => {
-      try {
-        await updatePreset.mutateAsync({ draft: { model } })
-      } catch (error) {
-        toast.error('Failed to update model', {
-          description:
-            error instanceof Error ? error.message : 'An error occurred',
-        })
-      }
-    },
-    [updatePreset],
-  )
-
-  // Handle aspect ratio change
-  const handleAspectRatioChange = useCallback(
-    async (aspectRatio: AspectRatio) => {
-      try {
-        await updatePreset.mutateAsync({ draft: { aspectRatio } })
-      } catch (error) {
-        toast.error('Failed to update aspect ratio', {
-          description:
-            error instanceof Error ? error.message : 'An error occurred',
-        })
-      }
-    },
-    [updatePreset],
-  )
-
-  // Handle adding media to registry
-  const handleAddMedia = useCallback(
-    async (media: AddMediaResult) => {
-      try {
-        const newEntry: PresetMediaEntry = {
-          mediaAssetId: media.mediaAssetId,
-          url: media.url,
-          filePath: media.filePath,
-          name: media.name,
-        }
-        const updatedRegistry = [...draft.mediaRegistry, newEntry]
-        await updatePreset.mutateAsync({
-          draft: { mediaRegistry: updatedRegistry },
-        })
-        toast.success(`Added @${media.name} to media registry`)
-      } catch (error) {
-        toast.error('Failed to add media', {
-          description:
-            error instanceof Error ? error.message : 'An error occurred',
-        })
-      }
-    },
-    [draft.mediaRegistry, updatePreset],
-  )
-
-  // Handle renaming media in registry
-  const handleRenameMedia = useCallback(
-    async (oldName: string, newName: string) => {
-      try {
-        const updatedRegistry = draft.mediaRegistry.map((m) =>
-          m.name === oldName ? { ...m, name: newName } : m,
-        )
-        await updatePreset.mutateAsync({
-          draft: { mediaRegistry: updatedRegistry },
-        })
-        toast.success(`Renamed @${oldName} to @${newName}`)
-      } catch (error) {
-        toast.error('Failed to rename media', {
-          description:
-            error instanceof Error ? error.message : 'An error occurred',
-        })
-      }
-    },
-    [draft.mediaRegistry, updatePreset],
-  )
-
-  // Handle removing media from registry
-  const handleDeleteMedia = useCallback(
-    async (name: string) => {
-      try {
-        const updatedRegistry = draft.mediaRegistry.filter(
-          (m) => m.name !== name,
-        )
-        await updatePreset.mutateAsync({
-          draft: { mediaRegistry: updatedRegistry },
-        })
-        toast.success(`Removed @${name} from media registry`)
-      } catch (error) {
-        toast.error('Failed to remove media', {
-          description:
-            error instanceof Error ? error.message : 'An error occurred',
-        })
-      }
-    },
-    [draft.mediaRegistry, updatePreset],
-  )
-
-  const isDisabled = disabled || updatePreset.isPending
-
   return (
     <div className="flex flex-1 overflow-hidden">
       {/* Left panel - Configuration */}
@@ -167,9 +59,9 @@ export function AIPresetEditorContent({
           <ModelSettingsSection
             model={draft.model}
             aspectRatio={draft.aspectRatio}
-            onModelChange={handleModelChange}
-            onAspectRatioChange={handleAspectRatioChange}
-            disabled={isDisabled}
+            workspaceId={workspaceId}
+            presetId={presetId}
+            disabled={disabled}
           />
         </section>
 
@@ -180,12 +72,10 @@ export function AIPresetEditorContent({
           </h2>
           <MediaRegistrySection
             mediaRegistry={draft.mediaRegistry}
-            onAdd={handleAddMedia}
-            onRename={handleRenameMedia}
-            onDelete={handleDeleteMedia}
-            disabled={isDisabled}
             workspaceId={workspaceId}
+            presetId={presetId}
             userId={userId}
+            disabled={disabled}
           />
         </section>
 

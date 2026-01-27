@@ -19,6 +19,9 @@ export * from './containers'
 // Hooks
 export * from './hooks'
 
+// Lib (shared helpers)
+export * from './lib'
+
 // Stores
 export * from './stores'
 
