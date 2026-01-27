@@ -2,9 +2,10 @@
  * SmartPastePlugin - Smart Paste Detection for Mentions
  *
  * Automatically detects and converts @mention patterns in pasted text.
- * Supports both variable and media mention formats:
- * - Variables: {variable_name} → VariableMentionNode
- * - Media: @media_name → MediaMentionNode
+ * Supports mention formats:
+ * - Text variables: @{text:name} → Text VariableMentionNode
+ * - Media inputs: @{input:name} → Media VariableMentionNode
+ * - Reference media: @{ref:name} → MediaMentionNode
  *
  * Features:
  * - Detects multiple mentions in a single paste
@@ -63,12 +64,13 @@ export function SmartPastePlugin({
         const text = clipboardData.getData('text/plain')
         if (!text) return false
 
-        // Check if text contains mention patterns
-        const hasVariableMentions = /\{[a-zA-Z_][a-zA-Z0-9_]*\}/.test(text)
-        const hasMediaMentions = /@[a-zA-Z_][a-zA-Z0-9_]*/.test(text)
+        // Check if text contains mention patterns: @{type:name}
+        const hasMentions = /@\{(text|input|ref):[a-zA-Z_][a-zA-Z0-9_]*\}/.test(
+          text,
+        )
 
         // If no mentions detected, use default paste behavior
-        if (!hasVariableMentions && !hasMediaMentions) {
+        if (!hasMentions) {
           return false
         }
 
@@ -79,34 +81,25 @@ export function SmartPastePlugin({
           // Build array of nodes from pasted text
           const nodes: TextNode[] = []
 
-          // Regex patterns for mentions
-          const variableRegex = /\{([a-zA-Z_][a-zA-Z0-9_]*)\}/g
-          const mediaRegex = /@([a-zA-Z_][a-zA-Z0-9_]*)/g
+          // Regex pattern for mentions: @{type:name}
+          const mentionRegex = /@\{(text|input|ref):([a-zA-Z_][a-zA-Z0-9_]*)\}/g
 
-          // Find all matches (both variables and media)
-          const allMatches: Array<{
+          // Find all matches
+          const allMatches: {
             index: number
             length: number
-            type: 'variable' | 'media'
+            type: 'text' | 'input' | 'ref'
             name: string
-          }> = []
+          }[] = []
 
-          let match
-          while ((match = variableRegex.exec(text)) !== null) {
+          let match: RegExpExecArray | null
+
+          while ((match = mentionRegex.exec(text)) !== null) {
             allMatches.push({
               index: match.index,
               length: match[0].length,
-              type: 'variable',
-              name: match[1],
-            })
-          }
-
-          while ((match = mediaRegex.exec(text)) !== null) {
-            allMatches.push({
-              index: match.index,
-              length: match[0].length,
-              type: 'media',
-              name: match[1],
+              type: match[1] as 'text' | 'input' | 'ref',
+              name: match[2],
             })
           }
 
@@ -122,8 +115,8 @@ export function SmartPastePlugin({
               nodes.push($createTextNode(textBefore))
             }
 
-            // Add mention node (if found in registry)
-            if (matchItem.type === 'variable') {
+            // Add mention node based on type
+            if (matchItem.type === 'text' || matchItem.type === 'input') {
               const variable = variables.find((v) => v.name === matchItem.name)
               if (variable) {
                 nodes.push(
@@ -135,9 +128,11 @@ export function SmartPastePlugin({
                 )
               } else {
                 // Variable not found, keep as text
-                nodes.push($createTextNode(`{${matchItem.name}}`))
+                nodes.push(
+                  $createTextNode(`@{${matchItem.type}:${matchItem.name}}`),
+                )
               }
-            } else if (matchItem.type === 'media') {
+            } else if (matchItem.type === 'ref') {
               const mediaItem = media.find((m) => m.name === matchItem.name)
               if (mediaItem) {
                 nodes.push(
@@ -145,7 +140,7 @@ export function SmartPastePlugin({
                 )
               } else {
                 // Media not found, keep as text
-                nodes.push($createTextNode(`@${matchItem.name}`))
+                nodes.push($createTextNode(`@{ref:${matchItem.name}}`))
               }
             }
 

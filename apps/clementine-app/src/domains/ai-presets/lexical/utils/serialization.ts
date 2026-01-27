@@ -74,13 +74,14 @@ export function loadFromJSON(
  * Serialize EditorState to plain text with mention syntax
  *
  * Converts mention nodes to plain text format:
- * - Variables: {variable_name}
- * - Media: @media_name
+ * - Text variables: @{text:variable_name}
+ * - Media input variables: @{input:variable_name}
+ * - Reference media: @{ref:media_name}
  *
- * Useful for:
- * - Backward compatibility with old storage format
- * - Copy/paste to external applications
- * - Display in non-rich-text contexts
+ * This format is optimized for cloud function parsing:
+ * - Clear distinction between text and media
+ * - Easy to identify data source (user input vs preset registry)
+ * - Scalable for future media types (video, audio, etc.)
  *
  * @param editorState - Current editor state
  * @returns Plain text string with mention syntax
@@ -94,9 +95,12 @@ export function serializeToPlainText(editorState: EditorState): string {
       if ($isParagraphNode(node)) {
         node.getChildren().forEach((child) => {
           if ($isVariableMentionNode(child)) {
-            text += `{${child.getVariableName()}}`
+            // Text vs media input (image/video)
+            const prefix = child.getVariableType() === 'text' ? 'text' : 'input'
+            text += `@{${prefix}:${child.getVariableName()}}`
           } else if ($isMediaMentionNode(child)) {
-            text += `@${child.getMediaName()}`
+            // Reference media from registry
+            text += `@{ref:${child.getMediaName()}}`
           } else if ($isTextNode(child)) {
             text += child.getTextContent()
           }
@@ -113,8 +117,9 @@ export function serializeToPlainText(editorState: EditorState): string {
  * Parse plain text with mention syntax and load into editor
  *
  * Converts plain text with mention patterns to EditorState:
- * - {variable_name} → VariableMentionNode
- * - @media_name → MediaMentionNode
+ * - @{text:name} → Text VariableMentionNode
+ * - @{input:name} → Media VariableMentionNode
+ * - @{ref:name} → MediaMentionNode
  *
  * @param editor - Lexical editor instance
  * @param text - Plain text with mention syntax
@@ -136,37 +141,26 @@ export function loadFromPlainText(
     paragraphs.forEach((paragraphText) => {
       const paragraph = $createParagraphNode()
 
-      // Parse variables and media mentions
-      const variableRegex = /\{([a-zA-Z_][a-zA-Z0-9_]*)\}/g
-      const mediaRegex = /@([a-zA-Z_][a-zA-Z0-9_]*)/g
+      // Parse format: @{type:name}
+      const mentionRegex = /@\{(text|input|ref):([a-zA-Z_][a-zA-Z0-9_]*)\}/g
 
       const allMatches: Array<{
         index: number
         length: number
-        type: 'variable' | 'media'
+        type: 'text' | 'input' | 'ref'
         name: string
       }> = []
 
-      let match
-      while ((match = variableRegex.exec(paragraphText)) !== null) {
+      let match: RegExpExecArray | null
+
+      while ((match = mentionRegex.exec(paragraphText)) !== null) {
         allMatches.push({
           index: match.index,
           length: match[0].length,
-          type: 'variable',
-          name: match[1],
+          type: match[1] as 'text' | 'input' | 'ref',
+          name: match[2],
         })
       }
-
-      while ((match = mediaRegex.exec(paragraphText)) !== null) {
-        allMatches.push({
-          index: match.index,
-          length: match[0].length,
-          type: 'media',
-          name: match[1],
-        })
-      }
-
-      allMatches.sort((a, b) => a.index - b.index)
 
       let lastIndex = 0
       for (const matchItem of allMatches) {
@@ -176,8 +170,8 @@ export function loadFromPlainText(
           paragraph.append($createTextNode(textBefore))
         }
 
-        // Add mention node
-        if (matchItem.type === 'variable') {
+        // Add mention node based on type
+        if (matchItem.type === 'text' || matchItem.type === 'input') {
           const variable = variables.find((v) => v.name === matchItem.name)
           if (variable) {
             paragraph.append(
@@ -189,9 +183,11 @@ export function loadFromPlainText(
             )
           } else {
             // Variable not found, keep as text
-            paragraph.append($createTextNode(`{${matchItem.name}}`))
+            paragraph.append(
+              $createTextNode(`@{${matchItem.type}:${matchItem.name}}`),
+            )
           }
-        } else if (matchItem.type === 'media') {
+        } else if (matchItem.type === 'ref') {
           const mediaItem = media.find((m) => m.name === matchItem.name)
           if (mediaItem) {
             paragraph.append(
@@ -199,7 +195,7 @@ export function loadFromPlainText(
             )
           } else {
             // Media not found, keep as text
-            paragraph.append($createTextNode(`@${matchItem.name}`))
+            paragraph.append($createTextNode(`@{ref:${matchItem.name}}`))
           }
         }
 
@@ -216,23 +212,3 @@ export function loadFromPlainText(
   })
 }
 
-/**
- * Convert plain text format to JSON format
- *
- * Utility for migrating old storage format to new format.
- * Creates a temporary editor to parse plain text and serialize to JSON.
- *
- * @param text - Plain text with mention syntax
- * @param variables - Available variables for lookup
- * @param media - Available media for lookup
- * @returns JSON string representation
- */
-export function migrateTextToJSON(
-  editor: LexicalEditor,
-  text: string,
-  variables: VariableOption[],
-  media: MediaOption[],
-): string {
-  loadFromPlainText(editor, text, variables, media)
-  return serializeToJSON(editor)
-}

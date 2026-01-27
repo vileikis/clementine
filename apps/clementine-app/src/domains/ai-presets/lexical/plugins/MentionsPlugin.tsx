@@ -1,10 +1,10 @@
 /**
- * MentionsPlugin - Autocomplete for Variable and Media Mentions
+ * MentionsPlugin - Unified Autocomplete for All Mentions
  *
- * Provides typeahead autocomplete for @mentions using LexicalTypeaheadMenuPlugin.
- * Supports two trigger patterns:
- * - Variables: { triggers variable autocomplete
- * - Media: @ triggers media autocomplete
+ * Provides single typeahead autocomplete for @mentions.
+ * Shows variables and media together in one menu.
+ *
+ * Trigger: @ (shows all options)
  *
  * Features:
  * - Keyboard navigation (Arrow Up/Down, Enter, Escape)
@@ -42,25 +42,25 @@ export type MediaOption = {
   name: string
 }
 
-type MentionType = 'variable' | 'media'
+type MentionCategory = 'variable' | 'media'
 
 class MentionTypeaheadOption extends MenuOption {
   id: string
   name: string
-  type: MentionType
+  category: MentionCategory
   variableType?: 'text' | 'image'
 
   constructor(
     key: string,
     id: string,
     name: string,
-    type: MentionType,
+    category: MentionCategory,
     variableType?: 'text' | 'image',
   ) {
     super(key)
     this.id = id
     this.name = name
-    this.type = type
+    this.category = category
     this.variableType = variableType
   }
 }
@@ -86,20 +86,27 @@ function MentionMenuItem({
   setRef,
 }: MentionMenuItemProps) {
   // Color coding based on type
+  // Green = all media (reference media + media input variables)
+  // Blue = text variables
   const bgColor = isSelected ? 'bg-accent' : 'bg-background'
-  const iconColor =
-    option.type === 'media'
-      ? 'text-purple-600'
-      : option.variableType === 'text'
-        ? 'text-blue-600'
-        : 'text-green-600'
+
+  const isMediaType =
+    option.category === 'media' || option.variableType === 'image'
+  const iconColor = isMediaType ? 'text-green-600' : 'text-blue-600'
 
   const icon =
-    option.type === 'media'
+    option.category === 'media'
       ? '🖼️'
       : option.variableType === 'text'
         ? '📝'
-        : '🖼️'
+        : '📸'
+
+  const typeLabel =
+    option.category === 'media'
+      ? 'ref'
+      : option.variableType === 'text'
+        ? 'text'
+        : 'input'
 
   return (
     <li
@@ -113,211 +120,13 @@ function MentionMenuItem({
     >
       <span className={`text-lg ${iconColor}`}>{icon}</span>
       <span className="flex-1 font-medium">{option.name}</span>
-      {option.type === 'variable' && (
-        <span className="text-xs text-muted-foreground">
-          {option.variableType}
-        </span>
-      )}
+      <span className="text-xs text-muted-foreground">{typeLabel}</span>
     </li>
   )
 }
 
 // ============================================================================
-// Variable Mentions Plugin
-// ============================================================================
-
-interface VariableMentionsPluginProps {
-  variables: VariableOption[]
-}
-
-function VariableMentionsPlugin({ variables }: VariableMentionsPluginProps) {
-  const [editor] = useLexicalComposerContext()
-  const [queryString, setQueryString] = useState<string | null>(null)
-
-  // Trigger pattern: { followed by alphanumeric/underscore
-  const checkForVariableTrigger = useBasicTypeaheadTriggerMatch('{', {
-    minLength: 0,
-    maxLength: 50,
-  })
-
-  // Filter variables based on search query
-  const options = useMemo(() => {
-    if (!variables.length) return []
-
-    const search = queryString?.toLowerCase() || ''
-    return variables
-      .filter((v) => v.name.toLowerCase().includes(search))
-      .map(
-        (v) =>
-          new MentionTypeaheadOption(v.id, v.id, v.name, 'variable', v.type),
-      )
-  }, [queryString, variables])
-
-  const onSelectOption = useCallback(
-    (
-      selectedOption: MentionTypeaheadOption,
-      nodeToReplace: TextNode | null,
-      closeMenu: () => void,
-    ) => {
-      editor.update(() => {
-        const mentionNode = $createVariableMentionNode(
-          selectedOption.id,
-          selectedOption.name,
-          selectedOption.variableType!,
-        )
-
-        if (nodeToReplace) {
-          nodeToReplace.replace(mentionNode)
-        }
-
-        // Add space after mention
-        const spaceNode = $createTextNode(' ')
-        mentionNode.insertAfter(spaceNode)
-        spaceNode.select()
-
-        closeMenu()
-      })
-    },
-    [editor],
-  )
-
-  return (
-    <LexicalTypeaheadMenuPlugin<MentionTypeaheadOption>
-      onQueryChange={setQueryString}
-      onSelectOption={onSelectOption}
-      triggerFn={checkForVariableTrigger}
-      options={options}
-      menuRenderFn={(
-        anchorElementRef,
-        { selectedIndex, selectOptionAndCleanUp, setHighlightedIndex },
-      ) => {
-        if (!anchorElementRef.current || options.length === 0) {
-          return null
-        }
-
-        return createPortal(
-          <div className="typeahead-popover mentions-menu z-50 w-64 rounded-md border bg-popover p-1 shadow-md">
-            <ul role="listbox" aria-label="Variable suggestions">
-              {options.map((option, index) => (
-                <MentionMenuItem
-                  key={option.key}
-                  index={index}
-                  isSelected={selectedIndex === index}
-                  onClick={() => {
-                    setHighlightedIndex(index)
-                    selectOptionAndCleanUp(option)
-                  }}
-                  onMouseEnter={() => setHighlightedIndex(index)}
-                  option={option}
-                  setRef={option.setRefElement.bind(option)}
-                />
-              ))}
-            </ul>
-          </div>,
-          anchorElementRef.current,
-        )
-      }}
-    />
-  )
-}
-
-// ============================================================================
-// Media Mentions Plugin
-// ============================================================================
-
-interface MediaMentionsPluginProps {
-  media: MediaOption[]
-}
-
-function MediaMentionsPlugin({ media }: MediaMentionsPluginProps) {
-  const [editor] = useLexicalComposerContext()
-  const [queryString, setQueryString] = useState<string | null>(null)
-
-  // Trigger pattern: @ followed by alphanumeric/underscore
-  const checkForMediaTrigger = useBasicTypeaheadTriggerMatch('@', {
-    minLength: 0,
-    maxLength: 50,
-  })
-
-  // Filter media based on search query
-  const options = useMemo(() => {
-    if (!media.length) return []
-
-    const search = queryString?.toLowerCase() || ''
-    return media
-      .filter((m) => m.name.toLowerCase().includes(search))
-      .map((m) => new MentionTypeaheadOption(m.id, m.id, m.name, 'media'))
-  }, [queryString, media])
-
-  const onSelectOption = useCallback(
-    (
-      selectedOption: MentionTypeaheadOption,
-      nodeToReplace: TextNode | null,
-      closeMenu: () => void,
-    ) => {
-      editor.update(() => {
-        const mentionNode = $createMediaMentionNode(
-          selectedOption.id,
-          selectedOption.name,
-        )
-
-        if (nodeToReplace) {
-          nodeToReplace.replace(mentionNode)
-        }
-
-        // Add space after mention
-        const spaceNode = $createTextNode(' ')
-        mentionNode.insertAfter(spaceNode)
-        spaceNode.select()
-
-        closeMenu()
-      })
-    },
-    [editor],
-  )
-
-  return (
-    <LexicalTypeaheadMenuPlugin<MentionTypeaheadOption>
-      onQueryChange={setQueryString}
-      onSelectOption={onSelectOption}
-      triggerFn={checkForMediaTrigger}
-      options={options}
-      menuRenderFn={(
-        anchorElementRef,
-        { selectedIndex, selectOptionAndCleanUp, setHighlightedIndex },
-      ) => {
-        if (!anchorElementRef.current || options.length === 0) {
-          return null
-        }
-
-        return createPortal(
-          <div className="typeahead-popover mentions-menu z-50 w-64 rounded-md border bg-popover p-1 shadow-md">
-            <ul role="listbox" aria-label="Media suggestions">
-              {options.map((option, index) => (
-                <MentionMenuItem
-                  key={option.key}
-                  index={index}
-                  isSelected={selectedIndex === index}
-                  onClick={() => {
-                    setHighlightedIndex(index)
-                    selectOptionAndCleanUp(option)
-                  }}
-                  onMouseEnter={() => setHighlightedIndex(index)}
-                  option={option}
-                  setRef={option.setRefElement.bind(option)}
-                />
-              ))}
-            </ul>
-          </div>,
-          anchorElementRef.current,
-        )
-      }}
-    />
-  )
-}
-
-// ============================================================================
-// Combined Mentions Plugin
+// Unified Mentions Plugin
 // ============================================================================
 
 export interface MentionsPluginProps {
@@ -328,9 +137,9 @@ export interface MentionsPluginProps {
 /**
  * MentionsPlugin
  *
- * Combines variable and media autocomplete plugins.
- * - Variables triggered by {
- * - Media triggered by @
+ * Unified autocomplete for variables and media.
+ * - Triggered by @
+ * - Shows all options in one menu
  *
  * @example
  * ```tsx
@@ -341,10 +150,117 @@ export interface MentionsPluginProps {
  * ```
  */
 export function MentionsPlugin({ variables, media }: MentionsPluginProps) {
+  const [editor] = useLexicalComposerContext()
+  const [queryString, setQueryString] = useState<string | null>(null)
+
+  // Trigger pattern: @ followed by alphanumeric/underscore
+  const checkForTrigger = useBasicTypeaheadTriggerMatch('@', {
+    minLength: 0,
+    maxLength: 50,
+  })
+
+  // Combine and filter all options based on search query
+  const options = useMemo(() => {
+    const search = queryString?.toLowerCase() || ''
+
+    // Convert variables to options
+    const variableOptions = variables
+      .filter((v) => v.name.toLowerCase().includes(search))
+      .map(
+        (v) =>
+          new MentionTypeaheadOption(
+            `var-${v.id}`,
+            v.id,
+            v.name,
+            'variable',
+            v.type,
+          ),
+      )
+
+    // Convert media to options
+    const mediaOptions = media
+      .filter((m) => m.name.toLowerCase().includes(search))
+      .map(
+        (m) => new MentionTypeaheadOption(`media-${m.id}`, m.id, m.name, 'media'),
+      )
+
+    // Combine and sort: variables first, then media
+    return [...variableOptions, ...mediaOptions]
+  }, [queryString, variables, media])
+
+  const onSelectOption = useCallback(
+    (
+      selectedOption: MentionTypeaheadOption,
+      nodeToReplace: TextNode | null,
+      closeMenu: () => void,
+    ) => {
+      editor.update(() => {
+        let mentionNode
+
+        if (selectedOption.category === 'variable') {
+          mentionNode = $createVariableMentionNode(
+            selectedOption.id,
+            selectedOption.name,
+            selectedOption.variableType!,
+          )
+        } else {
+          mentionNode = $createMediaMentionNode(
+            selectedOption.id,
+            selectedOption.name,
+          )
+        }
+
+        if (nodeToReplace) {
+          nodeToReplace.replace(mentionNode)
+        }
+
+        // Add space after mention
+        const spaceNode = $createTextNode(' ')
+        mentionNode.insertAfter(spaceNode)
+        spaceNode.select()
+
+        closeMenu()
+      })
+    },
+    [editor],
+  )
+
   return (
-    <>
-      <VariableMentionsPlugin variables={variables} />
-      <MediaMentionsPlugin media={media} />
-    </>
+    <LexicalTypeaheadMenuPlugin<MentionTypeaheadOption>
+      onQueryChange={setQueryString}
+      onSelectOption={onSelectOption}
+      triggerFn={checkForTrigger}
+      options={options}
+      menuRenderFn={(
+        anchorElementRef,
+        { selectedIndex, selectOptionAndCleanUp, setHighlightedIndex },
+      ) => {
+        if (!anchorElementRef.current || options.length === 0) {
+          return null
+        }
+
+        return createPortal(
+          <div className="typeahead-popover mentions-menu z-50 w-64 rounded-md border bg-popover p-1 shadow-md">
+            <ul role="listbox" aria-label="Mentions">
+              {options.map((option, index) => (
+                <MentionMenuItem
+                  key={option.key}
+                  index={index}
+                  isSelected={selectedIndex === index}
+                  onClick={() => {
+                    setHighlightedIndex(index)
+                    selectOptionAndCleanUp(option)
+                  }}
+                  onMouseEnter={() => setHighlightedIndex(index)}
+                  option={option}
+                  setRef={option.setRefElement.bind(option)}
+                />
+              ))}
+            </ul>
+          </div>,
+          anchorElementRef.current,
+        )
+      }}
+    />
   )
 }

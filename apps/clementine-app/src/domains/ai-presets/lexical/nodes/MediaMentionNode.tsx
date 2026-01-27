@@ -1,11 +1,14 @@
 /**
- * MediaMentionNode - Custom TextNode for Media Mentions
+ * MediaMentionNode - Custom TextNode for Reference Media Mentions
  *
  * Extends TextNode (not DecoratorNode) for proper text selection behavior.
- * Renders media mentions as colored pills inline in the text.
+ * Renders reference media mentions as colored pills inline in the text.
+ *
+ * Reference media = static media from preset's media registry
+ * Storage format: @{ref:media_name}
  *
  * Color coding:
- * - Media: Purple (#f3e5f5 background, #7b1fa2 text)
+ * - Media: Green (#e8f5e9 background, #2e7d32 text)
  *
  * Features:
  * - Atomic selection (select as a unit)
@@ -90,10 +93,10 @@ export class MediaMentionNode extends TextNode {
     const dom = super.createDOM(config)
     dom.className = 'media-mention'
 
-    // Apply purple color coding for media
+    // Apply green color coding for reference media
     dom.style.cssText = `
-      background-color: #f3e5f5;
-      color: #7b1fa2;
+      background-color: #e8f5e9;
+      color: #2e7d32;
       border-radius: 4px;
       padding: 2px 6px;
       font-family: monospace;

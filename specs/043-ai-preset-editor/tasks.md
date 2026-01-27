@@ -289,12 +289,13 @@
   - Keep same auto-save behavior (debounced updates to draft)
   - Maintain same external API (props and behavior unchanged)
 - [x] T075 [P] Create barrel exports for lexical subdomain in `apps/clementine-app/src/domains/ai-presets/lexical/index.ts`
-- [ ] T076 Test migration thoroughly:
+- [x] T076 Test migration thoroughly:
   - Verify @mention autocomplete works (both variables and media)
   - Test smart paste (@name text conversion)
   - Test click-to-remove on pills
   - Verify serialization (reload page, check persistence)
   - Test keyboard navigation and accessibility
+  - User tested and confirmed working with concerns addressed
 
 **Checkpoint**: PromptTemplateEditor now uses Lexical with all enhanced features (icons, click-to-remove, smart paste). Ready to reuse in ValueMappingsEditor. Research foundation documented in `lexical_research.md`.
 

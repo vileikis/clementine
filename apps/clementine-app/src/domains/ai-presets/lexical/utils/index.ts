@@ -8,5 +8,4 @@ export {
   loadFromJSON,
   serializeToPlainText,
   loadFromPlainText,
-  migrateTextToJSON,
 } from './serialization'

@@ -36,7 +36,6 @@ import {
   VariableMentionNode,
   loadFromJSON,
   loadFromPlainText,
-  serializeToJSON,
   serializeToPlainText,
   type MediaOption,
   type VariableOption,
@@ -161,32 +160,34 @@ export function PromptTemplateEditor({
       editorRef.current = editor
     }
 
-    // Serialize to JSON for storage
-    const json = serializeToJSON(editor)
-    setCurrentValue(json)
-
-    // Update character count (plain text length)
+    // Serialize to plain text for storage (human-readable, cloud function friendly)
+    // Format: @{text:name}, @{input:name}, @{ref:name}
     const plainText = serializeToPlainText(editorState)
+    setCurrentValue(plainText)
+
+    // Update character count
     setCharacterCount(plainText.length)
   }
 
   /**
    * Initialize editor content from stored value
-   * Handles both JSON (new format) and plain text (old format)
+   * Handles both plain text (new format) and JSON (legacy format)
    */
   const handleEditorInit = (editor: LexicalEditor) => {
     editorRef.current = editor
 
     if (!value) return
 
-    // Try to load as JSON first (new format)
-    const isJSON = value.trim().startsWith('{')
+    // Check if value is JSON (legacy Lexical EditorState format)
+    const isJSON = value.trim().startsWith('{') && value.includes('"type":"root"')
     if (isJSON) {
+      // Legacy format: Full Lexical EditorState JSON
       const success = loadFromJSON(editor, value)
       if (success) return
     }
 
-    // Fallback: Load as plain text (old format)
+    // New format: Plain text with @{type:name} mentions
+    // Also supports legacy formats: {name} and @name
     loadFromPlainText(editor, value, variableOptions, mediaOptions)
   }
 
@@ -205,8 +206,8 @@ export function PromptTemplateEditor({
             }
             placeholder={
               <div className="pointer-events-none absolute left-3 top-3 text-sm text-muted-foreground">
-                Write your prompt template here. Type { '{' } to mention
-                variables or @ to mention media.
+                Write your prompt template here. Type @ to mention variables or
+                media.
               </div>
             }
             ErrorBoundary={LexicalErrorBoundary}
@@ -230,8 +231,8 @@ export function PromptTemplateEditor({
 
       {/* Help text */}
       <div id="editor-help-text" className="sr-only">
-        Use curly brace to mention variables or @ to mention media. Press
-        escape to close autocomplete. Arrow keys to navigate suggestions.
+        Type @ to mention variables or media. Press escape to close
+        autocomplete. Arrow keys to navigate suggestions.
       </div>
     </div>
   )

@@ -79,7 +79,7 @@ export class VariableMentionNode extends TextNode {
     text?: string,
     key?: NodeKey,
   ) {
-    super(text ?? `{${variableName}}`, key)
+    super(text ?? `@${variableName}`, key)
     this.__variableId = variableId
     this.__variableName = variableName
     this.__variableType = variableType
@@ -171,7 +171,7 @@ export function $createVariableMentionNode(
     variableId,
     variableName,
     variableType,
-    `{${variableName}}`,
+    `@${variableName}`,
   )
   // Make mention atomic (select as a unit) and bidirectional
   node.setMode('segmented').toggleDirectionless()
