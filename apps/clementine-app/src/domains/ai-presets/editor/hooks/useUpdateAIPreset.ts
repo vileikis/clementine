@@ -3,9 +3,19 @@
  *
  * Mutation hook for updating AI preset fields.
  * Supports partial updates with save tracking via useTrackedMutation.
+ *
+ * Draft/Published Model (Phase 5.5):
+ * - Top-level fields (name, description) are written directly to preset
+ * - Draft config fields are written to preset.draft.* using dot notation
+ * - draftVersion is incremented on each update that includes draft changes
  */
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { doc, runTransaction, serverTimestamp } from 'firebase/firestore'
+import {
+  doc,
+  increment,
+  runTransaction,
+  serverTimestamp,
+} from 'firebase/firestore'
 import * as Sentry from '@sentry/tanstackstart-react'
 import { updateAIPresetInputSchema } from '../schemas/ai-preset-editor.schemas'
 import { useAIPresetEditorStore } from '../stores/useAIPresetEditorStore'
@@ -20,6 +30,11 @@ import { firestore } from '@/integrations/firebase/client'
  * Uses transaction with serverTimestamp to prevent Zod parse errors.
  * Automatically tracks save state via useTrackedMutation.
  *
+ * Draft/Published Workflow:
+ * - Draft config fields (model, aspectRatio, etc.) are written to preset.draft.*
+ * - Top-level fields (name, description) remain at preset root
+ * - draftVersion is incremented when draft fields are updated
+ *
  * @param workspaceId - Workspace ID for the preset collection
  * @param presetId - AI preset ID to update
  * @returns Mutation result with presetId on success
@@ -28,13 +43,15 @@ import { firestore } from '@/integrations/firebase/client'
  * ```tsx
  * const updatePreset = useUpdateAIPreset(workspaceId, presetId)
  *
- * // Update name
+ * // Update name (top-level)
  * updatePreset.mutate({ name: 'New Name' })
  *
- * // Update multiple fields
+ * // Update draft config fields
  * updatePreset.mutate({
- *   model: 'gemini-2.5-pro',
- *   aspectRatio: '16:9',
+ *   draft: {
+ *     model: 'gemini-2.5-pro',
+ *     aspectRatio: '16:9',
+ *   }
  * })
  * ```
  */
@@ -59,11 +76,44 @@ export function useUpdateAIPreset(workspaceId: string, presetId: string) {
           throw new Error(`Preset ${presetId} not found`)
         }
 
-        // Update only the provided fields plus timestamp
-        transaction.update(presetRef, {
-          ...validated,
+        // Build update object
+         
+        const updates: Record<string, any> = {
           updatedAt: serverTimestamp(),
-        })
+        }
+
+        // Add top-level fields
+        if (validated.name !== undefined) {
+          updates.name = validated.name
+        }
+        if (validated.description !== undefined) {
+          updates.description = validated.description
+        }
+
+        // Add draft config fields using dot notation
+        if (validated.draft) {
+          const { draft } = validated
+          if (draft.model !== undefined) {
+            updates['draft.model'] = draft.model
+          }
+          if (draft.aspectRatio !== undefined) {
+            updates['draft.aspectRatio'] = draft.aspectRatio
+          }
+          if (draft.mediaRegistry !== undefined) {
+            updates['draft.mediaRegistry'] = draft.mediaRegistry
+          }
+          if (draft.variables !== undefined) {
+            updates['draft.variables'] = draft.variables
+          }
+          if (draft.promptTemplate !== undefined) {
+            updates['draft.promptTemplate'] = draft.promptTemplate
+          }
+
+          // Increment draftVersion when draft fields are updated
+          updates.draftVersion = increment(1)
+        }
+
+        transaction.update(presetRef, updates)
 
         return { presetId }
       })

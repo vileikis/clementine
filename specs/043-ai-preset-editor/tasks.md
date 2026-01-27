@@ -116,8 +116,8 @@
 
 ### Part A: Schema Changes
 
-- [ ] T050 Create `aiPresetConfigSchema` in `packages/shared/src/schemas/ai-preset/ai-preset-config.schema.ts` containing: `model`, `aspectRatio`, `mediaRegistry`, `variables`, `promptTemplate`
-- [ ] T051 Update `aiPresetSchema` in `packages/shared/src/schemas/ai-preset/ai-preset.schema.ts`:
+- [x] T050 Create `aiPresetConfigSchema` in `packages/shared/src/schemas/ai-preset/ai-preset-config.schema.ts` containing: `model`, `aspectRatio`, `mediaRegistry`, `variables`, `promptTemplate`
+- [x] T051 Update `aiPresetSchema` in `packages/shared/src/schemas/ai-preset/ai-preset.schema.ts`:
   - Add `draft: aiPresetConfigSchema` field
   - Add `published: aiPresetConfigSchema.nullable().default(null)` field
   - Add `draftVersion: z.number().default(1)` field
@@ -125,41 +125,41 @@
   - Add `publishedAt: z.number().nullable().default(null)` field
   - Add `publishedBy: z.string().nullable().default(null)` field
   - Remove top-level `model`, `aspectRatio`, `mediaRegistry`, `variables`, `promptTemplate` (moved to config)
-- [ ] T052 Update barrel exports in `packages/shared/src/schemas/ai-preset/index.ts`
-- [ ] T053 Run `pnpm --filter @clementine/shared build` to verify schema compiles
+- [x] T052 Update barrel exports in `packages/shared/src/schemas/ai-preset/index.ts`
+- [x] T053 Run `pnpm --filter @clementine/shared build` to verify schema compiles
 
 ### Part B: Hook Updates
 
-- [ ] T054 Update `useUpdateAIPreset` hook to write to `draft` field and increment `draftVersion`
-- [ ] T055 Create `usePublishAIPreset` hook in `apps/clementine-app/src/domains/ai-presets/editor/hooks/usePublishAIPreset.ts`:
+- [x] T054 Update `useUpdateAIPreset` hook to write to `draft` field and increment `draftVersion`
+- [x] T055 Create `usePublishAIPreset` hook in `apps/clementine-app/src/domains/ai-presets/editor/hooks/usePublishAIPreset.ts`:
   - Copies `draft` → `published`
   - Sets `publishedVersion` = `draftVersion`
   - Sets `publishedAt` = serverTimestamp
   - Sets `publishedBy` = current user UID
-- [ ] T056 Update `useAIPreset` hook to return both draft and published data
-- [ ] T057 Update barrel exports for new hooks
+- [x] T056 Update `useAIPreset` hook to return both draft and published data
+- [x] T057 Update barrel exports for new hooks
 
 ### Part C: Layout Refactor (Follow Experience Pattern)
 
-- [ ] T058 Create `AIPresetEditorContent` container in `apps/clementine-app/src/domains/ai-presets/editor/containers/AIPresetEditorContent.tsx`:
+- [x] T058 Create `AIPresetEditorContent` container in `apps/clementine-app/src/domains/ai-presets/editor/containers/AIPresetEditorContent.tsx`:
   - Move two-column layout from AIPresetEditorLayout
   - Move all section handlers (model, aspect ratio, media, variables, prompt)
   - Receives `draft` config as prop, calls update handlers
-- [ ] T059 Refactor `AIPresetEditorLayout` container:
+- [x] T059 Refactor `AIPresetEditorLayout` container:
   - Keep TopNavBar with breadcrumbs
   - Add `EditorChangesBadge` (draftVersion vs publishedVersion)
   - Replace Save button with Publish button
   - Add publish handler with validation
   - Render `AIPresetEditorContent` as child
-- [ ] T060 Update `AIPresetEditorPage` to pass draft/published data to layout
-- [ ] T061 Update barrel exports for refactored containers
+- [x] T060 Update `AIPresetEditorPage` to pass draft/published data to layout
+- [x] T061 Update barrel exports for refactored containers
 
 ### Part D: UI Updates
 
-- [ ] T062 Update all editor sections to read from `preset.draft.*` instead of `preset.*`
-- [ ] T063 Add unpublished changes detection (draftVersion > publishedVersion)
-- [ ] T064 Add publish confirmation toast on success
-- [ ] T065 Add validation error display on publish failure (if draft is invalid)
+- [x] T062 Update all editor sections to read from `preset.draft.*` instead of `preset.*`
+- [x] T063 Add unpublished changes detection (draftVersion > publishedVersion)
+- [x] T064 Add publish confirmation toast on success
+- [x] T065 Add validation error display on publish failure (if draft is invalid)
 
 **Checkpoint**: After this phase:
 - Editor auto-saves to draft (no data loss on browser close)

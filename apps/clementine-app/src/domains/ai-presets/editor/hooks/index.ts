@@ -5,4 +5,5 @@
  */
 
 export { useAIPreset } from './useAIPreset'
+export { usePublishAIPreset } from './usePublishAIPreset'
 export { useUpdateAIPreset } from './useUpdateAIPreset'
