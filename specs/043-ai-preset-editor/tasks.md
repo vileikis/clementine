@@ -169,20 +169,31 @@
 
 ---
 
-## Phase 6: User Story 4 - Define Variables (Priority: P4)
+## Phase 6: User Story 4 - Define Variables (Priority: P4) ✅
 
-**Goal**: Users can create, edit, and delete variables (text and image types) with collapsible cards.
+**Goal**: Users can create, edit, and delete variables (text and image types) with inline editing and drag-and-drop reordering.
 
-**Independent Test**: Create a text variable with name/label/required, create an image variable, verify both appear in the list with correct configuration, edit and delete them.
+**Independent Test**: Create a text variable with name, create an image variable, verify both appear in the list with correct configuration, edit names inline, reorder via drag-and-drop, and delete them.
 
 ### Implementation for User Story 4
 
-- [ ] T026 [P] [US4] Add CreateVariableInput and UpdateVariableInput schemas in `apps/clementine-app/src/domains/ai-presets/editor/schemas/ai-preset-editor.schemas.ts`
-- [ ] T027 [P] [US4] Create VariableEditor component (form for editing variable properties) in `apps/clementine-app/src/domains/ai-presets/editor/components/VariableEditor.tsx`
-- [ ] T028 [US4] Create VariableCard component (collapsible card showing @name, type badge, label) in `apps/clementine-app/src/domains/ai-presets/editor/components/VariableCard.tsx`
-- [ ] T029 [US4] Create VariablesSection component (list of VariableCards + add button) in `apps/clementine-app/src/domains/ai-presets/editor/components/VariablesSection.tsx`
-- [ ] T030 [US4] Integrate VariablesSection into AIPresetEditorLayout left panel
-- [ ] T031 [US4] Update barrel exports for US4 components
+- [x] T026 [P] [US4] Add CreateVariableInput and UpdateVariableInput schemas in `apps/clementine-app/src/domains/ai-presets/editor/schemas/ai-preset-editor.schemas.ts`
+- [x] T027 [P] [US4] ~~Create VariableEditor component~~ **SKIPPED** - Replaced with inline editing pattern
+- [x] T028 [US4] Create VariableCard component (draggable card with inline name editing, color-coded by type) in `apps/clementine-app/src/domains/ai-presets/editor/components/VariableCard.tsx`
+- [x] T029 [US4] Create VariablesSection component (drag-and-drop list + header with add dropdown) in `apps/clementine-app/src/domains/ai-presets/editor/components/VariablesSection.tsx`
+- [x] T030 [US4] Integrate VariablesSection into AIPresetEditorContent
+- [x] T031 [US4] Update barrel exports for US4 components
+- [x] T032 [US4] Create useUpdateVariables hook in `apps/clementine-app/src/domains/ai-presets/editor/hooks/useUpdateVariables.ts`
+
+**Implementation Notes**:
+- **Schema Enhancement**: Added `id: string` field to `textVariableSchema` and `imageVariableSchema` in shared package for stable references across name changes
+- **Inline Editing**: Dropped VariableEditor component in favor of inline editing pattern (similar to AIPresetNameBadge) - click name to edit, Enter to save, Escape to cancel
+- **Color Coding**: Variables are color-coded by type - Text (info/blue), Image (success/green) - applied to both icon and name
+- **Drag-and-Drop**: Full reordering support using @dnd-kit (same pattern as StepList)
+- **Add Variable Menu**: Plus icon button in header opens ContextDropdownMenu with "Text" and "Image" options (with tooltip "Add Variable")
+- **UI Pattern**: Simple list with bottom borders (not rounded cards), hover effects on name area only (bg change + pencil icon)
+- **Settings Button**: Placeholder for future dialog with default value and value mappings (Phase 7)
+- **Auto-generated Names**: Creates unique default names (text_var, image_var, etc.) when adding variables
 
 **Checkpoint**: At this point, User Stories 1-4 should all work independently.
 
@@ -198,8 +209,10 @@
 
 - [ ] T032 [P] [US5] Add AddValueMappingInput schema in `apps/clementine-app/src/domains/ai-presets/editor/schemas/ai-preset-editor.schemas.ts`
 - [ ] T033 [US5] Create ValueMappingsEditor component (table of mappings with add/remove) in `apps/clementine-app/src/domains/ai-presets/editor/components/ValueMappingsEditor.tsx`
-- [ ] T034 [US5] Integrate ValueMappingsEditor into VariableEditor for text type variables
+- [ ] T034 [US5] ~~Integrate ValueMappingsEditor into VariableEditor~~ Create settings dialog triggered by VariableCard settings button
 - [ ] T035 [US5] Update barrel exports for US5 component
+
+**Note**: Phase 6 implementation replaced VariableEditor with inline editing. Settings button in VariableCard will trigger a dialog for default value and value mappings.
 
 **Checkpoint**: At this point, User Stories 1-5 should all work independently.
 
