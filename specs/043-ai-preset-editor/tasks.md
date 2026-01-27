@@ -265,17 +265,20 @@
 
 **Approach**: Migrate with documentation verification (Lexical v0.39.0+)
 
+**Research Findings**: See `specs/043-ai-preset-editor/lexical_research.md` for comprehensive documentation. Key decision: Use **TextNode extension** (not DecoratorNode) for mentions to maintain proper text selection behavior and performance.
+
 ### Implementation for Phase 10
 
-- [ ] T066 [P] Research current Lexical documentation and best practices (v0.39.0+):
+- [x] T066 [P] Research current Lexical documentation and best practices (v0.39.0+):
   - Review official Lexical docs (https://lexical.dev)
   - Check mention plugin examples and APIs
   - Verify DecoratorNode patterns for custom pills
   - Document findings and API signatures
+  - **Research complete**: See `lexical_research.md` for comprehensive documentation
 - [ ] T067 [P] Install Lexical dependencies: `pnpm add lexical @lexical/react @lexical/utils --filter clementine-app`
 - [ ] T068 Create Lexical subdomain folder structure: `mkdir -p apps/clementine-app/src/domains/ai-presets/lexical/{nodes,plugins,utils}`
-- [ ] T069 [P] Create VariableMentionNode (DecoratorNode with blue pill, type icon, hover to close) in `apps/clementine-app/src/domains/ai-presets/lexical/nodes/VariableMentionNode.tsx`
-- [ ] T070 [P] Create MediaMentionNode (DecoratorNode with green pill, image icon, hover to close) in `apps/clementine-app/src/domains/ai-presets/lexical/nodes/MediaMentionNode.tsx`
+- [ ] T069 [P] Create VariableMentionNode (extends TextNode, blue pill for text/green for image variables) in `apps/clementine-app/src/domains/ai-presets/lexical/nodes/VariableMentionNode.tsx`
+- [ ] T070 [P] Create MediaMentionNode (extends TextNode, purple pill, image icon) in `apps/clementine-app/src/domains/ai-presets/lexical/nodes/MediaMentionNode.tsx`
 - [ ] T071 Create MentionsPlugin (autocomplete trigger on @, keyboard navigation, configurable filters) in `apps/clementine-app/src/domains/ai-presets/lexical/plugins/MentionsPlugin.tsx`
 - [ ] T072 [P] Create SmartPastePlugin (detect @name text in paste, convert to mention nodes) in `apps/clementine-app/src/domains/ai-presets/lexical/plugins/SmartPastePlugin.tsx`
 - [ ] T073 [P] Create serialization utilities (storage format ↔ Lexical EditorState) in `apps/clementine-app/src/domains/ai-presets/lexical/utils/serialization.ts`
@@ -293,7 +296,7 @@
   - Verify serialization (reload page, check persistence)
   - Test keyboard navigation and accessibility
 
-**Checkpoint**: PromptTemplateEditor now uses Lexical with all enhanced features (icons, click-to-remove, smart paste). Ready to reuse in ValueMappingsEditor.
+**Checkpoint**: PromptTemplateEditor now uses Lexical with all enhanced features (icons, click-to-remove, smart paste). Ready to reuse in ValueMappingsEditor. Research foundation documented in `lexical_research.md`.
 
 ---
 
