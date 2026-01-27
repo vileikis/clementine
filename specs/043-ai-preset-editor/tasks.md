@@ -253,7 +253,74 @@
 
 ---
 
-## Phase 10: Polish & Cross-Cutting Concerns
+## Phase 10: Migrate PromptTemplateEditor to Lexical (Priority: P8)
+
+**Goal**: Replace contentEditable-based PromptTemplateEditor with Lexical rich text editor to enable advanced mention features (icons, click-to-remove, smart paste) and prepare for ValueMappingsEditor reuse.
+
+**Why Lexical**:
+- React components for pills (vs HTML strings) enable rich interactions
+- Built-in paste handling for smart @mention detection
+- Plugin architecture makes mentions reusable across editors
+- Better accessibility, mobile support, and maintainability
+
+**Approach**: Migrate with documentation verification (Lexical v0.39.0+)
+
+### Implementation for Phase 10
+
+- [ ] T066 [P] Research current Lexical documentation and best practices (v0.39.0+):
+  - Review official Lexical docs (https://lexical.dev)
+  - Check mention plugin examples and APIs
+  - Verify DecoratorNode patterns for custom pills
+  - Document findings and API signatures
+- [ ] T067 [P] Install Lexical dependencies: `pnpm add lexical @lexical/react @lexical/utils --filter clementine-app`
+- [ ] T068 Create Lexical subdomain folder structure: `mkdir -p apps/clementine-app/src/domains/ai-presets/lexical/{nodes,plugins,utils}`
+- [ ] T069 [P] Create VariableMentionNode (DecoratorNode with blue pill, type icon, hover to close) in `apps/clementine-app/src/domains/ai-presets/lexical/nodes/VariableMentionNode.tsx`
+- [ ] T070 [P] Create MediaMentionNode (DecoratorNode with green pill, image icon, hover to close) in `apps/clementine-app/src/domains/ai-presets/lexical/nodes/MediaMentionNode.tsx`
+- [ ] T071 Create MentionsPlugin (autocomplete trigger on @, keyboard navigation, configurable filters) in `apps/clementine-app/src/domains/ai-presets/lexical/plugins/MentionsPlugin.tsx`
+- [ ] T072 [P] Create SmartPastePlugin (detect @name text in paste, convert to mention nodes) in `apps/clementine-app/src/domains/ai-presets/lexical/plugins/SmartPastePlugin.tsx`
+- [ ] T073 [P] Create serialization utilities (storage format ↔ Lexical EditorState) in `apps/clementine-app/src/domains/ai-presets/lexical/utils/serialization.ts`
+- [ ] T074 Refactor PromptTemplateEditor to use Lexical:
+  - Replace contentEditable with LexicalComposer
+  - Integrate MentionsPlugin with variables + media
+  - Add SmartPastePlugin for paste detection
+  - Keep same auto-save behavior (debounced updates to draft)
+  - Maintain same external API (props and behavior unchanged)
+- [ ] T075 [P] Create barrel exports for lexical subdomain in `apps/clementine-app/src/domains/ai-presets/lexical/index.ts`
+- [ ] T076 Test migration thoroughly:
+  - Verify @mention autocomplete works (both variables and media)
+  - Test smart paste (@name text conversion)
+  - Test click-to-remove on pills
+  - Verify serialization (reload page, check persistence)
+  - Test keyboard navigation and accessibility
+
+**Checkpoint**: PromptTemplateEditor now uses Lexical with all enhanced features (icons, click-to-remove, smart paste). Ready to reuse in ValueMappingsEditor.
+
+---
+
+## Phase 11: Add Lexical to ValueMappingsEditor (Priority: P9)
+
+**Goal**: Enable @mention autocomplete for media in value mapping prompt text (Phase 9.5 requirement missed in Phase 8).
+
+**Reuse**: Leverage shared Lexical infrastructure from Phase 10 with media-only configuration.
+
+### Implementation for Phase 11
+
+- [ ] T077 Integrate Lexical into ValueMappingsEditor component:
+  - Replace textarea for "Prompt Text" column with Lexical editor
+  - Use MentionsPlugin with `allowVariables={false}` and `allowMedia={true}`
+  - Keep same grid layout and UX
+  - Auto-save mappings on change
+- [ ] T078 Test ValueMappingsEditor with Lexical:
+  - Verify @mention autocomplete shows only media (no variables)
+  - Test smart paste for media mentions
+  - Verify serialization and persistence
+  - Test within VariableSettingsDialog workflow
+
+**Checkpoint**: Value mappings support @media mentions. All mention functionality now consistent across editors.
+
+---
+
+## Phase 12: Polish & Cross-Cutting Concerns
 
 **Purpose**: Improvements that affect multiple user stories
 
@@ -280,7 +347,14 @@
   - Layout refactor following Experience pattern
 - **User Stories (Phase 6-9)**: Depend on Phase 5.5 completion
   - Must work with new draft/published model
-- **Polish (Phase 10)**: Depends on all user stories being complete
+- **Lexical Migration (Phase 10)**: Can start after Phase 8 (PromptTemplateEditor exists)
+  - Creates reusable Lexical infrastructure
+  - Enhances PromptTemplateEditor with advanced features
+  - BLOCKS Phase 11 (ValueMappingsEditor needs shared Lexical plugins)
+- **ValueMappingsEditor Lexical (Phase 11)**: Depends on Phase 10 completion
+  - Reuses Lexical infrastructure from Phase 10
+  - Completes Phase 9.5 requirement (media mentions in value mappings)
+- **Polish (Phase 12)**: Depends on all user stories and Lexical migration being complete
 
 ### User Story Dependencies
 
@@ -346,7 +420,9 @@ Task: "Integrate MediaRegistrySection into layout..."
 7. Add User Story 5 → Test independently → Value mappings work
 8. Add User Story 6 → Test independently → Prompt editor works
 9. Add User Story 7 → Test independently → Publish workflow works
-10. Polish phase for production readiness
+10. **Complete Phase 10 → Lexical migration → Enhanced mention features**
+11. **Complete Phase 11 → ValueMappingsEditor Lexical → Media mentions in mappings**
+12. Polish phase for production readiness
 
 ### Suggested MVP Scope
 
@@ -372,3 +448,9 @@ Task: "Integrate MediaRegistrySection into layout..."
   - Experiences reference the `published` field
   - Schema uses nested `AIPresetConfig` (consistent with `ExperienceConfig`)
   - Layout split: `AIPresetEditorLayout` (TopNavBar + publish) → `AIPresetEditorContent` (editor sections)
+- **Lexical Migration** (Phase 10-11):
+  - Replaces contentEditable with Lexical rich text editor
+  - Enables advanced mention features (icons, click-to-remove, smart paste)
+  - Creates reusable mention infrastructure in `domains/ai-presets/lexical/`
+  - Shared between PromptTemplateEditor and ValueMappingsEditor
+  - Migration includes documentation verification for latest Lexical APIs (v0.39.0+)
