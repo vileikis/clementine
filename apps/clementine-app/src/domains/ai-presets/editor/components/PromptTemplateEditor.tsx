@@ -5,10 +5,10 @@
  * Uses contentEditable for custom @mention rendering as colored pills.
  *
  * Features:
- * - Detects @ character and shows autocomplete
+ * - Position-aware autocomplete (shows when cursor is after @)
  * - Renders @mentions as visual pills (blue for variables, green for media)
  * - Serializes to storage format: @{var:name} or @{media:name}
- * - Handles backspace/delete on pill boundaries
+ * - Preserves cursor position during auto-save
  * - Auto-saves changes to draft
  */
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -89,7 +89,7 @@ export function PromptTemplateEditor({
   }, [debouncedValue, value, disabled, updateMutation.mutate])
 
   /**
-   * Parse storage format and render as HTML with pills
+   * Parse storage format and render as HTML with pills (no icons)
    * Format: @{var:name} → <span data-mention-type="variable" data-mention-name="name">@name</span>
    */
   const parseToHTML = useCallback((text: string): string => {
@@ -101,9 +101,8 @@ export function PromptTemplateEditor({
         const colorClass = isVariable
           ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200'
           : 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200'
-        const iconSvg = `<svg class="inline-block h-3 w-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isVariable ? 'M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z' : 'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z'}"></path></svg>`
 
-        return `<span class="inline-flex items-center rounded px-1.5 py-0.5 text-sm font-medium ${colorClass}" contenteditable="false" data-mention-type="${type}" data-mention-name="${name}">${iconSvg}@${name}</span>`
+        return `<span class="inline-flex items-center rounded px-1.5 py-0.5 text-sm font-medium ${colorClass}" contenteditable="false" data-mention-type="${type}" data-mention-name="${name}">@${name}</span>`
       },
     )
   }, [])
@@ -129,35 +128,50 @@ export function PromptTemplateEditor({
     return tempDiv.textContent || ''
   }, [])
 
-  // Initialize editor content
+  // Initialize editor content (only update when not actively editing)
   useEffect(() => {
-    if (
-      editorRef.current &&
-      editorRef.current.innerHTML !== parseToHTML(value)
-    ) {
-      editorRef.current.innerHTML = parseToHTML(value)
-    }
-  }, [value, parseToHTML])
-
-  /**
-   * Detect @ character and show autocomplete
-   */
-  const handleInput = useCallback(() => {
     if (!editorRef.current) return
 
-    const html = editorRef.current.innerHTML
-    const text = serializeToText(html)
-    setCurrentValue(text)
+    // Don't update if user is actively editing (has focus)
+    // This prevents cursor reset when typing and auto-save completes
+    if (document.activeElement === editorRef.current) {
+      return
+    }
 
-    // Get cursor position
+    // Get current serialized content
+    const currentHtml = editorRef.current.innerHTML
+    const currentText = serializeToText(currentHtml)
+
+    // Only update if the incoming value is different from what we have
+    // This handles external changes (e.g., same preset open in another tab)
+    if (currentText !== value) {
+      editorRef.current.innerHTML = parseToHTML(value)
+    }
+  }, [value, parseToHTML, serializeToText])
+
+  /**
+   * Check cursor position and update autocomplete state
+   * Called on input, click, and keyup to handle all cursor movements
+   */
+  const updateAutocompleteFromCursor = useCallback(() => {
+    if (!editorRef.current) return
+
     const selection = window.getSelection()
-    if (!selection || selection.rangeCount === 0) return
+    if (!selection || selection.rangeCount === 0) {
+      setShowAutocomplete(false)
+      return
+    }
 
     const range = selection.getRangeAt(0)
-    const textBeforeCursor =
-      range.startContainer.textContent?.slice(0, range.startOffset) || ''
 
-    // Check if @ was just typed
+    // Get text before cursor (handle text nodes properly)
+    let textBeforeCursor = ''
+    const node = range.startContainer
+    if (node.nodeType === Node.TEXT_NODE) {
+      textBeforeCursor = node.textContent?.slice(0, range.startOffset) || ''
+    }
+
+    // Check if we're in @mention context
     const atMatch = textBeforeCursor.match(/@([a-zA-Z0-9_]*)$/)
     if (atMatch) {
       const query = atMatch[1]
@@ -174,7 +188,38 @@ export function PromptTemplateEditor({
     } else {
       setShowAutocomplete(false)
     }
-  }, [serializeToText])
+  }, [])
+
+  /**
+   * Handle input events (typing)
+   */
+  const handleInput = useCallback(() => {
+    if (!editorRef.current) return
+
+    const html = editorRef.current.innerHTML
+    const text = serializeToText(html)
+    setCurrentValue(text)
+
+    // Update autocomplete based on cursor position
+    updateAutocompleteFromCursor()
+  }, [serializeToText, updateAutocompleteFromCursor])
+
+  /**
+   * Handle cursor position changes (arrow keys, clicks)
+   */
+  const handleCursorMove = useCallback(() => {
+    updateAutocompleteFromCursor()
+  }, [updateAutocompleteFromCursor])
+
+  /**
+   * Handle blur - close autocomplete when editor loses focus
+   */
+  const handleBlur = useCallback(() => {
+    // Small delay to allow clicking on autocomplete items
+    setTimeout(() => {
+      setShowAutocomplete(false)
+    }, 150)
+  }, [])
 
   /**
    * Insert mention pill at cursor position
@@ -247,6 +292,9 @@ export function PromptTemplateEditor({
         contentEditable={!disabled}
         onInput={handleInput}
         onPaste={handlePaste}
+        onClick={handleCursorMove}
+        onKeyUp={handleCursorMove}
+        onBlur={handleBlur}
         className="min-h-[200px] rounded-md border bg-background p-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
         data-placeholder="Write your prompt template here. Type @ to mention variables or media."
         style={{

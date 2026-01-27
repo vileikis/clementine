@@ -12,7 +12,7 @@
  * - Positioned at cursor location
  */
 import { useEffect, useRef, useState } from 'react'
-import { Image, Variable } from 'lucide-react'
+import { Image, Type } from 'lucide-react'
 import type { PresetMediaEntry, PresetVariable } from '@clementine/shared'
 
 export interface MentionSuggestion {
@@ -164,7 +164,7 @@ export function MentionAutocomplete({
     >
       {filteredSuggestions.map((suggestion, index) => {
         const isSelected = index === selectedIndex
-        const Icon = suggestion.type === 'variable' ? Variable : Image
+        const Icon = suggestion.type === 'variable' ? Type : Image
         const colorClass =
           suggestion.type === 'variable' ? 'text-blue-500' : 'text-green-500'
 
