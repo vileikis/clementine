@@ -1,18 +1,11 @@
 import { createFileRoute, notFound } from '@tanstack/react-router'
 import { doc, getDoc } from 'firebase/firestore'
-import { projectSchema, type Project } from '@clementine/shared'
+import { projectSchema } from '@clementine/shared'
 import { firestore } from '@/integrations/firebase/client'
 import { convertFirestoreDoc } from '@/shared/utils/firestore-utils'
 import { NotFound } from '@/shared/components/NotFound'
 import { ProjectConfigDesignerLayout } from '@/domains/project-config'
 import { useProject } from '@/domains/project'
-
-/**
- * Loader return type (explicit to avoid Zod looseObject type inference issues)
- */
-interface ProjectLoaderData {
-  project: Project
-}
 
 /**
  * Project layout route
@@ -26,7 +19,7 @@ interface ProjectLoaderData {
 export const Route = createFileRoute(
   '/workspace/$workspaceSlug/projects/$projectId',
 )({
-  loader: async ({ params }): Promise<ProjectLoaderData> => {
+  loader: async ({ params }) => {
     // Fetch project
     const projectRef = doc(firestore, 'projects', params.projectId)
     const projectDoc = await getDoc(projectRef)
@@ -46,7 +39,7 @@ export const Route = createFileRoute(
     // TODO: Validate project belongs to workspace (prevent cross-workspace access)
     // For now, skipping this check to simplify
 
-    return { project } as ProjectLoaderData
+    return { project } as { project: Record<string, {}> }
   },
   component: ProjectLayout,
   notFoundComponent: ProjectNotFound,
