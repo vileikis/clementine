@@ -275,20 +275,20 @@
   - Verify DecoratorNode patterns for custom pills
   - Document findings and API signatures
   - **Research complete**: See `lexical_research.md` for comprehensive documentation
-- [ ] T067 [P] Install Lexical dependencies: `pnpm add lexical @lexical/react @lexical/utils --filter clementine-app`
-- [ ] T068 Create Lexical subdomain folder structure: `mkdir -p apps/clementine-app/src/domains/ai-presets/lexical/{nodes,plugins,utils}`
-- [ ] T069 [P] Create VariableMentionNode (extends TextNode, blue pill for text/green for image variables) in `apps/clementine-app/src/domains/ai-presets/lexical/nodes/VariableMentionNode.tsx`
-- [ ] T070 [P] Create MediaMentionNode (extends TextNode, purple pill, image icon) in `apps/clementine-app/src/domains/ai-presets/lexical/nodes/MediaMentionNode.tsx`
-- [ ] T071 Create MentionsPlugin (autocomplete trigger on @, keyboard navigation, configurable filters) in `apps/clementine-app/src/domains/ai-presets/lexical/plugins/MentionsPlugin.tsx`
-- [ ] T072 [P] Create SmartPastePlugin (detect @name text in paste, convert to mention nodes) in `apps/clementine-app/src/domains/ai-presets/lexical/plugins/SmartPastePlugin.tsx`
-- [ ] T073 [P] Create serialization utilities (storage format ↔ Lexical EditorState) in `apps/clementine-app/src/domains/ai-presets/lexical/utils/serialization.ts`
-- [ ] T074 Refactor PromptTemplateEditor to use Lexical:
+- [x] T067 [P] Install Lexical dependencies: `pnpm add lexical @lexical/react @lexical/utils --filter clementine-app`
+- [x] T068 Create Lexical subdomain folder structure: `mkdir -p apps/clementine-app/src/domains/ai-presets/lexical/{nodes,plugins,utils}`
+- [x] T069 [P] Create VariableMentionNode (extends TextNode, blue pill for text/green for image variables) in `apps/clementine-app/src/domains/ai-presets/lexical/nodes/VariableMentionNode.tsx`
+- [x] T070 [P] Create MediaMentionNode (extends TextNode, purple pill, image icon) in `apps/clementine-app/src/domains/ai-presets/lexical/nodes/MediaMentionNode.tsx`
+- [x] T071 Create MentionsPlugin (autocomplete trigger on @, keyboard navigation, configurable filters) in `apps/clementine-app/src/domains/ai-presets/lexical/plugins/MentionsPlugin.tsx`
+- [x] T072 [P] Create SmartPastePlugin (detect @name text in paste, convert to mention nodes) in `apps/clementine-app/src/domains/ai-presets/lexical/plugins/SmartPastePlugin.tsx`
+- [x] T073 [P] Create serialization utilities (storage format ↔ Lexical EditorState) in `apps/clementine-app/src/domains/ai-presets/lexical/utils/serialization.ts`
+- [x] T074 Refactor PromptTemplateEditor to use Lexical:
   - Replace contentEditable with LexicalComposer
   - Integrate MentionsPlugin with variables + media
   - Add SmartPastePlugin for paste detection
   - Keep same auto-save behavior (debounced updates to draft)
   - Maintain same external API (props and behavior unchanged)
-- [ ] T075 [P] Create barrel exports for lexical subdomain in `apps/clementine-app/src/domains/ai-presets/lexical/index.ts`
+- [x] T075 [P] Create barrel exports for lexical subdomain in `apps/clementine-app/src/domains/ai-presets/lexical/index.ts`
 - [ ] T076 Test migration thoroughly:
   - Verify @mention autocomplete works (both variables and media)
   - Test smart paste (@name text conversion)
