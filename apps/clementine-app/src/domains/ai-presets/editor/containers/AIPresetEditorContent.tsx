@@ -11,6 +11,7 @@
  */
 import { MediaRegistrySection } from '../components/MediaRegistrySection'
 import { ModelSettingsSection } from '../components/ModelSettingsSection'
+import { VariablesSection } from '../components/VariablesSection'
 import type { AIPresetConfig } from '@clementine/shared'
 
 interface AIPresetEditorContentProps {
@@ -79,15 +80,14 @@ export function AIPresetEditorContent({
           />
         </section>
 
-        {/* Variables Section - placeholder for Phase 6 */}
-        <section>
-          <h2 className="mb-4 text-sm font-medium text-muted-foreground">
-            Variables
-          </h2>
-          <div className="text-sm text-muted-foreground">
-            Variables will be added in Phase 6.
-          </div>
-        </section>
+        {/* Variables Section */}
+
+        <VariablesSection
+          variables={draft.variables}
+          workspaceId={workspaceId}
+          presetId={presetId}
+          disabled={disabled}
+        />
       </div>
 
       {/* Right panel - Prompt Template */}

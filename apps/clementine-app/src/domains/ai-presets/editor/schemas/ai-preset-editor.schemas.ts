@@ -56,3 +56,59 @@ export const publishAIPresetInputSchema = z.object({
 })
 
 export type PublishAIPresetInput = z.infer<typeof publishAIPresetInputSchema>
+
+/**
+ * Create Variable Input Schema
+ *
+ * For creating a new variable (text or image type).
+ * Variable name must be unique within the preset.
+ */
+export const createVariableInputSchema = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('text'),
+    name: z
+      .string()
+      .min(1, 'Name is required')
+      .regex(
+        /^[a-zA-Z_][a-zA-Z0-9_]*$/,
+        'Name must start with a letter or underscore and contain only alphanumeric characters and underscores',
+      ),
+    defaultValue: z.string().nullable().default(null),
+    valueMap: z
+      .array(
+        z.object({
+          value: z.string().min(1, 'Value is required'),
+          text: z.string(),
+        }),
+      )
+      .nullable()
+      .default(null),
+  }),
+  z.object({
+    type: z.literal('image'),
+    name: z
+      .string()
+      .min(1, 'Name is required')
+      .regex(
+        /^[a-zA-Z_][a-zA-Z0-9_]*$/,
+        'Name must start with a letter or underscore and contain only alphanumeric characters and underscores',
+      ),
+  }),
+])
+
+export type CreateVariableInput = z.infer<typeof createVariableInputSchema>
+
+/**
+ * Update Variable Input Schema
+ *
+ * For updating an existing variable.
+ * Requires the original name to identify the variable to update.
+ */
+export const updateVariableInputSchema = z.object({
+  /** Original name to identify the variable */
+  originalName: z.string(),
+  /** Updated variable data */
+  variable: createVariableInputSchema,
+})
+
+export type UpdateVariableInput = z.infer<typeof updateVariableInputSchema>

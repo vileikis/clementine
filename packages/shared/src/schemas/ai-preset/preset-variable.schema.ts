@@ -25,6 +25,9 @@ export type ValueMappingEntry = z.infer<typeof valueMappingEntrySchema>
  * Used for text inputs from step answers or pass-through input
  */
 export const textVariableSchema = z.object({
+  /** Unique identifier for the variable (stable across name changes) */
+  id: z.string(),
+
   type: z.literal('text'),
 
   /** Variable name used in prompt (alphanumeric + underscore) */
@@ -47,6 +50,9 @@ export const textVariableSchema = z.object({
  * Used for image inputs from capture steps or node outputs
  */
 export const imageVariableSchema = z.object({
+  /** Unique identifier for the variable (stable across name changes) */
+  id: z.string(),
+
   type: z.literal('image'),
 
   /** Variable name used in prompt (alphanumeric + underscore) */
