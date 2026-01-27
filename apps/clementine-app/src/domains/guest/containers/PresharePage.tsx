@@ -26,7 +26,7 @@ import { useMarkExperienceComplete } from '../hooks'
 import { useInitSession } from '@/domains/session/shared'
 import { ExperienceRuntime } from '@/domains/experience/runtime'
 import { ThemeProvider, ThemedBackground } from '@/shared/theming'
-import { DEFAULT_THEME } from '@/domains/event/theme/constants'
+import { DEFAULT_THEME } from '@/domains/project-config/theme/constants'
 
 export interface PresharePageProps {
   /** Main session ID from URL query params (for linking) */
@@ -60,12 +60,11 @@ export interface PresharePageProps {
  */
 export function PresharePage({ mainSessionId }: PresharePageProps) {
   const navigate = useNavigate()
-  const { project, event, guest, experiences, experiencesLoading } =
-    useGuestContext()
+  const { project, guest, experiences, experiencesLoading } = useGuestContext()
   const markExperienceComplete = useMarkExperienceComplete()
 
-  // Get preshare config from event
-  const preshareConfig = event.publishedConfig?.experiences?.preshare
+  // Get preshare config from project
+  const preshareConfig = project.publishedConfig?.experiences?.preshare
   const preshareExperienceId = preshareConfig?.experienceId
 
   // Find preshare experience from loaded experiences
@@ -132,7 +131,6 @@ export function PresharePage({ mainSessionId }: PresharePageProps) {
   const sessionState = useInitSession({
     projectId: project.id,
     workspaceId: project.workspaceId,
-    eventId: event.id,
     experienceId: preshareExperienceId ?? '',
     initialSessionId: undefined,
     enabled:
@@ -144,8 +142,8 @@ export function PresharePage({ mainSessionId }: PresharePageProps) {
     // For now, we'll update the session after creation
   })
 
-  // Get theme from event config (with fallback to default)
-  const theme = event.publishedConfig?.theme ?? DEFAULT_THEME
+  // Get theme from project config (with fallback to default)
+  const theme = project.publishedConfig?.theme ?? DEFAULT_THEME
 
   // Handle error for runtime (logs but doesn't block)
   const handleRuntimeError = (error: Error) => {
