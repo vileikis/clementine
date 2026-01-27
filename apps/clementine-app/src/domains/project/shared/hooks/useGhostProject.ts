@@ -54,13 +54,18 @@ export function useGhostProject(workspaceId: string) {
         }
 
         // Create ghost project with required fields
+        // Note: Ghost projects don't need config fields - they're just containers for preview sessions
         const ghostProject: WithFieldValue<Project> = {
           id: ghostProjectId,
           name: 'Ghost Project', // System name, never displayed
           workspaceId,
           status: 'live' as const, // Always live so sessions can be created
           type: 'ghost' as const,
-          activeEventId: null,
+          draftConfig: null,
+          publishedConfig: null,
+          draftVersion: 1,
+          publishedVersion: null,
+          publishedAt: null,
           deletedAt: null,
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),

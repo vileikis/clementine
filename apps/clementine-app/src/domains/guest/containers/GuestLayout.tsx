@@ -5,27 +5,27 @@
  * only when ready. Uses TanStack Router's Outlet to render child routes.
  *
  * Two-phase loading:
- * - Phase 1: Auth, project/event validation, guest record (blocking)
+ * - Phase 1: Auth, project validation, guest record (blocking)
  * - Phase 2: Experiences (lazy-loaded after Phase 1)
  *
  * Responsibilities:
  * 1. Initialize authentication (anonymous sign-in if needed)
- * 2. Validate guest access (project, event, publish status)
+ * 2. Validate guest access (project existence and publish status)
  * 3. Initialize guest record (fetch or create)
  * 4. Lazy-load experiences after validation passes
  * 5. Render error/loading states
  * 6. Provide context to child routes when ready
  *
  * User Stories:
- * - US1: Guest Accesses Event via Shareable Link
- * - US3: Guest Encounters Invalid or Unavailable Event
+ * - US1: Guest Accesses Project via Shareable Link
+ * - US3: Guest Encounters Invalid or Unavailable Project
  */
 import { Outlet } from '@tanstack/react-router'
 
 import { ComingSoonPage, ErrorPage } from '../components'
 import { GuestProvider } from '../contexts'
 import { useGuestPageInit } from '../hooks/useGuestPageInit'
-import type { ProjectEventFull } from '@/domains/event/shared'
+import type { Project } from '@clementine/shared'
 import type { GuestContextValue } from '../contexts'
 import { useExperiencesByIds } from '@/domains/experience/shared'
 
@@ -39,7 +39,7 @@ export interface GuestLayoutProps {
  * Includes: main experiences, pregate experience, and preshare experience
  */
 function getAllExperienceIds(
-  publishedConfig: ProjectEventFull['publishedConfig'],
+  publishedConfig: Project['publishedConfig'],
 ): string[] {
   const ids: string[] = []
 
@@ -94,7 +94,7 @@ export function GuestLayout({ projectId }: GuestLayoutProps) {
   const isReady = baseState.status === 'ready'
   const workspaceId = isReady ? baseState.project.workspaceId : ''
   const enabledIds = isReady
-    ? getAllExperienceIds(baseState.event.publishedConfig)
+    ? getAllExperienceIds(baseState.project.publishedConfig)
     : []
 
   const experiencesQuery = useExperiencesByIds(workspaceId, enabledIds, {
@@ -108,22 +108,16 @@ export function GuestLayout({ projectId }: GuestLayoutProps) {
     )
   }
 
-  // Handle not-found state (project or event missing)
+  // Handle not-found state (project missing)
   if (baseState.status === 'not-found') {
-    const message =
-      baseState.reason === 'project'
-        ? "This project doesn't exist"
-        : "This event doesn't exist"
-    return <ErrorPage message={message} />
+    return <ErrorPage message="This project doesn't exist" />
   }
 
-  // Handle coming-soon state (no active event or not published)
+  // Handle coming-soon state (not published)
   if (baseState.status === 'coming-soon') {
-    const message =
-      baseState.reason === 'no-active-event'
-        ? "This experience isn't available yet. Check back soon!"
-        : 'This experience is being prepared. Check back soon!'
-    return <ComingSoonPage message={message} />
+    return (
+      <ComingSoonPage message="This experience is being prepared. Check back soon!" />
+    )
   }
 
   // Handle generic error
@@ -152,7 +146,6 @@ export function GuestLayout({ projectId }: GuestLayoutProps) {
   const contextValue: GuestContextValue = {
     user: baseState.user,
     project: baseState.project,
-    event: baseState.event,
     guest: baseState.guest,
     experiences: experiencesQuery.data ?? [],
     experiencesLoading: experiencesQuery.isLoading,

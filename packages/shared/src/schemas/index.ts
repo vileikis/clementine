@@ -14,10 +14,7 @@ export * from './job'
 // Experience domain
 export * from './experience'
 
-// Event domain
-export * from './event'
-
-// Project domain
+// Project domain (includes config schemas previously in event/)
 export * from './project'
 
 // Workspace domain

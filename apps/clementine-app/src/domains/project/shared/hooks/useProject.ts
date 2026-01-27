@@ -25,7 +25,7 @@ import { convertFirestoreDoc } from '@/shared/utils/firestore-utils'
  * @example
  * ```tsx
  * const { data: project, isLoading, error } = useProject(projectId)
- * const activeEventId = project?.activeEventId
+ * const theme = project?.draftConfig?.theme
  * ```
  */
 export function useProject(projectId: string) {

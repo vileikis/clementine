@@ -27,7 +27,7 @@ function createMockSnapshot(overrides: Partial<JobSnapshot> = {}): JobSnapshot {
       variableMappings: [],
       outputFormat: null,
     },
-    eventContext: {
+    projectContext: {
       overlay: null,
       applyOverlay: false,
       experienceRef: null,

@@ -43,14 +43,13 @@ export interface CreateSessionResult {
  *
  * @example
  * ```tsx
- * function PreviewModal({ experience, projectId, eventId, workspaceId }) {
+ * function PreviewModal({ experience, projectId, workspaceId }) {
  *   const createSession = useCreateSession()
  *
  *   useEffect(() => {
  *     createSession.mutateAsync({
  *       projectId,
  *       workspaceId,
- *       eventId,
  *       experienceId: experience.id,
  *       mode: 'preview',
  *       configSource: 'draft',
@@ -81,7 +80,6 @@ export function useCreateSession() {
           id: newRef.id,
           projectId: validated.projectId,
           workspaceId: validated.workspaceId,
-          eventId: validated.eventId,
           experienceId: validated.experienceId,
           mode: validated.mode,
           configSource: validated.configSource,

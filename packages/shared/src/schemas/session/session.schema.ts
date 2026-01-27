@@ -104,9 +104,6 @@ export const sessionSchema = z.looseObject({
   /** Workspace ID for cross-project analytics */
   workspaceId: z.string(),
 
-  /** Parent event ID (null for preview sessions) */
-  eventId: z.string().nullable(),
-
   /** Experience being executed */
   experienceId: z.string(),
 

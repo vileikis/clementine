@@ -33,8 +33,6 @@ export interface UseInitSessionOptions {
   projectId: string
   /** Workspace ID */
   workspaceId: string
-  /** Event ID */
-  eventId: string
   /** Experience ID */
   experienceId: string
   /** Initial session ID from URL (may be undefined) */
@@ -57,12 +55,11 @@ export interface UseInitSessionOptions {
  * @example
  * ```tsx
  * function ExperiencePage({ experienceId, sessionId }) {
- *   const { project, event } = useGuestContext()
+ *   const { project } = useGuestContext()
  *
  *   const sessionState = useInitSession({
  *     projectId: project.id,
  *     workspaceId: project.workspaceId,
- *     eventId: event.id,
  *     experienceId,
  *     initialSessionId: sessionId,
  *   })
@@ -78,7 +75,6 @@ export interface UseInitSessionOptions {
 export function useInitSession({
   projectId,
   workspaceId,
-  eventId,
   experienceId,
   initialSessionId,
   enabled = true,
@@ -125,7 +121,6 @@ export function useInitSession({
           const result = await createSession.mutateAsync({
             projectId,
             workspaceId,
-            eventId,
             experienceId,
             mode: 'guest',
             configSource: 'published',
@@ -151,7 +146,6 @@ export function useInitSession({
           const result = await createSession.mutateAsync({
             projectId,
             workspaceId,
-            eventId,
             experienceId,
             mode: 'guest',
             configSource: 'published',
@@ -177,7 +171,6 @@ export function useInitSession({
     session,
     projectId,
     workspaceId,
-    eventId,
     experienceId,
     createSession.mutateAsync,
   ])

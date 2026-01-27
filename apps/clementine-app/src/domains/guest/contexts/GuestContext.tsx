@@ -14,7 +14,7 @@ import { createContext, useContext } from 'react'
 import type { ReactNode } from 'react'
 import type { User } from 'firebase/auth'
 import type { Project } from '@clementine/shared'
-import type { ProjectEventFull } from '@/domains/event/shared'
+// Project now contains config directly (no separate event)
 import type { Experience } from '@/domains/experience/shared'
 import type { Guest } from '../schemas/guest.schema'
 
@@ -23,14 +23,15 @@ import type { Guest } from '../schemas/guest.schema'
  *
  * Contains all data needed by child routes after initialization is complete.
  * Experiences are lazy-loaded after the base state is ready.
+ *
+ * Note: Project now contains config directly (draftConfig, publishedConfig)
+ * instead of having a separate event document.
  */
 export interface GuestContextValue {
   /** Authenticated user (anonymous or admin) */
   user: User
-  /** Project being accessed */
+  /** Project being accessed (contains publishedConfig) */
   project: Project
-  /** Active event with published config */
-  event: ProjectEventFull
   /** Guest record for the current user */
   guest: Guest
   /** Full experience documents for enabled experiences (empty array while loading) */

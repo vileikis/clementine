@@ -12,3 +12,4 @@ node_modules/
 
 # Environment
 .env*
+credentials/

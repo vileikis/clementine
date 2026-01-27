@@ -6,7 +6,7 @@
  *
  * Handles:
  * 1. Anonymous authentication (auto sign-in if not authenticated)
- * 2. Guest validation (project, event existence and publish status)
+ * 2. Guest validation (project existence and publish status)
  * 3. Guest record initialization (fetch or create)
  *
  * Note: Experience loading is NOT handled here. GuestLayout fetches
@@ -15,8 +15,8 @@
  * Returns a discriminated union state that covers all possible states:
  * - loading: Still initializing
  * - auth-error: Failed to authenticate
- * - not-found: Project or event doesn't exist
- * - coming-soon: Event not yet published or no active event
+ * - not-found: Project doesn't exist
+ * - coming-soon: Project not yet published
  * - error: Generic error state
  * - ready: All data loaded and ready to render
  */
@@ -25,7 +25,6 @@ import { useGuestValidation } from './useGuestValidation'
 import { useInitGuest } from './useInitGuest'
 import type { Project } from '@clementine/shared'
 import type { User } from 'firebase/auth'
-import type { ProjectEventFull } from '@/domains/event/shared'
 import type { Guest } from '../schemas/guest.schema'
 import { useAnonymousSignIn, useAuth } from '@/domains/auth'
 
@@ -35,14 +34,13 @@ import { useAnonymousSignIn, useAuth } from '@/domains/auth'
 export type GuestPageInitState =
   | { status: 'loading' }
   | { status: 'auth-error'; message: string }
-  | { status: 'not-found'; reason: 'project' | 'event' }
-  | { status: 'coming-soon'; reason: 'no-active-event' | 'not-published' }
+  | { status: 'not-found'; reason: 'project' }
+  | { status: 'coming-soon'; reason: 'not-published' }
   | { status: 'error'; error: Error }
   | {
       status: 'ready'
       user: User
       project: Project
-      event: ProjectEventFull
       guest: Guest
     }
 
@@ -51,7 +49,7 @@ export type GuestPageInitState =
  *
  * Combines:
  * - useAuth() + useAnonymousSignIn() + auto-sign-in effect
- * - useGuestValidation(projectId) for project/event validation
+ * - useGuestValidation(projectId) for project validation
  * - useInitGuest(projectId) for guest record
  *
  * Note: Experience loading is handled separately by GuestLayout
@@ -91,7 +89,7 @@ export function useGuestPageInit(projectId: string): GuestPageInitState {
     }
   }, [authLoading, user, isSigningIn, signInAnonymously])
 
-  // Guest validation (project, event existence and publish status)
+  // Guest validation (project existence and publish status)
   const validation = useGuestValidation(projectId)
 
   // Guest record initialization (only runs once authenticated)
@@ -105,12 +103,12 @@ export function useGuestPageInit(projectId: string): GuestPageInitState {
     }
   }
 
-  // Handle not-found state (project or event missing)
+  // Handle not-found state (project missing)
   if (validation.status === 'not-found') {
     return { status: 'not-found', reason: validation.reason }
   }
 
-  // Handle coming-soon state (no active event or not published)
+  // Handle coming-soon state (not published)
   if (validation.status === 'coming-soon') {
     return { status: 'coming-soon', reason: validation.reason }
   }
@@ -140,7 +138,6 @@ export function useGuestPageInit(projectId: string): GuestPageInitState {
       status: 'ready',
       user,
       project: validation.project,
-      event: validation.event,
       guest: guestState.guest,
     }
   }
