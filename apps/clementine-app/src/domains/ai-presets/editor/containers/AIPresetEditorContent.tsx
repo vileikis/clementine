@@ -11,6 +11,7 @@
  */
 import { MediaRegistrySection } from '../components/MediaRegistrySection'
 import { ModelSettingsSection } from '../components/ModelSettingsSection'
+import { PromptTemplateEditor } from '../components/PromptTemplateEditor'
 import { VariablesSection } from '../components/VariablesSection'
 import type { AIPresetConfig } from '@clementine/shared'
 
@@ -96,9 +97,14 @@ export function AIPresetEditorContent({
           <h2 className="mb-4 text-sm font-medium text-muted-foreground">
             Prompt Template
           </h2>
-          <div className="text-sm text-muted-foreground">
-            Prompt template editor will be added in Phase 8.
-          </div>
+          <PromptTemplateEditor
+            value={draft.promptTemplate || ''}
+            variables={draft.variables}
+            media={draft.mediaRegistry}
+            workspaceId={workspaceId}
+            presetId={presetId}
+            disabled={disabled}
+          />
         </section>
       </div>
     </div>

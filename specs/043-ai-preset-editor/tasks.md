@@ -226,10 +226,10 @@
 
 ### Implementation for User Story 6
 
-- [ ] T036 [P] [US6] Create MentionAutocomplete component (dropdown with filtered suggestions, keyboard navigation) in `apps/clementine-app/src/domains/ai-presets/editor/components/MentionAutocomplete.tsx`
-- [ ] T037 [US6] Create PromptTemplateEditor component (contentEditable with @mention support, pill rendering) in `apps/clementine-app/src/domains/ai-presets/editor/components/PromptTemplateEditor.tsx`
-- [ ] T038 [US6] Integrate PromptTemplateEditor into AIPresetEditorLayout left panel
-- [ ] T039 [US6] Update barrel exports for US6 components
+- [x] T036 [P] [US6] Create MentionAutocomplete component (dropdown with filtered suggestions, keyboard navigation) in `apps/clementine-app/src/domains/ai-presets/editor/components/MentionAutocomplete.tsx`
+- [x] T037 [US6] Create PromptTemplateEditor component (contentEditable with @mention support, pill rendering) in `apps/clementine-app/src/domains/ai-presets/editor/components/PromptTemplateEditor.tsx`
+- [x] T038 [US6] Integrate PromptTemplateEditor into AIPresetEditorContent right panel
+- [x] T039 [US6] Update barrel exports for US6 components
 
 **Checkpoint**: At this point, User Stories 1-6 should all work independently.
 
@@ -245,9 +245,9 @@
 
 ### Implementation for User Story 7
 
-- [ ] T040 [US7] Verify Publish button is disabled when no unpublished changes (draftVersion === publishedVersion)
-- [ ] T041 [US7] Ensure breadcrumb icon correctly links back to AI Presets list page
-- [ ] T042 [US7] Verify EditorChangesBadge shows correct states (unpublished changes indicator)
+- [x] T040 [US7] Verify Publish button is disabled when no unpublished changes (draftVersion === publishedVersion)
+- [x] T041 [US7] Ensure breadcrumb icon correctly links back to AI Presets list page
+- [x] T042 [US7] Verify EditorChangesBadge shows correct states (unpublished changes indicator)
 
 **Checkpoint**: All user stories should now be independently functional.
 

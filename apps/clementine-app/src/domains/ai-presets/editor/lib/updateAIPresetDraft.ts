@@ -2,13 +2,18 @@
  * Shared Transaction Helper: updateAIPresetDraft
  *
  * Updates AI preset draft fields using Firestore dot notation with transactions.
- * Uses transactions to ensure immediate snapshot updates with correct values.
+ * Uses write-only transactions to prevent race conditions during rapid updates.
  *
  * Benefits:
- * - Atomic updates (no race conditions)
+ * - Atomic updates (no race conditions from concurrent edits)
+ * - No precondition checks (prevents stale timestamp conflicts)
  * - Immediate correct values (no snapshot delay)
  * - Version increment handled properly
  * - Firestore-native approach
+ * - Efficient (no read operations in transaction)
+ *
+ * Note: Firestore will automatically fail if the document doesn't exist,
+ * so no explicit existence check is needed.
  *
  * @example
  * ```typescript
@@ -51,12 +56,6 @@ export async function updateAIPresetDraft(
       `workspaces/${workspaceId}/aiPresets/${presetId}`,
     )
 
-    // Read preset to validate it exists (all reads must happen before writes)
-    const presetDoc = await transaction.get(presetRef)
-    if (!presetDoc.exists()) {
-      throw new Error(`Preset ${presetId} not found`)
-    }
-
     // Transform updates to Firestore paths with draft prefix
     const firestoreUpdates: Record<string, unknown> = {}
     for (const [key, value] of Object.entries(updates)) {
@@ -64,10 +63,13 @@ export async function updateAIPresetDraft(
     }
 
     // Atomic update with version increment
+    // Note: Firestore will automatically fail if document doesn't exist
     transaction.update(presetRef, {
       ...firestoreUpdates,
       draftVersion: increment(1),
       updatedAt: serverTimestamp(),
     })
+
+    return Promise.resolve()
   })
 }
