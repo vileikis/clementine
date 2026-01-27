@@ -26,13 +26,13 @@
 
 **Purpose**: Create the editor subdomain folder structure and barrel exports
 
-- [ ] T001 Create editor subdomain folder structure: `mkdir -p apps/clementine-app/src/domains/ai-presets/editor/{components,containers,hooks,stores,schemas}`
-- [ ] T002 [P] Create barrel export in `apps/clementine-app/src/domains/ai-presets/editor/components/index.ts`
-- [ ] T003 [P] Create barrel export in `apps/clementine-app/src/domains/ai-presets/editor/containers/index.ts`
-- [ ] T004 [P] Create barrel export in `apps/clementine-app/src/domains/ai-presets/editor/hooks/index.ts`
-- [ ] T005 [P] Create barrel export in `apps/clementine-app/src/domains/ai-presets/editor/stores/index.ts`
-- [ ] T006 [P] Create barrel export in `apps/clementine-app/src/domains/ai-presets/editor/schemas/index.ts`
-- [ ] T007 Create main barrel export in `apps/clementine-app/src/domains/ai-presets/editor/index.ts`
+- [x] T001 Create editor subdomain folder structure: `mkdir -p apps/clementine-app/src/domains/ai-presets/editor/{components,containers,hooks,stores,schemas}`
+- [x] T002 [P] Create barrel export in `apps/clementine-app/src/domains/ai-presets/editor/components/index.ts`
+- [x] T003 [P] Create barrel export in `apps/clementine-app/src/domains/ai-presets/editor/containers/index.ts`
+- [x] T004 [P] Create barrel export in `apps/clementine-app/src/domains/ai-presets/editor/hooks/index.ts`
+- [x] T005 [P] Create barrel export in `apps/clementine-app/src/domains/ai-presets/editor/stores/index.ts`
+- [x] T006 [P] Create barrel export in `apps/clementine-app/src/domains/ai-presets/editor/schemas/index.ts`
+- [x] T007 Create main barrel export in `apps/clementine-app/src/domains/ai-presets/editor/index.ts`
 
 ---
 
@@ -42,11 +42,11 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T008 Create editor store using createEditorStore factory in `apps/clementine-app/src/domains/ai-presets/editor/stores/useAIPresetEditorStore.ts`
-- [ ] T009 Create useAIPreset hook with real-time Firestore subscription in `apps/clementine-app/src/domains/ai-presets/editor/hooks/useAIPreset.ts`
-- [ ] T010 Create useUpdateAIPreset mutation hook with partial updates in `apps/clementine-app/src/domains/ai-presets/editor/hooks/useUpdateAIPreset.ts`
-- [ ] T011 [P] Create UpdateAIPresetInput schema in `apps/clementine-app/src/domains/ai-presets/editor/schemas/ai-preset-editor.schemas.ts`
-- [ ] T012 Update barrel exports to include new hooks, store, and schemas
+- [x] T008 Create editor store using createEditorStore factory in `apps/clementine-app/src/domains/ai-presets/editor/stores/useAIPresetEditorStore.ts`
+- [x] T009 Create useAIPreset hook with real-time Firestore subscription in `apps/clementine-app/src/domains/ai-presets/editor/hooks/useAIPreset.ts`
+- [x] T010 Create useUpdateAIPreset mutation hook with partial updates in `apps/clementine-app/src/domains/ai-presets/editor/hooks/useUpdateAIPreset.ts`
+- [x] T011 [P] Create UpdateAIPresetInput schema in `apps/clementine-app/src/domains/ai-presets/editor/schemas/ai-preset-editor.schemas.ts`
+- [x] T012 Update barrel exports to include new hooks, store, and schemas
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
@@ -60,11 +60,11 @@
 
 ### Implementation for User Story 1
 
-- [ ] T013 [P] [US1] Create AIPresetNameBadge component (editable name in breadcrumb) in `apps/clementine-app/src/domains/ai-presets/editor/components/AIPresetNameBadge.tsx`
-- [ ] T014 [P] [US1] Create AIPresetEditorLayout container (TopNavBar with breadcrumbs, save status, two-column layout) in `apps/clementine-app/src/domains/ai-presets/editor/containers/AIPresetEditorLayout.tsx`
-- [ ] T015 [US1] Create AIPresetEditorPage container (main page with data fetching) in `apps/clementine-app/src/domains/ai-presets/editor/containers/AIPresetEditorPage.tsx`
-- [ ] T016 [US1] Update route file to use AIPresetEditorPage in `apps/clementine-app/src/app/workspace/$workspaceSlug.ai-presets/$presetId.tsx`
-- [ ] T017 [US1] Update barrel exports for US1 components and containers
+- [x] T013 [P] [US1] Create AIPresetNameBadge component (editable name in breadcrumb) in `apps/clementine-app/src/domains/ai-presets/editor/components/AIPresetNameBadge.tsx`
+- [x] T014 [P] [US1] Create AIPresetEditorLayout container (TopNavBar with breadcrumbs, save status, two-column layout) in `apps/clementine-app/src/domains/ai-presets/editor/containers/AIPresetEditorLayout.tsx`
+- [x] T015 [US1] Create AIPresetEditorPage container (main page with data fetching) in `apps/clementine-app/src/domains/ai-presets/editor/containers/AIPresetEditorPage.tsx`
+- [x] T016 [US1] Update route file to use AIPresetEditorPage in `apps/clementine-app/src/app/workspace/$workspaceSlug.ai-presets/$presetId.tsx`
+- [x] T017 [US1] Update barrel exports for US1 components and containers
 
 **Checkpoint**: At this point, User Story 1 should be fully functional - users can navigate to the editor and edit the preset name.
 

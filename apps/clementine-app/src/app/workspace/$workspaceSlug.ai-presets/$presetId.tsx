@@ -1,31 +1,32 @@
 import { createFileRoute } from '@tanstack/react-router'
 
+import { AIPresetEditorPage } from '@/domains/ai-presets/editor'
+import { useWorkspace } from '@/domains/workspace'
+
 /**
- * AI Preset editor page route (placeholder)
+ * AI Preset editor page route
  *
  * Route: /workspace/:workspaceSlug/ai-presets/:presetId
  * Access: Admin only (enforced by parent route requireAdmin guard)
  *
- * Placeholder route for the AI preset editor. Full editor will be
- * implemented in Phase 3 of the AI Presets feature.
+ * Renders the AI preset editor for configuring preset settings,
+ * media registry, variables, and prompt template.
  */
 export const Route = createFileRoute(
   '/workspace/$workspaceSlug/ai-presets/$presetId',
 )({
-  component: AIPresetEditorPlaceholder,
+  component: AIPresetEditorRoute,
 })
 
-function AIPresetEditorPlaceholder() {
-  const { presetId } = Route.useParams()
+function AIPresetEditorRoute() {
+  const { workspaceSlug, presetId } = Route.useParams()
+  const { data: workspace } = useWorkspace(workspaceSlug)
 
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold">AI Preset Editor</h1>
-      <p className="text-muted-foreground mt-2">
-        Editor for preset{' '}
-        <code className="bg-muted px-1 rounded">{presetId}</code> coming in
-        Phase 3
-      </p>
-    </div>
+    <AIPresetEditorPage
+      workspaceId={workspace?.id || ''}
+      workspaceSlug={workspaceSlug}
+      presetId={presetId}
+    />
   )
 }
