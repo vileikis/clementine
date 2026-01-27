@@ -78,9 +78,9 @@
 
 ### Implementation for User Story 2
 
-- [ ] T018 [US2] Create ModelSettingsSection component (model + aspect ratio dropdowns using SelectField) in `apps/clementine-app/src/domains/ai-presets/editor/components/ModelSettingsSection.tsx`
-- [ ] T019 [US2] Integrate ModelSettingsSection into AIPresetEditorLayout left panel
-- [ ] T020 [US2] Update barrel exports for US2 component
+- [x] T018 [US2] Create ModelSettingsSection component (model + aspect ratio dropdowns using SelectField) in `apps/clementine-app/src/domains/ai-presets/editor/components/ModelSettingsSection.tsx`
+- [x] T019 [US2] Integrate ModelSettingsSection into AIPresetEditorLayout left panel
+- [x] T020 [US2] Update barrel exports for US2 component
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently.
 
@@ -94,11 +94,11 @@
 
 ### Implementation for User Story 3
 
-- [ ] T021 [P] [US3] Create MediaRegistryItem component (thumbnail with name and delete on hover) in `apps/clementine-app/src/domains/ai-presets/editor/components/MediaRegistryItem.tsx`
-- [ ] T022 [P] [US3] Create AddMediaDialog component (dialog with MediaPickerField + name input) in `apps/clementine-app/src/domains/ai-presets/editor/components/AddMediaDialog.tsx`
-- [ ] T023 [US3] Create MediaRegistrySection component (thumbnail grid + add button) in `apps/clementine-app/src/domains/ai-presets/editor/components/MediaRegistrySection.tsx`
-- [ ] T024 [US3] Integrate MediaRegistrySection into AIPresetEditorLayout left panel
-- [ ] T025 [US3] Update barrel exports for US3 components
+- [x] T021 [P] [US3] Create MediaRegistryItem component (thumbnail with name and delete on hover) in `apps/clementine-app/src/domains/ai-presets/editor/components/MediaRegistryItem.tsx`
+- [x] T022 [P] [US3] Create AddMediaDialog component (dialog with MediaPickerField + name input) in `apps/clementine-app/src/domains/ai-presets/editor/components/AddMediaDialog.tsx`
+- [x] T023 [US3] Create MediaRegistrySection component (thumbnail grid + add button) in `apps/clementine-app/src/domains/ai-presets/editor/components/MediaRegistrySection.tsx`
+- [x] T024 [US3] Integrate MediaRegistrySection into AIPresetEditorLayout left panel
+- [x] T025 [US3] Update barrel exports for US3 components
 
 **Checkpoint**: At this point, User Stories 1, 2, AND 3 should all work independently.
 

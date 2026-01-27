@@ -9,9 +9,18 @@ import { Loader2, Sparkles } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { AIPresetNameBadge } from '../components/AIPresetNameBadge'
+import { MediaRegistrySection } from '../components/MediaRegistrySection'
+import { ModelSettingsSection } from '../components/ModelSettingsSection'
 import { useUpdateAIPreset } from '../hooks/useUpdateAIPreset'
 import { useAIPresetEditorStore } from '../stores/useAIPresetEditorStore'
-import type { AIPreset } from '@clementine/shared'
+import type { AddMediaResult } from '../components/AddMediaDialog'
+import type {
+  AIModel,
+  AIPreset,
+  AspectRatio,
+  PresetMediaEntry,
+} from '@clementine/shared'
+import { useAuth } from '@/domains/auth'
 import { TopNavBar } from '@/domains/navigation'
 import { EditorSaveStatus } from '@/shared/editor-status'
 import { Button } from '@/ui-kit/ui/button'
@@ -51,6 +60,7 @@ export function AIPresetEditorLayout({
   workspaceSlug,
   workspaceId,
 }: AIPresetEditorLayoutProps) {
+  const { user } = useAuth()
   const { pendingSaves, lastCompletedAt, resetSaveState } =
     useAIPresetEditorStore()
   const updatePreset = useUpdateAIPreset(workspaceId, preset.id)
@@ -76,6 +86,78 @@ export function AIPresetEditorLayout({
       }
     },
     [updatePreset],
+  )
+
+  // Handle model change
+  const handleModelChange = useCallback(
+    async (model: AIModel) => {
+      try {
+        await updatePreset.mutateAsync({ model })
+      } catch (error) {
+        toast.error('Failed to update model', {
+          description:
+            error instanceof Error ? error.message : 'An error occurred',
+        })
+      }
+    },
+    [updatePreset],
+  )
+
+  // Handle aspect ratio change
+  const handleAspectRatioChange = useCallback(
+    async (aspectRatio: AspectRatio) => {
+      try {
+        await updatePreset.mutateAsync({ aspectRatio })
+      } catch (error) {
+        toast.error('Failed to update aspect ratio', {
+          description:
+            error instanceof Error ? error.message : 'An error occurred',
+        })
+      }
+    },
+    [updatePreset],
+  )
+
+  // Handle adding media to registry
+  const handleAddMedia = useCallback(
+    async (media: AddMediaResult) => {
+      try {
+        const newEntry: PresetMediaEntry = {
+          mediaAssetId: media.mediaAssetId,
+          url: media.url,
+          filePath: media.filePath,
+          name: media.name,
+        }
+        const updatedRegistry = [...preset.mediaRegistry, newEntry]
+        await updatePreset.mutateAsync({ mediaRegistry: updatedRegistry })
+        toast.success(`Added @${media.name} to media registry`)
+      } catch (error) {
+        toast.error('Failed to add media', {
+          description:
+            error instanceof Error ? error.message : 'An error occurred',
+        })
+      }
+    },
+    [preset.mediaRegistry, updatePreset],
+  )
+
+  // Handle removing media from registry
+  const handleDeleteMedia = useCallback(
+    async (name: string) => {
+      try {
+        const updatedRegistry = preset.mediaRegistry.filter(
+          (m) => m.name !== name,
+        )
+        await updatePreset.mutateAsync({ mediaRegistry: updatedRegistry })
+        toast.success(`Removed @${name} from media registry`)
+      } catch (error) {
+        toast.error('Failed to remove media', {
+          description:
+            error instanceof Error ? error.message : 'An error occurred',
+        })
+      }
+    },
+    [preset.mediaRegistry, updatePreset],
   )
 
   // Handle explicit save button click
@@ -122,24 +204,33 @@ export function AIPresetEditorLayout({
       <div className="flex flex-1 overflow-hidden">
         {/* Left panel - Configuration */}
         <div className="flex w-[400px] flex-col gap-6 overflow-y-auto border-r p-6">
-          {/* Model Settings Section - placeholder for Phase 4 */}
+          {/* Model Settings Section */}
           <section>
             <h2 className="mb-4 text-sm font-medium text-muted-foreground">
               Model Settings
             </h2>
-            <div className="text-sm text-muted-foreground">
-              Model and aspect ratio settings will be added in Phase 4.
-            </div>
+            <ModelSettingsSection
+              model={preset.model}
+              aspectRatio={preset.aspectRatio}
+              onModelChange={handleModelChange}
+              onAspectRatioChange={handleAspectRatioChange}
+              disabled={updatePreset.isPending}
+            />
           </section>
 
-          {/* Media Registry Section - placeholder for Phase 5 */}
+          {/* Media Registry Section */}
           <section>
             <h2 className="mb-4 text-sm font-medium text-muted-foreground">
               Media Registry
             </h2>
-            <div className="text-sm text-muted-foreground">
-              Media registry will be added in Phase 5.
-            </div>
+            <MediaRegistrySection
+              mediaRegistry={preset.mediaRegistry}
+              onAdd={handleAddMedia}
+              onDelete={handleDeleteMedia}
+              disabled={updatePreset.isPending}
+              workspaceId={workspaceId}
+              userId={user?.uid ?? ''}
+            />
           </section>
 
           {/* Variables Section - placeholder for Phase 6 */}
