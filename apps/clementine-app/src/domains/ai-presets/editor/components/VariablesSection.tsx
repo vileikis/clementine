@@ -341,7 +341,7 @@ export function VariablesSection({
                   onDelete={handleDelete}
                   isExpanded={expandedVariableId === variable.id}
                   onToggleExpanded={handleToggleExpanded}
-                  disabled={isDisabled}
+                  disabled={disabled}
                 />
               ))}
             </div>

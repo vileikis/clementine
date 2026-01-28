@@ -26,6 +26,7 @@ import type { PresetMediaEntry, PresetVariable } from '@clementine/shared'
 import { Button } from '@/ui-kit/ui/button'
 import { Input } from '@/ui-kit/ui/input'
 import { cn } from '@/shared/utils'
+import { useDebounce } from '@/shared/utils/useDebounce'
 
 interface VariableCardProps {
   /** The variable to display */
@@ -98,6 +99,10 @@ export function VariableCard({
   const [valueMap, setValueMap] = useState(
     variable.type === 'text' && variable.valueMap ? variable.valueMap : [],
   )
+
+  // Debounce settings changes (2 seconds like PromptTemplateEditor)
+  const debouncedDefaultValue = useDebounce(defaultValue, 2000)
+  const debouncedValueMap = useDebounce(valueMap, 2000)
 
   const {
     attributes,
@@ -193,17 +198,13 @@ export function VariableCard({
     onToggleExpanded(variable.id)
   }
 
-  // Save settings when changing default value or value mappings
+  // Update local state immediately (for responsive UI)
   const handleDefaultValueChange = (value: string) => {
-    const newValue = value || null
     setDefaultValue(value)
-    onUpdateSettings(variable.id, { defaultValue: newValue })
   }
 
   const handleValueMapChange = (newValueMap: { value: string; text: string }[]) => {
-    const newMap = newValueMap.length > 0 ? newValueMap : null
     setValueMap(newValueMap)
-    onUpdateSettings(variable.id, { valueMap: newMap })
   }
 
   // Sync local state when variable changes externally
@@ -213,6 +214,40 @@ export function VariableCard({
       setValueMap(variable.valueMap || [])
     }
   }, [variable])
+
+  // Auto-save debounced default value
+  useEffect(() => {
+    if (variable.type !== 'text') return
+
+    const currentDefault = variable.defaultValue || ''
+    if (debouncedDefaultValue !== currentDefault) {
+      const newValue = debouncedDefaultValue || null
+      onUpdateSettings(variable.id, { defaultValue: newValue })
+    }
+  }, [debouncedDefaultValue, variable, onUpdateSettings])
+
+  // Auto-save debounced value mappings (with validation)
+  useEffect(() => {
+    if (variable.type !== 'text') return
+
+    // Validate all mappings have both value and text before saving
+    const isValid = debouncedValueMap.every(
+      (mapping) => mapping.value.trim().length > 0 && mapping.text.trim().length > 0,
+    )
+
+    // Don't save if invalid (empty fields)
+    if (!isValid) return
+
+    // Check if changed from current state
+    const currentMap = variable.valueMap || []
+    const hasChanged =
+      JSON.stringify(debouncedValueMap) !== JSON.stringify(currentMap)
+
+    if (hasChanged) {
+      const newMap = debouncedValueMap.length > 0 ? debouncedValueMap : null
+      onUpdateSettings(variable.id, { valueMap: newMap })
+    }
+  }, [debouncedValueMap, variable, onUpdateSettings])
 
   // Color classes based on variable type
   const isTextType = variable.type === 'text'
