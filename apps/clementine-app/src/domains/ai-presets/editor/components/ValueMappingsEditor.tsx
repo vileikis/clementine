@@ -57,6 +57,7 @@ function toMediaOption(media: PresetMediaEntry): MediaOption {
 
 /**
  * Initialize content plugin for inline editor
+ * Only initializes once on mount with the initial value
  */
 function InitializeContentPlugin({
   value,
@@ -67,14 +68,17 @@ function InitializeContentPlugin({
 }) {
   const [editor] = useLexicalComposerContext()
   const hasInitialized = useRef(false)
+  const initialValue = useRef(value)
 
   useEffect(() => {
-    if (!hasInitialized.current && value) {
+    if (!hasInitialized.current) {
       hasInitialized.current = true
-      // Load plain text with @{ref:name} mentions
-      loadFromPlainText(editor, value, [], mediaOptions)
+      // Only load if there's initial content (ignore empty strings)
+      if (initialValue.current) {
+        loadFromPlainText(editor, initialValue.current, [], mediaOptions)
+      }
     }
-  }, [editor, value, mediaOptions])
+  }, [editor, mediaOptions]) // Intentionally omit 'value' to prevent reinitialization on content changes
 
   return null
 }
