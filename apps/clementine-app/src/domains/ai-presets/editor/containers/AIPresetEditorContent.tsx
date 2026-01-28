@@ -16,6 +16,7 @@
 import { AIPresetConfigPanel } from '../components/AIPresetConfigPanel'
 import { PromptTemplateEditor } from '../components/PromptTemplateEditor'
 import { VariablesSection } from '../components/VariablesSection'
+import { AIPresetPreviewPanel } from '../../preview/components/AIPresetPreviewPanel'
 import type { AIPresetConfig } from '@clementine/shared'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/ui-kit/ui/tabs'
 
@@ -105,22 +106,15 @@ export function AIPresetEditorContent({
             </div>
           </TabsContent>
 
-          {/* Preview Tab - Reserved for Testing/Validation */}
+          {/* Preview Tab - Testing and Validation */}
           <TabsContent
             value="preview"
             className="flex-1 overflow-y-auto p-6 m-0"
           >
-            <div className="flex h-full items-center justify-center">
-              <div className="text-center">
-                <p className="text-sm text-muted-foreground">
-                  Preview and testing functionality coming soon.
-                </p>
-                <p className="mt-2 text-xs text-muted-foreground">
-                  Test and validate the preset with real input values before
-                  publishing.
-                </p>
-              </div>
-            </div>
+            <AIPresetPreviewPanel
+              workspaceId={workspaceId}
+              presetId={presetId}
+            />
           </TabsContent>
         </Tabs>
       </div>
