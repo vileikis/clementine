@@ -12,7 +12,8 @@ import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import { ShareConfigPanel } from '../components/ShareConfigPanel'
 import { ShareLoadingConfigPanel } from '../components/ShareLoadingConfigPanel'
-import { SharePreview } from '../components/SharePreview'
+import { ShareLoadingRenderer } from '../components/ShareLoadingRenderer'
+import { ShareReadyRenderer } from '../components/ShareReadyRenderer'
 import { useUpdateShareLoading, useUpdateShareReady } from '../hooks'
 import { DEFAULT_SHARE_LOADING, DEFAULT_SHARE_READY } from '../constants'
 import type {
@@ -283,7 +284,6 @@ export function ShareEditorPage() {
             <Tabs
               value={previewState}
               onValueChange={(v: string) => setPreviewState(v as PreviewState)}
-              className="mr-4"
             >
               <TabsList>
                 <TabsTrigger value="ready">Ready</TabsTrigger>
@@ -293,12 +293,14 @@ export function ShareEditorPage() {
           }
         >
           <ThemeProvider theme={currentTheme}>
-            <SharePreview
-              previewState={previewState}
-              share={previewShare}
-              shareLoading={previewShareLoading}
-              shareOptions={displayShareOptions}
-            />
+            {previewState === 'loading' ? (
+              <ShareLoadingRenderer shareLoading={previewShareLoading} />
+            ) : (
+              <ShareReadyRenderer
+                share={previewShare}
+                shareOptions={displayShareOptions}
+              />
+            )}
           </ThemeProvider>
         </PreviewShell>
       </div>

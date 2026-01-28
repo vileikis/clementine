@@ -6,4 +6,5 @@
 
 export { ShareConfigPanel } from './ShareConfigPanel'
 export { ShareLoadingConfigPanel } from './ShareLoadingConfigPanel'
-export { SharePreview } from './SharePreview'
+export { ShareLoadingRenderer } from './ShareLoadingRenderer'
+export { ShareReadyRenderer } from './ShareReadyRenderer'

@@ -17,7 +17,7 @@ interface PreviewShellControlsProps {
  * Preview Shell Controls Component
  *
  * Container for viewport switcher and fullscreen trigger
- * Uses justify-between layout with bottom border separator
+ * Three-column layout: left (spacer), center (headerSlot), right (controls)
  */
 export function PreviewShellControls({
   mode,
@@ -28,17 +28,20 @@ export function PreviewShellControls({
   headerSlot,
 }: PreviewShellControlsProps) {
   return (
-    <div className="flex items-center justify-between border-b p-2 gap-4">
-      {/* Custom header content */}
-      {headerSlot}
+    <div className="flex items-center border-b p-2 gap-4">
+      {/* Left spacer - keeps center content centered */}
+      <div className="flex-1" />
 
-      {/* Existing controls */}
-      {enableViewportSwitcher ? (
-        <ViewportSwitcher mode={mode} onModeChange={onModeChange} />
-      ) : (
-        <div />
-      )}
-      {enableFullscreen && <FullscreenTrigger onClick={onFullscreenClick} />}
+      {/* Center - Custom header content */}
+      <div className="flex-shrink-0">{headerSlot}</div>
+
+      {/* Right - Controls */}
+      <div className="flex-1 flex items-center justify-end gap-2">
+        {enableViewportSwitcher && (
+          <ViewportSwitcher mode={mode} onModeChange={onModeChange} />
+        )}
+        {enableFullscreen && <FullscreenTrigger onClick={onFullscreenClick} />}
+      </div>
     </div>
   )
 }
