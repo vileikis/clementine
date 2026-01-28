@@ -8,7 +8,6 @@
 
 import { useCallback, useState } from 'react'
 import { useParams } from '@tanstack/react-router'
-import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   ShareConfigPanel,
@@ -16,7 +15,7 @@ import {
   ShareLoadingRenderer,
   ShareReadyRenderer,
 } from '../components'
-import { useUpdateShareLoading, useUpdateShareReady } from '../hooks'
+import { useShareLoadingForm, useShareReadyForm } from '../hooks'
 import { DEFAULT_SHARE_LOADING, DEFAULT_SHARE_READY } from '../constants'
 import type {
   CtaConfig,
@@ -26,7 +25,6 @@ import type {
 } from '@clementine/shared'
 import { Tabs, TabsList, TabsTrigger } from '@/ui-kit/ui/tabs'
 import { PreviewShell } from '@/shared/preview-shell'
-import { useAutoSave } from '@/shared/forms'
 import { useProject } from '@/domains/project/shared'
 import { useUpdateShareOptions } from '@/domains/project-config/settings'
 import { DEFAULT_THEME } from '@/domains/project-config/theme/constants'
@@ -44,18 +42,6 @@ const DEFAULT_SHARE_OPTIONS: ShareOptionsConfig = {
   tiktok: false,
   telegram: false,
 }
-
-// Fields to compare for auto-save change detection
-const SHARE_FIELDS_TO_COMPARE: (keyof ShareReadyConfig)[] = [
-  'title',
-  'description',
-  'cta',
-]
-
-const SHARE_LOADING_FIELDS_TO_COMPARE: (keyof ShareLoadingConfig)[] = [
-  'title',
-  'description',
-]
 
 // Preview state type
 type PreviewState = 'ready' | 'loading'
@@ -80,20 +66,19 @@ export function ShareEditorPage() {
   // Get current theme from project or use defaults
   const currentTheme = project?.draftConfig?.theme ?? DEFAULT_THEME
 
-  // Forms for both states
-  const shareForm = useForm<ShareReadyConfig>({
-    defaultValues: currentShare,
-    values: currentShare, // Sync form with server data when it changes
+  // Form hooks encapsulate all form logic, auto-save, and handlers
+  const { shareForm, watchedShare, handleShareUpdate } = useShareReadyForm({
+    projectId: projectId ?? '',
+    currentShare,
   })
 
-  const shareLoadingForm = useForm<ShareLoadingConfig>({
-    defaultValues: currentShareLoading,
-    values: currentShareLoading, // Sync form with server data when it changes
-  })
+  const { watchedShareLoading, handleShareLoadingUpdate } =
+    useShareLoadingForm({
+      projectId: projectId ?? '',
+      currentShareLoading,
+    })
 
-  // Mutations
-  const updateShare = useUpdateShareReady(projectId ?? '')
-  const updateShareLoading = useUpdateShareLoading(projectId ?? '')
+  // Share options mutation
   const updateShareOptions = useUpdateShareOptions(projectId ?? '')
 
   // Local state for optimistic UI updates on share options
@@ -106,86 +91,6 @@ export function ShareEditorPage() {
   // CTA URL validation state
   const [ctaUrlError, setCtaUrlError] = useState<string | null>(null)
 
-  // Auto-save for ready state (existing)
-  const { triggerSave } = useAutoSave({
-    form: shareForm,
-    originalValues: currentShare,
-    onUpdate: async () => {
-      try {
-        // Push complete share object (not partial updates)
-        const fullShare = shareForm.getValues()
-        await updateShare.mutateAsync(fullShare)
-        // No toast - save indicator handles feedback
-      } catch (error) {
-        const message =
-          error instanceof Error ? error.message : 'Failed to save share config'
-        toast.error(message)
-      }
-    },
-    fieldsToCompare: SHARE_FIELDS_TO_COMPARE,
-    debounceMs: 2000,
-  })
-
-  // Auto-save for loading state (new)
-  const { triggerSave: triggerLoadingSave } = useAutoSave({
-    form: shareLoadingForm,
-    originalValues: currentShareLoading,
-    onUpdate: async () => {
-      try {
-        // Push complete shareLoading object
-        const fullShareLoading = shareLoadingForm.getValues()
-        await updateShareLoading.mutateAsync(fullShareLoading)
-        // No toast - save indicator handles feedback
-      } catch (error) {
-        const message =
-          error instanceof Error
-            ? error.message
-            : 'Failed to save loading config'
-        toast.error(message)
-      }
-    },
-    fieldsToCompare: SHARE_LOADING_FIELDS_TO_COMPARE,
-    debounceMs: 2000,
-  })
-
-  // Watch both forms for live preview
-  const watchedShare = useWatch({
-    control: shareForm.control,
-  }) as ShareReadyConfig
-  const watchedShareLoading = useWatch({
-    control: shareLoadingForm.control,
-  }) as ShareLoadingConfig
-
-  // Handler for share content updates (ready state)
-  const handleShareUpdate = useCallback(
-    (updates: Partial<ShareReadyConfig>) => {
-      // Update form values
-      for (const [key, value] of Object.entries(updates)) {
-        shareForm.setValue(key as keyof ShareReadyConfig, value, {
-          shouldDirty: true,
-        })
-      }
-      // Trigger debounced save
-      triggerSave()
-    },
-    [shareForm, triggerSave],
-  )
-
-  // Handler for loading state updates (new)
-  const handleShareLoadingUpdate = useCallback(
-    (updates: Partial<ShareLoadingConfig>) => {
-      // Update form values
-      for (const [key, value] of Object.entries(updates)) {
-        shareLoadingForm.setValue(key as keyof ShareLoadingConfig, value, {
-          shouldDirty: true,
-        })
-      }
-      // Trigger debounced save
-      triggerLoadingSave()
-    },
-    [shareLoadingForm, triggerLoadingSave],
-  )
-
   // Handler for CTA updates
   const handleCtaUpdate = useCallback(
     (updates: Partial<CtaConfig>) => {
@@ -194,17 +99,16 @@ export function ShareEditorPage() {
         url: null,
       }
       const newCta = { ...currentCta, ...updates }
-      shareForm.setValue('cta', newCta, { shouldDirty: true })
 
       // Clear URL error when user types in URL field
       if ('url' in updates) {
         setCtaUrlError(null)
       }
 
-      // Trigger debounced save
-      triggerSave()
+      // Update through the form hook (triggers auto-save)
+      handleShareUpdate({ cta: newCta })
     },
-    [shareForm, triggerSave],
+    [shareForm, handleShareUpdate],
   )
 
   // URL validation on blur
