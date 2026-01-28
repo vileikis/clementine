@@ -29,7 +29,6 @@ import type { VariableSettingsUpdate } from './VariableSettingsDialog'
 import type { DragEndEvent } from '@dnd-kit/core'
 import type { PresetVariable } from '@clementine/shared'
 import { Button } from '@/ui-kit/ui/button'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui-kit/ui/tooltip'
 import { ContextDropdownMenu } from '@/shared/components/ContextDropdownMenu'
 
 interface VariablesSectionProps {
@@ -234,43 +233,35 @@ export function VariablesSection({
 
   return (
     <div className="space-y-3">
-      {/* Header with Add Variable dropdown */}
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium">Variables</h3>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <ContextDropdownMenu
-              trigger={
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  disabled={isDisabled}
-                  className="h-8 w-8 p-0"
-                >
-                  <Plus className="h-4 w-4" />
-                  <span className="sr-only">Add Variable</span>
-                </Button>
-              }
-              actions={[
-                {
-                  key: 'text',
-                  label: 'Text',
-                  icon: Type,
-                  onClick: () => handleAddVariable('text'),
-                },
-                {
-                  key: 'image',
-                  label: 'Image',
-                  icon: Image,
-                  onClick: () => handleAddVariable('image'),
-                },
-              ]}
-              aria-label="Add variable"
-            />
-          </TooltipTrigger>
-          <TooltipContent>Add Variable</TooltipContent>
-        </Tooltip>
-      </div>
+      {/* Add Variable button */}
+      <ContextDropdownMenu
+        trigger={
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={isDisabled}
+            className="h-8 gap-1.5 px-3 w-full justify-center"
+          >
+            <Plus className="h-4 w-4" />
+            <span className="text-xs">Add Variable</span>
+          </Button>
+        }
+        actions={[
+          {
+            key: 'text',
+            label: 'Text',
+            icon: Type,
+            onClick: () => handleAddVariable('text'),
+          },
+          {
+            key: 'image',
+            label: 'Image',
+            icon: Image,
+            onClick: () => handleAddVariable('image'),
+          },
+        ]}
+        aria-label="Add variable"
+      />
 
       {/* Empty state */}
       {variables.length === 0 && (
