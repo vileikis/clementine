@@ -34,19 +34,19 @@ function resolveMediaReferencesInText(
       )
       if (!variable) {
         unresolved.push({ type, name })
-        return `[Undefined: ${name}]`
+        return `<${name}> (undefined)`
       }
       const file = testInputs[name]
-      return file ? `[Image: ${name}]` : `[Image: ${name} (missing)]`
+      return file ? `<${name}>` : `<${name}> (missing)`
     }
 
     if (type === 'ref') {
       const media = mediaRegistry.find((m) => m.name === name)
       if (!media) {
         unresolved.push({ type, name })
-        return `[Media: ${name} (missing)]`
+        return `<${name}> (missing)`
       }
-      return `[Media: ${name}]`
+      return `<${name}>`
     }
 
     return match
@@ -114,19 +114,19 @@ export function resolvePrompt(
       )
       if (!variable) {
         unresolved.push({ type, name })
-        return `[Undefined: ${name}]`
+        return `<${name}> (undefined)`
       }
       const file = testInputs[name]
-      return file ? `[Image: ${name}]` : `[Image: ${name} (missing)]`
+      return file ? `<${name}>` : `<${name}> (missing)`
     }
 
     if (type === 'ref') {
       const media = mediaRegistry.find((m) => m.name === name)
       if (!media) {
         unresolved.push({ type, name })
-        return `[Media: ${name} (missing)]`
+        return `<${name}> (missing)`
       }
-      return `[Media: ${name}]`
+      return `<${name}>`
     }
 
     return match

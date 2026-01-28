@@ -16,7 +16,7 @@ describe('validatePresetInputs', () => {
       userPhoto: new File([''], 'test.jpg', { type: 'image/jpeg' }),
     }
     const resolvedPrompt: ResolvedPrompt = {
-      text: 'Hello Alice! [Image: userPhoto]',
+      text: 'Hello Alice! <userPhoto>',
       characterCount: 32,
       hasUnresolved: false,
       unresolvedRefs: [],
@@ -35,7 +35,7 @@ describe('validatePresetInputs', () => {
     ]
     const testInputs: TestInputState = { userPhoto: null }
     const resolvedPrompt: ResolvedPrompt = {
-      text: '[Image: userPhoto (missing)]',
+      text: '<userPhoto> (missing)',
       characterCount: 28,
       hasUnresolved: false,
       unresolvedRefs: [],
@@ -113,7 +113,7 @@ describe('validatePresetInputs', () => {
     const variables: PresetVariable[] = []
     const testInputs: TestInputState = {}
     const resolvedPrompt: ResolvedPrompt = {
-      text: '[Media: missingRef (missing)]',
+      text: '<missingRef> (missing)',
       characterCount: 29,
       hasUnresolved: true,
       unresolvedRefs: [{ type: 'ref', name: 'missingRef' }],
@@ -137,7 +137,7 @@ describe('validatePresetInputs', () => {
     ]
     const testInputs: TestInputState = { userPhoto: null }
     const resolvedPrompt: ResolvedPrompt = {
-      text: '[Image: userPhoto (missing)] [Undefined: deletedVar]',
+      text: '<userPhoto> (missing) [Undefined: deletedVar]',
       characterCount: 53,
       hasUnresolved: true,
       unresolvedRefs: [{ type: 'text', name: 'deletedVar' }],

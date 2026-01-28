@@ -75,9 +75,11 @@ export function PromptPreview({
     }
 
     // Split text to highlight unresolved references
-    // Pattern matches: [Undefined: name], [No value: name], [No mapping: name], [Image: name (missing)], [Media: name (missing)]
+    // Pattern matches:
+    // - Text variables: [Undefined: name], [No value: name], [No mapping: name]
+    // - Image/Media references: <name> (missing), <name> (undefined)
     const unresolvedPattern =
-      /\[(Undefined|No value|No mapping|Image|Media): ([^\]]+?)( \(missing\))?\]/g
+      /\[(Undefined|No value|No mapping): ([^\]]+)\]|<([a-zA-Z_][a-zA-Z0-9_]*)> \((missing|undefined)\)/g
     const parts = []
     let lastIndex = 0
     let match: RegExpExecArray | null

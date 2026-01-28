@@ -90,7 +90,7 @@ describe('resolvePrompt', () => {
       mediaRegistry,
     )
 
-    expect(result.text).toBe('Photo: [Image: userPhoto]')
+    expect(result.text).toBe('Photo: <userPhoto>')
   })
 
   it('should indicate missing image when not uploaded', () => {
@@ -108,7 +108,7 @@ describe('resolvePrompt', () => {
       mediaRegistry,
     )
 
-    expect(result.text).toBe('Photo: [Image: userPhoto (missing)]')
+    expect(result.text).toBe('Photo: <userPhoto> (missing)')
   })
 
   it('should replace media registry references', () => {
@@ -130,7 +130,7 @@ describe('resolvePrompt', () => {
       mediaRegistry,
     )
 
-    expect(result.text).toBe('Reference: [Media: styleRef]')
+    expect(result.text).toBe('Reference: <styleRef>')
   })
 
   it('should indicate missing media from registry', () => {
@@ -146,7 +146,7 @@ describe('resolvePrompt', () => {
       mediaRegistry,
     )
 
-    expect(result.text).toBe('Reference: [Media: missingRef (missing)]')
+    expect(result.text).toBe('Reference: <missingRef> (missing)')
     expect(result.hasUnresolved).toBe(true)
     expect(result.unresolvedRefs).toEqual([{ type: 'ref', name: 'missingRef' }])
   })
@@ -208,7 +208,7 @@ describe('resolvePrompt', () => {
     )
 
     expect(result.text).toBe(
-      'Character is holding They should be holding [Media: hammer]',
+      'Character is holding They should be holding <hammer>',
     )
     expect(result.hasUnresolved).toBe(false)
   })
@@ -236,7 +236,7 @@ describe('resolvePrompt', () => {
     )
 
     expect(result.text).toBe(
-      'Character is holding They should be holding [Media: hammer (missing)]',
+      'Character is holding They should be holding <hammer> (missing)',
     )
     expect(result.hasUnresolved).toBe(true)
     expect(result.unresolvedRefs).toEqual([{ type: 'ref', name: 'hammer' }])
@@ -272,9 +272,7 @@ describe('resolvePrompt', () => {
       mediaRegistry,
     )
 
-    expect(result.text).toBe(
-      'Using style Use [Image: fantasyRef] as the reference',
-    )
+    expect(result.text).toBe('Using style Use <fantasyRef> as the reference')
     expect(result.hasUnresolved).toBe(false)
   })
 })

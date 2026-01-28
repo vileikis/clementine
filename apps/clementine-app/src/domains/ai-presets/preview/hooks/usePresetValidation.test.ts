@@ -34,7 +34,7 @@ describe('usePresetValidation', () => {
     ]
     const testInputs: TestInputState = { userPhoto: null }
     const resolvedPrompt: ResolvedPrompt = {
-      text: '[Image: userPhoto (missing)]',
+      text: '<userPhoto> (missing)',
       characterCount: 28,
       hasUnresolved: false,
       unresolvedRefs: [],
@@ -78,7 +78,7 @@ describe('usePresetValidation', () => {
       { name: 'userPhoto', type: 'image', defaultValue: '' },
     ]
     const resolvedPrompt: ResolvedPrompt = {
-      text: '[Image: userPhoto]',
+      text: '<userPhoto>',
       characterCount: 18,
       hasUnresolved: false,
       unresolvedRefs: [],
