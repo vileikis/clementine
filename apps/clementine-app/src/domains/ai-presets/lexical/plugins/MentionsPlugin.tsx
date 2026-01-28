@@ -20,7 +20,7 @@ import {
   useBasicTypeaheadTriggerMatch,
 } from '@lexical/react/LexicalTypeaheadMenuPlugin'
 import { $createTextNode } from 'lexical'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { $createMediaMentionNode, $createVariableMentionNode } from '../nodes'
 import type { TextNode } from 'lexical'
@@ -120,6 +120,58 @@ function MentionMenuItem({
       <span className="flex-1 font-medium">{option.name}</span>
       <span className="text-xs text-muted-foreground">{typeLabel}</span>
     </li>
+  )
+}
+
+// ============================================================================
+// Positioned Menu Component
+// ============================================================================
+
+interface PositionedMenuProps {
+  anchorElement: HTMLElement
+  children: React.ReactNode
+}
+
+/**
+ * Menu component that positions itself relative to an anchor element
+ * Portaled to document.body to escape dialog stacking context
+ */
+function PositionedMenu({ anchorElement, children }: PositionedMenuProps) {
+  const menuRef = useRef<HTMLDivElement>(null)
+  const [position, setPosition] = useState({ top: 0, left: 0 })
+
+  useEffect(() => {
+    const updatePosition = () => {
+      const anchorRect = anchorElement.getBoundingClientRect()
+      setPosition({
+        top: anchorRect.bottom + window.scrollY + 4, // 4px gap below anchor
+        left: anchorRect.left + window.scrollX,
+      })
+    }
+
+    updatePosition()
+
+    // Update position on scroll/resize
+    window.addEventListener('scroll', updatePosition, true)
+    window.addEventListener('resize', updatePosition)
+
+    return () => {
+      window.removeEventListener('scroll', updatePosition, true)
+      window.removeEventListener('resize', updatePosition)
+    }
+  }, [anchorElement])
+
+  return (
+    <div
+      ref={menuRef}
+      className="typeahead-popover mentions-menu fixed z-[100] w-64 rounded-md border bg-popover p-1 shadow-md"
+      style={{
+        top: `${position.top}px`,
+        left: `${position.left}px`,
+      }}
+    >
+      {children}
+    </div>
   )
 }
 
@@ -239,7 +291,7 @@ export function MentionsPlugin({ variables, media }: MentionsPluginProps) {
         }
 
         return createPortal(
-          <div className="typeahead-popover mentions-menu z-[100] w-64 rounded-md border bg-popover p-1 shadow-md">
+          <PositionedMenu anchorElement={anchorElementRef.current}>
             <ul role="listbox" aria-label="Mentions">
               {options.map((option, index) => (
                 <MentionMenuItem
@@ -256,8 +308,8 @@ export function MentionsPlugin({ variables, media }: MentionsPluginProps) {
                 />
               ))}
             </ul>
-          </div>,
-          anchorElementRef.current,
+          </PositionedMenu>,
+          document.body,
         )
       }}
     />
