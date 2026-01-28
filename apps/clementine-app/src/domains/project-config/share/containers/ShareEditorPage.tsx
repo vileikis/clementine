@@ -18,7 +18,6 @@ import {
 import { useShareLoadingForm, useShareReadyForm } from '../hooks'
 import { DEFAULT_SHARE_LOADING, DEFAULT_SHARE_READY } from '../constants'
 import type {
-  CtaConfig,
   ShareLoadingConfig,
   ShareOptionsConfig,
   ShareReadyConfig,
@@ -54,10 +53,10 @@ export function ShareEditorPage() {
   const [previewState, setPreviewState] = useState<PreviewState>('ready')
 
   // Get current configs from project or use defaults
-  const currentShare: ShareReadyConfig = (project?.draftConfig?.share ??
-    DEFAULT_SHARE_READY) as ShareReadyConfig
-  const currentShareLoading: ShareLoadingConfig = (project?.draftConfig
-    ?.shareLoading ?? DEFAULT_SHARE_LOADING) as ShareLoadingConfig
+  const currentShareReady: ShareReadyConfig =
+    project?.draftConfig?.shareReady ?? DEFAULT_SHARE_READY
+  const currentShareLoading =
+    project?.draftConfig?.shareLoading ?? DEFAULT_SHARE_LOADING
 
   // Get current share options from project or use defaults
   const currentShareOptions =
@@ -67,16 +66,23 @@ export function ShareEditorPage() {
   const currentTheme = project?.draftConfig?.theme ?? DEFAULT_THEME
 
   // Form hooks encapsulate all form logic, auto-save, and handlers
-  const { shareForm, watchedShare, handleShareUpdate } = useShareReadyForm({
+  const {
+    watchedShare,
+    handleShareUpdate,
+    ctaUrlError,
+    handleCtaUrlBlur,
+    clearCtaUrlError,
+  } = useShareReadyForm({
     projectId: projectId ?? '',
-    currentShare,
+    currentShareReady,
   })
 
-  const { watchedShareLoading, handleShareLoadingUpdate } =
-    useShareLoadingForm({
+  const { watchedShareLoading, handleShareLoadingUpdate } = useShareLoadingForm(
+    {
       projectId: projectId ?? '',
       currentShareLoading,
-    })
+    },
+  )
 
   // Share options mutation
   const updateShareOptions = useUpdateShareOptions(projectId ?? '')
@@ -87,54 +93,6 @@ export function ShareEditorPage() {
 
   // Use local state for preview if available, otherwise use server state
   const displayShareOptions = localShareOptions ?? currentShareOptions
-
-  // CTA URL validation state
-  const [ctaUrlError, setCtaUrlError] = useState<string | null>(null)
-
-  // Handler for CTA updates
-  const handleCtaUpdate = useCallback(
-    (updates: Partial<CtaConfig>) => {
-      const currentCta = shareForm.getValues('cta') ?? {
-        label: null,
-        url: null,
-      }
-      const newCta = { ...currentCta, ...updates }
-
-      // Clear URL error when user types in URL field
-      if ('url' in updates) {
-        setCtaUrlError(null)
-      }
-
-      // Update through the form hook (triggers auto-save)
-      handleShareUpdate({ cta: newCta })
-    },
-    [shareForm, handleShareUpdate],
-  )
-
-  // URL validation on blur
-  const handleCtaUrlBlur = useCallback(() => {
-    const cta = shareForm.getValues('cta')
-    const hasLabel = cta?.label && cta.label.trim() !== ''
-    const hasUrl = cta?.url && cta.url.trim() !== ''
-
-    // If label is provided but URL is missing
-    if (hasLabel && !hasUrl) {
-      setCtaUrlError('URL is required when button label is provided')
-      return
-    }
-
-    // If URL is provided, validate format
-    if (hasUrl && cta.url) {
-      try {
-        new URL(cta.url)
-        setCtaUrlError(null)
-      } catch {
-        setCtaUrlError('Please enter a valid URL')
-      }
-    } else {
-      setCtaUrlError(null)
-    }
-  }, [shareForm])
 
   // Handler for share option toggles
   const handleShareOptionToggle = useCallback(
@@ -227,10 +185,10 @@ export function ShareEditorPage() {
             share={previewShare}
             shareOptions={displayShareOptions}
             onShareUpdate={handleShareUpdate}
-            onCtaUpdate={handleCtaUpdate}
             onShareOptionToggle={handleShareOptionToggle}
             ctaUrlError={ctaUrlError}
             onCtaUrlBlur={handleCtaUrlBlur}
+            onCtaUrlChange={clearCtaUrlError}
           />
         ) : (
           <ShareLoadingConfigPanel

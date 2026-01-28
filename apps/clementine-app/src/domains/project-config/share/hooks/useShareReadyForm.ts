@@ -1,11 +1,12 @@
 /**
  * useShareReadyForm Hook
  *
- * Encapsulates share ready state form management, auto-save, and update handlers.
- * Reduces complexity in ShareEditorPage by centralizing all ready state form logic.
+ * Encapsulates share ready state form management, auto-save, update handlers,
+ * and CTA validation. Reduces complexity in ShareEditorPage by centralizing
+ * all ready state form logic including CTA-specific concerns.
  */
 
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import { useUpdateShareReady } from './useUpdateShareReady'
@@ -23,7 +24,7 @@ export interface UseShareReadyFormProps {
   /** Project ID for mutations */
   projectId: string
   /** Current share ready config from server */
-  currentShare: ShareReadyConfig
+  currentShareReady: ShareReadyConfig
 }
 
 export interface UseShareReadyFormReturn {
@@ -33,6 +34,12 @@ export interface UseShareReadyFormReturn {
   watchedShare: ShareReadyConfig
   /** Handler for updating share ready config fields */
   handleShareUpdate: (updates: Partial<ShareReadyConfig>) => void
+  /** CTA URL validation error message */
+  ctaUrlError: string | null
+  /** Handler for CTA URL blur event (triggers validation) */
+  handleCtaUrlBlur: () => void
+  /** Clear CTA URL error (called when user types in URL field) */
+  clearCtaUrlError: () => void
 }
 
 /**
@@ -40,12 +47,12 @@ export interface UseShareReadyFormReturn {
  */
 export function useShareReadyForm({
   projectId,
-  currentShare,
+  currentShareReady,
 }: UseShareReadyFormProps): UseShareReadyFormReturn {
   // Form setup
   const shareForm = useForm<ShareReadyConfig>({
-    defaultValues: currentShare,
-    values: currentShare, // Sync form with server data when it changes
+    defaultValues: currentShareReady,
+    values: currentShareReady, // Sync form with server data when it changes
   })
 
   // Mutation
@@ -54,7 +61,7 @@ export function useShareReadyForm({
   // Auto-save configuration
   const { triggerSave } = useAutoSave({
     form: shareForm,
-    originalValues: currentShare,
+    originalValues: currentShareReady,
     onUpdate: async () => {
       try {
         // Push complete share object (not partial updates)
@@ -91,9 +98,45 @@ export function useShareReadyForm({
     [shareForm, triggerSave],
   )
 
+  // CTA validation state
+  const [ctaUrlError, setCtaUrlError] = useState<string | null>(null)
+
+  // Clear CTA URL error (called when user types in URL field)
+  const clearCtaUrlError = useCallback(() => {
+    setCtaUrlError(null)
+  }, [])
+
+  // CTA URL validation on blur
+  const handleCtaUrlBlur = useCallback(() => {
+    const cta = shareForm.getValues('cta')
+    const hasLabel = cta?.label && cta.label.trim() !== ''
+    const hasUrl = cta?.url && cta.url.trim() !== ''
+
+    // If label is provided but URL is missing
+    if (hasLabel && !hasUrl) {
+      setCtaUrlError('URL is required when button label is provided')
+      return
+    }
+
+    // If URL is provided, validate format
+    if (hasUrl && cta.url) {
+      try {
+        new URL(cta.url)
+        setCtaUrlError(null)
+      } catch {
+        setCtaUrlError('Please enter a valid URL')
+      }
+    } else {
+      setCtaUrlError(null)
+    }
+  }, [shareForm])
+
   return {
     shareForm,
     watchedShare,
     handleShareUpdate,
+    ctaUrlError,
+    handleCtaUrlBlur,
+    clearCtaUrlError,
   }
 }
