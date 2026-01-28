@@ -79,14 +79,16 @@ export function resolvePrompt(
       const variable = variables.find(
         (v) => v.name === name && v.type === 'text',
       )
-      if (!variable) {
+      if (!variable || variable.type !== 'text') {
         unresolved.push({ type, name })
         return `[Undefined: ${name}]`
       }
       const inputValue = testInputs[name]
       // Check value mapping
-      if (variable.valueMap && inputValue) {
-        const mapped = variable.valueMap.find((m) => m.value === inputValue)
+      if (variable.valueMap && inputValue && typeof inputValue === 'string') {
+        const mapped = variable.valueMap.find(
+          (m: { value: string; text: string }) => m.value === inputValue,
+        )
         if (mapped) {
           // Resolve any media/input references within the mapped text
           return resolveMediaReferencesInText(
@@ -99,7 +101,11 @@ export function resolvePrompt(
         }
         return variable.defaultValue || `[No mapping: ${name}]`
       }
-      return inputValue || variable.defaultValue || `[No value: ${name}]`
+      return (
+        (typeof inputValue === 'string' ? inputValue : null) ||
+        variable.defaultValue ||
+        `[No value: ${name}]`
+      )
     }
 
     if (type === 'input') {
@@ -147,7 +153,7 @@ export function resolvePrompt(
 export function extractMediaReferences(
   promptTemplate: string,
   testInputs: TestInputState,
-  variables: PresetVariable[],
+  _variables: PresetVariable[],
   mediaRegistry: PresetMediaEntry[],
 ): MediaReferenceList {
   const regex = /@\{(input|ref):([a-zA-Z_][a-zA-Z0-9_]*)\}/g

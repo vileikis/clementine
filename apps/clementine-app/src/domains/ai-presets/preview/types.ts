@@ -1,7 +1,22 @@
 // Types for AI Preset Preview Panel
 
+import type { MediaReference as SharedMediaReference } from '@clementine/shared'
+
+/**
+ * Test input value type
+ * - string for text variables
+ * - MediaReference for image variables (uploaded images)
+ * - null for empty/unset values
+ *
+ * Note: MediaReference is JSON-serializable and can be stored in localStorage
+ */
+export type TestInputValue = string | SharedMediaReference | null
+
+/**
+ * Test input state mapping variable names to their values
+ */
 export type TestInputState = {
-  [variableName: string]: string | File | null
+  [variableName: string]: TestInputValue
 }
 
 export type ResolvedPrompt = {

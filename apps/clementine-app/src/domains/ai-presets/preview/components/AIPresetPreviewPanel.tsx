@@ -10,7 +10,7 @@
  * T023: AIPresetPreviewPanel Container
  */
 
-import { Component } from 'react'
+import { Component, useCallback, useState } from 'react'
 import { AlertCircle } from 'lucide-react'
 import { useAIPreset } from '../../editor/hooks/useAIPreset'
 import { useTestInputs } from '../hooks/useTestInputs'
@@ -19,9 +19,12 @@ import { usePresetValidation } from '../hooks/usePresetValidation'
 import { TestInputsForm } from './TestInputsForm'
 import { PromptPreview } from './PromptPreview'
 import type { ReactNode } from 'react'
+import type { MediaReference } from '@clementine/shared'
 import { Skeleton } from '@/ui-kit/ui/skeleton'
 import { Alert, AlertDescription } from '@/ui-kit/ui/alert'
 import { EditorSection } from '@/shared/editor-controls'
+import { useUploadMediaAsset } from '@/domains/media-library/hooks/useUploadMediaAsset'
+import { useAuth } from '@/domains/auth/hooks/useAuth'
 
 interface AIPresetPreviewPanelProps {
   workspaceId: string
@@ -52,6 +55,14 @@ function AIPresetPreviewPanelContent({
   workspaceId,
   presetId,
 }: AIPresetPreviewPanelProps) {
+  // Get current user for uploads
+  const { user } = useAuth()
+
+  // Track uploading state per variable
+  const [uploadingImages, setUploadingImages] = useState<
+    Record<string, boolean>
+  >({})
+
   // Fetch preset data with real-time updates
   const {
     data: preset,
@@ -65,7 +76,51 @@ function AIPresetPreviewPanelContent({
   const mediaRegistry = preset?.draft.mediaRegistry ?? []
   const promptTemplate = preset?.draft.promptTemplate ?? ''
 
-  const { testInputs, updateInput, resetToDefaults } = useTestInputs(variables)
+  const { testInputs, updateInput, resetToDefaults } = useTestInputs(
+    presetId,
+    variables,
+  )
+
+  // Upload media asset hook
+  const { mutateAsync: uploadMedia } = useUploadMediaAsset(
+    workspaceId,
+    user?.uid,
+  )
+
+  // Handle image upload for test inputs
+  const handleUploadImage = useCallback(
+    async (variableName: string, file: File) => {
+      try {
+        // Set uploading state
+        setUploadingImages((prev) => ({ ...prev, [variableName]: true }))
+
+        // Upload to Firebase Storage (using 'other' type for preset test images)
+        const result = await uploadMedia({
+          file,
+          type: 'other',
+          onProgress: (progress) => {
+            // Could add progress tracking per variable if needed
+            console.log(`Uploading ${variableName}: ${progress}%`)
+          },
+        })
+
+        // Store MediaReference (serializable to localStorage)
+        const mediaRef: MediaReference = {
+          mediaAssetId: result.mediaAssetId,
+          url: result.url,
+          filePath: result.filePath,
+        }
+        updateInput(variableName, mediaRef)
+      } catch (uploadError) {
+        console.error('Failed to upload image:', uploadError)
+        // Could show toast notification here
+      } finally {
+        // Clear uploading state
+        setUploadingImages((prev) => ({ ...prev, [variableName]: false }))
+      }
+    },
+    [uploadMedia, updateInput],
+  )
 
   // Resolve prompt with current test inputs
   const resolvedPrompt = usePromptResolution(
@@ -116,7 +171,9 @@ function AIPresetPreviewPanelContent({
         variables={variables}
         testInputs={testInputs}
         onInputChange={updateInput}
+        onUploadImage={handleUploadImage}
         onReset={resetToDefaults}
+        uploadingImages={uploadingImages}
       />
 
       {/* Validation Status (if there are errors or warnings) */}

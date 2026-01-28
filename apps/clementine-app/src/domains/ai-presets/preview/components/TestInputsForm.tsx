@@ -20,7 +20,6 @@ import type { PresetVariable } from '@clementine/shared'
 import type { TestInputState } from '../types'
 import { Button } from '@/ui-kit/ui/button'
 import { Input } from '@/ui-kit/ui/input'
-import { Label } from '@/ui-kit/ui/label'
 import {
   Select,
   SelectContent,
@@ -34,10 +33,12 @@ import { cn } from '@/shared/utils'
 interface TestInputsFormProps {
   variables: PresetVariable[]
   testInputs: TestInputState
-  onInputChange: (name: string, value: string | File | null) => void
+  onInputChange: (name: string, value: TestInputState[string]) => void
+  onUploadImage: (name: string, file: File) => Promise<void>
   onReset: () => void
   disabled?: boolean
   className?: string
+  uploadingImages?: Record<string, boolean>
 }
 
 /**
@@ -85,8 +86,7 @@ function TextInputField({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         disabled={disabled}
-        size="sm"
-        className="w-48"
+        className="h-9 w-48"
       />
     </div>
   )
@@ -133,7 +133,7 @@ function SelectInputField({
         )}
       </div>
       <Select value={value} onValueChange={onChange} disabled={disabled}>
-        <SelectTrigger id={id} size="sm" className="w-48">
+        <SelectTrigger id={id} className="h-9 w-48">
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent>
@@ -166,9 +166,11 @@ export function TestInputsForm({
   variables,
   testInputs,
   onInputChange,
+  onUploadImage,
   onReset,
   disabled = false,
   className,
+  uploadingImages = {},
 }: TestInputsFormProps) {
   // No variables to display
   if (variables.length === 0) {
@@ -228,7 +230,7 @@ export function TestInputsForm({
                   }))}
                   disabled={disabled}
                   placeholder="Select a value..."
-                  defaultValue={variable.defaultValue}
+                  defaultValue={variable.defaultValue ?? undefined}
                 />
               ) : (
                 // Text variable without value mappings - render text input
@@ -242,7 +244,7 @@ export function TestInputsForm({
                   onChange={(value) => onInputChange(variable.name, value)}
                   placeholder={`Enter ${variable.name}...`}
                   disabled={disabled}
-                  defaultValue={variable.defaultValue}
+                  defaultValue={variable.defaultValue ?? undefined}
                 />
               )
             ) : (
@@ -260,15 +262,20 @@ export function TestInputsForm({
                 <div className="w-full max-w-[200px]">
                   <MediaPickerField
                     label=""
-                    value={
-                      testInputs[variable.name] instanceof File
-                        ? URL.createObjectURL(testInputs[variable.name] as File)
-                        : typeof testInputs[variable.name] === 'string'
-                          ? (testInputs[variable.name] as string)
-                          : null
-                    }
+                    value={(() => {
+                      const input = testInputs[variable.name]
+                      if (
+                        input &&
+                        typeof input === 'object' &&
+                        'url' in input &&
+                        typeof input.url === 'string'
+                      ) {
+                        return input.url
+                      }
+                      return null
+                    })()}
                     onChange={(value) => onInputChange(variable.name, value)}
-                    onUpload={(file) => onInputChange(variable.name, file)}
+                    onUpload={(file) => onUploadImage(variable.name, file)}
                     accept={[
                       'image/png',
                       'image/jpeg',
@@ -278,7 +285,7 @@ export function TestInputsForm({
                     ]}
                     disabled={disabled}
                     removable={true}
-                    uploading={false}
+                    uploading={uploadingImages[variable.name] ?? false}
                   />
                 </div>
               </div>

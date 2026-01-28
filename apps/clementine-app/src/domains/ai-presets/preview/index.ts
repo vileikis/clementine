@@ -2,6 +2,7 @@
 
 export type {
   TestInputState,
+  TestInputValue,
   ResolvedPrompt,
   MediaReference,
   MediaReferenceList,
@@ -14,6 +15,9 @@ export type {
 export { TestInputsForm } from './components/TestInputsForm'
 export { AIPresetPreviewPanel } from './components/AIPresetPreviewPanel'
 export { PromptPreview } from './components/PromptPreview'
+
+// Store
+export { useAIPresetPreviewStore } from './store/useAIPresetPreviewStore'
 
 // Hooks
 export { useTestInputs } from './hooks/useTestInputs'
