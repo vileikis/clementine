@@ -1,6 +1,5 @@
 /**
  * Domain-Specific Hook: useUpdateShareReady
- * (Formerly useUpdateShare - renamed for clarity)
  *
  * Specialized mutation hook for updating project share ready state configuration.
  * Pushes the complete shareReady object to Firestore (atomic replacement).
@@ -68,6 +67,3 @@ export function useUpdateShareReady(projectId: string) {
 
   return useTrackedMutation(mutation)
 }
-
-/** @deprecated Use useUpdateShareReady instead */
-export const useUpdateShare = useUpdateShareReady

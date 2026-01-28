@@ -13,13 +13,13 @@ import { toast } from 'sonner'
 import { ShareConfigPanel } from '../components/ShareConfigPanel'
 import { ShareLoadingConfigPanel } from '../components/ShareLoadingConfigPanel'
 import { SharePreview } from '../components/SharePreview'
-import { useUpdateShare, useUpdateShareLoading } from '../hooks'
-import { DEFAULT_SHARE, DEFAULT_SHARE_LOADING } from '../constants'
+import { useUpdateShareLoading, useUpdateShareReady } from '../hooks'
+import { DEFAULT_SHARE_LOADING, DEFAULT_SHARE_READY } from '../constants'
 import type {
   CtaConfig,
-  ShareConfig,
   ShareLoadingConfig,
   ShareOptionsConfig,
+  ShareReadyConfig,
 } from '@clementine/shared'
 import { Tabs, TabsList, TabsTrigger } from '@/ui-kit/ui/tabs'
 import { PreviewShell } from '@/shared/preview-shell'
@@ -43,7 +43,7 @@ const DEFAULT_SHARE_OPTIONS: ShareOptionsConfig = {
 }
 
 // Fields to compare for auto-save change detection
-const SHARE_FIELDS_TO_COMPARE: (keyof ShareConfig)[] = [
+const SHARE_FIELDS_TO_COMPARE: (keyof ShareReadyConfig)[] = [
   'title',
   'description',
   'cta',
@@ -65,8 +65,8 @@ export function ShareEditorPage() {
   const [previewState, setPreviewState] = useState<PreviewState>('ready')
 
   // Get current configs from project or use defaults
-  const currentShare: ShareConfig = (project?.draftConfig?.share ??
-    DEFAULT_SHARE) as ShareConfig
+  const currentShare: ShareReadyConfig = (project?.draftConfig?.share ??
+    DEFAULT_SHARE_READY) as ShareReadyConfig
   const currentShareLoading: ShareLoadingConfig = (project?.draftConfig
     ?.shareLoading ?? DEFAULT_SHARE_LOADING) as ShareLoadingConfig
 
@@ -78,7 +78,7 @@ export function ShareEditorPage() {
   const currentTheme = project?.draftConfig?.theme ?? DEFAULT_THEME
 
   // Forms for both states
-  const shareForm = useForm<ShareConfig>({
+  const shareForm = useForm<ShareReadyConfig>({
     defaultValues: currentShare,
     values: currentShare, // Sync form with server data when it changes
   })
@@ -89,9 +89,9 @@ export function ShareEditorPage() {
   })
 
   // Mutations
-  const updateShare = useUpdateShare(projectId)
-  const updateShareLoading = useUpdateShareLoading(projectId)
-  const updateShareOptions = useUpdateShareOptions(projectId)
+  const updateShare = useUpdateShareReady(projectId ?? '')
+  const updateShareLoading = useUpdateShareLoading(projectId ?? '')
+  const updateShareOptions = useUpdateShareOptions(projectId ?? '')
 
   // Local state for optimistic UI updates on share options
   const [localShareOptions, setLocalShareOptions] =
@@ -146,17 +146,17 @@ export function ShareEditorPage() {
   })
 
   // Watch both forms for live preview
-  const watchedShare = useWatch({ control: shareForm.control }) as ShareConfig
+  const watchedShare = useWatch({ control: shareForm.control }) as ShareReadyConfig
   const watchedShareLoading = useWatch({
     control: shareLoadingForm.control,
   }) as ShareLoadingConfig
 
   // Handler for share content updates (ready state)
   const handleShareUpdate = useCallback(
-    (updates: Partial<ShareConfig>) => {
+    (updates: Partial<ShareReadyConfig>) => {
       // Update form values
       for (const [key, value] of Object.entries(updates)) {
-        shareForm.setValue(key as keyof ShareConfig, value, {
+        shareForm.setValue(key as keyof ShareReadyConfig, value, {
           shouldDirty: true,
         })
       }
@@ -215,9 +215,9 @@ export function ShareEditorPage() {
     }
 
     // If URL is provided, validate format
-    if (hasUrl) {
+    if (hasUrl && cta.url) {
       try {
-        new URL(cta.url!)
+        new URL(cta.url)
         setCtaUrlError(null)
       } catch {
         setCtaUrlError('Please enter a valid URL')
@@ -262,8 +262,8 @@ export function ShareEditorPage() {
   }
 
   // Merge watched values with defaults for complete share object
-  const previewShare: ShareConfig = {
-    ...DEFAULT_SHARE,
+  const previewShare: ShareReadyConfig = {
+    ...DEFAULT_SHARE_READY,
     ...watchedShare,
   }
 

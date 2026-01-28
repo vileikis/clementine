@@ -30,9 +30,9 @@ import {
 } from 'react-icons/fa6'
 import { FaTelegramPlane } from 'react-icons/fa'
 import type {
-  ShareConfig,
   ShareLoadingConfig,
   ShareOptionsConfig,
+  ShareReadyConfig,
 } from '@clementine/shared'
 import type { LucideIcon } from 'lucide-react'
 import type { IconType } from 'react-icons'
@@ -48,7 +48,7 @@ export interface SharePreviewProps {
   /** Preview state: ready (result available) or loading (AI generating) */
   previewState: 'ready' | 'loading'
   /** Share ready state config to preview */
-  share: ShareConfig
+  share: ShareReadyConfig
   /** Share loading state config to preview */
   shareLoading: ShareLoadingConfig
   /** Share options (determines which icons appear) */

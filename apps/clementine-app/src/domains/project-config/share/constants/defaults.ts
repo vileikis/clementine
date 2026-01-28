@@ -44,7 +44,6 @@ export const DEFAULT_SHARE_LOADING: ShareLoadingConfig = {
 
 /**
  * Default share ready state configuration values
- * (Formerly DEFAULT_SHARE - renamed for clarity)
  * Used when initializing form state or providing fallbacks.
  */
 export const DEFAULT_SHARE_READY: ShareReadyConfig = {
@@ -52,6 +51,3 @@ export const DEFAULT_SHARE_READY: ShareReadyConfig = {
   description: null,
   cta: null,
 }
-
-/** @deprecated Use DEFAULT_SHARE_READY instead */
-export const DEFAULT_SHARE = DEFAULT_SHARE_READY

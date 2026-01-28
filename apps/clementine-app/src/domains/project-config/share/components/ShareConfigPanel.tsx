@@ -21,8 +21,8 @@ import {
 } from '../constants'
 import type {
   CtaConfig,
-  ShareConfig,
   ShareOptionsConfig,
+  ShareReadyConfig,
 } from '@/domains/project-config/shared'
 import {
   EditorSection,
@@ -35,11 +35,11 @@ import { Label } from '@/ui-kit/ui/label'
 
 export interface ShareConfigPanelProps {
   /** Current share values */
-  share: ShareConfig
+  share: ShareReadyConfig
   /** Current share options values */
   shareOptions: ShareOptionsConfig
   /** Callback when a share content field is updated */
-  onShareUpdate: (updates: Partial<ShareConfig>) => void
+  onShareUpdate: (updates: Partial<ShareReadyConfig>) => void
   /** Callback when CTA is updated */
   onCtaUpdate: (updates: Partial<CtaConfig>) => void
   /** Callback when a share option is toggled */

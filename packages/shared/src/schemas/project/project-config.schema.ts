@@ -71,16 +71,12 @@ export const shareLoadingConfigSchema = z.object({
 
 /**
  * Share Ready State Configuration
- * (Formerly "shareConfigSchema" - renamed for clarity)
  */
 export const shareReadyConfigSchema = z.object({
   title: z.string().nullable().default(null),
   description: z.string().nullable().default(null),
   cta: ctaConfigSchema.nullable().default(null),
 })
-
-/** @deprecated Use shareReadyConfigSchema instead */
-export const shareConfigSchema = shareReadyConfigSchema
 
 /**
  * Welcome Screen Configuration
@@ -119,8 +115,6 @@ export type WelcomeConfig = z.infer<typeof welcomeConfigSchema>
 export type CtaConfig = z.infer<typeof ctaConfigSchema>
 export type ShareLoadingConfig = z.infer<typeof shareLoadingConfigSchema>
 export type ShareReadyConfig = z.infer<typeof shareReadyConfigSchema>
-/** @deprecated Use ShareReadyConfig instead */
-export type ShareConfig = ShareReadyConfig
 export type ExperiencePickerLayout = z.infer<typeof experiencePickerLayoutSchema>
 
 // Re-export media schemas
