@@ -177,6 +177,106 @@ describe('resolvePrompt', () => {
     expect(result.characterCount).toBe(0)
     expect(result.hasUnresolved).toBe(false)
   })
+
+  it('should resolve media references within value mappings', () => {
+    const promptTemplate = 'Character is holding @{text:weapon}'
+    const testInputs: TestInputState = { weapon: 'hammer' }
+    const variables: PresetVariable[] = [
+      {
+        name: 'weapon',
+        type: 'text',
+        defaultValue: 'sword',
+        valueMap: [
+          { value: 'sword', text: 'They should be holding @{ref:sword_ref}' },
+          { value: 'hammer', text: 'They should be holding @{ref:hammer}' },
+        ],
+      },
+    ]
+    const mediaRegistry: PresetMediaEntry[] = [
+      {
+        name: 'hammer',
+        url: 'https://example.com/hammer.jpg',
+        mediaAssetId: 'asset-1',
+      },
+    ]
+
+    const result = resolvePrompt(
+      promptTemplate,
+      testInputs,
+      variables,
+      mediaRegistry,
+    )
+
+    expect(result.text).toBe(
+      'Character is holding They should be holding [Media: hammer]',
+    )
+    expect(result.hasUnresolved).toBe(false)
+  })
+
+  it('should resolve missing media references within value mappings', () => {
+    const promptTemplate = 'Character is holding @{text:weapon}'
+    const testInputs: TestInputState = { weapon: 'hammer' }
+    const variables: PresetVariable[] = [
+      {
+        name: 'weapon',
+        type: 'text',
+        defaultValue: 'sword',
+        valueMap: [
+          { value: 'hammer', text: 'They should be holding @{ref:hammer}' },
+        ],
+      },
+    ]
+    const mediaRegistry: PresetMediaEntry[] = []
+
+    const result = resolvePrompt(
+      promptTemplate,
+      testInputs,
+      variables,
+      mediaRegistry,
+    )
+
+    expect(result.text).toBe(
+      'Character is holding They should be holding [Media: hammer (missing)]',
+    )
+    expect(result.hasUnresolved).toBe(true)
+    expect(result.unresolvedRefs).toEqual([{ type: 'ref', name: 'hammer' }])
+  })
+
+  it('should resolve input references within value mappings', () => {
+    const promptTemplate = 'Using style @{text:artStyle}'
+    const mockFile = new File([''], 'test.jpg', { type: 'image/jpeg' })
+    const testInputs: TestInputState = {
+      artStyle: 'fantasy',
+      fantasyRef: mockFile,
+    }
+    const variables: PresetVariable[] = [
+      {
+        name: 'artStyle',
+        type: 'text',
+        defaultValue: 'realistic',
+        valueMap: [
+          {
+            value: 'fantasy',
+            text: 'Use @{input:fantasyRef} as the reference',
+          },
+        ],
+      },
+      { name: 'fantasyRef', type: 'image', defaultValue: '' },
+    ]
+    const mediaRegistry: PresetMediaEntry[] = []
+
+    const result = resolvePrompt(
+      promptTemplate,
+      testInputs,
+      variables,
+      mediaRegistry,
+    )
+
+    expect(result.text).toBe(
+      'Using style Use [Image: fantasyRef] as the reference',
+    )
+    expect(result.hasUnresolved).toBe(false)
+  })
 })
 
 describe('extractMediaReferences', () => {

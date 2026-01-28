@@ -17,6 +17,7 @@ import { useTestInputs } from '../hooks/useTestInputs'
 import { usePromptResolution } from '../hooks/usePromptResolution'
 import { usePresetValidation } from '../hooks/usePresetValidation'
 import { TestInputsForm } from './TestInputsForm'
+import { PromptPreview } from './PromptPreview'
 import type { ReactNode } from 'react'
 import { Skeleton } from '@/ui-kit/ui/skeleton'
 import { Alert, AlertDescription } from '@/ui-kit/ui/alert'
@@ -159,16 +160,9 @@ function AIPresetPreviewPanelContent({
         </EditorSection>
       )}
 
-      {/* Resolved Prompt Preview (placeholder for Phase 4) */}
+      {/* Resolved Prompt Preview */}
       <EditorSection title="Resolved Prompt">
-        <div className="text-center py-4">
-          <p className="text-sm text-muted-foreground">
-            Prompt preview coming in Phase 4
-          </p>
-          <p className="text-xs text-muted-foreground mt-2">
-            Character count: {resolvedPrompt.characterCount}
-          </p>
-        </div>
+        <PromptPreview resolvedPrompt={resolvedPrompt} />
       </EditorSection>
     </div>
   )

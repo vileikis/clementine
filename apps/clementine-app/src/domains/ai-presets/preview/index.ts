@@ -13,6 +13,7 @@ export type {
 // Components
 export { TestInputsForm } from './components/TestInputsForm'
 export { AIPresetPreviewPanel } from './components/AIPresetPreviewPanel'
+export { PromptPreview } from './components/PromptPreview'
 
 // Hooks
 export { useTestInputs } from './hooks/useTestInputs'

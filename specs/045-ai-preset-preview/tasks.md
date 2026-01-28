@@ -90,16 +90,16 @@ This is a web application using TanStack Start. Paths follow the established str
 
 ### Implementation for User Story 2
 
-- [ ] T029 [P] [US2] Create PromptPreview component in apps/clementine-app/src/domains/ai-presets/preview/components/PromptPreview.tsx displaying resolved prompt text using usePromptResolution hook
-- [ ] T030 [P] [US2] Add character count display in PromptPreview component showing length of resolved text
-- [ ] T031 [P] [US2] Add visual distinction in PromptPreview for unresolved references (red text/strikethrough for references that failed to resolve)
-- [ ] T032 [P] [US2] Apply syntax highlighting or monospace font styling to PromptPreview for better readability
-- [ ] T033 [US2] Integrate PromptPreview into AIPresetPreviewPanel component below TestInputsForm
-- [ ] T034 [US2] Add useMemo optimization in PromptPreview to prevent unnecessary re-renders when resolved prompt hasn't changed
-- [ ] T035 [US2] Add debouncing behavior (300ms) to prompt resolution using useMemo dependencies to match spec requirement
-- [ ] T036 [US2] Add scrollable container to PromptPreview for long resolved prompts (10,000+ characters)
-- [ ] T037 [US2] Add empty state to PromptPreview when prompt template has no content
-- [ ] T038 [US2] Add copy-to-clipboard button to PromptPreview component for easy testing
+- [X] T029 [P] [US2] Create PromptPreview component in apps/clementine-app/src/domains/ai-presets/preview/components/PromptPreview.tsx displaying resolved prompt text using usePromptResolution hook
+- [X] T030 [P] [US2] Add character count display in PromptPreview component showing length of resolved text
+- [X] T031 [P] [US2] Add visual distinction in PromptPreview for unresolved references (red text/strikethrough for references that failed to resolve)
+- [X] T032 [P] [US2] Apply syntax highlighting or monospace font styling to PromptPreview for better readability
+- [X] T033 [US2] Integrate PromptPreview into AIPresetPreviewPanel component below TestInputsForm
+- [X] T034 [US2] Add useMemo optimization in PromptPreview to prevent unnecessary re-renders when resolved prompt hasn't changed
+- [X] T035 [US2] Add debouncing behavior (300ms) to prompt resolution using useMemo dependencies to match spec requirement
+- [X] T036 [US2] Add scrollable container to PromptPreview for long resolved prompts (10,000+ characters)
+- [X] T037 [US2] Add empty state to PromptPreview when prompt template has no content
+- [X] T038 [US2] Add copy-to-clipboard button to PromptPreview component for easy testing
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently - users can input values and see resolved prompt update in real-time
 

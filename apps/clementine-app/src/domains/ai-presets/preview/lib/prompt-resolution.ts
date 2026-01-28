@@ -8,6 +8,52 @@ import type {
 import type { PresetMediaEntry, PresetVariable } from '@clementine/shared'
 
 /**
+ * Resolves media and input references within text (helper function).
+ * Used to resolve references in value mappings.
+ *
+ * @param text - Text that may contain @{ref:name} or @{input:name} references
+ * @param variables - Array of preset variables
+ * @param mediaRegistry - Array of preset media entries
+ * @param testInputs - Current test input values
+ * @param unresolved - Array to collect unresolved references
+ * @returns Text with media/input references resolved to [Media: name] or [Image: name]
+ */
+function resolveMediaReferencesInText(
+  text: string,
+  variables: PresetVariable[],
+  mediaRegistry: PresetMediaEntry[],
+  testInputs: TestInputState,
+  unresolved: { type: 'text' | 'input' | 'ref'; name: string }[],
+): string {
+  const regex = /@\{(input|ref):([a-zA-Z_][a-zA-Z0-9_]*)\}/g
+
+  return text.replace(regex, (match, type, name) => {
+    if (type === 'input') {
+      const variable = variables.find(
+        (v) => v.name === name && v.type === 'image',
+      )
+      if (!variable) {
+        unresolved.push({ type, name })
+        return `[Undefined: ${name}]`
+      }
+      const file = testInputs[name]
+      return file ? `[Image: ${name}]` : `[Image: ${name} (missing)]`
+    }
+
+    if (type === 'ref') {
+      const media = mediaRegistry.find((m) => m.name === name)
+      if (!media) {
+        unresolved.push({ type, name })
+        return `[Media: ${name} (missing)]`
+      }
+      return `[Media: ${name}]`
+    }
+
+    return match
+  })
+}
+
+/**
  * Resolves a prompt template by substituting all @{type:name} references
  * with their corresponding values from test inputs, value mappings, and media registry.
  *
@@ -41,9 +87,17 @@ export function resolvePrompt(
       // Check value mapping
       if (variable.valueMap && inputValue) {
         const mapped = variable.valueMap.find((m) => m.value === inputValue)
-        return mapped
-          ? mapped.text
-          : variable.defaultValue || `[No mapping: ${name}]`
+        if (mapped) {
+          // Resolve any media/input references within the mapped text
+          return resolveMediaReferencesInText(
+            mapped.text,
+            variables,
+            mediaRegistry,
+            testInputs,
+            unresolved,
+          )
+        }
+        return variable.defaultValue || `[No mapping: ${name}]`
       }
       return inputValue || variable.defaultValue || `[No value: ${name}]`
     }
