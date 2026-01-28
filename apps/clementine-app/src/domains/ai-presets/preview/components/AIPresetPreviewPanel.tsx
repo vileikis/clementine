@@ -108,9 +108,9 @@ function AIPresetPreviewPanelContent({
         const result = await uploadMedia({
           file,
           type: 'other',
-          onProgress: (progress) => {
-            // Could add progress tracking per variable if needed
-            console.log(`Uploading ${variableName}: ${progress}%`)
+          onProgress: (_progress) => {
+            // Progress tracking could be added here if needed
+            // For now, the uploading state indicator is sufficient
           },
         })
 

@@ -79,7 +79,7 @@ export function useShareReadyForm({
       }
     },
     fieldsToCompare: SHARE_READY_FIELDS_TO_COMPARE,
-    debounceMs: 10000,
+    debounceMs: 2000,
   })
 
   // Watch form for live preview

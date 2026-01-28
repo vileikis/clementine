@@ -85,7 +85,7 @@ export function resolvePrompt(
       }
       const inputValue = testInputs[name]
       // Check value mapping
-      if (variable.valueMap && inputValue && typeof inputValue === 'string') {
+      if (variable.valueMap && typeof inputValue === 'string') {
         const mapped = variable.valueMap.find(
           (m: { value: string; text: string }) => m.value === inputValue,
         )
@@ -99,11 +99,11 @@ export function resolvePrompt(
             unresolved,
           )
         }
-        return variable.defaultValue || `[No mapping: ${name}]`
+        return variable.defaultValue ?? `[No mapping: ${name}]`
       }
       return (
-        (typeof inputValue === 'string' ? inputValue : null) ||
-        variable.defaultValue ||
+        (typeof inputValue === 'string' ? inputValue : null) ??
+        variable.defaultValue ??
         `[No value: ${name}]`
       )
     }

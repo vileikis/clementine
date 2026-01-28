@@ -38,10 +38,14 @@ export function useTestInputs(presetId: string, variables: PresetVariable[]) {
       .getState()
       .getTestInputs(presetId)
 
-    // If preset has no stored inputs, initialize with defaults
-    if (Object.keys(storedInputs).length === 0 && variables.length > 0) {
+    // Initialize defaults for variables that don't have stored inputs
+    if (variables.length > 0) {
       for (const variable of variables) {
-        if (variable.type === 'text' && variable.defaultValue) {
+        const hasInput = Object.prototype.hasOwnProperty.call(
+          storedInputs,
+          variable.name,
+        )
+        if (!hasInput && variable.type === 'text' && variable.defaultValue) {
           setTestInput(presetId, variable.name, variable.defaultValue)
         }
       }

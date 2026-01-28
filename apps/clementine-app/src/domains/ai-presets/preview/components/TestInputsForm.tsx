@@ -10,7 +10,7 @@
  * T016-T022: Test Variable Inputs
  */
 
-import { memo, useEffect } from 'react'
+import { memo } from 'react'
 import { RotateCcw } from 'lucide-react'
 import { isMediaReference } from '../lib/type-guards'
 import { TextVariableInput } from './TextVariableInput'
@@ -58,18 +58,6 @@ function TestInputsFormInner({
   className,
   uploadingImages = {},
 }: TestInputsFormProps) {
-  // T076: Add keyboard navigation support (Escape to reset)
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !disabled) {
-        onReset()
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [onReset, disabled])
-
   // No variables to display
   if (variables.length === 0) {
     return (
