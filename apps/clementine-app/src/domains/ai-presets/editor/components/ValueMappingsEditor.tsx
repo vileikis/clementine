@@ -84,6 +84,20 @@ function InitializeContentPlugin({
 }
 
 /**
+ * Plugin to update editor editable state when disabled prop changes
+ * Responds to runtime prop changes
+ */
+function EditableStatePlugin({ disabled }: { disabled: boolean }) {
+  const [editor] = useLexicalComposerContext()
+
+  useEffect(() => {
+    editor.setEditable(!disabled)
+  }, [editor, disabled])
+
+  return null
+}
+
+/**
  * Inline Lexical editor for prompt text with media-only @mentions
  * Compact version for table cells
  */
@@ -149,6 +163,7 @@ function InlineLexicalEditor({
       {/* Pass empty variables array to show only media */}
       <MentionsPlugin variables={[]} media={mediaOptions} />
       <SmartPastePlugin variables={[]} media={mediaOptions} />
+      <EditableStatePlugin disabled={!!disabled} />
 
       {/* Initialize content */}
       <InitializeContentPlugin value={value} mediaOptions={mediaOptions} />

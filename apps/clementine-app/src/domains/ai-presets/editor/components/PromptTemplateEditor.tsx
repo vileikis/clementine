@@ -221,6 +221,7 @@ export function PromptTemplateEditor({
         <MentionsPlugin variables={variableOptions} media={mediaOptions} />
         <SmartPastePlugin variables={variableOptions} media={mediaOptions} />
         <MentionValidationPlugin variables={variables} media={media} />
+        <EditableStatePlugin disabled={disabled} />
 
         {/* Initialize content */}
         <InitializeContentPlugin onInit={handleEditorInit} />
@@ -258,6 +259,20 @@ function InitializeContentPlugin({
       onInit(editor)
     }
   }, [editor, onInit])
+
+  return null
+}
+
+/**
+ * Plugin to update editor editable state when disabled prop changes
+ * Responds to runtime prop changes
+ */
+function EditableStatePlugin({ disabled }: { disabled: boolean }) {
+  const [editor] = useLexicalComposerContext()
+
+  useEffect(() => {
+    editor.setEditable(!disabled)
+  }, [editor, disabled])
 
   return null
 }
