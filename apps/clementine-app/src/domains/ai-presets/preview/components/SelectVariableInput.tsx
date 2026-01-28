@@ -16,6 +16,8 @@ import {
   SelectValue,
 } from '@/ui-kit/ui/select'
 
+const EMPTY_VALUE = '__EMPTY__'
+
 interface SelectVariableInputProps {
   /** Text variable with value mappings */
   variable: TextVariable & {
@@ -57,6 +59,14 @@ export function SelectVariableInput({
 }: SelectVariableInputProps) {
   const id = useId()
 
+  // Convert empty string to special marker for Select component
+  const selectValue = value === '' ? EMPTY_VALUE : value
+
+  // Handle change and convert marker back to empty string
+  const handleChange = (newValue: string) => {
+    onChange(newValue === EMPTY_VALUE ? '' : newValue)
+  }
+
   return (
     <div className="grid grid-cols-[1fr_auto] items-center gap-3">
       <VariableMention
@@ -64,7 +74,11 @@ export function SelectVariableInput({
         type="text"
         defaultValue={variable.defaultValue}
       />
-      <Select value={value} onValueChange={onChange} disabled={disabled}>
+      <Select
+        value={selectValue}
+        onValueChange={handleChange}
+        disabled={disabled}
+      >
         <SelectTrigger
           id={id}
           className="h-11 w-48"
@@ -73,6 +87,7 @@ export function SelectVariableInput({
           <SelectValue placeholder="Select a value..." />
         </SelectTrigger>
         <SelectContent>
+          <SelectItem value={EMPTY_VALUE}>{'<empty>'}</SelectItem>
           {variable.valueMap.map((mapping: { value: string; text: string }) => (
             <SelectItem key={mapping.value} value={mapping.value}>
               {mapping.value}

@@ -194,7 +194,7 @@ This is a web application using TanStack Start. Paths follow the established str
 - [X] T082 Verify colocated tests all pass: pnpm app:test domains/ai-presets/preview
 - [X] T083 Update barrel export in preview/index.ts to export all public components and hooks
 - [ ] T084 Add preview panel feature to workspace navigation or onboarding tooltips if applicable
-- [ ] T085 Create git commit with message following convention: "Add AI preset preview panel for testing variable inputs (Phase 4)" with Co-Authored-By tag
+- [X] T085 Create git commit with message following convention: "Add AI preset preview panel for testing variable inputs (Phase 4)" with Co-Authored-By tag
 
 ---
 
