@@ -2,6 +2,7 @@
  * ShareEditorPage Container
  *
  * 2-column layout with live preview (right) and controls (left).
+ * Supports both ready and loading state configuration with tab switching.
  * Integrates with auto-save, tracked mutations, and PreviewShell.
  */
 
@@ -10,14 +11,17 @@ import { useParams } from '@tanstack/react-router'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import { ShareConfigPanel } from '../components/ShareConfigPanel'
+import { ShareLoadingConfigPanel } from '../components/ShareLoadingConfigPanel'
 import { SharePreview } from '../components/SharePreview'
-import { useUpdateShare } from '../hooks'
-import { DEFAULT_SHARE } from '../constants'
+import { useUpdateShare, useUpdateShareLoading } from '../hooks'
+import { DEFAULT_SHARE, DEFAULT_SHARE_LOADING } from '../constants'
 import type {
   CtaConfig,
   ShareConfig,
+  ShareLoadingConfig,
   ShareOptionsConfig,
-} from '@/domains/project-config/shared'
+} from '@clementine/shared'
+import { Tabs, TabsList, TabsTrigger } from '@/ui-kit/ui/tabs'
 import { PreviewShell } from '@/shared/preview-shell'
 import { useAutoSave } from '@/shared/forms'
 import { useProject } from '@/domains/project/shared'
@@ -45,12 +49,26 @@ const SHARE_FIELDS_TO_COMPARE: (keyof ShareConfig)[] = [
   'cta',
 ]
 
+const SHARE_LOADING_FIELDS_TO_COMPARE: (keyof ShareLoadingConfig)[] = [
+  'title',
+  'description',
+]
+
+// Preview state type
+type PreviewState = 'ready' | 'loading'
+
 export function ShareEditorPage() {
   const { projectId } = useParams({ strict: false })
   const { data: project } = useProject(projectId ?? '')
 
-  // Get current share from project or use defaults
-  const currentShare = project?.draftConfig?.share ?? DEFAULT_SHARE
+  // Preview state (controls both preview and config panel)
+  const [previewState, setPreviewState] = useState<PreviewState>('ready')
+
+  // Get current configs from project or use defaults
+  const currentShare: ShareConfig = (project?.draftConfig?.share ??
+    DEFAULT_SHARE) as ShareConfig
+  const currentShareLoading: ShareLoadingConfig = (project?.draftConfig
+    ?.shareLoading ?? DEFAULT_SHARE_LOADING) as ShareLoadingConfig
 
   // Get current share options from project or use defaults
   const currentShareOptions =
@@ -59,15 +77,21 @@ export function ShareEditorPage() {
   // Get current theme from project or use defaults
   const currentTheme = project?.draftConfig?.theme ?? DEFAULT_THEME
 
-  // Form setup
-  const form = useForm<ShareConfig>({
+  // Forms for both states
+  const shareForm = useForm<ShareConfig>({
     defaultValues: currentShare,
     values: currentShare, // Sync form with server data when it changes
   })
 
+  const shareLoadingForm = useForm<ShareLoadingConfig>({
+    defaultValues: currentShareLoading,
+    values: currentShareLoading, // Sync form with server data when it changes
+  })
+
   // Mutations
-  const updateShare = useUpdateShare(projectId!)
-  const updateShareOptions = useUpdateShareOptions(projectId!)
+  const updateShare = useUpdateShare(projectId)
+  const updateShareLoading = useUpdateShareLoading(projectId)
+  const updateShareOptions = useUpdateShareOptions(projectId)
 
   // Local state for optimistic UI updates on share options
   const [localShareOptions, setLocalShareOptions] =
@@ -79,14 +103,14 @@ export function ShareEditorPage() {
   // CTA URL validation state
   const [ctaUrlError, setCtaUrlError] = useState<string | null>(null)
 
-  // Auto-save with debounce
+  // Auto-save for ready state (existing)
   const { triggerSave } = useAutoSave({
-    form,
+    form: shareForm,
     originalValues: currentShare,
     onUpdate: async () => {
       try {
         // Push complete share object (not partial updates)
-        const fullShare = form.getValues()
+        const fullShare = shareForm.getValues()
         await updateShare.mutateAsync(fullShare)
         // No toast - save indicator handles feedback
       } catch (error) {
@@ -99,30 +123,73 @@ export function ShareEditorPage() {
     debounceMs: 2000,
   })
 
-  // Watch form values for live preview
-  const watchedShare = useWatch({ control: form.control }) as ShareConfig
+  // Auto-save for loading state (new)
+  const { triggerSave: triggerLoadingSave } = useAutoSave({
+    form: shareLoadingForm,
+    originalValues: currentShareLoading,
+    onUpdate: async () => {
+      try {
+        // Push complete shareLoading object
+        const fullShareLoading = shareLoadingForm.getValues()
+        await updateShareLoading.mutateAsync(fullShareLoading)
+        // No toast - save indicator handles feedback
+      } catch (error) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : 'Failed to save loading config'
+        toast.error(message)
+      }
+    },
+    fieldsToCompare: SHARE_LOADING_FIELDS_TO_COMPARE,
+    debounceMs: 2000,
+  })
 
-  // Handler for share content updates
+  // Watch both forms for live preview
+  const watchedShare = useWatch({ control: shareForm.control }) as ShareConfig
+  const watchedShareLoading = useWatch({
+    control: shareLoadingForm.control,
+  }) as ShareLoadingConfig
+
+  // Handler for share content updates (ready state)
   const handleShareUpdate = useCallback(
     (updates: Partial<ShareConfig>) => {
       // Update form values
       for (const [key, value] of Object.entries(updates)) {
-        form.setValue(key as keyof ShareConfig, value, {
+        shareForm.setValue(key as keyof ShareConfig, value, {
           shouldDirty: true,
         })
       }
       // Trigger debounced save
       triggerSave()
     },
-    [form, triggerSave],
+    [shareForm, triggerSave],
+  )
+
+  // Handler for loading state updates (new)
+  const handleShareLoadingUpdate = useCallback(
+    (updates: Partial<ShareLoadingConfig>) => {
+      // Update form values
+      for (const [key, value] of Object.entries(updates)) {
+        shareLoadingForm.setValue(key as keyof ShareLoadingConfig, value, {
+          shouldDirty: true,
+        })
+      }
+      // Trigger debounced save
+      triggerLoadingSave()
+    },
+    [shareLoadingForm, triggerLoadingSave],
   )
 
   // Handler for CTA updates
   const handleCtaUpdate = useCallback(
     (updates: Partial<CtaConfig>) => {
-      const currentCta = form.getValues('cta') ?? { label: null, url: null }
+      const currentCta = shareForm.getValues('cta') ?? {
+        label: null,
+        url: null,
+      }
       const newCta = { ...currentCta, ...updates }
-      form.setValue('cta', newCta, { shouldDirty: true })
+      shareForm.setValue('cta', newCta, { shouldDirty: true })
 
       // Clear URL error when user types in URL field
       if ('url' in updates) {
@@ -132,12 +199,12 @@ export function ShareEditorPage() {
       // Trigger debounced save
       triggerSave()
     },
-    [form, triggerSave],
+    [shareForm, triggerSave],
   )
 
   // URL validation on blur
   const handleCtaUrlBlur = useCallback(() => {
-    const cta = form.getValues('cta')
+    const cta = shareForm.getValues('cta')
     const hasLabel = cta?.label && cta.label.trim() !== ''
     const hasUrl = cta?.url && cta.url.trim() !== ''
 
@@ -158,7 +225,7 @@ export function ShareEditorPage() {
     } else {
       setCtaUrlError(null)
     }
-  }, [form])
+  }, [shareForm])
 
   // Handler for share option toggles
   const handleShareOptionToggle = useCallback(
@@ -186,7 +253,7 @@ export function ShareEditorPage() {
         toast.error(message)
       }
     },
-    [displayShareOptions, currentShareOptions, updateShareOptions],
+    [displayShareOptions, currentShareOptions, updateShareOptions.mutateAsync],
   )
 
   // Loading state
@@ -200,14 +267,36 @@ export function ShareEditorPage() {
     ...watchedShare,
   }
 
+  const previewShareLoading: ShareLoadingConfig = {
+    ...DEFAULT_SHARE_LOADING,
+    ...watchedShareLoading,
+  }
+
   return (
     <div className="flex h-full">
       {/* Right: Preview */}
       <div className="flex-1 min-w-0">
-        <PreviewShell enableViewportSwitcher enableFullscreen>
+        <PreviewShell
+          enableViewportSwitcher
+          enableFullscreen
+          headerSlot={
+            <Tabs
+              value={previewState}
+              onValueChange={(v: string) => setPreviewState(v as PreviewState)}
+              className="mr-4"
+            >
+              <TabsList>
+                <TabsTrigger value="ready">Ready</TabsTrigger>
+                <TabsTrigger value="loading">Loading</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          }
+        >
           <ThemeProvider theme={currentTheme}>
             <SharePreview
+              previewState={previewState}
               share={previewShare}
+              shareLoading={previewShareLoading}
               shareOptions={displayShareOptions}
             />
           </ThemeProvider>
@@ -217,17 +306,30 @@ export function ShareEditorPage() {
       {/* Left: Controls */}
       <aside className="w-80 shrink-0 border-r border-border overflow-y-auto bg-card">
         <div className="sticky top-0 z-10 border-b border-border bg-card px-4 py-3">
-          <h2 className="font-semibold">Share</h2>
+          <h2 className="font-semibold">
+            Share Screen
+            <span className="text-muted-foreground text-sm ml-2">
+              · {previewState === 'ready' ? 'Ready' : 'Loading'}
+            </span>
+          </h2>
         </div>
-        <ShareConfigPanel
-          share={previewShare}
-          shareOptions={displayShareOptions}
-          onShareUpdate={handleShareUpdate}
-          onCtaUpdate={handleCtaUpdate}
-          onShareOptionToggle={handleShareOptionToggle}
-          ctaUrlError={ctaUrlError}
-          onCtaUrlBlur={handleCtaUrlBlur}
-        />
+
+        {previewState === 'ready' ? (
+          <ShareConfigPanel
+            share={previewShare}
+            shareOptions={displayShareOptions}
+            onShareUpdate={handleShareUpdate}
+            onCtaUpdate={handleCtaUpdate}
+            onShareOptionToggle={handleShareOptionToggle}
+            ctaUrlError={ctaUrlError}
+            onCtaUrlBlur={handleCtaUrlBlur}
+          />
+        ) : (
+          <ShareLoadingConfigPanel
+            shareLoading={previewShareLoading}
+            onShareLoadingUpdate={handleShareLoadingUpdate}
+          />
+        )}
       </aside>
     </div>
   )

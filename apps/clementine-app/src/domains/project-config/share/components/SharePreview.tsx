@@ -2,12 +2,14 @@
  * SharePreview Component
  *
  * Display-only preview component showing how the share screen will appear
- * in the guest-facing experience. Uses ThemedText, ThemedBackground,
- * ThemedButton, and ThemedIconButton primitives from shared theming module.
+ * in the guest-facing experience. Supports both ready and loading states.
  *
- * Two-zone layout:
- * 1. Scrollable content zone (top): Title, description, media placeholder
- * 2. Fixed footer zone (bottom): Share icons, Start over, CTA button
+ * Uses ThemedText, ThemedBackground, ThemedButton, and ThemedIconButton primitives
+ * from shared theming module.
+ *
+ * Two states:
+ * 1. Loading: Skeleton placeholder + loading text (during AI generation)
+ * 2. Ready: Full share screen with media, title, description, CTA, share icons
  *
  * Must be used within a ThemeProvider.
  */
@@ -29,10 +31,12 @@ import {
 import { FaTelegramPlane } from 'react-icons/fa'
 import type {
   ShareConfig,
+  ShareLoadingConfig,
   ShareOptionsConfig,
-} from '@/domains/project-config/shared'
+} from '@clementine/shared'
 import type { LucideIcon } from 'lucide-react'
 import type { IconType } from 'react-icons'
+import { Skeleton } from '@/ui-kit/ui/skeleton'
 import {
   ThemedBackground,
   ThemedButton,
@@ -41,8 +45,12 @@ import {
 } from '@/shared/theming'
 
 export interface SharePreviewProps {
-  /** Share config to preview */
+  /** Preview state: ready (result available) or loading (AI generating) */
+  previewState: 'ready' | 'loading'
+  /** Share ready state config to preview */
   share: ShareConfig
+  /** Share loading state config to preview */
+  shareLoading: ShareLoadingConfig
   /** Share options (determines which icons appear) */
   shareOptions: ShareOptionsConfig
 }
@@ -76,12 +84,42 @@ const SHARE_ICON_ORDER: (keyof ShareOptionsConfig)[] = [
   'telegram',
 ]
 
-export function SharePreview({ share, shareOptions }: SharePreviewProps) {
+export function SharePreview({
+  previewState,
+  share,
+  shareLoading,
+  shareOptions,
+}: SharePreviewProps) {
   // Get enabled icons in order
   const enabledIcons = SHARE_ICON_ORDER.filter(
     (platform) => shareOptions[platform],
   )
 
+  // Loading state preview
+  if (previewState === 'loading') {
+    return (
+      <ThemedBackground
+        className="h-full w-full"
+        contentClassName="flex flex-col items-center justify-center p-8 space-y-6"
+      >
+        {/* Image skeleton */}
+        <Skeleton className="w-full aspect-square max-w-md rounded-lg" />
+
+        {/* Loading title */}
+        <ThemedText variant="heading" className="text-center">
+          {shareLoading.title || 'Creating your experience...'}
+        </ThemedText>
+
+        {/* Loading description */}
+        <ThemedText variant="body" className="text-center opacity-90 max-w-md">
+          {shareLoading.description ||
+            'This usually takes 30-60 seconds. Please wait while we generate your personalized result.'}
+        </ThemedText>
+      </ThemedBackground>
+    )
+  }
+
+  // Ready state preview (existing implementation)
   return (
     <ThemedBackground
       className="h-full w-full"

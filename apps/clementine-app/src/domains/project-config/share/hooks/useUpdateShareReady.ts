@@ -1,18 +1,19 @@
 /**
- * Domain-Specific Hook: useUpdateShare
+ * Domain-Specific Hook: useUpdateShareReady
+ * (Formerly useUpdateShare - renamed for clarity)
  *
- * Specialized mutation hook for updating project share screen configuration.
- * Pushes the complete share object to Firestore (atomic replacement).
+ * Specialized mutation hook for updating project share ready state configuration.
+ * Pushes the complete shareReady object to Firestore (atomic replacement).
  *
  * @param projectId - Project ID
- * @returns TanStack Query mutation for share updates
+ * @returns TanStack Query mutation for share ready updates
  *
  * @example
  * ```tsx
- * const updateShare = useUpdateShare(projectId)
+ * const updateShareReady = useUpdateShareReady(projectId)
  *
- * // Update entire share config
- * await updateShare.mutateAsync({
+ * // Update entire share ready config
+ * await updateShareReady.mutateAsync({
  *   title: 'Your photo is ready!',
  *   description: 'Download or share your creation',
  *   cta: { label: 'Visit Website', url: 'https://example.com' }
@@ -21,7 +22,7 @@
  */
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import * as Sentry from '@sentry/tanstackstart-react'
-import type { ShareConfig } from '@/domains/project-config/shared/schemas'
+import type { ShareReadyConfig } from '@clementine/shared'
 import {
   shareWriteSchema,
   updateProjectConfigField,
@@ -29,18 +30,18 @@ import {
 import { useTrackedMutation } from '@/domains/project-config/designer'
 
 /**
- * Hook for updating project share config with domain-specific tracking
+ * Hook for updating project share ready config with domain-specific tracking
  */
-export function useUpdateShare(projectId: string) {
+export function useUpdateShareReady(projectId: string) {
   const queryClient = useQueryClient()
 
   const mutation = useMutation({
-    mutationFn: async (share: ShareConfig) => {
+    mutationFn: async (shareReady: ShareReadyConfig) => {
       // Validate with write schema (stricter than read schema)
-      const validated = shareWriteSchema.parse(share)
+      const validated = shareWriteSchema.parse(shareReady)
 
-      // Push entire share object (atomic replacement)
-      await updateProjectConfigField(projectId, { share: validated })
+      // Push entire shareReady object (atomic replacement)
+      await updateProjectConfigField(projectId, { shareReady: validated })
     },
 
     // Success: invalidate queries to trigger re-fetch
@@ -55,10 +56,10 @@ export function useUpdateShare(projectId: string) {
       Sentry.captureException(error, {
         tags: {
           domain: 'project-config/share',
-          action: 'update-share',
+          action: 'update-share-ready',
         },
         extra: {
-          errorType: 'share-update-failure',
+          errorType: 'share-ready-update-failure',
           projectId,
         },
       })
@@ -67,3 +68,6 @@ export function useUpdateShare(projectId: string) {
 
   return useTrackedMutation(mutation)
 }
+
+/** @deprecated Use useUpdateShareReady instead */
+export const useUpdateShare = useUpdateShareReady

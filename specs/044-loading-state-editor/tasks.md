@@ -25,16 +25,16 @@
 
 **Purpose**: Add schema definitions and data persistence infrastructure that all user stories depend on
 
-- [ ] T001 [P] Add ShareLoadingConfig schema in packages/shared/src/schemas/project/project-config.schema.ts
-- [ ] T002 [P] Rename shareConfigSchema to shareReadyConfigSchema (keep deprecated alias) in packages/shared/src/schemas/project/project-config.schema.ts
-- [ ] T003 Update projectConfigSchema with shareReady and shareLoading fields in packages/shared/src/schemas/project/project-config.schema.ts
-- [ ] T004 Export ShareLoadingConfig and ShareReadyConfig types in packages/shared/src/index.ts
-- [ ] T005 Build shared package after schema changes: `pnpm --filter @clementine/shared build`
-- [ ] T006 [P] Add DEFAULT_SHARE_LOADING constant in apps/clementine-app/src/domains/project-config/share/constants/defaults.ts
-- [ ] T007 [P] Rename DEFAULT_SHARE to DEFAULT_SHARE_READY (keep deprecated alias) in apps/clementine-app/src/domains/project-config/share/constants/defaults.ts
-- [ ] T008 Create useUpdateShareLoading hook in apps/clementine-app/src/domains/project-config/share/hooks/useUpdateShareLoading.ts
-- [ ] T009 Rename useUpdateShare.ts to useUpdateShareReady.ts (keep deprecated export) in apps/clementine-app/src/domains/project-config/share/hooks/
-- [ ] T010 Update barrel export to export new hooks in apps/clementine-app/src/domains/project-config/share/index.ts
+- [X] T001 [P] Add ShareLoadingConfig schema in packages/shared/src/schemas/project/project-config.schema.ts
+- [X] T002 [P] Rename shareConfigSchema to shareReadyConfigSchema (keep deprecated alias) in packages/shared/src/schemas/project/project-config.schema.ts
+- [X] T003 Update projectConfigSchema with shareReady and shareLoading fields in packages/shared/src/schemas/project/project-config.schema.ts
+- [X] T004 Export ShareLoadingConfig and ShareReadyConfig types in packages/shared/src/index.ts
+- [X] T005 Build shared package after schema changes: `pnpm --filter @clementine/shared build`
+- [X] T006 [P] Add DEFAULT_SHARE_LOADING constant in apps/clementine-app/src/domains/project-config/share/constants/defaults.ts
+- [X] T007 [P] Rename DEFAULT_SHARE to DEFAULT_SHARE_READY (keep deprecated alias) in apps/clementine-app/src/domains/project-config/share/constants/defaults.ts
+- [X] T008 Create useUpdateShareLoading hook in apps/clementine-app/src/domains/project-config/share/hooks/useUpdateShareLoading.ts
+- [X] T009 Rename useUpdateShare.ts to useUpdateShareReady.ts (keep deprecated export) in apps/clementine-app/src/domains/project-config/share/hooks/
+- [X] T010 Update barrel export to export new hooks in apps/clementine-app/src/domains/project-config/share/hooks/index.ts
 
 **Checkpoint**: Schema and data layer complete. Shared package built. All subsequent tasks can now import new types.
 
@@ -46,8 +46,8 @@
 
 **⚠️ CRITICAL**: User story implementation depends on these foundational components
 
-- [ ] T011 Add headerSlot prop to PreviewShell component in apps/clementine-app/src/shared/preview-shell/containers/PreviewShell.tsx
-- [ ] T012 Render headerSlot in PreviewShell header before viewport switcher in apps/clementine-app/src/shared/preview-shell/containers/PreviewShell.tsx
+- [X] T011 Add headerSlot prop to PreviewShell component in apps/clementine-app/src/shared/preview-shell/containers/PreviewShell.tsx
+- [X] T012 Render headerSlot in PreviewShell header before viewport switcher in apps/clementine-app/src/shared/preview-shell/containers/PreviewShell.tsx
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -61,17 +61,17 @@
 
 ### Implementation for User Story 1
 
-- [ ] T013 [US1] Create ShareLoadingConfigPanel component in apps/clementine-app/src/domains/project-config/share/components/ShareLoadingConfigPanel.tsx
-- [ ] T014 [US1] Add title field (Textarea, 2 rows) to ShareLoadingConfigPanel
-- [ ] T015 [US1] Add description field (Textarea, 4 rows) to ShareLoadingConfigPanel
-- [ ] T016 [US1] Add help text for each field in ShareLoadingConfigPanel
-- [ ] T017 [US1] Update ShareEditorPage to add previewState state variable in apps/clementine-app/src/domains/project-config/share/containers/ShareEditorPage.tsx
-- [ ] T018 [US1] Create shareLoadingForm with React Hook Form in ShareEditorPage
-- [ ] T019 [US1] Add useUpdateShareLoading mutation in ShareEditorPage
-- [ ] T020 [US1] Add useAutoSave hook for loading form (2000ms debounce, fields: title, description) in ShareEditorPage
-- [ ] T021 [US1] Add handleShareLoadingUpdate function in ShareEditorPage
-- [ ] T022 [US1] Add conditional rendering to show ShareLoadingConfigPanel when previewState is 'loading' in ShareEditorPage
-- [ ] T023 [US1] Update config panel header to show current state ("Share Screen · Loading") in ShareEditorPage
+- [X] T013 [US1] Create ShareLoadingConfigPanel component in apps/clementine-app/src/domains/project-config/share/components/ShareLoadingConfigPanel.tsx
+- [X] T014 [US1] Add title field (Textarea, 2 rows) to ShareLoadingConfigPanel
+- [X] T015 [US1] Add description field (Textarea, 4 rows) to ShareLoadingConfigPanel
+- [X] T016 [US1] Add help text for each field in ShareLoadingConfigPanel
+- [X] T017 [US1] Update ShareEditorPage to add previewState state variable in apps/clementine-app/src/domains/project-config/share/containers/ShareEditorPage.tsx
+- [X] T018 [US1] Create shareLoadingForm with React Hook Form in ShareEditorPage
+- [X] T019 [US1] Add useUpdateShareLoading mutation in ShareEditorPage
+- [X] T020 [US1] Add useAutoSave hook for loading form (2000ms debounce, fields: title, description) in ShareEditorPage
+- [X] T021 [US1] Add handleShareLoadingUpdate function in ShareEditorPage
+- [X] T022 [US1] Add conditional rendering to show ShareLoadingConfigPanel when previewState is 'loading' in ShareEditorPage
+- [X] T023 [US1] Update config panel header to show current state ("Share Screen · Loading") in ShareEditorPage
 
 **Checkpoint**: User Story 1 complete - admins can configure loading state content and it persists via auto-save
 
@@ -85,15 +85,15 @@
 
 ### Implementation for User Story 2
 
-- [ ] T024 [P] [US2] Create ShareLoadingPreview component in apps/clementine-app/src/domains/project-config/share/components/ShareLoadingPreview.tsx
-- [ ] T025 [P] [US2] Rename SharePreview.tsx to ShareReadyPreview.tsx in apps/clementine-app/src/domains/project-config/share/components/
-- [ ] T026 [US2] Add Skeleton component for image placeholder in ShareLoadingPreview
-- [ ] T027 [US2] Add loading title rendering (with default fallback) in ShareLoadingPreview
-- [ ] T028 [US2] Add loading description rendering (with default fallback) in ShareLoadingPreview
-- [ ] T029 [US2] Update ShareReadyPreview props to use shareReady (renamed from share)
-- [ ] T030 [US2] Add useWatch for shareLoadingForm to watch real-time changes in ShareEditorPage
-- [ ] T031 [US2] Add conditional preview rendering (ShareLoadingPreview vs ShareReadyPreview) based on previewState in ShareEditorPage
-- [ ] T032 [US2] Pass shareLoading, shareReady, and shareOptions to respective preview components in ShareEditorPage
+- [X] T024 [P] [US2] Create ShareLoadingPreview component in apps/clementine-app/src/domains/project-config/share/components/ShareLoadingPreview.tsx
+- [X] T025 [P] [US2] Rename SharePreview.tsx to ShareReadyPreview.tsx in apps/clementine-app/src/domains/project-config/share/components/
+- [X] T026 [US2] Add Skeleton component for image placeholder in ShareLoadingPreview
+- [X] T027 [US2] Add loading title rendering (with default fallback) in ShareLoadingPreview
+- [X] T028 [US2] Add loading description rendering (with default fallback) in ShareLoadingPreview
+- [X] T029 [US2] Update ShareReadyPreview props to use shareReady (renamed from share)
+- [X] T030 [US2] Add useWatch for shareLoadingForm to watch real-time changes in ShareEditorPage
+- [X] T031 [US2] Add conditional preview rendering (ShareLoadingPreview vs ShareReadyPreview) based on previewState in ShareEditorPage
+- [X] T032 [US2] Pass shareLoading, shareReady, and shareOptions to respective preview components in ShareEditorPage
 
 **Checkpoint**: User Story 2 complete - admins can preview loading state with real-time updates as they type
 
@@ -107,14 +107,14 @@
 
 ### Implementation for User Story 3
 
-- [ ] T033 [US3] Rename ShareConfigPanel.tsx to ShareReadyConfigPanel.tsx in apps/clementine-app/src/domains/project-config/share/components/
-- [ ] T034 [US3] Update ShareReadyConfigPanel component name and props to use ShareReadyConfig type
-- [ ] T035 [US3] Rename shareReadyForm (if not already done) and update all references in ShareEditorPage
-- [ ] T036 [US3] Add Tabs component from shadcn/ui to ShareEditorPage imports
-- [ ] T037 [US3] Create state tabs UI (TabsList with "Ready" and "Loading" TabsTriggers) in ShareEditorPage
-- [ ] T038 [US3] Connect tabs to previewState state variable (value and onValueChange) in ShareEditorPage
-- [ ] T039 [US3] Pass state tabs to PreviewShell via headerSlot prop in ShareEditorPage
-- [ ] T040 [US3] Verify tab switching updates both preview and config panel synchronously
+- [X] T033 [US3] Rename ShareConfigPanel.tsx to ShareReadyConfigPanel.tsx in apps/clementine-app/src/domains/project-config/share/components/
+- [X] T034 [US3] Update ShareReadyConfigPanel component name and props to use ShareReadyConfig type
+- [X] T035 [US3] Rename shareReadyForm (if not already done) and update all references in ShareEditorPage
+- [X] T036 [US3] Add Tabs component from shadcn/ui to ShareEditorPage imports
+- [X] T037 [US3] Create state tabs UI (TabsList with "Ready" and "Loading" TabsTriggers) in ShareEditorPage
+- [X] T038 [US3] Connect tabs to previewState state variable (value and onValueChange) in ShareEditorPage
+- [X] T039 [US3] Pass state tabs to PreviewShell via headerSlot prop in ShareEditorPage
+- [X] T040 [US3] Verify tab switching updates both preview and config panel synchronously
 
 **Checkpoint**: All user stories complete - admins can configure, preview, and switch between both states seamlessly
 
@@ -124,9 +124,9 @@
 
 **Purpose**: Final improvements, validation, and documentation
 
-- [ ] T041 [P] Update barrel export to include ShareLoadingConfigPanel and ShareLoadingPreview in apps/clementine-app/src/domains/project-config/share/index.ts
-- [ ] T042 [P] Add JSDoc comments to new components and hooks
-- [ ] T043 Run validation gates: `pnpm app:check` (format + lint + type-check)
+- [X] T041 [P] Update barrel export to include ShareLoadingConfigPanel and ShareLoadingPreview in apps/clementine-app/src/domains/project-config/share/index.ts
+- [X] T042 [P] Add JSDoc comments to new components and hooks
+- [X] T043 Run validation gates: `pnpm app:check` (format + lint + type-check)
 - [ ] T044 Manual standards review: design-system.md (no hard-coded colors, theme tokens)
 - [ ] T045 Manual standards review: component-libraries.md (using shadcn/ui Tabs, Skeleton)
 - [ ] T046 Manual standards review: project-structure.md (domain organization, file naming)

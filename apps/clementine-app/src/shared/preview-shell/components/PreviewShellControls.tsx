@@ -10,6 +10,7 @@ interface PreviewShellControlsProps {
   enableViewportSwitcher: boolean
   enableFullscreen: boolean
   onFullscreenClick: () => void
+  headerSlot?: React.ReactNode
 }
 
 /**
@@ -24,9 +25,14 @@ export function PreviewShellControls({
   enableViewportSwitcher,
   enableFullscreen,
   onFullscreenClick,
+  headerSlot,
 }: PreviewShellControlsProps) {
   return (
-    <div className="flex items-center justify-between border-b p-2">
+    <div className="flex items-center justify-between border-b p-2 gap-4">
+      {/* Custom header content */}
+      {headerSlot}
+
+      {/* Existing controls */}
       {enableViewportSwitcher ? (
         <ViewportSwitcher mode={mode} onModeChange={onModeChange} />
       ) : (

@@ -5,8 +5,9 @@
  */
 import type {
   CtaConfig,
-  ShareConfig,
-} from '@/domains/project-config/shared/schemas'
+  ShareLoadingConfig,
+  ShareReadyConfig,
+} from '@clementine/shared'
 
 /**
  * Maximum character length for share title
@@ -32,11 +33,25 @@ export const DEFAULT_CTA: CtaConfig = {
 }
 
 /**
- * Default share configuration values
+ * Default share loading state configuration
+ * Used when initializing loading form or providing fallbacks during AI generation
+ */
+export const DEFAULT_SHARE_LOADING: ShareLoadingConfig = {
+  title: 'Creating your experience...',
+  description:
+    'This usually takes 30-60 seconds. Please wait while we generate your personalized result.',
+}
+
+/**
+ * Default share ready state configuration values
+ * (Formerly DEFAULT_SHARE - renamed for clarity)
  * Used when initializing form state or providing fallbacks.
  */
-export const DEFAULT_SHARE: ShareConfig = {
+export const DEFAULT_SHARE_READY: ShareReadyConfig = {
   title: null,
   description: null,
   cta: null,
 }
+
+/** @deprecated Use DEFAULT_SHARE_READY instead */
+export const DEFAULT_SHARE = DEFAULT_SHARE_READY

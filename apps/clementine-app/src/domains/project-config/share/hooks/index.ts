@@ -4,4 +4,8 @@
  * Export all share-related hooks.
  */
 
-export { useUpdateShare } from './useUpdateShare'
+export {
+  useUpdateShareReady,
+  useUpdateShare, // Deprecated alias
+} from './useUpdateShareReady'
+export { useUpdateShareLoading } from './useUpdateShareLoading'

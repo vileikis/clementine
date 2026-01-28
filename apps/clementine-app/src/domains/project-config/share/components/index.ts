@@ -5,4 +5,5 @@
  */
 
 export { ShareConfigPanel } from './ShareConfigPanel'
+export { ShareLoadingConfigPanel } from './ShareLoadingConfigPanel'
 export { SharePreview } from './SharePreview'
