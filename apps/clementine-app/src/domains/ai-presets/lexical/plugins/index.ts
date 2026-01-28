@@ -14,3 +14,5 @@ export {
   SmartPastePlugin,
   type SmartPastePluginProps,
 } from './SmartPastePlugin'
+
+export { MentionValidationPlugin } from './MentionValidationPlugin'

@@ -4,10 +4,11 @@
  * Main page container for the AI preset editor.
  * Handles preset data fetching and renders the editor layout.
  */
-import { Loader2 } from 'lucide-react'
+import { AlertCircle, Loader2 } from 'lucide-react'
 
 import { useAIPreset } from '../hooks/useAIPreset'
 import { AIPresetEditorLayout } from './AIPresetEditorLayout'
+import { Button } from '@/ui-kit/ui/button'
 
 interface AIPresetEditorPageProps {
   workspaceId: string
@@ -44,7 +45,12 @@ export function AIPresetEditorPage({
   workspaceSlug,
   presetId,
 }: AIPresetEditorPageProps) {
-  const { data: preset, isLoading, error } = useAIPreset(workspaceId, presetId)
+  const {
+    data: preset,
+    isLoading,
+    error,
+    refetch,
+  } = useAIPreset(workspaceId, presetId)
 
   // Loading state
   if (isLoading) {
@@ -59,8 +65,16 @@ export function AIPresetEditorPage({
   if (error) {
     return (
       <div className="flex h-screen flex-col items-center justify-center gap-4">
-        <p className="text-destructive">Failed to load preset</p>
-        <p className="text-sm text-muted-foreground">{error.message}</p>
+        <AlertCircle className="h-12 w-12 text-destructive" />
+        <div className="flex flex-col items-center gap-2">
+          <p className="text-lg font-medium text-destructive">
+            Failed to load preset
+          </p>
+          <p className="text-sm text-muted-foreground">{error.message}</p>
+        </div>
+        <Button variant="outline" onClick={() => refetch()} className="mt-2">
+          Try Again
+        </Button>
       </div>
     )
   }

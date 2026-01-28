@@ -22,6 +22,7 @@ export type SerializedVariableMentionNode = Spread<
     variableId: string
     variableName: string
     variableType: 'text' | 'image'
+    isInvalid?: boolean
   },
   SerializedTextNode
 >
@@ -36,19 +37,22 @@ export class VariableMentionNode extends TextNode {
   __variableId: string
   __variableName: string
   __variableType: 'text' | 'image'
+  __isInvalid: boolean
 
   static getType(): string {
     return 'variable-mention'
   }
 
   static clone(node: VariableMentionNode): VariableMentionNode {
-    return new VariableMentionNode(
+    const cloned = new VariableMentionNode(
       node.__variableId,
       node.__variableName,
       node.__variableType,
       node.__text,
       node.__key,
     )
+    cloned.__isInvalid = node.__isInvalid
+    return cloned
   }
 
   static importJSON(
@@ -59,6 +63,7 @@ export class VariableMentionNode extends TextNode {
       serialized.variableName,
       serialized.variableType,
     )
+    node.__isInvalid = serialized.isInvalid ?? false
     node.setFormat(serialized.format)
     node.setDetail(serialized.detail)
     node.setMode(serialized.mode)
@@ -77,6 +82,7 @@ export class VariableMentionNode extends TextNode {
     this.__variableId = variableId
     this.__variableName = variableName
     this.__variableType = variableType
+    this.__isInvalid = false
   }
 
   exportJSON(): SerializedVariableMentionNode {
@@ -85,6 +91,7 @@ export class VariableMentionNode extends TextNode {
       variableId: this.__variableId,
       variableName: this.__variableName,
       variableType: this.__variableType,
+      isInvalid: this.__isInvalid,
       type: 'variable-mention',
       version: 1,
     }
@@ -92,11 +99,21 @@ export class VariableMentionNode extends TextNode {
 
   createDOM(config: EditorConfig): HTMLElement {
     const dom = super.createDOM(config)
-    dom.className = `variable-mention variable-type-${this.__variableType}`
+    dom.className = `variable-mention variable-type-${this.__variableType} ${this.__isInvalid ? 'variable-invalid' : ''}`
 
-    // Apply color coding based on variable type
-    const bgColor = this.__variableType === 'text' ? '#e3f2fd' : '#e8f5e9'
-    const textColor = this.__variableType === 'text' ? '#1976d2' : '#2e7d32'
+    // Apply color coding based on variable type and validity
+    let bgColor: string
+    let textColor: string
+
+    if (this.__isInvalid) {
+      // Invalid mention: red styling
+      bgColor = '#fee'
+      textColor = '#c33'
+    } else {
+      // Valid mention: type-based colors
+      bgColor = this.__variableType === 'text' ? '#e3f2fd' : '#e8f5e9'
+      textColor = this.__variableType === 'text' ? '#1976d2' : '#2e7d32'
+    }
 
     dom.style.cssText = `
       background-color: ${bgColor};
@@ -107,14 +124,26 @@ export class VariableMentionNode extends TextNode {
       font-weight: 500;
       user-select: none;
       cursor: pointer;
+      ${this.__isInvalid ? 'text-decoration: line-through;' : ''}
     `
     dom.setAttribute('data-variable-id', this.__variableId)
     dom.setAttribute('data-variable-name', this.__variableName)
     dom.setAttribute('data-variable-type', this.__variableType)
+    dom.setAttribute('data-invalid', String(this.__isInvalid))
     dom.setAttribute('contenteditable', 'false')
     dom.spellcheck = false
 
+    if (this.__isInvalid) {
+      dom.title = `Variable @${this.__variableName} no longer exists`
+    }
+
     return dom
+  }
+
+  // Update DOM when invalid state changes
+  updateDOM(prevNode: VariableMentionNode, _dom: HTMLElement): boolean {
+    // Return true to trigger full re-render if invalid state changed
+    return prevNode.__isInvalid !== this.__isInvalid
   }
 
   // Mark as text entity for proper handling
@@ -142,6 +171,16 @@ export class VariableMentionNode extends TextNode {
 
   getVariableType(): 'text' | 'image' {
     return this.__variableType
+  }
+
+  getIsInvalid(): boolean {
+    return this.__isInvalid
+  }
+
+  // Method to mark mention as invalid
+  setInvalid(invalid: boolean): void {
+    const self = this.getWritable()
+    self.__isInvalid = invalid
   }
 }
 

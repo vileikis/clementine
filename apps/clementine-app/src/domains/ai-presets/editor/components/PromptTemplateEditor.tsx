@@ -28,6 +28,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useUpdateAIPresetDraft } from '../hooks/useUpdateAIPresetDraft'
 import {
   MediaMentionNode,
+  MentionValidationPlugin,
   MentionsPlugin,
   SmartPastePlugin,
   VariableMentionNode,
@@ -219,6 +220,7 @@ export function PromptTemplateEditor({
         <OnChangePlugin onChange={handleChange} ignoreSelectionChange />
         <MentionsPlugin variables={variableOptions} media={mediaOptions} />
         <SmartPastePlugin variables={variableOptions} media={mediaOptions} />
+        <MentionValidationPlugin variables={variables} media={media} />
 
         {/* Initialize content */}
         <InitializeContentPlugin onInit={handleEditorInit} />

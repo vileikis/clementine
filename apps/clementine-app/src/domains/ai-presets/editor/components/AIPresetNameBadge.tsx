@@ -40,6 +40,7 @@ export function AIPresetNameBadge({
 }: AIPresetNameBadgeProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [editValue, setEditValue] = useState(preset.name)
+  const [error, setError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
   // Focus input when entering edit mode
@@ -60,19 +61,31 @@ export function AIPresetNameBadge({
   const handleStartEdit = useCallback(() => {
     if (disabled) return
     setEditValue(preset.name)
+    setError(null)
     setIsEditing(true)
   }, [disabled, preset.name])
 
   const handleSave = useCallback(() => {
     const trimmedValue = editValue.trim()
-    if (trimmedValue && trimmedValue !== preset.name) {
+
+    // Validate non-empty name
+    if (!trimmedValue) {
+      setError('Name cannot be empty')
+      return
+    }
+
+    // Only save if changed
+    if (trimmedValue !== preset.name) {
       onNameChange(trimmedValue)
     }
+
+    setError(null)
     setIsEditing(false)
   }, [editValue, preset.name, onNameChange])
 
   const handleCancel = useCallback(() => {
     setEditValue(preset.name)
+    setError(null)
     setIsEditing(false)
   }, [preset.name])
 
@@ -91,37 +104,47 @@ export function AIPresetNameBadge({
 
   if (isEditing) {
     return (
-      <div className="flex items-center gap-1">
-        <input
-          ref={inputRef}
-          type="text"
-          value={editValue}
-          onChange={(e) => setEditValue(e.target.value)}
-          onKeyDown={handleKeyDown}
-          onBlur={handleSave}
-          className={cn(
-            'h-7 w-[200px] rounded border bg-background px-2 text-sm font-medium',
-            'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1',
-          )}
-          maxLength={100}
-          aria-label="Preset name"
-        />
-        <button
-          type="button"
-          onClick={handleSave}
-          className="rounded p-1 hover:bg-accent"
-          aria-label="Save name"
-        >
-          <Check className="h-4 w-4 text-green-600" />
-        </button>
-        <button
-          type="button"
-          onClick={handleCancel}
-          className="rounded p-1 hover:bg-accent"
-          aria-label="Cancel editing"
-        >
-          <X className="h-4 w-4 text-muted-foreground" />
-        </button>
+      <div className="flex flex-col gap-1">
+        <div className="flex items-center gap-1">
+          <input
+            ref={inputRef}
+            type="text"
+            value={editValue}
+            onChange={(e) => {
+              setEditValue(e.target.value)
+              if (error) setError(null)
+            }}
+            onKeyDown={handleKeyDown}
+            onBlur={handleSave}
+            className={cn(
+              'h-7 w-[200px] rounded border bg-background px-2 text-sm font-medium',
+              'focus:outline-none focus:ring-2 focus:ring-offset-1',
+              error
+                ? 'border-destructive focus:ring-destructive'
+                : 'focus:ring-ring',
+            )}
+            maxLength={100}
+            aria-label="Preset name"
+            aria-invalid={!!error}
+            aria-describedby={error ? 'name-error' : undefined}
+          />
+          <button
+            type="button"
+            onClick={handleSave}
+            className="rounded p-1 hover:bg-accent"
+            aria-label="Save name"
+          >
+            <Check className="h-4 w-4 text-green-600" />
+          </button>
+          <button
+            type="button"
+            onClick={handleCancel}
+            className="rounded p-1 hover:bg-accent"
+            aria-label="Cancel editing"
+          >
+            <X className="h-4 w-4 text-muted-foreground" />
+          </button>
+        </div>
       </div>
     )
   }

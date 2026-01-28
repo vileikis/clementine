@@ -125,7 +125,7 @@ export function AIPresetEditorLayout({
           error instanceof Error ? error.message : 'An error occurred',
       })
     }
-  }, [publishPreset, workspaceId, preset, user])
+  }, [publishPreset.mutateAsync, workspaceId, preset, user])
 
   const isPublishing = publishPreset.isPending
   const isDisabled = updatePreset.isPending || isPublishing

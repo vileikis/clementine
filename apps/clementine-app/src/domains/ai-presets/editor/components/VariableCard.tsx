@@ -316,39 +316,51 @@ export function VariableCard({
           <div className="min-w-0 flex-1">
             {isEditing ? (
               <div
-                className="flex items-center gap-1"
+                className="flex flex-col gap-1"
                 onClick={(e) => e.stopPropagation()}
               >
-                <Input
-                  ref={inputRef}
-                  value={editValue}
-                  onChange={(e) => {
-                    setEditValue(e.target.value)
-                    setError(null)
-                  }}
-                  onKeyDown={handleKeyDown}
-                  placeholder="my_variable"
-                  className={cn(
-                    'h-7 text-sm font-mono',
-                    error && 'border-destructive',
-                  )}
-                />
-                <button
-                  type="button"
-                  onClick={handleSave}
-                  className="rounded p-1 hover:bg-accent"
-                  aria-label="Save name"
-                >
-                  <Check className="h-4 w-4 text-green-600" />
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCancel}
-                  className="rounded p-1 hover:bg-accent"
-                  aria-label="Cancel editing"
-                >
-                  <X className="h-4 w-4 text-muted-foreground" />
-                </button>
+                <div className="flex items-center gap-1">
+                  <Input
+                    ref={inputRef}
+                    value={editValue}
+                    onChange={(e) => {
+                      setEditValue(e.target.value)
+                      setError(null)
+                    }}
+                    onKeyDown={handleKeyDown}
+                    placeholder="my_variable"
+                    className={cn(
+                      'h-7 text-sm font-mono',
+                      error && 'border-destructive',
+                    )}
+                    aria-invalid={!!error}
+                    aria-describedby={error ? 'variable-name-error' : undefined}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleSave}
+                    className="rounded p-1 hover:bg-accent"
+                    aria-label="Save name"
+                  >
+                    <Check className="h-4 w-4 text-green-600" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleCancel}
+                    className="rounded p-1 hover:bg-accent"
+                    aria-label="Cancel editing"
+                  >
+                    <X className="h-4 w-4 text-muted-foreground" />
+                  </button>
+                </div>
+                {error && (
+                  <p
+                    id="variable-name-error"
+                    className="text-xs text-destructive pl-2"
+                  >
+                    {error}
+                  </p>
+                )}
               </div>
             ) : (
               <div className="flex items-center gap-2">

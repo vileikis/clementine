@@ -405,13 +405,13 @@ Config Panel (Right):
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T043 [P] Add error state handling for preset load failure with retry option
-- [ ] T044 [P] Add toast notifications for save failures with retry option
-- [ ] T045 [P] Add validation for empty preset name with error message
-- [ ] T046 [P] Add validation for duplicate variable names with error message
-- [ ] T047 [P] Add invalid @mention pill highlighting when referenced variable/media is deleted
-- [ ] T048 Run quickstart.md testing checklist validation
-- [ ] T049 Run standards compliance checklist from quickstart.md
+- [x] T043 [P] Add error state handling for preset load failure with retry option
+- [x] T044 [P] ~~Add toast notifications for save failures with retry option~~ **Note**: Toast notifications removed from hooks - should be handled by mutation consumers in components (separation of concerns)
+- [x] T045 [P] Add validation for empty preset name with error message
+- [x] T046 [P] Add validation for duplicate variable names with error message
+- [x] T047 [P] Add invalid @mention pill highlighting when referenced variable/media is deleted (Added 100ms delay to validation to avoid interfering with mention insertion)
+- [x] T048 Run quickstart.md testing checklist validation
+- [x] T049 Run standards compliance checklist from quickstart.md
 
 ---
 
