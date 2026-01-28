@@ -7,7 +7,7 @@
  * Phase 11.5: Converted from dialog-based to inline accordion pattern.
  * Click to expand/collapse inline settings (default value, value mappings).
  */
-import { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import {

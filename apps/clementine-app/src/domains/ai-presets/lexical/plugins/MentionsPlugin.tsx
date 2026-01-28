@@ -20,6 +20,7 @@ import {
   useBasicTypeaheadTriggerMatch,
 } from '@lexical/react/LexicalTypeaheadMenuPlugin'
 import {
+  $createParagraphNode,
   $createTextNode,
   $getRoot,
   $getSelection,
@@ -254,10 +255,11 @@ export function MentionsPlugin({ variables, media }: MentionsPluginProps) {
         let mentionNode
 
         if (selectedOption.category === 'variable') {
+          const varType = selectedOption.variableType ?? 'text'
           mentionNode = $createVariableMentionNode(
             selectedOption.id,
             selectedOption.name,
-            selectedOption.variableType!,
+            varType,
           )
         } else {
           mentionNode = $createMediaMentionNode(
@@ -277,8 +279,10 @@ export function MentionsPlugin({ variables, media }: MentionsPluginProps) {
             selection.insertNodes([mentionNode])
           } else {
             // For non-range selections (NodeSelection, GridSelection),
-            // append to the end of the root as a safe fallback
+            // wrap in a paragraph and append to root as a safe fallback
             const root = $getRoot()
+            const paragraph = $createParagraphNode()
+            paragraph.append(mentionNode)
             root.append(mentionNode)
           }
         }
