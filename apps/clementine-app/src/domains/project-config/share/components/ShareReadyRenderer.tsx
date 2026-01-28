@@ -1,13 +1,11 @@
 /**
- * SharePreview Component
+ * ShareReadyRenderer Component
  *
- * Display-only preview component showing how the share screen will appear
- * in the guest-facing experience. Uses ThemedText, ThemedBackground,
- * ThemedButton, and ThemedIconButton primitives from shared theming module.
+ * Renders the ready state shown to guests when their AI-generated result is available.
+ * Uses ThemedText, ThemedBackground, ThemedButton, and ThemedIconButton primitives
+ * from shared theming module.
  *
- * Two-zone layout:
- * 1. Scrollable content zone (top): Title, description, media placeholder
- * 2. Fixed footer zone (bottom): Share icons, Start over, CTA button
+ * WYSIWYG Principle: What creators see in preview is exactly what guests see.
  *
  * Must be used within a ThemeProvider.
  */
@@ -27,12 +25,10 @@ import {
   FaXTwitter,
 } from 'react-icons/fa6'
 import { FaTelegramPlane } from 'react-icons/fa'
-import type {
-  ShareConfig,
-  ShareOptionsConfig,
-} from '@/domains/project-config/shared'
+import type { ShareOptionsConfig, ShareReadyConfig } from '@clementine/shared'
 import type { LucideIcon } from 'lucide-react'
 import type { IconType } from 'react-icons'
+import { Skeleton } from '@/ui-kit/ui/skeleton'
 import {
   ThemedBackground,
   ThemedButton,
@@ -40,11 +36,25 @@ import {
   ThemedText,
 } from '@/shared/theming'
 
-export interface SharePreviewProps {
-  /** Share config to preview */
-  share: ShareConfig
+export interface ShareReadyRendererProps {
+  /** Share ready config to render */
+  share: ShareReadyConfig
   /** Share options (determines which icons appear) */
   shareOptions: ShareOptionsConfig
+  /**
+   * Display mode
+   * - edit: Non-interactive WYSIWYG preview in designer
+   * - run: Interactive guest experience with actual sharing actions
+   */
+  mode?: 'edit' | 'run'
+  /** Media URL to display (when available in run mode) */
+  mediaUrl?: string | null
+  /** Callback when share platform is clicked (required in run mode, handles download too) */
+  onShare?: (platform: keyof ShareOptionsConfig) => void
+  /** Callback when CTA is clicked (required in run mode) */
+  onCta?: () => void
+  /** Callback when start over is clicked (required in run mode) */
+  onStartOver?: () => void
 }
 
 // Platform to icon mapping
@@ -76,11 +86,37 @@ const SHARE_ICON_ORDER: (keyof ShareOptionsConfig)[] = [
   'telegram',
 ]
 
-export function SharePreview({ share, shareOptions }: SharePreviewProps) {
+export function ShareReadyRenderer({
+  share,
+  shareOptions,
+  mode = 'edit',
+  mediaUrl,
+  onShare,
+  onCta,
+  onStartOver,
+}: ShareReadyRendererProps) {
   // Get enabled icons in order
   const enabledIcons = SHARE_ICON_ORDER.filter(
     (platform) => shareOptions[platform],
   )
+
+  const handleIconClick = (platform: keyof ShareOptionsConfig) => {
+    if (mode === 'run' && onShare) {
+      onShare(platform)
+    }
+  }
+
+  const handleCtaClick = () => {
+    if (mode === 'run' && onCta && share.cta?.url) {
+      onCta()
+    }
+  }
+
+  const handleStartOverClick = () => {
+    if (mode === 'run' && onStartOver) {
+      onStartOver()
+    }
+  }
 
   return (
     <ThemedBackground
@@ -88,11 +124,21 @@ export function SharePreview({ share, shareOptions }: SharePreviewProps) {
       contentClassName="flex flex-col h-full"
     >
       {/* Scrollable content zone */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {/* Media placeholder */}
-        <div className="aspect-square bg-muted rounded-lg flex items-center justify-center">
-          <ImageIcon className="h-12 w-12 text-muted-foreground/50" />
-        </div>
+      <div className="flex-1 overflow-y-auto p-8 flex flex-col items-center space-y-6">
+        {/* Media - using same sizing as loading skeleton */}
+        {mediaUrl ? (
+          <img
+            src={mediaUrl}
+            alt="Generated result"
+            className="w-full aspect-square max-w-md rounded-lg object-cover"
+          />
+        ) : mode === 'edit' ? (
+          <div className="w-full aspect-square max-w-md rounded-lg bg-muted flex items-center justify-center">
+            <ImageIcon className="h-12 w-12 text-muted-foreground/50" />
+          </div>
+        ) : (
+          <Skeleton className="w-full aspect-square max-w-md rounded-lg" />
+        )}
 
         {/* Title (hidden when null) */}
         {share.title && (
@@ -103,7 +149,10 @@ export function SharePreview({ share, shareOptions }: SharePreviewProps) {
 
         {/* Description (hidden when null) */}
         {share.description && (
-          <ThemedText variant="body" className="text-center opacity-90">
+          <ThemedText
+            variant="body"
+            className="text-center opacity-90 max-w-md"
+          >
             {share.description}
           </ThemedText>
         )}
@@ -121,6 +170,8 @@ export function SharePreview({ share, shareOptions }: SharePreviewProps) {
                   key={platform}
                   title={label}
                   aria-label={label}
+                  onClick={() => handleIconClick(platform)}
+                  disabled={mode === 'edit'}
                 >
                   <Icon className="h-5 w-5" />
                 </ThemedIconButton>
@@ -131,13 +182,25 @@ export function SharePreview({ share, shareOptions }: SharePreviewProps) {
 
         {/* CTA button (primary style, hidden when label is null/empty) */}
         {share.cta?.label && (
-          <ThemedButton variant="primary" size="md" className="w-full">
+          <ThemedButton
+            variant="primary"
+            size="md"
+            className="w-full"
+            onClick={handleCtaClick}
+            disabled={mode === 'edit'}
+          >
             {share.cta.label}
           </ThemedButton>
         )}
 
         {/* Start over button (secondary/outline style) */}
-        <ThemedButton variant="outline" size="md" className="w-full">
+        <ThemedButton
+          variant="outline"
+          size="md"
+          className="w-full"
+          onClick={handleStartOverClick}
+          disabled={mode === 'edit'}
+        >
           <RotateCcw className="mr-2 h-4 w-4" />
           Start over
         </ThemedButton>

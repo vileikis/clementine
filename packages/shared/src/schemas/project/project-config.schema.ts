@@ -61,9 +61,18 @@ export const ctaConfigSchema = z.object({
 })
 
 /**
- * Share Screen Configuration
+ * Share Loading State Configuration
+ * Shown while AI generation is in progress
  */
-export const shareConfigSchema = z.object({
+export const shareLoadingConfigSchema = z.object({
+  title: z.string().nullable().default(null),
+  description: z.string().nullable().default(null),
+})
+
+/**
+ * Share Ready State Configuration
+ */
+export const shareReadyConfigSchema = z.object({
   title: z.string().nullable().default(null),
   description: z.string().nullable().default(null),
   cta: ctaConfigSchema.nullable().default(null),
@@ -89,7 +98,8 @@ export const projectConfigSchema = z.looseObject({
   schemaVersion: z.number().default(CURRENT_CONFIG_VERSION),
   overlays: overlaysConfigSchema,
   shareOptions: shareOptionsConfigSchema.nullable().default(null),
-  share: shareConfigSchema.nullable().default(null),
+  shareReady: shareReadyConfigSchema.nullable().default(null),
+  shareLoading: shareLoadingConfigSchema.nullable().default(null),
   welcome: welcomeConfigSchema.nullable().default(null),
   theme: themeSchema.nullable().default(null),
   experiences: experiencesConfigSchema.nullable().default(null),
@@ -103,7 +113,8 @@ export type OverlaysConfig = z.infer<typeof overlaysConfigSchema>
 export type ShareOptionsConfig = z.infer<typeof shareOptionsConfigSchema>
 export type WelcomeConfig = z.infer<typeof welcomeConfigSchema>
 export type CtaConfig = z.infer<typeof ctaConfigSchema>
-export type ShareConfig = z.infer<typeof shareConfigSchema>
+export type ShareLoadingConfig = z.infer<typeof shareLoadingConfigSchema>
+export type ShareReadyConfig = z.infer<typeof shareReadyConfigSchema>
 export type ExperiencePickerLayout = z.infer<typeof experiencePickerLayoutSchema>
 
 // Re-export media schemas
