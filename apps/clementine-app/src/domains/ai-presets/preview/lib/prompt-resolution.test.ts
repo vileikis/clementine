@@ -14,7 +14,13 @@ describe('resolvePrompt', () => {
     const promptTemplate = 'Hello @{text:userName}!'
     const testInputs: TestInputState = { userName: 'Alice' }
     const variables: PresetVariable[] = [
-      { name: 'userName', type: 'text', defaultValue: '' },
+      {
+        id: '550e8400-e29b-41d4-a716-446655440001',
+        name: 'userName',
+        type: 'text',
+        defaultValue: '',
+        valueMap: null,
+      },
     ]
     const mediaRegistry: PresetMediaEntry[] = []
 
@@ -35,6 +41,7 @@ describe('resolvePrompt', () => {
     const testInputs: TestInputState = { style: 'modern' }
     const variables: PresetVariable[] = [
       {
+        id: '550e8400-e29b-41d4-a716-446655440002',
         name: 'style',
         type: 'text',
         defaultValue: 'modern',
@@ -60,7 +67,13 @@ describe('resolvePrompt', () => {
     const promptTemplate = 'Name: @{text:userName}'
     const testInputs: TestInputState = { userName: null }
     const variables: PresetVariable[] = [
-      { name: 'userName', type: 'text', defaultValue: 'Guest' },
+      {
+        id: '550e8400-e29b-41d4-a716-446655440003',
+        name: 'userName',
+        type: 'text',
+        defaultValue: 'Guest',
+        valueMap: null,
+      },
     ]
     const mediaRegistry: PresetMediaEntry[] = []
 
@@ -76,10 +89,18 @@ describe('resolvePrompt', () => {
 
   it('should replace image placeholders for uploaded files', () => {
     const promptTemplate = 'Photo: @{input:userPhoto}'
-    const mockFile = new File([''], 'test.jpg', { type: 'image/jpeg' })
-    const testInputs: TestInputState = { userPhoto: mockFile }
+    const mockMediaRef = {
+      mediaAssetId: 'test-asset-id',
+      url: 'https://example.com/test.jpg',
+      filePath: 'uploads/test.jpg',
+    }
+    const testInputs: TestInputState = { userPhoto: mockMediaRef }
     const variables: PresetVariable[] = [
-      { name: 'userPhoto', type: 'image', defaultValue: '' },
+      {
+        id: '550e8400-e29b-41d4-a716-446655440004',
+        name: 'userPhoto',
+        type: 'image',
+      },
     ]
     const mediaRegistry: PresetMediaEntry[] = []
 
@@ -97,7 +118,11 @@ describe('resolvePrompt', () => {
     const promptTemplate = 'Photo: @{input:userPhoto}'
     const testInputs: TestInputState = { userPhoto: null }
     const variables: PresetVariable[] = [
-      { name: 'userPhoto', type: 'image', defaultValue: '' },
+      {
+        id: '550e8400-e29b-41d4-a716-446655440005',
+        name: 'userPhoto',
+        type: 'image',
+      },
     ]
     const mediaRegistry: PresetMediaEntry[] = []
 
@@ -120,6 +145,7 @@ describe('resolvePrompt', () => {
         name: 'styleRef',
         url: 'https://example.com/image.jpg',
         mediaAssetId: 'asset-1',
+        filePath: 'uploads/styleRef.jpg',
       },
     ]
 
@@ -183,6 +209,7 @@ describe('resolvePrompt', () => {
     const testInputs: TestInputState = { weapon: 'hammer' }
     const variables: PresetVariable[] = [
       {
+        id: '550e8400-e29b-41d4-a716-446655440006',
         name: 'weapon',
         type: 'text',
         defaultValue: 'sword',
@@ -197,6 +224,7 @@ describe('resolvePrompt', () => {
         name: 'hammer',
         url: 'https://example.com/hammer.jpg',
         mediaAssetId: 'asset-1',
+        filePath: 'uploads/hammer.jpg',
       },
     ]
 
@@ -218,6 +246,7 @@ describe('resolvePrompt', () => {
     const testInputs: TestInputState = { weapon: 'hammer' }
     const variables: PresetVariable[] = [
       {
+        id: '550e8400-e29b-41d4-a716-446655440007',
         name: 'weapon',
         type: 'text',
         defaultValue: 'sword',
@@ -244,13 +273,18 @@ describe('resolvePrompt', () => {
 
   it('should resolve input references within value mappings', () => {
     const promptTemplate = 'Using style @{text:artStyle}'
-    const mockFile = new File([''], 'test.jpg', { type: 'image/jpeg' })
+    const mockMediaRef = {
+      mediaAssetId: 'test-asset-id',
+      url: 'https://example.com/fantasy.jpg',
+      filePath: 'uploads/fantasy.jpg',
+    }
     const testInputs: TestInputState = {
       artStyle: 'fantasy',
-      fantasyRef: mockFile,
+      fantasyRef: mockMediaRef,
     }
     const variables: PresetVariable[] = [
       {
+        id: '550e8400-e29b-41d4-a716-446655440008',
         name: 'artStyle',
         type: 'text',
         defaultValue: 'realistic',
@@ -261,7 +295,11 @@ describe('resolvePrompt', () => {
           },
         ],
       },
-      { name: 'fantasyRef', type: 'image', defaultValue: '' },
+      {
+        id: '550e8400-e29b-41d4-a716-446655440009',
+        name: 'fantasyRef',
+        type: 'image',
+      },
     ]
     const mediaRegistry: PresetMediaEntry[] = []
 
@@ -280,8 +318,12 @@ describe('resolvePrompt', () => {
 describe('extractMediaReferences', () => {
   it('should extract image input references', () => {
     const promptTemplate = 'Photo: @{input:userPhoto}'
-    const mockFile = new File([''], 'test.jpg', { type: 'image/jpeg' })
-    const testInputs: TestInputState = { userPhoto: mockFile }
+    const mockMediaRef = {
+      mediaAssetId: 'test-asset-id',
+      url: 'https://example.com/test.jpg',
+      filePath: 'uploads/test.jpg',
+    }
+    const testInputs: TestInputState = { userPhoto: mockMediaRef }
     const variables: PresetVariable[] = []
     const mediaRegistry: PresetMediaEntry[] = []
 
@@ -296,7 +338,7 @@ describe('extractMediaReferences', () => {
     expect(result[0].name).toBe('userPhoto')
     expect(result[0].source).toBe('test')
     expect(result[0].type).toBe('input')
-    expect(result[0].url).toContain('blob:')
+    expect(result[0].url).toBe('https://example.com/test.jpg')
   })
 
   it('should extract media registry references', () => {
@@ -308,6 +350,7 @@ describe('extractMediaReferences', () => {
         name: 'styleRef',
         url: 'https://example.com/image.jpg',
         mediaAssetId: 'asset-1',
+        filePath: 'uploads/styleRef.jpg',
       },
     ]
 
@@ -343,15 +386,27 @@ describe('extractMediaReferences', () => {
 
   it('should extract multiple media references', () => {
     const promptTemplate = '@{input:photo1} @{ref:ref1} @{input:photo2}'
-    const mockFile1 = new File([''], 'test1.jpg', { type: 'image/jpeg' })
-    const mockFile2 = new File([''], 'test2.jpg', { type: 'image/jpeg' })
-    const testInputs: TestInputState = { photo1: mockFile1, photo2: mockFile2 }
+    const mockMediaRef1 = {
+      mediaAssetId: 'test-asset-id-1',
+      url: 'https://example.com/test1.jpg',
+      filePath: 'uploads/test1.jpg',
+    }
+    const mockMediaRef2 = {
+      mediaAssetId: 'test-asset-id-2',
+      url: 'https://example.com/test2.jpg',
+      filePath: 'uploads/test2.jpg',
+    }
+    const testInputs: TestInputState = {
+      photo1: mockMediaRef1,
+      photo2: mockMediaRef2,
+    }
     const variables: PresetVariable[] = []
     const mediaRegistry: PresetMediaEntry[] = [
       {
         name: 'ref1',
         url: 'https://example.com/ref1.jpg',
         mediaAssetId: 'asset-1',
+        filePath: 'uploads/ref1.jpg',
       },
     ]
 

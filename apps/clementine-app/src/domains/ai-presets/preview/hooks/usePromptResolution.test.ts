@@ -11,7 +11,13 @@ describe('usePromptResolution', () => {
     const promptTemplate = 'Hello @{text:userName}!'
     const testInputs: TestInputState = { userName: 'Alice' }
     const variables: PresetVariable[] = [
-      { name: 'userName', type: 'text', defaultValue: '' },
+      {
+        id: '550e8400-e29b-41d4-a716-446655440005',
+        name: 'userName',
+        type: 'text',
+        defaultValue: '',
+        valueMap: null,
+      },
     ]
     const mediaRegistry: PresetMediaEntry[] = []
 
@@ -27,7 +33,13 @@ describe('usePromptResolution', () => {
     const promptTemplate = 'Hello @{text:userName}!'
     const testInputs: TestInputState = { userName: 'Alice' }
     const variables: PresetVariable[] = [
-      { name: 'userName', type: 'text', defaultValue: '' },
+      {
+        id: '550e8400-e29b-41d4-a716-446655440006',
+        name: 'userName',
+        type: 'text',
+        defaultValue: '',
+        valueMap: null,
+      },
     ]
     const mediaRegistry: PresetMediaEntry[] = []
 
@@ -47,7 +59,13 @@ describe('usePromptResolution', () => {
   it('should recompute when promptTemplate changes', () => {
     const testInputs: TestInputState = { userName: 'Alice' }
     const variables: PresetVariable[] = [
-      { name: 'userName', type: 'text', defaultValue: '' },
+      {
+        id: '550e8400-e29b-41d4-a716-446655440007',
+        name: 'userName',
+        type: 'text',
+        defaultValue: '',
+        valueMap: null,
+      },
     ]
     const mediaRegistry: PresetMediaEntry[] = []
 
@@ -73,7 +91,13 @@ describe('usePromptResolution', () => {
   it('should recompute when testInputs change', () => {
     const promptTemplate = 'Hello @{text:userName}!'
     const variables: PresetVariable[] = [
-      { name: 'userName', type: 'text', defaultValue: '' },
+      {
+        id: '550e8400-e29b-41d4-a716-446655440008',
+        name: 'userName',
+        type: 'text',
+        defaultValue: '',
+        valueMap: null,
+      },
     ]
     const mediaRegistry: PresetMediaEntry[] = []
 
@@ -101,12 +125,19 @@ describe('usePromptResolution', () => {
     const testInputs: TestInputState = { style: 'modern', userName: 'Alice' }
     const variables: PresetVariable[] = [
       {
+        id: '550e8400-e29b-41d4-a716-446655440009',
         name: 'style',
         type: 'text',
         defaultValue: '',
         valueMap: [{ value: 'modern', text: 'minimalist' }],
       },
-      { name: 'userName', type: 'text', defaultValue: '' },
+      {
+        id: '550e8400-e29b-41d4-a716-44665544000a',
+        name: 'userName',
+        type: 'text',
+        defaultValue: '',
+        valueMap: null,
+      },
     ]
     const mediaRegistry: PresetMediaEntry[] = []
 

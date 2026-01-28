@@ -8,12 +8,26 @@ import type { PresetVariable } from '@clementine/shared'
 describe('validatePresetInputs', () => {
   it('should return valid status when all inputs are provided', () => {
     const variables: PresetVariable[] = [
-      { name: 'userName', type: 'text', defaultValue: '' },
-      { name: 'userPhoto', type: 'image', defaultValue: '' },
+      {
+        id: '550e8400-e29b-41d4-a716-44665544000b',
+        name: 'userName',
+        type: 'text',
+        defaultValue: '',
+        valueMap: null,
+      },
+      {
+        id: '550e8400-e29b-41d4-a716-44665544000c',
+        name: 'userPhoto',
+        type: 'image',
+      },
     ]
     const testInputs: TestInputState = {
       userName: 'Alice',
-      userPhoto: new File([''], 'test.jpg', { type: 'image/jpeg' }),
+      userPhoto: {
+        mediaAssetId: 'test-asset-id',
+        url: 'https://example.com/test.jpg',
+        filePath: 'uploads/test.jpg',
+      },
     }
     const resolvedPrompt: ResolvedPrompt = {
       text: 'Hello Alice! <userPhoto>',
@@ -31,7 +45,11 @@ describe('validatePresetInputs', () => {
 
   it('should return incomplete status when image is missing', () => {
     const variables: PresetVariable[] = [
-      { name: 'userPhoto', type: 'image', defaultValue: '' },
+      {
+        id: '550e8400-e29b-41d4-a716-44665544000d',
+        name: 'userPhoto',
+        type: 'image',
+      },
     ]
     const testInputs: TestInputState = { userPhoto: null }
     const resolvedPrompt: ResolvedPrompt = {
@@ -51,7 +69,13 @@ describe('validatePresetInputs', () => {
 
   it('should return incomplete status when required text input is missing', () => {
     const variables: PresetVariable[] = [
-      { name: 'userName', type: 'text', defaultValue: '' }, // No default
+      {
+        id: '550e8400-e29b-41d4-a716-44665544000e',
+        name: 'userName',
+        type: 'text',
+        defaultValue: '',
+        valueMap: null,
+      }, // No default
     ]
     const testInputs: TestInputState = { userName: null }
     const resolvedPrompt: ResolvedPrompt = {
@@ -71,7 +95,13 @@ describe('validatePresetInputs', () => {
 
   it('should not error when text variable has default value', () => {
     const variables: PresetVariable[] = [
-      { name: 'userName', type: 'text', defaultValue: 'Guest' },
+      {
+        id: '550e8400-e29b-41d4-a716-44665544000f',
+        name: 'userName',
+        type: 'text',
+        defaultValue: 'Guest',
+        valueMap: null,
+      },
     ]
     const testInputs: TestInputState = { userName: null }
     const resolvedPrompt: ResolvedPrompt = {
@@ -133,7 +163,11 @@ describe('validatePresetInputs', () => {
 
   it('should prioritize incomplete over invalid status', () => {
     const variables: PresetVariable[] = [
-      { name: 'userPhoto', type: 'image', defaultValue: '' },
+      {
+        id: '550e8400-e29b-41d4-a716-446655440010',
+        name: 'userPhoto',
+        type: 'image',
+      },
     ]
     const testInputs: TestInputState = { userPhoto: null }
     const resolvedPrompt: ResolvedPrompt = {

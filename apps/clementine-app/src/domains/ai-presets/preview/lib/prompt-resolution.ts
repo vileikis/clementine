@@ -145,7 +145,7 @@ export function resolvePrompt(
  * and looks up their corresponding URLs from the media registry and test inputs.
  *
  * @param promptTemplate - Template string with @{type:name} references
- * @param testInputs - Current test input values (File objects for images)
+ * @param testInputs - Current test input values (MediaReference objects for images)
  * @param variables - Array of preset variables
  * @param mediaRegistry - Array of preset media entries with URLs
  * @returns Array of media references with URLs for preview
@@ -164,11 +164,12 @@ export function extractMediaReferences(
     const [, type, name] = match
 
     if (type === 'input') {
-      const file = testInputs[name]
-      if (file instanceof File) {
+      const inputValue = testInputs[name]
+      // TestInputValue is MediaReference for images (not File)
+      if (inputValue && typeof inputValue === 'object' && 'url' in inputValue) {
         references.push({
           name,
-          url: URL.createObjectURL(file), // Create blob URL for preview
+          url: inputValue.url,
           source: 'test',
           type: 'input',
         })

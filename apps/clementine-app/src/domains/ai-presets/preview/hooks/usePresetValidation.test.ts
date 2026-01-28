@@ -9,7 +9,13 @@ import type { PresetVariable } from '@clementine/shared'
 describe('usePresetValidation', () => {
   it('should return valid status when all inputs are provided', () => {
     const variables: PresetVariable[] = [
-      { name: 'userName', type: 'text', defaultValue: '' },
+      {
+        id: '550e8400-e29b-41d4-a716-446655440001',
+        name: 'userName',
+        type: 'text',
+        defaultValue: '',
+        valueMap: null,
+      },
     ]
     const testInputs: TestInputState = { userName: 'Alice' }
     const resolvedPrompt: ResolvedPrompt = {
@@ -30,7 +36,11 @@ describe('usePresetValidation', () => {
 
   it('should return incomplete status when required input is missing', () => {
     const variables: PresetVariable[] = [
-      { name: 'userPhoto', type: 'image', defaultValue: '' },
+      {
+        id: '550e8400-e29b-41d4-a716-446655440002',
+        name: 'userPhoto',
+        type: 'image',
+      },
     ]
     const testInputs: TestInputState = { userPhoto: null }
     const resolvedPrompt: ResolvedPrompt = {
@@ -50,7 +60,13 @@ describe('usePresetValidation', () => {
 
   it('should memoize result when dependencies do not change', () => {
     const variables: PresetVariable[] = [
-      { name: 'userName', type: 'text', defaultValue: '' },
+      {
+        id: '550e8400-e29b-41d4-a716-446655440003',
+        name: 'userName',
+        type: 'text',
+        defaultValue: '',
+        valueMap: null,
+      },
     ]
     const testInputs: TestInputState = { userName: 'Alice' }
     const resolvedPrompt: ResolvedPrompt = {
@@ -75,7 +91,11 @@ describe('usePresetValidation', () => {
 
   it('should recompute when testInputs change', () => {
     const variables: PresetVariable[] = [
-      { name: 'userPhoto', type: 'image', defaultValue: '' },
+      {
+        id: '550e8400-e29b-41d4-a716-446655440004',
+        name: 'userPhoto',
+        type: 'image',
+      },
     ]
     const resolvedPrompt: ResolvedPrompt = {
       text: '<userPhoto>',
@@ -84,17 +104,22 @@ describe('usePresetValidation', () => {
       unresolvedRefs: [],
     }
 
+    const mockMediaRef = {
+      mediaAssetId: 'test-asset-id',
+      url: 'https://example.com/test.jpg',
+      filePath: 'uploads/test.jpg',
+    }
+
     const { result, rerender } = renderHook(
-      ({ testInputs }) =>
+      ({ testInputs }: { testInputs: TestInputState }) =>
         usePresetValidation(variables, testInputs, resolvedPrompt),
-      { initialProps: { testInputs: { userPhoto: null } } },
+      { initialProps: { testInputs: { userPhoto: null } as TestInputState } },
     )
 
     expect(result.current.status).toBe('incomplete')
 
-    // Provide the image
-    const mockFile = new File([''], 'test.jpg', { type: 'image/jpeg' })
-    rerender({ testInputs: { userPhoto: mockFile } })
+    // Provide the image (as MediaReference)
+    rerender({ testInputs: { userPhoto: mockMediaRef } })
 
     expect(result.current.status).toBe('valid')
   })
