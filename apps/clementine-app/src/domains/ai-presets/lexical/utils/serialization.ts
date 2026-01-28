@@ -166,16 +166,16 @@ export function loadFromPlainText(
         }
 
         // Add mention node based on type
+        let mentionNode
         if (matchItem.type === 'text' || matchItem.type === 'input') {
           const variable = variables.find((v) => v.name === matchItem.name)
           if (variable) {
-            paragraph.append(
-              $createVariableMentionNode(
-                variable.id,
-                variable.name,
-                variable.type,
-              ),
+            mentionNode = $createVariableMentionNode(
+              variable.id,
+              variable.name,
+              variable.type,
             )
+            paragraph.append(mentionNode)
           } else {
             // Variable not found, keep as text
             paragraph.append(
@@ -185,21 +185,30 @@ export function loadFromPlainText(
         } else if (matchItem.type === 'ref') {
           const mediaItem = media.find((m) => m.name === matchItem.name)
           if (mediaItem) {
-            paragraph.append(
-              $createMediaMentionNode(mediaItem.id, mediaItem.name),
-            )
+            mentionNode = $createMediaMentionNode(mediaItem.id, mediaItem.name)
+            paragraph.append(mentionNode)
           } else {
             // Media not found, keep as text
             paragraph.append($createTextNode(`@{ref:${matchItem.name}}`))
           }
         }
 
+        // Add space after mention to prevent cursor trap
+        if (mentionNode) {
+          paragraph.append($createTextNode(' '))
+        }
+
         lastIndex = matchItem.index + matchItem.length
       }
 
       // Add remaining text
-      if (lastIndex < paragraphText.length) {
-        paragraph.append($createTextNode(paragraphText.slice(lastIndex)))
+      const remainingText = paragraphText.slice(lastIndex)
+      if (remainingText.length > 0) {
+        paragraph.append($createTextNode(remainingText))
+      } else if (allMatches.length > 0) {
+        // If paragraph ends with a mention, ensure there's a text node
+        // Even though we add space above, this ensures cursor can always land somewhere
+        paragraph.append($createTextNode(''))
       }
 
       root.append(paragraph)
