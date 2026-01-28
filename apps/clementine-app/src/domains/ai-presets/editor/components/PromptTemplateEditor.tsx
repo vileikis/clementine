@@ -129,7 +129,7 @@ export function PromptTemplateEditor({
     if (debouncedValue !== value && !disabled && !updateMutation.isPending) {
       updateMutation.mutate({ promptTemplate: debouncedValue })
     }
-  }, [debouncedValue, value, disabled, updateMutation])
+  }, [debouncedValue, value, disabled, updateMutation.mutate])
 
   // Initialize editor configuration
   const initialConfig = {
