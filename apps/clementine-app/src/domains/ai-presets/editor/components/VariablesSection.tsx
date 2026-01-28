@@ -79,7 +79,9 @@ export function VariablesSection({
   disabled = false,
   showHeader = false,
 }: VariablesSectionProps) {
-  const [expandedVariableId, setExpandedVariableId] = useState<string | null>(null)
+  const [expandedVariableId, setExpandedVariableId] = useState<string | null>(
+    null,
+  )
   const updateVariables = useUpdateVariables(workspaceId, presetId)
 
   // Configure sensors for drag and drop
@@ -156,12 +158,9 @@ export function VariablesSection({
   )
 
   // Handle toggle expanded state (accordion pattern)
-  const handleToggleExpanded = useCallback(
-    (id: string) => {
-      setExpandedVariableId((current) => (current === id ? null : id))
-    },
-    [],
-  )
+  const handleToggleExpanded = useCallback((id: string) => {
+    setExpandedVariableId((current) => (current === id ? null : id))
+  }, [])
 
   // Handle update settings (inline editing, no dialog)
   const handleUpdateSettings = useCallback(
@@ -180,7 +179,9 @@ export function VariablesSection({
               ...(updates.defaultValue !== undefined && {
                 defaultValue: updates.defaultValue,
               }),
-              ...(updates.valueMap !== undefined && { valueMap: updates.valueMap }),
+              ...(updates.valueMap !== undefined && {
+                valueMap: updates.valueMap,
+              }),
             }
           }
           return v

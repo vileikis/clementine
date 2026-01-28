@@ -40,7 +40,10 @@ interface VariableCardProps {
   /** Called when variable settings are updated */
   onUpdateSettings: (
     id: string,
-    updates: { defaultValue?: string | null; valueMap?: {value: string, text: string}[] | null },
+    updates: {
+      defaultValue?: string | null
+      valueMap?: { value: string; text: string }[] | null
+    },
   ) => void
   /** Called when delete button is clicked */
   onDelete: (id: string) => void
@@ -203,7 +206,9 @@ export function VariableCard({
     setDefaultValue(value)
   }
 
-  const handleValueMapChange = (newValueMap: { value: string; text: string }[]) => {
+  const handleValueMapChange = (
+    newValueMap: { value: string; text: string }[],
+  ) => {
     setValueMap(newValueMap)
   }
 
@@ -232,7 +237,8 @@ export function VariableCard({
 
     // Validate all mappings have both value and text before saving
     const isValid = debouncedValueMap.every(
-      (mapping) => mapping.value.trim().length > 0 && mapping.text.trim().length > 0,
+      (mapping) =>
+        mapping.value.trim().length > 0 && mapping.text.trim().length > 0,
     )
 
     // Don't save if invalid (empty fields)
@@ -258,7 +264,8 @@ export function VariableCard({
   const Icon = isTextType ? Type : Image
 
   // Indicators for collapsed state
-  const numMappings = isTextType && variable.valueMap ? variable.valueMap.length : 0
+  const numMappings =
+    isTextType && variable.valueMap ? variable.valueMap.length : 0
   const hasDefault = isTextType && variable.defaultValue
 
   return (
@@ -295,7 +302,11 @@ export function VariableCard({
 
         {/* Variable name and content - clickable area for expansion */}
         <div
-          onClick={isTextType && !disabled && !isEditing ? handleToggleExpanded : undefined}
+          onClick={
+            isTextType && !disabled && !isEditing
+              ? handleToggleExpanded
+              : undefined
+          }
           className={cn(
             'min-w-0 flex-1',
             isTextType && !disabled && !isEditing && 'cursor-pointer',
@@ -355,7 +366,10 @@ export function VariableCard({
                   )}
                 >
                   <span
-                    className={cn('font-mono text-sm font-medium', colorClasses)}
+                    className={cn(
+                      'font-mono text-sm font-medium',
+                      colorClasses,
+                    )}
                   >
                     @{variable.name}
                   </span>
