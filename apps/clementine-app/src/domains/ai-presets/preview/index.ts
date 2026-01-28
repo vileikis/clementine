@@ -17,6 +17,7 @@ export { AIPresetPreviewPanel } from './components/AIPresetPreviewPanel'
 export { PromptPreview } from './components/PromptPreview'
 export { MediaPreviewGrid } from './components/MediaPreviewGrid'
 export { ValidationDisplay } from './components/ValidationDisplay'
+export { TestGenerationButton } from './components/TestGenerationButton'
 
 // Store
 export { useAIPresetPreviewStore } from './store/useAIPresetPreviewStore'

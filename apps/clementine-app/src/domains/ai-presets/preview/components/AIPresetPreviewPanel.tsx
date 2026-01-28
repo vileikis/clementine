@@ -21,6 +21,7 @@ import { TestInputsForm } from './TestInputsForm'
 import { PromptPreview } from './PromptPreview'
 import { MediaPreviewGrid } from './MediaPreviewGrid'
 import { ValidationDisplay } from './ValidationDisplay'
+import { TestGenerationButton } from './TestGenerationButton'
 import type { ReactNode } from 'react'
 import type { MediaReference } from '@clementine/shared'
 import { Skeleton } from '@/ui-kit/ui/skeleton'
@@ -212,6 +213,11 @@ function AIPresetPreviewPanelContent({
           mediaReferences={mediaReferences}
           totalRegistryCount={mediaRegistry.length}
         />
+      </EditorSection>
+
+      {/* Test Generation Button */}
+      <EditorSection title="Test Generation">
+        <TestGenerationButton validation={validation} />
       </EditorSection>
     </div>
   )

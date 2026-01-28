@@ -161,16 +161,16 @@ This is a web application using TanStack Start. Paths follow the established str
 
 ### Implementation for User Story 5
 
-- [ ] T061 [P] [US5] Create TestGenerationButton component in apps/clementine-app/src/domains/ai-presets/preview/components/TestGenerationButton.tsx as placeholder UI
-- [ ] T062 [P] [US5] Add disabled state logic in TestGenerationButton based on validation status from usePresetValidation hook
-- [ ] T063 [P] [US5] Add tooltip to disabled TestGenerationButton using shadcn/ui Tooltip component explaining specific validation failures
-- [ ] T064 [P] [US5] Add enabled state styling to TestGenerationButton when validation passes (primary button style)
-- [ ] T065 [P] [US5] Add placeholder loading spinner UI in TestGenerationButton for future Phase 5 implementation
-- [ ] T066 [P] [US5] Add placeholder result display area in TestGenerationButton component for future Phase 5 implementation
-- [ ] T067 [US5] Integrate TestGenerationButton into AIPresetPreviewPanel component at bottom of panel
-- [ ] T068 [US5] Add onClick handler to TestGenerationButton that does nothing (no-op for Phase 4, Phase 5 will implement)
-- [ ] T069 [US5] Add button text "Run Test Generation" and appropriate icon using lucide-react icons
-- [ ] T070 [US5] Add hover state to enabled TestGenerationButton showing it's clickable (but explaining Phase 5 implementation in tooltip)
+- [X] T061 [P] [US5] Create TestGenerationButton component in apps/clementine-app/src/domains/ai-presets/preview/components/TestGenerationButton.tsx as placeholder UI
+- [X] T062 [P] [US5] Add disabled state logic in TestGenerationButton based on validation status from usePresetValidation hook
+- [X] T063 [P] [US5] Add tooltip to disabled TestGenerationButton using shadcn/ui Tooltip component explaining specific validation failures
+- [X] T064 [P] [US5] Add enabled state styling to TestGenerationButton when validation passes (primary button style)
+- [X] T065 [P] [US5] Add placeholder loading spinner UI in TestGenerationButton for future Phase 5 implementation
+- [X] T066 [P] [US5] Add placeholder result display area in TestGenerationButton component for future Phase 5 implementation
+- [X] T067 [US5] Integrate TestGenerationButton into AIPresetPreviewPanel component at bottom of panel
+- [X] T068 [US5] Add onClick handler to TestGenerationButton that does nothing (no-op for Phase 4, Phase 5 will implement)
+- [X] T069 [US5] Add button text "Run Test Generation" and appropriate icon using lucide-react icons
+- [X] T070 [US5] Add hover state to enabled TestGenerationButton showing it's clickable (but explaining Phase 5 implementation in tooltip)
 
 **Checkpoint**: All user stories (US1-US5) are now complete and independently functional - full preview panel is ready
 
