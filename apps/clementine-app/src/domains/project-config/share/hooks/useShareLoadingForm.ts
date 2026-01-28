@@ -45,6 +45,10 @@ export function useShareLoadingForm({
   const shareLoadingForm = useForm<ShareLoadingConfig>({
     defaultValues: currentShareLoading,
     values: currentShareLoading, // Sync form with server data when it changes
+    resetOptions: {
+      keepDirtyValues: true, // Preserve user edits during reset
+      keepErrors: true, // Preserve validation errors
+    },
   })
 
   // Mutation

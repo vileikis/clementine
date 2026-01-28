@@ -10,7 +10,13 @@
  * Must be used within a ThemeProvider.
  */
 
-import { Download, Link2, Mail, RotateCcw } from 'lucide-react'
+import {
+  Download,
+  Image as ImageIcon,
+  Link2,
+  Mail,
+  RotateCcw,
+} from 'lucide-react'
 import {
   FaFacebookF,
   FaInstagram,
@@ -126,6 +132,10 @@ export function ShareReadyRenderer({
             alt="Generated result"
             className="w-full aspect-square max-w-md rounded-lg object-cover"
           />
+        ) : mode === 'edit' ? (
+          <div className="w-full aspect-square max-w-md rounded-lg bg-muted flex items-center justify-center">
+            <ImageIcon className="h-12 w-12 text-muted-foreground/50" />
+          </div>
         ) : (
           <Skeleton className="w-full aspect-square max-w-md rounded-lg" />
         )}

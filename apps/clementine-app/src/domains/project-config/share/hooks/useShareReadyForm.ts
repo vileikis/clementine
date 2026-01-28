@@ -53,6 +53,10 @@ export function useShareReadyForm({
   const shareForm = useForm<ShareReadyConfig>({
     defaultValues: currentShareReady,
     values: currentShareReady, // Sync form with server data when it changes
+    resetOptions: {
+      keepDirtyValues: true, // Preserve user edits during reset
+      keepErrors: true, // Preserve validation errors
+    },
   })
 
   // Mutation
@@ -75,7 +79,7 @@ export function useShareReadyForm({
       }
     },
     fieldsToCompare: SHARE_READY_FIELDS_TO_COMPARE,
-    debounceMs: 2000,
+    debounceMs: 10000,
   })
 
   // Watch form for live preview
