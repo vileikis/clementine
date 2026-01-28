@@ -16,6 +16,7 @@ export { TestInputsForm } from './components/TestInputsForm'
 export { AIPresetPreviewPanel } from './components/AIPresetPreviewPanel'
 export { PromptPreview } from './components/PromptPreview'
 export { MediaPreviewGrid } from './components/MediaPreviewGrid'
+export { ValidationDisplay } from './components/ValidationDisplay'
 
 // Store
 export { useAIPresetPreviewStore } from './store/useAIPresetPreviewStore'

@@ -20,6 +20,7 @@ import { useMediaReferences } from '../hooks/useMediaReferences'
 import { TestInputsForm } from './TestInputsForm'
 import { PromptPreview } from './PromptPreview'
 import { MediaPreviewGrid } from './MediaPreviewGrid'
+import { ValidationDisplay } from './ValidationDisplay'
 import type { ReactNode } from 'react'
 import type { MediaReference } from '@clementine/shared'
 import { Skeleton } from '@/ui-kit/ui/skeleton'
@@ -64,6 +65,12 @@ function AIPresetPreviewPanelContent({
   const [uploadingImages, setUploadingImages] = useState<
     Record<string, boolean>
   >({})
+
+  // Handler to scroll to test inputs form when error is clicked
+  const handleErrorClick = useCallback(() => {
+    // Scroll to top of the form
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [])
 
   // Fetch preset data with real-time updates
   const {
@@ -186,46 +193,13 @@ function AIPresetPreviewPanelContent({
         uploadingImages={uploadingImages}
       />
 
-      {/* Validation Status (if there are errors or warnings) */}
-      {(validation.errors.length > 0 || validation.warnings.length > 0) && (
-        <EditorSection title="Validation">
-          {/* Errors */}
-          {validation.errors.length > 0 && (
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-destructive">Errors</p>
-              <ul className="space-y-1">
-                {validation.errors.map((validationError, idx) => (
-                  <li key={idx} className="text-sm text-destructive">
-                    <span className="font-medium">
-                      {validationError.field}:
-                    </span>{' '}
-                    {validationError.message}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* Warnings */}
-          {validation.warnings.length > 0 && (
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-orange-600 dark:text-orange-400">
-                Warnings
-              </p>
-              <ul className="space-y-1">
-                {validation.warnings.map((warning, idx) => (
-                  <li
-                    key={idx}
-                    className="text-sm text-orange-600 dark:text-orange-400"
-                  >
-                    {warning.message}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </EditorSection>
-      )}
+      {/* Validation Display - Always shown */}
+      <EditorSection title="Validation">
+        <ValidationDisplay
+          validation={validation}
+          onErrorClick={handleErrorClick}
+        />
+      </EditorSection>
 
       {/* Resolved Prompt Preview */}
       <EditorSection title="Resolved Prompt">
