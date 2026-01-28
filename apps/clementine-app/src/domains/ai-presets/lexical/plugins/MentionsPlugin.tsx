@@ -239,7 +239,7 @@ export function MentionsPlugin({ variables, media }: MentionsPluginProps) {
         }
 
         return createPortal(
-          <div className="typeahead-popover mentions-menu z-50 w-64 rounded-md border bg-popover p-1 shadow-md">
+          <div className="typeahead-popover mentions-menu z-[100] w-64 rounded-md border bg-popover p-1 shadow-md">
             <ul role="listbox" aria-label="Mentions">
               {options.map((option, index) => (
                 <MentionMenuItem

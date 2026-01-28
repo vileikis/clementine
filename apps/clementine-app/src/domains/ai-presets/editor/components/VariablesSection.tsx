@@ -27,13 +27,15 @@ import { VariableCard } from './VariableCard'
 import { VariableSettingsDialog } from './VariableSettingsDialog'
 import type { VariableSettingsUpdate } from './VariableSettingsDialog'
 import type { DragEndEvent } from '@dnd-kit/core'
-import type { PresetVariable } from '@clementine/shared'
+import type { PresetVariable, PresetMediaEntry } from '@clementine/shared'
 import { Button } from '@/ui-kit/ui/button'
 import { ContextDropdownMenu } from '@/shared/components/ContextDropdownMenu'
 
 interface VariablesSectionProps {
   /** Array of variable definitions */
   variables: PresetVariable[]
+  /** Array of media entries for @mention in value mappings */
+  media: PresetMediaEntry[]
   /** Workspace ID for updates */
   workspaceId: string
   /** Preset ID for updates */
@@ -62,6 +64,7 @@ const generateVariableName = (
  * ```tsx
  * <VariablesSection
  *   variables={preset.draft.variables}
+ *   media={preset.draft.mediaRegistry}
  *   workspaceId={workspaceId}
  *   presetId={preset.id}
  *   disabled={isPublishing}
@@ -70,6 +73,7 @@ const generateVariableName = (
  */
 export function VariablesSection({
   variables,
+  media,
   workspaceId,
   presetId,
   disabled = false,
@@ -304,6 +308,7 @@ export function VariablesSection({
       {/* Variable Settings Dialog */}
       <VariableSettingsDialog
         variable={selectedVariable}
+        media={media}
         onClose={() => setSelectedVariable(null)}
         onSave={handleSaveSettings}
       />

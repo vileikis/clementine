@@ -309,11 +309,13 @@
 
 ### Implementation for Phase 11
 
-- [ ] T077 Integrate Lexical into ValueMappingsEditor component:
+- [X] T077 Integrate Lexical into ValueMappingsEditor component:
   - Replace textarea for "Prompt Text" column with Lexical editor
-  - Use MentionsPlugin with `allowVariables={false}` and `allowMedia={true}`
+  - Use MentionsPlugin with empty variables array (media-only)
   - Keep same grid layout and UX
   - Auto-save mappings on change
+  - Pass media prop through AIPresetConfigPanel → VariablesSection → VariableSettingsDialog → ValueMappingsEditor
+  - Create InlineLexicalEditor component for compact table cell usage
 - [ ] T078 Test ValueMappingsEditor with Lexical:
   - Verify @mention autocomplete shows only media (no variables)
   - Test smart paste for media mentions

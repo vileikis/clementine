@@ -1,23 +1,42 @@
 /**
  * ValueMappingsEditor Component
  *
- * Unified editor for value mappings and default value.
+ * Unified editor for value mappings and default value with Lexical support.
  * Displays a clean grid with mappings and default fallback row.
+ * Prompt text fields support @mention autocomplete for reference media only.
  */
 import { useCallback, useEffect, useRef } from 'react'
 import { Info, Plus, Trash2 } from 'lucide-react'
-import type { ValueMappingEntry } from '@clementine/shared'
+import type { ValueMappingEntry, PresetMediaEntry } from '@clementine/shared'
+import type { EditorState } from 'lexical'
 import { Button } from '@/ui-kit/ui/button'
 import { Input } from '@/ui-kit/ui/input'
-import { Textarea } from '@/ui-kit/ui/textarea'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui-kit/ui/tooltip'
 import { cn } from '@/shared/utils'
+import { LexicalComposer } from '@lexical/react/LexicalComposer'
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import { ContentEditable } from '@lexical/react/LexicalContentEditable'
+import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary'
+import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
+import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin'
+import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
+import {
+  MediaMentionNode,
+  MentionsPlugin,
+  SmartPastePlugin,
+  VariableMentionNode,
+  loadFromPlainText,
+  serializeToPlainText,
+} from '../../lexical'
+import type { MediaOption } from '../../lexical'
 
 interface ValueMappingsEditorProps {
   /** Current value mappings */
   mappings: ValueMappingEntry[]
   /** Default value (fallback when no mapping matches) */
   defaultValue: string
+  /** Available media for @mention autocomplete */
+  media: PresetMediaEntry[]
   /** Called when mappings are updated */
   onMappingsChange: (mappings: ValueMappingEntry[]) => void
   /** Called when default value is updated */
@@ -27,59 +46,123 @@ interface ValueMappingsEditorProps {
 }
 
 /**
- * Auto-growing textarea component
+ * Convert PresetMediaEntry to MediaOption for Lexical plugins
  */
-function AutoGrowTextarea({
+function toMediaOption(media: PresetMediaEntry): MediaOption {
+  return {
+    id: media.mediaAssetId,
+    name: media.name,
+  }
+}
+
+/**
+ * Initialize content plugin for inline editor
+ */
+function InitializeContentPlugin({
+  value,
+  mediaOptions,
+}: {
+  value: string
+  mediaOptions: MediaOption[]
+}) {
+  const [editor] = useLexicalComposerContext()
+  const hasInitialized = useRef(false)
+
+  useEffect(() => {
+    if (!hasInitialized.current && value) {
+      hasInitialized.current = true
+      // Load plain text with @{ref:name} mentions
+      loadFromPlainText(editor, value, [], mediaOptions)
+    }
+  }, [editor, value, mediaOptions])
+
+  return null
+}
+
+/**
+ * Inline Lexical editor for prompt text with media-only @mentions
+ * Compact version for table cells
+ */
+function InlineLexicalEditor({
   value,
   onChange,
   placeholder,
   disabled,
-  className,
+  mediaOptions,
   'aria-label': ariaLabel,
 }: {
   value: string
   onChange: (value: string) => void
   placeholder?: string
   disabled?: boolean
-  className?: string
+  mediaOptions: MediaOption[]
   'aria-label'?: string
 }) {
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const handleChange = (editorState: EditorState) => {
+    // Serialize to plain text with @{ref:name} format
+    const plainText = serializeToPlainText(editorState)
+    onChange(plainText)
+  }
 
-  // Auto-resize on value change
-  useEffect(() => {
-    const textarea = textareaRef.current
-    if (textarea) {
-      textarea.style.height = 'auto'
-      textarea.style.height = `${textarea.scrollHeight}px`
-    }
-  }, [value])
+  const initialConfig = {
+    namespace: 'InlineValueMappingEditor',
+    theme: {
+      paragraph: 'editor-paragraph',
+    },
+    onError: (error: Error) => {
+      console.error('Lexical error in value mapping:', error)
+    },
+    nodes: [VariableMentionNode as never, MediaMentionNode as never],
+    editable: !disabled,
+  }
 
   return (
-    <Textarea
-      ref={textareaRef}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      placeholder={placeholder}
-      disabled={disabled}
-      className={cn(
-        'min-h-[36px] resize-none overflow-hidden py-2 text-sm',
-        className,
-      )}
-      rows={1}
-      aria-label={ariaLabel}
-    />
+    <LexicalComposer initialConfig={initialConfig}>
+      <div className="relative">
+        <RichTextPlugin
+          contentEditable={
+            <ContentEditable
+              className={cn(
+                'min-h-[36px] rounded-md border border-input bg-background px-3 py-2 text-sm outline-none',
+                'focus:ring-2 focus:ring-ring focus:ring-offset-2',
+                'disabled:cursor-not-allowed disabled:opacity-50',
+              )}
+              aria-label={ariaLabel}
+            />
+          }
+          placeholder={
+            <div className="pointer-events-none absolute left-3 top-2 text-sm text-muted-foreground">
+              {placeholder}
+            </div>
+          }
+          ErrorBoundary={LexicalErrorBoundary}
+        />
+      </div>
+
+      {/* Plugins */}
+      <HistoryPlugin />
+      <OnChangePlugin onChange={handleChange} ignoreSelectionChange />
+      {/* Pass empty variables array to show only media */}
+      <MentionsPlugin variables={[]} media={mediaOptions} />
+      <SmartPastePlugin variables={[]} media={mediaOptions} />
+
+      {/* Initialize content */}
+      <InitializeContentPlugin value={value} mediaOptions={mediaOptions} />
+    </LexicalComposer>
   )
 }
 
 /**
  * Unified editor for value mappings with default value as fallback row
  *
+ * Now includes Lexical editor with media-only @mention support for prompt text fields.
+ *
  * @example
  * ```tsx
  * <ValueMappingsEditor
- *   mappings={[{ value: 'summer', text: 'bright sunny day' }]}
+ *   mappings={[{ value: 'summer', text: 'bright sunny day with @{ref:style}' }]}
  *   defaultValue="neutral lighting"
+ *   media={draft.mediaRegistry}
  *   onMappingsChange={setMappings}
  *   onDefaultValueChange={setDefaultValue}
  * />
@@ -88,10 +171,13 @@ function AutoGrowTextarea({
 export function ValueMappingsEditor({
   mappings,
   defaultValue,
+  media,
   onMappingsChange,
   onDefaultValueChange,
   disabled = false,
 }: ValueMappingsEditorProps) {
+  // Convert media to options for Lexical
+  const mediaOptions = media.map(toMediaOption)
   // Add a new empty mapping
   const handleAdd = useCallback(() => {
     onMappingsChange([...mappings, { value: '', text: '' }])
@@ -187,11 +273,12 @@ export function ValueMappingsEditor({
               className="h-9 text-sm"
               aria-label="Mapping value"
             />
-            <AutoGrowTextarea
+            <InlineLexicalEditor
               value={mapping.text}
               onChange={(text) => handleUpdateText(index, text)}
-              placeholder="Enter prompt text..."
+              placeholder="Type @ to mention media..."
               disabled={disabled}
+              mediaOptions={mediaOptions}
               aria-label="Mapping prompt text"
             />
             <Button
@@ -228,11 +315,12 @@ export function ValueMappingsEditor({
               </TooltipContent>
             </Tooltip>
           </div>
-          <AutoGrowTextarea
+          <InlineLexicalEditor
             value={defaultValue}
             onChange={onDefaultValueChange}
-            placeholder="Enter default prompt text..."
+            placeholder="Type @ to mention media..."
             disabled={disabled}
+            mediaOptions={mediaOptions}
             aria-label="Default prompt text"
           />
           <span /> {/* Spacer to align with mapping rows */}

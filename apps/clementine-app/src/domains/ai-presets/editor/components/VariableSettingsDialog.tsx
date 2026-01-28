@@ -7,7 +7,11 @@
 import { useCallback, useEffect, useState } from 'react'
 
 import { ValueMappingsEditor } from './ValueMappingsEditor'
-import type { PresetVariable, ValueMappingEntry } from '@clementine/shared'
+import type {
+  PresetVariable,
+  PresetMediaEntry,
+  ValueMappingEntry,
+} from '@clementine/shared'
 import { Button } from '@/ui-kit/ui/button'
 import {
   Dialog,
@@ -21,6 +25,8 @@ import {
 interface VariableSettingsDialogProps {
   /** The variable being edited (null when dialog is closed) */
   variable: PresetVariable | null
+  /** Available media for @mention in value mappings */
+  media: PresetMediaEntry[]
   /** Callback to close the dialog */
   onClose: () => void
   /** Callback when settings are saved */
@@ -39,13 +45,14 @@ export interface VariableSettingsUpdate {
  * Features a unified value mappings grid with:
  * - Customizable value→text mappings
  * - Default value as fallback (always visible at bottom)
- * - Auto-growing textareas for prompt text
+ * - Lexical editors with media @mention support for prompt text
  * - Info tooltips for guidance
  *
  * @example
  * ```tsx
  * <VariableSettingsDialog
  *   variable={selectedVariable}
+ *   media={draft.mediaRegistry}
  *   onClose={() => setSelectedVariable(null)}
  *   onSave={(id, updates) => updateVariableSettings(id, updates)}
  * />
@@ -53,6 +60,7 @@ export interface VariableSettingsUpdate {
  */
 export function VariableSettingsDialog({
   variable,
+  media,
   onClose,
   onSave,
 }: VariableSettingsDialogProps) {
@@ -123,6 +131,7 @@ export function VariableSettingsDialog({
               <ValueMappingsEditor
                 mappings={mappings}
                 defaultValue={defaultValue}
+                media={media}
                 onMappingsChange={setMappings}
                 onDefaultValueChange={setDefaultValue}
               />

@@ -78,6 +78,7 @@ export function AIPresetConfigPanel({
       <EditorSection title="Variables">
         <VariablesSection
           variables={draft.variables}
+          media={draft.mediaRegistry}
           workspaceId={workspaceId}
           presetId={presetId}
           disabled={disabled}
