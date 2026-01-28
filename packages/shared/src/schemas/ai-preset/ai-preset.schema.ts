@@ -9,37 +9,32 @@
  * This schema uses Firestore-safe patterns:
  * - Optional fields use `.nullable().default(null)` (Firestore doesn't support undefined)
  * - Uses `z.looseObject()` for forward compatibility with future fields
+ *
+ * Draft/Published Model (Phase 5.5):
+ * - `draft`: Working configuration edited in the editor (auto-saved)
+ * - `published`: Live configuration used by experiences (set via Publish button)
+ * - `draftVersion`: Increments on each draft save
+ * - `publishedVersion`: Set to draftVersion when published
  */
 import { z } from 'zod'
 
-import { presetMediaEntrySchema } from './preset-media.schema'
-import { presetVariableSchema } from './preset-variable.schema'
+import { aiPresetConfigSchema } from './ai-preset-config.schema'
+
+// Re-export from config schema for backwards compatibility
+export {
+  aiModelSchema,
+  aspectRatioSchema,
+  aiPresetConfigSchema,
+  type AIPresetConfig,
+  type AIModel,
+  type AspectRatio,
+} from './ai-preset-config.schema'
 
 /**
  * AI Preset status enum schema
  * Lifecycle state of a preset (soft delete pattern)
  */
 export const aiPresetStatusSchema = z.enum(['active', 'deleted'])
-
-/**
- * Supported AI models for image generation
- */
-export const aiModelSchema = z.enum([
-  'gemini-2.5-flash',
-  'gemini-2.5-pro',
-  'gemini-3.0',
-])
-
-/**
- * Supported aspect ratios for generated images
- */
-export const aspectRatioSchema = z.enum([
-  '1:1',
-  '3:2',
-  '2:3',
-  '9:16',
-  '16:9',
-])
 
 /**
  * AI Preset document schema
@@ -79,27 +74,36 @@ export const aiPresetSchema = z.looseObject({
   createdBy: z.string().min(1),
 
   /**
-   * CONFIGURATION
+   * DRAFT/PUBLISHED WORKFLOW
+   *
+   * Editor writes to `draft` (auto-save)
+   * Publish button copies `draft` → `published`
+   * Experiences use `published` for execution
    */
 
-  /** Media registry - images available for prompt references */
-  mediaRegistry: z.array(presetMediaEntrySchema).default([]),
+  /** Draft configuration (edited in editor) - defaults for backwards compatibility */
+  draft: aiPresetConfigSchema.default({
+    model: 'gemini-2.5-flash',
+    aspectRatio: '1:1',
+    mediaRegistry: [],
+    variables: [],
+    promptTemplate: '',
+  }),
 
-  /** Variable definitions */
-  variables: z.array(presetVariableSchema).default([]),
+  /** Published configuration (used by runtime) - null if never published */
+  published: aiPresetConfigSchema.nullable().default(null),
 
-  /** Prompt template with @variable and @media references */
-  promptTemplate: z.string().default(''),
+  /** Draft version number - increments on each save */
+  draftVersion: z.number().default(1),
 
-  /**
-   * MODEL SETTINGS
-   */
+  /** Published version number - set to draftVersion when published */
+  publishedVersion: z.number().nullable().default(null),
 
-  /** AI model for generation */
-  model: aiModelSchema.default('gemini-2.5-flash'),
+  /** Timestamp when last published (Unix ms) */
+  publishedAt: z.number().nullable().default(null),
 
-  /** Output aspect ratio */
-  aspectRatio: aspectRatioSchema.default('1:1'),
+  /** UID of user who last published */
+  publishedBy: z.string().nullable().default(null),
 })
 
 /**
@@ -107,5 +111,3 @@ export const aiPresetSchema = z.looseObject({
  */
 export type AIPreset = z.infer<typeof aiPresetSchema>
 export type AIPresetStatus = z.infer<typeof aiPresetStatusSchema>
-export type AIModel = z.infer<typeof aiModelSchema>
-export type AspectRatio = z.infer<typeof aspectRatioSchema>

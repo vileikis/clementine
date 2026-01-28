@@ -22,6 +22,7 @@ export function MediaPickerField({
   uploadProgress,
   disabled = false,
   className,
+  objectFit = 'cover',
 }: MediaPickerFieldProps) {
   const id = useId()
   const inputRef = useRef<HTMLInputElement>(null)
@@ -125,7 +126,10 @@ export function MediaPickerField({
             <img
               src={value}
               alt="Background preview"
-              className="h-full w-full object-cover"
+              className={cn(
+                'h-full w-full',
+                objectFit === 'cover' ? 'object-cover' : 'object-contain',
+              )}
             />
 
             {/* Overlay with actions */}
