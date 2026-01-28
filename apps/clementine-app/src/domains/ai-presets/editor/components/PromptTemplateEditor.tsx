@@ -24,10 +24,7 @@ import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary'
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
-import type { EditorState, LexicalEditor } from 'lexical'
 import { useEffect, useRef, useState } from 'react'
-import type { PresetMediaEntry, PresetVariable } from '@clementine/shared'
-import { useDebounce } from '@/shared/utils/useDebounce'
 import { useUpdateAIPresetDraft } from '../hooks/useUpdateAIPresetDraft'
 import {
   MediaMentionNode,
@@ -37,9 +34,11 @@ import {
   loadFromJSON,
   loadFromPlainText,
   serializeToPlainText,
-  type MediaOption,
-  type VariableOption,
 } from '../../lexical'
+import type { EditorState, LexicalEditor } from 'lexical'
+import type { PresetMediaEntry, PresetVariable } from '@clementine/shared'
+import type { MediaOption, VariableOption } from '../../lexical'
+import { useDebounce } from '@/shared/utils/useDebounce'
 
 interface PromptTemplateEditorProps {
   /** Current prompt template value (JSON or plain text) */
@@ -179,7 +178,8 @@ export function PromptTemplateEditor({
     if (!value) return
 
     // Check if value is JSON (legacy Lexical EditorState format)
-    const isJSON = value.trim().startsWith('{') && value.includes('"type":"root"')
+    const isJSON =
+      value.trim().startsWith('{') && value.includes('"type":"root"')
     if (isJSON) {
       // Legacy format: Full Lexical EditorState JSON
       const success = loadFromJSON(editor, value)

@@ -9,3 +9,4 @@ export {
   serializeToPlainText,
   loadFromPlainText,
 } from './serialization'
+export type { MentionMatch } from './types'

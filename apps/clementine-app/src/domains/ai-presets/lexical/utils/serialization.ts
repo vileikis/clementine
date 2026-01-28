@@ -15,8 +15,6 @@ import {
   $getRoot,
   $isParagraphNode,
   $isTextNode,
-  type EditorState,
-  type LexicalEditor,
 } from 'lexical'
 import {
   $createMediaMentionNode,
@@ -24,7 +22,9 @@ import {
   $isMediaMentionNode,
   $isVariableMentionNode,
 } from '../nodes'
+import type { EditorState, LexicalEditor } from 'lexical'
 import type { MediaOption, VariableOption } from '../plugins/MentionsPlugin'
+import type { MentionMatch } from './types'
 
 // ============================================================================
 // JSON Serialization (Primary Storage Format)
@@ -92,21 +92,21 @@ export function serializeToPlainText(editorState: EditorState): string {
     let text = ''
 
     root.getChildren().forEach((node) => {
-      if ($isParagraphNode(node)) {
-        node.getChildren().forEach((child) => {
-          if ($isVariableMentionNode(child)) {
-            // Text vs media input (image/video)
-            const prefix = child.getVariableType() === 'text' ? 'text' : 'input'
-            text += `@{${prefix}:${child.getVariableName()}}`
-          } else if ($isMediaMentionNode(child)) {
-            // Reference media from registry
-            text += `@{ref:${child.getMediaName()}}`
-          } else if ($isTextNode(child)) {
-            text += child.getTextContent()
-          }
-        })
-        text += '\n'
-      }
+      if (!$isParagraphNode(node)) return
+
+      node.getChildren().forEach((child) => {
+        if ($isVariableMentionNode(child)) {
+          // Text vs media input (image/video)
+          const prefix = child.getVariableType() === 'text' ? 'text' : 'input'
+          text += `@{${prefix}:${child.getVariableName()}}`
+        } else if ($isMediaMentionNode(child)) {
+          // Reference media from registry
+          text += `@{ref:${child.getMediaName()}}`
+        } else if ($isTextNode(child)) {
+          text += child.getTextContent()
+        }
+      })
+      text += '\n'
     })
 
     return text.trim()
@@ -144,12 +144,7 @@ export function loadFromPlainText(
       // Parse format: @{type:name}
       const mentionRegex = /@\{(text|input|ref):([a-zA-Z_][a-zA-Z0-9_]*)\}/g
 
-      const allMatches: Array<{
-        index: number
-        length: number
-        type: 'text' | 'input' | 'ref'
-        name: string
-      }> = []
+      const allMatches: MentionMatch[] = []
 
       let match: RegExpExecArray | null
 
@@ -211,4 +206,3 @@ export function loadFromPlainText(
     })
   })
 }
-

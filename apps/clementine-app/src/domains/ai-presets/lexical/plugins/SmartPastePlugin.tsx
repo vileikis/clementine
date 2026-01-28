@@ -20,14 +20,12 @@ import {
   $isRangeSelection,
   COMMAND_PRIORITY_HIGH,
   PASTE_COMMAND,
-  TextNode,
 } from 'lexical'
 import { useEffect } from 'react'
-import {
-  $createMediaMentionNode,
-  $createVariableMentionNode,
-} from '../nodes'
+import { $createMediaMentionNode, $createVariableMentionNode } from '../nodes'
+import type { TextNode } from 'lexical'
 import type { MediaOption, VariableOption } from './MentionsPlugin'
+import type { MentionMatch } from '../utils/types'
 
 export interface SmartPastePluginProps {
   variables: VariableOption[]
@@ -85,12 +83,7 @@ export function SmartPastePlugin({
           const mentionRegex = /@\{(text|input|ref):([a-zA-Z_][a-zA-Z0-9_]*)\}/g
 
           // Find all matches
-          const allMatches: {
-            index: number
-            length: number
-            type: 'text' | 'input' | 'ref'
-            name: string
-          }[] = []
+          const allMatches: MentionMatch[] = []
 
           let match: RegExpExecArray | null
 

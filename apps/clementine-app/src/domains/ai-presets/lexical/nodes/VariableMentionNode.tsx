@@ -14,14 +14,8 @@
  * - Bidirectional text support
  * - Proper serialization/deserialization
  */
-import {
-  $applyNodeReplacement,
-  type EditorConfig,
-  type NodeKey,
-  type SerializedTextNode,
-  type Spread,
-  TextNode,
-} from 'lexical'
+import { $applyNodeReplacement, TextNode } from 'lexical'
+import type { EditorConfig, NodeKey, SerializedTextNode, Spread } from 'lexical'
 
 export type SerializedVariableMentionNode = Spread<
   {
@@ -122,7 +116,6 @@ export class VariableMentionNode extends TextNode {
 
     return dom
   }
-
 
   // Mark as text entity for proper handling
   isTextEntity(): true {

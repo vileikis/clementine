@@ -19,13 +19,11 @@ import {
   MenuOption,
   useBasicTypeaheadTriggerMatch,
 } from '@lexical/react/LexicalTypeaheadMenuPlugin'
-import { $createTextNode, TextNode } from 'lexical'
+import { $createTextNode } from 'lexical'
 import { useCallback, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
-import {
-  $createMediaMentionNode,
-  $createVariableMentionNode,
-} from '../nodes'
+import { $createMediaMentionNode, $createVariableMentionNode } from '../nodes'
+import type { TextNode } from 'lexical'
 
 // ============================================================================
 // Types
@@ -181,7 +179,8 @@ export function MentionsPlugin({ variables, media }: MentionsPluginProps) {
     const mediaOptions = media
       .filter((m) => m.name.toLowerCase().includes(search))
       .map(
-        (m) => new MentionTypeaheadOption(`media-${m.id}`, m.id, m.name, 'media'),
+        (m) =>
+          new MentionTypeaheadOption(`media-${m.id}`, m.id, m.name, 'media'),
       )
 
     // Combine and sort: variables first, then media
