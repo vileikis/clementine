@@ -10,10 +10,12 @@ import { useCallback, useState } from 'react'
 import { useParams } from '@tanstack/react-router'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
-import { ShareConfigPanel } from '../components/ShareConfigPanel'
-import { ShareLoadingConfigPanel } from '../components/ShareLoadingConfigPanel'
-import { ShareLoadingRenderer } from '../components/ShareLoadingRenderer'
-import { ShareReadyRenderer } from '../components/ShareReadyRenderer'
+import {
+  ShareConfigPanel,
+  ShareLoadingConfigPanel,
+  ShareLoadingRenderer,
+  ShareReadyRenderer,
+} from '../components'
 import { useUpdateShareLoading, useUpdateShareReady } from '../hooks'
 import { DEFAULT_SHARE_LOADING, DEFAULT_SHARE_READY } from '../constants'
 import type {
@@ -147,7 +149,9 @@ export function ShareEditorPage() {
   })
 
   // Watch both forms for live preview
-  const watchedShare = useWatch({ control: shareForm.control }) as ShareReadyConfig
+  const watchedShare = useWatch({
+    control: shareForm.control,
+  }) as ShareReadyConfig
   const watchedShareLoading = useWatch({
     control: shareLoadingForm.control,
   }) as ShareLoadingConfig
@@ -309,10 +313,8 @@ export function ShareEditorPage() {
       <aside className="w-80 shrink-0 border-r border-border overflow-y-auto bg-card">
         <div className="sticky top-0 z-10 border-b border-border bg-card px-4 py-3">
           <h2 className="font-semibold">
-            Share Screen
-            <span className="text-muted-foreground text-sm ml-2">
-              · {previewState === 'ready' ? 'Ready' : 'Loading'}
-            </span>
+            Share
+            <span> · {previewState === 'ready' ? 'Ready' : 'Loading'}</span>
           </h2>
         </div>
 

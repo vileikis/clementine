@@ -139,7 +139,10 @@ export function ShareReadyRenderer({
 
         {/* Description (hidden when null) */}
         {share.description && (
-          <ThemedText variant="body" className="text-center opacity-90 max-w-md">
+          <ThemedText
+            variant="body"
+            className="text-center opacity-90 max-w-md"
+          >
             {share.description}
           </ThemedText>
         )}
