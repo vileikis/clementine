@@ -77,10 +77,10 @@ export function AIPresetEditorContent({
 
           {/* Edit Tab - Prompt Template + Variables */}
           <TabsContent value="edit" className="flex-1 overflow-y-auto p-6 m-0">
-            <div className="space-y-6">
+            <div className="space-y-8">
               {/* Prompt Template Editor (Primary) */}
               <div>
-                <h3 className="mb-3 text-sm font-medium">Prompt Template</h3>
+                <h2 className="mb-4 text-lg font-semibold">Prompt Template</h2>
                 <PromptTemplateEditor
                   value={draft.promptTemplate || ''}
                   variables={draft.variables}
@@ -90,9 +90,6 @@ export function AIPresetEditorContent({
                   disabled={disabled}
                 />
               </div>
-
-              {/* Visual separator */}
-              <div className="border-t" />
 
               {/* Variables Section (Secondary) */}
               <div>

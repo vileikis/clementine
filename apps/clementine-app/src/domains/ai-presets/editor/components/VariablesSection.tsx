@@ -243,8 +243,8 @@ export function VariablesSection({
     <div className="space-y-3">
       {/* Section Header with + button */}
       {showHeader && (
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-medium">Variables</h3>
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-lg font-semibold">Variables</h2>
           <ContextDropdownMenu
             trigger={
               <Button
