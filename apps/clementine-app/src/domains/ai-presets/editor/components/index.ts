@@ -4,6 +4,8 @@
  * Barrel export for all editor components.
  */
 
+export { AIPresetConfigPanel } from './AIPresetConfigPanel'
+export type { AIPresetConfigPanelProps } from './AIPresetConfigPanel'
 export { AIPresetNameBadge } from './AIPresetNameBadge'
 export { AddMediaDialog } from './AddMediaDialog'
 export type { AddMediaResult } from './AddMediaDialog'

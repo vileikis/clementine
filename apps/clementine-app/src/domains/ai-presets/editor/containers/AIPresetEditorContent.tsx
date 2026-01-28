@@ -8,12 +8,15 @@
  * - AIPresetEditorLayout handles TopNavBar, publish, and version tracking
  * - AIPresetEditorContent handles layout only
  * - Section components (ModelSettingsSection, MediaRegistrySection) handle their own updates
+ *
+ * Layout:
+ * - Left: Main work area with tabs (Edit | Preview)
+ * - Right: AIPresetConfigPanel (collapsible sections for model, media, variables)
  */
-import { MediaRegistrySection } from '../components/MediaRegistrySection'
-import { ModelSettingsSection } from '../components/ModelSettingsSection'
+import { AIPresetConfigPanel } from '../components/AIPresetConfigPanel'
 import { PromptTemplateEditor } from '../components/PromptTemplateEditor'
-import { VariablesSection } from '../components/VariablesSection'
 import type { AIPresetConfig } from '@clementine/shared'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/ui-kit/ui/tabs'
 
 interface AIPresetEditorContentProps {
   draft: AIPresetConfig
@@ -26,8 +29,10 @@ interface AIPresetEditorContentProps {
 /**
  * AI preset editor content with two-column layout
  *
- * Left panel: Configuration sections (model, media, variables)
- * Right panel: Prompt template editor (Phase 8)
+ * Left panel: Main work area with tabs (Edit | Preview)
+ *   - Edit: Prompt template editor
+ *   - Preview: Testing and validation (reserved for future)
+ * Right panel: Configuration panel with collapsible sections (model, media, variables)
  *
  * Sections are self-contained and handle their own updates.
  *
@@ -51,62 +56,61 @@ export function AIPresetEditorContent({
 }: AIPresetEditorContentProps) {
   return (
     <div className="flex flex-1 overflow-hidden">
-      {/* Left panel - Configuration */}
-      <div className="flex w-[400px] flex-col gap-6 overflow-y-auto border-r p-6">
-        {/* Model Settings Section */}
-        <section>
-          <h2 className="mb-4 text-sm font-medium text-muted-foreground">
-            Model Settings
-          </h2>
-          <ModelSettingsSection
-            model={draft.model}
-            aspectRatio={draft.aspectRatio}
-            workspaceId={workspaceId}
-            presetId={presetId}
-            disabled={disabled}
-          />
-        </section>
+      {/* Left panel - Main Work Area with Tabs */}
+      <div className="flex flex-1 flex-col overflow-hidden min-w-0">
+        <Tabs
+          defaultValue="edit"
+          className="flex flex-1 flex-col overflow-hidden"
+        >
+          <div className="border-b px-6 pt-6">
+            <TabsList variant="line">
+              <TabsTrigger value="edit">Edit</TabsTrigger>
+              <TabsTrigger value="preview">Preview</TabsTrigger>
+            </TabsList>
+          </div>
 
-        {/* Media Registry Section */}
-        <section>
-          <h2 className="mb-4 text-sm font-medium text-muted-foreground">
-            Media Registry
-          </h2>
-          <MediaRegistrySection
-            mediaRegistry={draft.mediaRegistry}
-            workspaceId={workspaceId}
-            presetId={presetId}
-            userId={userId}
-            disabled={disabled}
-          />
-        </section>
+          {/* Edit Tab - Prompt Template Editor */}
+          <TabsContent value="edit" className="flex-1 overflow-y-auto p-6 m-0">
+            <PromptTemplateEditor
+              value={draft.promptTemplate || ''}
+              variables={draft.variables}
+              media={draft.mediaRegistry}
+              workspaceId={workspaceId}
+              presetId={presetId}
+              disabled={disabled}
+            />
+          </TabsContent>
 
-        {/* Variables Section */}
+          {/* Preview Tab - Reserved for Testing/Validation */}
+          <TabsContent
+            value="preview"
+            className="flex-1 overflow-y-auto p-6 m-0"
+          >
+            <div className="flex h-full items-center justify-center">
+              <div className="text-center">
+                <p className="text-sm text-muted-foreground">
+                  Preview and testing functionality coming soon.
+                </p>
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Test and validate the preset with real input values before
+                  publishing.
+                </p>
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </div>
 
-        <VariablesSection
-          variables={draft.variables}
+      {/* Right panel - Configuration Panel */}
+      <aside className="w-80 shrink-0 border-l overflow-y-auto bg-card">
+        <AIPresetConfigPanel
+          draft={draft}
           workspaceId={workspaceId}
           presetId={presetId}
+          userId={userId}
           disabled={disabled}
         />
-      </div>
-
-      {/* Right panel - Prompt Template */}
-      <div className="flex-1 overflow-y-auto p-6">
-        <section>
-          <h2 className="mb-4 text-sm font-medium text-muted-foreground">
-            Prompt Template
-          </h2>
-          <PromptTemplateEditor
-            value={draft.promptTemplate || ''}
-            variables={draft.variables}
-            media={draft.mediaRegistry}
-            workspaceId={workspaceId}
-            presetId={presetId}
-            disabled={disabled}
-          />
-        </section>
-      </div>
+      </aside>
     </div>
   )
 }
