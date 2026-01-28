@@ -8,6 +8,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { Check, Pencil, X } from 'lucide-react'
 
 import type { AIPreset } from '@clementine/shared'
+import { Button } from '@/ui-kit/ui/button'
 import { cn } from '@/shared/utils/style-utils'
 
 interface AIPresetNameBadgeProps {
@@ -126,40 +127,40 @@ export function AIPresetNameBadge({
             maxLength={100}
             aria-label="Preset name"
             aria-invalid={!!error}
-            aria-describedby={error ? 'name-error' : undefined}
           />
-          <button
+          <Button
             type="button"
+            size="icon-sm"
+            variant="ghost"
             onClick={handleSave}
             onMouseDown={(e) => e.preventDefault()}
-            className="rounded p-1 hover:bg-accent"
             aria-label="Save name"
           >
             <Check className="h-4 w-4 text-green-600" />
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            size="icon-sm"
+            variant="ghost"
             onClick={handleCancel}
             onMouseDown={(e) => e.preventDefault()}
-            className="rounded p-1 hover:bg-accent"
             aria-label="Cancel editing"
           >
             <X className="h-4 w-4 text-muted-foreground" />
-          </button>
+          </Button>
         </div>
       </div>
     )
   }
 
   return (
-    <button
+    <Button
       type="button"
+      variant="ghost"
       onClick={handleStartEdit}
       disabled={disabled}
       className={cn(
-        'group flex items-center gap-2 rounded-md px-2 py-1 transition-colors',
-        !disabled && 'hover:bg-accent',
-        disabled && 'cursor-not-allowed opacity-50',
+        'group flex h-auto items-center gap-2 px-2 py-1 transition-colors',
       )}
     >
       <span className="max-w-[200px] truncate text-sm font-medium">
@@ -168,6 +169,6 @@ export function AIPresetNameBadge({
       {!disabled && (
         <Pencil className="h-3 w-3 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
       )}
-    </button>
+    </Button>
   )
 }

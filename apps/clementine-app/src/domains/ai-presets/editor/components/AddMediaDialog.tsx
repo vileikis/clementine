@@ -6,6 +6,7 @@
  */
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
 
 import { useUploadMediaAsset } from '@/domains/media-library'
 import { MediaPickerField } from '@/shared/editor-controls'
@@ -132,15 +133,19 @@ export function AddMediaDialog({
           setUploadResult(result)
           setImageUrl(result.url)
         }
-      } catch {
-        // Error is handled by mutation's onError
+      } catch (error) {
+        // Show user feedback for upload failures
+        toast.error('Failed to upload media', {
+          description: 'Please try again.',
+        })
+        console.error('Media upload error:', error)
       } finally {
         if (isMountedRef.current) {
           setUploadProgress(undefined)
         }
       }
     },
-    [uploadMedia],
+    [uploadMedia.mutateAsync],
   )
 
   // Handle image removal

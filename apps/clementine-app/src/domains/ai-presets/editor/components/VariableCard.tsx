@@ -336,22 +336,24 @@ export function VariableCard({
                     aria-invalid={!!error}
                     aria-describedby={error ? 'variable-name-error' : undefined}
                   />
-                  <button
+                  <Button
                     type="button"
+                    size="icon-sm"
+                    variant="ghost"
                     onClick={handleSave}
-                    className="rounded p-1 hover:bg-accent"
                     aria-label="Save name"
                   >
                     <Check className="h-4 w-4 text-green-600" />
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
+                    size="icon-sm"
+                    variant="ghost"
                     onClick={handleCancel}
-                    className="rounded p-1 hover:bg-accent"
                     aria-label="Cancel editing"
                   >
                     <X className="h-4 w-4 text-muted-foreground" />
-                  </button>
+                  </Button>
                 </div>
                 {error && (
                   <p
@@ -364,17 +366,16 @@ export function VariableCard({
               </div>
             ) : (
               <div className="flex items-center gap-2">
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
                   onClick={(e) => {
                     e.stopPropagation()
                     handleStartEdit(e)
                   }}
                   disabled={disabled}
                   className={cn(
-                    'group/name flex items-center gap-2 rounded-md px-2 py-1 transition-colors',
-                    !disabled && 'hover:bg-accent',
-                    disabled && 'cursor-not-allowed',
+                    'group/name h-auto gap-2 px-2 py-1',
                   )}
                 >
                   <span
@@ -388,7 +389,7 @@ export function VariableCard({
                   {!disabled && (
                     <Pencil className="h-3 w-3 text-muted-foreground opacity-0 transition-opacity group-hover/name:opacity-100" />
                   )}
-                </button>
+                </Button>
 
                 {/* Indicators (collapsed state only) */}
                 {!isExpanded && (
@@ -435,14 +436,13 @@ export function VariableCard({
 
         {/* Expand/collapse chevron (text variables only) - on the right */}
         {isTextType && (
-          <button
+          <Button
             type="button"
+            size="icon-sm"
+            variant="ghost"
             onClick={handleToggleExpanded}
             disabled={disabled}
-            className={cn(
-              'shrink-0 rounded p-1 transition-colors hover:bg-accent',
-              disabled && 'cursor-not-allowed opacity-50',
-            )}
+            className="shrink-0"
             aria-label={isExpanded ? 'Collapse' : 'Expand'}
           >
             {isExpanded ? (
@@ -450,7 +450,7 @@ export function VariableCard({
             ) : (
               <ChevronRight className="h-4 w-4 text-muted-foreground" />
             )}
-          </button>
+          </Button>
         )}
       </div>
 

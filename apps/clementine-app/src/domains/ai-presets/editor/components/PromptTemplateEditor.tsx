@@ -8,7 +8,7 @@
  * - Position-aware autocomplete (variables with {, media with @)
  * - Renders @mentions as visual pills (blue for text vars, green for image vars, purple for media)
  * - Smart paste detection (converts {var} and @media patterns)
- * - Serializes to JSON format for storage
+ * - Serializes to plain text format for storage using serializeToPlainText()
  * - Preserves cursor position during auto-save
  * - Auto-saves changes to draft
  *
@@ -26,6 +26,7 @@ import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import { useEffect, useRef, useState } from 'react'
 import { useUpdateAIPresetDraft } from '../hooks/useUpdateAIPresetDraft'
+import { cn } from '@/shared/utils/style-utils'
 import {
   MediaMentionNode,
   MentionValidationPlugin,
@@ -84,7 +85,7 @@ function toMediaOption(media: PresetMediaEntry): MediaOption {
  * Provides rich text editing with visual pills for @mentions using Lexical.
  * Automatically saves changes to draft after debounce.
  *
- * Storage format: JSON (Lexical EditorState)
+ * Storage format: Plain text with @{type:name} mention patterns (via serializeToPlainText())
  * Display format: Blue pill for text vars, green for image vars, purple for media
  *
  * @example
@@ -200,9 +201,13 @@ export function PromptTemplateEditor({
           <RichTextPlugin
             contentEditable={
               <ContentEditable
-                className="min-h-[200px] rounded-md border bg-background p-3 text-sm outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                className={cn(
+                  'min-h-[200px] rounded-md border bg-background p-3 text-sm outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+                  disabled && 'cursor-not-allowed opacity-50 ring-0',
+                )}
                 aria-label="Prompt template editor"
                 aria-describedby="editor-help-text"
+                aria-disabled={disabled}
               />
             }
             placeholder={
