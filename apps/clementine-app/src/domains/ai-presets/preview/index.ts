@@ -31,3 +31,4 @@ export {
   parseReferences,
 } from './lib/prompt-resolution'
 export { validatePresetInputs } from './lib/validation'
+export { isMediaReference } from './lib/type-guards'
