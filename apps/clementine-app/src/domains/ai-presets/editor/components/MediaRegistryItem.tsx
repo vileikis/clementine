@@ -59,7 +59,7 @@ export function MediaRegistryItem({
             />
 
             {/* Action buttons overlay on hover */}
-            <div className="absolute inset-0 flex items-center justify-center gap-1 bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
+            <div className="absolute inset-0 flex items-center justify-center gap-1 bg-black/50 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
               <Button
                 type="button"
                 variant="secondary"

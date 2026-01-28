@@ -22,9 +22,14 @@ function AIPresetEditorRoute() {
   const { workspaceSlug, presetId } = Route.useParams()
   const { data: workspace } = useWorkspace(workspaceSlug)
 
+  // Wait for valid workspace before rendering
+  if (!workspace || !workspace.id) {
+    return null
+  }
+
   return (
     <AIPresetEditorPage
-      workspaceId={workspace?.id || ''}
+      workspaceId={workspace.id}
       workspaceSlug={workspaceSlug}
       presetId={presetId}
     />

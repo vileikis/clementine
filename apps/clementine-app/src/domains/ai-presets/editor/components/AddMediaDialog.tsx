@@ -4,7 +4,7 @@
  * Dialog for adding media to the preset's media registry.
  * Uses MediaPickerField for upload and TextField for reference name.
  */
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Loader2 } from 'lucide-react'
 
 import { useUploadMediaAsset } from '@/domains/media-library'
@@ -81,8 +81,14 @@ export function AddMediaDialog({
     undefined,
   )
   const [nameError, setNameError] = useState<string | null>(null)
+  const isMountedRef = useRef(true)
 
   const uploadMedia = useUploadMediaAsset(workspaceId, userId)
+
+  // Update mounted ref when dialog opens/closes
+  useEffect(() => {
+    isMountedRef.current = open
+  }, [open])
 
   // Validate name
   const validateName = useCallback(
@@ -121,12 +127,17 @@ export function AddMediaDialog({
           type: 'other',
           onProgress: setUploadProgress,
         })
-        setUploadResult(result)
-        setImageUrl(result.url)
+        // Only update state if dialog is still open
+        if (isMountedRef.current) {
+          setUploadResult(result)
+          setImageUrl(result.url)
+        }
       } catch {
         // Error is handled by mutation's onError
       } finally {
-        setUploadProgress(undefined)
+        if (isMountedRef.current) {
+          setUploadProgress(undefined)
+        }
       }
     },
     [uploadMedia],
@@ -165,6 +176,7 @@ export function AddMediaDialog({
 
   // Handle cancel/close
   const handleClose = useCallback(() => {
+    isMountedRef.current = false
     setName('')
     setImageUrl(null)
     setUploadResult(null)

@@ -131,6 +131,7 @@ export function AIPresetNameBadge({
           <button
             type="button"
             onClick={handleSave}
+            onMouseDown={(e) => e.preventDefault()}
             className="rounded p-1 hover:bg-accent"
             aria-label="Save name"
           >
@@ -139,6 +140,7 @@ export function AIPresetNameBadge({
           <button
             type="button"
             onClick={handleCancel}
+            onMouseDown={(e) => e.preventDefault()}
             className="rounded p-1 hover:bg-accent"
             aria-label="Cancel editing"
           >

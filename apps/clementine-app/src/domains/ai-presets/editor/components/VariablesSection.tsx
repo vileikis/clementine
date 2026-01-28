@@ -50,8 +50,23 @@ const generateVariableName = (
 ): string => {
   // Generate default name
   const baseName = type === 'text' ? 'text_var' : 'image_var'
-  const existingCount = existingNames.filter((n) => n.includes(baseName)).length
-  return `${baseName}_${existingCount + 1}`
+
+  // Parse existing names for the pattern `${baseName}_<number>`
+  const pattern = new RegExp(`^${baseName}_(\\d+)$`)
+  const existingSuffixes = existingNames
+    .map((name) => {
+      const match = name.match(pattern)
+      return match ? parseInt(match[1], 10) : null
+    })
+    .filter((n): n is number => n !== null)
+
+  // Find the smallest unused positive integer suffix
+  let suffix = 1
+  while (existingSuffixes.includes(suffix)) {
+    suffix++
+  }
+
+  return `${baseName}_${suffix}`
 }
 
 /**
