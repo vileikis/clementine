@@ -19,7 +19,12 @@ import {
   MenuOption,
   useBasicTypeaheadTriggerMatch,
 } from '@lexical/react/LexicalTypeaheadMenuPlugin'
-import { $createTextNode, $getSelection } from 'lexical'
+import {
+  $createTextNode,
+  $getRoot,
+  $getSelection,
+  $isRangeSelection,
+} from 'lexical'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { $createMediaMentionNode, $createVariableMentionNode } from '../nodes'
@@ -266,8 +271,15 @@ export function MentionsPlugin({ variables, media }: MentionsPluginProps) {
         } else {
           // If no node to replace, insert at current selection
           const selection = $getSelection()
-          if (selection) {
+
+          // Only insert nodes if selection is a RangeSelection
+          if ($isRangeSelection(selection)) {
             selection.insertNodes([mentionNode])
+          } else {
+            // For non-range selections (NodeSelection, GridSelection),
+            // append to the end of the root as a safe fallback
+            const root = $getRoot()
+            root.append(mentionNode)
           }
         }
 
