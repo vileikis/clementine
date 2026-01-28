@@ -456,7 +456,7 @@ export function VariableCard({
 
       {/* Expanded settings (text variables only) */}
       {isExpanded && isTextType && (
-        <div className="border-t px-3 pb-4 pt-4">
+        <div className="border-t px-3 pb-4 pt-4 pl-10">
           <ValueMappingsEditor
             mappings={valueMap}
             defaultValue={defaultValue}
