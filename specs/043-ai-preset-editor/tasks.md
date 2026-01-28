@@ -109,6 +109,7 @@
 **Purpose**: Implement draft/published workflow (consistent with Experience pattern) and separate layout concerns for maintainability.
 
 **⚠️ CRITICAL**: This phase refactors the save model. After this phase:
+
 - All edits auto-save to `draft` field (no data loss)
 - "Publish" button copies draft → published
 - Experiences reference the `published` version
@@ -162,6 +163,7 @@
 - [x] T065 Add validation error display on publish failure (if draft is invalid)
 
 **Checkpoint**: After this phase:
+
 - Editor auto-saves to draft (no data loss on browser close)
 - Publish button makes changes live
 - Clear separation of WIP vs published state
@@ -186,6 +188,7 @@
 - [x] T032 [US4] Create useUpdateVariables hook in `apps/clementine-app/src/domains/ai-presets/editor/hooks/useUpdateVariables.ts`
 
 **Implementation Notes**:
+
 - **Schema Enhancement**: Added `id: string` field to `textVariableSchema` and `imageVariableSchema` in shared package for stable references across name changes
 - **Inline Editing**: Dropped VariableEditor component in favor of inline editing pattern (similar to AIPresetNameBadge) - click name to edit, Enter to save, Escape to cancel
 - **Color Coding**: Variables are color-coded by type - Text (info/blue), Image (success/green) - applied to both icon and name
@@ -258,6 +261,7 @@
 **Goal**: Replace contentEditable-based PromptTemplateEditor with Lexical rich text editor to enable advanced mention features (icons, click-to-remove, smart paste) and prepare for ValueMappingsEditor reuse.
 
 **Why Lexical**:
+
 - React components for pills (vs HTML strings) enable rich interactions
 - Built-in paste handling for smart @mention detection
 - Plugin architecture makes mentions reusable across editors
@@ -309,20 +313,91 @@
 
 ### Implementation for Phase 11
 
-- [X] T077 Integrate Lexical into ValueMappingsEditor component:
+- [x] T077 Integrate Lexical into ValueMappingsEditor component:
   - Replace textarea for "Prompt Text" column with Lexical editor
   - Use MentionsPlugin with empty variables array (media-only)
   - Keep same grid layout and UX
   - Auto-save mappings on change
   - Pass media prop through AIPresetConfigPanel → VariablesSection → VariableSettingsDialog → ValueMappingsEditor
   - Create InlineLexicalEditor component for compact table cell usage
-- [ ] T078 Test ValueMappingsEditor with Lexical:
-  - Verify @mention autocomplete shows only media (no variables)
-  - Test smart paste for media mentions
-  - Verify serialization and persistence
-  - Test within VariableSettingsDialog workflow
+- [x] T078 Test ValueMappingsEditor with Lexical:
+  - Verify @mention autocomplete shows only media (no variables) ✓
+  - Test smart paste for media mentions ✓
+  - Verify serialization and persistence ✓
+  - Test within VariableSettingsDialog workflow ✓
+  - **Fix**: Z-index issue resolved by portaling to document.body with PositionedMenu component ✓
 
-**Checkpoint**: Value mappings support @media mentions. All mention functionality now consistent across editors.
+**Checkpoint**: Value mappings support @media mentions. All mention functionality now consistent across editors. Menu appears correctly above dialogs.
+
+---
+
+## Phase 11.5: Move Variables to Edit Tab (UX Enhancement)
+
+**Goal**: Improve authoring workflow by moving Variables section from right config panel to left Edit tab, with Prompt Template displayed first.
+
+**Rationale**:
+- **Workflow coherence**: Variables and prompt are tightly coupled in authoring flow
+- **Visual feedback loop**: See available variables while writing @mentions
+- **Space for complexity**: Left panel has more room for inline value mapping editing
+- **Better information architecture**:
+  - Left = Content Layer (Prompt + Variables = template authoring)
+  - Right = Infrastructure Layer (Model + Media = resources and settings)
+- **Prompt-first**: Users see the main content (prompt) immediately when opening preset
+
+**New Layout**:
+```
+Edit Tab (Left Panel):
+  1. Prompt Template Editor (primary, shown first)
+  2. Variables Section (secondary, below prompt)
+     - Accordion/collapsible cards
+     - Inline editing (no dialog needed)
+     - Drag-and-drop reordering preserved
+
+Config Panel (Right):
+  1. Model Settings (infrastructure)
+  2. Media Registry (assets)
+```
+
+### Implementation for Phase 11.5
+
+- [ ] T079 Refactor VariableCard for inline expansion:
+  - Convert click behavior from "open dialog" to "expand/collapse inline"
+  - Show full settings inline when expanded (name, type, required, default, value mappings)
+  - Collapsed state: name + type icon + small indicators (# mappings, has default)
+  - Add subtle background to expanded state (bg-muted/30)
+  - Remove settings icon button (no longer needed)
+  - Keep drag handle, delete button
+
+- [ ] T080 Update VariablesSection component:
+  - Remove VariableSettingsDialog integration
+  - Handle inline editing state (track which variable is expanded)
+  - Add accordion behavior (optional: auto-collapse others when one expands)
+  - Keep header with "Add Variable" dropdown
+  - Maintain drag-and-drop functionality
+  - Pass media prop to VariableCard for value mapping inline editing
+
+- [ ] T081 Refactor AIPresetEditorContent layout:
+  - Move VariablesSection from AIPresetConfigPanel to Edit tab
+  - Reorder: PromptTemplateEditor FIRST, VariablesSection BELOW
+  - Add visual separator between sections (subtle divider)
+  - Give prompt editor primary visual weight
+  - Ensure Variables section scrolls within Edit tab
+  - Remove media prop pass-through from AIPresetConfigPanel
+
+- [ ] T082 Update AIPresetConfigPanel:
+  - Remove VariablesSection from config panel
+  - Keep only Model Settings and Media Registry sections
+  - Update component interface (no longer needs media prop for variables)
+
+- [ ] T083 Test new layout and workflow:
+  - Verify prompt editor appears first in Edit tab
+  - Test variable expansion/collapse inline
+  - Verify value mappings can be edited inline with media @mentions
+  - Test drag-and-drop reordering still works
+  - Verify no layout breaks or scroll issues
+  - Confirm improved authoring workflow (less context switching)
+
+**Checkpoint**: Variables moved to Edit tab with prompt-first layout. Inline editing replaces dialog pattern. Clearer separation between content (left) and infrastructure (right).
 
 ---
 
@@ -360,7 +435,13 @@
 - **ValueMappingsEditor Lexical (Phase 11)**: Depends on Phase 10 completion
   - Reuses Lexical infrastructure from Phase 10
   - Completes Phase 9.5 requirement (media mentions in value mappings)
-- **Polish (Phase 12)**: Depends on all user stories and Lexical migration being complete
+- **Variables UX Refactor (Phase 11.5)**: Depends on Phase 11 completion
+  - Moves Variables from right panel to left Edit tab
+  - Converts dialog-based editing to inline accordion pattern
+  - Reorders layout: Prompt first, Variables below
+  - Improves authoring workflow and visual feedback
+  - BLOCKS Phase 12 (layout must be finalized before polish)
+- **Polish (Phase 12)**: Depends on all user stories, Lexical migration, and UX refactor being complete
 
 ### User Story Dependencies
 
@@ -428,11 +509,13 @@ Task: "Integrate MediaRegistrySection into layout..."
 9. Add User Story 7 → Test independently → Publish workflow works
 10. **Complete Phase 10 → Lexical migration → Enhanced mention features**
 11. **Complete Phase 11 → ValueMappingsEditor Lexical → Media mentions in mappings**
-12. Polish phase for production readiness
+12. **Complete Phase 11.5 → Variables UX refactor → Prompt-first layout, inline editing**
+13. Polish phase for production readiness
 
 ### Suggested MVP Scope
 
 **User Story 1 only** (navigate + edit preset name) provides immediate value:
+
 - Users can access the editor
 - Users can rename presets
 - Foundation for all other features
@@ -460,3 +543,11 @@ Task: "Integrate MediaRegistrySection into layout..."
   - Creates reusable mention infrastructure in `domains/ai-presets/lexical/`
   - Shared between PromptTemplateEditor and ValueMappingsEditor
   - Migration includes documentation verification for latest Lexical APIs (v0.39.0+)
+  - Fixed z-index issue: Mentions menu portaled to document.body with manual positioning to appear above dialogs
+- **Variables UX Refactor** (Phase 11.5):
+  - Moves Variables section from right config panel to left Edit tab
+  - Reorders layout: Prompt Template FIRST, Variables BELOW (prompt-first approach)
+  - Converts dialog-based editing to inline accordion/collapsible pattern
+  - Improves authoring workflow: tighter coupling of variables + prompt, visual feedback loop
+  - Information architecture: Left = Content (Prompt + Variables), Right = Infrastructure (Model + Media)
+  - No more modal interruptions - all editing happens inline with more space
