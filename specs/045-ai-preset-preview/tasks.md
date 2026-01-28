@@ -27,10 +27,10 @@ This is a web application using TanStack Start. Paths follow the established str
 
 **Purpose**: Initialize preview domain structure and establish foundational files
 
-- [ ] T001 Create preview domain directory structure at apps/clementine-app/src/domains/ai-presets/preview/ with subdirectories: components/, hooks/, lib/
-- [ ] T002 [P] Create TypeScript types file at apps/clementine-app/src/domains/ai-presets/preview/types.ts with TestInputState, ResolvedPrompt, MediaReference, ValidationState interfaces
-- [ ] T003 [P] Create barrel export file at apps/clementine-app/src/domains/ai-presets/preview/index.ts
-- [ ] T004 Verify TypeScript strict mode configuration and Vitest test runner are working
+- [X] T001 Create preview domain directory structure at apps/clementine-app/src/domains/ai-presets/preview/ with subdirectories: components/, hooks/, lib/
+- [X] T002 [P] Create TypeScript types file at apps/clementine-app/src/domains/ai-presets/preview/types.ts with TestInputState, ResolvedPrompt, MediaReference, ValidationState interfaces
+- [X] T003 [P] Create barrel export file at apps/clementine-app/src/domains/ai-presets/preview/index.ts
+- [X] T004 Verify TypeScript strict mode configuration and Vitest test runner are working
 
 ---
 
@@ -40,17 +40,17 @@ This is a web application using TanStack Start. Paths follow the established str
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T005 [P] Implement prompt resolution utilities in apps/clementine-app/src/domains/ai-presets/preview/lib/prompt-resolution.ts with functions: resolvePrompt(), extractMediaReferences(), parseReferences()
-- [ ] T006 [P] Create colocated unit tests in apps/clementine-app/src/domains/ai-presets/preview/lib/prompt-resolution.test.ts testing text substitution, value mappings, image placeholders, media placeholders
-- [ ] T007 [P] Implement validation utilities in apps/clementine-app/src/domains/ai-presets/preview/lib/validation.ts with validatePresetInputs() function
-- [ ] T008 [P] Create colocated unit tests in apps/clementine-app/src/domains/ai-presets/preview/lib/validation.test.ts testing missing inputs, undefined references, validation states
-- [ ] T009 Implement useTestInputs hook in apps/clementine-app/src/domains/ai-presets/preview/hooks/useTestInputs.ts managing local state for test values with updateInput() and resetToDefaults() functions
-- [ ] T010 [P] Create colocated unit tests in apps/clementine-app/src/domains/ai-presets/preview/hooks/useTestInputs.test.ts
-- [ ] T011 Implement usePromptResolution hook in apps/clementine-app/src/domains/ai-presets/preview/hooks/usePromptResolution.ts using useMemo for computed resolution
-- [ ] T012 [P] Create colocated unit tests in apps/clementine-app/src/domains/ai-presets/preview/hooks/usePromptResolution.test.ts
-- [ ] T013 Implement usePresetValidation hook in apps/clementine-app/src/domains/ai-presets/preview/hooks/usePresetValidation.ts using useMemo for computed validation
-- [ ] T014 [P] Create colocated unit tests in apps/clementine-app/src/domains/ai-presets/preview/hooks/usePresetValidation.test.ts
-- [ ] T015 Run pnpm app:check to verify all foundational code passes linting, formatting, and type checking
+- [X] T005 [P] Implement prompt resolution utilities in apps/clementine-app/src/domains/ai-presets/preview/lib/prompt-resolution.ts with functions: resolvePrompt(), extractMediaReferences(), parseReferences()
+- [X] T006 [P] Create colocated unit tests in apps/clementine-app/src/domains/ai-presets/preview/lib/prompt-resolution.test.ts testing text substitution, value mappings, image placeholders, media placeholders
+- [X] T007 [P] Implement validation utilities in apps/clementine-app/src/domains/ai-presets/preview/lib/validation.ts with validatePresetInputs() function
+- [X] T008 [P] Create colocated unit tests in apps/clementine-app/src/domains/ai-presets/preview/lib/validation.test.ts testing missing inputs, undefined references, validation states
+- [X] T009 Implement useTestInputs hook in apps/clementine-app/src/domains/ai-presets/preview/hooks/useTestInputs.ts managing local state for test values with updateInput() and resetToDefaults() functions
+- [X] T010 [P] Create colocated unit tests in apps/clementine-app/src/domains/ai-presets/preview/hooks/useTestInputs.test.ts
+- [X] T011 Implement usePromptResolution hook in apps/clementine-app/src/domains/ai-presets/preview/hooks/usePromptResolution.ts using useMemo for computed resolution
+- [X] T012 [P] Create colocated unit tests in apps/clementine-app/src/domains/ai-presets/preview/hooks/usePromptResolution.test.ts
+- [X] T013 Implement usePresetValidation hook in apps/clementine-app/src/domains/ai-presets/preview/hooks/usePresetValidation.ts using useMemo for computed validation
+- [X] T014 [P] Create colocated unit tests in apps/clementine-app/src/domains/ai-presets/preview/hooks/usePresetValidation.test.ts
+- [X] T015 Run pnpm app:check to verify all foundational code passes linting, formatting, and type checking
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -64,19 +64,19 @@ This is a web application using TanStack Start. Paths follow the established str
 
 ### Implementation for User Story 1
 
-- [ ] T016 [P] [US1] Create TestInputsForm component in apps/clementine-app/src/domains/ai-presets/preview/components/TestInputsForm.tsx rendering dynamic form based on variables array
-- [ ] T017 [P] [US1] Implement text input field rendering in TestInputsForm for variables without value mappings using shadcn/ui Input component
-- [ ] T018 [P] [US1] Implement dropdown field rendering in TestInputsForm for variables with value mappings using shadcn/ui Select component
-- [ ] T019 [P] [US1] Implement image upload zone rendering in TestInputsForm for image variables reusing MediaPickerField component from shared/media/components/
-- [ ] T020 [US1] Add default value initialization in TestInputsForm component using useTestInputs hook
-- [ ] T021 [US1] Add Reset to Defaults button in TestInputsForm component calling resetToDefaults() from useTestInputs hook
-- [ ] T022 [US1] Add onChange handlers to all input fields in TestInputsForm calling updateInput() from useTestInputs hook
-- [ ] T023 [US1] Create AIPresetPreviewPanel container component in apps/clementine-app/src/domains/ai-presets/preview/components/AIPresetPreviewPanel.tsx integrating TestInputsForm with preset data from useAIPreset hook
-- [ ] T024 [US1] Modify AIPresetEditorContent.tsx in apps/clementine-app/src/domains/ai-presets/editor/containers/ to add Preview tab and render AIPresetPreviewPanel when tab is active
-- [ ] T025 [US1] Update barrel export in apps/clementine-app/src/domains/ai-presets/preview/index.ts to export AIPresetPreviewPanel
-- [ ] T026 [US1] Apply responsive styling to TestInputsForm for mobile viewports (stack inputs vertically, touch-friendly targets ≥44px)
-- [ ] T027 [US1] Add loading state to TestInputsForm while preset data is being fetched
-- [ ] T028 [US1] Add error boundary around AIPresetPreviewPanel in AIPresetEditorContent to gracefully handle rendering errors
+- [X] T016 [P] [US1] Create TestInputsForm component in apps/clementine-app/src/domains/ai-presets/preview/components/TestInputsForm.tsx rendering dynamic form based on variables array
+- [X] T017 [P] [US1] Implement text input field rendering in TestInputsForm for variables without value mappings using shadcn/ui Input component
+- [X] T018 [P] [US1] Implement dropdown field rendering in TestInputsForm for variables with value mappings using shadcn/ui Select component
+- [X] T019 [P] [US1] Implement image upload zone rendering in TestInputsForm for image variables reusing MediaPickerField component from shared/media/components/
+- [X] T020 [US1] Add default value initialization in TestInputsForm component using useTestInputs hook
+- [X] T021 [US1] Add Reset to Defaults button in TestInputsForm component calling resetToDefaults() from useTestInputs hook
+- [X] T022 [US1] Add onChange handlers to all input fields in TestInputsForm calling updateInput() from useTestInputs hook
+- [X] T023 [US1] Create AIPresetPreviewPanel container component in apps/clementine-app/src/domains/ai-presets/preview/components/AIPresetPreviewPanel.tsx integrating TestInputsForm with preset data from useAIPreset hook
+- [X] T024 [US1] Modify AIPresetEditorContent.tsx in apps/clementine-app/src/domains/ai-presets/editor/containers/ to add Preview tab and render AIPresetPreviewPanel when tab is active
+- [X] T025 [US1] Update barrel export in apps/clementine-app/src/domains/ai-presets/preview/index.ts to export AIPresetPreviewPanel
+- [X] T026 [US1] Apply responsive styling to TestInputsForm for mobile viewports (stack inputs vertically, touch-friendly targets ≥44px)
+- [X] T027 [US1] Add loading state to TestInputsForm while preset data is being fetched
+- [X] T028 [US1] Add error boundary around AIPresetPreviewPanel in AIPresetEditorContent to gracefully handle rendering errors
 
 **Checkpoint**: At this point, User Story 1 should be fully functional - users can input test values and see form update
 
