@@ -6,16 +6,19 @@
  * Integrates with auto-save, tracked mutations, and PreviewShell.
  */
 
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 import { useParams } from '@tanstack/react-router'
-import { toast } from 'sonner'
 import {
   ShareConfigPanel,
   ShareLoadingConfigPanel,
   ShareLoadingRenderer,
   ShareReadyRenderer,
 } from '../components'
-import { useShareLoadingForm, useShareReadyForm } from '../hooks'
+import {
+  useShareLoadingForm,
+  useShareOptionsForm,
+  useShareReadyForm,
+} from '../hooks'
 import { DEFAULT_SHARE_LOADING, DEFAULT_SHARE_READY } from '../constants'
 import type {
   ShareLoadingConfig,
@@ -25,7 +28,6 @@ import type {
 import { Tabs, TabsList, TabsTrigger } from '@/ui-kit/ui/tabs'
 import { PreviewShell } from '@/shared/preview-shell'
 import { useProject } from '@/domains/project/shared'
-import { useUpdateShareOptions } from '@/domains/project-config/settings'
 import { DEFAULT_THEME } from '@/domains/project-config/theme/constants'
 import { ThemeProvider } from '@/shared/theming'
 
@@ -84,44 +86,11 @@ export function ShareEditorPage() {
     },
   )
 
-  // Share options mutation
-  const updateShareOptions = useUpdateShareOptions(projectId ?? '')
-
-  // Local state for optimistic UI updates on share options
-  const [localShareOptions, setLocalShareOptions] =
-    useState<ShareOptionsConfig | null>(null)
-
-  // Use local state for preview if available, otherwise use server state
-  const displayShareOptions = localShareOptions ?? currentShareOptions
-
-  // Handler for share option toggles
-  const handleShareOptionToggle = useCallback(
-    async (field: keyof ShareOptionsConfig) => {
-      const currentValue = displayShareOptions[field]
-      const newValue = !currentValue
-
-      // Optimistic update for instant preview feedback
-      setLocalShareOptions((prev) => ({
-        ...(prev ?? currentShareOptions),
-        [field]: newValue,
-      }))
-
-      try {
-        await updateShareOptions.mutateAsync({ [field]: newValue })
-        // Clear local state after successful save (let server state take over)
-        setLocalShareOptions(null)
-      } catch (error) {
-        // Revert optimistic update on error
-        setLocalShareOptions(null)
-        const message =
-          error instanceof Error
-            ? error.message
-            : 'Failed to save sharing option'
-        toast.error(message)
-      }
-    },
-    [displayShareOptions, currentShareOptions, updateShareOptions.mutateAsync],
-  )
+  // Share options form hook
+  const { displayShareOptions, handleShareOptionToggle } = useShareOptionsForm({
+    projectId: projectId ?? '',
+    currentShareOptions,
+  })
 
   // Loading state
   if (!project) {
