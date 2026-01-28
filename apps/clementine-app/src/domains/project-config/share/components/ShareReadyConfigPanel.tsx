@@ -1,5 +1,5 @@
 /**
- * ShareConfigPanel Component
+ * ShareReadyConfigPanel Component
  *
  * Left panel control interface for customizing share screen properties.
  * Organized into sections: Content (title, description), Share Options, CTA.
@@ -14,15 +14,15 @@ import {
   FaXTwitter,
 } from 'react-icons/fa6'
 import { FaTelegramPlane } from 'react-icons/fa'
+import { ctaConfigSchema } from '@clementine/shared'
 import {
   CTA_LABEL_MAX_LENGTH,
   SHARE_DESCRIPTION_MAX_LENGTH,
   SHARE_TITLE_MAX_LENGTH,
 } from '../constants'
 import type {
-  CtaConfig,
-  ShareConfig,
   ShareOptionsConfig,
+  ShareReadyConfig,
 } from '@/domains/project-config/shared'
 import {
   EditorSection,
@@ -33,35 +33,46 @@ import {
 import { Input } from '@/ui-kit/ui/input'
 import { Label } from '@/ui-kit/ui/label'
 
-export interface ShareConfigPanelProps {
+export interface ShareReadyConfigPanelProps {
   /** Current share values */
-  share: ShareConfig
+  share: ShareReadyConfig
   /** Current share options values */
   shareOptions: ShareOptionsConfig
   /** Callback when a share content field is updated */
-  onShareUpdate: (updates: Partial<ShareConfig>) => void
-  /** Callback when CTA is updated */
-  onCtaUpdate: (updates: Partial<CtaConfig>) => void
+  onShareUpdate: (updates: Partial<ShareReadyConfig>) => void
   /** Callback when a share option is toggled */
   onShareOptionToggle: (field: keyof ShareOptionsConfig) => void
   /** CTA validation error message */
   ctaUrlError?: string | null
   /** Callback when CTA URL loses focus (for validation) */
   onCtaUrlBlur?: () => void
+  /** Callback when CTA URL changes (to clear error) */
+  onCtaUrlChange?: () => void
   /** Whether controls are disabled (e.g., during save) */
   disabled?: boolean
 }
 
-export function ShareConfigPanel({
+export function ShareReadyConfigPanel({
   share,
   shareOptions,
   onShareUpdate,
-  onCtaUpdate,
   onShareOptionToggle,
   ctaUrlError,
   onCtaUrlBlur,
+  onCtaUrlChange,
   disabled = false,
-}: ShareConfigPanelProps) {
+}: ShareReadyConfigPanelProps) {
+  // Helper to merge CTA updates with schema defaults
+  const handleCtaUpdate = (
+    updates: Partial<{ label: string | null; url: string | null }>,
+  ) => {
+    // Get current CTA or use schema defaults
+    const ctaWithDefaults = ctaConfigSchema.parse(share.cta)
+    // Merge updates
+    const newCta = { ...ctaWithDefaults, ...updates }
+    // Update through parent handler
+    onShareUpdate({ cta: newCta })
+  }
   return (
     <div className="space-y-0">
       {/* Content Section - title, description */}
@@ -161,7 +172,7 @@ export function ShareConfigPanel({
               value={share.cta?.label ?? ''}
               onChange={(e) => {
                 const value = e.target.value || null
-                onCtaUpdate({ label: value })
+                handleCtaUpdate({ label: value })
               }}
               placeholder="e.g., Visit our website"
               maxLength={CTA_LABEL_MAX_LENGTH}
@@ -179,7 +190,9 @@ export function ShareConfigPanel({
               value={share.cta?.url ?? ''}
               onChange={(e) => {
                 const value = e.target.value || null
-                onCtaUpdate({ url: value })
+                handleCtaUpdate({ url: value })
+                // Clear error when user types
+                onCtaUrlChange?.()
               }}
               onBlur={onCtaUrlBlur}
               placeholder="https://example.com"

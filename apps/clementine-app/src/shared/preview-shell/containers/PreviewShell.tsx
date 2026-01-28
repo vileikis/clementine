@@ -18,6 +18,7 @@ export interface PreviewShellProps {
   viewportMode?: ViewportMode
   onViewportChange?: (mode: ViewportMode) => void
   className?: string
+  headerSlot?: React.ReactNode
 }
 
 /**
@@ -36,6 +37,7 @@ export function PreviewShell({
   viewportMode,
   onViewportChange,
   className,
+  headerSlot,
 }: PreviewShellProps) {
   // Global store state
   const { mode: globalMode, setMode: setGlobalMode } = useViewportStore()
@@ -70,6 +72,7 @@ export function PreviewShell({
           enableViewportSwitcher={enableViewportSwitcher}
           enableFullscreen={enableFullscreen}
           onFullscreenClick={enter}
+          headerSlot={headerSlot}
         />
 
         {/* Device Frame with wrapper for proper layout */}
