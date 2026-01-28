@@ -114,7 +114,7 @@ export function VariableCard({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: variable.id })
+  } = useSortable({ id: variable.id, disabled })
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -283,7 +283,7 @@ export function VariableCard({
         {/* Drag handle indicator (shows on hover) */}
         <div
           {...attributes}
-          {...listeners}
+          {...(!disabled && listeners)}
           className={cn(
             'shrink-0 rounded p-1 opacity-0 transition-opacity group-hover:opacity-100',
             'focus-visible:opacity-100',

@@ -19,7 +19,7 @@ import {
   MenuOption,
   useBasicTypeaheadTriggerMatch,
 } from '@lexical/react/LexicalTypeaheadMenuPlugin'
-import { $createTextNode } from 'lexical'
+import { $createTextNode, $getSelection } from 'lexical'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { $createMediaMentionNode, $createVariableMentionNode } from '../nodes'
@@ -263,6 +263,12 @@ export function MentionsPlugin({ variables, media }: MentionsPluginProps) {
 
         if (nodeToReplace) {
           nodeToReplace.replace(mentionNode)
+        } else {
+          // If no node to replace, insert at current selection
+          const selection = $getSelection()
+          if (selection) {
+            selection.insertNodes([mentionNode])
+          }
         }
 
         // Add space after mention
