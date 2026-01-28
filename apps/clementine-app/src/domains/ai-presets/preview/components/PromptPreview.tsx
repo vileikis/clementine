@@ -7,7 +7,7 @@
  * T029-T038: Live Prompt Resolution (User Story 2)
  */
 
-import { useState } from 'react'
+import { memo, useState } from 'react'
 import { Check, Copy } from 'lucide-react'
 import type { ResolvedPrompt } from '../types'
 import { Button } from '@/ui-kit/ui/button'
@@ -37,10 +37,7 @@ interface PromptPreviewProps {
  * />
  * ```
  */
-export function PromptPreview({
-  resolvedPrompt,
-  className,
-}: PromptPreviewProps) {
+function PromptPreviewInner({ resolvedPrompt, className }: PromptPreviewProps) {
   const [copied, setCopied] = useState(false)
 
   const handleCopy = async () => {
@@ -163,3 +160,5 @@ export function PromptPreview({
     </div>
   )
 }
+
+export const PromptPreview = memo(PromptPreviewInner)

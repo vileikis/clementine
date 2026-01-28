@@ -65,7 +65,11 @@ export function SelectVariableInput({
         defaultValue={variable.defaultValue}
       />
       <Select value={value} onValueChange={onChange} disabled={disabled}>
-        <SelectTrigger id={id} className="h-9 w-48">
+        <SelectTrigger
+          id={id}
+          className="h-11 w-48"
+          aria-label={`${variable.name} selection${variable.defaultValue ? `, default: ${variable.defaultValue}` : ''}`}
+        >
           <SelectValue placeholder="Select a value..." />
         </SelectTrigger>
         <SelectContent>

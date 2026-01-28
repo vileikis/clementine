@@ -225,6 +225,7 @@ function AIPresetPreviewPanelContent({
 
 /**
  * Error Boundary for AIPresetPreviewPanel
+ * T073: Error boundary with user-friendly error message and retry button
  */
 class PreviewErrorBoundary extends Component<
   { children: ReactNode },
@@ -239,14 +240,29 @@ class PreviewErrorBoundary extends Component<
     return { hasError: true }
   }
 
+  handleRetry = () => {
+    this.setState({ hasError: false })
+  }
+
   render() {
     if (this.state.hasError) {
       return (
         <Alert variant="destructive">
           <AlertCircle className="size-4" />
           <AlertDescription>
-            Something went wrong loading the preview panel. Please refresh the
-            page.
+            <div className="space-y-2">
+              <p>
+                Something went wrong loading the preview panel. Please try again
+                or refresh the page.
+              </p>
+              <button
+                type="button"
+                onClick={this.handleRetry}
+                className="text-sm font-medium underline hover:no-underline"
+              >
+                Try Again
+              </button>
+            </div>
           </AlertDescription>
         </Alert>
       )

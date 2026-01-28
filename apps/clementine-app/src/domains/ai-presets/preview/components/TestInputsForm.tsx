@@ -10,6 +10,7 @@
  * T016-T022: Test Variable Inputs
  */
 
+import { memo, useEffect } from 'react'
 import { RotateCcw } from 'lucide-react'
 import { isMediaReference } from '../lib/type-guards'
 import { TextVariableInput } from './TextVariableInput'
@@ -35,6 +36,7 @@ interface TestInputsFormProps {
 /**
  * Form for entering test values for preset variables.
  * Dynamically renders appropriate input types based on variable configuration.
+ * Optimized with React.memo to prevent unnecessary re-renders.
  *
  * @example
  * ```tsx
@@ -46,7 +48,7 @@ interface TestInputsFormProps {
  * />
  * ```
  */
-export function TestInputsForm({
+function TestInputsFormInner({
   variables,
   testInputs,
   onInputChange,
@@ -56,6 +58,18 @@ export function TestInputsForm({
   className,
   uploadingImages = {},
 }: TestInputsFormProps) {
+  // T076: Add keyboard navigation support (Escape to reset)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !disabled) {
+        onReset()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [onReset, disabled])
+
   // No variables to display
   if (variables.length === 0) {
     return (
@@ -143,3 +157,5 @@ export function TestInputsForm({
     </div>
   )
 }
+
+export const TestInputsForm = memo(TestInputsFormInner)

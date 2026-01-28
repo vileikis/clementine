@@ -180,19 +180,19 @@ This is a web application using TanStack Start. Paths follow the established str
 
 **Purpose**: Final improvements, optimization, and quality assurance across all user stories
 
-- [ ] T071 [P] Add comprehensive JSDoc comments to all public functions in prompt-resolution.ts and validation.ts for maintainability
-- [ ] T072 [P] Optimize performance across preview panel by adding React.memo() to TestInputsForm, PromptPreview, MediaPreviewGrid, ValidationDisplay components
-- [ ] T073 [P] Add error boundary with user-friendly error message and retry button around entire preview panel in AIPresetPreviewPanel
-- [ ] T074 [P] Review and ensure all colors use theme tokens (hsl(var(--primary))) not hard-coded hex values per design-system.md standards
-- [ ] T075 [P] Review and ensure all touch targets are ≥44px per mobile-first design principle in constitution
-- [ ] T076 [P] Add keyboard navigation support to TestInputsForm (Tab order, Enter to submit, Escape to reset)
-- [ ] T077 [P] Add loading skeleton states to preview panel components while preset data is fetching
-- [ ] T078 [P] Review accessibility: ARIA labels on all inputs, live regions for validation, proper heading hierarchy
+- [X] T071 [P] Add comprehensive JSDoc comments to all public functions in prompt-resolution.ts and validation.ts for maintainability
+- [X] T072 [P] Optimize performance across preview panel by adding React.memo() to TestInputsForm, PromptPreview, MediaPreviewGrid, ValidationDisplay components
+- [X] T073 [P] Add error boundary with user-friendly error message and retry button around entire preview panel in AIPresetPreviewPanel
+- [X] T074 [P] Review and ensure all colors use theme tokens (hsl(var(--primary))) not hard-coded hex values per design-system.md standards
+- [X] T075 [P] Review and ensure all touch targets are ≥44px per mobile-first design principle in constitution
+- [X] T076 [P] Add keyboard navigation support to TestInputsForm (Tab order, Enter to submit, Escape to reset)
+- [X] T077 [P] Add loading skeleton states to preview panel components while preset data is fetching
+- [X] T078 [P] Review accessibility: ARIA labels on all inputs, live regions for validation, proper heading hierarchy
 - [ ] T079 Run comprehensive manual testing following quickstart.md test scenarios to verify all user stories work independently
-- [ ] T080 Run pnpm app:check to verify final code passes all linting, formatting, and type checking
+- [X] T080 Run pnpm app:check to verify final code passes all linting, formatting, and type checking
 - [ ] T081 Test on mobile viewport (320px-768px) to verify responsive layout and touch-friendly interactions
-- [ ] T082 Verify colocated tests all pass: pnpm app:test domains/ai-presets/preview
-- [ ] T083 Update barrel export in preview/index.ts to export all public components and hooks
+- [X] T082 Verify colocated tests all pass: pnpm app:test domains/ai-presets/preview
+- [X] T083 Update barrel export in preview/index.ts to export all public components and hooks
 - [ ] T084 Add preview panel feature to workspace navigation or onboarding tooltips if applicable
 - [ ] T085 Create git commit with message following convention: "Add AI preset preview panel for testing variable inputs (Phase 4)" with Co-Authored-By tag
 

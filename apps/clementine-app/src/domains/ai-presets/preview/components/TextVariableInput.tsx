@@ -56,7 +56,8 @@ export function TextVariableInput({
         onChange={(e) => onChange(e.target.value)}
         placeholder={`Enter ${variable.name}...`}
         disabled={disabled}
-        className="h-9 w-48"
+        className="h-11 w-48"
+        aria-label={`${variable.name} input${variable.defaultValue ? `, default: ${variable.defaultValue}` : ''}`}
       />
     </div>
   )

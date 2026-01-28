@@ -1,6 +1,6 @@
 // Validation Display Component - Shows validation status and error/warning messages
 
-import { useEffect, useRef, useState } from 'react'
+import { memo, useEffect, useRef, useState } from 'react'
 import { ChevronDown, ChevronRight } from 'lucide-react'
 import type { ValidationState } from '../types'
 import { Badge } from '@/ui-kit/ui/badge'
@@ -15,8 +15,9 @@ type ValidationDisplayProps = {
  * Displays validation status with errors and warnings for the preview panel.
  * Shows color-coded status badges and lists of validation issues with expandable sections.
  * Supports auto-scroll to first error and click-to-focus on error fields.
+ * Optimized with React.memo to prevent unnecessary re-renders.
  */
-export function ValidationDisplay({
+function ValidationDisplayInner({
   validation,
   onErrorClick,
 }: ValidationDisplayProps) {
@@ -168,3 +169,5 @@ export function ValidationDisplay({
     </div>
   )
 }
+
+export const ValidationDisplay = memo(ValidationDisplayInner)

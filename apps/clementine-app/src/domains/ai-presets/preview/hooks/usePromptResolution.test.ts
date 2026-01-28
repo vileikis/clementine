@@ -146,6 +146,6 @@ describe('usePromptResolution', () => {
     )
 
     expect(result.current.text).toBe('A minimalist portrait of Alice.')
-    expect(result.current.characterCount).toBe(32)
+    expect(result.current.characterCount).toBe(31)
   })
 })
