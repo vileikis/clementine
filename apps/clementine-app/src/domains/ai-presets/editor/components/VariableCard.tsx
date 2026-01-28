@@ -374,9 +374,7 @@ export function VariableCard({
                     handleStartEdit(e)
                   }}
                   disabled={disabled}
-                  className={cn(
-                    'group/name h-auto gap-2 px-2 py-1',
-                  )}
+                  className={cn('group/name h-auto gap-2 px-2 py-1')}
                 >
                   <span
                     className={cn(

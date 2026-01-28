@@ -26,7 +26,6 @@ import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import { useEffect, useRef, useState } from 'react'
 import { useUpdateAIPresetDraft } from '../hooks/useUpdateAIPresetDraft'
-import { cn } from '@/shared/utils/style-utils'
 import {
   MediaMentionNode,
   MentionValidationPlugin,
@@ -40,6 +39,7 @@ import {
 import type { EditorState, LexicalEditor } from 'lexical'
 import type { PresetMediaEntry, PresetVariable } from '@clementine/shared'
 import type { MediaOption, VariableOption } from '../../lexical'
+import { cn } from '@/shared/utils/style-utils'
 import { useDebounce } from '@/shared/utils/useDebounce'
 
 interface PromptTemplateEditorProps {
