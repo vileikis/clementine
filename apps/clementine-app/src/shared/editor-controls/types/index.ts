@@ -141,6 +141,8 @@ export interface MediaPickerFieldProps extends Omit<
   uploadProgress?: number
   /** Additional class names for the picker container (use to override aspect ratio, width, etc.) */
   className?: string
+  /** How the image should fit within the container */
+  objectFit?: 'cover' | 'contain'
 }
 
 /**

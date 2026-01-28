@@ -68,8 +68,10 @@ export function AIPresetItem({ preset, workspaceId }: AIPresetItemProps) {
   // Mutations
   const duplicatePreset = useDuplicateAIPreset(workspaceId)
 
-  const variableCount = preset.variables?.length ?? 0
-  const mediaCount = preset.mediaRegistry?.length ?? 0
+  // Use draft config for display (draft is the working state)
+  const draft = preset.draft
+  const variableCount = draft?.variables?.length ?? 0
+  const mediaCount = draft?.mediaRegistry?.length ?? 0
 
   const handlePresetClick = () => {
     if (!workspaceSlug) {
@@ -154,9 +156,11 @@ export function AIPresetItem({ preset, workspaceId }: AIPresetItemProps) {
             </p>
           )}
           <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-            <span className="bg-muted px-2 py-0.5 rounded">{preset.model}</span>
             <span className="bg-muted px-2 py-0.5 rounded">
-              {preset.aspectRatio}
+              {draft?.model ?? 'gemini-2.5-flash'}
+            </span>
+            <span className="bg-muted px-2 py-0.5 rounded">
+              {draft?.aspectRatio ?? '1:1'}
             </span>
             <span>
               {variableCount} variable{variableCount !== 1 ? 's' : ''}
