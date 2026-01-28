@@ -14,6 +14,7 @@ import {
   Check,
   ChevronDown,
   ChevronRight,
+  GripVertical,
   Image,
   Pencil,
   Trash2,
@@ -237,20 +238,24 @@ export function VariableCard({
     >
       {/* Header */}
       <div className="flex items-center gap-3 py-3">
-        {/* Drag handle area */}
+        {/* Drag handle indicator (shows on hover) */}
         <div
           {...attributes}
           {...listeners}
           className={cn(
-            'shrink-0',
-            isDragging && 'cursor-grabbing',
-            !isDragging && !disabled && 'cursor-grab',
+            'shrink-0 rounded p-1 opacity-0 transition-opacity group-hover:opacity-100',
+            'focus-visible:opacity-100',
+            isDragging && 'opacity-100 cursor-grabbing',
+            !isDragging && !disabled && 'cursor-grab hover:bg-accent',
+            disabled && 'cursor-not-allowed',
           )}
         >
-          {/* Type icon */}
-          <div className={cn('shrink-0', colorClasses)}>
-            <Icon className="h-4 w-4" />
-          </div>
+          <GripVertical className="h-4 w-4 text-muted-foreground" />
+        </div>
+
+        {/* Type icon (not draggable) */}
+        <div className={cn('shrink-0', colorClasses)}>
+          <Icon className="h-4 w-4" />
         </div>
 
         {/* Variable name and content - clickable area for expansion */}
