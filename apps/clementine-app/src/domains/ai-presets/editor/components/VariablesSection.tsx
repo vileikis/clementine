@@ -24,10 +24,8 @@ import { toast } from 'sonner'
 
 import { useUpdateVariables } from '../hooks/useUpdateVariables'
 import { VariableCard } from './VariableCard'
-import { VariableSettingsDialog } from './VariableSettingsDialog'
-import type { VariableSettingsUpdate } from './VariableSettingsDialog'
 import type { DragEndEvent } from '@dnd-kit/core'
-import type { PresetVariable, PresetMediaEntry } from '@clementine/shared'
+import type { PresetMediaEntry, PresetVariable } from '@clementine/shared'
 import { Button } from '@/ui-kit/ui/button'
 import { ContextDropdownMenu } from '@/shared/components/ContextDropdownMenu'
 
@@ -42,6 +40,8 @@ interface VariablesSectionProps {
   presetId: string
   /** Whether the section is disabled (e.g., during publish) */
   disabled?: boolean
+  /** Whether to show the section header with + button */
+  showHeader?: boolean
 }
 
 const generateVariableName = (
@@ -77,9 +77,9 @@ export function VariablesSection({
   workspaceId,
   presetId,
   disabled = false,
+  showHeader = false,
 }: VariablesSectionProps) {
-  const [selectedVariable, setSelectedVariable] =
-    useState<PresetVariable | null>(null)
+  const [expandedVariableId, setExpandedVariableId] = useState<string | null>(null)
   const updateVariables = useUpdateVariables(workspaceId, presetId)
 
   // Configure sensors for drag and drop
@@ -155,33 +155,37 @@ export function VariablesSection({
     [variables, updateVariables.mutateAsync],
   )
 
-  // Handle settings - open dialog
-  const handleSettings = useCallback(
+  // Handle toggle expanded state (accordion pattern)
+  const handleToggleExpanded = useCallback(
     (id: string) => {
-      const variable = variables.find((v) => v.id === id)
-      if (variable) {
-        setSelectedVariable(variable)
-      }
+      setExpandedVariableId((current) => (current === id ? null : id))
     },
-    [variables],
+    [],
   )
 
-  // Handle save settings from dialog
-  const handleSaveSettings = useCallback(
-    async (variableId: string, updates: VariableSettingsUpdate) => {
+  // Handle update settings (inline editing, no dialog)
+  const handleUpdateSettings = useCallback(
+    async (
+      variableId: string,
+      updates: {
+        defaultValue?: string | null
+        valueMap?: { value: string; text: string }[] | null
+      },
+    ) => {
       try {
         const updatedVariables = variables.map((v) => {
           if (v.id === variableId && v.type === 'text') {
             return {
               ...v,
-              defaultValue: updates.defaultValue ?? v.defaultValue,
-              valueMap: updates.valueMap ?? v.valueMap,
+              ...(updates.defaultValue !== undefined && {
+                defaultValue: updates.defaultValue,
+              }),
+              ...(updates.valueMap !== undefined && { valueMap: updates.valueMap }),
             }
           }
           return v
         })
         await updateVariables.mutateAsync(updatedVariables)
-        toast.success('Variable settings updated')
       } catch (error) {
         toast.error('Failed to update settings', {
           description:
@@ -237,35 +241,72 @@ export function VariablesSection({
 
   return (
     <div className="space-y-3">
-      {/* Add Variable button */}
-      <ContextDropdownMenu
-        trigger={
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={isDisabled}
-            className="h-8 gap-1.5 px-3 w-full justify-center"
-          >
-            <Plus className="h-4 w-4" />
-            <span className="text-xs">Add Variable</span>
-          </Button>
-        }
-        actions={[
-          {
-            key: 'text',
-            label: 'Text',
-            icon: Type,
-            onClick: () => handleAddVariable('text'),
-          },
-          {
-            key: 'image',
-            label: 'Image',
-            icon: Image,
-            onClick: () => handleAddVariable('image'),
-          },
-        ]}
-        aria-label="Add variable"
-      />
+      {/* Section Header with + button */}
+      {showHeader && (
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-medium">Variables</h3>
+          <ContextDropdownMenu
+            trigger={
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled={isDisabled}
+                className="h-8 w-8 p-0"
+              >
+                <Plus className="h-4 w-4" />
+                <span className="sr-only">Add variable</span>
+              </Button>
+            }
+            actions={[
+              {
+                key: 'text',
+                label: 'Text',
+                icon: Type,
+                onClick: () => handleAddVariable('text'),
+              },
+              {
+                key: 'image',
+                label: 'Image',
+                icon: Image,
+                onClick: () => handleAddVariable('image'),
+              },
+            ]}
+            aria-label="Add variable"
+          />
+        </div>
+      )}
+
+      {/* Add Variable button (when no header) */}
+      {!showHeader && (
+        <ContextDropdownMenu
+          trigger={
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={isDisabled}
+              className="h-8 gap-1.5 px-3 w-full justify-center"
+            >
+              <Plus className="h-4 w-4" />
+              <span className="text-xs">Add Variable</span>
+            </Button>
+          }
+          actions={[
+            {
+              key: 'text',
+              label: 'Text',
+              icon: Type,
+              onClick: () => handleAddVariable('text'),
+            },
+            {
+              key: 'image',
+              label: 'Image',
+              icon: Image,
+              onClick: () => handleAddVariable('image'),
+            },
+          ]}
+          aria-label="Add variable"
+        />
+      )}
 
       {/* Empty state */}
       {variables.length === 0 && (
@@ -288,15 +329,18 @@ export function VariablesSection({
             items={variables.map((v) => v.id)}
             strategy={verticalListSortingStrategy}
           >
-            <div className="space-y-2">
+            <div className="border-y">
               {variables.map((variable) => (
                 <VariableCard
                   key={variable.id}
                   variable={variable}
                   existingNames={existingNames}
+                  media={media}
                   onRename={handleRename}
-                  onSettings={handleSettings}
+                  onUpdateSettings={handleUpdateSettings}
                   onDelete={handleDelete}
+                  isExpanded={expandedVariableId === variable.id}
+                  onToggleExpanded={handleToggleExpanded}
                   disabled={isDisabled}
                 />
               ))}
@@ -304,14 +348,6 @@ export function VariablesSection({
           </SortableContext>
         </DndContext>
       )}
-
-      {/* Variable Settings Dialog */}
-      <VariableSettingsDialog
-        variable={selectedVariable}
-        media={media}
-        onClose={() => setSelectedVariable(null)}
-        onSave={handleSaveSettings}
-      />
     </div>
   )
 }

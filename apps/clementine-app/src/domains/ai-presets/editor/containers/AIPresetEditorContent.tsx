@@ -7,14 +7,15 @@
  * Following Experience Designer pattern:
  * - AIPresetEditorLayout handles TopNavBar, publish, and version tracking
  * - AIPresetEditorContent handles layout only
- * - Section components (ModelSettingsSection, MediaRegistrySection) handle their own updates
+ * - Section components handle their own updates
  *
- * Layout:
- * - Left: Main work area with tabs (Edit | Preview)
- * - Right: AIPresetConfigPanel (collapsible sections for model, media, variables)
+ * Phase 11.5 Layout:
+ * - Left: Edit tab with Prompt Template (primary) + Variables (secondary)
+ * - Right: Config panel with Model Settings + Media Registry
  */
 import { AIPresetConfigPanel } from '../components/AIPresetConfigPanel'
 import { PromptTemplateEditor } from '../components/PromptTemplateEditor'
+import { VariablesSection } from '../components/VariablesSection'
 import type { AIPresetConfig } from '@clementine/shared'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/ui-kit/ui/tabs'
 
@@ -29,10 +30,15 @@ interface AIPresetEditorContentProps {
 /**
  * AI preset editor content with two-column layout
  *
+ * Phase 11.5 layout (prompt-first, variables in Edit tab):
+ *
  * Left panel: Main work area with tabs (Edit | Preview)
- *   - Edit: Prompt template editor
+ *   - Edit: Prompt template editor (primary) + Variables section (secondary)
  *   - Preview: Testing and validation (reserved for future)
- * Right panel: Configuration panel with collapsible sections (model, media, variables)
+ *
+ * Right panel: Configuration panel
+ *   - Model Settings (infrastructure)
+ *   - Media Registry (assets)
  *
  * Sections are self-contained and handle their own updates.
  *
@@ -62,23 +68,44 @@ export function AIPresetEditorContent({
           defaultValue="edit"
           className="flex flex-1 flex-col overflow-hidden"
         >
-          <div className="border-b px-6 pt-6">
+          <div className="border-b px-6 pt-2">
             <TabsList variant="line">
               <TabsTrigger value="edit">Edit</TabsTrigger>
               <TabsTrigger value="preview">Preview</TabsTrigger>
             </TabsList>
           </div>
 
-          {/* Edit Tab - Prompt Template Editor */}
+          {/* Edit Tab - Prompt Template + Variables */}
           <TabsContent value="edit" className="flex-1 overflow-y-auto p-6 m-0">
-            <PromptTemplateEditor
-              value={draft.promptTemplate || ''}
-              variables={draft.variables}
-              media={draft.mediaRegistry}
-              workspaceId={workspaceId}
-              presetId={presetId}
-              disabled={disabled}
-            />
+            <div className="space-y-6">
+              {/* Prompt Template Editor (Primary) */}
+              <div>
+                <h3 className="mb-3 text-sm font-medium">Prompt Template</h3>
+                <PromptTemplateEditor
+                  value={draft.promptTemplate || ''}
+                  variables={draft.variables}
+                  media={draft.mediaRegistry}
+                  workspaceId={workspaceId}
+                  presetId={presetId}
+                  disabled={disabled}
+                />
+              </div>
+
+              {/* Visual separator */}
+              <div className="border-t" />
+
+              {/* Variables Section (Secondary) */}
+              <div>
+                <VariablesSection
+                  variables={draft.variables}
+                  media={draft.mediaRegistry}
+                  workspaceId={workspaceId}
+                  presetId={presetId}
+                  disabled={disabled}
+                  showHeader={true}
+                />
+              </div>
+            </div>
           </TabsContent>
 
           {/* Preview Tab - Reserved for Testing/Validation */}

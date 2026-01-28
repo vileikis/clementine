@@ -1,13 +1,14 @@
 /**
  * AIPresetConfigPanel Component
  *
- * Left panel control interface for configuring AI preset settings.
- * Organized into collapsible sections: Model Settings, Media Registry, Variables.
+ * Right panel control interface for configuring AI preset infrastructure.
+ * Organized into collapsible sections: Model Settings, Media Registry.
+ *
+ * Phase 11.5: Variables moved to Edit tab (left panel).
  */
 
 import { MediaRegistrySection } from './MediaRegistrySection'
 import { ModelSettingsSection } from './ModelSettingsSection'
-import { VariablesSection } from './VariablesSection'
 import type { AIPresetConfig } from '@clementine/shared'
 import { EditorSection } from '@/shared/editor-controls'
 
@@ -27,10 +28,13 @@ export interface AIPresetConfigPanelProps {
 /**
  * AI preset configuration panel with collapsible sections
  *
+ * Phase 11.5: Focused on infrastructure settings only.
+ *
  * Contains:
  * - Model Settings: AI model and aspect ratio selection
  * - Media Registry: Media asset management
- * - Variables: Dynamic prompt variable definitions
+ *
+ * Variables section moved to Edit tab (left panel) for better authoring workflow.
  *
  * @example
  * ```tsx
@@ -70,17 +74,6 @@ export function AIPresetConfigPanel({
           workspaceId={workspaceId}
           presetId={presetId}
           userId={userId}
-          disabled={disabled}
-        />
-      </EditorSection>
-
-      {/* Variables Section */}
-      <EditorSection title="Variables">
-        <VariablesSection
-          variables={draft.variables}
-          media={draft.mediaRegistry}
-          workspaceId={workspaceId}
-          presetId={presetId}
           disabled={disabled}
         />
       </EditorSection>

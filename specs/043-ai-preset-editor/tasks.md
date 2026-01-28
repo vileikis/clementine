@@ -360,7 +360,7 @@ Config Panel (Right):
 
 ### Implementation for Phase 11.5
 
-- [ ] T079 Refactor VariableCard for inline expansion:
+- [x] T079 Refactor VariableCard for inline expansion:
   - Convert click behavior from "open dialog" to "expand/collapse inline"
   - Show full settings inline when expanded (name, type, required, default, value mappings)
   - Collapsed state: name + type icon + small indicators (# mappings, has default)
@@ -368,7 +368,7 @@ Config Panel (Right):
   - Remove settings icon button (no longer needed)
   - Keep drag handle, delete button
 
-- [ ] T080 Update VariablesSection component:
+- [x] T080 Update VariablesSection component:
   - Remove VariableSettingsDialog integration
   - Handle inline editing state (track which variable is expanded)
   - Add accordion behavior (optional: auto-collapse others when one expands)
@@ -376,7 +376,7 @@ Config Panel (Right):
   - Maintain drag-and-drop functionality
   - Pass media prop to VariableCard for value mapping inline editing
 
-- [ ] T081 Refactor AIPresetEditorContent layout:
+- [x] T081 Refactor AIPresetEditorContent layout:
   - Move VariablesSection from AIPresetConfigPanel to Edit tab
   - Reorder: PromptTemplateEditor FIRST, VariablesSection BELOW
   - Add visual separator between sections (subtle divider)
@@ -384,7 +384,7 @@ Config Panel (Right):
   - Ensure Variables section scrolls within Edit tab
   - Remove media prop pass-through from AIPresetConfigPanel
 
-- [ ] T082 Update AIPresetConfigPanel:
+- [x] T082 Update AIPresetConfigPanel:
   - Remove VariablesSection from config panel
   - Keep only Model Settings and Media Registry sections
   - Update component interface (no longer needs media prop for variables)

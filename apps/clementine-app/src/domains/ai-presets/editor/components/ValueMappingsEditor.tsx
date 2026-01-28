@@ -7,12 +7,6 @@
  */
 import { useCallback, useEffect, useRef } from 'react'
 import { Info, Plus, Trash2 } from 'lucide-react'
-import type { ValueMappingEntry, PresetMediaEntry } from '@clementine/shared'
-import type { EditorState } from 'lexical'
-import { Button } from '@/ui-kit/ui/button'
-import { Input } from '@/ui-kit/ui/input'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui-kit/ui/tooltip'
-import { cn } from '@/shared/utils'
 import { LexicalComposer } from '@lexical/react/LexicalComposer'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
@@ -28,7 +22,13 @@ import {
   loadFromPlainText,
   serializeToPlainText,
 } from '../../lexical'
+import type { EditorState } from 'lexical'
+import type { PresetMediaEntry, ValueMappingEntry } from '@clementine/shared'
 import type { MediaOption } from '../../lexical'
+import { cn } from '@/shared/utils'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui-kit/ui/tooltip'
+import { Input } from '@/ui-kit/ui/input'
+import { Button } from '@/ui-kit/ui/button'
 
 interface ValueMappingsEditorProps {
   /** Current value mappings */

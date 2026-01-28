@@ -8,8 +8,8 @@ import { useCallback, useEffect, useState } from 'react'
 
 import { ValueMappingsEditor } from './ValueMappingsEditor'
 import type {
-  PresetVariable,
   PresetMediaEntry,
+  PresetVariable,
   ValueMappingEntry,
 } from '@clementine/shared'
 import { Button } from '@/ui-kit/ui/button'
