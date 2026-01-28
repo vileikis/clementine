@@ -113,18 +113,18 @@ This is a web application using TanStack Start. Paths follow the established str
 
 ### Implementation for User Story 3
 
-- [ ] T039 [P] [US3] Create MediaPreviewGrid component in apps/clementine-app/src/domains/ai-presets/preview/components/MediaPreviewGrid.tsx displaying thumbnails in responsive grid layout
-- [ ] T040 [P] [US3] Implement media reference extraction in MediaPreviewGrid using extractMediaReferences() from prompt-resolution.ts
-- [ ] T041 [P] [US3] Add thumbnail rendering in MediaPreviewGrid for registry media (@{ref:name} references) showing media.url from mediaRegistry
-- [ ] T042 [P] [US3] Add thumbnail rendering in MediaPreviewGrid for test uploads (@{input:name} references) creating blob URLs from File objects
-- [ ] T043 [P] [US3] Add usage counter display in MediaPreviewGrid showing "X of Y media items used" where X is referenced count and Y is total registry count
-- [ ] T044 [P] [US3] Add hover tooltips to thumbnails in MediaPreviewGrid using shadcn/ui Tooltip component showing reference name and source (registry vs. test)
-- [ ] T045 [P] [US3] Add visual indication for unreferenced registry media in MediaPreviewGrid (grayed out or excluded from grid)
-- [ ] T046 [US3] Integrate MediaPreviewGrid into AIPresetPreviewPanel component below PromptPreview
-- [ ] T047 [US3] Add lazy loading to MediaPreviewGrid thumbnails using loading="lazy" attribute on img tags
-- [ ] T048 [US3] Add empty state to MediaPreviewGrid when no media is referenced in prompt
-- [ ] T049 [US3] Add error handling to MediaPreviewGrid for failed image loads (404, CORS errors)
-- [ ] T050 [US3] Optimize MediaPreviewGrid re-renders using React.memo() for thumbnail components
+- [X] T039 [P] [US3] Create MediaPreviewGrid component in apps/clementine-app/src/domains/ai-presets/preview/components/MediaPreviewGrid.tsx displaying thumbnails in responsive grid layout
+- [X] T040 [P] [US3] Implement media reference extraction in MediaPreviewGrid using extractMediaReferences() from prompt-resolution.ts
+- [X] T041 [P] [US3] Add thumbnail rendering in MediaPreviewGrid for registry media (@{ref:name} references) showing media.url from mediaRegistry
+- [X] T042 [P] [US3] Add thumbnail rendering in MediaPreviewGrid for test uploads (@{input:name} references) creating blob URLs from File objects
+- [X] T043 [P] [US3] Add usage counter display in MediaPreviewGrid showing "X of Y media items used" where X is referenced count and Y is total registry count
+- [X] T044 [P] [US3] Add hover tooltips to thumbnails in MediaPreviewGrid using shadcn/ui Tooltip component showing reference name and source (registry vs. test)
+- [X] T045 [P] [US3] Add visual indication for unreferenced registry media in MediaPreviewGrid (grayed out or excluded from grid)
+- [X] T046 [US3] Integrate MediaPreviewGrid into AIPresetPreviewPanel component below PromptPreview
+- [X] T047 [US3] Add lazy loading to MediaPreviewGrid thumbnails using loading="lazy" attribute on img tags
+- [X] T048 [US3] Add empty state to MediaPreviewGrid when no media is referenced in prompt
+- [X] T049 [US3] Add error handling to MediaPreviewGrid for failed image loads (404, CORS errors)
+- [X] T050 [US3] Optimize MediaPreviewGrid re-renders using React.memo() for thumbnail components
 
 **Checkpoint**: All core preview functionality (US1, US2, US3) should now work independently - full preview experience is functional
 

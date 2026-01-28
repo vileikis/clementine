@@ -16,8 +16,10 @@ import { useAIPreset } from '../../editor/hooks/useAIPreset'
 import { useTestInputs } from '../hooks/useTestInputs'
 import { usePromptResolution } from '../hooks/usePromptResolution'
 import { usePresetValidation } from '../hooks/usePresetValidation'
+import { useMediaReferences } from '../hooks/useMediaReferences'
 import { TestInputsForm } from './TestInputsForm'
 import { PromptPreview } from './PromptPreview'
+import { MediaPreviewGrid } from './MediaPreviewGrid'
 import type { ReactNode } from 'react'
 import type { MediaReference } from '@clementine/shared'
 import { Skeleton } from '@/ui-kit/ui/skeleton'
@@ -133,6 +135,14 @@ function AIPresetPreviewPanelContent({
   // Validate inputs
   const validation = usePresetValidation(variables, testInputs, resolvedPrompt)
 
+  // Extract media references for preview grid
+  const mediaReferences = useMediaReferences(
+    promptTemplate,
+    testInputs,
+    variables,
+    mediaRegistry,
+  )
+
   // Loading state
   if (isLoading) {
     return (
@@ -220,6 +230,14 @@ function AIPresetPreviewPanelContent({
       {/* Resolved Prompt Preview */}
       <EditorSection title="Resolved Prompt">
         <PromptPreview resolvedPrompt={resolvedPrompt} />
+      </EditorSection>
+
+      {/* Media Preview Grid */}
+      <EditorSection title="Media">
+        <MediaPreviewGrid
+          mediaReferences={mediaReferences}
+          totalRegistryCount={mediaRegistry.length}
+        />
       </EditorSection>
     </div>
   )

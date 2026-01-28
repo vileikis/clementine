@@ -15,6 +15,7 @@ export type {
 export { TestInputsForm } from './components/TestInputsForm'
 export { AIPresetPreviewPanel } from './components/AIPresetPreviewPanel'
 export { PromptPreview } from './components/PromptPreview'
+export { MediaPreviewGrid } from './components/MediaPreviewGrid'
 
 // Store
 export { useAIPresetPreviewStore } from './store/useAIPresetPreviewStore'
@@ -23,6 +24,7 @@ export { useAIPresetPreviewStore } from './store/useAIPresetPreviewStore'
 export { useTestInputs } from './hooks/useTestInputs'
 export { usePromptResolution } from './hooks/usePromptResolution'
 export { usePresetValidation } from './hooks/usePresetValidation'
+export { useMediaReferences } from './hooks/useMediaReferences'
 
 // Utilities
 export {
