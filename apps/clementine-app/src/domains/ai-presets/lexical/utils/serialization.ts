@@ -165,6 +165,10 @@ export function loadFromPlainText(
           paragraph.append($createTextNode(textBefore))
         }
 
+        // Calculate if this match is at the end of the paragraph
+        const nextIndex = matchItem.index + matchItem.length
+        const isAtEnd = nextIndex === paragraphText.length
+
         // Add mention node based on type
         let mentionNode
         if (matchItem.type === 'text' || matchItem.type === 'input') {
@@ -194,11 +198,12 @@ export function loadFromPlainText(
         }
 
         // Add space after mention to prevent cursor trap
-        if (mentionNode) {
+        // Only add if mention is at the end of paragraph to avoid accumulation
+        if (mentionNode && isAtEnd) {
           paragraph.append($createTextNode(' '))
         }
 
-        lastIndex = matchItem.index + matchItem.length
+        lastIndex = nextIndex
       }
 
       // Add remaining text
