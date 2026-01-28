@@ -9,9 +9,9 @@
 import { useState } from 'react'
 import { useParams } from '@tanstack/react-router'
 import {
-  ShareConfigPanel,
   ShareLoadingConfigPanel,
   ShareLoadingRenderer,
+  ShareReadyConfigPanel,
   ShareReadyRenderer,
 } from '../components'
 import {
@@ -150,7 +150,7 @@ export function ShareEditorPage() {
         </div>
 
         {previewState === 'ready' ? (
-          <ShareConfigPanel
+          <ShareReadyConfigPanel
             share={previewShare}
             shareOptions={displayShareOptions}
             onShareUpdate={handleShareUpdate}

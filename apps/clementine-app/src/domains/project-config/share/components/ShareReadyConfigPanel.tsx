@@ -1,5 +1,5 @@
 /**
- * ShareConfigPanel Component
+ * ShareReadyConfigPanel Component
  *
  * Left panel control interface for customizing share screen properties.
  * Organized into sections: Content (title, description), Share Options, CTA.
@@ -33,7 +33,7 @@ import {
 import { Input } from '@/ui-kit/ui/input'
 import { Label } from '@/ui-kit/ui/label'
 
-export interface ShareConfigPanelProps {
+export interface ShareReadyConfigPanelProps {
   /** Current share values */
   share: ShareReadyConfig
   /** Current share options values */
@@ -52,7 +52,7 @@ export interface ShareConfigPanelProps {
   disabled?: boolean
 }
 
-export function ShareConfigPanel({
+export function ShareReadyConfigPanel({
   share,
   shareOptions,
   onShareUpdate,
@@ -61,7 +61,7 @@ export function ShareConfigPanel({
   onCtaUrlBlur,
   onCtaUrlChange,
   disabled = false,
-}: ShareConfigPanelProps) {
+}: ShareReadyConfigPanelProps) {
   // Helper to merge CTA updates with schema defaults
   const handleCtaUpdate = (
     updates: Partial<{ label: string | null; url: string | null }>,
