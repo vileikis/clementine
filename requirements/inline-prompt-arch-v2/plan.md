@@ -1,5 +1,7 @@
 ## Implementation Plan
 
+**Part of**: [Inline Prompt Architecture (v2)](./README.md)
+
 ### Phase 1a: Schemas & Foundation (2-3 days)
 
 **Goal**: Update schemas to support AI-aware features
