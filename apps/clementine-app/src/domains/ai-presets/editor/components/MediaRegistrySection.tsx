@@ -70,6 +70,7 @@ export function MediaRegistrySection({
           mediaAssetId: result.mediaAssetId,
           url: result.url,
           filePath: result.filePath,
+          displayName: 'Untitled',
           name: result.name,
         }
         const updatedRegistry = [...mediaRegistry, newEntry]

@@ -8,11 +8,11 @@
  * The read schema (welcomeConfigSchema) is permissive to handle existing data.
  */
 import { z } from 'zod'
+import { mediaReferenceSchema } from '@clementine/shared'
 import {
   WELCOME_DESCRIPTION_MAX_LENGTH,
   WELCOME_TITLE_MAX_LENGTH,
 } from '../constants'
-import { mediaReferenceSchema } from '@/shared/theming'
 import { experiencePickerLayoutSchema } from '@/domains/project-config/shared'
 
 /**

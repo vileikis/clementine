@@ -93,6 +93,7 @@ describe('resolvePrompt', () => {
       mediaAssetId: 'test-asset-id',
       url: 'https://example.com/test.jpg',
       filePath: 'uploads/test.jpg',
+      displayName: 'Test Media',
     }
     const testInputs: TestInputState = { userPhoto: mockMediaRef }
     const variables: PresetVariable[] = [
@@ -146,6 +147,7 @@ describe('resolvePrompt', () => {
         url: 'https://example.com/image.jpg',
         mediaAssetId: 'asset-1',
         filePath: 'uploads/styleRef.jpg',
+        displayName: 'Test Media',
       },
     ]
 
@@ -225,6 +227,7 @@ describe('resolvePrompt', () => {
         url: 'https://example.com/hammer.jpg',
         mediaAssetId: 'asset-1',
         filePath: 'uploads/hammer.jpg',
+        displayName: 'Test Media',
       },
     ]
 
@@ -277,6 +280,7 @@ describe('resolvePrompt', () => {
       mediaAssetId: 'test-asset-id',
       url: 'https://example.com/fantasy.jpg',
       filePath: 'uploads/fantasy.jpg',
+      displayName: 'Test Media',
     }
     const testInputs: TestInputState = {
       artStyle: 'fantasy',
@@ -322,6 +326,7 @@ describe('extractMediaReferences', () => {
       mediaAssetId: 'test-asset-id',
       url: 'https://example.com/test.jpg',
       filePath: 'uploads/test.jpg',
+      displayName: 'Test Media',
     }
     const testInputs: TestInputState = { userPhoto: mockMediaRef }
     const variables: PresetVariable[] = []
@@ -351,6 +356,7 @@ describe('extractMediaReferences', () => {
         url: 'https://example.com/image.jpg',
         mediaAssetId: 'asset-1',
         filePath: 'uploads/styleRef.jpg',
+        displayName: 'Test Media',
       },
     ]
 
@@ -390,11 +396,13 @@ describe('extractMediaReferences', () => {
       mediaAssetId: 'test-asset-id-1',
       url: 'https://example.com/test1.jpg',
       filePath: 'uploads/test1.jpg',
+      displayName: 'Test Media',
     }
     const mockMediaRef2 = {
       mediaAssetId: 'test-asset-id-2',
       url: 'https://example.com/test2.jpg',
       filePath: 'uploads/test2.jpg',
+      displayName: 'Test Media',
     }
     const testInputs: TestInputState = {
       photo1: mockMediaRef1,
@@ -407,6 +415,7 @@ describe('extractMediaReferences', () => {
         url: 'https://example.com/ref1.jpg',
         mediaAssetId: 'asset-1',
         filePath: 'uploads/ref1.jpg',
+        displayName: 'Test Media',
       },
     ]
 

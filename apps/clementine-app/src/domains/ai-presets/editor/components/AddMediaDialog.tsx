@@ -7,6 +7,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
+import type { MediaReference } from '@clementine/shared'
 
 import { useUploadMediaAsset } from '@/domains/media-library'
 import { MediaPickerField } from '@/shared/editor-controls'
@@ -73,11 +74,7 @@ export function AddMediaDialog({
 }: AddMediaDialogProps) {
   const [name, setName] = useState('')
   const [imageUrl, setImageUrl] = useState<string | null>(null)
-  const [uploadResult, setUploadResult] = useState<{
-    mediaAssetId: string
-    url: string
-    filePath: string
-  } | null>(null)
+  const [uploadResult, setUploadResult] = useState<MediaReference | null>(null)
   const [uploadProgress, setUploadProgress] = useState<number | undefined>(
     undefined,
   )
@@ -165,7 +162,7 @@ export function AddMediaDialog({
       onAdd({
         mediaAssetId: uploadResult.mediaAssetId,
         url: uploadResult.url,
-        filePath: uploadResult.filePath,
+        filePath: uploadResult.filePath!,
         name,
       })
 

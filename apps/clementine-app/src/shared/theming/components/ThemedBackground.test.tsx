@@ -22,6 +22,7 @@ const mockTheme: Theme = {
       mediaAssetId: 'abc123',
       url: 'https://example.com/bg.jpg',
       filePath: null,
+      displayName: 'Test Media',
     },
     overlayOpacity: 0.5,
   },
@@ -33,6 +34,7 @@ const mockBackgroundOverride: ThemeBackground = {
     mediaAssetId: 'override123',
     url: 'https://example.com/override.jpg',
     filePath: null,
+    displayName: 'Test Media',
   },
   overlayOpacity: 0.3,
 }

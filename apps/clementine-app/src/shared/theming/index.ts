@@ -9,13 +9,11 @@ export type {
   ButtonRadius,
 } from './types'
 export type { ThemeContextValue } from './context'
-export type { MediaReference } from './schemas'
 
 // Schemas
 export {
   COLOR_REGEX,
   BUTTON_RADIUS_OPTIONS,
-  mediaReferenceSchema,
   themeTextSchema,
   themeButtonSchema,
   themeBackgroundSchema,
