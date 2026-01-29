@@ -29,12 +29,7 @@ import type { ShareOptionsConfig, ShareReadyConfig } from '@clementine/shared'
 import type { LucideIcon } from 'lucide-react'
 import type { IconType } from 'react-icons'
 import { Skeleton } from '@/ui-kit/ui/skeleton'
-import {
-  ThemedBackground,
-  ThemedButton,
-  ThemedIconButton,
-  ThemedText,
-} from '@/shared/theming'
+import { ThemedButton, ThemedIconButton, ThemedText } from '@/shared/theming'
 
 export interface ShareReadyRendererProps {
   /** Share ready config to render */
@@ -119,10 +114,7 @@ export function ShareReadyRenderer({
   }
 
   return (
-    <ThemedBackground
-      className="h-full w-full"
-      contentClassName="flex flex-col h-full"
-    >
+    <div className="flex flex-col h-full w-full">
       {/* Scrollable content zone */}
       <div className="flex-1 overflow-y-auto p-8 flex flex-col items-center space-y-6">
         {/* Media - using same sizing as loading skeleton */}
@@ -205,6 +197,6 @@ export function ShareReadyRenderer({
           Start over
         </ThemedButton>
       </div>
-    </ThemedBackground>
+    </div>
   )
 }

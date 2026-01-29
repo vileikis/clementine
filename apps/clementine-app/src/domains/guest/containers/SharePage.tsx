@@ -1,32 +1,67 @@
 /**
  * SharePage Container
  *
- * Placeholder share screen that displays after main experience completion.
- * Will show transform processing state and final result once transform is complete.
+ * Displays AI generation progress and final results using ShareLoadingRenderer
+ * and ShareReadyRenderer components. Uses mock data with simulated 3-second
+ * loading transition.
  *
- * This is a placeholder for E8 (Share Screen) implementation.
- *
- * User Story: US1 - Guest Executes Main Experience
+ * User Stories: P1-P3 (Loading, Ready State, Interactive Buttons)
  */
-import { Link } from '@tanstack/react-router'
-import { ArrowLeft, Clock } from 'lucide-react'
-
+import { useEffect, useState } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import { useGuestContext } from '../contexts'
+import type {
+  ShareLoadingConfig,
+  ShareOptionsConfig,
+  ShareReadyConfig,
+} from '@clementine/shared'
+import {
+  ShareLoadingRenderer,
+  ShareReadyRenderer,
+} from '@/domains/project-config/share/components'
+import { ThemeProvider, ThemedBackground } from '@/shared/theming'
+import { DEFAULT_THEME } from '@/domains/project-config/theme/constants'
 
 export interface SharePageProps {
   /** Main session ID from URL query params */
   mainSessionId: string
 }
 
+// Mock data constants
+const MOCK_LOADING_CONFIG: ShareLoadingConfig = {
+  title: 'Creating your masterpiece...',
+  description: 'Our AI is working its magic. This usually takes 30-60 seconds.',
+}
+
+const MOCK_READY_CONFIG: ShareReadyConfig = {
+  title: 'Your AI Creation is Ready!',
+  description: 'Share your unique creation with friends and family.',
+  cta: {
+    label: 'Visit Our Website',
+    url: 'https://example.com',
+  },
+}
+
+const MOCK_SHARE_OPTIONS: ShareOptionsConfig = {
+  download: true,
+  copyLink: true,
+  email: false,
+  instagram: true,
+  facebook: true,
+  linkedin: false,
+  twitter: true,
+  tiktok: false,
+  telegram: false,
+}
+
+const MOCK_RESULT_IMAGE =
+  'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800'
+
 /**
- * Share page placeholder
+ * Share page with renderer integration
  *
- * Displays a placeholder message indicating the share screen is coming.
- * In E8, this will:
- * - Subscribe to main session for jobStatus updates
- * - Display processing state while transform is running
- * - Show final result media when transform completes
- * - Provide sharing options (download, social share)
+ * Displays loading state for 3 seconds, then transitions to ready state
+ * with mock result image and share options.
  *
  * @example
  * ```tsx
@@ -37,43 +72,61 @@ export interface SharePageProps {
  * }
  * ```
  */
-export function SharePage({ mainSessionId }: SharePageProps) {
+export function SharePage({ mainSessionId: _mainSessionId }: SharePageProps) {
   const { project } = useGuestContext()
+  const navigate = useNavigate()
+  const [isReady, setIsReady] = useState(false)
+
+  // 3-second transition timer
+  useEffect(() => {
+    const timer = setTimeout(() => setIsReady(true), 3000)
+    return () => clearTimeout(timer)
+  }, [])
+
+  // Get theme from project or use default
+  const currentTheme = project.draftConfig?.theme ?? DEFAULT_THEME
+
+  // Navigation handlers
+  const handleStartOver = () => {
+    navigate({ to: '/join/$projectId', params: { projectId: project.id } })
+  }
+
+  const handleCta = () => {
+    if (MOCK_READY_CONFIG.cta?.url) {
+      window.location.href = MOCK_READY_CONFIG.cta.url
+    }
+  }
+
+  const handleShare = (platform: keyof ShareOptionsConfig) => {
+    // No-op - share functionality deferred (FR-008)
+    console.log(`Share clicked: ${platform}`)
+  }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
-      <div className="text-center max-w-md">
-        <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-          <Clock className="h-8 w-8 text-primary" />
-        </div>
-
-        <h1 className="text-2xl font-bold text-foreground">
-          Processing Your Creation
-        </h1>
-
-        <p className="mt-4 text-muted-foreground">
-          Your experience is complete! The AI is now transforming your content.
-          The full share screen with results will be available in Epic E8.
-        </p>
-
-        {/* Session info for debugging/verification */}
-        <div className="mt-6 p-4 rounded-lg bg-muted/50 text-left text-sm">
-          <p className="font-medium text-foreground">Session Details</p>
-          <p className="mt-2 text-muted-foreground">
-            <span className="font-mono text-xs break-all">{mainSessionId}</span>
-          </p>
-        </div>
-
-        {/* Back to welcome link */}
-        <Link
-          to="/join/$projectId"
-          params={{ projectId: project.id }}
-          className="mt-6 inline-flex items-center gap-2 text-primary hover:underline"
+    <ThemeProvider theme={currentTheme}>
+      <div className="h-screen">
+        <ThemedBackground
+          className="h-full w-full"
+          contentClassName="h-full w-full"
         >
-          <ArrowLeft className="h-4 w-4" />
-          Back to welcome screen
-        </Link>
+          {isReady ? (
+            <ShareReadyRenderer
+              share={MOCK_READY_CONFIG}
+              shareOptions={MOCK_SHARE_OPTIONS}
+              mode="run"
+              mediaUrl={MOCK_RESULT_IMAGE}
+              onShare={handleShare}
+              onCta={handleCta}
+              onStartOver={handleStartOver}
+            />
+          ) : (
+            <ShareLoadingRenderer
+              shareLoading={MOCK_LOADING_CONFIG}
+              mode="run"
+            />
+          )}
+        </ThemedBackground>
       </div>
-    </div>
+    </ThemeProvider>
   )
 }

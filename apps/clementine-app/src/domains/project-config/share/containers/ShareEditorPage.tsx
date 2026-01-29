@@ -29,7 +29,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/ui-kit/ui/tabs'
 import { PreviewShell } from '@/shared/preview-shell'
 import { useProject } from '@/domains/project/shared'
 import { DEFAULT_THEME } from '@/domains/project-config/theme/constants'
-import { ThemeProvider } from '@/shared/theming'
+import { ThemeProvider, ThemedBackground } from '@/shared/theming'
 
 // Default share options when none exist
 const DEFAULT_SHARE_OPTIONS: ShareOptionsConfig = {
@@ -128,14 +128,19 @@ export function ShareEditorPage() {
           }
         >
           <ThemeProvider theme={currentTheme}>
-            {previewState === 'loading' ? (
-              <ShareLoadingRenderer shareLoading={previewShareLoading} />
-            ) : (
-              <ShareReadyRenderer
-                share={previewShare}
-                shareOptions={displayShareOptions}
-              />
-            )}
+            <ThemedBackground
+              className="h-full w-full"
+              contentClassName="h-full w-full"
+            >
+              {previewState === 'loading' ? (
+                <ShareLoadingRenderer shareLoading={previewShareLoading} />
+              ) : (
+                <ShareReadyRenderer
+                  share={previewShare}
+                  shareOptions={displayShareOptions}
+                />
+              )}
+            </ThemedBackground>
           </ThemeProvider>
         </PreviewShell>
       </div>
