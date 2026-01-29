@@ -6,6 +6,7 @@
  * and toast notifications for unsupported platforms.
  */
 import { toast } from 'sonner'
+import * as Sentry from '@sentry/tanstackstart-react'
 import type { ShareOptionsConfig } from '@clementine/shared'
 
 export interface UseShareActionsParams {
@@ -45,6 +46,14 @@ export function useShareActions({ mediaUrl }: UseShareActionsParams) {
     try {
       // Fetch image as blob to handle CORS
       const response = await fetch(mediaUrl)
+
+      // Check response status before proceeding
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch media: ${response.status} ${response.statusText}`,
+        )
+      }
+
       const blob = await response.blob()
 
       // Create blob URL and trigger download
@@ -62,7 +71,16 @@ export function useShareActions({ mediaUrl }: UseShareActionsParams) {
       toast.success('Image downloaded successfully')
     } catch (error) {
       toast.error('Failed to download image')
-      console.error('Download error:', error)
+      Sentry.captureException(error, {
+        tags: {
+          domain: 'guest',
+          action: 'download-media',
+        },
+        extra: {
+          errorType: 'download-failure',
+          mediaUrl,
+        },
+      })
     }
   }
 
@@ -116,11 +134,11 @@ export function useShareActions({ mediaUrl }: UseShareActionsParams) {
         handleSocialShare(platform)
         break
 
-      default:
+      default: {
         // Exhaustive check ensures all platforms are handled
-        // eslint-disable-next-line no-case-declarations
         const exhaustiveCheck: never = platform
-        console.error('Unhandled share platform:', exhaustiveCheck)
+        return exhaustiveCheck
+      }
     }
   }
 
