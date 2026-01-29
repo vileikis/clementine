@@ -1,11 +1,11 @@
 # AI Presets - PRD Phases
 
-## Status: Active Implementation (Phase 4)
+## Status: Active Implementation (Phase 5)
 
 **Created**: 2025-01-26
-**Last Updated**: 2025-01-28
-**Current Phase**: Phase 4 - AI Preset Editor Preview
-**Completed Phases**: 1 (Foundation), 2 (List Page), 3 (Editor Configuration)
+**Last Updated**: 2026-01-29
+**Current Phase**: Phase 5 - AI Preset Test Generation
+**Completed Phases**: 1 (Foundation), 2 (List Page), 3 (Editor Configuration), 4 (Editor Preview)
 
 ---
 
@@ -24,7 +24,7 @@ This document outlines the phased implementation plan for AI Presets. The featur
   - Variable definitions with value mappings
   - Model and aspect ratio settings
   - Auto-save with save status tracking
-- 🔄 **Phase 4**: Editor Preview (In Progress)
+- ✅ **Phase 4**: Editor Preview (Complete - 2026-01-29)
   - Test inputs form
   - Live prompt resolution
   - Media preview grid
@@ -249,7 +249,9 @@ Build the left side of the AI Preset editor for configuring media, variables, an
 
 ---
 
-## Phase 4: AI Preset Editor - Preview
+## Phase 4: AI Preset Editor - Preview ✅
+
+**Status**: Complete (2026-01-29)
 
 ### Objective
 
@@ -259,23 +261,23 @@ Build the right side of the AI Preset editor for live preview and test inputs.
 
 #### 4.1 Test Inputs Section
 
-- [ ] Dynamic form based on preset variables
-- [ ] For image variables (`@{input:name}`): Upload zone or drag-and-drop
-- [ ] For text variables with valueMap: Dropdown selector
-- [ ] For text variables without valueMap: Free text input
-- [ ] Pre-fill with default values
-- [ ] Clear "Reset to Defaults" action
+- [x] Dynamic form based on preset variables
+- [x] For image variables (`@{input:name}`): Upload zone or drag-and-drop
+- [x] For text variables with valueMap: Dropdown selector
+- [x] For text variables without valueMap: Free text input
+- [x] Pre-fill with default values
+- [x] Clear "Reset to Defaults" action
 
 #### 4.2 Prompt Preview
 
-- [ ] Live-updating resolved prompt display
-- [ ] Updates as user changes test inputs or edits prompt template
-- [ ] Shows fully substituted text with references resolved:
+- [x] Live-updating resolved prompt display
+- [x] Updates as user changes test inputs or edits prompt template
+- [x] Shows fully substituted text with references resolved:
   - `@{text:name}` → replaced with text input value or valueMap result
   - `@{input:name}` → indicator showing image will be included
   - `@{ref:name}` → indicator showing media from registry will be included
-- [ ] Visual distinction for resolved vs unresolved references
-- [ ] Character count for resolved prompt
+- [x] Visual distinction for resolved vs unresolved references
+- [x] Character count for resolved prompt
 
 **Implementation Note**: Resolution logic must handle:
 - Text variable substitution (including valueMap lookups)
@@ -284,30 +286,30 @@ Build the right side of the AI Preset editor for live preview and test inputs.
 
 #### 4.3 Media Preview
 
-- [ ] Thumbnail grid showing all images that will be sent to AI:
+- [x] Thumbnail grid showing all images that will be sent to AI:
   - Images from `@{ref:name}` references (media registry)
   - Images from `@{input:name}` references (test input uploads)
-- [ ] Shows "X of Y images" indicator (e.g., "3 of 5 media items used")
-- [ ] Visual indication of unused media in registry (grayed out)
-- [ ] Hover to show reference name and source (registry vs input)
+- [x] Shows "X of Y images" indicator (e.g., "3 of 5 media items used")
+- [x] Visual indication of unused media in registry (grayed out)
+- [x] Hover to show reference name and source (registry vs input)
 
 #### 4.4 Validation Display
 
-- [ ] Show validation status indicator (valid/invalid/incomplete)
-- [ ] Highlight missing required variable inputs
-- [ ] Show warnings for:
+- [x] Show validation status indicator (valid/invalid/incomplete)
+- [x] Highlight missing required variable inputs
+- [x] Show warnings for:
   - Undefined variables referenced in prompt
   - Undefined media referenced in prompt
   - Text variables with unmapped values (using default)
-- [ ] Disable test generation button if validation fails
+- [x] Disable test generation button if validation fails
 
 #### 4.5 Test Generation UI (Placeholder)
 
-- [ ] "Run Test Generation" button (UI only, non-functional)
-- [ ] Button disabled state when validation fails
-- [ ] Tooltip explaining why button is disabled (if applicable)
-- [ ] Placeholder for loading state (spinner/progress)
-- [ ] Placeholder for result display area
+- [x] "Run Test Generation" button (UI only, non-functional)
+- [x] Button disabled state when validation fails
+- [x] Tooltip explaining why button is disabled (if applicable)
+- [x] Placeholder for loading state (spinner/progress)
+- [x] Placeholder for result display area
 
 **Note**: Button is UI-only placeholder. Actual generation functionality implemented in Phase 5.
 
@@ -448,7 +450,7 @@ Update Transform Pipeline to use AI Presets.
 | 1     | Foundation           | Schema, Firestore, API        | ✅ Complete |
 | 2     | List Page            | View/manage presets           | ✅ Complete |
 | 3     | Editor - Config      | Build preset configuration    | ✅ Complete |
-| 4     | Editor - Preview     | Live preview                  | 🔄 In Progress |
+| 4     | Editor - Preview     | Live preview                  | ✅ Complete |
 | 5     | Editor - Test        | Real AI generation testing    | ⏳ Pending  |
 | 6     | Pipeline Integration | Connect to Transform Pipeline | ⏳ Pending  |
 
@@ -460,7 +462,7 @@ Update Transform Pipeline to use AI Presets.
 
 - ✅ Create and manage AI Presets (Phases 1-2)
 - ✅ Full configuration editor with Lexical-based prompt editor (Phase 3)
-- 🔄 Live preview with test inputs and validation (Phase 4 - In Progress)
+- ✅ Live preview with test inputs and validation (Phase 4 - Complete)
 
 **Full Feature includes Phase 5:**
 
@@ -478,23 +480,23 @@ Update Transform Pipeline to use AI Presets.
 - ✅ **Implemented**: Zustand for editor state (`useAIPresetEditorStore`)
 - ✅ **Implemented**: Shared editor-status module for save status tracking
 - ✅ **Implemented**: Draft/published pattern (edits saved to `draft` field)
-- 🔄 **Phase 4**: Local state for test inputs (not persisted)
+- ✅ **Implemented**: Local state for test inputs (not persisted)
 
 ### Performance
 
 - ✅ **Implemented**: Debounce auto-save updates (2000ms)
 - ✅ **Implemented**: Lazy load media thumbnails
 - ✅ **Implemented**: Paginated preset list (Phase 2)
-- 🔄 **Phase 4**: Debounce prompt resolution (300ms)
-- 🔄 **Phase 4**: Memo components for preview panel
+- ✅ **Implemented**: Debounce prompt resolution (300ms)
+- ✅ **Implemented**: Memo components for preview panel
 
 ### Validation
 
 - ✅ **Implemented**: Client-side Zod validation for immediate feedback
 - ✅ **Implemented**: Variable name regex validation (`^[a-zA-Z_][a-zA-Z0-9_]*$`)
 - ✅ **Implemented**: Lexical-based MentionValidationPlugin for reference validation
-- 🔄 **Phase 4**: Real-time validation of required inputs
-- 🔄 **Phase 4**: Warning display for undefined references
+- ✅ **Implemented**: Real-time validation of required inputs
+- ✅ **Implemented**: Warning display for undefined references
 
 ### Rich Text Editor (Lexical)
 
@@ -523,10 +525,12 @@ Update Transform Pipeline to use AI Presets.
 - ✅ Integration tests for CRUD operations (React Query hooks)
 - ⏳ E2E tests for editor flow (deferred)
 
-**Phase 4-5 (Upcoming)**:
-- 🔄 Unit tests for prompt resolution logic
-- 🔄 Unit tests for reference parsing and validation
-- 🔄 Component tests for preview panel
+**Phase 4 (Complete)**:
+- ✅ Unit tests for prompt resolution logic
+- ✅ Unit tests for reference parsing and validation
+- ✅ Component tests for preview panel
+
+**Phase 5 (Upcoming)**:
 - ⏳ E2E tests for test generation flow
 
 ---
