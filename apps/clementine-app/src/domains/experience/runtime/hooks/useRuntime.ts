@@ -13,7 +13,7 @@
 import { useCallback } from 'react'
 
 import { useExperienceRuntimeStore } from '../stores/experienceRuntimeStore'
-import type { MediaReference } from '@/shared/theming'
+import type { MediaReference } from '@clementine/shared'
 import type { Answer } from '@/domains/session'
 import type {
   CapturedMediaRef,

@@ -43,9 +43,9 @@ export async function getImageDimensions(
 /**
  * Generate unique file name with nanoid
  * @param originalFile - Original file to generate name for
- * @returns Unique file name in format: overlay-{nanoid}.{ext}
+ * @returns Unique file name in format: {nanoid}.{ext}
  */
 export function generateFileName(originalFile: File): string {
   const ext = originalFile.name.split('.').pop() || 'png'
-  return `overlay-${nanoid()}.${ext}`
+  return `${nanoid()}.${ext}`
 }

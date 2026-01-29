@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { mediaReferenceSchema } from '@clementine/shared'
 import {
   BUTTON_RADIUS_OPTIONS,
   COLOR_REGEX,
@@ -7,7 +8,6 @@ import {
   themeSchema,
   themeTextSchema,
 } from './theme.schemas'
-import { mediaReferenceSchema } from './media-reference.schema'
 
 describe('COLOR_REGEX', () => {
   it('should match valid hex colors', () => {
@@ -222,6 +222,7 @@ describe('themeBackgroundSchema', () => {
       mediaAssetId: 'abc123',
       url: 'https://example.com/bg.jpg',
       filePath: null,
+      displayName: 'Untitled',
     })
   })
 

@@ -29,6 +29,7 @@ describe('ThemeContext', () => {
             mediaAssetId: 'abc123',
             url: 'https://example.com/bg.jpg',
             filePath: null,
+            displayName: 'Test Media',
           },
           overlayOpacity: 0.5,
         },

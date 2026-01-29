@@ -116,6 +116,7 @@ describe('useTestInputs', () => {
       mediaAssetId: 'test-asset-id',
       url: 'https://example.com/test.jpg',
       filePath: 'uploads/test.jpg',
+      displayName: 'Test Media',
     }
 
     act(() => {

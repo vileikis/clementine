@@ -13,6 +13,7 @@ export const mediaReferenceSchema = z.looseObject({
   mediaAssetId: z.string(),
   url: z.url(),
   filePath: z.string().nullable().default(null),
+  displayName: z.string().default('Untitled'),
 })
 
 export type MediaReference = z.infer<typeof mediaReferenceSchema>
