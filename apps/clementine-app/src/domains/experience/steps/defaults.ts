@@ -58,7 +58,7 @@ export function createDefaultInputMultiSelectConfig(): ExperienceInputMultiSelec
   return {
     title: '',
     required: false,
-    options: ['Option 1', 'Option 2'],
+    options: [{ value: 'Option 1' }, { value: 'Option 2' }],
     multiSelect: false,
   }
 }

@@ -24,13 +24,15 @@ export function InputMultiSelectConfigPanel({
 
   const handleOptionChange = (index: number, value: string) => {
     const newOptions = [...options]
-    newOptions[index] = value
+    newOptions[index] = { ...newOptions[index], value }
     onConfigChange({ options: newOptions })
   }
 
   const handleAddOption = () => {
     if (options.length < 10) {
-      onConfigChange({ options: [...options, `Option ${options.length + 1}`] })
+      onConfigChange({
+        options: [...options, { value: `Option ${options.length + 1}` }],
+      })
     }
   }
 
@@ -70,7 +72,7 @@ export function InputMultiSelectConfigPanel({
             {options.map((option, index) => (
               <div key={index} className="flex items-center gap-2">
                 <Input
-                  value={option}
+                  value={option.value}
                   onChange={(e) => handleOptionChange(index, e.target.value)}
                   placeholder={`Option ${index + 1}`}
                   maxLength={100}

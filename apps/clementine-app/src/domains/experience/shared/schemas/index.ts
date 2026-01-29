@@ -49,7 +49,6 @@ export {
   type ExperienceMedia,
   type TransformConfig,
   type TransformNode,
-  type VariableMapping,
   type OutputFormat,
   // Step types
   type ExperienceStep,

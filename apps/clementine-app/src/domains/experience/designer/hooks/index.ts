@@ -33,3 +33,6 @@ export type {
 
 // Cover image upload
 export { useUploadExperienceCover } from './useUploadExperienceCover'
+
+// Step name validation
+export { useValidateStepName } from './useValidateStepName'

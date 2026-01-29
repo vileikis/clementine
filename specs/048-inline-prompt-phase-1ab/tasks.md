@@ -75,17 +75,17 @@
 
 #### Validation Hook
 
-- [ ] T015 [US1] Create `useValidateStepName` hook in `apps/clementine-app/src/domains/experience/designer/hooks/useValidateStepName.ts` (Zod validation + O(n) uniqueness check, returns `{ valid: boolean; error?: string }`)
+- [X] T015 [US1] Create `useValidateStepName` hook in `apps/clementine-app/src/domains/experience/designer/hooks/useValidateStepName.ts` (Zod validation + O(n) uniqueness check, returns `{ valid: boolean; error?: string }`)
 
 #### Step Name Editor Components
 
 - [ ] T016 [P] [US1] Create `StepNameEditor` component in `apps/clementine-app/src/domains/experience/designer/components/StepNameEditor.tsx` (inline text input with validation, debounced auto-save, uses useValidateStepName hook)
-- [ ] T017 [P] [US1] Create `RenameStepDialog` component in `apps/clementine-app/src/domains/experience/designer/components/RenameStepDialog.tsx` (modal dialog with input field, validation, cursor positioned at end, Enter to save, Escape to cancel)
+- [X] T017 [P] [US1] Create `RenameStepDialog` component in `apps/clementine-app/src/domains/experience/designer/components/RenameStepDialog.tsx` (modal dialog with input field, validation, cursor positioned at end, Enter to save, Escape to cancel)
 
 #### Update StepList
 
-- [ ] T018 [US1] Update `StepList.tsx` in `apps/clementine-app/src/domains/experience/designer/components/StepList.tsx` to display `step.name || step.config.title || 'Untitled Step'` with step type badge
-- [ ] T019 [US1] Update `StepList.tsx` context menu to add "Rename..." option before "Delete" option (opens RenameStepDialog)
+- [X] T018 [US1] Update `StepList.tsx` in `apps/clementine-app/src/domains/experience/designer/components/StepList.tsx` to display `step.name || step.config.title || 'Untitled Step'` with step type badge
+- [X] T019 [US1] Update `StepList.tsx` context menu to add "Rename..." option before "Delete" option (opens RenameStepDialog)
 
 #### Add to Config Panels
 

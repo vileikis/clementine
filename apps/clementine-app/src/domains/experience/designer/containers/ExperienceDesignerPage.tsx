@@ -124,6 +124,22 @@ export function ExperienceDesignerPage({
     [steps, selectedStep?.id, selectStep, clearSelection, updateSteps],
   )
 
+  // Handle renaming a step (immediate save)
+  const handleRenameStep = useCallback(
+    (stepId: string, newName: string) => {
+      const newSteps = steps.map((step) =>
+        step.id === stepId ? { ...step, name: newName } : step,
+      )
+
+      // Update local state
+      setSteps(newSteps)
+
+      // Save immediately
+      updateSteps.mutate({ steps: newSteps })
+    },
+    [steps, updateSteps],
+  )
+
   // Mobile step selection handler - opens config sheet
   const handleMobileSelectStep = useCallback(
     (stepId: string) => {
@@ -165,6 +181,7 @@ export function ExperienceDesignerPage({
             selectedStepId={selectedStep?.id ?? null}
             onSelectStep={selectStep}
             onReorderSteps={handleReorderSteps}
+            onRenameStep={handleRenameStep}
             onDeleteStep={handleDeleteStep}
             onAddStep={() => setShowAddDialog(true)}
           />
@@ -199,6 +216,7 @@ export function ExperienceDesignerPage({
               selectedStepId={selectedStep?.id ?? null}
               onSelectStep={handleMobileSelectStep}
               onReorderSteps={handleReorderSteps}
+              onRenameStep={handleRenameStep}
               onDeleteStep={handleDeleteStep}
               onAddStep={() => {
                 setShowStepListSheet(false)

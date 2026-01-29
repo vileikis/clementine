@@ -6,7 +6,7 @@
  */
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { MoreVertical, Trash2 } from 'lucide-react'
+import { MoreVertical, Pencil, Trash2 } from 'lucide-react'
 
 import {
   getCategoryColorClasses,
@@ -29,6 +29,8 @@ interface StepListItemProps {
   isSelected: boolean
   /** Callback when step is clicked */
   onClick: () => void
+  /** Callback when rename is triggered */
+  onRename?: (stepId: string) => void
   /** Callback when delete is triggered */
   onDelete: () => void
   /** Optional disabled state */
@@ -57,6 +59,7 @@ export function StepListItem({
   step,
   isSelected,
   onClick,
+  onRename,
   onDelete,
   disabled,
 }: StepListItemProps) {
@@ -145,6 +148,17 @@ export function StepListItem({
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
+          {onRename && (
+            <DropdownMenuItem
+              onClick={(e) => {
+                e.stopPropagation()
+                onRename(step.id)
+              }}
+            >
+              <Pencil className="mr-2 h-4 w-4" />
+              Rename...
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem
             onClick={(e) => {
               e.stopPropagation()

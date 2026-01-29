@@ -71,10 +71,9 @@ export function InputMultiSelectRenderer({
           {options.map((option, index) => (
             <ThemedSelectOption
               key={index}
-              label={option}
-              selected={selectedValues.includes(option)}
-              onClick={() => handleToggle(option)}
-              disabled={mode === 'edit'}
+              label={option.value}
+              selected={selectedValues.includes(option.value)}
+              onClick={() => handleToggle(option.value)}
             />
           ))}
         </div>

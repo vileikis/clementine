@@ -3,9 +3,9 @@
  *
  * Left sidebar showing the list of steps in the experience.
  * Includes "Add Step" button, step items with selection handling,
- * drag-and-drop reordering, and keyboard navigation support.
+ * drag-and-drop reordering, keyboard navigation support, and rename dialog.
  */
-import { useCallback, useRef } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import {
   DndContext,
   KeyboardSensor,
@@ -21,6 +21,7 @@ import {
 } from '@dnd-kit/sortable'
 import { Plus } from 'lucide-react'
 
+import { RenameStepDialog } from './RenameStepDialog'
 import { StepListItem } from './StepListItem'
 import type { DragEndEvent } from '@dnd-kit/core'
 import type { Step } from '../../steps/registry/step-registry'
@@ -36,6 +37,8 @@ interface StepListProps {
   onSelectStep: (stepId: string) => void
   /** Callback when steps are reordered */
   onReorderSteps: (steps: Step[]) => void
+  /** Callback when a step is renamed */
+  onRenameStep: (stepId: string, newName: string) => void
   /** Callback when a step is deleted */
   onDeleteStep: (stepId: string) => void
   /** Callback when "Add Step" is clicked */
@@ -73,11 +76,16 @@ export function StepList({
   selectedStepId,
   onSelectStep,
   onReorderSteps,
+  onRenameStep,
   onDeleteStep,
   onAddStep,
   disabled,
 }: StepListProps) {
   const listRef = useRef<HTMLDivElement>(null)
+
+  // Rename dialog state
+  const [renameDialogOpen, setRenameDialogOpen] = useState(false)
+  const [renamingStepId, setRenamingStepId] = useState<string | null>(null)
   // Configure sensors for drag and drop
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -89,6 +97,12 @@ export function StepList({
       coordinateGetter: sortableKeyboardCoordinates,
     }),
   )
+
+  // Handle opening rename dialog
+  const handleOpenRenameDialog = useCallback((stepId: string) => {
+    setRenamingStepId(stepId)
+    setRenameDialogOpen(true)
+  }, [])
 
   // Handle drag end to reorder steps
   const handleDragEnd = (event: DragEndEvent) => {
@@ -205,6 +219,7 @@ export function StepList({
                     step={step}
                     isSelected={selectedStepId === step.id}
                     onClick={() => onSelectStep(step.id)}
+                    onRename={handleOpenRenameDialog}
                     onDelete={() => onDeleteStep(step.id)}
                     disabled={disabled}
                   />
@@ -214,6 +229,17 @@ export function StepList({
           )}
         </div>
       </ScrollArea>
+
+      {/* Rename dialog */}
+      {renamingStepId && (
+        <RenameStepDialog
+          step={steps.find((s) => s.id === renamingStepId)!}
+          allSteps={steps}
+          open={renameDialogOpen}
+          onOpenChange={setRenameDialogOpen}
+          onRename={onRenameStep}
+        />
+      )}
     </div>
   )
 }
