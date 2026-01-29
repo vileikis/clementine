@@ -11,29 +11,41 @@ import { describe, expect, it } from 'vitest'
 import { experienceStepNameSchema } from './step.schema'
 
 describe('experienceStepNameSchema', () => {
-  describe('required validation', () => {
-    it('should reject empty string', () => {
+  describe('required validation with fallback', () => {
+    it('should fallback to default for empty string', () => {
       const result = experienceStepNameSchema.safeParse('')
-      expect(result.success).toBe(false)
+      expect(result.success).toBe(true)
+      if (result.success) {
+        expect(result.data).toBe('Untitled Step')
+      }
     })
 
-    it('should reject whitespace-only string', () => {
+    it('should fallback to default for whitespace-only string', () => {
       const result = experienceStepNameSchema.safeParse('   ')
-      expect(result.success).toBe(false)
+      expect(result.success).toBe(true)
+      if (result.success) {
+        expect(result.data).toBe('Untitled Step')
+      }
     })
 
-    it('should reject undefined', () => {
+    it('should fallback to default for undefined', () => {
       const result = experienceStepNameSchema.safeParse(undefined)
-      expect(result.success).toBe(false)
+      expect(result.success).toBe(true)
+      if (result.success) {
+        expect(result.data).toBe('Untitled Step')
+      }
     })
 
-    it('should reject null', () => {
+    it('should fallback to default for null', () => {
       const result = experienceStepNameSchema.safeParse(null)
-      expect(result.success).toBe(false)
+      expect(result.success).toBe(true)
+      if (result.success) {
+        expect(result.data).toBe('Untitled Step')
+      }
     })
   })
 
-  describe('regex validation', () => {
+  describe('regex validation with fallback', () => {
     it('should accept valid names with letters, numbers, spaces, hyphens, underscores', () => {
       const validNames = [
         'Pet Choice',
@@ -49,10 +61,13 @@ describe('experienceStepNameSchema', () => {
       validNames.forEach(name => {
         const result = experienceStepNameSchema.safeParse(name)
         expect(result.success).toBe(true)
+        if (result.success) {
+          expect(result.data).toBe(name)
+        }
       })
     })
 
-    it('should reject special characters', () => {
+    it('should fallback to default for special characters', () => {
       const invalidNames = [
         'Pet Choice!',
         'User@Photo',
@@ -87,32 +102,47 @@ describe('experienceStepNameSchema', () => {
 
       invalidNames.forEach(name => {
         const result = experienceStepNameSchema.safeParse(name)
-        expect(result.success).toBe(false)
+        expect(result.success).toBe(true)
+        if (result.success) {
+          expect(result.data).toBe('Untitled Step')
+        }
       })
     })
 
-    it('should reject emoji', () => {
+    it('should fallback to default for emoji', () => {
       const result = experienceStepNameSchema.safeParse('Pet Choice 🐶')
-      expect(result.success).toBe(false)
+      expect(result.success).toBe(true)
+      if (result.success) {
+        expect(result.data).toBe('Untitled Step')
+      }
     })
 
-    it('should reject unicode characters', () => {
+    it('should fallback to default for unicode characters', () => {
       const result = experienceStepNameSchema.safeParse('Señor Option')
-      expect(result.success).toBe(false)
+      expect(result.success).toBe(true)
+      if (result.success) {
+        expect(result.data).toBe('Untitled Step')
+      }
     })
   })
 
-  describe('max length validation', () => {
+  describe('max length validation with fallback', () => {
     it('should accept names up to 50 characters', () => {
       const name50 = 'A'.repeat(50)
       const result = experienceStepNameSchema.safeParse(name50)
       expect(result.success).toBe(true)
+      if (result.success) {
+        expect(result.data).toBe(name50)
+      }
     })
 
-    it('should reject names longer than 50 characters', () => {
+    it('should fallback to default for names longer than 50 characters', () => {
       const name51 = 'A'.repeat(51)
       const result = experienceStepNameSchema.safeParse(name51)
-      expect(result.success).toBe(false)
+      expect(result.success).toBe(true)
+      if (result.success) {
+        expect(result.data).toBe('Untitled Step')
+      }
     })
   })
 

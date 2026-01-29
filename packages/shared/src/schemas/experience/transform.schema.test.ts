@@ -85,8 +85,12 @@ describe('aiImageNodeConfigSchema', () => {
       expect(result.success).toBe(false)
     })
 
-    it('should accept valid model names', () => {
-      const models = ['gemini-2.5-pro', 'gemini-2.5-flash', 'gemini-3.0']
+    it('should accept valid model names from enum', () => {
+      const models: Array<'gemini-2.5-pro' | 'gemini-2.5-flash' | 'gemini-3.0'> = [
+        'gemini-2.5-pro',
+        'gemini-2.5-flash',
+        'gemini-3.0',
+      ]
       models.forEach(model => {
         const result = aiImageNodeConfigSchema.safeParse({
           ...validConfig,

@@ -23,6 +23,9 @@ import { experienceTransformPipelineStepConfigSchema } from './steps/transform-p
  * Human-readable name for identification and AI prompt references
  * Required field with strict validation for AI-safe identifiers
  * Trims whitespace before validation so whitespace-only names are rejected
+ *
+ * Backward compatibility: If name is missing or invalid, falls back to 'Untitled Step'
+ * (Frontend will auto-generate better names based on step type during creation)
  */
 export const experienceStepNameSchema = z
   .string()
@@ -33,6 +36,7 @@ export const experienceStepNameSchema = z
     /^[a-zA-Z0-9 \-_]+$/,
     'Step name can only contain letters, numbers, spaces, hyphens, and underscores'
   )
+  .catch('Untitled Step')
 
 /**
  * Experience step type enumeration schema
