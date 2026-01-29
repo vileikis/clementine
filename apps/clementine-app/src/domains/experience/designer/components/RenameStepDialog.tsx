@@ -4,7 +4,7 @@
  * Modal dialog for renaming a step with validation.
  * Opened from StepList context menu.
  */
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 import { useValidateStepName } from '../hooks/useValidateStepName'
 import type { Step } from '../../steps/registry/step-registry'

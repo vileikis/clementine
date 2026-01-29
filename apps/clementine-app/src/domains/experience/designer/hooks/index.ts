@@ -34,5 +34,8 @@ export type {
 // Cover image upload
 export { useUploadExperienceCover } from './useUploadExperienceCover'
 
+// Prompt media upload
+export { useUploadPromptMedia } from './useUploadPromptMedia'
+
 // Step name validation
 export { useValidateStepName } from './useValidateStepName'

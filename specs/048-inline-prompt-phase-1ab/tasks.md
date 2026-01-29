@@ -111,17 +111,17 @@
 
 #### Prompt Fragment Input Component
 
-- [ ] T024 [US2] Create `PromptFragmentInput` component in `apps/clementine-app/src/domains/experience/steps/multiselect/components/PromptFragmentInput.tsx` (textarea with max 500 chars, character counter, debounced onChange callback, help text)
+- [X] T024 [US2] Create `PromptFragmentInput` component in `apps/clementine-app/src/domains/experience/steps/config-panels/components/PromptFragmentInput.tsx` (textarea with max 500 chars, character counter, debounced onChange callback, help text)
 
 #### Prompt Media Picker Component
 
-- [ ] T025 [US2] Create `PromptMediaPicker` component in `apps/clementine-app/src/domains/experience/steps/multiselect/components/PromptMediaPicker.tsx` (upload button or media library picker, thumbnail display with remove button, uses Firebase Storage upload)
-- [ ] T026 [US2] Create `useUploadPromptMedia` hook in `apps/clementine-app/src/domains/experience/designer/hooks/useUploadPromptMedia.ts` (adapt existing useUploadExperienceCover pattern, upload to `prompt-media/{workspaceId}/{mediaAssetId}`, return MediaReference)
+- [X] T025 [US2] Create `PromptMediaPicker` component in `apps/clementine-app/src/domains/experience/steps/config-panels/components/PromptMediaPicker.tsx` (upload button or media library picker, thumbnail display with remove button, uses Firebase Storage upload)
+- [X] T026 [US2] Create `useUploadPromptMedia` hook in `apps/clementine-app/src/domains/experience/designer/hooks/useUploadPromptMedia.ts` (adapt existing useUploadExperienceCover pattern, upload to `prompt-media/{workspaceId}/{mediaAssetId}`, return MediaReference)
 
 #### Update Option Editor
 
-- [ ] T027 [US2] Update `MultiSelectOptionEditor` component (find exact location) to add PromptFragmentInput and PromptMediaPicker fields after option value input (follow callback pattern from Decision 6 in plan.md)
-- [ ] T028 [US2] Update `InputMultiSelectConfigPanel` to implement `handleOptionChange(index, updates)` callback that flows to `onConfigChange({ options: [...] })` (see quickstart.md Step 8)
+- [X] T027 [US2] Update `InputMultiSelectConfigPanel` component to add PromptFragmentInput and PromptMediaPicker fields with collapsible sections for each option (follows callback pattern from Decision 6 in plan.md)
+- [X] T028 [US2] Update `InputMultiSelectConfigPanel` to implement `handleOptionChange(index, updates)` callback that flows to `onConfigChange({ options: [...] })` (see quickstart.md Step 8)
 
 #### AI-Enabled Badge (OPTIONAL - LOWEST PRIORITY)
 
