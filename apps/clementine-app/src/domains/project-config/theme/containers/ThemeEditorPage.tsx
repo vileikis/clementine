@@ -105,7 +105,7 @@ export function ThemeEditorPage() {
       setUploadProgress(0)
 
       try {
-        const { mediaAssetId, url, filePath } =
+        const { mediaAssetId, url, filePath, displayName } =
           await uploadBackground.mutateAsync({
             file,
             onProgress: (progress: number) => setUploadProgress(progress),
@@ -114,7 +114,7 @@ export function ThemeEditorPage() {
         // Update form with full MediaReference object and trigger save
         form.setValue(
           'background.image',
-          { mediaAssetId, url, filePath },
+          { mediaAssetId, url, filePath, displayName },
           { shouldDirty: true },
         )
         triggerSave()

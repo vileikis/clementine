@@ -14,6 +14,7 @@ import { mediaAssetTypeSchema } from './media-asset-type.schema'
 export const mediaAssetSchema = z.looseObject({
   id: z.string(),
   fileName: z.string(),
+  displayName: z.string().default('Untitled'),
   filePath: z.string(),
   url: z.url(),
   fileSize: z.number().int().positive(),

@@ -1,7 +1,7 @@
 /**
  * Hook: useUploadAndUpdateBackground
  *
- * Uploads a background image to Storage and returns the URL.
+ * Uploads a background image to Storage and returns a MediaReference.
  * The caller is responsible for updating form state and triggering save.
  *
  * @param workspaceId - Workspace ID for media storage
@@ -12,17 +12,18 @@
  * ```tsx
  * const uploadBackground = useUploadAndUpdateBackground(workspaceId, userId)
  *
- * const { url } = await uploadBackground.mutateAsync({
+ * const mediaRef = await uploadBackground.mutateAsync({
  *   file,
  *   onProgress: (progress) => console.log(`${progress}%`)
  * })
  *
- * // Caller updates form state
- * form.setValue('background.image', url)
+ * // Caller updates form state with MediaReference
+ * form.setValue('background.image', mediaRef)
  * triggerSave()
  * ```
  */
 import { useMutation } from '@tanstack/react-query'
+import type { MediaReference } from '@clementine/shared'
 import { useTrackedMutation } from '@/domains/project-config/designer'
 import { useUploadMediaAsset } from '@/domains/media-library'
 
@@ -33,19 +34,10 @@ interface UploadBackgroundParams {
   onProgress?: (progress: number) => void
 }
 
-interface UploadBackgroundResult {
-  /** Media asset ID */
-  mediaAssetId: string
-  /** Media asset URL */
-  url: string
-  /** Storage path for server-side access */
-  filePath: string
-}
-
 /**
  * Upload background image to Storage.
  *
- * Returns the URL for the caller to update form state.
+ * Returns a MediaReference for the caller to update form state.
  * Auto-save handles persisting the theme update to Firestore.
  */
 export function useUploadAndUpdateBackground(
@@ -54,20 +46,14 @@ export function useUploadAndUpdateBackground(
 ) {
   const uploadAsset = useUploadMediaAsset(workspaceId, userId)
 
-  const mutation = useMutation<
-    UploadBackgroundResult,
-    Error,
-    UploadBackgroundParams
-  >({
+  const mutation = useMutation<MediaReference, Error, UploadBackgroundParams>({
     mutationFn: async ({ file, onProgress }) => {
       // Upload to Storage + create MediaAsset document
-      const { mediaAssetId, url, filePath } = await uploadAsset.mutateAsync({
+      return await uploadAsset.mutateAsync({
         file,
         type: 'other', // Use 'other' for background images
         onProgress,
       })
-
-      return { mediaAssetId, url, filePath }
     },
   })
 

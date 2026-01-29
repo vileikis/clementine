@@ -119,6 +119,7 @@ function AIPresetPreviewPanelContent({
           mediaAssetId: result.mediaAssetId,
           url: result.url,
           filePath: result.filePath,
+          displayName: result.displayName,
         }
         updateInput(variableName, mediaRef)
       } catch (uploadError) {

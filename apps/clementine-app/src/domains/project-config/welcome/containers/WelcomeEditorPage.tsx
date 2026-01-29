@@ -148,7 +148,7 @@ export function WelcomeEditorPage() {
       setUploadProgress(0)
 
       try {
-        const { mediaAssetId, url, filePath } =
+        const { mediaAssetId, url, filePath, displayName } =
           await uploadHeroMedia.mutateAsync({
             file,
             onProgress: (progress) => setUploadProgress(progress),
@@ -157,7 +157,7 @@ export function WelcomeEditorPage() {
         // Update form with full MediaReference object and trigger save
         form.setValue(
           'media',
-          { mediaAssetId, url, filePath },
+          { mediaAssetId, url, filePath, displayName },
           { shouldDirty: true },
         )
         triggerSave()

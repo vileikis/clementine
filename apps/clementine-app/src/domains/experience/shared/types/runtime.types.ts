@@ -6,7 +6,7 @@
  *
  * This is an interface definition only for Phase 0 - implementation comes in Phase 3.
  */
-import type { MediaReference } from '@/shared/theming'
+import type { MediaReference } from '@clementine/shared'
 import type { Answer, SessionMode, SessionResultMedia } from '@/domains/session'
 import type { ExperienceStep } from '../schemas'
 

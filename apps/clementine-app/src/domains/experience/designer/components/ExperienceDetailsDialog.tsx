@@ -72,6 +72,7 @@ export function ExperienceDetailsDialog({
         mediaAssetId: result.mediaAssetId,
         url: result.url,
         filePath: result.filePath,
+        displayName: result.displayName,
       })
     }
   }

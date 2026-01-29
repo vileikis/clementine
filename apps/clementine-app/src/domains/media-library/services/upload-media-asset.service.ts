@@ -23,6 +23,7 @@ import type {
   ImageMimeType,
   MediaAsset,
   MediaAssetType,
+  MediaReference,
 } from '@clementine/shared'
 
 import { firestore, storage } from '@/integrations/firebase/client'
@@ -44,25 +45,13 @@ export interface UploadMediaAssetParams {
 }
 
 /**
- * Result of uploading a media asset
- */
-export interface UploadMediaAssetResult {
-  /** Media asset document ID */
-  mediaAssetId: string
-  /** Firebase Storage download URL */
-  url: string
-  /** Storage path for server-side access */
-  filePath: string
-}
-
-/**
  * Upload a media asset to Firebase Storage
  *
  * This is a pure function that can be used directly without React context.
  * For use in React components, prefer the useUploadMediaAsset hook.
  *
  * @param params - Upload parameters
- * @returns Upload result with asset ID, URL, and filePath
+ * @returns MediaReference with asset ID, URL, filePath, and displayName
  * @throws Error if file validation fails or upload fails
  *
  * @example
@@ -75,7 +64,8 @@ export interface UploadMediaAssetResult {
  *   onProgress: (progress) => console.log(`${progress}%`),
  * })
  *
- * console.log(result.filePath) // 'workspaces/ws-123/media/overlay-xyz.png'
+ * console.log(result.filePath) // 'workspaces/ws-123/media/xyz.png'
+ * console.log(result.displayName) // 'My Photo.jpg'
  * ```
  */
 export async function uploadMediaAsset({
@@ -84,7 +74,7 @@ export async function uploadMediaAsset({
   workspaceId,
   userId,
   onProgress,
-}: UploadMediaAssetParams): Promise<UploadMediaAssetResult> {
+}: UploadMediaAssetParams): Promise<MediaReference> {
   // 1. Validate file
   validateFile(file)
 
@@ -94,6 +84,7 @@ export async function uploadMediaAsset({
   // 3. Generate unique file name and storage path
   const fileName = generateFileName(file)
   const filePath = `workspaces/${workspaceId}/media/${fileName}`
+  const displayName = file.name
 
   // 4. Upload to Firebase Storage with progress tracking
   const storageRef = ref(storage, filePath)
@@ -130,6 +121,7 @@ export async function uploadMediaAsset({
 
   const docRef = await addDoc(mediaAssetsRef, {
     fileName,
+    displayName,
     filePath,
     url: downloadURL,
     fileSize: file.size,
@@ -142,10 +134,11 @@ export async function uploadMediaAsset({
     status: 'active',
   } satisfies Omit<MediaAsset, 'id'>)
 
-  // 7. Return media asset ID, URL, and filePath
+  // 7. Return MediaReference with asset ID, URL, filePath, and displayName
   return {
     mediaAssetId: docRef.id,
     url: downloadURL,
     filePath,
+    displayName,
   }
 }

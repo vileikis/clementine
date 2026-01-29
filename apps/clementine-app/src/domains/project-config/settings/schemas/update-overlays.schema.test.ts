@@ -23,6 +23,7 @@ describe('updateOverlaysConfigSchema', () => {
         mediaAssetId: 'asset-123',
         url: 'https://storage.googleapis.com/square.png',
         filePath: null,
+        displayName: 'Untitled',
       })
     })
 
@@ -40,6 +41,7 @@ describe('updateOverlaysConfigSchema', () => {
         mediaAssetId: 'asset-456',
         url: 'https://storage.googleapis.com/portrait.png',
         filePath: null,
+        displayName: 'Untitled',
       })
     })
 
@@ -61,11 +63,13 @@ describe('updateOverlaysConfigSchema', () => {
         mediaAssetId: 'asset-123',
         url: 'https://storage.googleapis.com/square.png',
         filePath: null,
+        displayName: 'Untitled',
       })
       expect(result['9:16']).toEqual({
         mediaAssetId: 'asset-456',
         url: 'https://storage.googleapis.com/portrait.png',
         filePath: null,
+        displayName: 'Untitled',
       })
     })
 
@@ -195,6 +199,7 @@ describe('updateOverlaysConfigSchema', () => {
           mediaAssetId: 'asset-123',
           url: 'https://storage.googleapis.com/square.png',
           filePath: null,
+          displayName: 'Untitled',
         })
       }
     })
@@ -287,6 +292,7 @@ describe('overlayReferenceSchema', () => {
         mediaAssetId: 'asset-123',
         url: 'https://storage.googleapis.com/image.png',
         filePath: null,
+        displayName: 'Untitled',
       })
     })
 
@@ -302,6 +308,7 @@ describe('overlayReferenceSchema', () => {
         mediaAssetId: 'asset-456',
         url: 'https://firebasestorage.googleapis.com/v0/b/bucket/o/image.png?alt=media&token=abc123',
         filePath: null,
+        displayName: 'Untitled',
       })
     })
 
