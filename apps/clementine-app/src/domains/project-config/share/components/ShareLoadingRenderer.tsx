@@ -11,7 +11,7 @@
 
 import type { ShareLoadingConfig } from '@clementine/shared'
 import { Skeleton } from '@/ui-kit/ui/skeleton'
-import { ThemedBackground, ThemedText } from '@/shared/theming'
+import { ThemedText } from '@/shared/theming'
 
 export interface ShareLoadingRendererProps {
   /** Share loading config to render */
@@ -29,10 +29,7 @@ export function ShareLoadingRenderer({
   mode: _mode = 'edit',
 }: ShareLoadingRendererProps) {
   return (
-    <ThemedBackground
-      className="h-full w-full"
-      contentClassName="flex flex-col items-center justify-center p-8 space-y-6"
-    >
+    <div className="flex flex-col items-center justify-center p-8 space-y-6 h-full w-full">
       {/* Image skeleton */}
       <Skeleton className="w-full aspect-square max-w-md rounded-lg" />
 
@@ -46,6 +43,6 @@ export function ShareLoadingRenderer({
         {shareLoading.description ||
           'This usually takes 30-60 seconds. Please wait while we generate your personalized result.'}
       </ThemedText>
-    </ThemedBackground>
+    </div>
   )
 }

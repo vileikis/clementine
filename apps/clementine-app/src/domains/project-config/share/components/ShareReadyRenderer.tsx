@@ -29,12 +29,7 @@ import type { ShareOptionsConfig, ShareReadyConfig } from '@clementine/shared'
 import type { LucideIcon } from 'lucide-react'
 import type { IconType } from 'react-icons'
 import { Skeleton } from '@/ui-kit/ui/skeleton'
-import {
-  ThemedBackground,
-  ThemedButton,
-  ThemedIconButton,
-  ThemedText,
-} from '@/shared/theming'
+import { ThemedButton, ThemedIconButton, ThemedText } from '@/shared/theming'
 
 export interface ShareReadyRendererProps {
   /** Share ready config to render */
@@ -119,18 +114,14 @@ export function ShareReadyRenderer({
   }
 
   return (
-    <ThemedBackground
-      className="h-full w-full"
-      contentClassName="flex flex-col h-full"
-    >
+    <div className="flex flex-col h-full w-full">
       {/* Scrollable content zone */}
-      <div className="flex-1 overflow-y-auto p-8 flex flex-col items-center space-y-6">
-        {/* Media - using same sizing as loading skeleton */}
+      <div className="flex flex-col overflow-y-auto p-4 items-center space-y-6 my-auto">
         {mediaUrl ? (
           <img
             src={mediaUrl}
             alt="Generated result"
-            className="w-full aspect-square max-w-md rounded-lg object-cover"
+            className="w-full max-w-[450px] rounded-lg"
           />
         ) : mode === 'edit' ? (
           <div className="w-full aspect-square max-w-md rounded-lg bg-muted flex items-center justify-center">
@@ -139,6 +130,27 @@ export function ShareReadyRenderer({
         ) : (
           <Skeleton className="w-full aspect-square max-w-md rounded-lg" />
         )}
+
+        {/* Share icons (displayed when enabled) */}
+        {enabledIcons.length > 0 && (
+          <div className="flex justify-center gap-3 flex-wrap">
+            {enabledIcons.map((platform) => {
+              const { icon: Icon, label } = PLATFORM_ICONS[platform]
+              return (
+                <ThemedIconButton
+                  key={platform}
+                  title={label}
+                  size="lg"
+                  aria-label={label}
+                  onClick={() => handleIconClick(platform)}
+                >
+                  <Icon className="h-5 w-5" />
+                </ThemedIconButton>
+              )
+            })}
+          </div>
+        )}
+        <div className="p-2" />
 
         {/* Title (hidden when null) */}
         {share.title && (
@@ -156,55 +168,32 @@ export function ShareReadyRenderer({
             {share.description}
           </ThemedText>
         )}
-      </div>
-
-      {/* Fixed footer zone */}
-      <div className="shrink-0 border-t border-current/10 p-4 space-y-3">
-        {/* Share icons (displayed when enabled) */}
-        {enabledIcons.length > 0 && (
-          <div className="flex justify-center gap-3 flex-wrap">
-            {enabledIcons.map((platform) => {
-              const { icon: Icon, label } = PLATFORM_ICONS[platform]
-              return (
-                <ThemedIconButton
-                  key={platform}
-                  title={label}
-                  aria-label={label}
-                  onClick={() => handleIconClick(platform)}
-                  disabled={mode === 'edit'}
-                >
-                  <Icon className="h-5 w-5" />
-                </ThemedIconButton>
-              )
-            })}
-          </div>
-        )}
 
         {/* CTA button (primary style, hidden when label is null/empty) */}
-        {share.cta?.label && (
+        <div className="w-full max-w-[450px] space-y-3 pt-4">
+          {share.cta?.label && (
+            <ThemedButton
+              variant="primary"
+              size="md"
+              className="w-full"
+              onClick={handleCtaClick}
+            >
+              {share.cta.label}
+            </ThemedButton>
+          )}
+
+          {/* Start over button (secondary/outline style) */}
           <ThemedButton
-            variant="primary"
+            variant="outline"
             size="md"
             className="w-full"
-            onClick={handleCtaClick}
-            disabled={mode === 'edit'}
+            onClick={handleStartOverClick}
           >
-            {share.cta.label}
+            <RotateCcw className="mr-2 h-4 w-4" />
+            Start over
           </ThemedButton>
-        )}
-
-        {/* Start over button (secondary/outline style) */}
-        <ThemedButton
-          variant="outline"
-          size="md"
-          className="w-full"
-          onClick={handleStartOverClick}
-          disabled={mode === 'edit'}
-        >
-          <RotateCcw className="mr-2 h-4 w-4" />
-          Start over
-        </ThemedButton>
+        </div>
       </div>
-    </ThemedBackground>
+    </div>
   )
 }
