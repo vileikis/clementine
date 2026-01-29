@@ -34,6 +34,7 @@
  */
 import { useMutation } from '@tanstack/react-query'
 import { useUpdateOverlays } from './useUpdateOverlays'
+import type { MediaReference } from '@clementine/shared'
 import { useTrackedMutation } from '@/domains/project-config/designer'
 import { useUploadMediaAsset } from '@/domains/media-library'
 
@@ -46,15 +47,6 @@ interface UploadAndUpdateOverlaysParams {
   aspectRatio: AspectRatio
   /** Optional progress callback (0-100) */
   onProgress?: (progress: number) => void
-}
-
-interface UploadAndUpdateOverlaysResult {
-  /** Media asset ID */
-  mediaAssetId: string
-  /** Media asset URL */
-  url: string
-  /** Storage path for server-side access */
-  filePath: string
 }
 
 /**
@@ -81,24 +73,24 @@ export function useUploadAndUpdateOverlays(
   const updateOverlays = useUpdateOverlays(projectId)
 
   const mutation = useMutation<
-    UploadAndUpdateOverlaysResult,
+    MediaReference,
     Error,
     UploadAndUpdateOverlaysParams
   >({
     mutationFn: async ({ file, aspectRatio, onProgress }) => {
       // Step 1: Upload to Storage + create MediaAsset document
-      const { mediaAssetId, url, filePath } = await uploadAsset.mutateAsync({
+      const mediaRef = await uploadAsset.mutateAsync({
         file,
         type: 'overlay',
         onProgress,
       })
 
-      // Step 2: Update project config with new overlay reference (including filePath)
+      // Step 2: Update project config with new overlay MediaReference
       await updateOverlays.mutateAsync({
-        [aspectRatio]: { mediaAssetId, url, filePath },
+        [aspectRatio]: mediaRef,
       })
 
-      return { mediaAssetId, url, filePath }
+      return mediaRef
     },
   })
 

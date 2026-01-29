@@ -1,7 +1,7 @@
 /**
  * Hook: useUploadAndUpdateHeroMedia
  *
- * Uploads a hero media image to Storage and returns the URL.
+ * Uploads a hero media image to Storage and returns a MediaReference.
  * The caller is responsible for updating form state and triggering save.
  *
  * @param workspaceId - Workspace ID for media storage
@@ -12,17 +12,18 @@
  * ```tsx
  * const uploadHeroMedia = useUploadAndUpdateHeroMedia(workspaceId, userId)
  *
- * const { mediaAssetId, url } = await uploadHeroMedia.mutateAsync({
+ * const mediaRef = await uploadHeroMedia.mutateAsync({
  *   file,
  *   onProgress: (progress) => console.log(`${progress}%`)
  * })
  *
- * // Caller updates form state
- * form.setValue('media', { mediaAssetId, url })
+ * // Caller updates form state with MediaReference
+ * form.setValue('media', mediaRef)
  * triggerSave()
  * ```
  */
 import { useMutation } from '@tanstack/react-query'
+import type { MediaReference } from '@clementine/shared'
 import { useTrackedMutation } from '@/domains/project-config/designer'
 import { useUploadMediaAsset } from '@/domains/media-library'
 
@@ -33,19 +34,10 @@ interface UploadHeroMediaParams {
   onProgress?: (progress: number) => void
 }
 
-interface UploadHeroMediaResult {
-  /** Media asset ID */
-  mediaAssetId: string
-  /** Media asset URL */
-  url: string
-  /** Storage path for server-side access */
-  filePath: string
-}
-
 /**
  * Upload hero media image to Storage.
  *
- * Returns the URL for the caller to update form state.
+ * Returns a MediaReference for the caller to update form state.
  * Auto-save handles persisting the welcome update to Firestore.
  *
  * Accepts undefined params - mutation will throw if called without valid IDs
@@ -56,11 +48,7 @@ export function useUploadAndUpdateHeroMedia(
 ) {
   const uploadAsset = useUploadMediaAsset(workspaceId, userId)
 
-  const mutation = useMutation<
-    UploadHeroMediaResult,
-    Error,
-    UploadHeroMediaParams
-  >({
+  const mutation = useMutation<MediaReference, Error, UploadHeroMediaParams>({
     mutationFn: async ({ file, onProgress }) => {
       // Guard against missing params
       if (!workspaceId || !userId) {
@@ -69,13 +57,11 @@ export function useUploadAndUpdateHeroMedia(
         )
       }
       // Upload to Storage + create MediaAsset document
-      const { mediaAssetId, url, filePath } = await uploadAsset.mutateAsync({
+      return await uploadAsset.mutateAsync({
         file,
         type: 'other', // Use 'other' for hero images
         onProgress,
       })
-
-      return { mediaAssetId, url, filePath }
     },
   })
 

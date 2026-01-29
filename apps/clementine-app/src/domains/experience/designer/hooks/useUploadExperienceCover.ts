@@ -9,14 +9,9 @@
  */
 import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
+import type { MediaReference } from '@clementine/shared'
 
 import { useUploadMediaAsset } from '@/domains/media-library'
-
-interface UploadResult {
-  mediaAssetId: string
-  url: string
-  filePath: string
-}
 
 export function useUploadExperienceCover(
   workspaceId: string | undefined,
@@ -28,7 +23,7 @@ export function useUploadExperienceCover(
   const uploadAsset = useUploadMediaAsset(workspaceId, userId)
 
   const upload = useCallback(
-    async (file: File): Promise<UploadResult | null> => {
+    async (file: File): Promise<MediaReference | null> => {
       if (!workspaceId || !userId) {
         toast.error('Cannot upload: missing context')
         return null
@@ -38,17 +33,11 @@ export function useUploadExperienceCover(
       setUploadProgress(0)
 
       try {
-        const result = await uploadAsset.mutateAsync({
+        return await uploadAsset.mutateAsync({
           file,
           type: 'other',
           onProgress: setUploadProgress,
         })
-
-        return {
-          mediaAssetId: result.mediaAssetId,
-          url: result.url,
-          filePath: result.filePath,
-        }
       } catch (error) {
         toast.error(error instanceof Error ? error.message : 'Upload failed')
         return null
