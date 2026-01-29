@@ -111,9 +111,78 @@
 
 ---
 
+### Phase 1b-2: Transform Pipeline Editor (2-3 days)
+
+**Goal**: Create transform pipeline editor UI foundation
+
+**Tasks**:
+
+- [ ] Add Transform panel to experience designer
+  - Show alongside step list (same layout area)
+  - Empty state message when no nodes
+  - Tab/section switcher between Steps and Transform
+- [ ] Node list/canvas UI
+  - Display AI Image nodes in list/canvas
+  - Node card shows summary (model, aspect ratio, prompt preview)
+  - Empty state with "Add Node" button
+- [ ] Add AI Image node
+  - "Add Node" button
+  - Creates new AI Image node with defaults (model: gemini-2.5-pro, aspectRatio: 3:2)
+  - Auto-generates node ID
+  - Opens node editor panel
+- [ ] Delete node
+  - Delete button on node card (show on hover)
+  - Confirmation dialog
+  - Remove from transform config
+- [ ] Node display card
+  - Shows node type badge ("AI Image Generation")
+  - Shows model name
+  - Shows aspect ratio
+  - Shows prompt preview (first 50 chars)
+  - Click card to edit
+- [ ] Save transform config
+  - Auto-save to experience.draft.transform
+  - Debounced updates (2000ms)
+  - Save status indicator
+- [ ] Node editor panel (placeholder structure)
+  - Opens in sidebar when node is selected
+  - Basic layout with sections for: Model Settings, Prompt, RefMedia, Test Run
+  - Section placeholders only - detailed config added in Phase 1c-1e
+  - Close button
+
+**Components** (new):
+
+- `domains/experience/designer/transform/containers/TransformPipelineEditor.tsx`
+- `domains/experience/designer/transform/components/TransformPanel.tsx`
+- `domains/experience/designer/transform/components/NodeList.tsx`
+- `domains/experience/designer/transform/components/AIImageNodeCard.tsx`
+- `domains/experience/designer/transform/components/AddNodeButton.tsx`
+- `domains/experience/designer/transform/components/DeleteNodeDialog.tsx`
+- `domains/experience/designer/transform/components/NodeEditorPanel.tsx`
+
+**Hooks** (new):
+
+- `domains/experience/designer/transform/hooks/useUpdateTransformConfig.ts`
+- `domains/experience/designer/transform/hooks/useAddNode.ts`
+- `domains/experience/designer/transform/hooks/useDeleteNode.ts`
+- `domains/experience/designer/transform/hooks/useSelectedNode.ts`
+
+**Success Criteria**:
+
+- ✅ Transform panel visible in experience designer
+- ✅ Can add AI Image node
+- ✅ Node card displays summary (model, aspect ratio, prompt preview)
+- ✅ Can delete node with confirmation
+- ✅ Node editor panel opens when node selected
+- ✅ Node editor panel has placeholder sections
+- ✅ Transform config saves to experience draft
+- ✅ Auto-save and save status work
+
+---
+
 ### Phase 1c: RefMedia Management (2-3 days)
 
-**Goal**: Build refMedia section for AI node
+**Goal**: Build refMedia section in AI node editor panel (builds on Phase 1b-2)
 
 **Tasks**:
 
@@ -162,7 +231,7 @@
 
 ### Phase 1d: Lexical Prompt Editor (3-4 days)
 
-**Goal**: Adapt Lexical editor for AI node prompt
+**Goal**: Build Lexical prompt editor in AI node editor panel (builds on Phase 1b-2)
 
 **Tasks**:
 
@@ -226,7 +295,7 @@
 
 ### Phase 1e: AI Node Settings (1-2 days)
 
-**Goal**: Add model and aspect ratio controls
+**Goal**: Add model and aspect ratio controls to AI node editor panel (builds on Phase 1b-2)
 
 **Tasks**:
 
@@ -377,50 +446,7 @@
 
 ---
 
-### Phase 1h: Transform Pipeline Integration (2-3 days)
-
-**Goal**: Integrate AI node into transform pipeline UI
-
-**Tasks**:
-
-- [ ] Update pipeline canvas
-  - Show AI Image nodes
-  - Node card displays:
-    - Model badge
-    - Aspect ratio
-    - Prompt preview (first 50 chars)
-    - Media count
-- [ ] Add AI node button
-  - "Add Node" menu → "AI Image Generation"
-  - Creates new node with defaults
-  - Opens editor
-- [ ] Edit node
-  - Click node card → open editor
-  - Editor in sidebar or dialog
-- [ ] Delete node
-  - Delete button on node card
-  - Confirmation dialog
-- [ ] Node connections (if multi-node)
-  - Visual connections between nodes
-  - Input/output indicators
-
-**Components** (enhanced):
-
-- `domains/experience/designer/transform/containers/TransformPipelineEditor.tsx`
-- `domains/experience/designer/transform/components/AIImageNodeCard.tsx`
-- `domains/experience/designer/transform/components/AddNodeMenu.tsx`
-
-**Success Criteria**:
-
-- ✅ Can add AI Image node
-- ✅ Node card shows summary
-- ✅ Can edit node (opens editor)
-- ✅ Can delete node
-- ✅ Pipeline saves to experience draft
-
----
-
-### Phase 1i: Testing & Documentation (2 days)
+### Phase 1h: Testing & Documentation (2 days)
 
 **Goal**: Ensure quality and document the system
 
@@ -458,6 +484,17 @@
 ---
 
 ### Phase 1 Total: ~21-27 days (4-5 weeks)
+
+**Phase breakdown:**
+- Phase 1a: 2-3 days
+- Phase 1b: 3-4 days
+- Phase 1b-2: 2-3 days (Transform Pipeline Editor)
+- Phase 1c: 2-3 days
+- Phase 1d: 3-4 days
+- Phase 1e: 1-2 days
+- Phase 1f: 3-4 days
+- Phase 1g: 3-4 days
+- Phase 1h: 2 days
 
 Each sub-phase is **1-4 days**, making progress trackable and manageable.
 

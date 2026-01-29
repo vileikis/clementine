@@ -17,7 +17,7 @@ This document breaks down the Transform Pipeline feature into incremental phases
 | Phase | Name | Status | Dependencies |
 |-------|------|--------|--------------|
 | 1 | Foundation & Schema | **Completed** | - |
-| 2 | Backend Pipeline Infrastructure | Not Started | Phase 1 |
+| 2 | Backend Pipeline Infrastructure | **Completed** | Phase 1 |
 | 3 | Creator Config UI (Basic) | Not Started | Phase 1 |
 | 4 | Runtime & Step Integration | Not Started | Phase 2, 3 |
 | 5 | AI Image Node | Not Started | Phase 4 |
@@ -68,7 +68,7 @@ This document breaks down the Transform Pipeline feature into incremental phases
 
 ## Phase 2: Backend Pipeline Infrastructure
 
-**Status**: Not Started
+**Status**: **Completed**
 
 **Goal**: Build execution backbone without actual node processing.
 
