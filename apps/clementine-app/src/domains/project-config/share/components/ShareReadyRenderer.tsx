@@ -122,7 +122,7 @@ export function ShareReadyRenderer({
           <img
             src={mediaUrl}
             alt="Generated result"
-            className="w-full aspect-square max-w-md rounded-lg object-cover"
+            className="w-full aspect-square max-w-md rounded-lg object-contain"
           />
         ) : mode === 'edit' ? (
           <div className="w-full aspect-square max-w-md rounded-lg bg-muted flex items-center justify-center">
