@@ -82,11 +82,13 @@ describe('experienceConfigSchema', () => {
         {
           id: '123e4567-e89b-12d3-a456-426614174000',
           type: 'info',
+          name: 'Info Step',
           config: { title: '', description: '', media: null },
         },
         {
           id: '123e4567-e89b-12d3-a456-426614174001',
           type: 'capture.photo',
+          name: 'Photo Step',
           config: { aspectRatio: '1:1' },
         },
       ],
@@ -181,6 +183,7 @@ describe('experienceSchema', () => {
             {
               id: '123e4567-e89b-12d3-a456-426614174000',
               type: 'info',
+              name: 'Info Step',
               config: { title: '', description: '', media: null },
             },
           ],
@@ -190,6 +193,7 @@ describe('experienceSchema', () => {
             {
               id: '123e4567-e89b-12d3-a456-426614174000',
               type: 'info',
+              name: 'Info Step',
               config: { title: '', description: '', media: null },
             },
           ],

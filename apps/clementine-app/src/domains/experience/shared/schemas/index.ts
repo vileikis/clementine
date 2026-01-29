@@ -16,7 +16,6 @@ export {
   // Transform schemas
   transformConfigSchema,
   transformNodeSchema,
-  variableMappingSchema,
   outputFormatSchema,
   // Step schemas (discriminated union)
   experienceStepSchema,

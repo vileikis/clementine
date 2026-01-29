@@ -26,9 +26,9 @@
 
 **Purpose**: Project initialization and verification
 
-- [ ] T001 Verify branch `048-inline-prompt-phase-1ab` is checked out with latest changes
-- [ ] T002 Install dependencies with `pnpm install` from repository root
-- [ ] T003 [P] Verify baseline with `pnpm app:check && pnpm app:type-check` (no errors expected)
+- [X] T001 Verify branch `048-inline-prompt-phase-1ab` is checked out with latest changes
+- [X] T002 Install dependencies with `pnpm install` from repository root
+- [X] T003 [P] Verify baseline with `pnpm app:check && pnpm app:type-check` (no errors expected)
 
 ---
 
@@ -46,20 +46,20 @@
 
 ### Schema Tests (CRITICAL - Write FIRST, ensure FAIL before implementation)
 
-- [ ] T004 [P] [US3] Create test file `packages/shared/src/schemas/experience/step.schema.test.ts` with tests for step name validation (required, regex, max length, trim)
-- [ ] T005 [P] [US3] Create test file `packages/shared/src/schemas/experience/steps/input-multi-select.schema.test.ts` with tests for MultiSelectOption schema (promptFragment max 500 chars, promptMedia optional MediaReference)
-- [ ] T006 [P] [US3] Add test cases for AIImageNode schema in `packages/shared/src/schemas/experience/transform.schema.test.ts` (model validation, aspectRatio enum, refMedia array)
+- [X] T004 [P] [US3] Create test file `packages/shared/src/schemas/experience/step.schema.test.ts` with tests for step name validation (required, regex, max length, trim)
+- [X] T005 [P] [US3] Create test file `packages/shared/src/schemas/experience/steps/input-multi-select.schema.test.ts` with tests for MultiSelectOption schema (promptFragment max 500 chars, promptMedia optional MediaReference)
+- [X] T006 [P] [US3] Add test cases for AIImageNode schema in `packages/shared/src/schemas/experience/transform.schema.test.ts` (model validation, aspectRatio enum, refMedia array)
 
 ### Schema Implementation
 
-- [ ] T007 [P] [US3] Update `experienceStepNameSchema` in `packages/shared/src/schemas/experience/step.schema.ts` (remove `.optional()`, add regex `/^[a-zA-Z0-9 \-_]+$/`, add `.trim()`, set min 1 max 50)
-- [ ] T008 [P] [US3] Update `multiSelectOptionSchema` in `packages/shared/src/schemas/experience/steps/input-multi-select.schema.ts` (change from `z.string()` array to object schema with `value`, `promptFragment: z.string().max(500).optional()`, `promptMedia: mediaReferenceSchema.optional()`)
-- [ ] T009 [P] [US3] Create `refMediaEntrySchema` in `packages/shared/src/schemas/experience/transform.schema.ts` (extend mediaReferenceSchema with `displayName: z.string()`)
-- [ ] T010 [P] [US3] Create `aiImageNodeConfigSchema` in `packages/shared/src/schemas/experience/transform.schema.ts` (fields: model, aspectRatio enum, prompt string, refMedia array)
-- [ ] T011 [P] [US3] Update `transformNodeSchema` in `packages/shared/src/schemas/experience/transform.schema.ts` to include discriminated union for ai.imageGeneration type
-- [ ] T012 [P] [US3] Remove obsolete `variableMappings` field from `transformConfigSchema` in `packages/shared/src/schemas/experience/transform.schema.ts`
-- [ ] T013 [US3] Build shared package with `pnpm --filter @clementine/shared build` to generate TypeScript types
-- [ ] T014 [US3] Run schema tests with `pnpm --filter @clementine/shared test` and verify 100% pass rate (all T004-T006 tests should now PASS)
+- [X] T007 [P] [US3] Update `experienceStepNameSchema` in `packages/shared/src/schemas/experience/step.schema.ts` (remove `.optional()`, add regex `/^[a-zA-Z0-9 \-_]+$/`, add `.trim()`, set min 1 max 50)
+- [X] T008 [P] [US3] Update `multiSelectOptionSchema` in `packages/shared/src/schemas/experience/steps/input-multi-select.schema.ts` (change from `z.string()` array to object schema with `value`, `promptFragment: z.string().max(500).optional()`, `promptMedia: mediaReferenceSchema.optional()`)
+- [X] T009 [P] [US3] Create `refMediaEntrySchema` in `packages/shared/src/schemas/experience/transform.schema.ts` (extend mediaReferenceSchema with `displayName: z.string()`)
+- [X] T010 [P] [US3] Create `aiImageNodeConfigSchema` in `packages/shared/src/schemas/experience/transform.schema.ts` (fields: model, aspectRatio enum, prompt string, refMedia array)
+- [X] T011 [P] [US3] Update `transformNodeSchema` in `packages/shared/src/schemas/experience/transform.schema.ts` to include discriminated union for ai.imageGeneration type
+- [X] T012 [P] [US3] Remove obsolete `variableMappings` field from `transformConfigSchema` in `packages/shared/src/schemas/experience/transform.schema.ts`
+- [X] T013 [US3] Build shared package with `pnpm --filter @clementine/shared build` to generate TypeScript types
+- [X] T014 [US3] Run schema tests with `pnpm --filter @clementine/shared test` and verify 100% pass rate (all T004-T006 tests should now PASS)
 
 **Checkpoint**: Foundation ready - UI implementation (User Stories 1 & 2) can now begin in parallel
 
