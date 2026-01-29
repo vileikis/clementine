@@ -5,7 +5,7 @@
  * Supports inline prompts with step and reference media placeholders.
  */
 import { z } from 'zod'
-import { refMediaEntrySchema } from './ref-media-entry.schema'
+import { mediaReferenceSchema } from '../../media/media-reference.schema'
 
 export const aiImageModelSchema = z.enum([
   'gemini-2.5-flash',
@@ -31,8 +31,8 @@ export const aiImageNodeConfigSchema = z.object({
   aspectRatio: aiImageAspectRatioSchema,
   /** Prompt template with @{step:name} and @{ref:mediaAssetId} placeholders */
   prompt: z.string().min(1, 'Prompt is required'),
-  /** Reference media for prompt (may be empty array) */
-  refMedia: z.array(refMediaEntrySchema),
+  /** Reference media for prompt with display names (may be empty array) */
+  refMedia: z.array(mediaReferenceSchema),
 })
 
 export type AIImageNodeConfig = z.infer<typeof aiImageNodeConfigSchema>

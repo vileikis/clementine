@@ -4,66 +4,13 @@
  * Tests for AI image node schema:
  * - Model validation
  * - AspectRatio enum
- * - RefMedia array
+ * - RefMedia array (uses mediaReferenceSchema)
  */
 import { describe, expect, it } from 'vitest'
 import {
   aiImageNodeConfigSchema,
-  refMediaEntrySchema,
   transformConfigSchema,
 } from './transform.schema'
-
-describe('refMediaEntrySchema', () => {
-  it('should accept valid RefMediaEntry with displayName', () => {
-    const result = refMediaEntrySchema.safeParse({
-      mediaAssetId: 'ref-1',
-      url: 'https://storage.googleapis.com/example/ref-1.jpg',
-      filePath: 'ref-media/workspace-id/ref-1.jpg',
-      displayName: 'Park Background',
-    })
-    expect(result.success).toBe(true)
-    if (result.success) {
-      expect(result.data.displayName).toBe('Park Background')
-    }
-  })
-
-  it('should require displayName', () => {
-    const result = refMediaEntrySchema.safeParse({
-      mediaAssetId: 'ref-1',
-      url: 'https://storage.googleapis.com/example/ref-1.jpg',
-      filePath: 'ref-media/workspace-id/ref-1.jpg',
-    })
-    expect(result.success).toBe(false)
-  })
-
-  it('should require mediaAssetId', () => {
-    const result = refMediaEntrySchema.safeParse({
-      url: 'https://storage.googleapis.com/example/ref-1.jpg',
-      filePath: 'ref-media/workspace-id/ref-1.jpg',
-      displayName: 'Park Background',
-    })
-    expect(result.success).toBe(false)
-  })
-
-  it('should require url', () => {
-    const result = refMediaEntrySchema.safeParse({
-      mediaAssetId: 'ref-1',
-      filePath: 'ref-media/workspace-id/ref-1.jpg',
-      displayName: 'Park Background',
-    })
-    expect(result.success).toBe(false)
-  })
-
-  it('should accept null filePath', () => {
-    const result = refMediaEntrySchema.safeParse({
-      mediaAssetId: 'ref-1',
-      url: 'https://storage.googleapis.com/example/ref-1.jpg',
-      filePath: null,
-      displayName: 'Park Background',
-    })
-    expect(result.success).toBe(true)
-  })
-})
 
 describe('aiImageNodeConfigSchema', () => {
   const validConfig = {
@@ -233,14 +180,30 @@ describe('aiImageNodeConfigSchema', () => {
       expect(result.success).toBe(false)
     })
 
-    it('should reject invalid refMedia entries', () => {
+    it('should accept refMedia entries without displayName (uses default)', () => {
       const result = aiImageNodeConfigSchema.safeParse({
         ...validConfig,
         refMedia: [
           {
             mediaAssetId: 'ref-1',
             url: 'https://storage.googleapis.com/example/ref-1.jpg',
-            // Missing displayName
+            // displayName will default to 'Untitled'
+          },
+        ],
+      })
+      expect(result.success).toBe(true)
+      if (result.success) {
+        expect(result.data.refMedia[0].displayName).toBe('Untitled')
+      }
+    })
+
+    it('should reject refMedia entries with missing required fields', () => {
+      const result = aiImageNodeConfigSchema.safeParse({
+        ...validConfig,
+        refMedia: [
+          {
+            // Missing mediaAssetId and url (required fields)
+            displayName: 'Background',
           },
         ],
       })

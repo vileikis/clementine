@@ -61,6 +61,7 @@ describe('mediaReferenceSchema', () => {
       mediaAssetId: 'asset-123',
       url: 'https://example.com/image.png',
       filePath: null,
+      displayName: 'Untitled', // Default from merged media-naming feature
     })
   })
 
