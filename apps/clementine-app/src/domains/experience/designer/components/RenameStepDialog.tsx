@@ -12,6 +12,7 @@ import { Button } from '@/ui-kit/ui/button'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -91,6 +92,10 @@ export function RenameStepDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Rename Step</DialogTitle>
+          <DialogDescription>
+            Enter a new name for this step. Names must be unique within the
+            experience.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
