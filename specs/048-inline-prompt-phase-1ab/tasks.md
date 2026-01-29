@@ -79,25 +79,25 @@
 
 #### Step Name Editor Components
 
-- [ ] T016 [P] [US1] Create `StepNameEditor` component in `apps/clementine-app/src/domains/experience/designer/components/StepNameEditor.tsx` (inline text input with validation, debounced auto-save, uses useValidateStepName hook)
+- [~] T016 [P] [US1] ~~Create `StepNameEditor` component~~ **SKIPPED** - Context menu rename is sufficient, inline editor would add unnecessary clutter to config panels
 - [X] T017 [P] [US1] Create `RenameStepDialog` component in `apps/clementine-app/src/domains/experience/designer/components/RenameStepDialog.tsx` (modal dialog with input field, validation, cursor positioned at end, Enter to save, Escape to cancel)
 
 #### Update StepList
 
-- [X] T018 [US1] Update `StepList.tsx` in `apps/clementine-app/src/domains/experience/designer/components/StepList.tsx` to display `step.name || step.config.title || 'Untitled Step'` with step type badge
+- [X] T018 [US1] Update `StepList.tsx` in `apps/clementine-app/src/domains/experience/designer/components/StepList.tsx` to display `step.name` with step type badge
 - [X] T019 [US1] Update `StepList.tsx` context menu to add "Rename..." option before "Delete" option (opens RenameStepDialog)
 
 #### Add to Config Panels
 
-- [ ] T020 [P] [US1] Add StepNameEditor to top of `InputMultiSelectStepConfigPanel` in `apps/clementine-app/src/domains/experience/designer/components/config-panels/` (or similar location)
-- [ ] T021 [P] [US1] Add StepNameEditor to top of `CapturePhotoStepConfigPanel` in `apps/clementine-app/src/domains/experience/designer/components/config-panels/`
-- [ ] T022 [P] [US1] Add StepNameEditor to top of `InputShortTextStepConfigPanel` in `apps/clementine-app/src/domains/experience/designer/components/config-panels/`
+- [~] T020 [P] [US1] ~~Add StepNameEditor to top of `InputMultiSelectStepConfigPanel`~~ **SKIPPED** - Not needed, see T016
+- [~] T021 [P] [US1] ~~Add StepNameEditor to top of `CapturePhotoStepConfigPanel`~~ **SKIPPED** - Not needed, see T016
+- [~] T022 [P] [US1] ~~Add StepNameEditor to top of `InputShortTextStepConfigPanel`~~ **SKIPPED** - Not needed, see T016
 
 #### Auto-Generate Names on Creation
 
-- [ ] T023 [US1] Update step creation logic in `ExperienceDesignerPage` to auto-generate name from step type (e.g., "Pet Choice" for multiselect, "User Photo" for capture.photo)
+- [X] T023 [US1] ~~Update step creation logic~~ **VERIFIED** - `createStep()` already auto-generates names, `ensureAllStepsHaveNames()` handles backward compatibility
 
-**Checkpoint**: At this point, User Story 1 should be fully functional - creators can rename steps via context menu or inline editor, see custom names in step list, and experience uniqueness validation
+**Checkpoint**: ✅ **Phase 3 Complete** - User Story 1 is fully functional: creators can rename steps via context menu, see custom names in step list, experience uniqueness validation, and auto-generated names on step creation
 
 ---
 
