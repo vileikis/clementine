@@ -10,6 +10,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useGuestContext } from '../contexts'
+import { useShareActions } from '../hooks'
 import type { ShareOptionsConfig } from '@clementine/shared'
 import {
   ShareLoadingRenderer,
@@ -81,6 +82,9 @@ export function SharePage({ mainSessionId: _mainSessionId }: SharePageProps) {
   const shareOptions =
     project.publishedConfig?.shareOptions ?? DEFAULT_SHARE_OPTIONS
 
+  // Share actions hook
+  const { handleShare } = useShareActions({ mediaUrl: MOCK_RESULT_IMAGE })
+
   // Navigation handlers
   const handleStartOver = () => {
     navigate({ to: '/join/$projectId', params: { projectId: project.id } })
@@ -90,11 +94,6 @@ export function SharePage({ mainSessionId: _mainSessionId }: SharePageProps) {
     if (shareReady.cta?.url) {
       window.open(shareReady.cta.url, '_blank', 'noopener,noreferrer')
     }
-  }
-
-  const handleShare = (platform: keyof ShareOptionsConfig) => {
-    // No-op - share functionality deferred (FR-008)
-    console.log(`Share clicked: ${platform}`)
   }
 
   return (

@@ -31,9 +31,6 @@ import type { IconType } from 'react-icons'
 import { Skeleton } from '@/ui-kit/ui/skeleton'
 import { ThemedButton, ThemedIconButton, ThemedText } from '@/shared/theming'
 
-const MOCK_RESULT_IMAGE =
-  'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=300&h=900'
-
 export interface ShareReadyRendererProps {
   /** Share ready config to render */
   share: ShareReadyConfig
