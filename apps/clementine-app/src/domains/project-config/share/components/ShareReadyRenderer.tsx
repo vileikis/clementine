@@ -116,13 +116,12 @@ export function ShareReadyRenderer({
   return (
     <div className="flex flex-col h-full w-full">
       {/* Scrollable content zone */}
-      <div className="flex-1 overflow-y-auto p-8 flex flex-col items-center space-y-6">
-        {/* Media - using same sizing as loading skeleton */}
+      <div className="flex-1 overflow-y-auto p-4 flex flex-col items-center space-y-6">
         {mediaUrl ? (
           <img
             src={mediaUrl}
             alt="Generated result"
-            className="w-full aspect-square max-w-md rounded-lg object-contain"
+            className="w-full max-w-[450px] rounded-lg"
           />
         ) : mode === 'edit' ? (
           <div className="w-full aspect-square max-w-md rounded-lg bg-muted flex items-center justify-center">

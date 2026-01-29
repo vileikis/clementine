@@ -40,9 +40,11 @@ const DEFAULT_SHARE_OPTIONS: ShareOptionsConfig = {
   telegram: false,
 }
 
-// Mock result image (temporary - will be fetched from session in future)
+// Mock result images (temporary - will be fetched from session in future)
+// Swap between these to test different aspect ratios:
+// const MOCK_RESULT_IMAGE = 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800' // Square
 const MOCK_RESULT_IMAGE =
-  'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800'
+  'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=300&h=900' // Portrait
 
 /**
  * Share page with renderer integration
