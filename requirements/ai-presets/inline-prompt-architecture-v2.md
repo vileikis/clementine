@@ -40,7 +40,7 @@ This document specifies the **Inline Prompt Architecture** - a streamlined appro
 5. [Lexical Editor Integration](#lexical-editor-integration)
 6. [User Workflows](#user-workflows)
 7. [Implementation Plan](#implementation-plan)
-8. [Migration from AI Presets](#migration-from-ai-presets)
+8. [Code Reuse from AI Presets](#code-reuse-from-ai-presets)
 9. [Edge Cases & Validation](#edge-cases--validation)
 
 ---
@@ -1409,38 +1409,38 @@ function deserializeFromPlainText(
 
 ---
 
-### Phase 1i: Migration & Testing (2 days)
+### Phase 1i: Testing & Documentation (2 days)
 
-**Goal**: Migrate test experiences and ensure quality
+**Goal**: Ensure quality and document the system
 
 **Tasks**:
-- [ ] Create migration script
-  - Find experiences using AI presets
-  - Extract preset config
-  - Map to inline node config
-  - Update experience document
-- [ ] Run migration on test data
-  - Verify all experiences migrated
-  - Test in experience preview
 - [ ] End-to-end testing
-  - Create new experience
-  - Add multiselect with AI options
-  - Configure AI node
-  - Test run
-  - Publish
-  - Verify in guest view
+  - Create new experience from scratch
+  - Add multiselect with AI options (promptFragment, promptMedia)
+  - Configure AI node (model, prompt, refMedia)
+  - Test run with test inputs
+  - Verify resolution works correctly
+  - Publish experience
+  - Test in guest runtime
+- [ ] Component testing
+  - Test Lexical editor (mention insertion, serialization)
+  - Test resolution algorithm (all step types)
+  - Test validation (errors, warnings)
+  - Test refMedia management (upload, edit, delete)
 - [ ] Bug fixes
-  - Address any issues found
+  - Address any issues found during testing
+  - Fix edge cases
 - [ ] Documentation
   - Update developer docs
-  - Add inline architecture doc to wiki
-  - Comment complex code
+  - Add code comments
+  - Create usage examples
+  - Update CLAUDE.md if needed
 
 **Success Criteria**:
-- ✅ All test experiences migrated
 - ✅ E2E workflow works smoothly
+- ✅ All components tested
 - ✅ No critical bugs
-- ✅ Documentation updated
+- ✅ Documentation complete
 
 ---
 
@@ -1450,159 +1450,128 @@ Each sub-phase is **1-4 days**, making progress trackable and manageable.
 
 ---
 
-## Migration from AI Presets
+## Code Reuse from AI Presets
 
-### What to Reuse
+The inline prompt architecture leverages significant code from the AI Presets implementation (Phases 1-4). Rather than starting from scratch, we adapt proven patterns and components.
 
-**Lexical Infrastructure** (~60% reuse):
-- ✅ Mention node architecture
+### Reusable Code (~60% reuse)
+
+#### Lexical Infrastructure (~90% reuse)
+**Location**: `domains/ai-presets/lexical/`
+
+**Reusable Components**:
+- ✅ Mention node architecture (adapt for step/refMedia types)
 - ✅ Autocomplete plugin pattern
-- ✅ Serialization/deserialization utils
+- ✅ Serialization/deserialization utilities
 - ✅ Smart paste plugin (convert plain @mentions)
 - ✅ Mention validation plugin
 
-**Resolution & Validation Logic** (~70% reuse):
-- ✅ Core resolution algorithm (adapt for steps)
+**Adaptation Required**:
+- Change mention types: `text`/`input`/`ref` → `step`/`ref`
+- Update autocomplete data source: preset variables → experience steps
+- Adjust serialization format: `@{text:var}` → `@{step:stepName}`
+
+**New Location**: `domains/experience/designer/transform/lexical/`
+
+---
+
+#### Resolution & Validation Logic (~70% reuse)
+**Location**: `domains/ai-presets/preview/lib/`
+
+**Reusable Components**:
+- ✅ Core resolution algorithm structure
 - ✅ Validation patterns (missing refs, required fields)
-- ✅ Media reference extraction
+- ✅ Media reference extraction logic
 - ✅ Type guards and utilities
 
-**Preview Components** (patterns):
+**Adaptation Required**:
+- Replace preset variable resolution → step-based resolution
+- Handle step types (capture, multiselect, text)
+- Auto-reference pattern for step promptMedia
+- mediaAssetId-based refs instead of names
+
+**New Location**: `domains/experience/designer/transform/lib/`
+
+---
+
+#### Preview Components (UI Patterns)
+**Location**: `domains/ai-presets/preview/components/`
+
+**Reusable Patterns**:
 - ✅ Test input form structure
-- ✅ Resolved prompt display
+- ✅ Resolved prompt display layout
 - ✅ Media preview grid
-- ✅ Validation display
+- ✅ Validation display (errors/warnings)
+- ✅ Test generation button (placeholder)
 
-**Media Management**:
-- ✅ Upload hooks
-- ✅ Media picker components
-- ✅ Thumbnail display
+**Adaptation Required**:
+- Generate inputs from experience steps (not preset variables)
+- Adapt media grid for step promptMedia + refMedia
+- Update validation messages for steps
 
-**Total Code Reuse: ~60%**
-
----
-
-### What to Archive
-
-**AI Preset Domain** (`domains/ai-presets/`):
-- ❌ Preset CRUD services
-- ❌ Preset editor containers
-- ❌ Preset list page
-- ❌ Preset-specific hooks
-- ❌ Variable management UI
-- ❌ Value mappings editor
-
-**Preset Schemas**:
-- ❌ `ai-preset.schema.ts`
-- ❌ `ai-preset-config.schema.ts`
-- ❌ `preset-variable.schema.ts`
-
-**Move to**: `domains/_archived/ai-presets/` for reference
+**New Location**: `domains/experience/designer/transform/components/`
 
 ---
 
-### Migration Script
+#### Media Management
+**Location**: `domains/ai-presets/editor/components/`
 
-```typescript
-/**
- * Migrate AI Presets to Inline AI Nodes
- *
- * For each experience using AI preset:
- * 1. Extract preset config
- * 2. Create inline AI node
- * 3. Map preset variables to steps
- * 4. Update experience document
- */
-async function migratePresetsToInline(workspaceId: string) {
-  const experiences = await getExperiences(workspaceId)
+**Reusable Components**:
+- ✅ Upload hooks (`useUploadMediaAsset`)
+- ✅ Media picker dialog patterns
+- ✅ Thumbnail display components
+- ✅ Media grid layout
 
-  for (const experience of experiences) {
-    // Find preset reference (old format)
-    const aiNode = experience.transformConfig.nodes.find(
-      node => node.type === 'aiImage' && 'presetId' in node
-    )
+**Adaptation Required**:
+- Add displayName field to refMedia
+- Validate displayName uniqueness
+- Generate displayName from fileName
 
-    if (!aiNode) continue  // No preset, skip
+**New Location**: `domains/experience/designer/transform/components/`
 
-    // Fetch preset
-    const preset = await getAIPreset(workspaceId, aiNode.presetId)
+---
 
-    // Map preset prompt to inline format
-    const inlinePrompt = mapPresetPromptToInline(
-      preset.published.promptTemplate,
-      aiNode.variableBindings,
-      experience.steps
-    )
+### What to Archive (No Migration Needed)
 
-    // Create inline node
-    const inlineNode: AIImageNode = {
-      type: 'ai.imageGeneration',
-      id: aiNode.id,
-      config: {
-        model: preset.published.model,
-        aspectRatio: preset.published.aspectRatio,
-        prompt: inlinePrompt,
-        refMedia: preset.published.mediaRegistry.map(entry => ({
-          mediaAssetId: entry.mediaId,
-          url: entry.url,
-          filePath: entry.filePath,
-          displayName: entry.name,  // Use preset name as displayName
-        })),
-      },
-    }
+Since we're pre-launch with no production data, we can archive the AI Presets implementation without migration:
 
-    // Update experience
-    await updateExperience(workspaceId, experience.id, {
-      transformConfig: {
-        ...experience.transformConfig,
-        nodes: experience.transformConfig.nodes.map(node =>
-          node.id === aiNode.id ? inlineNode : node
-        ),
-      },
-    })
+**Archive Location**: `domains/_archived/ai-presets/`
 
-    console.log(`✅ Migrated experience: ${experience.id}`)
-  }
-}
+**Files to Archive**:
+- Preset CRUD services
+- Preset editor containers
+- Preset list page
+- Variable management UI
+- Value mappings editor
+- Preset schemas
 
-/**
- * Map preset prompt with @{text:var} / @{input:var} to @{step:stepName}
- */
-function mapPresetPromptToInline(
-  presetPrompt: string,
-  variableBindings: Record<string, { stepId: string }>,
-  steps: ExperienceStep[]
-): string {
-  let result = presetPrompt
+**Keep for Reference**: Documentation and learned patterns
 
-  // Replace @{text:varName} and @{input:varName} with @{step:stepName}
-  for (const [varName, binding] of Object.entries(variableBindings)) {
-    const step = steps.find(s => s.id === binding.stepId)
-    const stepName = step?.name || varName
+---
 
-    result = result
-      .replace(new RegExp(`@\\{text:${varName}\\}`, 'g'), `@{step:${stepName}}`)
-      .replace(new RegExp(`@\\{input:${varName}\\}`, 'g'), `@{step:${stepName}}`)
-  }
+### Code Reuse Strategy
 
-  // Replace @{ref:mediaName} with @{ref:mediaAssetId}
-  // (Preset uses name, inline uses mediaAssetId)
-  // Look up mediaAssetId from preset.mediaRegistry
-  const mediaNameToId = new Map(
-    preset.published.mediaRegistry.map(m => [m.name, m.mediaId])
-  )
+1. **Copy Lexical Infrastructure**
+   - Copy `domains/ai-presets/lexical/` → `domains/experience/designer/transform/lexical/`
+   - Adapt mention node types
+   - Update serialization patterns
 
-  result = result.replace(
-    /@\{ref:(\w+)\}/g,
-    (match, name) => {
-      const mediaAssetId = mediaNameToId.get(name)
-      return mediaAssetId ? `@{ref:${mediaAssetId}}` : match
-    }
-  )
+2. **Adapt Resolution Logic**
+   - Reference `domains/ai-presets/preview/lib/prompt-resolution.ts`
+   - Rewrite for step-based resolution
+   - Keep core algorithm structure
 
-  return result
-}
-```
+3. **Reuse UI Patterns**
+   - Reference preview component layouts
+   - Build new components with similar structure
+   - Maintain consistent UX
+
+4. **Leverage Media Components**
+   - Reuse upload hooks directly
+   - Adapt media grid for refMedia
+   - Add displayName management
+
+**Estimated Effort Savings**: ~60% compared to building from scratch
 
 ---
 
@@ -1858,6 +1827,8 @@ The **Inline Prompt Architecture (v2)** provides a streamlined, intuitive approa
 - Display: `@stepName`, `@displayName` (user-friendly)
 - Resolved: `<mediaAssetId>` (LLM-ready)
 
-**Implementation**: 9 phases, ~4-5 weeks total, 60% code reuse from AI Presets
+**Implementation**: 9 phases, ~4-5 weeks total
+
+**Code Reuse**: ~60% from AI Presets (Lexical, resolution, UI patterns)
 
 **Next Steps**: Begin Phase 1a (Schemas & Foundation)

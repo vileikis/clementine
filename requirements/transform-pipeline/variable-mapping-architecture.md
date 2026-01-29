@@ -1,6 +1,7 @@
 # Variable Mapping Architecture
 
 ## Status: Superseded by AI Presets
+
 **Created**: 2025-01-24
 **Last Updated**: 2025-01-26
 
@@ -10,10 +11,10 @@
 
 This document originally proposed embedding variable mappings directly in the Transform Pipeline config. After further analysis (see [Problem Analysis](#problem-analysis-multiple-ai-nodes) below), the architecture evolved to separate concerns:
 
-| Domain | Responsibility | Location |
-|--------|---------------|----------|
-| **AI Presets** | Media registry, variables with value mappings, prompt template, model settings | `/workspaces/{workspaceId}/aiPresets/{presetId}` |
-| **Transform Pipeline** | Node orchestration, variable bindings (1:1 step mapping) | Experience config |
+| Domain                 | Responsibility                                                                 | Location                                         |
+| ---------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------ |
+| **AI Presets**         | Media registry, variables with value mappings, prompt template, model settings | `/workspaces/{workspaceId}/aiPresets/{presetId}` |
+| **Transform Pipeline** | Node orchestration, variable bindings (1:1 step mapping)                       | Experience config                                |
 
 **See:** `/requirements/ai-presets/spec.md` for full AI Presets specification.
 
@@ -40,6 +41,7 @@ This document originally proposed embedding variable mappings directly in the Tr
 Raw step values often don't map directly to what should appear in AI prompts.
 
 **Example:**
+
 - User selects: `"cat"`
 - What prompt needs: `"holding a cat (see image @cat)"`
 
@@ -62,6 +64,7 @@ Original design attached all reference images to the AI Image node statically:
 ```
 
 **Problems:**
+
 - All images sent to LLM regardless of user selections
 - Increased input tokens (cost)
 - LLM must decide which images are relevant (unpredictable)
@@ -76,6 +79,7 @@ An alternative (distributed refs per variable) would scatter image definitions a
 When exploring embedding variable mappings directly in transform config, a critical issue emerged:
 
 **Scenario:** Transform pipeline with 2 AI Image nodes:
+
 - Node 1: Portrait generation (uses `@style`, `@mood`)
 - Node 2: Frame overlay (uses `@frame_style`)
 
@@ -83,13 +87,13 @@ When exploring embedding variable mappings directly in transform config, a criti
 
 **Options Considered:**
 
-| Option | Approach | Issues |
-|--------|----------|--------|
-| A: Node-centric | Each AI node has its own mappings | Duplication, scattered config |
-| B: Direct step refs | Remove variables, reference steps directly | Loses enrichment capability |
-| C: Namespaced | `node1.style`, `node2.frame` | Complex, unintuitive |
-| D: Inheritance | Global + node overrides | Still scattered, complex resolution |
-| **E: AI Presets** | Standalone templates with simple wiring | Clean separation, testable |
+| Option              | Approach                                   | Issues                              |
+| ------------------- | ------------------------------------------ | ----------------------------------- |
+| A: Node-centric     | Each AI node has its own mappings          | Duplication, scattered config       |
+| B: Direct step refs | Remove variables, reference steps directly | Loses enrichment capability         |
+| C: Namespaced       | `node1.style`, `node2.frame`               | Complex, unintuitive                |
+| D: Inheritance      | Global + node overrides                    | Still scattered, complex resolution |
+| **E: AI Presets**   | Standalone templates with simple wiring    | Clean separation, testable          |
 
 **Decision:** Option E - AI Presets provides the best balance of testability, reusability, and clean UX.
 
@@ -131,20 +135,24 @@ When exploring embedding variable mappings directly in transform config, a criti
 **Value mappings live in AI Presets, NOT in Transform Pipeline.**
 
 Transform Pipeline only does 1:1 binding:
+
 - `@pet` → `petStep` (raw value passed to preset)
 - `@background` → `bgStep` (raw value passed to preset)
 
 The AI Preset's variable definition handles the transformation:
+
 ```typescript
 // In AI Preset
-variables: [{
-  name: 'pet',
-  valueMap: [
-    { value: 'cat', text: 'holding a cat (see @cat)' },
-    { value: 'dog', text: 'holding a dog (see @dog)' },
-    { value: 'none', text: 'with empty hands' }
-  ]
-}]
+variables: [
+  {
+    name: 'pet',
+    valueMap: [
+      { value: 'cat', text: 'holding a cat (see @cat)' },
+      { value: 'dog', text: 'holding a dog (see @dog)' },
+      { value: 'none', text: 'with empty hands' },
+    ],
+  },
+]
 ```
 
 ---
@@ -153,10 +161,10 @@ variables: [{
 
 Both variables and media use unified `@name` syntax with visual differentiation:
 
-| Type | Color | Example |
-|------|-------|---------|
-| Variables | Blue | `@pet`, `@background` |
-| Media | Green | `@user_photo`, `@cat` |
+| Type      | Color | Example               |
+| --------- | ----- | --------------------- |
+| Variables | Blue  | `@pet`, `@background` |
+| Media     | Green | `@user_photo`, `@cat` |
 
 ### How LLMs Handle Labeled Images
 
@@ -165,12 +173,12 @@ LLMs like Gemini expect interleaved text labels and images:
 ```javascript
 // Gemini API expects this pattern
 const result = await model.generateContent([
-  { text: "Image Reference ID: @user_photo" },
+  { text: 'Image Reference ID: @user_photo' },
   userPhotoData,
-  { text: "Image Reference ID: @cat" },
+  { text: 'Image Reference ID: @cat' },
   catImageData,
-  { text: "Transform @user_photo into hobbit holding a cat (see @cat)..." }
-]);
+  { text: 'Transform @user_photo into hobbit holding a cat (see @cat)...' },
+])
 ```
 
 Resolution parses `@name` references in the resolved prompt to determine which images to include.
@@ -189,24 +197,32 @@ const aiPresetSchema = z.object({
   description: z.string().optional(),
 
   // Media from workspace library
-  mediaRegistry: z.array(z.object({
-    name: z.string(),        // Reference name (@name)
-    mediaId: z.string(),     // Workspace media library asset
-    description: z.string().optional(),
-  })),
+  mediaRegistry: z.array(
+    z.object({
+      name: z.string(), // Reference name (@name)
+      mediaId: z.string(), // Workspace media library asset
+      description: z.string().optional(),
+    }),
+  ),
 
   // Variables with optional value mappings
-  variables: z.array(z.object({
-    name: z.string(),        // Reference name (@name)
-    type: z.enum(['text', 'image']),
-    label: z.string(),
-    required: z.boolean().default(true),
-    defaultValue: z.string().optional(),
-    valueMap: z.array(z.object({
-      value: z.string(),
-      text: z.string(),      // Can include @media refs
-    })).optional(),
-  })),
+  variables: z.array(
+    z.object({
+      name: z.string(), // Reference name (@name)
+      type: z.enum(['text', 'image']),
+      label: z.string(),
+      required: z.boolean().default(true),
+      defaultValue: z.string().optional(),
+      valueMap: z
+        .array(
+          z.object({
+            value: z.string(),
+            text: z.string(), // Can include @media refs
+          }),
+        )
+        .optional(),
+    }),
+  ),
 
   promptTemplate: z.string(),
   model: z.enum(['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-3.0']),
@@ -229,9 +245,12 @@ const aiImageNodeSchema = z.object({
   presetId: z.string(),
 
   // 1:1 bindings from preset variables to experience steps
-  variableBindings: z.record(z.string(), z.object({
-    stepId: z.string(),
-  })),
+  variableBindings: z.record(
+    z.string(),
+    z.object({
+      stepId: z.string(),
+    }),
+  ),
 
   // Input image (optional, can come from previous node)
   input: nodeInputSourceSchema.optional(),
@@ -268,6 +287,7 @@ const aiImageNodeSchema = z.object({
 ### Example Execution
 
 **AI Preset: "Hobbit Portrait"**
+
 ```typescript
 {
   mediaRegistry: [
@@ -312,6 +332,7 @@ const aiImageNodeSchema = z.object({
 ```
 
 **Transform Pipeline Node:**
+
 ```typescript
 {
   type: 'aiImage',
@@ -327,6 +348,7 @@ const aiImageNodeSchema = z.object({
 **Session Answers:** `{ pet: 'cat', background: 'hobbiton' }`
 
 **Execution:**
+
 ```
 1. Resolve @pet: 'cat' → "holding a cat (see @cat)"
 2. Resolve @background: 'hobbiton' → "in the Shire @hobbiton"
@@ -351,6 +373,7 @@ const aiImageNodeSchema = z.object({
 **Decision**: Create AI Presets as standalone, workspace-level entities
 
 **Rationale**:
+
 - Testable in isolation (preview + test generation)
 - Reusable across experiences
 - Clean separation from pipeline orchestration
@@ -361,6 +384,7 @@ const aiImageNodeSchema = z.object({
 **Decision**: Use `@name` for both variables and media references
 
 **Rationale**:
+
 - Familiar pattern (like Cursor IDE, Notion, etc.)
 - Single autocomplete system
 - Visual differentiation via color coding
@@ -371,6 +395,7 @@ const aiImageNodeSchema = z.object({
 **Decision**: Value transformations defined in AI Preset, pipeline does 1:1 binding only
 
 **Rationale**:
+
 - Value mappings are intrinsic to prompt design
 - Can test value mappings in preset editor
 - Pipeline stays simple (just wiring)
@@ -381,6 +406,7 @@ const aiImageNodeSchema = z.object({
 **Decision**: Use arrays instead of records/maps
 
 **Rationale**:
+
 - Supports reordering (drag-and-drop in admin UI)
 - Explicit ordering in data model
 - Consistent with other list-based UI patterns
@@ -390,6 +416,7 @@ const aiImageNodeSchema = z.object({
 **Decision**: Images included based on `@name` references in resolved prompt
 
 **Rationale**:
+
 - Only referenced images are sent to LLM
 - Explicit in prompt what images are used
 - Automatic optimization - no manual conditional logic
@@ -400,6 +427,7 @@ const aiImageNodeSchema = z.object({
 **Decision**: AI Preset media comes from workspace media library
 
 **Rationale**:
+
 - Reuse existing media management infrastructure
 - Consistent asset management across features
 - Thumbnails and metadata already available
@@ -442,6 +470,7 @@ Existing transform configs with inline prompt configuration will need migration:
 **Risk**: Admins must understand that AI Presets define "what" and Transform Pipeline defines "how/when".
 
 **Mitigation**:
+
 - Clear UI separation with navigation
 - Inline preview of preset configuration in pipeline editor
 - Good documentation and onboarding
@@ -451,6 +480,7 @@ Existing transform configs with inline prompt configuration will need migration:
 **Risk**: Changing a shared AI Preset affects all experiences using it.
 
 **Mitigation**:
+
 - Future: Preset versioning (noted as open question)
 - Current: Clear UI showing which experiences use a preset
 - Option to duplicate preset for isolated changes
@@ -460,6 +490,7 @@ Existing transform configs with inline prompt configuration will need migration:
 **Risk**: Need to validate that pipeline bindings satisfy preset requirements.
 
 **Mitigation**:
+
 - Validation at publish time
 - Clear error messages: "Preset requires @pet but no binding provided"
 - Real-time validation in pipeline editor
@@ -469,6 +500,7 @@ Existing transform configs with inline prompt configuration will need migration:
 **Risk**: Presets created but never used, cluttering workspace.
 
 **Mitigation**:
+
 - Future: Show usage count in preset list
 - Future: Archive/cleanup functionality
 
@@ -490,6 +522,7 @@ The architecture evolved from inline variable mappings to a clean separation:
    - Handles multi-node pipelines cleanly
 
 **Key benefits:**
+
 - Testable in isolation (preview + test generation in preset editor)
 - Reusable across experiences
 - Clean separation of concerns
@@ -498,6 +531,7 @@ The architecture evolved from inline variable mappings to a clean separation:
 - Unified @ mention syntax for intuitive editing
 
 **Related Documents:**
+
 - `/requirements/ai-presets/spec.md` - Full AI Presets specification
 - `/requirements/ai-presets/prd-phases.md` - Implementation phases
 - `/requirements/transform-pipeline/diagrams/transform-ui-pipeline-tab.html` - Pipeline tab mockup
