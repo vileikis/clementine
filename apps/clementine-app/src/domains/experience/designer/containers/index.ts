@@ -1,3 +1,3 @@
 export { ExperienceDesignerLayout } from './ExperienceDesignerLayout'
-export { ExperienceDesignerPage } from './ExperienceDesignerPage'
+export { ExperienceCollectPage } from './ExperienceCollectPage'
 export { StepConfigPanelContainer } from './StepConfigPanelContainer'

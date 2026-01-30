@@ -13,7 +13,6 @@ import {
   InputScaleConfigPanel,
   InputShortTextConfigPanel,
   InputYesNoConfigPanel,
-  TransformPipelineConfigPanel,
 } from '../../steps/config-panels'
 import type { Step, StepConfig } from '../../steps/registry/step-registry'
 import { ScrollArea } from '@/ui-kit/ui/scroll-area'
@@ -122,8 +121,6 @@ function ConfigPanelRouter({
       return <InputLongTextConfigPanel {...props} />
     case 'capture.photo':
       return <CapturePhotoConfigPanel {...props} />
-    case 'transform.pipeline':
-      return <TransformPipelineConfigPanel {...props} />
     default:
       // Type-safe exhaustive check - this should never happen
       return (

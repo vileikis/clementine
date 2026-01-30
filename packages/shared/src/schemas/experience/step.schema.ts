@@ -16,7 +16,6 @@ import { experienceInputMultiSelectStepConfigSchema } from './steps/input-multi-
 import { experienceInputShortTextStepConfigSchema } from './steps/input-short-text.schema'
 import { experienceInputLongTextStepConfigSchema } from './steps/input-long-text.schema'
 import { experienceCapturePhotoStepConfigSchema } from './steps/capture-photo.schema'
-import { experienceTransformPipelineStepConfigSchema } from './steps/transform-pipeline.schema'
 
 /**
  * Experience step name schema
@@ -49,7 +48,6 @@ export const experienceStepTypeSchema = z.enum([
   'input.shortText',
   'input.longText',
   'capture.photo',
-  'transform.pipeline',
 ])
 
 /**
@@ -115,13 +113,6 @@ export const experienceCapturePhotoStepSchema = z.object({
   config: experienceCapturePhotoStepConfigSchema,
 })
 
-export const experienceTransformPipelineStepSchema = z.object({
-  id: z.uuid(),
-  type: z.literal('transform.pipeline'),
-  name: experienceStepNameSchema,
-  config: experienceTransformPipelineStepConfigSchema,
-})
-
 /**
  * Experience step schema - discriminated union based on type field
  */
@@ -133,7 +124,6 @@ export const experienceStepSchema = z.discriminatedUnion('type', [
   experienceInputShortTextStepSchema,
   experienceInputLongTextStepSchema,
   experienceCapturePhotoStepSchema,
-  experienceTransformPipelineStepSchema,
 ])
 
 /**
@@ -154,4 +144,3 @@ export type ExperienceStepConfig =
   | z.infer<typeof experienceInputShortTextStepConfigSchema>
   | z.infer<typeof experienceInputLongTextStepConfigSchema>
   | z.infer<typeof experienceCapturePhotoStepConfigSchema>
-  | z.infer<typeof experienceTransformPipelineStepConfigSchema>
