@@ -12,7 +12,7 @@
 import { useCallback } from 'react'
 
 import { useRuntime } from '../../runtime'
-import { StepRendererRouter } from './StepRendererRouter'
+import { StepRendererRouter } from '../../steps'
 
 /**
  * PreviewRuntimeContent Component
