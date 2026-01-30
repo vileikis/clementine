@@ -74,7 +74,12 @@ export interface ExperienceRuntimeActions {
    * @param value - Primitive answer value for analytics
    * @param context - Optional step-specific context for AI generation
    */
-  setAnswer: (stepId: string, stepType: string, value: AnswerValue, context?: unknown) => void
+  setAnswer: (
+    stepId: string,
+    stepType: string,
+    value: AnswerValue,
+    context?: unknown,
+  ) => void
 
   /**
    * Record captured media for a step

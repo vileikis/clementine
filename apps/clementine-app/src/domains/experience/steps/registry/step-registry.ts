@@ -18,7 +18,6 @@ import {
 } from 'lucide-react'
 
 import {
-
   experienceCapturePhotoStepConfigSchema,
   experienceInfoStepConfigSchema,
   experienceInputLongTextStepConfigSchema,
@@ -36,11 +35,12 @@ import {
   createDefaultInputShortTextConfig,
   createDefaultInputYesNoConfig,
 } from '../defaults'
-import type {ExperienceStep,
+import type {
+  ExperienceStep,
   ExperienceStepCategory,
   ExperienceStepConfig,
-  ExperienceStepType
-} from '@clementine/shared';
+  ExperienceStepType,
+} from '@clementine/shared'
 
 import type { LucideIcon } from 'lucide-react'
 import type { z } from 'zod'
@@ -57,11 +57,7 @@ export type {
  * Answer value type for step inputs
  * Primitive types for analytics-friendly storage
  */
-export type AnswerValue =
-  | string
-  | number
-  | boolean
-  | string[]
+export type AnswerValue = string | number | boolean | string[]
 
 /**
  * Props for step renderers (edit-mode preview and guest-mode run)

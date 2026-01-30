@@ -59,7 +59,7 @@
 - [X] T011 [P] [US1] Create RuntimeTopBar tests in apps/clementine-app/src/domains/experience/runtime/components/RuntimeTopBar.test.tsx
 - [X] T012 [US1] Export RuntimeTopBar from apps/clementine-app/src/domains/experience/runtime/components/index.ts
 - [X] T013 [US1] Integrate RuntimeTopBar into ExperienceRuntime container in apps/clementine-app/src/domains/experience/runtime/containers/ExperienceRuntime.tsx
-- [ ] T014 [US1] Update ExperiencePreviewModal to pass experience name and progress props in apps/clementine-app/src/domains/experience/preview/containers/ExperiencePreviewModal.tsx
+- [X] T014 [US1] Update ExperiencePreviewModal to pass experience name and progress props in apps/clementine-app/src/domains/experience/preview/containers/ExperiencePreviewModal.tsx
 - [X] T015 [US1] Update PregatePage to pass experience name and progress props in apps/clementine-app/src/domains/guest/containers/PregatePage.tsx
 - [X] T016 [US1] Update ExperiencePage to pass experience name and progress props in apps/clementine-app/src/domains/guest/containers/ExperiencePage.tsx
 - [X] T017 [US1] Update PresharePage to pass experience name and progress props in apps/clementine-app/src/domains/guest/containers/PresharePage.tsx
@@ -108,8 +108,8 @@
 
 ### Implementation for User Story 3
 
-- [ ] T037 [US3] Update ExperiencePreviewModal to pass onHomeClick={undefined} for preview mode in apps/clementine-app/src/domains/experience/preview/containers/ExperiencePreviewModal.tsx
-- [ ] T038 [US3] Update RuntimeTopBar to disable home button when onHomeClick is undefined in apps/clementine-app/src/domains/experience/runtime/components/RuntimeTopBar.tsx
+- [X] T037 [US3] Update ExperiencePreviewModal to pass onHomeClick={undefined} for preview mode in apps/clementine-app/src/domains/experience/preview/containers/ExperiencePreviewModal.tsx
+- [X] T038 [US3] Update RuntimeTopBar to disable home button when onHomeClick is undefined in apps/clementine-app/src/domains/experience/runtime/components/RuntimeTopBar.tsx
 - [ ] T039 [US3] Test home button is visible but disabled in preview mode
 - [ ] T040 [US3] Test clicking home button in preview mode does nothing
 - [ ] T041 [US3] Test topbar appearance matches guest mode (WYSIWYG preview)
@@ -130,9 +130,9 @@
 - [ ] T047 [P] Test topbar accessibility with screen reader (VoiceOver/NVDA)
 - [ ] T048 Verify topbar doesn't overlap step content (proper z-index and spacing)
 - [ ] T049 Verify progress bar animation is smooth (no flickering on step navigation)
-- [ ] T050 Run validation workflow (pnpm app:check for lint/format)
-- [ ] T051 Run type checking (pnpm type-check)
-- [ ] T052 Run all tests (pnpm test)
+- [X] T050 Run validation workflow (pnpm app:check for lint/format)
+- [X] T051 Run type checking (pnpm type-check)
+- [X] T052 Run all tests (pnpm test)
 - [ ] T053 Review code against design system standards (frontend/design-system.md)
 - [ ] T054 Review code against component library standards (frontend/component-libraries.md)
 - [ ] T055 Review code against accessibility standards (frontend/accessibility.md)

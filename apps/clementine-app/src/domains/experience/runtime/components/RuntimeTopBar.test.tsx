@@ -41,11 +41,7 @@ describe('RuntimeTopBar', () => {
   it('shows fallback "Experience" when name is empty', () => {
     render(
       <ThemeProvider theme={mockTheme}>
-        <RuntimeTopBar
-          experienceName=""
-          currentStepIndex={0}
-          totalSteps={1}
-        />
+        <RuntimeTopBar experienceName="" currentStepIndex={0} totalSteps={1} />
       </ThemeProvider>,
     )
 
@@ -100,7 +96,7 @@ describe('RuntimeTopBar', () => {
     expect(progressBar).toHaveAttribute('aria-valuenow', '100')
   })
 
-  it('shows 100% progress for single-step experience', () => {
+  it('hides progress bar for single-step experience', () => {
     render(
       <ThemeProvider theme={mockTheme}>
         <RuntimeTopBar
@@ -111,9 +107,9 @@ describe('RuntimeTopBar', () => {
       </ThemeProvider>,
     )
 
-    // Step 1 of 1 = 100%
-    const progressBar = screen.getByRole('progressbar')
-    expect(progressBar).toHaveAttribute('aria-valuenow', '100')
+    // Progress bar should not be rendered for single-step experience
+    const progressBar = screen.queryByRole('progressbar')
+    expect(progressBar).not.toBeInTheDocument()
   })
 
   it('disables home button when onHomeClick is undefined (preview mode)', () => {
@@ -286,7 +282,10 @@ describe('RuntimeTopBar', () => {
 
     const progressBar = screen.getByRole('progressbar')
     // Step 3 of 5 (60% complete)
-    expect(progressBar).toHaveAttribute('aria-valuetext', 'Step 3 of 5 (60% complete)')
+    expect(progressBar).toHaveAttribute(
+      'aria-valuetext',
+      'Step 3 of 5 (60% complete)',
+    )
   })
 
   it('handles zero steps edge case gracefully', () => {
@@ -300,8 +299,8 @@ describe('RuntimeTopBar', () => {
       </ThemeProvider>,
     )
 
-    const progressBar = screen.getByRole('progressbar')
-    // Should show 0% progress
-    expect(progressBar).toHaveAttribute('aria-valuenow', '0')
+    // Progress bar should not be rendered for zero-step experience
+    const progressBar = screen.queryByRole('progressbar')
+    expect(progressBar).not.toBeInTheDocument()
   })
 })

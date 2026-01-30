@@ -99,11 +99,7 @@ describe('ThemedProgressBar', () => {
 
     render(
       <ThemeProvider theme={mockTheme}>
-        <ThemedProgressBar
-          value={3}
-          max={5}
-          getValueLabel={getValueLabel}
-        />
+        <ThemedProgressBar value={3} max={5} getValueLabel={getValueLabel} />
       </ThemeProvider>,
     )
 
@@ -147,10 +143,7 @@ describe('ThemedProgressBar', () => {
   it('applies custom className to indicator', () => {
     render(
       <ThemeProvider theme={mockTheme}>
-        <ThemedProgressBar
-          value={50}
-          indicatorClassName="custom-indicator"
-        />
+        <ThemedProgressBar value={50} indicatorClassName="custom-indicator" />
       </ThemeProvider>,
     )
 
