@@ -6,7 +6,7 @@
     "prettier.config.js",
     "vite.config.js"
   ],
-  "exclude": ["src/examples", "src/lib"],
+  "exclude": [],
   "compilerOptions": {
     "target": "ES2022",
     "jsx": "react-jsx",
