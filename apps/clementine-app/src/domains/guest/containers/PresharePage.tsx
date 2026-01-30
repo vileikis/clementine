@@ -25,10 +25,8 @@ import {
 import { useMarkExperienceComplete } from '../hooks'
 import { useInitSession } from '@/domains/session/shared'
 import { ExperienceRuntime } from '@/domains/experience/runtime'
-import { RuntimeTopBar } from '@/domains/experience/runtime/components'
 import { ThemeProvider, ThemedBackground } from '@/shared/theming'
 import { DEFAULT_THEME } from '@/domains/project-config/theme/constants'
-import { useExperienceRuntimeStore } from '@/domains/experience/runtime/stores/experienceRuntimeStore'
 
 export interface PresharePageProps {
   /** Main session ID from URL query params (for linking) */
@@ -246,45 +244,15 @@ export function PresharePage({ mainSessionId }: PresharePageProps) {
         experienceId={preshareExperienceId}
         steps={steps}
         session={session}
+        experienceName={preshareExperience?.name ?? 'Preshare'}
+        onHomeClick={navigateToWelcome}
         onComplete={() => void handlePreshareComplete()}
         onError={handleRuntimeError}
       >
-        <PreshareRuntimeWithTopBar
-          experienceName={preshareExperience?.name ?? 'Preshare'}
-          onHomeClick={navigateToWelcome}
-        />
-      </ExperienceRuntime>
-    )
-  }
-
-  /**
-   * Inner component that renders runtime content with topbar
-   * Must be inside ExperienceRuntime to access runtime store
-   */
-  function PreshareRuntimeWithTopBar({
-    experienceName,
-    onHomeClick,
-  }: {
-    experienceName: string
-    onHomeClick: () => void
-  }) {
-    const currentStepIndex = useExperienceRuntimeStore(
-      (s) => s.currentStepIndex,
-    )
-    const steps = useExperienceRuntimeStore((s) => s.steps)
-
-    return (
-      <>
-        <RuntimeTopBar
-          experienceName={experienceName}
-          currentStepIndex={currentStepIndex}
-          totalSteps={steps.length}
-          onHomeClick={onHomeClick}
-        />
         <div className="pt-20">
           <GuestRuntimeContent />
         </div>
-      </>
+      </ExperienceRuntime>
     )
   }
 
