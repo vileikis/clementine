@@ -13,6 +13,7 @@ import { useCallback } from 'react'
 
 import { useRuntime } from '../../runtime'
 import { StepRendererRouter } from '../../steps'
+import type { AnswerValue } from '../../steps/registry/step-registry'
 
 /**
  * PreviewRuntimeContent Component
@@ -31,14 +32,15 @@ export function PreviewRuntimeContent() {
     back,
     setAnswer,
     getAnswer,
+    getAnswerContext,
     isComplete,
   } = runtime
 
   // Handle answer change
   const handleAnswer = useCallback(
-    (value: string | number | boolean | string[]) => {
+    (value: AnswerValue, context?: unknown) => {
       if (currentStep) {
-        setAnswer(currentStep.id, value)
+        setAnswer(currentStep.id, value, context)
       }
     },
     [currentStep, setAnswer],
@@ -88,6 +90,7 @@ export function PreviewRuntimeContent() {
       step={currentStep}
       mode="run"
       answer={getAnswer(currentStep.id)}
+      answerContext={getAnswerContext(currentStep.id)}
       onAnswer={handleAnswer}
       onSubmit={next}
       onBack={back}

@@ -38,15 +38,40 @@ export const sessionStatusSchema = z.enum([
 
 /**
  * Answer schema
- * Represents a collected answer from an input step
+ * Represents a collected answer from an input step with optional AI context
+ *
+ * Design:
+ * - `value`: Primitive answer for analytics (string, number, boolean, string[])
+ * - `context`: Optional step-specific structured data for AI generation
+ *
+ * Example (multi-select):
+ * - value: ["option1", "option2"] (for analytics aggregation)
+ * - context: [{ value: "option1", promptFragment: "...", promptMedia: {...} }, ...]
  */
 export const answerSchema = z.object({
   /** Step that collected this answer */
   stepId: z.string(),
   /** Step type (e.g., 'input.scale', 'input.yesNo') */
   stepType: z.string(),
-  /** The answer value - type varies by step type */
-  value: z.union([z.string(), z.number(), z.boolean(), z.array(z.string())]),
+  /**
+   * The answer value - primitive types for analytics:
+   * - string: short text, long text
+   * - number: scale
+   * - boolean: yes/no
+   * - string[]: multi-select (array of selected option values)
+   */
+  value: z.union([
+    z.string(),
+    z.number(),
+    z.boolean(),
+    z.array(z.string()),
+  ]),
+  /**
+   * Optional step-specific context for AI generation
+   * - Multi-select: MultiSelectOption[] (full option objects with promptFragment/promptMedia)
+   * - Other steps: any step-specific structured data
+   */
+  context: z.unknown().optional(),
   /** Timestamp when answered (Unix ms) */
   answeredAt: z.number(),
 })

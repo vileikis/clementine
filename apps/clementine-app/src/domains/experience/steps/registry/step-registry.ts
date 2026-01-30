@@ -19,6 +19,7 @@ import {
 } from 'lucide-react'
 
 import {
+  
   experienceCapturePhotoStepConfigSchema,
   experienceInfoStepConfigSchema,
   experienceInputLongTextStepConfigSchema,
@@ -26,7 +27,7 @@ import {
   experienceInputScaleStepConfigSchema,
   experienceInputShortTextStepConfigSchema,
   experienceInputYesNoStepConfigSchema,
-  experienceTransformPipelineStepConfigSchema,
+  experienceTransformPipelineStepConfigSchema
 } from '@clementine/shared'
 import {
   createDefaultCapturePhotoConfig,
@@ -38,12 +39,11 @@ import {
   createDefaultInputYesNoConfig,
   createDefaultTransformPipelineConfig,
 } from '../defaults'
-import type {
-  ExperienceStep,
+import type {ExperienceStep,
   ExperienceStepCategory,
   ExperienceStepConfig,
-  ExperienceStepType,
-} from '@clementine/shared'
+  ExperienceStepType
+} from '@clementine/shared';
 
 import type { LucideIcon } from 'lucide-react'
 import type { z } from 'zod'
@@ -58,8 +58,13 @@ export type {
 
 /**
  * Answer value type for step inputs
+ * Primitive types for analytics-friendly storage
  */
-export type AnswerValue = string | number | boolean | string[]
+export type AnswerValue =
+  | string
+  | number
+  | boolean
+  | string[]
 
 /**
  * Props for step renderers (edit-mode preview and guest-mode run)
@@ -75,8 +80,10 @@ export interface StepRendererProps {
   // Run mode props (only used when mode === 'run')
   /** Current answer value (run mode only) */
   answer?: AnswerValue
+  /** Current answer context - step-specific AI generation data (run mode only) */
+  answerContext?: unknown
   /** Callback when user provides/updates answer (run mode only) */
-  onAnswer?: (value: AnswerValue) => void
+  onAnswer?: (value: AnswerValue, context?: unknown) => void
   /** Callback to go back (run mode only) */
   onBack?: () => void
   /** Whether back navigation is available (run mode only) */

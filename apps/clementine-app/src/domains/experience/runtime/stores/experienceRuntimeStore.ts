@@ -13,6 +13,7 @@
 import { create } from 'zustand'
 
 import { validateStepInput } from '../../steps/registry/step-validation'
+import type { AnswerValue } from '../../steps/registry/step-registry'
 import type {
   Answer,
   CapturedMedia,
@@ -68,12 +69,12 @@ export interface ExperienceRuntimeActions {
   /**
    * Record an answer for a step
    * Replaces any existing answer for the same stepId
+   * @param stepId - Step identifier
+   * @param stepType - Step type for validation
+   * @param value - Primitive answer value for analytics
+   * @param context - Optional step-specific context for AI generation
    */
-  setAnswer: (
-    stepId: string,
-    stepType: string,
-    value: string | number | boolean | string[],
-  ) => void
+  setAnswer: (stepId: string, stepType: string, value: AnswerValue, context?: unknown) => void
 
   /**
    * Record captured media for a step
@@ -134,10 +135,9 @@ export interface ExperienceRuntimeActions {
 
   /**
    * Get answer value for a specific step
+   * Supports both legacy string[] and new MultiSelectOption[] formats
    */
-  getAnswerValue: (
-    stepId: string,
-  ) => string | number | boolean | string[] | undefined
+  getAnswerValue: (stepId: string) => AnswerValue | undefined
 
   /**
    * Set syncing status
@@ -234,12 +234,13 @@ export const useExperienceRuntimeStore = create<ExperienceRuntimeStore>(
       })
     },
 
-    setAnswer: (stepId, stepType, value) => {
+    setAnswer: (stepId, stepType, value, context) => {
       set((state) => {
         const newAnswer: Answer = {
           stepId,
           stepType,
           value,
+          ...(context !== undefined && { context }),
           answeredAt: Date.now(),
         }
 

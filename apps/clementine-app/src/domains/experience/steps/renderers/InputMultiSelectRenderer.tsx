@@ -12,13 +12,17 @@
 import { useCallback } from 'react'
 import { StepLayout } from './StepLayout'
 import type { StepRendererProps } from '../registry/step-registry'
-import type { ExperienceInputMultiSelectStepConfig } from '@clementine/shared'
+import type {
+  ExperienceInputMultiSelectStepConfig,
+  MultiSelectOption,
+} from '@clementine/shared'
 import { ThemedSelectOption, ThemedText } from '@/shared/theming'
 
 export function InputMultiSelectRenderer({
   step,
   mode,
   answer,
+  answerContext,
   onAnswer,
   onSubmit,
   onBack,
@@ -28,26 +32,55 @@ export function InputMultiSelectRenderer({
   const config = step.config as ExperienceInputMultiSelectStepConfig
   const { title, options, multiSelect } = config
 
-  // Current selected values (always an array)
-  const selectedValues = Array.isArray(answer) ? answer : []
+  // Current selected options from context (MultiSelectOption[])
+  // Fall back to building from answer (string[]) for backward compatibility
+  const selectedOptions: MultiSelectOption[] = answerContext
+    ? (answerContext as MultiSelectOption[])
+    : Array.isArray(answer) && typeof answer[0] === 'string'
+      ? answer.map((value) => {
+          // Find full option object from value
+          const fullOption = options.find((opt) => opt.value === value)
+          return (
+            fullOption || {
+              value,
+              promptFragment: null,
+              promptMedia: null,
+            }
+          )
+        })
+      : []
 
-  // Handle option click
+  // Helper to check if an option is selected
+  const isOptionSelected = useCallback(
+    (optionValue: string) => {
+      return selectedOptions.some((selected) => selected.value === optionValue)
+    },
+    [selectedOptions],
+  )
+
+  // Handle option click - split into value (string[]) and context (MultiSelectOption[])
   const handleToggle = useCallback(
-    (option: string) => {
+    (option: MultiSelectOption) => {
       if (mode !== 'run' || !onAnswer) return
+
+      let newOptions: MultiSelectOption[]
 
       if (multiSelect) {
         // Multi-select: toggle the option
-        const newSelection = selectedValues.includes(option)
-          ? selectedValues.filter((v) => v !== option)
-          : [...selectedValues, option]
-        onAnswer(newSelection)
+        const isSelected = isOptionSelected(option.value)
+        newOptions = isSelected
+          ? selectedOptions.filter((opt) => opt.value !== option.value)
+          : [...selectedOptions, option]
       } else {
-        // Single-select: replace selection
-        onAnswer([option])
+        // Single-select: replace selection with this option
+        newOptions = [option]
       }
+
+      // Split into value (string[]) and context (MultiSelectOption[])
+      const values = newOptions.map((opt) => opt.value)
+      onAnswer(values, newOptions)
     },
-    [mode, onAnswer, multiSelect, selectedValues],
+    [mode, onAnswer, multiSelect, selectedOptions, isOptionSelected],
   )
 
   return (
@@ -72,8 +105,8 @@ export function InputMultiSelectRenderer({
             <ThemedSelectOption
               key={index}
               label={option.value}
-              selected={selectedValues.includes(option.value)}
-              onClick={() => handleToggle(option.value)}
+              selected={isOptionSelected(option.value)}
+              onClick={() => handleToggle(option)}
             />
           ))}
         </div>

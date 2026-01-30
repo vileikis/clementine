@@ -26,7 +26,11 @@
 
 import { useState } from 'react'
 import { Home } from 'lucide-react'
-import { ThemedIconButton, ThemedProgressBar, ThemedText } from '@/shared/theming'
+import {
+  ThemedIconButton,
+  ThemedProgressBar,
+  ThemedText,
+} from '@/shared/theming'
 import { cn } from '@/shared/utils'
 import {
   AlertDialog,
@@ -152,6 +156,7 @@ export function RuntimeTopBar({
 
         {/* Progress bar */}
         <ThemedProgressBar
+          className="w-1/2 self-center"
           value={progress}
           getValueLabel={(value) =>
             `Step ${currentStepIndex + 1} of ${totalSteps} (${Math.round(value)}% complete)`
@@ -165,13 +170,15 @@ export function RuntimeTopBar({
           <AlertDialogHeader>
             <AlertDialogTitle>Exit Experience?</AlertDialogTitle>
             <AlertDialogDescription>
-              Your progress will be lost if you leave now. Are you sure you
-              want to return home?
+              Your progress will be lost if you leave now. Are you sure you want
+              to return home?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmExit}>Exit</AlertDialogAction>
+            <AlertDialogAction onClick={handleConfirmExit}>
+              Exit
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

@@ -32,6 +32,7 @@
  */
 import { useCallback } from 'react'
 
+import type { AnswerValue } from '@/domains/experience/steps/registry/step-registry'
 import { useRuntime } from '@/domains/experience/runtime'
 import { StepRendererRouter } from '@/domains/experience/steps/components/StepRendererRouter'
 import { ThemedText } from '@/shared/theming'
@@ -53,14 +54,15 @@ export function GuestRuntimeContent() {
     back,
     setAnswer,
     getAnswer,
+    getAnswerContext,
     isComplete,
   } = runtime
 
   // Handle answer change
   const handleAnswer = useCallback(
-    (value: string | number | boolean | string[]) => {
+    (value: AnswerValue, context?: unknown) => {
       if (currentStep) {
-        setAnswer(currentStep.id, value)
+        setAnswer(currentStep.id, value, context)
       }
     },
     [currentStep, setAnswer],
@@ -87,6 +89,7 @@ export function GuestRuntimeContent() {
       step={currentStep}
       mode="run"
       answer={getAnswer(currentStep.id)}
+      answerContext={getAnswerContext(currentStep.id)}
       onAnswer={handleAnswer}
       onSubmit={next}
       onBack={back}

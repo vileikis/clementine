@@ -68,7 +68,8 @@ export function useUpdateSessionProgress() {
         }
 
         if (answers) {
-          updates.answers = answers
+          // Cast to satisfy Firestore types (MultiSelectOption[] is not recognized by UpdateData)
+          updates.answers = answers as UpdateData<Session>['answers']
         }
         if (capturedMedia) {
           updates.capturedMedia = capturedMedia
