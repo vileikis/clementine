@@ -8,9 +8,12 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { MoreVertical, Pencil, Trash2 } from 'lucide-react'
 
-import { getStepDefinition, getStepDisplayLabel } from '../../steps/registry/step-utils'
-import type { Step } from '../../steps/registry/step-registry'
+import {
+  getStepDefinition,
+  getStepDisplayLabel,
+} from '../../steps/registry/step-utils'
 import { StepTypeIcon } from '../../steps/components'
+import type { Step } from '../../steps/registry/step-registry'
 import { cn } from '@/shared/utils'
 import {
   DropdownMenu,

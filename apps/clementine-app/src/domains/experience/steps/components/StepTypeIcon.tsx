@@ -4,7 +4,10 @@
  * Displays a colored icon representing a step type.
  * Uses the step definition to determine the icon and category colors.
  */
-import { getStepDefinition, getCategoryColorClasses } from '../registry/step-utils'
+import {
+  getCategoryColorClasses,
+  getStepDefinition,
+} from '../registry/step-utils'
 import type { StepType } from '../registry/step-registry'
 import { cn } from '@/shared/utils'
 
