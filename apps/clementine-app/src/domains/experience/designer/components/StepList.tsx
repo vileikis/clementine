@@ -169,6 +169,10 @@ export function StepList({
     [disabled, steps, selectedStepId, onSelectStep, onDeleteStep],
   )
 
+  const renamingStep = renamingStepId
+    ? steps.find((step) => step.id === renamingStepId)
+    : null
+
   return (
     <div className="flex h-full flex-col">
       {/* Header with Add button */}
@@ -231,12 +235,17 @@ export function StepList({
       </ScrollArea>
 
       {/* Rename dialog */}
-      {renamingStepId && (
+      {renamingStep && (
         <RenameStepDialog
-          step={steps.find((s) => s.id === renamingStepId)!}
+          step={renamingStep}
           allSteps={steps}
           open={renameDialogOpen}
-          onOpenChange={setRenameDialogOpen}
+          onOpenChange={(open) => {
+            setRenameDialogOpen(open)
+            if (!open) {
+              setRenamingStepId(null)
+            }
+          }}
           onRename={onRenameStep}
         />
       )}

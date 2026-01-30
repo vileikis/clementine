@@ -8,9 +8,8 @@ import { z } from 'zod'
 import { mediaReferenceSchema } from '../../media/media-reference.schema'
 
 export const aiImageModelSchema = z.enum([
-  'gemini-2.5-flash',
-  'gemini-2.5-pro',
-  'gemini-3.0',
+  'gemini-2.5-flash-image',
+  'gemini-3-pro-image-preview',
 ])
 
 export const aiImageAspectRatioSchema = z.enum([

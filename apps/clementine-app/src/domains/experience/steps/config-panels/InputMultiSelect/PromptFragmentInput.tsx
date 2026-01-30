@@ -29,16 +29,18 @@ export function PromptFragmentInput({
 }: PromptFragmentInputProps) {
   const [localValue, setLocalValue] = useState(value || '')
 
-  // Sync local state with prop changes
-  useEffect(() => {
-    setLocalValue(value || '')
-  }, [value])
-
   const debouncedOnChange = useDebouncedCallback((newValue: string) => {
     // Only call onChange if value actually changed
     const trimmed = newValue.trim()
     onChange(trimmed || null)
   }, 2000)
+
+  // Sync local state with prop changes
+  useEffect(() => {
+    // Cancel any pending debounced calls to prevent stale updates
+    debouncedOnChange.cancel()
+    setLocalValue(value || '')
+  }, [value, debouncedOnChange])
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = e.target.value

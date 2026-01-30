@@ -14,7 +14,7 @@ import {
 
 describe('aiImageNodeConfigSchema', () => {
   const validConfig = {
-    model: 'gemini-2.5-pro',
+    model: 'gemini-2.5-flash-image',
     aspectRatio: '3:2',
     prompt: 'A photo of a cat in a park',
     refMedia: [],
@@ -33,10 +33,9 @@ describe('aiImageNodeConfigSchema', () => {
     })
 
     it('should accept valid model names from enum', () => {
-      const models: Array<'gemini-2.5-pro' | 'gemini-2.5-flash' | 'gemini-3.0'> = [
-        'gemini-2.5-pro',
-        'gemini-2.5-flash',
-        'gemini-3.0',
+      const models: Array<'gemini-2.5-flash-image' | 'gemini-3-pro-image-preview'> = [
+        'gemini-2.5-flash-image',
+        'gemini-3-pro-image-preview',
       ]
       models.forEach(model => {
         const result = aiImageNodeConfigSchema.safeParse({

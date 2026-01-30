@@ -93,6 +93,8 @@ export function OptionListItem({
               variant="ghost"
               size="icon"
               disabled={disabled}
+              aria-label="Option actions"
+              aria-haspopup="menu"
             >
               <MoreVertical className="h-4 w-4" />
             </Button>

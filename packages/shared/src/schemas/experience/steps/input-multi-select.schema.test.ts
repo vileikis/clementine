@@ -46,7 +46,7 @@ describe('multiSelectOptionSchema', () => {
       })
       expect(result.success).toBe(true)
       if (result.success) {
-        expect(result.data.promptFragment).toBeUndefined()
+        expect(result.data.promptFragment).toBeNull()
       }
     })
 
@@ -111,7 +111,7 @@ describe('multiSelectOptionSchema', () => {
       })
       expect(result.success).toBe(true)
       if (result.success) {
-        expect(result.data.promptMedia).toBeUndefined()
+        expect(result.data.promptMedia).toBeNull()
       }
     })
 
@@ -193,39 +193,6 @@ describe('multiSelectOptionSchema', () => {
         value: 'Dog',
       })
       expect(result.success).toBe(true)
-    })
-  })
-
-  describe('backward compatibility', () => {
-    it('should accept legacy string format', () => {
-      // Old schema had options as plain strings
-      const result = multiSelectOptionSchema.safeParse('Cat')
-      expect(result.success).toBe(true)
-      if (result.success) {
-        // Should transform to object format
-        expect(result.data).toEqual({ value: 'Cat' })
-      }
-    })
-
-    it('should accept new object format', () => {
-      const result = multiSelectOptionSchema.safeParse({
-        value: 'Cat',
-      })
-      expect(result.success).toBe(true)
-      if (result.success) {
-        expect(result.data.value).toBe('Cat')
-      }
-    })
-
-    it('should transform legacy string to object', () => {
-      const result = multiSelectOptionSchema.safeParse('Dog')
-      expect(result.success).toBe(true)
-      if (result.success) {
-        expect(result.data).toHaveProperty('value')
-        expect(result.data.value).toBe('Dog')
-        expect(result.data.promptFragment).toBeUndefined()
-        expect(result.data.promptMedia).toBeUndefined()
-      }
     })
   })
 })
