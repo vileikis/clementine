@@ -11,6 +11,7 @@ import {
   MoreVertical,
   Trash2,
 } from 'lucide-react'
+import { AIEnabledBadge } from '../../components'
 import { PromptFragmentInput } from './PromptFragmentInput'
 import { PromptMediaPicker } from './PromptMediaPicker'
 import type { MultiSelectOption } from '@clementine/shared'
@@ -109,11 +110,7 @@ export function OptionListItem({
       </div>
 
       {/* AI Context indicator when collapsed */}
-      {!isExpanded && hasAIContext && (
-        <div className="pb-3 text-xs text-muted-foreground">
-          ✨ AI context added
-        </div>
-      )}
+      {!isExpanded && hasAIContext && <AIEnabledBadge />}
 
       {/* AI Fields (expanded) */}
       {isExpanded && (

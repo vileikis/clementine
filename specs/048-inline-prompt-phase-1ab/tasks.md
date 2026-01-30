@@ -125,8 +125,8 @@
 
 #### AI-Enabled Badge (OPTIONAL - LOWEST PRIORITY)
 
-- [ ] T029 [US2] Create `AIEnabledBadge` component in `apps/clementine-app/src/domains/experience/designer/components/AIEnabledBadge.tsx` (shadcn Badge with Sparkles icon, shows when promptFragment OR promptMedia is set)
-- [ ] T030 [US2] Add AIEnabledBadge to MultiSelectOptionEditor option list display (conditional render when option has AI context)
+- [X] T029 [US2] Create `AIEnabledBadge` component in `apps/clementine-app/src/domains/experience/steps/components/AIEnabledBadge.tsx` (simple text indicator with sparkle emoji, shows when promptFragment OR promptMedia is set)
+- [X] T030 [US2] Add AIEnabledBadge to OptionListItem display (conditional render when option has AI context)
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently - creators can configure step names and add AI context to options
 
@@ -136,8 +136,8 @@
 
 **Purpose**: Validation, documentation, and final checks
 
-- [ ] T031 [P] Run `pnpm app:check` to verify formatting and linting pass
-- [ ] T032 [P] Run `pnpm app:type-check` to verify TypeScript has no errors
+- [X] T031 [P] Run `pnpm app:check` to verify formatting and linting pass
+- [X] T032 [P] Run `pnpm app:type-check` to verify TypeScript has no errors
 - [ ] T033 Run manual testing checklist from `specs/048-inline-prompt-phase-1ab/quickstart.md` (Testing & Validation section)
 - [ ] T034 Verify all acceptance scenarios from spec.md are met for User Stories 1, 2, and 3
 - [ ] T035 Test backward compatibility: create experience with old schema, open in designer, verify fallback displays, edit step to auto-generate name

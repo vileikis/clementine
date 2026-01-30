@@ -8,3 +8,4 @@ export {
   type StepRendererRouterProps,
 } from './StepRendererRouter'
 export { StepTypeIcon } from './StepTypeIcon'
+export { AIEnabledBadge } from './AIEnabledBadge'
