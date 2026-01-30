@@ -62,6 +62,45 @@ export async function uploadToStorage(
 }
 
 /**
+ * Upload a buffer to Firebase Storage with public access
+ *
+ * @param buffer - Buffer to upload
+ * @param storagePath - Storage destination path
+ * @param contentType - Content type (e.g., 'image/png')
+ * @param metadata - Optional metadata to attach
+ * @returns Public URL to access the uploaded file
+ */
+export async function uploadBufferToStorage(
+  buffer: Buffer,
+  storagePath: string,
+  contentType: string = 'image/png',
+  metadata?: Record<string, string>
+): Promise<string> {
+  const bucket = storage.bucket();
+  const file = bucket.file(storagePath);
+
+  await file.save(buffer, {
+    metadata: {
+      contentType,
+      cacheControl: 'public, max-age=31536000', // 1 year cache
+      metadata,
+    },
+  });
+
+  // Make file publicly accessible
+  try {
+    await file.makePublic();
+    console.log(`File made public: ${storagePath}`);
+  } catch (error) {
+    console.warn(`Failed to make file public: ${storagePath}`, error);
+    // Continue anyway - file might still be accessible via Storage rules
+  }
+
+  // Return public URL
+  return `https://storage.googleapis.com/${bucket.name}/${storagePath}`;
+}
+
+/**
  * Generate storage path for output media
  *
  * @param projectId - Project ID

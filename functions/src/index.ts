@@ -49,6 +49,8 @@ export { startTransformPipeline } from "./http/startTransformPipeline";
 export { transformPipelineJob } from "./tasks/transformPipelineJob";
 
 /**
- * Vertex AI Test
+ * Vertex AI Tests
  */
 export { testVertexAI } from "./http/testVertexAI";
+export { testImageGeneration } from "./http/testImageGeneration";
+export { testImageGenerationWithReference } from "./http/testImageGenerationWithReference";
