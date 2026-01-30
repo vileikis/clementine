@@ -23,17 +23,41 @@ export const Route = createFileRoute(
   notFoundComponent: ExperienceNotFound,
 })
 
+type ExperienceLayoutContentProps = {
+  workspace: NonNullable<ReturnType<typeof useWorkspace>['data']>
+  workspaceSlug: string
+  experienceId: string
+}
+
 function ExperienceLayout() {
   const { workspaceSlug, experienceId } = Route.useParams()
   const { data: workspace } = useWorkspace(workspaceSlug)
+
+  // Wait for workspace to load before setting up experience listener
+  if (!workspace) {
+    return null
+  }
+
+  return (
+    <ExperienceLayoutContent
+      workspace={workspace}
+      workspaceSlug={workspaceSlug}
+      experienceId={experienceId}
+    />
+  )
+}
+
+function ExperienceLayoutContent({
+  workspace,
+  workspaceSlug,
+  experienceId,
+}: ExperienceLayoutContentProps) {
   const { data: experience } = useWorkspaceExperience(
-    workspace?.id ?? '',
+    workspace.id,
     experienceId,
   )
 
-  // Data should be immediately available from hooks
-  // This check is a safety guard only
-  if (!workspace || !experience) {
+  if (!experience) {
     return null
   }
 
