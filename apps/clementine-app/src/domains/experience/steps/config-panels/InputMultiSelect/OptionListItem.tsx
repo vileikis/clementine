@@ -34,7 +34,7 @@ interface OptionListItemProps {
   onValueChange: (value: string) => void
   onDuplicate: () => void
   onDelete: () => void
-  onPromptFragmentChange: (value: string | undefined) => void
+  onPromptFragmentChange: (value: string | null) => void
   onPromptMediaChange: (value: MultiSelectOption['promptMedia']) => void
 }
 

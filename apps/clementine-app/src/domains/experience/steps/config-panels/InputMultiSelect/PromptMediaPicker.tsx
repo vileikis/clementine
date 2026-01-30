@@ -21,8 +21,8 @@ import { useWorkspace } from '@/domains/workspace'
 import { useAuth } from '@/domains/auth'
 
 interface PromptMediaPickerProps {
-  value: MediaReference | undefined
-  onChange: (value: MediaReference | undefined) => void
+  value: MediaReference | null
+  onChange: (value: MediaReference | null) => void
   disabled?: boolean
 }
 
@@ -48,7 +48,7 @@ export function PromptMediaPicker({
   }
 
   const handleRemove = () => {
-    onChange(undefined)
+    onChange(null)
   }
 
   return (

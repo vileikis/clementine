@@ -5,6 +5,7 @@
  * Handles state, validation, and all option-related operations.
  */
 import { Plus } from 'lucide-react'
+import { multiSelectOptionSchema } from '@clementine/shared'
 import { OptionListItem } from './OptionListItem'
 import type { MultiSelectOption } from '@clementine/shared'
 
@@ -47,25 +48,32 @@ export function ChoicesSection({
   }
 
   const handleAddOption = () => {
-    if (options.length < 10) {
-      onOptionsChange([...options, { value: `Option ${options.length + 1}` }])
+    if (options.length >= 10) {
+      return
     }
+
+    const newOption: MultiSelectOption = multiSelectOptionSchema.parse({
+      value: `Option ${options.length + 1}`,
+    })
+    onOptionsChange([...options, newOption])
   }
 
   const handleDuplicateOption = (index: number) => {
-    if (options.length < 10) {
-      const optionToDuplicate = options[index]
-      const newOption = {
-        ...optionToDuplicate,
-        value: `${optionToDuplicate.value} (copy)`,
-      }
-      const newOptions = [
-        ...options.slice(0, index + 1),
-        newOption,
-        ...options.slice(index + 1),
-      ]
-      onOptionsChange(newOptions)
+    if (options.length >= 10) {
+      return
     }
+
+    const optionToDuplicate = options[index]
+    const newOption = {
+      ...optionToDuplicate,
+      value: `${optionToDuplicate.value} (copy)`,
+    }
+    const newOptions = [
+      ...options.slice(0, index + 1),
+      newOption,
+      ...options.slice(index + 1),
+    ]
+    onOptionsChange(newOptions)
   }
 
   const handleRemoveOption = (index: number) => {

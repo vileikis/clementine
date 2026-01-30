@@ -9,40 +9,17 @@ import { mediaReferenceSchema } from '../../media/media-reference.schema'
 /**
  * Multi-select option schema with optional AI context fields
  * Each option can have a text fragment and/or media reference for AI prompts
- *
- * Supports backward compatibility: accepts both string (legacy) and object (new) formats
  */
-const multiSelectOptionObjectSchema = z.object({
-  /** Display value for the option (1-100 chars) */
-  value: z.string().min(1).max(100),
+export const multiSelectOptionSchema = z.object({
+  /** Display value for the option (1-100 chars, defaults to 'Option' if empty) */
+  value: z.string().min(1).max(100).catch('Option'),
   /** Optional text to insert into prompt when this option is selected (max 500 chars) */
   promptFragment: z.string().max(500).nullable().default(null),
   /** Optional media reference to insert into prompt when this option is selected */
   promptMedia: mediaReferenceSchema.nullable().default(null),
 })
 
-/**
- * Backward compatible option schema
- * Accepts either string (legacy format) or object (new format)
- * Always transforms to object format for consistent TypeScript types
- */
-export const multiSelectOptionSchema = z
-  .union([
-    // Legacy format: plain string
-    z.string().min(1).max(100),
-    // New format: object with AI fields
-    multiSelectOptionObjectSchema,
-  ])
-  .transform((val) => {
-    // If it's already an object, return as-is
-    if (typeof val === 'object') {
-      return val
-    }
-    // If it's a string (legacy format), transform to object
-    return { value: val }
-  })
-
-export type MultiSelectOption = z.infer<typeof multiSelectOptionObjectSchema>
+export type MultiSelectOption = z.infer<typeof multiSelectOptionSchema>
 
 /**
  * Experience input multi-select step configuration schema

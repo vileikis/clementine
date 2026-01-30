@@ -17,8 +17,8 @@ import {
 } from '@/ui-kit/ui/tooltip'
 
 interface PromptFragmentInputProps {
-  value: string | undefined
-  onChange: (value: string | undefined) => void
+  value: string | null
+  onChange: (value: string | null) => void
   disabled?: boolean
 }
 
@@ -37,7 +37,7 @@ export function PromptFragmentInput({
   const debouncedOnChange = useDebouncedCallback((newValue: string) => {
     // Only call onChange if value actually changed
     const trimmed = newValue.trim()
-    onChange(trimmed || undefined)
+    onChange(trimmed || null)
   }, 2000)
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
