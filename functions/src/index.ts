@@ -47,3 +47,8 @@ export { processMediaJob } from "./tasks/processMediaJob";
  */
 export { startTransformPipeline } from "./http/startTransformPipeline";
 export { transformPipelineJob } from "./tasks/transformPipelineJob";
+
+/**
+ * Vertex AI Test
+ */
+export { testVertexAI } from "./http/testVertexAI";
