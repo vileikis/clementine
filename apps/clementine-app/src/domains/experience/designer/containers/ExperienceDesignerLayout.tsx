@@ -16,9 +16,10 @@ import {
 } from '../hooks'
 import { ExperienceDetailsDialog, ExperienceIdentityBadge } from '../components'
 import { ExperiencePreviewModal } from '../../preview'
-import { ExperienceDesignerPage } from './ExperienceDesignerPage'
 import type { Experience } from '@/domains/experience/shared'
 import type { Step } from '@/domains/experience/steps'
+import type { TabItem } from '@/domains/navigation'
+import type { ReactNode } from 'react'
 import { useAuth } from '@/domains/auth'
 import { TopNavBar } from '@/domains/navigation'
 import { EditorChangesBadge, EditorSaveStatus } from '@/shared/editor-status'
@@ -28,6 +29,7 @@ interface ExperienceDesignerLayoutProps {
   experience: Experience
   workspaceSlug: string
   workspaceId: string
+  children: ReactNode
 }
 
 /**
@@ -52,6 +54,7 @@ export function ExperienceDesignerLayout({
   experience,
   workspaceSlug,
   workspaceId,
+  children,
 }: ExperienceDesignerLayoutProps) {
   const { pendingSaves, lastCompletedAt, resetSaveState } =
     useExperienceDesignerStore()
@@ -65,6 +68,20 @@ export function ExperienceDesignerLayout({
 
   // Compute paths for breadcrumb navigation
   const experiencesPath = `/workspace/${workspaceSlug}/experiences`
+
+  // Tab configuration for experience designer
+  const experienceDesignerTabs: TabItem[] = [
+    {
+      id: 'collect',
+      label: 'Collect',
+      to: `/workspace/${workspaceSlug}/experiences/${experience.id}/collect`,
+    },
+    {
+      id: 'generate',
+      label: 'Generate',
+      to: `/workspace/${workspaceSlug}/experiences/${experience.id}/generate`,
+    },
+  ]
 
   // Detect unpublished changes using version-based comparison
   const hasUnpublishedChanges = useMemo(() => {
@@ -138,6 +155,7 @@ export function ExperienceDesignerLayout({
             iconHref: experiencesPath,
           },
         ]}
+        tabs={experienceDesignerTabs}
         right={
           <>
             <EditorSaveStatus
@@ -163,11 +181,7 @@ export function ExperienceDesignerLayout({
           </>
         }
       />
-      <ExperienceDesignerPage
-        experience={experience}
-        workspaceSlug={workspaceSlug}
-        workspaceId={workspaceId}
-      />
+      {children}
 
       {/* Preview Modal */}
       <ExperiencePreviewModal

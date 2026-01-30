@@ -9,9 +9,9 @@ import { getRouteApi } from '@tanstack/react-router'
 
 import type { Step } from '../../steps/registry/step-registry'
 
-// Get typed route API for the experience designer route
+// Get typed route API for the Collect tab route
 const routeApi = getRouteApi(
-  '/workspace/$workspaceSlug/experiences/$experienceId',
+  '/workspace/$workspaceSlug/experiences/$experienceId/collect',
 )
 
 /**

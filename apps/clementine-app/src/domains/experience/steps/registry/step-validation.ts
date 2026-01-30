@@ -73,10 +73,6 @@ export function validateStepInput(
       // and calls onSubmit directly after successful upload
       return { isValid: true }
 
-    case 'transform.pipeline':
-      // Placeholder steps - always valid for now
-      return { isValid: true }
-
     default:
       // Unknown step type - treat as valid
       return { isValid: true }

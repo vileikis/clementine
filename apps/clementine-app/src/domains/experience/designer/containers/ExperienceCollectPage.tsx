@@ -1,7 +1,7 @@
 /**
- * ExperienceDesignerPage Container
+ * ExperienceCollectPage Container
  *
- * Main content area for the experience designer with 3-column layout.
+ * Main content area for the Collect tab with 3-column layout.
  * Left: Step list | Center: Preview | Right: Config panel
  *
  * Handles:
@@ -25,14 +25,14 @@ import type { Experience } from '@/domains/experience/shared'
 import { Button } from '@/ui-kit/ui/button'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/ui-kit/ui/sheet'
 
-interface ExperienceDesignerPageProps {
+interface ExperienceCollectPageProps {
   experience: Experience
   workspaceSlug: string
   workspaceId: string
 }
 
 /**
- * Experience designer with 3-column responsive layout
+ * Experience Collect tab with 3-column responsive layout
  *
  * Architecture:
  * - List operations (add/delete/reorder): Save immediately via useUpdateDraftSteps
@@ -41,12 +41,12 @@ interface ExperienceDesignerPageProps {
  * Layout:
  * - Desktop (lg+): 3 columns
  * - Tablet (md): 2 columns with collapsible config panel
- * - Mobile: Single column with bottom sheet (Phase 8)
+ * - Mobile: Single column with bottom sheet
  */
-export function ExperienceDesignerPage({
+export function ExperienceCollectPage({
   experience,
   workspaceId,
-}: ExperienceDesignerPageProps) {
+}: ExperienceCollectPageProps) {
   // Local step state for immediate UI updates
   // Apply lazy migration to ensure all steps have names (for backward compatibility)
   const [steps, setSteps] = useState<Step[]>(() =>

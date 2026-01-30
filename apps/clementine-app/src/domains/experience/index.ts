@@ -14,5 +14,6 @@
 export * from './shared'
 export * from './library'
 export * from './designer'
+export * from './generate'
 export * from './runtime'
 export * from './preview'

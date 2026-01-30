@@ -10,6 +10,5 @@ export { InputYesNoConfigPanel } from './InputYesNoConfigPanel'
 export { InputShortTextConfigPanel } from './InputShortTextConfigPanel'
 export { InputLongTextConfigPanel } from './InputLongTextConfigPanel'
 export { CapturePhotoConfigPanel } from './CapturePhotoConfigPanel'
-export { TransformPipelineConfigPanel } from './TransformPipelineConfigPanel'
 
 export { InputMultiSelectConfigPanel } from './InputMultiSelect'

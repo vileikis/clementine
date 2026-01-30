@@ -13,7 +13,6 @@ import type {
   ExperienceInputScaleStepConfig,
   ExperienceInputShortTextStepConfig,
   ExperienceInputYesNoStepConfig,
-  ExperienceTransformPipelineStepConfig,
 } from '@clementine/shared'
 
 /**
@@ -97,11 +96,4 @@ export function createDefaultCapturePhotoConfig(): ExperienceCapturePhotoStepCon
   return {
     aspectRatio: '1:1',
   }
-}
-
-/**
- * Default config factory for transform pipeline steps
- */
-export function createDefaultTransformPipelineConfig(): ExperienceTransformPipelineStepConfig {
-  return {}
 }
