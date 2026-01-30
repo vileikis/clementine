@@ -20,10 +20,23 @@ import { experienceTransformPipelineStepConfigSchema } from './steps/transform-p
 
 /**
  * Experience step name schema
- * Human-readable name for identification and transform variable mapping
+ * Human-readable name for identification and AI prompt references
+ * Required field with strict validation for AI-safe identifiers
  * Trims whitespace before validation so whitespace-only names are rejected
+ *
+ * Backward compatibility: If name is missing or invalid, falls back to 'Untitled Step'
+ * (Frontend will auto-generate better names based on step type during creation)
  */
-export const experienceStepNameSchema = z.string().trim().min(1).max(50).optional()
+export const experienceStepNameSchema = z
+  .string()
+  .trim()
+  .min(1, 'Step name is required')
+  .max(50, 'Step name must be 50 characters or less')
+  .regex(
+    /^[a-zA-Z0-9 \-_]+$/,
+    'Step name can only contain letters, numbers, spaces, hyphens, and underscores'
+  )
+  .catch('Untitled Step')
 
 /**
  * Experience step type enumeration schema

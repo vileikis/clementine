@@ -243,8 +243,8 @@ describe('eventContextSnapshotSchema', () => {
 describe('jobSnapshotSchema', () => {
   const validSnapshot = {
     sessionInputs: { answers: [], capturedMedia: [] },
-    transformConfig: { nodes: [], variableMappings: [] },
-    eventContext: { overlay: null, applyOverlay: false },
+    transformConfig: { nodes: [] },
+    projectContext: { overlay: null, applyOverlay: false },
     versions: { experienceVersion: 1, eventVersion: null },
   }
 
@@ -252,7 +252,7 @@ describe('jobSnapshotSchema', () => {
     const result = jobSnapshotSchema.parse(validSnapshot)
     expect(result.sessionInputs).toBeDefined()
     expect(result.transformConfig).toBeDefined()
-    expect(result.eventContext).toBeDefined()
+    expect(result.projectContext).toBeDefined()
     expect(result.versions).toBeDefined()
   })
 
@@ -274,7 +274,7 @@ describe('jobSchema', () => {
     snapshot: {
       sessionInputs: { answers: [], capturedMedia: [] },
       transformConfig: { nodes: [] },
-      eventContext: { overlay: null, applyOverlay: false },
+      projectContext: { overlay: null, applyOverlay: false },
       versions: { experienceVersion: 1, eventVersion: null },
     },
     createdAt: Date.now(),

@@ -8,6 +8,11 @@
 
 **Tasks**:
 
+- [ ] Update `experienceStepNameSchema`:
+  - Make required (remove `.optional()`)
+  - Add regex validation: `/^[a-zA-Z0-9 \-_]+$/` (letters, numbers, spaces, hyphens, underscores)
+  - Keep max length at 50 characters
+  - Update comment to reflect support for spaces in names
 - [ ] Enhance `multiSelectOptionSchema`:
   - Add `promptFragment: z.string().max(500).optional()`
   - Add `promptMedia: mediaReferenceSchema.optional()`
@@ -15,11 +20,15 @@
   - Extend `mediaReferenceSchema` with `displayName`
 - [ ] Create `aiImageNodeSchema`:
   - Fields: `model`, `aspectRatio`, `prompt`, `refMedia`
+- [ ] Update `transformConfigSchema`:
+  - Remove `variableMappings` field (obsolete with inline architecture)
+  - Remove `variableMappingSchema` export
 - [ ] Update `transformNodeSchema` to support typed configs
 - [ ] Write unit tests for schemas
 
 **Files**:
 
+- `packages/shared/src/schemas/experience/step.schema.ts`
 - `packages/shared/src/schemas/experience/steps/input-multi-select.schema.ts`
 - `packages/shared/src/schemas/experience/nodes/ai-image-node.schema.ts`
 - `packages/shared/src/schemas/experience/nodes/ref-media-entry.schema.ts`
@@ -30,15 +39,34 @@
 - ✅ Schemas validate correctly
 - ✅ TypeScript types generated
 - ✅ Unit tests pass
+- ✅ Step names support spaces and are required
 
 ---
 
 ### Phase 1b: Step Editor Enhancement (3-4 days)
 
-**Goal**: Add AI-aware fields to multiselect step editor
+**Goal**: Add step name editing and AI-aware fields to step editors
 
 **Tasks**:
 
+- [ ] **Step name editing**
+  - Add step name text input to all step editor settings panels
+  - Auto-generate initial name from step type on creation (e.g., "Pet Choice", "User Photo")
+  - Validate uniqueness on blur (case-sensitive)
+  - Show inline error if name is duplicate or invalid
+  - Debounced auto-save
+  - Max 50 characters
+  - Allow spaces, letters, numbers, hyphens, underscores
+- [ ] **Update StepList display**
+  - Show `step.name` instead of `step.config.title` in StepList
+  - Add fallback to title if name is empty (backward compatibility)
+  - Display step type badge/icon next to name
+  - Update StepListItem component
+- [ ] **Step name uniqueness validation**
+  - Implement `useValidateStepName` hook
+  - Check uniqueness across all steps in experience
+  - Show error message if duplicate found
+  - Prevent saving duplicate names
 - [ ] Add promptFragment text input to option editor
   - Label: "Prompt Fragment (optional)"
   - Help text: "Text to insert when this option is selected"
@@ -55,15 +83,27 @@
 - [ ] Validation
   - promptFragment max length
   - promptMedia must be valid MediaReference
+  - Step names must be unique
 
 **Components** (new or enhanced):
 
+- `domains/experience/designer/components/StepList.tsx`
+- `domains/experience/designer/components/StepListItem.tsx`
+- `domains/experience/designer/steps/components/StepNameEditor.tsx`
 - `domains/experience/designer/steps/components/MultiSelectOptionEditor.tsx`
 - `domains/experience/designer/steps/components/PromptFragmentInput.tsx`
 - `domains/experience/designer/steps/components/PromptMediaPicker.tsx`
 
+**Hooks** (new):
+
+- `domains/experience/designer/hooks/useValidateStepName.ts`
+- `domains/experience/designer/hooks/useUpdateStepName.ts`
+
 **Success Criteria**:
 
+- ✅ Can edit step names with validation
+- ✅ Step names are unique and required
+- ✅ StepList shows step names instead of titles
 - ✅ Can add/edit promptFragment for options
 - ✅ Can upload promptMedia for options
 - ✅ Changes save to experience draft
@@ -71,9 +111,78 @@
 
 ---
 
+### Phase 1b-2: Transform Pipeline Editor (2-3 days)
+
+**Goal**: Create transform pipeline editor UI foundation
+
+**Tasks**:
+
+- [ ] Add Transform panel to experience designer
+  - Show alongside step list (same layout area)
+  - Empty state message when no nodes
+  - Tab/section switcher between Steps and Transform
+- [ ] Node list/canvas UI
+  - Display AI Image nodes in list/canvas
+  - Node card shows summary (model, aspect ratio, prompt preview)
+  - Empty state with "Add Node" button
+- [ ] Add AI Image node
+  - "Add Node" button
+  - Creates new AI Image node with defaults (model: gemini-2.5-pro, aspectRatio: 3:2)
+  - Auto-generates node ID
+  - Opens node editor panel
+- [ ] Delete node
+  - Delete button on node card (show on hover)
+  - Confirmation dialog
+  - Remove from transform config
+- [ ] Node display card
+  - Shows node type badge ("AI Image Generation")
+  - Shows model name
+  - Shows aspect ratio
+  - Shows prompt preview (first 50 chars)
+  - Click card to edit
+- [ ] Save transform config
+  - Auto-save to experience.draft.transform
+  - Debounced updates (2000ms)
+  - Save status indicator
+- [ ] Node editor panel (placeholder structure)
+  - Opens in sidebar when node is selected
+  - Basic layout with sections for: Model Settings, Prompt, RefMedia, Test Run
+  - Section placeholders only - detailed config added in Phase 1c-1e
+  - Close button
+
+**Components** (new):
+
+- `domains/experience/designer/transform/containers/TransformPipelineEditor.tsx`
+- `domains/experience/designer/transform/components/TransformPanel.tsx`
+- `domains/experience/designer/transform/components/NodeList.tsx`
+- `domains/experience/designer/transform/components/AIImageNodeCard.tsx`
+- `domains/experience/designer/transform/components/AddNodeButton.tsx`
+- `domains/experience/designer/transform/components/DeleteNodeDialog.tsx`
+- `domains/experience/designer/transform/components/NodeEditorPanel.tsx`
+
+**Hooks** (new):
+
+- `domains/experience/designer/transform/hooks/useUpdateTransformConfig.ts`
+- `domains/experience/designer/transform/hooks/useAddNode.ts`
+- `domains/experience/designer/transform/hooks/useDeleteNode.ts`
+- `domains/experience/designer/transform/hooks/useSelectedNode.ts`
+
+**Success Criteria**:
+
+- ✅ Transform panel visible in experience designer
+- ✅ Can add AI Image node
+- ✅ Node card displays summary (model, aspect ratio, prompt preview)
+- ✅ Can delete node with confirmation
+- ✅ Node editor panel opens when node selected
+- ✅ Node editor panel has placeholder sections
+- ✅ Transform config saves to experience draft
+- ✅ Auto-save and save status work
+
+---
+
 ### Phase 1c: RefMedia Management (2-3 days)
 
-**Goal**: Build refMedia section for AI node
+**Goal**: Build refMedia section in AI node editor panel (builds on Phase 1b-2)
 
 **Tasks**:
 
@@ -122,7 +231,7 @@
 
 ### Phase 1d: Lexical Prompt Editor (3-4 days)
 
-**Goal**: Adapt Lexical editor for AI node prompt
+**Goal**: Build Lexical prompt editor in AI node editor panel (builds on Phase 1b-2)
 
 **Tasks**:
 
@@ -131,8 +240,9 @@
   - Adapt for experience context
 - [ ] Implement StepMentionNode
   - Blue pill display
-  - Serialize: `@{step:stepName}`
+  - Serialize: `@{step:stepName}` (step names can contain spaces, e.g., `@{step:Pet Choice}`)
   - Deserialize with step lookup
+  - Parse using regex: `/@\{step:([^}]+)\}/g` to handle spaces
 - [ ] Implement MediaMentionNode
   - Green pill display
   - Serialize: `@{ref:mediaAssetId}`
@@ -147,8 +257,10 @@
   - Search/filter by name
   - Keyboard navigation
 - [ ] Serialization utils
-  - `serializeToPlainText()`: EditorState → `@{type:name}` format
+  - `serializeToPlainText()`: EditorState → `@{step:name}` or `@{ref:id}` format
   - `deserializeFromPlainText()`: Plain text → EditorState
+  - Support step names with spaces (e.g., `@{step:Pet Choice}`)
+  - Parse using regex: `/@\{step:([^}]+)\}/g` and `/@\{ref:([^}]+)\}/g`
 - [ ] Character count display
 - [ ] Validation
   - Check for undefined step references
@@ -183,7 +295,7 @@
 
 ### Phase 1e: AI Node Settings (1-2 days)
 
-**Goal**: Add model and aspect ratio controls
+**Goal**: Add model and aspect ratio controls to AI node editor panel (builds on Phase 1b-2)
 
 **Tasks**:
 
@@ -334,50 +446,7 @@
 
 ---
 
-### Phase 1h: Transform Pipeline Integration (2-3 days)
-
-**Goal**: Integrate AI node into transform pipeline UI
-
-**Tasks**:
-
-- [ ] Update pipeline canvas
-  - Show AI Image nodes
-  - Node card displays:
-    - Model badge
-    - Aspect ratio
-    - Prompt preview (first 50 chars)
-    - Media count
-- [ ] Add AI node button
-  - "Add Node" menu → "AI Image Generation"
-  - Creates new node with defaults
-  - Opens editor
-- [ ] Edit node
-  - Click node card → open editor
-  - Editor in sidebar or dialog
-- [ ] Delete node
-  - Delete button on node card
-  - Confirmation dialog
-- [ ] Node connections (if multi-node)
-  - Visual connections between nodes
-  - Input/output indicators
-
-**Components** (enhanced):
-
-- `domains/experience/designer/transform/containers/TransformPipelineEditor.tsx`
-- `domains/experience/designer/transform/components/AIImageNodeCard.tsx`
-- `domains/experience/designer/transform/components/AddNodeMenu.tsx`
-
-**Success Criteria**:
-
-- ✅ Can add AI Image node
-- ✅ Node card shows summary
-- ✅ Can edit node (opens editor)
-- ✅ Can delete node
-- ✅ Pipeline saves to experience draft
-
----
-
-### Phase 1i: Testing & Documentation (2 days)
+### Phase 1h: Testing & Documentation (2 days)
 
 **Goal**: Ensure quality and document the system
 
@@ -416,6 +485,17 @@
 
 ### Phase 1 Total: ~21-27 days (4-5 weeks)
 
+**Phase breakdown:**
+- Phase 1a: 2-3 days
+- Phase 1b: 3-4 days
+- Phase 1b-2: 2-3 days (Transform Pipeline Editor)
+- Phase 1c: 2-3 days
+- Phase 1d: 3-4 days
+- Phase 1e: 1-2 days
+- Phase 1f: 3-4 days
+- Phase 1g: 3-4 days
+- Phase 1h: 2 days
+
 Each sub-phase is **1-4 days**, making progress trackable and manageable.
 
 ---
@@ -443,6 +523,8 @@ The inline prompt architecture leverages significant code from the AI Presets im
 - Change mention types: `text`/`input`/`ref` → `step`/`ref`
 - Update autocomplete data source: preset variables → experience steps
 - Adjust serialization format: `@{text:var}` → `@{step:stepName}`
+- Support step names with spaces (e.g., `@{step:Pet Choice}`)
+- Update parsing regex to handle spaces within braces: `/@\{step:([^}]+)\}/g`
 
 **New Location**: `domains/experience/designer/transform/lexical/`
 
@@ -650,17 +732,44 @@ RefMedia: [
 
 ---
 
+### Edge Case 5a: Step Name Collision
+
+**Scenario**:
+
+```typescript
+Steps: [
+  { id: 'abc', name: 'Pet Choice', type: 'input.multiSelect' },
+  { id: 'xyz', name: 'Pet Choice', type: 'input.multiSelect' }, // Duplicate!
+]
+```
+
+**Validation**: Error "Step name 'Pet Choice' is already used. Names must be unique."
+
+**UI**:
+- Show inline error when editing step name
+- Prevent saving duplicate names
+- Suggest alternative names (e.g., "Pet Choice 2")
+
+**Enforcement**:
+- Case-sensitive matching ("Pet Choice" ≠ "pet choice")
+- Validated on blur and on save
+- Implemented in `useValidateStepName` hook
+
+---
+
 ### Edge Case 6: Step Name Changes
 
 **Scenario**:
 
-1. Step named "petStep" is referenced in prompt
-2. User renames step to "animalStep"
-3. Prompt still has `@{step:petStep}`
+1. Step named "Pet Choice" is referenced in prompt
+2. User renames step to "Animal Choice"
+3. Prompt still has `@{step:Pet Choice}`
 
-**Solution**: Validation warning "Step 'petStep' not found. Did you rename it?"
+**Solution**: Validation warning "Step 'Pet Choice' not found. Did you rename it?"
 
 **Future Enhancement**: Auto-update references when step renamed
+
+**Note**: Step names support spaces (e.g., "Pet Choice", "User Photo")
 
 ---
 
@@ -701,6 +810,8 @@ Test input: ""  // Empty string
 - Missing required step inputs
 - Undefined step references in prompt
 - DisplayName collisions in refMedia
+- Step name collisions (duplicate step names)
+- Invalid step names (special characters, too long)
 
 **Warnings** (allow test generation):
 
@@ -737,6 +848,8 @@ interface ValidationState {
 - Missing required step inputs
 - Undefined step references in prompt
 - DisplayName collisions in refMedia
+- Step name collisions (duplicate step names)
+- Invalid step names (special characters, too long)
 
 **Warnings** (allow test generation):
 
@@ -858,9 +971,15 @@ The **Inline Prompt Architecture (v2)** provides a streamlined, intuitive approa
 
 **Three-Format System**:
 
-- Storage: `@{step:name}`, `@{ref:mediaAssetId}` (parseable)
-- Display: `@stepName`, `@displayName` (user-friendly)
+- Storage: `@{step:name}`, `@{ref:mediaAssetId}` (parseable, supports spaces: `@{step:Pet Choice}`)
+- Display: `@stepName`, `@displayName` (user-friendly pills in Lexical editor)
 - Resolved: `<mediaAssetId>` (LLM-ready)
+
+**Step Names**:
+
+- Support spaces and human-friendly naming (e.g., "Pet Choice", "User Photo")
+- Required and must be unique (case-sensitive)
+- Max 50 characters, letters/numbers/spaces/hyphens/underscores only
 
 **Implementation**: 9 phases, ~4-5 weeks total
 

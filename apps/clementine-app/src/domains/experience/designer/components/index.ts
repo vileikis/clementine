@@ -4,6 +4,7 @@
  * Components for the experience designer layout.
  */
 export { AddStepDialog } from './AddStepDialog'
+export { RenameStepDialog } from './RenameStepDialog'
 export { StepList } from './StepList'
 export { StepListItem } from './StepListItem'
 export { StepConfigPanel } from './StepConfigPanel'

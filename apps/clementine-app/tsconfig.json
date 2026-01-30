@@ -6,13 +6,13 @@
     "prettier.config.js",
     "vite.config.js"
   ],
-  "exclude": ["src/examples", "src/lib"],
+  "exclude": [],
   "compilerOptions": {
     "target": "ES2022",
     "jsx": "react-jsx",
     "module": "ESNext",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "types": ["vite/client"],
+    "types": ["vite/client", "@testing-library/jest-dom"],
 
     /* Bundler mode */
     "moduleResolution": "bundler",
