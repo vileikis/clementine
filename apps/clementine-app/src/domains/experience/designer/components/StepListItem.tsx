@@ -8,12 +8,9 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { MoreVertical, Pencil, Trash2 } from 'lucide-react'
 
-import {
-  getCategoryColorClasses,
-  getStepDefinition,
-  getStepDisplayLabel,
-} from '../../steps/registry/step-utils'
+import { getStepDefinition, getStepDisplayLabel } from '../../steps/registry/step-utils'
 import type { Step } from '../../steps/registry/step-registry'
+import { StepTypeIcon } from '../../steps/components'
 import { cn } from '@/shared/utils'
 import {
   DropdownMenu,
@@ -83,9 +80,6 @@ export function StepListItem({
     return null
   }
 
-  const Icon = definition.icon
-  const colorClasses = getCategoryColorClasses(definition.category)
-
   return (
     <div
       ref={setNodeRef}
@@ -115,14 +109,7 @@ export function StepListItem({
           'disabled:pointer-events-none disabled:opacity-50',
         )}
       >
-        <div
-          className={cn(
-            'flex h-6 w-6 shrink-0 items-center justify-center rounded-md',
-            colorClasses.wrapper,
-          )}
-        >
-          <Icon className={cn('h-4 w-4', colorClasses.icon)} />
-        </div>
+        <StepTypeIcon stepType={step.type} />
         <span className="min-w-0 line-clamp-2">
           {getStepDisplayLabel(step, definition)}
         </span>

@@ -7,3 +7,4 @@ export {
   StepRendererRouter,
   type StepRendererRouterProps,
 } from './StepRendererRouter'
+export { StepTypeIcon } from './StepTypeIcon'
