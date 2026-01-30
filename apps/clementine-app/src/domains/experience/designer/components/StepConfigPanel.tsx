@@ -4,7 +4,10 @@
  * Right sidebar that shows the configuration panel for the selected step.
  * Routes to the correct config panel based on step type.
  */
-import { getStepDefinition } from '../../steps/registry/step-utils'
+import {
+  getCategoryColorClasses,
+  getStepDefinition,
+} from '../../steps/registry/step-utils'
 import {
   CapturePhotoConfigPanel,
   InfoStepConfigPanel,
@@ -17,6 +20,7 @@ import {
 } from '../../steps/config-panels'
 import type { Step, StepConfig } from '../../steps/registry/step-registry'
 import { ScrollArea } from '@/ui-kit/ui/scroll-area'
+import { cn } from '@/shared/utils/style-utils'
 
 interface StepConfigPanelProps {
   /** The currently selected step, or null if no step selected */
@@ -71,12 +75,26 @@ export function StepConfigPanel({
 
   const definition = getStepDefinition(step.type)
 
+  if (!definition) {
+    return null
+  }
+  const Icon = definition.icon
+  const colorClasses = getCategoryColorClasses(definition.category)
+
   return (
     <div className="flex h-full flex-col">
       {/* Header with step type label */}
-      <div className="border-b px-4 py-3">
+      <div className="border-b px-4 py-3 flex items-center gap-2">
+        <div
+          className={cn(
+            'flex h-6 w-6 shrink-0 items-center justify-center rounded-md',
+            colorClasses.wrapper,
+          )}
+        >
+          <Icon className={cn('h-4 w-4', colorClasses.icon)} />
+        </div>
         <h2 className="text-sm font-semibold">
-          {definition?.label ?? 'Configuration'}
+          {step.name || definition?.label || 'Configuration'}
         </h2>
       </div>
 
