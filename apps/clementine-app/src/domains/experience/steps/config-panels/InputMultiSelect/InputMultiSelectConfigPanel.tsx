@@ -5,8 +5,8 @@
  * Fields: title, required, options, multiSelect.
  * Now includes AI-aware fields: promptFragment and promptMedia.
  */
-import { ChoicesSection } from './components'
-import type { StepConfigPanelProps } from '../registry/step-registry'
+import { ChoicesSection } from './ChoicesSection'
+import type { StepConfigPanelProps } from '../../registry/step-registry'
 import type { ExperienceInputMultiSelectStepConfig } from '@clementine/shared'
 import { EditorRow, EditorSection, TextField } from '@/shared/editor-controls'
 import { Switch } from '@/ui-kit/ui/switch'

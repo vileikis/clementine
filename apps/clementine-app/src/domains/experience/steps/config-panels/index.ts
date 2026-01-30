@@ -7,8 +7,9 @@
 export { InfoStepConfigPanel } from './InfoStepConfigPanel'
 export { InputScaleConfigPanel } from './InputScaleConfigPanel'
 export { InputYesNoConfigPanel } from './InputYesNoConfigPanel'
-export { InputMultiSelectConfigPanel } from './InputMultiSelectConfigPanel'
 export { InputShortTextConfigPanel } from './InputShortTextConfigPanel'
 export { InputLongTextConfigPanel } from './InputLongTextConfigPanel'
 export { CapturePhotoConfigPanel } from './CapturePhotoConfigPanel'
 export { TransformPipelineConfigPanel } from './TransformPipelineConfigPanel'
+
+export { InputMultiSelectConfigPanel } from './InputMultiSelect'

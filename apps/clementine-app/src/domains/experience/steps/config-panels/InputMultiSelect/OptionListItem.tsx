@@ -11,7 +11,8 @@ import {
   MoreVertical,
   Trash2,
 } from 'lucide-react'
-import { PromptFragmentInput, PromptMediaPicker } from '.'
+import { PromptFragmentInput } from './PromptFragmentInput'
+import { PromptMediaPicker } from './PromptMediaPicker'
 import type { MultiSelectOption } from '@clementine/shared'
 
 import { Input } from '@/ui-kit/ui/input'
