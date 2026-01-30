@@ -5,7 +5,6 @@
  * Handles state, validation, and all option-related operations.
  */
 import { Plus } from 'lucide-react'
-import { useState } from 'react'
 import { OptionListItem } from './OptionListItem'
 import type { MultiSelectOption } from '@clementine/shared'
 
@@ -23,9 +22,6 @@ export function ChoicesSection({
   onOptionsChange,
   disabled = false,
 }: ChoicesSectionProps) {
-  // Track which option's AI fields are expanded
-  const [expandedOption, setExpandedOption] = useState<number | null>(null)
-
   const handleOptionChange = (
     index: number,
     updates: Partial<MultiSelectOption>,
@@ -76,17 +72,7 @@ export function ChoicesSection({
     if (options.length > 2) {
       const newOptions = options.filter((_, i) => i !== index)
       onOptionsChange(newOptions)
-      // Close expanded section if removing that option
-      if (expandedOption === index) {
-        setExpandedOption(null)
-      } else if (expandedOption !== null && expandedOption > index) {
-        setExpandedOption(expandedOption - 1)
-      }
     }
-  }
-
-  const toggleExpanded = (index: number) => {
-    setExpandedOption(expandedOption === index ? null : index)
   }
 
   return (
@@ -117,11 +103,9 @@ export function ChoicesSection({
             key={index}
             option={option}
             index={index}
-            isExpanded={expandedOption === index}
             canDelete={options.length > 2}
             disabled={disabled}
             onValueChange={(value) => handleOptionChange(index, { value })}
-            onToggleExpanded={() => toggleExpanded(index)}
             onDuplicate={() => handleDuplicateOption(index)}
             onDelete={() => handleRemoveOption(index)}
             onPromptFragmentChange={(value) =>

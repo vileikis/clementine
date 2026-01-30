@@ -4,6 +4,7 @@
  * Individual option editor with collapsible AI context fields.
  * Used in InputMultiSelectConfigPanel.
  */
+import { useState } from 'react'
 import {
   ChevronDown,
   ChevronUp,
@@ -19,15 +20,18 @@ import type { MultiSelectOption } from '@clementine/shared'
 import { Input } from '@/ui-kit/ui/input'
 import { Button } from '@/ui-kit/ui/button'
 import { ContextDropdownMenu } from '@/shared/components/ContextDropdownMenu'
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/ui-kit/ui/collapsible'
 
 interface OptionListItemProps {
   option: MultiSelectOption
   index: number
-  isExpanded: boolean
   canDelete: boolean
   disabled?: boolean
   onValueChange: (value: string) => void
-  onToggleExpanded: () => void
   onDuplicate: () => void
   onDelete: () => void
   onPromptFragmentChange: (value: string | undefined) => void
@@ -37,20 +41,24 @@ interface OptionListItemProps {
 export function OptionListItem({
   option,
   index,
-  isExpanded,
   canDelete,
   disabled = false,
   onValueChange,
-  onToggleExpanded,
   onDuplicate,
   onDelete,
   onPromptFragmentChange,
   onPromptMediaChange,
 }: OptionListItemProps) {
+  // Each option manages its own expanded state
+  const [isOpen, setIsOpen] = useState(false)
   const hasAIContext = !!(option.promptFragment || option.promptMedia)
 
   return (
-    <div className="border-b border-border last:border-b-0">
+    <Collapsible
+      open={isOpen}
+      onOpenChange={setIsOpen}
+      className="border-b border-border last:border-b-0"
+    >
       {/* Option value and controls */}
       <div className="flex items-center gap-2 py-3">
         <Input
@@ -62,20 +70,21 @@ export function OptionListItem({
           className="flex-1"
         />
 
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={onToggleExpanded}
-          disabled={disabled}
-          title={isExpanded ? 'Hide AI fields' : 'Show AI fields'}
-        >
-          {isExpanded ? (
-            <ChevronUp className="h-4 w-4" />
-          ) : (
-            <ChevronDown className="h-4 w-4" />
-          )}
-        </Button>
+        <CollapsibleTrigger asChild>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            disabled={disabled}
+            title={isOpen ? 'Hide AI fields' : 'Show AI fields'}
+          >
+            {isOpen ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
+          </Button>
+        </CollapsibleTrigger>
 
         <ContextDropdownMenu
           trigger={
@@ -110,10 +119,10 @@ export function OptionListItem({
       </div>
 
       {/* AI Context indicator when collapsed */}
-      {!isExpanded && hasAIContext && <AIEnabledBadge />}
+      {!isOpen && hasAIContext && <AIEnabledBadge />}
 
-      {/* AI Fields (expanded) */}
-      {isExpanded && (
+      {/* AI Fields (collapsible content) */}
+      <CollapsibleContent>
         <div className="space-y-4 pb-3">
           <PromptFragmentInput
             value={option.promptFragment}
@@ -126,7 +135,7 @@ export function OptionListItem({
             disabled={disabled}
           />
         </div>
-      )}
-    </div>
+      </CollapsibleContent>
+    </Collapsible>
   )
 }
