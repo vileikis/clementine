@@ -16,6 +16,19 @@ service firebase.storage {
       return request.auth != null;                                                                                                       
     }    
 
+    // Session input files (guest photo/video uploads)
+    // Guests (including anonymous) can upload their captured media
+    match /projects/{projectId}/sessions/{sessionId}/inputs/{fileName} {
+      // Authenticated users (including anonymous) can upload to sessions
+      allow create: if isAnyUser();
+
+      // Authenticated users can read their session inputs
+      allow read: if isAnyUser();
+
+      // No updates or deletes (files are immutable)
+      allow update, delete: if false;
+    }
+
     // Media files rules (013-event-settings-overlays)
     // Authentication-based access control - file validation in client code
     match /workspaces/{workspaceId}/media/{fileName} {
