@@ -10,6 +10,7 @@
  * - Mobile responsive layout with Sheet for step list and config panel
  */
 import { useCallback, useState } from 'react'
+import { useParams } from '@tanstack/react-router'
 import { List, Settings } from 'lucide-react'
 
 import { ensureAllStepsHaveNames } from '../../steps/registry/step-name.helpers'
@@ -21,15 +22,10 @@ import { useStepSelection } from '../hooks/useStepSelection'
 import { useUpdateDraftSteps } from '../hooks/useUpdateDraftSteps'
 import { StepConfigPanelContainer } from './StepConfigPanelContainer'
 import type { Step, StepType } from '../../steps/registry/step-registry'
-import type { Experience } from '@/domains/experience/shared'
+import { useWorkspace } from '@/domains/workspace'
+import { useWorkspaceExperience } from '@/domains/experience'
 import { Button } from '@/ui-kit/ui/button'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/ui-kit/ui/sheet'
-
-interface ExperienceCollectPageProps {
-  experience: Experience
-  workspaceSlug: string
-  workspaceId: string
-}
 
 /**
  * Experience Collect tab with 3-column responsive layout
@@ -43,10 +39,20 @@ interface ExperienceCollectPageProps {
  * - Tablet (md): 2 columns with collapsible config panel
  * - Mobile: Single column with bottom sheet
  */
-export function ExperienceCollectPage({
-  experience,
-  workspaceId,
-}: ExperienceCollectPageProps) {
+export function ExperienceCollectPage() {
+  const { workspaceSlug, experienceId } = useParams({ strict: false })
+  const { data: workspace } = useWorkspace(workspaceSlug ?? '')
+  const { data: experience } = useWorkspaceExperience(
+    workspace?.id ?? '',
+    experienceId ?? '',
+  )
+
+  // Safety check - should not happen due to parent route
+  if (!experience || !workspace) {
+    return null
+  }
+
+  const workspaceId = workspace.id
   // Local step state for immediate UI updates
   // Apply lazy migration to ensure all steps have names (for backward compatibility)
   const [steps, setSteps] = useState<Step[]>(() =>
@@ -151,7 +157,7 @@ export function ExperienceCollectPage({
   )
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden">
+    <div className="flex flex-1 flex-col overflow-hidden h-full">
       {/* Mobile action bar - visible on small screens */}
       <div className="flex shrink-0 items-center justify-between border-b bg-background px-4 py-2 md:hidden">
         <Button

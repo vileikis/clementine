@@ -8,6 +8,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { Loader2, Sparkles } from 'lucide-react'
 import { toast } from 'sonner'
 
+import { Outlet } from '@tanstack/react-router'
+
 import { useExperienceDesignerStore } from '../stores'
 import {
   formatValidationErrors,
@@ -19,7 +21,6 @@ import { ExperiencePreviewModal } from '../../preview'
 import type { Experience } from '@/domains/experience/shared'
 import type { Step } from '@/domains/experience/steps'
 import type { TabItem } from '@/domains/navigation'
-import type { ReactNode } from 'react'
 import { useAuth } from '@/domains/auth'
 import { TopNavBar } from '@/domains/navigation'
 import { EditorChangesBadge, EditorSaveStatus } from '@/shared/editor-status'
@@ -29,7 +30,6 @@ interface ExperienceDesignerLayoutProps {
   experience: Experience
   workspaceSlug: string
   workspaceId: string
-  children: ReactNode
 }
 
 /**
@@ -54,7 +54,6 @@ export function ExperienceDesignerLayout({
   experience,
   workspaceSlug,
   workspaceId,
-  children,
 }: ExperienceDesignerLayoutProps) {
   const { pendingSaves, lastCompletedAt, resetSaveState } =
     useExperienceDesignerStore()
@@ -181,7 +180,9 @@ export function ExperienceDesignerLayout({
           </>
         }
       />
-      {children}
+      <main className="h-full overflow-auto">
+        <Outlet />
+      </main>
 
       {/* Preview Modal */}
       <ExperiencePreviewModal

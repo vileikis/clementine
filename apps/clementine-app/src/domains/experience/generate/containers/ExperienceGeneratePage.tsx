@@ -14,7 +14,7 @@ import { Sparkles } from 'lucide-react'
  */
 export function ExperienceGeneratePage() {
   return (
-    <div className="flex flex-1 items-center justify-center">
+    <div className="flex flex-1 items-center justify-center h-full">
       <div className="text-center space-y-4">
         <Sparkles className="mx-auto h-12 w-12 text-muted-foreground" />
         <div>

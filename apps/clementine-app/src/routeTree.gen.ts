@@ -40,6 +40,7 @@ import { Route as WorkspaceWorkspaceSlugExperiencesExperienceIdRouteImport } fro
 import { Route as WorkspaceWorkspaceSlugAiPresetsPresetIdRouteImport } from './app/workspace/$workspaceSlug.ai-presets/$presetId'
 import { Route as JoinProjectIdExperienceExperienceIdRouteImport } from './app/join/$projectId/experience/$experienceId'
 import { Route as WorkspaceWorkspaceSlugProjectsProjectIdIndexRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId.index'
+import { Route as WorkspaceWorkspaceSlugExperiencesExperienceIdIndexRouteImport } from './app/workspace/$workspaceSlug.experiences/$experienceId.index'
 import { Route as WorkspaceWorkspaceSlugProjectsProjectIdWelcomeRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId.welcome'
 import { Route as WorkspaceWorkspaceSlugProjectsProjectIdThemeRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId.theme'
 import { Route as WorkspaceWorkspaceSlugProjectsProjectIdShareRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId.share'
@@ -214,6 +215,12 @@ const WorkspaceWorkspaceSlugProjectsProjectIdIndexRoute =
     path: '/',
     getParentRoute: () => WorkspaceWorkspaceSlugProjectsProjectIdRoute,
   } as any)
+const WorkspaceWorkspaceSlugExperiencesExperienceIdIndexRoute =
+  WorkspaceWorkspaceSlugExperiencesExperienceIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => WorkspaceWorkspaceSlugExperiencesExperienceIdRoute,
+  } as any)
 const WorkspaceWorkspaceSlugProjectsProjectIdWelcomeRoute =
   WorkspaceWorkspaceSlugProjectsProjectIdWelcomeRouteImport.update({
     id: '/welcome',
@@ -288,6 +295,7 @@ export interface FileRoutesByFullPath {
   '/workspace/$workspaceSlug/projects/$projectId/share': typeof WorkspaceWorkspaceSlugProjectsProjectIdShareRoute
   '/workspace/$workspaceSlug/projects/$projectId/theme': typeof WorkspaceWorkspaceSlugProjectsProjectIdThemeRoute
   '/workspace/$workspaceSlug/projects/$projectId/welcome': typeof WorkspaceWorkspaceSlugProjectsProjectIdWelcomeRoute
+  '/workspace/$workspaceSlug/experiences/$experienceId/': typeof WorkspaceWorkspaceSlugExperiencesExperienceIdIndexRoute
   '/workspace/$workspaceSlug/projects/$projectId/': typeof WorkspaceWorkspaceSlugProjectsProjectIdIndexRoute
 }
 export interface FileRoutesByTo {
@@ -311,7 +319,6 @@ export interface FileRoutesByTo {
   '/workspace/$workspaceSlug': typeof WorkspaceWorkspaceSlugIndexRoute
   '/join/$projectId/experience/$experienceId': typeof JoinProjectIdExperienceExperienceIdRoute
   '/workspace/$workspaceSlug/ai-presets/$presetId': typeof WorkspaceWorkspaceSlugAiPresetsPresetIdRoute
-  '/workspace/$workspaceSlug/experiences/$experienceId': typeof WorkspaceWorkspaceSlugExperiencesExperienceIdRouteWithChildren
   '/workspace/$workspaceSlug/experiences/create': typeof WorkspaceWorkspaceSlugExperiencesCreateRoute
   '/workspace/$workspaceSlug/ai-presets': typeof WorkspaceWorkspaceSlugAiPresetsIndexRoute
   '/workspace/$workspaceSlug/experiences': typeof WorkspaceWorkspaceSlugExperiencesIndexRoute
@@ -322,6 +329,7 @@ export interface FileRoutesByTo {
   '/workspace/$workspaceSlug/projects/$projectId/share': typeof WorkspaceWorkspaceSlugProjectsProjectIdShareRoute
   '/workspace/$workspaceSlug/projects/$projectId/theme': typeof WorkspaceWorkspaceSlugProjectsProjectIdThemeRoute
   '/workspace/$workspaceSlug/projects/$projectId/welcome': typeof WorkspaceWorkspaceSlugProjectsProjectIdWelcomeRoute
+  '/workspace/$workspaceSlug/experiences/$experienceId': typeof WorkspaceWorkspaceSlugExperiencesExperienceIdIndexRoute
   '/workspace/$workspaceSlug/projects/$projectId': typeof WorkspaceWorkspaceSlugProjectsProjectIdIndexRoute
 }
 export interface FileRoutesById {
@@ -362,6 +370,7 @@ export interface FileRoutesById {
   '/workspace/$workspaceSlug/projects/$projectId/share': typeof WorkspaceWorkspaceSlugProjectsProjectIdShareRoute
   '/workspace/$workspaceSlug/projects/$projectId/theme': typeof WorkspaceWorkspaceSlugProjectsProjectIdThemeRoute
   '/workspace/$workspaceSlug/projects/$projectId/welcome': typeof WorkspaceWorkspaceSlugProjectsProjectIdWelcomeRoute
+  '/workspace/$workspaceSlug/experiences/$experienceId/': typeof WorkspaceWorkspaceSlugExperiencesExperienceIdIndexRoute
   '/workspace/$workspaceSlug/projects/$projectId/': typeof WorkspaceWorkspaceSlugProjectsProjectIdIndexRoute
 }
 export interface FileRouteTypes {
@@ -403,6 +412,7 @@ export interface FileRouteTypes {
     | '/workspace/$workspaceSlug/projects/$projectId/share'
     | '/workspace/$workspaceSlug/projects/$projectId/theme'
     | '/workspace/$workspaceSlug/projects/$projectId/welcome'
+    | '/workspace/$workspaceSlug/experiences/$experienceId/'
     | '/workspace/$workspaceSlug/projects/$projectId/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -426,7 +436,6 @@ export interface FileRouteTypes {
     | '/workspace/$workspaceSlug'
     | '/join/$projectId/experience/$experienceId'
     | '/workspace/$workspaceSlug/ai-presets/$presetId'
-    | '/workspace/$workspaceSlug/experiences/$experienceId'
     | '/workspace/$workspaceSlug/experiences/create'
     | '/workspace/$workspaceSlug/ai-presets'
     | '/workspace/$workspaceSlug/experiences'
@@ -437,6 +446,7 @@ export interface FileRouteTypes {
     | '/workspace/$workspaceSlug/projects/$projectId/share'
     | '/workspace/$workspaceSlug/projects/$projectId/theme'
     | '/workspace/$workspaceSlug/projects/$projectId/welcome'
+    | '/workspace/$workspaceSlug/experiences/$experienceId'
     | '/workspace/$workspaceSlug/projects/$projectId'
   id:
     | '__root__'
@@ -476,6 +486,7 @@ export interface FileRouteTypes {
     | '/workspace/$workspaceSlug/projects/$projectId/share'
     | '/workspace/$workspaceSlug/projects/$projectId/theme'
     | '/workspace/$workspaceSlug/projects/$projectId/welcome'
+    | '/workspace/$workspaceSlug/experiences/$experienceId/'
     | '/workspace/$workspaceSlug/projects/$projectId/'
   fileRoutesById: FileRoutesById
 }
@@ -708,6 +719,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdIndexRouteImport
       parentRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdRoute
     }
+    '/workspace/$workspaceSlug/experiences/$experienceId/': {
+      id: '/workspace/$workspaceSlug/experiences/$experienceId/'
+      path: '/'
+      fullPath: '/workspace/$workspaceSlug/experiences/$experienceId/'
+      preLoaderRoute: typeof WorkspaceWorkspaceSlugExperiencesExperienceIdIndexRouteImport
+      parentRoute: typeof WorkspaceWorkspaceSlugExperiencesExperienceIdRoute
+    }
     '/workspace/$workspaceSlug/projects/$projectId/welcome': {
       id: '/workspace/$workspaceSlug/projects/$projectId/welcome'
       path: '/welcome'
@@ -819,6 +837,7 @@ const JoinRouteRouteWithChildren = JoinRouteRoute._addFileChildren(
 interface WorkspaceWorkspaceSlugExperiencesExperienceIdRouteChildren {
   WorkspaceWorkspaceSlugExperiencesExperienceIdCollectRoute: typeof WorkspaceWorkspaceSlugExperiencesExperienceIdCollectRoute
   WorkspaceWorkspaceSlugExperiencesExperienceIdGenerateRoute: typeof WorkspaceWorkspaceSlugExperiencesExperienceIdGenerateRoute
+  WorkspaceWorkspaceSlugExperiencesExperienceIdIndexRoute: typeof WorkspaceWorkspaceSlugExperiencesExperienceIdIndexRoute
 }
 
 const WorkspaceWorkspaceSlugExperiencesExperienceIdRouteChildren: WorkspaceWorkspaceSlugExperiencesExperienceIdRouteChildren =
@@ -827,6 +846,8 @@ const WorkspaceWorkspaceSlugExperiencesExperienceIdRouteChildren: WorkspaceWorks
       WorkspaceWorkspaceSlugExperiencesExperienceIdCollectRoute,
     WorkspaceWorkspaceSlugExperiencesExperienceIdGenerateRoute:
       WorkspaceWorkspaceSlugExperiencesExperienceIdGenerateRoute,
+    WorkspaceWorkspaceSlugExperiencesExperienceIdIndexRoute:
+      WorkspaceWorkspaceSlugExperiencesExperienceIdIndexRoute,
   }
 
 const WorkspaceWorkspaceSlugExperiencesExperienceIdRouteWithChildren =
