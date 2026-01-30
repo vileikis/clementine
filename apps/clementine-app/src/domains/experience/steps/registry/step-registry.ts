@@ -14,12 +14,11 @@ import {
   Info,
   ListChecks,
   SlidersHorizontal,
-  Sparkles,
   Type,
 } from 'lucide-react'
 
 import {
-  
+
   experienceCapturePhotoStepConfigSchema,
   experienceInfoStepConfigSchema,
   experienceInputLongTextStepConfigSchema,
@@ -27,7 +26,6 @@ import {
   experienceInputScaleStepConfigSchema,
   experienceInputShortTextStepConfigSchema,
   experienceInputYesNoStepConfigSchema,
-  experienceTransformPipelineStepConfigSchema
 } from '@clementine/shared'
 import {
   createDefaultCapturePhotoConfig,
@@ -37,7 +35,6 @@ import {
   createDefaultInputScaleConfig,
   createDefaultInputShortTextConfig,
   createDefaultInputYesNoConfig,
-  createDefaultTransformPipelineConfig,
 } from '../defaults'
 import type {ExperienceStep,
   ExperienceStepCategory,
@@ -187,15 +184,6 @@ export const stepRegistry: Record<ExperienceStepType, StepDefinition> = {
     icon: Camera,
     configSchema: experienceCapturePhotoStepConfigSchema,
     defaultConfig: createDefaultCapturePhotoConfig,
-  },
-  'transform.pipeline': {
-    type: 'transform.pipeline',
-    category: 'transform',
-    label: 'AI Transform',
-    description: 'Process with AI pipeline',
-    icon: Sparkles,
-    configSchema: experienceTransformPipelineStepConfigSchema,
-    defaultConfig: createDefaultTransformPipelineConfig,
   },
 }
 

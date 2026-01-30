@@ -1,5 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { z } from 'zod'
+import { createFileRoute, notFound } from '@tanstack/react-router'
 
 import {
   ExperienceDesignerLayout,
@@ -7,69 +6,64 @@ import {
 } from '@/domains/experience'
 import { useWorkspace } from '@/domains/workspace'
 import { NotFound } from '@/shared/components/NotFound'
-import { Skeleton } from '@/ui-kit/ui/skeleton'
 
 /**
- * Search params schema for experience designer
- */
-const experienceDesignerSearchSchema = z.object({
-  step: z.string().optional(),
-})
-
-export type ExperienceDesignerSearch = z.infer<
-  typeof experienceDesignerSearchSchema
->
-
-/**
- * Experience designer route
+ * Experience designer layout route
  *
  * Route: /workspace/:workspaceSlug/experiences/:experienceId
  * Access: Admin only (enforced by parent route requireAdmin guard)
  *
- * Layout for the experience editor/designer.
- * Search params: ?step={stepId} for deep linking to specific steps
+ * Layout for experience designer routes (collect, generate).
+ * Loads experience data and renders the designer layout with tabs.
  */
 export const Route = createFileRoute(
   '/workspace/$workspaceSlug/experiences/$experienceId',
 )({
-  component: ExperienceDesignerRoute,
+  component: ExperienceLayout,
   notFoundComponent: ExperienceNotFound,
-  validateSearch: experienceDesignerSearchSchema,
 })
 
-function ExperienceDesignerRoute() {
-  const { workspaceSlug, experienceId } = Route.useParams()
-  const { data: workspace, isLoading: isWorkspaceLoading } =
-    useWorkspace(workspaceSlug)
-  const { data: experience, isLoading: isExperienceLoading } =
-    useWorkspaceExperience(workspace?.id ?? '', experienceId)
+type ExperienceLayoutContentProps = {
+  workspace: NonNullable<ReturnType<typeof useWorkspace>['data']>
+  workspaceSlug: string
+  experienceId: string
+}
 
-  // Loading state
-  if (isWorkspaceLoading || isExperienceLoading) {
-    return (
-      <div className="flex h-screen flex-col">
-        <div className="flex h-16 items-center justify-between border-b bg-background px-6">
-          <Skeleton className="h-6 w-64" />
-          <div className="flex gap-2">
-            <Skeleton className="h-9 w-20" />
-            <Skeleton className="h-9 w-20" />
-          </div>
-        </div>
-        <div className="flex-1 p-6">
-          <Skeleton className="h-64 w-full" />
-        </div>
-      </div>
-    )
+function ExperienceLayout() {
+  const { workspaceSlug, experienceId } = Route.useParams()
+  const { data: workspace } = useWorkspace(workspaceSlug)
+
+  // Wait for workspace to load before setting up experience listener
+  if (!workspace) {
+    return null
   }
 
-  // Not found
-  if (!workspace || !experience) {
-    return <ExperienceNotFound />
+  return (
+    <ExperienceLayoutContent
+      workspace={workspace}
+      workspaceSlug={workspaceSlug}
+      experienceId={experienceId}
+    />
+  )
+}
+
+function ExperienceLayoutContent({
+  workspace,
+  workspaceSlug,
+  experienceId,
+}: ExperienceLayoutContentProps) {
+  const { data: experience } = useWorkspaceExperience(
+    workspace.id,
+    experienceId,
+  )
+
+  if (!experience) {
+    return null
   }
 
   // Soft-deleted experience
   if (experience.status === 'deleted') {
-    return <ExperienceNotFound />
+    throw notFound()
   }
 
   return (

@@ -30,7 +30,6 @@ import {
   InputScaleRenderer,
   InputShortTextRenderer,
   InputYesNoRenderer,
-  TransformPipelineRenderer,
 } from '../renderers'
 import type { Step, StepRendererProps } from '../registry/step-registry'
 
@@ -65,8 +64,7 @@ export interface StepRendererRouterProps extends Omit<
  * - input.multiSelect: Multiple choice
  * - input.shortText: Short text input
  * - input.longText: Long text input
- * - capture.photo: Photo capture (placeholder)
- * - transform.pipeline: AI transform (placeholder)
+ * - capture.photo: Photo capture
  */
 export function StepRendererRouter({
   step,
@@ -90,8 +88,6 @@ export function StepRendererRouter({
       return <InputLongTextRenderer {...stepProps} />
     case 'capture.photo':
       return <CapturePhotoRenderer {...stepProps} />
-    case 'transform.pipeline':
-      return <TransformPipelineRenderer {...stepProps} />
     default:
       // Unknown step type fallback
       return (

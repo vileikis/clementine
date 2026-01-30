@@ -5,7 +5,7 @@
  */
 
 // Containers
-export { ExperienceDesignerLayout, ExperienceDesignerPage } from './containers'
+export { ExperienceDesignerLayout, ExperienceCollectPage } from './containers'
 
 // Stores
 export { useExperienceDesignerStore } from './stores'

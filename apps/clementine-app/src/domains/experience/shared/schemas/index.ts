@@ -29,7 +29,6 @@ export {
   experienceInputShortTextStepSchema,
   experienceInputLongTextStepSchema,
   experienceCapturePhotoStepSchema,
-  experienceTransformPipelineStepSchema,
   // Step config schemas
   experienceInfoStepConfigSchema,
   experienceInputScaleStepConfigSchema,
@@ -38,7 +37,6 @@ export {
   experienceInputShortTextStepConfigSchema,
   experienceInputLongTextStepConfigSchema,
   experienceCapturePhotoStepConfigSchema,
-  experienceTransformPipelineStepConfigSchema,
   experienceAspectRatioSchema,
   experienceMediaAssetSchema,
   // Types
@@ -63,7 +61,6 @@ export {
   type ExperienceInputShortTextStepConfig,
   type ExperienceInputLongTextStepConfig,
   type ExperienceCapturePhotoStepConfig,
-  type ExperienceTransformPipelineStepConfig,
   type ExperienceAspectRatio,
   type ExperienceMediaAsset,
 } from '@clementine/shared'
