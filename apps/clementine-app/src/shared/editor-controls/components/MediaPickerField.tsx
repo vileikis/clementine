@@ -169,7 +169,7 @@ export function MediaPickerField({
             ) : (
               <>
                 <ImagePlus className="size-8" />
-                <span className="text-sm">
+                <span className="text-sm text-center">
                   {isDragging ? 'Drop image here' : 'Click or drag to upload'}
                 </span>
               </>

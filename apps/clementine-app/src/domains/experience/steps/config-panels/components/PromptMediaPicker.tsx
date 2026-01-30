@@ -1,18 +1,21 @@
 /**
  * Prompt Media Picker Component
  *
- * File upload button with thumbnail preview for prompt media.
- * Features: upload button, thumbnail display, remove button.
+ * Media picker for prompt reference images.
+ * Uses MediaPickerField for drag-and-drop upload functionality.
  */
-import { useRef } from 'react'
-import { Upload, X } from 'lucide-react'
-import { toast } from 'sonner'
+import { Info } from 'lucide-react'
 import { useParams } from '@tanstack/react-router'
 import type { MediaReference } from '@clementine/shared'
 
-import { Button } from '@/ui-kit/ui/button'
-import { Input } from '@/ui-kit/ui/input'
 import { Label } from '@/ui-kit/ui/label'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/ui-kit/ui/tooltip'
+import { MediaPickerField } from '@/shared/editor-controls'
 import { useUploadPromptMedia } from '@/domains/experience/designer/hooks/useUploadPromptMedia'
 import { useWorkspace } from '@/domains/workspace'
 import { useAuth } from '@/domains/auth'
@@ -28,7 +31,6 @@ export function PromptMediaPicker({
   onChange,
   disabled = false,
 }: PromptMediaPickerProps) {
-  const fileInputRef = useRef<HTMLInputElement>(null)
   const { workspaceSlug } = useParams({ strict: false })
   const { data: workspace } = useWorkspace(workspaceSlug)
   const { user } = useAuth()
@@ -38,31 +40,10 @@ export function PromptMediaPicker({
     user?.uid,
   )
 
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file')
-      return
-    }
-
-    // Validate file size (5MB max)
-    const maxSize = 5 * 1024 * 1024 // 5MB
-    if (file.size > maxSize) {
-      toast.error('File size must be less than 5MB')
-      return
-    }
-
+  const handleUpload = async (file: File) => {
     const mediaRef = await upload(file)
     if (mediaRef) {
       onChange(mediaRef)
-    }
-
-    // Reset input
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ''
     }
   }
 
@@ -70,57 +51,35 @@ export function PromptMediaPicker({
     onChange(undefined)
   }
 
-  const handleUploadClick = () => {
-    fileInputRef.current?.click()
-  }
-
   return (
     <div className="space-y-2">
-      <Label>Prompt Media (optional)</Label>
+      <div className="flex items-center gap-1.5">
+        <Label>Prompt Media</Label>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+            </TooltipTrigger>
+            <TooltipContent side="top" className="max-w-xs">
+              <p>
+                This image will be used as context when the user selects this
+                option.
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
 
-      {value ? (
-        <div className="relative inline-block">
-          <img
-            src={value.url}
-            alt={(value.fileName as string) || 'Prompt media'}
-            className="h-32 w-32 rounded-md border object-cover"
-          />
-          <Button
-            type="button"
-            variant="destructive"
-            size="icon"
-            className="absolute -right-2 -top-2 h-6 w-6"
-            onClick={handleRemove}
-            disabled={disabled}
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-      ) : (
-        <div>
-          <Input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleFileSelect}
-            className="hidden"
-            disabled={disabled || isUploading}
-          />
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleUploadClick}
-            disabled={disabled || isUploading}
-          >
-            <Upload className="mr-2 h-4 w-4" />
-            {isUploading ? `Uploading... ${uploadProgress}%` : 'Upload Image'}
-          </Button>
-        </div>
-      )}
-
-      <p className="text-xs text-muted-foreground">
-        This image will be used as context when the user selects this option.
-      </p>
+      <MediaPickerField
+        value={value?.url ?? null}
+        onChange={handleRemove}
+        onUpload={handleUpload}
+        uploading={isUploading}
+        uploadProgress={uploadProgress}
+        disabled={disabled}
+        className="aspect-square w-32"
+        objectFit="cover"
+      />
     </div>
   )
 }
