@@ -24,8 +24,10 @@ import {
 import { useMarkExperienceComplete } from '../hooks'
 import { useInitSession } from '@/domains/session/shared'
 import { ExperienceRuntime } from '@/domains/experience/runtime'
+import { RuntimeTopBar } from '@/domains/experience/runtime/components'
 import { ThemeProvider, ThemedBackground } from '@/shared/theming'
 import { DEFAULT_THEME } from '@/domains/project-config/theme/constants'
+import { useExperienceRuntimeStore } from '@/domains/experience/runtime/stores/experienceRuntimeStore'
 
 export interface PregatePageProps {
   /** Selected main experience ID (to navigate to after pregate) */
@@ -123,11 +125,12 @@ export function PregatePage({ selectedExperienceId }: PregatePageProps) {
   }
 
   // Helper to navigate back to welcome
-  const navigateToWelcome = () =>
-    navigate({
+  const navigateToWelcome = () => {
+    void navigate({
       to: '/join/$projectId',
       params: { projectId: project.id },
     })
+  }
 
   /**
    * Handle pregate completion
@@ -215,8 +218,42 @@ export function PregatePage({ selectedExperienceId }: PregatePageProps) {
         onComplete={() => void handlePregateComplete()}
         onError={handleRuntimeError}
       >
-        <GuestRuntimeContent />
+        <PregateRuntimeWithTopBar
+          experienceName={pregateExperience?.name ?? 'Pregate'}
+          onHomeClick={navigateToWelcome}
+        />
       </ExperienceRuntime>
+    )
+  }
+
+  /**
+   * Inner component that renders runtime content with topbar
+   * Must be inside ExperienceRuntime to access runtime store
+   */
+  function PregateRuntimeWithTopBar({
+    experienceName,
+    onHomeClick,
+  }: {
+    experienceName: string
+    onHomeClick: () => void
+  }) {
+    const currentStepIndex = useExperienceRuntimeStore(
+      (s) => s.currentStepIndex,
+    )
+    const steps = useExperienceRuntimeStore((s) => s.steps)
+
+    return (
+      <>
+        <RuntimeTopBar
+          experienceName={experienceName}
+          currentStepIndex={currentStepIndex}
+          totalSteps={steps.length}
+          onHomeClick={onHomeClick}
+        />
+        <div className="pt-20">
+          <GuestRuntimeContent />
+        </div>
+      </>
     )
   }
 

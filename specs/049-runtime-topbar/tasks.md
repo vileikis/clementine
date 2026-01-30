@@ -24,10 +24,10 @@
 
 **Purpose**: Verify prerequisites and prepare development environment
 
-- [ ] T001 Verify Radix UI Progress is installed (@radix-ui/react-progress@^1.1.8 in package.json)
-- [ ] T002 Verify Radix UI AlertDialog is available (@radix-ui/react-alert-dialog@^1.1.15 in package.json)
-- [ ] T003 Review existing themed components pattern (ThemedButton, ThemedText, ThemedIconButton)
-- [ ] T004 Review ExperienceRuntimeStore interface in apps/clementine-app/src/domains/experience/runtime/stores/experienceRuntimeStore.ts
+- [X] T001 Verify Radix UI Progress is installed (@radix-ui/react-progress@^1.1.8 in package.json)
+- [X] T002 Verify Radix UI AlertDialog is available (@radix-ui/react-alert-dialog@^1.1.15 in package.json)
+- [X] T003 Review existing themed components pattern (ThemedButton, ThemedText, ThemedIconButton)
+- [X] T004 Review ExperienceRuntimeStore interface in apps/clementine-app/src/domains/experience/runtime/stores/experienceRuntimeStore.ts
 
 ---
 
@@ -37,11 +37,11 @@
 
 **⚠️ CRITICAL**: ThemedProgressBar must be complete before any user story implementation
 
-- [ ] T005 Create ThemedProgressBar component in apps/clementine-app/src/shared/theming/components/primitives/ThemedProgressBar.tsx
-- [ ] T006 Create ThemedProgressBar tests in apps/clementine-app/src/shared/theming/components/primitives/ThemedProgressBar.test.tsx
-- [ ] T007 Export ThemedProgressBar from apps/clementine-app/src/shared/theming/components/primitives/index.ts
-- [ ] T008 Export ThemedProgressBar from apps/clementine-app/src/shared/theming/index.ts
-- [ ] T009 Run tests to verify ThemedProgressBar works with different theme configurations
+- [X] T005 Create ThemedProgressBar component in apps/clementine-app/src/shared/theming/components/primitives/ThemedProgressBar.tsx
+- [X] T006 Create ThemedProgressBar tests in apps/clementine-app/src/shared/theming/components/primitives/ThemedProgressBar.test.tsx
+- [X] T007 Export ThemedProgressBar from apps/clementine-app/src/shared/theming/components/primitives/index.ts
+- [X] T008 Export ThemedProgressBar from apps/clementine-app/src/shared/theming/index.ts
+- [X] T009 Run tests to verify ThemedProgressBar works with different theme configurations
 
 **Checkpoint**: ThemedProgressBar primitive complete - user story implementation can now begin
 
@@ -55,14 +55,14 @@
 
 ### Implementation for User Story 1
 
-- [ ] T010 [P] [US1] Create RuntimeTopBar component in apps/clementine-app/src/domains/experience/runtime/components/RuntimeTopBar.tsx
-- [ ] T011 [P] [US1] Create RuntimeTopBar tests in apps/clementine-app/src/domains/experience/runtime/components/RuntimeTopBar.test.tsx
-- [ ] T012 [US1] Export RuntimeTopBar from apps/clementine-app/src/domains/experience/runtime/components/index.ts
-- [ ] T013 [US1] Integrate RuntimeTopBar into ExperienceRuntime container in apps/clementine-app/src/domains/experience/runtime/containers/ExperienceRuntime.tsx
+- [X] T010 [P] [US1] Create RuntimeTopBar component in apps/clementine-app/src/domains/experience/runtime/components/RuntimeTopBar.tsx
+- [X] T011 [P] [US1] Create RuntimeTopBar tests in apps/clementine-app/src/domains/experience/runtime/components/RuntimeTopBar.test.tsx
+- [X] T012 [US1] Export RuntimeTopBar from apps/clementine-app/src/domains/experience/runtime/components/index.ts
+- [X] T013 [US1] Integrate RuntimeTopBar into ExperienceRuntime container in apps/clementine-app/src/domains/experience/runtime/containers/ExperienceRuntime.tsx
 - [ ] T014 [US1] Update ExperiencePreviewModal to pass experience name and progress props in apps/clementine-app/src/domains/experience/preview/containers/ExperiencePreviewModal.tsx
-- [ ] T015 [US1] Update PregatePage to pass experience name and progress props in apps/clementine-app/src/domains/guest/containers/PregatePage.tsx
-- [ ] T016 [US1] Update ExperiencePage to pass experience name and progress props in apps/clementine-app/src/domains/guest/containers/ExperiencePage.tsx
-- [ ] T017 [US1] Update PresharePage to pass experience name and progress props in apps/clementine-app/src/domains/guest/containers/PresharePage.tsx
+- [X] T015 [US1] Update PregatePage to pass experience name and progress props in apps/clementine-app/src/domains/guest/containers/PregatePage.tsx
+- [X] T016 [US1] Update ExperiencePage to pass experience name and progress props in apps/clementine-app/src/domains/guest/containers/ExperiencePage.tsx
+- [X] T017 [US1] Update PresharePage to pass experience name and progress props in apps/clementine-app/src/domains/guest/containers/PresharePage.tsx
 - [ ] T018 [US1] Test topbar rendering in preview mode (verify experience name and progress display)
 - [ ] T019 [US1] Test topbar rendering in guest pregate mode (verify experience name and progress display)
 - [ ] T020 [US1] Test topbar rendering in guest main experience mode (verify experience name and progress display)
@@ -81,14 +81,14 @@
 
 ### Implementation for User Story 2
 
-- [ ] T023 [P] [US2] Create useNavigateHome hook in apps/clementine-app/src/domains/guest/hooks/useNavigateHome.ts
-- [ ] T024 [US2] Add home button click handler to PregatePage in apps/clementine-app/src/domains/guest/containers/PregatePage.tsx
-- [ ] T025 [US2] Add exit confirmation AlertDialog to PregatePage in apps/clementine-app/src/domains/guest/containers/PregatePage.tsx
-- [ ] T026 [US2] Add home button click handler to ExperiencePage in apps/clementine-app/src/domains/guest/containers/ExperiencePage.tsx
-- [ ] T027 [US2] Add exit confirmation AlertDialog to ExperiencePage in apps/clementine-app/src/domains/guest/containers/ExperiencePage.tsx
-- [ ] T028 [US2] Add home button click handler to PresharePage in apps/clementine-app/src/domains/guest/containers/PresharePage.tsx
-- [ ] T029 [US2] Add exit confirmation AlertDialog to PresharePage in apps/clementine-app/src/domains/guest/containers/PresharePage.tsx
-- [ ] T030 [US2] Update RuntimeTopBar to accept onHomeClick prop in apps/clementine-app/src/domains/experience/runtime/components/RuntimeTopBar.tsx
+- [X] T023 [P] [US2] Create useNavigateHome hook in apps/clementine-app/src/domains/guest/hooks/useNavigateHome.ts
+- [X] T024 [US2] Add home button click handler to PregatePage in apps/clementine-app/src/domains/guest/containers/PregatePage.tsx
+- [X] T025 [US2] Add exit confirmation AlertDialog to PregatePage in apps/clementine-app/src/domains/guest/containers/PregatePage.tsx
+- [X] T026 [US2] Add home button click handler to ExperiencePage in apps/clementine-app/src/domains/guest/containers/ExperiencePage.tsx
+- [X] T027 [US2] Add exit confirmation AlertDialog to ExperiencePage in apps/clementine-app/src/domains/guest/containers/ExperiencePage.tsx
+- [X] T028 [US2] Add home button click handler to PresharePage in apps/clementine-app/src/domains/guest/containers/PresharePage.tsx
+- [X] T029 [US2] Add exit confirmation AlertDialog to PresharePage in apps/clementine-app/src/domains/guest/containers/PresharePage.tsx
+- [X] T030 [US2] Update RuntimeTopBar to accept onHomeClick prop in apps/clementine-app/src/domains/experience/runtime/components/RuntimeTopBar.tsx
 - [ ] T031 [US2] Test home button opens confirmation dialog in pregate experience
 - [ ] T032 [US2] Test home button opens confirmation dialog in main experience
 - [ ] T033 [US2] Test home button opens confirmation dialog in preshare experience

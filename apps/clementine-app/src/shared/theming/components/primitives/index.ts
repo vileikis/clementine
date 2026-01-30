@@ -15,3 +15,6 @@ export type {
   IconButtonSize,
   IconButtonVariant,
 } from './ThemedIconButton'
+
+export { ThemedProgressBar } from './ThemedProgressBar'
+export type { ThemedProgressBarProps } from './ThemedProgressBar'
