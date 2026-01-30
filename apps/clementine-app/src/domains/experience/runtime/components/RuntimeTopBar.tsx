@@ -155,13 +155,15 @@ export function RuntimeTopBar({
         </div>
 
         {/* Progress bar */}
-        <ThemedProgressBar
-          className="w-1/2 self-center"
-          value={progress}
-          getValueLabel={(value) =>
-            `Step ${currentStepIndex + 1} of ${totalSteps} (${Math.round(value)}% complete)`
-          }
-        />
+        {totalSteps > 1 && (
+          <ThemedProgressBar
+            className="w-1/2 self-center"
+            value={progress}
+            getValueLabel={(value) =>
+              `Step ${currentStepIndex + 1} of ${totalSteps} (${Math.round(value)}% complete)`
+            }
+          />
+        )}
       </div>
 
       {/* Exit confirmation dialog */}
