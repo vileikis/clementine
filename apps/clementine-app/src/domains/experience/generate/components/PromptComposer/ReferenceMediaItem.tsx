@@ -40,10 +40,17 @@ export function ReferenceMediaItem({
     onRemove(media.mediaAssetId)
   }
 
+  const handleClick = () => {
+    navigator.clipboard.writeText(media.mediaAssetId)
+  }
+
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <div className="group relative size-16 shrink-0 bg-muted">
+        <div
+          className="group relative size-16 shrink-0 cursor-pointer bg-muted"
+          onClick={handleClick}
+        >
           <img
             src={media.url}
             alt={media.displayName}
