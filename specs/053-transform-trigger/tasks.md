@@ -24,8 +24,8 @@
 
 **Purpose**: Project initialization and Firebase client configuration
 
-- [ ] T001 [P] Add Firebase Functions to client in `apps/clementine-app/src/integrations/firebase/client.ts` - import `getFunctions` and export `functions` instance with 'europe-west1' region
-- [ ] T002 [P] Update transform-pipeline schema to remove stepId in `functions/src/schemas/transform-pipeline.schema.ts` - keep only projectId and sessionId
+- [x] T001 [P] Add Firebase Functions to client in `apps/clementine-app/src/integrations/firebase/client.ts` - import `getFunctions` and export `functions` instance with 'europe-west1' region
+- [x] T002 [P] Update transform-pipeline schema to remove stepId in `functions/src/schemas/transform-pipeline.schema.ts` - keep only projectId and sessionId
 
 ---
 
@@ -35,12 +35,12 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T003 Create callable function in `functions/src/callable/startTransformPipeline.ts` - convert from onRequest to onCall, use HttpsError for errors, validate with Zod schema
-- [ ] T004 Export callable function from `functions/src/index.ts` - add export for startTransformPipeline from callable directory
-- [ ] T005 [P] Create hasTransformConfig helper in `apps/clementine-app/src/domains/experience/shared/utils/hasTransformConfig.ts` - check if experience.config.transform?.nodes?.length > 0
-- [ ] T006 [P] Create useStartTransformPipeline hook in `apps/clementine-app/src/domains/experience/transform/hooks/useStartTransformPipeline.ts` - use httpsCallable with fire-and-forget pattern, log errors to Sentry
-- [ ] T007 [P] Create barrel export in `apps/clementine-app/src/domains/experience/transform/hooks/index.ts` - export useStartTransformPipeline
-- [ ] T008 [P] Create domain barrel export in `apps/clementine-app/src/domains/experience/transform/index.ts` - re-export from hooks
+- [x] T003 Create callable function in `functions/src/callable/startTransformPipeline.ts` - convert from onRequest to onCall, use HttpsError for errors, validate with Zod schema
+- [x] T004 Export callable function from `functions/src/index.ts` - add export for startTransformPipeline from callable directory
+- [x] T005 [P] Create hasTransformConfig helper in `apps/clementine-app/src/domains/experience/shared/utils/hasTransformConfig.ts` - check if experience.config.transform?.nodes?.length > 0
+- [x] T006 [P] Create useStartTransformPipeline hook in `apps/clementine-app/src/domains/experience/transform/hooks/useStartTransformPipeline.ts` - use httpsCallable with fire-and-forget pattern, log errors to Sentry
+- [x] T007 [P] Create barrel export in `apps/clementine-app/src/domains/experience/transform/hooks/index.ts` - export useStartTransformPipeline
+- [x] T008 [P] Create domain barrel export in `apps/clementine-app/src/domains/experience/transform/index.ts` - re-export from hooks
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
@@ -54,9 +54,9 @@
 
 ### Implementation for User Story 1
 
-- [ ] T009 [US1] Modify ExperiencePage to trigger transform in `apps/clementine-app/src/domains/guest/containers/ExperiencePage.tsx` - import useStartTransformPipeline and hasTransformConfig, call in handleExperienceComplete after markExperienceComplete and before navigation
-- [ ] T010 [US1] Modify SharePage to subscribe to session in `apps/clementine-app/src/domains/guest/containers/SharePage.tsx` - use useSubscribeSession(project.id, mainSessionId), derive isJobInProgress/isJobCompleted/isJobFailed from session.jobStatus
-- [ ] T011 [US1] Update SharePage rendering logic in `apps/clementine-app/src/domains/guest/containers/SharePage.tsx` - show ShareLoadingRenderer when job in progress, ShareReadyRenderer when completed or null, error state when failed
+- [x] T009 [US1] Modify ExperiencePage to trigger transform in `apps/clementine-app/src/domains/guest/containers/ExperiencePage.tsx` - import useStartTransformPipeline and hasTransformConfig, call in handleExperienceComplete after markExperienceComplete and before navigation
+- [x] T010 [US1] Modify SharePage to subscribe to session in `apps/clementine-app/src/domains/guest/containers/SharePage.tsx` - use useSubscribeSession(project.id, mainSessionId), derive isJobInProgress/isJobCompleted/isJobFailed from session.jobStatus
+- [x] T011 [US1] Update SharePage rendering logic in `apps/clementine-app/src/domains/guest/containers/SharePage.tsx` - show ShareLoadingRenderer when job in progress, ShareReadyRenderer when completed or null, error state when failed
 
 **Checkpoint**: User Story 1 complete - guest journey with transform trigger and SharePage job status works
 
@@ -70,9 +70,9 @@
 
 ### Implementation for User Story 2
 
-- [ ] T012 [P] [US2] Create JobStatusDisplay component in `apps/clementine-app/src/domains/experience/preview/components/JobStatusDisplay.tsx` - show spinner with status messages for pending/running, success icon for completed, error icon for failed
-- [ ] T013 [P] [US2] Export JobStatusDisplay from `apps/clementine-app/src/domains/experience/preview/components/index.ts` - add export statement
-- [ ] T014 [US2] Modify ExperiencePreviewModal in `apps/clementine-app/src/domains/experience/preview/containers/ExperiencePreviewModal.tsx` - import useStartTransformPipeline, hasTransformConfig, JobStatusDisplay; add showJobStatus state; modify handleComplete to trigger transform and show job status view instead of closing
+- [x] T012 [P] [US2] Create JobStatusDisplay component in `apps/clementine-app/src/domains/experience/preview/components/JobStatusDisplay.tsx` - show spinner with status messages for pending/running, success icon for completed, error icon for failed
+- [x] T013 [P] [US2] Export JobStatusDisplay from `apps/clementine-app/src/domains/experience/preview/components/index.ts` - add export statement
+- [x] T014 [US2] Modify ExperiencePreviewModal in `apps/clementine-app/src/domains/experience/preview/containers/ExperiencePreviewModal.tsx` - import useStartTransformPipeline, hasTransformConfig, JobStatusDisplay; add showJobStatus state; modify handleComplete to trigger transform and show job status view instead of closing
 
 **Checkpoint**: User Story 2 complete - preview modal shows transform job status
 
@@ -86,8 +86,8 @@
 
 ### Implementation for User Story 3
 
-- [ ] T015 [US3] Verify PregatePage does NOT trigger transform in `apps/clementine-app/src/domains/guest/containers/PregatePage.tsx` - confirm no useStartTransformPipeline import or call exists (should already be the case - no code changes needed, just verification)
-- [ ] T016 [US3] Verify PresharePage does NOT trigger transform in `apps/clementine-app/src/domains/guest/containers/PresharePage.tsx` - confirm no useStartTransformPipeline import or call exists (should already be the case - no code changes needed, just verification)
+- [x] T015 [US3] Verify PregatePage does NOT trigger transform in `apps/clementine-app/src/domains/guest/containers/PregatePage.tsx` - confirm no useStartTransformPipeline import or call exists (should already be the case - no code changes needed, just verification)
+- [x] T016 [US3] Verify PresharePage does NOT trigger transform in `apps/clementine-app/src/domains/guest/containers/PresharePage.tsx` - confirm no useStartTransformPipeline import or call exists (should already be the case - no code changes needed, just verification)
 
 **Checkpoint**: User Story 3 complete - pregate/preshare correctly skip transform
 
@@ -97,9 +97,9 @@
 
 **Purpose**: Validation and final checks
 
-- [ ] T017 Run frontend validation with `pnpm app:check` from apps/clementine-app
-- [ ] T018 Run frontend type-check with `pnpm app:type-check` from apps/clementine-app
-- [ ] T019 Build backend functions with `pnpm build` from functions/
+- [x] T017 Run frontend validation with `pnpm app:check` from apps/clementine-app
+- [x] T018 Run frontend type-check with `pnpm app:type-check` from apps/clementine-app
+- [x] T019 Build backend functions with `pnpm build` from functions/
 - [ ] T020 Manual testing: Complete experience with transform → verify SharePage job status flow
 - [ ] T021 Manual testing: Preview experience with transform → verify JobStatusDisplay in modal
 

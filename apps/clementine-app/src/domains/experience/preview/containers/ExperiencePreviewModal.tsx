@@ -35,7 +35,9 @@ import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { ExperienceRuntime } from '../../runtime'
-import { PreviewRuntimeContent } from '../components'
+import { useStartTransformPipeline } from '../../transform'
+import { hasTransformConfig } from '../../shared/utils/hasTransformConfig'
+import { JobStatusDisplay, PreviewRuntimeContent } from '../components'
 import type { Experience } from '@/domains/experience/shared'
 import type { Theme } from '@/shared/theming'
 import { useGhostProject } from '@/domains/project/shared'
@@ -81,9 +83,12 @@ export function ExperiencePreviewModal({
 
   // Session ID state - enables subscription once session is created
   const [sessionId, setSessionId] = useState<string | null>(null)
+  // Show job status view after completion (when transform configured)
+  const [showJobStatus, setShowJobStatus] = useState(false)
 
   // Mutations
   const createSession = useCreateSession()
+  const startTransformPipeline = useStartTransformPipeline()
 
   // Subscribe to session updates (disabled until sessionId is set)
   const { data: session } = useSubscribeSession(
@@ -146,6 +151,7 @@ export function ExperiencePreviewModal({
   useEffect(() => {
     if (!open) {
       setSessionId(null)
+      setShowJobStatus(false)
       createSession.reset()
     }
   }, [open, createSession.reset])
@@ -156,13 +162,31 @@ export function ExperiencePreviewModal({
   }, [onOpenChange])
 
   // Handle experience completion
-  const handleComplete = useCallback(() => {
-    toast.success('Preview complete!', {
-      description: 'The experience preview has finished.',
+  const handleComplete = useCallback(async () => {
+    // No transform - just show success toast
+    if (!hasTransformConfig(experience, 'draft')) {
+      toast.success('Preview complete!', {
+        description: 'The experience preview has finished.',
+      })
+      return
+    }
+
+    // Transform configured - trigger pipeline and show job status
+    if (!sessionId || !ghostProjectId) return
+
+    const success = await startTransformPipeline({
+      projectId: ghostProjectId,
+      sessionId,
     })
-    // Optionally close after a delay
-    setTimeout(() => onOpenChange(false), 1500)
-  }, [onOpenChange])
+    if (!success) {
+      toast.error('Failed to start processing', {
+        description: 'Please try again.',
+      })
+      return
+    }
+
+    setShowJobStatus(true)
+  }, [experience, sessionId, ghostProjectId, startTransformPipeline])
 
   // Handle runtime errors
   const handleError = useCallback((err: Error) => {
@@ -209,8 +233,23 @@ export function ExperiencePreviewModal({
         </div>
       )}
 
+      {/* Job status view (after completion with transform) */}
+      {showJobStatus && session && (
+        <ThemeProvider theme={previewTheme}>
+          <ThemedBackground
+            className="h-full w-full"
+            contentClassName="h-full w-full"
+          >
+            <JobStatusDisplay
+              jobStatus={session.jobStatus}
+              onClose={handleClose}
+            />
+          </ThemedBackground>
+        </ThemeProvider>
+      )}
+
       {/* Runtime content */}
-      {isReady && steps.length > 0 && (
+      {isReady && steps.length > 0 && !showJobStatus && (
         <ThemeProvider theme={previewTheme}>
           <ThemedBackground
             className="h-full w-full"

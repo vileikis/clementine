@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
+import { getFunctions } from 'firebase/functions'
 import { getStorage } from 'firebase/storage'
 
 // Firebase configuration
@@ -25,3 +26,6 @@ export const firestore = getFirestore(app)
 
 // Initialize Firebase Storage
 export const storage = getStorage(app)
+
+// Initialize Firebase Functions (europe-west1 region)
+export const functions = getFunctions(app, 'europe-west1')
