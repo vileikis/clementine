@@ -3,16 +3,16 @@
  *
  * Handles uploading reference media files for AI Image nodes.
  * Manages upload progress state and updates transform config after each upload.
- * Accumulates refs within a batch to handle stale transform prop correctly.
+ * Uses a ref to always read the latest transform to prevent stale closures.
  */
-import { useCallback, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { nanoid } from 'nanoid'
 
 import {
   MAX_REF_MEDIA_COUNT,
   addNodeRefMedia,
 } from '../lib/transform-operations'
-import type { MediaReference, TransformConfig } from '@clementine/shared'
+import type { TransformConfig } from '@clementine/shared'
 import { useUploadMediaAsset } from '@/domains/media-library'
 
 export interface UploadingFile {
@@ -65,6 +65,10 @@ export function useRefMediaUpload({
 }: UseRefMediaUploadParams): UseRefMediaUploadResult {
   const [uploadingFiles, setUploadingFiles] = useState<UploadingFile[]>([])
 
+  // Keep a ref to the latest transform to avoid stale closures in uploadFiles
+  const transformRef = useRef(transform)
+  transformRef.current = transform
+
   const uploadAsset = useUploadMediaAsset(workspaceId, userId)
 
   const availableSlots = MAX_REF_MEDIA_COUNT - currentRefMediaCount
@@ -85,9 +89,6 @@ export function useRefMediaUpload({
       }))
       setUploadingFiles((prev) => [...prev, ...uploadingEntries])
 
-      // Accumulate refs for this batch to handle stale transform
-      const uploadedRefs: MediaReference[] = []
-
       // Upload files sequentially to show progress per file
       for (const entry of uploadingEntries) {
         try {
@@ -103,17 +104,16 @@ export function useRefMediaUpload({
             },
           })
 
-          // Add to accumulated refs
-          uploadedRefs.push(mediaRef)
-
           // Remove from uploading state
           setUploadingFiles((prev) =>
             prev.filter((item) => item.tempId !== entry.tempId),
           )
 
-          // Update transform with ALL refs from this batch
-          // (addNodeRefMedia dedupes, so stale transform is handled correctly)
-          const newTransform = addNodeRefMedia(transform, nodeId, uploadedRefs)
+          // Always read the latest transform from ref to avoid stale closure
+          const latestTransform = transformRef.current
+          const newTransform = addNodeRefMedia(latestTransform, nodeId, [
+            mediaRef,
+          ])
           onUpdate(newTransform)
         } catch {
           // Remove failed upload from uploading state
@@ -123,7 +123,7 @@ export function useRefMediaUpload({
         }
       }
     },
-    [availableSlots, nodeId, onUpdate, transform, uploadAsset, userId],
+    [availableSlots, nodeId, onUpdate, uploadAsset, userId],
   )
 
   return {

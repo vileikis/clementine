@@ -56,14 +56,15 @@ export function PromptComposer({
   const [isDragOver, setIsDragOver] = useState(false)
 
   // Reference media upload hook
-  const { uploadingFiles, uploadFiles, canAddMore } = useRefMediaUpload({
-    workspaceId,
-    userId: user?.uid,
-    nodeId: node.id,
-    transform,
-    currentRefMediaCount: config.refMedia.length,
-    onUpdate,
-  })
+  const { uploadingFiles, uploadFiles, canAddMore, isUploading } =
+    useRefMediaUpload({
+      workspaceId,
+      userId: user?.uid,
+      nodeId: node.id,
+      transform,
+      currentRefMediaCount: config.refMedia.length,
+      onUpdate,
+    })
 
   // Debounce the local prompt value
   const debouncedPrompt = useDebounce(localPrompt, PROMPT_DEBOUNCE_DELAY)
@@ -106,12 +107,12 @@ export function PromptComposer({
     (e: React.DragEvent) => {
       e.preventDefault()
       e.stopPropagation()
-      // Only highlight if we can accept more files
-      if (!disabled && canAddMore) {
+      // Only highlight if we can accept more files and not currently uploading
+      if (!disabled && canAddMore && !isUploading) {
         setIsDragOver(true)
       }
     },
-    [disabled, canAddMore],
+    [disabled, canAddMore, isUploading],
   )
 
   const handleDragLeave = useCallback((e: React.DragEvent) => {
@@ -126,8 +127,8 @@ export function PromptComposer({
       e.stopPropagation()
       setIsDragOver(false)
 
-      // Check if we can accept more files
-      if (disabled || !canAddMore) {
+      // Check if we can accept more files and not currently uploading
+      if (disabled || !canAddMore || isUploading) {
         return
       }
 
@@ -140,11 +141,11 @@ export function PromptComposer({
         handleFilesSelected(droppedFiles)
       }
     },
-    [disabled, canAddMore, handleFilesSelected],
+    [disabled, canAddMore, isUploading, handleFilesSelected],
   )
 
-  // Check if add button should be disabled
-  const isAddDisabled = disabled || !canAddMore
+  // Check if add button should be disabled (also prevent concurrent batches)
+  const isAddDisabled = disabled || !canAddMore || isUploading
 
   return (
     <div

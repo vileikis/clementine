@@ -26,10 +26,12 @@ export function AddMediaButton({
   const inputRef = useRef<HTMLInputElement>(null)
 
   const handleClick = () => {
+    if (disabled) return
     inputRef.current?.click()
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (disabled) return
     const files = e.target.files
     if (files && files.length > 0) {
       onFilesSelected(Array.from(files))

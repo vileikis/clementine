@@ -36,7 +36,8 @@ export function ReferenceMediaItem({
   onRemove,
   disabled,
 }: ReferenceMediaItemProps) {
-  const handleRemove = () => {
+  const handleRemove = (e: React.MouseEvent) => {
+    e.stopPropagation()
     onRemove(media.mediaAssetId)
   }
 

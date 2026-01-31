@@ -47,7 +47,6 @@ export function AIImageNodeHeader({ node }: AIImageNodeProps) {
  *
  * Renders the expanded settings:
  * - PromptComposer (prompt input, model/aspect ratio selectors, reference media)
- * - Test Run placeholder
  */
 export function AIImageNodeSettings({
   node,
