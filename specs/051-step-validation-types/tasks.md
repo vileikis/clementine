@@ -28,12 +28,12 @@ Monorepo structure:
 
 **Why Shared Phase**: Answer schema changes must be complete before validator type updates (US1) and renderer updates (US2) can proceed. This is the single blocking prerequisite.
 
-- [ ] T001 Create answerValueSchema in packages/shared/src/schemas/session/session.schema.ts (add before answerSchema around line 40)
-- [ ] T002 Create AnswerValue type inferred from answerValueSchema in packages/shared/src/schemas/session/session.schema.ts
-- [ ] T003 Update answerSchema.value to use answerValueSchema instead of inline union in packages/shared/src/schemas/session/session.schema.ts
-- [ ] T004 Export AnswerValue type in packages/shared/src/schemas/session/session.schema.ts (add to existing exports around line 219)
-- [ ] T005 Build shared package with `pnpm --filter @clementine/shared build`
-- [ ] T006 Verify TypeScript compilation passes with `pnpm --filter @clementine/shared type-check`
+- [x] T001 Create answerValueSchema in packages/shared/src/schemas/session/session.schema.ts (add before answerSchema around line 40)
+- [x] T002 Create AnswerValue type inferred from answerValueSchema in packages/shared/src/schemas/session/session.schema.ts
+- [x] T003 Update answerSchema.value to use answerValueSchema instead of inline union in packages/shared/src/schemas/session/session.schema.ts
+- [x] T004 Export AnswerValue type in packages/shared/src/schemas/session/session.schema.ts (add to existing exports around line 219)
+- [x] T005 Build shared package with `pnpm --filter @clementine/shared build`
+- [x] T006 Verify TypeScript compilation passes with `pnpm --filter @clementine/shared type-check`
 
 **Checkpoint**: Shared package schema updated - US1 and US2 can now proceed in parallel
 
@@ -57,16 +57,16 @@ Monorepo structure:
 
 ### Implementation for User Story 1
 
-- [ ] T007 [P] [US1] Import specific config types in apps/clementine-app/src/domains/experience/steps/registry/step-validation.ts (add ExperienceInputScaleStepConfig, ExperienceInputYesNoStepConfig, ExperienceInputMultiSelectStepConfig, ExperienceInputShortTextStepConfig, ExperienceInputLongTextStepConfig from @clementine/shared)
-- [ ] T008 [P] [US1] Update validateScaleInput function signature to use ExperienceInputScaleStepConfig in apps/clementine-app/src/domains/experience/steps/registry/step-validation.ts (around line 85)
-- [ ] T009 [P] [US1] Update validateYesNoInput function signature to use ExperienceInputYesNoStepConfig in apps/clementine-app/src/domains/experience/steps/registry/step-validation.ts (around line 120)
-- [ ] T010 [P] [US1] Update validateMultiSelectInput function signature to use ExperienceInputMultiSelectStepConfig in apps/clementine-app/src/domains/experience/steps/registry/step-validation.ts (around line 142)
-- [ ] T011 [P] [US1] Update validateTextInput function signature to use ExperienceInputShortTextStepConfig | ExperienceInputLongTextStepConfig union in apps/clementine-app/src/domains/experience/steps/registry/step-validation.ts (around line 194)
-- [ ] T012 [US1] Update validateStepInput switch statement with type assertions in apps/clementine-app/src/domains/experience/steps/registry/step-validation.ts (add `as ExperienceInputScaleStepConfig` etc. for each case)
-- [ ] T013 [US1] Remove StepConfig type definition in apps/clementine-app/src/domains/experience/steps/registry/step-validation.ts (around line 22)
-- [ ] T014 [US1] Run TypeScript type check with `pnpm app:type-check` and verify no errors
-- [ ] T015 [US1] Verify IDE autocomplete works by opening step-validation.ts and typing `config.` in validateScaleInput
-- [ ] T016 [US1] Test compile-time error detection by temporarily adding `config.invalidProp` and verifying TypeScript error
+- [x] T007 [P] [US1] Import specific config types in apps/clementine-app/src/domains/experience/steps/registry/step-validation.ts (add ExperienceInputScaleStepConfig, ExperienceInputYesNoStepConfig, ExperienceInputMultiSelectStepConfig, ExperienceInputShortTextStepConfig, ExperienceInputLongTextStepConfig from @clementine/shared)
+- [x] T008 [P] [US1] Update validateScaleInput function signature to use ExperienceInputScaleStepConfig in apps/clementine-app/src/domains/experience/steps/registry/step-validation.ts (around line 85)
+- [x] T009 [P] [US1] Update validateYesNoInput function signature to use ExperienceInputYesNoStepConfig in apps/clementine-app/src/domains/experience/steps/registry/step-validation.ts (around line 120)
+- [x] T010 [P] [US1] Update validateMultiSelectInput function signature to use ExperienceInputMultiSelectStepConfig in apps/clementine-app/src/domains/experience/steps/registry/step-validation.ts (around line 142)
+- [x] T011 [P] [US1] Update validateTextInput function signature to use ExperienceInputShortTextStepConfig | ExperienceInputLongTextStepConfig union in apps/clementine-app/src/domains/experience/steps/registry/step-validation.ts (around line 194)
+- [x] T012 [US1] Update validateStepInput switch statement with type assertions in apps/clementine-app/src/domains/experience/steps/registry/step-validation.ts (add `as ExperienceInputScaleStepConfig` etc. for each case)
+- [x] T013 [US1] Remove StepConfig type definition in apps/clementine-app/src/domains/experience/steps/registry/step-validation.ts (around line 22)
+- [x] T014 [US1] Run TypeScript type check with `pnpm app:type-check` and verify no errors
+- [x] T015 [US1] Verify IDE autocomplete works by opening step-validation.ts and typing `config.` in validateScaleInput
+- [x] T016 [US1] Test compile-time error detection by temporarily adding `config.invalidProp` and verifying TypeScript error
 
 **Checkpoint**: US1 complete - Validators now have full type safety with autocomplete
 
@@ -95,25 +95,25 @@ Monorepo structure:
 
 **Step 1: Update Step Registry**
 
-- [ ] T017 [P] [US2] Import AnswerValue type from @clementine/shared in apps/clementine-app/src/domains/experience/steps/registry/step-registry.ts (add to existing imports around line 38-43)
-- [ ] T018 [P] [US2] Remove local AnswerValue type definition in apps/clementine-app/src/domains/experience/steps/registry/step-registry.ts (around line 60)
-- [ ] T019 [P] [US2] Re-export AnswerValue from shared in apps/clementine-app/src/domains/experience/steps/registry/step-registry.ts (add `export type { AnswerValue }` after removing local definition)
+- [x] T017 [P] [US2] Import AnswerValue type from @clementine/shared in apps/clementine-app/src/domains/experience/steps/registry/step-registry.ts (add to existing imports around line 38-43)
+- [x] T018 [P] [US2] Remove local AnswerValue type definition in apps/clementine-app/src/domains/experience/steps/registry/step-registry.ts (around line 60)
+- [x] T019 [P] [US2] Re-export AnswerValue from shared in apps/clementine-app/src/domains/experience/steps/registry/step-registry.ts (add `export type { AnswerValue }` after removing local definition)
 
 **Step 2: Update Renderers**
 
-- [ ] T020 [P] [US2] Update InputYesNoRenderer answer parsing logic in apps/clementine-app/src/domains/experience/steps/renderers/InputYesNoRenderer.tsx (change line 32 from `typeof answer === 'boolean'` to parse "yes"/"no" strings)
-- [ ] T021 [P] [US2] Update InputYesNoRenderer handleSelect to save "yes"/"no" strings in apps/clementine-app/src/domains/experience/steps/renderers/InputYesNoRenderer.tsx (change line 38 from `onAnswer(value)` to `onAnswer(value ? 'yes' : 'no')`)
-- [ ] T022 [P] [US2] Update InputScaleRenderer answer parsing logic in apps/clementine-app/src/domains/experience/steps/renderers/InputScaleRenderer.tsx (change line 35 from `typeof answer === 'number'` to parse string)
-- [ ] T023 [P] [US2] Update InputScaleRenderer handleSelect to save string in apps/clementine-app/src/domains/experience/steps/renderers/InputScaleRenderer.tsx (change line 41 from `onAnswer(value)` to `onAnswer(String(value))`)
+- [x] T020 [P] [US2] Update InputYesNoRenderer answer parsing logic in apps/clementine-app/src/domains/experience/steps/renderers/InputYesNoRenderer.tsx (change line 32 from `typeof answer === 'boolean'` to parse "yes"/"no" strings)
+- [x] T021 [P] [US2] Update InputYesNoRenderer handleSelect to save "yes"/"no" strings in apps/clementine-app/src/domains/experience/steps/renderers/InputYesNoRenderer.tsx (change line 38 from `onAnswer(value)` to `onAnswer(value ? 'yes' : 'no')`)
+- [x] T022 [P] [US2] Update InputScaleRenderer answer parsing logic in apps/clementine-app/src/domains/experience/steps/renderers/InputScaleRenderer.tsx (change line 35 from `typeof answer === 'number'` to parse string)
+- [x] T023 [P] [US2] Update InputScaleRenderer handleSelect to save string in apps/clementine-app/src/domains/experience/steps/renderers/InputScaleRenderer.tsx (change line 41 from `onAnswer(value)` to `onAnswer(String(value))`)
 
 **Step 3: Verification**
 
-- [ ] T024 [US2] Run TypeScript type check with `pnpm app:type-check` and verify no errors
-- [ ] T025 [US2] Run linter with `pnpm app:lint` and verify no errors
-- [ ] T026 [US2] Run existing tests with `pnpm app:test` and verify all pass
-- [ ] T027 [US2] Manual test: Start dev server and test yes/no renderer saves "yes"/"no" strings
-- [ ] T028 [US2] Manual test: Test scale renderer saves number as string (e.g., "3")
-- [ ] T029 [US2] Manual test: Check Firestore console to verify answer values are strings
+- [x] T024 [US2] Run TypeScript type check with `pnpm app:type-check` and verify no errors
+- [x] T025 [US2] Run linter with `pnpm app:lint` and verify no errors
+- [x] T026 [US2] Run existing tests with `pnpm app:test` and verify all pass
+- [x] T027 [US2] Manual test: Start dev server and test yes/no renderer saves "yes"/"no" strings
+- [x] T028 [US2] Manual test: Test scale renderer saves number as string (e.g., "3")
+- [x] T029 [US2] Manual test: Check Firestore console to verify answer values are strings
 
 **Checkpoint**: US2 complete - All renderers save answers in consistent string format
 
@@ -139,11 +139,11 @@ Monorepo structure:
 
 **Note**: Most work completed in US2. This phase focuses on verification and any remaining consistency improvements.
 
-- [ ] T030 [P] [US3] Verify InputShortTextRenderer uses AnswerValue type in apps/clementine-app/src/domains/experience/steps/renderers/InputShortTextRenderer.tsx
-- [ ] T031 [P] [US3] Verify InputLongTextRenderer uses AnswerValue type in apps/clementine-app/src/domains/experience/steps/renderers/InputLongTextRenderer.tsx
-- [ ] T032 [P] [US3] Verify InputMultiSelectRenderer uses AnswerValue type in apps/clementine-app/src/domains/experience/steps/renderers/InputMultiSelectRenderer.tsx
-- [ ] T033 [US3] Review all renderer components for consistent answer handling patterns
-- [ ] T034 [US3] Document any renderer-specific conversion logic in code comments if needed
+- [x] T030 [P] [US3] Verify InputShortTextRenderer uses AnswerValue type in apps/clementine-app/src/domains/experience/steps/renderers/InputShortTextRenderer.tsx
+- [x] T031 [P] [US3] Verify InputLongTextRenderer uses AnswerValue type in apps/clementine-app/src/domains/experience/steps/renderers/InputLongTextRenderer.tsx
+- [x] T032 [P] [US3] Verify InputMultiSelectRenderer uses AnswerValue type in apps/clementine-app/src/domains/experience/steps/renderers/InputMultiSelectRenderer.tsx
+- [x] T033 [US3] Review all renderer components for consistent answer handling patterns
+- [x] T034 [US3] Document any renderer-specific conversion logic in code comments if needed
 
 **Checkpoint**: US3 complete - All renderers verified for consistent behavior
 
@@ -153,13 +153,13 @@ Monorepo structure:
 
 **Purpose**: Cross-cutting validation and documentation
 
-- [ ] T035 Run full validation loop: `pnpm app:check` (format + lint)
-- [ ] T036 Run TypeScript type check: `pnpm app:type-check`
-- [ ] T037 Run test suite: `pnpm app:test`
-- [ ] T038 [P] Verify no `Record<string, unknown>` remains for step configs (search codebase)
-- [ ] T039 [P] Verify all answer values use string | string[] types (search for old usage)
-- [ ] T040 Review git diff to ensure all changes align with spec
-- [ ] T041 Update CHANGELOG or commit message with summary of changes
+- [x] T035 Run full validation loop: `pnpm app:check` (format + lint)
+- [x] T036 Run TypeScript type check: `pnpm app:type-check`
+- [x] T037 Run test suite: `pnpm app:test`
+- [x] T038 [P] Verify no `Record<string, unknown>` remains for step configs (search codebase)
+- [x] T039 [P] Verify all answer values use string | string[] types (search for old usage)
+- [x] T040 Review git diff to ensure all changes align with spec
+- [x] T041 Update CHANGELOG or commit message with summary of changes
 
 **Final Checkpoint**: Feature complete and ready for PR
 
