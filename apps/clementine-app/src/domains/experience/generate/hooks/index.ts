@@ -1,3 +1,5 @@
 export * from './useUpdateTransformConfig'
 export * from './useAddNode'
 export * from './useDeleteNode'
+export * from './useDuplicateNode'
+export * from './useReorderNodes'

@@ -17,7 +17,7 @@ export interface AIImageNodeCardProps {
   /** Whether this node is selected */
   isSelected?: boolean
   /** Click handler for selecting node */
-  onClick?: () => void
+  onSelect?: () => void
   /** Click handler for delete button */
   onDelete?: () => void
   /** Optional additional className */
@@ -38,7 +38,7 @@ export interface AIImageNodeCardProps {
 export function AIImageNodeCard({
   node,
   isSelected = false,
-  onClick,
+  onSelect,
   onDelete,
   className,
 }: AIImageNodeCardProps) {
@@ -53,7 +53,7 @@ export function AIImageNodeCard({
   return (
     <Card
       className={`group relative cursor-pointer transition-colors hover:bg-accent ${isSelected ? 'ring-2 ring-primary' : ''} ${className ?? ''}`}
-      onClick={onClick}
+      onClick={onSelect}
     >
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <Badge variant="secondary">AI Image</Badge>

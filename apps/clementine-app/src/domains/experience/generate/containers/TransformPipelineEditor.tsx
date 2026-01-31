@@ -2,18 +2,37 @@
  * TransformPipelineEditor Container
  *
  * Main editor container for managing transform pipeline nodes.
- * Integrates add/delete logic, node list display, empty state, and delete dialog.
+ * Single-column layout with collapsible node items and drag-drop reordering.
  */
 import { useState } from 'react'
-
 import {
-  AIImageNodeCard,
-  AddNodeButton,
-  DeleteNodeDialog,
-  EmptyState,
-} from '../components'
-import { useAddNode, useDeleteNode } from '../hooks'
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import { Plus } from 'lucide-react'
+
+import { DeleteNodeDialog, EmptyState, NodeListItem } from '../components'
+import {
+  useAddNode,
+  useDeleteNode,
+  useDuplicateNode,
+  useReorderNodes,
+} from '../hooks'
+import { useGenerateEditorStore } from '../stores/useGenerateEditorStore'
+import type { DragEndEvent } from '@dnd-kit/core'
 import type { Experience } from '../../shared/schemas'
+import { EditorSaveStatus } from '@/shared/editor-status/components/EditorSaveStatus'
+import { Button } from '@/ui-kit/ui/button'
+import { ScrollArea } from '@/ui-kit/ui/scroll-area'
 
 export interface TransformPipelineEditorProps {
   /** Experience with transform configuration */
@@ -26,13 +45,14 @@ export interface TransformPipelineEditorProps {
  * Transform Pipeline Editor
  *
  * Features:
- * - Add new AI Image nodes
- * - Display node list with cards
- * - Delete nodes with confirmation
- * - Empty state when no nodes
- * - Delete dialog state management
+ * - Single-column layout with collapsible nodes
+ * - Drag and drop reordering
+ * - Add, duplicate, delete nodes
+ * - Inline node settings (expanded by default)
+ * - Auto-save with status indicator
  *
  * User Story 1 (P1): Complete CRUD operations for AI Image nodes
+ * User Story 2 (P2): Configure node settings via inline collapsible
  */
 export function TransformPipelineEditor({
   experience,
@@ -40,6 +60,9 @@ export function TransformPipelineEditor({
 }: TransformPipelineEditorProps) {
   const addNode = useAddNode()
   const deleteNode = useDeleteNode()
+  const duplicateNode = useDuplicateNode()
+  const reorderNodes = useReorderNodes()
+  const store = useGenerateEditorStore()
 
   // Delete dialog state
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -48,8 +71,24 @@ export function TransformPipelineEditor({
   const nodes = experience.draft.transform?.nodes ?? []
   const hasNodes = nodes.length > 0
 
+  // Configure sensors for drag and drop
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // Require 8px movement before drag starts
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  )
+
   const handleAddNode = async () => {
     await addNode.mutateAsync({ experience, workspaceId })
+  }
+
+  const handleDuplicateNode = async (nodeId: string) => {
+    await duplicateNode.mutateAsync({ experience, workspaceId, nodeId })
   }
 
   const handleDeleteClick = (nodeId: string) => {
@@ -70,38 +109,99 @@ export function TransformPipelineEditor({
     setNodeToDelete(null)
   }
 
+  // Handle drag end to reorder nodes
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+
+    if (over && active.id !== over.id) {
+      const oldIndex = nodes.findIndex((node) => node.id === active.id)
+      const newIndex = nodes.findIndex((node) => node.id === over.id)
+
+      if (oldIndex !== -1 && newIndex !== -1) {
+        const newNodes = [...nodes]
+        const [movedNode] = newNodes.splice(oldIndex, 1)
+        newNodes.splice(newIndex, 0, movedNode)
+        reorderNodes.mutate({ experience, workspaceId, nodes: newNodes })
+      }
+    }
+  }
+
   return (
-    <div className="space-y-4">
-      {/* Header with Add Node button */}
-      <div className="flex items-center justify-between">
+    <div className="flex h-full flex-col">
+      {/* Header */}
+      <div className="flex shrink-0 items-center justify-between border-b bg-background px-6 py-4">
         <div>
-          <h2 className="text-2xl font-semibold">Transform Pipeline</h2>
+          <h2 className="text-xl font-semibold">Transform Pipeline</h2>
           <p className="text-sm text-muted-foreground">
-            Manage AI Image nodes in your transform pipeline
+            Configure AI transformations for your experience
           </p>
         </div>
-        {hasNodes && (
-          <AddNodeButton
-            onClick={handleAddNode}
-            isPending={addNode.isPending}
+        <div className="flex items-center gap-3">
+          <EditorSaveStatus
+            pendingSaves={store.pendingSaves}
+            lastCompletedAt={store.lastCompletedAt}
+            successDuration={3000}
           />
-        )}
+          {hasNodes && (
+            <Button
+              onClick={handleAddNode}
+              disabled={addNode.isPending}
+              className="min-h-[44px]"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Add Node
+            </Button>
+          )}
+        </div>
       </div>
 
-      {/* Node list or empty state */}
-      {hasNodes ? (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {nodes.map((node) => (
-            <AIImageNodeCard
-              key={node.id}
-              node={node}
-              onDelete={() => handleDeleteClick(node.id)}
+      {/* Node list */}
+      <ScrollArea className="flex-1">
+        <div className="mx-auto max-w-3xl space-y-4 p-6">
+          {hasNodes ? (
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={nodes.map((node) => node.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                {nodes.map((node, index) => (
+                  <NodeListItem
+                    key={node.id}
+                    node={node}
+                    index={index + 1}
+                    onDuplicate={() => handleDuplicateNode(node.id)}
+                    onDelete={() => handleDeleteClick(node.id)}
+                  />
+                ))}
+              </SortableContext>
+            </DndContext>
+          ) : (
+            <EmptyState
+              onAddNode={handleAddNode}
+              isPending={addNode.isPending}
             />
-          ))}
+          )}
+
+          {/* Add node button at bottom when nodes exist */}
+          {hasNodes && (
+            <div className="flex justify-center pt-4">
+              <Button
+                variant="outline"
+                onClick={handleAddNode}
+                disabled={addNode.isPending}
+                className="min-h-[44px]"
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Add Node
+              </Button>
+            </div>
+          )}
         </div>
-      ) : (
-        <EmptyState onAddNode={handleAddNode} isPending={addNode.isPending} />
-      )}
+      </ScrollArea>
 
       {/* Delete confirmation dialog */}
       <DeleteNodeDialog

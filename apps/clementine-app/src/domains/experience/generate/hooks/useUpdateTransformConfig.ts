@@ -3,6 +3,7 @@
  *
  * Mutation hook for updating the transform configuration in experience draft.
  * Updates draft.transform field with transaction, draftVersion increment, and cache invalidation.
+ * Uses tracked mutation for save status tracking.
  */
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import {
@@ -14,8 +15,10 @@ import {
 import * as Sentry from '@sentry/tanstackstart-react'
 
 import { experienceKeys } from '../../shared/queries/experience.query'
+import { useGenerateEditorStore } from '../stores/useGenerateEditorStore'
 import type { TransformConfig } from '@clementine/shared'
 import { firestore } from '@/integrations/firebase/client'
+import { useTrackedMutation } from '@/shared/editor-status/hooks/useTrackedMutation'
 
 /**
  * Input for updating transform configuration
@@ -72,8 +75,9 @@ export interface UpdateTransformConfigResult {
  */
 export function useUpdateTransformConfig() {
   const queryClient = useQueryClient()
+  const store = useGenerateEditorStore()
 
-  return useMutation<
+  const baseMutation = useMutation<
     UpdateTransformConfigResult,
     Error,
     UpdateTransformConfigInput
@@ -116,4 +120,7 @@ export function useUpdateTransformConfig() {
       })
     },
   })
+
+  // Wrap with tracked mutation for save status tracking
+  return useTrackedMutation(baseMutation, store)
 }
