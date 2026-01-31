@@ -1,29 +1,47 @@
 /**
  * ExperienceGeneratePage Container
  *
- * Placeholder for the Generate tab (AI transform pipeline configuration).
- * This is a work-in-progress component that will be implemented in a future phase.
+ * Main content area for the Generate tab (AI transform pipeline configuration).
+ * Provides CRUD operations for AI Image nodes in the transform pipeline.
  */
-import { Sparkles } from 'lucide-react'
+import { useParams } from '@tanstack/react-router'
+
+import { TransformPipelineEditor } from './TransformPipelineEditor'
+import { useWorkspace } from '@/domains/workspace'
+import { useWorkspaceExperience } from '@/domains/experience'
 
 /**
- * Generate tab placeholder with centered WIP message
+ * Generate tab with transform pipeline editor
  *
- * Shows a "Coming soon" message for future transform pipeline functionality.
- * Uses consistent styling with other placeholder states in the app.
+ * Features:
+ * - Add/delete AI Image nodes
+ * - View node list with cards
+ * - Empty state when no nodes
+ * - Delete confirmation dialog
+ *
+ * Phase 1b-2: CRUD operations and basic display (MVP)
+ * Future phases will add: editor panel, prompt editing, refMedia management
  */
 export function ExperienceGeneratePage() {
+  const { workspaceSlug, experienceId } = useParams({ strict: false })
+  const { data: workspace } = useWorkspace(workspaceSlug ?? '')
+  const { data: experience } = useWorkspaceExperience(
+    workspace?.id ?? '',
+    experienceId ?? '',
+  )
+
+  // Safety check - should not happen due to parent route
+  if (!experience || !workspace) {
+    return null
+  }
+
   return (
-    <div className="flex flex-1 items-center justify-center h-full">
-      <div className="text-center space-y-4">
-        <Sparkles className="mx-auto h-12 w-12 text-muted-foreground" />
-        <div>
-          <h2 className="text-lg font-semibold">AI Transform Pipeline</h2>
-          <p className="text-sm text-muted-foreground">
-            Configure AI transformation settings for your experience.
-          </p>
-          <p className="text-xs text-muted-foreground mt-2">Coming soon</p>
-        </div>
+    <div className="flex flex-1 flex-col overflow-hidden h-full">
+      <div className="flex-1 overflow-y-auto p-6">
+        <TransformPipelineEditor
+          experience={experience}
+          workspaceId={workspace.id}
+        />
       </div>
     </div>
   )

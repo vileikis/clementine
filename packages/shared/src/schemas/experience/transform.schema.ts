@@ -6,21 +6,32 @@
  */
 import { z } from 'zod'
 
+import { aiImageNodeSchema } from './nodes'
+
 // Re-export node schemas for convenience
 export * from './nodes'
 
 /**
- * Transform node definition
- * Represents a single node in the pipeline graph
+ * Transform node discriminated union
+ *
+ * Each node type has its own schema with a literal `type` discriminator.
+ * Add new node types to this union as they are implemented.
+ *
+ * @example
+ * ```ts
+ * // Type narrowing works automatically
+ * if (node.type === 'ai.imageGeneration') {
+ *   // node.config is typed as AIImageNodeConfig
+ *   console.log(node.config.model)
+ * }
+ * ```
  */
-export const transformNodeSchema = z.looseObject({
-  /** Unique node identifier */
-  id: z.string(),
-  /** Node type (e.g., 'ai.imageGeneration', 'filter.resize') */
-  type: z.string(),
-  /** Node-specific configuration */
-  config: z.record(z.string(), z.unknown()).default({}),
-})
+export const transformNodeSchema = z.discriminatedUnion('type', [
+  aiImageNodeSchema,
+  // Add future node types here:
+  // filterNodeSchema,
+  // videoNodeSchema,
+])
 
 /**
  * Aspect ratio options for transform output
