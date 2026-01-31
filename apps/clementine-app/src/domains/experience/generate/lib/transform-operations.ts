@@ -6,8 +6,9 @@
  */
 import { nanoid } from 'nanoid'
 
+import { AI_IMAGE_NODE_TYPE } from '@clementine/shared'
 import type {
-  AIImageNodeConfig,
+  AIImageNode,
   TransformConfig,
   TransformNode,
 } from '@clementine/shared'
@@ -23,16 +24,16 @@ export const DEFAULT_TRANSFORM_CONFIG: TransformConfig = {
 /**
  * Creates a new AI Image node with default configuration
  */
-export function createDefaultAIImageNode(): TransformNode {
+export function createDefaultAIImageNode(): AIImageNode {
   return {
     id: nanoid(),
-    type: 'ai.imageGeneration',
+    type: AI_IMAGE_NODE_TYPE,
     config: {
       model: 'gemini-2.5-flash-image',
       aspectRatio: '3:2',
       prompt: '',
       refMedia: [],
-    } satisfies AIImageNodeConfig,
+    },
   }
 }
 

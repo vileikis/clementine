@@ -1,15 +1,18 @@
 /**
  * NodeListItem Component
  *
- * Collapsible node item with drag handle outside the card.
- * Index number on the left, replaced by drag handle on hover.
+ * Wrapper component for transform nodes with drag handle,
+ * collapse/expand, and context menu actions.
+ * Delegates content rendering to NodeCardContent.
  */
 import { useState } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { ChevronDown, Copy, Trash2 } from 'lucide-react'
 
-import type { AIImageNodeConfig, TransformNode } from '@clementine/shared'
+import { NodeHeader } from './NodeHeader'
+import { NodeSettings } from './NodeSettings'
+import type { TransformNode } from '@clementine/shared'
 import { cn } from '@/shared/utils'
 import { ContextDropdownMenu } from '@/shared/components/ContextDropdownMenu'
 import { Button } from '@/ui-kit/ui/button'
@@ -31,13 +34,13 @@ export interface NodeListItemProps {
 }
 
 /**
- * Node list item with collapsible settings
+ * Node List Item
  *
  * Features:
- * - Index number outside card (hover shows drag handle)
+ * - Index number outside card (hover shows drag cursor)
  * - Clickable header to expand/collapse
  * - Context menu with duplicate/delete
- * - Inline settings when expanded
+ * - Delegates content to NodeCardContent (registry pattern)
  */
 export function NodeListItem({
   node,
@@ -47,8 +50,6 @@ export function NodeListItem({
 }: NodeListItemProps) {
   const [isOpen, setIsOpen] = useState(true)
   const [isHovered, setIsHovered] = useState(false)
-
-  const config = node.config as AIImageNodeConfig
 
   const {
     attributes,
@@ -63,13 +64,6 @@ export function NodeListItem({
     transform: CSS.Transform.toString(transform),
     transition,
   }
-
-  // Truncate prompt for display
-  const promptPreview = config.prompt
-    ? config.prompt.length > 60
-      ? `${config.prompt.slice(0, 60)}...`
-      : config.prompt
-    : '(No prompt configured)'
 
   return (
     <div
@@ -108,13 +102,8 @@ export function NodeListItem({
           {/* Header row - clickable to toggle */}
           <CollapsibleTrigger asChild>
             <div className="flex cursor-pointer items-center gap-3 p-3 hover:bg-accent/50">
-              {/* Node label */}
-              <div className="min-w-0 flex-1">
-                <div className="font-medium">AI Image Node</div>
-                <div className="truncate text-sm text-muted-foreground">
-                  {config.model} · {config.aspectRatio}
-                </div>
-              </div>
+              {/* Node-specific header content */}
+              <NodeHeader node={node} />
 
               {/* Collapse indicator */}
               <ChevronDown
@@ -171,39 +160,7 @@ export function NodeListItem({
 
           {/* Collapsible content - Node settings */}
           <CollapsibleContent>
-            <div className="space-y-4 border-t px-3 pb-4 pt-4">
-              {/* Model Settings placeholder */}
-              <div className="rounded-lg border p-4">
-                <h4 className="mb-2 font-medium">Model Settings</h4>
-                <p className="text-sm text-muted-foreground">
-                  Phase 1e: Model and aspect ratio controls
-                </p>
-              </div>
-
-              {/* Prompt placeholder */}
-              <div className="rounded-lg border p-4">
-                <h4 className="mb-2 font-medium">Prompt</h4>
-                <p className="text-sm text-muted-foreground">{promptPreview}</p>
-              </div>
-
-              {/* Reference Media placeholder */}
-              <div className="rounded-lg border p-4">
-                <h4 className="mb-2 font-medium">Reference Media</h4>
-                <p className="text-sm text-muted-foreground">
-                  Phase 1c: Upload and manage reference media
-                  {config.refMedia.length > 0 &&
-                    ` (${config.refMedia.length} items)`}
-                </p>
-              </div>
-
-              {/* Test Run placeholder */}
-              <div className="rounded-lg border p-4">
-                <h4 className="mb-2 font-medium">Test Run</h4>
-                <p className="text-sm text-muted-foreground">
-                  Phase 1g: Test prompt resolution and generate preview
-                </p>
-              </div>
-            </div>
+            <NodeSettings node={node} />
           </CollapsibleContent>
         </div>
       </Collapsible>
