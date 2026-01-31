@@ -7,10 +7,7 @@
  * - RefMedia array (uses mediaReferenceSchema)
  */
 import { describe, expect, it } from 'vitest'
-import {
-  aiImageNodeConfigSchema,
-  transformConfigSchema,
-} from './transform.schema'
+import { aiImageNodeConfigSchema } from './transform.schema'
 
 describe('aiImageNodeConfigSchema', () => {
   const validConfig = {
@@ -211,37 +208,3 @@ describe('aiImageNodeConfigSchema', () => {
   })
 })
 
-describe('transformConfigSchema - variableMappings removal', () => {
-  it('should not include variableMappings in schema', () => {
-    const config = {
-      nodes: [],
-      outputFormat: null,
-    }
-    const result = transformConfigSchema.safeParse(config)
-    expect(result.success).toBe(true)
-    if (result.success) {
-      // variableMappings should not exist in parsed result
-      expect('variableMappings' in result.data).toBe(false)
-    }
-  })
-
-  it('should accept config with AI image node', () => {
-    const config = {
-      nodes: [
-        {
-          id: 'node-1',
-          type: 'ai.imageGeneration',
-          config: {
-            model: 'gemini-2.5-flash-image',
-            aspectRatio: '3:2',
-            prompt: 'A photo of @{step:Pet Choice}',
-            refMedia: [],
-          },
-        },
-      ],
-      outputFormat: null,
-    }
-    const result = transformConfigSchema.safeParse(config)
-    expect(result.success).toBe(true)
-  })
-})

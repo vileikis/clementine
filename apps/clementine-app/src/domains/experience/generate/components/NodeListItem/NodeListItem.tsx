@@ -12,7 +12,7 @@ import { ChevronDown, Copy, Trash2 } from 'lucide-react'
 
 import { NodeHeader } from './NodeHeader'
 import { NodeSettings } from './NodeSettings'
-import type { TransformConfig, TransformNode } from '@clementine/shared'
+import type { TransformNode } from '@clementine/shared'
 import { cn } from '@/shared/utils'
 import { ContextDropdownMenu } from '@/shared/components/ContextDropdownMenu'
 import { Button } from '@/ui-kit/ui/button'
@@ -27,12 +27,12 @@ export interface NodeListItemProps {
   node: TransformNode
   /** 1-based index for display */
   index: number
-  /** Current transform configuration */
-  transformConfig: TransformConfig
+  /** Current transform nodes array */
+  transformNodes: TransformNode[]
   /** Workspace ID for media uploads */
   workspaceId: string
-  /** Callback to update transform configuration */
-  onUpdate: (transform: TransformConfig) => void
+  /** Callback to update transform nodes */
+  onUpdate: (nodes: TransformNode[]) => void
   /** Callback when duplicate is clicked */
   onDuplicate: () => void
   /** Callback when delete is clicked */
@@ -51,7 +51,7 @@ export interface NodeListItemProps {
 export function NodeListItem({
   node,
   index,
-  transformConfig,
+  transformNodes,
   workspaceId,
   onUpdate,
   onDuplicate,
@@ -171,7 +171,7 @@ export function NodeListItem({
           <CollapsibleContent>
             <NodeSettings
               node={node}
-              transform={transformConfig}
+              transformNodes={transformNodes}
               workspaceId={workspaceId}
               onUpdate={onUpdate}
             />

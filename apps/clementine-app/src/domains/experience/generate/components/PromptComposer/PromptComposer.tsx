@@ -15,7 +15,7 @@ import {
 import { ControlRow } from './ControlRow'
 import { PromptInput } from './PromptInput'
 import { ReferenceMediaStrip } from './ReferenceMediaStrip'
-import type { AIImageNode, TransformConfig } from '@clementine/shared'
+import type { AIImageNode, TransformNode } from '@clementine/shared'
 import { useAuth } from '@/domains/auth'
 import { cn } from '@/shared/utils'
 import { useDebounce } from '@/shared/utils/useDebounce'
@@ -23,12 +23,12 @@ import { useDebounce } from '@/shared/utils/useDebounce'
 export interface PromptComposerProps {
   /** AI Image node being edited */
   node: AIImageNode
-  /** Current transform configuration */
-  transform: TransformConfig
+  /** Current transform nodes array */
+  transformNodes: TransformNode[]
   /** Workspace ID for media uploads */
   workspaceId: string
-  /** Callback to update transform configuration */
-  onUpdate: (transform: TransformConfig) => void
+  /** Callback to update transform nodes */
+  onUpdate: (nodes: TransformNode[]) => void
   /** Whether the composer is disabled */
   disabled?: boolean
 }
@@ -41,7 +41,7 @@ const PROMPT_DEBOUNCE_DELAY = 2000
  */
 export function PromptComposer({
   node,
-  transform,
+  transformNodes,
   workspaceId,
   onUpdate,
   disabled,
@@ -61,7 +61,7 @@ export function PromptComposer({
       workspaceId,
       userId: user?.uid,
       nodeId: node.id,
-      transform,
+      transformNodes,
       currentRefMediaCount: config.refMedia.length,
       onUpdate,
     })
@@ -69,12 +69,16 @@ export function PromptComposer({
   // Debounce the local prompt value
   const debouncedPrompt = useDebounce(localPrompt, PROMPT_DEBOUNCE_DELAY)
 
-  // Update transform when debounced prompt changes
+  // Update transform nodes when debounced prompt changes
   useEffect(() => {
     // Only update if the debounced value differs from the config
     if (debouncedPrompt !== config.prompt) {
-      const newTransform = updateNodePrompt(transform, node.id, debouncedPrompt)
-      onUpdate(newTransform)
+      const newNodes = updateNodePrompt(
+        transformNodes,
+        node.id,
+        debouncedPrompt,
+      )
+      onUpdate(newNodes)
     }
   }, [debouncedPrompt])
 
@@ -96,10 +100,10 @@ export function PromptComposer({
   // Handle remove reference media
   const handleRemoveRefMedia = useCallback(
     (mediaAssetId: string) => {
-      const newTransform = removeNodeRefMedia(transform, node.id, mediaAssetId)
-      onUpdate(newTransform)
+      const newNodes = removeNodeRefMedia(transformNodes, node.id, mediaAssetId)
+      onUpdate(newNodes)
     },
-    [node.id, onUpdate, transform],
+    [node.id, onUpdate, transformNodes],
   )
 
   // Drag-and-drop handlers
@@ -175,7 +179,7 @@ export function PromptComposer({
       {/* Control Row */}
       <ControlRow
         node={node}
-        transform={transform}
+        transformNodes={transformNodes}
         onUpdate={onUpdate}
         onFilesSelected={handleFilesSelected}
         isAddDisabled={isAddDisabled}

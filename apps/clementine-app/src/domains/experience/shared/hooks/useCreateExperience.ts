@@ -84,7 +84,7 @@ export function useCreateExperience() {
           profile: validated.profile,
           status: 'active',
           media: null,
-          draft: { steps: [], transform: null },
+          draft: { steps: [], transformNodes: [] },
           published: null,
           draftVersion: 1,
           publishedVersion: null,

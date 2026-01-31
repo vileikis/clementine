@@ -6,7 +6,7 @@
  */
 import { PromptComposer } from '../PromptComposer'
 
-import type { AIImageNode, TransformConfig } from '@clementine/shared'
+import type { AIImageNode, TransformNode } from '@clementine/shared'
 
 export interface AIImageNodeProps {
   /** AI Image node data */
@@ -14,12 +14,12 @@ export interface AIImageNodeProps {
 }
 
 export interface AIImageNodeSettingsProps extends AIImageNodeProps {
-  /** Current transform configuration */
-  transform: TransformConfig
+  /** Current transform nodes array */
+  transformNodes: TransformNode[]
   /** Workspace ID for media uploads */
   workspaceId: string
-  /** Callback to update transform configuration */
-  onUpdate: (transform: TransformConfig) => void
+  /** Callback to update transform nodes */
+  onUpdate: (nodes: TransformNode[]) => void
 }
 
 /**
@@ -50,7 +50,7 @@ export function AIImageNodeHeader({ node }: AIImageNodeProps) {
  */
 export function AIImageNodeSettings({
   node,
-  transform,
+  transformNodes,
   workspaceId,
   onUpdate,
 }: AIImageNodeSettingsProps) {
@@ -58,7 +58,7 @@ export function AIImageNodeSettings({
     <div className="space-y-4 border-t px-3 pb-4 pt-4">
       <PromptComposer
         node={node}
-        transform={transform}
+        transformNodes={transformNodes}
         workspaceId={workspaceId}
         onUpdate={onUpdate}
       />

@@ -9,7 +9,7 @@ import {
   updateNodeModel,
 } from '../../lib/transform-operations'
 import { AddMediaButton } from './AddMediaButton'
-import type { AIImageNode, TransformConfig } from '@clementine/shared'
+import type { AIImageNode, TransformNode } from '@clementine/shared'
 import {
   Select,
   SelectContent,
@@ -21,10 +21,10 @@ import {
 export interface ControlRowProps {
   /** AI Image node being edited */
   node: AIImageNode
-  /** Current transform configuration */
-  transform: TransformConfig
-  /** Callback to update transform configuration */
-  onUpdate: (transform: TransformConfig) => void
+  /** Current transform nodes array */
+  transformNodes: TransformNode[]
+  /** Callback to update transform nodes */
+  onUpdate: (nodes: TransformNode[]) => void
   /** Callback when files are selected for upload */
   onFilesSelected: (files: File[]) => void
   /** Whether the add media button is disabled */
@@ -53,7 +53,7 @@ const ASPECT_RATIOS = [
  */
 export function ControlRow({
   node,
-  transform,
+  transformNodes,
   onUpdate,
   onFilesSelected,
   isAddDisabled,
@@ -62,21 +62,21 @@ export function ControlRow({
   const { config } = node
 
   const handleModelChange = (value: string) => {
-    const newTransform = updateNodeModel(
-      transform,
+    const newNodes = updateNodeModel(
+      transformNodes,
       node.id,
       value as (typeof AI_MODELS)[number]['value'],
     )
-    onUpdate(newTransform)
+    onUpdate(newNodes)
   }
 
   const handleAspectRatioChange = (value: string) => {
-    const newTransform = updateNodeAspectRatio(
-      transform,
+    const newNodes = updateNodeAspectRatio(
+      transformNodes,
       node.id,
       value as (typeof ASPECT_RATIOS)[number]['value'],
     )
-    onUpdate(newTransform)
+    onUpdate(newNodes)
   }
 
   return (

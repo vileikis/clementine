@@ -15,7 +15,7 @@ import { z } from 'zod'
 import { answerSchema, capturedMediaSchema } from '../session/session.schema'
 import { overlayReferenceSchema } from '../project/project-config.schema'
 import { mainExperienceReferenceSchema } from '../project/experiences.schema'
-import { transformConfigSchema } from '../experience/transform.schema'
+import { transformNodeSchema } from '../experience/transform.schema'
 import { jobStatusSchema } from './job-status.schema'
 
 // Re-export jobStatusSchema for convenience
@@ -80,12 +80,11 @@ export const sessionInputsSnapshotSchema = z.looseObject({
 })
 
 /**
- * Snapshot of transform configuration at job creation
+ * Snapshot of transform nodes at job creation
  *
- * Reuses transformConfigSchema from experience for consistency.
- * Schema is already a z.looseObject() so old jobs with extra fields still parse.
+ * Captures the transform nodes array from the experience config.
  */
-export const transformConfigSnapshotSchema = transformConfigSchema
+export const transformNodesSnapshotSchema = z.array(transformNodeSchema)
 
 /**
  * Snapshot of project context at job creation
@@ -117,7 +116,7 @@ export const versionSnapshotSchema = z.object({
  */
 export const jobSnapshotSchema = z.looseObject({
   sessionInputs: sessionInputsSnapshotSchema,
-  transformConfig: transformConfigSnapshotSchema,
+  transformNodes: transformNodesSnapshotSchema,
   projectContext: projectContextSnapshotSchema,
   versions: versionSnapshotSchema,
 })
@@ -162,8 +161,12 @@ export type JobError = z.infer<typeof jobErrorSchema>
 export type JobOutput = z.infer<typeof jobOutputSchema>
 export type JobSnapshot = z.infer<typeof jobSnapshotSchema>
 export type SessionInputsSnapshot = z.infer<typeof sessionInputsSnapshotSchema>
-export type TransformConfigSnapshot = z.infer<typeof transformConfigSnapshotSchema>
-export type ProjectContextSnapshot = z.infer<typeof projectContextSnapshotSchema>
+export type TransformNodesSnapshot = z.infer<
+  typeof transformNodesSnapshotSchema
+>
+export type ProjectContextSnapshot = z.infer<
+  typeof projectContextSnapshotSchema
+>
 /** @deprecated Use ProjectContextSnapshot instead */
 export type EventContextSnapshot = ProjectContextSnapshot
 export type VersionSnapshot = z.infer<typeof versionSnapshotSchema>

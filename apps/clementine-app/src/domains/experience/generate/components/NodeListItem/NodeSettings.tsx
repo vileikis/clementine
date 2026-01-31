@@ -8,21 +8,17 @@ import { AI_IMAGE_NODE_TYPE } from '@clementine/shared'
 
 import { AIImageNodeSettings } from './AIImageNode'
 import { UnknownNodeSettings } from './UnknownNode'
-import type {
-  AIImageNode,
-  TransformConfig,
-  TransformNode,
-} from '@clementine/shared'
+import type { AIImageNode, TransformNode } from '@clementine/shared'
 
 export interface NodeSettingsProps {
   /** Transform node data */
   node: TransformNode
-  /** Current transform configuration */
-  transform: TransformConfig
+  /** Current transform nodes array */
+  transformNodes: TransformNode[]
   /** Workspace ID for media uploads */
   workspaceId: string
-  /** Callback to update transform configuration */
-  onUpdate: (transform: TransformConfig) => void
+  /** Callback to update transform nodes */
+  onUpdate: (nodes: TransformNode[]) => void
 }
 
 /**
@@ -33,7 +29,7 @@ export interface NodeSettingsProps {
  */
 export function NodeSettings({
   node,
-  transform,
+  transformNodes,
   workspaceId,
   onUpdate,
 }: NodeSettingsProps) {
@@ -42,7 +38,7 @@ export function NodeSettings({
       return (
         <AIImageNodeSettings
           node={node as AIImageNode}
-          transform={transform}
+          transformNodes={transformNodes}
           workspaceId={workspaceId}
           onUpdate={onUpdate}
         />

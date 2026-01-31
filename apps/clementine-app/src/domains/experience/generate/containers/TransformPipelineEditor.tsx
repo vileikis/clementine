@@ -21,10 +21,10 @@ import {
 import { Plus } from 'lucide-react'
 
 import { DeleteNodeDialog, EmptyState, NodeListItem } from '../components'
-import { useUpdateTransformConfig } from '../hooks'
+import { useUpdateTransformNodes } from '../hooks'
 import { addNode, duplicateNode, removeNode, reorderNodes } from '../lib'
 import type { DragEndEvent } from '@dnd-kit/core'
-import type { Experience } from '../../shared/schemas'
+import type { Experience, TransformNode } from '../../shared/schemas'
 import { Button } from '@/ui-kit/ui/button'
 import { ScrollArea } from '@/ui-kit/ui/scroll-area'
 
@@ -52,15 +52,17 @@ export function TransformPipelineEditor({
   experience,
   workspaceId,
 }: TransformPipelineEditorProps) {
-  const updateTransform = useUpdateTransformConfig(workspaceId, experience.id)
+  const updateTransformNodes = useUpdateTransformNodes(
+    workspaceId,
+    experience.id,
+  )
 
   // Delete dialog state
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [nodeToDelete, setNodeToDelete] = useState<string | null>(null)
 
-  const transform = experience.draft.transform
-  const nodes = transform?.nodes ?? []
-  const hasNodes = nodes.length > 0
+  const transformNodes = experience.draft.transformNodes
+  const hasNodes = transformNodes.length > 0
 
   // Configure sensors for drag and drop
   const sensors = useSensors(
@@ -75,11 +77,13 @@ export function TransformPipelineEditor({
   )
 
   const handleAddNode = () => {
-    updateTransform.mutate({ transform: addNode(transform) })
+    updateTransformNodes.mutate({ transformNodes: addNode(transformNodes) })
   }
 
   const handleDuplicateNode = (nodeId: string) => {
-    updateTransform.mutate({ transform: duplicateNode(transform, nodeId) })
+    updateTransformNodes.mutate({
+      transformNodes: duplicateNode(transformNodes, nodeId),
+    })
   }
 
   const handleDeleteClick = (nodeId: string) => {
@@ -90,7 +94,9 @@ export function TransformPipelineEditor({
   const handleDeleteConfirm = () => {
     if (!nodeToDelete) return
 
-    updateTransform.mutate({ transform: removeNode(transform, nodeToDelete) })
+    updateTransformNodes.mutate({
+      transformNodes: removeNode(transformNodes, nodeToDelete),
+    })
     setDeleteDialogOpen(false)
     setNodeToDelete(null)
   }
@@ -100,14 +106,20 @@ export function TransformPipelineEditor({
     const { active, over } = event
 
     if (over && active.id !== over.id) {
-      const oldIndex = nodes.findIndex((node) => node.id === active.id)
-      const newIndex = nodes.findIndex((node) => node.id === over.id)
+      const oldIndex = transformNodes.findIndex(
+        (node: TransformNode) => node.id === active.id,
+      )
+      const newIndex = transformNodes.findIndex(
+        (node: TransformNode) => node.id === over.id,
+      )
 
       if (oldIndex !== -1 && newIndex !== -1) {
-        const newNodes = [...nodes]
+        const newNodes = [...transformNodes]
         const [movedNode] = newNodes.splice(oldIndex, 1)
         newNodes.splice(newIndex, 0, movedNode)
-        updateTransform.mutate({ transform: reorderNodes(transform, newNodes) })
+        updateTransformNodes.mutate({
+          transformNodes: reorderNodes(transformNodes, newNodes),
+        })
       }
     }
   }
@@ -126,7 +138,7 @@ export function TransformPipelineEditor({
           {hasNodes && (
             <Button
               onClick={handleAddNode}
-              disabled={updateTransform.isPending}
+              disabled={updateTransformNodes.isPending}
               className="min-h-[44px]"
             >
               <Plus className="mr-2 h-4 w-4" />
@@ -146,18 +158,18 @@ export function TransformPipelineEditor({
               onDragEnd={handleDragEnd}
             >
               <SortableContext
-                items={nodes.map((node) => node.id)}
+                items={transformNodes.map((node: TransformNode) => node.id)}
                 strategy={verticalListSortingStrategy}
               >
-                {nodes.map((node, index) => (
+                {transformNodes.map((node: TransformNode, index: number) => (
                   <NodeListItem
                     key={node.id}
                     node={node}
                     index={index + 1}
-                    transformConfig={transform!}
+                    transformNodes={transformNodes}
                     workspaceId={workspaceId}
-                    onUpdate={(newTransform) =>
-                      updateTransform.mutate({ transform: newTransform })
+                    onUpdate={(newNodes) =>
+                      updateTransformNodes.mutate({ transformNodes: newNodes })
                     }
                     onDuplicate={() => handleDuplicateNode(node.id)}
                     onDelete={() => handleDeleteClick(node.id)}
@@ -168,7 +180,7 @@ export function TransformPipelineEditor({
           ) : (
             <EmptyState
               onAddNode={handleAddNode}
-              isPending={updateTransform.isPending}
+              isPending={updateTransformNodes.isPending}
             />
           )}
 
@@ -178,7 +190,7 @@ export function TransformPipelineEditor({
               <Button
                 variant="outline"
                 onClick={handleAddNode}
-                disabled={updateTransform.isPending}
+                disabled={updateTransformNodes.isPending}
                 className="min-h-[44px]"
               >
                 <Plus className="mr-2 h-4 w-4" />
@@ -194,7 +206,7 @@ export function TransformPipelineEditor({
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
         onConfirm={handleDeleteConfirm}
-        isPending={updateTransform.isPending}
+        isPending={updateTransformNodes.isPending}
       />
     </div>
   )

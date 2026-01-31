@@ -45,7 +45,6 @@ export { processMediaJob } from './tasks/processMediaJob'
 /**
  * Transform Pipeline (Phase 2)
  */
-// export { startTransformPipeline } from "./callable/startTransformPipeline";
 export { startTransformPipelineV2 } from './callable/startTransformPipeline'
 export { transformPipelineJob } from './tasks/transformPipelineJob'
 

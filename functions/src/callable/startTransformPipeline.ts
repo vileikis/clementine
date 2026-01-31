@@ -77,7 +77,7 @@ export const startTransformPipelineV2 = onCall(
     const config =
       configSource === 'draft' ? experience.draft : experience.published
 
-    const transformNodes = config?.transform?.nodes ?? []
+    const transformNodes = config?.transformNodes ?? []
     if (transformNodes.length === 0) {
       throw new HttpsError(
         'not-found',

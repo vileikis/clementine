@@ -22,11 +22,7 @@ function createMockSnapshot(overrides: Partial<JobSnapshot> = {}): JobSnapshot {
       answers: [],
       capturedMedia: [],
     },
-    transformConfig: {
-      nodes: [],
-      variableMappings: [],
-      outputFormat: null,
-    },
+    transformNodes: [],
     projectContext: {
       overlay: null,
       applyOverlay: false,
