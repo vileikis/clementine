@@ -154,6 +154,11 @@ export function TransformPipelineEditor({
                     key={node.id}
                     node={node}
                     index={index + 1}
+                    transformConfig={transform!}
+                    workspaceId={workspaceId}
+                    onUpdate={(newTransform) =>
+                      updateTransform.mutate({ transform: newTransform })
+                    }
                     onDuplicate={() => handleDuplicateNode(node.id)}
                     onDelete={() => handleDeleteClick(node.id)}
                   />

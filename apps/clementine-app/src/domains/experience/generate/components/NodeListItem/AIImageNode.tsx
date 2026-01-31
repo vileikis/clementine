@@ -4,11 +4,22 @@
  * Header and Settings components for AI Image nodes.
  * Kept together for maintainability.
  */
-import type { AIImageNode } from '@clementine/shared'
+import { PromptComposer } from '../PromptComposer'
+
+import type { AIImageNode, TransformConfig } from '@clementine/shared'
 
 export interface AIImageNodeProps {
   /** AI Image node data */
   node: AIImageNode
+}
+
+export interface AIImageNodeSettingsProps extends AIImageNodeProps {
+  /** Current transform configuration */
+  transform: TransformConfig
+  /** Workspace ID for media uploads */
+  workspaceId: string
+  /** Callback to update transform configuration */
+  onUpdate: (transform: TransformConfig) => void
 }
 
 /**
@@ -34,54 +45,23 @@ export function AIImageNodeHeader({ node }: AIImageNodeProps) {
 /**
  * AI Image Node Settings
  *
- * Renders the expanded settings panels:
- * - Model Settings
- * - Prompt
- * - Reference Media
- * - Test Run
+ * Renders the expanded settings:
+ * - PromptComposer (prompt input, model/aspect ratio selectors, reference media)
  */
-export function AIImageNodeSettings({ node }: AIImageNodeProps) {
-  const { config } = node
-
-  // Truncate prompt for display
-  const promptPreview = config.prompt
-    ? config.prompt.length > 60
-      ? `${config.prompt.slice(0, 60)}...`
-      : config.prompt
-    : '(No prompt configured)'
-
+export function AIImageNodeSettings({
+  node,
+  transform,
+  workspaceId,
+  onUpdate,
+}: AIImageNodeSettingsProps) {
   return (
     <div className="space-y-4 border-t px-3 pb-4 pt-4">
-      {/* Model Settings placeholder */}
-      <div className="rounded-lg border p-4">
-        <h4 className="mb-2 font-medium">Model Settings</h4>
-        <p className="text-sm text-muted-foreground">
-          Phase 1e: Model and aspect ratio controls
-        </p>
-      </div>
-
-      {/* Prompt placeholder */}
-      <div className="rounded-lg border p-4">
-        <h4 className="mb-2 font-medium">Prompt</h4>
-        <p className="text-sm text-muted-foreground">{promptPreview}</p>
-      </div>
-
-      {/* Reference Media placeholder */}
-      <div className="rounded-lg border p-4">
-        <h4 className="mb-2 font-medium">Reference Media</h4>
-        <p className="text-sm text-muted-foreground">
-          Phase 1c: Upload and manage reference media
-          {config.refMedia.length > 0 && ` (${config.refMedia.length} items)`}
-        </p>
-      </div>
-
-      {/* Test Run placeholder */}
-      <div className="rounded-lg border p-4">
-        <h4 className="mb-2 font-medium">Test Run</h4>
-        <p className="text-sm text-muted-foreground">
-          Phase 1g: Test prompt resolution and generate preview
-        </p>
-      </div>
+      <PromptComposer
+        node={node}
+        transform={transform}
+        workspaceId={workspaceId}
+        onUpdate={onUpdate}
+      />
     </div>
   )
 }
