@@ -5,16 +5,8 @@
  * Shows both uploaded items and items currently uploading.
  */
 import { ReferenceMediaItem, UploadingMediaItem } from './ReferenceMediaItem'
+import type { UploadingFile } from '../../hooks'
 import type { MediaReference } from '@clementine/shared'
-
-export interface UploadingFile {
-  /** Temporary ID for tracking */
-  tempId: string
-  /** File being uploaded */
-  file: File
-  /** Upload progress (0-100) */
-  progress: number
-}
 
 export interface ReferenceMediaStripProps {
   /** Uploaded media references */

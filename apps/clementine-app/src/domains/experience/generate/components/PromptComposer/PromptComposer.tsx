@@ -6,21 +6,17 @@
  * Supports file upload via button and drag-and-drop.
  */
 import { useCallback, useEffect, useState } from 'react'
-import { nanoid } from 'nanoid'
 
+import { useRefMediaUpload } from '../../hooks'
 import {
-  MAX_REF_MEDIA_COUNT,
-  addNodeRefMedia,
   removeNodeRefMedia,
   updateNodePrompt,
 } from '../../lib/transform-operations'
 import { ControlRow } from './ControlRow'
 import { PromptInput } from './PromptInput'
 import { ReferenceMediaStrip } from './ReferenceMediaStrip'
-import type { UploadingFile } from './ReferenceMediaStrip'
 import type { AIImageNode, TransformConfig } from '@clementine/shared'
 import { useAuth } from '@/domains/auth'
-import { useUploadMediaAsset } from '@/domains/media-library'
 import { cn } from '@/shared/utils'
 import { useDebounce } from '@/shared/utils/useDebounce'
 
@@ -56,14 +52,18 @@ export function PromptComposer({
   // Local state for prompt to enable debouncing
   const [localPrompt, setLocalPrompt] = useState(config.prompt)
 
-  // Uploading files state for progress tracking
-  const [uploadingFiles, setUploadingFiles] = useState<UploadingFile[]>([])
-
   // Drag-over state for drop zone highlight
   const [isDragOver, setIsDragOver] = useState(false)
 
-  // Upload hook
-  const uploadAsset = useUploadMediaAsset(workspaceId, user?.uid)
+  // Reference media upload hook
+  const { uploadingFiles, uploadFiles, canAddMore } = useRefMediaUpload({
+    workspaceId,
+    userId: user?.uid,
+    nodeId: node.id,
+    transform,
+    currentRefMediaCount: config.refMedia.length,
+    onUpdate,
+  })
 
   // Debounce the local prompt value
   const debouncedPrompt = useDebounce(localPrompt, PROMPT_DEBOUNCE_DELAY)
@@ -84,66 +84,12 @@ export function PromptComposer({
     }
   }, [config.prompt])
 
-  // Handle file upload (used by both AddMediaButton and drag-drop)
+  // Handle file selection (from button or drop)
   const handleFilesSelected = useCallback(
-    async (files: File[]) => {
-      if (!user?.uid) return
-
-      // Check how many more can be added
-      const currentCount = config.refMedia.length
-      const availableSlots = MAX_REF_MEDIA_COUNT - currentCount
-      if (availableSlots <= 0) return
-
-      // Limit files to available slots
-      const filesToUpload = files.slice(0, availableSlots)
-
-      // Add files to uploading state
-      const uploadingEntries: UploadingFile[] = filesToUpload.map((file) => ({
-        tempId: nanoid(),
-        file,
-        progress: 0,
-      }))
-      setUploadingFiles((prev) => [...prev, ...uploadingEntries])
-
-      // Upload files sequentially to show progress per file
-      for (const entry of uploadingEntries) {
-        try {
-          const mediaRef = await uploadAsset.mutateAsync({
-            file: entry.file,
-            type: 'other',
-            onProgress: (progress) => {
-              setUploadingFiles((prev) =>
-                prev.map((item) =>
-                  item.tempId === entry.tempId ? { ...item, progress } : item,
-                ),
-              )
-            },
-          })
-
-          // Remove from uploading state
-          setUploadingFiles((prev) =>
-            prev.filter((item) => item.tempId !== entry.tempId),
-          )
-
-          // Add to transform config
-          const newTransform = addNodeRefMedia(transform, node.id, [mediaRef])
-          onUpdate(newTransform)
-        } catch {
-          // Remove failed upload from uploading state
-          setUploadingFiles((prev) =>
-            prev.filter((item) => item.tempId !== entry.tempId),
-          )
-        }
-      }
+    (files: File[]) => {
+      uploadFiles(files)
     },
-    [
-      config.refMedia.length,
-      node.id,
-      onUpdate,
-      transform,
-      uploadAsset,
-      user?.uid,
-    ],
+    [uploadFiles],
   )
 
   // Handle remove reference media
@@ -161,11 +107,11 @@ export function PromptComposer({
       e.preventDefault()
       e.stopPropagation()
       // Only highlight if we can accept more files
-      if (!disabled && config.refMedia.length < MAX_REF_MEDIA_COUNT) {
+      if (!disabled && canAddMore) {
         setIsDragOver(true)
       }
     },
-    [disabled, config.refMedia.length],
+    [disabled, canAddMore],
   )
 
   const handleDragLeave = useCallback((e: React.DragEvent) => {
@@ -181,7 +127,7 @@ export function PromptComposer({
       setIsDragOver(false)
 
       // Check if we can accept more files
-      if (disabled || config.refMedia.length >= MAX_REF_MEDIA_COUNT) {
+      if (disabled || !canAddMore) {
         return
       }
 
@@ -194,12 +140,11 @@ export function PromptComposer({
         handleFilesSelected(droppedFiles)
       }
     },
-    [disabled, config.refMedia.length, handleFilesSelected],
+    [disabled, canAddMore, handleFilesSelected],
   )
 
   // Check if add button should be disabled
-  const isAddDisabled =
-    disabled || config.refMedia.length >= MAX_REF_MEDIA_COUNT
+  const isAddDisabled = disabled || !canAddMore
 
   return (
     <div

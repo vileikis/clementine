@@ -8,6 +8,7 @@ import { Loader2, X } from 'lucide-react'
 
 import type { MediaReference } from '@clementine/shared'
 import { Button } from '@/ui-kit/ui/button'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui-kit/ui/tooltip'
 
 export interface ReferenceMediaItemProps {
   /** Media reference to display */
@@ -40,24 +41,29 @@ export function ReferenceMediaItem({
   }
 
   return (
-    <div className="group relative size-16 shrink-0  bg-muted">
-      <img
-        src={media.url}
-        alt={media.displayName}
-        className="size-full object-cover overflow-hidden rounded-md"
-      />
-      {!disabled && (
-        <Button
-          variant="destructive"
-          size="icon"
-          className="absolute -right-1 -top-1 size-5 opacity-0 transition-opacity group-hover:opacity-100"
-          onClick={handleRemove}
-          aria-label={`Remove ${media.displayName}`}
-        >
-          <X className="size-3" />
-        </Button>
-      )}
-    </div>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <div className="group relative size-16 shrink-0 bg-muted">
+          <img
+            src={media.url}
+            alt={media.displayName}
+            className="size-full overflow-hidden rounded-md object-cover"
+          />
+          {!disabled && (
+            <Button
+              variant="destructive"
+              size="icon"
+              className="absolute -right-1 -top-1 size-5 opacity-0 transition-opacity group-hover:opacity-100"
+              onClick={handleRemove}
+              aria-label={`Remove ${media.displayName}`}
+            >
+              <X className="size-3" />
+            </Button>
+          )}
+        </div>
+      </TooltipTrigger>
+      <TooltipContent side="top">{media.displayName}</TooltipContent>
+    </Tooltip>
   )
 }
 
@@ -69,15 +75,20 @@ export function UploadingMediaItem({
   fileName,
 }: UploadingMediaItemProps) {
   return (
-    <div className="relative flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-md bg-muted">
-      <Loader2 className="size-6 animate-spin text-muted-foreground" />
-      <div
-        className="absolute inset-x-0 bottom-0 h-1 bg-primary transition-all"
-        style={{ width: `${progress}%` }}
-      />
-      <span className="sr-only">
-        Uploading {fileName}: {progress}%
-      </span>
-    </div>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <div className="relative flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-md bg-muted">
+          <Loader2 className="size-6 animate-spin text-muted-foreground" />
+          <div
+            className="absolute inset-x-0 bottom-0 h-1 bg-primary transition-all"
+            style={{ width: `${progress}%` }}
+          />
+          <span className="sr-only">
+            Uploading {fileName}: {progress}%
+          </span>
+        </div>
+      </TooltipTrigger>
+      <TooltipContent side="top">Uploading: {fileName}</TooltipContent>
+    </Tooltip>
   )
 }
