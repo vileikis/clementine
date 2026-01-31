@@ -71,7 +71,7 @@ export const answerSchema = z.object({
    * - Multi-select: MultiSelectOption[] (full option objects with promptFragment/promptMedia)
    * - Other steps: any step-specific structured data
    */
-  context: z.unknown().optional(),
+  context: z.unknown().nullable().default(null),
   /** Timestamp when answered (Unix ms) */
   answeredAt: z.number(),
 })

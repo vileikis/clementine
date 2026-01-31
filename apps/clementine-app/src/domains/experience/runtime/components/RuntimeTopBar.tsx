@@ -128,7 +128,7 @@ export function RuntimeTopBar({
         )}
       >
         {/* Top row: Home button and experience name */}
-        <div className="flex items-center justify-between mb-3">
+        <div className="relative flex items-center justify-between mb-3">
           {/* Home button */}
           <ThemedIconButton
             size="md"

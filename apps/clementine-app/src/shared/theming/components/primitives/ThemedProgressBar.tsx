@@ -95,11 +95,14 @@ export function ThemedProgressBar({
   const theme = useThemeWithOverride(themeOverride)
   const borderRadius = BUTTON_RADIUS_MAP[theme.button.radius]
 
-  // Clamp value to 0-100 range for percentage display
+  // Clamp value to 0-max range
   const clampedValue =
     value !== null && value !== undefined
-      ? Math.max(0, Math.min(100, value))
+      ? Math.max(0, Math.min(max, value))
       : null
+
+  // Calculate percentage for visual display
+  const percentage = clampedValue !== null ? (clampedValue / max) * 100 : 0
 
   return (
     <ProgressPrimitive.Root
@@ -120,7 +123,7 @@ export function ThemedProgressBar({
         style={{
           backgroundColor: theme.primaryColor,
           borderRadius,
-          transform: `translateX(-${100 - (clampedValue || 0)}%)`,
+          transform: `translateX(-${100 - percentage}%)`,
         }}
       />
     </ProgressPrimitive.Root>
