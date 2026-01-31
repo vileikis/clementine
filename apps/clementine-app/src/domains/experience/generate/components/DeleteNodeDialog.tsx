@@ -2,18 +2,17 @@
  * DeleteNodeDialog Component
  *
  * Confirmation dialog for deleting transform nodes.
- * Uses AlertDialog with 44px buttons and isPending state.
+ * Matches the style of DeleteProjectDialog for consistency.
  */
+import { Button } from '@/ui-kit/ui/button'
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/ui-kit/ui/alert-dialog'
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/ui-kit/ui/dialog'
 
 export interface DeleteNodeDialogProps {
   /** Whether dialog is open */
@@ -21,7 +20,7 @@ export interface DeleteNodeDialogProps {
   /** Open state change handler */
   onOpenChange: (open: boolean) => void
   /** Confirm delete handler */
-  onConfirm: () => void | Promise<void>
+  onConfirm: () => void
   /** Whether deletion is pending */
   isPending?: boolean
 }
@@ -31,9 +30,8 @@ export interface DeleteNodeDialogProps {
  *
  * Features:
  * - Clear confirmation message
- * - 44px minimum button height for touch targets
  * - Disabled buttons during deletion
- * - Stays open on error for retry
+ * - Destructive variant for delete button
  * - Cancel and confirm actions
  */
 export function DeleteNodeDialog({
@@ -42,34 +40,33 @@ export function DeleteNodeDialog({
   onConfirm,
   isPending = false,
 }: DeleteNodeDialogProps) {
-  const handleConfirm = async () => {
-    await onConfirm()
-    if (!isPending) {
-      onOpenChange(false)
-    }
-  }
-
   return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Delete Node?</AlertDialogTitle>
-          <AlertDialogDescription>
-            This will remove the transform node from the pipeline. This action
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Delete Node</DialogTitle>
+          <DialogDescription>
+            Are you sure you want to delete this transform node? This action
             cannot be undone.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
-          <AlertDialogAction
-            onClick={handleConfirm}
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
             disabled={isPending}
-            className="min-h-[44px]"
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={onConfirm}
+            disabled={isPending}
           >
             {isPending ? 'Deleting...' : 'Delete'}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
