@@ -21,14 +21,38 @@ const GOOGLE_CLOUD_PROJECT =
 const IMAGE_MODEL = 'gemini-2.5-flash-image'
 
 // Reference image paths in Firebase Storage
-const USER_PHOTO_PATH = 'test/black-woman.jpeg'
-const CAT_PHOTO_PATH = 'test/bonya.jpg'
-
-// Hardcoded test prompt
-const TEST_PROMPT = `Transform the person from the first image into a Hobbit from Middle Earth,
-with a cat (shown in the second image) sitting next to them.
-Create a fantasy scene with Middle Earth atmosphere, warm lighting,
-and detailed Hobbit characteristics (pointed ears, bare feet, simple clothing).`
+const REFERENCE_IMAGES = [
+  {
+    id: 'userPhoto_abc123',
+    path: 'test/black-woman.jpeg',
+    mimeType: 'image/jpeg',
+  },
+  {
+    id: 'catPhoto_abc123',
+    path: 'test/bonya.jpg',
+    mimeType: 'image/jpeg',
+  },
+  {
+    id: 'artStylePhoto_abc123',
+    path: 'test/art_style_1.jpg',
+    mimeType: 'image/jpeg',
+  },
+  {
+    id: 'artStylePhoto_xyz789',
+    path: 'test/art_style_2.jpeg',
+    mimeType: 'image/jpeg',
+  },
+  {
+    id: 'bgPhoto_hobbiton',
+    path: 'test/bg_hobbiton.jpg',
+    mimeType: 'image/jpeg',
+  },
+  {
+    id: 'weaponPhoto_dagger',
+    path: 'test/weapon_dagger.webp',
+    mimeType: 'image/webp',
+  },
+]
 
 const SAFETY_SETTINGS: SafetySetting[] = [
   {
@@ -48,6 +72,42 @@ const SAFETY_SETTINGS: SafetySetting[] = [
     threshold: HarmBlockThreshold.OFF,
   },
 ]
+
+/**
+ * Build parts array for Gemini API with image references and prompt
+ *
+ * @param bucketName - Firebase Storage bucket name
+ * @returns Parts array for generateContent
+ */
+function buildImageGenerationParts(bucketName: string): any[] {
+  const parts: any[] = []
+
+  // Add each reference image with its ID label
+  for (const refImage of REFERENCE_IMAGES) {
+    // Add text label for the image reference
+    parts.push({
+      text: `Image Reference ID: <${refImage.id}>`,
+    })
+
+    // Add the image data
+    parts.push({
+      fileData: {
+        mimeType: refImage.mimeType,
+        fileUri: `gs://${bucketName}/${refImage.path}`,
+      },
+    })
+  }
+
+  // Build the prompt with image ID references
+  const prompt = `Transform the person from <userPhoto_abc123> into hobbit from Middle Earth. With a cat sitting next to them (see <catPhoto_abc123>). Person should be holding a dagger (see <weaponPhoto_dagger>). Make photo in the art style of the <artStylePhoto_xyz789>.`
+
+  // Add the final prompt
+  parts.push({
+    text: prompt,
+  })
+
+  return parts
+}
 
 /**
  * Extract single image buffer from Gemini API response
@@ -95,6 +155,8 @@ export const testImageGenerationWithReference = onRequest(
     timeoutSeconds: 300, // Image generation can take longer
   },
   async (req, res) => {
+    const startTime = Date.now()
+
     try {
       // Only allow POST requests
       if (req.method !== 'POST') {
@@ -113,8 +175,6 @@ export const testImageGenerationWithReference = onRequest(
         project: GOOGLE_CLOUD_PROJECT,
         location: VERTEX_AI_LOCATION.value(),
         model: IMAGE_MODEL,
-        userPhoto: USER_PHOTO_PATH,
-        catPhoto: CAT_PHOTO_PATH,
         bucket: bucketName,
       })
 
@@ -125,25 +185,10 @@ export const testImageGenerationWithReference = onRequest(
         location: VERTEX_AI_LOCATION.value(),
       })
 
-      // Reference images using gs:// URIs (Cloud Storage format)
-      const userImage = {
-        fileData: {
-          mimeType: 'image/jpeg',
-          fileUri: `gs://${bucketName}/${USER_PHOTO_PATH}`,
-        },
-      }
-
-      const catImage = {
-        fileData: {
-          mimeType: 'image/jpeg',
-          fileUri: `gs://${bucketName}/${CAT_PHOTO_PATH}`,
-        },
-      }
-
-      // Create prompt
-      const promptText = {
-        text: TEST_PROMPT,
-      }
+      // Build parts array with image references and prompt
+      // Gemini API expects this pattern:
+      // { text: 'Image Reference ID: <id>' }, { fileData: {...} }, ...
+      const parts = buildImageGenerationParts(bucketName)
 
       // Generation config
       const generationConfig = {
@@ -167,7 +212,7 @@ export const testImageGenerationWithReference = onRequest(
         contents: [
           {
             role: 'user',
-            parts: [userImage, catImage, promptText],
+            parts,
           },
         ],
         config: generationConfig,
@@ -186,28 +231,25 @@ export const testImageGenerationWithReference = onRequest(
         fileName,
         'image/png',
         {
-          prompt: TEST_PROMPT,
-          userPhotoPath: USER_PHOTO_PATH,
-          catPhotoPath: CAT_PHOTO_PATH,
           generatedAt: new Date().toISOString(),
           model: IMAGE_MODEL,
         },
       )
 
+      const completionTime = Date.now() - startTime
+
       console.log('Image generated and saved successfully', {
         fileName,
         imageUrl,
+        completionTime: `${completionTime}ms`,
       })
 
       res.status(200).json({
         success: true,
-        prompt: TEST_PROMPT,
         imageUrl,
         storagePath: fileName,
-        referenceImages: {
-          userPhoto: USER_PHOTO_PATH,
-          catPhoto: CAT_PHOTO_PATH,
-        },
+        referenceImages: REFERENCE_IMAGES,
+        completionTime,
         metadata: {
           project: GOOGLE_CLOUD_PROJECT,
           location: VERTEX_AI_LOCATION.value(),
