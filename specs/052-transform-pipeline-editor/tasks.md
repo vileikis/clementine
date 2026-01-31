@@ -19,35 +19,35 @@ All paths are relative to repository root: `apps/clementine-app/src/domains/expe
 
 ---
 
-## Phase 1: Setup (Shared Infrastructure)
+## Phase 1: Setup (Shared Infrastructure) ✅ COMPLETE
 
 **Purpose**: Create domain structure and foundational files
 
-- [ ] T001 Create domain directory structure at apps/clementine-app/src/domains/experience/generate/ with subdirectories: components/, containers/, hooks/, stores/
-- [ ] T002 [P] Create barrel export files: apps/clementine-app/src/domains/experience/generate/components/index.ts
-- [ ] T003 [P] Create barrel export files: apps/clementine-app/src/domains/experience/generate/containers/index.ts
-- [ ] T004 [P] Create barrel export files: apps/clementine-app/src/domains/experience/generate/hooks/index.ts
-- [ ] T005 [P] Create barrel export files: apps/clementine-app/src/domains/experience/generate/stores/index.ts
-- [ ] T006 Create domain public API: apps/clementine-app/src/domains/experience/generate/index.ts
+- [X] T001 Create domain directory structure at apps/clementine-app/src/domains/experience/generate/ with subdirectories: components/, containers/, hooks/, stores/
+- [X] T002 [P] Create barrel export files: apps/clementine-app/src/domains/experience/generate/components/index.ts
+- [X] T003 [P] Create barrel export files: apps/clementine-app/src/domains/experience/generate/containers/index.ts
+- [X] T004 [P] Create barrel export files: apps/clementine-app/src/domains/experience/generate/hooks/index.ts
+- [X] T005 [P] Create barrel export files: apps/clementine-app/src/domains/experience/generate/stores/index.ts
+- [X] T006 Create domain public API: apps/clementine-app/src/domains/experience/generate/index.ts
 
 ---
 
-## Phase 2: Foundational (Blocking Prerequisites)
+## Phase 2: Foundational (Blocking Prerequisites) ✅ COMPLETE
 
 **Purpose**: Core state management and Firebase integration that MUST be complete before ANY user story
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T007 Implement Zustand editor store in apps/clementine-app/src/domains/experience/generate/stores/useGenerateEditorStore.ts with selectedNodeId state and save tracking (using createEditorStore mixin)
-- [ ] T008 Implement Firestore update hook in apps/clementine-app/src/domains/experience/generate/hooks/useUpdateTransformConfig.ts with transaction, draftVersion increment, and cache invalidation
-- [ ] T009 Export store from apps/clementine-app/src/domains/experience/generate/stores/index.ts
-- [ ] T010 Export useUpdateTransformConfig from apps/clementine-app/src/domains/experience/generate/hooks/index.ts
+- [X] T007 Implement Zustand editor store in apps/clementine-app/src/domains/experience/generate/stores/useGenerateEditorStore.ts with selectedNodeId state and save tracking (using createEditorStore mixin)
+- [X] T008 Implement Firestore update hook in apps/clementine-app/src/domains/experience/generate/hooks/useUpdateTransformConfig.ts with transaction, draftVersion increment, and cache invalidation
+- [X] T009 Export store from apps/clementine-app/src/domains/experience/generate/stores/index.ts
+- [X] T010 Export useUpdateTransformConfig from apps/clementine-app/src/domains/experience/generate/hooks/index.ts
 
-**Checkpoint**: Foundation ready - user story implementation can now begin in parallel
+**Checkpoint**: Foundation ready - user story implementation can now begin in parallel ✅
 
 ---
 
-## Phase 3: User Story 1 - Manage AI Image Nodes (Priority: P1) 🎯 MVP
+## Phase 3: User Story 1 - Manage AI Image Nodes (Priority: P1) 🎯 MVP ✅ COMPLETE
 
 **Goal**: Enable adding, viewing, and deleting AI Image nodes in the transform pipeline
 
@@ -56,25 +56,25 @@ All paths are relative to repository root: `apps/clementine-app/src/domains/expe
 ### Implementation for User Story 1
 
 **Hooks**:
-- [ ] T011 [P] [US1] Implement useAddNode hook in apps/clementine-app/src/domains/experience/generate/hooks/useAddNode.ts (creates node with nanoid, default config, updates local state, calls useUpdateTransformConfig)
-- [ ] T012 [P] [US1] Implement useDeleteNode hook in apps/clementine-app/src/domains/experience/generate/hooks/useDeleteNode.ts (filters node from array, updates local state, calls useUpdateTransformConfig)
+- [X] T011 [P] [US1] Implement useAddNode hook in apps/clementine-app/src/domains/experience/generate/hooks/useAddNode.ts (creates node with nanoid, default config, updates local state, calls useUpdateTransformConfig)
+- [X] T012 [P] [US1] Implement useDeleteNode hook in apps/clementine-app/src/domains/experience/generate/hooks/useDeleteNode.ts (filters node from array, updates local state, calls useUpdateTransformConfig)
 
 **Components**:
-- [ ] T013 [P] [US1] Create AddNodeButton component in apps/clementine-app/src/domains/experience/generate/components/AddNodeButton.tsx with 44px min-height, Plus icon, loading state
-- [ ] T014 [P] [US1] Create AIImageNodeCard component in apps/clementine-app/src/domains/experience/generate/components/AIImageNodeCard.tsx showing Badge, model, aspect ratio, prompt preview (50 chars), hover delete button
-- [ ] T015 [P] [US1] Create DeleteNodeDialog component in apps/clementine-app/src/domains/experience/generate/components/DeleteNodeDialog.tsx using AlertDialog with confirmation text, 44px buttons, isPending state
-- [ ] T016 [P] [US1] Create EmptyState component in apps/clementine-app/src/domains/experience/generate/components/EmptyState.tsx with centered layout, message, AddNodeButton
+- [X] T013 [P] [US1] Create AddNodeButton component in apps/clementine-app/src/domains/experience/generate/components/AddNodeButton.tsx with 44px min-height, Plus icon, loading state
+- [X] T014 [P] [US1] Create AIImageNodeCard component in apps/clementine-app/src/domains/experience/generate/components/AIImageNodeCard.tsx showing Badge, model, aspect ratio, prompt preview (50 chars), hover delete button
+- [X] T015 [P] [US1] Create DeleteNodeDialog component in apps/clementine-app/src/domains/experience/generate/components/DeleteNodeDialog.tsx using AlertDialog with confirmation text, 44px buttons, isPending state
+- [X] T016 [P] [US1] Create EmptyState component in apps/clementine-app/src/domains/experience/generate/components/EmptyState.tsx with centered layout, message, AddNodeButton
 
 **Barrel Exports**:
-- [ ] T017 [US1] Export useAddNode and useDeleteNode from apps/clementine-app/src/domains/experience/generate/hooks/index.ts
-- [ ] T018 [US1] Export AddNodeButton, AIImageNodeCard, DeleteNodeDialog, EmptyState from apps/clementine-app/src/domains/experience/generate/components/index.ts
+- [X] T017 [US1] Export useAddNode and useDeleteNode from apps/clementine-app/src/domains/experience/generate/hooks/index.ts
+- [X] T018 [US1] Export AddNodeButton, AIImageNodeCard, DeleteNodeDialog, EmptyState from apps/clementine-app/src/domains/experience/generate/components/index.ts
 
 **Container Integration**:
-- [ ] T019 [US1] Create TransformPipelineEditor container in apps/clementine-app/src/domains/experience/generate/containers/TransformPipelineEditor.tsx integrating add/delete logic, node list display, empty state, delete dialog state management
-- [ ] T020 [US1] Export TransformPipelineEditor from apps/clementine-app/src/domains/experience/generate/containers/index.ts
-- [ ] T021 [US1] Export TransformPipelineEditor and types from domain public API: apps/clementine-app/src/domains/experience/generate/index.ts
+- [X] T019 [US1] Create TransformPipelineEditor container in apps/clementine-app/src/domains/experience/generate/containers/TransformPipelineEditor.tsx integrating add/delete logic, node list display, empty state, delete dialog state management
+- [X] T020 [US1] Export TransformPipelineEditor from apps/clementine-app/src/domains/experience/generate/containers/index.ts
+- [X] T021 [US1] Export TransformPipelineEditor and types from domain public API: apps/clementine-app/src/domains/experience/generate/index.ts
 
-**Checkpoint**: User Story 1 complete - can add, view, delete nodes independently. Empty state works. All operations persist to Firestore.
+**Checkpoint**: User Story 1 complete - can add, view, delete nodes independently. Empty state works. All operations persist to Firestore. ✅
 
 ---
 
