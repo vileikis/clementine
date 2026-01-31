@@ -311,7 +311,7 @@ function createSampleAnswers(): Answer[] {
     {
       stepId: 'input-step-1',
       stepType: 'input.scale',
-      value: 5,
+      value: '5',
       answeredAt: now,
     },
   ]
