@@ -1,0 +1,129 @@
+# Contract: Start Transform Pipeline (Callable Function)
+# Backend: functions/src/callable/startTransformPipeline.ts
+# Frontend: httpsCallable(functions, 'startTransformPipeline')
+
+# Note: This is a Firebase Callable Function (onCall), not an HTTP endpoint (onRequest)
+# Callable functions use a different invocation pattern than REST APIs
+
+function:
+  name: startTransformPipeline
+  type: callable  # Firebase onCall function
+  region: europe-west1
+
+  description: |
+    Initiates a transform pipeline job for a completed session.
+    Called from frontend via Firebase SDK httpsCallable.
+
+    **Callable vs HTTP:**
+    - Uses `onCall` instead of `onRequest`
+    - Invoked via `httpsCallable(functions, 'startTransformPipeline')`
+    - Automatic JSON handling (no manual serialization)
+    - Errors thrown as `HttpsError` with typed codes
+
+request:
+  type: object
+  required:
+    - projectId
+    - sessionId
+  properties:
+    projectId:
+      type: string
+      description: Project ID for the session
+      example: "proj_abc123"
+    sessionId:
+      type: string
+      description: Session ID to process
+      example: "sess_xyz789"
+
+response:
+  success:
+    type: object
+    properties:
+      success:
+        type: boolean
+        const: true
+      jobId:
+        type: string
+        description: Created job ID
+      message:
+        type: string
+        example: "Transform pipeline job created"
+
+errors:
+  # Callable functions throw HttpsError with these codes
+  invalid-argument:
+    description: Invalid request (missing or invalid parameters)
+    message: "Invalid request: {validation error}"
+
+  not-found:
+    description: Session, experience, or transform config not found
+    messages:
+      - "Session not found"
+      - "Experience not found"
+      - "Experience has no transform configuration"
+
+  already-exists:
+    description: Job already in progress for this session
+    message: "A job is already in progress for this session"
+
+  internal:
+    description: Unexpected server error
+    message: "An unexpected error occurred"
+
+# Frontend Integration
+frontend:
+  setup: |
+    // 1. Add functions to client.ts
+    import { getFunctions } from 'firebase/functions'
+    export const functions = getFunctions(app, 'europe-west1')
+
+  hook: |
+    // 2. Create useStartTransformPipeline hook
+    import { httpsCallable } from 'firebase/functions'
+    import { functions } from '@/integrations/firebase/client'
+
+    export function useStartTransformPipeline() {
+      return useCallback((params: StartTransformParams) => {
+        const startTransform = httpsCallable<StartTransformParams, StartTransformResponse>(
+          functions,
+          'startTransformPipeline'
+        )
+
+        // Fire-and-forget
+        startTransform(params).catch((error) => {
+          console.error('Failed to trigger transform:', error)
+          Sentry.captureException(error)
+        })
+      }, [])
+    }
+
+  usage: |
+    // 3. Use in ExperiencePage
+    import { useStartTransformPipeline } from '@/domains/experience/transform'
+
+    const startTransformPipeline = useStartTransformPipeline()
+
+    if (hasTransformConfig(experience, 'published')) {
+      startTransformPipeline({
+        projectId: project.id,
+        sessionId,
+      })
+    }
+
+# Backend Implementation Notes
+backend:
+  location: functions/src/callable/startTransformPipeline.ts
+
+  imports: |
+    import { onCall, HttpsError } from 'firebase-functions/v2/https'
+
+  error_handling: |
+    // Use HttpsError for typed errors
+    throw new HttpsError('not-found', 'Session not found')
+    throw new HttpsError('already-exists', 'Job already in progress')
+    throw new HttpsError('invalid-argument', 'Invalid request')
+
+  side_effects:
+    - Creates Job document in Firestore
+    - Updates Session.jobId and Session.jobStatus
+    - Queues Cloud Task for transformPipelineJob
