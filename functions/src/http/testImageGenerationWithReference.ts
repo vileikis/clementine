@@ -22,9 +22,6 @@ const GOOGLE_CLOUD_PROJECT =
 const IMAGE_MODEL = 'gemini-2.5-flash-image'
 // const IMAGE_MODEL = 'gemini-3-pro-image-preview'
 
-// const LOCATION = 'global'; // VERTEX_AI_LOCATION.value()
-const LOCATION = VERTEX_AI_LOCATION.value()
-
 // Reference image paths in Firebase Storage
 const REFERENCE_IMAGES = [
   {
@@ -32,11 +29,11 @@ const REFERENCE_IMAGES = [
     path: 'test/black-woman.jpeg',
     mimeType: 'image/jpeg',
   },
-  {
-    id: 'catPhoto_abc123',
-    path: 'test/bonya.jpg',
-    mimeType: 'image/jpeg',
-  },
+  // {
+  //   id: 'catPhoto_abc123',
+  //   path: 'test/bonya.jpg',
+  //   mimeType: 'image/jpeg',
+  // },
   // {
   //   id: 'dogPhoto_abc123',
   //   path: 'test/dog.jpg',
@@ -47,11 +44,11 @@ const REFERENCE_IMAGES = [
   //   path: 'test/art_style_1.jpg',
   //   mimeType: 'image/jpeg',
   // },
-  {
-    id: 'artStylePhoto_xyz789',
-    path: 'test/art_style_2.jpeg',
-    mimeType: 'image/jpeg',
-  },
+  // {
+  //   id: 'artStylePhoto_xyz789',
+  //   path: 'test/art_style_2.jpeg',
+  //   mimeType: 'image/jpeg',
+  // },
   // {
   //   id: 'bgPhoto_hobbiton',
   //   path: 'test/bg_hobbiton.jpg',
@@ -62,11 +59,11 @@ const REFERENCE_IMAGES = [
   //   path: 'test/weapon_dagger.webp',
   //   mimeType: 'image/webp',
   // },
-  {
-    id: 'weaponPhoto_2',
-    path: 'test/weapon_hammer.webp',
-    mimeType: 'image/webp',
-  },
+  // {
+  //   id: 'weaponPhoto_2',
+  //   path: 'test/weapon_hammer.webp',
+  //   mimeType: 'image/webp',
+  // },
   // {
   //   id: 'weaponPhoto_3',
   //   path: 'test/weapon_staff.jpg',
@@ -119,11 +116,15 @@ function buildImageGenerationParts(bucketName: string): any[] {
   }
 
   // Build the prompt with image ID references
-  let prompt = `Transform the person from <userPhoto_abc123> into hobbit from Middle Earth.`
-  prompt += ` With a cat sitting next to them (see <catPhoto_abc123>).`
-  prompt += ` Person should be holding <weaponPhoto_2>.`
-  prompt += ` Make photo in the art style of the <artStylePhoto_xyz789>.`
-  prompt += ` CRITICAL: Keep the person's exact skin skin tone, hair style and color, and facial features from the original image.`
+  let prompt = `Create a fantasy image of THE EXACT PERSON shown in <userPhoto_abc123> transformed into a hobbit from Middle Earth.`
+  prompt += ` CRITICAL REQUIREMENTS:`
+  prompt += ` 1. Paint the entire scene in the artistic style of vibrant modern mosaic art, featuring flowing serpentine paths of small tiles, bold color gradients, and heavy dark grout lines - everything must be unified in this single art style.`
+  prompt += ` 2. USE THE EXACT PERSON from <userPhoto_abc123> - preserve their skin tone, facial features, hair color and style exactly as shown.`
+  // prompt += ` 3. The dog from <dogPhoto_abc123> should be seamlessly integrated into the scene sitting next to the person - blend it naturally into the art style.`
+  // prompt += ` 4. The person should be holding the weapon from <weaponPhoto_3> - integrate it naturally into their hand, matching the art style.`
+  // prompt += ` 4. Paint the entire scene in the artistic style of <artStylePhoto_xyz789> - everything (person, cat, weapon, background) must be unified in this single art style.`
+  prompt += ` 5. Do NOT layer or copy-paste elements - seamlessly blend all elements together in one cohesive artistic composition.`
+  prompt += ` The person's identity (especially skin tone and facial features) must remain unchanged from the original photo.`
 
   // Add the final prompt
   parts.push({
@@ -191,6 +192,9 @@ export const testImageGenerationWithReference = onRequest(
       if (!GOOGLE_CLOUD_PROJECT) {
         throw new Error('Project ID not available')
       }
+
+      // const LOCATION = 'global'; // VERTEX_AI_LOCATION.value()
+      const LOCATION = VERTEX_AI_LOCATION.value()
 
       const bucket = storage.bucket()
       const bucketName = bucket.name
