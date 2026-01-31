@@ -1,6 +1,7 @@
 import { onRequest } from 'firebase-functions/v2/https'
 import { defineString } from 'firebase-functions/params'
 import {
+  GenerateContentConfig,
   GoogleGenAI,
   HarmBlockThreshold,
   HarmCategory,
@@ -19,6 +20,10 @@ const GOOGLE_CLOUD_PROJECT =
   process.env['GCLOUD_PROJECT'] || process.env['GOOGLE_CLOUD_PROJECT']
 
 const IMAGE_MODEL = 'gemini-2.5-flash-image'
+// const IMAGE_MODEL = 'gemini-3-pro-image-preview'
+
+// const LOCATION = 'global'; // VERTEX_AI_LOCATION.value()
+const LOCATION = VERTEX_AI_LOCATION.value()
 
 // Reference image paths in Firebase Storage
 const REFERENCE_IMAGES = [
@@ -32,26 +37,41 @@ const REFERENCE_IMAGES = [
     path: 'test/bonya.jpg',
     mimeType: 'image/jpeg',
   },
-  {
-    id: 'artStylePhoto_abc123',
-    path: 'test/art_style_1.jpg',
-    mimeType: 'image/jpeg',
-  },
+  // {
+  //   id: 'dogPhoto_abc123',
+  //   path: 'test/dog.jpg',
+  //   mimeType: 'image/jpeg',
+  // },
+  // {
+  //   id: 'artStylePhoto_abc123',
+  //   path: 'test/art_style_1.jpg',
+  //   mimeType: 'image/jpeg',
+  // },
   {
     id: 'artStylePhoto_xyz789',
     path: 'test/art_style_2.jpeg',
     mimeType: 'image/jpeg',
   },
+  // {
+  //   id: 'bgPhoto_hobbiton',
+  //   path: 'test/bg_hobbiton.jpg',
+  //   mimeType: 'image/jpeg',
+  // },
+  // {
+  //   id: 'weaponPhoto_1',
+  //   path: 'test/weapon_dagger.webp',
+  //   mimeType: 'image/webp',
+  // },
   {
-    id: 'bgPhoto_hobbiton',
-    path: 'test/bg_hobbiton.jpg',
-    mimeType: 'image/jpeg',
-  },
-  {
-    id: 'weaponPhoto_dagger',
-    path: 'test/weapon_dagger.webp',
+    id: 'weaponPhoto_2',
+    path: 'test/weapon_hammer.webp',
     mimeType: 'image/webp',
   },
+  // {
+  //   id: 'weaponPhoto_3',
+  //   path: 'test/weapon_staff.jpg',
+  //   mimeType: 'image/jpg',
+  // },
 ]
 
 const SAFETY_SETTINGS: SafetySetting[] = [
@@ -99,7 +119,11 @@ function buildImageGenerationParts(bucketName: string): any[] {
   }
 
   // Build the prompt with image ID references
-  const prompt = `Transform the person from <userPhoto_abc123> into hobbit from Middle Earth. With a cat sitting next to them (see <catPhoto_abc123>). Person should be holding a dagger (see <weaponPhoto_dagger>). Make photo in the art style of the <artStylePhoto_xyz789>.`
+  let prompt = `Transform the person from <userPhoto_abc123> into hobbit from Middle Earth.`
+  prompt += ` With a cat sitting next to them (see <catPhoto_abc123>).`
+  prompt += ` Person should be holding <weaponPhoto_2>.`
+  prompt += ` Make photo in the art style of the <artStylePhoto_xyz789>.`
+  prompt += ` CRITICAL: Keep the person's exact skin skin tone, hair style and color, and facial features from the original image.`
 
   // Add the final prompt
   parts.push({
@@ -173,7 +197,7 @@ export const testImageGenerationWithReference = onRequest(
 
       console.log('Generating image with reference images...', {
         project: GOOGLE_CLOUD_PROJECT,
-        location: VERTEX_AI_LOCATION.value(),
+        location: LOCATION,
         model: IMAGE_MODEL,
         bucket: bucketName,
       })
@@ -182,7 +206,7 @@ export const testImageGenerationWithReference = onRequest(
       const client = new GoogleGenAI({
         vertexai: true,
         project: GOOGLE_CLOUD_PROJECT,
-        location: VERTEX_AI_LOCATION.value(),
+        location: LOCATION,
       })
 
       // Build parts array with image references and prompt
@@ -191,7 +215,7 @@ export const testImageGenerationWithReference = onRequest(
       const parts = buildImageGenerationParts(bucketName)
 
       // Generation config
-      const generationConfig = {
+      const generationConfig: GenerateContentConfig = {
         maxOutputTokens: 32768,
         temperature: 1,
         topP: 0.95,
