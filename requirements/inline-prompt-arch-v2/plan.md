@@ -2,29 +2,29 @@
 
 **Part of**: [Inline Prompt Architecture (v2)](./README.md)
 
-### Phase 1a: Schemas & Foundation (2-3 days)
+### Phase 1a: Schemas & Foundation (2-3 days) ✅ COMPLETE
 
 **Goal**: Update schemas to support AI-aware features
 
 **Tasks**:
 
-- [ ] Update `experienceStepNameSchema`:
+- [x] Update `experienceStepNameSchema`:
   - Make required (remove `.optional()`)
   - Add regex validation: `/^[a-zA-Z0-9 \-_]+$/` (letters, numbers, spaces, hyphens, underscores)
   - Keep max length at 50 characters
   - Update comment to reflect support for spaces in names
-- [ ] Enhance `multiSelectOptionSchema`:
+- [x] Enhance `multiSelectOptionSchema`:
   - Add `promptFragment: z.string().max(500).optional()`
   - Add `promptMedia: mediaReferenceSchema.optional()`
-- [ ] Create `refMediaEntrySchema`:
+- [x] Create `refMediaEntrySchema`:
   - Extend `mediaReferenceSchema` with `displayName`
-- [ ] Create `aiImageNodeSchema`:
+- [x] Create `aiImageNodeSchema`:
   - Fields: `model`, `aspectRatio`, `prompt`, `refMedia`
-- [ ] Update `transformConfigSchema`:
+- [x] Update `transformConfigSchema`:
   - Remove `variableMappings` field (obsolete with inline architecture)
   - Remove `variableMappingSchema` export
-- [ ] Update `transformNodeSchema` to support typed configs
-- [ ] Write unit tests for schemas
+- [x] Update `transformNodeSchema` to support typed configs
+- [x] Write unit tests for schemas
 
 **Files**:
 
@@ -43,13 +43,13 @@
 
 ---
 
-### Phase 1b: Step Editor Enhancement (3-4 days)
+### Phase 1b: Step Editor Enhancement (3-4 days) ✅ COMPLETE
 
 **Goal**: Add step name editing and AI-aware fields to step editors
 
 **Tasks**:
 
-- [ ] **Step name editing**
+- [x] **Step name editing**
   - Add step name text input to all step editor settings panels
   - Auto-generate initial name from step type on creation (e.g., "Pet Choice", "User Photo")
   - Validate uniqueness on blur (case-sensitive)
@@ -57,30 +57,30 @@
   - Debounced auto-save
   - Max 50 characters
   - Allow spaces, letters, numbers, hyphens, underscores
-- [ ] **Update StepList display**
+- [x] **Update StepList display**
   - Show `step.name` instead of `step.config.title` in StepList
   - Add fallback to title if name is empty (backward compatibility)
   - Display step type badge/icon next to name
   - Update StepListItem component
-- [ ] **Step name uniqueness validation**
+- [x] **Step name uniqueness validation**
   - Implement `useValidateStepName` hook
   - Check uniqueness across all steps in experience
   - Show error message if duplicate found
   - Prevent saving duplicate names
-- [ ] Add promptFragment text input to option editor
+- [x] Add promptFragment text input to option editor
   - Label: "Prompt Fragment (optional)"
   - Help text: "Text to insert when this option is selected"
   - Max 500 chars
   - Debounced auto-save
-- [ ] Add promptMedia picker to option editor
+- [x] Add promptMedia picker to option editor
   - Label: "Prompt Media (optional)"
   - Upload button or media library picker
   - Shows thumbnail when set
   - Remove button
-- [ ] Visual indicator when option is AI-aware
+- [x] Visual indicator when option is AI-aware
   - Badge/icon showing "AI-enabled"
   - Visible when promptFragment or promptMedia is set
-- [ ] Validation
+- [x] Validation
   - promptFragment max length
   - promptMedia must be valid MediaReference
   - Step names must be unique
@@ -115,12 +115,10 @@
 
 **Goal**: Create transform pipeline editor UI foundation
 
+**Note**: Transform pipeline editor is built in a **dedicated domain** at `@apps/clementine-app/src/domains/experience/generate`. This is **separate** from the experience designer domain. There is **no Transform panel** in the experience designer itself.
+
 **Tasks**:
 
-- [ ] Add Transform panel to experience designer
-  - Show alongside step list (same layout area)
-  - Empty state message when no nodes
-  - Tab/section switcher between Steps and Transform
 - [ ] Node list/canvas UI
   - Display AI Image nodes in list/canvas
   - Node card shows summary (model, aspect ratio, prompt preview)
@@ -152,24 +150,23 @@
 
 **Components** (new):
 
-- `domains/experience/designer/transform/containers/TransformPipelineEditor.tsx`
-- `domains/experience/designer/transform/components/TransformPanel.tsx`
-- `domains/experience/designer/transform/components/NodeList.tsx`
-- `domains/experience/designer/transform/components/AIImageNodeCard.tsx`
-- `domains/experience/designer/transform/components/AddNodeButton.tsx`
-- `domains/experience/designer/transform/components/DeleteNodeDialog.tsx`
-- `domains/experience/designer/transform/components/NodeEditorPanel.tsx`
+- `domains/experience/generate/containers/TransformPipelineEditor.tsx`
+- `domains/experience/generate/components/NodeList.tsx`
+- `domains/experience/generate/components/AIImageNodeCard.tsx`
+- `domains/experience/generate/components/AddNodeButton.tsx`
+- `domains/experience/generate/components/DeleteNodeDialog.tsx`
+- `domains/experience/generate/components/NodeEditorPanel.tsx`
 
 **Hooks** (new):
 
-- `domains/experience/designer/transform/hooks/useUpdateTransformConfig.ts`
-- `domains/experience/designer/transform/hooks/useAddNode.ts`
-- `domains/experience/designer/transform/hooks/useDeleteNode.ts`
-- `domains/experience/designer/transform/hooks/useSelectedNode.ts`
+- `domains/experience/generate/hooks/useUpdateTransformConfig.ts`
+- `domains/experience/generate/hooks/useAddNode.ts`
+- `domains/experience/generate/hooks/useDeleteNode.ts`
+- `domains/experience/generate/hooks/useSelectedNode.ts`
 
 **Success Criteria**:
 
-- ✅ Transform panel visible in experience designer
+- ✅ Transform pipeline editor UI implemented in dedicated domain (`domains/experience/generate`)
 - ✅ Can add AI Image node
 - ✅ Node card displays summary (model, aspect ratio, prompt preview)
 - ✅ Can delete node with confirmation
@@ -210,14 +207,14 @@
 
 **Components** (new):
 
-- `domains/experience/designer/transform/components/RefMediaSection.tsx`
-- `domains/experience/designer/transform/components/RefMediaGrid.tsx`
-- `domains/experience/designer/transform/components/RefMediaItem.tsx`
-- `domains/experience/designer/transform/components/AddRefMediaDialog.tsx`
+- `domains/experience/generate/components/RefMediaSection.tsx`
+- `domains/experience/generate/components/RefMediaGrid.tsx`
+- `domains/experience/generate/components/RefMediaItem.tsx`
+- `domains/experience/generate/components/AddRefMediaDialog.tsx`
 
 **Hooks** (new):
 
-- `domains/experience/designer/transform/hooks/useUpdateRefMedia.ts`
+- `domains/experience/generate/hooks/useUpdateRefMedia.ts`
 
 **Success Criteria**:
 
@@ -268,17 +265,17 @@
 
 **Components** (new):
 
-- `domains/experience/designer/transform/components/PromptEditor.tsx`
-- `domains/experience/designer/transform/components/MentionAutocomplete.tsx`
-- `domains/experience/designer/transform/components/StepMentionPill.tsx`
-- `domains/experience/designer/transform/components/MediaMentionPill.tsx`
+- `domains/experience/generate/components/PromptEditor.tsx`
+- `domains/experience/generate/components/MentionAutocomplete.tsx`
+- `domains/experience/generate/components/StepMentionPill.tsx`
+- `domains/experience/generate/components/MediaMentionPill.tsx`
 
 **Lexical infrastructure** (adapt from ai-presets):
 
-- `domains/experience/designer/transform/lexical/nodes/StepMentionNode.ts`
-- `domains/experience/designer/transform/lexical/nodes/MediaMentionNode.ts`
-- `domains/experience/designer/transform/lexical/plugins/MentionsPlugin.tsx`
-- `domains/experience/designer/transform/lexical/utils/serialization.ts`
+- `domains/experience/generate/lexical/nodes/StepMentionNode.ts`
+- `domains/experience/generate/lexical/nodes/MediaMentionNode.ts`
+- `domains/experience/generate/lexical/plugins/MentionsPlugin.tsx`
+- `domains/experience/generate/lexical/utils/serialization.ts`
 
 **Success Criteria**:
 
@@ -314,7 +311,7 @@
 
 **Components** (new):
 
-- `domains/experience/designer/transform/components/ModelSettings.tsx`
+- `domains/experience/generate/components/ModelSettings.tsx`
 
 **Hooks** (adapt):
 
@@ -362,10 +359,10 @@
 
 **Files** (new):
 
-- `domains/experience/designer/transform/lib/prompt-resolution.ts`
-- `domains/experience/designer/transform/lib/prompt-resolution.test.ts`
-- `domains/experience/designer/transform/lib/validation.ts`
-- `domains/experience/designer/transform/lib/validation.test.ts`
+- `domains/experience/generate/lib/prompt-resolution.ts`
+- `domains/experience/generate/lib/prompt-resolution.test.ts`
+- `domains/experience/generate/lib/validation.ts`
+- `domains/experience/generate/lib/validation.test.ts`
 
 **Success Criteria**:
 
@@ -419,20 +416,20 @@
 
 **Components** (new):
 
-- `domains/experience/designer/transform/components/TestRunDialog.tsx`
-- `domains/experience/designer/transform/components/TestInputsForm.tsx`
-- `domains/experience/designer/transform/components/TestInputField.tsx`
-- `domains/experience/designer/transform/components/ResolvedPromptDisplay.tsx`
-- `domains/experience/designer/transform/components/MediaPreviewGrid.tsx`
-- `domains/experience/designer/transform/components/ValidationDisplay.tsx`
-- `domains/experience/designer/transform/components/TestGenerationButton.tsx`
+- `domains/experience/generate/components/TestRunDialog.tsx`
+- `domains/experience/generate/components/TestInputsForm.tsx`
+- `domains/experience/generate/components/TestInputField.tsx`
+- `domains/experience/generate/components/ResolvedPromptDisplay.tsx`
+- `domains/experience/generate/components/MediaPreviewGrid.tsx`
+- `domains/experience/generate/components/ValidationDisplay.tsx`
+- `domains/experience/generate/components/TestGenerationButton.tsx`
 
 **Hooks** (new):
 
-- `domains/experience/designer/transform/hooks/useTestInputs.ts` (Zustand store)
-- `domains/experience/designer/transform/hooks/usePromptResolution.ts`
-- `domains/experience/designer/transform/hooks/usePromptValidation.ts`
-- `domains/experience/designer/transform/hooks/useMediaReferences.ts`
+- `domains/experience/generate/hooks/useTestInputs.ts` (Zustand store)
+- `domains/experience/generate/hooks/usePromptResolution.ts`
+- `domains/experience/generate/hooks/usePromptValidation.ts`
+- `domains/experience/generate/hooks/useMediaReferences.ts`
 
 **Success Criteria**:
 
@@ -526,7 +523,7 @@ The inline prompt architecture leverages significant code from the AI Presets im
 - Support step names with spaces (e.g., `@{step:Pet Choice}`)
 - Update parsing regex to handle spaces within braces: `/@\{step:([^}]+)\}/g`
 
-**New Location**: `domains/experience/designer/transform/lexical/`
+**New Location**: `domains/experience/generate/lexical/`
 
 ---
 
@@ -548,7 +545,7 @@ The inline prompt architecture leverages significant code from the AI Presets im
 - Auto-reference pattern for step promptMedia
 - mediaAssetId-based refs instead of names
 
-**New Location**: `domains/experience/designer/transform/lib/`
+**New Location**: `domains/experience/generate/lib/`
 
 ---
 
@@ -570,7 +567,7 @@ The inline prompt architecture leverages significant code from the AI Presets im
 - Adapt media grid for step promptMedia + refMedia
 - Update validation messages for steps
 
-**New Location**: `domains/experience/designer/transform/components/`
+**New Location**: `domains/experience/generate/components/`
 
 ---
 
@@ -591,7 +588,7 @@ The inline prompt architecture leverages significant code from the AI Presets im
 - Validate displayName uniqueness
 - Generate displayName from fileName
 
-**New Location**: `domains/experience/designer/transform/components/`
+**New Location**: `domains/experience/generate/components/`
 
 ---
 
@@ -617,7 +614,7 @@ Since we're pre-launch with no production data, we can archive the AI Presets im
 ### Code Reuse Strategy
 
 1. **Copy Lexical Infrastructure**
-   - Copy `domains/ai-presets/lexical/` → `domains/experience/designer/transform/lexical/`
+   - Copy `domains/ai-presets/lexical/` → `domains/experience/generate/lexical/`
    - Adapt mention node types
    - Update serialization patterns
 
