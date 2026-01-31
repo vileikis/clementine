@@ -10,7 +10,6 @@
  * - Completion state display
  */
 import { useCallback } from 'react'
-
 import { useRuntime } from '../../runtime'
 import { StepRendererRouter } from '../../steps'
 import type { AnswerValue } from '../../steps/registry/step-registry'

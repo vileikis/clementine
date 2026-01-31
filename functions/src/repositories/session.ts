@@ -8,6 +8,7 @@
  */
 import { db } from '../infra/firebase-admin'
 import { sessionSchema, type Session, type JobStatus } from '@clementine/shared'
+import { convertFirestoreDoc } from '../utils/firestore-utils'
 
 /**
  * Get the Firestore reference for a session document
@@ -37,13 +38,7 @@ export async function fetchSession(
     return null
   }
 
-  const data = doc.data()
-  if (!data) {
-    return null
-  }
-
-  // Parse with Zod schema for runtime validation
-  return sessionSchema.parse({ id: doc.id, ...data })
+  return convertFirestoreDoc(doc, sessionSchema)
 }
 
 /**

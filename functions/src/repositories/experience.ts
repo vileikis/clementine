@@ -6,6 +6,7 @@
  */
 import { db } from '../infra/firebase-admin'
 import { experienceSchema, type Experience } from '@clementine/shared'
+import { convertFirestoreDoc } from '../utils/firestore-utils'
 
 /**
  * Get the Firestore reference for an experience document
@@ -35,10 +36,5 @@ export async function fetchExperience(
     return null
   }
 
-  const data = doc.data()
-  if (!data) {
-    return null
-  }
-
-  return experienceSchema.parse({ id: doc.id, ...data })
+  return convertFirestoreDoc(doc, experienceSchema)
 }

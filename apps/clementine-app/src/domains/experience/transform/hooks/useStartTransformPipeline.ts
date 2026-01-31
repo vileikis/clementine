@@ -40,7 +40,7 @@ export function useStartTransformPipeline() {
     const startTransform = httpsCallable<
       StartTransformParams,
       StartTransformResponse
-    >(functions, 'startTransformPipeline')
+    >(functions, 'startTransformPipelineV2')
 
     try {
       await startTransform(params)
