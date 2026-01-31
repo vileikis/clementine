@@ -14,7 +14,7 @@ import { z } from 'zod'
 
 import { experienceMediaSchema } from '../media/media-reference.schema'
 import { experienceStepSchema } from './step.schema'
-import { transformConfigSchema } from './transform.schema'
+import { transformNodeSchema } from './transform.schema'
 
 /**
  * Experience status enum schema
@@ -38,13 +38,13 @@ export const experienceProfileSchema = z.enum(['freeform', 'survey', 'story'])
  * Experience Config Schema
  *
  * Configuration object that defines the structure and behavior of an experience.
- * Contains step definitions and optional transform pipeline configuration.
+ * Contains step definitions and transform pipeline nodes.
  */
 export const experienceConfigSchema = z.looseObject({
   /** Array of steps in the experience (typed discriminated union) */
   steps: z.array(experienceStepSchema).default([]),
-  /** Optional transform pipeline configuration */
-  transform: transformConfigSchema.nullable().default(null),
+  /** Transform pipeline nodes (flattened from previous transform.nodes) */
+  transformNodes: z.array(transformNodeSchema).default([]),
 })
 
 /**

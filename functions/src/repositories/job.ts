@@ -278,7 +278,7 @@ export function buildJobData(params: {
  * at the time of job creation for immutable processing.
  *
  * @param session - Session with answers and captured media
- * @param experience - Experience with transform config
+ * @param experience - Experience with transform nodes
  * @param configSource - Which config to use ('draft' or 'published')
  * @returns JobSnapshot for the job document
  */
@@ -298,7 +298,7 @@ export function buildJobSnapshot(
       answers: session.answers,
       capturedMedia: session.capturedMedia,
     },
-    transformConfig: config.transform!,
+    transformNodes: config.transformNodes,
     projectContext: {
       overlay: null, // Will be populated from project if applicable
       applyOverlay: false,

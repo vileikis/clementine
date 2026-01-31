@@ -1,8 +1,8 @@
 /**
- * useUpdateTransformConfig Hook
+ * useUpdateTransformNodes Hook
  *
- * Mutation hook for updating the transform configuration in experience draft.
- * Updates draft.transform field with transaction, draftVersion increment, and cache invalidation.
+ * Mutation hook for updating the transform nodes in experience draft.
+ * Updates draft.transformNodes field with transaction, draftVersion increment, and cache invalidation.
  * Uses tracked mutation for save status tracking.
  */
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -11,22 +11,22 @@ import * as Sentry from '@sentry/tanstackstart-react'
 import { experienceKeys } from '../../shared/queries/experience.query'
 import { updateExperienceConfigField } from '../../shared/lib'
 import { useExperienceDesignerStore } from '../../designer/stores'
-import type { TransformConfig } from '@clementine/shared'
+import type { TransformNode } from '@clementine/shared'
 import { useTrackedMutation } from '@/shared/editor-status/hooks/useTrackedMutation'
 
 /**
- * Input for updating transform configuration
+ * Input for updating transform nodes
  */
-export interface UpdateTransformConfigInput {
-  /** Updated transform configuration */
-  transform: TransformConfig
+export interface UpdateTransformNodesInput {
+  /** Updated transform nodes array */
+  transformNodes: TransformNode[]
 }
 
 /**
- * Hook for updating experience transform configuration
+ * Hook for updating experience transform nodes
  *
  * Features:
- * - Updates draft.transform field with serverTimestamp() for updatedAt
+ * - Updates draft.transformNodes field with serverTimestamp() for updatedAt
  * - Atomically increments draftVersion for optimistic locking
  * - Invalidates experience detail cache on success
  * - Captures errors to Sentry with domain tags
@@ -38,26 +38,26 @@ export interface UpdateTransformConfigInput {
  * @example
  * ```tsx
  * function TransformPipelineEditor({ experience, workspaceId }) {
- *   const updateTransform = useUpdateTransformConfig(workspaceId, experience.id)
+ *   const updateTransformNodes = useUpdateTransformNodes(workspaceId, experience.id)
  *
  *   const handleAddNode = () => {
- *     const newTransform = addNode(experience.draft.transform)
- *     updateTransform.mutate({ transform: newTransform })
+ *     const newNodes = addNode(experience.draft.transformNodes)
+ *     updateTransformNodes.mutate({ transformNodes: newNodes })
  *   }
  * }
  * ```
  */
-export function useUpdateTransformConfig(
+export function useUpdateTransformNodes(
   workspaceId: string,
   experienceId: string,
 ) {
   const queryClient = useQueryClient()
   const store = useExperienceDesignerStore()
 
-  const mutation = useMutation<void, Error, UpdateTransformConfigInput>({
-    mutationFn: async ({ transform }) => {
+  const mutation = useMutation<void, Error, UpdateTransformNodesInput>({
+    mutationFn: async ({ transformNodes }) => {
       await updateExperienceConfigField(workspaceId, experienceId, {
-        transform,
+        transformNodes,
       })
     },
     onSuccess: () => {
@@ -70,7 +70,7 @@ export function useUpdateTransformConfig(
       Sentry.captureException(error, {
         tags: {
           domain: 'experience/generate',
-          action: 'update-transform-config',
+          action: 'update-transform-nodes',
         },
       })
     },
@@ -79,3 +79,8 @@ export function useUpdateTransformConfig(
   // Wrap with tracked mutation for save status tracking
   return useTrackedMutation(mutation, store)
 }
+
+/**
+ * @deprecated Use useUpdateTransformNodes instead
+ */
+export const useUpdateTransformConfig = useUpdateTransformNodes

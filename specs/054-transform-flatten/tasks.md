@@ -25,17 +25,17 @@
 
 ### Schema Changes
 
-- [ ] T001 [US1] Remove `outputAspectRatioSchema` and `outputFormatSchema` from `packages/shared/src/schemas/experience/transform.schema.ts`
-- [ ] T002 [US1] Remove `transformConfigSchema` from `packages/shared/src/schemas/experience/transform.schema.ts` (keep `transformNodeSchema`)
-- [ ] T003 [US1] Update `packages/shared/src/schemas/experience/transform.schema.test.ts` to remove tests for deleted schemas
-- [ ] T004 [US1] Replace `transform: transformConfigSchema` with `transformNodes: z.array(transformNodeSchema).default([])` in `packages/shared/src/schemas/experience/experience.schema.ts`
-- [ ] T005 [US1] Update `packages/shared/src/schemas/experience/experience.schema.test.ts` for new schema structure
-- [ ] T006 [US1] Remove `TransformConfig`, `OutputFormat`, `OutputAspectRatio` exports from `packages/shared/src/index.ts`
+- [X] T001 [US1] Remove `outputAspectRatioSchema` and `outputFormatSchema` from `packages/shared/src/schemas/experience/transform.schema.ts`
+- [X] T002 [US1] Remove `transformConfigSchema` from `packages/shared/src/schemas/experience/transform.schema.ts` (keep `transformNodeSchema`)
+- [X] T003 [US1] Update `packages/shared/src/schemas/experience/transform.schema.test.ts` to remove tests for deleted schemas
+- [X] T004 [US1] Replace `transform: transformConfigSchema` with `transformNodes: z.array(transformNodeSchema).default([])` in `packages/shared/src/schemas/experience/experience.schema.ts`
+- [X] T005 [US1] Update `packages/shared/src/schemas/experience/experience.schema.test.ts` for new schema structure
+- [X] T006 [US1] Remove `TransformConfig`, `OutputFormat`, `OutputAspectRatio` exports from `packages/shared/src/index.ts`
 
 ### Validation
 
-- [ ] T007 [US1] Build shared package: `pnpm --filter @clementine/shared build`
-- [ ] T008 [US1] Run shared package tests: `pnpm --filter @clementine/shared test`
+- [X] T007 [US1] Build shared package: `pnpm --filter @clementine/shared build`
+- [X] T008 [US1] Run shared package tests: `pnpm --filter @clementine/shared test`
 
 **Checkpoint**: Shared schema complete - TypeScript will now report errors in consuming packages
 
@@ -49,20 +49,20 @@
 
 ### Cloud Functions (US2)
 
-- [ ] T009 [US2] Update `buildJobSnapshot()` to use `transformNodes` in `functions/src/repositories/job.ts`
-- [ ] T010 [US2] Update `functions/src/repositories/job.test.ts` for new schema
-- [ ] T011 [US2] Update `functions/src/callable/startTransformPipeline.ts` to use `transformNodes`
-- [ ] T012 [US2] Update `functions/src/tasks/processMediaJob.ts` if it references transform config
-- [ ] T013 [US2] Update `functions/scripts/seed-emulators.ts` fixture data to use `transformNodes`
-- [ ] T014 [US2] Update `packages/shared/src/schemas/job/job.schema.ts` if it references `TransformConfig`
+- [X] T009 [US2] Update `buildJobSnapshot()` to use `transformNodes` in `functions/src/repositories/job.ts`
+- [X] T010 [US2] Update `functions/src/repositories/job.test.ts` for new schema
+- [X] T011 [US2] Update `functions/src/callable/startTransformPipeline.ts` to use `transformNodes`
+- [X] T012 [US2] Update `functions/src/tasks/processMediaJob.ts` if it references transform config (N/A - uses legacy pipeline)
+- [X] T013 [US2] Update `functions/scripts/seed-emulators.ts` fixture data to use `transformNodes`
+- [X] T014 [US2] Update `packages/shared/src/schemas/job/job.schema.ts` if it references `TransformConfig`
 
 ### Guest Domain (US4)
 
-- [ ] T015 [P] [US4] Update `apps/clementine-app/src/domains/guest/containers/ExperiencePage.tsx` to use `transformNodes`
+- [X] T015 [P] [US4] Update `apps/clementine-app/src/domains/guest/containers/ExperiencePage.tsx` to use `transformNodes` (N/A - uses hasTransformConfig utility, updated in T024)
 
 ### Validation
 
-- [ ] T016 [US2] Build functions: `pnpm functions:build`
+- [X] T016 [US2] Build functions: `pnpm functions:build`
 
 **Checkpoint**: Backend processing works with new schema
 
@@ -76,41 +76,41 @@
 
 ### Transform Operations Library
 
-- [ ] T017 [US3] Update `DEFAULT_TRANSFORM_CONFIG` to use `transformNodes` in `apps/clementine-app/src/domains/experience/generate/lib/transform-operations.ts`
-- [ ] T018 [US3] Update all operation functions (addNode, removeNode, duplicateNode, reorderNodes, updateNodePrompt, updateNodeModel, updateNodeAspectRatio, addNodeRefMedia, removeNodeRefMedia) in `apps/clementine-app/src/domains/experience/generate/lib/transform-operations.ts`
-- [ ] T019 [US3] Update `apps/clementine-app/src/domains/experience/generate/lib/transform-operations.test.ts` fixtures and assertions
+- [X] T017 [US3] Update `DEFAULT_TRANSFORM_CONFIG` to use `transformNodes` in `apps/clementine-app/src/domains/experience/generate/lib/transform-operations.ts`
+- [X] T018 [US3] Update all operation functions (addNode, removeNode, duplicateNode, reorderNodes, updateNodePrompt, updateNodeModel, updateNodeAspectRatio, addNodeRefMedia, removeNodeRefMedia) in `apps/clementine-app/src/domains/experience/generate/lib/transform-operations.ts`
+- [X] T019 [US3] Update `apps/clementine-app/src/domains/experience/generate/lib/transform-operations.test.ts` fixtures and assertions
 
 ### Schema Re-exports
 
-- [ ] T020 [P] [US3] Remove `TransformConfig`, `OutputFormat` re-exports from `apps/clementine-app/src/domains/experience/shared/schemas/index.ts`
+- [X] T020 [P] [US3] Remove `TransformConfig`, `OutputFormat` re-exports from `apps/clementine-app/src/domains/experience/shared/schemas/index.ts`
 
 ### Hooks
 
-- [ ] T021 [US3] Update `apps/clementine-app/src/domains/experience/generate/hooks/useUpdateTransformConfig.ts` to use `transformNodes`
-- [ ] T022 [P] [US3] Update `apps/clementine-app/src/domains/experience/generate/hooks/useRefMediaUpload.ts` if it references transform config
-- [ ] T023 [P] [US3] Update exports in `apps/clementine-app/src/domains/experience/generate/hooks/index.ts` if needed
+- [X] T021 [US3] Update `apps/clementine-app/src/domains/experience/generate/hooks/useUpdateTransformConfig.ts` to use `transformNodes`
+- [X] T022 [P] [US3] Update `apps/clementine-app/src/domains/experience/generate/hooks/useRefMediaUpload.ts` if it references transform config
+- [X] T023 [P] [US3] Update exports in `apps/clementine-app/src/domains/experience/generate/hooks/index.ts` if needed (N/A - barrel re-exports unchanged)
 
 ### Utility Functions
 
-- [ ] T024 [US3] Update or remove `apps/clementine-app/src/domains/experience/shared/utils/hasTransformConfig.ts` (may need renaming to `hasTransformNodes`)
+- [X] T024 [US3] Update or remove `apps/clementine-app/src/domains/experience/shared/utils/hasTransformConfig.ts` (may need renaming to `hasTransformNodes`)
 
 ### Components
 
-- [ ] T025 [P] [US3] Update `apps/clementine-app/src/domains/experience/generate/containers/TransformPipelineEditor.tsx` to use `transformNodes`
-- [ ] T026 [P] [US3] Update `apps/clementine-app/src/domains/experience/generate/components/NodeListItem/NodeListItem.tsx` if it references transform config
-- [ ] T027 [P] [US3] Update `apps/clementine-app/src/domains/experience/generate/components/NodeListItem/NodeSettings.tsx` if it references transform config
-- [ ] T028 [P] [US3] Update `apps/clementine-app/src/domains/experience/generate/components/NodeListItem/AIImageNode.tsx` if it references transform config
-- [ ] T029 [P] [US3] Update `apps/clementine-app/src/domains/experience/generate/components/PromptComposer/PromptComposer.tsx` if it references transform config
-- [ ] T030 [P] [US3] Update `apps/clementine-app/src/domains/experience/generate/components/PromptComposer/ControlRow.tsx` if it references transform config
+- [X] T025 [P] [US3] Update `apps/clementine-app/src/domains/experience/generate/containers/TransformPipelineEditor.tsx` to use `transformNodes`
+- [X] T026 [P] [US3] Update `apps/clementine-app/src/domains/experience/generate/components/NodeListItem/NodeListItem.tsx` if it references transform config
+- [X] T027 [P] [US3] Update `apps/clementine-app/src/domains/experience/generate/components/NodeListItem/NodeSettings.tsx` if it references transform config
+- [X] T028 [P] [US3] Update `apps/clementine-app/src/domains/experience/generate/components/NodeListItem/AIImageNode.tsx` if it references transform config
+- [X] T029 [P] [US3] Update `apps/clementine-app/src/domains/experience/generate/components/PromptComposer/PromptComposer.tsx` if it references transform config
+- [X] T030 [P] [US3] Update `apps/clementine-app/src/domains/experience/generate/components/PromptComposer/ControlRow.tsx` if it references transform config
 
 ### Preview
 
-- [ ] T031 [P] [US3] Update `apps/clementine-app/src/domains/experience/preview/containers/ExperiencePreviewModal.tsx` to use `transformNodes`
+- [X] T031 [P] [US3] Update `apps/clementine-app/src/domains/experience/preview/containers/ExperiencePreviewModal.tsx` to use `transformNodes` (uses hasTransformConfig alias)
 
 ### Validation
 
-- [ ] T032 [US3] Run app type check: `pnpm app:type-check`
-- [ ] T033 [US3] Run app tests: `pnpm app:test`
+- [X] T032 [US3] Run app type check: `pnpm app:type-check`
+- [X] T033 [US3] Run app tests: `pnpm app:test`
 
 **Checkpoint**: Frontend editor fully functional with new schema
 
@@ -120,12 +120,12 @@
 
 **Purpose**: Final verification and cleanup
 
-- [ ] T034 Run full validation: `pnpm app:check`
-- [ ] T035 Search codebase for remaining `transform?.nodes` or `transform.nodes` references
-- [ ] T036 Search codebase for remaining `TransformConfig` or `OutputFormat` type usage
-- [ ] T037 Verify quickstart.md validation commands pass
-- [ ] T038 Remove legacy session schema references in `packages/shared/src/schemas/session.schemas.legacy.ts` if applicable
-- [ ] T039 Clean up any spec contract files: `specs/048-inline-prompt-phase-1ab/contracts/transform-schemas.ts`
+- [X] T034 Run full validation: `pnpm app:check`
+- [X] T035 Search codebase for remaining `transform?.nodes` or `transform.nodes` references (only in specs/docs, not code)
+- [X] T036 Search codebase for remaining `TransformConfig` or `OutputFormat` type usage (AiTransformConfig and detectOutputFormat are unrelated)
+- [X] T037 Verify quickstart.md validation commands pass
+- [X] T038 Remove legacy session schema references in `packages/shared/src/schemas/session.schemas.legacy.ts` if applicable (N/A - pipelineConfigSchema is unrelated)
+- [X] T039 Clean up any spec contract files: `specs/048-inline-prompt-phase-1ab/contracts/transform-schemas.ts` (N/A - historical spec doc)
 
 ---
 

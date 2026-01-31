@@ -1,7 +1,7 @@
 /**
  * Transform Operations
  *
- * Pure functions for manipulating transform configuration.
+ * Pure functions for manipulating transform nodes.
  * These functions are side-effect free and easy to test.
  */
 import { nanoid } from 'nanoid'
@@ -12,17 +12,13 @@ import type {
   AIImageModel,
   AIImageNode,
   MediaReference,
-  TransformConfig,
   TransformNode,
 } from '@clementine/shared'
 
 /**
- * Default transform configuration
+ * Default transform nodes (empty array)
  */
-export const DEFAULT_TRANSFORM_CONFIG: TransformConfig = {
-  nodes: [],
-  outputFormat: null,
-}
+export const DEFAULT_TRANSFORM_NODES: TransformNode[] = []
 
 /**
  * Creates a new AI Image node with default configuration
@@ -41,164 +37,139 @@ export function createDefaultAIImageNode(): AIImageNode {
 }
 
 /**
- * Adds a new node to the transform configuration
+ * Adds a new node to the transform nodes array
  *
- * @param transform - Current transform config (or null/undefined)
- * @returns New transform config with the added node
+ * @param nodes - Current transform nodes (or undefined)
+ * @returns New transform nodes array with the added node
  */
-export function addNode(
-  transform: TransformConfig | null | undefined,
-): TransformConfig {
-  const current = transform ?? DEFAULT_TRANSFORM_CONFIG
+export function addNode(nodes: TransformNode[] | undefined): TransformNode[] {
+  const current = nodes ?? DEFAULT_TRANSFORM_NODES
   const newNode = createDefaultAIImageNode()
 
-  return {
-    ...current,
-    nodes: [...current.nodes, newNode],
-  }
+  return [...current, newNode]
 }
 
 /**
- * Removes a node from the transform configuration
+ * Removes a node from the transform nodes array
  *
- * @param transform - Current transform config (or null/undefined)
+ * @param nodes - Current transform nodes (or undefined)
  * @param nodeId - ID of the node to remove
- * @returns New transform config without the specified node
+ * @returns New transform nodes array without the specified node
  */
 export function removeNode(
-  transform: TransformConfig | null | undefined,
+  nodes: TransformNode[] | undefined,
   nodeId: string,
-): TransformConfig {
-  const current = transform ?? DEFAULT_TRANSFORM_CONFIG
+): TransformNode[] {
+  const current = nodes ?? DEFAULT_TRANSFORM_NODES
 
-  return {
-    ...current,
-    nodes: current.nodes.filter((n) => n.id !== nodeId),
-  }
+  return current.filter((n) => n.id !== nodeId)
 }
 
 /**
- * Duplicates a node in the transform configuration
+ * Duplicates a node in the transform nodes array
  * The duplicate is inserted immediately after the original
  *
- * @param transform - Current transform config (or null/undefined)
+ * @param nodes - Current transform nodes (or undefined)
  * @param nodeId - ID of the node to duplicate
- * @returns New transform config with the duplicated node
+ * @returns New transform nodes array with the duplicated node
  * @throws Error if the node is not found
  */
 export function duplicateNode(
-  transform: TransformConfig | null | undefined,
+  nodes: TransformNode[] | undefined,
   nodeId: string,
-): TransformConfig {
-  const current = transform ?? DEFAULT_TRANSFORM_CONFIG
-  const nodeIndex = current.nodes.findIndex((n) => n.id === nodeId)
+): TransformNode[] {
+  const current = nodes ?? DEFAULT_TRANSFORM_NODES
+  const nodeIndex = current.findIndex((n) => n.id === nodeId)
 
   if (nodeIndex === -1) {
     throw new Error(`Node with id ${nodeId} not found`)
   }
 
-  const originalNode = current.nodes[nodeIndex]
+  const originalNode = current[nodeIndex]
   const duplicatedNode: TransformNode = {
     ...originalNode,
     id: nanoid(),
     config: { ...originalNode.config },
   }
 
-  const newNodes = [...current.nodes]
+  const newNodes = [...current]
   newNodes.splice(nodeIndex + 1, 0, duplicatedNode)
 
-  return {
-    ...current,
-    nodes: newNodes,
-  }
+  return newNodes
 }
 
 /**
- * Reorders nodes in the transform configuration
+ * Reorders nodes in the transform nodes array
  *
- * @param transform - Current transform config (or null/undefined)
+ * @param _nodes - Current transform nodes (unused, for API consistency)
  * @param newNodes - New ordered array of nodes
- * @returns New transform config with reordered nodes
+ * @returns New transform nodes array with reordered nodes
  */
 export function reorderNodes(
-  transform: TransformConfig | null | undefined,
+  _nodes: TransformNode[] | undefined,
   newNodes: TransformNode[],
-): TransformConfig {
-  const current = transform ?? DEFAULT_TRANSFORM_CONFIG
-
-  return {
-    ...current,
-    nodes: newNodes,
-  }
+): TransformNode[] {
+  return newNodes
 }
 
 /**
  * Updates the prompt for an AI Image node
  *
- * @param transform - Current transform config
+ * @param nodes - Current transform nodes
  * @param nodeId - ID of the node to update
  * @param prompt - New prompt text
- * @returns New transform config with updated prompt
+ * @returns New transform nodes array with updated prompt
  */
 export function updateNodePrompt(
-  transform: TransformConfig,
+  nodes: TransformNode[],
   nodeId: string,
   prompt: string,
-): TransformConfig {
-  return {
-    ...transform,
-    nodes: transform.nodes.map((node) =>
-      node.id === nodeId && node.type === AI_IMAGE_NODE_TYPE
-        ? { ...node, config: { ...node.config, prompt } }
-        : node,
-    ),
-  }
+): TransformNode[] {
+  return nodes.map((node) =>
+    node.id === nodeId && node.type === AI_IMAGE_NODE_TYPE
+      ? { ...node, config: { ...node.config, prompt } }
+      : node,
+  )
 }
 
 /**
  * Updates the model for an AI Image node
  *
- * @param transform - Current transform config
+ * @param nodes - Current transform nodes
  * @param nodeId - ID of the node to update
  * @param model - New model selection
- * @returns New transform config with updated model
+ * @returns New transform nodes array with updated model
  */
 export function updateNodeModel(
-  transform: TransformConfig,
+  nodes: TransformNode[],
   nodeId: string,
   model: AIImageModel,
-): TransformConfig {
-  return {
-    ...transform,
-    nodes: transform.nodes.map((node) =>
-      node.id === nodeId && node.type === AI_IMAGE_NODE_TYPE
-        ? { ...node, config: { ...node.config, model } }
-        : node,
-    ),
-  }
+): TransformNode[] {
+  return nodes.map((node) =>
+    node.id === nodeId && node.type === AI_IMAGE_NODE_TYPE
+      ? { ...node, config: { ...node.config, model } }
+      : node,
+  )
 }
 
 /**
  * Updates the aspect ratio for an AI Image node
  *
- * @param transform - Current transform config
+ * @param nodes - Current transform nodes
  * @param nodeId - ID of the node to update
  * @param aspectRatio - New aspect ratio selection
- * @returns New transform config with updated aspect ratio
+ * @returns New transform nodes array with updated aspect ratio
  */
 export function updateNodeAspectRatio(
-  transform: TransformConfig,
+  nodes: TransformNode[],
   nodeId: string,
   aspectRatio: AIImageAspectRatio,
-): TransformConfig {
-  return {
-    ...transform,
-    nodes: transform.nodes.map((node) =>
-      node.id === nodeId && node.type === AI_IMAGE_NODE_TYPE
-        ? { ...node, config: { ...node.config, aspectRatio } }
-        : node,
-    ),
-  }
+): TransformNode[] {
+  return nodes.map((node) =>
+    node.id === nodeId && node.type === AI_IMAGE_NODE_TYPE
+      ? { ...node, config: { ...node.config, aspectRatio } }
+      : node,
+  )
 }
 
 /**
@@ -210,69 +181,61 @@ export const MAX_REF_MEDIA_COUNT = 10
  * Adds reference media to an AI Image node
  * Deduplicates by mediaAssetId and enforces max limit of 10
  *
- * @param transform - Current transform config
+ * @param nodes - Current transform nodes
  * @param nodeId - ID of the node to update
  * @param newRefs - New media references to add
- * @returns New transform config with added references
+ * @returns New transform nodes array with added references
  */
 export function addNodeRefMedia(
-  transform: TransformConfig,
+  nodes: TransformNode[],
   nodeId: string,
   newRefs: MediaReference[],
-): TransformConfig {
-  return {
-    ...transform,
-    nodes: transform.nodes.map((node) => {
-      if (node.id !== nodeId || node.type !== AI_IMAGE_NODE_TYPE) {
-        return node
-      }
+): TransformNode[] {
+  return nodes.map((node) => {
+    if (node.id !== nodeId || node.type !== AI_IMAGE_NODE_TYPE) {
+      return node
+    }
 
-      const existingIds = new Set(
-        node.config.refMedia.map((r) => r.mediaAssetId),
-      )
-      const uniqueNewRefs = newRefs.filter(
-        (r) => !existingIds.has(r.mediaAssetId),
-      )
-      const combined = [...node.config.refMedia, ...uniqueNewRefs]
+    const existingIds = new Set(node.config.refMedia.map((r) => r.mediaAssetId))
+    const uniqueNewRefs = newRefs.filter(
+      (r) => !existingIds.has(r.mediaAssetId),
+    )
+    const combined = [...node.config.refMedia, ...uniqueNewRefs]
 
-      return {
-        ...node,
-        config: {
-          ...node.config,
-          refMedia: combined.slice(0, MAX_REF_MEDIA_COUNT),
-        },
-      }
-    }),
-  }
+    return {
+      ...node,
+      config: {
+        ...node.config,
+        refMedia: combined.slice(0, MAX_REF_MEDIA_COUNT),
+      },
+    }
+  })
 }
 
 /**
  * Removes a reference media item from an AI Image node
  *
- * @param transform - Current transform config
+ * @param nodes - Current transform nodes
  * @param nodeId - ID of the node to update
  * @param mediaAssetId - ID of the media asset to remove
- * @returns New transform config with removed reference
+ * @returns New transform nodes array with removed reference
  */
 export function removeNodeRefMedia(
-  transform: TransformConfig,
+  nodes: TransformNode[],
   nodeId: string,
   mediaAssetId: string,
-): TransformConfig {
-  return {
-    ...transform,
-    nodes: transform.nodes.map((node) =>
-      node.id === nodeId && node.type === AI_IMAGE_NODE_TYPE
-        ? {
-            ...node,
-            config: {
-              ...node.config,
-              refMedia: node.config.refMedia.filter(
-                (r) => r.mediaAssetId !== mediaAssetId,
-              ),
-            },
-          }
-        : node,
-    ),
-  }
+): TransformNode[] {
+  return nodes.map((node) =>
+    node.id === nodeId && node.type === AI_IMAGE_NODE_TYPE
+      ? {
+          ...node,
+          config: {
+            ...node.config,
+            refMedia: node.config.refMedia.filter(
+              (r) => r.mediaAssetId !== mediaAssetId,
+            ),
+          },
+        }
+      : node,
+  )
 }

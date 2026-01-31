@@ -3,8 +3,7 @@ import { z } from 'zod'
 /**
  * Transform Pipeline Request/Response Schemas
  *
- * HTTP endpoint validation schemas for the transform pipeline.
- * See contracts/start-transform-pipeline.yaml for full API specification.
+ * Validation schemas for the transform pipeline callable function.
  */
 
 /**
@@ -30,36 +29,6 @@ export const startTransformPipelineResponseSchema = z.object({
 
 export type StartTransformPipelineResponse = z.infer<
   typeof startTransformPipelineResponseSchema
->
-
-/**
- * Error codes for startTransformPipeline endpoint
- */
-export const transformPipelineErrorCodeSchema = z.enum([
-  'INVALID_REQUEST',
-  'SESSION_NOT_FOUND',
-  'TRANSFORM_NOT_FOUND',
-  'JOB_IN_PROGRESS',
-  'INTERNAL_ERROR',
-])
-
-export type TransformPipelineErrorCode = z.infer<
-  typeof transformPipelineErrorCodeSchema
->
-
-/**
- * Error response schema for startTransformPipeline
- */
-export const transformPipelineErrorResponseSchema = z.object({
-  success: z.literal(false),
-  error: z.object({
-    code: transformPipelineErrorCodeSchema,
-    message: z.string(),
-  }),
-})
-
-export type TransformPipelineErrorResponse = z.infer<
-  typeof transformPipelineErrorResponseSchema
 >
 
 /**

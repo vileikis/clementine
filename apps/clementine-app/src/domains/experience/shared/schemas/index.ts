@@ -14,9 +14,7 @@ export {
   experienceProfileSchema,
   experienceMediaSchema,
   // Transform schemas
-  transformConfigSchema,
   transformNodeSchema,
-  outputFormatSchema,
   // Step schemas (discriminated union)
   experienceStepSchema,
   experienceStepTypeSchema,
@@ -45,9 +43,7 @@ export {
   type ExperienceStatus,
   type ExperienceProfile,
   type ExperienceMedia,
-  type TransformConfig,
   type TransformNode,
-  type OutputFormat,
   // Step types
   type ExperienceStep,
   type ExperienceStepType,

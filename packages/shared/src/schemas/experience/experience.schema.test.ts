@@ -74,7 +74,7 @@ describe('experienceConfigSchema', () => {
   it('applies defaults when parsing empty object', () => {
     const result = experienceConfigSchema.parse({})
     expect(result.steps).toEqual([])
-    expect(result.transform).toBeNull()
+    expect(result.transformNodes).toEqual([])
   })
 
   it('accepts steps array', () => {
@@ -97,25 +97,22 @@ describe('experienceConfigSchema', () => {
     expect(result.steps).toHaveLength(2)
   })
 
-  it('accepts transform config', () => {
+  it('accepts transformNodes array', () => {
     const result = experienceConfigSchema.parse({
-      transform: {
-        nodes: [
-          {
-            id: 'node-1',
-            type: 'ai.imageGeneration',
-            config: {
-              model: 'gemini-2.5-flash-image',
-              aspectRatio: '3:2',
-              prompt: 'A test prompt',
-              refMedia: [],
-            },
+      transformNodes: [
+        {
+          id: 'node-1',
+          type: 'ai.imageGeneration',
+          config: {
+            model: 'gemini-2.5-flash-image',
+            aspectRatio: '3:2',
+            prompt: 'A test prompt',
+            refMedia: [],
           },
-        ],
-      },
+        },
+      ],
     })
-    expect(result.transform).not.toBeNull()
-    expect(result.transform?.nodes).toHaveLength(1)
+    expect(result.transformNodes).toHaveLength(1)
   })
 
   it('preserves unknown fields (looseObject)', () => {
@@ -183,7 +180,7 @@ describe('experienceSchema', () => {
   describe('dual-state configuration', () => {
     it('draft is required, published is optional', () => {
       const result = experienceSchema.parse(validMinimalExperience)
-      expect(result.draft).toEqual({ steps: [], transform: null })
+      expect(result.draft).toEqual({ steps: [], transformNodes: [] })
       expect(result.published).toBeNull()
     })
 

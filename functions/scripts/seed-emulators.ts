@@ -37,7 +37,7 @@ import type {
   Project,
   Experience,
   Session,
-  TransformConfig,
+  TransformNode,
   ExperienceConfig,
   CapturedMedia,
   Answer,
@@ -96,35 +96,29 @@ const OVERLAY_FILES = ['square-overlay.png', 'story-overlay.png']
 const TOTAL_IMAGES = 12
 
 // ============================================================================
-// TRANSFORM CONFIG TEMPLATES
+// TRANSFORM NODE TEMPLATES
 // ============================================================================
 
 /**
- * Sample transform config for testing
+ * Sample transform nodes for testing
  */
-function createTransformConfig(): TransformConfig {
-  return {
-    nodes: [
-      {
-        id: 'node-1',
-        type: 'ai.imageGeneration',
-        config: {
-          prompt: 'Transform this image into a cartoon style',
-          model: 'gemini-2.5-flash-image',
-          aspectRatio: '1:1',
-          refMedia: [],
-        },
+function createTransformNodes(): TransformNode[] {
+  return [
+    {
+      id: 'node-1',
+      type: 'ai.imageGeneration',
+      config: {
+        prompt: 'Transform this image into a cartoon style',
+        model: 'gemini-2.5-flash-image',
+        aspectRatio: '1:1',
+        refMedia: [],
       },
-    ],
-    outputFormat: {
-      aspectRatio: '1:1',
-      quality: 85,
     },
-  }
+  ]
 }
 
 /**
- * Sample experience config with transform
+ * Sample experience config with transform nodes
  */
 function createExperienceConfigWithTransform(): ExperienceConfig {
   return {
@@ -138,12 +132,12 @@ function createExperienceConfigWithTransform(): ExperienceConfig {
         },
       },
     ],
-    transform: createTransformConfig(),
+    transformNodes: createTransformNodes(),
   }
 }
 
 /**
- * Experience config without transform
+ * Experience config without transform nodes
  */
 function createExperienceConfigWithoutTransform(): ExperienceConfig {
   return {
@@ -159,7 +153,7 @@ function createExperienceConfigWithoutTransform(): ExperienceConfig {
         },
       },
     ],
-    transform: null,
+    transformNodes: [],
   }
 }
 
