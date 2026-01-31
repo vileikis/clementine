@@ -22,6 +22,7 @@
  */
 import { useEffect, useRef } from 'react'
 import { useNavigate } from '@tanstack/react-router'
+import { toast } from 'sonner'
 
 import { useGuestContext } from '../contexts'
 import {
@@ -32,6 +33,8 @@ import {
 import { useMarkExperienceComplete, usePregate, usePreshare } from '../hooks'
 import { useInitSession, useLinkSession } from '@/domains/session/shared'
 import { ExperienceRuntime } from '@/domains/experience/runtime'
+import { useStartTransformPipeline } from '@/domains/experience/transform'
+import { hasTransformConfig } from '@/domains/experience/shared/utils/hasTransformConfig'
 import { ThemeProvider, ThemedBackground } from '@/shared/theming'
 import { DEFAULT_THEME } from '@/domains/project-config/theme/constants'
 
@@ -92,6 +95,7 @@ export function ExperiencePage({
   const { needsPreshare } = usePreshare(guest, experiencesConfig)
   const markExperienceComplete = useMarkExperienceComplete()
   const linkSession = useLinkSession()
+  const startTransformPipeline = useStartTransformPipeline()
 
   // Check pregate requirement BEFORE any other logic
   // This handles direct URL access to experience without completing pregate
@@ -216,12 +220,25 @@ export function ExperiencePage({
       })
     } catch (error) {
       console.error('Failed to mark experience complete:', error)
-      // Continue with navigation - guest shouldn't be stuck
+      // Continue - guest shouldn't be stuck
     }
 
-    // 2. Navigate to preshare or share
+    // 2. Trigger transform pipeline if configured (await to ensure job created)
+    if (experience && hasTransformConfig(experience, 'published')) {
+      const success = await startTransformPipeline({
+        projectId: project.id,
+        sessionId,
+      })
+      if (!success) {
+        toast.error('Failed to start processing', {
+          description: 'Please try again.',
+        })
+        return
+      }
+    }
+
+    // 3. Navigate to preshare or share
     if (needsPreshare()) {
-      // Navigate to preshare with main session ID (replace to hide main from history)
       void navigate({
         to: '/join/$projectId/preshare',
         params: { projectId: project.id },
@@ -229,7 +246,6 @@ export function ExperiencePage({
         replace: true,
       })
     } else {
-      // Navigate directly to share (replace to hide main from history)
       void navigate({
         to: '/join/$projectId/share',
         params: { projectId: project.id },

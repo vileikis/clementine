@@ -2,20 +2,21 @@
  * SharePage Container
  *
  * Displays AI generation progress and final results using ShareLoadingRenderer
- * and ShareReadyRenderer components. Uses mock data with simulated 3-second
- * loading transition.
+ * and ShareReadyRenderer components. Subscribes to session for real-time job
+ * status updates.
  *
  * User Stories: P1-P3 (Loading, Ready State, Interactive Buttons)
  */
-import { useEffect, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useGuestContext } from '../contexts'
 import { useShareActions } from '../hooks'
+import { ThemedErrorState } from '../components'
 import type { ShareOptionsConfig } from '@clementine/shared'
 import {
   ShareLoadingRenderer,
   ShareReadyRenderer,
 } from '@/domains/project-config/share/components'
+import { useSubscribeSession } from '@/domains/session/shared'
 import { ThemeProvider, ThemedBackground } from '@/shared/theming'
 import { DEFAULT_THEME } from '@/domains/project-config/theme/constants'
 import {
@@ -51,8 +52,8 @@ const MOCK_RESULT_IMAGE =
 /**
  * Share page with renderer integration
  *
- * Displays loading state for 3 seconds, then transitions to ready state
- * with mock result image and share options.
+ * Subscribes to session for real-time job status updates.
+ * Shows loading when job is pending/running, ready when completed or null (no transform).
  *
  * @example
  * ```tsx
@@ -63,16 +64,24 @@ const MOCK_RESULT_IMAGE =
  * }
  * ```
  */
-export function SharePage({ mainSessionId: _mainSessionId }: SharePageProps) {
+export function SharePage({ mainSessionId }: SharePageProps) {
   const { project } = useGuestContext()
   const navigate = useNavigate()
-  const [isReady, setIsReady] = useState(false)
 
-  // 3-second transition timer
-  useEffect(() => {
-    const timer = setTimeout(() => setIsReady(true), 3000)
-    return () => clearTimeout(timer)
-  }, [])
+  // Subscribe to session for real-time jobStatus updates
+  const { data: session, isLoading: isSessionLoading } = useSubscribeSession(
+    project.id,
+    mainSessionId,
+  )
+
+  // Derive UI state from job status
+  // null = no transform configured, should show ready immediately
+  const jobStatus = session?.jobStatus
+  const isSessionMissing = !isSessionLoading && !session
+  const isJobInProgress = jobStatus === 'pending' || jobStatus === 'running'
+  const isJobCompleted = jobStatus === 'completed' || jobStatus === null
+  const isJobFailed =
+    isSessionMissing || jobStatus === 'failed' || jobStatus === 'cancelled'
 
   // Get configurations from published config (guest sees published, not draft)
   const currentTheme = project.publishedConfig?.theme ?? DEFAULT_THEME
@@ -96,6 +105,22 @@ export function SharePage({ mainSessionId: _mainSessionId }: SharePageProps) {
     }
   }
 
+  // Show loading while session is being fetched
+  if (isSessionLoading) {
+    return (
+      <ThemeProvider theme={currentTheme}>
+        <div className="h-screen">
+          <ThemedBackground
+            className="h-full w-full"
+            contentClassName="h-full w-full"
+          >
+            <ShareLoadingRenderer shareLoading={shareLoading} mode="run" />
+          </ThemedBackground>
+        </div>
+      </ThemeProvider>
+    )
+  }
+
   return (
     <ThemeProvider theme={currentTheme}>
       <div className="h-screen">
@@ -103,7 +128,10 @@ export function SharePage({ mainSessionId: _mainSessionId }: SharePageProps) {
           className="h-full w-full"
           contentClassName="h-full w-full"
         >
-          {isReady ? (
+          {isJobInProgress && (
+            <ShareLoadingRenderer shareLoading={shareLoading} mode="run" />
+          )}
+          {isJobCompleted && (
             <ShareReadyRenderer
               share={shareReady}
               shareOptions={shareOptions}
@@ -113,8 +141,22 @@ export function SharePage({ mainSessionId: _mainSessionId }: SharePageProps) {
               onCta={handleCta}
               onStartOver={handleStartOver}
             />
-          ) : (
-            <ShareLoadingRenderer shareLoading={shareLoading} mode="run" />
+          )}
+          {isSessionMissing && (
+            <ThemedErrorState
+              title="Session not found"
+              message="We couldn't find your session. Please try again."
+              actionLabel="Start Over"
+              onAction={handleStartOver}
+            />
+          )}
+          {!isSessionMissing && isJobFailed && (
+            <ThemedErrorState
+              title="Something went wrong"
+              message="We couldn't process your image. Please try again."
+              actionLabel="Start Over"
+              onAction={handleStartOver}
+            />
           )}
         </ThemedBackground>
       </div>

@@ -8,11 +8,11 @@ import { z } from 'zod'
  */
 
 /**
- * Request schema for startTransformPipeline HTTP endpoint
+ * Request schema for startTransformPipeline callable function
  */
 export const startTransformPipelineRequestSchema = z.object({
+  projectId: z.string().min(1, 'projectId is required'),
   sessionId: z.string().min(1, 'sessionId is required'),
-  stepId: z.string().min(1, 'stepId is required'),
 })
 
 export type StartTransformPipelineRequest = z.infer<
