@@ -6,40 +6,20 @@
  * Uses tracked mutation for save status tracking.
  */
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import {
-  doc,
-  increment,
-  runTransaction,
-  serverTimestamp,
-} from 'firebase/firestore'
 import * as Sentry from '@sentry/tanstackstart-react'
 
 import { experienceKeys } from '../../shared/queries/experience.query'
+import { updateExperienceConfigField } from '../../shared/lib'
 import { useGenerateEditorStore } from '../stores/useGenerateEditorStore'
 import type { TransformConfig } from '@clementine/shared'
-import { firestore } from '@/integrations/firebase/client'
 import { useTrackedMutation } from '@/shared/editor-status/hooks/useTrackedMutation'
 
 /**
  * Input for updating transform configuration
  */
 export interface UpdateTransformConfigInput {
-  /** Workspace containing the experience */
-  workspaceId: string
-  /** Experience document ID */
-  experienceId: string
   /** Updated transform configuration */
   transform: TransformConfig
-}
-
-/**
- * Result returned on successful transform update
- */
-export interface UpdateTransformConfigResult {
-  /** Updated experience document ID */
-  experienceId: string
-  /** Workspace ID for cache invalidation */
-  workspaceId: string
 }
 
 /**
@@ -51,61 +31,36 @@ export interface UpdateTransformConfigResult {
  * - Invalidates experience detail cache on success
  * - Captures errors to Sentry with domain tags
  *
+ * @param workspaceId - Workspace containing the experience
+ * @param experienceId - Experience document ID
  * @returns TanStack Mutation result
  *
  * @example
  * ```tsx
- * function TransformPipelineEditor({ experience }) {
- *   const updateTransformConfig = useUpdateTransformConfig()
+ * function TransformPipelineEditor({ experience, workspaceId }) {
+ *   const updateTransform = useUpdateTransformConfig(workspaceId, experience.id)
  *
- *   const handleAddNode = async (newNode) => {
- *     const updatedTransform = {
- *       ...experience.draft.transform,
- *       nodes: [...experience.draft.transform.nodes, newNode],
- *     }
- *
- *     await updateTransformConfig.mutateAsync({
- *       workspaceId: experience.workspaceId,
- *       experienceId: experience.id,
- *       transform: updatedTransform,
- *     })
+ *   const handleAddNode = () => {
+ *     const newTransform = addNode(experience.draft.transform)
+ *     updateTransform.mutate({ transform: newTransform })
  *   }
  * }
  * ```
  */
-export function useUpdateTransformConfig() {
+export function useUpdateTransformConfig(
+  workspaceId: string,
+  experienceId: string,
+) {
   const queryClient = useQueryClient()
   const store = useGenerateEditorStore()
 
-  const baseMutation = useMutation<
-    UpdateTransformConfigResult,
-    Error,
-    UpdateTransformConfigInput
-  >({
-    mutationFn: async (input) => {
-      const { workspaceId, experienceId, transform } = input
-
-      const experienceRef = doc(
-        firestore,
-        `workspaces/${workspaceId}/experiences/${experienceId}`,
-      )
-
-      // Update draft.transform with atomic version increment in transaction
-      await runTransaction(firestore, (transaction) => {
-        transaction.update(experienceRef, {
-          'draft.transform': transform,
-          draftVersion: increment(1),
-          updatedAt: serverTimestamp(),
-        })
-        return Promise.resolve()
+  const mutation = useMutation<void, Error, UpdateTransformConfigInput>({
+    mutationFn: async ({ transform }) => {
+      await updateExperienceConfigField(workspaceId, experienceId, {
+        transform,
       })
-
-      return {
-        experienceId,
-        workspaceId,
-      }
     },
-    onSuccess: ({ workspaceId, experienceId }) => {
+    onSuccess: () => {
       // Invalidate detail query to refresh cache
       queryClient.invalidateQueries({
         queryKey: experienceKeys.detail(workspaceId, experienceId),
@@ -122,5 +77,5 @@ export function useUpdateTransformConfig() {
   })
 
   // Wrap with tracked mutation for save status tracking
-  return useTrackedMutation(baseMutation, store)
+  return useTrackedMutation(mutation, store)
 }

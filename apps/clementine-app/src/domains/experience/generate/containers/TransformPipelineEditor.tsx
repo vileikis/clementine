@@ -21,12 +21,8 @@ import {
 import { Plus } from 'lucide-react'
 
 import { DeleteNodeDialog, EmptyState, NodeListItem } from '../components'
-import {
-  useAddNode,
-  useDeleteNode,
-  useDuplicateNode,
-  useReorderNodes,
-} from '../hooks'
+import { useUpdateTransformConfig } from '../hooks'
+import { addNode, duplicateNode, removeNode, reorderNodes } from '../lib'
 import { useGenerateEditorStore } from '../stores/useGenerateEditorStore'
 import type { DragEndEvent } from '@dnd-kit/core'
 import type { Experience } from '../../shared/schemas'
@@ -58,17 +54,15 @@ export function TransformPipelineEditor({
   experience,
   workspaceId,
 }: TransformPipelineEditorProps) {
-  const addNode = useAddNode()
-  const deleteNode = useDeleteNode()
-  const duplicateNode = useDuplicateNode()
-  const reorderNodes = useReorderNodes()
+  const updateTransform = useUpdateTransformConfig(workspaceId, experience.id)
   const store = useGenerateEditorStore()
 
   // Delete dialog state
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [nodeToDelete, setNodeToDelete] = useState<string | null>(null)
 
-  const nodes = experience.draft.transform?.nodes ?? []
+  const transform = experience.draft.transform
+  const nodes = transform?.nodes ?? []
   const hasNodes = nodes.length > 0
 
   // Configure sensors for drag and drop
@@ -83,12 +77,12 @@ export function TransformPipelineEditor({
     }),
   )
 
-  const handleAddNode = async () => {
-    await addNode.mutateAsync({ experience, workspaceId })
+  const handleAddNode = () => {
+    updateTransform.mutate({ transform: addNode(transform) })
   }
 
-  const handleDuplicateNode = async (nodeId: string) => {
-    await duplicateNode.mutateAsync({ experience, workspaceId, nodeId })
+  const handleDuplicateNode = (nodeId: string) => {
+    updateTransform.mutate({ transform: duplicateNode(transform, nodeId) })
   }
 
   const handleDeleteClick = (nodeId: string) => {
@@ -96,15 +90,10 @@ export function TransformPipelineEditor({
     setDeleteDialogOpen(true)
   }
 
-  const handleDeleteConfirm = async () => {
+  const handleDeleteConfirm = () => {
     if (!nodeToDelete) return
 
-    await deleteNode.mutateAsync({
-      experience,
-      workspaceId,
-      nodeId: nodeToDelete,
-    })
-
+    updateTransform.mutate({ transform: removeNode(transform, nodeToDelete) })
     setDeleteDialogOpen(false)
     setNodeToDelete(null)
   }
@@ -121,7 +110,7 @@ export function TransformPipelineEditor({
         const newNodes = [...nodes]
         const [movedNode] = newNodes.splice(oldIndex, 1)
         newNodes.splice(newIndex, 0, movedNode)
-        reorderNodes.mutate({ experience, workspaceId, nodes: newNodes })
+        updateTransform.mutate({ transform: reorderNodes(transform, newNodes) })
       }
     }
   }
@@ -145,7 +134,7 @@ export function TransformPipelineEditor({
           {hasNodes && (
             <Button
               onClick={handleAddNode}
-              disabled={addNode.isPending}
+              disabled={updateTransform.isPending}
               className="min-h-[44px]"
             >
               <Plus className="mr-2 h-4 w-4" />
@@ -182,7 +171,7 @@ export function TransformPipelineEditor({
           ) : (
             <EmptyState
               onAddNode={handleAddNode}
-              isPending={addNode.isPending}
+              isPending={updateTransform.isPending}
             />
           )}
 
@@ -192,7 +181,7 @@ export function TransformPipelineEditor({
               <Button
                 variant="outline"
                 onClick={handleAddNode}
-                disabled={addNode.isPending}
+                disabled={updateTransform.isPending}
                 className="min-h-[44px]"
               >
                 <Plus className="mr-2 h-4 w-4" />
@@ -208,7 +197,7 @@ export function TransformPipelineEditor({
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
         onConfirm={handleDeleteConfirm}
-        isPending={deleteNode.isPending}
+        isPending={updateTransform.isPending}
       />
     </div>
   )
