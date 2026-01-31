@@ -7,7 +7,7 @@
 import { useState } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { ChevronDown, Copy, GripVertical, Trash2 } from 'lucide-react'
+import { ChevronDown, Copy, Trash2 } from 'lucide-react'
 
 import type { AIImageNodeConfig, TransformNode } from '@clementine/shared'
 import { cn } from '@/shared/utils'
@@ -90,11 +90,7 @@ export function NodeListItem({
             : 'bg-primary/10 text-primary',
         )}
       >
-        {isHovered ? (
-          <GripVertical className="h-4 w-4" />
-        ) : (
-          <span>{index}</span>
-        )}
+        <span>{index}</span>
       </div>
 
       {/* Collapsible card */}
