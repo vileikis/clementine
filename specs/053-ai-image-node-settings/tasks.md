@@ -23,9 +23,9 @@ All paths relative to `apps/clementine-app/src/`
 
 **Purpose**: Create component directory structure and barrel exports
 
-- [ ] T001 Create PromptComposer directory at `domains/experience/generate/components/PromptComposer/`
-- [ ] T002 Create barrel export in `domains/experience/generate/components/PromptComposer/index.ts`
-- [ ] T003 Update barrel export in `domains/experience/generate/components/index.ts` to re-export PromptComposer
+- [x] T001 Create PromptComposer directory at `domains/experience/generate/components/PromptComposer/`
+- [x] T002 Create barrel export in `domains/experience/generate/components/PromptComposer/index.ts`
+- [x] T003 Update barrel export in `domains/experience/generate/components/index.ts` to re-export PromptComposer
 
 ---
 
@@ -35,12 +35,12 @@ All paths relative to `apps/clementine-app/src/`
 
 **⚠️ CRITICAL**: US3 and US4 depend on these refMedia operations
 
-- [ ] T004 Add `updateNodePrompt` function to `domains/experience/generate/lib/transform-operations.ts`
-- [ ] T005 [P] Add `updateNodeModel` function to `domains/experience/generate/lib/transform-operations.ts`
-- [ ] T006 [P] Add `updateNodeAspectRatio` function to `domains/experience/generate/lib/transform-operations.ts`
-- [ ] T007 Add `addNodeRefMedia` function (with dedupe and max 10 limit) to `domains/experience/generate/lib/transform-operations.ts`
-- [ ] T008 [P] Add `removeNodeRefMedia` function to `domains/experience/generate/lib/transform-operations.ts`
-- [ ] T009 Export all new functions from `domains/experience/generate/lib/index.ts`
+- [x] T004 Add `updateNodePrompt` function to `domains/experience/generate/lib/transform-operations.ts`
+- [x] T005 [P] Add `updateNodeModel` function to `domains/experience/generate/lib/transform-operations.ts`
+- [x] T006 [P] Add `updateNodeAspectRatio` function to `domains/experience/generate/lib/transform-operations.ts`
+- [x] T007 Add `addNodeRefMedia` function (with dedupe and max 10 limit) to `domains/experience/generate/lib/transform-operations.ts`
+- [x] T008 [P] Add `removeNodeRefMedia` function to `domains/experience/generate/lib/transform-operations.ts`
+- [x] T009 Export all new functions from `domains/experience/generate/lib/index.ts`
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
@@ -54,12 +54,12 @@ All paths relative to `apps/clementine-app/src/`
 
 ### Implementation for User Story 1
 
-- [ ] T010 [US1] Create `PromptInput.tsx` component with multiline textarea in `domains/experience/generate/components/PromptComposer/PromptInput.tsx`
-- [ ] T011 [US1] Add prompt validation display ("Prompt is required") to PromptInput when empty
-- [ ] T012 [US1] Create skeleton `PromptComposer.tsx` container with bordered layout in `domains/experience/generate/components/PromptComposer/PromptComposer.tsx`
-- [ ] T013 [US1] Wire PromptInput into PromptComposer with debounced (300ms) onChange handler
-- [ ] T014 [US1] Connect PromptComposer to `useUpdateTransformConfig` hook for prompt mutations
-- [ ] T015 [US1] Export PromptInput from barrel in `domains/experience/generate/components/PromptComposer/index.ts`
+- [x] T010 [US1] Create `PromptInput.tsx` component with multiline textarea in `domains/experience/generate/components/PromptComposer/PromptInput.tsx`
+- [x] T011 [US1] Add prompt validation display ("Prompt is required") to PromptInput when empty
+- [x] T012 [US1] Create skeleton `PromptComposer.tsx` container with bordered layout in `domains/experience/generate/components/PromptComposer/PromptComposer.tsx`
+- [x] T013 [US1] Wire PromptInput into PromptComposer with debounced (300ms) onChange handler
+- [x] T014 [US1] Connect PromptComposer to `useUpdateTransformConfig` hook for prompt mutations
+- [x] T015 [US1] Export PromptInput from barrel in `domains/experience/generate/components/PromptComposer/index.ts`
 
 **Checkpoint**: Prompt editing works independently - admin can write and save prompts
 
@@ -73,13 +73,13 @@ All paths relative to `apps/clementine-app/src/`
 
 ### Implementation for User Story 2
 
-- [ ] T016 [P] [US2] Create `ControlRow.tsx` skeleton with flex layout in `domains/experience/generate/components/PromptComposer/ControlRow.tsx`
-- [ ] T017 [US2] Add unlabeled model Select dropdown to ControlRow using shadcn/ui Select component
-- [ ] T018 [US2] Add unlabeled aspect ratio Select dropdown to ControlRow using shadcn/ui Select component
-- [ ] T019 [US2] Connect model select onChange to `updateNodeModel` transform operation
-- [ ] T020 [US2] Connect aspect ratio select onChange to `updateNodeAspectRatio` transform operation
-- [ ] T021 [US2] Wire ControlRow into PromptComposer at bottom of container
-- [ ] T022 [US2] Export ControlRow from barrel in `domains/experience/generate/components/PromptComposer/index.ts`
+- [x] T016 [P] [US2] Create `ControlRow.tsx` skeleton with flex layout in `domains/experience/generate/components/PromptComposer/ControlRow.tsx`
+- [x] T017 [US2] Add unlabeled model Select dropdown to ControlRow using shadcn/ui Select component
+- [x] T018 [US2] Add unlabeled aspect ratio Select dropdown to ControlRow using shadcn/ui Select component
+- [x] T019 [US2] Connect model select onChange to `updateNodeModel` transform operation
+- [x] T020 [US2] Connect aspect ratio select onChange to `updateNodeAspectRatio` transform operation
+- [x] T021 [US2] Wire ControlRow into PromptComposer at bottom of container
+- [x] T022 [US2] Export ControlRow from barrel in `domains/experience/generate/components/PromptComposer/index.ts`
 
 **Checkpoint**: Model and aspect ratio selectors work - admin can configure output settings
 
@@ -134,8 +134,8 @@ All paths relative to `apps/clementine-app/src/`
 
 **Purpose**: Final wiring into existing components and validation
 
-- [ ] T042 Update `AIImageNodeSettings` in `domains/experience/generate/components/NodeListItem/AIImageNode.tsx` to use PromptComposer
-- [ ] T043 Remove placeholder sections (Model Settings, Prompt, Reference Media) from AIImageNodeSettings
+- [x] T042 Update `AIImageNodeSettings` in `domains/experience/generate/components/NodeListItem/AIImageNode.tsx` to use PromptComposer
+- [x] T043 Remove placeholder sections (Model Settings, Prompt, Reference Media) from AIImageNodeSettings
 - [ ] T044 Add ARIA labels to unlabeled model and aspect ratio selects for accessibility
 - [ ] T045 Verify 44px minimum touch targets on all interactive elements
 - [ ] T046 Run `pnpm app:check` to validate linting, formatting, and types

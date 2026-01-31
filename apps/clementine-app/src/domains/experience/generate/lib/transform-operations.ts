@@ -8,7 +8,10 @@ import { nanoid } from 'nanoid'
 
 import { AI_IMAGE_NODE_TYPE } from '@clementine/shared'
 import type {
+  AIImageAspectRatio,
+  AIImageModel,
   AIImageNode,
+  MediaReference,
   TransformConfig,
   TransformNode,
 } from '@clementine/shared'
@@ -126,5 +129,150 @@ export function reorderNodes(
   return {
     ...current,
     nodes: newNodes,
+  }
+}
+
+/**
+ * Updates the prompt for an AI Image node
+ *
+ * @param transform - Current transform config
+ * @param nodeId - ID of the node to update
+ * @param prompt - New prompt text
+ * @returns New transform config with updated prompt
+ */
+export function updateNodePrompt(
+  transform: TransformConfig,
+  nodeId: string,
+  prompt: string,
+): TransformConfig {
+  return {
+    ...transform,
+    nodes: transform.nodes.map((node) =>
+      node.id === nodeId && node.type === AI_IMAGE_NODE_TYPE
+        ? { ...node, config: { ...node.config, prompt } }
+        : node,
+    ),
+  }
+}
+
+/**
+ * Updates the model for an AI Image node
+ *
+ * @param transform - Current transform config
+ * @param nodeId - ID of the node to update
+ * @param model - New model selection
+ * @returns New transform config with updated model
+ */
+export function updateNodeModel(
+  transform: TransformConfig,
+  nodeId: string,
+  model: AIImageModel,
+): TransformConfig {
+  return {
+    ...transform,
+    nodes: transform.nodes.map((node) =>
+      node.id === nodeId && node.type === AI_IMAGE_NODE_TYPE
+        ? { ...node, config: { ...node.config, model } }
+        : node,
+    ),
+  }
+}
+
+/**
+ * Updates the aspect ratio for an AI Image node
+ *
+ * @param transform - Current transform config
+ * @param nodeId - ID of the node to update
+ * @param aspectRatio - New aspect ratio selection
+ * @returns New transform config with updated aspect ratio
+ */
+export function updateNodeAspectRatio(
+  transform: TransformConfig,
+  nodeId: string,
+  aspectRatio: AIImageAspectRatio,
+): TransformConfig {
+  return {
+    ...transform,
+    nodes: transform.nodes.map((node) =>
+      node.id === nodeId && node.type === AI_IMAGE_NODE_TYPE
+        ? { ...node, config: { ...node.config, aspectRatio } }
+        : node,
+    ),
+  }
+}
+
+/**
+ * Maximum number of reference media items allowed per node
+ */
+export const MAX_REF_MEDIA_COUNT = 10
+
+/**
+ * Adds reference media to an AI Image node
+ * Deduplicates by mediaAssetId and enforces max limit of 10
+ *
+ * @param transform - Current transform config
+ * @param nodeId - ID of the node to update
+ * @param newRefs - New media references to add
+ * @returns New transform config with added references
+ */
+export function addNodeRefMedia(
+  transform: TransformConfig,
+  nodeId: string,
+  newRefs: MediaReference[],
+): TransformConfig {
+  return {
+    ...transform,
+    nodes: transform.nodes.map((node) => {
+      if (node.id !== nodeId || node.type !== AI_IMAGE_NODE_TYPE) {
+        return node
+      }
+
+      const existingIds = new Set(
+        node.config.refMedia.map((r) => r.mediaAssetId),
+      )
+      const uniqueNewRefs = newRefs.filter(
+        (r) => !existingIds.has(r.mediaAssetId),
+      )
+      const combined = [...node.config.refMedia, ...uniqueNewRefs]
+
+      return {
+        ...node,
+        config: {
+          ...node.config,
+          refMedia: combined.slice(0, MAX_REF_MEDIA_COUNT),
+        },
+      }
+    }),
+  }
+}
+
+/**
+ * Removes a reference media item from an AI Image node
+ *
+ * @param transform - Current transform config
+ * @param nodeId - ID of the node to update
+ * @param mediaAssetId - ID of the media asset to remove
+ * @returns New transform config with removed reference
+ */
+export function removeNodeRefMedia(
+  transform: TransformConfig,
+  nodeId: string,
+  mediaAssetId: string,
+): TransformConfig {
+  return {
+    ...transform,
+    nodes: transform.nodes.map((node) =>
+      node.id === nodeId && node.type === AI_IMAGE_NODE_TYPE
+        ? {
+            ...node,
+            config: {
+              ...node.config,
+              refMedia: node.config.refMedia.filter(
+                (r) => r.mediaAssetId !== mediaAssetId,
+              ),
+            },
+          }
+        : node,
+    ),
   }
 }

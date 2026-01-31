@@ -8,11 +8,19 @@ import { AI_IMAGE_NODE_TYPE } from '@clementine/shared'
 
 import { AIImageNodeSettings } from './AIImageNode'
 import { UnknownNodeSettings } from './UnknownNode'
-import type { AIImageNode, TransformNode } from '@clementine/shared'
+import type {
+  AIImageNode,
+  TransformConfig,
+  TransformNode,
+} from '@clementine/shared'
 
 export interface NodeSettingsProps {
   /** Transform node data */
   node: TransformNode
+  /** Current transform configuration */
+  transform: TransformConfig
+  /** Callback to update transform configuration */
+  onUpdate: (transform: TransformConfig) => void
 }
 
 /**
@@ -21,10 +29,16 @@ export interface NodeSettingsProps {
  * Routes to the appropriate settings component based on node type.
  * Add new node types to the switch as they are implemented.
  */
-export function NodeSettings({ node }: NodeSettingsProps) {
+export function NodeSettings({ node, transform, onUpdate }: NodeSettingsProps) {
   switch (node.type) {
     case AI_IMAGE_NODE_TYPE:
-      return <AIImageNodeSettings node={node as AIImageNode} />
+      return (
+        <AIImageNodeSettings
+          node={node as AIImageNode}
+          transform={transform}
+          onUpdate={onUpdate}
+        />
+      )
 
     // Add future node types here:
     // case FILTER_NODE_TYPE:
