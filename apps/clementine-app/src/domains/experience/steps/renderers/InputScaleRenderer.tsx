@@ -28,15 +28,14 @@ export function InputScaleRenderer({
   const config = step.config as ExperienceInputScaleStepConfig
   const { title, min, max, minLabel, maxLabel } = config
 
-  // Generate scale values
-  const scaleValues = Array.from({ length: max - min + 1 }, (_, i) => min + i)
-
-  // Current selected value
-  const selectedValue = typeof answer === 'number' ? answer : undefined
+  // Generate scale values as strings
+  const scaleValues = Array.from({ length: max - min + 1 }, (_, i) =>
+    String(min + i),
+  )
 
   // Handle scale button click
   const handleSelect = useCallback(
-    (value: number) => {
+    (value: string) => {
       if (mode === 'run' && onAnswer) {
         onAnswer(value)
       }
@@ -66,8 +65,8 @@ export function InputScaleRenderer({
             {scaleValues.map((value) => (
               <ThemedScaleButton
                 key={value}
-                value={value}
-                selected={selectedValue === value}
+                value={Number(value)}
+                selected={answer === value}
                 onClick={() => handleSelect(value)}
                 disabled={mode === 'edit'}
               />

@@ -37,11 +37,28 @@ export const sessionStatusSchema = z.enum([
 ])
 
 /**
+ * Answer value schema
+ * Defines valid answer value types (simplified from 4 types to 2)
+ * - string: text inputs, yes/no ("yes"/"no"), scale ("1"-"5")
+ * - string[]: multi-select inputs
+ */
+export const answerValueSchema = z.union([
+  z.string(),          // Text, yes/no, scale
+  z.array(z.string()), // Multi-select
+])
+
+/**
+ * Answer value type inferred from schema
+ * Single source of truth for answer value types
+ */
+export type AnswerValue = z.infer<typeof answerValueSchema>
+
+/**
  * Answer schema
  * Represents a collected answer from an input step with optional AI context
  *
  * Design:
- * - `value`: Primitive answer for analytics (string, number, boolean, string[])
+ * - `value`: Primitive answer for analytics (string | string[])
  * - `context`: Optional step-specific structured data for AI generation
  *
  * Example (multi-select):
@@ -55,17 +72,10 @@ export const answerSchema = z.object({
   stepType: z.string(),
   /**
    * The answer value - primitive types for analytics:
-   * - string: short text, long text
-   * - number: scale
-   * - boolean: yes/no
+   * - string: short text, long text, yes/no ("yes"/"no"), scale ("1"-"5")
    * - string[]: multi-select (array of selected option values)
    */
-  value: z.union([
-    z.string(),
-    z.number(),
-    z.boolean(),
-    z.array(z.string()),
-  ]),
+  value: answerValueSchema,
   /**
    * Optional step-specific context for AI generation
    * - Multi-select: MultiSelectOption[] (full option objects with promptFragment/promptMedia)

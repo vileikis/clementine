@@ -36,6 +36,7 @@ import {
   createDefaultInputYesNoConfig,
 } from '../defaults'
 import type {
+  AnswerValue,
   ExperienceStep,
   ExperienceStepCategory,
   ExperienceStepConfig,
@@ -51,13 +52,8 @@ export type {
   ExperienceStepCategory as StepCategory,
   ExperienceStepConfig as StepConfig,
   ExperienceStepType as StepType,
+  AnswerValue,
 }
-
-/**
- * Answer value type for step inputs
- * Primitive types for analytics-friendly storage
- */
-export type AnswerValue = string | number | boolean | string[]
 
 /**
  * Props for step renderers (edit-mode preview and guest-mode run)

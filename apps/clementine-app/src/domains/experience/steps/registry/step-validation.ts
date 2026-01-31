@@ -4,7 +4,14 @@
  * Centralized validation logic for step inputs in run mode.
  * Each step type defines its own validation rules based on config.
  */
-import type { ExperienceStep, MultiSelectOption } from '@clementine/shared'
+import type {
+  ExperienceInputLongTextStepConfig,
+  ExperienceInputMultiSelectStepConfig,
+  ExperienceInputScaleStepConfig,
+  ExperienceInputShortTextStepConfig,
+  ExperienceInputYesNoStepConfig,
+  ExperienceStep,
+} from '@clementine/shared'
 
 /**
  * Validation result for a step input
@@ -15,11 +22,6 @@ export interface StepValidationResult {
   /** Error message if invalid */
   error?: string
 }
-
-/**
- * Config type for runtime validation (loose type from ExperienceStep)
- */
-type StepConfig = Record<string, unknown>
 
 /**
  * Validate step input based on step type and configuration
@@ -46,7 +48,7 @@ export function validateStepInput(
   step: ExperienceStep,
   input: unknown,
 ): StepValidationResult {
-  const config = step.config as StepConfig
+  const config = step.config as Record<string, unknown>
   const isRequired = config.required === true
 
   switch (step.type) {
@@ -55,17 +57,35 @@ export function validateStepInput(
       return { isValid: true }
 
     case 'input.scale':
-      return validateScaleInput(config, input, isRequired)
+      return validateScaleInput(
+        config as ExperienceInputScaleStepConfig,
+        input,
+        isRequired,
+      )
 
     case 'input.yesNo':
-      return validateYesNoInput(input, isRequired)
+      return validateYesNoInput(
+        config as ExperienceInputYesNoStepConfig,
+        input,
+        isRequired,
+      )
 
     case 'input.multiSelect':
-      return validateMultiSelectInput(config, input, isRequired)
+      return validateMultiSelectInput(
+        config as ExperienceInputMultiSelectStepConfig,
+        input,
+        isRequired,
+      )
 
     case 'input.shortText':
     case 'input.longText':
-      return validateTextInput(config, input, isRequired)
+      return validateTextInput(
+        config as
+          | ExperienceInputShortTextStepConfig
+          | ExperienceInputLongTextStepConfig,
+        input,
+        isRequired,
+      )
 
     case 'capture.photo':
       // Capture steps: validation handled by the renderer
@@ -83,7 +103,7 @@ export function validateStepInput(
  * Validate input.scale step input
  */
 function validateScaleInput(
-  config: StepConfig,
+  config: ExperienceInputScaleStepConfig,
   input: unknown,
   isRequired: boolean,
 ): StepValidationResult {
@@ -94,20 +114,28 @@ function validateScaleInput(
       : { isValid: true }
   }
 
-  // Must be a number
-  if (typeof input !== 'number') {
+  // Must be a string
+  if (typeof input !== 'string') {
+    return { isValid: false, error: 'Invalid selection' }
+  }
+
+  // Parse string to number for validation
+  const numValue = Number(input)
+
+  // Must be a valid number
+  if (isNaN(numValue)) {
     return { isValid: false, error: 'Invalid selection' }
   }
 
   // Must be within range
-  const min = (config.min as number) ?? 1
-  const max = (config.max as number) ?? 5
-  if (input < min || input > max) {
+  const min = config.min ?? 1
+  const max = config.max ?? 5
+  if (numValue < min || numValue > max) {
     return { isValid: false, error: `Value must be between ${min} and ${max}` }
   }
 
   // Must be an integer
-  if (!Number.isInteger(input)) {
+  if (!Number.isInteger(numValue)) {
     return { isValid: false, error: 'Please select a whole number' }
   }
 
@@ -118,6 +146,7 @@ function validateScaleInput(
  * Validate input.yesNo step input
  */
 function validateYesNoInput(
+  _config: ExperienceInputYesNoStepConfig,
   input: unknown,
   isRequired: boolean,
 ): StepValidationResult {
@@ -128,8 +157,8 @@ function validateYesNoInput(
       : { isValid: true }
   }
 
-  // Must be a boolean
-  if (typeof input !== 'boolean') {
+  // Must be a string with value "yes" or "no"
+  if (typeof input !== 'string' || (input !== 'yes' && input !== 'no')) {
     return { isValid: false, error: 'Invalid selection' }
   }
 
@@ -140,7 +169,7 @@ function validateYesNoInput(
  * Validate input.multiSelect step input
  */
 function validateMultiSelectInput(
-  config: StepConfig,
+  config: ExperienceInputMultiSelectStepConfig,
   input: unknown,
   isRequired: boolean,
 ): StepValidationResult {
@@ -162,7 +191,7 @@ function validateMultiSelectInput(
 
   // All values must be valid option values
   // Options are objects with { value, promptFragment, promptMedia }
-  const optionsArray = (config.options as MultiSelectOption[]) ?? []
+  const optionsArray = config.options ?? []
   const validValues = optionsArray.map((opt) => opt.value)
 
   // Input validation now only checks string[] (primitive values)
@@ -192,7 +221,9 @@ function validateMultiSelectInput(
  * Validate input.shortText and input.longText step inputs
  */
 function validateTextInput(
-  config: StepConfig,
+  config:
+    | ExperienceInputShortTextStepConfig
+    | ExperienceInputLongTextStepConfig,
   input: unknown,
   isRequired: boolean,
 ): StepValidationResult {
@@ -214,7 +245,7 @@ function validateTextInput(
   }
 
   // Check max length
-  const maxLength = (config.maxLength as number) ?? 1000
+  const maxLength = config.maxLength ?? 1000
   if (input.length > maxLength) {
     return {
       isValid: false,

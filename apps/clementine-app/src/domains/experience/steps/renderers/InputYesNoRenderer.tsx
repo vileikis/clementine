@@ -28,12 +28,9 @@ export function InputYesNoRenderer({
   const config = step.config as ExperienceInputYesNoStepConfig
   const { title } = config
 
-  // Current selected value
-  const selectedValue = typeof answer === 'boolean' ? answer : undefined
-
   // Handle button click
   const handleSelect = useCallback(
-    (value: boolean) => {
+    (value: 'yes' | 'no') => {
       if (mode === 'run' && onAnswer) {
         onAnswer(value)
       }
@@ -60,19 +57,19 @@ export function InputYesNoRenderer({
         {/* Yes/No buttons */}
         <div className="flex gap-4">
           <ThemedButton
-            variant={selectedValue === true ? 'primary' : 'outline'}
+            variant={answer === 'yes' ? 'primary' : 'outline'}
             size="lg"
             className="min-w-24"
-            onClick={() => handleSelect(true)}
+            onClick={() => handleSelect('yes')}
             disabled={mode === 'edit'}
           >
             Yes
           </ThemedButton>
           <ThemedButton
-            variant={selectedValue === false ? 'primary' : 'outline'}
+            variant={answer === 'no' ? 'primary' : 'outline'}
             size="lg"
             className="min-w-24"
-            onClick={() => handleSelect(false)}
+            onClick={() => handleSelect('no')}
             disabled={mode === 'edit'}
           >
             No
