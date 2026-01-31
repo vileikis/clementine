@@ -77,9 +77,11 @@ export function SharePage({ mainSessionId }: SharePageProps) {
   // Derive UI state from job status
   // null = no transform configured, should show ready immediately
   const jobStatus = session?.jobStatus
+  const isSessionMissing = !isSessionLoading && !session
   const isJobInProgress = jobStatus === 'pending' || jobStatus === 'running'
   const isJobCompleted = jobStatus === 'completed' || jobStatus === null
-  const isJobFailed = jobStatus === 'failed' || jobStatus === 'cancelled'
+  const isJobFailed =
+    isSessionMissing || jobStatus === 'failed' || jobStatus === 'cancelled'
 
   // Get configurations from published config (guest sees published, not draft)
   const currentTheme = project.publishedConfig?.theme ?? DEFAULT_THEME
@@ -140,7 +142,15 @@ export function SharePage({ mainSessionId }: SharePageProps) {
               onStartOver={handleStartOver}
             />
           )}
-          {isJobFailed && (
+          {isSessionMissing && (
+            <ThemedErrorState
+              title="Session not found"
+              message="We couldn't find your session. Please try again."
+              actionLabel="Start Over"
+              onAction={handleStartOver}
+            />
+          )}
+          {!isSessionMissing && isJobFailed && (
             <ThemedErrorState
               title="Something went wrong"
               message="We couldn't process your image. Please try again."

@@ -12,7 +12,11 @@
  */
 import { onCall, HttpsError } from 'firebase-functions/v2/https'
 import { getFunctions } from 'firebase-admin/functions'
-import { fetchSession, updateSessionJobStatus, hasActiveJob } from '../repositories/session'
+import {
+  fetchSession,
+  updateSessionJobStatus,
+  hasActiveJob,
+} from '../repositories/session'
 import { fetchExperience } from '../repositories/experience'
 import { createJob, buildJobData, buildJobSnapshot } from '../repositories/job'
 import {
@@ -26,18 +30,20 @@ import {
  * Initiates a transform pipeline job for a session.
  * Called from frontend via httpsCallable.
  */
-export const startTransformPipeline = onCall(
+export const startTransformPipelineV2 = onCall(
   {
     region: 'europe-west1',
   },
   async (request) => {
     // Validate request data
-    const parseResult = startTransformPipelineRequestSchema.safeParse(request.data)
+    const parseResult = startTransformPipelineRequestSchema.safeParse(
+      request.data,
+    )
     if (!parseResult.success) {
       const firstIssue = parseResult.error.issues[0]
       throw new HttpsError(
         'invalid-argument',
-        `Invalid request: ${firstIssue?.message ?? 'validation failed'}`
+        `Invalid request: ${firstIssue?.message ?? 'validation failed'}`,
       )
     }
 
@@ -51,21 +57,32 @@ export const startTransformPipeline = onCall(
 
     // Check if job already in progress
     if (hasActiveJob(session)) {
-      throw new HttpsError('already-exists', 'A job is already in progress for this session')
+      throw new HttpsError(
+        'already-exists',
+        'A job is already in progress for this session',
+      )
     }
 
     // Fetch experience and validate transform config exists
-    const experience = await fetchExperience(session.workspaceId, session.experienceId)
+    const experience = await fetchExperience(
+      session.workspaceId,
+      session.experienceId,
+    )
     if (!experience) {
       throw new HttpsError('not-found', 'Experience not found')
     }
 
     // Determine which config to use based on session mode
     const configSource = session.configSource
-    const config = configSource === 'draft' ? experience.draft : experience.published
+    const config =
+      configSource === 'draft' ? experience.draft : experience.published
 
-    if (!config || !config.transform) {
-      throw new HttpsError('not-found', 'Experience has no transform configuration')
+    const transformNodes = config?.transform?.nodes ?? []
+    if (transformNodes.length === 0) {
+      throw new HttpsError(
+        'not-found',
+        'Experience has no transform configuration',
+      )
     }
 
     // Build job snapshot
@@ -91,7 +108,12 @@ export const startTransformPipeline = onCall(
       sessionId,
       projectId,
     }
-    await queueTransformJob(payload)
+    try {
+      await queueTransformJob(payload)
+    } catch (error) {
+      await updateSessionJobStatus(projectId, sessionId, jobId, 'failed')
+      throw new HttpsError('internal', 'Failed to enqueue transform job')
+    }
 
     // Return success response
     return {
@@ -99,15 +121,17 @@ export const startTransformPipeline = onCall(
       jobId,
       message: 'Transform pipeline job created',
     }
-  }
+  },
 )
 
 /**
  * Queue Cloud Task for job processing
  */
-async function queueTransformJob(payload: TransformPipelineJobPayload): Promise<void> {
+async function queueTransformJob(
+  payload: TransformPipelineJobPayload,
+): Promise<void> {
   const queue = getFunctions().taskQueue(
-    'locations/europe-west1/functions/transformPipelineJob'
+    'locations/europe-west1/functions/transformPipelineJob',
   )
   await queue.enqueue(payload, {
     scheduleDelaySeconds: 0, // Run immediately
