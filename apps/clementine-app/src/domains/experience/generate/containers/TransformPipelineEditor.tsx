@@ -23,10 +23,8 @@ import { Plus } from 'lucide-react'
 import { DeleteNodeDialog, EmptyState, NodeListItem } from '../components'
 import { useUpdateTransformConfig } from '../hooks'
 import { addNode, duplicateNode, removeNode, reorderNodes } from '../lib'
-import { useGenerateEditorStore } from '../stores/useGenerateEditorStore'
 import type { DragEndEvent } from '@dnd-kit/core'
 import type { Experience } from '../../shared/schemas'
-import { EditorSaveStatus } from '@/shared/editor-status/components/EditorSaveStatus'
 import { Button } from '@/ui-kit/ui/button'
 import { ScrollArea } from '@/ui-kit/ui/scroll-area'
 
@@ -55,7 +53,6 @@ export function TransformPipelineEditor({
   workspaceId,
 }: TransformPipelineEditorProps) {
   const updateTransform = useUpdateTransformConfig(workspaceId, experience.id)
-  const store = useGenerateEditorStore()
 
   // Delete dialog state
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -126,11 +123,6 @@ export function TransformPipelineEditor({
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <EditorSaveStatus
-            pendingSaves={store.pendingSaves}
-            lastCompletedAt={store.lastCompletedAt}
-            successDuration={3000}
-          />
           {hasNodes && (
             <Button
               onClick={handleAddNode}

@@ -10,7 +10,7 @@ import * as Sentry from '@sentry/tanstackstart-react'
 
 import { experienceKeys } from '../../shared/queries/experience.query'
 import { updateExperienceConfigField } from '../../shared/lib'
-import { useGenerateEditorStore } from '../stores/useGenerateEditorStore'
+import { useExperienceDesignerStore } from '../../designer/stores'
 import type { TransformConfig } from '@clementine/shared'
 import { useTrackedMutation } from '@/shared/editor-status/hooks/useTrackedMutation'
 
@@ -52,7 +52,7 @@ export function useUpdateTransformConfig(
   experienceId: string,
 ) {
   const queryClient = useQueryClient()
-  const store = useGenerateEditorStore()
+  const store = useExperienceDesignerStore()
 
   const mutation = useMutation<void, Error, UpdateTransformConfigInput>({
     mutationFn: async ({ transform }) => {
