@@ -245,7 +245,7 @@ export const useExperienceRuntimeStore = create<ExperienceRuntimeStore>(
           stepId,
           stepType,
           value,
-          ...(context !== undefined && { context }),
+          context: context ?? null,
           answeredAt: Date.now(),
         }
 
