@@ -16,6 +16,8 @@ export interface AIImageNodeProps {
 export interface AIImageNodeSettingsProps extends AIImageNodeProps {
   /** Current transform configuration */
   transform: TransformConfig
+  /** Workspace ID for media uploads */
+  workspaceId: string
   /** Callback to update transform configuration */
   onUpdate: (transform: TransformConfig) => void
 }
@@ -50,11 +52,17 @@ export function AIImageNodeHeader({ node }: AIImageNodeProps) {
 export function AIImageNodeSettings({
   node,
   transform,
+  workspaceId,
   onUpdate,
 }: AIImageNodeSettingsProps) {
   return (
     <div className="space-y-4 border-t px-3 pb-4 pt-4">
-      <PromptComposer node={node} transform={transform} onUpdate={onUpdate} />
+      <PromptComposer
+        node={node}
+        transform={transform}
+        workspaceId={workspaceId}
+        onUpdate={onUpdate}
+      />
     </div>
   )
 }

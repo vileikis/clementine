@@ -19,6 +19,8 @@ export interface NodeSettingsProps {
   node: TransformNode
   /** Current transform configuration */
   transform: TransformConfig
+  /** Workspace ID for media uploads */
+  workspaceId: string
   /** Callback to update transform configuration */
   onUpdate: (transform: TransformConfig) => void
 }
@@ -29,13 +31,19 @@ export interface NodeSettingsProps {
  * Routes to the appropriate settings component based on node type.
  * Add new node types to the switch as they are implemented.
  */
-export function NodeSettings({ node, transform, onUpdate }: NodeSettingsProps) {
+export function NodeSettings({
+  node,
+  transform,
+  workspaceId,
+  onUpdate,
+}: NodeSettingsProps) {
   switch (node.type) {
     case AI_IMAGE_NODE_TYPE:
       return (
         <AIImageNodeSettings
           node={node as AIImageNode}
           transform={transform}
+          workspaceId={workspaceId}
           onUpdate={onUpdate}
         />
       )

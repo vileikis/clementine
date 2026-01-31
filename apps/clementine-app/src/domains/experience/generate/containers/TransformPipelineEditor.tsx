@@ -155,6 +155,7 @@ export function TransformPipelineEditor({
                     node={node}
                     index={index + 1}
                     transformConfig={transform!}
+                    workspaceId={workspaceId}
                     onUpdate={(newTransform) =>
                       updateTransform.mutate({ transform: newTransform })
                     }

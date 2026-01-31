@@ -29,6 +29,8 @@ export interface NodeListItemProps {
   index: number
   /** Current transform configuration */
   transformConfig: TransformConfig
+  /** Workspace ID for media uploads */
+  workspaceId: string
   /** Callback to update transform configuration */
   onUpdate: (transform: TransformConfig) => void
   /** Callback when duplicate is clicked */
@@ -50,6 +52,7 @@ export function NodeListItem({
   node,
   index,
   transformConfig,
+  workspaceId,
   onUpdate,
   onDuplicate,
   onDelete,
@@ -169,6 +172,7 @@ export function NodeListItem({
             <NodeSettings
               node={node}
               transform={transformConfig}
+              workspaceId={workspaceId}
               onUpdate={onUpdate}
             />
           </CollapsibleContent>

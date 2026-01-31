@@ -93,18 +93,18 @@ All paths relative to `apps/clementine-app/src/`
 
 ### Implementation for User Story 3
 
-- [ ] T023 [P] [US3] Create `ReferenceMediaItem.tsx` for single thumbnail with remove button in `domains/experience/generate/components/PromptComposer/ReferenceMediaItem.tsx`
-- [ ] T024 [P] [US3] Create `ReferenceMediaStrip.tsx` for horizontal thumbnail list in `domains/experience/generate/components/PromptComposer/ReferenceMediaStrip.tsx`
-- [ ] T025 [US3] Add uploading state display (spinner/progress) to ReferenceMediaItem
-- [ ] T026 [US3] Create `AddMediaButton.tsx` with native `<input type="file" multiple accept="image/*">` in `domains/experience/generate/components/PromptComposer/AddMediaButton.tsx`
-- [ ] T027 [US3] Wire AddMediaButton onChange to upload flow using `useUploadMediaAsset` from media-library domain
-- [ ] T028 [US3] Implement sequential file upload with progress tracking in PromptComposer
-- [ ] T029 [US3] Connect successful uploads to `addNodeRefMedia` transform operation
-- [ ] T030 [US3] Wire remove button onClick to `removeNodeRefMedia` transform operation
-- [ ] T031 [US3] Add limit check: disable AddMediaButton when `refMedia.length >= 10`
-- [ ] T032 [US3] Wire ReferenceMediaStrip into PromptComposer above PromptInput (conditionally hidden when empty)
-- [ ] T033 [US3] Wire AddMediaButton into ControlRow at far right
-- [ ] T034 [US3] Export ReferenceMediaItem, ReferenceMediaStrip, AddMediaButton from barrel
+- [x] T023 [P] [US3] Create `ReferenceMediaItem.tsx` for single thumbnail with remove button in `domains/experience/generate/components/PromptComposer/ReferenceMediaItem.tsx`
+- [x] T024 [P] [US3] Create `ReferenceMediaStrip.tsx` for horizontal thumbnail list in `domains/experience/generate/components/PromptComposer/ReferenceMediaStrip.tsx`
+- [x] T025 [US3] Add uploading state display (spinner/progress) to ReferenceMediaItem
+- [x] T026 [US3] Create `AddMediaButton.tsx` with native `<input type="file" multiple accept="image/*">` in `domains/experience/generate/components/PromptComposer/AddMediaButton.tsx`
+- [x] T027 [US3] Wire AddMediaButton onChange to upload flow using `useUploadMediaAsset` from media-library domain
+- [x] T028 [US3] Implement sequential file upload with progress tracking in PromptComposer
+- [x] T029 [US3] Connect successful uploads to `addNodeRefMedia` transform operation
+- [x] T030 [US3] Wire remove button onClick to `removeNodeRefMedia` transform operation
+- [x] T031 [US3] Add limit check: disable AddMediaButton when `refMedia.length >= 10`
+- [x] T032 [US3] Wire ReferenceMediaStrip into PromptComposer above PromptInput (conditionally hidden when empty)
+- [x] T033 [US3] Wire AddMediaButton into ControlRow at far right
+- [x] T034 [US3] Export ReferenceMediaItem, ReferenceMediaStrip, AddMediaButton from barrel
 
 **Checkpoint**: File picker upload works - admin can add/remove reference images via button
 
@@ -118,13 +118,13 @@ All paths relative to `apps/clementine-app/src/`
 
 ### Implementation for User Story 4
 
-- [ ] T035 [US4] Add `isDragOver` state to PromptComposer for drop zone highlight
-- [ ] T036 [US4] Implement `onDragOver` handler with `e.preventDefault()` and highlight activation
-- [ ] T037 [US4] Implement `onDragLeave` handler to clear highlight state
-- [ ] T038 [US4] Implement `onDrop` handler with image MIME type filtering
-- [ ] T039 [US4] Apply highlight/active border styles to PromptComposer when isDragOver is true
-- [ ] T040 [US4] Connect dropped files to same upload flow as AddMediaButton (reuse T028)
-- [ ] T041 [US4] Prevent drop when `refMedia.length >= 10` (show feedback or silently reject extras)
+- [x] T035 [US4] Add `isDragOver` state to PromptComposer for drop zone highlight
+- [x] T036 [US4] Implement `onDragOver` handler with `e.preventDefault()` and highlight activation
+- [x] T037 [US4] Implement `onDragLeave` handler to clear highlight state
+- [x] T038 [US4] Implement `onDrop` handler with image MIME type filtering
+- [x] T039 [US4] Apply highlight/active border styles to PromptComposer when isDragOver is true
+- [x] T040 [US4] Connect dropped files to same upload flow as AddMediaButton (reuse T028)
+- [x] T041 [US4] Prevent drop when `refMedia.length >= 10` (show feedback or silently reject extras)
 
 **Checkpoint**: Drag and drop works - admin has two methods to add reference images
 
@@ -136,9 +136,9 @@ All paths relative to `apps/clementine-app/src/`
 
 - [x] T042 Update `AIImageNodeSettings` in `domains/experience/generate/components/NodeListItem/AIImageNode.tsx` to use PromptComposer
 - [x] T043 Remove placeholder sections (Model Settings, Prompt, Reference Media) from AIImageNodeSettings
-- [ ] T044 Add ARIA labels to unlabeled model and aspect ratio selects for accessibility
-- [ ] T045 Verify 44px minimum touch targets on all interactive elements
-- [ ] T046 Run `pnpm app:check` to validate linting, formatting, and types
+- [x] T044 Add ARIA labels to unlabeled model and aspect ratio selects for accessibility
+- [x] T045 Verify 44px minimum touch targets on all interactive elements
+- [x] T046 Run `pnpm app:check` to validate linting, formatting, and types
 - [ ] T047 Manual test: Run through quickstart.md validation checklist
 
 ---
