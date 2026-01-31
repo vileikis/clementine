@@ -110,15 +110,10 @@ function createTransformConfig(): TransformConfig {
         type: 'ai.imageGeneration',
         config: {
           prompt: 'Transform this image into a cartoon style',
-          model: 'gemini-2.0-flash-exp',
+          model: 'gemini-2.5-flash-image',
+          aspectRatio: '1:1',
+          refMedia: [],
         },
-      },
-    ],
-    variableMappings: [
-      {
-        source: 'capture-step-1',
-        target: 'node-1.input',
-        mappingType: 'direct',
       },
     ],
     outputFormat: {
@@ -141,12 +136,6 @@ function createExperienceConfigWithTransform(): ExperienceConfig {
         config: {
           aspectRatio: '1:1',
         },
-      },
-      {
-        id: crypto.randomUUID(),
-        type: 'transform.pipeline',
-        name: 'Transform',
-        config: {},
       },
     ],
     transform: createTransformConfig(),
