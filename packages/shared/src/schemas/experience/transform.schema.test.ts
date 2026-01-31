@@ -119,12 +119,12 @@ describe('aiImageNodeConfigSchema', () => {
       expect(result.success).toBe(true)
     })
 
-    it('should reject empty prompt', () => {
+    it('should accept empty prompt (validation happens at publish time)', () => {
       const result = aiImageNodeConfigSchema.safeParse({
         ...validConfig,
         prompt: '',
       })
-      expect(result.success).toBe(false)
+      expect(result.success).toBe(true)
     })
   })
 
@@ -232,7 +232,7 @@ describe('transformConfigSchema - variableMappings removal', () => {
           id: 'node-1',
           type: 'ai.imageGeneration',
           config: {
-            model: 'gemini-2.5-pro',
+            model: 'gemini-2.5-flash-image',
             aspectRatio: '3:2',
             prompt: 'A photo of @{step:Pet Choice}',
             refMedia: [],

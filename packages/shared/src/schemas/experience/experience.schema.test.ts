@@ -100,7 +100,18 @@ describe('experienceConfigSchema', () => {
   it('accepts transform config', () => {
     const result = experienceConfigSchema.parse({
       transform: {
-        nodes: [{ id: 'node-1', type: 'ai.imageGeneration' }],
+        nodes: [
+          {
+            id: 'node-1',
+            type: 'ai.imageGeneration',
+            config: {
+              model: 'gemini-2.5-flash-image',
+              aspectRatio: '3:2',
+              prompt: 'A test prompt',
+              refMedia: [],
+            },
+          },
+        ],
       },
     })
     expect(result.transform).not.toBeNull()
