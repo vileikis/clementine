@@ -151,11 +151,12 @@ export function PresharePage({ mainSessionId }: PresharePageProps) {
   }
 
   // Helper to navigate back to welcome
-  const navigateToWelcome = () =>
-    navigate({
+  const navigateToWelcome = () => {
+    void navigate({
       to: '/join/$projectId',
       params: { projectId: project.id },
     })
+  }
 
   /**
    * Handle preshare completion
@@ -243,10 +244,14 @@ export function PresharePage({ mainSessionId }: PresharePageProps) {
         experienceId={preshareExperienceId}
         steps={steps}
         session={session}
+        experienceName={preshareExperience?.name ?? 'Preshare'}
+        onHomeClick={navigateToWelcome}
         onComplete={() => void handlePreshareComplete()}
         onError={handleRuntimeError}
       >
-        <GuestRuntimeContent />
+        <div className="pt-20">
+          <GuestRuntimeContent />
+        </div>
       </ExperienceRuntime>
     )
   }

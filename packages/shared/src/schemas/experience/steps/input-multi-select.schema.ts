@@ -11,8 +11,8 @@ import { mediaReferenceSchema } from '../../media/media-reference.schema'
  * Each option can have a text fragment and/or media reference for AI prompts
  */
 export const multiSelectOptionSchema = z.object({
-  /** Display value for the option (1-100 chars, defaults to 'Option' if empty) */
-  value: z.string().min(1).max(100).catch('Option'),
+  /** Display value for the option (1-100 chars) */
+  value: z.string().min(1).max(100),
   /** Optional text to insert into prompt when this option is selected (max 500 chars) */
   promptFragment: z.string().max(500).nullable().default(null),
   /** Optional media reference to insert into prompt when this option is selected */

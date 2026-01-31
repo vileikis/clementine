@@ -220,6 +220,8 @@ export function ExperiencePreviewModal({
               experienceId={experience.id}
               steps={steps}
               session={session}
+              experienceName={experience.name}
+              onHomeClick={undefined}
               onComplete={handleComplete}
               onError={handleError}
             >

@@ -248,11 +248,12 @@ export function ExperiencePage({
   }
 
   // Helper to navigate back to welcome
-  const navigateToWelcome = () =>
-    navigate({
+  const navigateToWelcome = () => {
+    void navigate({
       to: '/join/$projectId',
       params: { projectId: project.id },
     })
+  }
 
   // Determine content to render based on state
   const renderContent = () => {
@@ -311,10 +312,14 @@ export function ExperiencePage({
         experienceId={experienceId}
         steps={steps}
         session={session}
+        experienceName={experience?.name ?? 'Experience'}
+        onHomeClick={navigateToWelcome}
         onComplete={() => void handleExperienceComplete()}
         onError={handleRuntimeError}
       >
-        <GuestRuntimeContent />
+        <div className="pt-20">
+          <GuestRuntimeContent />
+        </div>
       </ExperienceRuntime>
     )
   }

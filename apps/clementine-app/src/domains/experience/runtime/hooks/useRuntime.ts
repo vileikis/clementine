@@ -40,11 +40,12 @@ export interface RuntimeAPI {
   goToStep: (index: number) => void
 
   // Data mutation
-  setAnswer: (stepId: string, value: Answer['value']) => void
+  setAnswer: (stepId: string, value: Answer['value'], context?: unknown) => void
   setMedia: (stepId: string, mediaRef: MediaReference) => void
 
   // State access
   getAnswer: (stepId: string) => Answer['value'] | undefined
+  getAnswerContext: (stepId: string) => unknown | undefined
   getMedia: (stepId: string) => CapturedMediaRef | undefined
   getState: () => RuntimeState
 }
@@ -146,10 +147,10 @@ export function useRuntime(): RuntimeAPI {
   // Data mutation: setAnswer
   // Just updates store - container handles debounced Firestore sync
   const setAnswer = useCallback(
-    (stepId: string, value: Answer['value']) => {
+    (stepId: string, value: Answer['value'], context?: unknown) => {
       const currentStep = store.getCurrentStep()
       if (!currentStep) return
-      store.setAnswer(stepId, currentStep.type, value)
+      store.setAnswer(stepId, currentStep.type, value, context)
     },
     [store],
   )
@@ -171,6 +172,15 @@ export function useRuntime(): RuntimeAPI {
   const getAnswer = useCallback(
     (stepId: string): Answer['value'] | undefined => {
       return store.getAnswerValue(stepId)
+    },
+    [store],
+  )
+
+  // State access: getAnswerContext
+  const getAnswerContext = useCallback(
+    (stepId: string): unknown | undefined => {
+      const answer = store.getAnswer(stepId)
+      return answer?.context
     },
     [store],
   )
@@ -228,6 +238,7 @@ export function useRuntime(): RuntimeAPI {
 
     // State access
     getAnswer,
+    getAnswerContext,
     getMedia,
     getState,
   }

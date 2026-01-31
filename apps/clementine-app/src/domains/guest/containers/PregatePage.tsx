@@ -123,11 +123,12 @@ export function PregatePage({ selectedExperienceId }: PregatePageProps) {
   }
 
   // Helper to navigate back to welcome
-  const navigateToWelcome = () =>
-    navigate({
+  const navigateToWelcome = () => {
+    void navigate({
       to: '/join/$projectId',
       params: { projectId: project.id },
     })
+  }
 
   /**
    * Handle pregate completion
@@ -212,10 +213,14 @@ export function PregatePage({ selectedExperienceId }: PregatePageProps) {
         experienceId={pregateExperienceId}
         steps={steps}
         session={session}
+        experienceName={pregateExperience?.name ?? 'Pregate'}
+        onHomeClick={navigateToWelcome}
         onComplete={() => void handlePregateComplete()}
         onError={handleRuntimeError}
       >
-        <GuestRuntimeContent />
+        <div className="pt-20">
+          <GuestRuntimeContent />
+        </div>
       </ExperienceRuntime>
     )
   }

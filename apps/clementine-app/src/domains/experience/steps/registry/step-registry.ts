@@ -55,6 +55,7 @@ export type {
 
 /**
  * Answer value type for step inputs
+ * Primitive types for analytics-friendly storage
  */
 export type AnswerValue = string | number | boolean | string[]
 
@@ -72,8 +73,10 @@ export interface StepRendererProps {
   // Run mode props (only used when mode === 'run')
   /** Current answer value (run mode only) */
   answer?: AnswerValue
+  /** Current answer context - step-specific AI generation data (run mode only) */
+  answerContext?: unknown
   /** Callback when user provides/updates answer (run mode only) */
-  onAnswer?: (value: AnswerValue) => void
+  onAnswer?: (value: AnswerValue, context?: unknown) => void
   /** Callback to go back (run mode only) */
   onBack?: () => void
   /** Whether back navigation is available (run mode only) */

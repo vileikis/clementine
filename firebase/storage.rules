@@ -12,9 +12,34 @@ service firebase.storage {
         && request.auth.token.admin == true;
     }
 
-    function isAnyUser() {                                                                                                               
-      return request.auth != null;                                                                                                       
-    }    
+    function isAnyUser() {
+      return request.auth != null;
+    }
+
+    // Helper function: Check if user is the session creator (via metadata)
+    function isSessionCreator() {
+      return isAnyUser()
+        && request.resource.metadata.createdBy == request.auth.uid;
+    }
+
+    // Helper function: Check if user can read session input
+    function canReadSessionInput() {
+      return isAdmin()
+        || (isAnyUser() && resource.metadata.createdBy == request.auth.uid);
+    }
+
+    // Session input files (guest photo/video uploads)
+    // Only session creators can upload/read their captured media
+    match /projects/{projectId}/sessions/{sessionId}/inputs/{fileName} {
+      // Only the session creator can upload (verified via metadata.createdBy)
+      allow create: if isSessionCreator();
+
+      // Only the session creator or admin can read
+      allow read: if canReadSessionInput();
+
+      // No updates or deletes (files are immutable)
+      allow update, delete: if false;
+    }
 
     // Media files rules (013-event-settings-overlays)
     // Authentication-based access control - file validation in client code

@@ -17,6 +17,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef } from 'react'
 
 import { useExperienceRuntimeStore } from '../stores/experienceRuntimeStore'
+import { RuntimeTopBar } from '../components/RuntimeTopBar'
 import type { ExperienceStep } from '../../shared/schemas'
 import type { Session } from '@/domains/session'
 import { useCompleteSession, useUpdateSessionProgress } from '@/domains/session'
@@ -34,6 +35,14 @@ export interface ExperienceRuntimeProps {
   /** Children that use useRuntime() hook */
   children: React.ReactNode
 
+  // Runtime TopBar props
+  /** Experience name to display in topbar */
+  experienceName?: string
+  /** Home navigation handler (guest mode: navigate home, preview mode: undefined/disabled) */
+  onHomeClick?: () => void
+  /** Whether to show the runtime topbar (default: true) */
+  showTopBar?: boolean
+
   // Lifecycle callbacks
   /** Called when step changes (for analytics, etc.) */
   onStepChange?: (step: ExperienceStep, index: number) => void
@@ -46,19 +55,37 @@ export interface ExperienceRuntimeProps {
 /**
  * ExperienceRuntime Container Component
  *
- * Initializes the runtime store and handles Firestore synchronization.
+ * Initializes the runtime store, handles Firestore synchronization, and renders RuntimeTopBar.
  * Sync happens on navigation (forward only) rather than reactively on every change.
  *
  * @example
  * ```tsx
+ * // Guest mode - with topbar and home button
+ * function ExperiencePage({ experience, session }) {
+ *   return (
+ *     <ExperienceRuntime
+ *       experienceId={experience.id}
+ *       steps={experience.published.steps}
+ *       session={session}
+ *       experienceName={experience.name}
+ *       onHomeClick={() => navigate('/home')}
+ *       onComplete={() => navigate('/share')}
+ *     >
+ *       <GuestRuntimeContent />
+ *     </ExperienceRuntime>
+ *   )
+ * }
+ *
+ * // Preview mode - no topbar or home button disabled
  * function PreviewModal({ experience, session }) {
  *   return (
  *     <ExperienceRuntime
  *       experienceId={experience.id}
  *       steps={experience.draft.steps}
  *       session={session}
- *       onComplete={() => toast.success('Experience complete!')}
- *       onStepChange={(step, index) => analytics.track('step_viewed', { step, index })}
+ *       experienceName={experience.name}
+ *       showTopBar={false}
+ *       onComplete={() => toast.success('Preview complete!')}
  *     >
  *       <StepRenderer />
  *     </ExperienceRuntime>
@@ -71,6 +98,9 @@ export function ExperienceRuntime({
   steps,
   session,
   children,
+  experienceName,
+  onHomeClick,
+  showTopBar = true,
   onStepChange,
   onComplete,
   onError,
@@ -234,5 +264,17 @@ export function ExperienceRuntime({
     return null
   }
 
-  return <>{children}</>
+  return (
+    <>
+      {showTopBar && (
+        <RuntimeTopBar
+          experienceName={experienceName ?? 'Experience'}
+          currentStepIndex={store.currentStepIndex}
+          totalSteps={steps.length}
+          onHomeClick={onHomeClick}
+        />
+      )}
+      {children}
+    </>
+  )
 }

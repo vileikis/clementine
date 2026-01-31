@@ -7,7 +7,7 @@
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage'
 import { nanoid } from 'nanoid'
 import type { CapturedPhoto } from '@/shared/camera'
-import { storage } from '@/integrations/firebase/client'
+import { auth, storage } from '@/integrations/firebase/client'
 
 interface UploadPhotoParams {
   photo: CapturedPhoto
@@ -30,6 +30,11 @@ export async function uploadPhoto({
   sessionId,
   stepId,
 }: UploadPhotoParams): Promise<UploadPhotoResult> {
+  const currentUser = auth.currentUser
+  if (!currentUser) {
+    throw new Error('User must be authenticated to upload photos')
+  }
+
   const assetId = nanoid()
   const path = `projects/${projectId}/sessions/${sessionId}/inputs/${assetId}.jpg`
 
@@ -41,6 +46,7 @@ export async function uploadPhoto({
       sessionId,
       captureMethod: photo.method,
       capturedAt: new Date().toISOString(),
+      createdBy: currentUser.uid, // Required for storage rules ownership validation
     },
   })
 

@@ -4,7 +4,7 @@
  * Centralized validation logic for step inputs in run mode.
  * Each step type defines its own validation rules based on config.
  */
-import type { ExperienceStep } from '../../shared/schemas'
+import type { ExperienceStep, MultiSelectOption } from '@clementine/shared'
 
 /**
  * Validation result for a step input
@@ -160,11 +160,17 @@ function validateMultiSelectInput(
     return { isValid: false, error: 'Invalid selection' }
   }
 
-  // All values must be strings in the options list
-  const options = (config.options as string[]) ?? []
-  const allValid = input.every(
-    (v) => typeof v === 'string' && options.includes(v),
-  )
+  // All values must be valid option values
+  // Options are objects with { value, promptFragment, promptMedia }
+  const optionsArray = (config.options as MultiSelectOption[]) ?? []
+  const validValues = optionsArray.map((opt) => opt.value)
+
+  // Input validation now only checks string[] (primitive values)
+  // The context field stores full MultiSelectOption[] separately
+  const allValid = input.every((v) => {
+    return typeof v === 'string' && validValues.includes(v)
+  })
+
   if (!allValid) {
     return { isValid: false, error: 'Invalid option selected' }
   }
