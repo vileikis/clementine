@@ -43,7 +43,11 @@ export class MediaMentionNode extends TextNode {
   }
 
   static clone(node: MediaMentionNode): MediaMentionNode {
-    const cloned = new MediaMentionNode(node.__mediaName, node.__text, node.__key)
+    const cloned = new MediaMentionNode(
+      node.__mediaName,
+      node.__text,
+      node.__key,
+    )
     cloned.__isInvalid = node.__isInvalid
     return cloned
   }

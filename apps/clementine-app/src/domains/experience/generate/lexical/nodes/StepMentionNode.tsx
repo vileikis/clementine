@@ -56,7 +56,10 @@ export class StepMentionNode extends TextNode {
   }
 
   static importJSON(serialized: SerializedStepMentionNode): StepMentionNode {
-    const node = $createStepMentionNode(serialized.stepName, serialized.stepType)
+    const node = $createStepMentionNode(
+      serialized.stepName,
+      serialized.stepType,
+    )
     node.__isInvalid = serialized.isInvalid ?? false
     node.setFormat(serialized.format)
     node.setDetail(serialized.detail)

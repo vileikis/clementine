@@ -40,7 +40,10 @@ function toStepOption(step: ExperienceStep): StepOption {
 /**
  * Convert refMedia to MediaOption for mention autocomplete
  */
-function toMediaOption(media: { mediaAssetId: string; displayName: string }): MediaOption {
+function toMediaOption(media: {
+  mediaAssetId: string
+  displayName: string
+}): MediaOption {
   return {
     id: media.mediaAssetId,
     name: media.displayName,

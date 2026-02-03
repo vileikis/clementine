@@ -75,7 +75,11 @@ export function SmartPastePlugin({
           if (!$isRangeSelection(selection)) return
 
           // Parse the text and build nodes
-          const nodes: (ReturnType<typeof $createTextNode> | ReturnType<typeof $createStepMentionNode> | ReturnType<typeof $createMediaMentionNode>)[] = []
+          const nodes: (
+            | ReturnType<typeof $createTextNode>
+            | ReturnType<typeof $createStepMentionNode>
+            | ReturnType<typeof $createMediaMentionNode>
+          )[] = []
 
           let lastIndex = 0
           let match: RegExpExecArray | null

@@ -89,7 +89,9 @@ function useMentionTriggerMatch(): (text: string) => MenuTextMatch | null {
     return {
       leadOffset: matchStart,
       matchingString: match[1],
-      replaceableString: match[0].startsWith('@') ? match[0] : match[0].slice(1),
+      replaceableString: match[0].startsWith('@')
+        ? match[0]
+        : match[0].slice(1),
     }
   }, [])
 }
