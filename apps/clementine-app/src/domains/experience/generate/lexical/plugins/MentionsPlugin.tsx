@@ -18,7 +18,6 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import {
   LexicalTypeaheadMenuPlugin,
   MenuOption,
-  useBasicTypeaheadTriggerMatch,
 } from '@lexical/react/LexicalTypeaheadMenuPlugin'
 import {
   $createParagraphNode,
@@ -31,6 +30,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { $createMediaMentionNode } from '../nodes/MediaMentionNode'
 import { $createStepMentionNode } from '../nodes/StepMentionNode'
+import type { MenuTextMatch } from '@lexical/react/LexicalTypeaheadMenuPlugin'
 import type { TextNode } from 'lexical'
 import type { MediaOption, StepOption } from '../utils/types'
 
@@ -59,6 +59,39 @@ class MentionTypeaheadOption extends MenuOption {
     this.category = category
     this.stepType = stepType
   }
+}
+
+// ============================================================================
+// Custom Trigger Function
+// ============================================================================
+
+/**
+ * Custom trigger function that allows spaces in the search query.
+ * The default useBasicTypeaheadTriggerMatch closes the menu on space.
+ * This version keeps the menu open to search names like "Pet Choice".
+ *
+ * Pattern: @ followed by alphanumeric characters, spaces, and common punctuation
+ * Max length: 50 characters
+ */
+function useMentionTriggerMatch(): (text: string) => MenuTextMatch | null {
+  return useCallback((text: string): MenuTextMatch | null => {
+    // Match @ followed by any characters except newline (up to 50 chars)
+    // The match includes spaces to allow searching "Pet Choice"
+    const match = /(?:^|\s)@([\w\s\-.]{0,50})$/.exec(text)
+
+    if (match === null) {
+      return null
+    }
+
+    // Check if this is at the start of text or after whitespace
+    const matchStart = match.index + (match[0].startsWith('@') ? 0 : 1)
+
+    return {
+      leadOffset: matchStart,
+      matchingString: match[1],
+      replaceableString: match[0].startsWith('@') ? match[0] : match[0].slice(1),
+    }
+  }, [])
 }
 
 // ============================================================================
@@ -229,11 +262,9 @@ export function MentionsPlugin({ steps, media }: MentionsPluginProps) {
   const [editor] = useLexicalComposerContext()
   const [queryString, setQueryString] = useState<string | null>(null)
 
-  // Trigger pattern: @ followed by any characters
-  const checkForTrigger = useBasicTypeaheadTriggerMatch('@', {
-    minLength: 0,
-    maxLength: 50,
-  })
+  // Custom trigger that allows spaces in search query
+  // e.g., "@Pet Choice" will search for items containing "Pet Choice"
+  const checkForTrigger = useMentionTriggerMatch()
 
   // Combine and filter all options based on search query
   const options = useMemo(() => {
@@ -322,8 +353,20 @@ export function MentionsPlugin({ steps, media }: MentionsPluginProps) {
         anchorElementRef,
         { selectedIndex, selectOptionAndCleanUp, setHighlightedIndex },
       ) => {
-        if (!anchorElementRef.current || options.length === 0) {
+        if (!anchorElementRef.current) {
           return null
+        }
+
+        // Show empty state when no results match the search
+        if (options.length === 0) {
+          return createPortal(
+            <PositionedMenu anchorElement={anchorElementRef.current}>
+              <div className="px-3 py-2 text-sm text-muted-foreground">
+                No matching steps or media
+              </div>
+            </PositionedMenu>,
+            document.body,
+          )
         }
 
         return createPortal(

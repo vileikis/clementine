@@ -21,6 +21,7 @@ import {
   MediaMentionNode,
   MentionValidationPlugin,
   MentionsPlugin,
+  SmartPastePlugin,
   StepMentionNode,
   serializeToPlainText,
 } from '../../lexical'
@@ -90,6 +91,7 @@ export function LexicalPromptInput({
         <MentionsPlugin steps={steps} media={media} />
         <InitializePlugin value={value} steps={steps} media={media} />
         <MentionValidationPlugin steps={steps} media={media} />
+        <SmartPastePlugin steps={steps} media={media} />
       </div>
     </LexicalComposer>
   )

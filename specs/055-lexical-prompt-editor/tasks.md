@@ -119,11 +119,11 @@ Base path: `apps/clementine-app/src/domains/experience/generate/`
 
 ### Implementation for User Story 3
 
-- [ ] T036 [US3] Ensure MentionsPlugin handles ArrowUp/ArrowDown for navigation in `lexical/plugins/MentionsPlugin.tsx`
-- [ ] T037 [US3] Ensure MentionsPlugin handles Enter for selection
-- [ ] T038 [US3] Ensure MentionsPlugin handles Escape to close without selection
-- [ ] T039 [US3] Add ARIA attributes for accessibility (role="listbox", role="option", aria-selected)
-- [ ] T040 [US3] Add visual highlight for focused/selected item in autocomplete
+- [X] T036 [US3] Ensure MentionsPlugin handles ArrowUp/ArrowDown for navigation in `lexical/plugins/MentionsPlugin.tsx`
+- [X] T037 [US3] Ensure MentionsPlugin handles Enter for selection
+- [X] T038 [US3] Ensure MentionsPlugin handles Escape to close without selection
+- [X] T039 [US3] Add ARIA attributes for accessibility (role="listbox", role="option", aria-selected)
+- [X] T040 [US3] Add visual highlight for focused/selected item in autocomplete
 
 **Checkpoint**: User Story 3 complete - Full keyboard navigation in autocomplete
 
@@ -137,10 +137,10 @@ Base path: `apps/clementine-app/src/domains/experience/generate/`
 
 ### Implementation for User Story 4
 
-- [ ] T041 [US4] Implement case-insensitive filter in MentionsPlugin based on search query
-- [ ] T042 [US4] Add "No results" empty state when filter matches nothing
-- [ ] T043 [US4] Ensure filter updates within 100ms (memoize filter results)
-- [ ] T043a [US4] **Enhancement**: Allow spaces in search query (custom trigger function to replace `useBasicTypeaheadTriggerMatch`) - currently typing "@pet " closes menu, should stay open to search "Pet Choice"
+- [X] T041 [US4] Implement case-insensitive filter in MentionsPlugin based on search query
+- [X] T042 [US4] Add "No results" empty state when filter matches nothing
+- [X] T043 [US4] Ensure filter updates within 100ms (memoize filter results)
+- [X] T043a [US4] **Enhancement**: Allow spaces in search query (custom trigger function to replace `useBasicTypeaheadTriggerMatch`) - currently typing "@pet " closes menu, should stay open to search "Pet Choice"
 
 **Checkpoint**: User Story 4 complete - Autocomplete filters as user types
 
@@ -154,10 +154,10 @@ Base path: `apps/clementine-app/src/domains/experience/generate/`
 
 ### Implementation for User Story 6
 
-- [ ] T044 [US6] Ensure StepMentionNode extends TextNode with atomic selection behavior in `lexical/nodes/StepMentionNode.tsx`
-- [ ] T045 [US6] Ensure MediaMentionNode extends TextNode with atomic selection behavior in `lexical/nodes/MediaMentionNode.tsx`
-- [ ] T046 [US6] Verify canInsertTextBefore/After return false for atomic behavior
-- [ ] T047 [US6] Test delete behavior with Backspace and Delete keys
+- [X] T044 [US6] Ensure StepMentionNode extends TextNode with atomic selection behavior in `lexical/nodes/StepMentionNode.tsx`
+- [X] T045 [US6] Ensure MediaMentionNode extends TextNode with atomic selection behavior in `lexical/nodes/MediaMentionNode.tsx`
+- [X] T046 [US6] Verify canInsertTextBefore/After return false for atomic behavior
+- [X] T047 [US6] Test delete behavior with Backspace and Delete keys
 
 **Checkpoint**: User Story 6 complete - Mentions delete as atomic units
 
@@ -167,11 +167,11 @@ Base path: `apps/clementine-app/src/domains/experience/generate/`
 
 **Purpose**: Handle edge cases and smart paste functionality
 
-- [ ] T048 Create SmartPastePlugin in `lexical/plugins/SmartPastePlugin.tsx` (detect `@{step:name}` and `@{ref:name}` in pasted text, convert to nodes)
-- [ ] T049 Add SmartPastePlugin to LexicalPromptInput
-- [ ] T050 Update plugins barrel export to include SmartPastePlugin in `lexical/plugins/index.ts`
-- [ ] T051 Handle empty prompt (show placeholder text, save as empty string)
-- [ ] T052 Handle "@" without selection (leave as literal text if no mention selected)
+- [X] T048 Create SmartPastePlugin in `lexical/plugins/SmartPastePlugin.tsx` (detect `@{step:name}` and `@{ref:name}` in pasted text, convert to nodes)
+- [X] T049 Add SmartPastePlugin to LexicalPromptInput
+- [X] T050 Update plugins barrel export to include SmartPastePlugin in `lexical/plugins/index.ts`
+- [X] T051 Handle empty prompt (show placeholder text, save as empty string)
+- [X] T052 Handle "@" without selection (leave as literal text if no mention selected)
 
 ---
 
@@ -179,12 +179,12 @@ Base path: `apps/clementine-app/src/domains/experience/generate/`
 
 **Purpose**: Final cleanup, validation, and quality checks
 
-- [ ] T053 Run format, lint, type-check (`pnpm app:check`)
-- [ ] T054 Verify mobile touch targets (44x44px minimum for autocomplete items)
-- [ ] T055 Verify theme tokens for mention pill colors per design-system.md
-- [ ] T056 Test manual scenarios from quickstart.md
-- [ ] T057 Delete old PromptInput.tsx if no longer used
-- [ ] T058 Final code review for unused imports and dead code
+- [X] T053 Run format, lint, type-check (`pnpm app:check`)
+- [X] T054 Verify mobile touch targets (44x44px minimum for autocomplete items)
+- [X] T055 Verify theme tokens for mention pill colors per design-system.md
+- [X] T056 Test manual scenarios from quickstart.md
+- [X] T057 Delete old PromptInput.tsx if no longer used
+- [X] T058 Final code review for unused imports and dead code
 
 ---
 
