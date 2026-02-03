@@ -97,12 +97,14 @@ async function executeNodes(
     })
 
     const result = await executeNode(node, context)
-    lastResult = result
 
-    logger.info('[Pipeline] Node completed', {
-      nodeId: node.id,
-      outputPath: result.outputPath,
-    })
+    if (result) {
+      lastResult = result
+      logger.info('[Pipeline] Node completed', {
+        nodeId: node.id,
+        outputPath: result.outputPath,
+      })
+    }
   }
 
   return lastResult
@@ -112,17 +114,24 @@ async function executeNodes(
  * Execute a single transform node
  *
  * Direct dispatch based on node type for better IDE navigation.
+ * Returns null for unknown/unsupported node types (graceful skip).
  */
 async function executeNode(
   node: TransformNode,
   context: PipelineContext
-): Promise<NodeResult> {
+): Promise<NodeResult | null> {
   switch (node.type) {
     case 'ai.imageGeneration':
       return executeAIImageNode(node as AIImageNode, context)
 
     default:
-      throw new Error(`Unknown node type: ${node.type}`)
+      // Log as error - unknown types indicate a bug or deployment mismatch
+      // Monitor these in production alerts
+      logger.error('[Pipeline] Skipping unknown node type', {
+        nodeId: node.id,
+        nodeType: node.type,
+      })
+      return null
   }
 }
 

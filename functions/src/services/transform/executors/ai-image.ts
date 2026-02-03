@@ -45,14 +45,14 @@ const GOOGLE_CLOUD_PROJECT =
 export async function executeAIImageNode(
   node: AIImageNode,
   context: PipelineContext
-): Promise<NodeResult> {
+): Promise<NodeResult | null> {
   const { config } = node
   const { snapshot, tmpDir } = context
 
   // Skip if prompt is empty
   if (!config.prompt || config.prompt.trim().length === 0) {
-    logger.info('[AIImage] Skipping node with empty prompt', { nodeId: node.id })
-    throw new Error('AI image node has empty prompt')
+    logger.warn('[AIImage] Skipping node with empty prompt', { nodeId: node.id })
+    return null
   }
 
   logger.info('[AIImage] Starting AI image generation', {
