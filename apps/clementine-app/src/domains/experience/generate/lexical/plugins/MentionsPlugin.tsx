@@ -189,7 +189,7 @@ function PositionedMenu({ anchorElement, children }: PositionedMenuProps) {
   return (
     <div
       ref={menuRef}
-      className="typeahead-popover mentions-menu fixed z-[100] w-64 rounded-md border bg-popover p-1 shadow-md"
+      className="typeahead-popover mentions-menu fixed z-100 w-64 rounded-md border bg-popover p-1 shadow-md"
       style={{
         top: `${position.top}px`,
         left: `${position.left}px`,
@@ -244,14 +244,21 @@ export function MentionsPlugin({ steps, media }: MentionsPluginProps) {
       .filter((s) => s.name.toLowerCase().includes(search))
       .map(
         (s) =>
-          new MentionTypeaheadOption(`step-${s.id}`, s.id, s.name, 'step', s.type),
+          new MentionTypeaheadOption(
+            `step-${s.id}`,
+            s.id,
+            s.name,
+            'step',
+            s.type,
+          ),
       )
 
     // Convert media to options
     const mediaOptions = media
       .filter((m) => m.name.toLowerCase().includes(search))
       .map(
-        (m) => new MentionTypeaheadOption(`media-${m.id}`, m.id, m.name, 'media'),
+        (m) =>
+          new MentionTypeaheadOption(`media-${m.id}`, m.id, m.name, 'media'),
       )
 
     // Combine: steps first, then media

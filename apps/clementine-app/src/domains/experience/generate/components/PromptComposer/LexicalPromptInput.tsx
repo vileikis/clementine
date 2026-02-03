@@ -16,15 +16,15 @@ import { ContentEditable } from '@lexical/react/LexicalContentEditable'
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin'
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary'
-
 import {
+  InitializePlugin,
   MediaMentionNode,
+  MentionValidationPlugin,
+  MentionsPlugin,
   StepMentionNode,
-} from '../../lexical/nodes'
-import { MentionsPlugin } from '../../lexical/plugins/MentionsPlugin'
-import { InitializePlugin } from '../../lexical/plugins/InitializePlugin'
-import { serializeToPlainText } from '../../lexical/utils/serialization'
-import type { MediaOption, StepOption } from '../../lexical/utils/types'
+  serializeToPlainText,
+} from '../../lexical'
+import type { MediaOption, StepOption } from '../../lexical'
 import type { EditorState } from 'lexical'
 
 export interface LexicalPromptInputProps {
@@ -89,6 +89,7 @@ export function LexicalPromptInput({
         <OnChangePlugin onChange={handleChange} ignoreSelectionChange />
         <MentionsPlugin steps={steps} media={media} />
         <InitializePlugin value={value} steps={steps} media={media} />
+        <MentionValidationPlugin steps={steps} media={media} />
       </div>
     </LexicalComposer>
   )

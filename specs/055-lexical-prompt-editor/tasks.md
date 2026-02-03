@@ -82,11 +82,11 @@ Base path: `apps/clementine-app/src/domains/experience/generate/`
 
 ### Implementation for User Story 2
 
-- [ ] T025 [US2] Extend MentionsPlugin to show media options with thumbnails in `lexical/plugins/MentionsPlugin.tsx`
-- [ ] T026 [US2] Add media section to autocomplete menu (Steps section first, then Media section)
-- [ ] T027 [US2] Implement toMediaOption adapter function for converting refMedia to MediaOption[]
-- [ ] T028 [US2] Update LexicalPromptInput to accept media prop in `components/PromptComposer/LexicalPromptInput.tsx`
-- [ ] T029 [US2] Update PromptComposer to pass mediaOptions to LexicalPromptInput
+- [X] T025 [US2] Extend MentionsPlugin to show media options with thumbnails in `lexical/plugins/MentionsPlugin.tsx`
+- [X] T026 [US2] Add media section to autocomplete menu (Steps section first, then Media section)
+- [X] T027 [US2] Implement toMediaOption adapter function for converting refMedia to MediaOption[]
+- [X] T028 [US2] Update LexicalPromptInput to accept media prop in `components/PromptComposer/LexicalPromptInput.tsx`
+- [X] T029 [US2] Update PromptComposer to pass mediaOptions to LexicalPromptInput
 
 **Checkpoint**: User Story 2 complete - Can insert both step and media mentions from unified autocomplete
 
@@ -100,12 +100,12 @@ Base path: `apps/clementine-app/src/domains/experience/generate/`
 
 ### Implementation for User Story 5
 
-- [ ] T030 [US5] Enhance deserializeFromPlainText to handle unmatched names (create invalid mention nodes)
-- [ ] T031 [US5] Add invalid state styling to StepMentionNode (red background, strikethrough when isInvalid)
-- [ ] T032 [US5] Add invalid state styling to MediaMentionNode (red background, strikethrough when isInvalid)
-- [ ] T033 [US5] Create MentionValidationPlugin in `lexical/plugins/MentionValidationPlugin.tsx` (validate mentions against current steps/media, mark invalid)
-- [ ] T034 [US5] Add MentionValidationPlugin to LexicalPromptInput
-- [ ] T035 [US5] Update plugins barrel export to include MentionValidationPlugin in `lexical/plugins/index.ts`
+- [X] T030 [US5] Enhance deserializeFromPlainText to handle unmatched names (create invalid mention nodes)
+- [X] T031 [US5] Add invalid state styling to StepMentionNode (red background, strikethrough when isInvalid)
+- [X] T032 [US5] Add invalid state styling to MediaMentionNode (red background, strikethrough when isInvalid)
+- [X] T033 [US5] Create MentionValidationPlugin in `lexical/plugins/MentionValidationPlugin.tsx` (validate mentions against current steps/media, mark invalid)
+- [X] T034 [US5] Add MentionValidationPlugin to LexicalPromptInput
+- [X] T035 [US5] Update plugins barrel export to include MentionValidationPlugin in `lexical/plugins/index.ts`
 
 **Checkpoint**: User Story 5 complete - Existing prompts load with visual pills, invalid mentions show error state
 
