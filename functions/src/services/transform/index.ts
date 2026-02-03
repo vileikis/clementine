@@ -1,8 +1,9 @@
 /**
  * Transform Service Barrel Export
  *
- * Node execution framework for transform pipeline.
+ * Pipeline execution for transform jobs.
  */
-export * from './node-executor'
+export * from './types'
 export * from './pipeline-runner'
+export * from './overlay'
 export * from './executors'

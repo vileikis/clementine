@@ -2,214 +2,152 @@
  * Pipeline Runner
  *
  * Orchestrates the execution of transform nodes in sequence.
- * Downloads initial input, runs each node's executor, and returns final output.
+ * Handles node dispatch, overlay application, and output upload.
  */
 import { logger } from 'firebase-functions/v2'
 import * as fs from 'fs/promises'
-import * as path from 'path'
 
-import type { JobSnapshot, TransformNode } from '@clementine/shared'
-import type { ExecutionContext, NodeExecutor, NodeExecutionResult } from './node-executor'
-import { AIImageExecutor } from './executors/ai-image.executor'
+import type { TransformNode, AIImageNode } from '@clementine/shared'
+import type { PipelineContext, PipelineResult, NodeResult, UploadedOutput } from './types'
+import { executeAIImageNode } from './executors'
+import { applyOverlayIfConfigured } from './overlay'
 import {
   downloadFromStorage,
   parseStorageUrl,
   uploadToStorage,
   getOutputStoragePath,
 } from '../../infra/storage'
-import { applyOverlayToMedia, generateThumbnail } from '../media-pipeline/ffmpeg'
-
-/**
- * Result of pipeline execution
- */
-export interface PipelineResult {
-  /** Path to final output file */
-  outputPath: string
-  /** Output format */
-  format: 'image' | 'gif' | 'video'
-  /** Output MIME type */
-  mimeType: string
-}
-
-/**
- * Uploaded output result
- */
-export interface UploadedOutput {
-  /** Public URL to the output */
-  url: string
-  /** Storage path */
-  storagePath: string
-  /** Asset ID (filename without extension) */
-  assetId: string
-  /** Thumbnail URL */
-  thumbnailUrl: string | null
-  /** File size in bytes */
-  sizeBytes: number
-  /** Dimensions */
-  dimensions: {
-    width: number
-    height: number
-  }
-}
-
-// Registry of available executors
-const executors: NodeExecutor[] = [new AIImageExecutor()]
-
-/**
- * Get executor for a node type
- *
- * @param nodeType - Node type discriminator
- * @returns Executor that can handle the node type
- * @throws Error if no executor found
- */
-function getExecutor(nodeType: string): NodeExecutor {
-  const executor = executors.find((e) => e.canHandle(nodeType))
-  if (!executor) {
-    throw new Error(`No executor found for node type: ${nodeType}`)
-  }
-  return executor
-}
+import { generateThumbnail } from '../media-pipeline/ffmpeg'
 
 /**
  * Execute transform pipeline
  *
- * Runs through all transform nodes in sequence, using each node's output
- * as the next node's input.
+ * Runs through all transform nodes in sequence. Nodes access captured media
+ * directly from context. If no nodes run, falls back to first captured media.
  *
- * @param context - Execution context with job/session info
- * @param tmpDir - Temporary directory for intermediate files
+ * @param context - Pipeline execution context
  * @returns Pipeline result with output path and format
  */
 export async function executeTransformPipeline(
-  context: ExecutionContext,
-  tmpDir: string
+  context: PipelineContext
 ): Promise<PipelineResult> {
-  const { snapshot } = context
-  const { sessionInputs, transformNodes } = snapshot
+  const { snapshot, tmpDir, jobId } = context
+  const { transformNodes } = snapshot
 
-  logger.info('[PipelineRunner] Starting transform pipeline', {
-    jobId: context.jobId,
+  logger.info('[Pipeline] Starting transform pipeline', {
+    jobId,
     nodeCount: transformNodes.length,
-    capturedMediaCount: sessionInputs.capturedMedia.length,
+    capturedMediaCount: snapshot.sessionInputs.capturedMedia.length,
   })
 
-  // Get first captured media as initial input
-  const firstMedia = sessionInputs.capturedMedia[0]
-  if (!firstMedia) {
-    throw new Error('No captured media found in session')
+  // Execute transform nodes
+  const nodeOutput = await executeNodes(transformNodes, context)
+
+  // Determine final output path
+  let outputPath: string
+
+  if (nodeOutput) {
+    // Use node-generated output
+    outputPath = nodeOutput.outputPath
+  } else {
+    // No nodes produced output - use first captured media
+    outputPath = await getFallbackOutput(context)
   }
 
-  // Download initial input
-  const initialInputPath = `${tmpDir}/input-captured.jpg`
-  const storagePath = parseStorageUrl(firstMedia.url)
-  await downloadFromStorage(storagePath, initialInputPath)
+  // Apply overlay if configured
+  outputPath = await applyOverlayIfConfigured(
+    outputPath,
+    snapshot.projectContext,
+    tmpDir
+  )
 
-  logger.info('[PipelineRunner] Downloaded initial input', {
-    url: firstMedia.url,
-    storagePath,
-    localPath: initialInputPath,
-  })
+  logger.info('[Pipeline] Pipeline completed', { outputPath })
 
-  // Execute nodes in sequence
-  let currentInputPath = initialInputPath
-  let currentMimeType = 'image/jpeg'
+  return {
+    outputPath,
+    format: 'image', // TODO: Detect from output
+    mimeType: 'image/png',
+  }
+}
 
-  for (let i = 0; i < transformNodes.length; i++) {
-    const node = transformNodes[i]
+/**
+ * Execute all transform nodes in sequence
+ *
+ * @returns Last node's result, or null if no nodes executed
+ */
+async function executeNodes(
+  nodes: TransformNode[],
+  context: PipelineContext
+): Promise<NodeResult | null> {
+  if (nodes.length === 0) {
+    logger.info('[Pipeline] No transform nodes to execute')
+    return null
+  }
+
+  let lastResult: NodeResult | null = null
+
+  for (let i = 0; i < nodes.length; i++) {
+    const node = nodes[i]
     if (!node) continue
 
-    logger.info('[PipelineRunner] Executing node', {
+    logger.info('[Pipeline] Executing node', {
       nodeIndex: i,
       nodeId: node.id,
       nodeType: node.type,
     })
 
-    // Skip nodes with empty config (defensive check)
-    if (shouldSkipNode(node)) {
-      logger.info('[PipelineRunner] Skipping node', {
-        nodeId: node.id,
-        reason: 'empty prompt or disabled',
-      })
-      continue
-    }
+    const result = await executeNode(node, context)
+    lastResult = result
 
-    // Get executor for node type
-    const executor = getExecutor(node.type)
-
-    // Execute node
-    const result = await executor.execute(currentInputPath, node, context, tmpDir)
-
-    // Update for next iteration
-    currentInputPath = result.outputPath
-    currentMimeType = result.mimeType
-
-    logger.info('[PipelineRunner] Node completed', {
+    logger.info('[Pipeline] Node completed', {
       nodeId: node.id,
       outputPath: result.outputPath,
     })
   }
 
-  // Apply overlay if configured
-  if (snapshot.projectContext.applyOverlay && snapshot.projectContext.overlay) {
-    logger.info('[PipelineRunner] Applying overlay', {
-      overlay: snapshot.projectContext.overlay.displayName,
-    })
+  return lastResult
+}
 
-    const overlayedPath = await applyOverlay(
-      currentInputPath,
-      snapshot.projectContext.overlay,
-      tmpDir
-    )
-    currentInputPath = overlayedPath
+/**
+ * Execute a single transform node
+ *
+ * Direct dispatch based on node type for better IDE navigation.
+ */
+async function executeNode(
+  node: TransformNode,
+  context: PipelineContext
+): Promise<NodeResult> {
+  switch (node.type) {
+    case 'ai.imageGeneration':
+      return executeAIImageNode(node as AIImageNode, context)
+
+    default:
+      throw new Error(`Unknown node type: ${node.type}`)
+  }
+}
+
+/**
+ * Get fallback output when no nodes executed
+ *
+ * Downloads first captured media to use as output.
+ * Throws if no captured media available.
+ */
+async function getFallbackOutput(context: PipelineContext): Promise<string> {
+  const { snapshot, tmpDir } = context
+  const firstMedia = snapshot.sessionInputs.capturedMedia[0]
+
+  if (!firstMedia) {
+    throw new Error('No transform nodes executed and no captured media available')
   }
 
-  logger.info('[PipelineRunner] Pipeline completed', {
-    finalOutputPath: currentInputPath,
+  logger.info('[Pipeline] Using first captured media as output', {
+    stepId: firstMedia.stepId,
+    assetId: firstMedia.assetId,
   })
 
-  return {
-    outputPath: currentInputPath,
-    format: 'image', // TODO: Detect from output (gif/video support)
-    mimeType: currentMimeType,
-  }
-}
-
-/**
- * Check if node should be skipped
- *
- * @param node - Transform node
- * @returns True if node should be skipped
- */
-function shouldSkipNode(node: TransformNode): boolean {
-  // For AI image nodes, skip if prompt is empty
-  if (node.type === 'ai.imageGeneration') {
-    const config = node.config as { prompt?: string }
-    return !config.prompt || config.prompt.trim().length === 0
-  }
-  return false
-}
-
-/**
- * Apply overlay to output image
- *
- * @param inputPath - Path to input image
- * @param overlay - Overlay media reference
- * @param tmpDir - Temporary directory
- * @returns Path to overlayed output
- */
-async function applyOverlay(
-  inputPath: string,
-  overlay: { url: string; filePath: string | null },
-  tmpDir: string
-): Promise<string> {
-  // Download overlay from storage
-  const overlayPath = `${tmpDir}/overlay.png`
-  const storagePath = overlay.filePath ?? parseStorageUrl(overlay.url)
-  await downloadFromStorage(storagePath, overlayPath)
-
-  // Apply overlay using FFmpeg
-  const outputPath = `${tmpDir}/output-with-overlay.png`
-  await applyOverlayToMedia(inputPath, overlayPath, outputPath)
+  const outputPath = `${tmpDir}/fallback-output.jpg`
+  const storagePath = parseStorageUrl(firstMedia.url)
+  await downloadFromStorage(storagePath, outputPath)
 
   return outputPath
 }
@@ -218,20 +156,17 @@ async function applyOverlay(
  * Upload pipeline output to storage and generate thumbnail
  *
  * @param pipelineResult - Result from pipeline execution
- * @param context - Execution context
- * @param tmpDir - Temporary directory
+ * @param context - Pipeline execution context
  * @returns Uploaded output metadata
  */
 export async function uploadPipelineOutput(
   pipelineResult: PipelineResult,
-  context: ExecutionContext,
-  tmpDir: string
+  context: PipelineContext
 ): Promise<UploadedOutput> {
-  const { projectId, sessionId } = context
+  const { projectId, sessionId, tmpDir } = context
 
   // Determine file extension from format
   const extension = pipelineResult.format === 'gif' ? 'gif' : 'png'
-  const contentType = pipelineResult.format === 'gif' ? 'image/gif' : 'image/png'
 
   // Get output storage path
   const storagePath = getOutputStoragePath(projectId, sessionId, 'output', extension)
@@ -252,7 +187,7 @@ export async function uploadPipelineOutput(
   // Extract asset ID from session ID
   const assetId = `${sessionId}-output`
 
-  logger.info('[PipelineRunner] Output uploaded', {
+  logger.info('[Pipeline] Output uploaded', {
     url,
     storagePath,
     thumbnailUrl,

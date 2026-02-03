@@ -22,17 +22,16 @@ import type { JobOutput } from '@clementine/shared'
 import {
   executeTransformPipeline,
   uploadPipelineOutput,
-  type ExecutionContext,
+  type PipelineContext,
   type PipelineResult,
   type UploadedOutput,
 } from '../services/transform'
 import { createTempDir, cleanupTempDir } from '../infra/temp-dir'
 
 /**
- * Execution context for the job handler
+ * Job handler context - extends PipelineContext with cleanup
  */
-interface JobExecutionContext extends ExecutionContext {
-  tmpDir: string
+interface JobHandlerContext extends PipelineContext {
   cleanup: () => Promise<void>
 }
 
@@ -61,7 +60,7 @@ export const transformPipelineJob = onTaskDispatched(
     },
   },
   async (req) => {
-    let context: JobExecutionContext | undefined
+    let context: JobHandlerContext | undefined
 
     try {
       // 1. Validate & prepare
@@ -71,7 +70,7 @@ export const transformPipelineJob = onTaskDispatched(
       await markJobRunning(context)
 
       // 3. Execute transform pipeline
-      const pipelineResult = await executeTransformPipeline(context, context.tmpDir)
+      const pipelineResult = await executeTransformPipeline(context)
 
       // 4. Upload & finalize
       await finalizeJobSuccess(pipelineResult, context)
@@ -95,7 +94,7 @@ export const transformPipelineJob = onTaskDispatched(
  *
  * @throws Error if payload invalid, job not found, or job not pending
  */
-async function prepareJobExecution(data: unknown): Promise<JobExecutionContext> {
+async function prepareJobExecution(data: unknown): Promise<JobHandlerContext> {
   // Validate payload
   const parseResult = transformPipelineJobPayloadSchema.safeParse(data)
   if (!parseResult.success) {
@@ -136,7 +135,7 @@ async function prepareJobExecution(data: unknown): Promise<JobExecutionContext> 
 /**
  * Mark job as running with initial progress
  */
-async function markJobRunning(context: JobExecutionContext): Promise<void> {
+async function markJobRunning(context: JobHandlerContext): Promise<void> {
   const { projectId, jobId, sessionId } = context
 
   // Combined write: status + progress in one update
@@ -155,9 +154,9 @@ async function markJobRunning(context: JobExecutionContext): Promise<void> {
  */
 async function finalizeJobSuccess(
   pipelineResult: PipelineResult,
-  context: JobExecutionContext
+  context: JobHandlerContext
 ): Promise<void> {
-  const { projectId, jobId, sessionId, tmpDir } = context
+  const { projectId, jobId, sessionId } = context
   const startTime = Date.now()
 
   // Update progress: uploading (before the upload starts)
@@ -168,7 +167,7 @@ async function finalizeJobSuccess(
   })
 
   // Upload output and generate thumbnail
-  const uploadedOutput = await uploadPipelineOutput(pipelineResult, context, tmpDir)
+  const uploadedOutput = await uploadPipelineOutput(pipelineResult, context)
 
   // Build job output
   const output = buildJobOutput(pipelineResult, uploadedOutput, startTime)
@@ -197,7 +196,7 @@ async function finalizeJobSuccess(
  * Handle job failure - update job and session to failed state
  */
 async function handleJobFailure(
-  context: JobExecutionContext,
+  context: JobHandlerContext,
   error: unknown
 ): Promise<void> {
   const { projectId, jobId, sessionId } = context
