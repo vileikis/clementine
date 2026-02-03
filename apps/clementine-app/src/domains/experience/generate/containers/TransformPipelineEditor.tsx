@@ -167,6 +167,7 @@ export function TransformPipelineEditor({
                     node={node}
                     index={index + 1}
                     transformNodes={transformNodes}
+                    steps={experience.draft.steps}
                     workspaceId={workspaceId}
                     onUpdate={(newNodes) =>
                       updateTransformNodes.mutate({ transformNodes: newNodes })

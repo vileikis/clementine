@@ -8,13 +8,19 @@ import { AI_IMAGE_NODE_TYPE } from '@clementine/shared'
 
 import { AIImageNodeSettings } from './AIImageNode'
 import { UnknownNodeSettings } from './UnknownNode'
-import type { AIImageNode, TransformNode } from '@clementine/shared'
+import type {
+  AIImageNode,
+  ExperienceStep,
+  TransformNode,
+} from '@clementine/shared'
 
 export interface NodeSettingsProps {
   /** Transform node data */
   node: TransformNode
   /** Current transform nodes array */
   transformNodes: TransformNode[]
+  /** Experience steps for @mention in prompt editor */
+  steps: ExperienceStep[]
   /** Workspace ID for media uploads */
   workspaceId: string
   /** Callback to update transform nodes */
@@ -30,6 +36,7 @@ export interface NodeSettingsProps {
 export function NodeSettings({
   node,
   transformNodes,
+  steps,
   workspaceId,
   onUpdate,
 }: NodeSettingsProps) {
@@ -39,6 +46,7 @@ export function NodeSettings({
         <AIImageNodeSettings
           node={node as AIImageNode}
           transformNodes={transformNodes}
+          steps={steps}
           workspaceId={workspaceId}
           onUpdate={onUpdate}
         />

@@ -12,7 +12,7 @@ import { ChevronDown, Copy, Trash2 } from 'lucide-react'
 
 import { NodeHeader } from './NodeHeader'
 import { NodeSettings } from './NodeSettings'
-import type { TransformNode } from '@clementine/shared'
+import type { ExperienceStep, TransformNode } from '@clementine/shared'
 import { cn } from '@/shared/utils'
 import { ContextDropdownMenu } from '@/shared/components/ContextDropdownMenu'
 import { Button } from '@/ui-kit/ui/button'
@@ -29,6 +29,8 @@ export interface NodeListItemProps {
   index: number
   /** Current transform nodes array */
   transformNodes: TransformNode[]
+  /** Experience steps for @mention in prompt editor */
+  steps: ExperienceStep[]
   /** Workspace ID for media uploads */
   workspaceId: string
   /** Callback to update transform nodes */
@@ -52,6 +54,7 @@ export function NodeListItem({
   node,
   index,
   transformNodes,
+  steps,
   workspaceId,
   onUpdate,
   onDuplicate,
@@ -172,6 +175,7 @@ export function NodeListItem({
             <NodeSettings
               node={node}
               transformNodes={transformNodes}
+              steps={steps}
               workspaceId={workspaceId}
               onUpdate={onUpdate}
             />

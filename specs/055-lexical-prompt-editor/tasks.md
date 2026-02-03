@@ -23,12 +23,12 @@ Base path: `apps/clementine-app/src/domains/experience/generate/`
 
 **Purpose**: Create the domain-specific Lexical infrastructure by copying and adapting from ai-presets
 
-- [ ] T001 Create lexical directory structure at `apps/clementine-app/src/domains/experience/generate/lexical/`
-- [ ] T002 [P] Create types file with StepOption and MediaOption interfaces in `lexical/utils/types.ts`
-- [ ] T003 [P] Create barrel export for utils in `lexical/utils/index.ts`
-- [ ] T004 [P] Create barrel export for nodes in `lexical/nodes/index.ts`
-- [ ] T005 [P] Create barrel export for plugins in `lexical/plugins/index.ts`
-- [ ] T006 Create main barrel export in `lexical/index.ts`
+- [X] T001 Create lexical directory structure at `apps/clementine-app/src/domains/experience/generate/lexical/`
+- [X] T002 [P] Create types file with StepOption and MediaOption interfaces in `lexical/utils/types.ts`
+- [X] T003 [P] Create barrel export for utils in `lexical/utils/index.ts`
+- [X] T004 [P] Create barrel export for nodes in `lexical/nodes/index.ts`
+- [X] T005 [P] Create barrel export for plugins in `lexical/plugins/index.ts`
+- [X] T006 Create main barrel export in `lexical/index.ts`
 
 ---
 
@@ -38,12 +38,12 @@ Base path: `apps/clementine-app/src/domains/experience/generate/`
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T007 Create StepMentionNode adapted from VariableMentionNode in `lexical/nodes/StepMentionNode.tsx` (stores stepName, stepType, isInvalid; blue pill styling)
-- [ ] T008 Create MediaMentionNode adapted from ai-presets in `lexical/nodes/MediaMentionNode.tsx` (stores mediaName, isInvalid; green pill styling)
-- [ ] T009 Implement serializeToPlainText function in `lexical/utils/serialization.ts` (StepMentionNode → `@{step:name}`, MediaMentionNode → `@{ref:name}`)
-- [ ] T010 Implement deserializeFromPlainText function in `lexical/utils/serialization.ts` (parse `@{step:name}` and `@{ref:name}` patterns, create nodes with name matching)
-- [ ] T011 Update nodes barrel export to include StepMentionNode and MediaMentionNode in `lexical/nodes/index.ts`
-- [ ] T012 Update utils barrel export to include serialization functions in `lexical/utils/index.ts`
+- [X] T007 Create StepMentionNode adapted from VariableMentionNode in `lexical/nodes/StepMentionNode.tsx` (stores stepName, stepType, isInvalid; blue pill styling)
+- [X] T008 Create MediaMentionNode adapted from ai-presets in `lexical/nodes/MediaMentionNode.tsx` (stores mediaName, isInvalid; green pill styling)
+- [X] T009 Implement serializeToPlainText function in `lexical/utils/serialization.ts` (StepMentionNode → `@{step:name}`, MediaMentionNode → `@{ref:name}`)
+- [X] T010 Implement deserializeFromPlainText function in `lexical/utils/serialization.ts` (parse `@{step:name}` and `@{ref:name}` patterns, create nodes with name matching)
+- [X] T011 Update nodes barrel export to include StepMentionNode and MediaMentionNode in `lexical/nodes/index.ts`
+- [X] T012 Update utils barrel export to include serialization functions in `lexical/utils/index.ts`
 
 **Checkpoint**: Foundation ready - mention nodes can serialize/deserialize. User story implementation can now begin.
 
@@ -57,18 +57,18 @@ Base path: `apps/clementine-app/src/domains/experience/generate/`
 
 ### Implementation for User Story 1
 
-- [ ] T013 [US1] Create MentionsPlugin adapted from ai-presets in `lexical/plugins/MentionsPlugin.tsx` (trigger on "@", show steps with type icons, keyboard navigation)
-- [ ] T014 [US1] Add step type icon mapping function to MentionsPlugin (📝 for input steps, 📷 for capture steps)
-- [ ] T015 [US1] Implement step filtering in MentionsPlugin (exclude info steps, filter by search query)
-- [ ] T016 [US1] Create LexicalPromptInput component in `components/PromptComposer/LexicalPromptInput.tsx` (Lexical editor with step mention support)
-- [ ] T017 [US1] Add InitializePlugin to LexicalPromptInput for loading initial prompt value
-- [ ] T018 [US1] Add OnChangePlugin to LexicalPromptInput for serializing on changes
-- [ ] T019 [US1] Update PromptComposer to accept steps prop in `components/PromptComposer/PromptComposer.tsx`
-- [ ] T020 [US1] Update PromptComposer to convert ExperienceStep[] to StepOption[] with toStepOption adapter
-- [ ] T021 [US1] Replace PromptInput usage with LexicalPromptInput in PromptComposer
-- [ ] T022 [US1] Update AIImageNodeSettings to pass steps to PromptComposer in `components/NodeListItem/AIImageNode.tsx`
-- [ ] T023 [US1] Update PromptComposer barrel export in `components/PromptComposer/index.ts`
-- [ ] T024 [US1] Update plugins barrel export to include MentionsPlugin in `lexical/plugins/index.ts`
+- [X] T013 [US1] Create MentionsPlugin adapted from ai-presets in `lexical/plugins/MentionsPlugin.tsx` (trigger on "@", show steps with type icons, keyboard navigation)
+- [X] T014 [US1] Add step type icon mapping function to MentionsPlugin (📝 for input steps, 📷 for capture steps)
+- [X] T015 [US1] Implement step filtering in MentionsPlugin (exclude info steps, filter by search query)
+- [X] T016 [US1] Create LexicalPromptInput component in `components/PromptComposer/LexicalPromptInput.tsx` (Lexical editor with step mention support)
+- [X] T017 [US1] Add InitializePlugin to LexicalPromptInput for loading initial prompt value
+- [X] T018 [US1] Add OnChangePlugin to LexicalPromptInput for serializing on changes
+- [X] T019 [US1] Update PromptComposer to accept steps prop in `components/PromptComposer/PromptComposer.tsx`
+- [X] T020 [US1] Update PromptComposer to convert ExperienceStep[] to StepOption[] with toStepOption adapter
+- [X] T021 [US1] Replace PromptInput usage with LexicalPromptInput in PromptComposer
+- [X] T022 [US1] Update AIImageNodeSettings to pass steps to PromptComposer in `components/NodeListItem/AIImageNode.tsx`
+- [X] T023 [US1] Update PromptComposer barrel export in `components/PromptComposer/index.ts`
+- [X] T024 [US1] Update plugins barrel export to include MentionsPlugin in `lexical/plugins/index.ts`
 
 **Checkpoint**: User Story 1 complete - Can type "@", see steps in autocomplete, select to insert blue pill
 
