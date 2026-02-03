@@ -7,7 +7,7 @@
 import { logger } from 'firebase-functions/v2'
 import type { ProjectContextSnapshot } from '@clementine/shared'
 import { downloadFromStorage, getStoragePathFromMediaReference } from '../../infra/storage'
-import { applyOverlayToMedia } from '../media-pipeline/ffmpeg'
+import { applyOverlayToMedia } from '../ffmpeg'
 
 /**
  * Apply overlay to output if configured

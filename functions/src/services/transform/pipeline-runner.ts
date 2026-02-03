@@ -17,7 +17,7 @@ import {
   uploadToStorage,
   getOutputStoragePath,
 } from '../../infra/storage'
-import { generateThumbnail } from '../media-pipeline/ffmpeg'
+import { generateThumbnail } from '../ffmpeg'
 
 /**
  * Execute transform pipeline
