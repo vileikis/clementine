@@ -1,6 +1,6 @@
 // PromptComposer barrel export
 export * from './PromptComposer'
-export * from './PromptInput'
+export * from './LexicalPromptInput'
 export * from './ControlRow'
 export * from './ReferenceMediaItem'
 export * from './ReferenceMediaStrip'
