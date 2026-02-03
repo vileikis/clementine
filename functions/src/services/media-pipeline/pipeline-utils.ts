@@ -1,8 +1,9 @@
 import {
   downloadFromStorage,
   parseStorageUrl,
+  getStoragePathFromMediaReference,
 } from '../../infra/storage';
-import type { InputAsset } from '@clementine/shared';
+import type { InputAsset, MediaReference } from '@clementine/shared';
 
 /**
  * Download a single input asset from storage to local directory
@@ -79,5 +80,32 @@ export async function downloadOverlay(
   await downloadFromStorage(storagePath, outputPath);
 
   console.log(`[downloadOverlay] Successfully downloaded overlay`);
+  return outputPath;
+}
+
+/**
+ * Download overlay from MediaReference to local temporary directory
+ *
+ * Uses filePath if available (new documents), otherwise falls back
+ * to parsing the URL (legacy documents without filePath).
+ *
+ * @param overlay - MediaReference to the overlay image
+ * @param tmpDir - Temporary directory path
+ * @returns Full path to downloaded overlay file
+ */
+export async function downloadOverlayFromReference(
+  overlay: MediaReference,
+  tmpDir: string
+): Promise<string> {
+  const storagePath = getStoragePathFromMediaReference(overlay);
+  const outputPath = `${tmpDir}/overlay.png`;
+
+  console.log(`[downloadOverlayFromReference] Overlay: ${overlay.displayName}`);
+  console.log(`[downloadOverlayFromReference] Storage path: ${storagePath}`);
+  console.log(`[downloadOverlayFromReference] Output path: ${outputPath}`);
+
+  await downloadFromStorage(storagePath, outputPath);
+
+  console.log(`[downloadOverlayFromReference] Successfully downloaded overlay`);
   return outputPath;
 }

@@ -7,7 +7,7 @@
  * Note: session-legacy.ts uses old path (/sessions/{id}) for legacy media pipeline
  */
 import { db } from '../infra/firebase-admin'
-import { sessionSchema, type Session, type JobStatus } from '@clementine/shared'
+import { sessionSchema, type Session, type JobStatus, type SessionResultMedia } from '@clementine/shared'
 import { convertFirestoreDoc } from '../utils/firestore-utils'
 
 /**
@@ -70,4 +70,24 @@ export async function updateSessionJobStatus(
  */
 export function hasActiveJob(session: Session): boolean {
   return session.jobStatus === 'pending' || session.jobStatus === 'running'
+}
+
+/**
+ * Update session with result media
+ *
+ * Sets the resultMedia field with the transform pipeline output.
+ *
+ * @param projectId - Project ID
+ * @param sessionId - Session document ID
+ * @param resultMedia - Result media to set
+ */
+export async function updateSessionResultMedia(
+  projectId: string,
+  sessionId: string,
+  resultMedia: SessionResultMedia
+): Promise<void> {
+  await getSessionRef(projectId, sessionId).update({
+    resultMedia,
+    updatedAt: Date.now(),
+  })
 }

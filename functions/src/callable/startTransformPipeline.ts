@@ -93,7 +93,6 @@ export const startTransformPipelineV2 = onCall(
       projectId,
       sessionId,
       experienceId: session.experienceId,
-      stepId: null, // stepId is deprecated - transform is now a standalone field
       snapshot,
     })
 

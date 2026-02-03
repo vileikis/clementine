@@ -43,14 +43,13 @@ describe('buildJobData', () => {
       projectId: 'project-123',
       sessionId: 'session-456',
       experienceId: 'exp-789',
-      stepId: 'transform-step',
       snapshot,
     })
 
     expect(result['projectId']).toBe('project-123')
     expect(result['sessionId']).toBe('session-456')
     expect(result['experienceId']).toBe('exp-789')
-    expect(result['stepId']).toBe('transform-step')
+    expect(result['stepId']).toBeNull() // stepId is deprecated
     expect(result['snapshot']).toEqual(snapshot)
   })
 
@@ -59,7 +58,6 @@ describe('buildJobData', () => {
       projectId: 'p',
       sessionId: 's',
       experienceId: 'e',
-      stepId: null,
       snapshot: createMockSnapshot(),
     })
 
@@ -71,7 +69,6 @@ describe('buildJobData', () => {
       projectId: 'p',
       sessionId: 's',
       experienceId: 'e',
-      stepId: null,
       snapshot: createMockSnapshot(),
     })
 
@@ -88,7 +85,6 @@ describe('buildJobData', () => {
       projectId: 'p',
       sessionId: 's',
       experienceId: 'e',
-      stepId: null,
       snapshot: createMockSnapshot(),
     })
     const after = Date.now()
@@ -100,12 +96,11 @@ describe('buildJobData', () => {
     expect(result['createdAt']).toBe(result['updatedAt'])
   })
 
-  it('accepts null stepId', () => {
+  it('sets stepId to null (deprecated field)', () => {
     const result = buildJobData({
       projectId: 'p',
       sessionId: 's',
       experienceId: 'e',
-      stepId: null,
       snapshot: createMockSnapshot(),
     })
 
