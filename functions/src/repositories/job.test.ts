@@ -28,10 +28,7 @@ function createMockSnapshot(overrides: Partial<JobSnapshot> = {}): JobSnapshot {
       applyOverlay: false,
       experienceRef: null,
     },
-    versions: {
-      experienceVersion: 1,
-      eventVersion: null,
-    },
+    experienceVersion: 1,
     ...overrides,
   }
 }

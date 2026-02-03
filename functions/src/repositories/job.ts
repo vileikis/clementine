@@ -319,12 +319,9 @@ export function buildJobSnapshot(
       applyOverlay: false,
       experienceRef: null,
     },
-    versions: {
-      experienceVersion:
-        configSource === 'draft'
-          ? experience.draftVersion
-          : (experience.publishedVersion ?? 1),
-      eventVersion: null, // Deprecated - kept for backward compatibility with old jobs
-    },
+    experienceVersion:
+      configSource === 'draft'
+        ? experience.draftVersion
+        : (experience.publishedVersion ?? 1),
   }
 }

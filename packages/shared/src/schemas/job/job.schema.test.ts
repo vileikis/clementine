@@ -4,7 +4,6 @@ import {
   jobProgressSchema,
   jobErrorSchema,
   jobOutputSchema,
-  versionSnapshotSchema,
   sessionInputsSnapshotSchema,
   eventContextSnapshotSchema,
   jobSnapshotSchema,
@@ -162,31 +161,6 @@ describe('jobOutputSchema', () => {
   })
 })
 
-describe('versionSnapshotSchema', () => {
-  it('parses valid version snapshot', () => {
-    const result = versionSnapshotSchema.parse({
-      experienceVersion: 5,
-      eventVersion: 3,
-    })
-    expect(result.experienceVersion).toBe(5)
-    expect(result.eventVersion).toBe(3)
-  })
-
-  it('requires positive integer experienceVersion', () => {
-    expect(() =>
-      versionSnapshotSchema.parse({ experienceVersion: 0, eventVersion: 1 })
-    ).toThrow()
-  })
-
-  it('allows null eventVersion', () => {
-    const result = versionSnapshotSchema.parse({
-      experienceVersion: 1,
-      eventVersion: null,
-    })
-    expect(result.eventVersion).toBeNull()
-  })
-})
-
 describe('sessionInputsSnapshotSchema', () => {
   it('parses valid session inputs', () => {
     const result = sessionInputsSnapshotSchema.parse({
@@ -245,7 +219,7 @@ describe('jobSnapshotSchema', () => {
     sessionInputs: { answers: [], capturedMedia: [] },
     transformNodes: [],
     projectContext: { overlay: null, applyOverlay: false },
-    versions: { experienceVersion: 1, eventVersion: null },
+    experienceVersion: 1,
   }
 
   it('parses valid snapshot', () => {
@@ -253,7 +227,7 @@ describe('jobSnapshotSchema', () => {
     expect(result.sessionInputs).toBeDefined()
     expect(result.transformNodes).toBeDefined()
     expect(result.projectContext).toBeDefined()
-    expect(result.versions).toBeDefined()
+    expect(result.experienceVersion).toBe(1)
   })
 
   it('preserves unknown fields for schema evolution', () => {
@@ -275,7 +249,7 @@ describe('jobSchema', () => {
       sessionInputs: { answers: [], capturedMedia: [] },
       transformNodes: [],
       projectContext: { overlay: null, applyOverlay: false },
-      versions: { experienceVersion: 1, eventVersion: null },
+      experienceVersion: 1,
     },
     createdAt: Date.now(),
     updatedAt: Date.now(),

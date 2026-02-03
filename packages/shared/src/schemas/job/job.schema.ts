@@ -104,21 +104,14 @@ export const projectContextSnapshotSchema = z.looseObject({
 export const eventContextSnapshotSchema = projectContextSnapshotSchema
 
 /**
- * Version snapshot for audit trail
- */
-export const versionSnapshotSchema = z.object({
-  experienceVersion: z.number().int().positive(),
-  eventVersion: z.number().int().positive().nullable(),
-})
-
-/**
  * Complete job execution snapshot
  */
 export const jobSnapshotSchema = z.looseObject({
   sessionInputs: sessionInputsSnapshotSchema,
   transformNodes: transformNodesSnapshotSchema,
   projectContext: projectContextSnapshotSchema,
-  versions: versionSnapshotSchema,
+  /** Experience version at time of job creation */
+  experienceVersion: z.number().int().positive(),
 })
 
 // Backward compatibility: eventContext is now projectContext
@@ -168,4 +161,3 @@ export type ProjectContextSnapshot = z.infer<
 >
 /** @deprecated Use ProjectContextSnapshot instead */
 export type EventContextSnapshot = ProjectContextSnapshot
-export type VersionSnapshot = z.infer<typeof versionSnapshotSchema>
