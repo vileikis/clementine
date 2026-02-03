@@ -4,8 +4,9 @@
  * Unified bordered container for AI Image node configuration.
  * Contains prompt input, model/aspect ratio selectors, and reference media.
  * Supports file upload via button and drag-and-drop.
+ * Supports @mention for steps and media references.
  */
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { useRefMediaUpload } from '../../hooks'
 import {
@@ -13,18 +14,49 @@ import {
   updateNodePrompt,
 } from '../../lib/transform-operations'
 import { ControlRow } from './ControlRow'
-import { PromptInput } from './PromptInput'
+import { LexicalPromptInput } from './LexicalPromptInput'
 import { ReferenceMediaStrip } from './ReferenceMediaStrip'
-import type { AIImageNode, TransformNode } from '@clementine/shared'
+import type {
+  AIImageNode,
+  ExperienceStep,
+  TransformNode,
+} from '@clementine/shared'
+import type { MediaOption, StepOption } from '../../lexical/utils/types'
 import { useAuth } from '@/domains/auth'
 import { cn } from '@/shared/utils'
 import { useDebounce } from '@/shared/utils/useDebounce'
+
+/**
+ * Convert ExperienceStep to StepOption for mention autocomplete
+ */
+function toStepOption(step: ExperienceStep): StepOption {
+  return {
+    id: step.id,
+    name: step.name,
+    type: step.type,
+  }
+}
+
+/**
+ * Convert refMedia to MediaOption for mention autocomplete
+ */
+function toMediaOption(media: {
+  mediaAssetId: string
+  displayName: string
+}): MediaOption {
+  return {
+    id: media.mediaAssetId,
+    name: media.displayName,
+  }
+}
 
 export interface PromptComposerProps {
   /** AI Image node being edited */
   node: AIImageNode
   /** Current transform nodes array */
   transformNodes: TransformNode[]
+  /** Experience steps for @mention (info steps should be excluded by caller) */
+  steps: ExperienceStep[]
   /** Workspace ID for media uploads */
   workspaceId: string
   /** Callback to update transform nodes */
@@ -42,6 +74,7 @@ const PROMPT_DEBOUNCE_DELAY = 2000
 export function PromptComposer({
   node,
   transformNodes,
+  steps,
   workspaceId,
   onUpdate,
   disabled,
@@ -51,6 +84,18 @@ export function PromptComposer({
 
   // Local state for prompt to enable debouncing
   const [localPrompt, setLocalPrompt] = useState(config.prompt)
+
+  // Convert steps to StepOption format (exclude info steps)
+  const stepOptions = useMemo(
+    () => steps.filter((s) => s.type !== 'info').map(toStepOption),
+    [steps],
+  )
+
+  // Convert refMedia to MediaOption format
+  const mediaOptions = useMemo(
+    () => config.refMedia.map(toMediaOption),
+    [config.refMedia],
+  )
 
   // Drag-over state for drop zone highlight
   const [isDragOver, setIsDragOver] = useState(false)
@@ -169,10 +214,12 @@ export function PromptComposer({
         disabled={disabled}
       />
 
-      {/* Prompt Input */}
-      <PromptInput
+      {/* Prompt Input with @mention support */}
+      <LexicalPromptInput
         value={localPrompt}
         onChange={setLocalPrompt}
+        steps={stepOptions}
+        media={mediaOptions}
         disabled={disabled}
       />
 
