@@ -140,6 +140,7 @@ Base path: `apps/clementine-app/src/domains/experience/generate/`
 - [ ] T041 [US4] Implement case-insensitive filter in MentionsPlugin based on search query
 - [ ] T042 [US4] Add "No results" empty state when filter matches nothing
 - [ ] T043 [US4] Ensure filter updates within 100ms (memoize filter results)
+- [ ] T043a [US4] **Enhancement**: Allow spaces in search query (custom trigger function to replace `useBasicTypeaheadTriggerMatch`) - currently typing "@pet " closes menu, should stay open to search "Pet Choice"
 
 **Checkpoint**: User Story 4 complete - Autocomplete filters as user types
 
