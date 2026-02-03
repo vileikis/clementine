@@ -48,7 +48,7 @@ describe('useCopyToClipboard', () => {
 
   it('should copy text using Clipboard API when available', async () => {
     const { result } = renderHook(() => useCopyToClipboard())
-    const testText = 'https://app.clementine.com/guest/test-project'
+    const testText = 'https://app.clementine.com/join/test-project'
 
     let copyPromise: Promise<boolean>
     act(() => {
@@ -66,7 +66,7 @@ describe('useCopyToClipboard', () => {
 
   it('should set isCopying to true during copy operation', async () => {
     const { result } = renderHook(() => useCopyToClipboard())
-    const testText = 'https://app.clementine.com/guest/test-project'
+    const testText = 'https://app.clementine.com/join/test-project'
 
     // Make writeText delay
     mockClipboard.writeText.mockImplementation(
@@ -94,7 +94,7 @@ describe('useCopyToClipboard', () => {
       execCommandMock as unknown as typeof document.execCommand
 
     const { result } = renderHook(() => useCopyToClipboard())
-    const testText = 'https://app.clementine.com/guest/test-project'
+    const testText = 'https://app.clementine.com/join/test-project'
 
     await act(async () => {
       await result.current.copyToClipboard(testText)
@@ -111,7 +111,7 @@ describe('useCopyToClipboard', () => {
   it('should show error toast when copy fails', async () => {
     mockClipboard.writeText.mockRejectedValue(new Error('Copy failed'))
     const { result } = renderHook(() => useCopyToClipboard())
-    const testText = 'https://app.clementine.com/guest/test-project'
+    const testText = 'https://app.clementine.com/join/test-project'
 
     await act(async () => {
       await result.current.copyToClipboard(testText)
@@ -126,7 +126,7 @@ describe('useCopyToClipboard', () => {
   it('should reset copySuccess after 3 seconds', async () => {
     vi.useFakeTimers()
     const { result } = renderHook(() => useCopyToClipboard())
-    const testText = 'https://app.clementine.com/guest/test-project'
+    const testText = 'https://app.clementine.com/join/test-project'
 
     await act(async () => {
       await result.current.copyToClipboard(testText)

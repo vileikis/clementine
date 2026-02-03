@@ -10,7 +10,7 @@ import type { GuestUrl, QRCodeOptions } from '../types'
 
 describe('QRCodeDisplay', () => {
   const mockQrOptions: QRCodeOptions = {
-    value: 'https://app.clementine.com/guest/test-project-123' as GuestUrl,
+    value: 'https://app.clementine.com/join/test-project-123' as GuestUrl,
     size: 512,
     level: 'M',
     fgColor: '#000000',
