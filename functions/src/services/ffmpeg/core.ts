@@ -99,8 +99,6 @@ export function runFFmpegCommand(
     let stderr = '';
     let stdout = '';
 
-    console.log(`FFmpeg command: ${FFMPEG_PATH} ${args.join(' ')}`);
-
     const process = spawn(FFMPEG_PATH, args);
 
     if (timeout > 0) {
@@ -137,7 +135,6 @@ export function runFFmpegCommand(
       if (timeoutHandle) clearTimeout(timeoutHandle);
 
       if (code === 0) {
-        console.log(`${description} completed successfully`);
         resolve();
         return
       }

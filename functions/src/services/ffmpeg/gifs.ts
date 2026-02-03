@@ -111,15 +111,10 @@ export async function createGIF(
     }
   } finally {
     // Cleanup temporary files (frames will be cleaned up by caller)
-    try {
-      await Promise.all([
-        fs.unlink(concatFilePath).catch(() => {}),
-        fs.unlink(palettePath).catch(() => {}),
-      ]);
-    } catch (err) {
-      // Ignore cleanup errors
-      console.warn(`Failed to cleanup temporary files: ${(err as Error).message}`);
-    }
+    await Promise.all([
+      fs.unlink(concatFilePath).catch(() => {}),
+      fs.unlink(palettePath).catch(() => {}),
+    ]);
   }
 }
 
