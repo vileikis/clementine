@@ -1,15 +1,8 @@
 /**
  * Media Pipeline Service
  *
- * Public API for media processing pipeline
+ * FFmpeg utilities for media processing.
  */
-
-// Pipeline processors
-export { processSingleImage } from './image.pipeline';
-export { processGIF } from './gif.pipeline';
-
-// Configuration
-export { getPipelineConfig, detectOutputFormat } from './config';
 
 // FFmpeg operations
 export {
@@ -17,8 +10,7 @@ export {
   generateThumbnail,
   createGIF,
   createMP4,
+  scaleAndCropGIF,
+  applyOverlayToMedia,
   FFmpegError,
-} from './ffmpeg';
-
-// Types
-export type { PipelineConfig } from '@clementine/shared';
+} from './ffmpeg'

@@ -37,13 +37,7 @@ export const helloWorld = onRequest(
 )
 
 /**
- * Media Processing Pipeline (Legacy POC)
- */
-export { processMedia } from './http/processMedia'
-export { processMediaJob } from './tasks/processMediaJob'
-
-/**
- * Transform Pipeline (Phase 2)
+ * Transform Pipeline
  */
 export { startTransformPipelineV2 } from './callable/startTransformPipeline'
 export { transformPipelineJob } from './tasks/transformPipelineJob'
