@@ -35,7 +35,7 @@ vi.mock('../hooks/useCopyToClipboard', () => ({
 vi.mock('../hooks/useQRCodeGenerator', () => ({
   useQRCodeGenerator: () => ({
     qrOptions: {
-      value: 'https://app.clementine.com/guest/test-project-123',
+      value: 'https://app.clementine.com/join/test-project-123',
       size: 256,
       level: 'M',
     },
@@ -94,7 +94,7 @@ describe('ShareDialog', () => {
       />,
     )
 
-    const expectedUrl = `https://app.clementine.com/guest/${mockProjectId}`
+    const expectedUrl = `https://app.clementine.com/join/${mockProjectId}`
     expect(screen.getByText(expectedUrl)).toBeInTheDocument()
   })
 

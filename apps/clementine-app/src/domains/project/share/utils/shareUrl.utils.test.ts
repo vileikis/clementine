@@ -27,7 +27,7 @@ describe('generateGuestUrl', () => {
 
   it('should generate valid guest URL from project ID', () => {
     const url = generateGuestUrl('test-project-123')
-    expect(url).toBe('https://app.clementine.com/guest/test-project-123')
+    expect(url).toBe('https://app.clementine.com/join/test-project-123')
   })
 
   it('should work with localhost in development', () => {
@@ -36,19 +36,19 @@ describe('generateGuestUrl', () => {
     }
 
     const url = generateGuestUrl('test-project-123')
-    expect(url).toBe('http://localhost:3000/guest/test-project-123')
+    expect(url).toBe('http://localhost:3000/join/test-project-123')
   })
 
   it('should handle different project IDs correctly', () => {
     const testCases = [
-      { id: 'abc123', expected: 'https://app.clementine.com/guest/abc123' },
+      { id: 'abc123', expected: 'https://app.clementine.com/join/abc123' },
       {
         id: 'test-project',
-        expected: 'https://app.clementine.com/guest/test-project',
+        expected: 'https://app.clementine.com/join/test-project',
       },
       {
         id: 'project_123',
-        expected: 'https://app.clementine.com/guest/project_123',
+        expected: 'https://app.clementine.com/join/project_123',
       },
     ]
 
@@ -60,19 +60,19 @@ describe('generateGuestUrl', () => {
 
 describe('extractProjectIdFromGuestUrl', () => {
   it('should extract project ID from valid guest URL', () => {
-    const url = 'https://app.clementine.com/guest/test-project-123' as GuestUrl
+    const url = 'https://app.clementine.com/join/test-project-123' as GuestUrl
     const projectId = extractProjectIdFromGuestUrl(url)
     expect(projectId).toBe('test-project-123')
   })
 
   it('should handle URLs with query parameters', () => {
     const url =
-      'https://app.clementine.com/guest/test-project-123?param=value' as GuestUrl
+      'https://app.clementine.com/join/test-project-123?param=value' as GuestUrl
     const projectId = extractProjectIdFromGuestUrl(url)
     expect(projectId).toBe('test-project-123')
   })
 
-  it('should return null for URLs without /guest/ path', () => {
+  it('should return null for URLs without /join/ path', () => {
     const url = 'https://app.clementine.com/test-project-123' as GuestUrl
     const projectId = extractProjectIdFromGuestUrl(url)
     expect(projectId).toBeNull()
@@ -80,13 +80,13 @@ describe('extractProjectIdFromGuestUrl', () => {
 
   it('should handle different valid project IDs', () => {
     const testCases = [
-      { url: 'https://app.clementine.com/guest/abc123', expected: 'abc123' },
+      { url: 'https://app.clementine.com/join/abc123', expected: 'abc123' },
       {
-        url: 'https://app.clementine.com/guest/test-project',
+        url: 'https://app.clementine.com/join/test-project',
         expected: 'test-project',
       },
       {
-        url: 'https://app.clementine.com/guest/project_123',
+        url: 'https://app.clementine.com/join/project_123',
         expected: 'project_123',
       },
     ]

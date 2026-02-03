@@ -8,7 +8,7 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import { ShareLinkSection } from './ShareLinkSection'
 
 describe('ShareLinkSection', () => {
-  const mockUrl = 'https://app.clementine.com/guest/test-project-123'
+  const mockUrl = 'https://app.clementine.com/join/test-project-123'
   const mockOnCopy = vi.fn()
 
   it('should render guest URL in readonly input', () => {

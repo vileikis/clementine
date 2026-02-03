@@ -4,8 +4,8 @@
  * Domain-owned layout for project config designer. Handles publish workflow,
  * change detection, and integrates TopNavBar + ProjectConfigDesignerPage.
  */
-import { useEffect, useMemo } from 'react'
-import { FolderOpen, Loader2 } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { FolderOpen, Loader2, Share } from 'lucide-react'
 import { toast } from 'sonner'
 import { usePublishProjectConfig } from '../hooks'
 import { useProjectConfigDesignerStore } from '../stores'
@@ -13,6 +13,7 @@ import { ProjectConfigDesignerPage } from './ProjectConfigDesignerPage'
 import type { Project } from '@clementine/shared'
 import type { TabItem } from '@/domains/navigation'
 import { TopNavBar } from '@/domains/navigation'
+import { ShareDialog } from '@/domains/project/share'
 import { EditorChangesBadge, EditorSaveStatus } from '@/shared/editor-status'
 import { Button } from '@/ui-kit/ui/button'
 
@@ -66,6 +67,7 @@ export function ProjectConfigDesignerLayout({
   project,
   workspaceSlug,
 }: ProjectConfigDesignerLayoutProps) {
+  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false)
   const publishConfig = usePublishProjectConfig(project.id)
   const { pendingSaves, lastCompletedAt, resetSaveState } =
     useProjectConfigDesignerStore()
@@ -124,9 +126,17 @@ export function ProjectConfigDesignerLayout({
               draftVersion={project.draftVersion}
               publishedVersion={project.publishedVersion}
             />
-            <Button variant="outline" disabled>
-              Preview
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsShareDialogOpen(true)}
+              aria-label="Share project"
+            >
+              <Share className="h-4 w-4" />
             </Button>
+            {/* <Button variant="outline" disabled>
+              Preview
+            </Button> */}
             <Button
               onClick={handlePublish}
               disabled={!hasUnpublishedChanges || publishConfig.isPending}
@@ -138,6 +148,11 @@ export function ProjectConfigDesignerLayout({
             </Button>
           </>
         }
+      />
+      <ShareDialog
+        projectId={project.id}
+        open={isShareDialogOpen}
+        onOpenChange={setIsShareDialogOpen}
       />
       <ProjectConfigDesignerPage />
     </div>

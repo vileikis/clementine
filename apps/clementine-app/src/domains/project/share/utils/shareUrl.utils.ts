@@ -13,14 +13,14 @@ import type { GuestUrl, ProjectId } from '../types'
  * @returns Guest URL for sharing
  *
  * @example
- * const url = generateGuestUrl('abc123'); // https://app.clementine.com/guest/abc123
+ * const url = generateGuestUrl('abc123'); // https://app.clementine.com/join/abc123
  */
 export function generateGuestUrl(projectId: string): GuestUrl {
   // Get current origin (handles dev/staging/prod)
   const origin = window.location.origin
 
   // Construct and brand guest URL
-  return `${origin}/guest/${projectId}` as GuestUrl
+  return `${origin}/join/${projectId}` as GuestUrl
 }
 
 /**
@@ -31,6 +31,6 @@ export function generateGuestUrl(projectId: string): GuestUrl {
  * @returns Project ID or null if URL doesn't match pattern
  */
 export function extractProjectIdFromGuestUrl(url: GuestUrl): ProjectId | null {
-  const match = url.match(/\/guest\/([^/?]+)/)
+  const match = url.match(/\/join\/([^/?]+)/)
   return match?.[1] ? (match[1] as ProjectId) : null
 }

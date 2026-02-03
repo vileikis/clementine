@@ -10,7 +10,7 @@ import type { GuestUrl } from '../types'
 
 describe('useQRCodeGenerator', () => {
   const mockGuestUrl =
-    'https://app.clementine.com/guest/test-project-123' as GuestUrl
+    'https://app.clementine.com/join/test-project-123' as GuestUrl
   let originalDateNow: () => number
 
   beforeEach(() => {
@@ -89,7 +89,7 @@ describe('useQRCodeGenerator', () => {
 
     expect(result.current.qrOptions.value).toContain(mockGuestUrl)
 
-    const newUrl = 'https://app.clementine.com/guest/new-project' as GuestUrl
+    const newUrl = 'https://app.clementine.com/join/new-project' as GuestUrl
     rerender({ url: newUrl })
 
     expect(result.current.qrOptions.value).toContain(newUrl)

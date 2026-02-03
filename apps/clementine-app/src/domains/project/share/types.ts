@@ -5,7 +5,7 @@
 
 /**
  * Guest URL for project access
- * Format: https://{domain}/guest/{projectId}
+ * Format: https://{domain}/join/{projectId}
  */
 export type GuestUrl = string & { readonly __brand: 'GuestUrl' }
 
