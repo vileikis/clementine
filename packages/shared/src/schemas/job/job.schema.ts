@@ -135,7 +135,6 @@ export const jobSchema = z.looseObject({
   projectId: z.string(),
   sessionId: z.string(),
   experienceId: z.string(),
-  stepId: z.string().nullable().default(null),
 
   // STATUS TRACKING
   status: jobStatusSchema.default('pending'),

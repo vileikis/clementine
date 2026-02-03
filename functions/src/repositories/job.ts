@@ -274,7 +274,6 @@ export function buildJobData(params: {
     projectId: params.projectId,
     sessionId: params.sessionId,
     experienceId: params.experienceId,
-    stepId: null, // Deprecated - transform is now a standalone pipeline
     status: 'pending',
     progress: null,
     output: null,

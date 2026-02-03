@@ -286,7 +286,6 @@ describe('jobSchema', () => {
 
     expect(result.id).toBe('job-123')
     expect(result.status).toBe('pending')
-    expect(result.stepId).toBeNull()
     expect(result.progress).toBeNull()
     expect(result.output).toBeNull()
     expect(result.error).toBeNull()
@@ -314,7 +313,6 @@ describe('jobSchema', () => {
     const result = jobSchema.parse({
       ...validMinimalJob,
       status: 'completed',
-      stepId: 'transform-step',
       progress: { currentStep: 'done', percentage: 100 },
       output: {
         assetId: 'asset-out',
@@ -329,7 +327,6 @@ describe('jobSchema', () => {
     })
 
     expect(result.status).toBe('completed')
-    expect(result.stepId).toBe('transform-step')
     expect(result.progress?.percentage).toBe(100)
     expect(result.output?.format).toBe('image')
     expect(result.startedAt).toBe(now - 5000)

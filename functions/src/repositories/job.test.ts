@@ -49,7 +49,6 @@ describe('buildJobData', () => {
     expect(result['projectId']).toBe('project-123')
     expect(result['sessionId']).toBe('session-456')
     expect(result['experienceId']).toBe('exp-789')
-    expect(result['stepId']).toBeNull() // stepId is deprecated
     expect(result['snapshot']).toEqual(snapshot)
   })
 
@@ -96,16 +95,6 @@ describe('buildJobData', () => {
     expect(result['createdAt']).toBe(result['updatedAt'])
   })
 
-  it('sets stepId to null (deprecated field)', () => {
-    const result = buildJobData({
-      projectId: 'p',
-      sessionId: 's',
-      experienceId: 'e',
-      snapshot: createMockSnapshot(),
-    })
-
-    expect(result['stepId']).toBeNull()
-  })
 })
 
 describe('createSanitizedError', () => {
