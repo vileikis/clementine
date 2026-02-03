@@ -143,6 +143,8 @@ export async function updateJobOutput(
 /**
  * Mark job as completed with output
  *
+ * Sets progress to 100% completed along with the output.
+ *
  * @param projectId - Project ID
  * @param jobId - Job document ID
  * @param output - Final output data
@@ -155,6 +157,11 @@ export async function updateJobComplete(
   const now = Date.now()
   await getJobRef(projectId, jobId).update({
     status: 'completed' as JobStatus,
+    progress: {
+      currentStep: 'completed',
+      percentage: 100,
+      message: 'Complete',
+    } satisfies JobProgress,
     output,
     completedAt: now,
     updatedAt: now,
@@ -185,19 +192,29 @@ export async function updateJobError(
 /**
  * Mark job as started (pending -> running)
  *
+ * Optionally sets initial progress in the same write.
+ *
  * @param projectId - Project ID
  * @param jobId - Job document ID
+ * @param initialProgress - Optional initial progress to set
  */
 export async function updateJobStarted(
   projectId: string,
-  jobId: string
+  jobId: string,
+  initialProgress?: JobProgress
 ): Promise<void> {
   const now = Date.now()
-  await getJobRef(projectId, jobId).update({
+  const update: Record<string, unknown> = {
     status: 'running' as JobStatus,
     startedAt: now,
     updatedAt: now,
-  })
+  }
+
+  if (initialProgress) {
+    update['progress'] = initialProgress
+  }
+
+  await getJobRef(projectId, jobId).update(update)
 }
 
 /**

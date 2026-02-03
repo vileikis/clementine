@@ -6,9 +6,6 @@
  *
  * See contracts/transform-pipeline-job.yaml for full spec.
  */
-import * as os from 'os'
-import * as path from 'path'
-import * as fs from 'fs/promises'
 import { onTaskDispatched } from 'firebase-functions/v2/tasks'
 import { logger } from 'firebase-functions/v2'
 import { transformPipelineJobPayloadSchema } from '../schemas/transform-pipeline.schema'
@@ -26,46 +23,31 @@ import {
   executeTransformPipeline,
   uploadPipelineOutput,
   type ExecutionContext,
+  type PipelineResult,
+  type UploadedOutput,
 } from '../services/transform'
+import { createTempDir, cleanupTempDir } from '../infra/temp-dir'
 
 /**
- * Create a temporary directory for pipeline execution
- *
- * @param jobId - Job ID for unique naming
- * @returns Path to temporary directory
+ * Execution context for the job handler
  */
-async function createTempDir(jobId: string): Promise<string> {
-  const tmpDir = path.join(os.tmpdir(), `transform-${jobId}`)
-  await fs.mkdir(tmpDir, { recursive: true })
-  return tmpDir
+interface JobExecutionContext extends ExecutionContext {
+  tmpDir: string
+  cleanup: () => Promise<void>
 }
 
-/**
- * Clean up temporary directory
- *
- * @param tmpDir - Path to temporary directory
- */
-async function cleanupTempDir(tmpDir: string): Promise<void> {
-  try {
-    await fs.rm(tmpDir, { recursive: true, force: true })
-    logger.info('[TransformJob] Cleaned up temp directory', { tmpDir })
-  } catch (error) {
-    logger.warn('[TransformJob] Failed to cleanup temp directory', {
-      tmpDir,
-      error: error instanceof Error ? error.message : String(error),
-    })
-  }
-}
+// ============================================================================
+// Main Handler
+// ============================================================================
 
 /**
  * Cloud Task handler: transformPipelineJob
  *
- * Processes transform pipeline jobs with the following lifecycle:
- * 1. Validate payload and fetch job
- * 2. Update job status to 'running'
- * 3. Execute pipeline (download input, run transforms, apply overlay)
- * 4. Upload output and update session
- * 5. Update job status to 'completed' with output
+ * Flow:
+ * 1. Validate payload & prepare execution context
+ * 2. Mark job as running
+ * 3. Execute transform pipeline
+ * 4. Upload output & finalize
  */
 export const transformPipelineJob = onTaskDispatched(
   {
@@ -79,143 +61,179 @@ export const transformPipelineJob = onTaskDispatched(
     },
   },
   async (req) => {
-    let projectId: string | undefined
-    let jobId: string | undefined
-    let sessionId: string | undefined
-    let tmpDir: string | undefined
+    let context: JobExecutionContext | undefined
 
     try {
-      // Validate payload
-      const parseResult = transformPipelineJobPayloadSchema.safeParse(req.data)
-      if (!parseResult.success) {
-        logger.error('Invalid task payload:', parseResult.error.issues)
-        throw new Error('Invalid task payload')
-      }
+      // 1. Validate & prepare
+      context = await prepareJobExecution(req.data)
 
-      const payload = parseResult.data
-      projectId = payload.projectId
-      jobId = payload.jobId
-      sessionId = payload.sessionId
+      // 2. Mark as running
+      await markJobRunning(context)
 
-      logger.info(`[TransformJob] Processing transform job ${jobId}`, {
-        projectId,
-        sessionId,
-      })
+      // 3. Execute transform pipeline
+      const pipelineResult = await executeTransformPipeline(context, context.tmpDir)
 
-      // Fetch job document
-      const job = await fetchJob(projectId, jobId)
-      if (!job) {
-        logger.error(`[TransformJob] Job not found: ${jobId}`)
-        throw new Error(`Job not found: ${jobId}`)
-      }
-
-      // Validate job status is 'pending'
-      if (job.status !== 'pending') {
-        logger.warn(`[TransformJob] Job ${jobId} has unexpected status: ${job.status}`)
-        return
-      }
-
-      // Update job status to 'running'
-      await updateJobStarted(projectId, jobId)
-      await updateSessionJobStatus(projectId, sessionId, jobId, 'running')
-
-      logger.info(`[TransformJob] Job ${jobId} started, executing pipeline...`)
-
-      // Create temp directory
-      tmpDir = await createTempDir(jobId)
-
-      // Build execution context
-      const context: ExecutionContext = {
-        jobId,
-        projectId,
-        sessionId,
-        snapshot: job.snapshot,
-      }
-
-      // Progress: initializing
-      await updateJobProgress(projectId, jobId, {
-        currentStep: 'initializing',
-        percentage: 10,
-        message: 'Initializing pipeline...',
-      })
-
-      const startTime = Date.now()
-
-      // Execute transform pipeline
-      await updateJobProgress(projectId, jobId, {
-        currentStep: 'processing',
-        percentage: 30,
-        message: 'Processing transform...',
-      })
-
-      const pipelineResult = await executeTransformPipeline(context, tmpDir)
-
-      // Upload output and generate thumbnail
-      await updateJobProgress(projectId, jobId, {
-        currentStep: 'uploading',
-        percentage: 80,
-        message: 'Uploading result...',
-      })
-
-      const uploadedOutput = await uploadPipelineOutput(pipelineResult, context, tmpDir)
-
-      // Calculate processing time
-      const processingTimeMs = Date.now() - startTime
-
-      // Build job output
-      const output: JobOutput = {
-        assetId: uploadedOutput.assetId,
-        url: uploadedOutput.url,
-        format: pipelineResult.format,
-        dimensions: uploadedOutput.dimensions,
-        sizeBytes: uploadedOutput.sizeBytes,
-        thumbnailUrl: uploadedOutput.thumbnailUrl,
-        processingTimeMs,
-      }
-
-      // Update session with result media
-      await updateSessionResultMedia(projectId, sessionId, {
-        stepId: 'transform', // Virtual step ID for transform output
-        assetId: uploadedOutput.assetId,
-        url: uploadedOutput.url,
-        createdAt: Date.now(),
-      })
-
-      // Update job status to 'completed'
-      await updateJobComplete(projectId, jobId, output)
-      await updateSessionJobStatus(projectId, sessionId, jobId, 'completed')
-
-      logger.info(`[TransformJob] Job ${jobId} completed successfully`, {
-        format: output.format,
-        processingTimeMs: output.processingTimeMs,
-        url: output.url,
-      })
+      // 4. Upload & finalize
+      await finalizeJobSuccess(pipelineResult, context)
     } catch (error) {
-      logger.error('[TransformJob] Error processing transform job:', error)
-
-      // Update job and session to failed state
-      if (projectId && jobId && sessionId) {
-        try {
-          const sanitizedError = createSanitizedError('PROCESSING_FAILED', 'pipeline')
-          await updateJobError(projectId, jobId, sanitizedError)
-          await updateSessionJobStatus(projectId, sessionId, jobId, 'failed')
-
-          logger.error('[TransformJob] Full error details:', {
-            jobId,
-            sessionId,
-            projectId,
-            error: error instanceof Error ? error.message : 'Unknown error',
-            stack: error instanceof Error ? error.stack : undefined,
-          })
-        } catch (updateError) {
-          logger.error('[TransformJob] Failed to update job/session error state:', updateError)
-        }
+      logger.error('[TransformJob] Pipeline failed', { error })
+      if (context) {
+        await handleJobFailure(context, error)
       }
     } finally {
-      // Cleanup temp directory
-      if (tmpDir) {
-        await cleanupTempDir(tmpDir)
-      }
+      await context?.cleanup()
     }
   }
 )
+
+// ============================================================================
+// Job Execution Helpers
+// ============================================================================
+
+/**
+ * Validate payload and prepare execution context
+ *
+ * @throws Error if payload invalid, job not found, or job not pending
+ */
+async function prepareJobExecution(data: unknown): Promise<JobExecutionContext> {
+  // Validate payload
+  const parseResult = transformPipelineJobPayloadSchema.safeParse(data)
+  if (!parseResult.success) {
+    logger.error('[TransformJob] Invalid payload', { issues: parseResult.error.issues })
+    throw new Error('Invalid task payload')
+  }
+
+  const { projectId, jobId, sessionId } = parseResult.data
+
+  logger.info('[TransformJob] Processing job', { jobId, projectId, sessionId })
+
+  // Fetch job document
+  const job = await fetchJob(projectId, jobId)
+  if (!job) {
+    logger.error('[TransformJob] Job not found', { jobId })
+    throw new Error(`Job not found: ${jobId}`)
+  }
+
+  // Validate job status
+  if (job.status !== 'pending') {
+    logger.warn('[TransformJob] Unexpected job status', { jobId, status: job.status })
+    throw new Error(`Job ${jobId} has unexpected status: ${job.status}`)
+  }
+
+  // Create temp directory
+  const tmpDir = await createTempDir(jobId, 'transform')
+
+  return {
+    jobId,
+    projectId,
+    sessionId,
+    snapshot: job.snapshot,
+    tmpDir,
+    cleanup: () => cleanupTempDir(tmpDir),
+  }
+}
+
+/**
+ * Mark job as running with initial progress
+ */
+async function markJobRunning(context: JobExecutionContext): Promise<void> {
+  const { projectId, jobId, sessionId } = context
+
+  // Combined write: status + progress in one update
+  await updateJobStarted(projectId, jobId, {
+    currentStep: 'transforming',
+    percentage: 20,
+    message: 'Processing transform...',
+  })
+  await updateSessionJobStatus(projectId, sessionId, jobId, 'running')
+
+  logger.info('[TransformJob] Job started', { jobId })
+}
+
+/**
+ * Upload output and finalize job as successful
+ */
+async function finalizeJobSuccess(
+  pipelineResult: PipelineResult,
+  context: JobExecutionContext
+): Promise<void> {
+  const { projectId, jobId, sessionId, tmpDir } = context
+  const startTime = Date.now()
+
+  // Update progress: uploading (before the upload starts)
+  await updateJobProgress(projectId, jobId, {
+    currentStep: 'uploading',
+    percentage: 80,
+    message: 'Uploading result...',
+  })
+
+  // Upload output and generate thumbnail
+  const uploadedOutput = await uploadPipelineOutput(pipelineResult, context, tmpDir)
+
+  // Build job output
+  const output = buildJobOutput(pipelineResult, uploadedOutput, startTime)
+
+  // Update session with result media
+  await updateSessionResultMedia(projectId, sessionId, {
+    stepId: 'transform',
+    assetId: uploadedOutput.assetId,
+    url: uploadedOutput.url,
+    createdAt: Date.now(),
+  })
+
+  // Mark job as completed (sets progress to 100% completed)
+  await updateJobComplete(projectId, jobId, output)
+  await updateSessionJobStatus(projectId, sessionId, jobId, 'completed')
+
+  logger.info('[TransformJob] Job completed', {
+    jobId,
+    format: output.format,
+    processingTimeMs: output.processingTimeMs,
+    url: output.url,
+  })
+}
+
+/**
+ * Handle job failure - update job and session to failed state
+ */
+async function handleJobFailure(
+  context: JobExecutionContext,
+  error: unknown
+): Promise<void> {
+  const { projectId, jobId, sessionId } = context
+
+  try {
+    const sanitizedError = createSanitizedError('PROCESSING_FAILED', 'pipeline')
+    await updateJobError(projectId, jobId, sanitizedError)
+    await updateSessionJobStatus(projectId, sessionId, jobId, 'failed')
+
+    logger.error('[TransformJob] Error details', {
+      jobId,
+      sessionId,
+      projectId,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+    })
+  } catch (updateError) {
+    logger.error('[TransformJob] Failed to update error state', { updateError })
+  }
+}
+
+/**
+ * Build JobOutput from pipeline and upload results
+ */
+function buildJobOutput(
+  pipelineResult: PipelineResult,
+  uploadedOutput: UploadedOutput,
+  startTime: number
+): JobOutput {
+  return {
+    assetId: uploadedOutput.assetId,
+    url: uploadedOutput.url,
+    format: pipelineResult.format,
+    dimensions: uploadedOutput.dimensions,
+    sizeBytes: uploadedOutput.sizeBytes,
+    thumbnailUrl: uploadedOutput.thumbnailUrl,
+    processingTimeMs: Date.now() - startTime,
+  }
+}
