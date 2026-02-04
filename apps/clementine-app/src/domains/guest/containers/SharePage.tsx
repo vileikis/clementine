@@ -17,7 +17,7 @@ import {
   ShareReadyRenderer,
 } from '@/domains/project-config/share/components'
 import { useSubscribeSession } from '@/domains/session/shared'
-import { ThemeProvider, ThemedBackground } from '@/shared/theming'
+import { ThemeProvider, ThemedBackground, useBodyThemeSync } from '@/shared/theming'
 import { DEFAULT_THEME } from '@/domains/project-config/theme/constants'
 import {
   DEFAULT_SHARE_LOADING,
@@ -85,6 +85,9 @@ export function SharePage({ mainSessionId }: SharePageProps) {
 
   // Get configurations from published config (guest sees published, not draft)
   const currentTheme = project.publishedConfig?.theme ?? DEFAULT_THEME
+
+  // Sync body background for Safari mobile immersive experience
+  useBodyThemeSync(currentTheme.background.color)
   const shareReady = project.publishedConfig?.shareReady ?? DEFAULT_SHARE_READY
   const shareLoading =
     project.publishedConfig?.shareLoading ?? DEFAULT_SHARE_LOADING

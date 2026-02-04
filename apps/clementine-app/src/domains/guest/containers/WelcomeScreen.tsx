@@ -27,7 +27,7 @@ import {
   DEFAULT_WELCOME,
   WelcomeRenderer,
 } from '@/domains/project-config/welcome'
-import { ThemeProvider } from '@/shared/theming'
+import { ThemeProvider, useBodyThemeSync } from '@/shared/theming'
 import { DEFAULT_THEME } from '@/domains/project-config/theme/constants'
 
 /**
@@ -67,6 +67,9 @@ export function WelcomeScreen() {
   const theme = publishedConfig.theme ?? DEFAULT_THEME
   const mainExperiences = publishedConfig.experiences?.main ?? []
   const experiencesConfig = publishedConfig.experiences ?? null
+
+  // Sync body background for Safari mobile immersive experience
+  useBodyThemeSync(theme.background.color)
 
   // Pregate check hook
   const { needsPregate } = usePregate(guest, experiencesConfig)

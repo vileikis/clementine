@@ -61,4 +61,9 @@ export type {
 } from './components'
 
 // Hooks
-export { useEventTheme, useThemedStyles, useThemeWithOverride } from './hooks'
+export {
+  useBodyThemeSync,
+  useEventTheme,
+  useThemedStyles,
+  useThemeWithOverride,
+} from './hooks'

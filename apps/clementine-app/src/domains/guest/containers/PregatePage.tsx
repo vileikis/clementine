@@ -24,7 +24,7 @@ import {
 import { useMarkExperienceComplete } from '../hooks'
 import { useInitSession } from '@/domains/session/shared'
 import { ExperienceRuntime } from '@/domains/experience/runtime'
-import { ThemeProvider, ThemedBackground } from '@/shared/theming'
+import { ThemeProvider, ThemedBackground, useBodyThemeSync } from '@/shared/theming'
 import { DEFAULT_THEME } from '@/domains/project-config/theme/constants'
 
 export interface PregatePageProps {
@@ -116,6 +116,9 @@ export function PregatePage({ selectedExperienceId }: PregatePageProps) {
 
   // Get theme from project config (with fallback to default)
   const theme = project.publishedConfig?.theme ?? DEFAULT_THEME
+
+  // Sync body background for Safari mobile immersive experience
+  useBodyThemeSync(theme.background.color)
 
   // Handle error for runtime (logs but doesn't block)
   const handleRuntimeError = (error: Error) => {
