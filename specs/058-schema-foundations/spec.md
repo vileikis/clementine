@@ -98,7 +98,7 @@ As an admin uploading reference media for prompts, I need display names that are
 - **FR-006**: System MUST include top-level `captureStepId` field (string or null) for source media reference.
 - **FR-007**: System MUST include top-level `aiEnabled` boolean field as global toggle for AI generation (default: true).
 - **FR-008**: System MUST include `imageGeneration` block with: prompt (string, default empty), refMedia (MediaReference[], default empty), model (enum, default 'gemini-2.5-flash-image'), aspectRatio (enum, default '1:1').
-- **FR-009**: System MUST reuse existing `aiImageModelSchema` and `aiImageAspectRatioSchema` from ai-image-node.schema.
+- **FR-009**: System MUST define `aiImageModelSchema` and `aiImageAspectRatioSchema` locally in create-outcome.schema.ts (NOT imported from nodes/ai-image-node.schema.ts to avoid coupling to deprecated transformNodes).
 - **FR-010**: System MUST include `options` field as discriminated union by `kind` field for type-specific settings.
 - **FR-011**: ImageOptions MUST have `kind: 'image'` (empty for MVP, structure allows future extensions).
 - **FR-012**: GifOptions MUST have `kind: 'gif'`, fps (1-60, default 24), and duration (0.5-30 seconds, default 3).
@@ -147,7 +147,8 @@ As an admin uploading reference media for prompts, I need display names that are
 
 ## Assumptions
 
-- Existing `mediaReferenceSchema` and `aiImageModelSchema` will be reused where applicable.
+- Existing `mediaReferenceSchema` will be reused for refMedia in imageGeneration.
+- `aiImageModelSchema` and `aiImageAspectRatioSchema` are defined locally in create-outcome.schema.ts (not imported from deprecated transformNodes).
 - The `stepName` validation will follow the existing `experienceStepNameSchema` pattern.
 - GIF and video outcome options are schema stubs only - not implemented in MVP.
 - Schemas will be placed in `packages/shared/src/schemas/` following existing directory structure.
