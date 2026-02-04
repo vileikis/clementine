@@ -207,7 +207,12 @@ interface PositionedMenuProps {
 function PositionedMenu({ anchorElement, children }: PositionedMenuProps) {
   const { refs, floatingStyles } = useFloating({
     placement: 'bottom-start',
-    middleware: [offset(-8), flip(), shift({ padding: 8 })],
+    middleware: [
+      // Dynamic offset: tight when below, more space when flipped above
+      offset(({ placement }) => (placement.startsWith('top') ? 24 : -8)),
+      flip(),
+      shift({ padding: 8 }),
+    ],
     whileElementsMounted: autoUpdate,
   })
 
