@@ -18,8 +18,8 @@ import { ThemedScaleButton, ThemedText } from '@/shared/theming'
 export function InputScaleRenderer({
   step,
   mode,
-  answer,
-  onAnswer,
+  response,
+  onResponseChange,
   onSubmit,
   onBack,
   canGoBack,
@@ -27,6 +27,9 @@ export function InputScaleRenderer({
 }: StepRendererProps) {
   const config = step.config as ExperienceInputScaleStepConfig
   const { title, min, max, minLabel, maxLabel } = config
+
+  // Current value from response
+  const currentValue = response?.value
 
   // Generate scale values as strings
   const scaleValues = Array.from({ length: max - min + 1 }, (_, i) =>
@@ -36,11 +39,11 @@ export function InputScaleRenderer({
   // Handle scale button click
   const handleSelect = useCallback(
     (value: string) => {
-      if (mode === 'run' && onAnswer) {
-        onAnswer(value)
+      if (mode === 'run' && onResponseChange) {
+        onResponseChange(value)
       }
     },
-    [mode, onAnswer],
+    [mode, onResponseChange],
   )
 
   return (
@@ -66,7 +69,7 @@ export function InputScaleRenderer({
               <ThemedScaleButton
                 key={value}
                 value={Number(value)}
-                selected={answer === value}
+                selected={currentValue === value}
                 onClick={() => handleSelect(value)}
                 disabled={mode === 'edit'}
               />

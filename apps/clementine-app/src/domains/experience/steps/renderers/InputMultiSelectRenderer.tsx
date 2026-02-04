@@ -21,9 +21,8 @@ import { ThemedSelectOption, ThemedText } from '@/shared/theming'
 export function InputMultiSelectRenderer({
   step,
   mode,
-  answer,
-  answerContext,
-  onAnswer,
+  response,
+  onResponseChange,
   onSubmit,
   onBack,
   canGoBack,
@@ -32,17 +31,17 @@ export function InputMultiSelectRenderer({
   const config = step.config as ExperienceInputMultiSelectStepConfig
   const { title, options, multiSelect } = config
 
-  // Current selected options from context (MultiSelectOption[])
-  // Fall back to building from answer (string[]) for backward compatibility
-  const selectedOptions: MultiSelectOption[] = answerContext
-    ? (answerContext as MultiSelectOption[])
-    : Array.isArray(answer) && typeof answer[0] === 'string'
-      ? answer.map((value) => {
+  // Current selected options from response.context (MultiSelectOption[])
+  // Fall back to building from response.value (string[]) for backward compatibility
+  const selectedOptions: MultiSelectOption[] = response?.context
+    ? (response.context as MultiSelectOption[])
+    : Array.isArray(response?.value) && typeof response.value[0] === 'string'
+      ? response.value.map((val: string) => {
           // Find full option object from value
-          const fullOption = options.find((opt) => opt.value === value)
+          const fullOption = options.find((opt) => opt.value === val)
           return (
             fullOption || {
-              value,
+              value: val,
               promptFragment: null,
               promptMedia: null,
             }
@@ -61,7 +60,7 @@ export function InputMultiSelectRenderer({
   // Handle option click - split into value (string[]) and context (MultiSelectOption[])
   const handleToggle = useCallback(
     (option: MultiSelectOption) => {
-      if (mode !== 'run' || !onAnswer) return
+      if (mode !== 'run' || !onResponseChange) return
 
       let newOptions: MultiSelectOption[]
 
@@ -78,9 +77,9 @@ export function InputMultiSelectRenderer({
 
       // Split into value (string[]) and context (MultiSelectOption[])
       const values = newOptions.map((opt) => opt.value)
-      onAnswer(values, newOptions)
+      onResponseChange(values, newOptions)
     },
-    [mode, onAnswer, multiSelect, selectedOptions, isOptionSelected],
+    [mode, onResponseChange, multiSelect, selectedOptions, isOptionSelected],
   )
 
   return (

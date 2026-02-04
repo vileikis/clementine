@@ -41,6 +41,7 @@ import type {
   ExperienceStepCategory,
   ExperienceStepConfig,
   ExperienceStepType,
+  SessionResponse,
 } from '@clementine/shared'
 
 import type { LucideIcon } from 'lucide-react'
@@ -67,12 +68,10 @@ export interface StepRendererProps {
   onSubmit?: () => void
 
   // Run mode props (only used when mode === 'run')
-  /** Current answer value (run mode only) */
-  answer?: AnswerValue
-  /** Current answer context - step-specific AI generation data (run mode only) */
-  answerContext?: unknown
-  /** Callback when user provides/updates answer (run mode only) */
-  onAnswer?: (value: AnswerValue, context?: unknown) => void
+  /** Current response for this step (run mode only) */
+  response?: SessionResponse
+  /** Callback when user provides/updates response (run mode only) */
+  onResponseChange?: (value: AnswerValue, context?: unknown) => void
   /** Callback to go back (run mode only) */
   onBack?: () => void
   /** Whether back navigation is available (run mode only) */

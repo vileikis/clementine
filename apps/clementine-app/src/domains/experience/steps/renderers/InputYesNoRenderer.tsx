@@ -18,8 +18,8 @@ import { ThemedButton, ThemedText } from '@/shared/theming'
 export function InputYesNoRenderer({
   step,
   mode,
-  answer,
-  onAnswer,
+  response,
+  onResponseChange,
   onSubmit,
   onBack,
   canGoBack,
@@ -28,14 +28,17 @@ export function InputYesNoRenderer({
   const config = step.config as ExperienceInputYesNoStepConfig
   const { title } = config
 
+  // Current value from response
+  const currentValue = response?.value
+
   // Handle button click
   const handleSelect = useCallback(
     (value: 'yes' | 'no') => {
-      if (mode === 'run' && onAnswer) {
-        onAnswer(value)
+      if (mode === 'run' && onResponseChange) {
+        onResponseChange(value)
       }
     },
-    [mode, onAnswer],
+    [mode, onResponseChange],
   )
 
   return (
@@ -57,7 +60,7 @@ export function InputYesNoRenderer({
         {/* Yes/No buttons */}
         <div className="flex gap-4">
           <ThemedButton
-            variant={answer === 'yes' ? 'primary' : 'outline'}
+            variant={currentValue === 'yes' ? 'primary' : 'outline'}
             size="lg"
             className="min-w-24"
             onClick={() => handleSelect('yes')}
@@ -66,7 +69,7 @@ export function InputYesNoRenderer({
             Yes
           </ThemedButton>
           <ThemedButton
-            variant={answer === 'no' ? 'primary' : 'outline'}
+            variant={currentValue === 'no' ? 'primary' : 'outline'}
             size="lg"
             className="min-w-24"
             onClick={() => handleSelect('no')}

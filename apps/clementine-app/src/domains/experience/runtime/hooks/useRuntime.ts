@@ -70,8 +70,6 @@ export interface RuntimeAPI {
 
   // State access
   getResponse: (stepId: string) => SessionResponse | undefined
-  getResponseValue: (stepId: string) => AnswerValue | null | undefined
-  getResponseContext: (stepId: string) => unknown | undefined
   getResponses: () => SessionResponse[]
   getState: () => RuntimeState
 }
@@ -97,16 +95,17 @@ export interface RuntimeAPI {
  *     next,
  *     back,
  *     setStepResponse,
- *     getResponseValue,
+ *     getResponse,
  *   } = useRuntime()
  *
  *   if (!currentStep) return <div>No steps</div>
  *
+ *   const response = getResponse(currentStep.id)
  *   return (
  *     <div>
  *       <h2>{currentStep.config.title}</h2>
  *       <input
- *         value={getResponseValue(currentStep.id) ?? ''}
+ *         value={response?.value ?? ''}
  *         onChange={(e) => setStepResponse(currentStep, e.target.value)}
  *       />
  *       <button onClick={back} disabled={!canGoBack}>Back</button>
@@ -192,22 +191,6 @@ export function useRuntime(): RuntimeAPI {
     [store],
   )
 
-  // State access: getResponseValue
-  const getResponseValue = useCallback(
-    (stepId: string): AnswerValue | null | undefined => {
-      return store.getResponse(stepId)?.value
-    },
-    [store],
-  )
-
-  // State access: getResponseContext
-  const getResponseContext = useCallback(
-    (stepId: string): unknown | undefined => {
-      return store.getResponse(stepId)?.context
-    },
-    [store],
-  )
-
   // State access: getResponses (unified format)
   const getResponses = useCallback((): SessionResponse[] => {
     return store.getResponses()
@@ -246,8 +229,6 @@ export function useRuntime(): RuntimeAPI {
 
     // State access
     getResponse,
-    getResponseValue,
-    getResponseContext,
     getResponses,
     getState,
   }

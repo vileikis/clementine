@@ -18,8 +18,8 @@ import { ThemedInput, ThemedText } from '@/shared/theming'
 export function InputShortTextRenderer({
   step,
   mode,
-  answer,
-  onAnswer,
+  response,
+  onResponseChange,
   onSubmit,
   onBack,
   canGoBack,
@@ -28,17 +28,17 @@ export function InputShortTextRenderer({
   const config = step.config as ExperienceInputShortTextStepConfig
   const { title, placeholder, maxLength } = config
 
-  // Current value
-  const value = typeof answer === 'string' ? answer : ''
+  // Current value from response
+  const value = typeof response?.value === 'string' ? response.value : ''
 
   // Handle input change
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (mode === 'run' && onAnswer) {
-        onAnswer(e.target.value)
+      if (mode === 'run' && onResponseChange) {
+        onResponseChange(e.target.value)
       }
     },
-    [mode, onAnswer],
+    [mode, onResponseChange],
   )
 
   // Show character count when approaching limit

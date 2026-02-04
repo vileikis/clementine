@@ -53,13 +53,12 @@ export function GuestRuntimeContent() {
     next,
     back,
     setStepResponse,
-    getResponseValue,
-    getResponseContext,
+    getResponse,
     isComplete,
   } = runtime
 
-  // Handle answer change - writes to unified responses
-  const handleAnswer = useCallback(
+  // Handle response change - writes to unified responses
+  const handleResponseChange = useCallback(
     (value: AnswerValue, context?: unknown) => {
       if (!currentStep) return
       setStepResponse(currentStep, value, context)
@@ -87,9 +86,8 @@ export function GuestRuntimeContent() {
     <StepRendererRouter
       step={currentStep}
       mode="run"
-      answer={getResponseValue(currentStep.id) ?? undefined}
-      answerContext={getResponseContext(currentStep.id)}
-      onAnswer={handleAnswer}
+      response={getResponse(currentStep.id)}
+      onResponseChange={handleResponseChange}
       onSubmit={next}
       onBack={back}
       canGoBack={canGoBack}

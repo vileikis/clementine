@@ -18,8 +18,8 @@ import { ThemedText, ThemedTextarea } from '@/shared/theming'
 export function InputLongTextRenderer({
   step,
   mode,
-  answer,
-  onAnswer,
+  response,
+  onResponseChange,
   onSubmit,
   onBack,
   canGoBack,
@@ -28,17 +28,17 @@ export function InputLongTextRenderer({
   const config = step.config as ExperienceInputLongTextStepConfig
   const { title, placeholder, maxLength } = config
 
-  // Current value
-  const value = typeof answer === 'string' ? answer : ''
+  // Current value from response
+  const value = typeof response?.value === 'string' ? response.value : ''
 
   // Handle textarea change
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      if (mode === 'run' && onAnswer) {
-        onAnswer(e.target.value)
+      if (mode === 'run' && onResponseChange) {
+        onResponseChange(e.target.value)
       }
     },
-    [mode, onAnswer],
+    [mode, onResponseChange],
   )
 
   // Show character count when approaching limit
