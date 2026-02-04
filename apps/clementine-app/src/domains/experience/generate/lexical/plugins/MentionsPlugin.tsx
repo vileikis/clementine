@@ -207,12 +207,8 @@ interface PositionedMenuProps {
 function PositionedMenu({ anchorElement, children }: PositionedMenuProps) {
   const { refs, floatingStyles } = useFloating({
     placement: 'bottom-start',
-    middleware: [
-      offset(4), // 4px gap below anchor
-      flip(), // Flip to top if no space below
-      shift({ padding: 8 }), // Shift left/right to stay in viewport
-    ],
-    whileElementsMounted: autoUpdate, // Update position on scroll/resize
+    middleware: [offset(-8), flip(), shift({ padding: 8 })],
+    whileElementsMounted: autoUpdate,
   })
 
   // Set the anchor element as the reference for floating-ui
