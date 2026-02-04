@@ -28,8 +28,8 @@ export function InputScaleRenderer({
   const config = step.config as ExperienceInputScaleStepConfig
   const { title, min, max, minLabel, maxLabel } = config
 
-  // Current value from response
-  const currentValue = response?.value
+  // Current value from response data
+  const currentValue = response?.data
 
   // Generate scale values as strings
   const scaleValues = Array.from({ length: max - min + 1 }, (_, i) =>

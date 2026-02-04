@@ -28,8 +28,8 @@ export function InputLongTextRenderer({
   const config = step.config as ExperienceInputLongTextStepConfig
   const { title, placeholder, maxLength } = config
 
-  // Current value from response
-  const value = typeof response?.value === 'string' ? response.value : ''
+  // Current value from response data
+  const value = typeof response?.data === 'string' ? response.data : ''
 
   // Handle textarea change
   const handleChange = useCallback(

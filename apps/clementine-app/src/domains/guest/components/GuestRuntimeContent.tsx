@@ -32,7 +32,6 @@
  */
 import { useCallback } from 'react'
 
-import type { AnswerValue } from '@/domains/experience/steps/registry/step-registry'
 import { useRuntime } from '@/domains/experience/runtime'
 import { StepRendererRouter } from '@/domains/experience/steps/components/StepRendererRouter'
 import { ThemedText } from '@/shared/theming'
@@ -59,9 +58,9 @@ export function GuestRuntimeContent() {
 
   // Handle response change - writes to unified responses
   const handleResponseChange = useCallback(
-    (value: AnswerValue, context?: unknown) => {
+    (data: unknown) => {
       if (!currentStep) return
-      setStepResponse(currentStep, value, context)
+      setStepResponse(currentStep, data)
     },
     [currentStep, setStepResponse],
   )

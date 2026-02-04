@@ -70,8 +70,8 @@ export interface StepRendererProps {
   // Run mode props (only used when mode === 'run')
   /** Current response for this step (run mode only) */
   response?: SessionResponse
-  /** Callback when user provides/updates response (run mode only) */
-  onResponseChange?: (value: AnswerValue, context?: unknown) => void
+  /** Callback when user provides/updates response data (run mode only) */
+  onResponseChange?: (data: unknown) => void
   /** Callback to go back (run mode only) */
   onBack?: () => void
   /** Whether back navigation is available (run mode only) */

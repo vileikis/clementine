@@ -111,8 +111,8 @@ export function CapturePhotoRunMode({
             displayName: step.name,
           }
 
-          // Write to unified responses array with MediaReference context
-          setStepResponse(step, null, [mediaRef])
+          // Write to unified responses array with MediaReference[] data
+          setStepResponse(step, [mediaRef])
         }
 
         // Revoke preview URL after upload

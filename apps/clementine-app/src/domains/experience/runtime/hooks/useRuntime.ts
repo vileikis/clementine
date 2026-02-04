@@ -16,24 +16,21 @@ import { useExperienceRuntimeStore } from '../stores/experienceRuntimeStore'
 import type { SessionResponse } from '@clementine/shared'
 import type { RuntimeState } from '../../shared/types/runtime.types'
 import type { ExperienceStep } from '../../shared/schemas'
-import type { AnswerValue } from '../../steps/registry/step-registry'
 
 /**
- * Build a SessionResponse from step and value/context.
+ * Build a SessionResponse from step and data.
  * Internal helper - not exported.
  */
 function buildSessionResponse(
   step: ExperienceStep,
-  value: AnswerValue | null,
-  context: unknown,
+  data: unknown,
 ): SessionResponse {
   const now = Date.now()
   return {
     stepId: step.id,
     stepName: step.name,
     stepType: step.type,
-    value,
-    context,
+    data,
     createdAt: now,
     updatedAt: now,
   }
@@ -65,8 +62,10 @@ export interface RuntimeAPI {
   /**
    * Record a response for a step (unified format).
    * Builds the SessionResponse internally from step metadata.
+   * @param step - The step being responded to
+   * @param data - Step-specific data (string for simple inputs, MultiSelectOption[] for multiSelect, MediaReference[] for capture)
    */
-  setStepResponse: (step: ExperienceStep, value: AnswerValue | null, context?: unknown) => void
+  setStepResponse: (step: ExperienceStep, data: unknown) => void
 
   // State access
   getResponse: (stepId: string) => SessionResponse | undefined
@@ -105,7 +104,7 @@ export interface RuntimeAPI {
  *     <div>
  *       <h2>{currentStep.config.title}</h2>
  *       <input
- *         value={response?.value ?? ''}
+ *         value={response?.data ?? ''}
  *         onChange={(e) => setStepResponse(currentStep, e.target.value)}
  *       />
  *       <button onClick={back} disabled={!canGoBack}>Back</button>
@@ -176,8 +175,8 @@ export function useRuntime(): RuntimeAPI {
   // Data mutation: setStepResponse (unified format)
   // Builds SessionResponse from step metadata, then updates store
   const setStepResponse = useCallback(
-    (step: ExperienceStep, value: AnswerValue | null, context?: unknown) => {
-      const response = buildSessionResponse(step, value, context ?? null)
+    (step: ExperienceStep, data: unknown) => {
+      const response = buildSessionResponse(step, data)
       store.setResponse(response)
     },
     [store],

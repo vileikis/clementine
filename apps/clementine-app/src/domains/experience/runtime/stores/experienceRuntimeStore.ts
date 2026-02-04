@@ -304,9 +304,9 @@ export const useExperienceRuntimeStore = create<ExperienceRuntimeStore>(
       const currentStep = state.steps[state.currentStepIndex]
       if (!currentStep) return false
 
-      // Get the response value for validation
+      // Get the response data for validation
       const response = state.responses.find((r) => r.stepId === currentStep.id)
-      const result = validateStepInput(currentStep, response?.value)
+      const result = validateStepInput(currentStep, response?.data)
       return result.isValid
     },
 

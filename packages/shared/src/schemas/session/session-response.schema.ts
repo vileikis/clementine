@@ -9,22 +9,21 @@
  */
 import { z } from 'zod'
 
-export const sessionResponseValueSchema = z.union([
-  z.string(), // Text, yes/no, scale
-  z.array(z.string()), // Multi-select
-])
-
 /**
  * Session response schema for capturing user input and media.
  *
- * value: Analytics-friendly primitive (string or string array)
- * context: Rich structured data (MediaReference[] for captures, options for multi-select)
+ * The `data` field contains step-specific structured data:
+ * - input.scale: string (e.g., "5")
+ * - input.yesNo: string ("yes" | "no")
+ * - input.shortText: string
+ * - input.longText: string
+ * - input.multiSelect: MultiSelectOption[] (full options with promptFragment/promptMedia)
+ * - capture.photo: MediaReference[] (media references)
  *
- * The context field is typed as `unknown` to avoid coupling to specific step types.
- * Interpretation is based on stepType:
- * - input.* (except multiSelect): context is null
- * - input.multiSelect: context is MultiSelectOption[]
- * - capture.*: context is MediaReference[]
+ * For analytics:
+ * - Simple inputs: data is the primitive value
+ * - MultiSelect: data.map(opt => opt.value) to get string[]
+ * - Capture: no primitive needed
  */
 export const sessionResponseSchema = z.object({
   /** Links to step definition */
@@ -33,10 +32,8 @@ export const sessionResponseSchema = z.object({
   stepName: z.string(),
   /** e.g., 'input.scale', 'capture.photo' */
   stepType: z.string(),
-  /** Analytics-friendly primitive value */
-  value: sessionResponseValueSchema.nullable().default(null),
-  /** Rich structured data (MediaReference[] for captures, etc.) */
-  context: z.unknown().nullable().default(null),
+  /** Step-specific structured data */
+  data: z.unknown().nullable().default(null),
   /** Unix timestamp (ms) */
   createdAt: z.number(),
   /** Unix timestamp (ms) */

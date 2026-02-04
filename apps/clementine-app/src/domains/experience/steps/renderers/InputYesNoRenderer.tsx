@@ -28,8 +28,8 @@ export function InputYesNoRenderer({
   const config = step.config as ExperienceInputYesNoStepConfig
   const { title } = config
 
-  // Current value from response
-  const currentValue = response?.value
+  // Current value from response data
+  const currentValue = response?.data
 
   // Handle button click
   const handleSelect = useCallback(

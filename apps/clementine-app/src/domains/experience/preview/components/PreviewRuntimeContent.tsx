@@ -12,7 +12,6 @@
 import { useCallback } from 'react'
 import { useRuntime } from '../../runtime'
 import { StepRendererRouter } from '../../steps'
-import type { AnswerValue } from '../../steps/registry/step-registry'
 
 /**
  * PreviewRuntimeContent Component
@@ -36,9 +35,9 @@ export function PreviewRuntimeContent() {
 
   // Handle response change - writes to unified responses
   const handleResponseChange = useCallback(
-    (value: AnswerValue, context?: unknown) => {
+    (data: unknown) => {
       if (!currentStep) return
-      setStepResponse(currentStep, value, context)
+      setStepResponse(currentStep, data)
     },
     [currentStep, setStepResponse],
   )

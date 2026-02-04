@@ -28,8 +28,8 @@ export function InputShortTextRenderer({
   const config = step.config as ExperienceInputShortTextStepConfig
   const { title, placeholder, maxLength } = config
 
-  // Current value from response
-  const value = typeof response?.value === 'string' ? response.value : ''
+  // Current value from response data
+  const value = typeof response?.data === 'string' ? response.data : ''
 
   // Handle input change
   const handleChange = useCallback(

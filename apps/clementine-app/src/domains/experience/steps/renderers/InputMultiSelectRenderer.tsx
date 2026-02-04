@@ -31,23 +31,10 @@ export function InputMultiSelectRenderer({
   const config = step.config as ExperienceInputMultiSelectStepConfig
   const { title, options, multiSelect } = config
 
-  // Current selected options from response.context (MultiSelectOption[])
-  // Fall back to building from response.value (string[]) for backward compatibility
-  const selectedOptions: MultiSelectOption[] = response?.context
-    ? (response.context as MultiSelectOption[])
-    : Array.isArray(response?.value) && typeof response.value[0] === 'string'
-      ? response.value.map((val: string) => {
-          // Find full option object from value
-          const fullOption = options.find((opt) => opt.value === val)
-          return (
-            fullOption || {
-              value: val,
-              promptFragment: null,
-              promptMedia: null,
-            }
-          )
-        })
-      : []
+  // Current selected options from response.data (MultiSelectOption[])
+  const selectedOptions: MultiSelectOption[] = Array.isArray(response?.data)
+    ? (response.data as MultiSelectOption[])
+    : []
 
   // Helper to check if an option is selected
   const isOptionSelected = useCallback(
@@ -57,7 +44,7 @@ export function InputMultiSelectRenderer({
     [selectedOptions],
   )
 
-  // Handle option click - split into value (string[]) and context (MultiSelectOption[])
+  // Handle option click - store full MultiSelectOption[] as data
   const handleToggle = useCallback(
     (option: MultiSelectOption) => {
       if (mode !== 'run' || !onResponseChange) return
@@ -75,9 +62,8 @@ export function InputMultiSelectRenderer({
         newOptions = [option]
       }
 
-      // Split into value (string[]) and context (MultiSelectOption[])
-      const values = newOptions.map((opt) => opt.value)
-      onResponseChange(values, newOptions)
+      // Store full options array as data
+      onResponseChange(newOptions)
     },
     [mode, onResponseChange, multiSelect, selectedOptions, isOptionSelected],
   )
