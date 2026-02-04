@@ -265,14 +265,9 @@ export function PresharePage({ mainSessionId }: PresharePageProps) {
   // Background stays mounted across all state transitions
   return (
     <ThemeProvider theme={theme}>
-      <div className="h-screen">
-        <ThemedBackground
-          className="h-full w-full"
-          contentClassName="h-full w-full"
-        >
-          {renderContent()}
-        </ThemedBackground>
-      </div>
+      <ThemedBackground className="h-dvh">
+        {renderContent()}
+      </ThemedBackground>
     </ThemeProvider>
   )
 }

@@ -32,7 +32,7 @@
 
 import { ChevronLeft } from 'lucide-react'
 import type { ReactNode } from 'react'
-import { ThemedButton } from '@/shared/theming'
+import { ScrollableView, ThemedButton } from '@/shared/theming'
 import { Button } from '@/ui-kit/ui/button'
 import { cn } from '@/shared/utils'
 
@@ -79,10 +79,10 @@ export function StepLayout({
         !hideButton && 'pb-20 md:pb-0',
       )}
     >
-      {/* Content area - grows to fill space, centers content vertically */}
-      <div
+      {/* Content area - scrollable, centers content vertically */}
+      <ScrollableView
         className={cn(
-          'flex flex-1 flex-col items-center px-4',
+          'items-center px-4',
           // Desktop: center content vertically
           'md:justify-center',
           // Mobile: content at top with some padding
@@ -91,7 +91,7 @@ export function StepLayout({
         )}
       >
         {children}
-      </div>
+      </ScrollableView>
 
       {/* Navigation buttons */}
       {!hideButton && (
