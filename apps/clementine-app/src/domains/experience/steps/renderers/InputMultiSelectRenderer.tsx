@@ -21,9 +21,8 @@ import { ThemedSelectOption, ThemedText } from '@/shared/theming'
 export function InputMultiSelectRenderer({
   step,
   mode,
-  answer,
-  answerContext,
-  onAnswer,
+  response,
+  onResponseChange,
   onSubmit,
   onBack,
   canGoBack,
@@ -32,23 +31,10 @@ export function InputMultiSelectRenderer({
   const config = step.config as ExperienceInputMultiSelectStepConfig
   const { title, options, multiSelect } = config
 
-  // Current selected options from context (MultiSelectOption[])
-  // Fall back to building from answer (string[]) for backward compatibility
-  const selectedOptions: MultiSelectOption[] = answerContext
-    ? (answerContext as MultiSelectOption[])
-    : Array.isArray(answer) && typeof answer[0] === 'string'
-      ? answer.map((value) => {
-          // Find full option object from value
-          const fullOption = options.find((opt) => opt.value === value)
-          return (
-            fullOption || {
-              value,
-              promptFragment: null,
-              promptMedia: null,
-            }
-          )
-        })
-      : []
+  // Current selected options from response.data (MultiSelectOption[])
+  const selectedOptions: MultiSelectOption[] = Array.isArray(response?.data)
+    ? (response.data as MultiSelectOption[])
+    : []
 
   // Helper to check if an option is selected
   const isOptionSelected = useCallback(
@@ -58,10 +44,10 @@ export function InputMultiSelectRenderer({
     [selectedOptions],
   )
 
-  // Handle option click - split into value (string[]) and context (MultiSelectOption[])
+  // Handle option click - store full MultiSelectOption[] as data
   const handleToggle = useCallback(
     (option: MultiSelectOption) => {
-      if (mode !== 'run' || !onAnswer) return
+      if (mode !== 'run' || !onResponseChange) return
 
       let newOptions: MultiSelectOption[]
 
@@ -76,11 +62,10 @@ export function InputMultiSelectRenderer({
         newOptions = [option]
       }
 
-      // Split into value (string[]) and context (MultiSelectOption[])
-      const values = newOptions.map((opt) => opt.value)
-      onAnswer(values, newOptions)
+      // Store full options array as data
+      onResponseChange(newOptions)
     },
-    [mode, onAnswer, multiSelect, selectedOptions, isOptionSelected],
+    [mode, onResponseChange, multiSelect, selectedOptions, isOptionSelected],
   )
 
   return (

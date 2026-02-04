@@ -13,8 +13,8 @@
  * <StepRendererRouter
  *   step={currentStep}
  *   mode="run"
- *   answer={getAnswer(currentStep.id)}
- *   onAnswer={handleAnswer}
+ *   response={getResponse(currentStep.id)}
+ *   onResponseChange={handleResponseChange}
  *   onSubmit={next}
  *   onBack={back}
  *   canGoBack={canGoBack}

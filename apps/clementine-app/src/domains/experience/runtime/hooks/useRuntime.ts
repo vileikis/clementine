@@ -13,18 +13,42 @@
 import { useCallback } from 'react'
 
 import { useExperienceRuntimeStore } from '../stores/experienceRuntimeStore'
-import type { MediaReference } from '@clementine/shared'
-import type { Answer } from '@/domains/session'
-import type {
-  CapturedMediaRef,
-  RuntimeState,
-} from '../../shared/types/runtime.types'
+import type { SessionResponse, SessionResponseData } from '@clementine/shared'
+import type { RuntimeState } from '../../shared/types/runtime.types'
 import type { ExperienceStep } from '../../shared/schemas'
+
+/**
+ * Build a SessionResponse from step and data.
+ * Internal helper - not exported.
+ *
+ * @param step - The step being responded to
+ * @param data - Step-specific response data
+ * @param existingCreatedAt - Optional createdAt from existing response (preserved on updates)
+ */
+function buildSessionResponse(
+  step: ExperienceStep,
+  data: SessionResponseData | null,
+  existingCreatedAt?: number,
+): SessionResponse {
+  const now = Date.now()
+  return {
+    stepId: step.id,
+    stepName: step.name,
+    stepType: step.type,
+    data,
+    createdAt: existingCreatedAt ?? now,
+    updatedAt: now,
+  }
+}
 
 /**
  * Return type for useRuntime hook
  */
 export interface RuntimeAPI {
+  // Identity
+  sessionId: string
+  projectId: string
+
   // Read-only state
   currentStep: ExperienceStep | null
   currentStepIndex: number
@@ -40,13 +64,20 @@ export interface RuntimeAPI {
   goToStep: (index: number) => void
 
   // Data mutation
-  setAnswer: (stepId: string, value: Answer['value'], context?: unknown) => void
-  setMedia: (stepId: string, mediaRef: MediaReference) => void
+  /**
+   * Record a response for a step (unified format).
+   * Builds the SessionResponse internally from step metadata.
+   * @param step - The step being responded to
+   * @param data - Step-specific data (string for simple inputs, MultiSelectOption[] for multiSelect, MediaReference[] for capture)
+   */
+  setStepResponse: (
+    step: ExperienceStep,
+    data: SessionResponseData | null,
+  ) => void
 
   // State access
-  getAnswer: (stepId: string) => Answer['value'] | undefined
-  getAnswerContext: (stepId: string) => unknown | undefined
-  getMedia: (stepId: string) => CapturedMediaRef | undefined
+  getResponse: (stepId: string) => SessionResponse | undefined
+  getResponses: () => SessionResponse[]
   getState: () => RuntimeState
 }
 
@@ -70,18 +101,19 @@ export interface RuntimeAPI {
  *     canGoBack,
  *     next,
  *     back,
- *     setAnswer,
- *     getAnswer,
+ *     setStepResponse,
+ *     getResponse,
  *   } = useRuntime()
  *
  *   if (!currentStep) return <div>No steps</div>
  *
+ *   const response = getResponse(currentStep.id)
  *   return (
  *     <div>
  *       <h2>{currentStep.config.title}</h2>
  *       <input
- *         value={getAnswer(currentStep.id) ?? ''}
- *         onChange={(e) => setAnswer(currentStep.id, e.target.value)}
+ *         value={response?.data ?? ''}
+ *         onChange={(e) => setStepResponse(currentStep, e.target.value)}
  *       />
  *       <button onClick={back} disabled={!canGoBack}>Back</button>
  *       <button onClick={next} disabled={!canProceed}>Next</button>
@@ -94,12 +126,16 @@ export function useRuntime(): RuntimeAPI {
   const store = useExperienceRuntimeStore()
 
   // Throw if not initialized (used outside ExperienceRuntime container)
-  if (!store.sessionId) {
+  if (!store.sessionId || !store.projectId) {
     throw new Error(
       'useRuntime must be used within an ExperienceRuntime container. ' +
         'Make sure you have wrapped your component with <ExperienceRuntime>.',
     )
   }
+
+  // These are guaranteed to be non-null after the check above
+  const sessionId = store.sessionId
+  const projectId = store.projectId
 
   // Navigation: next
   // Just updates store state - container handles Firestore sync reactively
@@ -144,80 +180,49 @@ export function useRuntime(): RuntimeAPI {
     [store],
   )
 
-  // Data mutation: setAnswer
-  // Just updates store - container handles debounced Firestore sync
-  const setAnswer = useCallback(
-    (stepId: string, value: Answer['value'], context?: unknown) => {
-      const currentStep = store.getCurrentStep()
-      if (!currentStep) return
-      store.setAnswer(stepId, currentStep.type, value, context)
+  // Data mutation: setStepResponse (unified format)
+  // Builds SessionResponse from step metadata, then updates store
+  // Preserves existing createdAt when updating
+  const setStepResponse = useCallback(
+    (step: ExperienceStep, data: SessionResponseData | null) => {
+      const existingResponse = store.getResponse(step.id)
+      const response = buildSessionResponse(
+        step,
+        data,
+        existingResponse?.createdAt,
+      )
+      store.setResponse(response)
     },
     [store],
   )
 
-  // Data mutation: setMedia
-  // Just updates store - container handles immediate Firestore sync
-  const setMedia = useCallback(
-    (stepId: string, mediaRef: MediaReference) => {
-      store.setCapturedMedia(stepId, {
-        assetId: mediaRef.url, // Using URL as assetId for now
-        url: mediaRef.url,
-        createdAt: Date.now(),
-      })
+  // State access: getResponse (unified format)
+  const getResponse = useCallback(
+    (stepId: string): SessionResponse | undefined => {
+      return store.getResponse(stepId)
     },
     [store],
   )
 
-  // State access: getAnswer
-  const getAnswer = useCallback(
-    (stepId: string): Answer['value'] | undefined => {
-      return store.getAnswerValue(stepId)
-    },
-    [store],
-  )
-
-  // State access: getAnswerContext
-  const getAnswerContext = useCallback(
-    (stepId: string): unknown | undefined => {
-      const answer = store.getAnswer(stepId)
-      return answer?.context
-    },
-    [store],
-  )
-
-  // State access: getMedia
-  const getMedia = useCallback(
-    (stepId: string): CapturedMediaRef | undefined => {
-      const media = store.capturedMedia.find((m) => m.stepId === stepId)
-      if (!media) return undefined
-      return { assetId: media.assetId, url: media.url }
-    },
-    [store],
-  )
+  // State access: getResponses (unified format)
+  const getResponses = useCallback((): SessionResponse[] => {
+    return store.getResponses()
+  }, [store])
 
   // State access: getState
   const getState = useCallback((): RuntimeState => {
-    // Convert answers array to Record
-    const answers: Record<string, Answer['value']> = {}
-    for (const answer of store.answers) {
-      answers[answer.stepId] = answer.value
-    }
-
-    // Convert capturedMedia array to Record
-    const capturedMedia: Record<string, CapturedMediaRef> = {}
-    for (const media of store.capturedMedia) {
-      capturedMedia[media.stepId] = { assetId: media.assetId, url: media.url }
-    }
-
     return {
       currentStepIndex: store.currentStepIndex,
-      answers,
-      capturedMedia,
+      responses: store.responses,
       resultMedia: store.resultMedia,
     }
   }, [store])
 
   return {
+    // Identity
+    sessionId,
+    projectId,
+
     // Read-only state
     currentStep: store.getCurrentStep(),
     currentStepIndex: store.currentStepIndex,
@@ -233,13 +238,11 @@ export function useRuntime(): RuntimeAPI {
     goToStep,
 
     // Data mutation
-    setAnswer,
-    setMedia,
+    setStepResponse,
 
     // State access
-    getAnswer,
-    getAnswerContext,
-    getMedia,
+    getResponse,
+    getResponses,
     getState,
   }
 }

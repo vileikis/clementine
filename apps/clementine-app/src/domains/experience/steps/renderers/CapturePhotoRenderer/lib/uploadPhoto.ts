@@ -19,6 +19,7 @@ interface UploadPhotoParams {
 interface UploadPhotoResult {
   assetId: string
   url: string
+  filePath: string
 }
 
 /**
@@ -51,5 +52,5 @@ export async function uploadPhoto({
   })
 
   const url = await getDownloadURL(storageRef)
-  return { assetId, url }
+  return { assetId, url, filePath: path }
 }

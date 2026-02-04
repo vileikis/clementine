@@ -10,9 +10,10 @@
  * - Completion state display
  */
 import { useCallback } from 'react'
+
 import { useRuntime } from '../../runtime'
 import { StepRendererRouter } from '../../steps'
-import type { AnswerValue } from '../../steps/registry/step-registry'
+import type { SessionResponseData } from '@clementine/shared'
 
 /**
  * PreviewRuntimeContent Component
@@ -29,20 +30,18 @@ export function PreviewRuntimeContent() {
     canGoBack,
     next,
     back,
-    setAnswer,
-    getAnswer,
-    getAnswerContext,
+    setStepResponse,
+    getResponse,
     isComplete,
   } = runtime
 
-  // Handle answer change
-  const handleAnswer = useCallback(
-    (value: AnswerValue, context?: unknown) => {
-      if (currentStep) {
-        setAnswer(currentStep.id, value, context)
-      }
+  // Handle response change - writes to unified responses
+  const handleResponseChange = useCallback(
+    (data: SessionResponseData | null) => {
+      if (!currentStep) return
+      setStepResponse(currentStep, data)
     },
-    [currentStep, setAnswer],
+    [currentStep, setStepResponse],
   )
 
   // Show completion message
@@ -88,9 +87,8 @@ export function PreviewRuntimeContent() {
     <StepRendererRouter
       step={currentStep}
       mode="run"
-      answer={getAnswer(currentStep.id)}
-      answerContext={getAnswerContext(currentStep.id)}
-      onAnswer={handleAnswer}
+      response={getResponse(currentStep.id)}
+      onResponseChange={handleResponseChange}
       onSubmit={next}
       onBack={back}
       canGoBack={canGoBack}
