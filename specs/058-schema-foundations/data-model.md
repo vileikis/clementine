@@ -96,25 +96,29 @@ export type CreateOutcomeType = z.infer<typeof createOutcomeTypeSchema>
 
 #### AI Image Model (defined locally)
 
+> **Note**: Named with 'create' prefix to avoid conflict with deprecated schemas in nodes/
+
 ```typescript
-export const aiImageModelSchema = z.enum([
+export const createAiImageModelSchema = z.enum([
   'gemini-2.5-flash-image',
   'gemini-3-pro-image-preview',
 ])
-export type AIImageModel = z.infer<typeof aiImageModelSchema>
+export type CreateAiImageModel = z.infer<typeof createAiImageModelSchema>
 ```
 
 #### AI Image Aspect Ratio (defined locally)
 
+> **Note**: Named with 'create' prefix to avoid conflict with deprecated schemas in nodes/
+
 ```typescript
-export const aiImageAspectRatioSchema = z.enum([
+export const createAiImageAspectRatioSchema = z.enum([
   '1:1',
   '3:2',
   '2:3',
   '9:16',
   '16:9',
 ])
-export type AIImageAspectRatio = z.infer<typeof aiImageAspectRatioSchema>
+export type CreateAiImageAspectRatio = z.infer<typeof createAiImageAspectRatioSchema>
 ```
 
 #### Image Generation Config
@@ -123,8 +127,8 @@ export type AIImageAspectRatio = z.infer<typeof aiImageAspectRatioSchema>
 export const imageGenerationConfigSchema = z.object({
   prompt: z.string().default(''),
   refMedia: z.array(mediaReferenceSchema).default([]),
-  model: aiImageModelSchema.default('gemini-2.5-flash-image'),
-  aspectRatio: aiImageAspectRatioSchema.default('1:1'),
+  model: createAiImageModelSchema.default('gemini-2.5-flash-image'),
+  aspectRatio: createAiImageAspectRatioSchema.default('1:1'),
 })
 export type ImageGenerationConfig = z.infer<typeof imageGenerationConfigSchema>
 ```
@@ -194,8 +198,8 @@ export type CreateOutcome = z.infer<typeof createOutcomeSchema>
 |-------|------|---------|-------------|
 | `prompt` | `string` | `''` | Prompt template with @{step:...} and @{ref:...} |
 | `refMedia` | `MediaReference[]` | `[]` | Reference images for style guidance |
-| `model` | `AIImageModel` | `'gemini-2.5-flash-image'` | AI model selection |
-| `aspectRatio` | `AIImageAspectRatio` | `'1:1'` | Output aspect ratio |
+| `model` | `CreateAiImageModel` | `'gemini-2.5-flash-image'` | AI model selection |
+| `aspectRatio` | `CreateAiImageAspectRatio` | `'1:1'` | Output aspect ratio |
 
 ### GifOptions Constraints
 

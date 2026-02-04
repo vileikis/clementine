@@ -23,8 +23,8 @@
 
 **Purpose**: Verify shared package is ready for new schemas
 
-- [ ] T001 Verify shared package builds cleanly: `pnpm --filter @clementine/shared build`
-- [ ] T002 Verify existing tests pass: `pnpm --filter @clementine/shared test`
+- [x] T001 Verify shared package builds cleanly: `pnpm --filter @clementine/shared build`
+- [x] T002 Verify existing tests pass: `pnpm --filter @clementine/shared test`
 
 ---
 
@@ -48,7 +48,7 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T003 [US1] Create test file `packages/shared/src/schemas/experience/create-outcome.schema.test.ts` with test cases for:
+- [x] T003 [US1] Create test file `packages/shared/src/schemas/experience/create-outcome.schema.test.ts` with test cases for:
   - Valid image outcome configuration passes validation
   - Invalid model value fails with descriptive error
   - Missing fields get defaults (aiEnabled=true, empty prompt, empty refMedia, default model/aspectRatio)
@@ -59,19 +59,19 @@
 
 ### Implementation for User Story 1
 
-- [ ] T004 [US1] Create `packages/shared/src/schemas/experience/create-outcome.schema.ts` with JSDoc header comment
-- [ ] T005 [US1] Add `createOutcomeTypeSchema` enum: `'image' | 'gif' | 'video'` in create-outcome.schema.ts
-- [ ] T006 [P] [US1] Add `aiImageModelSchema` enum (defined locally, NOT imported from nodes/) in create-outcome.schema.ts
-- [ ] T007 [P] [US1] Add `aiImageAspectRatioSchema` enum (defined locally, NOT imported from nodes/) in create-outcome.schema.ts
-- [ ] T008 [US1] Add `imageGenerationConfigSchema` with prompt, refMedia, model, aspectRatio defaults in create-outcome.schema.ts
-- [ ] T009 [P] [US1] Add `imageOptionsSchema` with `kind: 'image'` literal in create-outcome.schema.ts
-- [ ] T010 [P] [US1] Add `gifOptionsSchema` with `kind: 'gif'`, fps (1-60), duration (0.5-30) in create-outcome.schema.ts
-- [ ] T011 [P] [US1] Add `videoOptionsSchema` with `kind: 'video'`, videoPrompt, duration (1-60) in create-outcome.schema.ts
-- [ ] T012 [US1] Add `outcomeOptionsSchema` discriminated union by `kind` field in create-outcome.schema.ts
-- [ ] T013 [US1] Add complete `createOutcomeSchema` with type, captureStepId, aiEnabled, imageGeneration, options in create-outcome.schema.ts
-- [ ] T014 [US1] Export all types (CreateOutcomeType, AIImageModel, AIImageAspectRatio, ImageGenerationConfig, ImageOptions, GifOptions, VideoOptions, OutcomeOptions, CreateOutcome) from create-outcome.schema.ts
-- [ ] T015 [US1] Add export for create-outcome.schema in `packages/shared/src/schemas/experience/index.ts`
-- [ ] T016 [US1] Run tests and verify all pass: `pnpm --filter @clementine/shared test create-outcome`
+- [x] T004 [US1] Create `packages/shared/src/schemas/experience/create-outcome.schema.ts` with JSDoc header comment
+- [x] T005 [US1] Add `createOutcomeTypeSchema` enum: `'image' | 'gif' | 'video'` in create-outcome.schema.ts
+- [x] T006 [P] [US1] Add `createAiImageModelSchema` enum (defined locally, NOT imported from nodes/) in create-outcome.schema.ts
+- [x] T007 [P] [US1] Add `createAiImageAspectRatioSchema` enum (defined locally, NOT imported from nodes/) in create-outcome.schema.ts
+- [x] T008 [US1] Add `imageGenerationConfigSchema` with prompt, refMedia, model, aspectRatio defaults in create-outcome.schema.ts
+- [x] T009 [P] [US1] Add `imageOptionsSchema` with `kind: 'image'` literal in create-outcome.schema.ts
+- [x] T010 [P] [US1] Add `gifOptionsSchema` with `kind: 'gif'`, fps (1-60), duration (0.5-30) in create-outcome.schema.ts
+- [x] T011 [P] [US1] Add `videoOptionsSchema` with `kind: 'video'`, videoPrompt, duration (1-60) in create-outcome.schema.ts
+- [x] T012 [US1] Add `outcomeOptionsSchema` discriminated union by `kind` field in create-outcome.schema.ts
+- [x] T013 [US1] Add complete `createOutcomeSchema` with type, captureStepId, aiEnabled, imageGeneration, options in create-outcome.schema.ts
+- [x] T014 [US1] Export all types (CreateOutcomeType, CreateAiImageModel, CreateAiImageAspectRatio, ImageGenerationConfig, ImageOptions, GifOptions, VideoOptions, OutcomeOptions, CreateOutcome) from create-outcome.schema.ts
+- [x] T015 [US1] Add export for create-outcome.schema in `packages/shared/src/schemas/experience/index.ts`
+- [x] T016 [US1] Run tests and verify all pass: `pnpm --filter @clementine/shared test create-outcome`
 
 **Checkpoint**: User Story 1 complete - createOutcomeSchema is functional and tested
 
@@ -87,7 +87,7 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T017 [US2] Create test file `packages/shared/src/schemas/session/session-response.schema.test.ts` with test cases for:
+- [x] T017 [US2] Create test file `packages/shared/src/schemas/session/session-response.schema.test.ts` with test cases for:
   - Text input response with stepName, stepType, value passes validation
   - Capture response with MediaReference[] in context passes validation
   - Multi-select response with value array and context passes validation
@@ -99,11 +99,11 @@
 
 ### Implementation for User Story 2
 
-- [ ] T018 [US2] Create `packages/shared/src/schemas/session/session-response.schema.ts` with JSDoc header comment
-- [ ] T019 [US2] Add `sessionResponseSchema` with stepId, stepName, stepType, value, context, createdAt, updatedAt in session-response.schema.ts
-- [ ] T020 [US2] Export `SessionResponse` type from session-response.schema.ts
-- [ ] T021 [US2] Add export for session-response.schema in `packages/shared/src/schemas/session/index.ts`
-- [ ] T022 [US2] Run tests and verify all pass: `pnpm --filter @clementine/shared test session-response`
+- [x] T018 [US2] Create `packages/shared/src/schemas/session/session-response.schema.ts` with JSDoc header comment
+- [x] T019 [US2] Add `sessionResponseSchema` with stepId, stepName, stepType, value, context, createdAt, updatedAt in session-response.schema.ts
+- [x] T020 [US2] Export `SessionResponse` type from session-response.schema.ts
+- [x] T021 [US2] Add export for session-response.schema in `packages/shared/src/schemas/session/index.ts`
+- [x] T022 [US2] Run tests and verify all pass: `pnpm --filter @clementine/shared test session-response`
 
 **Checkpoint**: User Story 2 complete - sessionResponseSchema is functional and tested
 
@@ -119,7 +119,7 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T023 [US3] Add test cases to `packages/shared/src/schemas/media/media-reference.schema.test.ts` for:
+- [x] T023 [US3] Add test cases to `packages/shared/src/schemas/media/media-reference.schema.test.ts` for:
   - Display name "hero-shot" passes (alphanumeric with hyphen)
   - Display name "User Photo 1" passes (alphanumeric with space)
   - Display name "logo.v2" passes (alphanumeric with period)
@@ -133,11 +133,11 @@
 
 ### Implementation for User Story 3
 
-- [ ] T024 [US3] Add `mediaDisplayNameSchema` with trim, min(1), max(100), regex, catch('Untitled') in `packages/shared/src/schemas/media/media-reference.schema.ts`
-- [ ] T025 [US3] Update `mediaReferenceSchema` to use `mediaDisplayNameSchema` for displayName field in media-reference.schema.ts
-- [ ] T026 [US3] Export `mediaDisplayNameSchema` from media-reference.schema.ts
-- [ ] T027 [US3] Add export for `mediaDisplayNameSchema` in `packages/shared/src/schemas/media/index.ts` (if not already re-exported via media-reference.schema)
-- [ ] T028 [US3] Run tests and verify all pass: `pnpm --filter @clementine/shared test media-reference`
+- [x] T024 [US3] Add `mediaDisplayNameSchema` with trim, min(1), max(100), regex, catch('Untitled') in `packages/shared/src/schemas/media/media-reference.schema.ts`
+- [x] T025 [US3] Update `mediaReferenceSchema` to use `mediaDisplayNameSchema` for displayName field in media-reference.schema.ts
+- [x] T026 [US3] Export `mediaDisplayNameSchema` from media-reference.schema.ts
+- [x] T027 [US3] Add export for `mediaDisplayNameSchema` in `packages/shared/src/schemas/media/index.ts` (if not already re-exported via media-reference.schema)
+- [x] T028 [US3] Run tests and verify all pass: `pnpm --filter @clementine/shared test media-reference`
 
 **Checkpoint**: User Story 3 complete - mediaDisplayNameSchema is functional with backward compatibility
 
@@ -147,12 +147,12 @@
 
 **Purpose**: Final verification, build, and cross-cutting concerns
 
-- [ ] T029 Run full test suite: `pnpm --filter @clementine/shared test`
-- [ ] T030 Build shared package: `pnpm --filter @clementine/shared build`
-- [ ] T031 [P] Verify barrel exports work: create temp file importing from `@clementine/shared` and type-check
-- [ ] T032 Run validation gates from repo root: `pnpm app:check`
-- [ ] T033 Verify all JSDoc comments are present on exported schemas and types
-- [ ] T034 Run quickstart.md validation: verify usage examples in quickstart.md work
+- [x] T029 Run full test suite: `pnpm --filter @clementine/shared test`
+- [x] T030 Build shared package: `pnpm --filter @clementine/shared build`
+- [x] T031 [P] Verify barrel exports work: create temp file importing from `@clementine/shared` and type-check
+- [x] T032 Run validation gates from repo root: `pnpm app:check`
+- [x] T033 Verify all JSDoc comments are present on exported schemas and types
+- [x] T034 Run quickstart.md validation: verify usage examples in quickstart.md work
 
 **Checkpoint**: All schemas implemented, tested, exported, and validated
 
@@ -237,6 +237,6 @@ With multiple developers:
 - [Story] label maps task to specific user story for traceability
 - Each user story is independently completable and testable
 - Tests are written first (TDD) per Success Criteria SC-006
-- All schemas defined locally in create-outcome.schema.ts (no imports from deprecated nodes/)
+- Model/aspect ratio schemas renamed to `createAiImageModelSchema`/`createAiImageAspectRatioSchema` to avoid conflict with deprecated nodes/ exports
 - mediaDisplayNameSchema uses `.catch('Untitled')` for backward compatibility
 - Commit after each task or logical group
