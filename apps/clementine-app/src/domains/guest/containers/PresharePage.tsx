@@ -256,9 +256,7 @@ export function PresharePage({ mainSessionId }: PresharePageProps) {
         onComplete={() => void handlePreshareComplete()}
         onError={handleRuntimeError}
       >
-        <div className="pt-20">
-          <GuestRuntimeContent />
-        </div>
+        <GuestRuntimeContent />
       </ExperienceRuntime>
     )
   }

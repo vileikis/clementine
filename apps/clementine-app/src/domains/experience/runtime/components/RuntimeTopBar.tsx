@@ -121,7 +121,7 @@ export function RuntimeTopBar({
     <>
       <div
         className={cn(
-          'w-full z-50',
+          'w-full z-50 shrink-0',
           'flex flex-col',
           'px-4 pt-4 pb-3',
           className,

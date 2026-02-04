@@ -82,7 +82,7 @@ export function StepLayout({
       {/* Content area - grows to fill space, centers content vertically */}
       <div
         className={cn(
-          'flex flex-1 flex-col items-center',
+          'flex flex-1 flex-col items-center px-4',
           // Desktop: center content vertically
           'md:justify-center',
           // Mobile: content at top with some padding

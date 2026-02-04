@@ -225,9 +225,7 @@ export function PregatePage({ selectedExperienceId }: PregatePageProps) {
         onComplete={() => void handlePregateComplete()}
         onError={handleRuntimeError}
       >
-        <div className="pt-20">
-          <GuestRuntimeContent />
-        </div>
+        <GuestRuntimeContent />
       </ExperienceRuntime>
     )
   }

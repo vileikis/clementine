@@ -340,9 +340,7 @@ export function ExperiencePage({
         onComplete={() => void handleExperienceComplete()}
         onError={handleRuntimeError}
       >
-        <div className="pt-20">
-          <GuestRuntimeContent />
-        </div>
+        <GuestRuntimeContent />
       </ExperienceRuntime>
     )
   }

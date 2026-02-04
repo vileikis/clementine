@@ -31,8 +31,8 @@ All paths relative to `apps/clementine-app/src/`:
 
 **Note**: All affected files already exist. No new dependencies or project structure changes needed.
 
-- [ ] T001 Verify dev server runs with `pnpm app:dev`
-- [ ] T002 Verify type-check passes with `pnpm app:type-check`
+- [X] T001 Verify dev server runs with `pnpm app:dev`
+- [X] T002 Verify type-check passes with `pnpm app:type-check`
 
 **Checkpoint**: Development environment ready
 
@@ -52,8 +52,8 @@ All paths relative to `apps/clementine-app/src/`:
 ### Implementation
 
 - [X] T003 [PH2] Remove `overflow-auto`, `px-4 py-8`, `my-auto` from ThemedBackground inner wrapper in `shared/theming/components/ThemedBackground.tsx`
-- [ ] T004 [PH2] Add flex wrapper with `flex h-full flex-col` and scroll container with `flex-1 overflow-y-auto` around children in `domains/experience/runtime/containers/ExperienceRuntime.tsx`
-- [ ] T005 [PH2] Add `shrink-0` class to RuntimeTopBar root div in `domains/experience/runtime/components/RuntimeTopBar.tsx`
+- [X] T004 [PH2] Add flex wrapper with `flex h-full flex-col` and scroll container with `flex-1 overflow-y-auto` around children in `domains/experience/runtime/containers/ExperienceRuntime.tsx`
+- [X] T005 [PH2] Add `shrink-0` class to RuntimeTopBar root div in `domains/experience/runtime/components/RuntimeTopBar.tsx`
 
 **Checkpoint**: Core layout fix complete - TopBar should stay static on experience pages
 
@@ -73,7 +73,7 @@ All paths relative to `apps/clementine-app/src/`:
 
 ### Implementation
 
-- [ ] T006 [PH3] Add `px-4` horizontal padding to StepLayout content area in `domains/experience/steps/renderers/StepLayout.tsx`
+- [X] T006 [PH3] Add `px-4` horizontal padding to StepLayout content area in `domains/experience/steps/renderers/StepLayout.tsx`
 - [ ] T007 [PH3] Verify InfoStepRenderer displays correctly (visual check)
 - [ ] T008 [PH3] Verify InputShortTextRenderer and InputLongTextRenderer display correctly with keyboard (visual check)
 - [ ] T009 [PH3] Verify InputScaleRenderer, InputYesNoRenderer, InputMultiSelectRenderer display correctly (visual check)
@@ -99,9 +99,9 @@ All paths relative to `apps/clementine-app/src/`:
 
 - [X] T011 [P] [PH4] Remove ThemedBackground wrapper and add scroll wrapper with `h-full overflow-y-auto` in `domains/project-config/welcome/components/WelcomeRenderer.tsx`
 - [X] T012 [P] [PH4] Add ThemedBackground wrapper around WelcomeRenderer in `domains/guest/containers/WelcomeScreen.tsx`
-- [ ] T013 [P] [PH4] Remove `pt-20` from content div inside ExperienceRuntime in `domains/guest/containers/ExperiencePage.tsx`
-- [ ] T014 [P] [PH4] Remove `pt-20` from content div inside ExperienceRuntime in `domains/guest/containers/PregatePage.tsx`
-- [ ] T015 [P] [PH4] Remove `pt-20` from content div inside ExperienceRuntime in `domains/guest/containers/PresharePage.tsx`
+- [X] T013 [P] [PH4] Remove `pt-20` from content div inside ExperienceRuntime in `domains/guest/containers/ExperiencePage.tsx`
+- [X] T014 [P] [PH4] Remove `pt-20` from content div inside ExperienceRuntime in `domains/guest/containers/PregatePage.tsx`
+- [X] T015 [P] [PH4] Remove `pt-20` from content div inside ExperienceRuntime in `domains/guest/containers/PresharePage.tsx`
 - [ ] T016 [PH4] Verify WelcomeScreen displays correctly (visual check)
 - [ ] T017 [PH4] Verify ExperiencePage, PregatePage, PresharePage display correctly (visual check)
 
@@ -122,7 +122,7 @@ All paths relative to `apps/clementine-app/src/`:
 
 ### Implementation
 
-- [ ] T018 [PH5] Add scroll wrapper with `h-full w-full overflow-y-auto` and `min-h-full` inner container in `domains/project-config/share/components/ShareLoadingRenderer.tsx`
+- [X] T018 [PH5] Add scroll wrapper with `h-full w-full overflow-y-auto` and `min-h-full` inner container in `domains/project-config/share/components/ShareLoadingRenderer.tsx`
 - [ ] T019 [PH5] Verify ShareReadyRenderer scroll zone works correctly (already has scroll - visual check)
 - [ ] T020 [PH5] Verify SharePage loading state displays correctly (visual check)
 - [ ] T021 [PH5] Verify SharePage ready state displays correctly (visual check)
@@ -144,7 +144,7 @@ All paths relative to `apps/clementine-app/src/`:
 
 ### Implementation
 
-- [ ] T022 [PH6] Add ThemedBackground wrapper around WelcomeRenderer in `domains/project-config/welcome/containers/WelcomeEditorPage.tsx`
+- [X] T022 [PH6] Add ThemedBackground wrapper around WelcomeRenderer in `domains/project-config/welcome/containers/WelcomeEditorPage.tsx`
 - [ ] T023 [PH6] Verify WelcomeEditorPage preview displays correctly (visual check)
 - [ ] T024 [PH6] Verify ShareEditorPage preview displays correctly (visual check)
 - [ ] T025 [PH6] Verify experience designer step preview displays correctly (visual check)
