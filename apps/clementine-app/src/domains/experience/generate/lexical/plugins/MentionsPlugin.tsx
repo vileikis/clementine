@@ -20,13 +20,20 @@ import {
   MenuOption,
 } from '@lexical/react/LexicalTypeaheadMenuPlugin'
 import {
+  autoUpdate,
+  flip,
+  offset,
+  shift,
+  useFloating,
+} from '@floating-ui/react'
+import {
   $createParagraphNode,
   $createTextNode,
   $getRoot,
   $getSelection,
   $isRangeSelection,
 } from 'lexical'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { $createMediaMentionNode } from '../nodes/MediaMentionNode'
 import { $createStepMentionNode } from '../nodes/StepMentionNode'
@@ -194,43 +201,30 @@ interface PositionedMenuProps {
 
 /**
  * Menu component that positions itself relative to an anchor element
+ * Uses @floating-ui/react for robust positioning with collision detection
  * Portaled to document.body to escape dialog stacking context
  */
 function PositionedMenu({ anchorElement, children }: PositionedMenuProps) {
-  const menuRef = useRef<HTMLDivElement>(null)
-  const [position, setPosition] = useState({ top: 0, left: 0 })
+  const { refs, floatingStyles } = useFloating({
+    placement: 'bottom-start',
+    middleware: [
+      offset(4), // 4px gap below anchor
+      flip(), // Flip to top if no space below
+      shift({ padding: 8 }), // Shift left/right to stay in viewport
+    ],
+    whileElementsMounted: autoUpdate, // Update position on scroll/resize
+  })
 
+  // Set the anchor element as the reference for floating-ui
   useEffect(() => {
-    const updatePosition = () => {
-      const anchorRect = anchorElement.getBoundingClientRect()
-      // For fixed positioning, getBoundingClientRect() already returns viewport-relative
-      // coordinates, so we don't need to add window.scrollY/scrollX
-      setPosition({
-        top: anchorRect.bottom + 4, // 4px gap below anchor
-        left: anchorRect.left,
-      })
-    }
-
-    updatePosition()
-
-    // Update position on scroll/resize
-    window.addEventListener('scroll', updatePosition, true)
-    window.addEventListener('resize', updatePosition)
-
-    return () => {
-      window.removeEventListener('scroll', updatePosition, true)
-      window.removeEventListener('resize', updatePosition)
-    }
-  }, [anchorElement])
+    refs.setReference(anchorElement)
+  }, [anchorElement, refs])
 
   return (
     <div
-      ref={menuRef}
-      className="typeahead-popover mentions-menu fixed z-100 w-64 rounded-md border bg-popover p-1 shadow-md"
-      style={{
-        top: `${position.top}px`,
-        left: `${position.left}px`,
-      }}
+      ref={refs.setFloating}
+      style={floatingStyles}
+      className="typeahead-popover mentions-menu z-100 w-64 rounded-md border bg-popover p-1 shadow-md"
     >
       {children}
     </div>
