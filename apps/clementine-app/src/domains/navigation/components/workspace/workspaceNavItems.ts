@@ -13,11 +13,6 @@ export const workspaceNavItems: NavItem[] = [
     icon: Sparkles,
   },
   {
-    label: 'AI Presets',
-    to: '/workspace/$workspaceSlug/ai-presets',
-    icon: Wand2,
-  },
-  {
     label: 'Settings',
     to: '/workspace/$workspaceSlug/settings',
     icon: Settings,
