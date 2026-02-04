@@ -20,10 +20,15 @@ import type { ExperienceStep } from '../../shared/schemas'
 /**
  * Build a SessionResponse from step and data.
  * Internal helper - not exported.
+ *
+ * @param step - The step being responded to
+ * @param data - Step-specific response data
+ * @param existingCreatedAt - Optional createdAt from existing response (preserved on updates)
  */
 function buildSessionResponse(
   step: ExperienceStep,
   data: SessionResponseData | null,
+  existingCreatedAt?: number,
 ): SessionResponse {
   const now = Date.now()
   return {
@@ -31,7 +36,7 @@ function buildSessionResponse(
     stepName: step.name,
     stepType: step.type,
     data,
-    createdAt: now,
+    createdAt: existingCreatedAt ?? now,
     updatedAt: now,
   }
 }
@@ -177,9 +182,11 @@ export function useRuntime(): RuntimeAPI {
 
   // Data mutation: setStepResponse (unified format)
   // Builds SessionResponse from step metadata, then updates store
+  // Preserves existing createdAt when updating
   const setStepResponse = useCallback(
     (step: ExperienceStep, data: SessionResponseData | null) => {
-      const response = buildSessionResponse(step, data)
+      const existingResponse = store.getResponse(step.id)
+      const response = buildSessionResponse(step, data, existingResponse?.createdAt)
       store.setResponse(response)
     },
     [store],

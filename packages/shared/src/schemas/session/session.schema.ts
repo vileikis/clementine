@@ -179,7 +179,13 @@ export const sessionSchema = z.looseObject({
   /**
    * Unified responses from all steps (input + capture).
    * Replaces separate `answers` and `capturedMedia` arrays.
-   * Each response has value (for analytics) and context (for AI generation).
+   *
+   * Each response contains:
+   * - stepId, stepName, stepType: Links to the step definition
+   * - data: Step-specific structured data (string | MultiSelectOption[] | MediaReference[] | null)
+   * - createdAt, updatedAt: Timestamps (Unix ms)
+   *
+   * @see sessionResponseSchema for full structure
    */
   responses: z.array(sessionResponseSchema).default([]),
 

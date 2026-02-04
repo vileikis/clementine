@@ -229,14 +229,20 @@ export const useExperienceRuntimeStore = create<ExperienceRuntimeStore>(
         const existingIndex = state.responses.findIndex(
           (r) => r.stepId === response.stepId,
         )
+        const now = Date.now()
         const newResponses =
           existingIndex >= 0
             ? state.responses.map((r, i) =>
                 i === existingIndex
-                  ? { ...response, updatedAt: Date.now() }
+                  ? {
+                      ...response,
+                      // Preserve original createdAt from existing response
+                      createdAt: r.createdAt,
+                      updatedAt: now,
+                    }
                   : r,
               )
-            : [...state.responses, response]
+            : [...state.responses, { ...response, updatedAt: now }]
 
         return { responses: newResponses }
       })

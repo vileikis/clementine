@@ -37,7 +37,7 @@ export function PreviewRuntimeContent() {
 
   // Handle response change - writes to unified responses
   const handleResponseChange = useCallback(
-    (data: SessionResponseData) => {
+    (data: SessionResponseData | null) => {
       if (!currentStep) return
       setStepResponse(currentStep, data)
     },
