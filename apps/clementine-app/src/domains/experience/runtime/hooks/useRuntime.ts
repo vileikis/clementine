@@ -186,7 +186,11 @@ export function useRuntime(): RuntimeAPI {
   const setStepResponse = useCallback(
     (step: ExperienceStep, data: SessionResponseData | null) => {
       const existingResponse = store.getResponse(step.id)
-      const response = buildSessionResponse(step, data, existingResponse?.createdAt)
+      const response = buildSessionResponse(
+        step,
+        data,
+        existingResponse?.createdAt,
+      )
       store.setResponse(response)
     },
     [store],
