@@ -37,7 +37,9 @@ export function useBodyThemeSync(backgroundColor: string): void {
     document.body.style.backgroundColor = backgroundColor
 
     // Set or create meta theme-color for Safari status bar
-    let meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')
+    let meta = document.querySelector<HTMLMetaElement>(
+      'meta[name="theme-color"]',
+    )
     const metaWasCreated = !meta
 
     if (!meta) {
