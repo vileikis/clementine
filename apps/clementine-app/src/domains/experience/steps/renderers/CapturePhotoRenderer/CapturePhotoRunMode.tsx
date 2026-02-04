@@ -61,7 +61,7 @@ export function CapturePhotoRunMode({
   canGoBack,
 }: CapturePhotoRunModeProps) {
   // Runtime hook for session context and actions
-  const { sessionId, projectId, setMedia, setStepResponse } = useRuntime()
+  const { sessionId, projectId, setStepResponse } = useRuntime()
 
   // Camera refs and hooks
   const cameraRef = useRef<CameraViewRef>(null)
@@ -111,9 +111,6 @@ export function CapturePhotoRunMode({
             displayName: step.name,
           }
 
-          // Update runtime store with captured media (deprecated)
-          setMedia(step.id, mediaRef)
-
           // Write to unified responses array with MediaReference context
           setStepResponse(step, null, [mediaRef])
         }
@@ -132,7 +129,7 @@ export function CapturePhotoRunMode({
         setIsUploading(false)
       }
     },
-    [photo, sessionId, projectId, step, setMedia, setStepResponse, onSubmit],
+    [photo, sessionId, projectId, step, setStepResponse, onSubmit],
   )
 
   // Library picker - goes to preview first so user can confirm

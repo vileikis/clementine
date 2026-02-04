@@ -7,19 +7,11 @@
  * This is an interface definition only for Phase 0 - implementation comes in Phase 3.
  */
 import type { MediaReference, SessionResponse } from '@clementine/shared'
-import type { Answer, SessionMode, SessionResultMedia } from '@/domains/session'
+import type { SessionMode, SessionResultMedia } from '@/domains/session'
 import type { ExperienceStep } from '../schemas'
 
 // Re-export SessionMode for convenience
 export type { SessionMode }
-
-/**
- * Captured media reference for runtime state
- */
-export interface CapturedMediaRef {
-  assetId: string
-  url: string
-}
 
 /**
  * Runtime state snapshot
@@ -28,12 +20,6 @@ export interface CapturedMediaRef {
 export interface RuntimeState {
   /** Current step index (0-based) */
   currentStepIndex: number
-
-  /** Collected answers keyed by step ID */
-  answers: Record<string, Answer['value']>
-
-  /** Captured media keyed by step ID */
-  capturedMedia: Record<string, CapturedMediaRef>
 
   /** Unified responses from all steps (input + capture) */
   responses: SessionResponse[]

@@ -13,13 +13,7 @@
 import { create } from 'zustand'
 
 import { validateStepInput } from '../../steps/registry/step-validation'
-import type { AnswerValue } from '../../steps/registry/step-registry'
-import type {
-  Answer,
-  CapturedMedia,
-  Session,
-  SessionResultMedia,
-} from '@/domains/session'
+import type { Session, SessionResultMedia } from '@/domains/session'
 import type { SessionResponse } from '@clementine/shared'
 import type { ExperienceStep } from '../../shared/schemas'
 
@@ -40,8 +34,6 @@ export interface ExperienceRuntimeState {
   isComplete: boolean
 
   // Collected data
-  answers: Answer[]
-  capturedMedia: CapturedMedia[]
   responses: SessionResponse[]
   resultMedia: SessionResultMedia | null
 
@@ -66,31 +58,6 @@ export interface ExperienceRuntimeActions {
     session: Session,
     steps: ExperienceStep[],
     experienceId: string,
-  ) => void
-
-  /**
-   * Record an answer for a step
-   * Replaces any existing answer for the same stepId
-   * @param stepId - Step identifier
-   * @param stepType - Step type for validation
-   * @param value - Primitive answer value for analytics
-   * @param context - Optional step-specific context for AI generation
-   */
-  setAnswer: (
-    stepId: string,
-    stepType: string,
-    value: AnswerValue,
-    context?: unknown,
-  ) => void
-
-  /**
-   * Record captured media for a step
-   * Replaces any existing media for the same stepId
-   * @deprecated Use setResponse instead for new code
-   */
-  setCapturedMedia: (
-    stepId: string,
-    media: Omit<CapturedMedia, 'stepId'>,
   ) => void
 
   /**
@@ -153,17 +120,6 @@ export interface ExperienceRuntimeActions {
   getCurrentStep: () => ExperienceStep | null
 
   /**
-   * Get answer for a specific step
-   */
-  getAnswer: (stepId: string) => Answer | undefined
-
-  /**
-   * Get answer value for a specific step
-   * Supports both legacy string[] and new MultiSelectOption[] formats
-   */
-  getAnswerValue: (stepId: string) => AnswerValue | undefined
-
-  /**
    * Set syncing status
    */
   setSyncing: (isSyncing: boolean) => void
@@ -192,8 +148,6 @@ const initialState: ExperienceRuntimeState = {
   steps: [],
   currentStepIndex: 0,
   isComplete: false,
-  answers: [],
-  capturedMedia: [],
   responses: [],
   resultMedia: null,
   isReady: false,
@@ -257,64 +211,11 @@ export const useExperienceRuntimeStore = create<ExperienceRuntimeStore>(
         steps,
         currentStepIndex: startingIndex,
         isComplete: session.status === 'completed',
-        answers: session.answers ?? [],
-        capturedMedia: session.capturedMedia ?? [],
         responses: existingResponses,
         resultMedia: session.resultMedia ?? null,
         isReady: true,
         isSyncing: false,
         lastSyncedAt: null,
-      })
-    },
-
-    setAnswer: (stepId, stepType, value, context) => {
-      set((state) => {
-        const newAnswer: Answer = {
-          stepId,
-          stepType,
-          value,
-          context: context ?? null,
-          answeredAt: Date.now(),
-        }
-
-        // Replace existing answer for this step or add new
-        const existingIndex = state.answers.findIndex(
-          (a) => a.stepId === stepId,
-        )
-        const newAnswers =
-          existingIndex >= 0
-            ? [
-                ...state.answers.slice(0, existingIndex),
-                newAnswer,
-                ...state.answers.slice(existingIndex + 1),
-              ]
-            : [...state.answers, newAnswer]
-
-        return { answers: newAnswers }
-      })
-    },
-
-    setCapturedMedia: (stepId, media) => {
-      set((state) => {
-        const newMedia: CapturedMedia = {
-          stepId,
-          ...media,
-        }
-
-        // Replace existing media for this step or add new
-        const existingIndex = state.capturedMedia.findIndex(
-          (m) => m.stepId === stepId,
-        )
-        const newCapturedMedia =
-          existingIndex >= 0
-            ? [
-                ...state.capturedMedia.slice(0, existingIndex),
-                newMedia,
-                ...state.capturedMedia.slice(existingIndex + 1),
-              ]
-            : [...state.capturedMedia, newMedia]
-
-        return { capturedMedia: newCapturedMedia }
       })
     },
 
@@ -403,9 +304,9 @@ export const useExperienceRuntimeStore = create<ExperienceRuntimeStore>(
       const currentStep = state.steps[state.currentStepIndex]
       if (!currentStep) return false
 
-      // Get the answer value for validation
-      const answer = state.answers.find((a) => a.stepId === currentStep.id)
-      const result = validateStepInput(currentStep, answer?.value)
+      // Get the response value for validation
+      const response = state.responses.find((r) => r.stepId === currentStep.id)
+      const result = validateStepInput(currentStep, response?.value)
       return result.isValid
     },
 
@@ -417,16 +318,6 @@ export const useExperienceRuntimeStore = create<ExperienceRuntimeStore>(
     getCurrentStep: () => {
       const state = get()
       return state.steps[state.currentStepIndex] ?? null
-    },
-
-    getAnswer: (stepId) => {
-      const state = get()
-      return state.answers.find((a) => a.stepId === stepId)
-    },
-
-    getAnswerValue: (stepId) => {
-      const state = get()
-      return state.answers.find((a) => a.stepId === stepId)?.value
     },
 
     setSyncing: (isSyncing) => {

@@ -136,11 +136,7 @@ export function ExperienceRuntime({
   // Sync to Firestore helper - used on navigation events
   // Returns a promise that rejects on failure (for completion flow to handle)
   const syncToFirestore = useCallback(
-    async (options: {
-      answers?: typeof store.answers
-      capturedMedia?: typeof store.capturedMedia
-      responses?: typeof store.responses
-    }) => {
+    async (options: { responses?: typeof store.responses }) => {
       try {
         store.setSyncing(true)
         await updateProgress.mutateAsync({
@@ -174,11 +170,9 @@ export function ExperienceRuntime({
     const current = store.currentStepIndex
     const prev = prevStepIndexRef.current
 
-    // Sync answers/media/responses to Firestore on forward navigation
+    // Sync responses to Firestore on forward navigation
     if (current > prev) {
       syncToFirestore({
-        answers: store.answers,
-        capturedMedia: store.capturedMedia,
         responses: store.responses,
       })
     }
@@ -195,8 +189,6 @@ export function ExperienceRuntime({
   }, [
     store.isReady,
     store.currentStepIndex,
-    store.answers,
-    store.capturedMedia,
     store.responses,
     store.steps,
     syncToFirestore,
@@ -218,8 +210,6 @@ export function ExperienceRuntime({
       // Step 1: Sync to Firestore
       try {
         await syncToFirestore({
-          answers: store.answers,
-          capturedMedia: store.capturedMedia,
           responses: store.responses,
         })
       } catch {
@@ -246,8 +236,6 @@ export function ExperienceRuntime({
   }, [
     store.isReady,
     store.isComplete,
-    store.answers,
-    store.capturedMedia,
     store.responses,
     session.projectId,
     session.id,

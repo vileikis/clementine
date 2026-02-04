@@ -13,12 +13,8 @@
 import { useCallback } from 'react'
 
 import { useExperienceRuntimeStore } from '../stores/experienceRuntimeStore'
-import type { MediaReference, SessionResponse } from '@clementine/shared'
-import type { Answer } from '@/domains/session'
-import type {
-  CapturedMediaRef,
-  RuntimeState,
-} from '../../shared/types/runtime.types'
+import type { SessionResponse } from '@clementine/shared'
+import type { RuntimeState } from '../../shared/types/runtime.types'
 import type { ExperienceStep } from '../../shared/schemas'
 import type { AnswerValue } from '../../steps/registry/step-registry'
 
@@ -66,8 +62,6 @@ export interface RuntimeAPI {
   goToStep: (index: number) => void
 
   // Data mutation
-  setAnswer: (stepId: string, value: Answer['value'], context?: unknown) => void
-  setMedia: (stepId: string, mediaRef: MediaReference) => void
   /**
    * Record a response for a step (unified format).
    * Builds the SessionResponse internally from step metadata.
@@ -75,10 +69,9 @@ export interface RuntimeAPI {
   setStepResponse: (step: ExperienceStep, value: AnswerValue | null, context?: unknown) => void
 
   // State access
-  getAnswer: (stepId: string) => Answer['value'] | undefined
-  getAnswerContext: (stepId: string) => unknown | undefined
-  getMedia: (stepId: string) => CapturedMediaRef | undefined
   getResponse: (stepId: string) => SessionResponse | undefined
+  getResponseValue: (stepId: string) => AnswerValue | null | undefined
+  getResponseContext: (stepId: string) => unknown | undefined
   getResponses: () => SessionResponse[]
   getState: () => RuntimeState
 }
@@ -103,8 +96,8 @@ export interface RuntimeAPI {
  *     canGoBack,
  *     next,
  *     back,
- *     setAnswer,
- *     getAnswer,
+ *     setStepResponse,
+ *     getResponseValue,
  *   } = useRuntime()
  *
  *   if (!currentStep) return <div>No steps</div>
@@ -113,8 +106,8 @@ export interface RuntimeAPI {
  *     <div>
  *       <h2>{currentStep.config.title}</h2>
  *       <input
- *         value={getAnswer(currentStep.id) ?? ''}
- *         onChange={(e) => setAnswer(currentStep.id, e.target.value)}
+ *         value={getResponseValue(currentStep.id) ?? ''}
+ *         onChange={(e) => setStepResponse(currentStep, e.target.value)}
  *       />
  *       <button onClick={back} disabled={!canGoBack}>Back</button>
  *       <button onClick={next} disabled={!canProceed}>Next</button>
@@ -181,63 +174,12 @@ export function useRuntime(): RuntimeAPI {
     [store],
   )
 
-  // Data mutation: setAnswer
-  // Just updates store - container handles debounced Firestore sync
-  const setAnswer = useCallback(
-    (stepId: string, value: Answer['value'], context?: unknown) => {
-      const currentStep = store.getCurrentStep()
-      if (!currentStep) return
-      store.setAnswer(stepId, currentStep.type, value, context)
-    },
-    [store],
-  )
-
-  // Data mutation: setMedia
-  // Just updates store - container handles immediate Firestore sync
-  const setMedia = useCallback(
-    (stepId: string, mediaRef: MediaReference) => {
-      store.setCapturedMedia(stepId, {
-        assetId: mediaRef.url, // Using URL as assetId for now
-        url: mediaRef.url,
-        createdAt: Date.now(),
-      })
-    },
-    [store],
-  )
-
   // Data mutation: setStepResponse (unified format)
   // Builds SessionResponse from step metadata, then updates store
   const setStepResponse = useCallback(
     (step: ExperienceStep, value: AnswerValue | null, context?: unknown) => {
       const response = buildSessionResponse(step, value, context ?? null)
       store.setResponse(response)
-    },
-    [store],
-  )
-
-  // State access: getAnswer
-  const getAnswer = useCallback(
-    (stepId: string): Answer['value'] | undefined => {
-      return store.getAnswerValue(stepId)
-    },
-    [store],
-  )
-
-  // State access: getAnswerContext
-  const getAnswerContext = useCallback(
-    (stepId: string): unknown | undefined => {
-      const answer = store.getAnswer(stepId)
-      return answer?.context
-    },
-    [store],
-  )
-
-  // State access: getMedia
-  const getMedia = useCallback(
-    (stepId: string): CapturedMediaRef | undefined => {
-      const media = store.capturedMedia.find((m) => m.stepId === stepId)
-      if (!media) return undefined
-      return { assetId: media.assetId, url: media.url }
     },
     [store],
   )
@@ -250,6 +192,22 @@ export function useRuntime(): RuntimeAPI {
     [store],
   )
 
+  // State access: getResponseValue
+  const getResponseValue = useCallback(
+    (stepId: string): AnswerValue | null | undefined => {
+      return store.getResponse(stepId)?.value
+    },
+    [store],
+  )
+
+  // State access: getResponseContext
+  const getResponseContext = useCallback(
+    (stepId: string): unknown | undefined => {
+      return store.getResponse(stepId)?.context
+    },
+    [store],
+  )
+
   // State access: getResponses (unified format)
   const getResponses = useCallback((): SessionResponse[] => {
     return store.getResponses()
@@ -257,22 +215,8 @@ export function useRuntime(): RuntimeAPI {
 
   // State access: getState
   const getState = useCallback((): RuntimeState => {
-    // Convert answers array to Record
-    const answers: Record<string, Answer['value']> = {}
-    for (const answer of store.answers) {
-      answers[answer.stepId] = answer.value
-    }
-
-    // Convert capturedMedia array to Record
-    const capturedMedia: Record<string, CapturedMediaRef> = {}
-    for (const media of store.capturedMedia) {
-      capturedMedia[media.stepId] = { assetId: media.assetId, url: media.url }
-    }
-
     return {
       currentStepIndex: store.currentStepIndex,
-      answers,
-      capturedMedia,
       responses: store.responses,
       resultMedia: store.resultMedia,
     }
@@ -298,15 +242,12 @@ export function useRuntime(): RuntimeAPI {
     goToStep,
 
     // Data mutation
-    setAnswer,
-    setMedia,
     setStepResponse,
 
     // State access
-    getAnswer,
-    getAnswerContext,
-    getMedia,
     getResponse,
+    getResponseValue,
+    getResponseContext,
     getResponses,
     getState,
   }

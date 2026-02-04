@@ -52,25 +52,19 @@ export function GuestRuntimeContent() {
     canGoBack,
     next,
     back,
-    setAnswer,
     setStepResponse,
-    getAnswer,
-    getAnswerContext,
+    getResponseValue,
+    getResponseContext,
     isComplete,
   } = runtime
 
-  // Handle answer change - writes to both legacy and unified responses
+  // Handle answer change - writes to unified responses
   const handleAnswer = useCallback(
     (value: AnswerValue, context?: unknown) => {
       if (!currentStep) return
-
-      // Update legacy answers for backward compatibility (deprecated)
-      setAnswer(currentStep.id, value, context)
-
-      // Write to unified responses array
       setStepResponse(currentStep, value, context)
     },
-    [currentStep, setAnswer, setStepResponse],
+    [currentStep, setStepResponse],
   )
 
   // When complete, return null - parent handles navigation
@@ -93,8 +87,8 @@ export function GuestRuntimeContent() {
     <StepRendererRouter
       step={currentStep}
       mode="run"
-      answer={getAnswer(currentStep.id)}
-      answerContext={getAnswerContext(currentStep.id)}
+      answer={getResponseValue(currentStep.id) ?? undefined}
+      answerContext={getResponseContext(currentStep.id)}
       onAnswer={handleAnswer}
       onSubmit={next}
       onBack={back}
