@@ -65,7 +65,10 @@ export interface RuntimeAPI {
    * @param step - The step being responded to
    * @param data - Step-specific data (string for simple inputs, MultiSelectOption[] for multiSelect, MediaReference[] for capture)
    */
-  setStepResponse: (step: ExperienceStep, data: SessionResponseData | null) => void
+  setStepResponse: (
+    step: ExperienceStep,
+    data: SessionResponseData | null,
+  ) => void
 
   // State access
   getResponse: (stepId: string) => SessionResponse | undefined
