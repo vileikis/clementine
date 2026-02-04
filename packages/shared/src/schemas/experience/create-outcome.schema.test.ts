@@ -6,8 +6,8 @@
  */
 import { describe, expect, it } from 'vitest'
 import {
-  createAiImageAspectRatioSchema,
-  createAiImageModelSchema,
+  aiImageAspectRatioSchema,
+  aiImageModelSchema,
   createOutcomeSchema,
   createOutcomeTypeSchema,
   gifOptionsSchema,
@@ -15,8 +15,8 @@ import {
   imageOptionsSchema,
   outcomeOptionsSchema,
   videoOptionsSchema,
-  type CreateAiImageAspectRatio,
-  type CreateAiImageModel,
+  type AIImageAspectRatio,
+  type AIImageModel,
   type CreateOutcome,
   type CreateOutcomeType,
   type GifOptions,
@@ -39,18 +39,18 @@ describe('createOutcomeTypeSchema', () => {
   })
 })
 
-describe('createAiImageModelSchema', () => {
+describe('aiImageModelSchema', () => {
   it('accepts valid model values', () => {
-    expect(createAiImageModelSchema.parse('gemini-2.5-flash-image')).toBe(
+    expect(aiImageModelSchema.parse('gemini-2.5-flash-image')).toBe(
       'gemini-2.5-flash-image'
     )
-    expect(createAiImageModelSchema.parse('gemini-3-pro-image-preview')).toBe(
+    expect(aiImageModelSchema.parse('gemini-3-pro-image-preview')).toBe(
       'gemini-3-pro-image-preview'
     )
   })
 
   it('rejects invalid model value with descriptive error', () => {
-    const result = createAiImageModelSchema.safeParse('invalid-model')
+    const result = aiImageModelSchema.safeParse('invalid-model')
     expect(result.success).toBe(false)
     if (!result.success) {
       expect(result.error.message).toContain('Invalid option')
@@ -58,17 +58,17 @@ describe('createAiImageModelSchema', () => {
   })
 })
 
-describe('createAiImageAspectRatioSchema', () => {
+describe('aiImageAspectRatioSchema', () => {
   it('accepts valid aspect ratios', () => {
-    expect(createAiImageAspectRatioSchema.parse('1:1')).toBe('1:1')
-    expect(createAiImageAspectRatioSchema.parse('3:2')).toBe('3:2')
-    expect(createAiImageAspectRatioSchema.parse('2:3')).toBe('2:3')
-    expect(createAiImageAspectRatioSchema.parse('9:16')).toBe('9:16')
-    expect(createAiImageAspectRatioSchema.parse('16:9')).toBe('16:9')
+    expect(aiImageAspectRatioSchema.parse('1:1')).toBe('1:1')
+    expect(aiImageAspectRatioSchema.parse('3:2')).toBe('3:2')
+    expect(aiImageAspectRatioSchema.parse('2:3')).toBe('2:3')
+    expect(aiImageAspectRatioSchema.parse('9:16')).toBe('9:16')
+    expect(aiImageAspectRatioSchema.parse('16:9')).toBe('16:9')
   })
 
   it('rejects invalid aspect ratio', () => {
-    expect(() => createAiImageAspectRatioSchema.parse('4:3')).toThrow()
+    expect(() => aiImageAspectRatioSchema.parse('4:3')).toThrow()
   })
 })
 
@@ -303,8 +303,8 @@ describe('type inference', () => {
     // These are compile-time checks - if they compile, the types are correct
     const outcome: CreateOutcome = createOutcomeSchema.parse({})
     const outcomeType: CreateOutcomeType = createOutcomeTypeSchema.parse('image')
-    const model: CreateAiImageModel = createAiImageModelSchema.parse('gemini-2.5-flash-image')
-    const aspectRatio: CreateAiImageAspectRatio = createAiImageAspectRatioSchema.parse('1:1')
+    const model: AIImageModel = aiImageModelSchema.parse('gemini-2.5-flash-image')
+    const aspectRatio: AIImageAspectRatio = aiImageAspectRatioSchema.parse('1:1')
     const imageConfig: ImageGenerationConfig =
       imageGenerationConfigSchema.parse({})
     const imageOpts: ImageOptions = imageOptionsSchema.parse({ kind: 'image' })

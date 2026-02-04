@@ -22,28 +22,22 @@ export const createOutcomeTypeSchema = z.enum(['image', 'gif', 'video'])
 export type CreateOutcomeType = z.infer<typeof createOutcomeTypeSchema>
 
 /**
- * AI image generation model selection for Create outcomes.
+ * AI image generation model selection.
  * Defined locally to avoid coupling to deprecated nodes/ system.
- *
- * Named with 'create' prefix to avoid conflict with deprecated
- * aiImageModelSchema in nodes/ai-image-node.schema.ts until PRD 4 cleanup.
  */
-export const createAiImageModelSchema = z.enum([
+export const aiImageModelSchema = z.enum([
   'gemini-2.5-flash-image',
   'gemini-3-pro-image-preview',
 ])
 
-/** AI model for Create outcome image generation */
-export type CreateAiImageModel = z.infer<typeof createAiImageModelSchema>
+/** AI model for image generation */
+export type AIImageModel = z.infer<typeof aiImageModelSchema>
 
 /**
- * AI image aspect ratio options for Create outcomes.
+ * AI image aspect ratio options.
  * Defined locally to avoid coupling to deprecated nodes/ system.
- *
- * Named with 'create' prefix to avoid conflict with deprecated
- * aiImageAspectRatioSchema in nodes/ai-image-node.schema.ts until PRD 4 cleanup.
  */
-export const createAiImageAspectRatioSchema = z.enum([
+export const aiImageAspectRatioSchema = z.enum([
   '1:1',
   '3:2',
   '2:3',
@@ -51,8 +45,8 @@ export const createAiImageAspectRatioSchema = z.enum([
   '16:9',
 ])
 
-/** Aspect ratio for Create outcome generated images */
-export type CreateAiImageAspectRatio = z.infer<typeof createAiImageAspectRatioSchema>
+/** Aspect ratio for generated images */
+export type AIImageAspectRatio = z.infer<typeof aiImageAspectRatioSchema>
 
 /**
  * Image generation configuration.
@@ -64,9 +58,9 @@ export const imageGenerationConfigSchema = z.object({
   /** Reference images for style guidance */
   refMedia: z.array(mediaReferenceSchema).default([]),
   /** AI model selection */
-  model: createAiImageModelSchema.default('gemini-2.5-flash-image'),
+  model: aiImageModelSchema.default('gemini-2.5-flash-image'),
   /** Output aspect ratio */
-  aspectRatio: createAiImageAspectRatioSchema.default('1:1'),
+  aspectRatio: aiImageAspectRatioSchema.default('1:1'),
 })
 
 /** Configuration for AI image generation */
