@@ -167,6 +167,7 @@ function validateYesNoInput(
 
 /**
  * Validate input.multiSelect step input
+ * Input is now MultiSelectOption[] (full options with value, promptFragment, promptMedia)
  */
 function validateMultiSelectInput(
   config: ExperienceInputMultiSelectStepConfig,
@@ -190,14 +191,18 @@ function validateMultiSelectInput(
   }
 
   // All values must be valid option values
-  // Options are objects with { value, promptFragment, promptMedia }
+  // Input is now MultiSelectOption[] - extract values for validation
   const optionsArray = config.options ?? []
   const validValues = optionsArray.map((opt) => opt.value)
 
-  // Input validation now only checks string[] (primitive values)
-  // The context field stores full MultiSelectOption[] separately
-  const allValid = input.every((v) => {
-    return typeof v === 'string' && validValues.includes(v)
+  // Check if input items are MultiSelectOption objects or strings
+  const allValid = input.every((item) => {
+    // Handle MultiSelectOption objects (new format)
+    if (typeof item === 'object' && item !== null && 'value' in item) {
+      return validValues.includes((item as { value: string }).value)
+    }
+    // Handle string values (legacy format)
+    return typeof item === 'string' && validValues.includes(item)
   })
 
   if (!allValid) {

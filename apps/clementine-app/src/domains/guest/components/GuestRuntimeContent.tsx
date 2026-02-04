@@ -32,7 +32,7 @@
  */
 import { useCallback } from 'react'
 
-import type { AnswerValue } from '@/domains/experience/steps/registry/step-registry'
+import type { SessionResponseData } from '@clementine/shared'
 import { useRuntime } from '@/domains/experience/runtime'
 import { StepRendererRouter } from '@/domains/experience/steps/components/StepRendererRouter'
 import { ThemedText } from '@/shared/theming'
@@ -52,20 +52,18 @@ export function GuestRuntimeContent() {
     canGoBack,
     next,
     back,
-    setAnswer,
-    getAnswer,
-    getAnswerContext,
+    setStepResponse,
+    getResponse,
     isComplete,
   } = runtime
 
-  // Handle answer change
-  const handleAnswer = useCallback(
-    (value: AnswerValue, context?: unknown) => {
-      if (currentStep) {
-        setAnswer(currentStep.id, value, context)
-      }
+  // Handle response change - writes to unified responses
+  const handleResponseChange = useCallback(
+    (data: SessionResponseData | null) => {
+      if (!currentStep) return
+      setStepResponse(currentStep, data)
     },
-    [currentStep, setAnswer],
+    [currentStep, setStepResponse],
   )
 
   // When complete, return null - parent handles navigation
@@ -88,9 +86,8 @@ export function GuestRuntimeContent() {
     <StepRendererRouter
       step={currentStep}
       mode="run"
-      answer={getAnswer(currentStep.id)}
-      answerContext={getAnswerContext(currentStep.id)}
-      onAnswer={handleAnswer}
+      response={getResponse(currentStep.id)}
+      onResponseChange={handleResponseChange}
       onSubmit={next}
       onBack={back}
       canGoBack={canGoBack}

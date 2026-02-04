@@ -12,6 +12,7 @@ import * as Sentry from '@sentry/tanstackstart-react'
 import { doc, runTransaction, serverTimestamp } from 'firebase/firestore'
 
 import { experienceKeys } from '../../shared/queries/experience.query'
+import { validateCreateOutcome } from '../../shared/lib/create-outcome-validation'
 import { stepRegistry } from '../../steps/registry/step-registry'
 import { getStepTypesForProfile } from '../../steps/registry/step-utils'
 import type { UpdateData } from 'firebase/firestore'
@@ -120,6 +121,15 @@ export function validateForPublish(
         message: `Step type "${step.type}" is not allowed for ${experience.profile} profile`,
       })
     }
+  }
+
+  // Rule 4: Create outcome validation
+  const createValidation = validateCreateOutcome(
+    experience.draft.create,
+    experience.draft.steps,
+  )
+  if (!createValidation.valid) {
+    errors.push(...createValidation.errors)
   }
 
   return {
@@ -231,8 +241,16 @@ export function usePublishExperience() {
         }
 
         // Sync publishedVersion with current draftVersion
+        // Note: transformNodes set to [] as deprecated in favor of create
+        const emptyTransformNodes: typeof currentExperience.draft.transformNodes =
+          []
+        const publishedConfig = {
+          ...currentExperience.draft,
+          transformNodes: emptyTransformNodes, // Deprecated - always empty on publish
+        }
+
         transaction.update(experienceRef, {
-          published: currentExperience.draft,
+          published: publishedConfig,
           publishedVersion: currentExperience.draftVersion,
           publishedAt: serverTimestamp(),
           publishedBy: null, // TODO: Add current user ID when auth is integrated

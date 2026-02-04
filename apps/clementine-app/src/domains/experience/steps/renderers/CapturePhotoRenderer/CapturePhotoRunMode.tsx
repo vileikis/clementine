@@ -19,7 +19,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useExperienceRuntimeStore } from '../../../runtime/stores/experienceRuntimeStore'
+import { useRuntime } from '../../../runtime/hooks/useRuntime'
 import { StepLayout } from '../StepLayout'
 import { uploadPhoto } from './lib/uploadPhoto'
 import {
@@ -38,7 +38,7 @@ import type {
   CameraViewRef,
   CapturedPhoto,
 } from '@/shared/camera'
-import type { ExperienceAspectRatio } from '@clementine/shared'
+import type { ExperienceAspectRatio, MediaReference } from '@clementine/shared'
 import {
   useCameraPermission,
   useLibraryPicker,
@@ -60,8 +60,8 @@ export function CapturePhotoRunMode({
   onBack,
   canGoBack,
 }: CapturePhotoRunModeProps) {
-  // Runtime store for session context
-  const { sessionId, projectId, setCapturedMedia } = useExperienceRuntimeStore()
+  // Runtime hook for session context and actions
+  const { sessionId, projectId, setStepResponse } = useRuntime()
 
   // Camera refs and hooks
   const cameraRef = useRef<CameraViewRef>(null)
@@ -97,19 +97,22 @@ export function CapturePhotoRunMode({
       try {
         // Only upload if we have session context
         if (sessionId && projectId) {
-          const { assetId, url } = await uploadPhoto({
+          const { assetId, url, filePath } = await uploadPhoto({
             photo: targetPhoto,
             projectId,
             sessionId,
             stepId: step.id,
           })
 
-          // Update runtime store with captured media
-          setCapturedMedia(step.id, {
-            assetId,
+          const mediaRef: MediaReference = {
+            mediaAssetId: assetId,
             url,
-            createdAt: Date.now(),
-          })
+            filePath,
+            displayName: step.name,
+          }
+
+          // Write to unified responses array with MediaReference[] data
+          setStepResponse(step, [mediaRef])
         }
 
         // Revoke preview URL after upload
@@ -126,7 +129,7 @@ export function CapturePhotoRunMode({
         setIsUploading(false)
       }
     },
-    [photo, sessionId, projectId, step.id, setCapturedMedia, onSubmit],
+    [photo, sessionId, projectId, step, setStepResponse, onSubmit],
   )
 
   // Library picker - goes to preview first so user can confirm
