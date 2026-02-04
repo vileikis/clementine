@@ -42,6 +42,7 @@ import type {
   ExperienceStepConfig,
   ExperienceStepType,
   SessionResponse,
+  SessionResponseData,
 } from '@clementine/shared'
 
 import type { LucideIcon } from 'lucide-react'
@@ -71,7 +72,7 @@ export interface StepRendererProps {
   /** Current response for this step (run mode only) */
   response?: SessionResponse
   /** Callback when user provides/updates response data (run mode only) */
-  onResponseChange?: (data: unknown) => void
+  onResponseChange?: (data: SessionResponseData) => void
   /** Callback to go back (run mode only) */
   onBack?: () => void
   /** Whether back navigation is available (run mode only) */

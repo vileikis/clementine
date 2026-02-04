@@ -13,7 +13,7 @@
 import { useCallback } from 'react'
 
 import { useExperienceRuntimeStore } from '../stores/experienceRuntimeStore'
-import type { SessionResponse } from '@clementine/shared'
+import type { SessionResponse, SessionResponseData } from '@clementine/shared'
 import type { RuntimeState } from '../../shared/types/runtime.types'
 import type { ExperienceStep } from '../../shared/schemas'
 
@@ -23,7 +23,7 @@ import type { ExperienceStep } from '../../shared/schemas'
  */
 function buildSessionResponse(
   step: ExperienceStep,
-  data: unknown,
+  data: SessionResponseData | null,
 ): SessionResponse {
   const now = Date.now()
   return {
@@ -65,7 +65,7 @@ export interface RuntimeAPI {
    * @param step - The step being responded to
    * @param data - Step-specific data (string for simple inputs, MultiSelectOption[] for multiSelect, MediaReference[] for capture)
    */
-  setStepResponse: (step: ExperienceStep, data: unknown) => void
+  setStepResponse: (step: ExperienceStep, data: SessionResponseData | null) => void
 
   // State access
   getResponse: (stepId: string) => SessionResponse | undefined
@@ -175,7 +175,7 @@ export function useRuntime(): RuntimeAPI {
   // Data mutation: setStepResponse (unified format)
   // Builds SessionResponse from step metadata, then updates store
   const setStepResponse = useCallback(
-    (step: ExperienceStep, data: unknown) => {
+    (step: ExperienceStep, data: SessionResponseData | null) => {
       const response = buildSessionResponse(step, data)
       store.setResponse(response)
     },

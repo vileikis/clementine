@@ -8,6 +8,23 @@
  * @see PRD 1A - Schema Foundations
  */
 import { z } from 'zod'
+import { mediaReferenceSchema } from '../media/media-reference.schema'
+import { multiSelectOptionSchema } from '../experience/steps/input-multi-select.schema'
+
+/**
+ * Session response data schema - union of all possible data types.
+ *
+ * - string: Simple input steps (scale, yesNo, shortText, longText)
+ * - MultiSelectOption[]: Multi-select input step
+ * - MediaReference[]: Capture steps (photo, video)
+ */
+export const sessionResponseDataSchema = z.union([
+  z.string(),
+  z.array(multiSelectOptionSchema),
+  z.array(mediaReferenceSchema),
+])
+
+export type SessionResponseData = z.infer<typeof sessionResponseDataSchema>
 
 /**
  * Session response schema for capturing user input and media.
@@ -33,7 +50,7 @@ export const sessionResponseSchema = z.object({
   /** e.g., 'input.scale', 'capture.photo' */
   stepType: z.string(),
   /** Step-specific structured data */
-  data: z.unknown().nullable().default(null),
+  data: sessionResponseDataSchema.nullable().default(null),
   /** Unix timestamp (ms) */
   createdAt: z.number(),
   /** Unix timestamp (ms) */

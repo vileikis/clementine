@@ -32,6 +32,7 @@
  */
 import { useCallback } from 'react'
 
+import type { SessionResponseData } from '@clementine/shared'
 import { useRuntime } from '@/domains/experience/runtime'
 import { StepRendererRouter } from '@/domains/experience/steps/components/StepRendererRouter'
 import { ThemedText } from '@/shared/theming'
@@ -58,7 +59,7 @@ export function GuestRuntimeContent() {
 
   // Handle response change - writes to unified responses
   const handleResponseChange = useCallback(
-    (data: unknown) => {
+    (data: SessionResponseData) => {
       if (!currentStep) return
       setStepResponse(currentStep, data)
     },

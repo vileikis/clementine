@@ -10,8 +10,10 @@
  * - Completion state display
  */
 import { useCallback } from 'react'
+
 import { useRuntime } from '../../runtime'
 import { StepRendererRouter } from '../../steps'
+import type { SessionResponseData } from '@clementine/shared'
 
 /**
  * PreviewRuntimeContent Component
@@ -35,7 +37,7 @@ export function PreviewRuntimeContent() {
 
   // Handle response change - writes to unified responses
   const handleResponseChange = useCallback(
-    (data: unknown) => {
+    (data: SessionResponseData) => {
       if (!currentStep) return
       setStepResponse(currentStep, data)
     },
