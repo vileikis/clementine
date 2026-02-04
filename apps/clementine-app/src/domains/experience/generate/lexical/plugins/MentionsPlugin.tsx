@@ -203,9 +203,11 @@ function PositionedMenu({ anchorElement, children }: PositionedMenuProps) {
   useEffect(() => {
     const updatePosition = () => {
       const anchorRect = anchorElement.getBoundingClientRect()
+      // For fixed positioning, getBoundingClientRect() already returns viewport-relative
+      // coordinates, so we don't need to add window.scrollY/scrollX
       setPosition({
-        top: anchorRect.bottom + window.scrollY + 4, // 4px gap below anchor
-        left: anchorRect.left + window.scrollX,
+        top: anchorRect.bottom + 4, // 4px gap below anchor
+        left: anchorRect.left,
       })
     }
 
