@@ -21,19 +21,8 @@ export const experienceConfigSchema = z.looseObject({
   /** @deprecated Use create instead. Kept for backward compatibility. */
   transformNodes: z.array(transformNodeSchema).default([]),
 
-  /** Create outcome configuration (replaces transformNodes) */
-  create: createOutcomeSchema.default({
-    type: null,
-    captureStepId: null,
-    aiEnabled: true,
-    imageGeneration: {
-      prompt: '',
-      refMedia: [],
-      model: 'gemini-2.5-flash-image',
-      aspectRatio: '1:1',
-    },
-    options: null,
-  }),
+  /** Create outcome configuration (replaces transformNodes). Null means not configured. */
+  create: createOutcomeSchema.nullable().default(null),
 })
 ```
 
@@ -156,6 +145,8 @@ interface VideoOptions {
 
 ### Publish-Time Validation
 
+**Note:** If `create` is `null`, no validation is performed - publishing without outcome generation is valid.
+
 | Rule | Field | Condition | Error Message |
 |------|-------|-----------|---------------|
 | V1 | `create.type` | `=== null` | "Select an outcome type (Image, GIF, or Video)" |
@@ -170,6 +161,7 @@ interface VideoOptions {
 ### Validation Execution Order
 
 ```
+0. If create is null → valid (no outcome generation)
 1. Type null check (V1) → early return if fails
 2. Passthrough validation (V2)
 3. CaptureStepId validation (V3, V4)
@@ -184,11 +176,9 @@ interface VideoOptions {
 ### New Experience
 
 ```
-Created → draft.create initialized with defaults
-         type: null (requires explicit selection)
-         aiEnabled: true
-         imageGeneration: empty prompt, no refMedia
-         options: null
+Created → draft.create = null (not configured)
+         Can be published without outcome generation
+         Configure create when AI output is needed
 ```
 
 ### Publish Flow

@@ -24,10 +24,10 @@
 
 **Purpose**: Add create field to experience config schema in shared package
 
-- [ ] T001 [P] Add create field to experienceConfigSchema in `packages/shared/src/schemas/experience/experience.schema.ts`
-- [ ] T002 [P] Export CreateOutcome types from `packages/shared/src/schemas/experience/index.ts`
-- [ ] T003 Re-export CreateOutcome types in app schemas `apps/clementine-app/src/domains/experience/shared/schemas/index.ts`
-- [ ] T004 Build shared package to verify schema compiles: `pnpm --filter @clementine/shared build`
+- [x] T001 [P] Add create field to experienceConfigSchema in `packages/shared/src/schemas/experience/experience.schema.ts`
+- [x] T002 [P] Export CreateOutcome types from `packages/shared/src/schemas/experience/index.ts`
+- [x] T003 Re-export CreateOutcome types in app schemas `apps/clementine-app/src/domains/experience/shared/schemas/index.ts`
+- [x] T004 Build shared package to verify schema compiles: `pnpm --filter @clementine/shared build`
 
 **Checkpoint**: Schema changes complete, types available in app
 
@@ -39,9 +39,9 @@
 
 **⚠️ CRITICAL**: User story implementation depends on this validation function
 
-- [ ] T005 Create `validateCreateOutcome` function in `apps/clementine-app/src/domains/experience/shared/lib/create-outcome-validation.ts`
-- [ ] T006 [P] Create unit tests for validation function in `apps/clementine-app/src/domains/experience/shared/lib/create-outcome-validation.test.ts`
-- [ ] T007 Run validation tests to verify: `pnpm app:test create-outcome-validation`
+- [x] T005 Create `validateCreateOutcome` function in `apps/clementine-app/src/domains/experience/shared/lib/create-outcome-validation.ts`
+- [x] T006 [P] Create unit tests for validation function in `apps/clementine-app/src/domains/experience/shared/lib/create-outcome-validation.test.ts`
+- [x] T007 Run validation tests to verify: `pnpm app:test create-outcome-validation`
 
 **Checkpoint**: Foundation ready - validation function tested and available
 
@@ -55,10 +55,10 @@
 
 ### Implementation for User Story 1
 
-- [ ] T008 [US1] Implement V1 validation rule (type null check) in `apps/clementine-app/src/domains/experience/shared/lib/create-outcome-validation.ts`
-- [ ] T009 [US1] Implement V7 validation rule (gif/video coming soon) in `apps/clementine-app/src/domains/experience/shared/lib/create-outcome-validation.ts`
-- [ ] T010 [US1] Integrate validateCreateOutcome into validateForPublish in `apps/clementine-app/src/domains/experience/designer/hooks/usePublishExperience.ts`
-- [ ] T011 [US1] Update publish transaction to set transformNodes=[] in `apps/clementine-app/src/domains/experience/designer/hooks/usePublishExperience.ts`
+- [x] T008 [US1] Implement V1 validation rule (type null check) in `apps/clementine-app/src/domains/experience/shared/lib/create-outcome-validation.ts`
+- [x] T009 [US1] Implement V7 validation rule (gif/video coming soon) in `apps/clementine-app/src/domains/experience/shared/lib/create-outcome-validation.ts`
+- [x] T010 [US1] Integrate validateCreateOutcome into validateForPublish in `apps/clementine-app/src/domains/experience/designer/hooks/usePublishExperience.ts`
+- [x] T011 [US1] Update publish transaction to set transformNodes=[] in `apps/clementine-app/src/domains/experience/designer/hooks/usePublishExperience.ts`
 
 **Checkpoint**: US1 complete - publishing blocked without valid outcome type
 
@@ -72,9 +72,9 @@
 
 ### Implementation for User Story 2
 
-- [ ] T012 [US2] Implement V5 validation rule (prompt required when AI enabled) in `apps/clementine-app/src/domains/experience/shared/lib/create-outcome-validation.ts`
-- [ ] T013 [US2] Implement V6 validation rule (duplicate refMedia displayNames) in `apps/clementine-app/src/domains/experience/shared/lib/create-outcome-validation.ts`
-- [ ] T014 [P] [US2] Add unit tests for AI validation rules in `apps/clementine-app/src/domains/experience/shared/lib/create-outcome-validation.test.ts`
+- [x] T012 [US2] Implement V5 validation rule (prompt required when AI enabled) in `apps/clementine-app/src/domains/experience/shared/lib/create-outcome-validation.ts`
+- [x] T013 [US2] Implement V6 validation rule (duplicate refMedia displayNames) in `apps/clementine-app/src/domains/experience/shared/lib/create-outcome-validation.ts`
+- [x] T014 [P] [US2] Add unit tests for AI validation rules in `apps/clementine-app/src/domains/experience/shared/lib/create-outcome-validation.test.ts`
 
 **Checkpoint**: US2 complete - AI configuration properly validated
 
@@ -88,11 +88,11 @@
 
 ### Implementation for User Story 3
 
-- [ ] T015 [US3] Implement isCaptureStep helper function in `apps/clementine-app/src/domains/experience/shared/lib/create-outcome-validation.ts`
-- [ ] T016 [US3] Implement V2 validation rule (passthrough requires source) in `apps/clementine-app/src/domains/experience/shared/lib/create-outcome-validation.ts`
-- [ ] T017 [US3] Implement V3 validation rule (step not found) in `apps/clementine-app/src/domains/experience/shared/lib/create-outcome-validation.ts`
-- [ ] T018 [US3] Implement V4 validation rule (step not capture type) in `apps/clementine-app/src/domains/experience/shared/lib/create-outcome-validation.ts`
-- [ ] T019 [P] [US3] Add unit tests for passthrough validation in `apps/clementine-app/src/domains/experience/shared/lib/create-outcome-validation.test.ts`
+- [x] T015 [US3] Implement isCaptureStep helper function in `apps/clementine-app/src/domains/experience/shared/lib/create-outcome-validation.ts`
+- [x] T016 [US3] Implement V2 validation rule (passthrough requires source) in `apps/clementine-app/src/domains/experience/shared/lib/create-outcome-validation.ts`
+- [x] T017 [US3] Implement V3 validation rule (step not found) in `apps/clementine-app/src/domains/experience/shared/lib/create-outcome-validation.ts`
+- [x] T018 [US3] Implement V4 validation rule (step not capture type) in `apps/clementine-app/src/domains/experience/shared/lib/create-outcome-validation.ts`
+- [x] T019 [P] [US3] Add unit tests for passthrough validation in `apps/clementine-app/src/domains/experience/shared/lib/create-outcome-validation.test.ts`
 
 **Checkpoint**: US3 complete - passthrough mode properly validated
 
@@ -106,8 +106,8 @@
 
 ### Implementation for User Story 4
 
-- [ ] T020 [US4] Implement V8 validation rule (options kind mismatch) in `apps/clementine-app/src/domains/experience/shared/lib/create-outcome-validation.ts`
-- [ ] T021 [P] [US4] Add unit test for options kind validation in `apps/clementine-app/src/domains/experience/shared/lib/create-outcome-validation.test.ts`
+- [x] T020 [US4] Implement V8 validation rule (options kind mismatch) in `apps/clementine-app/src/domains/experience/shared/lib/create-outcome-validation.ts`
+- [x] T021 [P] [US4] Add unit test for options kind validation in `apps/clementine-app/src/domains/experience/shared/lib/create-outcome-validation.test.ts`
 
 **Checkpoint**: US4 complete - options consistency validated
 
@@ -121,8 +121,8 @@
 
 ### Implementation for User Story 5
 
-- [ ] T022 [US5] Update experience creation to include create defaults in `apps/clementine-app/src/domains/experience/shared/hooks/useCreateExperience.ts`
-- [ ] T023 [P] [US5] Add integration test for new experience defaults in `apps/clementine-app/src/domains/experience/shared/hooks/useCreateExperience.test.ts`
+- [x] T022 [US5] Update experience creation to include create defaults in `apps/clementine-app/src/domains/experience/shared/hooks/useCreateExperience.ts`
+- [x] T023 [P] [US5] Add integration test for new experience defaults in `apps/clementine-app/src/domains/experience/shared/hooks/useCreateExperience.test.ts`
 
 **Checkpoint**: US5 complete - new experiences have proper defaults
 
@@ -132,11 +132,11 @@
 
 **Purpose**: Final verification and cleanup
 
-- [ ] T024 Run full type check: `pnpm app:type-check`
-- [ ] T025 Run all tests: `pnpm app:test`
-- [ ] T026 Run lint and format: `pnpm app:check`
-- [ ] T027 Manual verification per quickstart.md scenarios
-- [ ] T028 Update shared package version if needed in `packages/shared/package.json`
+- [x] T024 Run full type check: `pnpm app:type-check`
+- [x] T025 Run all tests: `pnpm app:test`
+- [x] T026 Run lint and format: `pnpm app:check`
+- [x] T027 Manual verification per quickstart.md scenarios
+- [x] T028 Update shared package version if needed in `packages/shared/package.json`
 
 ---
 
