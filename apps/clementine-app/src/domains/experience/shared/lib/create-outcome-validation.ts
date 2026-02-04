@@ -112,16 +112,24 @@ export function validateCreateOutcome(
     }
   }
 
-  // V5: AI enabled requires a non-empty prompt
-  if (create.aiEnabled && !create.imageGeneration.prompt.trim()) {
-    errors.push({
-      field: 'create.imageGeneration.prompt',
-      message: 'Prompt is required when AI is enabled',
-    })
+  // V5: AI enabled requires imageGeneration with a non-empty prompt
+  if (create.aiEnabled) {
+    if (!create.imageGeneration) {
+      errors.push({
+        field: 'create.imageGeneration',
+        message: 'AI configuration is missing. Please configure AI generation settings.',
+      })
+    } else if (!create.imageGeneration.prompt?.trim()) {
+      errors.push({
+        field: 'create.imageGeneration.prompt',
+        message: 'Prompt is required when AI is enabled',
+      })
+    }
   }
 
   // V6: RefMedia displayNames must be unique
-  const displayNames = create.imageGeneration.refMedia.map((r) => r.displayName)
+  const refMedia = create.imageGeneration?.refMedia ?? []
+  const displayNames = refMedia.map((r) => r.displayName)
   const duplicates = displayNames.filter(
     (name, index) => displayNames.indexOf(name) !== index,
   )
