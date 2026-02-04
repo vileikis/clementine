@@ -13,6 +13,7 @@
 import { z } from 'zod'
 
 import { experienceMediaSchema } from '../media/media-reference.schema'
+import { createOutcomeSchema } from './create-outcome.schema'
 import { experienceStepSchema } from './step.schema'
 import { transformNodeSchema } from './transform.schema'
 
@@ -43,8 +44,10 @@ export const experienceProfileSchema = z.enum(['freeform', 'survey', 'story'])
 export const experienceConfigSchema = z.looseObject({
   /** Array of steps in the experience (typed discriminated union) */
   steps: z.array(experienceStepSchema).default([]),
-  /** Transform pipeline nodes (flattened from previous transform.nodes) */
+  /** @deprecated Use create instead. Kept for backward compatibility. */
   transformNodes: z.array(transformNodeSchema).default([]),
+  /** Create outcome configuration (replaces transformNodes). Null means not configured. */
+  create: createOutcomeSchema.nullable().default(null),
 })
 
 /**

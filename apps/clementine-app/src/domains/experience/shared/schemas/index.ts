@@ -15,6 +15,11 @@ export {
   experienceMediaSchema,
   // Transform schemas
   transformNodeSchema,
+  // Create outcome schemas
+  createOutcomeSchema,
+  createOutcomeTypeSchema,
+  imageGenerationConfigSchema,
+  outcomeOptionsSchema,
   // Step schemas (discriminated union)
   experienceStepSchema,
   experienceStepTypeSchema,
@@ -44,6 +49,11 @@ export {
   type ExperienceProfile,
   type ExperienceMedia,
   type TransformNode,
+  // Create outcome types
+  type CreateOutcome,
+  type CreateOutcomeType,
+  type ImageGenerationConfig,
+  type OutcomeOptions,
   // Step types
   type ExperienceStep,
   type ExperienceStepType,
