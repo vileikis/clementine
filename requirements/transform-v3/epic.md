@@ -1,528 +1,213 @@
-# EPIC: Outcome-based Create (Nodes removed from customer UX)
+# EPIC: Outcome-based Create (Transform v3)
 
 ## Goal
 
 Replace user-authored `transformNodes` with a **Create tab** where admins pick an **Outcome** and fill a small set of parameters. Guest runtime and Cloud Functions operate on **responses** only. `transformNodes` become deprecated (kept only for backward compatibility, ignored by runtime).
 
-## Non-goals (lock these or you'll spiral)
+## Non-goals
 
-- No advanced mode.
-- No template DSL in Firestore for MVP.
-- No migration of existing prelaunch data.
-- No fallback logic for old sessions (abandon them).
-
----
-
-# PRD Phase 1 — Data model groundwork (Experience + Session + Job)
-
-## 1.1 Experience config: add `create` and stop using transformNodes
-
-### Minimal schema delta
-
-Keep `steps` as-is (Collect). Add `create`. Keep `transformNodes` field but treat as deprecated.
-
-**New `create` schema** — reuse existing AI Image node config shape.
-
-### Create outcome types (MVP)
-
-- `image` (implemented)
-- `gif`, `video` (allowed in enum but may be disabled until implemented)
-
-### Zod additions
-
-**File**: `packages/shared/src/schemas/experience/create-outcome.schema.ts`
-
-```ts
-import { z } from 'zod'
-import {
-  aiImageModelSchema,
-  aiImageAspectRatioSchema,
-} from './nodes/ai-image-node.schema'
-import { mediaReferenceSchema } from '../media/media-reference.schema'
-
-export const createOutcomeTypeSchema = z.enum(['image', 'gif', 'video'])
-
-export const createImageOutcomeParamsSchema = z.object({
-  // Optional: allow prompt-only generation
-  sourceStepId: z.string().nullable().default(null),
-
-  prompt: z.string().default(''),
-  model: aiImageModelSchema.default('gemini-2.5-flash-image'),
-  aspectRatio: aiImageAspectRatioSchema.default('1:1'),
-
-  // 0..N reference images (MediaReference with displayName for @{ref:...} mentions)
-  refMedia: z.array(mediaReferenceSchema).default([]),
-})
-
-export const createOutcomeSchema = z.object({
-  type: createOutcomeTypeSchema.nullable().default(null),
-  // Start with image-only params; later discriminate by type.
-  image: createImageOutcomeParamsSchema.nullable().default(null),
-})
-
-export type CreateOutcomeType = z.infer<typeof createOutcomeTypeSchema>
-export type CreateImageOutcomeParams = z.infer<typeof createImageOutcomeParamsSchema>
-export type CreateOutcome = z.infer<typeof createOutcomeSchema>
-```
-
-Then update `experienceConfigSchema`:
-
-**File**: `packages/shared/src/schemas/experience/experience.schema.ts`
-
-```ts
-export const experienceConfigSchema = z.looseObject({
-  steps: z.array(experienceStepSchema).default([]),
-
-  // deprecated, kept for compatibility
-  transformNodes: z.array(transformNodeSchema).default([]),
-
-  // NEW
-  create: createOutcomeSchema.default({ type: null, image: null }),
-})
-```
-
-### Publish-time validation (critical)
-
-At publish time:
-
-- `create.type` must be non-null
-- If `type === 'image'` then `create.image` must exist and `prompt` must not be empty
-- `sourceStepId` may be null (prompt-only generation)
-
-### Acceptance criteria
-
-- [ ] AC-1.1.1: Experiences can be published with Create outcome configured.
-- [ ] AC-1.1.2: `published.transformNodes` is set to `[]` automatically on publish.
-- [ ] AC-1.1.3: Experiences without `create.type` fail publish with clear error.
+- No advanced mode
+- No template DSL in Firestore for MVP
+- No migration of existing prelaunch data
+- No fallback logic for old sessions (abandon them)
+- No text generation stage (future - see [future-patterns.md](./future-patterns.md))
+- No video/gif implementation (schema stubs only)
 
 ---
 
-## 1.2 Media displayName validation
+## PRD Overview
 
-Add validation to media display names to ensure they're safe for mention parsing.
-
-**File**: `packages/shared/src/schemas/media/media-reference.schema.ts`
-
-```ts
-/**
- * Media display name schema
- * Validation ensures names are safe for @{ref:displayName} mention parsing.
- * Prevents characters that would break mention syntax (}, :, {).
- */
-export const mediaDisplayNameSchema = z
-  .string()
-  .trim()
-  .min(1, 'Display name is required')
-  .max(100, 'Display name must be 100 characters or less')
-  .regex(
-    /^[a-zA-Z0-9 \-_.]+$/,
-    'Display name can only contain letters, numbers, spaces, hyphens, underscores, and periods'
-  )
-  .default('Untitled')
-
-export const mediaReferenceSchema = z.looseObject({
-  mediaAssetId: z.string(),
-  url: z.url(),
-  filePath: z.string().nullable().default(null),
-  displayName: mediaDisplayNameSchema, // Updated with validation
-})
-```
-
-**Note**: Apply validation to new media only. Existing media grandfathered.
-
-### Acceptance criteria
-
-- [ ] AC-1.2.1: New media uploads require valid displayName (no `}`, `:`, `{` characters).
-- [ ] AC-1.2.2: Existing media with invalid displayName still parses (backward compatible).
+| PRD | Name | Description |
+|-----|------|-------------|
+| [1A](./prd-1a-schemas.md) | Schema Foundations | New Zod schemas in shared package |
+| [1B](./prd-1b-experience-create.md) | Experience Create Config | Add `create` to experience, publish validation |
+| [1C](./prd-1c-session-responses.md) | Session Responses | Unified responses, guest runtime writes |
+| [2](./prd-2-admin-create-ux.md) | Admin Create Tab UX | Create tab UI with prompt editor |
+| [3](./prd-3-job-cloud-functions.md) | Job + Cloud Functions | Job snapshot, dispatcher, image outcome |
+| [4](./prd-4-cleanup.md) | Cleanup & Guardrails | Remove dead code, safety checks |
 
 ---
 
-## 1.3 Session: replace `answers[]` + `capturedMedia[]` with `responses[]`
+## Dependency Graph
 
-Unified array of response objects. Includes `stepName` for direct prompt mention resolution.
-
-### Response schema
-
-**File**: `packages/shared/src/schemas/session/session.schema.ts`
-
-```ts
-import { mediaReferenceSchema } from '../media/media-reference.schema'
-
-/**
- * Session Response Schema
- *
- * Unified shape for both input answers and capture media.
- * Uses stepType from experienceStepTypeSchema directly - no separate kind enum.
- */
-export const sessionResponseSchema = z.object({
-  /** Step that produced this response */
-  stepId: z.string(),
-
-  /** Step name for direct @{step:stepName} prompt resolution */
-  stepName: z.string(),
-
-  /** Step type (e.g., 'input.scale', 'capture.photo') - determines response structure */
-  stepType: z.string(),
-
-  /**
-   * Analytics-friendly primitive value:
-   * - string: text inputs, yes/no ("yes"/"no"), scale ("1"-"5")
-   * - string[]: multi-select inputs
-   * - null: capture steps (value is in media field)
-   */
-  value: z
-    .union([z.string(), z.array(z.string())])
-    .nullable()
-    .default(null),
-
-  /**
-   * Optional structured context for AI prompt fragments, option objects, etc.
-   * - Multi-select: MultiSelectOption[] (full option objects with promptFragment/promptMedia)
-   * - Other steps: any step-specific structured data
-   */
-  context: z.unknown().nullable().default(null),
-
-  /**
-   * Media reference for capture steps.
-   * Uses full MediaReference shape (includes filePath for CF processing).
-   */
-  media: mediaReferenceSchema.nullable().default(null),
-
-  /** Response creation timestamp (Unix ms) */
-  createdAt: z.number(),
-
-  /** Last update timestamp (Unix ms) */
-  updatedAt: z.number(),
-})
-
-export type SessionResponse = z.infer<typeof sessionResponseSchema>
+```
+┌─────────────────┐
+│   PRD 1A        │
+│   Schemas       │
+└────────┬────────┘
+         │
+    ┌────┴────┐
+    │         │
+    ▼         ▼
+┌───────┐ ┌───────┐
+│ PRD   │ │ PRD   │  ◄── Can be developed in PARALLEL
+│ 1B    │ │ 1C    │
+│ Exp.  │ │ Sess. │
+└───┬───┘ └───┬───┘
+    │         │
+    ▼         │
+┌───────┐     │
+│ PRD 2 │     │
+│ Admin │     │
+│ UX    │     │
+└───┬───┘     │
+    │         │
+    └────┬────┘
+         │
+         ▼
+┌─────────────────┐
+│   PRD 3         │
+│   Job + CF      │  ◄── Integration point
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│   PRD 4         │
+│   Cleanup       │
+└─────────────────┘
 ```
 
-Then in session schema:
+### Parallelization Summary
+
+| After completing | You can start in parallel |
+|------------------|---------------------------|
+| PRD 1A (Schemas) | PRD 1B + PRD 1C |
+| PRD 1B (Experience) | PRD 2 (Admin UX) |
+| PRD 1B + 1C | PRD 3 (Job + CF) |
+| PRD 3 | PRD 4 (Cleanup) |
+
+---
+
+## Create Outcome Schema
+
+### Final Structure
 
 ```ts
-export const sessionSchema = z.looseObject({
-  // ... existing fields ...
+create: {
+  // Outcome type
+  type: 'image' | 'gif' | 'video' | null,
 
-  /**
-   * ACCUMULATED DATA
-   */
+  // Shared (top-level)
+  sourceStepId: string | null,      // Capture step for source media
+  aiEnabled: boolean,               // Global toggle for AI generation
 
-  /** @deprecated Use responses instead */
-  answers: z.array(answerSchema).default([]),
-
-  /** @deprecated Use responses instead */
-  capturedMedia: z.array(capturedMediaSchema).default([]),
-
-  /** Unified responses from all steps (input + capture) */
-  responses: z.array(sessionResponseSchema).default([]),
-
-  // ... rest of schema ...
-})
-```
-
-### Guest runtime changes
-
-When saving a response:
-
-```ts
-// Input step response
-const response = {
-  stepId: step.id,
-  stepName: step.name,  // From step definition
-  stepType: step.type,
-  value: userInput,
-  context: stepContext,  // Optional structured data
-  media: null,
-  createdAt: Date.now(),
-  updatedAt: Date.now(),
-}
-
-// Capture step response
-const response = {
-  stepId: step.id,
-  stepName: step.name,  // From step definition
-  stepType: step.type,
-  value: null,
-  context: null,
-  media: {
-    mediaAssetId: asset.id,
-    url: asset.url,
-    filePath: asset.filePath,  // Full storage path for CF
-    displayName: step.name,    // Or custom display name
+  // Image generation config (preserved when switching outcomes)
+  imageGeneration: {
+    prompt: string,
+    refMedia: MediaReference[],
+    model: AIImageModel,
+    aspectRatio: AIImageAspectRatio,
   },
-  createdAt: Date.now(),
-  updatedAt: Date.now(),
+
+  // Type-specific options (discriminated union)
+  options: ImageOptions | GifOptions | VideoOptions | null,
 }
 ```
 
-### Acceptance criteria
+### Field Placement Rationale
 
-- [ ] AC-1.3.1: Guest flow writes only `responses` (not `answers`/`capturedMedia`).
-- [ ] AC-1.3.2: Preview flow uses `responses` (same codepath as guest).
-- [ ] AC-1.3.3: Every response includes `stepName` for prompt resolution.
-- [ ] AC-1.3.4: Capture responses include full `MediaReference` with `filePath`.
+| Field | Location | Rationale |
+|-------|----------|-----------|
+| `sourceStepId` | Top level | Same source media regardless of output format |
+| `aiEnabled` | Top level | Global toggle for all AI stages (future: text, video) |
+| `imageGeneration` | Named block | Preserved when switching outcomes; clear naming for future stages |
+| `options` | Discriminated union | Type-specific settings; can reset on switch without losing shared config |
+
+### Passthrough Mode
+
+| `aiEnabled` | `sourceStepId` | Behavior |
+|-------------|----------------|----------|
+| `true` | `null` | Prompt-only generation |
+| `true` | set | Image-to-image transformation |
+| `false` | set | Passthrough (apply overlay only) |
+| `false` | `null` | **Invalid** - validation error |
+
+### Switching Outcomes
+
+When user switches between image/gif/video:
+- `imageGeneration` block **preserved** (prompt, refMedia, model, aspectRatio)
+- `options` block **reset to defaults** for new outcome type
 
 ---
 
-## 1.4 Job snapshot: snapshot create outcome + responses (not transformNodes)
+## Schema Changes Summary
 
-### Replace snapshot parts
+| Schema | PRD | Change |
+|--------|-----|--------|
+| `mediaDisplayNameSchema` | 1A | NEW - validation for mention-safe names |
+| `createOutcomeSchema` | 1A | NEW - outcome config with imageGeneration |
+| `sessionResponseSchema` | 1A | NEW - unified response with `stepName` |
+| `experienceConfigSchema` | 1B | Add `create` field |
+| `sessionSchema` | 1C | Add `responses[]`, deprecate `answers[]` + `capturedMedia[]` |
+| `jobSnapshotSchema` | 3 | Add `createOutcome`, update `sessionInputs` |
 
-- `sessionInputs: { answers, capturedMedia }` → `sessionInputs: { responses }`
-- `transformNodes` → keep but always set to `[]`
-- Add `createOutcome` snapshot (copied from experience published)
+---
 
-**File**: `packages/shared/src/schemas/job/job.schema.ts`
+## Session Response Schema
 
 ```ts
-import { sessionResponseSchema } from '../session/session.schema'
-import { createOutcomeTypeSchema, createImageOutcomeParamsSchema } from '../experience/create-outcome.schema'
-
-/**
- * Snapshot of session inputs at job creation
- */
-export const sessionInputsSnapshotSchema = z.looseObject({
-  responses: z.array(sessionResponseSchema),
-})
-
-/**
- * Snapshot of create outcome at job creation
- */
-export const createOutcomeSnapshotSchema = z.looseObject({
-  type: createOutcomeTypeSchema,
-  image: createImageOutcomeParamsSchema.nullable().default(null),
-})
-
-/**
- * Complete job execution snapshot
- */
-export const jobSnapshotSchema = z.looseObject({
-  sessionInputs: sessionInputsSnapshotSchema,
-
-  // deprecated: kept for schema compatibility, always []
-  transformNodes: z.array(transformNodeSchema).default([]),
-
-  projectContext: projectContextSnapshotSchema,
-  experienceVersion: z.number().int().positive(),
-
-  // NEW: outcome configuration for execution
-  createOutcome: createOutcomeSnapshotSchema,
-})
-```
-
-### Acceptance criteria
-
-- [ ] AC-1.4.1: Every new job contains `snapshot.createOutcome`.
-- [ ] AC-1.4.2: Every new job contains `snapshot.sessionInputs.responses`.
-- [ ] AC-1.4.3: CF can execute a job without reading experience doc again.
-
----
-
-# PRD Phase 2 — Admin UX: Collect + Create (no nodes)
-
-## Create tab UX rules (MVP)
-
-1. Admin picks outcome: `Image` (GIF/Video can be disabled visually until implemented)
-
-2. Form fields for `Image`:
-   - **Prompt** (required) - Lexical editor with @{step:...} and @{ref:...} mention support
-   - **Reference images** (0..N) - Media picker, saved as `MediaReference[]`
-   - **Model** (required) - Dropdown from `aiImageModelSchema` values
-   - **Aspect ratio** (required) - Dropdown from `aiImageAspectRatioSchema` values
-   - **Source image step** (optional):
-     - Dropdown of capture steps from Collect tab
-     - Helper text: "Optional. If not set, image is generated from prompt only."
-
-3. Publish button validates:
-   - prompt non-empty
-   - if sourceStepId selected, ensure it points to an existing capture step id
-
-### Acceptance criteria
-
-- [ ] AC-2.1: Admin cannot see/edit transformNodes anywhere.
-- [ ] AC-2.2: Publishing always produces `published.create` and `published.transformNodes: []`.
-- [ ] AC-2.3: Prompt editor supports @{step:stepName} mentions for input/capture steps.
-- [ ] AC-2.4: Prompt editor supports @{ref:displayName} mentions for reference media.
-
----
-
-# PRD Phase 3 — Runtime: Dispatcher + local executors (image outcome only)
-
-## Dispatcher contract (Cloud Function)
-
-Input: Job doc
-Exec: `runOutcome(job.snapshot.createOutcome.type, ctx)`
-
-### Prompt resolution
-
-Before calling AI, resolve all mentions in the prompt:
-
-```ts
-function resolvePromptMentions(
-  prompt: string,
-  responses: SessionResponse[],
-  refMedia: MediaReference[]
-): string {
-  // Step mentions: @{step:stepName}
-  let resolved = prompt.replace(
-    /@\{step:([^}]+)\}/g,
-    (match, stepName) => {
-      const response = responses.find(r => r.stepName === stepName)
-      if (!response) return match  // Keep original if not found
-
-      // Input step: return value
-      if (response.value !== null) {
-        return Array.isArray(response.value)
-          ? response.value.join(', ')
-          : response.value
-      }
-
-      // Capture step: return media placeholder
-      if (response.media) {
-        return `<media:${response.media.filePath}>`
-      }
-
-      return match
-    }
-  )
-
-  // Media mentions: @{ref:displayName}
-  resolved = resolved.replace(
-    /@\{ref:([^}]+)\}/g,
-    (match, displayName) => {
-      const media = refMedia.find(m => m.displayName === displayName)
-      if (media) {
-        return `<media:${media.filePath}>`
-      }
-      return match
-    }
-  )
-
-  return resolved
+sessionResponse: {
+  stepId: string,
+  stepName: string,           // For @{step:...} resolution
+  stepType: string,           // No separate kind enum
+  value: string | string[] | null,
+  context: unknown | null,
+  media: MediaReference | null,  // Full reference with filePath
+  createdAt: number,
+  updatedAt: number,
 }
 ```
 
-### `image` outcome execution (MVP)
+---
 
-1. **Resolve `sourceMedia`**:
-   - If `sourceStepId` is set:
-     - find response where `response.stepId === sourceStepId`
-     - require `response.media != null`
-   - Else: `sourceMedia = null` (prompt-only)
+## Key Decisions (Locked)
 
-2. **Resolve prompt mentions** using `stepName` and `displayName`
+### Schema Design
+1. **No `responseKindSchema`** - use `stepType` directly
+2. **`sourceStepId` at top level** - shared across all outcome types
+3. **`aiEnabled` at top level** - global toggle for all AI stages
+4. **`imageGeneration` not `ai`** - clear naming for future stages
+5. **`options` as discriminated union** - type-specific, can reset on switch
 
-3. **Build AI generation request**:
-   - resolved prompt
-   - model
-   - aspectRatio
-   - refMedia[] (0..N) - using `filePath` not `url`
-   - plus `sourceMedia` if present
+### Data Handling
+6. **MediaReference for capture media** - includes `filePath` for CF processing
+7. **`stepName` in responses** - for direct `@{step:...}` prompt resolution
+8. **Abandon old sessions** - no migration, no fallback logic
+9. **`transformNodes` always `[]`** - kept in schema but ignored
 
-4. **Call `ai.image.generate(...)`**
-
-5. **Apply overlay** from `projectContext.overlays[aspectRatio]` if exists
-   - No experience toggle
-   - If missing for aspect ratio, skip
-
-6. **Write**:
-   - `job.output` (format=image etc.)
-   - `session.resultMedia`
-
-### Acceptance criteria
-
-- [ ] AC-3.1: CF never reads transformNodes.
-- [ ] AC-3.2: Prompt-only generation works.
-- [ ] AC-3.3: Image-from-capture works.
-- [ ] AC-3.4: Overlay auto-applied when project has overlay for output aspect ratio.
-- [ ] AC-3.5: Pipeline succeeds when no overlay exists.
-- [ ] AC-3.6: @{step:stepName} mentions resolved correctly from responses.
-- [ ] AC-3.7: @{ref:displayName} mentions resolved correctly from refMedia.
-- [ ] AC-3.8: CF uses `filePath` (not `url`) for media processing.
+### Overlays
+10. **Per aspect ratio** - `projectContext.overlays[aspectRatio]`
+11. **No experience toggle** - project owns overlay config
 
 ---
 
-# PRD Phase 4 — Cleanup & guardrails
+## MVP Scope
 
-## Remove dead complexity from product surface
-
-- Hide Generate/nodes UI entirely
-- Remove any code paths that assume `answers`/`capturedMedia`
-
-## Safety checks
-
-- Job creation fails early if:
-  - experience.published is null (guest sessions must use published)
-  - create outcome missing / invalid
-
-- Outcome type not implemented → job fails with clear non-retryable error
-
-### Acceptance criteria
-
-- [ ] AC-4.1: No silent fallbacks to transformNodes.
-- [ ] AC-4.2: Clear, actionable errors for invalid configurations.
-- [ ] AC-4.3: Old sessions with `answers`/`capturedMedia` are abandoned (no migration).
+| Feature | Status |
+|---------|--------|
+| Image outcome | **Implemented** |
+| Passthrough mode (`aiEnabled: false`) | **Implemented** |
+| GIF outcome | Schema stub, "coming soon" in UI |
+| Video outcome | Schema stub, "coming soon" in UI |
+| Text generation stage | Future (see [future-patterns.md](./future-patterns.md)) |
 
 ---
 
-# Summary of schema changes
+## Success Criteria
 
-| Schema | Change |
-|--------|--------|
-| `mediaReferenceSchema` | Add `displayName` validation (safe for mention parsing) |
-| `experienceConfigSchema` | Add `create: createOutcomeSchema` |
-| `sessionSchema` | Add `responses[]`, deprecate `answers[]` + `capturedMedia[]` |
-| `sessionResponseSchema` | NEW - unified response with `stepName`, `media: MediaReference` |
-| `jobSnapshotSchema` | Add `createOutcome`, replace `sessionInputs` with responses |
-| `projectContextSnapshotSchema` | No change (overlays already per-aspect-ratio) |
-
----
-
-# What you changed compared to your old transformNodes world
-
-- **Execution definition moved from Experience.transformNodes → Job.snapshot.createOutcome**
-- **User-facing configuration moved from nodes → Create params**
-- **Runtime inputs moved from answers/capturedMedia → responses with stepName**
-- **Overlay ownership moved fully into Project (per aspect ratio)**
-- **Media references include filePath for CF processing**
-- **Prompt resolution uses stepName/displayName for direct lookup**
+- [ ] Admin can configure Create outcome (image) without seeing nodes
+- [ ] Admin can toggle AI on/off (passthrough mode)
+- [ ] Switching outcomes preserves imageGeneration config
+- [ ] Guest flow writes unified `responses[]` with `stepName`
+- [ ] Cloud Functions execute from `job.snapshot.createOutcome`
+- [ ] Prompt mentions (`@{step:...}`, `@{ref:...}`) resolve correctly
+- [ ] Old `transformNodes` code paths are removed
 
 ---
 
-# Appendix
+## Related Documents
 
-### Recommended Cloud Functions structure
-
-```bash
-services/transform/
-  engine/
-    runOutcome.ts
-  outcomes/
-    imageOutcome.ts
-    gifOutcome.ts
-    videoOutcome.ts
-  executors/
-    aiGenerateImage.ts
-    applyOverlay.ts
-  bindings/
-    resolvePromptMentions.ts
-    resolveSessionInputs.ts
-```
-
-### Prompt mention resolution flow
-
-```
-Prompt: "Create a @{step:Pet Choice} with the style of @{ref:style-image.jpg}"
-         ↓
-Session responses: [{ stepName: "Pet Choice", value: "cat" }]
-Reference media: [{ displayName: "style-image.jpg", filePath: "..." }]
-         ↓
-Resolved: "Create a cat with the style of <media:projects/.../style-image.jpg>"
-```
-
-### Related documents
-
-- [055-lexical-prompt-editor spec](../specs/055-lexical-prompt-editor/spec.md)
-- [Session schema](../packages/shared/src/schemas/session/session.schema.ts)
-- [Media reference schema](../packages/shared/src/schemas/media/media-reference.schema.ts)
+- [Future Patterns](./future-patterns.md) - Linear chain generation, text stage, video stage
+- [055-lexical-prompt-editor spec](../../specs/055-lexical-prompt-editor/spec.md) - Prompt editor implementation
+- [Session schema](../../packages/shared/src/schemas/session/session.schema.ts)
+- [Experience schema](../../packages/shared/src/schemas/experience/experience.schema.ts)
