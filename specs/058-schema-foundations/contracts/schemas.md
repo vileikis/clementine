@@ -66,8 +66,8 @@ type CreateOutcome = {
   imageGeneration: {
     prompt: string
     refMedia: MediaReference[]
-    model: CreateAiImageModel
-    aspectRatio: CreateAiImageAspectRatio
+    model: 'gemini-2.5-flash-image' | 'gemini-3-pro-image-preview'
+    aspectRatio: '1:1' | '3:2' | '2:3' | '9:16' | '16:9'
   }
   options: ImageOptions | GifOptions | VideoOptions | null
 }
@@ -170,18 +170,18 @@ type MediaReference = {
 }
 ```
 
-### CreateAiImageModel (Defined in create-outcome.schema.ts)
+### AIImageModel (Defined in create-outcome.schema.ts)
 
-> **Note**: Defined locally with 'create' prefix to avoid conflict with deprecated `nodes/ai-image-node.schema.ts`
+> **Note**: Defined locally, NOT imported from deprecated `nodes/ai-image-node.schema.ts`
 
 ```typescript
-type CreateAiImageModel = 'gemini-2.5-flash-image' | 'gemini-3-pro-image-preview'
+type AIImageModel = 'gemini-2.5-flash-image' | 'gemini-3-pro-image-preview'
 ```
 
-### CreateAiImageAspectRatio (Defined in create-outcome.schema.ts)
+### AIImageAspectRatio (Defined in create-outcome.schema.ts)
 
-> **Note**: Defined locally with 'create' prefix to avoid conflict with deprecated `nodes/ai-image-node.schema.ts`
+> **Note**: Defined locally, NOT imported from deprecated `nodes/ai-image-node.schema.ts`
 
 ```typescript
-type CreateAiImageAspectRatio = '1:1' | '3:2' | '2:3' | '9:16' | '16:9'
+type AIImageAspectRatio = '1:1' | '3:2' | '2:3' | '9:16' | '16:9'
 ```

@@ -61,15 +61,15 @@
 
 - [x] T004 [US1] Create `packages/shared/src/schemas/experience/create-outcome.schema.ts` with JSDoc header comment
 - [x] T005 [US1] Add `createOutcomeTypeSchema` enum: `'image' | 'gif' | 'video'` in create-outcome.schema.ts
-- [x] T006 [P] [US1] Add `createAiImageModelSchema` enum (defined locally, NOT imported from nodes/) in create-outcome.schema.ts
-- [x] T007 [P] [US1] Add `createAiImageAspectRatioSchema` enum (defined locally, NOT imported from nodes/) in create-outcome.schema.ts
+- [x] T006 [P] [US1] Add `aiImageModelSchema` enum (defined locally, NOT imported from nodes/) in create-outcome.schema.ts
+- [x] T007 [P] [US1] Add `aiImageAspectRatioSchema` enum (defined locally, NOT imported from nodes/) in create-outcome.schema.ts
 - [x] T008 [US1] Add `imageGenerationConfigSchema` with prompt, refMedia, model, aspectRatio defaults in create-outcome.schema.ts
 - [x] T009 [P] [US1] Add `imageOptionsSchema` with `kind: 'image'` literal in create-outcome.schema.ts
 - [x] T010 [P] [US1] Add `gifOptionsSchema` with `kind: 'gif'`, fps (1-60), duration (0.5-30) in create-outcome.schema.ts
 - [x] T011 [P] [US1] Add `videoOptionsSchema` with `kind: 'video'`, videoPrompt, duration (1-60) in create-outcome.schema.ts
 - [x] T012 [US1] Add `outcomeOptionsSchema` discriminated union by `kind` field in create-outcome.schema.ts
 - [x] T013 [US1] Add complete `createOutcomeSchema` with type, captureStepId, aiEnabled, imageGeneration, options in create-outcome.schema.ts
-- [x] T014 [US1] Export all types (CreateOutcomeType, CreateAiImageModel, CreateAiImageAspectRatio, ImageGenerationConfig, ImageOptions, GifOptions, VideoOptions, OutcomeOptions, CreateOutcome) from create-outcome.schema.ts
+- [x] T014 [US1] Export all types (CreateOutcomeType, AIImageModel, AIImageAspectRatio, ImageGenerationConfig, ImageOptions, GifOptions, VideoOptions, OutcomeOptions, CreateOutcome) from create-outcome.schema.ts
 - [x] T015 [US1] Add export for create-outcome.schema in `packages/shared/src/schemas/experience/index.ts`
 - [x] T016 [US1] Run tests and verify all pass: `pnpm --filter @clementine/shared test create-outcome`
 
@@ -237,6 +237,6 @@ With multiple developers:
 - [Story] label maps task to specific user story for traceability
 - Each user story is independently completable and testable
 - Tests are written first (TDD) per Success Criteria SC-006
-- Model/aspect ratio schemas renamed to `createAiImageModelSchema`/`createAiImageAspectRatioSchema` to avoid conflict with deprecated nodes/ exports
+- Model/aspect ratio schemas defined locally with same names; barrel exports updated to avoid conflict with deprecated nodes/
 - mediaDisplayNameSchema uses `.catch('Untitled')` for backward compatibility
 - Commit after each task or logical group
