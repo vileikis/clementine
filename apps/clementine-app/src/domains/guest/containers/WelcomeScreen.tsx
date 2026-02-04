@@ -27,7 +27,11 @@ import {
   DEFAULT_WELCOME,
   WelcomeRenderer,
 } from '@/domains/project-config/welcome'
-import { ThemeProvider, useBodyThemeSync } from '@/shared/theming'
+import {
+  ThemeProvider,
+  ThemedBackground,
+  useBodyThemeSync,
+} from '@/shared/theming'
 import { DEFAULT_THEME } from '@/domains/project-config/theme/constants'
 
 /**
@@ -109,8 +113,8 @@ export function WelcomeScreen() {
   }
 
   return (
-    <div className="h-screen">
-      <ThemeProvider theme={theme}>
+    <ThemeProvider theme={theme}>
+      <ThemedBackground className="h-dvh">
         <WelcomeRenderer
           welcome={welcome}
           mainExperiences={mainExperiences}
@@ -118,7 +122,7 @@ export function WelcomeScreen() {
           mode="run"
           onSelectExperience={handleSelectExperience}
         />
-      </ThemeProvider>
-    </div>
+      </ThemedBackground>
+    </ThemeProvider>
   )
 }

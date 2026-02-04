@@ -25,7 +25,11 @@ import {
 import { useMarkExperienceComplete } from '../hooks'
 import { useInitSession } from '@/domains/session/shared'
 import { ExperienceRuntime } from '@/domains/experience/runtime'
-import { ThemeProvider, ThemedBackground, useBodyThemeSync } from '@/shared/theming'
+import {
+  ThemeProvider,
+  ThemedBackground,
+  useBodyThemeSync,
+} from '@/shared/theming'
 import { DEFAULT_THEME } from '@/domains/project-config/theme/constants'
 
 export interface PresharePageProps {

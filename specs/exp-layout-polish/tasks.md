@@ -51,7 +51,7 @@ All paths relative to `apps/clementine-app/src/`:
 
 ### Implementation
 
-- [ ] T003 [PH2] Remove `overflow-auto`, `px-4 py-8`, `my-auto` from ThemedBackground inner wrapper in `shared/theming/components/ThemedBackground.tsx`
+- [X] T003 [PH2] Remove `overflow-auto`, `px-4 py-8`, `my-auto` from ThemedBackground inner wrapper in `shared/theming/components/ThemedBackground.tsx`
 - [ ] T004 [PH2] Add flex wrapper with `flex h-full flex-col` and scroll container with `flex-1 overflow-y-auto` around children in `domains/experience/runtime/containers/ExperienceRuntime.tsx`
 - [ ] T005 [PH2] Add `shrink-0` class to RuntimeTopBar root div in `domains/experience/runtime/components/RuntimeTopBar.tsx`
 
@@ -97,8 +97,8 @@ All paths relative to `apps/clementine-app/src/`:
 
 ### Implementation
 
-- [ ] T011 [P] [PH4] Remove ThemedBackground wrapper and add scroll wrapper with `h-full overflow-y-auto` in `domains/project-config/welcome/components/WelcomeRenderer.tsx`
-- [ ] T012 [P] [PH4] Add ThemedBackground wrapper around WelcomeRenderer in `domains/guest/containers/WelcomeScreen.tsx`
+- [X] T011 [P] [PH4] Remove ThemedBackground wrapper and add scroll wrapper with `h-full overflow-y-auto` in `domains/project-config/welcome/components/WelcomeRenderer.tsx`
+- [X] T012 [P] [PH4] Add ThemedBackground wrapper around WelcomeRenderer in `domains/guest/containers/WelcomeScreen.tsx`
 - [ ] T013 [P] [PH4] Remove `pt-20` from content div inside ExperienceRuntime in `domains/guest/containers/ExperiencePage.tsx`
 - [ ] T014 [P] [PH4] Remove `pt-20` from content div inside ExperienceRuntime in `domains/guest/containers/PregatePage.tsx`
 - [ ] T015 [P] [PH4] Remove `pt-20` from content div inside ExperienceRuntime in `domains/guest/containers/PresharePage.tsx`

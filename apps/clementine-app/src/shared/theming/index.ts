@@ -29,6 +29,7 @@ export { ThemeProvider } from './providers'
 // Components
 export {
   ThemedBackground,
+  ScrollableView,
   ThemedText,
   ThemedButton,
   ThemedIconButton,

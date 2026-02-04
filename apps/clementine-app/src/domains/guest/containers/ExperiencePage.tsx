@@ -35,7 +35,11 @@ import { useInitSession, useLinkSession } from '@/domains/session/shared'
 import { ExperienceRuntime } from '@/domains/experience/runtime'
 import { useStartTransformPipeline } from '@/domains/experience/transform'
 import { hasTransformConfig } from '@/domains/experience/shared/utils/hasTransformConfig'
-import { ThemeProvider, ThemedBackground, useBodyThemeSync } from '@/shared/theming'
+import {
+  ThemeProvider,
+  ThemedBackground,
+  useBodyThemeSync,
+} from '@/shared/theming'
 import { DEFAULT_THEME } from '@/domains/project-config/theme/constants'
 
 export interface ExperiencePageProps {

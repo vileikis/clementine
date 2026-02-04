@@ -17,7 +17,11 @@ import {
   ShareReadyRenderer,
 } from '@/domains/project-config/share/components'
 import { useSubscribeSession } from '@/domains/session/shared'
-import { ThemeProvider, ThemedBackground, useBodyThemeSync } from '@/shared/theming'
+import {
+  ThemeProvider,
+  ThemedBackground,
+  useBodyThemeSync,
+} from '@/shared/theming'
 import { DEFAULT_THEME } from '@/domains/project-config/theme/constants'
 import {
   DEFAULT_SHARE_LOADING,

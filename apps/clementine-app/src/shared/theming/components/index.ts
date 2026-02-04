@@ -1,5 +1,6 @@
 // Components barrel export
 export { ThemedBackground } from './ThemedBackground'
+export { ScrollableView } from './ScrollableView'
 
 // Primitives
 export * from './primitives'

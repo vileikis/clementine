@@ -92,12 +92,11 @@ export function ThemedBackground({
         />
       )}
 
-      {/* Position wrapper: centers content, handles overflow */}
-      <div className="relative z-10 flex flex-1 flex-col items-center overflow-auto px-4 py-8">
-        {/* Content container: max-width + contentClassName */}
-        <div className={cn('w-full max-w-3xl my-auto', contentClassName)}>
-          {children}
-        </div>
+      {/* Content wrapper: provides stacking context, fills space */}
+      <div
+        className={cn('relative z-10 flex flex-1 flex-col', contentClassName)}
+      >
+        {children}
       </div>
     </div>
   )
