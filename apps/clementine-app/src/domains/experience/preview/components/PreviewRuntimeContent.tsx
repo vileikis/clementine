@@ -30,19 +30,24 @@ export function PreviewRuntimeContent() {
     next,
     back,
     setAnswer,
+    setStepResponse,
     getAnswer,
     getAnswerContext,
     isComplete,
   } = runtime
 
-  // Handle answer change
+  // Handle answer change - writes to both legacy and unified responses
   const handleAnswer = useCallback(
     (value: AnswerValue, context?: unknown) => {
-      if (currentStep) {
-        setAnswer(currentStep.id, value, context)
-      }
+      if (!currentStep) return
+
+      // Update legacy answers for backward compatibility (deprecated)
+      setAnswer(currentStep.id, value, context)
+
+      // Write to unified responses array
+      setStepResponse(currentStep, value, context)
     },
-    [currentStep, setAnswer],
+    [currentStep, setAnswer, setStepResponse],
   )
 
   // Show completion message
