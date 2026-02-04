@@ -17,14 +17,14 @@ Replace user-authored `transformNodes` with a **Create tab** where admins pick a
 
 ## PRD Overview
 
-| PRD | Name | Description |
-|-----|------|-------------|
-| [1A](./prd-1a-schemas.md) | Schema Foundations | New Zod schemas in shared package |
-| [1B](./prd-1b-experience-create.md) | Experience Create Config | Add `create` to experience, publish validation |
-| [1C](./prd-1c-session-responses.md) | Session Responses | Unified responses, guest runtime writes |
-| [2](./prd-2-admin-create-ux.md) | Admin Create Tab UX | Create tab UI with prompt editor |
-| [3](./prd-3-job-cloud-functions.md) | Job + Cloud Functions | Job snapshot, dispatcher, image outcome |
-| [4](./prd-4-cleanup.md) | Cleanup & Guardrails | Remove dead code, safety checks |
+| PRD | Name | Description | Status |
+|-----|------|-------------|--------|
+| [1A](./prd-1a-schemas.md) | Schema Foundations | New Zod schemas in shared package | ✅ Complete |
+| [1B](./prd-1b-experience-create.md) | Experience Create Config | Add `create` to experience, publish validation | |
+| [1C](./prd-1c-session-responses.md) | Session Responses | Unified responses, guest runtime writes | |
+| [2](./prd-2-admin-create-ux.md) | Admin Create Tab UX | Create tab UI with prompt editor | |
+| [3](./prd-3-job-cloud-functions.md) | Job + Cloud Functions | Job snapshot, dispatcher, image outcome | |
+| [4](./prd-4-cleanup.md) | Cleanup & Guardrails | Remove dead code, safety checks | |
 
 ---
 
