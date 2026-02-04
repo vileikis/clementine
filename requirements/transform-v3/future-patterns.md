@@ -74,7 +74,7 @@ All use cases follow a **fixed-order linear pipeline** (not arbitrary node graph
 ```ts
 create: {
   type: 'image' | 'gif' | 'video' | null,
-  sourceStepId: string | null,
+  captureStepId: string | null,
   aiEnabled: boolean,
 
   imageGeneration: {
@@ -93,7 +93,7 @@ create: {
 ```ts
 create: {
   type: 'image' | 'gif' | 'video' | null,
-  sourceStepId: string | null,
+  captureStepId: string | null,
   aiEnabled: boolean,  // Global kill switch for all AI
 
   // Stage 1: Text Generation (optional)
@@ -199,7 +199,7 @@ videoGeneration: {
 ```ts
 if (!aiEnabled) {
   // All generation stages disabled
-  if (!sourceStepId) {
+  if (!captureStepId) {
     throw Error('Passthrough requires source image')
   }
   // Only overlay application, no AI

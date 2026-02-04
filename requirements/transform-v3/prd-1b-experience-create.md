@@ -35,7 +35,7 @@ export const experienceConfigSchema = z.looseObject({
   /** Create outcome configuration (replaces transformNodes) */
   create: createOutcomeSchema.default({
     type: null,
-    sourceStepId: null,
+    captureStepId: null,
     aiEnabled: true,
     imageGeneration: {
       prompt: '',
@@ -85,14 +85,14 @@ function validateCreateOutcome(
     return { valid: false, errors }
   }
 
-  // Rule 2: Passthrough requires sourceStepId
-  if (!create.aiEnabled && !create.sourceStepId) {
+  // Rule 2: Passthrough requires captureStepId
+  if (!create.aiEnabled && !create.captureStepId) {
     errors.push('Passthrough mode requires a source image. Enable AI or select a source step.')
   }
 
-  // Rule 3: sourceStepId validation (if set)
-  if (create.sourceStepId) {
-    const sourceStep = steps.find(s => s.id === create.sourceStepId)
+  // Rule 3: captureStepId validation (if set)
+  if (create.captureStepId) {
+    const sourceStep = steps.find(s => s.id === create.captureStepId)
     if (!sourceStep) {
       errors.push('Selected source step no longer exists')
     } else if (!sourceStep.type.startsWith('capture.')) {
@@ -132,9 +132,9 @@ function validateCreateOutcome(
 ### Acceptance Criteria
 
 - [ ] AC-2.1: Publish fails if `create.type` is null
-- [ ] AC-2.2: Publish fails if passthrough mode without sourceStepId
-- [ ] AC-2.3: Publish fails if `sourceStepId` references non-existent step
-- [ ] AC-2.4: Publish fails if `sourceStepId` references non-capture step
+- [ ] AC-2.2: Publish fails if passthrough mode without captureStepId
+- [ ] AC-2.3: Publish fails if `captureStepId` references non-existent step
+- [ ] AC-2.4: Publish fails if `captureStepId` references non-capture step
 - [ ] AC-2.5: Publish fails if AI enabled with empty prompt
 - [ ] AC-2.6: Publish fails if refMedia has duplicate displayNames
 - [ ] AC-2.7: Publish fails with clear error for gif/video (coming soon)
@@ -180,7 +180,7 @@ When creating a new experience:
 ```ts
 const defaultCreate: CreateOutcome = {
   type: null,           // Must be configured before publish
-  sourceStepId: null,
+  captureStepId: null,
   aiEnabled: true,
   imageGeneration: {
     prompt: '',
@@ -233,7 +233,7 @@ function getDefaultOptionsForType(type: CreateOutcomeType): OutcomeOptions {
 
 - [ ] AC-5.1: Switching outcome type preserves `imageGeneration` block
 - [ ] AC-5.2: Switching outcome type resets `options` to defaults
-- [ ] AC-5.3: `sourceStepId` and `aiEnabled` preserved on switch
+- [ ] AC-5.3: `captureStepId` and `aiEnabled` preserved on switch
 
 ---
 

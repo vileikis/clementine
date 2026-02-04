@@ -43,7 +43,7 @@ export const createOutcomeSnapshotSchema = z.looseObject({
   type: createOutcomeTypeSchema,
 
   /** Source step ID (shared across outcomes) */
-  sourceStepId: z.string().nullable(),
+  captureStepId: z.string().nullable(),
 
   /** AI generation enabled */
   aiEnabled: z.boolean(),
@@ -79,7 +79,7 @@ export const jobSnapshotSchema = z.looseObject({
 ### Acceptance Criteria
 
 - [ ] AC-1.1: `jobSnapshotSchema` includes `createOutcome`
-- [ ] AC-1.2: `createOutcomeSnapshotSchema` includes `sourceStepId`, `aiEnabled`, `imageGeneration`, `options`
+- [ ] AC-1.2: `createOutcomeSnapshotSchema` includes `captureStepId`, `aiEnabled`, `imageGeneration`, `options`
 - [ ] AC-1.3: `sessionInputsSnapshotSchema` uses `responses` (not answers/capturedMedia)
 - [ ] AC-1.4: `transformNodes` always defaults to `[]`
 
@@ -102,7 +102,7 @@ async function createJob(params: CreateJobParams): Promise<Job> {
   }
 
   // Validate passthrough has source
-  if (!create.aiEnabled && !create.sourceStepId) {
+  if (!create.aiEnabled && !create.captureStepId) {
     throw new NonRetryableError('Passthrough mode requires source image')
   }
 
@@ -118,7 +118,7 @@ async function createJob(params: CreateJobParams): Promise<Job> {
     experienceVersion: experience.publishedVersion!,
     createOutcome: {
       type: create.type,
-      sourceStepId: create.sourceStepId,
+      captureStepId: create.captureStepId,
       aiEnabled: create.aiEnabled,
       imageGeneration: create.imageGeneration,
       options: create.options,
@@ -132,7 +132,7 @@ async function createJob(params: CreateJobParams): Promise<Job> {
 ### Acceptance Criteria
 
 - [ ] AC-2.1: Job creation fails if `create.type` is null
-- [ ] AC-2.2: Job creation fails if passthrough without sourceStepId
+- [ ] AC-2.2: Job creation fails if passthrough without captureStepId
 - [ ] AC-2.3: Job snapshot includes full `createOutcome` from published experience
 - [ ] AC-2.4: Job snapshot includes `responses` from session
 - [ ] AC-2.5: `transformNodes` is always `[]` in snapshot
@@ -224,10 +224,13 @@ export function resolvePromptMentions(
           : response.value
       }
 
-      // Capture step: add to media refs, return placeholder
-      if (response.media) {
-        mediaRefs.push(response.media)
-        return `[IMAGE: ${response.stepName}]`
+      // Capture step: media is in context as MediaReference[]
+      if (response.stepType.startsWith('capture.')) {
+        const captureMedia = response.context as MediaReference[] | null
+        if (captureMedia && captureMedia.length > 0) {
+          mediaRefs.push(...captureMedia)
+          return `[IMAGE: ${response.stepName}]`
+        }
       }
 
       return match
@@ -256,7 +259,7 @@ export function resolvePromptMentions(
 
 - [ ] AC-4.1: `@{step:stepName}` resolved from responses by stepName
 - [ ] AC-4.2: Input step values inserted as text
-- [ ] AC-4.3: Capture step media added to mediaRefs
+- [ ] AC-4.3: Capture step media extracted from `context` as `MediaReference[]` and added to mediaRefs
 - [ ] AC-4.4: `@{ref:displayName}` resolved from refMedia by displayName
 - [ ] AC-4.5: Unresolved mentions logged as warnings, kept in text
 
@@ -276,20 +279,24 @@ import { applyOverlay } from '../executors/applyOverlay'
 export async function imageOutcome(ctx: OutcomeContext): Promise<JobOutput> {
   const { snapshot, startTime } = ctx
   const { createOutcome, sessionInputs, projectContext } = snapshot
-  const { sourceStepId, aiEnabled, imageGeneration } = createOutcome
+  const { captureStepId, aiEnabled, imageGeneration } = createOutcome
 
   // 1. Resolve source media (if specified)
+  // Capture media is stored in context as MediaReference[]
   let sourceMedia: MediaReference | null = null
-  if (sourceStepId) {
-    const sourceResponse = sessionInputs.responses.find(
-      r => r.stepId === sourceStepId
+  if (captureStepId) {
+    const captureResponse = sessionInputs.responses.find(
+      r => r.stepId === captureStepId
     )
-    if (!sourceResponse?.media) {
+    const captureMedia = captureResponse?.context as MediaReference[] | null
+    if (!captureMedia || captureMedia.length === 0) {
       throw new NonRetryableError(
-        `Source step ${sourceStepId} has no media`
+        `Capture step ${captureStepId} has no media`
       )
     }
-    sourceMedia = sourceResponse.media
+    // For image outcome, use the first media reference
+    // (photo/video have 1 item, gif has 4 - image outcome uses first)
+    sourceMedia = captureMedia[0]
   }
 
   // 2. Passthrough mode (no AI)
@@ -356,12 +363,13 @@ export async function imageOutcome(ctx: OutcomeContext): Promise<JobOutput> {
 ### Acceptance Criteria
 
 - [ ] AC-5.1: Passthrough mode works (aiEnabled=false, just overlay)
-- [ ] AC-5.2: Prompt-only generation works (aiEnabled=true, sourceStepId=null)
-- [ ] AC-5.3: Image-to-image works (aiEnabled=true, sourceStepId set)
-- [ ] AC-5.4: Prompt mentions resolved before generation
-- [ ] AC-5.5: Reference media passed to AI generator
-- [ ] AC-5.6: Overlay applied when exists for aspect ratio
-- [ ] AC-5.7: Succeeds when no overlay exists
+- [ ] AC-5.2: Prompt-only generation works (aiEnabled=true, captureStepId=null)
+- [ ] AC-5.3: Image-to-image works (aiEnabled=true, captureStepId set)
+- [ ] AC-5.4: Capture media extracted from `response.context` as `MediaReference[]`
+- [ ] AC-5.5: Prompt mentions resolved before generation
+- [ ] AC-5.6: Reference media passed to AI generator
+- [ ] AC-5.7: Overlay applied when exists for aspect ratio
+- [ ] AC-5.8: Succeeds when no overlay exists
 
 ---
 

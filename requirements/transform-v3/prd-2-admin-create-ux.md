@@ -122,14 +122,14 @@ Replace existing tab structure:
 - Lists only capture steps (e.g., `capture.photo`)
 - Shows step name as option label
 - "None" means no source image (prompt-only or invalid for passthrough)
-- Saved to `create.sourceStepId`
+- Saved to `create.captureStepId`
 
 ### Acceptance Criteria
 
 - [ ] AC-3.1: Dropdown shows "None" + capture steps
 - [ ] AC-3.2: Only capture steps listed (not input steps)
-- [ ] AC-3.3: "None" sets `sourceStepId: null`
-- [ ] AC-3.4: Selection saved to `create.sourceStepId`
+- [ ] AC-3.3: "None" sets `captureStepId: null`
+- [ ] AC-3.4: Selection saved to `create.captureStepId`
 - [ ] AC-3.5: Helper text explains optional behavior
 
 ---
@@ -152,7 +152,7 @@ Replace existing tab structure:
 ### Passthrough Validation
 
 When `aiEnabled: false`:
-- Must have `sourceStepId` set (validation in PRD 1B)
+- Must have `captureStepId` set (validation in PRD 1B)
 - Result is: source image → apply overlay → output
 
 ### Acceptance Criteria
@@ -286,7 +286,7 @@ Show validation errors when publish fails.
 | No outcome type | "Select an outcome type" |
 | Passthrough without source | "Passthrough mode requires a source image" |
 | AI enabled, empty prompt | "Prompt is required" |
-| Invalid sourceStepId | "Selected source step no longer exists" |
+| Invalid captureStepId | "Selected source step no longer exists" |
 | Duplicate displayName | "Reference images must have unique names" |
 | GIF/Video selected | "GIF/Video coming soon" |
 

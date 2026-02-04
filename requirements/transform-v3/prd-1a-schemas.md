@@ -135,8 +135,8 @@ export const createOutcomeSchema = z.object({
   /** Outcome type. Null = not configured */
   type: createOutcomeTypeSchema.nullable().default(null),
 
-  /** Source capture step ID. Null = prompt-only or invalid for passthrough */
-  sourceStepId: z.string().nullable().default(null),
+  /** Capture step ID for source media. Null = prompt-only or invalid for passthrough */
+  captureStepId: z.string().nullable().default(null),
 
   /** Global toggle for AI generation. False = passthrough mode */
   aiEnabled: z.boolean().default(true),
@@ -166,7 +166,7 @@ export type CreateOutcome = z.infer<typeof createOutcomeSchema>
 ### Acceptance Criteria
 
 - [ ] AC-2.1: `createOutcomeSchema` exported from shared package
-- [ ] AC-2.2: `sourceStepId` at top level (shared across outcomes)
+- [ ] AC-2.2: `captureStepId` at top level (shared across outcomes)
 - [ ] AC-2.3: `aiEnabled` at top level (global toggle)
 - [ ] AC-2.4: `imageGeneration` as named block (not `ai`)
 - [ ] AC-2.5: `options` as discriminated union by `kind`
@@ -183,19 +183,24 @@ Unified response schema that replaces separate `answers[]` and `capturedMedia[]`
 
 ```ts
 import { z } from 'zod'
-import { mediaReferenceSchema } from '../media/media-reference.schema'
 
 /**
  * Session Response Schema
  *
  * Unified shape for both input answers and capture media.
  * Uses stepType directly - no separate kind enum needed.
+ *
+ * Key design decisions:
+ * - No separate `media` field - capture media stored in `context` as MediaReference[]
+ * - `value` is null for captures - no analytical use case for asset IDs
+ * - Captures always use MediaReference[] - even single photo/video uses array for consistency
+ * - @{step:...} works for all steps - inputs and captures both referenceable in prompts
  */
 export const sessionResponseSchema = z.object({
   /** Step that produced this response */
   stepId: z.string(),
 
-  /** Step name for direct @{step:stepName} prompt resolution */
+  /** Step name for direct @{step:stepName} prompt resolution (input AND capture) */
   stepName: z.string(),
 
   /** Step type (e.g., 'input.scale', 'capture.photo') */
@@ -205,7 +210,7 @@ export const sessionResponseSchema = z.object({
    * Analytics-friendly primitive value:
    * - string: text inputs, yes/no ("yes"/"no"), scale ("1"-"5")
    * - string[]: multi-select inputs
-   * - null: capture steps (value is in media field)
+   * - null: capture steps (no analytical use case for asset IDs)
    */
   value: z
     .union([z.string(), z.array(z.string())])
@@ -213,17 +218,14 @@ export const sessionResponseSchema = z.object({
     .default(null),
 
   /**
-   * Optional structured context for AI prompt fragments, option objects, etc.
-   * - Multi-select: MultiSelectOption[] with promptFragment/promptMedia
-   * - Other steps: any step-specific structured data
+   * Rich structured data - interpretation depends on stepType:
+   * - input.multiSelect: MultiSelectOption[] with promptFragment/promptMedia
+   * - capture.photo: MediaReference[] (1 item)
+   * - capture.gif: MediaReference[] (4 items)
+   * - capture.video: MediaReference[] (1 item)
+   * - other inputs: null (value is sufficient)
    */
   context: z.unknown().nullable().default(null),
-
-  /**
-   * Media reference for capture steps.
-   * Uses full MediaReference shape (includes filePath for CF processing).
-   */
-  media: mediaReferenceSchema.nullable().default(null),
 
   /** Response creation timestamp (Unix ms) */
   createdAt: z.number(),
@@ -235,13 +237,27 @@ export const sessionResponseSchema = z.object({
 export type SessionResponse = z.infer<typeof sessionResponseSchema>
 ```
 
+### Context Shape by Step Type
+
+| Step Type | `value` | `context` |
+|-----------|---------|-----------|
+| `input.shortText` | `"user text"` | `null` |
+| `input.longText` | `"user text"` | `null` |
+| `input.scale` | `"1"` to `"5"` | `null` |
+| `input.yesNo` | `"yes"` or `"no"` | `null` |
+| `input.multiSelect` | `["opt1", "opt2"]` | `MultiSelectOption[]` |
+| `capture.photo` | `null` | `MediaReference[]` (1 item) |
+| `capture.gif` | `null` | `MediaReference[]` (4 items) |
+| `capture.video` | `null` | `MediaReference[]` (1 item) |
+
 ### Acceptance Criteria
 
 - [ ] AC-3.1: `sessionResponseSchema` exported from shared package
-- [ ] AC-3.2: Includes `stepName` field for prompt resolution
-- [ ] AC-3.3: Uses `mediaReferenceSchema` for media (includes `filePath`)
+- [ ] AC-3.2: Includes `stepName` field for prompt resolution (input AND capture steps)
+- [ ] AC-3.3: No separate `media` field - captures use `context` with `MediaReference[]`
 - [ ] AC-3.4: No separate `kind` enum - uses `stepType` directly
 - [ ] AC-3.5: Type exported: `SessionResponse`
+- [ ] AC-3.6: Capture responses always use `MediaReference[]` (array), even for single items
 
 ---
 

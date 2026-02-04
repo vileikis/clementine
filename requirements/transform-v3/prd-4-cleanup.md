@@ -62,13 +62,23 @@ Remove deprecated session data handling.
 
 - Remove code that reads `answers` and `capturedMedia` from session
 - Only read `responses` from job snapshot
+- Capture media is in `response.context` as `MediaReference[]`, not a separate `media` field
+
+### Schema Cleanup (after migration complete)
+
+When all runtime code uses `responses[]` and old sessions are abandoned:
+- Remove `answers` field from `sessionSchema`
+- Remove `capturedMedia` field from `sessionSchema`
+- Remove `answerSchema` and `capturedMediaSchema` if not used elsewhere
+- Update any analytics/reporting queries to use `responses[]`
 
 ### Acceptance Criteria
 
 - [ ] AC-2.1: No code writes to `session.answers`
 - [ ] AC-2.2: No code writes to `session.capturedMedia`
 - [ ] AC-2.3: CF only reads `snapshot.sessionInputs.responses`
-- [ ] AC-2.4: Old sessions with only answers/capturedMedia are not processed (expected: abandoned)
+- [ ] AC-2.4: CF extracts capture media from `response.context` (not a `media` field)
+- [ ] AC-2.5: Old sessions with only answers/capturedMedia are not processed (expected: abandoned)
 
 ---
 
@@ -168,18 +178,20 @@ if (!createOutcome.image.prompt.trim()) {
   )
 }
 
-if (createOutcome.image.sourceStepId) {
-  const sourceResponse = responses.find(
-    r => r.stepId === createOutcome.image!.sourceStepId
+if (createOutcome.image.captureStepId) {
+  const captureResponse = responses.find(
+    r => r.stepId === createOutcome.image!.captureStepId
   )
-  if (!sourceResponse) {
+  if (!captureResponse) {
     throw new NonRetryableError(
-      `Source step not found: ${createOutcome.image.sourceStepId}`
+      `Capture step not found: ${createOutcome.image.captureStepId}`
     )
   }
-  if (!sourceResponse.media) {
+  // Capture media is stored in context as MediaReference[]
+  const mediaRefs = captureResponse.context as MediaReference[] | null
+  if (!mediaRefs || mediaRefs.length === 0) {
     throw new NonRetryableError(
-      `Source step has no media: ${sourceResponse.stepName}`
+      `Capture step has no media: ${captureResponse.stepName}`
     )
   }
 }
@@ -189,8 +201,8 @@ if (createOutcome.image.sourceStepId) {
 
 - [ ] AC-5.1: Missing image config fails with clear error
 - [ ] AC-5.2: Empty prompt fails with clear error
-- [ ] AC-5.3: Invalid sourceStepId fails with clear error
-- [ ] AC-5.4: Missing source media fails with clear error
+- [ ] AC-5.3: Invalid captureStepId fails with clear error
+- [ ] AC-5.4: Missing capture media (empty context) fails with clear error
 
 ---
 

@@ -88,7 +88,7 @@ create: {
   type: 'image' | 'gif' | 'video' | null,
 
   // Shared (top-level)
-  sourceStepId: string | null,      // Capture step for source media
+  captureStepId: string | null,     // Capture step for source media
   aiEnabled: boolean,               // Global toggle for AI generation
 
   // Image generation config (preserved when switching outcomes)
@@ -108,19 +108,26 @@ create: {
 
 | Field | Location | Rationale |
 |-------|----------|-----------|
-| `sourceStepId` | Top level | Same source media regardless of output format |
+| `captureStepId` | Top level | Same source media regardless of output format |
 | `aiEnabled` | Top level | Global toggle for all AI stages (future: text, video) |
 | `imageGeneration` | Named block | Preserved when switching outcomes; clear naming for future stages |
 | `options` | Discriminated union | Type-specific settings; can reset on switch without losing shared config |
 
 ### Passthrough Mode
 
-| `aiEnabled` | `sourceStepId` | Behavior |
-|-------------|----------------|----------|
+| `aiEnabled` | `captureStepId` | Behavior |
+|-------------|-----------------|----------|
 | `true` | `null` | Prompt-only generation |
 | `true` | set | Image-to-image transformation |
 | `false` | set | Passthrough (apply overlay only) |
 | `false` | `null` | **Invalid** - validation error |
+
+### Multiple Capture Steps
+
+For experiences with multiple capture steps (e.g., "user photo" + "friend photo"):
+- `captureStepId` specifies the **primary** source for image-to-image transformation
+- Additional captures can be referenced via `@{step:capture_name}` in the prompt
+- This provides flexibility without complicating the schema
 
 ### Switching Outcomes
 
@@ -135,8 +142,8 @@ When user switches between image/gif/video:
 | Schema | PRD | Change |
 |--------|-----|--------|
 | `mediaDisplayNameSchema` | 1A | NEW - validation for mention-safe names |
-| `createOutcomeSchema` | 1A | NEW - outcome config with imageGeneration |
-| `sessionResponseSchema` | 1A | NEW - unified response with `stepName` |
+| `createOutcomeSchema` | 1A | NEW - outcome config with `captureStepId` and imageGeneration |
+| `sessionResponseSchema` | 1A | NEW - unified response with `stepName`, `context` for all rich data |
 | `experienceConfigSchema` | 1B | Add `create` field |
 | `sessionSchema` | 1C | Add `responses[]`, deprecate `answers[]` + `capturedMedia[]` |
 | `jobSnapshotSchema` | 3 | Add `createOutcome`, update `sessionInputs` |
@@ -148,15 +155,35 @@ When user switches between image/gif/video:
 ```ts
 sessionResponse: {
   stepId: string,
-  stepName: string,           // For @{step:...} resolution
+  stepName: string,           // For @{step:...} resolution (input AND capture)
   stepType: string,           // No separate kind enum
   value: string | string[] | null,
-  context: unknown | null,
-  media: MediaReference | null,  // Full reference with filePath
+  context: unknown | null,    // Rich structured data (see table below)
   createdAt: number,
   updatedAt: number,
 }
 ```
+
+### Context Shape by Step Type
+
+The `context` field holds rich structured data, with interpretation based on `stepType`:
+
+| Step Type | `value` | `context` |
+|-----------|---------|-----------|
+| `input.shortText` | `"user text"` | `null` |
+| `input.longText` | `"user text"` | `null` |
+| `input.scale` | `"1"` to `"5"` | `null` |
+| `input.yesNo` | `"yes"` or `"no"` | `null` |
+| `input.multiSelect` | `["opt1", "opt2"]` | `MultiSelectOption[]` |
+| `capture.photo` | `null` | `MediaReference[]` (1 item) |
+| `capture.gif` | `null` | `MediaReference[]` (4 items) |
+| `capture.video` | `null` | `MediaReference[]` (1 item) |
+
+**Key design decisions:**
+- **No separate `media` field** - capture media stored in `context` as `MediaReference[]`
+- **Captures always use array** - even single photo/video uses `[MediaReference]` for consistency
+- **`value` is null for captures** - no analytical use case for asset IDs
+- **`@{step:...}` works for all steps** - inputs resolve to value/context, captures resolve to media in context
 
 ---
 
@@ -164,20 +191,23 @@ sessionResponse: {
 
 ### Schema Design
 1. **No `responseKindSchema`** - use `stepType` directly
-2. **`sourceStepId` at top level** - shared across all outcome types
+2. **`captureStepId` at top level** - shared across all outcome types (renamed from `sourceStepId`)
 3. **`aiEnabled` at top level** - global toggle for all AI stages
 4. **`imageGeneration` not `ai`** - clear naming for future stages
 5. **`options` as discriminated union** - type-specific, can reset on switch
 
 ### Data Handling
-6. **MediaReference for capture media** - includes `filePath` for CF processing
-7. **`stepName` in responses** - for direct `@{step:...}` prompt resolution
-8. **Abandon old sessions** - no migration, no fallback logic
-9. **`transformNodes` always `[]`** - kept in schema but ignored
+6. **No separate `media` field in responses** - capture media stored in `context` as `MediaReference[]`
+7. **`stepName` in responses** - for direct `@{step:...}` prompt resolution (both input AND capture steps)
+8. **Captures always use `MediaReference[]`** - even single photo/video uses array for consistency
+9. **`value` is null for captures** - no analytical use case for asset IDs as primitive values
+10. **Abandon old sessions** - no migration, no fallback logic
+11. **`transformNodes` always `[]`** - kept in schema but ignored
+12. **Deprecate `answers[]` and `capturedMedia[]`** - keep for backward compatibility, cleanup in PRD 4
 
 ### Overlays
-10. **Per aspect ratio** - `projectContext.overlays[aspectRatio]`
-11. **No experience toggle** - project owns overlay config
+13. **Per aspect ratio** - `projectContext.overlays[aspectRatio]`
+14. **No experience toggle** - project owns overlay config
 
 ---
 
