@@ -13,18 +13,44 @@
 import { useCallback } from 'react'
 
 import { useExperienceRuntimeStore } from '../stores/experienceRuntimeStore'
-import type { MediaReference } from '@clementine/shared'
+import type { MediaReference, SessionResponse } from '@clementine/shared'
 import type { Answer } from '@/domains/session'
 import type {
   CapturedMediaRef,
   RuntimeState,
 } from '../../shared/types/runtime.types'
 import type { ExperienceStep } from '../../shared/schemas'
+import type { AnswerValue } from '../../steps/registry/step-registry'
+
+/**
+ * Build a SessionResponse from step and value/context.
+ * Internal helper - not exported.
+ */
+function buildSessionResponse(
+  step: ExperienceStep,
+  value: AnswerValue | null,
+  context: unknown,
+): SessionResponse {
+  const now = Date.now()
+  return {
+    stepId: step.id,
+    stepName: step.name,
+    stepType: step.type,
+    value,
+    context,
+    createdAt: now,
+    updatedAt: now,
+  }
+}
 
 /**
  * Return type for useRuntime hook
  */
 export interface RuntimeAPI {
+  // Identity
+  sessionId: string
+  projectId: string
+
   // Read-only state
   currentStep: ExperienceStep | null
   currentStepIndex: number
@@ -42,11 +68,18 @@ export interface RuntimeAPI {
   // Data mutation
   setAnswer: (stepId: string, value: Answer['value'], context?: unknown) => void
   setMedia: (stepId: string, mediaRef: MediaReference) => void
+  /**
+   * Record a response for a step (unified format).
+   * Builds the SessionResponse internally from step metadata.
+   */
+  setStepResponse: (step: ExperienceStep, value: AnswerValue | null, context?: unknown) => void
 
   // State access
   getAnswer: (stepId: string) => Answer['value'] | undefined
   getAnswerContext: (stepId: string) => unknown | undefined
   getMedia: (stepId: string) => CapturedMediaRef | undefined
+  getResponse: (stepId: string) => SessionResponse | undefined
+  getResponses: () => SessionResponse[]
   getState: () => RuntimeState
 }
 
@@ -94,12 +127,16 @@ export function useRuntime(): RuntimeAPI {
   const store = useExperienceRuntimeStore()
 
   // Throw if not initialized (used outside ExperienceRuntime container)
-  if (!store.sessionId) {
+  if (!store.sessionId || !store.projectId) {
     throw new Error(
       'useRuntime must be used within an ExperienceRuntime container. ' +
         'Make sure you have wrapped your component with <ExperienceRuntime>.',
     )
   }
+
+  // These are guaranteed to be non-null after the check above
+  const sessionId = store.sessionId
+  const projectId = store.projectId
 
   // Navigation: next
   // Just updates store state - container handles Firestore sync reactively
@@ -168,6 +205,16 @@ export function useRuntime(): RuntimeAPI {
     [store],
   )
 
+  // Data mutation: setStepResponse (unified format)
+  // Builds SessionResponse from step metadata, then updates store
+  const setStepResponse = useCallback(
+    (step: ExperienceStep, value: AnswerValue | null, context?: unknown) => {
+      const response = buildSessionResponse(step, value, context ?? null)
+      store.setResponse(response)
+    },
+    [store],
+  )
+
   // State access: getAnswer
   const getAnswer = useCallback(
     (stepId: string): Answer['value'] | undefined => {
@@ -195,6 +242,19 @@ export function useRuntime(): RuntimeAPI {
     [store],
   )
 
+  // State access: getResponse (unified format)
+  const getResponse = useCallback(
+    (stepId: string): SessionResponse | undefined => {
+      return store.getResponse(stepId)
+    },
+    [store],
+  )
+
+  // State access: getResponses (unified format)
+  const getResponses = useCallback((): SessionResponse[] => {
+    return store.getResponses()
+  }, [store])
+
   // State access: getState
   const getState = useCallback((): RuntimeState => {
     // Convert answers array to Record
@@ -213,11 +273,16 @@ export function useRuntime(): RuntimeAPI {
       currentStepIndex: store.currentStepIndex,
       answers,
       capturedMedia,
+      responses: store.responses,
       resultMedia: store.resultMedia,
     }
   }, [store])
 
   return {
+    // Identity
+    sessionId,
+    projectId,
+
     // Read-only state
     currentStep: store.getCurrentStep(),
     currentStepIndex: store.currentStepIndex,
@@ -235,11 +300,14 @@ export function useRuntime(): RuntimeAPI {
     // Data mutation
     setAnswer,
     setMedia,
+    setStepResponse,
 
     // State access
     getAnswer,
     getAnswerContext,
     getMedia,
+    getResponse,
+    getResponses,
     getState,
   }
 }

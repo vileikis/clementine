@@ -11,6 +11,7 @@ import { doc, runTransaction, serverTimestamp } from 'firebase/firestore'
 import * as Sentry from '@sentry/tanstackstart-react'
 
 import type { UpdateData } from 'firebase/firestore'
+import type { SessionResponse } from '@clementine/shared'
 import type { Answer, CapturedMedia, Session } from '../schemas'
 
 import { firestore } from '@/integrations/firebase/client'
@@ -21,8 +22,12 @@ import { firestore } from '@/integrations/firebase/client'
 interface UpdateProgressInput {
   projectId: string
   sessionId: string
+  /** @deprecated Use responses instead */
   answers?: Answer[]
+  /** @deprecated Use responses instead */
   capturedMedia?: CapturedMedia[]
+  /** Unified responses array (replaces answers and capturedMedia) */
+  responses?: SessionResponse[]
 }
 
 /**
@@ -55,7 +60,13 @@ interface UpdateProgressInput {
  */
 export function useUpdateSessionProgress() {
   return useMutation<void, Error, UpdateProgressInput>({
-    mutationFn: async ({ projectId, sessionId, answers, capturedMedia }) => {
+    mutationFn: async ({
+      projectId,
+      sessionId,
+      answers,
+      capturedMedia,
+      responses,
+    }) => {
       const sessionRef = doc(
         firestore,
         `projects/${projectId}/sessions/${sessionId}`,
@@ -73,6 +84,10 @@ export function useUpdateSessionProgress() {
         }
         if (capturedMedia) {
           updates.capturedMedia = capturedMedia
+        }
+        if (responses) {
+          // Write unified responses array
+          updates.responses = responses as UpdateData<Session>['responses']
         }
 
         transaction.update(sessionRef, updates)

@@ -139,6 +139,7 @@ export function ExperienceRuntime({
     async (options: {
       answers?: typeof store.answers
       capturedMedia?: typeof store.capturedMedia
+      responses?: typeof store.responses
     }) => {
       try {
         store.setSyncing(true)
@@ -173,11 +174,12 @@ export function ExperienceRuntime({
     const current = store.currentStepIndex
     const prev = prevStepIndexRef.current
 
-    // Sync answers/media to Firestore on forward navigation
+    // Sync answers/media/responses to Firestore on forward navigation
     if (current > prev) {
       syncToFirestore({
         answers: store.answers,
         capturedMedia: store.capturedMedia,
+        responses: store.responses,
       })
     }
 
@@ -195,6 +197,7 @@ export function ExperienceRuntime({
     store.currentStepIndex,
     store.answers,
     store.capturedMedia,
+    store.responses,
     store.steps,
     syncToFirestore,
     onStepChange,
@@ -217,6 +220,7 @@ export function ExperienceRuntime({
         await syncToFirestore({
           answers: store.answers,
           capturedMedia: store.capturedMedia,
+          responses: store.responses,
         })
       } catch {
         // Error already reported by syncToFirestore via onError
@@ -244,6 +248,7 @@ export function ExperienceRuntime({
     store.isComplete,
     store.answers,
     store.capturedMedia,
+    store.responses,
     session.projectId,
     session.id,
     completeSession.mutateAsync,

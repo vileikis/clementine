@@ -12,6 +12,7 @@
  */
 import { z } from 'zod'
 import { jobStatusSchema } from '../job/job-status.schema'
+import { sessionResponseSchema } from './session-response.schema'
 
 /**
  * Session mode schema
@@ -163,11 +164,24 @@ export const sessionSchema = z.looseObject({
    * ACCUMULATED DATA
    */
 
-  /** Answers collected from input steps */
+  /**
+   * @deprecated Use `responses` instead. This field is kept for backward compatibility
+   * with existing sessions. New sessions should only write to `responses`.
+   */
   answers: z.array(answerSchema).default([]),
 
-  /** Media captured from capture steps */
+  /**
+   * @deprecated Use `responses` instead. This field is kept for backward compatibility
+   * with existing sessions. New sessions should only write to `responses`.
+   */
   capturedMedia: z.array(capturedMediaSchema).default([]),
+
+  /**
+   * Unified responses from all steps (input + capture).
+   * Replaces separate `answers` and `capturedMedia` arrays.
+   * Each response has value (for analytics) and context (for AI generation).
+   */
+  responses: z.array(sessionResponseSchema).default([]),
 
   /** Final result media from transform/capture */
   resultMedia: sessionResultMediaSchema.nullable().default(null),

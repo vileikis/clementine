@@ -20,6 +20,7 @@ import type {
   Session,
   SessionResultMedia,
 } from '@/domains/session'
+import type { SessionResponse } from '@clementine/shared'
 import type { ExperienceStep } from '../../shared/schemas'
 
 /**
@@ -41,6 +42,7 @@ export interface ExperienceRuntimeState {
   // Collected data
   answers: Answer[]
   capturedMedia: CapturedMedia[]
+  responses: SessionResponse[]
   resultMedia: SessionResultMedia | null
 
   // Lifecycle status
@@ -84,11 +86,28 @@ export interface ExperienceRuntimeActions {
   /**
    * Record captured media for a step
    * Replaces any existing media for the same stepId
+   * @deprecated Use setResponse instead for new code
    */
   setCapturedMedia: (
     stepId: string,
     media: Omit<CapturedMedia, 'stepId'>,
   ) => void
+
+  /**
+   * Record a response for a step (unified format)
+   * Replaces any existing response for the same stepId
+   */
+  setResponse: (response: SessionResponse) => void
+
+  /**
+   * Get response for a specific step
+   */
+  getResponse: (stepId: string) => SessionResponse | undefined
+
+  /**
+   * Get all responses
+   */
+  getResponses: () => SessionResponse[]
 
   /**
    * Set the final result media
@@ -175,6 +194,7 @@ const initialState: ExperienceRuntimeState = {
   isComplete: false,
   answers: [],
   capturedMedia: [],
+  responses: [],
   resultMedia: null,
   isReady: false,
   isSyncing: false,
@@ -213,10 +233,17 @@ export const useExperienceRuntimeStore = create<ExperienceRuntimeStore>(
     ...initialState,
 
     initFromSession: (session, steps, experienceId) => {
-      // Derive starting step from answers (find first unanswered step)
-      const answeredStepIds = new Set(
-        (session.answers ?? []).map((a) => a.stepId),
-      )
+      // Derive starting step from responses (preferred) or answers (legacy)
+      // First try unified responses, fall back to answers for backward compatibility
+      const existingResponses = session.responses ?? []
+      const respondedStepIds = new Set(existingResponses.map((r) => r.stepId))
+
+      // Fall back to answers if no responses exist (legacy sessions)
+      const answeredStepIds =
+        respondedStepIds.size > 0
+          ? respondedStepIds
+          : new Set((session.answers ?? []).map((a) => a.stepId))
+
       const firstUnansweredIndex = steps.findIndex(
         (step) => !answeredStepIds.has(step.id),
       )
@@ -232,6 +259,7 @@ export const useExperienceRuntimeStore = create<ExperienceRuntimeStore>(
         isComplete: session.status === 'completed',
         answers: session.answers ?? [],
         capturedMedia: session.capturedMedia ?? [],
+        responses: existingResponses,
         resultMedia: session.resultMedia ?? null,
         isReady: true,
         isSyncing: false,
@@ -292,6 +320,34 @@ export const useExperienceRuntimeStore = create<ExperienceRuntimeStore>(
 
     setResultMedia: (resultMedia) => {
       set({ resultMedia })
+    },
+
+    setResponse: (response) => {
+      set((state) => {
+        // Replace existing response for this step or add new
+        const existingIndex = state.responses.findIndex(
+          (r) => r.stepId === response.stepId,
+        )
+        const newResponses =
+          existingIndex >= 0
+            ? state.responses.map((r, i) =>
+                i === existingIndex
+                  ? { ...response, updatedAt: Date.now() }
+                  : r,
+              )
+            : [...state.responses, response]
+
+        return { responses: newResponses }
+      })
+    },
+
+    getResponse: (stepId) => {
+      const state = get()
+      return state.responses.find((r) => r.stepId === stepId)
+    },
+
+    getResponses: () => {
+      return get().responses
     },
 
     goToStep: (index) => {

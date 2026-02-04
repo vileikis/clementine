@@ -86,6 +86,7 @@ export function useCreateSession() {
           status: 'active',
           answers: [],
           capturedMedia: [],
+          responses: [],
           resultMedia: null,
           jobId: null,
           jobStatus: null,
