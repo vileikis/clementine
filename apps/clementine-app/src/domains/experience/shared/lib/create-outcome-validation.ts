@@ -117,7 +117,8 @@ export function validateCreateOutcome(
     if (!create.imageGeneration) {
       errors.push({
         field: 'create.imageGeneration',
-        message: 'AI configuration is missing. Please configure AI generation settings.',
+        message:
+          'AI configuration is missing. Please configure AI generation settings.',
       })
     } else if (!create.imageGeneration.prompt?.trim()) {
       errors.push({
