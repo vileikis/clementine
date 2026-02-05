@@ -86,10 +86,10 @@
 
 ### Implementation for User Story 3
 
-- [ ] T023 [US3] Create `apps/clementine-app/src/domains/experience/create/components/CreateTabForm/SourceImageSelector.tsx` with capture step dropdown
-- [ ] T024 [US3] Add step filtering logic to show only capture steps (type === 'capture.photo')
-- [ ] T025 [US3] Integrate SourceImageSelector into CreateTabForm.tsx
-- [ ] T026 [US3] Wire captureStepId changes to useUpdateOutcome mutation
+- [X] T023 [US3] Create `apps/clementine-app/src/domains/experience/create/components/CreateTabForm/SourceImageSelector.tsx` with capture step dropdown
+- [X] T024 [US3] Add step filtering logic to show only capture steps (type === 'capture.photo')
+- [X] T025 [US3] Integrate SourceImageSelector into CreateTabForm.tsx
+- [X] T026 [US3] Wire captureStepId changes to useUpdateOutcome mutation
 
 **Checkpoint**: US3 complete - Admin can select source image for transformation
 
@@ -103,10 +103,10 @@
 
 ### Implementation for User Story 4
 
-- [ ] T027 [US4] Verify refactored useRefMediaUpload works with outcome.imageGeneration.refMedia path
-- [ ] T028 [US4] Verify ReferenceMediaStrip displays uploaded images with editable display names
-- [ ] T029 [US4] Verify mention autocomplete shows reference images when typing @
-- [ ] T030 [US4] Add display name validation (reject `}`, `:`, `{` characters) in PromptComposer or CreateTabForm
+- [X] T027 [US4] Verify refactored useRefMediaUpload works with outcome.imageGeneration.refMedia path
+- [X] T028 [US4] Verify ReferenceMediaStrip displays uploaded images with editable display names
+- [X] T029 [US4] Verify mention autocomplete shows reference images when typing @
+- [X] T030 [US4] Add display name validation (reject `}`, `:`, `{` characters) in PromptComposer or CreateTabForm
 
 **Checkpoint**: US4 complete - Admin can upload and mention reference images
 
@@ -120,11 +120,11 @@
 
 ### Implementation for User Story 5
 
-- [ ] T031 [US5] Create `apps/clementine-app/src/domains/experience/create/components/CreateTabForm/AIGenerationToggle.tsx` checkbox component
-- [ ] T032 [US5] Integrate AIGenerationToggle into CreateTabForm.tsx
-- [ ] T033 [US5] Implement conditional rendering: hide PromptComposer when aiEnabled=false
-- [ ] T034 [US5] Ensure PromptComposer values are preserved when toggling (no reset on hide)
-- [ ] T035 [US5] Wire aiEnabled changes to useUpdateOutcome mutation
+- [X] T031 [US5] Create `apps/clementine-app/src/domains/experience/create/components/CreateTabForm/AIGenerationToggle.tsx` checkbox component
+- [X] T032 [US5] Integrate AIGenerationToggle into CreateTabForm.tsx
+- [X] T033 [US5] Implement conditional rendering: hide PromptComposer when aiEnabled=false
+- [X] T034 [US5] Ensure PromptComposer values are preserved when toggling (no reset on hide)
+- [X] T035 [US5] Wire aiEnabled changes to useUpdateOutcome mutation
 
 **Checkpoint**: US5 complete - Admin can toggle AI generation on/off
 

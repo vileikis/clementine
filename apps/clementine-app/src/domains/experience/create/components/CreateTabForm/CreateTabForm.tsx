@@ -19,12 +19,17 @@ import {
   addOutcomeRefMedia,
   createDefaultOutcome,
   removeOutcomeRefMedia,
+  sanitizeDisplayName,
+  updateOutcomeAiEnabled,
   updateOutcomeAspectRatio,
+  updateOutcomeCaptureStepId,
   updateOutcomeModel,
   updateOutcomePrompt,
   updateOutcomeType,
 } from '../../lib/outcome-operations'
+import { AIGenerationToggle } from './AIGenerationToggle'
 import { OutcomeTypeSelector } from './OutcomeTypeSelector'
+import { SourceImageSelector } from './SourceImageSelector'
 import type {
   AIImageAspectRatio,
   AIImageModel,
@@ -124,6 +129,27 @@ export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
     [currentOutcome, saveOutcome],
   )
 
+  // Handle capture step ID change - immediate save
+  const handleCaptureStepIdChange = useCallback(
+    (captureStepId: string | null) => {
+      const newOutcome = updateOutcomeCaptureStepId(
+        currentOutcome,
+        captureStepId,
+      )
+      saveOutcome(newOutcome)
+    },
+    [currentOutcome, saveOutcome],
+  )
+
+  // Handle AI enabled toggle change - immediate save
+  const handleAiEnabledChange = useCallback(
+    (aiEnabled: boolean) => {
+      const newOutcome = updateOutcomeAiEnabled(currentOutcome, aiEnabled)
+      saveOutcome(newOutcome)
+    },
+    [currentOutcome, saveOutcome],
+  )
+
   // Handle reference media removal - immediate save
   const handleRemoveRefMedia = useCallback(
     (mediaAssetId: string) => {
@@ -134,9 +160,14 @@ export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
   )
 
   // Handle media upload complete - immediate save
+  // Sanitize displayName to remove invalid characters (}, {, :)
   const handleMediaUploaded = useCallback(
     (mediaRef: MediaReference) => {
-      const newOutcome = addOutcomeRefMedia(currentOutcome, [mediaRef])
+      const sanitizedMediaRef = {
+        ...mediaRef,
+        displayName: sanitizeDisplayName(mediaRef.displayName),
+      }
+      const newOutcome = addOutcomeRefMedia(currentOutcome, [sanitizedMediaRef])
       saveOutcome(newOutcome)
     },
     [currentOutcome, saveOutcome],
@@ -164,8 +195,25 @@ export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
         onChange={handleOutcomeTypeChange}
       />
 
-      {/* AI Generation Configuration - only show when Image is selected */}
+      {/* Source Image Selection - only show when Image is selected */}
       {currentOutcome.type === 'image' && (
+        <SourceImageSelector
+          value={currentOutcome.captureStepId}
+          onChange={handleCaptureStepIdChange}
+          steps={steps}
+        />
+      )}
+
+      {/* AI Generation Toggle - only show when Image is selected */}
+      {currentOutcome.type === 'image' && (
+        <AIGenerationToggle
+          value={currentOutcome.aiEnabled}
+          onChange={handleAiEnabledChange}
+        />
+      )}
+
+      {/* AI Generation Configuration - only show when Image is selected AND AI is enabled */}
+      {currentOutcome.type === 'image' && currentOutcome.aiEnabled && (
         <PromptComposer
           prompt={localPrompt}
           onPromptChange={setLocalPrompt}

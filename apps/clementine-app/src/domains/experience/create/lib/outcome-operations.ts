@@ -188,3 +188,24 @@ export function getAvailableRefMediaSlots(outcome: Outcome): number {
 }
 
 // MAX_REF_MEDIA_COUNT is exported from model-options.ts
+
+/**
+ * Characters that are invalid in displayName because they conflict
+ * with the @{ref:displayName} mention serialization format.
+ */
+const INVALID_DISPLAY_NAME_CHARS = /[{}:]/g
+
+/**
+ * Sanitize a display name by removing invalid characters.
+ * Invalid characters are: }, {, : (which conflict with mention syntax)
+ */
+export function sanitizeDisplayName(displayName: string): string {
+  return displayName.replace(INVALID_DISPLAY_NAME_CHARS, '')
+}
+
+/**
+ * Check if a display name contains invalid characters.
+ */
+export function hasInvalidDisplayNameChars(displayName: string): boolean {
+  return INVALID_DISPLAY_NAME_CHARS.test(displayName)
+}
