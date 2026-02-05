@@ -19,10 +19,7 @@ import {
   useImperativeHandle,
   useRef,
 } from 'react'
-import {
-  captureFromVideo,
-  createCaptureFile,
-} from '../lib'
+import { captureFromVideo, createCaptureFile } from '../lib'
 import { useCameraStream } from '../hooks/useCameraStream'
 import type {
   AspectRatio,
@@ -105,17 +102,12 @@ export const CameraView = forwardRef<CameraViewRef, CameraViewProps>(
     const videoRef = useRef<HTMLVideoElement | null>(null)
 
     // Camera stream management
-    const {
-      stream,
-      facing,
-      hasMultipleCameras,
-      stop,
-      switchCamera,
-    } = useCameraStream({
-      initialFacing,
-      onReady,
-      onError,
-    })
+    const { stream, facing, hasMultipleCameras, stop, switchCamera } =
+      useCameraStream({
+        initialFacing,
+        onReady,
+        onError,
+      })
 
     // Attach stream to video element when it changes
     useEffect(() => {

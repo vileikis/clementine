@@ -85,6 +85,7 @@ export function useCameraStream(
   // Refs
   const streamRef = useRef<MediaStream | null>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
+  const desiredFacingRef = useRef<CameraFacing>(initialFacing)
 
   /**
    * Stop camera and release all resources
@@ -106,9 +107,13 @@ export function useCameraStream(
   /**
    * Switch to opposite camera (front <-> back)
    * Uses AbortController to handle race conditions
+   * Uses desiredFacingRef to handle rapid successive calls
    */
   const switchCamera = useCallback(async (): Promise<void> => {
-    const newFacing = facing === 'user' ? 'environment' : 'user'
+    // Use ref to get latest intended facing (handles rapid calls)
+    const newFacing =
+      desiredFacingRef.current === 'user' ? 'environment' : 'user'
+    desiredFacingRef.current = newFacing
 
     // Abort any previous ongoing operation
     abortControllerRef.current?.abort()
@@ -157,7 +162,7 @@ export function useCameraStream(
         onError?.(parseMediaError(err))
       }
     }
-  }, [facing, onReady, onError])
+  }, [onReady, onError])
 
   // Check for multiple cameras on mount
   useEffect(() => {
@@ -210,6 +215,7 @@ export function useCameraStream(
         streamRef.current = mediaStream
         setStream(mediaStream)
         setFacing(initialFacing)
+        desiredFacingRef.current = initialFacing
         setIsActive(true)
         onReady?.()
       } catch (err) {
@@ -222,8 +228,10 @@ export function useCameraStream(
     initCamera()
 
     return () => {
-      // Abort any ongoing operations
+      // Abort any ongoing operations from this effect
       controller.abort()
+      abortControllerRef.current?.abort()
+      abortControllerRef.current = null
 
       // Stop stream created by this effect
       if (localStream) {
