@@ -137,7 +137,7 @@ describe('resolvePromptMentions', () => {
   })
 
   describe('multi-select step resolution', () => {
-    it('resolves multi-select as comma-separated values', () => {
+    it('resolves multi-select as comma-separated values (no promptFragment/promptMedia)', () => {
       const responses: SessionResponse[] = [
         createResponse('step-1', 'colors', 'input.multiSelect', [
           { value: 'red', promptFragment: null, promptMedia: null },
@@ -184,6 +184,101 @@ describe('resolvePromptMentions', () => {
 
       expect(result.text).toBe('Selected: ')
     })
+
+    it('uses promptFragment when only promptFragment is present', () => {
+      const responses: SessionResponse[] = [
+        createResponse('step-1', 'style', 'input.multiSelect', [
+          { value: 'Vintage', promptFragment: 'classic retro aesthetic', promptMedia: null },
+        ]),
+      ]
+
+      const result = resolvePromptMentions(
+        'Style: @{step:style}',
+        responses,
+        [],
+      )
+
+      expect(result.text).toBe('Style: classic retro aesthetic')
+      expect(result.mediaRefs).toHaveLength(0)
+    })
+
+    it('uses promptMedia placeholder when only promptMedia is present', () => {
+      const styleRef = createMediaRef('retro-style', 'style-123')
+      const responses: SessionResponse[] = [
+        createResponse('step-1', 'style', 'input.multiSelect', [
+          { value: 'Style 1', promptFragment: null, promptMedia: styleRef },
+        ]),
+      ]
+
+      const result = resolvePromptMentions(
+        'Apply: @{step:style}',
+        responses,
+        [],
+      )
+
+      expect(result.text).toBe('Apply: (use <retro-style>)')
+      expect(result.mediaRefs).toHaveLength(1)
+      expect(result.mediaRefs[0]).toEqual(styleRef)
+    })
+
+    it('combines promptFragment and promptMedia when both present', () => {
+      const sunsetRef = createMediaRef('sunset-ref', 'sunset-123')
+      const responses: SessionResponse[] = [
+        createResponse('step-1', 'theme', 'input.multiSelect', [
+          { value: 'Sunset', promptFragment: 'warm golden hour lighting', promptMedia: sunsetRef },
+        ]),
+      ]
+
+      const result = resolvePromptMentions(
+        'Theme: @{step:theme}',
+        responses,
+        [],
+      )
+
+      expect(result.text).toBe('Theme: warm golden hour lighting (use <sunset-ref>)')
+      expect(result.mediaRefs).toHaveLength(1)
+      expect(result.mediaRefs[0]).toEqual(sunsetRef)
+    })
+
+    it('resolves mixed options with different configurations', () => {
+      const styleRef = createMediaRef('style-image', 'style-456')
+      const responses: SessionResponse[] = [
+        createResponse('step-1', 'options', 'input.multiSelect', [
+          { value: 'Option A', promptFragment: 'vibrant colors', promptMedia: null },
+          { value: 'Option B', promptFragment: null, promptMedia: styleRef },
+          { value: 'Option C', promptFragment: null, promptMedia: null },
+        ]),
+      ]
+
+      const result = resolvePromptMentions(
+        'Selected: @{step:options}',
+        responses,
+        [],
+      )
+
+      expect(result.text).toBe('Selected: vibrant colors, (use <style-image>), Option C')
+      expect(result.mediaRefs).toHaveLength(1)
+    })
+
+    it('collects multiple promptMedia from multi-select', () => {
+      const ref1 = createMediaRef('style1', 'ref-1')
+      const ref2 = createMediaRef('style2', 'ref-2')
+      const responses: SessionResponse[] = [
+        createResponse('step-1', 'styles', 'input.multiSelect', [
+          { value: 'Style 1', promptFragment: null, promptMedia: ref1 },
+          { value: 'Style 2', promptFragment: null, promptMedia: ref2 },
+        ]),
+      ]
+
+      const result = resolvePromptMentions(
+        'Styles: @{step:styles}',
+        responses,
+        [],
+      )
+
+      expect(result.text).toBe('Styles: (use <style1>), (use <style2>)')
+      expect(result.mediaRefs).toHaveLength(2)
+    })
   })
 
   describe('capture step resolution', () => {
@@ -199,7 +294,7 @@ describe('resolvePromptMentions', () => {
         [],
       )
 
-      expect(result.text).toBe('Transform [IMAGE: selfie] into art')
+      expect(result.text).toBe('Transform <selfie.jpg> into art')
       expect(result.mediaRefs).toHaveLength(1)
       expect(result.mediaRefs[0]).toEqual(selfieRef)
     })
@@ -217,7 +312,7 @@ describe('resolvePromptMentions', () => {
         [],
       )
 
-      expect(result.text).toBe('Use [IMAGE: photos]')
+      expect(result.text).toBe('Use <photo1.jpg>, <photo2.jpg>')
       expect(result.mediaRefs).toHaveLength(2)
     })
 
@@ -232,7 +327,7 @@ describe('resolvePromptMentions', () => {
         [],
       )
 
-      expect(result.text).toBe('Use [IMAGE: photo]')
+      expect(result.text).toBe('Use ')
       expect(result.mediaRefs).toHaveLength(0)
     })
   })
@@ -249,7 +344,7 @@ describe('resolvePromptMentions', () => {
         refMedia,
       )
 
-      expect(result.text).toBe('Use style from [IMAGE: style-guide.png]')
+      expect(result.text).toBe('Use style from <style-guide.png>')
       expect(result.mediaRefs).toHaveLength(1)
     })
 
@@ -265,7 +360,7 @@ describe('resolvePromptMentions', () => {
         refMedia,
       )
 
-      expect(result.text).toBe('Combine [IMAGE: style1.png] and [IMAGE: style2.png]')
+      expect(result.text).toBe('Combine <style1.png> and <style2.png>')
       expect(result.mediaRefs).toHaveLength(2)
     })
 
@@ -298,7 +393,7 @@ describe('resolvePromptMentions', () => {
       )
 
       expect(result.text).toBe(
-        'Transform Alice using [IMAGE: selfie] in style [IMAGE: anime-style.png]',
+        'Transform Alice using <selfie.jpg> in style <anime-style.png>',
       )
       expect(result.mediaRefs).toHaveLength(2)
     })
@@ -361,7 +456,7 @@ describe('resolvePromptMentions', () => {
       )
 
       // Media should only appear once in the array
-      expect(result.text).toBe('[IMAGE: photo] and again [IMAGE: photo]')
+      expect(result.text).toBe('<photo.jpg> and again <photo.jpg>')
       expect(result.mediaRefs).toHaveLength(1)
     })
   })

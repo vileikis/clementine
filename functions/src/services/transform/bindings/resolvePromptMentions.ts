@@ -7,8 +7,21 @@
  * @see data-model.md for SessionResponse and MediaReference structures
  */
 import { logger } from 'firebase-functions/v2'
-import type { SessionResponse, MediaReference } from '@clementine/shared'
+import type { SessionResponse, MediaReference, MultiSelectOption } from '@clementine/shared'
 import type { ResolvedPrompt } from '../types'
+
+// =============================================================================
+// Types
+// =============================================================================
+
+/** Function signature for adding media references */
+type AddMediaRef = (ref: MediaReference) => void
+
+/** Data resolver function signature */
+type DataResolver = (
+  response: SessionResponse,
+  addMediaRef: AddMediaRef,
+) => string
 
 // =============================================================================
 // Constants
@@ -19,6 +32,13 @@ const STEP_MENTION_PATTERN = /@\{step:([^}]+)\}/g
 
 /** Pattern for @{ref:displayName} mentions - resolves to reference media */
 const REF_MENTION_PATTERN = /@\{ref:([^}]+)\}/g
+
+/** Registry of step type resolvers */
+const STEP_TYPE_RESOLVERS: Record<string, DataResolver> = {
+  'input.multiSelect': resolveMultiSelectData,
+  'capture.photo': resolveCaptureData,
+  'capture.video': resolveCaptureData,
+}
 
 // =============================================================================
 // Main Function
@@ -31,7 +51,7 @@ const REF_MENTION_PATTERN = /@\{ref:([^}]+)\}/g
  * - @{step:stepName} - Replaced with session response data
  * - @{ref:displayName} - Replaced with reference media placeholder
  *
- * For capture steps and reference media, adds a [IMAGE: name] placeholder
+ * For capture steps and reference media, adds a <displayName> placeholder
  * and collects the MediaReference for the AI request.
  *
  * @param prompt - Original prompt with @{...} mentions
@@ -83,7 +103,7 @@ export function resolvePromptMentions(
     }
 
     addMediaRef(ref)
-    return `[IMAGE: ${displayName}]`
+    return `<${displayName}>`
   })
 
   return {
@@ -92,82 +112,163 @@ export function resolvePromptMentions(
   }
 }
 
+// =============================================================================
+// Step Data Resolution
+// =============================================================================
+
 /**
  * Resolve session response data to a string value
  *
- * Handles different data types:
- * - string: Returns directly (input.scale, input.shortText, etc.)
- * - MultiSelectOption[]: Returns comma-separated values
- * - MediaReference[]: Returns placeholder and collects media refs
- * - null: Returns empty string
+ * Uses registry pattern to dispatch to type-specific resolvers based on stepType.
+ * Falls back to string resolution for simple input types.
  */
 function resolveStepData(
   response: SessionResponse,
-  addMediaRef: (ref: MediaReference) => void,
+  addMediaRef: AddMediaRef,
 ): string {
-  const { stepName, stepType, data } = response
+  const { stepType, data } = response
 
   // Null data
   if (data === null || data === undefined) {
     return ''
   }
 
-  // String data (input.scale, input.shortText, input.yesNo, input.longText)
+  // Check for registered resolver
+  const resolver = STEP_TYPE_RESOLVERS[stepType]
+  if (resolver) {
+    return resolver(response, addMediaRef)
+  }
+
+  // Default: string data (input.scale, input.shortText, input.yesNo, input.longText)
+  return resolveStringData(response)
+}
+
+// =============================================================================
+// Type-Specific Resolvers
+// =============================================================================
+
+/**
+ * Resolve string data (input.scale, input.shortText, input.yesNo, input.longText)
+ */
+function resolveStringData(response: SessionResponse): string {
+  const { data } = response
+
   if (typeof data === 'string') {
     return data
   }
 
-  // Array data
-  if (Array.isArray(data)) {
-    // Empty array
-    if (data.length === 0) {
-      // For capture steps, still return the placeholder
-      if (stepType.startsWith('capture.')) {
-        return `[IMAGE: ${stepName}]`
-      }
-      return ''
-    }
-
-    // MultiSelectOption[] - has 'value' property
-    if (isMultiSelectArray(data)) {
-      return data.map((opt) => opt.value).join(', ')
-    }
-
-    // MediaReference[] - has 'mediaAssetId' property (capture steps)
-    if (isMediaReferenceArray(data)) {
-      for (const ref of data) {
-        addMediaRef(ref)
-      }
-      return `[IMAGE: ${stepName}]`
-    }
-  }
-
-  // Unknown data type - log warning and return empty string
-  logger.warn('[PromptResolution] Unknown data type', {
-    stepName,
-    stepType,
+  // Unexpected type for string step
+  logger.warn('[PromptResolution] Expected string data', {
+    stepName: response.stepName,
+    stepType: response.stepType,
     dataType: typeof data,
   })
   return ''
 }
 
 /**
- * Type guard for MultiSelectOption array
+ * Resolve multi-select data with promptFragment and promptMedia support
+ *
+ * Resolution priority per option:
+ * - promptFragment + promptMedia → "promptFragment (use <displayName>)"
+ * - promptFragment only → "promptFragment"
+ * - promptMedia only → "(use <displayName>)"
+ * - neither → "value"
+ *
+ * Multiple options are joined with comma.
  */
-function isMultiSelectArray(
-  data: unknown[],
-): data is Array<{ value: string; promptFragment?: string | null; promptMedia?: unknown | null }> {
-  return data.length > 0 && typeof data[0] === 'object' && data[0] !== null && 'value' in data[0]
+function resolveMultiSelectData(
+  response: SessionResponse,
+  addMediaRef: AddMediaRef,
+): string {
+  const { data } = response
+
+  if (!Array.isArray(data)) {
+    logger.warn('[PromptResolution] Expected array for multiSelect', {
+      stepName: response.stepName,
+      stepType: response.stepType,
+      dataType: typeof data,
+    })
+    return ''
+  }
+
+  if (data.length === 0) {
+    return ''
+  }
+
+  const options = data as MultiSelectOption[]
+  const resolvedParts = options.map((opt) => resolveMultiSelectOption(opt, addMediaRef))
+
+  return resolvedParts.join(', ')
 }
 
 /**
- * Type guard for MediaReference array
+ * Resolve a single multi-select option
  */
-function isMediaReferenceArray(data: unknown[]): data is MediaReference[] {
-  return (
-    data.length > 0 &&
-    typeof data[0] === 'object' &&
-    data[0] !== null &&
-    'mediaAssetId' in data[0]
-  )
+function resolveMultiSelectOption(
+  option: MultiSelectOption,
+  addMediaRef: AddMediaRef,
+): string {
+  const { value, promptFragment, promptMedia } = option
+
+  const hasFragment = promptFragment !== null && promptFragment !== undefined && promptFragment !== ''
+  const hasMedia = promptMedia !== null && promptMedia !== undefined
+
+  // Collect media reference if present
+  if (hasMedia) {
+    addMediaRef(promptMedia)
+  }
+
+  // Both promptFragment and promptMedia
+  if (hasFragment && hasMedia) {
+    return `${promptFragment} (use <${promptMedia.displayName}>)`
+  }
+
+  // Only promptFragment
+  if (hasFragment) {
+    return promptFragment
+  }
+
+  // Only promptMedia
+  if (hasMedia) {
+    return `(use <${promptMedia.displayName}>)`
+  }
+
+  // Neither - use value
+  return value
+}
+
+/**
+ * Resolve capture step data (MediaReference[])
+ *
+ * Collects all media references and returns comma-separated <displayName> placeholders.
+ */
+function resolveCaptureData(
+  response: SessionResponse,
+  addMediaRef: AddMediaRef,
+): string {
+  const { data } = response
+
+  if (!Array.isArray(data)) {
+    logger.warn('[PromptResolution] Expected array for capture step', {
+      stepName: response.stepName,
+      stepType: response.stepType,
+      dataType: typeof data,
+    })
+    return ''
+  }
+
+  if (data.length === 0) {
+    return ''
+  }
+
+  const mediaRefs = data as MediaReference[]
+  const placeholders: string[] = []
+
+  for (const ref of mediaRefs) {
+    addMediaRef(ref)
+    placeholders.push(`<${ref.displayName}>`)
+  }
+
+  return placeholders.join(', ')
 }
