@@ -1,5 +1,5 @@
 /**
- * Create Outcome Schema
+ * Outcome Schema
  *
  * Configuration schema for outcome-based generation (image/gif/video).
  * Part of Transform v3 - replaces node-based pipeline with outcome-focused config.
@@ -13,13 +13,13 @@ import { z } from 'zod'
 import { mediaReferenceSchema } from '../media/media-reference.schema'
 
 /**
- * Outcome type for Create configuration.
+ * Outcome type for configuration.
  * Determines the final output format.
  */
-export const createOutcomeTypeSchema = z.enum(['image', 'gif', 'video'])
+export const outcomeTypeSchema = z.enum(['image', 'gif', 'video'])
 
 /** Type of outcome: image, gif, or video */
-export type CreateOutcomeType = z.infer<typeof createOutcomeTypeSchema>
+export type OutcomeType = z.infer<typeof outcomeTypeSchema>
 
 /**
  * AI image generation model selection.
@@ -121,12 +121,12 @@ export const outcomeOptionsSchema = z.discriminatedUnion('kind', [
 export type OutcomeOptions = z.infer<typeof outcomeOptionsSchema>
 
 /**
- * Complete Create Outcome configuration.
+ * Complete Outcome configuration.
  * Defines how a session generates its final output.
  */
-export const createOutcomeSchema = z.object({
+export const outcomeSchema = z.object({
   /** Output type (null = not configured) */
-  type: createOutcomeTypeSchema.nullable().default(null),
+  type: outcomeTypeSchema.nullable().default(null),
   /** Source capture step ID for image-to-image (null = no source) */
   captureStepId: z.string().nullable().default(null),
   /** Global AI toggle (false = passthrough mode) */
@@ -142,5 +142,5 @@ export const createOutcomeSchema = z.object({
   options: outcomeOptionsSchema.nullable().default(null),
 })
 
-/** Complete outcome configuration for Create experiences */
-export type CreateOutcome = z.infer<typeof createOutcomeSchema>
+/** Complete outcome configuration for experiences */
+export type Outcome = z.infer<typeof outcomeSchema>
