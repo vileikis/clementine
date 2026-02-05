@@ -35,6 +35,14 @@ export const startTransformPipelineV2 = onCall(
     region: 'europe-west1',
   },
   async (request) => {
+    // Check authentication
+    if (!request.auth) {
+      throw new HttpsError(
+        'unauthenticated',
+        'Must be authenticated to start a transform pipeline',
+      )
+    }
+
     // Validate request data
     const parseResult = startTransformPipelineRequestSchema.safeParse(
       request.data,

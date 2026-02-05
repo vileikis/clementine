@@ -129,20 +129,40 @@ cd functions && pnpm test:watch
 
 ### Testing Callable Functions Locally
 
-#### Option 1: Firebase Functions Shell (Recommended)
+#### Option 1: Firebase Functions Shell with Emulators (Recommended)
 
 The Firebase shell provides an interactive REPL for testing functions:
 
 ```bash
-# Start the functions shell
+# Terminal 1: Start emulators
+pnpm functions:serve
+
+# Terminal 2: Start shell connected to emulators
 cd functions
-pnpm firebase functions:shell
+pnpm shell
 
 # In the shell, call a callable function:
 startTransformPipelineV2({ jobId: "test-job-123" })
 ```
 
-The shell automatically wraps your data and handles the callable protocol.
+The `pnpm shell` script automatically sets emulator environment variables and verifies connectivity.
+
+**Testing authenticated callable functions:**
+
+Callable functions that require authentication can be tested by passing a mock auth context as the second argument:
+
+```javascript
+// Unauthenticated call (will fail if function requires auth)
+startTransformPipelineV2({ projectId: "proj-1", sessionId: "sess-1" })
+
+// Authenticated call with mock user
+startTransformPipelineV2(
+  { projectId: "proj-1", sessionId: "sess-1" },
+  { auth: { uid: "test-user-123", token: { email: "test@example.com" } } }
+)
+```
+
+> **Note:** Running `firebase functions:shell` directly (without the script) connects to **production** Firebase services.
 
 #### Option 2: Using curl
 
