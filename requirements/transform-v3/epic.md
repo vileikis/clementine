@@ -20,9 +20,9 @@ Replace user-authored `transformNodes` with a **Create tab** where admins pick a
 | PRD | Name | Description | Status |
 |-----|------|-------------|--------|
 | [1A](./prd-1a-schemas.md) | Schema Foundations | New Zod schemas in shared package | ✅ Complete |
-| [1B](./prd-1b-experience-create.md) | Experience Create Config | Add `create` to experience, publish validation | ✅ Complete |
+| [1B](./prd-1b-experience-create.md) | Experience Outcome Config | Add `outcome` to experience, publish validation | ✅ Complete |
 | [1C](./prd-1c-session-responses.md) | Session Responses | Unified responses, guest runtime writes | ✅ Complete |
-| [2](./prd-2-admin-create-ux.md) | Admin Create Tab UX | Create tab UI with prompt editor | |
+| [2](./prd-2-admin-create-ux.md) | Admin Create Tab UX | Create tab UI with prompt editor | ✅ Complete |
 | [3](./prd-3-job-cloud-functions.md) | Job + Cloud Functions | Job snapshot, dispatcher, image outcome | |
 | [4](./prd-4-cleanup.md) | Cleanup & Guardrails | Remove dead code, safety checks | |
 
@@ -78,12 +78,13 @@ Replace user-authored `transformNodes` with a **Create tab** where admins pick a
 
 ---
 
-## Create Outcome Schema
+## Outcome Schema
 
 ### Final Structure
 
 ```ts
-create: {
+// Located at draft.outcome and published.outcome
+outcome: {
   // Outcome type
   type: 'image' | 'gif' | 'video' | null,
 
@@ -142,11 +143,11 @@ When user switches between image/gif/video:
 | Schema | PRD | Change |
 |--------|-----|--------|
 | `mediaDisplayNameSchema` | 1A | NEW - validation for mention-safe names |
-| `createOutcomeSchema` | 1A | NEW - outcome config with `captureStepId` and imageGeneration |
+| `outcomeSchema` | 1A | NEW - outcome config with `captureStepId` and imageGeneration |
 | `sessionResponseSchema` | 1A | NEW - unified response with `stepName`, `data` for all typed data |
-| `experienceConfigSchema` | 1B | Add `create` field |
+| `experienceConfigSchema` | 1B | Add `outcome` field |
 | `sessionSchema` | 1C | Add `responses[]`, deprecate `answers[]` + `capturedMedia[]` |
-| `jobSnapshotSchema` | 3 | Add `createOutcome`, update `sessionInputs` |
+| `jobSnapshotSchema` | 3 | Add `outcome`, update `sessionInputs` |
 
 ---
 
@@ -235,7 +236,7 @@ The `data` field holds typed data, with interpretation based on `stepType`:
 - [ ] Admin can toggle AI on/off (passthrough mode)
 - [ ] Switching outcomes preserves imageGeneration config
 - [ ] Guest flow writes unified `responses[]` with `stepName`
-- [ ] Cloud Functions execute from `job.snapshot.createOutcome`
+- [ ] Cloud Functions execute from `job.snapshot.outcome`
 - [ ] Prompt mentions (`@{step:...}`, `@{ref:...}`) resolve correctly
 - [ ] Old `transformNodes` code paths are removed
 

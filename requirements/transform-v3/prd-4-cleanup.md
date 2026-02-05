@@ -5,6 +5,8 @@
 **Dependencies**: PRD 3 (Job + Cloud Functions)
 **Enables**: None (final PRD)
 
+> **Note**: Schema uses `outcome` at `draft.outcome` and `published.outcome` (not `create`).
+
 ---
 
 ## Overview
@@ -124,10 +126,10 @@ function validateJobCreation(params: CreateJobParams): void {
     )
   }
 
-  // Rule 2: Must have create outcome
-  if (!experience.published.create?.type) {
+  // Rule 2: Must have outcome configured
+  if (!experience.published.outcome?.type) {
     throw new NonRetryableError(
-      'Cannot create job: experience has no create outcome configured'
+      'Cannot create job: experience has no outcome configured'
     )
   }
 
@@ -139,7 +141,7 @@ function validateJobCreation(params: CreateJobParams): void {
   }
 
   // Rule 4: Outcome type must be implemented
-  const outcomeType = experience.published.create.type
+  const outcomeType = experience.published.outcome.type
   if (outcomeType !== 'image') {
     throw new NonRetryableError(
       `Cannot create job: outcome type '${outcomeType}' is not implemented`
@@ -151,7 +153,7 @@ function validateJobCreation(params: CreateJobParams): void {
 ### Acceptance Criteria
 
 - [ ] AC-4.1: Job creation fails if experience.published is null
-- [ ] AC-4.2: Job creation fails if create.type is null
+- [ ] AC-4.2: Job creation fails if outcome.type is null
 - [ ] AC-4.3: Job creation fails if session has no responses
 - [ ] AC-4.4: Job creation fails for unimplemented outcome types
 - [ ] AC-4.5: All errors are non-retryable with clear messages
@@ -166,29 +168,29 @@ Fail fast during job execution.
 
 ```ts
 // In imageOutcome.ts
-if (!createOutcome.image) {
+if (!outcome.imageGeneration) {
   throw new NonRetryableError(
     'Image outcome missing configuration'
   )
 }
 
-if (!createOutcome.image.prompt.trim()) {
+if (outcome.aiEnabled && !outcome.imageGeneration.prompt.trim()) {
   throw new NonRetryableError(
     'Image outcome has empty prompt'
   )
 }
 
-if (createOutcome.image.captureStepId) {
+if (outcome.captureStepId) {
   const captureResponse = responses.find(
-    r => r.stepId === createOutcome.image!.captureStepId
+    r => r.stepId === outcome.captureStepId
   )
   if (!captureResponse) {
     throw new NonRetryableError(
-      `Capture step not found: ${createOutcome.image.captureStepId}`
+      `Capture step not found: ${outcome.captureStepId}`
     )
   }
-  // Capture media is stored in context as MediaReference[]
-  const mediaRefs = captureResponse.context as MediaReference[] | null
+  // Capture media is stored in data as MediaReference[]
+  const mediaRefs = captureResponse.data as MediaReference[] | null
   if (!mediaRefs || mediaRefs.length === 0) {
     throw new NonRetryableError(
       `Capture step has no media: ${captureResponse.stepName}`
@@ -199,10 +201,10 @@ if (createOutcome.image.captureStepId) {
 
 ### Acceptance Criteria
 
-- [ ] AC-5.1: Missing image config fails with clear error
-- [ ] AC-5.2: Empty prompt fails with clear error
+- [ ] AC-5.1: Missing imageGeneration config fails with clear error
+- [ ] AC-5.2: Empty prompt (when AI enabled) fails with clear error
 - [ ] AC-5.3: Invalid captureStepId fails with clear error
-- [ ] AC-5.4: Missing capture media (empty context) fails with clear error
+- [ ] AC-5.4: Missing capture media (empty data) fails with clear error
 
 ---
 
@@ -217,7 +219,7 @@ Ensure system never silently falls back to old behavior.
 const data = snapshot.sessionInputs.responses ?? snapshot.sessionInputs.answers
 
 // BAD: Silent fallback
-const config = experience.published.create ?? inferFromTransformNodes(...)
+const config = experience.published.outcome ?? inferFromTransformNodes(...)
 
 // BAD: Ignoring errors
 try {
