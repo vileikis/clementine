@@ -1,8 +1,9 @@
 /**
  * OutcomeTypeSelector Component
  *
- * Toggle group for selecting outcome type (Image, GIF, Video).
+ * Toggle group for switching outcome type (Image, GIF, Video) within the editor.
  * GIF and Video are disabled with "coming soon" labels.
+ * Does NOT allow deselection - use RemoveOutcomeAction to clear outcome.
  *
  * @see spec.md - US1 (Select Outcome Type)
  */
@@ -12,33 +13,30 @@ import type { OutcomeType } from '@clementine/shared'
 import { ToggleGroup, ToggleGroupItem } from '@/ui-kit/ui/toggle-group'
 
 export interface OutcomeTypeSelectorProps {
-  /** Currently selected outcome type (null = not selected) */
-  value: OutcomeType | null
+  /** Currently selected outcome type */
+  value: OutcomeType
   /** Callback when outcome type changes */
   onChange: (value: OutcomeType) => void
   /** Whether the selector is disabled */
   disabled?: boolean
-  /** Validation error message */
-  error?: string
 }
 
 /**
- * OutcomeTypeSelector - Toggle group for outcome type selection
+ * OutcomeTypeSelector - Toggle group for switching outcome type
  */
 export function OutcomeTypeSelector({
   value,
   onChange,
   disabled,
-  error,
 }: OutcomeTypeSelectorProps) {
   return (
     <div className="space-y-2">
       <label className="text-sm font-medium">Outcome Type</label>
       <ToggleGroup
         type="single"
-        value={value ?? ''}
+        value={value}
         onValueChange={(val) => {
-          // ToggleGroup returns empty string when deselecting
+          // Only change if a new value is selected (prevent deselection)
           if (val) {
             onChange(val as OutcomeType)
           }
@@ -75,11 +73,6 @@ export function OutcomeTypeSelector({
           <span className="text-muted-foreground text-xs">(soon)</span>
         </ToggleGroupItem>
       </ToggleGroup>
-      {error && (
-        <p className="text-destructive text-sm" role="alert">
-          {error}
-        </p>
-      )}
     </div>
   )
 }

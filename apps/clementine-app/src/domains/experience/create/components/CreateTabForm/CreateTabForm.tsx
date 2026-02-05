@@ -27,7 +27,9 @@ import {
   sanitizeDisplayName,
 } from '../../lib/outcome-operations'
 import { AIGenerationToggle } from './AIGenerationToggle'
+import { OutcomeTypePicker } from './OutcomeTypePicker'
 import { OutcomeTypeSelector } from './OutcomeTypeSelector'
+import { RemoveOutcomeAction } from './RemoveOutcomeAction'
 import { SourceImageSelector } from './SourceImageSelector'
 import { ValidationSummary } from './ValidationSummary'
 import type {
@@ -107,14 +109,21 @@ export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
   const refMediaRef = useRef(outcome.imageGeneration.refMedia)
   refMediaRef.current = outcome.imageGeneration.refMedia
 
-  // Handle outcome type change
-  const handleOutcomeTypeChange = useCallback(
+  // Handle outcome type selection from picker
+  const handleOutcomeTypeSelect = useCallback(
     (type: OutcomeType) => {
       form.setValue('type', type, { shouldDirty: true })
       triggerSave()
     },
     [form, triggerSave],
   )
+
+  // Handle outcome removal - reset to default (type: null)
+  const handleRemoveOutcome = useCallback(() => {
+    const defaultOutcome = createDefaultOutcome()
+    form.reset(defaultOutcome)
+    triggerSave()
+  }, [form, triggerSave])
 
   // Handle model change
   const handleModelChange = useCallback(
@@ -223,56 +232,60 @@ export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
   // Validation - computes errors based on current outcome state
   const validationErrors = useOutcomeValidation(outcome, steps)
 
+  // No outcome type selected - show picker
+  if (!outcome.type) {
+    return <OutcomeTypePicker onSelect={handleOutcomeTypeSelect} />
+  }
+
+  // Outcome type selected - show editor form
   return (
     <div className="space-y-6">
       {/* Validation Summary - shown at top when errors exist */}
       <ValidationSummary errors={validationErrors} />
 
-      {/* Outcome Type Selection */}
+      {/* Outcome Type Selector - switch between types */}
       <OutcomeTypeSelector
         value={outcome.type}
-        onChange={handleOutcomeTypeChange}
-        error={getFieldError(validationErrors, 'type')}
+        onChange={handleOutcomeTypeSelect}
       />
 
-      {/* Source Image Selection - only show when Image is selected */}
-      {outcome.type === 'image' && (
-        <SourceImageSelector
-          value={outcome.captureStepId}
-          onChange={handleCaptureStepIdChange}
-          steps={steps}
-          error={getFieldError(validationErrors, 'captureStepId')}
-        />
-      )}
+      {/* Source Image Selection */}
+      <SourceImageSelector
+        value={outcome.captureStepId}
+        onChange={handleCaptureStepIdChange}
+        steps={steps}
+        error={getFieldError(validationErrors, 'captureStepId')}
+      />
 
-      {/* AI Generation Toggle - only show when Image is selected */}
-      {outcome.type === 'image' && (
-        <AIGenerationToggle
-          value={outcome.aiEnabled}
-          onChange={handleAiEnabledChange}
-        />
-      )}
+      {/* AI Generation Toggle */}
+      <AIGenerationToggle
+        value={outcome.aiEnabled}
+        onChange={handleAiEnabledChange}
+      />
 
-      {/* AI Generation Configuration - only show when Image is selected, disabled when AI is off */}
-      {outcome.type === 'image' && (
-        <PromptComposer
-          prompt={outcome.imageGeneration.prompt}
-          onPromptChange={handlePromptChange}
-          model={outcome.imageGeneration.model}
-          onModelChange={handleModelChange}
-          aspectRatio={outcome.imageGeneration.aspectRatio}
-          onAspectRatioChange={handleAspectRatioChange}
-          refMedia={outcome.imageGeneration.refMedia}
-          onRefMediaRemove={handleRemoveRefMedia}
-          uploadingFiles={uploadingFiles}
-          onFilesSelected={uploadFiles}
-          canAddMore={canAddMore}
-          isUploading={isUploading}
-          steps={mentionableSteps}
-          disabled={!outcome.aiEnabled}
-          error={getFieldError(validationErrors, 'prompt')}
-        />
-      )}
+      {/* AI Generation Configuration - disabled when AI is off */}
+      <PromptComposer
+        prompt={outcome.imageGeneration.prompt}
+        onPromptChange={handlePromptChange}
+        model={outcome.imageGeneration.model}
+        onModelChange={handleModelChange}
+        aspectRatio={outcome.imageGeneration.aspectRatio}
+        onAspectRatioChange={handleAspectRatioChange}
+        refMedia={outcome.imageGeneration.refMedia}
+        onRefMediaRemove={handleRemoveRefMedia}
+        uploadingFiles={uploadingFiles}
+        onFilesSelected={uploadFiles}
+        canAddMore={canAddMore}
+        isUploading={isUploading}
+        steps={mentionableSteps}
+        disabled={!outcome.aiEnabled}
+        error={getFieldError(validationErrors, 'prompt')}
+      />
+
+      {/* Remove Outcome Action */}
+      <div className="border-t pt-4">
+        <RemoveOutcomeAction onRemove={handleRemoveOutcome} />
+      </div>
     </div>
   )
 }
