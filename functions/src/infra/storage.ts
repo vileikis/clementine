@@ -115,7 +115,7 @@ export function getOutputStoragePath(
   type: 'output' | 'thumb',
   extension: string
 ): string {
-  return `projects/${projectId}/results/${sessionId}-${type}.${extension}`;
+  return `projects/${projectId}/sessions/${sessionId}/results/${type}.${extension}`;
 }
 
 /**

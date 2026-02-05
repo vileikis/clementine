@@ -5,6 +5,7 @@ Firebase Cloud Functions for Clementine - the digital AI photobooth.
 ## Purpose
 
 This package contains Firebase Cloud Functions (v2) for:
+
 - **Transform Pipeline** - AI-powered image transformation with Gemini
 - **Media Processing Pipeline** - Image, GIF, and video generation from photos
 - **API Endpoints** - HTTP functions for triggering pipelines
@@ -17,7 +18,8 @@ This package contains Firebase Cloud Functions (v2) for:
 The transform pipeline handles AI-powered image transformations using Google's Gemini.
 
 **Flow:**
-1. `startTransformPipeline` - HTTP endpoint creates a job and queues processing
+
+1. `startTransformPipelineV2` - Callable function creates a job and queues processing
 2. `transformPipelineJob` - Cloud Task processes the job asynchronously
 3. AI service transforms images via Gemini provider
 4. Results stored in Firebase Storage, job status updated in Firestore
@@ -42,12 +44,10 @@ Transforms uploaded photos into final outputs (images, GIFs, or videos) using FF
 ```
 functions/
 ├── src/
-│   ├── http/
-│   │   ├── startTransformPipeline.ts  # Transform pipeline HTTP trigger
-│   │   └── processMedia.ts            # Legacy media processing trigger
+│   ├── callable/
+│   │   └── startTransformPipeline.ts  # Transform pipeline callable function
 │   ├── tasks/
-│   │   ├── transformPipelineJob.ts    # Transform pipeline task handler
-│   │   └── processMediaJob.ts         # Legacy media processing task
+│   │   └── transformPipelineJob.ts    # Transform pipeline task handler
 │   ├── services/
 │   │   ├── ai/
 │   │   │   ├── ai-transform.service.ts # AI transformation orchestration
@@ -81,13 +81,11 @@ functions/
 
 ## Exported Functions
 
-| Function | Type | Description |
-|----------|------|-------------|
-| `helloWorld` | HTTP | Health check endpoint |
-| `startTransformPipeline` | HTTP | Triggers AI transform pipeline |
-| `transformPipelineJob` | Task | Processes AI transform jobs |
-| `processMedia` | HTTP | Legacy media processing trigger |
-| `processMediaJob` | Task | Legacy media processing handler |
+| Function                   | Type     | Description                    |
+| -------------------------- | -------- | ------------------------------ |
+| `helloWorld`               | HTTP     | Health check endpoint          |
+| `startTransformPipelineV2` | Callable | Triggers AI transform pipeline |
+| `transformPipelineJob`     | Task     | Processes AI transform jobs    |
 
 ## Setup
 
@@ -131,7 +129,64 @@ pnpm functions:test
 cd functions && pnpm test:watch
 ```
 
-See `MANUAL-TESTING.md` for manual test cases and curl commands.
+### Testing Callable Functions Locally
+
+#### Option 1: Firebase Functions Shell with Emulators (Recommended)
+
+The Firebase shell provides an interactive REPL for testing functions:
+
+```bash
+# Terminal 1: Start emulators
+pnpm functions:serve
+
+# Terminal 2: Start shell connected to emulators
+cd functions
+pnpm shell
+
+# In the shell, call a callable function:
+startTransformPipelineV2({ jobId: "test-job-123" })
+```
+
+The `pnpm shell` script automatically sets emulator environment variables and verifies connectivity.
+
+**Testing authenticated callable functions:**
+
+Callable functions that require authentication can be tested by passing a mock auth context as the second argument:
+
+```javascript
+// Unauthenticated call (will fail if function requires auth)
+startTransformPipelineV2({ projectId: 'proj-1', sessionId: 'sess-1' })
+
+// Authenticated call with mock user
+startTransformPipelineV2(
+  { projectId: 'proj-1', sessionId: 'sess-1' },
+  { auth: { uid: 'test-user-123', token: { email: 'test@example.com' } } },
+)
+```
+
+> **Note:** Running `firebase functions:shell` directly (without the script) connects to **production** Firebase services.
+
+#### Option 2: Using curl
+
+Callable functions expect a POST request with a JSON body containing a `data` field:
+
+```bash
+# First start emulators
+pnpm functions:serve
+
+# Then call the function
+curl -X POST http://127.0.0.1:5003/clementine-7568d/europe-west1/startTransformPipelineV2 \
+    -H "Content-Type: application/json" \
+    -d '{ "data": { "projectId": "proj-1", "sessionId": "sess-1" } }'
+```
+
+**Tips:**
+
+- Replace `<project-id>` with your Firebase project ID (check `.firebaserc`)
+- The emulator URL format is: `http://127.0.0.1:5003/clementine-7568d/<region>/<function-name>`
+- Check the emulator UI at http://localhost:4000 to see function logs
+
+See `MANUAL-TESTING.md` for additional test cases.
 
 ### Key Technologies
 
@@ -149,26 +204,29 @@ See `MANUAL-TESTING.md` for manual test cases and curl commands.
 **IMPORTANT**: Always use the **modular API** for Firebase Admin SDK.
 
 ✅ **Correct (Modular API)**:
-```typescript
-import { initializeApp } from 'firebase-admin/app';
-import { getFirestore, FieldValue } from 'firebase-admin/firestore';
-import { getStorage } from 'firebase-admin/storage';
 
-initializeApp();
-const db = getFirestore();
-const storage = getStorage();
+```typescript
+import { initializeApp } from 'firebase-admin/app'
+import { getFirestore, FieldValue } from 'firebase-admin/firestore'
+import { getStorage } from 'firebase-admin/storage'
+
+initializeApp()
+const db = getFirestore()
+const storage = getStorage()
 ```
 
 ❌ **Incorrect (Global Namespace)**:
-```typescript
-import * as admin from 'firebase-admin';
 
-admin.initializeApp();
-const db = admin.firestore();
-const storage = admin.storage();
+```typescript
+import * as admin from 'firebase-admin'
+
+admin.initializeApp()
+const db = admin.firestore()
+const storage = admin.storage()
 ```
 
 **Why modular API?**
+
 - Better tree-shaking and smaller bundle sizes
 - More reliable in emulator environment
 - Avoids module loading issues with `FieldValue` and other exports

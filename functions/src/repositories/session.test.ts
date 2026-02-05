@@ -24,6 +24,7 @@ function createMockSession(overrides: Partial<Session> = {}): Session {
     status: 'active',
     answers: [],
     capturedMedia: [],
+    responses: [],
     resultMedia: null,
     mainSessionId: null,
     jobId: null,

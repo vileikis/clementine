@@ -34,7 +34,7 @@ import { useMarkExperienceComplete, usePregate, usePreshare } from '../hooks'
 import { useInitSession, useLinkSession } from '@/domains/session/shared'
 import { ExperienceRuntime } from '@/domains/experience/runtime'
 import { useStartTransformPipeline } from '@/domains/experience/transform'
-import { hasTransformConfig } from '@/domains/experience/shared/utils/hasTransformConfig'
+import { hasOutcome } from '@/domains/experience/shared/utils/hasTransformConfig'
 import { ThemeProvider, ThemedBackground } from '@/shared/theming'
 import { DEFAULT_THEME } from '@/domains/project-config/theme/constants'
 
@@ -223,8 +223,8 @@ export function ExperiencePage({
       // Continue - guest shouldn't be stuck
     }
 
-    // 2. Trigger transform pipeline if configured (await to ensure job created)
-    if (experience && hasTransformConfig(experience, 'published')) {
+    // 2. Trigger transform pipeline if outcome is configured (await to ensure job created)
+    if (experience && hasOutcome(experience, 'published')) {
       const success = await startTransformPipeline({
         projectId: project.id,
         sessionId,
