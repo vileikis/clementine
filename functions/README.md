@@ -5,6 +5,7 @@ Firebase Cloud Functions for Clementine - the digital AI photobooth.
 ## Purpose
 
 This package contains Firebase Cloud Functions (v2) for:
+
 - **Transform Pipeline** - AI-powered image transformation with Gemini
 - **Media Processing Pipeline** - Image, GIF, and video generation from photos
 - **API Endpoints** - HTTP functions for triggering pipelines
@@ -17,6 +18,7 @@ This package contains Firebase Cloud Functions (v2) for:
 The transform pipeline handles AI-powered image transformations using Google's Gemini.
 
 **Flow:**
+
 1. `startTransformPipelineV2` - Callable function creates a job and queues processing
 2. `transformPipelineJob` - Cloud Task processes the job asynchronously
 3. AI service transforms images via Gemini provider
@@ -79,11 +81,11 @@ functions/
 
 ## Exported Functions
 
-| Function | Type | Description |
-|----------|------|-------------|
-| `helloWorld` | HTTP | Health check endpoint |
+| Function                   | Type     | Description                    |
+| -------------------------- | -------- | ------------------------------ |
+| `helloWorld`               | HTTP     | Health check endpoint          |
 | `startTransformPipelineV2` | Callable | Triggers AI transform pipeline |
-| `transformPipelineJob` | Task | Processes AI transform jobs |
+| `transformPipelineJob`     | Task     | Processes AI transform jobs    |
 
 ## Setup
 
@@ -153,12 +155,12 @@ Callable functions that require authentication can be tested by passing a mock a
 
 ```javascript
 // Unauthenticated call (will fail if function requires auth)
-startTransformPipelineV2({ projectId: "proj-1", sessionId: "sess-1" })
+startTransformPipelineV2({ projectId: 'proj-1', sessionId: 'sess-1' })
 
 // Authenticated call with mock user
 startTransformPipelineV2(
-  { projectId: "proj-1", sessionId: "sess-1" },
-  { auth: { uid: "test-user-123", token: { email: "test@example.com" } } }
+  { projectId: 'proj-1', sessionId: 'sess-1' },
+  { auth: { uid: 'test-user-123', token: { email: 'test@example.com' } } },
 )
 ```
 
@@ -173,15 +175,15 @@ Callable functions expect a POST request with a JSON body containing a `data` fi
 pnpm functions:serve
 
 # Then call the function
-curl -X POST \
-  http://127.0.0.1:5001/<project-id>/europe-west1/startTransformPipelineV2 \
-  -H "Content-Type: application/json" \
-  -d '{ "data": { "jobId": "test-job-123" } }'
+curl -X POST http://127.0.0.1:5003/clementine-7568d/europe-west1/startTransformPipelineV2 \
+    -H "Content-Type: application/json" \
+    -d '{ "data": { "projectId": "proj-1", "sessionId": "sess-1" } }'
 ```
 
 **Tips:**
+
 - Replace `<project-id>` with your Firebase project ID (check `.firebaserc`)
-- The emulator URL format is: `http://127.0.0.1:5001/<project-id>/<region>/<function-name>`
+- The emulator URL format is: `http://127.0.0.1:5003/clementine-7568d/<region>/<function-name>`
 - Check the emulator UI at http://localhost:4000 to see function logs
 
 See `MANUAL-TESTING.md` for additional test cases.
@@ -202,26 +204,29 @@ See `MANUAL-TESTING.md` for additional test cases.
 **IMPORTANT**: Always use the **modular API** for Firebase Admin SDK.
 
 ✅ **Correct (Modular API)**:
-```typescript
-import { initializeApp } from 'firebase-admin/app';
-import { getFirestore, FieldValue } from 'firebase-admin/firestore';
-import { getStorage } from 'firebase-admin/storage';
 
-initializeApp();
-const db = getFirestore();
-const storage = getStorage();
+```typescript
+import { initializeApp } from 'firebase-admin/app'
+import { getFirestore, FieldValue } from 'firebase-admin/firestore'
+import { getStorage } from 'firebase-admin/storage'
+
+initializeApp()
+const db = getFirestore()
+const storage = getStorage()
 ```
 
 ❌ **Incorrect (Global Namespace)**:
-```typescript
-import * as admin from 'firebase-admin';
 
-admin.initializeApp();
-const db = admin.firestore();
-const storage = admin.storage();
+```typescript
+import * as admin from 'firebase-admin'
+
+admin.initializeApp()
+const db = admin.firestore()
+const storage = admin.storage()
 ```
 
 **Why modular API?**
+
 - Better tree-shaking and smaller bundle sizes
 - More reliable in emulator environment
 - Avoids module loading issues with `FieldValue` and other exports

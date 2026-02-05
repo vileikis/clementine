@@ -13,6 +13,7 @@
     "build:watch": "node esbuild.config.mjs --watch",
     "type-check": "tsc --noEmit",
     "serve": "pnpm build:watch | firebase emulators:start --config ../firebase.emulator.json",
+    "serve:functions": "pnpm build:watch | firebase emulators:start --only functions --config ../firebase.emulator.json",
     "serve:prod": "pnpm build && npx isolate && cd isolate && npm install && cd ../.. && firebase emulators:start",
     "clean": "rm -rf dist isolate",
     "seed": "tsx scripts/seed-emulators.ts",

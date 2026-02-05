@@ -36,7 +36,8 @@ export const startTransformPipelineV2 = onCall(
   },
   async (request) => {
     // Check authentication
-    if (!request.auth) {
+    const isEmulator = process.env['FUNCTIONS_EMULATOR'] === 'true'
+    if (!isEmulator && !request.auth) {
       throw new HttpsError(
         'unauthenticated',
         'Must be authenticated to start a transform pipeline',
