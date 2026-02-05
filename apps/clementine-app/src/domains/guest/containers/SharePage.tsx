@@ -42,13 +42,6 @@ const DEFAULT_SHARE_OPTIONS: ShareOptionsConfig = {
   telegram: false,
 }
 
-// Mock result images (temporary - will be fetched from session in future)
-// Swap between these to test different aspect ratios:
-const MOCK_RESULT_IMAGE =
-  'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=300&h=900' // Square
-// const MOCK_RESULT_IMAGE =
-// 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=300&h=900' // Portrait
-
 /**
  * Share page with renderer integration
  *
@@ -77,9 +70,12 @@ export function SharePage({ mainSessionId }: SharePageProps) {
   // Derive UI state from job status
   // null = no transform configured, should show ready immediately
   const jobStatus = session?.jobStatus
+  const resultMediaUrl = session?.resultMedia?.url ?? null
   const isSessionMissing = !isSessionLoading && !session
   const isJobInProgress = jobStatus === 'pending' || jobStatus === 'running'
-  const isJobCompleted = jobStatus === 'completed' || jobStatus === null
+  // Job is truly completed when we have the result media URL
+  const isJobCompleted =
+    (jobStatus === 'completed' && resultMediaUrl !== null) || jobStatus === null
   const isJobFailed =
     isSessionMissing || jobStatus === 'failed' || jobStatus === 'cancelled'
 
@@ -91,8 +87,8 @@ export function SharePage({ mainSessionId }: SharePageProps) {
   const shareOptions =
     project.publishedConfig?.shareOptions ?? DEFAULT_SHARE_OPTIONS
 
-  // Share actions hook
-  const { handleShare } = useShareActions({ mediaUrl: MOCK_RESULT_IMAGE })
+  // Share actions hook - only active when we have result media
+  const { handleShare } = useShareActions({ mediaUrl: resultMediaUrl })
 
   // Navigation handlers
   const handleStartOver = () => {
@@ -131,12 +127,12 @@ export function SharePage({ mainSessionId }: SharePageProps) {
           {isJobInProgress && (
             <ShareLoadingRenderer shareLoading={shareLoading} mode="run" />
           )}
-          {isJobCompleted && (
+          {isJobCompleted && resultMediaUrl && (
             <ShareReadyRenderer
               share={shareReady}
               shareOptions={shareOptions}
               mode="run"
-              mediaUrl={MOCK_RESULT_IMAGE}
+              mediaUrl={resultMediaUrl}
               onShare={handleShare}
               onCta={handleCta}
               onStartOver={handleStartOver}
