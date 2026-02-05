@@ -15,6 +15,7 @@ export type { CameraViewRef } from './components/CameraView'
 
 // Hooks
 export { useCameraPermission } from './hooks/useCameraPermission'
+export { useCameraStream } from './hooks/useCameraStream'
 export { useLibraryPicker } from './hooks/useLibraryPicker'
 export { usePhotoCapture } from './hooks/usePhotoCapture'
 
