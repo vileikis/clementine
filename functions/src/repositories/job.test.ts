@@ -20,7 +20,6 @@ function createMockSnapshot(overrides: Partial<JobSnapshot> = {}): JobSnapshot {
   return {
     sessionResponses: [],
     outcome: null,
-    transformNodes: [],
     projectContext: {
       overlay: null,
       applyOverlay: false,

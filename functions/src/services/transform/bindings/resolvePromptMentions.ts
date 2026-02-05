@@ -10,6 +10,20 @@ import { logger } from 'firebase-functions/v2'
 import type { SessionResponse, MediaReference } from '@clementine/shared'
 import type { ResolvedPrompt } from '../types'
 
+// =============================================================================
+// Constants
+// =============================================================================
+
+/** Pattern for @{step:stepName} mentions - resolves to session response data */
+const STEP_MENTION_PATTERN = /@\{step:([^}]+)\}/g
+
+/** Pattern for @{ref:displayName} mentions - resolves to reference media */
+const REF_MENTION_PATTERN = /@\{ref:([^}]+)\}/g
+
+// =============================================================================
+// Main Function
+// =============================================================================
+
 /**
  * Resolve prompt mentions to actual values
  *
@@ -42,8 +56,7 @@ export function resolvePromptMentions(
   }
 
   // Resolve @{step:stepName} mentions
-  const stepPattern = /@\{step:([^}]+)\}/g
-  let resolvedText = prompt.replace(stepPattern, (match, stepName: string) => {
+  let resolvedText = prompt.replace(STEP_MENTION_PATTERN, (match, stepName: string) => {
     const response = responses.find((r) => r.stepName === stepName)
 
     if (!response) {
@@ -58,8 +71,7 @@ export function resolvePromptMentions(
   })
 
   // Resolve @{ref:displayName} mentions
-  const refPattern = /@\{ref:([^}]+)\}/g
-  resolvedText = resolvedText.replace(refPattern, (match, displayName: string) => {
+  resolvedText = resolvedText.replace(REF_MENTION_PATTERN, (match, displayName: string) => {
     const ref = refMedia.find((r) => r.displayName === displayName)
 
     if (!ref) {

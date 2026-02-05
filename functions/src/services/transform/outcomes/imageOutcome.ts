@@ -17,11 +17,11 @@ import type {
 } from '@clementine/shared'
 import type { OutcomeContext } from '../types'
 import { resolvePromptMentions } from '../bindings/resolvePromptMentions'
-import { aiGenerateImage } from '../executors/aiGenerateImage'
+import { aiGenerateImage } from '../operations/aiGenerateImage'
 import {
   applyOverlay,
   getOverlayForAspectRatio,
-} from '../executors/applyOverlay'
+} from '../operations/applyOverlay'
 import {
   downloadFromStorage,
   uploadToStorage,
@@ -200,7 +200,7 @@ async function executePassthrough(
   })
 
   // Download captured media to temp directory
-  const outputPath = `${tmpDir}/passthrough-output.png`
+  const outputPath = `${tmpDir}/passthrough-output.jpg`
   const storagePath = getStoragePathFromMediaReference(sourceMedia)
   await downloadFromStorage(storagePath, outputPath)
 
@@ -269,7 +269,7 @@ async function uploadOutput(
     projectId,
     sessionId,
     'output',
-    'png',
+    'jpg',
   )
   const url = await uploadToStorage(outputPath, storagePath)
 

@@ -1,22 +1,3 @@
-import { onRequest } from 'firebase-functions/v2/https'
-
-/**
- * Hello World function to verify Firebase Functions deployment
- * and shared package integration.
- */
-export const helloWorld = onRequest(
-  {
-    region: 'europe-west1',
-  },
-  (_request, response) => {
-    response.json({
-      message: 'Functions operational',
-      sharedTypesWorking: true,
-      timestamp: new Date().toISOString(),
-    })
-  },
-)
-
 /**
  * Transform Pipeline
  */

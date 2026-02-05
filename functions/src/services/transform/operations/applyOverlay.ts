@@ -40,7 +40,7 @@ export async function applyOverlay(
   await downloadFromStorage(storagePath, overlayPath)
 
   // Apply overlay using FFmpeg
-  const outputPath = `${tmpDir}/output-with-overlay.png`
+  const outputPath = `${tmpDir}/output-with-overlay.jpg`
 
   logger.info('[Overlay] Compositing overlay onto output')
   await applyOverlayToMedia(inputPath, overlayPath, outputPath)

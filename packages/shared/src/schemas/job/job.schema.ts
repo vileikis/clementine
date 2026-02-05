@@ -12,13 +12,11 @@
  * - Schema evolution is natural as the system evolves
  */
 import { z } from 'zod'
-import { answerSchema, capturedMediaSchema } from '../session/session.schema'
 import {
   overlayReferenceSchema,
   overlaysConfigSchema,
 } from '../project/project-config.schema'
 import { mainExperienceReferenceSchema } from '../project/experiences.schema'
-import { transformNodeSchema } from '../experience/transform.schema'
 import { sessionResponseSchema } from '../session/session-response.schema'
 import { outcomeSchema } from '../experience/outcome.schema'
 import { jobStatusSchema } from './job-status.schema'
@@ -73,25 +71,6 @@ export const jobOutputSchema = z.object({
 })
 
 /**
- * Snapshot of session inputs at job creation
- *
- * Reuses session schemas for consistency. z.looseObject() ensures
- * old jobs with extra fields (e.g., stepName from earlier versions)
- * still parse successfully.
- */
-export const sessionInputsSnapshotSchema = z.looseObject({
-  answers: z.array(answerSchema),
-  capturedMedia: z.array(capturedMediaSchema),
-})
-
-/**
- * Snapshot of transform nodes at job creation
- *
- * Captures the transform nodes array from the experience config.
- */
-export const transformNodesSnapshotSchema = z.array(transformNodeSchema)
-
-/**
  * Snapshot of project context at job creation
  *
  * Captures overlay reference and experience reference for applyOverlay tracking.
@@ -116,12 +95,8 @@ export const eventContextSnapshotSchema = projectContextSnapshotSchema
  * Complete job execution snapshot
  */
 export const jobSnapshotSchema = z.looseObject({
-  /** @deprecated Use sessionResponses instead. Kept for backward compatibility. */
-  sessionInputs: sessionInputsSnapshotSchema.optional(),
   /** Session responses at job creation (unified from all steps) */
   sessionResponses: z.array(sessionResponseSchema).default([]),
-  /** @deprecated Always []. Kept for schema compatibility. */
-  transformNodes: z.array(transformNodeSchema).default([]),
   /** Project context (overlays, etc.) */
   projectContext: projectContextSnapshotSchema,
   /** Experience version at time of job creation */
@@ -168,10 +143,6 @@ export type JobProgress = z.infer<typeof jobProgressSchema>
 export type JobError = z.infer<typeof jobErrorSchema>
 export type JobOutput = z.infer<typeof jobOutputSchema>
 export type JobSnapshot = z.infer<typeof jobSnapshotSchema>
-export type SessionInputsSnapshot = z.infer<typeof sessionInputsSnapshotSchema>
-export type TransformNodesSnapshot = z.infer<
-  typeof transformNodesSnapshotSchema
->
 export type ProjectContextSnapshot = z.infer<
   typeof projectContextSnapshotSchema
 >

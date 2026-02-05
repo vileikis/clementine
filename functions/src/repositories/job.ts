@@ -312,12 +312,8 @@ export function buildJobSnapshot(
   }
 
   return {
-    // New unified responses array
     sessionResponses: session.responses,
-    // Outcome configuration from experience
     outcome: config.outcome ?? null,
-    // Deprecated fields kept for backward compatibility
-    transformNodes: [],
     projectContext: {
       overlay: null,
       applyOverlay: false,

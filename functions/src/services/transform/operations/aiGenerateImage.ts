@@ -84,7 +84,7 @@ export async function aiGenerateImage(
     responseModalities: [Modality.IMAGE],
     imageConfig: {
       aspectRatio,
-      outputMimeType: 'image/png',
+      outputMimeType: 'image/jpeg',
     },
   }
 
@@ -111,7 +111,7 @@ export async function aiGenerateImage(
 
   // Generate unique output filename
   const outputId = `ai-output-${Date.now()}`
-  const outputPath = `${tmpDir}/${outputId}.png`
+  const outputPath = `${tmpDir}/${outputId}.jpg`
 
   // Save to temp directory
   await fs.writeFile(outputPath, imageBuffer)
@@ -127,7 +127,7 @@ export async function aiGenerateImage(
 
   return {
     outputPath,
-    mimeType: 'image/png',
+    mimeType: 'image/jpeg',
     sizeBytes: imageBuffer.length,
     dimensions,
   }
