@@ -1,26 +1,25 @@
 /**
  * ExperienceCreatePage Container
  *
- * Main content area for the Create tab (AI transform pipeline configuration).
- * Provides CRUD operations for AI Image nodes in the transform pipeline.
+ * Main content area for the Create tab (AI image generation configuration).
+ * Renders the CreateTabForm for outcome-based configuration.
+ *
+ * @see spec.md - Admin Create Tab UX
  */
 import { useParams } from '@tanstack/react-router'
 
-import { TransformPipelineEditor } from './TransformPipelineEditor'
+import { CreateTabForm } from '../components/CreateTabForm'
 import { useWorkspace } from '@/domains/workspace'
 import { useWorkspaceExperience } from '@/domains/experience'
 
 /**
- * Create tab with transform pipeline editor
+ * Create tab with outcome-based configuration form
  *
  * Features:
- * - Add/delete AI Image nodes
- * - View node list with cards
- * - Empty state when no nodes
- * - Delete confirmation dialog
- *
- * Phase 1b-2: CRUD operations and basic display (MVP)
- * Future phases will add: editor panel, prompt editing, refMedia management
+ * - Outcome type selection (Image, GIF coming soon, Video coming soon)
+ * - AI generation configuration (prompt, model, aspect ratio)
+ * - Reference media upload and management
+ * - Autosave with debounced prompt saves
  */
 export function ExperienceCreatePage() {
   const { workspaceSlug, experienceId } = useParams({ strict: false })
@@ -38,10 +37,9 @@ export function ExperienceCreatePage() {
   return (
     <div className="flex flex-1 flex-col overflow-hidden h-full">
       <div className="flex-1 overflow-y-auto p-6">
-        <TransformPipelineEditor
-          experience={experience}
-          workspaceId={workspace.id}
-        />
+        <div className="mx-auto max-w-xl">
+          <CreateTabForm experience={experience} workspaceId={workspace.id} />
+        </div>
       </div>
     </div>
   )

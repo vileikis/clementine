@@ -6,7 +6,7 @@
  */
 import { describe, expect, it } from 'vitest'
 import { isCaptureStep, validateOutcome } from './outcome-validation'
-import type { Outcome, ExperienceStep } from '@clementine/shared'
+import type { ExperienceStep, Outcome } from '@clementine/shared'
 
 // Test helpers
 function createDefaultOutcome(overrides: Partial<Outcome> = {}): Outcome {

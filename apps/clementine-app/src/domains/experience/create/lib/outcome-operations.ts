@@ -4,14 +4,14 @@
  * Pure functions for updating outcome configuration.
  * These functions return new objects rather than mutating in place.
  */
+import { MAX_REF_MEDIA_COUNT } from './model-options'
 import type {
+  AIImageAspectRatio,
+  AIImageModel,
+  MediaReference,
   Outcome,
   OutcomeType,
-  AIImageModel,
-  AIImageAspectRatio,
-  MediaReference,
 } from '@clementine/shared'
-import { MAX_REF_MEDIA_COUNT } from './model-options'
 
 /**
  * Create a default outcome configuration.

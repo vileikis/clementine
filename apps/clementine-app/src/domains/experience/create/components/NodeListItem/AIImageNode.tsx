@@ -12,17 +12,17 @@ import { useCallback, useEffect, useState } from 'react'
 import { PromptComposer } from '../PromptComposer'
 import { useRefMediaUpload } from '../../hooks'
 import {
-  updateNodePrompt,
-  updateNodeModel,
-  updateNodeAspectRatio,
-  removeNodeRefMedia,
   addNodeRefMedia,
+  removeNodeRefMedia,
+  updateNodeAspectRatio,
+  updateNodeModel,
+  updateNodePrompt,
 } from '../../lib/transform-operations'
 import type {
   AIImageNode,
   ExperienceStep,
-  TransformNode,
   MediaReference,
+  TransformNode,
 } from '@clementine/shared'
 import { useAuth } from '@/domains/auth'
 import { useDebounce } from '@/shared/utils/useDebounce'
@@ -93,7 +93,11 @@ export function AIImageNodeSettings({
   // Update transform nodes when debounced prompt changes
   useEffect(() => {
     if (debouncedPrompt !== config.prompt) {
-      const newNodes = updateNodePrompt(transformNodes, node.id, debouncedPrompt)
+      const newNodes = updateNodePrompt(
+        transformNodes,
+        node.id,
+        debouncedPrompt,
+      )
       onUpdate(newNodes)
     }
   }, [debouncedPrompt])

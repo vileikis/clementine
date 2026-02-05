@@ -6,7 +6,7 @@
  *
  * @see PRD 1C - Experience Outcome Configuration
  */
-import type { Outcome, ExperienceStep } from '@clementine/shared'
+import type { ExperienceStep, Outcome } from '@clementine/shared'
 
 /**
  * Validation error returned from outcome validation.

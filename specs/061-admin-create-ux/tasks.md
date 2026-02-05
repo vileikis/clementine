@@ -65,14 +65,14 @@
 
 ### Implementation for User Story 1+2
 
-- [ ] T015 [P] [US1] Create `apps/clementine-app/src/domains/experience/create/components/CreateTabForm/OutcomeTypeSelector.tsx` with Image/GIF/Video toggle (GIF/Video disabled with "coming soon")
-- [ ] T016 [P] [US1] Create `apps/clementine-app/src/domains/experience/create/components/CreateTabForm/index.ts` barrel export
-- [ ] T017 [US1] Create `apps/clementine-app/src/domains/experience/create/components/CreateTabForm/CreateTabForm.tsx` composing OutcomeTypeSelector and PromptComposer
-- [ ] T018 [US1] Update `apps/clementine-app/src/domains/experience/create/containers/ExperienceCreatePage.tsx` to render CreateTabForm instead of TransformPipelineEditor
-- [ ] T019 [US1] Wire CreateTabForm to useUpdateOutcome mutation for saving outcome config
-- [ ] T020 [US1] Implement local state with debounced saves for prompt changes (2-second debounce)
-- [ ] T021 [US1] Implement immediate saves for discrete selections (model, aspect ratio, outcome type)
-- [ ] T022 [US1] Update barrel exports in `apps/clementine-app/src/domains/experience/create/components/index.ts`
+- [X] T015 [P] [US1] Create `apps/clementine-app/src/domains/experience/create/components/CreateTabForm/OutcomeTypeSelector.tsx` with Image/GIF/Video toggle (GIF/Video disabled with "coming soon")
+- [X] T016 [P] [US1] Create `apps/clementine-app/src/domains/experience/create/components/CreateTabForm/index.ts` barrel export
+- [X] T017 [US1] Create `apps/clementine-app/src/domains/experience/create/components/CreateTabForm/CreateTabForm.tsx` composing OutcomeTypeSelector and PromptComposer
+- [X] T018 [US1] Update `apps/clementine-app/src/domains/experience/create/containers/ExperienceCreatePage.tsx` to render CreateTabForm instead of TransformPipelineEditor
+- [X] T019 [US1] Wire CreateTabForm to useUpdateOutcome mutation for saving outcome config
+- [X] T020 [US1] Implement local state with debounced saves for prompt changes (2-second debounce)
+- [X] T021 [US1] Implement immediate saves for discrete selections (model, aspect ratio, outcome type)
+- [X] T022 [US1] Update barrel exports in `apps/clementine-app/src/domains/experience/create/components/index.ts`
 
 **Checkpoint**: US1+2 complete - Admin can configure AI image generation with outcome type, prompt, model, and aspect ratio
 

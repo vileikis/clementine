@@ -9,7 +9,7 @@ import { useCallback, useRef, useState } from 'react'
 import { nanoid } from 'nanoid'
 
 import { MAX_REF_MEDIA_COUNT } from '../lib/model-options'
-import type { Outcome, MediaReference } from '@clementine/shared'
+import type { MediaReference, Outcome } from '@clementine/shared'
 import { useUploadMediaAsset } from '@/domains/media-library'
 
 export interface UploadingFile {
