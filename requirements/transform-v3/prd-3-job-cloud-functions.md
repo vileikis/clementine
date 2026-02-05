@@ -2,14 +2,14 @@
 
 **Epic**: [Outcome-based Create](./epic.md)
 **Status**: Draft
-**Dependencies**: PRD 1B (Experience Create), PRD 1C (Session Responses)
+**Dependencies**: PRD 1B (Experience Outcome), PRD 1C (Session Responses), PRD 2 (Admin Create Tab UX)
 **Enables**: PRD 4 (Cleanup)
 
 ---
 
 ## Overview
 
-Update job snapshot schema to capture `createOutcome` and `responses`. Implement outcome dispatcher and image outcome executor in Cloud Functions.
+Update job snapshot schema to capture `outcome` and `responses`. Implement outcome dispatcher and image outcome executor in Cloud Functions.
 
 ---
 
@@ -22,10 +22,10 @@ Update snapshot to use new data structures.
 ```ts
 import { sessionResponseSchema } from '../session/session-response.schema'
 import {
-  createOutcomeTypeSchema,
+  outcomeTypeSchema,
   imageGenerationConfigSchema,
   outcomeOptionsSchema,
-} from '../experience/create-outcome.schema'
+} from '../experience/outcome.schema'
 
 /**
  * Snapshot of session inputs at job creation
@@ -36,11 +36,11 @@ export const sessionInputsSnapshotSchema = z.looseObject({
 })
 
 /**
- * Snapshot of create outcome at job creation
+ * Snapshot of outcome at job creation
  */
-export const createOutcomeSnapshotSchema = z.looseObject({
+export const outcomeSnapshotSchema = z.looseObject({
   /** Outcome type (never null in snapshot - validated at job creation) */
-  type: createOutcomeTypeSchema,
+  type: outcomeTypeSchema,
 
   /** Source step ID (shared across outcomes) */
   captureStepId: z.string().nullable(),
@@ -71,15 +71,15 @@ export const jobSnapshotSchema = z.looseObject({
   /** Experience version at job creation */
   experienceVersion: z.number().int().positive(),
 
-  /** Create outcome configuration */
-  createOutcome: createOutcomeSnapshotSchema,
+  /** Outcome configuration */
+  outcome: outcomeSnapshotSchema,
 })
 ```
 
 ### Acceptance Criteria
 
-- [ ] AC-1.1: `jobSnapshotSchema` includes `createOutcome`
-- [ ] AC-1.2: `createOutcomeSnapshotSchema` includes `captureStepId`, `aiEnabled`, `imageGeneration`, `options`
+- [ ] AC-1.1: `jobSnapshotSchema` includes `outcome`
+- [ ] AC-1.2: `outcomeSnapshotSchema` includes `captureStepId`, `aiEnabled`, `imageGeneration`, `options`
 - [ ] AC-1.3: `sessionInputsSnapshotSchema` uses `responses` (not answers/capturedMedia)
 - [ ] AC-1.4: `transformNodes` always defaults to `[]`
 
@@ -95,14 +95,14 @@ Update job creation to snapshot new data.
 async function createJob(params: CreateJobParams): Promise<Job> {
   const { session, experience, projectContext } = params
 
-  // Validate create outcome exists
-  const create = experience.published?.create
-  if (!create?.type) {
-    throw new NonRetryableError('Experience has no create outcome configured')
+  // Validate outcome exists
+  const outcome = experience.published?.outcome
+  if (!outcome?.type) {
+    throw new NonRetryableError('Experience has no outcome configured')
   }
 
   // Validate passthrough has source
-  if (!create.aiEnabled && !create.captureStepId) {
+  if (!outcome.aiEnabled && !outcome.captureStepId) {
     throw new NonRetryableError('Passthrough mode requires source image')
   }
 
@@ -116,12 +116,12 @@ async function createJob(params: CreateJobParams): Promise<Job> {
       experienceRef: projectContext.experienceRef,
     },
     experienceVersion: experience.publishedVersion!,
-    createOutcome: {
-      type: create.type,
-      captureStepId: create.captureStepId,
-      aiEnabled: create.aiEnabled,
-      imageGeneration: create.imageGeneration,
-      options: create.options,
+    outcome: {
+      type: outcome.type,
+      captureStepId: outcome.captureStepId,
+      aiEnabled: outcome.aiEnabled,
+      imageGeneration: outcome.imageGeneration,
+      options: outcome.options,
     },
   }
 
@@ -131,9 +131,9 @@ async function createJob(params: CreateJobParams): Promise<Job> {
 
 ### Acceptance Criteria
 
-- [ ] AC-2.1: Job creation fails if `create.type` is null
+- [ ] AC-2.1: Job creation fails if `outcome.type` is null
 - [ ] AC-2.2: Job creation fails if passthrough without captureStepId
-- [ ] AC-2.3: Job snapshot includes full `createOutcome` from published experience
+- [ ] AC-2.3: Job snapshot includes full `outcome` from published experience
 - [ ] AC-2.4: Job snapshot includes `responses` from session
 - [ ] AC-2.5: `transformNodes` is always `[]` in snapshot
 
@@ -158,14 +158,14 @@ interface OutcomeContext {
 
 type OutcomeExecutor = (ctx: OutcomeContext) => Promise<JobOutput>
 
-const outcomeRegistry: Record<CreateOutcomeType, OutcomeExecutor | null> = {
+const outcomeRegistry: Record<OutcomeType, OutcomeExecutor | null> = {
   image: imageOutcome,
   gif: null,   // Not implemented
   video: null, // Not implemented
 }
 
 export async function runOutcome(ctx: OutcomeContext): Promise<JobOutput> {
-  const { type } = ctx.snapshot.createOutcome
+  const { type } = ctx.snapshot.outcome
 
   const executor = outcomeRegistry[type]
 
@@ -179,7 +179,7 @@ export async function runOutcome(ctx: OutcomeContext): Promise<JobOutput> {
 
 ### Acceptance Criteria
 
-- [ ] AC-3.1: Dispatcher reads `createOutcome.type` from snapshot
+- [ ] AC-3.1: Dispatcher reads `outcome.type` from snapshot
 - [ ] AC-3.2: Routes to correct outcome executor
 - [ ] AC-3.3: Throws non-retryable error for unimplemented types
 - [ ] AC-3.4: Never reads `transformNodes`
@@ -284,8 +284,8 @@ import { applyOverlay } from '../executors/applyOverlay'
 
 export async function imageOutcome(ctx: OutcomeContext): Promise<JobOutput> {
   const { snapshot, startTime } = ctx
-  const { createOutcome, sessionInputs, projectContext } = snapshot
-  const { captureStepId, aiEnabled, imageGeneration } = createOutcome
+  const { outcome, sessionInputs, projectContext } = snapshot
+  const { captureStepId, aiEnabled, imageGeneration } = outcome
 
   // 1. Resolve source media (if specified)
   // Capture media is stored in data as MediaReference[]

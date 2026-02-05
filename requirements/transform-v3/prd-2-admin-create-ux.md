@@ -1,8 +1,8 @@
 # PRD 2: Admin Create Tab UX
 
 **Epic**: [Outcome-based Create](./epic.md)
-**Status**: Draft
-**Dependencies**: PRD 1B (Experience Create Config)
+**Status**: ✅ Complete
+**Dependencies**: PRD 1B (Experience Outcome Config)
 **Enables**: PRD 3 (Job + CF)
 
 ---
@@ -41,7 +41,7 @@ The existing `create/` subdomain contains reusable components from the previous 
 | `AddMediaButton` | ✅ Fully reusable | File picker trigger |
 | `PromptComposer` | 🔄 Refactor | Decouple from node-based data model |
 | `ControlRow` | 🔄 Refactor | Extract model/aspect ratio selectors |
-| `useRefMediaUpload` | 🔄 Refactor | Work with `create.imageGeneration.refMedia` |
+| `useRefMediaUpload` | 🔄 Refactor | Work with `outcome.imageGeneration.refMedia` |
 | `NodeListItem/*` | ❌ Delete | Node-centric UI being removed |
 | `TransformPipelineEditor` | ❌ Delete | Multi-node pipeline being replaced |
 | `transform-operations.ts` | ❌ Delete | Operations on `TransformNode[]` |
@@ -112,7 +112,7 @@ interface PromptComposerProps {
 | `OutcomeTypeSelector` | Image/GIF/Video toggle (Section 2) |
 | `SourceImageSelector` | Capture step dropdown (Section 3) |
 | `AIGenerationToggle` | Enable/disable AI toggle (Section 4) |
-| `CreateTabForm` | Container composing all fields, binds to `draft.create` |
+| `CreateTabForm` | Container composing all fields, binds to `draft.outcome` |
 
 ---
 
@@ -196,7 +196,7 @@ interface PromptComposerProps {
 
 - Selecting Image shows image-specific form fields
 - GIF/Video show "Coming soon" message when clicked
-- `create.type` updates in draft on selection
+- `outcome.type` updates in draft on selection
 - **Switching preserves** `imageGeneration` block (prompt, refMedia, model, aspectRatio)
 - **Switching resets** `options` to defaults for new type
 
@@ -222,14 +222,14 @@ interface PromptComposerProps {
 - Lists only capture steps (e.g., `capture.photo`)
 - Shows step name as option label
 - "None" means no source image (prompt-only or invalid for passthrough)
-- Saved to `create.captureStepId`
+- Saved to `outcome.captureStepId`
 
 ### Acceptance Criteria
 
 - [ ] AC-3.1: Dropdown shows "None" + capture steps
 - [ ] AC-3.2: Only capture steps listed (not input steps)
 - [ ] AC-3.3: "None" sets `captureStepId: null`
-- [ ] AC-3.4: Selection saved to `create.captureStepId`
+- [ ] AC-3.4: Selection saved to `outcome.captureStepId`
 - [ ] AC-3.5: Helper text explains optional behavior
 
 ---
@@ -257,7 +257,7 @@ When `aiEnabled: false`:
 
 ### Acceptance Criteria
 
-- [ ] AC-4.1: Toggle controls `create.aiEnabled`
+- [ ] AC-4.1: Toggle controls `outcome.aiEnabled`
 - [ ] AC-4.2: Prompt Composer section shows/hides based on toggle
 - [ ] AC-4.3: Prompt Composer values preserved when toggling off/on
 - [ ] AC-4.4: Warning shown if passthrough without source image
@@ -291,7 +291,7 @@ Use the Lexical prompt editor from 055-lexical-prompt-editor.
 - [ ] AC-5.2: `@` triggers mention autocomplete
 - [ ] AC-5.3: Step mentions show steps from Collect tab (excluding info)
 - [ ] AC-5.4: Ref mentions show reference images
-- [ ] AC-5.5: Prompt value saved to `create.imageGeneration.prompt`
+- [ ] AC-5.5: Prompt value saved to `outcome.imageGeneration.prompt`
 
 ---
 
@@ -318,7 +318,7 @@ Use the Lexical prompt editor from 055-lexical-prompt-editor.
 - [ ] AC-6.2: Each image shows editable displayName
 - [ ] AC-6.3: displayName validation (no `}`, `:`, `{` characters)
 - [ ] AC-6.4: Duplicate displayName shows error
-- [ ] AC-6.5: Images saved to `create.imageGeneration.refMedia`
+- [ ] AC-6.5: Images saved to `outcome.imageGeneration.refMedia`
 
 ---
 
@@ -340,7 +340,7 @@ Use the Lexical prompt editor from 055-lexical-prompt-editor.
 
 - [ ] AC-7.1: Dropdown shows all available models
 - [ ] AC-7.2: Default selection: `gemini-2.5-flash-image`
-- [ ] AC-7.3: Selection saved to `create.imageGeneration.model`
+- [ ] AC-7.3: Selection saved to `outcome.imageGeneration.model`
 
 ---
 
@@ -365,7 +365,7 @@ Use the Lexical prompt editor from 055-lexical-prompt-editor.
 
 - [ ] AC-8.1: All aspect ratios shown
 - [ ] AC-8.2: Default selection: `1:1`
-- [ ] AC-8.3: Selection saved to `create.imageGeneration.aspectRatio`
+- [ ] AC-8.3: Selection saved to `outcome.imageGeneration.aspectRatio`
 
 ---
 
@@ -423,7 +423,7 @@ Ensure no transformNodes UI is accessible.
 | Experience editor tab navigation | MODIFY | **Done** (PR #131) |
 | `PromptComposer` | REFACTOR | Decouple from node-based model |
 | `ControlRow` | REFACTOR | Accept options via props |
-| `useRefMediaUpload` | REFACTOR | Work with `create.imageGeneration` |
+| `useRefMediaUpload` | REFACTOR | Work with `outcome.imageGeneration` |
 | `LexicalPromptInput` | REUSE | No changes needed |
 | `ReferenceMediaStrip` / `ReferenceMediaItem` | REUSE | No changes needed |
 | `lexical/*` (mention system) | REUSE | No changes needed |

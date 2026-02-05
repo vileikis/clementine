@@ -1,4 +1,4 @@
-# PRD 1B: Experience Create Config
+# PRD 1B: Experience Outcome Config
 
 **Epic**: [Outcome-based Create](./epic.md)
 **Status**: ✅ Complete
@@ -9,18 +9,18 @@
 
 ## Overview
 
-Add `create` field to experience config schema and implement publish-time validation. This PRD covers the data model changes only - the admin UI is covered in PRD 2.
+Add `outcome` field to experience config schema and implement publish-time validation. This PRD covers the data model changes only - the admin UI is covered in PRD 2.
 
 ---
 
 ## 1. Experience Config Schema Update
 
-Add `create` field to experience config, deprecate `transformNodes`.
+Add `outcome` field to experience config, deprecate `transformNodes`.
 
 **File**: `packages/shared/src/schemas/experience/experience.schema.ts`
 
 ```ts
-import { createOutcomeSchema } from './create-outcome.schema'
+import { outcomeSchema } from './outcome.schema'
 
 /**
  * Experience Config Schema
@@ -29,36 +29,25 @@ export const experienceConfigSchema = z.looseObject({
   /** Array of steps in the experience */
   steps: z.array(experienceStepSchema).default([]),
 
-  /** @deprecated Use create instead. Kept for backward compatibility. */
+  /** @deprecated Use outcome instead. Kept for backward compatibility. */
   transformNodes: z.array(transformNodeSchema).default([]),
 
-  /** Create outcome configuration (replaces transformNodes) */
-  create: createOutcomeSchema.default({
-    type: null,
-    captureStepId: null,
-    aiEnabled: true,
-    imageGeneration: {
-      prompt: '',
-      refMedia: [],
-      model: 'gemini-2.5-flash-image',
-      aspectRatio: '1:1',
-    },
-    options: null,
-  }),
+  /** Outcome configuration (replaces transformNodes). Null means not configured. */
+  outcome: outcomeSchema.nullable().default(null),
 })
 ```
 
 ### Acceptance Criteria
 
-- [ ] AC-1.1: `experienceConfigSchema` includes `create` field
+- [ ] AC-1.1: `experienceConfigSchema` includes `outcome` field
 - [ ] AC-1.2: `transformNodes` field still exists (backward compatible)
-- [ ] AC-1.3: Default `create` has sensible defaults with `type: null`
+- [ ] AC-1.3: Default `outcome` is `null` (forces admin to configure)
 
 ---
 
 ## 2. Publish-Time Validation
 
-Validate create outcome configuration at publish time.
+Validate outcome configuration at publish time.
 
 **Location**: Experience publish logic (likely in `apps/clementine-app/src/domains/experience/...`)
 
@@ -71,28 +60,28 @@ interface ValidationResult {
 }
 
 /**
- * Validate experience create outcome before publishing
+ * Validate experience outcome before publishing
  */
-function validateCreateOutcome(
-  create: CreateOutcome,
+function validateOutcome(
+  outcome: Outcome | null,
   steps: ExperienceStep[]
 ): ValidationResult {
   const errors: string[] = []
 
-  // Rule 1: type must be set
-  if (create.type === null) {
+  // Rule 1: outcome must exist and type must be set
+  if (!outcome || outcome.type === null) {
     errors.push('Select an outcome type (Image, GIF, or Video)')
     return { valid: false, errors }
   }
 
   // Rule 2: Passthrough requires captureStepId
-  if (!create.aiEnabled && !create.captureStepId) {
+  if (!outcome.aiEnabled && !outcome.captureStepId) {
     errors.push('Passthrough mode requires a source image. Enable AI or select a source step.')
   }
 
   // Rule 3: captureStepId validation (if set)
-  if (create.captureStepId) {
-    const sourceStep = steps.find(s => s.id === create.captureStepId)
+  if (outcome.captureStepId) {
+    const sourceStep = steps.find(s => s.id === outcome.captureStepId)
     if (!sourceStep) {
       errors.push('Selected source step no longer exists')
     } else if (!sourceStep.type.startsWith('capture.')) {
@@ -101,14 +90,14 @@ function validateCreateOutcome(
   }
 
   // Rule 4: AI enabled validation
-  if (create.aiEnabled) {
+  if (outcome.aiEnabled) {
     // Prompt required when AI is enabled
-    if (!create.imageGeneration.prompt.trim()) {
+    if (!outcome.imageGeneration.prompt.trim()) {
       errors.push('Prompt is required when AI is enabled')
     }
 
     // refMedia displayName uniqueness
-    const displayNames = create.imageGeneration.refMedia.map(m => m.displayName)
+    const displayNames = outcome.imageGeneration.refMedia.map(m => m.displayName)
     const duplicates = displayNames.filter((name, i) => displayNames.indexOf(name) !== i)
     if (duplicates.length > 0) {
       errors.push(`Duplicate reference media names: ${[...new Set(duplicates)].join(', ')}`)
@@ -116,12 +105,12 @@ function validateCreateOutcome(
   }
 
   // Rule 5: gif/video not yet implemented
-  if (create.type === 'gif' || create.type === 'video') {
-    errors.push(`${create.type.toUpperCase()} outcome is coming soon`)
+  if (outcome.type === 'gif' || outcome.type === 'video') {
+    errors.push(`${outcome.type.toUpperCase()} outcome is coming soon`)
   }
 
   // Rule 6: options.kind must match type
-  if (create.options && create.options.kind !== create.type) {
+  if (outcome.options && outcome.options.kind !== outcome.type) {
     errors.push('Options kind must match outcome type')
   }
 
@@ -131,7 +120,7 @@ function validateCreateOutcome(
 
 ### Acceptance Criteria
 
-- [ ] AC-2.1: Publish fails if `create.type` is null
+- [ ] AC-2.1: Publish fails if `outcome` is null or `outcome.type` is null
 - [ ] AC-2.2: Publish fails if passthrough mode without captureStepId
 - [ ] AC-2.3: Publish fails if `captureStepId` references non-existent step
 - [ ] AC-2.4: Publish fails if `captureStepId` references non-capture step
@@ -149,23 +138,23 @@ Update publish logic to handle transformNodes deprecation.
 ### Rules
 
 1. On publish, always set `published.transformNodes = []`
-2. Copy `draft.create` to `published.create`
-3. Existing experiences without `create` configured fail validation
+2. Copy `draft.outcome` to `published.outcome`
+3. Existing experiences without `outcome` configured fail validation
 
 ```ts
 // In publish handler
 const publishedConfig: ExperienceConfig = {
   steps: draft.steps,
   transformNodes: [], // Always empty
-  create: draft.create,
+  outcome: draft.outcome,
 }
 ```
 
 ### Acceptance Criteria
 
 - [ ] AC-3.1: `published.transformNodes` is always `[]` after publish
-- [ ] AC-3.2: `published.create` reflects `draft.create` at publish time
-- [ ] AC-3.3: Experiences without `create.type` set cannot be published
+- [ ] AC-3.2: `published.outcome` reflects `draft.outcome` at publish time
+- [ ] AC-3.3: Experiences without `outcome.type` set cannot be published
 
 ---
 
@@ -173,12 +162,12 @@ const publishedConfig: ExperienceConfig = {
 
 New experiences should have sensible defaults.
 
-### Default Create Config
+### Default Outcome Config
 
-When creating a new experience:
+When creating a new experience, outcome starts as `null`. When configured:
 
 ```ts
-const defaultCreate: CreateOutcome = {
+const defaultOutcome: Outcome = {
   type: null,           // Must be configured before publish
   captureStepId: null,
   aiEnabled: true,
@@ -194,9 +183,9 @@ const defaultCreate: CreateOutcome = {
 
 ### Acceptance Criteria
 
-- [ ] AC-4.1: New experiences have `create` with defaults
-- [ ] AC-4.2: `create.type` is null (forces admin to make explicit choice)
-- [ ] AC-4.3: `create.aiEnabled` defaults to true
+- [ ] AC-4.1: New experiences have `outcome` (null or with defaults)
+- [ ] AC-4.2: `outcome.type` is null (forces admin to make explicit choice)
+- [ ] AC-4.3: `outcome.aiEnabled` defaults to true
 
 ---
 
@@ -207,8 +196,8 @@ When admin switches outcome type, preserve imageGeneration config.
 ### Implementation
 
 ```ts
-function handleOutcomeTypeChange(newType: CreateOutcomeType) {
-  setCreate(prev => ({
+function handleOutcomeTypeChange(newType: OutcomeType) {
+  setOutcome(prev => ({
     ...prev,
     type: newType,
     // imageGeneration preserved (prompt, refMedia, model, aspectRatio)
@@ -217,7 +206,7 @@ function handleOutcomeTypeChange(newType: CreateOutcomeType) {
   }))
 }
 
-function getDefaultOptionsForType(type: CreateOutcomeType): OutcomeOptions {
+function getDefaultOptionsForType(type: OutcomeType): OutcomeOptions {
   switch (type) {
     case 'image':
       return { kind: 'image' }
@@ -249,9 +238,9 @@ function getDefaultOptionsForType(type: CreateOutcomeType): OutcomeOptions {
 
 ## Testing
 
-- [ ] Unit tests for `validateCreateOutcome()` function
+- [ ] Unit tests for `validateOutcome()` function
 - [ ] Unit tests for outcome switching preserves imageGeneration
-- [ ] Integration test: publish with valid create config succeeds
-- [ ] Integration test: publish without create.type fails
+- [ ] Integration test: publish with valid outcome config succeeds
+- [ ] Integration test: publish without outcome.type fails
 - [ ] Integration test: publish with passthrough + no source fails
 - [ ] Integration test: publish with AI + empty prompt fails

@@ -1,20 +1,15 @@
 /**
- * Create Outcome Validation Tests
+ * Outcome Validation Tests
  *
- * Unit tests for validateCreateOutcome function.
+ * Unit tests for validateOutcome function.
  * Tests all validation rules V1-V8 as specified in data-model.md.
  */
 import { describe, expect, it } from 'vitest'
-import {
-  isCaptureStep,
-  validateCreateOutcome,
-} from './create-outcome-validation'
-import type { CreateOutcome, ExperienceStep } from '@clementine/shared'
+import { isCaptureStep, validateOutcome } from './outcome-validation'
+import type { ExperienceStep, Outcome } from '@clementine/shared'
 
 // Test helpers
-function createDefaultCreateOutcome(
-  overrides: Partial<CreateOutcome> = {},
-): CreateOutcome {
+function createDefaultOutcome(overrides: Partial<Outcome> = {}): Outcome {
   return {
     type: 'image',
     captureStepId: null,
@@ -69,10 +64,10 @@ describe('isCaptureStep', () => {
   })
 })
 
-describe('validateCreateOutcome', () => {
-  describe('Null create (no outcome configured)', () => {
-    it('passes when create is null - no outcome generation is valid', () => {
-      const result = validateCreateOutcome(null, [])
+describe('validateOutcome', () => {
+  describe('Null outcome (no outcome configured)', () => {
+    it('passes when outcome is null - no outcome generation is valid', () => {
+      const result = validateOutcome(null, [])
 
       expect(result.valid).toBe(true)
       expect(result.errors).toHaveLength(0)
@@ -81,20 +76,20 @@ describe('validateCreateOutcome', () => {
 
   describe('V1: Type must be selected', () => {
     it('fails when type is null', () => {
-      const create = createDefaultCreateOutcome({ type: null })
-      const result = validateCreateOutcome(create, [])
+      const outcome = createDefaultOutcome({ type: null })
+      const result = validateOutcome(outcome, [])
 
       expect(result.valid).toBe(false)
       expect(result.errors).toHaveLength(1)
       expect(result.errors[0]).toEqual({
-        field: 'create.type',
+        field: 'outcome.type',
         message: 'Select an outcome type (Image, GIF, or Video)',
       })
     })
 
     it('passes when type is image', () => {
-      const create = createDefaultCreateOutcome({ type: 'image' })
-      const result = validateCreateOutcome(create, [])
+      const outcome = createDefaultOutcome({ type: 'image' })
+      const result = validateOutcome(outcome, [])
 
       expect(result.valid).toBe(true)
       expect(result.errors).toHaveLength(0)
@@ -103,15 +98,15 @@ describe('validateCreateOutcome', () => {
 
   describe('V2: Passthrough mode requires source', () => {
     it('fails when aiEnabled is false and no captureStepId', () => {
-      const create = createDefaultCreateOutcome({
+      const outcome = createDefaultOutcome({
         aiEnabled: false,
         captureStepId: null,
       })
-      const result = validateCreateOutcome(create, [])
+      const result = validateOutcome(outcome, [])
 
       expect(result.valid).toBe(false)
       expect(result.errors).toContainEqual({
-        field: 'create.captureStepId',
+        field: 'outcome.captureStepId',
         message:
           'Passthrough mode requires a source image. Select a capture step or enable AI generation.',
       })
@@ -119,7 +114,7 @@ describe('validateCreateOutcome', () => {
 
     it('passes when aiEnabled is false but captureStepId is set', () => {
       const steps = [createCaptureStep('step-1')]
-      const create = createDefaultCreateOutcome({
+      const outcome = createDefaultOutcome({
         aiEnabled: false,
         captureStepId: 'step-1',
         imageGeneration: {
@@ -129,17 +124,17 @@ describe('validateCreateOutcome', () => {
           aspectRatio: '1:1',
         },
       })
-      const result = validateCreateOutcome(create, steps)
+      const result = validateOutcome(outcome, steps)
 
       expect(result.valid).toBe(true)
     })
 
     it('passes when aiEnabled is true even without captureStepId', () => {
-      const create = createDefaultCreateOutcome({
+      const outcome = createDefaultOutcome({
         aiEnabled: true,
         captureStepId: null,
       })
-      const result = validateCreateOutcome(create, [])
+      const result = validateOutcome(outcome, [])
 
       expect(result.valid).toBe(true)
     })
@@ -147,14 +142,14 @@ describe('validateCreateOutcome', () => {
 
   describe('V3: CaptureStepId must reference existing step', () => {
     it('fails when captureStepId references non-existent step', () => {
-      const create = createDefaultCreateOutcome({
+      const outcome = createDefaultOutcome({
         captureStepId: 'non-existent-step',
       })
-      const result = validateCreateOutcome(create, [])
+      const result = validateOutcome(outcome, [])
 
       expect(result.valid).toBe(false)
       expect(result.errors).toContainEqual({
-        field: 'create.captureStepId',
+        field: 'outcome.captureStepId',
         message: 'Selected source step no longer exists',
         stepId: 'non-existent-step',
       })
@@ -162,8 +157,8 @@ describe('validateCreateOutcome', () => {
 
     it('passes when captureStepId references existing capture step', () => {
       const steps = [createCaptureStep('step-1')]
-      const create = createDefaultCreateOutcome({ captureStepId: 'step-1' })
-      const result = validateCreateOutcome(create, steps)
+      const outcome = createDefaultOutcome({ captureStepId: 'step-1' })
+      const result = validateOutcome(outcome, steps)
 
       expect(result.valid).toBe(true)
     })
@@ -172,12 +167,12 @@ describe('validateCreateOutcome', () => {
   describe('V4: CaptureStepId must reference capture-type step', () => {
     it('fails when captureStepId references non-capture step', () => {
       const steps = [createInfoStep('step-1')]
-      const create = createDefaultCreateOutcome({ captureStepId: 'step-1' })
-      const result = validateCreateOutcome(create, steps)
+      const outcome = createDefaultOutcome({ captureStepId: 'step-1' })
+      const result = validateOutcome(outcome, steps)
 
       expect(result.valid).toBe(false)
       expect(result.errors).toContainEqual({
-        field: 'create.captureStepId',
+        field: 'outcome.captureStepId',
         message: 'Source step must be a capture step',
         stepId: 'step-1',
       })
@@ -186,7 +181,7 @@ describe('validateCreateOutcome', () => {
 
   describe('V5: AI enabled requires prompt', () => {
     it('fails when aiEnabled is true and prompt is empty', () => {
-      const create = createDefaultCreateOutcome({
+      const outcome = createDefaultOutcome({
         aiEnabled: true,
         imageGeneration: {
           prompt: '',
@@ -195,17 +190,17 @@ describe('validateCreateOutcome', () => {
           aspectRatio: '1:1',
         },
       })
-      const result = validateCreateOutcome(create, [])
+      const result = validateOutcome(outcome, [])
 
       expect(result.valid).toBe(false)
       expect(result.errors).toContainEqual({
-        field: 'create.imageGeneration.prompt',
+        field: 'outcome.imageGeneration.prompt',
         message: 'Prompt is required when AI is enabled',
       })
     })
 
     it('fails when aiEnabled is true and prompt is whitespace', () => {
-      const create = createDefaultCreateOutcome({
+      const outcome = createDefaultOutcome({
         aiEnabled: true,
         imageGeneration: {
           prompt: '   ',
@@ -214,18 +209,18 @@ describe('validateCreateOutcome', () => {
           aspectRatio: '1:1',
         },
       })
-      const result = validateCreateOutcome(create, [])
+      const result = validateOutcome(outcome, [])
 
       expect(result.valid).toBe(false)
       expect(result.errors).toContainEqual({
-        field: 'create.imageGeneration.prompt',
+        field: 'outcome.imageGeneration.prompt',
         message: 'Prompt is required when AI is enabled',
       })
     })
 
     it('passes when aiEnabled is false even without prompt', () => {
       const steps = [createCaptureStep('step-1')]
-      const create = createDefaultCreateOutcome({
+      const outcome = createDefaultOutcome({
         aiEnabled: false,
         captureStepId: 'step-1',
         imageGeneration: {
@@ -235,13 +230,13 @@ describe('validateCreateOutcome', () => {
           aspectRatio: '1:1',
         },
       })
-      const result = validateCreateOutcome(create, steps)
+      const result = validateOutcome(outcome, steps)
 
       expect(result.valid).toBe(true)
     })
 
     it('passes when aiEnabled is true and prompt is non-empty', () => {
-      const create = createDefaultCreateOutcome({
+      const outcome = createDefaultOutcome({
         aiEnabled: true,
         imageGeneration: {
           prompt: 'Transform this photo',
@@ -250,7 +245,7 @@ describe('validateCreateOutcome', () => {
           aspectRatio: '1:1',
         },
       })
-      const result = validateCreateOutcome(create, [])
+      const result = validateOutcome(outcome, [])
 
       expect(result.valid).toBe(true)
     })
@@ -258,7 +253,7 @@ describe('validateCreateOutcome', () => {
 
   describe('V6: RefMedia displayNames must be unique', () => {
     it('fails when duplicate displayNames exist', () => {
-      const create = createDefaultCreateOutcome({
+      const outcome = createDefaultOutcome({
         imageGeneration: {
           prompt: 'Test',
           refMedia: [
@@ -279,17 +274,17 @@ describe('validateCreateOutcome', () => {
           aspectRatio: '1:1',
         },
       })
-      const result = validateCreateOutcome(create, [])
+      const result = validateOutcome(outcome, [])
 
       expect(result.valid).toBe(false)
       expect(result.errors).toContainEqual({
-        field: 'create.imageGeneration.refMedia',
+        field: 'outcome.imageGeneration.refMedia',
         message: 'Duplicate reference media names: style',
       })
     })
 
     it('lists all duplicate names in error message', () => {
-      const create = createDefaultCreateOutcome({
+      const outcome = createDefaultOutcome({
         imageGeneration: {
           prompt: 'Test',
           refMedia: [
@@ -322,18 +317,18 @@ describe('validateCreateOutcome', () => {
           aspectRatio: '1:1',
         },
       })
-      const result = validateCreateOutcome(create, [])
+      const result = validateOutcome(outcome, [])
 
       expect(result.valid).toBe(false)
       const refMediaError = result.errors.find(
-        (e) => e.field === 'create.imageGeneration.refMedia',
+        (e) => e.field === 'outcome.imageGeneration.refMedia',
       )
       expect(refMediaError?.message).toContain('style')
       expect(refMediaError?.message).toContain('background')
     })
 
     it('passes with unique displayNames', () => {
-      const create = createDefaultCreateOutcome({
+      const outcome = createDefaultOutcome({
         imageGeneration: {
           prompt: 'Test',
           refMedia: [
@@ -354,7 +349,7 @@ describe('validateCreateOutcome', () => {
           aspectRatio: '1:1',
         },
       })
-      const result = validateCreateOutcome(create, [])
+      const result = validateOutcome(outcome, [])
 
       expect(result.valid).toBe(true)
     })
@@ -362,30 +357,30 @@ describe('validateCreateOutcome', () => {
 
   describe('V7: GIF/Video types are coming soon', () => {
     it('fails when type is gif', () => {
-      const create = createDefaultCreateOutcome({ type: 'gif' })
-      const result = validateCreateOutcome(create, [])
+      const outcome = createDefaultOutcome({ type: 'gif' })
+      const result = validateOutcome(outcome, [])
 
       expect(result.valid).toBe(false)
       expect(result.errors).toContainEqual({
-        field: 'create.type',
+        field: 'outcome.type',
         message: 'GIF outcome is coming soon',
       })
     })
 
     it('fails when type is video', () => {
-      const create = createDefaultCreateOutcome({ type: 'video' })
-      const result = validateCreateOutcome(create, [])
+      const outcome = createDefaultOutcome({ type: 'video' })
+      const result = validateOutcome(outcome, [])
 
       expect(result.valid).toBe(false)
       expect(result.errors).toContainEqual({
-        field: 'create.type',
+        field: 'outcome.type',
         message: 'VIDEO outcome is coming soon',
       })
     })
 
     it('passes when type is image', () => {
-      const create = createDefaultCreateOutcome({ type: 'image' })
-      const result = validateCreateOutcome(create, [])
+      const outcome = createDefaultOutcome({ type: 'image' })
+      const result = validateOutcome(outcome, [])
 
       expect(result.valid).toBe(true)
     })
@@ -393,35 +388,35 @@ describe('validateCreateOutcome', () => {
 
   describe('V8: Options kind must match outcome type', () => {
     it('fails when options.kind does not match type', () => {
-      const create = createDefaultCreateOutcome({
+      const outcome = createDefaultOutcome({
         type: 'image',
         options: { kind: 'gif', fps: 24, duration: 3 },
       })
-      const result = validateCreateOutcome(create, [])
+      const result = validateOutcome(outcome, [])
 
       expect(result.valid).toBe(false)
       expect(result.errors).toContainEqual({
-        field: 'create.options',
+        field: 'outcome.options',
         message: 'Options kind must match outcome type',
       })
     })
 
     it('passes when options.kind matches type', () => {
-      const create = createDefaultCreateOutcome({
+      const outcome = createDefaultOutcome({
         type: 'image',
         options: { kind: 'image' },
       })
-      const result = validateCreateOutcome(create, [])
+      const result = validateOutcome(outcome, [])
 
       expect(result.valid).toBe(true)
     })
 
     it('passes when options is null', () => {
-      const create = createDefaultCreateOutcome({
+      const outcome = createDefaultOutcome({
         type: 'image',
         options: null,
       })
-      const result = validateCreateOutcome(create, [])
+      const result = validateOutcome(outcome, [])
 
       expect(result.valid).toBe(true)
     })
@@ -429,7 +424,7 @@ describe('validateCreateOutcome', () => {
 
   describe('Multiple errors', () => {
     it('returns all errors when multiple validations fail', () => {
-      const create = createDefaultCreateOutcome({
+      const outcome = createDefaultOutcome({
         type: 'gif', // V7 fail
         captureStepId: 'non-existent', // V3 fail
         aiEnabled: true,
@@ -454,7 +449,7 @@ describe('validateCreateOutcome', () => {
         },
         options: { kind: 'image' }, // V8 fail
       })
-      const result = validateCreateOutcome(create, [])
+      const result = validateOutcome(outcome, [])
 
       expect(result.valid).toBe(false)
       expect(result.errors.length).toBeGreaterThanOrEqual(5)
@@ -463,7 +458,7 @@ describe('validateCreateOutcome', () => {
 
   describe('Valid configuration', () => {
     it('passes with minimal valid image configuration', () => {
-      const create = createDefaultCreateOutcome({
+      const outcome = createDefaultOutcome({
         type: 'image',
         aiEnabled: true,
         imageGeneration: {
@@ -473,7 +468,7 @@ describe('validateCreateOutcome', () => {
           aspectRatio: '1:1',
         },
       })
-      const result = validateCreateOutcome(create, [])
+      const result = validateOutcome(outcome, [])
 
       expect(result.valid).toBe(true)
       expect(result.errors).toHaveLength(0)
@@ -481,7 +476,7 @@ describe('validateCreateOutcome', () => {
 
     it('passes with full valid image configuration', () => {
       const steps = [createCaptureStep('step-1')]
-      const create = createDefaultCreateOutcome({
+      const outcome = createDefaultOutcome({
         type: 'image',
         captureStepId: 'step-1',
         aiEnabled: true,
@@ -500,7 +495,7 @@ describe('validateCreateOutcome', () => {
         },
         options: { kind: 'image' },
       })
-      const result = validateCreateOutcome(create, steps)
+      const result = validateOutcome(outcome, steps)
 
       expect(result.valid).toBe(true)
       expect(result.errors).toHaveLength(0)
@@ -508,7 +503,7 @@ describe('validateCreateOutcome', () => {
 
     it('passes with valid passthrough configuration', () => {
       const steps = [createCaptureStep('step-1')]
-      const create = createDefaultCreateOutcome({
+      const outcome = createDefaultOutcome({
         type: 'image',
         captureStepId: 'step-1',
         aiEnabled: false,
@@ -520,7 +515,7 @@ describe('validateCreateOutcome', () => {
         },
         options: { kind: 'image' },
       })
-      const result = validateCreateOutcome(create, steps)
+      const result = validateOutcome(outcome, steps)
 
       expect(result.valid).toBe(true)
       expect(result.errors).toHaveLength(0)

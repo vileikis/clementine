@@ -9,8 +9,9 @@
  * - Visual pills for mentions (blue for steps, green for media)
  * - Serialization to @{step:name} and @{ref:name} format
  */
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 import { LexicalComposer } from '@lexical/react/LexicalComposer'
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { PlainTextPlugin } from '@lexical/react/LexicalPlainTextPlugin'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
@@ -27,6 +28,19 @@ import {
 } from '../../lexical'
 import type { MediaOption, StepOption } from '../../lexical'
 import type { EditorState } from 'lexical'
+
+/**
+ * Plugin to sync editable state with disabled prop
+ */
+function EditablePlugin({ disabled }: { disabled?: boolean }) {
+  const [editor] = useLexicalComposerContext()
+
+  useEffect(() => {
+    editor.setEditable(!disabled)
+  }, [editor, disabled])
+
+  return null
+}
 
 export interface LexicalPromptInputProps {
   /** Current prompt value (serialized format) */
@@ -88,6 +102,7 @@ export function LexicalPromptInput({
         />
         <HistoryPlugin />
         <OnChangePlugin onChange={handleChange} ignoreSelectionChange />
+        <EditablePlugin disabled={disabled} />
         <MentionsPlugin steps={steps} media={media} />
         <InitializePlugin value={value} steps={steps} media={media} />
         <MentionValidationPlugin steps={steps} media={media} />

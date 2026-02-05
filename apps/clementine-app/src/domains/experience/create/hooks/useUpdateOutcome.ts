@@ -1,8 +1,8 @@
 /**
- * useUpdateTransformNodes Hook
+ * useUpdateOutcome Hook
  *
- * Mutation hook for updating the transform nodes in experience draft.
- * Updates draft.transformNodes field with transaction, draftVersion increment, and cache invalidation.
+ * Mutation hook for updating the outcome configuration in experience draft.
+ * Updates draft.outcome field with transaction, draftVersion increment, and cache invalidation.
  * Uses tracked mutation for save status tracking.
  */
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -11,22 +11,22 @@ import * as Sentry from '@sentry/tanstackstart-react'
 import { experienceKeys } from '../../shared/queries/experience.query'
 import { updateExperienceConfigField } from '../../shared/lib'
 import { useExperienceDesignerStore } from '../../designer/stores'
-import type { TransformNode } from '@clementine/shared'
+import type { Outcome } from '@clementine/shared'
 import { useTrackedMutation } from '@/shared/editor-status/hooks/useTrackedMutation'
 
 /**
- * Input for updating transform nodes
+ * Input for updating outcome
  */
-export interface UpdateTransformNodesInput {
-  /** Updated transform nodes array */
-  transformNodes: TransformNode[]
+export interface UpdateOutcomeInput {
+  /** Updated outcome configuration */
+  outcome: Outcome
 }
 
 /**
- * Hook for updating experience transform nodes
+ * Hook for updating experience outcome configuration
  *
  * Features:
- * - Updates draft.transformNodes field with serverTimestamp() for updatedAt
+ * - Updates draft.outcome field with serverTimestamp() for updatedAt
  * - Atomically increments draftVersion for optimistic locking
  * - Invalidates experience detail cache on success
  * - Captures errors to Sentry with domain tags
@@ -37,27 +37,24 @@ export interface UpdateTransformNodesInput {
  *
  * @example
  * ```tsx
- * function TransformPipelineEditor({ experience, workspaceId }) {
- *   const updateTransformNodes = useUpdateTransformNodes(workspaceId, experience.id)
+ * function CreateTabForm({ experience, workspaceId }) {
+ *   const updateOutcome = useUpdateOutcome(workspaceId, experience.id)
  *
- *   const handleAddNode = () => {
- *     const newNodes = addNode(experience.draft.transformNodes)
- *     updateTransformNodes.mutate({ transformNodes: newNodes })
+ *   const handlePromptChange = (prompt: string) => {
+ *     const newOutcome = updateOutcomePrompt(experience.draft.outcome, prompt)
+ *     updateOutcome.mutate({ outcome: newOutcome })
  *   }
  * }
  * ```
  */
-export function useUpdateTransformNodes(
-  workspaceId: string,
-  experienceId: string,
-) {
+export function useUpdateOutcome(workspaceId: string, experienceId: string) {
   const queryClient = useQueryClient()
   const store = useExperienceDesignerStore()
 
-  const mutation = useMutation<void, Error, UpdateTransformNodesInput>({
-    mutationFn: async ({ transformNodes }) => {
+  const mutation = useMutation<void, Error, UpdateOutcomeInput>({
+    mutationFn: async ({ outcome }) => {
       await updateExperienceConfigField(workspaceId, experienceId, {
-        transformNodes,
+        outcome,
       })
     },
     onSuccess: () => {
@@ -70,7 +67,7 @@ export function useUpdateTransformNodes(
       Sentry.captureException(error, {
         tags: {
           domain: 'experience/create',
-          action: 'update-transform-nodes',
+          action: 'update-outcome',
         },
       })
     },
@@ -79,8 +76,3 @@ export function useUpdateTransformNodes(
   // Wrap with tracked mutation for save status tracking
   return useTrackedMutation(mutation, store)
 }
-
-/**
- * @deprecated Use useUpdateTransformNodes instead
- */
-export const useUpdateTransformConfig = useUpdateTransformNodes

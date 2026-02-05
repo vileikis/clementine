@@ -1,0 +1,78 @@
+/**
+ * OutcomeTypeSelector Component
+ *
+ * Toggle group for switching outcome type (Image, GIF, Video) within the editor.
+ * GIF and Video are disabled with "coming soon" labels.
+ * Does NOT allow deselection - use RemoveOutcomeAction to clear outcome.
+ *
+ * @see spec.md - US1 (Select Outcome Type)
+ */
+import { Film, Image as ImageIcon, Video } from 'lucide-react'
+
+import type { OutcomeType } from '@clementine/shared'
+import { ToggleGroup, ToggleGroupItem } from '@/ui-kit/ui/toggle-group'
+
+export interface OutcomeTypeSelectorProps {
+  /** Currently selected outcome type */
+  value: OutcomeType
+  /** Callback when outcome type changes */
+  onChange: (value: OutcomeType) => void
+  /** Whether the selector is disabled */
+  disabled?: boolean
+}
+
+/**
+ * OutcomeTypeSelector - Toggle group for switching outcome type
+ */
+export function OutcomeTypeSelector({
+  value,
+  onChange,
+  disabled,
+}: OutcomeTypeSelectorProps) {
+  return (
+    <div className="space-y-2">
+      <label className="text-sm font-medium">Outcome Type</label>
+      <ToggleGroup
+        type="single"
+        value={value}
+        onValueChange={(val) => {
+          // Only change if a new value is selected (prevent deselection)
+          if (val) {
+            onChange(val as OutcomeType)
+          }
+        }}
+        disabled={disabled}
+        variant="outline"
+      >
+        <ToggleGroupItem
+          value="image"
+          className="min-h-11 min-w-11 gap-2 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+          aria-label="Image output"
+        >
+          <ImageIcon className="h-4 w-4" />
+          Image
+        </ToggleGroupItem>
+        <ToggleGroupItem
+          value="gif"
+          disabled
+          className="min-h-11 min-w-11 gap-2 opacity-50"
+          aria-label="GIF output (coming soon)"
+        >
+          <Film className="h-4 w-4" />
+          GIF
+          <span className="text-muted-foreground text-xs">(soon)</span>
+        </ToggleGroupItem>
+        <ToggleGroupItem
+          value="video"
+          disabled
+          className="min-h-11 min-w-11 gap-2 opacity-50"
+          aria-label="Video output (coming soon)"
+        >
+          <Video className="h-4 w-4" />
+          Video
+          <span className="text-muted-foreground text-xs">(soon)</span>
+        </ToggleGroupItem>
+      </ToggleGroup>
+    </div>
+  )
+}

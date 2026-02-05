@@ -12,7 +12,7 @@ import * as Sentry from '@sentry/tanstackstart-react'
 import { doc, runTransaction, serverTimestamp } from 'firebase/firestore'
 
 import { experienceKeys } from '../../shared/queries/experience.query'
-import { validateCreateOutcome } from '../../shared/lib/create-outcome-validation'
+import { validateOutcome } from '../../shared/lib/outcome-validation'
 import { stepRegistry } from '../../steps/registry/step-registry'
 import { getStepTypesForProfile } from '../../steps/registry/step-utils'
 import type { UpdateData } from 'firebase/firestore'
@@ -123,13 +123,13 @@ export function validateForPublish(
     }
   }
 
-  // Rule 4: Create outcome validation
-  const createValidation = validateCreateOutcome(
-    experience.draft.create,
+  // Rule 4: Outcome validation
+  const outcomeValidation = validateOutcome(
+    experience.draft.outcome,
     experience.draft.steps,
   )
-  if (!createValidation.valid) {
-    errors.push(...createValidation.errors)
+  if (!outcomeValidation.valid) {
+    errors.push(...outcomeValidation.errors)
   }
 
   return {
