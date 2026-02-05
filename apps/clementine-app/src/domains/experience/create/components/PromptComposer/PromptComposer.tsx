@@ -153,6 +153,7 @@ export function PromptComposer({
       className={cn(
         'flex flex-col overflow-hidden rounded-lg border transition-colors',
         isDragOver && 'border-primary bg-primary/5',
+        disabled && 'pointer-events-none opacity-50',
       )}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}

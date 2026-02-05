@@ -212,8 +212,8 @@ export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
         />
       )}
 
-      {/* AI Generation Configuration - only show when Image is selected AND AI is enabled */}
-      {currentOutcome.type === 'image' && currentOutcome.aiEnabled && (
+      {/* AI Generation Configuration - only show when Image is selected, disabled when AI is off */}
+      {currentOutcome.type === 'image' && (
         <PromptComposer
           prompt={localPrompt}
           onPromptChange={setLocalPrompt}
@@ -228,6 +228,7 @@ export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
           canAddMore={canAddMore}
           isUploading={isUploading}
           steps={mentionableSteps}
+          disabled={!currentOutcome.aiEnabled}
         />
       )}
     </div>
