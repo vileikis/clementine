@@ -17,7 +17,7 @@ This package contains Firebase Cloud Functions (v2) for:
 The transform pipeline handles AI-powered image transformations using Google's Gemini.
 
 **Flow:**
-1. `startTransformPipeline` - HTTP endpoint creates a job and queues processing
+1. `startTransformPipelineV2` - Callable function creates a job and queues processing
 2. `transformPipelineJob` - Cloud Task processes the job asynchronously
 3. AI service transforms images via Gemini provider
 4. Results stored in Firebase Storage, job status updated in Firestore
@@ -42,12 +42,10 @@ Transforms uploaded photos into final outputs (images, GIFs, or videos) using FF
 ```
 functions/
 ├── src/
-│   ├── http/
-│   │   ├── startTransformPipeline.ts  # Transform pipeline HTTP trigger
-│   │   └── processMedia.ts            # Legacy media processing trigger
+│   ├── callable/
+│   │   └── startTransformPipeline.ts  # Transform pipeline callable function
 │   ├── tasks/
-│   │   ├── transformPipelineJob.ts    # Transform pipeline task handler
-│   │   └── processMediaJob.ts         # Legacy media processing task
+│   │   └── transformPipelineJob.ts    # Transform pipeline task handler
 │   ├── services/
 │   │   ├── ai/
 │   │   │   ├── ai-transform.service.ts # AI transformation orchestration
@@ -84,10 +82,8 @@ functions/
 | Function | Type | Description |
 |----------|------|-------------|
 | `helloWorld` | HTTP | Health check endpoint |
-| `startTransformPipeline` | HTTP | Triggers AI transform pipeline |
+| `startTransformPipelineV2` | Callable | Triggers AI transform pipeline |
 | `transformPipelineJob` | Task | Processes AI transform jobs |
-| `processMedia` | HTTP | Legacy media processing trigger |
-| `processMediaJob` | Task | Legacy media processing handler |
 
 ## Setup
 
@@ -131,7 +127,44 @@ pnpm functions:test
 cd functions && pnpm test:watch
 ```
 
-See `MANUAL-TESTING.md` for manual test cases and curl commands.
+### Testing Callable Functions Locally
+
+#### Option 1: Firebase Functions Shell (Recommended)
+
+The Firebase shell provides an interactive REPL for testing functions:
+
+```bash
+# Start the functions shell
+cd functions
+pnpm firebase functions:shell
+
+# In the shell, call a callable function:
+startTransformPipelineV2({ jobId: "test-job-123" })
+```
+
+The shell automatically wraps your data and handles the callable protocol.
+
+#### Option 2: Using curl
+
+Callable functions expect a POST request with a JSON body containing a `data` field:
+
+```bash
+# First start emulators
+pnpm functions:serve
+
+# Then call the function
+curl -X POST \
+  http://127.0.0.1:5001/<project-id>/europe-west1/startTransformPipelineV2 \
+  -H "Content-Type: application/json" \
+  -d '{ "data": { "jobId": "test-job-123" } }'
+```
+
+**Tips:**
+- Replace `<project-id>` with your Firebase project ID (check `.firebaserc`)
+- The emulator URL format is: `http://127.0.0.1:5001/<project-id>/<region>/<function-name>`
+- Check the emulator UI at http://localhost:4000 to see function logs
+
+See `MANUAL-TESTING.md` for additional test cases.
 
 ### Key Technologies
 
