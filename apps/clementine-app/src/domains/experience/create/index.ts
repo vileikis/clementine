@@ -1,5 +1,5 @@
-// Generate subdomain barrel export
-export { ExperienceGeneratePage } from './containers'
+// Create subdomain barrel export
+export { ExperienceCreatePage } from './containers'
 
 // Domain public API - Export components, hooks, containers, lib (not stores)
 export * from './components'

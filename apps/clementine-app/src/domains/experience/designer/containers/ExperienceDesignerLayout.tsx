@@ -76,9 +76,9 @@ export function ExperienceDesignerLayout({
       to: `/workspace/${workspaceSlug}/experiences/${experience.id}/collect`,
     },
     {
-      id: 'generate',
-      label: 'Generate',
-      to: `/workspace/${workspaceSlug}/experiences/${experience.id}/generate`,
+      id: 'create',
+      label: 'Create',
+      to: `/workspace/${workspaceSlug}/experiences/${experience.id}/create`,
     },
   ]
 

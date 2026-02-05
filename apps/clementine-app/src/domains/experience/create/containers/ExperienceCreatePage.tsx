@@ -1,7 +1,7 @@
 /**
- * ExperienceGeneratePage Container
+ * ExperienceCreatePage Container
  *
- * Main content area for the Generate tab (AI transform pipeline configuration).
+ * Main content area for the Create tab (AI transform pipeline configuration).
  * Provides CRUD operations for AI Image nodes in the transform pipeline.
  */
 import { useParams } from '@tanstack/react-router'
@@ -11,7 +11,7 @@ import { useWorkspace } from '@/domains/workspace'
 import { useWorkspaceExperience } from '@/domains/experience'
 
 /**
- * Generate tab with transform pipeline editor
+ * Create tab with transform pipeline editor
  *
  * Features:
  * - Add/delete AI Image nodes
@@ -22,7 +22,7 @@ import { useWorkspaceExperience } from '@/domains/experience'
  * Phase 1b-2: CRUD operations and basic display (MVP)
  * Future phases will add: editor panel, prompt editing, refMedia management
  */
-export function ExperienceGeneratePage() {
+export function ExperienceCreatePage() {
   const { workspaceSlug, experienceId } = useParams({ strict: false })
   const { data: workspace } = useWorkspace(workspaceSlug ?? '')
   const { data: experience } = useWorkspaceExperience(

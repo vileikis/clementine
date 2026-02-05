@@ -69,7 +69,7 @@ export function useUpdateTransformNodes(
     onError: (error) => {
       Sentry.captureException(error, {
         tags: {
-          domain: 'experience/generate',
+          domain: 'experience/create',
           action: 'update-transform-nodes',
         },
       })
