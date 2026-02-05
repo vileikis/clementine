@@ -4,11 +4,10 @@
  * Manages camera stream lifecycle with proper cleanup for race conditions.
  * Handles the async nature of getUserMedia and React's mount/unmount cycles.
  *
- * Key features:
- * - Prevents orphaned streams when component unmounts during getUserMedia
- * - Supports camera switching (front/back)
- * - Detects multiple cameras
- * - Cleans up resources on unmount
+ * Uses AbortController pattern to:
+ * - Prevent orphaned streams when component unmounts during getUserMedia
+ * - Cancel previous switchCamera operations when rapidly switching
+ * - Provide consistent cancellation across all async operations
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -48,7 +47,7 @@ interface UseCameraStreamReturn {
  * Hook for managing camera stream lifecycle
  *
  * Automatically starts camera on mount and stops on unmount.
- * Handles race conditions when component unmounts during async getUserMedia.
+ * Uses AbortController to handle race conditions with async getUserMedia.
  *
  * @example
  * ```tsx
@@ -83,13 +82,19 @@ export function useCameraStream(
   const [hasMultipleCameras, setHasMultipleCameras] = useState(false)
   const [isActive, setIsActive] = useState(false)
 
-  // Ref for tracking current stream (for stop/switchCamera)
+  // Refs
   const streamRef = useRef<MediaStream | null>(null)
+  const abortControllerRef = useRef<AbortController | null>(null)
 
   /**
    * Stop camera and release all resources
    */
   const stop = useCallback(() => {
+    // Abort any ongoing async operations
+    abortControllerRef.current?.abort()
+    abortControllerRef.current = null
+
+    // Stop all tracks
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((track) => track.stop())
       streamRef.current = null
@@ -100,12 +105,19 @@ export function useCameraStream(
 
   /**
    * Switch to opposite camera (front <-> back)
-   * Note: Uses streamRef directly to avoid stale closure issues
+   * Uses AbortController to handle race conditions
    */
   const switchCamera = useCallback(async (): Promise<void> => {
     const newFacing = facing === 'user' ? 'environment' : 'user'
 
-    // Stop current stream first
+    // Abort any previous ongoing operation
+    abortControllerRef.current?.abort()
+
+    // Create new controller for this operation
+    const controller = new AbortController()
+    abortControllerRef.current = controller
+
+    // Stop current stream
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((track) => track.stop())
       streamRef.current = null
@@ -113,7 +125,7 @@ export function useCameraStream(
     setStream(null)
     setIsActive(false)
 
-    // Start with new facing
+    // Check availability
     if (!isMediaDevicesAvailable()) {
       onError?.(createUnavailableError())
       return
@@ -128,13 +140,22 @@ export function useCameraStream(
         audio: false,
       })
 
+      // Check if aborted during getUserMedia (unmount or new switch started)
+      if (controller.signal.aborted) {
+        mediaStream.getTracks().forEach((track) => track.stop())
+        return
+      }
+
       streamRef.current = mediaStream
       setStream(mediaStream)
       setFacing(newFacing)
       setIsActive(true)
       onReady?.()
     } catch (err) {
-      onError?.(parseMediaError(err))
+      // Only report error if not aborted
+      if (!controller.signal.aborted) {
+        onError?.(parseMediaError(err))
+      }
     }
   }, [facing, onReady, onError])
 
@@ -155,14 +176,16 @@ export function useCameraStream(
   }, [])
 
   // Auto-start camera on mount, cleanup on unmount
-  // Uses local mounted flag to handle race condition with async getUserMedia
   useEffect(() => {
-    let mounted = true
+    // Create controller for this effect's async operations
+    const controller = new AbortController()
+    abortControllerRef.current = controller
+
     let localStream: MediaStream | null = null
 
     async function initCamera() {
       if (!isMediaDevicesAvailable()) {
-        if (mounted) {
+        if (!controller.signal.aborted) {
           onError?.(createUnavailableError())
         }
         return
@@ -177,9 +200,8 @@ export function useCameraStream(
           audio: false,
         })
 
-        // Check if still mounted after async operation
-        if (!mounted) {
-          // Component unmounted during getUserMedia - stop orphaned stream
+        // Check if aborted during getUserMedia
+        if (controller.signal.aborted) {
           mediaStream.getTracks().forEach((track) => track.stop())
           return
         }
@@ -191,7 +213,7 @@ export function useCameraStream(
         setIsActive(true)
         onReady?.()
       } catch (err) {
-        if (mounted) {
+        if (!controller.signal.aborted) {
           onError?.(parseMediaError(err))
         }
       }
@@ -200,11 +222,14 @@ export function useCameraStream(
     initCamera()
 
     return () => {
-      mounted = false
-      // Stop any stream created by this effect
+      // Abort any ongoing operations
+      controller.abort()
+
+      // Stop stream created by this effect
       if (localStream) {
         localStream.getTracks().forEach((track) => track.stop())
       }
+
       // Also stop streamRef in case switchCamera was used
       if (streamRef.current && streamRef.current !== localStream) {
         streamRef.current.getTracks().forEach((track) => track.stop())
