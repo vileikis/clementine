@@ -26,6 +26,96 @@ Replace the Generate/nodes UI with a simplified Create tab where admins configur
 
 ---
 
+## Technical Approach
+
+### Reuse `domains/experience/create/` Subdomain
+
+The existing `create/` subdomain contains reusable components from the previous node-based implementation:
+
+| Component | Reusability | Notes |
+|-----------|-------------|-------|
+| `lexical/*` | ✅ Fully reusable | Complete @mention system (nodes, plugins, serialization) |
+| `LexicalPromptInput` | ✅ Fully reusable | Rich text editor with @mention support |
+| `ReferenceMediaStrip` | ✅ Fully reusable | Thumbnail strip for uploaded media |
+| `ReferenceMediaItem` | ✅ Fully reusable | Individual media thumbnail with remove |
+| `AddMediaButton` | ✅ Fully reusable | File picker trigger |
+| `PromptComposer` | 🔄 Refactor | Decouple from node-based data model |
+| `ControlRow` | 🔄 Refactor | Extract model/aspect ratio selectors |
+| `useRefMediaUpload` | 🔄 Refactor | Work with `create.imageGeneration.refMedia` |
+| `NodeListItem/*` | ❌ Delete | Node-centric UI being removed |
+| `TransformPipelineEditor` | ❌ Delete | Multi-node pipeline being replaced |
+| `transform-operations.ts` | ❌ Delete | Operations on `TransformNode[]` |
+
+### PromptComposer: Composition over Configuration
+
+Refactor `PromptComposer` to be **generation-type agnostic** using composition over configuration. This enables reuse for future generation types (video, text) without modifying the component.
+
+**Design Principle**: PromptComposer handles common UI; parent passes type-specific options.
+
+```typescript
+interface PromptComposerProps {
+  // Core prompt (same for all generation types)
+  prompt: string
+  onPromptChange: (prompt: string) => void
+
+  // Reference media (same for all types, can hide if not needed)
+  refMedia: MediaReference[]
+  onRefMediaAdd: (media: MediaReference) => void
+  onRefMediaRemove: (mediaAssetId: string) => void
+
+  // Model - options passed by parent (different per generation type)
+  model: string
+  onModelChange: (model: string) => void
+  modelOptions: SelectOption[]
+
+  // Aspect ratio - optional (not needed for text generation)
+  aspectRatio?: string
+  onAspectRatioChange?: (ratio: string) => void
+  aspectRatioOptions?: SelectOption[]
+
+  // Context
+  steps: ExperienceStep[]
+  workspaceId: string
+  disabled?: boolean
+}
+```
+
+**Usage by generation type**:
+
+```tsx
+// Image generation (this PRD)
+<PromptComposer
+  modelOptions={IMAGE_MODEL_OPTIONS}
+  aspectRatioOptions={IMAGE_ASPECT_RATIO_OPTIONS}
+  // ...
+/>
+
+// Future: Video generation
+<PromptComposer
+  modelOptions={VIDEO_MODEL_OPTIONS}
+  aspectRatioOptions={VIDEO_ASPECT_RATIO_OPTIONS}
+  // ...
+/>
+
+// Future: Text generation (no aspect ratio)
+<PromptComposer
+  modelOptions={TEXT_MODEL_OPTIONS}
+  // aspectRatioOptions omitted
+  // ...
+/>
+```
+
+### New Components to Create
+
+| Component | Purpose |
+|-----------|---------|
+| `OutcomeTypeSelector` | Image/GIF/Video toggle (Section 2) |
+| `SourceImageSelector` | Capture step dropdown (Section 3) |
+| `AIGenerationToggle` | Enable/disable AI toggle (Section 4) |
+| `CreateTabForm` | Container composing all fields, binds to `draft.create` |
+
+---
+
 ## 1. Create Tab Structure
 
 ### Tab Navigation
@@ -63,7 +153,7 @@ Replace the Generate/nodes UI with a simplified Create tab where admins configur
 │                                                     │
 │  ☑ Enable AI Generation                            │  ← Toggle
 │                                                     │
-│  ┌─ AI Settings ───────────────────────────────┐   │  ← Collapsible
+│  ┌─ Prompt Composer ──────────────────────────┐   │  ← Collapsible
 │  │                                             │   │
 │  │  Prompt *                                   │   │
 │  │  ┌─────────────────────────────────────┐   │   │
@@ -76,16 +166,11 @@ Replace the Generate/nodes UI with a simplified Create tab where admins configur
 │  │  │ [+ Add]  [style-image.jpg] [x]      │   │   │
 │  │  └─────────────────────────────────────┘   │   │
 │  │                                             │   │
-│  │  Model                                      │   │
-│  │  ┌─────────────────────────────────────┐   │   │
-│  │  │ Gemini 2.5 Flash Image         ▼    │   │   │
-│  │  └─────────────────────────────────────┘   │   │
+│  │  Model              Aspect Ratio            │   │
+│  │  ┌───────────────┐  ┌───────────────────┐  │   │
+│  │  │ Gemini 2.5  ▼ │  │ [1:1] [3:2] ...   │  │   │
+│  │  └───────────────┘  └───────────────────┘  │   │
 │  │                                             │   │
-│  └─────────────────────────────────────────────┘   │
-│                                                     │
-│  Aspect Ratio                                       │
-│  ┌─────────────────────────────────────────────┐   │
-│  │ [1:1] [3:2] [2:3] [9:16] [16:9]             │   │
 │  └─────────────────────────────────────────────┘   │
 │                                                     │
 └─────────────────────────────────────────────────────┘
@@ -155,13 +240,13 @@ Replace the Generate/nodes UI with a simplified Create tab where admins configur
 
 - Checkbox or toggle switch
 - Label: "Enable AI Generation"
-- When off, AI Settings section collapses but values are preserved
+- When off, Prompt Composer section collapses but values are preserved
 
 ### Behavior
 
 ```
-☑ Enable AI Generation  →  Show AI Settings (prompt, refMedia, model)
-☐ Enable AI Generation  →  Hide AI Settings (passthrough mode)
+☑ Enable AI Generation  →  Show Prompt Composer (prompt, refMedia, model)
+☐ Enable AI Generation  →  Hide Prompt Composer (passthrough mode)
 ```
 
 ### Passthrough Validation
@@ -173,8 +258,8 @@ When `aiEnabled: false`:
 ### Acceptance Criteria
 
 - [ ] AC-4.1: Toggle controls `create.aiEnabled`
-- [ ] AC-4.2: AI Settings section shows/hides based on toggle
-- [ ] AC-4.3: AI Settings values preserved when toggling off/on
+- [ ] AC-4.2: Prompt Composer section shows/hides based on toggle
+- [ ] AC-4.3: Prompt Composer values preserved when toggling off/on
 - [ ] AC-4.4: Warning shown if passthrough without source image
 
 ---
@@ -336,13 +421,18 @@ Ensure no transformNodes UI is accessible.
 | File | Action | Status |
 |------|--------|--------|
 | Experience editor tab navigation | MODIFY | **Done** (PR #131) |
-| Create tab component | CREATE | |
-| Outcome type selector component | CREATE | |
-| Source step selector component | CREATE | |
-| AI toggle component | CREATE | |
-| Existing prompt editor integration | REUSE | |
-| Existing media picker integration | REUSE | |
-| Generate tab / nodes UI | REMOVE | **Renamed** (PR #131) |
+| `PromptComposer` | REFACTOR | Decouple from node-based model |
+| `ControlRow` | REFACTOR | Accept options via props |
+| `useRefMediaUpload` | REFACTOR | Work with `create.imageGeneration` |
+| `LexicalPromptInput` | REUSE | No changes needed |
+| `ReferenceMediaStrip` / `ReferenceMediaItem` | REUSE | No changes needed |
+| `lexical/*` (mention system) | REUSE | No changes needed |
+| `CreateTabForm` (container) | CREATE | New container for Create tab |
+| `OutcomeTypeSelector` | CREATE | Image/GIF/Video selector |
+| `SourceImageSelector` | CREATE | Capture step dropdown |
+| `AIGenerationToggle` | CREATE | Enable/disable toggle |
+| `NodeListItem/*`, `TransformPipelineEditor` | DELETE | Node-centric UI removed |
+| `transform-operations.ts` | DELETE | Node operations removed |
 
 ---
 
