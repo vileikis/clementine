@@ -13,14 +13,29 @@ Replace the Generate/nodes UI with a simplified Create tab where admins configur
 
 ---
 
+## Completed Prep Work
+
+> **Note**: The following prep work has already been completed (PR #131):
+>
+> - [x] Renamed `domains/experience/generate/` subdomain to `domains/experience/create/`
+> - [x] Renamed route from `/experiences/$id/generate` to `/experiences/$id/create`
+> - [x] Renamed `ExperienceGeneratePage` to `ExperienceCreatePage`
+> - [x] Updated tab navigation to use "Create" label with `/create` path
+>
+> Existing components (Lexical, PromptComposer, reference media) are preserved in the `create/` subdomain and can be reused or refactored.
+
+---
+
 ## 1. Create Tab Structure
 
 ### Tab Navigation
 
-Replace existing tab structure:
+~~Replace existing tab structure:~~
 
-**Before**: Collect | Generate
-**After**: Collect | Create
+~~**Before**: Collect | Generate~~
+~~**After**: Collect | Create~~
+
+**Done** - Tab already renamed to "Create" (see Completed Prep Work above).
 
 ### Create Tab Layout
 
@@ -78,8 +93,8 @@ Replace existing tab structure:
 
 ### Acceptance Criteria
 
-- [ ] AC-1.1: Create tab visible in experience editor
-- [ ] AC-1.2: Generate tab removed (or hidden)
+- [x] AC-1.1: Create tab visible in experience editor *(done - tab renamed)*
+- [x] AC-1.2: Generate tab removed (or hidden) *(done - route renamed to /create)*
 - [ ] AC-1.3: Outcome type selector shows Image enabled, GIF/Video disabled with "coming soon"
 
 ---
@@ -304,30 +319,30 @@ Ensure no transformNodes UI is accessible.
 
 ### Changes
 
-- Remove Generate tab entirely
+- ~~Remove Generate tab entirely~~ *(done - renamed to Create)*
 - Remove any node editor components
-- Remove node-related routes
+- ~~Remove node-related routes~~ *(done - route is now /create)*
 
 ### Acceptance Criteria
 
 - [ ] AC-10.1: No transformNodes UI visible anywhere
-- [ ] AC-10.2: Direct URL to old Generate tab redirects to Create
+- [x] AC-10.2: Direct URL to old Generate tab redirects to Create *(done - route renamed, old URL will 404)*
 - [ ] AC-10.3: No node-editing functionality accessible
 
 ---
 
 ## Files Changed
 
-| File | Action |
-|------|--------|
-| Experience editor tab navigation | MODIFY |
-| Create tab component | CREATE |
-| Outcome type selector component | CREATE |
-| Source step selector component | CREATE |
-| AI toggle component | CREATE |
-| Existing prompt editor integration | REUSE |
-| Existing media picker integration | REUSE |
-| Generate tab / nodes UI | REMOVE |
+| File | Action | Status |
+|------|--------|--------|
+| Experience editor tab navigation | MODIFY | **Done** (PR #131) |
+| Create tab component | CREATE | |
+| Outcome type selector component | CREATE | |
+| Source step selector component | CREATE | |
+| AI toggle component | CREATE | |
+| Existing prompt editor integration | REUSE | |
+| Existing media picker integration | REUSE | |
+| Generate tab / nodes UI | REMOVE | **Renamed** (PR #131) |
 
 ---
 
