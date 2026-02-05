@@ -217,16 +217,21 @@ export function resolvePromptMentions(
         return match  // Keep original if not found
       }
 
-      // Input step: return text value
-      if (response.value !== null) {
-        return Array.isArray(response.value)
-          ? response.value.join(', ')
-          : response.value
+      // Input step: data is string or MultiSelectOption[]
+      if (typeof response.data === 'string') {
+        return response.data
       }
 
-      // Capture step: media is in context as MediaReference[]
+      // Multi-select: data is MultiSelectOption[]
+      if (Array.isArray(response.data) && response.data[0]?.value !== undefined) {
+        // MultiSelectOption[] - extract values
+        const options = response.data as { value: string }[]
+        return options.map(opt => opt.value).join(', ')
+      }
+
+      // Capture step: data is MediaReference[]
       if (response.stepType.startsWith('capture.')) {
-        const captureMedia = response.context as MediaReference[] | null
+        const captureMedia = response.data as MediaReference[] | null
         if (captureMedia && captureMedia.length > 0) {
           mediaRefs.push(...captureMedia)
           return `[IMAGE: ${response.stepName}]`
@@ -258,10 +263,11 @@ export function resolvePromptMentions(
 ### Acceptance Criteria
 
 - [ ] AC-4.1: `@{step:stepName}` resolved from responses by stepName
-- [ ] AC-4.2: Input step values inserted as text
-- [ ] AC-4.3: Capture step media extracted from `context` as `MediaReference[]` and added to mediaRefs
-- [ ] AC-4.4: `@{ref:displayName}` resolved from refMedia by displayName
-- [ ] AC-4.5: Unresolved mentions logged as warnings, kept in text
+- [ ] AC-4.2: Input step `data` (string) inserted as text
+- [ ] AC-4.3: Multi-select `data` (MultiSelectOption[]) extracted as comma-separated values
+- [ ] AC-4.4: Capture step `data` (MediaReference[]) added to mediaRefs
+- [ ] AC-4.5: `@{ref:displayName}` resolved from refMedia by displayName
+- [ ] AC-4.6: Unresolved mentions logged as warnings, kept in text
 
 ---
 
@@ -282,13 +288,13 @@ export async function imageOutcome(ctx: OutcomeContext): Promise<JobOutput> {
   const { captureStepId, aiEnabled, imageGeneration } = createOutcome
 
   // 1. Resolve source media (if specified)
-  // Capture media is stored in context as MediaReference[]
+  // Capture media is stored in data as MediaReference[]
   let sourceMedia: MediaReference | null = null
   if (captureStepId) {
     const captureResponse = sessionInputs.responses.find(
       r => r.stepId === captureStepId
     )
-    const captureMedia = captureResponse?.context as MediaReference[] | null
+    const captureMedia = captureResponse?.data as MediaReference[] | null
     if (!captureMedia || captureMedia.length === 0) {
       throw new NonRetryableError(
         `Capture step ${captureStepId} has no media`
@@ -365,7 +371,7 @@ export async function imageOutcome(ctx: OutcomeContext): Promise<JobOutput> {
 - [ ] AC-5.1: Passthrough mode works (aiEnabled=false, just overlay)
 - [ ] AC-5.2: Prompt-only generation works (aiEnabled=true, captureStepId=null)
 - [ ] AC-5.3: Image-to-image works (aiEnabled=true, captureStepId set)
-- [ ] AC-5.4: Capture media extracted from `response.context` as `MediaReference[]`
+- [ ] AC-5.4: Capture media extracted from `response.data` as `MediaReference[]`
 - [ ] AC-5.5: Prompt mentions resolved before generation
 - [ ] AC-5.6: Reference media passed to AI generator
 - [ ] AC-5.7: Overlay applied when exists for aspect ratio

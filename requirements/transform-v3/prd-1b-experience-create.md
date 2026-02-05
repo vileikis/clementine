@@ -1,7 +1,7 @@
 # PRD 1B: Experience Create Config
 
 **Epic**: [Outcome-based Create](./epic.md)
-**Status**: Draft
+**Status**: ✅ Complete
 **Dependencies**: PRD 1A (Schema Foundations)
 **Enables**: PRD 2 (Admin Create Tab UX), PRD 3 (Job + CF)
 

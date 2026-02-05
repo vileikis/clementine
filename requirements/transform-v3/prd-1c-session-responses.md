@@ -1,7 +1,7 @@
 # PRD 1C: Session Responses + Guest Runtime
 
 **Epic**: [Outcome-based Create](./epic.md)
-**Status**: Draft
+**Status**: ✅ Complete
 **Dependencies**: PRD 1A (Schema Foundations)
 **Enables**: PRD 3 (Job + CF)
 
@@ -13,23 +13,24 @@ Update session schema to use unified `responses[]` array and modify guest runtim
 
 ### Key Design Decisions
 
-- **No separate `media` field** - capture media stored in `context` as `MediaReference[]`
+- **Unified `data` field** - replaces separate `value`/`context` for better type safety
+- **No separate `media` field** - capture media stored in `data` as `MediaReference[]`
 - **Captures always use array** - even single photo/video uses `[MediaReference]` for consistency
-- **`value` is null for captures** - no analytical use case for asset IDs as primitive values
 - **`@{step:...}` works for all steps** - inputs and captures both referenceable in prompts
+- **Deprecated fields not written** - new sessions only write to `responses[]`, not `answers[]`/`capturedMedia[]`
 
-### Context Shape by Step Type
+### Data Shape by Step Type
 
-| Step Type | `value` | `context` |
-|-----------|---------|-----------|
-| `input.shortText` | `"user text"` | `null` |
-| `input.longText` | `"user text"` | `null` |
-| `input.scale` | `"1"` to `"5"` | `null` |
-| `input.yesNo` | `"yes"` or `"no"` | `null` |
-| `input.multiSelect` | `["opt1", "opt2"]` | `MultiSelectOption[]` |
-| `capture.photo` | `null` | `MediaReference[]` (1 item) |
-| `capture.gif` | `null` | `MediaReference[]` (4 items) |
-| `capture.video` | `null` | `MediaReference[]` (1 item) |
+| Step Type | `data` |
+|-----------|--------|
+| `input.shortText` | `"user text"` (string) |
+| `input.longText` | `"user text"` (string) |
+| `input.scale` | `"1"` to `"5"` (string) |
+| `input.yesNo` | `"yes"` or `"no"` (string) |
+| `input.multiSelect` | `MultiSelectOption[]` |
+| `capture.photo` | `MediaReference[]` (1 item) |
+| `capture.gif` | `MediaReference[]` (4 items) |
+| `capture.video` | `MediaReference[]` (1 item) |
 
 ---
 
@@ -67,10 +68,10 @@ export const sessionSchema = z.looseObject({
 
 ### Acceptance Criteria
 
-- [ ] AC-1.1: `sessionSchema` includes `responses` field
-- [ ] AC-1.2: `answers` and `capturedMedia` fields marked `@deprecated` but still exist (backward compatible)
-- [ ] AC-1.3: Default `responses` is empty array
-- [ ] AC-1.4: JSDoc comments reference cleanup in PRD 4
+- [x] AC-1.1: `sessionSchema` includes `responses` field
+- [x] AC-1.2: `answers` and `capturedMedia` fields marked `@deprecated` but still exist (backward compatible)
+- [x] AC-1.3: Default `responses` is empty array
+- [x] AC-1.4: JSDoc comments reference cleanup in PRD 4
 
 ---
 
@@ -86,11 +87,6 @@ Update Zustand store to manage responses instead of separate answers/capturedMed
 interface ExperienceRuntimeState {
   // ... existing fields ...
 
-  /** @deprecated Use responses instead */
-  answers: Answer[]
-  /** @deprecated Use responses instead */
-  capturedMedia: CapturedMedia[]
-
   /** Unified responses from all steps */
   responses: SessionResponse[]
 }
@@ -98,13 +94,14 @@ interface ExperienceRuntimeState {
 interface ExperienceRuntimeActions {
   // ... existing actions ...
 
-  /** @deprecated Use setResponse instead */
-  setAnswer: (stepId: string, stepType: string, value: AnswerValue, context?: unknown) => void
-  /** @deprecated Use setResponse instead */
-  setCapturedMedia: (stepId: string, assetId: string, url: string) => void
-
   /** Set a response for a step (unified for input and capture) */
   setResponse: (response: SessionResponse) => void
+
+  /** Get response for a specific step */
+  getResponse: (stepId: string) => SessionResponse | undefined
+
+  /** Get all responses */
+  getResponses: () => SessionResponse[]
 }
 ```
 
@@ -114,9 +111,19 @@ interface ExperienceRuntimeActions {
 setResponse: (response) => {
   set((state) => {
     const existingIndex = state.responses.findIndex(r => r.stepId === response.stepId)
+    const now = Date.now()
     const newResponses = existingIndex >= 0
-      ? state.responses.map((r, i) => i === existingIndex ? response : r)
-      : [...state.responses, response]
+      ? state.responses.map((r, i) =>
+          i === existingIndex
+            ? {
+                ...response,
+                // Preserve original createdAt from existing response
+                createdAt: r.createdAt,
+                updatedAt: now,
+              }
+            : r,
+        )
+      : [...state.responses, { ...response, updatedAt: now }]
 
     return { responses: newResponses }
   })
@@ -125,9 +132,9 @@ setResponse: (response) => {
 
 ### Acceptance Criteria
 
-- [ ] AC-2.1: Store has `responses` state field
-- [ ] AC-2.2: `setResponse()` action adds/updates response by `stepId`
-- [ ] AC-2.3: Old `setAnswer()` and `setCapturedMedia()` still exist (for gradual migration)
+- [x] AC-2.1: Store has `responses` state field
+- [x] AC-2.2: `setResponse()` action adds/updates response by `stepId`
+- [x] AC-2.3: Deprecated fields removed - new sessions only write to `responses[]`
 
 ---
 
@@ -143,8 +150,8 @@ Expose `setResponse` through the runtime hook.
 interface RuntimeAPI {
   // ... existing methods ...
 
-  /** Set a response for a step */
-  setResponse: (params: SetResponseParams) => void
+  /** Set a response for a step (unified format) */
+  setStepResponse: (step: ExperienceStep, data: SessionResponseData | null) => void
 
   /** Get response for a step */
   getResponse: (stepId: string) => SessionResponse | undefined
@@ -153,40 +160,51 @@ interface RuntimeAPI {
   getResponses: () => SessionResponse[]
 }
 
-interface SetResponseParams {
-  step: ExperienceStep
-  value?: AnswerValue
-  context?: unknown  // MultiSelectOption[] for multi-select, MediaReference[] for captures
-}
+// SessionResponseData is a union type:
+type SessionResponseData =
+  | string                    // Simple inputs (scale, yesNo, shortText, longText)
+  | MultiSelectOption[]       // Multi-select input
+  | MediaReference[]          // Capture steps (photo, video, gif)
 ```
 
 ### Implementation
 
 ```ts
-const setResponse = useCallback((params: SetResponseParams) => {
-  const { step, value = null, context = null } = params
+/**
+ * Build a SessionResponse from step and data.
+ */
+function buildSessionResponse(
+  step: ExperienceStep,
+  data: SessionResponseData | null,
+  existingCreatedAt?: number,
+): SessionResponse {
   const now = Date.now()
-
-  const response: SessionResponse = {
+  return {
     stepId: step.id,
-    stepName: step.name,  // From step definition
+    stepName: step.name,
     stepType: step.type,
-    value,
-    context,  // MultiSelectOption[] for multi-select, MediaReference[] for captures
-    createdAt: now,
+    data,
+    createdAt: existingCreatedAt ?? now,
     updatedAt: now,
   }
+}
 
-  store.setResponse(response)
-}, [store])
+const setStepResponse = useCallback(
+  (step: ExperienceStep, data: SessionResponseData | null) => {
+    const existingResponse = store.getResponse(step.id)
+    const response = buildSessionResponse(step, data, existingResponse?.createdAt)
+    store.setResponse(response)
+  },
+  [store],
+)
 ```
 
 ### Acceptance Criteria
 
-- [ ] AC-3.1: `setResponse()` available from `useRuntime()`
-- [ ] AC-3.2: `stepName` automatically populated from step definition
-- [ ] AC-3.3: Timestamps (`createdAt`, `updatedAt`) auto-set
-- [ ] AC-3.4: No `media` parameter - captures pass `MediaReference[]` via `context`
+- [x] AC-3.1: `setStepResponse()` available from `useRuntime()`
+- [x] AC-3.2: `stepName` automatically populated from step definition
+- [x] AC-3.3: Timestamps (`createdAt`, `updatedAt`) auto-set, `createdAt` preserved on updates
+- [x] AC-3.4: Unified `data` parameter accepts `string | MultiSelectOption[] | MediaReference[]`
 
 ---
 
@@ -241,9 +259,9 @@ if (responses) {
 
 ### Acceptance Criteria
 
-- [ ] AC-4.1: `responses` written to Firestore session document
-- [ ] AC-4.2: Old `answers`/`capturedMedia` fields NOT written for new sessions
-- [ ] AC-4.3: Firestore transaction succeeds with responses array
+- [x] AC-4.1: `responses` written to Firestore session document
+- [x] AC-4.2: Old `answers`/`capturedMedia` fields NOT written for new sessions
+- [x] AC-4.3: Firestore transaction succeeds with responses array
 
 ---
 
@@ -295,11 +313,11 @@ const handleCapture = useCallback((assets: MediaAsset | MediaAsset[]) => {
 
 ### Acceptance Criteria
 
-- [ ] AC-5.1: Input steps call `setResponse` with `value` and optional `context`
-- [ ] AC-5.2: Capture steps call `setResponse` with `context` as `MediaReference[]`
-- [ ] AC-5.3: `filePath` included in each MediaReference for CF processing
-- [ ] AC-5.4: Both preview and guest flows use same codepath
-- [ ] AC-5.5: Photo/video captures pass single-item array, GIF passes 4-item array
+- [x] AC-5.1: Input steps call `setStepResponse` with `data` as string
+- [x] AC-5.2: Multi-select steps call `setStepResponse` with `data` as `MultiSelectOption[]`
+- [x] AC-5.3: Capture steps call `setStepResponse` with `data` as `MediaReference[]`
+- [x] AC-5.4: Both preview and guest flows use same codepath
+- [x] AC-5.5: Photo/video captures pass single-item array, GIF passes 4-item array
 
 ---
 
@@ -312,8 +330,7 @@ const handleCapture = useCallback((assets: MediaAsset | MediaAsset[]) => {
   stepId: "uuid-123",
   stepName: "Favorite Color",
   stepType: "input.shortText",
-  value: "Blue",
-  context: null,
+  data: "Blue",
   createdAt: 1706745600000,
   updatedAt: 1706745600000,
 }
@@ -326,8 +343,7 @@ const handleCapture = useCallback((assets: MediaAsset | MediaAsset[]) => {
   stepId: "uuid-456",
   stepName: "Pet Choice",
   stepType: "input.multiSelect",
-  value: ["cat", "dog"],
-  context: [
+  data: [
     { value: "cat", promptFragment: "a cute cat", promptMedia: null },
     { value: "dog", promptFragment: "a friendly dog", promptMedia: null },
   ],
@@ -343,8 +359,7 @@ const handleCapture = useCallback((assets: MediaAsset | MediaAsset[]) => {
   stepId: "uuid-789",
   stepName: "Your Photo",
   stepType: "capture.photo",
-  value: null,
-  context: [{
+  data: [{
     mediaAssetId: "asset-abc",
     url: "https://storage.../photo.jpg",
     filePath: "projects/proj-1/sessions/sess-1/captures/photo.jpg",
@@ -362,8 +377,7 @@ const handleCapture = useCallback((assets: MediaAsset | MediaAsset[]) => {
   stepId: "uuid-012",
   stepName: "Your GIF",
   stepType: "capture.gif",
-  value: null,
-  context: [
+  data: [
     {
       mediaAssetId: "asset-1",
       url: "https://storage.../frame1.jpg",
