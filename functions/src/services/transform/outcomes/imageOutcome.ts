@@ -144,13 +144,6 @@ async function executeAIGeneration(
   // Resolve prompt mentions
   const resolved = resolvePromptMentions(prompt, sessionResponses, refMedia)
 
-  logger.info('[ImageOutcome] Original prompt and resolved prompt', {
-    originalPrompt: prompt,
-    resolvedPrompt: resolved.text,
-  })
-
-  // return ''
-
   logger.info('[ImageOutcome] Prompt resolved', {
     originalLength: prompt.length,
     resolvedLength: resolved.text.length,

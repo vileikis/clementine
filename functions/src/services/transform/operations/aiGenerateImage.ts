@@ -65,7 +65,6 @@ export async function aiGenerateImage(
 
   // Initialize Vertex AI client
   const location = getLocationForModel(model)
-
   if (!GOOGLE_CLOUD_PROJECT) {
     throw new Error('GOOGLE_CLOUD_PROJECT environment variable is required')
   }
@@ -156,7 +155,7 @@ function getLocationForModel(model: string): string {
  *
  * Constructs the multimodal content array with:
  * 1. Source media (if provided) for image-to-image
- * 2. Reference media with ID labels
+ * 2. Reference media with ID labels (excluding sourceMedia to avoid duplicates)
  * 3. Prompt text at the end
  */
 async function buildContentParts(
@@ -167,10 +166,13 @@ async function buildContentParts(
   const parts: Part[] = []
   const bucket = storage.bucket()
 
+  // Track added media to avoid duplicates
+  const addedMediaIds = new Set<string>()
+
   // Add source media (for image-to-image transformation)
   if (sourceMedia) {
     parts.push({
-      text: 'Image Reference ID: <source_image>',
+      text: `Input Photo ID: <${sourceMedia.displayName}>`,
     })
 
     const storagePath = getStoragePathFromMediaReference(sourceMedia)
@@ -180,12 +182,18 @@ async function buildContentParts(
         fileUri: `gs://${bucket.name}/${storagePath}`,
       },
     })
+
+    addedMediaIds.add(sourceMedia.mediaAssetId)
   }
 
-  // Add reference media with ID labels
+  // Add reference media with ID labels (skip if already added as source)
   for (const ref of referenceMedia) {
+    if (addedMediaIds.has(ref.mediaAssetId)) {
+      continue
+    }
+
     parts.push({
-      text: `Image Reference ID: <ref_${ref.displayName}>`,
+      text: `Image Reference ID: <${ref.displayName}>`,
     })
 
     const storagePath = getStoragePathFromMediaReference(ref)
@@ -195,6 +203,8 @@ async function buildContentParts(
         fileUri: `gs://${bucket.name}/${storagePath}`,
       },
     })
+
+    addedMediaIds.add(ref.mediaAssetId)
   }
 
   // Add prompt text at the end
