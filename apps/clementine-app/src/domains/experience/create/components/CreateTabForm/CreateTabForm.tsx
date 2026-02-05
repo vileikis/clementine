@@ -31,7 +31,6 @@ import { OutcomeTypePicker } from './OutcomeTypePicker'
 import { OutcomeTypeSelector } from './OutcomeTypeSelector'
 import { RemoveOutcomeAction } from './RemoveOutcomeAction'
 import { SourceImageSelector } from './SourceImageSelector'
-import { ValidationSummary } from './ValidationSummary'
 import type {
   AIImageAspectRatio,
   AIImageModel,
@@ -240,9 +239,6 @@ export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
   // Outcome type selected - show editor form
   return (
     <div className="space-y-6">
-      {/* Validation Summary - shown at top when errors exist */}
-      <ValidationSummary errors={validationErrors} />
-
       {/* Outcome Type Selector - switch between types */}
       <OutcomeTypeSelector
         value={outcome.type}
