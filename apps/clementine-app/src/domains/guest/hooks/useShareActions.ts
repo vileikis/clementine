@@ -35,7 +35,9 @@ const PLATFORM_LABELS: Record<keyof ShareOptionsConfig, string> = {
  */
 export function useShareActions({ mediaUrl }: UseShareActionsParams) {
   /**
-   * Handle image download with CORS-safe blob fetching
+   * Handle image download with CORS-safe blob fetching.
+   * On mobile devices with Web Share API support, opens the native share sheet.
+   * On desktop, triggers a file download.
    */
   const handleDownload = async () => {
     if (!mediaUrl) {
@@ -46,8 +48,6 @@ export function useShareActions({ mediaUrl }: UseShareActionsParams) {
     try {
       // Fetch image as blob to handle CORS
       const response = await fetch(mediaUrl)
-
-      // Check response status before proceeding
       if (!response.ok) {
         throw new Error(
           `Failed to fetch media: ${response.status} ${response.statusText}`,
@@ -55,12 +55,23 @@ export function useShareActions({ mediaUrl }: UseShareActionsParams) {
       }
 
       const blob = await response.blob()
+      const fileName = `clementine-result-${Date.now()}.jpg`
+      const file = new File([blob], fileName, {
+        type: blob.type || 'image/jpeg',
+      })
 
-      // Create blob URL and trigger download
+      // Use Web Share API on mobile devices that support file sharing
+      if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file] })
+        toast.success('Shared successfully')
+        return
+      }
+
+      // Fallback to download for desktop browsers
       const blobUrl = URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = blobUrl
-      link.download = `clementine-result-${Date.now()}.jpg`
+      link.download = fileName
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
@@ -70,6 +81,11 @@ export function useShareActions({ mediaUrl }: UseShareActionsParams) {
 
       toast.success('Image downloaded successfully')
     } catch (error) {
+      // User cancelled share sheet - not an error
+      if (error instanceof Error && error.name === 'AbortError') {
+        return
+      }
+
       toast.error('Failed to download image')
       Sentry.captureException(error, {
         tags: {
