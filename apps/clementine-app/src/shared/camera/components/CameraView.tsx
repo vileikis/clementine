@@ -7,10 +7,9 @@
  * Exposes imperative methods via ref:
  * - takePhoto(): Captures a photo from the current video frame
  * - switchCamera(): Switch to opposite camera
+ * - stop(): Stop camera stream
  *
- * Future extensions:
- * - startRecording(): Begin video recording
- * - stopRecording(): End video recording and return result
+ * Stream lifecycle is managed by useCameraStream hook.
  */
 
 import {
@@ -19,16 +18,9 @@ import {
   useEffect,
   useImperativeHandle,
   useRef,
-  useState,
 } from 'react'
-import { CAMERA_CONSTRAINTS } from '../constants'
-import {
-  captureFromVideo,
-  createCaptureFile,
-  createUnavailableError,
-  isMediaDevicesAvailable,
-  parseMediaError,
-} from '../lib'
+import { captureFromVideo, createCaptureFile } from '../lib'
+import { useCameraStream } from '../hooks/useCameraStream'
 import type {
   AspectRatio,
   CameraCaptureError,
@@ -45,6 +37,8 @@ export interface CameraViewRef {
   takePhoto: () => Promise<CapturedPhoto | null>
   /** Switch to opposite camera */
   switchCamera: () => Promise<void>
+  /** Stop the camera stream and release resources */
+  stop: () => void
   /** Current camera facing direction */
   facing: CameraFacing
   /** Whether device has multiple cameras */
@@ -104,98 +98,69 @@ export const CameraView = forwardRef<CameraViewRef, CameraViewProps>(
     },
     ref,
   ) {
-    // State
-    const [facing, setFacing] = useState<CameraFacing>(initialFacing)
-    const [hasMultipleCameras, setHasMultipleCameras] = useState(false)
-
-    // Refs
+    // Video element ref
     const videoRef = useRef<HTMLVideoElement | null>(null)
-    const streamRef = useRef<MediaStream | null>(null)
 
-    // Check for multiple cameras on mount
+    // Camera stream management
+    const { stream, facing, hasMultipleCameras, stop, switchCamera } =
+      useCameraStream({
+        initialFacing,
+        onReady,
+        onError,
+      })
+
+    // Attach stream to video element when it changes
     useEffect(() => {
-      async function checkCameras() {
-        try {
-          const devices = await navigator.mediaDevices.enumerateDevices()
-          const videoInputs = devices.filter(
-            (device) => device.kind === 'videoinput',
-          )
-          setHasMultipleCameras(videoInputs.length > 1)
-        } catch {
-          setHasMultipleCameras(false)
-        }
+      const video = videoRef.current
+      if (!video) return
+
+      video.srcObject = stream
+
+      // Clear video when stream is null
+      if (!stream) {
+        video.pause()
+        return
       }
-      checkCameras()
-    }, [])
 
-    // Start camera with specified facing
-    const startCamera = useCallback(
-      async (targetFacing: CameraFacing): Promise<MediaStream | null> => {
-        if (!isMediaDevicesAvailable()) {
-          onError?.(createUnavailableError())
-          return null
-        }
+      // Play video when stream is attached
+      if (video.readyState >= 1) {
+        video.play().catch((err) => {
+          console.error('Error playing video:', err)
+        })
+        return
+      }
 
-        try {
-          const mediaStream = await navigator.mediaDevices.getUserMedia({
-            video: {
-              facingMode: targetFacing,
-              ...CAMERA_CONSTRAINTS,
-            },
-            audio: false,
+      // Wait for metadata before playing
+      video.addEventListener(
+        'loadedmetadata',
+        () => {
+          video.play().catch((err) => {
+            console.error('Error playing video:', err)
           })
+        },
+        { once: true },
+      )
+    }, [stream])
 
-          streamRef.current = mediaStream
-          setFacing(targetFacing)
+    // Handle tab visibility change - pause/resume when tab loses/gains focus
+    useEffect(() => {
+      const handleVisibilityChange = () => {
+        if (!stream || !videoRef.current) return
 
-          // Attach to video element
-          if (videoRef.current) {
-            videoRef.current.srcObject = mediaStream
-
-            // Play when ready
-            if (videoRef.current.readyState >= 1) {
-              await videoRef.current.play()
-            } else {
-              videoRef.current.addEventListener(
-                'loadedmetadata',
-                () => {
-                  videoRef.current?.play().catch((err) => {
-                    console.error('Error playing video:', err)
-                  })
-                },
-                { once: true },
-              )
-            }
-          }
-
-          onReady?.()
-          return mediaStream
-        } catch (err) {
-          onError?.(parseMediaError(err))
-          return null
+        if (document.hidden) {
+          videoRef.current.pause()
+        } else {
+          videoRef.current.play().catch((err) => {
+            console.error('Error resuming video:', err)
+          })
         }
-      },
-      [onError, onReady],
-    )
-
-    // Stop camera and release resources
-    const stopCamera = useCallback(() => {
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((track) => track.stop())
-        streamRef.current = null
       }
-    }, [])
 
-    // Switch to opposite camera
-    const switchCamera = useCallback(async (): Promise<void> => {
-      const newFacing = facing === 'user' ? 'environment' : 'user'
-
-      // Stop current stream
-      stopCamera()
-
-      // Start with new facing
-      await startCamera(newFacing)
-    }, [facing, startCamera, stopCamera])
+      document.addEventListener('visibilitychange', handleVisibilityChange)
+      return () => {
+        document.removeEventListener('visibilitychange', handleVisibilityChange)
+      }
+    }, [stream])
 
     // Take photo from current video frame
     const takePhoto = useCallback(async (): Promise<CapturedPhoto | null> => {
@@ -264,43 +229,12 @@ export const CameraView = forwardRef<CameraViewRef, CameraViewProps>(
       () => ({
         takePhoto,
         switchCamera,
+        stop,
         facing,
         hasMultipleCameras,
       }),
-      [takePhoto, switchCamera, facing, hasMultipleCameras],
+      [takePhoto, switchCamera, stop, facing, hasMultipleCameras],
     )
-
-    // Auto-start camera on mount, stop on unmount
-    // Only run on mount/unmount - facing changes handled by switchCamera
-    // Dependencies intentionally omitted to prevent re-initialization
-    useEffect(() => {
-      startCamera(initialFacing)
-
-      return () => {
-        stopCamera()
-      }
-    }, [])
-
-    // Handle tab visibility change - pause/resume when tab loses/gains focus
-    useEffect(() => {
-      const handleVisibilityChange = () => {
-        // Guard: only act if stream and video are available
-        if (!streamRef.current || !videoRef.current) return
-
-        if (document.hidden) {
-          videoRef.current.pause()
-        } else {
-          videoRef.current.play().catch((err) => {
-            console.error('Error resuming video:', err)
-          })
-        }
-      }
-
-      document.addEventListener('visibilitychange', handleVisibilityChange)
-      return () => {
-        document.removeEventListener('visibilitychange', handleVisibilityChange)
-      }
-    }, [])
 
     // Mirror front camera for natural selfie appearance
     const shouldMirror = facing === 'user'

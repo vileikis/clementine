@@ -193,6 +193,30 @@ export function CapturePhotoRunMode({
   const errorMessage =
     uploadError || error?.message || 'Failed to capture photo'
 
+  // Uploading state - check first as it takes priority over all other states
+  if (isUploading) {
+    return (
+      <StepLayout hideButton>
+        <UploadProgress photo={photo} aspectRatio={aspectRatio} />
+      </StepLayout>
+    )
+  }
+
+  // Photo preview state - check before permission states so fallback picker works
+  // (user can select photo even when permission is denied/unavailable)
+  if (captureStatus === 'photo-preview' && photo) {
+    return (
+      <StepLayout hideButton>
+        <PhotoPreview
+          photo={photo}
+          aspectRatio={aspectRatio}
+          onRetake={retake}
+          onConfirm={handleConfirm}
+        />
+      </StepLayout>
+    )
+  }
+
   // Permission: unknown (loading)
   if (permStatus === 'unknown') {
     return (
@@ -239,15 +263,6 @@ export function CapturePhotoRunMode({
 
   // Permission granted - show capture flow
 
-  // Uploading state
-  if (isUploading) {
-    return (
-      <StepLayout hideButton>
-        <UploadProgress photo={photo} aspectRatio={aspectRatio} />
-      </StepLayout>
-    )
-  }
-
   // Error state
   if (captureStatus === 'error' || uploadError) {
     return (
@@ -258,20 +273,6 @@ export function CapturePhotoRunMode({
           onRetry={handleRetry}
           onOpenPicker={openPicker}
           onFileChange={handleFileChange}
-        />
-      </StepLayout>
-    )
-  }
-
-  // Photo preview state
-  if (captureStatus === 'photo-preview' && photo) {
-    return (
-      <StepLayout hideButton>
-        <PhotoPreview
-          photo={photo}
-          aspectRatio={aspectRatio}
-          onRetake={retake}
-          onConfirm={handleConfirm}
         />
       </StepLayout>
     )
