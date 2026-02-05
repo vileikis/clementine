@@ -4,28 +4,23 @@
  * Main form container for configuring AI image generation outcome.
  * Composes OutcomeTypeSelector and PromptComposer for complete configuration.
  *
- * Implements autosave pattern:
- * - 2-second debounce for prompt changes
- * - Immediate saves for discrete selections (type, model, aspect ratio)
+ * Implements autosave pattern using react-hook-form + useAutoSave:
+ * - All changes update local form state immediately (responsive UI)
+ * - Single debounced save (2s) batches all changes to Firestore
+ * - Avoids race conditions and stale closures
  *
  * @see spec.md - US1 (Configure AI Image Generation) + US2 (Select Outcome Type)
  */
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 
 import { PromptComposer } from '../PromptComposer'
 import { useUpdateOutcome } from '../../hooks'
 import { useRefMediaUpload } from '../../hooks/useRefMediaUpload'
 import {
-  addOutcomeRefMedia,
   createDefaultOutcome,
-  removeOutcomeRefMedia,
   sanitizeDisplayName,
-  updateOutcomeAiEnabled,
-  updateOutcomeAspectRatio,
-  updateOutcomeCaptureStepId,
-  updateOutcomeModel,
-  updateOutcomePrompt,
-  updateOutcomeType,
 } from '../../lib/outcome-operations'
 import { AIGenerationToggle } from './AIGenerationToggle'
 import { OutcomeTypeSelector } from './OutcomeTypeSelector'
@@ -40,10 +35,12 @@ import type {
   OutcomeType,
 } from '@clementine/shared'
 import { useAuth } from '@/domains/auth'
-import { useDebounce } from '@/shared/utils/useDebounce'
+import { useAutoSave } from '@/shared/forms'
+import { useExperienceDesignerStore } from '@/domains/experience/designer'
+import { useTrackedMutation } from '@/shared/editor-status'
 
-/** Debounce delay for prompt changes (ms) */
-const PROMPT_DEBOUNCE_DELAY = 2000
+/** Debounce delay for all changes (ms) */
+const AUTOSAVE_DEBOUNCE_MS = 2000
 
 export interface CreateTabFormProps {
   /** Experience data */
@@ -57,109 +54,126 @@ export interface CreateTabFormProps {
  */
 export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
   const { user } = useAuth()
+  const store = useExperienceDesignerStore()
 
-  // Get current outcome or use defaults
-  const currentOutcome = experience.draft.outcome ?? createDefaultOutcome()
+  // Server outcome (source of truth for resets)
+  const serverOutcome = experience.draft.outcome ?? createDefaultOutcome()
   const steps = experience.draft.steps
 
-  // Mutation for saving outcome changes
-  const updateOutcomeMutation = useUpdateOutcome(workspaceId, experience.id)
+  // Mutation for saving outcome changes (tracked for save status indicator)
+  const baseMutation = useUpdateOutcome(workspaceId, experience.id)
+  const updateOutcomeMutation = useTrackedMutation(baseMutation, store)
 
-  // Local state for prompt with debouncing
-  const [localPrompt, setLocalPrompt] = useState(
-    currentOutcome.imageGeneration.prompt,
-  )
-
-  // Debounce the local prompt value
-  const debouncedPrompt = useDebounce(localPrompt, PROMPT_DEBOUNCE_DELAY)
-
-  // Save outcome with mutation
-  const saveOutcome = useCallback(
-    (outcome: Outcome) => {
-      updateOutcomeMutation.mutate({ outcome })
+  // Form setup - manages outcome state locally
+  const form = useForm<Outcome>({
+    defaultValues: serverOutcome,
+    resetOptions: {
+      keepDirtyValues: true,
+      keepErrors: true,
     },
-    [updateOutcomeMutation],
-  )
+  })
 
-  // Update outcome when debounced prompt changes
+  // Reset form when experience changes (e.g., navigating to different experience)
   useEffect(() => {
-    if (debouncedPrompt !== currentOutcome.imageGeneration.prompt) {
-      const newOutcome = updateOutcomePrompt(currentOutcome, debouncedPrompt)
-      saveOutcome(newOutcome)
-    }
-  }, [debouncedPrompt])
+    form.reset(serverOutcome)
+  }, [experience.id])
 
-  // Sync local prompt with current outcome when it changes externally
-  useEffect(() => {
-    if (currentOutcome.imageGeneration.prompt !== localPrompt) {
-      setLocalPrompt(currentOutcome.imageGeneration.prompt)
-    }
-  }, [currentOutcome.imageGeneration.prompt])
+  // Auto-save with debounce (2 seconds)
+  const { triggerSave } = useAutoSave({
+    form,
+    originalValues: serverOutcome,
+    onUpdate: async () => {
+      try {
+        const outcome = form.getValues()
+        await updateOutcomeMutation.mutateAsync({ outcome })
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : 'Failed to save outcome'
+        toast.error(message)
+      }
+    },
+    debounceMs: AUTOSAVE_DEBOUNCE_MS,
+  })
 
-  // Handle outcome type change - immediate save
+  // Watch form values for reactive rendering
+  const outcome = form.watch()
+
+  // Ref to track current refMedia count for upload hook
+  const refMediaRef = useRef(outcome.imageGeneration.refMedia)
+  refMediaRef.current = outcome.imageGeneration.refMedia
+
+  // Handle outcome type change
   const handleOutcomeTypeChange = useCallback(
     (type: OutcomeType) => {
-      const newOutcome = updateOutcomeType(currentOutcome, type)
-      saveOutcome(newOutcome)
+      form.setValue('type', type, { shouldDirty: true })
+      triggerSave()
     },
-    [currentOutcome, saveOutcome],
+    [form, triggerSave],
   )
 
-  // Handle model change - immediate save
+  // Handle model change
   const handleModelChange = useCallback(
     (model: string) => {
-      const newOutcome = updateOutcomeModel(
-        currentOutcome,
-        model as AIImageModel,
-      )
-      saveOutcome(newOutcome)
+      form.setValue('imageGeneration.model', model as AIImageModel, {
+        shouldDirty: true,
+      })
+      triggerSave()
     },
-    [currentOutcome, saveOutcome],
+    [form, triggerSave],
   )
 
-  // Handle aspect ratio change - immediate save
+  // Handle aspect ratio change
   const handleAspectRatioChange = useCallback(
     (aspectRatio: string) => {
-      const newOutcome = updateOutcomeAspectRatio(
-        currentOutcome,
+      form.setValue(
+        'imageGeneration.aspectRatio',
         aspectRatio as AIImageAspectRatio,
+        { shouldDirty: true },
       )
-      saveOutcome(newOutcome)
+      triggerSave()
     },
-    [currentOutcome, saveOutcome],
+    [form, triggerSave],
   )
 
-  // Handle capture step ID change - immediate save
+  // Handle capture step ID change
   const handleCaptureStepIdChange = useCallback(
     (captureStepId: string | null) => {
-      const newOutcome = updateOutcomeCaptureStepId(
-        currentOutcome,
-        captureStepId,
-      )
-      saveOutcome(newOutcome)
+      form.setValue('captureStepId', captureStepId, { shouldDirty: true })
+      triggerSave()
     },
-    [currentOutcome, saveOutcome],
+    [form, triggerSave],
   )
 
-  // Handle AI enabled toggle change - immediate save
+  // Handle AI enabled toggle change
   const handleAiEnabledChange = useCallback(
     (aiEnabled: boolean) => {
-      const newOutcome = updateOutcomeAiEnabled(currentOutcome, aiEnabled)
-      saveOutcome(newOutcome)
+      form.setValue('aiEnabled', aiEnabled, { shouldDirty: true })
+      triggerSave()
     },
-    [currentOutcome, saveOutcome],
+    [form, triggerSave],
   )
 
-  // Handle reference media removal - immediate save
+  // Handle prompt change
+  const handlePromptChange = useCallback(
+    (prompt: string) => {
+      form.setValue('imageGeneration.prompt', prompt, { shouldDirty: true })
+      triggerSave()
+    },
+    [form, triggerSave],
+  )
+
+  // Handle reference media removal
   const handleRemoveRefMedia = useCallback(
     (mediaAssetId: string) => {
-      const newOutcome = removeOutcomeRefMedia(currentOutcome, mediaAssetId)
-      saveOutcome(newOutcome)
+      const current = form.getValues('imageGeneration.refMedia')
+      const updated = current.filter((m) => m.mediaAssetId !== mediaAssetId)
+      form.setValue('imageGeneration.refMedia', updated, { shouldDirty: true })
+      triggerSave()
     },
-    [currentOutcome, saveOutcome],
+    [form, triggerSave],
   )
 
-  // Handle media upload complete - immediate save
+  // Handle media upload complete
   // Sanitize displayName to remove invalid characters (}, {, :)
   const handleMediaUploaded = useCallback(
     (mediaRef: MediaReference) => {
@@ -167,18 +181,32 @@ export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
         ...mediaRef,
         displayName: sanitizeDisplayName(mediaRef.displayName),
       }
-      const newOutcome = addOutcomeRefMedia(currentOutcome, [sanitizedMediaRef])
-      saveOutcome(newOutcome)
+      const current = form.getValues('imageGeneration.refMedia')
+      form.setValue(
+        'imageGeneration.refMedia',
+        [...current, sanitizedMediaRef],
+        {
+          shouldDirty: true,
+        },
+      )
+      triggerSave()
     },
-    [currentOutcome, saveOutcome],
+    [form, triggerSave],
   )
 
   // Reference media upload hook
+  // Uses ref to get current refMedia count to avoid stale closure
   const { uploadingFiles, uploadFiles, canAddMore, isUploading } =
     useRefMediaUpload({
       workspaceId,
       userId: user?.uid,
-      outcome: currentOutcome,
+      outcome: {
+        ...outcome,
+        imageGeneration: {
+          ...outcome.imageGeneration,
+          refMedia: refMediaRef.current,
+        },
+      },
       onMediaUploaded: handleMediaUploaded,
     })
 
@@ -191,44 +219,44 @@ export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
     <div className="space-y-6">
       {/* Outcome Type Selection */}
       <OutcomeTypeSelector
-        value={currentOutcome.type}
+        value={outcome.type}
         onChange={handleOutcomeTypeChange}
       />
 
       {/* Source Image Selection - only show when Image is selected */}
-      {currentOutcome.type === 'image' && (
+      {outcome.type === 'image' && (
         <SourceImageSelector
-          value={currentOutcome.captureStepId}
+          value={outcome.captureStepId}
           onChange={handleCaptureStepIdChange}
           steps={steps}
         />
       )}
 
       {/* AI Generation Toggle - only show when Image is selected */}
-      {currentOutcome.type === 'image' && (
+      {outcome.type === 'image' && (
         <AIGenerationToggle
-          value={currentOutcome.aiEnabled}
+          value={outcome.aiEnabled}
           onChange={handleAiEnabledChange}
         />
       )}
 
       {/* AI Generation Configuration - only show when Image is selected, disabled when AI is off */}
-      {currentOutcome.type === 'image' && (
+      {outcome.type === 'image' && (
         <PromptComposer
-          prompt={localPrompt}
-          onPromptChange={setLocalPrompt}
-          model={currentOutcome.imageGeneration.model}
+          prompt={outcome.imageGeneration.prompt}
+          onPromptChange={handlePromptChange}
+          model={outcome.imageGeneration.model}
           onModelChange={handleModelChange}
-          aspectRatio={currentOutcome.imageGeneration.aspectRatio}
+          aspectRatio={outcome.imageGeneration.aspectRatio}
           onAspectRatioChange={handleAspectRatioChange}
-          refMedia={currentOutcome.imageGeneration.refMedia}
+          refMedia={outcome.imageGeneration.refMedia}
           onRefMediaRemove={handleRemoveRefMedia}
           uploadingFiles={uploadingFiles}
           onFilesSelected={uploadFiles}
           canAddMore={canAddMore}
           isUploading={isUploading}
           steps={mentionableSteps}
-          disabled={!currentOutcome.aiEnabled}
+          disabled={!outcome.aiEnabled}
         />
       )}
     </div>
