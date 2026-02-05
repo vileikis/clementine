@@ -70,6 +70,8 @@ export interface PromptComposerProps {
   steps: ExperienceStep[]
   /** Whether the composer is disabled */
   disabled?: boolean
+  /** Validation error message for prompt */
+  error?: string
 }
 
 /**
@@ -90,6 +92,7 @@ export function PromptComposer({
   isUploading,
   steps,
   disabled,
+  error,
 }: PromptComposerProps) {
   // Convert steps to StepOption format (exclude info steps)
   const stepOptions = useMemo(
@@ -149,45 +152,53 @@ export function PromptComposer({
   )
 
   return (
-    <div
-      className={cn(
-        'flex flex-col overflow-hidden rounded-lg border transition-colors',
-        isDragOver && 'border-primary bg-primary/5',
-        disabled && 'pointer-events-none opacity-50',
+    <div className="space-y-2">
+      <div
+        className={cn(
+          'flex flex-col overflow-hidden rounded-lg border transition-colors',
+          isDragOver && 'border-primary bg-primary/5',
+          error && 'border-destructive',
+          disabled && 'pointer-events-none opacity-50',
+        )}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+      >
+        {/* Reference Media Strip (only shown when items exist) */}
+        <ReferenceMediaStrip
+          media={refMedia}
+          uploadingFiles={uploadingFiles}
+          onRemove={onRefMediaRemove}
+          disabled={disabled}
+        />
+
+        {/* Prompt Input with @mention support */}
+        <LexicalPromptInput
+          value={prompt}
+          onChange={onPromptChange}
+          steps={stepOptions}
+          media={mediaOptions}
+          disabled={disabled}
+        />
+
+        {/* Control Row */}
+        <ControlRow
+          model={model}
+          onModelChange={onModelChange}
+          modelOptions={AI_IMAGE_MODELS}
+          aspectRatio={aspectRatio}
+          onAspectRatioChange={onAspectRatioChange}
+          aspectRatioOptions={ASPECT_RATIOS}
+          onFilesSelected={onFilesSelected}
+          isAddDisabled={isAddDisabled}
+          disabled={disabled}
+        />
+      </div>
+      {error && (
+        <p className="text-destructive text-sm" role="alert">
+          {error}
+        </p>
       )}
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
-    >
-      {/* Reference Media Strip (only shown when items exist) */}
-      <ReferenceMediaStrip
-        media={refMedia}
-        uploadingFiles={uploadingFiles}
-        onRemove={onRefMediaRemove}
-        disabled={disabled}
-      />
-
-      {/* Prompt Input with @mention support */}
-      <LexicalPromptInput
-        value={prompt}
-        onChange={onPromptChange}
-        steps={stepOptions}
-        media={mediaOptions}
-        disabled={disabled}
-      />
-
-      {/* Control Row */}
-      <ControlRow
-        model={model}
-        onModelChange={onModelChange}
-        modelOptions={AI_IMAGE_MODELS}
-        aspectRatio={aspectRatio}
-        onAspectRatioChange={onAspectRatioChange}
-        aspectRatioOptions={ASPECT_RATIOS}
-        onFilesSelected={onFilesSelected}
-        isAddDisabled={isAddDisabled}
-        disabled={disabled}
-      />
     </div>
   )
 }

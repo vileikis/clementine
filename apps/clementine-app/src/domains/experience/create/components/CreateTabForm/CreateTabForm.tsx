@@ -19,12 +19,17 @@ import { PromptComposer } from '../PromptComposer'
 import { useUpdateOutcome } from '../../hooks'
 import { useRefMediaUpload } from '../../hooks/useRefMediaUpload'
 import {
+  getFieldError,
+  useOutcomeValidation,
+} from '../../hooks/useOutcomeValidation'
+import {
   createDefaultOutcome,
   sanitizeDisplayName,
 } from '../../lib/outcome-operations'
 import { AIGenerationToggle } from './AIGenerationToggle'
 import { OutcomeTypeSelector } from './OutcomeTypeSelector'
 import { SourceImageSelector } from './SourceImageSelector'
+import { ValidationSummary } from './ValidationSummary'
 import type {
   AIImageAspectRatio,
   AIImageModel,
@@ -215,12 +220,19 @@ export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
     (s: ExperienceStep) => s.type !== 'info',
   )
 
+  // Validation - computes errors based on current outcome state
+  const validationErrors = useOutcomeValidation(outcome, steps)
+
   return (
     <div className="space-y-6">
+      {/* Validation Summary - shown at top when errors exist */}
+      <ValidationSummary errors={validationErrors} />
+
       {/* Outcome Type Selection */}
       <OutcomeTypeSelector
         value={outcome.type}
         onChange={handleOutcomeTypeChange}
+        error={getFieldError(validationErrors, 'type')}
       />
 
       {/* Source Image Selection - only show when Image is selected */}
@@ -229,6 +241,7 @@ export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
           value={outcome.captureStepId}
           onChange={handleCaptureStepIdChange}
           steps={steps}
+          error={getFieldError(validationErrors, 'captureStepId')}
         />
       )}
 
@@ -257,6 +270,7 @@ export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
           isUploading={isUploading}
           steps={mentionableSteps}
           disabled={!outcome.aiEnabled}
+          error={getFieldError(validationErrors, 'prompt')}
         />
       )}
     </div>

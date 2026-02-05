@@ -18,6 +18,8 @@ export interface OutcomeTypeSelectorProps {
   onChange: (value: OutcomeType) => void
   /** Whether the selector is disabled */
   disabled?: boolean
+  /** Validation error message */
+  error?: string
 }
 
 /**
@@ -27,6 +29,7 @@ export function OutcomeTypeSelector({
   value,
   onChange,
   disabled,
+  error,
 }: OutcomeTypeSelectorProps) {
   return (
     <div className="space-y-2">
@@ -72,6 +75,11 @@ export function OutcomeTypeSelector({
           <span className="text-muted-foreground text-xs">(soon)</span>
         </ToggleGroupItem>
       </ToggleGroup>
+      {error && (
+        <p className="text-destructive text-sm" role="alert">
+          {error}
+        </p>
+      )}
     </div>
   )
 }

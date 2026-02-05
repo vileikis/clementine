@@ -29,6 +29,8 @@ export interface SourceImageSelectorProps {
   steps: ExperienceStep[]
   /** Whether the selector is disabled */
   disabled?: boolean
+  /** Validation error message */
+  error?: string
 }
 
 /**
@@ -39,6 +41,7 @@ export function SourceImageSelector({
   onChange,
   steps,
   disabled,
+  error,
 }: SourceImageSelectorProps) {
   // Filter to capture steps only
   const captureSteps = steps.filter((s) => s.type === 'capture.photo')
@@ -87,6 +90,11 @@ export function SourceImageSelector({
       {captureSteps.length === 0 && (
         <p className="text-muted-foreground text-xs">
           Add a Photo Capture step to use as source image
+        </p>
+      )}
+      {error && (
+        <p className="text-destructive text-sm" role="alert">
+          {error}
         </p>
       )}
     </div>

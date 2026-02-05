@@ -138,12 +138,12 @@
 
 ### Implementation for User Story 6
 
-- [ ] T036 [US6] Create validation hook in `apps/clementine-app/src/domains/experience/create/hooks/useOutcomeValidation.ts`
-- [ ] T037 [US6] Create `apps/clementine-app/src/domains/experience/create/components/CreateTabForm/ValidationSummary.tsx` for error display
-- [ ] T038 [US6] Integrate ValidationSummary into CreateTabForm.tsx (top of form)
-- [ ] T039 [US6] Add inline error display next to invalid fields
-- [ ] T040 [US6] Wire validation errors to publish button (disable when errors exist)
-- [ ] T041 [US6] Update hooks barrel exports in `apps/clementine-app/src/domains/experience/create/hooks/index.ts`
+- [X] T036 [US6] Create validation hook in `apps/clementine-app/src/domains/experience/create/hooks/useOutcomeValidation.ts`
+- [X] T037 [US6] Create `apps/clementine-app/src/domains/experience/create/components/CreateTabForm/ValidationSummary.tsx` for error display
+- [X] T038 [US6] Integrate ValidationSummary into CreateTabForm.tsx (top of form)
+- [X] T039 [US6] Add inline error display next to invalid fields
+- [X] T040 [US6] Wire validation errors to publish button (disable when errors exist)
+- [X] T041 [US6] Update hooks barrel exports in `apps/clementine-app/src/domains/experience/create/hooks/index.ts`
 
 **Checkpoint**: US6 complete - Admin sees validation errors before publishing
 
@@ -153,18 +153,18 @@
 
 **Purpose**: Remove legacy code and finalize
 
-- [ ] T042 [P] Delete `apps/clementine-app/src/domains/experience/create/components/NodeListItem/` directory
-- [ ] T043 [P] Delete `apps/clementine-app/src/domains/experience/create/components/EmptyState.tsx` (if node-specific)
-- [ ] T044 [P] Delete `apps/clementine-app/src/domains/experience/create/components/AddNodeButton.tsx`
-- [ ] T045 [P] Delete `apps/clementine-app/src/domains/experience/create/components/DeleteNodeDialog.tsx`
-- [ ] T046 [P] Delete `apps/clementine-app/src/domains/experience/create/components/NodeEditorPanel.tsx`
-- [ ] T047 [P] Delete `apps/clementine-app/src/domains/experience/create/containers/TransformPipelineEditor.tsx`
-- [ ] T048 [P] Delete `apps/clementine-app/src/domains/experience/create/lib/transform-operations.ts`
-- [ ] T049 [P] Delete `apps/clementine-app/src/domains/experience/create/hooks/useUpdateTransformNodes.ts`
-- [ ] T050 Update all barrel exports to remove deleted components
-- [ ] T051 Update domain exports in `apps/clementine-app/src/domains/experience/create/index.ts`
-- [ ] T052 Run `pnpm app:check` (lint + format)
-- [ ] T053 Run `pnpm app:type-check` and fix any errors
+- [X] T042 [P] Delete `apps/clementine-app/src/domains/experience/create/components/NodeListItem/` directory
+- [X] T043 [P] Delete `apps/clementine-app/src/domains/experience/create/components/EmptyState.tsx` (if node-specific)
+- [X] T044 [P] Delete `apps/clementine-app/src/domains/experience/create/components/AddNodeButton.tsx`
+- [X] T045 [P] Delete `apps/clementine-app/src/domains/experience/create/components/DeleteNodeDialog.tsx`
+- [X] T046 [P] Delete `apps/clementine-app/src/domains/experience/create/components/NodeEditorPanel.tsx`
+- [X] T047 [P] Delete `apps/clementine-app/src/domains/experience/create/containers/TransformPipelineEditor.tsx`
+- [X] T048 [P] Delete `apps/clementine-app/src/domains/experience/create/lib/transform-operations.ts`
+- [X] T049 [P] Delete `apps/clementine-app/src/domains/experience/create/hooks/useUpdateTransformNodes.ts`
+- [X] T050 Update all barrel exports to remove deleted components
+- [X] T051 Update domain exports in `apps/clementine-app/src/domains/experience/create/index.ts`
+- [X] T052 Run `pnpm app:check` (lint + format)
+- [X] T053 Run `pnpm app:type-check` and fix any errors
 - [ ] T054 Manual testing: verify Create tab matches PRD wireframe
 - [ ] T055 Manual testing: verify mobile viewport and 44px touch targets
 
