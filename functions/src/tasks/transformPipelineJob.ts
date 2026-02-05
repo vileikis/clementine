@@ -1,7 +1,7 @@
 /**
  * Cloud Task Handler: transformPipelineJob
  *
- * Executes transform pipeline jobs asynchronously.
+ * Executes transform jobs asynchronously using outcome-based execution.
  * Manages job lifecycle: pending → running → completed/failed
  *
  * See contracts/transform-pipeline-job.yaml for full spec.
@@ -18,20 +18,18 @@ import {
   updateJobError,
   createSanitizedError,
 } from '../repositories/job'
-import type { JobOutput } from '@clementine/shared'
-import {
-  executeTransformPipeline,
-  uploadPipelineOutput,
-  type PipelineContext,
-  type PipelineResult,
-  type UploadedOutput,
-} from '../services/transform'
+import type { Job, JobOutput } from '@clementine/shared'
+import { runOutcome, type OutcomeContext } from '../services/transform'
 import { createTempDir, cleanupTempDir } from '../infra/temp-dir'
 
 /**
- * Job handler context - extends PipelineContext with cleanup
+ * Job handler context for cleanup management
  */
-interface JobHandlerContext extends PipelineContext {
+interface JobHandlerContext {
+  job: Job
+  projectId: string
+  sessionId: string
+  tmpDir: string
   cleanup: () => Promise<void>
 }
 
@@ -45,8 +43,8 @@ interface JobHandlerContext extends PipelineContext {
  * Flow:
  * 1. Validate payload & prepare execution context
  * 2. Mark job as running
- * 3. Execute transform pipeline
- * 4. Upload output & finalize
+ * 3. Execute outcome via runOutcome()
+ * 4. Update session with result & finalize
  */
 export const transformPipelineJob = onTaskDispatched(
   {
@@ -69,20 +67,26 @@ export const transformPipelineJob = onTaskDispatched(
       // 2. Mark as running
       await markJobRunning(context)
 
-      // 3. Execute transform pipeline
-      const pipelineResult = await executeTransformPipeline(context)
+      // 3. Execute outcome
+      const outcomeContext: OutcomeContext = {
+        job: context.job,
+        snapshot: context.job.snapshot,
+        startTime: Date.now(),
+        tmpDir: context.tmpDir,
+      }
+      const output = await runOutcome(outcomeContext)
 
-      // 4. Upload & finalize
-      await finalizeJobSuccess(pipelineResult, context)
+      // 4. Finalize success
+      await finalizeJobSuccess(output, context)
     } catch (error) {
-      logger.error('[TransformJob] Pipeline failed', { error })
+      logger.error('[TransformJob] Job execution failed', { error })
       if (context) {
         await handleJobFailure(context, error)
       }
     } finally {
       await context?.cleanup()
     }
-  }
+  },
 )
 
 // ============================================================================
@@ -123,10 +127,9 @@ async function prepareJobExecution(data: unknown): Promise<JobHandlerContext> {
   const tmpDir = await createTempDir(jobId, 'transform')
 
   return {
-    jobId,
+    job,
     projectId,
     sessionId,
-    snapshot: job.snapshot,
     tmpDir,
     cleanup: () => cleanupTempDir(tmpDir),
   }
@@ -136,56 +139,50 @@ async function prepareJobExecution(data: unknown): Promise<JobHandlerContext> {
  * Mark job as running with initial progress
  */
 async function markJobRunning(context: JobHandlerContext): Promise<void> {
-  const { projectId, jobId, sessionId } = context
+  const { projectId, job, sessionId } = context
 
   // Combined write: status + progress in one update
-  await updateJobStarted(projectId, jobId, {
-    currentStep: 'transforming',
+  await updateJobStarted(projectId, job.id, {
+    currentStep: 'processing',
     percentage: 20,
-    message: 'Processing transform...',
+    message: 'Processing outcome...',
   })
-  await updateSessionJobStatus(projectId, sessionId, jobId, 'running')
+  await updateSessionJobStatus(projectId, sessionId, job.id, 'running')
 
-  logger.info('[TransformJob] Job started', { jobId })
+  logger.info('[TransformJob] Job started', { jobId: job.id })
 }
 
 /**
- * Upload output and finalize job as successful
+ * Finalize job as successful with output
  */
 async function finalizeJobSuccess(
-  pipelineResult: PipelineResult,
-  context: JobHandlerContext
+  output: JobOutput,
+  context: JobHandlerContext,
 ): Promise<void> {
-  const { projectId, jobId, sessionId } = context
-  const startTime = Date.now()
+  const { projectId, job, sessionId } = context
 
-  // Update progress: uploading (before the upload starts)
-  await updateJobProgress(projectId, jobId, {
-    currentStep: 'uploading',
-    percentage: 80,
-    message: 'Uploading result...',
+  // Update progress: uploading (output already uploaded by outcome executor)
+  await updateJobProgress(projectId, job.id, {
+    currentStep: 'finalizing',
+    percentage: 90,
+    message: 'Finalizing result...',
   })
 
-  // Upload output and generate thumbnail
-  const uploadedOutput = await uploadPipelineOutput(pipelineResult, context)
-
-  // Build job output
-  const output = buildJobOutput(pipelineResult, uploadedOutput, startTime)
-
   // Update session with result media
+  // Use 'create' as the stepId (standard output step)
   await updateSessionResultMedia(projectId, sessionId, {
-    stepId: 'transform',
-    assetId: uploadedOutput.assetId,
-    url: uploadedOutput.url,
+    stepId: 'create',
+    assetId: output.assetId,
+    url: output.url,
     createdAt: Date.now(),
   })
 
   // Mark job as completed (sets progress to 100% completed)
-  await updateJobComplete(projectId, jobId, output)
-  await updateSessionJobStatus(projectId, sessionId, jobId, 'completed')
+  await updateJobComplete(projectId, job.id, output)
+  await updateSessionJobStatus(projectId, sessionId, job.id, 'completed')
 
   logger.info('[TransformJob] Job completed', {
-    jobId,
+    jobId: job.id,
     format: output.format,
     processingTimeMs: output.processingTimeMs,
     url: output.url,
@@ -197,17 +194,17 @@ async function finalizeJobSuccess(
  */
 async function handleJobFailure(
   context: JobHandlerContext,
-  error: unknown
+  error: unknown,
 ): Promise<void> {
-  const { projectId, jobId, sessionId } = context
+  const { projectId, job, sessionId } = context
 
   try {
-    const sanitizedError = createSanitizedError('PROCESSING_FAILED', 'pipeline')
-    await updateJobError(projectId, jobId, sanitizedError)
-    await updateSessionJobStatus(projectId, sessionId, jobId, 'failed')
+    const sanitizedError = createSanitizedError('PROCESSING_FAILED', 'outcome')
+    await updateJobError(projectId, job.id, sanitizedError)
+    await updateSessionJobStatus(projectId, sessionId, job.id, 'failed')
 
     logger.error('[TransformJob] Error details', {
-      jobId,
+      jobId: job.id,
       sessionId,
       projectId,
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -215,24 +212,5 @@ async function handleJobFailure(
     })
   } catch (updateError) {
     logger.error('[TransformJob] Failed to update error state', { updateError })
-  }
-}
-
-/**
- * Build JobOutput from pipeline and upload results
- */
-function buildJobOutput(
-  pipelineResult: PipelineResult,
-  uploadedOutput: UploadedOutput,
-  startTime: number
-): JobOutput {
-  return {
-    assetId: uploadedOutput.assetId,
-    url: uploadedOutput.url,
-    format: pipelineResult.format,
-    dimensions: uploadedOutput.dimensions,
-    sizeBytes: uploadedOutput.sizeBytes,
-    thumbnailUrl: uploadedOutput.thumbnailUrl,
-    processingTimeMs: Date.now() - startTime,
   }
 }

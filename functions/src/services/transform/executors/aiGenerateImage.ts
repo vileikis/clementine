@@ -1,11 +1,14 @@
 /**
- * AI Image Node Executor
+ * AI Image Generation Executor
  *
- * Executes ai.imageGeneration transform nodes using Vertex AI (Gemini).
- * Handles prompt resolution, media collection, and AI generation.
+ * Atomic executor for AI image generation using Vertex AI (Gemini).
+ * Accepts a GenerationRequest and returns a GeneratedImage.
+ *
+ * Refactored from the deprecated ai-image.ts node executor.
  */
 import { defineString } from 'firebase-functions/params'
 import {
+  GenerateContentResponse,
   GoogleGenAI,
   Modality,
   type GenerateContentConfig,
@@ -14,15 +17,10 @@ import {
 import { logger } from 'firebase-functions/v2'
 import * as fs from 'fs/promises'
 
-import type {
-  AIImageNode,
-  CapturedMedia,
-  MediaReference,
-  Answer,
-} from '@clementine/shared'
-import type { PipelineContext, NodeResult } from '../types'
+import type { MediaReference } from '@clementine/shared'
+import type { GenerationRequest, GeneratedImage } from '../types'
 import { storage } from '../../../infra/firebase-admin'
-import { getStoragePathFromMediaReference, parseStorageUrl } from '../../../infra/storage'
+import { getStoragePathFromMediaReference } from '../../../infra/storage'
 
 // Environment configuration for Vertex AI
 const VERTEX_AI_LOCATION = defineString('VERTEX_AI_LOCATION', {
@@ -33,50 +31,40 @@ const GOOGLE_CLOUD_PROJECT =
   process.env['GCLOUD_PROJECT'] || process.env['GOOGLE_CLOUD_PROJECT']
 
 /**
- * Execute AI image generation node
+ * Generate an AI image using Vertex AI
  *
- * Transforms images using Google's Gemini models via Vertex AI.
- * Supports prompt templates with step placeholders and reference media.
- *
- * @param node - AI image node configuration
- * @param context - Pipeline execution context
- * @returns Node result with output path
+ * @param request - Generation request with prompt, model, and media references
+ * @param tmpDir - Temporary directory for output file
+ * @returns Generated image result with output path
  */
-export async function executeAIImageNode(
-  node: AIImageNode,
-  context: PipelineContext
-): Promise<NodeResult | null> {
-  const { config } = node
-  const { snapshot, tmpDir } = context
+export async function aiGenerateImage(
+  request: GenerationRequest,
+  tmpDir: string,
+): Promise<GeneratedImage> {
+  const { prompt, model, aspectRatio, sourceMedia, referenceMedia } = request
 
   // Skip if prompt is empty
-  if (!config.prompt || config.prompt.trim().length === 0) {
-    logger.warn('[AIImage] Skipping node with empty prompt', { nodeId: node.id })
-    return null
+  if (!prompt || prompt.trim().length === 0) {
+    throw new Error('Cannot generate image with empty prompt')
   }
 
-  logger.info('[AIImage] Starting AI image generation', {
-    nodeId: node.id,
-    model: config.model,
-    aspectRatio: config.aspectRatio,
-    refMediaCount: config.refMedia.length,
+  logger.info('[AIGenerate] Starting AI image generation', {
+    model,
+    aspectRatio,
+    hasSourceMedia: !!sourceMedia,
+    refMediaCount: referenceMedia.length,
+    promptLength: prompt.length,
   })
-
-  // Resolve prompt with step placeholders
-  const resolvedPrompt = resolvePrompt(
-    config.prompt,
-    snapshot.sessionInputs.answers
-  )
 
   // Build content parts for Gemini API
   const contentParts = await buildContentParts(
-    resolvedPrompt,
-    snapshot.sessionInputs.capturedMedia,
-    config.refMedia
+    prompt,
+    sourceMedia,
+    referenceMedia,
   )
 
   // Initialize Vertex AI client
-  const location = getLocationForModel(config.model)
+  const location = getLocationForModel(model)
 
   if (!GOOGLE_CLOUD_PROJECT) {
     throw new Error('GOOGLE_CLOUD_PROJECT environment variable is required')
@@ -95,20 +83,20 @@ export async function executeAIImageNode(
     topP: 0.95,
     responseModalities: [Modality.IMAGE],
     imageConfig: {
-      aspectRatio: config.aspectRatio,
+      aspectRatio,
       outputMimeType: 'image/png',
     },
   }
 
-  logger.info('[AIImage] Calling Gemini API', {
-    model: config.model,
+  logger.info('[AIGenerate] Calling Gemini API', {
+    model,
     location,
     project: GOOGLE_CLOUD_PROJECT,
   })
 
   // Generate image
   const response = await client.models.generateContent({
-    model: config.model,
+    model,
     contents: [
       {
         role: 'user',
@@ -121,25 +109,33 @@ export async function executeAIImageNode(
   // Extract image from response
   const imageBuffer = extractImageFromResponse(response)
 
+  // Generate unique output filename
+  const outputId = `ai-output-${Date.now()}`
+  const outputPath = `${tmpDir}/${outputId}.png`
+
   // Save to temp directory
-  const outputPath = `${tmpDir}/ai-output-${node.id}.png`
   await fs.writeFile(outputPath, imageBuffer)
 
-  logger.info('[AIImage] AI image generation completed', {
-    nodeId: node.id,
+  // Get dimensions from aspect ratio
+  const dimensions = getDimensionsFromAspectRatio(aspectRatio)
+
+  logger.info('[AIGenerate] AI image generation completed', {
     outputPath,
     outputSize: imageBuffer.length,
+    dimensions,
   })
 
   return {
     outputPath,
     mimeType: 'image/png',
+    sizeBytes: imageBuffer.length,
+    dimensions,
   }
 }
 
-// ============================================================================
+// =============================================================================
 // Helper Functions
-// ============================================================================
+// =============================================================================
 
 /**
  * Get Vertex AI location for model
@@ -156,54 +152,28 @@ function getLocationForModel(model: string): string {
 }
 
 /**
- * Resolve prompt template with step placeholders
- *
- * Replaces @{step:stepId} placeholders with actual answer values.
- */
-function resolvePrompt(prompt: string, answers: Answer[]): string {
-  const stepPattern = /@\{step:([^}]+)\}/g
-
-  return prompt.replace(stepPattern, (match, stepId) => {
-    const answer = answers.find((a) => a.stepId === stepId)
-    if (!answer) {
-      logger.warn('[AIImage] No answer found for step placeholder', {
-        stepId,
-        placeholder: match,
-      })
-      return match // Keep original if not found
-    }
-
-    // Convert answer value to string
-    if (Array.isArray(answer.value)) {
-      return answer.value.join(', ')
-    }
-    return String(answer.value)
-  })
-}
-
-/**
  * Build content parts for Gemini API
  *
  * Constructs the multimodal content array with:
- * 1. Captured media with ID labels
+ * 1. Source media (if provided) for image-to-image
  * 2. Reference media with ID labels
  * 3. Prompt text at the end
  */
 async function buildContentParts(
   prompt: string,
-  capturedMedia: CapturedMedia[],
-  refMedia: MediaReference[]
+  sourceMedia: MediaReference | null,
+  referenceMedia: MediaReference[],
 ): Promise<Part[]> {
   const parts: Part[] = []
   const bucket = storage.bucket()
 
-  // Add captured media with ID labels
-  for (const media of capturedMedia) {
+  // Add source media (for image-to-image transformation)
+  if (sourceMedia) {
     parts.push({
-      text: `Image Reference ID: <captured_${media.stepId}>`,
+      text: 'Image Reference ID: <source_image>',
     })
 
-    const storagePath = parseStorageUrl(media.url)
+    const storagePath = getStoragePathFromMediaReference(sourceMedia)
     parts.push({
       fileData: {
         mimeType: 'image/jpeg',
@@ -213,9 +183,9 @@ async function buildContentParts(
   }
 
   // Add reference media with ID labels
-  for (const ref of refMedia) {
+  for (const ref of referenceMedia) {
     parts.push({
-      text: `Image Reference ID: <ref_${ref.mediaAssetId}>`,
+      text: `Image Reference ID: <ref_${ref.displayName}>`,
     })
 
     const storagePath = getStoragePathFromMediaReference(ref)
@@ -236,7 +206,7 @@ async function buildContentParts(
 /**
  * Extract image buffer from Gemini API response
  */
-function extractImageFromResponse(response: any): Buffer {
+function extractImageFromResponse(response: GenerateContentResponse): Buffer {
   if (!response.candidates || response.candidates.length === 0) {
     throw new Error('No candidates in Gemini API response')
   }
@@ -253,4 +223,25 @@ function extractImageFromResponse(response: any): Buffer {
   }
 
   throw new Error('No image data in Gemini API response')
+}
+
+/**
+ * Get output dimensions from aspect ratio
+ *
+ * Maps aspect ratios to actual pixel dimensions.
+ * These are the default output dimensions for Gemini image generation.
+ */
+function getDimensionsFromAspectRatio(aspectRatio: string): {
+  width: number
+  height: number
+} {
+  const dimensionMap: Record<string, { width: number; height: number }> = {
+    '1:1': { width: 1024, height: 1024 },
+    '3:2': { width: 1536, height: 1024 },
+    '2:3': { width: 1024, height: 1536 },
+    '16:9': { width: 1792, height: 1024 },
+    '9:16': { width: 1024, height: 1792 },
+  }
+
+  return dimensionMap[aspectRatio] ?? { width: 1024, height: 1024 }
 }

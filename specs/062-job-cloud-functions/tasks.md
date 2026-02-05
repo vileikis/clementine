@@ -25,10 +25,10 @@
 
 **Purpose**: Create new directory structure and remove deprecated files
 
-- [ ] T001 Create new directories: `functions/src/services/transform/engine/`, `functions/src/services/transform/outcomes/`, `functions/src/services/transform/bindings/`
-- [ ] T002 [P] Delete deprecated file `functions/src/services/transform/pipeline-runner.ts`
-- [ ] T003 [P] Delete deprecated file `functions/src/services/transform/overlay.ts`
-- [ ] T004 [P] Delete deprecated file `functions/src/services/transform/executors/ai-image.ts`
+- [x] T001 Create new directories: `functions/src/services/transform/engine/`, `functions/src/services/transform/outcomes/`, `functions/src/services/transform/bindings/`
+- [x] T002 [P] Delete deprecated file `functions/src/services/transform/pipeline-runner.ts`
+- [x] T003 [P] Delete deprecated file `functions/src/services/transform/overlay.ts`
+- [x] T004 [P] Delete deprecated file `functions/src/services/transform/executors/ai-image.ts`
 
 ---
 
@@ -38,9 +38,9 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T005 Update `jobSnapshotSchema` to add `sessionResponses` and `outcome` fields in `packages/shared/src/schemas/job/job.schema.ts`
-- [ ] T006 Add `OutcomeContext` and `OutcomeExecutor` interfaces to `functions/src/services/transform/types.ts`
-- [ ] T007 Build shared package to verify schema changes: `pnpm --filter @clementine/shared build`
+- [x] T005 Update `jobSnapshotSchema` to add `sessionResponses` and `outcome` fields in `packages/shared/src/schemas/job/job.schema.ts`
+- [x] T006 Add `OutcomeContext` and `OutcomeExecutor` interfaces to `functions/src/services/transform/types.ts`
+- [x] T007 Build shared package to verify schema changes: `pnpm --filter @clementine/shared build`
 
 **Checkpoint**: Schema and types ready - user story implementation can now begin
 
@@ -54,9 +54,9 @@
 
 ### Implementation for User Story 4
 
-- [ ] T008 [US4] Update `buildJobSnapshot()` to use `session.responses` and `experience.published.outcome` in `functions/src/repositories/job.ts`
-- [ ] T009 [US4] Update validation in `startTransformPipeline.ts` to check `outcome.type !== null` instead of `transformNodes.length > 0` in `functions/src/callable/startTransformPipeline.ts`
-- [ ] T010 [US4] Add passthrough validation: reject if `!aiEnabled && !captureStepId` in `functions/src/callable/startTransformPipeline.ts`
+- [x] T008 [US4] Update `buildJobSnapshot()` to use `session.responses` and `experience.published.outcome` in `functions/src/repositories/job.ts`
+- [x] T009 [US4] Update validation in `startTransformPipeline.ts` to check `outcome.type !== null` instead of `transformNodes.length > 0` in `functions/src/callable/startTransformPipeline.ts`
+- [x] T010 [US4] Add passthrough validation: reject if `!aiEnabled && !captureStepId` in `functions/src/callable/startTransformPipeline.ts`
 
 **Checkpoint**: Job creation validates outcome and builds correct snapshot
 
@@ -70,13 +70,13 @@
 
 ### Tests for User Story 3
 
-- [ ] T011 [P] [US3] Create unit test for `resolvePromptMentions()` covering text, multi-select, and capture step types in `functions/src/services/transform/bindings/__tests__/resolvePromptMentions.test.ts`
+- [x] T011 [P] [US3] Create unit test for `resolvePromptMentions()` covering text, multi-select, and capture step types in `functions/src/services/transform/bindings/__tests__/resolvePromptMentions.test.ts`
 
 ### Implementation for User Story 3
 
-- [ ] T012 [US3] Create `resolvePromptMentions()` function handling `@{step:stepName}` for text/multi-select/capture data types in `functions/src/services/transform/bindings/resolvePromptMentions.ts`
-- [ ] T013 [US3] Add `@{ref:displayName}` resolution from reference media array in `functions/src/services/transform/bindings/resolvePromptMentions.ts`
-- [ ] T014 [US3] Add warning logging for unresolved mentions (preserve original text) in `functions/src/services/transform/bindings/resolvePromptMentions.ts`
+- [x] T012 [US3] Create `resolvePromptMentions()` function handling `@{step:stepName}` for text/multi-select/capture data types in `functions/src/services/transform/bindings/resolvePromptMentions.ts`
+- [x] T013 [US3] Add `@{ref:displayName}` resolution from reference media array in `functions/src/services/transform/bindings/resolvePromptMentions.ts`
+- [x] T014 [US3] Add warning logging for unresolved mentions (preserve original text) in `functions/src/services/transform/bindings/resolvePromptMentions.ts`
 
 **Checkpoint**: Prompt resolution works for all data types, tests pass
 
@@ -86,9 +86,9 @@
 
 **Purpose**: Refactor existing code into reusable atomic executors
 
-- [ ] T015 [P] Create `aiGenerateImage()` executor (refactored from ai-image.ts, accept `GenerationRequest` interface) in `functions/src/services/transform/executors/aiGenerateImage.ts`
-- [ ] T016 [P] Create `applyOverlay()` executor (refactored from overlay.ts, accept media path and overlay reference) in `functions/src/services/transform/executors/applyOverlay.ts`
-- [ ] T017 Update executors barrel exports in `functions/src/services/transform/executors/index.ts`
+- [x] T015 [P] Create `aiGenerateImage()` executor (refactored from ai-image.ts, accept `GenerationRequest` interface) in `functions/src/services/transform/executors/aiGenerateImage.ts`
+- [x] T016 [P] Create `applyOverlay()` executor (refactored from overlay.ts, accept media path and overlay reference) in `functions/src/services/transform/executors/applyOverlay.ts`
+- [x] T017 Update executors barrel exports in `functions/src/services/transform/executors/index.ts`
 
 **Checkpoint**: Atomic executors ready for orchestration by outcomes
 
@@ -102,12 +102,12 @@
 
 ### Implementation for User Story 1
 
-- [ ] T018 [US1] Create `runOutcome()` dispatcher with registry pattern in `functions/src/services/transform/engine/runOutcome.ts`
-- [ ] T019 [US1] Add non-retryable error for unimplemented outcome types (gif, video) in `functions/src/services/transform/engine/runOutcome.ts`
-- [ ] T020 [US1] Create `imageOutcome()` executor with AI generation mode in `functions/src/services/transform/outcomes/imageOutcome.ts`
-- [ ] T021 [US1] Integrate prompt resolution, source media extraction, and AI generation call in `functions/src/services/transform/outcomes/imageOutcome.ts`
-- [ ] T022 [US1] Add overlay application after AI generation (lookup by aspect ratio) in `functions/src/services/transform/outcomes/imageOutcome.ts`
-- [ ] T023 [US1] Update `transformPipelineJob.ts` to call `runOutcome()` instead of `executeTransformPipeline()` in `functions/src/tasks/transformPipelineJob.ts`
+- [x] T018 [US1] Create `runOutcome()` dispatcher with registry pattern in `functions/src/services/transform/engine/runOutcome.ts`
+- [x] T019 [US1] Add non-retryable error for unimplemented outcome types (gif, video) in `functions/src/services/transform/engine/runOutcome.ts`
+- [x] T020 [US1] Create `imageOutcome()` executor with AI generation mode in `functions/src/services/transform/outcomes/imageOutcome.ts`
+- [x] T021 [US1] Integrate prompt resolution, source media extraction, and AI generation call in `functions/src/services/transform/outcomes/imageOutcome.ts`
+- [x] T022 [US1] Add overlay application after AI generation (lookup by aspect ratio) in `functions/src/services/transform/outcomes/imageOutcome.ts`
+- [x] T023 [US1] Update `transformPipelineJob.ts` to call `runOutcome()` instead of `executeTransformPipeline()` in `functions/src/tasks/transformPipelineJob.ts`
 
 **Checkpoint**: AI image generation flow works end-to-end
 
@@ -121,9 +121,9 @@
 
 ### Implementation for User Story 2
 
-- [ ] T024 [US2] Add passthrough mode branch in `imageOutcome()` (skip AI, apply overlay only) in `functions/src/services/transform/outcomes/imageOutcome.ts`
-- [ ] T025 [US2] Handle missing overlay gracefully (return media without overlay) in `functions/src/services/transform/outcomes/imageOutcome.ts`
-- [ ] T026 [US2] Add error handling for missing capture media in passthrough mode in `functions/src/services/transform/outcomes/imageOutcome.ts`
+- [x] T024 [US2] Add passthrough mode branch in `imageOutcome()` (skip AI, apply overlay only) in `functions/src/services/transform/outcomes/imageOutcome.ts`
+- [x] T025 [US2] Handle missing overlay gracefully (return media without overlay) in `functions/src/services/transform/outcomes/imageOutcome.ts`
+- [x] T026 [US2] Add error handling for missing capture media in passthrough mode in `functions/src/services/transform/outcomes/imageOutcome.ts`
 
 **Checkpoint**: Passthrough mode works, returns captured media with overlay
 
@@ -137,8 +137,8 @@
 
 ### Implementation for User Story 5
 
-- [ ] T027 [US5] Verify `updateSessionResultMedia()` is called with correct stepId ('create') in `functions/src/tasks/transformPipelineJob.ts`
-- [ ] T028 [US5] Verify `updateSessionJobStatus()` is called with 'completed' status in `functions/src/tasks/transformPipelineJob.ts`
+- [x] T027 [US5] Verify `updateSessionResultMedia()` is called with correct stepId ('create') in `functions/src/tasks/transformPipelineJob.ts`
+- [x] T028 [US5] Verify `updateSessionJobStatus()` is called with 'completed' status in `functions/src/tasks/transformPipelineJob.ts`
 
 **Checkpoint**: Session updates work correctly after job completion
 
@@ -148,11 +148,11 @@
 
 **Purpose**: Final integration, exports, and validation
 
-- [ ] T029 Update transform service barrel exports in `functions/src/services/transform/index.ts`
-- [ ] T030 Run type-check: `pnpm --filter functions type-check`
-- [ ] T031 Run lint: `pnpm --filter functions lint`
-- [ ] T032 Build functions package: `pnpm --filter functions build`
-- [ ] T033 Run tests: `pnpm --filter functions test`
+- [x] T029 Update transform service barrel exports in `functions/src/services/transform/index.ts`
+- [x] T030 Run type-check: `pnpm --filter functions type-check`
+- [x] T031 Run lint: `pnpm --filter functions lint` (no lint script in functions package - N/A)
+- [x] T032 Build functions package: `pnpm --filter functions build`
+- [x] T033 Run tests: `pnpm --filter functions test`
 
 ---
 

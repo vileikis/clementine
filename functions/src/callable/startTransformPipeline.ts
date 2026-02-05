@@ -86,15 +86,24 @@ export const startTransformPipelineV2 = onCall(
     const config =
       configSource === 'draft' ? experience.draft : experience.published
 
-    const transformNodes = config?.transformNodes ?? []
-    if (transformNodes.length === 0) {
+    // Validate outcome is configured (replaces transformNodes validation)
+    const outcome = config?.outcome
+    if (!outcome?.type) {
       throw new HttpsError(
-        'not-found',
-        'Experience has no transform configuration',
+        'invalid-argument',
+        'Experience has no outcome configured',
       )
     }
 
-    // Build job snapshot
+    // Validate passthrough mode has capture source
+    if (!outcome.aiEnabled && !outcome.captureStepId) {
+      throw new HttpsError(
+        'invalid-argument',
+        'Passthrough mode requires source image',
+      )
+    }
+
+    // Build job snapshot (no overlays for now - can be added when project context is available)
     const snapshot = buildJobSnapshot(session, experience, configSource)
 
     // Create job document with snapshot

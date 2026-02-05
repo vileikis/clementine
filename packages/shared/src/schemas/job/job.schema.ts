@@ -13,9 +13,14 @@
  */
 import { z } from 'zod'
 import { answerSchema, capturedMediaSchema } from '../session/session.schema'
-import { overlayReferenceSchema } from '../project/project-config.schema'
+import {
+  overlayReferenceSchema,
+  overlaysConfigSchema,
+} from '../project/project-config.schema'
 import { mainExperienceReferenceSchema } from '../project/experiences.schema'
 import { transformNodeSchema } from '../experience/transform.schema'
+import { sessionResponseSchema } from '../session/session-response.schema'
+import { outcomeSchema } from '../experience/outcome.schema'
 import { jobStatusSchema } from './job-status.schema'
 
 // Re-export jobStatusSchema for convenience
@@ -93,8 +98,12 @@ export const transformNodesSnapshotSchema = z.array(transformNodeSchema)
  * Reuses overlayReferenceSchema and mainExperienceReferenceSchema for consistency.
  */
 export const projectContextSnapshotSchema = z.looseObject({
-  overlay: overlayReferenceSchema,
-  applyOverlay: z.boolean(),
+  /** @deprecated Use overlays map instead */
+  overlay: overlayReferenceSchema.nullable().default(null),
+  /** @deprecated Use overlays map instead */
+  applyOverlay: z.boolean().default(false),
+  /** Overlays by aspect ratio (from project config) */
+  overlays: overlaysConfigSchema.nullable().default(null),
   /** Experience reference snapshot (from mainExperienceReferenceSchema) */
   experienceRef: mainExperienceReferenceSchema.nullable().default(null),
 })
@@ -107,11 +116,18 @@ export const eventContextSnapshotSchema = projectContextSnapshotSchema
  * Complete job execution snapshot
  */
 export const jobSnapshotSchema = z.looseObject({
-  sessionInputs: sessionInputsSnapshotSchema,
-  transformNodes: transformNodesSnapshotSchema,
+  /** @deprecated Use sessionResponses instead. Kept for backward compatibility. */
+  sessionInputs: sessionInputsSnapshotSchema.optional(),
+  /** Session responses at job creation (unified from all steps) */
+  sessionResponses: z.array(sessionResponseSchema).default([]),
+  /** @deprecated Always []. Kept for schema compatibility. */
+  transformNodes: z.array(transformNodeSchema).default([]),
+  /** Project context (overlays, etc.) */
   projectContext: projectContextSnapshotSchema,
   /** Experience version at time of job creation */
   experienceVersion: z.number().int().positive(),
+  /** Outcome configuration (from experience.published.outcome) */
+  outcome: outcomeSchema.nullable().default(null),
 })
 
 // Backward compatibility: eventContext is now projectContext
