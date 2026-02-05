@@ -25,12 +25,12 @@
 
 **Purpose**: Rename "create outcome" to "outcome" throughout the codebase before implementing UI
 
-- [ ] T001 Rename schema file from `packages/shared/src/schemas/experience/create-outcome.schema.ts` to `outcome.schema.ts`
-- [ ] T002 Update schema exports in `packages/shared/src/schemas/experience/outcome.schema.ts`: rename `createOutcomeSchema` → `outcomeSchema`, `CreateOutcome` → `Outcome`, `createOutcomeTypeSchema` → `outcomeTypeSchema`, `CreateOutcomeType` → `OutcomeType`
-- [ ] T003 Update field name in `packages/shared/src/schemas/experience/experience.schema.ts`: rename `create` → `outcome`
-- [ ] T004 Update barrel exports in `packages/shared/src/schemas/experience/index.ts` to use new names
-- [ ] T005 Update all imports in `apps/clementine-app/src/` that reference `CreateOutcome` or `config.create`
-- [ ] T006 Run `pnpm --filter @clementine/shared build` and verify no TypeScript errors
+- [X] T001 Rename schema file from `packages/shared/src/schemas/experience/create-outcome.schema.ts` to `outcome.schema.ts`
+- [X] T002 Update schema exports in `packages/shared/src/schemas/experience/outcome.schema.ts`: rename `createOutcomeSchema` → `outcomeSchema`, `CreateOutcome` → `Outcome`, `createOutcomeTypeSchema` → `outcomeTypeSchema`, `CreateOutcomeType` → `OutcomeType`
+- [X] T003 Update field name in `packages/shared/src/schemas/experience/experience.schema.ts`: rename `create` → `outcome`
+- [X] T004 Update barrel exports in `packages/shared/src/schemas/experience/index.ts` to use new names
+- [X] T005 Update all imports in `apps/clementine-app/src/` that reference `CreateOutcome` or `config.create`
+- [X] T006 Run `pnpm --filter @clementine/shared build` and verify no TypeScript errors
 
 **Checkpoint**: Schema rename complete - all references use "outcome" terminology
 
@@ -42,14 +42,14 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T007 [P] Create model/aspect ratio constants in `apps/clementine-app/src/domains/experience/create/lib/model-options.ts`
-- [ ] T008 [P] Create outcome operations (pure functions) in `apps/clementine-app/src/domains/experience/create/lib/outcome-operations.ts`
-- [ ] T009 Create mutation hook in `apps/clementine-app/src/domains/experience/create/hooks/useUpdateOutcome.ts`
-- [ ] T010 Refactor `apps/clementine-app/src/domains/experience/create/components/PromptComposer/ControlRow.tsx` to accept model/aspectRatio options via props
-- [ ] T011 Refactor `apps/clementine-app/src/domains/experience/create/components/PromptComposer/PromptComposer.tsx` for composition pattern (decouple from AIImageNode)
-- [ ] T012 Refactor `apps/clementine-app/src/domains/experience/create/hooks/useRefMediaUpload.ts` to work with `outcome.imageGeneration.refMedia` path
-- [ ] T013 Update barrel exports in `apps/clementine-app/src/domains/experience/create/lib/index.ts`
-- [ ] T014 Run `pnpm app:type-check` and verify no TypeScript errors
+- [X] T007 [P] Create model/aspect ratio constants in `apps/clementine-app/src/domains/experience/create/lib/model-options.ts`
+- [X] T008 [P] Create outcome operations (pure functions) in `apps/clementine-app/src/domains/experience/create/lib/outcome-operations.ts`
+- [X] T009 Create mutation hook in `apps/clementine-app/src/domains/experience/create/hooks/useUpdateOutcome.ts`
+- [X] T010 Refactor `apps/clementine-app/src/domains/experience/create/components/PromptComposer/ControlRow.tsx` to accept model/aspectRatio options via props
+- [X] T011 Refactor `apps/clementine-app/src/domains/experience/create/components/PromptComposer/PromptComposer.tsx` for composition pattern (decouple from AIImageNode)
+- [X] T012 Refactor `apps/clementine-app/src/domains/experience/create/hooks/useRefMediaUpload.ts` to work with `outcome.imageGeneration.refMedia` path
+- [X] T013 Update barrel exports in `apps/clementine-app/src/domains/experience/create/lib/index.ts`
+- [X] T014 Run `pnpm app:type-check` and verify no TypeScript errors
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 

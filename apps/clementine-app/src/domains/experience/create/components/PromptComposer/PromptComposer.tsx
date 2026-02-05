@@ -1,30 +1,24 @@
 /**
  * PromptComposer Component
  *
- * Unified bordered container for AI Image node configuration.
+ * Unified bordered container for AI generation configuration.
  * Contains prompt input, model/aspect ratio selectors, and reference media.
  * Supports file upload via button and drag-and-drop.
  * Supports @mention for steps and media references.
+ *
+ * Uses composition pattern - accepts all values and callbacks via props
+ * to work with any data source (outcome config, node config, etc.)
  */
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
-import { useRefMediaUpload } from '../../hooks'
-import {
-  removeNodeRefMedia,
-  updateNodePrompt,
-} from '../../lib/transform-operations'
+import { AI_IMAGE_MODELS, ASPECT_RATIOS } from '../../lib/model-options'
 import { ControlRow } from './ControlRow'
 import { LexicalPromptInput } from './LexicalPromptInput'
 import { ReferenceMediaStrip } from './ReferenceMediaStrip'
-import type {
-  AIImageNode,
-  ExperienceStep,
-  TransformNode,
-} from '@clementine/shared'
+import type { ExperienceStep, MediaReference } from '@clementine/shared'
 import type { MediaOption, StepOption } from '../../lexical/utils/types'
-import { useAuth } from '@/domains/auth'
+import type { UploadingFile } from '../../hooks/useRefMediaUpload'
 import { cn } from '@/shared/utils'
-import { useDebounce } from '@/shared/utils/useDebounce'
 
 /**
  * Convert ExperienceStep to StepOption for mention autocomplete
@@ -38,12 +32,9 @@ function toStepOption(step: ExperienceStep): StepOption {
 }
 
 /**
- * Convert refMedia to MediaOption for mention autocomplete
+ * Convert MediaReference to MediaOption for mention autocomplete
  */
-function toMediaOption(media: {
-  mediaAssetId: string
-  displayName: string
-}): MediaOption {
+function toMediaOption(media: MediaReference): MediaOption {
   return {
     id: media.mediaAssetId,
     name: media.displayName,
@@ -51,40 +42,55 @@ function toMediaOption(media: {
 }
 
 export interface PromptComposerProps {
-  /** AI Image node being edited */
-  node: AIImageNode
-  /** Current transform nodes array */
-  transformNodes: TransformNode[]
+  /** Current prompt value */
+  prompt: string
+  /** Callback when prompt changes (local state for debouncing) */
+  onPromptChange: (prompt: string) => void
+  /** Current model value */
+  model: string
+  /** Callback when model changes */
+  onModelChange: (model: string) => void
+  /** Current aspect ratio value */
+  aspectRatio: string
+  /** Callback when aspect ratio changes */
+  onAspectRatioChange: (aspectRatio: string) => void
+  /** Reference media array */
+  refMedia: MediaReference[]
+  /** Callback to remove reference media */
+  onRefMediaRemove: (mediaAssetId: string) => void
+  /** Files currently being uploaded */
+  uploadingFiles: UploadingFile[]
+  /** Callback when files are selected for upload */
+  onFilesSelected: (files: File[]) => void
+  /** Whether more files can be added */
+  canAddMore: boolean
+  /** Whether upload is in progress */
+  isUploading: boolean
   /** Experience steps for @mention (info steps should be excluded by caller) */
   steps: ExperienceStep[]
-  /** Workspace ID for media uploads */
-  workspaceId: string
-  /** Callback to update transform nodes */
-  onUpdate: (nodes: TransformNode[]) => void
   /** Whether the composer is disabled */
   disabled?: boolean
 }
 
-/** Debounce delay for prompt changes (ms) */
-const PROMPT_DEBOUNCE_DELAY = 2000
-
 /**
- * PromptComposer - Main container for AI Image node settings
+ * PromptComposer - Main container for AI generation configuration
  */
 export function PromptComposer({
-  node,
-  transformNodes,
+  prompt,
+  onPromptChange,
+  model,
+  onModelChange,
+  aspectRatio,
+  onAspectRatioChange,
+  refMedia,
+  onRefMediaRemove,
+  uploadingFiles,
+  onFilesSelected,
+  canAddMore,
+  isUploading,
   steps,
-  workspaceId,
-  onUpdate,
   disabled,
 }: PromptComposerProps) {
-  const { config } = node
-  const { user } = useAuth()
-
-  // Local state for prompt to enable debouncing
-  const [localPrompt, setLocalPrompt] = useState(config.prompt)
-
   // Convert steps to StepOption format (exclude info steps)
   const stepOptions = useMemo(
     () => steps.filter((s) => s.type !== 'info').map(toStepOption),
@@ -92,64 +98,13 @@ export function PromptComposer({
   )
 
   // Convert refMedia to MediaOption format
-  const mediaOptions = useMemo(
-    () => config.refMedia.map(toMediaOption),
-    [config.refMedia],
-  )
+  const mediaOptions = useMemo(() => refMedia.map(toMediaOption), [refMedia])
 
   // Drag-over state for drop zone highlight
   const [isDragOver, setIsDragOver] = useState(false)
 
-  // Reference media upload hook
-  const { uploadingFiles, uploadFiles, canAddMore, isUploading } =
-    useRefMediaUpload({
-      workspaceId,
-      userId: user?.uid,
-      nodeId: node.id,
-      transformNodes,
-      currentRefMediaCount: config.refMedia.length,
-      onUpdate,
-    })
-
-  // Debounce the local prompt value
-  const debouncedPrompt = useDebounce(localPrompt, PROMPT_DEBOUNCE_DELAY)
-
-  // Update transform nodes when debounced prompt changes
-  useEffect(() => {
-    // Only update if the debounced value differs from the config
-    if (debouncedPrompt !== config.prompt) {
-      const newNodes = updateNodePrompt(
-        transformNodes,
-        node.id,
-        debouncedPrompt,
-      )
-      onUpdate(newNodes)
-    }
-  }, [debouncedPrompt])
-
-  // Sync local prompt with config when it changes externally
-  useEffect(() => {
-    if (config.prompt !== localPrompt) {
-      setLocalPrompt(config.prompt)
-    }
-  }, [config.prompt])
-
-  // Handle file selection (from button or drop)
-  const handleFilesSelected = useCallback(
-    (files: File[]) => {
-      uploadFiles(files)
-    },
-    [uploadFiles],
-  )
-
-  // Handle remove reference media
-  const handleRemoveRefMedia = useCallback(
-    (mediaAssetId: string) => {
-      const newNodes = removeNodeRefMedia(transformNodes, node.id, mediaAssetId)
-      onUpdate(newNodes)
-    },
-    [node.id, onUpdate, transformNodes],
-  )
+  // Check if add button should be disabled
+  const isAddDisabled = disabled || !canAddMore || isUploading
 
   // Drag-and-drop handlers
   const handleDragOver = useCallback(
@@ -187,14 +142,11 @@ export function PromptComposer({
       )
 
       if (droppedFiles.length > 0) {
-        handleFilesSelected(droppedFiles)
+        onFilesSelected(droppedFiles)
       }
     },
-    [disabled, canAddMore, isUploading, handleFilesSelected],
+    [disabled, canAddMore, isUploading, onFilesSelected],
   )
-
-  // Check if add button should be disabled (also prevent concurrent batches)
-  const isAddDisabled = disabled || !canAddMore || isUploading
 
   return (
     <div
@@ -208,16 +160,16 @@ export function PromptComposer({
     >
       {/* Reference Media Strip (only shown when items exist) */}
       <ReferenceMediaStrip
-        media={config.refMedia}
+        media={refMedia}
         uploadingFiles={uploadingFiles}
-        onRemove={handleRemoveRefMedia}
+        onRemove={onRefMediaRemove}
         disabled={disabled}
       />
 
       {/* Prompt Input with @mention support */}
       <LexicalPromptInput
-        value={localPrompt}
-        onChange={setLocalPrompt}
+        value={prompt}
+        onChange={onPromptChange}
         steps={stepOptions}
         media={mediaOptions}
         disabled={disabled}
@@ -225,10 +177,13 @@ export function PromptComposer({
 
       {/* Control Row */}
       <ControlRow
-        node={node}
-        transformNodes={transformNodes}
-        onUpdate={onUpdate}
-        onFilesSelected={handleFilesSelected}
+        model={model}
+        onModelChange={onModelChange}
+        modelOptions={AI_IMAGE_MODELS}
+        aspectRatio={aspectRatio}
+        onAspectRatioChange={onAspectRatioChange}
+        aspectRatioOptions={ASPECT_RATIOS}
+        onFilesSelected={onFilesSelected}
         isAddDisabled={isAddDisabled}
         disabled={disabled}
       />

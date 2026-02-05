@@ -1,18 +1,15 @@
 /**
  * useRefMediaUpload Hook
  *
- * Handles uploading reference media files for AI Image nodes.
- * Manages upload progress state and updates transform nodes after each upload.
- * Uses a ref to always read the latest nodes to prevent stale closures.
+ * Handles uploading reference media files for outcome configuration.
+ * Manages upload progress state and provides uploaded media references.
+ * Uses a ref to always read the latest outcome to prevent stale closures.
  */
 import { useCallback, useRef, useState } from 'react'
 import { nanoid } from 'nanoid'
 
-import {
-  MAX_REF_MEDIA_COUNT,
-  addNodeRefMedia,
-} from '../lib/transform-operations'
-import type { TransformNode } from '@clementine/shared'
+import { MAX_REF_MEDIA_COUNT } from '../lib/model-options'
+import type { Outcome, MediaReference } from '@clementine/shared'
 import { useUploadMediaAsset } from '@/domains/media-library'
 
 export interface UploadingFile {
@@ -29,14 +26,10 @@ export interface UseRefMediaUploadParams {
   workspaceId: string
   /** User ID for uploads */
   userId: string | undefined
-  /** Node ID to add refs to */
-  nodeId: string
-  /** Current transform nodes (may be stale during batch uploads) */
-  transformNodes: TransformNode[]
-  /** Current ref media count for limit checking */
-  currentRefMediaCount: number
-  /** Callback to update transform nodes */
-  onUpdate: (nodes: TransformNode[]) => void
+  /** Current outcome configuration (may be stale during batch uploads) */
+  outcome: Outcome | null
+  /** Callback when a media reference is uploaded */
+  onMediaUploaded: (mediaRef: MediaReference) => void
 }
 
 export interface UseRefMediaUploadResult {
@@ -53,24 +46,23 @@ export interface UseRefMediaUploadResult {
 }
 
 /**
- * Hook for uploading reference media to AI Image nodes
+ * Hook for uploading reference media for outcome configuration
  */
 export function useRefMediaUpload({
   workspaceId,
   userId,
-  nodeId,
-  transformNodes,
-  currentRefMediaCount,
-  onUpdate,
+  outcome,
+  onMediaUploaded,
 }: UseRefMediaUploadParams): UseRefMediaUploadResult {
   const [uploadingFiles, setUploadingFiles] = useState<UploadingFile[]>([])
 
-  // Keep a ref to the latest transform nodes to avoid stale closures in uploadFiles
-  const nodesRef = useRef(transformNodes)
-  nodesRef.current = transformNodes
+  // Keep a ref to the latest outcome to avoid stale closures in uploadFiles
+  const outcomeRef = useRef(outcome)
+  outcomeRef.current = outcome
 
   const uploadAsset = useUploadMediaAsset(workspaceId, userId)
 
+  const currentRefMediaCount = outcome?.imageGeneration.refMedia.length ?? 0
   const availableSlots = MAX_REF_MEDIA_COUNT - currentRefMediaCount
   const canAddMore = availableSlots > 0
 
@@ -109,10 +101,8 @@ export function useRefMediaUpload({
             prev.filter((item) => item.tempId !== entry.tempId),
           )
 
-          // Always read the latest nodes from ref to avoid stale closure
-          const latestNodes = nodesRef.current
-          const newNodes = addNodeRefMedia(latestNodes, nodeId, [mediaRef])
-          onUpdate(newNodes)
+          // Notify parent of uploaded media
+          onMediaUploaded(mediaRef)
         } catch {
           // Remove failed upload from uploading state
           setUploadingFiles((prev) =>
@@ -121,7 +111,7 @@ export function useRefMediaUpload({
         }
       }
     },
-    [availableSlots, nodeId, onUpdate, uploadAsset, userId],
+    [availableSlots, onMediaUploaded, uploadAsset, userId],
   )
 
   return {
