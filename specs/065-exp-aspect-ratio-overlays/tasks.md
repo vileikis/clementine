@@ -106,7 +106,7 @@
 
 ---
 
-## Phase 6: User Story 4 - Automatic Overlay Resolution at Job Execution (Priority: P4)
+## Phase 6: User Story 4 - Automatic Overlay Resolution at Job Execution (Priority: P4) ✅ COMPLETE
 
 **Goal**: System automatically selects and applies correct overlay with fallback behavior (FR-007, FR-008, FR-009, FR-010, FR-011)
 
@@ -116,19 +116,19 @@
 
 ### Implementation for User Story 4
 
-- [ ] T022 [US4] Create fetchProject helper function to retrieve project with overlay config in `functions/src/repositories/project.ts`
-- [ ] T023 [US4] Add resolveOverlayChoice function implementing fallback logic using `outcome.aspectRatio` (exact → default → null) in `functions/src/callable/startTransformPipeline.ts`
-- [ ] T024 [US4] Update startTransformPipeline to fetch project, resolve overlay choice using top-level aspectRatio, and pass to buildJobSnapshot in `functions/src/callable/startTransformPipeline.ts`
-- [ ] T025 [US4] Update buildJobSnapshot to accept overlayChoice and experienceRef parameters, remove projectContext building in `functions/src/repositories/job.ts`
-- [ ] T026 [US4] Update imageOutcome to use `snapshot.overlayChoice` directly instead of resolution logic in `functions/src/services/transform/outcomes/imageOutcome.ts`
-- [ ] T027 [US4] Remove `getOverlayForAspectRatio` helper function (no longer needed) from `functions/src/services/transform/operations/applyOverlay.ts`
-- [ ] T028 [US4] Build functions and verify no type errors: `cd functions && pnpm build`
+- [X] T022 [US4] Create fetchProject helper function to retrieve project with overlay config in `functions/src/repositories/project.ts`
+- [X] T023 [US4] Add resolveOverlayChoice function implementing fallback logic using `outcome.aspectRatio` (exact → default → null) in `functions/src/callable/startTransformPipeline.ts`
+- [X] T024 [US4] Update startTransformPipeline to fetch project, resolve overlay choice using top-level aspectRatio, and pass to buildJobSnapshot in `functions/src/callable/startTransformPipeline.ts`
+- [X] T025 [US4] Update buildJobSnapshot to accept overlayChoice and experienceRef parameters, remove projectContext building in `functions/src/repositories/job.ts`
+- [X] T026 [US4] Update imageOutcome to use `snapshot.overlayChoice` directly instead of resolution logic in `functions/src/services/transform/outcomes/imageOutcome.ts`
+- [X] T027 [US4] Remove `getOverlayForAspectRatio` helper function (no longer needed) from `functions/src/services/transform/operations/applyOverlay.ts`
+- [X] T028 [US4] Build functions and verify no type errors: `cd functions && pnpm build`
 
 **Checkpoint**: User Story 4 complete - Overlay resolution happens at job creation using top-level aspectRatio, transform uses pre-resolved choice
 
 ---
 
-## Phase 7: User Story 5 - AI Generation Aspect Ratio Enforcement (Priority: P5)
+## Phase 7: User Story 5 - AI Generation Aspect Ratio Enforcement (Priority: P5) ✅ COMPLETE
 
 **Goal**: AI generation receives explicit aspect ratio parameter from experience config (FR-016, FR-017, FR-018)
 
@@ -138,9 +138,9 @@
 
 ### Implementation for User Story 5
 
-- [ ] T029 [US5] Update imageOutcome to read aspect ratio from top-level `snapshot.outcome.aspectRatio` instead of `imageGeneration.aspectRatio` in `functions/src/services/transform/outcomes/imageOutcome.ts`
-- [ ] T030 [US5] Verify no post-generation cropping/resizing occurs in image pipeline
-- [ ] T031 [US5] Manual test: create experience with 3:2, trigger generation, verify output dimensions
+- [X] T029 [US5] Update imageOutcome to read aspect ratio from top-level `snapshot.outcome.aspectRatio` instead of `imageGeneration.aspectRatio` in `functions/src/services/transform/outcomes/imageOutcome.ts`
+- [X] T030 [US5] Verify no post-generation cropping/resizing occurs in image pipeline
+- [X] T031 [US5] Manual test: create experience with 3:2, trigger generation, verify output dimensions
 
 **Checkpoint**: User Story 5 complete - AI generation uses top-level aspectRatio, produces correct dimensions
 

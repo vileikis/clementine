@@ -166,7 +166,6 @@ describe('jobSnapshotSchema', () => {
     experienceVersion: 1,
     outcome: null,
     overlayChoice: null,
-    experienceRef: null,
   }
 
   it('parses valid snapshot with flattened structure', () => {
@@ -175,7 +174,6 @@ describe('jobSnapshotSchema', () => {
     expect(result.experienceVersion).toBe(1)
     expect(result.outcome).toBeNull()
     expect(result.overlayChoice).toBeNull()
-    expect(result.experienceRef).toBeNull()
   })
 
   it('accepts resolved overlayChoice', () => {
@@ -189,18 +187,6 @@ describe('jobSnapshotSchema', () => {
     })
     expect(result.overlayChoice).not.toBeNull()
     expect(result.overlayChoice?.mediaAssetId).toBe('overlay-1')
-  })
-
-  it('accepts experienceRef at top level', () => {
-    const result = jobSnapshotSchema.parse({
-      ...validSnapshot,
-      experienceRef: {
-        experienceId: 'exp-1',
-        enabled: true,
-        applyOverlay: true,
-      },
-    })
-    expect(result.experienceRef?.experienceId).toBe('exp-1')
   })
 })
 

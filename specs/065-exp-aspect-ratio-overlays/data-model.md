@@ -194,9 +194,6 @@ export const jobSnapshotSchema = z.object({
 
   /** Resolved overlay to apply (null = no overlay) */
   overlayChoice: overlayReferenceSchema.nullable().default(null),
-
-  /** Experience reference for audit trail */
-  experienceRef: mainExperienceReferenceSchema.nullable().default(null),
 })
 
 export type JobSnapshot = z.infer<typeof jobSnapshotSchema>
@@ -210,7 +207,6 @@ export type JobSnapshot = z.infer<typeof jobSnapshotSchema>
 | `experienceVersion` | number | Yes | - | Experience version for traceability |
 | `outcome` | Outcome \| null | No | null | Full outcome config snapshot |
 | `overlayChoice` | MediaReference \| null | No | null | **Resolved** overlay to apply |
-| `experienceRef` | MainExperienceRef \| null | No | null | Experience reference for audit |
 
 ### Removed Fields
 
@@ -220,6 +216,7 @@ export type JobSnapshot = z.infer<typeof jobSnapshotSchema>
 | `projectContext.overlay` | Deprecated, replaced by `overlayChoice` |
 | `projectContext.applyOverlay` | Logic moved to resolution at job creation |
 | `projectContext.overlays` | Full map no longer stored; resolved to single choice |
+| `experienceRef` | Not used downstream; applyOverlay extracted at resolution time |
 
 ### Resolution Flow
 

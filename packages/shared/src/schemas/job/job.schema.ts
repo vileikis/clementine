@@ -9,11 +9,9 @@
  * Feature 065 Changes:
  * - Flattened snapshot: removed `projectContext` wrapper
  * - Added `overlayChoice` (resolved at job creation, not execution)
- * - Added `experienceRef` at top level for audit trail
  */
 import { z } from 'zod'
 import { overlayReferenceSchema } from '../project/project-config.schema'
-import { mainExperienceReferenceSchema } from '../project/experiences.schema'
 import { sessionResponseSchema } from '../session/session-response.schema'
 import { outcomeSchema } from '../experience/outcome.schema'
 import { jobStatusSchema } from './job-status.schema'
@@ -74,7 +72,6 @@ export const jobOutputSchema = z.object({
  *
  * Flattened structure (Feature 065):
  * - `overlayChoice`: Resolved overlay at job creation (exact match → default → null)
- * - `experienceRef`: Experience reference for audit trail
  *
  * Overlay resolution happens in `startTransformPipeline.ts`, not at execution time.
  * The transform uses `snapshot.overlayChoice` directly.
@@ -88,8 +85,6 @@ export const jobSnapshotSchema = z.object({
   outcome: outcomeSchema.nullable().default(null),
   /** Resolved overlay to apply (null = no overlay) */
   overlayChoice: overlayReferenceSchema.nullable().default(null),
-  /** Experience reference for audit trail */
-  experienceRef: mainExperienceReferenceSchema.nullable().default(null),
 })
 
 /**

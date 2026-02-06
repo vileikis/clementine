@@ -15,17 +15,15 @@ import type { JobSnapshot } from '@clementine/shared'
 
 /**
  * Helper to create a minimal valid job snapshot for testing
+ *
+ * Feature 065: Flattened structure - removed projectContext wrapper
+ * - overlayChoice: Pre-resolved at job creation
  */
 function createMockSnapshot(overrides: Partial<JobSnapshot> = {}): JobSnapshot {
   return {
     sessionResponses: [],
     outcome: null,
-    projectContext: {
-      overlay: null,
-      applyOverlay: false,
-      overlays: null,
-      experienceRef: null,
-    },
+    overlayChoice: null,
     experienceVersion: 1,
     ...overrides,
   }

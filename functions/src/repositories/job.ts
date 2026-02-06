@@ -15,7 +15,7 @@ import {
   type JobSnapshot,
   type Session,
   type Experience,
-  type OverlaysConfig,
+  type MediaReference,
 } from '@clementine/shared'
 
 /**
@@ -288,22 +288,33 @@ export function buildJobData(params: {
 }
 
 /**
+ * Options for building job snapshot
+ */
+interface BuildJobSnapshotOptions {
+  /** Pre-resolved overlay to apply (resolved at job creation) */
+  overlayChoice?: MediaReference | null
+}
+
+/**
  * Build job snapshot from session and experience
  *
  * Captures the current state of session responses and outcome config
  * at the time of job creation for immutable processing.
  *
+ * Feature 065: Flattened snapshot structure
+ * - overlayChoice: Resolved at job creation (exact match → default → null)
+ *
  * @param session - Session with responses
  * @param experience - Experience with outcome configuration
  * @param configSource - Which config to use ('draft' or 'published')
- * @param overlays - Optional overlays from project config
+ * @param options - Optional overlay options
  * @returns JobSnapshot for the job document
  */
 export function buildJobSnapshot(
   session: Session,
   experience: Experience,
   configSource: 'draft' | 'published',
-  overlays?: OverlaysConfig | null,
+  options?: BuildJobSnapshotOptions,
 ): JobSnapshot {
   const config = configSource === 'draft' ? experience.draft : experience.published
 
@@ -314,12 +325,7 @@ export function buildJobSnapshot(
   return {
     sessionResponses: session.responses,
     outcome: config.outcome ?? null,
-    projectContext: {
-      overlay: null,
-      applyOverlay: false,
-      overlays: overlays ?? null,
-      experienceRef: null,
-    },
+    overlayChoice: options?.overlayChoice ?? null,
     experienceVersion:
       configSource === 'draft'
         ? experience.draftVersion
