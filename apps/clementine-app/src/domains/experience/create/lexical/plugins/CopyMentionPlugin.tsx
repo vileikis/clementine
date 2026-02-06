@@ -25,9 +25,9 @@ import {
   COPY_COMMAND,
   CUT_COMMAND,
 } from 'lexical'
-import type { RangeSelection } from 'lexical'
 import { $isStepMentionNode } from '../nodes/StepMentionNode'
 import { $isMediaMentionNode } from '../nodes/MediaMentionNode'
+import type { RangeSelection } from 'lexical'
 
 /**
  * Serialize a RangeSelection to plain text with mention storage format.
@@ -49,9 +49,9 @@ function serializeSelectionWithMentions(selection: RangeSelection): string {
   const [start, end] = isBackward ? [focus, anchor] : [anchor, focus]
 
   // Find the first and last leaf nodes for offset handling
-  const firstLeafKey = nodes.find(
-    (n) => $isTextNode(n) || $isLineBreakNode(n),
-  )?.getKey()
+  const firstLeafKey = nodes
+    .find((n) => $isTextNode(n) || $isLineBreakNode(n))
+    ?.getKey()
   const lastLeafKey = [...nodes]
     .reverse()
     .find((n) => $isTextNode(n) || $isLineBreakNode(n))
