@@ -18,14 +18,12 @@ import type { JobSnapshot } from '@clementine/shared'
  */
 function createMockSnapshot(overrides: Partial<JobSnapshot> = {}): JobSnapshot {
   return {
-    sessionInputs: {
-      answers: [],
-      capturedMedia: [],
-    },
-    transformNodes: [],
+    sessionResponses: [],
+    outcome: null,
     projectContext: {
       overlay: null,
       applyOverlay: false,
+      overlays: null,
       experienceRef: null,
     },
     experienceVersion: 1,

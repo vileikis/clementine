@@ -20,9 +20,9 @@ Replace user-authored `transformNodes` with a **Create tab** where admins pick a
 | PRD | Name | Description | Status |
 |-----|------|-------------|--------|
 | [1A](./prd-1a-schemas.md) | Schema Foundations | New Zod schemas in shared package | ✅ Complete |
-| [1B](./prd-1b-experience-create.md) | Experience Create Config | Add `create` to experience, publish validation | |
-| [1C](./prd-1c-session-responses.md) | Session Responses | Unified responses, guest runtime writes | |
-| [2](./prd-2-admin-create-ux.md) | Admin Create Tab UX | Create tab UI with prompt editor | |
+| [1B](./prd-1b-experience-create.md) | Experience Outcome Config | Add `outcome` to experience, publish validation | ✅ Complete |
+| [1C](./prd-1c-session-responses.md) | Session Responses | Unified responses, guest runtime writes | ✅ Complete |
+| [2](./prd-2-admin-create-ux.md) | Admin Create Tab UX | Create tab UI with prompt editor | ✅ Complete |
 | [3](./prd-3-job-cloud-functions.md) | Job + Cloud Functions | Job snapshot, dispatcher, image outcome | |
 | [4](./prd-4-cleanup.md) | Cleanup & Guardrails | Remove dead code, safety checks | |
 
@@ -78,12 +78,13 @@ Replace user-authored `transformNodes` with a **Create tab** where admins pick a
 
 ---
 
-## Create Outcome Schema
+## Outcome Schema
 
 ### Final Structure
 
 ```ts
-create: {
+// Located at draft.outcome and published.outcome
+outcome: {
   // Outcome type
   type: 'image' | 'gif' | 'video' | null,
 
@@ -142,11 +143,11 @@ When user switches between image/gif/video:
 | Schema | PRD | Change |
 |--------|-----|--------|
 | `mediaDisplayNameSchema` | 1A | NEW - validation for mention-safe names |
-| `createOutcomeSchema` | 1A | NEW - outcome config with `captureStepId` and imageGeneration |
-| `sessionResponseSchema` | 1A | NEW - unified response with `stepName`, `context` for all rich data |
-| `experienceConfigSchema` | 1B | Add `create` field |
+| `outcomeSchema` | 1A | NEW - outcome config with `captureStepId` and imageGeneration |
+| `sessionResponseSchema` | 1A | NEW - unified response with `stepName`, `data` for all typed data |
+| `experienceConfigSchema` | 1B | Add `outcome` field |
 | `sessionSchema` | 1C | Add `responses[]`, deprecate `answers[]` + `capturedMedia[]` |
-| `jobSnapshotSchema` | 3 | Add `createOutcome`, update `sessionInputs` |
+| `jobSnapshotSchema` | 3 | Add `outcome`, update `sessionInputs` |
 
 ---
 
@@ -157,33 +158,39 @@ sessionResponse: {
   stepId: string,
   stepName: string,           // For @{step:...} resolution (input AND capture)
   stepType: string,           // No separate kind enum
-  value: string | string[] | null,
-  context: unknown | null,    // Rich structured data (see table below)
+  data: SessionResponseData,  // Typed union (see below)
   createdAt: number,
   updatedAt: number,
 }
+
+// SessionResponseData is a discriminated union:
+type SessionResponseData =
+  | string                    // Simple inputs (scale, yesNo, shortText, longText)
+  | MultiSelectOption[]       // Multi-select input
+  | MediaReference[]          // Capture steps (photo, video, gif)
 ```
 
-### Context Shape by Step Type
+### Data Shape by Step Type
 
-The `context` field holds rich structured data, with interpretation based on `stepType`:
+The `data` field holds typed data, with interpretation based on `stepType`:
 
-| Step Type | `value` | `context` |
-|-----------|---------|-----------|
-| `input.shortText` | `"user text"` | `null` |
-| `input.longText` | `"user text"` | `null` |
-| `input.scale` | `"1"` to `"5"` | `null` |
-| `input.yesNo` | `"yes"` or `"no"` | `null` |
-| `input.multiSelect` | `["opt1", "opt2"]` | `MultiSelectOption[]` |
-| `capture.photo` | `null` | `MediaReference[]` (1 item) |
-| `capture.gif` | `null` | `MediaReference[]` (4 items) |
-| `capture.video` | `null` | `MediaReference[]` (1 item) |
+| Step Type | `data` |
+|-----------|--------|
+| `input.shortText` | `"user text"` (string) |
+| `input.longText` | `"user text"` (string) |
+| `input.scale` | `"1"` to `"5"` (string) |
+| `input.yesNo` | `"yes"` or `"no"` (string) |
+| `input.multiSelect` | `MultiSelectOption[]` (with promptFragment, promptMedia) |
+| `capture.photo` | `MediaReference[]` (1 item) |
+| `capture.gif` | `MediaReference[]` (4 items) |
+| `capture.video` | `MediaReference[]` (1 item) |
 
 **Key design decisions:**
-- **No separate `media` field** - capture media stored in `context` as `MediaReference[]`
+- **Unified `data` field** - replaces separate `value`/`context` for better type safety
+- **No separate `media` field** - capture media stored in `data` as `MediaReference[]`
 - **Captures always use array** - even single photo/video uses `[MediaReference]` for consistency
-- **`value` is null for captures** - no analytical use case for asset IDs
-- **`@{step:...}` works for all steps** - inputs resolve to value/context, captures resolve to media in context
+- **`@{step:...}` works for all steps** - inputs resolve to data value, captures resolve to media in data
+- **Deprecated fields not written** - `answers[]` and `capturedMedia[]` exist for backward compatibility but new sessions only write to `responses[]`
 
 ---
 
@@ -197,13 +204,13 @@ The `context` field holds rich structured data, with interpretation based on `st
 5. **`options` as discriminated union** - type-specific, can reset on switch
 
 ### Data Handling
-6. **No separate `media` field in responses** - capture media stored in `context` as `MediaReference[]`
+6. **Unified `data` field in responses** - replaces separate `value`/`context` for better type safety
 7. **`stepName` in responses** - for direct `@{step:...}` prompt resolution (both input AND capture steps)
-8. **Captures always use `MediaReference[]`** - even single photo/video uses array for consistency
-9. **`value` is null for captures** - no analytical use case for asset IDs as primitive values
+8. **Captures always use `MediaReference[]`** - stored in `data` as array, even single photo/video
+9. **MultiSelect uses `MultiSelectOption[]`** - full option objects with promptFragment/promptMedia stored in `data`
 10. **Abandon old sessions** - no migration, no fallback logic
 11. **`transformNodes` always `[]`** - kept in schema but ignored
-12. **Deprecate `answers[]` and `capturedMedia[]`** - keep for backward compatibility, cleanup in PRD 4
+12. **Deprecate `answers[]` and `capturedMedia[]`** - keep for backward compatibility, new sessions only write to `responses[]`
 
 ### Overlays
 13. **Per aspect ratio** - `projectContext.overlays[aspectRatio]`
@@ -229,7 +236,7 @@ The `context` field holds rich structured data, with interpretation based on `st
 - [ ] Admin can toggle AI on/off (passthrough mode)
 - [ ] Switching outcomes preserves imageGeneration config
 - [ ] Guest flow writes unified `responses[]` with `stepName`
-- [ ] Cloud Functions execute from `job.snapshot.createOutcome`
+- [ ] Cloud Functions execute from `job.snapshot.outcome`
 - [ ] Prompt mentions (`@{step:...}`, `@{ref:...}`) resolve correctly
 - [ ] Old `transformNodes` code paths are removed
 

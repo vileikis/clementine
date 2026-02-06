@@ -4,8 +4,7 @@ import {
   jobProgressSchema,
   jobErrorSchema,
   jobOutputSchema,
-  sessionInputsSnapshotSchema,
-  eventContextSnapshotSchema,
+  projectContextSnapshotSchema,
   jobSnapshotSchema,
   jobSchema,
 } from './job.schema'
@@ -161,33 +160,9 @@ describe('jobOutputSchema', () => {
   })
 })
 
-describe('sessionInputsSnapshotSchema', () => {
-  it('parses valid session inputs', () => {
-    const result = sessionInputsSnapshotSchema.parse({
-      answers: [
-        { stepId: 'step-1', stepType: 'input.text', value: 'hello', answeredAt: Date.now() },
-      ],
-      capturedMedia: [
-        { stepId: 'step-2', assetId: 'asset-1', url: 'https://example.com/photo.jpg', createdAt: Date.now() },
-      ],
-    })
-    expect(result.answers).toHaveLength(1)
-    expect(result.capturedMedia).toHaveLength(1)
-  })
-
-  it('preserves unknown fields (looseObject)', () => {
-    const result: Record<string, unknown> = sessionInputsSnapshotSchema.parse({
-      answers: [],
-      capturedMedia: [],
-      legacyField: 'value',
-    })
-    expect(result['legacyField']).toBe('value')
-  })
-})
-
-describe('eventContextSnapshotSchema', () => {
-  it('parses valid event context', () => {
-    const result = eventContextSnapshotSchema.parse({
+describe('projectContextSnapshotSchema', () => {
+  it('parses valid project context', () => {
+    const result = projectContextSnapshotSchema.parse({
       overlay: { mediaAssetId: 'asset-1', url: 'https://example.com/overlay.png' },
       applyOverlay: true,
     })
@@ -197,7 +172,7 @@ describe('eventContextSnapshotSchema', () => {
   })
 
   it('accepts null overlay', () => {
-    const result = eventContextSnapshotSchema.parse({
+    const result = projectContextSnapshotSchema.parse({
       overlay: null,
       applyOverlay: false,
     })
@@ -205,7 +180,7 @@ describe('eventContextSnapshotSchema', () => {
   })
 
   it('accepts experience reference', () => {
-    const result = eventContextSnapshotSchema.parse({
+    const result = projectContextSnapshotSchema.parse({
       overlay: null,
       applyOverlay: false,
       experienceRef: { experienceId: 'exp-1', enabled: true, applyOverlay: true },
@@ -216,18 +191,18 @@ describe('eventContextSnapshotSchema', () => {
 
 describe('jobSnapshotSchema', () => {
   const validSnapshot = {
-    sessionInputs: { answers: [], capturedMedia: [] },
-    transformNodes: [],
+    sessionResponses: [],
     projectContext: { overlay: null, applyOverlay: false },
     experienceVersion: 1,
+    outcome: null,
   }
 
   it('parses valid snapshot', () => {
     const result = jobSnapshotSchema.parse(validSnapshot)
-    expect(result.sessionInputs).toBeDefined()
-    expect(result.transformNodes).toBeDefined()
+    expect(result.sessionResponses).toBeDefined()
     expect(result.projectContext).toBeDefined()
     expect(result.experienceVersion).toBe(1)
+    expect(result.outcome).toBeNull()
   })
 
   it('preserves unknown fields for schema evolution', () => {
@@ -246,10 +221,10 @@ describe('jobSchema', () => {
     sessionId: 'session-1',
     experienceId: 'exp-1',
     snapshot: {
-      sessionInputs: { answers: [], capturedMedia: [] },
-      transformNodes: [],
+      sessionResponses: [],
       projectContext: { overlay: null, applyOverlay: false },
       experienceVersion: 1,
+      outcome: null,
     },
     createdAt: Date.now(),
     updatedAt: Date.now(),

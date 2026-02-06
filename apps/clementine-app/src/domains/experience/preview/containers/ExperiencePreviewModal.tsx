@@ -36,7 +36,7 @@ import { toast } from 'sonner'
 
 import { ExperienceRuntime } from '../../runtime'
 import { useStartTransformPipeline } from '../../transform'
-import { hasTransformConfig } from '../../shared/utils/hasTransformConfig'
+import { hasOutcome } from '../../shared/utils/hasTransformConfig'
 import { JobStatusDisplay, PreviewRuntimeContent } from '../components'
 import type { Experience } from '@/domains/experience/shared'
 import type { Theme } from '@/shared/theming'
@@ -163,8 +163,8 @@ export function ExperiencePreviewModal({
 
   // Handle experience completion
   const handleComplete = useCallback(async () => {
-    // No transform - just show success toast
-    if (!hasTransformConfig(experience, 'draft')) {
+    // No outcome configured - just show success toast
+    if (!hasOutcome(experience, 'draft')) {
       toast.success('Preview complete!', {
         description: 'The experience preview has finished.',
       })

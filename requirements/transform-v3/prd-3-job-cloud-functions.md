@@ -2,14 +2,14 @@
 
 **Epic**: [Outcome-based Create](./epic.md)
 **Status**: Draft
-**Dependencies**: PRD 1B (Experience Create), PRD 1C (Session Responses)
+**Dependencies**: PRD 1B (Experience Outcome), PRD 1C (Session Responses), PRD 2 (Admin Create Tab UX)
 **Enables**: PRD 4 (Cleanup)
 
 ---
 
 ## Overview
 
-Update job snapshot schema to capture `createOutcome` and `responses`. Implement outcome dispatcher and image outcome executor in Cloud Functions.
+Update job snapshot schema to capture `outcome` and `responses`. Implement outcome dispatcher and image outcome executor in Cloud Functions.
 
 ---
 
@@ -21,46 +21,14 @@ Update snapshot to use new data structures.
 
 ```ts
 import { sessionResponseSchema } from '../session/session-response.schema'
-import {
-  createOutcomeTypeSchema,
-  imageGenerationConfigSchema,
-  outcomeOptionsSchema,
-} from '../experience/create-outcome.schema'
-
-/**
- * Snapshot of session inputs at job creation
- */
-export const sessionInputsSnapshotSchema = z.looseObject({
-  /** Unified responses from all steps */
-  responses: z.array(sessionResponseSchema),
-})
-
-/**
- * Snapshot of create outcome at job creation
- */
-export const createOutcomeSnapshotSchema = z.looseObject({
-  /** Outcome type (never null in snapshot - validated at job creation) */
-  type: createOutcomeTypeSchema,
-
-  /** Source step ID (shared across outcomes) */
-  captureStepId: z.string().nullable(),
-
-  /** AI generation enabled */
-  aiEnabled: z.boolean(),
-
-  /** Image generation config */
-  imageGeneration: imageGenerationConfigSchema,
-
-  /** Type-specific options */
-  options: outcomeOptionsSchema.nullable(),
-})
+import { outcomeSchema } from '../experience/outcome.schema'
 
 /**
  * Complete job execution snapshot
  */
 export const jobSnapshotSchema = z.looseObject({
-  /** Session responses at job creation */
-  sessionInputs: sessionInputsSnapshotSchema,
+  /** Session responses at job creation (unified from all steps) */
+  sessionResponses: z.array(sessionResponseSchema),
 
   /** @deprecated Always []. Kept for schema compatibility */
   transformNodes: z.array(transformNodeSchema).default([]),
@@ -71,17 +39,20 @@ export const jobSnapshotSchema = z.looseObject({
   /** Experience version at job creation */
   experienceVersion: z.number().int().positive(),
 
-  /** Create outcome configuration */
-  createOutcome: createOutcomeSnapshotSchema,
+  /** Outcome configuration (reuses experience outcome schema) */
+  outcome: outcomeSchema,
 })
 ```
 
+**Notes:**
+- Reuses `outcomeSchema` directly - non-null `type` validated at job creation time, not schema level
+- Flattened `sessionResponses` - no wrapper object needed since we unified answers + capturedMedia
+
 ### Acceptance Criteria
 
-- [ ] AC-1.1: `jobSnapshotSchema` includes `createOutcome`
-- [ ] AC-1.2: `createOutcomeSnapshotSchema` includes `captureStepId`, `aiEnabled`, `imageGeneration`, `options`
-- [ ] AC-1.3: `sessionInputsSnapshotSchema` uses `responses` (not answers/capturedMedia)
-- [ ] AC-1.4: `transformNodes` always defaults to `[]`
+- [ ] AC-1.1: `jobSnapshotSchema` includes `outcome` (reusing `outcomeSchema`)
+- [ ] AC-1.2: `jobSnapshotSchema` includes `sessionResponses` array directly (not nested in wrapper)
+- [ ] AC-1.3: `transformNodes` always defaults to `[]`
 
 ---
 
@@ -95,34 +66,26 @@ Update job creation to snapshot new data.
 async function createJob(params: CreateJobParams): Promise<Job> {
   const { session, experience, projectContext } = params
 
-  // Validate create outcome exists
-  const create = experience.published?.create
-  if (!create?.type) {
-    throw new NonRetryableError('Experience has no create outcome configured')
+  // Validate outcome exists
+  const outcome = experience.published?.outcome
+  if (!outcome?.type) {
+    throw new NonRetryableError('Experience has no outcome configured')
   }
 
   // Validate passthrough has source
-  if (!create.aiEnabled && !create.captureStepId) {
+  if (!outcome.aiEnabled && !outcome.captureStepId) {
     throw new NonRetryableError('Passthrough mode requires source image')
   }
 
   const snapshot: JobSnapshot = {
-    sessionInputs: {
-      responses: session.responses,
-    },
+    sessionResponses: session.responses,
     transformNodes: [], // Always empty
     projectContext: {
       overlays: projectContext.overlays,
       experienceRef: projectContext.experienceRef,
     },
     experienceVersion: experience.publishedVersion!,
-    createOutcome: {
-      type: create.type,
-      captureStepId: create.captureStepId,
-      aiEnabled: create.aiEnabled,
-      imageGeneration: create.imageGeneration,
-      options: create.options,
-    },
+    outcome, // Snapshot entire outcome object
   }
 
   // Create job document...
@@ -131,10 +94,10 @@ async function createJob(params: CreateJobParams): Promise<Job> {
 
 ### Acceptance Criteria
 
-- [ ] AC-2.1: Job creation fails if `create.type` is null
+- [ ] AC-2.1: Job creation fails if `outcome.type` is null
 - [ ] AC-2.2: Job creation fails if passthrough without captureStepId
-- [ ] AC-2.3: Job snapshot includes full `createOutcome` from published experience
-- [ ] AC-2.4: Job snapshot includes `responses` from session
+- [ ] AC-2.3: Job snapshot includes `outcome` from published experience
+- [ ] AC-2.4: Job snapshot includes `sessionResponses` from session
 - [ ] AC-2.5: `transformNodes` is always `[]` in snapshot
 
 ---
@@ -158,14 +121,14 @@ interface OutcomeContext {
 
 type OutcomeExecutor = (ctx: OutcomeContext) => Promise<JobOutput>
 
-const outcomeRegistry: Record<CreateOutcomeType, OutcomeExecutor | null> = {
+const outcomeRegistry: Record<OutcomeType, OutcomeExecutor | null> = {
   image: imageOutcome,
   gif: null,   // Not implemented
   video: null, // Not implemented
 }
 
 export async function runOutcome(ctx: OutcomeContext): Promise<JobOutput> {
-  const { type } = ctx.snapshot.createOutcome
+  const { type } = ctx.snapshot.outcome
 
   const executor = outcomeRegistry[type]
 
@@ -179,7 +142,7 @@ export async function runOutcome(ctx: OutcomeContext): Promise<JobOutput> {
 
 ### Acceptance Criteria
 
-- [ ] AC-3.1: Dispatcher reads `createOutcome.type` from snapshot
+- [ ] AC-3.1: Dispatcher reads `outcome.type` from snapshot
 - [ ] AC-3.2: Routes to correct outcome executor
 - [ ] AC-3.3: Throws non-retryable error for unimplemented types
 - [ ] AC-3.4: Never reads `transformNodes`
@@ -217,16 +180,21 @@ export function resolvePromptMentions(
         return match  // Keep original if not found
       }
 
-      // Input step: return text value
-      if (response.value !== null) {
-        return Array.isArray(response.value)
-          ? response.value.join(', ')
-          : response.value
+      // Input step: data is string or MultiSelectOption[]
+      if (typeof response.data === 'string') {
+        return response.data
       }
 
-      // Capture step: media is in context as MediaReference[]
+      // Multi-select: data is MultiSelectOption[]
+      if (Array.isArray(response.data) && response.data[0]?.value !== undefined) {
+        // MultiSelectOption[] - extract values
+        const options = response.data as { value: string }[]
+        return options.map(opt => opt.value).join(', ')
+      }
+
+      // Capture step: data is MediaReference[]
       if (response.stepType.startsWith('capture.')) {
-        const captureMedia = response.context as MediaReference[] | null
+        const captureMedia = response.data as MediaReference[] | null
         if (captureMedia && captureMedia.length > 0) {
           mediaRefs.push(...captureMedia)
           return `[IMAGE: ${response.stepName}]`
@@ -258,10 +226,11 @@ export function resolvePromptMentions(
 ### Acceptance Criteria
 
 - [ ] AC-4.1: `@{step:stepName}` resolved from responses by stepName
-- [ ] AC-4.2: Input step values inserted as text
-- [ ] AC-4.3: Capture step media extracted from `context` as `MediaReference[]` and added to mediaRefs
-- [ ] AC-4.4: `@{ref:displayName}` resolved from refMedia by displayName
-- [ ] AC-4.5: Unresolved mentions logged as warnings, kept in text
+- [ ] AC-4.2: Input step `data` (string) inserted as text
+- [ ] AC-4.3: Multi-select `data` (MultiSelectOption[]) extracted as comma-separated values
+- [ ] AC-4.4: Capture step `data` (MediaReference[]) added to mediaRefs
+- [ ] AC-4.5: `@{ref:displayName}` resolved from refMedia by displayName
+- [ ] AC-4.6: Unresolved mentions logged as warnings, kept in text
 
 ---
 
@@ -278,17 +247,17 @@ import { applyOverlay } from '../executors/applyOverlay'
 
 export async function imageOutcome(ctx: OutcomeContext): Promise<JobOutput> {
   const { snapshot, startTime } = ctx
-  const { createOutcome, sessionInputs, projectContext } = snapshot
-  const { captureStepId, aiEnabled, imageGeneration } = createOutcome
+  const { outcome, sessionResponses, projectContext } = snapshot
+  const { captureStepId, aiEnabled, imageGeneration } = outcome
 
   // 1. Resolve source media (if specified)
-  // Capture media is stored in context as MediaReference[]
+  // Capture media is stored in data as MediaReference[]
   let sourceMedia: MediaReference | null = null
   if (captureStepId) {
-    const captureResponse = sessionInputs.responses.find(
+    const captureResponse = sessionResponses.find(
       r => r.stepId === captureStepId
     )
-    const captureMedia = captureResponse?.context as MediaReference[] | null
+    const captureMedia = captureResponse?.data as MediaReference[] | null
     if (!captureMedia || captureMedia.length === 0) {
       throw new NonRetryableError(
         `Capture step ${captureStepId} has no media`
@@ -325,7 +294,7 @@ export async function imageOutcome(ctx: OutcomeContext): Promise<JobOutput> {
   // 3. AI generation mode
   const { text: resolvedPrompt, mediaRefs } = resolvePromptMentions(
     imageGeneration.prompt,
-    sessionInputs.responses,
+    sessionResponses,
     imageGeneration.refMedia
   )
 
@@ -365,7 +334,7 @@ export async function imageOutcome(ctx: OutcomeContext): Promise<JobOutput> {
 - [ ] AC-5.1: Passthrough mode works (aiEnabled=false, just overlay)
 - [ ] AC-5.2: Prompt-only generation works (aiEnabled=true, captureStepId=null)
 - [ ] AC-5.3: Image-to-image works (aiEnabled=true, captureStepId set)
-- [ ] AC-5.4: Capture media extracted from `response.context` as `MediaReference[]`
+- [ ] AC-5.4: Capture media extracted from `response.data` as `MediaReference[]`
 - [ ] AC-5.5: Prompt mentions resolved before generation
 - [ ] AC-5.6: Reference media passed to AI generator
 - [ ] AC-5.7: Overlay applied when exists for aspect ratio
@@ -454,8 +423,7 @@ functions/src/services/transform/
 │   ├── aiGenerateImage.ts      # AI image generation
 │   └── applyOverlay.ts         # Overlay application
 └── bindings/
-    ├── resolvePromptMentions.ts  # Prompt resolution
-    └── resolveSessionInputs.ts   # (if needed)
+    └── resolvePromptMentions.ts  # Prompt resolution
 ```
 
 ---

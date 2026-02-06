@@ -2,7 +2,7 @@
  * useUpdateSessionProgress Hook
  *
  * Mutation hook for updating session progress during experience execution.
- * Updates answers array and captured media.
+ * Updates the unified responses array.
  *
  * Uses transaction for consistency.
  */
@@ -12,7 +12,7 @@ import * as Sentry from '@sentry/tanstackstart-react'
 
 import type { UpdateData } from 'firebase/firestore'
 import type { SessionResponse } from '@clementine/shared'
-import type { Answer, CapturedMedia, Session } from '../schemas'
+import type { Session } from '../schemas'
 
 import { firestore } from '@/integrations/firebase/client'
 
@@ -22,12 +22,8 @@ import { firestore } from '@/integrations/firebase/client'
 interface UpdateProgressInput {
   projectId: string
   sessionId: string
-  /** @deprecated Use responses instead */
-  answers?: Answer[]
-  /** @deprecated Use responses instead */
-  capturedMedia?: CapturedMedia[]
-  /** Unified responses array (replaces answers and capturedMedia) */
-  responses?: SessionResponse[]
+  /** Unified responses array */
+  responses: SessionResponse[]
 }
 
 /**
@@ -47,12 +43,11 @@ interface UpdateProgressInput {
  * function RuntimeEngine({ session }) {
  *   const updateProgress = useUpdateSessionProgress()
  *
- *   const handleStepComplete = (stepId: string, stepType: string, value: unknown) => {
- *     const answer = { stepId, stepType, value, answeredAt: Date.now() }
+ *   const handleStepComplete = (response: SessionResponse) => {
  *     updateProgress.mutate({
  *       projectId: session.projectId,
  *       sessionId: session.id,
- *       answers: [...existingAnswers, answer],
+ *       responses: [...existingResponses, response],
  *     })
  *   }
  * }
@@ -60,13 +55,7 @@ interface UpdateProgressInput {
  */
 export function useUpdateSessionProgress() {
   return useMutation<void, Error, UpdateProgressInput>({
-    mutationFn: async ({
-      projectId,
-      sessionId,
-      answers,
-      capturedMedia,
-      responses,
-    }) => {
+    mutationFn: async ({ projectId, sessionId, responses }) => {
       const sessionRef = doc(
         firestore,
         `projects/${projectId}/sessions/${sessionId}`,
@@ -76,18 +65,7 @@ export function useUpdateSessionProgress() {
       await runTransaction(firestore, async (transaction) => {
         const updates: UpdateData<Session> = {
           updatedAt: serverTimestamp(),
-        }
-
-        if (answers) {
-          // Cast to satisfy Firestore types (MultiSelectOption[] is not recognized by UpdateData)
-          updates.answers = answers as UpdateData<Session>['answers']
-        }
-        if (capturedMedia) {
-          updates.capturedMedia = capturedMedia
-        }
-        if (responses) {
-          // Write unified responses array
-          updates.responses = responses as UpdateData<Session>['responses']
+          responses: responses as UpdateData<Session>['responses'],
         }
 
         transaction.update(sessionRef, updates)

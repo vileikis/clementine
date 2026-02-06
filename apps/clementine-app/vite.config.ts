@@ -7,6 +7,10 @@ import tailwindcss from '@tailwindcss/vite'
 import { nitro } from 'nitro/vite'
 
 const config = defineConfig(({ mode }) => ({
+  server: {
+    // Allow ngrok and similar tunneling services for mobile testing
+    allowedHosts: ['.ngrok-free.app', '.ngrok.io', '.ngrok-free.dev'],
+  },
   plugins: [
     devtools(),
     mode !== 'test' && nitro(),

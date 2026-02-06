@@ -141,13 +141,13 @@ export function ExperienceRuntime({
   // Sync to Firestore helper - used on navigation events
   // Returns a promise that rejects on failure (for completion flow to handle)
   const syncToFirestore = useCallback(
-    async (options: { responses?: typeof store.responses }) => {
+    async (responses: typeof store.responses) => {
       try {
         store.setSyncing(true)
         await updateProgress.mutateAsync({
           projectId: session.projectId,
           sessionId: session.id,
-          ...options,
+          responses,
         })
         store.markSynced()
       } catch (error) {
@@ -177,9 +177,7 @@ export function ExperienceRuntime({
 
     // Sync responses to Firestore on forward navigation
     if (current > prev) {
-      syncToFirestore({
-        responses: store.responses,
-      })
+      syncToFirestore(store.responses)
     }
 
     // Fire onStepChange callback on any step change
@@ -214,9 +212,7 @@ export function ExperienceRuntime({
     const runCompletion = async () => {
       // Step 1: Sync to Firestore
       try {
-        await syncToFirestore({
-          responses: store.responses,
-        })
+        await syncToFirestore(store.responses)
       } catch {
         // Error already reported by syncToFirestore via onError
         return

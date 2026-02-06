@@ -17,25 +17,23 @@ describe('sessionResponseSchema', () => {
   }
 
   describe('text input response', () => {
-    it('accepts valid text input with stepName, stepType, value', () => {
+    it('accepts valid text input with stepName, stepType, data', () => {
       const response = sessionResponseSchema.parse({
         stepId: 'step-1',
         stepName: 'user_name',
         stepType: 'input.shortText',
-        value: 'John Doe',
-        context: null,
+        data: 'John Doe',
         ...baseTimestamps,
       })
       expect(response.stepId).toBe('step-1')
       expect(response.stepName).toBe('user_name')
       expect(response.stepType).toBe('input.shortText')
-      expect(response.value).toBe('John Doe')
-      expect(response.context).toBeNull()
+      expect(response.data).toBe('John Doe')
     })
   })
 
   describe('capture response', () => {
-    it('accepts capture response with MediaReference[] in context', () => {
+    it('accepts capture response with MediaReference[] in data', () => {
       const mediaRefs = [
         {
           mediaAssetId: 'asset-123',
@@ -48,35 +46,31 @@ describe('sessionResponseSchema', () => {
         stepId: 'step-2',
         stepName: 'photo',
         stepType: 'capture.photo',
-        value: null,
-        context: mediaRefs,
+        data: mediaRefs,
         ...baseTimestamps,
       })
       expect(response.stepId).toBe('step-2')
       expect(response.stepType).toBe('capture.photo')
-      expect(response.value).toBeNull()
-      expect(response.context).toEqual(mediaRefs)
+      expect(response.data).toEqual(mediaRefs)
     })
   })
 
   describe('multi-select response', () => {
-    it('accepts multi-select response with value array and context', () => {
-      const multiSelectContext = [
-        { value: 'opt1', label: 'Option 1' },
-        { value: 'opt2', label: 'Option 2' },
+    it('accepts multi-select response with MultiSelectOption[] in data', () => {
+      const multiSelectOptions = [
+        { value: 'opt1', promptFragment: null, promptMedia: null },
+        { value: 'opt2', promptFragment: null, promptMedia: null },
       ]
       const response = sessionResponseSchema.parse({
         stepId: 'step-3',
         stepName: 'preferences',
         stepType: 'input.multiSelect',
-        value: ['opt1', 'opt2'],
-        context: multiSelectContext,
+        data: multiSelectOptions,
         ...baseTimestamps,
       })
       expect(response.stepId).toBe('step-3')
       expect(response.stepType).toBe('input.multiSelect')
-      expect(response.value).toEqual(['opt1', 'opt2'])
-      expect(response.context).toEqual(multiSelectContext)
+      expect(response.data).toEqual(multiSelectOptions)
     })
   })
 
@@ -110,24 +104,14 @@ describe('sessionResponseSchema', () => {
   })
 
   describe('default values', () => {
-    it('defaults value to null when not provided', () => {
+    it('defaults data to null when not provided', () => {
       const response = sessionResponseSchema.parse({
         stepId: 'step-1',
         stepName: 'user_name',
         stepType: 'input.shortText',
         ...baseTimestamps,
       })
-      expect(response.value).toBeNull()
-    })
-
-    it('defaults context to null when not provided', () => {
-      const response = sessionResponseSchema.parse({
-        stepId: 'step-1',
-        stepName: 'user_name',
-        stepType: 'input.shortText',
-        ...baseTimestamps,
-      })
-      expect(response.context).toBeNull()
+      expect(response.data).toBeNull()
     })
   })
 
@@ -172,8 +156,7 @@ describe('sessionResponseSchema', () => {
         stepId: 'step-1',
         stepName: 'user_name',
         stepType: 'input.shortText',
-        value: 'test',
-        context: null,
+        data: 'test',
         createdAt: Date.now(),
         updatedAt: Date.now(),
       })

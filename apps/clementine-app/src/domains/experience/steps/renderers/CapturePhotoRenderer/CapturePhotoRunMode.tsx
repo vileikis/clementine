@@ -212,6 +212,30 @@ export function CapturePhotoRunMode({
     </div>
   ) : null
 
+  // Uploading state - check first as it takes priority over all other states
+  if (isUploading) {
+    return (
+      <div className="relative flex h-full w-full flex-col items-center justify-center">
+        <UploadProgress photo={photo} aspectRatio={aspectRatio} />
+      </div>
+    )
+  }
+
+  // Photo preview state - check before permission states so fallback picker works
+  // (user can select photo even when permission is denied/unavailable)
+  if (captureStatus === 'photo-preview' && photo) {
+    return (
+      <div className="relative flex h-full w-full flex-col items-center justify-center">
+        <PhotoPreview
+          photo={photo}
+          aspectRatio={aspectRatio}
+          onRetake={retake}
+          onConfirm={handleConfirm}
+        />
+      </div>
+    )
+  }
+
   // Permission: unknown (loading)
   if (permStatus === 'unknown') {
     return (
@@ -262,15 +286,6 @@ export function CapturePhotoRunMode({
 
   // Permission granted - show capture flow
 
-  // Uploading state (no back button during upload)
-  if (isUploading) {
-    return (
-      <div className="relative flex h-full w-full flex-col items-center justify-center">
-        <UploadProgress photo={photo} aspectRatio={aspectRatio} />
-      </div>
-    )
-  }
-
   // Error state
   if (captureStatus === 'error' || uploadError) {
     return (
@@ -282,20 +297,6 @@ export function CapturePhotoRunMode({
           onRetry={handleRetry}
           onOpenPicker={openPicker}
           onFileChange={handleFileChange}
-        />
-      </div>
-    )
-  }
-
-  // Photo preview state (no back button - retake is available)
-  if (captureStatus === 'photo-preview' && photo) {
-    return (
-      <div className="relative flex h-full w-full flex-col items-center justify-center">
-        <PhotoPreview
-          photo={photo}
-          aspectRatio={aspectRatio}
-          onRetake={retake}
-          onConfirm={handleConfirm}
         />
       </div>
     )

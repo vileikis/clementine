@@ -36,7 +36,6 @@ import {
   createDefaultInputYesNoConfig,
 } from '../defaults'
 import type {
-  AnswerValue,
   ExperienceStep,
   ExperienceStepCategory,
   ExperienceStepConfig,
@@ -54,7 +53,6 @@ export type {
   ExperienceStepCategory as StepCategory,
   ExperienceStepConfig as StepConfig,
   ExperienceStepType as StepType,
-  AnswerValue,
 }
 
 /**

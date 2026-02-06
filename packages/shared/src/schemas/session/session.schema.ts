@@ -12,6 +12,7 @@
  */
 import { z } from 'zod'
 import { jobStatusSchema } from '../job/job-status.schema'
+import { mediaReferenceSchema } from '../media/media-reference.schema'
 import { sessionResponseSchema } from './session-response.schema'
 
 /**
@@ -36,71 +37,6 @@ export const sessionStatusSchema = z.enum([
   'abandoned',
   'error',
 ])
-
-/**
- * Answer value schema
- * Defines valid answer value types (simplified from 4 types to 2)
- * - string: text inputs, yes/no ("yes"/"no"), scale ("1"-"5")
- * - string[]: multi-select inputs
- */
-export const answerValueSchema = z.union([
-  z.string(),          // Text, yes/no, scale
-  z.array(z.string()), // Multi-select
-])
-
-/**
- * Answer value type inferred from schema
- * Single source of truth for answer value types
- */
-export type AnswerValue = z.infer<typeof answerValueSchema>
-
-/**
- * Answer schema
- * Represents a collected answer from an input step with optional AI context
- *
- * Design:
- * - `value`: Primitive answer for analytics (string | string[])
- * - `context`: Optional step-specific structured data for AI generation
- *
- * Example (multi-select):
- * - value: ["option1", "option2"] (for analytics aggregation)
- * - context: [{ value: "option1", promptFragment: "...", promptMedia: {...} }, ...]
- */
-export const answerSchema = z.object({
-  /** Step that collected this answer */
-  stepId: z.string(),
-  /** Step type (e.g., 'input.scale', 'input.yesNo') */
-  stepType: z.string(),
-  /**
-   * The answer value - primitive types for analytics:
-   * - string: short text, long text, yes/no ("yes"/"no"), scale ("1"-"5")
-   * - string[]: multi-select (array of selected option values)
-   */
-  value: answerValueSchema,
-  /**
-   * Optional step-specific context for AI generation
-   * - Multi-select: MultiSelectOption[] (full option objects with promptFragment/promptMedia)
-   * - Other steps: any step-specific structured data
-   */
-  context: z.unknown().nullable().default(null),
-  /** Timestamp when answered (Unix ms) */
-  answeredAt: z.number(),
-})
-
-/**
- * CapturedMedia schema
- * Represents media captured from a capture step
- */
-export const capturedMediaSchema = z.object({
-  /** Step that captured this media */
-  stepId: z.string(),
-  /** Media asset ID in storage */
-  assetId: z.string(),
-  /** Public URL to the asset */
-  url: z.string(),
-  /** Capture timestamp (Unix ms) */
-  createdAt: z.number(),
-})
 
 /**
  * SessionResultMedia schema
@@ -165,18 +101,6 @@ export const sessionSchema = z.looseObject({
    */
 
   /**
-   * @deprecated Use `responses` instead. This field is kept for backward compatibility
-   * with existing sessions. New sessions should only write to `responses`.
-   */
-  answers: z.array(answerSchema).default([]),
-
-  /**
-   * @deprecated Use `responses` instead. This field is kept for backward compatibility
-   * with existing sessions. New sessions should only write to `responses`.
-   */
-  capturedMedia: z.array(capturedMediaSchema).default([]),
-
-  /**
    * Unified responses from all steps (input + capture).
    * Replaces separate `answers` and `capturedMedia` arrays.
    *
@@ -190,7 +114,7 @@ export const sessionSchema = z.looseObject({
   responses: z.array(sessionResponseSchema).default([]),
 
   /** Final result media from transform/capture */
-  resultMedia: sessionResultMediaSchema.nullable().default(null),
+  resultMedia: mediaReferenceSchema.nullable().default(null),
 
   /**
    * JOURNEY LINKING
@@ -244,8 +168,6 @@ export type Session = z.infer<typeof sessionSchema>
 export type SessionMode = z.infer<typeof sessionModeSchema>
 export type ConfigSource = z.infer<typeof configSourceSchema>
 export type SessionStatus = z.infer<typeof sessionStatusSchema>
-export type Answer = z.infer<typeof answerSchema>
-export type CapturedMedia = z.infer<typeof capturedMediaSchema>
 export type SessionResultMedia = z.infer<typeof sessionResultMediaSchema>
 
 // Re-export JobStatus for convenience

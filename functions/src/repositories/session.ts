@@ -7,7 +7,7 @@
  * Note: session-legacy.ts uses old path (/sessions/{id}) for legacy media pipeline
  */
 import { db } from '../infra/firebase-admin'
-import { sessionSchema, type Session, type JobStatus, type SessionResultMedia } from '@clementine/shared'
+import { sessionSchema, type Session, type JobStatus, type MediaReference } from '@clementine/shared'
 import { convertFirestoreDoc } from '../utils/firestore-utils'
 
 /**
@@ -84,7 +84,7 @@ export function hasActiveJob(session: Session): boolean {
 export async function updateSessionResultMedia(
   projectId: string,
   sessionId: string,
-  resultMedia: SessionResultMedia
+  resultMedia: MediaReference
 ): Promise<void> {
   await getSessionRef(projectId, sessionId).update({
     resultMedia,

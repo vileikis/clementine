@@ -1,7 +1,7 @@
 # PRD 1A: Schema Foundations
 
 **Epic**: [Outcome-based Create](./epic.md)
-**Status**: Draft
+**Status**: ✅ Complete
 **Dependencies**: None (first PRD)
 **Enables**: PRD 1B, PRD 1C
 
@@ -52,75 +52,92 @@ export const mediaReferenceSchema = z.looseObject({
 
 ---
 
-## 2. Create Outcome Schema
+## 2. Outcome Schema
 
 New schema for outcome-based generation configuration.
 
-**File**: `packages/shared/src/schemas/experience/create-outcome.schema.ts` (NEW)
+**File**: `packages/shared/src/schemas/experience/outcome.schema.ts` (NEW)
 
 ```ts
 import { z } from 'zod'
-import {
-  aiImageModelSchema,
-  aiImageAspectRatioSchema,
-} from './nodes/ai-image-node.schema'
 import { mediaReferenceSchema } from '../media/media-reference.schema'
 
 /**
- * Create outcome types
- * - image: AI image generation (MVP)
- * - gif, video: Future outcome types (schema stubs)
+ * Outcome type for configuration.
+ * Determines the final output format.
  */
-export const createOutcomeTypeSchema = z.enum(['image', 'gif', 'video'])
+export const outcomeTypeSchema = z.enum(['image', 'gif', 'video'])
 
 /**
- * Image generation configuration
- * Used by all outcomes as the primary AI generation stage.
- * Named explicitly for future stages (textGeneration, videoGeneration).
+ * AI image generation model selection.
+ * Defined locally to avoid coupling to deprecated nodes/ system.
+ */
+export const aiImageModelSchema = z.enum([
+  'gemini-2.5-flash-image',
+  'gemini-3-pro-image-preview',
+])
+
+/**
+ * AI image aspect ratio options.
+ * Defined locally to avoid coupling to deprecated nodes/ system.
+ */
+export const aiImageAspectRatioSchema = z.enum([
+  '1:1',
+  '3:2',
+  '2:3',
+  '9:16',
+  '16:9',
+])
+
+/**
+ * Image generation configuration.
+ * Contains prompt template, reference media, model, and aspect ratio.
  */
 export const imageGenerationConfigSchema = z.object({
-  /** Prompt template with @{step:...} and @{ref:...} mentions */
+  /** Prompt template with @{step:...} and @{ref:...} placeholders */
   prompt: z.string().default(''),
-
-  /** Reference images for style/content guidance */
+  /** Reference images for style guidance */
   refMedia: z.array(mediaReferenceSchema).default([]),
-
-  /** AI model for generation */
+  /** AI model selection */
   model: aiImageModelSchema.default('gemini-2.5-flash-image'),
-
   /** Output aspect ratio */
   aspectRatio: aiImageAspectRatioSchema.default('1:1'),
 })
 
 /**
- * Image outcome options (type-specific)
- * Currently empty for MVP, but structure allows future extensions.
+ * Options for static image output.
  */
 export const imageOptionsSchema = z.object({
+  /** Discriminator for image options */
   kind: z.literal('image'),
 })
 
 /**
- * GIF outcome options (stub for future)
+ * Options for animated GIF output.
  */
 export const gifOptionsSchema = z.object({
+  /** Discriminator for GIF options */
   kind: z.literal('gif'),
+  /** Frames per second (1-60) */
   fps: z.number().int().min(1).max(60).default(24),
+  /** Duration in seconds (0.5-30) */
   duration: z.number().min(0.5).max(30).default(3),
 })
 
 /**
- * Video outcome options (stub for future)
+ * Options for video output.
  */
 export const videoOptionsSchema = z.object({
+  /** Discriminator for video options */
   kind: z.literal('video'),
+  /** Prompt for video generation/animation */
   videoPrompt: z.string().default(''),
-  // videoModel: videoModelSchema, // Future
+  /** Duration in seconds (1-60) */
   duration: z.number().min(1).max(60).default(5),
 })
 
 /**
- * Discriminated union for type-specific options
+ * Discriminated union of outcome options by 'kind' field.
  */
 export const outcomeOptionsSchema = z.discriminatedUnion('kind', [
   imageOptionsSchema,
@@ -129,48 +146,47 @@ export const outcomeOptionsSchema = z.discriminatedUnion('kind', [
 ])
 
 /**
- * Complete create outcome configuration
+ * Complete Outcome configuration.
+ * Defines how a session generates its final output.
  */
-export const createOutcomeSchema = z.object({
-  /** Outcome type. Null = not configured */
-  type: createOutcomeTypeSchema.nullable().default(null),
-
-  /** Capture step ID for source media. Null = prompt-only or invalid for passthrough */
+export const outcomeSchema = z.object({
+  /** Output type (null = not configured) */
+  type: outcomeTypeSchema.nullable().default(null),
+  /** Source capture step ID for image-to-image (null = no source) */
   captureStepId: z.string().nullable().default(null),
-
-  /** Global toggle for AI generation. False = passthrough mode */
+  /** Global AI toggle (false = passthrough mode) */
   aiEnabled: z.boolean().default(true),
-
-  /** Image generation config (preserved when switching outcomes) */
+  /** AI image generation settings */
   imageGeneration: imageGenerationConfigSchema.default({
     prompt: '',
     refMedia: [],
     model: 'gemini-2.5-flash-image',
     aspectRatio: '1:1',
   }),
-
-  /** Type-specific options (can reset on outcome switch) */
+  /** Type-specific output options (null = not configured) */
   options: outcomeOptionsSchema.nullable().default(null),
 })
 
 // Type exports
-export type CreateOutcomeType = z.infer<typeof createOutcomeTypeSchema>
+export type OutcomeType = z.infer<typeof outcomeTypeSchema>
+export type AIImageModel = z.infer<typeof aiImageModelSchema>
+export type AIImageAspectRatio = z.infer<typeof aiImageAspectRatioSchema>
 export type ImageGenerationConfig = z.infer<typeof imageGenerationConfigSchema>
 export type ImageOptions = z.infer<typeof imageOptionsSchema>
 export type GifOptions = z.infer<typeof gifOptionsSchema>
 export type VideoOptions = z.infer<typeof videoOptionsSchema>
 export type OutcomeOptions = z.infer<typeof outcomeOptionsSchema>
-export type CreateOutcome = z.infer<typeof createOutcomeSchema>
+export type Outcome = z.infer<typeof outcomeSchema>
 ```
 
 ### Acceptance Criteria
 
-- [ ] AC-2.1: `createOutcomeSchema` exported from shared package
+- [ ] AC-2.1: `outcomeSchema` exported from shared package
 - [ ] AC-2.2: `captureStepId` at top level (shared across outcomes)
 - [ ] AC-2.3: `aiEnabled` at top level (global toggle)
 - [ ] AC-2.4: `imageGeneration` as named block (not `ai`)
 - [ ] AC-2.5: `options` as discriminated union by `kind`
-- [ ] AC-2.6: Reuses `aiImageModelSchema` and `aiImageAspectRatioSchema`
+- [ ] AC-2.6: Model and aspect ratio enums defined locally (not coupled to deprecated nodes)
 - [ ] AC-2.7: GIF/Video options are stubs with reasonable defaults
 
 ---
@@ -268,7 +284,7 @@ Update index files to export new schemas.
 **File**: `packages/shared/src/schemas/experience/index.ts`
 ```ts
 // Add:
-export * from './create-outcome.schema'
+export * from './outcome.schema'
 ```
 
 **File**: `packages/shared/src/schemas/session/index.ts`
@@ -293,7 +309,7 @@ export { mediaDisplayNameSchema } from './media-reference.schema'
 ## Testing
 
 - [ ] Unit tests for `mediaDisplayNameSchema` validation (valid/invalid characters)
-- [ ] Unit tests for `createOutcomeSchema` defaults
+- [ ] Unit tests for `outcomeSchema` defaults
 - [ ] Unit tests for `outcomeOptionsSchema` discriminated union
 - [ ] Unit tests for `sessionResponseSchema` shape validation
 
@@ -304,7 +320,7 @@ export { mediaDisplayNameSchema } from './media-reference.schema'
 | File | Action |
 |------|--------|
 | `packages/shared/src/schemas/media/media-reference.schema.ts` | MODIFY |
-| `packages/shared/src/schemas/experience/create-outcome.schema.ts` | CREATE |
+| `packages/shared/src/schemas/experience/outcome.schema.ts` | CREATE |
 | `packages/shared/src/schemas/session/session-response.schema.ts` | CREATE |
 | `packages/shared/src/schemas/experience/index.ts` | MODIFY |
 | `packages/shared/src/schemas/session/index.ts` | MODIFY |

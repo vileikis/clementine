@@ -12,10 +12,13 @@
  * - Schema evolution is natural as the system evolves
  */
 import { z } from 'zod'
-import { answerSchema, capturedMediaSchema } from '../session/session.schema'
-import { overlayReferenceSchema } from '../project/project-config.schema'
+import {
+  overlayReferenceSchema,
+  overlaysConfigSchema,
+} from '../project/project-config.schema'
 import { mainExperienceReferenceSchema } from '../project/experiences.schema'
-import { transformNodeSchema } from '../experience/transform.schema'
+import { sessionResponseSchema } from '../session/session-response.schema'
+import { outcomeSchema } from '../experience/outcome.schema'
 import { jobStatusSchema } from './job-status.schema'
 
 // Re-export jobStatusSchema for convenience
@@ -52,6 +55,8 @@ export const jobOutputSchema = z.object({
   assetId: z.string(),
   /** Public URL to the output */
   url: z.url(),
+  /** Storage bucket path to the output file */
+  filePath: z.string(),
   /** Actual output format (determined by pipeline) */
   format: z.enum(['image', 'gif', 'video']),
   /** Output dimensions after resize/crop */
@@ -68,33 +73,18 @@ export const jobOutputSchema = z.object({
 })
 
 /**
- * Snapshot of session inputs at job creation
- *
- * Reuses session schemas for consistency. z.looseObject() ensures
- * old jobs with extra fields (e.g., stepName from earlier versions)
- * still parse successfully.
- */
-export const sessionInputsSnapshotSchema = z.looseObject({
-  answers: z.array(answerSchema),
-  capturedMedia: z.array(capturedMediaSchema),
-})
-
-/**
- * Snapshot of transform nodes at job creation
- *
- * Captures the transform nodes array from the experience config.
- */
-export const transformNodesSnapshotSchema = z.array(transformNodeSchema)
-
-/**
  * Snapshot of project context at job creation
  *
  * Captures overlay reference and experience reference for applyOverlay tracking.
  * Reuses overlayReferenceSchema and mainExperienceReferenceSchema for consistency.
  */
 export const projectContextSnapshotSchema = z.looseObject({
-  overlay: overlayReferenceSchema,
-  applyOverlay: z.boolean(),
+  /** @deprecated Use overlays map instead */
+  overlay: overlayReferenceSchema.nullable().default(null),
+  /** @deprecated Use overlays map instead */
+  applyOverlay: z.boolean().default(false),
+  /** Overlays by aspect ratio (from project config) */
+  overlays: overlaysConfigSchema.nullable().default(null),
   /** Experience reference snapshot (from mainExperienceReferenceSchema) */
   experienceRef: mainExperienceReferenceSchema.nullable().default(null),
 })
@@ -107,11 +97,14 @@ export const eventContextSnapshotSchema = projectContextSnapshotSchema
  * Complete job execution snapshot
  */
 export const jobSnapshotSchema = z.looseObject({
-  sessionInputs: sessionInputsSnapshotSchema,
-  transformNodes: transformNodesSnapshotSchema,
+  /** Session responses at job creation (unified from all steps) */
+  sessionResponses: z.array(sessionResponseSchema).default([]),
+  /** Project context (overlays, etc.) */
   projectContext: projectContextSnapshotSchema,
   /** Experience version at time of job creation */
   experienceVersion: z.number().int().positive(),
+  /** Outcome configuration (from experience.published.outcome) */
+  outcome: outcomeSchema.nullable().default(null),
 })
 
 // Backward compatibility: eventContext is now projectContext
@@ -152,10 +145,6 @@ export type JobProgress = z.infer<typeof jobProgressSchema>
 export type JobError = z.infer<typeof jobErrorSchema>
 export type JobOutput = z.infer<typeof jobOutputSchema>
 export type JobSnapshot = z.infer<typeof jobSnapshotSchema>
-export type SessionInputsSnapshot = z.infer<typeof sessionInputsSnapshotSchema>
-export type TransformNodesSnapshot = z.infer<
-  typeof transformNodesSnapshotSchema
->
 export type ProjectContextSnapshot = z.infer<
   typeof projectContextSnapshotSchema
 >

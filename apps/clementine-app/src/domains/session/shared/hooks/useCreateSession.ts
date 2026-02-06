@@ -84,8 +84,6 @@ export function useCreateSession() {
           mode: validated.mode,
           configSource: validated.configSource,
           status: 'active',
-          answers: [],
-          capturedMedia: [],
           responses: [],
           resultMedia: null,
           jobId: null,

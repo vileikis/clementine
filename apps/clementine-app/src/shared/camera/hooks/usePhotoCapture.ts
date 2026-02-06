@@ -65,6 +65,8 @@ export function usePhotoCapture({
     try {
       const capturedPhoto = await camera.takePhoto()
       if (capturedPhoto) {
+        // Stop camera immediately after capture to release hardware
+        // camera.stop()
         setPhoto(capturedPhoto)
         setStatus('photo-preview')
         onCapture?.(capturedPhoto)
