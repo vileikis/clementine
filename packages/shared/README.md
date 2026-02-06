@@ -14,13 +14,23 @@ pnpm add @clementine/shared --filter <workspace-name>
 ## Usage
 
 ```typescript
-import { sessionSchema, experienceSchema, jobSchema } from '@clementine/shared'
+import {
+  sessionSchema,
+  experienceSchema,
+  jobSchema,
+  type Session,
+  type Experience,
+  type Job,
+} from '@clementine/shared'
 
-// Validate session data
+// Validate data at runtime
 const session = sessionSchema.parse(data)
+const experience = experienceSchema.parse(experienceData)
 
-// Get TypeScript types
-type Session = z.infer<typeof sessionSchema>
+// Types are pre-exported for convenience
+function processSession(session: Session): void {
+  // ...
+}
 ```
 
 ## Schema Domains
@@ -29,35 +39,41 @@ The package organizes schemas by domain:
 
 ### Session
 
-Guest session data for photo/video experiences.
+Guest session data for photo/video experiences:
+- `sessionSchema` - Core session document
+- `sessionResponseSchema` - Session response data
 
 ### Job
 
-Transform pipeline execution and job status tracking.
+Transform pipeline execution and job status tracking:
+- `jobSchema` - Job document for AI processing tasks
+- `jobStatusSchema` - Job lifecycle states
 
 ### Experience
 
 Experience definitions including step configurations:
-- `info` - Information display steps
-- `capture-photo` - Photo capture steps
-- `input-*` - Various input types (short text, long text, scale, yes/no, multi-select)
-- `transform-pipeline` - AI transformation steps
-
-### Event
-
-Project event schemas including configuration and experiences.
+- `experienceSchema` - Complete experience definition
+- `stepSchema` - Discriminated union of all step types
+- `outcomeSchema` - Experience outcome definitions
+- Step types: `info`, `capture-photo`, `input-short-text`, `input-long-text`, `input-scale`, `input-yes-no`, `input-multi-select`
 
 ### Project
 
-Project-level schemas for workspace organization.
+Project-level schemas for workspace organization (includes configuration previously in event domain):
+- `projectSchema` - Project document
+- `projectConfigSchema` - Project configuration
+- `experiencesSchema` - Project experiences collection
 
 ### Workspace
 
-Workspace schemas for multi-tenant support.
+Workspace schemas for multi-tenant support:
+- `workspaceSchema` - Workspace document
 
 ### Theme
 
-Theme configuration including media references and styling constants.
+Theme configuration including media references and styling:
+- `themeSchema` - Theme configuration
+- Theme constants for styling defaults
 
 ### Media
 
@@ -111,9 +127,10 @@ pnpm clean
 
 ## Architecture
 
-- **Zod 4.x** - Runtime validation with TypeScript inference
-- **TypeScript** - Strict mode with ES2020 target
-- **Vitest** - Testing framework
+- **Zod 4.1.12** - Runtime validation with TypeScript inference
+- **TypeScript 5.x** - Strict mode with ES2020 target
+- **Vitest 3.x** - Testing framework
+- **ESM** - Native ES modules (`"type": "module"`)
 
 ## Adding New Schemas
 
