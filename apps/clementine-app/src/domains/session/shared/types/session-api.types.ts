@@ -5,13 +5,9 @@
  */
 import { z } from 'zod'
 
-import {
-  answerSchema,
-  capturedMediaSchema,
-  configSourceSchema,
-  sessionModeSchema,
-} from '../schemas'
+import { configSourceSchema, sessionModeSchema } from '../schemas'
 import type { Session } from '../schemas'
+import type { SessionResponse } from '@clementine/shared'
 
 /**
  * Create session input schema
@@ -36,22 +32,6 @@ export const createSessionInputSchema = z.object({
 })
 
 /**
- * Update session progress input schema
- *
- * Note: resultMedia is intentionally excluded - it's written by cloud functions only.
- */
-export const updateSessionProgressInputSchema = z.object({
-  /** Session to update */
-  sessionId: z.string(),
-
-  /** Answers to set (optional) - overwrites existing */
-  answers: z.array(answerSchema).optional(),
-
-  /** Captured media to set (optional) - overwrites existing */
-  capturedMedia: z.array(capturedMediaSchema).optional(),
-})
-
-/**
  * Complete session input schema
  */
 export const completeSessionInputSchema = z.object({
@@ -71,11 +51,19 @@ export const abandonSessionInputSchema = z.object({
  * TypeScript types inferred from schemas
  */
 export type CreateSessionInput = z.infer<typeof createSessionInputSchema>
-export type UpdateSessionProgressInput = z.infer<
-  typeof updateSessionProgressInputSchema
->
 export type CompleteSessionInput = z.infer<typeof completeSessionInputSchema>
 export type AbandonSessionInput = z.infer<typeof abandonSessionInputSchema>
+
+/**
+ * Update session progress input type
+ * Uses SessionResponse[] for responses
+ */
+export interface UpdateSessionProgressInput {
+  /** Session to update */
+  sessionId: string
+  /** Responses to set - overwrites existing */
+  responses: SessionResponse[]
+}
 
 /**
  * Create session function type
@@ -95,7 +83,7 @@ export type SubscribeSessionFn = (
 
 /**
  * Update session progress function type
- * Updates the current step and accumulated data
+ * Updates the responses array
  */
 export type UpdateSessionProgressFn = (
   input: UpdateSessionProgressInput,

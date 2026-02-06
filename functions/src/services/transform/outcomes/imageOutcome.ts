@@ -63,7 +63,8 @@ export async function imageOutcome(ctx: OutcomeContext): Promise<JobOutput> {
   })
 
   // Extract source media from capture step (if configured)
-  const sourceMedia = captureStepId
+  // This will throw an error if captureStepId is set but step not found or has no media
+  const sourceMedia: MediaReference | null = captureStepId
     ? getSourceMediaFromResponses(sessionResponses, captureStepId)
     : null
 
@@ -136,10 +137,15 @@ async function executeAIGeneration(
   const { outcome, sessionResponses } = snapshot
 
   if (!outcome?.imageGeneration) {
-    throw new Error('Image generation config is required for AI mode')
+    throw new Error('Image outcome missing configuration')
   }
 
   const { prompt, refMedia, model, aspectRatio } = outcome.imageGeneration
+
+  // RT-002: Validate prompt is not empty when AI enabled
+  if (!prompt.trim()) {
+    throw new Error('Image outcome has empty prompt')
+  }
 
   // Resolve prompt mentions
   const resolved = resolvePromptMentions(prompt, sessionResponses, refMedia)
@@ -208,37 +214,28 @@ async function executePassthrough(
  * Get source media from session responses by capture step ID
  *
  * Finds the response for the specified capture step and extracts the first media reference.
+ * Throws an error if the capture step is not found or has no media (fail-fast behavior).
  */
 function getSourceMediaFromResponses(
   responses: SessionResponse[],
   captureStepId: string,
-): MediaReference | null {
+): MediaReference {
   const response = responses.find((r) => r.stepId === captureStepId)
 
+  // RT-003: Capture step must exist
   if (!response) {
-    logger.warn('[ImageOutcome] Capture step not found in responses', {
-      captureStepId,
-      availableStepIds: responses.map((r) => r.stepId),
-    })
-    return null
+    throw new Error(`Capture step not found: ${captureStepId}`)
   }
 
-  // Data should be MediaReference[] for capture steps
+  // RT-004: Capture step must have media data
   if (!Array.isArray(response.data) || response.data.length === 0) {
-    logger.warn('[ImageOutcome] Capture step has no media data', {
-      captureStepId,
-      dataType: typeof response.data,
-    })
-    return null
+    throw new Error(`Capture step has no media: ${response.stepName}`)
   }
 
   // Return first media reference
   const firstMedia = response.data[0] as MediaReference
   if (!firstMedia?.mediaAssetId) {
-    logger.warn('[ImageOutcome] Invalid media reference in capture step', {
-      captureStepId,
-    })
-    return null
+    throw new Error(`Capture step has invalid media reference: ${response.stepName}`)
   }
 
   return firstMedia

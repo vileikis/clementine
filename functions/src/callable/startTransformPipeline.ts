@@ -86,12 +86,36 @@ export const startTransformPipelineV2 = onCall(
     const config =
       configSource === 'draft' ? experience.draft : experience.published
 
-    // Validate outcome is configured (replaces transformNodes validation)
+    // JC-001: Published config check (for guest sessions)
+    if (configSource === 'published' && !experience.published) {
+      throw new HttpsError(
+        'invalid-argument',
+        'Cannot create job: experience is not published',
+      )
+    }
+
+    // JC-002/003: Validate outcome is configured
     const outcome = config?.outcome
     if (!outcome?.type) {
       throw new HttpsError(
         'invalid-argument',
-        'Experience has no outcome configured',
+        'Cannot create job: experience has no outcome configured',
+      )
+    }
+
+    // JC-004: Validate session has responses
+    if (!session.responses || session.responses.length === 0) {
+      throw new HttpsError(
+        'invalid-argument',
+        'Cannot create job: session has no responses',
+      )
+    }
+
+    // JC-005: Validate outcome type is implemented
+    if (outcome.type !== 'image') {
+      throw new HttpsError(
+        'invalid-argument',
+        `Cannot create job: outcome type '${outcome.type}' is not implemented`,
       )
     }
 

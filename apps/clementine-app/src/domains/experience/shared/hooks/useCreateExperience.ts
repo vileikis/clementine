@@ -86,7 +86,6 @@ export function useCreateExperience() {
           media: null,
           draft: {
             steps: [],
-            transformNodes: [],
             outcome: null, // Not configured - requires explicit setup
           },
           published: null,

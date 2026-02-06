@@ -18,20 +18,3 @@ export function hasOutcome(
     configSource === 'draft' ? experience.draft : experience.published
   return config?.outcome?.type !== null && config?.outcome?.type !== undefined
 }
-
-/**
- * @deprecated Use hasOutcome instead. Transform nodes are no longer used.
- */
-export function hasTransformNodes(
-  experience: Experience,
-  configSource: 'draft' | 'published',
-): boolean {
-  const config =
-    configSource === 'draft' ? experience.draft : experience.published
-  return (config?.transformNodes?.length ?? 0) > 0
-}
-
-/**
- * @deprecated Use hasOutcome instead
- */
-export const hasTransformConfig = hasTransformNodes

@@ -24,8 +24,8 @@ This is a **monorepo** with:
 
 **Purpose**: Verify branch and understand scope
 
-- [ ] T001 Verify on branch `063-transform-cleanup` and review quickstart.md
-- [ ] T002 Run `pnpm --filter @clementine/shared build` to confirm current shared package builds
+- [x] T001 Verify on branch `063-transform-cleanup` and review quickstart.md
+- [x] T002 Run `pnpm --filter @clementine/shared build` to confirm current shared package builds
 
 ---
 
@@ -37,24 +37,24 @@ This is a **monorepo** with:
 
 ### Session Schema Cleanup
 
-- [ ] T003 Remove `answers` field from sessionSchema in `packages/shared/src/schemas/session/session.schema.ts`
-- [ ] T004 Remove `capturedMedia` field from sessionSchema in `packages/shared/src/schemas/session/session.schema.ts`
-- [ ] T005 Remove `answerSchema` definition from `packages/shared/src/schemas/session/session.schema.ts`
-- [ ] T006 Remove `answerValueSchema` definition from `packages/shared/src/schemas/session/session.schema.ts`
-- [ ] T007 Remove `capturedMediaSchema` definition from `packages/shared/src/schemas/session/session.schema.ts`
-- [ ] T008 Remove `Answer`, `AnswerValue`, `CapturedMedia` type exports from `packages/shared/src/schemas/session/session.schema.ts`
+- [x] T003 Remove `answers` field from sessionSchema in `packages/shared/src/schemas/session/session.schema.ts`
+- [x] T004 Remove `capturedMedia` field from sessionSchema in `packages/shared/src/schemas/session/session.schema.ts`
+- [x] T005 Remove `answerSchema` definition from `packages/shared/src/schemas/session/session.schema.ts`
+- [x] T006 Remove `answerValueSchema` definition from `packages/shared/src/schemas/session/session.schema.ts`
+- [x] T007 Remove `capturedMediaSchema` definition from `packages/shared/src/schemas/session/session.schema.ts`
+- [x] T008 Remove `Answer`, `AnswerValue`, `CapturedMedia` type exports from `packages/shared/src/schemas/session/session.schema.ts`
 
 ### Experience Schema Cleanup
 
-- [ ] T009 Remove `transformNodes` field from experienceConfigSchema in `packages/shared/src/schemas/experience/experience.schema.ts`
-- [ ] T010 Remove `transformNodeSchema` import from `packages/shared/src/schemas/experience/experience.schema.ts`
-- [ ] T011 Evaluate `packages/shared/src/schemas/experience/transform.schema.ts` for removal (check if referenced elsewhere)
-- [ ] T012 Evaluate `packages/shared/src/schemas/experience/nodes/` directory for removal (check if referenced elsewhere)
+- [x] T009 Remove `transformNodes` field from experienceConfigSchema in `packages/shared/src/schemas/experience/experience.schema.ts`
+- [x] T010 Remove `transformNodeSchema` import from `packages/shared/src/schemas/experience/experience.schema.ts`
+- [x] T011 Evaluate `packages/shared/src/schemas/experience/transform.schema.ts` for removal (check if referenced elsewhere) - **REMOVED**
+- [x] T012 Evaluate `packages/shared/src/schemas/experience/nodes/` directory for removal (check if referenced elsewhere) - **REMOVED**
 
 ### Verify Shared Package
 
-- [ ] T013 Run `pnpm --filter @clementine/shared build` to verify schema changes compile
-- [ ] T014 Run `pnpm --filter @clementine/shared test` to verify tests pass (update if needed)
+- [x] T013 Run `pnpm --filter @clementine/shared build` to verify schema changes compile
+- [x] T014 Run `pnpm --filter @clementine/shared test` to verify tests pass (update if needed) - **UPDATED TESTS**
 
 **Checkpoint**: Schema cleanup complete. TypeScript types no longer include deprecated fields. Proceed to user stories.
 
@@ -68,11 +68,11 @@ This is a **monorepo** with:
 
 ### Implementation for User Story 2
 
-- [ ] T015 [US2] Add published experience check in `functions/src/callable/startTransformPipeline.ts` - throw if `experience.published` is null
-- [ ] T016 [US2] Add outcome configured check in `functions/src/callable/startTransformPipeline.ts` - throw if `outcome.type` is null
-- [ ] T017 [US2] Add session responses check in `functions/src/callable/startTransformPipeline.ts` - throw if `responses` is empty
-- [ ] T018 [US2] Add outcome type implemented check in `functions/src/callable/startTransformPipeline.ts` - throw if type is not 'image'
-- [ ] T019 [US2] Run `pnpm --filter functions build` to verify Cloud Functions compile
+- [x] T015 [US2] Add published experience check in `functions/src/callable/startTransformPipeline.ts` - throw if `experience.published` is null
+- [x] T016 [US2] Add outcome configured check in `functions/src/callable/startTransformPipeline.ts` - throw if `outcome.type` is null
+- [x] T017 [US2] Add session responses check in `functions/src/callable/startTransformPipeline.ts` - throw if `responses` is empty
+- [x] T018 [US2] Add outcome type implemented check in `functions/src/callable/startTransformPipeline.ts` - throw if type is not 'image'
+- [x] T019 [US2] Run `pnpm --filter functions build` to verify Cloud Functions compile
 
 **Checkpoint**: Job creation now validates all requirements upfront with clear error messages.
 
@@ -86,10 +86,10 @@ This is a **monorepo** with:
 
 ### Implementation for User Story 3
 
-- [ ] T020 [US3] Add empty prompt check in `functions/src/services/transform/outcomes/imageOutcome.ts` - throw if AI enabled but prompt is empty
-- [ ] T021 [US3] Convert capture step not found from warning to error in `functions/src/services/transform/outcomes/imageOutcome.ts`
-- [ ] T022 [US3] Convert empty capture media from return null to error in `functions/src/services/transform/outcomes/imageOutcome.ts`
-- [ ] T023 [US3] Run `pnpm --filter functions build` to verify Cloud Functions compile
+- [x] T020 [US3] Add empty prompt check in `functions/src/services/transform/outcomes/imageOutcome.ts` - throw if AI enabled but prompt is empty
+- [x] T021 [US3] Convert capture step not found from warning to error in `functions/src/services/transform/outcomes/imageOutcome.ts`
+- [x] T022 [US3] Convert empty capture media from return null to error in `functions/src/services/transform/outcomes/imageOutcome.ts`
+- [x] T023 [US3] Run `pnpm --filter functions build` to verify Cloud Functions compile
 
 **Checkpoint**: Image outcome executor now validates configuration and fails fast with clear errors.
 
@@ -103,14 +103,14 @@ This is a **monorepo** with:
 
 ### Implementation for User Story 4
 
-- [ ] T024 [P] [US4] Remove `answers` fallback in `initFromSession()` in `apps/clementine-app/src/domains/experience/runtime/stores/experienceRuntimeStore.ts`
-- [ ] T025 [P] [US4] Remove `transformNodes` handling in `apps/clementine-app/src/domains/experience/designer/hooks/usePublishExperience.ts`
-- [ ] T026 [P] [US4] Remove `transformNodes: []` initialization in `apps/clementine-app/src/domains/experience/shared/hooks/useCreateExperience.ts`
-- [ ] T027 [P] [US4] Remove deprecated file `apps/clementine-app/src/domains/experience/shared/utils/hasTransformConfig.ts`
-- [ ] T028 [P] [US4] Clean up deprecated params in `apps/clementine-app/src/domains/session/shared/hooks/useUpdateSessionProgress.ts`
-- [ ] T029 [US4] Evaluate `apps/clementine-app/src/domains/experience/transform/` directory for removal (check if still used)
-- [ ] T030 [US4] Run `pnpm --filter @clementine/app type-check` to verify frontend compiles
-- [ ] T031 [US4] Run `pnpm --filter @clementine/app check` to fix linting/formatting
+- [x] T024 [P] [US4] Remove `answers` fallback in `initFromSession()` in `apps/clementine-app/src/domains/experience/runtime/stores/experienceRuntimeStore.ts`
+- [x] T025 [P] [US4] Remove `transformNodes` handling in `apps/clementine-app/src/domains/experience/designer/hooks/usePublishExperience.ts`
+- [x] T026 [P] [US4] Remove `transformNodes: []` initialization in `apps/clementine-app/src/domains/experience/shared/hooks/useCreateExperience.ts`
+- [x] T027 [P] [US4] Remove deprecated file `apps/clementine-app/src/domains/experience/shared/utils/hasTransformConfig.ts` - **KEPT hasOutcome, removed deprecated functions**
+- [x] T028 [P] [US4] Clean up deprecated params in `apps/clementine-app/src/domains/session/shared/hooks/useUpdateSessionProgress.ts`
+- [x] T029 [US4] Evaluate `apps/clementine-app/src/domains/experience/transform/` directory for removal (check if still used) - **REMOVED empty subdirectories**
+- [x] T030 [US4] Run `pnpm --filter @clementine/app type-check` to verify frontend compiles
+- [x] T031 [US4] Run `pnpm --filter @clementine/app check` to fix linting/formatting
 
 **Checkpoint**: Frontend no longer has any silent fallbacks to deprecated fields.
 
@@ -124,8 +124,8 @@ This is a **monorepo** with:
 
 ### Implementation for User Story 1
 
-- [ ] T032 [US1] Fix route comment in `apps/clementine-app/src/app/workspace/$workspaceSlug.experiences/$experienceId.tsx` - change "generate" to "create"
-- [ ] T033 [US1] Verify no "Generate" tab references in `apps/clementine-app/src/domains/experience/designer/`
+- [x] T032 [US1] Fix route comment in `apps/clementine-app/src/app/workspace/$workspaceSlug.experiences/$experienceId.tsx` - change "generate" to "create"
+- [x] T033 [US1] Verify no "Generate" tab references in `apps/clementine-app/src/domains/experience/designer/`
 
 **Checkpoint**: UI references are clean. No deprecated "Generate" tab terminology remains.
 
@@ -139,8 +139,8 @@ This is a **monorepo** with:
 
 ### Implementation for User Story 6
 
-- [ ] T034 [P] [US6] Review `functions/README.md` for accuracy and update if needed
-- [ ] T035 [P] [US6] Verify no "transform node workflow" references in project documentation
+- [x] T034 [P] [US6] Review `functions/README.md` for accuracy and update if needed - **No changes needed**
+- [x] T035 [P] [US6] Verify no "transform node workflow" references in project documentation - **Only in specs/requirements (design docs)**
 
 **Checkpoint**: Documentation accurately reflects current architecture.
 
@@ -150,9 +150,9 @@ This is a **monorepo** with:
 
 **Purpose**: Final verification and code audit
 
-- [ ] T036 Run code audit commands from quickstart.md to verify no deprecated field usage
-- [ ] T037 Run `pnpm app:check` from monorepo root to verify frontend
-- [ ] T038 Run `pnpm functions:build` from monorepo root to verify Cloud Functions
+- [x] T036 Run code audit commands from quickstart.md to verify no deprecated field usage - **Also fixed seed-emulators.ts**
+- [x] T037 Run `pnpm app:check` from monorepo root to verify frontend
+- [x] T038 Run `pnpm functions:build` from monorepo root to verify Cloud Functions
 - [ ] T039 Manual test: Create experience, publish, complete session, verify job succeeds
 - [ ] T040 Manual test: Verify job creation fails with clear error for unpublished experience
 - [ ] T041 Manual test: Verify job creation fails with clear error for missing outcome

@@ -13,7 +13,7 @@ import { NotFound } from '@/shared/components/NotFound'
  * Route: /workspace/:workspaceSlug/experiences/:experienceId
  * Access: Admin only (enforced by parent route requireAdmin guard)
  *
- * Layout for experience designer routes (collect, generate).
+ * Layout for experience designer routes (collect, create).
  * Loads experience data and renders the designer layout with tabs.
  */
 export const Route = createFileRoute(
