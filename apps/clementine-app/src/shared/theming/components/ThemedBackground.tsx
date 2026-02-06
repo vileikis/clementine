@@ -60,18 +60,18 @@ export function ThemedBackground({
         ...style,
       }}
     >
-      {/* Background Image */}
+      {/* Background Image - fixed to viewport */}
       {bgImage && (
         <div
-          className="absolute inset-0 bg-cover bg-center"
+          className="fixed inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${bgImage})` }}
         />
       )}
 
-      {/* Overlay for readability when image is present */}
+      {/* Overlay for readability when image is present - fixed to viewport */}
       {bgImage && overlayOpacity > 0 && (
         <div
-          className="absolute inset-0 bg-black pointer-events-none"
+          className="fixed inset-0 bg-black pointer-events-none"
           style={{ opacity: overlayOpacity }}
         />
       )}
