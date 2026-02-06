@@ -92,7 +92,7 @@ export function SmartPastePlugin({
             }
 
             const type = match[1] as 'step' | 'ref'
-            const name = match[2]
+            const name = match[2].trim()
 
             if (type === 'step') {
               const step = steps.find((s) => s.name === name)
