@@ -73,13 +73,14 @@ export function RenameStepDialog({
   }, [open, step.name])
 
   const handleRename = () => {
-    const result = validate(name)
+    const trimmedName = name.trim()
+    const result = validate(trimmedName)
     if (!result.valid) {
       setError(result.error)
       return
     }
 
-    onRename(step.id, name)
+    onRename(step.id, trimmedName)
     onOpenChange(false)
   }
 

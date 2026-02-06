@@ -15,6 +15,7 @@ import {
   $createParagraphNode,
   $createTextNode,
   $getRoot,
+  $isLineBreakNode,
   $isParagraphNode,
   $isTextNode,
 } from 'lexical'
@@ -58,6 +59,8 @@ export function serializeToPlainText(editorState: EditorState): string {
         } else if ($isMediaMentionNode(child)) {
           // Use display name (human-readable) for storage
           text += `@{ref:${child.getMediaName()}}`
+        } else if ($isLineBreakNode(child)) {
+          text += '\n'
         } else if ($isTextNode(child)) {
           text += child.getTextContent()
         }
@@ -109,7 +112,7 @@ export function deserializeFromPlainText(
           index: match.index,
           length: match[0].length,
           type: match[1] as 'step' | 'ref',
-          name: match[2],
+          name: match[2].trim(),
         })
       }
 

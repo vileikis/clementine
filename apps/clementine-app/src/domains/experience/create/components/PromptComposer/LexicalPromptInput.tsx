@@ -18,6 +18,7 @@ import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin'
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary'
 import {
+  CopyMentionPlugin,
   InitializePlugin,
   MediaMentionNode,
   MentionValidationPlugin,
@@ -107,6 +108,7 @@ export function LexicalPromptInput({
         <InitializePlugin value={value} steps={steps} media={media} />
         <MentionValidationPlugin steps={steps} media={media} />
         <SmartPastePlugin steps={steps} media={media} />
+        <CopyMentionPlugin />
       </div>
     </LexicalComposer>
   )
