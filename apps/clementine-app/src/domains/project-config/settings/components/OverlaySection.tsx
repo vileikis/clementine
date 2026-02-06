@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 import { useUpdateOverlays, useUploadAndUpdateOverlays } from '../hooks'
 import { OverlayFrame } from '.'
 import type { OverlayReference } from '@/domains/project-config/shared'
+import type { OverlayKey } from '@clementine/shared'
 
 interface OverlaySectionProps {
   /**
@@ -21,18 +22,40 @@ interface OverlaySectionProps {
   userId: string
 
   /**
-   * Current overlay references
+   * Current overlay references for all aspect ratios
    */
   overlays: {
     '1:1': OverlayReference | null
+    '3:2': OverlayReference | null
+    '2:3': OverlayReference | null
     '9:16': OverlayReference | null
+    default: OverlayReference | null
   } | null
 }
 
-type AspectRatio = '1:1' | '9:16'
+/**
+ * Overlay slot configuration for rendering
+ */
+const OVERLAY_SLOTS: {
+  key: OverlayKey
+  label: string
+  ratio: string
+  isDefault?: boolean
+}[] = [
+  { key: '1:1', label: '1:1 Square', ratio: '1:1' },
+  { key: '3:2', label: '3:2 Landscape', ratio: '3:2' },
+  { key: '2:3', label: '2:3 Portrait', ratio: '2:3' },
+  { key: '9:16', label: '9:16 Vertical', ratio: '9:16' },
+  {
+    key: 'default',
+    label: 'Default Fallback',
+    ratio: 'default',
+    isDefault: true,
+  },
+]
 
 interface UploadState {
-  aspectRatio: AspectRatio | null
+  aspectRatio: OverlayKey | null
   progress: number
   fileName: string
 }
@@ -60,7 +83,7 @@ export function OverlaySection({
   const updateOverlays = useUpdateOverlays(projectId)
 
   // Handle upload for a specific aspect ratio
-  const handleUpload = async (file: File, aspectRatio: AspectRatio) => {
+  const handleUpload = async (file: File, aspectRatio: OverlayKey) => {
     try {
       // Set uploading state
       setUploadState({
@@ -96,7 +119,7 @@ export function OverlaySection({
   }
 
   // Handle remove for a specific aspect ratio
-  const handleRemove = async (aspectRatio: AspectRatio) => {
+  const handleRemove = async (aspectRatio: OverlayKey) => {
     try {
       // Update project config to null
       await updateOverlays.mutateAsync({
@@ -118,35 +141,27 @@ export function OverlaySection({
         <h3 className="text-2xl font-semibold">Overlay Images</h3>
         <p className="text-sm text-muted-foreground">
           Upload overlay images for different aspect ratios. These will be
-          applied to guest photos. Supported formats: PNG, JPG, WebP. Max file
-          size: 5MB.
+          applied to guest photos. The default overlay is used when no exact
+          match is found. Supported formats: PNG, JPG, WebP. Max file size: 5MB.
         </p>
       </div>
 
-      <div className="flex flex-wrap gap-6">
-        {/* 1:1 Square Overlay */}
-        <OverlayFrame
-          label="1:1 Square"
-          ratio="1:1"
-          overlayRef={overlays?.['1:1'] || null}
-          onUpload={(file) => handleUpload(file, '1:1')}
-          onRemove={() => handleRemove('1:1')}
-          isUploading={uploadState.aspectRatio === '1:1'}
-          uploadProgress={uploadState.progress}
-          uploadingFileName={uploadState.fileName}
-        />
-
-        {/* 9:16 Portrait Overlay */}
-        <OverlayFrame
-          label="9:16 Portrait"
-          ratio="9:16"
-          overlayRef={overlays?.['9:16'] || null}
-          onUpload={(file) => handleUpload(file, '9:16')}
-          onRemove={() => handleRemove('9:16')}
-          isUploading={uploadState.aspectRatio === '9:16'}
-          uploadProgress={uploadState.progress}
-          uploadingFileName={uploadState.fileName}
-        />
+      {/* Responsive grid: 2 cols on mobile, 3+ on desktop */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+        {OVERLAY_SLOTS.map((slot) => (
+          <OverlayFrame
+            key={slot.key}
+            label={slot.label}
+            ratio={slot.ratio}
+            overlayRef={overlays?.[slot.key] || null}
+            onUpload={(file) => handleUpload(file, slot.key)}
+            onRemove={() => handleRemove(slot.key)}
+            isUploading={uploadState.aspectRatio === slot.key}
+            uploadProgress={uploadState.progress}
+            uploadingFileName={uploadState.fileName}
+            isDefault={slot.isDefault}
+          />
+        ))}
       </div>
     </div>
   )

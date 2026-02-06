@@ -15,6 +15,7 @@ import {
   InputYesNoConfigPanel,
 } from '../../steps/config-panels'
 import type { Step, StepConfig } from '../../steps/registry/step-registry'
+import type { AspectRatio } from '@clementine/shared'
 import { ScrollArea } from '@/ui-kit/ui/scroll-area'
 
 interface StepConfigPanelProps {
@@ -24,6 +25,8 @@ interface StepConfigPanelProps {
   onConfigChange: (updates: Partial<StepConfig>) => void
   /** Optional disabled state */
   disabled?: boolean
+  /** Outcome aspect ratio for capture step sync */
+  outcomeAspectRatio?: AspectRatio
 }
 
 /**
@@ -51,6 +54,7 @@ export function StepConfigPanel({
   step,
   onConfigChange,
   disabled,
+  outcomeAspectRatio,
 }: StepConfigPanelProps) {
   // No step selected
   if (!step) {
@@ -85,6 +89,7 @@ export function StepConfigPanel({
             step={step}
             onConfigChange={onConfigChange}
             disabled={disabled}
+            outcomeAspectRatio={outcomeAspectRatio}
           />
         </div>
       </ScrollArea>
@@ -99,10 +104,12 @@ function ConfigPanelRouter({
   step,
   onConfigChange,
   disabled,
+  outcomeAspectRatio,
 }: {
   step: Step
   onConfigChange: (updates: Partial<StepConfig>) => void
   disabled?: boolean
+  outcomeAspectRatio?: AspectRatio
 }) {
   const props = { step, onConfigChange, disabled }
 
@@ -120,7 +127,12 @@ function ConfigPanelRouter({
     case 'input.longText':
       return <InputLongTextConfigPanel {...props} />
     case 'capture.photo':
-      return <CapturePhotoConfigPanel {...props} />
+      return (
+        <CapturePhotoConfigPanel
+          {...props}
+          outcomeAspectRatio={outcomeAspectRatio}
+        />
+      )
     default:
       // Type-safe exhaustive check - this should never happen
       return (

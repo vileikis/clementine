@@ -32,6 +32,11 @@ export interface ControlRowProps {
   onAspectRatioChange: (aspectRatio: string) => void
   /** Available aspect ratio options */
   aspectRatioOptions: readonly SelectOption[]
+  /**
+   * Whether to hide the aspect ratio selector.
+   * @default false
+   */
+  hideAspectRatio?: boolean
   /** Callback when files are selected for upload */
   onFilesSelected: (files: File[]) => void
   /** Whether the add media button is disabled */
@@ -50,6 +55,7 @@ export function ControlRow({
   aspectRatio,
   onAspectRatioChange,
   aspectRatioOptions,
+  hideAspectRatio = false,
   onFilesSelected,
   isAddDisabled,
   disabled,
@@ -73,26 +79,28 @@ export function ControlRow({
         </SelectContent>
       </Select>
 
-      {/* Aspect Ratio Select */}
-      <Select
-        value={aspectRatio}
-        onValueChange={onAspectRatioChange}
-        disabled={disabled}
-      >
-        <SelectTrigger
-          className="h-11 w-auto min-w-20 border-0 bg-transparent font-semibold shadow-none focus-visible:ring-0"
-          aria-label="Select aspect ratio"
+      {/* Aspect Ratio Select - hidden when controlled at outcome level */}
+      {!hideAspectRatio && (
+        <Select
+          value={aspectRatio}
+          onValueChange={onAspectRatioChange}
+          disabled={disabled}
         >
-          <SelectValue placeholder="Ratio" />
-        </SelectTrigger>
-        <SelectContent>
-          {aspectRatioOptions.map((option) => (
-            <SelectItem key={option.value} value={option.value}>
-              {option.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+          <SelectTrigger
+            className="h-11 w-auto min-w-20 border-0 bg-transparent font-semibold shadow-none focus-visible:ring-0"
+            aria-label="Select aspect ratio"
+          >
+            <SelectValue placeholder="Ratio" />
+          </SelectTrigger>
+          <SelectContent>
+            {aspectRatioOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
 
       {/* Spacer to push add button to right */}
       <div className="flex-1" />

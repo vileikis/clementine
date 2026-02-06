@@ -54,6 +54,12 @@ export interface PromptComposerProps {
   aspectRatio: string
   /** Callback when aspect ratio changes */
   onAspectRatioChange: (aspectRatio: string) => void
+  /**
+   * Whether to hide the aspect ratio selector.
+   * When true, aspect ratio is controlled at a higher level (e.g., outcome.aspectRatio).
+   * @default true - Aspect ratio is now a top-level outcome setting (Feature 065)
+   */
+  hideAspectRatio?: boolean
   /** Reference media array */
   refMedia: MediaReference[]
   /** Callback to remove reference media */
@@ -84,6 +90,7 @@ export function PromptComposer({
   onModelChange,
   aspectRatio,
   onAspectRatioChange,
+  hideAspectRatio = true,
   refMedia,
   onRefMediaRemove,
   uploadingFiles,
@@ -189,6 +196,7 @@ export function PromptComposer({
           aspectRatio={aspectRatio}
           onAspectRatioChange={onAspectRatioChange}
           aspectRatioOptions={ASPECT_RATIOS}
+          hideAspectRatio={hideAspectRatio}
           onFilesSelected={onFilesSelected}
           isAddDisabled={isAddDisabled}
           disabled={disabled}

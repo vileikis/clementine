@@ -4,10 +4,13 @@
  * Atomic executor for applying overlay images to media.
  * Downloads overlay from storage and composites it onto the input media.
  *
- * Refactored from the deprecated overlay.ts module.
+ * Feature 065: Simplified module
+ * - Overlay resolution now happens at job creation in startTransformPipeline.ts
+ * - This module only handles the actual overlay application
+ * - Removed getOverlayForAspectRatio helper (no longer needed)
  */
 import { logger } from 'firebase-functions/v2'
-import type { MediaReference, OverlaysConfig } from '@clementine/shared'
+import type { MediaReference } from '@clementine/shared'
 import { downloadFromStorage, getStoragePathFromMediaReference } from '../../../infra/storage'
 import { applyOverlayToMedia } from '../../ffmpeg'
 
@@ -48,28 +51,4 @@ export async function applyOverlay(
   logger.info('[Overlay] Overlay applied successfully', { outputPath })
 
   return outputPath
-}
-
-/**
- * Get overlay reference for a specific aspect ratio
- *
- * Looks up the overlay from the overlays config by aspect ratio.
- * Returns null if no overlay is configured for the aspect ratio.
- *
- * @param overlays - Overlays config from project context
- * @param aspectRatio - Target aspect ratio (e.g., '1:1', '9:16')
- * @returns MediaReference for the overlay, or null if not configured
- */
-export function getOverlayForAspectRatio(
-  overlays: OverlaysConfig | null | undefined,
-  aspectRatio: string,
-): MediaReference | null {
-  if (!overlays) {
-    return null
-  }
-
-  // Type assertion because OverlaysConfig is a record with known keys
-  const overlayRef = (overlays as Record<string, MediaReference | null>)[aspectRatio]
-
-  return overlayRef ?? null
 }
