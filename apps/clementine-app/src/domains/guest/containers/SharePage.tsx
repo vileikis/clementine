@@ -70,7 +70,8 @@ export function SharePage({ mainSessionId }: SharePageProps) {
   // Derive UI state from job status
   // null = no transform configured, should show ready immediately
   const jobStatus = session?.jobStatus
-  const resultMediaUrl = session?.resultMedia?.url ?? null
+  const resultMedia = session?.resultMedia ?? null
+  const resultMediaUrl = resultMedia?.url ?? null
   const isSessionMissing = !isSessionLoading && !session
   const isJobInProgress = jobStatus === 'pending' || jobStatus === 'running'
   // Job is truly completed when we have the result media URL
@@ -88,7 +89,7 @@ export function SharePage({ mainSessionId }: SharePageProps) {
     project.publishedConfig?.shareOptions ?? DEFAULT_SHARE_OPTIONS
 
   // Share actions hook - only active when we have result media
-  const { handleShare } = useShareActions({ mediaUrl: resultMediaUrl })
+  const { handleShare } = useShareActions({ media: resultMedia })
 
   // Navigation handlers
   const handleStartOver = () => {

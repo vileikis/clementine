@@ -2,16 +2,17 @@
  * useShareActions Hook
  *
  * Handles share platform actions including download and social sharing.
- * Currently implements download functionality with CORS-safe blob handling
- * and toast notifications for unsupported platforms.
+ * Uses Firebase Storage SDK's getBlob() to bypass CORS restrictions.
  */
 import { toast } from 'sonner'
 import * as Sentry from '@sentry/tanstackstart-react'
-import type { ShareOptionsConfig } from '@clementine/shared'
+import { getBlob, ref } from 'firebase/storage'
+import type { MediaReference, ShareOptionsConfig } from '@clementine/shared'
+import { storage } from '@/integrations/firebase/client'
 
 export interface UseShareActionsParams {
-  /** URL of the media to share/download */
-  mediaUrl: string | null
+  /** Media reference containing filePath for Firebase Storage download */
+  media: MediaReference | null
 }
 
 // Platform labels for user-facing messages
@@ -33,59 +34,36 @@ const PLATFORM_LABELS: Record<keyof ShareOptionsConfig, string> = {
  * @param params - Configuration parameters
  * @returns Share action handler
  */
-export function useShareActions({ mediaUrl }: UseShareActionsParams) {
+export function useShareActions({ media }: UseShareActionsParams) {
   /**
-   * Handle image download with CORS-safe blob fetching.
-   * On mobile devices with Web Share API support, opens the native share sheet.
+   * Handle image download using Firebase Storage SDK.
+   * Uses getBlob() to bypass CORS restrictions.
+   * On mobile devices (iOS/Android), opens the native share sheet.
    * On desktop, triggers a file download.
    */
   const handleDownload = async () => {
-    if (!mediaUrl) {
+    if (!media?.filePath) {
       toast.error('No image available to download')
       return
     }
 
     try {
-      // Fetch image as blob to handle CORS
-      const response = await fetch(mediaUrl)
-      if (!response.ok) {
-        throw new Error(
-          `Failed to fetch media: ${response.status} ${response.statusText}`,
-        )
-      }
-
-      const blob = await response.blob()
+      const storageRef = ref(storage, media.filePath)
+      const blob = await getBlob(storageRef)
+      // TODO: magic value "clementine-result" should be a constant
       const fileName = `clementine-result-${Date.now()}.jpg`
-      const file = new File([blob], fileName, {
-        type: blob.type || 'image/jpeg',
-      })
 
-      // Use Web Share API on mobile devices that support file sharing
-      if (navigator.canShare?.({ files: [file] })) {
-        await navigator.share({ files: [file] })
+      const result = await openWebShare(blob, fileName)
+      if (result === 'shared') {
         toast.success('Shared successfully')
         return
       }
 
-      // Fallback to download for desktop browsers
-      const blobUrl = URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = blobUrl
-      link.download = fileName
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-
-      // Clean up blob URL
-      URL.revokeObjectURL(blobUrl)
-
-      toast.success('Image downloaded successfully')
-    } catch (error) {
-      // User cancelled share sheet - not an error
-      if (error instanceof Error && error.name === 'AbortError') {
-        return
+      if (result === 'unavailable') {
+        downloadFromLink(blob, fileName)
+        toast.success('Image downloaded successfully')
       }
-
+    } catch (error) {
       toast.error('Failed to download image')
       Sentry.captureException(error, {
         tags: {
@@ -94,7 +72,8 @@ export function useShareActions({ mediaUrl }: UseShareActionsParams) {
         },
         extra: {
           errorType: 'download-failure',
-          mediaUrl,
+          mediaAssetId: media?.mediaAssetId,
+          filePath: media?.filePath,
         },
       })
     }
@@ -159,4 +138,55 @@ export function useShareActions({ mediaUrl }: UseShareActionsParams) {
   }
 
   return { handleShare }
+}
+
+type ShareResult = 'shared' | 'unavailable' | 'cancelled'
+
+function isMobileOS(): boolean {
+  return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+}
+
+/**
+ * Attempts to open native share sheet on mobile devices.
+ * Only works on iOS and Android.
+ */
+async function openWebShare(
+  blob: Blob,
+  fileName: string,
+): Promise<ShareResult> {
+  if (!isMobileOS()) {
+    return 'unavailable'
+  }
+
+  const file = new File([blob], fileName, {
+    type: blob.type || 'image/jpeg',
+  })
+
+  if (!navigator.canShare?.({ files: [file] })) {
+    return 'unavailable'
+  }
+
+  try {
+    await navigator.share({ files: [file] })
+    return 'shared'
+  } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') {
+      return 'cancelled'
+    }
+    throw error
+  }
+}
+
+/**
+ * Downloads a blob as a file using an anchor element.
+ */
+function downloadFromLink(blob: Blob, fileName: string): void {
+  const blobUrl = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = blobUrl
+  link.download = fileName
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  URL.revokeObjectURL(blobUrl)
 }
