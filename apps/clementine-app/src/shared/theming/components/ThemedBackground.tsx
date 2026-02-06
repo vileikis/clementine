@@ -53,7 +53,7 @@ export function ThemedBackground({
 
   return (
     <div
-      className={cn('relative flex flex-1 flex-col', className)}
+      className={cn('relative flex flex-1 flex-col min-h-0', className)}
       style={{
         backgroundColor: bgColor,
         fontFamily: theme.fontFamily ?? undefined,
@@ -77,7 +77,7 @@ export function ThemedBackground({
       )}
 
       {/* Content wrapper - ensures stacking above background layers */}
-      <div className="relative z-10 flex flex-1 flex-col">
+      <div className="relative z-10 flex flex-1 flex-col min-h-0">
         {children}
       </div>
     </div>

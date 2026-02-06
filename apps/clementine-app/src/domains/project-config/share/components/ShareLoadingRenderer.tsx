@@ -11,7 +11,7 @@
 
 import type { ShareLoadingConfig } from '@clementine/shared'
 import { Skeleton } from '@/ui-kit/ui/skeleton'
-import { ScrollableView, ThemedText } from '@/shared/theming'
+import { ThemedText } from '@/shared/theming'
 
 export interface ShareLoadingRendererProps {
   /** Share loading config to render */
@@ -29,20 +29,22 @@ export function ShareLoadingRenderer({
   mode: _mode = 'edit',
 }: ShareLoadingRendererProps) {
   return (
-    <ScrollableView className="items-center justify-center gap-6 p-8">
-      {/* Image skeleton */}
-      <Skeleton className="w-full aspect-square max-w-md rounded-lg" />
+    <div className="flex-1 min-h-0 overflow-y-auto flex flex-col p-8">
+      <div className="w-full max-w-md mx-auto my-auto flex flex-col items-center gap-6">
+        {/* Image skeleton */}
+        <Skeleton className="w-full aspect-square rounded-lg" />
 
-      {/* Loading title */}
-      <ThemedText variant="heading" className="text-center">
-        {shareLoading.title || 'Creating your experience...'}
-      </ThemedText>
+        {/* Loading title */}
+        <ThemedText variant="heading" className="text-center">
+          {shareLoading.title || 'Creating your experience...'}
+        </ThemedText>
 
-      {/* Loading description */}
-      <ThemedText variant="body" className="text-center opacity-90 max-w-md">
-        {shareLoading.description ||
-          'This usually takes 30-60 seconds. Please wait while we generate your personalized result.'}
-      </ThemedText>
-    </ScrollableView>
+        {/* Loading description */}
+        <ThemedText variant="body" className="text-center opacity-90">
+          {shareLoading.description ||
+            'This usually takes 30-60 seconds. Please wait while we generate your personalized result.'}
+        </ThemedText>
+      </div>
+    </div>
   )
 }

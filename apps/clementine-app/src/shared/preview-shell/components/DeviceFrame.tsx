@@ -44,8 +44,8 @@ export function DeviceFrame({ children, className }: DeviceFrameProps) {
       {/* Content container - fills frame, creates containing block for fixed children */}
       <div
         className={cn(
-          'relative w-full',
-          isMobile ? 'h-full' : 'flex-1 flex flex-col',
+          'relative w-full flex flex-col min-h-0',
+          isMobile ? 'h-full' : 'flex-1',
         )}
         style={{
           // Creates a new containing block for fixed-position descendants

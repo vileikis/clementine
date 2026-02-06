@@ -114,10 +114,7 @@ export function SharePage({ mainSessionId }: SharePageProps) {
     return (
       <ThemeProvider theme={currentTheme}>
         <div className="h-screen">
-          <ThemedBackground
-            className="h-full w-full"
-            contentClassName="h-full w-full"
-          >
+          <ThemedBackground className="h-full w-full">
             <ShareLoadingRenderer shareLoading={shareLoading} mode="run" />
           </ThemedBackground>
         </div>
@@ -128,10 +125,7 @@ export function SharePage({ mainSessionId }: SharePageProps) {
   return (
     <ThemeProvider theme={currentTheme}>
       <div className="h-screen">
-        <ThemedBackground
-          className="h-full w-full"
-          contentClassName="h-full w-full"
-        >
+        <ThemedBackground className="h-full w-full">
           {isJobInProgress && (
             <ShareLoadingRenderer shareLoading={shareLoading} mode="run" />
           )}

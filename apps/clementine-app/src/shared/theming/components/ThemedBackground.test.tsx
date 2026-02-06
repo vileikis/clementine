@@ -265,33 +265,6 @@ describe('ThemedBackground', () => {
       expect(outerDiv.style.margin).toBe('10px')
     })
 
-    it('should apply custom contentClassName', () => {
-      const { container } = renderWithTheme(
-        <ThemedBackground contentClassName="custom-content">
-          <div>Content</div>
-        </ThemedBackground>,
-      )
-
-      const contentWrapper = container.querySelector(
-        '[class*="custom-content"]',
-      )
-      expect(contentWrapper).not.toBeNull()
-    })
-
-    it('should apply contentClassName to content container with default classes', () => {
-      const { container } = renderWithTheme(
-        <ThemedBackground contentClassName="flex flex-col gap-4">
-          <div data-testid="child">Content</div>
-        </ThemedBackground>,
-      )
-
-      // Content container should have both default max-w-3xl and custom classes
-      const contentContainer = container.querySelector('[class*="max-w-3xl"]')
-      expect(contentContainer).not.toBeNull()
-      expect(contentContainer?.className).toContain('flex')
-      expect(contentContainer?.className).toContain('flex-col')
-      expect(contentContainer?.className).toContain('gap-4')
-    })
   })
 
   // Default styles tests

@@ -114,9 +114,9 @@ export function ShareReadyRenderer({
   }
 
   return (
-    <div className="flex flex-col h-full w-full">
-      {/* Scrollable content zone */}
-      <div className="flex flex-col overflow-y-auto p-4 items-center space-y-6 my-auto">
+    <div className="flex-1 min-h-0 overflow-y-auto flex flex-col p-4">
+      {/* Content wrapper - centered */}
+      <div className="w-full max-w-md mx-auto my-auto flex flex-col items-center gap-6">
         {mediaUrl ? (
           <img
             src={mediaUrl}
