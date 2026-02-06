@@ -2,22 +2,19 @@
  * Capture Photo Config Panel
  *
  * Configuration panel for photo capture steps.
- * Aspect ratio is synced from the experience outcome (read-only display).
- *
- * @see Feature 065 - Camera capture constrained to experience output aspect ratio
+ * Allows setting the aspect ratio for photo capture.
  */
-import { Info } from 'lucide-react'
 import type { StepConfigPanelProps } from '../registry/step-registry'
-import type { AspectRatio } from '@clementine/shared'
+import type { AspectRatio, ExperienceCapturePhotoStepConfig } from '@clementine/shared'
 import { EditorSection } from '@/shared/editor-controls'
-
-// Aspect ratio display labels
-const ASPECT_RATIO_LABELS: Record<AspectRatio, string> = {
-  '1:1': 'Square (1:1)',
-  '9:16': 'Portrait (9:16)',
-  '3:2': 'Landscape (3:2)',
-  '2:3': 'Tall Portrait (2:3)',
-}
+import { ASPECT_RATIOS } from '@/domains/experience/create/lib/model-options'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/ui-kit/ui/select'
 
 // Aspect ratio descriptions
 const ASPECT_RATIO_DESCRIPTIONS: Record<AspectRatio, string> = {
@@ -28,32 +25,41 @@ const ASPECT_RATIO_DESCRIPTIONS: Record<AspectRatio, string> = {
 }
 
 export function CapturePhotoConfigPanel({
-  outcomeAspectRatio,
+  step,
+  onConfigChange,
+  disabled,
 }: StepConfigPanelProps) {
-  // Use outcome aspect ratio (synced from experience output settings)
-  const aspectRatio = outcomeAspectRatio ?? '1:1'
+  const config = step.config as ExperienceCapturePhotoStepConfig
+  const aspectRatio = config.aspectRatio ?? '1:1'
+
+  const handleAspectRatioChange = (value: string) => {
+    onConfigChange({ aspectRatio: value as AspectRatio })
+  }
 
   return (
     <div className="space-y-0">
       <EditorSection title="Camera">
-        {/* Read-only aspect ratio display - synced from outcome */}
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium">Aspect Ratio</span>
-            <span className="text-sm text-muted-foreground">
-              {ASPECT_RATIO_LABELS[aspectRatio]}
-            </span>
-          </div>
+          <label className="text-sm font-medium">Aspect Ratio</label>
+          <Select
+            value={aspectRatio}
+            onValueChange={handleAspectRatioChange}
+            disabled={disabled}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select aspect ratio" />
+            </SelectTrigger>
+            <SelectContent>
+              {ASPECT_RATIOS.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <p className="text-xs text-muted-foreground">
             {ASPECT_RATIO_DESCRIPTIONS[aspectRatio]}
           </p>
-          <div className="flex items-start gap-2 mt-3 p-2 bg-muted/50 rounded-md">
-            <Info className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
-            <p className="text-xs text-muted-foreground">
-              Camera aspect ratio is automatically synced from the output aspect
-              ratio in the Create tab.
-            </p>
-          </div>
         </div>
       </EditorSection>
     </div>
