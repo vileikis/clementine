@@ -198,3 +198,43 @@ Those are future problems. This PRD is about shipping a stable, scalable core.
     • Do we support safe-area overlays for social platforms later?
 
 These are deliberately excluded to avoid premature complexity.
+
+⸻
+
+12. Implementation Scope
+
+12.1 Overlay System Updates
+
+The project-level overlay editor must support all defined aspect ratios:
+• 1:1 (Square)
+• 3:2 (Landscape)
+• 2:3 (Portrait)
+• 9:16 (Vertical/Stories)
+• Default (aspect-ratio-agnostic fallback)
+
+The current implementation only supports 1:1 and 9:16. This must be extended to match the experience aspect ratio options.
+
+12.2 Unified Aspect Ratio Definition
+
+Technical Intent: Establish a single source of truth for aspect ratios in the shared schema package.
+
+Currently, aspect ratio enums are duplicated across:
+• Experience outcome configuration
+• Capture step configuration
+• Project overlay configuration
+
+This creates maintenance burden and risk of drift. The shared kernel should define:
+• A canonical list of supported aspect ratios
+• Media-type-specific subsets (image vs video ratios)
+• Reusable schema primitives that all domains consume
+
+All domain schemas should reference this shared definition rather than maintaining their own copies.
+
+12.3 Overlay Fallback Behavior
+
+When a specific aspect ratio overlay is not configured:
+1. Check for a "default" overlay
+2. If default exists → apply it (may require scaling/positioning logic)
+3. If no default → no overlay applied
+
+This matches the fallback strategy defined in section 7.3.
