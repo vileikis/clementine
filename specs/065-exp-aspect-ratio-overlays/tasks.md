@@ -146,17 +146,17 @@
 
 ---
 
-## Phase 8: Polish & Cross-Cutting Concerns
+## Phase 8: Polish & Cross-Cutting Concerns ✅ COMPLETE
 
 **Purpose**: Validation, cleanup, and final verification
 
-- [ ] T032 [P] Run full lint and type check across monorepo: `pnpm app:check`
-- [ ] T033 [P] Run shared package tests: `pnpm --filter @clementine/shared test`
-- [ ] T034 [P] Run frontend tests: `pnpm app:test`
-- [ ] T035 Execute quickstart.md testing checklist (overlay upload flow, experience config flow, overlay resolution flow)
-- [ ] T036 Review code against `standards/frontend/design-system.md` for UI components
-- [ ] T037 Review code against `standards/global/zod-validation.md` for schema definitions
-- [ ] T038 Final build verification: `pnpm app:build && pnpm functions:build`
+- [X] T032 [P] Run full lint and type check across monorepo: `pnpm app:check`
+- [X] T033 [P] Run shared package tests: `pnpm --filter @clementine/shared test`
+- [X] T034 [P] Run frontend tests: `pnpm app:test`
+- [X] T035 Execute quickstart.md testing checklist (overlay upload flow, experience config flow, overlay resolution flow)
+- [X] T036 Review code against `standards/frontend/design-system.md` for UI components
+- [X] T037 Review code against `standards/global/zod-validation.md` for schema definitions
+- [X] T038 Final build verification: `pnpm app:build && pnpm functions:build`
 
 ---
 
