@@ -7,7 +7,7 @@
  * This is an interface definition only for Phase 0 - implementation comes in Phase 3.
  */
 import type { MediaReference, SessionResponse } from '@clementine/shared'
-import type { SessionMode, SessionResultMedia } from '@/domains/session'
+import type { SessionMode } from '@/domains/session'
 import type { ExperienceStep } from '../schemas'
 
 // Re-export SessionMode for convenience
@@ -25,7 +25,7 @@ export interface RuntimeState {
   responses: SessionResponse[]
 
   /** Final result media from transform/capture */
-  resultMedia: SessionResultMedia | null
+  resultMedia: MediaReference | null
 }
 
 /**

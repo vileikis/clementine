@@ -12,6 +12,7 @@
  */
 import { z } from 'zod'
 import { jobStatusSchema } from '../job/job-status.schema'
+import { mediaReferenceSchema } from '../media/media-reference.schema'
 import { sessionResponseSchema } from './session-response.schema'
 
 /**
@@ -113,7 +114,7 @@ export const sessionSchema = z.looseObject({
   responses: z.array(sessionResponseSchema).default([]),
 
   /** Final result media from transform/capture */
-  resultMedia: sessionResultMediaSchema.nullable().default(null),
+  resultMedia: mediaReferenceSchema.nullable().default(null),
 
   /**
    * JOURNEY LINKING
