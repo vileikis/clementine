@@ -102,40 +102,89 @@ src/
 ├── integrations/        # Third-party integrations (Firebase, Sentry)
 ├── shared/              # Cross-cutting modules used across domains
 │   ├── camera/          # Camera capture & photo functionality
+│   │   ├── components/  # CameraPreview, PhotoCapture, etc.
+│   │   ├── containers/  # Camera container components
+│   │   ├── hooks/       # useCamera, useMediaStream, etc.
+│   │   ├── lib/         # Camera utilities
+│   │   ├── schemas/     # Camera validation schemas
+│   │   └── types/       # Camera type definitions
 │   ├── components/      # Generic shared components
 │   ├── editor-controls/ # Reusable editor UI (sliders, pickers, etc.)
 │   ├── editor-status/   # Editor save status tracking & indicators
-│   ├── forms/           # Form utilities
+│   │   ├── components/  # SaveStatusIndicator
+│   │   ├── hooks/       # useSaveStatus
+│   │   ├── store/       # Zustand save status store
+│   │   └── types/       # Status type definitions
+│   ├── forms/           # Form utilities (hooks, utils)
 │   ├── preview-shell/   # Preview container with viewport switcher
+│   │   ├── components/  # ViewportSwitcher, PreviewFrame
+│   │   ├── containers/  # PreviewShell container
+│   │   ├── context/     # Preview context provider
+│   │   ├── hooks/       # usePreviewViewport
+│   │   ├── store/       # Preview state store
+│   │   └── types/       # Viewport type definitions
 │   ├── theming/         # Theme utilities & CSS variable generation
+│   │   ├── components/  # ThemePreview
+│   │   ├── constants/   # Default theme values
+│   │   ├── context/     # ThemeContext
+│   │   ├── hooks/       # useTheme, useThemeCSS
+│   │   ├── providers/   # ThemeProvider
+│   │   ├── schemas/     # Theme validation schemas
+│   │   └── types/       # Theme type definitions
 │   └── utils/           # Utility functions
 └── domains/             # Business domains (bounded contexts)
     ├── admin/           # Workspace admin (super-admin functions)
     ├── auth/            # Authentication & login
     ├── dev-tools/       # Development utilities (camera preview, etc.)
-    ├── event/           # Event designer (see detail below)
     ├── experience/      # Experience system (designer, library, runtime)
     ├── guest/           # Guest photo experience (public-facing)
     ├── media-library/   # Media asset management
     ├── navigation/      # Sidebar, top nav, breadcrumbs
-    ├── project/         # Project management (events list, sharing)
+    ├── project/         # Project utilities (sharing)
+    ├── project-config/  # Project configuration designer
     ├── session/         # Session capture & tracking
     └── workspace/       # Workspace settings & project list
 ```
 
-#### Event Domain
+#### Project Config Domain
 
-The `event` domain handles event configuration and the event designer/editor:
+The `project-config` domain handles project configuration and the project designer/editor:
 
 ```
-domains/event/
+domains/project-config/
 ├── designer/            # Main editor layout & state
-├── experiences/         # Experience selection & management within events
+│   ├── components/      # EditorTabs, DesignerHeader
+│   ├── containers/      # ProjectDesignerPage
+│   ├── hooks/           # useProjectDesigner
+│   └── stores/          # Designer state store
+├── experiences/         # Experience selection & management within projects
+│   ├── components/      # ExperienceSelector, ExperienceCard
+│   ├── hooks/           # useExperienceSelection
+│   └── schemas/         # Experience reference schemas
 ├── settings/            # Settings tab (overlay, publish settings)
+│   ├── components/      # OverlaySettings, PublishSettings
+│   ├── containers/      # SettingsTab
+│   ├── hooks/           # useProjectSettings
+│   └── schemas/         # Settings validation schemas
 ├── share/               # Sharing configuration tab
+│   ├── components/      # SharePreview, SocialSettings
+│   ├── containers/      # ShareTab
+│   └── hooks/           # useShareSettings
 ├── theme/               # Theme tab (colors, fonts, branding)
+│   ├── components/      # ColorPicker, FontSelector
+│   ├── containers/      # ThemeTab
+│   └── hooks/           # useThemeEditor
 ├── welcome/             # Welcome screen editor tab
+│   ├── components/      # WelcomeEditor, WelcomePreview
+│   ├── containers/      # WelcomeTab
+│   ├── hooks/           # useWelcomeEditor
+│   └── schemas/         # Welcome validation schemas
 └── shared/              # Shared types, schemas, queries, hooks
+    ├── hooks/           # useProjectConfig
+    ├── lib/             # Project utilities
+    ├── queries/         # Firestore queries
+    ├── schemas/         # Common project schemas
+    └── types/           # Shared type definitions
 ```
 
 #### Experience Domain
@@ -144,12 +193,71 @@ The `experience` domain is the core of AI photo/video experiences:
 
 ```
 domains/experience/
+├── create/              # Experience creation wizard
+│   ├── components/      # ProfileSelector, CreateForm
+│   ├── containers/      # CreateExperiencePage
+│   ├── hooks/           # useCreateExperience
+│   ├── lexical/         # Lexical editor integration
+│   ├── lib/             # Creation utilities
+│   └── stores/          # Create wizard state
 ├── designer/            # Experience editor/designer
+│   ├── components/      # StepList, DesignerToolbar
+│   ├── containers/      # ExperienceDesignerPage
+│   ├── hooks/           # useExperienceDesigner
+│   └── stores/          # Designer state store
 ├── library/             # Experience library & selection
+│   ├── components/      # ExperienceGrid, ExperienceCard
+│   └── containers/      # ExperienceLibraryPage
 ├── preview/             # Experience preview components
+│   ├── components/      # PreviewRenderer, StepPreview
+│   └── containers/      # ExperiencePreviewPage
 ├── runtime/             # Guest-facing experience runtime
+│   ├── components/      # RuntimeStep, ProgressBar
+│   ├── containers/      # ExperienceRuntime
+│   ├── hooks/           # useExperienceRuntime
+│   └── stores/          # Runtime state store
 ├── steps/               # Step system (capture, transform, etc.)
+│   ├── components/      # Step type components
+│   ├── config-panels/   # Step configuration editors
+│   ├── registry/        # Step type registry
+│   └── renderers/       # Step rendering logic
+├── transform/           # AI transform pipeline
+│   └── hooks/           # useTransformJob, useJobStatus
 └── shared/              # Shared types, schemas, queries
+    ├── hooks/           # useExperience, useExperiences
+    ├── lib/             # Experience utilities
+    ├── queries/         # Firestore queries
+    ├── schemas/         # Experience validation schemas
+    ├── types/           # Shared type definitions
+    └── utils/           # Experience utility functions
+```
+
+#### Session Domain
+
+The `session` domain handles guest session data and tracking:
+
+```
+domains/session/
+└── shared/              # Session data layer
+    ├── hooks/           # useSession, useSessionResponses
+    ├── queries/         # Session Firestore queries
+    ├── schemas/         # Session validation schemas
+    └── types/           # Session type definitions
+```
+
+#### Guest Domain
+
+The `guest` domain handles the public-facing guest experience:
+
+```
+domains/guest/
+├── components/          # GuestHeader, GuestFooter
+├── containers/          # GuestExperiencePage
+├── contexts/            # GuestSessionContext
+├── hooks/               # useGuestSession, useGuestExperience
+├── queries/             # Guest-specific queries
+├── schemas/             # Guest validation schemas
+└── types/               # Guest type definitions
 ```
 
 **Key principles:**
@@ -207,7 +315,7 @@ pnpm test --ui        # UI mode (visual test runner)
 
 ### Building a Feature
 
-1. **Identify the domain** - Which business domain? (events, experiences, media, etc.)
+1. **Identify the domain** - Which business domain? (project-config, experiences, guest, session, etc.)
 2. **Check existing structure** - Does the domain/subdomain exist?
 3. **Create module structure** - Add folders as needed (components, containers, hooks, etc.)
 4. **Build with standards** - Follow DDD principles and all applicable standards
@@ -234,21 +342,21 @@ import { firestore } from '@/integrations/firebase/client'
 import { collection, query, where, onSnapshot } from 'firebase/firestore'
 
 // ✅ Client-side Firestore operations
-function useEvents() {
-  const [events, setEvents] = useState([])
+function useProjects(workspaceId: string) {
+  const [projects, setProjects] = useState([])
 
   useEffect(() => {
     const q = query(
-      collection(firestore, 'events'),
+      collection(firestore, 'workspaces', workspaceId, 'projects'),
       where('status', '==', 'active'),
     )
 
     return onSnapshot(q, (snapshot) => {
-      setEvents(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })))
+      setProjects(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })))
     })
-  }, [])
+  }, [workspaceId])
 
-  return events
+  return projects
 }
 ```
 
@@ -257,9 +365,11 @@ function useEvents() {
 ### TypeScript Path Aliases
 
 ```tsx
-import { Button } from '@/ui-kit/components/button'
+import { Button } from '@/ui-kit/ui/button'
 import { firestore } from '@/integrations/firebase/client'
-import { EventsPage } from '@/domains/events/management/containers/EventsPage'
+import { ProjectsPage } from '@/domains/workspace/projects/containers/ProjectsPage'
+import { ProjectDesignerPage } from '@/domains/project-config/designer/containers/ProjectDesignerPage'
+import { useCamera } from '@/shared/camera/hooks/useCamera'
 ```
 
 ## Standards Quick Reference
@@ -320,7 +430,12 @@ The Next.js app remains the reference implementation until this app is productio
 ### Adding a New Domain
 
 ```bash
-mkdir -p src/domains/new-domain/{components,containers,hooks,services,types}
+# Simple domain (flat structure)
+mkdir -p src/domains/new-domain/{components,containers,hooks,types}
+
+# Complex domain with subdomains
+mkdir -p src/domains/new-domain/subdomain/{components,containers,hooks,stores}
+mkdir -p src/domains/new-domain/shared/{hooks,queries,schemas,types}
 ```
 
 ### Installing Dependencies
