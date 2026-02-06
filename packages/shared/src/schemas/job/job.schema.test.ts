@@ -4,7 +4,6 @@ import {
   jobProgressSchema,
   jobErrorSchema,
   jobOutputSchema,
-  projectContextSnapshotSchema,
   jobSnapshotSchema,
   jobSchema,
 } from './job.schema'
@@ -89,6 +88,7 @@ describe('jobOutputSchema', () => {
   const validOutput = {
     assetId: 'asset-123',
     url: 'https://example.com/output.png',
+    filePath: 'outputs/project-1/output.png',
     format: 'image',
     dimensions: { width: 1024, height: 1024 },
     sizeBytes: 500000,
@@ -160,57 +160,47 @@ describe('jobOutputSchema', () => {
   })
 })
 
-describe('projectContextSnapshotSchema', () => {
-  it('parses valid project context', () => {
-    const result = projectContextSnapshotSchema.parse({
-      overlay: { mediaAssetId: 'asset-1', url: 'https://example.com/overlay.png' },
-      applyOverlay: true,
-    })
-    expect(result.overlay).not.toBeNull()
-    expect(result.applyOverlay).toBe(true)
-    expect(result.experienceRef).toBeNull()
-  })
-
-  it('accepts null overlay', () => {
-    const result = projectContextSnapshotSchema.parse({
-      overlay: null,
-      applyOverlay: false,
-    })
-    expect(result.overlay).toBeNull()
-  })
-
-  it('accepts experience reference', () => {
-    const result = projectContextSnapshotSchema.parse({
-      overlay: null,
-      applyOverlay: false,
-      experienceRef: { experienceId: 'exp-1', enabled: true, applyOverlay: true },
-    })
-    expect(result.experienceRef?.experienceId).toBe('exp-1')
-  })
-})
-
 describe('jobSnapshotSchema', () => {
   const validSnapshot = {
     sessionResponses: [],
-    projectContext: { overlay: null, applyOverlay: false },
     experienceVersion: 1,
     outcome: null,
+    overlayChoice: null,
+    experienceRef: null,
   }
 
-  it('parses valid snapshot', () => {
+  it('parses valid snapshot with flattened structure', () => {
     const result = jobSnapshotSchema.parse(validSnapshot)
     expect(result.sessionResponses).toBeDefined()
-    expect(result.projectContext).toBeDefined()
     expect(result.experienceVersion).toBe(1)
     expect(result.outcome).toBeNull()
+    expect(result.overlayChoice).toBeNull()
+    expect(result.experienceRef).toBeNull()
   })
 
-  it('preserves unknown fields for schema evolution', () => {
-    const result: Record<string, unknown> = jobSnapshotSchema.parse({
+  it('accepts resolved overlayChoice', () => {
+    const result = jobSnapshotSchema.parse({
       ...validSnapshot,
-      futureContext: { data: 'value' },
+      overlayChoice: {
+        mediaAssetId: 'overlay-1',
+        url: 'https://example.com/overlay.png',
+        displayName: 'Brand Overlay',
+      },
     })
-    expect(result['futureContext']).toEqual({ data: 'value' })
+    expect(result.overlayChoice).not.toBeNull()
+    expect(result.overlayChoice?.mediaAssetId).toBe('overlay-1')
+  })
+
+  it('accepts experienceRef at top level', () => {
+    const result = jobSnapshotSchema.parse({
+      ...validSnapshot,
+      experienceRef: {
+        experienceId: 'exp-1',
+        enabled: true,
+        applyOverlay: true,
+      },
+    })
+    expect(result.experienceRef?.experienceId).toBe('exp-1')
   })
 })
 
@@ -222,9 +212,10 @@ describe('jobSchema', () => {
     experienceId: 'exp-1',
     snapshot: {
       sessionResponses: [],
-      projectContext: { overlay: null, applyOverlay: false },
       experienceVersion: 1,
       outcome: null,
+      overlayChoice: null,
+      experienceRef: null,
     },
     createdAt: Date.now(),
     updatedAt: Date.now(),
@@ -266,6 +257,7 @@ describe('jobSchema', () => {
       output: {
         assetId: 'asset-out',
         url: 'https://example.com/out.png',
+        filePath: 'outputs/project-1/out.png',
         format: 'image',
         dimensions: { width: 512, height: 512 },
         sizeBytes: 100000,

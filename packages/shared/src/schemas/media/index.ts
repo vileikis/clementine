@@ -5,6 +5,7 @@
  * Includes schemas for media assets, media references, and related enums.
  */
 
+export * from './aspect-ratio.schema'
 export * from './image-mime-type.schema'
 export * from './media-asset-type.schema'
 export * from './media-asset-status.schema'

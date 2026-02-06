@@ -21,36 +21,36 @@
 
 ---
 
-## Phase 1: Setup (Shared Infrastructure)
+## Phase 1: Setup (Shared Infrastructure) ✅ COMPLETE
 
 **Purpose**: Create canonical aspect ratio schema - single source of truth for all downstream work
 
-- [ ] T001 Create canonical aspect ratio schema with `aspectRatioSchema`, `overlayKeySchema`, `imageAspectRatioSchema`, `videoAspectRatioSchema` in `packages/shared/src/schemas/media/aspect-ratio.schema.ts`
-- [ ] T002 Update media barrel export to include aspect-ratio module in `packages/shared/src/schemas/media/index.ts`
-- [ ] T003 Update root schemas barrel export in `packages/shared/src/schemas/index.ts`
-- [ ] T004 Build shared package and verify no type errors: `pnpm --filter @clementine/shared build`
+- [X] T001 Create canonical aspect ratio schema with `aspectRatioSchema`, `overlayKeySchema`, `imageAspectRatioSchema`, `videoAspectRatioSchema` in `packages/shared/src/schemas/media/aspect-ratio.schema.ts`
+- [X] T002 Update media barrel export to include aspect-ratio module in `packages/shared/src/schemas/media/index.ts`
+- [X] T003 Update root schemas barrel export in `packages/shared/src/schemas/index.ts`
+- [X] T004 Build shared package and verify no type errors: `pnpm --filter @clementine/shared build`
 
 **Checkpoint**: Canonical aspect ratio types available for import by all packages
 
 ---
 
-## Phase 2: Foundational (Blocking Prerequisites)
+## Phase 2: Foundational (Blocking Prerequisites) ✅ COMPLETE
 
 **Purpose**: Schema changes that ALL user stories depend on - must complete before any UI or backend work
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T005 Extend `overlaysConfigSchema` to support 5 keys (1:1, 3:2, 2:3, 9:16, default) in `packages/shared/src/schemas/project/project-config.schema.ts`
-- [ ] T006 [P] Update `outcome.schema.ts`: add top-level `aspectRatio` field (import from canonical schema), keep `imageGeneration.aspectRatio` for backwards compatibility, remove 16:9 option in `packages/shared/src/schemas/experience/outcome.schema.ts`
-- [ ] T007 [P] Update `capture-photo.schema.ts` to import from canonical aspect-ratio schema in `packages/shared/src/schemas/experience/steps/capture-photo.schema.ts`
-- [ ] T008 Flatten job snapshot: add `overlayChoice` and `experienceRef` at top level, remove `projectContext` wrapper and deprecated exports in `packages/shared/src/schemas/job/job.schema.ts`
-- [ ] T009 Rebuild shared package and run tests: `pnpm --filter @clementine/shared build && pnpm --filter @clementine/shared test`
+- [X] T005 Extend `overlaysConfigSchema` to support 5 keys (1:1, 3:2, 2:3, 9:16, default) in `packages/shared/src/schemas/project/project-config.schema.ts`
+- [X] T006 [P] Update `outcome.schema.ts`: add top-level `aspectRatio` field (import from canonical schema), keep `imageGeneration.aspectRatio` for backwards compatibility, remove 16:9 option in `packages/shared/src/schemas/experience/outcome.schema.ts`
+- [X] T007 [P] Update `capture-photo.schema.ts` to import from canonical aspect-ratio schema in `packages/shared/src/schemas/experience/steps/capture-photo.schema.ts`
+- [X] T008 Flatten job snapshot: add `overlayChoice` and `experienceRef` at top level, remove `projectContext` wrapper and deprecated exports in `packages/shared/src/schemas/job/job.schema.ts`
+- [X] T009 Rebuild shared package and run tests: `pnpm --filter @clementine/shared build && pnpm --filter @clementine/shared test`
 
 **Checkpoint**: Foundation ready - all schema changes complete, user story implementation can now begin
 
 ---
 
-## Phase 3: User Story 1 - Configure Experience Output Aspect Ratio (Priority: P1) 🎯 MVP
+## Phase 3: User Story 1 - Configure Experience Output Aspect Ratio (Priority: P1) ✅ COMPLETE 🎯 MVP
 
 **Goal**: Experience Creators can select output aspect ratio as a top-level outcome setting (FR-001, FR-002, FR-004)
 
@@ -63,11 +63,11 @@
 
 ### Implementation for User Story 1
 
-- [ ] T010 [US1] Update `ASPECT_RATIOS` constant to import from canonical schema (remove 16:9) in `apps/clementine-app/src/domains/experience/create/lib/model-options.ts`
-- [ ] T011 [US1] Create `AspectRatioSelector` component for top-level aspect ratio selection in `apps/clementine-app/src/domains/experience/create/components/CreateTabForm/AspectRatioSelector.tsx`
-- [ ] T012 [US1] Add AspectRatioSelector to CreateTabForm alongside SourceImageSelector (top-level config), add handler for `outcome.aspectRatio` in `apps/clementine-app/src/domains/experience/create/components/CreateTabForm/CreateTabForm.tsx`
-- [ ] T013 [US1] Hide aspect ratio control from PromptComposer (keep prop for future use, just don't render) in `apps/clementine-app/src/domains/experience/create/components/PromptComposer/PromptComposer.tsx`
-- [ ] T014 [US1] Run frontend type check to verify no breaking changes: `pnpm app:type-check`
+- [X] T010 [US1] Update `ASPECT_RATIOS` constant to import from canonical schema (remove 16:9) in `apps/clementine-app/src/domains/experience/create/lib/model-options.ts`
+- [X] T011 [US1] Create `AspectRatioSelector` component for top-level aspect ratio selection in `apps/clementine-app/src/domains/experience/create/components/CreateTabForm/AspectRatioSelector.tsx`
+- [X] T012 [US1] Add AspectRatioSelector to CreateTabForm alongside SourceImageSelector (top-level config), add handler for `outcome.aspectRatio` in `apps/clementine-app/src/domains/experience/create/components/CreateTabForm/CreateTabForm.tsx`
+- [X] T013 [US1] Hide aspect ratio control from PromptComposer (keep prop for future use, just don't render) in `apps/clementine-app/src/domains/experience/create/components/PromptComposer/PromptComposer.tsx`
+- [X] T014 [US1] Run frontend type check to verify no breaking changes: `pnpm app:type-check`
 
 **Checkpoint**: User Story 1 complete - Experience Creators see aspect ratio as top-level output setting alongside source media
 

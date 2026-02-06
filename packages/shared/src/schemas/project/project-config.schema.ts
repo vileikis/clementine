@@ -23,11 +23,21 @@ export const CURRENT_CONFIG_VERSION = 1
 
 /**
  * Overlay images for different aspect ratios
+ *
+ * Supports all 4 canonical aspect ratios plus a 'default' fallback:
+ * - 1:1   - Square
+ * - 3:2   - Landscape
+ * - 2:3   - Portrait
+ * - 9:16  - Vertical/stories
+ * - default - Fallback overlay when no exact match exists
  */
 export const overlaysConfigSchema = z
   .object({
     '1:1': overlayReferenceSchema.default(null),
+    '3:2': overlayReferenceSchema.default(null),
+    '2:3': overlayReferenceSchema.default(null),
     '9:16': overlayReferenceSchema.default(null),
+    default: overlayReferenceSchema.default(null),
   })
   .nullable()
   .default(null)
