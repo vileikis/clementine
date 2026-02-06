@@ -13,8 +13,8 @@
 import { create } from 'zustand'
 
 import { validateStepInput } from '../../steps/registry/step-validation'
-import type { Session, SessionResultMedia } from '@/domains/session'
-import type { SessionResponse } from '@clementine/shared'
+import type { Session } from '@/domains/session'
+import type { MediaReference, SessionResponse } from '@clementine/shared'
 import type { ExperienceStep } from '../../shared/schemas'
 
 /**
@@ -35,7 +35,7 @@ export interface ExperienceRuntimeState {
 
   // Collected data
   responses: SessionResponse[]
-  resultMedia: SessionResultMedia | null
+  resultMedia: MediaReference | null
 
   // Lifecycle status
   /** Whether the store has been initialized and is ready for use */
@@ -79,7 +79,7 @@ export interface ExperienceRuntimeActions {
   /**
    * Set the final result media
    */
-  setResultMedia: (resultMedia: SessionResultMedia) => void
+  setResultMedia: (resultMedia: MediaReference) => void
 
   /**
    * Navigate to a specific step (previously visited only)

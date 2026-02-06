@@ -14,7 +14,6 @@ export {
   jobStatusSchema,
   answerSchema,
   capturedMediaSchema,
-  sessionResultMediaSchema,
   type Session,
   type SessionMode,
   type ConfigSource,
@@ -22,5 +21,4 @@ export {
   type JobStatus,
   type Answer,
   type CapturedMedia,
-  type SessionResultMedia,
 } from '@clementine/shared'

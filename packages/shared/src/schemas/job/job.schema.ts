@@ -55,6 +55,8 @@ export const jobOutputSchema = z.object({
   assetId: z.string(),
   /** Public URL to the output */
   url: z.url(),
+  /** Storage bucket path to the output file */
+  filePath: z.string(),
   /** Actual output format (determined by pipeline) */
   format: z.enum(['image', 'gif', 'video']),
   /** Output dimensions after resize/crop */

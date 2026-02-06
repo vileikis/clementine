@@ -291,6 +291,7 @@ async function uploadOutput(
   return {
     assetId,
     url,
+    filePath: storagePath,
     format: 'image',
     dimensions: {
       width: 1024, // TODO: Get actual dimensions from image
