@@ -6,17 +6,12 @@
  *
  * Firestore Path: /projects/{projectId}/jobs/{jobId}
  *
- * Snapshot schemas use z.looseObject() for forward compatibility:
- * - Old jobs with extra fields (e.g., stepName) still parse
- * - New jobs use current schema definitions
- * - Schema evolution is natural as the system evolves
+ * Feature 065 Changes:
+ * - Flattened snapshot: removed `projectContext` wrapper
+ * - Added `overlayChoice` (resolved at job creation, not execution)
  */
 import { z } from 'zod'
-import {
-  overlayReferenceSchema,
-  overlaysConfigSchema,
-} from '../project/project-config.schema'
-import { mainExperienceReferenceSchema } from '../project/experiences.schema'
+import { overlayReferenceSchema } from '../project/project-config.schema'
 import { sessionResponseSchema } from '../session/session-response.schema'
 import { outcomeSchema } from '../experience/outcome.schema'
 import { jobStatusSchema } from './job-status.schema'
@@ -73,42 +68,24 @@ export const jobOutputSchema = z.object({
 })
 
 /**
- * Snapshot of project context at job creation
- *
- * Captures overlay reference and experience reference for applyOverlay tracking.
- * Reuses overlayReferenceSchema and mainExperienceReferenceSchema for consistency.
- */
-export const projectContextSnapshotSchema = z.looseObject({
-  /** @deprecated Use overlays map instead */
-  overlay: overlayReferenceSchema.nullable().default(null),
-  /** @deprecated Use overlays map instead */
-  applyOverlay: z.boolean().default(false),
-  /** Overlays by aspect ratio (from project config) */
-  overlays: overlaysConfigSchema.nullable().default(null),
-  /** Experience reference snapshot (from mainExperienceReferenceSchema) */
-  experienceRef: mainExperienceReferenceSchema.nullable().default(null),
-})
-
-// Backward compatibility alias
-/** @deprecated Use projectContextSnapshotSchema instead */
-export const eventContextSnapshotSchema = projectContextSnapshotSchema
-
-/**
  * Complete job execution snapshot
+ *
+ * Flattened structure (Feature 065):
+ * - `overlayChoice`: Resolved overlay at job creation (exact match → default → null)
+ *
+ * Overlay resolution happens in `startTransformPipeline.ts`, not at execution time.
+ * The transform uses `snapshot.overlayChoice` directly.
  */
-export const jobSnapshotSchema = z.looseObject({
+export const jobSnapshotSchema = z.object({
   /** Session responses at job creation (unified from all steps) */
   sessionResponses: z.array(sessionResponseSchema).default([]),
-  /** Project context (overlays, etc.) */
-  projectContext: projectContextSnapshotSchema,
   /** Experience version at time of job creation */
   experienceVersion: z.number().int().positive(),
   /** Outcome configuration (from experience.published.outcome) */
   outcome: outcomeSchema.nullable().default(null),
+  /** Resolved overlay to apply (null = no overlay) */
+  overlayChoice: overlayReferenceSchema.nullable().default(null),
 })
-
-// Backward compatibility: eventContext is now projectContext
-// Old jobs with eventContext will still parse due to looseObject()
 
 /**
  * Job Document Schema
@@ -145,8 +122,3 @@ export type JobProgress = z.infer<typeof jobProgressSchema>
 export type JobError = z.infer<typeof jobErrorSchema>
 export type JobOutput = z.infer<typeof jobOutputSchema>
 export type JobSnapshot = z.infer<typeof jobSnapshotSchema>
-export type ProjectContextSnapshot = z.infer<
-  typeof projectContextSnapshotSchema
->
-/** @deprecated Use ProjectContextSnapshot instead */
-export type EventContextSnapshot = ProjectContextSnapshot

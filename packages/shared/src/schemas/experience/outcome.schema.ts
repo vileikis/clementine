@@ -4,12 +4,16 @@
  * Configuration schema for outcome-based generation (image/gif/video).
  * Part of Transform v3 - replaces node-based pipeline with outcome-focused config.
  *
- * Note: Model and aspect ratio enums are defined locally to avoid coupling
- * to the deprecated transformNodes system (nodes/ai-image-node.schema.ts).
+ * Aspect ratio is now a top-level outcome setting (not AI-specific) because it affects:
+ * - Camera capture constraints
+ * - Overlay resolution
+ * - AI generation dimensions
  *
  * @see PRD 1A - Schema Foundations
+ * @see Feature 065 - Experience-Level Aspect Ratio & Overlay System
  */
 import { z } from 'zod'
+import { aspectRatioSchema, imageAspectRatioSchema } from '../media/aspect-ratio.schema'
 import { mediaReferenceSchema } from '../media/media-reference.schema'
 
 /**
@@ -35,15 +39,9 @@ export type AIImageModel = z.infer<typeof aiImageModelSchema>
 
 /**
  * AI image aspect ratio options.
- * Defined locally to avoid coupling to deprecated nodes/ system.
+ * Uses canonical aspect ratio schema. 16:9 removed per PRD spec.
  */
-export const aiImageAspectRatioSchema = z.enum([
-  '1:1',
-  '3:2',
-  '2:3',
-  '9:16',
-  '16:9',
-])
+export const aiImageAspectRatioSchema = imageAspectRatioSchema
 
 /** Aspect ratio for generated images */
 export type AIImageAspectRatio = z.infer<typeof aiImageAspectRatioSchema>
@@ -123,10 +121,23 @@ export type OutcomeOptions = z.infer<typeof outcomeOptionsSchema>
 /**
  * Complete Outcome configuration.
  * Defines how a session generates its final output.
+ *
+ * The top-level `aspectRatio` is the canonical output dimension setting that affects:
+ * - Camera capture constraints
+ * - Overlay resolution (at job creation)
+ * - AI generation dimensions
+ *
+ * Note: `imageGeneration.aspectRatio` is kept for backward compatibility but
+ * new code should use the top-level `aspectRatio` field.
  */
 export const outcomeSchema = z.object({
   /** Output type (null = not configured) */
   type: outcomeTypeSchema.nullable().default(null),
+  /**
+   * Output aspect ratio - single source of truth for all downstream systems.
+   * Affects camera capture, overlay resolution, and AI generation.
+   */
+  aspectRatio: aspectRatioSchema.default('1:1'),
   /** Source capture step ID for image-to-image (null = no source) */
   captureStepId: z.string().nullable().default(null),
   /** Global AI toggle (false = passthrough mode) */

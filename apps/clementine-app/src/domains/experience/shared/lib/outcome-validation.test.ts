@@ -12,6 +12,7 @@ import type { ExperienceStep, Outcome } from '@clementine/shared'
 function createDefaultOutcome(overrides: Partial<Outcome> = {}): Outcome {
   return {
     type: 'image',
+    aspectRatio: '1:1',
     captureStepId: null,
     aiEnabled: true,
     imageGeneration: {

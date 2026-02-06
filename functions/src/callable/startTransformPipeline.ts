@@ -12,12 +12,14 @@
  */
 import { onCall, HttpsError } from 'firebase-functions/v2/https'
 import { getFunctions } from 'firebase-admin/functions'
+import type { AspectRatio } from '@clementine/shared'
 import {
   fetchSession,
   updateSessionJobStatus,
   hasActiveJob,
 } from '../repositories/session'
 import { fetchExperience } from '../repositories/experience'
+import { fetchProject, pickOverlay } from '../repositories/project'
 import { createJob, buildJobData, buildJobSnapshot } from '../repositories/job'
 import {
   startTransformPipelineRequestSchema,
@@ -127,8 +129,19 @@ export const startTransformPipelineV2 = onCall(
       )
     }
 
-    // Build job snapshot (no overlays for now - can be added when project context is available)
-    const snapshot = buildJobSnapshot(session, experience, configSource)
+    // Fetch project for overlay resolution
+    const project = await fetchProject(projectId)
+
+    // Get aspect ratio from top-level outcome config (not imageGeneration)
+    const aspectRatio: AspectRatio = outcome.aspectRatio ?? outcome.imageGeneration?.aspectRatio ?? '1:1'
+
+    // Pick overlay at job creation time
+    const overlayChoice = pickOverlay(project, configSource, session.experienceId, aspectRatio)
+
+    // Build job snapshot with resolved overlay
+    const snapshot = buildJobSnapshot(session, experience, configSource, {
+      overlayChoice,
+    })
 
     // Create job document with snapshot
     const jobData = buildJobData({

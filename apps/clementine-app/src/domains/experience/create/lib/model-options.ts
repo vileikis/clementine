@@ -3,7 +3,11 @@
  *
  * Constants for AI model and aspect ratio selection.
  * Extracted to allow reuse across different outcome types.
+ *
+ * Aspect ratios use the canonical definitions from @clementine/shared.
  */
+import { ASPECT_RATIOS as CANONICAL_ASPECT_RATIOS } from '@clementine/shared'
+import type { AspectRatio as CanonicalAspectRatio } from '@clementine/shared'
 
 /**
  * Available AI image generation models.
@@ -15,17 +19,15 @@ export const AI_IMAGE_MODELS = [
 
 /**
  * Available aspect ratios for image generation.
+ * Uses canonical definitions from @clementine/shared (excludes 16:9).
  */
-export const ASPECT_RATIOS = [
-  { value: '1:1', label: '1:1' },
-  { value: '3:2', label: '3:2' },
-  { value: '2:3', label: '2:3' },
-  { value: '9:16', label: '9:16' },
-  { value: '16:9', label: '16:9' },
-] as const
+export const ASPECT_RATIOS = CANONICAL_ASPECT_RATIOS.map((value) => ({
+  value,
+  label: value,
+}))
 
 /** Maximum number of reference media allowed */
 export const MAX_REF_MEDIA_COUNT = 5
 
 export type AIImageModel = (typeof AI_IMAGE_MODELS)[number]['value']
-export type AspectRatio = (typeof ASPECT_RATIOS)[number]['value']
+export type AspectRatio = CanonicalAspectRatio

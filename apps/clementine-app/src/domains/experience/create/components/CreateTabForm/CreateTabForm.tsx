@@ -27,6 +27,7 @@ import {
   sanitizeDisplayName,
 } from '../../lib/outcome-operations'
 import { AIGenerationToggle } from './AIGenerationToggle'
+import { AspectRatioSelector } from './AspectRatioSelector'
 import { OutcomeTypePicker } from './OutcomeTypePicker'
 import { OutcomeTypeSelector } from './OutcomeTypeSelector'
 import { RemoveOutcomeAction } from './RemoveOutcomeAction'
@@ -34,6 +35,7 @@ import { SourceImageSelector } from './SourceImageSelector'
 import type {
   AIImageAspectRatio,
   AIImageModel,
+  AspectRatio,
   Experience,
   ExperienceStep,
   MediaReference,
@@ -135,7 +137,20 @@ export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
     [form, triggerSave],
   )
 
-  // Handle aspect ratio change
+  // Handle top-level aspect ratio change (canonical output setting)
+  const handleOutcomeAspectRatioChange = useCallback(
+    (aspectRatio: AspectRatio) => {
+      // Update both top-level and imageGeneration.aspectRatio for consistency
+      form.setValue('aspectRatio', aspectRatio, { shouldDirty: true })
+      form.setValue('imageGeneration.aspectRatio', aspectRatio, {
+        shouldDirty: true,
+      })
+      triggerSave()
+    },
+    [form, triggerSave],
+  )
+
+  // Handle aspect ratio change from PromptComposer (for backwards compatibility)
   const handleAspectRatioChange = useCallback(
     (aspectRatio: string) => {
       form.setValue(
@@ -143,6 +158,10 @@ export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
         aspectRatio as AIImageAspectRatio,
         { shouldDirty: true },
       )
+      // Also sync to top-level aspectRatio
+      form.setValue('aspectRatio', aspectRatio as AspectRatio, {
+        shouldDirty: true,
+      })
       triggerSave()
     },
     [form, triggerSave],
@@ -245,13 +264,19 @@ export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
         onChange={handleOutcomeTypeSelect}
       />
 
-      {/* Source Image Selection */}
-      <SourceImageSelector
-        value={outcome.captureStepId}
-        onChange={handleCaptureStepIdChange}
-        steps={steps}
-        error={getFieldError(validationErrors, 'captureStepId')}
-      />
+      {/* Source Image and Aspect Ratio - side by side */}
+      <div className="grid grid-cols-2 gap-4">
+        <SourceImageSelector
+          value={outcome.captureStepId}
+          onChange={handleCaptureStepIdChange}
+          steps={steps}
+          error={getFieldError(validationErrors, 'captureStepId')}
+        />
+        <AspectRatioSelector
+          value={outcome.aspectRatio}
+          onChange={handleOutcomeAspectRatioChange}
+        />
+      </div>
 
       {/* AI Generation Toggle */}
       <AIGenerationToggle

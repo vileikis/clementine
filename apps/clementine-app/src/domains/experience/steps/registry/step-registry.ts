@@ -36,6 +36,7 @@ import {
   createDefaultInputYesNoConfig,
 } from '../defaults'
 import type {
+  AspectRatio,
   ExperienceStep,
   ExperienceStepCategory,
   ExperienceStepConfig,
@@ -81,6 +82,8 @@ export interface StepConfigPanelProps {
   step: ExperienceStep
   onConfigChange: (updates: Partial<ExperienceStepConfig>) => void
   disabled?: boolean
+  /** Outcome aspect ratio for capture step sync (optional, only used by capture panels) */
+  outcomeAspectRatio?: AspectRatio
 }
 
 /**

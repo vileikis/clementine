@@ -19,6 +19,7 @@ import type {
 export function createDefaultOutcome(): Outcome {
   return {
     type: null,
+    aspectRatio: '1:1',
     captureStepId: null,
     aiEnabled: true,
     imageGeneration: {

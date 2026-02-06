@@ -18,10 +18,7 @@ import type {
 import type { OutcomeContext } from '../types'
 import { resolvePromptMentions } from '../bindings/resolvePromptMentions'
 import { aiGenerateImage } from '../operations/aiGenerateImage'
-import {
-  applyOverlay,
-  getOverlayForAspectRatio,
-} from '../operations/applyOverlay'
+import { applyOverlay } from '../operations/applyOverlay'
 import {
   downloadFromStorage,
   uploadToStorage,
@@ -45,21 +42,22 @@ import { generateThumbnail } from '../../ffmpeg'
  */
 export async function imageOutcome(ctx: OutcomeContext): Promise<JobOutput> {
   const { job, snapshot, tmpDir, startTime } = ctx
-  const { outcome, sessionResponses, projectContext } = snapshot
+  const { outcome, sessionResponses, overlayChoice } = snapshot
 
   if (!outcome) {
     throw new Error('Outcome configuration is required')
   }
 
   const { aiEnabled, captureStepId, imageGeneration } = outcome
-  const aspectRatio = imageGeneration?.aspectRatio ?? '1:1'
+  // Feature 065: Use top-level aspectRatio, fall back to imageGeneration.aspectRatio for backwards compat
+  const aspectRatio = outcome.aspectRatio ?? imageGeneration?.aspectRatio ?? '1:1'
 
   logger.info('[ImageOutcome] Starting image outcome execution', {
     jobId: job.id,
     aiEnabled,
     captureStepId,
     aspectRatio,
-    hasProjectContext: !!projectContext,
+    hasOverlayChoice: !!overlayChoice,
   })
 
   // Extract source media from capture step (if configured)
@@ -82,20 +80,17 @@ export async function imageOutcome(ctx: OutcomeContext): Promise<JobOutput> {
     throw new Error('No output path generated')
   }
 
-  // Apply overlay if configured
-  const overlay = getOverlayForAspectRatio(
-    projectContext?.overlays,
-    aspectRatio,
-  )
-  if (overlay) {
+  // Apply overlay if resolved at job creation
+  // Feature 065: Use pre-resolved overlayChoice from snapshot (resolved in startTransformPipeline)
+  if (overlayChoice) {
     logger.info('[ImageOutcome] Applying overlay', {
       jobId: job.id,
       aspectRatio,
-      overlayDisplayName: overlay.displayName,
+      overlayDisplayName: overlayChoice.displayName,
     })
-    outputPath = await applyOverlay(outputPath, overlay, tmpDir)
+    outputPath = await applyOverlay(outputPath, overlayChoice, tmpDir)
   } else {
-    logger.info('[ImageOutcome] No overlay configured for aspect ratio', {
+    logger.info('[ImageOutcome] No overlay to apply', {
       jobId: job.id,
       aspectRatio,
     })
