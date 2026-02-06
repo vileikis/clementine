@@ -9,6 +9,7 @@
  *
  * @see Feature 065 - Experience-Level Aspect Ratio & Overlay System
  */
+import { ASPECT_RATIOS } from '../../lib/model-options'
 import type { AspectRatio } from '@clementine/shared'
 import {
   Select,
@@ -17,8 +18,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/ui-kit/ui/select'
-
-import { ASPECT_RATIOS } from '../../lib/model-options'
 
 export interface AspectRatioSelectorProps {
   /** Currently selected aspect ratio */
@@ -44,7 +43,11 @@ export function AspectRatioSelector({
   return (
     <div className="space-y-2">
       <label className="text-sm font-medium">Aspect Ratio</label>
-      <Select value={value} onValueChange={handleValueChange} disabled={disabled}>
+      <Select
+        value={value}
+        onValueChange={handleValueChange}
+        disabled={disabled}
+      >
         <SelectTrigger className="min-h-11 w-full">
           <SelectValue placeholder="Select aspect ratio">{value}</SelectValue>
         </SelectTrigger>

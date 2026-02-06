@@ -34,17 +34,15 @@
  */
 import { useMutation } from '@tanstack/react-query'
 import { useUpdateOverlays } from './useUpdateOverlays'
-import type { MediaReference } from '@clementine/shared'
+import type { MediaReference, OverlayKey } from '@clementine/shared'
 import { useTrackedMutation } from '@/domains/project-config/designer'
 import { useUploadMediaAsset } from '@/domains/media-library'
-
-type AspectRatio = '1:1' | '9:16'
 
 interface UploadAndUpdateOverlaysParams {
   /** File to upload */
   file: File
-  /** Aspect ratio for the overlay */
-  aspectRatio: AspectRatio
+  /** Overlay key (aspect ratio or 'default') for the overlay */
+  aspectRatio: OverlayKey
   /** Optional progress callback (0-100) */
   onProgress?: (progress: number) => void
 }

@@ -6,10 +6,8 @@
  *
  * Aspect ratios use the canonical definitions from @clementine/shared.
  */
-import {
-  ASPECT_RATIOS as CANONICAL_ASPECT_RATIOS,
-  type AspectRatio as CanonicalAspectRatio,
-} from '@clementine/shared'
+import { ASPECT_RATIOS as CANONICAL_ASPECT_RATIOS } from '@clementine/shared'
+import type { AspectRatio as CanonicalAspectRatio } from '@clementine/shared'
 
 /**
  * Available AI image generation models.

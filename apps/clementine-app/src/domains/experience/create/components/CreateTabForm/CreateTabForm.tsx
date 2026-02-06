@@ -142,11 +142,9 @@ export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
     (aspectRatio: AspectRatio) => {
       // Update both top-level and imageGeneration.aspectRatio for consistency
       form.setValue('aspectRatio', aspectRatio, { shouldDirty: true })
-      form.setValue(
-        'imageGeneration.aspectRatio',
-        aspectRatio as AIImageAspectRatio,
-        { shouldDirty: true },
-      )
+      form.setValue('imageGeneration.aspectRatio', aspectRatio, {
+        shouldDirty: true,
+      })
       triggerSave()
     },
     [form, triggerSave],

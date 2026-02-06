@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from 'react'
-import { Upload, X } from 'lucide-react'
+import { Layers, Upload, X } from 'lucide-react'
 import type { OverlayReference } from '@/domains/project-config/shared'
 import { Card } from '@/ui-kit/ui/card'
 import { Progress } from '@/ui-kit/ui/progress'
@@ -11,7 +11,7 @@ interface OverlayFrameProps {
   label: string
 
   /**
-   * Aspect ratio value (e.g., "1:1", "9:16")
+   * Aspect ratio value (e.g., "1:1", "9:16", "default")
    */
   ratio: string
 
@@ -44,6 +44,11 @@ interface OverlayFrameProps {
    * File name being uploaded
    */
   uploadingFileName?: string
+
+  /**
+   * Whether this is the default/fallback overlay slot
+   */
+  isDefault?: boolean
 }
 
 export function OverlayFrame({
@@ -55,12 +60,17 @@ export function OverlayFrame({
   isUploading = false,
   uploadProgress = 0,
   uploadingFileName,
+  isDefault = false,
 }: OverlayFrameProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isDragging, setIsDragging] = useState(false)
 
   // Convert ratio format (1:1 -> 1/1, 9:16 -> 9/16)
-  const cssRatio = useMemo(() => ratio.replace(':', '/'), [ratio])
+  // Default uses 1/1 square aspect ratio for display
+  const cssRatio = useMemo(
+    () => (isDefault ? '1/1' : ratio.replace(':', '/')),
+    [ratio, isDefault],
+  )
 
   // Drag and drop handlers
   const handleDrop = (e: React.DragEvent) => {
@@ -103,15 +113,20 @@ export function OverlayFrame({
 
   // State: Empty
   if (!overlayRef && !isUploading) {
+    // Default slot uses different border styling (dashed with different color)
+    const emptyBorderClasses = isDefault
+      ? isDragging
+        ? 'border-amber-500 bg-amber-500/5'
+        : 'border-amber-400/50 hover:border-amber-500/70 hover:bg-amber-50/50 dark:hover:bg-amber-950/20'
+      : isDragging
+        ? 'border-primary bg-primary/5'
+        : 'border-border hover:border-primary/50 hover:bg-muted/50'
+
     return (
       <div className="max-w-xs">
         <Card className="relative border-0 shadow-none p-0 ">
           <div
-            className={`relative w-full h-80 flex items-center justify-center border-2 border-dashed transition-colors cursor-pointer ${
-              isDragging
-                ? 'border-primary bg-primary/5'
-                : 'border-border hover:border-primary/50 hover:bg-muted/50'
-            }`}
+            className={`relative w-full h-80 flex items-center justify-center border-2 border-dashed transition-colors cursor-pointer ${emptyBorderClasses}`}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
@@ -129,11 +144,17 @@ export function OverlayFrame({
               className="relative h-full max-w-full flex flex-col items-center justify-center gap-3 p-2"
               style={{ aspectRatio: cssRatio }}
             >
-              <Upload className="h-8 w-8 text-muted-foreground" />
+              {isDefault ? (
+                <Layers className="h-8 w-8 text-amber-500" />
+              ) : (
+                <Upload className="h-8 w-8 text-muted-foreground" />
+              )}
               <div className="text-center">
                 <p className="text-sm font-medium">{label}</p>
                 <p className="text-xs text-muted-foreground">
-                  Drop image or click to upload
+                  {isDefault
+                    ? 'Fallback when no exact match'
+                    : 'Drop image or click to upload'}
                 </p>
               </div>
             </div>

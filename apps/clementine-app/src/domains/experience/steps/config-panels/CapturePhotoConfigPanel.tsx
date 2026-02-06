@@ -2,52 +2,59 @@
  * Capture Photo Config Panel
  *
  * Configuration panel for photo capture steps.
- * Fields: aspectRatio.
+ * Aspect ratio is synced from the experience outcome (read-only display).
+ *
+ * @see Feature 065 - Camera capture constrained to experience output aspect ratio
  */
+import { Info } from 'lucide-react'
 import type { StepConfigPanelProps } from '../registry/step-registry'
-import type {
-  ExperienceAspectRatio,
-  ExperienceCapturePhotoStepConfig,
-} from '@clementine/shared'
-import type { EditorOption } from '@/shared/editor-controls'
-import { EditorSection, SelectField } from '@/shared/editor-controls'
+import type { AspectRatio } from '@clementine/shared'
+import { EditorSection } from '@/shared/editor-controls'
 
-// Aspect ratio options
-const ASPECT_RATIO_OPTIONS: EditorOption<ExperienceAspectRatio>[] = [
-  { value: '1:1', label: 'Square (1:1)' },
-  { value: '9:16', label: 'Portrait (9:16)' },
-  { value: '3:2', label: 'Landscape (3:2)' },
-  { value: '2:3', label: 'Tall Portrait (2:3)' },
-]
+// Aspect ratio display labels
+const ASPECT_RATIO_LABELS: Record<AspectRatio, string> = {
+  '1:1': 'Square (1:1)',
+  '9:16': 'Portrait (9:16)',
+  '3:2': 'Landscape (3:2)',
+  '2:3': 'Tall Portrait (2:3)',
+}
+
+// Aspect ratio descriptions
+const ASPECT_RATIO_DESCRIPTIONS: Record<AspectRatio, string> = {
+  '1:1': 'Best for profile photos and social media posts',
+  '9:16': 'Best for stories and full-screen mobile displays',
+  '3:2': 'Best for landscape photos and traditional DSLR-style shots',
+  '2:3': 'Best for portrait photos with more vertical space',
+}
 
 export function CapturePhotoConfigPanel({
-  step,
-  onConfigChange,
-  disabled,
+  outcomeAspectRatio,
 }: StepConfigPanelProps) {
-  const config = step.config as ExperienceCapturePhotoStepConfig
-  const { aspectRatio } = config
+  // Use outcome aspect ratio (synced from experience output settings)
+  const aspectRatio = outcomeAspectRatio ?? '1:1'
 
   return (
     <div className="space-y-0">
       <EditorSection title="Camera">
-        <SelectField
-          label="Aspect Ratio"
-          value={aspectRatio}
-          onChange={(value) => onConfigChange({ aspectRatio: value })}
-          options={ASPECT_RATIO_OPTIONS}
-          disabled={disabled}
-        />
-        <p className="text-xs text-muted-foreground">
-          {aspectRatio === '1:1' &&
-            'Best for profile photos and social media posts'}
-          {aspectRatio === '9:16' &&
-            'Best for stories and full-screen mobile displays'}
-          {aspectRatio === '3:2' &&
-            'Best for landscape photos and traditional DSLR-style shots'}
-          {aspectRatio === '2:3' &&
-            'Best for portrait photos with more vertical space'}
-        </p>
+        {/* Read-only aspect ratio display - synced from outcome */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium">Aspect Ratio</span>
+            <span className="text-sm text-muted-foreground">
+              {ASPECT_RATIO_LABELS[aspectRatio]}
+            </span>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {ASPECT_RATIO_DESCRIPTIONS[aspectRatio]}
+          </p>
+          <div className="flex items-start gap-2 mt-3 p-2 bg-muted/50 rounded-md">
+            <Info className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+            <p className="text-xs text-muted-foreground">
+              Camera aspect ratio is automatically synced from the output aspect
+              ratio in the Create tab.
+            </p>
+          </div>
+        </div>
       </EditorSection>
     </div>
   )

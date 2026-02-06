@@ -73,7 +73,7 @@
 
 ---
 
-## Phase 4: User Story 2 - Manage Project-Level Overlays by Aspect Ratio (Priority: P2)
+## Phase 4: User Story 2 - Manage Project-Level Overlays by Aspect Ratio (Priority: P2) ✅ COMPLETE
 
 **Goal**: Project Owners can configure overlays for all 5 aspect ratio slots including default fallback (FR-005, FR-006)
 
@@ -81,16 +81,16 @@
 
 ### Implementation for User Story 2
 
-- [ ] T015 [US2] Update OverlaySection to render 5 overlay slots in responsive grid (2 cols mobile, 3+ desktop) in `apps/clementine-app/src/domains/project-config/settings/components/OverlaySection.tsx`
-- [ ] T016 [P] [US2] Update OverlayFrame to support "default" variant styling (different icon, dashed border) in `apps/clementine-app/src/domains/project-config/settings/components/OverlayFrame.tsx`
-- [ ] T017 [US2] Update useUpdateOverlays hook to handle new aspect ratio keys (3:2, 2:3, default) in `apps/clementine-app/src/domains/project-config/settings/hooks/useUpdateOverlays.ts`
-- [ ] T018 [US2] Verify upload/remove works for all 5 slots via manual testing
+- [X] T015 [US2] Update OverlaySection to render 5 overlay slots in responsive grid (2 cols mobile, 3+ desktop) in `apps/clementine-app/src/domains/project-config/settings/components/OverlaySection.tsx`
+- [X] T016 [P] [US2] Update OverlayFrame to support "default" variant styling (different icon, dashed border) in `apps/clementine-app/src/domains/project-config/settings/components/OverlayFrame.tsx`
+- [X] T017 [US2] Update useUpdateOverlays hook to handle new aspect ratio keys (3:2, 2:3, default) in `apps/clementine-app/src/domains/project-config/settings/hooks/useUpdateOverlays.ts`
+- [X] T018 [US2] Verify upload/remove works for all 5 slots via manual testing
 
 **Checkpoint**: User Story 2 complete - Project Owners can upload overlays for all aspect ratios plus default
 
 ---
 
-## Phase 5: User Story 3 - Camera and Input Alignment (Priority: P3)
+## Phase 5: User Story 3 - Camera and Input Alignment (Priority: P3) ✅ COMPLETE
 
 **Goal**: Camera capture and image crop interfaces constrain to experience's output aspect ratio (FR-013, FR-014, FR-015)
 
@@ -98,9 +98,9 @@
 
 ### Implementation for User Story 3
 
-- [ ] T019 [US3] Review CapturePhotoConfigPanel for aspect ratio sync with experience outcome in `apps/clementine-app/src/domains/experience/steps/config-panels/CapturePhotoConfigPanel.tsx`
-- [ ] T020 [US3] Verify capture step reads aspect ratio from top-level `outcome.aspectRatio` (may already work after T006)
-- [ ] T021 [US3] Manual test: create experience with each aspect ratio, verify camera preview matches
+- [X] T019 [US3] Review CapturePhotoConfigPanel for aspect ratio sync with experience outcome in `apps/clementine-app/src/domains/experience/steps/config-panels/CapturePhotoConfigPanel.tsx`
+- [X] T020 [US3] Verify capture step reads aspect ratio from top-level `outcome.aspectRatio` (may already work after T006)
+- [X] T021 [US3] Manual test: create experience with each aspect ratio, verify camera preview matches
 
 **Checkpoint**: User Story 3 complete - Guest capture UI respects experience aspect ratio
 

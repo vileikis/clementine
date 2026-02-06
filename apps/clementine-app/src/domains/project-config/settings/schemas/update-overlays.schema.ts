@@ -14,13 +14,20 @@ import { overlayReferenceSchema } from '@/domains/project-config/shared'
  * Unlike overlaysConfigSchema, this doesn't set defaults for missing fields,
  * allowing partial updates without overwriting existing overlays.
  *
+ * Supports all 5 overlay keys:
+ * - 1:1     - Square
+ * - 3:2     - Landscape
+ * - 2:3     - Portrait
+ * - 9:16    - Vertical/stories
+ * - default - Fallback overlay when no exact match exists
+ *
  * @example
  * ```typescript
- * // Update only 1:1 overlay (doesn't affect 9:16)
+ * // Update only 1:1 overlay (doesn't affect others)
  * { '1:1': { mediaAssetId: 'abc', url: 'https://...' } }
  *
- * // Update only 9:16 overlay (doesn't affect 1:1)
- * { '9:16': { mediaAssetId: 'xyz', url: 'https://...' } }
+ * // Update default overlay
+ * { 'default': { mediaAssetId: 'xyz', url: 'https://...' } }
  *
  * // Remove an overlay
  * { '1:1': null }
@@ -28,7 +35,10 @@ import { overlayReferenceSchema } from '@/domains/project-config/shared'
  */
 export const updateOverlaysConfigSchema = z.looseObject({
   '1:1': overlayReferenceSchema.optional(),
+  '3:2': overlayReferenceSchema.optional(),
+  '2:3': overlayReferenceSchema.optional(),
   '9:16': overlayReferenceSchema.optional(),
+  default: overlayReferenceSchema.optional(),
 })
 
 /**
