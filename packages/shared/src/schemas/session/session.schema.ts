@@ -12,6 +12,7 @@
  */
 import { z } from 'zod'
 import { jobStatusSchema } from '../job/job-status.schema'
+import { mediaReferenceSchema } from '../media/media-reference.schema'
 import { sessionResponseSchema } from './session-response.schema'
 
 /**
@@ -103,21 +104,6 @@ export const capturedMediaSchema = z.object({
 })
 
 /**
- * SessionResultMedia schema
- * Represents the final output from transform/capture
- */
-export const sessionResultMediaSchema = z.object({
-  /** Step that produced the result */
-  stepId: z.string(),
-  /** Result asset ID */
-  assetId: z.string(),
-  /** Public URL to the result */
-  url: z.string(),
-  /** Result creation timestamp (Unix ms) */
-  createdAt: z.number(),
-})
-
-/**
  * Session Schema
  *
  * Complete session document schema for tracking experience execution.
@@ -190,7 +176,7 @@ export const sessionSchema = z.looseObject({
   responses: z.array(sessionResponseSchema).default([]),
 
   /** Final result media from transform/capture */
-  resultMedia: sessionResultMediaSchema.nullable().default(null),
+  resultMedia: mediaReferenceSchema.nullable().default(null),
 
   /**
    * JOURNEY LINKING
@@ -246,7 +232,6 @@ export type ConfigSource = z.infer<typeof configSourceSchema>
 export type SessionStatus = z.infer<typeof sessionStatusSchema>
 export type Answer = z.infer<typeof answerSchema>
 export type CapturedMedia = z.infer<typeof capturedMediaSchema>
-export type SessionResultMedia = z.infer<typeof sessionResultMediaSchema>
 
 // Re-export JobStatus for convenience
 export { jobStatusSchema, type JobStatus } from '../job/job-status.schema'

@@ -168,13 +168,12 @@ async function finalizeJobSuccess(
     message: 'Finalizing result...',
   })
 
-  // Update session with result media
-  // Use 'create' as the stepId (standard output step)
+  // Update session with result media (MediaReference format)
   await updateSessionResultMedia(projectId, sessionId, {
-    stepId: 'create',
-    assetId: output.assetId,
+    mediaAssetId: output.assetId,
     url: output.url,
-    createdAt: Date.now(),
+    filePath: output.filePath,
+    displayName: 'Result',
   })
 
   // Mark job as completed (sets progress to 100% completed)
