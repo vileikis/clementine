@@ -112,7 +112,7 @@ export function deserializeFromPlainText(
           index: match.index,
           length: match[0].length,
           type: match[1] as 'step' | 'ref',
-          name: match[2],
+          name: match[2].trim(),
         })
       }
 
