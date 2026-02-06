@@ -22,8 +22,6 @@ function createMockSession(overrides: Partial<Session> = {}): Session {
     mode: 'guest',
     configSource: 'published',
     status: 'active',
-    answers: [],
-    capturedMedia: [],
     responses: [],
     resultMedia: null,
     mainSessionId: null,
