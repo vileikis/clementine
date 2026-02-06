@@ -1,0 +1,12 @@
+[
+  {
+    "origin": [
+      "http://localhost:3000",
+      "https://clementine-be--clementine-7568d.europe-west4.hosted.app",
+      "https://thegnly-fatherly-elidia.ngrok-free.dev"
+    ],
+    "method": ["GET", "HEAD"],
+    "maxAgeSeconds": 3600,
+    "responseHeader": ["Content-Type", "Content-Disposition"]
+  }
+]

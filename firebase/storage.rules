@@ -41,6 +41,17 @@ service firebase.storage {
       allow update, delete: if false;
     }
 
+    // Session result files (AI-generated outputs from Cloud Functions)
+    // Any authenticated user can read (URL contains non-guessable session ID)
+    // Results are created by Cloud Functions, so we can't verify ownership via metadata
+    match /projects/{projectId}/sessions/{sessionId}/results/{fileName} {
+      // Any authenticated user (including anonymous guests) can read results
+      allow read: if isAnyUser();
+
+      // Only Cloud Functions (admin SDK) can write results
+      allow create, update, delete: if false;
+    }
+
     // Media files rules (013-event-settings-overlays)
     // Authentication-based access control - file validation in client code
     match /workspaces/{workspaceId}/media/{fileName} {
