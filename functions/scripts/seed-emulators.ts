@@ -37,10 +37,9 @@ import type {
   Project,
   Experience,
   Session,
-  TransformNode,
   ExperienceConfig,
-  CapturedMedia,
-  Answer,
+  SessionResponse,
+  Outcome,
 } from '@clementine/shared'
 
 // Configure emulator endpoints BEFORE initializing admin
@@ -96,35 +95,40 @@ const OVERLAY_FILES = ['square-overlay.png', 'story-overlay.png']
 const TOTAL_IMAGES = 12
 
 // ============================================================================
-// TRANSFORM NODE TEMPLATES
+// OUTCOME TEMPLATES
 // ============================================================================
 
 /**
- * Sample transform nodes for testing
+ * Sample outcome for AI image generation
  */
-function createTransformNodes(): TransformNode[] {
-  return [
-    {
-      id: 'node-1',
-      type: 'ai.imageGeneration',
-      config: {
+function createImageOutcome(): Outcome {
+  return {
+    type: 'image',
+    options: {
+      ai: {
+        enabled: true,
         prompt: 'Transform this image into a cartoon style',
         model: 'gemini-2.5-flash-image',
         aspectRatio: '1:1',
         refMedia: [],
       },
     },
-  ]
+  }
 }
 
 /**
- * Sample experience config with transform nodes
+ * Capture step ID for consistent references
  */
-function createExperienceConfigWithTransform(): ExperienceConfig {
+const CAPTURE_STEP_ID = 'capture-step-1'
+
+/**
+ * Sample experience config with outcome
+ */
+function createExperienceConfigWithOutcome(): ExperienceConfig {
   return {
     steps: [
       {
-        id: crypto.randomUUID(),
+        id: CAPTURE_STEP_ID,
         type: 'capture.photo',
         name: 'Take a photo',
         config: {
@@ -132,14 +136,14 @@ function createExperienceConfigWithTransform(): ExperienceConfig {
         },
       },
     ],
-    transformNodes: createTransformNodes(),
+    outcome: createImageOutcome(),
   }
 }
 
 /**
- * Experience config without transform nodes
+ * Experience config without outcome (survey only)
  */
-function createExperienceConfigWithoutTransform(): ExperienceConfig {
+function createExperienceConfigWithoutOutcome(): ExperienceConfig {
   return {
     steps: [
       {
@@ -148,12 +152,12 @@ function createExperienceConfigWithoutTransform(): ExperienceConfig {
         name: 'Welcome',
         config: {
           title: 'Welcome',
-          description: 'This is a test experience without transform.',
+          description: 'This is a test experience without outcome.',
           media: null,
         },
       },
     ],
-    transformNodes: [],
+    outcome: null,
   }
 }
 
@@ -216,45 +220,45 @@ async function createExperiences(): Promise<void> {
     .doc(IDS.workspace)
     .collection('experiences')
 
-  // Experience 1: With transform config (draft + published)
+  // Experience 1: With outcome config (draft + published)
   const exp1: Experience = {
     id: IDS.experienceWithTransform,
-    name: 'Experience with Transform',
+    name: 'Experience with Outcome',
     status: 'active',
     profile: 'freeform',
     media: null,
     createdAt: now,
     updatedAt: now,
     deletedAt: null,
-    draft: createExperienceConfigWithTransform(),
-    published: createExperienceConfigWithTransform(),
+    draft: createExperienceConfigWithOutcome(),
+    published: createExperienceConfigWithOutcome(),
     draftVersion: 2,
     publishedVersion: 1,
     publishedAt: now,
     publishedBy: 'admin-user-001',
   }
   await experiencesRef.doc(IDS.experienceWithTransform).set(exp1)
-  console.log(`   ✓ Created experience: ${IDS.experienceWithTransform} (with transform)`)
+  console.log(`   ✓ Created experience: ${IDS.experienceWithTransform} (with outcome)`)
 
-  // Experience 2: Without transform config
+  // Experience 2: Without outcome config (survey only)
   const exp2: Experience = {
     id: IDS.experienceNoTransform,
-    name: 'Experience without Transform',
+    name: 'Experience without Outcome',
     status: 'active',
     profile: 'survey',
     media: null,
     createdAt: now,
     updatedAt: now,
     deletedAt: null,
-    draft: createExperienceConfigWithoutTransform(),
-    published: createExperienceConfigWithoutTransform(),
+    draft: createExperienceConfigWithoutOutcome(),
+    published: createExperienceConfigWithoutOutcome(),
     draftVersion: 1,
     publishedVersion: 1,
     publishedAt: now,
     publishedBy: 'admin-user-001',
   }
   await experiencesRef.doc(IDS.experienceNoTransform).set(exp2)
-  console.log(`   ✓ Created experience: ${IDS.experienceNoTransform} (no transform)`)
+  console.log(`   ✓ Created experience: ${IDS.experienceNoTransform} (no outcome)`)
 
   // Experience 3: Draft only (no published config)
   const exp3: Experience = {
@@ -266,7 +270,7 @@ async function createExperiences(): Promise<void> {
     createdAt: now,
     updatedAt: now,
     deletedAt: null,
-    draft: createExperienceConfigWithTransform(),
+    draft: createExperienceConfigWithOutcome(),
     published: null,
     draftVersion: 1,
     publishedVersion: null,
@@ -282,31 +286,39 @@ async function createExperiences(): Promise<void> {
 // ============================================================================
 
 /**
- * Sample captured media for sessions
+ * Sample responses for sessions - unified format for all step data
  */
-function createSampleCapturedMedia(): CapturedMedia[] {
+function createSampleResponses(): SessionResponse[] {
   const now = Date.now()
   return [
     {
-      stepId: 'capture-step-1',
-      assetId: 'asset-001',
-      url: 'http://localhost:9199/v0/b/clementine-7568d.firebasestorage.app/o/test%2Fphoto-01.jpg?alt=media',
-      createdAt: now,
+      stepId: CAPTURE_STEP_ID,
+      stepName: 'Take a photo',
+      stepType: 'capture.photo',
+      data: [
+        {
+          assetId: 'asset-001',
+          url: 'http://localhost:9199/v0/b/clementine-7568d.firebasestorage.app/o/test%2Fphoto-01.jpg?alt=media',
+          createdAt: now,
+        },
+      ],
+      respondedAt: now,
     },
   ]
 }
 
 /**
- * Sample answers for sessions
+ * Sample responses with only input data (no captured media)
  */
-function createSampleAnswers(): Answer[] {
+function createInputOnlyResponses(): SessionResponse[] {
   const now = Date.now()
   return [
     {
       stepId: 'input-step-1',
+      stepName: 'Rate your experience',
       stepType: 'input.scale',
-      value: '5',
-      answeredAt: now,
+      data: 5,
+      respondedAt: now,
     },
   ]
 }
@@ -320,7 +332,7 @@ async function createSessions(): Promise<void> {
     .doc(IDS.project)
     .collection('sessions')
 
-  // Session 1: Ready to process (draft config)
+  // Session 1: Ready to process (draft config, has responses with captured media)
   const session1: Session = {
     id: IDS.sessionReady,
     projectId: IDS.project,
@@ -330,8 +342,7 @@ async function createSessions(): Promise<void> {
     mode: 'preview',
     configSource: 'draft',
     status: 'active',
-    answers: createSampleAnswers(),
-    capturedMedia: createSampleCapturedMedia(),
+    responses: createSampleResponses(),
     resultMedia: null,
     jobId: null,
     jobStatus: null,
@@ -353,8 +364,7 @@ async function createSessions(): Promise<void> {
     mode: 'guest',
     configSource: 'published',
     status: 'active',
-    answers: [],
-    capturedMedia: createSampleCapturedMedia(),
+    responses: createSampleResponses(),
     resultMedia: null,
     jobId: null,
     jobStatus: null,
@@ -376,8 +386,7 @@ async function createSessions(): Promise<void> {
     mode: 'preview',
     configSource: 'draft',
     status: 'active',
-    answers: [],
-    capturedMedia: createSampleCapturedMedia(),
+    responses: createSampleResponses(),
     resultMedia: null,
     jobId: 'existing-job-001',
     jobStatus: 'running',
@@ -389,7 +398,7 @@ async function createSessions(): Promise<void> {
   await sessionsRef.doc(IDS.sessionWithJob).set(session3)
   console.log(`   ✓ Created session: ${IDS.sessionWithJob} (has active job)`)
 
-  // Session 4: References experience without transform
+  // Session 4: References experience without outcome (survey only)
   const session4: Session = {
     id: IDS.sessionNoTransform,
     projectId: IDS.project,
@@ -399,8 +408,7 @@ async function createSessions(): Promise<void> {
     mode: 'preview',
     configSource: 'draft',
     status: 'active',
-    answers: [],
-    capturedMedia: [],
+    responses: createInputOnlyResponses(),
     resultMedia: null,
     jobId: null,
     jobStatus: null,
@@ -410,7 +418,7 @@ async function createSessions(): Promise<void> {
     completedAt: null,
   }
   await sessionsRef.doc(IDS.sessionNoTransform).set(session4)
-  console.log(`   ✓ Created session: ${IDS.sessionNoTransform} (no transform)`)
+  console.log(`   ✓ Created session: ${IDS.sessionNoTransform} (no outcome)`)
 
   // Session 5: Uses published config but experience has no published
   const session5: Session = {
@@ -422,8 +430,7 @@ async function createSessions(): Promise<void> {
     mode: 'guest',
     configSource: 'published',
     status: 'active',
-    answers: [],
-    capturedMedia: createSampleCapturedMedia(),
+    responses: createSampleResponses(),
     resultMedia: null,
     jobId: null,
     jobStatus: null,
@@ -604,8 +611,8 @@ async function seed(): Promise<void> {
     console.log('   Firestore:')
     console.log(`     - 1 Workspace: ${IDS.workspace}`)
     console.log(`     - 1 Project: ${IDS.project}`)
-    console.log('     - 3 Experiences (with transform, no transform, draft only)')
-    console.log('     - 5 Sessions (ready, published, with-job, no-transform, draft-only)')
+    console.log('     - 3 Experiences (with outcome, no outcome, draft only)')
+    console.log('     - 5 Sessions (ready, published, with-job, no-outcome, draft-only)')
     console.log('   Storage:')
     console.log('     - Test images uploaded (if available)')
     console.log('     - Overlays uploaded (if available)')

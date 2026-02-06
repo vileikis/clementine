@@ -15,7 +15,6 @@ import { z } from 'zod'
 import { experienceMediaSchema } from '../media/media-reference.schema'
 import { outcomeSchema } from './outcome.schema'
 import { experienceStepSchema } from './step.schema'
-import { transformNodeSchema } from './transform.schema'
 
 /**
  * Experience status enum schema
@@ -44,9 +43,7 @@ export const experienceProfileSchema = z.enum(['freeform', 'survey', 'story'])
 export const experienceConfigSchema = z.looseObject({
   /** Array of steps in the experience (typed discriminated union) */
   steps: z.array(experienceStepSchema).default([]),
-  /** @deprecated Use outcome instead. Kept for backward compatibility. */
-  transformNodes: z.array(transformNodeSchema).default([]),
-  /** Outcome configuration (replaces transformNodes). Null means not configured. */
+  /** Outcome configuration (defines how the AI result is generated). Null means not configured. */
   outcome: outcomeSchema.nullable().default(null),
 })
 

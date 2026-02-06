@@ -13,8 +13,6 @@ export {
   experienceStatusSchema,
   experienceProfileSchema,
   experienceMediaSchema,
-  // Transform schemas
-  transformNodeSchema,
   // Outcome schemas
   outcomeSchema,
   outcomeTypeSchema,
@@ -48,7 +46,6 @@ export {
   type ExperienceStatus,
   type ExperienceProfile,
   type ExperienceMedia,
-  type TransformNode,
   // Outcome types
   type Outcome,
   type OutcomeType,

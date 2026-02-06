@@ -187,19 +187,12 @@ export const useExperienceRuntimeStore = create<ExperienceRuntimeStore>(
     ...initialState,
 
     initFromSession: (session, steps, experienceId) => {
-      // Derive starting step from responses (preferred) or answers (legacy)
-      // First try unified responses, fall back to answers for backward compatibility
+      // Derive starting step from responses
       const existingResponses = session.responses ?? []
       const respondedStepIds = new Set(existingResponses.map((r) => r.stepId))
 
-      // Fall back to answers if no responses exist (legacy sessions)
-      const answeredStepIds =
-        respondedStepIds.size > 0
-          ? respondedStepIds
-          : new Set((session.answers ?? []).map((a) => a.stepId))
-
       const firstUnansweredIndex = steps.findIndex(
-        (step) => !answeredStepIds.has(step.id),
+        (step) => !respondedStepIds.has(step.id),
       )
       const startingIndex =
         firstUnansweredIndex === -1 ? steps.length : firstUnansweredIndex
