@@ -18,7 +18,7 @@ export function InfoStepRenderer({ step, mode }: StepRendererProps) {
   const { theme } = useEventTheme()
 
   return (
-    <div className="flex flex-col items-center gap-6 text-center w-full max-w-md px-4">
+    <div className="flex flex-col items-center gap-6 text-center w-full px-4">
       {/* Media */}
       {media ? (
         <img
@@ -40,7 +40,7 @@ export function InfoStepRenderer({ step, mode }: StepRendererProps) {
       ) : null}
 
       {/* Title */}
-      <ThemedText variant="heading" as="h2">
+      <ThemedText variant="heading" as="h2" className="whitespace-pre-line">
         {title ||
           (mode === 'edit' ? (
             <span className="opacity-50">Add a title...</span>
@@ -48,7 +48,7 @@ export function InfoStepRenderer({ step, mode }: StepRendererProps) {
       </ThemedText>
 
       {/* Description */}
-      <ThemedText variant="body" className="opacity-90">
+      <ThemedText variant="body" className="opacity-90 whitespace-pre-line">
         {description ||
           (mode === 'edit' ? (
             <span className="opacity-50">Add a description...</span>

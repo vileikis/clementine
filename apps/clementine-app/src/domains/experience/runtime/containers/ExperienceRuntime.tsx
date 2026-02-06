@@ -22,7 +22,7 @@ import { RuntimeTopBar } from '../components/RuntimeTopBar'
 import type { ExperienceStep } from '../../shared/schemas'
 import type { Session } from '@/domains/session'
 import { useCompleteSession, useUpdateSessionProgress } from '@/domains/session'
-import { ScrollableView } from '@/shared/theming'
+import { cn } from '@/shared/utils'
 
 /** Step types that manage their own navigation buttons */
 const STEPS_WITH_CUSTOM_NAVIGATION = new Set(['capture.photo'])
@@ -274,15 +274,21 @@ export function ExperienceRuntime({
           onHomeClick={onHomeClick}
         />
       )}
-      <ScrollableView
-        className={
-          hideNavigation
-            ? 'items-center justify-center'
-            : 'items-center justify-center pb-20 md:pb-0'
-        }
-      >
-        {children}
-      </ScrollableView>
+      {/* Scroll container */}
+      <div className="flex-1 min-h-0 overflow-y-auto flex flex-col">
+        {/* Content wrapper - centered with padding for fixed bars */}
+        <div
+          className={cn(
+            'w-full max-w-md mx-auto my-auto flex flex-col items-center',
+            // Padding for fixed top bar
+            'pt-28',
+            // Padding for fixed bottom navigation (mobile only)
+            'pb-28 md:pb-0',
+          )}
+        >
+          {children}
+        </div>
+      </div>
       {!hideNavigation && (
         <RuntimeNavigation
           onNext={store.nextStep}
