@@ -41,7 +41,7 @@
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
 - [ ] T005 Extend `overlaysConfigSchema` to support 5 keys (1:1, 3:2, 2:3, 9:16, default) in `packages/shared/src/schemas/project/project-config.schema.ts`
-- [ ] T006 [P] Update `outcome.schema.ts` to import from canonical aspect-ratio schema, remove 16:9 option in `packages/shared/src/schemas/experience/outcome.schema.ts`
+- [ ] T006 [P] Update `outcome.schema.ts`: add top-level `aspectRatio` field (import from canonical schema), keep `imageGeneration.aspectRatio` for backwards compatibility, remove 16:9 option in `packages/shared/src/schemas/experience/outcome.schema.ts`
 - [ ] T007 [P] Update `capture-photo.schema.ts` to import from canonical aspect-ratio schema in `packages/shared/src/schemas/experience/steps/capture-photo.schema.ts`
 - [ ] T008 Flatten job snapshot: add `overlayChoice` and `experienceRef` at top level, remove `projectContext` wrapper and deprecated exports in `packages/shared/src/schemas/job/job.schema.ts`
 - [ ] T009 Rebuild shared package and run tests: `pnpm --filter @clementine/shared build && pnpm --filter @clementine/shared test`
@@ -52,17 +52,24 @@
 
 ## Phase 3: User Story 1 - Configure Experience Output Aspect Ratio (Priority: P1) 🎯 MVP
 
-**Goal**: Experience Creators can select output aspect ratio with media-type-specific options (FR-001, FR-002, FR-004)
+**Goal**: Experience Creators can select output aspect ratio as a top-level outcome setting (FR-001, FR-002, FR-004)
 
-**Independent Test**: Create an experience, select aspect ratio, verify dropdown shows correct options (1:1, 3:2, 2:3, 9:16 for image; 9:16, 1:1 for video)
+**Architecture Decision**: Aspect ratio is a fundamental output characteristic, not an AI-specific setting. It affects:
+- Camera capture constraints (US3)
+- Overlay resolution (US4)
+- AI generation dimensions (US5)
+
+**Independent Test**: Create an experience, select aspect ratio from top-level selector (alongside source media), verify dropdown shows correct options (1:1, 3:2, 2:3, 9:16 for image; 9:16, 1:1 for video)
 
 ### Implementation for User Story 1
 
 - [ ] T010 [US1] Update `ASPECT_RATIOS` constant to import from canonical schema (remove 16:9) in `apps/clementine-app/src/domains/experience/create/lib/model-options.ts`
-- [ ] T011 [US1] Verify PromptComposer aspect ratio dropdown works with updated options in `apps/clementine-app/src/domains/experience/create/components/PromptComposer/PromptComposer.tsx`
-- [ ] T012 [US1] Run frontend type check to verify no breaking changes: `pnpm app:type-check`
+- [ ] T011 [US1] Create `AspectRatioSelector` component for top-level aspect ratio selection in `apps/clementine-app/src/domains/experience/create/components/CreateTabForm/AspectRatioSelector.tsx`
+- [ ] T012 [US1] Add AspectRatioSelector to CreateTabForm alongside SourceImageSelector (top-level config), add handler for `outcome.aspectRatio` in `apps/clementine-app/src/domains/experience/create/components/CreateTabForm/CreateTabForm.tsx`
+- [ ] T013 [US1] Hide aspect ratio control from PromptComposer (keep prop for future use, just don't render) in `apps/clementine-app/src/domains/experience/create/components/PromptComposer/PromptComposer.tsx`
+- [ ] T014 [US1] Run frontend type check to verify no breaking changes: `pnpm app:type-check`
 
-**Checkpoint**: User Story 1 complete - Experience Creators see correct aspect ratio options based on media type
+**Checkpoint**: User Story 1 complete - Experience Creators see aspect ratio as top-level output setting alongside source media
 
 ---
 
@@ -74,10 +81,10 @@
 
 ### Implementation for User Story 2
 
-- [ ] T013 [US2] Update OverlaySection to render 5 overlay slots in responsive grid (2 cols mobile, 3+ desktop) in `apps/clementine-app/src/domains/project-config/settings/components/OverlaySection.tsx`
-- [ ] T014 [P] [US2] Update OverlayFrame to support "default" variant styling (different icon, dashed border) in `apps/clementine-app/src/domains/project-config/settings/components/OverlayFrame.tsx`
-- [ ] T015 [US2] Update useUpdateOverlays hook to handle new aspect ratio keys (3:2, 2:3, default) in `apps/clementine-app/src/domains/project-config/settings/hooks/useUpdateOverlays.ts`
-- [ ] T016 [US2] Verify upload/remove works for all 5 slots via manual testing
+- [ ] T015 [US2] Update OverlaySection to render 5 overlay slots in responsive grid (2 cols mobile, 3+ desktop) in `apps/clementine-app/src/domains/project-config/settings/components/OverlaySection.tsx`
+- [ ] T016 [P] [US2] Update OverlayFrame to support "default" variant styling (different icon, dashed border) in `apps/clementine-app/src/domains/project-config/settings/components/OverlayFrame.tsx`
+- [ ] T017 [US2] Update useUpdateOverlays hook to handle new aspect ratio keys (3:2, 2:3, default) in `apps/clementine-app/src/domains/project-config/settings/hooks/useUpdateOverlays.ts`
+- [ ] T018 [US2] Verify upload/remove works for all 5 slots via manual testing
 
 **Checkpoint**: User Story 2 complete - Project Owners can upload overlays for all aspect ratios plus default
 
@@ -91,9 +98,9 @@
 
 ### Implementation for User Story 3
 
-- [ ] T017 [US3] Review CapturePhotoConfigPanel for aspect ratio sync with experience outcome in `apps/clementine-app/src/domains/experience/steps/config-panels/CapturePhotoConfigPanel.tsx`
-- [ ] T018 [US3] Verify capture step reads aspect ratio from experience outcome configuration (may already work after T006-T007)
-- [ ] T019 [US3] Manual test: create experience with each aspect ratio, verify camera preview matches
+- [ ] T019 [US3] Review CapturePhotoConfigPanel for aspect ratio sync with experience outcome in `apps/clementine-app/src/domains/experience/steps/config-panels/CapturePhotoConfigPanel.tsx`
+- [ ] T020 [US3] Verify capture step reads aspect ratio from top-level `outcome.aspectRatio` (may already work after T006)
+- [ ] T021 [US3] Manual test: create experience with each aspect ratio, verify camera preview matches
 
 **Checkpoint**: User Story 3 complete - Guest capture UI respects experience aspect ratio
 
@@ -103,19 +110,21 @@
 
 **Goal**: System automatically selects and applies correct overlay with fallback behavior (FR-007, FR-008, FR-009, FR-010, FR-011)
 
+**Architecture Note**: Overlay resolution uses top-level `outcome.aspectRatio` (not `imageGeneration.aspectRatio`)
+
 **Independent Test**: Create jobs with various overlay configurations, verify correct overlay is applied (exact match → default → none)
 
 ### Implementation for User Story 4
 
-- [ ] T020 [US4] Create fetchProject helper function to retrieve project with overlay config in `functions/src/repositories/project.ts`
-- [ ] T021 [US4] Add resolveOverlayChoice function implementing fallback logic (exact → default → null) in `functions/src/callable/startTransformPipeline.ts`
-- [ ] T022 [US4] Update startTransformPipeline to fetch project, resolve overlay choice, and pass to buildJobSnapshot in `functions/src/callable/startTransformPipeline.ts`
-- [ ] T023 [US4] Update buildJobSnapshot to accept overlayChoice and experienceRef parameters, remove projectContext building in `functions/src/repositories/job.ts`
-- [ ] T024 [US4] Update imageOutcome to use `snapshot.overlayChoice` directly instead of resolution logic in `functions/src/services/transform/outcomes/imageOutcome.ts`
-- [ ] T025 [US4] Remove `getOverlayForAspectRatio` helper function (no longer needed) from `functions/src/services/transform/operations/applyOverlay.ts`
-- [ ] T026 [US4] Build functions and verify no type errors: `cd functions && pnpm build`
+- [ ] T022 [US4] Create fetchProject helper function to retrieve project with overlay config in `functions/src/repositories/project.ts`
+- [ ] T023 [US4] Add resolveOverlayChoice function implementing fallback logic using `outcome.aspectRatio` (exact → default → null) in `functions/src/callable/startTransformPipeline.ts`
+- [ ] T024 [US4] Update startTransformPipeline to fetch project, resolve overlay choice using top-level aspectRatio, and pass to buildJobSnapshot in `functions/src/callable/startTransformPipeline.ts`
+- [ ] T025 [US4] Update buildJobSnapshot to accept overlayChoice and experienceRef parameters, remove projectContext building in `functions/src/repositories/job.ts`
+- [ ] T026 [US4] Update imageOutcome to use `snapshot.overlayChoice` directly instead of resolution logic in `functions/src/services/transform/outcomes/imageOutcome.ts`
+- [ ] T027 [US4] Remove `getOverlayForAspectRatio` helper function (no longer needed) from `functions/src/services/transform/operations/applyOverlay.ts`
+- [ ] T028 [US4] Build functions and verify no type errors: `cd functions && pnpm build`
 
-**Checkpoint**: User Story 4 complete - Overlay resolution happens at job creation, transform uses pre-resolved choice
+**Checkpoint**: User Story 4 complete - Overlay resolution happens at job creation using top-level aspectRatio, transform uses pre-resolved choice
 
 ---
 
@@ -123,15 +132,17 @@
 
 **Goal**: AI generation receives explicit aspect ratio parameter from experience config (FR-016, FR-017, FR-018)
 
+**Architecture Note**: AI generation uses top-level `outcome.aspectRatio` (consistent with overlay resolution)
+
 **Independent Test**: Trigger AI generation, verify output matches experience aspect ratio without post-processing
 
 ### Implementation for User Story 5
 
-- [ ] T027 [US5] Review AI generation service to confirm aspect ratio is passed from `snapshot.outcome.imageGeneration.aspectRatio` in `functions/src/services/transform/outcomes/imageOutcome.ts`
-- [ ] T028 [US5] Verify no post-generation cropping/resizing occurs in image pipeline
-- [ ] T029 [US5] Manual test: create experience with 3:2, trigger generation, verify output dimensions
+- [ ] T029 [US5] Update imageOutcome to read aspect ratio from top-level `snapshot.outcome.aspectRatio` instead of `imageGeneration.aspectRatio` in `functions/src/services/transform/outcomes/imageOutcome.ts`
+- [ ] T030 [US5] Verify no post-generation cropping/resizing occurs in image pipeline
+- [ ] T031 [US5] Manual test: create experience with 3:2, trigger generation, verify output dimensions
 
-**Checkpoint**: User Story 5 complete - AI generation produces correct aspect ratio outputs
+**Checkpoint**: User Story 5 complete - AI generation uses top-level aspectRatio, produces correct dimensions
 
 ---
 
@@ -139,13 +150,13 @@
 
 **Purpose**: Validation, cleanup, and final verification
 
-- [ ] T030 [P] Run full lint and type check across monorepo: `pnpm app:check`
-- [ ] T031 [P] Run shared package tests: `pnpm --filter @clementine/shared test`
-- [ ] T032 [P] Run frontend tests: `pnpm app:test`
-- [ ] T033 Execute quickstart.md testing checklist (overlay upload flow, experience config flow, overlay resolution flow)
-- [ ] T034 Review code against `standards/frontend/design-system.md` for UI components
-- [ ] T035 Review code against `standards/global/zod-validation.md` for schema definitions
-- [ ] T036 Final build verification: `pnpm app:build && pnpm functions:build`
+- [ ] T032 [P] Run full lint and type check across monorepo: `pnpm app:check`
+- [ ] T033 [P] Run shared package tests: `pnpm --filter @clementine/shared test`
+- [ ] T034 [P] Run frontend tests: `pnpm app:test`
+- [ ] T035 Execute quickstart.md testing checklist (overlay upload flow, experience config flow, overlay resolution flow)
+- [ ] T036 Review code against `standards/frontend/design-system.md` for UI components
+- [ ] T037 Review code against `standards/global/zod-validation.md` for schema definitions
+- [ ] T038 Final build verification: `pnpm app:build && pnpm functions:build`
 
 ---
 
@@ -180,8 +191,8 @@
 ### Parallel Opportunities
 
 - T006, T007 can run in parallel (different schema files)
-- T013, T014 can run in parallel (different component files)
-- T030, T031, T032 can run in parallel (independent validation)
+- T015, T016 can run in parallel (different component files)
+- T032, T033, T034 can run in parallel (independent validation)
 - US1, US2, US3 frontend work can proceed in parallel if team capacity allows
 
 ---
@@ -190,7 +201,7 @@
 
 ```bash
 # After T005 completes, launch T006 and T007 in parallel:
-Task: "Update outcome.schema.ts to import from canonical aspect-ratio"
+Task: "Update outcome.schema.ts - add top-level aspectRatio"
 Task: "Update capture-photo.schema.ts to import from canonical aspect-ratio"
 ```
 
