@@ -63,6 +63,25 @@ describe('useShareActions', () => {
       writable: true,
       configurable: true,
     })
+    Object.defineProperty(navigator, 'maxTouchPoints', {
+      value: 0,
+      writable: true,
+      configurable: true,
+    })
+  }
+
+  const setIPadOSUserAgent = () => {
+    // iPadOS 13+ reports as Macintosh but has touch support
+    Object.defineProperty(navigator, 'userAgent', {
+      value: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)',
+      writable: true,
+      configurable: true,
+    })
+    Object.defineProperty(navigator, 'maxTouchPoints', {
+      value: 5,
+      writable: true,
+      configurable: true,
+    })
   }
 
   beforeEach(() => {
@@ -148,6 +167,26 @@ describe('useShareActions', () => {
       })
       expect(toast.success).toHaveBeenCalledWith('Shared successfully')
       // Should not create blob URL for download
+      expect(mockCreateObjectURL).not.toHaveBeenCalled()
+    })
+
+    it('should use Web Share API on iPadOS 13+ (Macintosh UA with touch)', async () => {
+      setIPadOSUserAgent()
+      mockCanShare.mockReturnValue(true)
+
+      const { result } = renderHook(() => useShareActions({ media: mockMedia }))
+
+      await act(async () => {
+        await result.current.handleShare('download')
+      })
+
+      // iPadOS should be detected as mobile and use Web Share API
+      expect(mockGetBlob).toHaveBeenCalled()
+      expect(mockCanShare).toHaveBeenCalled()
+      expect(mockShare).toHaveBeenCalledWith({
+        files: expect.arrayContaining([expect.any(File)]),
+      })
+      expect(toast.success).toHaveBeenCalledWith('Shared successfully')
       expect(mockCreateObjectURL).not.toHaveBeenCalled()
     })
 

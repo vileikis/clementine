@@ -142,8 +142,25 @@ export function useShareActions({ media }: UseShareActionsParams) {
 
 type ShareResult = 'shared' | 'unavailable' | 'cancelled'
 
+/**
+ * Detects mobile/tablet devices for share sheet behavior.
+ * iPadOS 13+ reports as "Macintosh" in the UA string, so we use
+ * maxTouchPoints to detect touch-capable Mac-like devices (iPads).
+ */
 function isMobileOS(): boolean {
-  return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+  const ua = navigator.userAgent
+
+  // Standard mobile detection
+  if (/iPhone|iPad|iPod|Android/i.test(ua)) {
+    return true
+  }
+
+  // iPadOS 13+ detection: reports as Macintosh but has touch support
+  if (/Macintosh/i.test(ua) && navigator.maxTouchPoints > 1) {
+    return true
+  }
+
+  return false
 }
 
 /**
