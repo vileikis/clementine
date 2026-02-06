@@ -118,7 +118,8 @@ export function CopyMentionPlugin(): null {
 
       const text = serializeSelectionWithMentions(selection)
 
-      event.clipboardData?.setData('text/plain', text)
+      if (!event.clipboardData) return false
+      event.clipboardData.setData('text/plain', text)
       event.preventDefault()
 
       // For cut, also delete the selected content
