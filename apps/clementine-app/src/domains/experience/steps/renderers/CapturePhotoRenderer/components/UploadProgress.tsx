@@ -27,7 +27,7 @@ interface UploadProgressProps {
 
 export function UploadProgress({ photo, aspectRatio }: UploadProgressProps) {
   return (
-    <div className="flex flex-col items-center gap-6 w-full max-w-md">
+    <div className="flex flex-col items-center gap-6 w-full">
       {/* Preview image - responsive sizing */}
       {photo?.previewUrl && (
         <div

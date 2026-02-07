@@ -38,7 +38,7 @@ export function InputYesNoRenderer({
   )
 
   return (
-    <div className="flex flex-col items-center gap-8 w-full max-w-md px-4">
+    <div className="flex flex-col items-center gap-8 w-full px-4">
       {/* Title */}
       <ThemedText variant="heading" as="h2">
         {title ||

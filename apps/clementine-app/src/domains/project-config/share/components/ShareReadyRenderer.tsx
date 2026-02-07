@@ -119,7 +119,7 @@ export function ShareReadyRenderer({
   }
 
   return (
-    <ScrollableView className="items-center gap-6 p-8 max-w-md">
+    <ScrollableView className="items-center gap-6 p-8 max-w-2xl">
       {mediaUrl ? (
         <img
           src={mediaUrl}
@@ -164,7 +164,7 @@ export function ShareReadyRenderer({
 
       {/* Description (hidden when null) */}
       {share.description && (
-        <ThemedText variant="body" className="text-center opacity-90 max-w-md">
+        <ThemedText variant="body" className="text-center opacity-90">
           {share.description}
         </ThemedText>
       )}

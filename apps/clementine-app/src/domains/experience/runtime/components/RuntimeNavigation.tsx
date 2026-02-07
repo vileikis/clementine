@@ -44,7 +44,7 @@ export function RuntimeNavigation({
     <>
       {/* Mobile: Fixed bottom button */}
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-linear-to-t from-black/20 to-transparent md:hidden z-40">
-        <div className="flex justify-center max-w-md mx-auto">
+        <div className="flex justify-center mx-auto">
           <ThemedButton
             onClick={onNext}
             disabled={isNextDisabled}

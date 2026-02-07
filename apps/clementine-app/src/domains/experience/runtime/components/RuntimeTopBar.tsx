@@ -148,7 +148,7 @@ export function RuntimeTopBar({
         />
 
         {/* Inner container with max width */}
-        <div className="relative w-full max-w-md flex items-center gap-4">
+        <div className="relative w-full max-w-2xl flex items-center gap-4">
           {/* Left: Back button (hidden for single-step experiences) */}
           {onBack ? (
             <ThemedIconButton

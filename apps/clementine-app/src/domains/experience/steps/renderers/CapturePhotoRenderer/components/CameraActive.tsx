@@ -42,7 +42,7 @@ export function CameraActive({
   onFileChange,
 }: CameraActiveProps) {
   return (
-    <div className="flex flex-col h-full w-full max-w-md mx-auto">
+    <div className="flex flex-col h-full w-full mx-auto">
       {/* Camera container - fills space on mobile, centered on desktop */}
       <div className="flex-1 min-h-0 flex items-center justify-center">
         <div className="w-full h-full max-h-[70vh] flex items-center justify-center bg-black rounded-2xl overflow-hidden">

@@ -51,7 +51,7 @@ export function StepPreview({ step, theme }: StepPreviewProps) {
       <PreviewShell enableViewportSwitcher enableFullscreen>
         <ThemeProvider theme={previewTheme}>
           <ThemedBackground className="h-full">
-            <ScrollableView className="items-center gap-6 p-8 max-w-md">
+            <ScrollableView className="items-center gap-6 p-8 max-w-2xl">
               {step ? (
                 <StepRendererRouter step={step} mode="edit" />
               ) : (

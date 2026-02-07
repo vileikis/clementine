@@ -279,7 +279,7 @@ export function ExperienceRuntime({
       )}
       <ScrollableView
         className={cn(
-          'items-center max-w-md',
+          'items-center max-w-2xl',
           // Padding for fixed top bar
           'pt-28',
           // Padding for fixed bottom navigation (mobile only)

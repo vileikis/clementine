@@ -124,40 +124,38 @@ export function SharePage({ mainSessionId }: SharePageProps) {
 
   return (
     <ThemeProvider theme={currentTheme}>
-      <div className="h-screen">
-        <ThemedBackground className="h-full w-full">
-          {isJobInProgress && (
-            <ShareLoadingRenderer shareLoading={shareLoading} mode="run" />
-          )}
-          {isJobCompleted && resultMediaUrl && (
-            <ShareReadyRenderer
-              share={shareReady}
-              shareOptions={shareOptions}
-              mode="run"
-              mediaUrl={resultMediaUrl}
-              onShare={handleShare}
-              onCta={handleCta}
-              onStartOver={handleStartOver}
-            />
-          )}
-          {isSessionMissing && (
-            <ThemedErrorState
-              title="Session not found"
-              message="We couldn't find your session. Please try again."
-              actionLabel="Start Over"
-              onAction={handleStartOver}
-            />
-          )}
-          {!isSessionMissing && isJobFailed && (
-            <ThemedErrorState
-              title="Something went wrong"
-              message="We couldn't process your image. Please try again."
-              actionLabel="Start Over"
-              onAction={handleStartOver}
-            />
-          )}
-        </ThemedBackground>
-      </div>
+      <ThemedBackground className="h-dvh">
+        {isJobInProgress && (
+          <ShareLoadingRenderer shareLoading={shareLoading} mode="run" />
+        )}
+        {isJobCompleted && resultMediaUrl && (
+          <ShareReadyRenderer
+            share={shareReady}
+            shareOptions={shareOptions}
+            mode="run"
+            mediaUrl={resultMediaUrl}
+            onShare={handleShare}
+            onCta={handleCta}
+            onStartOver={handleStartOver}
+          />
+        )}
+        {isSessionMissing && (
+          <ThemedErrorState
+            title="Session not found"
+            message="We couldn't find your session. Please try again."
+            actionLabel="Start Over"
+            onAction={handleStartOver}
+          />
+        )}
+        {!isSessionMissing && isJobFailed && (
+          <ThemedErrorState
+            title="Something went wrong"
+            message="We couldn't process your image. Please try again."
+            actionLabel="Start Over"
+            onAction={handleStartOver}
+          />
+        )}
+      </ThemedBackground>
     </ThemeProvider>
   )
 }

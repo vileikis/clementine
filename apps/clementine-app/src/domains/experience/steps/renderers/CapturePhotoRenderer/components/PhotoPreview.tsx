@@ -37,7 +37,7 @@ export function PhotoPreview({
   onConfirm,
 }: PhotoPreviewProps) {
   return (
-    <div className="flex flex-col h-full w-full max-w-md mx-auto">
+    <div className="flex flex-col h-full w-full mx-auto">
       {/* Preview container - matches camera container styling */}
       <div className="flex-1 min-h-0 flex items-center justify-center">
         <div

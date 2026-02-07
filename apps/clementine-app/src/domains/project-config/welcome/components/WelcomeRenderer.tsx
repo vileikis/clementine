@@ -60,7 +60,7 @@ export function WelcomeRenderer({
   const hasExperiences = displayExperiences.length > 0
 
   return (
-    <ScrollableView className="items-center gap-6 px-4 py-16 max-w-md">
+    <ScrollableView className="items-center gap-6 px-4 py-16 max-w-2xl">
       {/* Hero media */}
       {welcome.media?.url && (
         <div className="w-full">

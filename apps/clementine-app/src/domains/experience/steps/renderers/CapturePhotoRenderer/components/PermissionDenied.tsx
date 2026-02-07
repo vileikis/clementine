@@ -23,7 +23,7 @@ export function PermissionDenied({
   const { theme } = useEventTheme()
 
   return (
-    <div className="flex flex-col items-center gap-6 w-full max-w-md px-4 py-8">
+    <div className="flex flex-col items-center gap-6 w-full px-4 py-8">
       {/* Camera off icon */}
       <div
         className="p-6 rounded-full"

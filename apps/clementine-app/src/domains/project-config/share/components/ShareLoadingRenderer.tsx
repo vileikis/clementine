@@ -29,7 +29,7 @@ export function ShareLoadingRenderer({
   mode: _mode = 'edit',
 }: ShareLoadingRendererProps) {
   return (
-    <ScrollableView className="items-center gap-6 p-8 max-w-md">
+    <ScrollableView className="items-center gap-6 p-8 max-w-2xl">
       {/* Image skeleton */}
       <Skeleton className="w-full aspect-square rounded-lg" />
 
