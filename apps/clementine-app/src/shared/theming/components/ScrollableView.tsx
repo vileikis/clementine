@@ -5,13 +5,13 @@ interface ScrollableViewProps {
   children: ReactNode
   /**
    * Classes for the inner content wrapper.
-   * Use for positioning (items-center, justify-center),
-   * spacing (gap-6), and padding (p-8).
+   * Use for positioning (items-center), spacing (gap-6), padding (p-8),
+   * and max-width (max-w-md).
    *
-   * Base classes (min-h-full flex flex-col) are always applied.
+   * Base classes (w-full my-auto flex flex-col) are always applied.
+   * Use my-auto for vertical centering when content is short.
    *
-   * @example className="items-center justify-center gap-6 p-8" // centered
-   * @example className="items-center justify-start gap-4 p-4" // top-aligned
+   * @example className="items-center gap-6 p-8 max-w-md" // centered content
    */
   className?: string
 }
@@ -20,31 +20,21 @@ interface ScrollableViewProps {
  * Scrollable container with flexible content positioning.
  *
  * Fills available space and enables vertical scrolling when content overflows.
- * Inner wrapper uses min-h-full to support vertical centering when content is short.
+ * Inner wrapper uses my-auto for vertical centering when content is short.
  *
  * @example
  * ```tsx
- * // Centered content (welcome screens)
- * <ScrollableView className="items-center justify-center gap-6 p-8">
+ * // Centered content (welcome, share screens)
+ * <ScrollableView className="items-center gap-6 p-8 max-w-md">
  *   <Content />
- * </ScrollableView>
- *
- * // Top-aligned content (step renderers)
- * <ScrollableView className="items-center justify-start gap-4 p-4">
- *   <StepContent />
  * </ScrollableView>
  * ```
  */
 export function ScrollableView({ children, className }: ScrollableViewProps) {
   return (
-    // Outer: takes space in flex parent, provides positioning context
-    <div className="relative flex-1">
-      {/* Scroll container: absolute bounds ensure fixed height for scrolling */}
-      <div className="absolute inset-0 overflow-y-auto">
-        {/* Content: min-h-full for centering, grows when content is tall */}
-        <div className={cn('min-h-full flex flex-col', className)}>
-          {children}
-        </div>
+    <div className="flex-1 min-h-0 overflow-y-auto flex flex-col items-center">
+      <div className={cn('w-full my-auto flex flex-col', className)}>
+        {children}
       </div>
     </div>
   )

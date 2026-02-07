@@ -5,10 +5,6 @@
  * Note: Components are lazy-loaded via step registry.
  */
 
-// Shared layout
-export { StepLayout } from './StepLayout'
-export type { StepLayoutProps } from './StepLayout'
-
 // Step renderers
 export { InfoStepRenderer } from './InfoStepRenderer'
 export { InputScaleRenderer } from './InputScaleRenderer'
