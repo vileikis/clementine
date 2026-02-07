@@ -52,13 +52,17 @@ interface JobHandlerContext {
 export const transformPipelineJob = onTaskDispatched(
   {
     region: 'europe-west1',
-    memory: '512MiB', // FFmpeg overlay with scale2ref requires more memory
-    timeoutSeconds: 600, // 10 minutes
+    memory: '512MiB',
+    cpu: 1,
+    timeoutSeconds: 300, // 5 minutes
+    minInstances: 1, // Keep one warm instance to reduce cold starts
+    maxInstances: 20, // Control max scaling
+    concurrency: 1, // One job per instance (FFmpeg is resource-intensive)
     retryConfig: {
-      maxAttempts: 0, // No retries
+      maxAttempts: 0, // No retries - job recovery handles this
     },
     rateLimits: {
-      maxConcurrentDispatches: 10,
+      maxConcurrentDispatches: 20, // Match maxInstances for full parallelism
     },
   },
   async (req) => {
