@@ -52,7 +52,7 @@ interface JobHandlerContext {
 export const transformPipelineJob = onTaskDispatched(
   {
     region: 'europe-west1',
-    // memory: '512MiB', // FFmpeg overlay with scale2ref requires more memory
+    memory: '512MiB', // FFmpeg overlay with scale2ref requires more memory
     timeoutSeconds: 600, // 10 minutes
     retryConfig: {
       maxAttempts: 0, // No retries

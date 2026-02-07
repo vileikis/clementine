@@ -1,3 +1,10 @@
+/**
+ * Overlay Application
+ *
+ * Applies overlay images to media files (images, GIFs, videos).
+ * Uses ffprobe to get source dimensions, then scales overlay to match.
+ * This approach is more memory-efficient than using -loop with scale2ref.
+ */
 import * as fs from 'fs/promises'
 import { logger } from 'firebase-functions/v2'
 import {
@@ -6,12 +13,13 @@ import {
   runFFmpegCommand,
   validateInputFile,
 } from './core'
+import { getMediaDimensions } from './probe'
 
 /**
  * Apply overlay image on top of media (image/GIF/video)
  *
- * FFmpeg automatically applies overlay to all frames for animated formats (GIF/video).
- * Overlay is scaled to match source dimensions using scale2ref, then composited at (0,0).
+ * For images: Scales overlay to source dimensions, composites once
+ * For GIFs/videos: Scales overlay to source dimensions, composites on all frames
  *
  * @param inputPath - Path to base media (image.jpg, output.gif, or video.mp4)
  * @param overlayPath - Path to overlay PNG (already downloaded)
@@ -25,35 +33,24 @@ export async function applyOverlayToMedia(
   await validateInputFile(inputPath)
   await validateInputFile(overlayPath)
 
-  const filterComplex =
-    '[1:v][0:v]scale2ref[scaled][source];[source][scaled]overlay=0:0:format=auto'
+  // Get source dimensions for overlay scaling
+  const dimensions = await getMediaDimensions(inputPath)
+  logger.info('[FFmpeg Overlay] Source dimensions', {
+    width: dimensions.width,
+    height: dimensions.height,
+  })
 
-  // Check if input is a single-frame image (not GIF or video)
-  const isStaticImage = /\.(jpe?g|png|webp)$/i.test(inputPath)
+  // Scale overlay to exact source dimensions, then composite
+  // This avoids memory-hungry scale2ref and -loop tricks
+  const filterComplex = `[1:v]scale=${dimensions.width}:${dimensions.height}[ov];[0:v][ov]overlay=0:0:format=auto`
 
-  // FFmpeg 7.x requires input looping for single-frame filter graphs
-  // For GIFs/videos, we don't need looping - they already have multiple frames
-  const args = isStaticImage
-    ? [
-        '-loop', '1',
-        '-t', '0.1',  // Limit to 0.1s to prevent memory bloat
-        '-i', inputPath,
-        '-loop', '1',
-        '-t', '0.1',
-        '-i', overlayPath,
-        '-filter_complex', filterComplex,
-        '-frames:v', '1',
-        '-y',
-        outputPath,
-      ]
-    : [
-        '-i', inputPath,
-        '-loop', '1',  // Overlay is still a static image, needs looping for GIF/video
-        '-i', overlayPath,
-        '-filter_complex', filterComplex,
-        '-y',
-        outputPath,
-      ]
+  const args = [
+    '-i', inputPath,
+    '-i', overlayPath,
+    '-filter_complex', filterComplex,
+    '-y',
+    outputPath,
+  ]
 
   try {
     await runFFmpegCommand(args, {
