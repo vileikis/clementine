@@ -52,6 +52,7 @@ interface JobHandlerContext {
 export const transformPipelineJob = onTaskDispatched(
   {
     region: 'europe-west1',
+    // memory: '512MiB', // FFmpeg overlay with scale2ref requires more memory
     timeoutSeconds: 600, // 10 minutes
     retryConfig: {
       maxAttempts: 0, // No retries
@@ -123,12 +124,21 @@ async function prepareJobExecution(data: unknown): Promise<JobHandlerContext> {
   }
 
   // Validate job status
-  if (job.status !== 'pending') {
-    logger.warn('[TransformJob] Unexpected job status', {
+  if (job.status === 'completed' || job.status === 'failed') {
+    // Job already finished, skip silently (could be duplicate task delivery)
+    logger.info('[TransformJob] Job already finished, skipping', {
       jobId,
       status: job.status,
     })
-    throw new Error(`Job ${jobId} has unexpected status: ${job.status}`)
+    throw new Error(`Job ${jobId} already ${job.status}, skipping`)
+  }
+
+  if (job.status === 'running') {
+    // Previous instance crashed - allow recovery
+    logger.warn('[TransformJob] Recovering crashed job', {
+      jobId,
+      status: job.status,
+    })
   }
 
   // Create temp directory
