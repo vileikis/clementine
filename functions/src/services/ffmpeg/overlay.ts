@@ -25,26 +25,35 @@ export async function applyOverlayToMedia(
   await validateInputFile(inputPath)
   await validateInputFile(overlayPath)
 
-  // FFmpeg 7.x requires input looping for single-frame filter graphs
   const filterComplex =
     '[1:v][0:v]scale2ref[scaled][source];[source][scaled]overlay=0:0:format=auto'
 
-  const args = [
-    '-loop',
-    '1',
-    '-i',
-    inputPath, // Loop input to create continuous frame stream
-    '-loop',
-    '1',
-    '-i',
-    overlayPath, // Loop overlay to create continuous frame stream
-    '-filter_complex',
-    filterComplex,
-    '-frames:v',
-    '1', // Output single frame
-    '-y', // Overwrite output file
-    outputPath,
-  ]
+  // Check if input is a single-frame image (not GIF or video)
+  const isStaticImage = /\.(jpe?g|png|webp)$/i.test(inputPath)
+
+  // FFmpeg 7.x requires input looping for single-frame filter graphs
+  // For GIFs/videos, we don't need looping - they already have multiple frames
+  const args = isStaticImage
+    ? [
+        '-loop', '1',
+        '-t', '0.1',  // Limit to 0.1s to prevent memory bloat
+        '-i', inputPath,
+        '-loop', '1',
+        '-t', '0.1',
+        '-i', overlayPath,
+        '-filter_complex', filterComplex,
+        '-frames:v', '1',
+        '-y',
+        outputPath,
+      ]
+    : [
+        '-i', inputPath,
+        '-loop', '1',  // Overlay is still a static image, needs looping for GIF/video
+        '-i', overlayPath,
+        '-filter_complex', filterComplex,
+        '-y',
+        outputPath,
+      ]
 
   try {
     await runFFmpegCommand(args, {
