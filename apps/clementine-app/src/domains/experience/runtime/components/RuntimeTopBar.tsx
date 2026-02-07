@@ -175,7 +175,7 @@ export function RuntimeTopBar({
           </div>
 
           {/* Right: Spacer to balance layout */}
-          <div className="w-10 shrink-0" />
+          <div className="w-11 shrink-0" />
         </div>
       </div>
 

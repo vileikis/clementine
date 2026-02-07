@@ -5,7 +5,10 @@
  * Allows setting the aspect ratio for photo capture.
  */
 import type { StepConfigPanelProps } from '../registry/step-registry'
-import type { AspectRatio, ExperienceCapturePhotoStepConfig } from '@clementine/shared'
+import type {
+  AspectRatio,
+  ExperienceCapturePhotoStepConfig,
+} from '@clementine/shared'
 import { EditorSection } from '@/shared/editor-controls'
 import { ASPECT_RATIOS } from '@/domains/experience/create/lib/model-options'
 import {

@@ -264,7 +264,6 @@ describe('ThemedBackground', () => {
       expect(outerDiv.style.padding).toBe('20px')
       expect(outerDiv.style.margin).toBe('10px')
     })
-
   })
 
   // Default styles tests
