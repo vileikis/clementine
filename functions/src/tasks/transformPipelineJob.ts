@@ -55,7 +55,7 @@ export const transformPipelineJob = onTaskDispatched(
     memory: '512MiB',
     cpu: 1,
     timeoutSeconds: 300, // 5 minutes
-    minInstances: 1, // Keep one warm instance to reduce cold starts
+    minInstances: 0, // Keep one warm instance to reduce cold starts
     maxInstances: 20, // Control max scaling
     concurrency: 1, // One job per instance (FFmpeg is resource-intensive)
     retryConfig: {
