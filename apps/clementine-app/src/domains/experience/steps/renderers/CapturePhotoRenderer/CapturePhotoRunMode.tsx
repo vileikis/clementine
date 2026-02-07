@@ -22,7 +22,6 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { ChevronLeft } from 'lucide-react'
 import { useRuntime } from '../../../runtime/hooks/useRuntime'
 import { uploadPhoto } from './lib/uploadPhoto'
 import {
@@ -47,7 +46,6 @@ import {
   useLibraryPicker,
   usePhotoCapture,
 } from '@/shared/camera'
-import { Button } from '@/ui-kit/ui/button'
 
 interface CapturePhotoRunModeProps {
   step: StepRendererProps['step']
@@ -64,8 +62,6 @@ export function CapturePhotoRunMode({
     projectId,
     setStepResponse,
     next: nextStep,
-    back: previousStep,
-    canGoBack,
   } = useRuntime()
 
   // Camera refs and hooks
@@ -198,20 +194,6 @@ export function CapturePhotoRunMode({
   const errorMessage =
     uploadError || error?.message || 'Failed to capture photo'
 
-  // Back button component - shown when canGoBack is true
-  const BackButton = canGoBack ? (
-    <div className="absolute top-4 left-4 z-10">
-      <Button
-        variant="outline"
-        size="icon"
-        onClick={previousStep}
-        aria-label="Go back"
-      >
-        <ChevronLeft className="h-5 w-5" />
-      </Button>
-    </div>
-  ) : null
-
   // Uploading state - check first as it takes priority over all other states
   if (isUploading) {
     return (
@@ -240,7 +222,6 @@ export function CapturePhotoRunMode({
   if (permStatus === 'unknown') {
     return (
       <div className="relative flex h-full w-full flex-col items-center justify-center">
-        {BackButton}
         <PermissionLoading />
       </div>
     )
@@ -250,7 +231,6 @@ export function CapturePhotoRunMode({
   if (permStatus === 'undetermined') {
     return (
       <div className="relative flex h-full w-full flex-col items-center justify-center">
-        {BackButton}
         <PermissionPrompt onRequestPermission={requestPermission} />
       </div>
     )
@@ -260,7 +240,6 @@ export function CapturePhotoRunMode({
   if (permStatus === 'denied') {
     return (
       <div className="relative flex h-full w-full flex-col items-center justify-center">
-        {BackButton}
         <PermissionDenied
           fileInputRef={fileInputRef}
           onOpenPicker={openPicker}
@@ -274,7 +253,6 @@ export function CapturePhotoRunMode({
   if (permStatus === 'unavailable') {
     return (
       <div className="relative flex h-full w-full flex-col items-center justify-center">
-        {BackButton}
         <PermissionUnavailable
           fileInputRef={fileInputRef}
           onOpenPicker={openPicker}
@@ -290,7 +268,6 @@ export function CapturePhotoRunMode({
   if (captureStatus === 'error' || uploadError) {
     return (
       <div className="relative flex h-full w-full flex-col items-center justify-center">
-        {BackButton}
         <CaptureError
           errorMessage={errorMessage}
           fileInputRef={fileInputRef}
@@ -305,7 +282,6 @@ export function CapturePhotoRunMode({
   // Camera active state (default)
   return (
     <div className="relative flex h-full w-full flex-col items-center justify-center">
-      {BackButton}
       <CameraActive
         cameraRef={cameraRef}
         aspectRatio={aspectRatio}

@@ -273,6 +273,8 @@ export function ExperienceRuntime({
           currentStepIndex={store.currentStepIndex}
           totalSteps={steps.length}
           onHomeClick={onHomeClick}
+          onBack={steps.length > 1 ? store.previousStep : undefined}
+          canGoBack={steps.length > 1 && store.canGoBack()}
         />
       )}
       <ScrollableView
@@ -289,8 +291,6 @@ export function ExperienceRuntime({
       {!hideNavigation && (
         <RuntimeNavigation
           onNext={store.nextStep}
-          onBack={store.previousStep}
-          canGoBack={store.canGoBack()}
           canProceed={store.canProceed()}
         />
       )}

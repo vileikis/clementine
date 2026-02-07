@@ -25,7 +25,7 @@
  */
 
 import { useState } from 'react'
-import { Home } from 'lucide-react'
+import { ArrowLeft, Home } from 'lucide-react'
 import {
   ThemedIconButton,
   ThemedProgressBar,
@@ -71,6 +71,12 @@ export interface RuntimeTopBarProps {
    */
   onHomeClick?: () => void
 
+  /** Handler for back navigation */
+  onBack?: () => void
+
+  /** Whether back navigation is available */
+  canGoBack?: boolean
+
   /**
    * Additional CSS classes for topbar container
    */
@@ -97,6 +103,8 @@ export function RuntimeTopBar({
   currentStepIndex,
   totalSteps,
   onHomeClick,
+  onBack,
+  canGoBack = false,
   className,
 }: RuntimeTopBarProps) {
   const [showDialog, setShowDialog] = useState(false)
@@ -141,17 +149,21 @@ export function RuntimeTopBar({
 
         {/* Inner container with max width */}
         <div className="relative w-full max-w-md flex items-center gap-4">
-          {/* Left: Home button */}
-          <ThemedIconButton
-            size="md"
-            variant="outline"
-            onClick={handleHomeButtonClick}
-            disabled={!onHomeClick}
-            aria-label="Return to home"
-            className="shrink-0"
-          >
-            <Home className="h-5 w-5" />
-          </ThemedIconButton>
+          {/* Left: Back button (hidden for single-step experiences) */}
+          {onBack ? (
+            <ThemedIconButton
+              size="md"
+              variant="outline"
+              onClick={onBack}
+              disabled={!canGoBack}
+              aria-label="Go back"
+              className="shrink-0"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </ThemedIconButton>
+          ) : (
+            <div className="w-11 shrink-0" />
+          )}
 
           {/* Center: Title and progress bar */}
           <div className="flex-1 flex flex-col items-center gap-2 min-w-0">
@@ -174,8 +186,17 @@ export function RuntimeTopBar({
             )}
           </div>
 
-          {/* Right: Spacer to balance layout */}
-          <div className="w-11 shrink-0" />
+          {/* Right: Home button */}
+          <ThemedIconButton
+            size="md"
+            variant="outline"
+            onClick={handleHomeButtonClick}
+            disabled={!onHomeClick}
+            aria-label="Return to home"
+            className="shrink-0"
+          >
+            <Home className="h-5 w-5" />
+          </ThemedIconButton>
         </div>
       </div>
 
