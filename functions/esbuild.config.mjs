@@ -23,6 +23,7 @@ await build({
     'firebase-functions/*',
     '@google/genai',
     'ffmpeg-static',
+    'ffprobe-static',
     'tmp',
     'zod',
   ],
