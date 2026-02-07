@@ -60,8 +60,8 @@ export function WelcomeRenderer({
   const hasExperiences = displayExperiences.length > 0
 
   return (
-    <div className="flex-1 min-h-0 overflow-y-auto flex flex-col p-8">
-      <div className="w-full max-w-md mx-auto my-auto flex flex-col items-center gap-6">
+    <div className="flex-1 min-h-0 overflow-y-auto flex flex-col items-center">
+      <div className="w-full max-w-md my-auto flex flex-col gap-6 p-8">
         {/* Hero media */}
         {welcome.media?.url && (
           <div className="w-full">
@@ -80,7 +80,10 @@ export function WelcomeRenderer({
 
         {/* Description */}
         {welcome.description && (
-          <ThemedText variant="body" className="text-center opacity-90 whitespace-pre-line">
+          <ThemedText
+            variant="body"
+            className="text-center opacity-90 whitespace-pre-line"
+          >
             {welcome.description}
           </ThemedText>
         )}

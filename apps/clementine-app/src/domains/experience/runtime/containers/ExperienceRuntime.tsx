@@ -275,11 +275,11 @@ export function ExperienceRuntime({
         />
       )}
       {/* Scroll container */}
-      <div className="flex-1 min-h-0 overflow-y-auto flex flex-col">
+      <div className="flex-1 min-h-0 overflow-y-auto flex flex-col items-center">
         {/* Content wrapper - centered with padding for fixed bars */}
         <div
           className={cn(
-            'w-full max-w-md mx-auto my-auto flex flex-col items-center',
+            'w-full max-w-md my-auto flex flex-col',
             // Padding for fixed top bar
             'pt-28',
             // Padding for fixed bottom navigation (mobile only)

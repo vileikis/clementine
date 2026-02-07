@@ -10,11 +10,7 @@ import { StepRendererRouter } from '../../steps'
 import type { Step } from '../../steps/registry/step-registry'
 import type { Theme } from '@/shared/theming'
 import { PreviewShell } from '@/shared/preview-shell'
-import {
-  ThemeProvider,
-  ThemedBackground,
-  themeSchema,
-} from '@/shared/theming'
+import { ThemeProvider, ThemedBackground, themeSchema } from '@/shared/theming'
 
 /** Default theme for step preview (using schema defaults) */
 const DEFAULT_PREVIEW_THEME: Theme = themeSchema.parse({})
@@ -50,8 +46,8 @@ export function StepPreview({ step, theme }: StepPreviewProps) {
       <PreviewShell enableViewportSwitcher enableFullscreen>
         <ThemeProvider theme={previewTheme}>
           <ThemedBackground className="h-full">
-            <div className="flex-1 min-h-0 overflow-y-auto flex flex-col p-8">
-              <div className="w-full max-w-md mx-auto my-auto flex flex-col items-center gap-6">
+            <div className="flex-1 min-h-0 overflow-y-auto flex flex-col items-center">
+              <div className="w-full max-w-md my-auto flex flex-col gap-6 p-8">
                 {step ? (
                   <StepRendererRouter step={step} mode="edit" />
                 ) : (

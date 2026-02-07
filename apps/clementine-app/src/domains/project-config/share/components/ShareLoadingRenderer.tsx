@@ -29,8 +29,8 @@ export function ShareLoadingRenderer({
   mode: _mode = 'edit',
 }: ShareLoadingRendererProps) {
   return (
-    <div className="flex-1 min-h-0 overflow-y-auto flex flex-col p-8">
-      <div className="w-full max-w-md mx-auto my-auto flex flex-col items-center gap-6">
+    <div className="flex-1 min-h-0 overflow-y-auto flex flex-col items-center">
+      <div className="w-full max-w-md my-auto flex flex-col gap-6 p-8">
         {/* Image skeleton */}
         <Skeleton className="w-full aspect-square rounded-lg" />
 

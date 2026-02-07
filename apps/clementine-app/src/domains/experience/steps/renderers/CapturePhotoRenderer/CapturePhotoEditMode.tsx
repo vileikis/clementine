@@ -29,7 +29,6 @@ export function CapturePhotoEditMode({
   const { theme } = useEventTheme()
 
   return (
-    // <StepLayout hideButton>
     <div className="flex flex-col items-center gap-6 w-full max-w-md">
       {/* Camera placeholder with aspect ratio */}
       <div
@@ -53,6 +52,5 @@ export function CapturePhotoEditMode({
         Aspect ratio: {aspectRatio}
       </ThemedText>
     </div>
-    // </StepLayout>
   )
 }
