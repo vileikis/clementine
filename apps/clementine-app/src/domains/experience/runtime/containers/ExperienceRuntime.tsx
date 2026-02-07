@@ -287,13 +287,13 @@ export function ExperienceRuntime({
         )}
       >
         {children}
+        {!hideNavigation && (
+          <RuntimeNavigation
+            onNext={store.nextStep}
+            canProceed={store.canProceed()}
+          />
+        )}
       </ScrollableView>
-      {!hideNavigation && (
-        <RuntimeNavigation
-          onNext={store.nextStep}
-          canProceed={store.canProceed()}
-        />
-      )}
     </>
   )
 }
