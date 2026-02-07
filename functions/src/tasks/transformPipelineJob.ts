@@ -9,7 +9,10 @@
 import { onTaskDispatched } from 'firebase-functions/v2/tasks'
 import { logger } from 'firebase-functions/v2'
 import { transformPipelineJobPayloadSchema } from '../schemas/transform-pipeline.schema'
-import { updateSessionJobStatus, updateSessionResultMedia } from '../repositories/session'
+import {
+  updateSessionJobStatus,
+  updateSessionResultMedia,
+} from '../repositories/session'
 import {
   fetchJob,
   updateJobStarted,
@@ -102,7 +105,9 @@ async function prepareJobExecution(data: unknown): Promise<JobHandlerContext> {
   // Validate payload
   const parseResult = transformPipelineJobPayloadSchema.safeParse(data)
   if (!parseResult.success) {
-    logger.error('[TransformJob] Invalid payload', { issues: parseResult.error.issues })
+    logger.error('[TransformJob] Invalid payload', {
+      issues: parseResult.error.issues,
+    })
     throw new Error('Invalid task payload')
   }
 
@@ -119,7 +124,10 @@ async function prepareJobExecution(data: unknown): Promise<JobHandlerContext> {
 
   // Validate job status
   if (job.status !== 'pending') {
-    logger.warn('[TransformJob] Unexpected job status', { jobId, status: job.status })
+    logger.warn('[TransformJob] Unexpected job status', {
+      jobId,
+      status: job.status,
+    })
     throw new Error(`Job ${jobId} has unexpected status: ${job.status}`)
   }
 

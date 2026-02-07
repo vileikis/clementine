@@ -22,7 +22,7 @@ export async function applyOverlayToMedia(
   const args = [
     '-i', inputPath,
     '-i', overlayPath,
-    '-filter_complex', '[0:v][1:v]scale2ref[source][scaled];[source][scaled]overlay=0:0:format=auto',
+    '-filter_complex', '[1:v][0:v]scale2ref[scaled][source];[source][scaled]overlay=0:0:format=auto',
     '-y', // Overwrite output file
     outputPath
   ];
