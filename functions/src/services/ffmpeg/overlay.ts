@@ -5,7 +5,7 @@ import { FFmpegError, TIMEOUTS, runFFmpegCommand, validateInputFile } from './co
  * Apply overlay image on top of media (image/GIF/video)
  *
  * FFmpeg automatically applies overlay to all frames for animated formats (GIF/video).
- * No scaling or positioning - overlay is composited at (0,0) covering the full frame.
+ * Overlay is scaled to match source dimensions using scale2ref, then composited at (0,0).
  *
  * @param inputPath - Path to base media (image.jpg, output.gif, or video.mp4)
  * @param overlayPath - Path to overlay PNG (already downloaded)
@@ -22,7 +22,7 @@ export async function applyOverlayToMedia(
   const args = [
     '-i', inputPath,
     '-i', overlayPath,
-    '-filter_complex', '[0:v][1:v]overlay=0:0:format=auto',
+    '-filter_complex', '[0:v][1:v]scale2ref[source][scaled];[source][scaled]overlay=0:0:format=auto',
     '-y', // Overwrite output file
     outputPath
   ];
