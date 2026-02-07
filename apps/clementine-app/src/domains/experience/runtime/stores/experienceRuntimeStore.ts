@@ -267,14 +267,15 @@ export const useExperienceRuntimeStore = create<ExperienceRuntimeStore>(
       const state = get()
       const { currentStepIndex, steps } = state
 
-      // Check if at end
-      if (currentStepIndex >= steps.length - 1) {
-        return false
-      }
-
       // Check if can proceed
       if (!get().canProceed()) {
         return false
+      }
+
+      // If at end, trigger completion instead of advancing
+      if (currentStepIndex >= steps.length - 1) {
+        get().complete()
+        return true
       }
 
       set({ currentStepIndex: currentStepIndex + 1 })

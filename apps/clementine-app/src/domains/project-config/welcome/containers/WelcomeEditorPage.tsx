@@ -21,7 +21,7 @@ import { useProject } from '@/domains/project/shared'
 import { useWorkspace } from '@/domains/workspace'
 import { useAuth } from '@/domains/auth'
 import { DEFAULT_THEME } from '@/domains/project-config/theme/constants'
-import { ThemeProvider } from '@/shared/theming'
+import { ThemeProvider, ThemedBackground } from '@/shared/theming'
 import {
   useExperiencesForSlot,
   useUpdateProjectExperiences,
@@ -208,12 +208,14 @@ export function WelcomeEditorPage() {
       <div className="flex-1 min-w-0">
         <PreviewShell enableViewportSwitcher enableFullscreen>
           <ThemeProvider theme={currentTheme}>
-            <WelcomeRenderer
-              welcome={previewWelcome}
-              mainExperiences={mainExperiences}
-              experienceDetails={mainExperienceDetails}
-              mode="edit"
-            />
+            <ThemedBackground className="h-full">
+              <WelcomeRenderer
+                welcome={previewWelcome}
+                mainExperiences={mainExperiences}
+                experienceDetails={mainExperienceDetails}
+                mode="edit"
+              />
+            </ThemedBackground>
           </ThemeProvider>
         </PreviewShell>
       </div>

@@ -6,8 +6,10 @@
  *
  * Handles:
  * - Displaying current step via StepRendererRouter
- * - Answer management
+ * - Response management
  * - Completion state display
+ *
+ * Note: Navigation (back/next buttons) is handled by ExperienceRuntime.
  */
 import { useCallback } from 'react'
 
@@ -19,21 +21,10 @@ import type { SessionResponseData } from '@clementine/shared'
  * PreviewRuntimeContent Component
  *
  * Renders the current step or completion state.
- * Uses runtime hook for navigation and answer management.
+ * Uses runtime hook for response management.
  */
 export function PreviewRuntimeContent() {
-  const runtime = useRuntime()
-
-  const {
-    currentStep,
-    canProceed,
-    canGoBack,
-    next,
-    back,
-    setStepResponse,
-    getResponse,
-    isComplete,
-  } = runtime
+  const { currentStep, setStepResponse, getResponse, isComplete } = useRuntime()
 
   // Handle response change - writes to unified responses
   const handleResponseChange = useCallback(
@@ -82,17 +73,13 @@ export function PreviewRuntimeContent() {
     )
   }
 
-  // Render current step
+  // Render current step (navigation handled by ExperienceRuntime)
   return (
     <StepRendererRouter
       step={currentStep}
       mode="run"
       response={getResponse(currentStep.id)}
       onResponseChange={handleResponseChange}
-      onSubmit={next}
-      onBack={back}
-      canGoBack={canGoBack}
-      canProceed={canProceed}
     />
   )
 }

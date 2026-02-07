@@ -12,41 +12,26 @@ interface ThemedBackgroundProps {
   className?: string
   /** Additional inline styles for the outer container */
   style?: CSSProperties
-  /**
-   * Additional classes for the content container.
-   * Default provides max-width constraint (max-w-3xl).
-   * Use to override width, add padding, flex layout, etc.
-   * @example contentClassName="max-w-xl p-8" // narrower with padding
-   * @example contentClassName="max-w-none" // full width
-   */
-  contentClassName?: string
 }
 
 /**
- * Renders a full-height container with themed background and centered content.
+ * Renders a themed background container with color, optional image, and overlay.
  *
  * Must be used within a ThemeProvider. Gets theme from context, with optional
- * background prop override (similar to ThemedText's align prop pattern).
+ * background prop override.
  *
- * Structure:
- * - Outer container: fills available space, handles background color/image/overlay
- * - Position wrapper: centers content vertically and horizontally, handles overflow
- * - Content container: max-width constraint, receives contentClassName
+ * Provides only the background - consumers handle their own layout and scrolling.
+ * Children render directly above the background layers.
  *
  * @example
  * ```tsx
  * // Standard usage - uses theme.background from context
- * <ThemedBackground>
- *   <PageContent />
+ * <ThemedBackground className="h-dvh">
+ *   <MyRenderer />
  * </ThemedBackground>
  *
- * // Override background (uses prop instead of theme.background)
+ * // Override background
  * <ThemedBackground background={customBackground}>
- *   <PageContent />
- * </ThemedBackground>
- *
- * // Custom content layout with padding and flex
- * <ThemedBackground contentClassName="flex flex-col gap-8 p-8">
  *   <Content />
  * </ThemedBackground>
  * ```
@@ -56,7 +41,6 @@ export function ThemedBackground({
   background: backgroundOverride,
   className,
   style,
-  contentClassName,
 }: ThemedBackgroundProps) {
   const { theme } = useEventTheme()
 
@@ -69,35 +53,32 @@ export function ThemedBackground({
 
   return (
     <div
-      className={cn('relative flex flex-1 flex-col overflow-hidden', className)}
+      className={cn('relative flex flex-1 flex-col min-h-0', className)}
       style={{
         backgroundColor: bgColor,
         fontFamily: theme.fontFamily ?? undefined,
         ...style,
       }}
     >
-      {/* Background Image */}
+      {/* Background Image - fixed to viewport */}
       {bgImage && (
         <div
-          className="absolute inset-0 bg-cover bg-center"
+          className="fixed inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${bgImage})` }}
         />
       )}
 
-      {/* Overlay for readability when image is present */}
+      {/* Overlay for readability when image is present - fixed to viewport */}
       {bgImage && overlayOpacity > 0 && (
         <div
-          className="absolute inset-0 bg-black pointer-events-none"
+          className="fixed inset-0 bg-black pointer-events-none"
           style={{ opacity: overlayOpacity }}
         />
       )}
 
-      {/* Position wrapper: centers content, handles overflow */}
-      <div className="relative z-10 flex flex-1 flex-col items-center overflow-auto px-4 py-8">
-        {/* Content container: max-width + contentClassName */}
-        <div className={cn('w-full max-w-3xl my-auto', contentClassName)}>
-          {children}
-        </div>
+      {/* Content wrapper - ensures stacking above background layers */}
+      <div className="relative z-10 flex flex-1 flex-col min-h-0">
+        {children}
       </div>
     </div>
   )

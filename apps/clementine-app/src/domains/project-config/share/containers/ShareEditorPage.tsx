@@ -128,10 +128,7 @@ export function ShareEditorPage() {
           }
         >
           <ThemeProvider theme={currentTheme}>
-            <ThemedBackground
-              className="h-full w-full"
-              contentClassName="h-full w-full"
-            >
+            <ThemedBackground className="h-full w-full">
               {previewState === 'loading' ? (
                 <ShareLoadingRenderer shareLoading={previewShareLoading} />
               ) : (

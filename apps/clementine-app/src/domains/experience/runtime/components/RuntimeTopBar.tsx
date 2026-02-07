@@ -121,15 +121,27 @@ export function RuntimeTopBar({
     <>
       <div
         className={cn(
-          'w-full z-50',
-          'flex flex-col',
-          'px-4 pt-4 pb-3',
+          // Fixed positioning
+          'fixed top-0 left-0 right-0 z-50',
+          'flex justify-center',
+          'px-4 pt-3 pb-8',
           className,
         )}
       >
-        {/* Top row: Home button and experience name */}
-        <div className="relative flex items-center justify-between mb-3">
-          {/* Home button */}
+        {/* Blurred background with gradient fade */}
+        <div
+          className="absolute inset-0 backdrop-blur-md bg-black/10"
+          style={{
+            maskImage:
+              'linear-gradient(to bottom, black 60%, transparent 100%)',
+            WebkitMaskImage:
+              'linear-gradient(to bottom, black 60%, transparent 100%)',
+          }}
+        />
+
+        {/* Inner container with max width */}
+        <div className="relative w-full max-w-md flex items-center gap-4">
+          {/* Left: Home button */}
           <ThemedIconButton
             size="md"
             variant="outline"
@@ -141,29 +153,30 @@ export function RuntimeTopBar({
             <Home className="h-5 w-5" />
           </ThemedIconButton>
 
-          {/* Experience name (centered) */}
-          <ThemedText
-            variant="heading"
-            as="h3"
-            className="absolute left-1/2 -translate-x-1/2 max-w-[200px] truncate text-xl"
-          >
-            {experienceName || 'Experience'}
-          </ThemedText>
+          {/* Center: Title and progress bar */}
+          <div className="flex-1 flex flex-col items-center gap-2 min-w-0">
+            <ThemedText
+              variant="heading"
+              as="h3"
+              className="max-w-[200px] truncate text-xl"
+            >
+              {experienceName || 'Experience'}
+            </ThemedText>
 
-          {/* Spacer to balance layout */}
-          <div className="w-10" />
+            {totalSteps > 1 && (
+              <ThemedProgressBar
+                className="w-full max-w-[200px]"
+                value={progress}
+                getValueLabel={(value) =>
+                  `Step ${currentStepIndex + 1} of ${totalSteps} (${Math.round(value)}% complete)`
+                }
+              />
+            )}
+          </div>
+
+          {/* Right: Spacer to balance layout */}
+          <div className="w-11 shrink-0" />
         </div>
-
-        {/* Progress bar */}
-        {totalSteps > 1 && (
-          <ThemedProgressBar
-            className="w-1/2 self-center"
-            value={progress}
-            getValueLabel={(value) =>
-              `Step ${currentStepIndex + 1} of ${totalSteps} (${Math.round(value)}% complete)`
-            }
-          />
-        )}
       </div>
 
       {/* Exit confirmation dialog */}

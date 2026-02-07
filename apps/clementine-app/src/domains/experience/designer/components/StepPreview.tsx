@@ -10,7 +10,12 @@ import { StepRendererRouter } from '../../steps'
 import type { Step } from '../../steps/registry/step-registry'
 import type { Theme } from '@/shared/theming'
 import { PreviewShell } from '@/shared/preview-shell'
-import { ThemeProvider, themeSchema } from '@/shared/theming'
+import {
+  ScrollableView,
+  ThemeProvider,
+  ThemedBackground,
+  themeSchema,
+} from '@/shared/theming'
 
 /** Default theme for step preview (using schema defaults) */
 const DEFAULT_PREVIEW_THEME: Theme = themeSchema.parse({})
@@ -45,11 +50,15 @@ export function StepPreview({ step, theme }: StepPreviewProps) {
     <div className="flex h-full flex-col bg-muted/30">
       <PreviewShell enableViewportSwitcher enableFullscreen>
         <ThemeProvider theme={previewTheme}>
-          {step ? (
-            <StepRendererRouter step={step} mode="edit" />
-          ) : (
-            <NoStepSelected />
-          )}
+          <ThemedBackground className="h-full">
+            <ScrollableView className="items-center gap-6 p-8 max-w-md">
+              {step ? (
+                <StepRendererRouter step={step} mode="edit" />
+              ) : (
+                <NoStepSelected />
+              )}
+            </ScrollableView>
+          </ThemedBackground>
         </ThemeProvider>
       </PreviewShell>
     </div>

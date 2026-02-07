@@ -58,26 +58,21 @@ export type {
 
 /**
  * Props for step renderers (edit-mode preview and guest-mode run)
+ *
+ * Navigation is handled by ExperienceRuntime, not by individual step renderers.
+ * Step renderers only handle content and response updates.
  */
 export interface StepRendererProps {
   /** Rendering mode - edit shows disabled controls, run allows interaction */
   mode: 'edit' | 'run'
   /** The step being rendered */
   step: ExperienceStep
-  /** Optional submit handler - when provided, the Next button is enabled */
-  onSubmit?: () => void
 
   // Run mode props (only used when mode === 'run')
   /** Current response for this step (run mode only) */
   response?: SessionResponse
   /** Callback when user provides/updates response data (run mode only). Pass null to clear response. */
   onResponseChange?: (data: SessionResponseData | null) => void
-  /** Callback to go back (run mode only) */
-  onBack?: () => void
-  /** Whether back navigation is available (run mode only) */
-  canGoBack?: boolean
-  /** Whether proceeding is allowed (run mode only) */
-  canProceed?: boolean
 }
 
 /**

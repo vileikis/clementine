@@ -235,10 +235,7 @@ export function ExperiencePreviewModal({
       {/* Job status view (after completion with transform) */}
       {showJobStatus && session && (
         <ThemeProvider theme={previewTheme}>
-          <ThemedBackground
-            className="h-full w-full"
-            contentClassName="h-full w-full"
-          >
+          <ThemedBackground className="h-full">
             <JobStatusDisplay
               jobStatus={session.jobStatus}
               onClose={handleClose}
@@ -250,10 +247,7 @@ export function ExperiencePreviewModal({
       {/* Runtime content */}
       {isReady && steps.length > 0 && !showJobStatus && (
         <ThemeProvider theme={previewTheme}>
-          <ThemedBackground
-            className="h-full w-full"
-            contentClassName="h-full w-full"
-          >
+          <ThemedBackground className="h-full">
             <ExperienceRuntime
               experienceId={experience.id}
               steps={steps}

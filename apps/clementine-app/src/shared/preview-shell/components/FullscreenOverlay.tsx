@@ -90,7 +90,7 @@ export function FullscreenOverlay({
         {/* Content Area - mobile centered, desktop fills space */}
         <div
           className={cn(
-            'flex flex-1 overflow-auto p-6',
+            'flex flex-1 min-h-0 overflow-auto p-6',
             // Mobile: center the fixed-size frame
             isMobile && 'items-center justify-center',
             // Desktop: fill available space with flex column

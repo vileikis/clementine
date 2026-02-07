@@ -3,14 +3,14 @@
  *
  * Renderer for yes/no question steps.
  * Shows title with Yes/No buttons using themed styling.
- * Uses StepLayout for responsive layout with submit button.
  *
  * Supports both edit and run modes:
  * - Edit mode: Preview-only display with disabled buttons
- * - Run mode: Interactive Yes/No selection with navigation
+ * - Run mode: Interactive Yes/No selection
+ *
+ * Navigation is handled by ExperienceRuntime.
  */
 import { useCallback } from 'react'
-import { StepLayout } from './StepLayout'
 import type { StepRendererProps } from '../registry/step-registry'
 import type { ExperienceInputYesNoStepConfig } from '@clementine/shared'
 import { ThemedButton, ThemedText } from '@/shared/theming'
@@ -20,10 +20,6 @@ export function InputYesNoRenderer({
   mode,
   response,
   onResponseChange,
-  onSubmit,
-  onBack,
-  canGoBack,
-  canProceed,
 }: StepRendererProps) {
   const config = step.config as ExperienceInputYesNoStepConfig
   const { title } = config
@@ -42,43 +38,36 @@ export function InputYesNoRenderer({
   )
 
   return (
-    <StepLayout
-      onSubmit={onSubmit}
-      onBack={onBack}
-      canGoBack={canGoBack}
-      canProceed={canProceed}
-    >
-      <div className="flex flex-col items-center gap-8 w-full max-w-md">
-        {/* Title */}
-        <ThemedText variant="heading" as="h2">
-          {title ||
-            (mode === 'edit' ? (
-              <span className="opacity-50">Enter your question...</span>
-            ) : null)}
-        </ThemedText>
+    <div className="flex flex-col items-center gap-8 w-full max-w-md px-4">
+      {/* Title */}
+      <ThemedText variant="heading" as="h2">
+        {title ||
+          (mode === 'edit' ? (
+            <span className="opacity-50">Enter your question...</span>
+          ) : null)}
+      </ThemedText>
 
-        {/* Yes/No buttons */}
-        <div className="flex gap-4">
-          <ThemedButton
-            variant={currentValue === 'yes' ? 'primary' : 'outline'}
-            size="lg"
-            className="min-w-24"
-            onClick={() => handleSelect('yes')}
-            disabled={mode === 'edit'}
-          >
-            Yes
-          </ThemedButton>
-          <ThemedButton
-            variant={currentValue === 'no' ? 'primary' : 'outline'}
-            size="lg"
-            className="min-w-24"
-            onClick={() => handleSelect('no')}
-            disabled={mode === 'edit'}
-          >
-            No
-          </ThemedButton>
-        </div>
+      {/* Yes/No buttons */}
+      <div className="flex gap-4">
+        <ThemedButton
+          variant={currentValue === 'yes' ? 'primary' : 'outline'}
+          size="lg"
+          className="min-w-24"
+          onClick={() => handleSelect('yes')}
+          disabled={mode === 'edit'}
+        >
+          Yes
+        </ThemedButton>
+        <ThemedButton
+          variant={currentValue === 'no' ? 'primary' : 'outline'}
+          size="lg"
+          className="min-w-24"
+          onClick={() => handleSelect('no')}
+          disabled={mode === 'edit'}
+        >
+          No
+        </ThemedButton>
       </div>
-    </StepLayout>
+    </div>
   )
 }

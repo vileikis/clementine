@@ -8,16 +8,17 @@
  *
  * Handles:
  * - Displaying current step via StepRendererRouter
- * - Answer management via useRuntime hook
+ * - Response management via useRuntime hook
  * - Completion state (returns null - parent handles completion navigation)
  *
+ * Note: Navigation (back/next buttons) is handled by ExperienceRuntime.
  * Note: Does NOT include ThemedBackground - parent page owns the background.
  * Must be used within ThemeProvider, ThemedBackground, and ExperienceRuntime.
  *
  * @example
  * ```tsx
  * <ThemeProvider theme={event.theme}>
- *   <ThemedBackground className="h-screen">
+ *   <ThemedBackground className="h-dvh">
  *     <ExperienceRuntime
  *       experienceId={experience.id}
  *       steps={experience.published.steps}
@@ -41,21 +42,10 @@ import { ThemedText } from '@/shared/theming'
  * GuestRuntimeContent Component
  *
  * Renders the current step or returns null when complete.
- * Uses runtime hook for navigation and answer management.
+ * Uses runtime hook for response management.
  */
 export function GuestRuntimeContent() {
-  const runtime = useRuntime()
-
-  const {
-    currentStep,
-    canProceed,
-    canGoBack,
-    next,
-    back,
-    setStepResponse,
-    getResponse,
-    isComplete,
-  } = runtime
+  const { currentStep, setStepResponse, getResponse, isComplete } = useRuntime()
 
   // Handle response change - writes to unified responses
   const handleResponseChange = useCallback(
@@ -81,17 +71,13 @@ export function GuestRuntimeContent() {
     )
   }
 
-  // Render current step
+  // Render current step (navigation handled by ExperienceRuntime)
   return (
     <StepRendererRouter
       step={currentStep}
       mode="run"
       response={getResponse(currentStep.id)}
       onResponseChange={handleResponseChange}
-      onSubmit={next}
-      onBack={back}
-      canGoBack={canGoBack}
-      canProceed={canProceed}
     />
   )
 }

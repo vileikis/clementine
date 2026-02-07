@@ -6,7 +6,6 @@
  */
 
 import { Camera } from 'lucide-react'
-import { StepLayout } from '../StepLayout'
 import type { ExperienceAspectRatio } from '@clementine/shared'
 import { ThemedText, useEventTheme } from '@/shared/theming'
 
@@ -30,30 +29,28 @@ export function CapturePhotoEditMode({
   const { theme } = useEventTheme()
 
   return (
-    <StepLayout hideButton>
-      <div className="flex flex-col items-center gap-6 w-full max-w-md">
-        {/* Camera placeholder with aspect ratio */}
-        <div
-          className="flex flex-col items-center justify-center rounded-lg w-full"
-          style={{
-            aspectRatio: ASPECT_RATIO_CSS[aspectRatio],
-            backgroundColor: `color-mix(in srgb, ${theme.text.color} 10%, transparent)`,
-          }}
-        >
-          <Camera
-            className="h-16 w-16"
-            style={{ color: theme.text.color, opacity: 0.5 }}
-          />
-          <ThemedText variant="body" className="mt-3 opacity-60">
-            Camera
-          </ThemedText>
-        </div>
-
-        {/* Aspect ratio indicator */}
-        <ThemedText variant="small" className="opacity-60">
-          Aspect ratio: {aspectRatio}
+    <div className="flex flex-col items-center gap-6 w-full max-w-md">
+      {/* Camera placeholder with aspect ratio */}
+      <div
+        className="flex flex-col items-center justify-center rounded-lg w-full"
+        style={{
+          aspectRatio: ASPECT_RATIO_CSS[aspectRatio],
+          backgroundColor: `color-mix(in srgb, ${theme.text.color} 10%, transparent)`,
+        }}
+      >
+        <Camera
+          className="h-16 w-16"
+          style={{ color: theme.text.color, opacity: 0.5 }}
+        />
+        <ThemedText variant="body" className="mt-3 opacity-60">
+          Camera
         </ThemedText>
       </div>
-    </StepLayout>
+
+      {/* Aspect ratio indicator */}
+      <ThemedText variant="small" className="opacity-60">
+        Aspect ratio: {aspectRatio}
+      </ThemedText>
+    </div>
   )
 }

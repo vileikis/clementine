@@ -17,10 +17,16 @@
 import { useCallback, useEffect, useLayoutEffect, useRef } from 'react'
 
 import { useExperienceRuntimeStore } from '../stores/experienceRuntimeStore'
+import { RuntimeNavigation } from '../components/RuntimeNavigation'
 import { RuntimeTopBar } from '../components/RuntimeTopBar'
 import type { ExperienceStep } from '../../shared/schemas'
 import type { Session } from '@/domains/session'
 import { useCompleteSession, useUpdateSessionProgress } from '@/domains/session'
+import { cn } from '@/shared/utils'
+import { ScrollableView } from '@/shared/theming'
+
+/** Step types that manage their own navigation buttons */
+const STEPS_WITH_CUSTOM_NAVIGATION = new Set(['capture.photo'])
 
 /**
  * Props for ExperienceRuntime container
@@ -253,6 +259,12 @@ export function ExperienceRuntime({
     return null
   }
 
+  // Check if current step manages its own navigation
+  const currentStep = store.steps[store.currentStepIndex]
+  const hideNavigation = currentStep
+    ? STEPS_WITH_CUSTOM_NAVIGATION.has(currentStep.type)
+    : false
+
   return (
     <>
       {showTopBar && (
@@ -263,7 +275,25 @@ export function ExperienceRuntime({
           onHomeClick={onHomeClick}
         />
       )}
-      {children}
+      <ScrollableView
+        className={cn(
+          'items-center max-w-md',
+          // Padding for fixed top bar
+          'pt-28',
+          // Padding for fixed bottom navigation (mobile only)
+          'pb-28 md:pb-0',
+        )}
+      >
+        {children}
+      </ScrollableView>
+      {!hideNavigation && (
+        <RuntimeNavigation
+          onNext={store.nextStep}
+          onBack={store.previousStep}
+          canGoBack={store.canGoBack()}
+          canProceed={store.canProceed()}
+        />
+      )}
     </>
   )
 }

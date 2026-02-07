@@ -14,7 +14,7 @@ import { ExperienceCard } from './ExperienceCard'
 import type { ExperienceCardData } from './ExperienceCard'
 import type { WelcomeConfig } from '@/domains/project-config/shared'
 import type { MainExperienceReference } from '@/domains/project-config/experiences'
-import { ThemedBackground, ThemedText, useEventTheme } from '@/shared/theming'
+import { ScrollableView, ThemedText, useEventTheme } from '@/shared/theming'
 import { cn } from '@/shared/utils/style-utils'
 
 export interface WelcomeRendererProps {
@@ -60,13 +60,10 @@ export function WelcomeRenderer({
   const hasExperiences = displayExperiences.length > 0
 
   return (
-    <ThemedBackground
-      className="h-full w-full"
-      contentClassName="flex flex-col items-center gap-6 p-8"
-    >
+    <ScrollableView className="items-center gap-6 px-4 py-16 max-w-md">
       {/* Hero media */}
       {welcome.media?.url && (
-        <div className="w-full max-w-md">
+        <div className="w-full">
           <img
             src={welcome.media.url}
             alt="Welcome hero"
@@ -82,13 +79,16 @@ export function WelcomeRenderer({
 
       {/* Description */}
       {welcome.description && (
-        <ThemedText variant="body" className="text-center opacity-90">
+        <ThemedText
+          variant="body"
+          className="text-center opacity-90 whitespace-pre-line"
+        >
           {welcome.description}
         </ThemedText>
       )}
 
       {/* Experiences section */}
-      <div className="mt-4 w-full max-w-md">
+      <div className="mt-4 w-full">
         {hasExperiences ? (
           <div
             className={cn('w-full', {
@@ -121,6 +121,6 @@ export function WelcomeRenderer({
           </div>
         )}
       </div>
-    </ThemedBackground>
+    </ScrollableView>
   )
 }

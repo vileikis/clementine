@@ -4,6 +4,9 @@
  * Orchestrator for the camera capture flow in run mode.
  * Manages permission states, capture states, and upload flow.
  *
+ * This step manages its own navigation - the ExperienceRuntime hides
+ * standard navigation for capture.photo steps.
+ *
  * Permission States:
  * - unknown: Loading spinner while checking permission
  * - undetermined: Prompt to request camera access
@@ -19,8 +22,8 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { ChevronLeft } from 'lucide-react'
 import { useRuntime } from '../../../runtime/hooks/useRuntime'
-import { StepLayout } from '../StepLayout'
 import { uploadPhoto } from './lib/uploadPhoto'
 import {
   CameraActive,
@@ -44,24 +47,26 @@ import {
   useLibraryPicker,
   usePhotoCapture,
 } from '@/shared/camera'
+import { Button } from '@/ui-kit/ui/button'
 
 interface CapturePhotoRunModeProps {
   step: StepRendererProps['step']
   aspectRatio: ExperienceAspectRatio
-  onSubmit?: () => void
-  onBack?: () => void
-  canGoBack?: boolean
 }
 
 export function CapturePhotoRunMode({
   step,
   aspectRatio,
-  onSubmit,
-  onBack,
-  canGoBack,
 }: CapturePhotoRunModeProps) {
-  // Runtime hook for session context and actions
-  const { sessionId, projectId, setStepResponse } = useRuntime()
+  // Runtime hook for session context, actions, and navigation
+  const {
+    sessionId,
+    projectId,
+    setStepResponse,
+    next: nextStep,
+    back: previousStep,
+    canGoBack,
+  } = useRuntime()
 
   // Camera refs and hooks
   const cameraRef = useRef<CameraViewRef>(null)
@@ -121,7 +126,7 @@ export function CapturePhotoRunMode({
         }
 
         // Proceed to next step
-        onSubmit?.()
+        nextStep()
       } catch (err) {
         setUploadError(
           err instanceof Error ? err.message : 'Failed to save photo',
@@ -129,7 +134,7 @@ export function CapturePhotoRunMode({
         setIsUploading(false)
       }
     },
-    [photo, sessionId, projectId, step, setStepResponse, onSubmit],
+    [photo, sessionId, projectId, step, setStepResponse, nextStep],
   )
 
   // Library picker - goes to preview first so user can confirm
@@ -193,12 +198,26 @@ export function CapturePhotoRunMode({
   const errorMessage =
     uploadError || error?.message || 'Failed to capture photo'
 
+  // Back button component - shown when canGoBack is true
+  const BackButton = canGoBack ? (
+    <div className="absolute top-4 left-4 z-10">
+      <Button
+        variant="outline"
+        size="icon"
+        onClick={previousStep}
+        aria-label="Go back"
+      >
+        <ChevronLeft className="h-5 w-5" />
+      </Button>
+    </div>
+  ) : null
+
   // Uploading state - check first as it takes priority over all other states
   if (isUploading) {
     return (
-      <StepLayout hideButton>
+      <div className="relative flex h-full w-full flex-col items-center justify-center">
         <UploadProgress photo={photo} aspectRatio={aspectRatio} />
-      </StepLayout>
+      </div>
     )
   }
 
@@ -206,58 +225,62 @@ export function CapturePhotoRunMode({
   // (user can select photo even when permission is denied/unavailable)
   if (captureStatus === 'photo-preview' && photo) {
     return (
-      <StepLayout hideButton>
+      <div className="relative flex h-full w-full flex-col items-center justify-center">
         <PhotoPreview
           photo={photo}
           aspectRatio={aspectRatio}
           onRetake={retake}
           onConfirm={handleConfirm}
         />
-      </StepLayout>
+      </div>
     )
   }
 
   // Permission: unknown (loading)
   if (permStatus === 'unknown') {
     return (
-      <StepLayout hideButton onBack={onBack} canGoBack={canGoBack}>
+      <div className="relative flex h-full w-full flex-col items-center justify-center">
+        {BackButton}
         <PermissionLoading />
-      </StepLayout>
+      </div>
     )
   }
 
   // Permission: undetermined (prompt to allow)
   if (permStatus === 'undetermined') {
     return (
-      <StepLayout hideButton onBack={onBack} canGoBack={canGoBack}>
+      <div className="relative flex h-full w-full flex-col items-center justify-center">
+        {BackButton}
         <PermissionPrompt onRequestPermission={requestPermission} />
-      </StepLayout>
+      </div>
     )
   }
 
   // Permission: denied (show instructions + fallback)
   if (permStatus === 'denied') {
     return (
-      <StepLayout hideButton onBack={onBack} canGoBack={canGoBack}>
+      <div className="relative flex h-full w-full flex-col items-center justify-center">
+        {BackButton}
         <PermissionDenied
           fileInputRef={fileInputRef}
           onOpenPicker={openPicker}
           onFileChange={handleFileChange}
         />
-      </StepLayout>
+      </div>
     )
   }
 
   // Permission: unavailable (no hardware)
   if (permStatus === 'unavailable') {
     return (
-      <StepLayout hideButton onBack={onBack} canGoBack={canGoBack}>
+      <div className="relative flex h-full w-full flex-col items-center justify-center">
+        {BackButton}
         <PermissionUnavailable
           fileInputRef={fileInputRef}
           onOpenPicker={openPicker}
           onFileChange={handleFileChange}
         />
-      </StepLayout>
+      </div>
     )
   }
 
@@ -266,7 +289,8 @@ export function CapturePhotoRunMode({
   // Error state
   if (captureStatus === 'error' || uploadError) {
     return (
-      <StepLayout hideButton onBack={onBack} canGoBack={canGoBack}>
+      <div className="relative flex h-full w-full flex-col items-center justify-center">
+        {BackButton}
         <CaptureError
           errorMessage={errorMessage}
           fileInputRef={fileInputRef}
@@ -274,13 +298,14 @@ export function CapturePhotoRunMode({
           onOpenPicker={openPicker}
           onFileChange={handleFileChange}
         />
-      </StepLayout>
+      </div>
     )
   }
 
   // Camera active state (default)
   return (
-    <StepLayout hideButton onBack={onBack} canGoBack={canGoBack}>
+    <div className="relative flex h-full w-full flex-col items-center justify-center">
+      {BackButton}
       <CameraActive
         cameraRef={cameraRef}
         aspectRatio={aspectRatio}
@@ -293,6 +318,6 @@ export function CapturePhotoRunMode({
         onOpenPicker={openPicker}
         onFileChange={handleFileChange}
       />
-    </StepLayout>
+    </div>
   )
 }

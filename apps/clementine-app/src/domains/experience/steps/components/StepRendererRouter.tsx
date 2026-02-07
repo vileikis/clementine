@@ -2,7 +2,9 @@
  * StepRendererRouter Component
  *
  * Routes step rendering to the appropriate renderer based on step type.
- * Supports both edit and run modes with all necessary props.
+ * Supports both edit and run modes.
+ *
+ * Navigation is handled by ExperienceRuntime, not by step renderers.
  *
  * @example
  * ```tsx
@@ -15,10 +17,6 @@
  *   mode="run"
  *   response={getResponse(currentStep.id)}
  *   onResponseChange={handleResponseChange}
- *   onSubmit={next}
- *   onBack={back}
- *   canGoBack={canGoBack}
- *   canProceed={canProceed}
  * />
  * ```
  */
