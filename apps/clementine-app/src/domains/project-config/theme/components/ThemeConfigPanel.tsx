@@ -11,7 +11,7 @@ import {
   TbBorderCornerRounded,
   TbBorderCornerSquare,
 } from 'react-icons/tb'
-import { GoogleFontPicker } from './GoogleFontPicker'
+import { GoogleFontPicker } from './google-font-picker'
 import type {
   ButtonRadius,
   Theme,
