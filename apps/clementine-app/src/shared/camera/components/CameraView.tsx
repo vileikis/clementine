@@ -48,7 +48,7 @@ export interface CameraViewRef {
 interface CameraViewProps {
   /** Camera facing direction */
   facing?: CameraFacing
-  /** Aspect ratio guide overlay */
+  /** Aspect ratio guide overlay (defaults to 1:1) */
   aspectRatio?: AspectRatio
   /** Additional CSS classes */
   className?: string
@@ -91,7 +91,7 @@ export const CameraView = forwardRef<CameraViewRef, CameraViewProps>(
   function CameraView(
     {
       facing: initialFacing = 'user',
-      aspectRatio,
+      aspectRatio = '1:1',
       className,
       onReady,
       onError,
@@ -239,18 +239,16 @@ export const CameraView = forwardRef<CameraViewRef, CameraViewProps>(
     // Mirror front camera for natural selfie appearance
     const shouldMirror = facing === 'user'
 
+    // Parse aspect ratio to calculate dimensions
+    const [widthRatio, heightRatio] = aspectRatio.split(':').map(Number)
+
     return (
       <div
-        className={cn(
-          'relative bg-black overflow-hidden',
-          aspectRatio ? 'w-full' : 'w-full h-full',
-          className,
-        )}
-        style={
-          aspectRatio
-            ? { aspectRatio: ASPECT_RATIO_CSS[aspectRatio], maxHeight: '100%' }
-            : undefined
-        }
+        className={cn('relative bg-black overflow-hidden', className)}
+        style={{
+          width: `min(100%, calc((100vh - 14rem) * ${widthRatio} / ${heightRatio}))`,
+          aspectRatio: ASPECT_RATIO_CSS[aspectRatio],
+        }}
       >
         {/* Video element - fills the constrained container */}
         <video

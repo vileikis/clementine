@@ -281,9 +281,9 @@ export function ExperienceRuntime({
         className={cn(
           'items-center max-w-2xl',
           // Padding for fixed top bar
-          'pt-28',
+          // 'pt-28',
           // Padding for fixed bottom navigation (mobile only)
-          'pb-28 md:pb-0',
+          // 'pb-28 md:pb-0',
         )}
       >
         {children}

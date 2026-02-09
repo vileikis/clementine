@@ -276,19 +276,17 @@ export function CapturePhotoRunMode({
 
   // Camera active state (default)
   return (
-    <div className="relative flex h-full w-full flex-col items-center justify-center">
-      <CameraActive
-        cameraRef={cameraRef}
-        aspectRatio={aspectRatio}
-        fileInputRef={fileInputRef}
-        hasMultipleCameras={hasMultipleCameras}
-        onCameraReady={handleCameraReady}
-        onCameraError={handleCameraError}
-        onCapture={capture}
-        onSwitchCamera={handleSwitchCamera}
-        onOpenPicker={openPicker}
-        onFileChange={handleFileChange}
-      />
-    </div>
+    <CameraActive
+      cameraRef={cameraRef}
+      aspectRatio={aspectRatio}
+      fileInputRef={fileInputRef}
+      hasMultipleCameras={hasMultipleCameras}
+      onCameraReady={handleCameraReady}
+      onCameraError={handleCameraError}
+      onCapture={capture}
+      onSwitchCamera={handleSwitchCamera}
+      onOpenPicker={openPicker}
+      onFileChange={handleFileChange}
+    />
   )
 }
