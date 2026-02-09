@@ -21,6 +21,7 @@ import {
 } from 'react'
 import { captureFromVideo, createCaptureFile } from '../lib'
 import { useCameraStream } from '../hooks/useCameraStream'
+import { ASPECT_RATIO_CSS } from '../constants'
 import type {
   AspectRatio,
   CameraCaptureError,
@@ -56,16 +57,6 @@ interface CameraViewProps {
   onReady?: () => void
   /** Called when an error occurs */
   onError?: (error: CameraCaptureError) => void
-}
-
-/**
- * Aspect ratio to CSS aspect-ratio value mapping
- */
-const ASPECT_RATIO_CSS: Record<AspectRatio, string> = {
-  '1:1': '1 / 1',
-  '9:16': '9 / 16',
-  '3:2': '3 / 2',
-  '2:3': '2 / 3',
 }
 
 /**

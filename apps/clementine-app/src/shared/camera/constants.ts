@@ -4,7 +4,18 @@
  * Error codes, default labels, and configuration constants.
  */
 
-import type { CameraCaptureLabels } from './types/camera.types'
+import type { AspectRatio, CameraCaptureLabels } from './types/camera.types'
+
+/**
+ * Aspect ratio to CSS aspect-ratio value mapping.
+ * Shared between CameraView (video) and PhotoFrame (image).
+ */
+export const ASPECT_RATIO_CSS: Record<AspectRatio, string> = {
+  '1:1': '1 / 1',
+  '9:16': '9 / 16',
+  '3:2': '3 / 2',
+  '2:3': '2 / 3',
+}
 
 /**
  * Default labels for internationalization (English)

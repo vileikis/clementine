@@ -196,25 +196,19 @@ export function CapturePhotoRunMode({
 
   // Uploading state - check first as it takes priority over all other states
   if (isUploading) {
-    return (
-      <div className="relative flex h-full w-full flex-col items-center justify-center">
-        <UploadProgress photo={photo} aspectRatio={aspectRatio} />
-      </div>
-    )
+    return <UploadProgress photo={photo} aspectRatio={activeAspectRatio} />
   }
 
   // Photo preview state - check before permission states so fallback picker works
   // (user can select photo even when permission is denied/unavailable)
   if (captureStatus === 'photo-preview' && photo) {
     return (
-      <div className="relative flex h-full w-full flex-col items-center justify-center">
-        <PhotoPreview
-          photo={photo}
-          aspectRatio={aspectRatio}
-          onRetake={retake}
-          onConfirm={handleConfirm}
-        />
-      </div>
+      <PhotoPreview
+        photo={photo}
+        aspectRatio={activeAspectRatio}
+        onRetake={retake}
+        onConfirm={handleConfirm}
+      />
     )
   }
 

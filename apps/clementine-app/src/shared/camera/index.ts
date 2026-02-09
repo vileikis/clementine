@@ -13,8 +13,9 @@ export type { CameraCaptureProps } from './containers/CameraCapture'
 export { CameraView } from './components/CameraView'
 export type { CameraViewRef } from './components/CameraView'
 
-// Controls
+// Components
 export { AspectRatioControl } from './components/AspectRatioControl'
+export { PhotoFrame } from './components/PhotoFrame'
 
 // Hooks
 export { useCameraPermission } from './hooks/useCameraPermission'
@@ -41,5 +42,5 @@ export type {
 // Permission utilities
 export { isMobileBrowser, getDeniedInstructions } from './lib/permission-utils'
 
-// Default labels for consumers who want to customize
-export { DEFAULT_LABELS } from './constants'
+// Constants
+export { DEFAULT_LABELS, ASPECT_RATIO_CSS } from './constants'
