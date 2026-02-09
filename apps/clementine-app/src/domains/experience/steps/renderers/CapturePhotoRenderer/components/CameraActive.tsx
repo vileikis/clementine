@@ -42,9 +42,9 @@ export function CameraActive({
   onFileChange,
 }: CameraActiveProps) {
   return (
-    <div className="flex flex-col w-full h-full">
+    <div className="flex flex-col w-full h-full items-center">
       {/* Camera - fills remaining space, CameraView handles aspect ratio internally */}
-      <div className="flex-1 min-h-0 p-4">
+      <div className="flex-1 min-h-0 w-full max-w-2xl">
         <CameraView
           ref={cameraRef}
           aspectRatio={aspectRatio}
