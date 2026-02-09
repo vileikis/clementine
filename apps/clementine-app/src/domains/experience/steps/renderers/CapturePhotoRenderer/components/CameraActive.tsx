@@ -43,47 +43,59 @@ export function CameraActive({
 }: CameraActiveProps) {
   return (
     <div className="flex flex-col w-full h-full items-center">
-      {/* Camera - fills remaining space, CameraView handles aspect ratio internally */}
+      {/* Camera - fills all available space, handles aspect ratio internally */}
       <div className="flex-1 min-h-0 w-full max-w-2xl">
         <CameraView
           ref={cameraRef}
           aspectRatio={aspectRatio}
-          className="w-full h-full rounded-2xl"
+          className="w-full h-full "
           onReady={onCameraReady}
           onError={onCameraError}
         />
       </div>
-
-      {/* Controls Zone - fixed height with safe-area padding */}
-      <div className="flex items-center justify-center gap-6 py-6 pb-[env(safe-area-inset-bottom,1.5rem)]">
+      {/* Controls - fixed to bottom, floating above camera */}
+      <div className="absolute bottom-0 inset-x-0 flex items-center justify-center gap-8 py-6 pb-6">
         {/* Library button (left) */}
-        <ThemedIconButton
-          onClick={onOpenPicker}
-          variant="outline"
-          aria-label="Choose from library"
-        >
-          <ImageIcon className="size-5" />
-        </ThemedIconButton>
+        <div className="flex flex-col items-center gap-1.5">
+          <ThemedIconButton
+            onClick={onOpenPicker}
+            variant="outline"
+            size="lg"
+            aria-label="Choose from library"
+          >
+            <ImageIcon className="size-6" />
+          </ThemedIconButton>
+          <span className="text-xs text-white/70">Library</span>
+        </div>
 
-        {/* Capture button (center) - larger */}
-        <ThemedIconButton
-          onClick={onCapture}
-          variant="primary"
-          size="lg"
-          aria-label="Take photo"
-        >
-          <Camera className="size-7" />
-        </ThemedIconButton>
+        {/* Capture button (center) - largest, custom size via className */}
+        <div className="flex flex-col items-center gap-1.5">
+          <ThemedIconButton
+            onClick={onCapture}
+            variant="primary"
+            size="lg"
+            className="h-20! w-20!"
+            aria-label="Take photo"
+          >
+            <Camera className="size-8" />
+          </ThemedIconButton>
+          {/* Invisible label to match side button height */}
+          <span className="text-xs invisible">Take</span>
+        </div>
 
         {/* Switch camera button (right) */}
-        <ThemedIconButton
-          onClick={onSwitchCamera}
-          variant="outline"
-          disabled={!hasMultipleCameras}
-          aria-label="Switch camera"
-        >
-          <SwitchCamera className="size-5" />
-        </ThemedIconButton>
+        <div className="flex flex-col items-center gap-1.5">
+          <ThemedIconButton
+            onClick={onSwitchCamera}
+            variant="outline"
+            size="lg"
+            disabled={!hasMultipleCameras}
+            aria-label="Switch camera"
+          >
+            <SwitchCamera className="size-6" />
+          </ThemedIconButton>
+          <span className="text-xs text-white/70">Flip</span>
+        </div>
       </div>
 
       {/* Hidden file input */}
