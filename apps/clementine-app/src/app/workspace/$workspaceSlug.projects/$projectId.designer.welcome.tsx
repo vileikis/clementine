@@ -2,15 +2,13 @@ import { createFileRoute } from '@tanstack/react-router'
 import { WelcomeEditorPage } from '@/domains/project-config'
 
 /**
- * Project welcome tab route
+ * Designer welcome tab route
  *
- * Route: /workspace/:workspaceSlug/projects/:projectId/welcome
+ * Route: /workspace/:workspaceSlug/projects/:projectId/designer/welcome
  * Access: Admin only (enforced by parent route)
- *
- * Welcome/overview page for the project config.
  */
 export const Route = createFileRoute(
-  '/workspace/$workspaceSlug/projects/$projectId/welcome',
+  '/workspace/$workspaceSlug/projects/$projectId/designer/welcome',
 )({
   component: WelcomeEditorPage,
 })

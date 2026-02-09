@@ -2,15 +2,13 @@ import { createFileRoute } from '@tanstack/react-router'
 import { ThemeEditorPage } from '@/domains/project-config'
 
 /**
- * Project theme tab route
+ * Designer theme tab route
  *
- * Route: /workspace/:workspaceSlug/projects/:projectId/theme
+ * Route: /workspace/:workspaceSlug/projects/:projectId/designer/theme
  * Access: Admin only (enforced by parent route)
- *
- * Theme customization page for the project config.
  */
 export const Route = createFileRoute(
-  '/workspace/$workspaceSlug/projects/$projectId/theme',
+  '/workspace/$workspaceSlug/projects/$projectId/designer/theme',
 )({
   component: ThemeEditorPage,
 })

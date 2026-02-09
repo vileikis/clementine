@@ -39,12 +39,17 @@ import { Route as WorkspaceWorkspaceSlugExperiencesExperienceIdRouteImport } fro
 import { Route as JoinProjectIdExperienceExperienceIdRouteImport } from './app/join/$projectId/experience/$experienceId'
 import { Route as WorkspaceWorkspaceSlugProjectsProjectIdIndexRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId.index'
 import { Route as WorkspaceWorkspaceSlugExperiencesExperienceIdIndexRouteImport } from './app/workspace/$workspaceSlug.experiences/$experienceId.index'
-import { Route as WorkspaceWorkspaceSlugProjectsProjectIdWelcomeRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId.welcome'
-import { Route as WorkspaceWorkspaceSlugProjectsProjectIdThemeRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId.theme'
-import { Route as WorkspaceWorkspaceSlugProjectsProjectIdShareRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId.share'
-import { Route as WorkspaceWorkspaceSlugProjectsProjectIdSettingsRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId.settings'
+import { Route as WorkspaceWorkspaceSlugProjectsProjectIdDistributeRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId.distribute'
+import { Route as WorkspaceWorkspaceSlugProjectsProjectIdDesignerRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId.designer'
+import { Route as WorkspaceWorkspaceSlugProjectsProjectIdConnectRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId.connect'
+import { Route as WorkspaceWorkspaceSlugProjectsProjectIdAnalyticsRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId.analytics'
 import { Route as WorkspaceWorkspaceSlugExperiencesExperienceIdCreateRouteImport } from './app/workspace/$workspaceSlug.experiences/$experienceId.create'
 import { Route as WorkspaceWorkspaceSlugExperiencesExperienceIdCollectRouteImport } from './app/workspace/$workspaceSlug.experiences/$experienceId.collect'
+import { Route as WorkspaceWorkspaceSlugProjectsProjectIdDesignerIndexRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId.designer.index'
+import { Route as WorkspaceWorkspaceSlugProjectsProjectIdDesignerWelcomeRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId.designer.welcome'
+import { Route as WorkspaceWorkspaceSlugProjectsProjectIdDesignerThemeRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId.designer.theme'
+import { Route as WorkspaceWorkspaceSlugProjectsProjectIdDesignerShareRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId.designer.share'
+import { Route as WorkspaceWorkspaceSlugProjectsProjectIdDesignerSettingsRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId.designer.settings'
 
 const LogoutRoute = LogoutRouteImport.update({
   id: '/logout',
@@ -207,28 +212,28 @@ const WorkspaceWorkspaceSlugExperiencesExperienceIdIndexRoute =
     path: '/',
     getParentRoute: () => WorkspaceWorkspaceSlugExperiencesExperienceIdRoute,
   } as any)
-const WorkspaceWorkspaceSlugProjectsProjectIdWelcomeRoute =
-  WorkspaceWorkspaceSlugProjectsProjectIdWelcomeRouteImport.update({
-    id: '/welcome',
-    path: '/welcome',
+const WorkspaceWorkspaceSlugProjectsProjectIdDistributeRoute =
+  WorkspaceWorkspaceSlugProjectsProjectIdDistributeRouteImport.update({
+    id: '/distribute',
+    path: '/distribute',
     getParentRoute: () => WorkspaceWorkspaceSlugProjectsProjectIdRoute,
   } as any)
-const WorkspaceWorkspaceSlugProjectsProjectIdThemeRoute =
-  WorkspaceWorkspaceSlugProjectsProjectIdThemeRouteImport.update({
-    id: '/theme',
-    path: '/theme',
+const WorkspaceWorkspaceSlugProjectsProjectIdDesignerRoute =
+  WorkspaceWorkspaceSlugProjectsProjectIdDesignerRouteImport.update({
+    id: '/designer',
+    path: '/designer',
     getParentRoute: () => WorkspaceWorkspaceSlugProjectsProjectIdRoute,
   } as any)
-const WorkspaceWorkspaceSlugProjectsProjectIdShareRoute =
-  WorkspaceWorkspaceSlugProjectsProjectIdShareRouteImport.update({
-    id: '/share',
-    path: '/share',
+const WorkspaceWorkspaceSlugProjectsProjectIdConnectRoute =
+  WorkspaceWorkspaceSlugProjectsProjectIdConnectRouteImport.update({
+    id: '/connect',
+    path: '/connect',
     getParentRoute: () => WorkspaceWorkspaceSlugProjectsProjectIdRoute,
   } as any)
-const WorkspaceWorkspaceSlugProjectsProjectIdSettingsRoute =
-  WorkspaceWorkspaceSlugProjectsProjectIdSettingsRouteImport.update({
-    id: '/settings',
-    path: '/settings',
+const WorkspaceWorkspaceSlugProjectsProjectIdAnalyticsRoute =
+  WorkspaceWorkspaceSlugProjectsProjectIdAnalyticsRouteImport.update({
+    id: '/analytics',
+    path: '/analytics',
     getParentRoute: () => WorkspaceWorkspaceSlugProjectsProjectIdRoute,
   } as any)
 const WorkspaceWorkspaceSlugExperiencesExperienceIdCreateRoute =
@@ -242,6 +247,36 @@ const WorkspaceWorkspaceSlugExperiencesExperienceIdCollectRoute =
     id: '/collect',
     path: '/collect',
     getParentRoute: () => WorkspaceWorkspaceSlugExperiencesExperienceIdRoute,
+  } as any)
+const WorkspaceWorkspaceSlugProjectsProjectIdDesignerIndexRoute =
+  WorkspaceWorkspaceSlugProjectsProjectIdDesignerIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => WorkspaceWorkspaceSlugProjectsProjectIdDesignerRoute,
+  } as any)
+const WorkspaceWorkspaceSlugProjectsProjectIdDesignerWelcomeRoute =
+  WorkspaceWorkspaceSlugProjectsProjectIdDesignerWelcomeRouteImport.update({
+    id: '/welcome',
+    path: '/welcome',
+    getParentRoute: () => WorkspaceWorkspaceSlugProjectsProjectIdDesignerRoute,
+  } as any)
+const WorkspaceWorkspaceSlugProjectsProjectIdDesignerThemeRoute =
+  WorkspaceWorkspaceSlugProjectsProjectIdDesignerThemeRouteImport.update({
+    id: '/theme',
+    path: '/theme',
+    getParentRoute: () => WorkspaceWorkspaceSlugProjectsProjectIdDesignerRoute,
+  } as any)
+const WorkspaceWorkspaceSlugProjectsProjectIdDesignerShareRoute =
+  WorkspaceWorkspaceSlugProjectsProjectIdDesignerShareRouteImport.update({
+    id: '/share',
+    path: '/share',
+    getParentRoute: () => WorkspaceWorkspaceSlugProjectsProjectIdDesignerRoute,
+  } as any)
+const WorkspaceWorkspaceSlugProjectsProjectIdDesignerSettingsRoute =
+  WorkspaceWorkspaceSlugProjectsProjectIdDesignerSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => WorkspaceWorkspaceSlugProjectsProjectIdDesignerRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -275,12 +310,17 @@ export interface FileRoutesByFullPath {
   '/workspace/$workspaceSlug/projects': typeof WorkspaceWorkspaceSlugProjectsIndexRoute
   '/workspace/$workspaceSlug/experiences/$experienceId/collect': typeof WorkspaceWorkspaceSlugExperiencesExperienceIdCollectRoute
   '/workspace/$workspaceSlug/experiences/$experienceId/create': typeof WorkspaceWorkspaceSlugExperiencesExperienceIdCreateRoute
-  '/workspace/$workspaceSlug/projects/$projectId/settings': typeof WorkspaceWorkspaceSlugProjectsProjectIdSettingsRoute
-  '/workspace/$workspaceSlug/projects/$projectId/share': typeof WorkspaceWorkspaceSlugProjectsProjectIdShareRoute
-  '/workspace/$workspaceSlug/projects/$projectId/theme': typeof WorkspaceWorkspaceSlugProjectsProjectIdThemeRoute
-  '/workspace/$workspaceSlug/projects/$projectId/welcome': typeof WorkspaceWorkspaceSlugProjectsProjectIdWelcomeRoute
+  '/workspace/$workspaceSlug/projects/$projectId/analytics': typeof WorkspaceWorkspaceSlugProjectsProjectIdAnalyticsRoute
+  '/workspace/$workspaceSlug/projects/$projectId/connect': typeof WorkspaceWorkspaceSlugProjectsProjectIdConnectRoute
+  '/workspace/$workspaceSlug/projects/$projectId/designer': typeof WorkspaceWorkspaceSlugProjectsProjectIdDesignerRouteWithChildren
+  '/workspace/$workspaceSlug/projects/$projectId/distribute': typeof WorkspaceWorkspaceSlugProjectsProjectIdDistributeRoute
   '/workspace/$workspaceSlug/experiences/$experienceId/': typeof WorkspaceWorkspaceSlugExperiencesExperienceIdIndexRoute
   '/workspace/$workspaceSlug/projects/$projectId/': typeof WorkspaceWorkspaceSlugProjectsProjectIdIndexRoute
+  '/workspace/$workspaceSlug/projects/$projectId/designer/settings': typeof WorkspaceWorkspaceSlugProjectsProjectIdDesignerSettingsRoute
+  '/workspace/$workspaceSlug/projects/$projectId/designer/share': typeof WorkspaceWorkspaceSlugProjectsProjectIdDesignerShareRoute
+  '/workspace/$workspaceSlug/projects/$projectId/designer/theme': typeof WorkspaceWorkspaceSlugProjectsProjectIdDesignerThemeRoute
+  '/workspace/$workspaceSlug/projects/$projectId/designer/welcome': typeof WorkspaceWorkspaceSlugProjectsProjectIdDesignerWelcomeRoute
+  '/workspace/$workspaceSlug/projects/$projectId/designer/': typeof WorkspaceWorkspaceSlugProjectsProjectIdDesignerIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -307,12 +347,16 @@ export interface FileRoutesByTo {
   '/workspace/$workspaceSlug/projects': typeof WorkspaceWorkspaceSlugProjectsIndexRoute
   '/workspace/$workspaceSlug/experiences/$experienceId/collect': typeof WorkspaceWorkspaceSlugExperiencesExperienceIdCollectRoute
   '/workspace/$workspaceSlug/experiences/$experienceId/create': typeof WorkspaceWorkspaceSlugExperiencesExperienceIdCreateRoute
-  '/workspace/$workspaceSlug/projects/$projectId/settings': typeof WorkspaceWorkspaceSlugProjectsProjectIdSettingsRoute
-  '/workspace/$workspaceSlug/projects/$projectId/share': typeof WorkspaceWorkspaceSlugProjectsProjectIdShareRoute
-  '/workspace/$workspaceSlug/projects/$projectId/theme': typeof WorkspaceWorkspaceSlugProjectsProjectIdThemeRoute
-  '/workspace/$workspaceSlug/projects/$projectId/welcome': typeof WorkspaceWorkspaceSlugProjectsProjectIdWelcomeRoute
+  '/workspace/$workspaceSlug/projects/$projectId/analytics': typeof WorkspaceWorkspaceSlugProjectsProjectIdAnalyticsRoute
+  '/workspace/$workspaceSlug/projects/$projectId/connect': typeof WorkspaceWorkspaceSlugProjectsProjectIdConnectRoute
+  '/workspace/$workspaceSlug/projects/$projectId/distribute': typeof WorkspaceWorkspaceSlugProjectsProjectIdDistributeRoute
   '/workspace/$workspaceSlug/experiences/$experienceId': typeof WorkspaceWorkspaceSlugExperiencesExperienceIdIndexRoute
   '/workspace/$workspaceSlug/projects/$projectId': typeof WorkspaceWorkspaceSlugProjectsProjectIdIndexRoute
+  '/workspace/$workspaceSlug/projects/$projectId/designer/settings': typeof WorkspaceWorkspaceSlugProjectsProjectIdDesignerSettingsRoute
+  '/workspace/$workspaceSlug/projects/$projectId/designer/share': typeof WorkspaceWorkspaceSlugProjectsProjectIdDesignerShareRoute
+  '/workspace/$workspaceSlug/projects/$projectId/designer/theme': typeof WorkspaceWorkspaceSlugProjectsProjectIdDesignerThemeRoute
+  '/workspace/$workspaceSlug/projects/$projectId/designer/welcome': typeof WorkspaceWorkspaceSlugProjectsProjectIdDesignerWelcomeRoute
+  '/workspace/$workspaceSlug/projects/$projectId/designer': typeof WorkspaceWorkspaceSlugProjectsProjectIdDesignerIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -346,12 +390,17 @@ export interface FileRoutesById {
   '/workspace/$workspaceSlug/projects/': typeof WorkspaceWorkspaceSlugProjectsIndexRoute
   '/workspace/$workspaceSlug/experiences/$experienceId/collect': typeof WorkspaceWorkspaceSlugExperiencesExperienceIdCollectRoute
   '/workspace/$workspaceSlug/experiences/$experienceId/create': typeof WorkspaceWorkspaceSlugExperiencesExperienceIdCreateRoute
-  '/workspace/$workspaceSlug/projects/$projectId/settings': typeof WorkspaceWorkspaceSlugProjectsProjectIdSettingsRoute
-  '/workspace/$workspaceSlug/projects/$projectId/share': typeof WorkspaceWorkspaceSlugProjectsProjectIdShareRoute
-  '/workspace/$workspaceSlug/projects/$projectId/theme': typeof WorkspaceWorkspaceSlugProjectsProjectIdThemeRoute
-  '/workspace/$workspaceSlug/projects/$projectId/welcome': typeof WorkspaceWorkspaceSlugProjectsProjectIdWelcomeRoute
+  '/workspace/$workspaceSlug/projects/$projectId/analytics': typeof WorkspaceWorkspaceSlugProjectsProjectIdAnalyticsRoute
+  '/workspace/$workspaceSlug/projects/$projectId/connect': typeof WorkspaceWorkspaceSlugProjectsProjectIdConnectRoute
+  '/workspace/$workspaceSlug/projects/$projectId/designer': typeof WorkspaceWorkspaceSlugProjectsProjectIdDesignerRouteWithChildren
+  '/workspace/$workspaceSlug/projects/$projectId/distribute': typeof WorkspaceWorkspaceSlugProjectsProjectIdDistributeRoute
   '/workspace/$workspaceSlug/experiences/$experienceId/': typeof WorkspaceWorkspaceSlugExperiencesExperienceIdIndexRoute
   '/workspace/$workspaceSlug/projects/$projectId/': typeof WorkspaceWorkspaceSlugProjectsProjectIdIndexRoute
+  '/workspace/$workspaceSlug/projects/$projectId/designer/settings': typeof WorkspaceWorkspaceSlugProjectsProjectIdDesignerSettingsRoute
+  '/workspace/$workspaceSlug/projects/$projectId/designer/share': typeof WorkspaceWorkspaceSlugProjectsProjectIdDesignerShareRoute
+  '/workspace/$workspaceSlug/projects/$projectId/designer/theme': typeof WorkspaceWorkspaceSlugProjectsProjectIdDesignerThemeRoute
+  '/workspace/$workspaceSlug/projects/$projectId/designer/welcome': typeof WorkspaceWorkspaceSlugProjectsProjectIdDesignerWelcomeRoute
+  '/workspace/$workspaceSlug/projects/$projectId/designer/': typeof WorkspaceWorkspaceSlugProjectsProjectIdDesignerIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -386,12 +435,17 @@ export interface FileRouteTypes {
     | '/workspace/$workspaceSlug/projects'
     | '/workspace/$workspaceSlug/experiences/$experienceId/collect'
     | '/workspace/$workspaceSlug/experiences/$experienceId/create'
-    | '/workspace/$workspaceSlug/projects/$projectId/settings'
-    | '/workspace/$workspaceSlug/projects/$projectId/share'
-    | '/workspace/$workspaceSlug/projects/$projectId/theme'
-    | '/workspace/$workspaceSlug/projects/$projectId/welcome'
+    | '/workspace/$workspaceSlug/projects/$projectId/analytics'
+    | '/workspace/$workspaceSlug/projects/$projectId/connect'
+    | '/workspace/$workspaceSlug/projects/$projectId/designer'
+    | '/workspace/$workspaceSlug/projects/$projectId/distribute'
     | '/workspace/$workspaceSlug/experiences/$experienceId/'
     | '/workspace/$workspaceSlug/projects/$projectId/'
+    | '/workspace/$workspaceSlug/projects/$projectId/designer/settings'
+    | '/workspace/$workspaceSlug/projects/$projectId/designer/share'
+    | '/workspace/$workspaceSlug/projects/$projectId/designer/theme'
+    | '/workspace/$workspaceSlug/projects/$projectId/designer/welcome'
+    | '/workspace/$workspaceSlug/projects/$projectId/designer/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -418,12 +472,16 @@ export interface FileRouteTypes {
     | '/workspace/$workspaceSlug/projects'
     | '/workspace/$workspaceSlug/experiences/$experienceId/collect'
     | '/workspace/$workspaceSlug/experiences/$experienceId/create'
-    | '/workspace/$workspaceSlug/projects/$projectId/settings'
-    | '/workspace/$workspaceSlug/projects/$projectId/share'
-    | '/workspace/$workspaceSlug/projects/$projectId/theme'
-    | '/workspace/$workspaceSlug/projects/$projectId/welcome'
+    | '/workspace/$workspaceSlug/projects/$projectId/analytics'
+    | '/workspace/$workspaceSlug/projects/$projectId/connect'
+    | '/workspace/$workspaceSlug/projects/$projectId/distribute'
     | '/workspace/$workspaceSlug/experiences/$experienceId'
     | '/workspace/$workspaceSlug/projects/$projectId'
+    | '/workspace/$workspaceSlug/projects/$projectId/designer/settings'
+    | '/workspace/$workspaceSlug/projects/$projectId/designer/share'
+    | '/workspace/$workspaceSlug/projects/$projectId/designer/theme'
+    | '/workspace/$workspaceSlug/projects/$projectId/designer/welcome'
+    | '/workspace/$workspaceSlug/projects/$projectId/designer'
   id:
     | '__root__'
     | '/'
@@ -456,12 +514,17 @@ export interface FileRouteTypes {
     | '/workspace/$workspaceSlug/projects/'
     | '/workspace/$workspaceSlug/experiences/$experienceId/collect'
     | '/workspace/$workspaceSlug/experiences/$experienceId/create'
-    | '/workspace/$workspaceSlug/projects/$projectId/settings'
-    | '/workspace/$workspaceSlug/projects/$projectId/share'
-    | '/workspace/$workspaceSlug/projects/$projectId/theme'
-    | '/workspace/$workspaceSlug/projects/$projectId/welcome'
+    | '/workspace/$workspaceSlug/projects/$projectId/analytics'
+    | '/workspace/$workspaceSlug/projects/$projectId/connect'
+    | '/workspace/$workspaceSlug/projects/$projectId/designer'
+    | '/workspace/$workspaceSlug/projects/$projectId/distribute'
     | '/workspace/$workspaceSlug/experiences/$experienceId/'
     | '/workspace/$workspaceSlug/projects/$projectId/'
+    | '/workspace/$workspaceSlug/projects/$projectId/designer/settings'
+    | '/workspace/$workspaceSlug/projects/$projectId/designer/share'
+    | '/workspace/$workspaceSlug/projects/$projectId/designer/theme'
+    | '/workspace/$workspaceSlug/projects/$projectId/designer/welcome'
+    | '/workspace/$workspaceSlug/projects/$projectId/designer/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -686,32 +749,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkspaceWorkspaceSlugExperiencesExperienceIdIndexRouteImport
       parentRoute: typeof WorkspaceWorkspaceSlugExperiencesExperienceIdRoute
     }
-    '/workspace/$workspaceSlug/projects/$projectId/welcome': {
-      id: '/workspace/$workspaceSlug/projects/$projectId/welcome'
-      path: '/welcome'
-      fullPath: '/workspace/$workspaceSlug/projects/$projectId/welcome'
-      preLoaderRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdWelcomeRouteImport
+    '/workspace/$workspaceSlug/projects/$projectId/distribute': {
+      id: '/workspace/$workspaceSlug/projects/$projectId/distribute'
+      path: '/distribute'
+      fullPath: '/workspace/$workspaceSlug/projects/$projectId/distribute'
+      preLoaderRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdDistributeRouteImport
       parentRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdRoute
     }
-    '/workspace/$workspaceSlug/projects/$projectId/theme': {
-      id: '/workspace/$workspaceSlug/projects/$projectId/theme'
-      path: '/theme'
-      fullPath: '/workspace/$workspaceSlug/projects/$projectId/theme'
-      preLoaderRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdThemeRouteImport
+    '/workspace/$workspaceSlug/projects/$projectId/designer': {
+      id: '/workspace/$workspaceSlug/projects/$projectId/designer'
+      path: '/designer'
+      fullPath: '/workspace/$workspaceSlug/projects/$projectId/designer'
+      preLoaderRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdDesignerRouteImport
       parentRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdRoute
     }
-    '/workspace/$workspaceSlug/projects/$projectId/share': {
-      id: '/workspace/$workspaceSlug/projects/$projectId/share'
-      path: '/share'
-      fullPath: '/workspace/$workspaceSlug/projects/$projectId/share'
-      preLoaderRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdShareRouteImport
+    '/workspace/$workspaceSlug/projects/$projectId/connect': {
+      id: '/workspace/$workspaceSlug/projects/$projectId/connect'
+      path: '/connect'
+      fullPath: '/workspace/$workspaceSlug/projects/$projectId/connect'
+      preLoaderRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdConnectRouteImport
       parentRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdRoute
     }
-    '/workspace/$workspaceSlug/projects/$projectId/settings': {
-      id: '/workspace/$workspaceSlug/projects/$projectId/settings'
-      path: '/settings'
-      fullPath: '/workspace/$workspaceSlug/projects/$projectId/settings'
-      preLoaderRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdSettingsRouteImport
+    '/workspace/$workspaceSlug/projects/$projectId/analytics': {
+      id: '/workspace/$workspaceSlug/projects/$projectId/analytics'
+      path: '/analytics'
+      fullPath: '/workspace/$workspaceSlug/projects/$projectId/analytics'
+      preLoaderRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdAnalyticsRouteImport
       parentRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdRoute
     }
     '/workspace/$workspaceSlug/experiences/$experienceId/create': {
@@ -727,6 +790,41 @@ declare module '@tanstack/react-router' {
       fullPath: '/workspace/$workspaceSlug/experiences/$experienceId/collect'
       preLoaderRoute: typeof WorkspaceWorkspaceSlugExperiencesExperienceIdCollectRouteImport
       parentRoute: typeof WorkspaceWorkspaceSlugExperiencesExperienceIdRoute
+    }
+    '/workspace/$workspaceSlug/projects/$projectId/designer/': {
+      id: '/workspace/$workspaceSlug/projects/$projectId/designer/'
+      path: '/'
+      fullPath: '/workspace/$workspaceSlug/projects/$projectId/designer/'
+      preLoaderRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdDesignerIndexRouteImport
+      parentRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdDesignerRoute
+    }
+    '/workspace/$workspaceSlug/projects/$projectId/designer/welcome': {
+      id: '/workspace/$workspaceSlug/projects/$projectId/designer/welcome'
+      path: '/welcome'
+      fullPath: '/workspace/$workspaceSlug/projects/$projectId/designer/welcome'
+      preLoaderRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdDesignerWelcomeRouteImport
+      parentRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdDesignerRoute
+    }
+    '/workspace/$workspaceSlug/projects/$projectId/designer/theme': {
+      id: '/workspace/$workspaceSlug/projects/$projectId/designer/theme'
+      path: '/theme'
+      fullPath: '/workspace/$workspaceSlug/projects/$projectId/designer/theme'
+      preLoaderRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdDesignerThemeRouteImport
+      parentRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdDesignerRoute
+    }
+    '/workspace/$workspaceSlug/projects/$projectId/designer/share': {
+      id: '/workspace/$workspaceSlug/projects/$projectId/designer/share'
+      path: '/share'
+      fullPath: '/workspace/$workspaceSlug/projects/$projectId/designer/share'
+      preLoaderRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdDesignerShareRouteImport
+      parentRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdDesignerRoute
+    }
+    '/workspace/$workspaceSlug/projects/$projectId/designer/settings': {
+      id: '/workspace/$workspaceSlug/projects/$projectId/designer/settings'
+      path: '/settings'
+      fullPath: '/workspace/$workspaceSlug/projects/$projectId/designer/settings'
+      preLoaderRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdDesignerSettingsRouteImport
+      parentRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdDesignerRoute
     }
   }
 }
@@ -815,24 +913,51 @@ const WorkspaceWorkspaceSlugExperiencesExperienceIdRouteWithChildren =
     WorkspaceWorkspaceSlugExperiencesExperienceIdRouteChildren,
   )
 
+interface WorkspaceWorkspaceSlugProjectsProjectIdDesignerRouteChildren {
+  WorkspaceWorkspaceSlugProjectsProjectIdDesignerSettingsRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdDesignerSettingsRoute
+  WorkspaceWorkspaceSlugProjectsProjectIdDesignerShareRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdDesignerShareRoute
+  WorkspaceWorkspaceSlugProjectsProjectIdDesignerThemeRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdDesignerThemeRoute
+  WorkspaceWorkspaceSlugProjectsProjectIdDesignerWelcomeRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdDesignerWelcomeRoute
+  WorkspaceWorkspaceSlugProjectsProjectIdDesignerIndexRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdDesignerIndexRoute
+}
+
+const WorkspaceWorkspaceSlugProjectsProjectIdDesignerRouteChildren: WorkspaceWorkspaceSlugProjectsProjectIdDesignerRouteChildren =
+  {
+    WorkspaceWorkspaceSlugProjectsProjectIdDesignerSettingsRoute:
+      WorkspaceWorkspaceSlugProjectsProjectIdDesignerSettingsRoute,
+    WorkspaceWorkspaceSlugProjectsProjectIdDesignerShareRoute:
+      WorkspaceWorkspaceSlugProjectsProjectIdDesignerShareRoute,
+    WorkspaceWorkspaceSlugProjectsProjectIdDesignerThemeRoute:
+      WorkspaceWorkspaceSlugProjectsProjectIdDesignerThemeRoute,
+    WorkspaceWorkspaceSlugProjectsProjectIdDesignerWelcomeRoute:
+      WorkspaceWorkspaceSlugProjectsProjectIdDesignerWelcomeRoute,
+    WorkspaceWorkspaceSlugProjectsProjectIdDesignerIndexRoute:
+      WorkspaceWorkspaceSlugProjectsProjectIdDesignerIndexRoute,
+  }
+
+const WorkspaceWorkspaceSlugProjectsProjectIdDesignerRouteWithChildren =
+  WorkspaceWorkspaceSlugProjectsProjectIdDesignerRoute._addFileChildren(
+    WorkspaceWorkspaceSlugProjectsProjectIdDesignerRouteChildren,
+  )
+
 interface WorkspaceWorkspaceSlugProjectsProjectIdRouteChildren {
-  WorkspaceWorkspaceSlugProjectsProjectIdSettingsRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdSettingsRoute
-  WorkspaceWorkspaceSlugProjectsProjectIdShareRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdShareRoute
-  WorkspaceWorkspaceSlugProjectsProjectIdThemeRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdThemeRoute
-  WorkspaceWorkspaceSlugProjectsProjectIdWelcomeRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdWelcomeRoute
+  WorkspaceWorkspaceSlugProjectsProjectIdAnalyticsRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdAnalyticsRoute
+  WorkspaceWorkspaceSlugProjectsProjectIdConnectRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdConnectRoute
+  WorkspaceWorkspaceSlugProjectsProjectIdDesignerRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdDesignerRouteWithChildren
+  WorkspaceWorkspaceSlugProjectsProjectIdDistributeRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdDistributeRoute
   WorkspaceWorkspaceSlugProjectsProjectIdIndexRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdIndexRoute
 }
 
 const WorkspaceWorkspaceSlugProjectsProjectIdRouteChildren: WorkspaceWorkspaceSlugProjectsProjectIdRouteChildren =
   {
-    WorkspaceWorkspaceSlugProjectsProjectIdSettingsRoute:
-      WorkspaceWorkspaceSlugProjectsProjectIdSettingsRoute,
-    WorkspaceWorkspaceSlugProjectsProjectIdShareRoute:
-      WorkspaceWorkspaceSlugProjectsProjectIdShareRoute,
-    WorkspaceWorkspaceSlugProjectsProjectIdThemeRoute:
-      WorkspaceWorkspaceSlugProjectsProjectIdThemeRoute,
-    WorkspaceWorkspaceSlugProjectsProjectIdWelcomeRoute:
-      WorkspaceWorkspaceSlugProjectsProjectIdWelcomeRoute,
+    WorkspaceWorkspaceSlugProjectsProjectIdAnalyticsRoute:
+      WorkspaceWorkspaceSlugProjectsProjectIdAnalyticsRoute,
+    WorkspaceWorkspaceSlugProjectsProjectIdConnectRoute:
+      WorkspaceWorkspaceSlugProjectsProjectIdConnectRoute,
+    WorkspaceWorkspaceSlugProjectsProjectIdDesignerRoute:
+      WorkspaceWorkspaceSlugProjectsProjectIdDesignerRouteWithChildren,
+    WorkspaceWorkspaceSlugProjectsProjectIdDistributeRoute:
+      WorkspaceWorkspaceSlugProjectsProjectIdDistributeRoute,
     WorkspaceWorkspaceSlugProjectsProjectIdIndexRoute:
       WorkspaceWorkspaceSlugProjectsProjectIdIndexRoute,
   }

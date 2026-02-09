@@ -1,15 +1,15 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 
 /**
- * Project index route - redirects to designer/welcome
+ * Designer index route - redirects to welcome
  *
- * Route: /workspace/:workspaceSlug/projects/:projectId (exact match)
+ * Route: /workspace/:workspaceSlug/projects/:projectId/designer (exact match)
  * Access: Admin only (enforced by parent route)
  *
- * Redirects to the welcome tab of the project designer.
+ * Redirects to the welcome tab within the designer.
  */
 export const Route = createFileRoute(
-  '/workspace/$workspaceSlug/projects/$projectId/',
+  '/workspace/$workspaceSlug/projects/$projectId/designer/',
 )({
   beforeLoad: ({ params }) => {
     throw redirect({

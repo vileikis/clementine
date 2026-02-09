@@ -4,8 +4,7 @@ import { projectSchema } from '@clementine/shared'
 import { firestore } from '@/integrations/firebase/client'
 import { convertFirestoreDoc } from '@/shared/utils/firestore-utils'
 import { NotFound } from '@/shared/components/NotFound'
-import { ProjectConfigDesignerLayout } from '@/domains/project-config'
-import { useProject } from '@/domains/project'
+import { ProjectLayout, useProject } from '@/domains/project'
 
 /**
  * Project layout route
@@ -13,8 +12,8 @@ import { useProject } from '@/domains/project'
  * Route: /workspace/:workspaceSlug/projects/:projectId
  * Access: Admin only (enforced by parent route)
  *
- * Layout for project routes (welcome, theme, share, settings).
- * Loads project data and renders the designer layout.
+ * Layout for project routes (designer, distribute, connect, analytics).
+ * Loads project data and renders the project layout with primary tabs.
  */
 export const Route = createFileRoute(
   '/workspace/$workspaceSlug/projects/$projectId',
@@ -41,11 +40,11 @@ export const Route = createFileRoute(
 
     return { project } as { project: Record<string, {}> }
   },
-  component: ProjectLayout,
+  component: ProjectLayoutRoute,
   notFoundComponent: ProjectNotFound,
 })
 
-function ProjectLayout() {
+function ProjectLayoutRoute() {
   const { workspaceSlug, projectId } = Route.useParams()
 
   // Get data from hooks (real-time updates enabled)
@@ -57,12 +56,7 @@ function ProjectLayout() {
     return null
   }
 
-  return (
-    <ProjectConfigDesignerLayout
-      project={project}
-      workspaceSlug={workspaceSlug}
-    />
-  )
+  return <ProjectLayout project={project} workspaceSlug={workspaceSlug} />
 }
 
 function ProjectNotFound() {
