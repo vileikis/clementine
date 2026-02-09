@@ -104,7 +104,8 @@ export function ExperienceCard({
   // Base classes (layout and interaction behavior, no hardcoded colors)
   // Edit mode is WYSIWYG - same visual appearance as run mode, just non-interactive
   const cardClasses = cn(
-    'flex gap-3 p-3 rounded-lg min-h-[44px] transition-colors cursor-pointer select-none',
+    'flex gap-3 p-3 rounded-lg min-h-[44px] transition-all duration-150 ease-out cursor-pointer select-none',
+    'hover:scale-[1.02] active:scale-[0.97] active:duration-75',
     {
       // Layout-specific styles
       'flex-row items-center': layout === 'list',

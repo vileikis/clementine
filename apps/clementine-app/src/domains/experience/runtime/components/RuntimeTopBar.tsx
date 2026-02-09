@@ -25,7 +25,7 @@
  */
 
 import { useState } from 'react'
-import { ArrowLeft, Home } from 'lucide-react'
+import { ArrowLeft, Home, X } from 'lucide-react'
 import {
   ThemedIconButton,
   ThemedProgressBar,
@@ -74,6 +74,9 @@ export interface RuntimeTopBarProps {
   /** Handler for back navigation */
   onBack?: () => void
 
+  /** Handler for closing the experience (first step or single-step) */
+  onClose?: () => void
+
   /** Whether back navigation is available */
   canGoBack?: boolean
 
@@ -104,15 +107,26 @@ export function RuntimeTopBar({
   totalSteps,
   onHomeClick,
   onBack,
-  canGoBack = false,
+  onClose,
   className,
 }: RuntimeTopBarProps) {
   const [showDialog, setShowDialog] = useState(false)
+
+  const isCloseMode = totalSteps === 1 || currentStepIndex === 0
 
   // Calculate progress percentage
   // Add 1 to currentStepIndex because it's 0-based (step 0 = first step)
   const progress =
     totalSteps > 0 ? ((currentStepIndex + 1) / totalSteps) * 100 : 0
+
+  const handleGoBack = () => {
+    if (isCloseMode) {
+      handleHomeButtonClick()
+      onClose?.()
+    } else {
+      onBack?.()
+    }
+  }
 
   const handleHomeButtonClick = () => {
     if (onHomeClick) {
@@ -149,21 +163,20 @@ export function RuntimeTopBar({
 
         {/* Inner container with max width */}
         <div className="relative w-full max-w-2xl flex items-center gap-4">
-          {/* Left: Back button (hidden for single-step experiences) */}
-          {onBack ? (
-            <ThemedIconButton
-              size="md"
-              variant="outline"
-              onClick={onBack}
-              disabled={!canGoBack}
-              aria-label="Go back"
-              className="shrink-0"
-            >
+          {/* Left: Back/Close button */}
+          <ThemedIconButton
+            size="md"
+            variant="outline"
+            onClick={handleGoBack}
+            aria-label={isCloseMode ? 'Close' : 'Go back'}
+            className="shrink-0"
+          >
+            {isCloseMode ? (
+              <X className="h-5 w-5" />
+            ) : (
               <ArrowLeft className="h-5 w-5" />
-            </ThemedIconButton>
-          ) : (
-            <div className="w-11 shrink-0" />
-          )}
+            )}
+          </ThemedIconButton>
 
           {/* Center: Title and progress bar */}
           <div className="flex-1 flex flex-col items-center gap-2 min-w-0">
