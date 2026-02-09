@@ -2,18 +2,15 @@
  * Camera Active State
  *
  * Shows live camera feed with icon-based controls.
- * Layout: camera container (black bg, rounded) + control row (library, capture, switch)
- *
- * Responsive behavior:
- * - Mobile: camera fills available vertical space
- * - Desktop: camera container has max dimensions, centered vertically
+ * Uses CaptureLayout for consistent positioning across capture states.
  */
 
 import { Camera, ImageIcon, SwitchCamera } from 'lucide-react'
+import { CaptureLayout } from './CaptureLayout'
 import type { RefObject } from 'react'
 import type { AspectRatio, CameraCaptureError } from '@/shared/camera/types'
 import type { CameraViewRef } from '@/shared/camera'
-import { CameraView } from '@/shared/camera'
+import { AspectRatioControl, CameraView } from '@/shared/camera'
 import { ThemedIconButton } from '@/shared/theming'
 
 interface CameraActiveProps {
@@ -27,6 +24,8 @@ interface CameraActiveProps {
   onSwitchCamera: () => void
   onOpenPicker: () => void
   onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  showAspectRatioSwitcher?: boolean
+  onAspectRatioChange?: (ratio: AspectRatio) => void
 }
 
 export function CameraActive({
@@ -40,54 +39,66 @@ export function CameraActive({
   onSwitchCamera,
   onOpenPicker,
   onFileChange,
+  showAspectRatioSwitcher = false,
+  onAspectRatioChange,
 }: CameraActiveProps) {
   return (
-    <div className="flex flex-col h-full w-full mx-auto">
-      {/* Camera container - fills space on mobile, centered on desktop */}
-      <div className="flex-1 min-h-0 flex items-center justify-center">
-        <div className="w-full h-full max-h-[70vh] flex items-center justify-center bg-black rounded-2xl overflow-hidden">
-          <CameraView
-            ref={cameraRef}
-            aspectRatio={aspectRatio}
-            onReady={onCameraReady}
-            onError={onCameraError}
-          />
-        </div>
-      </div>
-
-      {/* Controls row */}
-      <div className="flex items-center justify-center gap-6 py-6">
-        {/* Library button (left) */}
-        <ThemedIconButton
-          onClick={onOpenPicker}
-          variant="outline"
-          aria-label="Choose from library"
-        >
-          <ImageIcon className="size-5" />
-        </ThemedIconButton>
-
-        {/* Capture button (center) - larger */}
-        <ThemedIconButton
-          onClick={onCapture}
-          variant="primary"
-          size="lg"
-          aria-label="Take photo"
-        >
-          <Camera className="size-7" />
-        </ThemedIconButton>
-
-        {/* Switch camera button (right) */}
-        <ThemedIconButton
-          onClick={onSwitchCamera}
-          variant="outline"
-          disabled={!hasMultipleCameras}
-          aria-label="Switch camera"
-        >
-          <SwitchCamera className="size-5" />
-        </ThemedIconButton>
-      </div>
-
-      {/* Hidden file input */}
+    <CaptureLayout
+      controls={
+        <>
+          {showAspectRatioSwitcher && onAspectRatioChange && (
+            <AspectRatioControl
+              value={aspectRatio}
+              onChange={onAspectRatioChange}
+            />
+          )}
+          <div className="flex items-center justify-center gap-8">
+            <div className="flex flex-col items-center gap-1.5">
+              <ThemedIconButton
+                onClick={onOpenPicker}
+                variant="outline"
+                size="lg"
+                aria-label="Choose from library"
+              >
+                <ImageIcon className="size-6" />
+              </ThemedIconButton>
+              <span className="text-xs text-white/70">Library</span>
+            </div>
+            <div className="flex flex-col items-center gap-1.5">
+              <ThemedIconButton
+                onClick={onCapture}
+                variant="primary"
+                size="lg"
+                className="h-20! w-20!"
+                aria-label="Take photo"
+              >
+                <Camera className="size-8" />
+              </ThemedIconButton>
+              <span className="text-xs invisible">Take</span>
+            </div>
+            <div className="flex flex-col items-center gap-1.5">
+              <ThemedIconButton
+                onClick={onSwitchCamera}
+                variant="outline"
+                size="lg"
+                disabled={!hasMultipleCameras}
+                aria-label="Switch camera"
+              >
+                <SwitchCamera className="size-6" />
+              </ThemedIconButton>
+              <span className="text-xs text-white/70">Flip</span>
+            </div>
+          </div>
+        </>
+      }
+    >
+      <CameraView
+        ref={cameraRef}
+        aspectRatio={aspectRatio}
+        className="w-full h-full"
+        onReady={onCameraReady}
+        onError={onCameraError}
+      />
       <input
         ref={fileInputRef}
         type="file"
@@ -95,6 +106,6 @@ export function CameraActive({
         onChange={onFileChange}
         className="hidden"
       />
-    </div>
+    </CaptureLayout>
   )
 }

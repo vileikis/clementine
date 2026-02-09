@@ -98,10 +98,11 @@ export function ThemedButton({
       className={cn(
         SIZE_CLASSES[size],
         'inline-flex items-center justify-center',
-        'font-bold transition-opacity',
+        'font-bold transition-all duration-150 ease-out',
         variant === 'primary' && 'shadow-sm',
-        'hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-offset-2',
-        'disabled:cursor-not-allowed disabled:opacity-50',
+        'hover:scale-[1.03] hover:opacity-90 active:scale-[0.96] active:duration-75',
+        'focus:outline-none focus:ring-2 focus:ring-offset-2',
+        'disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100',
         className,
       )}
       style={style}

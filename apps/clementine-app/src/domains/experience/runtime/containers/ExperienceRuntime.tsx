@@ -259,9 +259,9 @@ export function ExperienceRuntime({
     return null
   }
 
-  // Check if current step manages its own navigation
+  // Check if current step manages its own navigation and layout
   const currentStep = store.steps[store.currentStepIndex]
-  const hideNavigation = currentStep
+  const isFullHeightStep = currentStep
     ? STEPS_WITH_CUSTOM_NAVIGATION.has(currentStep.type)
     : false
 
@@ -277,23 +277,27 @@ export function ExperienceRuntime({
           canGoBack={steps.length > 1 && store.canGoBack()}
         />
       )}
-      <ScrollableView
-        className={cn(
-          'items-center max-w-2xl',
-          // Padding for fixed top bar
-          'pt-28',
-          // Padding for fixed bottom navigation (mobile only)
-          'pb-28 md:pb-0',
-        )}
-      >
-        {children}
-        {!hideNavigation && (
+      {isFullHeightStep ? (
+        // Full-height steps (camera, video): no ScrollableView, no padding, own controls
+        <div className="flex-1 min-h-0 overflow-hidden">{children}</div>
+      ) : (
+        // Content steps (forms, info): scrollable, centered, with topbar/nav padding
+        <ScrollableView
+          className={cn(
+            'items-center max-w-2xl',
+            // Padding for fixed top bar
+            'pt-28',
+            // Padding for fixed bottom navigation (mobile only)
+            'pb-28 md:pb-0',
+          )}
+        >
+          {children}
           <RuntimeNavigation
             onNext={store.nextStep}
             canProceed={store.canProceed()}
           />
-        )}
-      </ScrollableView>
+        </ScrollableView>
+      )}
     </>
   )
 }

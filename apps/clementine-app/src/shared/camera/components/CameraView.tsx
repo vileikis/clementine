@@ -21,6 +21,7 @@ import {
 } from 'react'
 import { captureFromVideo, createCaptureFile } from '../lib'
 import { useCameraStream } from '../hooks/useCameraStream'
+import { ASPECT_RATIO_CSS } from '../constants'
 import type {
   AspectRatio,
   CameraCaptureError,
@@ -48,7 +49,7 @@ export interface CameraViewRef {
 interface CameraViewProps {
   /** Camera facing direction */
   facing?: CameraFacing
-  /** Aspect ratio guide overlay */
+  /** Aspect ratio guide overlay (defaults to 1:1) */
   aspectRatio?: AspectRatio
   /** Additional CSS classes */
   className?: string
@@ -56,16 +57,6 @@ interface CameraViewProps {
   onReady?: () => void
   /** Called when an error occurs */
   onError?: (error: CameraCaptureError) => void
-}
-
-/**
- * Aspect ratio to CSS aspect-ratio value mapping
- */
-const ASPECT_RATIO_CSS: Record<AspectRatio, string> = {
-  '1:1': '1 / 1',
-  '9:16': '9 / 16',
-  '3:2': '3 / 2',
-  '2:3': '2 / 3',
 }
 
 /**
@@ -91,15 +82,16 @@ export const CameraView = forwardRef<CameraViewRef, CameraViewProps>(
   function CameraView(
     {
       facing: initialFacing = 'user',
-      aspectRatio,
+      aspectRatio = '1:1',
       className,
       onReady,
       onError,
     },
     ref,
   ) {
-    // Video element ref
+    // Video element refs (main + blurred background)
     const videoRef = useRef<HTMLVideoElement | null>(null)
+    const bgVideoRef = useRef<HTMLVideoElement | null>(null)
 
     // Camera stream management
     const { stream, facing, hasMultipleCameras, stop, switchCamera } =
@@ -109,50 +101,55 @@ export const CameraView = forwardRef<CameraViewRef, CameraViewProps>(
         onError,
       })
 
-    // Attach stream to video element when it changes
+    // Attach stream to video elements when it changes
     useEffect(() => {
-      const video = videoRef.current
-      if (!video) return
+      const videos = [videoRef.current, bgVideoRef.current].filter(
+        (v): v is HTMLVideoElement => v !== null,
+      )
 
-      video.srcObject = stream
+      for (const video of videos) {
+        video.srcObject = stream
 
-      // Clear video when stream is null
-      if (!stream) {
-        video.pause()
-        return
-      }
+        if (!stream) {
+          video.pause()
+          continue
+        }
 
-      // Play video when stream is attached
-      if (video.readyState >= 1) {
-        video.play().catch((err) => {
-          console.error('Error playing video:', err)
-        })
-        return
-      }
-
-      // Wait for metadata before playing
-      video.addEventListener(
-        'loadedmetadata',
-        () => {
+        if (video.readyState >= 1) {
           video.play().catch((err) => {
             console.error('Error playing video:', err)
           })
-        },
-        { once: true },
-      )
+          continue
+        }
+
+        video.addEventListener(
+          'loadedmetadata',
+          () => {
+            video.play().catch((err) => {
+              console.error('Error playing video:', err)
+            })
+          },
+          { once: true },
+        )
+      }
     }, [stream])
 
     // Handle tab visibility change - pause/resume when tab loses/gains focus
     useEffect(() => {
       const handleVisibilityChange = () => {
-        if (!stream || !videoRef.current) return
+        if (!stream) return
+        const videos = [videoRef.current, bgVideoRef.current].filter(
+          (v): v is HTMLVideoElement => v !== null,
+        )
 
-        if (document.hidden) {
-          videoRef.current.pause()
-        } else {
-          videoRef.current.play().catch((err) => {
-            console.error('Error resuming video:', err)
-          })
+        for (const video of videos) {
+          if (document.hidden) {
+            video.pause()
+          } else {
+            video.play().catch((err) => {
+              console.error('Error resuming video:', err)
+            })
+          }
         }
       }
 
@@ -240,30 +237,40 @@ export const CameraView = forwardRef<CameraViewRef, CameraViewProps>(
     const shouldMirror = facing === 'user'
 
     return (
-      <div
-        className={cn(
-          'relative bg-black overflow-hidden',
-          aspectRatio ? 'w-full' : 'w-full h-full',
-          className,
-        )}
-        style={
-          aspectRatio
-            ? { aspectRatio: ASPECT_RATIO_CSS[aspectRatio], maxHeight: '100%' }
-            : undefined
-        }
-      >
-        {/* Video element - fills the constrained container */}
+      // Outer container - takes whatever space parent gives, black bg = fallback
+      <div className={cn('relative bg-gray-700 overflow-hidden', className)}>
+        {/* Background layer - blurred camera feed for letterbox area */}
         <video
-          ref={videoRef}
+          ref={bgVideoRef}
           autoPlay
           playsInline
           muted
           webkit-playsinline="true"
-          className={cn(
-            'absolute inset-0 w-full h-full object-cover',
-            shouldMirror && 'scale-x-[-1]',
-          )}
+          className="absolute inset-0 w-full h-full object-cover scale-110 blur-xl brightness-[0.5]"
         />
+
+        {/* Aspect frame - centered within container, maintains target ratio */}
+        <div
+          className="absolute inset-0 m-auto overflow-hidden rounded-2xl max-w-2xl"
+          style={{
+            aspectRatio: ASPECT_RATIO_CSS[aspectRatio],
+            width: '100%',
+            maxHeight: '100%',
+          }}
+        >
+          {/* Video stream - fills aspect frame, crops to fit */}
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            muted
+            webkit-playsinline="true"
+            className={cn(
+              'w-full h-full object-cover',
+              shouldMirror && 'scale-x-[-1]',
+            )}
+          />
+        </div>
       </div>
     )
   },

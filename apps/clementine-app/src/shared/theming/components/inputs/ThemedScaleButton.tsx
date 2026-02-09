@@ -67,9 +67,10 @@ export function ThemedScaleButton({
       className={cn(
         'flex items-center justify-center',
         'h-12 w-12 text-lg font-semibold',
-        'border-2 transition-all',
-        'hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-offset-2',
-        'disabled:cursor-not-allowed disabled:opacity-50',
+        'border-2 transition-all duration-150 ease-out',
+        'hover:scale-[1.06] hover:opacity-90 active:scale-[0.93] active:duration-75',
+        'focus:outline-none focus:ring-2 focus:ring-offset-2',
+        'disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100',
         className,
       )}
       style={style}

@@ -2,30 +2,17 @@
  * Photo Preview State
  *
  * Shows captured photo with retake and confirm options.
- * Layout matches CameraActive: container (black bg, rounded) + control row.
- *
- * Responsive behavior:
- * - Mobile: preview fills available vertical space
- * - Desktop: preview container has max dimensions, centered vertically
+ * Uses CaptureLayout + PhotoFrame for visual continuity with camera state.
  */
 
-import type { CapturedPhoto } from '@/shared/camera'
-import type { ExperienceAspectRatio } from '@clementine/shared'
+import { CaptureLayout } from './CaptureLayout'
+import type { AspectRatio, CapturedPhoto } from '@/shared/camera'
+import { PhotoFrame } from '@/shared/camera'
 import { ThemedButton } from '@/shared/theming'
-
-/**
- * CSS aspect-ratio values for the preview container
- */
-const ASPECT_RATIO_CSS: Record<ExperienceAspectRatio, string> = {
-  '1:1': '1 / 1',
-  '9:16': '9 / 16',
-  '3:2': '3 / 2',
-  '2:3': '2 / 3',
-}
 
 interface PhotoPreviewProps {
   photo: CapturedPhoto
-  aspectRatio: ExperienceAspectRatio
+  aspectRatio: AspectRatio
   onRetake: () => void
   onConfirm: () => void
 }
@@ -37,30 +24,24 @@ export function PhotoPreview({
   onConfirm,
 }: PhotoPreviewProps) {
   return (
-    <div className="flex flex-col h-full w-full mx-auto">
-      {/* Preview container - matches camera container styling */}
-      <div className="flex-1 min-h-0 flex items-center justify-center">
-        <div
-          className="w-full max-h-[70vh] bg-black rounded-2xl overflow-hidden"
-          style={{ aspectRatio: ASPECT_RATIO_CSS[aspectRatio] }}
-        >
-          <img
-            src={photo.previewUrl}
-            alt="Captured photo preview"
-            className="w-full h-full object-cover"
-          />
+    <CaptureLayout
+      controls={
+        <div className="flex items-center justify-center gap-4">
+          <ThemedButton onClick={onRetake} variant="outline">
+            Retake
+          </ThemedButton>
+          <ThemedButton onClick={onConfirm} variant="primary">
+            Continue
+          </ThemedButton>
         </div>
-      </div>
-
-      {/* Controls row - Retake and Continue */}
-      <div className="flex items-center justify-center gap-4 py-6">
-        <ThemedButton onClick={onRetake} variant="outline">
-          Retake
-        </ThemedButton>
-        <ThemedButton onClick={onConfirm} variant="primary">
-          Continue
-        </ThemedButton>
-      </div>
-    </div>
+      }
+    >
+      <PhotoFrame
+        src={photo.previewUrl}
+        aspectRatio={aspectRatio}
+        alt="Captured photo preview"
+        className="w-full h-full"
+      />
+    </CaptureLayout>
   )
 }

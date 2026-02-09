@@ -36,11 +36,12 @@ import {
 } from './components'
 import type { StepRendererProps } from '../../registry/step-registry'
 import type {
+  AspectRatio,
   CameraCaptureError,
   CameraViewRef,
   CapturedPhoto,
 } from '@/shared/camera'
-import type { ExperienceAspectRatio, MediaReference } from '@clementine/shared'
+import type { MediaReference } from '@clementine/shared'
 import {
   useCameraPermission,
   useLibraryPicker,
@@ -49,7 +50,7 @@ import {
 
 interface CapturePhotoRunModeProps {
   step: StepRendererProps['step']
-  aspectRatio: ExperienceAspectRatio
+  aspectRatio: AspectRatio
 }
 
 export function CapturePhotoRunMode({
@@ -78,6 +79,10 @@ export function CapturePhotoRunMode({
 
   // Track if device has multiple cameras (for switch button)
   const [hasMultipleCameras, setHasMultipleCameras] = useState(false)
+
+  // Local aspect ratio state (user can switch during capture)
+  const [activeAspectRatio, setActiveAspectRatio] =
+    useState<AspectRatio>(aspectRatio)
 
   /**
    * Handle confirm: upload photo and update session
@@ -191,25 +196,19 @@ export function CapturePhotoRunMode({
 
   // Uploading state - check first as it takes priority over all other states
   if (isUploading) {
-    return (
-      <div className="relative flex h-full w-full flex-col items-center justify-center">
-        <UploadProgress photo={photo} aspectRatio={aspectRatio} />
-      </div>
-    )
+    return <UploadProgress photo={photo} aspectRatio={activeAspectRatio} />
   }
 
   // Photo preview state - check before permission states so fallback picker works
   // (user can select photo even when permission is denied/unavailable)
   if (captureStatus === 'photo-preview' && photo) {
     return (
-      <div className="relative flex h-full w-full flex-col items-center justify-center">
-        <PhotoPreview
-          photo={photo}
-          aspectRatio={aspectRatio}
-          onRetake={retake}
-          onConfirm={handleConfirm}
-        />
-      </div>
+      <PhotoPreview
+        photo={photo}
+        aspectRatio={activeAspectRatio}
+        onRetake={retake}
+        onConfirm={handleConfirm}
+      />
     )
   }
 
@@ -276,19 +275,19 @@ export function CapturePhotoRunMode({
 
   // Camera active state (default)
   return (
-    <div className="relative flex h-full w-full flex-col items-center justify-center">
-      <CameraActive
-        cameraRef={cameraRef}
-        aspectRatio={aspectRatio}
-        fileInputRef={fileInputRef}
-        hasMultipleCameras={hasMultipleCameras}
-        onCameraReady={handleCameraReady}
-        onCameraError={handleCameraError}
-        onCapture={capture}
-        onSwitchCamera={handleSwitchCamera}
-        onOpenPicker={openPicker}
-        onFileChange={handleFileChange}
-      />
-    </div>
+    <CameraActive
+      cameraRef={cameraRef}
+      aspectRatio={activeAspectRatio}
+      fileInputRef={fileInputRef}
+      hasMultipleCameras={hasMultipleCameras}
+      onCameraReady={handleCameraReady}
+      onCameraError={handleCameraError}
+      onCapture={capture}
+      onSwitchCamera={handleSwitchCamera}
+      onOpenPicker={openPicker}
+      onFileChange={handleFileChange}
+      onAspectRatioChange={setActiveAspectRatio}
+      showAspectRatioSwitcher={true}
+    />
   )
 }
