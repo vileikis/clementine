@@ -279,7 +279,7 @@ export function ExperienceRuntime({
       )}
       {isFullHeightStep ? (
         // Full-height steps (camera, video): no ScrollableView, no padding, own controls
-        <div className="flex-1 min-h-0 scroll-disabled">{children}</div>
+        <div className="flex-1 min-h-0 overflow-hidden">{children}</div>
       ) : (
         // Content steps (forms, info): scrollable, centered, with topbar/nav padding
         <ScrollableView
