@@ -13,6 +13,9 @@ export type { CameraCaptureProps } from './containers/CameraCapture'
 export { CameraView } from './components/CameraView'
 export type { CameraViewRef } from './components/CameraView'
 
+// Controls
+export { AspectRatioControl } from './components/AspectRatioControl'
+
 // Hooks
 export { useCameraPermission } from './hooks/useCameraPermission'
 export { useCameraStream } from './hooks/useCameraStream'

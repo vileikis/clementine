@@ -13,7 +13,7 @@ import { Camera, ImageIcon, SwitchCamera } from 'lucide-react'
 import type { RefObject } from 'react'
 import type { AspectRatio, CameraCaptureError } from '@/shared/camera/types'
 import type { CameraViewRef } from '@/shared/camera'
-import { CameraView } from '@/shared/camera'
+import { AspectRatioControl, CameraView } from '@/shared/camera'
 import { ThemedIconButton } from '@/shared/theming'
 
 interface CameraActiveProps {
@@ -27,6 +27,8 @@ interface CameraActiveProps {
   onSwitchCamera: () => void
   onOpenPicker: () => void
   onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  showAspectRatioSwitcher?: boolean
+  onAspectRatioChange?: (ratio: AspectRatio) => void
 }
 
 export function CameraActive({
@@ -40,6 +42,8 @@ export function CameraActive({
   onSwitchCamera,
   onOpenPicker,
   onFileChange,
+  showAspectRatioSwitcher = false,
+  onAspectRatioChange,
 }: CameraActiveProps) {
   return (
     <div className="flex flex-col w-full h-full items-center">
@@ -54,7 +58,14 @@ export function CameraActive({
         />
       </div>
       {/* Controls - fixed to bottom, floating above camera */}
-      <div className="absolute bottom-0 inset-x-0 flex items-center justify-center gap-8 py-6 pb-8">
+      <div className="absolute bottom-0 inset-x-0 flex flex-col items-center gap-4 py-6 pb-8">
+        {/* Aspect ratio switcher */}
+        {showAspectRatioSwitcher && onAspectRatioChange && (
+          <AspectRatioControl value={aspectRatio} onChange={onAspectRatioChange} />
+        )}
+
+        {/* Capture controls row */}
+        <div className="flex items-center justify-center gap-8">
         {/* Library button (left) */}
         <div className="flex flex-col items-center gap-1.5">
           <ThemedIconButton
@@ -95,6 +106,7 @@ export function CameraActive({
             <SwitchCamera className="size-6" />
           </ThemedIconButton>
           <span className="text-xs text-white/70">Flip</span>
+        </div>
         </div>
       </div>
 

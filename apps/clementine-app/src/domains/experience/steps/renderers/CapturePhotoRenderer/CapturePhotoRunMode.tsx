@@ -36,6 +36,7 @@ import {
 } from './components'
 import type { StepRendererProps } from '../../registry/step-registry'
 import type {
+  AspectRatio,
   CameraCaptureError,
   CameraViewRef,
   CapturedPhoto,
@@ -78,6 +79,10 @@ export function CapturePhotoRunMode({
 
   // Track if device has multiple cameras (for switch button)
   const [hasMultipleCameras, setHasMultipleCameras] = useState(false)
+
+  // Local aspect ratio state (user can switch during capture)
+  const [activeAspectRatio, setActiveAspectRatio] =
+    useState<AspectRatio>(aspectRatio)
 
   /**
    * Handle confirm: upload photo and update session
@@ -278,7 +283,7 @@ export function CapturePhotoRunMode({
   return (
     <CameraActive
       cameraRef={cameraRef}
-      aspectRatio={aspectRatio}
+      aspectRatio={activeAspectRatio}
       fileInputRef={fileInputRef}
       hasMultipleCameras={hasMultipleCameras}
       onCameraReady={handleCameraReady}
@@ -287,6 +292,8 @@ export function CapturePhotoRunMode({
       onSwitchCamera={handleSwitchCamera}
       onOpenPicker={openPicker}
       onFileChange={handleFileChange}
+      onAspectRatioChange={setActiveAspectRatio}
+      showAspectRatioSwitcher={true}
     />
   )
 }
