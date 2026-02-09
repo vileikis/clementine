@@ -83,6 +83,7 @@ interface SearchableProps {
 function Searchable({ open, onOpenChange, children }: SearchableProps) {
   const [highlightIndex, setHighlightIndex] = React.useState(-1)
   const [virtualCount, setVirtualCount] = React.useState(0)
+  const [pinnedCount, setPinnedCount] = React.useState(0)
 
   const pinnedCounter = React.useRef(0)
   const selectHandlers = React.useRef(new Map<number, () => void>())
@@ -96,13 +97,12 @@ function Searchable({ open, onOpenChange, children }: SearchableProps) {
     if (open && !prevOpen.current) {
       setHighlightIndex(0)
       pinnedCounter.current = 0
+      setPinnedCount(0)
       selectHandlers.current.clear()
       virtualSelectHandler.current = null
     }
     prevOpen.current = open
   }, [open])
-
-  const pinnedCount = pinnedCounter.current
 
   const ctxValue = React.useMemo<SearchableContextValue>(
     () => ({
@@ -113,7 +113,12 @@ function Searchable({ open, onOpenChange, children }: SearchableProps) {
       pinnedCount,
       virtualCount,
       setVirtualCount,
-      claimPinnedIndex: () => pinnedCounter.current++,
+      claimPinnedIndex: () => {
+        const index = pinnedCounter.current
+        pinnedCounter.current++
+        setPinnedCount((c) => c + 1)
+        return index
+      },
       registerSelectHandler: (index, handler) => {
         selectHandlers.current.set(index, handler)
       },
@@ -286,15 +291,20 @@ function SearchableItem({
 }: SearchableItemProps) {
   const ctx = useSearchableContext()
 
-  // Claim a stable index on first render
+  // Claim a stable index on mount (before paint)
   const indexRef = React.useRef<number | null>(null)
-  if (indexRef.current === null) {
-    indexRef.current = ctx.claimPinnedIndex()
-  }
-  const index = indexRef.current
+  React.useLayoutEffect(() => {
+    if (indexRef.current === null) {
+      indexRef.current = ctx.claimPinnedIndex()
+    }
+  }, [ctx])
+
+  const index = indexRef.current ?? -1
 
   // Register select handler
   React.useEffect(() => {
+    if (index === -1) return // Skip until index is claimed
+
     const handler = () => {
       if (!disabled) {
         onSelect()
@@ -305,7 +315,7 @@ function SearchableItem({
     return () => ctx.unregisterSelectHandler(index)
   }, [ctx, index, onSelect, disabled])
 
-  const isHighlighted = ctx.highlightIndex === index
+  const isHighlighted = index !== -1 && ctx.highlightIndex === index
 
   return (
     <div
@@ -316,17 +326,21 @@ function SearchableItem({
       aria-selected={isHighlighted}
       className={cn(
         'relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none',
-        'data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground',
-        'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+        'data-highlighted:bg-accent data-highlighted:text-accent-foreground',
+        'data-disabled:pointer-events-none data-disabled:opacity-50',
         className,
       )}
       onClick={() => {
-        if (!disabled) {
+        if (!disabled && index !== -1) {
           onSelect()
           ctx.onOpenChange(false)
         }
       }}
-      onMouseEnter={() => ctx.setHighlightIndex(index)}
+      onMouseEnter={() => {
+        if (index !== -1) {
+          ctx.setHighlightIndex(index)
+        }
+      }}
     >
       {children}
     </div>
