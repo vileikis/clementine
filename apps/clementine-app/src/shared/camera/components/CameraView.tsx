@@ -98,8 +98,9 @@ export const CameraView = forwardRef<CameraViewRef, CameraViewProps>(
     },
     ref,
   ) {
-    // Video element ref
+    // Video element refs (main + blurred background)
     const videoRef = useRef<HTMLVideoElement | null>(null)
+    const bgVideoRef = useRef<HTMLVideoElement | null>(null)
 
     // Camera stream management
     const { stream, facing, hasMultipleCameras, stop, switchCamera } =
@@ -109,50 +110,51 @@ export const CameraView = forwardRef<CameraViewRef, CameraViewProps>(
         onError,
       })
 
-    // Attach stream to video element when it changes
+    // Attach stream to video elements when it changes
     useEffect(() => {
-      const video = videoRef.current
-      if (!video) return
+      const videos = [videoRef.current, bgVideoRef.current].filter(Boolean)
 
-      video.srcObject = stream
+      for (const video of videos) {
+        video.srcObject = stream
 
-      // Clear video when stream is null
-      if (!stream) {
-        video.pause()
-        return
-      }
+        if (!stream) {
+          video.pause()
+          continue
+        }
 
-      // Play video when stream is attached
-      if (video.readyState >= 1) {
-        video.play().catch((err) => {
-          console.error('Error playing video:', err)
-        })
-        return
-      }
-
-      // Wait for metadata before playing
-      video.addEventListener(
-        'loadedmetadata',
-        () => {
+        if (video.readyState >= 1) {
           video.play().catch((err) => {
             console.error('Error playing video:', err)
           })
-        },
-        { once: true },
-      )
+          continue
+        }
+
+        video.addEventListener(
+          'loadedmetadata',
+          () => {
+            video.play().catch((err) => {
+              console.error('Error playing video:', err)
+            })
+          },
+          { once: true },
+        )
+      }
     }, [stream])
 
     // Handle tab visibility change - pause/resume when tab loses/gains focus
     useEffect(() => {
       const handleVisibilityChange = () => {
-        if (!stream || !videoRef.current) return
+        if (!stream) return
+        const videos = [videoRef.current, bgVideoRef.current].filter(Boolean)
 
-        if (document.hidden) {
-          videoRef.current.pause()
-        } else {
-          videoRef.current.play().catch((err) => {
-            console.error('Error resuming video:', err)
-          })
+        for (const video of videos) {
+          if (document.hidden) {
+            video.pause()
+          } else {
+            video.play().catch((err) => {
+              console.error('Error resuming video:', err)
+            })
+          }
         }
       }
 
@@ -240,8 +242,18 @@ export const CameraView = forwardRef<CameraViewRef, CameraViewProps>(
     const shouldMirror = facing === 'user'
 
     return (
-      // Outer container - takes whatever space parent gives, black bg = letterbox
-      <div className={cn('relative bg-black overflow-hidden', className)}>
+      // Outer container - takes whatever space parent gives, black bg = fallback
+      <div className={cn('relative bg-gray-700 overflow-hidden', className)}>
+        {/* Background layer - blurred camera feed for letterbox area */}
+        <video
+          ref={bgVideoRef}
+          autoPlay
+          playsInline
+          muted
+          webkit-playsinline="true"
+          className="absolute inset-0 w-full h-full object-cover scale-110 blur-xl brightness-[0.5]"
+        />
+
         {/* Aspect frame - centered within container, maintains target ratio */}
         <div
           className="absolute inset-0 m-auto overflow-hidden rounded-2xl max-w-2xl"
