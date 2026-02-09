@@ -17,7 +17,7 @@ An experience creator managing their project needs to easily switch between desi
 
 **Acceptance Scenarios**:
 
-1. **Given** a user is viewing any project page, **When** they look at the top navigation bar, **Then** they see three clearly labeled tabs: "Designer", "Distribute", and "Analytics" in the center of the bar.
+1. **Given** a user is viewing any project page, **When** they look at the top navigation bar, **Then** they see four clearly labeled tabs: "Designer", "Distribute", "Connect", and "Analytics" in the center of the bar.
 2. **Given** a user is on the Designer tab, **When** they click the "Distribute" tab, **Then** they are navigated to the distribute section and the Distribute tab appears active.
 3. **Given** a user is on any tab, **When** they refresh the page, **Then** they return to the same tab they were viewing.
 
@@ -81,14 +81,15 @@ An experience creator wants to understand how their project is performing. The A
 
 ### Functional Requirements
 
-- **FR-001**: System MUST display three primary navigation tabs (Designer, Distribute, Analytics) in the center of the TopNavBar when viewing a project.
+- **FR-001**: System MUST display four primary navigation tabs (Designer, Distribute, Connect, Analytics) in the center of the TopNavBar when viewing a project.
 - **FR-002**: System MUST maintain the current Designer sub-tabs (Welcome, Share, Theme, Settings) within the Designer section.
 - **FR-003**: System MUST route the project index page to the Designer section by default.
 - **FR-004**: System MUST display the Distribute page as a full page (not a dialog) showing the shareable URL, QR code, and usage instructions.
 - **FR-005**: System MUST display the Analytics page with a work-in-progress placeholder message.
-- **FR-006**: The `project` domain MUST handle the root project layout and primary navigation (Designer, Distribute, Analytics tabs).
+- **FR-011**: System MUST display the Connect page with a work-in-progress placeholder message. Connect is the section for setting up integrations & webhooks (e.g., sending result media to Dropbox, Google Drive).
+- **FR-006**: The `project` domain MUST handle the root project layout and primary navigation (Designer, Distribute, Connect, Analytics tabs).
 - **FR-007**: The `project-config` domain MUST handle the Designer section with its sub-navigation (Welcome, Share, Theme, Settings).
-- **FR-008**: System MUST display the publish workflow functionality (save status, changes badge, Preview button, Publish button) in the TopNavBar on Designer and Distribute sections, but not on Analytics.
+- **FR-008**: System MUST display the publish workflow functionality (save status, changes badge, Preview button, Publish button) in the TopNavBar on Designer and Distribute sections, but not on Connect or Analytics.
 - **FR-009**: System MUST support deep linking to all routes (users can bookmark and share URLs to specific sections).
 - **FR-010**: The TopNavBar MUST display breadcrumbs showing the project name with navigation back to the projects list.
 
@@ -100,23 +101,28 @@ An experience creator wants to understand how their project is performing. The A
   - `/workspace/:workspaceSlug/projects/:projectId` - Root layout (redirect to designer)
   - `/workspace/:workspaceSlug/projects/:projectId/designer/*` - Designer section with sub-routes
   - `/workspace/:workspaceSlug/projects/:projectId/distribute` - Distribution page
+  - `/workspace/:workspaceSlug/projects/:projectId/connect` - Connect page (WIP) - integrations & webhooks
   - `/workspace/:workspaceSlug/projects/:projectId/analytics` - Analytics page (WIP)
 
 ## Success Criteria *(mandatory)*
 
 ### Measurable Outcomes
 
-- **SC-001**: Users can navigate between Designer, Distribute, and Analytics tabs within 1 click from any project page.
+- **SC-001**: Users can navigate between Designer, Distribute, Connect, and Analytics tabs within 1 click from any project page.
 - **SC-002**: All existing Designer functionality (Welcome, Share, Theme, Settings) remains fully accessible and operational.
 - **SC-003**: All new routes are accessible via deep linking (users can bookmark and share URLs to specific sections).
 - **SC-004**: Users can copy the project share link from the Distribute page and successfully share it with guests.
-- **SC-005**: The navigation structure clearly communicates the three distinct project management areas to users.
+- **SC-005**: The navigation structure clearly communicates the four distinct project management areas to users.
 
 ## Clarifications
 
 ### Session 2026-02-03
 
 - Q: Should publish workflow controls (save status, changes badge, Publish button) be visible on all tabs or only Designer? → A: Designer + Distribute - Publish controls visible on Designer and Distribute sections (since sharing needs published content), but not on Analytics.
+
+### Session 2026-02-09
+
+- Q: Is there a place for integrations and webhooks (e.g., sending result media to Dropbox, Google Drive, etc.)? → A: Yes — add a "Connect" tab as a fourth primary navigation tab alongside Designer, Distribute, and Analytics. Connect is the place to set up integrations & webhooks. Marked as WIP for now (similar to Analytics).
 
 ## Assumptions
 
