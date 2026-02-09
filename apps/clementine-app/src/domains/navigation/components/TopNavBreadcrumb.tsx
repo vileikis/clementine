@@ -53,7 +53,9 @@ export function TopNavBreadcrumb({ items }: TopNavBreadcrumbProps) {
                       {!hasIconLink && Icon && (
                         <Icon className="shrink-0 size-4" />
                       )}
-                      <span className="truncate">{item.label}</span>
+                      <span className="max-w-[26ch] truncate">
+                        {item.label}
+                      </span>
                     </Link>
                   </BreadcrumbLink>
                 ) : (
@@ -61,7 +63,7 @@ export function TopNavBreadcrumb({ items }: TopNavBreadcrumbProps) {
                     {!hasIconLink && Icon && (
                       <Icon className="shrink-0 size-4" />
                     )}
-                    <span className="truncate">{item.label}</span>
+                    <span className="max-w-[26ch] truncate">{item.label}</span>
                   </BreadcrumbPage>
                 )}
               </ShadcnBreadcrumbItem>

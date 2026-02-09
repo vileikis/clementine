@@ -23,6 +23,9 @@ import { useAuth } from '@/domains/auth'
 // Fields to compare for auto-save change detection
 const THEME_FIELDS_TO_COMPARE: (keyof Theme)[] = [
   'fontFamily',
+  'fontSource',
+  'fontVariants',
+  'fallbackStack',
   'primaryColor',
   'text',
   'button',

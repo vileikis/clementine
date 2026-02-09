@@ -27,10 +27,16 @@ export {
   DEFAULT_OVERLAY_OPACITY,
   DEFAULT_BACKGROUND,
   DEFAULT_THEME,
+  // Font constants
+  DEFAULT_FONT_SOURCE,
+  DEFAULT_FONT_VARIANTS,
+  DEFAULT_FALLBACK_STACK,
+  FONT_SOURCE_OPTIONS,
   // Types
   type Theme,
   type ThemeText,
   type ThemeButton,
   type ThemeBackground,
   type ButtonRadius,
+  type FontSource,
 } from '@clementine/shared'

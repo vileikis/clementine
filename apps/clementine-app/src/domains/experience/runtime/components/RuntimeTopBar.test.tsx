@@ -6,6 +6,10 @@ import { ThemeProvider } from '@/shared/theming/providers/ThemeProvider'
 
 const mockTheme: Theme = {
   fontFamily: 'Inter, sans-serif',
+  fontSource: 'system',
+  fontVariants: [400, 700],
+  fallbackStack:
+    'system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif',
   primaryColor: '#3B82F6',
   text: {
     color: '#1F2937',

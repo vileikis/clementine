@@ -6,6 +6,10 @@ import type { Theme, ThemeBackground } from '../types'
 
 const mockTheme: Theme = {
   fontFamily: 'Inter, sans-serif',
+  fontSource: 'system',
+  fontVariants: [400, 700],
+  fallbackStack:
+    'system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif',
   primaryColor: '#3B82F6',
   text: {
     color: '#1F2937',
@@ -96,7 +100,7 @@ describe('ThemedBackground', () => {
     expect(overlayDiv.style.opacity).toBe('0.5')
   })
 
-  it('should apply fontFamily from theme context', () => {
+  it('should not apply fontFamily when fontSource is system', () => {
     const { container } = renderWithTheme(
       <ThemedBackground>
         <div>Content</div>
@@ -104,7 +108,29 @@ describe('ThemedBackground', () => {
     )
 
     const outerDiv = container.firstChild as HTMLElement
-    expect(outerDiv.style.fontFamily).toBe('Inter, sans-serif')
+    // System fonts don't set fontFamily - browser uses default
+    expect(outerDiv.style.fontFamily).toBe('')
+  })
+
+  it('should apply fontFamily with fallback when fontSource is google', () => {
+    const themeWithGoogleFont: Theme = {
+      ...mockTheme,
+      fontFamily: 'Inter',
+      fontSource: 'google',
+    }
+
+    const { container } = renderWithTheme(
+      <ThemedBackground>
+        <div>Content</div>
+      </ThemedBackground>,
+      themeWithGoogleFont,
+    )
+
+    const outerDiv = container.firstChild as HTMLElement
+    // Browser adds quotes around font names with spaces
+    expect(outerDiv.style.fontFamily).toBe(
+      '"Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif',
+    )
   })
 
   it('should not apply fontFamily when theme.fontFamily is null', () => {
@@ -280,7 +306,7 @@ describe('ThemedBackground', () => {
       expect(outerDiv.className).toContain('flex')
       expect(outerDiv.className).toContain('flex-1')
       expect(outerDiv.className).toContain('flex-col')
-      expect(outerDiv.className).toContain('overflow-hidden')
+      expect(outerDiv.className).toContain('min-h-0')
       expect(screen.getByTestId('child')).toBeDefined()
     })
 
