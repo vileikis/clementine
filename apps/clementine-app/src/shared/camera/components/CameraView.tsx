@@ -239,29 +239,31 @@ export const CameraView = forwardRef<CameraViewRef, CameraViewProps>(
     // Mirror front camera for natural selfie appearance
     const shouldMirror = facing === 'user'
 
-    // Parse aspect ratio to calculate dimensions
-    const [widthRatio, heightRatio] = aspectRatio.split(':').map(Number)
-
     return (
-      <div
-        className={cn('relative bg-black overflow-hidden', className)}
-        style={{
-          width: `min(100%, calc((100vh - 14rem) * ${widthRatio} / ${heightRatio}))`,
-          aspectRatio: ASPECT_RATIO_CSS[aspectRatio],
-        }}
-      >
-        {/* Video element - fills the constrained container */}
-        <video
-          ref={videoRef}
-          autoPlay
-          playsInline
-          muted
-          webkit-playsinline="true"
-          className={cn(
-            'absolute inset-0 w-full h-full object-cover',
-            shouldMirror && 'scale-x-[-1]',
-          )}
-        />
+      // Outer container - takes whatever space parent gives, black bg = letterbox
+      <div className={cn('relative bg-black overflow-hidden', className)}>
+        {/* Aspect frame - centered within container, maintains target ratio */}
+        <div
+          className="absolute inset-0 m-auto overflow-hidden"
+          style={{
+            aspectRatio: ASPECT_RATIO_CSS[aspectRatio],
+            width: '100%',
+            maxHeight: '100%',
+          }}
+        >
+          {/* Video stream - fills aspect frame, crops to fit */}
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            muted
+            webkit-playsinline="true"
+            className={cn(
+              'w-full h-full object-cover',
+              shouldMirror && 'scale-x-[-1]',
+            )}
+          />
+        </div>
       </div>
     )
   },

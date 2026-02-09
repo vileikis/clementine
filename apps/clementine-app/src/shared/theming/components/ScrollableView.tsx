@@ -33,7 +33,7 @@ interface ScrollableViewProps {
 export function ScrollableView({ children, className }: ScrollableViewProps) {
   return (
     <div className="flex-1 min-h-0 overflow-y-auto flex flex-col items-center">
-      <div className={cn('w-full my-auto flex flex-col', className)}>
+      <div className={cn('w-full h-full flex flex-col', className)}>
         {children}
       </div>
     </div>

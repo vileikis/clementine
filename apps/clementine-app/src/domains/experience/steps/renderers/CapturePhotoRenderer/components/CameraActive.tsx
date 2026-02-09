@@ -42,13 +42,13 @@ export function CameraActive({
   onFileChange,
 }: CameraActiveProps) {
   return (
-    <div className="flex flex-col w-full">
-      {/* Preview Zone - fills space but constrained to keep controls visible */}
-      <div className="flex-1 max-h-[calc(100vh-14rem)] min-h-0 flex items-center justify-center p-2">
+    <div className="flex flex-col w-full h-full">
+      {/* Camera - fills remaining space, CameraView handles aspect ratio internally */}
+      <div className="flex-1 min-h-0 p-4">
         <CameraView
           ref={cameraRef}
           aspectRatio={aspectRatio}
-          className="rounded-2xl max-w-full"
+          className="w-full h-full rounded-2xl"
           onReady={onCameraReady}
           onError={onCameraError}
         />
