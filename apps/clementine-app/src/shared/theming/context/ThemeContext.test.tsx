@@ -14,6 +14,10 @@ describe('ThemeContext', () => {
       theme: {
         primaryColor: '#FF5733',
         fontFamily: 'Arial',
+        fontSource: 'system' as const,
+        fontVariants: [400, 700],
+        fallbackStack:
+          'system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif',
         text: {
           color: '#000000',
           alignment: 'center' as const,

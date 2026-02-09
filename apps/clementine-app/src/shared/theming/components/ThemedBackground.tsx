@@ -1,4 +1,5 @@
 import { useEventTheme } from '../hooks/useEventTheme'
+import { buildFontFamilyValue } from '../lib/font-css'
 import type { CSSProperties, ReactNode } from 'react'
 import type { ThemeBackground } from '../types'
 import { cn } from '@/shared/utils'
@@ -56,7 +57,11 @@ export function ThemedBackground({
       className={cn('relative flex flex-1 flex-col min-h-0', className)}
       style={{
         backgroundColor: bgColor,
-        fontFamily: theme.fontFamily ?? undefined,
+        fontFamily: buildFontFamilyValue(
+          theme.fontFamily,
+          theme.fontSource,
+          theme.fallbackStack,
+        ),
         ...style,
       }}
     >

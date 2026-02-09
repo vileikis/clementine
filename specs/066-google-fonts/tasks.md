@@ -17,8 +17,8 @@
 
 **Purpose**: Install dependencies and configure environment
 
-- [ ] T001 Install `react-window` and `@types/react-window` — run `pnpm add react-window --filter clementine-app && pnpm add -D @types/react-window --filter clementine-app`
-- [ ] T002 Add `VITE_GOOGLE_FONTS_API_KEY` environment variable to `apps/clementine-app/.env` (obtain free key from Google Cloud Console, enable "Google Fonts Developer API")
+- [x] T001 Install `react-window` and `@types/react-window` — run `pnpm add react-window --filter clementine-app && pnpm add -D @types/react-window --filter clementine-app`
+- [x] T002 Add `VITE_GOOGLE_FONTS_API_KEY` environment variable to `apps/clementine-app/.env` (obtain free key from Google Cloud Console, enable "Google Fonts Developer API")
 
 ---
 
@@ -28,17 +28,17 @@
 
 **CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T003 Add new font constants (`DEFAULT_FONT_SOURCE`, `DEFAULT_FONT_VARIANTS`, `DEFAULT_FALLBACK_STACK`, `FONT_SOURCE_OPTIONS`) to `packages/shared/src/schemas/theme/theme.constants.ts` — per theme-schema.contract.md
-- [ ] T004 Add `fontSource`, `fontVariants`, `fallbackStack` fields to `themeSchema` in `packages/shared/src/schemas/theme/theme.schema.ts` — using new constants from T003, export `FontSource` type. Per theme-schema.contract.md
-- [ ] T005 Export new constants and `FontSource` type from `packages/shared/src/schemas/theme/index.ts`
-- [ ] T006 Build shared package — run `pnpm --filter @clementine/shared build` to generate updated type definitions
-- [ ] T007 Re-export new constants and types (`DEFAULT_FONT_SOURCE`, `DEFAULT_FONT_VARIANTS`, `DEFAULT_FALLBACK_STACK`, `FONT_SOURCE_OPTIONS`, `FontSource`) from `apps/clementine-app/src/shared/theming/schemas/theme.schemas.ts`
-- [ ] T008 [P] Create font CSS utility functions (`buildGoogleFontsUrl`, `buildFontFamilyValue`, `buildGoogleFontsPreviewUrl`) in `apps/clementine-app/src/shared/theming/lib/font-css.ts` — per font-css-builder.contract.md
-- [ ] T009 [P] Create `useGoogleFontLoader` hook in `apps/clementine-app/src/shared/theming/hooks/useGoogleFontLoader.ts` — injects `<link>` stylesheet into `<head>` for Google Fonts, no-op for system fonts, handles dedup via stable element ID and cleanup on unmount. Per google-font-loader.contract.md. Uses `buildGoogleFontsUrl` from T008
-- [ ] T010 Export `useGoogleFontLoader` from `apps/clementine-app/src/shared/theming/hooks/index.ts` and export font-css utilities from `apps/clementine-app/src/shared/theming/index.ts`
-- [ ] T011 Integrate `useGoogleFontLoader` into `ThemeProvider` in `apps/clementine-app/src/shared/theming/providers/ThemeProvider.tsx` — call with `theme.fontFamily`, `theme.fontSource`, `theme.fontVariants`. Per google-font-loader.contract.md integration section
-- [ ] T012 Update `ThemedBackground` in `apps/clementine-app/src/shared/theming/components/ThemedBackground.tsx` — replace `theme.fontFamily ?? undefined` with `buildFontFamilyValue(theme.fontFamily, theme.fontSource, theme.fallbackStack)` for the inline `fontFamily` style
-- [ ] T013 Add preconnect `<link>` tags for `fonts.googleapis.com` and `fonts.gstatic.com` (with crossorigin) to the root document head configuration in `apps/clementine-app/src/app/__root.tsx`
+- [x] T003 Add new font constants (`DEFAULT_FONT_SOURCE`, `DEFAULT_FONT_VARIANTS`, `DEFAULT_FALLBACK_STACK`, `FONT_SOURCE_OPTIONS`) to `packages/shared/src/schemas/theme/theme.constants.ts` — per theme-schema.contract.md
+- [x] T004 Add `fontSource`, `fontVariants`, `fallbackStack` fields to `themeSchema` in `packages/shared/src/schemas/theme/theme.schema.ts` — using new constants from T003, export `FontSource` type. Per theme-schema.contract.md
+- [x] T005 Export new constants and `FontSource` type from `packages/shared/src/schemas/theme/index.ts`
+- [x] T006 Build shared package — run `pnpm --filter @clementine/shared build` to generate updated type definitions
+- [x] T007 Re-export new constants and types (`DEFAULT_FONT_SOURCE`, `DEFAULT_FONT_VARIANTS`, `DEFAULT_FALLBACK_STACK`, `FONT_SOURCE_OPTIONS`, `FontSource`) from `apps/clementine-app/src/shared/theming/schemas/theme.schemas.ts`
+- [x] T008 [P] Create font CSS utility functions (`buildGoogleFontsUrl`, `buildFontFamilyValue`, `buildGoogleFontsPreviewUrl`) in `apps/clementine-app/src/shared/theming/lib/font-css.ts` — per font-css-builder.contract.md
+- [x] T009 [P] Create `useGoogleFontLoader` hook in `apps/clementine-app/src/shared/theming/hooks/useGoogleFontLoader.ts` — injects `<link>` stylesheet into `<head>` for Google Fonts, no-op for system fonts, handles dedup via stable element ID and cleanup on unmount. Per google-font-loader.contract.md. Uses `buildGoogleFontsUrl` from T008
+- [x] T010 Export `useGoogleFontLoader` from `apps/clementine-app/src/shared/theming/hooks/index.ts` and export font-css utilities from `apps/clementine-app/src/shared/theming/index.ts`
+- [x] T011 Integrate `useGoogleFontLoader` into `ThemeProvider` in `apps/clementine-app/src/shared/theming/providers/ThemeProvider.tsx` — call with `theme.fontFamily`, `theme.fontSource`, `theme.fontVariants`. Per google-font-loader.contract.md integration section
+- [x] T012 Update `ThemedBackground` in `apps/clementine-app/src/shared/theming/components/ThemedBackground.tsx` — replace `theme.fontFamily ?? undefined` with `buildFontFamilyValue(theme.fontFamily, theme.fontSource, theme.fallbackStack)` for the inline `fontFamily` style
+- [x] T013 Add preconnect `<link>` tags for `fonts.googleapis.com` and `fonts.gstatic.com` (with crossorigin) to the root document head configuration in `apps/clementine-app/src/app/__root.tsx`
 
 **Checkpoint**: Theme schema extended, font loading infrastructure ready. Google Fonts can now be loaded by setting theme fields manually. All existing themes continue to work unchanged.
 
@@ -52,13 +52,13 @@
 
 ### Implementation for User Story 1
 
-- [ ] T014 [US1] Create `useGoogleFontsCatalog` TanStack Query hook in `apps/clementine-app/src/domains/project-config/theme/hooks/useGoogleFontsCatalog.ts` — fetches from Google Fonts API (`/webfonts/v1/webfonts?key=...&sort=popularity`), transforms response to `GoogleFontEntry[]` with derived `weights` field, caches with `staleTime: 24h`. Per google-fonts-catalog.contract.md
-- [ ] T015 [US1] Export `useGoogleFontsCatalog` and `GoogleFontEntry` type from `apps/clementine-app/src/domains/project-config/theme/hooks/index.ts`
-- [ ] T016 [US1] Build `GoogleFontPicker` component in `apps/clementine-app/src/domains/project-config/theme/components/GoogleFontPicker.tsx` — shadcn Popover + Command (cmdk) with search input, "System Default" pinned at top, virtualized list via `react-window` FixedSizeList for ~1600 fonts. Each row renders font name in its own typeface + preview sentence "Clementine makes sharing magical." loaded lazily via `buildGoogleFontsPreviewUrl` with `text=` parameter. Uses `useGoogleFontsCatalog` for font data. Shows loading/error states. Per google-font-picker.contract.md
-- [ ] T017 [US1] Export `GoogleFontPicker` from `apps/clementine-app/src/domains/project-config/theme/components/index.ts`
-- [ ] T018 [US1] Replace `SelectField` with `GoogleFontPicker` in `apps/clementine-app/src/domains/project-config/theme/components/ThemeConfigPanel.tsx` — on selection, call `onUpdate` with `fontFamily`, `fontSource`, and `fontVariants` (clamped to available weights, default [400, 700]). On "System Default", set `fontFamily: null`, `fontSource: 'system'`, `fontVariants: [400, 700]`. Per google-font-picker.contract.md integration section
-- [ ] T019 [US1] Add `fontSource`, `fontVariants`, `fallbackStack` to `THEME_FIELDS_TO_COMPARE` array in `apps/clementine-app/src/domains/project-config/theme/containers/ThemeEditorPage.tsx` — ensures auto-save detects changes to new fields
-- [ ] T020 [US1] Update `getFontLabel` and remove old `FONT_OPTIONS` array in `apps/clementine-app/src/domains/project-config/theme/constants/fonts.ts` — `getFontLabel` should return font family name directly or "System Default" for null
+- [x] T014 [US1] Create `useGoogleFontsCatalog` TanStack Query hook in `apps/clementine-app/src/domains/project-config/theme/hooks/useGoogleFontsCatalog.ts` — fetches from Google Fonts API (`/webfonts/v1/webfonts?key=...&sort=popularity`), transforms response to `GoogleFontEntry[]` with derived `weights` field, caches with `staleTime: 24h`. Per google-fonts-catalog.contract.md
+- [x] T015 [US1] Export `useGoogleFontsCatalog` and `GoogleFontEntry` type from `apps/clementine-app/src/domains/project-config/theme/hooks/index.ts`
+- [x] T016 [US1] Build `GoogleFontPicker` component in `apps/clementine-app/src/domains/project-config/theme/components/GoogleFontPicker.tsx` — shadcn Popover + Command (cmdk) with search input, "System Default" pinned at top, virtualized list via `react-window` FixedSizeList for ~1600 fonts. Each row renders font name in its own typeface + preview sentence "Clementine makes sharing magical." loaded lazily via `buildGoogleFontsPreviewUrl` with `text=` parameter. Uses `useGoogleFontsCatalog` for font data. Shows loading/error states. Per google-font-picker.contract.md
+- [x] T017 [US1] Export `GoogleFontPicker` from `apps/clementine-app/src/domains/project-config/theme/components/index.ts`
+- [x] T018 [US1] Replace `SelectField` with `GoogleFontPicker` in `apps/clementine-app/src/domains/project-config/theme/components/ThemeConfigPanel.tsx` — on selection, call `onUpdate` with `fontFamily`, `fontSource`, and `fontVariants` (clamped to available weights, default [400, 700]). On "System Default", set `fontFamily: null`, `fontSource: 'system'`, `fontVariants: [400, 700]`. Per google-font-picker.contract.md integration section
+- [x] T019 [US1] Add `fontSource`, `fontVariants`, `fallbackStack` to `THEME_FIELDS_TO_COMPARE` array in `apps/clementine-app/src/domains/project-config/theme/containers/ThemeEditorPage.tsx` — ensures auto-save detects changes to new fields
+- [x] T020 [US1] Update `getFontLabel` and remove old `FONT_OPTIONS` array in `apps/clementine-app/src/domains/project-config/theme/constants/fonts.ts` — `getFontLabel` should return font family name directly or "System Default" for null
 
 **Checkpoint**: Theme Editor has a fully functional Google Font picker. Creators can search, preview, select, and auto-save. Live preview shows the selected font immediately.
 

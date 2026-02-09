@@ -63,12 +63,32 @@ export const DEFAULT_BACKGROUND = {
 } as const
 
 // =============================================================================
+// Font Defaults
+// =============================================================================
+
+/** Font source options */
+export const FONT_SOURCE_OPTIONS = ['google', 'system'] as const
+
+/** Default font source (system fonts) */
+export const DEFAULT_FONT_SOURCE = 'system' as const
+
+/** Default font variants (weights to load) */
+export const DEFAULT_FONT_VARIANTS = [400, 700]
+
+/** Default CSS fallback font stack */
+export const DEFAULT_FALLBACK_STACK =
+  'system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif'
+
+// =============================================================================
 // Complete Theme Default
 // =============================================================================
 
 /** Default theme (light theme with blue primary) */
 export const DEFAULT_THEME = {
   fontFamily: null,
+  fontSource: DEFAULT_FONT_SOURCE,
+  fontVariants: DEFAULT_FONT_VARIANTS,
+  fallbackStack: DEFAULT_FALLBACK_STACK,
   primaryColor: DEFAULT_PRIMARY_COLOR,
   text: DEFAULT_TEXT,
   button: DEFAULT_BUTTON,

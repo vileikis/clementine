@@ -21,6 +21,10 @@ import {
   DEFAULT_BACKGROUND_COLOR,
   DEFAULT_OVERLAY_OPACITY,
   DEFAULT_BACKGROUND,
+  DEFAULT_FONT_SOURCE,
+  DEFAULT_FONT_VARIANTS,
+  DEFAULT_FALLBACK_STACK,
+  FONT_SOURCE_OPTIONS,
 } from './theme.constants'
 
 /** Hex color regex pattern */
@@ -76,8 +80,14 @@ export const themeBackgroundSchema = z.object({
  * All fields have defaults - parsing partial data fills missing fields.
  * Default theme is light (dark text on white background).
  */
+/** Font source type */
+export type FontSource = (typeof FONT_SOURCE_OPTIONS)[number]
+
 export const themeSchema = z.object({
   fontFamily: z.string().nullable().default(null),
+  fontSource: z.enum(FONT_SOURCE_OPTIONS).default(DEFAULT_FONT_SOURCE),
+  fontVariants: z.array(z.number()).default(DEFAULT_FONT_VARIANTS),
+  fallbackStack: z.string().default(DEFAULT_FALLBACK_STACK),
   primaryColor: z
     .string()
     .regex(COLOR_REGEX, 'Invalid hex color format')
