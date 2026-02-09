@@ -54,7 +54,9 @@
 
 - [x] T014 [US1] Create `useGoogleFontsCatalog` TanStack Query hook in `apps/clementine-app/src/domains/project-config/theme/hooks/useGoogleFontsCatalog.ts` — fetches from Google Fonts API (`/webfonts/v1/webfonts?key=...&sort=popularity`), transforms response to `GoogleFontEntry[]` with derived `weights` field, caches with `staleTime: 24h`. Per google-fonts-catalog.contract.md
 - [x] T015 [US1] Export `useGoogleFontsCatalog` and `GoogleFontEntry` type from `apps/clementine-app/src/domains/project-config/theme/hooks/index.ts`
-- [x] T016 [US1] Build `GoogleFontPicker` component in `apps/clementine-app/src/domains/project-config/theme/components/GoogleFontPicker.tsx` — shadcn Popover + Command (cmdk) with search input, "System Default" pinned at top, virtualized list via `react-window` FixedSizeList for ~1600 fonts. Each row renders font name in its own typeface + preview sentence "Clementine makes sharing magical." loaded lazily via `buildGoogleFontsPreviewUrl` with `text=` parameter. Uses `useGoogleFontsCatalog` for font data. Shows loading/error states. Per google-font-picker.contract.md
+- [x] T016a [US1] Create reusable `Searchable` ui-kit component in `apps/clementine-app/src/ui-kit/ui/searchable.tsx` — composable Popover-based searchable list with keyboard navigation (ArrowUp/Down, Enter, Home/End), unified index space across pinned items and virtualized rows, react-window v2 integration via `SearchableVirtualList`. Exports: `Searchable`, `SearchableTrigger`, `SearchableContent`, `SearchableInput`, `SearchableItem`, `SearchableVirtualList`, `SearchableEmpty`, `useSearchableHighlight`
+- [x] T016b [US1] Build `GoogleFontPicker` component folder at `apps/clementine-app/src/domains/project-config/theme/components/google-font-picker/` — uses `Searchable` (not cmdk) with search input, "System Default" pinned at top, virtualized list via react-window v2 for ~1600 fonts. Each row renders font name in its own typeface + preview sentence loaded lazily via `buildGoogleFontsPreviewUrl` with `text=` parameter. Full keyboard navigation across all rows. Organized as: `GoogleFontPicker.tsx` (main), `FontRow.tsx` (row components with named interfaces), `useLazyFontPreview.ts` (hook), `constants.ts`, `index.ts` (barrel)
+- [x] T016c [US1] Remove `cmdk` dependency and delete `apps/clementine-app/src/ui-kit/ui/command.tsx` — replaced by the custom `Searchable` component which provides proper keyboard navigation through virtualized rows (cmdk's `Command` did not support this)
 - [x] T017 [US1] Export `GoogleFontPicker` from `apps/clementine-app/src/domains/project-config/theme/components/index.ts`
 - [x] T018 [US1] Replace `SelectField` with `GoogleFontPicker` in `apps/clementine-app/src/domains/project-config/theme/components/ThemeConfigPanel.tsx` — on selection, call `onUpdate` with `fontFamily`, `fontSource`, and `fontVariants` (clamped to available weights, default [400, 700]). On "System Default", set `fontFamily: null`, `fontSource: 'system'`, `fontVariants: [400, 700]`. Per google-font-picker.contract.md integration section
 - [x] T019 [US1] Add `fontSource`, `fontVariants`, `fallbackStack` to `THEME_FIELDS_TO_COMPARE` array in `apps/clementine-app/src/domains/project-config/theme/containers/ThemeEditorPage.tsx` — ensures auto-save detects changes to new fields
@@ -104,7 +106,7 @@
 
 ### Implementation for User Story 4
 
-- [ ] T027 [US4] Verify "System Default" option in `GoogleFontPicker` (`apps/clementine-app/src/domains/project-config/theme/components/GoogleFontPicker.tsx`) correctly calls `onChange(null)` — and that `ThemeConfigPanel` maps this to `{ fontFamily: null, fontSource: 'system', fontVariants: [400, 700] }`
+- [ ] T027 [US4] Verify "System Default" option in `GoogleFontPicker` (`apps/clementine-app/src/domains/project-config/theme/components/google-font-picker/GoogleFontPicker.tsx`) correctly calls `onChange(null)` — and that `ThemeConfigPanel` maps this to `{ fontFamily: null, fontSource: 'system', fontVariants: [400, 700] }`
 - [ ] T028 [US4] Verify `useGoogleFontLoader` is a no-op when `fontSource` is `'system'` — no `<link>` tag injected, and any previously injected `<link>` tag for a prior Google Font is cleaned up
 
 **Checkpoint**: System Default works as a clean "reset" — no Google Font loaded, text uses native platform fonts via fallback stack.
@@ -201,6 +203,6 @@ Task: "T023 [P] [US2] Verify themed input components use buildFontFamilyValue"
 - [P] tasks = different files, no dependencies
 - [Story] label maps task to specific user story for traceability
 - US2 and US3 are primarily verification tasks — most implementation happens in Phase 2 (Foundational) and US1
-- The font picker (T016) is the most complex single task — it combines shadcn Popover/Command, react-window virtualization, lazy font loading, and search
+- The font picker (T016a-c) was the most complex work — replaced cmdk with a custom reusable `Searchable` ui-kit component (`searchable.tsx`) that provides composable Popover + keyboard navigation + react-window v2 virtualization. The `GoogleFontPicker` was then refactored into a component folder with separated concerns (FontRow, useLazyFontPreview, constants)
 - No Firestore rule changes needed — schema extension is backward compatible via Zod defaults
 - Commit after each phase or logical group
