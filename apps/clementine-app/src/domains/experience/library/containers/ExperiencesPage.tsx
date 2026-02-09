@@ -6,7 +6,7 @@
  */
 import { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import { Pencil, Trash2 } from 'lucide-react'
+import { Copy, Pencil, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 import {
@@ -16,17 +16,15 @@ import {
   RenameExperienceDialog,
 } from '../components'
 import type { Experience, ExperienceProfile } from '@/domains/experience/shared'
+import type { MenuSection } from '@/shared/components/ContextDropdownMenu'
 import {
   profileMetadata,
   useDeleteExperience,
+  useDuplicateExperience,
   useWorkspaceExperiences,
 } from '@/domains/experience/shared'
 import { Button } from '@/ui-kit/ui/button'
 import { Skeleton } from '@/ui-kit/ui/skeleton'
-import {
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-} from '@/ui-kit/ui/dropdown-menu'
 import { cn } from '@/shared/utils/style-utils'
 
 interface ExperiencesPageProps {
@@ -59,6 +57,7 @@ const profileOptions: {
  * - Empty states (no experiences / no matches)
  * - Create experience button
  * - Rename experience via context menu
+ * - Duplicate experience via context menu
  *
  * @example
  * ```tsx
@@ -87,8 +86,9 @@ export function ExperiencesPage({
     profileFilter ? { profile: profileFilter } : undefined,
   )
 
-  // Delete mutation
+  // Mutations
   const deleteExperience = useDeleteExperience()
+  const duplicateExperience = useDuplicateExperience()
 
   const handleCreateExperience = () => {
     navigate({
@@ -111,6 +111,49 @@ export function ExperiencesPage({
       toast.error('Failed to delete experience')
     }
   }
+
+  const handleDuplicate = async (exp: Experience) => {
+    try {
+      const result = await duplicateExperience.mutateAsync({
+        workspaceId,
+        experienceId: exp.id,
+      })
+      toast.success(`Duplicated as "${result.name}"`)
+    } catch {
+      toast.error("Couldn't duplicate experience")
+    }
+  }
+
+  const getMenuSections = (exp: Experience): MenuSection[] => [
+    {
+      items: [
+        {
+          key: 'rename',
+          label: 'Rename',
+          icon: Pencil,
+          onClick: () => setRenameExperience(exp),
+        },
+        {
+          key: 'duplicate',
+          label: 'Duplicate',
+          icon: Copy,
+          onClick: () => handleDuplicate(exp),
+          disabled: duplicateExperience.isPending,
+        },
+      ],
+    },
+    {
+      items: [
+        {
+          key: 'delete',
+          label: 'Delete',
+          icon: Trash2,
+          onClick: () => setDeleteExperienceTarget(exp),
+          destructive: true,
+        },
+      ],
+    },
+  ]
 
   // Loading state
   if (isLoading) {
@@ -176,24 +219,7 @@ export function ExperiencesPage({
               key={experience.id}
               experience={experience}
               workspaceSlug={workspaceSlug}
-              renderMenuItems={() => (
-                <>
-                  <DropdownMenuItem
-                    onClick={() => setRenameExperience(experience)}
-                  >
-                    <Pencil className="mr-2 h-4 w-4" />
-                    Rename
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={() => setDeleteExperienceTarget(experience)}
-                    className="text-destructive"
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Delete
-                  </DropdownMenuItem>
-                </>
-              )}
+              menuSections={getMenuSections(experience)}
             />
           ))}
         </div>

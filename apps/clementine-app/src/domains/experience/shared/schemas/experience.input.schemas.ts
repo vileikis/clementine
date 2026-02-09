@@ -68,3 +68,20 @@ export const deleteExperienceInputSchema = z.object({
 })
 
 export type DeleteExperienceInput = z.infer<typeof deleteExperienceInputSchema>
+
+/**
+ * Duplicate Experience Input Schema
+ *
+ * Validates input for duplicating an existing experience.
+ */
+export const duplicateExperienceInputSchema = z.object({
+  /** Workspace ID containing the experience */
+  workspaceId: z.string().min(1, 'Workspace ID is required'),
+
+  /** Source experience ID to duplicate */
+  experienceId: z.string().min(1, 'Experience ID is required'),
+})
+
+export type DuplicateExperienceInput = z.infer<
+  typeof duplicateExperienceInputSchema
+>
