@@ -75,10 +75,11 @@ export function ThemedSelectOption({
       disabled={disabled}
       className={cn(
         'w-full px-5 py-3 text-left text-base',
-        'border-2 transition-all',
+        'border-2 transition-all duration-150 ease-out',
         'min-h-[48px]', // Touch target
-        'hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-offset-2',
-        'disabled:cursor-not-allowed disabled:opacity-50',
+        'hover:scale-[1.02] hover:opacity-90 active:scale-[0.97] active:duration-75',
+        'focus:outline-none focus:ring-2 focus:ring-offset-2',
+        'disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100',
         className,
       )}
       style={style}
