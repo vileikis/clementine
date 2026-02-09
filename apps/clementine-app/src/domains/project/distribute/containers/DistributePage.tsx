@@ -1,10 +1,10 @@
 import { useMemo } from 'react'
 import { getRouteApi } from '@tanstack/react-router'
-import { generateGuestUrl } from '../../share/utils/shareUrl.utils'
-import { useCopyToClipboard } from '../../share/hooks/useCopyToClipboard'
-import { useQRCodeGenerator } from '../../share/hooks/useQRCodeGenerator'
-import { ShareLinkSection } from '../../share/components/ShareLinkSection'
-import { QRCodeDisplay } from '../../share/components/QRCodeDisplay'
+import { generateGuestUrl } from '@/domains/project/share/utils/shareUrl.utils'
+import { useCopyToClipboard } from '@/domains/project/share/hooks/useCopyToClipboard'
+import { useQRCodeGenerator } from '@/domains/project/share/hooks/useQRCodeGenerator'
+import { ShareLinkSection } from '@/domains/project/share/components/ShareLinkSection'
+import { QRCodeDisplay } from '@/domains/project/share/components/QRCodeDisplay'
 
 const route = getRouteApi(
   '/workspace/$workspaceSlug/projects/$projectId/distribute',
