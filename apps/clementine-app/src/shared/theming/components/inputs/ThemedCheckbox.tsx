@@ -59,7 +59,6 @@ export function ThemedCheckbox({
 
   const labelStyle: CSSProperties = {
     color: theme.text.color,
-    fontFamily: theme.fontFamily ?? undefined,
   }
 
   return (

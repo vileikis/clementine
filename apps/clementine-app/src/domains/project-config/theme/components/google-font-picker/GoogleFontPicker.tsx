@@ -9,7 +9,11 @@ import { useCallback, useMemo, useState } from 'react'
 import { AlertCircle, Check, ChevronsUpDown, Loader2 } from 'lucide-react'
 import { useGoogleFontsCatalog } from '../../hooks/useGoogleFontsCatalog'
 import { VirtualizedFontRow } from './FontRow'
-import { DEFAULT_VARIANTS, ITEM_HEIGHT, SYSTEM_DEFAULT_LABEL } from './constants'
+import {
+  DEFAULT_VARIANTS,
+  ITEM_HEIGHT,
+  SYSTEM_DEFAULT_LABEL,
+} from './constants'
 import type { GoogleFontEntry } from '../../hooks/useGoogleFontsCatalog'
 import type { FontRowProps } from './FontRow'
 import {

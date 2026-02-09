@@ -46,7 +46,7 @@ export function ThemedInput({
     backgroundColor: `color-mix(in srgb, ${theme.text.color} 5%, transparent)`,
     borderColor: `color-mix(in srgb, ${theme.text.color} 30%, transparent)`,
     borderRadius,
-    fontFamily: theme.fontFamily ?? undefined,
+    fontFamily: 'inherit',
   }
 
   return (

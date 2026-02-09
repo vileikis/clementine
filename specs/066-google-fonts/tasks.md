@@ -74,10 +74,10 @@
 
 ### Implementation for User Story 2
 
-- [ ] T021 [US2] Verify `ThemedText` in `apps/clementine-app/src/shared/theming/components/primitives/ThemedText.tsx` uses `buildFontFamilyValue` (or theme.fontFamily with fallback) for its inline `fontFamily` style — update if it still uses `theme.fontFamily ?? undefined` directly
-- [ ] T022 [P] [US2] Verify `ThemedButton` in `apps/clementine-app/src/shared/theming/components/primitives/ThemedButton.tsx` uses `buildFontFamilyValue` for its inline `fontFamily` style — update if it still uses `theme.fontFamily ?? undefined` directly
-- [ ] T023 [P] [US2] Verify all themed input components (`ThemedInput`, `ThemedTextarea`, `ThemedCheckbox`, `ThemedRadio`) in `apps/clementine-app/src/shared/theming/components/inputs/` use `buildFontFamilyValue` — update any that still use `theme.fontFamily ?? undefined`
-- [ ] T024 [US2] Verify guest pages in `apps/clementine-app/src/domains/guest/containers/` pass the full theme (with new `fontSource`, `fontVariants`, `fallbackStack` fields) through to `ThemeProvider` — the schema defaults should handle this automatically, but confirm no partial theme spreads strip the new fields
+- [x] T021 [US2] Verify `ThemedText` in `apps/clementine-app/src/shared/theming/components/primitives/ThemedText.tsx` uses `buildFontFamilyValue` (or theme.fontFamily with fallback) for its inline `fontFamily` style — update if it still uses `theme.fontFamily ?? undefined` directly
+- [x] T022 [P] [US2] Verify `ThemedButton` in `apps/clementine-app/src/shared/theming/components/primitives/ThemedButton.tsx` uses `buildFontFamilyValue` for its inline `fontFamily` style — update if it still uses `theme.fontFamily ?? undefined` directly
+- [x] T023 [P] [US2] Verify all themed input components (`ThemedInput`, `ThemedTextarea`, `ThemedCheckbox`, `ThemedRadio`) in `apps/clementine-app/src/shared/theming/components/inputs/` use `buildFontFamilyValue` — update any that still use `theme.fontFamily ?? undefined`
+- [x] T024 [US2] Verify guest pages in `apps/clementine-app/src/domains/guest/containers/` pass the full theme (with new `fontSource`, `fontVariants`, `fallbackStack` fields) through to `ThemeProvider` — the schema defaults should handle this automatically, but confirm no partial theme spreads strip the new fields
 
 **Checkpoint**: Guest experience renders all text in the selected Google Font. Font loads on first visit and is consistent across welcome, experience, and share screens.
 
@@ -91,8 +91,8 @@
 
 ### Implementation for User Story 3
 
-- [ ] T025 [US3] Verify `useGoogleFontLoader` in `apps/clementine-app/src/shared/theming/hooks/useGoogleFontLoader.ts` uses `display=swap` in the constructed URL — already specified in contract, confirm implementation matches
-- [ ] T026 [US3] Verify `buildFontFamilyValue` in `apps/clementine-app/src/shared/theming/lib/font-css.ts` always includes the fallback stack after the Google Font name — so CSS falls back automatically when font doesn't load
+- [x] T025 [US3] Verify `useGoogleFontLoader` in `apps/clementine-app/src/shared/theming/hooks/useGoogleFontLoader.ts` uses `display=swap` in the constructed URL — already specified in contract, confirm implementation matches
+- [x] T026 [US3] Verify `buildFontFamilyValue` in `apps/clementine-app/src/shared/theming/lib/font-css.ts` always includes the fallback stack after the Google Font name — so CSS falls back automatically when font doesn't load
 
 **Checkpoint**: Fallback is automatic via `display=swap` + CSS fallback stack. No additional implementation needed beyond verifying T008/T009 were implemented correctly. Text is always visible.
 
@@ -106,8 +106,8 @@
 
 ### Implementation for User Story 4
 
-- [ ] T027 [US4] Verify "System Default" option in `GoogleFontPicker` (`apps/clementine-app/src/domains/project-config/theme/components/google-font-picker/GoogleFontPicker.tsx`) correctly calls `onChange(null)` — and that `ThemeConfigPanel` maps this to `{ fontFamily: null, fontSource: 'system', fontVariants: [400, 700] }`
-- [ ] T028 [US4] Verify `useGoogleFontLoader` is a no-op when `fontSource` is `'system'` — no `<link>` tag injected, and any previously injected `<link>` tag for a prior Google Font is cleaned up
+- [x] T027 [US4] Verify "System Default" option in `GoogleFontPicker` (`apps/clementine-app/src/domains/project-config/theme/components/google-font-picker/GoogleFontPicker.tsx`) correctly calls `onChange(null)` — and that `ThemeConfigPanel` maps this to `{ fontFamily: null, fontSource: 'system', fontVariants: [400, 700] }`
+- [x] T028 [US4] Verify `useGoogleFontLoader` is a no-op when `fontSource` is `'system'` — no `<link>` tag injected, and any previously injected `<link>` tag for a prior Google Font is cleaned up
 
 **Checkpoint**: System Default works as a clean "reset" — no Google Font loaded, text uses native platform fonts via fallback stack.
 
@@ -117,9 +117,9 @@
 
 **Purpose**: Final validation and cleanup
 
-- [ ] T029 Run `pnpm --filter @clementine/shared build` to ensure shared package compiles with new schema fields
-- [ ] T030 Run `pnpm app:type-check` from monorepo root to verify no TypeScript errors across the app
-- [ ] T031 Run `pnpm app:check` from monorepo root to fix any lint/format issues
+- [x] T029 Run `pnpm --filter @clementine/shared build` to ensure shared package compiles with new schema fields
+- [x] T030 Run `pnpm app:type-check` from monorepo root to verify no TypeScript errors across the app
+- [x] T031 Run `pnpm app:check` from monorepo root to fix any lint/format issues
 - [ ] T032 Manual verification: Open Theme Editor, search for "Inter", select it, confirm live preview updates and auto-saves within 2 seconds
 - [ ] T033 Manual verification: Visit a guest URL for a project with a Google Font set, confirm all text (headings, body, buttons, labels) uses the selected font
 - [ ] T034 Manual verification: Block `fonts.googleapis.com` in DevTools, reload guest page, confirm text is readable in fallback font

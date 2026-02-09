@@ -75,7 +75,6 @@ export function ThemedText({
   const style: CSSProperties = {
     color: theme.text.color,
     textAlign,
-    fontFamily: theme.fontFamily ?? undefined,
   }
 
   return (
