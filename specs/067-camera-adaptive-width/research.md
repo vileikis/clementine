@@ -1,6 +1,6 @@
 # Research: Camera Adaptive Width
 
-**Branch**: `001-camera-adaptive-width`
+**Branch**: `067-camera-adaptive-width`
 **Date**: 2026-02-09
 **Purpose**: Document technical research and decisions for two-zone adaptive camera layout
 

@@ -1,7 +1,7 @@
 # Implementation Plan: Camera Adaptive Width
 
-**Branch**: `001-camera-adaptive-width` | **Date**: 2026-02-09 | **Spec**: [spec.md](./spec.md)
-**Input**: Feature specification from `/specs/001-camera-adaptive-width/spec.md`
+**Branch**: `067-camera-adaptive-width` | **Date**: 2026-02-09 | **Spec**: [spec.md](./spec.md)
+**Input**: Feature specification from `/specs/067-camera-adaptive-width/spec.md`
 
 ## Summary
 
@@ -43,7 +43,7 @@ Refactor the camera capture UI to use a strict two-zone layout (Preview Zone + C
 ### Documentation (this feature)
 
 ```text
-specs/001-camera-adaptive-width/
+specs/067-camera-adaptive-width/
 ├── plan.md              # This file
 ├── research.md          # Phase 0 output
 ├── data-model.md        # N/A - no data model changes

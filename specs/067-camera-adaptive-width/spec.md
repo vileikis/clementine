@@ -1,6 +1,6 @@
 # Feature Specification: Camera Adaptive Width
 
-**Feature Branch**: `001-camera-adaptive-width`
+**Feature Branch**: `067-camera-adaptive-width`
 **Created**: 2026-02-09
 **Status**: Draft
 **Input**: User description: "Make camera capture UI look intentional on any device and aspect ratio, while keeping controls always accessible. Applies to Camera Active, Photo Review, and Upload Progress states."
