@@ -34,6 +34,12 @@ export function buildFontFamilyValue(
  */
 export function buildGoogleFontsUrl(family: string, weights: number[]): string {
   const encoded = family.replace(/ /g, '+')
+
+  if (weights.length === 0) {
+    // Default to weight 400 if no weights provided
+    return `https://fonts.googleapis.com/css2?family=${encoded}:wght@400&display=swap`
+  }
+
   const sorted = [...weights].sort((a, b) => a - b)
   const weightStr = sorted.join(';')
   return `https://fonts.googleapis.com/css2?family=${encoded}:wght@${weightStr}&display=swap`

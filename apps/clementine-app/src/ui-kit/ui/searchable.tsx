@@ -20,7 +20,6 @@
 import * as React from 'react'
 import { SearchIcon } from 'lucide-react'
 import { List, useListRef } from 'react-window'
-import type { ListImperativeAPI } from 'react-window'
 import { Popover, PopoverContent, PopoverTrigger } from '@/ui-kit/ui/popover'
 import { cn } from '@/shared/utils/index'
 
@@ -38,8 +37,6 @@ interface SearchableContextValue {
   pinnedCount: number
   virtualCount: number
   setVirtualCount: React.Dispatch<React.SetStateAction<number>>
-
-  listApiRef: React.MutableRefObject<ListImperativeAPI | null>
 
   claimPinnedIndex: () => number
   registerSelectHandler: (index: number, handler: () => void) => void
@@ -87,7 +84,6 @@ function Searchable({ open, onOpenChange, children }: SearchableProps) {
   const [highlightIndex, setHighlightIndex] = React.useState(-1)
   const [virtualCount, setVirtualCount] = React.useState(0)
 
-  const listApiRef = React.useRef<ListImperativeAPI | null>(null)
   const pinnedCounter = React.useRef(0)
   const selectHandlers = React.useRef(new Map<number, () => void>())
   const virtualSelectHandler = React.useRef<
@@ -117,7 +113,6 @@ function Searchable({ open, onOpenChange, children }: SearchableProps) {
       pinnedCount,
       virtualCount,
       setVirtualCount,
-      listApiRef,
       claimPinnedIndex: () => pinnedCounter.current++,
       registerSelectHandler: (index, handler) => {
         selectHandlers.current.set(index, handler)

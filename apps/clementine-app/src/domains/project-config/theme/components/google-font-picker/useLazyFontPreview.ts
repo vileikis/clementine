@@ -20,14 +20,17 @@ export function useLazyFontPreview(family: string) {
         if (!entries[0]?.isIntersecting) return
 
         const linkId = `gfont-preview-${family.replace(/\s+/g, '-').toLowerCase()}`
-        if (!document.getElementById(linkId)) {
+        const existing = document.getElementById(linkId)
+        if (existing) {
+          setFontLoaded(true)
+        } else {
           const link = document.createElement('link')
           link.id = linkId
           link.rel = 'stylesheet'
           link.href = buildGoogleFontsPreviewUrl(family, PREVIEW_TEXT)
+          link.onload = () => setFontLoaded(true)
           document.head.appendChild(link)
         }
-        setFontLoaded(true)
         observer.disconnect()
       },
       { threshold: 0 },

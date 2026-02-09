@@ -56,10 +56,10 @@ async function fetchGoogleFontsCatalog(): Promise<GoogleFontEntry[]> {
   const data: GoogleFontsApiResponse = await res.json()
 
   return data.items.map((item) => {
-    const weights = item.variants
+    const mapped = item.variants
       .map(variantToWeight)
       .filter((w): w is number => w !== null)
-      .sort((a, b) => a - b)
+    const weights = Array.from(new Set(mapped)).sort((a, b) => a - b)
 
     return {
       family: item.family,

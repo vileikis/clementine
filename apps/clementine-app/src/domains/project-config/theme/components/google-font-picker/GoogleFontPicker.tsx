@@ -76,6 +76,7 @@ export function GoogleFontPicker({
         category: font.category,
       })
       setSearch('')
+      setOpen(false)
     },
     [onChange],
   )
@@ -83,6 +84,7 @@ export function GoogleFontPicker({
   const handleSelectSystem = useCallback(() => {
     onChange(null)
     setSearch('')
+    setOpen(false)
   }, [onChange])
 
   const displayValue = value ?? SYSTEM_DEFAULT_LABEL

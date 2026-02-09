@@ -34,10 +34,12 @@ export function VirtualizedFontRow({
   selectedFamily,
   onSelectFont,
 }: VirtualizedFontRowProps): ReactElement | null {
+  // Hook must be called unconditionally before any early returns
+  const { highlightIndex, pinnedCount } = useSearchableHighlight()
+
   const font = fonts[index]
   if (!font) return null
 
-  const { highlightIndex, pinnedCount } = useSearchableHighlight()
   const isHighlighted = highlightIndex === pinnedCount + index
 
   return (
