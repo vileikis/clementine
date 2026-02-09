@@ -44,7 +44,7 @@ export function CameraActive({
   return (
     <div className="flex flex-col w-full h-full items-center">
       {/* Camera - fills all available space, handles aspect ratio internally */}
-      <div className="flex-1 min-h-0 w-full max-w-2xl">
+      <div className="flex-1 min-h-0 w-full">
         <CameraView
           ref={cameraRef}
           aspectRatio={aspectRatio}
@@ -54,7 +54,7 @@ export function CameraActive({
         />
       </div>
       {/* Controls - fixed to bottom, floating above camera */}
-      <div className="absolute bottom-0 inset-x-0 flex items-center justify-center gap-8 py-6 pb-6">
+      <div className="absolute bottom-0 inset-x-0 flex items-center justify-center gap-8 py-6 pb-8">
         {/* Library button (left) */}
         <div className="flex flex-col items-center gap-1.5">
           <ThemedIconButton

@@ -241,10 +241,10 @@ export const CameraView = forwardRef<CameraViewRef, CameraViewProps>(
 
     return (
       // Outer container - takes whatever space parent gives, black bg = letterbox
-      <div className={cn('relative  overflow-hidden', className)}>
+      <div className={cn('relative bg-black overflow-hidden', className)}>
         {/* Aspect frame - centered within container, maintains target ratio */}
         <div
-          className="absolute inset-0 m-auto overflow-hidden rounded-2xl"
+          className="absolute inset-0 m-auto overflow-hidden rounded-2xl max-w-2xl"
           style={{
             aspectRatio: ASPECT_RATIO_CSS[aspectRatio],
             width: '100%',
