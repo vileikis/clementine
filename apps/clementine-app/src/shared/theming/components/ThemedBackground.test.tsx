@@ -280,7 +280,7 @@ describe('ThemedBackground', () => {
       expect(outerDiv.className).toContain('flex')
       expect(outerDiv.className).toContain('flex-1')
       expect(outerDiv.className).toContain('flex-col')
-      expect(outerDiv.className).toContain('overflow-hidden')
+      expect(outerDiv.className).toContain('min-h-0')
       expect(screen.getByTestId('child')).toBeDefined()
     })
 
