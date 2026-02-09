@@ -6,3 +6,4 @@ export type {
   ContextDropdownMenuProps,
 } from './ContextDropdownMenu'
 export { NotFound } from './NotFound'
+export { WipPlaceholder } from './WipPlaceholder'
