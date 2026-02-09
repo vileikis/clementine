@@ -112,7 +112,9 @@ export const CameraView = forwardRef<CameraViewRef, CameraViewProps>(
 
     // Attach stream to video elements when it changes
     useEffect(() => {
-      const videos = [videoRef.current, bgVideoRef.current].filter(Boolean)
+      const videos = [videoRef.current, bgVideoRef.current].filter(
+        (v): v is HTMLVideoElement => v !== null,
+      )
 
       for (const video of videos) {
         video.srcObject = stream
@@ -145,7 +147,9 @@ export const CameraView = forwardRef<CameraViewRef, CameraViewProps>(
     useEffect(() => {
       const handleVisibilityChange = () => {
         if (!stream) return
-        const videos = [videoRef.current, bgVideoRef.current].filter(Boolean)
+        const videos = [videoRef.current, bgVideoRef.current].filter(
+          (v): v is HTMLVideoElement => v !== null,
+        )
 
         for (const video of videos) {
           if (document.hidden) {
