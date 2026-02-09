@@ -6,12 +6,20 @@
 export { ThemeEditorPage } from './containers'
 
 // Components
-export { ThemeConfigPanel, ThemePreview } from './components'
-export type { ThemeConfigPanelProps } from './components'
+export { GoogleFontPicker, ThemeConfigPanel, ThemePreview } from './components'
+export type {
+  GoogleFontPickerProps,
+  GoogleFontSelection,
+  ThemeConfigPanelProps,
+} from './components'
 
 // Hooks
-export { useUpdateTheme, useUploadAndUpdateBackground } from './hooks'
+export {
+  useGoogleFontsCatalog,
+  useUpdateTheme,
+  useUploadAndUpdateBackground,
+} from './hooks'
+export type { GoogleFontEntry } from './hooks'
 
 // Constants
-export { FONT_OPTIONS, DEFAULT_THEME, getFontLabel } from './constants'
-export type { FontFamily } from './constants'
+export { DEFAULT_THEME, getFontLabel } from './constants'

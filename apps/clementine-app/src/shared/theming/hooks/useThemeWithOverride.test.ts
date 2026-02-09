@@ -12,6 +12,10 @@ import type { ReactNode } from 'react'
 // Mock theme for testing
 const mockTheme: Theme = {
   fontFamily: 'Arial',
+  fontSource: 'system',
+  fontVariants: [400, 700],
+  fallbackStack:
+    'system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif',
   primaryColor: '#3B82F6',
   text: { color: '#1E1E1E', alignment: 'center' },
   button: { backgroundColor: null, textColor: '#FFFFFF', radius: 'rounded' },
@@ -21,6 +25,10 @@ const mockTheme: Theme = {
 // Alternative theme for testing override
 const overrideTheme: Theme = {
   fontFamily: 'Helvetica',
+  fontSource: 'system',
+  fontVariants: [400, 700],
+  fallbackStack:
+    'system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif',
   primaryColor: '#FF0000',
   text: { color: '#000000', alignment: 'left' },
   button: { backgroundColor: '#00FF00', textColor: '#000000', radius: 'pill' },

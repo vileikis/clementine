@@ -79,7 +79,7 @@ export function ThemedButton({
           backgroundColor: primaryBgColor,
           color: primaryTextColor,
           borderRadius,
-          fontFamily: theme.fontFamily ?? undefined,
+          fontFamily: 'inherit',
         }
       : {
           backgroundColor: `color-mix(in srgb, ${theme.text.color} 10%, transparent)`,
@@ -88,7 +88,7 @@ export function ThemedButton({
           borderWidth: '1px',
           borderStyle: 'solid',
           borderColor: `color-mix(in srgb, ${theme.text.color} 40%, transparent)`,
-          fontFamily: theme.fontFamily ?? undefined,
+          fontFamily: 'inherit',
         }
 
   return (

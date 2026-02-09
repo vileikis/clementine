@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { ThemeContext } from '../context/ThemeContext'
 import { BUTTON_RADIUS_MAP } from '../constants'
+import { useGoogleFontLoader } from '../hooks/useGoogleFontLoader'
 import type { ReactNode } from 'react'
 import type { ThemeContextValue } from '../context/ThemeContext'
 import type { Theme } from '../types'
@@ -28,6 +29,12 @@ interface ThemeProviderProps {
  * ```
  */
 export function ThemeProvider({ theme, children }: ThemeProviderProps) {
+  useGoogleFontLoader({
+    fontFamily: theme.fontFamily,
+    fontSource: theme.fontSource,
+    fontVariants: theme.fontVariants,
+  })
+
   const value = useMemo<ThemeContextValue>(() => {
     return {
       theme,

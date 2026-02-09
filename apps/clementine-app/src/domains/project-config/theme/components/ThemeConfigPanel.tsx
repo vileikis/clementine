@@ -11,7 +11,7 @@ import {
   TbBorderCornerRounded,
   TbBorderCornerSquare,
 } from 'react-icons/tb'
-import { FONT_OPTIONS } from '../constants'
+import { GoogleFontPicker } from './google-font-picker'
 import type {
   ButtonRadius,
   Theme,
@@ -21,7 +21,6 @@ import {
   ColorPickerField,
   EditorSection,
   MediaPickerField,
-  SelectField,
   SliderField,
   ToggleGroupField,
 } from '@/shared/editor-controls'
@@ -83,13 +82,24 @@ export function ThemeConfigPanel({
     <div className="space-y-0">
       {/* Text Section */}
       <EditorSection title="Text">
-        <SelectField
+        <GoogleFontPicker
           label="Font"
-          value={theme.fontFamily ?? 'system'}
-          onChange={(value) =>
-            onUpdate({ fontFamily: value === 'system' ? null : value })
-          }
-          options={FONT_OPTIONS}
+          value={theme.fontFamily}
+          onChange={(selection) => {
+            if (selection === null) {
+              onUpdate({
+                fontFamily: null,
+                fontSource: 'system',
+                fontVariants: [400, 700],
+              })
+            } else {
+              onUpdate({
+                fontFamily: selection.family,
+                fontSource: selection.source,
+                fontVariants: selection.variants,
+              })
+            }
+          }}
           disabled={disabled}
         />
         <ColorPickerField

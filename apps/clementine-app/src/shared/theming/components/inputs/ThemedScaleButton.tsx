@@ -50,14 +50,14 @@ export function ThemedScaleButton({
         color: theme.button.textColor,
         borderColor: theme.primaryColor,
         borderRadius,
-        fontFamily: theme.fontFamily ?? undefined,
+        fontFamily: 'inherit',
       }
     : {
         backgroundColor: `color-mix(in srgb, ${theme.text.color} 10%, transparent)`,
         color: theme.text.color,
         borderColor: `color-mix(in srgb, ${theme.text.color} 30%, transparent)`,
         borderRadius,
-        fontFamily: theme.fontFamily ?? undefined,
+        fontFamily: 'inherit',
       }
 
   return (

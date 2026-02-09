@@ -58,7 +58,6 @@ export function ThemedRadio({
 
   const labelStyle: CSSProperties = {
     color: theme.text.color,
-    fontFamily: theme.fontFamily ?? undefined,
   }
 
   return (
