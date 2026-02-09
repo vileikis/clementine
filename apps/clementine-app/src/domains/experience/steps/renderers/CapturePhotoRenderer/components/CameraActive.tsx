@@ -42,21 +42,22 @@ export function CameraActive({
   onFileChange,
 }: CameraActiveProps) {
   return (
-    <div className="flex flex-col h-full w-full mx-auto">
-      {/* Camera container - fills space on mobile, centered on desktop */}
-      <div className="flex-1 min-h-0 flex items-center justify-center">
-        <div className="w-full h-full max-h-[70vh] flex items-center justify-center bg-black rounded-2xl overflow-hidden">
+    <div className="flex flex-col h-full w-full">
+      {/* Preview Zone - fills remaining space, centers content */}
+      <div className="flex-1 min-h-0 flex items-center justify-center p-4">
+        <div className="w-full h-full max-w-full max-h-full flex items-center justify-center bg-black rounded-2xl overflow-hidden">
           <CameraView
             ref={cameraRef}
             aspectRatio={aspectRatio}
+            className="max-w-full max-h-full"
             onReady={onCameraReady}
             onError={onCameraError}
           />
         </div>
       </div>
 
-      {/* Controls row */}
-      <div className="flex items-center justify-center gap-6 py-6">
+      {/* Controls Zone - fixed height with safe-area padding */}
+      <div className="flex items-center justify-center gap-6 py-6 pb-[env(safe-area-inset-bottom,1.5rem)]">
         {/* Library button (left) */}
         <ThemedIconButton
           onClick={onOpenPicker}

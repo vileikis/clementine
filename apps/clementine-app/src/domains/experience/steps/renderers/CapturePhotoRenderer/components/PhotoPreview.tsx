@@ -37,23 +37,19 @@ export function PhotoPreview({
   onConfirm,
 }: PhotoPreviewProps) {
   return (
-    <div className="flex flex-col h-full w-full mx-auto">
-      {/* Preview container - matches camera container styling */}
-      <div className="flex-1 min-h-0 flex items-center justify-center">
-        <div
-          className="w-full max-h-[70vh] bg-black rounded-2xl overflow-hidden"
+    <div className="flex flex-col h-full w-full">
+      {/* Preview Zone - NO black container for cleaner appearance */}
+      <div className="flex-1 min-h-0 flex items-center justify-center p-4">
+        <img
+          src={photo.previewUrl}
+          alt="Captured photo preview"
+          className="max-w-full max-h-full object-contain"
           style={{ aspectRatio: ASPECT_RATIO_CSS[aspectRatio] }}
-        >
-          <img
-            src={photo.previewUrl}
-            alt="Captured photo preview"
-            className="w-full h-full object-cover"
-          />
-        </div>
+        />
       </div>
 
-      {/* Controls row - Retake and Continue */}
-      <div className="flex items-center justify-center gap-4 py-6">
+      {/* Controls Zone - fixed height with safe-area padding */}
+      <div className="flex items-center justify-center gap-4 py-6 pb-[env(safe-area-inset-bottom,1.5rem)]">
         <ThemedButton onClick={onRetake} variant="outline">
           Retake
         </ThemedButton>

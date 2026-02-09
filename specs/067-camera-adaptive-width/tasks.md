@@ -24,8 +24,8 @@
 
 **Purpose**: Review existing code and prepare for layout changes
 
-- [ ] T001 Review current CameraView component to verify aspect-ratio support in `apps/clementine-app/src/shared/camera/components/CameraView.tsx`
-- [ ] T002 Review CapturePhotoRunMode to understand component orchestration in `apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer/CapturePhotoRunMode.tsx`
+- [x] T001 Review current CameraView component to verify aspect-ratio support in `apps/clementine-app/src/shared/camera/components/CameraView.tsx`
+- [x] T002 Review CapturePhotoRunMode to understand component orchestration in `apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer/CapturePhotoRunMode.tsx`
 
 ---
 
@@ -50,17 +50,17 @@
 
 ### Implementation for User Story 1
 
-- [ ] T003 [US1] Refactor CameraActive to two-zone layout structure in `apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer/components/CameraActive.tsx`
+- [x] T003 [US1] Refactor CameraActive to two-zone layout structure in `apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer/components/CameraActive.tsx`
   - Change outer container to `flex flex-col h-full w-full`
   - Add Preview Zone with `flex-1 min-h-0 flex items-center justify-center`
   - Add Camera Container with `bg-black rounded-2xl overflow-hidden`
   - Update CameraView styling for contain behavior (`max-w-full max-h-full`)
 
-- [ ] T004 [US1] Add safe-area padding to controls zone in `apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer/components/CameraActive.tsx`
+- [x] T004 [US1] Add safe-area padding to controls zone in `apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer/components/CameraActive.tsx`
   - Update controls div to use `pb-[env(safe-area-inset-bottom,1.5rem)]`
   - Ensure controls never overlap preview zone
 
-- [ ] T005 [US1] Remove `max-h-[70vh]` constraint from camera container in `apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer/components/CameraActive.tsx`
+- [x] T005 [US1] Remove `max-h-[70vh]` constraint from camera container in `apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer/components/CameraActive.tsx`
   - Allow preview zone to use full available space
   - Letterboxing handled by flexbox centering + aspect-ratio
 
@@ -84,16 +84,16 @@
 
 ### Implementation for User Story 2
 
-- [ ] T007 [US2] Refactor PhotoPreview to two-zone layout in `apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer/components/PhotoPreview.tsx`
+- [x] T007 [US2] Refactor PhotoPreview to two-zone layout in `apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer/components/PhotoPreview.tsx`
   - Change outer container to `flex flex-col h-full w-full`
   - Add Preview Zone with `flex-1 min-h-0 flex items-center justify-center p-4`
   - Remove black container wrapper (`bg-black rounded-2xl`)
 
-- [ ] T008 [US2] Update image styling for contain behavior in `apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer/components/PhotoPreview.tsx`
+- [x] T008 [US2] Update image styling for contain behavior in `apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer/components/PhotoPreview.tsx`
   - Use `max-w-full max-h-full object-contain` on img element
   - Maintain aspect-ratio via inline style
 
-- [ ] T009 [US2] Add safe-area padding to controls zone in `apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer/components/PhotoPreview.tsx`
+- [x] T009 [US2] Add safe-area padding to controls zone in `apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer/components/PhotoPreview.tsx`
   - Update controls div to use `pb-[env(safe-area-inset-bottom,1.5rem)]`
   - Ensure consistent controls height with CameraActive
 
@@ -117,17 +117,17 @@
 
 ### Implementation for User Story 3
 
-- [ ] T011 [US3] Refactor UploadProgress to two-zone layout in `apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer/components/UploadProgress.tsx`
+- [x] T011 [US3] Refactor UploadProgress to two-zone layout in `apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer/components/UploadProgress.tsx`
   - Change outer container to `flex flex-col h-full w-full`
   - Add Preview Zone with `flex-1 min-h-0 flex items-center justify-center`
   - Move photo preview into preview zone
 
-- [ ] T012 [US3] Update image styling for contain behavior in `apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer/components/UploadProgress.tsx`
+- [x] T012 [US3] Update image styling for contain behavior in `apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer/components/UploadProgress.tsx`
   - Use `max-w-full max-h-full object-contain` on img element
   - Maintain aspect-ratio via inline style
   - Keep overlay with spinner positioned correctly
 
-- [ ] T013 [US3] Add status message zone (replaces controls) in `apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer/components/UploadProgress.tsx`
+- [x] T013 [US3] Add status message zone (replaces controls) in `apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer/components/UploadProgress.tsx`
   - Position "Saving your photo..." message in consistent location
   - Apply safe-area padding if needed
 
@@ -144,8 +144,8 @@
 
 **Purpose**: Final validation and cleanup
 
-- [ ] T015 Run validation: `cd apps/clementine-app && pnpm check` (format + lint)
-- [ ] T016 Run type check: `cd apps/clementine-app && pnpm type-check`
+- [x] T015 Run validation: `cd apps/clementine-app && pnpm check` (format + lint)
+- [x] T016 Run type check: `cd apps/clementine-app && pnpm type-check`
 - [ ] T017 Cross-device validation per quickstart.md testing checklist
   - [ ] iPhone (with notch/dynamic island)
   - [ ] Android phone

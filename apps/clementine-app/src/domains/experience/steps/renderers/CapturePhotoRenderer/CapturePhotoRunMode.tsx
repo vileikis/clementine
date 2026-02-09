@@ -57,12 +57,7 @@ export function CapturePhotoRunMode({
   aspectRatio,
 }: CapturePhotoRunModeProps) {
   // Runtime hook for session context, actions, and navigation
-  const {
-    sessionId,
-    projectId,
-    setStepResponse,
-    next: nextStep,
-  } = useRuntime()
+  const { sessionId, projectId, setStepResponse, next: nextStep } = useRuntime()
 
   // Camera refs and hooks
   const cameraRef = useRef<CameraViewRef>(null)

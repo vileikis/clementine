@@ -27,31 +27,34 @@ interface UploadProgressProps {
 
 export function UploadProgress({ photo, aspectRatio }: UploadProgressProps) {
   return (
-    <div className="flex flex-col items-center gap-6 w-full">
-      {/* Preview image - responsive sizing */}
-      {photo?.previewUrl && (
-        <div
-          className="relative w-full max-h-full overflow-hidden rounded-lg"
-          style={{ aspectRatio: ASPECT_RATIO_CSS[aspectRatio] }}
-        >
-          <img
-            src={photo.previewUrl}
-            alt="Uploading photo"
-            className="w-full h-full object-cover"
-          />
-          {/* Overlay with spinner */}
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-            <Loader2
-              className="h-12 w-12 animate-spin"
-              style={{ color: 'white' }}
+    <div className="flex flex-col h-full w-full">
+      {/* Preview Zone - fills remaining space, centers content */}
+      <div className="flex-1 min-h-0 flex items-center justify-center p-4">
+        {photo?.previewUrl && (
+          <div className="relative max-w-full max-h-full">
+            <img
+              src={photo.previewUrl}
+              alt="Uploading photo"
+              className="max-w-full max-h-full object-contain"
+              style={{ aspectRatio: ASPECT_RATIO_CSS[aspectRatio] }}
             />
+            {/* Overlay with spinner */}
+            <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-lg">
+              <Loader2
+                className="h-12 w-12 animate-spin"
+                style={{ color: 'white' }}
+              />
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
-      <ThemedText variant="body" className="opacity-80">
-        Saving your photo...
-      </ThemedText>
+      {/* Status Zone - consistent with controls zone positioning */}
+      <div className="flex items-center justify-center py-6 pb-[env(safe-area-inset-bottom,1.5rem)]">
+        <ThemedText variant="body" className="opacity-80">
+          Saving your photo...
+        </ThemedText>
+      </div>
     </div>
   )
 }
