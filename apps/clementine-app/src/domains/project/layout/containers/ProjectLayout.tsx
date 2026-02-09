@@ -1,38 +1,73 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Outlet, useLocation } from '@tanstack/react-router'
+import { Link, Outlet, useLocation } from '@tanstack/react-router'
 import { FolderOpen, Loader2, Share } from 'lucide-react'
 import { toast } from 'sonner'
 import type { Project } from '@clementine/shared'
-import type { TabItem } from '@/domains/navigation'
 import { TopNavBar } from '@/domains/navigation'
 import { ShareDialog } from '@/domains/project/share'
 import { usePublishProjectConfig } from '@/domains/project-config/designer/hooks'
 import { useProjectConfigDesignerStore } from '@/domains/project-config/designer/stores'
 import { EditorChangesBadge, EditorSaveStatus } from '@/shared/editor-status'
+import { cn } from '@/shared/utils/style-utils'
 import { Button } from '@/ui-kit/ui/button'
 
-const projectTabs: TabItem[] = [
+const projectTabs = [
   {
     id: 'designer',
-    label: 'Designer',
-    to: '/workspace/$workspaceSlug/projects/$projectId/designer',
-  },
-  {
-    id: 'distribute',
-    label: 'Distribute',
-    to: '/workspace/$workspaceSlug/projects/$projectId/distribute',
+    label: 'Design',
+    to: '/workspace/$workspaceSlug/projects/$projectId/designer' as const,
   },
   {
     id: 'connect',
     label: 'Connect',
-    to: '/workspace/$workspaceSlug/projects/$projectId/connect',
+    to: '/workspace/$workspaceSlug/projects/$projectId/connect' as const,
+  },
+  {
+    id: 'distribute',
+    label: 'Share',
+    to: '/workspace/$workspaceSlug/projects/$projectId/distribute' as const,
   },
   {
     id: 'analytics',
     label: 'Analytics',
-    to: '/workspace/$workspaceSlug/projects/$projectId/analytics',
+    to: '/workspace/$workspaceSlug/projects/$projectId/analytics' as const,
   },
 ]
+
+function ProjectPillTabs({
+  workspaceSlug,
+  projectId,
+}: {
+  workspaceSlug: string
+  projectId: string
+}) {
+  const params = { workspaceSlug, projectId }
+
+  return (
+    <nav className="flex gap-1">
+      {projectTabs.map((tab) => (
+        <Link
+          key={tab.id}
+          to={tab.to}
+          params={params}
+          className={cn(
+            'rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
+            'text-muted-foreground hover:bg-muted hover:text-foreground',
+          )}
+          activeProps={{
+            className: 'bg-muted text-foreground',
+          }}
+          inactiveProps={{
+            className:
+              'text-muted-foreground hover:bg-muted hover:text-foreground',
+          }}
+        >
+          {tab.label}
+        </Link>
+      ))}
+    </nav>
+  )
+}
 
 interface ProjectLayoutProps {
   project: Project
@@ -48,10 +83,10 @@ export function ProjectLayout({ project, workspaceSlug }: ProjectLayoutProps) {
 
   const projectsListPath = `/workspace/${workspaceSlug}/projects`
 
-  // Show publish workflow on Designer and Distribute routes only
+  // Show publish workflow on Designer, Distribute, and Connect (not Analytics)
   const showPublishWorkflow = useMemo(() => {
     const path = location.pathname
-    return path.includes('/designer') || path.includes('/distribute')
+    return !path.includes('/analytics')
   }, [location.pathname])
 
   const hasUnpublishedChanges = useMemo(() => {
@@ -80,15 +115,19 @@ export function ProjectLayout({ project, workspaceSlug }: ProjectLayoutProps) {
     }
   }
 
-  // Determine if share button should show (not on distribute page — it IS the share page)
+  // Hide share button on distribute page (it IS the share page)
   const showShareButton = useMemo(() => {
     return !location.pathname.includes('/distribute')
   }, [location.pathname])
+
+  // Hide TopNavBar border on designer route (designer sub-tabs provide their own border)
+  const isDesignerRoute = location.pathname.includes('/designer')
 
   return (
     <div className="flex h-screen flex-col">
       <TopNavBar
         className="shrink-0"
+        borderless={isDesignerRoute}
         breadcrumbs={[
           {
             label: project.name,
@@ -96,7 +135,12 @@ export function ProjectLayout({ project, workspaceSlug }: ProjectLayoutProps) {
             iconHref: projectsListPath,
           },
         ]}
-        tabs={projectTabs}
+        center={
+          <ProjectPillTabs
+            workspaceSlug={workspaceSlug}
+            projectId={project.id}
+          />
+        }
         right={
           showPublishWorkflow ? (
             <>
