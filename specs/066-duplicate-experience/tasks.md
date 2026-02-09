@@ -23,8 +23,8 @@ All paths relative to `apps/clementine-app/src/` unless otherwise noted.
 
 **Purpose**: Create the shared lib directory and utility function that all user stories depend on.
 
-- [ ] T001 [P] Create `generateDuplicateName` utility function in `domains/experience/shared/lib/generate-duplicate-name.ts`. Implement: if name ends with `" (Copy)"` return unchanged, else append `" (Copy)"`. If result exceeds 100 chars, truncate original name to fit. Export the function. See `contracts/duplicate-experience.md` for examples.
-- [ ] T002 [P] Add `duplicateExperienceInputSchema` to `domains/experience/shared/schemas/experience.input.schemas.ts`. Schema: `z.object({ workspaceId: z.string().min(1), experienceId: z.string().min(1) })`. Export the schema and its inferred type.
+- [x] T001 [P] Create `generateDuplicateName` utility function in `domains/experience/shared/lib/generate-duplicate-name.ts`. Implement: if name ends with `" (Copy)"` return unchanged, else append `" (Copy)"`. If result exceeds 100 chars, truncate original name to fit. Export the function. See `contracts/duplicate-experience.md` for examples.
+- [x] T002 [P] Add `duplicateExperienceInputSchema` to `domains/experience/shared/schemas/experience.input.schemas.ts`. Schema: `z.object({ workspaceId: z.string().min(1), experienceId: z.string().min(1) })`. Export the schema and its inferred type.
 
 ---
 
@@ -34,8 +34,8 @@ All paths relative to `apps/clementine-app/src/` unless otherwise noted.
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T003 Create `useDuplicateExperience` mutation hook in `domains/experience/shared/hooks/useDuplicateExperience.ts`. Follow the `useCreateExperience` pattern: validate input with `duplicateExperienceInputSchema`, open Firestore `runTransaction`, `transaction.get()` the source document (throw if not found or `status !== 'active'`), generate name via `generateDuplicateName()`, create new doc ref with `doc(experiencesRef)`, deep-copy configs with `structuredClone()`, `transaction.set()` the new document per field mapping in `data-model.md` (new id, `serverTimestamp()` for createdAt/updatedAt, reset publish fields to null, set `sourceExperienceId` to source.id, copy profile/media/draft/published). On success: invalidate `experienceKeys.lists()` filtered by workspaceId. On error: `Sentry.captureException`. Return `{ workspaceId, experienceId: newRef.id, name }`.
-- [ ] T004 Add `export * from './useDuplicateExperience'` to `domains/experience/shared/hooks/index.ts` barrel export.
+- [x] T003 Create `useDuplicateExperience` mutation hook in `domains/experience/shared/hooks/useDuplicateExperience.ts`. Follow the `useCreateExperience` pattern: validate input with `duplicateExperienceInputSchema`, open Firestore `runTransaction`, `transaction.get()` the source document (throw if not found or `status !== 'active'`), generate name via `generateDuplicateName()`, create new doc ref with `doc(experiencesRef)`, deep-copy configs with `structuredClone()`, `transaction.set()` the new document per field mapping in `data-model.md` (new id, `serverTimestamp()` for createdAt/updatedAt, reset publish fields to null, set `sourceExperienceId` to source.id, copy profile/media/draft/published). On success: invalidate `experienceKeys.lists()` filtered by workspaceId. On error: `Sentry.captureException`. Return `{ workspaceId, experienceId: newRef.id, name }`.
+- [x] T004 Add `export * from './useDuplicateExperience'` to `domains/experience/shared/hooks/index.ts` barrel export.
 
 **Checkpoint**: Mutation hook is ready. UI integration can now begin.
 
@@ -49,8 +49,8 @@ All paths relative to `apps/clementine-app/src/` unless otherwise noted.
 
 ### Implementation for User Story 1
 
-- [ ] T005 [US1] Refactor `ExperienceListItem` in `domains/experience/library/components/ExperienceListItem.tsx`. Replace the `renderMenuItems` render prop and raw `DropdownMenu` with the shared `ContextDropdownMenu` component. Change props interface: replace `renderMenuItems?: () => React.ReactNode` with `menuSections?: MenuSection[]` (import `MenuSection` from `@/shared/components/ContextDropdownMenu`). Render `ContextDropdownMenu` with `trigger` as the existing ghost button with `MoreVertical` icon and `sections={menuSections}`. Remove the `DropdownMenu`, `DropdownMenuContent`, `DropdownMenuTrigger` imports. Keep all other component behavior unchanged.
-- [ ] T006 [US1] Wire up duplicate action in `domains/experience/library/containers/ExperiencesPage.tsx`. Import `useDuplicateExperience` hook, `Copy` and `Pencil` icons from lucide-react, `toast` from sonner, and `MenuSection` type. Call `useDuplicateExperience()` to get the mutation. Create a `handleDuplicate` async function that calls `duplicateExperience.mutateAsync({ workspaceId, experienceId: exp.id })`, then on success calls `toast.success(\`Duplicated as "\${result.name}"\`)`, on catch calls `toast.error("Couldn't duplicate experience")`. Build `menuSections` array with two sections: first section has Rename (`{ key: 'rename', label: 'Rename', icon: Pencil, onClick: () => setRenameExperience(exp) }`) and Duplicate (`{ key: 'duplicate', label: 'Duplicate', icon: Copy, onClick: () => handleDuplicate(exp), disabled: duplicateExperience.isPending }`); second section has Delete (`{ key: 'delete', label: 'Delete', icon: Trash2, onClick: () => setDeleteExperienceTarget(exp), destructive: true }`). Pass `menuSections` to `ExperienceListItem` instead of `renderMenuItems`. Remove `DropdownMenuItem` and `DropdownMenuSeparator` imports if no longer used.
+- [x] T005 [US1] Refactor `ExperienceListItem` in `domains/experience/library/components/ExperienceListItem.tsx`. Replace the `renderMenuItems` render prop and raw `DropdownMenu` with the shared `ContextDropdownMenu` component. Change props interface: replace `renderMenuItems?: () => React.ReactNode` with `menuSections?: MenuSection[]` (import `MenuSection` from `@/shared/components/ContextDropdownMenu`). Render `ContextDropdownMenu` with `trigger` as the existing ghost button with `MoreVertical` icon and `sections={menuSections}`. Remove the `DropdownMenu`, `DropdownMenuContent`, `DropdownMenuTrigger` imports. Keep all other component behavior unchanged.
+- [x] T006 [US1] Wire up duplicate action in `domains/experience/library/containers/ExperiencesPage.tsx`. Import `useDuplicateExperience` hook, `Copy` and `Pencil` icons from lucide-react, `toast` from sonner, and `MenuSection` type. Call `useDuplicateExperience()` to get the mutation. Create a `handleDuplicate` async function that calls `duplicateExperience.mutateAsync({ workspaceId, experienceId: exp.id })`, then on success calls `toast.success(\`Duplicated as "\${result.name}"\`)`, on catch calls `toast.error("Couldn't duplicate experience")`. Build `menuSections` array with two sections: first section has Rename (`{ key: 'rename', label: 'Rename', icon: Pencil, onClick: () => setRenameExperience(exp) }`) and Duplicate (`{ key: 'duplicate', label: 'Duplicate', icon: Copy, onClick: () => handleDuplicate(exp), disabled: duplicateExperience.isPending }`); second section has Delete (`{ key: 'delete', label: 'Delete', icon: Trash2, onClick: () => setDeleteExperienceTarget(exp), destructive: true }`). Pass `menuSections` to `ExperienceListItem` instead of `renderMenuItems`. Remove `DropdownMenuItem` and `DropdownMenuSeparator` imports if no longer used.
 
 **Checkpoint**: User Story 1 is fully functional. Creator can duplicate any experience from the list with one click.
 
@@ -64,7 +64,7 @@ All paths relative to `apps/clementine-app/src/` unless otherwise noted.
 
 ### Implementation for User Story 2
 
-- [ ] T007 [US2] Verify and refine `generateDuplicateName` in `domains/experience/shared/lib/generate-duplicate-name.ts`. Confirm the function correctly handles all naming scenarios from the contract: (1) "Photo Booth" → "Photo Booth (Copy)", (2) "Photo Booth (Copy)" → "Photo Booth (Copy)" unchanged, (3) "My Event (Copy) Special" → "My Event (Copy) Special (Copy)" — only strip trailing suffix, (4) 100-char name → truncate original to 93 chars + " (Copy)". Ensure the suffix check is case-sensitive and matches only trailing `" (Copy)"` exactly. Test manually in dev server.
+- [x] T007 [US2] Verify and refine `generateDuplicateName` in `domains/experience/shared/lib/generate-duplicate-name.ts`. Confirm the function correctly handles all naming scenarios from the contract: (1) "Photo Booth" → "Photo Booth (Copy)", (2) "Photo Booth (Copy)" → "Photo Booth (Copy)" unchanged, (3) "My Event (Copy) Special" → "My Event (Copy) Special (Copy)" — only strip trailing suffix, (4) 100-char name → truncate original to 93 chars + " (Copy)". Ensure the suffix check is case-sensitive and matches only trailing `" (Copy)"` exactly. Test manually in dev server.
 
 **Checkpoint**: Naming logic is verified for all edge cases.
 
@@ -78,8 +78,8 @@ All paths relative to `apps/clementine-app/src/` unless otherwise noted.
 
 ### Implementation for User Story 3
 
-- [ ] T008 [US3] Verify error handling in `useDuplicateExperience` hook in `domains/experience/shared/hooks/useDuplicateExperience.ts`. Confirm: (1) If source document doesn't exist or has `status !== 'active'`, the transaction throws a descriptive error. (2) The `onError` callback calls `Sentry.captureException` with tags `{ domain: 'experience/library', action: 'duplicate-experience' }`. (3) The error surfaces to the caller so the catch block in `ExperiencesPage` can show the toast. Test by attempting to duplicate a deleted experience.
-- [ ] T009 [US3] Verify concurrency protection in `domains/experience/library/containers/ExperiencesPage.tsx`. Confirm the `disabled: duplicateExperience.isPending` prop on the Duplicate menu action correctly disables the action while a duplication is in progress. Test by triggering a duplicate and verifying the menu action is disabled until completion.
+- [x] T008 [US3] Verify error handling in `useDuplicateExperience` hook in `domains/experience/shared/hooks/useDuplicateExperience.ts`. Confirm: (1) If source document doesn't exist or has `status !== 'active'`, the transaction throws a descriptive error. (2) The `onError` callback calls `Sentry.captureException` with tags `{ domain: 'experience/library', action: 'duplicate-experience' }`. (3) The error surfaces to the caller so the catch block in `ExperiencesPage` can show the toast. Test by attempting to duplicate a deleted experience.
+- [x] T009 [US3] Verify concurrency protection in `domains/experience/library/containers/ExperiencesPage.tsx`. Confirm the `disabled: duplicateExperience.isPending` prop on the Duplicate menu action correctly disables the action while a duplication is in progress. Test by triggering a duplicate and verifying the menu action is disabled until completion.
 
 **Checkpoint**: Error handling verified for all failure cases.
 
@@ -89,9 +89,9 @@ All paths relative to `apps/clementine-app/src/` unless otherwise noted.
 
 **Purpose**: Validation and cleanup across all stories.
 
-- [ ] T010 Run `pnpm check` (format + lint) from `apps/clementine-app/` and fix any issues.
-- [ ] T011 Run `pnpm type-check` from `apps/clementine-app/` and fix any TypeScript errors.
-- [ ] T012 Manual smoke test in dev server (`pnpm dev`): duplicate an experience, verify it appears in list, verify name, verify draft config, verify not published, verify toast messages.
+- [x] T010 Run `pnpm check` (format + lint) from `apps/clementine-app/` and fix any issues.
+- [x] T011 Run `pnpm type-check` from `apps/clementine-app/` and fix any TypeScript errors.
+- [x] T012 Manual smoke test in dev server (`pnpm dev`): duplicate an experience, verify it appears in list, verify name, verify draft config, verify not published, verify toast messages.
 
 ---
 

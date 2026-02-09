@@ -3,28 +3,25 @@
  *
  * Card component displaying a single experience in the library list.
  * Shows thumbnail (if available), name, profile badge, and status.
- * Includes context menu with rename and delete actions.
+ * Includes context menu with actions provided via sections prop.
  */
 import { Link } from '@tanstack/react-router'
 import { Image as ImageIcon, MoreVertical } from 'lucide-react'
 
 import { ProfileBadge } from './ProfileBadge'
 import type { Experience } from '@/domains/experience/shared'
+import type { MenuSection } from '@/shared/components/ContextDropdownMenu'
 import { Button } from '@/ui-kit/ui/button'
 import { Card } from '@/ui-kit/ui/card'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from '@/ui-kit/ui/dropdown-menu'
+import { ContextDropdownMenu } from '@/shared/components/ContextDropdownMenu'
 
 interface ExperienceListItemProps {
   /** Experience data to display */
   experience: Experience
   /** Workspace slug for navigation */
   workspaceSlug: string
-  /** Render prop for context menu items (allows parent to handle dialogs) */
-  renderMenuItems?: () => React.ReactNode
+  /** Menu sections for ContextDropdownMenu */
+  menuSections?: MenuSection[]
 }
 
 /**
@@ -38,27 +35,10 @@ function getPublishStatus(experience: Experience): string {
   return 'Published'
 }
 
-/**
- * List item component for experience library
- *
- * @example
- * ```tsx
- * <ExperienceListItem
- *   experience={experience}
- *   workspaceSlug="my-workspace"
- *   renderMenuItems={() => (
- *     <>
- *       <DropdownMenuItem onClick={onRename}>Rename</DropdownMenuItem>
- *       <DropdownMenuItem onClick={onDelete}>Delete</DropdownMenuItem>
- *     </>
- *   )}
- * />
- * ```
- */
 export function ExperienceListItem({
   experience,
   workspaceSlug,
-  renderMenuItems,
+  menuSections,
 }: ExperienceListItemProps) {
   const publishStatus = getPublishStatus(experience)
 
@@ -94,19 +74,16 @@ export function ExperienceListItem({
         </Link>
 
         {/* Context menu */}
-        {renderMenuItems && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+        {menuSections && (
+          <ContextDropdownMenu
+            trigger={
               <Button variant="ghost" size="icon" className="h-11 w-11">
                 <MoreVertical className="h-4 w-4" />
                 <span className="sr-only">Actions</span>
               </Button>
-            </DropdownMenuTrigger>
-
-            <DropdownMenuContent align="end">
-              {renderMenuItems()}
-            </DropdownMenuContent>
-          </DropdownMenu>
+            }
+            sections={menuSections}
+          />
         )}
       </div>
     </Card>
