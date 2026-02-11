@@ -72,7 +72,41 @@ pnpm app:check        # Format + lint
 pnpm app:type-check   # TypeScript
 ```
 
+### Phase 5: Completion error handling
+
+**12. experienceRuntimeStore.ts**
+- Add `completionError: string | null` to state (initial: `null`)
+- Add `setCompletionError` action
+- Clear in `initFromSession` and `reset()`
+
+**13. useRuntime.ts**
+- Add `completionError: string | null` to `RuntimeAPI`
+
+**14. ExperienceRuntime.tsx**
+- Change `onComplete` type to `() => void | Promise<void>`
+- Extract `runCompletion` into a stable callback (callable from effect + retry)
+- In `runCompletion`: clear error → sync (guarded) → completeSession → `await onComplete?.()` — catch at each step, `store.setCompletionError(error.message)`
+- Add retry handler calling `runCompletion`
+- Render: `isComplete && completionError` → error UI (heading + error message + "Try Again" button)
+
+**15. ExperiencePage.tsx**
+- In `handleExperienceComplete`: throw on transform failure (remove toast)
+- Change `onComplete` prop: remove `() => void` wrapper
+
+**16. ExperiencePreviewModal.tsx**
+- In `handleComplete`: throw on transform failure (remove toast)
+- Move `setShowJobStatus(true)` after successful pipeline trigger
+
+## Validation
+
+```bash
+pnpm app:check        # Format + lint
+pnpm app:type-check   # TypeScript
+```
+
 ## Manual Testing
+
+### Phase 1-3 (completing state)
 
 1. **ExperiencePage (guest)**: Complete all steps → spinner until share page
 2. **PreviewModal**: Complete preview → spinner until JobStatusDisplay
@@ -82,3 +116,11 @@ pnpm app:type-check   # TypeScript
 6. **X button during completing**: Home confirmation dialog appears
 7. **Back navigation**: Still works normally during non-completing states
 8. **Single-step experience**: X icon shown (close mode), no progress bar
+
+### Phase 4 (completion error handling)
+
+9. **Transform pipeline failure (guest)**: Simulate error in `useStartTransformPipeline` → completing spinner → error state with message + "Try Again" button (not infinite spinner)
+10. **Transform pipeline failure (preview)**: Same simulation → error state in preview modal
+11. **Retry success**: Click "Try Again" after error → re-attempts completion → navigates on success
+12. **Close during error**: Click X during error state → home confirmation dialog works
+13. **Happy path unchanged**: Disable artificial error → complete experience → navigates to share normally

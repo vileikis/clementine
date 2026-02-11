@@ -43,6 +43,13 @@ export function useStartTransformPipeline() {
     >(functions, 'startTransformPipelineV2')
 
     try {
+      // TESTING: INSERT_YOUR_CODE
+      // await new Promise((_, reject) =>
+      //   setTimeout(
+      //     () => reject(new Error('Artificial transform pipeline error')),
+      //     3000,
+      //   ),
+      // )
       await startTransform(params)
       return true
     } catch (error) {

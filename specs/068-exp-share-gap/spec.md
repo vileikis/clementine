@@ -132,5 +132,88 @@ Remove stale `isComplete` handling from content components — ExperienceRuntime
 3. RuntimeTopBar stays visible during completing with close button (X) and no progress bar.
 4. Clicking close (X) during completing triggers home confirmation dialog (existing behavior).
 5. The completing state persists until the runtime unmounts (navigation) or is swapped out (PreviewModal).
-6. If `startTransformPipeline` fails, the error state is shown cleanly by the consumer (existing behavior, no regression).
-7. All four consumers (ExperiencePage, PreviewModal, PregatePage, PresharePage) benefit without changes to them.
+6. All four consumers (ExperiencePage, PreviewModal, PregatePage, PresharePage) benefit without changes to them.
+
+---
+
+### Phase 2: Completion Error Handling
+
+#### Problem
+
+The completing spinner introduced above has no error escape hatch. If any step in the completion flow fails (Firestore sync, session completion, or transform pipeline), the user is stuck on "Completing your experience..." forever. The only current feedback is a brief toast that disappears.
+
+There are **three failure points** in the completion flow:
+
+| Step | What fails | Current behavior |
+|------|-----------|-----------------|
+| Firestore sync | Network error, permission denied | `onError` toast → spinner stays forever |
+| `completeSession` | Cloud function/mutation error | `onError` toast → spinner stays forever |
+| `onComplete` callback (transform pipeline) | Cloud function error, timeout | Toast in parent → spinner stays forever (guest) or dead job status view (preview) |
+
+#### Solution: Completion error state in ExperienceRuntime
+
+Add a `completionError` field to the runtime store. When any step of the completion flow fails, store the error message. ExperienceRuntime renders an error state (with the error message, retry button, and optional close) instead of the infinite spinner.
+
+#### Layout during completion error
+
+```
+┌─────────────────────────┐
+│ RuntimeTopBar            │  ← stays visible, X icon (close mode)
+│  [X]   Title             │     progress bar hidden
+├─────────────────────────┤
+│                         │
+│   "Something went wrong" │  ← ThemedText heading
+│   "{error.message}"      │  ← ThemedText body with actual error
+│                         │
+│   [ Try Again ]          │  ← ThemedButton, retries completion flow
+│                         │
+└─────────────────────────┘
+```
+
+#### ExperienceRuntime completion flow changes
+
+1. **`onComplete` type**: Change from `() => void` to `() => void | Promise<void>` — allows runtime to await and catch errors from parent callbacks
+2. **`runCompletion` extraction**: Extract from useEffect into a stable callback so both the effect and the retry button can call it
+3. **Error capture**: Wrap each completion step in try/catch, set `completionError` with the error message on failure
+4. **Retry**: Retry button calls `runCompletion` again. Already-succeeded steps are skipped via existing guards (`hasCompletedRef`)
+5. **Error cleared on retry**: `runCompletion` clears `completionError` at the start of each attempt
+
+#### Render logic (three-way → four-way)
+
+```tsx
+{isCompleting && completionError ? (
+  // Error state: message + retry + close
+) : isCompleting ? (
+  // Loading state: spinner + "Completing your experience..."
+) : isFullHeightStep ? (
+  // Full-height step (camera)
+) : (
+  // Normal scrollable content
+)}
+```
+
+#### Consumer changes
+
+Parents that do async work in `onComplete` must let errors propagate (throw) instead of swallowing them:
+
+| Consumer | Change |
+|----------|--------|
+| **ExperiencePage** | Remove `() => void` wrapper and toast on transform failure — throw instead so runtime catches it |
+| **ExperiencePreviewModal** | Throw on transform failure instead of showing toast |
+| **PregatePage** | No change — `onComplete` does sync navigation only |
+| **PresharePage** | No change — `onComplete` does sync navigation only |
+
+#### What we are NOT doing
+
+- Not adding a generic error boundary — this is specific to the completion flow
+- Not changing the transform pipeline or cloud function
+- Not retrying individual sub-steps (sync, session, transform) independently — the full `runCompletion` re-runs, skipping already-succeeded steps
+
+#### Acceptance Criteria (Phase 2)
+
+1. If Firestore sync fails during completion, user sees error state with the error message and a "Try Again" button instead of an infinite spinner.
+2. If `completeSession` fails, same error state with message and retry.
+3. If `onComplete` (transform pipeline) fails, same error state with message and retry.
+4. Clicking "Try Again" clears the error and re-attempts completion from the point of failure.
+5. RuntimeTopBar remains visible during error state with close button (X).
+6. Error message text is displayed to the user (not just a generic message).

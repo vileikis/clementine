@@ -76,3 +76,38 @@ interface ExperienceRuntimeState {
 | `onNext` | `() => void` (optional) | Removed — from store |
 | `canProceed` | `boolean` (optional) | Removed — from store |
 | `buttonLabel` | `string` (optional) | Kept — UI customization |
+
+---
+
+## Phase 2: Completion Error Handling — Data Model Changes
+
+### experienceRuntimeStore — completionError state
+
+**New state field**:
+```typescript
+interface ExperienceRuntimeState {
+  // ... existing fields ...
+  completionError: string | null  // Error message from failed completion flow
+}
+```
+
+**New action**:
+```typescript
+interface ExperienceRuntimeActions {
+  // ... existing actions ...
+  setCompletionError: (error: string | null) => void
+}
+```
+
+**Initial value**: `null`
+**Cleared in**: `initFromSession()`, `reset()`, start of `runCompletion()`
+
+### useRuntime Hook — API Addition
+
+**New field**: `completionError: string | null` — read from `store.completionError`
+
+### ExperienceRuntimeProps — onComplete type change
+
+| Prop | Before | After |
+|------|--------|-------|
+| `onComplete` | `() => void` (optional) | `() => void \| Promise<void>` (optional) |

@@ -238,6 +238,116 @@ Four consumers need prop updates. Each is a one-line-per-prop change:
 <ExperienceRuntime experience={experience} steps={steps} onClose={undefined} ...>
 ```
 
+## Phase 2 Design: Completion Error Handling
+
+### Change 9: experienceRuntimeStore.ts — Add completionError state
+
+**File**: `apps/clementine-app/src/domains/experience/runtime/stores/experienceRuntimeStore.ts`
+
+**New state field**:
+```typescript
+completionError: string | null  // Error message from completion flow
+```
+
+**New action**:
+```typescript
+setCompletionError: (error: string | null) => void
+```
+
+**Implementation**:
+1. Add `completionError: string | null` to `ExperienceRuntimeState` (initial: `null`)
+2. Add `setCompletionError` to `ExperienceRuntimeActions`
+3. Clear `completionError: null` in `initFromSession` and `reset()`
+
+### Change 10: useRuntime.ts — Expose completionError
+
+**File**: `apps/clementine-app/src/domains/experience/runtime/hooks/useRuntime.ts`
+
+Add `completionError: string | null` to `RuntimeAPI` interface, read from `store.completionError`.
+
+### Change 11: ExperienceRuntime.tsx — Completion error flow + error UI + retry
+
+**File**: `apps/clementine-app/src/domains/experience/runtime/containers/ExperienceRuntime.tsx`
+
+**Props change**:
+- `onComplete` type: `() => void` → `() => void | Promise<void>`
+
+**Completion flow refactor**:
+1. Extract `runCompletion` from the completion `useEffect` into a `useCallback` stored in a ref, so both the effect and retry button can invoke it
+2. In `runCompletion`:
+   - Clear `completionError` at start (`store.setCompletionError(null)`)
+   - Step 1 (sync): guarded by `hasCompletedRef` — skip if already synced. On failure, `store.setCompletionError(error.message)` and return
+   - Step 2 (completeSession): on failure, `store.setCompletionError(error.message)` and return
+   - Step 3 (`await onComplete?.()`): catch rejection, `store.setCompletionError(error.message)`
+3. Completion `useEffect` calls `runCompletion()` once when conditions are met (same guards as today)
+
+**Retry mechanism**:
+- Retry button calls `runCompletion()` directly
+- Already-succeeded steps are skipped by existing guards (`hasCompletedRef` for sync)
+- `completeSession` is idempotent (Firestore set on existing doc)
+
+**Render change** (four-way):
+```tsx
+{isCompleting && store.completionError ? (
+  <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center px-6">
+    <ThemedText variant="heading" as="h2">Something went wrong</ThemedText>
+    <ThemedText variant="body">{store.completionError}</ThemedText>
+    <ThemedButton onClick={handleRetry}>Try Again</ThemedButton>
+  </div>
+) : isCompleting ? (
+  <ThemedLoading message="Completing your experience..." />
+) : isFullHeightStep ? (
+  ...
+) : (
+  ...
+)}
+```
+
+### Change 12: ExperiencePage.tsx — Propagate completion errors
+
+**File**: `apps/clementine-app/src/domains/guest/containers/ExperiencePage.tsx`
+
+**Current** (`handleExperienceComplete`):
+```tsx
+const success = await startTransformPipeline({...})
+if (!success) {
+  toast.error('Failed to start processing', { description: 'Please try again.' })
+  return
+}
+```
+
+**After**: Throw on failure so the runtime catches it:
+```tsx
+const success = await startTransformPipeline({...})
+if (!success) {
+  throw new Error('Failed to start processing. Please try again.')
+}
+```
+
+Also change the `onComplete` prop from `() => void handleExperienceComplete()` to `handleExperienceComplete` (remove `void` wrapper so the runtime can await the returned promise).
+
+### Change 13: ExperiencePreviewModal.tsx — Propagate completion errors
+
+**File**: `apps/clementine-app/src/domains/experience/preview/containers/ExperiencePreviewModal.tsx`
+
+**Current** (`handleComplete`):
+```tsx
+const success = await startTransformPipeline({...})
+if (!success) {
+  toast.error('Failed to start processing', { description: 'Please try again.' })
+}
+```
+
+**After**: Throw on failure:
+```tsx
+const success = await startTransformPipeline({...})
+if (!success) {
+  throw new Error('Failed to start processing. Please try again.')
+}
+```
+
+`onComplete={handleComplete}` is already passed without void wrapper — no change needed.
+
 ## Complexity Tracking
 
 No violations — no complexity justification needed.
