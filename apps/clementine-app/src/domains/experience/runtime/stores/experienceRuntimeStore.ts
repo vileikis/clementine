@@ -15,7 +15,7 @@ import { create } from 'zustand'
 import { validateStepInput } from '../../steps/registry/step-validation'
 import type { Session } from '@/domains/session'
 import type { MediaReference, SessionResponse } from '@clementine/shared'
-import type { ExperienceStep } from '../../shared/schemas'
+import type { Experience, ExperienceStep } from '../../shared/schemas'
 
 /**
  * Experience runtime state
@@ -24,7 +24,7 @@ export interface ExperienceRuntimeState {
   // Identity
   sessionId: string | null
   projectId: string | null
-  experienceId: string | null
+  experience: Experience | null
 
   // Steps configuration
   steps: ExperienceStep[]
@@ -44,6 +44,9 @@ export interface ExperienceRuntimeState {
   // Sync status
   isSyncing: boolean
   lastSyncedAt: number | null
+
+  // Completion error (shown instead of infinite spinner on failure)
+  completionError: string | null
 }
 
 /**
@@ -57,7 +60,7 @@ export interface ExperienceRuntimeActions {
   initFromSession: (
     session: Session,
     steps: ExperienceStep[],
-    experienceId: string,
+    experience: Experience,
   ) => void
 
   /**
@@ -130,6 +133,11 @@ export interface ExperienceRuntimeActions {
   markSynced: () => void
 
   /**
+   * Set completion error message (null to clear)
+   */
+  setCompletionError: (error: string | null) => void
+
+  /**
    * Reset the store
    */
   reset: () => void
@@ -144,7 +152,7 @@ export type ExperienceRuntimeStore = ExperienceRuntimeState &
 const initialState: ExperienceRuntimeState = {
   sessionId: null,
   projectId: null,
-  experienceId: null,
+  experience: null,
   steps: [],
   currentStepIndex: 0,
   isComplete: false,
@@ -153,6 +161,7 @@ const initialState: ExperienceRuntimeState = {
   isReady: false,
   isSyncing: false,
   lastSyncedAt: null,
+  completionError: null,
 }
 
 /**
@@ -160,12 +169,12 @@ const initialState: ExperienceRuntimeState = {
  *
  * @example
  * ```tsx
- * function RuntimeComponent({ session, steps, experienceId }) {
+ * function RuntimeComponent({ session, steps, experience }) {
  *   const store = useExperienceRuntimeStore()
  *
  *   // Initialize on mount
  *   useEffect(() => {
- *     store.initFromSession(session, steps, experienceId)
+ *     store.initFromSession(session, steps, experience)
  *   }, [session.id])
  *
  *   // Use store state
@@ -186,7 +195,7 @@ export const useExperienceRuntimeStore = create<ExperienceRuntimeStore>(
   (set, get) => ({
     ...initialState,
 
-    initFromSession: (session, steps, experienceId) => {
+    initFromSession: (session, steps, experience) => {
       // Derive starting step from responses
       const existingResponses = session.responses ?? []
       const respondedStepIds = new Set(existingResponses.map((r) => r.stepId))
@@ -200,7 +209,7 @@ export const useExperienceRuntimeStore = create<ExperienceRuntimeStore>(
       set({
         sessionId: session.id,
         projectId: session.projectId,
-        experienceId,
+        experience,
         steps,
         currentStepIndex: startingIndex,
         isComplete: session.status === 'completed',
@@ -209,6 +218,7 @@ export const useExperienceRuntimeStore = create<ExperienceRuntimeStore>(
         isReady: true,
         isSyncing: false,
         lastSyncedAt: null,
+        completionError: null,
       })
     },
 
@@ -326,6 +336,10 @@ export const useExperienceRuntimeStore = create<ExperienceRuntimeStore>(
 
     markSynced: () => {
       set({ isSyncing: false, lastSyncedAt: Date.now() })
+    },
+
+    setCompletionError: (error) => {
+      set({ completionError: error })
     },
 
     reset: () => {

@@ -248,11 +248,10 @@ export function PresharePage({ mainSessionId }: PresharePageProps) {
 
     return (
       <ExperienceRuntime
-        experienceId={preshareExperienceId}
+        experience={preshareExperience!}
         steps={steps}
         session={session}
-        experienceName={preshareExperience?.name ?? 'Preshare'}
-        onHomeClick={navigateToWelcome}
+        onClose={navigateToWelcome}
         onComplete={() => void handlePreshareComplete()}
         onError={handleRuntimeError}
       >

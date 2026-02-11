@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { RuntimeTopBar } from './RuntimeTopBar'
 import type { Theme } from '@/shared/theming/types'
 import { ThemeProvider } from '@/shared/theming/providers/ThemeProvider'
@@ -27,25 +27,67 @@ const mockTheme: Theme = {
   },
 }
 
+// Mock useRuntime hook
+const mockBack = vi.fn()
+const mockRuntimeValues = {
+  experienceName: 'Test Experience',
+  currentStepIndex: 0,
+  totalSteps: 5,
+  isComplete: false,
+  canGoBack: false,
+  back: mockBack,
+  // Required by RuntimeAPI but not used by RuntimeTopBar
+  sessionId: 'test-session',
+  projectId: 'test-project',
+  currentStep: null,
+  canProceed: true,
+  isSyncing: false,
+  next: vi.fn(),
+  goToStep: vi.fn(),
+  setStepResponse: vi.fn(),
+  getResponse: vi.fn(),
+  getResponses: vi.fn(() => []),
+  getState: vi.fn(),
+}
+
+vi.mock('../hooks/useRuntime', () => ({
+  useRuntime: () => mockRuntimeValues,
+}))
+
+// Helper to set mock values for each test
+function setMockRuntime(overrides: Partial<typeof mockRuntimeValues>) {
+  Object.assign(mockRuntimeValues, overrides)
+}
+
+// Reset mock values before each test
+beforeEach(() => {
+  setMockRuntime({
+    experienceName: 'Test Experience',
+    currentStepIndex: 0,
+    totalSteps: 5,
+    isComplete: false,
+    canGoBack: false,
+  })
+  mockBack.mockClear()
+})
+
 describe('RuntimeTopBar', () => {
-  it('renders experience name', () => {
+  it('renders experience name from store', () => {
     render(
       <ThemeProvider theme={mockTheme}>
-        <RuntimeTopBar
-          experienceName="Test Experience"
-          currentStepIndex={0}
-          totalSteps={5}
-        />
+        <RuntimeTopBar />
       </ThemeProvider>,
     )
 
     expect(screen.getByText('Test Experience')).toBeInTheDocument()
   })
 
-  it('shows fallback "Experience" when name is empty', () => {
+  it('shows "Experience" fallback when name is empty', () => {
+    setMockRuntime({ experienceName: 'Experience' })
+
     render(
       <ThemeProvider theme={mockTheme}>
-        <RuntimeTopBar experienceName="" currentStepIndex={0} totalSteps={1} />
+        <RuntimeTopBar />
       </ThemeProvider>,
     )
 
@@ -53,13 +95,11 @@ describe('RuntimeTopBar', () => {
   })
 
   it('calculates progress correctly for first step', () => {
+    setMockRuntime({ currentStepIndex: 0, totalSteps: 5 })
+
     render(
       <ThemeProvider theme={mockTheme}>
-        <RuntimeTopBar
-          experienceName="Test"
-          currentStepIndex={0}
-          totalSteps={5}
-        />
+        <RuntimeTopBar />
       </ThemeProvider>,
     )
 
@@ -69,13 +109,11 @@ describe('RuntimeTopBar', () => {
   })
 
   it('calculates progress correctly for middle step', () => {
+    setMockRuntime({ currentStepIndex: 2, totalSteps: 5 })
+
     render(
       <ThemeProvider theme={mockTheme}>
-        <RuntimeTopBar
-          experienceName="Test"
-          currentStepIndex={2}
-          totalSteps={5}
-        />
+        <RuntimeTopBar />
       </ThemeProvider>,
     )
 
@@ -85,13 +123,11 @@ describe('RuntimeTopBar', () => {
   })
 
   it('calculates progress correctly for last step', () => {
+    setMockRuntime({ currentStepIndex: 4, totalSteps: 5 })
+
     render(
       <ThemeProvider theme={mockTheme}>
-        <RuntimeTopBar
-          experienceName="Test"
-          currentStepIndex={4}
-          totalSteps={5}
-        />
+        <RuntimeTopBar />
       </ThemeProvider>,
     )
 
@@ -101,13 +137,11 @@ describe('RuntimeTopBar', () => {
   })
 
   it('hides progress bar for single-step experience', () => {
+    setMockRuntime({ currentStepIndex: 0, totalSteps: 1 })
+
     render(
       <ThemeProvider theme={mockTheme}>
-        <RuntimeTopBar
-          experienceName="Test"
-          currentStepIndex={0}
-          totalSteps={1}
-        />
+        <RuntimeTopBar />
       </ThemeProvider>,
     )
 
@@ -116,15 +150,10 @@ describe('RuntimeTopBar', () => {
     expect(progressBar).not.toBeInTheDocument()
   })
 
-  it('disables home button when onHomeClick is undefined (preview mode)', () => {
+  it('disables home button when onClose is undefined (preview mode)', () => {
     render(
       <ThemeProvider theme={mockTheme}>
-        <RuntimeTopBar
-          experienceName="Test"
-          currentStepIndex={0}
-          totalSteps={1}
-          onHomeClick={undefined}
-        />
+        <RuntimeTopBar onClose={undefined} />
       </ThemeProvider>,
     )
 
@@ -132,17 +161,12 @@ describe('RuntimeTopBar', () => {
     expect(homeButton).toBeDisabled()
   })
 
-  it('enables home button when onHomeClick is provided (guest mode)', () => {
-    const handleClick = vi.fn()
+  it('enables home button when onClose is provided (guest mode)', () => {
+    const handleClose = vi.fn()
 
     render(
       <ThemeProvider theme={mockTheme}>
-        <RuntimeTopBar
-          experienceName="Test"
-          currentStepIndex={0}
-          totalSteps={1}
-          onHomeClick={handleClick}
-        />
+        <RuntimeTopBar onClose={handleClose} />
       </ThemeProvider>,
     )
 
@@ -151,16 +175,11 @@ describe('RuntimeTopBar', () => {
   })
 
   it('opens confirmation dialog when home button is clicked', () => {
-    const handleClick = vi.fn()
+    const handleClose = vi.fn()
 
     render(
       <ThemeProvider theme={mockTheme}>
-        <RuntimeTopBar
-          experienceName="Test"
-          currentStepIndex={0}
-          totalSteps={1}
-          onHomeClick={handleClick}
-        />
+        <RuntimeTopBar onClose={handleClose} />
       </ThemeProvider>,
     )
 
@@ -169,20 +188,15 @@ describe('RuntimeTopBar', () => {
 
     // Dialog should open
     expect(screen.getByText('Exit Experience?')).toBeInTheDocument()
-    expect(handleClick).not.toHaveBeenCalled()
+    expect(handleClose).not.toHaveBeenCalled()
   })
 
-  it('calls onHomeClick when exit is confirmed', () => {
-    const handleClick = vi.fn()
+  it('calls onClose when exit is confirmed', () => {
+    const handleClose = vi.fn()
 
     render(
       <ThemeProvider theme={mockTheme}>
-        <RuntimeTopBar
-          experienceName="Test"
-          currentStepIndex={0}
-          totalSteps={1}
-          onHomeClick={handleClick}
-        />
+        <RuntimeTopBar onClose={handleClose} />
       </ThemeProvider>,
     )
 
@@ -194,20 +208,15 @@ describe('RuntimeTopBar', () => {
     const exitButton = screen.getByText('Exit')
     fireEvent.click(exitButton)
 
-    expect(handleClick).toHaveBeenCalledTimes(1)
+    expect(handleClose).toHaveBeenCalledTimes(1)
   })
 
-  it('does not call onHomeClick when cancel is clicked', () => {
-    const handleClick = vi.fn()
+  it('does not call onClose when cancel is clicked', () => {
+    const handleClose = vi.fn()
 
     render(
       <ThemeProvider theme={mockTheme}>
-        <RuntimeTopBar
-          experienceName="Test"
-          currentStepIndex={0}
-          totalSteps={1}
-          onHomeClick={handleClick}
-        />
+        <RuntimeTopBar onClose={handleClose} />
       </ThemeProvider>,
     )
 
@@ -219,18 +228,13 @@ describe('RuntimeTopBar', () => {
     const cancelButton = screen.getByText('Cancel')
     fireEvent.click(cancelButton)
 
-    expect(handleClick).not.toHaveBeenCalled()
+    expect(handleClose).not.toHaveBeenCalled()
   })
 
   it('does not open dialog when button is disabled', () => {
     render(
       <ThemeProvider theme={mockTheme}>
-        <RuntimeTopBar
-          experienceName="Test"
-          currentStepIndex={0}
-          totalSteps={1}
-          onHomeClick={undefined}
-        />
+        <RuntimeTopBar onClose={undefined} />
       </ThemeProvider>,
     )
 
@@ -244,11 +248,7 @@ describe('RuntimeTopBar', () => {
   it('renders home icon', () => {
     render(
       <ThemeProvider theme={mockTheme}>
-        <RuntimeTopBar
-          experienceName="Test"
-          currentStepIndex={0}
-          totalSteps={1}
-        />
+        <RuntimeTopBar />
       </ThemeProvider>,
     )
 
@@ -260,12 +260,7 @@ describe('RuntimeTopBar', () => {
   it('applies custom className to container', () => {
     const { container } = render(
       <ThemeProvider theme={mockTheme}>
-        <RuntimeTopBar
-          experienceName="Test"
-          currentStepIndex={0}
-          totalSteps={1}
-          className="custom-topbar-class"
-        />
+        <RuntimeTopBar className="custom-topbar-class" />
       </ThemeProvider>,
     )
 
@@ -274,13 +269,11 @@ describe('RuntimeTopBar', () => {
   })
 
   it('generates correct accessibility label for progress', () => {
+    setMockRuntime({ currentStepIndex: 2, totalSteps: 5 })
+
     render(
       <ThemeProvider theme={mockTheme}>
-        <RuntimeTopBar
-          experienceName="Test"
-          currentStepIndex={2}
-          totalSteps={5}
-        />
+        <RuntimeTopBar />
       </ThemeProvider>,
     )
 
@@ -293,18 +286,47 @@ describe('RuntimeTopBar', () => {
   })
 
   it('handles zero steps edge case gracefully', () => {
+    setMockRuntime({ currentStepIndex: 0, totalSteps: 0 })
+
     render(
       <ThemeProvider theme={mockTheme}>
-        <RuntimeTopBar
-          experienceName="Test"
-          currentStepIndex={0}
-          totalSteps={0}
-        />
+        <RuntimeTopBar />
       </ThemeProvider>,
     )
 
     // Progress bar should not be rendered for zero-step experience
     const progressBar = screen.queryByRole('progressbar')
     expect(progressBar).not.toBeInTheDocument()
+  })
+
+  it('hides progress bar when isComplete is true', () => {
+    setMockRuntime({ currentStepIndex: 2, totalSteps: 5, isComplete: true })
+
+    render(
+      <ThemeProvider theme={mockTheme}>
+        <RuntimeTopBar />
+      </ThemeProvider>,
+    )
+
+    // Progress bar hidden during completing state
+    const progressBar = screen.queryByRole('progressbar')
+    expect(progressBar).not.toBeInTheDocument()
+  })
+
+  it('shows X icon (close mode) when isComplete is true', () => {
+    setMockRuntime({
+      currentStepIndex: 4,
+      totalSteps: 5,
+      isComplete: true,
+    })
+
+    render(
+      <ThemeProvider theme={mockTheme}>
+        <RuntimeTopBar onClose={vi.fn()} />
+      </ThemeProvider>,
+    )
+
+    const closeButton = screen.getByLabelText('Close')
+    expect(closeButton).toBeInTheDocument()
   })
 })

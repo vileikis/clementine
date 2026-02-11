@@ -217,11 +217,10 @@ export function PregatePage({ selectedExperienceId }: PregatePageProps) {
 
     return (
       <ExperienceRuntime
-        experienceId={pregateExperienceId}
+        experience={pregateExperience!}
         steps={steps}
         session={session}
-        experienceName={pregateExperience?.name ?? 'Pregate'}
-        onHomeClick={navigateToWelcome}
+        onClose={navigateToWelcome}
         onComplete={() => void handlePregateComplete()}
         onError={handleRuntimeError}
       >
