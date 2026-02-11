@@ -244,22 +244,35 @@ StageInput = {
 **Stage types (discriminated union, extensible):**
 
 ```
+AITextStage = {
+  ...common
+  type: 'ai.text'
+  prompt: string                // @{step:...} for input step text, @{stage:...} for prior text stages
+  model: AITextModel            // Text generation model
+}
+  Output: text (NOT media)
+  Referenced by: @{stage:StageName} in downstream stage prompts
+
 AIImageStage = {
   ...common
   type: 'ai.image'
-  prompt: string                // @{step:...} for TEXT substitution from input steps
+  prompt: string                // @{step:...} for input step text, @{stage:...} for text stage output
                                 // @{ref:...} for reference media mentions
                                 // Image inputs come from `inputs`, NOT from prompt mentions
   model: AIImageModel
   refMedia: MediaReference[]    // Uploaded reference images for style guidance (max 5)
 }
+  Output: image (media)
+  Referenced by: inputs[] in downstream stages
 
 AIVideoStage = {
   ...common
   type: 'ai.video'
-  prompt: string
+  prompt: string                // @{step:...}, @{stage:...} for text
   model: AIVideoModel           // Future: model selection
 }
+  Output: video (media)
+  Referenced by: inputs[] in downstream stages
 
 GIFComposeStage = {
   ...common
@@ -267,9 +280,63 @@ GIFComposeStage = {
   fps: number                   // 1-60
   duration: number              // Output duration in seconds
 }
+  Output: gif (media)
+  Referenced by: inputs[] in downstream stages
 ```
 
 New stage types can be added to the union as capabilities expand (e.g., `style.transfer`, `background.remove`, `image.upscale`). The `inputs` + `type` + config pattern stays the same.
+
+### Stage Output Types & Reference System
+
+Stages produce either **text** or **media**. The output type determines how downstream stages can consume it:
+
+| Stage Output | How to Reference | Used For |
+|-------------|-----------------|----------|
+| **Text** (`ai.text`) | `@{stage:StageName}` in prompt | AI-generated prompts, descriptions, instructions |
+| **Media** (`ai.image`, `ai.video`, `gif.compose`) | `inputs[]` binding | Source images/video for generation |
+
+The @mention system now resolves three source types:
+- `@{step:StepName}` — text from input steps (scale values, text answers, multi-select choices)
+- `@{stage:StageName}` — text from `ai.text` stages
+- `@{ref:DisplayName}` — reference media display names (existing)
+
+Capture step images and media stage outputs are **never** @mentioned — they flow through explicit `inputs[]` bindings.
+
+### AI Text Stage: Use Cases
+
+**TX-1: Prompt enhancement** — Transform simple user inputs into rich generation prompts:
+```
+Steps:  [input.multiSelect "Mood", input.shortText "Scene"]
+Stages: [
+  ai.text "Prompt Builder" (
+    inputs: [],
+    prompt: "Create a detailed image generation prompt.
+             Mood: @{step:Mood}. Scene: @{step:Scene}.
+             Include artistic style, lighting, and composition details."
+  ),
+  ai.image "Generate" (
+    inputs: [step:Photo],
+    prompt: "@{stage:Prompt Builder}"
+  ),
+]
+```
+
+**TX-2: Photo description -> reimagination** — Describe a photo, then use description for a new generation:
+```
+Steps:  [capture.photo "Photo"]
+Stages: [
+  ai.text "Describe" (
+    inputs: [step:Photo],
+    prompt: "Describe this photo in vivid detail"
+  ),
+  ai.image "Reimagine" (
+    inputs: [],
+    prompt: "@{stage:Describe} — reimagined as a watercolor painting"
+  ),
+]
+```
+
+**Validation**: `ai.text` stages cannot be the last stage in a media experience (they produce text, not the expected media output). They are always intermediate stages.
 
 ### New Capture Step Types
 
@@ -482,33 +549,40 @@ The current `runOutcome()` dispatcher (routes by `outcome.type`) becomes a **sta
 
 ```
 function runWorkflow(workflow, sessionResponses, context):
-  outputRegistry = {}  // stageId -> output media
+  mediaRegistry = {}   // stageId -> output media (for ai.image, ai.video, gif.compose)
+  textRegistry = {}    // stageId -> output text (for ai.text)
 
   for each stage in workflow.stages:
-    // Resolve inputs from explicit bindings
+    // Resolve media inputs from explicit bindings
     mediaInputs = stage.inputs.map(input =>
       input.sourceType === 'step'
         ? getStepMedia(sessionResponses, input.sourceId)
-        : outputRegistry[input.sourceId]
+        : mediaRegistry[input.sourceId]
     )
 
-    // Resolve text mentions in prompt
-    resolvedPrompt = resolveTextMentions(stage.prompt, sessionResponses)
+    // Resolve text mentions in prompt: @{step:...} and @{stage:...}
+    resolvedPrompt = resolvePrompt(stage.prompt, sessionResponses, textRegistry)
 
     // Execute stage
     output = executeStage(stage, mediaInputs, resolvedPrompt, context)
-    outputRegistry[stage.id] = output
 
-  // Return last stage's output
-  return outputRegistry[lastStage.id]
+    // Route output to appropriate registry
+    if stage.type === 'ai.text':
+      textRegistry[stage.id] = output    // text string
+    else:
+      mediaRegistry[stage.id] = output   // media file
+
+  // Return last stage's output (must be media for media experience types)
+  return mediaRegistry[lastStage.id]
 ```
 
 Each stage executor:
-- `ai.image`: Sends media inputs as image parts + resolved prompt as text to Gemini, returns generated image
-- `ai.video`: Sends media inputs + prompt to video generation API, returns video
-- `gif.compose`: Takes capture frames from inputs, composites into GIF
+- `ai.text`: Sends media inputs (optional, for visual context) + resolved prompt to LLM, returns **text string**
+- `ai.image`: Sends media inputs as image parts + resolved prompt as text to Gemini, returns **generated image**
+- `ai.video`: Sends media inputs + prompt to video generation API, returns **video**
+- `gif.compose`: Takes capture frames from inputs, composites into **GIF**
 
-The key difference: **input images are resolved from explicit bindings**, not extracted from prompt mentions. The prompt resolution only handles text substitution.
+Two registries keep text and media outputs separate. `@{stage:...}` resolves against the text registry; `inputs[]` resolves against the media registry.
 
 ### Direct Mode Logic
 

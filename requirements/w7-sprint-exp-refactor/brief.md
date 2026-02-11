@@ -202,6 +202,7 @@ For media-type experiences, support multi-stage pipelines that can express:
 - Multiple captures -> AI generation -> output (multi-source)
 - Capture -> AI image -> AI video -> output (chained generation)
 - Multiple captures -> composition -> output (GIF from frames)
+- Input steps -> AI text generation -> AI image generation -> output (AI-enhanced prompting)
 
 ### G4: Unified Aspect Ratio Model
 
@@ -261,6 +262,16 @@ These are the concrete media workflows the redesigned system must handle. Non-me
 |---|----------|---------|---------|---------|--------|
 | HY-1 | Photo -> AI image -> AI video | 1x capture.photo | AI image gen (prompt + source) | AI video gen (prompt + image) | AI generated video |
 | HY-2 | Photo(s) -> AI video | 1+ capture.photo | AI video gen (prompt + photos) | - | AI generated video |
+
+### AI Text (Prompt Enhancement) Scenarios
+
+| # | Scenario | Input Steps | Stage 1 | Stage 2 | Output |
+|---|----------|-------------|---------|---------|--------|
+| TX-1 | AI-enhanced prompt -> image | Input steps (mood, scene, etc.) | AI text gen (builds rich prompt from inputs) | AI image gen (uses generated prompt + optional capture) | AI generated image |
+| TX-2 | Photo description -> reimagine | 1x capture.photo | AI text gen (describes photo) | AI image gen (uses description as prompt, no source image) | AI generated image |
+| TX-3 | AI-enhanced prompt -> video | Input steps | AI text gen (builds prompt) | AI video gen (uses generated prompt + capture) | AI generated video |
+
+**Why AI text generation matters**: The current @mention system substitutes raw user input into prompts (e.g., `@{step:Mood}` becomes "happy"). An AI text stage can transform simple user inputs into rich, detailed prompts — handling nuance, combination, and creative direction that template substitution cannot. This enables "dumb inputs, smart prompts" where the guest answers simple questions but the AI receives a sophisticated generation prompt.
 
 ### Non-Media Scenarios
 
