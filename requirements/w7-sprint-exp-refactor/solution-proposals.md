@@ -4,47 +4,46 @@ Companion to `brief.md`. Captures design decisions, schema proposals, and UX dir
 
 ---
 
-## 1. Unified Experience Type
+## 1. Experience Identity: Templates + Derived Output
 
-### Decision: Type = Final Output Format
+### No User-Set "Type" — Templates at Creation, Derived Output at Runtime
 
-Replace `profile` + `outcome.type` with a single `experience.type` that describes what the experience produces:
+Replace `profile` + `outcome.type` with two concepts:
 
-| Type | Output | Description |
-|------|--------|-------------|
-| **photo** | Image file | AI-transformed or captured photo |
-| **gif** | Animated GIF | Composed from captured frames |
-| **video** | Video file | Captured or AI-generated video |
-| **survey** | Collected data | Input responses, no media output |
-| **story** | None (display) | Info-only sequence |
+1. **Creation templates** — Pre-built starting configurations that set up default steps + workflow preset. The template is a starting point, not a permanent classification. Users pick a template at creation ("What do you want to start with?") and then freely evolve the experience.
 
-Future candidates: `legal` (consent collection).
+2. **Derived output format** — The system determines the output format from the actual workflow config. This drives aspect ratio constraints and library badges automatically. (Can be omitted for v1 simplicity — just use the template label as stored metadata.)
 
-### Why Type = Output
+### Creation Templates
 
-Users think in terms of what they get: "I want a photo experience." The type in the library immediately communicates the result. For hybrid cases (photo capture -> AI image -> AI video), the type is **video** because that's the final output. The workflow stages describe *how* that output is produced, not *what* it is.
+Templates are declarative definitions: initial steps + initial workflow preset. New templates can be added without changing business logic.
 
-### Naming: "Photo" vs "Image"
+| Template | Default Steps | Default Preset | Description |
+|----------|---------------|----------------|-------------|
+| **Photo** | `[capture.photo]` | Photo (direct) | Capture and output a photo |
+| **AI Photo** | `[capture.photo]` | AI Photo | Capture photo + AI image generation |
+| **AI Image** | `[]` | AI Image | AI image from prompt only (no capture) |
+| **GIF** | `[capture.gif]` | GIF (direct) | Capture frames as animated GIF |
+| **Video** | `[capture.video]` | Video (direct) | Capture and output video |
+| **AI Video** | `[capture.photo]` | AI Video | Photo capture + AI image + AI video gen |
+| **Survey** | `[]` | None | Data collection with input steps |
+| **Story** | `[]` | None | Info-only display sequence |
 
-"Photo" aligns with the photobooth product metaphor and is how users think about it. Even AI-generated images are colloquially "photos." Using "photo" keeps the language product-oriented rather than technical.
+Users can also start blank and build from scratch.
 
-If this feels limiting later (e.g., pure illustration generation with no camera involved), we can reconsider. For now, "photo" works.
+### Step Constraints: None
 
-### Step Constraints by Type
+Any experience can have any step types. No type-based gating.
 
-| Type | Allowed Steps |
-|------|---------------|
-| **photo** | info, input.*, capture.photo |
-| **gif** | info, input.*, capture.gif |
-| **video** | info, input.*, capture.photo, capture.video |
-| **survey** | info, input.* |
-| **story** | info |
+- A survey can have capture steps (video book use case: rate event + record video feedback)
+- A photo experience can have input steps (prompt personalization via @mentions)
+- A story can have input steps (interactive narrative, future)
 
-Video allows both `capture.photo` and `capture.video` because hybrid workflows (HY-1, HY-2) start with photo capture but produce video output.
+The template sets up sensible defaults. The user can add whatever they need.
 
-### Type Mutability
+### Library Display
 
-**Mutable**, but with a warning. Pre-launch, we don't need strict immutability. Changing type may invalidate steps/workflow (e.g., photo -> survey drops capture steps), so the UI should warn and clean up. This avoids the dead-end problem (P9).
+The library badge shows the creation template label (stored as metadata). Future: derive from workflow output for accuracy, add user-defined tags for custom organization.
 
 ---
 
@@ -55,9 +54,9 @@ Video allows both `capture.photo` and `capture.video` because hybrid workflows (
 An experience has two conceptual layers:
 
 1. **Steps** - What the guest interacts with (info screens, input questions, camera capture). Sequential, visible, user-facing.
-2. **Workflow** - What happens after the guest completes all steps (AI generation, GIF composition). Automated, backend, invisible to guest.
+2. **Workflow** - What happens after the guest completes all steps (AI generation, media processing). Automated, backend, invisible to guest.
 
-These are fundamentally different: steps are interactive UI, workflow is processing pipeline. Keeping them as separate concepts (but in one view) is cleaner than mixing them.
+These are fundamentally different: steps are interactive UI, workflow is a processing pipeline.
 
 ### Capture Stays as a Step
 
@@ -68,96 +67,66 @@ This allows:
 - Multiple named captures (e.g., "Selfie" + "Full Body")
 - The creator to control exactly when capture happens in the guest flow
 
-### Two Concepts for Stage Inputs: Media Bindings vs Text Mentions
+### Workflow Presets (Not Raw Pipeline Editing)
 
-A stage needs two kinds of input:
+Exposing raw pipeline node composition to non-technical users is too tedious. Instead, **presets** define pre-built pipelines that expose only the fields users need to populate.
 
-1. **Media inputs** (images/video fed to the AI as visual context) — **explicit bindings**, not hidden in prompt text. The creator picks which capture steps or previous stages provide images. This is structural and visible in the UI.
+Each preset:
+- Defines a fixed pipeline structure (which nodes, how they connect)
+- Exposes specific fields as a form (capture source, prompt, model, ref media, etc.)
+- Populates pipeline nodes from the form values under the hood
+- Can be switched at any time — common fields are preserved across switches
 
-2. **Text context** (personalization from input steps) — **@{step:...} mentions** in the prompt. When the prompt says `@{step:Style Choice}`, the multi-select response is substituted as text. This stays as-is.
+**The preset is the user-facing abstraction. Pipeline nodes are the internal implementation.**
+
+### Preset Catalog
+
+| Preset | User Fills In | Pipeline Nodes (Internal) | Output |
+|--------|--------------|--------------------------|--------|
+| **Photo** (direct) | Source capture step | None (direct passthrough) | Captured photo |
+| **GIF** (direct) | Source capture GIF step | None (GIF composition automatic from capture.gif) | Animated GIF |
+| **Video** (direct) | Source capture video step | None (direct passthrough) | Captured video |
+| **AI Photo** | Source capture step (optional), prompt, model, ref media | `[ai.image]` | AI generated image |
+| **AI Image** | Prompt, model, ref media | `[ai.image]` (no capture input) | AI generated image |
+| **AI Video** | Source capture step, image gen config, video gen config | `[ai.image, ai.video]` | AI generated video |
+
+Each preset with AI stages also has an **"Enhance prompt with AI" toggle** that, when enabled, adds an `ai.text` node before the first AI media node. This exposes an additional prompt-builder field. The toggle keeps AI text generation as an opt-in enhancement rather than a separate preset.
+
+### Switching Presets
+
+When switching from one preset to another:
+- Common fields are preserved (e.g., prompt text, model selection, capture step binding carry over between AI Photo and AI Video)
+- Preset-specific fields are added/removed as needed
+- The pipeline nodes are regenerated from the new preset + preserved field values
+
+This enables the iterative building flow:
+1. Start with "Photo" preset → test direct capture
+2. Switch to "AI Photo" → fill in prompt, test AI generation
+3. Switch to "AI Video" → image gen fields carry over, add video gen config, test
+
+No type switching. No validation blocking experimentation.
+
+### Media Bindings vs Text Mentions
+
+Pipeline nodes need two kinds of input:
+
+1. **Media inputs** (images/video fed to AI as visual context) — **explicit bindings** configured in the preset form. The creator picks which capture steps provide images. This is structural and visible in the UI.
+
+2. **Text context** (personalization from input steps) — **@{step:...} mentions** in the prompt text. `@{step:Style Choice}` substitutes the multi-select response as text.
+
+3. **AI-generated text** (from ai.text nodes) — **@{stage:...} mentions** in downstream prompts. When "Enhance prompt" is enabled, the generated text is referenced via `@{stage:Prompt Builder}`.
 
 This separation means:
-- A creator can bind 2 capture steps as image inputs without ever writing `@{step:Photo}` in the prompt — the prompt just says "transform the input images into cartoon style"
-- @mentions are reserved for text substitution from input steps (scale values, text answers, multi-select choices)
-- The binding is visible in the UI (not buried in prompt syntax) and validated structurally
+- Capture step images are never @mentioned in prompts — they flow through explicit bindings
+- @mentions are reserved for text substitution from input steps and text stages
+- Bindings are visible in the UI and validated structurally
 
-### Explicit Input Routing (Not a Linear Chain)
+### Aspect Ratio
 
-Each workflow stage declares its **inputs**: an explicit list of sources, where each source is either a capture step or a previous stage. This is ordered — stages can only reference things defined before them — but it's not strictly linear. Two stages can independently pull from different captures, and a later stage can combine outputs from multiple earlier stages.
-
-**Examples:**
-
-**PH-3: AI from 1 capture**
-```
-Steps:  [capture.photo "Selfie"]
-Stages: [ai.image(inputs: [step:Selfie], prompt: "cartoon style")]
-```
-
-**PH-4: AI from 2 captures**
-```
-Steps:  [capture.photo "Selfie", capture.photo "Full Body"]
-Stages: [ai.image(inputs: [step:Selfie, step:Full Body], prompt: "merge into one scene")]
-```
-
-**2 captures -> 2 separate AI images -> 1 AI video**
-```
-Steps:  [capture.photo "Photo A", capture.photo "Photo B"]
-Stages: [
-  ai.image "Gen A" (inputs: [step:Photo A], prompt: "stylize"),
-  ai.image "Gen B" (inputs: [step:Photo B], prompt: "stylize"),
-  ai.video (inputs: [stage:Gen A, stage:Gen B], prompt: "animate both"),
-]
-```
-
-**PH-2: AI from prompt only (no capture)**
-```
-Steps:  [input.shortText "Describe your scene"]
-Stages: [ai.image(inputs: [], prompt: "Generate: @{step:Describe your scene}")]
-```
-
-This explicit routing solves:
-- **P7 (fragile coupling)**: No more `captureStepId` — bindings are structural, validated, and visible
-- **Multi-source**: A stage can take 0, 1, or N inputs from any combination of captures and previous stages
-- **Fan-out**: Two AI image stages can each take a different capture, then a video stage combines both outputs
-- **Transparency**: The creator sees exactly what flows where, no hidden @mention-as-image-binding
-
-### Passthrough & Output Source
-
-When there are **no stages** (or AI is toggled off), the experience outputs captured media directly. But with multiple captures, which one?
-
-The workflow includes a `passthroughStepId` that explicitly designates which capture step provides the output in passthrough mode:
-
-```
-Workflow = {
-  aiEnabled: false,
-  stages: [...],                    // Preserved but skipped
-  passthroughStepId: "capture-A"    // This capture's media is the output
-}
-```
-
-When `aiEnabled: true`, the **last stage's output** is the experience output. `passthroughStepId` is ignored.
-
-### Output Mode
-
-The workflow has a `mode` field:
-- `'direct'`: Output the capture step designated by `directOutputStepId`. Stages are preserved but skipped.
-- `'stages'`: Execute stages in order (using their explicit inputs). Last stage's output is the result.
-
-Switching between modes in the UI preserves all stage config — the creator can toggle freely without losing configured stages, prompts, and bindings.
-
-### Default Workflows by Type
-
-When a creator selects a type during creation, the experience gets sensible defaults:
-
-| Type | Default Steps | Default Workflow |
-|------|---------------|------------------|
-| **photo** | `[capture.photo("Photo")]` | `{ mode: 'direct', directOutputStepId: <Photo>, stages: [] }` |
-| **gif** | `[capture.gif("GIF Capture")]` | `{ mode: 'direct', directOutputStepId: <GIF>, stages: [] }` |
-| **video** | `[capture.video("Video")]` | `{ mode: 'direct', directOutputStepId: <Video>, stages: [] }` |
-| **survey** | `[]` | `null` |
-| **story** | `[]` | `null` |
-
-The creator then customizes from there: adds input steps, switches to Workflow mode, configures stages, etc.
+`experience.aspectRatio` is the single source of truth:
+- Camera viewfinder, AI generation, and overlay all use this value
+- Available options constrained by the active preset's output format (image: 1:1, 3:2, 2:3, 9:16 / video: 1:1, 9:16)
+- Switching presets may narrow the available options — if current ratio becomes invalid, prompt the user to choose a compatible one
 
 ---
 
@@ -171,10 +140,11 @@ experience = {
   id: string
   name: string
 
-  // THE unified type (replaces profile + outcome.type)
-  type: 'photo' | 'gif' | 'video' | 'survey' | 'story'
+  // Template label (set at creation, user-changeable)
+  // Used for library badge and filtering
+  template: string   // e.g., 'photo', 'ai-photo', 'survey', 'ai-video', etc.
 
-  // Top-level aspect ratio (media types only, null for non-media)
+  // Top-level aspect ratio (null for experiences without media output)
   // Single source of truth: camera, AI gen, overlay all use this
   aspectRatio: AspectRatio | null
 
@@ -200,143 +170,96 @@ ExperienceConfig = {
   // Guest-facing steps (info, input, capture)
   steps: ExperienceStep[]
 
-  // Processing workflow (null for survey/story)
+  // Processing workflow (null when no media processing needed)
   workflow: Workflow | null
 }
 ```
-
-This replaces the current `{ steps, outcome }` structure. `outcome` becomes `workflow`.
 
 ### Workflow
 
 ```
 Workflow = {
-  // Output mode: 'direct' = output a capture step directly, 'stages' = execute pipeline
-  mode: 'direct' | 'stages'
+  // Active preset identifier
+  preset: string                // e.g., 'photo', 'ai-photo', 'ai-video', 'gif', etc.
 
-  // Which capture step provides output in direct mode
-  // Null when mode='stages' or when no capture steps exist (PH-2 text-to-image)
+  // Direct output: which capture step provides output in direct presets
+  // Null for non-direct presets (pipeline produces the output)
   directOutputStepId: string | null
 
-  // Processing stages with explicit input routing
-  // Always preserved regardless of mode (switching to 'direct' doesn't delete stages)
-  stages: WorkflowStage[]
+  // Pipeline nodes (internal, populated by preset from form values)
+  // Always preserved when switching presets (common fields carry over)
+  nodes: PipelineNode[]
 }
 ```
 
-### Workflow Stages
+### Pipeline Nodes
 
-Every stage has an `id`, a `type`, and an `inputs` array declaring where it gets its media from. The `inputs` list is explicit — no implicit "previous stage" assumption.
+Every node has an `id`, a `type`, and an `inputs` array. Nodes are ordered — each can only reference captures or earlier nodes.
 
 ```
-WorkflowStage (common fields) = {
-  id: string                    // UUID, for referencing by later stages
+PipelineNode (common fields) = {
+  id: string                    // UUID, for referencing by later nodes
   type: string                  // Discriminator
-  inputs: StageInput[]          // Explicit media sources (captures or earlier stages)
+  inputs: NodeInput[]           // Explicit media sources (captures or earlier nodes)
 }
 
-StageInput = {
-  sourceType: 'step' | 'stage'
-  sourceId: string              // UUID of a capture step or an earlier stage
+NodeInput = {
+  sourceType: 'step' | 'node'
+  sourceId: string              // UUID of a capture step or an earlier node
 }
 ```
 
-**Stage types (discriminated union, extensible):**
+**Node types (discriminated union, extensible):**
 
 ```
-AITextStage = {
+AITextNode = {
   ...common
   type: 'ai.text'
-  prompt: string                // @{step:...} for input step text, @{stage:...} for prior text stages
-  model: AITextModel            // Text generation model
+  prompt: string                // @{step:...} for input step text, @{stage:...} for prior text nodes
+  model: AITextModel
 }
   Output: text (NOT media)
-  Referenced by: @{stage:StageName} in downstream stage prompts
+  Referenced by: @{stage:NodeName} in downstream node prompts
 
-AIImageStage = {
+AIImageNode = {
   ...common
   type: 'ai.image'
-  prompt: string                // @{step:...} for input step text, @{stage:...} for text stage output
+  prompt: string                // @{step:...} for input step text, @{stage:...} for text node output
                                 // @{ref:...} for reference media mentions
                                 // Image inputs come from `inputs`, NOT from prompt mentions
   model: AIImageModel
   refMedia: MediaReference[]    // Uploaded reference images for style guidance (max 5)
 }
   Output: image (media)
-  Referenced by: inputs[] in downstream stages
+  Referenced by: inputs[] in downstream nodes
 
-AIVideoStage = {
+AIVideoNode = {
   ...common
   type: 'ai.video'
   prompt: string                // @{step:...}, @{stage:...} for text
-  model: AIVideoModel           // Future: model selection
+  model: AIVideoModel
 }
   Output: video (media)
-  Referenced by: inputs[] in downstream stages
-
-GIFComposeStage = {
-  ...common
-  type: 'gif.compose'
-  fps: number                   // 1-60
-  duration: number              // Output duration in seconds
-}
-  Output: gif (media)
-  Referenced by: inputs[] in downstream stages
+  Referenced by: inputs[] in downstream nodes
 ```
 
-New stage types can be added to the union as capabilities expand (e.g., `style.transfer`, `background.remove`, `image.upscale`). The `inputs` + `type` + config pattern stays the same.
+New node types can be added as capabilities expand (e.g., `style.transfer`, `background.remove`, `image.upscale`). No `GIFComposeNode` — GIF composition is automatic from `capture.gif`.
 
-### Stage Output Types & Reference System
+### Node Output Types & Reference System
 
-Stages produce either **text** or **media**. The output type determines how downstream stages can consume it:
+Nodes produce either **text** or **media**. The output type determines how downstream nodes consume it:
 
-| Stage Output | How to Reference | Used For |
+| Node Output | How to Reference | Used For |
 |-------------|-----------------|----------|
-| **Text** (`ai.text`) | `@{stage:StageName}` in prompt | AI-generated prompts, descriptions, instructions |
-| **Media** (`ai.image`, `ai.video`, `gif.compose`) | `inputs[]` binding | Source images/video for generation |
+| **Text** (`ai.text`) | `@{stage:NodeName}` in prompt | AI-generated prompts, descriptions, instructions |
+| **Media** (`ai.image`, `ai.video`) | `inputs[]` binding | Source images/video for generation |
 
-The @mention system now resolves three source types:
+The @mention system resolves three source types:
 - `@{step:StepName}` — text from input steps (scale values, text answers, multi-select choices)
-- `@{stage:StageName}` — text from `ai.text` stages
+- `@{stage:NodeName}` — text from `ai.text` nodes
 - `@{ref:DisplayName}` — reference media display names (existing)
 
-Capture step images and media stage outputs are **never** @mentioned — they flow through explicit `inputs[]` bindings.
-
-### AI Text Stage: Use Cases
-
-**TX-1: Prompt enhancement** — Transform simple user inputs into rich generation prompts:
-```
-Steps:  [input.multiSelect "Mood", input.shortText "Scene"]
-Stages: [
-  ai.text "Prompt Builder" (
-    inputs: [],
-    prompt: "Create a detailed image generation prompt.
-             Mood: @{step:Mood}. Scene: @{step:Scene}.
-             Include artistic style, lighting, and composition details."
-  ),
-  ai.image "Generate" (
-    inputs: [step:Photo],
-    prompt: "@{stage:Prompt Builder}"
-  ),
-]
-```
-
-**TX-2: Photo description -> reimagination** — Describe a photo, then use description for a new generation:
-```
-Steps:  [capture.photo "Photo"]
-Stages: [
-  ai.text "Describe" (
-    inputs: [step:Photo],
-    prompt: "Describe this photo in vivid detail"
-  ),
-  ai.image "Reimagine" (
-    inputs: [],
-    prompt: "@{stage:Describe} — reimagined as a watercolor painting"
-  ),
-]
-```
-
-**Validation**: `ai.text` stages cannot be the last stage in a media experience (they produce text, not the expected media output). They are always intermediate stages.
+Capture step images and media node outputs are **never** @mentioned — they flow through explicit `inputs[]` bindings.
 
 ### New Capture Step Types
 
@@ -359,32 +282,18 @@ capture.video config = {
 }
 ```
 
-### Aspect Ratio: Single Source of Truth
-
-`experience.aspectRatio` is the ONE place aspect ratio lives:
-- **Camera**: Capture steps read `experience.aspectRatio` for viewfinder constraints
-- **AI generation**: Workflow stages use `experience.aspectRatio` for output dimensions
-- **Overlay**: Backend resolves overlay by `experience.aspectRatio`
-- **Non-media types**: `null` (irrelevant)
-
-No more:
-- ~~`outcome.aspectRatio`~~
-- ~~`outcome.imageGeneration.aspectRatio`~~
-- ~~`capture.photo.config.aspectRatio`~~
-- ~~fallback chains~~
-
 ### What's Removed
 
 | Current Field | Status | Replacement |
 |---------------|--------|-------------|
-| `experience.profile` | **Removed** | `experience.type` |
-| `outcome` | **Removed** | `workflow` |
-| `outcome.type` | **Removed** | `experience.type` |
-| `outcome.captureStepId` | **Removed** | `stage.inputs[]` explicit bindings + `workflow.directOutputStepId` |
-| `outcome.aiEnabled` | **Removed** | `workflow.mode` (`'direct'` / `'stages'`) |
-| `outcome.imageGeneration` | **Replaced** | `AIImageStage` in `workflow.stages` |
+| `experience.profile` | **Removed** | `experience.template` (label) + no constraints |
+| `outcome` | **Removed** | `workflow` with preset + nodes |
+| `outcome.type` | **Removed** | Derived from active preset / last node output |
+| `outcome.captureStepId` | **Removed** | `node.inputs[]` explicit bindings + `workflow.directOutputStepId` |
+| `outcome.aiEnabled` | **Removed** | `workflow.preset` (direct presets vs AI presets) |
+| `outcome.imageGeneration` | **Replaced** | `AIImageNode` in `workflow.nodes` |
 | `outcome.aspectRatio` | **Moved up** | `experience.aspectRatio` |
-| `outcome.options` | **Replaced** | Stage-specific config (GIF fps/duration, etc.) |
+| `outcome.options` | **Removed** | Capture step config handles GIF/video specifics |
 | `capture.photo.config.aspectRatio` | **Removed** | `experience.aspectRatio` |
 
 ---
@@ -418,76 +327,106 @@ The current two-tab split (Collect / Create) is replaced by a left-panel navigat
 
 ```
 Overview
-┌──────────────────────────────────────┐
-│ Name:        [My Photo Experience  ] │
-│ Type:        Photo (read-only)       │
-│ Description: [Optional description ] │
-│ Cover Image: [Upload / preview]      │
-│ Aspect Ratio: [1:1 ▾]               │
-└──────────────────────────────────────┘
++--------------------------------------+
+| Name:        [My Photo Experience  ] |
+| Template:    AI Photo (changeable)   |
+| Description: [Optional description ] |
+| Cover Image: [Upload / preview]      |
+| Aspect Ratio: [1:1 v]               |
++--------------------------------------+
 ```
 
 Fields:
 - **Name**: Editable, same validation as current
-- **Type**: Read-only badge (set at creation). Future: changeable with warning.
+- **Template**: Shows current template label. Changeable (updates library badge). Future: auto-derived from workflow.
 - **Description**: Optional text (future: used on landing/details page)
 - **Cover Image**: Experience thumbnail/media
-- **Aspect Ratio**: Selector (media types only, hidden for survey/story). Single source of truth for camera, AI gen, overlay.
+- **Aspect Ratio**: Selector. Options constrained by active preset output format. Single source of truth for camera, AI gen, overlay. Hidden when no workflow and no capture steps.
 
 This is the first screen users see — the "control space" for experience identity and global settings.
 
-### Section: Create (media types only)
+### Section: Create
 
-**Left nav**: "Create" nav item. Hidden entirely for survey/story types.
+**Left nav**: "Create" nav item. Visible when workflow exists (media experiences). Hidden when `workflow === null` (pure survey/story). If a user adds capture steps to a survey and wants processing, they can activate a workflow from here.
 
-**Main content**: Inline scrollable form (same pattern as current `ExperienceCreatePage`). All stage config is rendered inline — no right config panel.
+**Main content**: Inline scrollable form (same pattern as current `ExperienceCreatePage`). The preset determines the form layout — no raw node editing.
 
+**Example: AI Photo preset**
 ```
 Create
-┌──────────────────────────────────────────┐
-│ Output Mode                              │
-│ [Direct ○] [Workflow ●]                 │
-│                                          │
-│ ┌── Stage 1: AI Image Gen ─────────────┐│
-│ │                                       ││
-│ │ Inputs                                ││
-│ │ ┌─────────────────────────────────┐   ││
-│ │ │ [Photo A (capture)] [x]        │   ││
-│ │ │ [+ Add input]                   │   ││
-│ │ └─────────────────────────────────┘   ││
-│ │                                       ││
-│ │ Prompt                                ││
-│ │ ┌─────────────────────────────────┐   ││
-│ │ │ Transform into cartoon style    │   ││
-│ │ │ using @{step:Style Choice} ...  │   ││
-│ │ └─────────────────────────────────┘   ││
-│ │                                       ││
-│ │ Model: [Gemini 3 Pro ▾]              ││
-│ │ Ref Media: [img1] [img2] [+]         ││
-│ └───────────────────────────────────────┘│
-│                                          │
-│ [+ Add Stage]                            │
-└──────────────────────────────────────────┘
++------------------------------------------+
+| Preset: [AI Photo v]                     |
+|                                          |
+| Source Image                             |
+| [Photo (capture step) v]                |
+|                                          |
+| [] Enhance prompt with AI               |
+|                                          |
+| Prompt                                   |
+| +--------------------------------------+ |
+| | Transform into cartoon style         | |
+| | using @{step:Style Choice} ...       | |
+| +--------------------------------------+ |
+|                                          |
+| Model: [Gemini 3 Pro v]                 |
+| Ref Media: [img1] [img2] [+]            |
++------------------------------------------+
 ```
 
-**Direct mode** (when selected):
+**Example: AI Video preset**
 ```
-│ Output Mode                              │
-│ [Direct ●] [Workflow ○]                 │
-│                                          │
-│ Output Source                            │
-│ [Photo (capture step) ▾]                │
-│                                          │
-│ (Stages hidden but preserved)            │
+Create
++------------------------------------------+
+| Preset: [AI Video v]                     |
+|                                          |
+| Source Image                             |
+| [Photo (capture step) v]                |
+|                                          |
+| -- Image Generation --                   |
+| Prompt: [Transform into cartoon...]      |
+| Model: [Gemini 3 Pro v]                 |
+| Ref Media: [img1] [+]                   |
+|                                          |
+| -- Video Generation --                   |
+| Prompt: [Animate with gentle motion]     |
+| Model: [Video Model v]                  |
++------------------------------------------+
+```
+
+**Example: Photo preset (direct)**
+```
+Create
++------------------------------------------+
+| Preset: [Photo v]                        |
+|                                          |
+| Output Source                            |
+| [Photo (capture step) v]                |
++------------------------------------------+
+```
+
+**Example: "Enhance prompt with AI" toggle enabled**
+```
+| [x] Enhance prompt with AI              |
+|                                          |
+| Prompt Builder                           |
+| +--------------------------------------+ |
+| | Create a detailed prompt from:       | |
+| | Mood: @{step:Mood}                   | |
+| | Scene: @{step:Scene Description}     | |
+| +--------------------------------------+ |
+|                                          |
+| Image Generation Prompt                  |
+| +--------------------------------------+ |
+| | @{stage:Prompt Builder}              | |
+| +--------------------------------------+ |
 ```
 
 Key behaviors:
-- **Mode toggle**: Switching between Direct and Workflow preserves all stage config
-- **Direct mode**: Shows a dropdown of available capture steps to pick the output source
-- **Workflow mode**: Shows all stages inline, each with its own inputs picker, prompt composer, model selector, and reference media
-- **Multiple stages**: Each stage is an expandable card/section. Add Stage button at the bottom for multi-stage pipelines.
-- **Stage inputs**: Each stage has an explicit Inputs section where the creator picks which capture steps and/or previous stages provide media. Dropdown/checklist of available sources.
-- **Prompt @mentions**: Only for TEXT substitution from input steps. Capture step images come from the explicit Inputs binding, not from @mentions in the prompt.
+- **Preset selector**: Dropdown at top. Switching preserves common fields.
+- **Direct presets** (Photo, GIF, Video): Show only a capture step dropdown.
+- **AI presets** (AI Photo, AI Image, AI Video): Show prompt, model, ref media, capture source per their structure.
+- **Enhance prompt toggle**: Available on AI presets. Adds an ai.text node to the pipeline. Exposes the prompt-builder form section.
+- **Prompt @mentions**: Only for TEXT substitution from input steps and ai.text nodes. Capture step images come from the explicit source binding.
 
 ### Section: Collect
 
@@ -502,16 +441,16 @@ Key behaviors:
 | Overview           | +------------+  | [Selected step   |
 | Create             | | Live step  |  |  config panel]   |
 | Collect            | | preview    |  |                  |
-|   1. Welcome   [▸] | |            |  | Title: [...]     |
-|   2. Style     [▸] | |            |  | Required: [x]    |
-|   3. Photo     [▸] | +------------+  | Options: [...]   |
+|   1. Welcome   [>] | |            |  | Title: [...]     |
+|   2. Style     [>] | |            |  | Required: [x]    |
+|   3. Photo     [>] | +------------+  | Options: [...]   |
 |   [+ Add Step]     |                  |                  |
 +--------------------+------------------+------------------+
 ```
 
 - Selecting a step in the left nav shows its preview (center) and config (right)
 - Steps support drag-to-reorder, add, rename, delete (same as current)
-- Step config panel is the same as current `StepConfigPanel`
+- No step type restrictions — any step type available for any experience
 - Capture step config is simplified: no aspect ratio field (uses experience-level setting from Overview)
 
 ### Publish & Top Nav
@@ -521,16 +460,6 @@ Publish action stays in the top navigation bar (same as current `ExperienceDesig
 - Save status indicator
 - Changes badge (unpublished changes)
 - Publish button
-
-### Type-Adaptive Behavior
-
-| Type | Overview | Create | Collect |
-|------|----------|--------|---------|
-| **photo** | name, type, desc, media, aspect ratio | Direct / Workflow (ai.image stages) | info, input, capture.photo |
-| **gif** | name, type, desc, media, aspect ratio | Direct / Workflow (gif.compose stages) | info, input, capture.gif |
-| **video** | name, type, desc, media, aspect ratio | Direct / Workflow (ai.video stages) | info, input, capture.photo/video |
-| **survey** | name, type, desc, media | Hidden | info, input |
-| **story** | name, type, desc, media | Hidden | info |
 
 ### Responsive / Mobile
 
@@ -543,61 +472,60 @@ Publish action stays in the top navigation bar (same as current `ExperienceDesig
 
 ## 5. Backend Pipeline Changes
 
-### Outcome Dispatcher -> Workflow Executor
+### Outcome Dispatcher -> Node Executor
 
-The current `runOutcome()` dispatcher (routes by `outcome.type`) becomes a **stage runner** with explicit input resolution:
+The current `runOutcome()` dispatcher becomes a **node runner** that executes pipeline nodes in sequence with explicit input resolution:
 
 ```
 function runWorkflow(workflow, sessionResponses, context):
-  mediaRegistry = {}   // stageId -> output media (for ai.image, ai.video, gif.compose)
-  textRegistry = {}    // stageId -> output text (for ai.text)
+  if workflow.preset is a direct preset:
+    return getStepMedia(sessionResponses, workflow.directOutputStepId)
 
-  for each stage in workflow.stages:
+  mediaRegistry = {}   // nodeId -> output media (for ai.image, ai.video)
+  textRegistry = {}    // nodeId -> output text (for ai.text)
+
+  for each node in workflow.nodes:
     // Resolve media inputs from explicit bindings
-    mediaInputs = stage.inputs.map(input =>
+    mediaInputs = node.inputs.map(input =>
       input.sourceType === 'step'
         ? getStepMedia(sessionResponses, input.sourceId)
         : mediaRegistry[input.sourceId]
     )
 
     // Resolve text mentions in prompt: @{step:...} and @{stage:...}
-    resolvedPrompt = resolvePrompt(stage.prompt, sessionResponses, textRegistry)
+    resolvedPrompt = resolvePrompt(node.prompt, sessionResponses, textRegistry)
 
-    // Execute stage
-    output = executeStage(stage, mediaInputs, resolvedPrompt, context)
+    // Execute node
+    output = executeNode(node, mediaInputs, resolvedPrompt, context)
 
     // Route output to appropriate registry
-    if stage.type === 'ai.text':
-      textRegistry[stage.id] = output    // text string
+    if node.type === 'ai.text':
+      textRegistry[node.id] = output    // text string
     else:
-      mediaRegistry[stage.id] = output   // media file
+      mediaRegistry[node.id] = output   // media file
 
-  // Return last stage's output (must be media for media experience types)
-  return mediaRegistry[lastStage.id]
+  // Return last node's output (must be media)
+  return mediaRegistry[lastNode.id]
 ```
 
-Each stage executor:
+Each node executor:
 - `ai.text`: Sends media inputs (optional, for visual context) + resolved prompt to LLM, returns **text string**
-- `ai.image`: Sends media inputs as image parts + resolved prompt as text to Gemini, returns **generated image**
+- `ai.image`: Sends media inputs as image parts + resolved prompt to Gemini, returns **generated image**
 - `ai.video`: Sends media inputs + prompt to video generation API, returns **video**
-- `gif.compose`: Takes capture frames from inputs, composites into **GIF**
 
 Two registries keep text and media outputs separate. `@{stage:...}` resolves against the text registry; `inputs[]` resolves against the media registry.
 
-### Direct Mode Logic
+### GIF Handling
 
-When `workflow.mode === 'direct'`:
-- Use `workflow.directOutputStepId` to find the designated capture step
-- Output that capture's media directly (after overlay if applicable)
-- Validation: `directOutputStepId` must reference a valid capture step with a response
+GIF composition is NOT a pipeline node. `capture.gif` produces frames, and the backend automatically composes them into a GIF. This happens in the direct output path, not the node pipeline.
 
-### Aspect Ratio Flow (Simplified)
+### Aspect Ratio Flow
 
 ```
 experience.aspectRatio
     |
     +-> Camera viewfinder (capture steps)
-    +-> AI generation (stage config)
+    +-> AI generation (node config)
     +-> Overlay resolution (pickOverlay)
     +-> Output dimensions
 ```
@@ -609,7 +537,7 @@ One value flows everywhere. No resolution chain.
 ```
 JobSnapshot = {
   sessionResponses: SessionResponse[]
-  workflow: Workflow                    // Replaces outcome
+  workflow: Workflow                    // Preset + nodes
   aspectRatio: AspectRatio             // From experience
   overlayChoice: MediaReference | null // Pre-resolved at job creation
   experienceVersion: number
@@ -618,14 +546,12 @@ JobSnapshot = {
 
 ### Validation at Job Creation
 
-Current JC checks adapted:
-- JC-001: Published config check (unchanged)
-- JC-002/003: Workflow must exist for media types, stages must exist if `mode === 'stages'`
-- JC-004: Session must have responses (unchanged)
-- JC-005: Each stage type must have an implemented executor
-- New: All `stage.inputs` references resolve to valid step responses or earlier stage outputs
-- New: `directOutputStepId` references a capture step that has a response (when `mode === 'direct'`)
-- New: No circular references (enforced by ordering — stages can only reference earlier items)
+- Published config check (unchanged)
+- Workflow must have valid preset configuration
+- For direct presets: `directOutputStepId` references a valid capture step with a response
+- For AI presets: nodes must exist, each node type must have an implemented executor
+- All `node.inputs` references resolve to valid step responses or earlier node outputs
+- Last node must produce media (not text)
 
 ---
 
@@ -635,33 +561,43 @@ Current JC checks adapted:
 
 Current: Name + Profile selector (freeform/survey/story)
 
-New: Name + Type selector with visual cards:
+New: Name + Template selector with visual cards:
 
 ```
-+-------+  +-------+  +-------+
-| 📷    |  | 🎞️    |  | 🎬    |
-| Photo |  |  GIF  |  | Video |
-+-------+  +-------+  +-------+
+What do you want to create?
 
-+-------+  +-------+
-| 📋    |  | 📖    |
-| Survey|  | Story |
-+-------+  +-------+
++----------+  +----------+  +----------+
+|          |  |          |  |          |
+|  Photo   |  | AI Photo |  | AI Image |
+|          |  |          |  |          |
++----------+  +----------+  +----------+
+
++----------+  +----------+  +----------+
+|          |  |          |  |          |
+|   GIF    |  |  Video   |  | AI Video |
+|          |  |          |  |          |
++----------+  +----------+  +----------+
+
++----------+  +----------+
+|          |  |          |
+|  Survey  |  |  Story   |
+|          |  |          |
++----------+  +----------+
 ```
 
-Each card shows: icon, type name, brief description of what it produces.
+Each card shows: icon, template name, brief description.
 
 On creation:
-1. Experience document created with selected type
-2. Default steps + workflow applied (see Section 2 defaults table)
-3. Redirect to unified editor
+1. Experience document created with template label + defaults
+2. Default steps + workflow preset applied per template
+3. Redirect to editor (Overview section)
 
 ### Library Display
 
-Experience cards show the **type** badge instead of profile badge:
-- Color-coded per type (photo: blue, gif: purple, video: red, survey: green, story: amber)
-- Filter tabs: `[All] [Photo] [GIF] [Video] [Survey] [Story]`
-- Users can immediately see what each experience produces
+Experience cards show the **template** badge:
+- Color-coded (photo variants: blue, gif: purple, video: red, survey: green, story: amber)
+- Filter tabs for common categories
+- Users can immediately see the intent of each experience
 
 ---
 
@@ -671,23 +607,21 @@ These can be resolved during implementation:
 
 1. **capture.gif UX**: How does the multi-frame capture flow work for the guest? Countdown timer between frames? Continuous burst?
 
-2. **AI Video generation**: Which API/model? This is a backend integration question that doesn't affect the schema design.
+2. **AI Video generation**: Which API/model? Backend integration question, doesn't affect schema.
 
-3. **Stage preview**: What does the center panel show when a workflow stage is selected? Pipeline diagram? Last result? Placeholder?
+3. **Preset extensibility**: How are presets defined? Hardcoded in the app, or declarative config that can be extended? (Recommend: start hardcoded, extract to config when patterns stabilize.)
 
-4. **Stage validation**: Should we validate stage combinations at edit time or only at publish? (Recommend: publish-time, with warnings at edit time.)
+4. **Preset switching edge cases**: When switching from AI Video to Photo, what happens to video-specific fields? (Recommend: preserve all fields, only show relevant ones per preset. Switching back restores everything.)
 
-5. **Passthrough for GIF/Video**: For GF-1 with `aiEnabled: false`, the output is the raw captured frames as a GIF. Is this useful or should GIF always go through composition?
+5. **"Custom" preset (future)**: For power users who want arbitrary node composition. Not needed for v1. The architecture supports it — presets map to nodes, a "custom" preset just exposes the node editor directly.
 
-6. **Experience type change**: When type changes, what happens to incompatible steps/workflow? (Recommend: warn and offer to clean up, but allow it.)
+6. **Derived output format**: Should we auto-derive the library badge from the actual workflow output, or keep the template label as-is? (Recommend: template label for v1, auto-derive later for accuracy.)
 
-7. **Empty stages in Workflow mode**: If `mode: 'stages'` but `stages: []`, is that a validation error at publish? (Recommend: yes — Workflow mode with no stages is invalid.)
+7. **Aspect ratio on preset switch**: When switching from AI Photo (4 ratios) to AI Video (2 ratios) and current ratio is 3:2, what happens? (Recommend: prompt user to choose a compatible ratio.)
 
-8. **Input validation on stages**: Should we enforce that `stage.inputs` references are valid at edit time? (Recommend: yes - if a referenced capture step is deleted, show warning on the stage and require re-binding.)
+8. **Workflow activation for non-media templates**: If a survey user adds capture steps and wants AI processing, how do they activate a workflow? (Recommend: show a "Set up processing" option in the Create section.)
 
-9. **Stage ordering constraints**: Can any stage type appear in any position? Or should we enforce rules like "gif.compose can't follow ai.video"? (Recommend: minimal constraints for now, validate at publish that the chain makes sense for the experience type.)
-
-10. **@mention scope change**: With image inputs moved to explicit bindings, should @mentions of capture steps still resolve to their media, or should they be disallowed in prompts? (Recommend: disallow capture-step @mentions in prompts — images come from inputs, text comes from @mentions. Clean separation.)
+9. **@mention scope**: With image inputs as explicit bindings, capture-step @mentions in prompts should be disallowed. Only input steps and ai.text nodes are @mentionable. (Clean separation: images via bindings, text via @mentions.)
 
 ---
 
@@ -695,16 +629,17 @@ These can be resolved during implementation:
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
-| Unified type | Type = final output format | Users think in outputs, not capabilities |
-| Type mutability | Mutable with warnings | Avoids dead-ends (P9) |
-| Capture modeling | Stays as guest-facing step | Creators control when capture happens |
-| Image input binding | Explicit `stage.inputs[]` | Visible, structural, validated — not hidden in prompt text |
-| Text personalization | @{step:...} mentions in prompt | Only for text substitution from input steps |
-| Workflow model | Ordered stages with explicit input routing | Handles linear chains, fan-out, and multi-source merges |
-| Output mode | `workflow.mode`: `'direct'` / `'stages'` | Explicit, preserves stages when switching |
-| Aspect ratio | One field on experience | Single source of truth, no fallbacks |
+| Experience identity | Template at creation + derived output | Templates for starting point, no permanent type constraints |
+| Step constraints | None — any step for any experience | Video book survey needs capture; photo needs input for personalization |
+| Workflow abstraction | Presets (user-facing) over pipeline nodes (internal) | Non-technical users shouldn't wire nodes manually |
+| Preset switching | Preserves common fields across switches | Enables iterative building without data loss |
+| AI text generation | Toggle within AI presets, not a separate preset | Opt-in enhancement, not a workflow the user composes |
+| Capture modeling | Stays as guest-facing step | Creators control when capture happens in the flow |
+| Image input binding | Explicit bindings in preset form | Visible, structural, validated — not hidden in prompt |
+| Text personalization | @{step:...} and @{stage:...} mentions in prompt | Text from input steps and ai.text nodes |
+| GIF composition | Automatic from capture.gif, no pipeline node | Not a creative decision — just format conversion |
+| Aspect ratio | One field on experience, constrained by preset output | Single source of truth, auto-adjusts on preset switch |
 | Editor UX | Left nav: Overview / Create / Collect | Three focused sections, steps always visible |
-| Multi-capture | Both patterns (named steps + multi-shot) | Named steps for different inputs, multi-shot for same-type |
 | Backward compat | Clean break | Pre-launch, no migration needed |
 
 ---
