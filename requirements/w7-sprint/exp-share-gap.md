@@ -39,46 +39,52 @@ Make the experience-to-share transition feel **seamless and intentional**. Users
 
 ---
 
-### Proposed Approach
+### Solution: Completing State in ExperienceRuntime
 
-#### 1. Surface a "completing" state from ExperienceRuntime
+Show a unified completing state **inside ExperienceRuntime** when `store.isComplete` is `true`. This replaces the step content with a loading indicator + support text, covering all consumers automatically (ExperiencePage, PreviewModal, PregatePage, PresharePage) with zero changes to any of them.
 
-When `store.isComplete` becomes `true` and the completion effect fires, the runtime should visually communicate that completion is in progress. Options:
+#### What to render
 
-- **Option A**: ExperienceRuntime renders a built-in loading/transition overlay when `isComplete && !hasCalledOnComplete` (or while the `onComplete` promise is pending).
-- **Option B**: Expose an `isCompleting` state via the store so consumers (ExperiencePage, PreviewModal) can render their own transition UI.
+When `store.isComplete` is `true`, instead of rendering step content, render:
 
-#### 2. ExperiencePage — show loading state during async completion
+- A **loading spinner** (centered, `Loader2` animated icon)
+- A **support text** below the spinner: "Completing your experience..."
 
-While `handleExperienceComplete` is running (marking complete, triggering transform, waiting for response), show a loading/transition screen instead of the runtime content. This could be:
+The completing state stays visible until the component unmounts (navigation happens) or the parent swaps it out (PreviewModal switches to job status view).
 
-- The share loading screen (`ShareLoadingRenderer`) shown early
-- A simple themed spinner with "Processing your photo..." messaging
+#### Why this works for all consumers
 
-#### 3. ExperiencePreviewModal — show transition during completion
+| Consumer | What happens | Completing state visible until... |
+|----------|-------------|----------------------------------|
+| **ExperiencePage** | `onComplete` → mark complete → startTransformPipeline → navigate | Navigation to SharePage unmounts runtime |
+| **ExperiencePreviewModal** | `onComplete` → startTransformPipeline → `setShowJobStatus(true)` | Conditional render swaps runtime for JobStatusDisplay |
+| **PregatePage** | `onComplete` → mark complete → navigate to main experience | Navigation unmounts runtime |
+| **PresharePage** | `onComplete` → mark complete → navigate to share | Navigation unmounts runtime |
 
-Same principle: show a loading state between the runtime finishing and `showJobStatus` becoming `true`.
+#### What we are NOT doing
+
+- Not reusing `ShareLoadingRenderer` — that component is tailored to share-specific content (AI generation messaging, image skeleton). The completing state is a different moment: "saving your responses and wrapping up."
+- Not adding per-consumer loading states — the runtime owns this UX since it knows when completion starts.
+- Not changing any consumer components (ExperiencePage, PreviewModal, PregatePage, PresharePage).
 
 ---
 
 ### Scope
 
 **In scope:**
-- Visual feedback during the completion flow in ExperiencePage (guest)
-- Visual feedback during the completion flow in ExperiencePreviewModal
-- Graceful handling of slow `startTransformPipeline` responses
+- Completing state UI in ExperienceRuntime (spinner + support text) when `store.isComplete` is `true`
 
 **Out of scope:**
-- PregatePage / PresharePage (no cloud functions, navigation is fast enough)
-- Changes to the transform pipeline itself
-- Changes to SharePage or ShareLoadingRenderer behavior
+- Changes to consumer components (ExperiencePage, PreviewModal, PregatePage, PresharePage)
+- Changes to the transform pipeline or cloud function
+- Changes to SharePage or ShareLoadingRenderer
 
 ---
 
 ### Acceptance Criteria
 
 1. After completing the last step, users **never** see a blank/empty screen.
-2. A loading/transition indicator appears immediately when the experience completes.
-3. The loading state persists until navigation to share (ExperiencePage) or job status display (PreviewModal).
-4. If `startTransformPipeline` fails, the error state is shown cleanly (existing behavior, just no blank gap before it).
-5. PregatePage and PresharePage continue to work as-is (no regression).
+2. A loading spinner and support text ("Completing your experience...") appear immediately when the experience completes.
+3. The completing state persists until the runtime unmounts (navigation) or is swapped out (PreviewModal).
+4. If `startTransformPipeline` fails, the error state is shown cleanly by the consumer (existing behavior, no regression).
+5. All four consumers (ExperiencePage, PreviewModal, PregatePage, PresharePage) benefit without any changes to them.
