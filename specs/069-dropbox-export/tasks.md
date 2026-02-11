@@ -81,10 +81,10 @@
 
 ### Implementation for User Story 2
 
-- [ ] T021 [P] [US2] Create `toggleDropboxExportFn` server function in `apps/clementine-app/src/domains/project/connect/server/functions.ts` — validates admin auth, writes `exports.dropbox` fields (enabled, enabledBy, enabledAt) to project document via Firebase Admin SDK per contract SF-004
-- [ ] T022 [P] [US2] Create `useDropboxExport` hook in `apps/clementine-app/src/domains/project/connect/hooks/useDropboxExport.ts` — reads project `exports.dropbox` field from project document (already available via existing useProject hook), provides toggle callback using toggleDropboxExportFn
+- [ ] T021 [P] [US2] Create `useToggleDropboxExport` mutation hook in `apps/clementine-app/src/domains/project/connect/hooks/useToggleDropboxExport.ts` — uses `useMutation` with client-side Firestore SDK (`updateDoc`) to write `exports.dropbox` fields (enabled, enabledBy, enabledAt) to project document, with `serverTimestamp()` for audit fields. Security enforced by Firestore rules (admin-only write). Follows existing mutation hook patterns (see `useCreateProject`, `useDeleteProject`).
+- [ ] T022 [P] [US2] Create `useDropboxExport` hook in `apps/clementine-app/src/domains/project/connect/hooks/useDropboxExport.ts` — reads project `exports.dropbox` field from project document (already available via existing useProject hook), provides toggle callback using `useToggleDropboxExport` mutation hook
 - [ ] T023 [US2] Update `DropboxCard` component in `apps/clementine-app/src/domains/project/connect/components/DropboxCard.tsx` — add export toggle switch (only visible when connected), display destination path `/Apps/Clementine/<ProjectName>/<ExperienceName>/` when enabled, implement UX states B (connected, export off) and C (connected, export on) per spec
-- [ ] T024 [US2] Update barrel exports in `apps/clementine-app/src/domains/project/connect/hooks/index.ts` to include useDropboxExport
+- [ ] T024 [US2] Update barrel exports in `apps/clementine-app/src/domains/project/connect/hooks/index.ts` to include useDropboxExport and useToggleDropboxExport
 
 **Checkpoint**: User Story 2 complete — Export toggle works per project. Verify toggle persists and displays correct path.
 
@@ -184,7 +184,7 @@
 - T003, T004, T005, T006 (all schemas) can run in parallel
 - T008, T009, T010 (encryption, repositories) can run in parallel
 - T013, T014, T016 (US1 server functions + hook) can run in parallel
-- T021, T022 (US2 server function + hook) can run in parallel
+- T021, T022 (US2 mutation hook + read hook) can run in parallel
 - T025, T026 (US3 Dropbox service + experience repo) can run in parallel
 - US4 can run in parallel with US2/US3 after US1 completes
 
@@ -250,5 +250,6 @@ Task: "Create useDropboxConnection hook in apps/clementine-app/src/domains/proje
 - Commit after each task or logical group
 - Stop at any checkpoint to validate story independently
 - The `workspaceSchema` and `projectSchema` use `looseObject()` so new fields don't require modifying the base schemas — existing code continues to work
-- Server functions in the app use `createServerFn()` pattern with Firebase Admin SDK for mutations
+- Server functions in the app use `createServerFn()` pattern only for operations requiring secrets (OAuth token exchange, disconnect/revoke)
+- Data mutations (e.g., export toggle) use client-side Firestore SDK with `useMutation` hooks, following the existing client-first pattern (security enforced by Firestore rules)
 - Cloud Tasks in functions use `onTaskDispatched()` pattern matching existing transform pipeline

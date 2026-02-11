@@ -5,7 +5,7 @@
 
 ## Summary
 
-Automatically export AI-generated photo results to a workspace's connected Dropbox account, organized by project and experience. The feature spans three layers: (1) TanStack Start server functions for OAuth connect/disconnect, (2) a Connect tab UI for managing the integration and per-project export toggle, and (3) Firebase Cloud Tasks for async export dispatch and Dropbox file upload after each successful pipeline job.
+Automatically export AI-generated photo results to a workspace's connected Dropbox account, organized by project and experience. The feature spans three layers: (1) TanStack Start server functions for OAuth connect/disconnect (secrets-dependent operations only), (2) a Connect tab UI for managing the integration and per-project export toggle (client-side Firestore SDK for reads and mutations, following the client-first architecture), and (3) Firebase Cloud Tasks for async export dispatch and Dropbox file upload after each successful pipeline job.
 
 ## Technical Context
 
@@ -30,7 +30,7 @@ Automatically export AI-generated photo results to a workspace's connected Dropb
 | III. Type-Safe Development | PASS | All new schemas use Zod; strict TypeScript; server function inputs validated |
 | IV. Minimal Testing Strategy | PASS | Unit tests for encryption utility and schema validation; integration testing via manual OAuth flow |
 | V. Validation Gates | PASS | All code will pass format/lint/type-check before commit; standards compliance review before merge |
-| VI. Frontend Architecture | PASS | Client-first: workspace/project data read via Firestore client SDK with real-time listeners; mutations via server functions |
+| VI. Frontend Architecture | PASS | Client-first: workspace/project data read via Firestore client SDK with real-time listeners; data mutations via client-side Firestore SDK + useMutation hooks (matching existing patterns); server functions only for OAuth/disconnect (require secrets) |
 | VII. Backend & Firebase | PASS | Admin SDK for Cloud Functions (write export logs, update integration status); Firestore rules enforce access control |
 | VIII. Project Structure | PASS | New code follows vertical slice architecture within existing domain modules |
 
@@ -75,10 +75,11 @@ apps/clementine-app/src/
 │   │   └── ConnectPage.tsx              # MODIFY: Replace WipPlaceholder with real UI
 │   ├── hooks/
 │   │   ├── useDropboxConnection.ts      # NEW: Read workspace Dropbox integration state
-│   │   ├── useDropboxExport.ts          # NEW: Read/write project export toggle
+│   │   ├── useDropboxExport.ts          # NEW: Read project export config + toggle callback
+│   │   ├── useToggleDropboxExport.ts    # NEW: Client-side mutation hook for export toggle (useMutation + updateDoc)
 │   │   └── index.ts                     # NEW: Barrel export
 │   ├── server/
-│   │   ├── functions.ts                 # NEW: OAuth + toggle server functions
+│   │   ├── functions.ts                 # NEW: OAuth + disconnect server functions (secrets-dependent only)
 │   │   └── index.ts                     # NEW: Barrel export
 │   └── index.ts                         # MODIFY: Re-export new modules
 ├── app/workspace/

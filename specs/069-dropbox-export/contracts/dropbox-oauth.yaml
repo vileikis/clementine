@@ -116,29 +116,32 @@ errors:
     (token may already be invalid)
 
 ---
-# SF-004: Toggle Project Dropbox Export
-name: toggleDropboxExportFn
-type: TanStack Start Server Function
-method: POST
+# SF-004: Toggle Project Dropbox Export (CLIENT-SIDE)
+# NOTE: This is NOT a server function. It is a client-side mutation hook
+# (useToggleDropboxExport) using Firestore client SDK (updateDoc).
+# Security enforced by Firestore rules (admin-only write on project doc).
+name: useToggleDropboxExport
+type: Client-side mutation hook (useMutation + updateDoc)
 
 description: >
   Enables or disables Dropbox export for a specific project.
+  Uses client-side Firestore SDK following the existing mutation pattern
+  (see useCreateProject, useDeleteProject, useRenameProject).
 
 input:
   projectId: string     # Project to toggle
   enabled: boolean      # New export state
 
 output:
-  success: boolean
+  void  # Firestore write, cache invalidation handled by onSnapshot
 
 behavior:
-  - Verify user is authenticated and is admin
-  - Update project document:
+  - Auth enforced by Firestore rules (admin-only write on project document)
+  - Update project document via updateDoc:
     - exports.dropbox.enabled = enabled
-    - exports.dropbox.enabledBy = current user ID
-    - exports.dropbox.enabledAt = now
-  - Return success
+    - exports.dropbox.enabledBy = current user ID (from auth context)
+    - exports.dropbox.enabledAt = serverTimestamp()
+  - Real-time listener (onSnapshot) automatically reflects update in UI
 
 errors:
-  - 401 Unauthenticated
-  - 403 Forbidden: Not admin
+  - Firestore permission denied: User is not admin (enforced by rules)
