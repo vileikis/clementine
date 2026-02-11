@@ -18,3 +18,6 @@ export type {
 
 export { ThemedProgressBar } from './ThemedProgressBar'
 export type { ThemedProgressBarProps } from './ThemedProgressBar'
+
+export { ThemedLoading } from './ThemedLoading'
+export type { ThemedLoadingProps } from './ThemedLoading'

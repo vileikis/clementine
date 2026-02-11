@@ -15,7 +15,6 @@
  * - This minimizes Firestore writes while ensuring data is persisted at meaningful moments
  */
 import { useCallback, useEffect, useLayoutEffect, useRef } from 'react'
-import { Loader2 } from 'lucide-react'
 
 import { useExperienceRuntimeStore } from '../stores/experienceRuntimeStore'
 import { RuntimeNavigation } from '../components/RuntimeNavigation'
@@ -24,7 +23,7 @@ import type { Experience, ExperienceStep } from '../../shared/schemas'
 import type { Session } from '@/domains/session'
 import { useCompleteSession, useUpdateSessionProgress } from '@/domains/session'
 import { cn } from '@/shared/utils'
-import { ScrollableView, ThemedText } from '@/shared/theming'
+import { ScrollableView, ThemedLoading } from '@/shared/theming'
 
 /** Step types that manage their own navigation buttons */
 const STEPS_WITH_CUSTOM_NAVIGATION = new Set(['capture.photo'])
@@ -238,13 +237,8 @@ export function ExperienceRuntime({
     <>
       {showTopBar && <RuntimeTopBar onClose={onClose} />}
       {isCompleting ? (
-        // Completing state: spinner + text while async completion runs
-        <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center">
-          <Loader2 className="h-12 w-12 animate-spin opacity-50" />
-          <ThemedText variant="body" className="opacity-60">
-            Completing your experience...
-          </ThemedText>
-        </div>
+        // Completing state: themed spinner + text while async completion runs
+        <ThemedLoading message="Completing your experience..." />
       ) : isFullHeightStep ? (
         // Full-height steps (camera, video): no ScrollableView, no padding, own controls
         <div className="flex-1 min-h-0 overflow-hidden">{children}</div>
