@@ -27,7 +27,7 @@ The Dropbox OAuth token is stored **once per Workspace**. A single Dropbox accou
 
 - **Who can connect/disconnect:** Workspace Owner or Admin
 - **What's stored:** encrypted refresh token, Dropbox account email/name, connected-by user, connected-at timestamp
-- **Managed from:** Workspace Settings → Integrations
+- **Managed from:** Project Editor → Connect tab (v1); Workspace Settings → Integrations (future)
 
 ### Project level — Export toggle
 
@@ -70,10 +70,10 @@ Users cannot choose an arbitrary export destination (e.g., `/Events/Brand Launch
 
 ### Do this: OAuth 2.0 with App Folder scope
 
-- User clicks "Connect Dropbox" (from Workspace Settings or Project Connect tab)
+- User clicks "Connect Dropbox" (from Project Connect tab)
 - Redirected through Dropbox OAuth with `app_folder` scope
 - Refresh token (encrypted) + metadata stored at Workspace level
-- Files uploaded via Dropbox API into the sandboxed App Folder
+- Files uploaded via Dropbox API into the App Folder
 
 **Why this is the only sane option**
 
@@ -93,43 +93,18 @@ Users cannot choose an arbitrary export destination (e.g., `/Events/Brand Launch
 
 ---
 
-## UX: Workspace Settings → Integrations
-
-### Not connected state
-
-Card: **Dropbox**
-
-- Copy: "Connect your Dropbox account to enable automatic export of generated media across your projects."
-- Subtext: "Clementine will create an app folder in your Dropbox. We cannot access your other files."
-- CTA: **Connect Dropbox**
-
-### Connected state
-
-- Status: **Connected** — `user@example.com` (Dropbox account)
-- Connected by: Jane Doe, Feb 11 2026
-- Info: "Exports go to `/Apps/Clementine/` in your Dropbox"
-- CTA: **Disconnect** (Workspace Owner/Admin only)
-- Note: "Disconnecting will stop all active Dropbox exports across projects in this workspace."
-
-### Failure state
-
-- "Needs re-authentication" (token revoked/expired) — CTA: **Reconnect**
-
----
-
 ## UX: Project Editor → Connect tab
+
+All Dropbox management happens here in v1. Connect, disconnect, toggle export — one place.
 
 ### State A: Workspace Dropbox not connected
 
 Card: **Dropbox**
 
 - Copy: "Automatically export generated results to Dropbox."
-- Subtext: "Dropbox is not connected on this workspace yet."
+- Subtext: "Clementine will create an app folder in your Dropbox. We cannot access your other files."
 - CTA: **Connect Dropbox** (initiates the OAuth flow, saves token at Workspace level)
 - On success: transitions to State B
-- Secondary: "Learn how it works"
-
-This allows users to connect Dropbox without leaving the project context. The connection is stored at the workspace level, but the user doesn't need to navigate to Workspace Settings to set it up.
 
 ### State B: Workspace connected, export disabled
 
@@ -138,6 +113,7 @@ Card: **Dropbox**
 - Status: **Connected** — `user@example.com`
 - Toggle: **Export to Dropbox** (OFF)
 - Subtext: "Results will be exported to `/Apps/Clementine/<ProjectName>/<ExperienceName>/`"
+- Link: **Disconnect** — "This will disconnect Dropbox for all projects in this workspace."
 
 ### State C: Workspace connected, export enabled
 
@@ -147,14 +123,13 @@ Card: **Dropbox**
 - Connected Dropbox: `user@example.com`
 - Toggle: **Export to Dropbox** (ON)
 - Info: "Exporting to `/Apps/Clementine/<ProjectName>/<ExperienceName>/`"
-- Buttons:
-  - **Send test file**
-  - **View logs**
+- Last export status: "Success" / "Failed: [reason]" (from job document)
+- Link: **Disconnect** — "This will disconnect Dropbox for all projects in this workspace."
 
-### Failure states (must be explicit)
+### Failure states
 
-- "Dropbox connection lost — ask a workspace admin to reconnect" (token revoked/expired)
-- "Rate-limited by Dropbox (retrying)"
+- "Dropbox connection lost — reconnect to resume exports" (token revoked/expired, shown reactively when an export fails with 401)
+- CTA: **Reconnect** (re-initiates OAuth)
 
 ---
 
@@ -164,11 +139,8 @@ Card: **Dropbox**
 |---|---|
 | Connect Dropbox (OAuth) | Workspace Owner / Admin |
 | Disconnect Dropbox | Workspace Owner / Admin |
-| Reconnect (re-auth) | Workspace Owner / Admin |
 | View connection status | Any workspace member |
 | Enable/disable export on a project | Project Editor+ |
-| Send test file | Project Editor+ |
-| View export logs | Any project member |
 
 ---
 
@@ -193,14 +165,6 @@ All exports go into the Dropbox-managed App Folder:
 
 Example: `2026-02-11_19-24-03_session-8F3K_result.jpg`
 
-### Date partitioning (v2-ready)
-
-Can be added later without breaking existing structure:
-
-```
-/Apps/Clementine/<ProjectName>/<ExperienceName>/2026-02-11/<file>
-```
-
 ---
 
 ## System behavior (pipeline integration)
@@ -217,8 +181,7 @@ transformPipelineJob completes successfully
 dispatchExports (Cloud Task, own retry policy)
   → read project export config (live)
   → if dropbox enabled:  enqueue dropboxExportTask({ jobId, projectId, resultMedia })
-  → if gdrive enabled:   enqueue gdriveExportTask(...)   (future)
-  → if webhook enabled:  enqueue webhookDeliverTask(...)  (future)
+  → (future integrations added here)
 ```
 
 The `resultMedia` payload follows the existing `MediaReference` schema (`mediaAssetId`, `url`, `filePath`, `displayName`). One job produces one result — no artifact arrays.
@@ -231,8 +194,8 @@ The `resultMedia` payload follows the existing `MediaReference` schema (`mediaAs
 
 **Why separate worker tasks per integration:**
 
-- Independent failure domains — Dropbox rate limits don't block webhook delivery
-- Independent retry policies — webhooks retry 3x over 1h, Dropbox retries 10x over 24h
+- Independent failure domains — Dropbox rate limits don't block future webhook delivery
+- Independent retry policies per integration
 - Each worker is self-contained and testable in isolation
 - Adding a new integration = add one worker + one `if` in the dispatcher
 
@@ -250,29 +213,18 @@ The `resultMedia` payload follows the existing `MediaReference` schema (`mediaAs
 4. Download result file from Firebase Storage (using `resultMedia.filePath`)
 5. Compute destination path: `/<ProjectName>/<ExperienceName>/<filename>`
 6. Ensure folders exist (create if missing via Dropbox API)
-7. Upload file to Dropbox App Folder
-8. Record export outcome:
-   - `success | retrying | failed`
-   - Dropbox file id/path
-   - Error details if any
+7. Upload file to Dropbox App Folder (simple single-request upload)
+8. Record export status on the job document (`exportStatus`, `exportError`)
 
-### Retries & idempotency (this is not optional)
+### Duplicate handling
 
-You will get duplicated uploads unless you make exports idempotent.
+File paths are deterministic (based on project, experience, session, timestamp). If Cloud Tasks redelivers, the same file uploads to the same path — Dropbox overwrites it. No duplicates, no DB tracking needed.
 
-**Idempotency approach**
+### Retries
 
-- Generate a deterministic `export_key` per result:
-  - `projectId + experienceId + jobId + mediaAssetId`
+Cloud Tasks handles retries with built-in exponential backoff. Configure via task queue settings (max attempts, backoff parameters). No custom retry logic needed.
 
-- Store it in DB with status.
-- On retry, if `export_key` already succeeded, do nothing.
-
-### Rate limits / backoff
-
-- Use exponential backoff on 429 / transient errors
-- Cap retries (e.g., 10 attempts over ~24h)
-- After max retries: mark failed + surface in UI logs
+On auth errors (401), mark workspace integration as `needs_reauth` so the UI can surface the issue.
 
 ---
 
@@ -306,22 +258,12 @@ exports: {
 }
 ```
 
-### Export log (Firestore: `projects/{id}/exportLogs/{logId}`)
+### Job-level export status (Firestore: `projects/{id}/jobs/{jobId}`)
 
 ```
-{
-  jobId: string,
-  artifactId: string,
-  provider: "dropbox",
-  exportKey: string,             // idempotency key
-  status: "success" | "retrying" | "failed",
-  dropboxFileId: string | null,
-  dropboxPath: string | null,
-  error: string | null,
-  attempts: number,
-  createdAt: timestamp,
-  lastAttemptAt: timestamp,
-}
+exportStatus: "pending" | "success" | "failed" | null,
+exportError: string | null,
+exportedAt: timestamp | null,
 ```
 
 ---
@@ -335,3 +277,41 @@ exports: {
 - Never show full tokens in logs
 - Project editors can toggle export but cannot access or view the token
 - Disconnecting at workspace level immediately stops all project exports
+
+---
+
+## Future enhancements (post-v1)
+
+### Workspace Settings → Integrations page
+
+Dedicated workspace-level page for managing all integrations (Dropbox, Google Drive, webhooks). Central place to connect/disconnect, view all connected accounts, and see which projects use each integration. For v1, connect/disconnect is managed from the Project Connect tab.
+
+### Export logs UI
+
+Full export log subcollection (`projects/{id}/exportLogs/{logId}`) with a "View logs" UI showing export history per project — timestamps, success/failure, Dropbox paths, error details. For v1, just the last export status on the job document.
+
+### Send test file
+
+"Send test file" button on the Project Connect tab to verify the Dropbox connection works without running a real experience. For v1, running an experience is the test.
+
+### Proactive re-auth detection
+
+Periodic health checks or Dropbox webhook listeners to detect token revocation before an export fails. For v1, re-auth is detected reactively when an export fails with a 401.
+
+### Chunked upload for large files
+
+Dropbox chunked upload API for files > 150MB (videos). For v1, only images are exported (a few MB each), so simple single-request upload is sufficient.
+
+### Date partitioning
+
+Add date-based subfolders to the export structure:
+
+```
+/Apps/Clementine/<ProjectName>/<ExperienceName>/2026-02-11/<file>
+```
+
+Can be added later without breaking existing structure.
+
+### Custom folder paths
+
+Upgrade from App Folder scope to full Dropbox access, allowing users to choose arbitrary export destinations. Requires folder picker UI and path validation.
