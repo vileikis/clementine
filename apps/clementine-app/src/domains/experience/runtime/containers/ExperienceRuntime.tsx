@@ -19,11 +19,11 @@ import { useCallback, useEffect, useLayoutEffect, useRef } from 'react'
 import { useExperienceRuntimeStore } from '../stores/experienceRuntimeStore'
 import { RuntimeNavigation } from '../components/RuntimeNavigation'
 import { RuntimeTopBar } from '../components/RuntimeTopBar'
-import type { ExperienceStep } from '../../shared/schemas'
+import type { Experience, ExperienceStep } from '../../shared/schemas'
 import type { Session } from '@/domains/session'
 import { useCompleteSession, useUpdateSessionProgress } from '@/domains/session'
 import { cn } from '@/shared/utils'
-import { ScrollableView } from '@/shared/theming'
+import { ScrollableView, ThemedError, ThemedLoading } from '@/shared/theming'
 
 /** Step types that manage their own navigation buttons */
 const STEPS_WITH_CUSTOM_NAVIGATION = new Set(['capture.photo'])
@@ -32,8 +32,8 @@ const STEPS_WITH_CUSTOM_NAVIGATION = new Set(['capture.photo'])
  * Props for ExperienceRuntime container
  */
 export interface ExperienceRuntimeProps {
-  /** Experience ID being executed */
-  experienceId: string
+  /** Experience being executed */
+  experience: Experience
   /** Steps to execute */
   steps: ExperienceStep[]
   /** Active session for persistence */
@@ -42,18 +42,16 @@ export interface ExperienceRuntimeProps {
   children: React.ReactNode
 
   // Runtime TopBar props
-  /** Experience name to display in topbar */
-  experienceName?: string
-  /** Home navigation handler (guest mode: navigate home, preview mode: undefined/disabled) */
-  onHomeClick?: () => void
+  /** Exit handler (guest mode: navigate home, preview mode: undefined/disabled) */
+  onClose?: () => void
   /** Whether to show the runtime topbar (default: true) */
   showTopBar?: boolean
 
   // Lifecycle callbacks
   /** Called when step changes (for analytics, etc.) */
   onStepChange?: (step: ExperienceStep, index: number) => void
-  /** Called when experience completes */
-  onComplete?: () => void
+  /** Called when experience completes (async supported — rejection shows error state) */
+  onComplete?: () => void | Promise<void>
   /** Called on sync errors */
   onError?: (error: Error) => void
 }
@@ -64,48 +62,15 @@ export interface ExperienceRuntimeProps {
  * Initializes the runtime store, handles Firestore synchronization, and renders RuntimeTopBar.
  * Sync happens on navigation (forward only) rather than reactively on every change.
  *
- * @example
- * ```tsx
- * // Guest mode - with topbar and home button
- * function ExperiencePage({ experience, session }) {
- *   return (
- *     <ExperienceRuntime
- *       experienceId={experience.id}
- *       steps={experience.published.steps}
- *       session={session}
- *       experienceName={experience.name}
- *       onHomeClick={() => navigate('/home')}
- *       onComplete={() => navigate('/share')}
- *     >
- *       <GuestRuntimeContent />
- *     </ExperienceRuntime>
- *   )
- * }
- *
- * // Preview mode - no topbar or home button disabled
- * function PreviewModal({ experience, session }) {
- *   return (
- *     <ExperienceRuntime
- *       experienceId={experience.id}
- *       steps={experience.draft.steps}
- *       session={session}
- *       experienceName={experience.name}
- *       showTopBar={false}
- *       onComplete={() => toast.success('Preview complete!')}
- *     >
- *       <StepRenderer />
- *     </ExperienceRuntime>
- *   )
- * }
- * ```
+ * When the experience is complete (store.isComplete), renders a completing state
+ * (spinner + text) instead of children, providing visual feedback during async completion.
  */
 export function ExperienceRuntime({
-  experienceId,
+  experience,
   steps,
   session,
   children,
-  experienceName,
-  onHomeClick,
+  onClose,
   showTopBar = true,
   onStepChange,
   onComplete,
@@ -120,19 +85,22 @@ export function ExperienceRuntime({
 
   // Refs for tracking state changes
   const prevStepIndexRef = useRef<number>(0)
-  const hasCompletedRef = useRef(session.status === 'completed')
+  const syncDoneRef = useRef(session.status === 'completed')
+  // True when the session was already completed at mount — skip completing UI
+  const mountedAlreadyCompleteRef = useRef(session.status === 'completed')
 
   // Initialize store synchronously before paint using useLayoutEffect
   // This ensures useRuntime() works in children during initial render
   useLayoutEffect(() => {
     if (!store.sessionId || store.sessionId !== session.id) {
-      store.initFromSession(session, steps, experienceId)
+      store.initFromSession(session, steps, experience)
       prevStepIndexRef.current = 0
-      hasCompletedRef.current = session.status === 'completed'
+      syncDoneRef.current = session.status === 'completed'
+      mountedAlreadyCompleteRef.current = session.status === 'completed'
     }
   }, [
     session.id,
-    experienceId,
+    experience,
     steps,
     store.sessionId,
     store.initFromSession,
@@ -199,53 +167,50 @@ export function ExperienceRuntime({
     onStepChange,
   ])
 
-  // React to completion
-  // Note: No cancellation pattern - hasCompletedRef prevents re-execution.
-  // Once completion starts, it must run to completion to call onComplete.
-  // Sync must succeed before we mark complete - if sync fails, we don't proceed.
+  // Completion flow — extracted so both the effect and retry button can invoke it.
+  // syncDoneRef guards Firestore sync (skip on retry if already succeeded).
+  // completeSession is idempotent so it can safely re-run on retry.
+  const runCompletion = useCallback(async () => {
+    store.setCompletionError(null)
+
+    try {
+      // Step 1: Sync to Firestore (skip if already synced)
+      if (!syncDoneRef.current) {
+        await syncToFirestore(store.responses)
+        syncDoneRef.current = true
+      }
+
+      // Step 2: Complete the session (idempotent — safe to re-call on retry)
+      await completeSession.mutateAsync({
+        projectId: session.projectId,
+        sessionId: session.id,
+      })
+
+      // Step 3: Parent callback (transform pipeline, navigation, etc.)
+      await onComplete?.()
+    } catch (error) {
+      store.setCompletionError(
+        error instanceof Error ? error.message : 'Something went wrong',
+      )
+    }
+  }, [
+    syncToFirestore,
+    store.responses,
+    store.setCompletionError,
+    completeSession.mutateAsync,
+    session.projectId,
+    session.id,
+    onComplete,
+  ])
+
+  // Trigger completion when isComplete becomes true
   useEffect(() => {
     if (!store.isReady) return
     if (!store.isComplete) return
-    if (hasCompletedRef.current) return // Already completed
-
-    // Sync final state before completing
-    // Only proceed with completion if sync succeeds
-    const runCompletion = async () => {
-      // Step 1: Sync to Firestore
-      try {
-        await syncToFirestore(store.responses)
-      } catch {
-        // Error already reported by syncToFirestore via onError
-        return
-      }
-
-      // Step 2: Mark as completed only after successful sync
-      hasCompletedRef.current = true
-
-      // Step 3: Complete the session
-      try {
-        await completeSession.mutateAsync({
-          projectId: session.projectId,
-          sessionId: session.id,
-        })
-        onComplete?.()
-      } catch (error) {
-        onError?.(error instanceof Error ? error : new Error('Complete failed'))
-      }
-    }
+    if (syncDoneRef.current) return // Already past sync
 
     void runCompletion()
-  }, [
-    store.isReady,
-    store.isComplete,
-    store.responses,
-    session.projectId,
-    session.id,
-    completeSession.mutateAsync,
-    syncToFirestore,
-    onComplete,
-    onError,
-  ])
+  }, [store.isReady, store.isComplete, runCompletion])
 
   // Cleanup on unmount
   useEffect(() => {
@@ -254,10 +219,14 @@ export function ExperienceRuntime({
     }
   }, [store.reset])
 
-  // Don't render children until store is initialized
+  // Show loading until store is initialized
   if (!store.isReady) {
-    return null
+    return <ThemedLoading />
   }
+
+  // Check if experience is completing (async completion in progress).
+  // Skip when session was already completed at mount — no async work to wait for.
+  const isCompleting = store.isComplete && !mountedAlreadyCompleteRef.current
 
   // Check if current step manages its own navigation and layout
   const currentStep = store.steps[store.currentStepIndex]
@@ -267,17 +236,17 @@ export function ExperienceRuntime({
 
   return (
     <>
-      {showTopBar && (
-        <RuntimeTopBar
-          experienceName={experienceName ?? 'Experience'}
-          currentStepIndex={store.currentStepIndex}
-          totalSteps={steps.length}
-          onHomeClick={onHomeClick}
-          onBack={steps.length > 1 ? store.previousStep : undefined}
-          canGoBack={steps.length > 1 && store.canGoBack()}
+      {showTopBar && <RuntimeTopBar onClose={onClose} />}
+      {isCompleting && store.completionError ? (
+        // Completion error: show message + retry instead of infinite spinner
+        <ThemedError
+          message={store.completionError}
+          onRetry={() => void runCompletion()}
         />
-      )}
-      {isFullHeightStep ? (
+      ) : isCompleting ? (
+        // Completing state: themed spinner + text while async completion runs
+        <ThemedLoading message="Completing your experience..." />
+      ) : isFullHeightStep ? (
         // Full-height steps (camera, video): no ScrollableView, no padding, own controls
         <div className="flex-1 min-h-0 overflow-hidden">{children}</div>
       ) : (
@@ -292,10 +261,7 @@ export function ExperienceRuntime({
           )}
         >
           {children}
-          <RuntimeNavigation
-            onNext={store.nextStep}
-            canProceed={store.canProceed()}
-          />
+          <RuntimeNavigation />
         </ScrollableView>
       )}
     </>

@@ -50,12 +50,14 @@ export interface RuntimeAPI {
   projectId: string
 
   // Read-only state
+  experienceName: string
   currentStep: ExperienceStep | null
   currentStepIndex: number
   totalSteps: number
   canProceed: boolean
   canGoBack: boolean
   isComplete: boolean
+  completionError: string | null
   isSyncing: boolean
 
   // Navigation actions
@@ -224,12 +226,14 @@ export function useRuntime(): RuntimeAPI {
     projectId,
 
     // Read-only state
+    experienceName: store.experience?.name ?? 'Experience',
     currentStep: store.getCurrentStep(),
     currentStepIndex: store.currentStepIndex,
     totalSteps: store.steps.length,
     canProceed: store.canProceed(),
     canGoBack: store.canGoBack(),
     isComplete: store.isComplete,
+    completionError: store.completionError,
     isSyncing: store.isSyncing,
 
     // Navigation actions

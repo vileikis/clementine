@@ -36,7 +36,7 @@ interface StartTransformResponse {
  * ```
  */
 export function useStartTransformPipeline() {
-  return useCallback(async (params: StartTransformParams): Promise<boolean> => {
+  return useCallback(async (params: StartTransformParams): Promise<void> => {
     const startTransform = httpsCallable<
       StartTransformParams,
       StartTransformResponse
@@ -44,7 +44,6 @@ export function useStartTransformPipeline() {
 
     try {
       await startTransform(params)
-      return true
     } catch (error) {
       console.error('Failed to trigger transform pipeline:', error)
       Sentry.captureException(error, {
@@ -57,7 +56,7 @@ export function useStartTransformPipeline() {
           sessionId: params.sessionId,
         },
       })
-      return false
+      throw error
     }
   }, [])
 }

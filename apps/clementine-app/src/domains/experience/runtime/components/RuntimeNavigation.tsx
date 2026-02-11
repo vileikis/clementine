@@ -1,27 +1,20 @@
 /**
  * RuntimeNavigation Component
  *
- * Bottom navigation bar for experience runtime with back/next buttons.
- * Handles responsive layout: fixed bottom on mobile, in-flow on desktop.
+ * Bottom navigation bar for experience runtime with next button.
+ * Reads next and canProceed from the runtime store via useRuntime().
  *
  * @example
  * ```tsx
- * <RuntimeNavigation
- *   onNext={handleNext}
- *   onBack={handleBack}
- *   canGoBack={currentStepIndex > 0}
- *   canProceed={isResponseValid}
- * />
+ * <RuntimeNavigation />
+ * <RuntimeNavigation buttonLabel="Submit" />
  * ```
  */
 
+import { useRuntime } from '../hooks/useRuntime'
 import { ThemedButton } from '@/shared/theming'
 
 export interface RuntimeNavigationProps {
-  /** Handler for next/submit action */
-  onNext?: () => void
-  /** Whether proceeding is allowed */
-  canProceed?: boolean
   /** Custom button label (defaults to "Next") */
   buttonLabel?: string
 }
@@ -34,11 +27,11 @@ export interface RuntimeNavigationProps {
  * - Desktop: Centered in flow with margin top
  */
 export function RuntimeNavigation({
-  onNext,
-  canProceed = true,
   buttonLabel = 'Next',
 }: RuntimeNavigationProps) {
-  const isNextDisabled = !onNext || !canProceed
+  const { next, canProceed } = useRuntime()
+
+  const isNextDisabled = !canProceed
 
   return (
     <>
@@ -46,7 +39,7 @@ export function RuntimeNavigation({
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-linear-to-t from-black/20 to-transparent md:hidden z-40">
         <div className="flex justify-center mx-auto">
           <ThemedButton
-            onClick={onNext}
+            onClick={next}
             disabled={isNextDisabled}
             size="md"
             className="min-w-32"
@@ -59,7 +52,7 @@ export function RuntimeNavigation({
       {/* Desktop: Button in flow */}
       <div className="hidden md:flex justify-center py-8 shrink-0">
         <ThemedButton
-          onClick={onNext}
+          onClick={next}
           disabled={isNextDisabled}
           size="md"
           className="min-w-32"

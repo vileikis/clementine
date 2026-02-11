@@ -174,17 +174,13 @@ export function ExperiencePreviewModal({
     // Transform configured - trigger pipeline and show job status
     if (!sessionId || !ghostProjectId) return
 
-    setShowJobStatus(true)
-
-    const success = await startTransformPipeline({
+    // Throws on failure — runtime catches and shows error state
+    await startTransformPipeline({
       projectId: ghostProjectId,
       sessionId,
     })
-    if (!success) {
-      toast.error('Failed to start processing', {
-        description: 'Please try again.',
-      })
-    }
+
+    setShowJobStatus(true)
   }, [experience, sessionId, ghostProjectId, startTransformPipeline])
 
   // Handle runtime errors
@@ -238,6 +234,7 @@ export function ExperiencePreviewModal({
           <ThemedBackground className="h-full">
             <JobStatusDisplay
               jobStatus={session.jobStatus}
+              resultMediaUrl={session.resultMedia?.url}
               onClose={handleClose}
             />
           </ThemedBackground>
@@ -249,11 +246,10 @@ export function ExperiencePreviewModal({
         <ThemeProvider theme={previewTheme}>
           <ThemedBackground className="h-full">
             <ExperienceRuntime
-              experienceId={experience.id}
+              experience={experience}
               steps={steps}
               session={session}
-              experienceName={experience.name}
-              onHomeClick={undefined}
+              onClose={undefined}
               onComplete={handleComplete}
               onError={handleError}
             >
