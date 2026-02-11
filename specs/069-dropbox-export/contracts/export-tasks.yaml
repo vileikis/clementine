@@ -1,0 +1,111 @@
+# Export Cloud Tasks
+# Firebase Cloud Functions v2 (onTaskDispatched)
+
+---
+# CT-001: Dispatch Exports
+name: dispatchExports
+type: Cloud Task (onTaskDispatched)
+trigger: Enqueued by transformPipelineJob after successful completion
+
+description: >
+  Reads live project export config and fans out to per-integration
+  export worker tasks. This is the routing layer — it determines
+  which integrations are enabled and creates individual worker tasks.
+
+payload:
+  jobId: string         # Completed job ID
+  projectId: string     # Project the job belongs to
+  sessionId: string     # Session that triggered the job
+  resultMedia:
+    url: string         # Public URL of the result
+    filePath: string    # Firebase Storage path
+    displayName: string # Display name for the result
+
+config:
+  region: europe-west1
+  memory: 256MiB
+  timeoutSeconds: 60
+  retryConfig:
+    maxAttempts: 3        # Retry on transient failures (e.g., Firestore read error)
+    minBackoffSeconds: 10
+    maxBackoffSeconds: 60
+
+behavior:
+  - Fetch project document (for exports config)
+  - Fetch session document (for workspaceId, experienceId)
+  - If project.exports.dropbox.enabled == true:
+    - Enqueue dropboxExportWorker task with full context
+  - (Future: check other integrations here)
+  - If no integrations enabled: exit silently (no error)
+
+errors:
+  - Project not found: Log warning, exit (no retry)
+  - Session not found: Log warning, exit (no retry)
+  - Firestore read failure: Retry (transient)
+
+---
+# CT-002: Dropbox Export Worker
+name: dropboxExportWorker
+type: Cloud Task (onTaskDispatched)
+trigger: Enqueued by dispatchExports
+
+description: >
+  Exports a single result file to the workspace's Dropbox App Folder.
+  Self-contained: fetches all context, handles auth, uploads, and logs.
+
+payload:
+  jobId: string
+  projectId: string
+  sessionId: string
+  workspaceId: string
+  experienceId: string
+  resultMedia:
+    url: string
+    filePath: string
+    displayName: string
+
+config:
+  region: europe-west1
+  memory: 512MiB         # Needs memory for file download + upload
+  timeoutSeconds: 120     # Allow time for large file transfer
+  retryConfig:
+    maxAttempts: 3
+    minBackoffSeconds: 30
+    maxBackoffSeconds: 300
+
+behavior:
+  1. Validate payload
+  2. Fetch workspace integration config (check Dropbox connected)
+     - If not connected or status != "connected": skip, log, exit
+  3. Fetch project document (check export still enabled)
+     - If not enabled: skip, log, exit
+  4. Fetch project name and experience name for folder path
+  5. Decrypt refresh token from workspace integration
+  6. Get fresh access token from Dropbox (using refresh token)
+     - If refresh fails with invalid_grant: mark workspace as needs_reauth, log, exit
+  7. Download result file from Firebase Storage (using filePath)
+  8. Compute destination path:
+     - /<ProjectName>/<ExperienceName>/<date>_<time>_session-<shortCode>_result.<ext>
+  9. Upload file to Dropbox via /files/upload API
+     - mode: overwrite (handles duplicates)
+     - autorename: false
+  10. Write export log to projects/{projectId}/exportLogs/{logId}:
+      - status: "success"
+      - destinationPath: computed path
+  11. Done
+
+errors:
+  - Auth error (401 from Dropbox):
+    - Update workspace: integrations.dropbox.status = "needs_reauth"
+    - Write export log with status: "failed", error message
+    - Do NOT retry (auth errors won't self-resolve)
+  - Dropbox API rate limit (429):
+    - Retry with backoff (Cloud Tasks handles this)
+  - Dropbox API server error (5xx):
+    - Retry with backoff
+  - Firebase Storage download error:
+    - Write export log with status: "failed"
+    - Retry (transient)
+  - Dropbox storage full (507 or insufficient_space):
+    - Write export log with status: "failed", error message
+    - Do NOT retry

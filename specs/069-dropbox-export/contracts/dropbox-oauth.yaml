@@ -1,0 +1,144 @@
+# Dropbox OAuth Server Functions
+# TanStack Start server functions (createServerFn) — NOT REST endpoints
+# These run server-side via RPC from the frontend
+
+---
+# SF-001: Initiate Dropbox OAuth
+name: initiateDropboxOAuthFn
+type: TanStack Start Server Function
+method: POST
+
+description: >
+  Generates a Dropbox OAuth authorization URL with PKCE challenge.
+  Returns the URL for the frontend to redirect the user to Dropbox consent.
+
+input:
+  workspaceId: string   # Workspace to connect Dropbox to
+  projectId: string     # Project the user came from (for return redirect)
+
+output:
+  authorizationUrl: string  # Full Dropbox OAuth URL to redirect user to
+
+behavior:
+  - Verify user is authenticated and is admin (via session)
+  - Generate PKCE code verifier and challenge
+  - Store code verifier in server session (for callback exchange)
+  - Store workspaceId and projectId in server session (for callback context)
+  - Build Dropbox authorization URL with:
+    - client_id (Dropbox app key)
+    - redirect_uri (callback route)
+    - response_type: code
+    - token_access_type: offline (for refresh token)
+    - scope: (app_folder scope is set at app registration, not per-request)
+    - code_challenge and code_challenge_method (PKCE S256)
+    - state parameter (CSRF protection)
+  - Return the authorization URL
+
+errors:
+  - 401 Unauthenticated: User not logged in
+  - 403 Forbidden: User is not admin
+
+---
+# SF-002: Handle Dropbox OAuth Callback
+name: handleDropboxCallbackFn
+type: TanStack Start Route Loader (beforeLoad)
+route: /workspace/$workspaceSlug/integrations/dropbox/callback
+
+description: >
+  Handles the Dropbox OAuth redirect. Exchanges auth code for tokens,
+  encrypts refresh token, stores connection at workspace level,
+  and redirects back to the project Connect tab.
+
+input:
+  # From URL query params:
+  code: string          # Authorization code from Dropbox
+  state: string         # CSRF state parameter
+
+output:
+  # Redirects to project Connect tab (no JSON response)
+  redirect: /workspace/$workspaceSlug/projects/$projectId/connect
+
+behavior:
+  - Validate state parameter matches session-stored value (CSRF protection)
+  - Retrieve code verifier from server session (PKCE)
+  - Exchange authorization code for tokens via Dropbox API:
+    - POST https://api.dropboxapi.com/oauth2/token
+    - Include code_verifier for PKCE
+  - Fetch Dropbox account info via API to get email and display name
+  - Encrypt refresh token using AES-256-GCM
+  - Write integration data to workspace document:
+    - integrations.dropbox.status = "connected"
+    - integrations.dropbox.accountEmail
+    - integrations.dropbox.accountDisplayName
+    - integrations.dropbox.encryptedRefreshToken
+    - integrations.dropbox.connectedBy = current user ID
+    - integrations.dropbox.connectedAt = now
+    - integrations.dropbox.scopes = ["app_folder"]
+  - Clean up session (remove code verifier, state, context)
+  - Redirect to project Connect tab
+
+errors:
+  - Invalid state: Redirect to Connect tab with error toast
+  - Token exchange failure: Redirect to Connect tab with error toast
+  - User cancelled OAuth: Redirect to Connect tab (no error)
+
+---
+# SF-003: Disconnect Dropbox
+name: disconnectDropboxFn
+type: TanStack Start Server Function
+method: POST
+
+description: >
+  Disconnects Dropbox from a workspace. Revokes the token via Dropbox API,
+  removes stored credentials, and updates workspace status.
+
+input:
+  workspaceId: string   # Workspace to disconnect
+
+output:
+  success: boolean
+
+behavior:
+  - Verify user is authenticated and is admin
+  - Fetch workspace integration config
+  - If connected:
+    - Decrypt refresh token
+    - Revoke token via Dropbox API (POST https://api.dropboxapi.com/2/auth/token/revoke)
+    - Update workspace: integrations.dropbox = null (or status = "disconnected")
+  - If not connected: no-op, return success
+  - Note: does NOT individually disable project exports — the workspace-level
+    disconnection means export workers will skip (live config check)
+
+errors:
+  - 401 Unauthenticated
+  - 403 Forbidden: Not admin
+  - Dropbox API failure during revoke: Log warning, still remove local token
+    (token may already be invalid)
+
+---
+# SF-004: Toggle Project Dropbox Export
+name: toggleDropboxExportFn
+type: TanStack Start Server Function
+method: POST
+
+description: >
+  Enables or disables Dropbox export for a specific project.
+
+input:
+  projectId: string     # Project to toggle
+  enabled: boolean      # New export state
+
+output:
+  success: boolean
+
+behavior:
+  - Verify user is authenticated and is admin
+  - Update project document:
+    - exports.dropbox.enabled = enabled
+    - exports.dropbox.enabledBy = current user ID
+    - exports.dropbox.enabledAt = now
+  - Return success
+
+errors:
+  - 401 Unauthenticated
+  - 403 Forbidden: Not admin
