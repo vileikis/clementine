@@ -19,8 +19,8 @@
 
 **Purpose**: Update runtime store to hold full Experience reference and expose experience name via hook. BLOCKS all subsequent work.
 
-- [ ] T001 Replace `experienceId` with `experience: Experience | null` in store state, update `initFromSession` signature to accept `Experience`, update `reset()`, and derive `experienceId` as `state.experience?.id` in `apps/clementine-app/src/domains/experience/runtime/stores/experienceRuntimeStore.ts`
-- [ ] T002 Add `experienceName: string` to `RuntimeAPI` interface and derive from `store.experience?.name ?? 'Experience'` in `apps/clementine-app/src/domains/experience/runtime/hooks/useRuntime.ts`
+- [X] T001 Replace `experienceId` with `experience: Experience | null` in store state, update `initFromSession` signature to accept `Experience`, update `reset()`, and derive `experienceId` as `state.experience?.id` in `apps/clementine-app/src/domains/experience/runtime/stores/experienceRuntimeStore.ts`
+- [X] T002 Add `experienceName: string` to `RuntimeAPI` interface and derive from `store.experience?.name ?? 'Experience'` in `apps/clementine-app/src/domains/experience/runtime/hooks/useRuntime.ts`
 
 **Checkpoint**: Store accepts full Experience, hook exposes experienceName. Components can now migrate to store.
 
@@ -34,21 +34,21 @@
 
 ### Runtime Components (consume store)
 
-- [ ] T003 [P] [US1] Refactor RuntimeTopBar to use `useRuntime()` for all state (`experienceName`, `currentStepIndex`, `totalSteps`, `isComplete`, `canGoBack`, `back`), reduce props to `onClose?: () => void` + `className?: string`, compute `isCloseMode = isComplete || totalSteps === 1 || currentStepIndex === 0`, hide progress bar when `isComplete`, simplify `handleGoBack` to use `back()` from hook in `apps/clementine-app/src/domains/experience/runtime/components/RuntimeTopBar.tsx`
-- [ ] T004 [P] [US1] Refactor RuntimeNavigation to use `useRuntime()` for `next` and `canProceed`, keep only optional `buttonLabel` prop in `apps/clementine-app/src/domains/experience/runtime/components/RuntimeNavigation.tsx`
+- [X] T003 [P] [US1] Refactor RuntimeTopBar to use `useRuntime()` for all state (`experienceName`, `currentStepIndex`, `totalSteps`, `isComplete`, `canGoBack`, `back`), reduce props to `onClose?: () => void` + `className?: string`, compute `isCloseMode = isComplete || totalSteps === 1 || currentStepIndex === 0`, hide progress bar when `isComplete`, simplify `handleGoBack` to use `back()` from hook in `apps/clementine-app/src/domains/experience/runtime/components/RuntimeTopBar.tsx`
+- [X] T004 [P] [US1] Refactor RuntimeNavigation to use `useRuntime()` for `next` and `canProceed`, keep only optional `buttonLabel` prop in `apps/clementine-app/src/domains/experience/runtime/components/RuntimeNavigation.tsx`
 
 ### ExperienceRuntime Container
 
-- [ ] T005 [US1] Update ExperienceRuntime: replace `experienceId` + `experienceName` props with `experience: Experience`, rename `onHomeClick` to `onClose`, pass `experience` to `store.initFromSession`, simplify RuntimeTopBar render to `<RuntimeTopBar onClose={onClose} />`, simplify RuntimeNavigation render to `<RuntimeNavigation />`, add completing state (Loader2 + ThemedText) when `store.isComplete` replacing children + navigation in `apps/clementine-app/src/domains/experience/runtime/containers/ExperienceRuntime.tsx`
+- [X] T005 [US1] Update ExperienceRuntime: replace `experienceId` + `experienceName` props with `experience: Experience`, rename `onHomeClick` to `onClose`, pass `experience` to `store.initFromSession`, simplify RuntimeTopBar render to `<RuntimeTopBar onClose={onClose} />`, simplify RuntimeNavigation render to `<RuntimeNavigation />`, add completing state (Loader2 + ThemedText) when `store.isComplete` replacing children + navigation in `apps/clementine-app/src/domains/experience/runtime/containers/ExperienceRuntime.tsx`
 
 ### Dead Code Removal & Consumer Updates
 
-- [ ] T006 [P] [US1] Remove `isComplete` from `useRuntime()` destructure, remove `if (isComplete) return null` block (lines 59-63), remove stale completion comments in `apps/clementine-app/src/domains/guest/components/GuestRuntimeContent.tsx`
-- [ ] T007 [P] [US1] Remove `isComplete` from `useRuntime()` destructure, remove entire `if (isComplete)` checkmark block (lines 38-65), update completion comment in `apps/clementine-app/src/domains/experience/preview/components/PreviewRuntimeContent.tsx`
-- [ ] T008 [P] [US1] Update ExperienceRuntime props: replace `experienceId`/`experienceName` with `experience={experience}`, rename `onHomeClick` to `onClose={navigateToWelcome}` in `apps/clementine-app/src/domains/guest/containers/ExperiencePage.tsx`
-- [ ] T009 [P] [US1] Update ExperienceRuntime props: replace `experienceId`/`experienceName` with `experience={pregateExperience}`, rename `onHomeClick` to `onClose={navigateToWelcome}` in `apps/clementine-app/src/domains/guest/containers/PregatePage.tsx`
-- [ ] T010 [P] [US1] Update ExperienceRuntime props: replace `experienceId`/`experienceName` with `experience={preshareExperience}`, rename `onHomeClick` to `onClose={navigateToWelcome}` in `apps/clementine-app/src/domains/guest/containers/PresharePage.tsx`
-- [ ] T011 [P] [US1] Update ExperienceRuntime props: replace `experienceId`/`experienceName` with `experience={experience}`, rename `onHomeClick` to `onClose={undefined}` in `apps/clementine-app/src/domains/experience/preview/containers/ExperiencePreviewModal.tsx`
+- [X] T006 [P] [US1] Remove `isComplete` from `useRuntime()` destructure, remove `if (isComplete) return null` block (lines 59-63), remove stale completion comments in `apps/clementine-app/src/domains/guest/components/GuestRuntimeContent.tsx`
+- [X] T007 [P] [US1] Remove `isComplete` from `useRuntime()` destructure, remove entire `if (isComplete)` checkmark block (lines 38-65), update completion comment in `apps/clementine-app/src/domains/experience/preview/components/PreviewRuntimeContent.tsx`
+- [X] T008 [P] [US1] Update ExperienceRuntime props: replace `experienceId`/`experienceName` with `experience={experience}`, rename `onHomeClick` to `onClose={navigateToWelcome}` in `apps/clementine-app/src/domains/guest/containers/ExperiencePage.tsx`
+- [X] T009 [P] [US1] Update ExperienceRuntime props: replace `experienceId`/`experienceName` with `experience={pregateExperience}`, rename `onHomeClick` to `onClose={navigateToWelcome}` in `apps/clementine-app/src/domains/guest/containers/PregatePage.tsx`
+- [X] T010 [P] [US1] Update ExperienceRuntime props: replace `experienceId`/`experienceName` with `experience={preshareExperience}`, rename `onHomeClick` to `onClose={navigateToWelcome}` in `apps/clementine-app/src/domains/guest/containers/PresharePage.tsx`
+- [X] T011 [P] [US1] Update ExperienceRuntime props: replace `experienceId`/`experienceName` with `experience={experience}`, rename `onHomeClick` to `onClose={undefined}` in `apps/clementine-app/src/domains/experience/preview/containers/ExperiencePreviewModal.tsx`
 
 **Checkpoint**: All four consumers compile, completing state visible in all contexts, no blank screen.
 
@@ -58,8 +58,8 @@
 
 **Purpose**: Verify all changes compile, lint, and work correctly.
 
-- [ ] T012 Run `pnpm app:check` (format + lint) and `pnpm app:type-check` (TypeScript) from monorepo root — fix any issues
-- [ ] T013 Run quickstart.md manual testing: verify completing state in ExperiencePage, PreviewModal, PregatePage, PresharePage; verify TopBar X icon + no progress bar during completing; verify X button triggers confirmation dialog; verify back navigation works in non-completing states
+- [X] T012 Run `pnpm app:check` (format + lint) and `pnpm app:type-check` (TypeScript) from monorepo root — fix any issues
+- [X] T013 Run quickstart.md manual testing: verify completing state in ExperiencePage, PreviewModal, PregatePage, PresharePage; verify TopBar X icon + no progress bar during completing; verify X button triggers confirmation dialog; verify back navigation works in non-completing states
 
 ---
 

@@ -50,6 +50,7 @@ export interface RuntimeAPI {
   projectId: string
 
   // Read-only state
+  experienceName: string
   currentStep: ExperienceStep | null
   currentStepIndex: number
   totalSteps: number
@@ -224,6 +225,7 @@ export function useRuntime(): RuntimeAPI {
     projectId,
 
     // Read-only state
+    experienceName: store.experience?.name ?? 'Experience',
     currentStep: store.getCurrentStep(),
     currentStepIndex: store.currentStepIndex,
     totalSteps: store.steps.length,

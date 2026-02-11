@@ -2,30 +2,23 @@
  * RuntimeTopBar Component
  *
  * Top navigation bar displayed during experience execution.
- * Shows experience name, progress tracking, and home navigation button with confirmation.
+ * Reads all runtime state from the store via useRuntime().
+ * Only accepts onClose callback and className as props.
  *
  * @example
  * ```tsx
- * // Guest mode - home button active with confirmation
- * <RuntimeTopBar
- *   experienceName="Summer Festival 2024"
- *   currentStepIndex={2}
- *   totalSteps={5}
- *   onHomeClick={() => navigate('/home')}
- * />
+ * // Guest mode - close button active with confirmation
+ * <RuntimeTopBar onClose={() => navigate('/home')} />
  *
- * // Preview mode - home button disabled
- * <RuntimeTopBar
- *   experienceName="Preview Experience"
- *   currentStepIndex={0}
- *   totalSteps={3}
- *   onHomeClick={undefined}
- * />
+ * // Preview mode - close button disabled
+ * <RuntimeTopBar onClose={undefined} />
  * ```
  */
 
 import { useState } from 'react'
 import { ArrowLeft, Home, X } from 'lucide-react'
+
+import { useRuntime } from '../hooks/useRuntime'
 import {
   ThemedIconButton,
   ThemedProgressBar,
@@ -45,40 +38,11 @@ import {
 
 export interface RuntimeTopBarProps {
   /**
-   * Experience name to display in center
-   * Should be human-readable experience title
-   * Will truncate if too long (CSS: max-w-[200px] truncate)
-   */
-  experienceName: string
-
-  /**
-   * Current step index (0-based)
-   * Used for progress calculation
-   */
-  currentStepIndex: number
-
-  /**
-   * Total number of steps in experience
-   * Used for progress calculation
-   * Must be >= 1 (experiences with 0 steps should not render topbar)
-   */
-  totalSteps: number
-
-  /**
-   * Home navigation handler (called after confirmation)
+   * Exit handler (called after confirmation dialog)
    * - Guest mode: Function to navigate home
    * - Preview mode: undefined (button disabled/inactive)
    */
-  onHomeClick?: () => void
-
-  /** Handler for back navigation */
-  onBack?: () => void
-
-  /** Handler for closing the experience (first step or single-step) */
   onClose?: () => void
-
-  /** Whether back navigation is available */
-  canGoBack?: boolean
 
   /**
    * Additional CSS classes for topbar container
@@ -90,53 +54,50 @@ export interface RuntimeTopBarProps {
  * RuntimeTopBar - Experience execution topbar
  *
  * Displays experience name, progress bar showing step completion,
- * and home button for navigation with confirmation dialog.
+ * and back/close button with confirmation dialog.
+ *
+ * Reads all state from the runtime store via useRuntime():
+ * - experienceName, currentStepIndex, totalSteps, isComplete, canGoBack, back
  *
  * Progress calculation: ((currentStepIndex + 1) / totalSteps) * 100
- * - Add 1 to index because it's 0-based (step 0 = first step = 1/5 = 20%)
- *
- * Layout:
- * - Relative positioning (respects parent container width)
- * - Home button (left), experience name (center), progress bar (bottom)
- * - Touch target minimum 44px for mobile accessibility
- * - Confirmation dialog managed internally
  */
-export function RuntimeTopBar({
-  experienceName,
-  currentStepIndex,
-  totalSteps,
-  onHomeClick,
-  onBack,
-  onClose,
-  className,
-}: RuntimeTopBarProps) {
+export function RuntimeTopBar({ onClose, className }: RuntimeTopBarProps) {
+  const {
+    experienceName,
+    currentStepIndex,
+    totalSteps,
+    isComplete,
+    canGoBack,
+    back,
+  } = useRuntime()
+
   const [showDialog, setShowDialog] = useState(false)
 
-  const isCloseMode = totalSteps === 1 || currentStepIndex === 0
+  const isCloseMode = isComplete || totalSteps === 1 || currentStepIndex === 0
 
   // Calculate progress percentage
-  // Add 1 to currentStepIndex because it's 0-based (step 0 = first step)
   const progress =
     totalSteps > 0 ? ((currentStepIndex + 1) / totalSteps) * 100 : 0
 
   const handleGoBack = () => {
     if (isCloseMode) {
-      handleHomeButtonClick()
-      onClose?.()
-    } else {
-      onBack?.()
+      if (onClose) {
+        setShowDialog(true)
+      }
+    } else if (canGoBack) {
+      back()
     }
   }
 
   const handleHomeButtonClick = () => {
-    if (onHomeClick) {
+    if (onClose) {
       setShowDialog(true)
     }
   }
 
   const handleConfirmExit = () => {
     setShowDialog(false)
-    onHomeClick?.()
+    onClose?.()
   }
 
   return (
@@ -185,10 +146,10 @@ export function RuntimeTopBar({
               as="h3"
               className="max-w-[200px] truncate text-xl"
             >
-              {experienceName || 'Experience'}
+              {experienceName}
             </ThemedText>
 
-            {totalSteps > 1 && (
+            {totalSteps > 1 && !isComplete && (
               <ThemedProgressBar
                 className="w-full max-w-[200px]"
                 value={progress}
@@ -204,7 +165,7 @@ export function RuntimeTopBar({
             size="md"
             variant="outline"
             onClick={handleHomeButtonClick}
-            disabled={!onHomeClick}
+            disabled={!onClose}
             aria-label="Return to home"
             className="shrink-0"
           >

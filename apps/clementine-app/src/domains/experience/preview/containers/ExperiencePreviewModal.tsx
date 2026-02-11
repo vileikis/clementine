@@ -249,11 +249,10 @@ export function ExperiencePreviewModal({
         <ThemeProvider theme={previewTheme}>
           <ThemedBackground className="h-full">
             <ExperienceRuntime
-              experienceId={experience.id}
+              experience={experience}
               steps={steps}
               session={session}
-              experienceName={experience.name}
-              onHomeClick={undefined}
+              onClose={undefined}
               onComplete={handleComplete}
               onError={handleError}
             >

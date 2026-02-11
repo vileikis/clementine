@@ -9,9 +9,9 @@
  * Handles:
  * - Displaying current step via StepRendererRouter
  * - Response management via useRuntime hook
- * - Completion state (returns null - parent handles completion navigation)
  *
  * Note: Navigation (back/next buttons) is handled by ExperienceRuntime.
+ * Note: Completion state is handled by ExperienceRuntime (completing spinner).
  * Note: Does NOT include ThemedBackground - parent page owns the background.
  * Must be used within ThemeProvider, ThemedBackground, and ExperienceRuntime.
  *
@@ -41,11 +41,11 @@ import { ThemedText } from '@/shared/theming'
 /**
  * GuestRuntimeContent Component
  *
- * Renders the current step or returns null when complete.
+ * Renders the current step.
  * Uses runtime hook for response management.
  */
 export function GuestRuntimeContent() {
-  const { currentStep, setStepResponse, getResponse, isComplete } = useRuntime()
+  const { currentStep, setStepResponse, getResponse } = useRuntime()
 
   // Handle response change - writes to unified responses
   const handleResponseChange = useCallback(
@@ -55,12 +55,6 @@ export function GuestRuntimeContent() {
     },
     [currentStep, setStepResponse],
   )
-
-  // When complete, return null - parent handles navigation
-  // The onComplete callback in ExperienceRuntime will handle the transition
-  if (isComplete) {
-    return null
-  }
 
   // No current step (edge case - should not happen with proper step validation)
   if (!currentStep) {

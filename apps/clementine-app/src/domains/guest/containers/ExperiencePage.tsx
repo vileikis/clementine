@@ -332,11 +332,10 @@ export function ExperiencePage({
 
     return (
       <ExperienceRuntime
-        experienceId={experienceId}
+        experience={experience}
         steps={steps}
         session={session}
-        experienceName={experience?.name ?? 'Experience'}
-        onHomeClick={navigateToWelcome}
+        onClose={navigateToWelcome}
         onComplete={() => void handleExperienceComplete()}
         onError={handleRuntimeError}
       >

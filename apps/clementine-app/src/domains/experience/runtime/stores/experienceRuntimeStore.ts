@@ -15,7 +15,7 @@ import { create } from 'zustand'
 import { validateStepInput } from '../../steps/registry/step-validation'
 import type { Session } from '@/domains/session'
 import type { MediaReference, SessionResponse } from '@clementine/shared'
-import type { ExperienceStep } from '../../shared/schemas'
+import type { Experience, ExperienceStep } from '../../shared/schemas'
 
 /**
  * Experience runtime state
@@ -24,7 +24,7 @@ export interface ExperienceRuntimeState {
   // Identity
   sessionId: string | null
   projectId: string | null
-  experienceId: string | null
+  experience: Experience | null
 
   // Steps configuration
   steps: ExperienceStep[]
@@ -57,7 +57,7 @@ export interface ExperienceRuntimeActions {
   initFromSession: (
     session: Session,
     steps: ExperienceStep[],
-    experienceId: string,
+    experience: Experience,
   ) => void
 
   /**
@@ -144,7 +144,7 @@ export type ExperienceRuntimeStore = ExperienceRuntimeState &
 const initialState: ExperienceRuntimeState = {
   sessionId: null,
   projectId: null,
-  experienceId: null,
+  experience: null,
   steps: [],
   currentStepIndex: 0,
   isComplete: false,
@@ -160,12 +160,12 @@ const initialState: ExperienceRuntimeState = {
  *
  * @example
  * ```tsx
- * function RuntimeComponent({ session, steps, experienceId }) {
+ * function RuntimeComponent({ session, steps, experience }) {
  *   const store = useExperienceRuntimeStore()
  *
  *   // Initialize on mount
  *   useEffect(() => {
- *     store.initFromSession(session, steps, experienceId)
+ *     store.initFromSession(session, steps, experience)
  *   }, [session.id])
  *
  *   // Use store state
@@ -186,7 +186,7 @@ export const useExperienceRuntimeStore = create<ExperienceRuntimeStore>(
   (set, get) => ({
     ...initialState,
 
-    initFromSession: (session, steps, experienceId) => {
+    initFromSession: (session, steps, experience) => {
       // Derive starting step from responses
       const existingResponses = session.responses ?? []
       const respondedStepIds = new Set(existingResponses.map((r) => r.stepId))
@@ -200,7 +200,7 @@ export const useExperienceRuntimeStore = create<ExperienceRuntimeStore>(
       set({
         sessionId: session.id,
         projectId: session.projectId,
-        experienceId,
+        experience,
         steps,
         currentStepIndex: startingIndex,
         isComplete: session.status === 'completed',
