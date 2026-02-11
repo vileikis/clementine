@@ -123,7 +123,6 @@ Card: **Dropbox**
 - Connected Dropbox: `user@example.com`
 - Toggle: **Export to Dropbox** (ON)
 - Info: "Exporting to `/Apps/Clementine/<ProjectName>/<ExperienceName>/`"
-- Last export status: "Success" / "Failed: [reason]" (from job document)
 - Link: **Disconnect** — "This will disconnect Dropbox for all projects in this workspace."
 
 ### Failure states
@@ -214,7 +213,7 @@ The `resultMedia` payload follows the existing `MediaReference` schema (`mediaAs
 5. Compute destination path: `/<ProjectName>/<ExperienceName>/<filename>`
 6. Ensure folders exist (create if missing via Dropbox API)
 7. Upload file to Dropbox App Folder (simple single-request upload)
-8. Record export status on the job document (`exportStatus`, `exportError`)
+8. Write export log to `projects/{id}/exportLogs/{logId}`
 
 ### Duplicate handling
 
@@ -258,12 +257,19 @@ exports: {
 }
 ```
 
-### Job-level export status (Firestore: `projects/{id}/jobs/{jobId}`)
+### Export logs (Firestore: `projects/{id}/exportLogs/{logId}`)
+
+Written by export workers. No UI in v1 — used for debugging via Firebase console and as foundation for future logs UI.
 
 ```
-exportStatus: "pending" | "success" | "failed" | null,
-exportError: string | null,
-exportedAt: timestamp | null,
+{
+  jobId: string,
+  provider: "dropbox",
+  status: "success" | "failed",
+  destinationPath: string | null,    // e.g. "/ProjectName/ExperienceName/file.jpg"
+  error: string | null,
+  createdAt: timestamp,
+}
 ```
 
 ---
@@ -288,7 +294,7 @@ Dedicated workspace-level page for managing all integrations (Dropbox, Google Dr
 
 ### Export logs UI
 
-Full export log subcollection (`projects/{id}/exportLogs/{logId}`) with a "View logs" UI showing export history per project — timestamps, success/failure, Dropbox paths, error details. For v1, just the last export status on the job document.
+"View logs" UI on the Project Connect tab showing export history — timestamps, success/failure, Dropbox paths, error details. The `exportLogs` subcollection is written in v1; this adds the frontend to browse it.
 
 ### Send test file
 
