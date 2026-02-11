@@ -234,6 +234,7 @@ export function ExperiencePreviewModal({
           <ThemedBackground className="h-full">
             <JobStatusDisplay
               jobStatus={session.jobStatus}
+              resultMediaUrl={session.resultMedia?.url}
               onClose={handleClose}
             />
           </ThemedBackground>

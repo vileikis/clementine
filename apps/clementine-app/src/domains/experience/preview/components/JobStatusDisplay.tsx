@@ -6,7 +6,8 @@
  *
  * States:
  * - pending/running: Spinner with status message
- * - completed: Success icon with completion message
+ * - completed: Result media image + success message
+ * - completed (no media yet): Success icon while media URL resolves
  * - failed/cancelled: Error icon with error message
  */
 import { CheckCircle, Loader2, XCircle } from 'lucide-react'
@@ -16,6 +17,8 @@ import { Button } from '@/ui-kit/ui/button'
 interface JobStatusDisplayProps {
   /** Current job status from session.jobStatus */
   jobStatus: JobStatus | null
+  /** Result media URL (available when job completes) */
+  resultMediaUrl?: string | null
   /** Optional callback when user clicks close/done button */
   onClose?: () => void
 }
@@ -29,18 +32,20 @@ const STATUS_MESSAGES: Record<JobStatus, string> = {
 }
 
 /**
- * Displays job status with icons and messages
+ * Displays job status with icons, messages, and result media
  *
  * @example
  * ```tsx
  * <JobStatusDisplay
  *   jobStatus={session.jobStatus}
+ *   resultMediaUrl={session.resultMedia?.url}
  *   onClose={handleClose}
  * />
  * ```
  */
 export function JobStatusDisplay({
   jobStatus,
+  resultMediaUrl,
   onClose,
 }: JobStatusDisplayProps) {
   const isInProgress = jobStatus === 'pending' || jobStatus === 'running'
@@ -48,7 +53,7 @@ export function JobStatusDisplay({
   const isFailed = jobStatus === 'failed' || jobStatus === 'cancelled'
 
   return (
-    <div className="flex h-full items-center justify-center">
+    <div className="flex h-full items-center justify-center p-6">
       <div className="flex flex-col items-center gap-4 text-center">
         {isInProgress && (
           <>
@@ -64,7 +69,15 @@ export function JobStatusDisplay({
 
         {isCompleted && (
           <>
-            <CheckCircle className="h-12 w-12 text-green-500" />
+            {resultMediaUrl ? (
+              <img
+                src={resultMediaUrl}
+                alt="Transform result"
+                className="max-h-80 w-auto rounded-lg object-contain shadow-md"
+              />
+            ) : (
+              <CheckCircle className="h-12 w-12 text-green-500" />
+            )}
             <p className="text-lg font-medium">{STATUS_MESSAGES.completed}</p>
             {onClose && <Button onClick={onClose}>Close Preview</Button>}
           </>
