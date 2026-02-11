@@ -10,6 +10,7 @@
  * - completed (no media yet): Success icon while media URL resolves
  * - failed/cancelled: Error icon with error message
  */
+import { useState } from 'react'
 import { CheckCircle, Loader2, XCircle } from 'lucide-react'
 import type { JobStatus } from '@clementine/shared'
 import { Button } from '@/ui-kit/ui/button'
@@ -48,6 +49,7 @@ export function JobStatusDisplay({
   resultMediaUrl,
   onClose,
 }: JobStatusDisplayProps) {
+  const [imageError, setImageError] = useState(false)
   const isInProgress = jobStatus === 'pending' || jobStatus === 'running'
   const isCompleted = jobStatus === 'completed'
   const isFailed = jobStatus === 'failed' || jobStatus === 'cancelled'
@@ -69,11 +71,12 @@ export function JobStatusDisplay({
 
         {isCompleted && (
           <>
-            {resultMediaUrl ? (
+            {resultMediaUrl && !imageError ? (
               <img
                 src={resultMediaUrl}
                 alt="Transform result"
                 className="max-h-80 w-auto rounded-lg object-contain shadow-md"
+                onError={() => setImageError(true)}
               />
             ) : (
               <CheckCircle className="h-12 w-12 text-green-500" />

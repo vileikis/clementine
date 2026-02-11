@@ -86,6 +86,8 @@ export function ExperienceRuntime({
   // Refs for tracking state changes
   const prevStepIndexRef = useRef<number>(0)
   const syncDoneRef = useRef(session.status === 'completed')
+  // True when the session was already completed at mount — skip completing UI
+  const mountedAlreadyCompleteRef = useRef(session.status === 'completed')
 
   // Initialize store synchronously before paint using useLayoutEffect
   // This ensures useRuntime() works in children during initial render
@@ -94,6 +96,7 @@ export function ExperienceRuntime({
       store.initFromSession(session, steps, experience)
       prevStepIndexRef.current = 0
       syncDoneRef.current = session.status === 'completed'
+      mountedAlreadyCompleteRef.current = session.status === 'completed'
     }
   }, [
     session.id,
@@ -221,8 +224,9 @@ export function ExperienceRuntime({
     return <ThemedLoading />
   }
 
-  // Check if experience is completing (async completion in progress)
-  const isCompleting = store.isComplete
+  // Check if experience is completing (async completion in progress).
+  // Skip when session was already completed at mount — no async work to wait for.
+  const isCompleting = store.isComplete && !mountedAlreadyCompleteRef.current
 
   // Check if current step manages its own navigation and layout
   const currentStep = store.steps[store.currentStepIndex]
