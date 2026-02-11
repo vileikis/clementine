@@ -21,3 +21,6 @@ export type { ThemedProgressBarProps } from './ThemedProgressBar'
 
 export { ThemedLoading } from './ThemedLoading'
 export type { ThemedLoadingProps } from './ThemedLoading'
+
+export { ThemedError } from './ThemedError'
+export type { ThemedErrorProps } from './ThemedError'

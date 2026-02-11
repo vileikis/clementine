@@ -44,6 +44,9 @@ export interface ExperienceRuntimeState {
   // Sync status
   isSyncing: boolean
   lastSyncedAt: number | null
+
+  // Completion error (shown instead of infinite spinner on failure)
+  completionError: string | null
 }
 
 /**
@@ -130,6 +133,11 @@ export interface ExperienceRuntimeActions {
   markSynced: () => void
 
   /**
+   * Set completion error message (null to clear)
+   */
+  setCompletionError: (error: string | null) => void
+
+  /**
    * Reset the store
    */
   reset: () => void
@@ -153,6 +161,7 @@ const initialState: ExperienceRuntimeState = {
   isReady: false,
   isSyncing: false,
   lastSyncedAt: null,
+  completionError: null,
 }
 
 /**
@@ -209,6 +218,7 @@ export const useExperienceRuntimeStore = create<ExperienceRuntimeStore>(
         isReady: true,
         isSyncing: false,
         lastSyncedAt: null,
+        completionError: null,
       })
     },
 
@@ -326,6 +336,10 @@ export const useExperienceRuntimeStore = create<ExperienceRuntimeStore>(
 
     markSynced: () => {
       set({ isSyncing: false, lastSyncedAt: Date.now() })
+    },
+
+    setCompletionError: (error) => {
+      set({ completionError: error })
     },
 
     reset: () => {

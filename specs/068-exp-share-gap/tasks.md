@@ -71,21 +71,21 @@
 
 ### Store & Hook (foundation)
 
-- [ ] T014 [P] [US2] Add `completionError: string | null` to `ExperienceRuntimeState` (initial: `null`), add `setCompletionError: (error: string | null) => void` to `ExperienceRuntimeActions`, clear in `initFromSession` and `reset()` in `apps/clementine-app/src/domains/experience/runtime/stores/experienceRuntimeStore.ts`
-- [ ] T015 [P] [US2] Add `completionError: string | null` to `RuntimeAPI` interface, derive from `store.completionError` in `apps/clementine-app/src/domains/experience/runtime/hooks/useRuntime.ts`
+- [X] T014 [P] [US2] Add `completionError: string | null` to `ExperienceRuntimeState` (initial: `null`), add `setCompletionError: (error: string | null) => void` to `ExperienceRuntimeActions`, clear in `initFromSession` and `reset()` in `apps/clementine-app/src/domains/experience/runtime/stores/experienceRuntimeStore.ts`
+- [X] T015 [P] [US2] Add `completionError: string | null` to `RuntimeAPI` interface, derive from `store.completionError` in `apps/clementine-app/src/domains/experience/runtime/hooks/useRuntime.ts`
 
 ### ExperienceRuntime (core change)
 
-- [ ] T016 [US2] Update ExperienceRuntime completion flow and render: (1) change `onComplete` prop type to `() => void | Promise<void>`, (2) extract `runCompletion` into a stable callback callable from both the completion effect and a retry handler, (3) in `runCompletion`: clear `completionError` at start, catch errors at each step (sync, completeSession, `await onComplete?.()`) and call `store.setCompletionError(error.message)` on failure, (4) add retry handler that calls `runCompletion`, (5) render four-way: `isComplete && completionError` → error state (ThemedText heading "Something went wrong" + ThemedText body with error message + ThemedButton "Try Again"), `isComplete` → ThemedLoading spinner, else existing layout in `apps/clementine-app/src/domains/experience/runtime/containers/ExperienceRuntime.tsx`
+- [X] T016 [US2] Update ExperienceRuntime completion flow and render: (1) change `onComplete` prop type to `() => void | Promise<void>`, (2) extract `runCompletion` into a stable callback callable from both the completion effect and a retry handler, (3) in `runCompletion`: clear `completionError` at start, catch errors at each step (sync, completeSession, `await onComplete?.()`) and call `store.setCompletionError(error.message)` on failure, (4) add retry handler that calls `runCompletion`, (5) render four-way: `isComplete && completionError` → error state (ThemedText heading "Something went wrong" + ThemedText body with error message + ThemedButton "Try Again"), `isComplete` → ThemedLoading spinner, else existing layout in `apps/clementine-app/src/domains/experience/runtime/containers/ExperienceRuntime.tsx`
 
 ### Consumer updates (propagate errors)
 
-- [ ] T017 [P] [US2] Update `handleExperienceComplete` in ExperiencePage: remove toast on transform failure, throw `new Error('Failed to start processing. Please try again.')` when `startTransformPipeline` returns false; change `onComplete` prop from `() => void handleExperienceComplete()` to `handleExperienceComplete` (remove void wrapper so runtime can await) in `apps/clementine-app/src/domains/guest/containers/ExperiencePage.tsx`
-- [ ] T018 [P] [US2] Update `handleComplete` in ExperiencePreviewModal: remove toast on transform failure, throw `new Error('Failed to start processing. Please try again.')` when `startTransformPipeline` returns false; remove `setShowJobStatus(true)` before pipeline call (move after success, before navigation/status switch) in `apps/clementine-app/src/domains/experience/preview/containers/ExperiencePreviewModal.tsx`
+- [X] T017 [P] [US2] Update `handleExperienceComplete` in ExperiencePage: remove toast on transform failure, throw `new Error('Failed to start processing. Please try again.')` when `startTransformPipeline` returns false; change `onComplete` prop from `() => void handleExperienceComplete()` to `handleExperienceComplete` (remove void wrapper so runtime can await) in `apps/clementine-app/src/domains/guest/containers/ExperiencePage.tsx`
+- [X] T018 [P] [US2] Update `handleComplete` in ExperiencePreviewModal: remove toast on transform failure, throw `new Error('Failed to start processing. Please try again.')` when `startTransformPipeline` returns false; remove `setShowJobStatus(true)` before pipeline call (move after success, before navigation/status switch) in `apps/clementine-app/src/domains/experience/preview/containers/ExperiencePreviewModal.tsx`
 
 ### Validation
 
-- [ ] T019 Run `pnpm app:check` and `pnpm app:type-check` from monorepo root — fix any issues
+- [X] T019 Run `pnpm app:check` and `pnpm app:type-check` from monorepo root — fix any issues
 - [ ] T020 Manual testing: (1) simulate transform pipeline error → verify error state with message + retry button appears, (2) click retry → verify re-attempt, (3) verify close (X) still works during error state, (4) verify happy path (no error) still navigates correctly, (5) test in both ExperiencePage (guest) and PreviewModal (admin)
 
 ---

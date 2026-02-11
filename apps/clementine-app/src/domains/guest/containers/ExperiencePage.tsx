@@ -22,8 +22,6 @@
  */
 import { useEffect, useRef } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import { toast } from 'sonner'
-
 import { useGuestContext } from '../contexts'
 import {
   GuestRuntimeContent,
@@ -227,18 +225,12 @@ export function ExperiencePage({
       // Continue - guest shouldn't be stuck
     }
 
-    // 2. Trigger transform pipeline if outcome is configured (await to ensure job created)
+    // 2. Trigger transform pipeline if outcome is configured (throws on failure)
     if (experience && hasOutcome(experience, 'published')) {
-      const success = await startTransformPipeline({
+      await startTransformPipeline({
         projectId: project.id,
         sessionId,
       })
-      if (!success) {
-        toast.error('Failed to start processing', {
-          description: 'Please try again.',
-        })
-        return
-      }
     }
 
     // 3. Navigate to preshare or share
@@ -336,7 +328,7 @@ export function ExperiencePage({
         steps={steps}
         session={session}
         onClose={navigateToWelcome}
-        onComplete={() => void handleExperienceComplete()}
+        onComplete={handleExperienceComplete}
         onError={handleRuntimeError}
       >
         <GuestRuntimeContent />

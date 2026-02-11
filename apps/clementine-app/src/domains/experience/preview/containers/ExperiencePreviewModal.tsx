@@ -174,17 +174,13 @@ export function ExperiencePreviewModal({
     // Transform configured - trigger pipeline and show job status
     if (!sessionId || !ghostProjectId) return
 
-    setShowJobStatus(true)
-
-    const success = await startTransformPipeline({
+    // Throws on failure — runtime catches and shows error state
+    await startTransformPipeline({
       projectId: ghostProjectId,
       sessionId,
     })
-    if (!success) {
-      toast.error('Failed to start processing', {
-        description: 'Please try again.',
-      })
-    }
+
+    setShowJobStatus(true)
   }, [experience, sessionId, ghostProjectId, startTransformPipeline])
 
   // Handle runtime errors

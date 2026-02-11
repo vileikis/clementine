@@ -36,22 +36,14 @@ interface StartTransformResponse {
  * ```
  */
 export function useStartTransformPipeline() {
-  return useCallback(async (params: StartTransformParams): Promise<boolean> => {
+  return useCallback(async (params: StartTransformParams): Promise<void> => {
     const startTransform = httpsCallable<
       StartTransformParams,
       StartTransformResponse
     >(functions, 'startTransformPipelineV2')
 
     try {
-      // TESTING: INSERT_YOUR_CODE
-      // await new Promise((_, reject) =>
-      //   setTimeout(
-      //     () => reject(new Error('Artificial transform pipeline error')),
-      //     3000,
-      //   ),
-      // )
       await startTransform(params)
-      return true
     } catch (error) {
       console.error('Failed to trigger transform pipeline:', error)
       Sentry.captureException(error, {
@@ -64,7 +56,7 @@ export function useStartTransformPipeline() {
           sessionId: params.sessionId,
         },
       })
-      return false
+      throw error
     }
   }, [])
 }

@@ -35,6 +35,7 @@ export {
   ThemedIconButton,
   ThemedProgressBar,
   ThemedLoading,
+  ThemedError,
   // Inputs
   ThemedInput,
   ThemedTextarea,
@@ -54,6 +55,7 @@ export type {
   IconButtonVariant,
   ThemedProgressBarProps,
   ThemedLoadingProps,
+  ThemedErrorProps,
   // Input types
   ThemedInputProps,
   ThemedTextareaProps,

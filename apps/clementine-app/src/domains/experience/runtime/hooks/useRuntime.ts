@@ -57,6 +57,7 @@ export interface RuntimeAPI {
   canProceed: boolean
   canGoBack: boolean
   isComplete: boolean
+  completionError: string | null
   isSyncing: boolean
 
   // Navigation actions
@@ -232,6 +233,7 @@ export function useRuntime(): RuntimeAPI {
     canProceed: store.canProceed(),
     canGoBack: store.canGoBack(),
     isComplete: store.isComplete,
+    completionError: store.completionError,
     isSyncing: store.isSyncing,
 
     // Navigation actions
