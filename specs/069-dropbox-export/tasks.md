@@ -26,8 +26,8 @@
 
 **Purpose**: Environment configuration and Dropbox app registration
 
-- [ ] T001 Register Dropbox app in Dropbox Developer Console with App Folder access type and configure redirect URIs per `specs/069-dropbox-export/quickstart.md`
-- [ ] T002 Add Dropbox environment variables (`VITE_DROPBOX_APP_KEY`, `DROPBOX_APP_SECRET`, `DROPBOX_TOKEN_ENCRYPTION_KEY`) to `apps/clementine-app/.env` and `functions/.env` per quickstart.md
+- [x] T001 Register Dropbox app in Dropbox Developer Console with App Folder access type and configure redirect URIs per `specs/069-dropbox-export/quickstart.md`
+- [x] T002 Add Dropbox environment variables (`VITE_DROPBOX_APP_KEY`, `DROPBOX_APP_SECRET`, `DROPBOX_TOKEN_ENCRYPTION_KEY`) to `apps/clementine-app/.env` and `functions/.env` per quickstart.md
 
 ---
 
@@ -37,16 +37,16 @@
 
 **CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T003 [P] Create workspace integration schema (dropboxIntegrationStatusSchema, dropboxIntegrationSchema, workspaceIntegrationsSchema) in `packages/shared/src/schemas/workspace/workspace-integration.schema.ts` per data-model.md
-- [ ] T004 [P] Create project export config schema (dropboxExportConfigSchema, projectExportsSchema) in `packages/shared/src/schemas/project/project-exports.schema.ts` per data-model.md
-- [ ] T005 [P] Create export log schema (exportLogSchema) in `packages/shared/src/schemas/export/export-log.schema.ts` per data-model.md
-- [ ] T006 [P] Create Cloud Task payload schemas (dispatchExportsPayloadSchema, dropboxExportPayloadSchema) in `functions/src/schemas/export.schema.ts` per data-model.md
-- [ ] T007 Re-export new schemas from barrel files: `packages/shared/src/schemas/workspace/index.ts`, `packages/shared/src/schemas/project/index.ts`, new `packages/shared/src/schemas/export/index.ts`, and `packages/shared/src/schemas/index.ts`
-- [ ] T008 [P] Create encryption service with encrypt/decrypt functions (AES-256-GCM, key from env var `DROPBOX_TOKEN_ENCRYPTION_KEY`) in `functions/src/services/export/encryption.service.ts` per research.md R2
-- [ ] T009 [P] Create workspace repository with fetchWorkspaceIntegration, updateWorkspaceIntegration functions in `functions/src/repositories/workspace.ts` — reads/writes `integrations.dropbox` field on workspace document
-- [ ] T010 [P] Create export log repository with createExportLog function in `functions/src/repositories/export-log.ts` — writes to `projects/{projectId}/exportLogs/{logId}` subcollection
-- [ ] T011 Add exportLogs subcollection security rules (admin read, server-only write) to `firebase/firestore.rules` under the existing `projects/{projectId}` match block per data-model.md
-- [ ] T012 Create barrel export for export services in `functions/src/services/export/index.ts`
+- [x] T003 [P] Create workspace integration schema (dropboxIntegrationStatusSchema, dropboxIntegrationSchema, workspaceIntegrationsSchema) in `packages/shared/src/schemas/workspace/workspace-integration.schema.ts` per data-model.md
+- [x] T004 [P] Create project export config schema (dropboxExportConfigSchema, projectExportsSchema) in `packages/shared/src/schemas/project/project-exports.schema.ts` per data-model.md
+- [x] T005 [P] Create export log schema (exportLogSchema) in `packages/shared/src/schemas/export/export-log.schema.ts` per data-model.md
+- [x] T006 [P] Create Cloud Task payload schemas (dispatchExportsPayloadSchema, dropboxExportPayloadSchema) in `functions/src/schemas/export.schema.ts` per data-model.md
+- [x] T007 Re-export new schemas from barrel files: `packages/shared/src/schemas/workspace/index.ts`, `packages/shared/src/schemas/project/index.ts`, new `packages/shared/src/schemas/export/index.ts`, and `packages/shared/src/schemas/index.ts`
+- [x] T008 [P] Create encryption service with encrypt/decrypt functions (AES-256-GCM, key from env var `DROPBOX_TOKEN_ENCRYPTION_KEY`) in `functions/src/services/export/encryption.service.ts` per research.md R2
+- [x] T009 [P] Create workspace repository with fetchWorkspaceIntegration, updateWorkspaceIntegration functions in `functions/src/repositories/workspace.ts` — reads/writes `integrations.dropbox` field on workspace document
+- [x] T010 [P] Create export log repository with createExportLog function in `functions/src/repositories/export-log.ts` — writes to `projects/{projectId}/exportLogs/{logId}` subcollection
+- [x] T011 Add exportLogs subcollection security rules (admin read, server-only write) to `firebase/firestore.rules` under the existing `projects/{projectId}` match block per data-model.md
+- [x] T012 Create barrel export for export services in `functions/src/services/export/index.ts`
 
 **Checkpoint**: Foundation ready — all schemas, repositories, encryption, and security rules in place
 
@@ -60,14 +60,14 @@
 
 ### Implementation for User Story 1
 
-- [ ] T013 [P] [US1] Create `initiateDropboxOAuthFn` server function in `apps/clementine-app/src/domains/project/connect/server/functions.ts` — generates PKCE challenge, stores code verifier + context in session, returns Dropbox authorization URL per contract SF-001
-- [ ] T014 [P] [US1] Create `handleDropboxCallbackFn` as a server-side route loader in `apps/clementine-app/src/app/workspace/$workspaceSlug.integrations.dropbox.callback.tsx` — validates state, exchanges code for tokens via Dropbox API, encrypts refresh token, writes integration to workspace doc via Firebase Admin SDK, redirects to Connect tab per contract SF-002
-- [ ] T015 [US1] Extend session types to include Dropbox OAuth PKCE fields (codeVerifier, state, dropboxOAuthContext with workspaceId/projectId/workspaceSlug) in `apps/clementine-app/src/domains/auth/types/session.types.ts`
-- [ ] T016 [P] [US1] Create `useDropboxConnection` hook in `apps/clementine-app/src/domains/project/connect/hooks/useDropboxConnection.ts` — reads workspace `integrations.dropbox` field from Firestore in real-time via onSnapshot, returns connection status and account info
-- [ ] T017 [US1] Create `DropboxCard` component in `apps/clementine-app/src/domains/project/connect/components/DropboxCard.tsx` — renders "not connected" state with "Connect Dropbox" button (calls initiateDropboxOAuthFn then redirects) and "connected" state showing email and status per spec UX states A and B
-- [ ] T018 [US1] Update `ConnectPage` container in `apps/clementine-app/src/domains/project/connect/containers/ConnectPage.tsx` — replace WipPlaceholder with centered layout rendering DropboxCard, pass workspace and project context from route params
-- [ ] T019 [US1] Create barrel exports for hooks in `apps/clementine-app/src/domains/project/connect/hooks/index.ts`, components in `apps/clementine-app/src/domains/project/connect/components/index.ts`, server functions in `apps/clementine-app/src/domains/project/connect/server/index.ts`
-- [ ] T020 [US1] Update domain barrel export in `apps/clementine-app/src/domains/project/connect/index.ts` to re-export new modules
+- [x] T013 [P] [US1] Create `initiateDropboxOAuthFn` server function in `apps/clementine-app/src/domains/project/connect/server/functions.ts` — generates PKCE challenge, stores code verifier + context in session, returns Dropbox authorization URL per contract SF-001
+- [x] T014 [P] [US1] Create `handleDropboxCallbackFn` as a server-side route loader in `apps/clementine-app/src/app/workspace/$workspaceSlug.integrations.dropbox.callback.tsx` — validates state, exchanges code for tokens via Dropbox API, encrypts refresh token, writes integration to workspace doc via Firebase Admin SDK, redirects to Connect tab per contract SF-002
+- [x] T015 [US1] Extend session types to include Dropbox OAuth PKCE fields (codeVerifier, state, dropboxOAuthContext with workspaceId/projectId/workspaceSlug) in `apps/clementine-app/src/domains/auth/types/session.types.ts`
+- [x] T016 [P] [US1] Create `useDropboxConnection` hook in `apps/clementine-app/src/domains/project/connect/hooks/useDropboxConnection.ts` — reads workspace `integrations.dropbox` field from Firestore in real-time via onSnapshot, returns connection status and account info
+- [x] T017 [US1] Create `DropboxCard` component in `apps/clementine-app/src/domains/project/connect/components/DropboxCard.tsx` — renders "not connected" state with "Connect Dropbox" button (calls initiateDropboxOAuthFn then redirects) and "connected" state showing email and status per spec UX states A and B
+- [x] T018 [US1] Update `ConnectPage` container in `apps/clementine-app/src/domains/project/connect/containers/ConnectPage.tsx` — replace WipPlaceholder with centered layout rendering DropboxCard, pass workspace and project context from route params
+- [x] T019 [US1] Create barrel exports for hooks in `apps/clementine-app/src/domains/project/connect/hooks/index.ts`, components in `apps/clementine-app/src/domains/project/connect/components/index.ts`, server functions in `apps/clementine-app/src/domains/project/connect/server/index.ts`
+- [x] T020 [US1] Update domain barrel export in `apps/clementine-app/src/domains/project/connect/index.ts` to re-export new modules
 
 **Checkpoint**: User Story 1 complete — Dropbox can be connected from the Connect tab. Verify OAuth flow works end-to-end and connected state displays.
 
@@ -81,10 +81,10 @@
 
 ### Implementation for User Story 2
 
-- [ ] T021 [P] [US2] Create `useToggleDropboxExport` mutation hook in `apps/clementine-app/src/domains/project/connect/hooks/useToggleDropboxExport.ts` — uses `useMutation` with client-side Firestore SDK (`updateDoc`) to write `exports.dropbox` fields (enabled, enabledBy, enabledAt) to project document, with `serverTimestamp()` for audit fields. Security enforced by Firestore rules (admin-only write). Follows existing mutation hook patterns (see `useCreateProject`, `useDeleteProject`).
-- [ ] T022 [P] [US2] Create `useDropboxExport` hook in `apps/clementine-app/src/domains/project/connect/hooks/useDropboxExport.ts` — reads project `exports.dropbox` field from project document (already available via existing useProject hook), provides toggle callback using `useToggleDropboxExport` mutation hook
-- [ ] T023 [US2] Update `DropboxCard` component in `apps/clementine-app/src/domains/project/connect/components/DropboxCard.tsx` — add export toggle switch (only visible when connected), display destination path `/Apps/Clementine/<ProjectName>/<ExperienceName>/` when enabled, implement UX states B (connected, export off) and C (connected, export on) per spec
-- [ ] T024 [US2] Update barrel exports in `apps/clementine-app/src/domains/project/connect/hooks/index.ts` to include useDropboxExport and useToggleDropboxExport
+- [x] T021 [P] [US2] Create `useToggleDropboxExport` mutation hook in `apps/clementine-app/src/domains/project/connect/hooks/useToggleDropboxExport.ts` — uses `useMutation` with client-side Firestore SDK (`updateDoc`) to write `exports.dropbox` fields (enabled, enabledBy, enabledAt) to project document, with `serverTimestamp()` for audit fields. Security enforced by Firestore rules (admin-only write). Follows existing mutation hook patterns (see `useCreateProject`, `useDeleteProject`).
+- [x] T022 [P] [US2] Create `useDropboxExport` hook in `apps/clementine-app/src/domains/project/connect/hooks/useDropboxExport.ts` — reads project `exports.dropbox` field from project document (already available via existing useProject hook), provides toggle callback using `useToggleDropboxExport` mutation hook
+- [x] T023 [US2] Update `DropboxCard` component in `apps/clementine-app/src/domains/project/connect/components/DropboxCard.tsx` — add export toggle switch (only visible when connected), display destination path `/Apps/Clementine/<ProjectName>/<ExperienceName>/` when enabled, implement UX states B (connected, export off) and C (connected, export on) per spec
+- [x] T024 [US2] Update barrel exports in `apps/clementine-app/src/domains/project/connect/hooks/index.ts` to include useDropboxExport and useToggleDropboxExport
 
 **Checkpoint**: User Story 2 complete — Export toggle works per project. Verify toggle persists and displays correct path.
 
