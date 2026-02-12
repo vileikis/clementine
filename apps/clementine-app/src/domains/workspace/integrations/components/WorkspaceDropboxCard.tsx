@@ -23,7 +23,7 @@ import { Badge } from '@/ui-kit/ui/badge'
 import {
   disconnectDropboxFn,
   initiateDropboxOAuthFn,
-} from '@/domains/project/connect/server/functions'
+} from '@/domains/workspace/integrations/server'
 
 interface WorkspaceDropboxCardProps {
   workspaceId: string
