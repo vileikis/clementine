@@ -10,9 +10,11 @@ const route = getRouteApi(
 
 export function ConnectPage() {
   const { workspaceSlug, projectId } = route.useParams()
-  const { data: project } = useProject(projectId)
-  const { data: workspace, isLoading } = useWorkspace(workspaceSlug)
+  const { data: project, isLoading: isProjectLoading } = useProject(projectId)
+  const { data: workspace, isLoading: isWorkspaceLoading } =
+    useWorkspace(workspaceSlug)
 
+  const isLoading = isProjectLoading || isWorkspaceLoading
   const integration = workspace?.integrations?.dropbox ?? null
   const { isEnabled, toggle, isToggling } = useDropboxExport(project)
 

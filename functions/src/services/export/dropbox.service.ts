@@ -42,16 +42,29 @@ export async function refreshAccessToken(
   appKey: string,
   appSecret: string,
 ): Promise<string> {
-  const response = await fetch('https://api.dropboxapi.com/oauth2/token', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
-      grant_type: 'refresh_token',
-      refresh_token: refreshToken,
-      client_id: appKey,
-      client_secret: appSecret,
-    }),
-  })
+  const tokenController = new AbortController()
+  const tokenTimeout = setTimeout(() => tokenController.abort(), 30_000)
+  let response: Response
+  try {
+    response = await fetch('https://api.dropboxapi.com/oauth2/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        grant_type: 'refresh_token',
+        refresh_token: refreshToken,
+        client_id: appKey,
+        client_secret: appSecret,
+      }),
+      signal: tokenController.signal,
+    })
+  } catch (error) {
+    clearTimeout(tokenTimeout)
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      throw new Error('Dropbox token refresh timed out after 30s')
+    }
+    throw error
+  }
+  clearTimeout(tokenTimeout)
 
   if (!response.ok) {
     const errorBody = await response.text()
@@ -86,20 +99,33 @@ export async function uploadFile(
   path: string,
   content: Buffer,
 ): Promise<void> {
-  const response = await fetch('https://content.dropboxapi.com/2/files/upload', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/octet-stream',
-      'Dropbox-API-Arg': JSON.stringify({
-        path,
-        mode: 'overwrite',
-        autorename: false,
-        mute: true,
-      }),
-    },
-    body: content,
-  })
+  const uploadController = new AbortController()
+  const uploadTimeout = setTimeout(() => uploadController.abort(), 120_000)
+  let response: Response
+  try {
+    response = await fetch('https://content.dropboxapi.com/2/files/upload', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/octet-stream',
+        'Dropbox-API-Arg': JSON.stringify({
+          path,
+          mode: 'overwrite',
+          autorename: false,
+          mute: true,
+        }),
+      },
+      body: content,
+      signal: uploadController.signal,
+    })
+  } catch (error) {
+    clearTimeout(uploadTimeout)
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      throw new Error('Dropbox file upload timed out after 120s')
+    }
+    throw error
+  }
+  clearTimeout(uploadTimeout)
 
   if (!response.ok) {
     const errorBody = await response.text()

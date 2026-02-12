@@ -70,10 +70,13 @@ export const handleDropboxCallbackFn = createServerFn({ method: 'GET' })
             throw new Error('Dropbox app credentials not configured')
           }
 
-          const baseUrl =
-            process.env.NODE_ENV === 'production'
-              ? `https://${process.env['VITE_APP_DOMAIN'] || 'localhost:3000'}`
-              : 'http://localhost:3000'
+          const appDomain = process.env['VITE_APP_DOMAIN']
+          if (process.env.NODE_ENV === 'production' && !appDomain) {
+            throw new Error('VITE_APP_DOMAIN must be configured in production')
+          }
+          const baseUrl = appDomain
+            ? `https://${appDomain}`
+            : 'http://localhost:3000'
 
           const redirectUri = `${baseUrl}/workspace/${workspaceSlug}/integrations/dropbox/callback`
 

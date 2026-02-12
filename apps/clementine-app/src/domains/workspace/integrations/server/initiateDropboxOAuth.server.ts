@@ -4,9 +4,16 @@
  * Generates PKCE challenge, stores verifier in session, returns authorization URL.
  */
 import { createHash, randomBytes } from 'node:crypto'
+import { z } from 'zod'
 import { createServerFn } from '@tanstack/react-start'
 import * as Sentry from '@sentry/tanstackstart-react'
 import { useAppSession } from '@/domains/auth/server/session.server'
+
+const initiateDropboxOAuthInputSchema = z.object({
+  workspaceId: z.string().min(1),
+  workspaceSlug: z.string().min(1),
+  returnTo: z.string().min(1),
+})
 
 /**
  * Generate PKCE code verifier and challenge
@@ -18,10 +25,7 @@ function generatePKCE() {
 }
 
 export const initiateDropboxOAuthFn = createServerFn({ method: 'POST' })
-  .inputValidator(
-    (data: { workspaceId: string; workspaceSlug: string; returnTo: string }) =>
-      data,
-  )
+  .inputValidator(initiateDropboxOAuthInputSchema)
   .handler(async ({ data }) => {
     return Sentry.startSpan(
       { name: 'initiateDropboxOAuthFn', op: 'dropbox.oauth.initiate' },
@@ -53,10 +57,13 @@ export const initiateDropboxOAuthFn = createServerFn({ method: 'POST' })
         }
 
         // Build callback URL from the workspace slug
-        const baseUrl =
-          process.env.NODE_ENV === 'production'
-            ? `https://${process.env['VITE_APP_DOMAIN'] || 'localhost:3000'}`
-            : 'http://localhost:3000'
+        const appDomain = process.env['VITE_APP_DOMAIN']
+        if (process.env.NODE_ENV === 'production' && !appDomain) {
+          throw new Error('VITE_APP_DOMAIN must be set in production')
+        }
+        const baseUrl = appDomain
+          ? `https://${appDomain}`
+          : 'http://localhost:3000'
 
         const redirectUri = `${baseUrl}/workspace/${data.workspaceSlug}/integrations/dropbox/callback`
 

@@ -22,6 +22,7 @@ import { fetchProject, pickOverlay } from '../repositories/project'
 import { createJob, buildJobData, buildJobSnapshot } from '../repositories/job'
 import {
   startTransformPipelineRequestSchema,
+  TransformPipelineJobPayload,
 } from '../schemas/transform-pipeline.schema'
 import { queueTransformJob } from '../infra/task-queues'
 
@@ -132,10 +133,16 @@ export const startTransformPipelineV2 = onCall(
     const project = await fetchProject(projectId)
 
     // Get aspect ratio from top-level outcome config (not imageGeneration)
-    const aspectRatio: AspectRatio = outcome.aspectRatio ?? outcome.imageGeneration?.aspectRatio ?? '1:1'
+    const aspectRatio: AspectRatio =
+      outcome.aspectRatio ?? outcome.imageGeneration?.aspectRatio ?? '1:1'
 
     // Pick overlay at job creation time
-    const overlayChoice = pickOverlay(project, configSource, session.experienceId, aspectRatio)
+    const overlayChoice = pickOverlay(
+      project,
+      configSource,
+      session.experienceId,
+      aspectRatio,
+    )
 
     // Build job snapshot with resolved overlay
     const snapshot = buildJobSnapshot(session, experience, configSource, {
@@ -176,4 +183,3 @@ export const startTransformPipelineV2 = onCall(
     }
   },
 )
-

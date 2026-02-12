@@ -115,6 +115,10 @@ export const dropboxExportWorker = onTaskDispatched(
         payload,
       )
 
+      // If upload returned undefined, it was a non-retryable failure
+      // (e.g. insufficient space) — already logged, skip success log
+      if (!destinationPath) return
+
       // 4. Log success
       await createExportLog(projectId, {
         jobId,
@@ -260,7 +264,7 @@ async function executeDropboxUpload(
   accessToken: string,
   context: ExportContext,
   payload: DropboxExportPayload,
-): Promise<string> {
+): Promise<string | undefined> {
   const { resultMedia, sessionId } = payload
 
   // Download from Firebase Storage
@@ -290,7 +294,7 @@ async function executeDropboxUpload(
         error: 'Dropbox account has insufficient storage space',
         createdAt: Date.now(),
       })
-      return destinationPath // Return path for logging, caller won't use it
+      return // Return without path — caller checks for undefined
     }
     throw error
   }

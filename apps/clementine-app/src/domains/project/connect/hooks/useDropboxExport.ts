@@ -29,11 +29,7 @@ export function useDropboxExport(
 ): DropboxExportState {
   const mutation = useToggleDropboxExport()
 
-  const exportConfig = (
-    project as Record<string, unknown> | null | undefined
-  )?.['exports'] as { dropbox?: { enabled?: boolean } | null } | undefined
-
-  const isEnabled = exportConfig?.dropbox?.enabled === true
+  const isEnabled = project?.exports?.dropbox?.enabled === true
 
   const toggle = useCallback(() => {
     if (!project) return
