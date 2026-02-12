@@ -1,0 +1,47 @@
+# Contract: onSessionUpdated (Firestore Trigger)
+#
+# Monitors session document updates and sends result email
+# when all conditions are met.
+#
+# Type: Firestore onDocumentUpdated trigger
+# Path: projects/{projectId}/sessions/{sessionId}
+
+id: FT-001
+name: onSessionUpdated
+type: firestore-trigger
+event: onDocumentUpdated
+path: projects/{projectId}/sessions/{sessionId}
+region: europe-west1
+
+trigger_conditions:
+  description: >
+    Fires on every session document update. Checks if email should be sent
+    by verifying all four conditions are met simultaneously.
+  conditions:
+    - field: guestEmail
+      check: "!== null"
+      description: Guest has submitted their email
+    - field: jobStatus
+      check: "=== 'completed'"
+      description: AI transform has finished
+    - field: resultMedia
+      check: "!== null"
+      description: Result media is available
+    - field: emailSentAt
+      check: "=== null"
+      description: Email has not already been sent
+
+action:
+  - Verify all four conditions on the updated document (after state)
+  - Call sendResultEmail() utility with session data
+  - On success: update session with emailSentAt = Date.now()
+  - On failure: log error (do not retry, do not throw)
+
+secrets:
+  - SMTP_APP_PASSWORD
+
+notes:
+  - Handles both timing cases (email first, result first) with identical logic
+  - emailSentAt field prevents duplicate sends even if trigger fires multiple times
+  - Trigger fires on ALL session updates but only acts when all conditions are met
+  - Email sending failures are logged but do not throw (prevents infinite retries)

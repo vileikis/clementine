@@ -1,0 +1,54 @@
+# Contract: submitGuestEmail (Callable Function)
+#
+# Saves a guest's email address to a session for result delivery.
+# Called from the guest loading screen email capture form.
+#
+# Type: Firebase Callable Function (onCall)
+# Auth: None required (guest users are anonymous)
+
+id: CF-001
+name: submitGuestEmail
+type: callable
+region: europe-west1
+
+request:
+  schema:
+    projectId:
+      type: string
+      required: true
+      description: Project ID that owns the session
+    sessionId:
+      type: string
+      required: true
+      description: Session ID to attach email to
+    email:
+      type: string
+      format: email
+      required: true
+      description: Guest's email address (validated with Zod z.string().email())
+
+response:
+  success:
+    schema:
+      success:
+        type: boolean
+        value: true
+  errors:
+    - code: invalid-argument
+      description: Email validation failed or missing required fields
+    - code: not-found
+      description: Session not found for given projectId/sessionId
+    - code: already-exists
+      description: Email already submitted for this session (guestEmail already set)
+
+behavior:
+  - Validate payload with Zod schema
+  - Fetch session document
+  - Verify session exists and guestEmail is null (prevent overwrite)
+  - Write guestEmail to session document
+  - Return success (email sending is handled by Firestore trigger, not this function)
+
+notes:
+  - Does NOT send the email — the onDocumentUpdated trigger handles email dispatch
+  - Does NOT require authentication — guest sessions are anonymous
+  - The guestEmail field is PII and must not be logged

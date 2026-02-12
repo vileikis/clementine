@@ -1,0 +1,59 @@
+# Contract: sendResultEmail (Internal Utility)
+#
+# Sends a result email to a guest using Nodemailer + Google Workspace SMTP.
+# Called by the onSessionUpdated Firestore trigger.
+#
+# Type: Internal utility function (not exported as Cloud Function)
+
+id: UT-001
+name: sendResultEmail
+type: utility
+
+input:
+  schema:
+    guestEmail:
+      type: string
+      format: email
+      required: true
+      description: Recipient email address
+    resultMediaUrl:
+      type: string
+      format: url
+      required: true
+      description: Public URL to the result media
+    sharePageUrl:
+      type: string
+      format: url
+      required: true
+      description: URL to the guest share page for viewing/downloading result
+
+output:
+  success:
+    description: Email sent successfully via SMTP
+  failure:
+    description: SMTP error — logged but not thrown
+
+smtp_config:
+  host: smtp.gmail.com
+  port: 587
+  secure: false  # STARTTLS
+  auth:
+    user: info@clementine-labs.com
+    pass: SMTP_APP_PASSWORD (Firebase secret)
+
+email_content:
+  from: '"Clementine" <info@clementine-labs.com>'
+  subject: "Your result is ready!"
+  html:
+    description: >
+      Simple HTML email with inline styles containing:
+      - Heading: "Your result is ready!"
+      - Result image preview (img tag with resultMediaUrl)
+      - CTA button linking to sharePageUrl
+      - Footer with Clementine branding
+
+notes:
+  - No retry logic in v1 — failures are logged and silently dropped
+  - Nodemailer transporter should be created lazily (not on cold start)
+  - SMTP App Password accessed via defineSecret().value()
+  - Do not log guestEmail in any log statements
