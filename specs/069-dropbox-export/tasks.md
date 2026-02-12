@@ -139,16 +139,49 @@
 
 ---
 
-## Phase 8: Polish & Cross-Cutting Concerns
+## Phase 8: Workspace Integrations Settings
+
+**Goal**: Move Dropbox connection management (disconnect, reconnect) to a dedicated Workspace Settings → Integrations page. Project Connect tab keeps inline connect + export toggle but links to workspace settings for management.
+
+**Independent Test**: Navigate to Workspace Settings → see General and Integrations tabs. Click Integrations → see Dropbox card with connection status and disconnect. Go to Project Connect tab → see "Manage in Workspace Settings" link instead of disconnect button.
+
+### Routing Changes
+
+Convert `$workspaceSlug.settings.tsx` (single file) into a folder-based route matching the `$workspaceSlug.projects/` and `$workspaceSlug.experiences/` pattern:
+
+```
+$workspaceSlug.settings/
+├── route.tsx              # Layout: page header + NavTabs (General, Integrations) + Outlet
+├── index.tsx              # Redirect → general
+├── general.tsx            # Current name/slug form (moved from $workspaceSlug.settings.tsx)
+└── integrations.tsx       # NEW: Workspace integrations page
+```
+
+### Implementation
+
+- [ ] T041 [P] Delete `$workspaceSlug.settings.tsx` and create `$workspaceSlug.settings/route.tsx` — layout route with page header ("Workspace Settings"), NavTabs (General, Integrations), loading/error states from existing page, and `Outlet` for child content. Tabs use existing `NavTabs` component with paths `/workspace/$workspaceSlug/settings/general` and `/workspace/$workspaceSlug/settings/integrations`.
+- [ ] T042 [P] Create `$workspaceSlug.settings/index.tsx` — redirect to general tab (use `redirect` in route config or `Navigate` component)
+- [ ] T043 Create `$workspaceSlug.settings/general.tsx` — move `WorkspaceSettingsForm` rendering here (just the form, header/tabs are in the layout)
+- [ ] T044 [P] Create `WorkspaceDropboxCard` component in `apps/clementine-app/src/domains/workspace/integrations/components/WorkspaceDropboxCard.tsx` — workspace-level Dropbox management card showing: connection status + account email, disconnect button (reuses `disconnectDropboxFn`), needs_reauth state with reconnect button (reuses `initiateDropboxOAuthFn`). Does NOT include export toggle (that's project-level).
+- [ ] T045 Create `IntegrationsPage` container in `apps/clementine-app/src/domains/workspace/integrations/containers/IntegrationsPage.tsx` — centered layout rendering WorkspaceDropboxCard, reads workspace data via `useWorkspace` hook
+- [ ] T046 Create `$workspaceSlug.settings/integrations.tsx` — thin route rendering IntegrationsPage
+- [ ] T047 Update project-level `DropboxCard` in `apps/clementine-app/src/domains/project/connect/components/DropboxCard.tsx` — remove disconnect button and inline reconnect. When connected: add "Manage in Workspace Settings" link pointing to `/workspace/$workspaceSlug/settings/integrations`. When needs_reauth: show "Connection lost" message with link to workspace settings instead of inline reconnect button. Keep connect button and export toggle unchanged.
+- [ ] T048 [P] Create barrel exports for `domains/workspace/integrations/` (components/index.ts, containers/index.ts, index.ts) and update `domains/workspace/index.ts` to re-export integrations module
+
+**Checkpoint**: Workspace Integrations Settings complete — disconnect/reconnect managed at workspace level, project Connect tab simplified.
+
+---
+
+## Phase 9: Polish & Cross-Cutting Concerns
 
 **Purpose**: Validation, cleanup, and standards compliance
 
-- [ ] T035 Run `pnpm app:check` (format + lint fix) across the monorepo to ensure all new code passes validation gates
-- [ ] T036 Run `pnpm app:type-check` to verify TypeScript strict mode compliance with no errors
-- [ ] T037 Run `pnpm --filter @clementine/shared build` to verify shared package builds with new schemas
-- [ ] T038 Run `pnpm functions:build` to verify Cloud Functions build with new tasks and services
-- [ ] T039 Review all new code against applicable standards: `standards/global/project-structure.md` (barrel exports, file naming), `standards/global/code-quality.md`, `standards/backend/firebase-functions.md` (Cloud Task patterns), `standards/frontend/design-system.md` (DropboxCard styling)
-- [ ] T040 Verify end-to-end flow per quickstart.md: connect Dropbox → enable export → run experience → verify file in Dropbox → disconnect → verify exports stop
+- [ ] T049 Run `pnpm app:check` (format + lint fix) across the monorepo to ensure all new code passes validation gates
+- [ ] T050 Run `pnpm app:type-check` to verify TypeScript strict mode compliance with no errors
+- [ ] T051 Run `pnpm --filter @clementine/shared build` to verify shared package builds with new schemas
+- [ ] T052 Run `pnpm functions:build` to verify Cloud Functions build with new tasks and services
+- [ ] T053 Review all new code against applicable standards: `standards/global/project-structure.md` (barrel exports, file naming), `standards/global/code-quality.md`, `standards/backend/firebase-functions.md` (Cloud Task patterns), `standards/frontend/design-system.md` (DropboxCard styling)
+- [ ] T054 Verify end-to-end flow per quickstart.md: connect Dropbox → enable export → run experience → verify file in Dropbox → disconnect (from Workspace Settings) → verify exports stop
 
 ---
 
@@ -163,7 +196,8 @@
 - **US3 (Phase 5)**: Depends on US1 + US2 (must be able to connect and enable export)
 - **US4 (Phase 6)**: Depends on US1 (must be connected to disconnect). Can run in parallel with US2/US3
 - **US5 (Phase 7)**: Depends on US3 (export must fail to trigger re-auth detection)
-- **Polish (Phase 8)**: Depends on all user stories being complete
+- **Workspace Integrations (Phase 8)**: Depends on US4 + US5 (disconnect and reconnect must exist to move them). Restructures settings routing and moves workspace-level management out of project Connect tab.
+- **Polish (Phase 9)**: Depends on all previous phases being complete
 
 ### User Story Dependencies
 
@@ -172,6 +206,7 @@
 - **US3 (P1)**: Depends on US1 + US2 (connection and export toggle must exist for export to trigger)
 - **US4 (P2)**: Depends on US1 only — can start after US1 completes, in parallel with US2/US3
 - **US5 (P2)**: Depends on US3 (needs the export worker to exist for error handling)
+- **Workspace Integrations (Phase 8)**: Depends on US4 + US5 (moves disconnect/reconnect UI to workspace level)
 
 ### Within Each User Story
 
@@ -187,6 +222,7 @@
 - T021, T022 (US2 mutation hook + read hook) can run in parallel
 - T025, T026 (US3 Dropbox service + experience repo) can run in parallel
 - US4 can run in parallel with US2/US3 after US1 completes
+- T041, T042, T044, T048 (Phase 8 routing + component + barrel exports) can run in parallel
 
 ---
 
@@ -238,7 +274,8 @@ Task: "Create useDropboxConnection hook in apps/clementine-app/src/domains/proje
 4. Add US3 → Test full export flow → **Core MVP complete**
 5. Add US4 → Test disconnect → Security controls in place
 6. Add US5 → Test error recovery → Resilience complete
-7. Polish → Standards compliance, final validation
+7. Workspace Integrations → Settings tabs, disconnect/reconnect at workspace level, project Connect tab simplified
+8. Polish → Standards compliance, final validation
 
 ---
 
