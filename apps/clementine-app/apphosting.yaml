@@ -92,3 +92,13 @@ env:
     secret: FIREBASE_ADMIN_PRIVATE_KEY
     availability:
       - RUNTIME
+
+  - variable: DROPBOX_APP_SECRET
+    secret: DROPBOX_APP_SECRET
+    availability:
+      - RUNTIME
+
+  - variable: DROPBOX_TOKEN_ENCRYPTION_KEY
+    secret: DROPBOX_TOKEN_ENCRYPTION_KEY
+    availability:
+      - RUNTIME
