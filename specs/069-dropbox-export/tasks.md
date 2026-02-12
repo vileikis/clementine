@@ -98,12 +98,12 @@
 
 ### Implementation for User Story 3
 
-- [ ] T025 [P] [US3] Create Dropbox API service with `refreshAccessToken` (exchanges refresh token for access token) and `uploadFile` (uploads buffer to Dropbox path via `/files/upload` API with overwrite mode) functions in `functions/src/services/export/dropbox.service.ts`
-- [ ] T026 [P] [US3] Create experience repository function `fetchExperience` (if not already available for export context) in `functions/src/repositories/experience.ts` — fetches experience name for folder path computation
-- [ ] T027 [US3] Create `dispatchExports` Cloud Task handler in `functions/src/tasks/dispatchExports.ts` — validates payload, fetches project export config and session (for workspaceId/experienceId), if dropbox export enabled enqueues `dropboxExportWorker` task with full context per contract CT-001
-- [ ] T028 [US3] Create `dropboxExportWorker` Cloud Task handler in `functions/src/tasks/dropboxExportWorker.ts` — validates payload, checks workspace connection + project export enabled (live config), decrypts refresh token, refreshes access token, downloads result from Firebase Storage, computes destination path (`/<ProjectName>/<ExperienceName>/<date>_<time>_session-<shortCode>_result.<ext>`), uploads to Dropbox, writes export log per contract CT-002
-- [ ] T029 [US3] Hook export dispatch into transform pipeline: add `queueDispatchExports` call at the end of `finalizeJobSuccess` in `functions/src/tasks/transformPipelineJob.ts` (after line 203, after session job status updated to completed) — enqueues dispatchExports Cloud Task with jobId, projectId, sessionId, and resultMedia from output
-- [ ] T030 [US3] Export new Cloud Task functions (dispatchExports, dropboxExportWorker) from `functions/src/index.ts`
+- [x] T025 [P] [US3] Create Dropbox API service with `refreshAccessToken` (exchanges refresh token for access token) and `uploadFile` (uploads buffer to Dropbox path via `/files/upload` API with overwrite mode) functions in `functions/src/services/export/dropbox.service.ts`
+- [x] T026 [P] [US3] Create experience repository function `fetchExperience` (if not already available for export context) in `functions/src/repositories/experience.ts` — fetches experience name for folder path computation
+- [x] T027 [US3] Create `dispatchExports` Cloud Task handler in `functions/src/tasks/dispatchExports.ts` — validates payload, fetches project export config and session (for workspaceId/experienceId), if dropbox export enabled enqueues `dropboxExportWorker` task with full context per contract CT-001
+- [x] T028 [US3] Create `dropboxExportWorker` Cloud Task handler in `functions/src/tasks/dropboxExportWorker.ts` — validates payload, checks workspace connection + project export enabled (live config), decrypts refresh token, refreshes access token, downloads result from Firebase Storage, computes destination path (`/<ProjectName>/<ExperienceName>/<date>_<time>_session-<shortCode>_result.<ext>`), uploads to Dropbox, writes export log per contract CT-002
+- [x] T029 [US3] Hook export dispatch into transform pipeline: add `queueDispatchExports` call at the end of `finalizeJobSuccess` in `functions/src/tasks/transformPipelineJob.ts` (after line 203, after session job status updated to completed) — enqueues dispatchExports Cloud Task with jobId, projectId, sessionId, and resultMedia from output
+- [x] T030 [US3] Export new Cloud Task functions (dispatchExports, dropboxExportWorker) from `functions/src/index.ts`
 
 **Checkpoint**: User Story 3 complete — End-to-end export works. Run experience → check Dropbox for file. Verify file naming, folder structure, and export log written.
 
@@ -117,8 +117,8 @@
 
 ### Implementation for User Story 4
 
-- [ ] T031 [US4] Create `disconnectDropboxFn` server function in `apps/clementine-app/src/domains/project/connect/server/functions.ts` — validates admin auth, decrypts refresh token, revokes token via Dropbox API (`/2/auth/token/revoke`), sets `integrations.dropbox` to null on workspace document per contract SF-003
-- [ ] T032 [US4] Update `DropboxCard` component in `apps/clementine-app/src/domains/project/connect/components/DropboxCard.tsx` — add "Disconnect" link (visible only for admins when connected), show confirmation prompt ("This will disconnect Dropbox for all projects in this workspace"), call disconnectDropboxFn on confirm
+- [x] T031 [US4] Create `disconnectDropboxFn` server function in `apps/clementine-app/src/domains/project/connect/server/functions.ts` — validates admin auth, decrypts refresh token, revokes token via Dropbox API (`/2/auth/token/revoke`), sets `integrations.dropbox` to null on workspace document per contract SF-003
+- [x] T032 [US4] Update `DropboxCard` component in `apps/clementine-app/src/domains/project/connect/components/DropboxCard.tsx` — add "Disconnect" link (visible only for admins when connected), show confirmation prompt ("This will disconnect Dropbox for all projects in this workspace"), call disconnectDropboxFn on confirm
 
 **Checkpoint**: User Story 4 complete — Disconnect works end-to-end. Verify token revoked, status resets, exports stop.
 
@@ -132,8 +132,8 @@
 
 ### Implementation for User Story 5
 
-- [ ] T033 [US5] Add `needs_reauth` handling to `dropboxExportWorker` in `functions/src/tasks/dropboxExportWorker.ts` — when token refresh returns `invalid_grant`, update workspace `integrations.dropbox.status` to `needs_reauth` via workspace repository, write failed export log, and exit without retry
-- [ ] T034 [US5] Update `DropboxCard` component in `apps/clementine-app/src/domains/project/connect/components/DropboxCard.tsx` — add error/needs_reauth state rendering: show "Dropbox connection lost — reconnect to resume exports" message with "Reconnect" button that re-initiates the OAuth flow (reuses initiateDropboxOAuthFn from US1)
+- [x] T033 [US5] Add `needs_reauth` handling to `dropboxExportWorker` in `functions/src/tasks/dropboxExportWorker.ts` — when token refresh returns `invalid_grant`, update workspace `integrations.dropbox.status` to `needs_reauth` via workspace repository, write failed export log, and exit without retry
+- [x] T034 [US5] Update `DropboxCard` component in `apps/clementine-app/src/domains/project/connect/components/DropboxCard.tsx` — add error/needs_reauth state rendering: show "Dropbox connection lost — reconnect to resume exports" message with "Reconnect" button that re-initiates the OAuth flow (reuses initiateDropboxOAuthFn from US1)
 
 **Checkpoint**: User Story 5 complete — Error state displays correctly and reconnect restores functionality.
 

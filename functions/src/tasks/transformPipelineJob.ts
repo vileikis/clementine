@@ -24,6 +24,7 @@ import {
 import type { Job, JobOutput } from '@clementine/shared'
 import { runOutcome, type OutcomeContext } from '../services/transform'
 import { createTempDir, cleanupTempDir } from '../infra/temp-dir'
+import { queueDispatchExports } from './dispatchExportsQueue'
 
 /**
  * Job handler context for cleanup management
@@ -208,6 +209,25 @@ async function finalizeJobSuccess(
     processingTimeMs: output.processingTimeMs,
     url: output.url,
   })
+
+  // Dispatch export tasks (best-effort — failure does not affect the guest experience)
+  try {
+    await queueDispatchExports({
+      jobId: job.id,
+      projectId,
+      sessionId,
+      resultMedia: {
+        url: output.url,
+        filePath: output.filePath,
+        displayName: 'Result',
+      },
+    })
+  } catch (error) {
+    logger.warn('[TransformJob] Failed to enqueue export dispatch', {
+      jobId: job.id,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    })
+  }
 }
 
 /**

@@ -1,0 +1,225 @@
+/**
+ * Cloud Task Handler: dropboxExportWorker
+ *
+ * Exports a single result file to the workspace's Dropbox App Folder.
+ * Self-contained: fetches all context, handles auth, uploads, and logs.
+ *
+ * Includes needs_reauth handling (US5/T033): when token refresh returns
+ * invalid_grant, marks workspace as needs_reauth and exits without retry.
+ *
+ * See contracts/export-tasks.yaml CT-002 for full spec.
+ */
+import { onTaskDispatched } from 'firebase-functions/v2/tasks'
+import { logger } from 'firebase-functions/v2'
+import { dropboxExportPayloadSchema } from '../schemas/export.schema'
+import {
+  fetchWorkspaceIntegration,
+  updateWorkspaceIntegration,
+} from '../repositories/workspace'
+import { fetchProject } from '../repositories/project'
+import { fetchExperience } from '../repositories/experience'
+import { createExportLog } from '../repositories/export-log'
+import {
+  decrypt,
+  refreshAccessToken,
+  uploadFile,
+  DropboxInvalidGrantError,
+  DropboxInsufficientSpaceError,
+} from '../services/export'
+import { storage } from '../infra/firebase-admin'
+
+export const dropboxExportWorker = onTaskDispatched(
+  {
+    region: 'europe-west1',
+    memory: '512MiB',
+    timeoutSeconds: 120,
+    retryConfig: {
+      maxAttempts: 3,
+      minBackoffSeconds: 30,
+      maxBackoffSeconds: 300,
+    },
+  },
+  async (req) => {
+    // 1. Validate payload
+    const parseResult = dropboxExportPayloadSchema.safeParse(req.data)
+    if (!parseResult.success) {
+      logger.error('[DropboxExportWorker] Invalid payload', {
+        issues: parseResult.error.issues,
+      })
+      return // Don't retry invalid payloads
+    }
+
+    const { jobId, projectId, sessionId, workspaceId, experienceId, resultMedia } =
+      parseResult.data
+
+    logger.info('[DropboxExportWorker] Processing', {
+      jobId,
+      projectId,
+      workspaceId,
+    })
+
+    try {
+      // 2. Fetch workspace integration config (live check)
+      const integration = await fetchWorkspaceIntegration(workspaceId)
+      if (!integration || integration.status !== 'connected') {
+        logger.warn('[DropboxExportWorker] Workspace not connected, skipping', {
+          workspaceId,
+          status: integration?.status ?? 'null',
+        })
+        return
+      }
+
+      // 3. Fetch project to verify export still enabled (live check)
+      const project = await fetchProject(projectId)
+      if (!project) {
+        logger.warn('[DropboxExportWorker] Project not found, skipping', { projectId })
+        return
+      }
+
+      const dropboxExport = (project as Record<string, unknown>)['exports'] as
+        | { dropbox?: { enabled?: boolean } | null }
+        | undefined
+      if (dropboxExport?.dropbox?.enabled !== true) {
+        logger.info('[DropboxExportWorker] Export disabled, skipping', { projectId })
+        return
+      }
+
+      // 4. Fetch project name and experience name for folder path
+      const projectName = project.name || 'Untitled Project'
+
+      const experience = await fetchExperience(workspaceId, experienceId)
+      const experienceName = experience?.name || 'Untitled Experience'
+
+      // 5. Decrypt refresh token
+      const refreshToken = decrypt(integration.encryptedRefreshToken)
+
+      // 6. Get fresh access token
+      let accessToken: string
+      try {
+        accessToken = await refreshAccessToken(refreshToken)
+      } catch (error) {
+        if (error instanceof DropboxInvalidGrantError) {
+          // US5/T033: Mark workspace as needs_reauth
+          logger.warn('[DropboxExportWorker] Token invalid, marking needs_reauth', {
+            workspaceId,
+          })
+          await updateWorkspaceIntegration(workspaceId, {
+            ...integration,
+            status: 'needs_reauth',
+          })
+          await createExportLog(projectId, {
+            jobId,
+            sessionId,
+            provider: 'dropbox',
+            status: 'failed',
+            destinationPath: null,
+            error: 'Dropbox connection lost — token is invalid. Reconnection required.',
+            createdAt: Date.now(),
+          })
+          return // Don't retry auth errors
+        }
+        throw error // Retry other errors
+      }
+
+      // 7. Download result file from Firebase Storage
+      const bucket = storage.bucket()
+      const file = bucket.file(resultMedia.filePath)
+      const [fileBuffer] = await file.download()
+
+      // 8. Compute destination path
+      const ext = getFileExtension(resultMedia.filePath)
+      const now = new Date()
+      const dateStr = formatDate(now)
+      const timeStr = formatTime(now)
+      const shortCode = sessionId.slice(0, 4).toUpperCase()
+      const fileName = `${dateStr}_${timeStr}_session-${shortCode}_result.${ext}`
+      const destinationPath = `/${sanitizePath(projectName)}/${sanitizePath(experienceName)}/${fileName}`
+
+      // 9. Upload to Dropbox
+      try {
+        await uploadFile(accessToken, destinationPath, fileBuffer)
+      } catch (error) {
+        if (error instanceof DropboxInsufficientSpaceError) {
+          await createExportLog(projectId, {
+            jobId,
+            sessionId,
+            provider: 'dropbox',
+            status: 'failed',
+            destinationPath,
+            error: 'Dropbox account has insufficient storage space',
+            createdAt: Date.now(),
+          })
+          return // Don't retry storage full errors
+        }
+        throw error // Retry other upload errors
+      }
+
+      // 10. Write success export log
+      await createExportLog(projectId, {
+        jobId,
+        sessionId,
+        provider: 'dropbox',
+        status: 'success',
+        destinationPath,
+        error: null,
+        createdAt: Date.now(),
+      })
+
+      logger.info('[DropboxExportWorker] Export complete', {
+        jobId,
+        destinationPath,
+      })
+    } catch (error) {
+      // Write failure log for unexpected errors (will be retried by Cloud Tasks)
+      logger.error('[DropboxExportWorker] Export failed', {
+        jobId,
+        projectId,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      })
+
+      await createExportLog(projectId, {
+        jobId,
+        sessionId,
+        provider: 'dropbox',
+        status: 'failed',
+        destinationPath: null,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        createdAt: Date.now(),
+      }).catch((logError) => {
+        logger.error('[DropboxExportWorker] Failed to write export log', { logError })
+      })
+
+      throw error // Re-throw to trigger Cloud Task retry
+    }
+  },
+)
+
+/**
+ * Extract file extension from a storage path
+ */
+function getFileExtension(filePath: string): string {
+  const parts = filePath.split('.')
+  return parts.length > 1 ? (parts.pop() ?? 'jpg') : 'jpg'
+}
+
+/**
+ * Format date as YYYY-MM-DD
+ */
+function formatDate(date: Date): string {
+  return date.toISOString().split('T')[0]!
+}
+
+/**
+ * Format time as HH-MM-SS
+ */
+function formatTime(date: Date): string {
+  return date.toISOString().split('T')[1]!.split('.')[0]!.replace(/:/g, '-')
+}
+
+/**
+ * Sanitize a string for use in a Dropbox file path.
+ * Replaces characters that are invalid in Dropbox paths.
+ */
+function sanitizePath(name: string): string {
+  return name.replace(/[/\\:*?"<>|]/g, '_').trim() || 'Untitled'
+}
