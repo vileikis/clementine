@@ -72,6 +72,7 @@ export const initiateDropboxOAuthFn = createServerFn({ method: 'POST' })
           redirect_uri: redirectUri,
           response_type: 'code',
           token_access_type: 'offline',
+          scope: 'account_info.read files.metadata.read files.content.write',
           code_challenge: challenge,
           code_challenge_method: 'S256',
           state,
