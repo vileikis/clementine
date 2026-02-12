@@ -1,4 +1,1 @@
-export {
-  initiateDropboxOAuthFn,
-  disconnectDropboxFn,
-} from './functions'
+export { initiateDropboxOAuthFn, disconnectDropboxFn } from './functions'

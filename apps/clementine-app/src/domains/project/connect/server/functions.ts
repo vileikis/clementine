@@ -4,8 +4,8 @@
  * Server functions for OAuth connect/disconnect flows.
  * These require server-side secrets (DROPBOX_APP_SECRET, encryption key).
  */
+import { createHash, randomBytes } from 'node:crypto'
 import { createServerFn } from '@tanstack/react-start'
-import { randomBytes, createHash } from 'node:crypto'
 import * as Sentry from '@sentry/tanstackstart-react'
 import { useAppSession } from '@/domains/auth/server/session.server'
 import { adminDb } from '@/integrations/firebase/server'
@@ -112,21 +112,17 @@ export const disconnectDropboxFn = createServerFn({ method: 'POST' })
         if (integration && integration.encryptedRefreshToken) {
           // Decrypt and revoke the token
           try {
-            const { decrypt } = await import(
-              '@/domains/project/connect/server/encryption.server'
-            )
+            const { decrypt } =
+              await import('@/domains/project/connect/server/encryption.server')
             const refreshToken = decrypt(integration.encryptedRefreshToken)
 
             // Best-effort revoke — if the token is already invalid, that's fine
             const accessToken = await refreshAccessToken(refreshToken)
             if (accessToken) {
-              await fetch(
-                'https://api.dropboxapi.com/2/auth/token/revoke',
-                {
-                  method: 'POST',
-                  headers: { Authorization: `Bearer ${accessToken}` },
-                },
-              )
+              await fetch('https://api.dropboxapi.com/2/auth/token/revoke', {
+                method: 'POST',
+                headers: { Authorization: `Bearer ${accessToken}` },
+              })
             }
           } catch (error) {
             // Log but don't fail — token may already be invalid

@@ -8,3 +8,6 @@ export * from './settings'
 
 // Projects subdomain
 export * from './projects'
+
+// Integrations subdomain
+export * from './integrations'

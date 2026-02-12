@@ -6,8 +6,8 @@
  */
 import { useCallback } from 'react'
 import { toast } from 'sonner'
-import type { Project } from '@clementine/shared'
 import { useToggleDropboxExport } from './useToggleDropboxExport'
+import type { Project } from '@clementine/shared'
 
 interface DropboxExportState {
   /** Whether Dropbox export is enabled for this project */
@@ -24,12 +24,14 @@ interface DropboxExportState {
  * @param project - Project data from useProject hook
  * @returns Export state and toggle callback
  */
-export function useDropboxExport(project: Project | null | undefined): DropboxExportState {
+export function useDropboxExport(
+  project: Project | null | undefined,
+): DropboxExportState {
   const mutation = useToggleDropboxExport()
 
-  const exportConfig = (project as Record<string, unknown> | null | undefined)?.['exports'] as
-    | { dropbox?: { enabled?: boolean } | null }
-    | undefined
+  const exportConfig = (
+    project as Record<string, unknown> | null | undefined
+  )?.['exports'] as { dropbox?: { enabled?: boolean } | null } | undefined
 
   const isEnabled = exportConfig?.dropbox?.enabled === true
 
@@ -43,9 +45,7 @@ export function useDropboxExport(project: Project | null | undefined): DropboxEx
       {
         onSuccess: () => {
           toast.success(
-            newEnabled
-              ? 'Dropbox export enabled'
-              : 'Dropbox export disabled',
+            newEnabled ? 'Dropbox export enabled' : 'Dropbox export disabled',
           )
         },
         onError: () => {

@@ -159,14 +159,14 @@ $workspaceSlug.settings/
 
 ### Implementation
 
-- [ ] T041 [P] Delete `$workspaceSlug.settings.tsx` and create `$workspaceSlug.settings/route.tsx` — layout route with page header ("Workspace Settings"), NavTabs (General, Integrations), loading/error states from existing page, and `Outlet` for child content. Tabs use existing `NavTabs` component with paths `/workspace/$workspaceSlug/settings/general` and `/workspace/$workspaceSlug/settings/integrations`.
-- [ ] T042 [P] Create `$workspaceSlug.settings/index.tsx` — redirect to general tab (use `redirect` in route config or `Navigate` component)
-- [ ] T043 Create `$workspaceSlug.settings/general.tsx` — move `WorkspaceSettingsForm` rendering here (just the form, header/tabs are in the layout)
-- [ ] T044 [P] Create `WorkspaceDropboxCard` component in `apps/clementine-app/src/domains/workspace/integrations/components/WorkspaceDropboxCard.tsx` — workspace-level Dropbox management card showing: connection status + account email, disconnect button (reuses `disconnectDropboxFn`), needs_reauth state with reconnect button (reuses `initiateDropboxOAuthFn`). Does NOT include export toggle (that's project-level).
-- [ ] T045 Create `IntegrationsPage` container in `apps/clementine-app/src/domains/workspace/integrations/containers/IntegrationsPage.tsx` — centered layout rendering WorkspaceDropboxCard, reads workspace data via `useWorkspace` hook
-- [ ] T046 Create `$workspaceSlug.settings/integrations.tsx` — thin route rendering IntegrationsPage
-- [ ] T047 Update project-level `DropboxCard` in `apps/clementine-app/src/domains/project/connect/components/DropboxCard.tsx` — remove disconnect button and inline reconnect. When connected: add "Manage in Workspace Settings" link pointing to `/workspace/$workspaceSlug/settings/integrations`. When needs_reauth: show "Connection lost" message with link to workspace settings instead of inline reconnect button. Keep connect button and export toggle unchanged.
-- [ ] T048 [P] Create barrel exports for `domains/workspace/integrations/` (components/index.ts, containers/index.ts, index.ts) and update `domains/workspace/index.ts` to re-export integrations module
+- [x] T041 [P] Delete `$workspaceSlug.settings.tsx` and create `$workspaceSlug.settings/route.tsx` — layout route with page header ("Workspace Settings"), NavTabs (General, Integrations), loading/error states from existing page, and `Outlet` for child content. Tabs use existing `NavTabs` component with paths `/workspace/$workspaceSlug/settings/general` and `/workspace/$workspaceSlug/settings/integrations`.
+- [x] T042 [P] Create `$workspaceSlug.settings/index.tsx` — redirect to general tab (use `redirect` in route config or `Navigate` component)
+- [x] T043 Create `$workspaceSlug.settings/general.tsx` — move `WorkspaceSettingsForm` rendering here (just the form, header/tabs are in the layout)
+- [x] T044 [P] Create `WorkspaceDropboxCard` component in `apps/clementine-app/src/domains/workspace/integrations/components/WorkspaceDropboxCard.tsx` — workspace-level Dropbox management card showing: connection status + account email, disconnect button (reuses `disconnectDropboxFn`), needs_reauth state with reconnect button (reuses `initiateDropboxOAuthFn`). Does NOT include export toggle (that's project-level).
+- [x] T045 Create `IntegrationsPage` container in `apps/clementine-app/src/domains/workspace/integrations/containers/IntegrationsPage.tsx` — centered layout rendering WorkspaceDropboxCard, reads workspace data via `useWorkspace` hook
+- [x] T046 Create `$workspaceSlug.settings/integrations.tsx` — thin route rendering IntegrationsPage
+- [x] T047 Update project-level `DropboxCard` in `apps/clementine-app/src/domains/project/connect/components/DropboxCard.tsx` — remove disconnect button and inline reconnect. When connected: add "Manage in Workspace Settings" link pointing to `/workspace/$workspaceSlug/settings/integrations`. When needs_reauth: show "Connection lost" message with link to workspace settings instead of inline reconnect button. Keep connect button and export toggle unchanged.
+- [x] T048 [P] Create barrel exports for `domains/workspace/integrations/` (components/index.ts, containers/index.ts, index.ts) and update `domains/workspace/index.ts` to re-export integrations module
 
 **Checkpoint**: Workspace Integrations Settings complete — disconnect/reconnect managed at workspace level, project Connect tab simplified.
 

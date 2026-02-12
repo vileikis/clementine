@@ -109,8 +109,7 @@ const handleDropboxCallbackFn = createServerFn({ method: 'GET' })
             throw new Error(`Token exchange failed: ${errorText}`)
           }
 
-          const tokenData =
-            (await tokenResponse.json()) as DropboxTokenResponse
+          const tokenData = (await tokenResponse.json()) as DropboxTokenResponse
 
           // Fetch account info
           const accountResponse = await fetch(
@@ -134,9 +133,7 @@ const handleDropboxCallbackFn = createServerFn({ method: 'GET' })
           const encryptedRefreshToken = encrypt(tokenData.refresh_token)
 
           // Write integration to workspace
-          const workspaceRef = adminDb
-            .collection('workspaces')
-            .doc(workspaceId)
+          const workspaceRef = adminDb.collection('workspaces').doc(workspaceId)
 
           await workspaceRef.update({
             'integrations.dropbox': {

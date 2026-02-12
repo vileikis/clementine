@@ -1,19 +1,15 @@
 /**
- * DropboxCard
+ * WorkspaceDropboxCard
  *
- * Project-level integration card for Dropbox connection and export toggle.
- * Renders different UI states: not connected, connected (export off/on),
- * needs re-auth, and loading.
- *
- * Disconnect and reconnect are managed at workspace level
- * (Workspace Settings → Integrations).
+ * Workspace-level Dropbox integration management card.
+ * Shows connection status, disconnect button, and needs_reauth state with reconnect.
+ * Does NOT include the export toggle (that's project-level in DropboxCard).
  */
 import { useState } from 'react'
-import { Link } from '@tanstack/react-router'
+import { useQueryClient } from '@tanstack/react-query'
 import { useServerFn } from '@tanstack/react-start'
 import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
-import { initiateDropboxOAuthFn } from '../server/functions'
 import type { DropboxIntegration } from '@clementine/shared'
 import {
   Card,
@@ -24,48 +20,58 @@ import {
 } from '@/ui-kit/ui/card'
 import { Button } from '@/ui-kit/ui/button'
 import { Badge } from '@/ui-kit/ui/badge'
-import { Switch } from '@/ui-kit/ui/switch'
-import { Label } from '@/ui-kit/ui/label'
+import {
+  disconnectDropboxFn,
+  initiateDropboxOAuthFn,
+} from '@/domains/project/connect/server/functions'
 
-interface DropboxCardProps {
+interface WorkspaceDropboxCardProps {
   workspaceId: string
   workspaceSlug: string
-  projectId: string
-  projectName: string
   integration: DropboxIntegration | null
   isLoading: boolean
-  /** Whether Dropbox export is enabled for this project */
-  isExportEnabled: boolean
-  /** Toggle export on/off */
-  onToggleExport: () => void
-  /** Whether a toggle mutation is in progress */
-  isToggling: boolean
 }
 
-export function DropboxCard({
+export function WorkspaceDropboxCard({
   workspaceId,
   workspaceSlug,
-  projectId,
-  projectName,
   integration,
   isLoading,
-  isExportEnabled,
-  onToggleExport,
-  isToggling,
-}: DropboxCardProps) {
+}: WorkspaceDropboxCardProps) {
   const [isConnecting, setIsConnecting] = useState(false)
+  const [isDisconnecting, setIsDisconnecting] = useState(false)
+  const queryClient = useQueryClient()
   const initiateOAuth = useServerFn(initiateDropboxOAuthFn)
+  const disconnectDropbox = useServerFn(disconnectDropboxFn)
 
   const handleConnect = async () => {
     setIsConnecting(true)
     try {
       const result = await initiateOAuth({
-        data: { workspaceId, projectId, workspaceSlug },
+        data: { workspaceId, projectId: '', workspaceSlug },
       })
       window.location.href = result.authorizationUrl
     } catch {
       toast.error('Failed to initiate Dropbox connection')
       setIsConnecting(false)
+    }
+  }
+
+  const handleDisconnect = async () => {
+    const confirmed = window.confirm(
+      'This will disconnect Dropbox for all projects in this workspace. Continue?',
+    )
+    if (!confirmed) return
+
+    setIsDisconnecting(true)
+    try {
+      await disconnectDropbox({ data: { workspaceId } })
+      await queryClient.invalidateQueries({ queryKey: ['workspace'] })
+      toast.success('Dropbox disconnected')
+    } catch {
+      toast.error('Failed to disconnect Dropbox')
+    } finally {
+      setIsDisconnecting(false)
     }
   }
 
@@ -85,14 +91,15 @@ export function DropboxCard({
     )
   }
 
-  // State A: Not connected
+  // Not connected
   if (!integration || integration.status === 'disconnected') {
     return (
       <Card>
         <CardHeader>
           <CardTitle>Dropbox</CardTitle>
           <CardDescription>
-            Automatically export AI-generated results to your Dropbox.
+            Connect a Dropbox account to enable automatic export of AI-generated
+            results across projects in this workspace.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -111,7 +118,7 @@ export function DropboxCard({
     )
   }
 
-  // State: Needs re-auth — link to workspace settings instead of inline reconnect
+  // Needs re-auth
   if (integration.status === 'needs_reauth') {
     return (
       <Card>
@@ -121,24 +128,26 @@ export function DropboxCard({
             <Badge variant="destructive">Connection Lost</Badge>
           </div>
           <CardDescription>
-            Dropbox connection lost — reconnect from Workspace Settings to
-            resume exports.
+            Dropbox connection lost — reconnect to resume exports.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Link
-            to="/workspace/$workspaceSlug/settings/integrations"
-            params={{ workspaceSlug }}
-            className="text-primary text-sm font-medium hover:underline"
-          >
-            Manage in Workspace Settings
-          </Link>
+          <Button onClick={handleConnect} disabled={isConnecting}>
+            {isConnecting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Reconnecting...
+              </>
+            ) : (
+              'Reconnect Dropbox'
+            )}
+          </Button>
         </CardContent>
       </Card>
     )
   }
 
-  // State B/C: Connected — export toggle + link to workspace settings
+  // Connected
   return (
     <Card>
       <CardHeader>
@@ -150,38 +159,15 @@ export function DropboxCard({
           Connected as {integration.accountEmail}
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex items-center justify-between">
-          <Label
-            htmlFor="dropbox-export-toggle"
-            className="text-sm font-medium"
-          >
-            Export results to Dropbox
-          </Label>
-          <Switch
-            id="dropbox-export-toggle"
-            checked={isExportEnabled}
-            onCheckedChange={onToggleExport}
-            disabled={isToggling}
-          />
-        </div>
-        {isExportEnabled && (
-          <div className="text-muted-foreground text-sm">
-            Results will be exported to{' '}
-            <code className="bg-muted rounded px-1 py-0.5 text-xs">
-              /Apps/Clementine/{projectName}/
-            </code>
-          </div>
-        )}
-        <div>
-          <Link
-            to="/workspace/$workspaceSlug/settings/integrations"
-            params={{ workspaceSlug }}
-            className="text-muted-foreground text-sm underline underline-offset-4 transition-colors hover:text-foreground"
-          >
-            Manage in Workspace Settings
-          </Link>
-        </div>
+      <CardContent>
+        <button
+          type="button"
+          onClick={handleDisconnect}
+          disabled={isDisconnecting}
+          className="text-muted-foreground hover:text-destructive text-sm underline underline-offset-4 transition-colors"
+        >
+          {isDisconnecting ? 'Disconnecting...' : 'Disconnect'}
+        </button>
       </CardContent>
     </Card>
   )
