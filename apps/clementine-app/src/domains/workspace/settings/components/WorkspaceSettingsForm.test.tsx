@@ -66,6 +66,7 @@ describe('WorkspaceSettingsForm', () => {
     slug: 'acme-corp',
     status: 'active',
     deletedAt: null,
+    integrations: null,
     createdAt: Date.now(),
     updatedAt: Date.now(),
   }

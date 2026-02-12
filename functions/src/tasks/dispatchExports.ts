@@ -47,10 +47,7 @@ export const dispatchExports = onTaskDispatched(
     }
 
     // Check if Dropbox export is enabled for this project
-    const dropboxExport = (project as Record<string, unknown>)['exports'] as
-      | { dropbox?: { enabled?: boolean } | null }
-      | undefined
-    const isDropboxEnabled = dropboxExport?.dropbox?.enabled === true
+    const isDropboxEnabled = project.exports?.dropbox?.enabled === true
 
     if (isDropboxEnabled) {
       await queueDropboxExportWorker({

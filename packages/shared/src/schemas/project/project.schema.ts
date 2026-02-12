@@ -10,6 +10,7 @@
  */
 import { z } from 'zod'
 import { projectConfigSchema } from './project-config.schema'
+import { projectExportsSchema } from './project-exports.schema'
 
 /**
  * Project status enum
@@ -45,6 +46,12 @@ export const projectSchema = z.looseObject({
    */
   draftConfig: projectConfigSchema.nullable().default(null),
   publishedConfig: projectConfigSchema.nullable().default(null),
+
+  /**
+   * EXPORTS
+   * Per-integration export configuration (e.g., Dropbox)
+   */
+  exports: projectExportsSchema.nullable().default(null),
 
   /**
    * PUBLISH TRACKING

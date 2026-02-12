@@ -167,10 +167,7 @@ async function validateExportContext(
     return null
   }
 
-  const dropboxExport = (project as Record<string, unknown>)['exports'] as
-    | { dropbox?: { enabled?: boolean } | null }
-    | undefined
-  if (dropboxExport?.dropbox?.enabled !== true) {
+  if (project.exports?.dropbox?.enabled !== true) {
     logger.info('[DropboxExportWorker] Export disabled, skipping', {
       projectId,
     })

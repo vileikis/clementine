@@ -37,6 +37,7 @@ export function useCreateProject() {
           type: 'standard' as const,
           draftConfig: null,
           publishedConfig: null,
+          exports: null,
           draftVersion: 1,
           publishedVersion: null,
           publishedAt: null,

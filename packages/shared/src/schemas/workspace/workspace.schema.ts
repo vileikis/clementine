@@ -23,7 +23,7 @@ export const workspaceSchema = z.object({
   slug: z.string().min(1, 'Slug is required').max(50, 'Slug too long'),
   status: workspaceStatusSchema,
   deletedAt: z.number().nullable(),
-  integrations: workspaceIntegrationsSchema.optional(),
+  integrations: workspaceIntegrationsSchema.nullable().default(null),
   createdAt: z.number(),
   updatedAt: z.number(),
 })
