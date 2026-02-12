@@ -34,7 +34,7 @@ export const dispatchExports = onTaskDispatched(
       return // Don't retry invalid payloads
     }
 
-    const { jobId, projectId, sessionId, experienceId, resultMedia } =
+    const { jobId, projectId, sessionId, experienceId, resultMedia, createdAt } =
       parseResult.data
 
     logger.info('[DispatchExports] Processing', { jobId, projectId })
@@ -57,7 +57,7 @@ export const dispatchExports = onTaskDispatched(
         workspaceId: project.workspaceId,
         experienceId,
         resultMedia,
-        createdAt: Date.now(),
+        createdAt,
       })
 
       logger.info('[DispatchExports] Enqueued dropboxExportWorker', {

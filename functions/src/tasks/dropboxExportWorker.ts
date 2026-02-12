@@ -330,7 +330,8 @@ function buildDestinationPath(
 
 function getFileExtension(filePath: string): string {
   const parts = filePath.split('.')
-  return parts.length > 1 ? (parts.pop() ?? 'jpg') : 'jpg'
+  const ext = parts.length > 1 ? parts.pop() : undefined
+  return ext || 'jpg'
 }
 
 function formatDate(date: Date): string {

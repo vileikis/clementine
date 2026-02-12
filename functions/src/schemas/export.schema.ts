@@ -24,6 +24,8 @@ export const dispatchExportsPayloadSchema = z.object({
   sessionId: z.string().min(1),
   experienceId: z.string().min(1),
   resultMedia: resultMediaSchema,
+  /** Stable timestamp (epoch ms) set at the original enqueue site, propagated through the pipeline */
+  createdAt: z.number(),
 })
 
 export type DispatchExportsPayload = z.infer<typeof dispatchExportsPayloadSchema>

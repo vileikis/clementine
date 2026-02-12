@@ -222,6 +222,7 @@ async function finalizeJobSuccess(
         filePath: output.filePath,
         displayName: 'Result',
       },
+      createdAt: Date.now(),
     })
   } catch (error) {
     logger.warn('[TransformJob] Failed to enqueue export dispatch', {
