@@ -1,0 +1,70 @@
+# Contract: sendSessionEmail (Cloud Task)
+#
+# Fetches a session and sends the result email if all conditions are met.
+# Queued from two entry points:
+#   1. transformPipelineJob.finalizeJobSuccess() — job just completed
+#   2. submitGuestEmail callable — guest just submitted email, job already done
+#
+# Mirrors the dispatchExports → dropboxExportWorker pattern.
+#
+# Type: Firebase Cloud Task (onTaskDispatched)
+
+id: CT-002
+name: sendSessionEmail
+type: cloud-task
+region: europe-west1
+
+config:
+  memory: 256MiB
+  timeoutSeconds: 60
+  retryConfig:
+    maxAttempts: 3
+    minBackoffSeconds: 10
+    maxBackoffSeconds: 60
+
+payload:
+  schema:
+    projectId:
+      type: string
+      required: true
+      description: Project ID that owns the session
+    sessionId:
+      type: string
+      required: true
+      description: Session to check and send email for
+    resultMedia:
+      type: object
+      required: true
+      description: Result media reference (url, filePath, displayName)
+      properties:
+        url:
+          type: string
+          required: true
+        filePath:
+          type: string
+          required: true
+        displayName:
+          type: string
+          required: true
+
+secrets:
+  - SMTP_APP_PASSWORD
+
+behavior:
+  - Validate payload with Zod schema
+  - Fetch session document from Firestore
+  - Check all four conditions:
+    - guestEmail !== null
+    - jobStatus === 'completed'
+    - resultMedia !== null
+    - emailSentAt === null
+  - If any condition fails, return silently (no-op)
+  - If all conditions met, call sendResultEmail() utility
+  - On success: update session with emailSentAt = Date.now()
+  - On SMTP failure: log error, do not throw (allow retry via retryConfig)
+
+notes:
+  - The emailSentAt field prevents duplicate sends even if queued from both entry points
+  - Payload includes resultMedia so the task doesn't need to re-fetch the project
+  - Retry config allows 3 attempts for transient SMTP failures
+  - Guest email is PII — must not be logged

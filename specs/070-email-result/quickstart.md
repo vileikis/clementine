@@ -97,7 +97,7 @@ pnpm app:type-check
 | Area | Files |
 |------|-------|
 | **Shared Schemas** | `packages/shared/src/schemas/session/session.schema.ts`, `packages/shared/src/schemas/project/project-config.schema.ts` |
-| **Cloud Functions** | `functions/src/triggers/onSessionUpdated.ts`, `functions/src/callable/submitGuestEmail.ts`, `functions/src/services/email/email.service.ts` |
+| **Cloud Functions** | `functions/src/tasks/sendSessionEmail.ts`, `functions/src/callable/submitGuestEmail.ts`, `functions/src/services/email/email.service.ts` |
 | **Guest Loading Screen** | `apps/clementine-app/src/domains/project-config/share/components/ShareLoadingRenderer.tsx` |
 | **Email Capture Form** | `apps/clementine-app/src/domains/project-config/share/components/EmailCaptureForm.tsx` |
 | **Creator Config** | `apps/clementine-app/src/domains/project-config/share/components/ShareLoadingConfigPanel.tsx` |

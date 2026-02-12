@@ -4,7 +4,7 @@
 
 ## R-001: Email Trigger Architecture
 
-### Decision: Firestore `onDocumentUpdated` trigger + `submitGuestEmail` callable
+### Decision: Cloud Task (`sendSessionEmail`) + `submitGuestEmail` callable — two entry points, one utility
 
 ### Context
 
@@ -18,17 +18,34 @@ The timing of these two events is non-deterministic — the guest may submit the
 
 | Approach | Description | Pros | Cons |
 |----------|-------------|------|------|
-| **A. Firestore trigger (chosen)** | `onDocumentUpdated` on sessions fires on every session update, checks conditions, sends email | Self-contained; handles both timing cases in one place; doesn't modify transform pipeline | Introduces new pattern (no existing Firestore triggers in codebase); fires on every session update |
-| **B. Extend dispatchExports + callable** | Add email to export pipeline for "job completes" case; use callable for "email submitted after job" case | Consistent with existing Cloud Task pattern | Two separate code paths; requires modifying transform pipeline; more complex |
-| **C. Pure callable** | Callable sends immediately if result ready; transform pipeline calls email function on completion | No new patterns | Tightly couples transform pipeline to email; two code paths |
+| **A. Firestore trigger** | `onDocumentUpdated` on sessions fires on every session update, checks conditions, sends email | Self-contained; handles both timing cases in one place; doesn't modify transform pipeline | Introduces new pattern (no existing Firestore triggers in codebase); fires on every session update — wasted invocations; cost scales with all session updates, not email usage |
+| **B. Cloud Task + callable (chosen)** | `sendSessionEmail` task queued from pipeline on completion + callable checks and queues on email submission | Zero wasted invocations; consistent with existing Cloud Task pattern; keeps transform pipeline self-contained (one queue call) | Two entry points (but share same utility + task); small modification to transform pipeline |
+| **C. Pure callable** | Callable sends immediately if result ready; transform pipeline calls email function on completion | No new patterns | Tightly couples transform pipeline to email logic; makes it a "god function" |
 
 ### Rationale
 
-- **Option A is simplest**: Single trigger handles both timing cases with identical condition-checking logic
-- **No pipeline modification**: The trigger is self-contained — the existing transform pipeline doesn't need any changes
-- **Firestore triggers are the right tool**: This is fundamentally a reactive pattern ("when these conditions are met, do X"), which is exactly what Firestore triggers are designed for
-- **New pattern is justified**: While the codebase currently uses only Cloud Tasks and callables, Firestore triggers are a first-class Firebase feature appropriate for event-driven patterns like this
-- **Cost negligible**: The trigger fires on every session update but the check is a simple field comparison — no external calls unless conditions are met
+- **Zero wasted invocations**: Email logic only runs when it's actually relevant — when the pipeline completes or when a guest submits their email. Unlike a Firestore trigger, no invocations fire on unrelated session updates (responses, status changes, etc.)
+- **Consistent with existing architecture**: Mirrors the `dispatchExports` → `dropboxExportWorker` pattern. The codebase uses Cloud Tasks and callables — not Firestore triggers
+- **Transform pipeline stays self-contained**: Only adds one `queueSendSessionEmail()` call to `finalizeJobSuccess()` (same pattern as `queueDispatchExports()`). No email/SMTP knowledge leaks into the pipeline
+- **Shared utility prevents divergence**: Both entry points queue the same `sendSessionEmail` task, which calls the same `sendResultEmail()` utility. The `emailSentAt` field guards against duplicates regardless of which path fires first
+
+### Two Entry Points
+
+**Entry 1 — Job completes (guest may or may not have submitted email):**
+```
+transformPipelineJob.finalizeJobSuccess()
+  → queueDispatchExports(...)      // existing
+  → queueSendSessionEmail(...)     // NEW — best-effort, same pattern
+```
+The `sendSessionEmail` task fetches the session, checks conditions, sends if met.
+
+**Entry 2 — Guest submits email (job may or may not be completed):**
+```
+submitGuestEmail callable
+  → write guestEmail to session
+  → check if jobStatus === 'completed' && resultMedia exists
+  → if yes: queueSendSessionEmail(...)
+```
 
 ### Guest Email Write Path
 

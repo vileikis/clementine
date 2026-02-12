@@ -5,7 +5,7 @@
 
 ## Summary
 
-Enable guests to optionally enter their email on the AI processing loading screen to receive their result via email. The implementation spans three layers: shared schemas (new session and config fields), Cloud Functions (Firestore trigger for email sending + callable for email submission + Nodemailer SMTP service), and the TanStack Start frontend (loading screen visual improvements, email capture form, creator configuration panel).
+Enable guests to optionally enter their email on the AI processing loading screen to receive their result via email. The implementation spans three layers: shared schemas (new session and config fields), Cloud Functions (Cloud Task for email sending + callable for email submission + Nodemailer SMTP service), and the TanStack Start frontend (loading screen visual improvements, email capture form, creator configuration panel).
 
 ## Technical Context
 
@@ -26,12 +26,12 @@ Enable guests to optionally enter their email on the AI processing loading scree
 | Principle | Status | Notes |
 |-----------|--------|-------|
 | I. Mobile-First Design | PASS | Email capture form renders on mobile loading screen (primary viewport). Touch targets will follow 44x44px minimum. |
-| II. Clean Code & Simplicity | PASS | Minimal additions — 2 session fields, 1 config object, 1 trigger, 1 callable, 1 utility. No premature abstraction. |
+| II. Clean Code & Simplicity | PASS | Minimal additions — 2 session fields, 1 config object, 1 Cloud Task, 1 callable, 1 utility. No premature abstraction. |
 | III. Type-Safe Development | PASS | Zod schemas for all new fields. Server-side validation in callable. Strict TypeScript throughout. |
 | IV. Minimal Testing Strategy | PASS | Unit tests for email service utility and schema validation. No E2E required for v1. |
 | V. Validation Gates | PASS | Will run `pnpm app:check` + `pnpm app:type-check` + `pnpm functions:build` before completion. |
 | VI. Frontend Architecture | PASS | Client-first: guest reads config via Firestore subscription. Email write via callable (server validation). |
-| VII. Backend & Firebase | PASS | Callable for email write (server-validated mutation). Firestore trigger for reactive email sending. Admin SDK only in functions. |
+| VII. Backend & Firebase | PASS | Callable for email write (server-validated mutation). Cloud Task for email sending (mirrors dispatchExports pattern). Admin SDK only in functions. |
 | VIII. Project Structure | PASS | Follows vertical slice architecture. New files placed in existing domain folders. |
 
 ## Project Structure
@@ -47,7 +47,7 @@ specs/070-email-result/
 ├── quickstart.md        # Setup guide
 ├── contracts/           # API contracts
 │   ├── submit-guest-email.yaml
-│   ├── session-email-trigger.yaml
+│   ├── send-session-email.yaml
 │   └── send-result-email.yaml
 ├── checklists/
 │   └── requirements.md  # Spec quality checklist
@@ -64,11 +64,13 @@ packages/shared/src/schemas/
     └── project-config.schema.ts       # Add emailCaptureConfigSchema to shareLoading
 
 functions/src/
-├── index.ts                           # Export new trigger + callable
+├── index.ts                           # Export new task + callable
 ├── infra/
-│   └── params.ts                      # Add SMTP_APP_PASSWORD secret
-├── triggers/
-│   └── onSessionUpdated.ts            # NEW: Firestore trigger for email dispatch
+│   ├── params.ts                      # Add SMTP_APP_PASSWORD secret
+│   └── task-queues.ts                 # Add queueSendSessionEmail()
+├── tasks/
+│   ├── transformPipelineJob.ts        # MODIFY: Queue sendSessionEmail on completion
+│   └── sendSessionEmail.ts            # NEW: Cloud Task for email dispatch
 ├── callable/
 │   └── submitGuestEmail.ts            # NEW: Callable for guest email submission
 ├── services/
@@ -99,19 +101,21 @@ apps/clementine-app/src/
 
 ## Architecture Decisions
 
-### AD-001: Firestore Trigger for Email Dispatch
+### AD-001: Cloud Task for Email Dispatch (mirrors dispatchExports pattern)
 
-**Pattern**: `onDocumentUpdated` on `projects/{projectId}/sessions/{sessionId}`
+**Pattern**: `sendSessionEmail` Cloud Task + two entry points
 
-The trigger fires on every session document update. It checks four conditions:
-1. `guestEmail !== null`
-2. `jobStatus === 'completed'`
-3. `resultMedia !== null`
-4. `emailSentAt === null`
+Email sending is handled by a dedicated Cloud Task (`sendSessionEmail`) that mirrors the existing `dispatchExports` / `dropboxExportWorker` pattern. Two entry points queue it:
 
-If all conditions are met, it calls `sendResultEmail()` and updates `emailSentAt`.
+**Entry 1 — Job completes after email submitted:**
+`transformPipelineJob.finalizeJobSuccess()` queues `sendSessionEmail` alongside the existing `queueDispatchExports()` call. The task fetches the session, checks if `guestEmail` exists and `emailSentAt` is null, and sends if conditions are met.
 
-**Why this over extending the transform pipeline**: The trigger is self-contained and handles both timing cases (email-first, result-first) without modifying any existing code. See [research.md](./research.md#r-001) for full analysis.
+**Entry 2 — Email submitted after job completed:**
+`submitGuestEmail` callable writes `guestEmail` to the session, then checks if `jobStatus === 'completed'` and `resultMedia` exists. If so, it queues `sendSessionEmail` immediately.
+
+Both paths share the same `sendResultEmail()` utility. The `emailSentAt` field prevents duplicates.
+
+**Why this over Firestore trigger (`onDocumentUpdated`)**: A trigger would fire on every session update across all projects — most invocations wasted no-ops. The Cloud Task approach has zero wasted invocations, is consistent with the existing architecture, and keeps `transformPipelineJob` self-contained (just one additional `queueX()` call). See [research.md](./research.md#r-001) for full analysis.
 
 ### AD-002: Callable Function for Email Write
 
@@ -123,7 +127,7 @@ The guest calls this function from the loading screen to submit their email. The
 
 ### AD-003: Lazy Nodemailer Transporter
 
-The SMTP transporter is created lazily (on first use) to avoid cold-start overhead when the trigger fires but conditions aren't met. The transporter instance is cached at module scope for reuse across invocations within the same function instance.
+The SMTP transporter is created lazily (on first use) to avoid cold-start overhead. The transporter instance is cached at module scope for reuse across invocations within the same function instance.
 
 ### AD-004: EmailCaptureForm Co-located with ShareLoadingRenderer
 

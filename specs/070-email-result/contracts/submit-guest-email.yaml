@@ -2,6 +2,7 @@
 #
 # Saves a guest's email address to a session for result delivery.
 # Called from the guest loading screen email capture form.
+# If the job is already completed, queues sendSessionEmail immediately.
 #
 # Type: Firebase Callable Function (onCall)
 # Auth: None required (guest users are anonymous)
@@ -46,9 +47,12 @@ behavior:
   - Fetch session document
   - Verify session exists and guestEmail is null (prevent overwrite)
   - Write guestEmail to session document
-  - Return success (email sending is handled by Firestore trigger, not this function)
+  - Check if jobStatus === 'completed' and resultMedia exists
+  - If yes: queue sendSessionEmail Cloud Task (immediate email send)
+  - Return success
 
 notes:
-  - Does NOT send the email — the onDocumentUpdated trigger handles email dispatch
+  - Handles the "email submitted after job completed" timing case
+  - For the "job completes after email submitted" case, transformPipelineJob queues sendSessionEmail
   - Does NOT require authentication — guest sessions are anonymous
   - The guestEmail field is PII and must not be logged
