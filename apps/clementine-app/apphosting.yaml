@@ -65,7 +65,13 @@ env:
       - RUNTIME
 
   - variable: VITE_APP_DOMAIN
-    value: https://clementine-be--clementine-7568d.europe-west4.hosted.app
+    value: clementine-be--clementine-7568d.europe-west4.hosted.app
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: VITE_DROPBOX_APP_KEY
+    value: zym0zoj3234ohwx
     availability:
       - BUILD
       - RUNTIME

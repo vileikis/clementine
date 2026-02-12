@@ -39,6 +39,8 @@ export const dropboxExportPayloadSchema = z.object({
   workspaceId: z.string().min(1),
   experienceId: z.string().min(1),
   resultMedia: resultMediaSchema,
+  /** Stable timestamp (epoch ms) set at dispatch time for idempotent file paths across retries */
+  createdAt: z.number(),
 })
 
 export type DropboxExportPayload = z.infer<typeof dropboxExportPayloadSchema>

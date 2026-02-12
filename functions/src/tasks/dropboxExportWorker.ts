@@ -272,12 +272,13 @@ async function executeDropboxUpload(
   const file = bucket.file(resultMedia.filePath)
   const [fileBuffer] = await file.download()
 
-  // Compute destination path
+  // Compute destination path (uses stable timestamp from dispatch for retry idempotency)
   const destinationPath = buildDestinationPath(
     context.projectName,
     context.experienceName,
     sessionId,
     resultMedia.filePath,
+    payload.createdAt,
   )
 
   // Upload to Dropbox
@@ -315,11 +316,12 @@ function buildDestinationPath(
   experienceName: string,
   sessionId: string,
   filePath: string,
+  createdAt: number,
 ): string {
   const ext = getFileExtension(filePath)
-  const now = new Date()
-  const dateStr = formatDate(now)
-  const timeStr = formatTime(now)
+  const timestamp = new Date(createdAt)
+  const dateStr = formatDate(timestamp)
+  const timeStr = formatTime(timestamp)
   const shortCode = sessionId.slice(0, 4).toUpperCase()
   const fileName = `${dateStr}_${timeStr}_session-${shortCode}_result.${ext}`
 

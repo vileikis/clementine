@@ -57,6 +57,7 @@ export const dispatchExports = onTaskDispatched(
         workspaceId: project.workspaceId,
         experienceId,
         resultMedia,
+        createdAt: Date.now(),
       })
 
       logger.info('[DispatchExports] Enqueued dropboxExportWorker', {
