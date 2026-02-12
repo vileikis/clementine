@@ -24,15 +24,18 @@ import { Route as AdminDevToolsRouteRouteImport } from './app/admin/dev-tools/ro
 import { Route as WorkspaceWorkspaceSlugIndexRouteImport } from './app/workspace/$workspaceSlug.index'
 import { Route as JoinProjectIdIndexRouteImport } from './app/join/$projectId/index'
 import { Route as AdminWorkspacesIndexRouteImport } from './app/admin/workspaces/index'
-import { Route as WorkspaceWorkspaceSlugSettingsRouteImport } from './app/workspace/$workspaceSlug.settings'
 import { Route as JoinProjectIdShareRouteImport } from './app/join/$projectId/share'
 import { Route as JoinProjectIdPreshareRouteImport } from './app/join/$projectId/preshare'
 import { Route as JoinProjectIdPregateRouteImport } from './app/join/$projectId/pregate'
 import { Route as AdminWorkspacesCreateRouteImport } from './app/admin/workspaces/create'
 import { Route as AdminDevToolsPreviewShellRouteImport } from './app/admin/dev-tools/preview-shell'
 import { Route as AdminDevToolsCameraRouteImport } from './app/admin/dev-tools/camera'
+import { Route as WorkspaceWorkspaceSlugSettingsRouteRouteImport } from './app/workspace/$workspaceSlug.settings/route'
+import { Route as WorkspaceWorkspaceSlugSettingsIndexRouteImport } from './app/workspace/$workspaceSlug.settings/index'
 import { Route as WorkspaceWorkspaceSlugProjectsIndexRouteImport } from './app/workspace/$workspaceSlug.projects/index'
 import { Route as WorkspaceWorkspaceSlugExperiencesIndexRouteImport } from './app/workspace/$workspaceSlug.experiences/index'
+import { Route as WorkspaceWorkspaceSlugSettingsIntegrationsRouteImport } from './app/workspace/$workspaceSlug.settings/integrations'
+import { Route as WorkspaceWorkspaceSlugSettingsGeneralRouteImport } from './app/workspace/$workspaceSlug.settings/general'
 import { Route as WorkspaceWorkspaceSlugProjectsProjectIdRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId'
 import { Route as WorkspaceWorkspaceSlugExperiencesCreateRouteImport } from './app/workspace/$workspaceSlug.experiences/create'
 import { Route as WorkspaceWorkspaceSlugExperiencesExperienceIdRouteImport } from './app/workspace/$workspaceSlug.experiences/$experienceId'
@@ -43,6 +46,7 @@ import { Route as WorkspaceWorkspaceSlugProjectsProjectIdDistributeRouteImport }
 import { Route as WorkspaceWorkspaceSlugProjectsProjectIdDesignerRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId.designer'
 import { Route as WorkspaceWorkspaceSlugProjectsProjectIdConnectRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId.connect'
 import { Route as WorkspaceWorkspaceSlugProjectsProjectIdAnalyticsRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId.analytics'
+import { Route as WorkspaceWorkspaceSlugIntegrationsDropboxCallbackRouteImport } from './app/workspace/$workspaceSlug.integrations.dropbox.callback'
 import { Route as WorkspaceWorkspaceSlugExperiencesExperienceIdCreateRouteImport } from './app/workspace/$workspaceSlug.experiences/$experienceId.create'
 import { Route as WorkspaceWorkspaceSlugExperiencesExperienceIdCollectRouteImport } from './app/workspace/$workspaceSlug.experiences/$experienceId.collect'
 import { Route as WorkspaceWorkspaceSlugProjectsProjectIdDesignerIndexRouteImport } from './app/workspace/$workspaceSlug.projects/$projectId.designer.index'
@@ -127,12 +131,6 @@ const AdminWorkspacesIndexRoute = AdminWorkspacesIndexRouteImport.update({
   path: '/workspaces/',
   getParentRoute: () => AdminRouteRoute,
 } as any)
-const WorkspaceWorkspaceSlugSettingsRoute =
-  WorkspaceWorkspaceSlugSettingsRouteImport.update({
-    id: '/settings',
-    path: '/settings',
-    getParentRoute: () => WorkspaceWorkspaceSlugRoute,
-  } as any)
 const JoinProjectIdShareRoute = JoinProjectIdShareRouteImport.update({
   id: '/share',
   path: '/share',
@@ -164,6 +162,18 @@ const AdminDevToolsCameraRoute = AdminDevToolsCameraRouteImport.update({
   path: '/camera',
   getParentRoute: () => AdminDevToolsRouteRoute,
 } as any)
+const WorkspaceWorkspaceSlugSettingsRouteRoute =
+  WorkspaceWorkspaceSlugSettingsRouteRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => WorkspaceWorkspaceSlugRoute,
+  } as any)
+const WorkspaceWorkspaceSlugSettingsIndexRoute =
+  WorkspaceWorkspaceSlugSettingsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => WorkspaceWorkspaceSlugSettingsRouteRoute,
+  } as any)
 const WorkspaceWorkspaceSlugProjectsIndexRoute =
   WorkspaceWorkspaceSlugProjectsIndexRouteImport.update({
     id: '/projects/',
@@ -175,6 +185,18 @@ const WorkspaceWorkspaceSlugExperiencesIndexRoute =
     id: '/experiences/',
     path: '/experiences/',
     getParentRoute: () => WorkspaceWorkspaceSlugRoute,
+  } as any)
+const WorkspaceWorkspaceSlugSettingsIntegrationsRoute =
+  WorkspaceWorkspaceSlugSettingsIntegrationsRouteImport.update({
+    id: '/integrations',
+    path: '/integrations',
+    getParentRoute: () => WorkspaceWorkspaceSlugSettingsRouteRoute,
+  } as any)
+const WorkspaceWorkspaceSlugSettingsGeneralRoute =
+  WorkspaceWorkspaceSlugSettingsGeneralRouteImport.update({
+    id: '/general',
+    path: '/general',
+    getParentRoute: () => WorkspaceWorkspaceSlugSettingsRouteRoute,
   } as any)
 const WorkspaceWorkspaceSlugProjectsProjectIdRoute =
   WorkspaceWorkspaceSlugProjectsProjectIdRouteImport.update({
@@ -236,6 +258,12 @@ const WorkspaceWorkspaceSlugProjectsProjectIdAnalyticsRoute =
     path: '/analytics',
     getParentRoute: () => WorkspaceWorkspaceSlugProjectsProjectIdRoute,
   } as any)
+const WorkspaceWorkspaceSlugIntegrationsDropboxCallbackRoute =
+  WorkspaceWorkspaceSlugIntegrationsDropboxCallbackRouteImport.update({
+    id: '/integrations/dropbox/callback',
+    path: '/integrations/dropbox/callback',
+    getParentRoute: () => WorkspaceWorkspaceSlugRoute,
+  } as any)
 const WorkspaceWorkspaceSlugExperiencesExperienceIdCreateRoute =
   WorkspaceWorkspaceSlugExperiencesExperienceIdCreateRouteImport.update({
     id: '/create',
@@ -292,13 +320,13 @@ export interface FileRoutesByFullPath {
   '/workspace/$workspaceSlug': typeof WorkspaceWorkspaceSlugRouteWithChildren
   '/admin/': typeof AdminIndexRoute
   '/workspace/': typeof WorkspaceIndexRoute
+  '/workspace/$workspaceSlug/settings': typeof WorkspaceWorkspaceSlugSettingsRouteRouteWithChildren
   '/admin/dev-tools/camera': typeof AdminDevToolsCameraRoute
   '/admin/dev-tools/preview-shell': typeof AdminDevToolsPreviewShellRoute
   '/admin/workspaces/create': typeof AdminWorkspacesCreateRoute
   '/join/$projectId/pregate': typeof JoinProjectIdPregateRoute
   '/join/$projectId/preshare': typeof JoinProjectIdPreshareRoute
   '/join/$projectId/share': typeof JoinProjectIdShareRoute
-  '/workspace/$workspaceSlug/settings': typeof WorkspaceWorkspaceSlugSettingsRoute
   '/admin/workspaces': typeof AdminWorkspacesIndexRoute
   '/join/$projectId/': typeof JoinProjectIdIndexRoute
   '/workspace/$workspaceSlug/': typeof WorkspaceWorkspaceSlugIndexRoute
@@ -306,10 +334,14 @@ export interface FileRoutesByFullPath {
   '/workspace/$workspaceSlug/experiences/$experienceId': typeof WorkspaceWorkspaceSlugExperiencesExperienceIdRouteWithChildren
   '/workspace/$workspaceSlug/experiences/create': typeof WorkspaceWorkspaceSlugExperiencesCreateRoute
   '/workspace/$workspaceSlug/projects/$projectId': typeof WorkspaceWorkspaceSlugProjectsProjectIdRouteWithChildren
+  '/workspace/$workspaceSlug/settings/general': typeof WorkspaceWorkspaceSlugSettingsGeneralRoute
+  '/workspace/$workspaceSlug/settings/integrations': typeof WorkspaceWorkspaceSlugSettingsIntegrationsRoute
   '/workspace/$workspaceSlug/experiences': typeof WorkspaceWorkspaceSlugExperiencesIndexRoute
   '/workspace/$workspaceSlug/projects': typeof WorkspaceWorkspaceSlugProjectsIndexRoute
+  '/workspace/$workspaceSlug/settings/': typeof WorkspaceWorkspaceSlugSettingsIndexRoute
   '/workspace/$workspaceSlug/experiences/$experienceId/collect': typeof WorkspaceWorkspaceSlugExperiencesExperienceIdCollectRoute
   '/workspace/$workspaceSlug/experiences/$experienceId/create': typeof WorkspaceWorkspaceSlugExperiencesExperienceIdCreateRoute
+  '/workspace/$workspaceSlug/integrations/dropbox/callback': typeof WorkspaceWorkspaceSlugIntegrationsDropboxCallbackRoute
   '/workspace/$workspaceSlug/projects/$projectId/analytics': typeof WorkspaceWorkspaceSlugProjectsProjectIdAnalyticsRoute
   '/workspace/$workspaceSlug/projects/$projectId/connect': typeof WorkspaceWorkspaceSlugProjectsProjectIdConnectRoute
   '/workspace/$workspaceSlug/projects/$projectId/designer': typeof WorkspaceWorkspaceSlugProjectsProjectIdDesignerRouteWithChildren
@@ -337,16 +369,19 @@ export interface FileRoutesByTo {
   '/join/$projectId/pregate': typeof JoinProjectIdPregateRoute
   '/join/$projectId/preshare': typeof JoinProjectIdPreshareRoute
   '/join/$projectId/share': typeof JoinProjectIdShareRoute
-  '/workspace/$workspaceSlug/settings': typeof WorkspaceWorkspaceSlugSettingsRoute
   '/admin/workspaces': typeof AdminWorkspacesIndexRoute
   '/join/$projectId': typeof JoinProjectIdIndexRoute
   '/workspace/$workspaceSlug': typeof WorkspaceWorkspaceSlugIndexRoute
   '/join/$projectId/experience/$experienceId': typeof JoinProjectIdExperienceExperienceIdRoute
   '/workspace/$workspaceSlug/experiences/create': typeof WorkspaceWorkspaceSlugExperiencesCreateRoute
+  '/workspace/$workspaceSlug/settings/general': typeof WorkspaceWorkspaceSlugSettingsGeneralRoute
+  '/workspace/$workspaceSlug/settings/integrations': typeof WorkspaceWorkspaceSlugSettingsIntegrationsRoute
   '/workspace/$workspaceSlug/experiences': typeof WorkspaceWorkspaceSlugExperiencesIndexRoute
   '/workspace/$workspaceSlug/projects': typeof WorkspaceWorkspaceSlugProjectsIndexRoute
+  '/workspace/$workspaceSlug/settings': typeof WorkspaceWorkspaceSlugSettingsIndexRoute
   '/workspace/$workspaceSlug/experiences/$experienceId/collect': typeof WorkspaceWorkspaceSlugExperiencesExperienceIdCollectRoute
   '/workspace/$workspaceSlug/experiences/$experienceId/create': typeof WorkspaceWorkspaceSlugExperiencesExperienceIdCreateRoute
+  '/workspace/$workspaceSlug/integrations/dropbox/callback': typeof WorkspaceWorkspaceSlugIntegrationsDropboxCallbackRoute
   '/workspace/$workspaceSlug/projects/$projectId/analytics': typeof WorkspaceWorkspaceSlugProjectsProjectIdAnalyticsRoute
   '/workspace/$workspaceSlug/projects/$projectId/connect': typeof WorkspaceWorkspaceSlugProjectsProjectIdConnectRoute
   '/workspace/$workspaceSlug/projects/$projectId/distribute': typeof WorkspaceWorkspaceSlugProjectsProjectIdDistributeRoute
@@ -372,13 +407,13 @@ export interface FileRoutesById {
   '/workspace/$workspaceSlug': typeof WorkspaceWorkspaceSlugRouteWithChildren
   '/admin/': typeof AdminIndexRoute
   '/workspace/': typeof WorkspaceIndexRoute
+  '/workspace/$workspaceSlug/settings': typeof WorkspaceWorkspaceSlugSettingsRouteRouteWithChildren
   '/admin/dev-tools/camera': typeof AdminDevToolsCameraRoute
   '/admin/dev-tools/preview-shell': typeof AdminDevToolsPreviewShellRoute
   '/admin/workspaces/create': typeof AdminWorkspacesCreateRoute
   '/join/$projectId/pregate': typeof JoinProjectIdPregateRoute
   '/join/$projectId/preshare': typeof JoinProjectIdPreshareRoute
   '/join/$projectId/share': typeof JoinProjectIdShareRoute
-  '/workspace/$workspaceSlug/settings': typeof WorkspaceWorkspaceSlugSettingsRoute
   '/admin/workspaces/': typeof AdminWorkspacesIndexRoute
   '/join/$projectId/': typeof JoinProjectIdIndexRoute
   '/workspace/$workspaceSlug/': typeof WorkspaceWorkspaceSlugIndexRoute
@@ -386,10 +421,14 @@ export interface FileRoutesById {
   '/workspace/$workspaceSlug/experiences/$experienceId': typeof WorkspaceWorkspaceSlugExperiencesExperienceIdRouteWithChildren
   '/workspace/$workspaceSlug/experiences/create': typeof WorkspaceWorkspaceSlugExperiencesCreateRoute
   '/workspace/$workspaceSlug/projects/$projectId': typeof WorkspaceWorkspaceSlugProjectsProjectIdRouteWithChildren
+  '/workspace/$workspaceSlug/settings/general': typeof WorkspaceWorkspaceSlugSettingsGeneralRoute
+  '/workspace/$workspaceSlug/settings/integrations': typeof WorkspaceWorkspaceSlugSettingsIntegrationsRoute
   '/workspace/$workspaceSlug/experiences/': typeof WorkspaceWorkspaceSlugExperiencesIndexRoute
   '/workspace/$workspaceSlug/projects/': typeof WorkspaceWorkspaceSlugProjectsIndexRoute
+  '/workspace/$workspaceSlug/settings/': typeof WorkspaceWorkspaceSlugSettingsIndexRoute
   '/workspace/$workspaceSlug/experiences/$experienceId/collect': typeof WorkspaceWorkspaceSlugExperiencesExperienceIdCollectRoute
   '/workspace/$workspaceSlug/experiences/$experienceId/create': typeof WorkspaceWorkspaceSlugExperiencesExperienceIdCreateRoute
+  '/workspace/$workspaceSlug/integrations/dropbox/callback': typeof WorkspaceWorkspaceSlugIntegrationsDropboxCallbackRoute
   '/workspace/$workspaceSlug/projects/$projectId/analytics': typeof WorkspaceWorkspaceSlugProjectsProjectIdAnalyticsRoute
   '/workspace/$workspaceSlug/projects/$projectId/connect': typeof WorkspaceWorkspaceSlugProjectsProjectIdConnectRoute
   '/workspace/$workspaceSlug/projects/$projectId/designer': typeof WorkspaceWorkspaceSlugProjectsProjectIdDesignerRouteWithChildren
@@ -417,13 +456,13 @@ export interface FileRouteTypes {
     | '/workspace/$workspaceSlug'
     | '/admin/'
     | '/workspace/'
+    | '/workspace/$workspaceSlug/settings'
     | '/admin/dev-tools/camera'
     | '/admin/dev-tools/preview-shell'
     | '/admin/workspaces/create'
     | '/join/$projectId/pregate'
     | '/join/$projectId/preshare'
     | '/join/$projectId/share'
-    | '/workspace/$workspaceSlug/settings'
     | '/admin/workspaces'
     | '/join/$projectId/'
     | '/workspace/$workspaceSlug/'
@@ -431,10 +470,14 @@ export interface FileRouteTypes {
     | '/workspace/$workspaceSlug/experiences/$experienceId'
     | '/workspace/$workspaceSlug/experiences/create'
     | '/workspace/$workspaceSlug/projects/$projectId'
+    | '/workspace/$workspaceSlug/settings/general'
+    | '/workspace/$workspaceSlug/settings/integrations'
     | '/workspace/$workspaceSlug/experiences'
     | '/workspace/$workspaceSlug/projects'
+    | '/workspace/$workspaceSlug/settings/'
     | '/workspace/$workspaceSlug/experiences/$experienceId/collect'
     | '/workspace/$workspaceSlug/experiences/$experienceId/create'
+    | '/workspace/$workspaceSlug/integrations/dropbox/callback'
     | '/workspace/$workspaceSlug/projects/$projectId/analytics'
     | '/workspace/$workspaceSlug/projects/$projectId/connect'
     | '/workspace/$workspaceSlug/projects/$projectId/designer'
@@ -462,16 +505,19 @@ export interface FileRouteTypes {
     | '/join/$projectId/pregate'
     | '/join/$projectId/preshare'
     | '/join/$projectId/share'
-    | '/workspace/$workspaceSlug/settings'
     | '/admin/workspaces'
     | '/join/$projectId'
     | '/workspace/$workspaceSlug'
     | '/join/$projectId/experience/$experienceId'
     | '/workspace/$workspaceSlug/experiences/create'
+    | '/workspace/$workspaceSlug/settings/general'
+    | '/workspace/$workspaceSlug/settings/integrations'
     | '/workspace/$workspaceSlug/experiences'
     | '/workspace/$workspaceSlug/projects'
+    | '/workspace/$workspaceSlug/settings'
     | '/workspace/$workspaceSlug/experiences/$experienceId/collect'
     | '/workspace/$workspaceSlug/experiences/$experienceId/create'
+    | '/workspace/$workspaceSlug/integrations/dropbox/callback'
     | '/workspace/$workspaceSlug/projects/$projectId/analytics'
     | '/workspace/$workspaceSlug/projects/$projectId/connect'
     | '/workspace/$workspaceSlug/projects/$projectId/distribute'
@@ -496,13 +542,13 @@ export interface FileRouteTypes {
     | '/workspace/$workspaceSlug'
     | '/admin/'
     | '/workspace/'
+    | '/workspace/$workspaceSlug/settings'
     | '/admin/dev-tools/camera'
     | '/admin/dev-tools/preview-shell'
     | '/admin/workspaces/create'
     | '/join/$projectId/pregate'
     | '/join/$projectId/preshare'
     | '/join/$projectId/share'
-    | '/workspace/$workspaceSlug/settings'
     | '/admin/workspaces/'
     | '/join/$projectId/'
     | '/workspace/$workspaceSlug/'
@@ -510,10 +556,14 @@ export interface FileRouteTypes {
     | '/workspace/$workspaceSlug/experiences/$experienceId'
     | '/workspace/$workspaceSlug/experiences/create'
     | '/workspace/$workspaceSlug/projects/$projectId'
+    | '/workspace/$workspaceSlug/settings/general'
+    | '/workspace/$workspaceSlug/settings/integrations'
     | '/workspace/$workspaceSlug/experiences/'
     | '/workspace/$workspaceSlug/projects/'
+    | '/workspace/$workspaceSlug/settings/'
     | '/workspace/$workspaceSlug/experiences/$experienceId/collect'
     | '/workspace/$workspaceSlug/experiences/$experienceId/create'
+    | '/workspace/$workspaceSlug/integrations/dropbox/callback'
     | '/workspace/$workspaceSlug/projects/$projectId/analytics'
     | '/workspace/$workspaceSlug/projects/$projectId/connect'
     | '/workspace/$workspaceSlug/projects/$projectId/designer'
@@ -644,13 +694,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminWorkspacesIndexRouteImport
       parentRoute: typeof AdminRouteRoute
     }
-    '/workspace/$workspaceSlug/settings': {
-      id: '/workspace/$workspaceSlug/settings'
-      path: '/settings'
-      fullPath: '/workspace/$workspaceSlug/settings'
-      preLoaderRoute: typeof WorkspaceWorkspaceSlugSettingsRouteImport
-      parentRoute: typeof WorkspaceWorkspaceSlugRoute
-    }
     '/join/$projectId/share': {
       id: '/join/$projectId/share'
       path: '/share'
@@ -693,6 +736,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminDevToolsCameraRouteImport
       parentRoute: typeof AdminDevToolsRouteRoute
     }
+    '/workspace/$workspaceSlug/settings': {
+      id: '/workspace/$workspaceSlug/settings'
+      path: '/settings'
+      fullPath: '/workspace/$workspaceSlug/settings'
+      preLoaderRoute: typeof WorkspaceWorkspaceSlugSettingsRouteRouteImport
+      parentRoute: typeof WorkspaceWorkspaceSlugRoute
+    }
+    '/workspace/$workspaceSlug/settings/': {
+      id: '/workspace/$workspaceSlug/settings/'
+      path: '/'
+      fullPath: '/workspace/$workspaceSlug/settings/'
+      preLoaderRoute: typeof WorkspaceWorkspaceSlugSettingsIndexRouteImport
+      parentRoute: typeof WorkspaceWorkspaceSlugSettingsRouteRoute
+    }
     '/workspace/$workspaceSlug/projects/': {
       id: '/workspace/$workspaceSlug/projects/'
       path: '/projects'
@@ -706,6 +763,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/workspace/$workspaceSlug/experiences'
       preLoaderRoute: typeof WorkspaceWorkspaceSlugExperiencesIndexRouteImport
       parentRoute: typeof WorkspaceWorkspaceSlugRoute
+    }
+    '/workspace/$workspaceSlug/settings/integrations': {
+      id: '/workspace/$workspaceSlug/settings/integrations'
+      path: '/integrations'
+      fullPath: '/workspace/$workspaceSlug/settings/integrations'
+      preLoaderRoute: typeof WorkspaceWorkspaceSlugSettingsIntegrationsRouteImport
+      parentRoute: typeof WorkspaceWorkspaceSlugSettingsRouteRoute
+    }
+    '/workspace/$workspaceSlug/settings/general': {
+      id: '/workspace/$workspaceSlug/settings/general'
+      path: '/general'
+      fullPath: '/workspace/$workspaceSlug/settings/general'
+      preLoaderRoute: typeof WorkspaceWorkspaceSlugSettingsGeneralRouteImport
+      parentRoute: typeof WorkspaceWorkspaceSlugSettingsRouteRoute
     }
     '/workspace/$workspaceSlug/projects/$projectId': {
       id: '/workspace/$workspaceSlug/projects/$projectId'
@@ -776,6 +847,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/workspace/$workspaceSlug/projects/$projectId/analytics'
       preLoaderRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdAnalyticsRouteImport
       parentRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdRoute
+    }
+    '/workspace/$workspaceSlug/integrations/dropbox/callback': {
+      id: '/workspace/$workspaceSlug/integrations/dropbox/callback'
+      path: '/integrations/dropbox/callback'
+      fullPath: '/workspace/$workspaceSlug/integrations/dropbox/callback'
+      preLoaderRoute: typeof WorkspaceWorkspaceSlugIntegrationsDropboxCallbackRouteImport
+      parentRoute: typeof WorkspaceWorkspaceSlugRoute
     }
     '/workspace/$workspaceSlug/experiences/$experienceId/create': {
       id: '/workspace/$workspaceSlug/experiences/$experienceId/create'
@@ -892,6 +970,27 @@ const JoinRouteRouteWithChildren = JoinRouteRoute._addFileChildren(
   JoinRouteRouteChildren,
 )
 
+interface WorkspaceWorkspaceSlugSettingsRouteRouteChildren {
+  WorkspaceWorkspaceSlugSettingsGeneralRoute: typeof WorkspaceWorkspaceSlugSettingsGeneralRoute
+  WorkspaceWorkspaceSlugSettingsIntegrationsRoute: typeof WorkspaceWorkspaceSlugSettingsIntegrationsRoute
+  WorkspaceWorkspaceSlugSettingsIndexRoute: typeof WorkspaceWorkspaceSlugSettingsIndexRoute
+}
+
+const WorkspaceWorkspaceSlugSettingsRouteRouteChildren: WorkspaceWorkspaceSlugSettingsRouteRouteChildren =
+  {
+    WorkspaceWorkspaceSlugSettingsGeneralRoute:
+      WorkspaceWorkspaceSlugSettingsGeneralRoute,
+    WorkspaceWorkspaceSlugSettingsIntegrationsRoute:
+      WorkspaceWorkspaceSlugSettingsIntegrationsRoute,
+    WorkspaceWorkspaceSlugSettingsIndexRoute:
+      WorkspaceWorkspaceSlugSettingsIndexRoute,
+  }
+
+const WorkspaceWorkspaceSlugSettingsRouteRouteWithChildren =
+  WorkspaceWorkspaceSlugSettingsRouteRoute._addFileChildren(
+    WorkspaceWorkspaceSlugSettingsRouteRouteChildren,
+  )
+
 interface WorkspaceWorkspaceSlugExperiencesExperienceIdRouteChildren {
   WorkspaceWorkspaceSlugExperiencesExperienceIdCollectRoute: typeof WorkspaceWorkspaceSlugExperiencesExperienceIdCollectRoute
   WorkspaceWorkspaceSlugExperiencesExperienceIdCreateRoute: typeof WorkspaceWorkspaceSlugExperiencesExperienceIdCreateRoute
@@ -968,18 +1067,20 @@ const WorkspaceWorkspaceSlugProjectsProjectIdRouteWithChildren =
   )
 
 interface WorkspaceWorkspaceSlugRouteChildren {
-  WorkspaceWorkspaceSlugSettingsRoute: typeof WorkspaceWorkspaceSlugSettingsRoute
+  WorkspaceWorkspaceSlugSettingsRouteRoute: typeof WorkspaceWorkspaceSlugSettingsRouteRouteWithChildren
   WorkspaceWorkspaceSlugIndexRoute: typeof WorkspaceWorkspaceSlugIndexRoute
   WorkspaceWorkspaceSlugExperiencesExperienceIdRoute: typeof WorkspaceWorkspaceSlugExperiencesExperienceIdRouteWithChildren
   WorkspaceWorkspaceSlugExperiencesCreateRoute: typeof WorkspaceWorkspaceSlugExperiencesCreateRoute
   WorkspaceWorkspaceSlugProjectsProjectIdRoute: typeof WorkspaceWorkspaceSlugProjectsProjectIdRouteWithChildren
   WorkspaceWorkspaceSlugExperiencesIndexRoute: typeof WorkspaceWorkspaceSlugExperiencesIndexRoute
   WorkspaceWorkspaceSlugProjectsIndexRoute: typeof WorkspaceWorkspaceSlugProjectsIndexRoute
+  WorkspaceWorkspaceSlugIntegrationsDropboxCallbackRoute: typeof WorkspaceWorkspaceSlugIntegrationsDropboxCallbackRoute
 }
 
 const WorkspaceWorkspaceSlugRouteChildren: WorkspaceWorkspaceSlugRouteChildren =
   {
-    WorkspaceWorkspaceSlugSettingsRoute: WorkspaceWorkspaceSlugSettingsRoute,
+    WorkspaceWorkspaceSlugSettingsRouteRoute:
+      WorkspaceWorkspaceSlugSettingsRouteRouteWithChildren,
     WorkspaceWorkspaceSlugIndexRoute: WorkspaceWorkspaceSlugIndexRoute,
     WorkspaceWorkspaceSlugExperiencesExperienceIdRoute:
       WorkspaceWorkspaceSlugExperiencesExperienceIdRouteWithChildren,
@@ -991,6 +1092,8 @@ const WorkspaceWorkspaceSlugRouteChildren: WorkspaceWorkspaceSlugRouteChildren =
       WorkspaceWorkspaceSlugExperiencesIndexRoute,
     WorkspaceWorkspaceSlugProjectsIndexRoute:
       WorkspaceWorkspaceSlugProjectsIndexRoute,
+    WorkspaceWorkspaceSlugIntegrationsDropboxCallbackRoute:
+      WorkspaceWorkspaceSlugIntegrationsDropboxCallbackRoute,
   }
 
 const WorkspaceWorkspaceSlugRouteWithChildren =

@@ -23,6 +23,16 @@ export interface SessionData {
    * @example "acme-corp-events"
    */
   lastVisitedWorkspaceSlug?: string
+
+  /** Dropbox OAuth PKCE flow state (transient, cleared after callback) */
+  dropboxOAuth?: {
+    codeVerifier: string
+    state: string
+    workspaceId: string
+    workspaceSlug: string
+    /** Where to redirect after OAuth completes */
+    returnTo: string
+  }
 }
 
 /**

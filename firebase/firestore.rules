@@ -155,6 +155,17 @@ service cloud.firestore {
         // All job creation and updates happen in Cloud Functions
         allow create, update, delete: if false;
       }
+
+      // Export logs subcollection (069-dropbox-export)
+      // Records of export attempts for audit and debugging
+      // Path: /projects/{projectId}/exportLogs/{logId}
+      match /exportLogs/{logId} {
+        // READ: Admins only
+        allow read: if isAdmin();
+
+        // WRITE: Server only via Admin SDK (Cloud Tasks write export logs)
+        allow create, update, delete: if false;
+      }
     }
 
     // Admin users: Full access to everything

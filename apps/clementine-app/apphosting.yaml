@@ -64,6 +64,18 @@ env:
       - BUILD
       - RUNTIME
 
+  - variable: VITE_APP_DOMAIN
+    value: clementine-be--clementine-7568d.europe-west4.hosted.app
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: VITE_DROPBOX_APP_KEY
+    value: zym0zoj3234ohwx
+    availability:
+      - BUILD
+      - RUNTIME
+
   # ============================================
   # Server-side secrets (NEVER commit actual values!)
   # These reference secret names in Google Cloud Secret Manager
@@ -90,5 +102,15 @@ env:
 
   - variable: FIREBASE_ADMIN_PRIVATE_KEY
     secret: FIREBASE_ADMIN_PRIVATE_KEY
+    availability:
+      - RUNTIME
+
+  - variable: DROPBOX_APP_SECRET
+    secret: DROPBOX_APP_SECRET
+    availability:
+      - RUNTIME
+
+  - variable: DROPBOX_TOKEN_ENCRYPTION_KEY
+    secret: DROPBOX_TOKEN_ENCRYPTION_KEY
     availability:
       - RUNTIME

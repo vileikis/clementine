@@ -1,20 +1,34 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { WorkspaceSettingsForm, useWorkspace } from '@/domains/workspace'
+import { Outlet, createFileRoute } from '@tanstack/react-router'
+import type { TabItem } from '@/domains/navigation'
+import { useWorkspace } from '@/domains/workspace'
+import { NavTabs } from '@/domains/navigation'
+
+const settingsTabs: TabItem[] = [
+  {
+    id: 'general',
+    label: 'General',
+    to: '/workspace/$workspaceSlug/settings/general',
+  },
+  {
+    id: 'integrations',
+    label: 'Integrations',
+    to: '/workspace/$workspaceSlug/settings/integrations',
+  },
+]
 
 /**
- * Workspace settings page route
+ * Workspace settings layout route
  *
  * Route: /workspace/:workspaceSlug/settings
  * Access: Admin only (enforced by parent route requireAdmin guard)
  *
- * Allows admins to edit workspace name and slug.
- * Automatically redirects to new URL if slug is changed.
+ * Layout with page header, NavTabs (General, Integrations), and Outlet for child content.
  */
 export const Route = createFileRoute('/workspace/$workspaceSlug/settings')({
-  component: SettingsPage,
+  component: SettingsLayout,
 })
 
-function SettingsPage() {
+function SettingsLayout() {
   const { workspaceSlug } = Route.useParams()
   const { data: workspace, isLoading, isError } = useWorkspace(workspaceSlug)
 
@@ -39,10 +53,13 @@ function SettingsPage() {
       <div className="mb-6">
         <h1 className="text-2xl font-bold">Workspace Settings</h1>
         <p className="text-muted-foreground mt-2">
-          Manage your workspace name and URL
+          Manage your workspace configuration
         </p>
       </div>
-      <WorkspaceSettingsForm workspace={workspace} />
+      <div className="border-b mb-6">
+        <NavTabs tabs={settingsTabs} />
+      </div>
+      <Outlet />
     </div>
   )
 }

@@ -63,6 +63,7 @@ export function useGhostProject(workspaceId: string) {
           type: 'ghost' as const,
           draftConfig: null,
           publishedConfig: null,
+          exports: null,
           draftVersion: 1,
           publishedVersion: null,
           publishedAt: null,

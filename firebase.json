@@ -15,7 +15,7 @@
         ".git"
       ],
       "predeploy": [
-        "cd functions && pnpm build && npx isolate && cd isolate && npm install"
+        "cd functions && pnpm build && npx isolate && cp -f .env.clementine-7568d isolate/ 2>/dev/null || true && cd isolate && npm install"
       ]
     }
   ],

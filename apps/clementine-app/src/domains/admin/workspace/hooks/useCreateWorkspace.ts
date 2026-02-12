@@ -79,6 +79,7 @@ export function useCreateWorkspace() {
           slug,
           status: 'active' as WorkspaceStatus,
           deletedAt: null,
+          integrations: null,
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
         }

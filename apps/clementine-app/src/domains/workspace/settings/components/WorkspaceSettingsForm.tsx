@@ -62,7 +62,7 @@ export function WorkspaceSettingsForm({
       // If slug changed, redirect to new URL
       if (slugChanged && values.slug) {
         navigate({
-          to: '/workspace/$workspaceSlug/settings',
+          to: '/workspace/$workspaceSlug/settings/general',
           params: { workspaceSlug: values.slug },
         })
       }
