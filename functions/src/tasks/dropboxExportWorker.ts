@@ -31,6 +31,11 @@ import {
   DropboxInsufficientSpaceError,
 } from '../services/export'
 import { storage } from '../infra/firebase-admin'
+import {
+  DROPBOX_APP_KEY,
+  DROPBOX_APP_SECRET,
+  DROPBOX_TOKEN_ENCRYPTION_KEY,
+} from '../infra/params'
 
 // ============================================================================
 // Types
@@ -42,6 +47,13 @@ interface ExportContext {
   experienceName: string
 }
 
+/** Resolved param values passed to step functions */
+interface DropboxCredentials {
+  appKey: string
+  appSecret: string
+  encryptionKey: string
+}
+
 // ============================================================================
 // Main Handler
 // ============================================================================
@@ -51,6 +63,7 @@ export const dropboxExportWorker = onTaskDispatched(
     region: 'europe-west1',
     memory: '512MiB',
     timeoutSeconds: 120,
+    secrets: [DROPBOX_APP_SECRET, DROPBOX_TOKEN_ENCRYPTION_KEY],
     retryConfig: {
       maxAttempts: 3,
       minBackoffSeconds: 30,
@@ -69,6 +82,13 @@ export const dropboxExportWorker = onTaskDispatched(
     const payload = parseResult.data
     const { jobId, projectId, sessionId, workspaceId } = payload
 
+    // Resolve credentials once at the top
+    const credentials: DropboxCredentials = {
+      appKey: DROPBOX_APP_KEY.value(),
+      appSecret: DROPBOX_APP_SECRET.value(),
+      encryptionKey: DROPBOX_TOKEN_ENCRYPTION_KEY.value(),
+    }
+
     logger.info('[DropboxExportWorker] Processing', {
       jobId,
       projectId,
@@ -83,6 +103,7 @@ export const dropboxExportWorker = onTaskDispatched(
       // 2. Get a fresh Dropbox access token
       const accessToken = await getDropboxAccessToken(
         context.integration,
+        credentials,
         payload,
       )
       if (!accessToken) return
@@ -189,12 +210,20 @@ async function validateExportContext(
  */
 async function getDropboxAccessToken(
   integration: DropboxIntegration,
+  credentials: DropboxCredentials,
   payload: DropboxExportPayload,
 ): Promise<string | null> {
-  const refreshToken = decrypt(integration.encryptedRefreshToken)
+  const refreshToken = decrypt(
+    integration.encryptedRefreshToken,
+    credentials.encryptionKey,
+  )
 
   try {
-    return await refreshAccessToken(refreshToken)
+    return await refreshAccessToken(
+      refreshToken,
+      credentials.appKey,
+      credentials.appSecret,
+    )
   } catch (error) {
     if (error instanceof DropboxInvalidGrantError) {
       logger.warn('[DropboxExportWorker] Token invalid, marking needs_reauth', {

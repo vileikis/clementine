@@ -31,18 +31,17 @@ export class DropboxInsufficientSpaceError extends Error {
  * Refresh a Dropbox access token using a refresh token.
  *
  * @param refreshToken - Decrypted Dropbox refresh token
+ * @param appKey - Dropbox app key (client ID)
+ * @param appSecret - Dropbox app secret
  * @returns Fresh short-lived access token
  * @throws DropboxInvalidGrantError if the refresh token is revoked/expired
  * @throws Error for other API failures
  */
-export async function refreshAccessToken(refreshToken: string): Promise<string> {
-  const appKey = process.env['VITE_DROPBOX_APP_KEY']
-  const appSecret = process.env['DROPBOX_APP_SECRET']
-
-  if (!appKey || !appSecret) {
-    throw new Error('Dropbox app credentials not configured (VITE_DROPBOX_APP_KEY / DROPBOX_APP_SECRET)')
-  }
-
+export async function refreshAccessToken(
+  refreshToken: string,
+  appKey: string,
+  appSecret: string,
+): Promise<string> {
   const response = await fetch('https://api.dropboxapi.com/oauth2/token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
