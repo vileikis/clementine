@@ -26,7 +26,7 @@ function generatePKCE() {
  */
 export const initiateDropboxOAuthFn = createServerFn({ method: 'POST' })
   .inputValidator(
-    (data: { workspaceId: string; projectId: string; workspaceSlug: string }) =>
+    (data: { workspaceId: string; workspaceSlug: string; returnTo: string }) =>
       data,
   )
   .handler(async ({ data }) => {
@@ -49,8 +49,8 @@ export const initiateDropboxOAuthFn = createServerFn({ method: 'POST' })
             codeVerifier: verifier,
             state,
             workspaceId: data.workspaceId,
-            projectId: data.projectId,
             workspaceSlug: data.workspaceSlug,
+            returnTo: data.returnTo,
           },
         })
 

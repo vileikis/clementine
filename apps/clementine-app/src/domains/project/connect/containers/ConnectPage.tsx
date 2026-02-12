@@ -13,7 +13,6 @@ export function ConnectPage() {
   const { data: project } = useProject(projectId)
   const { data: workspace, isLoading } = useWorkspace(workspaceSlug)
 
-  const workspaceId = workspace?.id ?? project?.workspaceId
   const integration = workspace?.integrations?.dropbox ?? null
   const { isEnabled, toggle, isToggling } = useDropboxExport(project)
 
@@ -21,12 +20,10 @@ export function ConnectPage() {
     <div className="flex justify-center py-8">
       <div className="w-full max-w-md space-y-6 px-4">
         <DropboxCard
-          workspaceId={workspaceId ?? ''}
           workspaceSlug={workspaceSlug}
-          projectId={projectId}
           projectName={project?.name ?? 'Project'}
           integration={integration}
-          isLoading={isLoading || !workspaceId}
+          isLoading={isLoading}
           isExportEnabled={isEnabled}
           onToggleExport={toggle}
           isToggling={isToggling}

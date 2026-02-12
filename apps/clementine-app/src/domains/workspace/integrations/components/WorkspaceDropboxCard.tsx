@@ -48,7 +48,11 @@ export function WorkspaceDropboxCard({
     setIsConnecting(true)
     try {
       const result = await initiateOAuth({
-        data: { workspaceId, projectId: '', workspaceSlug },
+        data: {
+          workspaceId,
+          workspaceSlug,
+          returnTo: `/workspace/${workspaceSlug}/settings/integrations`,
+        },
       })
       window.location.href = result.authorizationUrl
     } catch {

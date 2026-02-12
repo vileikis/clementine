@@ -1,19 +1,14 @@
 /**
  * DropboxCard
  *
- * Project-level integration card for Dropbox connection and export toggle.
- * Renders different UI states: not connected, connected (export off/on),
- * needs re-auth, and loading.
+ * Project-level Dropbox export card. Shows export toggle when connected,
+ * or directs users to Workspace Settings to connect/reconnect.
  *
- * Disconnect and reconnect are managed at workspace level
- * (Workspace Settings → Integrations).
+ * All connection management (connect, disconnect, reconnect) lives in
+ * Workspace Settings → Integrations.
  */
-import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
-import { useServerFn } from '@tanstack/react-start'
 import { Loader2 } from 'lucide-react'
-import { toast } from 'sonner'
-import { initiateDropboxOAuthFn } from '../server/functions'
 import type { DropboxIntegration } from '@clementine/shared'
 import {
   Card,
@@ -22,15 +17,12 @@ import {
   CardHeader,
   CardTitle,
 } from '@/ui-kit/ui/card'
-import { Button } from '@/ui-kit/ui/button'
 import { Badge } from '@/ui-kit/ui/badge'
 import { Switch } from '@/ui-kit/ui/switch'
 import { Label } from '@/ui-kit/ui/label'
 
 interface DropboxCardProps {
-  workspaceId: string
   workspaceSlug: string
-  projectId: string
   projectName: string
   integration: DropboxIntegration | null
   isLoading: boolean
@@ -43,9 +35,7 @@ interface DropboxCardProps {
 }
 
 export function DropboxCard({
-  workspaceId,
   workspaceSlug,
-  projectId,
   projectName,
   integration,
   isLoading,
@@ -53,22 +43,6 @@ export function DropboxCard({
   onToggleExport,
   isToggling,
 }: DropboxCardProps) {
-  const [isConnecting, setIsConnecting] = useState(false)
-  const initiateOAuth = useServerFn(initiateDropboxOAuthFn)
-
-  const handleConnect = async () => {
-    setIsConnecting(true)
-    try {
-      const result = await initiateOAuth({
-        data: { workspaceId, projectId, workspaceSlug },
-      })
-      window.location.href = result.authorizationUrl
-    } catch {
-      toast.error('Failed to initiate Dropbox connection')
-      setIsConnecting(false)
-    }
-  }
-
   if (isLoading) {
     return (
       <Card>
@@ -85,44 +59,25 @@ export function DropboxCard({
     )
   }
 
-  // State A: Not connected
-  if (!integration || integration.status === 'disconnected') {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Dropbox</CardTitle>
-          <CardDescription>
-            Automatically export AI-generated results to your Dropbox.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Button onClick={handleConnect} disabled={isConnecting}>
-            {isConnecting ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Connecting...
-              </>
-            ) : (
-              'Connect Dropbox'
-            )}
-          </Button>
-        </CardContent>
-      </Card>
-    )
-  }
+  // Not connected or needs re-auth — direct to workspace settings
+  if (
+    !integration ||
+    integration.status === 'disconnected' ||
+    integration.status === 'needs_reauth'
+  ) {
+    const isLost = integration?.status === 'needs_reauth'
 
-  // State: Needs re-auth — link to workspace settings instead of inline reconnect
-  if (integration.status === 'needs_reauth') {
     return (
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
             <CardTitle>Dropbox</CardTitle>
-            <Badge variant="destructive">Connection Lost</Badge>
+            {isLost && <Badge variant="destructive">Connection Lost</Badge>}
           </div>
           <CardDescription>
-            Dropbox connection lost — reconnect from Workspace Settings to
-            resume exports.
+            {isLost
+              ? 'Dropbox connection lost — reconnect from Workspace Settings to resume exports.'
+              : 'Automatically export AI-generated results to your Dropbox.'}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -131,14 +86,16 @@ export function DropboxCard({
             params={{ workspaceSlug }}
             className="text-primary text-sm font-medium hover:underline"
           >
-            Manage in Workspace Settings
+            {isLost
+              ? 'Reconnect in Workspace Settings'
+              : 'Connect in Workspace Settings'}
           </Link>
         </CardContent>
       </Card>
     )
   }
 
-  // State B/C: Connected — export toggle + link to workspace settings
+  // Connected — export toggle + link to workspace settings
   return (
     <Card>
       <CardHeader>

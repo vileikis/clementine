@@ -29,8 +29,9 @@ export interface SessionData {
     codeVerifier: string
     state: string
     workspaceId: string
-    projectId: string
     workspaceSlug: string
+    /** Where to redirect after OAuth completes */
+    returnTo: string
   }
 }
 

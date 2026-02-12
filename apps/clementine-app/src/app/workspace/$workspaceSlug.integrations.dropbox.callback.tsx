@@ -3,7 +3,7 @@
  *
  * Handles the redirect from Dropbox after user authorizes.
  * Exchanges auth code for tokens, encrypts refresh token,
- * stores integration in workspace, and redirects to Connect tab.
+ * stores integration in workspace, and redirects to Workspace Settings.
  */
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
@@ -39,18 +39,15 @@ const handleDropboxCallbackFn = createServerFn({ method: 'GET' })
         const session = await useAppSession()
         const oauthState = session.data.dropboxOAuth
 
+        const defaultRedirect = oauthState ? oauthState.returnTo : '/workspace'
+
         // User cancelled or Dropbox returned an error
         if (data.error || !data.code) {
-          // Clean up session
           if (oauthState) {
             const { dropboxOAuth: _, ...rest } = session.data
             await session.update(rest)
           }
-          return {
-            redirect: oauthState
-              ? `/workspace/${oauthState.workspaceSlug}/projects/${oauthState.projectId}/connect`
-              : '/workspace',
-          }
+          return { redirect: defaultRedirect }
         }
 
         // Validate state matches session
@@ -60,14 +57,10 @@ const handleDropboxCallbackFn = createServerFn({ method: 'GET' })
           })
           const { dropboxOAuth: _, ...rest } = session.data
           await session.update(rest)
-          return {
-            redirect: oauthState
-              ? `/workspace/${oauthState.workspaceSlug}/projects/${oauthState.projectId}/connect?error=invalid_state`
-              : '/workspace',
-          }
+          return { redirect: defaultRedirect }
         }
 
-        const { codeVerifier, workspaceId, projectId, workspaceSlug } =
+        const { codeVerifier, workspaceId, workspaceSlug, returnTo } =
           oauthState
 
         try {
@@ -152,9 +145,7 @@ const handleDropboxCallbackFn = createServerFn({ method: 'GET' })
           const { dropboxOAuth: _, ...rest } = session.data
           await session.update(rest)
 
-          return {
-            redirect: `/workspace/${workspaceSlug}/projects/${projectId}/connect?dropbox=connected`,
-          }
+          return { redirect: returnTo }
         } catch (error) {
           Sentry.captureException(error, {
             tags: { action: 'dropbox-oauth-callback' },
@@ -164,9 +155,7 @@ const handleDropboxCallbackFn = createServerFn({ method: 'GET' })
           const { dropboxOAuth: _, ...rest } = session.data
           await session.update(rest)
 
-          return {
-            redirect: `/workspace/${workspaceSlug}/projects/${projectId}/connect?error=oauth_failed`,
-          }
+          return { redirect: returnTo }
         }
       },
     )
