@@ -4,8 +4,8 @@
  * Workspace-level integrations management page.
  * Renders integration cards (starting with Dropbox).
  */
-import { WorkspaceDropboxCard } from '@/domains/workspace/integrations/components/WorkspaceDropboxCard'
 import type { Workspace } from '@clementine/shared'
+import { WorkspaceDropboxCard } from '@/domains/workspace/integrations/components/WorkspaceDropboxCard'
 
 interface IntegrationsPageProps {
   workspace: Workspace
