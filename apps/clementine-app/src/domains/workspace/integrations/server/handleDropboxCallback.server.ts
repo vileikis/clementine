@@ -58,8 +58,7 @@ export const handleDropboxCallbackFn = createServerFn({ method: 'GET' })
           return { redirect: defaultRedirect }
         }
 
-        const { codeVerifier, workspaceId, workspaceSlug, returnTo } =
-          oauthState
+        const { codeVerifier, workspaceId, returnTo } = oauthState
 
         try {
           // Exchange code for tokens
@@ -78,7 +77,7 @@ export const handleDropboxCallbackFn = createServerFn({ method: 'GET' })
             ? `https://${appDomain}`
             : 'http://localhost:3000'
 
-          const redirectUri = `${baseUrl}/workspace/${workspaceSlug}/integrations/dropbox/callback`
+          const redirectUri = `${baseUrl}/integrations/dropbox/callback`
 
           const tokenResponse = await fetch(
             'https://api.dropboxapi.com/oauth2/token',

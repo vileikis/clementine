@@ -50,7 +50,6 @@ export function WorkspaceDropboxCard({
       const result = await initiateOAuth({
         data: {
           workspaceId,
-          workspaceSlug,
           returnTo: `/workspace/${workspaceSlug}/settings/integrations`,
         },
       })

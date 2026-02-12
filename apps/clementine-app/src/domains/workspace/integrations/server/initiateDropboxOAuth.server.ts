@@ -11,7 +11,6 @@ import { useAppSession } from '@/domains/auth/server/session.server'
 
 const initiateDropboxOAuthInputSchema = z.object({
   workspaceId: z.string().min(1),
-  workspaceSlug: z.string().min(1),
   returnTo: z.string().min(1),
 })
 
@@ -46,7 +45,6 @@ export const initiateDropboxOAuthFn = createServerFn({ method: 'POST' })
             codeVerifier: verifier,
             state,
             workspaceId: data.workspaceId,
-            workspaceSlug: data.workspaceSlug,
             returnTo: data.returnTo,
           },
         })
@@ -56,7 +54,7 @@ export const initiateDropboxOAuthFn = createServerFn({ method: 'POST' })
           throw new Error('VITE_DROPBOX_APP_KEY is not configured')
         }
 
-        // Build callback URL from the workspace slug
+        // Build fixed callback URL (workspace context stored in session)
         const appDomain = process.env['VITE_APP_DOMAIN']
         if (process.env.NODE_ENV === 'production' && !appDomain) {
           throw new Error('VITE_APP_DOMAIN must be set in production')
@@ -65,7 +63,7 @@ export const initiateDropboxOAuthFn = createServerFn({ method: 'POST' })
           ? `https://${appDomain}`
           : 'http://localhost:3000'
 
-        const redirectUri = `${baseUrl}/workspace/${data.workspaceSlug}/integrations/dropbox/callback`
+        const redirectUri = `${baseUrl}/integrations/dropbox/callback`
 
         const params = new URLSearchParams({
           client_id: appKey,
