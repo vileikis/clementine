@@ -8,14 +8,10 @@
  * See contracts/export-tasks.yaml CT-001 for full spec.
  */
 import { onTaskDispatched } from 'firebase-functions/v2/tasks'
-import { getFunctions } from 'firebase-admin/functions'
 import { logger } from 'firebase-functions/v2'
-import {
-  dispatchExportsPayloadSchema,
-  type DropboxExportPayload,
-} from '../schemas/export.schema'
+import { dispatchExportsPayloadSchema } from '../schemas/export.schema'
 import { fetchProject } from '../repositories/project'
-import { fetchSession } from '../repositories/session'
+import { queueDropboxExportWorker } from '../infra/task-queues'
 
 export const dispatchExports = onTaskDispatched(
   {
@@ -38,22 +34,16 @@ export const dispatchExports = onTaskDispatched(
       return // Don't retry invalid payloads
     }
 
-    const { jobId, projectId, sessionId, resultMedia } = parseResult.data
+    const { jobId, projectId, sessionId, experienceId, resultMedia } =
+      parseResult.data
 
-    logger.info('[DispatchExports] Processing', { jobId, projectId, sessionId })
+    logger.info('[DispatchExports] Processing', { jobId, projectId })
 
-    // Fetch project to check export config
+    // Fetch project to check export config and get workspaceId
     const project = await fetchProject(projectId)
     if (!project) {
       logger.warn('[DispatchExports] Project not found, skipping', { projectId })
       return // Don't retry — project deleted
-    }
-
-    // Fetch session for workspaceId and experienceId
-    const session = await fetchSession(projectId, sessionId)
-    if (!session) {
-      logger.warn('[DispatchExports] Session not found, skipping', { sessionId })
-      return // Don't retry — session deleted
     }
 
     // Check if Dropbox export is enabled for this project
@@ -63,21 +53,19 @@ export const dispatchExports = onTaskDispatched(
     const isDropboxEnabled = dropboxExport?.dropbox?.enabled === true
 
     if (isDropboxEnabled) {
-      const payload: DropboxExportPayload = {
+      await queueDropboxExportWorker({
         jobId,
         projectId,
         sessionId,
-        workspaceId: session.workspaceId,
-        experienceId: session.experienceId,
+        workspaceId: project.workspaceId,
+        experienceId,
         resultMedia,
-      }
-
-      await queueDropboxExportWorker(payload)
+      })
 
       logger.info('[DispatchExports] Enqueued dropboxExportWorker', {
         jobId,
         projectId,
-        workspaceId: session.workspaceId,
+        workspaceId: project.workspaceId,
       })
     } else {
       logger.info('[DispatchExports] No exports enabled, skipping', {
@@ -87,17 +75,3 @@ export const dispatchExports = onTaskDispatched(
     }
   },
 )
-
-/**
- * Enqueue a dropboxExportWorker Cloud Task
- */
-async function queueDropboxExportWorker(
-  payload: DropboxExportPayload,
-): Promise<void> {
-  const queue = getFunctions().taskQueue(
-    'locations/europe-west1/functions/dropboxExportWorker',
-  )
-  await queue.enqueue(payload, {
-    scheduleDelaySeconds: 0,
-  })
-}

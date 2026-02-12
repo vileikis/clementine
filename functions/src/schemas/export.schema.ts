@@ -22,6 +22,7 @@ export const dispatchExportsPayloadSchema = z.object({
   jobId: z.string().min(1),
   projectId: z.string().min(1),
   sessionId: z.string().min(1),
+  experienceId: z.string().min(1),
   resultMedia: resultMediaSchema,
 })
 

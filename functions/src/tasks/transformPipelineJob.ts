@@ -24,7 +24,7 @@ import {
 import type { Job, JobOutput } from '@clementine/shared'
 import { runOutcome, type OutcomeContext } from '../services/transform'
 import { createTempDir, cleanupTempDir } from '../infra/temp-dir'
-import { queueDispatchExports } from './dispatchExportsQueue'
+import { queueDispatchExports } from '../infra/task-queues'
 
 /**
  * Job handler context for cleanup management
@@ -216,6 +216,7 @@ async function finalizeJobSuccess(
       jobId: job.id,
       projectId,
       sessionId,
+      experienceId: job.experienceId,
       resultMedia: {
         url: output.url,
         filePath: output.filePath,
