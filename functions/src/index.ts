@@ -11,6 +11,12 @@ export { dispatchExports } from './tasks/dispatchExports'
 export { dropboxExportWorker } from './tasks/dropboxExportWorker'
 
 /**
+ * Email Result
+ */
+export { sendSessionEmail } from './tasks/sendSessionEmail'
+export { submitGuestEmail } from './callable/submitGuestEmail'
+
+/**
  * Vertex AI Tests
  */
 export { testVertexAI } from './http/testVertexAI'

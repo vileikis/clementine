@@ -7,6 +7,7 @@
 import { getFunctions } from 'firebase-admin/functions'
 import type { TransformPipelineJobPayload } from '../schemas/transform-pipeline.schema'
 import type { DispatchExportsPayload, DropboxExportPayload } from '../schemas/export.schema'
+import type { SendSessionEmailPayload } from '../schemas/email.schema'
 
 const REGION = 'europe-west1'
 
@@ -44,5 +45,19 @@ export async function queueDropboxExportWorker(
   payload: DropboxExportPayload,
 ): Promise<void> {
   const queue = getFunctions().taskQueue(taskQueuePath('dropboxExportWorker'))
+  await queue.enqueue(payload, { scheduleDelaySeconds: 0 })
+}
+
+/**
+ * Enqueue a sendSessionEmail Cloud Task
+ *
+ * Called from transformPipelineJob after successful completion
+ * and from submitGuestEmail callable when job is already done.
+ * Best-effort — callers should catch and log errors without failing.
+ */
+export async function queueSendSessionEmail(
+  payload: SendSessionEmailPayload,
+): Promise<void> {
+  const queue = getFunctions().taskQueue(taskQueuePath('sendSessionEmail'))
   await queue.enqueue(payload, { scheduleDelaySeconds: 0 })
 }

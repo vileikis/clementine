@@ -81,6 +81,40 @@ export function hasActiveJob(session: Session): boolean {
  * @param sessionId - Session document ID
  * @param resultMedia - Result media to set
  */
+/**
+ * Update session with guest email address
+ *
+ * @param projectId - Project ID
+ * @param sessionId - Session document ID
+ * @param guestEmail - Guest email address (PII — never log)
+ */
+export async function updateSessionGuestEmail(
+  projectId: string,
+  sessionId: string,
+  guestEmail: string
+): Promise<void> {
+  await getSessionRef(projectId, sessionId).update({
+    guestEmail,
+    updatedAt: Date.now(),
+  })
+}
+
+/**
+ * Update session with email sent timestamp
+ *
+ * @param projectId - Project ID
+ * @param sessionId - Session document ID
+ */
+export async function updateSessionEmailSentAt(
+  projectId: string,
+  sessionId: string
+): Promise<void> {
+  await getSessionRef(projectId, sessionId).update({
+    emailSentAt: Date.now(),
+    updatedAt: Date.now(),
+  })
+}
+
 export async function updateSessionResultMedia(
   projectId: string,
   sessionId: string,

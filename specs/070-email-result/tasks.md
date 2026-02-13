@@ -19,8 +19,8 @@
 
 **Purpose**: Install dependencies and configure secrets for email sending
 
-- [ ] T001 Install nodemailer and @types/nodemailer in functions workspace: `pnpm add nodemailer --filter @clementine/functions && pnpm add -D @types/nodemailer --filter @clementine/functions`
-- [ ] T002 Add SMTP_APP_PASSWORD secret definition to `functions/src/infra/params.ts` using `defineSecret('SMTP_APP_PASSWORD')` following the existing DROPBOX_APP_SECRET pattern
+- [X] T001 Install nodemailer and @types/nodemailer in functions workspace: `pnpm add nodemailer --filter @clementine/functions && pnpm add -D @types/nodemailer --filter @clementine/functions`
+- [X] T002 Add SMTP_APP_PASSWORD secret definition to `functions/src/infra/params.ts` using `defineSecret('SMTP_APP_PASSWORD')` following the existing DROPBOX_APP_SECRET pattern
 
 ---
 
@@ -30,12 +30,12 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T003 [P] Add `guestEmail` (z.string().email().nullable().default(null)) and `emailSentAt` (z.number().nullable().default(null)) fields to session schema in `packages/shared/src/schemas/session/session.schema.ts` — follow existing nullable field pattern, add JSDoc noting guestEmail is PII
-- [ ] T004 [P] Add `emailCaptureConfigSchema` (enabled: boolean, heading: string nullable) and nest as `emailCapture` field in `shareLoadingConfigSchema` in `packages/shared/src/schemas/project/project-config.schema.ts` — export `EmailCaptureConfig` type, follow the nullable object pattern used by `cta` in `shareReadyConfigSchema`
-- [ ] T005 [P] Create email payload Zod schemas in `functions/src/schemas/email.schema.ts` — define `submitGuestEmailPayloadSchema` (projectId, sessionId, email) and `sendSessionEmailPayloadSchema` (projectId, sessionId, resultMedia) per contracts
-- [ ] T006 [P] Add `queueSendSessionEmail()` function to `functions/src/infra/task-queues.ts` — follow the existing `queueDropboxExportWorker()` pattern with `SendSessionEmailPayload` type
-- [ ] T007 [P] Add default `emailCapture` config (`{ enabled: false, heading: null }`) to `apps/clementine-app/src/domains/project-config/share/constants/defaults.ts` — add `DEFAULT_EMAIL_CAPTURE` constant
-- [ ] T008 Build shared package to propagate schema changes: `pnpm --filter @clementine/shared build`
+- [X] T003 [P] Add `guestEmail` (z.string().email().nullable().default(null)) and `emailSentAt` (z.number().nullable().default(null)) fields to session schema in `packages/shared/src/schemas/session/session.schema.ts` — follow existing nullable field pattern, add JSDoc noting guestEmail is PII
+- [X] T004 [P] Add `emailCaptureConfigSchema` (enabled: boolean, heading: string nullable) and nest as `emailCapture` field in `shareLoadingConfigSchema` in `packages/shared/src/schemas/project/project-config.schema.ts` — export `EmailCaptureConfig` type, follow the nullable object pattern used by `cta` in `shareReadyConfigSchema`
+- [X] T005 [P] Create email payload Zod schemas in `functions/src/schemas/email.schema.ts` — define `submitGuestEmailPayloadSchema` (projectId, sessionId, email) and `sendSessionEmailPayloadSchema` (projectId, sessionId, resultMedia) per contracts
+- [X] T006 [P] Add `queueSendSessionEmail()` function to `functions/src/infra/task-queues.ts` — follow the existing `queueDropboxExportWorker()` pattern with `SendSessionEmailPayload` type
+- [X] T007 [P] Add default `emailCapture` config (`{ enabled: false, heading: null }`) to `apps/clementine-app/src/domains/project-config/share/constants/defaults.ts` — add `DEFAULT_EMAIL_CAPTURE` constant
+- [X] T008 Build shared package to propagate schema changes: `pnpm --filter @clementine/shared build`
 
 **Checkpoint**: Schemas, infrastructure, and defaults ready — user story implementation can now begin
 
@@ -49,18 +49,18 @@
 
 ### Backend (Cloud Functions)
 
-- [ ] T009 [US1] Create `sendResultEmail()` utility in `functions/src/services/email/email.service.ts` — Nodemailer SMTP transporter (lazy, cached at module scope), sends HTML email with result image + share page link, uses SMTP_APP_PASSWORD secret, never logs guestEmail. See contract UT-001.
-- [ ] T010 [US1] Create `sendSessionEmail` Cloud Task handler in `functions/src/tasks/sendSessionEmail.ts` — validate payload with Zod, fetch session, check all 4 conditions (guestEmail, jobStatus=completed, resultMedia, emailSentAt=null), call sendResultEmail(), update emailSentAt on success, log errors without throwing. See contract CT-002. Depends on T009.
-- [ ] T011 [P] [US1] Create `submitGuestEmail` callable in `functions/src/callable/submitGuestEmail.ts` — validate payload with Zod, fetch session, verify guestEmail is null (prevent overwrite), write guestEmail to session, check if job completed + resultMedia exists → queue sendSessionEmail if so. See contract CF-001.
-- [ ] T012 [US1] Modify `finalizeJobSuccess()` in `functions/src/tasks/transformPipelineJob.ts` — add best-effort `queueSendSessionEmail()` call after existing `queueDispatchExports()`, same try/catch pattern with logger.warn on failure. Pass { projectId, sessionId, resultMedia: { url, filePath, displayName } }.
-- [ ] T013 [US1] Export `sendSessionEmail` and `submitGuestEmail` in `functions/src/index.ts` — add to new "Email Result" section following existing export pattern
+- [X] T009 [US1] Create `sendResultEmail()` utility in `functions/src/services/email/email.service.ts` — Nodemailer SMTP transporter (lazy, cached at module scope), sends HTML email with result image + share page link, uses SMTP_APP_PASSWORD secret, never logs guestEmail. See contract UT-001.
+- [X] T010 [US1] Create `sendSessionEmail` Cloud Task handler in `functions/src/tasks/sendSessionEmail.ts` — validate payload with Zod, fetch session, check all 4 conditions (guestEmail, jobStatus=completed, resultMedia, emailSentAt=null), call sendResultEmail(), update emailSentAt on success, log errors without throwing. See contract CT-002. Depends on T009.
+- [X] T011 [P] [US1] Create `submitGuestEmail` callable in `functions/src/callable/submitGuestEmail.ts` — validate payload with Zod, fetch session, verify guestEmail is null (prevent overwrite), write guestEmail to session, check if job completed + resultMedia exists → queue sendSessionEmail if so. See contract CF-001.
+- [X] T012 [US1] Modify `finalizeJobSuccess()` in `functions/src/tasks/transformPipelineJob.ts` — add best-effort `queueSendSessionEmail()` call after existing `queueDispatchExports()`, same try/catch pattern with logger.warn on failure. Pass { projectId, sessionId, resultMedia: { url, filePath, displayName } }.
+- [X] T013 [US1] Export `sendSessionEmail` and `submitGuestEmail` in `functions/src/index.ts` — add to new "Email Result" section following existing export pattern
 
 ### Frontend (TanStack Start App)
 
-- [ ] T014 [P] [US1] Create `useSubmitGuestEmail` mutation hook in `apps/clementine-app/src/domains/project-config/share/hooks/useSubmitGuestEmail.ts` — calls submitGuestEmail callable via Firebase httpsCallable, accepts { projectId, sessionId, email }, returns mutation state. Follow existing callable invocation patterns.
-- [ ] T015 [P] [US1] Create `EmailCaptureForm` component in `apps/clementine-app/src/domains/project-config/share/components/EmailCaptureForm.tsx` — email input + submit button, client-side validation (HTML type=email + inline error), isSubmitting/isSubmitted state, confirmation message replacing form after submit, mobile-first with 44x44px touch targets. Props: `onSubmit(email)`, `isSubmitted`, `submittedEmail`, `heading` (default: "Get your result by email").
-- [ ] T016 [US1] Modify `ShareLoadingRenderer` in `apps/clementine-app/src/domains/project-config/share/components/ShareLoadingRenderer.tsx` — add props: `session` (Session | null), `emailCaptureConfig` (EmailCaptureConfig | null), `onEmailSubmit` callback. Conditionally render EmailCaptureForm below title/description when `emailCaptureConfig?.enabled` is true and `mode === 'run'`. Pass heading from config. Show confirmation state when `session?.guestEmail` exists.
-- [ ] T017 [US1] Modify `SharePage` container in `apps/clementine-app/src/domains/guest/containers/SharePage.tsx` — extract `emailCapture` config from `project.publishedConfig?.shareLoading?.emailCapture`, create handleEmailSubmit callback using useSubmitGuestEmail, pass `session`, `emailCaptureConfig`, and `onEmailSubmit` props to ShareLoadingRenderer
+- [X] T014 [P] [US1] Create `useSubmitGuestEmail` mutation hook in `apps/clementine-app/src/domains/project-config/share/hooks/useSubmitGuestEmail.ts` — calls submitGuestEmail callable via Firebase httpsCallable, accepts { projectId, sessionId, email }, returns mutation state. Follow existing callable invocation patterns.
+- [X] T015 [P] [US1] Create `EmailCaptureForm` component in `apps/clementine-app/src/domains/project-config/share/components/EmailCaptureForm.tsx` — email input + submit button, client-side validation (HTML type=email + inline error), isSubmitting/isSubmitted state, confirmation message replacing form after submit, mobile-first with 44x44px touch targets. Props: `onSubmit(email)`, `isSubmitted`, `submittedEmail`, `heading` (default: "Get your result by email").
+- [X] T016 [US1] Modify `ShareLoadingRenderer` in `apps/clementine-app/src/domains/project-config/share/components/ShareLoadingRenderer.tsx` — add props: `session` (Session | null), `emailCaptureConfig` (EmailCaptureConfig | null), `onEmailSubmit` callback. Conditionally render EmailCaptureForm below title/description when `emailCaptureConfig?.enabled` is true and `mode === 'run'`. Pass heading from config. Show confirmation state when `session?.guestEmail` exists.
+- [X] T017 [US1] Modify `SharePage` container in `apps/clementine-app/src/domains/guest/containers/SharePage.tsx` — extract `emailCapture` config from `project.publishedConfig?.shareLoading?.emailCapture`, create handleEmailSubmit callback using useSubmitGuestEmail, pass `session`, `emailCaptureConfig`, and `onEmailSubmit` props to ShareLoadingRenderer
 
 **Checkpoint**: Guest can enter email on loading screen, receive result email when processing completes. Both timing cases work. This is the MVP.
 
@@ -72,8 +72,8 @@
 
 **Independent Test**: Trigger an AI transform, verify loading screen shows themed spinner (using primaryColor) and elapsed counter incrementing each second.
 
-- [ ] T018 [US2] Replace `<Skeleton>` with themed `<Loader2>` spinner in `ShareLoadingRenderer` in `apps/clementine-app/src/domains/project-config/share/components/ShareLoadingRenderer.tsx` — use `useThemeWithOverride()` to get theme.primaryColor, apply via inline style `{ color: theme.primaryColor }`, follow existing ThemedLoading pattern from `src/shared/theming/components/primitives/ThemedLoading.tsx`
-- [ ] T019 [US2] Add elapsed time counter to `ShareLoadingRenderer` in `apps/clementine-app/src/domains/project-config/share/components/ShareLoadingRenderer.tsx` — useState + useEffect with setInterval(1000ms), display below spinner as "0s", "1s", "2s"..., only show when `mode === 'run'`, cleanup interval on unmount
+- [X] T018 [US2] Replace `<Skeleton>` with themed `<Loader2>` spinner in `ShareLoadingRenderer` in `apps/clementine-app/src/domains/project-config/share/components/ShareLoadingRenderer.tsx` — use `useThemeWithOverride()` to get theme.primaryColor, apply via inline style `{ color: theme.primaryColor }`, follow existing ThemedLoading pattern from `src/shared/theming/components/primitives/ThemedLoading.tsx`
+- [X] T019 [US2] Add elapsed time counter to `ShareLoadingRenderer` in `apps/clementine-app/src/domains/project-config/share/components/ShareLoadingRenderer.tsx` — useState + useEffect with setInterval(1000ms), display below spinner as "0s", "1s", "2s"..., only show when `mode === 'run'`, cleanup interval on unmount
 
 **Checkpoint**: Loading screen shows themed spinner + live counter. Previous email functionality still works.
 
@@ -85,8 +85,8 @@
 
 **Independent Test**: Toggle email capture in Share Editor → verify loading screen shows/hides email form. Customize heading → verify guest sees custom heading.
 
-- [ ] T020 [US3] Modify `ShareLoadingConfigPanel` in `apps/clementine-app/src/domains/project-config/share/components/ShareLoadingConfigPanel.tsx` — add "Email Capture" section with: Switch toggle for `emailCapture.enabled` (label: "Get result by email"), Textarea for `emailCapture.heading` (placeholder: "Get your result by email", shown only when enabled). Wire to `onShareLoadingUpdate` callback with nested emailCapture object.
-- [ ] T021 [US3] Modify `useShareLoadingForm` in `apps/clementine-app/src/domains/project-config/share/hooks/useShareLoadingForm.ts` — add `emailCapture` to form state and `SHARE_LOADING_FIELDS_TO_COMPARE` array so changes auto-save via debounce. Handle nested emailCapture object in form values.
+- [X] T020 [US3] Modify `ShareLoadingConfigPanel` in `apps/clementine-app/src/domains/project-config/share/components/ShareLoadingConfigPanel.tsx` — add "Email Capture" section with: Switch toggle for `emailCapture.enabled` (label: "Get result by email"), Textarea for `emailCapture.heading` (placeholder: "Get your result by email", shown only when enabled). Wire to `onShareLoadingUpdate` callback with nested emailCapture object.
+- [X] T021 [US3] Modify `useShareLoadingForm` in `apps/clementine-app/src/domains/project-config/share/hooks/useShareLoadingForm.ts` — add `emailCapture` to form state and `SHARE_LOADING_FIELDS_TO_COMPARE` array so changes auto-save via debounce. Handle nested emailCapture object in form values.
 
 **Checkpoint**: Creators can configure email capture per project. Changes reflect on guest loading screen after publish.
 
@@ -96,8 +96,8 @@
 
 **Purpose**: Validation, barrel exports, and final verification
 
-- [ ] T022 Update barrel exports (`index.ts`) for any new components/hooks in `apps/clementine-app/src/domains/project-config/share/components/` and `apps/clementine-app/src/domains/project-config/share/hooks/` — export EmailCaptureForm and useSubmitGuestEmail
-- [ ] T023 Run validation gates: `pnpm --filter @clementine/shared build && pnpm --filter @clementine/shared test && pnpm functions:build && pnpm app:check && pnpm app:type-check`
+- [X] T022 Update barrel exports (`index.ts`) for any new components/hooks in `apps/clementine-app/src/domains/project-config/share/components/` and `apps/clementine-app/src/domains/project-config/share/hooks/` — export EmailCaptureForm and useSubmitGuestEmail
+- [X] T023 Run validation gates: `pnpm --filter @clementine/shared build && pnpm --filter @clementine/shared test && pnpm functions:build && pnpm app:check && pnpm app:type-check`
 - [ ] T024 Run quickstart.md verification steps — verify end-to-end flow works per `specs/070-email-result/quickstart.md`
 
 ---
