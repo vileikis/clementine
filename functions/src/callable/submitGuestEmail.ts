@@ -18,6 +18,15 @@ export const submitGuestEmail = onCall(
     region: 'europe-west1',
   },
   async (request) => {
+    // Check authentication
+    const isEmulator = process.env['FUNCTIONS_EMULATOR'] === 'true'
+    if (!isEmulator && !request.auth) {
+      throw new HttpsError(
+        'unauthenticated',
+        'Must be authenticated to submit guest email',
+      )
+    }
+
     // Validate payload
     const parseResult = submitGuestEmailPayloadSchema.safeParse(request.data)
     if (!parseResult.success) {

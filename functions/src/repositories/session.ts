@@ -73,15 +73,6 @@ export function hasActiveJob(session: Session): boolean {
 }
 
 /**
- * Update session with result media
- *
- * Sets the resultMedia field with the transform pipeline output.
- *
- * @param projectId - Project ID
- * @param sessionId - Session document ID
- * @param resultMedia - Result media to set
- */
-/**
  * Update session with guest email address
  *
  * @param projectId - Project ID
@@ -115,6 +106,15 @@ export async function updateSessionEmailSentAt(
   })
 }
 
+/**
+ * Update session with result media
+ *
+ * Sets the resultMedia field with the transform pipeline output.
+ *
+ * @param projectId - Project ID
+ * @param sessionId - Session document ID
+ * @param resultMedia - Result media to set
+ */
 export async function updateSessionResultMedia(
   projectId: string,
   sessionId: string,

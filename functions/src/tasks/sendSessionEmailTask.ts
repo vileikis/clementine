@@ -94,6 +94,7 @@ export const sendSessionEmailTask = onTaskDispatched(
         sessionId,
         error: error instanceof Error ? error.message : 'Unknown error',
       })
+      throw error
     }
   },
 )
