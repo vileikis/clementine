@@ -3,7 +3,7 @@
  *
  * Saves a guest's email address to a session for result delivery.
  * Called from the guest loading screen email capture form.
- * If the job is already completed, queues sendSessionEmail immediately.
+ * If the job is already completed, queues sendSessionEmailTask immediately.
  *
  * See contracts/submit-guest-email.yaml (CF-001)
  */

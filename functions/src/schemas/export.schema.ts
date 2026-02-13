@@ -15,8 +15,8 @@ const resultMediaSchema = z.object({
 })
 
 /**
- * Payload for dispatchExports Cloud Task
- * Enqueued by transformPipelineJob after successful completion
+ * Payload for dispatchExportsTask Cloud Task
+ * Enqueued by transformPipelineTask after successful completion
  */
 export const dispatchExportsPayloadSchema = z.object({
   jobId: z.string().min(1),
@@ -31,8 +31,8 @@ export const dispatchExportsPayloadSchema = z.object({
 export type DispatchExportsPayload = z.infer<typeof dispatchExportsPayloadSchema>
 
 /**
- * Payload for dropboxExportWorker Cloud Task
- * Enqueued by dispatchExports for each enabled integration
+ * Payload for exportDropboxTask Cloud Task
+ * Enqueued by dispatchExportsTask for each enabled integration
  */
 export const dropboxExportPayloadSchema = z.object({
   jobId: z.string().min(1),

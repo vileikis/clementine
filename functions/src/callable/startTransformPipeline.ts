@@ -162,7 +162,7 @@ export const startTransformPipelineV2 = onCall(
     // Update session with jobId and jobStatus='pending'
     await updateSessionJobStatus(projectId, sessionId, jobId, 'pending')
 
-    // Queue Cloud Task for transformPipelineJob
+    // Queue Cloud Task for transformPipelineTask
     const payload: TransformPipelineJobPayload = {
       jobId,
       sessionId,

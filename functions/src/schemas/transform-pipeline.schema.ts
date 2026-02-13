@@ -32,7 +32,7 @@ export type StartTransformPipelineResponse = z.infer<
 >
 
 /**
- * Cloud Task payload schema for transformPipelineJob
+ * Cloud Task payload schema for transformPipelineTask
  */
 export const transformPipelineJobPayloadSchema = z.object({
   jobId: z.string().min(1),

@@ -1,5 +1,5 @@
 /**
- * Cloud Task Handler: dispatchExports
+ * Cloud Task Handler: dispatchExportsTask
  *
  * Reads live project export config and fans out to per-integration
  * export worker tasks. This is the routing layer — it determines
@@ -11,9 +11,9 @@ import { onTaskDispatched } from 'firebase-functions/v2/tasks'
 import { logger } from 'firebase-functions/v2'
 import { dispatchExportsPayloadSchema } from '../schemas/export.schema'
 import { fetchProject } from '../repositories/project'
-import { queueDropboxExportWorker } from '../infra/task-queues'
+import { queueExportDropboxTask } from '../infra/task-queues'
 
-export const dispatchExports = onTaskDispatched(
+export const dispatchExportsTask = onTaskDispatched(
   {
     region: 'europe-west1',
     memory: '256MiB',
@@ -50,7 +50,7 @@ export const dispatchExports = onTaskDispatched(
     const isDropboxEnabled = project.exports?.dropbox?.enabled === true
 
     if (isDropboxEnabled) {
-      await queueDropboxExportWorker({
+      await queueExportDropboxTask({
         jobId,
         projectId,
         sessionId,
@@ -60,7 +60,7 @@ export const dispatchExports = onTaskDispatched(
         createdAt,
       })
 
-      logger.info('[DispatchExports] Enqueued dropboxExportWorker', {
+      logger.info('[DispatchExports] Enqueued exportDropboxTask', {
         jobId,
         projectId,
         workspaceId: project.workspaceId,

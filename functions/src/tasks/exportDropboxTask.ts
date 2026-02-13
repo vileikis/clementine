@@ -1,5 +1,5 @@
 /**
- * Cloud Task Handler: dropboxExportWorker
+ * Cloud Task Handler: exportDropboxTask
  *
  * Exports a single result file to the workspace's Dropbox App Folder.
  * Self-contained: fetches all context, handles auth, uploads, and logs.
@@ -58,7 +58,7 @@ interface DropboxCredentials {
 // Main Handler
 // ============================================================================
 
-export const dropboxExportWorker = onTaskDispatched(
+export const exportDropboxTask = onTaskDispatched(
   {
     region: 'europe-west1',
     memory: '512MiB',
@@ -73,7 +73,7 @@ export const dropboxExportWorker = onTaskDispatched(
   async (req) => {
     const parseResult = dropboxExportPayloadSchema.safeParse(req.data)
     if (!parseResult.success) {
-      logger.error('[DropboxExportWorker] Invalid payload', {
+      logger.error('[ExportDropboxTask] Invalid payload', {
         issues: parseResult.error.issues,
       })
       return
@@ -89,7 +89,7 @@ export const dropboxExportWorker = onTaskDispatched(
       encryptionKey: DROPBOX_TOKEN_ENCRYPTION_KEY.value(),
     }
 
-    logger.info('[DropboxExportWorker] Processing', {
+    logger.info('[ExportDropboxTask] Processing', {
       jobId,
       projectId,
       workspaceId,
@@ -130,12 +130,12 @@ export const dropboxExportWorker = onTaskDispatched(
         createdAt: Date.now(),
       })
 
-      logger.info('[DropboxExportWorker] Export complete', {
+      logger.info('[ExportDropboxTask] Export complete', {
         jobId,
         destinationPath,
       })
     } catch (error) {
-      logger.error('[DropboxExportWorker] Export failed', {
+      logger.error('[ExportDropboxTask] Export failed', {
         jobId,
         projectId,
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -150,7 +150,7 @@ export const dropboxExportWorker = onTaskDispatched(
         error: error instanceof Error ? error.message : 'Unknown error',
         createdAt: Date.now(),
       }).catch((logError) => {
-        logger.error('[DropboxExportWorker] Failed to write export log', {
+        logger.error('[ExportDropboxTask] Failed to write export log', {
           logError,
         })
       })
@@ -176,7 +176,7 @@ async function validateExportContext(
   // Check workspace connection
   const integration = await fetchWorkspaceIntegration(workspaceId)
   if (!integration || integration.status !== 'connected') {
-    logger.warn('[DropboxExportWorker] Workspace not connected, skipping', {
+    logger.warn('[ExportDropboxTask] Workspace not connected, skipping', {
       workspaceId,
       status: integration?.status ?? 'null',
     })
@@ -186,14 +186,14 @@ async function validateExportContext(
   // Check project export config (live check)
   const project = await fetchProject(projectId)
   if (!project) {
-    logger.warn('[DropboxExportWorker] Project not found, skipping', {
+    logger.warn('[ExportDropboxTask] Project not found, skipping', {
       projectId,
     })
     return null
   }
 
   if (project.exports?.dropbox?.enabled !== true) {
-    logger.info('[DropboxExportWorker] Export disabled, skipping', {
+    logger.info('[ExportDropboxTask] Export disabled, skipping', {
       projectId,
     })
     return null
@@ -230,7 +230,7 @@ async function getDropboxAccessToken(
     )
   } catch (error) {
     if (error instanceof DropboxInvalidGrantError) {
-      logger.warn('[DropboxExportWorker] Token invalid, marking needs_reauth', {
+      logger.warn('[ExportDropboxTask] Token invalid, marking needs_reauth', {
         workspaceId: payload.workspaceId,
       })
 

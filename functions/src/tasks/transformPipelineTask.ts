@@ -1,5 +1,5 @@
 /**
- * Cloud Task Handler: transformPipelineJob
+ * Cloud Task Handler: transformPipelineTask
  *
  * Executes transform jobs asynchronously using outcome-based execution.
  * Manages job lifecycle: pending → running → completed/failed
@@ -42,7 +42,7 @@ interface JobHandlerContext {
 // ============================================================================
 
 /**
- * Cloud Task handler: transformPipelineJob
+ * Cloud Task handler: transformPipelineTask
  *
  * Flow:
  * 1. Validate payload & prepare execution context
@@ -50,7 +50,7 @@ interface JobHandlerContext {
  * 3. Execute outcome via runOutcome()
  * 4. Update session with result & finalize
  */
-export const transformPipelineJob = onTaskDispatched(
+export const transformPipelineTask = onTaskDispatched(
   {
     region: 'europe-west1',
     memory: '512MiB',

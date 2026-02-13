@@ -27,8 +27,8 @@ export const submitGuestEmailPayloadSchema = z.object({
 export type SubmitGuestEmailPayload = z.infer<typeof submitGuestEmailPayloadSchema>
 
 /**
- * Payload for sendSessionEmail Cloud Task
- * Enqueued by transformPipelineJob or submitGuestEmail callable
+ * Payload for sendSessionEmailTask Cloud Task
+ * Enqueued by transformPipelineTask or submitGuestEmail callable
  */
 export const sendSessionEmailPayloadSchema = z.object({
   projectId: z.string().min(1),
