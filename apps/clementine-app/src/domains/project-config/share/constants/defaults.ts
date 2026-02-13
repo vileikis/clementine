@@ -5,6 +5,7 @@
  */
 import type {
   CtaConfig,
+  EmailCaptureConfig,
   ShareLoadingConfig,
   ShareReadyConfig,
 } from '@clementine/shared'
@@ -33,6 +34,14 @@ export const DEFAULT_CTA: CtaConfig = {
 }
 
 /**
+ * Default email capture configuration
+ */
+export const DEFAULT_EMAIL_CAPTURE: EmailCaptureConfig = {
+  enabled: false,
+  heading: null,
+}
+
+/**
  * Default share loading state configuration
  * Used when initializing loading form or providing fallbacks during AI generation
  */
@@ -40,6 +49,7 @@ export const DEFAULT_SHARE_LOADING: ShareLoadingConfig = {
   title: 'Creating your experience...',
   description:
     'This usually takes 30-60 seconds. Please wait while we generate your personalized result.',
+  emailCapture: null,
 }
 
 /**

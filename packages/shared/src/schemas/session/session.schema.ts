@@ -116,6 +116,12 @@ export const sessionSchema = z.looseObject({
   /** Final result media from transform/capture */
   resultMedia: mediaReferenceSchema.nullable().default(null),
 
+  /** Guest email for result delivery (PII — do not log) */
+  guestEmail: z.string().email().nullable().default(null),
+
+  /** Timestamp when result email was sent (Unix ms, duplicate guard) */
+  emailSentAt: z.number().nullable().default(null),
+
   /**
    * JOURNEY LINKING
    * For pregate/preshare sessions: references the main session ID

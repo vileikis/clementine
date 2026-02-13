@@ -7,6 +7,7 @@
 import type { ShareLoadingConfig } from '@clementine/shared'
 import { Label } from '@/ui-kit/ui/label'
 import { Textarea } from '@/ui-kit/ui/textarea'
+import { Switch } from '@/ui-kit/ui/switch'
 
 export interface ShareLoadingConfigPanelProps {
   shareLoading: ShareLoadingConfig
@@ -23,6 +24,11 @@ export function ShareLoadingConfigPanel({
   onShareLoadingUpdate,
   disabled = false,
 }: ShareLoadingConfigPanelProps) {
+  const emailCapture = shareLoading.emailCapture ?? {
+    enabled: false,
+    heading: null,
+  }
+
   return (
     <div className="space-y-6 p-4">
       {/* Title Field */}
@@ -59,6 +65,49 @@ export function ShareLoadingConfigPanel({
         <p className="text-xs text-muted-foreground">
           Additional context about wait time or what's happening
         </p>
+      </div>
+
+      {/* Email Capture Section */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="space-y-0.5">
+            <Label htmlFor="email-capture-toggle">Get result by email</Label>
+            <p className="text-xs text-muted-foreground">
+              Let guests enter their email to receive the result
+            </p>
+          </div>
+          <Switch
+            id="email-capture-toggle"
+            checked={emailCapture.enabled}
+            onCheckedChange={(checked) =>
+              onShareLoadingUpdate({
+                emailCapture: { ...emailCapture, enabled: checked },
+              })
+            }
+            disabled={disabled}
+          />
+        </div>
+
+        {emailCapture.enabled && (
+          <div className="space-y-2">
+            <Label htmlFor="email-capture-heading">Email Form Heading</Label>
+            <Textarea
+              id="email-capture-heading"
+              value={emailCapture.heading ?? ''}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                onShareLoadingUpdate({
+                  emailCapture: {
+                    ...emailCapture,
+                    heading: e.target.value || null,
+                  },
+                })
+              }
+              placeholder="Get your result by email"
+              rows={2}
+              disabled={disabled}
+            />
+          </div>
+        )}
       </div>
     </div>
   )

@@ -7,6 +7,7 @@
  *
  * User Stories: P1-P3 (Loading, Ready State, Interactive Buttons)
  */
+import { useCallback } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useGuestContext } from '../contexts'
 import { useShareActions } from '../hooks'
@@ -16,6 +17,7 @@ import {
   ShareLoadingRenderer,
   ShareReadyRenderer,
 } from '@/domains/project-config/share/components'
+import { useSubmitGuestEmail } from '@/domains/project-config/share/hooks'
 import { useSubscribeSession } from '@/domains/session/shared'
 import {
   ThemeProvider,
@@ -94,6 +96,21 @@ export function SharePage({ mainSessionId }: SharePageProps) {
     project.publishedConfig?.shareLoading ?? DEFAULT_SHARE_LOADING
   const shareOptions =
     project.publishedConfig?.shareOptions ?? DEFAULT_SHARE_OPTIONS
+  const emailCaptureConfig =
+    project.publishedConfig?.shareLoading?.emailCapture ?? null
+
+  // Email capture
+  const { submitEmail } = useSubmitGuestEmail()
+  const handleEmailSubmit = useCallback(
+    async (email: string) => {
+      await submitEmail({
+        projectId: project.id,
+        sessionId: mainSessionId,
+        email,
+      })
+    },
+    [submitEmail, project.id, mainSessionId],
+  )
 
   // Share actions hook - only active when we have result media
   const { handleShare } = useShareActions({ media: resultMedia })
@@ -115,7 +132,13 @@ export function SharePage({ mainSessionId }: SharePageProps) {
       <ThemeProvider theme={currentTheme}>
         <div className="h-screen">
           <ThemedBackground className="h-full w-full">
-            <ShareLoadingRenderer shareLoading={shareLoading} mode="run" />
+            <ShareLoadingRenderer
+              shareLoading={shareLoading}
+              mode="run"
+              session={session}
+              emailCaptureConfig={emailCaptureConfig}
+              onEmailSubmit={handleEmailSubmit}
+            />
           </ThemedBackground>
         </div>
       </ThemeProvider>
@@ -126,7 +149,13 @@ export function SharePage({ mainSessionId }: SharePageProps) {
     <ThemeProvider theme={currentTheme}>
       <ThemedBackground className="h-dvh">
         {isJobInProgress && (
-          <ShareLoadingRenderer shareLoading={shareLoading} mode="run" />
+          <ShareLoadingRenderer
+            shareLoading={shareLoading}
+            mode="run"
+            session={session}
+            emailCaptureConfig={emailCaptureConfig}
+            onEmailSubmit={handleEmailSubmit}
+          />
         )}
         {isJobCompleted && resultMediaUrl && (
           <ShareReadyRenderer

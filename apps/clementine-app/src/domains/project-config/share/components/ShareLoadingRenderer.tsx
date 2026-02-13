@@ -9,9 +9,19 @@
  * Must be used within a ThemeProvider.
  */
 
-import type { ShareLoadingConfig } from '@clementine/shared'
-import { Skeleton } from '@/ui-kit/ui/skeleton'
-import { ScrollableView, ThemedText } from '@/shared/theming'
+import { useEffect, useState } from 'react'
+import { Loader2 } from 'lucide-react'
+import { EmailCaptureForm } from './EmailCaptureForm'
+import type {
+  EmailCaptureConfig,
+  Session,
+  ShareLoadingConfig,
+} from '@clementine/shared'
+import {
+  ScrollableView,
+  ThemedText,
+  useThemeWithOverride,
+} from '@/shared/theming'
 
 export interface ShareLoadingRendererProps {
   /** Share loading config to render */
@@ -22,16 +32,49 @@ export interface ShareLoadingRendererProps {
    * - run: Actual guest experience during AI generation
    */
   mode?: 'edit' | 'run'
+  /** Session data for email state (run mode only) */
+  session?: Session | null
+  /** Email capture config from project config */
+  emailCaptureConfig?: EmailCaptureConfig | null
+  /** Callback when guest submits email */
+  onEmailSubmit?: (email: string) => Promise<void>
 }
 
 export function ShareLoadingRenderer({
   shareLoading,
-  mode: _mode = 'edit',
+  mode = 'edit',
+  session,
+  emailCaptureConfig,
+  onEmailSubmit,
 }: ShareLoadingRendererProps) {
+  const theme = useThemeWithOverride()
+  const showEmailCapture =
+    mode === 'run' && emailCaptureConfig?.enabled && onEmailSubmit
+
+  // Elapsed time counter (run mode only)
+  const [elapsed, setElapsed] = useState(0)
+  useEffect(() => {
+    if (mode !== 'run') return
+    const interval = setInterval(() => {
+      setElapsed((prev) => prev + 1)
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [mode])
+
   return (
     <ScrollableView className="items-center gap-6 p-8 max-w-2xl">
-      {/* Image skeleton */}
-      <Skeleton className="w-full aspect-square rounded-lg" />
+      {/* Themed spinner */}
+      <div className="flex flex-col items-center gap-3">
+        <Loader2
+          className="h-12 w-12 animate-spin opacity-60"
+          style={{ color: theme.primaryColor }}
+        />
+        {mode === 'run' && (
+          <ThemedText variant="body" className="text-center opacity-60 text-sm">
+            {elapsed}s
+          </ThemedText>
+        )}
+      </div>
 
       {/* Loading title */}
       <ThemedText variant="heading" className="text-center">
@@ -43,6 +86,18 @@ export function ShareLoadingRenderer({
         {shareLoading.description ||
           'This usually takes 30-60 seconds. Please wait while we generate your personalized result.'}
       </ThemedText>
+
+      {/* Email capture form */}
+      {showEmailCapture && (
+        <EmailCaptureForm
+          onSubmit={onEmailSubmit}
+          isSubmitted={
+            session?.guestEmail !== null && session?.guestEmail !== undefined
+          }
+          submittedEmail={session?.guestEmail ?? null}
+          heading={emailCaptureConfig.heading}
+        />
+      )}
     </ScrollableView>
   )
 }

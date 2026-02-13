@@ -16,6 +16,7 @@ import { useAutoSave } from '@/shared/forms'
 const SHARE_LOADING_FIELDS_TO_COMPARE: (keyof ShareLoadingConfig)[] = [
   'title',
   'description',
+  'emailCapture',
 ]
 
 export interface UseShareLoadingFormProps {
