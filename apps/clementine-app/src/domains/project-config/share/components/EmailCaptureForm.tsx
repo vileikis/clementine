@@ -50,19 +50,16 @@ export function EmailCaptureForm({
         <ThemedText variant="body" className="opacity-90">
           {message}
         </ThemedText>
-        {onSubmit && (
-          <button
-            type="button"
-            onClick={() => {
-              setLocalSubmittedEmail(null)
-              setEmail(effectiveEmail)
-            }}
-            className="text-sm opacity-60 underline underline-offset-2 hover:opacity-80 transition-opacity"
-            style={{ color: 'inherit' }}
-          >
-            Change email
-          </button>
-        )}
+        <ThemedButton
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            setLocalSubmittedEmail(null)
+            setEmail(effectiveEmail)
+          }}
+        >
+          Change email
+        </ThemedButton>
       </div>
     )
   }
@@ -82,13 +79,9 @@ export function EmailCaptureForm({
       return
     }
 
-    if (!onSubmit) {
-      return
-    }
-
     setIsSubmitting(true)
     try {
-      await onSubmit(trimmed)
+      await onSubmit?.(trimmed)
       setLocalSubmittedEmail(trimmed)
     } catch {
       setValidationError('Failed to submit. Please try again.')
