@@ -27,6 +27,7 @@ export function ShareLoadingConfigPanel({
   const emailCapture = shareLoading.emailCapture ?? {
     enabled: false,
     heading: null,
+    successMessage: null,
   }
 
   return (
@@ -73,18 +74,32 @@ export function ShareLoadingConfigPanel({
         </div>
 
         {emailCapture.enabled && (
-          <TextareaField
-            label="Email Form Heading"
-            value={emailCapture.heading ?? ''}
-            onChange={(heading) =>
-              onShareLoadingUpdate({
-                emailCapture: { ...emailCapture, heading },
-              })
-            }
-            placeholder="Get your result by email"
-            rows={2}
-            disabled={disabled}
-          />
+          <>
+            <TextareaField
+              label="Email Form Heading"
+              value={emailCapture.heading ?? ''}
+              onChange={(heading) =>
+                onShareLoadingUpdate({
+                  emailCapture: { ...emailCapture, heading },
+                })
+              }
+              placeholder="Get your result by email"
+              rows={2}
+              disabled={disabled}
+            />
+            <TextareaField
+              label="Success Message"
+              value={emailCapture.successMessage ?? ''}
+              onChange={(successMessage) =>
+                onShareLoadingUpdate({
+                  emailCapture: { ...emailCapture, successMessage },
+                })
+              }
+              placeholder="We'll send your result to {email}"
+              rows={2}
+              disabled={disabled}
+            />
+          </>
         )}
       </EditorSection>
     </div>

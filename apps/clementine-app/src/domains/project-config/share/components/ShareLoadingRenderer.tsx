@@ -37,7 +37,7 @@ export interface ShareLoadingRendererProps {
 
 export function ShareLoadingRenderer({
   shareLoading,
-  mode = 'edit',
+  mode: _mode = 'edit',
   session,
   onEmailSubmit,
 }: ShareLoadingRendererProps) {
@@ -70,11 +70,13 @@ export function ShareLoadingRenderer({
         {shareLoading.title || 'Creating your experience...'}
       </ThemedText>
 
-      {/* Loading description */}
-      <ThemedText variant="body" className="text-center opacity-90">
-        {shareLoading.description ||
-          'This usually takes 30-60 seconds. Please wait while we generate your personalized result.'}
-      </ThemedText>
+      {/* Loading description (hidden when email capture is enabled to reduce text) */}
+      {!showEmailCapture && (
+        <ThemedText variant="body" className="text-center opacity-90">
+          {shareLoading.description ||
+            'This usually takes 30-60 seconds. Please wait while we generate your personalized result.'}
+        </ThemedText>
+      )}
 
       {/* Email capture form */}
       {showEmailCapture && (
@@ -85,6 +87,7 @@ export function ShareLoadingRenderer({
           }
           submittedEmail={session?.guestEmail ?? null}
           heading={emailCapture.heading}
+          successMessage={emailCapture.successMessage}
         />
       )}
     </ScrollableView>

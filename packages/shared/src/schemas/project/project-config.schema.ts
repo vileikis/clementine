@@ -77,6 +77,7 @@ export const ctaConfigSchema = z.object({
 export const emailCaptureConfigSchema = z.object({
   enabled: z.boolean().default(false),
   heading: z.string().nullable().default(null),
+  successMessage: z.string().nullable().default(null),
 })
 
 /**

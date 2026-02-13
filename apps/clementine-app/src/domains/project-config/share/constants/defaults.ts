@@ -45,6 +45,7 @@ export const DEFAULT_CTA: CtaConfig = {
 export const DEFAULT_EMAIL_CAPTURE: EmailCaptureConfig = {
   enabled: false,
   heading: null,
+  successMessage: null,
 }
 
 /**

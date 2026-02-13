@@ -19,6 +19,7 @@ export interface EmailCaptureFormProps {
   isSubmitted: boolean
   submittedEmail: string | null
   heading?: string | null
+  successMessage?: string | null
 }
 
 export function EmailCaptureForm({
@@ -26,17 +27,42 @@ export function EmailCaptureForm({
   isSubmitted,
   submittedEmail,
   heading,
+  successMessage,
 }: EmailCaptureFormProps) {
   const [email, setEmail] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [validationError, setValidationError] = useState<string | null>(null)
+  const [localSubmittedEmail, setLocalSubmittedEmail] = useState<string | null>(
+    null,
+  )
 
-  if (isSubmitted && submittedEmail) {
+  // Derive success state from either local optimistic state or session prop
+  const effectiveEmail = localSubmittedEmail ?? submittedEmail
+  const showSuccess = isSubmitted || !!localSubmittedEmail
+
+  if (showSuccess && effectiveEmail) {
+    const message = successMessage
+      ? successMessage.replace('{email}', effectiveEmail)
+      : `We'll send your result to ${effectiveEmail}`
+
     return (
-      <div className="w-full text-center">
+      <div className="w-full space-y-3 text-center">
         <ThemedText variant="body" className="opacity-90">
-          We'll send your result to {submittedEmail}
+          {message}
         </ThemedText>
+        {onSubmit && (
+          <button
+            type="button"
+            onClick={() => {
+              setLocalSubmittedEmail(null)
+              setEmail(effectiveEmail)
+            }}
+            className="text-sm opacity-60 underline underline-offset-2 hover:opacity-80 transition-opacity"
+            style={{ color: 'inherit' }}
+          >
+            Change email
+          </button>
+        )}
       </div>
     )
   }
@@ -63,6 +89,7 @@ export function EmailCaptureForm({
     setIsSubmitting(true)
     try {
       await onSubmit(trimmed)
+      setLocalSubmittedEmail(trimmed)
     } catch {
       setValidationError('Failed to submit. Please try again.')
     } finally {

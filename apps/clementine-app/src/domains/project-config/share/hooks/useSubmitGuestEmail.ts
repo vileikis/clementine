@@ -1,15 +1,12 @@
 import { useCallback, useState } from 'react'
-import { httpsCallable } from 'firebase/functions'
-import { functions } from '@/integrations/firebase/client'
+// TODO: Enable when cloud function is deployed
+// import { httpsCallable } from 'firebase/functions'
+// import { functions } from '@/integrations/firebase/client'
 
 interface SubmitGuestEmailParams {
   projectId: string
   sessionId: string
   email: string
-}
-
-interface SubmitGuestEmailResponse {
-  success: boolean
 }
 
 /**
@@ -28,11 +25,12 @@ export function useSubmitGuestEmail() {
     setError(null)
 
     try {
-      const callable = httpsCallable<
-        SubmitGuestEmailParams,
-        SubmitGuestEmailResponse
-      >(functions, 'submitGuestEmail')
-      // await callable(params)
+      // TODO: Enable when cloud function is deployed
+      // const submitGuestEmail = httpsCallable<
+      //   SubmitGuestEmailParams,
+      //   SubmitGuestEmailResponse
+      // >(functions, 'submitGuestEmail')
+      // await submitGuestEmail(params)
       console.log('----submitEmail', params)
       setIsSubmitted(true)
       setSubmittedEmail(params.email)
