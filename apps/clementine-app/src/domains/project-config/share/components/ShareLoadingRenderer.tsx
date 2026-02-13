@@ -50,24 +50,19 @@ export function ShareLoadingRenderer({
 
   // Elapsed time counter (run mode only)
   const [elapsed, setElapsed] = useState(0)
-  useInterval(
-    () => setElapsed((prev) => prev + 1),
-    mode === 'run' ? 1000 : null,
-  )
+  useInterval(() => setElapsed((prev) => prev + 1), 1000)
 
   return (
     <ScrollableView className="items-center gap-6 p-8 max-w-2xl">
       {/* Themed spinner */}
       <div className="flex flex-col items-center gap-3">
         <Loader2
-          className="h-12 w-12 animate-spin opacity-60"
+          className="h-12 w-12 animate-spin"
           style={{ color: theme.primaryColor }}
         />
-        {mode === 'run' && (
-          <ThemedText variant="body" className="text-center opacity-60 text-sm">
-            {elapsed}s
-          </ThemedText>
-        )}
+        <ThemedText variant="body" className="text-center opacity-70">
+          {elapsed}s
+        </ThemedText>
       </div>
 
       {/* Loading title */}
