@@ -4,17 +4,18 @@
  * Email input + submit button for the guest loading screen.
  * Client-side validation, mobile-first with 44x44px touch targets.
  * Shows confirmation message after successful submission.
+ *
+ * Uses themed components for consistent guest-facing styling.
  */
 
 import { useState } from 'react'
 import { Send } from 'lucide-react'
+import { EMAIL_REGEX } from '../constants'
 import type { FormEvent } from 'react'
-import { Input } from '@/ui-kit/ui/input'
-import { Button } from '@/ui-kit/ui/button'
-import { ThemedText } from '@/shared/theming'
+import { ThemedButton, ThemedInput, ThemedText } from '@/shared/theming'
 
 export interface EmailCaptureFormProps {
-  onSubmit: (email: string) => Promise<void>
+  onSubmit?: (email: string) => Promise<void>
   isSubmitted: boolean
   submittedEmail: string | null
   heading?: string | null
@@ -50,9 +51,12 @@ export function EmailCaptureForm({
       return
     }
 
-    // Basic email format check (HTML5 type=email handles most of this)
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+    if (!EMAIL_REGEX.test(trimmed)) {
       setValidationError('Please enter a valid email')
+      return
+    }
+
+    if (!onSubmit) {
       return
     }
 
@@ -72,7 +76,7 @@ export function EmailCaptureForm({
         {heading || 'Get your result by email'}
       </ThemedText>
       <form onSubmit={handleSubmit} className="flex gap-2">
-        <Input
+        <ThemedInput
           type="email"
           placeholder="your@email.com"
           value={email}
@@ -84,19 +88,19 @@ export function EmailCaptureForm({
           className="min-h-[44px] flex-1"
           autoComplete="email"
         />
-        <Button
+        <ThemedButton
           type="submit"
           disabled={isSubmitting}
-          size="icon"
+          size="sm"
           className="min-h-[44px] min-w-[44px]"
         >
           <Send className="h-4 w-4" />
-        </Button>
+        </ThemedButton>
       </form>
       {validationError && (
-        <p className="text-sm text-destructive text-center">
+        <ThemedText variant="small" className="text-center">
           {validationError}
-        </p>
+        </ThemedText>
       )}
     </div>
   )

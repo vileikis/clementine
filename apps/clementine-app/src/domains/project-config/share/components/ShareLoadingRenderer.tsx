@@ -9,22 +9,19 @@
  * Must be used within a ThemeProvider.
  */
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { EmailCaptureForm } from './EmailCaptureForm'
-import type {
-  EmailCaptureConfig,
-  Session,
-  ShareLoadingConfig,
-} from '@clementine/shared'
+import type { Session, ShareLoadingConfig } from '@clementine/shared'
 import {
   ScrollableView,
   ThemedText,
   useThemeWithOverride,
 } from '@/shared/theming'
+import { useInterval } from '@/shared/utils'
 
 export interface ShareLoadingRendererProps {
-  /** Share loading config to render */
+  /** Share loading config to render (includes emailCapture) */
   shareLoading: ShareLoadingConfig
   /**
    * Display mode
@@ -34,9 +31,7 @@ export interface ShareLoadingRendererProps {
   mode?: 'edit' | 'run'
   /** Session data for email state (run mode only) */
   session?: Session | null
-  /** Email capture config from project config */
-  emailCaptureConfig?: EmailCaptureConfig | null
-  /** Callback when guest submits email */
+  /** Callback when guest submits email (run mode only) */
   onEmailSubmit?: (email: string) => Promise<void>
 }
 
@@ -44,22 +39,21 @@ export function ShareLoadingRenderer({
   shareLoading,
   mode = 'edit',
   session,
-  emailCaptureConfig,
   onEmailSubmit,
 }: ShareLoadingRendererProps) {
   const theme = useThemeWithOverride()
-  const showEmailCapture =
-    mode === 'run' && emailCaptureConfig?.enabled && onEmailSubmit
+  const emailCapture = shareLoading.emailCapture
+
+  // Show email capture in both modes when enabled (WYSIWYG)
+  // In edit mode: non-interactive preview. In run mode: functional form.
+  const showEmailCapture = !!emailCapture?.enabled
 
   // Elapsed time counter (run mode only)
   const [elapsed, setElapsed] = useState(0)
-  useEffect(() => {
-    if (mode !== 'run') return
-    const interval = setInterval(() => {
-      setElapsed((prev) => prev + 1)
-    }, 1000)
-    return () => clearInterval(interval)
-  }, [mode])
+  useInterval(
+    () => setElapsed((prev) => prev + 1),
+    mode === 'run' ? 1000 : null,
+  )
 
   return (
     <ScrollableView className="items-center gap-6 p-8 max-w-2xl">
@@ -95,7 +89,7 @@ export function ShareLoadingRenderer({
             session?.guestEmail !== null && session?.guestEmail !== undefined
           }
           submittedEmail={session?.guestEmail ?? null}
-          heading={emailCaptureConfig.heading}
+          heading={emailCapture.heading}
         />
       )}
     </ScrollableView>

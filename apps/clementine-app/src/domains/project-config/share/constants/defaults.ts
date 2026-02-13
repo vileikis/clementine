@@ -26,6 +26,12 @@ export const SHARE_DESCRIPTION_MAX_LENGTH = 500
 export const CTA_LABEL_MAX_LENGTH = 50
 
 /**
+ * Client-side email format validation pattern.
+ * Matches: user@domain.tld (basic format check, HTML5 type=email handles the rest)
+ */
+export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+/**
  * Default CTA configuration values
  */
 export const DEFAULT_CTA: CtaConfig = {

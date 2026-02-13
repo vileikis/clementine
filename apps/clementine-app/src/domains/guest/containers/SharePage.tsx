@@ -96,8 +96,6 @@ export function SharePage({ mainSessionId }: SharePageProps) {
     project.publishedConfig?.shareLoading ?? DEFAULT_SHARE_LOADING
   const shareOptions =
     project.publishedConfig?.shareOptions ?? DEFAULT_SHARE_OPTIONS
-  const emailCaptureConfig =
-    project.publishedConfig?.shareLoading?.emailCapture ?? null
 
   // Email capture
   const { submitEmail } = useSubmitGuestEmail()
@@ -136,7 +134,6 @@ export function SharePage({ mainSessionId }: SharePageProps) {
               shareLoading={shareLoading}
               mode="run"
               session={session}
-              emailCaptureConfig={emailCaptureConfig}
               onEmailSubmit={handleEmailSubmit}
             />
           </ThemedBackground>
@@ -153,7 +150,6 @@ export function SharePage({ mainSessionId }: SharePageProps) {
             shareLoading={shareLoading}
             mode="run"
             session={session}
-            emailCaptureConfig={emailCaptureConfig}
             onEmailSubmit={handleEmailSubmit}
           />
         )}
