@@ -26,6 +26,7 @@ await build({
     'ffprobe-static',
     'tmp',
     'zod',
+    'nodemailer',
   ],
 
   // Preserve function names for Firebase

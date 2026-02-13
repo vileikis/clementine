@@ -65,7 +65,7 @@ export function ThemedLoading({
       )}
     >
       <Loader2
-        className="h-12 w-12 animate-spin opacity-60"
+        className="h-12 w-12 animate-spin"
         style={{ color: theme.primaryColor }}
       />
       {message && <ThemedText variant="body">{message}</ThemedText>}

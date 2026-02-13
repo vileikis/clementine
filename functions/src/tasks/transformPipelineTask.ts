@@ -1,5 +1,5 @@
 /**
- * Cloud Task Handler: transformPipelineJob
+ * Cloud Task Handler: transformPipelineTask
  *
  * Executes transform jobs asynchronously using outcome-based execution.
  * Manages job lifecycle: pending → running → completed/failed
@@ -24,7 +24,7 @@ import {
 import type { Job, JobOutput } from '@clementine/shared'
 import { runOutcome, type OutcomeContext } from '../services/transform'
 import { createTempDir, cleanupTempDir } from '../infra/temp-dir'
-import { queueDispatchExports } from '../infra/task-queues'
+import { queueDispatchExports, queueSendSessionEmail } from '../infra/task-queues'
 
 /**
  * Job handler context for cleanup management
@@ -42,7 +42,7 @@ interface JobHandlerContext {
 // ============================================================================
 
 /**
- * Cloud Task handler: transformPipelineJob
+ * Cloud Task handler: transformPipelineTask
  *
  * Flow:
  * 1. Validate payload & prepare execution context
@@ -50,7 +50,7 @@ interface JobHandlerContext {
  * 3. Execute outcome via runOutcome()
  * 4. Update session with result & finalize
  */
-export const transformPipelineJob = onTaskDispatched(
+export const transformPipelineTask = onTaskDispatched(
   {
     region: 'europe-west1',
     memory: '512MiB',
@@ -226,6 +226,24 @@ async function finalizeJobSuccess(
     })
   } catch (error) {
     logger.warn('[TransformJob] Failed to enqueue export dispatch', {
+      jobId: job.id,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    })
+  }
+
+  // Queue email send (best-effort — failure does not affect the guest experience)
+  try {
+    await queueSendSessionEmail({
+      projectId,
+      sessionId,
+      resultMedia: {
+        url: output.url,
+        filePath: output.filePath,
+        displayName: 'Result',
+      },
+    })
+  } catch (error) {
+    logger.warn('[TransformJob] Failed to enqueue email send', {
       jobId: job.id,
       error: error instanceof Error ? error.message : 'Unknown error',
     })

@@ -71,12 +71,23 @@ export const ctaConfigSchema = z.object({
 })
 
 /**
+ * Email Capture Configuration
+ * Controls the email capture form on the loading screen
+ */
+export const emailCaptureConfigSchema = z.object({
+  enabled: z.boolean().default(false),
+  heading: z.string().nullable().default(null),
+  successMessage: z.string().nullable().default(null),
+})
+
+/**
  * Share Loading State Configuration
  * Shown while AI generation is in progress
  */
 export const shareLoadingConfigSchema = z.object({
   title: z.string().nullable().default(null),
   description: z.string().nullable().default(null),
+  emailCapture: emailCaptureConfigSchema.nullable().default(null),
 })
 
 /**
@@ -123,6 +134,7 @@ export type OverlaysConfig = z.infer<typeof overlaysConfigSchema>
 export type ShareOptionsConfig = z.infer<typeof shareOptionsConfigSchema>
 export type WelcomeConfig = z.infer<typeof welcomeConfigSchema>
 export type CtaConfig = z.infer<typeof ctaConfigSchema>
+export type EmailCaptureConfig = z.infer<typeof emailCaptureConfigSchema>
 export type ShareLoadingConfig = z.infer<typeof shareLoadingConfigSchema>
 export type ShareReadyConfig = z.infer<typeof shareReadyConfigSchema>
 export type ExperiencePickerLayout = z.infer<typeof experiencePickerLayoutSchema>

@@ -18,3 +18,6 @@ export const VERTEX_AI_LOCATION = defineString('VERTEX_AI_LOCATION', {
 export const DROPBOX_APP_KEY = defineString('DROPBOX_APP_KEY')
 export const DROPBOX_APP_SECRET = defineSecret('DROPBOX_APP_SECRET')
 export const DROPBOX_TOKEN_ENCRYPTION_KEY = defineSecret('DROPBOX_TOKEN_ENCRYPTION_KEY')
+
+// Email (SMTP via Google Workspace)
+export const SMTP_APP_PASSWORD = defineSecret('SMTP_APP_PASSWORD')

@@ -5,6 +5,7 @@
  */
 import type {
   CtaConfig,
+  EmailCaptureConfig,
   ShareLoadingConfig,
   ShareReadyConfig,
 } from '@clementine/shared'
@@ -25,11 +26,26 @@ export const SHARE_DESCRIPTION_MAX_LENGTH = 500
 export const CTA_LABEL_MAX_LENGTH = 50
 
 /**
+ * Client-side email format validation pattern.
+ * Matches: user@domain.tld (basic format check, HTML5 type=email handles the rest)
+ */
+export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+/**
  * Default CTA configuration values
  */
 export const DEFAULT_CTA: CtaConfig = {
   label: null,
   url: null,
+}
+
+/**
+ * Default email capture configuration
+ */
+export const DEFAULT_EMAIL_CAPTURE: EmailCaptureConfig = {
+  enabled: false,
+  heading: null,
+  successMessage: null,
 }
 
 /**
@@ -40,6 +56,7 @@ export const DEFAULT_SHARE_LOADING: ShareLoadingConfig = {
   title: 'Creating your experience...',
   description:
     'This usually takes 30-60 seconds. Please wait while we generate your personalized result.',
+  emailCapture: null,
 }
 
 /**

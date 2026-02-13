@@ -1,15 +1,15 @@
 /**
- * Cloud Task Handler Tests: transformPipelineJob
+ * Cloud Task Handler Tests: transformPipelineTask
  *
- * Tests for the transformPipelineJob Cloud Task handler.
+ * Tests for the transformPipelineTask Cloud Task handler.
  * These tests verify the payload validation and expected behavior.
  *
  * Note: Full integration tests with Firestore require emulator setup.
  */
 import { describe, it, expect } from 'vitest'
-import { transformPipelineJobPayloadSchema } from '../schemas/transform-pipeline.schema'
+import { transformPipelineTaskPayloadSchema } from '../schemas/transform-pipeline.schema'
 
-describe('transformPipelineJob payload schema', () => {
+describe('transformPipelineTask payload schema', () => {
   it('validates a valid payload', () => {
     const payload = {
       jobId: 'job-xyz789',
@@ -17,7 +17,7 @@ describe('transformPipelineJob payload schema', () => {
       projectId: 'project-456',
     }
 
-    const result = transformPipelineJobPayloadSchema.safeParse(payload)
+    const result = transformPipelineTaskPayloadSchema.safeParse(payload)
     expect(result.success).toBe(true)
     if (result.success) {
       expect(result.data.jobId).toBe('job-xyz789')
@@ -32,7 +32,7 @@ describe('transformPipelineJob payload schema', () => {
       projectId: 'project-456',
     }
 
-    const result = transformPipelineJobPayloadSchema.safeParse(payload)
+    const result = transformPipelineTaskPayloadSchema.safeParse(payload)
     expect(result.success).toBe(false)
   })
 
@@ -42,7 +42,7 @@ describe('transformPipelineJob payload schema', () => {
       projectId: 'project-456',
     }
 
-    const result = transformPipelineJobPayloadSchema.safeParse(payload)
+    const result = transformPipelineTaskPayloadSchema.safeParse(payload)
     expect(result.success).toBe(false)
   })
 
@@ -52,7 +52,7 @@ describe('transformPipelineJob payload schema', () => {
       sessionId: 'session-123',
     }
 
-    const result = transformPipelineJobPayloadSchema.safeParse(payload)
+    const result = transformPipelineTaskPayloadSchema.safeParse(payload)
     expect(result.success).toBe(false)
   })
 
@@ -64,13 +64,13 @@ describe('transformPipelineJob payload schema', () => {
     ]
 
     payloads.forEach((payload) => {
-      const result = transformPipelineJobPayloadSchema.safeParse(payload)
+      const result = transformPipelineTaskPayloadSchema.safeParse(payload)
       expect(result.success).toBe(false)
     })
   })
 })
 
-describe('transformPipelineJob expected behavior', () => {
+describe('transformPipelineTask expected behavior', () => {
   /**
    * These describe the expected behavior of the Cloud Task handler
    * based on the contract spec. Full integration tests
