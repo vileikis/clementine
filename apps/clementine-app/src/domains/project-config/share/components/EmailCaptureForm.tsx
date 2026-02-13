@@ -9,7 +9,7 @@
  */
 
 import { useState } from 'react'
-import { Send } from 'lucide-react'
+import { Loader2, Send } from 'lucide-react'
 import { EMAIL_REGEX } from '../constants'
 import type { FormEvent } from 'react'
 import { ThemedButton, ThemedInput, ThemedText } from '@/shared/theming'
@@ -114,7 +114,11 @@ export function EmailCaptureForm({
           size="sm"
           className="min-h-[44px] min-w-[44px]"
         >
-          <Send className="h-4 w-4" />
+          {isSubmitting ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Send className="h-4 w-4" />
+          )}
         </ThemedButton>
       </form>
       {validationError && (
