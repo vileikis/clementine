@@ -35,34 +35,12 @@ export function EmailCaptureForm({
   const [localSubmittedEmail, setLocalSubmittedEmail] = useState<string | null>(
     null,
   )
+  const [isEditing, setIsEditing] = useState(false)
 
   // Derive success state from either local optimistic state or session prop
   const effectiveEmail = localSubmittedEmail ?? submittedEmail
-  const showSuccess = isSubmitted || !!localSubmittedEmail
-
-  if (showSuccess && effectiveEmail) {
-    const message = successMessage
-      ? successMessage.replace('{email}', effectiveEmail)
-      : `We'll send your result to ${effectiveEmail}`
-
-    return (
-      <div className="w-full space-y-3 text-center">
-        <ThemedText variant="body" className="opacity-90">
-          {message}
-        </ThemedText>
-        <ThemedButton
-          variant="outline"
-          size="sm"
-          onClick={() => {
-            setLocalSubmittedEmail(null)
-            setEmail(effectiveEmail)
-          }}
-        >
-          Change email
-        </ThemedButton>
-      </div>
-    )
-  }
+  const showSuccess =
+    !isEditing && (isSubmitted || !!localSubmittedEmail) && !!effectiveEmail
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
@@ -83,11 +61,34 @@ export function EmailCaptureForm({
     try {
       await onSubmit?.(trimmed)
       setLocalSubmittedEmail(trimmed)
+      setIsEditing(false)
     } catch {
       setValidationError('Failed to submit. Please try again.')
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  const handleChangeEmail = () => {
+    setIsEditing(true)
+    setEmail(effectiveEmail ?? '')
+  }
+
+  if (showSuccess) {
+    const formattedSuccessMessage = successMessage
+      ? successMessage.replace('{email}', effectiveEmail)
+      : `We'll send your result to ${effectiveEmail}`
+
+    return (
+      <div className="w-full space-y-3 text-center">
+        <ThemedText variant="body" className="opacity-90">
+          {formattedSuccessMessage}
+        </ThemedText>
+        <ThemedButton variant="outline" size="sm" onClick={handleChangeEmail}>
+          Change email
+        </ThemedButton>
+      </div>
+    )
   }
 
   return (

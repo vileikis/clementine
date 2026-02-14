@@ -45,15 +45,7 @@ export const submitGuestEmail = onCall(
       throw new HttpsError('not-found', 'Session not found')
     }
 
-    // Prevent overwrite — guestEmail should only be set once
-    if (session.guestEmail !== null) {
-      throw new HttpsError(
-        'already-exists',
-        'Email already submitted for this session',
-      )
-    }
-
-    // Write guestEmail to session
+    // Write guestEmail to session (allows overwrite if guest changes email)
     await updateSessionGuestEmail(projectId, sessionId, email)
 
     // If job is NOT completed or missing result media, do NOT queue email
