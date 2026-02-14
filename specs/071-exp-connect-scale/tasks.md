@@ -33,7 +33,7 @@ All paths relative to `apps/clementine-app/src/`:
 
 ### Implementation for User Story 1
 
-- [ ] T001 [P] [US1] Refactor WelcomeEditorPage to fetch connected experiences by ID in `apps/clementine-app/src/domains/project-config/welcome/containers/WelcomeEditorPage.tsx`
+- [x] T001 [P] [US1] Refactor WelcomeEditorPage to fetch connected experiences by ID in `apps/clementine-app/src/domains/project-config/welcome/containers/WelcomeEditorPage.tsx`
 
   **Details:**
   1. Remove the `useExperiencesForSlot` import (line 26–28) and its usage (lines 60–63 fetching `availableExperiences`)
@@ -84,7 +84,7 @@ All paths relative to `apps/clementine-app/src/`:
 
 ### Implementation for User Story 2
 
-- [ ] T002 [P] [US2] Create `usePaginatedExperiencesForSlot` hook in `apps/clementine-app/src/domains/project-config/experiences/hooks/usePaginatedExperiencesForSlot.ts`
+- [x] T002 [P] [US2] Create `usePaginatedExperiencesForSlot` hook in `apps/clementine-app/src/domains/project-config/experiences/hooks/usePaginatedExperiencesForSlot.ts`
 
   **Details:**
   1. Create the new file with the hook following the contract in `contracts/hooks.md`
@@ -120,13 +120,13 @@ All paths relative to `apps/clementine-app/src/`:
   9. Export `paginatedSlotExperiencesKeys` for cache invalidation
   10. Verify: `pnpm app:type-check` passes
 
-- [ ] T003 [P] [US2] Add barrel export for new hook in `apps/clementine-app/src/domains/project-config/experiences/index.ts`
+- [x] T003 [P] [US2] Add barrel export for new hook in `apps/clementine-app/src/domains/project-config/experiences/index.ts`
 
   **Details:**
   1. Add line: `export * from './hooks/usePaginatedExperiencesForSlot'`
   2. Keep existing `useExperiencesForSlot` export (removed in cleanup phase)
 
-- [ ] T004 [US2] Update ConnectExperienceDrawer to use paginated hook and add Load More UI in `apps/clementine-app/src/domains/project-config/experiences/components/ConnectExperienceDrawer.tsx`
+- [x] T004 [US2] Update ConnectExperienceDrawer to use paginated hook and add Load More UI in `apps/clementine-app/src/domains/project-config/experiences/components/ConnectExperienceDrawer.tsx`
 
   **Details:**
   1. Replace `useExperiencesForSlot` import with `usePaginatedExperiencesForSlot` from `../hooks/usePaginatedExperiencesForSlot`
@@ -182,7 +182,7 @@ All paths relative to `apps/clementine-app/src/`:
 
 **Purpose**: Remove dead code and run validation gates
 
-- [ ] T005 Remove `useExperiencesForSlot` hook and its barrel export now that it has zero consumers
+- [x] T005 Remove `useExperiencesForSlot` hook and its barrel export now that it has zero consumers
 
   **Details:**
   1. Verify no imports remain: search for `useExperiencesForSlot` across the codebase
@@ -191,7 +191,7 @@ All paths relative to `apps/clementine-app/src/`:
   4. Also remove `slotExperiencesQuery` and `slotExperiencesKeys` exports if they were only used by that hook
   5. Verify: `pnpm app:type-check` passes with no broken imports
 
-- [ ] T006 Run validation gates: `pnpm app:check` and `pnpm app:type-check` from `apps/clementine-app/`
+- [x] T006 Run validation gates: `pnpm app:check` and `pnpm app:type-check` from `apps/clementine-app/`
 
   **Details:**
   1. Run `pnpm app:check` (format + lint fixes)

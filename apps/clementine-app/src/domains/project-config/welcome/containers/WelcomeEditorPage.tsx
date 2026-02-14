@@ -22,10 +22,8 @@ import { useWorkspace } from '@/domains/workspace'
 import { useAuth } from '@/domains/auth'
 import { DEFAULT_THEME } from '@/domains/project-config/theme/constants'
 import { ThemeProvider, ThemedBackground } from '@/shared/theming'
-import {
-  useExperiencesForSlot,
-  useUpdateProjectExperiences,
-} from '@/domains/project-config/experiences'
+import { useUpdateProjectExperiences } from '@/domains/project-config/experiences'
+import { useExperiencesByIds } from '@/domains/experience/shared'
 
 // Fields to compare for auto-save change detection
 const WELCOME_FIELDS_TO_COMPARE: (keyof WelcomeConfig)[] = [
@@ -56,10 +54,14 @@ export function WelcomeEditorPage() {
   const pregateExperience = project?.draftConfig?.experiences?.pregate
   const preshareExperience = project?.draftConfig?.experiences?.preshare
 
-  // Fetch available experiences for the main slot
-  const { data: availableExperiences = [] } = useExperiencesForSlot(
-    workspace?.id,
-    'main',
+  // Fetch only the connected experiences by their IDs
+  const mainExperienceIds = useMemo(
+    () => mainExperiences.map((exp) => exp.experienceId),
+    [mainExperiences],
+  )
+  const { data: connectedExperiences = [] } = useExperiencesByIds(
+    workspace?.id ?? '',
+    mainExperienceIds,
   )
 
   // Get all assigned experience IDs across all slots
@@ -70,10 +72,10 @@ export function WelcomeEditorPage() {
     return ids
   }, [mainExperiences, pregateExperience, preshareExperience])
 
-  // Filter available experiences and map to card data format for preview
+  // Map connected experiences to card data format for preview
   const mainExperienceDetails: ExperienceCardData[] = useMemo(() => {
     const experienceMap = new Map(
-      availableExperiences.map((exp) => [exp.id, exp]),
+      connectedExperiences.map((exp) => [exp.id, exp]),
     )
     return mainExperiences
       .map((ref) => experienceMap.get(ref.experienceId))
@@ -83,7 +85,7 @@ export function WelcomeEditorPage() {
         name: exp.name,
         thumbnailUrl: exp.media?.url ?? null,
       }))
-  }, [mainExperiences, availableExperiences])
+  }, [mainExperiences, connectedExperiences])
 
   // Form setup
   const form = useForm<WelcomeConfig>({
