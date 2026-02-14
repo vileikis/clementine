@@ -5,8 +5,8 @@
  * Features search, profile filtering, and create new experience button.
  */
 import { useMemo, useState } from 'react'
-import { ExternalLink, Plus, Search } from 'lucide-react'
-import { useExperiencesForSlot } from '../hooks/useExperiencesForSlot'
+import { ExternalLink, Loader2, Plus, Search } from 'lucide-react'
+import { usePaginatedExperiencesForSlot } from '../hooks'
 import { ConnectExperienceItem } from './ConnectExperienceItem'
 import type { SlotType } from '../constants'
 import {
@@ -40,6 +40,9 @@ export interface ConnectExperienceDrawerProps {
 
   /** Callback when experience is selected */
   onSelect: (experienceId: string) => void
+
+  /** Number of experiences to load per page. Default: 20 */
+  pageSize?: number
 }
 
 /**
@@ -73,14 +76,18 @@ export function ConnectExperienceDrawer({
   workspaceSlug,
   assignedExperienceIds,
   onSelect,
+  pageSize,
 }: ConnectExperienceDrawerProps) {
   const [searchQuery, setSearchQuery] = useState('')
 
-  // Fetch experiences filtered by slot compatibility
-  const { data: experiences = [], isLoading } = useExperiencesForSlot(
-    workspaceId,
-    slot,
-  )
+  // Fetch experiences filtered by slot compatibility with pagination
+  const {
+    experiences,
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = usePaginatedExperiencesForSlot(workspaceId, slot, { pageSize })
 
   // Filter experiences by search query (client-side)
   const filteredExperiences = useMemo(() => {
@@ -161,16 +168,38 @@ export function ConnectExperienceDrawer({
                 </p>
               </div>
             ) : (
-              <div className="space-y-2">
-                {filteredExperiences.map((experience) => (
-                  <ConnectExperienceItem
-                    key={experience.id}
-                    experience={experience}
-                    isAssigned={assignedSet.has(experience.id)}
-                    onSelect={() => handleSelect(experience.id)}
-                  />
-                ))}
-              </div>
+              <>
+                <div className="space-y-2">
+                  {filteredExperiences.map((experience) => (
+                    <ConnectExperienceItem
+                      key={experience.id}
+                      experience={experience}
+                      isAssigned={assignedSet.has(experience.id)}
+                      onSelect={() => handleSelect(experience.id)}
+                    />
+                  ))}
+                </div>
+                {hasNextPage && (
+                  <div className="flex justify-center py-3">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => fetchNextPage()}
+                      disabled={isFetchingNextPage}
+                      className="gap-2"
+                    >
+                      {isFetchingNextPage ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Loading...
+                        </>
+                      ) : (
+                        'Load More'
+                      )}
+                    </Button>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>

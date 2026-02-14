@@ -3,7 +3,7 @@
 
 export * from './constants'
 export * from './schemas/event-experiences.schema'
-export * from './hooks/useExperiencesForSlot'
+export * from './hooks/usePaginatedExperiencesForSlot'
 export * from './hooks/useUpdateProjectExperiences'
 // Note: ExperienceCard moved to @/domains/project-config/welcome for WYSIWYG parity
 export * from './components/ExperienceSlotEmpty'
