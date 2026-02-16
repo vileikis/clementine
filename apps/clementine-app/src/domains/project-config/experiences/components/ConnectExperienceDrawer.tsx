@@ -142,9 +142,7 @@ export function ConnectExperienceDrawer({
       return (
         <div className="flex flex-col items-center justify-center py-12 gap-2">
           <p className="text-sm font-medium text-muted-foreground">
-            {searchQuery
-              ? 'No experiences found'
-              : 'No compatible experiences'}
+            {searchQuery ? 'No experiences found' : 'No compatible experiences'}
           </p>
           <p className="text-xs text-muted-foreground text-center">
             {searchQuery

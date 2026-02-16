@@ -96,8 +96,7 @@ export function usePaginatedExperiencesForSlot(
   })
 
   const experiences = useMemo(
-    () =>
-      infiniteQuery.data?.pages.flatMap((page) => page.experiences) ?? [],
+    () => infiniteQuery.data?.pages.flatMap((page) => page.experiences) ?? [],
     [infiniteQuery.data],
   )
 
