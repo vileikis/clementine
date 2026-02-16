@@ -5,6 +5,7 @@ import viteReact from '@vitejs/plugin-react'
 import viteTsConfigPaths from 'vite-tsconfig-paths'
 import tailwindcss from '@tailwindcss/vite'
 import { nitro } from 'nitro/vite'
+import { sentryTanstackStart } from '@sentry/tanstackstart-react'
 
 const config = defineConfig(({ mode }) => ({
   server: {
@@ -25,6 +26,11 @@ const config = defineConfig(({ mode }) => ({
           routesDirectory: 'app', // Relative to srcDirectory (defaults to 'src')
         },
       }),
+    sentryTanstackStart({
+      org: process.env.VITE_SENTRY_ORG,
+      project: process.env.VITE_SENTRY_PROJECT,
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+    }),
     viteReact(),
   ].filter(Boolean),
   test: {

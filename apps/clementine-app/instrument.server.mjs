@@ -8,6 +8,7 @@ if (!sentryDsn) {
 } else {
   Sentry.init({
     dsn: sentryDsn,
+    environment: import.meta.env?.MODE ?? process.env.NODE_ENV ?? 'production',
     // Adds request headers and IP for users, for more info visit:
     // https://docs.sentry.io/platforms/javascript/guides/tanstackstart-react/configuration/options/#sendDefaultPii
     sendDefaultPii: true,

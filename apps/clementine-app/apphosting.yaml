@@ -64,6 +64,24 @@ env:
       - BUILD
       - RUNTIME
 
+  - variable: VITE_SENTRY_DSN
+    value: https://67156156f75d20ff750c5c97cfb84209@o4510896254877697.ingest.de.sentry.io/4510896266543184
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: VITE_SENTRY_ORG
+    value: clementine-labs
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: VITE_SENTRY_PROJECT
+    value: javascript-tanstackstart-react
+    availability:
+      - BUILD
+      - RUNTIME
+
   - variable: VITE_APP_DOMAIN
     value: clementine-be--clementine-7568d.europe-west4.hosted.app
     availability:
@@ -104,6 +122,11 @@ env:
     secret: FIREBASE_ADMIN_PRIVATE_KEY
     availability:
       - RUNTIME
+
+  - variable: SENTRY_AUTH_TOKEN
+    secret: SENTRY_AUTH_TOKEN
+    availability:
+      - BUILD
 
   - variable: DROPBOX_APP_SECRET
     secret: DROPBOX_APP_SECRET

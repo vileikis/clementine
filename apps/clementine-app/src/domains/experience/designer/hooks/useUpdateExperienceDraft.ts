@@ -81,6 +81,8 @@ export function useUpdateExperienceDraft() {
         `workspaces/${workspaceId}/experiences/${experienceId}`,
       )
 
+      throw new Error('Sentry Test Error mutation hook')
+
       // Update draft with atomic version increment in transaction
       await runTransaction(firestore, (transaction) => {
         transaction.update(experienceRef, {

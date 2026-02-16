@@ -8,6 +8,6 @@ export default defineNitroConfig({
   // This is critical because firebase-admin uses native Node.js crypto libraries
   // that break when bundled
   rollupConfig: {
-    external: ['firebase-admin'],
+    external: ['firebase-admin', 'fsevents'],
   },
 })
