@@ -5,7 +5,7 @@
  * Features search, profile filtering, and create new experience button.
  */
 import { useMemo, useState } from 'react'
-import { ExternalLink, Loader2, Plus, Search } from 'lucide-react'
+import { AlertCircle, ExternalLink, Loader2, Plus, Search } from 'lucide-react'
 import { usePaginatedExperiencesForSlot } from '../hooks'
 import { ConnectExperienceItem } from './ConnectExperienceItem'
 import type { SlotType } from '../constants'
@@ -49,7 +49,7 @@ export interface ConnectExperienceDrawerProps {
  * Drawer component for connecting experiences to events
  *
  * Features:
- * - Search experiences by name (debounced 300ms)
+ * - Search experiences by name
  * - Profile filtering based on slot compatibility
  * - Shows "in use" badge for assigned experiences
  * - "Create New Experience" button opens in new tab
@@ -87,6 +87,7 @@ export function ConnectExperienceDrawer({
     isFetchingNextPage,
     hasNextPage,
     fetchNextPage,
+    isError,
   } = usePaginatedExperiencesForSlot(workspaceId, slot, { pageSize })
 
   // Filter experiences by search query (client-side)
@@ -112,6 +113,84 @@ export function ConnectExperienceDrawer({
   // Handle create new experience
   const handleCreateNew = () => {
     window.open(`/workspace/${workspaceSlug}/experiences/create`, '_blank')
+  }
+
+  const renderContent = () => {
+    if (isError) {
+      return (
+        <div className="flex flex-col items-center justify-center py-12 gap-2">
+          <AlertCircle className="h-5 w-5 text-destructive" />
+          <p className="text-sm font-medium text-destructive">
+            Failed to load experiences
+          </p>
+          <p className="text-xs text-muted-foreground text-center">
+            Please try again or check your connection
+          </p>
+        </div>
+      )
+    }
+
+    if (isLoading) {
+      return (
+        <div className="flex items-center justify-center py-12">
+          <p className="text-sm text-muted-foreground">Loading...</p>
+        </div>
+      )
+    }
+
+    if (filteredExperiences.length === 0) {
+      return (
+        <div className="flex flex-col items-center justify-center py-12 gap-2">
+          <p className="text-sm font-medium text-muted-foreground">
+            {searchQuery
+              ? 'No experiences found'
+              : 'No compatible experiences'}
+          </p>
+          <p className="text-xs text-muted-foreground text-center">
+            {searchQuery
+              ? hasNextPage
+                ? 'Try loading more experiences or adjusting your search'
+                : 'Try adjusting your search'
+              : 'Create a new experience to get started'}
+          </p>
+        </div>
+      )
+    }
+
+    return (
+      <>
+        <div className="space-y-2">
+          {filteredExperiences.map((experience) => (
+            <ConnectExperienceItem
+              key={experience.id}
+              experience={experience}
+              isAssigned={assignedSet.has(experience.id)}
+              onSelect={() => handleSelect(experience.id)}
+            />
+          ))}
+        </div>
+        {hasNextPage && (
+          <div className="flex justify-center py-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => fetchNextPage()}
+              disabled={isFetchingNextPage}
+              className="gap-2"
+            >
+              {isFetchingNextPage ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Loading...
+                </>
+              ) : (
+                'Load More'
+              )}
+            </Button>
+          </div>
+        )}
+      </>
+    )
   }
 
   return (
@@ -150,57 +229,7 @@ export function ConnectExperienceDrawer({
 
           {/* Experience List */}
           <div className="flex-1 overflow-y-auto -mx-4 px-4">
-            {isLoading ? (
-              <div className="flex items-center justify-center py-12">
-                <p className="text-sm text-muted-foreground">Loading...</p>
-              </div>
-            ) : filteredExperiences.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 gap-2">
-                <p className="text-sm font-medium text-muted-foreground">
-                  {searchQuery
-                    ? 'No experiences found'
-                    : 'No compatible experiences'}
-                </p>
-                <p className="text-xs text-muted-foreground text-center">
-                  {searchQuery
-                    ? 'Try adjusting your search'
-                    : 'Create a new experience to get started'}
-                </p>
-              </div>
-            ) : (
-              <>
-                <div className="space-y-2">
-                  {filteredExperiences.map((experience) => (
-                    <ConnectExperienceItem
-                      key={experience.id}
-                      experience={experience}
-                      isAssigned={assignedSet.has(experience.id)}
-                      onSelect={() => handleSelect(experience.id)}
-                    />
-                  ))}
-                </div>
-                {hasNextPage && (
-                  <div className="flex justify-center py-3">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => fetchNextPage()}
-                      disabled={isFetchingNextPage}
-                      className="gap-2"
-                    >
-                      {isFetchingNextPage ? (
-                        <>
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                          Loading...
-                        </>
-                      ) : (
-                        'Load More'
-                      )}
-                    </Button>
-                  </div>
-                )}
-              </>
-            )}
+            {renderContent()}
           </div>
         </div>
       </SheetContent>
