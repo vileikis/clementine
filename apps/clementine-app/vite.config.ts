@@ -7,6 +7,7 @@ import viteTsConfigPaths from 'vite-tsconfig-paths'
 import tailwindcss from '@tailwindcss/vite'
 import { nitro } from 'nitro/vite'
 import { sentryTanstackStart } from '@sentry/tanstackstart-react'
+import { sentryRollupPlugin } from '@sentry/rollup-plugin'
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
@@ -46,7 +47,14 @@ function createPlugins(
           external: ['firebase-admin', 'fsevents'],
           // Nitro hardcodes sourcemapExcludeSources: true with highest defu priority,
           // so we use a Rollup plugin hook to override it after config merging.
-          plugins: [includeSourcesInSourceMaps()],
+          plugins: [
+            includeSourcesInSourceMaps(),
+            sentryRollupPlugin({
+              org: env.VITE_SENTRY_ORG,
+              project: env.VITE_SENTRY_PROJECT,
+              authToken: env.SENTRY_AUTH_TOKEN,
+            }),
+          ],
           output: { sourcemap: true },
         },
       }),
