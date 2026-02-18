@@ -63,12 +63,12 @@ function createPlugins(
   }
 
   plugins.push(
+    viteReact(),
     sentryTanstackStart({
       org: env.VITE_SENTRY_ORG,
       project: env.VITE_SENTRY_PROJECT,
       authToken: env.SENTRY_AUTH_TOKEN,
     }),
-    viteReact(),
   )
 
   return plugins
