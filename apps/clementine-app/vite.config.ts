@@ -1,4 +1,5 @@
-import { defineConfig, loadEnv, type PluginOption } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
+import type { PluginOption, Plugin } from 'vite'
 import { devtools } from '@tanstack/devtools-vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import viteReact from '@vitejs/plugin-react'
@@ -6,7 +7,6 @@ import viteTsConfigPaths from 'vite-tsconfig-paths'
 import tailwindcss from '@tailwindcss/vite'
 import { nitro } from 'nitro/vite'
 import { sentryTanstackStart } from '@sentry/tanstackstart-react'
-import type { Plugin as RollupPlugin } from 'rollup'
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
@@ -30,9 +30,11 @@ function createPlugins(
   env: Record<string, string>,
 ): PluginOption[] {
   const isTest = mode === 'test'
-  const plugins: PluginOption[] = []
-
-  plugins.push(devtools())
+  const plugins: PluginOption[] = [
+    devtools(),
+    viteTsConfigPaths({ projects: ['./tsconfig.json'] }),
+    tailwindcss(),
+  ]
 
   if (!isTest) {
     plugins.push(
@@ -44,16 +46,8 @@ function createPlugins(
           output: { sourcemap: true },
         },
       }),
+      tanstackStart({ router: { routesDirectory: 'app' } }),
     )
-  }
-
-  plugins.push(
-    viteTsConfigPaths({ projects: ['./tsconfig.json'] }),
-    tailwindcss(),
-  )
-
-  if (!isTest) {
-    plugins.push(tanstackStart({ router: { routesDirectory: 'app' } }))
   }
 
   plugins.push(
@@ -73,7 +67,7 @@ function createPlugins(
  * so that server source maps include the original source content (`sourcesContent`).
  * This is required for Sentry to properly symbolicate server-side stack traces.
  */
-function includeSourcesInSourceMaps(): RollupPlugin {
+function includeSourcesInSourceMaps(): Plugin {
   return {
     name: 'include-sources-in-sourcemaps',
     outputOptions(options) {
