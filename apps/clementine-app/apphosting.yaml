@@ -89,7 +89,7 @@ env:
       - RUNTIME
 
   - variable: VITE_DROPBOX_APP_KEY
-    value: zym0zoj3234ohwx
+    value: qy0ws3mcqgu2z7d
     availability:
       - BUILD
       - RUNTIME
