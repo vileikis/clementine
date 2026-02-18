@@ -6,6 +6,7 @@ import viteTsConfigPaths from 'vite-tsconfig-paths'
 import tailwindcss from '@tailwindcss/vite'
 import { nitro } from 'nitro/vite'
 import { sentryTanstackStart } from '@sentry/tanstackstart-react'
+import type { Plugin as RollupPlugin } from 'rollup'
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
@@ -34,7 +35,16 @@ function createPlugins(
   plugins.push(devtools())
 
   if (!isTest) {
-    plugins.push(nitro({ rollupConfig: { output: { sourcemap: true } } }))
+    plugins.push(
+      nitro({
+        rollupConfig: {
+          // Nitro hardcodes sourcemapExcludeSources: true with highest defu priority,
+          // so we use a Rollup plugin hook to override it after config merging.
+          plugins: [includeSourcesInSourceMaps()],
+          output: { sourcemap: true },
+        },
+      }),
+    )
   }
 
   plugins.push(
@@ -56,4 +66,18 @@ function createPlugins(
   )
 
   return plugins
+}
+
+/**
+ * Rollup plugin that overrides Nitro's hardcoded `sourcemapExcludeSources: true`
+ * so that server source maps include the original source content (`sourcesContent`).
+ * This is required for Sentry to properly symbolicate server-side stack traces.
+ */
+function includeSourcesInSourceMaps(): RollupPlugin {
+  return {
+    name: 'include-sources-in-sourcemaps',
+    outputOptions(options) {
+      return { ...options, sourcemapExcludeSources: false }
+    },
+  }
 }
