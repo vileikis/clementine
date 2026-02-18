@@ -17,7 +17,14 @@ const config = defineConfig(({ mode }) => {
     },
     plugins: [
       devtools(),
-      mode !== 'test' && nitro(),
+      mode !== 'test' &&
+        nitro({
+          rollupConfig: {
+            output: {
+              sourcemap: true,
+            },
+          },
+        }),
       // this is the plugin that enables path aliases
       viteTsConfigPaths({
         projects: ['./tsconfig.json'],
