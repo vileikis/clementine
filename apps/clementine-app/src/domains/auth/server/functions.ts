@@ -27,14 +27,6 @@ export const getCurrentUserFn = createServerFn({ method: 'GET' }).handler(
           lastVisitedWorkspaceSlug,
         } = session.data
 
-        try {
-          throw new Error('Sentry Test Error function')
-        } catch (error) {
-          Sentry.captureException(error, {
-            tags: { function: 'getCurrentUserFn', action: 'error' },
-          })
-        }
-
         if (!userId) {
           return null
         }
