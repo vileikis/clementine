@@ -39,7 +39,11 @@ function createPlugins(
   if (!isTest) {
     plugins.push(
       nitro({
+        node: true,
         rollupConfig: {
+          // Externalize firebase-admin to prevent bundling —
+          // it uses native Node.js crypto libraries that break when bundled.
+          external: ['firebase-admin', 'fsevents'],
           // Nitro hardcodes sourcemapExcludeSources: true with highest defu priority,
           // so we use a Rollup plugin hook to override it after config merging.
           plugins: [includeSourcesInSourceMaps()],
