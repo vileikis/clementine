@@ -1,10 +1,10 @@
-# Phase 1: Schema Redesign + Photo & AI Photo (Full Stack)
+# Phase 1: Schema Redesign + Photo & AI Image (Full Stack)
 
 > Part of [Experience Designer v4 — Outcome Schema Redesign](./brief.md)
 
 ## Overview
 
-Refactor the outcome system from a flat, conditional schema to a per-type config architecture. Deliver full-stack support for `photo` and `ai.photo` outcome types. This phase replaces all existing outcome functionality with the new schema — same capabilities, new structure.
+Refactor the outcome system from a flat, conditional schema to a per-type config architecture. Deliver full-stack support for `photo` and `ai.image` outcome types. This phase replaces all existing outcome functionality with the new schema — same capabilities, new structure.
 
 GIF, Video, and AI Video types are defined in the schema but marked as "coming soon" in the UI and "not implemented" in the backend.
 
@@ -14,7 +14,7 @@ GIF, Video, and AI Video types are defined in the schema but marked as "coming s
 2. Deliver output type picker UI (empty state) and type-specific config forms
 3. Update cloud functions to read/write the new schema
 4. Migrate existing Firestore documents from old to new format
-5. Maintain feature parity — no regressions in photo or AI photo workflows
+5. Maintain feature parity — no regressions in photo or AI image workflows
 
 ## Deployment
 
@@ -31,7 +31,7 @@ Replace `packages/shared/src/schemas/experience/outcome.schema.ts` with the new 
 **Outcome type enum:**
 
 ```
-OutcomeType = 'photo' | 'gif' | 'video' | 'ai.photo' | 'ai.video'
+OutcomeType = 'photo' | 'gif' | 'video' | 'ai.image' | 'ai.video'
 ```
 
 **Top-level outcome:**
@@ -43,7 +43,7 @@ outcome: {
   photo:   PhotoOutcomeConfig   | null
   gif:     GifOutcomeConfig     | null
   video:   VideoOutcomeConfig   | null
-  aiPhoto: AIPhotoOutcomeConfig | null
+  aiImage: AIImageOutcomeConfig | null
   aiVideo: AIVideoOutcomeConfig | null
 }
 ```
@@ -61,7 +61,7 @@ All per-type config fields default to `null` (Firestore-safe pattern).
 }
 ```
 
-**AIPhotoOutcomeConfig:**
+**AIImageOutcomeConfig:**
 
 ```
 {
@@ -105,8 +105,8 @@ Create a Firestore migration script in `functions/scripts/migrations/` that read
 | Old State | New `type` | New Config Field |
 |-----------|-----------|-----------------|
 | `type: 'image'`, `aiEnabled: false` | `'photo'` | `photo: { captureStepId, aspectRatio }` |
-| `type: 'image'`, `aiEnabled: true`, `captureStepId: null` | `'ai.photo'` | `aiPhoto: { task: 'text-to-image', captureStepId: null, aspectRatio, prompt, model, refMedia }` |
-| `type: 'image'`, `aiEnabled: true`, `captureStepId: <id>` | `'ai.photo'` | `aiPhoto: { task: 'image-to-image', captureStepId, aspectRatio, prompt, model, refMedia }` |
+| `type: 'image'`, `aiEnabled: true`, `captureStepId: null` | `'ai.image'` | `aiImage: { task: 'text-to-image', captureStepId: null, aspectRatio, prompt, model, refMedia }` |
+| `type: 'image'`, `aiEnabled: true`, `captureStepId: <id>` | `'ai.image'` | `aiImage: { task: 'image-to-image', captureStepId, aspectRatio, prompt, model, refMedia }` |
 | `type: null` | `null` | All config fields `null` |
 
 Migration must handle both `draft.outcome` and `published.outcome` fields.
@@ -129,7 +129,7 @@ When `outcome.type === null`, show a picker with two groups:
 - Video (disabled — "Coming soon")
 
 **AI Generated**
-- AI Photo (enabled)
+- AI Image (enabled)
 - AI Video (disabled — "Coming soon")
 
 Category grouping is hardcoded in the frontend (not stored in schema).
@@ -151,7 +151,7 @@ Fields:
 
 Aspect ratio cascades to the referenced capture step's config (writes to `draft.steps[]`).
 
-### 3.4 AI Photo Config Form
+### 3.4 AI Image Config Form
 
 Fields:
 - **Task selector** — toggle between `text-to-image` and `image-to-image`
@@ -194,10 +194,10 @@ Update the callable function to read the new outcome schema:
 - Flow: download captured media → apply overlay (if configured) → upload output
 - Reads from `PhotoOutcomeConfig`
 
-**`aiPhotoOutcome`** (new file: `functions/src/services/transform/outcomes/aiPhotoOutcome.ts`)
+**`aiImageOutcome`** (new file: `functions/src/services/transform/outcomes/aiImageOutcome.ts`)
 - AI generation mode
 - Flow: resolve prompt mentions → generate image via AI → apply overlay → upload output
-- Reads from `AIPhotoOutcomeConfig`
+- Reads from `AIImageOutcomeConfig`
 - Handles both `text-to-image` (no source media) and `image-to-image` (source from capture step) based on `task` field
 
 ### 4.3 Update `runOutcome` Dispatcher
@@ -209,7 +209,7 @@ outcomeRegistry: {
   'photo':    photoOutcome,
   'gif':      null,
   'video':    null,
-  'ai.photo': aiPhotoOutcome,
+  'ai.image': aiImageOutcome,
   'ai.video': null,
 }
 ```
@@ -239,7 +239,7 @@ Existing completed/failed jobs with old snapshot format are historical records a
 
 ### Schema
 - [ ] New `outcomeSchema` with per-type configs defined in `@clementine/shared`
-- [ ] All 5 type configs defined (photo, gif, video, aiPhoto, aiVideo)
+- [ ] All 5 type configs defined (photo, gif, video, aiImage, aiVideo)
 - [ ] Old schema fields removed or deprecated
 - [ ] Shared package builds and passes type checking
 
@@ -251,7 +251,7 @@ Existing completed/failed jobs with old snapshot format are historical records a
 ### Editor
 - [ ] Empty state shows output type picker with correct grouping
 - [ ] Photo config form: source step selector + aspect ratio
-- [ ] AI Photo config form: task selector, source step (i2i), aspect ratio, prompt, model, ref media
+- [ ] AI Image config form: task selector, source step (i2i), aspect ratio, prompt, model, ref media
 - [ ] Type switching preserves per-type config
 - [ ] Aspect ratio cascades to capture step
 - [ ] Remove output action returns to picker (configs preserved)
@@ -261,13 +261,13 @@ Existing completed/failed jobs with old snapshot format are historical records a
 ### Backend
 - [ ] `startTransformPipeline` reads new schema correctly
 - [ ] `photoOutcome` executor handles passthrough flow
-- [ ] `aiPhotoOutcome` executor handles text-to-image and image-to-image
+- [ ] `aiImageOutcome` executor handles text-to-image and image-to-image
 - [ ] `runOutcome` dispatcher routes to correct executor
 - [ ] GIF, Video, AI Video return "not implemented" error
 - [ ] Existing overlay system works with new executors
 
 ### End-to-End
 - [ ] Admin can configure a `photo` outcome and guest receives passthrough result
-- [ ] Admin can configure an `ai.photo` (text-to-image) outcome and guest receives AI-generated result
-- [ ] Admin can configure an `ai.photo` (image-to-image) outcome and guest receives AI-generated result
+- [ ] Admin can configure an `ai.image` (text-to-image) outcome and guest receives AI-generated result
+- [ ] Admin can configure an `ai.image` (image-to-image) outcome and guest receives AI-generated result
 - [ ] No regressions from current functionality

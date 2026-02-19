@@ -1,11 +1,11 @@
-# Implementation Plan: Outcome Schema Redesign — Photo & AI Photo
+# Implementation Plan: Outcome Schema Redesign — Photo & AI Image
 
 **Branch**: `072-outcome-schema-redesign` | **Date**: 2026-02-19 | **Spec**: [spec.md](./spec.md)
 **Input**: Feature specification from `/specs/072-outcome-schema-redesign/spec.md`
 
 ## Summary
 
-Refactor the outcome system from a flat, conditional schema (`type` + `aiEnabled` + top-level fields) to a per-type config architecture (`type` + nullable config objects per type). Deliver full-stack support for `photo` and `ai.photo` outcome types. Split the existing `imageOutcome` executor into `photoOutcome` and `aiPhotoOutcome`. Migrate existing Firestore documents. Update the editor UI with type picker, type-specific config forms, and type switching.
+Refactor the outcome system from a flat, conditional schema (`type` + `aiEnabled` + top-level fields) to a per-type config architecture (`type` + nullable config objects per type). Deliver full-stack support for `photo` and `ai.image` outcome types. Split the existing `imageOutcome` executor into `photoOutcome` and `aiImageOutcome`. Migrate existing Firestore documents. Update the editor UI with type picker, type-specific config forms, and type switching.
 
 ## Technical Context
 
@@ -78,8 +78,8 @@ apps/clementine-app/src/domains/experience/
 │   │   │   └── RemoveOutcomeAction.tsx    # MINOR UPDATE — terminology
 │   │   ├── photo-config/                  # Photo type config form
 │   │   │   └── PhotoConfigForm.tsx        # NEW — source step + aspect ratio
-│   │   ├── ai-photo-config/               # AI Photo type config form
-│   │   │   ├── AIPhotoConfigForm.tsx      # NEW — task, source, aspect, prompt, model, refs
+│   │   ├── ai-image-config/               # AI Image type config form
+│   │   │   ├── AIImageConfigForm.tsx      # NEW — task, source, aspect, prompt, model, refs
 │   │   │   └── TaskSelector.tsx           # NEW — t2i/i2i toggle
 │   │   ├── shared-controls/               # Reused by multiple config forms
 │   │   │   ├── SourceImageSelector.tsx    # NO CHANGE — moved from CreateTabForm/
@@ -90,7 +90,7 @@ apps/clementine-app/src/domains/experience/
 │   ├── hooks/
 │   │   ├── useUpdateOutcome.ts        # UPDATE — new mutation payload shape
 │   │   ├── useOutcomeValidation.ts    # REWRITE — validate per-type configs
-│   │   └── useRefMediaUpload.ts       # MINOR UPDATE — read from aiPhoto config
+│   │   └── useRefMediaUpload.ts       # MINOR UPDATE — read from aiImage config
 │   └── lib/
 │       ├── outcome-operations.ts      # REWRITE — per-type config operations
 │       └── model-options.ts           # MINOR UPDATE — new type constants
@@ -107,9 +107,9 @@ functions/src/
 │   ├── engine/
 │   │   └── runOutcome.ts              # UPDATE — new registry with 5 types
 │   ├── outcomes/
-│   │   ├── imageOutcome.ts            # DELETE — split into photo + aiPhoto
+│   │   ├── imageOutcome.ts            # DELETE — split into photo + aiImage
 │   │   ├── photoOutcome.ts            # NEW — passthrough executor
-│   │   └── aiPhotoOutcome.ts          # NEW — AI generation executor
+│   │   └── aiImageOutcome.ts          # NEW — AI generation executor
 │   ├── operations/                    # NO CHANGE (entire directory)
 │   └── types.ts                       # NO CHANGE
 ├── repositories/

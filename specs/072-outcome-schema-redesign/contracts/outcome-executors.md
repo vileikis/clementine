@@ -11,7 +11,7 @@ const outcomeRegistry: Record<OutcomeType, OutcomeExecutor | null> = {
   'photo':    photoOutcome,
   'gif':      null,          // Not implemented — Phase 2+
   'video':    null,          // Not implemented — Phase 2+
-  'ai.photo': aiPhotoOutcome,
+  'ai.image': aiImageOutcome,
   'ai.video': null,          // Not implemented — Phase 2+
 }
 ```
@@ -47,29 +47,29 @@ Flow:
 6. Upload output → return JobOutput
 ```
 
-## aiPhotoOutcome
+## aiImageOutcome
 
-**File**: `outcomes/aiPhotoOutcome.ts`
+**File**: `outcomes/aiImageOutcome.ts`
 **Signature**: `(ctx: OutcomeContext) => Promise<JobOutput>`
 
 ```
-Input: ctx.snapshot.outcome.aiPhoto (AIPhotoOutcomeConfig)
+Input: ctx.snapshot.outcome.aiImage (AIImageOutcomeConfig)
        ctx.snapshot.sessionResponses
        ctx.snapshot.overlayChoice
 
 Flow:
-1. Read aiPhoto config from snapshot.outcome.aiPhoto
-2. Validate aiPhoto config exists → error if null
+1. Read aiImage config from snapshot.outcome.aiImage
+2. Validate aiImage config exists → error if null
 3. If task === 'image-to-image':
-   → Get source media from sessionResponses using aiPhoto.captureStepId
+   → Get source media from sessionResponses using aiImage.captureStepId
    → Validate captureStepId is not null
 4. If task === 'text-to-image':
    → sourceMedia = null
-5. resolvePromptMentions(aiPhoto.prompt, sessionResponses, aiPhoto.refMedia)
+5. resolvePromptMentions(aiImage.prompt, sessionResponses, aiImage.refMedia)
 6. aiGenerateImage({
      prompt: resolvedPrompt.text,
-     model: aiPhoto.model,
-     aspectRatio: aiPhoto.aspectRatio,
+     model: aiImage.model,
+     aspectRatio: aiImage.aspectRatio,
      sourceMedia,
      referenceMedia: resolvedPrompt.mediaRefs
    }, tmpDir)

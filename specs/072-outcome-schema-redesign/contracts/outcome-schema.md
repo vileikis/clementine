@@ -6,7 +6,7 @@
 ## OutcomeType
 
 ```typescript
-const outcomeTypeSchema = z.enum(['photo', 'gif', 'video', 'ai.photo', 'ai.video'])
+const outcomeTypeSchema = z.enum(['photo', 'gif', 'video', 'ai.image', 'ai.video'])
 ```
 
 ## PhotoOutcomeConfig
@@ -18,13 +18,13 @@ const photoOutcomeConfigSchema = z.object({
 })
 ```
 
-## AIPhotoOutcomeConfig
+## AIImageOutcomeConfig
 
 ```typescript
-const aiPhotoTaskSchema = z.enum(['text-to-image', 'image-to-image'])
+const aiImageTaskSchema = z.enum(['text-to-image', 'image-to-image'])
 
-const aiPhotoOutcomeConfigSchema = z.object({
-  task: aiPhotoTaskSchema.default('text-to-image'),
+const aiImageOutcomeConfigSchema = z.object({
+  task: aiImageTaskSchema.default('text-to-image'),
   captureStepId: z.string().nullable().default(null),
   aspectRatio: imageAspectRatioSchema.default('1:1'),
   prompt: z.string().default(''),
@@ -78,7 +78,7 @@ const outcomeSchema = z.looseObject({
   photo: photoOutcomeConfigSchema.nullable().default(null),
   gif: gifOutcomeConfigSchema.nullable().default(null),
   video: videoOutcomeConfigSchema.nullable().default(null),
-  aiPhoto: aiPhotoOutcomeConfigSchema.nullable().default(null),
+  aiImage: aiImageOutcomeConfigSchema.nullable().default(null),
   aiVideo: aiVideoOutcomeConfigSchema.nullable().default(null),
 })
 ```
@@ -90,7 +90,7 @@ const outcomeSchema = z.looseObject({
 ```typescript
 type OutcomeType = z.infer<typeof outcomeTypeSchema>
 type PhotoOutcomeConfig = z.infer<typeof photoOutcomeConfigSchema>
-type AIPhotoOutcomeConfig = z.infer<typeof aiPhotoOutcomeConfigSchema>
+type AIImageOutcomeConfig = z.infer<typeof aiImageOutcomeConfigSchema>
 type GifOutcomeConfig = z.infer<typeof gifOutcomeConfigSchema>
 type VideoOutcomeConfig = z.infer<typeof videoOutcomeConfigSchema>
 type AIVideoOutcomeConfig = z.infer<typeof aiVideoOutcomeConfigSchema>
@@ -101,7 +101,7 @@ type Outcome = z.infer<typeof outcomeSchema>
 
 The following schemas and types are removed:
 
-- `imageGenerationConfigSchema` / `ImageGenerationConfig` (flattened into `AIPhotoOutcomeConfig`)
+- `imageGenerationConfigSchema` / `ImageGenerationConfig` (flattened into `AIImageOutcomeConfig`)
 - `outcomeOptionsSchema` / `OutcomeOptions` (replaced by per-type configs)
 - `imageOptionsSchema` / `ImageOptions`
 - `gifOptionsSchema` / `GifOptions`

@@ -11,7 +11,7 @@ components/
 ├── outcome-picker/
 │   ├── OutcomeTypePicker.tsx           (when outcome.type === null)
 │   │   ├── Media group: Photo, GIF*, Video*
-│   │   └── AI Generated group: AI Photo, AI Video*
+│   │   └── AI Generated group: AI Image, AI Video*
 │   │                                   (* = disabled, "Coming soon")
 │   ├── OutcomeTypeSelector.tsx         (dropdown to switch types)
 │   └── RemoveOutcomeAction.tsx         (clears type to null)
@@ -19,8 +19,8 @@ components/
 │   └── PhotoConfigForm.tsx             (when type === 'photo')
 │       ├── SourceImageSelector         (from shared-controls/)
 │       └── AspectRatioSelector         (from shared-controls/)
-├── ai-photo-config/
-│   ├── AIPhotoConfigForm.tsx           (when type === 'ai.photo')
+├── ai-image-config/
+│   ├── AIImageConfigForm.tsx           (when type === 'ai.image')
 │   │   ├── TaskSelector               (t2i / i2i toggle)
 │   │   ├── SourceImageSelector         (visible only for i2i, from shared-controls/)
 │   │   ├── AspectRatioSelector         (from shared-controls/)
@@ -43,7 +43,7 @@ Props:
 
 Behavior:
   - Renders two groups: "Media" and "AI Generated"
-  - Photo and AI Photo are enabled (clickable)
+  - Photo and AI Image are enabled (clickable)
   - GIF, Video, AI Video are disabled with "Coming soon" badge
   - On select: sets outcome.type AND initializes per-type config with defaults
   - Smart default: if exactly 1 capture.photo step, auto-set captureStepId
@@ -63,12 +63,12 @@ Fields:
   - AspectRatioSelector (aspectRatio) — with cascade to capture step
 ```
 
-### AIPhotoConfigForm (new)
+### AIImageConfigForm (new)
 
 ```
 Props:
-  config: AIPhotoOutcomeConfig
-  onConfigChange: (updates: Partial<AIPhotoOutcomeConfig>) => void
+  config: AIImageOutcomeConfig
+  onConfigChange: (updates: Partial<AIImageOutcomeConfig>) => void
   steps: ExperienceStep[]
   errors: FieldValidationError[]
   // PromptComposer-related props (upload state, etc.)
@@ -102,7 +102,7 @@ Behavior:
 
 ## Removed Components
 
-- **AIGenerationToggle** — Replaced by type selection (photo vs ai.photo). The toggle concept is eliminated.
+- **AIGenerationToggle** — Replaced by type selection (photo vs ai.image). The toggle concept is eliminated.
 
 ## Data Flow
 
@@ -132,8 +132,8 @@ updateOutcome({
 
 // New: per-type config update
 updateOutcome({
-  type: 'ai.photo',
-  aiPhoto: {
+  type: 'ai.image',
+  aiImage: {
     task: 'image-to-image',
     captureStepId: '...',
     aspectRatio: '1:1',

@@ -49,7 +49,7 @@ Types use a flat naming convention. Non-AI types have no prefix; AI types use th
 | `photo` | Non-AI | Direct photo output from capture step |
 | `gif` | Non-AI | Direct GIF output from capture step |
 | `video` | Non-AI | Direct video output from capture step |
-| `ai.photo` | AI | AI-generated image (text-to-image or image-to-image) |
+| `ai.image` | AI | AI-generated image (text-to-image or image-to-image) |
 | `ai.video` | AI | AI-generated video (configurable start/end frames) |
 
 ### Non-AI Use Cases
@@ -62,9 +62,9 @@ Types use a flat naming convention. Non-AI types have no prefix; AI types use th
 
 > **Future extensibility**: Non-AI types may gain optional post-processing config (e.g., background swap: `{ enabled, backgroundImageRef }`). The per-type config structure supports this without schema-level changes.
 
-### AI Photo Use Cases
+### AI Image Use Cases
 
-AI Photo has two tasks, configured within one type:
+AI Image has two tasks, configured within one type:
 
 | Task | Input | Description |
 |------|-------|-------------|
@@ -101,7 +101,7 @@ outcome: {
   photo:   PhotoOutcomeConfig   | null
   gif:     GifOutcomeConfig     | null
   video:   VideoOutcomeConfig   | null
-  aiPhoto: AIPhotoOutcomeConfig | null
+  aiImage: AIImageOutcomeConfig | null
   aiVideo: AIVideoOutcomeConfig | null
 }
 ```
@@ -114,8 +114,8 @@ outcome: {
 ### Naming Conventions
 
 The outcome schema uses a consistent hierarchy:
-- **type** — the outcome type: `photo`, `gif`, `video`, `ai.photo`, `ai.video`
-- **task** — the specific variant within a type: `text-to-image`, `image-to-image` (used in `ai.photo`)
+- **type** — the outcome type: `photo`, `gif`, `video`, `ai.image`, `ai.video`
+- **task** — the specific variant within a type: `text-to-image`, `image-to-image` (used in `ai.image`)
 
 **Category** is NOT stored in the schema. It is a UI-only grouping concept, hardcoded in the frontend for the outcome type picker (e.g., grouping types under "Media" vs "AI Generated" sections).
 
@@ -159,7 +159,7 @@ In code and schemas, we use the term **"outcome"**. In user-facing UI copy, use 
 }
 ```
 
-#### AIPhotoOutcomeConfig
+#### AIImageOutcomeConfig
 
 ```
 {
@@ -210,7 +210,7 @@ In code and schemas, we use the term **"outcome"**. In user-facing UI copy, use 
 
 | Type | Supported Aspect Ratios |
 |------|------------------------|
-| `photo`, `gif`, `ai.photo` | `1:1`, `3:2`, `2:3`, `9:16` (ImageAspectRatio) |
+| `photo`, `gif`, `ai.image` | `1:1`, `3:2`, `2:3`, `9:16` (ImageAspectRatio) |
 | `video`, `ai.video` | `9:16`, `1:1` (VideoAspectRatio) |
 
 ### Cascading to Capture Step
@@ -235,7 +235,7 @@ User sees a picker screen with two groups:
 - Video
 
 **AI Generated**
-- AI Photo
+- AI Image
 - AI Video
 
 > Implementation note: GIF, Video, and AI Video may show as "coming soon" initially.
@@ -276,8 +276,8 @@ Maps to the new schema as follows:
 | Current State | New Type | New Config |
 |---------------|----------|------------|
 | `type: 'image'`, `aiEnabled: false` | `photo` | `photo: { captureStepId, aspectRatio }` |
-| `type: 'image'`, `aiEnabled: true`, `captureStepId: null` | `ai.photo` | `aiPhoto: { task: 'text-to-image', ... }` |
-| `type: 'image'`, `aiEnabled: true`, `captureStepId: <id>` | `ai.photo` | `aiPhoto: { task: 'image-to-image', ... }` |
+| `type: 'image'`, `aiEnabled: true`, `captureStepId: null` | `ai.image` | `aiImage: { task: 'text-to-image', ... }` |
+| `type: 'image'`, `aiEnabled: true`, `captureStepId: <id>` | `ai.image` | `aiImage: { task: 'image-to-image', ... }` |
 | `type: null` | `null` | All configs null |
 
 > `type: 'gif'` and `type: 'video'` were never fully implemented in v3, so no migration needed for those.
@@ -295,7 +295,7 @@ outcomeRegistry: {
   'photo':    photoOutcome,      // Renamed from imageOutcome (passthrough path)
   'gif':      null,              // Future
   'video':    null,              // Future
-  'ai.photo': aiPhotoOutcome,    // Renamed from imageOutcome (AI path)
+  'ai.image': aiImageOutcome,    // Renamed from imageOutcome (AI path)
   'ai.video': aiVideoOutcome,    // New
 }
 ```
@@ -304,7 +304,7 @@ outcomeRegistry: {
 
 The current `imageOutcome.ts` handles both AI and passthrough modes. This splits into:
 - **photoOutcome** — passthrough only (download capture → apply overlay → upload)
-- **aiPhotoOutcome** — AI generation (resolve prompt → generate → apply overlay → upload)
+- **aiImageOutcome** — AI generation (resolve prompt → generate → apply overlay → upload)
 
 ### New aiVideoOutcome
 
@@ -344,6 +344,6 @@ The job snapshot already captures the full outcome config. The new per-type stru
 
 ## Open Questions
 
-1. **AI Photo task switching**: When user switches from `image-to-image` to `text-to-image`, should `captureStepId` be cleared or preserved (in case they switch back)?
+1. **AI Image task switching**: When user switches from `image-to-image` to `text-to-image`, should `captureStepId` be cleared or preserved (in case they switch back)?
 2. **AI Video model schema**: What video generation models will be supported? Need to define `AIVideoModel` enum.
 3. **Overlay behavior**: Does overlay application change per outcome type, or does the current overlay system (resolved at job creation, applied post-generation) work for all types?

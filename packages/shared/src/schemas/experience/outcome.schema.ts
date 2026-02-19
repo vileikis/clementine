@@ -1,157 +1,137 @@
 /**
  * Outcome Schema
  *
- * Configuration schema for outcome-based generation (image/gif/video).
- * Part of Transform v3 - replaces node-based pipeline with outcome-focused config.
+ * Per-type config architecture for outcome-based generation.
+ * Each outcome type (photo, gif, video, ai.image, ai.video) has its own
+ * nullable config object. Only the active type's config is populated.
  *
- * Aspect ratio is now a top-level outcome setting (not AI-specific) because it affects:
- * - Camera capture constraints
- * - Overlay resolution
- * - AI generation dimensions
+ * Uses z.looseObject() at the top level for backward compatibility —
+ * old fields (aiEnabled, imageGeneration, etc.) are silently ignored during parsing.
  *
- * @see PRD 1A - Schema Foundations
- * @see Feature 065 - Experience-Level Aspect Ratio & Overlay System
+ * @see specs/072-outcome-schema-redesign
  */
 import { z } from 'zod'
-import { aspectRatioSchema, imageAspectRatioSchema } from '../media/aspect-ratio.schema'
+import {
+  imageAspectRatioSchema,
+  videoAspectRatioSchema,
+} from '../media/aspect-ratio.schema'
 import { mediaReferenceSchema } from '../media/media-reference.schema'
 
-/**
- * Outcome type for configuration.
- * Determines the final output format.
- */
-export const outcomeTypeSchema = z.enum(['image', 'gif', 'video'])
+// ── OutcomeType ──────────────────────────────────────────────
 
-/** Type of outcome: image, gif, or video */
-export type OutcomeType = z.infer<typeof outcomeTypeSchema>
+/** Outcome type enum — determines the final output format. */
+export const outcomeTypeSchema = z.enum([
+  'photo',
+  'gif',
+  'video',
+  'ai.image',
+  'ai.video',
+])
 
-/**
- * AI image generation model selection.
- * Defined locally to avoid coupling to deprecated nodes/ system.
- */
+// ── AI Image Model ───────────────────────────────────────────
+
 export const aiImageModelSchema = z.enum([
   'gemini-2.5-flash-image',
   'gemini-3-pro-image-preview',
 ])
 
-/** AI model for image generation */
-export type AIImageModel = z.infer<typeof aiImageModelSchema>
+// ── AI Image Aspect Ratio (alias) ───────────────────────────
 
-/**
- * AI image aspect ratio options.
- * Uses canonical aspect ratio schema. 16:9 removed per PRD spec.
- */
 export const aiImageAspectRatioSchema = imageAspectRatioSchema
 
-/** Aspect ratio for generated images */
-export type AIImageAspectRatio = z.infer<typeof aiImageAspectRatioSchema>
+// ── Per-Type Config Schemas ──────────────────────────────────
+
+/** Photo outcome config — passthrough capture with optional overlay. */
+export const photoOutcomeConfigSchema = z.object({
+  captureStepId: z.string(),
+  aspectRatio: imageAspectRatioSchema.default('1:1'),
+})
+
+/** AI image task type — text-to-image or image-to-image. */
+export const aiImageTaskSchema = z.enum(['text-to-image', 'image-to-image'])
+
+/** AI image outcome config — AI-generated image from prompt and/or source. */
+export const aiImageOutcomeConfigSchema = z.object({
+  task: aiImageTaskSchema.default('text-to-image'),
+  captureStepId: z.string().nullable().default(null),
+  aspectRatio: imageAspectRatioSchema.default('1:1'),
+  prompt: z.string().default(''),
+  model: aiImageModelSchema.default('gemini-2.5-flash-image'),
+  refMedia: z.array(mediaReferenceSchema).default([]),
+})
+
+/** GIF outcome config — placeholder for future implementation. */
+export const gifOutcomeConfigSchema = z.object({
+  captureStepId: z.string(),
+  aspectRatio: imageAspectRatioSchema.default('1:1'),
+})
+
+/** Video outcome config — placeholder for future implementation. */
+export const videoOutcomeConfigSchema = z.object({
+  captureStepId: z.string(),
+  aspectRatio: imageAspectRatioSchema.default('1:1'),
+})
+
+// ── AI Video (internal helpers) ──────────────────────────────
+
+/** AI video task type. */
+const aiVideoTaskSchema = z.enum(['animate', 'transform', 'reimagine'])
 
 /**
- * Image generation configuration.
- * Contains prompt template, reference media, model, and aspect ratio.
+ * Image generation config — used internally by AI video for
+ * start/end frame generation. Not exported as a top-level concept.
  */
-export const imageGenerationConfigSchema = z.object({
-  /** Prompt template with @{step:...} and @{ref:...} placeholders */
+const imageGenerationConfigSchema = z.object({
   prompt: z.string().default(''),
-  /** Reference images for style guidance */
   refMedia: z.array(mediaReferenceSchema).default([]),
-  /** AI model selection */
   model: aiImageModelSchema.default('gemini-2.5-flash-image'),
-  /** Output aspect ratio */
   aspectRatio: aiImageAspectRatioSchema.default('1:1'),
 })
 
-/** Configuration for AI image generation */
-export type ImageGenerationConfig = z.infer<typeof imageGenerationConfigSchema>
-
-/**
- * Options for static image output.
- */
-export const imageOptionsSchema = z.object({
-  /** Discriminator for image options */
-  kind: z.literal('image'),
+/** AI video outcome config — placeholder for future implementation. */
+export const aiVideoOutcomeConfigSchema = z.object({
+  task: aiVideoTaskSchema.default('animate'),
+  captureStepId: z.string(),
+  aspectRatio: videoAspectRatioSchema.default('9:16'),
+  startFrameImageGen: imageGenerationConfigSchema.nullable().default(null),
+  endFrameImageGen: imageGenerationConfigSchema.nullable().default(null),
+  videoGeneration: z.object({
+    prompt: z.string().default(''),
+    model: z.string().default(''),
+    duration: z.number().min(1).max(60).default(5),
+  }),
 })
 
-/** Options specific to image output */
-export type ImageOptions = z.infer<typeof imageOptionsSchema>
-
-/**
- * Options for animated GIF output.
- */
-export const gifOptionsSchema = z.object({
-  /** Discriminator for GIF options */
-  kind: z.literal('gif'),
-  /** Frames per second (1-60) */
-  fps: z.number().int().min(1).max(60).default(24),
-  /** Duration in seconds (0.5-30) */
-  duration: z.number().min(0.5).max(30).default(3),
-})
-
-/** Options specific to GIF output */
-export type GifOptions = z.infer<typeof gifOptionsSchema>
-
-/**
- * Options for video output.
- */
-export const videoOptionsSchema = z.object({
-  /** Discriminator for video options */
-  kind: z.literal('video'),
-  /** Prompt for video generation/animation */
-  videoPrompt: z.string().default(''),
-  /** Duration in seconds (1-60) */
-  duration: z.number().min(1).max(60).default(5),
-})
-
-/** Options specific to video output */
-export type VideoOptions = z.infer<typeof videoOptionsSchema>
-
-/**
- * Discriminated union of outcome options by 'kind' field.
- * Enables type-safe narrowing based on output type.
- */
-export const outcomeOptionsSchema = z.discriminatedUnion('kind', [
-  imageOptionsSchema,
-  gifOptionsSchema,
-  videoOptionsSchema,
-])
-
-/** Union of all outcome-specific options */
-export type OutcomeOptions = z.infer<typeof outcomeOptionsSchema>
+// ── Outcome (top-level) ──────────────────────────────────────
 
 /**
  * Complete Outcome configuration.
- * Defines how a session generates its final output.
  *
- * The top-level `aspectRatio` is the canonical output dimension setting that affects:
- * - Camera capture constraints
- * - Overlay resolution (at job creation)
- * - AI generation dimensions
+ * Uses z.looseObject() for backward compatibility — old fields
+ * (aiEnabled, imageGeneration, captureStepId, options, etc.)
+ * are silently ignored during parsing.
  *
- * Note: `imageGeneration.aspectRatio` is kept for backward compatibility but
- * new code should use the top-level `aspectRatio` field.
+ * Per-type configs persist independently — switching types does NOT
+ * clear other configs. Setting type to null preserves all configs.
  */
-export const outcomeSchema = z.object({
-  /** Output type (null = not configured) */
+export const outcomeSchema = z.looseObject({
   type: outcomeTypeSchema.nullable().default(null),
-  /**
-   * Output aspect ratio - single source of truth for all downstream systems.
-   * Affects camera capture, overlay resolution, and AI generation.
-   */
-  aspectRatio: aspectRatioSchema.default('1:1'),
-  /** Source capture step ID for image-to-image (null = no source) */
-  captureStepId: z.string().nullable().default(null),
-  /** Global AI toggle (false = passthrough mode) */
-  aiEnabled: z.boolean().default(true),
-  /** AI image generation settings */
-  imageGeneration: imageGenerationConfigSchema.default({
-    prompt: '',
-    refMedia: [],
-    model: 'gemini-2.5-flash-image',
-    aspectRatio: '1:1',
-  }),
-  /** Type-specific output options (null = not configured) */
-  options: outcomeOptionsSchema.nullable().default(null),
+  photo: photoOutcomeConfigSchema.nullable().default(null),
+  gif: gifOutcomeConfigSchema.nullable().default(null),
+  video: videoOutcomeConfigSchema.nullable().default(null),
+  aiImage: aiImageOutcomeConfigSchema.nullable().default(null),
+  aiVideo: aiVideoOutcomeConfigSchema.nullable().default(null),
 })
 
-/** Complete outcome configuration for experiences */
+// ── Type Exports ─────────────────────────────────────────────
+
+export type OutcomeType = z.infer<typeof outcomeTypeSchema>
+export type AIImageModel = z.infer<typeof aiImageModelSchema>
+export type AIImageAspectRatio = z.infer<typeof aiImageAspectRatioSchema>
+export type PhotoOutcomeConfig = z.infer<typeof photoOutcomeConfigSchema>
+export type AIImageTask = z.infer<typeof aiImageTaskSchema>
+export type AIImageOutcomeConfig = z.infer<typeof aiImageOutcomeConfigSchema>
+export type GifOutcomeConfig = z.infer<typeof gifOutcomeConfigSchema>
+export type VideoOutcomeConfig = z.infer<typeof videoOutcomeConfigSchema>
+export type AIVideoOutcomeConfig = z.infer<typeof aiVideoOutcomeConfigSchema>
 export type Outcome = z.infer<typeof outcomeSchema>

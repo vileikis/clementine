@@ -1,4 +1,4 @@
-# Specification Quality Checklist: Outcome Schema Redesign — Photo & AI Photo
+# Specification Quality Checklist: Outcome Schema Redesign — Photo & AI Image
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
 **Created**: 2026-02-19
@@ -33,4 +33,4 @@
 
 - All items pass validation. Spec is ready for `/speckit.clarify` or `/speckit.plan`.
 - The requirements document provided detailed technical context which was translated into business-level specification language.
-- Seven user stories cover all major flows: photo config, AI photo (t2i), AI photo (i2i), type switching, output removal, data migration, and coming-soon display.
+- Seven user stories cover all major flows: photo config, AI image (t2i), AI image (i2i), type switching, output removal, data migration, and coming-soon display.

@@ -1,4 +1,4 @@
-# Research: Outcome Schema Redesign — Photo & AI Photo
+# Research: Outcome Schema Redesign — Photo & AI Image
 
 **Branch**: `072-outcome-schema-redesign` | **Date**: 2026-02-19
 
@@ -12,13 +12,13 @@
 
 | Current Field | New Location | Notes |
 |---------------|-------------|-------|
-| `type: 'image' \| 'gif' \| 'video'` | `type: 'photo' \| 'gif' \| 'video' \| 'ai.photo' \| 'ai.video'` | 'image' splits into 'photo' and 'ai.photo' |
-| `aiEnabled` | Removed — encoded in type (`ai.photo` vs `photo`) | No longer needed |
-| `captureStepId` | `photo.captureStepId` or `aiPhoto.captureStepId` | Moved into per-type config |
-| `aspectRatio` | `photo.aspectRatio` or `aiPhoto.aspectRatio` | Moved into per-type config |
-| `imageGeneration.prompt` | `aiPhoto.prompt` | Flattened from nested object |
-| `imageGeneration.model` | `aiPhoto.model` | Flattened from nested object |
-| `imageGeneration.refMedia` | `aiPhoto.refMedia` | Flattened from nested object |
+| `type: 'image' \| 'gif' \| 'video'` | `type: 'photo' \| 'gif' \| 'video' \| 'ai.image' \| 'ai.video'` | 'image' splits into 'photo' and 'ai.image' |
+| `aiEnabled` | Removed — encoded in type (`ai.image` vs `photo`) | No longer needed |
+| `captureStepId` | `photo.captureStepId` or `aiImage.captureStepId` | Moved into per-type config |
+| `aspectRatio` | `photo.aspectRatio` or `aiImage.aspectRatio` | Moved into per-type config |
+| `imageGeneration.prompt` | `aiImage.prompt` | Flattened from nested object |
+| `imageGeneration.model` | `aiImage.model` | Flattened from nested object |
+| `imageGeneration.refMedia` | `aiImage.refMedia` | Flattened from nested object |
 | `imageGeneration.aspectRatio` | Removed (was already deprecated) | Redundant with per-type aspectRatio |
 | `options` (discriminated union) | Removed — per-type configs replace this | gif/video options move into their respective configs |
 
@@ -50,7 +50,7 @@
 1. **OutcomeTypePicker** — Rewrite with two-group layout (Media + AI Generated). Replaces current card-based picker.
 2. **OutcomeTypeSelector** — Keep as type switcher dropdown but update to new types.
 3. **PhotoConfigForm** — New component: source step selector + aspect ratio. Extracted from current form.
-4. **AIPhotoConfigForm** — New component: task toggle + conditional source step + aspect ratio + PromptComposer + model + ref media. Refactored from current form.
+4. **AIImageConfigForm** — New component: task toggle + conditional source step + aspect ratio + PromptComposer + model + ref media. Refactored from current form.
 5. **PromptComposer** — Reuse as-is (no changes needed to Lexical editor, serialization, or mention system).
 6. **AspectRatioSelector** — Reuse as-is.
 7. **SourceImageSelector** — Reuse as-is.
@@ -61,7 +61,7 @@
 
 ## R4: Backend Executor Split
 
-**Decision**: Split `imageOutcome.ts` into `photoOutcome.ts` and `aiPhotoOutcome.ts`.
+**Decision**: Split `imageOutcome.ts` into `photoOutcome.ts` and `aiImageOutcome.ts`.
 
 **Rationale**: The current `imageOutcome` branches on `aiEnabled` internally. The new schema makes the type distinction explicit at the dispatcher level, so each executor handles exactly one flow.
 
@@ -71,7 +71,7 @@
 3. Apply overlay if `overlayChoice` exists
 4. Upload output → return `JobOutput`
 
-**aiPhotoOutcome flow**:
+**aiImageOutcome flow**:
 1. If task is `image-to-image`: get source media from session responses using `captureStepId`
 2. Resolve prompt mentions (`resolvePromptMentions`)
 3. Call `aiGenerateImage` with resolved prompt, model, aspect ratio, source media, reference media
@@ -98,7 +98,7 @@
 
 **Rationale**: The existing migration script is well-structured with statistics tracking, error handling, and safety flags. Reusing this pattern ensures consistency.
 
-**Idempotency strategy**: Check if the document already has the new schema format (presence of per-type config fields like `photo`, `aiPhoto`) before migrating. If already migrated, skip.
+**Idempotency strategy**: Check if the document already has the new schema format (presence of per-type config fields like `photo`, `aiImage`) before migrating. If already migrated, skip.
 
 ---
 

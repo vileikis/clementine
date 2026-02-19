@@ -1,9 +1,9 @@
-# Feature Specification: Outcome Schema Redesign — Photo & AI Photo
+# Feature Specification: Outcome Schema Redesign — Photo & AI Image
 
 **Feature Branch**: `072-outcome-schema-redesign`
 **Created**: 2026-02-19
 **Status**: Draft
-**Input**: Phase 1 of Experience Designer v4 — Refactor outcome system from flat, conditional schema to per-type config architecture with full-stack support for photo and ai.photo outcome types.
+**Input**: Phase 1 of Experience Designer v4 — Refactor outcome system from flat, conditional schema to per-type config architecture with full-stack support for photo and ai.image outcome types.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -17,7 +17,7 @@ An experience creator opens the experience designer, navigates to the output con
 
 **Acceptance Scenarios**:
 
-1. **Given** an experience with no output configured, **When** the creator opens the output section, **Then** they see an output type picker with grouped options (Media: Photo, GIF, Video; AI Generated: AI Photo, AI Video).
+1. **Given** an experience with no output configured, **When** the creator opens the output section, **Then** they see an output type picker with grouped options (Media: Photo, GIF, Video; AI Generated: AI Image, AI Video).
 2. **Given** the output type picker is displayed, **When** the creator selects "Photo", **Then** the system shows the photo configuration form with source step selector and aspect ratio selector.
 3. **Given** the photo config form is shown and the experience has exactly one photo capture step, **When** the form loads, **Then** the source step is auto-selected.
 4. **Given** the creator has selected a source step and aspect ratio, **When** changes are made, **Then** the configuration is auto-saved and the aspect ratio cascades to the referenced capture step.
@@ -25,30 +25,30 @@ An experience creator opens the experience designer, navigates to the output con
 
 ---
 
-### User Story 2 - Configure an AI Photo Output (Text-to-Image) (Priority: P1)
+### User Story 2 - Configure an AI Image Output (Text-to-Image) (Priority: P1)
 
-An experience creator selects "AI Photo" from the output type picker and configures a text-to-image generation. They set an aspect ratio, write a prompt (using mention placeholders for step responses and reference media), select an AI model, and optionally upload reference images. The system saves automatically. When a guest completes the experience, they receive an AI-generated image based on the prompt.
+An experience creator selects "AI Image" from the output type picker and configures a text-to-image generation. They set an aspect ratio, write a prompt (using mention placeholders for step responses and reference media), select an AI model, and optionally upload reference images. The system saves automatically. When a guest completes the experience, they receive an AI-generated image based on the prompt.
 
-**Why this priority**: AI photo generation is the platform's differentiating feature and equally critical as basic photo output.
+**Why this priority**: AI image generation is the platform's differentiating feature and equally critical as basic photo output.
 
-**Independent Test**: Can be fully tested by creating an experience with an AI Photo (text-to-image) output, providing a prompt with placeholders, and verifying a guest receives an AI-generated result.
+**Independent Test**: Can be fully tested by creating an experience with an AI Image (text-to-image) output, providing a prompt with placeholders, and verifying a guest receives an AI-generated result.
 
 **Acceptance Scenarios**:
 
-1. **Given** the creator selects "AI Photo" from the type picker, **When** the AI Photo config form loads, **Then** it shows: task selector (defaulting to text-to-image), aspect ratio selector, prompt composer, model selector, and reference media uploader.
+1. **Given** the creator selects "AI Image" from the type picker, **When** the AI Image config form loads, **Then** it shows: task selector (defaulting to text-to-image), aspect ratio selector, prompt composer, model selector, and reference media uploader.
 2. **Given** the task is "text-to-image", **When** the creator views the form, **Then** the source step selector is hidden (no capture step needed).
 3. **Given** the creator writes a prompt, **When** they type a mention trigger, **Then** the system offers autocomplete for step references and reference media placeholders.
 4. **Given** a fully configured text-to-image output, **When** a guest completes the experience, **Then** the system resolves prompt mentions, generates an image via the selected AI model, applies any overlay, and delivers the result to the guest.
 
 ---
 
-### User Story 3 - Configure an AI Photo Output (Image-to-Image) (Priority: P2)
+### User Story 3 - Configure an AI Image Output (Image-to-Image) (Priority: P2)
 
-An experience creator selects "AI Photo" and switches the task to "image-to-image". They choose a source capture step (the guest's photo to transform), set an aspect ratio, write a transformation prompt, select an AI model, and optionally upload reference images. The aspect ratio cascades to the capture step.
+An experience creator selects "AI Image" and switches the task to "image-to-image". They choose a source capture step (the guest's photo to transform), set an aspect ratio, write a transformation prompt, select an AI model, and optionally upload reference images. The aspect ratio cascades to the capture step.
 
 **Why this priority**: Image-to-image is a secondary AI workflow that builds on both the photo capture and AI generation capabilities.
 
-**Independent Test**: Can be fully tested by creating an experience with a photo capture step, configuring an AI Photo (image-to-image) output, and verifying a guest receives an AI-transformed version of their captured photo.
+**Independent Test**: Can be fully tested by creating an experience with a photo capture step, configuring an AI Image (image-to-image) output, and verifying a guest receives an AI-transformed version of their captured photo.
 
 **Acceptance Scenarios**:
 
@@ -60,15 +60,15 @@ An experience creator selects "AI Photo" and switches the task to "image-to-imag
 
 ### User Story 4 - Switch Between Output Types (Priority: P2)
 
-An experience creator who has already configured a "Photo" output decides to switch to "AI Photo". The system updates the visible form to show the AI Photo configuration. The previous photo configuration is preserved so that if they switch back, their settings are retained.
+An experience creator who has already configured a "Photo" output decides to switch to "AI Image". The system updates the visible form to show the AI Image configuration. The previous photo configuration is preserved so that if they switch back, their settings are retained.
 
 **Why this priority**: Type switching enables experimentation and reduces friction when creators change their minds during setup.
 
-**Independent Test**: Can be fully tested by configuring a Photo output, switching to AI Photo, switching back, and verifying all settings are preserved.
+**Independent Test**: Can be fully tested by configuring a Photo output, switching to AI Image, switching back, and verifying all settings are preserved.
 
 **Acceptance Scenarios**:
 
-1. **Given** a photo output is configured, **When** the creator changes the output type to "AI Photo", **Then** the AI Photo form is displayed and the photo config is preserved.
+1. **Given** a photo output is configured, **When** the creator changes the output type to "AI Image", **Then** the AI Image form is displayed and the photo config is preserved.
 2. **Given** the creator switches back to "Photo", **When** the photo form loads, **Then** all previously configured photo settings (source step, aspect ratio) are restored.
 
 ---
@@ -99,8 +99,8 @@ Existing experiences stored in the old flat outcome schema format must be migrat
 **Acceptance Scenarios**:
 
 1. **Given** an experience with `type: 'image'` and `aiEnabled: false`, **When** the migration runs, **Then** the outcome becomes `type: 'photo'` with photo config populated from existing fields.
-2. **Given** an experience with `type: 'image'`, `aiEnabled: true`, and no capture step, **When** the migration runs, **Then** the outcome becomes `type: 'ai.photo'` with task `text-to-image`.
-3. **Given** an experience with `type: 'image'`, `aiEnabled: true`, and a capture step, **When** the migration runs, **Then** the outcome becomes `type: 'ai.photo'` with task `image-to-image`.
+2. **Given** an experience with `type: 'image'`, `aiEnabled: true`, and no capture step, **When** the migration runs, **Then** the outcome becomes `type: 'ai.image'` with task `text-to-image`.
+3. **Given** an experience with `type: 'image'`, `aiEnabled: true`, and a capture step, **When** the migration runs, **Then** the outcome becomes `type: 'ai.image'` with task `image-to-image`.
 4. **Given** an experience with `type: null`, **When** the migration runs, **Then** the outcome type remains `null` with all config fields set to `null`.
 5. **Given** the migration has already run, **When** it runs again, **Then** no changes are made (idempotent).
 6. **Given** any experience, **When** the migration runs, **Then** both `draft.outcome` and `published.outcome` are migrated.
@@ -135,12 +135,12 @@ When a creator views the output type picker, GIF, Video, and AI Video options ar
 
 ### Functional Requirements
 
-- **FR-001**: System MUST support five outcome types: photo, gif, video, ai.photo, ai.video.
+- **FR-001**: System MUST support five outcome types: photo, gif, video, ai.image, ai.video.
 - **FR-002**: System MUST store outcome configuration as a per-type structure where each type has its own dedicated config field (all defaulting to null when not configured).
-- **FR-003**: System MUST provide an output type picker when no type is selected, displaying options in two groups: Media (Photo, GIF, Video) and AI Generated (AI Photo, AI Video).
+- **FR-003**: System MUST provide an output type picker when no type is selected, displaying options in two groups: Media (Photo, GIF, Video) and AI Generated (AI Image, AI Video).
 - **FR-004**: GIF, Video, and AI Video options MUST be displayed as disabled with "Coming soon" labels in the type picker.
 - **FR-005**: System MUST provide a photo configuration form with source step selector (limited to photo capture steps) and aspect ratio selector (1:1, 3:2, 2:3, 9:16).
-- **FR-006**: System MUST provide an AI photo configuration form with: task selector (text-to-image / image-to-image), conditional source step selector, aspect ratio selector, prompt composer with mention support, model selector, and reference media management.
+- **FR-006**: System MUST provide an AI image configuration form with: task selector (text-to-image / image-to-image), conditional source step selector, aspect ratio selector, prompt composer with mention support, model selector, and reference media management.
 - **FR-007**: When a type is selected, system MUST show a type switcher allowing the creator to change between types.
 - **FR-008**: Switching output types MUST preserve the previous type's configuration in its dedicated field.
 - **FR-009**: Removing the output MUST clear the type to null while preserving all per-type configurations.
@@ -149,8 +149,8 @@ When a creator views the output type picker, GIF, Video, and AI Video options ar
 - **FR-012**: Configuration changes MUST be auto-saved using the existing debounced save pattern.
 - **FR-013**: All user-facing labels MUST use "output" terminology instead of "outcome".
 - **FR-014**: The photo outcome executor MUST process captured media through a passthrough flow: download captured media, apply overlay if configured, upload output.
-- **FR-015**: The AI photo outcome executor MUST handle text-to-image: resolve prompt mentions, generate image via AI model, apply overlay, upload output.
-- **FR-016**: The AI photo outcome executor MUST handle image-to-image: download source media from capture step, resolve prompt mentions, generate transformed image via AI model, apply overlay, upload output.
+- **FR-015**: The AI image outcome executor MUST handle text-to-image: resolve prompt mentions, generate image via AI model, apply overlay, upload output.
+- **FR-016**: The AI image outcome executor MUST handle image-to-image: download source media from capture step, resolve prompt mentions, generate transformed image via AI model, apply overlay, upload output.
 - **FR-017**: The backend MUST reject processing requests for outcome types without executors (gif, video, ai.video) with a "not implemented" error.
 - **FR-018**: The backend MUST reject processing requests when outcome type is null.
 - **FR-019**: A migration MUST transform all existing experience documents from the old flat schema to the new per-type config structure.
@@ -163,17 +163,17 @@ When a creator views the output type picker, GIF, Video, and AI Video options ar
 
 - **Outcome**: Top-level output configuration for an experience. Contains a type selector and per-type config fields. Only one type is active at a time.
 - **PhotoOutcomeConfig**: Configuration for direct photo capture output. Links to a capture step and defines aspect ratio.
-- **AIPhotoOutcomeConfig**: Configuration for AI-generated photo output. Defines generation task (text-to-image or image-to-image), optional source capture step, aspect ratio, prompt template, AI model, and reference media.
+- **AIImageOutcomeConfig**: Configuration for AI-generated photo output. Defines generation task (text-to-image or image-to-image), optional source capture step, aspect ratio, prompt template, AI model, and reference media.
 - **GifOutcomeConfig / VideoOutcomeConfig / AIVideoOutcomeConfig**: Placeholder configs for future outcome types (defined in schema but not active in this phase).
-- **OutcomeType**: Enumeration of all supported outcome types (photo, gif, video, ai.photo, ai.video).
+- **OutcomeType**: Enumeration of all supported outcome types (photo, gif, video, ai.image, ai.video).
 
 ## Success Criteria *(mandatory)*
 
 ### Measurable Outcomes
 
 - **SC-001**: Creators can configure a photo output and guests receive the correct passthrough result with no regressions from current functionality.
-- **SC-002**: Creators can configure an AI photo (text-to-image) output and guests receive an AI-generated image result.
-- **SC-003**: Creators can configure an AI photo (image-to-image) output and guests receive an AI-transformed image result based on their captured photo.
+- **SC-002**: Creators can configure an AI image (text-to-image) output and guests receive an AI-generated image result.
+- **SC-003**: Creators can configure an AI image (image-to-image) output and guests receive an AI-transformed image result based on their captured photo.
 - **SC-004**: All existing experience documents are successfully migrated to the new schema format with zero data loss.
 - **SC-005**: Creators can switch between output types and return to previously configured settings without re-entering data.
 - **SC-006**: Schema, editor, backend, and migration deploy together as a single coordinated release with no schema mismatch errors.

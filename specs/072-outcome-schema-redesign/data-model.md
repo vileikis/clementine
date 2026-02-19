@@ -1,4 +1,4 @@
-# Data Model: Outcome Schema Redesign — Photo & AI Photo
+# Data Model: Outcome Schema Redesign — Photo & AI Image
 
 **Branch**: `072-outcome-schema-redesign` | **Date**: 2026-02-19
 
@@ -12,7 +12,7 @@ ExperienceConfig
      ├── photo: PhotoOutcomeConfig | null
      ├── gif: GifOutcomeConfig | null
      ├── video: VideoOutcomeConfig | null
-     ├── aiPhoto: AIPhotoOutcomeConfig | null
+     ├── aiImage: AIImageOutcomeConfig | null
      └── aiVideo: AIVideoOutcomeConfig | null
 
 JobSnapshot
@@ -27,7 +27,7 @@ JobSnapshot
 ### OutcomeType (enum)
 
 ```
-'photo' | 'gif' | 'video' | 'ai.photo' | 'ai.video'
+'photo' | 'gif' | 'video' | 'ai.image' | 'ai.video'
 ```
 
 Replaces old `'image' | 'gif' | 'video'` enum. The `ai.` prefix distinguishes AI-generated types from capture-based types.
@@ -40,7 +40,7 @@ Replaces old `'image' | 'gif' | 'video'` enum. The `ai.` prefix distinguishes AI
 | `photo` | `PhotoOutcomeConfig` | — | `null` | Config for photo type. null = never configured. |
 | `gif` | `GifOutcomeConfig` | — | `null` | Config for gif type. Placeholder — Phase 1. |
 | `video` | `VideoOutcomeConfig` | — | `null` | Config for video type. Placeholder — Phase 1. |
-| `aiPhoto` | `AIPhotoOutcomeConfig` | — | `null` | Config for ai.photo type. |
+| `aiImage` | `AIImageOutcomeConfig` | — | `null` | Config for ai.image type. |
 | `aiVideo` | `AIVideoOutcomeConfig` | — | `null` | Config for ai.video type. Placeholder — Phase 1. |
 
 **Invariants**:
@@ -55,7 +55,7 @@ Replaces old `'image' | 'gif' | 'video'` enum. The `ai.` prefix distinguishes AI
 | `captureStepId` | `string` | — | No | Must reference a `capture.photo` step |
 | `aspectRatio` | `ImageAspectRatio` | `'1:1'` | No | `'1:1' \| '3:2' \| '2:3' \| '9:16'` |
 
-### AIPhotoOutcomeConfig
+### AIImageOutcomeConfig
 
 | Field | Type | Default | Nullable | Validation |
 |-------|------|---------|----------|------------|
@@ -103,8 +103,8 @@ Replaces old `'image' | 'gif' | 'video'` enum. The `ai.` prefix distinguishes AI
 | Old State | New `type` | New Config |
 |-----------|-----------|------------|
 | `type: 'image'`, `aiEnabled: false` | `'photo'` | `photo: { captureStepId, aspectRatio }` |
-| `type: 'image'`, `aiEnabled: true`, `captureStepId: null` | `'ai.photo'` | `aiPhoto: { task: 'text-to-image', captureStepId: null, aspectRatio, prompt, model, refMedia }` |
-| `type: 'image'`, `aiEnabled: true`, `captureStepId: <id>` | `'ai.photo'` | `aiPhoto: { task: 'image-to-image', captureStepId, aspectRatio, prompt, model, refMedia }` |
+| `type: 'image'`, `aiEnabled: true`, `captureStepId: null` | `'ai.image'` | `aiImage: { task: 'text-to-image', captureStepId: null, aspectRatio, prompt, model, refMedia }` |
+| `type: 'image'`, `aiEnabled: true`, `captureStepId: <id>` | `'ai.image'` | `aiImage: { task: 'image-to-image', captureStepId, aspectRatio, prompt, model, refMedia }` |
 | `type: null` | `null` | All config fields remain `null` |
 | `type: 'gif'` | `'gif'` | `gif: { captureStepId, aspectRatio }` (if fields exist) |
 | `type: 'video'` | `'video'` | `video: { captureStepId, aspectRatio }` (if fields exist) |
@@ -113,10 +113,10 @@ Replaces old `'image' | 'gif' | 'video'` enum. The `ai.` prefix distinguishes AI
 
 | Field | Replacement |
 |-------|-------------|
-| `aiEnabled` | Encoded in `type` (`'photo'` vs `'ai.photo'`) |
-| Top-level `captureStepId` | `photo.captureStepId` or `aiPhoto.captureStepId` |
+| `aiEnabled` | Encoded in `type` (`'photo'` vs `'ai.image'`) |
+| Top-level `captureStepId` | `photo.captureStepId` or `aiImage.captureStepId` |
 | Top-level `aspectRatio` | Per-type config `aspectRatio` |
-| `imageGeneration` (nested object) | Fields flattened into `AIPhotoOutcomeConfig` |
+| `imageGeneration` (nested object) | Fields flattened into `AIImageOutcomeConfig` |
 | `options` (discriminated union) | Replaced by per-type config fields |
 | `outcomeOptionsSchema` | Removed |
 | `imageOptionsSchema` | Removed |

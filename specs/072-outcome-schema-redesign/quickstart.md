@@ -1,4 +1,4 @@
-# Quickstart: Outcome Schema Redesign — Photo & AI Photo
+# Quickstart: Outcome Schema Redesign — Photo & AI Image
 
 **Branch**: `072-outcome-schema-redesign` | **Date**: 2026-02-19
 
