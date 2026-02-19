@@ -97,7 +97,7 @@
 
 **Independent Test**: Run migration with `--dry-run` against production data. Verify all 4 mapping cases produce correct output. Run again to verify idempotency.
 
-- [ ] T030 [US6] Create migration script at `functions/scripts/migrations/072-outcome-schema-redesign.ts` — follow the `042-flatten-events.ts` pattern: support `--dry-run` and `--production` flags, Firebase Admin SDK init with emulator/production support, statistics tracking (scanned, migrated, skipped, errors). Read all experience documents. For each, transform both `draft.outcome` and `published.outcome`:
+- [x] T030 [US6] Create migration script at `functions/scripts/migrations/072-outcome-schema-redesign.ts` — follow the `042-flatten-events.ts` pattern: support `--dry-run` and `--production` flags, Firebase Admin SDK init with emulator/production support, statistics tracking (scanned, migrated, skipped, errors). Read all experience documents. For each, transform both `draft.outcome` and `published.outcome`:
   - `type: 'image'` + `aiEnabled: false` → `type: 'photo'`, `photo: { captureStepId, aspectRatio }`
   - `type: 'image'` + `aiEnabled: true` + `captureStepId: null` → `type: 'ai.image'`, `aiImage: { task: 'text-to-image', captureStepId: null, aspectRatio, imageGeneration: { prompt, model, refMedia } }` (read from old `imageGeneration`)
   - `type: 'image'` + `aiEnabled: true` + `captureStepId: <id>` → `type: 'ai.image'`, `aiImage: { task: 'image-to-image', captureStepId, aspectRatio, imageGeneration: { prompt, model, refMedia } }` (read from old `imageGeneration`)
