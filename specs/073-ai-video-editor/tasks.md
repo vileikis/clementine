@@ -90,10 +90,10 @@
 
 ### Implementation for User Story 3
 
-- [ ] T019 [US3] Create `FrameGenerationSection` component in `apps/clementine-app/src/domains/experience/create/components/ai-video-config/FrameGenerationSection.tsx` — reusable section accepting props per contracts (label, config: ImageGenerationConfig, onConfigChange, steps, errors, errorFieldPrefix, workspaceId, userId); render section header with label; internally use `useRefMediaUpload` hook (passing `currentRefMedia: config.refMedia`) for upload state; render `PromptComposer` with: prompt/model/refMedia from config, `hideAspectRatio=true`, `modelOptions={AI_IMAGE_MODELS}`, mention support via steps, error from `getFieldError(errors, errorFieldPrefix + '.prompt')`; handle all nested field updates (prompt, model, refMedia add/remove) via `onConfigChange`
-- [ ] T020 [US3] Integrate end frame `FrameGenerationSection` into `AIVideoConfigForm` — add `updateEndFrameImageGen` helper; conditionally render FrameGenerationSection with label "End Frame Image Generation" when `config.task === 'transform' || config.task === 'reimagine'`; pass `config.endFrameImageGen` (initialize with defaults if null when task requires it); pass `errorFieldPrefix="aiVideo.endFrameImageGen"`
-- [ ] T021 [US3] Update barrel exports in `apps/clementine-app/src/domains/experience/create/components/ai-video-config/index.ts` — add export for `FrameGenerationSection`
-- [ ] T022 [US3] Run `pnpm app:type-check` and `pnpm app:check` to verify no type errors or lint issues
+- [x] T019 [US3] Create `FrameGenerationSection` component in `apps/clementine-app/src/domains/experience/create/components/ai-video-config/FrameGenerationSection.tsx` — reusable section accepting props per contracts (label, config: ImageGenerationConfig, onConfigChange, steps, errors, errorFieldPrefix, workspaceId, userId); render section header with label; internally use `useRefMediaUpload` hook (passing `currentRefMedia: config.refMedia`) for upload state; render `PromptComposer` with: prompt/model/refMedia from config, `hideAspectRatio=true`, `modelOptions={AI_IMAGE_MODELS}`, mention support via steps, error from `getFieldError(errors, errorFieldPrefix + '.prompt')`; handle all nested field updates (prompt, model, refMedia add/remove) via `onConfigChange`
+- [x] T020 [US3] Integrate end frame `FrameGenerationSection` into `AIVideoConfigForm` — add `updateEndFrameImageGen` helper; conditionally render FrameGenerationSection with label "End Frame Image Generation" when `config.task === 'transform' || config.task === 'reimagine'`; pass `config.endFrameImageGen` (initialize with defaults if null when task requires it); pass `errorFieldPrefix="aiVideo.endFrameImageGen"`
+- [x] T021 [US3] Update barrel exports in `apps/clementine-app/src/domains/experience/create/components/ai-video-config/index.ts` — add export for `FrameGenerationSection`
+- [x] T022 [US3] Run `pnpm app:type-check` and `pnpm app:check` to verify no type errors or lint issues
 
 **Checkpoint**: Transform task shows shared fields + end frame image generation with full PromptComposer (mentions, model, ref media). Config saves correctly.
 
@@ -107,8 +107,8 @@
 
 ### Implementation for User Story 4
 
-- [ ] T023 [US4] Add start frame `FrameGenerationSection` to `AIVideoConfigForm` in `apps/clementine-app/src/domains/experience/create/components/ai-video-config/AIVideoConfigForm.tsx` — add `updateStartFrameImageGen` helper; conditionally render FrameGenerationSection with label "Start Frame Image Generation" when `config.task === 'reimagine'`; pass `config.startFrameImageGen` (initialize with defaults if null); pass `errorFieldPrefix="aiVideo.startFrameImageGen"`; render start frame section ABOVE end frame section
-- [ ] T024 [US4] Run `pnpm app:type-check` and `pnpm app:check` to verify no type errors or lint issues
+- [x] T023 [US4] Add start frame `FrameGenerationSection` to `AIVideoConfigForm` in `apps/clementine-app/src/domains/experience/create/components/ai-video-config/AIVideoConfigForm.tsx` — add `updateStartFrameImageGen` helper; conditionally render FrameGenerationSection with label "Start Frame Image Generation" when `config.task === 'reimagine'`; pass `config.startFrameImageGen` (initialize with defaults if null); pass `errorFieldPrefix="aiVideo.startFrameImageGen"`; render start frame section ABOVE end frame section
+- [x] T024 [US4] Run `pnpm app:type-check` and `pnpm app:check` to verify no type errors or lint issues
 
 **Checkpoint**: Reimagine task shows shared fields + start frame + end frame image generation sections. Each frame section has independent prompt, model, and reference media.
 
@@ -122,8 +122,8 @@
 
 ### Implementation for User Story 5
 
-- [ ] T025 [US5] Implement task switching logic with config initialization in `AIVideoConfigForm` in `apps/clementine-app/src/domains/experience/create/components/ai-video-config/AIVideoConfigForm.tsx` — add `handleTaskChange` handler that: (1) updates task field via `onConfigChange({ task })`, (2) when switching TO transform and `endFrameImageGen` is null, initializes it with default ImageGenerationConfig, (3) when switching TO reimagine and either frame gen is null, initializes the null one(s) with defaults, (4) NEVER clears existing frame gen configs (preserves data when hiding sections)
-- [ ] T026 [US5] Run `pnpm app:type-check` and `pnpm app:check` to verify no type errors or lint issues
+- [x] T025 [US5] Implement task switching logic with config initialization in `AIVideoConfigForm` in `apps/clementine-app/src/domains/experience/create/components/ai-video-config/AIVideoConfigForm.tsx` — add `handleTaskChange` handler that: (1) updates task field via `onConfigChange({ task })`, (2) when switching TO transform and `endFrameImageGen` is null, initializes it with default ImageGenerationConfig, (3) when switching TO reimagine and either frame gen is null, initializes the null one(s) with defaults, (4) NEVER clears existing frame gen configs (preserves data when hiding sections)
+- [x] T026 [US5] Run `pnpm app:type-check` and `pnpm app:check` to verify no type errors or lint issues
 
 **Checkpoint**: Task switching preserves all frame gen configs. Switching animate→transform→reimagine→animate→reimagine shows configs restored at each step.
 
@@ -137,8 +137,8 @@
 
 ### Implementation for User Story 6
 
-- [ ] T027 [US6] Verify output type switching preserves AI Video config — this should already work via the existing per-type config persistence pattern in `CreateTabForm.tsx` (`initializeOutcomeType` only initializes if config is null, never clears existing configs). Manually verify by: (1) configuring AI Video fully, (2) switching to Photo, (3) switching back — all AI Video config should be restored. If any issue found, fix in `outcome-operations.ts`
-- [ ] T028 [US6] Run `pnpm app:type-check` and `pnpm app:check` to verify no type errors or lint issues
+- [x] T027 [US6] Verify output type switching preserves AI Video config — this should already work via the existing per-type config persistence pattern in `CreateTabForm.tsx` (`initializeOutcomeType` only initializes if config is null, never clears existing configs). Manually verify by: (1) configuring AI Video fully, (2) switching to Photo, (3) switching back — all AI Video config should be restored. If any issue found, fix in `outcome-operations.ts`
+- [x] T028 [US6] Run `pnpm app:type-check` and `pnpm app:check` to verify no type errors or lint issues
 
 **Checkpoint**: All output type switching works — Photo, AI Image, AI Video all preserve their configs independently.
 
@@ -148,10 +148,10 @@
 
 **Purpose**: Final validation, cleanup, and regression checking
 
-- [ ] T029 Verify no regressions in Photo outcome — open experience designer, configure Photo output, verify source step and aspect ratio work correctly
-- [ ] T030 Verify no regressions in AI Image outcome — open experience designer, configure AI Image output with image-to-image task, prompt with @mentions, reference media; verify all works correctly
-- [ ] T031 Run full validation: `pnpm app:type-check && pnpm app:check && pnpm app:test`
-- [ ] T032 Run quickstart.md manual testing checklist against dev server
+- [x] T029 Verify no regressions in Photo outcome — open experience designer, configure Photo output, verify source step and aspect ratio work correctly
+- [x] T030 Verify no regressions in AI Image outcome — open experience designer, configure AI Image output with image-to-image task, prompt with @mentions, reference media; verify all works correctly
+- [x] T031 Run full validation: `pnpm app:type-check && pnpm app:check && pnpm app:test`
+- [x] T032 Run quickstart.md manual testing checklist against dev server
 
 ---
 
