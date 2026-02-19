@@ -1,5 +1,30 @@
 # Experience Designer v4 — Outcome Schema Redesign
 
+## Context
+
+### Shared Schemas
+
+- `packages/shared/src/schemas/experience/experience.schema.ts` — Experience document schema (contains `draft.outcome` and `published.outcome`)
+- `packages/shared/src/schemas/experience/outcome.schema.ts` — Current outcome schema (flat structure being replaced)
+- `packages/shared/src/schemas/experience/step.schema.ts` — Step definitions including `capture.photo`
+- `packages/shared/src/schemas/media/aspect-ratio.schema.ts` — Canonical aspect ratio definitions (image vs video)
+- `packages/shared/src/schemas/media/media-reference.schema.ts` — MediaReference used for ref images and capture output
+
+### Frontend — Experience Designer
+
+- `apps/clementine-app/src/domains/experience/designer/containers/ExperienceCollectPage.tsx` — Collect tab (step list, preview, config panel)
+- `apps/clementine-app/src/domains/experience/create/containers/ExperienceCreatePage.tsx` — Create tab (outcome configuration)
+- `apps/clementine-app/src/domains/experience/create/components/CreateTabForm/` — Outcome config form (type picker, AI generation toggle, prompt composer, aspect ratio selector, source image selector)
+
+### Backend — Cloud Functions
+
+- `functions/src/tasks/transformPipelineTask.ts` — Cloud Task handler (job lifecycle: pending → running → completed/failed)
+- `functions/src/services/transform/engine/runOutcome.ts` — Outcome dispatcher (routes to executor by type)
+- `functions/src/services/transform/outcomes/imageOutcome.ts` — Current image executor (handles both AI and passthrough modes)
+- `functions/src/services/transform/operations/` — Shared operations (`aiGenerateImage`, `applyOverlay`)
+
+---
+
 ## Problem
 
 The current `outcomeSchema` uses a flat structure with `aiEnabled` as a boolean toggle and a single `imageGeneration` config block. This creates several limitations:
