@@ -9,6 +9,7 @@
 import { MAX_REF_MEDIA_COUNT } from './model-options'
 import type {
   AIImageOutcomeConfig,
+  AIVideoOutcomeConfig,
   ExperienceStep,
   MediaReference,
   Outcome,
@@ -62,6 +63,27 @@ export function createDefaultAIImageConfig(
 }
 
 /**
+ * Create a default AIVideoOutcomeConfig.
+ */
+export function createDefaultAIVideoConfig(
+  captureStepId?: string,
+): AIVideoOutcomeConfig {
+  return {
+    task: 'animate',
+    captureStepId: captureStepId ?? '',
+    aspectRatio: '9:16',
+    startFrameImageGen: null,
+    endFrameImageGen: null,
+    videoGeneration: {
+      prompt: '',
+      model: 'veo-3.1-fast-generate-001',
+      duration: 5,
+      aspectRatio: null,
+    },
+  }
+}
+
+/**
  * Initialize outcome with a type and default config.
  *
  * Smart defaults: if exactly 1 capture.photo step exists, auto-set captureStepId.
@@ -82,6 +104,8 @@ export function initializeOutcomeType(
     updated.photo = createDefaultPhotoConfig(autoStepId)
   } else if (type === 'ai.image' && !outcome.aiImage) {
     updated.aiImage = createDefaultAIImageConfig()
+  } else if (type === 'ai.video' && !outcome.aiVideo) {
+    updated.aiVideo = createDefaultAIVideoConfig(autoStepId)
   }
 
   return updated

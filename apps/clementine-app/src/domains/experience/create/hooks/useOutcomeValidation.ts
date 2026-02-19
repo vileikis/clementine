@@ -46,14 +46,10 @@ export function useOutcomeValidation(
     }
 
     // Coming soon types
-    if (
-      outcome.type === 'gif' ||
-      outcome.type === 'video' ||
-      outcome.type === 'ai.video'
-    ) {
+    if (outcome.type === 'gif' || outcome.type === 'video') {
       errors.push({
         field: 'type',
-        message: `${outcome.type === 'ai.video' ? 'AI Video' : outcome.type.toUpperCase()} coming soon`,
+        message: `${outcome.type.toUpperCase()} coming soon`,
       })
       return errors
     }
@@ -125,6 +121,56 @@ export function useOutcomeValidation(
           field: 'aiImage.imageGeneration.refMedia',
           message: 'Reference images must have unique names',
         })
+      }
+    }
+
+    // AI Video type validation
+    if (outcome.type === 'ai.video') {
+      const config = outcome.aiVideo
+      if (!config) return errors
+
+      // captureStepId is required
+      if (!config.captureStepId) {
+        errors.push({
+          field: 'aiVideo.captureStepId',
+          message: 'Select a source image step',
+        })
+      } else {
+        const stepExists = steps.some(
+          (s) => s.id === config.captureStepId && s.type === 'capture.photo',
+        )
+        if (!stepExists) {
+          errors.push({
+            field: 'aiVideo.captureStepId',
+            message: 'Selected source step no longer exists',
+          })
+        }
+      }
+
+      // Duplicate displayNames in startFrameImageGen.refMedia
+      if (config.startFrameImageGen) {
+        const displayNames = config.startFrameImageGen.refMedia.map(
+          (m) => m.displayName,
+        )
+        if (displayNames.length !== new Set(displayNames).size) {
+          errors.push({
+            field: 'aiVideo.startFrameImageGen.refMedia',
+            message: 'Reference images must have unique names',
+          })
+        }
+      }
+
+      // Duplicate displayNames in endFrameImageGen.refMedia
+      if (config.endFrameImageGen) {
+        const displayNames = config.endFrameImageGen.refMedia.map(
+          (m) => m.displayName,
+        )
+        if (displayNames.length !== new Set(displayNames).size) {
+          errors.push({
+            field: 'aiVideo.endFrameImageGen.refMedia',
+            message: 'Reference images must have unique names',
+          })
+        }
       }
     }
 

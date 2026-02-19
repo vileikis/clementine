@@ -64,7 +64,7 @@ const AI_OPTIONS: OutcomeOption[] = [
     label: 'AI Video',
     description: 'Generate AI video from prompts',
     icon: <Video className="h-8 w-8" />,
-    enabled: false,
+    enabled: true,
   },
 ]
 

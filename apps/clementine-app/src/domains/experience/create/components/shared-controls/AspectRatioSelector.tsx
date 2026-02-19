@@ -21,9 +21,11 @@ import {
 
 export interface AspectRatioSelectorProps {
   /** Currently selected aspect ratio */
-  value: AspectRatio
+  value: string
   /** Callback when aspect ratio changes */
   onChange: (value: AspectRatio) => void
+  /** Custom options to override the default image aspect ratios */
+  options?: readonly { value: string; label: string }[]
   /** Whether the selector is disabled */
   disabled?: boolean
 }
@@ -34,8 +36,10 @@ export interface AspectRatioSelectorProps {
 export function AspectRatioSelector({
   value,
   onChange,
+  options,
   disabled,
 }: AspectRatioSelectorProps) {
+  const items = options ?? ASPECT_RATIOS
   const handleValueChange = (val: string) => {
     onChange(val as AspectRatio)
   }
@@ -52,7 +56,7 @@ export function AspectRatioSelector({
           <SelectValue placeholder="Select aspect ratio">{value}</SelectValue>
         </SelectTrigger>
         <SelectContent>
-          {ASPECT_RATIOS.map((option) => (
+          {items.map((option) => (
             <SelectItem key={option.value} value={option.value}>
               {option.label}
             </SelectItem>
