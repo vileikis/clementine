@@ -2,7 +2,7 @@
 
 > Part of [Experience Designer v4 — Outcome Schema Redesign](./brief.md)
 >
-> Depends on: [Phase 1 — Schema Redesign + Photo & AI Photo](./phase-1-schema-photo-ai-photo.md)
+> Depends on: [Phase 1 — Schema Redesign + Photo & AI Image](./phase-1-schema-photo-ai-photo.md)
 
 ## Overview
 
@@ -24,7 +24,7 @@ Add AI Video configuration UI to the experience designer. This phase enables adm
 
 ## 1. Output Type Picker Update
 
-Enable the "AI Video" option in the output type picker. Remove "coming soon" badge. The picker now has 3 enabled types: Photo, AI Photo, AI Video. GIF and Video remain "coming soon".
+Enable the "AI Video" option in the output type picker. Remove "coming soon" badge. The picker now has 3 enabled types: Photo, AI Image, AI Video. GIF and Video remain "coming soon".
 
 ---
 
@@ -159,5 +159,5 @@ Define `AIVideoModel` enum in `@clementine/shared` if not already defined. Accep
 - [ ] Autosave works for all config changes
 
 ### No Regressions
-- [ ] Photo and AI Photo outcomes still work end-to-end
+- [ ] Photo and AI Image outcomes still work end-to-end
 - [ ] Type switching between all enabled types works correctly

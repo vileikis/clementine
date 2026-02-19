@@ -15,6 +15,9 @@ import {
   DEFAULT_BUTTON_RADIUS,
   DEFAULT_BACKGROUND_COLOR,
   DEFAULT_OVERLAY_OPACITY,
+  DEFAULT_FONT_SOURCE,
+  DEFAULT_FONT_VARIANTS,
+  DEFAULT_FALLBACK_STACK,
 } from './theme.constants'
 
 describe('COLOR_REGEX', () => {
@@ -140,6 +143,9 @@ describe('themeSchema', () => {
     const result = themeSchema.parse({})
     expect(result).toEqual({
       fontFamily: null,
+      fontSource: DEFAULT_FONT_SOURCE,
+      fontVariants: DEFAULT_FONT_VARIANTS,
+      fallbackStack: DEFAULT_FALLBACK_STACK,
       primaryColor: DEFAULT_PRIMARY_COLOR,
       text: {
         color: DEFAULT_TEXT_COLOR,

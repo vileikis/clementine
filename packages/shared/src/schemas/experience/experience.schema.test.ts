@@ -100,18 +100,23 @@ describe('experienceConfigSchema', () => {
   it('accepts outcome configuration', () => {
     const result = experienceConfigSchema.parse({
       outcome: {
-        type: 'image',
-        captureStepId: 'step-1',
-        aiEnabled: true,
-        imageGeneration: {
-          prompt: 'A test prompt',
-          model: 'gemini-2.5-flash-image',
-          aspectRatio: '1:1',
-          refMedia: [],
-        },
+        type: 'photo',
+        photo: { captureStepId: 'step-1', aspectRatio: '1:1' },
       },
     })
-    expect(result.outcome?.type).toBe('image')
+    expect(result.outcome?.type).toBe('photo')
+  })
+
+  it('accepts outcome with extra legacy-like fields via looseObject', () => {
+    const result = experienceConfigSchema.parse({
+      outcome: {
+        type: 'photo',
+        photo: { captureStepId: 'step-1', aspectRatio: '1:1' },
+        aiEnabled: true,
+        imageGeneration: { prompt: 'test' },
+      },
+    })
+    expect(result.outcome?.type).toBe('photo')
   })
 
   it('preserves unknown fields (looseObject)', () => {

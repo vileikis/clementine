@@ -1,0 +1,1 @@
+export { getSourceMedia } from './getSourceMedia'

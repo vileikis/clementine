@@ -1,8 +1,10 @@
 /**
  * RemoveOutcomeAction Component
  *
- * Button with confirmation dialog to remove/clear the outcome configuration.
- * Placed at the bottom of the Create tab form.
+ * Button with confirmation dialog to remove/clear the output configuration.
+ * Sets outcome.type to null without clearing per-type configs (preserves switching).
+ *
+ * @see specs/072-outcome-schema-redesign — US5
  */
 import { useState } from 'react'
 import { Trash2 } from 'lucide-react'
@@ -21,14 +23,14 @@ import {
 } from '@/ui-kit/ui/alert-dialog'
 
 export interface RemoveOutcomeActionProps {
-  /** Callback when outcome is confirmed for removal */
+  /** Callback when output is confirmed for removal */
   onRemove: () => void
   /** Whether the action is disabled */
   disabled?: boolean
 }
 
 /**
- * RemoveOutcomeAction - Button with confirmation to remove outcome
+ * RemoveOutcomeAction - Button with confirmation to remove output
  */
 export function RemoveOutcomeAction({
   onRemove,
@@ -52,16 +54,15 @@ export function RemoveOutcomeAction({
           className="text-destructive hover:text-destructive hover:bg-destructive/10"
         >
           <Trash2 className="mr-2 h-4 w-4" />
-          Remove Outcome
+          Remove Output
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Remove outcome configuration?</AlertDialogTitle>
+          <AlertDialogTitle>Remove output configuration?</AlertDialogTitle>
           <AlertDialogDescription>
-            This will clear all outcome settings including the prompt, model
-            selection, and reference images. You can configure a new outcome at
-            any time.
+            This will deselect the current output type. Your configuration
+            settings will be preserved if you re-select the same type later.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

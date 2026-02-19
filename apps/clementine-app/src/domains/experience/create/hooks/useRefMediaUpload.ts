@@ -1,9 +1,11 @@
 /**
  * useRefMediaUpload Hook
  *
- * Handles uploading reference media files for outcome configuration.
+ * Handles uploading reference media files for AI image outcome configuration.
  * Manages upload progress state and provides uploaded media references.
  * Uses a ref to always read the latest outcome to prevent stale closures.
+ *
+ * @see specs/072-outcome-schema-redesign
  */
 import { useCallback, useRef, useState } from 'react'
 import { nanoid } from 'nanoid'
@@ -26,7 +28,7 @@ export interface UseRefMediaUploadParams {
   workspaceId: string
   /** User ID for uploads */
   userId: string | undefined
-  /** Current outcome configuration (may be stale during batch uploads) */
+  /** Current outcome configuration */
   outcome: Outcome | null
   /** Callback when a media reference is uploaded */
   onMediaUploaded: (mediaRef: MediaReference) => void
@@ -46,7 +48,7 @@ export interface UseRefMediaUploadResult {
 }
 
 /**
- * Hook for uploading reference media for outcome configuration
+ * Hook for uploading reference media for AI image outcome configuration
  */
 export function useRefMediaUpload({
   workspaceId,
@@ -62,7 +64,8 @@ export function useRefMediaUpload({
 
   const uploadAsset = useUploadMediaAsset(workspaceId, userId)
 
-  const currentRefMediaCount = outcome?.imageGeneration.refMedia.length ?? 0
+  const currentRefMediaCount =
+    outcome?.aiImage?.imageGeneration.refMedia.length ?? 0
   const availableSlots = MAX_REF_MEDIA_COUNT - currentRefMediaCount
   const canAddMore = availableSlots > 0
 

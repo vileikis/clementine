@@ -120,7 +120,7 @@ outcomeRegistry: {
   'photo':    photoOutcome,
   'gif':      null,
   'video':    null,
-  'ai.photo': aiPhotoOutcome,
+  'ai.image': aiImageOutcome,
   'ai.video': aiVideoOutcome,    // null → aiVideoOutcome
 }
 ```
@@ -234,4 +234,4 @@ If overlay behavior for video differs from images, document the decision and imp
 - [ ] Admin configures `ai.video` (animate) → guest receives generated video
 - [ ] Admin configures `ai.video` (transform) → guest receives generated video
 - [ ] Admin configures `ai.video` (reimagine) → guest receives generated video
-- [ ] Photo and AI Photo outcomes continue to work (no regressions)
+- [ ] Photo and AI Image outcomes continue to work (no regressions)

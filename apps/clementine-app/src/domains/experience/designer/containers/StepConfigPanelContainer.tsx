@@ -143,8 +143,14 @@ export function StepConfigPanelContainer({
     [step, steps, form, onStepsChange, triggerSave],
   )
 
-  // Get outcome aspect ratio for capture step config panel
-  const outcomeAspectRatio = experience.draft.outcome?.aspectRatio ?? '1:1'
+  // Get outcome aspect ratio from the active type's config
+  const outcome = experience.draft.outcome
+  const outcomeAspectRatio =
+    (outcome?.type === 'photo'
+      ? outcome.photo?.aspectRatio
+      : outcome?.type === 'ai.image'
+        ? outcome.aiImage?.aspectRatio
+        : undefined) ?? '1:1'
 
   return (
     <StepConfigPanel

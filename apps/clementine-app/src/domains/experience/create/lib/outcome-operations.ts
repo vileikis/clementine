@@ -1,175 +1,168 @@
 /**
  * Outcome Operations
  *
- * Pure functions for updating outcome configuration.
+ * Pure functions for updating per-type outcome configuration.
  * These functions return new objects rather than mutating in place.
+ *
+ * @see specs/072-outcome-schema-redesign
  */
 import { MAX_REF_MEDIA_COUNT } from './model-options'
 import type {
-  AIImageAspectRatio,
-  AIImageModel,
+  AIImageOutcomeConfig,
+  ExperienceStep,
   MediaReference,
   Outcome,
   OutcomeType,
+  PhotoOutcomeConfig,
 } from '@clementine/shared'
 
 /**
- * Create a default outcome configuration.
+ * Create a default outcome configuration (no type selected).
  */
 export function createDefaultOutcome(): Outcome {
   return {
     type: null,
+    photo: null,
+    gif: null,
+    video: null,
+    aiImage: null,
+    aiVideo: null,
+  }
+}
+
+/**
+ * Create a default PhotoOutcomeConfig.
+ */
+export function createDefaultPhotoConfig(
+  captureStepId?: string,
+): PhotoOutcomeConfig {
+  return {
+    captureStepId: captureStepId ?? '',
     aspectRatio: '1:1',
-    captureStepId: null,
-    aiEnabled: true,
+  }
+}
+
+/**
+ * Create a default AIImageOutcomeConfig.
+ */
+export function createDefaultAIImageConfig(
+  captureStepId?: string | null,
+): AIImageOutcomeConfig {
+  return {
+    task: 'text-to-image',
+    captureStepId: captureStepId ?? null,
+    aspectRatio: '1:1',
     imageGeneration: {
       prompt: '',
-      refMedia: [],
       model: 'gemini-2.5-flash-image',
-      aspectRatio: '1:1',
-    },
-    options: null,
-  }
-}
-
-/**
- * Update the outcome type.
- */
-export function updateOutcomeType(
-  outcome: Outcome,
-  type: OutcomeType | null,
-): Outcome {
-  return {
-    ...outcome,
-    type,
-  }
-}
-
-/**
- * Update the capture step ID (source image).
- */
-export function updateOutcomeCaptureStepId(
-  outcome: Outcome,
-  captureStepId: string | null,
-): Outcome {
-  return {
-    ...outcome,
-    captureStepId,
-  }
-}
-
-/**
- * Update the AI enabled flag.
- */
-export function updateOutcomeAiEnabled(
-  outcome: Outcome,
-  aiEnabled: boolean,
-): Outcome {
-  return {
-    ...outcome,
-    aiEnabled,
-  }
-}
-
-/**
- * Update the prompt.
- */
-export function updateOutcomePrompt(outcome: Outcome, prompt: string): Outcome {
-  return {
-    ...outcome,
-    imageGeneration: {
-      ...outcome.imageGeneration,
-      prompt,
+      refMedia: [],
+      aspectRatio: null,
     },
   }
 }
 
 /**
- * Update the AI model.
+ * Initialize outcome with a type and default config.
+ *
+ * Smart defaults: if exactly 1 capture.photo step exists, auto-set captureStepId.
+ * If the type already has a config, reuse it (preserves switching).
  */
-export function updateOutcomeModel(
+export function initializeOutcomeType(
   outcome: Outcome,
-  model: AIImageModel,
+  type: OutcomeType,
+  steps: ExperienceStep[],
+): Outcome {
+  const captureSteps = steps.filter((s) => s.type === 'capture.photo')
+  const autoStepId = captureSteps.length === 1 ? captureSteps[0].id : undefined
+
+  const updated = { ...outcome, type }
+
+  // Only initialize config if it doesn't already exist (preserves switching)
+  if (type === 'photo' && !outcome.photo) {
+    updated.photo = createDefaultPhotoConfig(autoStepId)
+  } else if (type === 'ai.image' && !outcome.aiImage) {
+    updated.aiImage = createDefaultAIImageConfig()
+  }
+
+  return updated
+}
+
+/**
+ * Update photo config fields.
+ */
+export function updatePhotoConfig(
+  outcome: Outcome,
+  updates: Partial<PhotoOutcomeConfig>,
 ): Outcome {
   return {
     ...outcome,
-    imageGeneration: {
-      ...outcome.imageGeneration,
-      model,
+    photo: {
+      ...(outcome.photo ?? createDefaultPhotoConfig()),
+      ...updates,
     },
   }
 }
 
 /**
- * Update the aspect ratio.
+ * Update AI image config fields.
  */
-export function updateOutcomeAspectRatio(
+export function updateAIImageConfig(
   outcome: Outcome,
-  aspectRatio: AIImageAspectRatio,
+  updates: Partial<AIImageOutcomeConfig>,
 ): Outcome {
   return {
     ...outcome,
-    imageGeneration: {
-      ...outcome.imageGeneration,
-      aspectRatio,
+    aiImage: {
+      ...(outcome.aiImage ?? createDefaultAIImageConfig()),
+      ...updates,
     },
   }
 }
 
 /**
- * Add reference media to the outcome.
+ * Add reference media to the AI image outcome config.
  * Enforces the maximum count limit.
  */
 export function addOutcomeRefMedia(
   outcome: Outcome,
   newMedia: MediaReference[],
 ): Outcome {
-  const currentMedia = outcome.imageGeneration.refMedia
+  const currentMedia = outcome.aiImage?.imageGeneration.refMedia ?? []
   const availableSlots = MAX_REF_MEDIA_COUNT - currentMedia.length
   const mediaToAdd = newMedia.slice(0, availableSlots)
 
   return {
     ...outcome,
-    imageGeneration: {
-      ...outcome.imageGeneration,
-      refMedia: [...currentMedia, ...mediaToAdd],
+    aiImage: {
+      ...(outcome.aiImage ?? createDefaultAIImageConfig()),
+      imageGeneration: {
+        ...(outcome.aiImage?.imageGeneration ??
+          createDefaultAIImageConfig().imageGeneration),
+        refMedia: [...currentMedia, ...mediaToAdd],
+      },
     },
   }
 }
 
 /**
- * Remove reference media from the outcome.
+ * Remove reference media from the AI image outcome config.
  */
 export function removeOutcomeRefMedia(
   outcome: Outcome,
   mediaAssetId: string,
 ): Outcome {
-  return {
-    ...outcome,
-    imageGeneration: {
-      ...outcome.imageGeneration,
-      refMedia: outcome.imageGeneration.refMedia.filter(
-        (m) => m.mediaAssetId !== mediaAssetId,
-      ),
-    },
-  }
-}
+  if (!outcome.aiImage) return outcome
 
-/**
- * Update reference media display name.
- */
-export function updateOutcomeRefMediaDisplayName(
-  outcome: Outcome,
-  mediaAssetId: string,
-  displayName: string,
-): Outcome {
   return {
     ...outcome,
-    imageGeneration: {
-      ...outcome.imageGeneration,
-      refMedia: outcome.imageGeneration.refMedia.map((m) =>
-        m.mediaAssetId === mediaAssetId ? { ...m, displayName } : m,
-      ),
+    aiImage: {
+      ...outcome.aiImage,
+      imageGeneration: {
+        ...outcome.aiImage.imageGeneration,
+        refMedia: outcome.aiImage.imageGeneration.refMedia.filter(
+          (m) => m.mediaAssetId !== mediaAssetId,
+        ),
+      },
     },
   }
 }
@@ -178,17 +171,17 @@ export function updateOutcomeRefMediaDisplayName(
  * Check if more reference media can be added.
  */
 export function canAddMoreRefMedia(outcome: Outcome): boolean {
-  return outcome.imageGeneration.refMedia.length < MAX_REF_MEDIA_COUNT
+  const count = outcome.aiImage?.imageGeneration.refMedia.length ?? 0
+  return count < MAX_REF_MEDIA_COUNT
 }
 
 /**
  * Get available slots for reference media.
  */
 export function getAvailableRefMediaSlots(outcome: Outcome): number {
-  return MAX_REF_MEDIA_COUNT - outcome.imageGeneration.refMedia.length
+  const count = outcome.aiImage?.imageGeneration.refMedia.length ?? 0
+  return MAX_REF_MEDIA_COUNT - count
 }
-
-// MAX_REF_MEDIA_COUNT is exported from model-options.ts
 
 /**
  * Characters that are invalid in displayName because they conflict

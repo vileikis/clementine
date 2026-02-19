@@ -2,8 +2,13 @@
  * useUpdateOutcome Hook
  *
  * Mutation hook for updating the outcome configuration in experience draft.
- * Updates draft.outcome field with transaction, draftVersion increment, and cache invalidation.
+ * Updates draft.outcome field with cache invalidation.
  * Uses tracked mutation for save status tracking.
+ *
+ * Writes per-type config structure: outcome.type + active type's config.
+ * Non-active type configs are NOT cleared (preserves switching).
+ *
+ * @see specs/072-outcome-schema-redesign
  */
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import * as Sentry from '@sentry/tanstackstart-react'
@@ -34,18 +39,6 @@ export interface UpdateOutcomeInput {
  * @param workspaceId - Workspace containing the experience
  * @param experienceId - Experience document ID
  * @returns TanStack Mutation result
- *
- * @example
- * ```tsx
- * function CreateTabForm({ experience, workspaceId }) {
- *   const updateOutcome = useUpdateOutcome(workspaceId, experience.id)
- *
- *   const handlePromptChange = (prompt: string) => {
- *     const newOutcome = updateOutcomePrompt(experience.draft.outcome, prompt)
- *     updateOutcome.mutate({ outcome: newOutcome })
- *   }
- * }
- * ```
  */
 export function useUpdateOutcome(workspaceId: string, experienceId: string) {
   const queryClient = useQueryClient()

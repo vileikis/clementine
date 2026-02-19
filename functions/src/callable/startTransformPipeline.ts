@@ -8,7 +8,7 @@
  * This is a Firebase Callable Function (onCall) invoked via httpsCallable
  * from the frontend.
  *
- * See contracts/start-transform-pipeline.yaml for full API spec.
+ * @see specs/072-outcome-schema-redesign
  */
 import { onCall, HttpsError } from 'firebase-functions/v2/https'
 import type { AspectRatio } from '@clementine/shared'
@@ -25,6 +25,26 @@ import {
   TransformPipelineJobPayload,
 } from '../schemas/transform-pipeline.schema'
 import { queueTransformJob } from '../infra/task-queues'
+
+/** Outcome types that have implemented executors */
+const IMPLEMENTED_OUTCOME_TYPES = new Set(['photo', 'ai.image'])
+
+/**
+ * Get the aspect ratio from the active outcome type's config.
+ */
+function getOutcomeAspectRatio(outcome: {
+  type: string | null
+  photo?: { aspectRatio?: string } | null
+  aiImage?: { aspectRatio?: string } | null
+}): AspectRatio {
+  if (outcome.type === 'photo' && outcome.photo?.aspectRatio) {
+    return outcome.photo.aspectRatio as AspectRatio
+  }
+  if (outcome.type === 'ai.image' && outcome.aiImage?.aspectRatio) {
+    return outcome.aiImage.aspectRatio as AspectRatio
+  }
+  return '1:1'
+}
 
 /**
  * Callable Cloud Function: startTransformPipeline
@@ -114,27 +134,32 @@ export const startTransformPipelineV2 = onCall(
     }
 
     // JC-005: Validate outcome type is implemented
-    if (outcome.type !== 'image') {
+    if (!IMPLEMENTED_OUTCOME_TYPES.has(outcome.type)) {
       throw new HttpsError(
         'invalid-argument',
         `Cannot create job: outcome type '${outcome.type}' is not implemented`,
       )
     }
 
-    // Validate passthrough mode has capture source
-    if (!outcome.aiEnabled && !outcome.captureStepId) {
+    // Validate the active type's config exists
+    if (outcome.type === 'photo' && !outcome.photo) {
       throw new HttpsError(
         'invalid-argument',
-        'Passthrough mode requires source image',
+        'Cannot create job: photo configuration is missing',
+      )
+    }
+    if (outcome.type === 'ai.image' && !outcome.aiImage) {
+      throw new HttpsError(
+        'invalid-argument',
+        'Cannot create job: AI image configuration is missing',
       )
     }
 
     // Fetch project for overlay resolution
     const project = await fetchProject(projectId)
 
-    // Get aspect ratio from top-level outcome config (not imageGeneration)
-    const aspectRatio: AspectRatio =
-      outcome.aspectRatio ?? outcome.imageGeneration?.aspectRatio ?? '1:1'
+    // Get aspect ratio from active type's config
+    const aspectRatio = getOutcomeAspectRatio(outcome)
 
     // Pick overlay at job creation time
     const overlayChoice = pickOverlay(

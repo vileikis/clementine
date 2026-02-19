@@ -1,18 +1,15 @@
 /**
  * useOutcomeValidation Hook
  *
- * Validates outcome configuration and returns validation errors.
- * Used for publish-time validation with inline error display.
+ * Validates per-type outcome configuration and returns validation errors.
+ * Used for inline error display in the create tab form.
  *
- * Validation Rules:
- * - No outcome type → "Select an outcome type"
- * - Passthrough (AI disabled) without source → "Passthrough mode requires a source image"
- * - AI enabled without prompt → "Prompt is required"
- * - Invalid captureStepId → "Selected source step no longer exists"
- * - Duplicate displayNames → "Reference images must have unique names"
- * - GIF/Video selected → "GIF/Video coming soon" (disabled in UI, but validated as fallback)
+ * Validation Rules (per-type):
+ * - photo: captureStepId must reference a valid capture step
+ * - ai.image: prompt required, captureStepId valid for i2i, no duplicate refMedia displayNames
+ * - gif/video/ai.video: not yet supported
  *
- * @see spec.md - US6 (Validate and Publish)
+ * @see specs/072-outcome-schema-redesign
  */
 import { useMemo } from 'react'
 import type { ExperienceStep, Outcome } from '@clementine/shared'
@@ -21,38 +18,20 @@ import type { ExperienceStep, Outcome } from '@clementine/shared'
  * Field-level validation error for inline display
  */
 export interface FieldValidationError {
-  /** Field path that has the error (e.g., 'type', 'prompt', 'captureStepId') */
+  /** Field path that has the error (e.g., 'photo.captureStepId', 'aiImage.imageGeneration.prompt') */
   field: string
   /** Human-readable error message */
   message: string
 }
 
 /**
- * Validates outcome configuration
- *
- * @param outcome - Outcome configuration to validate (null = not configured)
- * @param steps - Experience steps for validating captureStepId references
- * @returns Array of validation errors (empty if valid)
- *
- * @example
- * ```tsx
- * function CreateTabForm({ experience }) {
- *   const errors = useOutcomeValidation(
- *     experience.draft.outcome,
- *     experience.draft.steps
- *   )
- *
- *   const hasErrors = errors.length > 0
- *   const promptError = errors.find(e => e.field === 'prompt')
- * }
- * ```
+ * Validates outcome configuration based on active type
  */
 export function useOutcomeValidation(
   outcome: Outcome | null,
   steps: ExperienceStep[],
 ): FieldValidationError[] {
   return useMemo(() => {
-    // No outcome = no validation errors (form is empty)
     if (!outcome) return []
 
     const errors: FieldValidationError[] = []
@@ -61,57 +40,92 @@ export function useOutcomeValidation(
     if (!outcome.type) {
       errors.push({
         field: 'type',
-        message: 'Select an outcome type',
+        message: 'Select an output type',
       })
+      return errors
     }
 
-    // GIF/Video not yet supported (fallback validation - UI should prevent this)
-    if (outcome.type === 'gif' || outcome.type === 'video') {
+    // Coming soon types
+    if (
+      outcome.type === 'gif' ||
+      outcome.type === 'video' ||
+      outcome.type === 'ai.video'
+    ) {
       errors.push({
         field: 'type',
-        message: `${outcome.type.toUpperCase()} coming soon`,
+        message: `${outcome.type === 'ai.video' ? 'AI Video' : outcome.type.toUpperCase()} coming soon`,
       })
+      return errors
     }
 
-    // Passthrough mode (AI disabled) requires a source image
-    if (!outcome.aiEnabled && !outcome.captureStepId) {
-      errors.push({
-        field: 'captureStepId',
-        message: 'Passthrough mode requires a source image',
-      })
-    }
+    // Photo type validation
+    if (outcome.type === 'photo') {
+      const config = outcome.photo
+      if (!config) return errors
 
-    // AI enabled requires a prompt
-    if (outcome.aiEnabled && outcome.imageGeneration.prompt.trim() === '') {
-      errors.push({
-        field: 'prompt',
-        message: 'Prompt is required',
-      })
-    }
-
-    // Validate captureStepId references an existing capture step
-    if (outcome.captureStepId) {
-      const stepExists = steps.some(
-        (s) => s.id === outcome.captureStepId && s.type === 'capture.photo',
-      )
-      if (!stepExists) {
+      // captureStepId is required for photo
+      if (!config.captureStepId) {
         errors.push({
-          field: 'captureStepId',
-          message: 'Selected source step no longer exists',
+          field: 'photo.captureStepId',
+          message: 'Select a source image step',
         })
+      } else {
+        const stepExists = steps.some(
+          (s) => s.id === config.captureStepId && s.type === 'capture.photo',
+        )
+        if (!stepExists) {
+          errors.push({
+            field: 'photo.captureStepId',
+            message: 'Selected source step no longer exists',
+          })
+        }
       }
     }
 
-    // Check for duplicate displayNames in reference media
-    const displayNames = outcome.imageGeneration.refMedia.map(
-      (m) => m.displayName,
-    )
-    const hasDuplicates = displayNames.length !== new Set(displayNames).size
-    if (hasDuplicates) {
-      errors.push({
-        field: 'refMedia',
-        message: 'Reference images must have unique names',
-      })
+    // AI Image type validation
+    if (outcome.type === 'ai.image') {
+      const config = outcome.aiImage
+      if (!config) return errors
+
+      // Prompt is required
+      if (!config.imageGeneration.prompt.trim()) {
+        errors.push({
+          field: 'aiImage.imageGeneration.prompt',
+          message: 'Prompt is required',
+        })
+      }
+
+      // captureStepId must be valid for image-to-image
+      if (config.task === 'image-to-image') {
+        if (!config.captureStepId) {
+          errors.push({
+            field: 'aiImage.captureStepId',
+            message: 'Select a source image step for image-to-image',
+          })
+        } else {
+          const stepExists = steps.some(
+            (s) => s.id === config.captureStepId && s.type === 'capture.photo',
+          )
+          if (!stepExists) {
+            errors.push({
+              field: 'aiImage.captureStepId',
+              message: 'Selected source step no longer exists',
+            })
+          }
+        }
+      }
+
+      // Duplicate displayNames in refMedia
+      const displayNames = config.imageGeneration.refMedia.map(
+        (m) => m.displayName,
+      )
+      const hasDuplicates = displayNames.length !== new Set(displayNames).size
+      if (hasDuplicates) {
+        errors.push({
+          field: 'aiImage.imageGeneration.refMedia',
+          message: 'Reference images must have unique names',
+        })
+      }
     }
 
     return errors
