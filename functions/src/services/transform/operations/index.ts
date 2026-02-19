@@ -9,3 +9,5 @@
  */
 export { aiGenerateImage } from './aiGenerateImage'
 export { applyOverlay } from './applyOverlay'
+export { uploadOutput } from './uploadOutput'
+export type { UploadOutputParams } from './uploadOutput'

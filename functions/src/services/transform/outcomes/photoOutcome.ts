@@ -14,21 +14,15 @@
  * @see specs/072-outcome-schema-redesign — US1
  */
 import { logger } from 'firebase-functions/v2'
-import * as fs from 'fs/promises'
-import type {
-  JobOutput,
-  MediaReference,
-  SessionResponse,
-} from '@clementine/shared'
+import type { JobOutput } from '@clementine/shared'
 import type { OutcomeContext } from '../types'
+import { getSourceMedia } from '../helpers/getSourceMedia'
 import { applyOverlay } from '../operations/applyOverlay'
+import { uploadOutput } from '../operations/uploadOutput'
 import {
   downloadFromStorage,
-  uploadToStorage,
-  getOutputStoragePath,
   getStoragePathFromMediaReference,
 } from '../../../infra/storage'
-import { generateThumbnail } from '../../ffmpeg'
 
 /**
  * Execute photo outcome (passthrough)
@@ -51,7 +45,7 @@ export async function photoOutcome(ctx: OutcomeContext): Promise<JobOutput> {
   })
 
   // Get source media from capture step
-  const sourceMedia = getSourceMediaFromResponses(
+  const sourceMedia = getSourceMedia(
     snapshot.sessionResponses,
     captureStepId,
   )
@@ -78,13 +72,17 @@ export async function photoOutcome(ctx: OutcomeContext): Promise<JobOutput> {
   }
 
   // Upload output and generate thumbnail
-  const output = await uploadOutput(
+  const result = await uploadOutput({
     outputPath,
-    job.projectId,
-    job.sessionId,
+    projectId: job.projectId,
+    sessionId: job.sessionId,
     tmpDir,
-    startTime,
-  )
+  })
+
+  const output: JobOutput = {
+    ...result,
+    processingTimeMs: Date.now() - startTime,
+  }
 
   logger.info('[PhotoOutcome] Photo outcome completed', {
     jobId: job.id,
@@ -93,79 +91,4 @@ export async function photoOutcome(ctx: OutcomeContext): Promise<JobOutput> {
   })
 
   return output
-}
-
-/**
- * Get source media from session responses by capture step ID
- */
-function getSourceMediaFromResponses(
-  responses: SessionResponse[],
-  captureStepId: string,
-): MediaReference {
-  const response = responses.find((r) => r.stepId === captureStepId)
-
-  if (!response) {
-    throw new Error(`Capture step not found: ${captureStepId}`)
-  }
-
-  if (!Array.isArray(response.data) || response.data.length === 0) {
-    throw new Error(`Capture step has no media: ${response.stepName}`)
-  }
-
-  const firstMedia = response.data[0] as MediaReference
-  if (!firstMedia?.mediaAssetId) {
-    throw new Error(
-      `Capture step has invalid media reference: ${response.stepName}`,
-    )
-  }
-
-  return firstMedia
-}
-
-/**
- * Upload output to storage and generate thumbnail
- */
-async function uploadOutput(
-  outputPath: string,
-  projectId: string,
-  sessionId: string,
-  tmpDir: string,
-  startTime: number,
-): Promise<JobOutput> {
-  const stats = await fs.stat(outputPath)
-
-  const storagePath = getOutputStoragePath(
-    projectId,
-    sessionId,
-    'output',
-    'jpg',
-  )
-  const url = await uploadToStorage(outputPath, storagePath)
-
-  const thumbPath = `${tmpDir}/thumb.jpg`
-  await generateThumbnail(outputPath, thumbPath, 300)
-
-  const thumbStoragePath = getOutputStoragePath(
-    projectId,
-    sessionId,
-    'thumb',
-    'jpg',
-  )
-  const thumbnailUrl = await uploadToStorage(thumbPath, thumbStoragePath)
-
-  const assetId = `${sessionId}-output`
-
-  return {
-    assetId,
-    url,
-    filePath: storagePath,
-    format: 'image',
-    dimensions: {
-      width: 1024,
-      height: 1024,
-    },
-    sizeBytes: stats.size,
-    thumbnailUrl,
-    processingTimeMs: Date.now() - startTime,
-  }
 }

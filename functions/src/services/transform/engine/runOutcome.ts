@@ -9,6 +9,7 @@
 import { logger } from 'firebase-functions/v2'
 import type { JobOutput, OutcomeType } from '@clementine/shared'
 import type { OutcomeContext, OutcomeExecutor } from '../types'
+import { aiImageOutcome } from '../outcomes/aiImageOutcome'
 import { photoOutcome } from '../outcomes/photoOutcome'
 
 /**
@@ -21,7 +22,7 @@ const outcomeRegistry: Record<OutcomeType, OutcomeExecutor | null> = {
   photo: photoOutcome,
   gif: null,
   video: null,
-  'ai.image': null, // Will be registered in Phase 3
+  'ai.image': aiImageOutcome,
   'ai.video': null,
 }
 
