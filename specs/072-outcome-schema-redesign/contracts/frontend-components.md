@@ -6,23 +6,30 @@
 ## Component Hierarchy (New)
 
 ```
-CreateTabForm
-├── OutcomeTypePicker          (when outcome.type === null)
-│   ├── Media group: Photo, GIF*, Video*
-│   └── AI Generated group: AI Photo, AI Video*
-│                              (* = disabled, "Coming soon")
-│
-├── [When type selected]:
-│   ├── OutcomeTypeSelector    (dropdown to switch types)
-│   ├── PhotoConfigForm        (when type === 'photo')
-│   │   ├── SourceImageSelector
-│   │   └── AspectRatioSelector
-│   ├── AIPhotoConfigForm      (when type === 'ai.photo')
-│   │   ├── TaskSelector       (text-to-image / image-to-image toggle)
-│   │   ├── SourceImageSelector (visible only for image-to-image)
-│   │   ├── AspectRatioSelector
-│   │   └── PromptComposer     (reused as-is)
-│   └── RemoveOutcomeAction    (clears type to null)
+components/
+├── CreateTabForm.tsx                   (thin orchestrator — top level)
+├── outcome-picker/
+│   ├── OutcomeTypePicker.tsx           (when outcome.type === null)
+│   │   ├── Media group: Photo, GIF*, Video*
+│   │   └── AI Generated group: AI Photo, AI Video*
+│   │                                   (* = disabled, "Coming soon")
+│   ├── OutcomeTypeSelector.tsx         (dropdown to switch types)
+│   └── RemoveOutcomeAction.tsx         (clears type to null)
+├── photo-config/
+│   └── PhotoConfigForm.tsx             (when type === 'photo')
+│       ├── SourceImageSelector         (from shared-controls/)
+│       └── AspectRatioSelector         (from shared-controls/)
+├── ai-photo-config/
+│   ├── AIPhotoConfigForm.tsx           (when type === 'ai.photo')
+│   │   ├── TaskSelector               (t2i / i2i toggle)
+│   │   ├── SourceImageSelector         (visible only for i2i, from shared-controls/)
+│   │   ├── AspectRatioSelector         (from shared-controls/)
+│   │   └── PromptComposer             (from PromptComposer/)
+│   └── TaskSelector.tsx
+├── shared-controls/
+│   ├── SourceImageSelector.tsx         (capture step dropdown — reused)
+│   └── AspectRatioSelector.tsx         (aspect ratio dropdown — reused)
+└── PromptComposer/                     (unchanged)
 ```
 
 ## New Components

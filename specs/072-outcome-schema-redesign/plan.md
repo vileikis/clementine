@@ -71,18 +71,22 @@ packages/shared/src/schemas/
 apps/clementine-app/src/domains/experience/
 ├── create/
 │   ├── components/
-│   │   ├── CreateTabForm/
-│   │   │   ├── CreateTabForm.tsx      # REWRITE — conditional rendering by type
-│   │   │   ├── OutcomeTypePicker.tsx   # REWRITE — two-group layout with coming soon
-│   │   │   ├── OutcomeTypeSelector.tsx # UPDATE — new type options
-│   │   │   ├── PhotoConfigForm.tsx     # NEW — photo config form
-│   │   │   ├── AIPhotoConfigForm.tsx   # NEW — ai photo config form
-│   │   │   ├── TaskSelector.tsx        # NEW — t2i/i2i toggle
-│   │   │   ├── SourceImageSelector.tsx # NO CHANGE
-│   │   │   ├── AspectRatioSelector.tsx # NO CHANGE
-│   │   │   ├── AIGenerationToggle.tsx  # DELETE — replaced by type system
-│   │   │   └── RemoveOutcomeAction.tsx # MINOR UPDATE — terminology
-│   │   └── PromptComposer/            # NO CHANGE (entire directory)
+│   │   ├── CreateTabForm.tsx              # REWRITE — thin orchestrator, promoted to top level
+│   │   ├── outcome-picker/                # Type selection & switching
+│   │   │   ├── OutcomeTypePicker.tsx      # REWRITE — two-group layout with coming soon
+│   │   │   ├── OutcomeTypeSelector.tsx    # UPDATE — new type options
+│   │   │   └── RemoveOutcomeAction.tsx    # MINOR UPDATE — terminology
+│   │   ├── photo-config/                  # Photo type config form
+│   │   │   └── PhotoConfigForm.tsx        # NEW — source step + aspect ratio
+│   │   ├── ai-photo-config/               # AI Photo type config form
+│   │   │   ├── AIPhotoConfigForm.tsx      # NEW — task, source, aspect, prompt, model, refs
+│   │   │   └── TaskSelector.tsx           # NEW — t2i/i2i toggle
+│   │   ├── shared-controls/               # Reused by multiple config forms
+│   │   │   ├── SourceImageSelector.tsx    # NO CHANGE — moved from CreateTabForm/
+│   │   │   └── AspectRatioSelector.tsx    # NO CHANGE — moved from CreateTabForm/
+│   │   ├── PromptComposer/               # NO CHANGE (entire directory)
+│   │   └── CreateTabForm/                 # DELETE folder — contents reorganized above
+│   │       └── AIGenerationToggle.tsx     # DELETE — replaced by type system
 │   ├── hooks/
 │   │   ├── useUpdateOutcome.ts        # UPDATE — new mutation payload shape
 │   │   ├── useOutcomeValidation.ts    # REWRITE — validate per-type configs
