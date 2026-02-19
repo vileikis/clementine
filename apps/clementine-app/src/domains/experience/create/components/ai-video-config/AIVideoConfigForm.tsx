@@ -144,7 +144,7 @@ export function AIVideoConfigForm({
         <AspectRatioSelector
           value={config.aspectRatio}
           onChange={(aspectRatio) =>
-            onConfigChange({ aspectRatio: aspectRatio as VideoAspectRatio })
+            onConfigChange({ aspectRatio: aspectRatio })
           }
           options={VIDEO_ASPECT_RATIO_OPTIONS}
         />
