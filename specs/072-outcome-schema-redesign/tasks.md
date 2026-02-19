@@ -115,8 +115,8 @@
 
 **Independent Test**: Configure Photo → switch to AI Image → switch back → verify Photo config preserved. Configure output → remove → re-select same type → verify config restored.
 
-- [ ] T031 [US4] Verify and fix type switching in `apps/clementine-app/src/domains/experience/create/hooks/useUpdateOutcome.ts` — ensure the mutation payload for type switching writes ONLY `outcome.type` and the newly active type's config. It must NOT clear or overwrite other type config fields (e.g., switching from photo to ai.image must not set `photo: null`). Add explicit handling: on type change, merge only `{ type: newType, [activeConfigKey]: activeConfig }` without touching other fields.
-- [ ] T032 [US5] Verify remove output behavior — ensure `RemoveOutcomeAction` writes `{ type: null }` to Firestore without modifying per-type config fields. Test: configure photo, remove output, re-select photo → config should be preserved from Firestore (not cleared client-side).
+- [x] T031 [US4] Verify and fix type switching in `apps/clementine-app/src/domains/experience/create/hooks/useUpdateOutcome.ts` — ensure the mutation payload for type switching writes ONLY `outcome.type` and the newly active type's config. It must NOT clear or overwrite other type config fields (e.g., switching from photo to ai.image must not set `photo: null`). Add explicit handling: on type change, merge only `{ type: newType, [activeConfigKey]: activeConfig }` without touching other fields.
+- [x] T032 [US5] Verify remove output behavior — ensure `RemoveOutcomeAction` writes `{ type: null }` to Firestore without modifying per-type config fields. Test: configure photo, remove output, re-select photo → config should be preserved from Firestore (not cleared client-side).
 
 **Checkpoint**: Type switching preserves all configs. Remove + re-select restores previous settings.
 
@@ -126,10 +126,10 @@
 
 **Purpose**: Final cleanup, validation, and standards compliance.
 
-- [ ] T033 [P] Add barrel exports (`index.ts`) for new component folders: `outcome-picker/index.ts`, `photo-config/index.ts`, `ai-image-config/index.ts`, `shared-controls/index.ts` in `apps/clementine-app/src/domains/experience/create/components/`
-- [ ] T034 [P] Verify "output" terminology — audit all user-facing strings in the create domain for any remaining "outcome" references. Replace with "output" per FR-013.
-- [ ] T035 Run validation gates — execute `pnpm --filter @clementine/shared build && pnpm --filter @clementine/shared test`, then `pnpm app:type-check && pnpm app:check`, then `pnpm functions:build`. Fix any errors.
-- [ ] T036 Standards compliance review — verify against applicable standards: `frontend/design-system.md` (theme tokens, no hardcoded colors), `global/project-structure.md` (barrel exports, naming conventions), `backend/firestore.md` (nullable patterns, no undefined), `global/zod-validation.md` (looseObject, nullable defaults).
+- [x] T033 [P] Add barrel exports (`index.ts`) for new component folders: `outcome-picker/index.ts`, `photo-config/index.ts`, `ai-image-config/index.ts`, `shared-controls/index.ts` in `apps/clementine-app/src/domains/experience/create/components/`
+- [x] T034 [P] Verify "output" terminology — audit all user-facing strings in the create domain for any remaining "outcome" references. Replace with "output" per FR-013.
+- [x] T035 Run validation gates — execute `pnpm --filter @clementine/shared build && pnpm --filter @clementine/shared test`, then `pnpm app:type-check && pnpm app:check`, then `pnpm functions:build`. Fix any errors.
+- [x] T036 Standards compliance review — verify against applicable standards: `frontend/design-system.md` (theme tokens, no hardcoded colors), `global/project-structure.md` (barrel exports, naming conventions), `backend/firestore.md` (nullable patterns, no undefined), `global/zod-validation.md` (looseObject, nullable defaults).
 
 ---
 
