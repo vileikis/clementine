@@ -75,17 +75,17 @@ Config: `task` + `captureStepId` (i2i only) + `aspectRatio` + `prompt` + `model`
 
 ### AI Video Use Cases
 
-AI Video is one type with configurable start and end frames:
+AI Video has three tasks, configured within one type:
 
-| Variant | Start Frame | End Frame | Description |
-|---------|-------------|-----------|-------------|
-| **Image-to-video** | Subject photo (capture) | None | Animate a photo into video |
-| **Photo + AI end frame** | Subject photo (capture) | AI-generated image | Video from photo to AI-generated end state |
-| **AI start + AI end** | AI-generated image | AI-generated image | Video between two AI-generated frames (both from same subject photo) |
+| Task | Start Frame | End Frame | Description |
+|------|-------------|-----------|-------------|
+| **animate** | Subject photo (capture) | — | Animate a photo into video |
+| **transform** | Subject photo (capture) | AI-generated image | Photo transitions into an AI-generated version |
+| **reimagine** | AI-generated image | AI-generated image | Video between two AI-generated frames (both derived from same subject photo) |
 
-All variants require a `capture.photo` step as the subject source. The start/end frame sources determine which AI image generation configs are needed.
+All tasks require a `capture.photo` step as the subject source. The task determines which AI image generation configs are needed.
 
-Config: `captureStepId` + `aspectRatio` + `startFrame` + `endFrame` + `videoGeneration`
+Config: `task` + `captureStepId` + `aspectRatio` + `videoGeneration` + task-specific image generation configs
 
 ---
 
@@ -176,16 +176,13 @@ In code and schemas, we use the term **"outcome"**. In user-facing UI copy, use 
 
 ```
 {
+  task: 'animate' | 'transform' | 'reimagine'
   captureStepId: string              // Always required (subject photo source)
   aspectRatio: VideoAspectRatio      // 9:16 | 1:1 — cascades to all sub-generations
 
-  startFrame:
-    | { source: 'capture' }                                    // Use subject photo directly
-    | { source: 'ai', imageGen: ImageGenerationConfig }        // AI-generate from subject
-
-  endFrame:
-    | { source: 'none' }                                       // No end frame (simple i2v)
-    | { source: 'ai', imageGen: ImageGenerationConfig }        // AI-generate from subject
+  // Task-specific image generation configs (null when not needed by task)
+  startFrameImageGen: ImageGenerationConfig | null   // Required for 'reimagine', null for others
+  endFrameImageGen: ImageGenerationConfig | null     // Required for 'transform' and 'reimagine', null for 'animate'
 
   videoGeneration: {
     prompt: string                   // Video generation prompt
@@ -195,7 +192,15 @@ In code and schemas, we use the term **"outcome"**. In user-facing UI copy, use 
 }
 ```
 
-**Note**: `ImageGenerationConfig` within start/end frames does NOT have its own `aspectRatio` — it inherits from the parent `AIVideoOutcomeConfig.aspectRatio` to ensure dimensional consistency across all generated frames and the final video.
+**Task → required image generation configs:**
+
+| Task | `startFrameImageGen` | `endFrameImageGen` |
+|------|:---:|:---:|
+| `animate` | — | — |
+| `transform` | — | required |
+| `reimagine` | required | required |
+
+**Note**: `ImageGenerationConfig` within frame configs does NOT have its own `aspectRatio` — it inherits from the parent `AIVideoOutcomeConfig.aspectRatio` to ensure dimensional consistency across all generated frames and the final video.
 
 ---
 
@@ -303,10 +308,10 @@ The current `imageOutcome.ts` handles both AI and passthrough modes. This splits
 
 ### New aiVideoOutcome
 
-New executor that orchestrates:
+New executor that orchestrates based on `task`:
 1. Download subject photo
-2. Generate start frame (if `source: 'ai'`)
-3. Generate end frame (if `source: 'ai'`)
+2. Generate start frame image (if task is `reimagine`)
+3. Generate end frame image (if task is `transform` or `reimagine`)
 4. Run video generation with resolved frames
 5. Upload output
 
