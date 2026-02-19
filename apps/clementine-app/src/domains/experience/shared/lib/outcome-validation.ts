@@ -1,10 +1,10 @@
 /**
  * Outcome Validation
  *
- * Validates Outcome configuration for publishing.
+ * Validates per-type Outcome configuration for publishing.
  * Pure function for easy testing and reuse across publish hook and future UI.
  *
- * @see PRD 1C - Experience Outcome Configuration
+ * @see specs/072-outcome-schema-redesign
  */
 import type { ExperienceStep, Outcome } from '@clementine/shared'
 
@@ -12,7 +12,7 @@ import type { ExperienceStep, Outcome } from '@clementine/shared'
  * Validation error returned from outcome validation.
  */
 export interface OutcomeValidationError {
-  /** Field path that failed validation (e.g., 'outcome.type') */
+  /** Field path that failed validation (e.g., 'outcome.photo.captureStepId') */
   field: string
   /** User-friendly error message */
   message: string
@@ -33,9 +33,6 @@ export interface OutcomeValidationResult {
 /**
  * Check if a step is a capture step.
  * Capture steps have types that start with 'capture.' prefix.
- *
- * @param step - Experience step to check
- * @returns true if the step is a capture step
  */
 export function isCaptureStep(step: ExperienceStep): boolean {
   return step.type.startsWith('capture.')
@@ -47,19 +44,11 @@ export function isCaptureStep(step: ExperienceStep): boolean {
  * If outcome is null, the experience has no outcome configuration,
  * which is valid - it simply won't generate any output.
  *
- * Validation rules (executed in order, only if outcome is configured):
+ * Validation rules (per-type):
  * - V1: Type must be selected (not null)
- * - V2: Passthrough mode requires a capture step source
- * - V3: CaptureStepId must reference an existing step
- * - V4: CaptureStepId must reference a capture-type step
- * - V5: AI enabled requires a non-empty prompt
- * - V6: RefMedia displayNames must be unique
- * - V7: GIF/Video types are not yet supported
- * - V8: Options kind must match outcome type
- *
- * @param outcome - Outcome configuration to validate (null means no outcome)
- * @param steps - Experience steps for captureStepId validation
- * @returns Validation result with errors list
+ * - V2: Coming soon types are not yet supported
+ * - V3: Photo — captureStepId required and valid
+ * - V4: AI Image — prompt required, captureStepId valid for i2i, unique refMedia displayNames
  */
 export function validateOutcome(
   outcome: Outcome | null,
@@ -76,86 +65,114 @@ export function validateOutcome(
   if (outcome.type === null) {
     errors.push({
       field: 'outcome.type',
-      message: 'Select an outcome type (Image, GIF, or Video)',
+      message: 'Select an output type',
     })
-    // Early return - no point validating further without a type
     return { valid: false, errors }
   }
 
-  // V2: Passthrough mode requires a capture step source
-  if (!outcome.aiEnabled && !outcome.captureStepId) {
-    errors.push({
-      field: 'outcome.captureStepId',
-      message:
-        'Passthrough mode requires a source image. Select a capture step or enable AI generation.',
-    })
-  }
-
-  // V3 & V4: Validate captureStepId if set
-  if (outcome.captureStepId) {
-    const step = steps.find((s) => s.id === outcome.captureStepId)
-
-    if (!step) {
-      // V3: Step not found
-      errors.push({
-        field: 'outcome.captureStepId',
-        message: 'Selected source step no longer exists',
-        stepId: outcome.captureStepId,
-      })
-    } else if (!isCaptureStep(step)) {
-      // V4: Step is not a capture type
-      errors.push({
-        field: 'outcome.captureStepId',
-        message: 'Source step must be a capture step',
-        stepId: outcome.captureStepId,
-      })
-    }
-  }
-
-  // V5: AI enabled requires imageGeneration with a non-empty prompt
-  if (outcome.aiEnabled) {
-    if (!outcome.imageGeneration) {
-      errors.push({
-        field: 'outcome.imageGeneration',
-        message:
-          'AI configuration is missing. Please configure AI generation settings.',
-      })
-    } else if (!outcome.imageGeneration.prompt?.trim()) {
-      errors.push({
-        field: 'outcome.imageGeneration.prompt',
-        message: 'Prompt is required when AI is enabled',
-      })
-    }
-  }
-
-  // V6: RefMedia displayNames must be unique
-  const refMedia = outcome.imageGeneration?.refMedia ?? []
-  const displayNames = refMedia.map((r) => r.displayName)
-  const duplicates = displayNames.filter(
-    (name, index) => displayNames.indexOf(name) !== index,
-  )
-  if (duplicates.length > 0) {
-    const uniqueDuplicates = [...new Set(duplicates)]
-    errors.push({
-      field: 'outcome.imageGeneration.refMedia',
-      message: `Duplicate reference media names: ${uniqueDuplicates.join(', ')}`,
-    })
-  }
-
-  // V7: GIF/Video types are not yet supported
-  if (outcome.type === 'gif' || outcome.type === 'video') {
+  // V2: Coming soon types
+  if (
+    outcome.type === 'gif' ||
+    outcome.type === 'video' ||
+    outcome.type === 'ai.video'
+  ) {
     errors.push({
       field: 'outcome.type',
-      message: `${outcome.type.toUpperCase()} outcome is coming soon`,
+      message: `${outcome.type === 'ai.video' ? 'AI Video' : outcome.type.toUpperCase()} output is coming soon`,
     })
+    return { valid: false, errors }
   }
 
-  // V8: Options kind must match outcome type
-  if (outcome.options && outcome.options.kind !== outcome.type) {
-    errors.push({
-      field: 'outcome.options',
-      message: 'Options kind must match outcome type',
-    })
+  // V3: Photo type validation
+  if (outcome.type === 'photo') {
+    const config = outcome.photo
+    if (!config) {
+      errors.push({
+        field: 'outcome.photo',
+        message: 'Photo configuration is missing',
+      })
+    } else {
+      if (!config.captureStepId) {
+        errors.push({
+          field: 'outcome.photo.captureStepId',
+          message: 'Select a source image step for photo output',
+        })
+      } else {
+        const step = steps.find((s) => s.id === config.captureStepId)
+        if (!step) {
+          errors.push({
+            field: 'outcome.photo.captureStepId',
+            message: 'Selected source step no longer exists',
+            stepId: config.captureStepId,
+          })
+        } else if (!isCaptureStep(step)) {
+          errors.push({
+            field: 'outcome.photo.captureStepId',
+            message: 'Source step must be a capture step',
+            stepId: config.captureStepId,
+          })
+        }
+      }
+    }
+  }
+
+  // V4: AI Image type validation
+  if (outcome.type === 'ai.image') {
+    const config = outcome.aiImage
+    if (!config) {
+      errors.push({
+        field: 'outcome.aiImage',
+        message: 'AI Image configuration is missing',
+      })
+    } else {
+      // Prompt required
+      if (!config.imageGeneration.prompt?.trim()) {
+        errors.push({
+          field: 'outcome.aiImage.imageGeneration.prompt',
+          message: 'Prompt is required for AI Image output',
+        })
+      }
+
+      // captureStepId validation for image-to-image
+      if (config.task === 'image-to-image') {
+        if (!config.captureStepId) {
+          errors.push({
+            field: 'outcome.aiImage.captureStepId',
+            message:
+              'Select a source image step for image-to-image',
+          })
+        } else {
+          const step = steps.find((s) => s.id === config.captureStepId)
+          if (!step) {
+            errors.push({
+              field: 'outcome.aiImage.captureStepId',
+              message: 'Selected source step no longer exists',
+              stepId: config.captureStepId,
+            })
+          } else if (!isCaptureStep(step)) {
+            errors.push({
+              field: 'outcome.aiImage.captureStepId',
+              message: 'Source step must be a capture step',
+              stepId: config.captureStepId,
+            })
+          }
+        }
+      }
+
+      // Unique refMedia displayNames
+      const refMedia = config.imageGeneration.refMedia ?? []
+      const displayNames = refMedia.map((r) => r.displayName)
+      const duplicates = displayNames.filter(
+        (name, index) => displayNames.indexOf(name) !== index,
+      )
+      if (duplicates.length > 0) {
+        const uniqueDuplicates = [...new Set(duplicates)]
+        errors.push({
+          field: 'outcome.aiImage.imageGeneration.refMedia',
+          message: `Duplicate reference media names: ${uniqueDuplicates.join(', ')}`,
+        })
+      }
+    }
   }
 
   return { valid: errors.length === 0, errors }

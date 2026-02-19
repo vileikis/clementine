@@ -1,15 +1,16 @@
 /**
  * OutcomeTypeSelector Component
  *
- * Toggle group for switching outcome type (Image, GIF, Video) within the editor.
- * GIF and Video are disabled with "coming soon" labels.
+ * Toggle group for switching outcome type within the editor.
+ * Shows only enabled types (Photo, AI Image).
  * Does NOT allow deselection - use RemoveOutcomeAction to clear outcome.
  *
- * @see spec.md - US1 (Select Outcome Type)
+ * @see specs/072-outcome-schema-redesign — US1
  */
-import { Film, Image as ImageIcon, Video } from 'lucide-react'
+import { Camera, Sparkles } from 'lucide-react'
 
 import type { OutcomeType } from '@clementine/shared'
+import { OUTCOME_TYPE_LABELS } from '../../lib/model-options'
 import { ToggleGroup, ToggleGroupItem } from '@/ui-kit/ui/toggle-group'
 
 export interface OutcomeTypeSelectorProps {
@@ -22,7 +23,7 @@ export interface OutcomeTypeSelectorProps {
 }
 
 /**
- * OutcomeTypeSelector - Toggle group for switching outcome type
+ * OutcomeTypeSelector - Toggle group for switching enabled outcome types
  */
 export function OutcomeTypeSelector({
   value,
@@ -31,7 +32,7 @@ export function OutcomeTypeSelector({
 }: OutcomeTypeSelectorProps) {
   return (
     <div className="space-y-2">
-      <label className="text-sm font-medium">Outcome Type</label>
+      <label className="text-sm font-medium">Output Type</label>
       <ToggleGroup
         type="single"
         value={value}
@@ -45,32 +46,20 @@ export function OutcomeTypeSelector({
         variant="outline"
       >
         <ToggleGroupItem
-          value="image"
+          value="photo"
           className="min-h-11 min-w-11 gap-2 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
-          aria-label="Image output"
+          aria-label="Photo output"
         >
-          <ImageIcon className="h-4 w-4" />
-          Image
+          <Camera className="h-4 w-4" />
+          {OUTCOME_TYPE_LABELS.photo}
         </ToggleGroupItem>
         <ToggleGroupItem
-          value="gif"
-          disabled
-          className="min-h-11 min-w-11 gap-2 opacity-50"
-          aria-label="GIF output (coming soon)"
+          value="ai.image"
+          className="min-h-11 min-w-11 gap-2 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+          aria-label="AI Image output"
         >
-          <Film className="h-4 w-4" />
-          GIF
-          <span className="text-muted-foreground text-xs">(soon)</span>
-        </ToggleGroupItem>
-        <ToggleGroupItem
-          value="video"
-          disabled
-          className="min-h-11 min-w-11 gap-2 opacity-50"
-          aria-label="Video output (coming soon)"
-        >
-          <Video className="h-4 w-4" />
-          Video
-          <span className="text-muted-foreground text-xs">(soon)</span>
+          <Sparkles className="h-4 w-4" />
+          {OUTCOME_TYPE_LABELS['ai.image']}
         </ToggleGroupItem>
       </ToggleGroup>
     </div>

@@ -17,7 +17,9 @@ export {
   outcomeSchema,
   outcomeTypeSchema,
   imageGenerationConfigSchema,
-  outcomeOptionsSchema,
+  photoOutcomeConfigSchema,
+  aiImageOutcomeConfigSchema,
+  aiImageTaskSchema,
   // Step schemas (discriminated union)
   experienceStepSchema,
   experienceStepTypeSchema,
@@ -50,7 +52,9 @@ export {
   type Outcome,
   type OutcomeType,
   type ImageGenerationConfig,
-  type OutcomeOptions,
+  type PhotoOutcomeConfig,
+  type AIImageOutcomeConfig,
+  type AIImageTask,
   // Step types
   type ExperienceStep,
   type ExperienceStepType,
