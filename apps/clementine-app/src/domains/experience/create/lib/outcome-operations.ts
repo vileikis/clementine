@@ -136,7 +136,8 @@ export function addOutcomeRefMedia(
     aiImage: {
       ...(outcome.aiImage ?? createDefaultAIImageConfig()),
       imageGeneration: {
-        ...(outcome.aiImage?.imageGeneration ?? createDefaultAIImageConfig().imageGeneration),
+        ...(outcome.aiImage?.imageGeneration ??
+          createDefaultAIImageConfig().imageGeneration),
         refMedia: [...currentMedia, ...mediaToAdd],
       },
     },

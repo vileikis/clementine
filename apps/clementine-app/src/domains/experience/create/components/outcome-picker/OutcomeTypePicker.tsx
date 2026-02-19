@@ -7,16 +7,10 @@
  *
  * @see specs/072-outcome-schema-redesign — US1 + US7
  */
-import {
-  Camera,
-  Film,
-  Image as ImageIcon,
-  Sparkles,
-  Video,
-} from 'lucide-react'
+import { Camera, Film, Image as ImageIcon, Sparkles, Video } from 'lucide-react'
 
-import type { OutcomeType } from '@clementine/shared'
 import { COMING_SOON_TYPES } from '../../lib/model-options'
+import type { OutcomeType } from '@clementine/shared'
 import { cn } from '@/shared/utils'
 
 export interface OutcomeTypePickerProps {
@@ -91,8 +85,7 @@ function OptionCard({
       className={cn(
         'relative flex flex-col items-center gap-3 rounded-lg border-2 p-6 text-center transition-all',
         'focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-2',
-        option.enabled &&
-          'hover:border-primary hover:bg-accent cursor-pointer',
+        option.enabled && 'hover:border-primary hover:bg-accent cursor-pointer',
         !option.enabled && 'cursor-not-allowed opacity-50',
       )}
     >
@@ -122,9 +115,7 @@ function OptionCard({
 /**
  * OutcomeTypePicker - Two-group card picker for outcome type selection
  */
-export function OutcomeTypePicker({
-  onTypeSelect,
-}: OutcomeTypePickerProps) {
+export function OutcomeTypePicker({ onTypeSelect }: OutcomeTypePickerProps) {
   return (
     <div className="space-y-6">
       <div className="text-center">

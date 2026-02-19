@@ -104,8 +104,7 @@ export function useOutcomeValidation(
           })
         } else {
           const stepExists = steps.some(
-            (s) =>
-              s.id === config.captureStepId && s.type === 'capture.photo',
+            (s) => s.id === config.captureStepId && s.type === 'capture.photo',
           )
           if (!stepExists) {
             errors.push({

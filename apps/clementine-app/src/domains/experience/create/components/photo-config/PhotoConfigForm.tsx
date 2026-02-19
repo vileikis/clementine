@@ -6,15 +6,11 @@
  *
  * @see specs/072-outcome-schema-redesign — US1
  */
-import type {
-  AspectRatio,
-  ExperienceStep,
-  PhotoOutcomeConfig,
-} from '@clementine/shared'
-import type { FieldValidationError } from '../../hooks/useOutcomeValidation'
 import { getFieldError } from '../../hooks/useOutcomeValidation'
 import { SourceImageSelector } from '../shared-controls/SourceImageSelector'
 import { AspectRatioSelector } from '../shared-controls/AspectRatioSelector'
+import type { FieldValidationError } from '../../hooks/useOutcomeValidation'
+import type { ExperienceStep, PhotoOutcomeConfig } from '@clementine/shared'
 
 export interface PhotoConfigFormProps {
   /** Photo outcome configuration */
@@ -48,9 +44,7 @@ export function PhotoConfigForm({
       />
       <AspectRatioSelector
         value={config.aspectRatio}
-        onChange={(aspectRatio) =>
-          onConfigChange({ aspectRatio: aspectRatio as AspectRatio })
-        }
+        onChange={(aspectRatio) => onConfigChange({ aspectRatio: aspectRatio })}
       />
     </div>
   )

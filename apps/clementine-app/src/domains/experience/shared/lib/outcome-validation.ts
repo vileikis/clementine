@@ -138,8 +138,7 @@ export function validateOutcome(
         if (!config.captureStepId) {
           errors.push({
             field: 'outcome.aiImage.captureStepId',
-            message:
-              'Select a source image step for image-to-image',
+            message: 'Select a source image step for image-to-image',
           })
         } else {
           const step = steps.find((s) => s.id === config.captureStepId)

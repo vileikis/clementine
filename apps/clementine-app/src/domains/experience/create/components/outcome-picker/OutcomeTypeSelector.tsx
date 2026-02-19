@@ -9,8 +9,8 @@
  */
 import { Camera, Sparkles } from 'lucide-react'
 
-import type { OutcomeType } from '@clementine/shared'
 import { OUTCOME_TYPE_LABELS } from '../../lib/model-options'
+import type { OutcomeType } from '@clementine/shared'
 import { ToggleGroup, ToggleGroupItem } from '@/ui-kit/ui/toggle-group'
 
 export interface OutcomeTypeSelectorProps {
