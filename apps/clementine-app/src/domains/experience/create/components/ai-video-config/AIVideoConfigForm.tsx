@@ -22,7 +22,6 @@ import type {
   AIVideoTask,
   ExperienceStep,
   ImageGenerationConfig,
-  VideoAspectRatio,
   VideoGenerationConfig,
 } from '@clementine/shared'
 
