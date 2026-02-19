@@ -39,6 +39,13 @@ export const aiImageModelSchema = z.enum([
 
 export const aiImageAspectRatioSchema = imageAspectRatioSchema
 
+// ── AI Video Model ──────────────────────────────────────────
+
+export const aiVideoModelSchema = z.enum([
+  'veo-3.1-generate-001',
+  'veo-3.1-fast-generate-001',
+])
+
 // ── Generation Config Schemas ────────────────────────────────
 
 /**
@@ -62,7 +69,7 @@ export const imageGenerationConfigSchema = z.object({
  */
 export const videoGenerationConfigSchema = z.object({
   prompt: z.string().default(''),
-  model: z.string().default(''),
+  model: aiVideoModelSchema.default('veo-3.1-fast-generate-001'),
   duration: z.number().min(1).max(60).default(5),
   aspectRatio: videoAspectRatioSchema.nullable().default(null),
 })
@@ -101,7 +108,7 @@ export const videoOutcomeConfigSchema = z.object({
 // ── AI Video ─────────────────────────────────────────────────
 
 /** AI video task type. */
-const aiVideoTaskSchema = z.enum(['animate', 'transform', 'reimagine'])
+export const aiVideoTaskSchema = z.enum(['animate', 'transform', 'reimagine'])
 
 /** AI video outcome config — placeholder for future implementation. */
 export const aiVideoOutcomeConfigSchema = z.object({
@@ -146,5 +153,7 @@ export type AIImageTask = z.infer<typeof aiImageTaskSchema>
 export type AIImageOutcomeConfig = z.infer<typeof aiImageOutcomeConfigSchema>
 export type GifOutcomeConfig = z.infer<typeof gifOutcomeConfigSchema>
 export type VideoOutcomeConfig = z.infer<typeof videoOutcomeConfigSchema>
+export type AIVideoTask = z.infer<typeof aiVideoTaskSchema>
+export type AIVideoModel = z.infer<typeof aiVideoModelSchema>
 export type AIVideoOutcomeConfig = z.infer<typeof aiVideoOutcomeConfigSchema>
 export type Outcome = z.infer<typeof outcomeSchema>

@@ -23,6 +23,14 @@ export const AI_IMAGE_MODELS = [
 ] as const
 
 /**
+ * Available AI video generation models.
+ */
+export const AI_VIDEO_MODELS = [
+  { value: 'veo-3.1-generate-001', label: 'Veo 3.1' },
+  { value: 'veo-3.1-fast-generate-001', label: 'Veo 3.1 Fast' },
+] as const
+
+/**
  * Available aspect ratios for image generation.
  * Uses canonical definitions from @clementine/shared (excludes 16:9).
  */
@@ -51,12 +59,16 @@ export const OUTCOME_TYPES: OutcomeType[] = [
 /**
  * Currently enabled outcome types (selectable by users).
  */
-export const ENABLED_OUTCOME_TYPES: OutcomeType[] = ['photo', 'ai.image']
+export const ENABLED_OUTCOME_TYPES: OutcomeType[] = [
+  'photo',
+  'ai.image',
+  'ai.video',
+]
 
 /**
  * Outcome types that are not yet implemented (shown as "Coming soon").
  */
-export const COMING_SOON_TYPES: OutcomeType[] = ['gif', 'video', 'ai.video']
+export const COMING_SOON_TYPES: OutcomeType[] = ['gif', 'video']
 
 /**
  * User-facing labels for outcome types.

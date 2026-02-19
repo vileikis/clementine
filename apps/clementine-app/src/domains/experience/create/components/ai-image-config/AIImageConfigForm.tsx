@@ -24,7 +24,6 @@ import type {
   AspectRatio,
   ExperienceStep,
   MediaReference,
-  Outcome,
 } from '@clementine/shared'
 
 export interface AIImageConfigFormProps {
@@ -122,14 +121,11 @@ export function AIImageConfigForm({
 
   // ── Ref media upload hook ─────────────────────────────────
 
-  // Build a minimal Outcome for the hook (it only reads aiImage.imageGeneration.refMedia.length)
-  const outcomeForUpload = { aiImage: config } as Outcome
-
   const { uploadingFiles, uploadFiles, canAddMore, isUploading } =
     useRefMediaUpload({
       workspaceId,
       userId,
-      outcome: outcomeForUpload,
+      currentRefMedia: config.imageGeneration.refMedia,
       onMediaUploaded: handleMediaUploaded,
     })
 

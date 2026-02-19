@@ -23,12 +23,14 @@ import {
   initializeOutcomeType,
 } from '../lib/outcome-operations'
 import { AIImageConfigForm } from './ai-image-config/AIImageConfigForm'
+import { AIVideoConfigForm } from './ai-video-config'
 import { OutcomeTypePicker } from './outcome-picker/OutcomeTypePicker'
 import { OutcomeTypeSelector } from './outcome-picker/OutcomeTypeSelector'
 import { RemoveOutcomeAction } from './outcome-picker/RemoveOutcomeAction'
 import { PhotoConfigForm } from './photo-config/PhotoConfigForm'
 import type {
   AIImageOutcomeConfig,
+  AIVideoOutcomeConfig,
   Experience,
   Outcome,
   OutcomeType,
@@ -145,6 +147,19 @@ export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
     [form, triggerSave],
   )
 
+  const handleAIVideoConfigChange = useCallback(
+    (updates: Partial<AIVideoOutcomeConfig>) => {
+      const currentConfig = form.getValues('aiVideo')
+      form.setValue(
+        'aiVideo',
+        { ...currentConfig, ...updates } as AIVideoOutcomeConfig,
+        { shouldDirty: true },
+      )
+      triggerSave()
+    },
+    [form, triggerSave],
+  )
+
   // ── Render ────────────────────────────────────────────────
 
   // No outcome type selected → show picker
@@ -184,6 +199,29 @@ export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
         <AIImageConfigForm
           config={outcome.aiImage}
           onConfigChange={handleAIImageConfigChange}
+          steps={steps}
+          errors={validationErrors}
+          workspaceId={workspaceId}
+          userId={user?.uid}
+        />
+        <div className="border-t pt-4">
+          <RemoveOutcomeAction onRemove={handleRemoveOutcome} />
+        </div>
+      </div>
+    )
+  }
+
+  // AI Video type
+  if (outcome.type === 'ai.video' && outcome.aiVideo) {
+    return (
+      <div className="space-y-6">
+        <OutcomeTypeSelector
+          value={outcome.type}
+          onChange={handleOutcomeTypeSelect}
+        />
+        <AIVideoConfigForm
+          config={outcome.aiVideo}
+          onConfigChange={handleAIVideoConfigChange}
           steps={steps}
           errors={validationErrors}
           workspaceId={workspaceId}

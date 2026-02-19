@@ -11,7 +11,7 @@ import { useCallback, useRef, useState } from 'react'
 import { nanoid } from 'nanoid'
 
 import { MAX_REF_MEDIA_COUNT } from '../lib/model-options'
-import type { MediaReference, Outcome } from '@clementine/shared'
+import type { MediaReference } from '@clementine/shared'
 import { useUploadMediaAsset } from '@/domains/media-library'
 
 export interface UploadingFile {
@@ -28,8 +28,8 @@ export interface UseRefMediaUploadParams {
   workspaceId: string
   /** User ID for uploads */
   userId: string | undefined
-  /** Current outcome configuration */
-  outcome: Outcome | null
+  /** Current reference media array */
+  currentRefMedia: MediaReference[]
   /** Callback when a media reference is uploaded */
   onMediaUploaded: (mediaRef: MediaReference) => void
 }
@@ -53,19 +53,18 @@ export interface UseRefMediaUploadResult {
 export function useRefMediaUpload({
   workspaceId,
   userId,
-  outcome,
+  currentRefMedia,
   onMediaUploaded,
 }: UseRefMediaUploadParams): UseRefMediaUploadResult {
   const [uploadingFiles, setUploadingFiles] = useState<UploadingFile[]>([])
 
-  // Keep a ref to the latest outcome to avoid stale closures in uploadFiles
-  const outcomeRef = useRef(outcome)
-  outcomeRef.current = outcome
+  // Keep a ref to the latest ref media to avoid stale closures in uploadFiles
+  const refMediaRef = useRef(currentRefMedia)
+  refMediaRef.current = currentRefMedia
 
   const uploadAsset = useUploadMediaAsset(workspaceId, userId)
 
-  const currentRefMediaCount =
-    outcome?.aiImage?.imageGeneration.refMedia.length ?? 0
+  const currentRefMediaCount = currentRefMedia.length
   const availableSlots = MAX_REF_MEDIA_COUNT - currentRefMediaCount
   const canAddMore = availableSlots > 0
 

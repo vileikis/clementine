@@ -9,8 +9,8 @@
  *
  * @see Feature 065 - Experience-Level Aspect Ratio & Overlay System
  */
-import { ASPECT_RATIOS } from '../../lib/model-options'
 import type { AspectRatio } from '@clementine/shared'
+import { ASPECT_RATIOS } from '@/domains/experience/create/lib/model-options'
 import {
   Select,
   SelectContent,
@@ -19,11 +19,13 @@ import {
   SelectValue,
 } from '@/ui-kit/ui/select'
 
-export interface AspectRatioSelectorProps {
+export interface AspectRatioSelectorProps<T extends string = AspectRatio> {
   /** Currently selected aspect ratio */
-  value: AspectRatio
+  value: T
   /** Callback when aspect ratio changes */
-  onChange: (value: AspectRatio) => void
+  onChange: (value: T) => void
+  /** Custom options to override the default image aspect ratios */
+  options?: readonly { value: T; label: string }[]
   /** Whether the selector is disabled */
   disabled?: boolean
 }
@@ -31,13 +33,15 @@ export interface AspectRatioSelectorProps {
 /**
  * AspectRatioSelector - Dropdown for output aspect ratio selection
  */
-export function AspectRatioSelector({
+export function AspectRatioSelector<T extends string = AspectRatio>({
   value,
   onChange,
+  options,
   disabled,
-}: AspectRatioSelectorProps) {
+}: AspectRatioSelectorProps<T>) {
+  const items = options ?? ASPECT_RATIOS
   const handleValueChange = (val: string) => {
-    onChange(val as AspectRatio)
+    onChange(val as T)
   }
 
   return (
@@ -52,7 +56,7 @@ export function AspectRatioSelector({
           <SelectValue placeholder="Select aspect ratio">{value}</SelectValue>
         </SelectTrigger>
         <SelectContent>
-          {ASPECT_RATIOS.map((option) => (
+          {items.map((option) => (
             <SelectItem key={option.value} value={option.value}>
               {option.label}
             </SelectItem>

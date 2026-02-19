@@ -7,7 +7,7 @@
  *
  * @see specs/072-outcome-schema-redesign — US1
  */
-import { Camera, Sparkles } from 'lucide-react'
+import { Camera, Sparkles, Video } from 'lucide-react'
 
 import { OUTCOME_TYPE_LABELS } from '../../lib/model-options'
 import type { OutcomeType } from '@clementine/shared'
@@ -60,6 +60,14 @@ export function OutcomeTypeSelector({
         >
           <Sparkles className="h-4 w-4" />
           {OUTCOME_TYPE_LABELS['ai.image']}
+        </ToggleGroupItem>
+        <ToggleGroupItem
+          value="ai.video"
+          className="min-h-11 min-w-11 gap-2 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+          aria-label="AI Video output"
+        >
+          <Video className="h-4 w-4" />
+          {OUTCOME_TYPE_LABELS['ai.video']}
         </ToggleGroupItem>
       </ToggleGroup>
     </div>
