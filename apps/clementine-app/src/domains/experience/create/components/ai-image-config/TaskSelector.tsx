@@ -13,8 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/ui-kit/ui/select'
-
-type AIImageTask = 'text-to-image' | 'image-to-image'
+import type { AIImageTask } from '@clementine/shared'
 
 const TASK_OPTIONS: { value: AIImageTask; label: string }[] = [
   { value: 'text-to-image', label: 'Text to Image' },

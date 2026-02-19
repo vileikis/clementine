@@ -7,7 +7,8 @@
  *
  * @see specs/072-outcome-schema-redesign — US1 + US7
  */
-import { Camera, Film, Image as ImageIcon, Sparkles, Video } from 'lucide-react'
+import type { ReactNode } from 'react'
+import { Camera, Film, Sparkles, Video } from 'lucide-react'
 
 import { COMING_SOON_TYPES } from '../../lib/model-options'
 import type { OutcomeType } from '@clementine/shared'
@@ -22,7 +23,7 @@ interface OutcomeOption {
   type: OutcomeType
   label: string
   description: string
-  icon: React.ReactNode
+  icon: ReactNode
   enabled: boolean
 }
 
@@ -62,7 +63,7 @@ const AI_OPTIONS: OutcomeOption[] = [
     type: 'ai.video',
     label: 'AI Video',
     description: 'Generate AI video from prompts',
-    icon: <ImageIcon className="h-8 w-8" />,
+    icon: <Video className="h-8 w-8" />,
     enabled: false,
   },
 ]

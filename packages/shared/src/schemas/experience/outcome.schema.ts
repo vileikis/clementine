@@ -95,7 +95,7 @@ export const gifOutcomeConfigSchema = z.object({
 /** Video outcome config — placeholder for future implementation. */
 export const videoOutcomeConfigSchema = z.object({
   captureStepId: z.string(),
-  aspectRatio: imageAspectRatioSchema.default('1:1'),
+  aspectRatio: videoAspectRatioSchema.default('1:1'),
 })
 
 // ── AI Video ─────────────────────────────────────────────────

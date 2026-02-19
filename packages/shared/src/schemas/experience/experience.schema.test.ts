@@ -107,7 +107,7 @@ describe('experienceConfigSchema', () => {
     expect(result.outcome?.type).toBe('photo')
   })
 
-  it('accepts outcome with old fields via looseObject (backward compat)', () => {
+  it('accepts outcome with extra legacy-like fields via looseObject', () => {
     const result = experienceConfigSchema.parse({
       outcome: {
         type: 'photo',
