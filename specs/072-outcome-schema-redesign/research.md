@@ -16,10 +16,10 @@
 | `aiEnabled` | Removed — encoded in type (`ai.image` vs `photo`) | No longer needed |
 | `captureStepId` | `photo.captureStepId` or `aiImage.captureStepId` | Moved into per-type config |
 | `aspectRatio` | `photo.aspectRatio` or `aiImage.aspectRatio` | Moved into per-type config |
-| `imageGeneration.prompt` | `aiImage.prompt` | Flattened from nested object |
-| `imageGeneration.model` | `aiImage.model` | Flattened from nested object |
-| `imageGeneration.refMedia` | `aiImage.refMedia` | Flattened from nested object |
-| `imageGeneration.aspectRatio` | Removed (was already deprecated) | Redundant with per-type aspectRatio |
+| `imageGeneration.prompt` | `aiImage.imageGeneration.prompt` | Nested within per-type config |
+| `imageGeneration.model` | `aiImage.imageGeneration.model` | Nested within per-type config |
+| `imageGeneration.refMedia` | `aiImage.imageGeneration.refMedia` | Nested within per-type config |
+| `imageGeneration.aspectRatio` | `aiImage.imageGeneration.aspectRatio` | Nullable — null means inherit from `aiImage.aspectRatio` |
 | `options` (discriminated union) | Removed — per-type configs replace this | gif/video options move into their respective configs |
 
 **Alternatives considered**:

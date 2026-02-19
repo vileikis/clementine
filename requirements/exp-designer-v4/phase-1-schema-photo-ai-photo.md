@@ -68,9 +68,7 @@ All per-type config fields default to `null` (Firestore-safe pattern).
   task: 'text-to-image' | 'image-to-image'
   captureStepId: string | null       // Required for i2i, null for t2i
   aspectRatio: ImageAspectRatio      // 1:1 | 3:2 | 2:3 | 9:16
-  prompt: string                     // Template with @{step:...} and @{ref:...} placeholders
-  model: AIImageModel
-  refMedia: MediaReference[]
+  imageGeneration: ImageGenerationConfig  // prompt, model, refMedia, aspectRatio (nullable override)
 }
 ```
 
@@ -105,8 +103,8 @@ Create a Firestore migration script in `functions/scripts/migrations/` that read
 | Old State | New `type` | New Config Field |
 |-----------|-----------|-----------------|
 | `type: 'image'`, `aiEnabled: false` | `'photo'` | `photo: { captureStepId, aspectRatio }` |
-| `type: 'image'`, `aiEnabled: true`, `captureStepId: null` | `'ai.image'` | `aiImage: { task: 'text-to-image', captureStepId: null, aspectRatio, prompt, model, refMedia }` |
-| `type: 'image'`, `aiEnabled: true`, `captureStepId: <id>` | `'ai.image'` | `aiImage: { task: 'image-to-image', captureStepId, aspectRatio, prompt, model, refMedia }` |
+| `type: 'image'`, `aiEnabled: true`, `captureStepId: null` | `'ai.image'` | `aiImage: { task: 'text-to-image', captureStepId: null, aspectRatio, imageGeneration: { prompt, model, refMedia } }` |
+| `type: 'image'`, `aiEnabled: true`, `captureStepId: <id>` | `'ai.image'` | `aiImage: { task: 'image-to-image', captureStepId, aspectRatio, imageGeneration: { prompt, model, refMedia } }` |
 | `type: null` | `null` | All config fields `null` |
 
 Migration must handle both `draft.outcome` and `published.outcome` fields.

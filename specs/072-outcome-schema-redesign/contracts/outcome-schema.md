@@ -9,6 +9,34 @@
 const outcomeTypeSchema = z.enum(['photo', 'gif', 'video', 'ai.image', 'ai.video'])
 ```
 
+## Generation Config Schemas (shared)
+
+### ImageGenerationConfig
+
+Shared by `ai.image` and `ai.video` outcomes. Contains the parameters passed to `aiGenerateImage()`.
+
+```typescript
+const imageGenerationConfigSchema = z.object({
+  prompt: z.string().default(''),
+  model: aiImageModelSchema.default('gemini-2.5-flash-image'),
+  refMedia: z.array(mediaReferenceSchema).default([]),
+  aspectRatio: imageAspectRatioSchema.nullable().default(null), // null = inherit from parent
+})
+```
+
+### VideoGenerationConfig
+
+Used by `ai.video` outcome. Contains the parameters passed to the video generation service.
+
+```typescript
+const videoGenerationConfigSchema = z.object({
+  prompt: z.string().default(''),
+  model: z.string().default(''),
+  duration: z.number().min(1).max(60).default(5),
+  aspectRatio: videoAspectRatioSchema.nullable().default(null), // null = inherit from parent
+})
+```
+
 ## PhotoOutcomeConfig
 
 ```typescript
@@ -27,9 +55,12 @@ const aiImageOutcomeConfigSchema = z.object({
   task: aiImageTaskSchema.default('text-to-image'),
   captureStepId: z.string().nullable().default(null),
   aspectRatio: imageAspectRatioSchema.default('1:1'),
-  prompt: z.string().default(''),
-  model: aiImageModelSchema.default('gemini-2.5-flash-image'),
-  refMedia: z.array(mediaReferenceSchema).default([]),
+  imageGeneration: imageGenerationConfigSchema.default({
+    prompt: '',
+    model: 'gemini-2.5-flash-image',
+    refMedia: [],
+    aspectRatio: null,
+  }),
 })
 ```
 
@@ -62,11 +93,7 @@ const aiVideoOutcomeConfigSchema = z.object({
   aspectRatio: videoAspectRatioSchema.default('9:16'),
   startFrameImageGen: imageGenerationConfigSchema.nullable().default(null),
   endFrameImageGen: imageGenerationConfigSchema.nullable().default(null),
-  videoGeneration: z.object({
-    prompt: z.string().default(''),
-    model: z.string().default(''),
-    duration: z.number().min(1).max(60).default(5),
-  }),
+  videoGeneration: videoGenerationConfigSchema,
 })
 ```
 
@@ -89,6 +116,8 @@ const outcomeSchema = z.looseObject({
 
 ```typescript
 type OutcomeType = z.infer<typeof outcomeTypeSchema>
+type ImageGenerationConfig = z.infer<typeof imageGenerationConfigSchema>
+type VideoGenerationConfig = z.infer<typeof videoGenerationConfigSchema>
 type PhotoOutcomeConfig = z.infer<typeof photoOutcomeConfigSchema>
 type AIImageOutcomeConfig = z.infer<typeof aiImageOutcomeConfigSchema>
 type GifOutcomeConfig = z.infer<typeof gifOutcomeConfigSchema>
@@ -101,10 +130,18 @@ type Outcome = z.infer<typeof outcomeSchema>
 
 The following schemas and types are removed:
 
-- `imageGenerationConfigSchema` / `ImageGenerationConfig` (flattened into `AIImageOutcomeConfig`)
 - `outcomeOptionsSchema` / `OutcomeOptions` (replaced by per-type configs)
 - `imageOptionsSchema` / `ImageOptions`
 - `gifOptionsSchema` / `GifOptions`
 - `videoOptionsSchema` / `VideoOptions`
 
-**Note**: `imageGenerationConfigSchema` is kept internally for `AIVideoOutcomeConfig.startFrameImageGen` and `endFrameImageGen` but no longer exported as a top-level concept.
+## aspectRatio Cascade Pattern
+
+Generation configs (`imageGenerationConfigSchema`, `videoGenerationConfigSchema`) have `aspectRatio` as **nullable with null default**. The executor resolves AR as:
+
+```typescript
+const aspectRatio = genConfig.aspectRatio ?? parentConfig.aspectRatio
+```
+
+- **Outcome context**: `aspectRatio` is `null` → inherits from parent outcome config.
+- **Standalone context**: can be set explicitly for self-contained generation requests.

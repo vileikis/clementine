@@ -39,6 +39,34 @@ export const aiImageModelSchema = z.enum([
 
 export const aiImageAspectRatioSchema = imageAspectRatioSchema
 
+// ── Generation Config Schemas ────────────────────────────────
+
+/**
+ * Image generation config — shared by ai.image and ai.video outcomes.
+ *
+ * Contains the parameters passed to aiGenerateImage().
+ * aspectRatio is nullable: null = inherit from parent outcome config.
+ */
+export const imageGenerationConfigSchema = z.object({
+  prompt: z.string().default(''),
+  model: aiImageModelSchema.default('gemini-2.5-flash-image'),
+  refMedia: z.array(mediaReferenceSchema).default([]),
+  aspectRatio: imageAspectRatioSchema.nullable().default(null),
+})
+
+/**
+ * Video generation config — used by ai.video outcome.
+ *
+ * Contains the parameters passed to the video generation service.
+ * aspectRatio is nullable: null = inherit from parent outcome config.
+ */
+export const videoGenerationConfigSchema = z.object({
+  prompt: z.string().default(''),
+  model: z.string().default(''),
+  duration: z.number().min(1).max(60).default(5),
+  aspectRatio: videoAspectRatioSchema.nullable().default(null),
+})
+
 // ── Per-Type Config Schemas ──────────────────────────────────
 
 /** Photo outcome config — passthrough capture with optional overlay. */
@@ -55,9 +83,7 @@ export const aiImageOutcomeConfigSchema = z.object({
   task: aiImageTaskSchema.default('text-to-image'),
   captureStepId: z.string().nullable().default(null),
   aspectRatio: imageAspectRatioSchema.default('1:1'),
-  prompt: z.string().default(''),
-  model: aiImageModelSchema.default('gemini-2.5-flash-image'),
-  refMedia: z.array(mediaReferenceSchema).default([]),
+  imageGeneration: imageGenerationConfigSchema,
 })
 
 /** GIF outcome config — placeholder for future implementation. */
@@ -72,21 +98,10 @@ export const videoOutcomeConfigSchema = z.object({
   aspectRatio: imageAspectRatioSchema.default('1:1'),
 })
 
-// ── AI Video (internal helpers) ──────────────────────────────
+// ── AI Video ─────────────────────────────────────────────────
 
 /** AI video task type. */
 const aiVideoTaskSchema = z.enum(['animate', 'transform', 'reimagine'])
-
-/**
- * Image generation config — used internally by AI video for
- * start/end frame generation. Not exported as a top-level concept.
- */
-const imageGenerationConfigSchema = z.object({
-  prompt: z.string().default(''),
-  refMedia: z.array(mediaReferenceSchema).default([]),
-  model: aiImageModelSchema.default('gemini-2.5-flash-image'),
-  aspectRatio: aiImageAspectRatioSchema.default('1:1'),
-})
 
 /** AI video outcome config — placeholder for future implementation. */
 export const aiVideoOutcomeConfigSchema = z.object({
@@ -95,11 +110,7 @@ export const aiVideoOutcomeConfigSchema = z.object({
   aspectRatio: videoAspectRatioSchema.default('9:16'),
   startFrameImageGen: imageGenerationConfigSchema.nullable().default(null),
   endFrameImageGen: imageGenerationConfigSchema.nullable().default(null),
-  videoGeneration: z.object({
-    prompt: z.string().default(''),
-    model: z.string().default(''),
-    duration: z.number().min(1).max(60).default(5),
-  }),
+  videoGeneration: videoGenerationConfigSchema,
 })
 
 // ── Outcome (top-level) ──────────────────────────────────────
@@ -128,6 +139,8 @@ export const outcomeSchema = z.looseObject({
 export type OutcomeType = z.infer<typeof outcomeTypeSchema>
 export type AIImageModel = z.infer<typeof aiImageModelSchema>
 export type AIImageAspectRatio = z.infer<typeof aiImageAspectRatioSchema>
+export type ImageGenerationConfig = z.infer<typeof imageGenerationConfigSchema>
+export type VideoGenerationConfig = z.infer<typeof videoGenerationConfigSchema>
 export type PhotoOutcomeConfig = z.infer<typeof photoOutcomeConfigSchema>
 export type AIImageTask = z.infer<typeof aiImageTaskSchema>
 export type AIImageOutcomeConfig = z.infer<typeof aiImageOutcomeConfigSchema>

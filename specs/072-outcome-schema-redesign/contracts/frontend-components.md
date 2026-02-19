@@ -77,7 +77,7 @@ Fields:
   - TaskSelector (task toggle: text-to-image / image-to-image)
   - SourceImageSelector (captureStepId) — visible only when task === 'image-to-image'
   - AspectRatioSelector (aspectRatio) — with cascade to capture step (when i2i)
-  - PromptComposer (prompt, model, refMedia) — reused component
+  - PromptComposer (imageGeneration.prompt, imageGeneration.model, imageGeneration.refMedia) — reused component
 ```
 
 ### TaskSelector (new)
@@ -137,9 +137,11 @@ updateOutcome({
     task: 'image-to-image',
     captureStepId: '...',
     aspectRatio: '1:1',
-    prompt: '...',
-    model: '...',
-    refMedia: [...],
+    imageGeneration: {
+      prompt: '...',
+      model: '...',
+      refMedia: [...],
+    },
   },
 })
 ```

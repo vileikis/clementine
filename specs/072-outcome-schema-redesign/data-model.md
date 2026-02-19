@@ -48,6 +48,28 @@ Replaces old `'image' | 'gif' | 'video'` enum. The `ai.` prefix distinguishes AI
 - Per-type configs persist independently — switching types does NOT clear other configs.
 - Setting `type` to `null` (remove output) preserves all configs.
 
+### ImageGenerationConfig (shared)
+
+Reusable generation config used by `AIImageOutcomeConfig.imageGeneration` and `AIVideoOutcomeConfig.startFrameImageGen` / `endFrameImageGen`.
+
+| Field | Type | Default | Nullable | Notes |
+|-------|------|---------|----------|-------|
+| `prompt` | `string` | `''` | No | Template with `@{step:...}` and `@{ref:...}` placeholders |
+| `model` | `AIImageModel` | `'gemini-2.5-flash-image'` | No | AI model selection |
+| `refMedia` | `MediaReference[]` | `[]` | No | Reference images for style guidance. Max 5. |
+| `aspectRatio` | `ImageAspectRatio` | — | `null` | null = inherit from parent outcome config |
+
+### VideoGenerationConfig
+
+Used by `AIVideoOutcomeConfig.videoGeneration`.
+
+| Field | Type | Default | Nullable | Notes |
+|-------|------|---------|----------|-------|
+| `prompt` | `string` | `''` | No | Video generation prompt |
+| `model` | `string` | `''` | No | Video generation model |
+| `duration` | `number` | `5` | No | Duration in seconds (1-60) |
+| `aspectRatio` | `VideoAspectRatio` | — | `null` | null = inherit from parent outcome config |
+
 ### PhotoOutcomeConfig
 
 | Field | Type | Default | Nullable | Validation |
@@ -62,9 +84,7 @@ Replaces old `'image' | 'gif' | 'video'` enum. The `ai.` prefix distinguishes AI
 | `task` | `string` | `'text-to-image'` | No | `'text-to-image' \| 'image-to-image'` |
 | `captureStepId` | `string` | — | `null` | Required when task = `image-to-image`. Must reference a `capture.photo` step. |
 | `aspectRatio` | `ImageAspectRatio` | `'1:1'` | No | `'1:1' \| '3:2' \| '2:3' \| '9:16'` |
-| `prompt` | `string` | `''` | No | Template with `@{step:...}` and `@{ref:...}` placeholders |
-| `model` | `AIImageModel` | `'gemini-2.5-flash-image'` | No | `'gemini-2.5-flash-image' \| 'gemini-3-pro-image-preview'` |
-| `refMedia` | `MediaReference[]` | `[]` | No | Max 5 items. Each has unique displayName. |
+| `imageGeneration` | `ImageGenerationConfig` | `{...defaults}` | No | Prompt, model, refMedia for AI generation |
 
 ### GifOutcomeConfig (Phase 1 placeholder)
 
@@ -98,13 +118,24 @@ Replaces old `'image' | 'gif' | 'video'` enum. The `ai.` prefix distinguishes AI
 - **AIImageModel**: `'gemini-2.5-flash-image' | 'gemini-3-pro-image-preview'` — no changes
 - **MediaReference**: `{ mediaAssetId, url, filePath, displayName }` — no changes
 
+## aspectRatio Cascade Pattern
+
+Generation configs have `aspectRatio` as **nullable with null default**. The executor resolves:
+
+```
+effectiveAR = genConfig.aspectRatio ?? parentOutcomeConfig.aspectRatio
+```
+
+- **Outcome context**: `aspectRatio` is `null` → inherits from parent outcome config.
+- **Standalone context**: can be set explicitly for self-contained generation requests.
+
 ## Migration Mapping
 
 | Old State | New `type` | New Config |
 |-----------|-----------|------------|
 | `type: 'image'`, `aiEnabled: false` | `'photo'` | `photo: { captureStepId, aspectRatio }` |
-| `type: 'image'`, `aiEnabled: true`, `captureStepId: null` | `'ai.image'` | `aiImage: { task: 'text-to-image', captureStepId: null, aspectRatio, prompt, model, refMedia }` |
-| `type: 'image'`, `aiEnabled: true`, `captureStepId: <id>` | `'ai.image'` | `aiImage: { task: 'image-to-image', captureStepId, aspectRatio, prompt, model, refMedia }` |
+| `type: 'image'`, `aiEnabled: true`, `captureStepId: null` | `'ai.image'` | `aiImage: { task: 'text-to-image', captureStepId: null, aspectRatio, imageGeneration: { prompt, model, refMedia } }` |
+| `type: 'image'`, `aiEnabled: true`, `captureStepId: <id>` | `'ai.image'` | `aiImage: { task: 'image-to-image', captureStepId, aspectRatio, imageGeneration: { prompt, model, refMedia } }` |
 | `type: null` | `null` | All config fields remain `null` |
 | `type: 'gif'` | `'gif'` | `gif: { captureStepId, aspectRatio }` (if fields exist) |
 | `type: 'video'` | `'video'` | `video: { captureStepId, aspectRatio }` (if fields exist) |
@@ -116,7 +147,7 @@ Replaces old `'image' | 'gif' | 'video'` enum. The `ai.` prefix distinguishes AI
 | `aiEnabled` | Encoded in `type` (`'photo'` vs `'ai.image'`) |
 | Top-level `captureStepId` | `photo.captureStepId` or `aiImage.captureStepId` |
 | Top-level `aspectRatio` | Per-type config `aspectRatio` |
-| `imageGeneration` (nested object) | Fields flattened into `AIImageOutcomeConfig` |
+| `imageGeneration` (top-level nested object) | `aiImage.imageGeneration` (nested within outcome config) |
 | `options` (discriminated union) | Replaced by per-type config fields |
 | `outcomeOptionsSchema` | Removed |
 | `imageOptionsSchema` | Removed |

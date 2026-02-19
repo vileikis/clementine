@@ -60,21 +60,22 @@ Input: ctx.snapshot.outcome.aiImage (AIImageOutcomeConfig)
 Flow:
 1. Read aiImage config from snapshot.outcome.aiImage
 2. Validate aiImage config exists → error if null
-3. If task === 'image-to-image':
+3. Read imageGen = aiImage.imageGeneration
+4. If task === 'image-to-image':
    → Get source media from sessionResponses using aiImage.captureStepId
    → Validate captureStepId is not null
-4. If task === 'text-to-image':
+5. If task === 'text-to-image':
    → sourceMedia = null
-5. resolvePromptMentions(aiImage.prompt, sessionResponses, aiImage.refMedia)
-6. aiGenerateImage({
+6. resolvePromptMentions(imageGen.prompt, sessionResponses, imageGen.refMedia)
+7. aiGenerateImage({
      prompt: resolvedPrompt.text,
-     model: aiImage.model,
-     aspectRatio: aiImage.aspectRatio,
+     model: imageGen.model,
+     aspectRatio: imageGen.aspectRatio ?? aiImage.aspectRatio,
      sourceMedia,
      referenceMedia: resolvedPrompt.mediaRefs
    }, tmpDir)
-7. If overlayChoice exists → applyOverlay(outputPath, overlayChoice, tmpDir)
-8. Upload output → return JobOutput
+8. If overlayChoice exists → applyOverlay(outputPath, overlayChoice, tmpDir)
+9. Upload output → return JobOutput
 ```
 
 ## Shared Operations (unchanged)

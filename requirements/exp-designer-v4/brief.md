@@ -166,9 +166,7 @@ In code and schemas, we use the term **"outcome"**. In user-facing UI copy, use 
   task: 'text-to-image' | 'image-to-image'
   captureStepId: string | null       // Required for i2i, null for t2i
   aspectRatio: ImageAspectRatio      // 1:1 | 3:2 | 2:3 | 9:16
-  prompt: string                     // Template with @{step:...} and @{ref:...} placeholders
-  model: AIImageModel                // e.g., 'gemini-2.5-flash-image'
-  refMedia: MediaReference[]         // Reference images for style guidance
+  imageGeneration: ImageGenerationConfig  // prompt, model, refMedia, aspectRatio (nullable override)
 }
 ```
 
