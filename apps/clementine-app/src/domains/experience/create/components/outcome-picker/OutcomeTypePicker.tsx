@@ -7,10 +7,10 @@
  *
  * @see specs/072-outcome-schema-redesign — US1 + US7
  */
-import type { ReactNode } from 'react'
 import { Camera, Film, Sparkles, Video } from 'lucide-react'
 
 import { COMING_SOON_TYPES } from '../../lib/model-options'
+import type { ReactNode } from 'react'
 import type { OutcomeType } from '@clementine/shared'
 import { cn } from '@/shared/utils'
 

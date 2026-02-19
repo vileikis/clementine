@@ -6,6 +6,7 @@
  *
  * @see specs/072-outcome-schema-redesign — US2
  */
+import type { AIImageTask } from '@clementine/shared'
 import {
   Select,
   SelectContent,
@@ -13,7 +14,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/ui-kit/ui/select'
-import type { AIImageTask } from '@clementine/shared'
 
 const TASK_OPTIONS: { value: AIImageTask; label: string }[] = [
   { value: 'text-to-image', label: 'Text to Image' },
