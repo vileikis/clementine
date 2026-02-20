@@ -53,9 +53,9 @@ interface JobHandlerContext {
 export const transformPipelineTask = onTaskDispatched(
   {
     region: 'europe-west1',
-    memory: '512MiB',
+    memory: '1GiB',
     cpu: 1,
-    timeoutSeconds: 300, // 5 minutes
+    timeoutSeconds: 540, // 9 minutes (accommodates Veo video generation)
     minInstances: 0, // Keep one warm instance to reduce cold starts
     maxInstances: 20, // Control max scaling
     concurrency: 1, // One job per instance (FFmpeg is resource-intensive)
@@ -77,11 +77,14 @@ export const transformPipelineTask = onTaskDispatched(
       await markJobRunning(context)
 
       // 3. Execute outcome
+      const { projectId, job: contextJob } = context
       const outcomeContext: OutcomeContext = {
         job: context.job,
         snapshot: context.job.snapshot,
         startTime: Date.now(),
         tmpDir: context.tmpDir,
+        reportProgress: (progress) =>
+          updateJobProgress(projectId, contextJob.id, progress),
       }
       const output = await runOutcome(outcomeContext)
 

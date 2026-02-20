@@ -70,7 +70,7 @@ export const imageGenerationConfigSchema = z.object({
 export const videoGenerationConfigSchema = z.object({
   prompt: z.string().default(''),
   model: aiVideoModelSchema.default('veo-3.1-fast-generate-001'),
-  duration: z.number().min(1).max(60).default(5),
+  duration: z.union([z.literal(4), z.literal(6), z.literal(8)]).default(8),
   aspectRatio: videoAspectRatioSchema.nullable().default(null),
 })
 
@@ -102,7 +102,7 @@ export const gifOutcomeConfigSchema = z.object({
 /** Video outcome config — placeholder for future implementation. */
 export const videoOutcomeConfigSchema = z.object({
   captureStepId: z.string(),
-  aspectRatio: videoAspectRatioSchema.default('1:1'),
+  aspectRatio: videoAspectRatioSchema.default('9:16'),
 })
 
 // ── AI Video ─────────────────────────────────────────────────

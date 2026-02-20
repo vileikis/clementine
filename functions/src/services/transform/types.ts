@@ -3,7 +3,7 @@
  *
  * Shared types for the transform pipeline execution.
  */
-import type { Job, JobSnapshot, JobOutput, MediaReference } from '@clementine/shared'
+import type { Job, JobSnapshot, JobOutput, JobProgress, MediaReference } from '@clementine/shared'
 
 /**
  * Context for pipeline execution
@@ -85,6 +85,8 @@ export interface OutcomeContext {
   startTime: number
   /** Temporary directory for intermediate files */
   tmpDir: string
+  /** Optional callback to report intermediate progress */
+  reportProgress?: (progress: JobProgress) => Promise<void>
 }
 
 /**

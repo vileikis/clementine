@@ -21,6 +21,12 @@ export interface UploadOutputParams {
   sessionId: string
   /** Temporary directory for intermediate files (thumbnail) */
   tmpDir: string
+  /** Output format (default: 'image') */
+  format?: 'image' | 'video'
+  /** Output dimensions (default: { width: 1024, height: 1024 }) */
+  dimensions?: { width: number; height: number }
+  /** File extension for storage path (default: 'jpg') */
+  extension?: string
 }
 
 /**
@@ -33,6 +39,9 @@ export async function uploadOutput({
   projectId,
   sessionId,
   tmpDir,
+  format = 'image',
+  dimensions = { width: 1024, height: 1024 },
+  extension = 'jpg',
 }: UploadOutputParams): Promise<Omit<JobOutput, 'processingTimeMs'>> {
   const stats = await fs.stat(outputPath)
 
@@ -40,7 +49,7 @@ export async function uploadOutput({
     projectId,
     sessionId,
     'output',
-    'jpg',
+    extension,
   )
   const url = await uploadToStorage(outputPath, storagePath)
 
@@ -61,11 +70,8 @@ export async function uploadOutput({
     assetId,
     url,
     filePath: storagePath,
-    format: 'image',
-    dimensions: {
-      width: 1024,
-      height: 1024,
-    },
+    format,
+    dimensions,
     sizeBytes: stats.size,
     thumbnailUrl,
   }

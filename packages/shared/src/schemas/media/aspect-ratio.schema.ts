@@ -32,7 +32,7 @@ export const imageAspectRatioSchema = aspectRatioSchema
 /**
  * Video-specific aspect ratios (subset: only 9:16 and 1:1).
  */
-export const videoAspectRatioSchema = z.enum(['9:16', '1:1'])
+export const videoAspectRatioSchema = z.enum(['16:9', '9:16'])
 
 // Type exports
 export type AspectRatio = z.infer<typeof aspectRatioSchema>

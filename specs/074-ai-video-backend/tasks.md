@@ -19,11 +19,11 @@
 
 **Purpose**: Update shared package schemas to match Veo API constraints. These changes are prerequisites for all video outcome work.
 
-- [ ] T001 Update `videoAspectRatioSchema` in `packages/shared/src/schemas/experience/outcome.schema.ts` — replace `'9:16' | '1:1'` with `'16:9' | '9:16'` to match Veo's supported aspect ratios. Also update the `VideoAspectRatio` type export if it exists separately. See research.md R-002 for rationale.
+- [X] T001 Update `videoAspectRatioSchema` in `packages/shared/src/schemas/experience/outcome.schema.ts` — replace `'9:16' | '1:1'` with `'16:9' | '9:16'` to match Veo's supported aspect ratios. Also update the `VideoAspectRatio` type export if it exists separately. See research.md R-002 for rationale.
 
-- [ ] T002 Update `videoGenerationConfigSchema` duration field in `packages/shared/src/schemas/experience/outcome.schema.ts` — replace `z.number().min(1).max(60).default(5)` with `z.union([z.literal(4), z.literal(6), z.literal(8)]).default(8)` to match Veo 3.1 supported durations. See research.md R-003 for rationale.
+- [X] T002 Update `videoGenerationConfigSchema` duration field in `packages/shared/src/schemas/experience/outcome.schema.ts` — replace `z.number().min(1).max(60).default(5)` with `z.union([z.literal(4), z.literal(6), z.literal(8)]).default(8)` to match Veo 3.1 supported durations. See research.md R-003 for rationale.
 
-- [ ] T003 Build shared package and run tests — execute `pnpm --filter @clementine/shared build && pnpm --filter @clementine/shared test` to verify schema changes compile and existing tests pass. Fix any failures from the schema tightening (e.g., test fixtures using `1:1` or `duration: 5`).
+- [X] T003 Build shared package and run tests — execute `pnpm --filter @clementine/shared build && pnpm --filter @clementine/shared test` to verify schema changes compile and existing tests pass. Fix any failures from the schema tightening (e.g., test fixtures using `1:1` or `duration: 5`).
 
 ---
 
@@ -33,7 +33,7 @@
 
 **CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T004 [P] Create `aiGenerateVideo` operation in `functions/src/services/transform/operations/aiGenerateVideo.ts` — new file implementing the Veo video generation operation. Must:
+- [X] T004 [P] Create `aiGenerateVideo` operation in `functions/src/services/transform/operations/aiGenerateVideo.ts` — new file implementing the Veo video generation operation. Must:
   - Define `GenerateVideoRequest` type: `{ prompt, model, aspectRatio, duration, startFrame, endFrame? }` (see data-model.md)
   - Define `GeneratedVideo` return type: `{ outputPath, mimeType, sizeBytes, duration, dimensions }` (see data-model.md)
   - Initialize `GoogleGenAI` client with `vertexai: true`, project from `GCLOUD_PROJECT` env, location from `VERTEX_AI_LOCATION` Firebase param (NOT `'global'` — see research.md R-001)
@@ -50,19 +50,19 @@
   - Return `GeneratedVideo` with all fields populated
   - Follow the same module pattern as `aiGenerateImage.ts` (named export, types at top, single exported function)
 
-- [ ] T005 [P] Extend `uploadOutput` in `functions/src/services/transform/operations/uploadOutput.ts` — add optional parameters to `UploadOutputParams` interface: `format?: 'image' | 'video'` (default `'image'`), `dimensions?: { width: number; height: number }` (default `{ width: 1024, height: 1024 }`), `extension?: string` (default `'jpg'`). Update the function body to:
+- [X] T005 [P] Extend `uploadOutput` in `functions/src/services/transform/operations/uploadOutput.ts` — add optional parameters to `UploadOutputParams` interface: `format?: 'image' | 'video'` (default `'image'`), `dimensions?: { width: number; height: number }` (default `{ width: 1024, height: 1024 }`), `extension?: string` (default `'jpg'`). Update the function body to:
   - Use `extension` param in `getOutputStoragePath()` call instead of hardcoded `'jpg'`
   - Use `format` param in the returned object instead of hardcoded `'image'`
   - Use `dimensions` param in the returned object instead of hardcoded `{ width: 1024, height: 1024 }`
   - All existing callers (photoOutcome, aiImageOutcome) must continue working unchanged since all new params have defaults matching current behavior
 
-- [ ] T006 [P] Add `reportProgress` callback to `OutcomeContext` in `functions/src/services/transform/types.ts` — add optional field `reportProgress?: (progress: JobProgress) => Promise<void>` to the `OutcomeContext` interface. Import `JobProgress` type from the shared package or the job repository. This is backward-compatible — existing executors ignore it.
+- [X] T006 [P] Add `reportProgress` callback to `OutcomeContext` in `functions/src/services/transform/types.ts` — add optional field `reportProgress?: (progress: JobProgress) => Promise<void>` to the `OutcomeContext` interface. Import `JobProgress` type from the shared package or the job repository. This is backward-compatible — existing executors ignore it.
 
-- [ ] T007 [P] Wire up progress callback and update config in `functions/src/tasks/transformPipelineTask.ts` — two changes:
+- [X] T007 [P] Wire up progress callback and update config in `functions/src/tasks/transformPipelineTask.ts` — two changes:
   1. **Progress callback**: Before calling `runOutcome(outcomeContext)`, create a `reportProgress` callback that calls `updateJobProgress(projectId, jobId, progress)`. Add it to the `outcomeContext` object. This gives executors the ability to report intermediate progress.
   2. **Timeout/memory config**: Increase `timeoutSeconds` from `300` to `540` (9 min) and `memory` from `'512MiB'` to `'1GiB'` to accommodate Veo's longer processing time and video file sizes. See research.md R-008.
 
-- [ ] T008 Update `startTransformPipeline` callable in `functions/src/callable/startTransformPipeline.ts` — three changes:
+- [X] T008 Update `startTransformPipeline` callable in `functions/src/callable/startTransformPipeline.ts` — three changes:
   1. Add `'ai.video'` to the `IMPLEMENTED_OUTCOME_TYPES` Set
   2. Add validation guard: `if (outcome.type === 'ai.video' && !outcome.aiVideo)` → throw `HttpsError('invalid-argument', ...)`
   3. Extend `getOutcomeAspectRatio()` to handle `'ai.video'` → return `outcome.aiVideo?.aspectRatio` (same pattern as `'ai.image'` → `outcome.aiImage?.aspectRatio`)
@@ -79,7 +79,7 @@
 
 ### Implementation for User Story 1
 
-- [ ] T009 [US1] Create `aiVideoOutcome` executor in `functions/src/services/transform/outcomes/aiVideoOutcome.ts` — new file implementing the `animate` task flow. Follow the `aiImageOutcome.ts` pattern exactly (see research.md R-009). The executor must:
+- [X] T009 [US1] Create `aiVideoOutcome` executor in `functions/src/services/transform/outcomes/aiVideoOutcome.ts` — new file implementing the `animate` task flow. Follow the `aiImageOutcome.ts` pattern exactly (see research.md R-009). The executor must:
   - Export `async function aiVideoOutcome(ctx: OutcomeContext): Promise<JobOutput>`
   - Destructure `{ job, snapshot, tmpDir, startTime, reportProgress }` from `ctx`
   - Guard: assert `snapshot.outcome?.aiVideo` exists, throw if missing
@@ -96,9 +96,9 @@
   - Call `uploadOutput({ outputPath: generatedVideo.outputPath, projectId: job.projectId, sessionId: job.sessionId, tmpDir, format: 'video', dimensions: generatedVideo.dimensions, extension: 'mp4' })`
   - Return `{ ...uploaded, processingTimeMs: Date.now() - startTime }`
 
-- [ ] T010 [US1] Register `aiVideoOutcome` in dispatcher in `functions/src/services/transform/engine/runOutcome.ts` — import `aiVideoOutcome` from `../outcomes/aiVideoOutcome` and replace `'ai.video': null` with `'ai.video': aiVideoOutcome` in the `outcomeRegistry` object.
+- [X] T010 [US1] Register `aiVideoOutcome` in dispatcher in `functions/src/services/transform/engine/runOutcome.ts` — import `aiVideoOutcome` from `../outcomes/aiVideoOutcome` and replace `'ai.video': null` with `'ai.video': aiVideoOutcome` in the `outcomeRegistry` object.
 
-- [ ] T011 [US1] Build and type-check functions workspace — run `pnpm functions:build` to verify the entire functions workspace compiles with no TypeScript errors. Fix any type errors that surface from the new code or modified interfaces.
+- [X] T011 [US1] Build and type-check functions workspace — run `pnpm functions:build` to verify the entire functions workspace compiles with no TypeScript errors. Fix any type errors that surface from the new code or modified interfaces.
 
 **Checkpoint**: At this point, the animate task works end-to-end. A guest can upload a photo and receive an AI-generated video. This is the MVP.
 

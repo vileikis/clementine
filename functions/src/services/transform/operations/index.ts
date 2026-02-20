@@ -8,6 +8,8 @@
  * - Overlay resolution now happens at job creation in startTransformPipeline.ts
  */
 export { aiGenerateImage } from './aiGenerateImage'
+export { aiGenerateVideo } from './aiGenerateVideo'
+export type { GenerateVideoRequest, GeneratedVideo } from './aiGenerateVideo'
 export { applyOverlay } from './applyOverlay'
 export { uploadOutput } from './uploadOutput'
 export type { UploadOutputParams } from './uploadOutput'
