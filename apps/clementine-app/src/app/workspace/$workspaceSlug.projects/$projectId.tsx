@@ -1,8 +1,4 @@
-import { createFileRoute, notFound } from '@tanstack/react-router'
-import { doc, getDoc } from 'firebase/firestore'
-import { projectSchema } from '@clementine/shared'
-import { firestore } from '@/integrations/firebase/client'
-import { convertFirestoreDoc } from '@/shared/utils/firestore-utils'
+import { createFileRoute } from '@tanstack/react-router'
 import { NotFound } from '@/shared/components/NotFound'
 import { ProjectLayout, useProject } from '@/domains/project'
 
@@ -13,47 +9,29 @@ import { ProjectLayout, useProject } from '@/domains/project'
  * Access: Admin only (enforced by parent route)
  *
  * Layout for project routes (designer, distribute, connect, analytics).
- * Loads project data and renders the project layout with primary tabs.
+ * Project data is fetched client-side via useProject hook (real-time updates).
  */
 export const Route = createFileRoute(
   '/workspace/$workspaceSlug/projects/$projectId',
 )({
-  loader: async ({ params }) => {
-    // Fetch project
-    const projectRef = doc(firestore, 'projects', params.projectId)
-    const projectDoc = await getDoc(projectRef)
-
-    if (!projectDoc.exists()) {
-      throw notFound()
-    }
-
-    // Convert Firestore document (Timestamps → numbers) and validate with schema
-    const project = convertFirestoreDoc(projectDoc, projectSchema)
-
-    // Return 404 for soft-deleted projects
-    if (project.status === 'deleted') {
-      throw notFound()
-    }
-
-    // TODO: Validate project belongs to workspace (prevent cross-workspace access)
-    // For now, skipping this check to simplify
-
-    return { project } as { project: Record<string, {}> }
-  },
   component: ProjectLayoutRoute,
   notFoundComponent: ProjectNotFound,
 })
 
 function ProjectLayoutRoute() {
   const { workspaceSlug, projectId } = Route.useParams()
+  const { data: project, isLoading } = useProject(projectId)
 
-  // Get data from hooks (real-time updates enabled)
-  const { data: project } = useProject(projectId)
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-muted-foreground">Loading project...</div>
+      </div>
+    )
+  }
 
-  // Data should be immediately available from loader cache
-  // This check is a safety guard only
-  if (!project) {
-    return null
+  if (!project || project.status === 'deleted') {
+    return <ProjectNotFound />
   }
 
   return <ProjectLayout project={project} workspaceSlug={workspaceSlug} />

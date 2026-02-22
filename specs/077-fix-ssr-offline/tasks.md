@@ -44,8 +44,8 @@
 
 ### Implementation
 
-- [ ] T001 [US1] Remove `loader` property and its contents (lines 21-42) from `apps/clementine-app/src/app/workspace/$workspaceSlug.projects/$projectId.tsx`
-- [ ] T002 [US1] Remove unused imports (`doc`, `getDoc` from `firebase/firestore`; `projectSchema` from `@clementine/shared`; `firestore` from `@/integrations/firebase/client`; `convertFirestoreDoc` from `@/shared/utils/firestore-utils`; `notFound` from `@tanstack/react-router`) from `apps/clementine-app/src/app/workspace/$workspaceSlug.projects/$projectId.tsx`
+- [x] T001 [US1] Remove `loader` property and its contents (lines 21-42) from `apps/clementine-app/src/app/workspace/$workspaceSlug.projects/$projectId.tsx`
+- [x] T002 [US1] Remove unused imports (`doc`, `getDoc` from `firebase/firestore`; `projectSchema` from `@clementine/shared`; `firestore` from `@/integrations/firebase/client`; `convertFirestoreDoc` from `@/shared/utils/firestore-utils`; `notFound` from `@tanstack/react-router`) from `apps/clementine-app/src/app/workspace/$workspaceSlug.projects/$projectId.tsx`
 
 **Checkpoint**: The route no longer has a loader. SSR renders the component directly. The `useProject` hook fetches data client-side. Page refresh no longer produces a 500 error (shows blank/null briefly). Client-side navigation still works because `useProject` was already the data source for the component.
 
@@ -59,7 +59,7 @@
 
 ### Implementation
 
-- [ ] T003 [US2] Destructure `isLoading` from the `useProject(projectId)` return value and add a loading state that renders a centered "Loading project..." message (matching the workspace route pattern in `$workspaceSlug.tsx` lines 43-49) in `apps/clementine-app/src/app/workspace/$workspaceSlug.projects/$projectId.tsx`
+- [x] T003 [US2] Destructure `isLoading` from the `useProject(projectId)` return value and add a loading state that renders a centered "Loading project..." message (matching the workspace route pattern in `$workspaceSlug.tsx` lines 43-49) in `apps/clementine-app/src/app/workspace/$workspaceSlug.projects/$projectId.tsx`
 
 **Checkpoint**: Page refresh shows "Loading project..." text while data loads, then renders the project layout. No blank flash.
 
@@ -73,7 +73,7 @@
 
 ### Implementation
 
-- [ ] T004 [US3] Replace the `if (!project) return null` guard with a check for `!project || project.status === 'deleted'` that renders `<ProjectNotFound />` in `apps/clementine-app/src/app/workspace/$workspaceSlug.projects/$projectId.tsx`
+- [x] T004 [US3] Replace the `if (!project) return null` guard with a check for `!project || project.status === 'deleted'` that renders `<ProjectNotFound />` in `apps/clementine-app/src/app/workspace/$workspaceSlug.projects/$projectId.tsx`
 
 **Checkpoint**: Non-existent and deleted projects show the "Project Not Found" view with a link back to the projects list. Real-time updates also trigger the not-found view if a project is deleted while being viewed.
 
@@ -83,8 +83,8 @@
 
 **Purpose**: Validate the fix passes all quality gates and works in production SSR.
 
-- [ ] T005 Run `pnpm app:check` (format + lint auto-fix) from monorepo root to ensure code quality
-- [ ] T006 Run `pnpm app:type-check` from monorepo root to verify TypeScript compilation
+- [x] T005 Run `pnpm app:check` (format + lint auto-fix) from monorepo root to ensure code quality
+- [x] T006 Run `pnpm app:type-check` from monorepo root to verify TypeScript compilation
 - [ ] T007 Verify fix in dev server (`pnpm app:dev`) — refresh project pages, test navigation, test not-found
 - [ ] T008 Build production app (`pnpm app:build`) and verify SSR works (`pnpm app:start`) — refresh project pages confirm no 500 error
 
