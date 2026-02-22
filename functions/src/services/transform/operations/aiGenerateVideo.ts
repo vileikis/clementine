@@ -2,19 +2,38 @@
  * AI Video Generation Operation
  *
  * Generates video using Google Veo via the @google/genai SDK.
- * Veo writes output directly to the session results folder in GCS.
- * The output is copied to a canonical filename, downloaded locally
- * for thumbnail generation, and the original Veo file is preserved.
+ * Accepts domain-level MediaReference inputs and handles all GCS plumbing.
+ *
+ * Veo API patterns (inferred from media inputs):
+ * 1. sourceMedia only → params.image (animate)
+ * 2. sourceMedia + referenceMedia/styleMedia → config.referenceImages (animate-reference)
+ * 3. sourceMedia + lastFrameMedia → params.image + config.lastFrame (transform/reimagine)
+ *
+ * Output is written directly to the session results folder in GCS,
+ * copied to a canonical filename, and downloaded locally for thumbnail/overlay.
  *
  * @see specs/074-ai-video-backend/research.md R-001, R-006
  */
 import { defineString } from 'firebase-functions/params'
-import { GoogleGenAI, type Image } from '@google/genai'
+import {
+  GoogleGenAI,
+  VideoGenerationReferenceType,
+  type Image,
+  type VideoGenerationReferenceImage,
+} from '@google/genai'
 import { logger } from 'firebase-functions/v2'
 import * as fs from 'fs/promises'
 
-import type { AIVideoModel, VideoAspectRatio } from '@clementine/shared'
+import type {
+  AIVideoModel,
+  MediaReference,
+  VideoAspectRatio,
+} from '@clementine/shared'
 import { storage } from '../../../infra/firebase-admin'
+import {
+  getOutputStoragePath,
+  getStoragePathFromMediaReference,
+} from '../../../infra/storage'
 import { getMediaDimensions } from '../../ffmpeg/probe'
 import { sleep } from '../helpers/sleep'
 
@@ -36,6 +55,11 @@ const MAX_POLL_TIMEOUT_MS = 5 * 60 * 1000 // 5 minutes
 
 /**
  * Request for AI video generation
+ *
+ * The Veo API pattern is inferred from which media fields are provided:
+ * - sourceMedia only → animate (params.image)
+ * - sourceMedia + referenceMedia/styleMedia → animate-reference (config.referenceImages)
+ * - sourceMedia + lastFrameMedia → transform/reimagine (params.image + config.lastFrame)
  */
 export interface GenerateVideoRequest {
   /** Video generation prompt */
@@ -46,18 +70,24 @@ export interface GenerateVideoRequest {
   aspectRatio: VideoAspectRatio
   /** Duration in seconds (4–8) */
   duration: number
-  /** GCS URI for start frame image */
-  startFrameGcsUri: string
-  /** GCS URI for end frame image (optional) */
-  endFrameGcsUri?: string
+  /** Source image (subject photo) — always required */
+  sourceMedia: MediaReference
+  /** End frame image for transform/reimagine */
+  lastFrameMedia?: MediaReference
+  /** Style reference image for animate-reference */
+  styleMedia?: MediaReference
+  /** Asset reference images for animate-reference */
+  referenceMedia?: MediaReference[]
 }
 
 /**
  * Output destination configuration
  */
 export interface VideoOutputConfig {
-  /** Canonical storage path for final output (e.g., projects/.../results/output.mp4) */
-  storagePath: string
+  /** Project document ID */
+  projectId: string
+  /** Session document ID */
+  sessionId: string
   /** Local temp directory for downloaded file */
   tmpDir: string
 }
@@ -89,7 +119,7 @@ export interface GeneratedVideo {
 /**
  * Generate a video using Google Veo
  *
- * @param request - Video generation parameters
+ * @param request - Video generation parameters with media references
  * @param output - Output destination configuration
  * @returns Generated video result with local path and GCS metadata
  */
@@ -107,17 +137,25 @@ export async function aiGenerateVideo(
     model,
     aspectRatio,
     duration,
-    hasEndFrame: !!request.endFrameGcsUri,
+    hasLastFrame: !!request.lastFrameMedia,
+    hasReferenceMedia: !!request.referenceMedia?.length,
+    hasStyleMedia: !!request.styleMedia,
     promptLength: prompt.length,
   })
 
   const client = initVeoClient()
   const bucket = storage.bucket()
 
-  // Derive the GCS output folder from the canonical storage path
-  const outputFolder = output.storagePath.substring(
+  // Compute output paths
+  const canonicalPath = getOutputStoragePath(
+    output.projectId,
+    output.sessionId,
+    'output',
+    'mp4',
+  )
+  const outputFolder = canonicalPath.substring(
     0,
-    output.storagePath.lastIndexOf('/') + 1,
+    canonicalPath.lastIndexOf('/') + 1,
   )
   const outputGcsUri = `gs://${bucket.name}/${outputFolder}`
 
@@ -127,8 +165,9 @@ export async function aiGenerateVideo(
     location: VERTEX_AI_LOCATION.value(),
   })
 
-  // Build and submit Veo request
-  const operation = await submitVeoRequest(client, request, outputGcsUri)
+  // Build and submit Veo request (pattern inferred from media inputs)
+  const veoParams = buildVeoParams(request, bucket.name, outputGcsUri)
+  const operation = await client.models.generateVideos(veoParams)
 
   // Poll until complete
   const completedOp = await pollOperation(client, operation)
@@ -138,26 +177,26 @@ export async function aiGenerateVideo(
 
   logger.info('[AIVideoGenerate] Video generated, copying to canonical path', {
     videoUri,
-    canonicalPath: output.storagePath,
+    canonicalPath,
   })
 
   // Copy Veo output to canonical path (keep original for dev visibility)
   const veoStoragePath = parseGcsUri(videoUri, bucket.name)
-  await bucket.file(veoStoragePath).copy(bucket.file(output.storagePath))
-  await bucket.file(output.storagePath).makePublic()
+  await bucket.file(veoStoragePath).copy(bucket.file(canonicalPath))
+  await bucket.file(canonicalPath).makePublic()
 
-  const url = `https://storage.googleapis.com/${bucket.name}/${output.storagePath}`
+  const url = `https://storage.googleapis.com/${bucket.name}/${canonicalPath}`
 
   // Download locally for thumbnail generation (and future overlay)
   const localPath = `${output.tmpDir}/output.mp4`
-  await bucket.file(output.storagePath).download({ destination: localPath })
+  await bucket.file(canonicalPath).download({ destination: localPath })
 
   // Get file metadata via local file
   const stats = await fs.stat(localPath)
   const dimensions = await getMediaDimensions(localPath)
 
   logger.info('[AIVideoGenerate] Video generation completed', {
-    storagePath: output.storagePath,
+    storagePath: canonicalPath,
     sizeBytes: stats.size,
     dimensions,
     duration,
@@ -165,13 +204,113 @@ export async function aiGenerateVideo(
 
   return {
     localPath,
-    storagePath: output.storagePath,
+    storagePath: canonicalPath,
     url,
     mimeType: 'video/mp4',
     sizeBytes: stats.size,
     duration,
     dimensions,
   }
+}
+
+// =============================================================================
+// Veo Request Building
+// =============================================================================
+
+/**
+ * Build Veo API parameters based on media inputs
+ *
+ * Infers the correct API pattern:
+ * - sourceMedia only → params.image (animate)
+ * - referenceMedia/styleMedia present → config.referenceImages (animate-reference)
+ * - lastFrameMedia present → params.image + config.lastFrame (transform/reimagine)
+ */
+function buildVeoParams(
+  request: GenerateVideoRequest,
+  bucketName: string,
+  outputGcsUri: string,
+) {
+  const { prompt, model, aspectRatio, duration, sourceMedia } = request
+  const hasReferences = !!(request.referenceMedia?.length || request.styleMedia)
+
+  const baseConfig = {
+    aspectRatio,
+    durationSeconds: duration,
+    personGeneration: 'allow_adult' as const,
+    numberOfVideos: 1,
+    outputGcsUri,
+  }
+
+  // Pattern 2: animate-reference (config.referenceImages, no params.image)
+  if (hasReferences) {
+    return {
+      model,
+      prompt,
+      config: {
+        ...baseConfig,
+        referenceImages: buildReferenceImages(request, bucketName),
+      },
+    }
+  }
+
+  // Pattern 3: transform/reimagine (params.image + config.lastFrame)
+  if (request.lastFrameMedia) {
+    return {
+      model,
+      prompt,
+      image: mediaRefToGcsImage(sourceMedia, bucketName),
+      config: {
+        ...baseConfig,
+        lastFrame: mediaRefToGcsImage(request.lastFrameMedia, bucketName),
+      },
+    }
+  }
+
+  // Pattern 1: animate (params.image only)
+  return {
+    model,
+    prompt,
+    image: mediaRefToGcsImage(sourceMedia, bucketName),
+    config: baseConfig,
+  }
+}
+
+/**
+ * Build referenceImages array for animate-reference pattern
+ *
+ * sourceMedia → asset type, styleMedia → style type, referenceMedia → asset type
+ */
+function buildReferenceImages(
+  request: GenerateVideoRequest,
+  bucketName: string,
+): VideoGenerationReferenceImage[] {
+  const refs: VideoGenerationReferenceImage[] = []
+
+  // Source media as asset reference
+  refs.push({
+    image: mediaRefToGcsImage(request.sourceMedia, bucketName),
+    referenceType: VideoGenerationReferenceType.ASSET,
+  })
+
+  // Additional asset references
+  if (request.referenceMedia) {
+    for (const ref of request.referenceMedia) {
+      refs.push({
+        image: mediaRefToGcsImage(ref, bucketName),
+        referenceType: VideoGenerationReferenceType.ASSET,
+      })
+    }
+  }
+
+  // Style media
+  if (request.styleMedia) {
+    refs.push({
+      image: mediaRefToGcsImage(request.styleMedia, bucketName),
+      referenceType: VideoGenerationReferenceType.STYLE,
+    })
+  }
+
+  return refs
 }
 
 // =============================================================================
@@ -196,42 +335,14 @@ function initVeoClient(): GoogleGenAI {
 }
 
 /**
- * Build an Image reference from a GCS URI for the Veo API
+ * Convert a MediaReference to a GCS Image for the Veo API
  */
-function buildGcsImage(gcsUri: string): Image {
+function mediaRefToGcsImage(ref: MediaReference, bucketName: string): Image {
+  const storagePath = getStoragePathFromMediaReference(ref)
   return {
-    gcsUri,
+    gcsUri: `gs://${bucketName}/${storagePath}`,
     mimeType: 'image/jpeg',
   }
-}
-
-/**
- * Submit a video generation request to Veo
- */
-async function submitVeoRequest(
-  client: GoogleGenAI,
-  request: GenerateVideoRequest,
-  outputGcsUri: string,
-) {
-  const { prompt, model, aspectRatio, duration, startFrameGcsUri, endFrameGcsUri } =
-    request
-
-  const startFrame = buildGcsImage(startFrameGcsUri)
-  const lastFrame = endFrameGcsUri ? buildGcsImage(endFrameGcsUri) : undefined
-
-  return client.models.generateVideos({
-    model,
-    prompt,
-    image: startFrame,
-    config: {
-      aspectRatio,
-      durationSeconds: duration,
-      personGeneration: 'allow_adult',
-      numberOfVideos: 1,
-      outputGcsUri,
-      ...(lastFrame ? { lastFrame } : {}),
-    },
-  })
 }
 
 /**
@@ -241,7 +352,9 @@ async function submitVeoRequest(
  */
 async function pollOperation(
   client: GoogleGenAI,
-  initialOperation: Awaited<ReturnType<GoogleGenAI['models']['generateVideos']>>,
+  initialOperation: Awaited<
+    ReturnType<GoogleGenAI['models']['generateVideos']>
+  >,
 ) {
   let operation = initialOperation
   const pollStart = Date.now()
@@ -269,7 +382,9 @@ async function pollOperation(
  * Validates the operation completed successfully and was not filtered.
  */
 function extractVideoUri(
-  operation: Awaited<ReturnType<GoogleGenAI['operations']['getVideosOperation']>>,
+  operation: Awaited<
+    ReturnType<GoogleGenAI['operations']['getVideosOperation']>
+  >,
 ): string {
   if (operation.error) {
     throw new Error(

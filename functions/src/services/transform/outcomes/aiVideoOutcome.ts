@@ -6,9 +6,9 @@
  *
  * Flow (animate):
  * 1. Read aiVideo config from snapshot
- * 2. Build GCS URI for subject photo (no download needed)
+ * 2. Get source media reference from capture step
  * 3. Resolve video generation prompt
- * 4. Generate video via Veo (writes directly to session results folder)
+ * 4. Generate video via Veo (operation handles all GCS plumbing)
  * 5. Generate + upload thumbnail from local copy
  *
  * @see specs/074-ai-video-backend
@@ -20,12 +20,7 @@ import { getSourceMedia } from '../helpers/getSourceMedia'
 import { resolvePromptMentions } from '../bindings/resolvePromptMentions'
 import { aiGenerateVideo } from '../operations/aiGenerateVideo'
 import { generateThumbnail } from '../../ffmpeg/images'
-import {
-  getStoragePathFromMediaReference,
-  getOutputStoragePath,
-  uploadToStorage,
-} from '../../../infra/storage'
-import { storage } from '../../../infra/firebase-admin'
+import { getOutputStoragePath, uploadToStorage } from '../../../infra/storage'
 
 /**
  * Execute AI video outcome
@@ -52,26 +47,14 @@ export async function aiVideoOutcome(ctx: OutcomeContext): Promise<JobOutput> {
     throw new Error('AI Video outcome has empty prompt')
   }
 
-  // Build GCS URI for source photo (already in storage, no download needed)
+  // Get source media reference from capture step
   const sourceMedia = getSourceMedia(snapshot.sessionResponses, captureStepId)
-  const bucket = storage.bucket()
-  const sourceStoragePath = getStoragePathFromMediaReference(sourceMedia)
-  const startFrameGcsUri = `gs://${bucket.name}/${sourceStoragePath}`
-
-  // For animate task: start frame = subject photo, no end frame
-  let endFrameGcsUri: string | undefined
-
-  if (task === 'animate') {
-    // Start frame is the subject photo, no end frame needed
-  } else {
-    throw new Error(`Unsupported ai.video task: ${task}`)
-  }
 
   // Resolve video generation prompt
   const resolved = resolvePromptMentions(
     videoGeneration.prompt,
     snapshot.sessionResponses,
-    [], // No refMedia for video generation prompt
+    [],
   )
 
   logger.info('[AIVideoOutcome] Prompt resolved', {
@@ -90,25 +73,18 @@ export async function aiVideoOutcome(ctx: OutcomeContext): Promise<JobOutput> {
     )
   }
 
-  // Generate video (writes directly to session results folder in GCS)
-  const canonicalStoragePath = getOutputStoragePath(
-    job.projectId,
-    job.sessionId,
-    'output',
-    'mp4',
-  )
-
+  // Generate video (operation handles GCS URIs, output paths, download)
   const generatedVideo = await aiGenerateVideo(
     {
       prompt: resolved.text,
       model: videoGeneration.model,
       aspectRatio: videoGeneration.aspectRatio ?? aspectRatio,
       duration: videoGeneration.duration,
-      startFrameGcsUri,
-      endFrameGcsUri,
+      sourceMedia,
     },
     {
-      storagePath: canonicalStoragePath,
+      projectId: job.projectId,
+      sessionId: job.sessionId,
       tmpDir,
     },
   )
