@@ -27,7 +27,7 @@ import {
 import { queueTransformJob } from '../infra/task-queues'
 
 /** Outcome types that have implemented executors */
-const IMPLEMENTED_OUTCOME_TYPES = new Set(['photo', 'ai.image'])
+const IMPLEMENTED_OUTCOME_TYPES = new Set(['photo', 'ai.image', 'ai.video'])
 
 /**
  * Get the aspect ratio from the active outcome type's config.
@@ -36,12 +36,16 @@ function getOutcomeAspectRatio(outcome: {
   type: string | null
   photo?: { aspectRatio?: string } | null
   aiImage?: { aspectRatio?: string } | null
+  aiVideo?: { aspectRatio?: string } | null
 }): AspectRatio {
   if (outcome.type === 'photo' && outcome.photo?.aspectRatio) {
     return outcome.photo.aspectRatio as AspectRatio
   }
   if (outcome.type === 'ai.image' && outcome.aiImage?.aspectRatio) {
     return outcome.aiImage.aspectRatio as AspectRatio
+  }
+  if (outcome.type === 'ai.video' && outcome.aiVideo?.aspectRatio) {
+    return outcome.aiVideo.aspectRatio as AspectRatio
   }
   return '1:1'
 }
@@ -152,6 +156,12 @@ export const startTransformPipelineV2 = onCall(
       throw new HttpsError(
         'invalid-argument',
         'Cannot create job: AI image configuration is missing',
+      )
+    }
+    if (outcome.type === 'ai.video' && !outcome.aiVideo) {
+      throw new HttpsError(
+        'invalid-argument',
+        'Cannot create job: AI video configuration is missing',
       )
     }
 

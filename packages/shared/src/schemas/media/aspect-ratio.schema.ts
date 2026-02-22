@@ -30,9 +30,9 @@ export const overlayKeySchema = z.enum(['1:1', '3:2', '2:3', '9:16', 'default'])
 export const imageAspectRatioSchema = aspectRatioSchema
 
 /**
- * Video-specific aspect ratios (subset: only 9:16 and 1:1).
+ * Video-specific aspect ratios (subset: 16:9 and 9:16).
  */
-export const videoAspectRatioSchema = z.enum(['9:16', '1:1'])
+export const videoAspectRatioSchema = z.enum(['16:9', '9:16'])
 
 // Type exports
 export type AspectRatio = z.infer<typeof aspectRatioSchema>

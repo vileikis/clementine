@@ -24,7 +24,10 @@ import {
 import type { Job, JobOutput } from '@clementine/shared'
 import { runOutcome, type OutcomeContext } from '../services/transform'
 import { createTempDir, cleanupTempDir } from '../infra/temp-dir'
-import { queueDispatchExports, queueSendSessionEmail } from '../infra/task-queues'
+import {
+  queueDispatchExports,
+  queueSendSessionEmail,
+} from '../infra/task-queues'
 
 /**
  * Job handler context for cleanup management
@@ -53,10 +56,10 @@ interface JobHandlerContext {
 export const transformPipelineTask = onTaskDispatched(
   {
     region: 'europe-west1',
-    memory: '512MiB',
+    memory: '1GiB',
     cpu: 1,
-    timeoutSeconds: 300, // 5 minutes
-    minInstances: 0, // Keep one warm instance to reduce cold starts
+    timeoutSeconds: 600, // 10 minutes (accommodates Veo video generation)
+    minInstances: 0,
     maxInstances: 20, // Control max scaling
     concurrency: 1, // One job per instance (FFmpeg is resource-intensive)
     retryConfig: {
