@@ -6,10 +6,10 @@
  *
  * Flow (animate):
  * 1. Read aiVideo config from snapshot
- * 2. Download subject photo from capture step
+ * 2. Build GCS URI for subject photo (no download needed)
  * 3. Resolve video generation prompt
- * 4. Generate video via Veo (aiGenerateVideo)
- * 5. Upload output with thumbnail
+ * 4. Generate video via Veo (writes directly to session results folder)
+ * 5. Generate + upload thumbnail from local copy
  *
  * @see specs/074-ai-video-backend
  */
@@ -19,17 +19,19 @@ import type { OutcomeContext } from '../types'
 import { getSourceMedia } from '../helpers/getSourceMedia'
 import { resolvePromptMentions } from '../bindings/resolvePromptMentions'
 import { aiGenerateVideo } from '../operations/aiGenerateVideo'
-import { uploadOutput } from '../operations/uploadOutput'
+import { generateThumbnail } from '../../ffmpeg/images'
 import {
-  downloadFromStorage,
   getStoragePathFromMediaReference,
+  getOutputStoragePath,
+  uploadToStorage,
 } from '../../../infra/storage'
+import { storage } from '../../../infra/firebase-admin'
 
 /**
  * Execute AI video outcome
  */
 export async function aiVideoOutcome(ctx: OutcomeContext): Promise<JobOutput> {
-  const { job, snapshot, tmpDir, startTime, reportProgress } = ctx
+  const { job, snapshot, tmpDir, startTime } = ctx
   const { outcome, overlayChoice } = snapshot
 
   if (!outcome?.aiVideo) {
@@ -50,22 +52,14 @@ export async function aiVideoOutcome(ctx: OutcomeContext): Promise<JobOutput> {
     throw new Error('AI Video outcome has empty prompt')
   }
 
-  // Report starting progress
-  await reportProgress?.({
-    currentStep: 'starting',
-    percentage: 10,
-    message: 'Processing video...',
-  })
-
-  // Download subject photo
+  // Build GCS URI for source photo (already in storage, no download needed)
   const sourceMedia = getSourceMedia(snapshot.sessionResponses, captureStepId)
-  const localSourcePath = `${tmpDir}/source.jpg`
-  const storagePath = getStoragePathFromMediaReference(sourceMedia)
-  await downloadFromStorage(storagePath, localSourcePath)
+  const bucket = storage.bucket()
+  const sourceStoragePath = getStoragePathFromMediaReference(sourceMedia)
+  const startFrameGcsUri = `gs://${bucket.name}/${sourceStoragePath}`
 
   // For animate task: start frame = subject photo, no end frame
-  let startFrame = localSourcePath
-  let endFrame: string | undefined
+  let endFrameGcsUri: string | undefined
 
   if (task === 'animate') {
     // Start frame is the subject photo, no end frame needed
@@ -85,34 +79,6 @@ export async function aiVideoOutcome(ctx: OutcomeContext): Promise<JobOutput> {
     resolvedLength: resolved.text.length,
   })
 
-  // Report generating progress
-  await reportProgress?.({
-    currentStep: 'generating-video',
-    percentage: 20,
-    message: 'Generating video...',
-  })
-
-  // Generate video
-  const generatedVideo = await aiGenerateVideo(
-    {
-      prompt: resolved.text,
-      model: videoGeneration.model,
-      aspectRatio: videoGeneration.aspectRatio ?? aspectRatio,
-      duration: videoGeneration.duration,
-      startFrame,
-      endFrame,
-    },
-    tmpDir,
-    job.id,
-  )
-
-  // Report uploading progress
-  await reportProgress?.({
-    currentStep: 'uploading',
-    percentage: 80,
-    message: 'Uploading result...',
-  })
-
   // Overlay: skip for video outcomes
   if (overlayChoice) {
     logger.warn(
@@ -124,19 +90,49 @@ export async function aiVideoOutcome(ctx: OutcomeContext): Promise<JobOutput> {
     )
   }
 
-  // Upload output
-  const uploaded = await uploadOutput({
-    outputPath: generatedVideo.outputPath,
-    projectId: job.projectId,
-    sessionId: job.sessionId,
-    tmpDir,
-    format: 'video',
-    dimensions: generatedVideo.dimensions,
-    extension: 'mp4',
-  })
+  // Generate video (writes directly to session results folder in GCS)
+  const canonicalStoragePath = getOutputStoragePath(
+    job.projectId,
+    job.sessionId,
+    'output',
+    'mp4',
+  )
+
+  const generatedVideo = await aiGenerateVideo(
+    {
+      prompt: resolved.text,
+      model: videoGeneration.model,
+      aspectRatio: videoGeneration.aspectRatio ?? aspectRatio,
+      duration: videoGeneration.duration,
+      startFrameGcsUri,
+      endFrameGcsUri,
+    },
+    {
+      storagePath: canonicalStoragePath,
+      tmpDir,
+    },
+  )
+
+  // Generate and upload thumbnail from local copy
+  const thumbLocalPath = `${tmpDir}/thumb.jpg`
+  await generateThumbnail(generatedVideo.localPath, thumbLocalPath, 300)
+
+  const thumbStoragePath = getOutputStoragePath(
+    job.projectId,
+    job.sessionId,
+    'thumb',
+    'jpg',
+  )
+  const thumbnailUrl = await uploadToStorage(thumbLocalPath, thumbStoragePath)
 
   const output: JobOutput = {
-    ...uploaded,
+    assetId: `${job.sessionId}-output`,
+    url: generatedVideo.url,
+    filePath: generatedVideo.storagePath,
+    format: 'video',
+    dimensions: generatedVideo.dimensions,
+    sizeBytes: generatedVideo.sizeBytes,
+    thumbnailUrl,
     processingTimeMs: Date.now() - startTime,
   }
 

@@ -77,14 +77,11 @@ export const transformPipelineTask = onTaskDispatched(
       await markJobRunning(context)
 
       // 3. Execute outcome
-      const { projectId, job: contextJob } = context
       const outcomeContext: OutcomeContext = {
         job: context.job,
         snapshot: context.job.snapshot,
         startTime: Date.now(),
         tmpDir: context.tmpDir,
-        reportProgress: (progress) =>
-          updateJobProgress(projectId, contextJob.id, progress),
       }
       const output = await runOutcome(outcomeContext)
 

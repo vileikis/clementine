@@ -70,7 +70,7 @@ export const imageGenerationConfigSchema = z.object({
 export const videoGenerationConfigSchema = z.object({
   prompt: z.string().default(''),
   model: aiVideoModelSchema.default('veo-3.1-fast-generate-001'),
-  duration: z.union([z.literal(4), z.literal(6), z.literal(8)]).default(8),
+  duration: z.number().min(4).max(8).default(5),
   aspectRatio: videoAspectRatioSchema.nullable().default(null),
 })
 
