@@ -7,7 +7,11 @@
  */
 import { describe, expect, it } from 'vitest'
 import { isCaptureStep, validateOutcome } from './outcome-validation'
-import type { ExperienceStep, Outcome } from '@clementine/shared'
+import type {
+  AIVideoOutcomeConfig,
+  ExperienceStep,
+  Outcome,
+} from '@clementine/shared'
 
 // Test helpers
 function createDefaultOutcome(overrides: Partial<Outcome> = {}): Outcome {
@@ -107,7 +111,6 @@ describe('validateOutcome', () => {
         message: 'VIDEO output is coming soon',
       })
     })
-
   })
 
   describe('V3: Photo type validation', () => {
@@ -401,28 +404,27 @@ describe('validateOutcome', () => {
   })
 
   describe('V5: AI Video type validation', () => {
+    const defaultAiVideo: AIVideoOutcomeConfig = {
+      task: 'animate',
+      captureStepId: 'step-1',
+      aspectRatio: '9:16',
+      startFrameImageGen: null,
+      endFrameImageGen: null,
+      videoGeneration: {
+        prompt: 'Animate this',
+        model: 'veo-3.1-fast-generate-001',
+        duration: 5,
+        aspectRatio: null,
+      },
+    }
+
     function createAiVideoOutcome(
-      overrides: Partial<{
-        captureStepId: string
-        task: string
-        startFrameImageGen: object | null
-        endFrameImageGen: object | null
-      }> = {},
+      overrides: Partial<AIVideoOutcomeConfig> = {},
     ) {
       return createDefaultOutcome({
         type: 'ai.video',
         aiVideo: {
-          task: 'animate',
-          captureStepId: 'step-1',
-          aspectRatio: '9:16',
-          startFrameImageGen: null,
-          endFrameImageGen: null,
-          videoGeneration: {
-            prompt: 'Animate this',
-            model: 'veo-3.1-fast-generate-001',
-            duration: 5,
-            aspectRatio: null,
-          },
+          ...defaultAiVideo,
           ...overrides,
         },
       })

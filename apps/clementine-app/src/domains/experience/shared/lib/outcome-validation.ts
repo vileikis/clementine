@@ -108,10 +108,16 @@ function validatePhoto(
 ): OutcomeValidationError[] {
   const config = outcome.photo
   if (!config) {
-    return [{ field: 'outcome.photo', message: 'Photo configuration is missing' }]
+    return [
+      { field: 'outcome.photo', message: 'Photo configuration is missing' },
+    ]
   }
 
-  const error = validateCaptureStepId(config.captureStepId, steps, 'outcome.photo')
+  const error = validateCaptureStepId(
+    config.captureStepId,
+    steps,
+    'outcome.photo',
+  )
   return error ? [error] : []
 }
 
@@ -121,7 +127,12 @@ function validateAiImage(
 ): OutcomeValidationError[] {
   const config = outcome.aiImage
   if (!config) {
-    return [{ field: 'outcome.aiImage', message: 'AI Image configuration is missing' }]
+    return [
+      {
+        field: 'outcome.aiImage',
+        message: 'AI Image configuration is missing',
+      },
+    ]
   }
 
   const errors: OutcomeValidationError[] = []
@@ -157,12 +168,21 @@ function validateAiVideo(
 ): OutcomeValidationError[] {
   const config = outcome.aiVideo
   if (!config) {
-    return [{ field: 'outcome.aiVideo', message: 'AI Video configuration is missing' }]
+    return [
+      {
+        field: 'outcome.aiVideo',
+        message: 'AI Video configuration is missing',
+      },
+    ]
   }
 
   const errors: OutcomeValidationError[] = []
 
-  const stepError = validateCaptureStepId(config.captureStepId, steps, 'outcome.aiVideo')
+  const stepError = validateCaptureStepId(
+    config.captureStepId,
+    steps,
+    'outcome.aiVideo',
+  )
   if (stepError) errors.push(stepError)
 
   if (config.startFrameImageGen) {
