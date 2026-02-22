@@ -49,7 +49,7 @@ export function AddMediaButton({
         onClick={handleClick}
         disabled={disabled}
         aria-label="Add reference images"
-        className="size-11 shrink-0"
+        className="size-11 shrink-0 cursor-pointer"
       >
         <Plus className="size-4" />
       </Button>

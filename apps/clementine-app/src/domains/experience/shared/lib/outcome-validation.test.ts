@@ -405,7 +405,7 @@ describe('validateOutcome', () => {
 
   describe('V5: AI Video type validation', () => {
     const defaultAiVideo: AIVideoOutcomeConfig = {
-      task: 'animate',
+      task: 'image-to-video',
       captureStepId: 'step-1',
       aspectRatio: '9:16',
       startFrameImageGen: null,
@@ -413,8 +413,9 @@ describe('validateOutcome', () => {
       videoGeneration: {
         prompt: 'Animate this',
         model: 'veo-3.1-fast-generate-001',
-        duration: 5,
+        duration: 6,
         aspectRatio: null,
+        refMedia: [],
       },
     }
 
@@ -461,8 +462,9 @@ describe('validateOutcome', () => {
         videoGeneration: {
           prompt: '',
           model: 'veo-3.1-fast-generate-001',
-          duration: 5,
+          duration: 6,
           aspectRatio: null,
+          refMedia: [],
         },
       })
       const result = validateOutcome(outcome, steps)

@@ -14,11 +14,14 @@
  * @see specs/074-ai-video-backend
  */
 import { logger } from 'firebase-functions/v2'
-import type { JobOutput } from '@clementine/shared'
+import type { JobOutput, MediaReference } from '@clementine/shared'
 import type { OutcomeContext } from '../types'
 import { getSourceMedia } from '../helpers/getSourceMedia'
 import { resolvePromptMentions } from '../bindings/resolvePromptMentions'
-import { aiGenerateVideo } from '../operations/aiGenerateVideo'
+import {
+  aiGenerateVideo,
+  type GenerateVideoRequest,
+} from '../operations/aiGenerateVideo'
 import { generateThumbnail } from '../../ffmpeg/images'
 import { getOutputStoragePath, uploadToStorage } from '../../../infra/storage'
 
@@ -50,11 +53,11 @@ export async function aiVideoOutcome(ctx: OutcomeContext): Promise<JobOutput> {
   // Get source media reference from capture step
   const sourceMedia = getSourceMedia(snapshot.sessionResponses, captureStepId)
 
-  // Resolve video generation prompt
+  // Resolve video generation prompt (pass refMedia for @{ref:...} mention resolution)
   const resolved = resolvePromptMentions(
     videoGeneration.prompt,
     snapshot.sessionResponses,
-    [],
+    videoGeneration.refMedia ?? [],
   )
 
   logger.info('[AIVideoOutcome] Prompt resolved', {
@@ -73,15 +76,47 @@ export async function aiVideoOutcome(ctx: OutcomeContext): Promise<JobOutput> {
     )
   }
 
+  // Build GenerateVideoRequest based on task type
+  const baseRequest: GenerateVideoRequest = {
+    prompt: resolved.text,
+    model: videoGeneration.model,
+    aspectRatio: videoGeneration.aspectRatio ?? aspectRatio,
+    duration: videoGeneration.duration,
+    sourceMedia,
+  }
+
+  let generateVideoRequest: GenerateVideoRequest
+  switch (task) {
+    case 'image-to-video':
+      // Animate: sourceMedia only (params.image path)
+      generateVideoRequest = baseRequest
+      break
+
+    case 'ref-images-to-video': {
+      // Remix: sourceMedia + refMedia as referenceMedia (config.referenceImages path)
+      // Combine explicit refMedia with prompt-mentioned media, deduplicated
+      const allRefMedia = deduplicateMediaRefs([
+        ...(videoGeneration.refMedia ?? []),
+        ...resolved.mediaRefs,
+      ])
+      generateVideoRequest = {
+        ...baseRequest,
+        referenceMedia: allRefMedia,
+      }
+      break
+    }
+
+    case 'transform':
+    case 'reimagine':
+      throw new Error(`Task "${task}" is not yet supported`)
+
+    default:
+      throw new Error(`Unknown AI video task: ${String(task)}`)
+  }
+
   // Generate video (operation handles GCS URIs, output paths, download)
   const generatedVideo = await aiGenerateVideo(
-    {
-      prompt: resolved.text,
-      model: videoGeneration.model,
-      aspectRatio: videoGeneration.aspectRatio ?? aspectRatio,
-      duration: videoGeneration.duration,
-      sourceMedia,
-    },
+    generateVideoRequest,
     {
       projectId: job.projectId,
       sessionId: job.sessionId,
@@ -120,4 +155,16 @@ export async function aiVideoOutcome(ctx: OutcomeContext): Promise<JobOutput> {
   })
 
   return output
+}
+
+/**
+ * Deduplicate media references by mediaAssetId
+ */
+function deduplicateMediaRefs(refs: MediaReference[]): MediaReference[] {
+  const seen = new Set<string>()
+  return refs.filter((ref) => {
+    if (seen.has(ref.mediaAssetId)) return false
+    seen.add(ref.mediaAssetId)
+    return true
+  })
 }

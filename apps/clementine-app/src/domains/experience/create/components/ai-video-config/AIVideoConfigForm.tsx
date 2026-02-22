@@ -5,23 +5,35 @@
  * Owns all AI-video-specific handlers and rendering.
  * Communicates back to parent via a single `onConfigChange` callback.
  *
- * @see specs/073-ai-video-editor — US1/US2
+ * Uses PromptComposer for prompt input, model selection, duration, and @mentions.
+ *
+ * @see specs/075-ai-video-editor-v2 — US1/US2
  */
 import { useCallback } from 'react'
 
 import { VIDEO_ASPECT_RATIOS } from '@clementine/shared'
 import { getFieldError } from '../../hooks/useOutcomeValidation'
+import {
+  AI_VIDEO_MODELS,
+  DURATION_OPTIONS,
+  MAX_VIDEO_REF_MEDIA_COUNT,
+} from '../../lib/model-options'
+import { useRefMediaUpload } from '../../hooks/useRefMediaUpload'
 import { SourceImageSelector } from '../shared-controls/SourceImageSelector'
 import { AspectRatioSelector } from '../shared-controls/AspectRatioSelector'
+import { PromptComposer } from '../PromptComposer'
 import { AIVideoTaskSelector } from './AIVideoTaskSelector'
 import { FrameGenerationSection } from './FrameGenerationSection'
-import { VideoGenerationSection } from './VideoGenerationSection'
 import type { FieldValidationError } from '../../hooks/useOutcomeValidation'
 import type {
+  AIVideoModel,
   AIVideoOutcomeConfig,
   AIVideoTask,
   ExperienceStep,
   ImageGenerationConfig,
+  MediaReference,
+  VideoAspectRatio,
+  VideoDuration,
   VideoGenerationConfig,
 } from '@clementine/shared'
 
@@ -76,6 +88,43 @@ export function AIVideoConfigForm({
     [videoGeneration, onConfigChange],
   )
 
+  // ── Reference media upload for Remix task ──────────────────
+
+  const handleRefMediaUploaded = useCallback(
+    (mediaRef: MediaReference) => {
+      onConfigChange({
+        videoGeneration: {
+          ...videoGeneration,
+          refMedia: [...videoGeneration.refMedia, mediaRef],
+        },
+      })
+    },
+    [videoGeneration, onConfigChange],
+  )
+
+  const { uploadingFiles, isUploading, uploadFiles, canAddMore } =
+    useRefMediaUpload({
+      workspaceId,
+      userId,
+      currentRefMedia: videoGeneration.refMedia,
+      onMediaUploaded: handleRefMediaUploaded,
+      maxCount: MAX_VIDEO_REF_MEDIA_COUNT,
+    })
+
+  const handleRemoveRefMedia = useCallback(
+    (mediaAssetId: string) => {
+      onConfigChange({
+        videoGeneration: {
+          ...videoGeneration,
+          refMedia: videoGeneration.refMedia.filter(
+            (m) => m.mediaAssetId !== mediaAssetId,
+          ),
+        },
+      })
+    },
+    [videoGeneration, onConfigChange],
+  )
+
   // ── startFrameImageGen field helpers ───────────────────────
 
   const updateStartFrameImageGen = useCallback(
@@ -125,6 +174,9 @@ export function AIVideoConfigForm({
 
   // ── Render ────────────────────────────────────────────────
 
+  // Filter steps for @mention (exclude info steps)
+  const mentionableSteps = steps.filter((s) => s.type !== 'info')
+
   return (
     <div className="space-y-6">
       {/* Task selector */}
@@ -149,11 +201,38 @@ export function AIVideoConfigForm({
         />
       </div>
 
-      {/* Video generation section */}
-      <VideoGenerationSection
-        config={videoGeneration}
-        onConfigChange={updateVideoGeneration}
-      />
+      {/* Video generation — PromptComposer with video models + duration */}
+      {(config.task === 'image-to-video' ||
+        config.task === 'ref-images-to-video') && (
+        <PromptComposer
+          prompt={videoGeneration.prompt}
+          onPromptChange={(prompt) => updateVideoGeneration({ prompt })}
+          model={videoGeneration.model}
+          onModelChange={(model) =>
+            updateVideoGeneration({ model: model as AIVideoModel })
+          }
+          modelOptions={AI_VIDEO_MODELS}
+          aspectRatio={config.aspectRatio}
+          onAspectRatioChange={(aspectRatio) =>
+            onConfigChange({ aspectRatio: aspectRatio as VideoAspectRatio })
+          }
+          hideAspectRatio
+          duration={String(videoGeneration.duration)}
+          onDurationChange={(d) =>
+            updateVideoGeneration({ duration: Number(d) as VideoDuration })
+          }
+          durationOptions={DURATION_OPTIONS}
+          hideRefMedia={config.task === 'image-to-video'}
+          refMedia={videoGeneration.refMedia}
+          onRefMediaRemove={handleRemoveRefMedia}
+          uploadingFiles={uploadingFiles}
+          onFilesSelected={uploadFiles}
+          canAddMore={canAddMore}
+          isUploading={isUploading}
+          steps={mentionableSteps}
+          error={getFieldError(errors, 'aiVideo.videoGeneration.prompt')}
+        />
+      )}
 
       {/* Start frame image generation (reimagine only) */}
       {config.task === 'reimagine' && config.startFrameImageGen && (

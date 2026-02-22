@@ -15,7 +15,7 @@
 
 **Purpose**: Schema changes and constants that MUST be complete before any frontend or backend work. These changes also implement US4 (migration) via Zod transforms.
 
-- [ ] T001 Update AI video schemas in `packages/shared/src/schemas/experience/outcome.schema.ts`:
+- [X] T001 Update AI video schemas in `packages/shared/src/schemas/experience/outcome.schema.ts`:
   - Replace `aiVideoTaskSchema` enum with new values (`image-to-video`, `ref-images-to-video`, `transform`, `reimagine`) plus legacy `animate` value, and add `.transform()` to map `'animate'` → `'image-to-video'` (see data-model.md Section 1)
   - Create `videoDurationSchema` with `.transform()` that coerces any number to nearest valid value (4, 6, 8) and `.pipe()` to validate output (see data-model.md Section 2)
   - Update `videoGenerationConfigSchema`: replace inline duration with `videoDurationSchema.default(6)`, add `refMedia: z.array(mediaReferenceSchema).default([])` (import `mediaReferenceSchema` from `../media/media-reference.schema`)
@@ -23,14 +23,14 @@
   - Add `VideoDuration` type export: `export type VideoDuration = z.infer<typeof videoDurationSchema>`
   - Note: `AIVideoTask` type will change from enum literal to transformed output type — verify downstream TypeScript still compiles
 
-- [ ] T002 [P] Add video-specific constants in `apps/clementine-app/src/domains/experience/create/lib/model-options.ts`:
+- [X] T002 [P] Add video-specific constants in `apps/clementine-app/src/domains/experience/create/lib/model-options.ts`:
   - Add `DURATION_OPTIONS` array: `[{ value: '4', label: '4s' }, { value: '6', label: '6s' }, { value: '8', label: '8s' }]` (string values for Select component compatibility)
   - Add `MAX_VIDEO_REF_MEDIA_COUNT = 2` constant
 
-- [ ] T003 [P] Update default config factory in `apps/clementine-app/src/domains/experience/create/lib/outcome-operations.ts`:
+- [X] T003 [P] Update default config factory in `apps/clementine-app/src/domains/experience/create/lib/outcome-operations.ts`:
   - In `createDefaultAIVideoConfig()`: change `task: 'animate'` to `task: 'image-to-video'`, change `duration: 5` to `duration: 6`, add `refMedia: []` to the `videoGeneration` object
 
-- [ ] T004 Build shared package and verify: run `pnpm --filter @clementine/shared build` then `pnpm --filter @clementine/shared test` to confirm schema changes compile and existing tests pass
+- [X] T004 Build shared package and verify: run `pnpm --filter @clementine/shared build` then `pnpm --filter @clementine/shared test` to confirm schema changes compile and existing tests pass
 
 **Checkpoint**: Shared schemas updated. All downstream workspaces can now use new task identifiers and duration type. US4 (migration) is complete — legacy `'animate'` values and non-standard durations are handled by Zod transforms at parse time.
 
@@ -42,26 +42,26 @@
 
 **Independent Test**: Open AI Video editor → see 4 task options (2 active, 2 coming soon) → select Animate → compose prompt with @mentions → pick model → pick duration → verify config saves via autosave.
 
-- [ ] T005 [P] [US1] Add optional duration picker to ControlRow in `apps/clementine-app/src/domains/experience/create/components/PromptComposer/ControlRow.tsx`:
+- [X] T005 [P] [US1] Add optional duration picker to ControlRow in `apps/clementine-app/src/domains/experience/create/components/PromptComposer/ControlRow.tsx`:
   - Add props to `ControlRowProps`: `duration?: string`, `onDurationChange?: (duration: string) => void`, `durationOptions?: readonly SelectOption[]`
   - Render a third Select dropdown (between aspect ratio and the flex spacer) when `durationOptions` is provided
   - Follow the same Select pattern used for model and aspect ratio pickers
   - When `durationOptions` is not provided, render nothing (backward compatible)
 
-- [ ] T006 [P] [US1] Add `modelOptions`, `duration`, and `hideRefMedia` props to PromptComposer in `apps/clementine-app/src/domains/experience/create/components/PromptComposer/PromptComposer.tsx`:
+- [X] T006 [P] [US1] Add `modelOptions`, `duration`, and `hideRefMedia` props to PromptComposer in `apps/clementine-app/src/domains/experience/create/components/PromptComposer/PromptComposer.tsx`:
   - Add to `PromptComposerProps`: `modelOptions?: readonly SelectOption[]` (default: `AI_IMAGE_MODELS`), `duration?: string`, `onDurationChange?: (duration: string) => void`, `durationOptions?: readonly SelectOption[]`, `hideRefMedia?: boolean` (default: `false`)
   - Pass `modelOptions` to ControlRow's `modelOptions` prop (currently hardcoded as `AI_IMAGE_MODELS`)
   - Pass `duration`, `onDurationChange`, `durationOptions` through to ControlRow
   - When `hideRefMedia` is true: hide `ReferenceMediaStrip` rendering, pass `isAddDisabled={true}` to ControlRow's AddMediaButton (or hide it), and disable drag-and-drop
   - Import `SelectOption` type from `./ControlRow` if not already imported
 
-- [ ] T007 [P] [US1] Update AIVideoTaskSelector with new task options and coming soon state in `apps/clementine-app/src/domains/experience/create/components/ai-video-config/AIVideoTaskSelector.tsx`:
+- [X] T007 [P] [US1] Update AIVideoTaskSelector with new task options and coming soon state in `apps/clementine-app/src/domains/experience/create/components/ai-video-config/AIVideoTaskSelector.tsx`:
   - Replace current task options array with: `image-to-video` (label: "Animate", description: "Bring a photo to life as video"), `ref-images-to-video` (label: "Remix", description: "Create a new video using photo and reference images as creative input"), `transform` (label: "Transform", description: "Photo transitions into an AI-generated version", comingSoon: true), `reimagine` (label: "Reimagine", description: "Video between two AI-generated frames", comingSoon: true)
   - Update the type of `task` prop from old `AIVideoTask` enum to the new type (will be inferred from updated schema)
   - Render coming soon tasks as disabled options with a "Coming soon" badge (use `<span className="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-xs">Coming soon</span>` — matches the pattern in `OutcomeTypePicker.tsx`)
   - Disabled options should not trigger `onTaskChange`
 
-- [ ] T008 [US1] Refactor AIVideoConfigForm to replace VideoGenerationSection with PromptComposer in `apps/clementine-app/src/domains/experience/create/components/ai-video-config/AIVideoConfigForm.tsx`:
+- [X] T008 [US1] Refactor AIVideoConfigForm to replace VideoGenerationSection with PromptComposer in `apps/clementine-app/src/domains/experience/create/components/ai-video-config/AIVideoConfigForm.tsx`:
   - Remove import of `VideoGenerationSection`
   - Add imports: `PromptComposer` from `../PromptComposer`, `AI_VIDEO_MODELS`, `DURATION_OPTIONS` from `../../lib/model-options`, `useRefMediaUpload` (will be wired for US2)
   - Replace `<VideoGenerationSection config={videoGeneration} onConfigChange={updateVideoGeneration} />` with `<PromptComposer>` configured for video generation:
@@ -79,7 +79,7 @@
   - Update conditional rendering: replace `config.task === 'animate'` with `config.task === 'image-to-video'`, update transform/reimagine checks (these stay the same)
   - Compute `mentionableSteps` by filtering out info steps (follow pattern from `AIImageConfigForm.tsx`)
 
-- [ ] T009 [US1] Delete VideoGenerationSection and update barrel export:
+- [X] T009 [US1] Delete VideoGenerationSection and update barrel export:
   - Delete `apps/clementine-app/src/domains/experience/create/components/ai-video-config/VideoGenerationSection.tsx`
   - Remove `export { VideoGenerationSection } from './VideoGenerationSection'` from `apps/clementine-app/src/domains/experience/create/components/ai-video-config/index.ts`
 
@@ -93,12 +93,12 @@
 
 **Independent Test**: Select Remix → see ref media strip → upload 2 images → verify max enforced → switch to Animate → ref media hidden → switch back to Remix → ref media reappears.
 
-- [ ] T010 [P] [US2] Add `maxCount` parameter to useRefMediaUpload hook in `apps/clementine-app/src/domains/experience/create/hooks/useRefMediaUpload.ts`:
+- [X] T010 [P] [US2] Add `maxCount` parameter to useRefMediaUpload hook in `apps/clementine-app/src/domains/experience/create/hooks/useRefMediaUpload.ts`:
   - Add `maxCount?: number` to `UseRefMediaUploadParams` interface (default: `MAX_REF_MEDIA_COUNT` which is 5)
   - Replace hardcoded `MAX_REF_MEDIA_COUNT` usage in `availableSlots` computation with `maxCount ?? MAX_REF_MEDIA_COUNT`
   - Existing callers (AIImageConfigForm, FrameGenerationSection) continue to work unchanged with the default
 
-- [ ] T011 [US2] Wire reference media upload for `ref-images-to-video` task in `apps/clementine-app/src/domains/experience/create/components/ai-video-config/AIVideoConfigForm.tsx`:
+- [X] T011 [US2] Wire reference media upload for `ref-images-to-video` task in `apps/clementine-app/src/domains/experience/create/components/ai-video-config/AIVideoConfigForm.tsx`:
   - Add `useRefMediaUpload` hook call with `maxCount: MAX_VIDEO_REF_MEDIA_COUNT` (import from `model-options.ts`), `currentRefMedia: videoGeneration.refMedia`, and `onMediaUploaded` handler that appends to `videoGeneration.refMedia`
   - Add `handleRemoveRefMedia` handler that filters `videoGeneration.refMedia` by `mediaAssetId`
   - Update PromptComposer props conditionally based on task:
@@ -116,7 +116,7 @@
 
 **Independent Test**: Trigger video generation for Animate → verify `sourceMedia` passed as `GenerateVideoRequest.sourceMedia` (no `referenceMedia`). Trigger for Remix → verify `sourceMedia` + `refMedia` passed as `referenceMedia` (no direct `sourceMedia` image). Both produce valid videos.
 
-- [ ] T012 [US3] Update aiVideoOutcome executor with task-based routing and refMedia support in `functions/src/services/transform/outcomes/aiVideoOutcome.ts`:
+- [X] T012 [US3] Update aiVideoOutcome executor with task-based routing and refMedia support in `functions/src/services/transform/outcomes/aiVideoOutcome.ts`:
   - Pass `videoGeneration.refMedia` (instead of `[]`) to `resolvePromptMentions()` as the third argument, so @{ref:...} mentions in video prompts can resolve to reference media
   - Add task-based routing using a `switch` statement on `task`:
     - `'image-to-video'`: compose `GenerateVideoRequest` with `sourceMedia` only (existing behavior — no changes to current params)
@@ -133,9 +133,9 @@
 
 **Purpose**: Validation, regression testing, and cleanup
 
-- [ ] T013 [P] Run validation gates: `pnpm --filter @clementine/shared build && pnpm --filter @clementine/shared test` then `pnpm app:check` (format + lint) then `pnpm app:type-check` then `pnpm functions:build`
+- [X] T013 [P] Run validation gates: `pnpm --filter @clementine/shared build && pnpm --filter @clementine/shared test` then `pnpm app:check` (format + lint) then `pnpm app:type-check` then `pnpm functions:build`
 
-- [ ] T014 Verify no regressions: manually confirm Photo and AI Image outcome types still work end-to-end (create/edit/save). Verify AI Image PromptComposer still renders correctly (no props broken by the extension). Run quickstart.md testing checklist.
+- [X] T014 Verify no regressions: manually confirm Photo and AI Image outcome types still work end-to-end (create/edit/save). Verify AI Image PromptComposer still renders correctly (no props broken by the extension). Run quickstart.md testing checklist.
 
 ---
 

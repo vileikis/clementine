@@ -37,6 +37,12 @@ export interface ControlRowProps {
    * @default false
    */
   hideAspectRatio?: boolean
+  /** Current duration value */
+  duration?: string
+  /** Callback when duration changes */
+  onDurationChange?: (duration: string) => void
+  /** Available duration options — when provided, duration picker is rendered */
+  durationOptions?: readonly SelectOption[]
   /** Callback when files are selected for upload */
   onFilesSelected: (files: File[]) => void
   /** Whether the add media button is disabled */
@@ -56,6 +62,9 @@ export function ControlRow({
   onAspectRatioChange,
   aspectRatioOptions,
   hideAspectRatio = false,
+  duration,
+  onDurationChange,
+  durationOptions,
   onFilesSelected,
   isAddDisabled,
   disabled,
@@ -65,7 +74,7 @@ export function ControlRow({
       {/* Model Select */}
       <Select value={model} onValueChange={onModelChange} disabled={disabled}>
         <SelectTrigger
-          className="h-11 w-auto min-w-32 border-0 bg-transparent font-semibold shadow-none focus-visible:ring-0"
+          className="h-11 w-auto min-w-32 cursor-pointer border-0 bg-transparent font-semibold shadow-none focus-visible:ring-0"
           aria-label="Select AI model"
         >
           <SelectValue placeholder="Model" />
@@ -87,13 +96,36 @@ export function ControlRow({
           disabled={disabled}
         >
           <SelectTrigger
-            className="h-11 w-auto min-w-20 border-0 bg-transparent font-semibold shadow-none focus-visible:ring-0"
+            className="h-11 w-auto min-w-20 cursor-pointer border-0 bg-transparent font-semibold shadow-none focus-visible:ring-0"
             aria-label="Select aspect ratio"
           >
             <SelectValue placeholder="Ratio" />
           </SelectTrigger>
           <SelectContent>
             {aspectRatioOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
+
+      {/* Duration Select - shown when durationOptions is provided */}
+      {durationOptions && onDurationChange && (
+        <Select
+          value={duration}
+          onValueChange={onDurationChange}
+          disabled={disabled}
+        >
+          <SelectTrigger
+            className="h-11 w-auto min-w-20 cursor-pointer border-0 bg-transparent font-semibold shadow-none focus-visible:ring-0"
+            aria-label="Select duration"
+          >
+            <SelectValue placeholder="Duration" />
+          </SelectTrigger>
+          <SelectContent>
+            {durationOptions.map((option) => (
               <SelectItem key={option.value} value={option.value}>
                 {option.label}
               </SelectItem>

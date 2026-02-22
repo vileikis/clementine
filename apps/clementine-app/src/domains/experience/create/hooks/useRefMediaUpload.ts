@@ -32,6 +32,8 @@ export interface UseRefMediaUploadParams {
   currentRefMedia: MediaReference[]
   /** Callback when a media reference is uploaded */
   onMediaUploaded: (mediaRef: MediaReference) => void
+  /** Maximum number of reference media allowed (defaults to MAX_REF_MEDIA_COUNT) */
+  maxCount?: number
 }
 
 export interface UseRefMediaUploadResult {
@@ -55,6 +57,7 @@ export function useRefMediaUpload({
   userId,
   currentRefMedia,
   onMediaUploaded,
+  maxCount = MAX_REF_MEDIA_COUNT,
 }: UseRefMediaUploadParams): UseRefMediaUploadResult {
   const [uploadingFiles, setUploadingFiles] = useState<UploadingFile[]>([])
 
@@ -65,7 +68,7 @@ export function useRefMediaUpload({
   const uploadAsset = useUploadMediaAsset(workspaceId, userId)
 
   const currentRefMediaCount = currentRefMedia.length
-  const availableSlots = MAX_REF_MEDIA_COUNT - currentRefMediaCount
+  const availableSlots = maxCount - currentRefMediaCount
   const canAddMore = availableSlots > 0
 
   const uploadFiles = useCallback(

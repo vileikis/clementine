@@ -61,6 +61,20 @@ export const imageGenerationConfigSchema = z.object({
   aspectRatio: imageAspectRatioSchema.nullable().default(null),
 })
 
+/** Video duration — coerces any number to nearest valid value (4, 6, 8). */
+const VALID_DURATIONS = [4, 6, 8] as const
+export type VideoDuration = (typeof VALID_DURATIONS)[number]
+
+export const videoDurationSchema = z
+  .number()
+  .transform((n): VideoDuration => {
+    const clamped = Math.max(4, Math.min(8, n))
+    return VALID_DURATIONS.reduce((prev, curr) =>
+      Math.abs(curr - clamped) < Math.abs(prev - clamped) ? curr : prev,
+    ) as VideoDuration
+  })
+  .pipe(z.literal(4).or(z.literal(6)).or(z.literal(8)))
+
 /**
  * Video generation config — used by ai.video outcome.
  *
@@ -70,8 +84,9 @@ export const imageGenerationConfigSchema = z.object({
 export const videoGenerationConfigSchema = z.object({
   prompt: z.string().default(''),
   model: aiVideoModelSchema.default('veo-3.1-fast-generate-001'),
-  duration: z.number().min(4).max(8).default(5),
+  duration: videoDurationSchema.default(6),
   aspectRatio: videoAspectRatioSchema.nullable().default(null),
+  refMedia: z.array(mediaReferenceSchema).default([]),
 })
 
 // ── Per-Type Config Schemas ──────────────────────────────────
@@ -107,12 +122,23 @@ export const videoOutcomeConfigSchema = z.object({
 
 // ── AI Video ─────────────────────────────────────────────────
 
-/** AI video task type. */
-export const aiVideoTaskSchema = z.enum(['animate', 'transform', 'reimagine'])
+/** Raw AI video task enum — accepts legacy 'animate' value for backward compatibility. */
+const rawAiVideoTaskSchema = z.enum([
+  'animate',
+  'image-to-video',
+  'ref-images-to-video',
+  'transform',
+  'reimagine',
+])
 
-/** AI video outcome config — placeholder for future implementation. */
+/** AI video task type with lazy migration transform (animate → image-to-video). */
+export const aiVideoTaskSchema = rawAiVideoTaskSchema.transform((v) =>
+  v === 'animate' ? ('image-to-video' as const) : v,
+)
+
+/** AI video outcome config. */
 export const aiVideoOutcomeConfigSchema = z.object({
-  task: aiVideoTaskSchema.default('animate'),
+  task: aiVideoTaskSchema.default('image-to-video'),
   captureStepId: z.string(),
   aspectRatio: videoAspectRatioSchema.default('9:16'),
   startFrameImageGen: imageGenerationConfigSchema.nullable().default(null),
