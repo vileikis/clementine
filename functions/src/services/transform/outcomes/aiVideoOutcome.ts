@@ -96,8 +96,10 @@ export async function aiVideoOutcome(ctx: OutcomeContext): Promise<JobOutput> {
     case 'ref-images-to-video':
       // Remix: ALL images go via referenceMedia (config.referenceImages path).
       // sourceMedia is included as a reference — not as params.image.
+      // Veo ref-images-to-video only supports 8s duration — override any client value.
       generateVideoRequest = {
         ...baseRequest,
+        duration: 8,
         referenceMedia: [sourceMedia, ...(videoGeneration.refMedia ?? [])],
       }
       break
