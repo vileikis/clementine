@@ -6,7 +6,7 @@
  *
  * Veo API patterns (inferred from media inputs):
  * 1. sourceMedia only → params.image (animate)
- * 2. sourceMedia + referenceMedia/styleMedia → config.referenceImages (animate-reference)
+ * 2. sourceMedia + referenceMedia → config.referenceImages (animate-reference)
  * 3. sourceMedia + lastFrameMedia → params.image + config.lastFrame (transform/reimagine)
  *
  * Output is written directly to the session results folder in GCS,
@@ -55,7 +55,7 @@ const MAX_POLL_TIMEOUT_MS = 5 * 60 * 1000 // 5 minutes
  *
  * The Veo API pattern is inferred from which media fields are provided:
  * - sourceMedia only → animate (params.image)
- * - sourceMedia + referenceMedia/styleMedia → animate-reference (config.referenceImages)
+ * - sourceMedia + referenceMedia → animate-reference (config.referenceImages)
  * - sourceMedia + lastFrameMedia → transform/reimagine (params.image + config.lastFrame)
  */
 export interface GenerateVideoRequest {
@@ -71,8 +71,6 @@ export interface GenerateVideoRequest {
   sourceMedia: MediaReference
   /** End frame image for transform/reimagine */
   lastFrameMedia?: MediaReference
-  /** Style reference image for animate-reference */
-  styleMedia?: MediaReference
   /** Asset reference images for animate-reference */
   referenceMedia?: MediaReference[]
 }
@@ -136,8 +134,7 @@ export async function aiGenerateVideo(
     duration,
     hasLastFrame: !!request.lastFrameMedia,
     hasReferenceMedia: !!request.referenceMedia?.length,
-    hasStyleMedia: !!request.styleMedia,
-    promptLength: prompt.length,
+promptLength: prompt.length,
   })
 
   const client = initVeoClient()
@@ -219,7 +216,7 @@ export async function aiGenerateVideo(
  *
  * Infers the correct API pattern:
  * - sourceMedia only → params.image (animate)
- * - referenceMedia/styleMedia present → config.referenceImages (animate-reference)
+ * - referenceMedia present → config.referenceImages (animate-reference)
  * - lastFrameMedia present → params.image + config.lastFrame (transform/reimagine)
  */
 function buildVeoParams(
@@ -228,7 +225,7 @@ function buildVeoParams(
   outputGcsUri: string,
 ) {
   const { prompt, model, aspectRatio, duration, sourceMedia } = request
-  const hasReferences = !!(request.referenceMedia?.length || request.styleMedia)
+  const hasReferences = !!request.referenceMedia?.length
 
   const baseConfig = {
     aspectRatio,
@@ -275,7 +272,7 @@ function buildVeoParams(
 /**
  * Build referenceImages array for animate-reference pattern
  *
- * sourceMedia → asset type, styleMedia → style type, referenceMedia → asset type
+ * sourceMedia → asset type, referenceMedia → asset type
  */
 function buildReferenceImages(
   request: GenerateVideoRequest,
@@ -297,14 +294,6 @@ function buildReferenceImages(
         referenceType: VideoGenerationReferenceType.ASSET,
       })
     }
-  }
-
-  // Style media
-  if (request.styleMedia) {
-    refs.push({
-      image: mediaRefToGcsImage(request.styleMedia, bucketName),
-      referenceType: VideoGenerationReferenceType.STYLE,
-    })
   }
 
   return refs
