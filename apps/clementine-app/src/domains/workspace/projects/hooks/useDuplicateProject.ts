@@ -10,7 +10,7 @@ import { duplicateProjectInputSchema } from '../schemas/project.schemas'
 import type { WithFieldValue } from 'firebase/firestore'
 import type { Project } from '../types'
 import type { DuplicateProjectInput } from '../schemas/project.schemas'
-import { generateDuplicateName } from '@/domains/experience/shared/lib/generate-duplicate-name'
+import { generateDuplicateName } from '@/shared/utils/generate-duplicate-name'
 import { firestore } from '@/integrations/firebase/client'
 
 export interface DuplicateProjectResult {
@@ -22,53 +22,58 @@ export interface DuplicateProjectResult {
 export function useDuplicateProject() {
   return useMutation<DuplicateProjectResult, Error, DuplicateProjectInput>({
     mutationFn: async (input) => {
-      const validated = duplicateProjectInputSchema.parse(input)
+      return Sentry.startSpan(
+        { name: 'duplicateProject', op: 'mutation' },
+        async () => {
+          const validated = duplicateProjectInputSchema.parse(input)
 
-      const projectsRef = collection(firestore, 'projects')
+          const projectsRef = collection(firestore, 'projects')
 
-      return await runTransaction(firestore, async (transaction) => {
-        const sourceRef = doc(projectsRef, validated.projectId)
-        const sourceSnapshot = await transaction.get(sourceRef)
+          return await runTransaction(firestore, async (transaction) => {
+            const sourceRef = doc(projectsRef, validated.projectId)
+            const sourceSnapshot = await transaction.get(sourceRef)
 
-        if (!sourceSnapshot.exists()) {
-          throw new Error('Source project not found')
-        }
+            if (!sourceSnapshot.exists()) {
+              throw new Error('Source project not found')
+            }
 
-        const source = sourceSnapshot.data() as Project
-        if (source.status === 'deleted') {
-          throw new Error('Source project is deleted')
-        }
+            const source = sourceSnapshot.data() as Project
+            if (source.status === 'deleted') {
+              throw new Error('Source project is deleted')
+            }
 
-        const newRef = doc(projectsRef)
-        const name = generateDuplicateName(source.name)
+            const newRef = doc(projectsRef)
+            const name = generateDuplicateName(source.name)
 
-        const newProject: WithFieldValue<Project> = {
-          id: newRef.id,
-          name,
-          workspaceId: source.workspaceId,
-          status: 'draft' as const,
-          type: source.type,
-          draftConfig: source.draftConfig
-            ? structuredClone(source.draftConfig)
-            : null,
-          publishedConfig: null,
-          exports: null,
-          draftVersion: 1,
-          publishedVersion: null,
-          publishedAt: null,
-          deletedAt: null,
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp(),
-        }
+            const newProject: WithFieldValue<Project> = {
+              id: newRef.id,
+              name,
+              workspaceId: source.workspaceId,
+              status: 'draft' as const,
+              type: source.type,
+              draftConfig: source.draftConfig
+                ? structuredClone(source.draftConfig)
+                : null,
+              publishedConfig: null,
+              exports: null,
+              draftVersion: 1,
+              publishedVersion: null,
+              publishedAt: null,
+              deletedAt: null,
+              createdAt: serverTimestamp(),
+              updatedAt: serverTimestamp(),
+            }
 
-        transaction.set(newRef, newProject)
+            transaction.set(newRef, newProject)
 
-        return {
-          workspaceId: validated.workspaceId,
-          projectId: newRef.id,
-          name,
-        }
-      })
+            return {
+              workspaceId: validated.workspaceId,
+              projectId: newRef.id,
+              name,
+            }
+          })
+        },
+      )
     },
     onSuccess: () => {},
     onError: (error) => {

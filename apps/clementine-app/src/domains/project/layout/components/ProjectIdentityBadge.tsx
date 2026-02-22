@@ -13,6 +13,8 @@ export function ProjectIdentityBadge({
     <button
       type="button"
       onClick={onClick}
+      aria-label={`Rename project ${name}`}
+      title={name}
       className="group flex items-center gap-2 rounded-md px-2 py-1 transition-colors hover:bg-accent"
     >
       {/* Name */}

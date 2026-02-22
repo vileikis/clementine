@@ -14,7 +14,7 @@ import {
 import * as Sentry from '@sentry/tanstackstart-react'
 import { duplicateExperienceInputSchema } from '../schemas/experience.input.schemas'
 import { experienceKeys } from '../queries/experience.query'
-import { generateDuplicateName } from '../lib/generate-duplicate-name'
+import { generateDuplicateName } from '@/shared/utils/generate-duplicate-name'
 import type { WithFieldValue } from 'firebase/firestore'
 
 import type { Experience } from '../schemas'
