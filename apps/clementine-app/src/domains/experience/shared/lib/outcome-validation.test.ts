@@ -455,6 +455,25 @@ describe('validateOutcome', () => {
       })
     })
 
+    it('fails when videoGeneration prompt is empty', () => {
+      const steps = [createCaptureStep('step-1')]
+      const outcome = createAiVideoOutcome({
+        videoGeneration: {
+          prompt: '',
+          model: 'veo-3.1-fast-generate-001',
+          duration: 5,
+          aspectRatio: null,
+        },
+      })
+      const result = validateOutcome(outcome, steps)
+
+      expect(result.valid).toBe(false)
+      expect(result.errors).toContainEqual({
+        field: 'outcome.aiVideo.videoGeneration.prompt',
+        message: 'Video generation prompt is required',
+      })
+    })
+
     it('fails when captureStepId references non-existent step', () => {
       const outcome = createAiVideoOutcome({ captureStepId: 'non-existent' })
       const result = validateOutcome(outcome, [])

@@ -185,6 +185,13 @@ function validateAiVideo(
   )
   if (stepError) errors.push(stepError)
 
+  if (!config.videoGeneration?.prompt?.trim()) {
+    errors.push({
+      field: 'outcome.aiVideo.videoGeneration.prompt',
+      message: 'Video generation prompt is required',
+    })
+  }
+
   if (config.startFrameImageGen) {
     const refError = validateRefMediaDisplayNames(
       config.startFrameImageGen.refMedia ?? [],
