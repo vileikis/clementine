@@ -94,10 +94,11 @@ export async function aiVideoOutcome(ctx: OutcomeContext): Promise<JobOutput> {
       break
 
     case 'ref-images-to-video':
-      // Remix: sourceMedia + refMedia as referenceMedia (config.referenceImages path)
+      // Remix: ALL images go via referenceMedia (config.referenceImages path).
+      // sourceMedia is included as a reference — not as params.image.
       generateVideoRequest = {
         ...baseRequest,
-        referenceMedia: videoGeneration.refMedia ?? [],
+        referenceMedia: [sourceMedia, ...(videoGeneration.refMedia ?? [])],
       }
       break
 

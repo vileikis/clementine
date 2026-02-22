@@ -273,31 +273,19 @@ function buildVeoParams(
 /**
  * Build referenceImages array for animate-reference pattern
  *
- * sourceMedia → asset type, referenceMedia → asset type
+ * The caller is responsible for providing the complete set of references
+ * (including sourceMedia if needed) in request.referenceMedia.
  */
 function buildReferenceImages(
   request: GenerateVideoRequest,
   bucketName: string,
 ): VideoGenerationReferenceImage[] {
-  const refs: VideoGenerationReferenceImage[] = []
+  if (!request.referenceMedia) return []
 
-  // Source media as asset reference
-  refs.push({
-    image: mediaRefToGcsImage(request.sourceMedia, bucketName),
+  return request.referenceMedia.map((ref) => ({
+    image: mediaRefToGcsImage(ref, bucketName),
     referenceType: VideoGenerationReferenceType.ASSET,
-  })
-
-  // Additional asset references
-  if (request.referenceMedia) {
-    for (const ref of request.referenceMedia) {
-      refs.push({
-        image: mediaRefToGcsImage(ref, bucketName),
-        referenceType: VideoGenerationReferenceType.ASSET,
-      })
-    }
-  }
-
-  return refs
+  }))
 }
 
 // =============================================================================
