@@ -27,8 +27,8 @@ All paths relative to `apps/clementine-app/src/`.
 
 ### Implementation for User Story 1
 
-- [ ] T001 [P] [US1] Create `ProjectIdentityBadge` component in `domains/project/layout/components/ProjectIdentityBadge.tsx` — clickable `<button>` with project name (max-w-[200px] truncated) + Pencil icon visible on hover (`opacity-0 group-hover:opacity-100`). Follow `ExperienceIdentityBadge` pattern but without thumbnail. Props: `{ name: string; onClick: () => void }`. Classes: `group flex items-center gap-2 rounded-md px-2 py-1 transition-colors hover:bg-accent`.
-- [ ] T002 [US1] Integrate `ProjectIdentityBadge` and `RenameProjectDialog` into `ProjectLayout` in `domains/project/layout/containers/ProjectLayout.tsx` — add `isRenameOpen` state, replace static `project.name` breadcrumb label with `<ProjectIdentityBadge name={project.name} onClick={() => setIsRenameOpen(true)} />`, render `<RenameProjectDialog>` (imported from `domains/workspace/projects/components/`) with `projectId`, `workspaceId`, `initialName`, `open`, `onOpenChange` props. Determine `workspaceId` from route params or project object.
+- [x] T001 [P] [US1] Create `ProjectIdentityBadge` component in `domains/project/layout/components/ProjectIdentityBadge.tsx` — clickable `<button>` with project name (max-w-[200px] truncated) + Pencil icon visible on hover (`opacity-0 group-hover:opacity-100`). Follow `ExperienceIdentityBadge` pattern but without thumbnail. Props: `{ name: string; onClick: () => void }`. Classes: `group flex items-center gap-2 rounded-md px-2 py-1 transition-colors hover:bg-accent`.
+- [x] T002 [US1] Integrate `ProjectIdentityBadge` and `RenameProjectDialog` into `ProjectLayout` in `domains/project/layout/containers/ProjectLayout.tsx` — add `isRenameOpen` state, replace static `project.name` breadcrumb label with `<ProjectIdentityBadge name={project.name} onClick={() => setIsRenameOpen(true)} />`, render `<RenameProjectDialog>` (imported from `domains/workspace/projects/components/`) with `projectId`, `workspaceId`, `initialName`, `open`, `onOpenChange` props. Determine `workspaceId` from route params or project object.
 
 **Checkpoint**: Rename from designer is fully functional. Test all 5 acceptance scenarios from spec.
 
@@ -42,11 +42,11 @@ All paths relative to `apps/clementine-app/src/`.
 
 ### Implementation for User Story 2
 
-- [ ] T003 [P] [US2] Add `duplicateProjectInputSchema` to `domains/workspace/projects/schemas/project.schemas.ts` — Zod schema validating `{ workspaceId: z.string().min(1), projectId: z.string().min(1) }`. Export the schema and inferred `DuplicateProjectInput` type.
-- [ ] T004 [US2] Create `useDuplicateProject` hook in `domains/workspace/projects/hooks/useDuplicateProject.ts` — follow `useDuplicateExperience` pattern: validate input with `duplicateProjectInputSchema` → Firestore `runTransaction` → `transaction.get(sourceRef)` from `projects` collection → verify exists and status !== 'deleted' → `generateDuplicateName(source.name)` (import from `domains/experience/shared/lib/generate-duplicate-name`) → `structuredClone(source.draftConfig)` → `transaction.set(newRef, { ...clonedProject })` with `status: 'draft'`, `publishedConfig: null`, `exports: null`, `draftVersion: 1`, `publishedVersion: null`, `publishedAt: null`, `deletedAt: null`, `createdAt: serverTimestamp()`, `updatedAt: serverTimestamp()` → `onSuccess`: invalidate `['projects', workspaceId]` → `onError`: report to Sentry. Returns `{ workspaceId, projectId, name }`.
-- [ ] T005 [US2] Export `useDuplicateProject` from `domains/workspace/projects/hooks/index.ts` barrel file.
-- [ ] T006 [US2] Refactor `ProjectListItem` in `domains/workspace/projects/components/ProjectListItem.tsx` — remove inline `DropdownMenu` imports and markup, remove internal `showDeleteDialog`/`showRenameDialog` state, remove `DeleteProjectDialog`/`RenameProjectDialog` renders. Replace props `onDelete`/`isDeleting` with `menuSections?: MenuSection[]`. Import `ContextDropdownMenu` from `@/shared/components/ContextDropdownMenu` and render with `sections={menuSections}`. Keep MoreVertical trigger button with `h-11 w-11` for 44px touch target.
-- [ ] T007 [US2] Update `ProjectsPage` in `domains/workspace/projects/containers/ProjectsPage.tsx` — import `useDuplicateProject`, `Copy`/`Pencil`/`Trash2` icons, `MenuSection` type. Add state for `renameProject` and `deleteProjectTarget` (like `ExperiencesPage` pattern). Build `getMenuSections(project): MenuSection[]` with Section 1: Rename + Duplicate (Duplicate disabled while `duplicateProject.isPending`), Section 2: Delete (destructive). Add `handleDuplicate(project)` with try/catch, success toast `Duplicated as "{name}"`, error toast. Pass `menuSections={getMenuSections(project)}` to `ProjectListItem`. Render `RenameProjectDialog` and `DeleteProjectDialog` at page level (controlled by state).
+- [x] T003 [P] [US2] Add `duplicateProjectInputSchema` to `domains/workspace/projects/schemas/project.schemas.ts` — Zod schema validating `{ workspaceId: z.string().min(1), projectId: z.string().min(1) }`. Export the schema and inferred `DuplicateProjectInput` type.
+- [x] T004 [US2] Create `useDuplicateProject` hook in `domains/workspace/projects/hooks/useDuplicateProject.ts` — follow `useDuplicateExperience` pattern: validate input with `duplicateProjectInputSchema` → Firestore `runTransaction` → `transaction.get(sourceRef)` from `projects` collection → verify exists and status !== 'deleted' → `generateDuplicateName(source.name)` (import from `domains/experience/shared/lib/generate-duplicate-name`) → `structuredClone(source.draftConfig)` → `transaction.set(newRef, { ...clonedProject })` with `status: 'draft'`, `publishedConfig: null`, `exports: null`, `draftVersion: 1`, `publishedVersion: null`, `publishedAt: null`, `deletedAt: null`, `createdAt: serverTimestamp()`, `updatedAt: serverTimestamp()` → `onSuccess`: invalidate `['projects', workspaceId]` → `onError`: report to Sentry. Returns `{ workspaceId, projectId, name }`.
+- [x] T005 [US2] Export `useDuplicateProject` from `domains/workspace/projects/hooks/index.ts` barrel file.
+- [x] T006 [US2] Refactor `ProjectListItem` in `domains/workspace/projects/components/ProjectListItem.tsx` — remove inline `DropdownMenu` imports and markup, remove internal `showDeleteDialog`/`showRenameDialog` state, remove `DeleteProjectDialog`/`RenameProjectDialog` renders. Replace props `onDelete`/`isDeleting` with `menuSections?: MenuSection[]`. Import `ContextDropdownMenu` from `@/shared/components/ContextDropdownMenu` and render with `sections={menuSections}`. Keep MoreVertical trigger button with `h-11 w-11` for 44px touch target.
+- [x] T007 [US2] Update `ProjectsPage` in `domains/workspace/projects/containers/ProjectsPage.tsx` — import `useDuplicateProject`, `Copy`/`Pencil`/`Trash2` icons, `MenuSection` type. Add state for `renameProject` and `deleteProjectTarget` (like `ExperiencesPage` pattern). Build `getMenuSections(project): MenuSection[]` with Section 1: Rename + Duplicate (Duplicate disabled while `duplicateProject.isPending`), Section 2: Delete (destructive). Add `handleDuplicate(project)` with try/catch, success toast `Duplicated as "{name}"`, error toast. Pass `menuSections={getMenuSections(project)}` to `ProjectListItem`. Render `RenameProjectDialog` and `DeleteProjectDialog` at page level (controlled by state).
 
 **Checkpoint**: Project duplication works end-to-end. Context menu uses shared component. Test all 5 acceptance scenarios from spec.
 
@@ -62,7 +62,7 @@ All paths relative to `apps/clementine-app/src/`.
 
 ### Implementation for User Story 3
 
-- [ ] T008 [US3] Make `ProjectListItem` fully clickable with hover in `domains/workspace/projects/components/ProjectListItem.tsx` — wrap the Card in a `<Link to="/workspace/$workspaceSlug/projects/$projectId" params={...}>` (or make the Link the outermost element with card-like styles). Add `transition-colors hover:bg-accent/50 cursor-pointer` to the card/link. Remove the inner `<Link>` that currently wraps only content. Wrap the `ContextDropdownMenu` trigger area in a `<div onClick={(e) => e.stopPropagation()}>` to prevent navigation on menu click. The `<Link>` renders as `<a>` — natively focusable and Enter-activatable for keyboard accessibility.
+- [x] T008 [US3] Make `ProjectListItem` fully clickable with hover in `domains/workspace/projects/components/ProjectListItem.tsx` — wrap the Card in a `<Link to="/workspace/$workspaceSlug/projects/$projectId" params={...}>` (or make the Link the outermost element with card-like styles). Add `transition-colors hover:bg-accent/50 cursor-pointer` to the card/link. Remove the inner `<Link>` that currently wraps only content. Wrap the `ContextDropdownMenu` trigger area in a `<div onClick={(e) => e.stopPropagation()}>` to prevent navigation on menu click. The `<Link>` renders as `<a>` — natively focusable and Enter-activatable for keyboard accessibility.
 
 **Checkpoint**: Project cards are fully clickable with hover. Context menu isolated. Keyboard navigation works.
 
@@ -76,7 +76,7 @@ All paths relative to `apps/clementine-app/src/`.
 
 ### Implementation for User Story 4
 
-- [ ] T009 [P] [US4] Make `ExperienceListItem` fully clickable with hover in `domains/experience/library/components/ExperienceListItem.tsx` — same pattern as T008: wrap Card in `<Link>` with `transition-colors hover:bg-accent/50 cursor-pointer`, remove inner `<Link>` that wraps only content, wrap `ContextDropdownMenu` trigger in `<div onClick={(e) => e.stopPropagation()}>`. Ensure thumbnail area is now also clickable (currently outside the inner Link). Maintain 44px touch target on menu button.
+- [x] T009 [P] [US4] Make `ExperienceListItem` fully clickable with hover in `domains/experience/library/components/ExperienceListItem.tsx` — same pattern as T008: wrap Card in `<Link>` with `transition-colors hover:bg-accent/50 cursor-pointer`, remove inner `<Link>` that wraps only content, wrap `ContextDropdownMenu` trigger in `<div onClick={(e) => e.stopPropagation()}>`. Ensure thumbnail area is now also clickable (currently outside the inner Link). Maintain 44px touch target on menu button.
 
 **Checkpoint**: Experience cards behave identically to project cards. Test all 4 acceptance scenarios.
 
@@ -86,7 +86,7 @@ All paths relative to `apps/clementine-app/src/`.
 
 **Purpose**: Validation, consistency, and cleanup
 
-- [ ] T010 Run validation gates: `pnpm type-check` and `pnpm check` (format + lint) from `apps/clementine-app/`. Fix any TypeScript errors, lint issues, or formatting problems across all changed files.
+- [x] T010 Run validation gates: `pnpm type-check` and `pnpm check` (format + lint) from `apps/clementine-app/`. Fix any TypeScript errors, lint issues, or formatting problems across all changed files.
 
 ---
 

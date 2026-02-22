@@ -2,11 +2,14 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, Outlet, useLocation } from '@tanstack/react-router'
 import { FolderOpen, Loader2, Share } from 'lucide-react'
 import { toast } from 'sonner'
+
+import { ProjectIdentityBadge } from '../components/ProjectIdentityBadge'
 import type { Project } from '@clementine/shared'
 import { TopNavBar } from '@/domains/navigation'
 import { ShareDialog } from '@/domains/project/share'
 import { usePublishProjectConfig } from '@/domains/project-config/designer/hooks'
 import { useProjectConfigDesignerStore } from '@/domains/project-config/designer/stores'
+import { RenameProjectDialog } from '@/domains/workspace/projects/components/RenameProjectDialog'
 import { EditorChangesBadge, EditorSaveStatus } from '@/shared/editor-status'
 import { cn } from '@/shared/utils/style-utils'
 import { Button } from '@/ui-kit/ui/button'
@@ -76,6 +79,7 @@ interface ProjectLayoutProps {
 
 export function ProjectLayout({ project, workspaceSlug }: ProjectLayoutProps) {
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false)
+  const [isRenameOpen, setIsRenameOpen] = useState(false)
   const publishConfig = usePublishProjectConfig(project.id)
   const { pendingSaves, lastCompletedAt, resetSaveState } =
     useProjectConfigDesignerStore()
@@ -130,7 +134,12 @@ export function ProjectLayout({ project, workspaceSlug }: ProjectLayoutProps) {
         borderless={isDesignerRoute}
         breadcrumbs={[
           {
-            label: project.name,
+            label: (
+              <ProjectIdentityBadge
+                name={project.name}
+                onClick={() => setIsRenameOpen(true)}
+              />
+            ),
             icon: FolderOpen,
             iconHref: projectsListPath,
           },
@@ -174,6 +183,13 @@ export function ProjectLayout({ project, workspaceSlug }: ProjectLayoutProps) {
             </>
           ) : undefined
         }
+      />
+      <RenameProjectDialog
+        projectId={project.id}
+        workspaceId={project.workspaceId}
+        initialName={project.name}
+        open={isRenameOpen}
+        onOpenChange={setIsRenameOpen}
       />
       <ShareDialog
         projectId={project.id}

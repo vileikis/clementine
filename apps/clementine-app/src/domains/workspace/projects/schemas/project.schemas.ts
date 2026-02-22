@@ -38,8 +38,18 @@ export const updateProjectInputSchema = z.object({
 })
 
 /**
+ * Duplicate project input schema
+ * Validates input for duplicating a project
+ */
+export const duplicateProjectInputSchema = z.object({
+  workspaceId: z.string().min(1, 'Workspace ID is required'),
+  projectId: z.string().min(1, 'Project ID is required'),
+})
+
+/**
  * Type exports
  */
 export type CreateProjectInput = z.infer<typeof createProjectInputSchema>
 export type DeleteProjectInput = z.infer<typeof deleteProjectInputSchema>
 export type UpdateProjectInput = z.infer<typeof updateProjectInputSchema>
+export type DuplicateProjectInput = z.infer<typeof duplicateProjectInputSchema>
