@@ -213,7 +213,7 @@ export function ExperiencesPage({
           onClearFilter={() => setProfileFilter(null)}
         />
       ) : (
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           {experiences.map((experience) => (
             <ExperienceListItem
               key={experience.id}

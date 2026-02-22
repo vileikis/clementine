@@ -1,4 +1,5 @@
 export * from './firestore-utils'
+export * from './generate-duplicate-name'
 export * from './slug-utils'
 export * from './style-utils'
 export * from './useDebounce'

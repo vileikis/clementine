@@ -1,4 +1,5 @@
 export * from './useProjects'
 export * from './useCreateProject'
 export * from './useDeleteProject'
+export * from './useDuplicateProject'
 export * from './useRenameProject'
