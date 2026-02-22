@@ -4,6 +4,7 @@
  * Card component displaying a single experience in the library list.
  * Shows thumbnail (if available), name, profile badge, and status.
  * Includes context menu with actions provided via sections prop.
+ * Entire card is clickable for navigation with hover feedback.
  */
 import { Link } from '@tanstack/react-router'
 import { Image as ImageIcon, MoreVertical } from 'lucide-react'
@@ -43,49 +44,54 @@ export function ExperienceListItem({
   const publishStatus = getPublishStatus(experience)
 
   return (
-    <Card className="p-4">
-      <div className="flex items-center gap-4">
-        {/* Thumbnail */}
-        <div className="h-16 w-16 rounded-md bg-muted flex items-center justify-center shrink-0 overflow-hidden">
-          {experience.media?.url ? (
-            <img
-              src={experience.media.url}
-              alt=""
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <ImageIcon className="h-6 w-6 text-muted-foreground" />
+    <Link
+      to="/workspace/$workspaceSlug/experiences/$experienceId"
+      params={{ workspaceSlug, experienceId: experience.id }}
+    >
+      <Card className="cursor-pointer p-4 transition-colors hover:bg-accent/50">
+        <div className="flex items-center gap-4">
+          {/* Thumbnail */}
+          <div className="h-16 w-16 rounded-md bg-muted flex items-center justify-center shrink-0 overflow-hidden">
+            {experience.media?.url ? (
+              <img
+                src={experience.media.url}
+                alt=""
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <ImageIcon className="h-6 w-6 text-muted-foreground" />
+            )}
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-lg truncate">
+              {experience.name}
+            </h3>
+            <div className="flex items-center gap-2 mt-1">
+              <ProfileBadge profile={experience.profile} />
+              <span className="text-sm text-muted-foreground">
+                {publishStatus}
+              </span>
+            </div>
+          </div>
+
+          {/* Context menu */}
+          {menuSections && (
+            <div onClick={(e) => e.preventDefault()}>
+              <ContextDropdownMenu
+                trigger={
+                  <Button variant="ghost" size="icon" className="h-11 w-11">
+                    <MoreVertical className="h-4 w-4" />
+                    <span className="sr-only">Actions</span>
+                  </Button>
+                }
+                sections={menuSections}
+              />
+            </div>
           )}
         </div>
-
-        {/* Content */}
-        <Link
-          to="/workspace/$workspaceSlug/experiences/$experienceId"
-          params={{ workspaceSlug, experienceId: experience.id }}
-          className="flex-1 min-w-0"
-        >
-          <h3 className="font-semibold text-lg truncate">{experience.name}</h3>
-          <div className="flex items-center gap-2 mt-1">
-            <ProfileBadge profile={experience.profile} />
-            <span className="text-sm text-muted-foreground">
-              {publishStatus}
-            </span>
-          </div>
-        </Link>
-
-        {/* Context menu */}
-        {menuSections && (
-          <ContextDropdownMenu
-            trigger={
-              <Button variant="ghost" size="icon" className="h-11 w-11">
-                <MoreVertical className="h-4 w-4" />
-                <span className="sr-only">Actions</span>
-              </Button>
-            }
-            sections={menuSections}
-          />
-        )}
-      </div>
-    </Card>
+      </Card>
+    </Link>
   )
 }

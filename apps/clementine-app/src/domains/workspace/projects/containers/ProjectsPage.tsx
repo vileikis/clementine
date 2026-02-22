@@ -1,7 +1,22 @@
+import { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
+import { Copy, Pencil, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
-import { useCreateProject, useDeleteProject, useProjects } from '../hooks'
-import { ProjectListEmpty, ProjectListItem } from '../components'
+
+import {
+  DeleteProjectDialog,
+  ProjectListEmpty,
+  ProjectListItem,
+  RenameProjectDialog,
+} from '../components'
+import {
+  useCreateProject,
+  useDeleteProject,
+  useDuplicateProject,
+  useProjects,
+} from '../hooks'
+import type { Project } from '../types'
+import type { MenuSection } from '@/shared/components/ContextDropdownMenu'
 import { Button } from '@/ui-kit/ui/button'
 import { Skeleton } from '@/ui-kit/ui/skeleton'
 
@@ -17,7 +32,13 @@ export function ProjectsPage({
   const { data: projects, isLoading } = useProjects(workspaceId)
   const createProject = useCreateProject()
   const deleteProject = useDeleteProject()
+  const duplicateProject = useDuplicateProject()
   const navigate = useNavigate()
+
+  // Dialog state
+  const [renameProject, setRenameProject] = useState<Project | null>(null)
+  const [deleteProjectTarget, setDeleteProjectTarget] =
+    useState<Project | null>(null)
 
   const handleCreateProject = async () => {
     try {
@@ -26,7 +47,6 @@ export function ProjectsPage({
         workspaceSlug,
       })
 
-      // Consumer handles navigation
       navigate({
         to: '/workspace/$workspaceSlug/projects/$projectId',
         params: {
@@ -36,14 +56,65 @@ export function ProjectsPage({
       })
 
       toast.success('Project created')
-    } catch (error) {
+    } catch {
       toast.error('Failed to create project')
     }
   }
 
-  const handleDeleteProject = (projectId: string) => {
-    deleteProject.mutate(projectId)
+  const handleDeleteProject = async () => {
+    if (!deleteProjectTarget) return
+
+    try {
+      await deleteProject.mutateAsync(deleteProjectTarget.id)
+      toast.success('Project deleted')
+      setDeleteProjectTarget(null)
+    } catch {
+      toast.error('Failed to delete project')
+    }
   }
+
+  const handleDuplicate = async (project: Project) => {
+    try {
+      const result = await duplicateProject.mutateAsync({
+        workspaceId,
+        projectId: project.id,
+      })
+      toast.success(`Duplicated as "${result.name}"`)
+    } catch {
+      toast.error("Couldn't duplicate project")
+    }
+  }
+
+  const getMenuSections = (project: Project): MenuSection[] => [
+    {
+      items: [
+        {
+          key: 'rename',
+          label: 'Rename',
+          icon: Pencil,
+          onClick: () => setRenameProject(project),
+        },
+        {
+          key: 'duplicate',
+          label: 'Duplicate',
+          icon: Copy,
+          onClick: () => handleDuplicate(project),
+          disabled: duplicateProject.isPending,
+        },
+      ],
+    },
+    {
+      items: [
+        {
+          key: 'delete',
+          label: 'Delete',
+          icon: Trash2,
+          onClick: () => setDeleteProjectTarget(project),
+          destructive: true,
+        },
+      ],
+    },
+  ]
 
   if (isLoading) {
     return (
@@ -67,18 +138,38 @@ export function ProjectsPage({
       {projects && projects.length === 0 ? (
         <ProjectListEmpty onCreateProject={handleCreateProject} />
       ) : (
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           {projects?.map((project) => (
             <ProjectListItem
               key={project.id}
               project={project}
-              workspaceId={workspaceId}
               workspaceSlug={workspaceSlug}
-              onDelete={handleDeleteProject}
-              isDeleting={deleteProject.isPending}
+              menuSections={getMenuSections(project)}
             />
           ))}
         </div>
+      )}
+
+      {/* Rename dialog */}
+      {renameProject && (
+        <RenameProjectDialog
+          projectId={renameProject.id}
+          workspaceId={workspaceId}
+          initialName={renameProject.name}
+          open={!!renameProject}
+          onOpenChange={(open) => !open && setRenameProject(null)}
+        />
+      )}
+
+      {/* Delete dialog */}
+      {deleteProjectTarget && (
+        <DeleteProjectDialog
+          open={!!deleteProjectTarget}
+          projectName={deleteProjectTarget.name}
+          isDeleting={deleteProject.isPending}
+          onOpenChange={(open) => !open && setDeleteProjectTarget(null)}
+          onConfirm={handleDeleteProject}
+        />
       )}
     </div>
   )
