@@ -108,16 +108,6 @@ describe('validateOutcome', () => {
       })
     })
 
-    it('fails when type is ai.video', () => {
-      const outcome = createDefaultOutcome({ type: 'ai.video' })
-      const result = validateOutcome(outcome, [])
-
-      expect(result.valid).toBe(false)
-      expect(result.errors).toContainEqual({
-        field: 'outcome.type',
-        message: 'AI Video output is coming soon',
-      })
-    })
   })
 
   describe('V3: Photo type validation', () => {
@@ -142,7 +132,7 @@ describe('validateOutcome', () => {
       expect(result.valid).toBe(false)
       expect(result.errors).toContainEqual({
         field: 'outcome.photo.captureStepId',
-        message: 'Select a source image step for photo output',
+        message: 'Select a source image step',
       })
     })
 
@@ -273,7 +263,7 @@ describe('validateOutcome', () => {
       expect(result.valid).toBe(false)
       expect(result.errors).toContainEqual({
         field: 'outcome.aiImage.captureStepId',
-        message: 'Select a source image step for image-to-image',
+        message: 'Select a source image step',
       })
     })
 
@@ -407,6 +397,194 @@ describe('validateOutcome', () => {
       const result = validateOutcome(outcome, [])
 
       expect(result.valid).toBe(true)
+    })
+  })
+
+  describe('V5: AI Video type validation', () => {
+    function createAiVideoOutcome(
+      overrides: Partial<{
+        captureStepId: string
+        task: string
+        startFrameImageGen: object | null
+        endFrameImageGen: object | null
+      }> = {},
+    ) {
+      return createDefaultOutcome({
+        type: 'ai.video',
+        aiVideo: {
+          task: 'animate',
+          captureStepId: 'step-1',
+          aspectRatio: '9:16',
+          startFrameImageGen: null,
+          endFrameImageGen: null,
+          videoGeneration: {
+            prompt: 'Animate this',
+            model: 'veo-3.1-fast-generate-001',
+            duration: 5,
+            aspectRatio: null,
+          },
+          ...overrides,
+        },
+      })
+    }
+
+    it('fails when aiVideo config is missing', () => {
+      const outcome = createDefaultOutcome({
+        type: 'ai.video',
+        aiVideo: null,
+      })
+      const result = validateOutcome(outcome, [])
+
+      expect(result.valid).toBe(false)
+      expect(result.errors).toContainEqual({
+        field: 'outcome.aiVideo',
+        message: 'AI Video configuration is missing',
+      })
+    })
+
+    it('fails when captureStepId is empty', () => {
+      const outcome = createAiVideoOutcome({ captureStepId: '' })
+      const result = validateOutcome(outcome, [])
+
+      expect(result.valid).toBe(false)
+      expect(result.errors).toContainEqual({
+        field: 'outcome.aiVideo.captureStepId',
+        message: 'Select a source image step',
+      })
+    })
+
+    it('fails when captureStepId references non-existent step', () => {
+      const outcome = createAiVideoOutcome({ captureStepId: 'non-existent' })
+      const result = validateOutcome(outcome, [])
+
+      expect(result.valid).toBe(false)
+      expect(result.errors).toContainEqual({
+        field: 'outcome.aiVideo.captureStepId',
+        message: 'Selected source step no longer exists',
+        stepId: 'non-existent',
+      })
+    })
+
+    it('fails when captureStepId references non-capture step', () => {
+      const steps = [createInfoStep('step-1')]
+      const outcome = createAiVideoOutcome({ captureStepId: 'step-1' })
+      const result = validateOutcome(outcome, steps)
+
+      expect(result.valid).toBe(false)
+      expect(result.errors).toContainEqual({
+        field: 'outcome.aiVideo.captureStepId',
+        message: 'Source step must be a capture step',
+        stepId: 'step-1',
+      })
+    })
+
+    it('fails with duplicate startFrameImageGen refMedia displayNames', () => {
+      const steps = [createCaptureStep('step-1')]
+      const outcome = createAiVideoOutcome({
+        startFrameImageGen: {
+          prompt: 'Start frame',
+          model: 'gemini-2.5-flash-image',
+          refMedia: [
+            {
+              mediaAssetId: 'a1',
+              url: 'https://example.com/1.jpg',
+              filePath: 'p/1.jpg',
+              displayName: 'style',
+            },
+            {
+              mediaAssetId: 'a2',
+              url: 'https://example.com/2.jpg',
+              filePath: 'p/2.jpg',
+              displayName: 'style',
+            },
+          ],
+          aspectRatio: null,
+        },
+      })
+      const result = validateOutcome(outcome, steps)
+
+      expect(result.valid).toBe(false)
+      expect(result.errors).toContainEqual({
+        field: 'outcome.aiVideo.startFrameImageGen.refMedia',
+        message: 'Duplicate reference media names: style',
+      })
+    })
+
+    it('fails with duplicate endFrameImageGen refMedia displayNames', () => {
+      const steps = [createCaptureStep('step-1')]
+      const outcome = createAiVideoOutcome({
+        endFrameImageGen: {
+          prompt: 'End frame',
+          model: 'gemini-2.5-flash-image',
+          refMedia: [
+            {
+              mediaAssetId: 'a1',
+              url: 'https://example.com/1.jpg',
+              filePath: 'p/1.jpg',
+              displayName: 'ref',
+            },
+            {
+              mediaAssetId: 'a2',
+              url: 'https://example.com/2.jpg',
+              filePath: 'p/2.jpg',
+              displayName: 'ref',
+            },
+          ],
+          aspectRatio: null,
+        },
+      })
+      const result = validateOutcome(outcome, steps)
+
+      expect(result.valid).toBe(false)
+      expect(result.errors).toContainEqual({
+        field: 'outcome.aiVideo.endFrameImageGen.refMedia',
+        message: 'Duplicate reference media names: ref',
+      })
+    })
+
+    it('passes with valid ai.video configuration', () => {
+      const steps = [createCaptureStep('step-1')]
+      const outcome = createAiVideoOutcome()
+      const result = validateOutcome(outcome, steps)
+
+      expect(result.valid).toBe(true)
+      expect(result.errors).toHaveLength(0)
+    })
+
+    it('passes with startFrameImageGen and endFrameImageGen having unique refMedia', () => {
+      const steps = [createCaptureStep('step-1')]
+      const outcome = createAiVideoOutcome({
+        startFrameImageGen: {
+          prompt: 'Start',
+          model: 'gemini-2.5-flash-image',
+          refMedia: [
+            {
+              mediaAssetId: 'a1',
+              url: 'https://example.com/1.jpg',
+              filePath: 'p/1.jpg',
+              displayName: 'style-a',
+            },
+          ],
+          aspectRatio: null,
+        },
+        endFrameImageGen: {
+          prompt: 'End',
+          model: 'gemini-2.5-flash-image',
+          refMedia: [
+            {
+              mediaAssetId: 'a2',
+              url: 'https://example.com/2.jpg',
+              filePath: 'p/2.jpg',
+              displayName: 'style-b',
+            },
+          ],
+          aspectRatio: null,
+        },
+      })
+      const result = validateOutcome(outcome, steps)
+
+      expect(result.valid).toBe(true)
+      expect(result.errors).toHaveLength(0)
     })
   })
 })
