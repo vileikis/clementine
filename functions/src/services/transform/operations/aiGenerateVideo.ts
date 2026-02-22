@@ -14,7 +14,6 @@
  *
  * @see specs/074-ai-video-backend/research.md R-001, R-006
  */
-import { defineString } from 'firebase-functions/params'
 import {
   GoogleGenAI,
   VideoGenerationReferenceType,
@@ -37,10 +36,8 @@ import {
 import { getMediaDimensions } from '../../ffmpeg/probe'
 import { sleep } from '../helpers/sleep'
 
-// Environment configuration for Vertex AI
-const VERTEX_AI_LOCATION = defineString('VERTEX_AI_LOCATION', {
-  default: 'us-central1',
-})
+// Veo 3+ models are only available in us-central1 (not yet in EU regions)
+const VEO_LOCATION = 'us-central1'
 
 const GOOGLE_CLOUD_PROJECT =
   process.env['GCLOUD_PROJECT'] || process.env['GOOGLE_CLOUD_PROJECT']
@@ -162,7 +159,7 @@ export async function aiGenerateVideo(
   logger.info('[AIVideoGenerate] Calling Veo API', {
     model,
     outputGcsUri,
-    location: VERTEX_AI_LOCATION.value(),
+    location: VEO_LOCATION,
   })
 
   // Build and submit Veo request (pattern inferred from media inputs)
@@ -330,7 +327,7 @@ function initVeoClient(): GoogleGenAI {
   return new GoogleGenAI({
     vertexai: true,
     project: GOOGLE_CLOUD_PROJECT,
-    location: VERTEX_AI_LOCATION.value(),
+    location: VEO_LOCATION,
   })
 }
 
