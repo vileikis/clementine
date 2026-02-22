@@ -14,7 +14,7 @@
  * @see specs/074-ai-video-backend
  */
 import { logger } from 'firebase-functions/v2'
-import type { JobOutput, MediaReference } from '@clementine/shared'
+import type { JobOutput } from '@clementine/shared'
 import type { OutcomeContext } from '../types'
 import { getSourceMedia } from '../helpers/getSourceMedia'
 import { resolvePromptMentions } from '../bindings/resolvePromptMentions'
@@ -53,11 +53,12 @@ export async function aiVideoOutcome(ctx: OutcomeContext): Promise<JobOutput> {
   // Get source media reference from capture step
   const sourceMedia = getSourceMedia(snapshot.sessionResponses, captureStepId)
 
-  // Resolve video generation prompt (pass refMedia for @{ref:...} mention resolution)
+  // Resolve video generation prompt (step mentions only — Veo referenceImages
+  // don't support display-name labels, so @{ref:...} mentions are not useful)
   const resolved = resolvePromptMentions(
     videoGeneration.prompt,
     snapshot.sessionResponses,
-    videoGeneration.refMedia ?? [],
+    [],
   )
 
   logger.info('[AIVideoOutcome] Prompt resolved', {
@@ -92,19 +93,13 @@ export async function aiVideoOutcome(ctx: OutcomeContext): Promise<JobOutput> {
       generateVideoRequest = baseRequest
       break
 
-    case 'ref-images-to-video': {
+    case 'ref-images-to-video':
       // Remix: sourceMedia + refMedia as referenceMedia (config.referenceImages path)
-      // Combine explicit refMedia with prompt-mentioned media, deduplicated
-      const allRefMedia = deduplicateMediaRefs([
-        ...(videoGeneration.refMedia ?? []),
-        ...resolved.mediaRefs,
-      ])
       generateVideoRequest = {
         ...baseRequest,
-        referenceMedia: allRefMedia,
+        referenceMedia: videoGeneration.refMedia ?? [],
       }
       break
-    }
 
     case 'transform':
     case 'reimagine':
@@ -155,16 +150,4 @@ export async function aiVideoOutcome(ctx: OutcomeContext): Promise<JobOutput> {
   })
 
   return output
-}
-
-/**
- * Deduplicate media references by mediaAssetId
- */
-function deduplicateMediaRefs(refs: MediaReference[]): MediaReference[] {
-  const seen = new Set<string>()
-  return refs.filter((ref) => {
-    if (seen.has(ref.mediaAssetId)) return false
-    seen.add(ref.mediaAssetId)
-    return true
-  })
 }

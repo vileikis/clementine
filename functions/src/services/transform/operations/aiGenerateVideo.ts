@@ -15,6 +15,7 @@
  * @see specs/074-ai-video-backend/research.md R-001, R-006
  */
 import {
+  GenerateVideosParameters,
   GoogleGenAI,
   VideoGenerationReferenceType,
   type Image,
@@ -134,7 +135,7 @@ export async function aiGenerateVideo(
     duration,
     hasLastFrame: !!request.lastFrameMedia,
     hasReferenceMedia: !!request.referenceMedia?.length,
-promptLength: prompt.length,
+    promptLength: prompt.length,
   })
 
   const client = initVeoClient()
@@ -223,7 +224,7 @@ function buildVeoParams(
   request: GenerateVideoRequest,
   bucketName: string,
   outputGcsUri: string,
-) {
+): GenerateVideosParameters {
   const { prompt, model, aspectRatio, duration, sourceMedia } = request
   const hasReferences = !!request.referenceMedia?.length
 
