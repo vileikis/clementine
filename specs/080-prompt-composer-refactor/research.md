@@ -1,6 +1,6 @@
 # Research: PromptComposer Refactor
 
-**Feature Branch**: `001-prompt-composer-refactor`
+**Feature Branch**: `080-prompt-composer-refactor`
 **Date**: 2026-02-23
 
 ## R-001: Context vs Zustand for Modality State

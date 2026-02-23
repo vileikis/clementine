@@ -9,7 +9,7 @@
  * Accepts a ModalityDefinition to auto-render the correct controls.
  * Child components read from PromptComposerContext instead of props.
  *
- * @see specs/001-prompt-composer-refactor
+ * @see specs/080-prompt-composer-refactor
  */
 import { useCallback, useMemo, useState } from 'react'
 

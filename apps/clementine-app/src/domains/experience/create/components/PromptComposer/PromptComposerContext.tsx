@@ -5,7 +5,7 @@
  * to PromptComposer child components (ControlRow, ReferenceMediaStrip,
  * AddMediaButton). Eliminates prop drilling through the component tree.
  *
- * @see specs/001-prompt-composer-refactor
+ * @see specs/080-prompt-composer-refactor
  */
 import { createContext, useContext } from 'react'
 

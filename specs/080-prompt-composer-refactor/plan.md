@@ -1,7 +1,7 @@
 # Implementation Plan: PromptComposer Refactor
 
-**Branch**: `001-prompt-composer-refactor` | **Date**: 2026-02-23 | **Spec**: [spec.md](./spec.md)
-**Input**: Feature specification from `/specs/001-prompt-composer-refactor/spec.md`
+**Branch**: `080-prompt-composer-refactor` | **Date**: 2026-02-23 | **Spec**: [spec.md](./spec.md)
+**Input**: Feature specification from `/specs/080-prompt-composer-refactor/spec.md`
 
 ## Summary
 
@@ -49,7 +49,7 @@ Refactor the PromptComposer component from a 19-prop flat interface to a modalit
 ### Documentation (this feature)
 
 ```text
-specs/001-prompt-composer-refactor/
+specs/080-prompt-composer-refactor/
 ├── plan.md              # This file
 ├── research.md          # Phase 0 output - design decisions
 ├── data-model.md        # Phase 1 output - type definitions

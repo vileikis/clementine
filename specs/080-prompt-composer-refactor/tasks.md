@@ -1,6 +1,6 @@
 # Tasks: PromptComposer Refactor
 
-**Input**: Design documents from `/specs/001-prompt-composer-refactor/`
+**Input**: Design documents from `/specs/080-prompt-composer-refactor/`
 **Prerequisites**: plan.md (required), spec.md (required), research.md, data-model.md, quickstart.md
 
 **Tests**: Not requested in feature specification. Manual regression validation included in Polish phase.

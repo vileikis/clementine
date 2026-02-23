@@ -8,7 +8,7 @@
  * Consumers can create task-specific variants via spread:
  *   const remix = { ...VIDEO_MODALITY, durationOptions: REMIX_ONLY }
  *
- * @see specs/001-prompt-composer-refactor
+ * @see specs/080-prompt-composer-refactor
  */
 import {
   AI_IMAGE_MODELS,

@@ -1,7 +1,7 @@
 # Architecture Memo: Compound Components vs Context Pattern
 
 **Date**: 2026-02-23
-**Feature**: 001-prompt-composer-refactor
+**Feature**: 080-prompt-composer-refactor
 
 ## PRD Proposal
 
@@ -59,5 +59,5 @@ The context infrastructure is already in place, so evolving toward compound comp
 ## References
 
 - PRD: `requirements/w9-mvp-polish/prd-p3-prompt-composer-refactor.md`
-- Research decision: `specs/001-prompt-composer-refactor/research.md` §R-003
-- Plan decision: `specs/001-prompt-composer-refactor/plan.md` §D-003
+- Research decision: `specs/080-prompt-composer-refactor/research.md` §R-003
+- Plan decision: `specs/080-prompt-composer-refactor/plan.md` §D-003

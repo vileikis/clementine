@@ -1,6 +1,6 @@
 # Feature Specification: PromptComposer Refactor
 
-**Feature Branch**: `001-prompt-composer-refactor`
+**Feature Branch**: `080-prompt-composer-refactor`
 **Created**: 2026-02-23
 **Status**: Draft
 **Input**: User description: "Move from prop explosion to modular modality-based configuration"

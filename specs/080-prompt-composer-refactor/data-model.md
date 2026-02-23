@@ -1,6 +1,6 @@
 # Data Model: PromptComposer Refactor
 
-**Feature Branch**: `001-prompt-composer-refactor`
+**Feature Branch**: `080-prompt-composer-refactor`
 **Date**: 2026-02-23
 
 > This feature is a pure frontend refactor. No backend/database changes. All entities below are TypeScript types.
