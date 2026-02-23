@@ -64,8 +64,8 @@ export const submitGuestEmail = onCall(
           filePath: session.resultMedia.filePath!,
           displayName: session.resultMedia.displayName,
         },
-        format: session['resultMediaFormat'] ?? 'image',
-        thumbnailUrl: session['resultMediaThumbnailUrl'] ?? null,
+        format: session.resultMediaFormat ?? 'image',
+        thumbnailUrl: session.resultMediaThumbnailUrl ?? null,
         resultPageUrl,
       })
     } catch (error) {

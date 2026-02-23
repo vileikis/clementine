@@ -322,7 +322,7 @@ async function executeDropboxUpload(
       provider: 'dropbox',
       status: 'failed',
       destinationPath: null,
-      error: 'source_file_missing',
+      error: 'source_file_empty',
       createdAt: Date.now(),
     })
     return // Don't retry — zero-size file
