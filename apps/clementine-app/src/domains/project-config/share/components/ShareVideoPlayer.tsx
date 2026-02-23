@@ -79,8 +79,21 @@ export function ShareVideoPlayer({
   }
 
   return (
-    <div className={`relative h-full w-full ${className ?? ''}`}>
-      {/* Video element */}
+    <div
+      className={`relative h-full w-full overflow-hidden bg-black ${className ?? ''}`}
+    >
+      {/* Background layer — blurred, scaled, dimmed duplicate */}
+      <video
+        src={src}
+        autoPlay
+        muted
+        loop
+        playsInline
+        aria-hidden
+        className="absolute inset-0 h-full w-full scale-110 object-cover blur-xl brightness-[0.5]"
+      />
+
+      {/* Foreground video — sharp, centered */}
       <video
         ref={videoRef}
         src={src}
@@ -89,7 +102,7 @@ export function ShareVideoPlayer({
         muted
         loop
         playsInline
-        className="h-full w-full object-contain"
+        className="relative h-full w-full object-contain"
         onWaiting={() => setIsLoading(true)}
         onCanPlay={() => setIsLoading(false)}
         onPlaying={() => setIsLoading(false)}
