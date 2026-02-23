@@ -87,20 +87,21 @@ export function ShareVideoPlayer({
 
       {/* Play/Pause overlay */}
       {!isLoading && (
-        <button
-          type="button"
-          className="absolute inset-0 flex cursor-pointer items-center justify-center"
-          onClick={togglePlayback}
-          aria-label={isPlaying ? 'Pause video' : 'Play video'}
-        >
-          <div className="rounded-full bg-black/40 p-3 opacity-0 transition-opacity hover:opacity-100">
+        <div className="absolute inset-0 flex items-center justify-center">
+          <Button
+            variant="ghost"
+            size="icon-lg"
+            className="rounded-full bg-black/40 text-white opacity-0 transition-opacity hover:bg-black/50 hover:text-white hover:opacity-100"
+            onClick={togglePlayback}
+            aria-label={isPlaying ? 'Pause video' : 'Play video'}
+          >
             {isPlaying ? (
-              <Pause className="h-6 w-6 text-white" />
+              <Pause className="h-6 w-6" />
             ) : (
-              <Play className="h-6 w-6 text-white" />
+              <Play className="h-6 w-6" />
             )}
-          </div>
-        </button>
+          </Button>
+        </div>
       )}
     </div>
   )

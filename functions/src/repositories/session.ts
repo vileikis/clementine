@@ -119,17 +119,15 @@ export async function updateSessionResultMedia(
   projectId: string,
   sessionId: string,
   resultMedia: MediaReference,
-  options?: {
-    format?: 'image' | 'gif' | 'video'
-    thumbnailUrl?: string | null
+  mediaMetadata?: {
+    format: 'image' | 'gif' | 'video'
+    thumbnailUrl: string | null
   }
 ): Promise<void> {
   await getSessionRef(projectId, sessionId).update({
     resultMedia,
-    ...(options?.format != null && { resultMediaFormat: options.format }),
-    ...(options?.thumbnailUrl !== undefined && {
-      resultMediaThumbnailUrl: options.thumbnailUrl,
-    }),
+    resultMediaFormat: mediaMetadata?.format ?? null,
+    resultMediaThumbnailUrl: mediaMetadata?.thumbnailUrl ?? null,
     updatedAt: Date.now(),
   })
 }
