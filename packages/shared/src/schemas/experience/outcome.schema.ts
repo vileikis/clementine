@@ -70,7 +70,7 @@ export const videoDurationSchema = z
   .transform((n): VideoDuration => {
     const clamped = Math.max(4, Math.min(8, n))
     return VALID_DURATIONS.reduce((prev, curr) =>
-      Math.abs(curr - clamped) < Math.abs(prev - clamped) ? curr : prev,
+      Math.abs(curr - clamped) <= Math.abs(prev - clamped) ? curr : prev,
     ) as VideoDuration
   })
   .pipe(z.literal(4).or(z.literal(6)).or(z.literal(8)))

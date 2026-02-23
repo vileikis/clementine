@@ -9,7 +9,7 @@
  *
  * @see specs/075-ai-video-editor-v2 — US1/US2
  */
-import { useCallback } from 'react'
+import { useCallback, useRef } from 'react'
 
 import { VIDEO_ASPECT_RATIOS } from '@clementine/shared'
 import { getFieldError } from '../../hooks/useOutcomeValidation'
@@ -33,7 +33,6 @@ import type {
   ImageGenerationConfig,
   MediaReference,
   VideoAspectRatio,
-  VideoDuration,
   VideoGenerationConfig,
 } from '@clementine/shared'
 
@@ -41,6 +40,9 @@ const VIDEO_ASPECT_RATIO_OPTIONS = VIDEO_ASPECT_RATIOS.map((value) => ({
   value,
   label: value,
 }))
+
+/** Remix task only supports 8s duration (Veo API constraint) */
+const REMIX_DURATION_OPTIONS = [{ value: '8', label: '8s' }] as const
 
 const DEFAULT_IMAGE_GEN_CONFIG: ImageGenerationConfig = {
   prompt: '',
@@ -77,6 +79,11 @@ export function AIVideoConfigForm({
 }: AIVideoConfigFormProps) {
   const { videoGeneration } = config
 
+  // Keep a stable ref to the latest videoGeneration to avoid stale closures
+  // when multiple ref-media files are uploaded in a single batch.
+  const videoGenerationRef = useRef(videoGeneration)
+  videoGenerationRef.current = videoGeneration
+
   // ── videoGeneration field helpers ─────────────────────────
 
   const updateVideoGeneration = useCallback(
@@ -92,14 +99,15 @@ export function AIVideoConfigForm({
 
   const handleRefMediaUploaded = useCallback(
     (mediaRef: MediaReference) => {
+      const currentGen = videoGenerationRef.current
       onConfigChange({
         videoGeneration: {
-          ...videoGeneration,
-          refMedia: [...videoGeneration.refMedia, mediaRef],
+          ...currentGen,
+          refMedia: [...currentGen.refMedia, mediaRef],
         },
       })
     },
-    [videoGeneration, onConfigChange],
+    [onConfigChange],
   )
 
   const { uploadingFiles, isUploading, uploadFiles, canAddMore } =
@@ -155,6 +163,15 @@ export function AIVideoConfigForm({
     (task: AIVideoTask) => {
       const updates: Partial<AIVideoOutcomeConfig> = { task }
 
+      // ref-images-to-video only supports 8s duration (Veo API constraint).
+      // Reset duration when switching to this task so UI matches backend behavior.
+      if (task === 'ref-images-to-video') {
+        updates.videoGeneration = {
+          ...videoGeneration,
+          duration: 8,
+        }
+      }
+
       // Initialize frame gen configs with defaults when null and new task requires them.
       // Never clear existing configs — preserves data when hiding sections.
       if (
@@ -169,7 +186,12 @@ export function AIVideoConfigForm({
 
       onConfigChange(updates)
     },
-    [config.endFrameImageGen, config.startFrameImageGen, onConfigChange],
+    [
+      videoGeneration,
+      config.endFrameImageGen,
+      config.startFrameImageGen,
+      onConfigChange,
+    ],
   )
 
   // ── Render ────────────────────────────────────────────────
@@ -217,11 +239,18 @@ export function AIVideoConfigForm({
             onConfigChange({ aspectRatio: aspectRatio as VideoAspectRatio })
           }
           hideAspectRatio
-          duration={String(videoGeneration.duration)}
-          onDurationChange={(d) =>
-            updateVideoGeneration({ duration: Number(d) as VideoDuration })
+          duration={String(videoGeneration.duration ?? 6)}
+          onDurationChange={(d) => {
+            const n = Number(d)
+            if (n === 4 || n === 6 || n === 8) {
+              updateVideoGeneration({ duration: n })
+            }
+          }}
+          durationOptions={
+            config.task === 'ref-images-to-video'
+              ? REMIX_DURATION_OPTIONS
+              : DURATION_OPTIONS
           }
-          durationOptions={DURATION_OPTIONS}
           hideRefMedia={config.task === 'image-to-video'}
           refMedia={videoGeneration.refMedia}
           onRefMediaRemove={handleRemoveRefMedia}
