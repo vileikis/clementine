@@ -15,7 +15,11 @@ import {
   AI_VIDEO_MODELS,
   DURATION_OPTIONS,
 } from './model-options'
-import type { SelectOption } from '../components/PromptComposer/ControlRow'
+
+export interface SelectOption {
+  value: string
+  label: string
+}
 
 export interface ModalitySupports {
   negativePrompt: boolean

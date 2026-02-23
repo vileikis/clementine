@@ -8,6 +8,7 @@
  * @see specs/080-prompt-composer-refactor
  */
 import { createContext, useContext } from 'react'
+import type { ReactNode } from 'react'
 
 import type { ExperienceStep, MediaReference } from '@clementine/shared'
 import type { ModalityDefinition } from '../../lib/modality-definitions'
@@ -51,13 +52,9 @@ export function PromptComposerProvider({
   children,
 }: {
   value: PromptComposerContextValue
-  children: React.ReactNode
+  children: ReactNode
 }) {
-  return (
-    <PromptComposerContext.Provider value={value}>
-      {children}
-    </PromptComposerContext.Provider>
-  )
+  return <PromptComposerContext value={value}>{children}</PromptComposerContext>
 }
 
 export function usePromptComposerContext(): PromptComposerContextValue {

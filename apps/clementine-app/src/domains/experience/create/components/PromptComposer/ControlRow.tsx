@@ -7,9 +7,11 @@
  *
  * Controls auto-render based on modality.supports.*
  */
+
 import { ASPECT_RATIOS } from '../../lib/model-options'
 import { usePromptComposerContext } from './PromptComposerContext'
 import { AddMediaButton } from './AddMediaButton'
+import type { SelectOption } from '../../lib/modality-definitions'
 import {
   Select,
   SelectContent,
@@ -18,10 +20,7 @@ import {
   SelectValue,
 } from '@/ui-kit/ui/select'
 
-export interface SelectOption {
-  value: string
-  label: string
-}
+export type { SelectOption }
 
 /**
  * ControlRow - Model, aspect ratio, duration, and add media controls
