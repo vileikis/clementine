@@ -132,7 +132,7 @@ describe('useShareActions', () => {
         await result.current.handleShare('download')
       })
 
-      expect(toast.error).toHaveBeenCalledWith('No image available to download')
+      expect(toast.error).toHaveBeenCalledWith('No media available to download')
       expect(mockGetBlob).not.toHaveBeenCalled()
     })
 
@@ -146,7 +146,7 @@ describe('useShareActions', () => {
         await result.current.handleShare('download')
       })
 
-      expect(toast.error).toHaveBeenCalledWith('No image available to download')
+      expect(toast.error).toHaveBeenCalledWith('No media available to download')
       expect(mockGetBlob).not.toHaveBeenCalled()
     })
 
@@ -204,9 +204,7 @@ describe('useShareActions', () => {
       expect(mockShare).not.toHaveBeenCalled()
       expect(mockCreateObjectURL).toHaveBeenCalledWith(mockBlob)
       expect(mockRevokeObjectURL).toHaveBeenCalledWith('blob:mock-url')
-      expect(toast.success).toHaveBeenCalledWith(
-        'Image downloaded successfully',
-      )
+      expect(toast.success).toHaveBeenCalledWith('Downloaded successfully')
     })
 
     it('should fallback to download on mobile when Web Share API is not available', async () => {
@@ -225,9 +223,7 @@ describe('useShareActions', () => {
       expect(mockShare).not.toHaveBeenCalled()
       expect(mockCreateObjectURL).toHaveBeenCalledWith(mockBlob)
       expect(mockRevokeObjectURL).toHaveBeenCalledWith('blob:mock-url')
-      expect(toast.success).toHaveBeenCalledWith(
-        'Image downloaded successfully',
-      )
+      expect(toast.success).toHaveBeenCalledWith('Downloaded successfully')
     })
 
     it('should handle user cancelling share sheet (AbortError)', async () => {
@@ -259,7 +255,7 @@ describe('useShareActions', () => {
         await result.current.handleShare('download')
       })
 
-      expect(toast.error).toHaveBeenCalledWith('Failed to download image')
+      expect(toast.error).toHaveBeenCalledWith('Failed to download')
       expect(Sentry.captureException).toHaveBeenCalledWith(
         expect.any(Error),
         expect.objectContaining({
@@ -287,7 +283,7 @@ describe('useShareActions', () => {
         await result.current.handleShare('download')
       })
 
-      expect(toast.error).toHaveBeenCalledWith('Failed to download image')
+      expect(toast.error).toHaveBeenCalledWith('Failed to download')
       expect(Sentry.captureException).toHaveBeenCalled()
     })
 
