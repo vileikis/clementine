@@ -10,6 +10,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import * as Sentry from '@sentry/tanstackstart-react'
 import { Loader2, Pause, Play, Volume2, VolumeOff } from 'lucide-react'
 import { Button } from '@/ui-kit/ui/button'
 
@@ -33,23 +34,27 @@ function useCanvasMirror(
   const rafRef = useRef<number>(0)
 
   useEffect(() => {
-    const video = videoRef.current
-    const canvas = canvasRef.current
-    if (!video || !canvas) return
-
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
     let lastTime = 0
     const interval = 1000 / 30 // ~30fps is enough for a blurred background
 
     function draw(timestamp: number) {
+      const video = videoRef.current
+      const canvas = canvasRef.current
+      if (!video || !canvas) {
+        rafRef.current = requestAnimationFrame(draw)
+        return
+      }
+      const ctx = canvas.getContext('2d')
+      if (!ctx) {
+        rafRef.current = requestAnimationFrame(draw)
+        return
+      }
       if (timestamp - lastTime >= interval) {
         lastTime = timestamp
-        if (video!.readyState >= video!.HAVE_CURRENT_DATA) {
-          canvas!.width = video!.videoWidth
-          canvas!.height = video!.videoHeight
-          ctx!.drawImage(video!, 0, 0)
+        if (video.readyState >= video.HAVE_CURRENT_DATA) {
+          canvas.width = video.videoWidth
+          canvas.height = video.videoHeight
+          ctx.drawImage(video, 0, 0)
         }
       }
       rafRef.current = requestAnimationFrame(draw)
@@ -88,8 +93,10 @@ export function ShareVideoPlayer({
     if (!video) return
 
     if (video.paused) {
-      video.play()
       setIsPlaying(true)
+      video.play().catch(() => {
+        setIsPlaying(false)
+      })
     } else {
       video.pause()
       setIsPlaying(false)
@@ -150,7 +157,14 @@ export function ShareVideoPlayer({
         onWaiting={() => setIsLoading(true)}
         onCanPlay={() => setIsLoading(false)}
         onPlaying={() => setIsLoading(false)}
-        onError={() => setHasError(true)}
+        onError={(e) => {
+          const mediaError = e.currentTarget.error
+          Sentry.captureException(
+            mediaError ?? new Error('ShareVideoPlayer: video failed to load'),
+            { extra: { src } },
+          )
+          setHasError(true)
+        }}
       />
 
       {/* Loading spinner overlay */}
