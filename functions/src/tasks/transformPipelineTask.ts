@@ -28,6 +28,7 @@ import {
   queueDispatchExports,
   queueSendSessionEmail,
 } from '../infra/task-queues'
+import { APP_DOMAIN } from '../infra/params'
 
 /**
  * Job handler context for cleanup management
@@ -226,6 +227,7 @@ async function finalizeJobSuccess(
         displayName: 'Result',
       },
       createdAt: Date.now(),
+      sizeBytes: output.sizeBytes,
     })
   } catch (error) {
     logger.warn('[TransformJob] Failed to enqueue export dispatch', {
@@ -236,6 +238,7 @@ async function finalizeJobSuccess(
 
   // Queue email send (best-effort — failure does not affect the guest experience)
   try {
+    const resultPageUrl = `${APP_DOMAIN.value()}/join/${projectId}/share?session=${sessionId}`
     await queueSendSessionEmail({
       projectId,
       sessionId,
@@ -244,6 +247,9 @@ async function finalizeJobSuccess(
         filePath: output.filePath,
         displayName: 'Result',
       },
+      format: output.format,
+      thumbnailUrl: output.thumbnailUrl ?? null,
+      resultPageUrl,
     })
   } catch (error) {
     logger.warn('[TransformJob] Failed to enqueue email send', {

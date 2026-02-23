@@ -26,6 +26,8 @@ export const dispatchExportsPayloadSchema = z.object({
   resultMedia: resultMediaSchema,
   /** Stable timestamp (epoch ms) set at the original enqueue site, propagated through the pipeline */
   createdAt: z.number(),
+  /** File size in bytes, propagated to export tasks for pre-upload validation */
+  sizeBytes: z.number().int().positive(),
 })
 
 export type DispatchExportsPayload = z.infer<typeof dispatchExportsPayloadSchema>
@@ -43,6 +45,8 @@ export const dropboxExportPayloadSchema = z.object({
   resultMedia: resultMediaSchema,
   /** Stable timestamp (epoch ms) set at dispatch time for idempotent file paths across retries */
   createdAt: z.number(),
+  /** File size in bytes for pre-upload validation and upload method routing */
+  sizeBytes: z.number().int().positive(),
 })
 
 export type DropboxExportPayload = z.infer<typeof dropboxExportPayloadSchema>

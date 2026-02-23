@@ -11,7 +11,9 @@ import { onCall, HttpsError } from 'firebase-functions/v2/https'
 import { logger } from 'firebase-functions/v2'
 import { submitGuestEmailPayloadSchema } from '../schemas/email.schema'
 import { fetchSession, updateSessionGuestEmail } from '../repositories/session'
+import { fetchJob } from '../repositories/job'
 import { queueSendSessionEmail } from '../infra/task-queues'
+import { APP_DOMAIN } from '../infra/params'
 
 export const submitGuestEmail = onCall(
   {
@@ -54,6 +56,18 @@ export const submitGuestEmail = onCall(
     }
 
     try {
+      // Fetch job to get format and thumbnailUrl for video-aware emails
+      let format: 'image' | 'gif' | 'video' = 'image'
+      let thumbnailUrl: string | null = null
+      if (session.jobId) {
+        const job = await fetchJob(projectId, session.jobId)
+        if (job?.output) {
+          format = job.output.format
+          thumbnailUrl = job.output.thumbnailUrl ?? null
+        }
+      }
+
+      const resultPageUrl = `${APP_DOMAIN.value()}/join/${projectId}/share?session=${sessionId}`
       await queueSendSessionEmail({
         projectId,
         sessionId,
@@ -62,6 +76,9 @@ export const submitGuestEmail = onCall(
           filePath: session.resultMedia.filePath!,
           displayName: session.resultMedia.displayName,
         },
+        format,
+        thumbnailUrl,
+        resultPageUrl,
       })
     } catch (error) {
       logger.warn('[SubmitGuestEmail] Failed to queue email task', {

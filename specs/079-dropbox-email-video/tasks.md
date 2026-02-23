@@ -19,7 +19,7 @@
 
 **Purpose**: Verify current state compiles before making changes
 
-- [ ] T001 Verify current builds pass: run `pnpm --filter @clementine/shared build` and `pnpm functions:build` to confirm clean baseline
+- [X] T001 Verify current builds pass: run `pnpm --filter @clementine/shared build` and `pnpm functions:build` to confirm clean baseline
 
 ---
 
@@ -29,8 +29,8 @@
 
 **CRITICAL**: The shared package must be rebuilt after schema changes so functions can import updated types
 
-- [ ] T002 Add `format`, `thumbnailUrl`, and `resultPageUrl` fields to `sendSessionEmailPayloadSchema` in `packages/shared/src/schemas/email/email.schema.ts`. Add `format: z.enum(['image', 'gif', 'video']).default('image')` for backward compatibility. Add `thumbnailUrl: z.string().nullable().default(null)` and `resultPageUrl: z.string().nullable().default(null)`.
-- [ ] T003 Rebuild shared package: run `pnpm --filter @clementine/shared build` to make new types available to functions
+- [X] T002 Add `format`, `thumbnailUrl`, and `resultPageUrl` fields to `sendSessionEmailPayloadSchema` in `packages/shared/src/schemas/email/email.schema.ts`. Add `format: z.enum(['image', 'gif', 'video']).default('image')` for backward compatibility. Add `thumbnailUrl: z.string().nullable().default(null)` and `resultPageUrl: z.string().nullable().default(null)`.
+- [X] T003 Rebuild shared package: run `pnpm --filter @clementine/shared build` to make new types available to functions
 
 **Checkpoint**: Shared schema updated and built — user story implementation can now begin
 
@@ -44,9 +44,9 @@
 
 ### Implementation for User Story 1
 
-- [ ] T004 [US1] Implement `uploadLargeFile()` function in `functions/src/services/export/dropbox.service.ts`. Use Dropbox Upload Session API: `upload_session/start` (first 8MB chunk) → `upload_session/append_v2` (repeated, 8MB chunks) → `upload_session/finish` (final chunk + commit). Use same HTTP pattern as existing `uploadFile()`. Log progress after each chunk (chunk N/total, percentage). Accept `accessToken`, `path`, `buffer`, and `totalSize` params. See `specs/079-dropbox-email-video/contracts/dropbox-chunked-upload.yaml` for API contracts.
-- [ ] T005 [US1] Add `sizeBytes` field to `DropboxExportPayload` schema and add upload routing in `functions/src/tasks/exportDropboxTask.ts`. Add `sizeBytes: z.number().int().positive()` to the payload schema. Add validation: reject with logged `ExportLog(status: 'failed', error: 'file_size_exceeded')` if `sizeBytes > 524_288_000` (500MB). After file download, route to `uploadLargeFile()` if `sizeBytes > 157_286_400` (150MB), otherwise use existing `uploadFile()`.
-- [ ] T006 [US1] Update `dispatchExportsTask` to include `sizeBytes` from `job.output.sizeBytes` in the Dropbox export task payload in `functions/src/tasks/dispatchExportsTask.ts`. Read job output to get `sizeBytes` and pass it through to `queueExportDropboxTask()`.
+- [X] T004 [US1] Implement `uploadLargeFile()` function in `functions/src/services/export/dropbox.service.ts`. Use Dropbox Upload Session API: `upload_session/start` (first 8MB chunk) → `upload_session/append_v2` (repeated, 8MB chunks) → `upload_session/finish` (final chunk + commit). Use same HTTP pattern as existing `uploadFile()`. Log progress after each chunk (chunk N/total, percentage). Accept `accessToken`, `path`, `buffer`, and `totalSize` params. See `specs/079-dropbox-email-video/contracts/dropbox-chunked-upload.yaml` for API contracts.
+- [X] T005 [US1] Add `sizeBytes` field to `DropboxExportPayload` schema and add upload routing in `functions/src/tasks/exportDropboxTask.ts`. Add `sizeBytes: z.number().int().positive()` to the payload schema. Add validation: reject with logged `ExportLog(status: 'failed', error: 'file_size_exceeded')` if `sizeBytes > 524_288_000` (500MB). After file download, route to `uploadLargeFile()` if `sizeBytes > 157_286_400` (150MB), otherwise use existing `uploadFile()`.
+- [X] T006 [US1] Update `dispatchExportsTask` to include `sizeBytes` from `job.output.sizeBytes` in the Dropbox export task payload in `functions/src/tasks/dispatchExportsTask.ts`. Read job output to get `sizeBytes` and pass it through to `queueExportDropboxTask()`.
 
 **Checkpoint**: Video files up to 500MB export to Dropbox via chunked upload. Files ≤150MB still use existing single upload.
 
@@ -60,11 +60,11 @@
 
 ### Implementation for User Story 2
 
-- [ ] T007 [P] [US2] Update result email template in `functions/src/services/email/templates/resultEmail.ts`. Accept `format`, `thumbnailUrl`, and `resultPageUrl` params. When `format === 'video'`: display thumbnail image (or generic placeholder if `thumbnailUrl` is null — FR-012), set subheading to "Here's your AI-generated video", set CTA to "Watch Your Video" linking to `resultPageUrl`. When `format === 'image'` or `'gif'`: keep existing behavior (embed `resultMediaUrl` directly, "Here's your AI-generated photo", "View & Download" CTA). See `specs/079-dropbox-email-video/contracts/email-video-template.yaml` for template contracts.
-- [ ] T008 [P] [US2] Update `sendResultEmail()` in `functions/src/services/email/email.service.ts` to accept and pass `format`, `thumbnailUrl`, and `resultPageUrl` parameters to the template function.
-- [ ] T009 [US2] Update `sendSessionEmailTask` handler in `functions/src/tasks/sendSessionEmailTask.ts` to extract `format`, `thumbnailUrl`, and `resultPageUrl` from the validated payload and pass them to `sendResultEmail()`.
-- [ ] T010 [P] [US2] Update `transformPipelineTask` in `functions/src/tasks/transformPipelineTask.ts`. In `finalizeJobSuccess()`, when queuing the email task via `queueSendSessionEmail()`, include `format: output.format`, `thumbnailUrl: output.thumbnailUrl`, and build `resultPageUrl` from project ID and session ID (e.g., `https://{domain}/join/{projectId}/share?session={sessionId}`).
-- [ ] T011 [P] [US2] Update `submitGuestEmail` callable in `functions/src/callable/submitGuestEmail.ts`. When queuing the email task, read `job.output.format` and `job.output.thumbnailUrl` from the session/job data and include them along with the built `resultPageUrl` in the email payload.
+- [X] T007 [P] [US2] Update result email template in `functions/src/services/email/templates/resultEmail.ts`. Accept `format`, `thumbnailUrl`, and `resultPageUrl` params. When `format === 'video'`: display thumbnail image (or generic placeholder if `thumbnailUrl` is null — FR-012), set subheading to "Here's your AI-generated video", set CTA to "Watch Your Video" linking to `resultPageUrl`. When `format === 'image'` or `'gif'`: keep existing behavior (embed `resultMediaUrl` directly, "Here's your AI-generated photo", "View & Download" CTA). See `specs/079-dropbox-email-video/contracts/email-video-template.yaml` for template contracts.
+- [X] T008 [P] [US2] Update `sendResultEmail()` in `functions/src/services/email/email.service.ts` to accept and pass `format`, `thumbnailUrl`, and `resultPageUrl` parameters to the template function.
+- [X] T009 [US2] Update `sendSessionEmailTask` handler in `functions/src/tasks/sendSessionEmailTask.ts` to extract `format`, `thumbnailUrl`, and `resultPageUrl` from the validated payload and pass them to `sendResultEmail()`.
+- [X] T010 [P] [US2] Update `transformPipelineTask` in `functions/src/tasks/transformPipelineTask.ts`. In `finalizeJobSuccess()`, when queuing the email task via `queueSendSessionEmail()`, include `format: output.format`, `thumbnailUrl: output.thumbnailUrl`, and build `resultPageUrl` from project ID and session ID (e.g., `https://{domain}/join/{projectId}/share?session={sessionId}`).
+- [X] T011 [P] [US2] Update `submitGuestEmail` callable in `functions/src/callable/submitGuestEmail.ts`. When queuing the email task, read `job.output.format` and `job.output.thumbnailUrl` from the session/job data and include them along with the built `resultPageUrl` in the email payload.
 
 **Checkpoint**: Video result emails show thumbnail + "Watch Your Video" CTA. Image/GIF emails are unchanged.
 
@@ -78,8 +78,8 @@
 
 ### Implementation for User Story 3
 
-- [ ] T012 [P] [US3] Add source file pre-validation in `functions/src/tasks/exportDropboxTask.ts`. Before downloading the file from Firebase Storage, validate the source file exists and has non-zero size using Storage metadata. If missing or zero-size, log `ExportLog(status: 'failed', error: 'source_file_missing')` and return without retrying.
-- [ ] T013 [P] [US3] Add error classification in `uploadLargeFile()` chunked upload methods in `functions/src/services/export/dropbox.service.ts`. Handle HTTP 401/400 auth errors (throw `DropboxInvalidGrantError` — same as existing single upload). Handle HTTP 429 rate limit (re-throw to trigger Cloud Task retry with backoff). Handle 409 `insufficient_space` (throw `DropboxInsufficientSpaceError`). Ensure all three chunked upload endpoints (start, append, finish) have consistent error handling matching the existing `uploadFile()` patterns.
+- [X] T012 [P] [US3] Add source file pre-validation in `functions/src/tasks/exportDropboxTask.ts`. Before downloading the file from Firebase Storage, validate the source file exists and has non-zero size using Storage metadata. If missing or zero-size, log `ExportLog(status: 'failed', error: 'source_file_missing')` and return without retrying.
+- [X] T013 [P] [US3] Add error classification in `uploadLargeFile()` chunked upload methods in `functions/src/services/export/dropbox.service.ts`. Handle HTTP 401/400 auth errors (throw `DropboxInvalidGrantError` — same as existing single upload). Handle HTTP 429 rate limit (re-throw to trigger Cloud Task retry with backoff). Handle 409 `insufficient_space` (throw `DropboxInsufficientSpaceError`). Ensure all three chunked upload endpoints (start, append, finish) have consistent error handling matching the existing `uploadFile()` patterns.
 
 **Checkpoint**: Video export failures are caught early, classified correctly, and logged with actionable detail.
 
@@ -89,8 +89,8 @@
 
 **Purpose**: Validate all changes build and pass quality gates
 
-- [ ] T014 Run full build validation: `pnpm --filter @clementine/shared build && pnpm functions:build` to verify all type-checks pass across shared package and functions
-- [ ] T015 Manual standards compliance review per Constitution Principle V: verify code against applicable backend standards (`backend/firestore.md`, `backend/firebase-functions.md`), global standards (`global/code-quality.md`, `global/security.md`), and Zod validation patterns (`global/zod-validation.md`)
+- [X] T014 Run full build validation: `pnpm --filter @clementine/shared build && pnpm functions:build` to verify all type-checks pass across shared package and functions
+- [X] T015 Manual standards compliance review per Constitution Principle V: verify code against applicable backend standards (`backend/firestore.md`, `backend/firebase-functions.md`), global standards (`global/code-quality.md`, `global/security.md`), and Zod validation patterns (`global/zod-validation.md`)
 
 ---
 

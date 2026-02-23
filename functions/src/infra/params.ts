@@ -21,3 +21,8 @@ export const DROPBOX_TOKEN_ENCRYPTION_KEY = defineSecret('DROPBOX_TOKEN_ENCRYPTI
 
 // Email (SMTP via Google Workspace)
 export const SMTP_APP_PASSWORD = defineSecret('SMTP_APP_PASSWORD')
+
+// App domain for building public-facing URLs (e.g., result page links in emails)
+export const APP_DOMAIN = defineString('APP_DOMAIN', {
+  default: 'https://app.useclementine.com',
+})
