@@ -2,11 +2,12 @@
  * ShareVideoPlayer Component
  *
  * Minimal video player for the share screen with autoplay muted loop,
- * custom play/pause overlay, loading spinner, and error state with retry.
+ * custom play/pause overlay (full area click), mute/unmute toggle,
+ * loading spinner, and error state with retry.
  */
 
 import { useCallback, useRef, useState } from 'react'
-import { Loader2, Pause, Play } from 'lucide-react'
+import { Loader2, Pause, Play, Volume2, VolumeOff } from 'lucide-react'
 import { Button } from '@/ui-kit/ui/button'
 
 export interface ShareVideoPlayerProps {
@@ -25,6 +26,7 @@ export function ShareVideoPlayer({
 }: ShareVideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [isPlaying, setIsPlaying] = useState(true)
+  const [isMuted, setIsMuted] = useState(true)
   const [isLoading, setIsLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
 
@@ -41,6 +43,14 @@ export function ShareVideoPlayer({
     }
   }, [])
 
+  const toggleMute = useCallback(() => {
+    const video = videoRef.current
+    if (!video) return
+
+    video.muted = !video.muted
+    setIsMuted(video.muted)
+  }, [])
+
   const handleRetry = useCallback(() => {
     setHasError(false)
     setIsLoading(true)
@@ -50,9 +60,9 @@ export function ShareVideoPlayer({
   if (hasError) {
     return (
       <div
-        className={`flex max-h-[50vh] w-full flex-col items-center justify-center gap-4 rounded-lg bg-muted p-8 ${className ?? ''}`}
+        className={`flex h-full w-full flex-col items-center justify-center gap-4 rounded-lg bg-black/80 p-8 ${className ?? ''}`}
       >
-        <p className="text-sm text-muted-foreground">Video failed to load</p>
+        <p className="text-sm text-white/70">Video failed to load</p>
         <Button variant="outline" size="sm" onClick={handleRetry}>
           Try again
         </Button>
@@ -61,7 +71,7 @@ export function ShareVideoPlayer({
   }
 
   return (
-    <div className={`relative ${className ?? ''}`}>
+    <div className={`relative h-full w-full ${className ?? ''}`}>
       {/* Video element */}
       <video
         ref={videoRef}
@@ -71,7 +81,7 @@ export function ShareVideoPlayer({
         muted
         loop
         playsInline
-        className="max-h-[50vh] w-full rounded-lg object-contain"
+        className="h-full w-full object-contain"
         onWaiting={() => setIsLoading(true)}
         onCanPlay={() => setIsLoading(false)}
         onPlaying={() => setIsLoading(false)}
@@ -85,20 +95,38 @@ export function ShareVideoPlayer({
         </div>
       )}
 
-      {/* Play/Pause overlay */}
+      {/* Full-area play/pause click zone */}
       {!isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center">
+        <button
+          type="button"
+          className="group absolute inset-0 flex cursor-pointer items-center justify-center focus:outline-none"
+          onClick={togglePlayback}
+          aria-label={isPlaying ? 'Pause video' : 'Play video'}
+        >
+          <div className="rounded-full bg-black/40 p-3 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+            {isPlaying ? (
+              <Pause className="h-6 w-6 text-white" />
+            ) : (
+              <Play className="h-6 w-6 text-white" />
+            )}
+          </div>
+        </button>
+      )}
+
+      {/* Mute/unmute toggle — bottom right */}
+      {!isLoading && (
+        <div className="absolute bottom-3 right-3">
           <Button
             variant="ghost"
-            size="icon-lg"
-            className="rounded-full bg-black/40 text-white opacity-0 transition-opacity hover:bg-black/50 hover:text-white hover:opacity-100"
-            onClick={togglePlayback}
-            aria-label={isPlaying ? 'Pause video' : 'Play video'}
+            size="icon-sm"
+            className="rounded-full bg-black/40 text-white hover:bg-black/60 hover:text-white"
+            onClick={toggleMute}
+            aria-label={isMuted ? 'Unmute video' : 'Mute video'}
           >
-            {isPlaying ? (
-              <Pause className="h-6 w-6" />
+            {isMuted ? (
+              <VolumeOff className="h-4 w-4" />
             ) : (
-              <Play className="h-6 w-6" />
+              <Volume2 className="h-4 w-4" />
             )}
           </Button>
         </div>

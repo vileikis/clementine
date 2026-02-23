@@ -126,85 +126,90 @@ export function ShareReadyRenderer({
   }
 
   return (
-    <ScrollableView className="items-center gap-6 p-8 max-w-2xl">
-      {mediaUrl && mediaFormat === 'video' ? (
-        <ShareVideoPlayer
-          src={mediaUrl}
-          posterUrl={mediaThumbnailUrl}
-          className="w-full max-w-[450px]"
-        />
-      ) : mediaUrl ? (
-        <img
-          src={mediaUrl}
-          alt="Generated result"
-          className="max-h-[50vh] w-full max-w-[450px] rounded-lg object-contain"
-        />
+    <ScrollableView className="items-center max-w-2xl">
+      {mediaUrl ? (
+        <div className="flex h-[50vh] w-full items-center justify-center overflow-hidden rounded-lg bg-black">
+          {mediaFormat === 'video' ? (
+            <ShareVideoPlayer src={mediaUrl} posterUrl={mediaThumbnailUrl} />
+          ) : (
+            <img
+              src={mediaUrl}
+              alt="Generated result"
+              className="h-full w-full object-contain"
+            />
+          )}
+        </div>
       ) : mode === 'edit' ? (
-        <div className="w-full aspect-square max-w-md rounded-lg bg-muted flex items-center justify-center">
+        <div className="flex h-[50vh] w-full items-center justify-center rounded-lg bg-muted">
           <ImageIcon className="h-12 w-12 text-muted-foreground/50" />
         </div>
       ) : (
-        <Skeleton className="w-full aspect-square max-w-md rounded-lg" />
+        <Skeleton className="h-[50vh] w-full rounded-lg" />
       )}
 
-      {/* Share icons (displayed when enabled) */}
-      {enabledIcons.length > 0 && (
-        <div className="flex justify-center gap-3 flex-wrap">
-          {enabledIcons.map((platform) => {
-            const { icon: Icon, label } = PLATFORM_ICONS[platform]
-            return (
-              <ThemedIconButton
-                key={platform}
-                title={label}
-                size="lg"
-                aria-label={label}
-                onClick={() => handleIconClick(platform)}
-              >
-                <Icon className="h-5 w-5" />
-              </ThemedIconButton>
-            )
-          })}
+      <div className="space-y-6 p-6 pb-12">
+        {/* Share icons (displayed when enabled) */}
+        <div>
+          {enabledIcons.length > 0 && (
+            <div className="flex justify-center gap-3 flex-wrap">
+              {enabledIcons.map((platform) => {
+                const { icon: Icon, label } = PLATFORM_ICONS[platform]
+                return (
+                  <ThemedIconButton
+                    key={platform}
+                    title={label}
+                    size="lg"
+                    aria-label={label}
+                    onClick={() => handleIconClick(platform)}
+                  >
+                    <Icon className="h-5 w-5" />
+                  </ThemedIconButton>
+                )
+              })}
+            </div>
+          )}
         </div>
-      )}
-      <div className="p-2" />
 
-      {/* Title (hidden when null) */}
-      {share.title && (
-        <ThemedText variant="heading" className="text-center">
-          {share.title}
-        </ThemedText>
-      )}
+        <div className="space-y-2">
+          {/* Title (hidden when null) */}
+          {share.title && (
+            <ThemedText variant="heading" className="text-center">
+              {share.title}
+            </ThemedText>
+          )}
 
-      {/* Description (hidden when null) */}
-      {share.description && (
-        <ThemedText variant="body" className="text-center opacity-90">
-          {share.description}
-        </ThemedText>
-      )}
+          {/* Description (hidden when null) */}
+          {share.description && (
+            <ThemedText variant="body" className="text-center opacity-90">
+              {share.description}
+            </ThemedText>
+          )}
+        </div>
 
-      {/* CTA button (primary style, hidden when label is null/empty) */}
-      <div className="w-full max-w-[450px] space-y-3 pt-4">
-        {share.cta?.label && (
+        {/* CTA button (primary style, hidden when label is null/empty) */}
+        <div className="w-full max-w-[450px] space-y-3 pt-4">
+          {share.cta?.label && (
+            <ThemedButton
+              variant="primary"
+              size="md"
+              className="w-full"
+              onClick={handleCtaClick}
+            >
+              {share.cta.label}
+            </ThemedButton>
+          )}
+
+          {/* Start over button (secondary/outline style) */}
           <ThemedButton
-            variant="primary"
+            variant="outline"
             size="md"
             className="w-full"
-            onClick={handleCtaClick}
+            onClick={handleStartOverClick}
           >
-            {share.cta.label}
+            <RotateCcw className="mr-2 h-4 w-4" />
+            Start over
           </ThemedButton>
-        )}
-
-        {/* Start over button (secondary/outline style) */}
-        <ThemedButton
-          variant="outline"
-          size="md"
-          className="w-full"
-          onClick={handleStartOverClick}
-        >
-          <RotateCcw className="mr-2 h-4 w-4" />
-          Start over
-        </ThemedButton>
+        </div>
       </div>
     </ScrollableView>
   )
