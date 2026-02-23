@@ -31,6 +31,9 @@ function getTransporter(): Transporter {
 interface SendResultEmailParams {
   guestEmail: string
   resultMediaUrl: string
+  format: 'image' | 'gif' | 'video'
+  thumbnailUrl: string | null
+  resultPageUrl: string | null
 }
 
 /**
@@ -41,8 +44,16 @@ interface SendResultEmailParams {
 export async function sendResultEmail({
   guestEmail,
   resultMediaUrl,
+  format,
+  thumbnailUrl,
+  resultPageUrl,
 }: SendResultEmailParams): Promise<void> {
-  const html = resultEmailTemplate({ resultMediaUrl })
+  const html = resultEmailTemplate({
+    resultMediaUrl,
+    format,
+    thumbnailUrl,
+    resultPageUrl,
+  })
 
   await getTransporter().sendMail({
     from: '"Clementine" <info@clementine-labs.com>',

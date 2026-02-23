@@ -42,7 +42,8 @@ export const sendSessionEmailTask = onTaskDispatched(
       return
     }
 
-    const { projectId, sessionId, resultMedia } = parseResult.data
+    const { projectId, sessionId, resultMedia, format, thumbnailUrl, resultPageUrl } =
+      parseResult.data
 
     logger.info('[SendSessionEmail] Processing', { projectId, sessionId })
 
@@ -79,6 +80,9 @@ export const sendSessionEmailTask = onTaskDispatched(
       await sendResultEmail({
         guestEmail: session.guestEmail,
         resultMediaUrl: resultMedia.url,
+        format,
+        thumbnailUrl,
+        resultPageUrl,
       })
 
       // Update emailSentAt on success

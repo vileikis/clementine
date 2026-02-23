@@ -17,7 +17,14 @@ export const VERTEX_AI_LOCATION = defineString('VERTEX_AI_LOCATION', {
 // Dropbox OAuth
 export const DROPBOX_APP_KEY = defineString('DROPBOX_APP_KEY')
 export const DROPBOX_APP_SECRET = defineSecret('DROPBOX_APP_SECRET')
-export const DROPBOX_TOKEN_ENCRYPTION_KEY = defineSecret('DROPBOX_TOKEN_ENCRYPTION_KEY')
+export const DROPBOX_TOKEN_ENCRYPTION_KEY = defineSecret(
+  'DROPBOX_TOKEN_ENCRYPTION_KEY',
+)
 
 // Email (SMTP via Google Workspace)
 export const SMTP_APP_PASSWORD = defineSecret('SMTP_APP_PASSWORD')
+
+// App domain for building public-facing URLs (e.g., result page links in emails)
+export const APP_DOMAIN = defineString('APP_DOMAIN', {
+  default: 'https://clementine-be--clementine-7568d.europe-west4.hosted.app',
+})

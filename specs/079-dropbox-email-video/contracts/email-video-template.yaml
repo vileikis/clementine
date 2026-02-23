@@ -1,0 +1,97 @@
+# Email Video Template Contract
+# Feature: 079-dropbox-email-video
+# Implements: FR-009, FR-010, FR-011, FR-012
+
+---
+# EM-V01: Send Session Email Task Payload (Extended)
+operation: sendSessionEmailTask
+description: >
+  Cloud Task payload for sending result emails. Extended with
+  format, thumbnailUrl, and resultPageUrl for video support.
+payload:
+  projectId:
+    type: string
+    required: true
+    description: Project ID for the session
+  sessionId:
+    type: string
+    required: true
+    description: Session ID for result lookup
+  resultMedia:
+    type: object
+    required: true
+    properties:
+      url:
+        type: string
+        required: true
+        description: Direct URL to the result media file
+      filePath:
+        type: string
+        required: true
+        description: Firebase Storage path
+      displayName:
+        type: string
+        required: true
+        description: Human-readable file name
+  format:
+    type: enum
+    values: [image, gif, video]
+    required: true
+    default: image
+    description: Media type discriminator for template branching
+  thumbnailUrl:
+    type: string
+    required: false
+    default: null
+    description: >
+      URL to video thumbnail image. Required when format is 'video'.
+      Falls back to placeholder if null and format is video.
+  resultPageUrl:
+    type: string
+    required: false
+    default: null
+    description: >
+      URL to hosted result page. Required when format is 'video'.
+      Used as CTA destination in video emails.
+
+---
+# EM-V02: Video Email Template
+operation: resultEmailTemplate (format === 'video')
+description: >
+  HTML email content when the result media type is video.
+  Displays thumbnail with "Watch Your Video" CTA.
+template_sections:
+  subject: "Your result is ready!"
+  heading: "Your result is ready!"
+  subheading: "Here's your AI-generated video"
+  media_display:
+    type: image
+    src: "{thumbnailUrl || placeholderUrl}"
+    alt: "Video preview"
+    style: "max-width: 100%; border-radius: 8px;"
+  cta_button:
+    text: "Watch Your Video"
+    href: "{resultPageUrl}"
+    style: "background-color: primary; color: white; padding; border-radius"
+  footer: "Powered by Clementine"
+
+---
+# EM-V03: Image Email Template (Existing, Reference)
+operation: resultEmailTemplate (format === 'image' | 'gif')
+description: >
+  Existing HTML email content for image/gif results.
+  Embeds media directly with "View & Download" CTA.
+template_sections:
+  subject: "Your result is ready!"
+  heading: "Your result is ready!"
+  subheading: "Here's your AI-generated photo"
+  media_display:
+    type: image
+    src: "{resultMedia.url}"
+    alt: "Your AI result"
+    style: "max-width: 100%; border-radius: 8px;"
+  cta_button:
+    text: "View & Download"
+    href: "{resultMedia.url}"
+    style: "background-color: primary; color: white; padding; border-radius"
+  footer: "Powered by Clementine"

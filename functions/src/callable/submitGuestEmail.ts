@@ -12,6 +12,7 @@ import { logger } from 'firebase-functions/v2'
 import { submitGuestEmailPayloadSchema } from '../schemas/email.schema'
 import { fetchSession, updateSessionGuestEmail } from '../repositories/session'
 import { queueSendSessionEmail } from '../infra/task-queues'
+import { APP_DOMAIN } from '../infra/params'
 
 export const submitGuestEmail = onCall(
   {
@@ -54,6 +55,7 @@ export const submitGuestEmail = onCall(
     }
 
     try {
+      const resultPageUrl = `${APP_DOMAIN.value()}/join/${projectId}/share?session=${sessionId}`
       await queueSendSessionEmail({
         projectId,
         sessionId,
@@ -62,6 +64,9 @@ export const submitGuestEmail = onCall(
           filePath: session.resultMedia.filePath!,
           displayName: session.resultMedia.displayName,
         },
+        format: session.resultMediaFormat ?? 'image',
+        thumbnailUrl: session.resultMediaThumbnailUrl ?? null,
+        resultPageUrl,
       })
     } catch (error) {
       logger.warn('[SubmitGuestEmail] Failed to queue email task', {

@@ -7,7 +7,7 @@
  * Note: Full integration tests with Firestore require emulator setup.
  */
 import { describe, it, expect } from 'vitest'
-import { transformPipelineTaskPayloadSchema } from '../schemas/transform-pipeline.schema'
+import { transformPipelineJobPayloadSchema as transformPipelineTaskPayloadSchema } from '../schemas/transform-pipeline.schema'
 
 describe('transformPipelineTask payload schema', () => {
   it('validates a valid payload', () => {

@@ -27,6 +27,7 @@ import {
   decrypt,
   refreshAccessToken,
   uploadFile,
+  uploadLargeFile,
   DropboxInvalidGrantError,
   DropboxInsufficientSpaceError,
 } from '../services/export'
@@ -80,7 +81,7 @@ export const exportDropboxTask = onTaskDispatched(
     }
 
     const payload = parseResult.data
-    const { jobId, projectId, sessionId, workspaceId } = payload
+    const { jobId, projectId, sessionId, workspaceId, sizeBytes } = payload
 
     // Resolve credentials once at the top
     const credentials: DropboxCredentials = {
@@ -93,7 +94,28 @@ export const exportDropboxTask = onTaskDispatched(
       jobId,
       projectId,
       workspaceId,
+      sizeBytes,
     })
+
+    // Reject files exceeding 500MB limit
+    const MAX_FILE_SIZE = 524_288_000
+    if (sizeBytes > MAX_FILE_SIZE) {
+      logger.warn('[ExportDropboxTask] File size exceeded limit', {
+        jobId,
+        sizeBytes,
+        maxSize: MAX_FILE_SIZE,
+      })
+      await createExportLog(projectId, {
+        jobId,
+        sessionId,
+        provider: 'dropbox',
+        status: 'failed',
+        destinationPath: null,
+        error: 'file_size_exceeded',
+        createdAt: Date.now(),
+      })
+      return
+    }
 
     try {
       // 1. Validate prerequisites (workspace connected, export enabled)
@@ -267,9 +289,46 @@ async function executeDropboxUpload(
 ): Promise<string | undefined> {
   const { resultMedia, sessionId } = payload
 
-  // Download from Firebase Storage
+  // Pre-validate source file exists and has non-zero size
   const bucket = storage.bucket()
   const file = bucket.file(resultMedia.filePath)
+  const [exists] = await file.exists()
+  if (!exists) {
+    logger.warn('[ExportDropboxTask] Source file missing', {
+      filePath: resultMedia.filePath,
+      jobId: payload.jobId,
+    })
+    await createExportLog(payload.projectId, {
+      jobId: payload.jobId,
+      sessionId: payload.sessionId,
+      provider: 'dropbox',
+      status: 'failed',
+      destinationPath: null,
+      error: 'source_file_missing',
+      createdAt: Date.now(),
+    })
+    return // Don't retry — file won't appear
+  }
+
+  const [metadata] = await file.getMetadata()
+  if (!metadata.size || Number(metadata.size) === 0) {
+    logger.warn('[ExportDropboxTask] Source file has zero size', {
+      filePath: resultMedia.filePath,
+      jobId: payload.jobId,
+    })
+    await createExportLog(payload.projectId, {
+      jobId: payload.jobId,
+      sessionId: payload.sessionId,
+      provider: 'dropbox',
+      status: 'failed',
+      destinationPath: null,
+      error: 'source_file_empty',
+      createdAt: Date.now(),
+    })
+    return // Don't retry — zero-size file
+  }
+
+  // Download from Firebase Storage
   const [fileBuffer] = await file.download()
 
   // Compute destination path (uses stable timestamp from dispatch for retry idempotency)
@@ -281,9 +340,23 @@ async function executeDropboxUpload(
     payload.createdAt,
   )
 
-  // Upload to Dropbox
+  // Upload to Dropbox — route to chunked upload for files > 150MB
+  const CHUNKED_UPLOAD_THRESHOLD = 157_286_400
+  // const CHUNKED_UPLOAD_THRESHOLD = 1_000_000
   try {
-    await uploadFile(accessToken, destinationPath, fileBuffer)
+    if (payload.sizeBytes > CHUNKED_UPLOAD_THRESHOLD) {
+      logger.info('[ExportDropboxTask] Using chunked upload', {
+        sizeBytes: payload.sizeBytes,
+      })
+      await uploadLargeFile(
+        accessToken,
+        destinationPath,
+        fileBuffer,
+        payload.sizeBytes,
+      )
+    } else {
+      await uploadFile(accessToken, destinationPath, fileBuffer)
+    }
   } catch (error) {
     if (error instanceof DropboxInsufficientSpaceError) {
       await createExportLog(payload.projectId, {

@@ -34,6 +34,12 @@ export const sendSessionEmailPayloadSchema = z.object({
   projectId: z.string().min(1),
   sessionId: z.string().min(1),
   resultMedia: resultMediaSchema,
+  /** Media type discriminator for email template branching */
+  format: z.enum(['image', 'gif', 'video']).default('image'),
+  /** Video thumbnail URL for email preview (required for video, null for image/gif) */
+  thumbnailUrl: z.string().nullable().default(null),
+  /** Link to hosted result page (required for video CTA) */
+  resultPageUrl: z.string().nullable().default(null),
 })
 
 export type SendSessionEmailPayload = z.infer<typeof sendSessionEmailPayloadSchema>
