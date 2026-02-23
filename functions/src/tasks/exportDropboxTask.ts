@@ -342,12 +342,18 @@ async function executeDropboxUpload(
 
   // Upload to Dropbox — route to chunked upload for files > 150MB
   const CHUNKED_UPLOAD_THRESHOLD = 157_286_400
+  // const CHUNKED_UPLOAD_THRESHOLD = 1_000_000
   try {
     if (payload.sizeBytes > CHUNKED_UPLOAD_THRESHOLD) {
       logger.info('[ExportDropboxTask] Using chunked upload', {
         sizeBytes: payload.sizeBytes,
       })
-      await uploadLargeFile(accessToken, destinationPath, fileBuffer, payload.sizeBytes)
+      await uploadLargeFile(
+        accessToken,
+        destinationPath,
+        fileBuffer,
+        payload.sizeBytes,
+      )
     } else {
       await uploadFile(accessToken, destinationPath, fileBuffer)
     }

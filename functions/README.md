@@ -178,6 +178,16 @@ pnpm functions:serve
 curl -X POST http://127.0.0.1:5003/clementine-7568d/europe-west1/startTransformPipelineV2 \
     -H "Content-Type: application/json" \
     -d '{ "data": { "projectId": "proj-1", "sessionId": "sess-1" } }'
+
+curl -X POST http://127.0.0.1:5003/clementine-7568d/europe-west1/startTransformPipelineV2 \
+    -H "Content-Type: application/json" \
+    -d '{ "data": { "projectId": "817gbhF6aMc9SM6C3q1x", "sessionId": "IWSHNRioRh8vzXfhIec0" } }'
+
+curl -X POST http://127.0.0.1:5003/clementine-7568d/europe-west1/submitGuestEmail \
+    -H "Content-Type: application/json" \
+    -d '{ "data": { "projectId": "817gbhF6aMc9SM6C3q1x", "sessionId": "9sraDlQsWOF99I06doF2", "email": "iggy.vileikis@gmail.com" } }'
+
+
 ```
 
 **Tips:**
