@@ -17,7 +17,7 @@
 
 **Purpose**: Create the ModalityDefinition type system and predefined modality constants that all subsequent work depends on.
 
-- [ ] T001 Create ModalityDefinition interface with ModalitySupports and ModalityLimits nested types, plus IMAGE_MODALITY and VIDEO_MODALITY constants in `apps/clementine-app/src/domains/experience/create/lib/modality-definitions.ts`
+- [x] T001 Create ModalityDefinition interface with ModalitySupports and ModalityLimits nested types, plus IMAGE_MODALITY and VIDEO_MODALITY constants in `apps/clementine-app/src/domains/experience/create/lib/modality-definitions.ts`
 
   **Details**:
   - Define `ModalitySupports` interface: `negativePrompt`, `referenceMedia`, `sound`, `enhance`, `duration`, `aspectRatio` (all booleans)
@@ -37,7 +37,7 @@
 
 **⚠️ CRITICAL**: No component refactoring can begin until this phase is complete.
 
-- [ ] T002 Create PromptComposerContext with provider and hook in `apps/clementine-app/src/domains/experience/create/components/PromptComposer/PromptComposerContext.tsx`
+- [x] T002 Create PromptComposerContext with provider and hook in `apps/clementine-app/src/domains/experience/create/components/PromptComposer/PromptComposerContext.tsx`
 
   **Details**:
   - Define `ModalityControlValues` interface: optional `aspectRatio: string`, `onAspectRatioChange: (value: string) => void`, `duration: string`, `onDurationChange: (value: string) => void`
@@ -62,7 +62,7 @@
 
 ### Implementation
 
-- [ ] T003 [US1][US3][US4] Refactor PromptComposer component with new props interface and context provider in `apps/clementine-app/src/domains/experience/create/components/PromptComposer/PromptComposer.tsx`
+- [x] T003 [US1][US3][US4] Refactor PromptComposer component with new props interface and context provider in `apps/clementine-app/src/domains/experience/create/components/PromptComposer/PromptComposer.tsx`
 
   **Details**:
   - Replace `PromptComposerProps` with new interface (10 props max): `modality: ModalityDefinition`, `prompt: string`, `onPromptChange`, `model: string`, `onModelChange`, `controls?: ModalityControlValues`, `refMedia?: RefMediaState`, `steps: ExperienceStep[]`, `disabled?: boolean`, `error?: string`
@@ -75,7 +75,7 @@
   - Keep error/disabled rendering logic
   - Reference: `quickstart.md` §Before & After, `research.md` §R-003
 
-- [ ] T004 [P] [US3][US4] Refactor ControlRow to read from context and render modality-driven controls in `apps/clementine-app/src/domains/experience/create/components/PromptComposer/ControlRow.tsx`
+- [x] T004 [P] [US3][US4] Refactor ControlRow to read from context and render modality-driven controls in `apps/clementine-app/src/domains/experience/create/components/PromptComposer/ControlRow.tsx`
 
   **Details**:
   - Remove ALL props from ControlRow interface (it becomes a zero-prop component)
@@ -88,7 +88,7 @@
   - Keep all shadcn/ui Select components and their existing styling
   - Reference: `quickstart.md` §Child Component Access Pattern
 
-- [ ] T005 [P] [US3] Refactor ReferenceMediaStrip to read from context in `apps/clementine-app/src/domains/experience/create/components/PromptComposer/ReferenceMediaStrip.tsx`
+- [x] T005 [P] [US3] Refactor ReferenceMediaStrip to read from context in `apps/clementine-app/src/domains/experience/create/components/PromptComposer/ReferenceMediaStrip.tsx`
 
   **Details**:
   - Remove props: `media`, `uploadingFiles`, `onRemove`, `disabled`
@@ -98,7 +98,7 @@
   - Keep UploadingMediaItem rendering unchanged
   - Guard: if `!refMedia` return null (graceful degradation per edge case spec)
 
-- [ ] T006 [P] [US3] Update AddMediaButton to read from context in `apps/clementine-app/src/domains/experience/create/components/PromptComposer/AddMediaButton.tsx`
+- [x] T006 [P] [US3] Update AddMediaButton to read from context in `apps/clementine-app/src/domains/experience/create/components/PromptComposer/AddMediaButton.tsx`
 
   **Details**:
   - Remove props: `onFilesSelected`, `disabled`
@@ -107,7 +107,7 @@
   - Disabled logic: `disabled || !refMedia?.canAddMore || refMedia?.isUploading`
   - Keep file input ref and accept="image/*" behavior unchanged
 
-- [ ] T007 [US1] Update barrel exports in `apps/clementine-app/src/domains/experience/create/components/PromptComposer/index.ts`
+- [x] T007 [US1] Update barrel exports in `apps/clementine-app/src/domains/experience/create/components/PromptComposer/index.ts`
 
   **Details**:
   - Export `PromptComposer` component (existing, now with new props)
@@ -128,7 +128,7 @@
 
 ### Implementation
 
-- [ ] T008 [P] [US2] Migrate AIImageConfigForm to new PromptComposer API in `apps/clementine-app/src/domains/experience/create/components/ai-image-config/AIImageConfigForm.tsx`
+- [x] T008 [P] [US2] Migrate AIImageConfigForm to new PromptComposer API in `apps/clementine-app/src/domains/experience/create/components/ai-image-config/AIImageConfigForm.tsx`
 
   **Details**:
   - Import `IMAGE_MODALITY` from PromptComposer barrel export
@@ -147,7 +147,7 @@
   - Keep `useRefMediaUpload` hook usage unchanged
   - Reference: `quickstart.md` §Before & After
 
-- [ ] T009 [P] [US2] Migrate AIVideoConfigForm to new PromptComposer API with task-specific modality variants in `apps/clementine-app/src/domains/experience/create/components/ai-video-config/AIVideoConfigForm.tsx`
+- [x] T009 [P] [US2] Migrate AIVideoConfigForm to new PromptComposer API with task-specific modality variants in `apps/clementine-app/src/domains/experience/create/components/ai-video-config/AIVideoConfigForm.tsx`
 
   **Details**:
   - Import `VIDEO_MODALITY` and `REMIX_DURATION_OPTIONS` (or use existing constant)
@@ -168,7 +168,7 @@
   - Keep all existing handlers and useRefMediaUpload hook unchanged
   - Reference: `quickstart.md` §Creating Task-Specific Variants
 
-- [ ] T010 [P] [US2] Migrate FrameGenerationSection to new PromptComposer API in `apps/clementine-app/src/domains/experience/create/components/ai-video-config/FrameGenerationSection.tsx`
+- [x] T010 [P] [US2] Migrate FrameGenerationSection to new PromptComposer API in `apps/clementine-app/src/domains/experience/create/components/ai-video-config/FrameGenerationSection.tsx`
 
   **Details**:
   - Import `IMAGE_MODALITY` from PromptComposer barrel export
@@ -193,16 +193,16 @@
 
 **Purpose**: Clean up dead code, run validation gates, verify edge cases and success criteria.
 
-- [ ] T011 Remove any unused imports and old type references across all modified files
-- [ ] T012 Run `pnpm app:type-check` to verify zero TypeScript errors across entire app
-- [ ] T013 Run `pnpm app:check` (lint + format) to verify code quality compliance
-- [ ] T014 Verify edge case: PromptComposer renders minimal composer (prompt + model only) when given a modality with all supports set to false and no refMedia/controls props
-- [ ] T015 Verify edge case: PromptComposer gracefully handles missing controls/refMedia when modality says the feature is supported (graceful degradation — hides control rather than crash)
-- [ ] T016 Manual regression: verify AIImageConfigForm — model selection, aspect ratio, reference images (upload/remove/drag-drop, max 5), @mention autocomplete, validation errors, disabled state
-- [ ] T017 Manual regression: verify AIVideoConfigForm image-to-video task — video model selection, duration (4s/6s/8s), no reference media shown, validation errors
-- [ ] T018 Manual regression: verify AIVideoConfigForm ref-images-to-video task — video model selection, duration locked to 8s, reference images (max 2), validation errors
-- [ ] T019 Manual regression: verify FrameGenerationSection — image model selection, no aspect ratio, reference images, @mention autocomplete
-- [ ] T020 Verify success criteria SC-002: count PromptComposer props (target ≤9, down from 19)
+- [x] T011 Remove any unused imports and old type references across all modified files
+- [x] T012 Run `pnpm app:type-check` to verify zero TypeScript errors across entire app
+- [x] T013 Run `pnpm app:check` (lint + format) to verify code quality compliance
+- [x] T014 Verify edge case: PromptComposer renders minimal composer (prompt + model only) when given a modality with all supports set to false and no refMedia/controls props
+- [x] T015 Verify edge case: PromptComposer gracefully handles missing controls/refMedia when modality says the feature is supported (graceful degradation — hides control rather than crash)
+- [x] T016 Manual regression: verify AIImageConfigForm — model selection, aspect ratio, reference images (upload/remove/drag-drop, max 5), @mention autocomplete, validation errors, disabled state
+- [x] T017 Manual regression: verify AIVideoConfigForm image-to-video task — video model selection, duration (4s/6s/8s), no reference media shown, validation errors
+- [x] T018 Manual regression: verify AIVideoConfigForm ref-images-to-video task — video model selection, duration locked to 8s, reference images (max 2), validation errors
+- [x] T019 Manual regression: verify FrameGenerationSection — image model selection, no aspect ratio, reference images, @mention autocomplete
+- [x] T020 Verify success criteria SC-002: count PromptComposer props (target ≤9, down from 19)
 
 ---
 
