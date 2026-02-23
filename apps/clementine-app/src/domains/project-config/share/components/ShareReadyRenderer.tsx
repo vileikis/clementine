@@ -25,6 +25,7 @@ import {
   FaXTwitter,
 } from 'react-icons/fa6'
 import { FaTelegramPlane } from 'react-icons/fa'
+import { ShareVideoPlayer } from './ShareVideoPlayer'
 import type { ShareOptionsConfig, ShareReadyConfig } from '@clementine/shared'
 import type { LucideIcon } from 'lucide-react'
 import type { IconType } from 'react-icons'
@@ -49,6 +50,10 @@ export interface ShareReadyRendererProps {
   mode?: 'edit' | 'run'
   /** Media URL to display (when available in run mode) */
   mediaUrl?: string | null
+  /** Format of the result media */
+  mediaFormat?: 'image' | 'gif' | 'video' | null
+  /** Thumbnail URL for video poster image */
+  mediaThumbnailUrl?: string | null
   /** Callback when share platform is clicked (required in run mode, handles download too) */
   onShare?: (platform: keyof ShareOptionsConfig) => void
   /** Callback when CTA is clicked (required in run mode) */
@@ -91,6 +96,8 @@ export function ShareReadyRenderer({
   shareOptions,
   mode = 'edit',
   mediaUrl,
+  mediaFormat,
+  mediaThumbnailUrl,
   onShare,
   onCta,
   onStartOver,
@@ -120,11 +127,17 @@ export function ShareReadyRenderer({
 
   return (
     <ScrollableView className="items-center gap-6 p-8 max-w-2xl">
-      {mediaUrl ? (
+      {mediaUrl && mediaFormat === 'video' ? (
+        <ShareVideoPlayer
+          src={mediaUrl}
+          posterUrl={mediaThumbnailUrl}
+          className="w-full max-w-[450px]"
+        />
+      ) : mediaUrl ? (
         <img
           src={mediaUrl}
           alt="Generated result"
-          className="w-full max-w-[450px] rounded-lg"
+          className="max-h-[50vh] w-full max-w-[450px] rounded-lg object-contain"
         />
       ) : mode === 'edit' ? (
         <div className="w-full aspect-square max-w-md rounded-lg bg-muted flex items-center justify-center">

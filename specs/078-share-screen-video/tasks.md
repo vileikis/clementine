@@ -21,9 +21,9 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T001 [P] Add `resultMediaFormat` (`z.enum(['image', 'gif', 'video']).nullable().default(null)`) and `resultMediaThumbnailUrl` (`z.url().nullable().default(null)`) fields to the session schema in `packages/shared/src/schemas/session/session.schema.ts`. Place them after the existing `resultMedia` field. Build the shared package with `pnpm --filter @clementine/shared build` to verify types compile.
+- [x] T001 [P] Add `resultMediaFormat` (`z.enum(['image', 'gif', 'video']).nullable().default(null)`) and `resultMediaThumbnailUrl` (`z.url().nullable().default(null)`) fields to the session schema in `packages/shared/src/schemas/session/session.schema.ts`. Place them after the existing `resultMedia` field. Build the shared package with `pnpm --filter @clementine/shared build` to verify types compile.
 
-- [ ] T002 [P] Update the backend to write `resultMediaFormat` and `resultMediaThumbnailUrl` to the session document when a job completes. In `functions/src/repositories/session.ts`, extend `updateSessionResultMedia` to accept `format` and `thumbnailUrl` params and include them in the Firestore update. In `functions/src/tasks/transformPipelineTask.ts`, pass `output.format` and `output.thumbnailUrl` to the updated repository function at the existing `updateSessionResultMedia` call site (~line 198). Build functions with `pnpm functions:build` to verify.
+- [x] T002 [P] Update the backend to write `resultMediaFormat` and `resultMediaThumbnailUrl` to the session document when a job completes. In `functions/src/repositories/session.ts`, extend `updateSessionResultMedia` to accept `format` and `thumbnailUrl` params and include them in the Firestore update. In `functions/src/tasks/transformPipelineTask.ts`, pass `output.format` and `output.thumbnailUrl` to the updated repository function at the existing `updateSessionResultMedia` call site (~line 198). Build functions with `pnpm functions:build` to verify.
 
 **Checkpoint**: Schema defines new fields, backend writes them at job completion. Frontend can now read `session.resultMediaFormat` and `session.resultMediaThumbnailUrl` via the existing `useSubscribeSession` hook.
 
@@ -37,11 +37,11 @@
 
 ### Implementation for User Story 1
 
-- [ ] T003 [US1] Create `ShareVideoPlayer` component in `apps/clementine-app/src/domains/project-config/share/components/ShareVideoPlayer.tsx`. Render a `<video>` element with `autoplay muted loop playsInline` attributes (no native `controls` attribute). Add a custom play/pause overlay: clicking/tapping the video area toggles playback via `videoRef.play()`/`videoRef.pause()` with a centered Play/Pause icon (use `lucide-react` `Play` and `Pause` icons). Overlay icon should be 44x44px minimum touch target. Accept props: `src: string`, `posterUrl?: string | null`, `className?: string`. Apply `max-h-[50vh] w-full object-contain rounded-lg` to the video element to constrain height and preserve aspect ratio.
+- [x] T003 [US1] Create `ShareVideoPlayer` component in `apps/clementine-app/src/domains/project-config/share/components/ShareVideoPlayer.tsx`. Render a `<video>` element with `autoplay muted loop playsInline` attributes (no native `controls` attribute). Add a custom play/pause overlay: clicking/tapping the video area toggles playback via `videoRef.play()`/`videoRef.pause()` with a centered Play/Pause icon (use `lucide-react` `Play` and `Pause` icons). Overlay icon should be 44x44px minimum touch target. Accept props: `src: string`, `posterUrl?: string | null`, `className?: string`. Apply `max-h-[50vh] w-full object-contain rounded-lg` to the video element to constrain height and preserve aspect ratio.
 
-- [ ] T004 [US1] Update `ShareReadyRenderer` props interface to add `mediaFormat?: 'image' | 'gif' | 'video' | null` and `mediaThumbnailUrl?: string | null` in `apps/clementine-app/src/domains/project-config/share/components/ShareReadyRenderer.tsx`. In the render body, replace the current `<img>` rendering with a conditional: when `mediaFormat === 'video'` and `mediaUrl` exists, render `<ShareVideoPlayer src={mediaUrl} posterUrl={mediaThumbnailUrl} />`. Otherwise render the existing `<img>` tag. Add `max-h-[50vh] object-contain` to the existing `<img>` className to match the video constraint. Keep the edit-mode placeholder and loading skeleton branches unchanged.
+- [x] T004 [US1] Update `ShareReadyRenderer` props interface to add `mediaFormat?: 'image' | 'gif' | 'video' | null` and `mediaThumbnailUrl?: string | null` in `apps/clementine-app/src/domains/project-config/share/components/ShareReadyRenderer.tsx`. In the render body, replace the current `<img>` rendering with a conditional: when `mediaFormat === 'video'` and `mediaUrl` exists, render `<ShareVideoPlayer src={mediaUrl} posterUrl={mediaThumbnailUrl} />`. Otherwise render the existing `<img>` tag. Add `max-h-[50vh] object-contain` to the existing `<img>` className to match the video constraint. Keep the edit-mode placeholder and loading skeleton branches unchanged.
 
-- [ ] T005 [US1] Update `SharePage` container in `apps/clementine-app/src/domains/guest/containers/SharePage.tsx` to extract `resultMediaFormat` and `resultMediaThumbnailUrl` from the session object (already available via `useSubscribeSession`). Pass them as `mediaFormat` and `mediaThumbnailUrl` props to `ShareReadyRenderer`.
+- [x] T005 [US1] Update `SharePage` container in `apps/clementine-app/src/domains/guest/containers/SharePage.tsx` to extract `resultMediaFormat` and `resultMediaThumbnailUrl` from the session object (already available via `useSubscribeSession`). Pass them as `mediaFormat` and `mediaThumbnailUrl` props to `ShareReadyRenderer`.
 
 **Checkpoint**: Video results autoplay muted on the share screen with play/pause control. Image results render unchanged. CTA stays above fold for all aspect ratios.
 
@@ -55,9 +55,9 @@
 
 ### Implementation for User Story 2
 
-- [ ] T006 [US2] Update `useShareActions` hook in `apps/clementine-app/src/domains/guest/hooks/useShareActions.ts`. Add `mediaFormat?: 'image' | 'gif' | 'video' | null` to `UseShareActionsParams`. Add a `FORMAT_MAP` constant mapping each format to its file extension and MIME type: `image` → `{ ext: '.jpg', mime: 'image/jpeg' }`, `gif` → `{ ext: '.gif', mime: 'image/gif' }`, `video` → `{ ext: '.mp4', mime: 'video/mp4' }`. In the download handler, replace the hardcoded `clementine-result-${Date.now()}.jpg` filename with `clementine-result-${Date.now()}${FORMAT_MAP[mediaFormat ?? 'image'].ext}`. Update the `File` constructor MIME type to use `FORMAT_MAP[mediaFormat ?? 'image'].mime` instead of the hardcoded value.
+- [x] T006 [US2] Update `useShareActions` hook in `apps/clementine-app/src/domains/guest/hooks/useShareActions.ts`. Add `mediaFormat?: 'image' | 'gif' | 'video' | null` to `UseShareActionsParams`. Add a `FORMAT_MAP` constant mapping each format to its file extension and MIME type: `image` → `{ ext: '.jpg', mime: 'image/jpeg' }`, `gif` → `{ ext: '.gif', mime: 'image/gif' }`, `video` → `{ ext: '.mp4', mime: 'video/mp4' }`. In the download handler, replace the hardcoded `clementine-result-${Date.now()}.jpg` filename with `clementine-result-${Date.now()}${FORMAT_MAP[mediaFormat ?? 'image'].ext}`. Update the `File` constructor MIME type to use `FORMAT_MAP[mediaFormat ?? 'image'].mime` instead of the hardcoded value.
 
-- [ ] T007 [US2] Wire `resultMediaFormat` from session to `useShareActions` in `apps/clementine-app/src/domains/guest/containers/SharePage.tsx`. Pass `mediaFormat: resultMediaFormat` (already extracted in T005) to the `useShareActions` call.
+- [x] T007 [US2] Wire `resultMediaFormat` from session to `useShareActions` in `apps/clementine-app/src/domains/guest/containers/SharePage.tsx`. Pass `mediaFormat: resultMediaFormat` (already extracted in T005) to the `useShareActions` call.
 
 **Checkpoint**: Video downloads have `.mp4` extension. Mobile share sheet receives correct MIME type. Image downloads unchanged.
 
@@ -71,9 +71,9 @@
 
 ### Implementation for User Story 3
 
-- [ ] T008 [US3] Add loading/buffering state to `ShareVideoPlayer` in `apps/clementine-app/src/domains/project-config/share/components/ShareVideoPlayer.tsx`. Track buffering state via `onWaiting` (set loading true) and `onCanPlay`/`onPlaying` (set loading false) video events. When loading, display a centered spinner overlay (use a simple `animate-spin` Tailwind animation on a `Loader2` icon from `lucide-react`) positioned over the video/poster. The poster image (via `<video poster={posterUrl}>`) already displays while the video loads — ensure it remains visible under the spinner.
+- [x] T008 [US3] Add loading/buffering state to `ShareVideoPlayer` in `apps/clementine-app/src/domains/project-config/share/components/ShareVideoPlayer.tsx`. Track buffering state via `onWaiting` (set loading true) and `onCanPlay`/`onPlaying` (set loading false) video events. When loading, display a centered spinner overlay (use a simple `animate-spin` Tailwind animation on a `Loader2` icon from `lucide-react`) positioned over the video/poster. The poster image (via `<video poster={posterUrl}>`) already displays while the video loads — ensure it remains visible under the spinner.
 
-- [ ] T009 [US3] Add error state to `ShareVideoPlayer` in `apps/clementine-app/src/domains/project-config/share/components/ShareVideoPlayer.tsx`. Track error state via the `onError` video event. When an error occurs, hide the `<video>` element and display a fallback: a `bg-muted rounded-lg` container with a centered error message ("Video failed to load") and a retry `Button` (from `@/ui-kit/ui/button`) that resets the error state and reloads the video by resetting the `src` attribute via `videoRef.current.load()`.
+- [x] T009 [US3] Add error state to `ShareVideoPlayer` in `apps/clementine-app/src/domains/project-config/share/components/ShareVideoPlayer.tsx`. Track error state via the `onError` video event. When an error occurs, hide the `<video>` element and display a fallback: a `bg-muted rounded-lg` container with a centered error message ("Video failed to load") and a retry `Button` (from `@/ui-kit/ui/button`) that resets the error state and reloads the video by resetting the `src` attribute via `videoRef.current.load()`.
 
 **Checkpoint**: Slow connections show thumbnail + spinner. Failed loads show error with retry. Fast connections show seamless autoplay.
 
@@ -83,9 +83,9 @@
 
 **Purpose**: Validate everything works together and passes quality gates.
 
-- [ ] T010 Build and validate shared package: `pnpm --filter @clementine/shared build`
-- [ ] T011 Run validation gates: `pnpm app:check` (format + lint) and `pnpm app:type-check` (TypeScript)
-- [ ] T012 Run manual testing walkthrough per `specs/078-share-screen-video/quickstart.md`: verify video autoplay, play/pause toggle, download with correct extension, mobile share sheet, image result regression, layout across aspect ratios (1:1, 9:16, 16:9)
+- [x] T010 Build and validate shared package: `pnpm --filter @clementine/shared build`
+- [x] T011 Run validation gates: `pnpm app:check` (format + lint) and `pnpm app:type-check` (TypeScript)
+- [x] T012 Run manual testing walkthrough per `specs/078-share-screen-video/quickstart.md`: verify video autoplay, play/pause toggle, download with correct extension, mobile share sheet, image result regression, layout across aspect ratios (1:1, 9:16, 16:9)
 
 ---
 

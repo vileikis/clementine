@@ -13,7 +13,15 @@ import { storage } from '@/integrations/firebase/client'
 export interface UseShareActionsParams {
   /** Media reference containing filePath for Firebase Storage download */
   media: MediaReference | null
+  /** Media format for correct file extension and MIME type */
+  mediaFormat?: 'image' | 'gif' | 'video' | null
 }
+
+const FORMAT_MAP = {
+  image: { ext: '.jpg', mime: 'image/jpeg' },
+  gif: { ext: '.gif', mime: 'image/gif' },
+  video: { ext: '.mp4', mime: 'video/mp4' },
+} as const
 
 // Platform labels for user-facing messages
 const PLATFORM_LABELS: Record<keyof ShareOptionsConfig, string> = {
@@ -34,7 +42,7 @@ const PLATFORM_LABELS: Record<keyof ShareOptionsConfig, string> = {
  * @param params - Configuration parameters
  * @returns Share action handler
  */
-export function useShareActions({ media }: UseShareActionsParams) {
+export function useShareActions({ media, mediaFormat }: UseShareActionsParams) {
   /**
    * Handle image download using Firebase Storage SDK.
    * Uses getBlob() to bypass CORS restrictions.
@@ -43,17 +51,17 @@ export function useShareActions({ media }: UseShareActionsParams) {
    */
   const handleDownload = async () => {
     if (!media?.filePath) {
-      toast.error('No image available to download')
+      toast.error('No media available to download')
       return
     }
 
     try {
       const storageRef = ref(storage, media.filePath)
       const blob = await getBlob(storageRef)
-      // TODO: magic value "clementine-result" should be a constant
-      const fileName = `clementine-result-${Date.now()}.jpg`
+      const { ext, mime } = FORMAT_MAP[mediaFormat ?? 'image']
+      const fileName = `clementine-result-${Date.now()}${ext}`
 
-      const result = await openWebShare(blob, fileName)
+      const result = await openWebShare(blob, fileName, mime)
       if (result === 'shared') {
         toast.success('Shared successfully')
         return
@@ -61,10 +69,10 @@ export function useShareActions({ media }: UseShareActionsParams) {
 
       if (result === 'unavailable') {
         downloadFromLink(blob, fileName)
-        toast.success('Image downloaded successfully')
+        toast.success('Downloaded successfully')
       }
     } catch (error) {
-      toast.error('Failed to download image')
+      toast.error('Failed to download')
       Sentry.captureException(error, {
         tags: {
           domain: 'guest',
@@ -170,13 +178,14 @@ function isMobileOS(): boolean {
 async function openWebShare(
   blob: Blob,
   fileName: string,
+  mimeType?: string,
 ): Promise<ShareResult> {
   if (!isMobileOS()) {
     return 'unavailable'
   }
 
   const file = new File([blob], fileName, {
-    type: blob.type || 'image/jpeg',
+    type: mimeType ?? (blob.type || 'image/jpeg'),
   })
 
   if (!navigator.canShare?.({ files: [file] })) {
