@@ -7,12 +7,12 @@
  *
  * @see specs/073-ai-video-editor — US3/US4
  */
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 
 import { sanitizeDisplayName } from '../../lib/outcome-operations'
 import { getFieldError } from '../../hooks/useOutcomeValidation'
 import { useRefMediaUpload } from '../../hooks/useRefMediaUpload'
-import { PromptComposer } from '../PromptComposer/PromptComposer'
+import { IMAGE_MODALITY, PromptComposer } from '../PromptComposer'
 import type { FieldValidationError } from '../../hooks/useOutcomeValidation'
 import type {
   AIImageModel,
@@ -53,6 +53,15 @@ export function FrameGenerationSection({
   workspaceId,
   userId,
 }: FrameGenerationSectionProps) {
+  // Frame-specific modality: IMAGE but without aspect ratio
+  const frameModality = useMemo(
+    () => ({
+      ...IMAGE_MODALITY,
+      supports: { ...IMAGE_MODALITY.supports, aspectRatio: false },
+    }),
+    [],
+  )
+
   // ── Handlers ──────────────────────────────────────────────
 
   const handlePromptChange = useCallback(
@@ -62,14 +71,6 @@ export function FrameGenerationSection({
 
   const handleModelChange = useCallback(
     (model: string) => onConfigChange({ model: model as AIImageModel }),
-    [onConfigChange],
-  )
-
-  const handleAspectRatioChange = useCallback(
-    (aspectRatio: string) =>
-      onConfigChange({
-        aspectRatio: aspectRatio as ImageGenerationConfig['aspectRatio'],
-      }),
     [onConfigChange],
   )
 
@@ -117,21 +118,20 @@ export function FrameGenerationSection({
     <div className="space-y-3">
       <h4 className="text-sm font-medium">{label}</h4>
       <PromptComposer
+        modality={frameModality}
         prompt={config.prompt}
         onPromptChange={handlePromptChange}
         model={config.model}
         onModelChange={handleModelChange}
-        aspectRatio={config.aspectRatio ?? ''}
-        onAspectRatioChange={handleAspectRatioChange}
-        hideAspectRatio={true}
-        refMedia={config.refMedia}
-        onRefMediaRemove={handleRemoveRefMedia}
-        uploadingFiles={uploadingFiles}
-        onFilesSelected={uploadFiles}
-        canAddMore={canAddMore}
-        isUploading={isUploading}
+        refMedia={{
+          items: config.refMedia,
+          onRemove: handleRemoveRefMedia,
+          uploadingFiles,
+          onFilesSelected: uploadFiles,
+          canAddMore,
+          isUploading,
+        }}
         steps={mentionableSteps}
-        disabled={false}
         error={getFieldError(errors, `${errorFieldPrefix}.prompt`)}
       />
     </div>

@@ -27,7 +27,8 @@ This is literally what the end user sees. If videos are part of our core offer a
 
 - Detect media type (image / video)
 - If video:
-  - Autoplay OFF by default
+  - Autoplay ON by default
+  - Sound OFF by default
   - Controls: Play / Pause only
   - No scrub bar
   - No download inside player

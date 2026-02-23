@@ -86,6 +86,8 @@ export function useCreateSession() {
           status: 'active',
           responses: [],
           resultMedia: null,
+          resultMediaFormat: null,
+          resultMediaThumbnailUrl: null,
           guestEmail: null,
           emailSentAt: null,
           jobId: null,

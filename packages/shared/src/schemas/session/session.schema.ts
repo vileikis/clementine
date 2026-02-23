@@ -116,6 +116,15 @@ export const sessionSchema = z.looseObject({
   /** Final result media from transform/capture */
   resultMedia: mediaReferenceSchema.nullable().default(null),
 
+  /** Format of the result media, set when job completes */
+  resultMediaFormat: z
+    .enum(['image', 'gif', 'video'])
+    .nullable()
+    .default(null),
+
+  /** Thumbnail URL for video poster image, set when job completes */
+  resultMediaThumbnailUrl: z.url().nullable().default(null),
+
   /** Guest email for result delivery (PII — do not log) */
   guestEmail: z.string().email().nullable().default(null),
 

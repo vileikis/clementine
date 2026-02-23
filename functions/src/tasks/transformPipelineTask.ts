@@ -195,13 +195,21 @@ async function finalizeJobSuccess(
     message: 'Finalizing result...',
   })
 
-  // Update session with result media (MediaReference format)
-  await updateSessionResultMedia(projectId, sessionId, {
-    mediaAssetId: output.assetId,
-    url: output.url,
-    filePath: output.filePath,
-    displayName: 'Result',
-  })
+  // Update session with result media (MediaReference format) + format metadata
+  await updateSessionResultMedia(
+    projectId,
+    sessionId,
+    {
+      mediaAssetId: output.assetId,
+      url: output.url,
+      filePath: output.filePath,
+      displayName: 'Result',
+    },
+    {
+      format: output.format,
+      thumbnailUrl: output.thumbnailUrl,
+    },
+  )
 
   // Mark job as completed (sets progress to 100% completed)
   await updateJobComplete(projectId, job.id, output)
