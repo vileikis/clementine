@@ -18,7 +18,10 @@ import type { JobOutput } from '@clementine/shared'
 import type { OutcomeContext } from '../types'
 import { getSourceMedia } from '../helpers/getSourceMedia'
 import { resolvePromptMentions } from '../bindings/resolvePromptMentions'
-import { aiGenerateVideo } from '../operations/aiGenerateVideo'
+import {
+  aiGenerateVideo,
+  type GenerateVideoRequest,
+} from '../operations/aiGenerateVideo'
 import { generateThumbnail } from '../../ffmpeg/images'
 import { getOutputStoragePath, uploadToStorage } from '../../../infra/storage'
 
@@ -50,7 +53,8 @@ export async function aiVideoOutcome(ctx: OutcomeContext): Promise<JobOutput> {
   // Get source media reference from capture step
   const sourceMedia = getSourceMedia(snapshot.sessionResponses, captureStepId)
 
-  // Resolve video generation prompt
+  // Resolve video generation prompt (step mentions only — Veo referenceImages
+  // don't support display-name labels, so @{ref:...} mentions are not useful)
   const resolved = resolvePromptMentions(
     videoGeneration.prompt,
     snapshot.sessionResponses,
@@ -73,15 +77,44 @@ export async function aiVideoOutcome(ctx: OutcomeContext): Promise<JobOutput> {
     )
   }
 
+  // Build GenerateVideoRequest based on task type
+  const baseRequest: GenerateVideoRequest = {
+    prompt: resolved.text,
+    model: videoGeneration.model,
+    aspectRatio: videoGeneration.aspectRatio ?? aspectRatio,
+    duration: videoGeneration.duration,
+    sourceMedia,
+  }
+
+  let generateVideoRequest: GenerateVideoRequest
+  switch (task) {
+    case 'image-to-video':
+      // Animate: sourceMedia only (params.image path)
+      generateVideoRequest = baseRequest
+      break
+
+    case 'ref-images-to-video':
+      // Remix: ALL images go via referenceMedia (config.referenceImages path).
+      // sourceMedia is included as a reference — not as params.image.
+      // Veo ref-images-to-video only supports 8s duration — override any client value.
+      generateVideoRequest = {
+        ...baseRequest,
+        duration: 8,
+        referenceMedia: [sourceMedia, ...(videoGeneration.refMedia ?? [])],
+      }
+      break
+
+    case 'transform':
+    case 'reimagine':
+      throw new Error(`Task "${task}" is not yet supported`)
+
+    default:
+      throw new Error(`Unknown AI video task: ${String(task)}`)
+  }
+
   // Generate video (operation handles GCS URIs, output paths, download)
   const generatedVideo = await aiGenerateVideo(
-    {
-      prompt: resolved.text,
-      model: videoGeneration.model,
-      aspectRatio: videoGeneration.aspectRatio ?? aspectRatio,
-      duration: videoGeneration.duration,
-      sourceMedia,
-    },
+    generateVideoRequest,
     {
       projectId: job.projectId,
       sessionId: job.sessionId,

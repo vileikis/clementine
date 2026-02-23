@@ -15,6 +15,7 @@ import { AI_IMAGE_MODELS, ASPECT_RATIOS } from '../../lib/model-options'
 import { ControlRow } from './ControlRow'
 import { LexicalPromptInput } from './LexicalPromptInput'
 import { ReferenceMediaStrip } from './ReferenceMediaStrip'
+import type { SelectOption } from './ControlRow'
 import type { ExperienceStep, MediaReference } from '@clementine/shared'
 import type { MediaOption, StepOption } from '../../lexical/utils/types'
 import type { UploadingFile } from '../../hooks/useRefMediaUpload'
@@ -50,6 +51,8 @@ export interface PromptComposerProps {
   model: string
   /** Callback when model changes */
   onModelChange: (model: string) => void
+  /** Available model options (defaults to AI_IMAGE_MODELS) */
+  modelOptions?: readonly SelectOption[]
   /** Current aspect ratio value */
   aspectRatio: string
   /** Callback when aspect ratio changes */
@@ -60,6 +63,12 @@ export interface PromptComposerProps {
    * @default true - Aspect ratio is now a top-level outcome setting (Feature 065)
    */
   hideAspectRatio?: boolean
+  /** Current duration value */
+  duration?: string
+  /** Callback when duration changes */
+  onDurationChange?: (duration: string) => void
+  /** Available duration options — when provided, duration picker is rendered */
+  durationOptions?: readonly SelectOption[]
   /** Reference media array */
   refMedia: MediaReference[]
   /** Callback to remove reference media */
@@ -72,6 +81,8 @@ export interface PromptComposerProps {
   canAddMore: boolean
   /** Whether upload is in progress */
   isUploading: boolean
+  /** Whether to hide reference media strip and add button */
+  hideRefMedia?: boolean
   /** Experience steps for @mention (info steps should be excluded by caller) */
   steps: ExperienceStep[]
   /** Whether the composer is disabled */
@@ -88,15 +99,20 @@ export function PromptComposer({
   onPromptChange,
   model,
   onModelChange,
+  modelOptions = AI_IMAGE_MODELS,
   aspectRatio,
   onAspectRatioChange,
   hideAspectRatio = true,
+  duration,
+  onDurationChange,
+  durationOptions,
   refMedia,
   onRefMediaRemove,
   uploadingFiles,
   onFilesSelected,
   canAddMore,
   isUploading,
+  hideRefMedia = false,
   steps,
   disabled,
   error,
@@ -114,7 +130,7 @@ export function PromptComposer({
   const [isDragOver, setIsDragOver] = useState(false)
 
   // Check if add button should be disabled
-  const isAddDisabled = disabled || !canAddMore || isUploading
+  const isAddDisabled = disabled || !canAddMore || isUploading || hideRefMedia
 
   // Drag-and-drop handlers
   const handleDragOver = useCallback(
@@ -122,11 +138,11 @@ export function PromptComposer({
       e.preventDefault()
       e.stopPropagation()
       // Only highlight if we can accept more files and not currently uploading
-      if (!disabled && canAddMore && !isUploading) {
+      if (!disabled && canAddMore && !isUploading && !hideRefMedia) {
         setIsDragOver(true)
       }
     },
-    [disabled, canAddMore, isUploading],
+    [disabled, canAddMore, isUploading, hideRefMedia],
   )
 
   const handleDragLeave = useCallback((e: React.DragEvent) => {
@@ -142,7 +158,7 @@ export function PromptComposer({
       setIsDragOver(false)
 
       // Check if we can accept more files and not currently uploading
-      if (disabled || !canAddMore || isUploading) {
+      if (disabled || !canAddMore || isUploading || hideRefMedia) {
         return
       }
 
@@ -155,7 +171,7 @@ export function PromptComposer({
         onFilesSelected(droppedFiles)
       }
     },
-    [disabled, canAddMore, isUploading, onFilesSelected],
+    [disabled, canAddMore, isUploading, hideRefMedia, onFilesSelected],
   )
 
   return (
@@ -171,13 +187,15 @@ export function PromptComposer({
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
       >
-        {/* Reference Media Strip (only shown when items exist) */}
-        <ReferenceMediaStrip
-          media={refMedia}
-          uploadingFiles={uploadingFiles}
-          onRemove={onRefMediaRemove}
-          disabled={disabled}
-        />
+        {/* Reference Media Strip (hidden when hideRefMedia is true) */}
+        {!hideRefMedia && (
+          <ReferenceMediaStrip
+            media={refMedia}
+            uploadingFiles={uploadingFiles}
+            onRemove={onRefMediaRemove}
+            disabled={disabled}
+          />
+        )}
 
         {/* Prompt Input with @mention support */}
         <LexicalPromptInput
@@ -192,13 +210,16 @@ export function PromptComposer({
         <ControlRow
           model={model}
           onModelChange={onModelChange}
-          modelOptions={AI_IMAGE_MODELS}
+          modelOptions={modelOptions}
           aspectRatio={aspectRatio}
           onAspectRatioChange={onAspectRatioChange}
           aspectRatioOptions={ASPECT_RATIOS}
           hideAspectRatio={hideAspectRatio}
+          duration={duration}
+          onDurationChange={onDurationChange}
+          durationOptions={durationOptions}
           onFilesSelected={onFilesSelected}
-          isAddDisabled={isAddDisabled}
+          isAddDisabled={hideRefMedia ? true : isAddDisabled}
           disabled={disabled}
         />
       </div>

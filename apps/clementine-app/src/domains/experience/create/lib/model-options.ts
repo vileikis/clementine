@@ -42,6 +42,19 @@ export const ASPECT_RATIOS = CANONICAL_ASPECT_RATIOS.map((value) => ({
 /** Maximum number of reference media allowed */
 export const MAX_REF_MEDIA_COUNT = 5
 
+/** Maximum number of reference media allowed for video Remix task */
+export const MAX_VIDEO_REF_MEDIA_COUNT = 2
+
+/**
+ * Available video duration options (fixed values).
+ * String values for Select component compatibility.
+ */
+export const DURATION_OPTIONS = [
+  { value: '4', label: '4s' },
+  { value: '6', label: '6s' },
+  { value: '8', label: '8s' },
+] as const
+
 export type AIImageModel = (typeof AI_IMAGE_MODELS)[number]['value']
 export type AspectRatio = CanonicalAspectRatio
 

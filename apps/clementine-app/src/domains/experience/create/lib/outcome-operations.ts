@@ -69,7 +69,7 @@ export function createDefaultAIVideoConfig(
   captureStepId?: string,
 ): AIVideoOutcomeConfig {
   return {
-    task: 'animate',
+    task: 'image-to-video',
     captureStepId: captureStepId ?? '',
     aspectRatio: '9:16',
     startFrameImageGen: null,
@@ -77,8 +77,9 @@ export function createDefaultAIVideoConfig(
     videoGeneration: {
       prompt: '',
       model: 'veo-3.1-fast-generate-001',
-      duration: 5,
+      duration: 6,
       aspectRatio: null,
+      refMedia: [],
     },
   }
 }

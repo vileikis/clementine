@@ -1,9 +1,11 @@
 /**
  * AIVideoTaskSelector Component
  *
- * Dropdown for selecting the AI video task type (animate, transform, reimagine).
+ * Dropdown for selecting the AI video task type.
+ * Active: image-to-video (Animate), ref-images-to-video (Remix)
+ * Coming soon: transform, reimagine
  *
- * @see specs/073-ai-video-editor — US1
+ * @see specs/075-ai-video-editor-v2 — US1
  */
 import type { AIVideoTask } from '@clementine/shared'
 import {
@@ -14,25 +16,36 @@ import {
   SelectValue,
 } from '@/ui-kit/ui/select'
 
-const TASK_OPTIONS: {
+interface TaskOption {
   value: AIVideoTask
   label: string
   description: string
-}[] = [
+  comingSoon?: boolean
+}
+
+const TASK_OPTIONS: TaskOption[] = [
   {
-    value: 'animate',
+    value: 'image-to-video',
     label: 'Animate',
     description: 'Bring a photo to life as video',
   },
   {
+    value: 'ref-images-to-video',
+    label: 'Remix',
+    description:
+      'Create a new video using photo and reference images as creative input',
+  },
+  {
     value: 'transform',
     label: 'Transform',
-    description: 'Photo transitions into AI-generated version',
+    description: 'Photo transitions into an AI-generated version',
+    comingSoon: true,
   },
   {
     value: 'reimagine',
     label: 'Reimagine',
     description: 'Video between two AI-generated frames',
+    comingSoon: true,
   },
 ]
 
@@ -66,11 +79,21 @@ export function AIVideoTaskSelector({
         </SelectTrigger>
         <SelectContent>
           {TASK_OPTIONS.map((option) => (
-            <SelectItem key={option.value} value={option.value}>
+            <SelectItem
+              key={option.value}
+              value={option.value}
+              disabled={option.comingSoon}
+            >
               <span>{option.label}</span>
-              <span className="text-muted-foreground ml-2 text-xs">
-                — {option.description}
-              </span>
+              {option.comingSoon ? (
+                <span className="bg-muted text-muted-foreground ml-2 rounded-full px-2 py-0.5 text-xs">
+                  Coming soon
+                </span>
+              ) : (
+                <span className="text-muted-foreground ml-2 text-xs">
+                  — {option.description}
+                </span>
+              )}
             </SelectItem>
           ))}
         </SelectContent>
