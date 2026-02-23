@@ -4,9 +4,12 @@
  * Minimal video player for the share screen with autoplay muted loop,
  * tap-to-toggle play/pause with a brief status indicator flash,
  * mute/unmute toggle, loading spinner, and error state with retry.
+ *
+ * Uses a single <video> element with a <canvas> mirror for the blurred
+ * background — avoids sync issues from dual video streams.
  */
 
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Loader2, Pause, Play, Volume2, VolumeOff } from 'lucide-react'
 import { Button } from '@/ui-kit/ui/button'
 
@@ -19,12 +22,54 @@ export interface ShareVideoPlayerProps {
   className?: string
 }
 
+/**
+ * Continuously draws the video frame onto the canvas at ~30fps.
+ * Starts on mount, stops on unmount or when video ends/errors.
+ */
+function useCanvasMirror(
+  videoRef: React.RefObject<HTMLVideoElement | null>,
+  canvasRef: React.RefObject<HTMLCanvasElement | null>,
+) {
+  const rafRef = useRef<number>(0)
+
+  useEffect(() => {
+    const video = videoRef.current
+    const canvas = canvasRef.current
+    if (!video || !canvas) return
+
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    let lastTime = 0
+    const interval = 1000 / 30 // ~30fps is enough for a blurred background
+
+    function draw(timestamp: number) {
+      if (timestamp - lastTime >= interval) {
+        lastTime = timestamp
+        if (video!.readyState >= video!.HAVE_CURRENT_DATA) {
+          canvas!.width = video!.videoWidth
+          canvas!.height = video!.videoHeight
+          ctx!.drawImage(video!, 0, 0)
+        }
+      }
+      rafRef.current = requestAnimationFrame(draw)
+    }
+
+    rafRef.current = requestAnimationFrame(draw)
+
+    return () => {
+      cancelAnimationFrame(rafRef.current)
+    }
+  }, [videoRef, canvasRef])
+}
+
 export function ShareVideoPlayer({
   src,
   posterUrl,
   className,
 }: ShareVideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
   const [isPlaying, setIsPlaying] = useState(true)
   const [isMuted, setIsMuted] = useState(true)
   const [isLoading, setIsLoading] = useState(true)
@@ -34,6 +79,9 @@ export function ShareVideoPlayer({
   // restarting the CSS fade-out animation even on rapid clicks.
   // 0 = no indicator shown yet (initial state).
   const [indicatorKey, setIndicatorKey] = useState(0)
+
+  // Mirror video frames onto the background canvas
+  useCanvasMirror(videoRef, canvasRef)
 
   const togglePlayback = useCallback(() => {
     const video = videoRef.current
@@ -82,13 +130,9 @@ export function ShareVideoPlayer({
     <div
       className={`relative h-full w-full overflow-hidden bg-black ${className ?? ''}`}
     >
-      {/* Background layer — blurred, scaled, dimmed duplicate */}
-      <video
-        src={src}
-        autoPlay
-        muted
-        loop
-        playsInline
+      {/* Background layer — canvas mirror with blur */}
+      <canvas
+        ref={canvasRef}
         aria-hidden
         className="absolute inset-0 h-full w-full scale-110 object-cover blur-xl brightness-[0.5]"
       />

@@ -25,7 +25,6 @@ import {
   FaXTwitter,
 } from 'react-icons/fa6'
 import { FaTelegramPlane } from 'react-icons/fa'
-import { ShareImageFrame } from './ShareImageFrame'
 import { ShareVideoPlayer } from './ShareVideoPlayer'
 import type { ShareOptionsConfig, ShareReadyConfig } from '@clementine/shared'
 import type { LucideIcon } from 'lucide-react'
@@ -129,7 +128,7 @@ export function ShareReadyRenderer({
   return (
     <ScrollableView className="items-center max-w-2xl">
       {mediaUrl ? (
-        <div className="h-[50vh] w-full overflow-hidden rounded-lg">
+        <div className="h-[50vh] w-full overflow-hidden rounded-lg flex items-center justify-center">
           {mediaFormat === 'video' ? (
             <ShareVideoPlayer
               src={mediaUrl}
@@ -137,9 +136,10 @@ export function ShareReadyRenderer({
               className="h-full w-full"
             />
           ) : (
-            <ShareImageFrame
+            <img
               src={mediaUrl}
-              className="h-full w-full"
+              alt="Generated result"
+              className="h-full object-contain rounded-lg overflow-hidden"
             />
           )}
         </div>
