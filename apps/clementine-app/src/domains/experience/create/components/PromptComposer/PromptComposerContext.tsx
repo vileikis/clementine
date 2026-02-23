@@ -9,7 +9,7 @@
  */
 import { createContext, useContext } from 'react'
 
-import type { ExperienceStep, MediaReference  } from '@clementine/shared'
+import type { ExperienceStep, MediaReference } from '@clementine/shared'
 import type { ModalityDefinition } from '../../lib/modality-definitions'
 import type { UploadingFile } from '../../hooks/useRefMediaUpload'
 

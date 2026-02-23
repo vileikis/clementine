@@ -15,14 +15,13 @@ import { useCallback, useMemo, useState } from 'react'
 
 import { ControlRow } from './ControlRow'
 import { LexicalPromptInput } from './LexicalPromptInput'
-import {
-  
-  
-  PromptComposerProvider
-  
-} from './PromptComposerContext'
+import { PromptComposerProvider } from './PromptComposerContext'
 import { ReferenceMediaStrip } from './ReferenceMediaStrip'
-import type {ModalityControlValues, PromptComposerContextValue, RefMediaState} from './PromptComposerContext';
+import type {
+  ModalityControlValues,
+  PromptComposerContextValue,
+  RefMediaState,
+} from './PromptComposerContext'
 import type { ExperienceStep, MediaReference } from '@clementine/shared'
 import type { MediaOption, StepOption } from '../../lexical/utils/types'
 import type { ModalityDefinition } from '../../lib/modality-definitions'

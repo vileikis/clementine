@@ -18,9 +18,9 @@ export function AddMediaButton() {
   const { modality, refMedia, disabled } = usePromptComposerContext()
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const isHidden = !modality.supports.referenceMedia
-  const isDisabled =
-    disabled || !refMedia?.canAddMore || refMedia?.isUploading || isHidden
+  if (!modality.supports.referenceMedia) return null
+
+  const isDisabled = disabled || !refMedia?.canAddMore || refMedia?.isUploading
 
   const handleClick = () => {
     if (isDisabled) return
