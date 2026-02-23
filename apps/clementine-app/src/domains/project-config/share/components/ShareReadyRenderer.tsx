@@ -25,6 +25,7 @@ import {
   FaXTwitter,
 } from 'react-icons/fa6'
 import { FaTelegramPlane } from 'react-icons/fa'
+import { ShareVideoPlayer } from './ShareVideoPlayer'
 import type { ShareOptionsConfig, ShareReadyConfig } from '@clementine/shared'
 import type { LucideIcon } from 'lucide-react'
 import type { IconType } from 'react-icons'
@@ -49,6 +50,10 @@ export interface ShareReadyRendererProps {
   mode?: 'edit' | 'run'
   /** Media URL to display (when available in run mode) */
   mediaUrl?: string | null
+  /** Format of the result media */
+  mediaFormat?: 'image' | 'gif' | 'video' | null
+  /** Thumbnail URL for video poster image */
+  mediaThumbnailUrl?: string | null
   /** Callback when share platform is clicked (required in run mode, handles download too) */
   onShare?: (platform: keyof ShareOptionsConfig) => void
   /** Callback when CTA is clicked (required in run mode) */
@@ -91,6 +96,8 @@ export function ShareReadyRenderer({
   shareOptions,
   mode = 'edit',
   mediaUrl,
+  mediaFormat,
+  mediaThumbnailUrl,
   onShare,
   onCta,
   onStartOver,
@@ -119,79 +126,94 @@ export function ShareReadyRenderer({
   }
 
   return (
-    <ScrollableView className="items-center gap-6 p-8 max-w-2xl">
+    <ScrollableView className="items-center max-w-2xl">
       {mediaUrl ? (
-        <img
-          src={mediaUrl}
-          alt="Generated result"
-          className="w-full max-w-[450px] rounded-lg"
-        />
+        <div className="h-[50vh] w-full overflow-hidden rounded-lg flex items-center justify-center">
+          {mediaFormat === 'video' ? (
+            <ShareVideoPlayer
+              src={mediaUrl}
+              posterUrl={mediaThumbnailUrl}
+              className="h-full w-full"
+            />
+          ) : (
+            <img
+              src={mediaUrl}
+              alt="Generated result"
+              className="h-full object-contain rounded-lg overflow-hidden"
+            />
+          )}
+        </div>
       ) : mode === 'edit' ? (
-        <div className="w-full aspect-square max-w-md rounded-lg bg-muted flex items-center justify-center">
+        <div className="flex h-[50vh] w-full items-center justify-center rounded-lg bg-muted">
           <ImageIcon className="h-12 w-12 text-muted-foreground/50" />
         </div>
       ) : (
-        <Skeleton className="w-full aspect-square max-w-md rounded-lg" />
+        <Skeleton className="h-[50vh] w-full rounded-lg" />
       )}
 
-      {/* Share icons (displayed when enabled) */}
-      {enabledIcons.length > 0 && (
-        <div className="flex justify-center gap-3 flex-wrap">
-          {enabledIcons.map((platform) => {
-            const { icon: Icon, label } = PLATFORM_ICONS[platform]
-            return (
-              <ThemedIconButton
-                key={platform}
-                title={label}
-                size="lg"
-                aria-label={label}
-                onClick={() => handleIconClick(platform)}
-              >
-                <Icon className="h-5 w-5" />
-              </ThemedIconButton>
-            )
-          })}
+      <div className="flex flex-col space-y-6 p-6 pb-12 items-center justify-center">
+        {/* Share icons (displayed when enabled) */}
+        <div>
+          {enabledIcons.length > 0 && (
+            <div className="flex justify-center gap-3 flex-wrap">
+              {enabledIcons.map((platform) => {
+                const { icon: Icon, label } = PLATFORM_ICONS[platform]
+                return (
+                  <ThemedIconButton
+                    key={platform}
+                    title={label}
+                    size="lg"
+                    aria-label={label}
+                    onClick={() => handleIconClick(platform)}
+                  >
+                    <Icon className="h-5 w-5" />
+                  </ThemedIconButton>
+                )
+              })}
+            </div>
+          )}
         </div>
-      )}
-      <div className="p-2" />
 
-      {/* Title (hidden when null) */}
-      {share.title && (
-        <ThemedText variant="heading" className="text-center">
-          {share.title}
-        </ThemedText>
-      )}
+        <div className="space-y-2">
+          {/* Title (hidden when null) */}
+          {share.title && (
+            <ThemedText variant="heading" className="text-center">
+              {share.title}
+            </ThemedText>
+          )}
 
-      {/* Description (hidden when null) */}
-      {share.description && (
-        <ThemedText variant="body" className="text-center opacity-90">
-          {share.description}
-        </ThemedText>
-      )}
+          {/* Description (hidden when null) */}
+          {share.description && (
+            <ThemedText variant="body" className="text-center opacity-90">
+              {share.description}
+            </ThemedText>
+          )}
+        </div>
 
-      {/* CTA button (primary style, hidden when label is null/empty) */}
-      <div className="w-full max-w-[450px] space-y-3 pt-4">
-        {share.cta?.label && (
+        {/* CTA button (primary style, hidden when label is null/empty) */}
+        <div className="w-full max-w-[450px] space-y-3 pt-4">
+          {share.cta?.label && (
+            <ThemedButton
+              variant="primary"
+              size="md"
+              className="w-full"
+              onClick={handleCtaClick}
+            >
+              {share.cta.label}
+            </ThemedButton>
+          )}
+
+          {/* Start over button (secondary/outline style) */}
           <ThemedButton
-            variant="primary"
+            variant="outline"
             size="md"
             className="w-full"
-            onClick={handleCtaClick}
+            onClick={handleStartOverClick}
           >
-            {share.cta.label}
+            <RotateCcw className="mr-2 h-4 w-4" />
+            Start over
           </ThemedButton>
-        )}
-
-        {/* Start over button (secondary/outline style) */}
-        <ThemedButton
-          variant="outline"
-          size="md"
-          className="w-full"
-          onClick={handleStartOverClick}
-        >
-          <RotateCcw className="mr-2 h-4 w-4" />
-          Start over
-        </ThemedButton>
+        </div>
       </div>
     </ScrollableView>
   )

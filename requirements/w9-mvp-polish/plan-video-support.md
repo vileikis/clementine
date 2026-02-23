@@ -85,6 +85,17 @@ Could become a major differentiator -- dynamically overlay brand logo, campaign 
 
 ---
 
+## P6 -- MediaReference Schema Enrichment
+
+**Tier**: Architecture & Tech Debt
+**PRD**: [prd-p6-media-reference-enrichment.md](./prd-p6-media-reference-enrichment.md)
+
+`MediaReference` is a dumb pointer — knows where media lives but not what kind. AI pipelines hardcode `'image/jpeg'`, format metadata is scattered across parent documents, and dimensions are lost between `MediaAsset` and its reference. Add `format`, `mimeType`, and `width`/`height` to make every media pointer self-describing.
+
+**Strategic context:** Every new media modality (video, GIF, audio) will hit this same wall. Fix it once in the shared schema rather than adding format side-channels to every parent document.
+
+---
+
 # Final Priority Stack
 
 | # | Feature | PRD | Tier |
@@ -94,6 +105,7 @@ Could become a major differentiator -- dynamically overlay brand logo, campaign 
 | 3 | PromptComposer refactor | [P3](./prd-p3-prompt-composer-refactor.md) | Tech Debt |
 | 4 | Video advanced controls | [P4](./prd-p4-video-advanced-controls.md) | Differentiation |
 | 5 | Video overlay engine | [P5](./prd-p5-video-overlay-engine.md) | Differentiation |
+| 6 | MediaReference enrichment | [P6](./prd-p6-media-reference-enrichment.md) | Tech Debt |
 
 ---
 

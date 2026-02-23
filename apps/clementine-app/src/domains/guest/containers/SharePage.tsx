@@ -78,6 +78,8 @@ export function SharePage({ mainSessionId }: SharePageProps) {
   const jobStatus = session?.jobStatus
   const resultMedia = session?.resultMedia ?? null
   const resultMediaUrl = resultMedia?.url ?? null
+  const resultMediaFormat = session?.resultMediaFormat ?? null
+  const resultMediaThumbnailUrl = session?.resultMediaThumbnailUrl ?? null
   const isSessionMissing = !isSessionLoading && !session
   const isJobInProgress = jobStatus === 'pending' || jobStatus === 'running'
   // Job is truly completed when we have the result media URL
@@ -111,7 +113,10 @@ export function SharePage({ mainSessionId }: SharePageProps) {
   )
 
   // Share actions hook - only active when we have result media
-  const { handleShare } = useShareActions({ media: resultMedia })
+  const { handleShare } = useShareActions({
+    media: resultMedia,
+    mediaFormat: resultMediaFormat,
+  })
 
   // Navigation handlers
   const handleStartOver = () => {
@@ -159,6 +164,8 @@ export function SharePage({ mainSessionId }: SharePageProps) {
             shareOptions={shareOptions}
             mode="run"
             mediaUrl={resultMediaUrl}
+            mediaFormat={resultMediaFormat}
+            mediaThumbnailUrl={resultMediaThumbnailUrl}
             onShare={handleShare}
             onCta={handleCta}
             onStartOver={handleStartOver}
