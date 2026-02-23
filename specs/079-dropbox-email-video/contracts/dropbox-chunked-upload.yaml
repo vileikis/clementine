@@ -1,0 +1,98 @@
+# Dropbox Chunked Upload Contract
+# Feature: 079-dropbox-email-video
+# Implements: FR-001 (chunked upload for files up to 500MB)
+
+# These are external Dropbox API contracts that our service calls.
+# Documented here for implementation reference.
+
+---
+# CT-V01: Upload Session Start
+operation: upload_session/start
+description: >
+  Initiate a chunked upload session. Send the first chunk of data
+  in the request body. Returns a session_id for subsequent appends.
+endpoint: https://content.dropboxapi.com/2/files/upload_session/start
+method: POST
+headers:
+  Authorization: "Bearer {accessToken}"
+  Content-Type: application/octet-stream
+  Dropbox-API-Arg: |
+    {
+      "close": false
+    }
+request_body: binary (first chunk, up to 8MB)
+response:
+  200:
+    body:
+      session_id: string  # Used for append and finish calls
+  409:
+    description: Conflict (e.g., insufficient space)
+  429:
+    description: Rate limited — apply backoff and retry
+
+---
+# CT-V02: Upload Session Append
+operation: upload_session/append_v2
+description: >
+  Append a chunk to an existing upload session. Called repeatedly
+  for each 8MB chunk after the first.
+endpoint: https://content.dropboxapi.com/2/files/upload_session/append_v2
+method: POST
+headers:
+  Authorization: "Bearer {accessToken}"
+  Content-Type: application/octet-stream
+  Dropbox-API-Arg: |
+    {
+      "cursor": {
+        "session_id": "{sessionId}",
+        "offset": {byteOffset}
+      },
+      "close": false
+    }
+request_body: binary (next chunk, up to 8MB)
+response:
+  200:
+    body: null  # Success, no body
+  409:
+    description: Conflict (offset mismatch, session expired)
+  429:
+    description: Rate limited
+
+---
+# CT-V03: Upload Session Finish
+operation: upload_session/finish
+description: >
+  Complete the upload session. Send the final chunk (may be empty)
+  and specify the destination path and write mode.
+endpoint: https://content.dropboxapi.com/2/files/upload_session/finish
+method: POST
+headers:
+  Authorization: "Bearer {accessToken}"
+  Content-Type: application/octet-stream
+  Dropbox-API-Arg: |
+    {
+      "cursor": {
+        "session_id": "{sessionId}",
+        "offset": {totalBytes}
+      },
+      "commit": {
+        "path": "{destinationPath}",
+        "mode": "overwrite",
+        "autorename": false,
+        "mute": true
+      }
+    }
+request_body: binary (final chunk, may be 0 bytes)
+response:
+  200:
+    body:
+      name: string
+      path_lower: string
+      path_display: string
+      id: string
+      size: number
+      content_hash: string  # Can be used for integrity verification
+  409:
+    description: Conflict (path conflict, insufficient space)
+  429:
+    description: Rate limited
