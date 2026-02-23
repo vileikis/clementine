@@ -147,7 +147,7 @@ export function ShareReadyRenderer({
         <Skeleton className="h-[50vh] w-full rounded-lg" />
       )}
 
-      <div className="space-y-6 p-6 pb-12">
+      <div className="flex flex-col space-y-6 p-6 pb-12 items-center justify-center">
         {/* Share icons (displayed when enabled) */}
         <div>
           {enabledIcons.length > 0 && (

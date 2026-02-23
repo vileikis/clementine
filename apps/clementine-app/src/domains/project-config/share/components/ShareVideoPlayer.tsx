@@ -2,8 +2,8 @@
  * ShareVideoPlayer Component
  *
  * Minimal video player for the share screen with autoplay muted loop,
- * custom play/pause overlay (full area click), mute/unmute toggle,
- * loading spinner, and error state with retry.
+ * tap-to-toggle play/pause with a brief status indicator flash,
+ * mute/unmute toggle, loading spinner, and error state with retry.
  */
 
 import { useCallback, useRef, useState } from 'react'
@@ -30,6 +30,11 @@ export function ShareVideoPlayer({
   const [isLoading, setIsLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
 
+  // Incrementing key forces re-mount of the indicator on each toggle,
+  // restarting the CSS fade-out animation even on rapid clicks.
+  // 0 = no indicator shown yet (initial state).
+  const [indicatorKey, setIndicatorKey] = useState(0)
+
   const togglePlayback = useCallback(() => {
     const video = videoRef.current
     if (!video) return
@@ -41,6 +46,9 @@ export function ShareVideoPlayer({
       video.pause()
       setIsPlaying(false)
     }
+
+    // Bump key to re-mount indicator and restart animation
+    setIndicatorKey((k) => k + 1)
   }, [])
 
   const toggleMute = useCallback(() => {
@@ -95,22 +103,30 @@ export function ShareVideoPlayer({
         </div>
       )}
 
-      {/* Full-area play/pause click zone */}
+      {/* Full-area tap/click zone for play/pause */}
       {!isLoading && (
         <button
           type="button"
-          className="group absolute inset-0 flex cursor-pointer items-center justify-center focus:outline-none"
+          className="absolute inset-0 cursor-pointer focus:outline-none"
           onClick={togglePlayback}
           aria-label={isPlaying ? 'Pause video' : 'Play video'}
+        />
+      )}
+
+      {/* Play/pause status indicator — flashes briefly on toggle */}
+      {indicatorKey > 0 && (
+        <div
+          key={indicatorKey}
+          className="pointer-events-none absolute inset-0 flex items-center justify-center"
         >
-          <div className="rounded-full bg-black/40 p-3 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+          <div className="animate-fade-out rounded-full bg-black/50 p-4">
             {isPlaying ? (
-              <Pause className="h-6 w-6 text-white" />
+              <Play className="h-8 w-8 text-white" />
             ) : (
-              <Play className="h-6 w-6 text-white" />
+              <Pause className="h-8 w-8 text-white" />
             )}
           </div>
-        </button>
+        </div>
       )}
 
       {/* Mute/unmute toggle — bottom right */}
