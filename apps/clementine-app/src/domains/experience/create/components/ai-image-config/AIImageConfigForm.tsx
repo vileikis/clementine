@@ -14,7 +14,7 @@ import { useRefMediaUpload } from '../../hooks/useRefMediaUpload'
 import { sanitizeDisplayName } from '../../lib/outcome-operations'
 import { SourceImageSelector } from '../shared-controls/SourceImageSelector'
 import { AspectRatioSelector } from '../shared-controls/AspectRatioSelector'
-import { PromptComposer } from '../PromptComposer'
+import { IMAGE_MODALITY, PromptComposer } from '../PromptComposer'
 import { TaskSelector } from './TaskSelector'
 import type { FieldValidationError } from '../../hooks/useOutcomeValidation'
 import type {
@@ -169,20 +169,24 @@ export function AIImageConfigForm({
 
       {/* PromptComposer */}
       <PromptComposer
+        modality={IMAGE_MODALITY}
         prompt={imageGeneration.prompt}
         onPromptChange={handlePromptChange}
         model={imageGeneration.model}
         onModelChange={handleModelChange}
-        aspectRatio={imageGeneration.aspectRatio ?? config.aspectRatio}
-        onAspectRatioChange={handleGenAspectRatioChange}
-        refMedia={imageGeneration.refMedia}
-        onRefMediaRemove={handleRemoveRefMedia}
-        uploadingFiles={uploadingFiles}
-        onFilesSelected={uploadFiles}
-        canAddMore={canAddMore}
-        isUploading={isUploading}
+        controls={{
+          aspectRatio: imageGeneration.aspectRatio ?? config.aspectRatio,
+          onAspectRatioChange: handleGenAspectRatioChange,
+        }}
+        refMedia={{
+          items: imageGeneration.refMedia,
+          onRemove: handleRemoveRefMedia,
+          uploadingFiles,
+          onFilesSelected: uploadFiles,
+          canAddMore,
+          isUploading,
+        }}
         steps={mentionableSteps}
-        disabled={false}
         error={getFieldError(errors, 'aiImage.imageGeneration.prompt')}
       />
     </div>

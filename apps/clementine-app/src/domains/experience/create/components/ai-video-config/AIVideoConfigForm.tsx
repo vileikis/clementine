@@ -9,19 +9,15 @@
  *
  * @see specs/075-ai-video-editor-v2 — US1/US2
  */
-import { useCallback, useRef } from 'react'
+import { useCallback, useMemo, useRef } from 'react'
 
 import { VIDEO_ASPECT_RATIOS } from '@clementine/shared'
 import { getFieldError } from '../../hooks/useOutcomeValidation'
-import {
-  AI_VIDEO_MODELS,
-  DURATION_OPTIONS,
-  MAX_VIDEO_REF_MEDIA_COUNT,
-} from '../../lib/model-options'
+import { MAX_VIDEO_REF_MEDIA_COUNT } from '../../lib/model-options'
 import { useRefMediaUpload } from '../../hooks/useRefMediaUpload'
 import { SourceImageSelector } from '../shared-controls/SourceImageSelector'
 import { AspectRatioSelector } from '../shared-controls/AspectRatioSelector'
-import { PromptComposer } from '../PromptComposer'
+import { PromptComposer, VIDEO_MODALITY } from '../PromptComposer'
 import { AIVideoTaskSelector } from './AIVideoTaskSelector'
 import { FrameGenerationSection } from './FrameGenerationSection'
 import type { FieldValidationError } from '../../hooks/useOutcomeValidation'
@@ -32,7 +28,6 @@ import type {
   ExperienceStep,
   ImageGenerationConfig,
   MediaReference,
-  VideoAspectRatio,
   VideoGenerationConfig,
 } from '@clementine/shared'
 
@@ -194,6 +189,24 @@ export function AIVideoConfigForm({
     ],
   )
 
+  // ── Task-specific modality variants ────────────────────────
+
+  const taskModality = useMemo(() => {
+    if (config.task === 'image-to-video') {
+      return {
+        ...VIDEO_MODALITY,
+        supports: { ...VIDEO_MODALITY.supports, referenceMedia: false },
+      }
+    }
+    if (config.task === 'ref-images-to-video') {
+      return {
+        ...VIDEO_MODALITY,
+        durationOptions: REMIX_DURATION_OPTIONS,
+      }
+    }
+    return VIDEO_MODALITY
+  }, [config.task])
+
   // ── Render ────────────────────────────────────────────────
 
   // Filter steps for @mention (exclude info steps)
@@ -227,37 +240,34 @@ export function AIVideoConfigForm({
       {(config.task === 'image-to-video' ||
         config.task === 'ref-images-to-video') && (
         <PromptComposer
+          modality={taskModality}
           prompt={videoGeneration.prompt}
           onPromptChange={(prompt) => updateVideoGeneration({ prompt })}
           model={videoGeneration.model}
           onModelChange={(model) =>
             updateVideoGeneration({ model: model as AIVideoModel })
           }
-          modelOptions={AI_VIDEO_MODELS}
-          aspectRatio={config.aspectRatio}
-          onAspectRatioChange={(aspectRatio) =>
-            onConfigChange({ aspectRatio: aspectRatio as VideoAspectRatio })
-          }
-          hideAspectRatio
-          duration={String(videoGeneration.duration ?? 6)}
-          onDurationChange={(d) => {
-            const n = Number(d)
-            if (n === 4 || n === 6 || n === 8) {
-              updateVideoGeneration({ duration: n })
-            }
+          controls={{
+            duration: String(videoGeneration.duration ?? 6),
+            onDurationChange: (d) => {
+              const n = Number(d)
+              if (n === 4 || n === 6 || n === 8) {
+                updateVideoGeneration({ duration: n })
+              }
+            },
           }}
-          durationOptions={
+          refMedia={
             config.task === 'ref-images-to-video'
-              ? REMIX_DURATION_OPTIONS
-              : DURATION_OPTIONS
+              ? {
+                  items: videoGeneration.refMedia,
+                  onRemove: handleRemoveRefMedia,
+                  uploadingFiles,
+                  onFilesSelected: uploadFiles,
+                  canAddMore,
+                  isUploading,
+                }
+              : undefined
           }
-          hideRefMedia={config.task === 'image-to-video'}
-          refMedia={videoGeneration.refMedia}
-          onRefMediaRemove={handleRemoveRefMedia}
-          uploadingFiles={uploadingFiles}
-          onFilesSelected={uploadFiles}
-          canAddMore={canAddMore}
-          isUploading={isUploading}
           steps={mentionableSteps}
           error={getFieldError(errors, 'aiVideo.videoGeneration.prompt')}
         />
