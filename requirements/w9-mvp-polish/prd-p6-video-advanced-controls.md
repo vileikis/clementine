@@ -1,7 +1,7 @@
-# PRD P4 — AI Video Advanced Controls
+# PRD P6 — AI Video Advanced Controls
 
 > **Master Plan**: [plan-video-support.md](./plan-video-support.md)
-> **Priority**: P4 — Growth / Differentiation
+> **Priority**: P6 — Growth / Differentiation
 > **Area**: App (Frontend)
 
 ---

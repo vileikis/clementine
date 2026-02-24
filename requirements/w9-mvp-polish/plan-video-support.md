@@ -23,11 +23,15 @@ Improves perceived value.
 
 Important but not immediately revenue critical.
 
+## Tier 4 -- UX Polish
+
+Improves creator experience and reduces confusion.
+
 ---
 
 # PRIORITY ORDER (Brutally Honest)
 
-## P1 -- Share Screen + Video Handling (App)
+## ~~P1 -- Share Screen + Video Handling (App)~~ ✅ COMPLETED
 
 **Tier**: Revenue Blocking
 **PRD**: [prd-p1-share-screen-video.md](./prd-p1-share-screen-video.md)
@@ -45,7 +49,7 @@ You're dead on arrival.
 
 ---
 
-## P2 -- Cloud: Dropbox + Email Video Handling
+## ~~P2 -- Cloud: Dropbox + Email Video Handling~~ ✅ COMPLETED
 
 **Tier**: Revenue Blocking
 **PRD**: [prd-p2-dropbox-email-video.md](./prd-p2-dropbox-email-video.md)
@@ -54,7 +58,7 @@ Because once users create video, the backend must not choke. This is operational
 
 ---
 
-## P3 -- PromptComposer Refactor
+## ~~P3 -- PromptComposer Refactor~~ ✅ COMPLETED
 
 **Tier**: Architecture & Tech Debt
 **PRD**: [prd-p3-prompt-composer-refactor.md](./prd-p3-prompt-composer-refactor.md)
@@ -65,19 +69,41 @@ Because once users create video, the backend must not choke. This is operational
 
 ---
 
-## P4 -- Video AI Controls (Enhance / Sound / Negative Prompt / Quality)
+## P4 -- Experience Type Flattening
 
-**Tier**: Growth / Differentiation
-**PRD**: [prd-p4-video-advanced-controls.md](./prd-p4-video-advanced-controls.md)
+**Tier**: Architecture / Foundation
+**PRD**: [prd-p4-experience-type-flattening.md](./prd-p4-experience-type-flattening.md)
 
-This is feature expansion. It improves differentiation. But only after stability.
+Unify `experience.profile` and `outcome.type` into a single `experience.type`. The experience's real identity — what kind of output it produces — should be a first-class, top-level concept selected at creation time, not buried inside a nested config object.
+
+**Why P4:** Every feature from here on (type-specific controls, type filtering in library, type badges, analytics) needs to know "what kind of experience is this?" at the top level. Building on the current profile + outcome.type split means every future feature inherits the indirection. Fix the foundation before expanding.
 
 ---
 
-## P5 -- Overlay for AI Video Outcome (Cloud)
+## P5 -- Create Tab UX: Aspect Ratio Clarity
+
+**Tier**: UX Polish
+**PRD**: [prd-p5-create-tab-ar-clarity.md](./prd-p5-create-tab-ar-clarity.md)
+
+The Create tab's aspect ratio picker is ambiguous — users can't tell if it controls input (capture) or output (generation) shape. Simplify to a two-level model: capture AR + single output AR. Remove redundant generation-level AR overrides.
+
+**Why P5:** Depends on P4 (flattened outcome). Once the Create tab is restructured, the AR sections should be clearly labeled and logically grouped.
+
+---
+
+## P6 -- Video AI Controls (Enhance / Sound / Negative Prompt / Quality)
+
+**Tier**: Growth / Differentiation
+**PRD**: [prd-p6-video-advanced-controls.md](./prd-p6-video-advanced-controls.md)
+
+This is feature expansion. It improves differentiation. But only after stability and correct foundation (P4).
+
+---
+
+## P7 -- Overlay for AI Video Outcome (Cloud)
 
 **Tier**: Growth / Differentiation (unless pilot requires it)
-**PRD**: [prd-p5-video-overlay-engine.md](./prd-p5-video-overlay-engine.md)
+**PRD**: [prd-p7-video-overlay-engine.md](./prd-p7-video-overlay-engine.md)
 
 Only high priority if overlay is a brand requirement for pilots. Otherwise secondary.
 
@@ -85,12 +111,14 @@ Could become a major differentiator -- dynamically overlay brand logo, campaign 
 
 ---
 
-## P6 -- MediaReference Schema Enrichment
+## P8 -- MediaReference Schema Enrichment
 
 **Tier**: Architecture & Tech Debt
-**PRD**: [prd-p6-media-reference-enrichment.md](./prd-p6-media-reference-enrichment.md)
+**PRD**: [prd-p8-media-reference-enrichment.md](./prd-p8-media-reference-enrichment.md)
 
 `MediaReference` is a dumb pointer — knows where media lives but not what kind. AI pipelines hardcode `'image/jpeg'`, format metadata is scattered across parent documents, and dimensions are lost between `MediaAsset` and its reference. Add `format`, `mimeType`, and `width`/`height` to make every media pointer self-describing.
+
+**Now also includes:** Fix AI image pipeline to read real output dimensions instead of hardcoded guesses, and pass them through to `uploadOutput()`.
 
 **Strategic context:** Every new media modality (video, GIF, audio) will hit this same wall. Fix it once in the shared schema rather than adding format side-channels to every parent document.
 
@@ -100,12 +128,14 @@ Could become a major differentiator -- dynamically overlay brand logo, campaign 
 
 | # | Feature | PRD | Tier |
 |---|---------|-----|------|
-| 1 | Share screen video handling | [P1](./prd-p1-share-screen-video.md) | Revenue Blocking |
-| 2 | Dropbox + Email video support | [P2](./prd-p2-dropbox-email-video.md) | Revenue Blocking |
-| 3 | PromptComposer refactor | [P3](./prd-p3-prompt-composer-refactor.md) | Tech Debt |
-| 4 | Video advanced controls | [P4](./prd-p4-video-advanced-controls.md) | Differentiation |
-| 5 | Video overlay engine | [P5](./prd-p5-video-overlay-engine.md) | Differentiation |
-| 6 | MediaReference enrichment | [P6](./prd-p6-media-reference-enrichment.md) | Tech Debt |
+| ~~1~~ | ~~Share screen video handling~~ | ~~[P1](./prd-p1-share-screen-video.md)~~ | ✅ Done |
+| ~~2~~ | ~~Dropbox + Email video support~~ | ~~[P2](./prd-p2-dropbox-email-video.md)~~ | ✅ Done |
+| ~~3~~ | ~~PromptComposer refactor~~ | ~~[P3](./prd-p3-prompt-composer-refactor.md)~~ | ✅ Done |
+| 4 | Experience type flattening | [P4](./prd-p4-experience-type-flattening.md) | Foundation |
+| 5 | Create tab AR clarity | [P5](./prd-p5-create-tab-ar-clarity.md) | UX Polish |
+| 6 | Video advanced controls | [P6](./prd-p6-video-advanced-controls.md) | Differentiation |
+| 7 | Video overlay engine | [P7](./prd-p7-video-overlay-engine.md) | Differentiation |
+| 8 | MediaReference enrichment + real dimensions | [P8](./prd-p8-media-reference-enrichment.md) | Tech Debt |
 
 ---
 
