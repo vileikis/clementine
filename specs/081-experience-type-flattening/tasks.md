@@ -119,8 +119,8 @@
 
 ### Implementation for User Story 4
 
-- [ ] T031 [US4] Write migration script following 072 pattern — support `--dry-run` and `--production` flags, implement type derivation rules (freeform→outcome.type, survey→survey, story→survey), flatten draft and published configs, remove old fields (profile, outcome wrapper), make idempotent in `functions/scripts/migrations/081-experience-type-flattening.ts`
-- [ ] T032 [US4] Test migration script — run `--dry-run` against emulators, verify all mapping cases (freeform/ai.image, freeform/photo, freeform/null, survey, story), verify both draft and published configs are flattened, verify old fields removed in `functions/scripts/migrations/081-experience-type-flattening.ts`
+- [x] T031 [US4] Write migration script following 072 pattern — support `--dry-run` and `--production` flags, implement type derivation rules (freeform→outcome.type, survey→survey, story→survey), flatten draft and published configs, remove old fields (profile, outcome wrapper), make idempotent in `functions/scripts/migrations/081-experience-type-flattening.ts`
+- [x] T032 [US4] Test migration script — run `--dry-run` against emulators, verify all mapping cases (freeform/ai.image, freeform/photo, freeform/null, survey, story), verify both draft and published configs are flattened, verify old fields removed in `functions/scripts/migrations/081-experience-type-flattening.ts`
 
 **Checkpoint**: Migration script handles all existing data shapes and can be safely run against production.
 
@@ -130,10 +130,10 @@
 
 **Purpose**: Final cleanup, barrel export updates, and full validation
 
-- [ ] T033 Update barrel exports across experience domain — update `create/index.ts`, `library/index.ts`, `shared/index.ts`, `create/components/index.ts` to export renamed components/hooks in `apps/clementine-app/src/domains/experience/`
-- [ ] T034 [P] Remove remaining dead code — delete any lingering references to `experienceProfileSchema`, `outcomeSchema`, `OutcomeType` imports, `'story'` profile code across the codebase
-- [ ] T035 [P] Grep for remaining old references — search for `\.profile`, `outcome\.type`, `outcome\.aiImage`, `outcomeSchema`, `useUpdateOutcome`, `OutcomeTypePicker`, `ProfileSelector`, `ProfileBadge` across all workspaces and fix any remaining hits
-- [ ] T036 Run full validation suite — `pnpm --filter @clementine/shared build && pnpm --filter @clementine/shared test && pnpm app:check && pnpm app:type-check && pnpm app:test && pnpm functions:build`
+- [x] T033 Update barrel exports across experience domain — update `create/index.ts`, `library/index.ts`, `shared/index.ts`, `create/components/index.ts` to export renamed components/hooks in `apps/clementine-app/src/domains/experience/`
+- [x] T034 [P] Remove remaining dead code — delete any lingering references to `experienceProfileSchema`, `outcomeSchema`, `OutcomeType` imports, `'story'` profile code across the codebase
+- [x] T035 [P] Grep for remaining old references — search for `\.profile`, `outcome\.type`, `outcome\.aiImage`, `outcomeSchema`, `useUpdateOutcome`, `OutcomeTypePicker`, `ProfileSelector`, `ProfileBadge` across all workspaces and fix any remaining hits
+- [x] T036 Run full validation suite — `pnpm --filter @clementine/shared build && pnpm --filter @clementine/shared test && pnpm app:check && pnpm app:type-check && pnpm app:test && pnpm functions:build`
 
 **Checkpoint**: Zero compilation errors, zero old-term references, all tests pass, all linting clean.
 
