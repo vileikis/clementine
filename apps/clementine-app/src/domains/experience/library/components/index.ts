@@ -4,10 +4,9 @@
  * Exports all components for the experience library UI.
  */
 
-export * from './ProfileBadge'
 export * from './ExperienceListEmpty'
 export * from './ExperienceListItem'
-export * from './ProfileSelector'
-export * from './CreateExperienceForm'
+export * from './ExperienceTypePicker'
+export * from './TypeBadge'
 export * from './RenameExperienceDialog'
 export * from './DeleteExperienceDialog'

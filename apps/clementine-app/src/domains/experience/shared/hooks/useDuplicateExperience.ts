@@ -88,7 +88,7 @@ export function useDuplicateExperience() {
           id: newRef.id,
           name,
           status: 'active',
-          profile: source.profile,
+          type: source.type,
           media: source.media,
           draft: structuredClone(source.draft),
           published: source.published

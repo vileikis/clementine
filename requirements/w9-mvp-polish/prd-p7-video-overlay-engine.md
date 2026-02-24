@@ -1,7 +1,7 @@
-# PRD P5 — Video Overlay Engine
+# PRD P7 — Video Overlay Engine
 
 > **Master Plan**: [plan-video-support.md](./plan-video-support.md)
-> **Priority**: P5 — Growth / Differentiation (unless pilot requires it)
+> **Priority**: P7 — Growth / Differentiation (unless pilot requires it)
 > **Area**: Cloud (Backend)
 
 ---

@@ -1,13 +1,17 @@
 /**
  * CreateExperiencePage Container
  *
- * Page container for creating a new experience.
- * Wraps the CreateExperienceForm with navigation handling.
+ * Page for creating a new experience. Shows a type picker — selecting a type
+ * immediately creates the experience with a default name and navigates
+ * to the editor.
+ *
+ * @see specs/081-experience-type-flattening — US1
  */
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 
-import { CreateExperienceForm } from '../components'
+import { ExperienceTypePicker } from '../components'
+import type { ExperienceType } from '@clementine/shared'
 import { useCreateExperience } from '@/domains/experience/shared'
 
 interface CreateExperiencePageProps {
@@ -17,23 +21,6 @@ interface CreateExperiencePageProps {
   workspaceSlug: string
 }
 
-/**
- * Create experience page container
- *
- * Features:
- * - Form for name and profile selection
- * - Redirects to editor on success
- * - Shows toast notifications
- * - Cancel button returns to library
- *
- * @example
- * ```tsx
- * <CreateExperiencePage
- *   workspaceId="abc123"
- *   workspaceSlug="my-workspace"
- * />
- * ```
- */
 export function CreateExperiencePage({
   workspaceId,
   workspaceSlug,
@@ -41,15 +28,16 @@ export function CreateExperiencePage({
   const navigate = useNavigate()
   const createExperience = useCreateExperience()
 
-  const handleSubmit = async (
-    data: Parameters<typeof createExperience.mutateAsync>[0],
-  ) => {
+  const handleTypeSelect = async (type: ExperienceType) => {
     try {
-      const result = await createExperience.mutateAsync(data)
+      const result = await createExperience.mutateAsync({
+        workspaceId,
+        name: 'Untitled Experience',
+        type,
+      })
 
       toast.success('Experience created')
 
-      // Navigate to editor
       navigate({
         to: '/workspace/$workspaceSlug/experiences/$experienceId',
         params: {
@@ -62,23 +50,12 @@ export function CreateExperiencePage({
     }
   }
 
-  const handleCancel = () => {
-    navigate({
-      to: '/workspace/$workspaceSlug/experiences',
-      params: { workspaceSlug },
-    })
-  }
-
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Create Experience</h1>
-
-      <div className="max-w-xl">
-        <CreateExperienceForm
-          workspaceId={workspaceId}
-          onSubmit={handleSubmit}
-          isSubmitting={createExperience.isPending}
-          onCancel={handleCancel}
+    <div className="px-6 pt-16">
+      <div className="mx-auto" style={{ maxWidth: '1140px' }}>
+        <ExperienceTypePicker
+          onTypeSelect={handleTypeSelect}
+          disabled={createExperience.isPending}
         />
       </div>
     </div>

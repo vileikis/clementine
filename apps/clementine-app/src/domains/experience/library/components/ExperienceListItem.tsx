@@ -2,14 +2,14 @@
  * ExperienceListItem Component
  *
  * Card component displaying a single experience in the library list.
- * Shows thumbnail (if available), name, profile badge, and status.
+ * Shows thumbnail (if available), name, type badge, and status.
  * Includes context menu with actions provided via sections prop.
  * Entire card is clickable for navigation with hover feedback.
  */
 import { Link } from '@tanstack/react-router'
 import { Image as ImageIcon, MoreVertical } from 'lucide-react'
 
-import { ProfileBadge } from './ProfileBadge'
+import { TypeBadge } from './TypeBadge'
 import type { Experience } from '@/domains/experience/shared'
 import type { MenuSection } from '@/shared/components/ContextDropdownMenu'
 import { Button } from '@/ui-kit/ui/button'
@@ -69,7 +69,7 @@ export function ExperienceListItem({
               {experience.name}
             </h3>
             <div className="flex items-center gap-2 mt-1">
-              <ProfileBadge profile={experience.profile} />
+              <TypeBadge type={experience.type} />
               <span className="text-sm text-muted-foreground">
                 {publishStatus}
               </span>

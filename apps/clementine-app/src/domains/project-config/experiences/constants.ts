@@ -1,12 +1,6 @@
-import type { ExperienceProfile } from '@/domains/experience/shared/schemas'
-
-/**
- * Slot type definition
- * - main: Multiple experiences shown on welcome screen
- * - pregate: Single experience before welcome screen
- * - preshare: Single experience after main, before share screen
- */
-export type SlotType = 'main' | 'pregate' | 'preshare'
+import type { ExperienceType } from '@clementine/shared'
+import type { SlotType } from '@/domains/experience/shared/types/type-metadata'
+import { typeMetadata } from '@/domains/experience/shared/types/type-metadata'
 
 /**
  * Slot mode definition
@@ -15,12 +9,23 @@ export type SlotType = 'main' | 'pregate' | 'preshare'
  */
 export type SlotMode = 'list' | 'single'
 
+// Re-export SlotType from type-metadata (single source of truth)
+export type { SlotType }
+
 /**
- * Slot to profile mapping for filtering
- * Defines which experience profiles are compatible with each slot
+ * Slot to type mapping for filtering
+ * Derives which experience types are compatible with each slot from typeMetadata
  */
-export const SLOT_PROFILES: Record<SlotType, ExperienceProfile[]> = {
-  main: ['freeform', 'survey'],
-  pregate: ['survey', 'story'],
-  preshare: ['survey', 'story'],
-} as const
+export const SLOT_TYPES: Record<SlotType, ExperienceType[]> = (() => {
+  const result: Record<SlotType, ExperienceType[]> = {
+    main: [],
+    pregate: [],
+    preshare: [],
+  }
+  for (const [type, meta] of Object.entries(typeMetadata)) {
+    for (const slot of meta.slotCompatibility) {
+      result[slot].push(type as ExperienceType)
+    }
+  }
+  return result
+})()

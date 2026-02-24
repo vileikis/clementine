@@ -249,7 +249,7 @@
           "order": "ASCENDING"
         },
         {
-          "fieldPath": "profile",
+          "fieldPath": "type",
           "order": "ASCENDING"
         },
         {

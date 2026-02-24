@@ -13,7 +13,14 @@
 import { z } from 'zod'
 import { overlayReferenceSchema } from '../project/project-config.schema'
 import { sessionResponseSchema } from '../session/session-response.schema'
-import { outcomeSchema } from '../experience/outcome.schema'
+import { experienceTypeSchema } from '../experience/experience.schema'
+import {
+  aiImageConfigSchema,
+  aiVideoConfigSchema,
+  gifConfigSchema,
+  photoConfigSchema,
+  videoConfigSchema,
+} from '../experience/experience-config.schema'
 import { jobStatusSchema } from './job-status.schema'
 
 // Re-export jobStatusSchema for convenience
@@ -68,9 +75,28 @@ export const jobOutputSchema = z.object({
 })
 
 /**
+ * Snapshot config — per-type configuration captured at job creation.
+ * Only the active type's config is populated; others are null.
+ */
+export const snapshotConfigSchema = z.object({
+  /** Photo config — null means not active */
+  photo: photoConfigSchema.nullable().default(null),
+  /** GIF config — null means not active */
+  gif: gifConfigSchema.nullable().default(null),
+  /** Video config — null means not active */
+  video: videoConfigSchema.nullable().default(null),
+  /** AI image config — null means not active */
+  aiImage: aiImageConfigSchema.nullable().default(null),
+  /** AI video config — null means not active */
+  aiVideo: aiVideoConfigSchema.nullable().default(null),
+})
+
+/**
  * Complete job execution snapshot
  *
- * Flattened structure (Feature 065):
+ * Structure:
+ * - `type`: Experience type — determines which executor to run
+ * - `config`: Per-type configuration captured at job creation
  * - `overlayChoice`: Resolved overlay at job creation (exact match → default → null)
  *
  * Overlay resolution happens in `startTransformPipeline.ts`, not at execution time.
@@ -81,8 +107,10 @@ export const jobSnapshotSchema = z.object({
   sessionResponses: z.array(sessionResponseSchema).default([]),
   /** Experience version at time of job creation */
   experienceVersion: z.number().int().positive(),
-  /** Outcome configuration (from experience.published.outcome) */
-  outcome: outcomeSchema.nullable().default(null),
+  /** Experience type (from experience.type) — determines executor dispatch */
+  type: experienceTypeSchema,
+  /** Per-type configuration (from experience config at publish time) */
+  config: snapshotConfigSchema,
   /** Resolved overlay to apply (null = no overlay) */
   overlayChoice: overlayReferenceSchema.nullable().default(null),
 })
@@ -121,4 +149,5 @@ export type Job = z.infer<typeof jobSchema>
 export type JobProgress = z.infer<typeof jobProgressSchema>
 export type JobError = z.infer<typeof jobErrorSchema>
 export type JobOutput = z.infer<typeof jobOutputSchema>
+export type SnapshotConfig = z.infer<typeof snapshotConfigSchema>
 export type JobSnapshot = z.infer<typeof jobSnapshotSchema>

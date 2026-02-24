@@ -2,47 +2,67 @@
  * CreateTabForm Component
  *
  * Thin orchestrator for the Create tab. Routes to the correct config form
- * based on outcome.type:
- * - null → OutcomeTypePicker
- * - 'photo' → OutcomeTypeSelector + PhotoConfigForm + RemoveOutcomeAction
- * - 'ai.image' → OutcomeTypeSelector + AIImageConfigForm + RemoveOutcomeAction
+ * based on experience.type:
+ * - 'survey' → hidden (survey has no create tab)
+ * - 'photo' → ExperienceTypeSwitch + PhotoConfigForm + ClearTypeConfigAction
+ * - 'ai.image' → ExperienceTypeSwitch + AIImageConfigForm + ClearTypeConfigAction
+ * - 'ai.video' → ExperienceTypeSwitch + AIVideoConfigForm + ClearTypeConfigAction
  *
- * Each config form is self-contained — it owns its own handlers and hooks.
- * This orchestrator only manages form state, type selection, and autosave.
+ * Reads type from experience.type (top-level).
+ * Reads config from experience.draft.[type] (flattened).
  *
- * @see specs/072-outcome-schema-redesign
+ * @see specs/081-experience-type-flattening
  */
 import { useCallback, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
-import { useUpdateOutcome } from '../hooks'
-import { useOutcomeValidation } from '../hooks/useOutcomeValidation'
+import { useUpdateExperienceConfig } from '../hooks'
+import { useExperienceConfigValidation } from '../hooks/useExperienceConfigValidation'
 import {
-  createDefaultOutcome,
-  initializeOutcomeType,
-} from '../lib/outcome-operations'
+  getConfigKey,
+  getDefaultConfigForType,
+} from '../lib/experience-config-operations'
 import { AIImageConfigForm } from './ai-image-config/AIImageConfigForm'
 import { AIVideoConfigForm } from './ai-video-config'
-import { OutcomeTypePicker } from './outcome-picker/OutcomeTypePicker'
-import { OutcomeTypeSelector } from './outcome-picker/OutcomeTypeSelector'
-import { RemoveOutcomeAction } from './outcome-picker/RemoveOutcomeAction'
+import { ExperienceTypeSwitch } from './ExperienceTypeSwitch'
+import { ClearTypeConfigAction } from './ClearTypeConfigAction'
 import { PhotoConfigForm } from './photo-config/PhotoConfigForm'
 import type {
-  AIImageOutcomeConfig,
-  AIVideoOutcomeConfig,
+  AIImageConfig,
+  AIVideoConfig,
   Experience,
-  Outcome,
+  ExperienceConfig,
   OutcomeType,
-  PhotoOutcomeConfig,
+  PhotoConfig,
 } from '@clementine/shared'
 import { useAuth } from '@/domains/auth'
 import { useAutoSave } from '@/shared/forms'
 import { useExperienceDesignerStore } from '@/domains/experience/designer'
 import { useTrackedMutation } from '@/shared/editor-status'
+import { switchExperienceType } from '@/domains/experience/shared/lib'
 
 /** Debounce delay for all changes (ms) */
 const AUTOSAVE_DEBOUNCE_MS = 2000
+
+/**
+ * Config form state — per-type config fields from ExperienceConfig (excluding steps).
+ */
+type ConfigFormState = Pick<
+  ExperienceConfig,
+  'photo' | 'gif' | 'video' | 'aiImage' | 'aiVideo'
+>
+
+/** Extract config form state from experience draft */
+function extractConfigState(draft: ExperienceConfig): ConfigFormState {
+  return {
+    photo: draft.photo,
+    gif: draft.gif,
+    video: draft.video,
+    aiImage: draft.aiImage,
+    aiVideo: draft.aiVideo,
+  }
+}
 
 export interface CreateTabFormProps {
   /** Experience data */
@@ -57,18 +77,25 @@ export interface CreateTabFormProps {
 export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
   const { user } = useAuth()
   const store = useExperienceDesignerStore()
+  const experienceType = experience.type
 
-  // Server outcome (source of truth for resets)
-  const serverOutcome = experience.draft.outcome ?? createDefaultOutcome()
+  // Survey type has no create tab
+  if (experienceType === 'survey') {
+    return null
+  }
+
+  // Server config state (source of truth for resets)
+  const serverConfig = extractConfigState(experience.draft)
   const steps = experience.draft.steps
+  const configKey = getConfigKey(experienceType)
 
-  // Mutation for saving outcome changes (tracked for save status indicator)
-  const baseMutation = useUpdateOutcome(workspaceId, experience.id)
-  const updateOutcomeMutation = useTrackedMutation(baseMutation, store)
+  // Mutation for saving config changes (tracked for save status indicator)
+  const baseMutation = useUpdateExperienceConfig(workspaceId, experience.id)
+  const updateConfigMutation = useTrackedMutation(baseMutation, store)
 
-  // Form setup - manages outcome state locally
-  const form = useForm<Outcome>({
-    defaultValues: serverOutcome,
+  // Form setup - manages per-type config state locally
+  const form = useForm<ConfigFormState>({
+    defaultValues: serverConfig,
     resetOptions: {
       keepDirtyValues: true,
       keepErrors: true,
@@ -77,17 +104,21 @@ export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
 
   // Reset form when experience changes (e.g., navigating to different experience)
   useEffect(() => {
-    form.reset(serverOutcome)
+    form.reset(serverConfig)
   }, [experience.id])
 
-  // Auto-save with debounce (2 seconds)
+  // Auto-save with debounce (2 seconds) — writes only the active type's config
   const { triggerSave } = useAutoSave({
     form,
-    originalValues: serverOutcome,
+    originalValues: serverConfig,
     onUpdate: async () => {
       try {
-        const outcome = form.getValues()
-        await updateOutcomeMutation.mutateAsync({ outcome })
+        if (!configKey) return
+        const values = form.getValues()
+        const activeConfig = values[configKey]
+        await updateConfigMutation.mutateAsync({
+          updates: { [configKey]: activeConfig },
+        })
       } catch (error) {
         const message =
           error instanceof Error ? error.message : 'Failed to save output'
@@ -98,48 +129,83 @@ export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
   })
 
   // Watch form values for reactive rendering
-  const outcome = form.watch()
+  const formValues = form.watch()
 
-  // Validation - computes errors based on current outcome state
-  const validationErrors = useOutcomeValidation(outcome, steps)
-
-  // ── Type Selection & Removal ──────────────────────────────
-
-  const handleOutcomeTypeSelect = useCallback(
-    (type: OutcomeType) => {
-      const updated = initializeOutcomeType(outcome, type, steps)
-      form.reset(updated, { keepDefaultValues: true })
-      triggerSave()
-    },
-    [form, outcome, steps, triggerSave],
+  // Validation - computes errors based on current experience type and config
+  const validationErrors = useExperienceConfigValidation(
+    experienceType,
+    { ...experience.draft, ...formValues } as ExperienceConfig,
+    steps,
   )
 
-  const handleRemoveOutcome = useCallback(() => {
-    form.setValue('type', null, { shouldDirty: true })
+  // ── Type Selection ────────────────────────────────────────
+
+  const handleTypeSwitch = useCallback(
+    async (newType: OutcomeType) => {
+      const newConfigKey = getConfigKey(newType)
+      if (!newConfigKey) return
+
+      // Get existing config or create default
+      const existingConfig = formValues[newConfigKey]
+      const defaultConfig = existingConfig
+        ? undefined
+        : { key: newConfigKey, value: getDefaultConfigForType(newType, steps) }
+
+      // Atomic Firestore update: type + default config
+      try {
+        await switchExperienceType(
+          workspaceId,
+          experience.id,
+          newType,
+          defaultConfig,
+        )
+
+        // Update local form with default config if initialized
+        if (defaultConfig) {
+          form.setValue(
+            newConfigKey,
+            defaultConfig.value as ConfigFormState[typeof newConfigKey],
+            {
+              shouldDirty: false,
+            },
+          )
+        }
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : 'Failed to switch type'
+        toast.error(message)
+      }
+    },
+    [form, formValues, steps, workspaceId, experience.id],
+  )
+
+  // ── Clear Config ──────────────────────────────────────────
+
+  const handleClearConfig = useCallback(() => {
+    if (!configKey) return
+    form.setValue(configKey, null, { shouldDirty: true })
     triggerSave()
-  }, [form, triggerSave])
+  }, [form, configKey, triggerSave])
 
   // ── Per-Type Config Change Handlers ───────────────────────
 
   const handlePhotoConfigChange = useCallback(
-    (updates: Partial<PhotoOutcomeConfig>) => {
+    (updates: Partial<PhotoConfig>) => {
       const currentConfig = form.getValues('photo')
-      form.setValue(
-        'photo',
-        { ...currentConfig, ...updates } as PhotoOutcomeConfig,
-        { shouldDirty: true },
-      )
+      form.setValue('photo', { ...currentConfig, ...updates } as PhotoConfig, {
+        shouldDirty: true,
+      })
       triggerSave()
     },
     [form, triggerSave],
   )
 
   const handleAIImageConfigChange = useCallback(
-    (updates: Partial<AIImageOutcomeConfig>) => {
+    (updates: Partial<AIImageConfig>) => {
       const currentConfig = form.getValues('aiImage')
       form.setValue(
         'aiImage',
-        { ...currentConfig, ...updates } as AIImageOutcomeConfig,
+        { ...currentConfig, ...updates } as AIImageConfig,
         { shouldDirty: true },
       )
       triggerSave()
@@ -148,11 +214,11 @@ export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
   )
 
   const handleAIVideoConfigChange = useCallback(
-    (updates: Partial<AIVideoOutcomeConfig>) => {
+    (updates: Partial<AIVideoConfig>) => {
       const currentConfig = form.getValues('aiVideo')
       form.setValue(
         'aiVideo',
-        { ...currentConfig, ...updates } as AIVideoOutcomeConfig,
+        { ...currentConfig, ...updates } as AIVideoConfig,
         { shouldDirty: true },
       )
       triggerSave()
@@ -162,42 +228,49 @@ export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
 
   // ── Render ────────────────────────────────────────────────
 
-  // No outcome type selected → show picker
-  if (!outcome.type) {
-    return <OutcomeTypePicker onTypeSelect={handleOutcomeTypeSelect} />
+  const activeConfig = configKey ? formValues[configKey] : null
+
+  // No config initialized — show type switch only (fallback for pre-migration)
+  if (!activeConfig) {
+    return (
+      <ExperienceTypeSwitch
+        value={experienceType}
+        onChange={handleTypeSwitch}
+      />
+    )
   }
 
   // Photo type
-  if (outcome.type === 'photo' && outcome.photo) {
+  if (experienceType === 'photo' && formValues.photo) {
     return (
       <div className="space-y-6">
-        <OutcomeTypeSelector
-          value={outcome.type}
-          onChange={handleOutcomeTypeSelect}
+        <ExperienceTypeSwitch
+          value={experienceType as OutcomeType}
+          onChange={handleTypeSwitch}
         />
         <PhotoConfigForm
-          config={outcome.photo}
+          config={formValues.photo}
           onConfigChange={handlePhotoConfigChange}
           steps={steps}
           errors={validationErrors}
         />
         <div className="border-t pt-4">
-          <RemoveOutcomeAction onRemove={handleRemoveOutcome} />
+          <ClearTypeConfigAction onClear={handleClearConfig} />
         </div>
       </div>
     )
   }
 
   // AI Image type
-  if (outcome.type === 'ai.image' && outcome.aiImage) {
+  if (experienceType === 'ai.image' && formValues.aiImage) {
     return (
       <div className="space-y-6">
-        <OutcomeTypeSelector
-          value={outcome.type}
-          onChange={handleOutcomeTypeSelect}
+        <ExperienceTypeSwitch
+          value={experienceType as OutcomeType}
+          onChange={handleTypeSwitch}
         />
         <AIImageConfigForm
-          config={outcome.aiImage}
+          config={formValues.aiImage}
           onConfigChange={handleAIImageConfigChange}
           steps={steps}
           errors={validationErrors}
@@ -205,22 +278,22 @@ export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
           userId={user?.uid}
         />
         <div className="border-t pt-4">
-          <RemoveOutcomeAction onRemove={handleRemoveOutcome} />
+          <ClearTypeConfigAction onClear={handleClearConfig} />
         </div>
       </div>
     )
   }
 
   // AI Video type
-  if (outcome.type === 'ai.video' && outcome.aiVideo) {
+  if (experienceType === 'ai.video' && formValues.aiVideo) {
     return (
       <div className="space-y-6">
-        <OutcomeTypeSelector
-          value={outcome.type}
-          onChange={handleOutcomeTypeSelect}
+        <ExperienceTypeSwitch
+          value={experienceType as OutcomeType}
+          onChange={handleTypeSwitch}
         />
         <AIVideoConfigForm
-          config={outcome.aiVideo}
+          config={formValues.aiVideo}
           onConfigChange={handleAIVideoConfigChange}
           steps={steps}
           errors={validationErrors}
@@ -228,12 +301,14 @@ export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
           userId={user?.uid}
         />
         <div className="border-t pt-4">
-          <RemoveOutcomeAction onRemove={handleRemoveOutcome} />
+          <ClearTypeConfigAction onClear={handleClearConfig} />
         </div>
       </div>
     )
   }
 
   // Fallback — type set but config not initialized
-  return <OutcomeTypePicker onTypeSelect={handleOutcomeTypeSelect} />
+  return (
+    <ExperienceTypeSwitch value={experienceType} onChange={handleTypeSwitch} />
+  )
 }

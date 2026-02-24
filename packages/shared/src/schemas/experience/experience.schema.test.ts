@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   experienceStatusSchema,
-  experienceProfileSchema,
+  experienceTypeSchema,
   experienceMediaSchema,
   experienceConfigSchema,
   experienceSchema,
@@ -19,16 +19,20 @@ describe('experienceStatusSchema', () => {
   })
 })
 
-describe('experienceProfileSchema', () => {
-  it('accepts valid profile values', () => {
-    expect(experienceProfileSchema.parse('freeform')).toBe('freeform')
-    expect(experienceProfileSchema.parse('survey')).toBe('survey')
-    expect(experienceProfileSchema.parse('story')).toBe('story')
+describe('experienceTypeSchema', () => {
+  it('accepts valid type values', () => {
+    expect(experienceTypeSchema.parse('survey')).toBe('survey')
+    expect(experienceTypeSchema.parse('photo')).toBe('photo')
+    expect(experienceTypeSchema.parse('gif')).toBe('gif')
+    expect(experienceTypeSchema.parse('video')).toBe('video')
+    expect(experienceTypeSchema.parse('ai.image')).toBe('ai.image')
+    expect(experienceTypeSchema.parse('ai.video')).toBe('ai.video')
   })
 
-  it('rejects invalid profile values', () => {
-    expect(() => experienceProfileSchema.parse('custom')).toThrow()
-    expect(() => experienceProfileSchema.parse('quiz')).toThrow()
+  it('rejects invalid type values', () => {
+    expect(() => experienceTypeSchema.parse('freeform')).toThrow()
+    expect(() => experienceTypeSchema.parse('story')).toThrow()
+    expect(() => experienceTypeSchema.parse('custom')).toThrow()
   })
 })
 
@@ -74,7 +78,11 @@ describe('experienceConfigSchema', () => {
   it('applies defaults when parsing empty object', () => {
     const result = experienceConfigSchema.parse({})
     expect(result.steps).toEqual([])
-    expect(result.outcome).toBeNull()
+    expect(result.photo).toBeNull()
+    expect(result.gif).toBeNull()
+    expect(result.video).toBeNull()
+    expect(result.aiImage).toBeNull()
+    expect(result.aiVideo).toBeNull()
   })
 
   it('accepts steps array', () => {
@@ -97,26 +105,23 @@ describe('experienceConfigSchema', () => {
     expect(result.steps).toHaveLength(2)
   })
 
-  it('accepts outcome configuration', () => {
+  it('accepts flattened per-type config', () => {
     const result = experienceConfigSchema.parse({
-      outcome: {
-        type: 'photo',
-        photo: { captureStepId: 'step-1', aspectRatio: '1:1' },
-      },
+      photo: { captureStepId: 'step-1', aspectRatio: '1:1' },
     })
-    expect(result.outcome?.type).toBe('photo')
+    expect(result.photo?.captureStepId).toBe('step-1')
   })
 
-  it('accepts outcome with extra legacy-like fields via looseObject', () => {
+  it('accepts ai image config directly', () => {
     const result = experienceConfigSchema.parse({
-      outcome: {
-        type: 'photo',
-        photo: { captureStepId: 'step-1', aspectRatio: '1:1' },
-        aiEnabled: true,
+      aiImage: {
+        task: 'text-to-image',
+        captureStepId: null,
+        aspectRatio: '1:1',
         imageGeneration: { prompt: 'test' },
       },
     })
-    expect(result.outcome?.type).toBe('photo')
+    expect(result.aiImage?.task).toBe('text-to-image')
   })
 
   it('preserves unknown fields (looseObject)', () => {
@@ -131,7 +136,7 @@ describe('experienceSchema', () => {
   const validMinimalExperience = {
     id: 'exp-123',
     name: 'Test Experience',
-    profile: 'freeform',
+    type: 'ai.image',
     createdAt: Date.now(),
     updatedAt: Date.now(),
     draft: { steps: [] },
@@ -142,7 +147,7 @@ describe('experienceSchema', () => {
 
     expect(result.id).toBe('exp-123')
     expect(result.name).toBe('Test Experience')
-    expect(result.profile).toBe('freeform')
+    expect(result.type).toBe('ai.image')
     expect(result.status).toBe('active')
     expect(result.media).toBeNull()
     expect(result.deletedAt).toBeNull()
@@ -171,9 +176,9 @@ describe('experienceSchema', () => {
     ).toThrow()
   })
 
-  it('requires profile field', () => {
-    const { profile: _, ...withoutProfile } = validMinimalExperience
-    expect(() => experienceSchema.parse(withoutProfile)).toThrow()
+  it('requires type field', () => {
+    const { type: _, ...withoutType } = validMinimalExperience
+    expect(() => experienceSchema.parse(withoutType)).toThrow()
   })
 
   it('requires draft field', () => {
@@ -184,7 +189,9 @@ describe('experienceSchema', () => {
   describe('dual-state configuration', () => {
     it('draft is required, published is optional', () => {
       const result = experienceSchema.parse(validMinimalExperience)
-      expect(result.draft).toEqual({ steps: [], outcome: null })
+      expect(result.draft.steps).toEqual([])
+      expect(result.draft.photo).toBeNull()
+      expect(result.draft.aiImage).toBeNull()
       expect(result.published).toBeNull()
     })
 

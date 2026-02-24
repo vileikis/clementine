@@ -9,11 +9,11 @@
  */
 import { useCallback, useMemo } from 'react'
 
-import { sanitizeDisplayName } from '../../lib/outcome-operations'
-import { getFieldError } from '../../hooks/useOutcomeValidation'
+import { sanitizeDisplayName } from '../../lib/experience-config-operations'
+import { getFieldError } from '../../hooks/useExperienceConfigValidation'
 import { useRefMediaUpload } from '../../hooks/useRefMediaUpload'
 import { IMAGE_MODALITY, PromptComposer } from '../PromptComposer'
-import type { FieldValidationError } from '../../hooks/useOutcomeValidation'
+import type { FieldValidationError } from '../../hooks/useExperienceConfigValidation'
 import type {
   AIImageModel,
   ExperienceStep,

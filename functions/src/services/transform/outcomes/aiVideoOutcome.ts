@@ -2,7 +2,7 @@
  * AI Video Outcome Executor
  *
  * Handles AI video generation for animate, transform, and reimagine tasks.
- * Reads config from snapshot.outcome.aiVideo.
+ * Reads config from snapshot.config.aiVideo.
  *
  * Flow (animate):
  * 1. Read aiVideo config from snapshot
@@ -30,13 +30,13 @@ import { getOutputStoragePath, uploadToStorage } from '../../../infra/storage'
  */
 export async function aiVideoOutcome(ctx: OutcomeContext): Promise<JobOutput> {
   const { job, snapshot, tmpDir, startTime } = ctx
-  const { outcome, overlayChoice } = snapshot
+  const { config, overlayChoice } = snapshot
 
-  if (!outcome?.aiVideo) {
+  if (!config?.aiVideo) {
     throw new Error('AI Video outcome configuration is required')
   }
 
-  const { task, captureStepId, aspectRatio, videoGeneration } = outcome.aiVideo
+  const { task, captureStepId, aspectRatio, videoGeneration } = config.aiVideo
 
   logger.info('[AIVideoOutcome] Starting AI video outcome execution', {
     jobId: job.id,

@@ -1,7 +1,7 @@
-# PRD P6 — MediaReference Schema Enrichment
+# PRD P8 — MediaReference Schema Enrichment
 
 > **Master Plan**: [plan-video-support.md](./plan-video-support.md)
-> **Priority**: P6 — Architecture & Tech Debt
+> **Priority**: P8 — Architecture & Tech Debt
 > **Area**: Shared Schema, Backend (Functions), App (Frontend)
 
 ---
@@ -47,7 +47,18 @@ Today `MediaReference` is a dumb pointer — it knows *where* media lives but no
 - Already available on `MediaAsset` — this propagates it to the lightweight reference
 - `null` = legacy document or dimensions unknown
 
-### 4. Update All Write Sites
+### 4. Fix Real Output Dimensions in AI Pipelines
+
+Currently `aiGenerateImage.ts` uses a hardcoded dimension map (`getDimensionsFromAspectRatio`) instead of reading actual pixel dimensions from the generated image. And `aiImageOutcome.ts` doesn't pass dimensions to `uploadOutput()` at all, falling back to the default `1024x1024`.
+
+**Fix:**
+- `aiGenerateImage.ts`: Read actual dimensions from the output image buffer (e.g., parse JPEG header or use a lightweight image probe)
+- `aiImageOutcome.ts`: Pass `result.dimensions` to `uploadOutput()`
+- `aiGenerateVideo.ts`: Already correct (uses `getMediaDimensions` via ffprobe) — no change needed
+
+This ensures `JobOutput.dimensions` reflects reality, which feeds into MediaReference dimensions (req 3 above).
+
+### 5. Update All Write Sites
 
 Every place that constructs a `MediaReference` must populate the new fields:
 
@@ -60,7 +71,7 @@ Every place that constructs a `MediaReference` must populate the new fields:
 | Test helpers (`resolvePromptMentions.test.ts`) | Test fixtures | Explicit format values |
 | Any other upload flow constructing MediaReference | Various | Populate from MediaAsset or upload metadata |
 
-### 5. Update All Read Sites / Consumers
+### 6. Update All Read Sites / Consumers
 
 | Consumer | Current Behavior | Target Behavior |
 |----------|-----------------|-----------------|
@@ -70,14 +81,14 @@ Every place that constructs a `MediaReference` must populate the new fields:
 | `ShareReadyRenderer.tsx` | Receives `mediaFormat` + `mediaThumbnailUrl` as separate props | Read `mediaUrl` format from reference, simplify props |
 | `SharePage.tsx` | Extracts `resultMediaFormat` separately | Can derive from `resultMedia.format` |
 
-### 6. Deprecate Session-Level Format Fields
+### 7. Deprecate Session-Level Format Fields
 
 Once MediaReference carries `format`:
 - `session.resultMediaFormat` becomes redundant (available as `session.resultMedia.format`)
 - `session.resultMediaThumbnailUrl` stays — thumbnails are a separate concern, not part of the media reference itself
 - Migration: keep both fields temporarily, read from `resultMedia.format` with fallback to `resultMediaFormat`
 
-### 7. Backward Compatibility
+### 8. Backward Compatibility
 
 - All new fields use `.nullable().default(null)` — existing Firestore documents parse without error
 - `z.looseObject()` already preserves unknown fields — no migration needed for existing documents

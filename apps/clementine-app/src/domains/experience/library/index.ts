@@ -5,7 +5,7 @@
  *
  * Usage:
  * ```typescript
- * import { ExperiencesPage, ProfileBadge } from '@/domains/experience/library'
+ * import { ExperiencesPage, TypeBadge } from '@/domains/experience/library'
  * ```
  */
 

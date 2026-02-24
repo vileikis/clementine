@@ -1,10 +1,10 @@
 /**
  * Outcome Dispatcher
  *
- * Routes job execution to the appropriate outcome executor based on outcome type.
+ * Routes job execution to the appropriate outcome executor based on experience type.
  * Registry maps all 5 outcome types to their executor (or null for unimplemented).
  *
- * @see specs/072-outcome-schema-redesign
+ * @see specs/081-experience-type-flattening
  */
 import { logger } from 'firebase-functions/v2'
 import type { JobOutput, OutcomeType } from '@clementine/shared'
@@ -43,48 +43,50 @@ class OutcomeError extends Error {
 /**
  * Execute the appropriate outcome based on job snapshot configuration
  *
- * Dispatches to the correct outcome executor based on outcome.type.
+ * Dispatches to the correct outcome executor based on snapshot.type.
  * Throws a non-retryable error for invalid or unimplemented outcomes.
  */
 export async function runOutcome(ctx: OutcomeContext): Promise<JobOutput> {
   const { snapshot, job } = ctx
-  const { outcome } = snapshot
+  const { type } = snapshot
 
-  // Validate outcome exists
-  if (!outcome) {
-    logger.error('[Outcome] No outcome configuration in snapshot', {
+  // Validate type is set
+  if (!type) {
+    logger.error('[Outcome] No experience type in snapshot', {
       jobId: job.id,
     })
     throw new OutcomeError(
-      'Job snapshot has no outcome configuration',
+      'Job snapshot has no experience type configured',
       'INVALID_INPUT',
     )
   }
 
-  // Validate outcome type
-  if (!outcome.type) {
-    logger.error('[Outcome] No outcome type configured', { jobId: job.id })
+  // Survey type should never reach here (rejected at pipeline entry)
+  if (type === 'survey') {
+    logger.error('[Outcome] Survey type cannot produce output', {
+      jobId: job.id,
+    })
     throw new OutcomeError(
-      'No outcome type configured',
+      'Survey experiences do not produce output',
       'INVALID_INPUT',
     )
   }
 
   logger.info('[Outcome] Dispatching to outcome executor', {
     jobId: job.id,
-    outcomeType: outcome.type,
+    outcomeType: type,
   })
 
   // Look up executor
-  const executor = outcomeRegistry[outcome.type]
+  const executor = outcomeRegistry[type as OutcomeType]
 
   if (executor === null) {
     logger.error('[Outcome] Outcome type not implemented', {
       jobId: job.id,
-      outcomeType: outcome.type,
+      outcomeType: type,
     })
     throw new OutcomeError(
-      `Outcome type '${outcome.type}' is not implemented`,
+      `Outcome type '${type}' is not implemented`,
       'INVALID_INPUT',
     )
   }
@@ -92,10 +94,10 @@ export async function runOutcome(ctx: OutcomeContext): Promise<JobOutput> {
   if (!executor) {
     logger.error('[Outcome] Unknown outcome type', {
       jobId: job.id,
-      outcomeType: outcome.type,
+      outcomeType: type,
     })
     throw new OutcomeError(
-      `Unknown outcome type: ${outcome.type}`,
+      `Unknown outcome type: ${type}`,
       'INVALID_INPUT',
     )
   }
@@ -106,7 +108,7 @@ export async function runOutcome(ctx: OutcomeContext): Promise<JobOutput> {
 
   logger.info('[Outcome] Outcome execution completed', {
     jobId: job.id,
-    outcomeType: outcome.type,
+    outcomeType: type,
     durationMs: Date.now() - startTime,
     assetId: output.assetId,
   })

@@ -2,7 +2,7 @@
  * Photo Outcome Executor
  *
  * Passthrough executor: returns captured media with optional overlay.
- * Reads config from snapshot.outcome.photo.
+ * Reads config from snapshot.config.photo.
  *
  * Flow:
  * 1. Read photo config from snapshot
@@ -29,13 +29,13 @@ import {
  */
 export async function photoOutcome(ctx: OutcomeContext): Promise<JobOutput> {
   const { job, snapshot, tmpDir, startTime } = ctx
-  const { outcome, overlayChoice } = snapshot
+  const { config, overlayChoice } = snapshot
 
-  if (!outcome?.photo) {
+  if (!config?.photo) {
     throw new Error('Photo outcome configuration is required')
   }
 
-  const { captureStepId, aspectRatio } = outcome.photo
+  const { captureStepId, aspectRatio } = config.photo
 
   logger.info('[PhotoOutcome] Starting photo outcome execution', {
     jobId: job.id,

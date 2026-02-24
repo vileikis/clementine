@@ -1,35 +1,37 @@
 /**
- * OutcomeTypeSelector Component
+ * ExperienceTypeSwitch Component
  *
- * Toggle group for switching outcome type within the editor.
- * Shows only enabled types (Photo, AI Image).
- * Does NOT allow deselection - use RemoveOutcomeAction to clear outcome.
+ * Toggle group for switching experience type within the editor.
+ * Shows only enabled types (Photo, AI Image, AI Video).
+ * Does NOT allow deselection - use ClearTypeConfigAction to clear config.
  *
- * @see specs/072-outcome-schema-redesign — US1
+ * Reads/writes experience.type (top-level field).
+ *
+ * @see specs/081-experience-type-flattening — US3
  */
 import { Camera, Sparkles, Video } from 'lucide-react'
 
-import { OUTCOME_TYPE_LABELS } from '../../lib/model-options'
+import { OUTCOME_TYPE_LABELS } from '../lib/model-options'
 import type { OutcomeType } from '@clementine/shared'
 import { ToggleGroup, ToggleGroupItem } from '@/ui-kit/ui/toggle-group'
 
-export interface OutcomeTypeSelectorProps {
-  /** Currently selected outcome type */
+export interface ExperienceTypeSwitchProps {
+  /** Currently selected experience type (non-survey) */
   value: OutcomeType
-  /** Callback when outcome type changes */
+  /** Callback when experience type changes */
   onChange: (value: OutcomeType) => void
   /** Whether the selector is disabled */
   disabled?: boolean
 }
 
 /**
- * OutcomeTypeSelector - Toggle group for switching enabled outcome types
+ * ExperienceTypeSwitch - Toggle group for switching enabled experience types
  */
-export function OutcomeTypeSelector({
+export function ExperienceTypeSwitch({
   value,
   onChange,
   disabled,
-}: OutcomeTypeSelectorProps) {
+}: ExperienceTypeSwitchProps) {
   return (
     <div className="space-y-2">
       <label className="text-sm font-medium">Output Type</label>

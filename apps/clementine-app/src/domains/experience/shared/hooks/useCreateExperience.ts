@@ -2,6 +2,10 @@
  * useCreateExperience Hook
  *
  * Mutation hook for creating a new experience in a workspace.
+ * Creates the experience with a unified `type` field and initializes
+ * the active type's default config on the draft.
+ *
+ * @see specs/081-experience-type-flattening — US1
  */
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import {
@@ -15,7 +19,11 @@ import { createExperienceInputSchema } from '../schemas/experience.input.schemas
 import { experienceKeys } from '../queries/experience.query'
 import type { WithFieldValue } from 'firebase/firestore'
 
-import type { Experience } from '../schemas'
+import type {
+  Experience,
+  ExperienceConfig,
+  ExperienceType,
+} from '@clementine/shared'
 import type { CreateExperienceInput } from '../schemas/experience.input.schemas'
 import { firestore } from '@/integrations/firebase/client'
 
@@ -30,36 +38,81 @@ export interface CreateExperienceResult {
 }
 
 /**
+ * Build default draft config for a given experience type.
+ * Per contracts/firestore-schema.md: all per-type configs are null except the
+ * active type's config which gets initialized with defaults.
+ */
+export function buildDefaultDraft(
+  type: ExperienceType,
+): WithFieldValue<ExperienceConfig> {
+  const base = {
+    steps: [] as WithFieldValue<ExperienceConfig>['steps'],
+    photo: null,
+    gif: null,
+    video: null,
+    aiImage: null,
+    aiVideo: null,
+  } satisfies WithFieldValue<ExperienceConfig>
+
+  switch (type) {
+    case 'ai.image':
+      return {
+        ...base,
+        aiImage: {
+          task: 'text-to-image' as const,
+          captureStepId: null,
+          aspectRatio: '1:1' as const,
+          imageGeneration: {
+            prompt: '',
+            model: 'gemini-2.5-flash-image' as const,
+            refMedia: [],
+            aspectRatio: null,
+          },
+        },
+      }
+    case 'ai.video':
+      return {
+        ...base,
+        aiVideo: {
+          task: 'image-to-video' as const,
+          captureStepId: '',
+          aspectRatio: '9:16' as const,
+          startFrameImageGen: null,
+          endFrameImageGen: null,
+          videoGeneration: {
+            prompt: '',
+            model: 'veo-3.1-fast-generate-001' as const,
+            duration: 6,
+            aspectRatio: null,
+            refMedia: [],
+          },
+        },
+      }
+    case 'photo':
+      return {
+        ...base,
+        photo: {
+          captureStepId: '',
+          aspectRatio: '1:1' as const,
+        },
+      }
+    // Survey, gif, video — no active config at creation
+    default:
+      return base
+  }
+}
+
+/**
  * Hook for creating a new experience
  *
  * Features:
  * - Validates input with Zod schema
  * - Creates document in transaction with serverTimestamp()
- * - Initializes with status: 'active', draft: { steps: [] }, published: null
+ * - Initializes with status: 'active', draft with type-specific defaults
  * - Invalidates experiences list cache on success
  * - Captures errors to Sentry
  *
  * @returns TanStack Mutation result
- *
- * @example
- * ```tsx
- * function CreateExperienceForm({ workspaceId }) {
- *   const createExperience = useCreateExperience()
- *
- *   const handleSubmit = async (data) => {
- *     try {
- *       const result = await createExperience.mutateAsync({
- *         workspaceId,
- *         name: data.name,
- *         profile: data.profile,
- *       })
- *       navigate(`/experiences/${result.experienceId}`)
- *     } catch {
- *       toast.error('Failed to create experience')
- *     }
- *   }
- * }
- * ```
  */
 export function useCreateExperience() {
   const queryClient = useQueryClient()
@@ -81,13 +134,10 @@ export function useCreateExperience() {
         const newExperience: WithFieldValue<Experience> = {
           id: newRef.id,
           name: validated.name,
-          profile: validated.profile,
+          type: validated.type,
           status: 'active',
           media: null,
-          draft: {
-            steps: [],
-            outcome: null, // Not configured - requires explicit setup
-          },
+          draft: buildDefaultDraft(validated.type),
           published: null,
           draftVersion: 1,
           publishedVersion: null,

@@ -20,7 +20,7 @@ import {
 } from 'firebase/firestore'
 
 import { experienceSchema } from '../schemas'
-import type { Experience, ExperienceProfile } from '../schemas'
+import type { Experience, ExperienceType } from '@clementine/shared'
 import { firestore } from '@/integrations/firebase/client'
 import { convertFirestoreDoc } from '@/shared/utils/firestore-utils'
 
@@ -37,7 +37,7 @@ export const experienceKeys = {
   lists: () => [...experienceKeys.all, 'list'] as const,
 
   /** Key for specific workspace list with optional filters */
-  list: (workspaceId: string, filters?: { profile?: ExperienceProfile }) =>
+  list: (workspaceId: string, filters?: { type?: ExperienceType }) =>
     [...experienceKeys.lists(), workspaceId, filters] as const,
 
   /** Key for experience details */
@@ -58,21 +58,12 @@ export const experienceKeys = {
  * Note: staleTime=Infinity because data is kept fresh by onSnapshot listener in hooks
  *
  * @param workspaceId - Workspace to fetch experiences from
- * @param filters - Optional filters (profile type)
+ * @param filters - Optional filters (type)
  * @returns Query options for use with useQuery or prefetchQuery
- *
- * @example
- * ```typescript
- * // In hook
- * return useQuery(experiencesQuery(workspaceId, filters))
- *
- * // In loader
- * await context.queryClient.ensureQueryData(experiencesQuery(workspaceId))
- * ```
  */
 export const experiencesQuery = (
   workspaceId: string,
-  filters?: { profile?: ExperienceProfile },
+  filters?: { type?: ExperienceType },
 ) =>
   queryOptions({
     queryKey: experienceKeys.list(workspaceId, filters),
@@ -82,18 +73,18 @@ export const experiencesQuery = (
         `workspaces/${workspaceId}/experiences`,
       )
 
-      // Build query with status filter and optional profile filter
+      // Build query with status filter and optional type filter
       let q = query(
         experiencesRef,
         where('status', '==', 'active'),
         orderBy('createdAt', 'desc'),
       )
 
-      if (filters?.profile) {
+      if (filters?.type) {
         q = query(
           experiencesRef,
           where('status', '==', 'active'),
-          where('profile', '==', filters.profile),
+          where('type', '==', filters.type),
           orderBy('createdAt', 'desc'),
         )
       }
@@ -115,17 +106,6 @@ export const experiencesQuery = (
  * @param workspaceId - Workspace containing the experience
  * @param experienceId - Experience document ID
  * @returns Query options for use with useQuery or prefetchQuery
- *
- * @example
- * ```typescript
- * // In hook
- * return useQuery(experienceQuery(workspaceId, experienceId))
- *
- * // In loader
- * const exp = await context.queryClient.ensureQueryData(
- *   experienceQuery(workspaceId, experienceId)
- * )
- * ```
  */
 export const experienceQuery = (workspaceId: string, experienceId: string) =>
   queryOptions({
@@ -157,13 +137,6 @@ export const experienceQuery = (workspaceId: string, experienceId: string) =>
  * @param workspaceId - Workspace containing the experiences
  * @param experienceIds - Array of experience document IDs to fetch
  * @returns Query options for use with useQuery
- *
- * @example
- * ```typescript
- * const { data: experiences } = useQuery(
- *   experiencesByIdsQuery(workspaceId, ['exp1', 'exp2', 'exp3'])
- * )
- * ```
  */
 export const experiencesByIdsQuery = (
   workspaceId: string,

@@ -13,7 +13,13 @@
 import { z } from 'zod'
 
 import { experienceMediaSchema } from '../media/media-reference.schema'
-import { outcomeSchema } from './outcome.schema'
+import {
+  aiImageConfigSchema,
+  aiVideoConfigSchema,
+  gifConfigSchema,
+  photoConfigSchema,
+  videoConfigSchema,
+} from './experience-config.schema'
 import { experienceStepSchema } from './step.schema'
 
 /**
@@ -23,16 +29,26 @@ import { experienceStepSchema } from './step.schema'
 export const experienceStatusSchema = z.enum(['active', 'deleted'])
 
 /**
- * Experience Profile enum schema
+ * Experience Type enum schema
  *
- * Defines valid experience profiles that determine allowed step types.
- * - freeform: Full flexibility with info, input, capture, transform steps
- * - survey: Data collection with info, input, capture steps
- * - story: Display only with info steps
+ * Unified type that replaces the old profile + outcome type two-step system.
+ * Determines what kind of experience this is and what output it produces.
  *
- * Profile is immutable after experience creation.
+ * - survey: Data collection (info, input, capture steps)
+ * - photo: Passthrough photo capture with optional overlay
+ * - gif: Animated GIF capture (coming soon)
+ * - video: Video capture (coming soon)
+ * - ai.image: AI-generated image from prompt and/or source
+ * - ai.video: AI-generated video
  */
-export const experienceProfileSchema = z.enum(['freeform', 'survey', 'story'])
+export const experienceTypeSchema = z.enum([
+  'survey',
+  'photo',
+  'gif',
+  'video',
+  'ai.image',
+  'ai.video',
+])
 
 /**
  * Experience Config Schema
@@ -43,8 +59,16 @@ export const experienceProfileSchema = z.enum(['freeform', 'survey', 'story'])
 export const experienceConfigSchema = z.looseObject({
   /** Array of steps in the experience (typed discriminated union) */
   steps: z.array(experienceStepSchema).default([]),
-  /** Outcome configuration (defines how the AI result is generated). Null means not configured. */
-  outcome: outcomeSchema.nullable().default(null),
+  /** Photo config — null means not configured */
+  photo: photoConfigSchema.nullable().default(null),
+  /** GIF config — null means not configured */
+  gif: gifConfigSchema.nullable().default(null),
+  /** Video config — null means not configured */
+  video: videoConfigSchema.nullable().default(null),
+  /** AI image config — null means not configured */
+  aiImage: aiImageConfigSchema.nullable().default(null),
+  /** AI video config — null means not configured */
+  aiVideo: aiVideoConfigSchema.nullable().default(null),
 })
 
 /**
@@ -71,11 +95,11 @@ export const experienceSchema = z.looseObject({
   status: experienceStatusSchema.default('active'),
 
   /**
-   * Experience profile type
-   * Determines validation rules for step sequences
-   * Immutable after creation
+   * Experience type
+   * Determines the kind of experience and its output format
+   * Set at creation, can be changed via config header
    */
-  profile: experienceProfileSchema,
+  type: experienceTypeSchema,
 
   /** Optional thumbnail/cover image */
   media: experienceMediaSchema.default(null),
@@ -126,7 +150,7 @@ export const experienceSchema = z.looseObject({
 export type Experience = z.infer<typeof experienceSchema>
 export type ExperienceConfig = z.infer<typeof experienceConfigSchema>
 export type ExperienceStatus = z.infer<typeof experienceStatusSchema>
-export type ExperienceProfile = z.infer<typeof experienceProfileSchema>
+export type ExperienceType = z.infer<typeof experienceTypeSchema>
 
 // Re-export media schemas for backward compatibility
 export {

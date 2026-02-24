@@ -2,7 +2,9 @@
  * ExperiencesPage Container
  *
  * Main container for the experience library page.
- * Displays list of experiences with profile filtering and loading states.
+ * Displays list of experiences with type filtering and loading states.
+ *
+ * @see specs/081-experience-type-flattening — US2
  */
 import { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
@@ -15,10 +17,10 @@ import {
   ExperienceListItem,
   RenameExperienceDialog,
 } from '../components'
-import type { Experience, ExperienceProfile } from '@/domains/experience/shared'
+import type { Experience, ExperienceType } from '@clementine/shared'
 import type { MenuSection } from '@/shared/components/ContextDropdownMenu'
 import {
-  profileMetadata,
+  typeMetadata,
   useDeleteExperience,
   useDuplicateExperience,
   useWorkspaceExperiences,
@@ -35,43 +37,25 @@ interface ExperiencesPageProps {
 }
 
 /**
- * Profile filter options including "all"
+ * Type filter options — only show selectable types (not coming-soon)
  */
-const profileOptions: {
-  value: ExperienceProfile | null
+const typeFilterOptions: {
+  value: ExperienceType | null
   label: string
 }[] = [
   { value: null, label: 'All' },
-  { value: 'freeform', label: profileMetadata.freeform.label },
-  { value: 'survey', label: profileMetadata.survey.label },
-  { value: 'story', label: profileMetadata.story.label },
+  { value: 'photo', label: typeMetadata.photo.label },
+  { value: 'ai.image', label: typeMetadata['ai.image'].label },
+  { value: 'ai.video', label: typeMetadata['ai.video'].label },
+  { value: 'survey', label: typeMetadata.survey.label },
 ]
 
-/**
- * Experience library page container
- *
- * Features:
- * - Lists all active experiences
- * - Profile filter tabs (All, Freeform, Survey, Story)
- * - Loading skeleton state
- * - Empty states (no experiences / no matches)
- * - Create experience button
- * - Rename experience via context menu
- * - Duplicate experience via context menu
- *
- * @example
- * ```tsx
- * <ExperiencesPage workspaceId="abc123" workspaceSlug="my-workspace" />
- * ```
- */
 export function ExperiencesPage({
   workspaceId,
   workspaceSlug,
 }: ExperiencesPageProps) {
   const navigate = useNavigate()
-  const [profileFilter, setProfileFilter] = useState<ExperienceProfile | null>(
-    null,
-  )
+  const [typeFilter, setTypeFilter] = useState<ExperienceType | null>(null)
 
   // Dialog state
   const [renameExperience, setRenameExperience] = useState<Experience | null>(
@@ -80,10 +64,10 @@ export function ExperiencesPage({
   const [deleteExperienceTarget, setDeleteExperienceTarget] =
     useState<Experience | null>(null)
 
-  // Fetch experiences with optional profile filter
+  // Fetch experiences with optional type filter
   const { data: experiences, isLoading } = useWorkspaceExperiences(
     workspaceId,
-    profileFilter ? { profile: profileFilter } : undefined,
+    typeFilter ? { type: typeFilter } : undefined,
   )
 
   // Mutations
@@ -164,7 +148,7 @@ export function ExperiencesPage({
           <Skeleton className="h-10 w-36" />
         </div>
         <div className="flex gap-2">
-          {[1, 2, 3, 4].map((i) => (
+          {[1, 2, 3, 4, 5].map((i) => (
             <Skeleton key={i} className="h-9 w-20" />
           ))}
         </div>
@@ -177,7 +161,7 @@ export function ExperiencesPage({
 
   // Determine empty state type
   const hasExperiences = experiences && experiences.length > 0
-  const isFiltered = profileFilter !== null
+  const isFiltered = typeFilter !== null
 
   return (
     <div className="p-6">
@@ -187,17 +171,15 @@ export function ExperiencesPage({
         <Button onClick={handleCreateExperience}>Create Experience</Button>
       </div>
 
-      {/* Profile filter tabs */}
+      {/* Type filter tabs */}
       <div className="flex gap-2 mb-6">
-        {profileOptions.map((option) => (
+        {typeFilterOptions.map((option) => (
           <Button
             key={option.label}
-            variant={profileFilter === option.value ? 'default' : 'outline'}
+            variant={typeFilter === option.value ? 'default' : 'outline'}
             size="sm"
-            onClick={() => setProfileFilter(option.value)}
-            className={cn(
-              profileFilter === option.value && 'pointer-events-none',
-            )}
+            onClick={() => setTypeFilter(option.value)}
+            className={cn(typeFilter === option.value && 'pointer-events-none')}
           >
             {option.label}
           </Button>
@@ -208,9 +190,9 @@ export function ExperiencesPage({
       {!hasExperiences ? (
         <ExperienceListEmpty
           variant={isFiltered ? 'no-matches' : 'no-experiences'}
-          profile={profileFilter ?? undefined}
+          typeLabel={typeFilter ? typeMetadata[typeFilter].label : undefined}
           onCreate={handleCreateExperience}
-          onClearFilter={() => setProfileFilter(null)}
+          onClearFilter={() => setTypeFilter(null)}
         />
       ) : (
         <div className="flex flex-col gap-4">

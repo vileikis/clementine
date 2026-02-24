@@ -15,7 +15,7 @@ import {
   startAfter,
   where,
 } from 'firebase/firestore'
-import { SLOT_PROFILES } from '../constants'
+import { SLOT_TYPES } from '../constants'
 import type { DocumentSnapshot } from 'firebase/firestore'
 
 import type { SlotType } from '../constants'
@@ -65,11 +65,11 @@ export function usePaginatedExperiencesForSlot(
         `workspaces/${workspaceId}/experiences`,
       )
 
-      const allowedProfiles = SLOT_PROFILES[slot]
+      const allowedTypes = SLOT_TYPES[slot]
 
       const constraints = [
         where('status', '==', 'active'),
-        where('profile', 'in', allowedProfiles),
+        where('type', 'in', allowedTypes),
         orderBy('createdAt', 'desc'),
         limit(pageSize),
         ...(pageParam ? [startAfter(pageParam)] : []),

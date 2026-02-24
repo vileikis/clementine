@@ -6,17 +6,17 @@
  *
  * @see specs/072-outcome-schema-redesign — US1
  */
-import { getFieldError } from '../../hooks/useOutcomeValidation'
+import { getFieldError } from '../../hooks/useExperienceConfigValidation'
 import { SourceImageSelector } from '../shared-controls/SourceImageSelector'
 import { AspectRatioSelector } from '../shared-controls/AspectRatioSelector'
-import type { FieldValidationError } from '../../hooks/useOutcomeValidation'
-import type { ExperienceStep, PhotoOutcomeConfig } from '@clementine/shared'
+import type { FieldValidationError } from '../../hooks/useExperienceConfigValidation'
+import type { ExperienceStep, PhotoConfig } from '@clementine/shared'
 
 export interface PhotoConfigFormProps {
-  /** Photo outcome configuration */
-  config: PhotoOutcomeConfig
+  /** Photo configuration */
+  config: PhotoConfig
   /** Callback when config changes */
-  onConfigChange: (updates: Partial<PhotoOutcomeConfig>) => void
+  onConfigChange: (updates: Partial<PhotoConfig>) => void
   /** Experience steps */
   steps: ExperienceStep[]
   /** Validation errors */
