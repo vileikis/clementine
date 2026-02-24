@@ -164,15 +164,21 @@ describe('jobSnapshotSchema', () => {
   const validSnapshot = {
     sessionResponses: [],
     experienceVersion: 1,
-    outcome: null,
+    type: 'ai.image' as const,
+    config: {},
     overlayChoice: null,
   }
 
-  it('parses valid snapshot with flattened structure', () => {
+  it('parses valid snapshot with type and config', () => {
     const result = jobSnapshotSchema.parse(validSnapshot)
     expect(result.sessionResponses).toBeDefined()
     expect(result.experienceVersion).toBe(1)
-    expect(result.outcome).toBeNull()
+    expect(result.type).toBe('ai.image')
+    expect(result.config.photo).toBeNull()
+    expect(result.config.gif).toBeNull()
+    expect(result.config.video).toBeNull()
+    expect(result.config.aiImage).toBeNull()
+    expect(result.config.aiVideo).toBeNull()
     expect(result.overlayChoice).toBeNull()
   })
 
@@ -188,6 +194,21 @@ describe('jobSnapshotSchema', () => {
     expect(result.overlayChoice).not.toBeNull()
     expect(result.overlayChoice?.mediaAssetId).toBe('overlay-1')
   })
+
+  it('accepts per-type config in config object', () => {
+    const result = jobSnapshotSchema.parse({
+      ...validSnapshot,
+      config: {
+        aiImage: {
+          task: 'text-to-image',
+          captureStepId: null,
+          aspectRatio: '1:1',
+          imageGeneration: { prompt: 'a photo of a cat' },
+        },
+      },
+    })
+    expect(result.config.aiImage?.task).toBe('text-to-image')
+  })
 })
 
 describe('jobSchema', () => {
@@ -199,9 +220,9 @@ describe('jobSchema', () => {
     snapshot: {
       sessionResponses: [],
       experienceVersion: 1,
-      outcome: null,
+      type: 'ai.image' as const,
+      config: {},
       overlayChoice: null,
-      experienceRef: null,
     },
     createdAt: Date.now(),
     updatedAt: Date.now(),

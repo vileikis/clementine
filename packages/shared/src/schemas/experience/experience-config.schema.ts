@@ -1,14 +1,14 @@
 /**
- * Outcome Schema
+ * Experience Config Schemas
  *
- * Per-type config architecture for outcome-based generation.
- * Each outcome type (photo, gif, video, ai.image, ai.video) has its own
+ * Per-type configuration schemas for experience types.
+ * Each experience type (photo, gif, video, ai.image, ai.video) has its own
  * nullable config object. Only the active type's config is populated.
  *
  * Uses z.looseObject() at the top level for backward compatibility —
  * old fields (aiEnabled, imageGeneration, etc.) are silently ignored during parsing.
  *
- * @see specs/072-outcome-schema-redesign
+ * @see specs/081-experience-type-flattening
  */
 import { z } from 'zod'
 import {
@@ -19,7 +19,10 @@ import { mediaReferenceSchema } from '../media/media-reference.schema'
 
 // ── OutcomeType ──────────────────────────────────────────────
 
-/** Outcome type enum — determines the final output format. */
+/**
+ * Outcome type enum — the subset of experience types that produce output.
+ * Used by backend executor dispatch. Excludes 'survey' which has no output.
+ */
 export const outcomeTypeSchema = z.enum([
   'photo',
   'gif',
@@ -49,10 +52,10 @@ export const aiVideoModelSchema = z.enum([
 // ── Generation Config Schemas ────────────────────────────────
 
 /**
- * Image generation config — shared by ai.image and ai.video outcomes.
+ * Image generation config — shared by ai.image and ai.video types.
  *
  * Contains the parameters passed to aiGenerateImage().
- * aspectRatio is nullable: null = inherit from parent outcome config.
+ * aspectRatio is nullable: null = inherit from parent config.
  */
 export const imageGenerationConfigSchema = z.object({
   prompt: z.string().default(''),
@@ -76,10 +79,10 @@ export const videoDurationSchema = z
   .pipe(z.literal(4).or(z.literal(6)).or(z.literal(8)))
 
 /**
- * Video generation config — used by ai.video outcome.
+ * Video generation config — used by ai.video type.
  *
  * Contains the parameters passed to the video generation service.
- * aspectRatio is nullable: null = inherit from parent outcome config.
+ * aspectRatio is nullable: null = inherit from parent config.
  */
 export const videoGenerationConfigSchema = z.object({
   prompt: z.string().default(''),
@@ -91,8 +94,8 @@ export const videoGenerationConfigSchema = z.object({
 
 // ── Per-Type Config Schemas ──────────────────────────────────
 
-/** Photo outcome config — passthrough capture with optional overlay. */
-export const photoOutcomeConfigSchema = z.object({
+/** Photo config — passthrough capture with optional overlay. */
+export const photoConfigSchema = z.object({
   captureStepId: z.string(),
   aspectRatio: imageAspectRatioSchema.default('1:1'),
 })
@@ -100,22 +103,22 @@ export const photoOutcomeConfigSchema = z.object({
 /** AI image task type — text-to-image or image-to-image. */
 export const aiImageTaskSchema = z.enum(['text-to-image', 'image-to-image'])
 
-/** AI image outcome config — AI-generated image from prompt and/or source. */
-export const aiImageOutcomeConfigSchema = z.object({
+/** AI image config — AI-generated image from prompt and/or source. */
+export const aiImageConfigSchema = z.object({
   task: aiImageTaskSchema.default('text-to-image'),
   captureStepId: z.string().nullable().default(null),
   aspectRatio: imageAspectRatioSchema.default('1:1'),
   imageGeneration: imageGenerationConfigSchema,
 })
 
-/** GIF outcome config — placeholder for future implementation. */
-export const gifOutcomeConfigSchema = z.object({
+/** GIF config — placeholder for future implementation. */
+export const gifConfigSchema = z.object({
   captureStepId: z.string(),
   aspectRatio: imageAspectRatioSchema.default('1:1'),
 })
 
-/** Video outcome config — placeholder for future implementation. */
-export const videoOutcomeConfigSchema = z.object({
+/** Video config — placeholder for future implementation. */
+export const videoConfigSchema = z.object({
   captureStepId: z.string(),
   aspectRatio: videoAspectRatioSchema.default('9:16'),
 })
@@ -136,35 +139,14 @@ export const aiVideoTaskSchema = rawAiVideoTaskSchema.transform((v) =>
   v === 'animate' ? ('image-to-video' as const) : v,
 )
 
-/** AI video outcome config. */
-export const aiVideoOutcomeConfigSchema = z.object({
+/** AI video config. */
+export const aiVideoConfigSchema = z.object({
   task: aiVideoTaskSchema.default('image-to-video'),
   captureStepId: z.string(),
   aspectRatio: videoAspectRatioSchema.default('9:16'),
   startFrameImageGen: imageGenerationConfigSchema.nullable().default(null),
   endFrameImageGen: imageGenerationConfigSchema.nullable().default(null),
   videoGeneration: videoGenerationConfigSchema,
-})
-
-// ── Outcome (top-level) ──────────────────────────────────────
-
-/**
- * Complete Outcome configuration.
- *
- * Uses z.looseObject() for backward compatibility — old fields
- * (aiEnabled, imageGeneration, captureStepId, options, etc.)
- * are silently ignored during parsing.
- *
- * Per-type configs persist independently — switching types does NOT
- * clear other configs. Setting type to null preserves all configs.
- */
-export const outcomeSchema = z.looseObject({
-  type: outcomeTypeSchema.nullable().default(null),
-  photo: photoOutcomeConfigSchema.nullable().default(null),
-  gif: gifOutcomeConfigSchema.nullable().default(null),
-  video: videoOutcomeConfigSchema.nullable().default(null),
-  aiImage: aiImageOutcomeConfigSchema.nullable().default(null),
-  aiVideo: aiVideoOutcomeConfigSchema.nullable().default(null),
 })
 
 // ── Type Exports ─────────────────────────────────────────────
@@ -174,12 +156,11 @@ export type AIImageModel = z.infer<typeof aiImageModelSchema>
 export type AIImageAspectRatio = z.infer<typeof aiImageAspectRatioSchema>
 export type ImageGenerationConfig = z.infer<typeof imageGenerationConfigSchema>
 export type VideoGenerationConfig = z.infer<typeof videoGenerationConfigSchema>
-export type PhotoOutcomeConfig = z.infer<typeof photoOutcomeConfigSchema>
+export type PhotoConfig = z.infer<typeof photoConfigSchema>
 export type AIImageTask = z.infer<typeof aiImageTaskSchema>
-export type AIImageOutcomeConfig = z.infer<typeof aiImageOutcomeConfigSchema>
-export type GifOutcomeConfig = z.infer<typeof gifOutcomeConfigSchema>
-export type VideoOutcomeConfig = z.infer<typeof videoOutcomeConfigSchema>
+export type AIImageConfig = z.infer<typeof aiImageConfigSchema>
+export type GifConfig = z.infer<typeof gifConfigSchema>
+export type VideoConfig = z.infer<typeof videoConfigSchema>
 export type AIVideoTask = z.infer<typeof aiVideoTaskSchema>
 export type AIVideoModel = z.infer<typeof aiVideoModelSchema>
-export type AIVideoOutcomeConfig = z.infer<typeof aiVideoOutcomeConfigSchema>
-export type Outcome = z.infer<typeof outcomeSchema>
+export type AIVideoConfig = z.infer<typeof aiVideoConfigSchema>
