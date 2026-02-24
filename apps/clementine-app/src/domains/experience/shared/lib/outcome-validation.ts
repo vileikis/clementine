@@ -237,7 +237,14 @@ export function validateOutcome(
   // Survey has no per-type config
   if (type === 'survey') return { valid: true, errors: [] }
 
-  if (!config) return { valid: true, errors: [] }
+  if (!config) {
+    return {
+      valid: false,
+      errors: [
+        { field: 'config', message: 'Experience configuration is required' },
+      ],
+    }
+  }
 
   if (COMING_SOON_TYPES.has(type)) {
     return {
@@ -252,7 +259,15 @@ export function validateOutcome(
   }
 
   const validator = typeValidators[type]
-  const errors = validator ? validator(config, steps) : []
+  if (!validator) {
+    return {
+      valid: false,
+      errors: [
+        { field: 'type', message: `No validator registered for type: ${type}` },
+      ],
+    }
+  }
+  const errors = validator(config, steps)
 
   return { valid: errors.length === 0, errors }
 }

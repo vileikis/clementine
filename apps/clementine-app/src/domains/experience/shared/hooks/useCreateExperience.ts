@@ -42,7 +42,7 @@ export interface CreateExperienceResult {
  * Per contracts/firestore-schema.md: all per-type configs are null except the
  * active type's config which gets initialized with defaults.
  */
-function buildDefaultDraft(
+export function buildDefaultDraft(
   type: ExperienceType,
 ): WithFieldValue<ExperienceConfig> {
   const base = {

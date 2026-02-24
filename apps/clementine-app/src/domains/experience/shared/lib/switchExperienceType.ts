@@ -43,14 +43,20 @@ export async function switchExperienceType(
       `workspaces/${workspaceId}/experiences/${experienceId}`,
     )
 
+    const snapshot = await transaction.get(experienceRef)
+    if (!snapshot.exists()) {
+      throw new Error(`Experience ${experienceId} not found`)
+    }
+    const draft = (snapshot.data()?.draft ?? {}) as Record<string, unknown>
+
     const updateData: Record<string, unknown> = {
       type: newType,
       draftVersion: increment(1),
       updatedAt: serverTimestamp(),
     }
 
-    // Initialize the new type's default config if provided
-    if (defaultConfig) {
+    // Initialize the new type's default config only if not already present
+    if (defaultConfig && draft[defaultConfig.key] == null) {
       updateData[`draft.${defaultConfig.key}`] = defaultConfig.value
     }
 

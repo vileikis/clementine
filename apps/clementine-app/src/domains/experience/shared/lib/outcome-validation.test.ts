@@ -87,11 +87,14 @@ describe('validateOutcome', () => {
   })
 
   describe('Null config', () => {
-    it('passes when config is null', () => {
+    it('fails when config is null for non-survey type', () => {
       const result = validateOutcome('photo', null, [])
 
-      expect(result.valid).toBe(true)
-      expect(result.errors).toHaveLength(0)
+      expect(result.valid).toBe(false)
+      expect(result.errors).toContainEqual({
+        field: 'config',
+        message: 'Experience configuration is required',
+      })
     })
   })
 
