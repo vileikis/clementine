@@ -2,10 +2,10 @@
  * ConnectExperienceItem Component
  *
  * List item within the connect drawer for selecting experiences.
- * Shows thumbnail, name, profile badge, and assigned state.
+ * Shows thumbnail, name, type badge, and assigned state.
  */
 import type { Experience } from '@/domains/experience/shared'
-import { ProfileBadge } from '@/domains/experience/library/components/ProfileBadge'
+import { TypeBadge } from '@/domains/experience/library/components/TypeBadge'
 import { Badge } from '@/ui-kit/ui/badge'
 import { cn } from '@/shared/utils/style-utils'
 
@@ -93,7 +93,7 @@ export function ConnectExperienceItem({
             </Badge>
           )}
         </div>
-        <ProfileBadge profile={experience.profile} />
+        <TypeBadge type={experience.type} />
       </div>
     </button>
   )

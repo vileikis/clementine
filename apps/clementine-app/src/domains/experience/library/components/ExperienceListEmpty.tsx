@@ -6,8 +6,6 @@
  * - no-experiences: No experiences exist at all
  * - no-matches: No experiences match the current filter
  */
-import type { ExperienceProfile } from '@/domains/experience/shared'
-import { profileMetadata } from '@/domains/experience/shared'
 import { Button } from '@/ui-kit/ui/button'
 
 interface ExperienceListEmptyProps {
@@ -15,36 +13,17 @@ interface ExperienceListEmptyProps {
   variant: 'no-experiences' | 'no-matches'
   /** Callback to navigate to create page */
   onCreate?: () => void
-  /** Callback to clear the profile filter */
+  /** Callback to clear the type filter */
   onClearFilter?: () => void
-  /** Current profile filter (for no-matches variant) */
-  profile?: ExperienceProfile
+  /** Current type filter label (for no-matches variant) */
+  typeLabel?: string
 }
 
-/**
- * Empty state component for experience library
- *
- * @example
- * ```tsx
- * // No experiences at all
- * <ExperienceListEmpty
- *   variant="no-experiences"
- *   onCreate={() => navigate('/create')}
- * />
- *
- * // No experiences matching filter
- * <ExperienceListEmpty
- *   variant="no-matches"
- *   profile="survey"
- *   onClearFilter={() => setFilter(null)}
- * />
- * ```
- */
 export function ExperienceListEmpty({
   variant,
   onCreate,
   onClearFilter,
-  profile,
+  typeLabel,
 }: ExperienceListEmptyProps) {
   if (variant === 'no-experiences') {
     return (
@@ -59,11 +38,11 @@ export function ExperienceListEmpty({
   }
 
   // no-matches variant
-  const profileLabel = profile ? profileMetadata[profile].label : 'this type'
+  const label = typeLabel ?? 'this type'
 
   return (
     <div className="p-8 text-center">
-      <h3 className="text-lg font-semibold">No {profileLabel} experiences</h3>
+      <h3 className="text-lg font-semibold">No {label} experiences</h3>
       <p className="text-muted-foreground mt-2 mb-4">
         Try a different filter or create a new experience
       </p>

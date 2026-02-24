@@ -6,8 +6,8 @@
  * exported from ../schemas (re-exported from @clementine/shared).
  */
 
-// Profile types and validators
-export * from './profile.types'
+// Experience type metadata and validators
+export * from './type-metadata'
 
 // Runtime engine interface
 export * from './runtime.types'

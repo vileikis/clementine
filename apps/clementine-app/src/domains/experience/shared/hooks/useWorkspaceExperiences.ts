@@ -1,10 +1,12 @@
 /**
  * useWorkspaceExperiences Hook
  *
- * Lists all active experiences in a workspace with optional profile filtering.
+ * Lists all active experiences in a workspace with optional type filtering.
  * Features real-time updates via Firestore onSnapshot listener.
  *
  * Pattern: Combines Firebase onSnapshot (real-time) with TanStack Query (caching)
+ *
+ * @see specs/081-experience-type-flattening — US2
  */
 import { useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
@@ -18,7 +20,7 @@ import {
 
 import { experienceSchema } from '../schemas'
 import { experienceKeys, experiencesQuery } from '../queries/experience.query'
-import type { Experience, ExperienceProfile } from '../schemas'
+import type { Experience, ExperienceType } from '@clementine/shared'
 import { firestore } from '@/integrations/firebase/client'
 import { convertFirestoreDoc } from '@/shared/utils/firestore-utils'
 
@@ -26,8 +28,8 @@ import { convertFirestoreDoc } from '@/shared/utils/firestore-utils'
  * Filter options for experience list
  */
 export interface ExperienceFilters {
-  /** Filter by profile type */
-  profile?: ExperienceProfile
+  /** Filter by experience type */
+  type?: ExperienceType
 }
 
 /**
@@ -37,23 +39,12 @@ export interface ExperienceFilters {
  * - Real-time updates via Firestore onSnapshot
  * - TanStack Query cache integration
  * - Filters to status === 'active' (excludes soft-deleted)
- * - Optional profile filtering
+ * - Optional type filtering
  * - Sorted by createdAt descending (newest first)
  *
  * @param workspaceId - Workspace ID to fetch experiences from
- * @param filters - Optional filter by profile type
+ * @param filters - Optional filter by experience type
  * @returns TanStack Query result with experiences array
- *
- * @example
- * ```tsx
- * function ExperiencesList({ workspaceId }) {
- *   const { data: experiences, isLoading } = useWorkspaceExperiences(workspaceId)
- *
- *   if (isLoading) return <Skeleton />
- *
- *   return experiences.map(exp => <ExperienceCard key={exp.id} experience={exp} />)
- * }
- * ```
  */
 export function useWorkspaceExperiences(
   workspaceId: string,
@@ -68,18 +59,18 @@ export function useWorkspaceExperiences(
       `workspaces/${workspaceId}/experiences`,
     )
 
-    // Build query with status filter and optional profile filter
+    // Build query with status filter and optional type filter
     let q = query(
       experiencesRef,
       where('status', '==', 'active'),
       orderBy('createdAt', 'desc'),
     )
 
-    if (filters?.profile) {
+    if (filters?.type) {
       q = query(
         experiencesRef,
         where('status', '==', 'active'),
-        where('profile', '==', filters.profile),
+        where('type', '==', filters.type),
         orderBy('createdAt', 'desc'),
       )
     }
@@ -95,7 +86,7 @@ export function useWorkspaceExperiences(
     })
 
     return () => unsubscribe()
-  }, [workspaceId, filters?.profile, queryClient])
+  }, [workspaceId, filters?.type, queryClient])
 
   return useQuery(experiencesQuery(workspaceId, filters))
 }

@@ -5,7 +5,7 @@
  * Includes client-side validation for:
  * - At least one step required
  * - All step configs valid per their schemas
- * - Step types allowed for the experience profile
+ * - Step types allowed for the experience type
  */
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import * as Sentry from '@sentry/tanstackstart-react'
@@ -14,7 +14,7 @@ import { doc, runTransaction, serverTimestamp } from 'firebase/firestore'
 import { experienceKeys } from '../../shared/queries/experience.query'
 import { validateOutcome } from '../../shared/lib/outcome-validation'
 import { stepRegistry } from '../../steps/registry/step-registry'
-import { getStepTypesForProfile } from '../../steps/registry/step-utils'
+import { getStepTypesForType } from '../../steps/registry/step-utils'
 import type { UpdateData } from 'firebase/firestore'
 import type { Experience } from '../../shared/schemas'
 import type { Step } from '../../steps/registry/step-registry'
@@ -111,14 +111,14 @@ export function validateForPublish(
     }
   }
 
-  // Rule 3: Profile constraints
-  const allowedTypes = getStepTypesForProfile(experience.profile)
+  // Rule 3: Type constraints
+  const allowedTypes = getStepTypesForType(experience.type)
   for (const step of experience.draft.steps) {
     if (!allowedTypes.includes(step.type)) {
       errors.push({
         field: 'steps',
         stepId: step.id,
-        message: `Step type "${step.type}" is not allowed for ${experience.profile} profile`,
+        message: `Step type "${step.type}" is not allowed for ${experience.type} type`,
       })
     }
   }

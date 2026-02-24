@@ -2,6 +2,8 @@
  * Step Utilities
  *
  * Helper functions for working with the step registry.
+ *
+ * @see specs/081-experience-type-flattening — maps ExperienceType to allowed categories
  */
 import { generateStepName } from './step-name.helpers'
 import { stepRegistry } from './step-registry'
@@ -11,15 +13,19 @@ import type {
   StepDefinition,
   StepType,
 } from './step-registry'
-import type { ExperienceProfile } from '../../shared/schemas'
+import type { ExperienceType } from '@clementine/shared'
 
 /**
- * Profile-to-allowed-categories mapping
+ * Type-to-allowed-categories mapping
+ * survey → info/input/capture; all others → info/input/capture/transform
  */
-const PROFILE_ALLOWED_CATEGORIES: Record<ExperienceProfile, StepCategory[]> = {
-  freeform: ['info', 'input', 'capture', 'transform'],
+const TYPE_ALLOWED_CATEGORIES: Record<ExperienceType, StepCategory[]> = {
   survey: ['info', 'input', 'capture'],
-  story: ['info'],
+  photo: ['info', 'input', 'capture', 'transform'],
+  gif: ['info', 'input', 'capture', 'transform'],
+  video: ['info', 'input', 'capture', 'transform'],
+  'ai.image': ['info', 'input', 'capture', 'transform'],
+  'ai.video': ['info', 'input', 'capture', 'transform'],
 }
 
 /**
@@ -30,10 +36,10 @@ export function getStepDefinition(type: StepType): StepDefinition | undefined {
 }
 
 /**
- * Get all step types allowed for a specific profile
+ * Get all step types allowed for a specific experience type
  */
-export function getStepTypesForProfile(profile: ExperienceProfile): StepType[] {
-  const allowedCategories = PROFILE_ALLOWED_CATEGORIES[profile]
+export function getStepTypesForType(experienceType: ExperienceType): StepType[] {
+  const allowedCategories = TYPE_ALLOWED_CATEGORIES[experienceType]
 
   return Object.values(stepRegistry)
     .filter((def) => allowedCategories.includes(def.category))
@@ -41,12 +47,12 @@ export function getStepTypesForProfile(profile: ExperienceProfile): StepType[] {
 }
 
 /**
- * Get step definitions allowed for a specific profile
+ * Get step definitions allowed for a specific experience type
  */
-export function getStepDefinitionsForProfile(
-  profile: ExperienceProfile,
+export function getStepDefinitionsForType(
+  experienceType: ExperienceType,
 ): StepDefinition[] {
-  const allowedCategories = PROFILE_ALLOWED_CATEGORIES[profile]
+  const allowedCategories = TYPE_ALLOWED_CATEGORIES[experienceType]
 
   return Object.values(stepRegistry).filter((def) =>
     allowedCategories.includes(def.category),
@@ -72,12 +78,12 @@ export function getStepsByCategory(): Record<StepCategory, StepDefinition[]> {
 }
 
 /**
- * Get step definitions grouped by category, filtered by profile
+ * Get step definitions grouped by category, filtered by experience type
  */
-export function getStepsByCategoryForProfile(
-  profile: ExperienceProfile,
+export function getStepsByCategoryForType(
+  experienceType: ExperienceType,
 ): Record<StepCategory, StepDefinition[]> {
-  const allowedCategories = PROFILE_ALLOWED_CATEGORIES[profile]
+  const allowedCategories = TYPE_ALLOWED_CATEGORIES[experienceType]
   const grouped: Record<StepCategory, StepDefinition[]> = {
     info: [],
     input: [],
@@ -122,13 +128,13 @@ export function createStep(
 }
 
 /**
- * Check if a step type is allowed for a profile
+ * Check if a step type is allowed for an experience type
  */
-export function isStepTypeAllowedForProfile(
+export function isStepTypeAllowedForType(
   type: StepType,
-  profile: ExperienceProfile,
+  experienceType: ExperienceType,
 ): boolean {
-  const allowedTypes = getStepTypesForProfile(profile)
+  const allowedTypes = getStepTypesForType(experienceType)
   return allowedTypes.includes(type)
 }
 

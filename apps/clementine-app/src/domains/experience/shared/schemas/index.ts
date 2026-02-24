@@ -11,14 +11,13 @@ export {
   experienceSchema,
   experienceConfigSchema,
   experienceStatusSchema,
-  experienceProfileSchema,
+  experienceTypeSchema,
   experienceMediaSchema,
-  // Outcome schemas
-  outcomeSchema,
+  // Per-type config schemas
   outcomeTypeSchema,
   imageGenerationConfigSchema,
-  photoOutcomeConfigSchema,
-  aiImageOutcomeConfigSchema,
+  photoConfigSchema,
+  aiImageConfigSchema,
   aiImageTaskSchema,
   // Step schemas (discriminated union)
   experienceStepSchema,
@@ -46,14 +45,13 @@ export {
   type Experience,
   type ExperienceConfig,
   type ExperienceStatus,
-  type ExperienceProfile,
+  type ExperienceType,
   type ExperienceMedia,
-  // Outcome types
-  type Outcome,
+  // Per-type config types
   type OutcomeType,
   type ImageGenerationConfig,
-  type PhotoOutcomeConfig,
-  type AIImageOutcomeConfig,
+  type PhotoConfig,
+  type AIImageConfig,
   type AIImageTask,
   // Step types
   type ExperienceStep,

@@ -11,7 +11,7 @@ import type {
   MainExperienceReference,
 } from '../schemas/event-experiences.schema'
 import type { SlotType } from '../constants'
-import { ProfileBadge } from '@/domains/experience/library/components/ProfileBadge'
+import { TypeBadge } from '@/domains/experience/library/components/TypeBadge'
 import { Switch } from '@/ui-kit/ui/switch'
 import { Label } from '@/ui-kit/ui/label'
 import { Button } from '@/ui-kit/ui/button'
@@ -143,7 +143,7 @@ export function ExperienceDetailsSheet({
                 {experience.name}
               </h3>
               <div className="mt-1">
-                <ProfileBadge profile={experience.profile} />
+                <TypeBadge type={experience.type} />
               </div>
             </div>
           </div>

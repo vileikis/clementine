@@ -8,7 +8,7 @@ import { z } from 'zod'
 
 import {
   experienceMediaSchema,
-  experienceProfileSchema,
+  experienceTypeSchema,
 } from '@clementine/shared'
 
 /**
@@ -26,8 +26,8 @@ export const createExperienceInputSchema = z.object({
     .min(1, 'Name is required')
     .max(100, 'Name must be 100 characters or less'),
 
-  /** Experience profile type (immutable after creation) */
-  profile: experienceProfileSchema,
+  /** Experience type — determines the kind of experience and its output */
+  type: experienceTypeSchema,
 })
 
 export type CreateExperienceInput = z.infer<typeof createExperienceInputSchema>

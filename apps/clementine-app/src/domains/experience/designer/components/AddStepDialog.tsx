@@ -2,14 +2,14 @@
  * AddStepDialog Component
  *
  * Modal dialog for adding new steps to an experience.
- * Shows step types grouped by category, filtered by experience profile.
+ * Shows step types grouped by category, filtered by experience type.
  */
 import {
   getCategoryColorClasses,
   getCategoryLabel,
-  getStepsByCategoryForProfile,
+  getStepsByCategoryForType,
 } from '../../steps/registry/step-utils'
-import type { ExperienceProfile } from '../../shared/schemas'
+import type { ExperienceType } from '@clementine/shared'
 import type { StepCategory, StepType } from '../../steps/registry/step-registry'
 import { Button } from '@/ui-kit/ui/button'
 import {
@@ -26,39 +26,19 @@ interface AddStepDialogProps {
   open: boolean
   /** Dialog state change handler */
   onOpenChange: (open: boolean) => void
-  /** Experience profile for filtering available step types */
-  profile: ExperienceProfile
+  /** Experience type for filtering available step types */
+  type: ExperienceType
   /** Callback when a step type is selected */
   onAddStep: (type: StepType) => void
 }
 
-/**
- * Dialog for adding new steps to an experience
- *
- * Shows step types grouped by category (Information, Input, Capture, Transform).
- * Available step types are filtered based on the experience profile.
- *
- * @example
- * ```tsx
- * <AddStepDialog
- *   open={showAddStep}
- *   onOpenChange={setShowAddStep}
- *   profile={experience.profile}
- *   onAddStep={(type) => {
- *     const step = createStep(type)
- *     setSteps([...steps, step])
- *     setShowAddStep(false)
- *   }}
- * />
- * ```
- */
 export function AddStepDialog({
   open,
   onOpenChange,
-  profile,
+  type,
   onAddStep,
 }: AddStepDialogProps) {
-  const stepsByCategory = getStepsByCategoryForProfile(profile)
+  const stepsByCategory = getStepsByCategoryForType(type)
 
   // Filter out empty categories
   const categories = (
@@ -68,8 +48,8 @@ export function AddStepDialog({
     ][]
   ).filter(([, steps]) => steps.length > 0)
 
-  const handleStepSelect = (type: StepType) => {
-    onAddStep(type)
+  const handleStepSelect = (stepType: StepType) => {
+    onAddStep(stepType)
     onOpenChange(false)
   }
 

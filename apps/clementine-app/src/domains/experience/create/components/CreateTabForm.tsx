@@ -3,7 +3,7 @@
  *
  * Thin orchestrator for the Create tab. Routes to the correct config form
  * based on outcome.type:
- * - null → OutcomeTypePicker
+ * - null → OutcomeTypeSelector (fallback for pre-migration experiences)
  * - 'photo' → OutcomeTypeSelector + PhotoConfigForm + RemoveOutcomeAction
  * - 'ai.image' → OutcomeTypeSelector + AIImageConfigForm + RemoveOutcomeAction
  *
@@ -24,7 +24,6 @@ import {
 } from '../lib/outcome-operations'
 import { AIImageConfigForm } from './ai-image-config/AIImageConfigForm'
 import { AIVideoConfigForm } from './ai-video-config'
-import { OutcomeTypePicker } from './outcome-picker/OutcomeTypePicker'
 import { OutcomeTypeSelector } from './outcome-picker/OutcomeTypeSelector'
 import { RemoveOutcomeAction } from './outcome-picker/RemoveOutcomeAction'
 import { PhotoConfigForm } from './photo-config/PhotoConfigForm'
@@ -162,9 +161,16 @@ export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
 
   // ── Render ────────────────────────────────────────────────
 
-  // No outcome type selected → show picker
+  // No outcome type selected → show type selector
+  // (Type is now set at creation time via ExperienceTypePicker.
+  //  This fallback handles pre-migration experiences. Phase 5 will rewrite this.)
   if (!outcome.type) {
-    return <OutcomeTypePicker onTypeSelect={handleOutcomeTypeSelect} />
+    return (
+      <OutcomeTypeSelector
+        value={outcome.type}
+        onChange={handleOutcomeTypeSelect}
+      />
+    )
   }
 
   // Photo type
@@ -235,5 +241,10 @@ export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
   }
 
   // Fallback — type set but config not initialized
-  return <OutcomeTypePicker onTypeSelect={handleOutcomeTypeSelect} />
+  return (
+    <OutcomeTypeSelector
+      value={outcome.type}
+      onChange={handleOutcomeTypeSelect}
+    />
+  )
 }

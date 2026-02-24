@@ -48,11 +48,11 @@
 
 ### Implementation for User Story 1
 
-- [ ] T008 [US1] Create `ExperienceTypePicker` component — card-based selector showing all 6 types (Photo, GIF [coming soon], Video [coming soon], AI Image, AI Video, Survey) with coming-soon badges on disabled items in `apps/clementine-app/src/domains/experience/library/components/ExperienceTypePicker.tsx`
-- [ ] T009 [US1] Update `CreateExperienceForm` — replace `ProfileSelector` with `ExperienceTypePicker`, change form default from `profile: 'freeform'` to `type: 'ai.image'`, update Zod validation schema to use `experienceTypeSchema` in `apps/clementine-app/src/domains/experience/library/components/CreateExperienceForm.tsx`
-- [ ] T010 [US1] Update create experience action/mutation — write `type` field instead of `profile` when creating experience document in Firestore, initialize active type's default config on `draft` per contracts/firestore-schema.md in `apps/clementine-app/src/domains/experience/shared/` (locate create experience action)
-- [ ] T011 [P] [US1] Delete `ProfileSelector` component in `apps/clementine-app/src/domains/experience/library/components/ProfileSelector.tsx`
-- [ ] T012 [P] [US1] Delete `OutcomeTypePicker` component (type selection now happens at creation, not in Create tab) in `apps/clementine-app/src/domains/experience/create/components/outcome-picker/OutcomeTypePicker.tsx`
+- [x] T008 [US1] Create `ExperienceTypePicker` component — card-based selector showing all 6 types (Photo, GIF [coming soon], Video [coming soon], AI Image, AI Video, Survey) with coming-soon badges on disabled items in `apps/clementine-app/src/domains/experience/library/components/ExperienceTypePicker.tsx`
+- [x] T009 [US1] Update `CreateExperienceForm` — replace `ProfileSelector` with `ExperienceTypePicker`, change form default from `profile: 'freeform'` to `type: 'ai.image'`, update Zod validation schema to use `experienceTypeSchema` in `apps/clementine-app/src/domains/experience/library/components/CreateExperienceForm.tsx`
+- [x] T010 [US1] Update create experience action/mutation — write `type` field instead of `profile` when creating experience document in Firestore, initialize active type's default config on `draft` per contracts/firestore-schema.md in `apps/clementine-app/src/domains/experience/shared/` (locate create experience action)
+- [x] T011 [P] [US1] Delete `ProfileSelector` component in `apps/clementine-app/src/domains/experience/library/components/ProfileSelector.tsx`
+- [x] T012 [P] [US1] Delete `OutcomeTypePicker` component (type selection now happens at creation, not in Create tab) in `apps/clementine-app/src/domains/experience/create/components/outcome-picker/OutcomeTypePicker.tsx`
 
 **Checkpoint**: Creating an experience uses a single-step type picker. The old two-step flow (profile → outcome type) is gone.
 
@@ -66,10 +66,10 @@
 
 ### Implementation for User Story 2
 
-- [ ] T013 [P] [US2] Create `TypeBadge` component — colored badge displaying experience type label, use `typeMetadata` for labels and color mapping in `apps/clementine-app/src/domains/experience/library/components/TypeBadge.tsx`
-- [ ] T014 [US2] Update `ExperienceListItem` — replace `ProfileBadge` with `TypeBadge`, read `experience.type` instead of `experience.profile` in `apps/clementine-app/src/domains/experience/library/components/ExperienceListItem.tsx`
-- [ ] T015 [US2] Update `ExperiencesPage` — replace profile filter tabs (All/Freeform/Survey/Story) with type filter tabs (All/Photo/AI Image/AI Video/Survey), update filter logic to match on `experience.type` in `apps/clementine-app/src/domains/experience/library/containers/ExperiencesPage.tsx`
-- [ ] T016 [US2] Delete `ProfileBadge` component in `apps/clementine-app/src/domains/experience/library/components/ProfileBadge.tsx`
+- [x] T013 [P] [US2] Create `TypeBadge` component — colored badge displaying experience type label, use `typeMetadata` for labels and color mapping in `apps/clementine-app/src/domains/experience/library/components/TypeBadge.tsx`
+- [x] T014 [US2] Update `ExperienceListItem` — replace `ProfileBadge` with `TypeBadge`, read `experience.type` instead of `experience.profile` in `apps/clementine-app/src/domains/experience/library/components/ExperienceListItem.tsx`
+- [x] T015 [US2] Update `ExperiencesPage` — replace profile filter tabs (All/Freeform/Survey/Story) with type filter tabs (All/Photo/AI Image/AI Video/Survey), update filter logic to match on `experience.type` in `apps/clementine-app/src/domains/experience/library/containers/ExperiencesPage.tsx`
+- [x] T016 [US2] Delete `ProfileBadge` component in `apps/clementine-app/src/domains/experience/library/components/ProfileBadge.tsx`
 
 **Checkpoint**: Library shows type badges on every card. Filter tabs work by type. Old profile concepts are gone from library view.
 

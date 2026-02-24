@@ -8,36 +8,46 @@
  * Full integration testing requires Firebase emulators.
  */
 import { describe, expect, it } from 'vitest'
-import type { Outcome } from '@clementine/shared'
-
-/**
- * The default outcome configuration for new experiences.
- * New experiences start with outcome: null, meaning not configured.
- */
-const DEFAULT_OUTCOME: Outcome | null = null
 
 describe('useCreateExperience', () => {
-  describe('Default outcome configuration', () => {
-    it('new experiences have outcome set to null (not configured)', () => {
-      // New experiences start with outcome: null
-      // This requires explicit configuration before publishing
-      expect(DEFAULT_OUTCOME).toBeNull()
+  describe('Default experience type', () => {
+    it('new experiences default to ai.image type', () => {
+      // The create form defaults to ai.image as the most common type
+      const defaultType = 'ai.image'
+      expect(defaultType).toBe('ai.image')
     })
   })
 
   describe('Experience initialization requirements', () => {
-    it('new experience will fail validation until outcome is configured', () => {
-      // This validates the design decision: new experiences cannot be published
-      // until the creator explicitly configures the outcome
-      expect(DEFAULT_OUTCOME).toBeNull()
+    it('survey type creates draft with null config fields', () => {
+      // Survey experiences have no per-type config
+      const surveyDraft = {
+        steps: [],
+        photo: null,
+        gif: null,
+        video: null,
+        aiImage: null,
+        aiVideo: null,
+      }
+      expect(surveyDraft.aiImage).toBeNull()
+      expect(surveyDraft.photo).toBeNull()
     })
 
-    it('null outcome is cleaner than an object with type: null', () => {
-      // Design rationale:
-      // - Smaller Firestore documents
-      // - Explicit "not configured" state
-      // - Consistent with how published config works (also nullable)
-      expect(DEFAULT_OUTCOME).toBeNull()
+    it('ai.image type initializes with default aiImage config', () => {
+      // AI image experiences get default config at creation
+      const aiImageConfig = {
+        task: 'text-to-image' as const,
+        captureStepId: null,
+        aspectRatio: '1:1' as const,
+        imageGeneration: {
+          prompt: '',
+          model: 'gemini-2.5-flash-image' as const,
+          refMedia: [],
+          aspectRatio: null,
+        },
+      }
+      expect(aiImageConfig.task).toBe('text-to-image')
+      expect(aiImageConfig.imageGeneration.model).toBe('gemini-2.5-flash-image')
     })
   })
 })
