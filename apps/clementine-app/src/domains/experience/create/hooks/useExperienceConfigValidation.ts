@@ -91,7 +91,7 @@ function validateAiImage(
 ): FieldValidationError[] {
   const errors: FieldValidationError[] = []
 
-  if (!config.imageGeneration.prompt.trim()) {
+  if (!config.imageGeneration?.prompt?.trim()) {
     errors.push({
       field: 'aiImage.imageGeneration.prompt',
       message: 'Prompt is required',
@@ -114,7 +114,7 @@ function validateAiImage(
   }
 
   const refError = validateUniqueRefMediaNames(
-    config.imageGeneration.refMedia,
+    config.imageGeneration?.refMedia ?? [],
     'aiImage.imageGeneration.refMedia',
   )
   if (refError) errors.push(refError)
@@ -135,7 +135,7 @@ function validateAiVideo(
   )
   if (stepError) errors.push(stepError)
 
-  if (config.videoGeneration && !config.videoGeneration.prompt.trim()) {
+  if (!config.videoGeneration?.prompt?.trim()) {
     errors.push({
       field: 'aiVideo.videoGeneration.prompt',
       message: 'Prompt is required',
@@ -144,7 +144,7 @@ function validateAiVideo(
 
   if (config.startFrameImageGen) {
     const refError = validateUniqueRefMediaNames(
-      config.startFrameImageGen.refMedia,
+      config.startFrameImageGen.refMedia ?? [],
       'aiVideo.startFrameImageGen.refMedia',
     )
     if (refError) errors.push(refError)
@@ -152,7 +152,7 @@ function validateAiVideo(
 
   if (config.endFrameImageGen) {
     const refError = validateUniqueRefMediaNames(
-      config.endFrameImageGen.refMedia,
+      config.endFrameImageGen.refMedia ?? [],
       'aiVideo.endFrameImageGen.refMedia',
     )
     if (refError) errors.push(refError)
@@ -172,21 +172,32 @@ export function useExperienceConfigValidation(
   steps: ExperienceStep[],
 ): FieldValidationError[] {
   return useMemo(() => {
-    if (!config) return []
+    if (!config)
+      return [
+        { field: 'config', message: 'Experience configuration is required' },
+      ]
     if (type === 'survey') return []
 
     if (type === 'gif' || type === 'video') {
       return [{ field: 'type', message: `${type.toUpperCase()} coming soon` }]
     }
 
-    if (type === 'photo' && config.photo)
-      return validatePhoto(config.photo, steps)
-    if (type === 'ai.image' && config.aiImage)
-      return validateAiImage(config.aiImage, steps)
-    if (type === 'ai.video' && config.aiVideo)
-      return validateAiVideo(config.aiVideo, steps)
+    if (type === 'photo')
+      return config.photo
+        ? validatePhoto(config.photo, steps)
+        : [{ field: 'photo', message: 'Photo configuration is missing' }]
+    if (type === 'ai.image')
+      return config.aiImage
+        ? validateAiImage(config.aiImage, steps)
+        : [{ field: 'aiImage', message: 'AI Image configuration is missing' }]
+    if (type === 'ai.video')
+      return config.aiVideo
+        ? validateAiVideo(config.aiVideo, steps)
+        : [{ field: 'aiVideo', message: 'AI Video configuration is missing' }]
 
-    return []
+    return [
+      { field: 'type', message: `No validator registered for type: ${type}` },
+    ]
   }, [type, config, steps])
 }
 
