@@ -6,10 +6,7 @@
  */
 import { z } from 'zod'
 
-import {
-  experienceMediaSchema,
-  experienceTypeSchema,
-} from '@clementine/shared'
+import { experienceMediaSchema, experienceTypeSchema } from '@clementine/shared'
 
 /**
  * Create Experience Input Schema

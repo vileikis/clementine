@@ -20,8 +20,7 @@ import {
 } from 'firebase/firestore'
 
 import { experienceSchema } from '../schemas'
-import type { Experience } from '@clementine/shared'
-import type { ExperienceType } from '@clementine/shared'
+import type { Experience, ExperienceType } from '@clementine/shared'
 import { firestore } from '@/integrations/firebase/client'
 import { convertFirestoreDoc } from '@/shared/utils/firestore-utils'
 

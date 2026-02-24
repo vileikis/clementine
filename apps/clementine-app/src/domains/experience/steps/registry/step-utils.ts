@@ -38,7 +38,9 @@ export function getStepDefinition(type: StepType): StepDefinition | undefined {
 /**
  * Get all step types allowed for a specific experience type
  */
-export function getStepTypesForType(experienceType: ExperienceType): StepType[] {
+export function getStepTypesForType(
+  experienceType: ExperienceType,
+): StepType[] {
   const allowedCategories = TYPE_ALLOWED_CATEGORIES[experienceType]
 
   return Object.values(stepRegistry)

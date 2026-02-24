@@ -6,7 +6,11 @@
  *
  * @see specs/081-experience-type-flattening
  */
-import type { ExperienceConfig, ExperienceStep, ExperienceType } from '@clementine/shared'
+import type {
+  ExperienceConfig,
+  ExperienceStep,
+  ExperienceType,
+} from '@clementine/shared'
 
 /**
  * Validation error returned from outcome validation.
@@ -108,16 +112,10 @@ function validatePhoto(
 ): OutcomeValidationError[] {
   const typeConfig = config.photo
   if (!typeConfig) {
-    return [
-      { field: 'photo', message: 'Photo configuration is missing' },
-    ]
+    return [{ field: 'photo', message: 'Photo configuration is missing' }]
   }
 
-  const error = validateCaptureStepId(
-    typeConfig.captureStepId,
-    steps,
-    'photo',
-  )
+  const error = validateCaptureStepId(typeConfig.captureStepId, steps, 'photo')
   return error ? [error] : []
 }
 
@@ -215,7 +213,10 @@ function validateAiVideo(
 
 const typeValidators: Record<
   string,
-  (config: ExperienceConfig, steps: ExperienceStep[]) => OutcomeValidationError[]
+  (
+    config: ExperienceConfig,
+    steps: ExperienceStep[],
+  ) => OutcomeValidationError[]
 > = {
   photo: validatePhoto,
   'ai.image': validateAiImage,

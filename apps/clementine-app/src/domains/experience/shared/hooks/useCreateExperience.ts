@@ -19,7 +19,11 @@ import { createExperienceInputSchema } from '../schemas/experience.input.schemas
 import { experienceKeys } from '../queries/experience.query'
 import type { WithFieldValue } from 'firebase/firestore'
 
-import type { Experience, ExperienceConfig, ExperienceType } from '@clementine/shared'
+import type {
+  Experience,
+  ExperienceConfig,
+  ExperienceType,
+} from '@clementine/shared'
 import type { CreateExperienceInput } from '../schemas/experience.input.schemas'
 import { firestore } from '@/integrations/firebase/client'
 
@@ -38,7 +42,9 @@ export interface CreateExperienceResult {
  * Per contracts/firestore-schema.md: all per-type configs are null except the
  * active type's config which gets initialized with defaults.
  */
-function buildDefaultDraft(type: ExperienceType): WithFieldValue<ExperienceConfig> {
+function buildDefaultDraft(
+  type: ExperienceType,
+): WithFieldValue<ExperienceConfig> {
   const base = {
     steps: [] as WithFieldValue<ExperienceConfig>['steps'],
     photo: null,

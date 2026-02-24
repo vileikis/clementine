@@ -13,9 +13,9 @@
 import { Camera, Film, FormInput, Sparkles, Video } from 'lucide-react'
 
 import type { ExperienceType } from '@clementine/shared'
+import type { ReactNode } from 'react'
 import { typeMetadata } from '@/domains/experience/shared'
 import { cn } from '@/shared/utils/style-utils'
-import type { ReactNode } from 'react'
 
 interface TypeOption {
   type: ExperienceType

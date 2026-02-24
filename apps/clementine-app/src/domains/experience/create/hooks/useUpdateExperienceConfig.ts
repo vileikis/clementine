@@ -36,7 +36,10 @@ export interface UpdateExperienceConfigInput {
  * @param experienceId - Experience document ID
  * @returns TanStack Mutation result
  */
-export function useUpdateExperienceConfig(workspaceId: string, experienceId: string) {
+export function useUpdateExperienceConfig(
+  workspaceId: string,
+  experienceId: string,
+) {
   const queryClient = useQueryClient()
   const store = useExperienceDesignerStore()
 

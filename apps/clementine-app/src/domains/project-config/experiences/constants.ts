@@ -1,8 +1,6 @@
 import type { ExperienceType } from '@clementine/shared'
-import {
-  typeMetadata,
-  type SlotType,
-} from '@/domains/experience/shared/types/type-metadata'
+import type { SlotType } from '@/domains/experience/shared/types/type-metadata'
+import { typeMetadata } from '@/domains/experience/shared/types/type-metadata'
 
 /**
  * Slot mode definition

@@ -48,7 +48,10 @@ const AUTOSAVE_DEBOUNCE_MS = 2000
 /**
  * Config form state — per-type config fields from ExperienceConfig (excluding steps).
  */
-type ConfigFormState = Pick<ExperienceConfig, 'photo' | 'gif' | 'video' | 'aiImage' | 'aiVideo'>
+type ConfigFormState = Pick<
+  ExperienceConfig,
+  'photo' | 'gif' | 'video' | 'aiImage' | 'aiVideo'
+>
 
 /** Extract config form state from experience draft */
 function extractConfigState(draft: ExperienceConfig): ConfigFormState {
@@ -159,9 +162,13 @@ export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
 
         // Update local form with default config if initialized
         if (defaultConfig) {
-          form.setValue(newConfigKey, defaultConfig.value as ConfigFormState[typeof newConfigKey], {
-            shouldDirty: false,
-          })
+          form.setValue(
+            newConfigKey,
+            defaultConfig.value as ConfigFormState[typeof newConfigKey],
+            {
+              shouldDirty: false,
+            },
+          )
         }
       } catch (error) {
         const message =
@@ -185,11 +192,9 @@ export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
   const handlePhotoConfigChange = useCallback(
     (updates: Partial<PhotoConfig>) => {
       const currentConfig = form.getValues('photo')
-      form.setValue(
-        'photo',
-        { ...currentConfig, ...updates } as PhotoConfig,
-        { shouldDirty: true },
-      )
+      form.setValue('photo', { ...currentConfig, ...updates } as PhotoConfig, {
+        shouldDirty: true,
+      })
       triggerSave()
     },
     [form, triggerSave],
@@ -229,7 +234,7 @@ export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
   if (!activeConfig) {
     return (
       <ExperienceTypeSwitch
-        value={experienceType as OutcomeType}
+        value={experienceType}
         onChange={handleTypeSwitch}
       />
     )
@@ -304,9 +309,6 @@ export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
 
   // Fallback — type set but config not initialized
   return (
-    <ExperienceTypeSwitch
-      value={experienceType as OutcomeType}
-      onChange={handleTypeSwitch}
-    />
+    <ExperienceTypeSwitch value={experienceType} onChange={handleTypeSwitch} />
   )
 }

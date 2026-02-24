@@ -44,11 +44,17 @@ function validateCaptureStepId(
   fieldPrefix: string,
 ): FieldValidationError | undefined {
   if (!captureStepId) {
-    return { field: `${fieldPrefix}.captureStepId`, message: 'Select a source image step' }
+    return {
+      field: `${fieldPrefix}.captureStepId`,
+      message: 'Select a source image step',
+    }
   }
 
   if (!steps.some((s) => isCaptureStep(s, captureStepId))) {
-    return { field: `${fieldPrefix}.captureStepId`, message: 'Selected source step no longer exists' }
+    return {
+      field: `${fieldPrefix}.captureStepId`,
+      message: 'Selected source step no longer exists',
+    }
   }
 
   return undefined
@@ -86,15 +92,23 @@ function validateAiImage(
   const errors: FieldValidationError[] = []
 
   if (!config.imageGeneration.prompt.trim()) {
-    errors.push({ field: 'aiImage.imageGeneration.prompt', message: 'Prompt is required' })
+    errors.push({
+      field: 'aiImage.imageGeneration.prompt',
+      message: 'Prompt is required',
+    })
   }
 
   if (config.task === 'image-to-image') {
-    const stepError = validateCaptureStepId(config.captureStepId, steps, 'aiImage')
+    const stepError = validateCaptureStepId(
+      config.captureStepId,
+      steps,
+      'aiImage',
+    )
     if (stepError) {
-      stepError.message = stepError.message === 'Select a source image step'
-        ? 'Select a source image step for image-to-image'
-        : stepError.message
+      stepError.message =
+        stepError.message === 'Select a source image step'
+          ? 'Select a source image step for image-to-image'
+          : stepError.message
       errors.push(stepError)
     }
   }
@@ -114,7 +128,11 @@ function validateAiVideo(
 ): FieldValidationError[] {
   const errors: FieldValidationError[] = []
 
-  const stepError = validateCaptureStepId(config.captureStepId, steps, 'aiVideo')
+  const stepError = validateCaptureStepId(
+    config.captureStepId,
+    steps,
+    'aiVideo',
+  )
   if (stepError) errors.push(stepError)
 
   if (config.startFrameImageGen) {
@@ -154,9 +172,12 @@ export function useExperienceConfigValidation(
       return [{ field: 'type', message: `${type.toUpperCase()} coming soon` }]
     }
 
-    if (type === 'photo' && config.photo) return validatePhoto(config.photo, steps)
-    if (type === 'ai.image' && config.aiImage) return validateAiImage(config.aiImage, steps)
-    if (type === 'ai.video' && config.aiVideo) return validateAiVideo(config.aiVideo, steps)
+    if (type === 'photo' && config.photo)
+      return validatePhoto(config.photo, steps)
+    if (type === 'ai.image' && config.aiImage)
+      return validateAiImage(config.aiImage, steps)
+    if (type === 'ai.video' && config.aiVideo)
+      return validateAiVideo(config.aiVideo, steps)
 
     return []
   }, [type, config, steps])

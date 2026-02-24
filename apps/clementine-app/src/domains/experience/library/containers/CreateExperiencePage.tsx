@@ -11,8 +11,8 @@ import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 
 import { ExperienceTypePicker } from '../components'
-import { useCreateExperience } from '@/domains/experience/shared'
 import type { ExperienceType } from '@clementine/shared'
+import { useCreateExperience } from '@/domains/experience/shared'
 
 interface CreateExperiencePageProps {
   /** Workspace ID for experience creation */

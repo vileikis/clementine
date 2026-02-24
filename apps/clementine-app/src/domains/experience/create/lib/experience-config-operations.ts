@@ -37,15 +37,13 @@ export type ConfigKey = (typeof CONFIG_KEYS)[OutcomeType]
  */
 export function getConfigKey(type: ExperienceType): ConfigKey | null {
   if (type === 'survey') return null
-  return CONFIG_KEYS[type as OutcomeType]
+  return CONFIG_KEYS[type]
 }
 
 /**
  * Create a default PhotoConfig.
  */
-export function createDefaultPhotoConfig(
-  captureStepId?: string,
-): PhotoConfig {
+export function createDefaultPhotoConfig(captureStepId?: string): PhotoConfig {
   return {
     captureStepId: captureStepId ?? '',
     aspectRatio: '1:1',
@@ -128,7 +126,9 @@ export function canAddMoreRefMedia(config: AIImageConfig | null): boolean {
 /**
  * Get available slots for reference media.
  */
-export function getAvailableRefMediaSlots(config: AIImageConfig | null): number {
+export function getAvailableRefMediaSlots(
+  config: AIImageConfig | null,
+): number {
   const count = config?.imageGeneration.refMedia.length ?? 0
   return MAX_REF_MEDIA_COUNT - count
 }

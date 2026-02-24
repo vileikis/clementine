@@ -17,8 +17,7 @@ import {
   ExperienceListItem,
   RenameExperienceDialog,
 } from '../components'
-import type { Experience } from '@clementine/shared'
-import type { ExperienceType } from '@clementine/shared'
+import type { Experience, ExperienceType } from '@clementine/shared'
 import type { MenuSection } from '@/shared/components/ContextDropdownMenu'
 import {
   typeMetadata,
@@ -180,9 +179,7 @@ export function ExperiencesPage({
             variant={typeFilter === option.value ? 'default' : 'outline'}
             size="sm"
             onClick={() => setTypeFilter(option.value)}
-            className={cn(
-              typeFilter === option.value && 'pointer-events-none',
-            )}
+            className={cn(typeFilter === option.value && 'pointer-events-none')}
           >
             {option.label}
           </Button>

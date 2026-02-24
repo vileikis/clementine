@@ -35,10 +35,7 @@ export function TypeBadge({ type, className }: TypeBadgeProps) {
   const meta = typeMetadata[type]
 
   return (
-    <Badge
-      variant="secondary"
-      className={cn(typeColors[type], className)}
-    >
+    <Badge variant="secondary" className={cn(typeColors[type], className)}>
       {meta.label}
     </Badge>
   )

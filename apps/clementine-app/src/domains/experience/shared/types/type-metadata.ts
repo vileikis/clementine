@@ -93,9 +93,7 @@ export interface TypeValidationResult {
 /**
  * Type validator function type
  */
-export type TypeValidator = (
-  config: ExperienceConfig,
-) => TypeValidationResult
+export type TypeValidator = (config: ExperienceConfig) => TypeValidationResult
 
 /**
  * Empty validator factory
