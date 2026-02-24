@@ -5,6 +5,7 @@
  */
 
 export { updateExperienceConfigField } from './updateExperienceConfigField'
+export { switchExperienceType } from './switchExperienceType'
 export {
   isCaptureStep,
   validateOutcome,

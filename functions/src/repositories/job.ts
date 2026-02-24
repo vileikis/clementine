@@ -298,14 +298,17 @@ interface BuildJobSnapshotOptions {
 /**
  * Build job snapshot from session and experience
  *
- * Captures the current state of session responses and outcome config
+ * Captures the current state of session responses and type config
  * at the time of job creation for immutable processing.
  *
  * Feature 065: Flattened snapshot structure
+ * Feature 081: Flattened type config (no outcome wrapper)
+ * - type: From experience.type
+ * - config: Per-type configs from experience draft/published config
  * - overlayChoice: Resolved at job creation (exact match → default → null)
  *
  * @param session - Session with responses
- * @param experience - Experience with outcome configuration
+ * @param experience - Experience with type and configuration
  * @param configSource - Which config to use ('draft' or 'published')
  * @param options - Optional overlay options
  * @returns JobSnapshot for the job document
@@ -324,7 +327,14 @@ export function buildJobSnapshot(
 
   return {
     sessionResponses: session.responses,
-    outcome: config.outcome ?? null,
+    type: experience.type,
+    config: {
+      photo: config.photo ?? null,
+      gif: config.gif ?? null,
+      video: config.video ?? null,
+      aiImage: config.aiImage ?? null,
+      aiVideo: config.aiVideo ?? null,
+    },
     overlayChoice: options?.overlayChoice ?? null,
     experienceVersion:
       configSource === 'draft'

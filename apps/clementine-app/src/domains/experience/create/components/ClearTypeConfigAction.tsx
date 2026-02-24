@@ -1,10 +1,10 @@
 /**
- * RemoveOutcomeAction Component
+ * ClearTypeConfigAction Component
  *
- * Button with confirmation dialog to remove/clear the output configuration.
- * Sets outcome.type to null without clearing per-type configs (preserves switching).
+ * Button with confirmation dialog to clear the active type's configuration.
+ * Clears per-type config without changing the experience type.
  *
- * @see specs/072-outcome-schema-redesign — US5
+ * @see specs/081-experience-type-flattening — US3
  */
 import { useState } from 'react'
 import { Trash2 } from 'lucide-react'
@@ -22,24 +22,24 @@ import {
   AlertDialogTrigger,
 } from '@/ui-kit/ui/alert-dialog'
 
-export interface RemoveOutcomeActionProps {
-  /** Callback when output is confirmed for removal */
-  onRemove: () => void
+export interface ClearTypeConfigActionProps {
+  /** Callback when config is confirmed for clearing */
+  onClear: () => void
   /** Whether the action is disabled */
   disabled?: boolean
 }
 
 /**
- * RemoveOutcomeAction - Button with confirmation to remove output
+ * ClearTypeConfigAction - Button with confirmation to clear type config
  */
-export function RemoveOutcomeAction({
-  onRemove,
+export function ClearTypeConfigAction({
+  onClear,
   disabled,
-}: RemoveOutcomeActionProps) {
+}: ClearTypeConfigActionProps) {
   const [open, setOpen] = useState(false)
 
   const handleConfirm = () => {
-    onRemove()
+    onClear()
     setOpen(false)
   }
 
@@ -61,8 +61,8 @@ export function RemoveOutcomeAction({
         <AlertDialogHeader>
           <AlertDialogTitle>Remove output configuration?</AlertDialogTitle>
           <AlertDialogDescription>
-            This will deselect the current output type. Your configuration
-            settings will be preserved if you re-select the same type later.
+            This will clear the current output configuration. Your settings will
+            be reset to defaults if you configure it again.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

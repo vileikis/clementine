@@ -1,14 +1,11 @@
 /**
- * useUpdateOutcome Hook
+ * useUpdateExperienceConfig Hook
  *
- * Mutation hook for updating the outcome configuration in experience draft.
- * Updates draft.outcome field with cache invalidation.
+ * Mutation hook for updating per-type configuration in experience draft.
+ * Writes individual config fields (e.g., draft.aiImage, draft.photo) with cache invalidation.
  * Uses tracked mutation for save status tracking.
  *
- * Writes per-type config structure: outcome.type + active type's config.
- * Non-active type configs are NOT cleared (preserves switching).
- *
- * @see specs/072-outcome-schema-redesign
+ * @see specs/081-experience-type-flattening
  */
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import * as Sentry from '@sentry/tanstackstart-react'
@@ -16,22 +13,21 @@ import * as Sentry from '@sentry/tanstackstart-react'
 import { experienceKeys } from '../../shared/queries/experience.query'
 import { updateExperienceConfigField } from '../../shared/lib'
 import { useExperienceDesignerStore } from '../../designer/stores'
-import type { Outcome } from '@clementine/shared'
 import { useTrackedMutation } from '@/shared/editor-status/hooks/useTrackedMutation'
 
 /**
- * Input for updating outcome
+ * Input for updating experience config
  */
-export interface UpdateOutcomeInput {
-  /** Updated outcome configuration */
-  outcome: Outcome
+export interface UpdateExperienceConfigInput {
+  /** Config field updates (e.g., { aiImage: config } or { photo: config }) */
+  updates: Record<string, unknown>
 }
 
 /**
- * Hook for updating experience outcome configuration
+ * Hook for updating experience per-type configuration
  *
  * Features:
- * - Updates draft.outcome field with serverTimestamp() for updatedAt
+ * - Updates draft config fields with serverTimestamp() for updatedAt
  * - Atomically increments draftVersion for optimistic locking
  * - Invalidates experience detail cache on success
  * - Captures errors to Sentry with domain tags
@@ -40,18 +36,15 @@ export interface UpdateOutcomeInput {
  * @param experienceId - Experience document ID
  * @returns TanStack Mutation result
  */
-export function useUpdateOutcome(workspaceId: string, experienceId: string) {
+export function useUpdateExperienceConfig(workspaceId: string, experienceId: string) {
   const queryClient = useQueryClient()
   const store = useExperienceDesignerStore()
 
-  const mutation = useMutation<void, Error, UpdateOutcomeInput>({
-    mutationFn: async ({ outcome }) => {
-      await updateExperienceConfigField(workspaceId, experienceId, {
-        outcome,
-      })
+  const mutation = useMutation<void, Error, UpdateExperienceConfigInput>({
+    mutationFn: async ({ updates }) => {
+      await updateExperienceConfigField(workspaceId, experienceId, updates)
     },
     onSuccess: () => {
-      // Invalidate detail query to refresh cache
       queryClient.invalidateQueries({
         queryKey: experienceKeys.detail(workspaceId, experienceId),
       })
@@ -60,12 +53,11 @@ export function useUpdateOutcome(workspaceId: string, experienceId: string) {
       Sentry.captureException(error, {
         tags: {
           domain: 'experience/create',
-          action: 'update-outcome',
+          action: 'update-experience-config',
         },
       })
     },
   })
 
-  // Wrap with tracked mutation for save status tracking
   return useTrackedMutation(mutation, store)
 }

@@ -8,7 +8,7 @@
  */
 import { AlertCircle } from 'lucide-react'
 
-import type { FieldValidationError } from '../../hooks/useOutcomeValidation'
+import type { FieldValidationError } from '../../hooks/useExperienceConfigValidation'
 import { Alert, AlertDescription, AlertTitle } from '@/ui-kit/ui/alert'
 
 export interface ValidationSummaryProps {

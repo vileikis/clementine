@@ -1,2 +1,2 @@
 export * from './model-options'
-export * from './outcome-operations'
+export * from './experience-config-operations'

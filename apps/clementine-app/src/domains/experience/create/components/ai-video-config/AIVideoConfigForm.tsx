@@ -12,7 +12,7 @@
 import { useCallback, useMemo, useRef } from 'react'
 
 import { VIDEO_ASPECT_RATIOS } from '@clementine/shared'
-import { getFieldError } from '../../hooks/useOutcomeValidation'
+import { getFieldError } from '../../hooks/useExperienceConfigValidation'
 import { MAX_VIDEO_REF_MEDIA_COUNT } from '../../lib/model-options'
 import { useRefMediaUpload } from '../../hooks/useRefMediaUpload'
 import { SourceImageSelector } from '../shared-controls/SourceImageSelector'
@@ -20,10 +20,10 @@ import { AspectRatioSelector } from '../shared-controls/AspectRatioSelector'
 import { PromptComposer, VIDEO_MODALITY } from '../PromptComposer'
 import { AIVideoTaskSelector } from './AIVideoTaskSelector'
 import { FrameGenerationSection } from './FrameGenerationSection'
-import type { FieldValidationError } from '../../hooks/useOutcomeValidation'
+import type { FieldValidationError } from '../../hooks/useExperienceConfigValidation'
 import type {
+  AIVideoConfig,
   AIVideoModel,
-  AIVideoOutcomeConfig,
   AIVideoTask,
   ExperienceStep,
   ImageGenerationConfig,
@@ -48,9 +48,9 @@ const DEFAULT_IMAGE_GEN_CONFIG: ImageGenerationConfig = {
 
 export interface AIVideoConfigFormProps {
   /** AI Video outcome configuration */
-  config: AIVideoOutcomeConfig
+  config: AIVideoConfig
   /** Callback when any config field changes (parent handles form.setValue + save) */
-  onConfigChange: (updates: Partial<AIVideoOutcomeConfig>) => void
+  onConfigChange: (updates: Partial<AIVideoConfig>) => void
   /** Experience steps */
   steps: ExperienceStep[]
   /** Validation errors */
@@ -156,7 +156,7 @@ export function AIVideoConfigForm({
 
   const handleTaskChange = useCallback(
     (task: AIVideoTask) => {
-      const updates: Partial<AIVideoOutcomeConfig> = { task }
+      const updates: Partial<AIVideoConfig> = { task }
 
       // ref-images-to-video only supports 8s duration (Veo API constraint).
       // Reset duration when switching to this task so UI matches backend behavior.

@@ -83,29 +83,29 @@
 
 ### Frontend — Rename & Update Hooks/Lib for User Story 3
 
-- [ ] T017 [P] [US3] Rename `outcome-operations.ts` → `experience-config-operations.ts` and update all functions to read/write flattened config paths (`experience.draft.[type]` instead of `experience.draft.outcome.[type]`) in `apps/clementine-app/src/domains/experience/create/lib/experience-config-operations.ts`
-- [ ] T018 [P] [US3] Rename `useUpdateOutcome` → `useUpdateExperienceConfig` and update mutation to write to flattened config paths in `apps/clementine-app/src/domains/experience/create/hooks/useUpdateExperienceConfig.ts`
-- [ ] T019 [P] [US3] Rename `useOutcomeValidation` → `useExperienceConfigValidation` and update field path references in `apps/clementine-app/src/domains/experience/create/hooks/useExperienceConfigValidation.ts`
-- [ ] T020 [P] [US3] Rename `OutcomeTypeSelector` → `ExperienceTypeSwitch` — update to read/write `experience.type` instead of `experience.draft.outcome.type`, move out of `outcome-picker/` directory in `apps/clementine-app/src/domains/experience/create/components/ExperienceTypeSwitch.tsx`
-- [ ] T021 [P] [US3] Rename `RemoveOutcomeAction` → `ClearTypeConfigAction` — update to clear the active type's config field on `experience.draft`, move out of `outcome-picker/` directory in `apps/clementine-app/src/domains/experience/create/components/ClearTypeConfigAction.tsx`
+- [x] T017 [P] [US3] Rename `outcome-operations.ts` → `experience-config-operations.ts` and update all functions to read/write flattened config paths (`experience.draft.[type]` instead of `experience.draft.outcome.[type]`) in `apps/clementine-app/src/domains/experience/create/lib/experience-config-operations.ts`
+- [x] T018 [P] [US3] Rename `useUpdateOutcome` → `useUpdateExperienceConfig` and update mutation to write to flattened config paths in `apps/clementine-app/src/domains/experience/create/hooks/useUpdateExperienceConfig.ts`
+- [x] T019 [P] [US3] Rename `useOutcomeValidation` → `useExperienceConfigValidation` and update field path references in `apps/clementine-app/src/domains/experience/create/hooks/useExperienceConfigValidation.ts`
+- [x] T020 [P] [US3] Rename `OutcomeTypeSelector` → `ExperienceTypeSwitch` — update to read/write `experience.type` instead of `experience.draft.outcome.type`, move out of `outcome-picker/` directory in `apps/clementine-app/src/domains/experience/create/components/ExperienceTypeSwitch.tsx`
+- [x] T021 [P] [US3] Rename `RemoveOutcomeAction` → `ClearTypeConfigAction` — update to clear the active type's config field on `experience.draft`, move out of `outcome-picker/` directory in `apps/clementine-app/src/domains/experience/create/components/ClearTypeConfigAction.tsx`
 
 ### Frontend — Update Config Forms for User Story 3
 
-- [ ] T022 [US3] Update `CreateTabForm` — read type from `experience.type` (not `experience.draft.outcome.type`), read config from `experience.draft.[type]` (not `experience.draft.outcome.[type]`), hide Create tab for survey type, use renamed hooks/components in `apps/clementine-app/src/domains/experience/create/components/CreateTabForm.tsx`
-- [ ] T023 [US3] Update `getStepTypesForProfile` → `getStepTypesForType` — change parameter from `ExperienceProfile` to `ExperienceType`, map survey→[info,input,capture], all others→[info,input,capture,transform] in `apps/clementine-app/src/domains/experience/steps/registry/step-utils.ts`
+- [x] T022 [US3] Update `CreateTabForm` — read type from `experience.type` (not `experience.draft.outcome.type`), read config from `experience.draft.[type]` (not `experience.draft.outcome.[type]`), hide Create tab for survey type, use renamed hooks/components in `apps/clementine-app/src/domains/experience/create/components/CreateTabForm.tsx`
+- [x] T023 [US3] Update `getStepTypesForProfile` → `getStepTypesForType` — change parameter from `ExperienceProfile` to `ExperienceType`, map survey→[info,input,capture], all others→[info,input,capture,transform] in `apps/clementine-app/src/domains/experience/steps/registry/step-utils.ts`
 
 ### Backend — Update Pipeline for User Story 3
 
-- [ ] T024 [P] [US3] Update `buildJobSnapshot` — copy `experience.type` → `snapshot.type`, copy per-type configs from flattened `config.[type]` instead of `config.outcome.[type]` in `functions/src/repositories/job.ts`
-- [ ] T025 [P] [US3] Update `startTransformPipeline` — validate `experience.type` (reject survey), read active config from flattened path, update `getOutcomeAspectRatio` helper in `functions/src/callable/startTransformPipeline.ts`
-- [ ] T026 [US3] Update `runOutcome` dispatcher — use `snapshot.type` instead of `snapshot.outcome.type` for executor lookup in `functions/src/services/transform/engine/runOutcome.ts`
-- [ ] T027 [P] [US3] Update `aiImageOutcome` — read from `snapshot.aiImage` instead of `snapshot.outcome.aiImage` in `functions/src/services/transform/outcomes/aiImageOutcome.ts`
-- [ ] T028 [P] [US3] Update `aiVideoOutcome` — read from `snapshot.aiVideo` instead of `snapshot.outcome.aiVideo` in `functions/src/services/transform/outcomes/aiVideoOutcome.ts`
-- [ ] T029 [P] [US3] Update `photoOutcome` — read from `snapshot.photo` instead of `snapshot.outcome.photo` in `functions/src/services/transform/outcomes/photoOutcome.ts`
+- [x] T024 [P] [US3] Update `buildJobSnapshot` — copy `experience.type` → `snapshot.type`, copy per-type configs from flattened `config.[type]` instead of `config.outcome.[type]` in `functions/src/repositories/job.ts`
+- [x] T025 [P] [US3] Update `startTransformPipeline` — validate `experience.type` (reject survey), read active config from flattened path, update `getOutcomeAspectRatio` helper in `functions/src/callable/startTransformPipeline.ts`
+- [x] T026 [US3] Update `runOutcome` dispatcher — use `snapshot.type` instead of `snapshot.outcome.type` for executor lookup in `functions/src/services/transform/engine/runOutcome.ts`
+- [x] T027 [P] [US3] Update `aiImageOutcome` — read from `snapshot.aiImage` instead of `snapshot.outcome.aiImage` in `functions/src/services/transform/outcomes/aiImageOutcome.ts`
+- [x] T028 [P] [US3] Update `aiVideoOutcome` — read from `snapshot.aiVideo` instead of `snapshot.outcome.aiVideo` in `functions/src/services/transform/outcomes/aiVideoOutcome.ts`
+- [x] T029 [P] [US3] Update `photoOutcome` — read from `snapshot.photo` instead of `snapshot.outcome.photo` in `functions/src/services/transform/outcomes/photoOutcome.ts`
 
 ### Cleanup for User Story 3
 
-- [ ] T030 [US3] Delete empty `outcome-picker/` directory after all components moved out in `apps/clementine-app/src/domains/experience/create/components/outcome-picker/`
+- [x] T030 [US3] Delete empty `outcome-picker/` directory after all components moved out in `apps/clementine-app/src/domains/experience/create/components/outcome-picker/`
 
 **Checkpoint**: Config forms show type-specific settings directly. Backend processes jobs from flattened snapshots. Zero "outcome" references remain in frontend code.
 

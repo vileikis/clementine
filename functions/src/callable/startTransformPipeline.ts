@@ -8,10 +8,10 @@
  * This is a Firebase Callable Function (onCall) invoked via httpsCallable
  * from the frontend.
  *
- * @see specs/072-outcome-schema-redesign
+ * @see specs/081-experience-type-flattening
  */
 import { onCall, HttpsError } from 'firebase-functions/v2/https'
-import type { AspectRatio } from '@clementine/shared'
+import type { AspectRatio, ExperienceType } from '@clementine/shared'
 import {
   fetchSession,
   updateSessionJobStatus,
@@ -26,26 +26,29 @@ import {
 } from '../schemas/transform-pipeline.schema'
 import { queueTransformJob } from '../infra/task-queues'
 
-/** Outcome types that have implemented executors */
-const IMPLEMENTED_OUTCOME_TYPES = new Set(['photo', 'ai.image', 'ai.video'])
+/** Experience types that have implemented executors (excludes survey) */
+const IMPLEMENTED_TYPES = new Set<ExperienceType>(['photo', 'ai.image', 'ai.video'])
 
 /**
- * Get the aspect ratio from the active outcome type's config.
+ * Get the aspect ratio from the active type's config.
+ * Reads from flattened config paths (config.[type]).
  */
-function getOutcomeAspectRatio(outcome: {
-  type: string | null
-  photo?: { aspectRatio?: string } | null
-  aiImage?: { aspectRatio?: string } | null
-  aiVideo?: { aspectRatio?: string } | null
-}): AspectRatio {
-  if (outcome.type === 'photo' && outcome.photo?.aspectRatio) {
-    return outcome.photo.aspectRatio as AspectRatio
+function getOutcomeAspectRatio(
+  type: ExperienceType,
+  config: {
+    photo?: { aspectRatio?: string } | null
+    aiImage?: { aspectRatio?: string } | null
+    aiVideo?: { aspectRatio?: string } | null
+  },
+): AspectRatio {
+  if (type === 'photo' && config.photo?.aspectRatio) {
+    return config.photo.aspectRatio as AspectRatio
   }
-  if (outcome.type === 'ai.image' && outcome.aiImage?.aspectRatio) {
-    return outcome.aiImage.aspectRatio as AspectRatio
+  if (type === 'ai.image' && config.aiImage?.aspectRatio) {
+    return config.aiImage.aspectRatio as AspectRatio
   }
-  if (outcome.type === 'ai.video' && outcome.aiVideo?.aspectRatio) {
-    return outcome.aiVideo.aspectRatio as AspectRatio
+  if (type === 'ai.video' && config.aiVideo?.aspectRatio) {
+    return config.aiVideo.aspectRatio as AspectRatio
   }
   return '1:1'
 }
@@ -120,12 +123,20 @@ export const startTransformPipelineV2 = onCall(
       )
     }
 
-    // JC-002/003: Validate outcome is configured
-    const outcome = config?.outcome
-    if (!outcome?.type) {
+    // JC-002: Validate experience type is set and implemented
+    const experienceType = experience.type
+    if (!experienceType) {
       throw new HttpsError(
         'invalid-argument',
-        'Cannot create job: experience has no outcome configured',
+        'Cannot create job: experience has no type configured',
+      )
+    }
+
+    // JC-003: Reject survey type (no transform output)
+    if (!IMPLEMENTED_TYPES.has(experienceType)) {
+      throw new HttpsError(
+        'invalid-argument',
+        `Cannot create job: experience type '${experienceType}' is not supported for transform`,
       )
     }
 
@@ -137,28 +148,20 @@ export const startTransformPipelineV2 = onCall(
       )
     }
 
-    // JC-005: Validate outcome type is implemented
-    if (!IMPLEMENTED_OUTCOME_TYPES.has(outcome.type)) {
-      throw new HttpsError(
-        'invalid-argument',
-        `Cannot create job: outcome type '${outcome.type}' is not implemented`,
-      )
-    }
-
-    // Validate the active type's config exists
-    if (outcome.type === 'photo' && !outcome.photo) {
+    // JC-005: Validate the active type's config exists (flattened paths)
+    if (experienceType === 'photo' && !config?.photo) {
       throw new HttpsError(
         'invalid-argument',
         'Cannot create job: photo configuration is missing',
       )
     }
-    if (outcome.type === 'ai.image' && !outcome.aiImage) {
+    if (experienceType === 'ai.image' && !config?.aiImage) {
       throw new HttpsError(
         'invalid-argument',
         'Cannot create job: AI image configuration is missing',
       )
     }
-    if (outcome.type === 'ai.video' && !outcome.aiVideo) {
+    if (experienceType === 'ai.video' && !config?.aiVideo) {
       throw new HttpsError(
         'invalid-argument',
         'Cannot create job: AI video configuration is missing',
@@ -168,8 +171,10 @@ export const startTransformPipelineV2 = onCall(
     // Fetch project for overlay resolution
     const project = await fetchProject(projectId)
 
-    // Get aspect ratio from active type's config
-    const aspectRatio = getOutcomeAspectRatio(outcome)
+    // Get aspect ratio from active type's config (flattened)
+    const aspectRatio = config
+      ? getOutcomeAspectRatio(experienceType, config)
+      : ('1:1' as AspectRatio)
 
     // Pick overlay at job creation time
     const overlayChoice = pickOverlay(

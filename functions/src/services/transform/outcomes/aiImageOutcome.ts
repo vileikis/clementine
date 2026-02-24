@@ -2,7 +2,7 @@
  * AI Image Outcome Executor
  *
  * Handles AI image generation for both text-to-image and image-to-image tasks.
- * Reads config from snapshot.outcome.aiImage.
+ * Reads config from snapshot.config.aiImage.
  *
  * Flow:
  * 1. Read aiImage config from snapshot
@@ -29,13 +29,13 @@ import { uploadOutput } from '../operations/uploadOutput'
  */
 export async function aiImageOutcome(ctx: OutcomeContext): Promise<JobOutput> {
   const { job, snapshot, tmpDir, startTime } = ctx
-  const { outcome, overlayChoice } = snapshot
+  const { config, overlayChoice } = snapshot
 
-  if (!outcome?.aiImage) {
+  if (!config?.aiImage) {
     throw new Error('AI Image outcome configuration is required')
   }
 
-  const { task, captureStepId, aspectRatio, imageGeneration } = outcome.aiImage
+  const { task, captureStepId, aspectRatio, imageGeneration } = config.aiImage
 
   logger.info('[AIImageOutcome] Starting AI image outcome execution', {
     jobId: job.id,

@@ -9,17 +9,17 @@
  */
 import { useCallback } from 'react'
 
-import { getFieldError } from '../../hooks/useOutcomeValidation'
+import { getFieldError } from '../../hooks/useExperienceConfigValidation'
 import { useRefMediaUpload } from '../../hooks/useRefMediaUpload'
-import { sanitizeDisplayName } from '../../lib/outcome-operations'
+import { sanitizeDisplayName } from '../../lib/experience-config-operations'
 import { SourceImageSelector } from '../shared-controls/SourceImageSelector'
 import { AspectRatioSelector } from '../shared-controls/AspectRatioSelector'
 import { IMAGE_MODALITY, PromptComposer } from '../PromptComposer'
 import { TaskSelector } from './TaskSelector'
-import type { FieldValidationError } from '../../hooks/useOutcomeValidation'
+import type { FieldValidationError } from '../../hooks/useExperienceConfigValidation'
 import type {
+  AIImageConfig,
   AIImageModel,
-  AIImageOutcomeConfig,
   AIImageTask,
   AspectRatio,
   ExperienceStep,
@@ -27,10 +27,10 @@ import type {
 } from '@clementine/shared'
 
 export interface AIImageConfigFormProps {
-  /** AI Image outcome configuration */
-  config: AIImageOutcomeConfig
+  /** AI Image configuration */
+  config: AIImageConfig
   /** Callback when any config field changes (parent handles form.setValue + save) */
-  onConfigChange: (updates: Partial<AIImageOutcomeConfig>) => void
+  onConfigChange: (updates: Partial<AIImageConfig>) => void
   /** Experience steps */
   steps: ExperienceStep[]
   /** Validation errors */
@@ -57,7 +57,7 @@ export function AIImageConfigForm({
   // ── imageGeneration field helpers ─────────────────────────
 
   const updateImageGeneration = useCallback(
-    (genUpdates: Partial<AIImageOutcomeConfig['imageGeneration']>) => {
+    (genUpdates: Partial<AIImageConfig['imageGeneration']>) => {
       onConfigChange({
         imageGeneration: { ...imageGeneration, ...genUpdates },
       })

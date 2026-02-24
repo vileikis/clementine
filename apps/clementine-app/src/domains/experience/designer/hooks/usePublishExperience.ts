@@ -125,7 +125,8 @@ export function validateForPublish(
 
   // Rule 4: Outcome validation
   const outcomeValidation = validateOutcome(
-    experience.draft.outcome,
+    experience.type,
+    experience.draft,
     experience.draft.steps,
   )
   if (!outcomeValidation.valid) {
