@@ -12,7 +12,7 @@ import { useCallback } from 'react'
 import { getFieldError } from '../../hooks/useExperienceConfigValidation'
 import { useRefMediaUpload } from '../../hooks/useRefMediaUpload'
 import { sanitizeDisplayName } from '../../lib/experience-config-operations'
-import { SourceImageSelector } from '../shared-controls/SourceImageSelector'
+import { SubjectMediaSection } from '../shared-controls/SubjectMediaSection'
 import { AspectRatioSelector } from '../shared-controls/AspectRatioSelector'
 import { IMAGE_MODALITY, PromptComposer } from '../PromptComposer'
 import { TaskSelector } from './TaskSelector'
@@ -39,6 +39,11 @@ export interface AIImageConfigFormProps {
   workspaceId: string
   /** User ID for media uploads */
   userId: string | undefined
+  /** Callback when a capture step's aspect ratio is changed inline */
+  onCaptureAspectRatioChange?: (
+    stepId: string,
+    aspectRatio: AspectRatio,
+  ) => void
 }
 
 /**
@@ -51,6 +56,7 @@ export function AIImageConfigForm({
   errors,
   workspaceId,
   userId,
+  onCaptureAspectRatioChange,
 }: AIImageConfigFormProps) {
   const { imageGeneration } = config
 
@@ -74,12 +80,6 @@ export function AIImageConfigForm({
 
   const handleModelChange = useCallback(
     (model: string) => updateImageGeneration({ model: model as AIImageModel }),
-    [updateImageGeneration],
-  )
-
-  const handleGenAspectRatioChange = useCallback(
-    (aspectRatio: string) =>
-      updateImageGeneration({ aspectRatio: aspectRatio as AspectRatio }),
     [updateImageGeneration],
   )
 
@@ -139,56 +139,47 @@ export function AIImageConfigForm({
       {/* Task selector */}
       <TaskSelector task={config.task} onTaskChange={handleTaskChange} />
 
-      {/* Source image + aspect ratio */}
-      {config.task === 'image-to-image' ? (
-        <div className="grid grid-cols-2 gap-4">
-          <SourceImageSelector
-            value={config.captureStepId}
-            onChange={(captureStepId) => onConfigChange({ captureStepId })}
-            steps={steps}
-            error={getFieldError(errors, 'aiImage.captureStepId')}
-          />
-          <AspectRatioSelector
-            value={config.aspectRatio}
-            onChange={(aspectRatio) =>
-              onConfigChange({ aspectRatio: aspectRatio })
-            }
-          />
-        </div>
-      ) : (
-        <div className="grid grid-cols-2 gap-4">
-          <div /> {/* Empty slot */}
-          <AspectRatioSelector
-            value={config.aspectRatio}
-            onChange={(aspectRatio) =>
-              onConfigChange({ aspectRatio: aspectRatio })
-            }
-          />
-        </div>
+      {/* Subject Media section (visible for image-to-image only) */}
+      {config.task === 'image-to-image' && (
+        <SubjectMediaSection
+          captureStepId={config.captureStepId}
+          steps={steps}
+          onCaptureStepChange={(captureStepId) =>
+            onConfigChange({ captureStepId })
+          }
+          onCaptureAspectRatioChange={onCaptureAspectRatioChange}
+          error={getFieldError(errors, 'aiImage.captureStepId')}
+        />
       )}
 
-      {/* PromptComposer */}
-      <PromptComposer
-        modality={IMAGE_MODALITY}
-        prompt={imageGeneration.prompt}
-        onPromptChange={handlePromptChange}
-        model={imageGeneration.model}
-        onModelChange={handleModelChange}
-        controls={{
-          aspectRatio: imageGeneration.aspectRatio ?? config.aspectRatio,
-          onAspectRatioChange: handleGenAspectRatioChange,
-        }}
-        refMedia={{
-          items: imageGeneration.refMedia,
-          onRemove: handleRemoveRefMedia,
-          uploadingFiles,
-          onFilesSelected: uploadFiles,
-          canAddMore,
-          isUploading,
-        }}
-        steps={mentionableSteps}
-        error={getFieldError(errors, 'aiImage.imageGeneration.prompt')}
-      />
+      {/* Output section */}
+      <div className="space-y-3">
+        <h3 className="text-sm font-semibold text-muted-foreground">Output</h3>
+        <AspectRatioSelector
+          value={config.aspectRatio}
+          onChange={(aspectRatio) =>
+            onConfigChange({ aspectRatio: aspectRatio })
+          }
+        />
+        <PromptComposer
+          modality={IMAGE_MODALITY}
+          prompt={imageGeneration.prompt}
+          onPromptChange={handlePromptChange}
+          model={imageGeneration.model}
+          onModelChange={handleModelChange}
+          controls={{}}
+          refMedia={{
+            items: imageGeneration.refMedia,
+            onRemove: handleRemoveRefMedia,
+            uploadingFiles,
+            onFilesSelected: uploadFiles,
+            canAddMore,
+            isUploading,
+          }}
+          steps={mentionableSteps}
+          error={getFieldError(errors, 'aiImage.imageGeneration.prompt')}
+        />
+      </div>
     </div>
   )
 }

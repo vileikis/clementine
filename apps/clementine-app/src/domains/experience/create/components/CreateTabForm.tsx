@@ -31,8 +31,10 @@ import { PhotoConfigForm } from './photo-config/PhotoConfigForm'
 import type {
   AIImageConfig,
   AIVideoConfig,
+  AspectRatio,
   Experience,
   ExperienceConfig,
+  ExperienceStep,
   OutcomeType,
   PhotoConfig,
 } from '@clementine/shared'
@@ -226,6 +228,30 @@ export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
     [form, triggerSave],
   )
 
+  // ── Capture Step AR Change (inline from Subject Media section) ──
+
+  const handleCaptureAspectRatioChange = useCallback(
+    async (stepId: string, aspectRatio: AspectRatio) => {
+      const updatedSteps = steps.map((s: ExperienceStep) =>
+        s.id === stepId && s.type === 'capture.photo'
+          ? { ...s, config: { ...s.config, aspectRatio } }
+          : s,
+      )
+      try {
+        await updateConfigMutation.mutateAsync({
+          updates: { steps: updatedSteps },
+        })
+      } catch (error) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : 'Failed to update capture aspect ratio'
+        toast.error(message)
+      }
+    },
+    [steps, updateConfigMutation],
+  )
+
   // ── Render ────────────────────────────────────────────────
 
   const activeConfig = configKey ? formValues[configKey] : null
@@ -253,6 +279,7 @@ export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
           onConfigChange={handlePhotoConfigChange}
           steps={steps}
           errors={validationErrors}
+          onCaptureAspectRatioChange={handleCaptureAspectRatioChange}
         />
         <div className="border-t pt-4">
           <ClearTypeConfigAction onClear={handleClearConfig} />
@@ -276,6 +303,7 @@ export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
           errors={validationErrors}
           workspaceId={workspaceId}
           userId={user?.uid}
+          onCaptureAspectRatioChange={handleCaptureAspectRatioChange}
         />
         <div className="border-t pt-4">
           <ClearTypeConfigAction onClear={handleClearConfig} />
@@ -299,6 +327,7 @@ export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
           errors={validationErrors}
           workspaceId={workspaceId}
           userId={user?.uid}
+          onCaptureAspectRatioChange={handleCaptureAspectRatioChange}
         />
         <div className="border-t pt-4">
           <ClearTypeConfigAction onClear={handleClearConfig} />

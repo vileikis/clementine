@@ -2,15 +2,19 @@
  * PhotoConfigForm Component
  *
  * Configuration form for Photo outcome type.
- * Renders SourceImageSelector (captureStepId) and AspectRatioSelector.
+ * Renders SubjectMediaSection (captureStepId) and AspectRatioSelector.
  *
  * @see specs/072-outcome-schema-redesign — US1
  */
 import { getFieldError } from '../../hooks/useExperienceConfigValidation'
-import { SourceImageSelector } from '../shared-controls/SourceImageSelector'
+import { SubjectMediaSection } from '../shared-controls/SubjectMediaSection'
 import { AspectRatioSelector } from '../shared-controls/AspectRatioSelector'
 import type { FieldValidationError } from '../../hooks/useExperienceConfigValidation'
-import type { ExperienceStep, PhotoConfig } from '@clementine/shared'
+import type {
+  AspectRatio,
+  ExperienceStep,
+  PhotoConfig,
+} from '@clementine/shared'
 
 export interface PhotoConfigFormProps {
   /** Photo configuration */
@@ -21,6 +25,11 @@ export interface PhotoConfigFormProps {
   steps: ExperienceStep[]
   /** Validation errors */
   errors: FieldValidationError[]
+  /** Callback when a capture step's aspect ratio is changed inline */
+  onCaptureAspectRatioChange?: (
+    stepId: string,
+    aspectRatio: AspectRatio,
+  ) => void
 }
 
 /**
@@ -31,21 +40,31 @@ export function PhotoConfigForm({
   onConfigChange,
   steps,
   errors,
+  onCaptureAspectRatioChange,
 }: PhotoConfigFormProps) {
   return (
-    <div className="grid grid-cols-2 gap-4">
-      <SourceImageSelector
-        value={config.captureStepId || null}
-        onChange={(captureStepId) =>
+    <div className="space-y-6">
+      {/* Subject Media section */}
+      <SubjectMediaSection
+        captureStepId={config.captureStepId || null}
+        steps={steps}
+        onCaptureStepChange={(captureStepId) =>
           onConfigChange({ captureStepId: captureStepId ?? '' })
         }
-        steps={steps}
+        onCaptureAspectRatioChange={onCaptureAspectRatioChange}
         error={getFieldError(errors, 'photo.captureStepId')}
       />
-      <AspectRatioSelector
-        value={config.aspectRatio}
-        onChange={(aspectRatio) => onConfigChange({ aspectRatio: aspectRatio })}
-      />
+
+      {/* Output section */}
+      <div className="space-y-3">
+        <h3 className="text-sm font-semibold text-muted-foreground">Output</h3>
+        <AspectRatioSelector
+          value={config.aspectRatio}
+          onChange={(aspectRatio) =>
+            onConfigChange({ aspectRatio: aspectRatio })
+          }
+        />
+      </div>
     </div>
   )
 }
