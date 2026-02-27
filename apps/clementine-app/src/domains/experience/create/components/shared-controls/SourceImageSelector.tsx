@@ -31,6 +31,8 @@ export interface SourceImageSelectorProps {
   disabled?: boolean
   /** Validation error message */
   error?: string
+  /** Hide the label (when rendered inside a section with its own heading) */
+  hideLabel?: boolean
 }
 
 /**
@@ -42,6 +44,7 @@ export function SourceImageSelector({
   steps,
   disabled,
   error,
+  hideLabel,
 }: SourceImageSelectorProps) {
   // Filter to capture steps only
   const captureSteps = steps.filter((s) => s.type === 'capture.photo')
@@ -59,7 +62,9 @@ export function SourceImageSelector({
 
   return (
     <div className="space-y-2">
-      <label className="text-sm font-medium">Source Image</label>
+      {!hideLabel && (
+        <label className="text-sm font-medium">Source Image</label>
+      )}
       <Select
         value={selectValue}
         onValueChange={handleValueChange}

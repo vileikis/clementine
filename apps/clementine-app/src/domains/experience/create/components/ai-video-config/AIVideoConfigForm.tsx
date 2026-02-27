@@ -15,7 +15,7 @@ import { VIDEO_ASPECT_RATIOS } from '@clementine/shared'
 import { getFieldError } from '../../hooks/useExperienceConfigValidation'
 import { MAX_VIDEO_REF_MEDIA_COUNT } from '../../lib/model-options'
 import { useRefMediaUpload } from '../../hooks/useRefMediaUpload'
-import { SourceImageSelector } from '../shared-controls/SourceImageSelector'
+import { SubjectMediaSection } from '../shared-controls/SubjectMediaSection'
 import { AspectRatioSelector } from '../shared-controls/AspectRatioSelector'
 import { PromptComposer, VIDEO_MODALITY } from '../PromptComposer'
 import { AIVideoTaskSelector } from './AIVideoTaskSelector'
@@ -25,6 +25,7 @@ import type {
   AIVideoConfig,
   AIVideoModel,
   AIVideoTask,
+  AspectRatio,
   ExperienceStep,
   ImageGenerationConfig,
   MediaReference,
@@ -59,6 +60,11 @@ export interface AIVideoConfigFormProps {
   workspaceId: string
   /** User ID for media uploads */
   userId: string | undefined
+  /** Callback when a capture step's aspect ratio is changed inline */
+  onCaptureAspectRatioChange?: (
+    stepId: string,
+    aspectRatio: AspectRatio,
+  ) => void
 }
 
 /**
@@ -71,6 +77,7 @@ export function AIVideoConfigForm({
   errors,
   workspaceId,
   userId,
+  onCaptureAspectRatioChange,
 }: AIVideoConfigFormProps) {
   const { videoGeneration } = config
 
@@ -217,16 +224,20 @@ export function AIVideoConfigForm({
       {/* Task selector */}
       <AIVideoTaskSelector task={config.task} onTaskChange={handleTaskChange} />
 
-      {/* Source image + aspect ratio */}
-      <div className="grid grid-cols-2 gap-4">
-        <SourceImageSelector
-          value={config.captureStepId}
-          onChange={(captureStepId) =>
-            onConfigChange({ captureStepId: captureStepId ?? '' })
-          }
-          steps={steps}
-          error={getFieldError(errors, 'aiVideo.captureStepId')}
-        />
+      {/* Subject Media section */}
+      <SubjectMediaSection
+        captureStepId={config.captureStepId}
+        steps={steps}
+        onCaptureStepChange={(captureStepId) =>
+          onConfigChange({ captureStepId: captureStepId ?? '' })
+        }
+        onCaptureAspectRatioChange={onCaptureAspectRatioChange}
+        error={getFieldError(errors, 'aiVideo.captureStepId')}
+      />
+
+      {/* Output section */}
+      <div className="space-y-3">
+        <h3 className="text-sm font-semibold text-muted-foreground">Output</h3>
         <AspectRatioSelector
           value={config.aspectRatio}
           onChange={(aspectRatio) =>
@@ -234,44 +245,42 @@ export function AIVideoConfigForm({
           }
           options={VIDEO_ASPECT_RATIO_OPTIONS}
         />
-      </div>
-
-      {/* Video generation — PromptComposer with video models + duration */}
-      {(config.task === 'image-to-video' ||
-        config.task === 'ref-images-to-video') && (
-        <PromptComposer
-          modality={taskModality}
-          prompt={videoGeneration.prompt}
-          onPromptChange={(prompt) => updateVideoGeneration({ prompt })}
-          model={videoGeneration.model}
-          onModelChange={(model) =>
-            updateVideoGeneration({ model: model as AIVideoModel })
-          }
-          controls={{
-            duration: String(videoGeneration.duration ?? 6),
-            onDurationChange: (d) => {
-              const n = Number(d)
-              if (n === 4 || n === 6 || n === 8) {
-                updateVideoGeneration({ duration: n })
-              }
-            },
-          }}
-          refMedia={
-            config.task === 'ref-images-to-video'
-              ? {
-                  items: videoGeneration.refMedia,
-                  onRemove: handleRemoveRefMedia,
-                  uploadingFiles,
-                  onFilesSelected: uploadFiles,
-                  canAddMore,
-                  isUploading,
+        {(config.task === 'image-to-video' ||
+          config.task === 'ref-images-to-video') && (
+          <PromptComposer
+            modality={taskModality}
+            prompt={videoGeneration.prompt}
+            onPromptChange={(prompt) => updateVideoGeneration({ prompt })}
+            model={videoGeneration.model}
+            onModelChange={(model) =>
+              updateVideoGeneration({ model: model as AIVideoModel })
+            }
+            controls={{
+              duration: String(videoGeneration.duration ?? 6),
+              onDurationChange: (d) => {
+                const n = Number(d)
+                if (n === 4 || n === 6 || n === 8) {
+                  updateVideoGeneration({ duration: n })
                 }
-              : undefined
-          }
-          steps={mentionableSteps}
-          error={getFieldError(errors, 'aiVideo.videoGeneration.prompt')}
-        />
-      )}
+              },
+            }}
+            refMedia={
+              config.task === 'ref-images-to-video'
+                ? {
+                    items: videoGeneration.refMedia,
+                    onRemove: handleRemoveRefMedia,
+                    uploadingFiles,
+                    onFilesSelected: uploadFiles,
+                    canAddMore,
+                    isUploading,
+                  }
+                : undefined
+            }
+            steps={mentionableSteps}
+            error={getFieldError(errors, 'aiVideo.videoGeneration.prompt')}
+          />
+        )}
+      </div>
 
       {/* Start frame image generation (reimagine only) */}
       {config.task === 'reimagine' && config.startFrameImageGen && (

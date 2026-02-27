@@ -24,8 +24,8 @@
 
 **Purpose**: Create the shared SubjectPhotoSection component that both user stories depend on
 
-- [ ] T001 Create SubjectPhotoSection component in `apps/clementine-app/src/domains/experience/create/components/shared-controls/SubjectPhotoSection.tsx` — renders a labeled "Subject Photo" section heading, looks up the selected capture step from `steps` array by `captureStepId`, displays step name and its AR (read from `step.config.aspectRatio` after narrowing `type === 'capture.photo'`). When `captureStepId` is null, shows "None (prompt only)" if `showNoneOption` is true, otherwise hides. Uses SourceImageSelector dropdown for step selection. Props: `captureStepId: string | null`, `steps: ExperienceStep[]`, `onCaptureStepChange: (id: string | null) => void`, `showNoneOption?: boolean`, `error?: string`.
-- [ ] T002 Update barrel export in `apps/clementine-app/src/domains/experience/create/components/shared-controls/index.ts` — add `SubjectPhotoSection` export
+- [x] T001 Create SubjectPhotoSection component in `apps/clementine-app/src/domains/experience/create/components/shared-controls/SubjectPhotoSection.tsx` — renders a labeled "Subject Photo" section heading, looks up the selected capture step from `steps` array by `captureStepId`, displays step name and its AR (read from `step.config.aspectRatio` after narrowing `type === 'capture.photo'`). When `captureStepId` is null, shows "None (prompt only)" if `showNoneOption` is true, otherwise hides. Uses SourceImageSelector dropdown for step selection. Props: `captureStepId: string | null`, `steps: ExperienceStep[]`, `onCaptureStepChange: (id: string | null) => void`, `showNoneOption?: boolean`, `error?: string`.
+- [x] T002 Update barrel export in `apps/clementine-app/src/domains/experience/create/components/shared-controls/index.ts` — add `SubjectPhotoSection` export
 
 **Checkpoint**: SubjectPhotoSection component exists and is exported. Ready for integration into config forms.
 
@@ -39,9 +39,9 @@
 
 ### Implementation for User Story 1
 
-- [ ] T003 [P] [US1] Reorganize AIImageConfigForm in `apps/clementine-app/src/domains/experience/create/components/ai-image-config/AIImageConfigForm.tsx` — replace flat 2-column grid with SubjectPhotoSection (for image-to-image task; hidden for text-to-image when captureStepId is null) + "Output" section (heading `<h3>` + AspectRatioSelector at top + PromptComposer below). Remove `controls.aspectRatio` and `controls.onAspectRatioChange` from PromptComposer props — ControlRow auto-hides AR when not passed. Remove the `handleGenAspectRatioChange` handler (no longer needed). Remove the empty `<div />` slot used for text-to-image layout.
-- [ ] T004 [P] [US1] Reorganize AIVideoConfigForm in `apps/clementine-app/src/domains/experience/create/components/ai-video-config/AIVideoConfigForm.tsx` — replace flat 2-column grid with SubjectPhotoSection + "Output" section (heading + AspectRatioSelector with `VIDEO_ASPECT_RATIO_OPTIONS` at top + PromptComposer + FrameGenerationSection(s) below).
-- [ ] T005 [P] [US1] Reorganize PhotoConfigForm in `apps/clementine-app/src/domains/experience/create/components/photo-config/PhotoConfigForm.tsx` — replace flat 2-column grid with SubjectPhotoSection + "Output" section (heading + AspectRatioSelector). Use section headings with `text-sm font-semibold text-muted-foreground` for design system token compliance.
+- [x] T003 [P] [US1] Reorganize AIImageConfigForm in `apps/clementine-app/src/domains/experience/create/components/ai-image-config/AIImageConfigForm.tsx` — replace flat 2-column grid with SubjectPhotoSection (for image-to-image task; hidden for text-to-image when captureStepId is null) + "Output" section (heading `<h3>` + AspectRatioSelector at top + PromptComposer below). Remove `controls.aspectRatio` and `controls.onAspectRatioChange` from PromptComposer props — ControlRow auto-hides AR when not passed. Remove the `handleGenAspectRatioChange` handler (no longer needed). Remove the empty `<div />` slot used for text-to-image layout.
+- [x] T004 [P] [US1] Reorganize AIVideoConfigForm in `apps/clementine-app/src/domains/experience/create/components/ai-video-config/AIVideoConfigForm.tsx` — replace flat 2-column grid with SubjectPhotoSection + "Output" section (heading + AspectRatioSelector with `VIDEO_ASPECT_RATIO_OPTIONS` at top + PromptComposer + FrameGenerationSection(s) below).
+- [x] T005 [P] [US1] Reorganize PhotoConfigForm in `apps/clementine-app/src/domains/experience/create/components/photo-config/PhotoConfigForm.tsx` — replace flat 2-column grid with SubjectPhotoSection + "Output" section (heading + AspectRatioSelector). Use section headings with `text-sm font-semibold text-muted-foreground` for design system token compliance.
 
 **Checkpoint**: All three config forms display two labeled sections. Output AR is separate from capture step info. PromptComposer no longer shows AR control (AI Image). This is the MVP — test all three outcome types.
 
@@ -55,7 +55,7 @@
 
 ### Implementation for User Story 2
 
-- [ ] T006 [US2] Enhance SubjectPhotoSection in `apps/clementine-app/src/domains/experience/create/components/shared-controls/SubjectPhotoSection.tsx` — add conditional rendering: when exactly 1 capture step exists, display step name + AR as static text (e.g., Camera icon + step name + AR badge) instead of SourceImageSelector dropdown. When multiple capture steps exist, keep the SourceImageSelector dropdown. When 0 capture steps, show helper text "Add a Photo Capture step to use as source image". Ensure no hidden/empty elements occupy space in any case.
+- [x] T006 [US2] Enhance SubjectPhotoSection in `apps/clementine-app/src/domains/experience/create/components/shared-controls/SubjectPhotoSection.tsx` — add conditional rendering: when exactly 1 capture step exists, display step name + AR as static text (e.g., Camera icon + step name + AR badge) instead of SourceImageSelector dropdown. When multiple capture steps exist, keep the SourceImageSelector dropdown. When 0 capture steps, show helper text "Add a Photo Capture step to use as source image". Ensure no hidden/empty elements occupy space in any case.
 
 **Checkpoint**: Single capture step shows as static content. Multiple steps show dropdown. No layout artifacts.
 
@@ -65,7 +65,7 @@
 
 **Purpose**: Validation, cleanup, and final verification
 
-- [ ] T007 Run validation gates — execute `pnpm app:check` (format + lint) and `pnpm app:type-check` (TypeScript) from `apps/clementine-app/`
+- [x] T007 Run validation gates — execute `pnpm app:check` (format + lint) and `pnpm app:type-check` (TypeScript) from `apps/clementine-app/`
 - [ ] T008 Manual verification per `specs/082-create-tab-ar-clarity/quickstart.md` — test all scenarios: AI Image, AI Video, Photo types; single vs. multiple capture steps; text-to-image (no source); output AR changes; verify PromptComposer no longer shows AR inside it
 
 ---
