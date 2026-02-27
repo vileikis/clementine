@@ -112,9 +112,9 @@
 
 **Independent Test**: Trigger a transform pipeline job. Verify the cloud function reads type from `published.type`. Verify job snapshot contains the correct type.
 
-- [ ] T024 [P] [US6] Update `startTransformPipeline` in `functions/src/callable/startTransformPipeline.ts`. Replace `experience.type` reads with `experience.published.type` (or `experience.published?.type`). Remove manual config presence checks (JC-005: `if (experienceType === 'photo' && !config?.photo)`) — the discriminated union guarantees the right config exists. Keep the `IMPLEMENTED_TYPES` check but read type from published config.
-- [ ] T025 [P] [US6] Update `buildJobSnapshot()` in `functions/src/repositories/job.ts`. Replace `type: experience.type` with `type: experience.published.type` (or however published config is accessed). Update any per-type config reads to use the self-describing published config.
-- [ ] T026 [US6] Search for any remaining `experience.type` references in `functions/src/` and guest-facing code in `apps/clementine-app/src/domains/guest/`. Update to read from published config. Check `ExperiencePage.tsx` and any guest runtime containers.
+- [X] T024 [P] [US6] Update `startTransformPipeline` in `functions/src/callable/startTransformPipeline.ts`. Replace `experience.type` reads with `experience.published.type` (or `experience.published?.type`). Remove manual config presence checks (JC-005: `if (experienceType === 'photo' && !config?.photo)`) — the discriminated union guarantees the right config exists. Keep the `IMPLEMENTED_TYPES` check but read type from published config.
+- [X] T025 [P] [US6] Update `buildJobSnapshot()` in `functions/src/repositories/job.ts`. Replace `type: experience.type` with `type: experience.published.type` (or however published config is accessed). Update any per-type config reads to use the self-describing published config.
+- [X] T026 [US6] Search for any remaining `experience.type` references in `functions/src/` and guest-facing code in `apps/clementine-app/src/domains/guest/`. Update to read from published config. Check `ExperiencePage.tsx` and any guest runtime containers.
 
 **Checkpoint**: Cloud functions correctly process experiences using `published.type`. No references to top-level `experience.type` remain in backend code.
 
@@ -124,7 +124,7 @@
 
 **Goal**: Replace the `status + type + createdAt` composite index with `status + draftType + createdAt`.
 
-- [ ] T027 [US7] Update `firebase/firestore.indexes.json`. In the experiences collection composite index (lines 244-260), change `"fieldPath": "type"` to `"fieldPath": "draftType"`. Keep `status` and `createdAt` fields unchanged.
+- [X] T027 [US7] Update `firebase/firestore.indexes.json`. In the experiences collection composite index (lines 244-260), change `"fieldPath": "type"` to `"fieldPath": "draftType"`. Keep `status` and `createdAt` fields unchanged.
 
 **Checkpoint**: Index configuration updated. Deploy with `pnpm fb:deploy:indexes` when ready.
 

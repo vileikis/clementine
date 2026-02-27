@@ -8,7 +8,7 @@
  * This is a Firebase Callable Function (onCall) invoked via httpsCallable
  * from the frontend.
  *
- * @see specs/081-experience-type-flattening
+ * @see specs/083-config-discriminated-union
  */
 import { onCall, HttpsError } from 'firebase-functions/v2/https'
 import type { CallableRequest } from 'firebase-functions/v2/https'
@@ -19,6 +19,7 @@ import type {
   Experience,
   ExperienceConfig,
 } from '@clementine/shared'
+
 import {
   fetchSession,
   updateSessionJobStatus,
@@ -67,8 +68,11 @@ function parseRequest(data: unknown): { projectId: string; sessionId: string } {
 }
 
 /**
- * Fetch session + experience and run all precondition checks (JC-001 → JC-005).
+ * Fetch session + experience and run all precondition checks (JC-001 → JC-004).
  * Returns the validated entities needed to build the job.
+ *
+ * JC-005 (config presence) is no longer needed — the discriminated union
+ * guarantees that the type-specific config exists on each variant.
  */
 async function validateJobPreconditions(
   projectId: string,
@@ -111,14 +115,14 @@ async function validateJobPreconditions(
     )
   }
 
-  // JC-002: Validate experience type is set
-  const experienceType = experience.type
-  if (!experienceType) {
+  // JC-002: Read type from config (discriminated union)
+  if (!config) {
     throw new HttpsError(
       'invalid-argument',
-      'Cannot create job: experience has no type configured',
+      'Cannot create job: experience has no config',
     )
   }
+  const experienceType = config.type
 
   // JC-003: Reject unsupported types (e.g. survey — no transform output)
   if (!IMPLEMENTED_TYPES.has(experienceType)) {
@@ -136,48 +140,24 @@ async function validateJobPreconditions(
     )
   }
 
-  // JC-005: Validate the active type's config exists (flattened paths)
-  if (experienceType === 'photo' && !config?.photo) {
-    throw new HttpsError(
-      'invalid-argument',
-      'Cannot create job: photo configuration is missing',
-    )
-  }
-  if (experienceType === 'ai.image' && !config?.aiImage) {
-    throw new HttpsError(
-      'invalid-argument',
-      'Cannot create job: AI image configuration is missing',
-    )
-  }
-  if (experienceType === 'ai.video' && !config?.aiVideo) {
-    throw new HttpsError(
-      'invalid-argument',
-      'Cannot create job: AI video configuration is missing',
-    )
-  }
-
-  // config is guaranteed non-null after JC-001 + JC-005
-  return { session, experience, config: config!, experienceType }
+  return { session, experience, config, experienceType }
 }
 
 /**
- * Get the aspect ratio from the active type's config.
- * Reads from flattened config paths (config.[type]).
+ * Get the aspect ratio from the config's type-specific fields.
+ * Uses discriminated union narrowing on config.type.
  */
-function getOutcomeAspectRatio(
-  type: ExperienceType,
-  config: ExperienceConfig,
-): AspectRatio {
-  if (type === 'photo' && config.photo?.aspectRatio) {
-    return config.photo.aspectRatio as AspectRatio
+function getOutcomeAspectRatio(config: ExperienceConfig): AspectRatio {
+  switch (config.type) {
+    case 'photo':
+      return config.photo.aspectRatio as AspectRatio
+    case 'ai.image':
+      return config.aiImage.aspectRatio as AspectRatio
+    case 'ai.video':
+      return config.aiVideo.aspectRatio as AspectRatio
+    default:
+      return '1:1'
   }
-  if (type === 'ai.image' && config.aiImage?.aspectRatio) {
-    return config.aiImage.aspectRatio as AspectRatio
-  }
-  if (type === 'ai.video' && config.aiVideo?.aspectRatio) {
-    return config.aiVideo.aspectRatio as AspectRatio
-  }
-  return '1:1'
 }
 
 /**
@@ -187,10 +167,9 @@ async function resolveJobConfig(
   projectId: string,
   session: Session,
   config: ExperienceConfig,
-  experienceType: ExperienceType,
 ) {
   const project = await fetchProject(projectId)
-  const aspectRatio = getOutcomeAspectRatio(experienceType, config)
+  const aspectRatio = getOutcomeAspectRatio(config)
   const overlayChoice = pickOverlay(
     project,
     session.configSource,
@@ -256,14 +235,13 @@ export const startTransformPipelineV2 = onCall(
 
     const { projectId, sessionId } = parseRequest(request.data)
 
-    const { session, experience, config, experienceType } =
+    const { session, experience, config } =
       await validateJobPreconditions(projectId, sessionId)
 
     const { overlayChoice } = await resolveJobConfig(
       projectId,
       session,
       config,
-      experienceType,
     )
 
     const jobId = await createAndDispatchJob({

@@ -249,7 +249,7 @@
           "order": "ASCENDING"
         },
         {
-          "fieldPath": "type",
+          "fieldPath": "draftType",
           "order": "ASCENDING"
         },
         {
