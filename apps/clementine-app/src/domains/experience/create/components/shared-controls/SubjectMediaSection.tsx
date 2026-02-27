@@ -113,13 +113,10 @@ export function SubjectMediaSection({
       ? selectedStep.config.aspectRatio
       : null
 
-  // Allow remove when multiple steps exist or "None" is a valid option
-  const canRemove = captureSteps.length > 1 || showNoneOption === true
-
   return (
     <div className="space-y-3">
       <h3 className="text-sm font-semibold text-muted-foreground">{label}</h3>
-      <div className="group bg-muted/50 flex items-center gap-3 rounded-md border px-3 py-2">
+      <div className="group flex items-center gap-3 rounded-md border bg-background px-3 py-2">
         {/* Left: step info */}
         <div className="flex min-w-0 flex-1 items-center gap-2">
           <Camera className="text-muted-foreground h-4 w-4 shrink-0" />
@@ -140,7 +137,10 @@ export function SubjectMediaSection({
                 )
               }
             >
-              <SelectTrigger size="sm" className="h-8 w-auto gap-1">
+              <SelectTrigger
+                size="sm"
+                className="h-8 w-auto gap-1 border-0 bg-transparent font-semibold shadow-none"
+              >
                 <SelectValue>{captureAR}</SelectValue>
               </SelectTrigger>
               <SelectContent>
@@ -153,17 +153,15 @@ export function SubjectMediaSection({
             </Select>
           )}
 
-          {canRemove && (
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              className="text-muted-foreground hover:text-destructive shrink-0 transition-opacity md:opacity-0 md:group-hover:opacity-100"
-              onClick={() => onCaptureStepChange(null)}
-              aria-label={`Remove ${selectedStep.name}`}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          )}
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            className="text-muted-foreground hover:text-destructive shrink-0"
+            onClick={() => onCaptureStepChange(null)}
+            aria-label={`Remove ${selectedStep.name}`}
+          >
+            <X className="h-4 w-4" />
+          </Button>
         </div>
       </div>
       {error && (
