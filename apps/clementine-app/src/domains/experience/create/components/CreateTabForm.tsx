@@ -19,10 +19,7 @@ import { toast } from 'sonner'
 
 import { useUpdateExperienceConfig } from '../hooks'
 import { useExperienceConfigValidation } from '../hooks/useExperienceConfigValidation'
-import {
-  getConfigKey,
-  getDefaultConfigForType,
-} from '../lib/experience-config-operations'
+import { getConfigKey } from '../lib/experience-config-operations'
 import { AIImageConfigForm } from './ai-image-config/AIImageConfigForm'
 import { AIVideoConfigForm } from './ai-video-config'
 import { ExperienceTypeSwitch } from './ExperienceTypeSwitch'
@@ -144,41 +141,15 @@ export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
 
   const handleTypeSwitch = useCallback(
     async (newType: OutcomeType) => {
-      const newConfigKey = getConfigKey(newType)
-      if (!newConfigKey) return
-
-      // Get existing config or create default
-      const existingConfig = formValues[newConfigKey]
-      const defaultConfig = existingConfig
-        ? undefined
-        : { key: newConfigKey, value: getDefaultConfigForType(newType, steps) }
-
-      // Atomic Firestore update: type + default config
       try {
-        await switchExperienceType(
-          workspaceId,
-          experience.id,
-          newType,
-          defaultConfig,
-        )
-
-        // Update local form with default config if initialized
-        if (defaultConfig) {
-          form.setValue(
-            newConfigKey,
-            defaultConfig.value as ConfigFormState[typeof newConfigKey],
-            {
-              shouldDirty: false,
-            },
-          )
-        }
+        await switchExperienceType(workspaceId, experience.id, newType)
       } catch (error) {
         const message =
           error instanceof Error ? error.message : 'Failed to switch type'
         toast.error(message)
       }
     },
-    [form, formValues, steps, workspaceId, experience.id],
+    [workspaceId, experience.id],
   )
 
   // ── Clear Config ──────────────────────────────────────────

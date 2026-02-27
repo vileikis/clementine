@@ -1,10 +1,10 @@
 /**
  * Switch Experience Type
  *
- * Atomically updates experience.type (top-level) and initializes/clears
- * per-type config in draft. Uses a Firestore transaction for consistency.
+ * Atomically replaces the draft with a new discriminated union config variant
+ * and updates draftType. Uses a Firestore transaction for consistency.
  *
- * @see specs/081-experience-type-flattening — Write Contract: Update Experience Type
+ * @see specs/083-config-discriminated-union — US3
  */
 import {
   doc,
@@ -12,30 +12,30 @@ import {
   runTransaction,
   serverTimestamp,
 } from 'firebase/firestore'
-import type { ExperienceType } from '../schemas'
+import type { ExperienceStep, ExperienceType } from '../schemas'
 import { firestore } from '@/integrations/firebase/client'
+import { buildDefaultDraft } from '../hooks/useCreateExperience'
 
 /**
  * Switch experience type atomically.
  *
+ * Builds a new discriminated union config for the target type,
+ * preserving existing steps. Replaces the entire draft.
+ *
  * Updates:
- * - experience.type = newType (top-level)
- * - experience.draft.[newType] = defaultConfig (if provided)
+ * - experience.draftType = newType
+ * - experience.draft = { type: newType, steps: existingSteps, [typeConfig]: defaults }
  * - experience.draftVersion += 1
  * - experience.updatedAt = serverTimestamp
- *
- * Does NOT clear the previous type's config (preserves switching).
  *
  * @param workspaceId - Workspace ID
  * @param experienceId - Experience ID
  * @param newType - New experience type
- * @param defaultConfig - Default config for the new type (optional, set if not already present)
  */
 export async function switchExperienceType(
   workspaceId: string,
   experienceId: string,
   newType: ExperienceType,
-  defaultConfig?: { key: string; value: unknown },
 ): Promise<void> {
   await runTransaction(firestore, async (transaction) => {
     const experienceRef = doc(
@@ -47,21 +47,24 @@ export async function switchExperienceType(
     if (!snapshot.exists()) {
       throw new Error(`Experience ${experienceId} not found`)
     }
-    const draft = (snapshot.data()?.draft ?? {}) as Record<string, unknown>
 
-    const updateData: Record<string, unknown> = {
-      type: newType,
+    // Preserve existing steps from the current draft
+    const currentDraft = (snapshot.data()?.draft ?? {}) as {
+      steps?: ExperienceStep[]
+    }
+    const existingSteps = currentDraft.steps ?? []
+
+    // Build new discriminated config with defaults for the target type
+    const newDraft = buildDefaultDraft(newType)
+
+    // Carry over existing steps
+    newDraft.steps = existingSteps
+
+    transaction.update(experienceRef, {
+      draftType: newType,
+      draft: newDraft,
       draftVersion: increment(1),
       updatedAt: serverTimestamp(),
-    }
-
-    // Initialize the new type's default config only if not already present
-    if (defaultConfig && draft[defaultConfig.key] == null) {
-      updateData[`draft.${defaultConfig.key}`] = defaultConfig.value
-    }
-
-    transaction.update(experienceRef, updateData)
-
-    return Promise.resolve()
+    })
   })
 }
