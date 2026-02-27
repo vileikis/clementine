@@ -9,15 +9,23 @@
  * structure to the new discriminated union structure.
  *
  * Per-document transformation:
- *   1. Read `experience.type` (top-level field)
- *   2. Inject `type` into `draft`: draft.type = experience.type
- *   3. If `published` is not null: inject published.type = experience.type
- *   4. Set `draftType = experience.type` (denormalized query field)
- *   5. Delete top-level `type` field
- *   6. Delete null type-specific config fields (photo, gif, video, aiImage, aiVideo)
+ *   1. For each config (draft, published): infer actual type from which
+ *      type-specific config field (aiImage, photo, etc.) is non-null
+ *   2. Inject inferred type into draft.type and published.type
+ *   3. Set draftType = draft's inferred type (denormalized query field)
+ *   4. Delete top-level `type` field
+ *   5. Delete null type-specific config fields (photo, gif, video, aiImage, aiVideo)
  *      from draft and published
  *
- * Idempotency: Skips documents where `draft.type` already exists.
+ * Type inference: The type is determined by which config field has data,
+ * NOT from the top-level `type` field (which could be stale if the user
+ * changed the draft type after publishing, or if data was partially saved).
+ *
+ * Idempotency: Skips documents where draft.type and published.type already
+ * match the inferred types.
+ *
+ * Repair: Re-running after a prior migration will fix any draft.type or
+ * published.type that was incorrectly set.
  *
  * Usage:
  *   pnpm tsx scripts/migrations/083-config-discriminated-union.ts [--dry-run] [--production]
@@ -90,15 +98,39 @@ const VALID_TYPES = new Set(['survey', 'photo', 'gif', 'video', 'ai.image', 'ai.
 /** Type-specific config keys that should be removed when null */
 const TYPE_CONFIG_KEYS = ['photo', 'gif', 'video', 'aiImage', 'aiVideo'] as const
 
+/** Map from config key to experience type */
+const CONFIG_KEY_TO_TYPE: Record<string, string> = {
+  aiImage: 'ai.image',
+  aiVideo: 'ai.video',
+  photo: 'photo',
+  gif: 'gif',
+  video: 'video',
+}
+
 interface MigrationStats {
   experiencesScanned: number
   experiencesMigrated: number
+  experiencesRepaired: number
   experiencesSkipped: number
   skipReasons: Record<string, number>
   errors: Array<{ experienceId: string; workspaceId: string; error: string }>
 }
 
 // ── Migration Logic ────────────────────────────────────────────
+
+/**
+ * Infer the experience type from a config object by checking which
+ * type-specific config field is present and non-null.
+ * Returns 'survey' if no type-specific config is found.
+ */
+function inferTypeFromConfig(config: Record<string, unknown>): string {
+  for (const [key, expType] of Object.entries(CONFIG_KEY_TO_TYPE)) {
+    if (config[key] != null && typeof config[key] === 'object') {
+      return expType
+    }
+  }
+  return 'survey'
+}
 
 /**
  * Check if a document has already been migrated.
@@ -113,15 +145,73 @@ function isAlreadyMigrated(data: Record<string, unknown>): boolean {
 }
 
 /**
- * Process a single experience document.
- * Returns the Firestore update object or null if no migration needed.
+ * Check if an already-migrated document needs repair on draft.type,
+ * published.type, or draftType. Returns update object or null.
  */
-function processExperience(data: Record<string, unknown>): Record<string, unknown> | null {
-  // Idempotency check
-  if (isAlreadyMigrated(data)) {
-    return null
+function repairTypes(data: Record<string, unknown>): {
+  updates: Record<string, unknown>
+  details: string[]
+} | null {
+  const updates: Record<string, unknown> = {}
+  const details: string[] = []
+
+  // Check draft.type
+  const draft = data['draft'] as Record<string, unknown> | null | undefined
+  if (draft) {
+    const currentDraftType = draft['type'] as string | undefined
+    const inferredDraftType = inferTypeFromConfig(draft)
+
+    if (currentDraftType !== inferredDraftType) {
+      updates['draft.type'] = inferredDraftType
+      updates['draftType'] = inferredDraftType
+      details.push(`draft.type: '${currentDraftType ?? '(none)'}' → '${inferredDraftType}'`)
+    }
+
+    // Also check draftType consistency
+    const currentDraftTypeField = data['draftType'] as string | undefined
+    if (currentDraftTypeField !== inferredDraftType && !updates['draftType']) {
+      updates['draftType'] = inferredDraftType
+      details.push(`draftType: '${currentDraftTypeField ?? '(none)'}' → '${inferredDraftType}'`)
+    }
   }
 
+  // Check published.type
+  const published = data['published'] as Record<string, unknown> | null | undefined
+  if (published) {
+    const currentPublishedType = published['type'] as string | undefined
+    const inferredPublishedType = inferTypeFromConfig(published)
+
+    if (currentPublishedType !== inferredPublishedType) {
+      updates['published.type'] = inferredPublishedType
+      details.push(`published.type: '${currentPublishedType ?? '(none)'}' → '${inferredPublishedType}'`)
+    }
+  }
+
+  return details.length > 0 ? { updates, details } : null
+}
+
+/**
+ * Process a single experience document.
+ * Returns { updates, action } or null if no changes needed.
+ */
+function processExperience(data: Record<string, unknown>): {
+  updates: Record<string, unknown>
+  action: 'migrate' | 'repair'
+  detail?: string
+} | null {
+  // Already migrated → check if types need repair
+  if (isAlreadyMigrated(data)) {
+    const repair = repairTypes(data)
+    if (!repair) return null
+
+    return {
+      updates: repair.updates,
+      action: 'repair',
+      detail: repair.details.join(', '),
+    }
+  }
+
+  // Full migration for unmigrated documents
   const type = data['type'] as string | undefined
 
   if (!type || !VALID_TYPES.has(type)) {
@@ -129,24 +219,28 @@ function processExperience(data: Record<string, unknown>): Record<string, unknow
   }
 
   const updates: Record<string, unknown> = {}
-
-  // 1. Inject type into draft
-  updates['draft.type'] = type
-
-  // 2. If published exists, inject type into published
+  const draft = data['draft'] as Record<string, unknown> | null | undefined
   const published = data['published'] as Record<string, unknown> | null | undefined
-  if (published) {
-    updates['published.type'] = type
+
+  // 1. Infer draft type from config contents (safer than trusting top-level type)
+  if (draft) {
+    const inferredDraftType = inferTypeFromConfig(draft)
+    updates['draft.type'] = inferredDraftType
+    updates['draftType'] = inferredDraftType
+  } else {
+    // No draft — fall back to top-level type
+    updates['draftType'] = type
   }
 
-  // 3. Set draftType (denormalized query field)
-  updates['draftType'] = type
+  // 2. If published exists, infer type from config contents
+  if (published) {
+    updates['published.type'] = inferTypeFromConfig(published)
+  }
 
-  // 4. Delete top-level type field
+  // 3. Delete top-level type field
   updates['type'] = FieldValue.delete()
 
-  // 5. Delete null type-specific config fields from draft
-  const draft = data['draft'] as Record<string, unknown> | null | undefined
+  // 4. Delete null type-specific config fields from draft
   if (draft) {
     for (const key of TYPE_CONFIG_KEYS) {
       if (draft[key] === null) {
@@ -155,7 +249,7 @@ function processExperience(data: Record<string, unknown>): Record<string, unknow
     }
   }
 
-  // 6. Delete null type-specific config fields from published
+  // 5. Delete null type-specific config fields from published
   if (published) {
     for (const key of TYPE_CONFIG_KEYS) {
       if (published[key] === null) {
@@ -164,7 +258,7 @@ function processExperience(data: Record<string, unknown>): Record<string, unknow
     }
   }
 
-  return updates
+  return { updates, action: 'migrate' }
 }
 
 // ── Main ───────────────────────────────────────────────────────
@@ -191,9 +285,10 @@ async function runMigration(): Promise<void> {
   const stats: MigrationStats = {
     experiencesScanned: 0,
     experiencesMigrated: 0,
+    experiencesRepaired: 0,
     experiencesSkipped: 0,
     skipReasons: {
-      'already-migrated': 0,
+      'already-correct': 0,
       'no-type-field': 0,
     },
     errors: [],
@@ -219,15 +314,17 @@ async function runMigration(): Promise<void> {
       const type = (data['type'] as string) ?? '(none)'
 
       try {
-        const updates = processExperience(data)
+        const result = processExperience(data)
 
-        if (!updates) {
-          const reason = isAlreadyMigrated(data) ? 'already-migrated' : 'no-type-field'
+        if (!result) {
+          const reason = isAlreadyMigrated(data) ? 'already-correct' : 'no-type-field'
           stats.skipReasons[reason]++
           stats.experiencesSkipped++
           console.log(`  [${workspaceId}/${experienceId}] "${name}" - Skipped (${reason})`)
           continue
         }
+
+        const { updates, action, detail } = result
 
         if (!isDryRun) {
           batch.update(doc.ref, updates)
@@ -240,13 +337,17 @@ async function runMigration(): Promise<void> {
             batch = db.batch()
             batchCount = 0
           }
-
-          console.log(`  [${workspaceId}/${experienceId}] "${name}" - Migrated (type: '${type}' → draftType + draft.type)`)
-        } else {
-          console.log(`  [${workspaceId}/${experienceId}] "${name}" - [DRY RUN] Would migrate (type: '${type}' → draftType + draft.type)`)
         }
 
-        stats.experiencesMigrated++
+        if (action === 'repair') {
+          stats.experiencesRepaired++
+          const prefix = isDryRun ? '[DRY RUN] Would repair' : 'Repaired'
+          console.log(`  [${workspaceId}/${experienceId}] "${name}" - ${prefix} (${detail})`)
+        } else {
+          stats.experiencesMigrated++
+          const prefix = isDryRun ? '[DRY RUN] Would migrate' : 'Migrated'
+          console.log(`  [${workspaceId}/${experienceId}] "${name}" - ${prefix} (type: '${type}' → draftType + draft.type)`)
+        }
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error)
         console.log(`  [${workspaceId}/${experienceId}] "${name}" - ERROR: ${errorMessage}`)
@@ -267,10 +368,11 @@ async function runMigration(): Promise<void> {
     console.log('═══════════════════════════════════════════════════════════')
     console.log(`  Experiences scanned:    ${stats.experiencesScanned}`)
     console.log(`  Experiences migrated:   ${stats.experiencesMigrated}`)
+    console.log(`  Experiences repaired:   ${stats.experiencesRepaired}`)
     console.log(`  Experiences skipped:    ${stats.experiencesSkipped}`)
     console.log('')
     console.log('  Skip Reasons:')
-    console.log(`    already migrated:     ${stats.skipReasons['already-migrated']}`)
+    console.log(`    already correct:      ${stats.skipReasons['already-correct']}`)
     console.log(`    no type field:        ${stats.skipReasons['no-type-field']}`)
     console.log('')
     console.log(`  Errors:                 ${stats.errors.length}`)
@@ -287,10 +389,10 @@ async function runMigration(): Promise<void> {
     if (isDryRun) {
       console.log('  This was a DRY RUN. No changes were made.')
       console.log('  Run without --dry-run to apply changes.')
-    } else if (stats.experiencesMigrated > 0) {
+    } else if (stats.experiencesMigrated > 0 || stats.experiencesRepaired > 0) {
       console.log('  Migration completed successfully!')
     } else {
-      console.log('  No experiences needed migration.')
+      console.log('  No experiences needed migration or repair.')
     }
     console.log('')
 
