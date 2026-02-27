@@ -61,18 +61,18 @@ As an experience creator using the admin UI, the experience designer, create tab
 
 ### User Story 4 — Validation Simplification (Priority: P2)
 
-As a developer maintaining the validation logic, outcome validation should only contain semantic checks (captureStepId exists, prompt is non-empty, refMedia names unique) since structural checks ("is the right config present?") are now enforced by the discriminated union at parse time.
+As a developer maintaining the validation logic, config validation should only contain semantic checks (captureStepId exists, prompt is non-empty, refMedia names unique) since structural checks ("is the right config present?") are now enforced by the discriminated union at parse time. The validation file and functions should be renamed to reflect that they validate config, not an "outcome".
 
-**Why this priority**: Directly enabled by P1. Reduces validation code and eliminates a class of bugs where structural and schema validation diverge.
+**Why this priority**: Directly enabled by P1. Reduces validation code and eliminates a class of bugs where structural and schema validation diverge. Renames clarify what the code actually does.
 
-**Independent Test**: Call the simplified validation function with each experience config variant and verify that only semantic errors are returned. Verify that missing config structure is caught at parse time, not by outcome validation.
+**Independent Test**: Call the simplified validation function with each experience config variant and verify that only semantic errors are returned. Verify that missing config structure is caught at parse time, not by config validation.
 
 **Acceptance Scenarios**:
 
-1. **Given** a photo config with a valid `captureStepId`, **When** outcome validation is called, **Then** it returns valid with no errors.
-2. **Given** an `ai.image` config with an empty prompt, **When** outcome validation is called, **Then** it returns an error for the prompt field.
+1. **Given** a photo config with a valid `captureStepId`, **When** config validation is called, **Then** it returns valid with no errors.
+2. **Given** an `ai.image` config with an empty prompt, **When** config validation is called, **Then** it returns an error for the prompt field.
 3. **Given** the new validation function signature, **When** called with a config, **Then** it does not require a separate `type` parameter — `config.type` is used internally.
-4. **Given** a `gif` or `video` config, **When** outcome validation is called, **Then** a "coming soon" error is returned (semantic check retained).
+4. **Given** a `gif` or `video` config, **When** config validation is called, **Then** a "coming soon" error is returned (semantic check retained).
 
 ---
 
@@ -143,8 +143,9 @@ As the system querying experiences by type, a composite index must exist for `st
 - **FR-007**: The publish action MUST copy the entire draft config (including `type`) to `published`, making published config self-describing.
 - **FR-008**: A one-time migration script MUST update all existing experience documents to conform to the new schema (inject `type` into configs, set `draftType`, remove top-level `type`, remove null config fields).
 - **FR-009**: The migration script MUST be idempotent — running it multiple times produces the same result.
-- **FR-010**: The outcome validation function MUST accept a config (which includes `type`) instead of requiring a separate `type` parameter.
-- **FR-011**: Structural validation checks ("is the correct type-specific config present?") MUST be removed from outcome validation — the discriminated union enforces this at parse time.
+- **FR-010**: The config validation function MUST accept a config (which includes `type`) instead of requiring a separate `type` parameter. The file `outcome-validation.ts` MUST be renamed to `config-validation.ts` and the function `validateOutcome()` renamed to `validateConfig()`.
+- **FR-011**: Structural validation checks ("is the correct type-specific config present?") MUST be removed from config validation — the discriminated union enforces this at parse time.
+- **FR-018**: The file `hasTransformConfig.ts` MUST be renamed to `config-checks.ts` and the function `hasOutcome()` renamed to `hasTypeConfig()`. With the discriminated union, this simplifies to checking `config.type !== 'survey'`.
 - **FR-012**: Semantic validation checks (captureStepId exists in steps, prompt is non-empty, refMedia uniqueness, coming-soon blocking) MUST be retained.
 - **FR-013**: The experience library type filter MUST query on `draftType` (flat field) instead of a top-level `type` or nested `draft.type` path.
 - **FR-014**: A composite database index MUST exist for `status` + `draftType` on the experiences collection.
@@ -163,7 +164,7 @@ As the system querying experiences by type, a composite index must exist for `st
 ### Measurable Outcomes
 
 - **SC-001**: After checking `config.type`, type-specific fields are accessible without null-checks — developers can access type-specific config directly on a narrowed variant without casting or guarding.
-- **SC-002**: Outcome validation code is reduced by approximately 40% (structural presence checks removed), with only semantic checks remaining.
+- **SC-002**: Config validation code (formerly outcome validation) is reduced by approximately 40% (structural presence checks removed), with only semantic checks remaining.
 - **SC-003**: All existing experience documents pass the new schema validation after migration — zero parse errors across the entire collection.
 - **SC-004**: The experience library type filter returns correct results using the `draftType` field — functional parity with the previous `type` field behavior.
 - **SC-005**: Guest runtime and backend services correctly process experiences using the published config's type — no behavioral change from the user's perspective.
