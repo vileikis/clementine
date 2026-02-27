@@ -13,14 +13,7 @@
 import { z } from 'zod'
 
 import { experienceMediaSchema } from '../media/media-reference.schema'
-import {
-  aiImageConfigSchema,
-  aiVideoConfigSchema,
-  gifConfigSchema,
-  photoConfigSchema,
-  videoConfigSchema,
-} from './experience-config.schema'
-import { experienceStepSchema } from './step.schema'
+import { experienceConfigSchema } from './experience-config.schema'
 
 /**
  * Experience status enum schema
@@ -51,27 +44,6 @@ export const experienceTypeSchema = z.enum([
 ])
 
 /**
- * Experience Config Schema
- *
- * Configuration object that defines the structure and behavior of an experience.
- * Contains step definitions and transform pipeline nodes.
- */
-export const experienceConfigSchema = z.looseObject({
-  /** Array of steps in the experience (typed discriminated union) */
-  steps: z.array(experienceStepSchema).default([]),
-  /** Photo config — null means not configured */
-  photo: photoConfigSchema.nullable().default(null),
-  /** GIF config — null means not configured */
-  gif: gifConfigSchema.nullable().default(null),
-  /** Video config — null means not configured */
-  video: videoConfigSchema.nullable().default(null),
-  /** AI image config — null means not configured */
-  aiImage: aiImageConfigSchema.nullable().default(null),
-  /** AI video config — null means not configured */
-  aiVideo: aiVideoConfigSchema.nullable().default(null),
-})
-
-/**
  * Experience Schema
  *
  * Complete experience document schema including both admin metadata and configuration.
@@ -95,11 +67,10 @@ export const experienceSchema = z.looseObject({
   status: experienceStatusSchema.default('active'),
 
   /**
-   * Experience type
-   * Determines the kind of experience and its output format
-   * Set at creation, can be changed via config header
+   * Experience draft type — denormalized from draft.type for Firestore queries.
+   * Updated whenever draft type changes (create, switch type).
    */
-  type: experienceTypeSchema,
+  draftType: experienceTypeSchema,
 
   /** Optional thumbnail/cover image */
   media: experienceMediaSchema.default(null),
@@ -148,7 +119,6 @@ export const experienceSchema = z.looseObject({
  * TypeScript types exported from schemas
  */
 export type Experience = z.infer<typeof experienceSchema>
-export type ExperienceConfig = z.infer<typeof experienceConfigSchema>
 export type ExperienceStatus = z.infer<typeof experienceStatusSchema>
 export type ExperienceType = z.infer<typeof experienceTypeSchema>
 

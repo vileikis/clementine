@@ -23,10 +23,10 @@
 
 **⚠️ CRITICAL**: No other story can begin until this phase is complete (all app code depends on the new schema shape).
 
-- [ ] T001 [US1] Create discriminated union config variants in `packages/shared/src/schemas/experience/experience-config.schema.ts`. Define 6 `z.looseObject()` variants (survey, photo, ai.image, ai.video, gif, video) each with `type: z.literal(...)`, shared `steps` field, and type-specific config field. Combine into `experienceConfigSchema` using `z.discriminatedUnion('type', [...])`. Export individual variant schemas and the union type.
-- [ ] T002 [US1] Update experience document schema in `packages/shared/src/schemas/experience/experience.schema.ts`. Remove `type: experienceTypeSchema` field. Add `draftType: experienceTypeSchema` field. Change `draft` and `published` to use the new discriminated union `experienceConfigSchema`. Update `ExperienceConfig` and `Experience` type exports.
-- [ ] T003 [US1] Update shared package barrel exports in `packages/shared/src/schemas/experience/index.ts` (or wherever schemas are re-exported). Ensure new variant schemas and updated types are accessible to consumers. Build shared package and verify no errors: `pnpm --filter @clementine/shared build`.
-- [ ] T004 [US1] Update `apps/clementine-app/src/domains/experience/shared/schemas/experience.input.schemas.ts` (if it references ExperienceConfig or Experience types) to align with the new schema shape. Check for any other input schemas that reference `type` on Experience.
+- [X] T001 [US1] Create discriminated union config variants in `packages/shared/src/schemas/experience/experience-config.schema.ts`. Define 6 `z.looseObject()` variants (survey, photo, ai.image, ai.video, gif, video) each with `type: z.literal(...)`, shared `steps` field, and type-specific config field. Combine into `experienceConfigSchema` using `z.discriminatedUnion('type', [...])`. Export individual variant schemas and the union type.
+- [X] T002 [US1] Update experience document schema in `packages/shared/src/schemas/experience/experience.schema.ts`. Remove `type: experienceTypeSchema` field. Add `draftType: experienceTypeSchema` field. Change `draft` and `published` to use the new discriminated union `experienceConfigSchema`. Update `ExperienceConfig` and `Experience` type exports.
+- [X] T003 [US1] Update shared package barrel exports in `packages/shared/src/schemas/experience/index.ts` (or wherever schemas are re-exported). Ensure new variant schemas and updated types are accessible to consumers. Build shared package and verify no errors: `pnpm --filter @clementine/shared build`.
+- [X] T004 [US1] Update `apps/clementine-app/src/domains/experience/shared/schemas/experience.input.schemas.ts` (if it references ExperienceConfig or Experience types) to align with the new schema shape. Check for any other input schemas that reference `type` on Experience.
 
 **Checkpoint**: Shared package builds cleanly. TypeScript type narrowing works on `config.type`. All variants parse correctly.
 
@@ -38,7 +38,7 @@
 
 **Independent Test**: Run the migration script against a Firestore database. Verify all documents have `draftType` set, `type` removed, `draft.type` and `published.type` injected, and null config fields cleaned up. Run a second time and verify idempotency (no errors, no changes).
 
-- [ ] T005 [US2] Create migration script at `functions/scripts/migrations/083-config-discriminated-union.ts`. Using Firebase Admin SDK, iterate all experience documents in batches of 500. For each document: (1) read `experience.type`, (2) set `draft.type = experience.type`, (3) if `published` is not null set `published.type = experience.type`, (4) set `draftType = experience.type`, (5) delete top-level `type` field with `FieldValue.delete()`, (6) delete null type-specific config fields (photo, gif, video, aiImage, aiVideo) from draft and published. Add idempotency check: skip if `draft.type` already exists. Log progress (documents processed, skipped, errors).
+- [X] T005 [US2] Create migration script at `functions/scripts/migrations/083-config-discriminated-union.ts`. Using Firebase Admin SDK, iterate all experience documents in batches of 500. For each document: (1) read `experience.type`, (2) set `draft.type = experience.type`, (3) if `published` is not null set `published.type = experience.type`, (4) set `draftType = experience.type`, (5) delete top-level `type` field with `FieldValue.delete()`, (6) delete null type-specific config fields (photo, gif, video, aiImage, aiVideo) from draft and published. Add idempotency check: skip if `draft.type` already exists. Log progress (documents processed, skipped, errors).
 
 **Checkpoint**: Migration script runs successfully against Firestore. All documents parse through the new schema without errors.
 
@@ -136,9 +136,12 @@
 
 - [ ] T028 Run `pnpm --filter @clementine/shared build` to verify shared package compiles cleanly with new discriminated union schema.
 - [ ] T029 Run `pnpm app:type-check` from `apps/clementine-app/` to verify zero TypeScript errors across the entire app. Fix any remaining type errors from the `experience.type` removal.
-- [ ] T030 Run `pnpm app:check` (format + lint) from `apps/clementine-app/` to ensure code quality. Fix any lint/format issues.
-- [ ] T031 Search entire codebase for remaining references to `experience.type` (excluding comments/docs). Grep for `experience\.type` and `experience.type` across `apps/`, `functions/`, `packages/`. All should be replaced with `draftType`, `draft.type`, or `published.type`.
-- [ ] T032 Verify in local dev server (`pnpm app:dev`): create experience, switch types, edit config, filter library, publish. Confirm no runtime errors and identical behavior to before the refactor.
+- [ ] T030 Run `pnpm app:type-check` and fix any remaining type errors from the `outcomeTypeSchema` removal and `experience.type` changes.
+- [ ] T031 Search entire codebase for remaining references to `outcomeTypeSchema`, `OutcomeType` (as import from shared), and `experience.type` (excluding comments/docs). All should be cleaned up.
+- [ ] T032 Remove `outcomeTypeSchema` and `OutcomeType`. Delete the schema and type from `packages/shared/src/schemas/experience/experience-config.schema.ts`. Replace all `OutcomeType` usages with `Exclude<ExperienceType, 'survey'>` (Option A). Update consumers: `functions/src/services/transform/engine/runOutcome.ts`, `apps/.../experience-config-operations.ts`, `apps/.../model-options.ts`, `apps/.../ExperienceTypeSwitch.tsx`, `apps/.../CreateTabForm.tsx`, and the app barrel re-export in `apps/.../shared/schemas/index.ts`. Build shared package and type-check app to verify.
+- [ ] T033 Run `pnpm app:check` (format + lint) from `apps/clementine-app/` to ensure code quality. Fix any lint/format issues.
+- [ ] T034 Search entire codebase for remaining references to `experience.type` (excluding comments/docs). Grep for `experience\.type` and `experience.type` across `apps/`, `functions/`, `packages/`. All should be replaced with `draftType`, `draft.type`, or `published.type`.
+- [ ] T035 Verify in local dev server (`pnpm app:dev`): create experience, switch types, edit config, filter library, publish. Confirm no runtime errors and identical behavior to before the refactor.
 
 ---
 
