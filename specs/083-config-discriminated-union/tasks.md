@@ -134,13 +134,13 @@
 
 **Purpose**: Final validation, cleanup, and verification across all workspaces.
 
-- [ ] T028 Run `pnpm --filter @clementine/shared build` to verify shared package compiles cleanly with new discriminated union schema.
-- [ ] T029 Run `pnpm app:type-check` from `apps/clementine-app/` to verify zero TypeScript errors across the entire app. Fix any remaining type errors from the `experience.type` removal.
-- [ ] T030 Run `pnpm app:type-check` and fix any remaining type errors from the `outcomeTypeSchema` removal and `experience.type` changes.
-- [ ] T031 Search entire codebase for remaining references to `outcomeTypeSchema`, `OutcomeType` (as import from shared), and `experience.type` (excluding comments/docs). All should be cleaned up.
-- [ ] T032 Remove `outcomeTypeSchema` and `OutcomeType`. Delete the schema and type from `packages/shared/src/schemas/experience/experience-config.schema.ts`. Replace all `OutcomeType` usages with `Exclude<ExperienceType, 'survey'>` (Option A). Update consumers: `functions/src/services/transform/engine/runOutcome.ts`, `apps/.../experience-config-operations.ts`, `apps/.../model-options.ts`, `apps/.../ExperienceTypeSwitch.tsx`, `apps/.../CreateTabForm.tsx`, and the app barrel re-export in `apps/.../shared/schemas/index.ts`. Build shared package and type-check app to verify.
-- [ ] T033 Run `pnpm app:check` (format + lint) from `apps/clementine-app/` to ensure code quality. Fix any lint/format issues.
-- [ ] T034 Search entire codebase for remaining references to `experience.type` (excluding comments/docs). Grep for `experience\.type` and `experience.type` across `apps/`, `functions/`, `packages/`. All should be replaced with `draftType`, `draft.type`, or `published.type`.
+- [X] T028 Run `pnpm --filter @clementine/shared build` to verify shared package compiles cleanly with new discriminated union schema.
+- [X] T029 Run `pnpm app:type-check` from `apps/clementine-app/` to verify zero TypeScript errors across the entire app. Fix any remaining type errors from the `experience.type` removal.
+- [X] T030 Run `pnpm app:type-check` and fix any remaining type errors from the `outcomeTypeSchema` removal and `experience.type` changes.
+- [X] T031 Search entire codebase for remaining references to `outcomeTypeSchema`, `OutcomeType` (as import from shared), and `experience.type` (excluding comments/docs). All should be cleaned up.
+- [X] T032 Remove `outcomeTypeSchema` and `OutcomeType`. Delete the schema and type from `packages/shared/src/schemas/experience/experience-config.schema.ts`. Replace all `OutcomeType` usages with `Exclude<ExperienceType, 'survey'>` (Option A). Update consumers: `functions/src/services/transform/engine/runOutcome.ts`, `apps/.../experience-config-operations.ts`, `apps/.../model-options.ts`, `apps/.../ExperienceTypeSwitch.tsx`, `apps/.../CreateTabForm.tsx`, and the app barrel re-export in `apps/.../shared/schemas/index.ts`. Build shared package and type-check app to verify.
+- [X] T033 Run `pnpm app:check` (format + lint) from `apps/clementine-app/` to ensure code quality. Fix any lint/format issues.
+- [X] T034 Search entire codebase for remaining references to `experience.type` (excluding comments/docs). Grep for `experience\.type` and `experience.type` across `apps/`, `functions/`, `packages/`. All should be replaced with `draftType`, `draft.type`, or `published.type`.
 - [ ] T035 Verify in local dev server (`pnpm app:dev`): create experience, switch types, edit config, filter library, publish. Confirm no runtime errors and identical behavior to before the refactor.
 
 ---

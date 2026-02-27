@@ -19,18 +19,8 @@ import { mediaReferenceSchema } from '../media/media-reference.schema'
 import { experienceStepSchema } from './step.schema'
 
 // ── OutcomeType ──────────────────────────────────────────────
-
-/**
- * Outcome type enum — the subset of experience types that produce output.
- * Used by backend executor dispatch. Excludes 'survey' which has no output.
- */
-export const outcomeTypeSchema = z.enum([
-  'photo',
-  'gif',
-  'video',
-  'ai.image',
-  'ai.video',
-])
+// outcomeTypeSchema removed — the discriminated union makes a separate
+// Zod enum redundant. OutcomeType is now a derived type alias (see below).
 
 // ── AI Image Model ───────────────────────────────────────────
 
@@ -218,7 +208,6 @@ export type AIVideoConfigVariant = z.infer<typeof aiVideoConfigVariantSchema>
 export type GifConfigVariant = z.infer<typeof gifConfigVariantSchema>
 export type VideoConfigVariant = z.infer<typeof videoConfigVariantSchema>
 
-export type OutcomeType = z.infer<typeof outcomeTypeSchema>
 export type AIImageModel = z.infer<typeof aiImageModelSchema>
 export type AIImageAspectRatio = z.infer<typeof aiImageAspectRatioSchema>
 export type ImageGenerationConfig = z.infer<typeof imageGenerationConfigSchema>

@@ -36,7 +36,12 @@ function createAiImageConfig(
     imageGeneration: {
       prompt: string
       model: string
-      refMedia: { mediaAssetId: string; url: string; filePath: string; displayName: string }[]
+      refMedia: {
+        mediaAssetId: string
+        url: string
+        filePath: string
+        displayName: string
+      }[]
       aspectRatio: string | null
     }
   } = {
@@ -168,7 +173,10 @@ describe('validateConfig', () => {
 
   describe('Photo type validation', () => {
     it('fails when photo captureStepId is empty', () => {
-      const config = createPhotoConfig({ captureStepId: '', aspectRatio: '1:1' })
+      const config = createPhotoConfig({
+        captureStepId: '',
+        aspectRatio: '1:1',
+      })
       const result = validateConfig(config, [])
 
       expect(result.valid).toBe(false)

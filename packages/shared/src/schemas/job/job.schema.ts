@@ -107,7 +107,7 @@ export const jobSnapshotSchema = z.object({
   sessionResponses: z.array(sessionResponseSchema).default([]),
   /** Experience version at time of job creation */
   experienceVersion: z.number().int().positive(),
-  /** Experience type (from experience.type) — determines executor dispatch */
+  /** Experience type (from config.type) — determines executor dispatch */
   type: experienceTypeSchema,
   /** Per-type configuration (from experience config at publish time) */
   config: snapshotConfigSchema,

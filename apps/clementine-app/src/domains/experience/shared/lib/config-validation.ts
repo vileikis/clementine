@@ -197,10 +197,7 @@ function validateAiVideo(
 
 const typeValidators: Record<
   string,
-  (
-    config: ExperienceConfig,
-    steps: ExperienceStep[],
-  ) => ConfigValidationError[]
+  (config: ExperienceConfig, steps: ExperienceStep[]) => ConfigValidationError[]
 > = {
   photo: validatePhoto,
   'ai.image': validateAiImage,

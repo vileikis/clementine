@@ -122,6 +122,9 @@ export type Experience = z.infer<typeof experienceSchema>
 export type ExperienceStatus = z.infer<typeof experienceStatusSchema>
 export type ExperienceType = z.infer<typeof experienceTypeSchema>
 
+/** Subset of experience types that produce output (excludes 'survey'). */
+export type OutcomeType = Exclude<ExperienceType, 'survey'>
+
 // Re-export media schemas for backward compatibility
 export {
   experienceMediaSchema,

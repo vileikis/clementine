@@ -12,9 +12,9 @@ import {
   runTransaction,
   serverTimestamp,
 } from 'firebase/firestore'
+import { buildDefaultDraft } from '../hooks/useCreateExperience'
 import type { ExperienceStep, ExperienceType } from '../schemas'
 import { firestore } from '@/integrations/firebase/client'
-import { buildDefaultDraft } from '../hooks/useCreateExperience'
 
 /**
  * Switch experience type atomically.
