@@ -12,7 +12,7 @@ import * as Sentry from '@sentry/tanstackstart-react'
 import { doc, runTransaction, serverTimestamp } from 'firebase/firestore'
 
 import { experienceKeys } from '../../shared/queries/experience.query'
-import { validateOutcome } from '../../shared/lib/outcome-validation'
+import { validateConfig } from '../../shared/lib/config-validation'
 import { stepRegistry } from '../../steps/registry/step-registry'
 import { getStepTypesForType } from '../../steps/registry/step-utils'
 import type { UpdateData } from 'firebase/firestore'
@@ -112,25 +112,24 @@ export function validateForPublish(
   }
 
   // Rule 3: Type constraints
-  const allowedTypes = getStepTypesForType(experience.type)
+  const allowedTypes = getStepTypesForType(experience.draft.type)
   for (const step of experience.draft.steps) {
     if (!allowedTypes.includes(step.type)) {
       errors.push({
         field: 'steps',
         stepId: step.id,
-        message: `Step type "${step.type}" is not allowed for ${experience.type} type`,
+        message: `Step type "${step.type}" is not allowed for ${experience.draft.type} type`,
       })
     }
   }
 
-  // Rule 4: Outcome validation
-  const outcomeValidation = validateOutcome(
-    experience.type,
+  // Rule 4: Config validation
+  const configValidation = validateConfig(
     experience.draft,
     experience.draft.steps,
   )
-  if (!outcomeValidation.valid) {
-    errors.push(...outcomeValidation.errors)
+  if (!configValidation.valid) {
+    errors.push(...configValidation.errors)
   }
 
   return {

@@ -32,7 +32,7 @@ import { useMarkExperienceComplete, usePregate, usePreshare } from '../hooks'
 import { useInitSession, useLinkSession } from '@/domains/session/shared'
 import { ExperienceRuntime } from '@/domains/experience/runtime'
 import { useStartTransformPipeline } from '@/domains/experience/transform'
-import { hasOutcome } from '@/domains/experience/shared/utils/hasTransformConfig'
+import { hasTypeConfig } from '@/domains/experience/shared/utils/config-checks'
 import {
   ThemeProvider,
   ThemedBackground,
@@ -226,7 +226,7 @@ export function ExperiencePage({
     }
 
     // 2. Trigger transform pipeline if outcome is configured (throws on failure)
-    if (experience && hasOutcome(experience, 'published')) {
+    if (experience?.published && hasTypeConfig(experience.published)) {
       await startTransformPipeline({
         projectId: project.id,
         sessionId,

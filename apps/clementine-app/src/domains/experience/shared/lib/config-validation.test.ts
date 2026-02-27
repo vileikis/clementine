@@ -1,31 +1,97 @@
 /**
- * Outcome Validation Tests
+ * Config Validation Tests
  *
- * Unit tests for validateOutcome function with per-type config architecture.
+ * Unit tests for validateConfig function with discriminated union config.
  *
- * @see specs/081-experience-type-flattening
+ * @see specs/083-config-discriminated-union
  */
 import { describe, expect, it } from 'vitest'
-import { isCaptureStep, validateOutcome } from './outcome-validation'
+import { isCaptureStep, validateConfig } from './config-validation'
 import type {
   AIVideoConfig,
   ExperienceConfig,
   ExperienceStep,
-  ExperienceType,
 } from '@clementine/shared'
 
-// Test helpers
-function createDefaultConfig(
-  overrides: Partial<ExperienceConfig> = {},
+// Test helpers — build discriminated union config variants
+
+function createSurveyConfig(): ExperienceConfig {
+  return { type: 'survey', steps: [] } as ExperienceConfig
+}
+
+function createPhotoConfig(
+  photo: { captureStepId: string; aspectRatio: string } = {
+    captureStepId: '',
+    aspectRatio: '1:1',
+  },
+): ExperienceConfig {
+  return { type: 'photo', steps: [], photo } as ExperienceConfig
+}
+
+function createAiImageConfig(
+  aiImage: {
+    task: string
+    captureStepId: string | null
+    aspectRatio: string
+    imageGeneration: {
+      prompt: string
+      model: string
+      refMedia: { mediaAssetId: string; url: string; filePath: string; displayName: string }[]
+      aspectRatio: string | null
+    }
+  } = {
+    task: 'text-to-image',
+    captureStepId: null,
+    aspectRatio: '1:1',
+    imageGeneration: {
+      prompt: '',
+      model: 'gemini-2.5-flash-image',
+      refMedia: [],
+      aspectRatio: null,
+    },
+  },
+): ExperienceConfig {
+  return { type: 'ai.image', steps: [], aiImage } as ExperienceConfig
+}
+
+function createGifConfig(): ExperienceConfig {
+  return {
+    type: 'gif',
+    steps: [],
+    gif: { captureStepId: '', aspectRatio: '1:1' },
+  } as ExperienceConfig
+}
+
+function createVideoConfig(): ExperienceConfig {
+  return {
+    type: 'video',
+    steps: [],
+    video: { captureStepId: '', aspectRatio: '9:16' },
+  } as ExperienceConfig
+}
+
+const defaultAiVideo: AIVideoConfig = {
+  task: 'image-to-video',
+  captureStepId: 'step-1',
+  aspectRatio: '9:16',
+  startFrameImageGen: null,
+  endFrameImageGen: null,
+  videoGeneration: {
+    prompt: 'Animate this',
+    model: 'veo-3.1-fast-generate-001',
+    duration: 6,
+    aspectRatio: null,
+    refMedia: [],
+  },
+}
+
+function createAiVideoConfig(
+  overrides: Partial<AIVideoConfig> = {},
 ): ExperienceConfig {
   return {
+    type: 'ai.video',
     steps: [],
-    photo: null,
-    gif: null,
-    video: null,
-    aiImage: null,
-    aiVideo: null,
-    ...overrides,
+    aiVideo: { ...defaultAiVideo, ...overrides },
   } as ExperienceConfig
 }
 
@@ -68,40 +134,19 @@ describe('isCaptureStep', () => {
   })
 })
 
-describe('validateOutcome', () => {
+describe('validateConfig', () => {
   describe('Survey type (no per-type config)', () => {
     it('passes for survey type - no outcome generation needed', () => {
-      const result = validateOutcome('survey', null, [])
+      const result = validateConfig(createSurveyConfig(), [])
 
       expect(result.valid).toBe(true)
       expect(result.errors).toHaveLength(0)
-    })
-
-    it('passes for survey type even with config', () => {
-      const config = createDefaultConfig()
-      const result = validateOutcome('survey', config, [])
-
-      expect(result.valid).toBe(true)
-      expect(result.errors).toHaveLength(0)
-    })
-  })
-
-  describe('Null config', () => {
-    it('fails when config is null for non-survey type', () => {
-      const result = validateOutcome('photo', null, [])
-
-      expect(result.valid).toBe(false)
-      expect(result.errors).toContainEqual({
-        field: 'config',
-        message: 'Experience configuration is required',
-      })
     })
   })
 
   describe('Coming soon types', () => {
     it('fails when type is gif', () => {
-      const config = createDefaultConfig()
-      const result = validateOutcome('gif', config, [])
+      const result = validateConfig(createGifConfig(), [])
 
       expect(result.valid).toBe(false)
       expect(result.errors).toContainEqual({
@@ -111,8 +156,7 @@ describe('validateOutcome', () => {
     })
 
     it('fails when type is video', () => {
-      const config = createDefaultConfig()
-      const result = validateOutcome('video', config, [])
+      const result = validateConfig(createVideoConfig(), [])
 
       expect(result.valid).toBe(false)
       expect(result.errors).toContainEqual({
@@ -123,24 +167,9 @@ describe('validateOutcome', () => {
   })
 
   describe('Photo type validation', () => {
-    const type: ExperienceType = 'photo'
-
-    it('fails when photo config is missing', () => {
-      const config = createDefaultConfig({ photo: null })
-      const result = validateOutcome(type, config, [])
-
-      expect(result.valid).toBe(false)
-      expect(result.errors).toContainEqual({
-        field: 'photo',
-        message: 'Photo configuration is missing',
-      })
-    })
-
     it('fails when photo captureStepId is empty', () => {
-      const config = createDefaultConfig({
-        photo: { captureStepId: '', aspectRatio: '1:1' },
-      })
-      const result = validateOutcome(type, config, [])
+      const config = createPhotoConfig({ captureStepId: '', aspectRatio: '1:1' })
+      const result = validateConfig(config, [])
 
       expect(result.valid).toBe(false)
       expect(result.errors).toContainEqual({
@@ -150,10 +179,11 @@ describe('validateOutcome', () => {
     })
 
     it('fails when photo captureStepId references non-existent step', () => {
-      const config = createDefaultConfig({
-        photo: { captureStepId: 'non-existent', aspectRatio: '1:1' },
+      const config = createPhotoConfig({
+        captureStepId: 'non-existent',
+        aspectRatio: '1:1',
       })
-      const result = validateOutcome(type, config, [])
+      const result = validateConfig(config, [])
 
       expect(result.valid).toBe(false)
       expect(result.errors).toContainEqual({
@@ -165,10 +195,11 @@ describe('validateOutcome', () => {
 
     it('fails when photo captureStepId references non-capture step', () => {
       const steps = [createInfoStep('step-1')]
-      const config = createDefaultConfig({
-        photo: { captureStepId: 'step-1', aspectRatio: '1:1' },
+      const config = createPhotoConfig({
+        captureStepId: 'step-1',
+        aspectRatio: '1:1',
       })
-      const result = validateOutcome(type, config, steps)
+      const result = validateConfig(config, steps)
 
       expect(result.valid).toBe(false)
       expect(result.errors).toContainEqual({
@@ -180,10 +211,11 @@ describe('validateOutcome', () => {
 
     it('passes with valid photo configuration', () => {
       const steps = [createCaptureStep('step-1')]
-      const config = createDefaultConfig({
-        photo: { captureStepId: 'step-1', aspectRatio: '1:1' },
+      const config = createPhotoConfig({
+        captureStepId: 'step-1',
+        aspectRatio: '1:1',
       })
-      const result = validateOutcome(type, config, steps)
+      const result = validateConfig(config, steps)
 
       expect(result.valid).toBe(true)
       expect(result.errors).toHaveLength(0)
@@ -191,34 +223,19 @@ describe('validateOutcome', () => {
   })
 
   describe('AI Image type validation', () => {
-    const type: ExperienceType = 'ai.image'
-
-    it('fails when aiImage config is missing', () => {
-      const config = createDefaultConfig({ aiImage: null })
-      const result = validateOutcome(type, config, [])
-
-      expect(result.valid).toBe(false)
-      expect(result.errors).toContainEqual({
-        field: 'aiImage',
-        message: 'AI Image configuration is missing',
-      })
-    })
-
     it('fails when prompt is empty', () => {
-      const config = createDefaultConfig({
-        aiImage: {
-          task: 'text-to-image',
-          captureStepId: null,
-          aspectRatio: '1:1',
-          imageGeneration: {
-            prompt: '',
-            model: 'gemini-2.5-flash-image',
-            refMedia: [],
-            aspectRatio: null,
-          },
+      const config = createAiImageConfig({
+        task: 'text-to-image',
+        captureStepId: null,
+        aspectRatio: '1:1',
+        imageGeneration: {
+          prompt: '',
+          model: 'gemini-2.5-flash-image',
+          refMedia: [],
+          aspectRatio: null,
         },
       })
-      const result = validateOutcome(type, config, [])
+      const result = validateConfig(config, [])
 
       expect(result.valid).toBe(false)
       expect(result.errors).toContainEqual({
@@ -228,20 +245,18 @@ describe('validateOutcome', () => {
     })
 
     it('fails when prompt is whitespace', () => {
-      const config = createDefaultConfig({
-        aiImage: {
-          task: 'text-to-image',
-          captureStepId: null,
-          aspectRatio: '1:1',
-          imageGeneration: {
-            prompt: '   ',
-            model: 'gemini-2.5-flash-image',
-            refMedia: [],
-            aspectRatio: null,
-          },
+      const config = createAiImageConfig({
+        task: 'text-to-image',
+        captureStepId: null,
+        aspectRatio: '1:1',
+        imageGeneration: {
+          prompt: '   ',
+          model: 'gemini-2.5-flash-image',
+          refMedia: [],
+          aspectRatio: null,
         },
       })
-      const result = validateOutcome(type, config, [])
+      const result = validateConfig(config, [])
 
       expect(result.valid).toBe(false)
       expect(result.errors).toContainEqual({
@@ -251,20 +266,18 @@ describe('validateOutcome', () => {
     })
 
     it('fails when i2i has no captureStepId', () => {
-      const config = createDefaultConfig({
-        aiImage: {
-          task: 'image-to-image',
-          captureStepId: null,
-          aspectRatio: '1:1',
-          imageGeneration: {
-            prompt: 'Transform photo',
-            model: 'gemini-2.5-flash-image',
-            refMedia: [],
-            aspectRatio: null,
-          },
+      const config = createAiImageConfig({
+        task: 'image-to-image',
+        captureStepId: null,
+        aspectRatio: '1:1',
+        imageGeneration: {
+          prompt: 'Transform photo',
+          model: 'gemini-2.5-flash-image',
+          refMedia: [],
+          aspectRatio: null,
         },
       })
-      const result = validateOutcome(type, config, [])
+      const result = validateConfig(config, [])
 
       expect(result.valid).toBe(false)
       expect(result.errors).toContainEqual({
@@ -274,20 +287,18 @@ describe('validateOutcome', () => {
     })
 
     it('fails when i2i captureStepId references non-existent step', () => {
-      const config = createDefaultConfig({
-        aiImage: {
-          task: 'image-to-image',
-          captureStepId: 'non-existent',
-          aspectRatio: '1:1',
-          imageGeneration: {
-            prompt: 'Transform photo',
-            model: 'gemini-2.5-flash-image',
-            refMedia: [],
-            aspectRatio: null,
-          },
+      const config = createAiImageConfig({
+        task: 'image-to-image',
+        captureStepId: 'non-existent',
+        aspectRatio: '1:1',
+        imageGeneration: {
+          prompt: 'Transform photo',
+          model: 'gemini-2.5-flash-image',
+          refMedia: [],
+          aspectRatio: null,
         },
       })
-      const result = validateOutcome(type, config, [])
+      const result = validateConfig(config, [])
 
       expect(result.valid).toBe(false)
       expect(result.errors).toContainEqual({
@@ -298,33 +309,31 @@ describe('validateOutcome', () => {
     })
 
     it('fails with duplicate refMedia displayNames', () => {
-      const config = createDefaultConfig({
-        aiImage: {
-          task: 'text-to-image',
-          captureStepId: null,
-          aspectRatio: '1:1',
-          imageGeneration: {
-            prompt: 'Test',
-            model: 'gemini-2.5-flash-image',
-            refMedia: [
-              {
-                mediaAssetId: 'asset-1',
-                url: 'https://example.com/1.jpg',
-                filePath: 'path/1.jpg',
-                displayName: 'style',
-              },
-              {
-                mediaAssetId: 'asset-2',
-                url: 'https://example.com/2.jpg',
-                filePath: 'path/2.jpg',
-                displayName: 'style',
-              },
-            ],
-            aspectRatio: null,
-          },
+      const config = createAiImageConfig({
+        task: 'text-to-image',
+        captureStepId: null,
+        aspectRatio: '1:1',
+        imageGeneration: {
+          prompt: 'Test',
+          model: 'gemini-2.5-flash-image',
+          refMedia: [
+            {
+              mediaAssetId: 'asset-1',
+              url: 'https://example.com/1.jpg',
+              filePath: 'path/1.jpg',
+              displayName: 'style',
+            },
+            {
+              mediaAssetId: 'asset-2',
+              url: 'https://example.com/2.jpg',
+              filePath: 'path/2.jpg',
+              displayName: 'style',
+            },
+          ],
+          aspectRatio: null,
         },
       })
-      const result = validateOutcome(type, config, [])
+      const result = validateConfig(config, [])
 
       expect(result.valid).toBe(false)
       expect(result.errors).toContainEqual({
@@ -334,20 +343,18 @@ describe('validateOutcome', () => {
     })
 
     it('passes with valid t2i configuration', () => {
-      const config = createDefaultConfig({
-        aiImage: {
-          task: 'text-to-image',
-          captureStepId: null,
-          aspectRatio: '1:1',
-          imageGeneration: {
-            prompt: 'Generate a beautiful landscape',
-            model: 'gemini-2.5-flash-image',
-            refMedia: [],
-            aspectRatio: null,
-          },
+      const config = createAiImageConfig({
+        task: 'text-to-image',
+        captureStepId: null,
+        aspectRatio: '1:1',
+        imageGeneration: {
+          prompt: 'Generate a beautiful landscape',
+          model: 'gemini-2.5-flash-image',
+          refMedia: [],
+          aspectRatio: null,
         },
       })
-      const result = validateOutcome(type, config, [])
+      const result = validateConfig(config, [])
 
       expect(result.valid).toBe(true)
       expect(result.errors).toHaveLength(0)
@@ -355,95 +362,52 @@ describe('validateOutcome', () => {
 
     it('passes with valid i2i configuration', () => {
       const steps = [createCaptureStep('step-1')]
-      const config = createDefaultConfig({
-        aiImage: {
-          task: 'image-to-image',
-          captureStepId: 'step-1',
-          aspectRatio: '1:1',
-          imageGeneration: {
-            prompt: 'Transform photo into art',
-            model: 'gemini-2.5-flash-image',
-            refMedia: [
-              {
-                mediaAssetId: 'asset-1',
-                url: 'https://example.com/1.jpg',
-                filePath: 'path/1.jpg',
-                displayName: 'style',
-              },
-            ],
-            aspectRatio: null,
-          },
+      const config = createAiImageConfig({
+        task: 'image-to-image',
+        captureStepId: 'step-1',
+        aspectRatio: '1:1',
+        imageGeneration: {
+          prompt: 'Transform photo into art',
+          model: 'gemini-2.5-flash-image',
+          refMedia: [
+            {
+              mediaAssetId: 'asset-1',
+              url: 'https://example.com/1.jpg',
+              filePath: 'path/1.jpg',
+              displayName: 'style',
+            },
+          ],
+          aspectRatio: null,
         },
       })
-      const result = validateOutcome(type, config, steps)
+      const result = validateConfig(config, steps)
 
       expect(result.valid).toBe(true)
       expect(result.errors).toHaveLength(0)
     })
 
     it('passes t2i even without captureStepId', () => {
-      const config = createDefaultConfig({
-        aiImage: {
-          task: 'text-to-image',
-          captureStepId: null,
-          aspectRatio: '1:1',
-          imageGeneration: {
-            prompt: 'Generate an image',
-            model: 'gemini-2.5-flash-image',
-            refMedia: [],
-            aspectRatio: null,
-          },
+      const config = createAiImageConfig({
+        task: 'text-to-image',
+        captureStepId: null,
+        aspectRatio: '1:1',
+        imageGeneration: {
+          prompt: 'Generate an image',
+          model: 'gemini-2.5-flash-image',
+          refMedia: [],
+          aspectRatio: null,
         },
       })
-      const result = validateOutcome(type, config, [])
+      const result = validateConfig(config, [])
 
       expect(result.valid).toBe(true)
     })
   })
 
   describe('AI Video type validation', () => {
-    const type: ExperienceType = 'ai.video'
-
-    const defaultAiVideo: AIVideoConfig = {
-      task: 'image-to-video',
-      captureStepId: 'step-1',
-      aspectRatio: '9:16',
-      startFrameImageGen: null,
-      endFrameImageGen: null,
-      videoGeneration: {
-        prompt: 'Animate this',
-        model: 'veo-3.1-fast-generate-001',
-        duration: 6,
-        aspectRatio: null,
-        refMedia: [],
-      },
-    }
-
-    function createAiVideoConfig(
-      overrides: Partial<AIVideoConfig> = {},
-    ): ExperienceConfig {
-      return createDefaultConfig({
-        aiVideo: {
-          ...defaultAiVideo,
-          ...overrides,
-        },
-      })
-    }
-
-    it('fails when aiVideo config is missing', () => {
-      const config = createDefaultConfig({ aiVideo: null })
-      const result = validateOutcome(type, config, [])
-
-      expect(result.valid).toBe(false)
-      expect(result.errors).toContainEqual({
-        field: 'aiVideo',
-        message: 'AI Video configuration is missing',
-      })
-    })
-
     it('fails when captureStepId is empty', () => {
       const config = createAiVideoConfig({ captureStepId: '' })
-      const result = validateOutcome(type, config, [])
+      const result = validateConfig(config, [])
 
       expect(result.valid).toBe(false)
       expect(result.errors).toContainEqual({
@@ -463,7 +427,7 @@ describe('validateOutcome', () => {
           refMedia: [],
         },
       })
-      const result = validateOutcome(type, config, steps)
+      const result = validateConfig(config, steps)
 
       expect(result.valid).toBe(false)
       expect(result.errors).toContainEqual({
@@ -474,7 +438,7 @@ describe('validateOutcome', () => {
 
     it('fails when captureStepId references non-existent step', () => {
       const config = createAiVideoConfig({ captureStepId: 'non-existent' })
-      const result = validateOutcome(type, config, [])
+      const result = validateConfig(config, [])
 
       expect(result.valid).toBe(false)
       expect(result.errors).toContainEqual({
@@ -487,7 +451,7 @@ describe('validateOutcome', () => {
     it('fails when captureStepId references non-capture step', () => {
       const steps = [createInfoStep('step-1')]
       const config = createAiVideoConfig({ captureStepId: 'step-1' })
-      const result = validateOutcome(type, config, steps)
+      const result = validateConfig(config, steps)
 
       expect(result.valid).toBe(false)
       expect(result.errors).toContainEqual({
@@ -520,7 +484,7 @@ describe('validateOutcome', () => {
           aspectRatio: null,
         },
       })
-      const result = validateOutcome(type, config, steps)
+      const result = validateConfig(config, steps)
 
       expect(result.valid).toBe(false)
       expect(result.errors).toContainEqual({
@@ -552,7 +516,7 @@ describe('validateOutcome', () => {
           aspectRatio: null,
         },
       })
-      const result = validateOutcome(type, config, steps)
+      const result = validateConfig(config, steps)
 
       expect(result.valid).toBe(false)
       expect(result.errors).toContainEqual({
@@ -564,7 +528,7 @@ describe('validateOutcome', () => {
     it('passes with valid ai.video configuration', () => {
       const steps = [createCaptureStep('step-1')]
       const config = createAiVideoConfig()
-      const result = validateOutcome(type, config, steps)
+      const result = validateConfig(config, steps)
 
       expect(result.valid).toBe(true)
       expect(result.errors).toHaveLength(0)
@@ -600,7 +564,7 @@ describe('validateOutcome', () => {
           aspectRatio: null,
         },
       })
-      const result = validateOutcome(type, config, steps)
+      const result = validateConfig(config, steps)
 
       expect(result.valid).toBe(true)
       expect(result.errors).toHaveLength(0)

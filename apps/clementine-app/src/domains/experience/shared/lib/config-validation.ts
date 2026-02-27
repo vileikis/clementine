@@ -1,21 +1,20 @@
 /**
- * Outcome Validation
+ * Config Validation
  *
  * Validates per-type experience configuration for publishing.
  * Pure function for easy testing and reuse across publish hook and future UI.
  *
- * @see specs/081-experience-type-flattening
+ * With the discriminated union schema, structural checks (e.g. "config is missing")
+ * are enforced at parse time by Zod. Only semantic checks remain here.
+ *
+ * @see specs/083-config-discriminated-union
  */
-import type {
-  ExperienceConfig,
-  ExperienceStep,
-  ExperienceType,
-} from '@clementine/shared'
+import type { ExperienceConfig, ExperienceStep } from '@clementine/shared'
 
 /**
- * Validation error returned from outcome validation.
+ * Validation error returned from config validation.
  */
-export interface OutcomeValidationError {
+export interface ConfigValidationError {
   /** Field path that failed validation (e.g., 'photo.captureStepId') */
   field: string
   /** User-friendly error message */
@@ -25,13 +24,13 @@ export interface OutcomeValidationError {
 }
 
 /**
- * Result of outcome validation.
+ * Result of config validation.
  */
-export interface OutcomeValidationResult {
-  /** Whether the outcome configuration is valid */
+export interface ConfigValidationResult {
+  /** Whether the configuration is valid */
   valid: boolean
   /** List of validation errors (empty if valid) */
-  errors: OutcomeValidationError[]
+  errors: ConfigValidationError[]
 }
 
 const COMING_SOON_TYPES = new Set(['gif', 'video'])
@@ -54,7 +53,7 @@ function validateCaptureStepId(
   captureStepId: string,
   steps: ExperienceStep[],
   fieldPrefix: string,
-): OutcomeValidationError | undefined {
+): ConfigValidationError | undefined {
   if (!captureStepId) {
     return {
       field: `${fieldPrefix}.captureStepId`,
@@ -90,7 +89,7 @@ function validateCaptureStepId(
 function validateRefMediaDisplayNames(
   refMedia: { displayName: string }[],
   field: string,
-): OutcomeValidationError | undefined {
+): ConfigValidationError | undefined {
   const displayNames = refMedia.map((r) => r.displayName)
   const duplicates = displayNames.filter(
     (name, index) => displayNames.indexOf(name) !== index,
@@ -109,42 +108,35 @@ function validateRefMediaDisplayNames(
 function validatePhoto(
   config: ExperienceConfig,
   steps: ExperienceStep[],
-): OutcomeValidationError[] {
-  const typeConfig = config.photo
-  if (!typeConfig) {
-    return [{ field: 'photo', message: 'Photo configuration is missing' }]
-  }
+): ConfigValidationError[] {
+  if (config.type !== 'photo') return []
 
-  const error = validateCaptureStepId(typeConfig.captureStepId, steps, 'photo')
+  const error = validateCaptureStepId(
+    config.photo.captureStepId,
+    steps,
+    'photo',
+  )
   return error ? [error] : []
 }
 
 function validateAiImage(
   config: ExperienceConfig,
   steps: ExperienceStep[],
-): OutcomeValidationError[] {
-  const typeConfig = config.aiImage
-  if (!typeConfig) {
-    return [
-      {
-        field: 'aiImage',
-        message: 'AI Image configuration is missing',
-      },
-    ]
-  }
+): ConfigValidationError[] {
+  if (config.type !== 'ai.image') return []
 
-  const errors: OutcomeValidationError[] = []
+  const errors: ConfigValidationError[] = []
 
-  if (!typeConfig.imageGeneration.prompt?.trim()) {
+  if (!config.aiImage.imageGeneration.prompt?.trim()) {
     errors.push({
       field: 'aiImage.imageGeneration.prompt',
       message: 'Prompt is required for AI Image output',
     })
   }
 
-  if (typeConfig.task === 'image-to-image') {
+  if (config.aiImage.task === 'image-to-image') {
     const stepError = validateCaptureStepId(
-      typeConfig.captureStepId ?? '',
+      config.aiImage.captureStepId ?? '',
       steps,
       'aiImage',
     )
@@ -152,7 +144,7 @@ function validateAiImage(
   }
 
   const refError = validateRefMediaDisplayNames(
-    typeConfig.imageGeneration.refMedia ?? [],
+    config.aiImage.imageGeneration.refMedia ?? [],
     'aiImage.imageGeneration.refMedia',
   )
   if (refError) errors.push(refError)
@@ -163,44 +155,36 @@ function validateAiImage(
 function validateAiVideo(
   config: ExperienceConfig,
   steps: ExperienceStep[],
-): OutcomeValidationError[] {
-  const typeConfig = config.aiVideo
-  if (!typeConfig) {
-    return [
-      {
-        field: 'aiVideo',
-        message: 'AI Video configuration is missing',
-      },
-    ]
-  }
+): ConfigValidationError[] {
+  if (config.type !== 'ai.video') return []
 
-  const errors: OutcomeValidationError[] = []
+  const errors: ConfigValidationError[] = []
 
   const stepError = validateCaptureStepId(
-    typeConfig.captureStepId,
+    config.aiVideo.captureStepId,
     steps,
     'aiVideo',
   )
   if (stepError) errors.push(stepError)
 
-  if (!typeConfig.videoGeneration?.prompt?.trim()) {
+  if (!config.aiVideo.videoGeneration?.prompt?.trim()) {
     errors.push({
       field: 'aiVideo.videoGeneration.prompt',
       message: 'Video generation prompt is required',
     })
   }
 
-  if (typeConfig.startFrameImageGen) {
+  if (config.aiVideo.startFrameImageGen) {
     const refError = validateRefMediaDisplayNames(
-      typeConfig.startFrameImageGen.refMedia ?? [],
+      config.aiVideo.startFrameImageGen.refMedia ?? [],
       'aiVideo.startFrameImageGen.refMedia',
     )
     if (refError) errors.push(refError)
   }
 
-  if (typeConfig.endFrameImageGen) {
+  if (config.aiVideo.endFrameImageGen) {
     const refError = validateRefMediaDisplayNames(
-      typeConfig.endFrameImageGen.refMedia ?? [],
+      config.aiVideo.endFrameImageGen.refMedia ?? [],
       'aiVideo.endFrameImageGen.refMedia',
     )
     if (refError) errors.push(refError)
@@ -216,7 +200,7 @@ const typeValidators: Record<
   (
     config: ExperienceConfig,
     steps: ExperienceStep[],
-  ) => OutcomeValidationError[]
+  ) => ConfigValidationError[]
 > = {
   photo: validatePhoto,
   'ai.image': validateAiImage,
@@ -224,27 +208,20 @@ const typeValidators: Record<
 }
 
 /**
- * Validate outcome configuration for publishing.
+ * Validate experience config for publishing.
  *
- * Takes the experience type and config (draft or published).
+ * Reads type from `config.type` (discriminated union).
  * Survey type always passes (no per-type config to validate).
+ * Structural checks are enforced by the Zod discriminated union at parse time.
  */
-export function validateOutcome(
-  type: ExperienceType,
-  config: ExperienceConfig | null,
+export function validateConfig(
+  config: ExperienceConfig,
   steps: ExperienceStep[],
-): OutcomeValidationResult {
+): ConfigValidationResult {
+  const { type } = config
+
   // Survey has no per-type config
   if (type === 'survey') return { valid: true, errors: [] }
-
-  if (!config) {
-    return {
-      valid: false,
-      errors: [
-        { field: 'config', message: 'Experience configuration is required' },
-      ],
-    }
-  }
 
   if (COMING_SOON_TYPES.has(type)) {
     return {
