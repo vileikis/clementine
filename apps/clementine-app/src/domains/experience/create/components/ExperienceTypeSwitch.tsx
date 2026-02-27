@@ -5,9 +5,10 @@
  * Shows only enabled types (Photo, AI Image, AI Video).
  * Does NOT allow deselection - use ClearTypeConfigAction to clear config.
  *
- * Reads/writes experience.type (top-level field).
+ * Value comes from experience.draft.type (passed by parent).
+ * onChange calls switchExperienceType() which sets draftType + draft.
  *
- * @see specs/081-experience-type-flattening — US3
+ * @see specs/083-config-discriminated-union — US3
  */
 import { Camera, Sparkles, Video } from 'lucide-react'
 

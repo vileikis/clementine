@@ -176,27 +176,35 @@ export function useExperienceConfigValidation(
       return [
         { field: 'config', message: 'Experience configuration is required' },
       ]
-    if (type === 'survey') return []
 
-    if (type === 'gif' || type === 'video') {
-      return [{ field: 'type', message: `${type.toUpperCase()} coming soon` }]
+    // Narrow via config.type (discriminated union) for type-safe field access
+    if (config.type === 'survey') return []
+
+    if (config.type === 'gif' || config.type === 'video') {
+      return [
+        { field: 'type', message: `${config.type.toUpperCase()} coming soon` },
+      ]
     }
 
-    if (type === 'photo')
+    // Null checks for form state (form values may temporarily be null via clear action)
+    if (config.type === 'photo')
       return config.photo
         ? validatePhoto(config.photo, steps)
         : [{ field: 'photo', message: 'Photo configuration is missing' }]
-    if (type === 'ai.image')
+    if (config.type === 'ai.image')
       return config.aiImage
         ? validateAiImage(config.aiImage, steps)
         : [{ field: 'aiImage', message: 'AI Image configuration is missing' }]
-    if (type === 'ai.video')
+    if (config.type === 'ai.video')
       return config.aiVideo
         ? validateAiVideo(config.aiVideo, steps)
         : [{ field: 'aiVideo', message: 'AI Video configuration is missing' }]
 
     return [
-      { field: 'type', message: `No validator registered for type: ${type}` },
+      {
+        field: 'type',
+        message: `No validator registered for type: ${type}`,
+      },
     ]
   }, [type, config, steps])
 }

@@ -69,7 +69,7 @@ export function ExperienceListItem({
               {experience.name}
             </h3>
             <div className="flex items-center gap-2 mt-1">
-              <TypeBadge type={experience.type} />
+              <TypeBadge type={experience.draftType} />
               <span className="text-sm text-muted-foreground">
                 {publishStatus}
               </span>

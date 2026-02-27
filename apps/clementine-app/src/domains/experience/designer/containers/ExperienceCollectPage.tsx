@@ -255,7 +255,7 @@ export function ExperienceCollectPage() {
       <AddStepDialog
         open={showAddDialog}
         onOpenChange={setShowAddDialog}
-        type={experience.type}
+        type={experience.draftType}
         onAddStep={handleAddStep}
       />
     </div>
