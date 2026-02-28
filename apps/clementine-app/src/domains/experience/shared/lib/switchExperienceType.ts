@@ -76,7 +76,7 @@ export async function switchExperienceType(
       const currentDraft = snapshot.data()?.draft as
         | Record<string, unknown>
         | undefined
-      if (!currentDraft?.[configKey]) {
+      if (!currentDraft || !(configKey in currentDraft)) {
         const defaults = buildDefaultDraft(newType) as Record<string, unknown>
         updates[`draft.${configKey}`] = defaults[configKey]
       }
