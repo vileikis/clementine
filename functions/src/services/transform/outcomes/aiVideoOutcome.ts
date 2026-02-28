@@ -22,8 +22,8 @@ import {
   aiGenerateVideo,
   type GenerateVideoRequest,
 } from '../operations/aiGenerateVideo'
-import { generateThumbnail } from '../../ffmpeg/images'
-import { getOutputStoragePath, uploadToStorage } from '../../../infra/storage'
+import { applyOverlay } from '../operations/applyOverlay'
+import { uploadOutput } from '../operations/uploadOutput'
 
 /**
  * Execute AI video outcome
@@ -65,17 +65,6 @@ export async function aiVideoOutcome(ctx: OutcomeContext): Promise<JobOutput> {
     jobId: job.id,
     resolvedLength: resolved.text.length,
   })
-
-  // Overlay: skip for video outcomes
-  if (overlayChoice) {
-    logger.warn(
-      '[AIVideoOutcome] Overlay not supported for ai.video outcomes, skipping',
-      {
-        jobId: job.id,
-        overlayDisplayName: overlayChoice.displayName,
-      },
-    )
-  }
 
   // Build GenerateVideoRequest based on task type
   const baseRequest: GenerateVideoRequest = {
@@ -122,26 +111,30 @@ export async function aiVideoOutcome(ctx: OutcomeContext): Promise<JobOutput> {
     },
   )
 
-  // Generate and upload thumbnail from local copy
-  const thumbLocalPath = `${tmpDir}/thumb.jpg`
-  await generateThumbnail(generatedVideo.localPath, thumbLocalPath, 300)
+  // Apply overlay if resolved at job creation (before thumbnail/upload)
+  let outputPath = generatedVideo.localPath
 
-  const thumbStoragePath = getOutputStoragePath(
-    job.projectId,
-    job.sessionId,
-    'thumb',
-    'jpg',
-  )
-  const thumbnailUrl = await uploadToStorage(thumbLocalPath, thumbStoragePath)
+  if (overlayChoice) {
+    logger.info('[AIVideoOutcome] Applying overlay', {
+      jobId: job.id,
+      overlayDisplayName: overlayChoice.displayName,
+    })
+    outputPath = await applyOverlay(generatedVideo.localPath, overlayChoice, tmpDir)
+  }
 
-  const output: JobOutput = {
-    assetId: `${job.sessionId}-output`,
-    url: generatedVideo.url,
-    filePath: generatedVideo.storagePath,
+  // Upload output and generate thumbnail
+  const uploaded = await uploadOutput({
+    outputPath,
+    projectId: job.projectId,
+    sessionId: job.sessionId,
+    tmpDir,
     format: 'video',
     dimensions: generatedVideo.dimensions,
-    sizeBytes: generatedVideo.sizeBytes,
-    thumbnailUrl,
+    extension: 'mp4',
+  })
+
+  const output: JobOutput = {
+    ...uploaded,
     processingTimeMs: Date.now() - startTime,
   }
 

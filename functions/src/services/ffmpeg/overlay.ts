@@ -7,13 +7,16 @@
  */
 import * as fs from 'fs/promises'
 import { logger } from 'firebase-functions/v2'
+import * as path from 'path'
 import {
   FFmpegError,
   TIMEOUTS,
   runFFmpegCommand,
   validateInputFile,
 } from './core'
-import { getMediaDimensions } from './probe'
+import { getMediaDimensions, hasAudioStream } from './probe'
+
+const VIDEO_EXTENSIONS = new Set(['.mp4', '.mov', '.webm', '.avi', '.mkv'])
 
 /**
  * Apply overlay image on top of media (image/GIF/video)
@@ -44,10 +47,24 @@ export async function applyOverlayToMedia(
   // This avoids memory-hungry scale2ref and -loop tricks
   const filterComplex = `[1:v]scale=${dimensions.width}:${dimensions.height}[ov];[0:v][ov]overlay=0:0:format=auto`
 
+  const isVideo = VIDEO_EXTENSIONS.has(path.extname(inputPath).toLowerCase())
+
+  // For video inputs: passthrough audio if present, drop if absent
+  const audioArgs: string[] = []
+  if (isVideo) {
+    const hasAudio = await hasAudioStream(inputPath)
+    if (hasAudio) {
+      audioArgs.push('-c:a', 'copy')
+    } else {
+      audioArgs.push('-an')
+    }
+  }
+
   const args = [
     '-i', inputPath,
     '-i', overlayPath,
     '-filter_complex', filterComplex,
+    ...audioArgs,
     '-y',
     outputPath,
   ]

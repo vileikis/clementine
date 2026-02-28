@@ -69,7 +69,7 @@ export function usePaginatedExperiencesForSlot(
 
       const constraints = [
         where('status', '==', 'active'),
-        where('type', 'in', allowedTypes),
+        where('draftType', 'in', allowedTypes),
         orderBy('createdAt', 'desc'),
         limit(pageSize),
         ...(pageParam ? [startAfter(pageParam)] : []),

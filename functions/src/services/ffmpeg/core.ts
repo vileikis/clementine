@@ -1,13 +1,36 @@
-import { spawn } from 'child_process';
+import { spawn, execFileSync } from 'child_process';
 import ffmpegStatic from 'ffmpeg-static';
 import * as fs from 'fs/promises';
+import { logger } from 'firebase-functions/v2';
 
-// Validate ffmpeg binary path
-if (!ffmpegStatic) {
-  throw new Error('ffmpeg-static binary not found');
+// Prefer FFMPEG_BIN env var (e.g. Homebrew FFmpeg) over ffmpeg-static.
+// This aligns local dev (macOS) with Cloud Functions (Linux) on FFmpeg 7.x.
+// See: https://github.com/eugeneware/ffmpeg-static/issues/151
+const resolvedPath = process.env.FFMPEG_BIN || ffmpegStatic;
+if (!resolvedPath) {
+  throw new Error('FFmpeg binary not found. Set FFMPEG_BIN or install ffmpeg-static.');
 }
 
-export const FFMPEG_PATH = ffmpegStatic;
+export const FFMPEG_PATH = resolvedPath;
+
+// Log FFmpeg version on cold start for version alignment diagnostics
+try {
+  const versionOutput = execFileSync(FFMPEG_PATH, ['-version'], {
+    encoding: 'utf-8',
+    timeout: 5000,
+  });
+  const firstLine = versionOutput.split('\n')[0] ?? '';
+  logger.info('[ffmpeg-diagnostic] FFmpeg version on cold start', {
+    version: firstLine,
+    source: process.env.FFMPEG_BIN ? 'FFMPEG_BIN env var' : 'ffmpeg-static',
+    binaryPath: FFMPEG_PATH,
+  });
+} catch (err) {
+  logger.warn('[ffmpeg-diagnostic] Failed to read FFmpeg version', {
+    error: (err as Error).message,
+    binaryPath: FFMPEG_PATH,
+  });
+}
 
 /**
  * Custom error classes for FFmpeg operations
