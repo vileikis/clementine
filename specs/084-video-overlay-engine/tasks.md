@@ -25,8 +25,8 @@ All paths relative to repository root. This feature modifies only the `functions
 
 **Key files**: `functions/package.json` (`ffmpeg-static` 5.3.0 → FFmpeg 6.1.1), `functions/src/services/ffmpeg/core.ts` (binary path resolution), `functions/esbuild.config.mjs` (`ffmpeg-static` marked external)
 
-- [ ] T001 Add FFmpeg version diagnostic log to `functions/src/services/ffmpeg/core.ts` — on module load (cold start), spawn `FFMPEG_PATH` with `-version` flag, log the resolved version string via `firebase-functions/v2` logger. This confirms whether Cloud Functions uses the `ffmpeg-static` 6.1.1 binary or the system FFmpeg 7.x.
-- [ ] T002 Deploy diagnostic to production and verify FFmpeg version — run `pnpm functions:deploy`, trigger a cold start (invoke any function), check Cloud Logging for the FFmpeg version output. Document the result.
+- [x] T001 Add FFmpeg version diagnostic log to `functions/src/services/ffmpeg/core.ts` — on module load (cold start), spawn `FFMPEG_PATH` with `-version` flag, log the resolved version string via `firebase-functions/v2` logger. This confirms whether Cloud Functions uses the `ffmpeg-static` 6.1.1 binary or the system FFmpeg 7.x.
+- [x] T002 Deploy diagnostic to production and verify FFmpeg version — **Result: Local=FFmpeg 6.0, Cloud=FFmpeg 7.0.2-static (mismatch)** — run `pnpm functions:deploy`, trigger a cold start (invoke any function), check Cloud Logging for the FFmpeg version output. Document the result.
 - [ ] T003 Resolve version mismatch (if any) — based on T002 results: if `ffmpeg-static` 6.1.1 loads correctly, no action needed (remove diagnostic log or keep as permanent telemetry). If system FFmpeg 7.x is used instead, choose standardization path per PRD: keep `ffmpeg-static` (fix loading), use system FFmpeg 7 (drop `ffmpeg-static`, update local dev), or vendor a pinned binary.
 
 **Checkpoint**: FFmpeg version is confirmed identical in local dev and Cloud Functions. Gate passes — video overlay implementation can proceed.

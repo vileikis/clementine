@@ -1,6 +1,7 @@
-import { spawn } from 'child_process';
+import { spawn, execFileSync } from 'child_process';
 import ffmpegStatic from 'ffmpeg-static';
 import * as fs from 'fs/promises';
+import { logger } from 'firebase-functions/v2';
 
 // Validate ffmpeg binary path
 if (!ffmpegStatic) {
@@ -8,6 +9,24 @@ if (!ffmpegStatic) {
 }
 
 export const FFMPEG_PATH = ffmpegStatic;
+
+// Log FFmpeg version on cold start for version alignment diagnostics
+try {
+  const versionOutput = execFileSync(FFMPEG_PATH, ['-version'], {
+    encoding: 'utf-8',
+    timeout: 5000,
+  });
+  const firstLine = versionOutput.split('\n')[0] ?? '';
+  logger.info('[ffmpeg-diagnostic] FFmpeg version on cold start', {
+    version: firstLine,
+    binaryPath: FFMPEG_PATH,
+  });
+} catch (err) {
+  logger.warn('[ffmpeg-diagnostic] Failed to read FFmpeg version', {
+    error: (err as Error).message,
+    binaryPath: FFMPEG_PATH,
+  });
+}
 
 /**
  * Custom error classes for FFmpeg operations
