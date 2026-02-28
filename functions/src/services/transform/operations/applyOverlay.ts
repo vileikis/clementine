@@ -9,6 +9,7 @@
  * - This module only handles the actual overlay application
  * - Removed getOverlayForAspectRatio helper (no longer needed)
  */
+import * as path from 'path'
 import { logger } from 'firebase-functions/v2'
 import type { MediaReference } from '@clementine/shared'
 import { downloadFromStorage, getStoragePathFromMediaReference } from '../../../infra/storage'
@@ -42,8 +43,9 @@ export async function applyOverlay(
   logger.info('[Overlay] Downloading overlay', { storagePath })
   await downloadFromStorage(storagePath, overlayPath)
 
-  // Apply overlay using FFmpeg
-  const outputPath = `${tmpDir}/output-with-overlay.jpg`
+  // Apply overlay using FFmpeg — preserve input format (e.g. .mp4 for video, .gif for GIF)
+  const ext = path.extname(inputPath).toLowerCase() || '.jpg'
+  const outputPath = `${tmpDir}/output-with-overlay${ext}`
 
   logger.info('[Overlay] Compositing overlay onto output')
   await applyOverlayToMedia(inputPath, overlayPath, outputPath)

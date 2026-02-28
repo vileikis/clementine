@@ -37,8 +37,8 @@ All paths relative to repository root. This feature modifies only the `functions
 
 **Purpose**: Add `hasAudioStream()` probe function — required by overlay.ts before it can handle video audio passthrough
 
-- [ ] T004 Add `hasAudioStream(filePath)` function to `functions/src/services/ffmpeg/probe.ts` — query ffprobe for audio stream `a:0`, return `Promise<boolean>`
-- [ ] T005 Export `hasAudioStream` from `functions/src/services/ffmpeg/index.ts` barrel file
+- [x] T004 Add `hasAudioStream(filePath)` function to `functions/src/services/ffmpeg/probe.ts` — query ffprobe for audio stream `a:0`, return `Promise<boolean>`
+- [x] T005 Export `hasAudioStream` from `functions/src/services/ffmpeg/index.ts` barrel file
 
 **Checkpoint**: `hasAudioStream` is available for import. `pnpm functions:build` passes.
 
@@ -52,8 +52,8 @@ All paths relative to repository root. This feature modifies only the `functions
 
 ### Implementation for User Story 1
 
-- [ ] T006 [P] [US1] Update `applyOverlayToMedia` in `functions/src/services/ffmpeg/overlay.ts` — detect video input by extension, call `hasAudioStream`, add `-c:a copy` if audio exists or `-an` if not. Non-video inputs unchanged.
-- [ ] T007 [P] [US1] Update `applyOverlay` in `functions/src/services/transform/operations/applyOverlay.ts` — derive output extension from `path.extname(inputPath)` (`.mp4` → `.mp4`, otherwise `.jpg`). Replace hardcoded `output-with-overlay.jpg`.
+- [x] T006 [P] [US1] Update `applyOverlayToMedia` in `functions/src/services/ffmpeg/overlay.ts` — detect video input by extension, call `hasAudioStream`, add `-c:a copy` if audio exists or `-an` if not. Non-video inputs unchanged.
+- [x] T007 [P] [US1] Update `applyOverlay` in `functions/src/services/transform/operations/applyOverlay.ts` — derive output extension from `path.extname(inputPath)` (`.mp4` → `.mp4`, otherwise `.jpg`). Replace hardcoded `output-with-overlay.jpg`.
 
 **Checkpoint**: FFmpeg overlay composition and operation layer both handle video inputs correctly. `pnpm functions:build` passes. Existing image overlay behavior is unchanged.
 
@@ -69,7 +69,7 @@ All paths relative to repository root. This feature modifies only the `functions
 
 ### Implementation for User Story 2
 
-- [ ] T008 [US2] Wire overlay into `functions/src/services/transform/outcomes/aiVideoOutcome.ts` — replace "overlay not supported" warning (lines 69-78) with `applyOverlay` call. Apply overlay to `generatedVideo.localPath` before thumbnail extraction. Re-upload overlayed video to Storage and use new URL in output. Follow `aiImageOutcome.ts` lines 97-105 pattern. Import `applyOverlay` from `../operations/applyOverlay` and `uploadOutput` from `../operations/uploadOutput`.
+- [x] T008 [US2] Wire overlay into `functions/src/services/transform/outcomes/aiVideoOutcome.ts` — replace "overlay not supported" warning (lines 69-78) with `applyOverlay` call. Apply overlay to `generatedVideo.localPath` before thumbnail extraction. Re-upload overlayed video to Storage and use new URL in output. Follow `aiImageOutcome.ts` lines 97-105 pattern. Import `applyOverlay` from `../operations/applyOverlay` and `uploadOutput` from `../operations/uploadOutput`.
 
 **Checkpoint**: Full end-to-end video overlay works. AI video outcomes with overlay configured produce branded video output with correct thumbnail.
 
@@ -79,8 +79,8 @@ All paths relative to repository root. This feature modifies only the `functions
 
 **Purpose**: Build verification and final checks
 
-- [ ] T009 Run `pnpm functions:build` to verify TypeScript compilation passes with no errors
-- [ ] T010 Verify no regression to existing image overlay by reviewing unchanged `aiImageOutcome.ts` and `photoOutcome.ts` imports and usage
+- [x] T009 Run `pnpm functions:build` to verify TypeScript compilation passes with no errors
+- [x] T010 Verify no regression to existing image overlay by reviewing unchanged `aiImageOutcome.ts` and `photoOutcome.ts` imports and usage
 
 ---
 

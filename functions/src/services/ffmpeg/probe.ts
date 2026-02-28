@@ -19,6 +19,55 @@ export interface MediaDimensions {
  * @param filePath - Path to media file
  * @returns Width and height in pixels
  */
+/**
+ * Check if a media file contains an audio stream
+ *
+ * @param filePath - Path to media file
+ * @returns true if the file has at least one audio stream
+ */
+export async function hasAudioStream(filePath: string): Promise<boolean> {
+  return new Promise((resolve, reject) => {
+    const args = [
+      '-v', 'error',
+      '-select_streams', 'a:0',
+      '-show_entries', 'stream=codec_type',
+      '-of', 'json',
+      filePath,
+    ]
+
+    let stdout = ''
+    let stderr = ''
+
+    const proc = spawn(FFPROBE_PATH, args)
+
+    proc.stdout?.on('data', (data) => {
+      stdout += data.toString()
+    })
+
+    proc.stderr?.on('data', (data) => {
+      stderr += data.toString()
+    })
+
+    proc.on('error', (err) => {
+      reject(new Error(`ffprobe failed to start: ${err.message}`))
+    })
+
+    proc.on('close', (code) => {
+      if (code !== 0) {
+        reject(new Error(`ffprobe failed with code ${code}: ${stderr}`))
+        return
+      }
+
+      try {
+        const result = JSON.parse(stdout)
+        resolve((result.streams?.length ?? 0) > 0)
+      } catch {
+        reject(new Error(`Failed to parse ffprobe output: ${stdout}`))
+      }
+    })
+  })
+}
+
 export async function getMediaDimensions(filePath: string): Promise<MediaDimensions> {
   return new Promise((resolve, reject) => {
     const args = [

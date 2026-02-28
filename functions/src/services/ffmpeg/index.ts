@@ -16,5 +16,8 @@ export { createGIF, scaleAndCropGIF } from './gifs'
 // Video operations
 export { createMP4 } from './videos'
 
+// Probe utilities
+export { hasAudioStream } from './probe'
+
 // Overlay/compositing
 export { applyOverlayToMedia } from './overlay'
