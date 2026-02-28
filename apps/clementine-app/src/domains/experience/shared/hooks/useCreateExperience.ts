@@ -2,10 +2,10 @@
  * useCreateExperience Hook
  *
  * Mutation hook for creating a new experience in a workspace.
- * Creates the experience with a unified `type` field and initializes
- * the active type's default config on the draft.
+ * Creates the experience with `draftType` and initializes the draft
+ * as a discriminated union config variant.
  *
- * @see specs/081-experience-type-flattening — US1
+ * @see specs/083-config-discriminated-union — US3
  */
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import {
@@ -39,25 +39,17 @@ export interface CreateExperienceResult {
 
 /**
  * Build default draft config for a given experience type.
- * Per contracts/firestore-schema.md: all per-type configs are null except the
- * active type's config which gets initialized with defaults.
+ * Returns a discriminated union variant with `type` literal,
+ * shared `steps`, and type-specific config defaults.
  */
 export function buildDefaultDraft(
   type: ExperienceType,
 ): WithFieldValue<ExperienceConfig> {
-  const base = {
-    steps: [] as WithFieldValue<ExperienceConfig>['steps'],
-    photo: null,
-    gif: null,
-    video: null,
-    aiImage: null,
-    aiVideo: null,
-  } satisfies WithFieldValue<ExperienceConfig>
-
   switch (type) {
     case 'ai.image':
       return {
-        ...base,
+        type: 'ai.image' as const,
+        steps: [],
         aiImage: {
           task: 'text-to-image' as const,
           captureStepId: null,
@@ -72,7 +64,8 @@ export function buildDefaultDraft(
       }
     case 'ai.video':
       return {
-        ...base,
+        type: 'ai.video' as const,
+        steps: [],
         aiVideo: {
           task: 'image-to-video' as const,
           captureStepId: '',
@@ -90,15 +83,37 @@ export function buildDefaultDraft(
       }
     case 'photo':
       return {
-        ...base,
+        type: 'photo' as const,
+        steps: [],
         photo: {
           captureStepId: '',
           aspectRatio: '1:1' as const,
         },
       }
-    // Survey, gif, video — no active config at creation
+    case 'gif':
+      return {
+        type: 'gif' as const,
+        steps: [],
+        gif: {
+          captureStepId: '',
+          aspectRatio: '1:1' as const,
+        },
+      }
+    case 'video':
+      return {
+        type: 'video' as const,
+        steps: [],
+        video: {
+          captureStepId: '',
+          aspectRatio: '9:16' as const,
+        },
+      }
+    case 'survey':
     default:
-      return base
+      return {
+        type: 'survey' as const,
+        steps: [],
+      }
   }
 }
 
@@ -134,7 +149,7 @@ export function useCreateExperience() {
         const newExperience: WithFieldValue<Experience> = {
           id: newRef.id,
           name: validated.name,
-          type: validated.type,
+          draftType: validated.type,
           status: 'active',
           media: null,
           draft: buildDefaultDraft(validated.type),

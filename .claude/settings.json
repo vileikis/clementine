@@ -1,5 +1,19 @@
 {
   "permissions": {
+    "read": {
+      "deny": [
+        "**/.env*",
+        "**/*.secret.*",
+        "**/*.pem",
+        "**/*.key",
+        "**/secrets/**",
+        "**/credentials/**",
+        "**/.aws/**",
+        "**/.ssh/**",
+        "**/docker-compose*.yml",
+        "**/config/database.yml"
+      ]
+    },
     "allow": [
       "WebSearch",
       "WebFetch",
@@ -30,8 +44,6 @@
       "Bash(test:*)"
     ],
     "deny": [],
-    "ask": [
-      "Bash(rm:*)"
-    ]
+    "ask": ["Bash(rm:*)"]
   }
 }

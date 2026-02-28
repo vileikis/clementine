@@ -2,16 +2,16 @@
  * CreateTabForm Component
  *
  * Thin orchestrator for the Create tab. Routes to the correct config form
- * based on experience.type:
+ * based on experience.draft.type (discriminated union):
  * - 'survey' → hidden (survey has no create tab)
  * - 'photo' → ExperienceTypeSwitch + PhotoConfigForm + ClearTypeConfigAction
  * - 'ai.image' → ExperienceTypeSwitch + AIImageConfigForm + ClearTypeConfigAction
  * - 'ai.video' → ExperienceTypeSwitch + AIVideoConfigForm + ClearTypeConfigAction
  *
- * Reads type from experience.type (top-level).
- * Reads config from experience.draft.[type] (flattened).
+ * Reads type from experience.draft.type (discriminated union config).
+ * Reads config from the type-specific field on the draft variant.
  *
- * @see specs/081-experience-type-flattening
+ * @see specs/083-config-discriminated-union
  */
 import { useCallback, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
@@ -19,10 +19,7 @@ import { toast } from 'sonner'
 
 import { useUpdateExperienceConfig } from '../hooks'
 import { useExperienceConfigValidation } from '../hooks/useExperienceConfigValidation'
-import {
-  getConfigKey,
-  getDefaultConfigForType,
-} from '../lib/experience-config-operations'
+import { getConfigKey } from '../lib/experience-config-operations'
 import { AIImageConfigForm } from './ai-image-config/AIImageConfigForm'
 import { AIVideoConfigForm } from './ai-video-config'
 import { ExperienceTypeSwitch } from './ExperienceTypeSwitch'
@@ -35,8 +32,10 @@ import type {
   Experience,
   ExperienceConfig,
   ExperienceStep,
+  GifConfig,
   OutcomeType,
   PhotoConfig,
+  VideoConfig,
 } from '@clementine/shared'
 import { useAuth } from '@/domains/auth'
 import { useAutoSave } from '@/shared/forms'
@@ -48,21 +47,32 @@ import { switchExperienceType } from '@/domains/experience/shared/lib'
 const AUTOSAVE_DEBOUNCE_MS = 2000
 
 /**
- * Config form state — per-type config fields from ExperienceConfig (excluding steps).
+ * Config form state — per-type config fields.
+ * Only the active type's field is populated; others are undefined.
  */
-type ConfigFormState = Pick<
-  ExperienceConfig,
-  'photo' | 'gif' | 'video' | 'aiImage' | 'aiVideo'
->
+interface ConfigFormState {
+  photo?: PhotoConfig | null
+  gif?: GifConfig | null
+  video?: VideoConfig | null
+  aiImage?: AIImageConfig | null
+  aiVideo?: AIVideoConfig | null
+}
 
-/** Extract config form state from experience draft */
+/** Extract config form state from discriminated union draft */
 function extractConfigState(draft: ExperienceConfig): ConfigFormState {
-  return {
-    photo: draft.photo,
-    gif: draft.gif,
-    video: draft.video,
-    aiImage: draft.aiImage,
-    aiVideo: draft.aiVideo,
+  switch (draft.type) {
+    case 'photo':
+      return { photo: draft.photo }
+    case 'gif':
+      return { gif: draft.gif }
+    case 'video':
+      return { video: draft.video }
+    case 'ai.image':
+      return { aiImage: draft.aiImage }
+    case 'ai.video':
+      return { aiVideo: draft.aiVideo }
+    default:
+      return {}
   }
 }
 
@@ -79,7 +89,7 @@ export interface CreateTabFormProps {
 export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
   const { user } = useAuth()
   const store = useExperienceDesignerStore()
-  const experienceType = experience.type
+  const experienceType = experience.draft.type
 
   // Survey type has no create tab
   if (experienceType === 'survey') {
@@ -104,10 +114,10 @@ export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
     },
   })
 
-  // Reset form when experience changes (e.g., navigating to different experience)
+  // Reset form when experience or type changes
   useEffect(() => {
     form.reset(serverConfig)
-  }, [experience.id])
+  }, [experience.id, experienceType])
 
   // Auto-save with debounce (2 seconds) — writes only the active type's config
   const { triggerSave } = useAutoSave({
@@ -144,41 +154,15 @@ export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
 
   const handleTypeSwitch = useCallback(
     async (newType: OutcomeType) => {
-      const newConfigKey = getConfigKey(newType)
-      if (!newConfigKey) return
-
-      // Get existing config or create default
-      const existingConfig = formValues[newConfigKey]
-      const defaultConfig = existingConfig
-        ? undefined
-        : { key: newConfigKey, value: getDefaultConfigForType(newType, steps) }
-
-      // Atomic Firestore update: type + default config
       try {
-        await switchExperienceType(
-          workspaceId,
-          experience.id,
-          newType,
-          defaultConfig,
-        )
-
-        // Update local form with default config if initialized
-        if (defaultConfig) {
-          form.setValue(
-            newConfigKey,
-            defaultConfig.value as ConfigFormState[typeof newConfigKey],
-            {
-              shouldDirty: false,
-            },
-          )
-        }
+        await switchExperienceType(workspaceId, experience.id, newType)
       } catch (error) {
         const message =
           error instanceof Error ? error.message : 'Failed to switch type'
         toast.error(message)
       }
     },
-    [form, formValues, steps, workspaceId, experience.id],
+    [workspaceId, experience.id],
   )
 
   // ── Clear Config ──────────────────────────────────────────

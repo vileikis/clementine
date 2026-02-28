@@ -29,6 +29,7 @@ interface OverlaySectionProps {
     '3:2': OverlayReference | null
     '2:3': OverlayReference | null
     '9:16': OverlayReference | null
+    '16:9': OverlayReference | null
     default: OverlayReference | null
   } | null
 }
@@ -46,6 +47,7 @@ const OVERLAY_SLOTS: {
   { key: '3:2', label: '3:2 Landscape', ratio: '3:2' },
   { key: '2:3', label: '2:3 Portrait', ratio: '2:3' },
   { key: '9:16', label: '9:16 Vertical', ratio: '9:16' },
+  { key: '16:9', label: '16:9 Landscape', ratio: '16:9' },
   {
     key: 'default',
     label: 'Default Fallback',

@@ -70,7 +70,7 @@ export function useWorkspaceExperiences(
       q = query(
         experiencesRef,
         where('status', '==', 'active'),
-        where('type', '==', filters.type),
+        where('draftType', '==', filters.type),
         orderBy('createdAt', 'desc'),
       )
     }

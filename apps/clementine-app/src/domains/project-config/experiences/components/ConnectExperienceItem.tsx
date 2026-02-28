@@ -93,7 +93,7 @@ export function ConnectExperienceItem({
             </Badge>
           )}
         </div>
-        <TypeBadge type={experience.type} />
+        <TypeBadge type={experience.draftType} />
       </div>
     </button>
   )

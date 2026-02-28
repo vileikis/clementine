@@ -8,7 +8,7 @@ export { updateExperienceConfigField } from './updateExperienceConfigField'
 export { switchExperienceType } from './switchExperienceType'
 export {
   isCaptureStep,
-  validateOutcome,
-  type OutcomeValidationError,
-  type OutcomeValidationResult,
-} from './outcome-validation'
+  validateConfig,
+  type ConfigValidationError,
+  type ConfigValidationResult,
+} from './config-validation'

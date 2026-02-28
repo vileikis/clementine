@@ -5,13 +5,12 @@
  * Uses canonical aspect ratio schema for consistency across the platform.
  */
 import { z } from 'zod'
-import { aspectRatioSchema, type AspectRatio } from '../../media/aspect-ratio.schema'
+import { imageAspectRatioSchema, type ImageAspectRatio } from '../../media/aspect-ratio.schema'
 
 /**
- * Aspect ratio options for photo capture.
- * Uses canonical aspect ratio schema.
+ * Aspect ratio options for photo capture (image ratios only, excludes 16:9).
  */
-export const experienceAspectRatioSchema = aspectRatioSchema
+export const experienceAspectRatioSchema = imageAspectRatioSchema
 
 /**
  * Experience capture photo step configuration schema
@@ -21,8 +20,8 @@ export const experienceCapturePhotoStepConfigSchema = z.object({
   aspectRatio: experienceAspectRatioSchema.default('1:1'),
 })
 
-/** @deprecated Use AspectRatio from media/aspect-ratio.schema instead */
-export type ExperienceAspectRatio = AspectRatio
+/** @deprecated Use ImageAspectRatio from media/aspect-ratio.schema instead */
+export type ExperienceAspectRatio = ImageAspectRatio
 export type ExperienceCapturePhotoStepConfig = z.infer<
   typeof experienceCapturePhotoStepConfigSchema
 >

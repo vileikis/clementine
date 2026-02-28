@@ -2,13 +2,13 @@
  * Experience Config Schemas
  *
  * Per-type configuration schemas for experience types.
- * Each experience type (photo, gif, video, ai.image, ai.video) has its own
- * nullable config object. Only the active type's config is populated.
+ * The top-level ExperienceConfig is a Zod discriminated union keyed on `type`.
+ * Each variant contains shared fields (type, steps) plus type-specific config.
  *
- * Uses z.looseObject() at the top level for backward compatibility —
- * old fields (aiEnabled, imageGeneration, etc.) are silently ignored during parsing.
+ * Uses z.looseObject() for backward compatibility —
+ * unknown fields are silently preserved during parsing.
  *
- * @see specs/081-experience-type-flattening
+ * @see specs/083-config-discriminated-union
  */
 import { z } from 'zod'
 import {
@@ -16,20 +16,11 @@ import {
   videoAspectRatioSchema,
 } from '../media/aspect-ratio.schema'
 import { mediaReferenceSchema } from '../media/media-reference.schema'
+import { experienceStepSchema } from './step.schema'
 
 // ── OutcomeType ──────────────────────────────────────────────
-
-/**
- * Outcome type enum — the subset of experience types that produce output.
- * Used by backend executor dispatch. Excludes 'survey' which has no output.
- */
-export const outcomeTypeSchema = z.enum([
-  'photo',
-  'gif',
-  'video',
-  'ai.image',
-  'ai.video',
-])
+// outcomeTypeSchema removed — the discriminated union makes a separate
+// Zod enum redundant. OutcomeType is now a derived type alias (see below).
 
 // ── AI Image Model ───────────────────────────────────────────
 
@@ -149,9 +140,74 @@ export const aiVideoConfigSchema = z.object({
   videoGeneration: videoGenerationConfigSchema,
 })
 
+// ── Config Variants (discriminated union) ────────────────────
+
+/** Survey config variant — data collection only, no type-specific config. */
+export const surveyConfigSchema = z.looseObject({
+  type: z.literal('survey'),
+  steps: z.array(experienceStepSchema).default([]),
+})
+
+/** Photo config variant — passthrough capture with optional overlay. */
+export const photoConfigVariantSchema = z.looseObject({
+  type: z.literal('photo'),
+  steps: z.array(experienceStepSchema).default([]),
+  photo: photoConfigSchema,
+})
+
+/** AI image config variant — AI-generated image from prompt and/or source. */
+export const aiImageConfigVariantSchema = z.looseObject({
+  type: z.literal('ai.image'),
+  steps: z.array(experienceStepSchema).default([]),
+  aiImage: aiImageConfigSchema,
+})
+
+/** AI video config variant — AI-generated video. */
+export const aiVideoConfigVariantSchema = z.looseObject({
+  type: z.literal('ai.video'),
+  steps: z.array(experienceStepSchema).default([]),
+  aiVideo: aiVideoConfigSchema,
+})
+
+/** GIF config variant — animated GIF capture. */
+export const gifConfigVariantSchema = z.looseObject({
+  type: z.literal('gif'),
+  steps: z.array(experienceStepSchema).default([]),
+  gif: gifConfigSchema,
+})
+
+/** Video config variant — video capture. */
+export const videoConfigVariantSchema = z.looseObject({
+  type: z.literal('video'),
+  steps: z.array(experienceStepSchema).default([]),
+  video: videoConfigSchema,
+})
+
+/**
+ * Experience Config Schema — discriminated union keyed on `type`.
+ *
+ * Each variant is self-describing: the `type` field determines which
+ * type-specific config is present. TypeScript narrows automatically.
+ */
+export const experienceConfigSchema = z.discriminatedUnion('type', [
+  surveyConfigSchema,
+  photoConfigVariantSchema,
+  aiImageConfigVariantSchema,
+  aiVideoConfigVariantSchema,
+  gifConfigVariantSchema,
+  videoConfigVariantSchema,
+])
+
 // ── Type Exports ─────────────────────────────────────────────
 
-export type OutcomeType = z.infer<typeof outcomeTypeSchema>
+export type ExperienceConfig = z.infer<typeof experienceConfigSchema>
+export type SurveyConfig = z.infer<typeof surveyConfigSchema>
+export type PhotoConfigVariant = z.infer<typeof photoConfigVariantSchema>
+export type AIImageConfigVariant = z.infer<typeof aiImageConfigVariantSchema>
+export type AIVideoConfigVariant = z.infer<typeof aiVideoConfigVariantSchema>
+export type GifConfigVariant = z.infer<typeof gifConfigVariantSchema>
+export type VideoConfigVariant = z.infer<typeof videoConfigVariantSchema>
+
 export type AIImageModel = z.infer<typeof aiImageModelSchema>
 export type AIImageAspectRatio = z.infer<typeof aiImageAspectRatioSchema>
 export type ImageGenerationConfig = z.infer<typeof imageGenerationConfigSchema>

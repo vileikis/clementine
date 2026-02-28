@@ -80,11 +80,11 @@ export function resolvePromptMentions(
     const response = responses.find((r) => r.stepName === stepName)
 
     if (!response) {
-      logger.warn('[PromptResolution] Step not found, removing placeholder', {
+      logger.warn('[PromptResolution] Step not found, preserving placeholder', {
         stepName,
         placeholder: match,
       })
-      return ''  // Remove unresolved placeholders instead of preserving them
+      return match  // Preserve unresolved placeholders
     }
 
     return resolveStepData(response, addMediaRef)
@@ -95,11 +95,11 @@ export function resolvePromptMentions(
     const ref = refMedia.find((r) => r.displayName === displayName)
 
     if (!ref) {
-      logger.warn('[PromptResolution] Reference not found, removing placeholder', {
+      logger.warn('[PromptResolution] Reference not found, preserving placeholder', {
         displayName,
         placeholder: match,
       })
-      return ''  // Remove unresolved placeholders instead of preserving them
+      return match  // Preserve unresolved placeholders
     }
 
     addMediaRef(ref)

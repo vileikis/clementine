@@ -14,7 +14,6 @@ export {
   experienceTypeSchema,
   experienceMediaSchema,
   // Per-type config schemas
-  outcomeTypeSchema,
   imageGenerationConfigSchema,
   photoConfigSchema,
   aiImageConfigSchema,

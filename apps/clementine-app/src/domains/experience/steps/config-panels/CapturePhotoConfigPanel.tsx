@@ -4,10 +4,11 @@
  * Configuration panel for photo capture steps.
  * Allows setting the aspect ratio for photo capture.
  */
+import { imageAspectRatioSchema } from '@clementine/shared'
 import type { StepConfigPanelProps } from '../registry/step-registry'
 import type {
-  AspectRatio,
   ExperienceCapturePhotoStepConfig,
+  ImageAspectRatio,
 } from '@clementine/shared'
 import { EditorSection } from '@/shared/editor-controls'
 import { ASPECT_RATIOS } from '@/domains/experience/create/lib/model-options'
@@ -20,7 +21,7 @@ import {
 } from '@/ui-kit/ui/select'
 
 // Aspect ratio descriptions
-const ASPECT_RATIO_DESCRIPTIONS: Record<AspectRatio, string> = {
+const ASPECT_RATIO_DESCRIPTIONS: Record<ImageAspectRatio, string> = {
   '1:1': 'Best for profile photos and social media posts',
   '9:16': 'Best for stories and full-screen mobile displays',
   '3:2': 'Best for landscape photos and traditional DSLR-style shots',
@@ -36,7 +37,9 @@ export function CapturePhotoConfigPanel({
   const aspectRatio = config.aspectRatio ?? '1:1'
 
   const handleAspectRatioChange = (value: string) => {
-    onConfigChange({ aspectRatio: value as AspectRatio })
+    const parsed = imageAspectRatioSchema.safeParse(value)
+    if (!parsed.success) return
+    onConfigChange({ aspectRatio: parsed.data })
   }
 
   return (

@@ -14,11 +14,12 @@ import { overlayReferenceSchema } from '@/domains/project-config/shared'
  * Unlike overlaysConfigSchema, this doesn't set defaults for missing fields,
  * allowing partial updates without overwriting existing overlays.
  *
- * Supports all 5 overlay keys:
+ * Supports all 6 overlay keys:
  * - 1:1     - Square
  * - 3:2     - Landscape
  * - 2:3     - Portrait
  * - 9:16    - Vertical/stories
+ * - 16:9    - Landscape video
  * - default - Fallback overlay when no exact match exists
  *
  * @example
@@ -38,6 +39,7 @@ export const updateOverlaysConfigSchema = z.looseObject({
   '3:2': overlayReferenceSchema.optional(),
   '2:3': overlayReferenceSchema.optional(),
   '9:16': overlayReferenceSchema.optional(),
+  '16:9': overlayReferenceSchema.optional(),
   default: overlayReferenceSchema.optional(),
 })
 

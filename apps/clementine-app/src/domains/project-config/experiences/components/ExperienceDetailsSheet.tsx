@@ -143,7 +143,7 @@ export function ExperienceDetailsSheet({
                 {experience.name}
               </h3>
               <div className="mt-1">
-                <TypeBadge type={experience.type} />
+                <TypeBadge type={experience.draftType} />
               </div>
             </div>
           </div>

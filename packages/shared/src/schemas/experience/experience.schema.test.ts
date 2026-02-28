@@ -5,7 +5,10 @@ import {
   experienceMediaSchema,
   experienceConfigSchema,
   experienceSchema,
-} from './experience.schema'
+  surveyConfigSchema,
+  aiImageConfigVariantSchema,
+  photoConfigVariantSchema,
+} from './index'
 
 describe('experienceStatusSchema', () => {
   it('accepts valid status values', () => {
@@ -74,19 +77,21 @@ describe('experienceMediaSchema', () => {
   })
 })
 
-describe('experienceConfigSchema', () => {
-  it('applies defaults when parsing empty object', () => {
-    const result = experienceConfigSchema.parse({})
-    expect(result.steps).toEqual([])
-    expect(result.photo).toBeNull()
-    expect(result.gif).toBeNull()
-    expect(result.video).toBeNull()
-    expect(result.aiImage).toBeNull()
-    expect(result.aiVideo).toBeNull()
+describe('experienceConfigSchema (discriminated union)', () => {
+  it('rejects config without type discriminator', () => {
+    expect(() => experienceConfigSchema.parse({})).toThrow()
+    expect(() => experienceConfigSchema.parse({ steps: [] })).toThrow()
   })
 
-  it('accepts steps array', () => {
+  it('parses survey config with defaults', () => {
+    const result = surveyConfigSchema.parse({ type: 'survey' })
+    expect(result.type).toBe('survey')
+    expect(result.steps).toEqual([])
+  })
+
+  it('accepts steps array in survey config', () => {
     const result = experienceConfigSchema.parse({
+      type: 'survey',
       steps: [
         {
           id: '123e4567-e89b-12d3-a456-426614174000',
@@ -105,15 +110,17 @@ describe('experienceConfigSchema', () => {
     expect(result.steps).toHaveLength(2)
   })
 
-  it('accepts flattened per-type config', () => {
-    const result = experienceConfigSchema.parse({
+  it('accepts photo config variant', () => {
+    const result = photoConfigVariantSchema.parse({
+      type: 'photo',
       photo: { captureStepId: 'step-1', aspectRatio: '1:1' },
     })
-    expect(result.photo?.captureStepId).toBe('step-1')
+    expect(result.photo.captureStepId).toBe('step-1')
   })
 
-  it('accepts ai image config directly', () => {
-    const result = experienceConfigSchema.parse({
+  it('accepts ai.image config variant', () => {
+    const result = aiImageConfigVariantSchema.parse({
+      type: 'ai.image',
       aiImage: {
         task: 'text-to-image',
         captureStepId: null,
@@ -121,11 +128,12 @@ describe('experienceConfigSchema', () => {
         imageGeneration: { prompt: 'test' },
       },
     })
-    expect(result.aiImage?.task).toBe('text-to-image')
+    expect(result.aiImage.task).toBe('text-to-image')
   })
 
   it('preserves unknown fields (looseObject)', () => {
-    const result: Record<string, unknown> = experienceConfigSchema.parse({
+    const result: Record<string, unknown> = surveyConfigSchema.parse({
+      type: 'survey',
       futureField: 'value',
     })
     expect(result['futureField']).toBe('value')
@@ -136,10 +144,18 @@ describe('experienceSchema', () => {
   const validMinimalExperience = {
     id: 'exp-123',
     name: 'Test Experience',
-    type: 'ai.image',
+    draftType: 'ai.image' as const,
     createdAt: Date.now(),
     updatedAt: Date.now(),
-    draft: { steps: [] },
+    draft: {
+      type: 'ai.image' as const,
+      aiImage: {
+        task: 'text-to-image' as const,
+        captureStepId: null,
+        aspectRatio: '1:1' as const,
+        imageGeneration: { prompt: 'test prompt' },
+      },
+    },
   }
 
   it('parses minimal valid experience with defaults', () => {
@@ -147,7 +163,7 @@ describe('experienceSchema', () => {
 
     expect(result.id).toBe('exp-123')
     expect(result.name).toBe('Test Experience')
-    expect(result.type).toBe('ai.image')
+    expect(result.draftType).toBe('ai.image')
     expect(result.status).toBe('active')
     expect(result.media).toBeNull()
     expect(result.deletedAt).toBeNull()
@@ -176,9 +192,28 @@ describe('experienceSchema', () => {
     ).toThrow()
   })
 
-  it('requires type field', () => {
-    const { type: _, ...withoutType } = validMinimalExperience
-    expect(() => experienceSchema.parse(withoutType)).toThrow()
+  it('requires draftType field', () => {
+    const { draftType: _, ...withoutDraftType } = validMinimalExperience
+    expect(() => experienceSchema.parse(withoutDraftType)).toThrow()
+  })
+
+  it('accepts draftType matching draft.type', () => {
+    const result = experienceSchema.parse(validMinimalExperience)
+    expect(result.draftType).toBe(result.draft.type)
+  })
+
+  it('parses even when draftType differs from draft.type (denormalized field)', () => {
+    // draftType is a denormalized Firestore query field — the schema does not
+    // enforce consistency with draft.type. Write-path code (switchExperienceType,
+    // createExperience) is responsible for keeping them in sync.
+    const mismatch = {
+      ...validMinimalExperience,
+      draftType: 'photo' as const,
+      // draft.type is still 'ai.image'
+    }
+    const result = experienceSchema.parse(mismatch)
+    expect(result.draftType).toBe('photo')
+    expect(result.draft.type).toBe('ai.image')
   })
 
   it('requires draft field', () => {
@@ -190,34 +225,28 @@ describe('experienceSchema', () => {
     it('draft is required, published is optional', () => {
       const result = experienceSchema.parse(validMinimalExperience)
       expect(result.draft.steps).toEqual([])
-      expect(result.draft.photo).toBeNull()
-      expect(result.draft.aiImage).toBeNull()
+      expect(result.draft.type).toBe('ai.image')
       expect(result.published).toBeNull()
     })
 
     it('accepts both draft and published configs', () => {
+      const surveyConfig = {
+        type: 'survey' as const,
+        steps: [
+          {
+            id: '123e4567-e89b-12d3-a456-426614174000',
+            type: 'info',
+            name: 'Info Step',
+            config: { title: '', description: '', media: null },
+          },
+        ],
+      }
+
       const result = experienceSchema.parse({
         ...validMinimalExperience,
-        draft: {
-          steps: [
-            {
-              id: '123e4567-e89b-12d3-a456-426614174000',
-              type: 'info',
-              name: 'Info Step',
-              config: { title: '', description: '', media: null },
-            },
-          ],
-        },
-        published: {
-          steps: [
-            {
-              id: '123e4567-e89b-12d3-a456-426614174000',
-              type: 'info',
-              name: 'Info Step',
-              config: { title: '', description: '', media: null },
-            },
-          ],
-        },
+        draftType: 'survey',
+        draft: surveyConfig,
+        published: surveyConfig,
       })
       expect(result.draft.steps).toHaveLength(1)
       expect(result.published?.steps).toHaveLength(1)
@@ -257,7 +286,15 @@ describe('experienceSchema', () => {
       const now = Date.now()
       const result = experienceSchema.parse({
         ...validMinimalExperience,
-        published: { steps: [] },
+        published: {
+          type: 'ai.image',
+          aiImage: {
+            task: 'text-to-image',
+            captureStepId: null,
+            aspectRatio: '1:1',
+            imageGeneration: { prompt: 'test' },
+          },
+        },
         publishedVersion: 1,
         publishedAt: now,
         publishedBy: 'user-123',
