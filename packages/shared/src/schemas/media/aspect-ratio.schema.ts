@@ -9,6 +9,7 @@
  * - 3:2  - Landscape (images, GIFs only)
  * - 2:3  - Portrait/tall (images, GIFs only)
  * - 9:16 - Vertical/stories (images, GIFs, videos)
+ * - 16:9 - Landscape (videos only)
  */
 import { z } from 'zod'
 
@@ -16,18 +17,25 @@ import { z } from 'zod'
  * Canonical aspect ratios supported by the platform.
  * Used for AI generation output dimensions and overlay matching.
  */
-export const aspectRatioSchema = z.enum(['1:1', '3:2', '2:3', '9:16'])
+export const aspectRatioSchema = z.enum(['1:1', '3:2', '2:3', '9:16', '16:9'])
 
 /**
  * Overlay configuration keys.
  * Extends aspect ratios with 'default' fallback option.
  */
-export const overlayKeySchema = z.enum(['1:1', '3:2', '2:3', '9:16', 'default'])
+export const overlayKeySchema = z.enum([
+  '1:1',
+  '3:2',
+  '2:3',
+  '9:16',
+  '16:9',
+  'default',
+])
 
 /**
- * Image-specific aspect ratios (all 4 ratios supported).
+ * Image-specific aspect ratios (excludes 16:9 landscape video).
  */
-export const imageAspectRatioSchema = aspectRatioSchema
+export const imageAspectRatioSchema = z.enum(['1:1', '3:2', '2:3', '9:16'])
 
 /**
  * Video-specific aspect ratios (subset: 16:9 and 9:16).

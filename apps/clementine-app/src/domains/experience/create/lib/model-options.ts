@@ -8,7 +8,7 @@
  *
  * @see specs/072-outcome-schema-redesign
  */
-import { ASPECT_RATIOS as CANONICAL_ASPECT_RATIOS } from '@clementine/shared'
+import { IMAGE_ASPECT_RATIOS as CANONICAL_ASPECT_RATIOS } from '@clementine/shared'
 import type {
   AspectRatio as CanonicalAspectRatio,
   OutcomeType,

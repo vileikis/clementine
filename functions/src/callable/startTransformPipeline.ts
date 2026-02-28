@@ -150,11 +150,15 @@ async function validateJobPreconditions(
 function getOutcomeAspectRatio(config: ExperienceConfig): AspectRatio {
   switch (config.type) {
     case 'photo':
-      return config.photo.aspectRatio as AspectRatio
+      return config.photo.aspectRatio
     case 'ai.image':
-      return config.aiImage.aspectRatio as AspectRatio
+      return config.aiImage.aspectRatio
     case 'ai.video':
-      return config.aiVideo.aspectRatio as AspectRatio
+      return config.aiVideo.aspectRatio
+    case 'video':
+      return config.video.aspectRatio
+    case 'gif':
+      return config.gif.aspectRatio
     default:
       return '1:1'
   }
