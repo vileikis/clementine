@@ -41,6 +41,10 @@ export const aiVideoModelSchema = z.enum([
   'veo-3.1-fast-generate-001',
 ])
 
+// ── Video Resolution ────────────────────────────────────────
+
+export const videoResolutionSchema = z.enum(['720p', '1080p', '4k'])
+
 // ── Generation Config Schemas ────────────────────────────────
 
 /**
@@ -82,6 +86,10 @@ export const videoGenerationConfigSchema = z.object({
   duration: videoDurationSchema.default(6),
   aspectRatio: videoAspectRatioSchema.nullable().default(null),
   refMedia: z.array(mediaReferenceSchema).default([]),
+  resolution: videoResolutionSchema.default('1080p'),
+  negativePrompt: z.string().max(500).default(''),
+  sound: z.boolean().default(false),
+  enhance: z.boolean().default(false),
 })
 
 // ── Per-Type Config Schemas ──────────────────────────────────
@@ -220,4 +228,5 @@ export type GifConfig = z.infer<typeof gifConfigSchema>
 export type VideoConfig = z.infer<typeof videoConfigSchema>
 export type AIVideoTask = z.infer<typeof aiVideoTaskSchema>
 export type AIVideoModel = z.infer<typeof aiVideoModelSchema>
+export type VideoResolution = z.infer<typeof videoResolutionSchema>
 export type AIVideoConfig = z.infer<typeof aiVideoConfigSchema>

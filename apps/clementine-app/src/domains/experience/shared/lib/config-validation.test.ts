@@ -87,6 +87,10 @@ const defaultAiVideo: AIVideoConfig = {
     duration: 6,
     aspectRatio: null,
     refMedia: [],
+    resolution: '1080p',
+    negativePrompt: '',
+    sound: false,
+    enhance: false,
   },
 }
 
@@ -433,6 +437,10 @@ describe('validateConfig', () => {
           duration: 6,
           aspectRatio: null,
           refMedia: [],
+          resolution: '1080p',
+          negativePrompt: '',
+          sound: false,
+          enhance: false,
         },
       })
       const result = validateConfig(config, steps)

@@ -19,12 +19,12 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T001 Add `videoResolutionSchema` enum (`'720p' | '1080p' | '4k'`) and extend `videoGenerationConfigSchema` with four new fields (`resolution`, `negativePrompt`, `sound`, `enhance`) with Zod defaults in `packages/shared/src/schemas/experience/experience-config.schema.ts`. Export `VideoResolution` type.
-- [ ] T002 Build shared package to make new types available to frontend and backend: run `pnpm --filter @clementine/shared build`
-- [ ] T003 [P] Add `resolution: boolean` to `ModalitySupports` interface. Set `resolution: true`, `sound: true`, `enhance: true` on `VIDEO_MODALITY` in `apps/clementine-app/src/domains/experience/create/lib/modality-definitions.ts`. Add `resolution: false` to all other modality definitions for type safety.
-- [ ] T004 [P] Add `RESOLUTION_OPTIONS` constant (720p, 1080p, 4K) and `MODEL_RESOLUTION_MAP` mapping each `AIVideoModel` to its allowed resolutions in `apps/clementine-app/src/domains/experience/create/lib/model-options.ts`
-- [ ] T005 [P] Extend `ModalityControlValues` with `resolution`, `onResolutionChange`, `sound`, `onSoundChange`, `enhance`, `onEnhanceChange` fields in `apps/clementine-app/src/domains/experience/create/components/PromptComposer/PromptComposerContext.tsx`
-- [ ] T006 [P] Update `createDefaultAIVideoConfig()` to include `resolution: '1080p'`, `negativePrompt: ''`, `sound: false`, `enhance: false` in `apps/clementine-app/src/domains/experience/create/lib/experience-config-operations.ts`
+- [x] T001 Add `videoResolutionSchema` enum (`'720p' | '1080p' | '4k'`) and extend `videoGenerationConfigSchema` with four new fields (`resolution`, `negativePrompt`, `sound`, `enhance`) with Zod defaults in `packages/shared/src/schemas/experience/experience-config.schema.ts`. Export `VideoResolution` type.
+- [x] T002 Build shared package to make new types available to frontend and backend: run `pnpm --filter @clementine/shared build`
+- [x] T003 [P] Add `resolution: boolean` to `ModalitySupports` interface. Set `resolution: true`, `sound: true`, `enhance: true` on `VIDEO_MODALITY` in `apps/clementine-app/src/domains/experience/create/lib/modality-definitions.ts`. Add `resolution: false` to all other modality definitions for type safety.
+- [x] T004 [P] Add `RESOLUTION_OPTIONS` constant (720p, 1080p, 4K) and `MODEL_RESOLUTION_MAP` mapping each `AIVideoModel` to its allowed resolutions in `apps/clementine-app/src/domains/experience/create/lib/model-options.ts`
+- [x] T005 [P] Extend `ModalityControlValues` with `resolution`, `onResolutionChange`, `sound`, `onSoundChange`, `enhance`, `onEnhanceChange` fields in `apps/clementine-app/src/domains/experience/create/components/PromptComposer/PromptComposerContext.tsx`
+- [x] T006 [P] Update `createDefaultAIVideoConfig()` to include `resolution: '1080p'`, `negativePrompt: ''`, `sound: false`, `enhance: false` in `apps/clementine-app/src/domains/experience/create/lib/experience-config-operations.ts`
 
 **Checkpoint**: Schema extended, modality system ready, control infrastructure in place. User story implementation can begin.
 
@@ -38,10 +38,10 @@
 
 ### Implementation for User Story 1
 
-- [ ] T007 [P] [US1] Render a Sound toggle in `ControlRow` when `modality.supports.sound` is `true`. Use a compact toggle/switch component (shadcn/ui Switch or similar) with "Sound" label. Read value from `controls.sound` and call `controls.onSoundChange` on toggle in `apps/clementine-app/src/domains/experience/create/components/PromptComposer/ControlRow.tsx`
-- [ ] T008 [P] [US1] Wire `sound` state from `videoGeneration.sound` to PromptComposer's `controls` prop. Add `onSoundChange` callback that calls `updateVideoGeneration({ sound })` in `apps/clementine-app/src/domains/experience/create/components/ai-video-config/AIVideoConfigForm.tsx`
-- [ ] T009 [P] [US1] Extend `GenerateVideoRequest` interface with `resolution: VideoResolution`, `negativePrompt: string`, `sound: boolean`, `enhance: boolean`. Update `buildVeoParams` to include `resolution: request.resolution`, conditionally add `negativePrompt` (if non-empty), `generateAudio` (if sound true), `enhancePrompt` (if enhance true) to `baseConfig` in `functions/src/services/transform/operations/aiGenerateVideo.ts`
-- [ ] T010 [P] [US1] Pass `resolution`, `negativePrompt`, `sound`, `enhance` from `videoGeneration` config to `GenerateVideoRequest` when building the request in `functions/src/services/transform/outcomes/aiVideoOutcome.ts`
+- [x] T007 [P] [US1] Render a Sound toggle in `ControlRow` when `modality.supports.sound` is `true`. Use a compact toggle/switch component (shadcn/ui Switch or similar) with "Sound" label. Read value from `controls.sound` and call `controls.onSoundChange` on toggle in `apps/clementine-app/src/domains/experience/create/components/PromptComposer/ControlRow.tsx`
+- [x] T008 [P] [US1] Wire `sound` state from `videoGeneration.sound` to PromptComposer's `controls` prop. Add `onSoundChange` callback that calls `updateVideoGeneration({ sound })` in `apps/clementine-app/src/domains/experience/create/components/ai-video-config/AIVideoConfigForm.tsx`
+- [x] T009 [P] [US1] Extend `GenerateVideoRequest` interface with `resolution: VideoResolution`, `negativePrompt: string`, `sound: boolean`, `enhance: boolean`. Update `buildVeoParams` to include `resolution: request.resolution`, conditionally add `negativePrompt` (if non-empty), `generateAudio` (if sound true), `enhancePrompt` (if enhance true) to `baseConfig` in `functions/src/services/transform/operations/aiGenerateVideo.ts`
+- [x] T010 [P] [US1] Pass `resolution`, `negativePrompt`, `sound`, `enhance` from `videoGeneration` config to `GenerateVideoRequest` when building the request in `functions/src/services/transform/outcomes/aiVideoOutcome.ts`
 
 **Checkpoint**: Sound toggle visible in ControlRow, backend passes all 4 advanced params to Veo API. MVP complete.
 
@@ -55,8 +55,8 @@
 
 ### Implementation for User Story 2
 
-- [ ] T011 [P] [US2] Render a Resolution selector in `ControlRow` when `modality.supports.resolution` is `true`. Use `Select` component matching existing model/duration selectors. Filter options from `RESOLUTION_OPTIONS` using `MODEL_RESOLUTION_MAP` based on current `model` value. Show a cost indicator (e.g., small badge or tooltip) when `4k` is selected in `apps/clementine-app/src/domains/experience/create/components/PromptComposer/ControlRow.tsx`
-- [ ] T012 [US2] Wire `resolution` state from `videoGeneration.resolution` to PromptComposer's `controls` prop. Add `onResolutionChange` callback. Add model-switch auto-downgrade logic to the existing `onModelChange` handler: when switching to a model that doesn't support the current resolution, reset to `'1080p'` and show an inline toast/notice in `apps/clementine-app/src/domains/experience/create/components/ai-video-config/AIVideoConfigForm.tsx`
+- [x] T011 [P] [US2] Render a Resolution selector in `ControlRow` when `modality.supports.resolution` is `true`. Use `Select` component matching existing model/duration selectors. Filter options from `RESOLUTION_OPTIONS` using `MODEL_RESOLUTION_MAP` based on current `model` value. Show a cost indicator (e.g., small badge or tooltip) when `4k` is selected in `apps/clementine-app/src/domains/experience/create/components/PromptComposer/ControlRow.tsx`
+- [x] T012 [US2] Wire `resolution` state from `videoGeneration.resolution` to PromptComposer's `controls` prop. Add `onResolutionChange` callback. Add model-switch auto-downgrade logic to the existing `onModelChange` handler: when switching to a model that doesn't support the current resolution, reset to `'1080p'` and show an inline toast/notice in `apps/clementine-app/src/domains/experience/create/components/ai-video-config/AIVideoConfigForm.tsx`
 
 **Checkpoint**: Resolution selector visible in ControlRow with model-aware filtering. Auto-downgrade works on model switch.
 
@@ -70,7 +70,7 @@
 
 ### Implementation for User Story 3
 
-- [ ] T013 [US3] Add a Negative Prompt textarea below the PromptComposer in `AIVideoConfigForm`. Use a `Textarea` component with placeholder "Describe what to avoid in the generated video", `maxLength={500}`, and a character counter. Bind to `videoGeneration.negativePrompt` via `updateVideoGeneration({ negativePrompt })` in `apps/clementine-app/src/domains/experience/create/components/ai-video-config/AIVideoConfigForm.tsx`
+- [x] T013 [US3] Add a Negative Prompt textarea below the PromptComposer in `AIVideoConfigForm`. Use a `Textarea` component with placeholder "Describe what to avoid in the generated video", `maxLength={500}`, and a character counter. Bind to `videoGeneration.negativePrompt` via `updateVideoGeneration({ negativePrompt })` in `apps/clementine-app/src/domains/experience/create/components/ai-video-config/AIVideoConfigForm.tsx`
 
 **Checkpoint**: Negative prompt textarea visible below PromptComposer with 500-char limit. Value persists and flows to backend.
 
@@ -84,8 +84,8 @@
 
 ### Implementation for User Story 4
 
-- [ ] T014 [P] [US4] Render an Enhance toggle in `ControlRow` when `modality.supports.enhance` is `true`. Use the same toggle pattern as Sound (T007). Add a brief description/tooltip explaining what enhancement does (e.g., "Improves prompt for better results") in `apps/clementine-app/src/domains/experience/create/components/PromptComposer/ControlRow.tsx`
-- [ ] T015 [P] [US4] Wire `enhance` state from `videoGeneration.enhance` to PromptComposer's `controls` prop. Add `onEnhanceChange` callback that calls `updateVideoGeneration({ enhance })` in `apps/clementine-app/src/domains/experience/create/components/ai-video-config/AIVideoConfigForm.tsx`
+- [x] T014 [P] [US4] Render an Enhance toggle in `ControlRow` when `modality.supports.enhance` is `true`. Use the same toggle pattern as Sound (T007). Add a brief description/tooltip explaining what enhancement does (e.g., "Improves prompt for better results") in `apps/clementine-app/src/domains/experience/create/components/PromptComposer/ControlRow.tsx`
+- [x] T015 [P] [US4] Wire `enhance` state from `videoGeneration.enhance` to PromptComposer's `controls` prop. Add `onEnhanceChange` callback that calls `updateVideoGeneration({ enhance })` in `apps/clementine-app/src/domains/experience/create/components/ai-video-config/AIVideoConfigForm.tsx`
 
 **Checkpoint**: Enhance toggle visible in ControlRow with description. Value persists and flows to backend.
 
@@ -95,10 +95,10 @@
 
 **Purpose**: Ensure everything works together, passes validation gates, and maintains backward compatibility
 
-- [ ] T016 Run `pnpm app:check` (format + lint) and `pnpm app:type-check` to verify no type errors across the frontend
-- [ ] T017 Run `pnpm functions:build` to verify backend compiles with the extended GenerateVideoRequest
-- [ ] T018 Verify backward compatibility: confirm existing experience configs without new fields parse correctly with Zod defaults (manually test or check schema parsing)
-- [ ] T019 Run standards compliance review per constitution Principle V: check design-system.md compliance (theme tokens, no hardcoded colors), component-libraries.md (shadcn/ui usage), code-quality.md (clean code, no dead code)
+- [x] T016 Run `pnpm app:check` (format + lint) and `pnpm app:type-check` to verify no type errors across the frontend
+- [x] T017 Run `pnpm functions:build` to verify backend compiles with the extended GenerateVideoRequest
+- [x] T018 Verify backward compatibility: confirm existing experience configs without new fields parse correctly with Zod defaults (manually test or check schema parsing)
+- [x] T019 Run standards compliance review per constitution Principle V: check design-system.md compliance (theme tokens, no hardcoded colors), component-libraries.md (shadcn/ui usage), code-quality.md (clean code, no dead code)
 
 ---
 

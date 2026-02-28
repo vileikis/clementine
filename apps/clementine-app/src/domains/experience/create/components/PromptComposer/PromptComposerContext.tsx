@@ -19,6 +19,12 @@ export interface ModalityControlValues {
   onAspectRatioChange?: (value: string) => void
   duration?: string
   onDurationChange?: (value: string) => void
+  resolution?: string
+  onResolutionChange?: (value: string) => void
+  sound?: boolean
+  onSoundChange?: (value: boolean) => void
+  enhance?: boolean
+  onEnhanceChange?: (value: boolean) => void
 }
 
 export interface RefMediaState {

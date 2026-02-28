@@ -87,6 +87,10 @@ export function createDefaultAIVideoConfig(
       duration: 6,
       aspectRatio: null,
       refMedia: [],
+      resolution: '1080p',
+      negativePrompt: '',
+      sound: false,
+      enhance: false,
     },
   }
 }

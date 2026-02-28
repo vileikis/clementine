@@ -8,10 +8,15 @@
  * Controls auto-render based on modality.supports.*
  */
 
-import { ASPECT_RATIOS } from '../../lib/model-options'
+import {
+  ASPECT_RATIOS,
+  MODEL_RESOLUTION_MAP,
+  RESOLUTION_OPTIONS,
+} from '../../lib/model-options'
 import { usePromptComposerContext } from './PromptComposerContext'
 import { AddMediaButton } from './AddMediaButton'
 import type { SelectOption } from '../../lib/modality-definitions'
+import type { AIVideoModel } from '@clementine/shared'
 import {
   Select,
   SelectContent,
@@ -19,6 +24,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/ui-kit/ui/select'
+import { Switch } from '@/ui-kit/ui/switch'
+import { Label } from '@/ui-kit/ui/label'
 
 export type { SelectOption }
 
@@ -95,6 +102,87 @@ export function ControlRow() {
               ))}
             </SelectContent>
           </Select>
+        )}
+
+      {/* Resolution Select — shown when modality supports it */}
+      {modality.supports.resolution &&
+        controls?.resolution !== undefined &&
+        controls?.onResolutionChange && (
+          <Select
+            value={controls.resolution}
+            onValueChange={controls.onResolutionChange}
+            disabled={disabled}
+          >
+            <SelectTrigger
+              className="h-11 w-auto min-w-20 cursor-pointer border-0 bg-transparent font-semibold shadow-none focus-visible:ring-0"
+              aria-label="Select resolution"
+            >
+              <SelectValue placeholder="Resolution" />
+            </SelectTrigger>
+            <SelectContent>
+              {RESOLUTION_OPTIONS.filter((option) => {
+                const allowedResolutions =
+                  MODEL_RESOLUTION_MAP[model as AIVideoModel]
+                return allowedResolutions
+                  ? allowedResolutions.includes(
+                      option.value,
+                    )
+                  : true
+              }).map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                  {option.value === '4k' && (
+                    <span className="ml-1 text-xs text-muted-foreground">
+                      $$
+                    </span>
+                  )}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+
+      {/* Sound Toggle — shown when modality supports it */}
+      {modality.supports.sound &&
+        controls?.sound !== undefined &&
+        controls?.onSoundChange && (
+          <div className="flex items-center gap-1.5">
+            <Switch
+              id="sound-toggle"
+              checked={controls.sound}
+              onCheckedChange={controls.onSoundChange}
+              disabled={disabled}
+              aria-label="Toggle sound"
+            />
+            <Label
+              htmlFor="sound-toggle"
+              className="cursor-pointer text-xs font-semibold"
+            >
+              Sound
+            </Label>
+          </div>
+        )}
+
+      {/* Enhance Toggle — shown when modality supports it */}
+      {modality.supports.enhance &&
+        controls?.enhance !== undefined &&
+        controls?.onEnhanceChange && (
+          <div className="flex items-center gap-1.5">
+            <Switch
+              id="enhance-toggle"
+              checked={controls.enhance}
+              onCheckedChange={controls.onEnhanceChange}
+              disabled={disabled}
+              aria-label="Toggle prompt enhancement"
+            />
+            <Label
+              htmlFor="enhance-toggle"
+              className="cursor-pointer text-xs font-semibold"
+              title="Improves prompt for better results"
+            >
+              Enhance
+            </Label>
+          </div>
         )}
 
       {/* Spacer to push add button to right */}

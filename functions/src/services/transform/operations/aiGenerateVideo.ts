@@ -28,6 +28,7 @@ import type {
   AIVideoModel,
   MediaReference,
   VideoAspectRatio,
+  VideoResolution,
 } from '@clementine/shared'
 import { storage } from '../../../infra/firebase-admin'
 import {
@@ -74,6 +75,14 @@ export interface GenerateVideoRequest {
   lastFrameMedia?: MediaReference
   /** Asset reference images for animate-reference */
   referenceMedia?: MediaReference[]
+  /** Output video resolution */
+  resolution: VideoResolution
+  /** Elements to avoid in generation */
+  negativePrompt: string
+  /** Enable AI-generated audio */
+  sound: boolean
+  /** Enable prompt enhancement */
+  enhance: boolean
 }
 
 /**
@@ -234,6 +243,10 @@ function buildVeoParams(
     personGeneration: 'allow_adult' as const,
     numberOfVideos: 1,
     outputGcsUri,
+    resolution: request.resolution,
+    ...(request.negativePrompt ? { negativePrompt: request.negativePrompt } : {}),
+    generateAudio: request.sound,
+    enhancePrompt: request.enhance,
   }
 
   // Pattern 2: animate-reference (config.referenceImages, no params.image)
