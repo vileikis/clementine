@@ -1,8 +1,12 @@
 /**
  * Switch Experience Type
  *
- * Atomically replaces the draft with a new discriminated union config variant
- * and updates draftType. Uses a Firestore transaction for consistency.
+ * Switches the draft's discriminator (`draft.type`) to the new type using
+ * dot-notation partial updates. Existing type-specific configs are preserved
+ * as inert sibling fields (looseObject tolerates them), so switching back
+ * restores previous inputs without data loss.
+ *
+ * If the new type has no config field yet, initializes it with defaults.
  *
  * @see specs/083-config-discriminated-union — US3
  */
@@ -13,20 +17,31 @@ import {
   serverTimestamp,
 } from 'firebase/firestore'
 import { buildDefaultDraft } from '../hooks/useCreateExperience'
-import type { ExperienceStep, ExperienceType } from '../schemas'
+import type { ExperienceType } from '../schemas'
 import { firestore } from '@/integrations/firebase/client'
+
+/** Maps outcome types to their config field key on the draft object */
+const CONFIG_FIELD_KEYS: Partial<Record<ExperienceType, string>> = {
+  photo: 'photo',
+  gif: 'gif',
+  video: 'video',
+  'ai.image': 'aiImage',
+  'ai.video': 'aiVideo',
+}
 
 /**
  * Switch experience type atomically.
  *
- * Builds a new discriminated union config for the target type,
- * preserving existing steps. Replaces the entire draft.
+ * Uses dot-notation updates so only the discriminator and (optionally)
+ * the new type's config field are written. All other draft fields —
+ * including steps and other type configs — are left untouched.
  *
  * Updates:
- * - experience.draftType = newType
- * - experience.draft = { type: newType, steps: existingSteps, [typeConfig]: defaults }
- * - experience.draftVersion += 1
- * - experience.updatedAt = serverTimestamp
+ * - draftType = newType
+ * - draft.type = newType
+ * - draft.[newConfigKey] = defaults  (only if the field doesn't exist yet)
+ * - draftVersion += 1
+ * - updatedAt = serverTimestamp
  *
  * @param workspaceId - Workspace ID
  * @param experienceId - Experience ID
@@ -48,23 +63,25 @@ export async function switchExperienceType(
       throw new Error(`Experience ${experienceId} not found`)
     }
 
-    // Preserve existing steps from the current draft
-    const currentDraft = (snapshot.data()?.draft ?? {}) as {
-      steps?: ExperienceStep[]
-    }
-    const existingSteps = currentDraft.steps ?? []
-
-    // Build new discriminated config with defaults for the target type
-    const newDraft = buildDefaultDraft(newType)
-
-    // Carry over existing steps
-    newDraft.steps = existingSteps
-
-    transaction.update(experienceRef, {
+    const updates: Record<string, unknown> = {
       draftType: newType,
-      draft: newDraft,
+      'draft.type': newType,
       draftVersion: increment(1),
       updatedAt: serverTimestamp(),
-    })
+    }
+
+    // Initialize the new type's config field if it doesn't exist yet
+    const configKey = CONFIG_FIELD_KEYS[newType]
+    if (configKey) {
+      const currentDraft = snapshot.data()?.draft as
+        | Record<string, unknown>
+        | undefined
+      if (!currentDraft?.[configKey]) {
+        const defaults = buildDefaultDraft(newType) as Record<string, unknown>
+        updates[`draft.${configKey}`] = defaults[configKey]
+      }
+    }
+
+    transaction.update(experienceRef, updates)
   })
 }

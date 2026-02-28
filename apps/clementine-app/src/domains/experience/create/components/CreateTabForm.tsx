@@ -114,10 +114,10 @@ export function CreateTabForm({ experience, workspaceId }: CreateTabFormProps) {
     },
   })
 
-  // Reset form when experience changes (e.g., navigating to different experience)
+  // Reset form when experience or type changes
   useEffect(() => {
     form.reset(serverConfig)
-  }, [experience.id])
+  }, [experience.id, experienceType])
 
   // Auto-save with debounce (2 seconds) — writes only the active type's config
   const { triggerSave } = useAutoSave({
