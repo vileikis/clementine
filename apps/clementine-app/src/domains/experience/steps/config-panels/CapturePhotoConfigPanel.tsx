@@ -9,6 +9,7 @@ import type {
   ExperienceCapturePhotoStepConfig,
   ImageAspectRatio,
 } from '@clementine/shared'
+import { imageAspectRatioSchema } from '@clementine/shared'
 import { EditorSection } from '@/shared/editor-controls'
 import { ASPECT_RATIOS } from '@/domains/experience/create/lib/model-options'
 import {
@@ -36,7 +37,9 @@ export function CapturePhotoConfigPanel({
   const aspectRatio = config.aspectRatio ?? '1:1'
 
   const handleAspectRatioChange = (value: string) => {
-    onConfigChange({ aspectRatio: value as ImageAspectRatio })
+    const parsed = imageAspectRatioSchema.safeParse(value)
+    if (!parsed.success) return
+    onConfigChange({ aspectRatio: parsed.data })
   }
 
   return (

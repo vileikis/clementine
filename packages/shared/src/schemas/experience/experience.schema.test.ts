@@ -197,6 +197,25 @@ describe('experienceSchema', () => {
     expect(() => experienceSchema.parse(withoutDraftType)).toThrow()
   })
 
+  it('accepts draftType matching draft.type', () => {
+    const result = experienceSchema.parse(validMinimalExperience)
+    expect(result.draftType).toBe(result.draft.type)
+  })
+
+  it('parses even when draftType differs from draft.type (denormalized field)', () => {
+    // draftType is a denormalized Firestore query field — the schema does not
+    // enforce consistency with draft.type. Write-path code (switchExperienceType,
+    // createExperience) is responsible for keeping them in sync.
+    const mismatch = {
+      ...validMinimalExperience,
+      draftType: 'photo' as const,
+      // draft.type is still 'ai.image'
+    }
+    const result = experienceSchema.parse(mismatch)
+    expect(result.draftType).toBe('photo')
+    expect(result.draft.type).toBe('ai.image')
+  })
+
   it('requires draft field', () => {
     const { draft: _, ...withoutDraft } = validMinimalExperience
     expect(() => experienceSchema.parse(withoutDraft)).toThrow()
