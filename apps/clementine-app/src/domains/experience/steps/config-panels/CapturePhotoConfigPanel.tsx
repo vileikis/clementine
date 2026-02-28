@@ -4,12 +4,12 @@
  * Configuration panel for photo capture steps.
  * Allows setting the aspect ratio for photo capture.
  */
+import { imageAspectRatioSchema } from '@clementine/shared'
 import type { StepConfigPanelProps } from '../registry/step-registry'
 import type {
   ExperienceCapturePhotoStepConfig,
   ImageAspectRatio,
 } from '@clementine/shared'
-import { imageAspectRatioSchema } from '@clementine/shared'
 import { EditorSection } from '@/shared/editor-controls'
 import { ASPECT_RATIOS } from '@/domains/experience/create/lib/model-options'
 import {
