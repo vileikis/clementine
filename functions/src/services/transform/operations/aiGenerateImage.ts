@@ -144,7 +144,10 @@ export async function aiGenerateImage(
  * - gemini-3-pro-image-preview: Requires "global" location
  */
 function getLocationForModel(model: string): string {
-  if (model === 'gemini-3-pro-image-preview') {
+  if (
+    model === 'gemini-3-pro-image-preview' ||
+    model === 'gemini-3.1-flash-image-preview'
+  ) {
     return 'global'
   }
   return VERTEX_AI_LOCATION.value()
