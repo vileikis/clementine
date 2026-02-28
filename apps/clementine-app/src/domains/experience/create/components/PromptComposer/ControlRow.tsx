@@ -124,9 +124,7 @@ export function ControlRow() {
                 const allowedResolutions =
                   MODEL_RESOLUTION_MAP[model as AIVideoModel]
                 return allowedResolutions
-                  ? allowedResolutions.includes(
-                      option.value,
-                    )
+                  ? allowedResolutions.includes(option.value)
                   : true
               }).map((option) => (
                 <SelectItem key={option.value} value={option.value}>
