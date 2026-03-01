@@ -22,9 +22,16 @@ import type { JobSnapshot } from '@clementine/shared'
 function createMockSnapshot(overrides: Partial<JobSnapshot> = {}): JobSnapshot {
   return {
     sessionResponses: [],
-    outcome: null,
     overlayChoice: null,
     experienceVersion: 1,
+    type: 'photo',
+    config: {
+      photo: null,
+      gif: null,
+      video: null,
+      aiImage: null,
+      aiVideo: null,
+    },
     ...overrides,
   }
 }
