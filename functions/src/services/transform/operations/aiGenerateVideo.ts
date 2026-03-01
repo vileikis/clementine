@@ -15,6 +15,7 @@
  * @see specs/074-ai-video-backend/research.md R-001, R-006
  */
 import {
+  GenerateVideosConfig,
   GenerateVideosParameters,
   GoogleGenAI,
   VideoGenerationReferenceType,
@@ -237,14 +238,16 @@ function buildVeoParams(
   const { prompt, model, aspectRatio, duration, sourceMedia } = request
   const hasReferences = !!request.referenceMedia?.length
 
-  const baseConfig = {
+  const baseConfig: GenerateVideosConfig = {
     aspectRatio,
     durationSeconds: duration,
     personGeneration: 'allow_adult' as const,
     numberOfVideos: 1,
     outputGcsUri,
     resolution: request.resolution,
-    ...(request.negativePrompt ? { negativePrompt: request.negativePrompt } : {}),
+    ...(request.negativePrompt
+      ? { negativePrompt: request.negativePrompt }
+      : {}),
     generateAudio: request.sound,
     enhancePrompt: request.enhance,
   }

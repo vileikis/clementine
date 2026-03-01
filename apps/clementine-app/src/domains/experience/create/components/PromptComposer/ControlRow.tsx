@@ -39,7 +39,7 @@ export function ControlRow() {
   return (
     <div className="flex items-start gap-2 px-3 py-2">
       {/* Controls — wraps to next row when space is limited */}
-      <div className="flex flex-1 flex-wrap items-center gap-1.5">
+      <div className="flex flex-1 flex-wrap items-center gap-1 mt-1">
         {/* Model Select */}
         <Select value={model} onValueChange={onModelChange} disabled={disabled}>
           <SelectTrigger
