@@ -352,6 +352,8 @@ See individual workspace documentation for required environment variables.
 ## Active Technologies
 - TypeScript 5.7.2 (strict mode) + TanStack Start 1.132.0, Firebase SDK 12.5.0, Firebase Cloud Functions v2, Dropbox API (HTTP — no SDK), Zod 4.1.12 (069-dropbox-export)
 - Firebase Firestore (workspace integration config, project export config, export logs), Firebase Storage (result media source) (069-dropbox-export)
+- TypeScript 5.7.2 (strict mode) + TanStack Start 1.132.0, React 19, Zod 4.1.12, shadcn/ui, `@google/genai` v1.38.0 (086-video-advanced-controls)
+- Firebase Firestore (experience config documents, job snapshots) (086-video-advanced-controls)
 
 ## Recent Changes
 - 069-dropbox-export: Added TypeScript 5.7.2 (strict mode) + TanStack Start 1.132.0, Firebase SDK 12.5.0, Firebase Cloud Functions v2, Dropbox API (HTTP — no SDK), Zod 4.1.12

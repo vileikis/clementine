@@ -6,7 +6,7 @@ import { logger } from 'firebase-functions/v2';
 // Prefer FFMPEG_BIN env var (e.g. Homebrew FFmpeg) over ffmpeg-static.
 // This aligns local dev (macOS) with Cloud Functions (Linux) on FFmpeg 7.x.
 // See: https://github.com/eugeneware/ffmpeg-static/issues/151
-const resolvedPath = process.env.FFMPEG_BIN || ffmpegStatic;
+const resolvedPath = process.env['FFMPEG_BIN'] || ffmpegStatic;
 if (!resolvedPath) {
   throw new Error('FFmpeg binary not found. Set FFMPEG_BIN or install ffmpeg-static.');
 }
@@ -22,7 +22,7 @@ try {
   const firstLine = versionOutput.split('\n')[0] ?? '';
   logger.info('[ffmpeg-diagnostic] FFmpeg version on cold start', {
     version: firstLine,
-    source: process.env.FFMPEG_BIN ? 'FFMPEG_BIN env var' : 'ffmpeg-static',
+    source: process.env['FFMPEG_BIN'] ? 'FFMPEG_BIN env var' : 'ffmpeg-static',
     binaryPath: FFMPEG_PATH,
   });
 } catch (err) {

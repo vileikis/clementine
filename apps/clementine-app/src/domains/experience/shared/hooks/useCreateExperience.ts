@@ -78,6 +78,10 @@ export function buildDefaultDraft(
             duration: 6,
             aspectRatio: null,
             refMedia: [],
+            resolution: '1080p' as const,
+            negativePrompt: '',
+            sound: false,
+            enhance: false,
           },
         },
       }

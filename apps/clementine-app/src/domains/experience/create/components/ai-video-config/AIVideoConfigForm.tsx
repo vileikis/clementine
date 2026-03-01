@@ -12,8 +12,12 @@
 import { useCallback, useMemo, useRef } from 'react'
 
 import { VIDEO_ASPECT_RATIOS } from '@clementine/shared'
+import { toast } from 'sonner'
 import { getFieldError } from '../../hooks/useExperienceConfigValidation'
-import { MAX_VIDEO_REF_MEDIA_COUNT } from '../../lib/model-options'
+import {
+  MAX_VIDEO_REF_MEDIA_COUNT,
+  MODEL_RESOLUTION_MAP,
+} from '../../lib/model-options'
 import { useRefMediaUpload } from '../../hooks/useRefMediaUpload'
 import { SubjectMediaSection } from '../shared-controls/SubjectMediaSection'
 import { AspectRatioSelector } from '../shared-controls/AspectRatioSelector'
@@ -30,7 +34,10 @@ import type {
   ImageGenerationConfig,
   MediaReference,
   VideoGenerationConfig,
+  VideoResolution,
 } from '@clementine/shared'
+import { Textarea } from '@/ui-kit/ui/textarea'
+import { Label } from '@/ui-kit/ui/label'
 
 const VIDEO_ASPECT_RATIO_OPTIONS = VIDEO_ASPECT_RATIOS.map((value) => ({
   value,
@@ -196,6 +203,28 @@ export function AIVideoConfigForm({
     ],
   )
 
+  const handleModelChange = useCallback(
+    (newModel: string) => {
+      const model = newModel as AIVideoModel
+      const updates: Partial<VideoGenerationConfig> = { model }
+
+      // Auto-downgrade resolution if the new model doesn't support it
+      const allowedResolutions = MODEL_RESOLUTION_MAP[model]
+      const isResolutionSupported = allowedResolutions?.includes(
+        videoGeneration.resolution,
+      )
+      if (!isResolutionSupported) {
+        updates.resolution = '1080p'
+        toast.info(
+          'Resolution reset to 1080p (not supported by selected model)',
+        )
+      }
+
+      updateVideoGeneration(updates)
+    },
+    [updateVideoGeneration, videoGeneration.resolution],
+  )
+
   // ── Task-specific modality variants ────────────────────────
 
   const taskModality = useMemo(() => {
@@ -252,9 +281,7 @@ export function AIVideoConfigForm({
             prompt={videoGeneration.prompt}
             onPromptChange={(prompt) => updateVideoGeneration({ prompt })}
             model={videoGeneration.model}
-            onModelChange={(model) =>
-              updateVideoGeneration({ model: model as AIVideoModel })
-            }
+            onModelChange={handleModelChange}
             controls={{
               duration: String(videoGeneration.duration ?? 6),
               onDurationChange: (d) => {
@@ -263,6 +290,15 @@ export function AIVideoConfigForm({
                   updateVideoGeneration({ duration: n })
                 }
               },
+              resolution: videoGeneration.resolution,
+              onResolutionChange: (resolution) =>
+                updateVideoGeneration({
+                  resolution: resolution as VideoResolution,
+                }),
+              sound: videoGeneration.sound,
+              onSoundChange: (sound) => updateVideoGeneration({ sound }),
+              enhance: videoGeneration.enhance,
+              onEnhanceChange: (enhance) => updateVideoGeneration({ enhance }),
             }}
             refMedia={
               config.task === 'ref-images-to-video'
@@ -279,6 +315,28 @@ export function AIVideoConfigForm({
             steps={mentionableSteps}
             error={getFieldError(errors, 'aiVideo.videoGeneration.prompt')}
           />
+        )}
+
+        {/* Negative Prompt — shown for video tasks with PromptComposer */}
+        {(config.task === 'image-to-video' ||
+          config.task === 'ref-images-to-video') && (
+          <div className="space-y-1.5">
+            <Label htmlFor="negative-prompt">Negative Prompt</Label>
+            <Textarea
+              id="negative-prompt"
+              value={videoGeneration.negativePrompt}
+              onChange={(e) =>
+                updateVideoGeneration({ negativePrompt: e.target.value })
+              }
+              placeholder="Describe what to avoid in the generated video"
+              maxLength={500}
+              rows={2}
+              className="resize-none text-sm"
+            />
+            <p className="text-right text-xs text-muted-foreground">
+              {videoGeneration.negativePrompt.length}/500
+            </p>
+          </div>
         )}
       </div>
 

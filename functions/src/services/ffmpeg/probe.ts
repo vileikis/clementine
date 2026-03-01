@@ -6,7 +6,7 @@ import ffprobeStatic from 'ffprobe-static'
 
 // Prefer FFPROBE_BIN env var (e.g. Homebrew ffprobe) over ffprobe-static.
 // Mirrors FFMPEG_BIN alignment strategy in core.ts.
-const FFPROBE_PATH = process.env.FFPROBE_BIN || ffprobeStatic.path
+const FFPROBE_PATH = process.env['FFPROBE_BIN'] || ffprobeStatic.path
 
 export interface MediaDimensions {
   width: number

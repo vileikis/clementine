@@ -28,6 +28,7 @@ export interface ModalitySupports {
   enhance: boolean
   duration: boolean
   aspectRatio: boolean
+  resolution: boolean
 }
 
 export interface ModalityLimits {
@@ -52,6 +53,7 @@ export const IMAGE_MODALITY: ModalityDefinition = {
     enhance: false,
     duration: false,
     aspectRatio: true,
+    resolution: false,
   },
   limits: {
     maxRefImages: 5,
@@ -65,10 +67,11 @@ export const VIDEO_MODALITY: ModalityDefinition = {
   supports: {
     negativePrompt: false,
     referenceMedia: true,
-    sound: false,
-    enhance: false,
+    sound: true,
+    enhance: true,
     duration: true,
     aspectRatio: false,
+    resolution: true,
   },
   limits: {
     maxRefImages: 2,

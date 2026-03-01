@@ -10,8 +10,10 @@
  */
 import { IMAGE_ASPECT_RATIOS as CANONICAL_ASPECT_RATIOS } from '@clementine/shared'
 import type {
+  AIVideoModel,
   AspectRatio as CanonicalAspectRatio,
   OutcomeType,
+  VideoResolution,
 } from '@clementine/shared'
 
 /**
@@ -45,6 +47,24 @@ export const MAX_REF_MEDIA_COUNT = 5
 
 /** Maximum number of reference media allowed for video Remix task */
 export const MAX_VIDEO_REF_MEDIA_COUNT = 2
+
+/**
+ * Available video resolution options.
+ */
+export const RESOLUTION_OPTIONS = [
+  { value: '720p', label: '720p' },
+  { value: '1080p', label: '1080p' },
+  { value: '4k', label: '4K' },
+] as const
+
+/**
+ * Maps each AI video model to its supported resolutions.
+ * Fast model does not support 4K.
+ */
+export const MODEL_RESOLUTION_MAP: Record<AIVideoModel, VideoResolution[]> = {
+  'veo-3.1-generate-001': ['720p', '1080p', '4k'],
+  'veo-3.1-fast-generate-001': ['720p', '1080p'],
+}
 
 /**
  * Available video duration options (fixed values).

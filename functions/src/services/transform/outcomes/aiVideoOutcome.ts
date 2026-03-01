@@ -73,6 +73,10 @@ export async function aiVideoOutcome(ctx: OutcomeContext): Promise<JobOutput> {
     aspectRatio: videoGeneration.aspectRatio ?? aspectRatio,
     duration: videoGeneration.duration,
     sourceMedia,
+    resolution: videoGeneration.resolution,
+    negativePrompt: videoGeneration.negativePrompt,
+    sound: videoGeneration.sound,
+    enhance: videoGeneration.enhance,
   }
 
   let generateVideoRequest: GenerateVideoRequest
