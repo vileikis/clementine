@@ -222,7 +222,7 @@ export function AIVideoConfigForm({
 
       updateVideoGeneration(updates)
     },
-    [updateVideoGeneration],
+    [updateVideoGeneration, videoGeneration.resolution],
   )
 
   // ── Task-specific modality variants ────────────────────────
