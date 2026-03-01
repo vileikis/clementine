@@ -8,6 +8,8 @@
  * Controls auto-render based on modality.supports.*
  */
 
+import { Volume2, Wand2 } from 'lucide-react'
+
 import {
   ASPECT_RATIOS,
   MODEL_RESOLUTION_MAP,
@@ -24,8 +26,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/ui-kit/ui/select'
-import { Switch } from '@/ui-kit/ui/switch'
-import { Label } from '@/ui-kit/ui/label'
 
 export type { SelectOption }
 
@@ -37,156 +37,152 @@ export function ControlRow() {
     usePromptComposerContext()
 
   return (
-    <div className="flex items-center gap-2 px-3 py-2">
-      {/* Model Select */}
-      <Select value={model} onValueChange={onModelChange} disabled={disabled}>
-        <SelectTrigger
-          className="h-11 w-auto min-w-32 cursor-pointer border-0 bg-transparent font-semibold shadow-none focus-visible:ring-0"
-          aria-label="Select AI model"
-        >
-          <SelectValue placeholder="Model" />
-        </SelectTrigger>
-        <SelectContent>
-          {modality.modelOptions.map((option) => (
-            <SelectItem key={option.value} value={option.value}>
-              {option.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
-      {/* Aspect Ratio Select — shown when modality supports it and values are provided */}
-      {modality.supports.aspectRatio && controls?.aspectRatio !== undefined && (
-        <Select
-          value={controls.aspectRatio}
-          onValueChange={controls.onAspectRatioChange}
-          disabled={disabled}
-        >
+    <div className="flex items-start gap-2 px-3 py-2">
+      {/* Controls — wraps to next row when space is limited */}
+      <div className="flex flex-1 flex-wrap items-center gap-1.5">
+        {/* Model Select */}
+        <Select value={model} onValueChange={onModelChange} disabled={disabled}>
           <SelectTrigger
-            className="h-11 w-auto min-w-20 cursor-pointer border-0 bg-transparent font-semibold shadow-none focus-visible:ring-0"
-            aria-label="Select aspect ratio"
+            className="h-9 w-auto  cursor-pointer border-0 bg-transparent font-semibold shadow-none hover:bg-muted focus-visible:ring-0"
+            aria-label="Select AI model"
           >
-            <SelectValue placeholder="Ratio" />
+            <SelectValue placeholder="Model" />
           </SelectTrigger>
           <SelectContent>
-            {ASPECT_RATIOS.map((option) => (
+            {modality.modelOptions.map((option) => (
               <SelectItem key={option.value} value={option.value}>
                 {option.label}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
-      )}
 
-      {/* Duration Select — shown when modality supports it and values are provided */}
-      {modality.supports.duration &&
-        modality.durationOptions &&
-        controls?.duration !== undefined &&
-        controls?.onDurationChange && (
-          <Select
-            value={controls.duration}
-            onValueChange={controls.onDurationChange}
-            disabled={disabled}
-          >
-            <SelectTrigger
-              className="h-11 w-auto min-w-20 cursor-pointer border-0 bg-transparent font-semibold shadow-none focus-visible:ring-0"
-              aria-label="Select duration"
+        {/* Aspect Ratio Select */}
+        {modality.supports.aspectRatio &&
+          controls?.aspectRatio !== undefined && (
+            <Select
+              value={controls.aspectRatio}
+              onValueChange={controls.onAspectRatioChange}
+              disabled={disabled}
             >
-              <SelectValue placeholder="Duration" />
-            </SelectTrigger>
-            <SelectContent>
-              {modality.durationOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
+              <SelectTrigger
+                className="h-9 w-auto cursor-pointer border-0 bg-transparent font-semibold shadow-none hover:bg-muted focus-visible:ring-0"
+                aria-label="Select aspect ratio"
+              >
+                <SelectValue placeholder="Ratio" />
+              </SelectTrigger>
+              <SelectContent>
+                {ASPECT_RATIOS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
 
-      {/* Resolution Select — shown when modality supports it */}
-      {modality.supports.resolution &&
-        controls?.resolution !== undefined &&
-        controls?.onResolutionChange && (
-          <Select
-            value={controls.resolution}
-            onValueChange={controls.onResolutionChange}
-            disabled={disabled}
-          >
-            <SelectTrigger
-              className="h-11 w-auto min-w-20 cursor-pointer border-0 bg-transparent font-semibold shadow-none focus-visible:ring-0"
-              aria-label="Select resolution"
+        {/* Duration Select */}
+        {modality.supports.duration &&
+          modality.durationOptions &&
+          controls?.duration !== undefined &&
+          controls?.onDurationChange && (
+            <Select
+              value={controls.duration}
+              onValueChange={controls.onDurationChange}
+              disabled={disabled}
             >
-              <SelectValue placeholder="Resolution" />
-            </SelectTrigger>
-            <SelectContent>
-              {RESOLUTION_OPTIONS.filter((option) => {
-                const allowedResolutions =
-                  MODEL_RESOLUTION_MAP[model as AIVideoModel]
-                return allowedResolutions
-                  ? allowedResolutions.includes(option.value)
-                  : true
-              }).map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                  {option.value === '4k' && (
-                    <span className="ml-1 text-xs text-muted-foreground">
-                      $$
-                    </span>
-                  )}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
+              <SelectTrigger
+                className="h-9 w-auto cursor-pointer border-0 bg-transparent font-semibold shadow-none hover:bg-muted focus-visible:ring-0"
+                aria-label="Select duration"
+              >
+                <SelectValue placeholder="Duration" />
+              </SelectTrigger>
+              <SelectContent>
+                {modality.durationOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
 
-      {/* Sound Toggle — shown when modality supports it */}
-      {modality.supports.sound &&
-        controls?.sound !== undefined &&
-        controls?.onSoundChange && (
-          <div className="flex items-center gap-1.5">
-            <Switch
-              id="sound-toggle"
-              checked={controls.sound}
-              onCheckedChange={controls.onSoundChange}
+        {/* Resolution Select */}
+        {modality.supports.resolution &&
+          controls?.resolution !== undefined &&
+          controls?.onResolutionChange && (
+            <Select
+              value={controls.resolution}
+              onValueChange={controls.onResolutionChange}
+              disabled={disabled}
+            >
+              <SelectTrigger
+                className="h-9 w-auto cursor-pointer border-0 bg-transparent font-semibold shadow-none hover:bg-muted focus-visible:ring-0"
+                aria-label="Select resolution"
+              >
+                <SelectValue placeholder="Resolution" />
+              </SelectTrigger>
+              <SelectContent>
+                {RESOLUTION_OPTIONS.filter((option) => {
+                  const allowedResolutions =
+                    MODEL_RESOLUTION_MAP[model as AIVideoModel]
+                  return allowedResolutions
+                    ? allowedResolutions.includes(option.value)
+                    : true
+                }).map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                    {option.value === '4k' && (
+                      <span className="ml-1 text-xs text-muted-foreground">
+                        $$
+                      </span>
+                    )}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+
+        {/* Sound Chip */}
+        {modality.supports.sound &&
+          controls?.sound !== undefined &&
+          controls?.onSoundChange && (
+            <button
+              type="button"
+              onClick={() => controls.onSoundChange?.(!controls.sound)}
               disabled={disabled}
               aria-label="Toggle sound"
-            />
-            <Label
-              htmlFor="sound-toggle"
-              className="cursor-pointer text-xs font-semibold"
+              aria-pressed={controls.sound}
+              className="inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-md px-3 text-xs font-semibold transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Sound
-            </Label>
-          </div>
-        )}
+              <Volume2 className="size-3.5" />
+              {controls.sound ? 'ON' : 'OFF'}
+            </button>
+          )}
 
-      {/* Enhance Toggle — shown when modality supports it */}
-      {modality.supports.enhance &&
-        controls?.enhance !== undefined &&
-        controls?.onEnhanceChange && (
-          <div className="flex items-center gap-1.5">
-            <Switch
-              id="enhance-toggle"
-              checked={controls.enhance}
-              onCheckedChange={controls.onEnhanceChange}
+        {/* Enhance Chip */}
+        {modality.supports.enhance &&
+          controls?.enhance !== undefined &&
+          controls?.onEnhanceChange && (
+            <button
+              type="button"
+              onClick={() => controls.onEnhanceChange?.(!controls.enhance)}
               disabled={disabled}
               aria-label="Toggle prompt enhancement"
-            />
-            <Label
-              htmlFor="enhance-toggle"
-              className="cursor-pointer text-xs font-semibold"
+              aria-pressed={controls.enhance}
               title="Improves prompt for better results"
+              className="inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-md px-3 text-xs font-semibold transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
             >
+              <Wand2 className="size-3.5" />
               Enhance
-            </Label>
-          </div>
-        )}
+              <span className="text-muted-foreground">
+                {controls.enhance ? 'ON' : 'OFF'}
+              </span>
+            </button>
+          )}
+      </div>
 
-      {/* Spacer to push add button to right */}
-      <div className="flex-1" />
-
-      {/* Add Media Button */}
+      {/* Add Media Button — stays pinned right */}
       <AddMediaButton />
     </div>
   )
