@@ -203,6 +203,28 @@ export function AIVideoConfigForm({
     ],
   )
 
+  const handleModelChange = useCallback(
+    (newModel: string) => {
+      const model = newModel as AIVideoModel
+      const updates: Partial<VideoGenerationConfig> = { model }
+
+      // Auto-downgrade resolution if the new model doesn't support it
+      const allowedResolutions = MODEL_RESOLUTION_MAP[model]
+      const isResolutionSupported = allowedResolutions?.includes(
+        videoGeneration.resolution,
+      )
+      if (!isResolutionSupported) {
+        updates.resolution = '1080p'
+        toast.info(
+          'Resolution reset to 1080p (not supported by selected model)',
+        )
+      }
+
+      updateVideoGeneration(updates)
+    },
+    [updateVideoGeneration],
+  )
+
   // ── Task-specific modality variants ────────────────────────
 
   const taskModality = useMemo(() => {
@@ -259,24 +281,7 @@ export function AIVideoConfigForm({
             prompt={videoGeneration.prompt}
             onPromptChange={(prompt) => updateVideoGeneration({ prompt })}
             model={videoGeneration.model}
-            onModelChange={(newModel) => {
-              const model = newModel as AIVideoModel
-              const updates: Partial<VideoGenerationConfig> = { model }
-
-              // Auto-downgrade resolution if the new model doesn't support it
-              const allowedResolutions = MODEL_RESOLUTION_MAP[model]
-              if (
-                allowedResolutions &&
-                !allowedResolutions.includes(videoGeneration.resolution)
-              ) {
-                updates.resolution = '1080p'
-                toast.info(
-                  'Resolution reset to 1080p (not supported by selected model)',
-                )
-              }
-
-              updateVideoGeneration(updates)
-            }}
+            onModelChange={handleModelChange}
             controls={{
               duration: String(videoGeneration.duration ?? 6),
               onDurationChange: (d) => {
@@ -316,9 +321,7 @@ export function AIVideoConfigForm({
         {(config.task === 'image-to-video' ||
           config.task === 'ref-images-to-video') && (
           <div className="space-y-1.5">
-            <Label htmlFor="negative-prompt" className="text-xs">
-              Negative Prompt
-            </Label>
+            <Label htmlFor="negative-prompt">Negative Prompt</Label>
             <Textarea
               id="negative-prompt"
               value={videoGeneration.negativePrompt}
