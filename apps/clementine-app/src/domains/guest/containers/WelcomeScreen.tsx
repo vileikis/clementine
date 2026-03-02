@@ -85,6 +85,7 @@ export function WelcomeScreen() {
         id: exp.id,
         name: exp.name,
         thumbnailUrl: exp.media?.url ?? null,
+        type: exp.published!.type,
       })),
     [experiences],
   )

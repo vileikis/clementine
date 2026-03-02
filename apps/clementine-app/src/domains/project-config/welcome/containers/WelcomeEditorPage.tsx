@@ -84,6 +84,7 @@ export function WelcomeEditorPage() {
         id: exp.id,
         name: exp.name,
         thumbnailUrl: exp.media?.url ?? null,
+        type: exp.published?.type ?? exp.draftType,
       }))
   }, [mainExperiences, connectedExperiences])
 
