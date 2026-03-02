@@ -115,6 +115,8 @@ export function ThemedIconButton({
         'flex items-center justify-center',
         'rounded-full',
         'transition-all duration-150 ease-out',
+        variant === 'primary' && 'shadow-sm hover:shadow-md',
+        variant === 'outline' && 'shadow-sm hover:shadow-md',
         'hover:scale-[1.06] hover:opacity-90 active:scale-[0.93] active:duration-75',
         'focus:outline-none focus:ring-2 focus:ring-offset-2',
         'disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100',

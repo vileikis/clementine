@@ -180,21 +180,23 @@ export function ExperienceTopBar({
       {/* Exit confirmation dialog */}
       <AlertDialog open={showDialog} onOpenChange={setShowDialog}>
         <AlertDialogContent
-          className="max-w-sm"
+          className="max-w-sm sm:max-w-sm text-center"
           style={{
             backgroundColor: theme.background.color,
           }}
         >
-          <AlertDialogHeader>
+          <AlertDialogHeader className="items-center">
             <AlertDialogTitle style={{ color: theme.text.color }}>
               Exit Experience?
             </AlertDialogTitle>
-            <AlertDialogDescription style={{ color: theme.text.color }}>
-              Your progress will be lost if you leave now. Are you sure you want
-              to return home?
+            <AlertDialogDescription
+              style={{ color: theme.text.color }}
+              className="text-center"
+            >
+              Your progress will be lost if you leave now.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
+          <AlertDialogFooter className="justify-center sm:justify-center">
             <ThemedButton
               variant="outline"
               size="sm"
