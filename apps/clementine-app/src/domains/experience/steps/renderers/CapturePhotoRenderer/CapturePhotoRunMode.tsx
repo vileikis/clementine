@@ -22,6 +22,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { toast } from 'sonner'
 import { useRuntime } from '../../../runtime/hooks/useRuntime'
 import { uploadPhoto } from './lib/uploadPhoto'
 import {
@@ -142,7 +143,7 @@ export function CapturePhotoRunMode({
       setPhotoForPreview(selectedPhoto)
     },
     onError: (err) => {
-      setUploadError(err.message)
+      toast.error(err.message)
     },
   })
 
