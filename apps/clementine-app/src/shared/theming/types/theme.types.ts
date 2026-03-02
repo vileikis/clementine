@@ -11,3 +11,6 @@ export type {
   ThemeButton,
   ThemeBackground,
 } from '../schemas/theme.schemas'
+
+/** Rendering surface context for themed components */
+export type Surface = 'auto' | 'dark'

@@ -20,7 +20,7 @@ export function UploadProgress({ photo, aspectRatio }: UploadProgressProps) {
   return (
     <CaptureLayout
       controls={
-        <ThemedText variant="body" className="opacity-80">
+        <ThemedText variant="body" surface="dark" className="opacity-80">
           Saving your photo...
         </ThemedText>
       }

@@ -7,6 +7,7 @@ export type {
   ThemeButton,
   ThemeBackground,
   ButtonRadius,
+  Surface,
 } from './types'
 export type { ThemeContextValue } from './context'
 

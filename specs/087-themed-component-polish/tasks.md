@@ -17,12 +17,12 @@
 
 **Why foundational**: Every user story depends on themed primitives accepting a `surface` prop. The outline variant redesign (US2) is inherently delivered by these primitive changes.
 
-- [ ] T001 Add `Surface` type (`'auto' | 'dark'`) to `apps/clementine-app/src/shared/theming/types/theme.types.ts` and export it
-- [ ] T002 [P] Add `surface` prop to ThemedButton and redesign outline variant: auto surface uses inverted solid colors (`color-mix(in srgb, ${buttonTextColor} 92%, ${buttonBgColor})` bg, `buttonBgColor` text, no border); dark surface uses `rgba(0,0,0,0.4)` bg, `#FFFFFF` text, no border. Primary variant unchanged on both surfaces. File: `apps/clementine-app/src/shared/theming/components/primitives/ThemedButton.tsx`
-- [ ] T003 [P] Add `surface` prop to ThemedIconButton with same outline variant logic as T002. File: `apps/clementine-app/src/shared/theming/components/primitives/ThemedIconButton.tsx`
-- [ ] T004 [P] Add `surface` prop to ThemedText: auto surface uses `theme.text.color` (unchanged); dark surface uses `#FFFFFF`. File: `apps/clementine-app/src/shared/theming/components/primitives/ThemedText.tsx`
-- [ ] T005 [P] Add `surface` prop to ThemedProgressBar: auto surface unchanged; dark surface uses `rgba(255,255,255,0.2)` track bg and `#FFFFFF` indicator. File: `apps/clementine-app/src/shared/theming/components/primitives/ThemedProgressBar.tsx`
-- [ ] T006 Export `Surface` type from barrel files: `apps/clementine-app/src/shared/theming/components/primitives/index.ts` and `apps/clementine-app/src/shared/theming/index.ts`
+- [x] T001 Add `Surface` type (`'auto' | 'dark'`) to `apps/clementine-app/src/shared/theming/types/theme.types.ts` and export it
+- [x] T002 [P] Add `surface` prop to ThemedButton and redesign outline variant: auto surface uses inverted solid colors (`color-mix(in srgb, ${buttonTextColor} 92%, ${buttonBgColor})` bg, `buttonBgColor` text, no border); dark surface uses `rgba(0,0,0,0.4)` bg, `#FFFFFF` text, no border. Primary variant unchanged on both surfaces. File: `apps/clementine-app/src/shared/theming/components/primitives/ThemedButton.tsx`
+- [x] T003 [P] Add `surface` prop to ThemedIconButton with same outline variant logic as T002. File: `apps/clementine-app/src/shared/theming/components/primitives/ThemedIconButton.tsx`
+- [x] T004 [P] Add `surface` prop to ThemedText: auto surface uses `theme.text.color` (unchanged); dark surface uses `#FFFFFF`. File: `apps/clementine-app/src/shared/theming/components/primitives/ThemedText.tsx`
+- [x] T005 [P] Add `surface` prop to ThemedProgressBar: auto surface unchanged; dark surface uses `rgba(255,255,255,0.2)` track bg and `#FFFFFF` indicator. File: `apps/clementine-app/src/shared/theming/components/primitives/ThemedProgressBar.tsx`
+- [x] T006 Export `Surface` type from barrel files: `apps/clementine-app/src/shared/theming/components/primitives/index.ts` and `apps/clementine-app/src/shared/theming/index.ts`
 
 **Checkpoint**: `pnpm type-check` passes. All existing callsites render identically (default `surface='auto'`). Outline buttons now show solid backgrounds on themed surfaces.
 
@@ -36,9 +36,9 @@
 
 ### Implementation for US1 + US2
 
-- [ ] T007 [P] [US1] Pass `surface="dark"` to all ThemedIconButton instances and replace hardcoded `text-white/70` labels with `<ThemedText surface="dark" variant="small">` in `apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer/components/CameraActive.tsx`
-- [ ] T008 [P] [US1] Pass `surface="dark"` to both ThemedButton instances (retake outline + continue primary) in `apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer/components/PhotoPreview.tsx`
-- [ ] T009 [P] [US1] Pass `surface="dark"` to ThemedText in `apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer/components/UploadProgress.tsx`
+- [x] T007 [P] [US1] Pass `surface="dark"` to all ThemedIconButton instances and replace hardcoded `text-white/70` labels with `<ThemedText surface="dark" variant="small">` in `apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer/components/CameraActive.tsx`
+- [x] T008 [P] [US1] Pass `surface="dark"` to both ThemedButton instances (retake outline + continue primary) in `apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer/components/PhotoPreview.tsx`
+- [x] T009 [P] [US1] Pass `surface="dark"` to ThemedText in `apps/clementine-app/src/domains/experience/steps/renderers/CapturePhotoRenderer/components/UploadProgress.tsx`
 
 **Checkpoint**: Capture step controls visible with any theme. Secondary buttons on all surfaces have solid backgrounds. No visual regression on welcome/content steps.
 
@@ -52,12 +52,12 @@
 
 ### Implementation for US3 + US4
 
-- [ ] T010 [US3] Rename `RuntimeTopBar.tsx` → `ExperienceTopBar.tsx` and `RuntimeTopBar.test.tsx` → `ExperienceTopBar.test.tsx` in `apps/clementine-app/src/domains/experience/runtime/components/`. Update all internal references.
-- [ ] T011 [US4] Refactor ExperienceTopBar to accept props-driven API: replace `useRuntime()` with `ExperienceTopBarProps` (`title`, `surface`, `progress: { current, total }`, `onBack`, `onClose`, `className`). Hide back button when `onBack` is undefined. Hide progress bar when `progress` is undefined. File: `apps/clementine-app/src/domains/experience/runtime/components/ExperienceTopBar.tsx`
-- [ ] T012 [US3] Forward `surface` prop to all themed children in ExperienceTopBar: pass to ThemedIconButton (back, home buttons), ThemedText (title), and ThemedProgressBar. File: `apps/clementine-app/src/domains/experience/runtime/components/ExperienceTopBar.tsx`
-- [ ] T013 [US3] Define `StepRenderTraits` type and `STEP_RENDER_TRAITS` map in ExperienceRuntime. Replace `STEPS_WITH_CUSTOM_NAVIGATION` Set with traits-based logic for layout, surface, and navigation. Derive ExperienceTopBar props from runtime state (title from `experienceName`, progress from `currentStepIndex`/`totalSteps`, onBack from `canGoBack`/`back`, onClose passed through). Pass `traits.surface` to ExperienceTopBar. File: `apps/clementine-app/src/domains/experience/runtime/containers/ExperienceRuntime.tsx`
-- [ ] T014 [US4] Update barrel exports: rename `RuntimeTopBar` → `ExperienceTopBar` and `RuntimeTopBarProps` → `ExperienceTopBarProps` in `apps/clementine-app/src/domains/experience/runtime/components/index.ts`. Update any import references across the codebase.
-- [ ] T015 [US4] Update ExperienceTopBar tests to pass props instead of mocking `useRuntime()`. Test: title renders, progress bar shows/hides based on `progress` prop, back button shows/hides based on `onBack` prop, close triggers dialog. File: `apps/clementine-app/src/domains/experience/runtime/components/ExperienceTopBar.test.tsx`
+- [x] T010 [US3] Rename `RuntimeTopBar.tsx` → `ExperienceTopBar.tsx` and `RuntimeTopBar.test.tsx` → `ExperienceTopBar.test.tsx` in `apps/clementine-app/src/domains/experience/runtime/components/`. Update all internal references.
+- [x] T011 [US4] Refactor ExperienceTopBar to accept props-driven API: replace `useRuntime()` with `ExperienceTopBarProps` (`title`, `surface`, `progress: { current, total }`, `onBack`, `onClose`, `className`). Hide back button when `onBack` is undefined. Hide progress bar when `progress` is undefined. File: `apps/clementine-app/src/domains/experience/runtime/components/ExperienceTopBar.tsx`
+- [x] T012 [US3] Forward `surface` prop to all themed children in ExperienceTopBar: pass to ThemedIconButton (back, home buttons), ThemedText (title), and ThemedProgressBar. File: `apps/clementine-app/src/domains/experience/runtime/components/ExperienceTopBar.tsx`
+- [x] T013 [US3] Define `StepRenderTraits` type and `STEP_RENDER_TRAITS` map in ExperienceRuntime. Replace `STEPS_WITH_CUSTOM_NAVIGATION` Set with traits-based logic for layout, surface, and navigation. Derive ExperienceTopBar props from runtime state (title from `experienceName`, progress from `currentStepIndex`/`totalSteps`, onBack from `canGoBack`/`back`, onClose passed through). Pass `traits.surface` to ExperienceTopBar. File: `apps/clementine-app/src/domains/experience/runtime/containers/ExperienceRuntime.tsx`
+- [x] T014 [US4] Update barrel exports: rename `RuntimeTopBar` → `ExperienceTopBar` and `RuntimeTopBarProps` → `ExperienceTopBarProps` in `apps/clementine-app/src/domains/experience/runtime/components/index.ts`. Update any import references across the codebase.
+- [x] T015 [US4] Update ExperienceTopBar tests to pass props instead of mocking `useRuntime()`. Test: title renders, progress bar shows/hides based on `progress` prop, back button shows/hides based on `onBack` prop, close triggers dialog. File: `apps/clementine-app/src/domains/experience/runtime/components/ExperienceTopBar.test.tsx`
 
 **Checkpoint**: Top bar switches between themed and dark-surface styling as guest navigates. ExperienceTopBar works with any prop combination. Tests pass. `pnpm type-check` passes.
 
@@ -73,7 +73,7 @@
 
 ### Implementation for US5
 
-- [ ] T016 [US5] Add `ExperienceTopBar` to SharePage with `title={shareReady.title ?? 'Your Result'}` and `onClose={handleStartOver}`. No `progress` or `onBack` props. File: `apps/clementine-app/src/domains/guest/containers/SharePage.tsx`
+- [x] T016 [US5] Add `ExperienceTopBar` to SharePage with `title={shareReady.title ?? 'Your Result'}` and `onClose={handleStartOver}`. No `progress` or `onBack` props. File: `apps/clementine-app/src/domains/guest/containers/SharePage.tsx`
 
 **Checkpoint**: Share page has top bar. Guest can navigate home. No progress bar or back button shown.
 
@@ -87,7 +87,7 @@
 
 ### Implementation for US6
 
-- [ ] T017 [US6] Theme the exit dialog in ExperienceTopBar: use `useThemeWithOverride()` to access theme. Apply `theme.background.color` as AlertDialogContent background, `theme.text.color` for title and description text via inline styles. Replace AlertDialogCancel and AlertDialogAction with `ThemedButton` (primary for confirm/exit, outline for cancel). Set max width to `max-w-sm` (384px) on AlertDialogContent. File: `apps/clementine-app/src/domains/experience/runtime/components/ExperienceTopBar.tsx`
+- [x] T017 [US6] Theme the exit dialog in ExperienceTopBar: use `useThemeWithOverride()` to access theme. Apply `theme.background.color` as AlertDialogContent background, `theme.text.color` for title and description text via inline styles. Replace AlertDialogCancel and AlertDialogAction with `ThemedButton` (primary for confirm/exit, outline for cancel). Set max width to `max-w-sm` (384px) on AlertDialogContent. File: `apps/clementine-app/src/domains/experience/runtime/components/ExperienceTopBar.tsx`
 
 **Checkpoint**: Exit dialog background, text, and buttons match theme. Dialog width is 384px max.
 
@@ -101,7 +101,7 @@
 
 ### Implementation for US7
 
-- [ ] T018 [US7] Fix list layout card width in WelcomeRenderer: ensure the card container div and ScrollableView inner wrapper don't constrain width in run mode. Cards should be full container width when `layout === 'list'`. File: `apps/clementine-app/src/domains/project-config/welcome/components/WelcomeRenderer.tsx`
+- [x] T018 [US7] Fix list layout card width in WelcomeRenderer: ensure the card container div and ScrollableView inner wrapper don't constrain width in run mode. Cards should be full container width when `layout === 'list'`. File: `apps/clementine-app/src/domains/project-config/welcome/components/WelcomeRenderer.tsx`
 
 **Checkpoint**: List layout cards full-width in both edit and run mode. Grid layout unaffected.
 
@@ -111,9 +111,9 @@
 
 **Purpose**: Final validation across all stories
 
-- [ ] T019 Run `pnpm app:check` (format + lint) from monorepo root and fix any issues
-- [ ] T020 Run `pnpm app:type-check` and verify zero errors
-- [ ] T021 Run `pnpm app:test` and verify all tests pass (including updated ExperienceTopBar tests)
+- [x] T019 Run `pnpm app:check` (format + lint) from monorepo root and fix any issues
+- [x] T020 Run `pnpm app:type-check` and verify zero errors
+- [x] T021 Run `pnpm app:test` and verify all tests pass (including updated ExperienceTopBar tests)
 - [ ] T022 Visual verification: test with 3 distinct themes (light, dark, high-saturation) across the full guest flow — welcome → capture → share. Confirm SC-001 through SC-008 from spec.md success criteria
 
 ---

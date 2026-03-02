@@ -18,15 +18,13 @@ import { useCallback, useEffect, useLayoutEffect, useRef } from 'react'
 
 import { useExperienceRuntimeStore } from '../stores/experienceRuntimeStore'
 import { RuntimeNavigation } from '../components/RuntimeNavigation'
-import { RuntimeTopBar } from '../components/RuntimeTopBar'
+import { ExperienceTopBar } from '../components/ExperienceTopBar'
+import { getStepRenderTraits } from '../constants'
 import type { Experience, ExperienceStep } from '../../shared/schemas'
 import type { Session } from '@/domains/session'
 import { useCompleteSession, useUpdateSessionProgress } from '@/domains/session'
 import { cn } from '@/shared/utils'
 import { ScrollableView, ThemedError, ThemedLoading } from '@/shared/theming'
-
-/** Step types that manage their own navigation buttons */
-const STEPS_WITH_CUSTOM_NAVIGATION = new Set(['capture.photo'])
 
 /**
  * Props for ExperienceRuntime container
@@ -228,15 +226,31 @@ export function ExperienceRuntime({
   // Skip when session was already completed at mount — no async work to wait for.
   const isCompleting = store.isComplete && !mountedAlreadyCompleteRef.current
 
-  // Check if current step manages its own navigation and layout
+  // Resolve render traits for current step
   const currentStep = store.steps[store.currentStepIndex]
-  const isFullHeightStep = currentStep
-    ? STEPS_WITH_CUSTOM_NAVIGATION.has(currentStep.type)
-    : false
+  const traits = getStepRenderTraits(currentStep?.type, isCompleting)
+  const isFullHeightStep = traits.layout === 'full-height'
+
+  // Derive ExperienceTopBar props from runtime state
+  const totalSteps = store.steps.length
+  const canGoBackFromStep =
+    store.canGoBack() && !store.isComplete && store.currentStepIndex > 0
 
   return (
     <>
-      {showTopBar && <RuntimeTopBar onClose={onClose} />}
+      {showTopBar && (
+        <ExperienceTopBar
+          title={store.experience?.name ?? 'Experience'}
+          surface={traits.surface}
+          progress={
+            totalSteps > 1 && !store.isComplete
+              ? { current: store.currentStepIndex + 1, total: totalSteps }
+              : undefined
+          }
+          onBack={canGoBackFromStep ? () => store.previousStep() : undefined}
+          onClose={onClose}
+        />
+      )}
       {isCompleting && store.completionError ? (
         // Completion error: show message + retry instead of infinite spinner
         <ThemedError

@@ -34,7 +34,7 @@
 
 import { useThemeWithOverride } from '../../hooks/useThemeWithOverride'
 import type { ButtonHTMLAttributes, CSSProperties, ReactNode } from 'react'
-import type { Theme } from '../../types'
+import type { Surface, Theme } from '../../types'
 import { cn } from '@/shared/utils'
 
 /** Icon button size variants */
@@ -60,6 +60,8 @@ export interface ThemedIconButtonProps extends Omit<
   size?: IconButtonSize
   /** Button style variant (defaults to 'outline') */
   variant?: IconButtonVariant
+  /** Rendering surface context (defaults to 'auto') */
+  surface?: Surface
   /** Theme override for use without ThemeProvider */
   theme?: Theme
 }
@@ -68,6 +70,7 @@ export function ThemedIconButton({
   children,
   size = 'md',
   variant = 'outline',
+  surface = 'auto',
   theme: themeOverride,
   className,
   disabled,
@@ -77,23 +80,31 @@ export function ThemedIconButton({
   const theme = useThemeWithOverride(themeOverride)
 
   // Compute button colors with fallback
-  const primaryBgColor = theme.button.backgroundColor ?? theme.primaryColor
-  const primaryTextColor = theme.button.textColor
+  const buttonBgColor = theme.button.backgroundColor ?? theme.primaryColor
+  const buttonTextColor = theme.button.textColor
 
-  // Style based on variant
-  const style: CSSProperties =
-    variant === 'primary'
-      ? {
-          backgroundColor: primaryBgColor,
-          color: primaryTextColor,
-        }
-      : {
-          backgroundColor: `color-mix(in srgb, ${theme.text.color} 10%, transparent)`,
-          color: theme.text.color,
-          borderWidth: '1px',
-          borderStyle: 'solid',
-          borderColor: `color-mix(in srgb, ${theme.text.color} 40%, transparent)`,
-        }
+  // Style based on variant and surface
+  const style: CSSProperties = (() => {
+    if (variant === 'primary') {
+      return {
+        backgroundColor: buttonBgColor,
+        color: buttonTextColor,
+      }
+    }
+
+    // Outline variant
+    if (surface === 'dark') {
+      return {
+        backgroundColor: 'rgba(0, 0, 0, 0.4)',
+        color: '#FFFFFF',
+      }
+    }
+
+    return {
+      backgroundColor: `color-mix(in srgb, ${buttonTextColor} 92%, ${buttonBgColor})`,
+      color: buttonBgColor,
+    }
+  })()
 
   return (
     <button

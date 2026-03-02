@@ -19,6 +19,7 @@ import {
 } from '@/domains/project-config/share/components'
 import { useSubmitGuestEmail } from '@/domains/project-config/share/hooks'
 import { useSubscribeSession } from '@/domains/session/shared'
+import { ExperienceTopBar } from '@/domains/experience/runtime/components'
 import {
   ThemeProvider,
   ThemedBackground,
@@ -150,6 +151,10 @@ export function SharePage({ mainSessionId }: SharePageProps) {
   return (
     <ThemeProvider theme={currentTheme}>
       <ThemedBackground className="h-dvh">
+        <ExperienceTopBar
+          title={shareReady.title ?? 'Your Result'}
+          onClose={handleStartOver}
+        />
         {isJobInProgress && (
           <ShareLoadingRenderer
             shareLoading={shareLoading}

@@ -20,7 +20,7 @@
 import { useThemeWithOverride } from '../../hooks/useThemeWithOverride'
 import type { CSSProperties, ElementType, ReactNode } from 'react'
 
-import type { Theme } from '../../types'
+import type { Surface, Theme } from '../../types'
 import { cn } from '@/shared/utils'
 
 /** Text size variants with corresponding font sizes and weights */
@@ -49,6 +49,8 @@ export interface ThemedTextProps {
   as?: 'h1' | 'h2' | 'h3' | 'h4' | 'p' | 'span' | 'div'
   /** Text alignment override (defaults to theme.text.alignment) */
   align?: 'left' | 'center' | 'right' | 'inherit'
+  /** Rendering surface context (defaults to 'auto') */
+  surface?: Surface
   /** Additional CSS classes */
   className?: string
   /** Theme override for use without ThemeProvider */
@@ -60,6 +62,7 @@ export function ThemedText({
   variant = 'body',
   as,
   align,
+  surface = 'auto',
   className,
   theme: themeOverride,
 }: ThemedTextProps) {
@@ -73,7 +76,7 @@ export function ThemedText({
     align === 'inherit' ? undefined : (align ?? theme.text.alignment)
 
   const style: CSSProperties = {
-    color: theme.text.color,
+    color: surface === 'dark' ? '#FFFFFF' : theme.text.color,
     textAlign,
   }
 
