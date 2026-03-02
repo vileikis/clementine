@@ -5,4 +5,5 @@ export type {
   ThemeButton,
   ThemeBackground,
   ButtonRadius,
+  Surface,
 } from './theme.types'

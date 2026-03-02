@@ -22,6 +22,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { toast } from 'sonner'
 import { useRuntime } from '../../../runtime/hooks/useRuntime'
 import { uploadPhoto } from './lib/uploadPhoto'
 import {
@@ -142,7 +143,7 @@ export function CapturePhotoRunMode({
       setPhotoForPreview(selectedPhoto)
     },
     onError: (err) => {
-      setUploadError(err.message)
+      toast.error(err.message)
     },
   })
 
@@ -194,100 +195,119 @@ export function CapturePhotoRunMode({
   const errorMessage =
     uploadError || error?.message || 'Failed to capture photo'
 
-  // Uploading state - check first as it takes priority over all other states
-  if (isUploading) {
-    return <UploadProgress photo={photo} aspectRatio={activeAspectRatio} />
-  }
+  // Render state-specific content
+  const renderContent = () => {
+    // Uploading state - check first as it takes priority over all other states
+    if (isUploading) {
+      return <UploadProgress photo={photo} aspectRatio={activeAspectRatio} />
+    }
 
-  // Photo preview state - check before permission states so fallback picker works
-  // (user can select photo even when permission is denied/unavailable)
-  if (captureStatus === 'photo-preview' && photo) {
+    // Photo preview state - check before permission states so fallback picker works
+    // (user can select photo even when permission is denied/unavailable)
+    if (captureStatus === 'photo-preview' && photo) {
+      return (
+        <PhotoPreview
+          photo={photo}
+          aspectRatio={activeAspectRatio}
+          onRetake={retake}
+          onConfirm={handleConfirm}
+        />
+      )
+    }
+
+    // Permission: unknown (loading)
+    if (permStatus === 'unknown') {
+      return (
+        <div className="flex flex-1 items-center justify-center">
+          <div className="w-full max-w-2xl">
+            <PermissionLoading />
+          </div>
+        </div>
+      )
+    }
+
+    // Permission: undetermined (prompt to allow)
+    if (permStatus === 'undetermined') {
+      return (
+        <div className="flex flex-1 items-center justify-center">
+          <div className="w-full max-w-2xl">
+            <PermissionPrompt onRequestPermission={requestPermission} />
+          </div>
+        </div>
+      )
+    }
+
+    // Permission: denied (show instructions + fallback)
+    if (permStatus === 'denied') {
+      return (
+        <div className="flex flex-1 items-center justify-center">
+          <div className="w-full max-w-2xl">
+            <PermissionDenied
+              fileInputRef={fileInputRef}
+              onOpenPicker={openPicker}
+              onFileChange={handleFileChange}
+            />
+          </div>
+        </div>
+      )
+    }
+
+    // Permission: unavailable (no hardware)
+    if (permStatus === 'unavailable') {
+      return (
+        <div className="flex flex-1 items-center justify-center">
+          <div className="w-full max-w-2xl">
+            <PermissionUnavailable
+              fileInputRef={fileInputRef}
+              onOpenPicker={openPicker}
+              onFileChange={handleFileChange}
+            />
+          </div>
+        </div>
+      )
+    }
+
+    // Permission granted - show capture flow
+
+    // Error state
+    if (captureStatus === 'error' || uploadError) {
+      return (
+        <div className="flex flex-1 items-center justify-center">
+          <div className="w-full max-w-2xl">
+            <CaptureError
+              errorMessage={errorMessage}
+              fileInputRef={fileInputRef}
+              onRetry={handleRetry}
+              onOpenPicker={openPicker}
+              onFileChange={handleFileChange}
+            />
+          </div>
+        </div>
+      )
+    }
+
+    // Camera active state (default)
     return (
-      <PhotoPreview
-        photo={photo}
+      <CameraActive
+        cameraRef={cameraRef}
         aspectRatio={activeAspectRatio}
-        onRetake={retake}
-        onConfirm={handleConfirm}
+        fileInputRef={fileInputRef}
+        hasMultipleCameras={hasMultipleCameras}
+        onCameraReady={handleCameraReady}
+        onCameraError={handleCameraError}
+        onCapture={capture}
+        onSwitchCamera={handleSwitchCamera}
+        onOpenPicker={openPicker}
+        onFileChange={handleFileChange}
+        onAspectRatioChange={setActiveAspectRatio}
+        showAspectRatioSwitcher={true}
       />
     )
   }
 
-  // Permission: unknown (loading)
-  if (permStatus === 'unknown') {
-    return (
-      <div className="relative flex h-full w-full flex-col items-center justify-center">
-        <PermissionLoading />
-      </div>
-    )
-  }
-
-  // Permission: undetermined (prompt to allow)
-  if (permStatus === 'undetermined') {
-    return (
-      <div className="relative flex h-full w-full flex-col items-center justify-center">
-        <PermissionPrompt onRequestPermission={requestPermission} />
-      </div>
-    )
-  }
-
-  // Permission: denied (show instructions + fallback)
-  if (permStatus === 'denied') {
-    return (
-      <div className="relative flex h-full w-full flex-col items-center justify-center">
-        <PermissionDenied
-          fileInputRef={fileInputRef}
-          onOpenPicker={openPicker}
-          onFileChange={handleFileChange}
-        />
-      </div>
-    )
-  }
-
-  // Permission: unavailable (no hardware)
-  if (permStatus === 'unavailable') {
-    return (
-      <div className="relative flex h-full w-full flex-col items-center justify-center">
-        <PermissionUnavailable
-          fileInputRef={fileInputRef}
-          onOpenPicker={openPicker}
-          onFileChange={handleFileChange}
-        />
-      </div>
-    )
-  }
-
-  // Permission granted - show capture flow
-
-  // Error state
-  if (captureStatus === 'error' || uploadError) {
-    return (
-      <div className="relative flex h-full w-full flex-col items-center justify-center">
-        <CaptureError
-          errorMessage={errorMessage}
-          fileInputRef={fileInputRef}
-          onRetry={handleRetry}
-          onOpenPicker={openPicker}
-          onFileChange={handleFileChange}
-        />
-      </div>
-    )
-  }
-
-  // Camera active state (default)
   return (
-    <CameraActive
-      cameraRef={cameraRef}
-      aspectRatio={activeAspectRatio}
-      fileInputRef={fileInputRef}
-      hasMultipleCameras={hasMultipleCameras}
-      onCameraReady={handleCameraReady}
-      onCameraError={handleCameraError}
-      onCapture={capture}
-      onSwitchCamera={handleSwitchCamera}
-      onOpenPicker={openPicker}
-      onFileChange={handleFileChange}
-      onAspectRatioChange={setActiveAspectRatio}
-      showAspectRatioSwitcher={true}
-    />
+    <div className="relative flex flex-col w-full h-full bg-gray-700">
+      {renderContent()}
+    </div>
   )
 }

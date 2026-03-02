@@ -67,7 +67,7 @@ export function WelcomeRenderer({
           <img
             src={welcome.media.url}
             alt="Welcome hero"
-            className="w-full max-h-48 object-contain rounded-lg"
+            className="w-full max-h-48 object-contain rounded-lg pointer-events-none"
           />
         </div>
       )}
@@ -92,7 +92,7 @@ export function WelcomeRenderer({
         {hasExperiences ? (
           <div
             className={cn('w-full', {
-              'space-y-3': welcome.layout === 'list',
+              'space-y-3 max-w-[560px] mx-auto': welcome.layout === 'list',
               'grid grid-cols-2 gap-3': welcome.layout === 'grid',
             })}
           >

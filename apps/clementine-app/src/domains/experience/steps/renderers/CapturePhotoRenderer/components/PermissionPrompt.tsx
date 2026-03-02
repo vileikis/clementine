@@ -5,7 +5,7 @@
  */
 
 import { Camera } from 'lucide-react'
-import { ThemedButton, ThemedText, useEventTheme } from '@/shared/theming'
+import { ThemedButton, ThemedText } from '@/shared/theming'
 
 interface PermissionPromptProps {
   onRequestPermission: () => void
@@ -14,32 +14,29 @@ interface PermissionPromptProps {
 export function PermissionPrompt({
   onRequestPermission,
 }: PermissionPromptProps) {
-  const { theme } = useEventTheme()
-
   return (
     <div className="flex flex-col items-center gap-6 w-full px-4 py-8">
       {/* Camera icon */}
-      <div
-        className="p-6 rounded-full"
-        style={{
-          backgroundColor: `color-mix(in srgb, ${theme.text.color} 10%, transparent)`,
-        }}
-      >
-        <Camera className="h-12 w-12" style={{ color: theme.text.color }} />
+      <div className="p-6 rounded-full bg-white/10">
+        <Camera className="h-12 w-12 text-white" />
       </div>
 
       {/* Header */}
-      <ThemedText variant="heading" className="text-center">
+      <ThemedText variant="heading" surface="dark" className="text-center">
         Camera Access Needed
       </ThemedText>
 
       {/* Description */}
-      <ThemedText variant="body" className="text-center opacity-80">
+      <ThemedText
+        variant="body"
+        surface="dark"
+        className="text-center opacity-80"
+      >
         We need camera access to take your photo
       </ThemedText>
 
       {/* Action button */}
-      <ThemedButton onClick={onRequestPermission} size="lg" className="w-full">
+      <ThemedButton onClick={onRequestPermission} size="md" surface="dark">
         Allow Camera
       </ThemedButton>
     </div>

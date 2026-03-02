@@ -1,4 +1,6 @@
 // Primitives barrel export
+export type { Surface } from '../../types'
+
 export { ThemedText } from './ThemedText'
 export type { ThemedTextProps, TextVariant } from './ThemedText'
 

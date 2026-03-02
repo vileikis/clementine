@@ -27,10 +27,10 @@ export function PhotoPreview({
     <CaptureLayout
       controls={
         <div className="flex items-center justify-center gap-4">
-          <ThemedButton onClick={onRetake} variant="outline">
+          <ThemedButton onClick={onRetake} variant="outline" surface="dark">
             Retake
           </ThemedButton>
-          <ThemedButton onClick={onConfirm} variant="primary">
+          <ThemedButton onClick={onConfirm} variant="primary" surface="dark">
             Continue
           </ThemedButton>
         </div>

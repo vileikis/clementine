@@ -11,7 +11,7 @@ import type { RefObject } from 'react'
 import type { AspectRatio, CameraCaptureError } from '@/shared/camera/types'
 import type { CameraViewRef } from '@/shared/camera'
 import { AspectRatioControl, CameraView } from '@/shared/camera'
-import { ThemedIconButton } from '@/shared/theming'
+import { ThemedIconButton, ThemedText } from '@/shared/theming'
 
 interface CameraActiveProps {
   cameraRef: RefObject<CameraViewRef | null>
@@ -57,12 +57,15 @@ export function CameraActive({
               <ThemedIconButton
                 onClick={onOpenPicker}
                 variant="outline"
+                surface="dark"
                 size="lg"
                 aria-label="Choose from library"
               >
                 <ImageIcon className="size-6" />
               </ThemedIconButton>
-              <span className="text-xs text-white/70">Library</span>
+              <ThemedText surface="dark" variant="small" as="span">
+                Library
+              </ThemedText>
             </div>
             <div className="flex flex-col items-center gap-1.5">
               <ThemedIconButton
@@ -80,13 +83,16 @@ export function CameraActive({
               <ThemedIconButton
                 onClick={onSwitchCamera}
                 variant="outline"
+                surface="dark"
                 size="lg"
                 disabled={!hasMultipleCameras}
                 aria-label="Switch camera"
               >
                 <SwitchCamera className="size-6" />
               </ThemedIconButton>
-              <span className="text-xs text-white/70">Flip</span>
+              <ThemedText surface="dark" variant="small" as="span">
+                Flip
+              </ThemedText>
             </div>
           </div>
         </>

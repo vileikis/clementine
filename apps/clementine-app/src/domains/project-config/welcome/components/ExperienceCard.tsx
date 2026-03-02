@@ -108,7 +108,7 @@ export function ExperienceCard({
     'hover:scale-[1.02] active:scale-[0.97] active:duration-75',
     {
       // Layout-specific styles
-      'flex-row items-center': layout === 'list',
+      'w-full flex-row items-center': layout === 'list',
       'flex-col': layout === 'grid',
     },
   )
@@ -145,7 +145,8 @@ export function ExperienceCard({
           <img
             src={experience.thumbnailUrl}
             alt={displayName}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover pointer-events-none"
+            draggable={false}
           />
         ) : (
           // Placeholder when no media
@@ -162,7 +163,10 @@ export function ExperienceCard({
           layout === 'list' ? 'flex-1 min-w-0' : '',
         )}
       >
-        <h3 className="font-medium text-sm truncate" style={textStyle}>
+        <h3
+          className="font-medium text-base truncate text-left"
+          style={textStyle}
+        >
           {displayName}
         </h3>
       </div>

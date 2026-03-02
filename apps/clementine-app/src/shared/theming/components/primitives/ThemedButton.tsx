@@ -25,7 +25,7 @@
 import { BUTTON_RADIUS_MAP } from '../../constants'
 import { useThemeWithOverride } from '../../hooks/useThemeWithOverride'
 import type { ButtonHTMLAttributes, CSSProperties, ReactNode } from 'react'
-import type { Theme } from '../../types'
+import type { Surface, Theme } from '../../types'
 import { cn } from '@/shared/utils'
 
 /** Button size variants */
@@ -51,6 +51,8 @@ export interface ThemedButtonProps extends Omit<
   size?: ButtonSize
   /** Button style variant (defaults to 'primary') */
   variant?: ButtonVariant
+  /** Rendering surface context (defaults to 'auto') */
+  surface?: Surface
   /** Theme override for use without ThemeProvider */
   theme?: Theme
 }
@@ -59,6 +61,7 @@ export function ThemedButton({
   children,
   size = 'md',
   variant = 'primary',
+  surface = 'auto',
   theme: themeOverride,
   className,
   disabled,
@@ -68,28 +71,38 @@ export function ThemedButton({
   const theme = useThemeWithOverride(themeOverride)
 
   // Compute button colors with fallback
-  const primaryBgColor = theme.button.backgroundColor ?? theme.primaryColor
-  const primaryTextColor = theme.button.textColor
+  const buttonBgColor = theme.button.backgroundColor ?? theme.primaryColor
+  const buttonTextColor = theme.button.textColor
   const borderRadius = BUTTON_RADIUS_MAP[theme.button.radius]
 
-  // Style based on variant
-  const style: CSSProperties =
-    variant === 'primary'
-      ? {
-          backgroundColor: primaryBgColor,
-          color: primaryTextColor,
-          borderRadius,
-          fontFamily: 'inherit',
-        }
-      : {
-          backgroundColor: `color-mix(in srgb, ${theme.text.color} 10%, transparent)`,
-          color: theme.text.color,
-          borderRadius,
-          borderWidth: '1px',
-          borderStyle: 'solid',
-          borderColor: `color-mix(in srgb, ${theme.text.color} 40%, transparent)`,
-          fontFamily: 'inherit',
-        }
+  // Style based on variant and surface
+  const style: CSSProperties = (() => {
+    if (variant === 'primary') {
+      return {
+        backgroundColor: buttonBgColor,
+        color: buttonTextColor,
+        borderRadius,
+        fontFamily: 'inherit',
+      }
+    }
+
+    // Outline variant
+    if (surface === 'dark') {
+      return {
+        backgroundColor: 'rgba(0, 0, 0, 0.4)',
+        color: '#FFFFFF',
+        borderRadius,
+        fontFamily: 'inherit',
+      }
+    }
+
+    return {
+      backgroundColor: `color-mix(in srgb, ${buttonTextColor} 92%, ${buttonBgColor})`,
+      color: buttonBgColor,
+      borderRadius,
+      fontFamily: 'inherit',
+    }
+  })()
 
   return (
     <button
@@ -99,7 +112,8 @@ export function ThemedButton({
         SIZE_CLASSES[size],
         'inline-flex items-center justify-center',
         'font-bold transition-all duration-150 ease-out',
-        variant === 'primary' && 'shadow-sm',
+        variant === 'primary' && 'shadow-sm hover:shadow-md',
+        variant === 'outline' && 'shadow-sm hover:shadow-md',
         'hover:scale-[1.03] hover:opacity-90 active:scale-[0.96] active:duration-75',
         'focus:outline-none focus:ring-2 focus:ring-offset-2',
         'disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100',

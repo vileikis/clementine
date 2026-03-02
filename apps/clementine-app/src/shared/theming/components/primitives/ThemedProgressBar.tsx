@@ -26,7 +26,7 @@
 import * as ProgressPrimitive from '@radix-ui/react-progress'
 import { BUTTON_RADIUS_MAP } from '../../constants'
 import { useThemeWithOverride } from '../../hooks/useThemeWithOverride'
-import type { Theme } from '../../types'
+import type { Surface, Theme } from '../../types'
 import { cn } from '@/shared/utils'
 
 export interface ThemedProgressBarProps {
@@ -52,6 +52,9 @@ export interface ThemedProgressBarProps {
    * @example (value, max) => `Upload ${value}% complete`
    */
   getValueLabel?: (value: number, max: number) => string
+
+  /** Rendering surface context (defaults to 'auto') */
+  surface?: Surface
 
   /**
    * Theme override for use without ThemeProvider
@@ -88,6 +91,7 @@ export function ThemedProgressBar({
   value,
   max = 100,
   getValueLabel,
+  surface = 'auto',
   theme: themeOverride,
   className,
   indicatorClassName,
@@ -104,6 +108,8 @@ export function ThemedProgressBar({
   // Calculate percentage for visual display
   const percentage = clampedValue !== null ? (clampedValue / max) * 100 : 0
 
+  const isDark = surface === 'dark'
+
   return (
     <ProgressPrimitive.Root
       value={clampedValue}
@@ -111,7 +117,9 @@ export function ThemedProgressBar({
       getValueLabel={getValueLabel}
       className={cn('relative h-2 w-full overflow-hidden', className)}
       style={{
-        backgroundColor: `color-mix(in srgb, ${theme.text.color} 10%, transparent)`,
+        backgroundColor: isDark
+          ? 'rgba(255, 255, 255, 0.2)'
+          : `color-mix(in srgb, ${theme.text.color} 10%, transparent)`,
         borderRadius,
       }}
     >
@@ -121,7 +129,7 @@ export function ThemedProgressBar({
           indicatorClassName,
         )}
         style={{
-          backgroundColor: theme.primaryColor,
+          backgroundColor: isDark ? '#FFFFFF' : theme.primaryColor,
           borderRadius,
           transform: `translateX(-${100 - percentage}%)`,
         }}
