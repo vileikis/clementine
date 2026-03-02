@@ -7,7 +7,7 @@
 import { CameraOff } from 'lucide-react'
 import type { RefObject } from 'react'
 import { getDeniedInstructions } from '@/shared/camera'
-import { ThemedButton, ThemedText, useEventTheme } from '@/shared/theming'
+import { ThemedButton, ThemedText } from '@/shared/theming'
 
 interface PermissionDeniedProps {
   fileInputRef: RefObject<HTMLInputElement | null>
@@ -20,32 +20,29 @@ export function PermissionDenied({
   onOpenPicker,
   onFileChange,
 }: PermissionDeniedProps) {
-  const { theme } = useEventTheme()
-
   return (
     <div className="flex flex-col items-center gap-6 w-full px-4 py-8">
       {/* Camera off icon */}
-      <div
-        className="p-6 rounded-full"
-        style={{
-          backgroundColor: `color-mix(in srgb, ${theme.text.color} 10%, transparent)`,
-        }}
-      >
-        <CameraOff className="h-12 w-12" style={{ color: theme.text.color }} />
+      <div className="p-6 rounded-full bg-white/10">
+        <CameraOff className="h-12 w-12 text-white" />
       </div>
 
       {/* Header */}
-      <ThemedText variant="heading" className="text-center">
+      <ThemedText variant="heading" surface="dark" className="text-center">
         Camera Blocked
       </ThemedText>
 
       {/* Instructions */}
-      <ThemedText variant="body" className="text-center opacity-80">
+      <ThemedText
+        variant="body"
+        surface="dark"
+        className="text-center opacity-80"
+      >
         {getDeniedInstructions()}
       </ThemedText>
 
       {/* Fallback button */}
-      <ThemedButton onClick={onOpenPicker} size="lg" className="w-full">
+      <ThemedButton onClick={onOpenPicker} size="md" surface="dark">
         Upload a Photo Instead
       </ThemedButton>
 

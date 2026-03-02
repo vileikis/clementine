@@ -163,7 +163,10 @@ export function ExperienceCard({
           layout === 'list' ? 'flex-1 min-w-0' : '',
         )}
       >
-        <h3 className="font-medium text-base truncate text-left" style={textStyle}>
+        <h3
+          className="font-medium text-base truncate text-left"
+          style={textStyle}
+        >
           {displayName}
         </h3>
       </div>

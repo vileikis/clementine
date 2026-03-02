@@ -30,7 +30,7 @@ export function PhotoPreview({
           <ThemedButton onClick={onRetake} variant="outline" surface="dark">
             Retake
           </ThemedButton>
-          <ThemedButton onClick={onConfirm} variant="primary">
+          <ThemedButton onClick={onConfirm} variant="primary" surface="dark">
             Continue
           </ThemedButton>
         </div>

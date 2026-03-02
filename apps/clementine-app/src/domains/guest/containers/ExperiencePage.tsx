@@ -227,13 +227,11 @@ export function ExperiencePage({
 
     // 2. Trigger transform pipeline if outcome is configured (throws on failure)
     if (experience?.published && hasTypeConfig(experience.published)) {
-      // await startTransformPipeline({
-      //   projectId: project.id,
-      //   sessionId,
-      // })
+      await startTransformPipeline({
+        projectId: project.id,
+        sessionId,
+      })
     }
-
-    return
 
     // 3. Navigate to preshare or share
     if (needsPreshare()) {
