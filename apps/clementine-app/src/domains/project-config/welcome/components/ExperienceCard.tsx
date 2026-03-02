@@ -137,13 +137,7 @@ function GridCard({
       </div>
 
       {/* Bottom gradient overlay with title */}
-      <div
-        className="absolute inset-x-0 bottom-0 p-3 pt-10"
-        style={{
-          background:
-            'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%)',
-        }}
-      >
+      <div className="absolute inset-x-0 bottom-0 p-3 pt-10 bg-gradient-to-t from-black/80 to-transparent">
         <h3 className="font-semibold text-lg text-white line-clamp-2 text-center leading-snug">
           {displayName}
         </h3>
