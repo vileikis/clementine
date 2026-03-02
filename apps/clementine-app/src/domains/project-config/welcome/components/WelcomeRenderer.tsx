@@ -67,7 +67,7 @@ export function WelcomeRenderer({
           <img
             src={welcome.media.url}
             alt="Welcome hero"
-            className="w-full max-h-48 object-contain rounded-lg"
+            className="w-full max-h-48 object-contain rounded-lg pointer-events-none"
           />
         </div>
       )}

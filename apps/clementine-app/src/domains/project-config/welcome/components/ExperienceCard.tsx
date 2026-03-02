@@ -145,7 +145,8 @@ export function ExperienceCard({
           <img
             src={experience.thumbnailUrl}
             alt={displayName}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover pointer-events-none"
+            draggable={false}
           />
         ) : (
           // Placeholder when no media
