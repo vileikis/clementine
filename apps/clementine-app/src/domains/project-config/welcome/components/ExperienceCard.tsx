@@ -73,13 +73,6 @@ export function ExperienceCard({
     }
   }
 
-  const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (isInteractive && (event.key === 'Enter' || event.key === ' ')) {
-      event.preventDefault()
-      onClick()
-    }
-  }
-
   if (layout === 'grid') {
     return (
       <GridCard
@@ -89,7 +82,6 @@ export function ExperienceCard({
         theme={theme}
         isInteractive={!!isInteractive}
         onClick={handleClick}
-        onKeyDown={handleKeyDown}
       />
     )
   }
@@ -103,7 +95,6 @@ export function ExperienceCard({
       theme={theme}
       isInteractive={!!isInteractive}
       onClick={handleClick}
-      onKeyDown={handleKeyDown}
     />
   )
 }
@@ -117,7 +108,6 @@ function GridCard({
   theme,
   isInteractive,
   onClick,
-  onKeyDown,
 }: {
   experience: ExperienceCardData
   displayName: string
@@ -125,7 +115,6 @@ function GridCard({
   theme: Theme
   isInteractive: boolean
   onClick: () => void
-  onKeyDown: (e: React.KeyboardEvent) => void
 }) {
   const content = (
     <div className="relative aspect-square w-full">
@@ -177,7 +166,6 @@ function GridCard({
           '--tw-ring-color': theme.primaryColor,
         }}
         onClick={onClick}
-        onKeyDown={onKeyDown}
       >
         {content}
       </button>
@@ -197,7 +185,6 @@ function ListCard({
   theme,
   isInteractive,
   onClick,
-  onKeyDown,
 }: {
   experience: ExperienceCardData
   displayName: string
@@ -206,7 +193,6 @@ function ListCard({
   theme: Theme
   isInteractive: boolean
   onClick: () => void
-  onKeyDown: (e: React.KeyboardEvent) => void
 }) {
   const placeholderStyle: CSSProperties = {
     backgroundColor: `color-mix(in srgb, ${theme.primaryColor} 15%, transparent)`,
@@ -280,7 +266,6 @@ function ListCard({
           '--tw-ring-color': theme.primaryColor,
         }}
         onClick={onClick}
-        onKeyDown={onKeyDown}
         onMouseEnter={(e) => {
           e.currentTarget.style.backgroundColor = hoverBg
         }}
