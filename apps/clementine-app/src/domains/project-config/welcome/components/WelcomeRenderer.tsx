@@ -93,7 +93,8 @@ export function WelcomeRenderer({
           <div
             className={cn('w-full', {
               'space-y-3 max-w-[560px] mx-auto': welcome.layout === 'list',
-              'grid grid-cols-2 gap-3': welcome.layout === 'grid',
+              'grid grid-cols-2 gap-3 max-w-lg mx-auto':
+                welcome.layout === 'grid',
             })}
           >
             {displayExperiences.map((experience) => (
