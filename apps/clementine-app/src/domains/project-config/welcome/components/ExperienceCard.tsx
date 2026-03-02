@@ -198,15 +198,14 @@ function ListCard({
     backgroundColor: `color-mix(in srgb, ${theme.primaryColor} 15%, transparent)`,
   }
 
-  const cardStyle: CSSProperties = {
-    backgroundColor: `color-mix(in srgb, ${theme.primaryColor} 8%, transparent)`,
+  const cardStyle = {
     borderWidth: '1px',
     borderStyle: 'solid',
     borderColor: `color-mix(in srgb, ${theme.primaryColor} 20%, transparent)`,
     fontFamily: theme.fontFamily ?? undefined,
-  }
-
-  const hoverBg = `color-mix(in srgb, ${theme.primaryColor} 15%, transparent)`
+    '--card-bg': `color-mix(in srgb, ${theme.primaryColor} 8%, transparent)`,
+    '--card-hover-bg': `color-mix(in srgb, ${theme.primaryColor} 15%, transparent)`,
+  } as CSSProperties
 
   const content = (
     <div className="flex items-center gap-3 p-2">
@@ -253,6 +252,7 @@ function ListCard({
   const baseClasses = cn(
     'rounded-lg overflow-hidden transition-all duration-150 ease-out cursor-pointer select-none w-full',
     'hover:scale-[1.02] active:scale-[0.97] active:duration-75',
+    'bg-[var(--card-bg)] hover:bg-[var(--card-hover-bg)]',
   )
 
   if (isInteractive) {
@@ -260,18 +260,13 @@ function ListCard({
       <button
         type="button"
         className={cn(baseClasses, 'focus:outline-none focus:ring-2')}
-        style={{
-          ...cardStyle,
-          // @ts-expect-error CSS custom property for focus ring color
-          '--tw-ring-color': theme.primaryColor,
-        }}
+        style={
+          {
+            ...cardStyle,
+            '--tw-ring-color': theme.primaryColor,
+          } as CSSProperties
+        }
         onClick={onClick}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = hoverBg
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = cardStyle.backgroundColor!
-        }}
       >
         {content}
       </button>
@@ -279,16 +274,7 @@ function ListCard({
   }
 
   return (
-    <div
-      className={baseClasses}
-      style={cardStyle}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.backgroundColor = hoverBg
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.backgroundColor = cardStyle.backgroundColor!
-      }}
-    >
+    <div className={baseClasses} style={cardStyle}>
       {content}
     </div>
   )
