@@ -113,7 +113,7 @@ export function RuntimeTopBar({ onClose, className }: RuntimeTopBarProps) {
       >
         {/* Blurred background with gradient fade */}
         <div
-          className="absolute inset-0 backdrop-blur-md bg-black/10"
+          className="absolute inset-0 backdrop-blur-md"
           style={{
             maskImage:
               'linear-gradient(to bottom, black 60%, transparent 100%)',
