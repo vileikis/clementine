@@ -2,13 +2,17 @@
  * ExperienceCard Component
  *
  * Card component for displaying experience in welcome screen preview.
- * Shows thumbnail and name with theme-derived styling.
+ * Grid layout: full-bleed image with gradient overlay and white text.
+ * List layout: horizontal row with thumbnail and type metadata.
  * Supports different layouts (list/grid) and modes (edit/run).
  */
 import type { CSSProperties } from 'react'
+import type { ExperienceType } from '@clementine/shared'
 import type { Theme } from '@/shared/theming'
 import { useThemeWithOverride } from '@/shared/theming'
 import { cn } from '@/shared/utils/style-utils'
+import { getExperienceTypeIcon } from '@/domains/experience/shared'
+import { typeMetadata } from '@/domains/experience/shared/types/type-metadata'
 
 /**
  * Minimal experience data needed for card display
@@ -20,6 +24,8 @@ export interface ExperienceCardData {
   name: string
   /** Thumbnail URL (null if no media) */
   thumbnailUrl: string | null
+  /** Experience type */
+  type: ExperienceType
 }
 
 export interface ExperienceCardProps {
@@ -28,8 +34,8 @@ export interface ExperienceCardProps {
 
   /**
    * Layout mode - affects card dimensions and arrangement
-   * - list: Full width, smaller thumbnail (64x64px)
-   * - grid: 50% width, aspect ratio thumbnail (16:9)
+   * - list: Full width, horizontal row with 80x80 thumbnail
+   * - grid: Square card with full-bleed image and gradient overlay
    */
   layout: 'list' | 'grid'
 
@@ -47,27 +53,6 @@ export interface ExperienceCardProps {
   theme?: Theme
 }
 
-/**
- * Card component for displaying experiences
- *
- * @example
- * ```tsx
- * // List layout (edit mode - WYSIWYG preview)
- * <ExperienceCard
- *   experience={experience}
- *   layout="list"
- *   mode="edit"
- * />
- *
- * // Grid layout (run mode)
- * <ExperienceCard
- *   experience={experience}
- *   layout="grid"
- *   mode="run"
- *   onClick={() => startExperience(experience.id)}
- * />
- * ```
- */
 export function ExperienceCard({
   experience,
   layout,
@@ -78,47 +63,9 @@ export function ExperienceCard({
   const theme = useThemeWithOverride(themeOverride)
   const isInteractive = mode === 'run' && onClick
 
-  // Display name with fallback for empty names
   const displayName = experience.name || 'Untitled Experience'
-
-  // Themed card styles using color-mix for semi-transparent backgrounds
-  const cardStyle: CSSProperties = {
-    backgroundColor: `color-mix(in srgb, ${theme.primaryColor} 8%, transparent)`,
-    borderWidth: '1px',
-    borderStyle: 'solid',
-    borderColor: `color-mix(in srgb, ${theme.primaryColor} 20%, transparent)`,
-    fontFamily: theme.fontFamily ?? undefined,
-  }
-
-  // Themed placeholder styles
-  const placeholderStyle: CSSProperties = {
-    backgroundColor: `color-mix(in srgb, ${theme.primaryColor} 10%, transparent)`,
-    color: `color-mix(in srgb, ${theme.text.color} 40%, transparent)`,
-  }
-
-  // Text color style
-  const textStyle: CSSProperties = {
-    color: theme.text.color,
-  }
-
-  // Base classes (layout and interaction behavior, no hardcoded colors)
-  // Edit mode is WYSIWYG - same visual appearance as run mode, just non-interactive
-  const cardClasses = cn(
-    'flex gap-3 p-3 rounded-lg min-h-[44px] transition-all duration-150 ease-out cursor-pointer select-none',
-    'hover:scale-[1.02] active:scale-[0.97] active:duration-75',
-    {
-      // Layout-specific styles
-      'w-full flex-row items-center': layout === 'list',
-      'flex-col': layout === 'grid',
-    },
-  )
-
-  const thumbnailClasses = cn({
-    // List layout: square thumbnail
-    'w-16 h-16 shrink-0': layout === 'list',
-    // Grid layout: aspect ratio thumbnail
-    'w-full aspect-video': layout === 'grid',
-  })
+  const TypeIcon = getExperienceTypeIcon(experience.type)
+  const typeLabel = typeMetadata[experience.type].label
 
   const handleClick = () => {
     if (isInteractive) {
@@ -133,13 +80,154 @@ export function ExperienceCard({
     }
   }
 
-  // Card content (shared between interactive and non-interactive variants)
-  const cardContent = (
-    <>
+  if (layout === 'grid') {
+    return (
+      <GridCard
+        experience={experience}
+        displayName={displayName}
+        TypeIcon={TypeIcon}
+        theme={theme}
+        isInteractive={!!isInteractive}
+        onClick={handleClick}
+        onKeyDown={handleKeyDown}
+      />
+    )
+  }
+
+  return (
+    <ListCard
+      experience={experience}
+      displayName={displayName}
+      TypeIcon={TypeIcon}
+      typeLabel={typeLabel}
+      theme={theme}
+      isInteractive={!!isInteractive}
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
+    />
+  )
+}
+
+// --- Grid Card ---
+
+function GridCard({
+  experience,
+  displayName,
+  TypeIcon,
+  theme,
+  isInteractive,
+  onClick,
+  onKeyDown,
+}: {
+  experience: ExperienceCardData
+  displayName: string
+  TypeIcon: React.ComponentType<{ className?: string }>
+  theme: Theme
+  isInteractive: boolean
+  onClick: () => void
+  onKeyDown: (e: React.KeyboardEvent) => void
+}) {
+  const content = (
+    <div className="relative aspect-square w-full">
+      {experience.thumbnailUrl ? (
+        <img
+          src={experience.thumbnailUrl}
+          alt={displayName}
+          className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+          draggable={false}
+        />
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center bg-black">
+          <TypeIcon className="size-10 text-white/80" />
+        </div>
+      )}
+
+      {/* Type indicator — top-left */}
+      <div className="absolute top-2 left-2 z-10 rounded-full bg-black/50 p-2">
+        <TypeIcon className="size-[16px] text-white drop-shadow-md" />
+      </div>
+
+      {/* Bottom gradient overlay with title */}
+      <div
+        className="absolute inset-x-0 bottom-0 p-3 pt-10"
+        style={{
+          background:
+            'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%)',
+        }}
+      >
+        <h3 className="font-semibold text-lg text-white line-clamp-2 text-center leading-snug">
+          {displayName}
+        </h3>
+      </div>
+    </div>
+  )
+
+  const baseClasses = cn(
+    'rounded-lg overflow-hidden transition-all duration-150 ease-out cursor-pointer select-none',
+    'hover:scale-[1.02] active:scale-[0.97] active:duration-75',
+  )
+
+  if (isInteractive) {
+    return (
+      <button
+        type="button"
+        className={cn(baseClasses, 'focus:outline-none focus:ring-2')}
+        style={{
+          // @ts-expect-error CSS custom property for focus ring color
+          '--tw-ring-color': theme.primaryColor,
+        }}
+        onClick={onClick}
+        onKeyDown={onKeyDown}
+      >
+        {content}
+      </button>
+    )
+  }
+
+  return <div className={baseClasses}>{content}</div>
+}
+
+// --- List Card ---
+
+function ListCard({
+  experience,
+  displayName,
+  TypeIcon,
+  typeLabel,
+  theme,
+  isInteractive,
+  onClick,
+  onKeyDown,
+}: {
+  experience: ExperienceCardData
+  displayName: string
+  TypeIcon: React.ComponentType<{ className?: string }>
+  typeLabel: string
+  theme: Theme
+  isInteractive: boolean
+  onClick: () => void
+  onKeyDown: (e: React.KeyboardEvent) => void
+}) {
+  const placeholderStyle: CSSProperties = {
+    backgroundColor: `color-mix(in srgb, ${theme.primaryColor} 15%, transparent)`,
+  }
+
+  const cardStyle: CSSProperties = {
+    backgroundColor: `color-mix(in srgb, ${theme.primaryColor} 8%, transparent)`,
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: `color-mix(in srgb, ${theme.primaryColor} 20%, transparent)`,
+    fontFamily: theme.fontFamily ?? undefined,
+  }
+
+  const hoverBg = `color-mix(in srgb, ${theme.primaryColor} 15%, transparent)`
+
+  const content = (
+    <div className="flex items-center gap-3 p-2">
       {/* Thumbnail */}
       <div
-        className={cn(thumbnailClasses, 'rounded-md overflow-hidden')}
-        style={placeholderStyle}
+        className="size-20 shrink-0 rounded-md overflow-hidden"
+        style={!experience.thumbnailUrl ? placeholderStyle : undefined}
       >
         {experience.thumbnailUrl ? (
           <img
@@ -149,73 +237,74 @@ export function ExperienceCard({
             draggable={false}
           />
         ) : (
-          // Placeholder when no media
           <div className="w-full h-full flex items-center justify-center">
-            <span className="text-xs">No image</span>
+            <TypeIcon className="size-6 text-black/80" />
           </div>
         )}
       </div>
 
-      {/* Content */}
-      <div
-        className={cn(
-          'flex flex-col',
-          layout === 'list' ? 'flex-1 min-w-0' : '',
-        )}
-      >
+      {/* Text block */}
+      <div className="flex-1 min-w-0 flex flex-col gap-0.5">
         <h3
           className="font-medium text-base truncate text-left"
-          style={textStyle}
+          style={{ color: theme.text.color }}
         >
           {displayName}
         </h3>
+        <div
+          className="flex items-center gap-1.5 text-sm"
+          style={{
+            color: `color-mix(in srgb, ${theme.text.color} 60%, transparent)`,
+          }}
+        >
+          <TypeIcon className="size-3.5 shrink-0" />
+          <span>{typeLabel}</span>
+        </div>
       </div>
-    </>
+    </div>
   )
 
-  // Hover style for cards (slightly increased opacity)
-  const hoverStyle: CSSProperties = {
-    backgroundColor: `color-mix(in srgb, ${theme.primaryColor} 15%, transparent)`,
-  }
+  const baseClasses = cn(
+    'rounded-lg overflow-hidden transition-all duration-150 ease-out cursor-pointer select-none w-full',
+    'hover:scale-[1.02] active:scale-[0.97] active:duration-75',
+  )
 
-  // Render as interactive button when in run mode with onClick
   if (isInteractive) {
     return (
       <button
         type="button"
-        className={cn(cardClasses, 'focus:outline-none focus:ring-2 group')}
+        className={cn(baseClasses, 'focus:outline-none focus:ring-2')}
         style={{
           ...cardStyle,
           // @ts-expect-error CSS custom property for focus ring color
           '--tw-ring-color': theme.primaryColor,
         }}
-        onClick={handleClick}
-        onKeyDown={handleKeyDown}
+        onClick={onClick}
+        onKeyDown={onKeyDown}
         onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = hoverStyle.backgroundColor!
+          e.currentTarget.style.backgroundColor = hoverBg
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.backgroundColor = cardStyle.backgroundColor!
         }}
       >
-        {cardContent}
+        {content}
       </button>
     )
   }
 
-  // Render as non-interactive div otherwise (edit mode - WYSIWYG with hover but no click)
   return (
     <div
-      className={cardClasses}
+      className={baseClasses}
       style={cardStyle}
       onMouseEnter={(e) => {
-        e.currentTarget.style.backgroundColor = hoverStyle.backgroundColor!
+        e.currentTarget.style.backgroundColor = hoverBg
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.backgroundColor = cardStyle.backgroundColor!
       }}
     >
-      {cardContent}
+      {content}
     </div>
   )
 }

@@ -12,3 +12,8 @@ export {
   type ConfigValidationError,
   type ConfigValidationResult,
 } from './config-validation'
+export {
+  experienceTypeIcons,
+  getExperienceTypeIcon,
+  type ExperienceIcon,
+} from './experience-type-icons'
