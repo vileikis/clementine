@@ -2,7 +2,7 @@
   {
     "origin": [
       "http://localhost:3000",
-      "https://clementine-be--clementine-7568d.europe-west4.hosted.app",
+      "https://app.clementine-labs.com",
       "https://thegnly-fatherly-elidia.ngrok-free.dev"
     ],
     "method": ["GET", "HEAD"],

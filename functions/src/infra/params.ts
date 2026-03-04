@@ -26,5 +26,5 @@ export const SMTP_APP_PASSWORD = defineSecret('SMTP_APP_PASSWORD')
 
 // App domain for building public-facing URLs (e.g., result page links in emails)
 export const APP_DOMAIN = defineString('APP_DOMAIN', {
-  default: 'https://clementine-be--clementine-7568d.europe-west4.hosted.app',
+  default: 'https://app.clementine-labs.com',
 })
