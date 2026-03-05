@@ -295,6 +295,15 @@ async function handleJobFailure(
   logMemoryUsage('job-failure', job.id)
 
   try {
+    // Guard: re-fetch job to avoid overwriting a completed job (at-least-once delivery)
+    const currentJob = await fetchJob(projectId, job.id)
+    if (currentJob?.status === 'completed') {
+      logger.warn('[TransformJob] Job already completed, skipping failure update', {
+        jobId: job.id,
+      })
+      return
+    }
+
     const sanitizedError = createSanitizedError('PROCESSING_FAILED', 'outcome')
     await updateJobError(projectId, job.id, sanitizedError)
     await updateSessionJobStatus(projectId, sessionId, job.id, 'failed')
