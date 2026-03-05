@@ -49,7 +49,7 @@ export function PromptFragmentInput({
   }
 
   const charCount = localValue.length
-  const maxChars = 500
+  const maxChars = 2000
 
   return (
     <div className="space-y-2">

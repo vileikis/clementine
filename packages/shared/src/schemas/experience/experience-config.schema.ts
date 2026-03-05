@@ -87,7 +87,7 @@ export const videoGenerationConfigSchema = z.object({
   aspectRatio: videoAspectRatioSchema.nullable().default(null),
   refMedia: z.array(mediaReferenceSchema).default([]),
   resolution: videoResolutionSchema.default('1080p'),
-  negativePrompt: z.string().max(500).default(''),
+  negativePrompt: z.string().max(2000).default(''),
   sound: z.boolean().default(false),
   enhance: z.boolean().default(false),
 })

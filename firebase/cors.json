@@ -2,8 +2,8 @@
   {
     "origin": [
       "http://localhost:3000",
-      "https://app.clementine-labs.com",
-      "https://thegnly-fatherly-elidia.ngrok-free.dev"
+      "http://192.168.0.180:3000",
+      "https://app.clementine-labs.com"
     ],
     "method": ["GET", "HEAD"],
     "maxAgeSeconds": 3600,

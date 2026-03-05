@@ -88,7 +88,7 @@ export interface MultiSelectOption {
    * Prompt fragment (NEW in Phase 1b)
    *
    * Optional text inserted into AI prompt when this option is selected.
-   * Max length: 500 characters.
+   * Max length: 2000 characters.
    */
   promptFragment?: string
 
@@ -240,4 +240,4 @@ export const STEP_NAME_REGEX = /^[a-zA-Z0-9 \-_]+$/
  * Step Name Constraints
  */
 export const STEP_NAME_MAX_LENGTH = 50
-export const PROMPT_FRAGMENT_MAX_LENGTH = 500
+export const PROMPT_FRAGMENT_MAX_LENGTH = 2000

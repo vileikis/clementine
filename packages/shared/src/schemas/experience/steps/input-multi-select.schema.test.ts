@@ -2,7 +2,7 @@
  * Experience Input Multi-Select Step Config Schema Tests
  *
  * Tests for MultiSelectOption schema with AI-aware fields:
- * - promptFragment: optional, max 500 characters
+ * - promptFragment: optional, max 2000 characters
  * - promptMedia: optional MediaReference
  */
 import { describe, expect, it } from 'vitest'
@@ -57,7 +57,9 @@ describe('multiSelectOptionSchema', () => {
       })
       expect(result.success).toBe(true)
       if (result.success) {
-        expect(result.data.promptFragment).toBe('fluffy orange tabby cat with green eyes')
+        expect(result.data.promptFragment).toBe(
+          'fluffy orange tabby cat with green eyes',
+        )
       }
     })
 
@@ -69,20 +71,20 @@ describe('multiSelectOptionSchema', () => {
       expect(result.success).toBe(true)
     })
 
-    it('should accept prompt fragment up to 500 characters', () => {
-      const fragment500 = 'A'.repeat(500)
+    it('should accept prompt fragment up to 2000 characters', () => {
+      const fragment = 'A'.repeat(2000)
       const result = multiSelectOptionSchema.safeParse({
         value: 'Cat',
-        promptFragment: fragment500,
+        promptFragment: fragment,
       })
       expect(result.success).toBe(true)
     })
 
-    it('should reject prompt fragment longer than 500 characters', () => {
-      const fragment501 = 'A'.repeat(501)
+    it('should reject prompt fragment longer than 2000 characters', () => {
+      const fragment = 'A'.repeat(2001)
       const result = multiSelectOptionSchema.safeParse({
         value: 'Cat',
-        promptFragment: fragment501,
+        promptFragment: fragment,
       })
       expect(result.success).toBe(false)
     })

@@ -329,12 +329,12 @@ export function AIVideoConfigForm({
                 updateVideoGeneration({ negativePrompt: e.target.value })
               }
               placeholder="Describe what to avoid in the generated video"
-              maxLength={500}
+              maxLength={2000}
               rows={2}
               className="resize-none text-sm"
             />
             <p className="text-right text-xs text-muted-foreground">
-              {videoGeneration.negativePrompt.length}/500
+              {videoGeneration.negativePrompt.length}/2000
             </p>
           </div>
         )}

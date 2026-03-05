@@ -73,7 +73,7 @@ export function createDefaultInputShortTextConfig(): ExperienceInputShortTextSte
     title: '',
     required: false,
     placeholder: '',
-    maxLength: 100,
+    maxLength: 120,
   }
 }
 
@@ -85,7 +85,7 @@ export function createDefaultInputLongTextConfig(): ExperienceInputLongTextStepC
     title: '',
     required: false,
     placeholder: '',
-    maxLength: 500,
+    maxLength: 2000,
   }
 }
 
