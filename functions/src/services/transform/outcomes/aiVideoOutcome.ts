@@ -113,6 +113,7 @@ export async function aiVideoOutcome(ctx: OutcomeContext): Promise<JobOutput> {
       sessionId: job.sessionId,
       tmpDir,
     },
+    job.id,
   )
 
   // Apply overlay if resolved at job creation (before thumbnail/upload)
@@ -123,7 +124,7 @@ export async function aiVideoOutcome(ctx: OutcomeContext): Promise<JobOutput> {
       jobId: job.id,
       overlayDisplayName: overlayChoice.displayName,
     })
-    outputPath = await applyOverlay(generatedVideo.localPath, overlayChoice, tmpDir)
+    outputPath = await applyOverlay(generatedVideo.localPath, overlayChoice, tmpDir, job.id)
   }
 
   // Upload output and generate thumbnail
@@ -131,6 +132,7 @@ export async function aiVideoOutcome(ctx: OutcomeContext): Promise<JobOutput> {
     outputPath,
     projectId: job.projectId,
     sessionId: job.sessionId,
+    jobId: job.id,
     tmpDir,
     format: 'video',
     dimensions: generatedVideo.dimensions,

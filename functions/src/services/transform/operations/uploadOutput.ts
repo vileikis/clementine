@@ -11,6 +11,7 @@ import {
   getOutputStoragePath,
 } from '../../../infra/storage'
 import { generateThumbnail } from '../../ffmpeg'
+import { logMemoryUsage } from '../helpers'
 
 export interface UploadOutputParams {
   /** Path to the output file on disk */
@@ -19,6 +20,8 @@ export interface UploadOutputParams {
   projectId: string
   /** Session document ID */
   sessionId: string
+  /** Job document ID (for memory logging) */
+  jobId: string
   /** Temporary directory for intermediate files (thumbnail) */
   tmpDir: string
   /** Output format (default: 'image') */
@@ -38,11 +41,14 @@ export async function uploadOutput({
   outputPath,
   projectId,
   sessionId,
+  jobId,
   tmpDir,
   format = 'image',
   dimensions = { width: 1024, height: 1024 },
   extension = 'jpg',
 }: UploadOutputParams): Promise<Omit<JobOutput, 'processingTimeMs'>> {
+  logMemoryUsage('upload-output-start', jobId)
+
   const stats = await fs.stat(outputPath)
 
   const storagePath = getOutputStoragePath(

@@ -14,6 +14,7 @@ import { logger } from 'firebase-functions/v2'
 import type { MediaReference } from '@clementine/shared'
 import { downloadFromStorage, getStoragePathFromMediaReference } from '../../../infra/storage'
 import { applyOverlayToMedia } from '../../ffmpeg'
+import { logMemoryUsage } from '../helpers'
 
 /**
  * Apply overlay to media file
@@ -30,7 +31,10 @@ export async function applyOverlay(
   inputPath: string,
   overlay: MediaReference,
   tmpDir: string,
+  jobId: string,
 ): Promise<string> {
+  logMemoryUsage('apply-overlay-start', jobId)
+
   logger.info('[Overlay] Applying overlay', {
     displayName: overlay.displayName,
     mediaAssetId: overlay.mediaAssetId,

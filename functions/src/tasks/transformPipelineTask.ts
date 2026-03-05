@@ -23,6 +23,7 @@ import {
 } from '../repositories/job'
 import type { Job, JobOutput } from '@clementine/shared'
 import { runOutcome, type OutcomeContext } from '../services/transform'
+import { logMemoryUsage } from '../services/transform/helpers'
 import { createTempDir, cleanupTempDir } from '../infra/temp-dir'
 import {
   queueDispatchExports,
@@ -39,25 +40,6 @@ interface JobHandlerContext {
   sessionId: string
   tmpDir: string
   cleanup: () => Promise<void>
-}
-
-// ============================================================================
-// Memory Logging
-// ============================================================================
-
-/**
- * Log current process memory usage at key execution points
- */
-function logMemoryUsage(phase: string, jobId: string): void {
-  const mem = process.memoryUsage()
-  logger.info('[TransformJob] Memory usage', {
-    phase,
-    jobId,
-    heapUsedMB: Math.round(mem.heapUsed / 1024 / 1024),
-    heapTotalMB: Math.round(mem.heapTotal / 1024 / 1024),
-    rssMB: Math.round(mem.rss / 1024 / 1024),
-    externalMB: Math.round(mem.external / 1024 / 1024),
-  })
 }
 
 // ============================================================================
@@ -109,7 +91,6 @@ export const transformPipelineTask = onTaskDispatched(
         tmpDir: context.tmpDir,
       }
       const output = await runOutcome(outcomeContext)
-      logMemoryUsage('after-outcome', context.job.id)
 
       // 4. Finalize success
       await finalizeJobSuccess(output, context)
@@ -222,7 +203,7 @@ async function finalizeJobSuccess(
   context: JobHandlerContext,
 ): Promise<void> {
   const { projectId, job, sessionId } = context
-  logMemoryUsage('finalize-success', job.id)
+  logMemoryUsage('job-success', job.id)
 
   // Update progress: uploading (output already uploaded by outcome executor)
   await updateJobProgress(projectId, job.id, {
@@ -311,7 +292,7 @@ async function handleJobFailure(
   error: unknown,
 ): Promise<void> {
   const { projectId, job, sessionId } = context
-  logMemoryUsage('handle-failure', job.id)
+  logMemoryUsage('job-failure', job.id)
 
   try {
     const sanitizedError = createSanitizedError('PROCESSING_FAILED', 'outcome')

@@ -20,7 +20,7 @@ import * as fs from 'fs/promises'
 
 import type { MediaReference } from '@clementine/shared'
 import type { GenerationRequest, GeneratedImage } from '../types'
-import { retryWithBackoff } from '../helpers'
+import { logMemoryUsage, retryWithBackoff } from '../helpers'
 import { storage } from '../../../infra/firebase-admin'
 import { getStoragePathFromMediaReference } from '../../../infra/storage'
 
@@ -42,6 +42,7 @@ const GOOGLE_CLOUD_PROJECT =
 export async function aiGenerateImage(
   request: GenerationRequest,
   tmpDir: string,
+  jobId: string,
 ): Promise<GeneratedImage> {
   const { prompt, model, aspectRatio, sourceMedia, referenceMedia } = request
 
@@ -95,6 +96,8 @@ export async function aiGenerateImage(
     location,
     project: GOOGLE_CLOUD_PROJECT,
   })
+
+  logMemoryUsage('ai-generate-image-start', jobId)
 
   // Generate image (with retry for 429/503)
   const response = await retryWithBackoff(

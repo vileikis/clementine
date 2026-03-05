@@ -38,7 +38,7 @@ import {
   getStoragePathFromMediaReference,
 } from '../../../infra/storage'
 import { getMediaDimensions } from '../../ffmpeg/probe'
-import { retryWithBackoff } from '../helpers'
+import { logMemoryUsage, retryWithBackoff } from '../helpers'
 import { sleep } from '../helpers/sleep'
 
 // Veo 3+ models are only available in us-central1 (not yet in EU regions)
@@ -134,12 +134,15 @@ export interface GeneratedVideo {
 export async function aiGenerateVideo(
   request: GenerateVideoRequest,
   output: VideoOutputConfig,
+  jobId: string,
 ): Promise<GeneratedVideo> {
   const { prompt, model, aspectRatio, duration } = request
 
   if (!prompt || prompt.trim().length === 0) {
     throw new Error('Cannot generate video with empty prompt')
   }
+
+  logMemoryUsage('ai-generate-video-start', jobId)
 
   logger.info('[AIVideoGenerate] Starting video generation', {
     model,

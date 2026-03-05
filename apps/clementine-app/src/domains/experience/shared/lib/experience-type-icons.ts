@@ -4,7 +4,7 @@
  * Centralized icon mapping for experience types.
  * Uses react-icons/ri for AI types to better convey AI context.
  */
-import { Camera, Film, FormInput, Video } from 'lucide-react'
+import { Camera, ClipboardList, Film, Video } from 'lucide-react'
 import { RiImageAiLine, RiVideoOnAiLine } from 'react-icons/ri'
 import type { ComponentType } from 'react'
 import type { ExperienceType } from '@clementine/shared'
@@ -13,7 +13,7 @@ import type { ExperienceType } from '@clementine/shared'
 export type ExperienceIcon = ComponentType<{ className?: string }>
 
 export const experienceTypeIcons: Record<ExperienceType, ExperienceIcon> = {
-  survey: FormInput,
+  survey: ClipboardList,
   photo: Camera,
   gif: Film,
   video: Video,

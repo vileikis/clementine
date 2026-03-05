@@ -68,7 +68,7 @@ export async function photoOutcome(ctx: OutcomeContext): Promise<JobOutput> {
       aspectRatio,
       overlayDisplayName: overlayChoice.displayName,
     })
-    outputPath = await applyOverlay(outputPath, overlayChoice, tmpDir)
+    outputPath = await applyOverlay(outputPath, overlayChoice, tmpDir, job.id)
   }
 
   // Upload output and generate thumbnail
@@ -76,6 +76,7 @@ export async function photoOutcome(ctx: OutcomeContext): Promise<JobOutput> {
     outputPath,
     projectId: job.projectId,
     sessionId: job.sessionId,
+    jobId: job.id,
     tmpDir,
   })
 
