@@ -42,6 +42,25 @@ interface JobHandlerContext {
 }
 
 // ============================================================================
+// Memory Logging
+// ============================================================================
+
+/**
+ * Log current process memory usage at key execution points
+ */
+function logMemoryUsage(phase: string, jobId: string): void {
+  const mem = process.memoryUsage()
+  logger.info('[TransformJob] Memory usage', {
+    phase,
+    jobId,
+    heapUsedMB: Math.round(mem.heapUsed / 1024 / 1024),
+    heapTotalMB: Math.round(mem.heapTotal / 1024 / 1024),
+    rssMB: Math.round(mem.rss / 1024 / 1024),
+    externalMB: Math.round(mem.external / 1024 / 1024),
+  })
+}
+
+// ============================================================================
 // Main Handler
 // ============================================================================
 
@@ -57,14 +76,14 @@ interface JobHandlerContext {
 export const transformPipelineTask = onTaskDispatched(
   {
     region: 'europe-west1',
-    memory: '1GiB',
+    memory: '2GiB',
     cpu: 1,
     timeoutSeconds: 600, // 10 minutes (accommodates Veo video generation)
     minInstances: 0,
     maxInstances: 20, // Control max scaling
     concurrency: 1, // One job per instance (FFmpeg is resource-intensive)
     retryConfig: {
-      maxAttempts: 0, // No retries - job recovery handles this
+      maxAttempts: 2, // Allow 1 retry after OOM crash
     },
     rateLimits: {
       maxConcurrentDispatches: 20, // Match maxInstances for full parallelism
@@ -77,6 +96,8 @@ export const transformPipelineTask = onTaskDispatched(
       // 1. Validate & prepare
       context = await prepareJobExecution(req.data)
 
+      logMemoryUsage('job-start', context.job.id)
+
       // 2. Mark as running
       await markJobRunning(context)
 
@@ -88,6 +109,7 @@ export const transformPipelineTask = onTaskDispatched(
         tmpDir: context.tmpDir,
       }
       const output = await runOutcome(outcomeContext)
+      logMemoryUsage('after-outcome', context.job.id)
 
       // 4. Finalize success
       await finalizeJobSuccess(output, context)
@@ -143,10 +165,23 @@ async function prepareJobExecution(data: unknown): Promise<JobHandlerContext> {
   }
 
   if (job.status === 'running') {
+    // Check for OOM restart loop — fail after second crash
+    if ((job.attemptCount ?? 0) >= 2) {
+      logger.error('[TransformJob] Job exceeded max attempts, failing', {
+        jobId,
+        attemptCount: job.attemptCount,
+      })
+      const sanitizedError = createSanitizedError('PROCESSING_FAILED', 'restart-guard')
+      await updateJobError(projectId, jobId, sanitizedError)
+      await updateSessionJobStatus(projectId, sessionId, jobId, 'failed')
+      throw new Error(`Job ${jobId} exceeded max attempts (${job.attemptCount}), aborting`)
+    }
+
     // Previous instance crashed - allow recovery
     logger.warn('[TransformJob] Recovering crashed job', {
       jobId,
       status: job.status,
+      attemptCount: job.attemptCount,
     })
   }
 
@@ -187,6 +222,7 @@ async function finalizeJobSuccess(
   context: JobHandlerContext,
 ): Promise<void> {
   const { projectId, job, sessionId } = context
+  logMemoryUsage('finalize-success', job.id)
 
   // Update progress: uploading (output already uploaded by outcome executor)
   await updateJobProgress(projectId, job.id, {
@@ -275,6 +311,7 @@ async function handleJobFailure(
   error: unknown,
 ): Promise<void> {
   const { projectId, job, sessionId } = context
+  logMemoryUsage('handle-failure', job.id)
 
   try {
     const sanitizedError = createSanitizedError('PROCESSING_FAILED', 'outcome')

@@ -19,10 +19,10 @@
 
 **Purpose**: Delete unused test HTTP endpoints to reduce deployed function count and attack surface
 
-- [ ] T001 [P] [R001] Delete test endpoint file `functions/src/http/testVertexAI.ts`
-- [ ] T002 [P] [R001] Delete test endpoint file `functions/src/http/testImageGeneration.ts`
-- [ ] T003 [P] [R001] Delete test endpoint file `functions/src/http/testImageGenerationWithReference.ts`
-- [ ] T004 [R001] Remove test exports and "Vertex AI Tests" comment block from `functions/src/index.ts` (lines 19–24)
+- [x] T001 [P] [R001] Delete test endpoint file `functions/src/http/testVertexAI.ts`
+- [x] T002 [P] [R001] Delete test endpoint file `functions/src/http/testImageGeneration.ts`
+- [x] T003 [P] [R001] Delete test endpoint file `functions/src/http/testImageGenerationWithReference.ts`
+- [x] T004 [R001] Remove test exports and "Vertex AI Tests" comment block from `functions/src/index.ts` (lines 19–24)
 
 **Checkpoint**: `pnpm functions:build` should pass with 3 fewer exported functions
 
@@ -34,9 +34,9 @@
 
 **⚠️ CRITICAL**: Phase 4 and Phase 5 depend on this phase completing first
 
-- [ ] T005 [R005] Create exponential backoff retry utility at `functions/src/services/transform/helpers/retryWithBackoff.ts` — import `ApiError` from `@google/genai`, use existing `sleep` helper, implement `retryWithBackoff<T>(fn, label, config?)` with defaults: maxRetries=3, initialDelayMs=2000, backoffMultiplier=2, jitterFraction=0.25. Check `error.status` for 429/503 retryable codes. Log each retry attempt with delay and attempt number.
-- [ ] T006 [R005] Re-export `retryWithBackoff` from barrel file `functions/src/services/transform/helpers/index.ts`
-- [ ] T007 [R004] Add optional `attemptCount` field to Job schema in `packages/shared/src/schemas/job/job.schema.ts` — add `attemptCount: z.number().int().nonnegative().default(0)` to `jobSchema`
+- [x] T005 [R005] Create exponential backoff retry utility at `functions/src/services/transform/helpers/retryWithBackoff.ts` — import `ApiError` from `@google/genai`, use existing `sleep` helper, implement `retryWithBackoff<T>(fn, label, config?)` with defaults: maxRetries=3, initialDelayMs=2000, backoffMultiplier=2, jitterFraction=0.25. Check `error.status` for 429/503 retryable codes. Log each retry attempt with delay and attempt number.
+- [x] T006 [R005] Re-export `retryWithBackoff` from barrel file `functions/src/services/transform/helpers/index.ts`
+- [x] T007 [R004] Add optional `attemptCount` field to Job schema in `packages/shared/src/schemas/job/job.schema.ts` — add `attemptCount: z.number().int().nonnegative().default(0)` to `jobSchema`
 
 **Checkpoint**: `pnpm --filter @clementine/shared build && pnpm functions:build` should pass
 
@@ -48,9 +48,9 @@
 
 **Independent Test**: Deploy functions and verify config via `gcloud functions describe transformpipelinetask`
 
-- [ ] T008 [P] [R002] Change memory from `'1GiB'` to `'2GiB'` in `functions/src/tasks/transformPipelineTask.ts` (line 60)
-- [ ] T009 [P] [R003] Add `personGeneration: 'ALLOW_ALL'` inside `imageConfig` block in `functions/src/services/transform/operations/aiGenerateImage.ts` (after `outputMimeType` line ~86)
-- [ ] T010 [P] [R003] Change `personGeneration` from `'allow_adult' as const` to `'allow_all'` in `baseConfig` in `functions/src/services/transform/operations/aiGenerateVideo.ts` (line 248)
+- [x] T008 [P] [R002] Change memory from `'1GiB'` to `'2GiB'` in `functions/src/tasks/transformPipelineTask.ts` (line 60)
+- [x] T009 [P] [R003] Add `personGeneration: 'ALLOW_ALL'` inside `imageConfig` block in `functions/src/services/transform/operations/aiGenerateImage.ts` (after `outputMimeType` line ~86)
+- [x] T010 [P] [R003] Change `personGeneration` from `'allow_adult' as const` to `'allow_all'` in `baseConfig` in `functions/src/services/transform/operations/aiGenerateVideo.ts` (line 248)
 
 **Checkpoint**: `pnpm functions:build` should pass — config-only changes, no logic impact
 
@@ -64,10 +64,10 @@
 
 **Independent Test**: Trigger a job, verify `attemptCount` increments in Firestore. Simulate crash recovery by manually setting job status to `running` and re-dispatching.
 
-- [ ] T011 [R004] Add `attemptCount: FieldValue.increment(1)` to the Firestore update in `updateJobStarted()` in `functions/src/repositories/job.ts`
-- [ ] T012 [R004] Change `retryConfig.maxAttempts` from `0` to `2` in `functions/src/tasks/transformPipelineTask.ts` (line 67)
-- [ ] T013 [R004] Add second-failure guard in `prepareJobExecution()` in `functions/src/tasks/transformPipelineTask.ts` — when `job.status === 'running'` and `job.attemptCount >= 2`, immediately fail the job (call `updateJobError` + `updateSessionJobStatus` with 'failed') and throw to abort execution
-- [ ] T014 [R004] Add `logMemoryUsage(phase, jobId)` helper in `functions/src/tasks/transformPipelineTask.ts` — logs `process.memoryUsage()` with heapUsedMB, heapTotalMB, rssMB, externalMB. Call at: job start (after `prepareJobExecution`), after `runOutcome`, on `finalizeJobSuccess`, and in `handleJobFailure`
+- [x] T011 [R004] Add `attemptCount: FieldValue.increment(1)` to the Firestore update in `updateJobStarted()` in `functions/src/repositories/job.ts`
+- [x] T012 [R004] Change `retryConfig.maxAttempts` from `0` to `2` in `functions/src/tasks/transformPipelineTask.ts` (line 67)
+- [x] T013 [R004] Add second-failure guard in `prepareJobExecution()` in `functions/src/tasks/transformPipelineTask.ts` — when `job.status === 'running'` and `job.attemptCount >= 2`, immediately fail the job (call `updateJobError` + `updateSessionJobStatus` with 'failed') and throw to abort execution
+- [x] T014 [R004] Add `logMemoryUsage(phase, jobId)` helper in `functions/src/tasks/transformPipelineTask.ts` — logs `process.memoryUsage()` with heapUsedMB, heapTotalMB, rssMB, externalMB. Call at: job start (after `prepareJobExecution`), after `runOutcome`, on `finalizeJobSuccess`, and in `handleJobFailure`
 
 **Checkpoint**: Build passes. Memory usage appears in structured logs at 4 execution points.
 
@@ -81,8 +81,8 @@
 
 **Independent Test**: Trigger an AI image or video job. Verify in logs that if a 429 occurs, retry attempts are logged with increasing delays before either succeeding or failing.
 
-- [ ] T015 [R005] Wrap `client.models.generateContent()` call in `functions/src/services/transform/operations/aiGenerateImage.ts` with `retryWithBackoff(() => client.models.generateContent(...), 'AIImageGenerate')`
-- [ ] T016 [R005] Wrap `client.models.generateVideos()` call in `functions/src/services/transform/operations/aiGenerateVideo.ts` with `retryWithBackoff(() => client.models.generateVideos(...), 'AIVideoGenerate')`
+- [x] T015 [R005] Wrap `client.models.generateContent()` call in `functions/src/services/transform/operations/aiGenerateImage.ts` with `retryWithBackoff(() => client.models.generateContent(...), 'AIImageGenerate')`
+- [x] T016 [R005] Wrap `client.models.generateVideos()` call in `functions/src/services/transform/operations/aiGenerateVideo.ts` with `retryWithBackoff(() => client.models.generateVideos(...), 'AIVideoGenerate')`
 
 **Checkpoint**: `pnpm functions:build` passes. API calls are wrapped with retry logic.
 
@@ -92,9 +92,9 @@
 
 **Purpose**: Final build verification across all workspaces
 
-- [ ] T017 Build shared package: `pnpm --filter @clementine/shared build`
-- [ ] T018 Build functions: `pnpm functions:build` — verify zero type errors and all exports resolve
-- [ ] T019 Verify `functions/src/index.ts` exports exactly 6 functions (was 9, minus 3 test endpoints)
+- [x] T017 Build shared package: `pnpm --filter @clementine/shared build`
+- [x] T018 Build functions: `pnpm functions:build` — verify zero type errors and all exports resolve
+- [x] T019 Verify `functions/src/index.ts` exports exactly 6 functions (was 9, minus 3 test endpoints)
 
 ---
 

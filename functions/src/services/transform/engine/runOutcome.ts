@@ -78,8 +78,7 @@ export async function runOutcome(ctx: OutcomeContext): Promise<JobOutput> {
   })
 
   // Look up executor
-  const executor = outcomeRegistry[type as OutcomeType]
-
+  const executor = outcomeRegistry[type]
   if (executor === null) {
     logger.error('[Outcome] Outcome type not implemented', {
       jobId: job.id,
@@ -96,10 +95,7 @@ export async function runOutcome(ctx: OutcomeContext): Promise<JobOutput> {
       jobId: job.id,
       outcomeType: type,
     })
-    throw new OutcomeError(
-      `Unknown outcome type: ${type}`,
-      'INVALID_INPUT',
-    )
+    throw new OutcomeError(`Unknown outcome type: ${type}`, 'INVALID_INPUT')
   }
 
   // Execute

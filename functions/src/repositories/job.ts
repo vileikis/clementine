@@ -4,7 +4,7 @@
  * CRUD operations for Job documents in Firestore.
  * Path: /projects/{projectId}/jobs/{jobId}
  */
-import { db } from '../infra/firebase-admin'
+import { db, FieldValue } from '../infra/firebase-admin'
 import {
   jobSchema,
   type Job,
@@ -209,6 +209,7 @@ export async function updateJobStarted(
     status: 'running' as JobStatus,
     startedAt: now,
     updatedAt: now,
+    attemptCount: FieldValue.increment(1),
   }
 
   if (initialProgress) {

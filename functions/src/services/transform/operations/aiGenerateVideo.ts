@@ -18,6 +18,7 @@ import {
   GenerateVideosConfig,
   GenerateVideosParameters,
   GoogleGenAI,
+  PersonGeneration,
   VideoGenerationReferenceType,
   type Image,
   type VideoGenerationReferenceImage,
@@ -37,6 +38,7 @@ import {
   getStoragePathFromMediaReference,
 } from '../../../infra/storage'
 import { getMediaDimensions } from '../../ffmpeg/probe'
+import { retryWithBackoff } from '../helpers'
 import { sleep } from '../helpers/sleep'
 
 // Veo 3+ models are only available in us-central1 (not yet in EU regions)
@@ -174,9 +176,12 @@ export async function aiGenerateVideo(
     location: VEO_LOCATION,
   })
 
-  // Build and submit Veo request (pattern inferred from media inputs)
+  // Build and submit Veo request (with retry for 429/503)
   const veoParams = buildVeoParams(request, bucket.name, outputGcsUri)
-  const operation = await client.models.generateVideos(veoParams)
+  const operation = await retryWithBackoff(
+    () => client.models.generateVideos(veoParams),
+    'AIVideoGenerate',
+  )
 
   // Poll until complete
   const completedOp = await pollOperation(client, operation)
@@ -245,15 +250,15 @@ function buildVeoParams(
   const baseConfig: GenerateVideosConfig = {
     aspectRatio,
     durationSeconds: duration,
-    personGeneration: 'allow_adult' as const,
+    personGeneration: PersonGeneration.ALLOW_ALL,
     numberOfVideos: 1,
     outputGcsUri,
     resolution: request.resolution,
+    generateAudio: request.sound,
     ...(request.negativePrompt
       ? { negativePrompt: request.negativePrompt }
       : {}),
-    generateAudio: request.sound,
-    enhancePrompt: request.enhance,
+    ...(request.enhance ? { enhancePrompt: true } : {}),
   }
 
   // Pattern 2: animate-reference (config.referenceImages, no params.image)

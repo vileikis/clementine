@@ -11,6 +11,7 @@ import {
   GenerateContentResponse,
   GoogleGenAI,
   Modality,
+  PersonGeneration,
   type GenerateContentConfig,
   type Part,
 } from '@google/genai'
@@ -19,6 +20,7 @@ import * as fs from 'fs/promises'
 
 import type { MediaReference } from '@clementine/shared'
 import type { GenerationRequest, GeneratedImage } from '../types'
+import { retryWithBackoff } from '../helpers'
 import { storage } from '../../../infra/firebase-admin'
 import { getStoragePathFromMediaReference } from '../../../infra/storage'
 
@@ -84,6 +86,7 @@ export async function aiGenerateImage(
     imageConfig: {
       aspectRatio,
       outputMimeType: 'image/jpeg',
+      personGeneration: PersonGeneration.ALLOW_ALL,
     },
   }
 
@@ -93,17 +96,21 @@ export async function aiGenerateImage(
     project: GOOGLE_CLOUD_PROJECT,
   })
 
-  // Generate image
-  const response = await client.models.generateContent({
-    model,
-    contents: [
-      {
-        role: 'user',
-        parts: contentParts,
-      },
-    ],
-    config: generationConfig,
-  })
+  // Generate image (with retry for 429/503)
+  const response = await retryWithBackoff(
+    () =>
+      client.models.generateContent({
+        model,
+        contents: [
+          {
+            role: 'user',
+            parts: contentParts,
+          },
+        ],
+        config: generationConfig,
+      }),
+    'AIImageGenerate',
+  )
 
   // Extract image from response
   const imageBuffer = extractImageFromResponse(response)
