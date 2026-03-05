@@ -127,9 +127,12 @@ export function CameraCapture({
   )
 
   // Handle camera ready
-  const handleCameraReady = useCallback(() => {
-    setHasMultipleCameras(cameraViewRef.current?.hasMultipleCameras ?? false)
-  }, [])
+  const handleCameraReady = useCallback(
+    (info: { hasMultipleCameras: boolean }) => {
+      setHasMultipleCameras(info.hasMultipleCameras)
+    },
+    [],
+  )
 
   // Handle camera errors (hardware errors, not permission)
   const handleCameraError = useCallback(

@@ -54,7 +54,7 @@ interface CameraViewProps {
   /** Additional CSS classes */
   className?: string
   /** Called when camera is ready and streaming */
-  onReady?: () => void
+  onReady?: (info: { hasMultipleCameras: boolean }) => void
   /** Called when an error occurs */
   onError?: (error: CameraCaptureError) => void
 }

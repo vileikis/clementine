@@ -175,11 +175,13 @@ export function CapturePhotoRunMode({
   }, [retake])
 
   // Handle camera ready
-  const handleCameraReady = useCallback(() => {
-    setStatus('camera-active')
-    // Update hasMultipleCameras from camera ref
-    setHasMultipleCameras(cameraRef.current?.hasMultipleCameras ?? false)
-  }, [setStatus])
+  const handleCameraReady = useCallback(
+    (info: { hasMultipleCameras: boolean }) => {
+      setStatus('camera-active')
+      setHasMultipleCameras(info.hasMultipleCameras)
+    },
+    [setStatus],
+  )
 
   // Handle switch camera
   const handleSwitchCamera = useCallback(async () => {
@@ -300,7 +302,7 @@ export function CapturePhotoRunMode({
         onOpenPicker={openPicker}
         onFileChange={handleFileChange}
         onAspectRatioChange={setActiveAspectRatio}
-        showAspectRatioSwitcher={true}
+        showAspectRatioSwitcher={false}
       />
     )
   }

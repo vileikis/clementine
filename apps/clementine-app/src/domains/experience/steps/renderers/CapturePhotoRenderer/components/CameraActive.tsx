@@ -18,7 +18,7 @@ interface CameraActiveProps {
   aspectRatio: AspectRatio
   fileInputRef: RefObject<HTMLInputElement | null>
   hasMultipleCameras: boolean
-  onCameraReady: () => void
+  onCameraReady: (info: { hasMultipleCameras: boolean }) => void
   onCameraError: (error: CameraCaptureError) => void
   onCapture: () => void
   onSwitchCamera: () => void
