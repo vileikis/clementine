@@ -143,6 +143,9 @@ export const jobSchema = z.looseObject({
   updatedAt: z.number().int().positive(),
   startedAt: z.number().int().positive().nullable().default(null),
   completedAt: z.number().int().positive().nullable().default(null),
+
+  // OOM prevention: tracks Cloud Task delivery attempts
+  attemptCount: z.number().int().nonnegative().default(0),
 })
 
 export type Job = z.infer<typeof jobSchema>

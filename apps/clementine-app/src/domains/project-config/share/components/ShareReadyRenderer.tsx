@@ -126,7 +126,7 @@ export function ShareReadyRenderer({
   }
 
   return (
-    <ScrollableView className="items-center max-w-2xl">
+    <ScrollableView className="items-center max-w-2xl mt-18">
       {mediaUrl ? (
         <div className="h-[50vh] w-full overflow-hidden rounded-lg flex items-center justify-center">
           {mediaFormat === 'video' ? (

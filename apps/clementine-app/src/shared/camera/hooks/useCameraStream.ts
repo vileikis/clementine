@@ -23,7 +23,7 @@ interface UseCameraStreamOptions {
   /** Initial camera facing direction */
   initialFacing?: CameraFacing
   /** Called when camera stream is ready */
-  onReady?: () => void
+  onReady?: (info: { hasMultipleCameras: boolean }) => void
   /** Called when an error occurs */
   onError?: (error: CameraCaptureError) => void
 }
@@ -86,6 +86,7 @@ export function useCameraStream(
   const streamRef = useRef<MediaStream | null>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
   const desiredFacingRef = useRef<CameraFacing>(initialFacing)
+  const hasMultipleCamerasRef = useRef(false)
 
   /**
    * Stop camera and release all resources
@@ -155,7 +156,8 @@ export function useCameraStream(
       setStream(mediaStream)
       setFacing(newFacing)
       setIsActive(true)
-      onReady?.()
+      // hasMultipleCameras doesn't change between switches — use current state via ref
+      onReady?.({ hasMultipleCameras: hasMultipleCamerasRef.current })
     } catch (err) {
       // Only report error if not aborted
       if (!controller.signal.aborted) {
@@ -163,22 +165,6 @@ export function useCameraStream(
       }
     }
   }, [onReady, onError])
-
-  // Check for multiple cameras on mount
-  useEffect(() => {
-    async function checkCameras() {
-      try {
-        const devices = await navigator.mediaDevices.enumerateDevices()
-        const videoInputs = devices.filter(
-          (device) => device.kind === 'videoinput',
-        )
-        setHasMultipleCameras(videoInputs.length > 1)
-      } catch {
-        setHasMultipleCameras(false)
-      }
-    }
-    checkCameras()
-  }, [])
 
   // Auto-start camera on mount, cleanup on unmount
   useEffect(() => {
@@ -211,13 +197,31 @@ export function useCameraStream(
           return
         }
 
+        // Enumerate cameras before signalling ready so consumers
+        // get the value directly (React state won't flush before callback).
+        let multipleCameras = false
+        try {
+          const devices = await navigator.mediaDevices.enumerateDevices()
+          const videoInputs = devices.filter((d) => d.kind === 'videoinput')
+          multipleCameras = videoInputs.length > 1
+        } catch {
+          // Non-critical — leave default (false)
+        }
+
+        if (controller.signal.aborted) {
+          mediaStream.getTracks().forEach((track) => track.stop())
+          return
+        }
+
+        hasMultipleCamerasRef.current = multipleCameras
+        setHasMultipleCameras(multipleCameras)
         localStream = mediaStream
         streamRef.current = mediaStream
         setStream(mediaStream)
         setFacing(initialFacing)
         desiredFacingRef.current = initialFacing
         setIsActive(true)
-        onReady?.()
+        onReady?.({ hasMultipleCameras: multipleCameras })
       } catch (err) {
         if (!controller.signal.aborted) {
           onError?.(parseMediaError(err))

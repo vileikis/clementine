@@ -90,6 +90,7 @@ export async function aiImageOutcome(ctx: OutcomeContext): Promise<JobOutput> {
       referenceMedia: resolved.mediaRefs,
     },
     tmpDir,
+    job.id,
   )
 
   let outputPath = result.outputPath
@@ -101,7 +102,7 @@ export async function aiImageOutcome(ctx: OutcomeContext): Promise<JobOutput> {
       aspectRatio: effectiveAspectRatio,
       overlayDisplayName: overlayChoice.displayName,
     })
-    outputPath = await applyOverlay(outputPath, overlayChoice, tmpDir)
+    outputPath = await applyOverlay(outputPath, overlayChoice, tmpDir, job.id)
   }
 
   // Upload output and generate thumbnail
@@ -109,6 +110,7 @@ export async function aiImageOutcome(ctx: OutcomeContext): Promise<JobOutput> {
     outputPath,
     projectId: job.projectId,
     sessionId: job.sessionId,
+    jobId: job.id,
     tmpDir,
   })
 

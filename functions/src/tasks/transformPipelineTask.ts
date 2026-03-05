@@ -23,6 +23,7 @@ import {
 } from '../repositories/job'
 import type { Job, JobOutput } from '@clementine/shared'
 import { runOutcome, type OutcomeContext } from '../services/transform'
+import { logMemoryUsage } from '../services/transform/helpers'
 import { createTempDir, cleanupTempDir } from '../infra/temp-dir'
 import {
   queueDispatchExports,
@@ -57,14 +58,14 @@ interface JobHandlerContext {
 export const transformPipelineTask = onTaskDispatched(
   {
     region: 'europe-west1',
-    memory: '1GiB',
+    memory: '2GiB',
     cpu: 1,
     timeoutSeconds: 600, // 10 minutes (accommodates Veo video generation)
     minInstances: 0,
     maxInstances: 20, // Control max scaling
     concurrency: 1, // One job per instance (FFmpeg is resource-intensive)
     retryConfig: {
-      maxAttempts: 0, // No retries - job recovery handles this
+      maxAttempts: 2, // Allow 1 retry after OOM crash
     },
     rateLimits: {
       maxConcurrentDispatches: 20, // Match maxInstances for full parallelism
@@ -76,6 +77,8 @@ export const transformPipelineTask = onTaskDispatched(
     try {
       // 1. Validate & prepare
       context = await prepareJobExecution(req.data)
+
+      logMemoryUsage('job-start', context.job.id)
 
       // 2. Mark as running
       await markJobRunning(context)
@@ -143,10 +146,23 @@ async function prepareJobExecution(data: unknown): Promise<JobHandlerContext> {
   }
 
   if (job.status === 'running') {
+    // Check for OOM restart loop — fail after second crash
+    if ((job.attemptCount ?? 0) >= 2) {
+      logger.error('[TransformJob] Job exceeded max attempts, failing', {
+        jobId,
+        attemptCount: job.attemptCount,
+      })
+      const sanitizedError = createSanitizedError('PROCESSING_FAILED', 'restart-guard')
+      await updateJobError(projectId, jobId, sanitizedError)
+      await updateSessionJobStatus(projectId, sessionId, jobId, 'failed')
+      throw new Error(`Job ${jobId} exceeded max attempts (${job.attemptCount}), aborting`)
+    }
+
     // Previous instance crashed - allow recovery
     logger.warn('[TransformJob] Recovering crashed job', {
       jobId,
       status: job.status,
+      attemptCount: job.attemptCount,
     })
   }
 
@@ -187,6 +203,7 @@ async function finalizeJobSuccess(
   context: JobHandlerContext,
 ): Promise<void> {
   const { projectId, job, sessionId } = context
+  logMemoryUsage('job-success', job.id)
 
   // Update progress: uploading (output already uploaded by outcome executor)
   await updateJobProgress(projectId, job.id, {
@@ -275,8 +292,18 @@ async function handleJobFailure(
   error: unknown,
 ): Promise<void> {
   const { projectId, job, sessionId } = context
+  logMemoryUsage('job-failure', job.id)
 
   try {
+    // Guard: re-fetch job to avoid overwriting a completed job (at-least-once delivery)
+    const currentJob = await fetchJob(projectId, job.id)
+    if (currentJob?.status === 'completed') {
+      logger.warn('[TransformJob] Job already completed, skipping failure update', {
+        jobId: job.id,
+      })
+      return
+    }
+
     const sanitizedError = createSanitizedError('PROCESSING_FAILED', 'outcome')
     await updateJobError(projectId, job.id, sanitizedError)
     await updateSessionJobStatus(projectId, sessionId, job.id, 'failed')
