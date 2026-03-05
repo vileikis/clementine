@@ -146,11 +146,11 @@ export function StepConfigPanelContainer({
   // Get aspect ratio from the active type's discriminated config
   const outcomeAspectRatio = (() => {
     const draft = experience.draft
-    if (draft.type === 'photo') return draft.photo.aspectRatio
-    if (draft.type === 'ai.image') return draft.aiImage.aspectRatio
-    if (draft.type === 'ai.video') return draft.aiVideo.aspectRatio
-    if (draft.type === 'video') return draft.video.aspectRatio
-    if (draft.type === 'gif') return draft.gif.aspectRatio
+    if (draft.type === 'photo') return draft.photo?.aspectRatio ?? '1:1'
+    if (draft.type === 'ai.image') return draft.aiImage?.aspectRatio ?? '1:1'
+    if (draft.type === 'ai.video') return draft.aiVideo?.aspectRatio ?? '9:16'
+    if (draft.type === 'video') return draft.video?.aspectRatio ?? '9:16'
+    if (draft.type === 'gif') return draft.gif?.aspectRatio ?? '1:1'
     return '1:1'
   })()
 

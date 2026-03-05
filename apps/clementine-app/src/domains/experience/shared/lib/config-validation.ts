@@ -111,6 +111,8 @@ function validatePhoto(
 ): ConfigValidationError[] {
   if (config.type !== 'photo') return []
 
+  if (!config.photo) return []
+
   const error = validateCaptureStepId(
     config.photo.captureStepId,
     steps,
@@ -126,6 +128,8 @@ function validateAiImage(
   if (config.type !== 'ai.image') return []
 
   const errors: ConfigValidationError[] = []
+
+  if (!config.aiImage) return errors
 
   if (!config.aiImage.imageGeneration.prompt?.trim()) {
     errors.push({
@@ -159,6 +163,8 @@ function validateAiVideo(
   if (config.type !== 'ai.video') return []
 
   const errors: ConfigValidationError[] = []
+
+  if (!config.aiVideo) return errors
 
   const stepError = validateCaptureStepId(
     config.aiVideo.captureStepId,

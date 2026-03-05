@@ -22,12 +22,13 @@ describe('buildDefaultDraft', () => {
     const draft = getDraft('ai.image')
     expect(draft.type).toBe('ai.image')
     if (draft.type !== 'ai.image') throw new Error('narrowing')
-    expect(draft.aiImage.task).toBe('text-to-image')
-    expect(draft.aiImage.imageGeneration.model).toBe('gemini-2.5-flash-image')
-    expect(draft.aiImage.imageGeneration.prompt).toBe('')
-    expect(draft.aiImage.imageGeneration.refMedia).toEqual([])
-    expect(draft.aiImage.aspectRatio).toBe('1:1')
-    expect(draft.aiImage.captureStepId).toBeNull()
+    expect(draft.aiImage).not.toBeNull()
+    expect(draft.aiImage!.task).toBe('text-to-image')
+    expect(draft.aiImage!.imageGeneration.model).toBe('gemini-2.5-flash-image')
+    expect(draft.aiImage!.imageGeneration.prompt).toBe('')
+    expect(draft.aiImage!.imageGeneration.refMedia).toEqual([])
+    expect(draft.aiImage!.aspectRatio).toBe('1:1')
+    expect(draft.aiImage!.captureStepId).toBeNull()
   })
 
   it('ai.image variant does not include other type configs', () => {
@@ -43,9 +44,10 @@ describe('buildDefaultDraft', () => {
     const draft = getDraft('ai.video')
     expect(draft.type).toBe('ai.video')
     if (draft.type !== 'ai.video') throw new Error('narrowing')
-    expect(draft.aiVideo.task).toBe('image-to-video')
-    expect(draft.aiVideo.videoGeneration.prompt).toBe('')
-    expect(draft.aiVideo.aspectRatio).toBe('9:16')
+    expect(draft.aiVideo).not.toBeNull()
+    expect(draft.aiVideo!.task).toBe('image-to-video')
+    expect(draft.aiVideo!.videoGeneration.prompt).toBe('')
+    expect(draft.aiVideo!.aspectRatio).toBe('9:16')
   })
 
   it('ai.video variant does not include other type configs', () => {
@@ -61,8 +63,9 @@ describe('buildDefaultDraft', () => {
     const draft = getDraft('photo')
     expect(draft.type).toBe('photo')
     if (draft.type !== 'photo') throw new Error('narrowing')
-    expect(draft.photo.aspectRatio).toBe('1:1')
-    expect(draft.photo.captureStepId).toBe('')
+    expect(draft.photo).not.toBeNull()
+    expect(draft.photo!.aspectRatio).toBe('1:1')
+    expect(draft.photo!.captureStepId).toBe('')
   })
 
   it('photo variant does not include other type configs', () => {

@@ -161,35 +161,35 @@ export const surveyConfigSchema = z.looseObject({
 export const photoConfigVariantSchema = z.looseObject({
   type: z.literal('photo'),
   steps: z.array(experienceStepSchema).default([]),
-  photo: photoConfigSchema,
+  photo: photoConfigSchema.nullable().default(null),
 })
 
 /** AI image config variant — AI-generated image from prompt and/or source. */
 export const aiImageConfigVariantSchema = z.looseObject({
   type: z.literal('ai.image'),
   steps: z.array(experienceStepSchema).default([]),
-  aiImage: aiImageConfigSchema,
+  aiImage: aiImageConfigSchema.nullable().default(null),
 })
 
 /** AI video config variant — AI-generated video. */
 export const aiVideoConfigVariantSchema = z.looseObject({
   type: z.literal('ai.video'),
   steps: z.array(experienceStepSchema).default([]),
-  aiVideo: aiVideoConfigSchema,
+  aiVideo: aiVideoConfigSchema.nullable().default(null),
 })
 
 /** GIF config variant — animated GIF capture. */
 export const gifConfigVariantSchema = z.looseObject({
   type: z.literal('gif'),
   steps: z.array(experienceStepSchema).default([]),
-  gif: gifConfigSchema,
+  gif: gifConfigSchema.nullable().default(null),
 })
 
 /** Video config variant — video capture. */
 export const videoConfigVariantSchema = z.looseObject({
   type: z.literal('video'),
   steps: z.array(experienceStepSchema).default([]),
-  video: videoConfigSchema,
+  video: videoConfigSchema.nullable().default(null),
 })
 
 /**
