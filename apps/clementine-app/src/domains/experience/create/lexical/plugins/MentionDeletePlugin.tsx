@@ -23,6 +23,7 @@ import { $isMediaMentionNode } from '../nodes/MediaMentionNode'
 import type { LexicalNode } from 'lexical'
 
 const STYLE_ID = 'mention-delete-plugin-styles'
+let styleRefCount = 0
 
 /** Width of the clickable close zone on the left edge of a mention pill */
 const CLOSE_ZONE_WIDTH = 16
@@ -90,18 +91,25 @@ export function MentionDeletePlugin({
 }): null {
   const [editor] = useLexicalComposerContext()
 
-  // Inject CSS for ::after close icon
+  // Inject CSS for ::after close icon (ref-counted for multiple instances)
   useEffect(() => {
     if (disabled) return
-    if (document.getElementById(STYLE_ID)) return
 
-    const style = document.createElement('style')
-    style.id = STYLE_ID
-    style.textContent = MENTION_CSS
-    document.head.appendChild(style)
+    let existing = document.getElementById(STYLE_ID)
+    if (!existing) {
+      existing = document.createElement('style')
+      existing.id = STYLE_ID
+      existing.textContent = MENTION_CSS
+      document.head.appendChild(existing)
+    }
+    styleRefCount++
 
     return () => {
-      style.remove()
+      styleRefCount--
+      if (styleRefCount <= 0) {
+        document.getElementById(STYLE_ID)?.remove()
+        styleRefCount = 0
+      }
     }
   }, [disabled])
 
