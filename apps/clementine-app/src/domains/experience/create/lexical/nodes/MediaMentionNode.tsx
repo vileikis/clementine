@@ -87,10 +87,12 @@ export class MediaMentionNode extends TextNode {
     const textColor = this.__isInvalid ? '#c33' : '#2e7d32'
 
     dom.style.cssText = `
+      display: inline-block;
       background-color: ${bgColor};
       color: ${textColor};
       border-radius: 4px;
       padding: 2px 6px;
+      margin: 0 1px;
       font-family: monospace;
       font-weight: 500;
       position: relative;
@@ -155,7 +157,7 @@ export class MediaMentionNode extends TextNode {
 export function $createMediaMentionNode(mediaName: string): MediaMentionNode {
   const node = new MediaMentionNode(mediaName, `@${mediaName}`)
   // Make mention atomic (select as a unit) and bidirectional
-  node.setMode('segmented').toggleDirectionless()
+  node.setMode('token').toggleDirectionless()
   return $applyNodeReplacement(node)
 }
 

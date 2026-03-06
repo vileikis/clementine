@@ -110,10 +110,12 @@ export class StepMentionNode extends TextNode {
     }
 
     dom.style.cssText = `
+      display: inline-block;
       background-color: ${bgColor};
       color: ${textColor};
       border-radius: 4px;
       padding: 2px 6px;
+      margin: 0 1px;
       font-family: monospace;
       font-weight: 500;
       position: relative;
@@ -187,7 +189,7 @@ export function $createStepMentionNode(
 ): StepMentionNode {
   const node = new StepMentionNode(stepName, stepType, `@${stepName}`)
   // Make mention atomic (select as a unit) and bidirectional
-  node.setMode('segmented').toggleDirectionless()
+  node.setMode('token').toggleDirectionless()
   return $applyNodeReplacement(node)
 }
 
