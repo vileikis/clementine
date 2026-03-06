@@ -87,19 +87,20 @@ export class MediaMentionNode extends TextNode {
     const textColor = this.__isInvalid ? '#c33' : '#2e7d32'
 
     dom.style.cssText = `
+      display: inline-block;
       background-color: ${bgColor};
       color: ${textColor};
       border-radius: 4px;
       padding: 2px 6px;
+      margin: 0 1px;
       font-family: monospace;
       font-weight: 500;
-      user-select: none;
+      position: relative;
       cursor: pointer;
       ${this.__isInvalid ? 'text-decoration: line-through;' : ''}
     `
     dom.setAttribute('data-media-name', this.__mediaName)
     dom.setAttribute('data-invalid', String(this.__isInvalid))
-    dom.setAttribute('contenteditable', 'false')
     dom.spellcheck = false
 
     if (this.__isInvalid) {
@@ -156,7 +157,7 @@ export class MediaMentionNode extends TextNode {
 export function $createMediaMentionNode(mediaName: string): MediaMentionNode {
   const node = new MediaMentionNode(mediaName, `@${mediaName}`)
   // Make mention atomic (select as a unit) and bidirectional
-  node.setMode('segmented').toggleDirectionless()
+  node.setMode('token').toggleDirectionless()
   return $applyNodeReplacement(node)
 }
 

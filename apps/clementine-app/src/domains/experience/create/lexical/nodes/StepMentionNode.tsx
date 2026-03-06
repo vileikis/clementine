@@ -110,20 +110,21 @@ export class StepMentionNode extends TextNode {
     }
 
     dom.style.cssText = `
+      display: inline-block;
       background-color: ${bgColor};
       color: ${textColor};
       border-radius: 4px;
       padding: 2px 6px;
+      margin: 0 1px;
       font-family: monospace;
       font-weight: 500;
-      user-select: none;
+      position: relative;
       cursor: pointer;
       ${this.__isInvalid ? 'text-decoration: line-through;' : ''}
     `
     dom.setAttribute('data-step-name', this.__stepName)
     dom.setAttribute('data-step-type', this.__stepType)
     dom.setAttribute('data-invalid', String(this.__isInvalid))
-    dom.setAttribute('contenteditable', 'false')
     dom.spellcheck = false
 
     if (this.__isInvalid) {
@@ -188,7 +189,7 @@ export function $createStepMentionNode(
 ): StepMentionNode {
   const node = new StepMentionNode(stepName, stepType, `@${stepName}`)
   // Make mention atomic (select as a unit) and bidirectional
-  node.setMode('segmented').toggleDirectionless()
+  node.setMode('token').toggleDirectionless()
   return $applyNodeReplacement(node)
 }
 
