@@ -28,8 +28,8 @@ All source files are under:
 
 ### Implementation for User Stories 1 & 2
 
-- [ ] T001 [P] [US1] Remove `contenteditable="false"` attribute and `user-select: none` CSS from `createDOM()` in `lexical/nodes/StepMentionNode.tsx`; add `position: relative` to inline styles
-- [ ] T002 [P] [US2] Remove `contenteditable="false"` attribute and `user-select: none` CSS from `createDOM()` in `lexical/nodes/MediaMentionNode.tsx`; add `position: relative` to inline styles
+- [x] T001 [P] [US1] Remove `contenteditable="false"` attribute and `user-select: none` CSS from `createDOM()` in `lexical/nodes/StepMentionNode.tsx`; add `position: relative` to inline styles
+- [x] T002 [P] [US2] Remove `contenteditable="false"` attribute and `user-select: none` CSS from `createDOM()` in `lexical/nodes/MediaMentionNode.tsx`; add `position: relative` to inline styles
 - [ ] T003 [US1] Manually verify cursor navigation for isolated mention nodes: click before/after, arrow key up/down/left/right traversal, both StepMention and MediaMention types per quickstart.md test scenarios
 - [ ] T004 [US2] Manually verify cursor navigation for inline mention nodes: click at left/right boundary, arrow key left/right traversal past mention, both node types per quickstart.md test scenarios
 
@@ -45,9 +45,9 @@ All source files are under:
 
 ### Implementation for User Story 3
 
-- [ ] T005 [US3] Create `MentionDeletePlugin.tsx` in `lexical/plugins/MentionDeletePlugin.tsx`: implement plugin using `useLexicalComposerContext`, inject `<style>` for `.mention-delete-btn` hover rules, register mutation listeners for both `StepMentionNode` and `MediaMentionNode`, inject absolutely-positioned delete button on node creation, attach `mousedown`+`click` handlers with `preventDefault`/`stopPropagation` that call `editor.update(() => $getNodeByKey(key)?.remove())`, check `editor.isEditable()` before injection
-- [ ] T006 [US3] Add barrel export `export * from './MentionDeletePlugin'` to `lexical/plugins/index.ts`
-- [ ] T007 [US3] Register `<MentionDeletePlugin />` in the plugin stack in `components/PromptComposer/LexicalPromptInput.tsx`, passing `disabled` prop
+- [x] T005 [US3] Create `MentionDeletePlugin.tsx` in `lexical/plugins/MentionDeletePlugin.tsx`: implement plugin using `useLexicalComposerContext`, inject `<style>` for `.mention-delete-btn` hover rules, register mutation listeners for both `StepMentionNode` and `MediaMentionNode`, inject absolutely-positioned delete button on node creation, attach `mousedown`+`click` handlers with `preventDefault`/`stopPropagation` that call `editor.update(() => $getNodeByKey(key)?.remove())`, check `editor.isEditable()` before injection
+- [x] T006 [US3] Add barrel export `export * from './MentionDeletePlugin'` to `lexical/plugins/index.ts`
+- [x] T007 [US3] Register `<MentionDeletePlugin />` in the plugin stack in `components/PromptComposer/LexicalPromptInput.tsx`, passing `disabled` prop
 - [ ] T008 [US3] Manually verify hover delete: hover shows icon, mouseout hides icon, click removes node, disabled state suppresses icon, both valid and invalid mention states, both StepMention and MediaMention types per quickstart.md test scenarios
 
 **Checkpoint**: Hover delete works for all mention types and states. US3 acceptance scenarios all pass.
@@ -59,7 +59,7 @@ All source files are under:
 **Purpose**: Validation, regression checks, and cleanup
 
 - [ ] T009 Verify serialization round-trip is unchanged: insert mentions, serialize, deserialize, confirm output matches — in `lexical/utils/serialization.ts` (no code changes expected, verification only)
-- [ ] T010 Run validation gates: `pnpm app:type-check` + `pnpm app:lint` + `pnpm app:format` from monorepo root
+- [x] T010 Run validation gates: `pnpm app:type-check` + `pnpm app:lint` + `pnpm app:format` from monorepo root
 - [ ] T011 Verify edge cases: adjacent mentions (cursor between them, independent close icons), delete last mention on a line (empty paragraph remains), delete during active selection (selection cleared, node removed)
 - [ ] T012 Standards compliance review: verify against `standards/frontend/design-system.md` and `standards/frontend/component-libraries.md` per constitution Principle V
 

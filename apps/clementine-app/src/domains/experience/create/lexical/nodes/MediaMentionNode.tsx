@@ -93,13 +93,12 @@ export class MediaMentionNode extends TextNode {
       padding: 2px 6px;
       font-family: monospace;
       font-weight: 500;
-      user-select: none;
+      position: relative;
       cursor: pointer;
       ${this.__isInvalid ? 'text-decoration: line-through;' : ''}
     `
     dom.setAttribute('data-media-name', this.__mediaName)
     dom.setAttribute('data-invalid', String(this.__isInvalid))
-    dom.setAttribute('contenteditable', 'false')
     dom.spellcheck = false
 
     if (this.__isInvalid) {

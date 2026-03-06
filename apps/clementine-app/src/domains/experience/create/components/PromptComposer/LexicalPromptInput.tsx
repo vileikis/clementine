@@ -21,6 +21,7 @@ import {
   CopyMentionPlugin,
   InitializePlugin,
   MediaMentionNode,
+  MentionDeletePlugin,
   MentionValidationPlugin,
   MentionsPlugin,
   SmartPastePlugin,
@@ -106,6 +107,7 @@ export function LexicalPromptInput({
         <EditablePlugin disabled={disabled} />
         <MentionsPlugin steps={steps} media={media} />
         <InitializePlugin value={value} steps={steps} media={media} />
+        <MentionDeletePlugin disabled={disabled} />
         <MentionValidationPlugin steps={steps} media={media} />
         <SmartPastePlugin steps={steps} media={media} />
         <CopyMentionPlugin />
