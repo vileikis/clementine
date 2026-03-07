@@ -183,14 +183,12 @@ export async function updateJobError(
 ): Promise<void> {
   const now = Date.now()
 
-  const update: UpdateData<Job> = {
-    status: 'failed',
+  await getJobRef(projectId, jobId).update({
+    status: 'failed' as JobStatus,
     error,
     completedAt: now,
     updatedAt: now,
-  }
-
-  await getJobRef(projectId, jobId).update(update)
+  })
 }
 
 /**

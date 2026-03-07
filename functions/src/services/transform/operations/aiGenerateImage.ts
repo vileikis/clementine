@@ -8,12 +8,12 @@
  */
 import { defineString } from 'firebase-functions/params'
 import {
-  BlockedReason,
   FinishReason,
   GenerateContentResponse,
   GoogleGenAI,
   Modality,
   PersonGeneration,
+  type Candidate,
   type GenerateContentConfig,
   type Part,
 } from '@google/genai'
@@ -232,59 +232,71 @@ async function buildContentParts(
 /**
  * Extract image buffer from Gemini API response
  */
-const SAFETY_BLOCK_REASONS: BlockedReason[] = [
-  BlockedReason.SAFETY,
-  BlockedReason.IMAGE_SAFETY,
-  BlockedReason.BLOCKLIST,
-  BlockedReason.PROHIBITED_CONTENT,
-]
-
-const SAFETY_FINISH_REASONS: FinishReason[] = [
-  FinishReason.SAFETY,
-  FinishReason.IMAGE_SAFETY,
-  FinishReason.BLOCKLIST,
-  FinishReason.PROHIBITED_CONTENT,
-]
-
 function extractImageFromResponse(response: GenerateContentResponse): Buffer {
-  // Check prompt-level blocking
-  const { blockReason, blockReasonMessage } = response.promptFeedback ?? {}
-  if (blockReason && SAFETY_BLOCK_REASONS.includes(blockReason)) {
-    const message = `Image generation blocked by safety filter: ${blockReason}${blockReasonMessage ? ` - ${blockReasonMessage}` : ''}`
-    const error = new AiTransformError(message, 'SAFETY_FILTERED')
-    error.metadata = {
-      blockReason,
-      ...(blockReasonMessage && { blockReasonMessage }),
-    }
-    throw error
-  }
+  checkPromptBlocked(response)
 
-  if (!response.candidates || response.candidates.length === 0) {
+  const candidate = response.candidates?.[0]
+  if (!candidate) {
     throw new Error('No candidates in Gemini API response')
   }
 
-  const candidate = response.candidates[0]
-
-  // Check candidate-level safety filtering
-  if (candidate?.finishReason && SAFETY_FINISH_REASONS.includes(candidate.finishReason)) {
-    const blockedRatings = candidate.safetyRatings?.filter((r) => r.blocked)
-    const message = `Image generation blocked by safety filter: finishReason=${candidate.finishReason}`
-    const error = new AiTransformError(message, 'SAFETY_FILTERED')
-    error.metadata = {
-      finishReason: candidate.finishReason,
-      ...(blockedRatings?.length && { safetyRatings: blockedRatings }),
-    }
-    throw error
+  const result = tryExtractImageBuffer(candidate)
+  if (result) {
+    return result
   }
 
-  if (!candidate?.content?.parts) {
-    throw new Error('No content parts in Gemini API response')
+  return throwNoImageError(candidate)
+}
+
+/**
+ * Throw if the prompt was rejected at the request level
+ */
+function checkPromptBlocked(response: GenerateContentResponse): void {
+  const { blockReason, blockReasonMessage } = response.promptFeedback ?? {}
+  if (!blockReason) return
+
+  const message = `Image generation blocked: ${blockReason}${blockReasonMessage ? ` - ${blockReasonMessage}` : ''}`
+  const error = new AiTransformError(message, 'SAFETY_FILTERED')
+  error.metadata = {
+    blockReason,
+    ...(blockReasonMessage && { blockReasonMessage }),
   }
+  throw error
+}
+
+/**
+ * Try to extract an image buffer from candidate parts
+ */
+function tryExtractImageBuffer(candidate: Candidate): Buffer | null {
+  if (!candidate.content?.parts) return null
 
   for (const part of candidate.content.parts) {
     if (part.inlineData?.data) {
       return Buffer.from(part.inlineData.data, 'base64')
     }
+  }
+
+  return null
+}
+
+/**
+ * Diagnose why no image was returned and throw an appropriate error
+ */
+function throwNoImageError(candidate: Candidate): never {
+  const { finishReason } = candidate
+  if (
+    finishReason &&
+    finishReason !== FinishReason.STOP &&
+    finishReason !== FinishReason.MAX_TOKENS
+  ) {
+    const blockedRatings = candidate.safetyRatings?.filter((r) => r.blocked)
+    const message = `Image generation blocked: finishReason=${finishReason}`
+    const error = new AiTransformError(message, 'SAFETY_FILTERED')
+    error.metadata = {
+      finishReason,
+      ...(blockedRatings?.length && { safetyRatings: blockedRatings }),
+    }
+    throw error
   }
 
   throw new Error('No image data in Gemini API response')
