@@ -385,7 +385,7 @@ async function pollOperation(
  *
  * Validates the operation completed successfully and was not filtered.
  */
-function extractVideoUri(
+export function extractVideoUri(
   operation: Awaited<
     ReturnType<GoogleGenAI['operations']['getVideosOperation']>
   >,

@@ -8,6 +8,8 @@
  */
 import { describe, it, expect } from 'vitest'
 import { transformPipelineJobPayloadSchema as transformPipelineTaskPayloadSchema } from '../schemas/transform-pipeline.schema'
+import { buildJobError } from './transformPipelineTask'
+import { AiTransformError } from '../services/ai/providers/types'
 
 describe('transformPipelineTask payload schema', () => {
   it('validates a valid payload', () => {
@@ -227,5 +229,61 @@ describe('transformPipelineTask expected behavior', () => {
       expect(sanitizedMessage).not.toContain('stack')
       expect(sanitizedMessage).not.toContain('.ts')
     })
+  })
+})
+
+describe('buildJobError', () => {
+  it('maps AiTransformError with SAFETY_FILTERED to JobError with same code + metadata', () => {
+    const aiError = new AiTransformError('blocked by safety', 'SAFETY_FILTERED')
+    aiError.metadata = { blockReason: 'SAFETY', finishReason: 'SAFETY' }
+
+    const jobError = buildJobError(aiError)
+
+    expect(jobError.code).toBe('SAFETY_FILTERED')
+    expect(jobError.message).toBe('blocked by safety')
+    expect(jobError.step).toBe('outcome')
+    expect(jobError.metadata).toEqual({ blockReason: 'SAFETY', finishReason: 'SAFETY' })
+    expect(jobError.isRetryable).toBe(false)
+    expect(jobError.timestamp).toBeGreaterThan(0)
+  })
+
+  it('maps AiTransformError with API_ERROR to JobError with API_ERROR', () => {
+    const aiError = new AiTransformError('api failed', 'API_ERROR')
+
+    const jobError = buildJobError(aiError)
+
+    expect(jobError.code).toBe('API_ERROR')
+    expect(jobError.message).toBe('api failed')
+    expect(jobError.step).toBe('outcome')
+  })
+
+  it('maps OutcomeError (name-based check) to JobError with outcome code', () => {
+    const outcomeError = new Error('Outcome failed')
+    outcomeError.name = 'OutcomeError'
+    ;(outcomeError as Error & { code?: string }).code = 'INVALID_INPUT'
+
+    const jobError = buildJobError(outcomeError)
+
+    expect(jobError.code).toBe('INVALID_INPUT')
+    expect(jobError.message).toBe('Outcome failed')
+    expect(jobError.step).toBe('outcome')
+  })
+
+  it('maps unknown Error to JobError with PROCESSING_FAILED + sanitized message', () => {
+    const genericError = new Error('Something internal broke at line 42')
+
+    const jobError = buildJobError(genericError)
+
+    expect(jobError.code).toBe('PROCESSING_FAILED')
+    expect(jobError.message).not.toContain('line 42')
+    expect(jobError.step).toBe('outcome')
+  })
+
+  it('maps non-Error value to JobError with PROCESSING_FAILED', () => {
+    const jobError = buildJobError('string error')
+
+    expect(jobError.code).toBe('PROCESSING_FAILED')
+    expect(jobError.step).toBe('outcome')
+    expect(jobError.isRetryable).toBe(false)
   })
 })

@@ -232,7 +232,7 @@ async function buildContentParts(
 /**
  * Extract image buffer from Gemini API response
  */
-function extractImageFromResponse(response: GenerateContentResponse): Buffer {
+export function extractImageFromResponse(response: GenerateContentResponse): Buffer {
   checkPromptBlocked(response)
 
   const candidate = response.candidates?.[0]
@@ -251,7 +251,7 @@ function extractImageFromResponse(response: GenerateContentResponse): Buffer {
 /**
  * Throw if the prompt was rejected at the request level
  */
-function checkPromptBlocked(response: GenerateContentResponse): void {
+export function checkPromptBlocked(response: GenerateContentResponse): void {
   const { blockReason, blockReasonMessage } = response.promptFeedback ?? {}
   if (!blockReason) return
 
@@ -267,7 +267,7 @@ function checkPromptBlocked(response: GenerateContentResponse): void {
 /**
  * Try to extract an image buffer from candidate parts
  */
-function tryExtractImageBuffer(candidate: Candidate): Buffer | null {
+export function tryExtractImageBuffer(candidate: Candidate): Buffer | null {
   if (!candidate.content?.parts) return null
 
   for (const part of candidate.content.parts) {
@@ -282,7 +282,7 @@ function tryExtractImageBuffer(candidate: Candidate): Buffer | null {
 /**
  * Diagnose why no image was returned and throw an appropriate error
  */
-function throwNoImageError(candidate: Candidate): never {
+export function throwNoImageError(candidate: Candidate): never {
   const { finishReason } = candidate
   if (
     finishReason &&

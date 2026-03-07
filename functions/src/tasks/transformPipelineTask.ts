@@ -296,7 +296,7 @@ async function finalizeJobSuccess(
 /**
  * Build a JobError from an error, preserving AiTransformError fields directly
  */
-function buildJobError(error: unknown): JobError {
+export function buildJobError(error: unknown): JobError {
   if (error instanceof AiTransformError) {
     return createJobError({
       code: error.code,

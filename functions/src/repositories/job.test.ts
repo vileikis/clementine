@@ -9,6 +9,7 @@ import { describe, it, expect } from 'vitest'
 import {
   buildJobData,
   createSanitizedError,
+  createJobError,
   SANITIZED_ERROR_MESSAGES,
 } from './job'
 import type { JobSnapshot } from '@clementine/shared'
@@ -227,6 +228,71 @@ describe('job module exports', () => {
   it('exports createSanitizedError function', async () => {
     const { createSanitizedError } = await import('./job')
     expect(typeof createSanitizedError).toBe('function')
+  })
+})
+
+describe('createJobError', () => {
+  it('creates error with all provided fields', () => {
+    const error = createJobError({
+      code: 'SAFETY_FILTERED',
+      message: 'Content was blocked',
+      step: 'outcome',
+      metadata: { blockReason: 'SAFETY' },
+    })
+
+    expect(error.code).toBe('SAFETY_FILTERED')
+    expect(error.message).toBe('Content was blocked')
+    expect(error.step).toBe('outcome')
+    expect(error.metadata).toEqual({ blockReason: 'SAFETY' })
+    expect(error.isRetryable).toBe(false)
+    expect(error.timestamp).toBeGreaterThan(0)
+  })
+
+  it('defaults step to null when omitted', () => {
+    const error = createJobError({
+      code: 'PROCESSING_FAILED',
+      message: 'Something went wrong',
+    })
+
+    expect(error.step).toBeNull()
+  })
+
+  it('defaults metadata to null when omitted', () => {
+    const error = createJobError({
+      code: 'PROCESSING_FAILED',
+      message: 'Something went wrong',
+    })
+
+    expect(error.metadata).toBeNull()
+  })
+
+  it('sets isRetryable to false', () => {
+    const error = createJobError({
+      code: 'API_ERROR',
+      message: 'API failed',
+    })
+
+    expect(error.isRetryable).toBe(false)
+  })
+
+  it('sets timestamp to current time', () => {
+    const before = Date.now()
+    const error = createJobError({
+      code: 'UNKNOWN',
+      message: 'Unknown error',
+    })
+    const after = Date.now()
+
+    expect(error.timestamp).toBeGreaterThanOrEqual(before)
+    expect(error.timestamp).toBeLessThanOrEqual(after)
+  })
+})
+
+describe('SANITIZED_ERROR_MESSAGES includes SAFETY_FILTERED', () => {
+  it('has SAFETY_FILTERED error code', () => {
+    expect(SANITIZED_ERROR_MESSAGES['SAFETY_FILTERED']).toBeDefined()
+    expect(typeof SANITIZED_ERROR_MESSAGES['SAFETY_FILTERED']).toBe('string')
+    expect(SANITIZED_ERROR_MESSAGES['SAFETY_FILTERED']!.length).toBeGreaterThan(0)
   })
 })
 
