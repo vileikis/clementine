@@ -20,6 +20,32 @@ import type {
 } from '../types/auth.types'
 import { auth } from '@/integrations/firebase/client'
 
+const AUTH_TIMEOUT_MS = 6_000
+
+const UNAUTHENTICATED_STATE: AuthState = {
+  user: null,
+  isAdmin: false,
+  isAnonymous: false,
+  isLoading: false,
+  hasTimedOut: false,
+  idTokenResult: null,
+}
+
+function logAuthEvent(
+  message: string,
+  level: 'info' | 'warning' | 'error',
+  data?: Record<string, unknown>,
+) {
+  Sentry.addBreadcrumb({ category: 'auth', message, level, data })
+  const loggers = {
+    error: console.error,
+    warning: console.warn,
+    info: console.info,
+  }
+  const log = loggers[level] ?? console.info
+  log(`[AuthProvider] ${message}`, data ?? '')
+}
+
 const AuthContext = createContext<AuthContextValue | null>(null)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -28,6 +54,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     isAdmin: false,
     isAnonymous: false,
     isLoading: true,
+    hasTimedOut: false,
     idTokenResult: null,
   })
 
@@ -61,37 +88,71 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [clearSession, router])
 
   useEffect(() => {
-    // Use onIdTokenChanged to detect custom claims changes
+    const startTime = Date.now()
+    const elapsed = () => Date.now() - startTime
+    let authResolved = false
+
+    logAuthEvent('Auth initialization started', 'info')
+
+    const timeoutId = setTimeout(() => {
+      if (!authResolved) {
+        logAuthEvent('Auth initialization timed out', 'warning', {
+          elapsed: elapsed(),
+        })
+        setAuthState({ ...UNAUTHENTICATED_STATE, hasTimedOut: true })
+      }
+    }, AUTH_TIMEOUT_MS)
+
+    const resolve = () => {
+      authResolved = true
+      clearTimeout(timeoutId)
+    }
+
     const unsubscribe = onIdTokenChanged(auth, async (user: User | null) => {
-      if (user) {
-        // Get ID token and custom claims
-        const idToken = await user.getIdToken()
-        const idTokenResult =
-          (await user.getIdTokenResult()) as TypedIdTokenResult
+      try {
+        if (user) {
+          const idToken = await user.getIdToken()
+          const idTokenResult =
+            (await user.getIdTokenResult()) as TypedIdTokenResult
+          await createSession({ data: { idToken } })
 
-        // Create server session with ID token
-        await createSession({ data: { idToken } })
-
-        setAuthState({
-          user,
-          isAdmin: idTokenResult.claims.admin === true,
-          isAnonymous: user.isAnonymous,
-          isLoading: false,
-          idTokenResult,
+          resolve()
+          logAuthEvent('Auth resolved successfully', 'info', {
+            elapsed: elapsed(),
+            isAnonymous: user.isAnonymous,
+          })
+          setAuthState({
+            user,
+            isAdmin: idTokenResult.claims.admin === true,
+            isAnonymous: user.isAnonymous,
+            isLoading: false,
+            hasTimedOut: false,
+            idTokenResult,
+          })
+        } else {
+          resolve()
+          logAuthEvent('Auth resolved (no user)', 'info', {
+            elapsed: elapsed(),
+          })
+          setAuthState(UNAUTHENTICATED_STATE)
+        }
+      } catch (error) {
+        resolve()
+        Sentry.captureException(error, {
+          tags: { component: 'AuthProvider', action: 'onIdTokenChanged' },
         })
-      } else {
-        // User signed out - client state only (session cleared by signOutFn)
-        setAuthState({
-          user: null,
-          isAdmin: false,
-          isAnonymous: false,
-          isLoading: false,
-          idTokenResult: null,
-        })
+        logAuthEvent(
+          `Auth error: ${error instanceof Error ? `${error.name}: ${error.message}` : String(error)}`,
+          'error',
+        )
+        setAuthState(UNAUTHENTICATED_STATE)
       }
     })
 
-    return () => unsubscribe()
+    return () => {
+      clearTimeout(timeoutId)
+      unsubscribe()
+    }
   }, [createSession])
 
   const value: AuthContextValue = {
