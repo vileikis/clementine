@@ -229,6 +229,7 @@ export async function updateJobStarted(
 export const SANITIZED_ERROR_MESSAGES: Record<string, string> = {
   INVALID_INPUT: 'The request could not be processed due to invalid input.',
   PROCESSING_FAILED: 'An error occurred while processing your request.',
+  API_ERROR: 'The AI service encountered an error. Please try again.',
   AI_MODEL_ERROR: 'The AI service is temporarily unavailable.',
   STORAGE_ERROR: 'Unable to save the result. Please try again.',
   TIMEOUT: 'Processing took too long and was cancelled.',

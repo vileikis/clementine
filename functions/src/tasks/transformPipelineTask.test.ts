@@ -8,8 +8,9 @@
  */
 import { describe, it, expect } from 'vitest'
 import { transformPipelineJobPayloadSchema as transformPipelineTaskPayloadSchema } from '../schemas/transform-pipeline.schema'
-import { buildJobError } from './transformPipelineTask'
+import { buildJobError, buildSessionErrorMessage } from './transformPipelineTask'
 import { AiTransformError } from '../services/ai/providers/types'
+import { SANITIZED_ERROR_MESSAGES } from '../repositories/job'
 
 describe('transformPipelineTask payload schema', () => {
   it('validates a valid payload', () => {
@@ -285,5 +286,82 @@ describe('buildJobError', () => {
     expect(jobError.code).toBe('PROCESSING_FAILED')
     expect(jobError.step).toBe('outcome')
     expect(jobError.isRetryable).toBe(false)
+  })
+})
+
+describe('buildSessionErrorMessage', () => {
+  it('includes category label for SAFETY_FILTERED with known safetyCategories', () => {
+    const message = buildSessionErrorMessage({
+      code: 'SAFETY_FILTERED',
+      message: 'raw internal message',
+      step: 'outcome',
+      isRetryable: false,
+      timestamp: Date.now(),
+      metadata: {
+        supportCodes: ['90789179'],
+        safetyCategories: ['sexual_content'],
+      },
+    })
+
+    expect(message).toBe(
+      'Your content was blocked due to explicit content. Please try different content.',
+    )
+  })
+
+  it('joins multiple category labels', () => {
+    const message = buildSessionErrorMessage({
+      code: 'SAFETY_FILTERED',
+      message: 'raw internal message',
+      step: 'outcome',
+      isRetryable: false,
+      timestamp: Date.now(),
+      metadata: {
+        supportCodes: ['90789179', '61493863'],
+        safetyCategories: ['sexual_content', 'violence'],
+      },
+    })
+
+    expect(message).toBe(
+      'Your content was blocked due to explicit content, violent content. Please try different content.',
+    )
+  })
+
+  it('falls back to generic SAFETY_FILTERED message when no safetyCategories', () => {
+    const message = buildSessionErrorMessage({
+      code: 'SAFETY_FILTERED',
+      message: 'raw internal message',
+      step: 'outcome',
+      isRetryable: false,
+      timestamp: Date.now(),
+      metadata: { supportCodes: ['99999999'] },
+    })
+
+    expect(message).toBe(SANITIZED_ERROR_MESSAGES['SAFETY_FILTERED'])
+  })
+
+  it('falls back to generic SAFETY_FILTERED message when no metadata', () => {
+    const message = buildSessionErrorMessage({
+      code: 'SAFETY_FILTERED',
+      message: 'raw internal message',
+      step: 'outcome',
+      isRetryable: false,
+      timestamp: Date.now(),
+      metadata: null,
+    })
+
+    expect(message).toBe(SANITIZED_ERROR_MESSAGES['SAFETY_FILTERED'])
+  })
+
+  it('uses sanitized message for non-safety error codes', () => {
+    const message = buildSessionErrorMessage({
+      code: 'PROCESSING_FAILED',
+      message: 'internal details',
+      step: 'outcome',
+      isRetryable: false,
+      timestamp: Date.now(),
+      metadata: null,
+    })
+
+    expect(message).toBe(SANITIZED_ERROR_MESSAGES['PROCESSING_FAILED'])
   })
 })
