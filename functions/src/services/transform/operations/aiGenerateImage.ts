@@ -11,6 +11,8 @@ import {
   FinishReason,
   GenerateContentResponse,
   GoogleGenAI,
+  HarmBlockThreshold,
+  HarmCategory,
   Modality,
   PersonGeneration,
   type Candidate,
@@ -87,6 +89,24 @@ export async function aiGenerateImage(
     temperature: 1,
     topP: 0.95,
     responseModalities: [Modality.IMAGE],
+    safetySettings: [
+      {
+        category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+        threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+        threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_IMAGE_SEXUALLY_EXPLICIT,
+        threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_IMAGE_DANGEROUS_CONTENT,
+        threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+      },
+    ],
     imageConfig: {
       aspectRatio,
       outputMimeType: 'image/jpeg',
@@ -229,7 +249,9 @@ async function buildContentParts(
 /**
  * Extract image buffer from Gemini API response
  */
-export function extractImageFromResponse(response: GenerateContentResponse): Buffer {
+export function extractImageFromResponse(
+  response: GenerateContentResponse,
+): Buffer {
   checkPromptBlocked(response)
 
   const candidate = response.candidates?.[0]

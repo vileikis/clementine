@@ -380,6 +380,24 @@ async function pollOperation(
   return operation
 }
 
+/** Patterns in Veo error messages that indicate safety/policy violations */
+const SAFETY_ERROR_PATTERNS = [
+  'responsible ai',
+  'safety',
+  'violates',
+  'policy',
+  'prohibited',
+  'blocked',
+]
+
+/**
+ * Check if a Veo operation error message indicates a safety/policy violation
+ */
+export function isVeoSafetyError(message: string): boolean {
+  const lower = message.toLowerCase()
+  return SAFETY_ERROR_PATTERNS.some((pattern) => lower.includes(pattern))
+}
+
 /**
  * Extract the video GCS URI from a completed operation
  *
@@ -391,9 +409,24 @@ export function extractVideoUri(
   >,
 ): string {
   if (operation.error) {
-    throw new Error(
-      `Video generation failed: ${operation.error['message'] ?? 'Unknown error'}`,
-    )
+    const errorMessage =
+      (operation.error['message'] as string) ?? 'Unknown error'
+
+    logger.warn('[AIVideoGenerate] Operation error', {
+      operationError: operation.error,
+      operationResponse: operation.response ?? null,
+    })
+
+    if (isVeoSafetyError(errorMessage)) {
+      const error = new AiTransformError(
+        `Video generation blocked by safety policy: ${errorMessage}`,
+        'SAFETY_FILTERED',
+      )
+      error.metadata = { operationError: operation.error }
+      throw error
+    }
+
+    throw new Error(`Video generation failed: ${errorMessage}`)
   }
 
   const response = operation.response

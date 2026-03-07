@@ -6,7 +6,7 @@
  */
 import { describe, it, expect } from 'vitest'
 import { AiTransformError } from '../../ai/providers/types'
-import { extractVideoUri } from './aiGenerateVideo'
+import { extractVideoUri, isVeoSafetyError } from './aiGenerateVideo'
 
 /**
  * Helper to create a mock completed operation
@@ -23,13 +23,33 @@ function createMockOperation(overrides: Record<string, unknown> = {}) {
 // =============================================================================
 
 describe('extractVideoUri', () => {
-  it('throws generic Error when operation.error is set', () => {
+  it('throws generic Error when operation.error has non-safety message', () => {
     const operation = createMockOperation({
       error: { message: 'Internal server error' },
     })
 
     expect(() => extractVideoUri(operation)).toThrow('Video generation failed')
     expect(() => extractVideoUri(operation)).not.toThrow(AiTransformError)
+  })
+
+  it('throws AiTransformError with SAFETY_FILTERED when operation.error indicates safety violation', () => {
+    const operation = createMockOperation({
+      error: {
+        message:
+          'Veo could not generate videos because the input image violates Google\'s Responsible AI practices.',
+      },
+    })
+
+    expect(() => extractVideoUri(operation)).toThrow(AiTransformError)
+
+    try {
+      extractVideoUri(operation)
+    } catch (e) {
+      const err = e as AiTransformError
+      expect(err.code).toBe('SAFETY_FILTERED')
+      expect(err.metadata).toBeDefined()
+      expect(err.metadata!['operationError']).toBeDefined()
+    }
   })
 
   it('throws AiTransformError with SAFETY_FILTERED when no generated videos + RAI filter reasons', () => {
@@ -111,5 +131,37 @@ describe('extractVideoUri', () => {
 
     expect(() => extractVideoUri(operation)).toThrow('No video URI')
     expect(() => extractVideoUri(operation)).not.toThrow(AiTransformError)
+  })
+})
+
+describe('isVeoSafetyError', () => {
+  it('detects "Responsible AI" messages', () => {
+    expect(
+      isVeoSafetyError(
+        "Veo could not generate videos because the input image violates Google's Responsible AI practices.",
+      ),
+    ).toBe(true)
+  })
+
+  it('detects "safety" messages', () => {
+    expect(isVeoSafetyError('Content blocked due to safety concerns')).toBe(true)
+  })
+
+  it('detects "policy" messages', () => {
+    expect(isVeoSafetyError('Request rejected by content policy')).toBe(true)
+  })
+
+  it('detects "prohibited" messages', () => {
+    expect(isVeoSafetyError('Prohibited content detected')).toBe(true)
+  })
+
+  it('is case-insensitive', () => {
+    expect(isVeoSafetyError('VIOLATES usage policy')).toBe(true)
+  })
+
+  it('returns false for generic errors', () => {
+    expect(isVeoSafetyError('Internal server error')).toBe(false)
+    expect(isVeoSafetyError('Request timeout')).toBe(false)
+    expect(isVeoSafetyError('Unknown error')).toBe(false)
   })
 })
