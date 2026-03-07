@@ -68,7 +68,7 @@ export const VIDEO_MODALITY: ModalityDefinition = {
     negativePrompt: false,
     referenceMedia: true,
     sound: true,
-    enhance: true,
+    enhance: false,
     duration: true,
     aspectRatio: false,
     resolution: true,

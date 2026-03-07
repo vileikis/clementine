@@ -7,9 +7,6 @@
 // Main service
 export { transformImage } from './ai-transform.service';
 
-// Configuration
-export { MOCKED_AI_CONFIG } from './config';
-
 // Types and errors
 export type {
   AiTransformConfig,

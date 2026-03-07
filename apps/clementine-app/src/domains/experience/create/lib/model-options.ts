@@ -21,7 +21,6 @@ import type {
  */
 export const AI_IMAGE_MODELS = [
   { value: 'gemini-2.5-flash-image', label: 'Gemini 2.5 Flash' },
-  { value: 'gemini-3-pro-image-preview', label: 'Gemini 3 Pro' },
   { value: 'gemini-3.1-flash-image-preview', label: 'Gemini 3.1 Flash' },
 ] as const
 
