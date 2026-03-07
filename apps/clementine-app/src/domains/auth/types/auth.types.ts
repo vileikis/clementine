@@ -30,6 +30,9 @@ export interface AuthState {
   /** Whether auth state is being initialized */
   isLoading: boolean
 
+  /** Whether auth initialization timed out */
+  hasTimedOut: boolean
+
   /** ID token result with custom claims (null if unauthenticated) */
   idTokenResult: TypedIdTokenResult | null
 }
