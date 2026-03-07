@@ -10,6 +10,7 @@ import { describe, it, expect } from 'vitest'
 import { transformPipelineJobPayloadSchema as transformPipelineTaskPayloadSchema } from '../schemas/transform-pipeline.schema'
 import { buildJobError } from './transformPipelineTask'
 import { AiTransformError } from '../services/ai/providers/types'
+import { SANITIZED_ERROR_MESSAGES } from '../repositories/job'
 
 describe('transformPipelineTask payload schema', () => {
   it('validates a valid payload', () => {
@@ -233,31 +234,31 @@ describe('transformPipelineTask expected behavior', () => {
 })
 
 describe('buildJobError', () => {
-  it('maps AiTransformError with SAFETY_FILTERED to JobError with same code + metadata', () => {
+  it('maps AiTransformError with SAFETY_FILTERED to JobError with sanitized message + metadata', () => {
     const aiError = new AiTransformError('blocked by safety', 'SAFETY_FILTERED')
     aiError.metadata = { blockReason: 'SAFETY', finishReason: 'SAFETY' }
 
     const jobError = buildJobError(aiError)
 
     expect(jobError.code).toBe('SAFETY_FILTERED')
-    expect(jobError.message).toBe('blocked by safety')
+    expect(jobError.message).toBe(SANITIZED_ERROR_MESSAGES['SAFETY_FILTERED'])
     expect(jobError.step).toBe('outcome')
     expect(jobError.metadata).toEqual({ blockReason: 'SAFETY', finishReason: 'SAFETY' })
     expect(jobError.isRetryable).toBe(false)
     expect(jobError.timestamp).toBeGreaterThan(0)
   })
 
-  it('maps AiTransformError with API_ERROR to JobError with API_ERROR', () => {
+  it('maps AiTransformError with unmapped code to PROCESSING_FAILED', () => {
     const aiError = new AiTransformError('api failed', 'API_ERROR')
 
     const jobError = buildJobError(aiError)
 
-    expect(jobError.code).toBe('API_ERROR')
-    expect(jobError.message).toBe('api failed')
+    expect(jobError.code).toBe('PROCESSING_FAILED')
+    expect(jobError.message).toBe(SANITIZED_ERROR_MESSAGES['PROCESSING_FAILED'])
     expect(jobError.step).toBe('outcome')
   })
 
-  it('maps OutcomeError (name-based check) to JobError with outcome code', () => {
+  it('maps OutcomeError with known code to sanitized JobError', () => {
     const outcomeError = new Error('Outcome failed')
     outcomeError.name = 'OutcomeError'
     ;(outcomeError as Error & { code?: string }).code = 'INVALID_INPUT'
@@ -265,7 +266,19 @@ describe('buildJobError', () => {
     const jobError = buildJobError(outcomeError)
 
     expect(jobError.code).toBe('INVALID_INPUT')
-    expect(jobError.message).toBe('Outcome failed')
+    expect(jobError.message).toBe(SANITIZED_ERROR_MESSAGES['INVALID_INPUT'])
+    expect(jobError.step).toBe('outcome')
+  })
+
+  it('maps OutcomeError with unknown code to PROCESSING_FAILED', () => {
+    const outcomeError = new Error('Outcome failed')
+    outcomeError.name = 'OutcomeError'
+    ;(outcomeError as Error & { code?: string }).code = 'SOME_UNKNOWN_CODE'
+
+    const jobError = buildJobError(outcomeError)
+
+    expect(jobError.code).toBe('PROCESSING_FAILED')
+    expect(jobError.message).toBe(SANITIZED_ERROR_MESSAGES['PROCESSING_FAILED'])
     expect(jobError.step).toBe('outcome')
   })
 

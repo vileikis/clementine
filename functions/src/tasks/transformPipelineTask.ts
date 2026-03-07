@@ -298,9 +298,13 @@ async function finalizeJobSuccess(
  */
 export function buildJobError(error: unknown): JobError {
   if (error instanceof AiTransformError) {
+    const code =
+      error.code in SANITIZED_ERROR_MESSAGES ? error.code : 'PROCESSING_FAILED'
     return createJobError({
-      code: error.code,
-      message: error.message,
+      code,
+      message:
+        SANITIZED_ERROR_MESSAGES[code] ??
+        SANITIZED_ERROR_MESSAGES['PROCESSING_FAILED']!,
       step: 'outcome',
       metadata: error.metadata,
     })
@@ -309,9 +313,15 @@ export function buildJobError(error: unknown): JobError {
   // Check for OutcomeError (not exported, check by name)
   if (error instanceof Error && error.name === 'OutcomeError') {
     const outcomeCode = (error as Error & { code?: string }).code
+    const code =
+      outcomeCode && outcomeCode in SANITIZED_ERROR_MESSAGES
+        ? outcomeCode
+        : 'PROCESSING_FAILED'
     return createJobError({
-      code: outcomeCode ?? 'PROCESSING_FAILED',
-      message: error.message,
+      code,
+      message:
+        SANITIZED_ERROR_MESSAGES[code] ??
+        SANITIZED_ERROR_MESSAGES['PROCESSING_FAILED']!,
       step: 'outcome',
     })
   }

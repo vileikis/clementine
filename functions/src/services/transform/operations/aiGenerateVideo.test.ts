@@ -74,7 +74,7 @@ describe('extractVideoUri', () => {
     }
   })
 
-  it('throws AiTransformError with SAFETY_FILTERED when no generated videos + empty RAI reasons', () => {
+  it('throws generic Error when no generated videos and no RAI indicators', () => {
     const operation = createMockOperation({
       response: {
         generatedVideos: [],
@@ -83,14 +83,8 @@ describe('extractVideoUri', () => {
       },
     })
 
-    expect(() => extractVideoUri(operation)).toThrow(AiTransformError)
-
-    try {
-      extractVideoUri(operation)
-    } catch (e) {
-      const err = e as AiTransformError
-      expect(err.code).toBe('SAFETY_FILTERED')
-    }
+    expect(() => extractVideoUri(operation)).toThrow('No generated videos')
+    expect(() => extractVideoUri(operation)).not.toThrow(AiTransformError)
   })
 
   it('returns URI string on valid operation response', () => {

@@ -165,6 +165,15 @@ describe('throwNoImageError', () => {
     }
   })
 
+  it('throws generic Error when finishReason is non-safety (e.g. LANGUAGE)', () => {
+    const candidate = {
+      finishReason: FinishReason.LANGUAGE,
+    } as Candidate
+
+    expect(() => throwNoImageError(candidate)).toThrow(Error)
+    expect(() => throwNoImageError(candidate)).not.toThrow(AiTransformError)
+  })
+
   it('throws generic Error when finishReason=STOP', () => {
     const candidate = {
       finishReason: FinishReason.STOP,

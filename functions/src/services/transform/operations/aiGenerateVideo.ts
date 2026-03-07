@@ -400,18 +400,26 @@ export function extractVideoUri(
   const generatedVideo = response?.generatedVideos?.[0]
 
   if (!generatedVideo) {
-    const raiMediaFilteredCount = response?.raiMediaFilteredCount || 0
-    const raiMediaFilteredReasons = response?.raiMediaFilteredReasons || []
+    const raiMediaFilteredCount = response?.raiMediaFilteredCount ?? 0
+    const raiMediaFilteredReasons = response?.raiMediaFilteredReasons ?? []
 
-    const reasons = raiMediaFilteredReasons?.join(', ') ?? 'unknown'
-    const message = `Video was filtered by safety policy: ${reasons}`
-
-    const error = new AiTransformError(message, 'SAFETY_FILTERED')
-    error.metadata = {
-      raiMediaFilteredCount,
-      raiMediaFilteredReasons,
+    if (raiMediaFilteredCount > 0 || raiMediaFilteredReasons.length > 0) {
+      const reasons =
+        raiMediaFilteredReasons.length > 0
+          ? raiMediaFilteredReasons.join(', ')
+          : 'unknown'
+      const error = new AiTransformError(
+        `Video was filtered by safety policy: ${reasons}`,
+        'SAFETY_FILTERED',
+      )
+      error.metadata = {
+        raiMediaFilteredCount,
+        raiMediaFilteredReasons,
+      }
+      throw error
     }
-    throw error
+
+    throw new Error('No generated videos in Veo response')
   }
 
   const videoUri = generatedVideo.video?.uri

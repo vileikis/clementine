@@ -62,15 +62,12 @@ export async function updateSessionJobStatus(
   jobStatus: JobStatus,
   jobError?: { code: string; message: string },
 ): Promise<void> {
-  const update: UpdateData<Session> = {
+  const update = {
     jobId,
     jobStatus,
+    jobErrorCode: jobError?.code ?? null,
+    jobErrorMessage: jobError?.message ?? null,
     updatedAt: Date.now(),
-  }
-
-  if (jobError) {
-    update.jobErrorCode = jobError.code
-    update.jobErrorMessage = jobError.message
   }
 
   await getSessionRef(projectId, sessionId).update(update)

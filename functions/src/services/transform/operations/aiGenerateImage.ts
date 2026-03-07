@@ -282,13 +282,21 @@ export function tryExtractImageBuffer(candidate: Candidate): Buffer | null {
 /**
  * Diagnose why no image was returned and throw an appropriate error
  */
+/** FinishReason values that indicate safety/policy blocking */
+const SAFETY_FINISH_REASONS = new Set([
+  FinishReason.SAFETY,
+  FinishReason.RECITATION,
+  FinishReason.BLOCKLIST,
+  FinishReason.PROHIBITED_CONTENT,
+  FinishReason.SPII,
+  FinishReason.IMAGE_SAFETY,
+  FinishReason.IMAGE_PROHIBITED_CONTENT,
+  FinishReason.IMAGE_RECITATION,
+])
+
 export function throwNoImageError(candidate: Candidate): never {
   const { finishReason } = candidate
-  if (
-    finishReason &&
-    finishReason !== FinishReason.STOP &&
-    finishReason !== FinishReason.MAX_TOKENS
-  ) {
+  if (finishReason && SAFETY_FINISH_REASONS.has(finishReason)) {
     const blockedRatings = candidate.safetyRatings?.filter((r) => r.blocked)
     const message = `Image generation blocked: finishReason=${finishReason}`
     const error = new AiTransformError(message, 'SAFETY_FILTERED')
