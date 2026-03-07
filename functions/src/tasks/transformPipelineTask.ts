@@ -24,6 +24,7 @@ import {
 } from '../repositories/job'
 import type { Job, JobError, JobOutput } from '@clementine/shared'
 import { AiTransformError } from '../services/ai/providers/types'
+import { SAFETY_CATEGORY_LABELS } from '../services/transform/veo-safety'
 import { runOutcome, type OutcomeContext } from '../services/transform'
 import { logMemoryUsage } from '../services/transform/helpers'
 import { createTempDir, cleanupTempDir } from '../infra/temp-dir'
@@ -294,6 +295,37 @@ async function finalizeJobSuccess(
 }
 
 /**
+ * Build a sanitized session error message from a JobError
+ *
+ * For SAFETY_FILTERED errors with a known safety category, includes the
+ * user-friendly category label. Otherwise uses the generic sanitized message.
+ */
+export function buildSessionErrorMessage(jobError: JobError): string {
+  if (jobError.code === 'SAFETY_FILTERED' && jobError.metadata) {
+    const categories = jobError.metadata['safetyCategories'] as
+      | string[]
+      | undefined
+    if (categories?.length) {
+      const labels = [
+        ...new Set(
+          categories
+            .map((c) => SAFETY_CATEGORY_LABELS[c])
+            .filter((l): l is string => !!l),
+        ),
+      ]
+      if (labels.length > 0) {
+        return `Your content was blocked due to ${labels.join(', ')}. Please try different content.`
+      }
+    }
+  }
+
+  return (
+    SANITIZED_ERROR_MESSAGES[jobError.code] ??
+    SANITIZED_ERROR_MESSAGES['PROCESSING_FAILED']!
+  )
+}
+
+/**
  * Build a JobError from an error, preserving AiTransformError fields directly
  */
 export function buildJobError(error: unknown): JobError {
@@ -347,9 +379,7 @@ async function handleJobFailure(
     await updateJobError(projectId, job.id, jobError)
     await updateSessionJobStatus(projectId, sessionId, job.id, 'failed', {
       code: jobError.code,
-      message:
-        SANITIZED_ERROR_MESSAGES[jobError.code] ??
-        SANITIZED_ERROR_MESSAGES['PROCESSING_FAILED']!,
+      message: buildSessionErrorMessage(jobError),
     })
 
     logger.error('[TransformJob] Error details', {

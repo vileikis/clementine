@@ -39,6 +39,7 @@ import {
 } from '../../../infra/storage'
 import { getMediaDimensions } from '../../ffmpeg/probe'
 import { AiTransformError } from '../../ai/providers/types'
+import { VEO_SUPPORT_CODE_CATEGORIES } from '../veo-safety'
 import { logMemoryUsage, retryWithBackoff } from '../helpers'
 import { sleep } from '../helpers/sleep'
 
@@ -380,28 +381,151 @@ async function pollOperation(
   return operation
 }
 
-/** Patterns in Veo error messages that indicate safety/policy violations */
-const SAFETY_ERROR_PATTERNS = [
-  'responsible ai',
-  'safety',
-  'violates',
-  'policy',
-  'prohibited',
-  'blocked',
-]
+/**
+ * Extract support codes and safety categories from a Veo error message
+ *
+ * Veo error messages may contain one or more 8-digit support codes,
+ * e.g. "Support codes: 63429089" or "Support codes: 63429089, 90789179"
+ */
+export function parseVeoSupportCodes(message: string): {
+  supportCodes: string[]
+  safetyCategories: string[]
+} {
+  const match = message.match(/Support codes?:\s*([\d,\s]+)/)
+  if (!match) return { supportCodes: [], safetyCategories: [] }
+
+  const supportCodes = match[1]!
+    .split(/[,\s]+/)
+    .map((c) => c.trim())
+    .filter((c) => c.length > 0)
+
+  const safetyCategories = [
+    ...new Set(
+      supportCodes
+        .map((code) => VEO_SUPPORT_CODE_CATEGORIES[code])
+        .filter((c): c is string => !!c),
+    ),
+  ]
+
+  return { supportCodes, safetyCategories }
+}
 
 /**
- * Check if a Veo operation error message indicates a safety/policy violation
+ * gRPC status codes relevant to Veo operation errors
+ *
+ * operation.error.code uses gRPC codes (not HTTP):
+ * - gRPC 8 (RESOURCE_EXHAUSTED) = HTTP 429 Too Many Requests
+ * - gRPC 7 (PERMISSION_DENIED)  = HTTP 403 Forbidden
  */
-export function isVeoSafetyError(message: string): boolean {
-  const lower = message.toLowerCase()
-  return SAFETY_ERROR_PATTERNS.some((pattern) => lower.includes(pattern))
+const GRPC_RESOURCE_EXHAUSTED = 8 // HTTP 429
+const GRPC_PERMISSION_DENIED = 7 // HTTP 403
+
+/**
+ * Classify and throw for a Veo operation error (operation.error is set)
+ *
+ * Classification order (most specific → least specific):
+ * 1. Support codes present → SAFETY_FILTERED (with categories)
+ * 2. gRPC RESOURCE_EXHAUSTED (8) → API_ERROR (rate limit)
+ * 3. gRPC PERMISSION_DENIED (7) → API_ERROR (config issue)
+ * 4. PUBLIC_ERROR_MINOR in message → API_ERROR (transient model error)
+ * 5. Everything else → generic Error
+ */
+export function handleVeoOperationError(
+  operationError: Record<string, unknown>,
+  operationResponse?: unknown,
+): never {
+  const errorMessage =
+    (operationError['message'] as string) ?? 'Unknown error'
+  const errorCode = operationError['code'] as number | undefined
+
+  logger.warn('[AIVideoGenerate] Operation error', {
+    operationError,
+    operationResponse: operationResponse ?? null,
+  })
+
+  // 1. Support codes → SAFETY_FILTERED
+  const { supportCodes, safetyCategories } =
+    parseVeoSupportCodes(errorMessage)
+
+  if (supportCodes.length > 0) {
+    const error = new AiTransformError(
+      `Video generation blocked by safety policy: ${errorMessage}`,
+      'SAFETY_FILTERED',
+    )
+    error.metadata = {
+      supportCodes,
+      ...(safetyCategories.length > 0 && { safetyCategories }),
+    }
+    throw error
+  }
+
+  // 2. Rate limit (gRPC RESOURCE_EXHAUSTED)
+  if (errorCode === GRPC_RESOURCE_EXHAUSTED) {
+    throw new AiTransformError(
+      `Video generation rate limited: ${errorMessage}`,
+      'API_ERROR',
+    )
+  }
+
+  // 3. Permission denied (gRPC PERMISSION_DENIED)
+  if (errorCode === GRPC_PERMISSION_DENIED) {
+    throw new AiTransformError(
+      `Video generation permission denied: ${errorMessage}`,
+      'API_ERROR',
+    )
+  }
+
+  // 4. Transient model error
+  if (errorMessage.includes('PUBLIC_ERROR_MINOR')) {
+    throw new AiTransformError(
+      `Video generation model error: ${errorMessage}`,
+      'API_ERROR',
+    )
+  }
+
+  // 5. Fallback
+  throw new Error(`Video generation failed: ${errorMessage}`)
+}
+
+/**
+ * Check for RAI-filtered response (no generated videos but RAI indicators present)
+ *
+ * Throws AiTransformError with SAFETY_FILTERED if the response was filtered.
+ * Throws generic Error if no videos and no RAI indicators.
+ */
+export function handleNoGeneratedVideos(response: {
+  raiMediaFilteredCount?: number
+  raiMediaFilteredReasons?: string[]
+}): never {
+  const raiMediaFilteredCount = response.raiMediaFilteredCount ?? 0
+  const raiMediaFilteredReasons = response.raiMediaFilteredReasons ?? []
+
+  if (raiMediaFilteredCount > 0 || raiMediaFilteredReasons.length > 0) {
+    const reasons =
+      raiMediaFilteredReasons.length > 0
+        ? raiMediaFilteredReasons.join(', ')
+        : 'unknown'
+    const error = new AiTransformError(
+      `Video was filtered by safety policy: ${reasons}`,
+      'SAFETY_FILTERED',
+    )
+    error.metadata = {
+      raiMediaFilteredCount,
+      raiMediaFilteredReasons,
+    }
+    throw error
+  }
+
+  throw new Error('No generated videos in Veo response')
 }
 
 /**
  * Extract the video GCS URI from a completed operation
  *
- * Validates the operation completed successfully and was not filtered.
+ * Orchestrates error classification:
+ * 1. operation.error → handleVeoOperationError (support codes → SAFETY_FILTERED)
+ * 2. No generated videos → handleNoGeneratedVideos (RAI filters → SAFETY_FILTERED)
+ * 3. Valid response → extract URI
  */
 export function extractVideoUri(
   operation: Awaited<
@@ -409,50 +533,16 @@ export function extractVideoUri(
   >,
 ): string {
   if (operation.error) {
-    const errorMessage =
-      (operation.error['message'] as string) ?? 'Unknown error'
-
-    logger.warn('[AIVideoGenerate] Operation error', {
-      operationError: operation.error,
-      operationResponse: operation.response ?? null,
-    })
-
-    if (isVeoSafetyError(errorMessage)) {
-      const error = new AiTransformError(
-        `Video generation blocked by safety policy: ${errorMessage}`,
-        'SAFETY_FILTERED',
-      )
-      error.metadata = { operationError: operation.error }
-      throw error
-    }
-
-    throw new Error(`Video generation failed: ${errorMessage}`)
+    handleVeoOperationError(
+      operation.error as Record<string, unknown>,
+      operation.response,
+    )
   }
 
-  const response = operation.response
-  const generatedVideo = response?.generatedVideos?.[0]
+  const generatedVideo = operation.response?.generatedVideos?.[0]
 
   if (!generatedVideo) {
-    const raiMediaFilteredCount = response?.raiMediaFilteredCount ?? 0
-    const raiMediaFilteredReasons = response?.raiMediaFilteredReasons ?? []
-
-    if (raiMediaFilteredCount > 0 || raiMediaFilteredReasons.length > 0) {
-      const reasons =
-        raiMediaFilteredReasons.length > 0
-          ? raiMediaFilteredReasons.join(', ')
-          : 'unknown'
-      const error = new AiTransformError(
-        `Video was filtered by safety policy: ${reasons}`,
-        'SAFETY_FILTERED',
-      )
-      error.metadata = {
-        raiMediaFilteredCount,
-        raiMediaFilteredReasons,
-      }
-      throw error
-    }
-
-    throw new Error('No generated videos in Veo response')
+    handleNoGeneratedVideos(operation.response ?? {})
   }
 
   const videoUri = generatedVideo.video?.uri
