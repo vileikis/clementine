@@ -61,6 +61,8 @@ describe('checkPromptBlocked', () => {
       },
     } as GenerateContentResponse
 
+    expect(() => checkPromptBlocked(response)).toThrow(AiTransformError)
+
     try {
       checkPromptBlocked(response)
     } catch (e) {
@@ -151,6 +153,8 @@ describe('throwNoImageError', () => {
         { category: 'HARM_CATEGORY_HATE_SPEECH', probability: 'LOW', blocked: false },
       ],
     } as unknown as Candidate
+
+    expect(() => throwNoImageError(candidate)).toThrow(AiTransformError)
 
     try {
       throwNoImageError(candidate)

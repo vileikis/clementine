@@ -65,6 +65,8 @@ describe('extractVideoUri', () => {
       },
     })
 
+    expect(() => extractVideoUri(operation)).toThrow(AiTransformError)
+
     try {
       extractVideoUri(operation)
     } catch (e) {
