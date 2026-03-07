@@ -77,7 +77,7 @@ describe('handleVeoOperationError', () => {
     }
   })
 
-  it('includes supportCodes but omits safetyCategories when codes are unknown', () => {
+  it('includes empty safetyCategories when support codes are unknown', () => {
     const operationError = {
       code: 3,
       message: 'Error. Support codes: 99999999',
@@ -92,8 +92,10 @@ describe('handleVeoOperationError', () => {
     } catch (e) {
       const err = e as AiTransformError
       expect(err.code).toBe('SAFETY_FILTERED')
-      expect(err.metadata).toEqual({ supportCodes: ['99999999'] })
-      expect(err.metadata!['safetyCategories']).toBeUndefined()
+      expect(err.metadata).toEqual({
+        supportCodes: ['99999999'],
+        safetyCategories: [],
+      })
     }
   })
 
@@ -182,7 +184,33 @@ describe('handleVeoOperationError', () => {
 // =============================================================================
 
 describe('handleNoGeneratedVideos', () => {
-  it('throws AiTransformError with SAFETY_FILTERED when RAI filter reasons present', () => {
+  it('extracts support codes and categories from reason strings', () => {
+    const reason =
+      "1 videos were filtered out because they violated Vertex AI's usage guidelines. Support codes: 17301594"
+
+    expect(() =>
+      handleNoGeneratedVideos({
+        raiMediaFilteredCount: 1,
+        raiMediaFilteredReasons: [reason],
+      }),
+    ).toThrow(AiTransformError)
+
+    try {
+      handleNoGeneratedVideos({
+        raiMediaFilteredCount: 1,
+        raiMediaFilteredReasons: [reason],
+      })
+    } catch (e) {
+      const err = e as AiTransformError
+      expect(err.code).toBe('SAFETY_FILTERED')
+      expect(err.metadata!['supportCodes']).toEqual(['17301594'])
+      expect(err.metadata!['safetyCategories']).toEqual(['child_safety'])
+      expect(err.metadata!['raiMediaFilteredCount']).toBe(1)
+      expect(err.metadata!['raiMediaFilteredReasons']).toEqual([reason])
+    }
+  })
+
+  it('throws AiTransformError with SAFETY_FILTERED when RAI filter reasons have no support codes', () => {
     expect(() =>
       handleNoGeneratedVideos({
         raiMediaFilteredCount: 1,
@@ -202,6 +230,8 @@ describe('handleNoGeneratedVideos', () => {
       expect(err.metadata).toEqual({
         raiMediaFilteredCount: 1,
         raiMediaFilteredReasons: ['VIOLENCE', 'SEXUALLY_EXPLICIT'],
+        supportCodes: [],
+        safetyCategories: [],
       })
     }
   })

@@ -434,8 +434,7 @@ export function handleVeoOperationError(
   operationError: Record<string, unknown>,
   operationResponse?: unknown,
 ): never {
-  const errorMessage =
-    (operationError['message'] as string) ?? 'Unknown error'
+  const errorMessage = (operationError['message'] as string) ?? 'Unknown error'
   const errorCode = operationError['code'] as number | undefined
 
   logger.warn('[AIVideoGenerate] Operation error', {
@@ -444,8 +443,7 @@ export function handleVeoOperationError(
   })
 
   // 1. Support codes → SAFETY_FILTERED
-  const { supportCodes, safetyCategories } =
-    parseVeoSupportCodes(errorMessage)
+  const { supportCodes, safetyCategories } = parseVeoSupportCodes(errorMessage)
 
   if (supportCodes.length > 0) {
     const error = new AiTransformError(
@@ -454,7 +452,7 @@ export function handleVeoOperationError(
     )
     error.metadata = {
       supportCodes,
-      ...(safetyCategories.length > 0 && { safetyCategories }),
+      safetyCategories,
     }
     throw error
   }
@@ -501,6 +499,11 @@ export function handleNoGeneratedVideos(response: {
   const raiMediaFilteredReasons = response.raiMediaFilteredReasons ?? []
 
   if (raiMediaFilteredCount > 0 || raiMediaFilteredReasons.length > 0) {
+    // Reason strings can contain support codes (e.g. "...Support codes: 17301594")
+    const { supportCodes, safetyCategories } = parseVeoSupportCodes(
+      raiMediaFilteredReasons.join(' '),
+    )
+
     const reasons =
       raiMediaFilteredReasons.length > 0
         ? raiMediaFilteredReasons.join(', ')
@@ -512,6 +515,8 @@ export function handleNoGeneratedVideos(response: {
     error.metadata = {
       raiMediaFilteredCount,
       raiMediaFilteredReasons,
+      supportCodes,
+      safetyCategories,
     }
     throw error
   }
