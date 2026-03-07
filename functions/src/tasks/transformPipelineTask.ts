@@ -22,7 +22,7 @@ import {
   createJobError,
   SANITIZED_ERROR_MESSAGES,
 } from '../repositories/job'
-import type { Job, JobOutput } from '@clementine/shared'
+import type { Job, JobError, JobOutput } from '@clementine/shared'
 import { AiTransformError } from '../services/ai/providers/types'
 import { runOutcome, type OutcomeContext } from '../services/transform'
 import { logMemoryUsage } from '../services/transform/helpers'
