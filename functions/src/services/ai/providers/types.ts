@@ -12,7 +12,7 @@ export interface AiTransformConfig {
   /** AI provider identifier (currently only 'google' supported) */
   provider: 'google';
 
-  /** Model name (e.g., 'gemini-3-pro-image-preview', 'gemini-2.5-flash') */
+  /** Model name (e.g., 'gemini-2.5-flash-image', 'gemini-3.1-flash-image-preview') */
   model: string;
 
   /** Transformation prompt describing desired output */

@@ -149,18 +149,15 @@ export async function aiGenerateImage(
 /**
  * Get Vertex AI location for model
  *
- * Some Gemini models require specific locations:
- * - gemini-2.5-flash-image: Uses VERTEX_AI_LOCATION env var
- * - gemini-3-pro-image-preview: Requires "global" location
+ * Some Gemini models require specific locations.
+ * Models not listed use the VERTEX_AI_LOCATION env var.
  */
+const MODEL_LOCATIONS: Record<string, string> = {
+  'gemini-3.1-flash-image-preview': 'global',
+}
+
 function getLocationForModel(model: string): string {
-  if (
-    model === 'gemini-3-pro-image-preview' ||
-    model === 'gemini-3.1-flash-image-preview'
-  ) {
-    return 'global'
-  }
-  return VERTEX_AI_LOCATION.value()
+  return MODEL_LOCATIONS[model] ?? VERTEX_AI_LOCATION.value()
 }
 
 /**
